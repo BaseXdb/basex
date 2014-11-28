@@ -12,7 +12,7 @@ import org.basex.util.*;
  */
 public abstract class Stemmer extends LanguageImpl {
   /** List of available stemmers. */
-  static final LinkedList<Stemmer> IMPL = new LinkedList<>();
+  static final ArrayList<Stemmer> IMPL = new ArrayList<>();
 
   /** Load stemmers and order them by precedence. */
   static {

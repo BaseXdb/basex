@@ -19,9 +19,9 @@ final class DataFTBuilder {
   /** Dots. */
   private static final byte[] DOTS = token(Text.DOTS);
   /** Full-text position data. */
-  private final FTPosData ftpos;
+  private final FTPosData pos;
   /** Length of full-text extract. */
-  private final int ftlen;
+  private final int len;
 
   /**
    * Constructor.
@@ -29,8 +29,8 @@ final class DataFTBuilder {
    * @param len length of extract
    */
   DataFTBuilder(final FTPosData pos, final int len) {
-    ftpos = pos;
-    ftlen = len;
+    this.pos = pos;
+    this.len = len;
   }
 
   /**
@@ -49,30 +49,30 @@ final class DataFTBuilder {
 
   /**
    * Builds full-text information.
-   * @param d data reference
-   * @param p pre value
-   * @param str string value
+   * @param data data reference
+   * @param pre pre value
+   * @param string string value
    * @return number of added nodes
    */
-  private TokenList build(final Data d, final int p, final byte[] str) {
-    final FTPos ftp = ftpos.get(d, p);
+  private TokenList build(final Data data, final int pre, final byte[] string) {
+    final FTPos ftp = pos.get(data, pre);
     if(ftp == null) return null;
 
     boolean marked = false;
     final TokenList tl = new TokenList();
     final TokenBuilder tb = new TokenBuilder();
-    final FTLexer lex = new FTLexer().sc().init(str);
-    int len = -ftlen;
+    final FTLexer lex = new FTLexer().all().init(string);
+    int ln = -len;
     while(lex.hasNext()) {
       final FTSpan span = lex.next();
       // check if current text is still to be marked or already marked
       if(ftp.contains(span.pos) || marked) {
         if(!tb.isEmpty()) {
           // write current text node
-          len += tb.size();
+          ln += tb.size();
           tl.add(tb.next());
           // skip construction
-          if(len >= 0 && tl.size() > 1 && !marked) break;
+          if(ln >= 0 && tl.size() > 1 && !marked) break;
         }
         if(!marked) tl.add((byte[]) null);
         marked ^= true;
@@ -82,40 +82,43 @@ final class DataFTBuilder {
     }
     // write last text node
     if(!tb.isEmpty()) {
-      len += tb.size();
+      ln += tb.size();
       tl.add(tb.finish());
     }
 
     // chop first and last text
-    if(len > 0) {
+    if(ln > 0) {
       final int ts = tl.size();
       // get first text (empty if it is a full-text match)
       final byte[] first = tl.get(0) != null ? tl.get(0) : EMPTY;
+      final int firstl = first.length;
       // get last text (empty if it is a full-text match)
       final byte[] last = tl.get(ts - 2) != null ? tl.get(ts - 1) : EMPTY;
+      final int lastl = last.length;
 
+      // remove leading characters of first text
       if(first != EMPTY) {
-        // remove leading characters of first text
-        final double l = first.length + last.length;
-        final int ll = Math.min(first.length, (int) (first.length / l * len));
-        tl.set(0, concat(DOTS, subtoken(first, ll)));
-        len -= ll;
+        final double fl = firstl + lastl;
+        final int l = Math.min(firstl, (int) (firstl / fl * ln));
+        tl.set(0, concat(DOTS, subtoken(first, l)));
+        ln -= l;
       }
-      if(last != EMPTY && len > 0) {
-        // remove trailing characters of last text
-        final int ll = Math.min(last.length, len);
-        tl.set(ts - 1, concat(subtoken(last, 0, last.length - ll), DOTS));
-        len -= ll;
+      // remove trailing characters of last text
+      if(last != EMPTY && ln > 0) {
+        final int ll = Math.min(lastl, ln);
+        tl.set(ts - 1, concat(subtoken(last, 0, lastl - ll), DOTS));
+        ln -= ll;
       }
       // still too much text: shorten inner texts
-      for(int t = ts - 2; t > 0 && len > 0; t--) {
+      for(int t = ts - 2; t > 0 && ln > 0; t--) {
         final byte[] txt = tl.get(t);
         // skip elements, marked texts and too short text snippets
         if(txt == null || tl.get(t - 1) == null) continue;
-        final int ll = Math.min(txt.length, len);
-        tl.set(t, concat(subtoken(txt, 0, (txt.length - ll) / 2), DOTS,
-                subtoken(txt, (txt.length + ll) / 2)));
-        len -= ll;
+        final int txtl = txt.length;
+        final int ll = Math.min(txtl, ln);
+        tl.set(t, concat(subtoken(txt, 0, (txtl - ll) / 2), DOTS,
+                subtoken(txt, (txtl + ll) / 2)));
+        ln -= ll;
       }
     }
     return tl;

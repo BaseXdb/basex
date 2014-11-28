@@ -76,7 +76,7 @@ final class MapRenderer {
 
     // get index on first pre value
     int ll = 0;
-    final FTLexer lex = new FTLexer().sc().init(s);
+    final FTLexer lex = new FTLexer().all().init(s);
     while(lex.hasNext()) {
       final FTSpan span = lex.next();
       byte[] tok = span.text;
@@ -117,8 +117,7 @@ final class MapRenderer {
 
       if(draw) {
         // color each full-text hit
-        g.setColor(r.pos != null && r.pos.contains(span.pos) &&
-            !span.special ? GREEN : textc);
+        g.setColor(r.pos != null && r.pos.contains(span.pos) && !span.del ? GREEN : textc);
         g.drawString(string(tok), xx + ll, yy);
       }
       ll += wl;

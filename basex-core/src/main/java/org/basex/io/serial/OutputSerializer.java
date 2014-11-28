@@ -302,10 +302,10 @@ public abstract class OutputSerializer extends Serializer {
         print(CDATA_C);
       }
     } else {
-      final FTLexer lex = new FTLexer().sc().init(value);
+      final FTLexer lex = new FTLexer().all().init(value);
       while(lex.hasNext()) {
         final FTSpan span = lex.next();
-        if(!span.special && ftp.contains(span.pos)) print((char) TokenBuilder.MARK);
+        if(!span.del && ftp.contains(span.pos)) print((char) TokenBuilder.MARK);
         final byte[] text = span.text;
         final int tl = text.length;
         for(int t = 0; t < tl; t += cl(text, t)) encode(cp(text, t));

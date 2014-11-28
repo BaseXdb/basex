@@ -15,19 +15,19 @@ public final class FTSpan {
   public byte[] text;
   /** Token position. */
   public final int pos;
-  /** Special character flag. */
-  public final boolean special;
+  /** Delimiter flag. */
+  public final boolean del;
 
   /**
    * Constructor.
    * @param text token text
    * @param pos number of tokens parsed before the current token
-   * @param special is a special character
+   * @param del the token contains delimiters
    */
-  FTSpan(final byte[] text, final int pos, final boolean special) {
+  FTSpan(final byte[] text, final int pos, final boolean del) {
     this.text = text;
     this.pos = pos;
-    this.special = special;
+    this.del = del;
   }
 
   @Override

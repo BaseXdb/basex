@@ -10,10 +10,10 @@ import java.util.*;
  */
 public abstract class Tokenizer extends LanguageImpl {
   /** List of available tokenizers. */
-  public static final LinkedList<Tokenizer> IMPL = new LinkedList<>();
+  public static final ArrayList<Tokenizer> IMPL = new ArrayList<>();
 
-  /** Are special characters included? */
-  boolean special;
+  /** Also return non-fulltext tokens. */
+  boolean all;
 
   /** Load tokenizer classes and order them by precedence. */
   static {
@@ -40,8 +40,8 @@ public abstract class Tokenizer extends LanguageImpl {
   abstract Tokenizer get(final FTOpt f);
 
   /**
-   * Gets full-text info for the specified token; needed for visualizations.
-   * Does not have to be implemented by all tokenizers.
+   * Gets full-text info for the specified token.
+   * Needed for visualizations; does not have to be implemented by all tokenizers.
    * <ul>
    * <li/>int[0]: length of each token
    * <li/>int[1]: sentence info, length of each sentence
@@ -56,9 +56,9 @@ public abstract class Tokenizer extends LanguageImpl {
   }
 
   /**
-   * Checks if current token is a paragraph. Does not have to be implemented
-   * by all tokenizers. Returns false if not implemented.
-   * @return whether current token is a paragraph
+   * Checks if current token is a paragraph.
+   * Needed for visualizations; Does not have to be implemented by all tokenizers.
+   * @return whether current token is a paragraph, or {@code false} if not implemented.
    */
   boolean paragraph() {
     return false;

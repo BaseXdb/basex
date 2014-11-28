@@ -276,19 +276,8 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
     final TokenBuilder tb = new TokenBuilder(Util.className(this) + '[');
     for(int i = 0; i < size; ++i) {
       if(i != 0) tb.add(", ");
-      tb.add(list[i]);
+      tb.addExt(list[i]);
     }
     return tb.add(']').toString();
-  }
-
-  /**
-   * Creates a copy of this list.
-   * @return copy of this list
-   */
-  public TokenList copy() {
-    final TokenList tl = new TokenList(list.length);
-    tl.factor = factor;
-    for(int i = 0; i < size; i++) tl.add(list[i].clone());
-    return tl;
   }
 }

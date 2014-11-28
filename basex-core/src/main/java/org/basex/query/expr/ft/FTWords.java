@@ -425,7 +425,7 @@ public final class FTWords extends FTExpr {
     final FTWords ftw = new FTWords(info, query.copy(qc, scp, vs), mode,
         occ == null ? null : Arr.copyAll(qc, scp, vs, occ));
     if(ftt != null) ftw.ftt = ftt.copy(ftw);
-    if(tokens != null) ftw.tokens = tokens.copy();
+    ftw.tokens = tokens;
     ftw.data = data;
     ftw.first = first;
     ftw.pos = pos;

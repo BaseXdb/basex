@@ -54,7 +54,7 @@ public final class FTLexer extends FTIterator implements IndexToken {
     if(lang == null) lang = Language.def();
 
     // use default tokenizer if specific tokenizer is not available.
-    Tokenizer tk = Tokenizer.IMPL.getFirst();
+    Tokenizer tk = Tokenizer.IMPL.get(0);
     for(final Tokenizer t : Tokenizer.IMPL) {
       if(t.supports(lang)) {
         tk = t;
@@ -68,7 +68,7 @@ public final class FTLexer extends FTIterator implements IndexToken {
     if(ftoptions != null && ftoptions.is(FTFlag.ST)) {
       if(ftoptions.sd == null) {
         // use default stemmer if specific stemmer is not available.
-        Stemmer st = Stemmer.IMPL.getFirst();
+        Stemmer st = Stemmer.IMPL.get(0);
         for(final Stemmer stem : Stemmer.IMPL) {
           if(stem.supports(lang)) {
             st = stem;
@@ -83,12 +83,11 @@ public final class FTLexer extends FTIterator implements IndexToken {
   }
 
   /**
-   * Sets the special character flag.
-   * Returns not only tokens, but also delimiters.
+   * If called, all tokens will be returned (including non-fulltext tokens).
    * @return self reference
    */
-  public FTLexer sc() {
-    tok.special = true;
+  public FTLexer all() {
+    tok.all = true;
     return this;
   }
 
@@ -186,7 +185,8 @@ public final class FTLexer extends FTIterator implements IndexToken {
   }
 
   /**
-   * Is paragraph? Does not have to be implemented by all tokenizers.
+   * Returns if the current token starts a new paragraph. Needed for visualizations.
+   * Does not have to be implemented by all tokenizers.
    * Returns false if not implemented.
    * @return boolean
    */
@@ -206,8 +206,8 @@ public final class FTLexer extends FTIterator implements IndexToken {
   }
 
   /**
-   * Gets full-text info for the specified token; needed for visualizations.
-   * See {@link Tokenizer#info()} for more info.
+   * Gets full-text info for the specified token.
+   * Needed for visualizations; see {@link Tokenizer#info()} for more info.
    * @return int arrays or empty array if not implemented
    */
   public int[][] info() {
