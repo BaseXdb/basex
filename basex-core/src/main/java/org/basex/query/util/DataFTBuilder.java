@@ -2,12 +2,13 @@ package org.basex.query.util;
 
 import static org.basex.util.Token.*;
 
+import java.util.*;
+
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
-import org.basex.util.list.*;
 
 /**
  * Class for constructing decorated full-text nodes.
@@ -35,92 +36,114 @@ final class DataFTBuilder {
 
   /**
    * Builds full-text information.
-   * @param nd node to be added
-   * @return number of added nodes
+   * @param node node to be added
+   * @return added strings, or {@code null} if no full-text positions exist
    */
-  TokenList build(final ANode nd) {
-    // check full-text mode
-    if(!(nd instanceof DBNode)) return null;
+  ArrayList<DataFTMarker> build(final ANode node) {
+    // only database nodes can have full-text positions
+    if(!(node instanceof DBNode)) return null;
 
-    // check if full-text data exists for the current node
-    final DBNode node = (DBNode) nd;
-    return build(node.data, node.pre, nd.string());
-  }
-
-  /**
-   * Builds full-text information.
-   * @param data data reference
-   * @param pre pre value
-   * @param string string value
-   * @return number of added nodes
-   */
-  private TokenList build(final Data data, final int pre, final byte[] string) {
-    final FTPos ftp = pos.get(data, pre);
+    // not all nodes have full-text positions
+    final DBNode dbnode = (DBNode) node;
+    final FTPos ftp = pos.get(dbnode.data, dbnode.pre);
     if(ftp == null) return null;
 
-    boolean marked = false;
-    final TokenList tl = new TokenList();
-    final TokenBuilder tb = new TokenBuilder();
-    final FTLexer lex = new FTLexer().all().init(string);
-    int ln = -len;
-    while(lex.hasNext()) {
+    final ArrayList<DataFTMarker> marks = new ArrayList<>();
+    final TokenBuilder token = new TokenBuilder();
+    // indicates if the currently parsed text is marked
+    final byte[] string = node.string();
+    for(final FTLexer lex = new FTLexer().all().init(string); lex.hasNext();) {
       final FTSpan span = lex.next();
       // check if current text is still to be marked or already marked
-      if(ftp.contains(span.pos) || marked) {
-        if(!tb.isEmpty()) {
-          // write current text node
-          ln += tb.size();
-          tl.add(tb.next());
-          // skip construction
-          if(ln >= 0 && tl.size() > 1 && !marked) break;
-        }
-        if(!marked) tl.add((byte[]) null);
-        marked ^= true;
+      if(!span.del && ftp.contains(span.pos)) {
+        // write current text node
+        if(!token.isEmpty()) marks.add(new DataFTMarker(token.next(), false));
+        marks.add(new DataFTMarker(span.text, true));
+      } else {
+        // add span
+        token.add(span.text);
       }
-      // add span
-      tb.add(span.text);
     }
     // write last text node
-    if(!tb.isEmpty()) {
-      ln += tb.size();
-      tl.add(tb.finish());
-    }
+    if(!token.isEmpty()) marks.add(new DataFTMarker(token.finish(), false));
 
-    // chop first and last text
+    // chop text
+    int ln = -len + string.length;
     if(ln > 0) {
-      final int ts = tl.size();
-      // get first text (empty if it is a full-text match)
-      final byte[] first = tl.get(0) != null ? tl.get(0) : EMPTY;
-      final int firstl = first.length;
-      // get last text (empty if it is a full-text match)
-      final byte[] last = tl.get(ts - 2) != null ? tl.get(ts - 1) : EMPTY;
-      final int lastl = last.length;
+      final int ms = marks.size();
+      final DataFTMarker first = marks.get(0);
+      final int firstl = first.mark ? 0 : first.token.length;
+      final DataFTMarker last = marks.get(ms - 1);
+      final int lastl = last.mark ? 0 : last.token.length;
 
       // remove leading characters of first text
-      if(first != EMPTY) {
-        final double fl = firstl + lastl;
-        final int l = Math.min(firstl, (int) (firstl / fl * ln));
-        tl.set(0, concat(DOTS, subtoken(first, l)));
+      if(!first.mark) {
+        final int l = Math.min(firstl, (int) ((long) ln * firstl / (firstl + lastl)));
+        if(l > 0) {
+          first.token = concat(DOTS, subtoken(first.token, l));
+          ln -= l;
+        }
+      }
+
+      // remove trailing characters of last text
+      if(!last.mark && ln > 0) {
+        final int l = Math.min(lastl, ln);
+        last.token = concat(subtoken(last.token, 0, lastl - l), DOTS);
         ln -= l;
       }
-      // remove trailing characters of last text
-      if(last != EMPTY && ln > 0) {
-        final int ll = Math.min(lastl, ln);
-        tl.set(ts - 1, concat(subtoken(last, 0, lastl - ll), DOTS));
-        ln -= ll;
-      }
+
       // still too much text: shorten inner texts
-      for(int t = ts - 2; t > 0 && ln > 0; t--) {
-        final byte[] txt = tl.get(t);
-        // skip elements, marked texts and too short text snippets
-        if(txt == null || tl.get(t - 1) == null) continue;
-        final int txtl = txt.length;
-        final int ll = Math.min(txtl, ln);
-        tl.set(t, concat(subtoken(txt, 0, (txtl - ll) / 2), DOTS,
-                subtoken(txt, (txtl + ll) / 2)));
-        ln -= ll;
+      for(int m = ms - 2; m > 0 && ln > 0; m--) {
+        final DataFTMarker dm = marks.get(m);
+        // skip elements
+        if(dm.mark) continue;
+        final int txtl = dm.token.length;
+        final int l = Math.min(txtl, ln);
+        dm.token = concat(subtoken(dm.token, 0, (txtl - l) / 2), DOTS,
+                subtoken(dm.token, (txtl + l) / 2));
+        ln -= l;
+      }
+
+      // still too much text: remove hits
+      for(int m = ms - 1; m >= 0 && ln > 0; m--) {
+        DataFTMarker dm = marks.get(m);
+        if(dm.mark) ln -= marks.remove(m).token.length;
+      }
+
+      // merge adjacent text nodes
+      for(int m = marks.size() - 2; m >= 0; m--) {
+        DataFTMarker dm1 = marks.get(m), dm2 = marks.get(m + 1);
+        if(!dm1.mark && !dm2.mark) {
+          if(!(eq(dm1.token, DOTS) && eq(dm2.token, DOTS))) {
+            dm1.token = concat(dm1.token, dm2.token);
+          }
+          marks.remove(m + 1);
+        }
       }
     }
-    return tl;
+    return marks;
+  }
+
+  /** Data full-text marker. */
+  static class DataFTMarker {
+    /** Token. */
+    byte[] token;
+    /** Marker flag. */
+    boolean mark;
+
+    /**
+     * Constructor.
+     * @param token text
+     * @param mark marker flag
+     */
+    DataFTMarker(final byte[] token, final boolean mark) {
+      this.token = token;
+      this.mark = mark;
+    }
+
+    @Override
+    public String toString() {
+      return string(token) + " (" + mark + ")";
+    }
   }
 }

@@ -85,7 +85,7 @@ public final class FTPosData {
     if(size != ft.size) return false;
     for(int i = 0; i < size; ++i) {
       if(pos[i].pre != ft.pos[i].pre || !Arrays.equals(
-          pos[i].poss.toArray(), ft.pos[i].poss.toArray())) return false;
+          pos[i].list.toArray(), ft.pos[i].list.toArray())) return false;
     }
     return true;
   }

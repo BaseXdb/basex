@@ -2,15 +2,17 @@ package org.basex.query.util;
 
 import static org.basex.util.Token.*;
 
+import java.util.*;
+
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.DataFTBuilder.DataFTMarker;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Class for building memory-based database nodes.
@@ -24,26 +26,26 @@ public final class DataBuilder {
   /** Full-text position data. */
   private DataFTBuilder ftbuilder;
   /** Index reference of marker element. */
-  private int marker;
+  private int name;
 
   /**
    * Constructor.
-   * @param md target data
+   * @param data target data
    */
-  public DataBuilder(final MemData md) {
-    data = md;
+  public DataBuilder(final MemData data) {
+    this.data = data;
   }
 
   /**
    * Attaches full-text position data.
-   * @param name name of marker element
+   * @param nm name of marker element
    * @param pos full-text position data
    * @param len length of extract
    * @return self reference
    */
-  public DataBuilder ftpos(final byte[] name, final FTPosData pos, final int len) {
+  public DataBuilder ftpos(final byte[] nm, final FTPosData pos, final int len) {
     ftbuilder = new DataFTBuilder(pos, len);
-    marker = data.elemNames.index(name, null, false);
+    name = data.elemNames.index(nm, null, false);
     return this;
   }
 
@@ -138,9 +140,9 @@ public final class DataBuilder {
    */
   private int addText(final ANode node, final int pre, final int par, final ANode pNode) {
     // check full-text mode
-    final int dist = pre - par;
-    final TokenList tl = ftbuilder != null ? ftbuilder.build(node) : null;
-    if(tl == null) return pre + addText(node.string(), dist);
+    int dist = pre - par;
+    final ArrayList<DataFTMarker> marks = ftbuilder != null ? ftbuilder.build(node) : null;
+    if(marks == null) return pre + addText(node.string(), dist);
 
     // adopt namespace from parent
     ANode p = pNode;
@@ -149,20 +151,18 @@ public final class DataBuilder {
       if(n != null && !n.hasPrefix()) break;
       p = p.parent();
     }
-    int u = 0;
-    if(p != null) u = data.nspaces.uri(p.name(), true);
+    final int u = p == null ? 0 : data.nspaces.uri(p.name(), true);
 
-    final int ts = tl.size();
-    for(int t = 0; t < ts; t++) {
-      byte[] text = tl.get(t);
-      final boolean elem = text == null;
-      if(elem) {
+    int ts = marks.size();
+    for(final DataFTMarker marker : marks) {
+      if(marker.mark) {
         // open element
-        data.elem(dist + t, marker, 1, 2, u, false);
+        data.elem(dist++, name, 1, 2, u, false);
         data.insert(data.meta.size);
-        text = tl.get(++t);
+        ts++;
       }
-      addText(text, elem ? 1 : dist + t);
+      addText(marker.token, marker.mark ? 1 : dist);
+      dist++;
     }
     return pre + ts;
   }
@@ -226,10 +226,10 @@ public final class DataBuilder {
     for(int n = 0; n < nl; n++) data.nspaces.add(ns.name(n), ns.value(n), ds);
 
     // analyze node name
-    final QNm name = node.qname();
-    final int tn = data.elemNames.index(name.string(), null, false);
+    final QNm nm = node.qname();
+    final int tn = data.elemNames.index(nm.string(), null, false);
     final int s = size(node, false);
-    final int u = data.nspaces.uri(name.uri());
+    final int u = data.nspaces.uri(nm.uri());
 
     // add element node
     data.elem(pre - par, tn, size(node, true), s, u, nl != 0);
@@ -296,11 +296,11 @@ public final class DataBuilder {
       final byte[] uri = md.nspaces.uri(md.uri(pre, kind));
       if(uri == null || !eq(uri, ns)) continue;
 
-      final byte[] name = md.name(pre, kind);
-      if(prefix(name).length == 0) {
+      final byte[] nm = md.name(pre, kind);
+      if(prefix(nm).length == 0) {
         // no prefix: remove namespace from element
         if(kind == Data.ELEM) {
-          md.update(pre, Data.ELEM, name, EMPTY);
+          md.update(pre, Data.ELEM, nm, EMPTY);
           md.nsFlag(pre, false);
         }
       } else {

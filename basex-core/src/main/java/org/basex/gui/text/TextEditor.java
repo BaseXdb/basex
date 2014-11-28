@@ -60,10 +60,12 @@ public final class TextEditor {
    */
   boolean text(final byte[] txt) {
     if(eq(txt, text)) return false;
+    final int tl = txt.length;
     text = txt;
     lines = -1;
     noSelect();
     if(search != null) searchPos = search.search(txt);
+    if(pos > tl) pos = tl;
     return true;
   }
 
