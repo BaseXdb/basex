@@ -18,6 +18,7 @@ attribute            = Атрибут
 attribute_index      = Атрбут индекс
 attributes           = Атрибутууд
 auto_add_chars       = Automatically add characters
+backslashes          = Backslashes
 backup               = Нөөцлөх
 backup_dropped_%     = Нөөцлөлт '%' устгагдсан байна.
 backup_not_found_%   = '%'-нд зориулсан нөөцлөлт байхгүй байна.

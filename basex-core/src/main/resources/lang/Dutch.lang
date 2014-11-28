@@ -18,6 +18,7 @@ attribute            = Attribuut
 attribute_index      = Attribuut index
 attributes           = Attributen
 auto_add_chars       = Voeg automatisch tekens toe
+backslashes          = Backslashes
 backup               = Backup
 backup_dropped_%     = Backup bestanden '%' zijn verwijderd.
 backup_not_found_%   = Geen backup gevonden voor '%'.

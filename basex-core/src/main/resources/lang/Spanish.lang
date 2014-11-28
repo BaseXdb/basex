@@ -18,6 +18,7 @@ attribute            = Atributo
 attribute_index      = Índice del atributo
 attributes           = Atributos
 auto_add_chars       = Añadir caracteres automáticamente
+backslashes          = Backslashes
 backup               = Copia de seguridad
 backup_dropped_%     = Los ficheros de copia de seguridad '%' han sido borrados.
 backup_not_found_%   = No se ha encontrado una copia de seguridad para '%'.

@@ -21,7 +21,7 @@ public class CsvOptions extends Options {
   /** Option: header line. */
   public static final BooleanOption HEADER = new BooleanOption("header", false);
   /** Option: backslash flag . */
-  public static final BooleanOption BACKSLASH = new BooleanOption("backslash", false);
+  public static final BooleanOption BACKSLASHES = new BooleanOption("backslashes", false);
   /** Option: lax conversion of strings to QNames. */
   public static final BooleanOption LAX = new BooleanOption("lax", true);
   /** Option: parse quotes. */

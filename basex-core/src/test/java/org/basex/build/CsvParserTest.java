@@ -136,13 +136,16 @@ public final class CsvParserTest extends SandboxTest {
     final CsvParserOptions copts = context.options.get(MainOptions.CSVPARSER);
     copts.set(CsvOptions.HEADER, true);
 
-    copts.set(CsvOptions.BACKSLASH, false);
+    // "H \n""U\",a@b.c....
+    copts.set(CsvOptions.BACKSLASHES, false);
     new CreateDB(NAME, FILE).execute(context);
+    // H \n"U\
     assertEquals("H \"U\\", new XQuery("normalize-space((//Props)[1])").execute(context));
 
-    copts.set(CsvOptions.BACKSLASH, true);
+    copts.set(CsvOptions.BACKSLASHES, true);
     new CreateDB(NAME, FILE).execute(context);
-    assertEquals("true", new XQuery("starts-with(normalize-space((//Props)[1]), 'H \"\"U\",')").
+    // H \nU,a
+    assertEquals("H U\"", new XQuery("replace(normalize-space((//Props)[1]), ',.*', '')").
         execute(context));
   }
 

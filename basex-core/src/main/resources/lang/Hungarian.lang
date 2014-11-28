@@ -18,6 +18,7 @@ attribute            = Attribútum
 attribute_index      = Attribútum index
 attributes           = Attribútumok
 auto_add_chars       = Automatikus karakter-hozzáadás
+backslashes          = Backslashes
 backup               = Mentés
 backup_dropped_%     = '%' biztonsági mentés fájljai törölve.
 backup_not_found_%   = 'Nem található biztonsági mentés a következőhöz: '%'.

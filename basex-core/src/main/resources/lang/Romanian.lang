@@ -18,6 +18,7 @@ attribute            = Atribut
 attribute_index      = Atribut Index
 attributes           = Atribute
 auto_add_chars       = Automatically add characters
+backslashes          = Backslashes
 backup               = Copie de rezervă
 backup_dropped_%     = Fişierele de rezervă  '%' au fost sterse.
 backup_not_found_%   = Fişierele de rezervă  '%' nu au fost gasite.

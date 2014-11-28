@@ -18,6 +18,7 @@ attribute            = 属性
 attribute_index      = 属性インデックス
 attributes           = 属性
 auto_add_chars       = 自動的に文字を補完
+backslashes          = Backslashes
 backup               = バックアップ
 backup_dropped_%     = バックアップファイル '%' はドロップされました。
 backup_not_found_%   = '%' のバックアップがみつかりませんでした。

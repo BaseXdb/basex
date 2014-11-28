@@ -1139,6 +1139,8 @@ public interface Text {
   String UNESCAPE_CHARS = lang("unescape_chars");
   /** Liberal parsing. */
   String LIBERAL_PARSING = lang("liberal_parsing");
+  /** Backslash. */
+  String BACKSLASHES = lang("backslashes");
 
   /** General info. */
   String GENERAL = lang("general");

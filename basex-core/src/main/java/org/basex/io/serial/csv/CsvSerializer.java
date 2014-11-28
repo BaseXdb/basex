@@ -22,6 +22,8 @@ abstract class CsvSerializer extends OutputSerializer {
   private final int separator;
   /** Generate quotes. */
   private final boolean quotes;
+  /** Generate backslashes. */
+  private final boolean backslashes;
 
   /**
    * Constructor.
@@ -33,6 +35,7 @@ abstract class CsvSerializer extends OutputSerializer {
     super(os, opts);
     copts = opts.get(SerializerOptions.CSV);
     quotes = copts.get(CsvOptions.QUOTES);
+    backslashes = copts.get(CsvOptions.BACKSLASHES);
     separator = copts.separator();
   }
 
@@ -49,15 +52,18 @@ abstract class CsvSerializer extends OutputSerializer {
       if(i != 0) print(separator);
 
       byte[] txt = v == null ? EMPTY : v;
-      if(contains(txt, separator) || quotes && (contains(txt, '\n') || contains(txt, '"'))) {
-        final TokenBuilder tb = new TokenBuilder().add('"');
+      if(contains(txt, separator) || ((quotes || backslashes) &&
+          (contains(txt, '\n') || contains(txt, '"')))) {
+        final TokenBuilder tb = new TokenBuilder();
+        if(quotes) tb.add('"');
         final int len = txt.length;
         for(int c = 0; c < len; c += cl(txt, c)) {
           final int cp = cp(txt, c);
-          if(cp == '"') tb.add('"');
+          if(cp == '"') tb.add(backslashes ? '\\' : '"');
           tb.add(cp);
         }
-        txt = tb.add('"').finish();
+        if(quotes) tb.add('"');
+        txt = tb.finish();
       }
       print(txt);
     }
