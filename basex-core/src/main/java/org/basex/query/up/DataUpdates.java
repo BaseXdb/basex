@@ -175,9 +175,14 @@ final class DataUpdates {
     // execute fn:put operations
     for(final Put put : puts.values()) put.apply();
 
-    // optional: write main memory databases of file instances back to disk
+    /* optional: export file if...
+     * - WRITEBACK option is turned on
+     * - an original file path exists
+     * - data is a main-memory instance
+     * - this data reference is not opened in the current context
+     */
     final String original = data.meta.original;
-    if(data.inMemory() && !original.isEmpty() && writeback) {
+    if(writeback && data.inMemory() && !original.isEmpty() && data != qc.context.data()) {
       try {
         Export.export(data, original, qc.context.options, null);
       } catch(final IOException ex) {
