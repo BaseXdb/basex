@@ -39,37 +39,39 @@ final class Replace extends StructuralUpdate {
    * @return instance
    */
   static Replace getInstance(final Data data, final int pre, final DataClip clip) {
-    final int oldsize = data.size(pre, data.kind(pre));
+    final int kind = data.kind(pre);
+    final int par = data.parent(pre, kind);
+    final int oldsize = data.size(pre, kind);
     final int newsize = clip.size();
     final int sh = newsize - oldsize;
-    return new Replace(pre, sh, sh, pre + oldsize, clip, data.parent(pre, data.kind(pre)));
+    return new Replace(pre, sh, sh, pre + oldsize, clip, par);
   }
 
   @Override
   void apply(final Data data) {
     // [LK] replace optimizations only work without namespaces..
     if(data.nspaces.size() == 0 && clip.data.nspaces.size() == 0) {
-      // Lazy Replace
+      // Lazy Replace: rewrite to value updates if structure has not changed
       if(lazyReplace(data)) return;
-      // Rapid Replace
+      // Rapid Replace: in-place update, overwrite existing table entries
       data.replace(location, clip);
     } else {
-      final int targetKind = data.kind(location);
-      final int targetParent = data.parent(location, targetKind);
+      // fallback: delete old entries, add new ones
+      final int kind = data.kind(location);
+      final int par = data.parent(location, kind);
       // delete first - otherwise insert must be at location+1
       data.delete(location);
-      if(targetKind == Data.ATTR) {
-        data.insertAttr(location, targetParent, clip);
+      if(kind == Data.ATTR) {
+        data.insertAttr(location, par, clip);
       } else {
-        data.insert(location, targetParent, clip);
+        data.insert(location, par, clip);
       }
     }
   }
 
   /**
    * Lazy Replace implementation. Checks if the replace operation can be substituted with
-   * cheaper value updates. If structural changes have to be made no substitution takes
-   * place.
+   * cheaper value updates. If structural changes have to be made no substitution takes place.
    * @param data destination data reference
    * @return true if substitution successful
    */

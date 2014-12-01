@@ -519,8 +519,7 @@ public abstract class Data {
   }
 
   /**
-   * Rapid Replace implementation. Replaces parts of the database with the specified
-   * data instance.
+   * Rapid Replace implementation. Replaces parts of the database with the specified data instance.
    * @param tpre pre value of target node to be replaced
    * @param source clip with source data
    */

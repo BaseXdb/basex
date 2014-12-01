@@ -358,8 +358,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   }
 
   /**
-   * ReplaceElementContent on a target T with a text node and insertBefore
-   * on a child of T.
+   * ReplaceElementContent on a target T with a text node and insertBefore on a child of T.
    */
   @Test
   public void replaceelementcontent3() {
@@ -414,8 +413,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   }
 
   /**
-   * ReplaceNode on a target T and replaceElementContent on the only child of
-   * T.
+   * ReplaceNode on a target T and replaceElementContent on the only child of T.
    */
   @Test
   public void replaceelementcontent8() {
@@ -784,7 +782,7 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Distance caching tested for inserts at different levels.
-   * @throws BaseXException excp
+   * @throws BaseXException exception
    */
   @Test
   public void delayedDistanceAdjustment1() throws BaseXException {
@@ -796,7 +794,7 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Distance caching tested for inserts at different levels.
-   * @throws BaseXException excp
+   * @throws BaseXException exception
    */
   @Test
   public void delayedDistanceAdjustment2() throws BaseXException {
@@ -808,7 +806,7 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Distance caching tested for inserts at different levels.
-   * @throws BaseXException excp
+   * @throws BaseXException exception
    */
   @Test
   public void delayedDistanceAdjustment3() throws BaseXException {
@@ -820,7 +818,7 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Distance caching tested for inserts at different levels.
-   * @throws BaseXException excp
+   * @throws BaseXException exception
    */
   @Test
   public void delayedDistanceAdjustment4() throws BaseXException {
@@ -832,7 +830,7 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Distance caching tested for inserts at different levels.
-   * @throws BaseXException excp
+   * @throws BaseXException exception
    */
   @Test
   public void delayedDistanceAdjustment5() throws BaseXException {
@@ -843,7 +841,7 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Distance caching tested for simple deletes.
-   * @throws BaseXException excp
+   * @throws BaseXException exception
    */
   @Test
   public void delayedDistanceAdjustment6() throws BaseXException {
@@ -854,7 +852,7 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Distance caching tested for simple deletes.
-   * @throws BaseXException excp
+   * @throws BaseXException exception
    */
   @Test
   public void delayedDistanceAdjustment7() throws BaseXException {
@@ -865,7 +863,7 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Distance caching tested for deletes at different levels.
-   * @throws BaseXException excp
+   * @throws BaseXException exception
    */
   @Test
   public void delayedDistanceAdjustment8() throws BaseXException {
@@ -876,7 +874,7 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Distance caching tested for deletes at different levels.
-   * @throws BaseXException excp
+   * @throws BaseXException exception
    */
   @Test
   public void delayedDistanceAdjustment9() throws BaseXException {
@@ -887,7 +885,7 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Distance caching tested for deletes at different levels.
-   * @throws BaseXException excp
+   * @throws BaseXException exception
    */
   @Test
   public void delayedDistanceAdjustment10() throws BaseXException {
@@ -898,7 +896,7 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Distance caching tested for deletes at different levels.
-   * @throws BaseXException excp
+   * @throws BaseXException exception
    */
   @Test
   public void delayedDistanceAdjustment11() throws BaseXException {
@@ -909,7 +907,7 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Distance caching tested for deletes at different levels.
-   * @throws BaseXException excp
+   * @throws BaseXException exception
    */
   @Test
   public void delayedDistanceAdjustment12() throws BaseXException {
@@ -920,7 +918,7 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Distance caching tested for deletes at different levels.
-   * @throws BaseXException excp
+   * @throws BaseXException exception
    */
   @Test
   public void delayedDistanceAdjustment13() throws BaseXException {
@@ -933,7 +931,7 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Distance caching tested for neighboring inserts.
-   * @throws BaseXException excp
+   * @throws BaseXException exception
    */
   @Test
   public void delayedDistanceAdjustment14() throws BaseXException {
@@ -946,7 +944,7 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Distance caching tested for neighboring inserts.
-   * @throws BaseXException excp
+   * @throws BaseXException exception
    */
   @Test
   public void delayedDistanceAdjustment15() throws BaseXException {
@@ -958,7 +956,7 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Distance caching tested for neighboring inserts.
-   * @throws BaseXException excp
+   * @throws BaseXException exception
    */
   @Test
   public void delayedDistanceAdjustment16() throws BaseXException {
@@ -970,7 +968,7 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Tests if pre cache is clear / free of ambiguous entries.
-   * @throws BaseXException excp
+   * @throws BaseXException exception
    */
   @Test
   public void delayedDistanceAdjustment17() throws BaseXException {
@@ -981,7 +979,7 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Tests if pre cache is clear / free of ambiguous entries.
-   * @throws BaseXException excp
+   * @throws BaseXException exception
    */
   @Test
   public void delayedDistanceAdjustment18() throws BaseXException {
@@ -992,7 +990,7 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Tests if pre cache is clear / free of ambiguous entries.
-   * @throws BaseXException excp
+   * @throws BaseXException exception
    */
   @Test
   public void delayedDistanceAdjustment19() throws BaseXException {
@@ -1033,7 +1031,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   /**
    * Testing distance caching when a node is deleted and there have been updates on the
    * descendant axis. Tests effect on following nodes.
-   * @throws BaseXException excp
+   * @throws BaseXException exception
    */
   @Test
   public void delayedDistanceAdjustment22() throws BaseXException {
@@ -1045,7 +1043,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   /**
    * Tests if updates are executed in the correct order and if the sorting of updates
    * is stable.
-   * @throws BaseXException excp
+   * @throws BaseXException exception
    */
   @Test
   public void delayedDistanceAdjustment23() throws BaseXException {
@@ -1056,7 +1054,7 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Tests if reordering of updates works correctly.
-   * @throws BaseXException excp
+   * @throws BaseXException exception
    */
   @Test
   public void delayedDistanceAdjustment24() throws BaseXException {
@@ -1067,7 +1065,7 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Tests if reordering of updates works correctly.
-   * @throws BaseXException excp
+   * @throws BaseXException exception
    */
   @Test
   public void delayedDistanceAdjustment25() throws BaseXException {
