@@ -15,7 +15,7 @@ import org.basex.util.options.*;
  * Replace document primitive.
  *
  * @author BaseX Team 2005-14, BSD License
- * @author Lukas Kircher
+ * @author Christian Gruen
  */
 public class ReplaceDoc extends NodeUpdate {
   /** Container for new database documents. */

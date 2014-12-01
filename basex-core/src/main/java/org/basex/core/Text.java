@@ -55,7 +55,7 @@ public interface Text {
   /** Start information. */
   String  S_LOCALINFO =
     " [-bcdiLoqrRsuvVwxXz] [input]" + NL +
-    "  [input]     Execute input file or expression" + NL +
+    "  [input]     XQuery or command file, or query string" + NL +
     "  -b<pars>    Bind external query variables" + NL +
     "  -c<input>   Execute commands from file or string" + NL +
     "  -d          Activate debugging mode" + NL +
@@ -79,7 +79,7 @@ public interface Text {
   /** Client start information. */
   String S_CLIENTINFO =
     " [-bcdiLnopPqrRsUvVwxz] [input]" + NL +
-    "  [input]     Execute input file or expression" + NL +
+    "  [input]     XQuery or command file, or query string" + NL +
     "  -b<pars>    Bind external query variables" + NL +
     "  -c<input>   Execute commands from file or string" + NL +
     "  -d          Activate debugging mode" + NL +
