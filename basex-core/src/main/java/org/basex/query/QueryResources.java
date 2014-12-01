@@ -374,7 +374,7 @@ public final class QueryResources {
     final Context context = qc.context;
 
     // do not check input if no read permissions are given
-    if(!qc.context.user.has(Perm.READ))
+    if(!context.user.has(Perm.READ))
       throw BXXQ_PERM_X.get(info, Util.info(Text.PERM_REQUIRED_X, Perm.READ));
 
     // check if input is an existing file
@@ -382,10 +382,10 @@ public final class QueryResources {
     if(single && source.isDir()) WHICHRES_X.get(info, baseIO);
 
     // overwrite parsing options with default values
-    final MainOptions mo = new MainOptions(context.options);
     try {
-      final boolean fc = mo.get(MainOptions.FORCECREATE);
-      return addData(CreateDB.create(source.dbname(), new DirParser(source, mo), context, !fc));
+      final boolean mem = !context.options.get(MainOptions.FORCECREATE);
+      final MainOptions opts = new MainOptions(context.options);
+      return addData(CreateDB.create(source.dbname(), new DirParser(source, opts), context, mem));
     } catch(final IOException ex) {
       throw IOERR_X.get(info, ex);
     } finally {

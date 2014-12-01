@@ -29,7 +29,6 @@ public final class XQUTS extends W3CTS {
   public XQUTS(final String[] args) {
     super(args, Util.className(XQUTS.class));
     context.options.set(MainOptions.FORCECREATE, true);
-    context.options.set(MainOptions.MIXUPDATES, false);
   }
 
   @Override
