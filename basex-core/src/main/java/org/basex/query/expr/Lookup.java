@@ -45,7 +45,7 @@ public final class Lookup extends Arr {
     final ValueBuilder vb = new ValueBuilder();
     for(final Item ctx : exprs.length == 1 ? ctxValue(qc) : qc.value(exprs[1])) {
       final boolean map = ctx instanceof Map, array = ctx instanceof Array;
-      if(!map && !array) throw CTXMAPARRAY.get(info, ctx);
+      if(!map && !array) throw LOOKUP_X.get(info, ctx);
 
       final FItem f = (FItem) ctx;
       if(exprs[0] == Str.WC) {

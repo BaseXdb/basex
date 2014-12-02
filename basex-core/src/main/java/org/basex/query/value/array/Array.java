@@ -93,9 +93,9 @@ public final class Array extends FItem {
     if(!key.type.instanceOf(AtomType.ITR) && !key.type.isUntyped())
       throw castError(ii, key, AtomType.ITR);
 
-    final long i = key.itr(ii);
-    if(i > 0 && i <= size) return get((int) i - 1);
-    throw ARRAYPOS_X.get(ii, i);
+    final long pos = key.itr(ii);
+    if(pos > 0 && pos <= size) return get((int) pos - 1);
+    throw (size == 0 ? ARRAYEMPTY : ARRAYBOUNDS_X_X).get(ii, pos, size);
   }
 
   @Override

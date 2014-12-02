@@ -36,7 +36,7 @@ public final class RawSerializer extends TextSerializer {
   }
 
   @Override
-  protected void encode(final int ch) throws IOException {
-    print(ch);
+  protected void encode(final int cp) throws IOException {
+    print(cp);
   }
 }

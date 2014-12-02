@@ -710,7 +710,7 @@ public final class QT3TS extends Main {
         Pattern.MULTILINE | Pattern.DOTALL);
 
     try {
-      return pat.matcher(".*" + serialize(value, sprop) + ".*").matches() ? null : exp;
+      return pat.matcher("^.*" + serialize(value, sprop) + ".*").matches() ? null : exp;
     } catch(final IOException ex) {
       return Util.info("% (found: %)", exp, ex);
     }

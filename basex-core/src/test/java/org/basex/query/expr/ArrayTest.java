@@ -44,13 +44,13 @@ public final class ArrayTest extends AdvancedQueryTest {
     array("[[1]](1)", "[1]");
     query("[[[1]]](1)(1)(1)", "1");
 
-    error("[](0)", ARRAYPOS_X);
-    error("[](1)", ARRAYPOS_X);
-    error("[1](-5000000000)", ARRAYPOS_X);
-    error("[1](-1)", ARRAYPOS_X);
-    error("[1](0)", ARRAYPOS_X);
-    error("[1](2)", ARRAYPOS_X);
-    error("[1](5000000000)", ARRAYPOS_X);
+    error("[](0)", ARRAYEMPTY);
+    error("[](1)", ARRAYEMPTY);
+    error("[1](-5000000000)", ARRAYBOUNDS_X_X);
+    error("[1](-1)", ARRAYBOUNDS_X_X);
+    error("[1](0)", ARRAYBOUNDS_X_X);
+    error("[1](2)", ARRAYBOUNDS_X_X);
+    error("[1](5000000000)", ARRAYBOUNDS_X_X);
   }
 
   /** Constructor. */

@@ -171,7 +171,7 @@ public final class FtModuleTest extends AdvancedQueryTest {
     query(_FT_EXTRACT.args(" //*[text() contains text '2'], '_o_', 1"),
       "<li>...<_o_>2</_o_></li>");
     contains(_FT_EXTRACT.args(" //*[text() contains text 'Exercise'], 'b', 1"),
-      "<li><b>Exercise</b>...</li>");
+      "<li>...</li>");
   }
 
   /** Test method. */

@@ -62,7 +62,7 @@ public final class ArrayModuleTest extends AdvancedQueryTest {
     array(_ARRAY_REMOVE.args(" array { 1 to 5 }", " 3"), "[1, 2, 4, 5]");
     array(_ARRAY_REMOVE.args(" array { 1 to 5 }", " 5"), "[1, 2, 3, 4]");
 
-    error(_ARRAY_REMOVE.args(" []", " 0"), ARRAYBOUNDS_X_X);
+    error(_ARRAY_REMOVE.args(" []", " 0"), ARRAYEMPTY);
     error(_ARRAY_REMOVE.args(" [1]", " 0"), ARRAYBOUNDS_X_X);
     error(_ARRAY_REMOVE.args(" [1]", " 2"), ARRAYBOUNDS_X_X);
   }
@@ -83,7 +83,7 @@ public final class ArrayModuleTest extends AdvancedQueryTest {
     query(_ARRAY_HEAD.args(" array { 1 to 5 }"), "1");
     query(_ARRAY_HEAD.args(" [1 to 2, 3]"), "1 2");
 
-    error(_ARRAY_HEAD.args(" []"), ARRAYBOUNDS_X_X);
+    error(_ARRAY_HEAD.args(" []"), ARRAYEMPTY);
   }
 
   /** Test method. */
@@ -92,7 +92,7 @@ public final class ArrayModuleTest extends AdvancedQueryTest {
     array(_ARRAY_TAIL.args(" array { 1 to 5 }"), "[2, 3, 4, 5]");
     array(_ARRAY_TAIL.args(" [1 to 2, 3]"), "[3]");
 
-    error(_ARRAY_TAIL.args(" []"), ARRAYBOUNDS_X_X);
+    error(_ARRAY_TAIL.args(" []"), ARRAYEMPTY);
   }
 
   /** Test method. */

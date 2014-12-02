@@ -58,6 +58,6 @@ public final class LookupTest extends AdvancedQueryTest {
 
   /** Test. */
   @Test public void error() {
-    error("1?a", CTXMAPARRAY);
+    error("1?a", LOOKUP_X);
   }
 }

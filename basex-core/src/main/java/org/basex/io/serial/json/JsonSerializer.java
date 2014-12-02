@@ -45,8 +45,8 @@ public abstract class JsonSerializer extends OutputSerializer {
   }
 
   @Override
-  public void serialize(final Item item) throws IOException {
-    if(sep) print(' ');
+  public final void serialize(final Item item) throws IOException {
+    if(sep) throw SERJSON.getIO();
     if(lvl == 0) openResult();
 
     try {
@@ -67,9 +67,9 @@ public abstract class JsonSerializer extends OutputSerializer {
           indent();
           string(name);
           print(':');
-          print(' ');
+          if(indent) print(' ');
           final Value v = map.get(key, null);
-          if(v.size() > 1) throw BXJS_SERIAL_X.getIO("Map value has more than one item.");
+          if(v.size() > 1) throw SERMAPSEQ.getIO();
           sep = false;
           serialize(v.isEmpty() ? null : (Item) v);
           s = true;
@@ -87,7 +87,7 @@ public abstract class JsonSerializer extends OutputSerializer {
         for(final Value v : ((Array) item).members()) {
           if(s) print(',');
           indent();
-          if(v.size() > 1) throw BXJS_SERIAL_X.getIO("Array member has more than one item.");
+          if(v.size() > 1) throw SERARRAYSEQ.getIO();
           sep = false;
           serialize(v.isEmpty() ? null : (Item) v);
           s = true;
@@ -125,20 +125,21 @@ public abstract class JsonSerializer extends OutputSerializer {
 
   /**
    * Serialize a JSON string.
-   * @param str string
+   * @param string string
    * @throws IOException I/O exception
    */
-  protected void string(final byte[] str) throws IOException {
+  protected final void string(final byte[] string) throws IOException {
     print('"');
+    final byte[] str = norm(string);
     final int sl = str.length;
     for(int s = 0; s < sl; s += cl(str, s)) encode(cp(str, s));
     print('"');
   }
 
   @Override
-  protected final void encode(final int ch) throws IOException {
+  protected final void encode(final int cp) throws IOException {
     if(escape) {
-      switch (ch) {
+      switch(cp) {
         case '\b': print("\\b"); break;
         case '\f': print("\\f"); break;
         case '\n': print("\\n"); break;
@@ -146,10 +147,10 @@ public abstract class JsonSerializer extends OutputSerializer {
         case '\t': print("\\t"); break;
         case '"': print("\\\""); break;
         case '\\': print("\\\\"); break;
-        default: print(ch); break;
+        default: print(cp); break;
       }
     } else {
-      print(ch);
+      print(cp);
     }
   }
 
@@ -159,5 +160,10 @@ public abstract class JsonSerializer extends OutputSerializer {
     print(nl);
     final int ls = lvl * indents;
     for(int l = 0; l < ls; ++l) print(tab);
+  }
+
+  @Override
+  public void close() throws IOException {
+    if(!sep) print(NULL);
   }
 }

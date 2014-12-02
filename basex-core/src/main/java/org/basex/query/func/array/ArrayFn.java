@@ -23,7 +23,7 @@ abstract class ArrayFn extends StandardFunc {
    */
   final int checkPos(final Array array, final long pos, final boolean incl) throws QueryException {
     final int as = array.arraySize() + (incl ? 1 : 0);
-    if(pos < 1 || pos > as) throw ARRAYBOUNDS_X_X.get(info, pos, as);
+    if(pos < 1 || pos > as) throw (as == 0 ? ARRAYEMPTY : ARRAYBOUNDS_X_X).get(info, pos, as);
     return (int) pos - 1;
   }
 

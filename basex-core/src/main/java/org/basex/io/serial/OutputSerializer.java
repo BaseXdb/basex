@@ -8,7 +8,10 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.nio.*;
 import java.nio.charset.*;
+import java.text.*;
+import java.text.Normalizer.Form;
 
+import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
@@ -35,6 +38,8 @@ public abstract class OutputSerializer extends Serializer {
   int ct;
   /** Separator flag (used for formatting). */
   protected boolean sep;
+  /** Normalization form. */
+  protected final Form form;
   /** Item separator flag (used for formatting). */
   private boolean isep;
   /** Script flag. */
@@ -83,8 +88,6 @@ public abstract class OutputSerializer extends Serializer {
   /** Tabular character. */
   protected final char tab;
 
-  /** Format items. */
-  private final boolean format;
   /** Prefix for wrapped results. */
   private final byte[] wPre;
   /** Wrapper flag. */
@@ -125,7 +128,6 @@ public abstract class OutputSerializer extends Serializer {
 
     // project specific options
     indents = opts.get(INDENTS);
-    format  = opts.yes(FORMAT);
     tab     = opts.yes(TABULATOR) ? '\t' : ' ';
     wPre    = token(opts.get(WRAP_PREFIX));
     wrap    = wPre.length != 0;
@@ -140,9 +142,9 @@ public abstract class OutputSerializer extends Serializer {
     escuri  = opts.yes(ESCAPE_URI_ATTRIBUTES);
     content = opts.yes(INCLUDE_CONTENT_TYPE);
     undecl  = opts.yes(UNDECLARE_PREFIXES);
-    indent  = opts.yes(INDENT) && format;
+    indent  = opts.yes(INDENT);
 
-    webdav = "webdav".equals(maps);
+    webdav = maps.equals("webdav");
     if(!webdav && !maps.isEmpty()) throw SERMAP_X.getIO(maps);
 
     if(docsys.isEmpty()) docsys = null;
@@ -170,6 +172,20 @@ public abstract class OutputSerializer extends Serializer {
         if(c.length != 0) suppress.add(c);
       }
     }
+
+    // normalization form
+    final String norm = opts.get(NORMALIZATION_FORM);
+    final Form frm;
+    if(norm.equals(Text.NONE)) {
+      frm = null;
+    } else {
+      try {
+        frm = Form.valueOf(norm);
+      } catch(final IllegalArgumentException ex) {
+        throw SERNORM_X.getIO(norm);
+      }
+    }
+    form = frm;
 
     // collect CData elements
     final boolean html = this instanceof HTMLSerializer;
@@ -260,17 +276,16 @@ public abstract class OutputSerializer extends Serializer {
     print(' ');
     print(name);
     print(ATT1);
-    final int vl = value.length;
-    for(int k = 0; k < vl; k += cl(value, k)) {
-      final int ch = cp(value, k);
-      if(!format) {
-        printChar(ch);
-      } else if(ch == '"') {
+    final byte[] val = norm(value);
+    final int vl = val.length;
+    for(int k = 0; k < vl; k += cl(val, k)) {
+      final int cp = cp(val, k);
+      if(cp == '"') {
         print(E_QU);
-      } else if(ch == 0x9 || ch == 0xA) {
-        hex(ch);
+      } else if(cp == 0x9 || cp == 0xA) {
+        hex(cp);
       } else {
-        encode(ch);
+        encode(cp);
       }
     }
     print(ATT2);
@@ -278,31 +293,31 @@ public abstract class OutputSerializer extends Serializer {
 
   @Override
   protected void text(final byte[] value, final FTPos ftp) throws IOException {
+    final byte[] val = norm(value);
+    final int vl = val.length;
     if(ftp == null) {
-      final int bl = value.length;
       if(cdata.isEmpty() || elems.isEmpty() || !cdata.contains(elems.peek())) {
-        for(int k = 0; k < bl; k += cl(value, k)) encode(cp(value, k));
+        for(int k = 0; k < vl; k += cl(val, k)) encode(cp(val, k));
       } else {
         print(CDATA_O);
         int c = 0;
-        final int vl = value.length;
-        for(int k = 0; k < vl; k += cl(value, k)) {
-          final int ch = cp(value, k);
-          if(ch == ']') {
+        for(int k = 0; k < vl; k += cl(val, k)) {
+          final int cp = cp(val, k);
+          if(cp == ']') {
             ++c;
           } else {
-            if(c > 1 && ch == '>') {
+            if(c > 1 && cp == '>') {
               print(CDATA_C);
               print(CDATA_O);
             }
             c = 0;
           }
-          printChar(ch);
+          printChar(cp);
         }
         print(CDATA_C);
       }
     } else {
-      final FTLexer lex = new FTLexer().all().init(value);
+      final FTLexer lex = new FTLexer().all().init(val);
       while(lex.hasNext()) {
         final FTSpan span = lex.next();
         if(!span.del && ftp.contains(span.pos)) print((char) TokenBuilder.MARK);
@@ -338,17 +353,17 @@ public abstract class OutputSerializer extends Serializer {
   protected void atomic(final Item it, final boolean iter) throws IOException {
     if(sep && atomic) print(' ');
     try {
-      if(it instanceof StrStream) {
+      if(it instanceof StrStream && form == null) {
         try(final InputStream ni = ((StrStream) it).input(null)) {
           for(int cp; (cp = ni.read()) != -1;) {
             if(iter) print(cp); else encode(cp);
           }
         }
       } else {
-        final byte[] atom = it.string(null);
-        final int al = atom.length;
-        for(int a = 0; a < al; a += cl(atom, a)) {
-          final int cp = cp(atom, a);
+        final byte[] str = norm(it.string(null));
+        final int al = str.length;
+        for(int a = 0; a < al; a += cl(str, a)) {
+          final int cp = cp(str, a);
           if(iter) print(cp); else encode(cp);
         }
       }
@@ -393,27 +408,33 @@ public abstract class OutputSerializer extends Serializer {
   }
 
   /**
-   * Encodes the specified character before printing it.
-   * @param ch character to be encoded and printed
+   * Encodes the specified codepoint before printing it.
+   * @param cp codepoint to be encoded and printed
    * @throws IOException I/O exception
    */
-  protected void encode(final int ch) throws IOException {
-    if(!format) {
-      printChar(ch);
-    } else if(ch < ' ' && ch != '\n' && ch != '\t' || ch >= 0x7F && ch < 0xA0 ||
-        webdav && ch == 0xA0) {
-      hex(ch);
-    } else if(ch == '&') {
+  protected void encode(final int cp) throws IOException {
+    if(cp < ' ' && cp != '\n' && cp != '\t' || cp >= 0x7F && cp < 0xA0 || webdav && cp == 0xA0) {
+      hex(cp);
+    } else if(cp == '&') {
       print(E_AMP);
-    } else if(ch == '>') {
+    } else if(cp == '>') {
       print(E_GT);
-    } else if(ch == '<') {
+    } else if(cp == '<') {
       print(E_LT);
-    } else if(ch == 0x2028) {
+    } else if(cp == 0x2028) {
       print(E_2028);
     } else {
-      printChar(ch);
+      printChar(cp);
     }
+  }
+
+  /**
+   * Normalizes the specified text.
+   * @param text text to be normalized
+   * @return normalized text
+   */
+  protected byte[] norm(final byte[] text) {
+    return form == null || ascii(text) ? text : token(Normalizer.normalize(string(text), form));
   }
 
   /**
@@ -454,43 +475,49 @@ public abstract class OutputSerializer extends Serializer {
   }
 
   /**
-   * Returns a hex entity for the specified character.
-   * @param ch character
+   * Returns a hex entity for the specified codepoint.
+   * @param cp codepoint (00-FF)
    * @throws IOException I/O exception
    */
-  final void hex(final int ch) throws IOException {
+  final void hex(final int cp) throws IOException {
     print("&#x");
-    final int h = ch >> 4;
-    if(h != 0) print(HEX[h]);
-    print(HEX[ch & 15]);
+    //if(ch > 0xFFFF) print(HEX[ch >> 16]);
+    //if(ch > 0xFFF) print(HEX[(ch & 0xFFFF) >> 12]);
+    //if(ch > 0xFF) print(HEX[(ch & 0xFFF) >> 8]);
+    if(cp > 0xF) print(HEX[(cp & 0xFF) >> 4]);
+    print(HEX[cp & 0xF]);
     print(';');
   }
 
   /**
-   * Writes a character in the current encoding.
-   * Converts newlines to the operating system default.
-   * @param ch character to be printed
+   * Writes a codepoint in the current encoding and
+   * converts newlines to the operating system's default.
+   * @param cp codepoint to be printed
    * @throws IOException I/O exception
    */
-  protected final void printChar(final int ch) throws IOException {
-    if(ch == '\n') out.write(nl);
-    else print(ch);
+  protected final void printChar(final int cp) throws IOException {
+    if(cp == '\n') out.write(nl);
+    else print(cp);
   }
 
   /**
-   * Writes a character in the current encoding.
-   * @param ch character to be printed
+   * Writes a codepoint in the current encoding.
+   * @param cp codepoint to be printed
    * @throws IOException I/O exception
    */
-  protected void print(final int ch) throws IOException {
+  protected void print(final int cp) throws IOException {
     // comparison by reference
     if(utf8) {
-      out.print(ch);
+      out.print(cp);
     } else {
       encbuffer.reset();
       encoder.reset();
-      final ByteBuffer bb = encoder.encode(CharBuffer.wrap(encbuffer.add(ch).toString()));
-      out.write(bb.array(), 0, bb.limit());
+      try {
+        final ByteBuffer bb = encoder.encode(CharBuffer.wrap(encbuffer.add(cp).toString()));
+        out.write(bb.array(), 0, bb.limit());
+      } catch(final UnmappableCharacterException ex) {
+        throw SERMAP_X_X.getIO(Integer.toHexString(cp), encoding);
+      }
     }
   }
 

@@ -388,6 +388,8 @@ public enum QueryError {
 
   /** FOAY0001. */
   ARRAYBOUNDS_X_X(FOAY, 1, "Array index % out of bounds (1-%)."),
+  /** FOAY0001. */
+  ARRAYEMPTY(FOAY, 1, "Array has no entries."),
   /** FOAY0002. */
   ARRAYNEG_X(FOAY, 2, "Length is negative: %."),
 
@@ -647,10 +649,14 @@ public enum QueryError {
   SERDT(SEPM, 4, "If 'doctype-system' is specified, the root must be a single element."),
   /** SESU0007. */
   SERENCODING_X(SESU, 7, "Unknown encoding '%'."),
+  /** SESU0007. */
+  SERMAP_X_X(SESU, 7, "Character '#x%;' cannot be mapped to '%'."),
   /** SEPM0009. */
   SERSTAND(SEPM, 9, "Invalid combination of 'omit-xml-declaration'."),
   /** SEPM0010. */
   SERUNDECL(SEPM, 10, "XML 1.0: undeclaring prefixes not allowed."),
+  /** SESU0011. */
+  SERNORM_X(SESU, 11, "Normalization form not supported: %."),
   /** SESU0013. */
   SERNOTSUPP_X(SESU, 13, "%"),
   /** SERE0014. */
@@ -658,9 +664,9 @@ public enum QueryError {
   /** SERE0015. */
   SERPI(SERE, 15, "Processing construction contains '>'."),
   /** SEPM0016. */
-  SERMAP_X(SEPM, 16, "Character map '%' is not defined."),
-  /** SEPM0016. */
   SER_X(SEPM, 16, "%"),
+  /** SEPM0017. */
+  SERMAP_X(SEPM, 17, "Character map '%' is not defined."),
   /** SEPM0017. */
   SEROPT_X(SEPM, 17, "%."),
   /** SEPM0017. */
@@ -669,6 +675,12 @@ public enum QueryError {
   SERNUMBER_X(SERE, 20, "Numeric value cannot be represented: '%'"),
   /** SERE0022. */
   SERDUPL_X(SERE, 22, "Duplicate name found: '%'"),
+  /** SERE0023. */
+  SERJSON(SERE, 23, "Only one item can be serialized with JSON."),
+  /** SERE0023. */
+  SERMAPSEQ(SERE, 23, "Map value has more than one item."),
+  /** SERE0023. */
+  SERARRAYSEQ(SERE, 23, "Array has more than one member."),
 
   /** XPDY0002. */
   NOCTX_X(XPDY, 2, "%: no context value bound."),
@@ -929,6 +941,8 @@ public enum QueryError {
   INVNCNAME_X(XPTY, 4, "Invalid NCName: '%'."),
   /** XPTY0004. */
   CITYPES_X_X(XPTY, 4, "Incompatible types in context value declarations: % vs. %."),
+  /** XPTY0004. */
+  LOOKUP_X(XPTY, 4, "Input of lookup operator is not a map or array: %."),
 
   /** XPTY0018. */
   EVALNODESVALS(XPTY, 18, "Path yields both nodes and atomic values."),
@@ -978,11 +992,7 @@ public enum QueryError {
   /** XQDY0137. */
   MAPDUPLKEY_X_X_X(XQDY, 137, "Key % already exists in map (values: % vs. %)."),
   /** XQDY0138. */
-  ARRAYPOS_X(XQDY, 138, "No value exists at array index %."),
-  /** XQDY0138. */
   MAPTZ(XQDY, 138, "Map contains keys with and without timezone."),
-  /** XQDY0140. */
-  CTXMAPARRAY(XQDY, 140, "Input of lookup operator is not a map or array: %."),
 
   /** XQST0009. */
   IMPLSCHEMA(XQST, 9, "Schema import not supported."),
@@ -1072,15 +1082,15 @@ public enum QueryError {
   INVCHARREF_X(XQST, 90, "Invalid character reference '%'."),
   /** XQST0093. */
   CIRCMODULE(XQST, 93, "Circular module declaration."),
-  /** XPST0094. */
+  /** XQST0094. */
   GVARNOTDEFINED_X(XQST, 94, "Undeclared grouping variable '%'."),
-  /** XPST0097. */
+  /** XQST0097. */
   INVDECFORM_X_X(XQST, 97, "Invalid decimal-format property: %='%'."),
-  /** XPST0097. */
+  /** XQST0097. */
   INVDECSINGLE_X_X(XQST, 97, "Decimal-format property must be a single character: %='%'."),
-  /** XPST0097. */
+  /** XQST0097. */
   INVDECZERO_X(XQST, 97, "Zero-digit property must be Unicode digit with value zero: '%'."),
-  /** XPST0098. */
+  /** XQST0098. */
   DUPLDECFORM_X(XQST, 98, "Duplicate use of decimal-format '%'."),
   /** XQST0099. */
   DUPLITEM(XQST, 99, "Duplicate declaration of context value."),
@@ -1092,15 +1102,17 @@ public enum QueryError {
   DUPLVIS(XQST, 106, "More than one visibility annotation declared."),
   /** XQST0108. */
   MODOUT(XQST, 108, "No output declarations allowed in library modules."),
-  /** XPST0109. */
+  /** XQST0109. */
+  OUTMAP_X(XQST, 109, "Character map '%' is not defined."),
+  /** XQST0109. */
   OUTINVALID_X(XQST, 109, "%"),
-  /** XPST0110. */
+  /** XQST0110. */
   OUTDUPL_X(XQST, 110, "Duplicate declaration of 'output:%'."),
-  /** XPST0111. */
+  /** XQST0111. */
   DECDUPL(XQST, 111, "Duplicate decimal-format declaration."),
   /** XQST0113. */
   DECITEM(XQST, 113, "Context value cannot be bound in library module."),
-  /** XPST0111. */
+  /** XQST0111. */
   DECDUPLPROP_X(XQST, 114, "Duplicate decimal-format property '%'."),
   /** XQST0116. */
   DUPLVARVIS(XQST, 116, "More than one visibility annotation declared."),
@@ -1110,7 +1122,7 @@ public enum QueryError {
   OUTDOC_X(XQST, 119, "Serialization document '%' cannot be parsed."),
   /** XQST0123. */
   DECLOPTION_X(XQST, 123, "Unknown option: %."),
-  /** XPST0125. */
+  /** XQST0125. */
   INVISIBLE(XQST, 125, "No visibility annotation allowed in inline function."),
 
   /** XQTY0024. */

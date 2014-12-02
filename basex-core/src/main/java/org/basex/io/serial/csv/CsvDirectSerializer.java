@@ -115,8 +115,8 @@ public final class CsvDirectSerializer extends CsvSerializer {
   }
 
   @Override
-  protected void encode(final int ch) throws IOException {
-    printChar(ch);
+  protected void encode(final int cp) throws IOException {
+    printChar(cp);
   }
 
   /**

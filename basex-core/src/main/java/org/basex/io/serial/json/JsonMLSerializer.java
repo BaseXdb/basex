@@ -58,7 +58,7 @@ public final class JsonMLSerializer extends JsonSerializer {
     print('"');
     for(final byte ch : name) encode(ch);
     print("\":\"");
-    for(final byte ch : value) encode(ch);
+    for(final byte ch : norm(value)) encode(ch);
     print("\"");
   }
 

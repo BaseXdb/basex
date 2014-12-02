@@ -16,7 +16,7 @@ import org.junit.*;
  */
 public final class BaseXStandaloneTest extends BaseXTest {
   /**
-   * Write back updates.
+   * Writes back updates.
    * @throws IOException I/O exception
    */
   @Test

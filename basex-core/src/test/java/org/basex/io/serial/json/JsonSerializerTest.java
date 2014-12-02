@@ -106,24 +106,24 @@ public final class JsonSerializerTest extends SandboxTest {
 
     // objects
     serialize("map { }", "{}", format);
-    serialize("map { '': () }", "{'': null}", format);
-    serialize("map { 'A' : 'B' }", "{'A': 'B'}", format);
-    serialize("map { 'A': 1 }", "{'A': 1}", format);
-    serialize("map { 'A': 1.2 }", "{'A': 1.2}", format);
-    serialize("map { 'A': .2 }", "{'A': 0.2}", format);
-    serialize("map { 'A': .0 }", "{'A': 0}", format);
-    serialize("map { 'A': true() }", "{'A': true}", format);
-    serialize("map { 'A': false() }", "{'A': false}", format);
-    serialize("map { 'A': false() }", "{'A': false}", format);
-    serialize("map { true(): false() }", "{'true': false}", format);
-    serialize("map { 1: 'E' }", "{'1': 'E'}", format);
+    serialize("map { '': () }", "{'':null}", format);
+    serialize("map { 'A' : 'B' }", "{'A':'B'}", format);
+    serialize("map { 'A': 1 }", "{'A':1}", format);
+    serialize("map { 'A': 1.2 }", "{'A':1.2}", format);
+    serialize("map { 'A': .2 }", "{'A':0.2}", format);
+    serialize("map { 'A': .0 }", "{'A':0}", format);
+    serialize("map { 'A': true() }", "{'A':true}", format);
+    serialize("map { 'A': false() }", "{'A':false}", format);
+    serialize("map { 'A': false() }", "{'A':false}", format);
+    serialize("map { true(): false() }", "{'true':false}", format);
+    serialize("map { 1: 'E' }", "{'1':'E'}", format);
 
     error("map { 'A': 1 div 0.0e0 }", format, SERNUMBER_X);
     error("map { 'A': -1 div 0.0e0 }", format, SERNUMBER_X);
     error("map { 'A': 0 div 0.0e0 }", format, SERNUMBER_X);
 
     error("map { true(): true#0 }", format, FIATOM_X);
-    error("map { 'A': ('B','C') }", format, BXJS_SERIAL_X);
+    error("map { 'A': ('B','C') }", format, SERMAPSEQ);
 
     // arrays
     serialize("[()]", "[null]", format);
@@ -132,25 +132,17 @@ public final class JsonSerializerTest extends SandboxTest {
     serialize("[2, (), 4]", "[2,null,4]", format);
 
     // mixed
-    serialize("map { 'A':map {} }", "{'A': {}}", format);
-    serialize("map { 'A':map {'B':'C'} }", "{'A': {'B': 'C'}}", format);
-    serialize("map { 'A':array {'B'} }", "{'A': ['B']}", format);
-    serialize("map { '0': () }", "{'0': null}", format);
-    serialize("map { '-1': () }", "{'-1': null}", format);
+    serialize("map { 'A':map {} }", "{'A':{}}", format);
+    serialize("map { 'A':map {'B':'C'} }", "{'A':{'B':'C'}}", format);
+    serialize("map { 'A':array {'B'} }", "{'A':['B']}", format);
+    serialize("map { '0': () }", "{'0':null}", format);
+    serialize("map { '-1': () }", "{'-1':null}", format);
 
     // atomic values
+    serialize("()", "null", format);
     serialize("'A'", "'A'", format);
     serialize("true()", "true", format);
     serialize("1", "1", format);
-    serialize("(1,'x')", "1 'x'", format);
-  }
-
-  /**
-   * Tests for the 'map' serialization format.
-   */
-  @Test public void x() {
-    final JsonFormat format = JsonFormat.MAP;
-    serialize("(1,'x')", "1 'x'", format);
   }
 
 
@@ -210,6 +202,7 @@ public final class JsonSerializerTest extends SandboxTest {
 
       final Serializer ser = Serializer.get(ao, sopts);
       for(final Item it : qp.value()) ser.serialize(it);
+      ser.close();
     }
     // replace quotes with apostrophes to increase legibility of tests
     return ao.toString().replace("\"", "'");
