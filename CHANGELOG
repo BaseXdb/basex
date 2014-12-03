@@ -1,8 +1,3 @@
-==================================================== BASEX CHANGELOG ===
-
- Welcome to the changelog. This file contains all code changes since
- BaseX 6.5:
-
 VERSION 7.9 (June 27, 2014) --------------------------------------------
 
  XQUNIT
@@ -545,5 +540,3 @@ VERSION 6.5 (November 17, 2010) ----------------------------------------
   [FIX] Storage: text decompression synchronized
   [FIX] XQuery: context choice in filter predicates
   [MOD] JavaDoc: package.html files added and updated
-
-========================================================================
