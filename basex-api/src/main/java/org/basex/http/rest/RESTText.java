@@ -19,7 +19,7 @@ interface RESTText {
   /** Name. */
   QNm Q_DATABASES = QNm.get(REST_PREFIX, "databases", REST_URI);
   /** Name. */
-  QNm Q_DATABASE = QNm.get(REST_PREFIX, "databases", REST_URI);
+  QNm Q_DATABASE = QNm.get(REST_PREFIX, "database", REST_URI);
   /** Name. */
   QNm Q_RESOURCE = QNm.get(REST_PREFIX, "resource", REST_URI);
 
