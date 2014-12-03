@@ -66,7 +66,7 @@ public final class Grant extends AUser {
 
     // set global permissions
     if(db == null) {
-      context.users.get(user).perm = prm;
+      context.users.get(user).perm(prm);
       context.users.write();
       return info(GRANTED_X_X, args[0], user);
     }
@@ -82,13 +82,13 @@ public final class Grant extends AUser {
     // try to lock database
     if(!startUpdate(data)) return false;
 
-    User u = data.meta.users.get(user);
+    User us = data.meta.users.get(user);
     // add local user reference
-    if(u == null) {
-      u = context.users.get(user).copy();
-      data.meta.users.create(u);
+    if(us == null) {
+      us = context.users.get(user).copy();
+      data.meta.users.create(us);
     }
-    u.perm = prm;
+    us.perm(prm);
     data.meta.dirty = true;
     finishUpdate(data);
 

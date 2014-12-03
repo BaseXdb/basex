@@ -68,7 +68,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
   public Service getService(final String name, final String version) throws XMLDBException {
     check();
     if("1.0".equals(version)) {
-      if(Token.eq(name, BXQueryService.XPATH, BXQueryService.XQUERY))
+      if(Strings.eq(name, BXQueryService.XPATH, BXQueryService.XQUERY))
         return new BXQueryService(this, name, version);
       if(name.equals(BXCollectionManagementService.MANAGEMENT))
         return new BXCollectionManagementService(this);

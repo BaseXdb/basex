@@ -340,7 +340,7 @@ final class ProjectFilter extends BaseXBack {
       int c = 0;
       while(true) {
         if(!il.isEmpty()) {
-          if(il.deleteAt(0) == search[c++]) continue;
+          if(il.remove(0) == search[c++]) continue;
           c = 0;
         }
         while(true) {

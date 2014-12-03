@@ -1,6 +1,6 @@
 package org.basex.io.in;
 
-import static org.basex.util.Token.*;
+import static org.basex.util.Strings.*;
 
 import java.io.*;
 import java.nio.*;
@@ -32,7 +32,7 @@ abstract class TextDecoder {
 
   /**
    * Returns a decoder for the specified encoding.
-   * @param enc encoding, normalized via {@link Token#normEncoding}.
+   * @param enc encoding, normalized via {@link Strings#normEncoding}.
    * @return decoder
    * @throws IOException I/O exception
    */
@@ -69,13 +69,13 @@ abstract class TextDecoder {
       if(ch < 0x80) return ch;
       if(ch < 0xC0) return invalid();
       cache[0] = (byte) ch;
-      final int cl = cl((byte) ch);
+      final int cl = Token.cl((byte) ch);
       for(int c = 1; c < cl; ++c) {
         ch = ti.readByte();
         if(ch < 0x80) return invalid();
         cache[c] = (byte) ch;
       }
-      return cp(cache, 0);
+      return Token.cp(cache, 0);
     }
   }
 

@@ -22,7 +22,7 @@ public final class WesternTokenizer extends Tokenizer {
   static {
     final String[] nonw = { "ar", "ja", "ko", "th", "zh" };
     for(final Language l : Language.ALL.values()) {
-      if(!eq(l.code(), nonw)) SUPPORTED.add(l);
+      if(!Strings.eq(l.code(), nonw)) SUPPORTED.add(l);
     }
   }
 

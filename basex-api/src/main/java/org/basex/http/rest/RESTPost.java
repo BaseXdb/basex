@@ -38,7 +38,7 @@ final class RESTPost {
   public static RESTCmd get(final RESTSession rs) throws IOException {
     final HTTPContext http = rs.http;
     String enc = http.req.getCharacterEncoding();
-    if(enc == null) enc = Token.UTF8;
+    if(enc == null) enc = Strings.UTF8;
 
     // perform queries
     final byte[] input = new NewlineInput(http.req.getInputStream()).encoding(enc).content();
@@ -62,7 +62,7 @@ final class RESTPost {
           if(sopts.option(name) != null) {
             sopts.assign(name, value);
           } else if(name.equals(WRAP)) {
-            http.wrapping = Util.yes(value);
+            http.wrapping = Strings.yes(value);
           } else {
             throw HTTPCode.UNKNOWN_PARAM_X.get(name);
           }

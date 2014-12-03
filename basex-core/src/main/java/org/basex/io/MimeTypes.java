@@ -1,7 +1,5 @@
 package org.basex.io;
 
-import static org.basex.util.Token.*;
-
 import java.io.*;
 import java.util.*;
 
@@ -91,7 +89,8 @@ public final class MimeTypes {
    * @return result of check
    */
   public static boolean isXML(final String type) {
-    return eq(type, TEXT_XML, TEXT_XML_EXT, APP_XML, APP_XML_EXTERNAL) || type.endsWith(XML_SUFFIX);
+    return Strings.eq(type, TEXT_XML, TEXT_XML_EXT, APP_XML, APP_XML_EXTERNAL) ||
+        type.endsWith(XML_SUFFIX);
   }
 
   /**
@@ -100,7 +99,7 @@ public final class MimeTypes {
    * @return result of check
    */
   public static boolean isJSON(final String type) {
-    return eq(type, APP_JSON, APP_JSONML);
+    return Strings.eq(type, APP_JSON, APP_JSONML);
   }
 
   /**
@@ -129,7 +128,7 @@ public final class MimeTypes {
    */
   public static boolean matches(final String type, final String pattern) {
     final String[] t = prepareType(type), p = prepareType(pattern);
-    return Token.eq(p[0], t[0], "*") && Token.eq(p[1], t[1], "*");
+    return Strings.eq(p[0], t[0], "*") && Strings.eq(p[1], t[1], "*");
   }
 
   /**

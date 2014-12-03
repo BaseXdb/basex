@@ -39,6 +39,6 @@ public final class BXDomImpl implements DOMImplementation {
   @Override
   public boolean hasFeature(final String name, final String value) {
     return "XML".equalsIgnoreCase(name) && (value == null ||
-        Token.eq(value, "", "1.0", "2.0", "3.0"));
+        Strings.eq(value, "", "1.0", "2.0", "3.0"));
   }
 }

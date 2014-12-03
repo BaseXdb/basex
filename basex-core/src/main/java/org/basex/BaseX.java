@@ -126,7 +126,7 @@ public class BaseX extends CLI {
           console = false;
         } else if(c == 'r') {
           // parse number of runs
-          execute(new Set(MainOptions.RUNS, Token.toInt(val)), false);
+          execute(new Set(MainOptions.RUNS, Strings.toInt(val)), false);
         } else if(c == 'R') {
           // toggle query evaluation
           execute(new Set(MainOptions.RUNQUERY, null), false);

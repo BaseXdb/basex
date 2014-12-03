@@ -1,7 +1,5 @@
 package org.basex.http;
 
-import static org.basex.util.Token.*;
-
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -14,6 +12,8 @@ import org.basex.query.func.http.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Bundles parameters of an HTTP request.
@@ -107,6 +107,19 @@ public final class HTTPParams {
     return query;
   }
 
+  /**
+   * Returns the cached body.
+   * @return value
+   * @throws IOException I/O exception
+   */
+  public IOContent body() throws IOException {
+    if(content == null) {
+      content = new IOContent(new BufferInput(http.req.getInputStream()).content());
+      content.name(http.method + IO.XMLSUFFIX);
+    }
+    return content;
+  }
+
   // PRIVATE FUNCTIONS ============================================================================
 
   /**
@@ -135,26 +148,14 @@ public final class HTTPParams {
    * @throws IOException I/O exception
    */
   private void addURLEncoded(final Map<String, Value> params) throws IOException {
-    for(final String nv : body().toString().split("&")) {
-      final String[] parts = nv.split("=", 2);
-      if(parts.length == 2) {
-        final Atm i = new Atm(URLDecoder.decode(parts[1], UTF8));
-        final Value v = params.get(parts[0]);
-        params.put(parts[0], v == null ? i : new ValueBuilder().add(v).add(i).value());
+    for(final String nv : Strings.split(body().toString(), '&')) {
+      final StringList parts = Strings.split(nv, '=', 2);
+      if(parts.size() == 2) {
+        final Atm i = new Atm(URLDecoder.decode(parts.get(1), Strings.UTF8));
+        final String k = parts.get(0);
+        final Value v = params.get(k);
+        params.put(k, v == null ? i : new ValueBuilder().add(v).add(i).value());
       }
     }
-  }
-
-  /**
-   * Returns the cached body.
-   * @return value
-   * @throws IOException I/O exception
-   */
-  private IOContent body() throws IOException {
-    if(content == null) {
-      content = new IOContent(new BufferInput(http.req.getInputStream()).content());
-      content.name(http.method + IO.XMLSUFFIX);
-    }
-    return content;
   }
 }

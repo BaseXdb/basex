@@ -283,7 +283,6 @@ printing             = Imprimiendo
 project              = Proyecto
 properties           = Propiedades
 pw_changed_%         = Se ha cambiado la clave del usuario '%'.
-pw_not_valid         = La clave no es un hash MD5 válido.
 query                = Consulta
 query_executed_%_%   = Consulta % ejecutada en %.
 query_info           = Información de la Consulta

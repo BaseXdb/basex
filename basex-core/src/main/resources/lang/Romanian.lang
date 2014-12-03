@@ -283,7 +283,6 @@ printing             = In curs de tipărire
 project              = Project
 properties           = Proprietăți
 pw_changed_%         = Parola utilizatorului '%' a  fost schimbata.
-pw_not_valid         = Parola nu este validă cu hash MD5.
 query                = Interogare
 query_executed_%_%   = Interogare % executata in %.
 query_info           = Informatii interogari

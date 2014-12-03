@@ -48,6 +48,6 @@ public class FruitsModule extends QueryModule {
    * @return user
    */
   public String user() {
-    return queryContext.context.user.name;
+    return queryContext.context.user().name();
   }
 }

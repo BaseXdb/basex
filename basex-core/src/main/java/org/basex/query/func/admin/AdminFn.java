@@ -17,6 +17,8 @@ abstract class AdminFn extends StandardFunc {
   static final String USER = "user";
   /** QName: permission. */
   static final String PERMISSION = "permission";
+  /** QName: salt. */
+  static final String SALT = "salt";
   /** QName: password. */
   static final String PASSWORD = "password";
   /** QName: entry. */

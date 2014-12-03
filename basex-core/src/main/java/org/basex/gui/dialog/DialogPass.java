@@ -54,7 +54,7 @@ public final class DialogPass extends BaseXDialog {
 
   @Override
   public void action(final Object cmp) {
-    final String nm = pass();
+    final String nm = password();
     ok = !nm.isEmpty() && nm.matches("[^ ;'\"]*");
     info.setText(ok || nm.isEmpty() ? null : Util.info(INVALID_X, PASSWORD), Msg.ERROR);
     enableOK(buttons, B_OK, ok);
@@ -70,7 +70,7 @@ public final class DialogPass extends BaseXDialog {
    * Returns the password.
    * @return password
    */
-  public String pass() {
+  public String password() {
     return new String(pass.getPassword());
   }
 }

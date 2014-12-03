@@ -377,7 +377,7 @@ public final class IOFile extends IO {
    */
   public static String regex(final String glob, final boolean sub) {
     final StringBuilder sb = new StringBuilder();
-    for(final String globs : glob.split(",")) {
+    for(final String globs : Strings.split(glob, ',')) {
       final String glb = globs.trim();
       if(sb.length() != 0) sb.append('|');
       // loop through single pattern
@@ -445,7 +445,7 @@ public final class IOFile extends IO {
       }
       if("..".equals(s) && size > 0) {
         // parent step
-        if(list[size - 1].indexOf(':') == -1) deleteAt(size - 1);
+        if(list[size - 1].indexOf(':') == -1) remove(size - 1);
       } else if(!".".equals(s) && !s.isEmpty()) {
         // skip self and empty steps
         add(s);

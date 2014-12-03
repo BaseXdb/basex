@@ -53,7 +53,7 @@ public final class Check extends Command {
    */
   private boolean open(final QueryInput qi) {
     // minimum permissions: create
-    if(!context.user.has(Perm.CREATE)) return true;
+    if(!context.user().has(Perm.CREATE)) return true;
     // database with given name does not exist
     if(!soptions.dbpath(qi.db).exists()) return false;
     // open database if addressed file does not exist

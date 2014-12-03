@@ -1,7 +1,6 @@
 package org.basex.util;
 
 import static org.basex.core.Text.*;
-import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.lang.reflect.*;
@@ -23,7 +22,7 @@ public abstract class ConsoleReader {
   private final PasswordReader pwReader = new PasswordReader() {
     @Override
     public String password() {
-      return md5(readPassword());
+      return readPassword();
     }
   };
 

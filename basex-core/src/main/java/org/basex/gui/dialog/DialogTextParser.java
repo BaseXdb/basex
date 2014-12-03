@@ -55,7 +55,7 @@ final class DialogTextParser extends DialogParser {
   @Override
   void update() {
     final String enc = encoding.getSelectedItem();
-    topts.set(TextOptions.ENCODING, enc.equals(Token.UTF8) ? null : enc);
+    topts.set(TextOptions.ENCODING, enc.equals(Strings.UTF8) ? null : enc);
     topts.set(TextOptions.LINES, lines.isSelected());
   }
 

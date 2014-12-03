@@ -1,7 +1,6 @@
 package org.basex.server;
 
 import static org.basex.core.Text.*;
-import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.net.*;
@@ -9,12 +8,13 @@ import java.util.*;
 
 import org.basex.*;
 import org.basex.core.*;
+import org.basex.core.User.Code;
 import org.basex.core.cmd.*;
 import org.basex.core.parse.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
-import org.basex.server.Log.*;
+import org.basex.server.Log.LogType;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -187,13 +187,13 @@ public final class ClientListener extends Thread {
       // evaluate login data
       in = new BufferInput(socket.getInputStream());
       // receive {USER}0{PASSWORD}0
-      final String us = in.readString();
-      final String pw = in.readString();
-      context.user = context.users.get(us);
-      running = context.user != null && md5(context.user.password + ts).equals(pw);
+      final String us = in.readString(), md5pwts = in.readString();
+      final User user = context.users.get(us);
+      running = user != null && Strings.md5(user.code(Code.MD5) + ts).equals(md5pwts);
 
       // write log information
       if(running) {
+        context.user(user);
         // send {OK}
         send(true);
         context.blocker.remove(address);
@@ -546,6 +546,6 @@ public final class ClientListener extends Thread {
    * @param info message info
    */
   private void log(final LogType type, final String info) {
-    context.log.write(address(), context.user, type, info, perf);
+    context.log.write(address(), context.user(), type, info, perf);
   }
 }

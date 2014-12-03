@@ -38,14 +38,26 @@ public final class Users {
     if(!file.exists()) file = new IOFile(Prop.HOME, perm);
 
     if(file.exists()) {
-      try(DataInput in = new DataInput(file)) {
-        read(in);
+      try {
+        read(new DataInput(file));
       } catch(final IOException ex) {
         Util.errln(ex);
       }
     } else {
       // define default admin user with all rights
-      list.add(new User(S_ADMIN, md5(S_ADMIN), Perm.ADMIN));
+      list.add(new User(S_ADMIN, S_ADMIN, Perm.ADMIN));
+    }
+  }
+
+  /**
+   * Parses user permissions.
+   * @param f file to read from
+   * @throws IOException I/O error while reading from the file
+   */
+  public synchronized void read(final IOFile f) throws IOException {
+    if(!f.exists()) return;
+    try(final DataInput in = new DataInput(f)) {
+      // ...
     }
   }
 
@@ -55,12 +67,7 @@ public final class Users {
    * @throws IOException I/O exception
    */
   public synchronized void read(final DataInput in) throws IOException {
-    final int s = in.readNum();
-    for(int u = 0; u < s; ++u) {
-      final User user = new User(string(in.readToken()), string(in.readToken()),
-          Perm.get(in.readNum()));
-      list.add(user);
-    }
+    for(int u = in.readNum(); u > 0; --u) list.add(new User(in));
   }
 
   /**
@@ -68,6 +75,7 @@ public final class Users {
    */
   public synchronized void write() {
     if(file == null) return;
+    // [CG] USERS: write to XML
     try(final DataOutput out = new DataOutput(file)) {
       write(out);
     } catch(final IOException ex) {
@@ -77,13 +85,13 @@ public final class Users {
 
   /**
    * Stores a user and encrypted password.
-   * @param usern user name
-   * @param pass password
+   * @param username user name
+   * @param password password (plain text)
    * @return success of operation
    */
-  public synchronized boolean create(final String usern, final String pass) {
+  public synchronized boolean create(final String username, final String password) {
     // check if user already exists
-    return get(usern) == null && create(new User(usern, pass, Perm.NONE));
+    return get(username) == null && create(new User(username, password, Perm.NONE));
   }
 
   /**
@@ -99,16 +107,16 @@ public final class Users {
 
   /**
    * Changes the password of a user.
-   * @param usern user name
-   * @param pass password
+   * @param username user name
+   * @param password password
    * @return success of operation
    */
-  public synchronized boolean alter(final String usern, final String pass) {
+  public synchronized boolean alter(final String username, final String password) {
     // check if user already exists
-    final User user = get(usern);
+    final User user = get(username);
     if(user == null) return false;
 
-    user.password = pass.toLowerCase(Locale.ENGLISH);
+    user.password(password);
     write();
     return true;
   }
@@ -126,11 +134,11 @@ public final class Users {
 
   /**
    * Returns a user reference with the specified name.
-   * @param usern user name
+   * @param username user name
    * @return success of operation
    */
-  public synchronized User get(final String usern) {
-    for(final User user : list) if(user.name.equals(usern)) return user;
+  public synchronized User get(final String username) {
+    for(final User user : list) if(user.name().equals(username)) return user;
     return null;
   }
 
@@ -142,24 +150,20 @@ public final class Users {
   public synchronized String[] find(final Pattern pattern) {
     final StringList sl = new StringList();
     for(final User u : list) {
-      if(pattern.matcher(u.name).matches()) sl.add(u.name);
+      final String name = u.name();
+      if(pattern.matcher(name).matches()) sl.add(name);
     }
     return sl.finish();
   }
 
   /**
    * Writes permissions to disk.
-   * @param out output stream; if set to null, the global rights are written
+   * @param out output stream
    * @throws IOException I/O exception
    */
   public synchronized void write(final DataOutput out) throws IOException {
-    // skip writing of local rights
     out.writeNum(list.size());
-    for(final User user : list) {
-      out.writeToken(token(user.name));
-      out.writeToken(token(user.password));
-      out.writeNum(user.perm.num);
-    }
+    for(final User user : list) user.write(out);
   }
 
   /**
@@ -176,7 +180,7 @@ public final class Users {
 
     for(final User user : users(users)) {
       final TokenList tl = new TokenList();
-      tl.add(user.name);
+      tl.add(user.name());
       tl.add(user.has(Perm.READ) ? "X" : "");
       tl.add(user.has(Perm.WRITE) ? "X" : "");
       if(sz == 5) {
@@ -196,7 +200,7 @@ public final class Users {
   public synchronized User[] users(final Users users) {
     final ArrayList<User> al = new ArrayList<>();
     for(final User user : list) {
-      if(users == null || users.get(user.name) != null) al.add(user);
+      if(users == null || users.get(user.name()) != null) al.add(user);
     }
     return al.toArray(new User[al.size()]);
   }

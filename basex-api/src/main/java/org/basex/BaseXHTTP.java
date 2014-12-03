@@ -188,7 +188,7 @@ public final class BaseXHTTP extends Main {
    */
   private static int num(final NumberOption option, final StaticOptions sopts) {
     final String val = Options.getSystem(option);
-    return val.isEmpty() ? sopts.get(option) : Token.toInt(val);
+    return val.isEmpty() ? sopts.get(option) : Strings.toInt(val);
   }
 
   /**

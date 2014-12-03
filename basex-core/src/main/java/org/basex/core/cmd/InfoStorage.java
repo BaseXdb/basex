@@ -2,7 +2,7 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
-import static org.basex.util.Token.*;
+import static org.basex.util.Strings.*;
 
 import java.io.*;
 
@@ -133,7 +133,7 @@ public final class InfoStorage extends AQuery {
     } else {
       cont = data.text(pre, true);
     }
-    tl.add(replace(chop(cont, 64), '\n', ' '));
+    tl.add(Token.replace(Token.chop(cont, 64), '\n', ' '));
     table.contents.add(tl);
   }
 

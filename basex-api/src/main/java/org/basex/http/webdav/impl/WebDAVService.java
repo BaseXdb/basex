@@ -17,7 +17,6 @@ import org.basex.core.cmd.Set;
 import org.basex.http.*;
 import org.basex.io.in.*;
 import org.basex.query.func.db.*;
-import org.basex.server.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -62,9 +61,9 @@ public final class WebDAVService<T> {
    * Authenticates the user with the given password.
    * @param user user name
    * @param pass password
-   * @throws LoginException if the login is invalid
+   * @throws IOException I/O exception
    */
-  public void authenticate(final String user, final String pass) throws LoginException {
+  public void authenticate(final String user, final String pass) throws IOException {
     http.credentials(user, pass);
     http.authenticate();
   }
@@ -568,10 +567,10 @@ public final class WebDAVService<T> {
   /**
    * Constructor.
    * @return local session
-   * @throws LoginException login exception
+   * @throws IOException I/O exception
    */
-  private LocalSession session() throws LoginException {
-    if(ls == null) ls = new LocalSession(http.authenticate(), http.user, http.pass);
+  private LocalSession session() throws IOException {
+    if(ls == null) ls = new LocalSession(http.authenticate(), http.user, http.password);
     return ls;
   }
 }

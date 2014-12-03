@@ -42,15 +42,18 @@ public final class Info extends AInfo {
     final TokenBuilder tb = new TokenBuilder();
     tb.add(GENERAL_INFO + COL + NL);
     info(tb, VERSINFO, Prop.VERSION);
-    if(context.user.has(Perm.CREATE)) {
+
+    final User user = context.user();
+    if(user.has(Perm.CREATE)) {
       Performance.gc(1);
       info(tb, USED_MEM, Performance.getMemory());
     }
-    if(context.user.has(Perm.ADMIN)) {
+    if(user.has(Perm.ADMIN)) {
       final StaticOptions sopts = context.soptions;
       tb.add(NL + GLOBAL_OPTIONS + COL + NL);
       for(final Option<?> o : sopts) info(tb, o.name(), sopts.get(o));
     }
+
     final MainOptions opts = context.options;
     tb.add(NL + LOCAL_OPTIONS + NL);
     for(final Option<?> o : opts) info(tb, o.name(), opts.get(o));

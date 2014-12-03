@@ -52,28 +52,21 @@ public final class DiskData extends Data {
 
   /**
    * Default constructor, called from {@link Open#open}.
-   * @param db name of database
-   * @param ctx database context
+   * @param meta meta data
+   * @param in data input
    * @throws IOException I/O Exception
    */
-  public DiskData(final String db, final Context ctx) throws IOException {
-    meta = new MetaData(db, ctx);
+  public DiskData(final MetaData meta, final DataInput in) throws IOException {
+    super(meta);
 
-    // don't open databases marked as updating
-    if(updateFile().exists()) throw new BaseXException(Text.DB_UPDATED_X, meta.name);
-
-    try(final DataInput in = new DataInput(meta.dbfile(DATAINF))) {
-      // read meta data and indexes
-      meta.read(in);
-      while(true) {
-        final String k = string(in.readToken());
-        if(k.isEmpty()) break;
-        if(k.equals(DBTAGS))      elemNames = new Names(in, meta);
-        else if(k.equals(DBATTS)) attrNames = new Names(in, meta);
-        else if(k.equals(DBPATH)) paths = new PathSummary(this, in);
-        else if(k.equals(DBNS))   nspaces = new Namespaces(in);
-        else if(k.equals(DBDOCS)) resources.read(in);
-      }
+    while(true) {
+      final String k = string(in.readToken());
+      if(k.isEmpty()) break;
+      if(k.equals(DBTAGS))      elemNames = new Names(in, meta);
+      else if(k.equals(DBATTS)) attrNames = new Names(in, meta);
+      else if(k.equals(DBPATH)) paths = new PathSummary(this, in);
+      else if(k.equals(DBNS))   nspaces = new Namespaces(in);
+      else if(k.equals(DBDOCS)) resources.read(in);
     }
 
     // open data and indexes
@@ -101,7 +94,7 @@ public final class DiskData extends Data {
   public DiskData(final MetaData meta, final Names elemNames, final Names attrNames,
       final PathSummary paths, final Namespaces n) throws IOException {
 
-    this.meta = meta;
+    super(meta);
     this.elemNames = elemNames;
     this.attrNames = attrNames;
     this.paths = paths;
@@ -220,7 +213,7 @@ public final class DiskData extends Data {
   public void startUpdate(final MainOptions opts) throws IOException {
     if(!table.lock(true)) throw new BaseXException(Text.DB_PINNED_X, meta.name);
     if(opts.get(MainOptions.AUTOFLUSH)) {
-      final IOFile uf = updateFile();
+      final IOFile uf = meta.updateFile();
       if(uf.exists()) throw new BaseXException(Text.DB_UPDATED_X, meta.name);
       if(!uf.touch()) throw Util.notExpected("%: could not create lock file.", meta.name);
     }
@@ -231,7 +224,7 @@ public final class DiskData extends Data {
     // remove updating file
     final boolean auto = opts.get(MainOptions.AUTOFLUSH);
     if(auto) {
-      final IOFile uf = updateFile();
+      final IOFile uf = meta.updateFile();
       if(!uf.exists()) throw Util.notExpected("%: lock file does not exist.", meta.name);
       if(!uf.delete()) throw Util.notExpected("%: could not delete lock file.", meta.name);
     }
@@ -257,14 +250,6 @@ public final class DiskData extends Data {
     } catch(final IOException ex) {
       Util.stack(ex);
     }
-  }
-
-  /**
-   * Returns a file that indicates ongoing updates.
-   * @return updating file
-   */
-  public IOFile updateFile() {
-    return meta.dbfile(DATAUPD);
   }
 
   @Override

@@ -283,7 +283,6 @@ printing             = Megjelenítés
 project              = Projekt
 properties           = Tulajdonságok
 pw_changed_%         = '%' felhasználó jelszava megváltozott.
-pw_not_valid         = A jelszó nem érvényes MD5 hash.
 query                = Lekérdezés
 query_executed_%_%   = % lekérdezés lefutott % alatt.
 query_info           = Lekérdezési információk

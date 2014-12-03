@@ -4,7 +4,6 @@ import static org.basex.util.Token.*;
 
 import org.basex.build.*;
 import org.basex.build.CsvOptions.CsvFormat;
-import org.basex.io.parse.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -33,7 +32,7 @@ public final class CsvStringConverter extends CsvConverter {
   private final boolean lax;
 
   /** XML string. */
-  private final XmlTokenBuilder xml = new XmlTokenBuilder();
+  private final XMLTokenBuilder xml = new XMLTokenBuilder();
   /** Record. */
   private boolean record;
   /** Current column. */
@@ -78,8 +77,6 @@ public final class CsvStringConverter extends CsvConverter {
 
   @Override
   public Str finish() {
-    if(record) xml.close();
-    xml.close();
     return Str.get(xml.finish());
   }
 }

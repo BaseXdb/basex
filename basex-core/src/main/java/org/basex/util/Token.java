@@ -1,7 +1,5 @@
 package org.basex.util;
 
-import java.nio.charset.*;
-import java.security.*;
 import java.text.*;
 import java.util.*;
 
@@ -67,24 +65,6 @@ public final class Token {
   private static final byte[] IRIRES = token("!#$%&*'()+,-./:;=?@[]~_");
   /** Reserved characters. */
   private static final byte[] RES = token("-._~");
-
-  /** UTF8 encoding string. */
-  public static final String UTF8 = "UTF-8";
-  /** UTF16 encoding string. */
-  public static final String UTF16 = "UTF-16";
-  /** UTF16BE encoding string. */
-  public static final String UTF16BE = "UTF-16BE";
-  /** UTF16 encoding string. */
-  public static final String UTF16LE = "UTF-16LE";
-  /** UTF16 encoding string. */
-  public static final String UTF32 = "UTF-32";
-
-  /** UTF8 encoding strings. */
-  private static final String[] ALL_UTF8 = { UTF8, "UTF8" };
-  /** UTF16-LE encoding strings. */
-  private static final String[] ALL_UTF16 = { UTF16, "UTF16" };
-  /** UTF32 encoding strings. */
-  private static final String[] ALL_UTF32 = { UTF32, "UTF32" };
 
   /** Comparator for byte arrays. */
   public static final Comparator<byte[]> COMP = new Comparator<byte[]>() {
@@ -224,7 +204,7 @@ public final class Token {
    */
   public static byte[] utf8(final byte[] token, final String encoding) {
     // UTF8 (comparison by ref.) or no special characters: return input
-    if(encoding == UTF8 || ascii(token)) return token;
+    if(encoding == Strings.UTF8 || ascii(token)) return token;
 
     // convert to utf8. if errors occur while converting, an empty is returned.
     try {
@@ -232,45 +212,6 @@ public final class Token {
     } catch(final Exception ex) {
       Util.debug(ex);
       return EMPTY;
-    }
-  }
-
-  /**
-   * Returns a unified representation of the specified encoding.
-   * @param encoding input encoding (UTF-8 is returned for a {@code null} reference)
-   * @return encoding
-   */
-  public static String normEncoding(final String encoding) {
-    return normEncoding(encoding, false);
-  }
-
-  /**
-   * Returns a unified representation of the specified encoding.
-   * @param encoding input encoding (UTF-8 is returned for a {@code null} reference)
-   * @param utf16 normalize UTF-16 encoding
-   * @return encoding
-   */
-  public static String normEncoding(final String encoding, final boolean utf16) {
-    if(encoding == null) return UTF8;
-    final String e = encoding.toUpperCase(Locale.ENGLISH);
-    if(eq(e, ALL_UTF8)) return UTF8;
-    if(e.equals(UTF16LE)) return UTF16LE;
-    if(e.equals(UTF16BE)) return UTF16BE;
-    if(eq(e, ALL_UTF16))  return utf16 ? UTF16BE : UTF16;
-    if(eq(e, ALL_UTF32))  return UTF32;
-    return encoding;
-  }
-
-  /**
-   * Checks if the specified encoding is supported.
-   * @param encoding encoding
-   * @return result of check
-   */
-  public static boolean supported(final String encoding) {
-    try {
-      return Charset.isSupported(encoding);
-    } catch(final IllegalArgumentException ex) {
-      return false;
     }
   }
 
@@ -497,7 +438,7 @@ public final class Token {
   /** Constant float values. */
   private static final float[] FLT = { 1.0E17f, 1.0E15f, 1.0E13f, 1.0E11f,
     -1.0E17f, -1.0E15f, -1.0E13f, -1.0E11f };
-  /** String representations of float values. */
+  /** Token representations of float values. */
   private static final byte[][] FLTSTR = tokens("1.0E17", "1.0E15",
     "1.0E13", "1.0E11", "-1.0E17", "-1.0E15", "-1.0E13", "-1.0E11");
 
@@ -552,16 +493,6 @@ public final class Token {
   }
 
   /**
-   * Converts the specified string into an long value.
-   * {@link Long#MIN_VALUE} is returned if the input is invalid.
-   * @param string string to be converted
-   * @return resulting long value
-   */
-  public static long toLong(final String string) {
-    return toLong(token(string));
-  }
-
-  /**
    * Converts the specified token into an long value.
    * {@link Long#MIN_VALUE} is returned if the input is invalid.
    * Note that this may also be the actual value ({@link #MINLONG})..
@@ -597,16 +528,6 @@ public final class Token {
     }
     while(p < end && ws(token[p])) ++p;
     return p < end ? Long.MIN_VALUE : m ? -v : v;
-  }
-
-  /**
-   * Converts the specified string into an integer value.
-   * {@link Integer#MIN_VALUE} is returned if the input is invalid.
-   * @param string string to be converted
-   * @return resulting integer value
-   */
-  public static int toInt(final String string) {
-    return toInt(token(string));
   }
 
   /**
@@ -698,42 +619,6 @@ public final class Token {
    */
   public static boolean eq(final byte[] token, final byte[]... tokens) {
     for(final byte[] t : tokens) if(eq(token, t)) return true;
-    return false;
-  }
-
-  /**
-   * Compares two strings for equality. The arguments may be {@code null}.
-   * @param str1 first string
-   * @param str2 strings to be compared
-   * @return true if one test is successful
-   */
-  public static boolean eq(final String str1, final String str2) {
-    return str1 == null ? str2 == null : str1.equals(str2);
-  }
-
-  /**
-   * Compares several strings for equality. The arguments may be {@code null}.
-   * @param str first string
-   * @param strings strings to be compared
-   * @return true if one test is successful
-   */
-  public static boolean eq(final String str, final String... strings) {
-    for(final String s : strings) {
-      if(str == null ? s == null : str.equals(s)) return true;
-    }
-    return false;
-  }
-
-  /**
-   * Compares several strings for equality, ignoring the case.
-   * @param str first string
-   * @param strings strings to be compared
-   * @return true if one test is successful
-   */
-  public static boolean eqic(final String str, final String... strings) {
-    for(final String s : strings) {
-      if(str == null ? s == null : str.equalsIgnoreCase(s)) return true;
-    }
     return false;
   }
 
@@ -1116,7 +1001,7 @@ public final class Token {
   }
 
   /**
-   * Deletes the specified character from the token.
+   * Deletes a character from the token.
    * @param token token
    * @param ch character to be removed
    * @return resulting token
@@ -1308,42 +1193,6 @@ public final class Token {
     tb.add('%');
     tb.addByte(HEX[(value & 0xFF) >> 4]);
     tb.addByte(HEX[value & 0xFF & 15]);
-  }
-
-  /**
-   * Returns an MD5 hash in lower case.
-   * @param string string to be hashed
-   * @return md5 hash
-   */
-  public static String md5(final String string) {
-    try {
-      final MessageDigest md = MessageDigest.getInstance("MD5");
-      return string(hex(md.digest(token(string)), false));
-    } catch(final Exception ex) {
-      throw Util.notExpected(ex);
-    }
-  }
-
-  /**
-   * Converts the given string to camel case.
-   * @param string string to convert
-   * @return resulting string
-   */
-  public static String camelCase(final String string) {
-    final StringBuilder sb = new StringBuilder(string.length());
-    boolean dash = false;
-    final int sl = string.length();
-    for(int s = 0; s < sl; s++) {
-      final char ch = string.charAt(s);
-      if(dash) {
-        sb.append(Character.toUpperCase(ch));
-        dash = false;
-      } else {
-        dash = ch == '-';
-        if(!dash) sb.append(ch);
-      }
-    }
-    return sb.toString();
   }
 
   /**

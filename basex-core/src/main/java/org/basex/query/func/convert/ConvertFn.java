@@ -55,7 +55,7 @@ public abstract class ConvertFn extends StandardFunc {
   final byte[] stringToBinary(final QueryContext qc) throws QueryException {
     final byte[] in = toToken(exprs[0], qc);
     final String enc = toEncoding(1, BXCO_ENCODING_X, qc);
-    if(enc == null || enc == UTF8) return in;
+    if(enc == null || enc == Strings.UTF8) return in;
     try {
       return toBinary(in, enc);
     } catch(final CharacterCodingException ex) {
@@ -71,7 +71,7 @@ public abstract class ConvertFn extends StandardFunc {
    * @throws CharacterCodingException character coding exception
    */
   public static byte[] toBinary(final byte[] in, final String enc) throws CharacterCodingException {
-    if(enc == UTF8) return in;
+    if(enc == Strings.UTF8) return in;
     final ByteBuffer bb = Charset.forName(enc).newEncoder().encode(CharBuffer.wrap(string(in)));
     final int il = bb.limit();
     final byte[] tmp = bb.array();

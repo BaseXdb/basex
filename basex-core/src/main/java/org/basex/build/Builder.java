@@ -169,7 +169,7 @@ public abstract class Builder extends Proc {
    * @param encoding encoding
    */
   public final void encoding(final String encoding) {
-    meta.encoding = normEncoding(encoding);
+    meta.encoding = Strings.normEncoding(encoding);
   }
 
   // PROGRESS INFORMATION =====================================================

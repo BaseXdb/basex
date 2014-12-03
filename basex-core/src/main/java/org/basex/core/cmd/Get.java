@@ -42,7 +42,7 @@ public final class Get extends AGet {
   protected boolean run() throws IOException {
     if(args[0] == null) {
       // retrieve values of all options
-      if(context.user.has(Perm.ADMIN)) {
+      if(context.user().has(Perm.ADMIN)) {
         out.println(GLOBAL_OPTIONS + COL);
         for(final Option<?> o : soptions) out.println(o.name() + COLS + soptions.get(o));
       }
@@ -70,7 +70,7 @@ public final class Get extends AGet {
   public static String get(final String name, final Context ctx) throws BaseXException {
     Options opts = ctx.options;
     Option<?> opt = opts.option(name);
-    if(opt == null && ctx.user.has(Perm.ADMIN)) {
+    if(opt == null && ctx.user().has(Perm.ADMIN)) {
       opts = ctx.soptions;
       opt = opts.option(name);
     }

@@ -156,13 +156,13 @@ public final class PinTest extends SandboxTest {
   @Test
   public void createDropAlterUser() {
     // create and alter users (open issue: allow this if other instances are opened?)
-    ok(new CreateUser(NAME, Token.md5(Text.S_ADMIN)), context);
-    ok(new AlterUser(NAME, Token.md5("abc")), context);
+    ok(new CreateUser(NAME, Text.S_ADMIN), context);
+    ok(new AlterUser(NAME, "abc"), context);
     // create databases and open by second context
     ok(new CreateDB(NAME), context);
     ok(new Check(NAME), CONTEXT2);
     // create databases and open by second context
-    ok(new AlterUser(NAME, Token.md5("abc")), context);
+    ok(new AlterUser(NAME, "abc"), context);
   }
 
   /** Test CREATE INDEX and DROP INDEX. */

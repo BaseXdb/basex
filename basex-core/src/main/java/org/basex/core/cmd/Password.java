@@ -3,6 +3,7 @@ package org.basex.core.cmd;
 import static org.basex.core.Text.*;
 
 import org.basex.core.*;
+import org.basex.core.parse.*;
 
 /**
  * Evaluates the 'password' command and alters the user's password.
@@ -13,17 +14,22 @@ import org.basex.core.*;
 public final class Password extends AUser {
   /**
    * Default constructor.
-   * @param pw password
+   * @param password password (plain text)
    */
-  public Password(final String pw) {
-    super(Perm.NONE, pw);
+  public Password(final String password) {
+    super(Perm.NONE, password);
   }
 
   @Override
   protected boolean run() {
-    final String user = context.user.name;
-    final String pass = args[0];
-    return isMD5(pass) && context.users.alter(user, pass) ?
-        info(PW_CHANGED_X, user) : error(PW_NOT_VALID);
+    final String user = context.user().name(), pass = args[0];
+    context.users.alter(user, pass);
+    return info(PW_CHANGED_X, user);
+  }
+
+  @Override
+  protected void build(final CmdBuilder cb) {
+    cb.init();
+    if(cb.conf()) cb.arg(0);
   }
 }

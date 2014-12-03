@@ -61,7 +61,7 @@ public final class PermissionTest extends SandboxTest {
         ok(new DropUser(NAME), adminSession);
       }
 
-      ok(new CreateUser(NAME, Token.md5(NAME)), adminSession);
+      ok(new CreateUser(NAME, NAME), adminSession);
       ok(new CreateDB(RENAMED), adminSession);
       server.context.soptions.set(StaticOptions.REPOPATH, REPO);
       testSession = createClient(NAME, NAME);
@@ -93,7 +93,7 @@ public final class PermissionTest extends SandboxTest {
   public void noPermsNeeded() {
     ok(new Grant("none", NAME), adminSession);
 
-    ok(new Password(Token.md5(NAME)), testSession);
+    ok(new Password(NAME), testSession);
     ok(new Help("list"), testSession);
     ok(new Close(), testSession);
     no(new List(NAME), testSession);
@@ -123,13 +123,13 @@ public final class PermissionTest extends SandboxTest {
     no(new CreateIndex("SUMMARY"), testSession);
     no(new DropDB(NAME), testSession);
     no(new DropIndex("SUMMARY"), testSession);
-    no(new CreateUser(NAME, Token.md5(NAME)), testSession);
+    no(new CreateUser(NAME, NAME), testSession);
     no(new DropUser(NAME), testSession);
     no(new Kill("dada"), testSession);
     no(new ShowUsers("Users"), testSession);
     no(new Grant("read", NAME), testSession);
     no(new Grant("none", NAME), testSession);
-    no(new AlterUser(NAME, Token.md5(NAME)), testSession);
+    no(new AlterUser(NAME, NAME), testSession);
     no(new Flush(), testSession);
   }
 
@@ -164,14 +164,14 @@ public final class PermissionTest extends SandboxTest {
     no(new CreateIndex("SUMMARY"), testSession);
     no(new DropDB(NAME), testSession);
     no(new DropIndex("SUMMARY"), testSession);
-    no(new CreateUser(NAME, Token.md5(NAME)), testSession);
+    no(new CreateUser(NAME, NAME), testSession);
     no(new DropUser(NAME), testSession);
     no(new Export(Prop.TMP + NAME), testSession);
     no(new Kill("dada"), testSession);
     no(new ShowUsers("Users"), testSession);
     no(new Grant("read", NAME), testSession);
     no(new Grant("none", NAME), testSession);
-    no(new AlterUser(NAME, Token.md5(NAME)), testSession);
+    no(new AlterUser(NAME, NAME), testSession);
     no(new Flush(), testSession);
     ok(new Close(), testSession);
   }
@@ -213,14 +213,14 @@ public final class PermissionTest extends SandboxTest {
     ok(new Close(), testSession);
     no(new CreateDB(NAME, "<xml/>"), testSession);
     no(new DropDB(NAME), testSession);
-    no(new CreateUser(NAME, Token.md5(NAME)), testSession);
+    no(new CreateUser(NAME, NAME), testSession);
     no(new DropUser(NAME), testSession);
     no(new Export(Prop.TMP + NAME), testSession);
     no(new Kill("dada"), testSession);
     no(new ShowUsers("Users"), testSession);
     no(new Grant("read", NAME), testSession);
     no(new Grant("none", NAME), testSession);
-    no(new AlterUser(NAME, Token.md5(NAME)), testSession);
+    no(new AlterUser(NAME, NAME), testSession);
   }
 
   /** Tests all commands where create permission is needed. */
@@ -241,13 +241,13 @@ public final class PermissionTest extends SandboxTest {
     ok(new RepoList(), testSession);
     ok(new RepoDelete("http://www.pkg3.com", null), testSession);
 
-    no(new CreateUser(NAME, Token.md5(NAME)), testSession);
+    no(new CreateUser(NAME, NAME), testSession);
     no(new DropUser(NAME), testSession);
     no(new Kill("dada"), testSession);
     no(new ShowUsers("Users"), testSession);
     no(new Grant("read", NAME), testSession);
     no(new Grant("none", NAME), testSession);
-    no(new AlterUser(NAME, Token.md5(NAME)), testSession);
+    no(new AlterUser(NAME, NAME), testSession);
     no(new org.basex.core.cmd.Test(FOLDER + "tests-ok.xqm"), testSession);
   }
 
@@ -258,12 +258,12 @@ public final class PermissionTest extends SandboxTest {
     if(server.context.users.get("test2") != null) {
       ok(new DropUser("test2"), testSession);
     }
-    ok(new CreateUser("test2", Token.md5(NAME)), testSession);
+    ok(new CreateUser("test2", NAME), testSession);
     ok(new CreateDB(NAME, "<xml/>"), testSession);
     ok(new ShowUsers(), testSession);
     ok(new Grant(S_ADMIN, "test2"), testSession);
     ok(new Grant("create", "test2"), testSession);
-    ok(new AlterUser(NAME, Token.md5(NAME)), testSession);
+    ok(new AlterUser(NAME, NAME), testSession);
     ok(new DropUser("test2"), testSession);
     ok(new Close(), testSession);
     ok(new Close(), adminSession);

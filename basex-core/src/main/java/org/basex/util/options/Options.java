@@ -557,7 +557,7 @@ public class Options implements Iterable<Option<?>> {
           final int ss = name.length();
           for(int s = 0; s < ss; ++s) {
             if(Character.isDigit(name.charAt(s))) {
-              num = toInt(name.substring(s));
+              num = Strings.toInt(name.substring(s));
               name = name.substring(0, s);
               break;
             }
@@ -625,12 +625,12 @@ public class Options implements Iterable<Option<?>> {
         if(b == null) throw new BaseXException(Text.OPT_BOOLEAN, option.name());
         v = !b;
       } else {
-        v = Util.yes(val);
-        if(!v && !Util.no(val)) throw new BaseXException(Text.OPT_BOOLEAN, option.name());
+        v = Strings.yes(val);
+        if(!v && !Strings.no(val)) throw new BaseXException(Text.OPT_BOOLEAN, option.name());
       }
       put(option, v);
     } else if(option instanceof NumberOption) {
-      final int v = toInt(val);
+      final int v = Strings.toInt(val);
       if(v == MIN_VALUE) throw new BaseXException(Text.OPT_NUMBER, option.name());
       put(option, v);
     } else if(option instanceof StringOption) {
@@ -645,7 +645,7 @@ public class Options implements Iterable<Option<?>> {
       o.parse(val);
       put(option, o);
     } else if(option instanceof NumbersOption) {
-      final int v = toInt(val);
+      final int v = Strings.toInt(val);
       if(v == MIN_VALUE) throw new BaseXException(Text.OPT_NUMBER, option.name());
       int[] ii = (int[]) get(option);
       if(num == -1) {
@@ -665,7 +665,7 @@ public class Options implements Iterable<Option<?>> {
         for(final String s : ss) sl.add(s);
         put(option, sl.add(val).finish());
       } else if(num == 0) {
-        final int v = toInt(val);
+        final int v = Strings.toInt(val);
         if(v == MIN_VALUE) throw new BaseXException(Text.OPT_NUMBER, option.name());
         values.put(name, new String[v]);
       } else {

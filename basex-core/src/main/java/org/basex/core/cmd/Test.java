@@ -29,7 +29,7 @@ public final class Test extends Command {
   protected boolean run() {
     final IOFile root = new IOFile(args[0]);
     if(!root.exists()) return error(RES_NOT_FOUND_X,
-        context.user.has(Perm.CREATE) ? root : args[0]);
+        context.user().has(Perm.CREATE) ? root : args[0]);
 
     try {
       final XMLSerializer ser = Serializer.get(out);

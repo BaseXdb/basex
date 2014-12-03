@@ -2,7 +2,6 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
-import static org.basex.util.Token.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
@@ -45,7 +44,7 @@ public final class AdminModuleTest extends AdvancedQueryTest {
     // check if the admin user exists
     query(_ADMIN_USERS.args() + "= 'admin'", "true");
     // check if the temporarily created user is found
-    new CreateUser(NAME, md5(NAME)).execute(context);
+    new CreateUser(NAME, NAME).execute(context);
     query(_ADMIN_USERS.args() + "= '" + NAME + '\'', "true");
     // check if local user is found
     new Grant(Perm.READ, NAME, NAME).execute(context);

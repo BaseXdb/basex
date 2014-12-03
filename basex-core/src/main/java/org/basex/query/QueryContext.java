@@ -799,7 +799,7 @@ public final class QueryContext extends Proc implements AutoCloseable {
       time = new Tim(token(hms + zn), null);
       date = new Dat(token(ymd + zn), null);
       dtm = new Dtm(token(ymd + 'T' + hms + zn), null);
-      zone = new DTDur(toInt(zon.substring(0, 3)), toInt(zon.substring(3)));
+      zone = new DTDur(Strings.toInt(zon.substring(0, 3)), Strings.toInt(zon.substring(3)));
     }
     return this;
   }

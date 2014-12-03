@@ -185,8 +185,8 @@ final class Docs {
 
     // pre value points to a document node...
     if(doc >= 0) {
-      if(pathIndex) paths().deleteAt(doc);
-      docs.deleteAt(doc);
+      if(pathIndex) paths().remove(doc);
+      docs.remove(doc);
     }
 
     // adjust pre values of following document nodes

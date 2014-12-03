@@ -73,7 +73,7 @@ final class DialogCsvParser extends DialogParser {
     sep.add(seps);
 
     final String s = copts.get(CsvOptions.SEPARATOR);
-    if(Token.eq(s, sa)) {
+    if(Strings.eq(s, sa)) {
       seps.setSelectedItem(s);
     } else {
       seps.setSelectedIndex(sa.length);
@@ -137,7 +137,7 @@ final class DialogCsvParser extends DialogParser {
   @Override
   void update() {
     final String enc = encoding.getSelectedItem();
-    copts.set(CsvParserOptions.ENCODING, enc.equals(Token.UTF8) ? null : enc);
+    copts.set(CsvParserOptions.ENCODING, enc.equals(Strings.UTF8) ? null : enc);
     copts.set(CsvOptions.HEADER, header.isSelected());
     copts.set(CsvOptions.FORMAT, format.getSelectedItem());
     copts.set(CsvOptions.LAX, lax.isSelected());

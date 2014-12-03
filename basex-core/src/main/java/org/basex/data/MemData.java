@@ -41,7 +41,7 @@ public final class MemData extends Data {
       final Namespaces nspaces, final Index textIndex, final Index attrIndex,
       final MainOptions options) {
 
-    meta = new MetaData(options);
+    super(new MetaData(options));
     table = new TableMemAccess(meta);
     final boolean up = meta.updindex;
     if(up) idmap = new IdPreMap(meta.lastid);

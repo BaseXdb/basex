@@ -80,15 +80,6 @@ abstract class AUser extends Command {
   }
 
   /**
-   * Checks if the specified string is a valid MD5 hash value.
-   * @param md5 string to be checked
-   * @return result of check
-   */
-  static boolean isMD5(final String md5) {
-    return md5 != null && md5.matches("[0-9a-fA-F]{32}");
-  }
-
-  /**
    * Returns all users matching the specified glob pattern.
    * If the specified pattern does not contain any special characters,
    * it is treated as literal.

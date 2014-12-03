@@ -10,6 +10,7 @@ import java.util.*;
 
 import org.basex.*;
 import org.basex.core.*;
+import org.basex.core.StaticOptions.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
@@ -163,7 +164,7 @@ public abstract class HTTPTest extends SandboxTest {
     conn.setRequestProperty(MimeTypes.CONTENT_TYPE, type);
     // basic authentication
     final String encoded = org.basex.util.Base64.encode(Text.S_ADMIN + ':' + Text.S_ADMIN);
-    conn.setRequestProperty(HTTPText.AUTHORIZATION, HTTPText.BASIC + ' ' + encoded);
+    conn.setRequestProperty(HTTPText.AUTHORIZATION, AuthMethod.BASIC + " " + encoded);
     // send query
     try(final OutputStream out = conn.getOutputStream()) {
       out.write(token(request));

@@ -215,9 +215,9 @@ public final class HttpClient {
     if(m == null) {
       final byte[] tp = payloadAtts.get(MEDIA_TYPE);
       final String type = tp == null ? "" : string(tp);
-      if(eq(type, APP_HTML_XML)) {
+      if(Strings.eq(type, APP_HTML_XML)) {
         method = SerialMethod.XHTML.toString();
-      } else if(eq(type, TEXT_HTML)) {
+      } else if(Strings.eq(type, TEXT_HTML)) {
         method = SerialMethod.HTML.toString();
       } else if(isXML(type)) {
         method = SerialMethod.XML.toString();
@@ -237,7 +237,7 @@ public final class HttpClient {
       write(payload, payloadAtts, method, out);
     } else {
       final IOUrl io = new IOUrl(string(src));
-      if(eq(method, BINARY)) {
+      if(Strings.eq(method, BINARY)) {
         out.write(io.read());
       } else {
         final ValueBuilder vb = new ValueBuilder().add(Str.get(new TextInput(io).content()));

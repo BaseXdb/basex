@@ -7,7 +7,6 @@ import java.io.*;
 import java.util.*;
 
 import org.basex.http.webdav.impl.*;
-import org.basex.server.*;
 import org.basex.util.*;
 import org.xml.sax.*;
 import org.xml.sax.helpers.*;
@@ -45,7 +44,7 @@ public abstract class BXAbstractResource implements CopyableResource, DeletableR
     if(user == null) return null;
     return new BXCode<Object>(this) {
       @Override
-      public String get() throws LoginException {
+      public String get() throws IOException {
         service.authenticate(user, pass);
         return user;
       }

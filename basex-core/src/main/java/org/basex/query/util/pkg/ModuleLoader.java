@@ -113,7 +113,7 @@ public final class ModuleLoader {
     if(file.exists()) addURL(file);
 
     // try to create Java class instance
-    final String cp = camelCase(uriPath.replace('/', '.').substring(1));
+    final String cp = Strings.camelCase(uriPath.replace('/', '.').substring(1));
     final Class<?> clz;
     try {
       clz = findClass(cp);

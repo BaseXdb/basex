@@ -1,6 +1,6 @@
 package org.basex.io.in;
 
-import static org.basex.util.Token.*;
+import static org.basex.util.Strings.*;
 
 import java.io.*;
 
@@ -52,20 +52,20 @@ public class TextInput extends BufferInput {
       final int b = readByte();
       final int c = readByte();
       final int d = readByte();
-      String e = UTF8;
+      String e = Strings.UTF8;
       int skip = 0;
       if(a == 0xFF && b == 0xFE) { // BOM: FF FE
-        e = UTF16LE;
+        e = Strings.UTF16LE;
         skip = 2;
       } else if(a == 0xFE && b == 0xFF) { // BOM: FE FF
-        e = UTF16BE;
+        e = Strings.UTF16BE;
         skip = 2;
       } else if(a == 0xEF && b == 0xBB && c == 0xBF) { // BOM: EF BB BF
         skip = 3;
       } else if(a == '<' && b == 0 && c == '?' && d == 0) {
-        e = UTF16LE;
+        e = Strings.UTF16LE;
       } else if(a == 0 && b == '<' && c == 0 && d == '?') {
-        e = UTF16BE;
+        e = Strings.UTF16BE;
       }
       reset();
       for(int s = 0; s < skip; s++) readByte();

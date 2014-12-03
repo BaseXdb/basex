@@ -2,7 +2,7 @@ package org.basex.data;
 
 import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
-import static org.basex.util.Token.*;
+import static org.basex.util.Strings.*;
 
 import java.io.*;
 import java.util.concurrent.atomic.*;
@@ -233,6 +233,14 @@ public final class MetaData {
   }
 
   /**
+   * Returns a file that indicates ongoing updates.
+   * @return updating file
+   */
+  public IOFile updateFile() {
+    return dbfile(DATAUPD);
+  }
+
+  /**
    * Returns the specified binary file or {@code null} if the resource
    * path cannot be resolved (e.g. if it points to a parent directory).
    * @param pth internal file path
@@ -273,12 +281,13 @@ public final class MetaData {
   public void read(final DataInput in) throws IOException {
     String storage = "", istorage = "";
     while(true) {
-      final String k = string(in.readToken());
+      final String k = Token.string(in.readToken());
       if(k.isEmpty()) break;
       if(k.equals(DBPERM)) {
+        // legacy (Version <= 7.9)
         users.read(in);
       } else {
-        final String v = string(in.readToken());
+        final String v = Token.string(in.readToken());
         if(k.equals(DBSTR))           storage    = v;
         else if(k.equals(IDBSTR))     istorage   = v;
         else if(k.equals(DBFNAME))    original   = v;
@@ -320,6 +329,9 @@ public final class MetaData {
     corrupt = dbfile(DATAUPD).exists();
     // deactivate full-text index if obsolete trie structure was used
     if(wcindex) ftxtindex = false;
+
+    // [CG] USERS: read prm.basex
+    //users.read(dbfile(DATAPRM));
   }
 
   /**
@@ -353,7 +365,9 @@ public final class MetaData {
     writeInfo(out, DBUPTODATE, uptodate);
     writeInfo(out, DBLASTID,   lastid);
     if(language != null) writeInfo(out, DBFTLN, language.toString());
-    out.writeToken(token(DBPERM));
+
+    // [CG] USERS: to be replaced with XML representation in extra file
+    out.writeToken(Token.token(DBPERM));
     users.write(out);
     out.write(0);
   }
@@ -428,8 +442,8 @@ public final class MetaData {
    */
   private static void writeInfo(final DataOutput out, final String name, final String value)
       throws IOException {
-    out.writeToken(token(name));
-    out.writeToken(token(value));
+    out.writeToken(Token.token(name));
+    out.writeToken(Token.token(value));
   }
 
 }

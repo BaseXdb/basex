@@ -18,7 +18,7 @@ import org.junit.Test;
  */
 public final class UTF8Test extends SandboxTest {
   /** UTF8 character set. */
-  private static final Charset CS_UTF8 = Charset.availableCharsets().get(UTF8);
+  private static final Charset CS_UTF8 = Charset.availableCharsets().get(Strings.UTF8);
 
   /**
    * Tests for all valid code points if characters are properly converted.

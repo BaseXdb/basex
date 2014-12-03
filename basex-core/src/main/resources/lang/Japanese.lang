@@ -283,7 +283,6 @@ printing             = 印刷中
 project              = プロジェクト
 properties           = プロパティ
 pw_changed_%         = ユーザー '%' のパスワードを変更しました。
-pw_not_valid         = パスワードが有効なMD5ハッシュ値ではありません。
 query                = クエリー
 query_executed_%_%   = % % のクエリーが実行されました。
 query_info           = クエリー情報

@@ -283,7 +283,6 @@ printing             = Вывод на экран
 project              = Проект
 properties           = Свойства
 pw_changed_%         = Пароль пользователя '%' был изменен
-pw_not_valid         = Пароль не является корректным хэшем MD5
 query                = Запрос
 query_executed_%_%   = Запрос% выполнен за %.
 query_info           = Информация о запросе

@@ -104,6 +104,6 @@ public final class XQFTTS extends W3CTS {
    * @throws QueryException query exception
    */
   private String[] aux(final String role, final Item root) throws QueryException {
-    return text("*:aux-URI[@role = '" + role + "']", root).split("/");
+    return Strings.split(text("*:aux-URI[@role = '" + role + "']", root), '/').finish();
   }
 }

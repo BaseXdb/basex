@@ -127,7 +127,7 @@ final class DialogJsonParser extends DialogParser {
   @Override
   void update() {
     final String enc = encoding.getSelectedItem();
-    jopts.set(JsonParserOptions.ENCODING, enc.equals(Token.UTF8) ? null : enc);
+    jopts.set(JsonParserOptions.ENCODING, enc.equals(Strings.UTF8) ? null : enc);
     jopts.set(JsonParserOptions.LIBERAL, liberal.isSelected());
     jopts.set(JsonParserOptions.UNESCAPE, unescape.isSelected());
     jopts.set(JsonOptions.MERGE, merge.isSelected());

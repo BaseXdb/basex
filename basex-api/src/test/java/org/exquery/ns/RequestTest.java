@@ -168,6 +168,6 @@ public final class RequestTest extends HTTPTest {
    */
   private static String request(final String query) throws Exception {
     return URLEncoder.encode(
-        "import module namespace R='http://exquery.org/ns/request';" + query, Token.UTF8);
+        "import module namespace R='http://exquery.org/ns/request';" + query, Strings.UTF8);
   }
 }

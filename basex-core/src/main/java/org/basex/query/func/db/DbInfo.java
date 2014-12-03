@@ -20,7 +20,7 @@ public final class DbInfo extends DbAccess {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Data data = checkData(qc);
-    final boolean create = qc.context.user.has(Perm.CREATE);
+    final boolean create = qc.context.user().has(Perm.CREATE);
     return toNode(InfoDB.db(data.meta, false, true, create), DATABASE);
   }
 }

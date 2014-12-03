@@ -369,7 +369,7 @@ public final class BaseXServer extends CLI implements Runnable {
             break;
           }
           final BufferInput bi = new BufferInput(es.getInputStream());
-          final long id = Token.toLong(bi.readString());
+          final long id = Strings.toLong(bi.readString());
           for(final ClientListener s : context.sessions) {
             if(s.getId() == id) {
               s.register(es);

@@ -619,7 +619,7 @@ public abstract class W3CTS extends Main {
       final File file = new File(results + pth);
       if(!file.exists()) file.mkdirs();
       try(final BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
-          new FileOutputStream(results + pth + name), UTF8))) {
+          new FileOutputStream(results + pth + name), Strings.UTF8))) {
         bw.write(msg);
       }
     }

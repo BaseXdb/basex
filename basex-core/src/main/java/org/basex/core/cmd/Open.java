@@ -1,11 +1,13 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
+import static org.basex.data.DataText.*;
 
 import java.io.*;
 
 import org.basex.core.*;
 import org.basex.data.*;
+import org.basex.io.in.DataInput;
 import org.basex.util.*;
 
 /**
@@ -76,18 +78,32 @@ public final class Open extends Command {
    * @throws IOException I/O exception
    */
   public static Data open(final String name, final Context ctx) throws IOException {
+    // [CG] USERS: check permissions before opening database
+
     synchronized(ctx.dbs) {
       Data data = ctx.dbs.pin(name);
-      if(data == null) {
-        // check if database exists
+      if(data != null) {
+        // check permissions in opened database
+        if(!ctx.perm(Perm.READ, data.meta)) {
+          ctx.dbs.unpin(data);
+          throw new BaseXException(PERM_REQUIRED_X, Perm.READ);
+        }
+      } else {
+        // check if the addressed database exists
         if(!ctx.soptions.dbexists(name)) throw new BaseXException(dbnf(name));
-        data = new DiskData(name, ctx);
+
+        // do not open a database that is currently updated
+        final MetaData meta = new MetaData(name, ctx);
+        if(meta.updateFile().exists()) throw new BaseXException(Text.DB_UPDATED_X, meta.name);
+
+        // open meta data and database
+        try(final DataInput in = new DataInput(meta.dbfile(DATAINF))) {
+          meta.read(in);
+          // open database if user has permissions
+          if(!ctx.perm(Perm.READ, meta)) throw new BaseXException(PERM_REQUIRED_X, Perm.READ);
+          data = new DiskData(meta, in);
+        }
         ctx.dbs.add(data);
-      }
-      // check permissions
-      if(!ctx.perm(Perm.READ, data.meta)) {
-        Close.close(data, ctx);
-        throw new BaseXException(PERM_REQUIRED_X, Perm.READ);
       }
       return data;
     }

@@ -107,7 +107,7 @@ final class XMLScanner extends Proc {
           prev(5);
         }
       }
-      encoding = enc == null ? UTF8 : enc;
+      encoding = enc == null ? Strings.UTF8 : enc;
 
       if(!fragment) {
         final int n = consume();

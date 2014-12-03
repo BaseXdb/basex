@@ -350,7 +350,7 @@ public final class ViewContainer extends BaseXBack {
       int nv = 0;
       while(st.hasMoreTokens()) {
         final String t = st.nextToken();
-        if(Token.eq(t, "H", "V")) {
+        if(Strings.eq(t, "H", "V")) {
           l[lvl + 1] = new ViewAlignment("H".equals(t));
           if(layout == null) {
             layout = l[0];

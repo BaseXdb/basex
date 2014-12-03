@@ -136,7 +136,7 @@ public abstract class RESTCmd extends Command {
   }
 
   /**
-   * Returns a string representation of the used serialization parameters.
+   * Returns serialization parameters.
    * @param http HTTP context
    * @return serialization parameters
    */

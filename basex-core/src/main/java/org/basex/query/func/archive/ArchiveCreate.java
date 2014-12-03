@@ -34,12 +34,12 @@ public class ArchiveCreate extends ArchiveFn {
       final String alg = opts.get(ArchOptions.ALGORITHM);
       int level = ZipEntry.DEFLATED;
       if(alg != null) {
-        if(format.equals(ZIP)  && !eq(alg, STORED, DEFLATE) ||
-           format.equals(GZIP) && !eq(alg, DEFLATE)) {
+        if(format.equals(ZIP)  && !Strings.eq(alg, STORED, DEFLATE) ||
+           format.equals(GZIP) && !Strings.eq(alg, DEFLATE)) {
           throw ARCH_SUPP_X_X.get(info, ArchOptions.ALGORITHM.name(), alg);
         }
-        if(eq(alg, STORED)) level = ZipEntry.STORED;
-        else if(eq(alg, DEFLATE)) level = ZipEntry.DEFLATED;
+        if(Strings.eq(alg, STORED)) level = ZipEntry.STORED;
+        else if(Strings.eq(alg, DEFLATE)) level = ZipEntry.DEFLATED;
       }
       out.level(level);
 
@@ -114,7 +114,7 @@ public class ArchiveCreate extends ArchiveFn {
 
     // data to be compressed
     byte[] val = toBinary(cont);
-    if(cont instanceof AStr && enc != null && enc != UTF8) val = encode(val, enc, qc);
+    if(cont instanceof AStr && enc != null && enc != Strings.UTF8) val = encode(val, enc, qc);
 
     try {
       out.level(lvl == null ? level : toInt(lvl));

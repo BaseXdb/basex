@@ -213,7 +213,7 @@ public final class QueryResources {
       final int cs = colls.size();
       for(int c = 0; c < cs; c++) {
         final String name = collNames.get(c);
-        if(Prop.CASE ? Token.eq(name, names) : Token.eqic(name, names)) return colls.get(c);
+        if(Prop.CASE ? Strings.eq(name, names) : Strings.eqic(name, names)) return colls.get(c);
       }
     }
 
@@ -374,7 +374,7 @@ public final class QueryResources {
     final Context context = qc.context;
 
     // do not check input if no read permissions are given
-    if(!context.user.has(Perm.READ))
+    if(!context.user().has(Perm.READ))
       throw BXXQ_PERM_X.get(info, Util.info(Text.PERM_REQUIRED_X, Perm.READ));
 
     // check if input is an existing file

@@ -334,7 +334,7 @@ public final class HttpPayload {
     if(ctype != null) {
       if(isJSON(ctype)) {
         final JsonParserOptions jopts = new JsonParserOptions();
-        if(eq(ctype, APP_JSONML)) jopts.set(JsonOptions.FORMAT, JsonFormat.JSONML);
+        if(Strings.eq(ctype, APP_JSONML)) jopts.set(JsonOptions.FORMAT, JsonFormat.JSONML);
         val = new DBNode(new JsonParser(in, opts, jopts));
       } else if(TEXT_CSV.equals(ctype)) {
         val = new DBNode(new CsvParser(in, opts));
@@ -342,7 +342,7 @@ public final class HttpPayload {
         val = new DBNode(new HtmlParser(in, opts));
       } else if(APP_FORM_URLENCODED.equals(ctype)) {
         final String enc = charset(ext);
-        val = Str.get(URLDecoder.decode(string(in.read()), enc == null ? UTF8 : enc));
+        val = Str.get(URLDecoder.decode(string(in.read()), enc == null ? Strings.UTF8 : enc));
       } else if(isXML(ctype)) {
         val = new DBNode(in);
       } else if(isText(ctype)) {

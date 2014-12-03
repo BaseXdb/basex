@@ -84,6 +84,6 @@ public class SessionTest extends HTTPTest {
    */
   private static String request(final String query) throws Exception {
     return URLEncoder.encode("import module namespace " +
-        "S='http://basex.org/modules/session';" + query, Token.UTF8);
+        "S='http://basex.org/modules/session';" + query, Strings.UTF8);
   }
 }

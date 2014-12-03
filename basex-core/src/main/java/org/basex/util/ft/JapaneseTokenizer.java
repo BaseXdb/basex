@@ -597,8 +597,7 @@ public class JapaneseTokenizer extends Tokenizer {
      * @return base form
      */
     public String getBaseForm() {
-      final String[] parts = mFeature.split(",");
-      return parts[6];
+      return Strings.split(mFeature, ',').get(6);
     }
 
     /**
@@ -606,8 +605,7 @@ public class JapaneseTokenizer extends Tokenizer {
      * @return parts of speech(coding in Japanese)
      */
     private String getPos() {
-      final String[] parts = mFeature.split(",");
-      return parts[0];
+      return Strings.split(mFeature, ',').get(0);
     }
 
     @Override

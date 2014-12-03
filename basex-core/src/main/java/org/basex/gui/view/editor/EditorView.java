@@ -761,7 +761,7 @@ public final class EditorView extends View {
   public void jump(final String link) {
     final Matcher m = LINK.matcher(link);
     if(m.matches()) {
-      errorInfo = new InputInfo(m.group(1), toInt(m.group(2)), toInt(m.group(3)));
+      errorInfo = new InputInfo(m.group(1), Strings.toInt(m.group(2)), Strings.toInt(m.group(3)));
       error(true);
     } else {
       Util.stack("No match found: " + link);

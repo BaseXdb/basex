@@ -143,7 +143,7 @@ public class IntList extends ElementList {
    * @param index index of the element to delete
    * @return deleted element
    */
-  public final int deleteAt(final int index) {
+  public final int remove(final int index) {
     final int[] lst = list;
     final int l = lst[index];
     Array.move(lst, index + 1, -1, --size - index);

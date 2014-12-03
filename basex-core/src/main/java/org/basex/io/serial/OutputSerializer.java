@@ -114,13 +114,13 @@ public abstract class OutputSerializer extends Serializer {
     saomit = sa == YesNoOmit.OMIT;
 
     final String maps = opts.get(USE_CHARACTER_MAPS);
-    final String enc = normEncoding(opts.get(ENCODING), true);
+    final String enc = Strings.normEncoding(opts.get(ENCODING), true);
     try {
       encoding = Charset.forName(enc);
     } catch(final Exception ex) {
       throw SERENCODING_X.getIO(enc);
     }
-    utf8 = enc == UTF8;
+    utf8 = enc == Strings.UTF8;
     if(!utf8) {
       encoder = encoding.newEncoder();
       encbuffer = new TokenBuilder();
@@ -157,11 +157,11 @@ public abstract class OutputSerializer extends Serializer {
 
     if(bom) {
       // comparison by reference
-      if(enc == UTF8) {
+      if(enc == Strings.UTF8) {
         out.write(0xEF); out.write(0xBB); out.write(0xBF);
-      } else if(enc == UTF16LE) {
+      } else if(enc == Strings.UTF16LE) {
         out.write(0xFF); out.write(0xFE);
-      } else if(enc == UTF16BE) {
+      } else if(enc == Strings.UTF16BE) {
         out.write(0xFE); out.write(0xFF);
       }
     }
@@ -281,7 +281,7 @@ public abstract class OutputSerializer extends Serializer {
     for(int k = 0; k < vl; k += cl(val, k)) {
       final int cp = cp(val, k);
       if(cp == '"') {
-        print(E_QU);
+        print(E_QUOT);
       } else if(cp == 0x9 || cp == 0xA) {
         hex(cp);
       } else {
@@ -484,7 +484,8 @@ public abstract class OutputSerializer extends Serializer {
     //if(ch > 0xFFFF) print(HEX[ch >> 16]);
     //if(ch > 0xFFF) print(HEX[(ch & 0xFFFF) >> 12]);
     //if(ch > 0xFF) print(HEX[(ch & 0xFFF) >> 8]);
-    if(cp > 0xF) print(HEX[(cp & 0xFF) >> 4]);
+    //if(cp > 0xF) print(HEX[(cp & 0xFF) >> 4]);
+    if(cp > 0xF) print(HEX[cp >> 4]);
     print(HEX[cp & 0xF]);
     print(';');
   }

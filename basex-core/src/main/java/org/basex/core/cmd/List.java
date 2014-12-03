@@ -64,7 +64,7 @@ public final class List extends Command {
     final Table table = new Table();
     table.description = DATABASES_X;
 
-    final boolean create = context.user.has(Perm.CREATE);
+    final boolean create = context.user().has(Perm.CREATE);
     table.header.add(NAME);
     table.header.add(RESOURCES);
     table.header.add(SIZE);

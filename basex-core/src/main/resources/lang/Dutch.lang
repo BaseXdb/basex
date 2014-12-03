@@ -283,7 +283,6 @@ printing             = Printen
 project              = Project
 properties           = Eigenschappen
 pw_changed_%         = Wachtwoord van gebruiker '%' veranderd.
-pw_not_valid         = Password is geen geldige MD5 hash.
 query                = Query
 query_executed_%_%   = Query% uitgevoerd in % seconden.
 query_info           = Query info

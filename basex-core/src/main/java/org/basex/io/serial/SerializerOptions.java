@@ -26,7 +26,7 @@ public final class SerializerOptions extends Options {
       new StringOption("doctype-system", "");
   /** Serialization parameter: valid encoding. */
   public static final StringOption ENCODING =
-      new StringOption("encoding", Token.UTF8);
+      new StringOption("encoding", Strings.UTF8);
   /** Serialization parameter: yes/no. */
   public static final EnumOption<YesNo> ESCAPE_URI_ATTRIBUTES =
       new EnumOption<>("escape-uri-attributes", YesNo.NO);

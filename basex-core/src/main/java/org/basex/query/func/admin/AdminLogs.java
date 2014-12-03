@@ -47,7 +47,7 @@ public final class AdminLogs extends AdminFn {
         final FElem elem = new FElem(ENTRY);
         if(l1.address != null) {
           if(merge && l1.ms.equals(BigDecimal.ZERO) &&
-              !Token.eq(l1.address, Log.SERVER, Log.STANDALONE)) {
+              !Strings.eq(l1.address, Log.SERVER, Log.STANDALONE)) {
             for(int l = s + 1; l < logs.size(); l++) {
               final LogEntry l2 = logs.get(l);
               if(l2 != null && l1.address.equals(l2.address)) {

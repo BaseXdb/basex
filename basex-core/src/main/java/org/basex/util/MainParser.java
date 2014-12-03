@@ -118,7 +118,7 @@ public final class MainParser {
    * @throws BaseXException database exception
    */
   public int number() throws BaseXException {
-    final int i = Token.toInt(string());
+    final int i = Strings.toInt(string());
     if(i < 0) throw usage();
     return i;
   }

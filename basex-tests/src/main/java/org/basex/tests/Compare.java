@@ -69,7 +69,7 @@ public abstract class Compare {
 
     // loop through all queries
     try(final BufferedReader br = new BufferedReader(
-        new InputStreamReader(new FileInputStream(QUERIES), Token.UTF8))) {
+        new InputStreamReader(new FileInputStream(QUERIES), Strings.UTF8))) {
       while(true) {
         final String line = br.readLine();
         if(line == null) break;

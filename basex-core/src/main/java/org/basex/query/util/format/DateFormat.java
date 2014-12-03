@@ -50,10 +50,10 @@ final class DateFormat extends FormatParser {
     if(width != null) {
       final Matcher m = WIDTH.matcher(string(width));
       if(!m.find()) throw PICDATE_X.get(info, width);
-      int i = toInt(m.group(1));
+      int i = Strings.toInt(m.group(1));
       if(i != Integer.MIN_VALUE) min = i;
       final String mc = m.group(3);
-      i = mc != null ? toInt(mc) : Integer.MIN_VALUE;
+      i = mc != null ? Strings.toInt(mc) : Integer.MIN_VALUE;
       if(i != Integer.MIN_VALUE) max = i;
     }
   }

@@ -85,7 +85,8 @@ public abstract class Data {
   /** Resource index. */
   public final Resources resources = new Resources(this);
   /** Meta data. */
-  public MetaData meta;
+  public final MetaData meta;
+
   /** Element names. */
   public Names elemNames;
   /** Attribute names. */
@@ -109,6 +110,14 @@ public abstract class Data {
   IdPreMap idmap;
   /** States if distance caching is active. */
   public boolean cache;
+
+  /**
+   * Default constructor.
+   * @param meta meta data
+   */
+  protected Data(final MetaData meta) {
+    this.meta = meta;
+  }
 
   /**
    * Closes the database.

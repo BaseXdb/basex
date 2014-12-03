@@ -17,13 +17,17 @@ public final class CmdBuilder {
   private final TokenBuilder tb = new TokenBuilder();
   /** Command to be output. */
   private final Command cmd;
+  /** Confidential flag. */
+  private final boolean conf;
 
   /**
    * Constructor.
    * @param cmd command
+   * @param conf confidential flag
    */
-  public CmdBuilder(final Command cmd) {
+  public CmdBuilder(final Command cmd, final boolean conf) {
     this.cmd = cmd;
+    this.conf = conf;
   }
 
   /**
@@ -63,6 +67,14 @@ public final class CmdBuilder {
   public CmdBuilder xquery(final int arg) {
     tb.add(' ').add(cmd.args[arg]);
     return this;
+  }
+
+  /**
+   * Returns the confidential flag.
+   * @return flag
+   */
+  public boolean conf() {
+    return conf;
   }
 
   /**

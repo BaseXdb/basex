@@ -50,7 +50,7 @@ public final class SqlConnect extends SqlFn {
           final HashMap<String, String> options = opts.free();
           final String commit = options.get(AUTO_COMM);
           if(commit != null) {
-            ac = Util.yes(commit);
+            ac = Strings.yes(commit);
             options.remove(AUTO_COMM);
           }
           // connection properties

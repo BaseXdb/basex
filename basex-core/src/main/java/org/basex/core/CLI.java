@@ -33,7 +33,7 @@ public abstract class CLI extends Main {
     @Override
     public String password() {
       Util.out(PASSWORD + COLS);
-      return md5(Util.password());
+      return Util.password();
     }
   };
   /** Session. */

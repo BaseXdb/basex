@@ -107,7 +107,7 @@ public final class GUI extends JFrame {
     @Override
     public String password() {
       final DialogPass dp = new DialogPass();
-      return dp.ok() ? Token.md5(dp.pass()) : "";
+      return dp.ok() ? dp.password() : "";
     }
   };
 

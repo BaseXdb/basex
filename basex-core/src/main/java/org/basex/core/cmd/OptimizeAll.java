@@ -142,8 +142,8 @@ public final class OptimizeAll extends ACreate {
         // move binary files
         final IOFile bin = data.meta.binaries();
         if(bin.exists()) bin.rename(dt.meta.binaries());
-        final IOFile upd = odata.updateFile();
-        if(upd.exists()) upd.copyTo(dt.updateFile());
+        final IOFile upd = odata.meta.updateFile();
+        if(upd.exists()) upd.copyTo(dt.meta.updateFile());
       } finally {
         dt.close();
       }

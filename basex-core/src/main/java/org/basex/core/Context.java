@@ -41,8 +41,6 @@ public final class Context {
   /** Databases list. */
   public final Databases databases;
 
-  /** User reference. */
-  public User user;
   /** Log. */
   public final Log log;
 
@@ -50,6 +48,8 @@ public final class Context {
   private DBNodes current;
   /** Process locking. */
   private final Locking locks;
+  /** User reference. */
+  private User user;
   /** Data reference. */
   private Data data;
 
@@ -115,6 +115,23 @@ public final class Context {
     log = new Log(soptions);
     user = users.get(S_ADMIN);
     listener = null;
+  }
+
+  /**
+   * Returns the user of this context.
+   * @return user
+   */
+  public User user() {
+    return user;
+  }
+
+  /**
+   * Sets the user of this context. This method can only be called once.
+   * @param us user
+   */
+  public void user(final User us) {
+    if(user != null) throw Util.notExpected("User has already been assigned.");
+    user = us;
   }
 
   /**
@@ -219,7 +236,7 @@ public final class Context {
    */
   public boolean perm(final Perm perm, final MetaData md) {
     final User us = md == null || perm == Perm.CREATE || perm == Perm.ADMIN ? null :
-      md.users.get(user.name);
+      md.users.get(user.name());
     return (us == null ? user : us).has(perm);
   }
 
@@ -264,8 +281,8 @@ public final class Context {
 
     // replace empty string with currently opened database and return array
     for(int d = 0; d < sl.size(); d++) {
-      if(Token.eq(sl.get(d), DBLocking.CTX, DBLocking.COLL)) {
-        if(data == null) sl.deleteAt(d);
+      if(Strings.eq(sl.get(d), DBLocking.CTX, DBLocking.COLL)) {
+        if(data == null) sl.remove(d);
         else sl.set(d, data.meta.name);
       }
     }

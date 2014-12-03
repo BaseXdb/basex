@@ -36,13 +36,15 @@ public final class CreateUser extends AUser {
 
   @Override
   public void build(final CmdBuilder cb) {
-    cb.init(Cmd.CREATE + " " + CmdCreate.USER).args();
+    cb.init(Cmd.CREATE + " " + CmdCreate.USER);
+    cb.arg(0);
+    if(!cb.conf()) cb.arg(1);
   }
 
   /**
    * Creates a new user.
    * @param user user name
-   * @param pass password
+   * @param pass password (plain text)
    * @param ctx database context
    * @throws BaseXException database exception
    */
@@ -50,7 +52,6 @@ public final class CreateUser extends AUser {
       throws BaseXException {
 
     if(!Databases.validName(user)) throw new BaseXException(NAME_INVALID_X, user);
-    if(!isMD5(pass)) throw new BaseXException(PW_NOT_VALID);
     if(!ctx.users.create(user, pass)) throw new BaseXException(USER_EXISTS_X, user);
   }
 }

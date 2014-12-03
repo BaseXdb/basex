@@ -107,6 +107,10 @@ public interface DataText {
   String DATAUPD = "upd";
   /** Database - Document path index. */
   String DATADOC = "doc";
+  /** Database - ID->PRE mapping. */
+  String DATAIDP = "idp";
+  /** Database - Permissions. */
+  String DATAPRM = "prm";
 
   // XML SERIALIZATION ============================================================================
 
@@ -140,7 +144,7 @@ public interface DataText {
   /** Ampersand entity. */
   byte[] E_AMP = token("&amp;");
   /** Quote entity. */
-  byte[] E_QU = token("&quot;");
+  byte[] E_QUOT = token("&quot;");
   /** GreaterThan entity. */
   byte[] E_GT = token("&gt;");
   /** LessThan entity. */
@@ -253,6 +257,4 @@ public interface DataText {
   byte[] TABLEURI = token("URI");
   /** Table kinds. */
   byte[][] TABLEKINDS = tokens("DOC ", "ELEM", "TEXT", "ATTR", "COMM", "PI  ");
-  /** Database - ID->PRE mapping. */
-  String DATAIDP = "idp";
 }

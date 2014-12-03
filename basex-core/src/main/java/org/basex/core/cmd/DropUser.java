@@ -49,7 +49,7 @@ public final class DropUser extends AUser {
     // drop global user
     if(db == null) {
       for(final ClientListener s : context.sessions) {
-        if(s.context().user.name.equals(user)) return !info(USER_LOGGED_IN_X, user);
+        if(s.context().user().name().equals(user)) return !info(USER_LOGGED_IN_X, user);
       }
       context.users.drop(context.users.get(user));
       return info(USER_DROPPED_X, user);

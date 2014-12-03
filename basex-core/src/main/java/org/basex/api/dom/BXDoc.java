@@ -129,7 +129,7 @@ public final class BXDoc extends BXNode implements Document {
 
   @Override
   public String getInputEncoding() {
-    return UTF8;
+    return Strings.UTF8;
   }
 
   @Override
@@ -139,7 +139,7 @@ public final class BXDoc extends BXNode implements Document {
 
   @Override
   public String getXmlEncoding() {
-    return UTF8;
+    return Strings.UTF8;
   }
 
   @Override

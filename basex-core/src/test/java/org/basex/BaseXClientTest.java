@@ -6,7 +6,6 @@ import java.io.*;
 
 import org.basex.core.*;
 import org.basex.io.out.*;
-import org.basex.util.*;
 import org.basex.util.list.*;
 import org.junit.*;
 
@@ -58,7 +57,7 @@ public final class BaseXClientTest extends BaseXTest {
   public void user() throws IOException {
     run("-cexit", "-cdrop user " + NAME);
     equals("5", new String[] { "-U" + NAME, "-P" + NAME, "-q5" },
-        new String[] { "-ccreate user " + NAME + ' ' + Token.md5(NAME) });
+        new String[] { "-ccreate user " + NAME + ' ' + NAME });
     run("-cexit", "-cdrop user " + NAME);
   }
 

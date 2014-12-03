@@ -283,7 +283,6 @@ printing             = Printing
 project              = Project
 properties           = Properties
 pw_changed_%         = Password of user '%' changed.
-pw_not_valid         = Password is no valid MD5 hash.
 query                = Query
 query_executed_%_%   = Query% executed in %.
 query_info           = Query Info

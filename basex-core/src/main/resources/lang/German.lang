@@ -283,7 +283,6 @@ printing             = Ausgabe
 project              = Projekt
 properties           = Eigenschaften
 pw_changed_%         = Passwort von Benutzer '%' geändert.
-pw_not_valid         = Passwort ist kein gültiger MD5-Hash.
 query                = Anfrage
 query_executed_%_%   = Anfrage% ausgeführt (%).
 query_info           = Anfrage-Info

@@ -109,7 +109,7 @@ public final class HtmlParser extends XMLParser {
 
       // define input
       final InputSource is = new InputSource(new ArrayInput(content));
-      is.setEncoding(supported(enc) ? normEncoding(enc) : UTF8);
+      is.setEncoding(Strings.supported(enc) ? Strings.normEncoding(enc) : Strings.UTF8);
       // define output
       final StringWriter sw = new StringWriter();
       final XMLReader reader = (XMLReader) Reflect.get(READER);

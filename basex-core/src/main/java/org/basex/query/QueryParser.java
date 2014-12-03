@@ -245,7 +245,8 @@ public class QueryParser extends InputParser {
    */
   private void init() throws QueryException {
     final IO baseIO = sc.baseIO();
-    file = baseIO == null ? null : qc.context.user.has(Perm.ADMIN) ? baseIO.path() : baseIO.name();
+    file = baseIO == null ? null : qc.context.user().has(Perm.ADMIN) ? baseIO.path() :
+      baseIO.name();
     if(!more()) throw error(QUERYEMPTY);
 
     // checks if the query string contains invalid characters
@@ -302,12 +303,12 @@ public class QueryParser extends InputParser {
     if(version) {
       // parse xquery version
       final String ver = string(stringLiteral());
-      if(!ver.equals(XQ10) && !eq(ver, XQ11, XQ30, XQ31)) throw error(XQUERYVER_X, ver);
+      if(!ver.equals(XQ10) && !Strings.eq(ver, XQ11, XQ30, XQ31)) throw error(XQUERYVER_X, ver);
     }
     // parse xquery encoding (ignored, as input always comes in as string)
     if(wsConsumeWs(ENCODING)) {
       final String enc = string(stringLiteral());
-      if(!supported(enc)) throw error(XQUERYENC2_X, enc);
+      if(!Strings.supported(enc)) throw error(XQUERYENC2_X, enc);
     } else if(!version) {
       pos = i;
       return;
@@ -766,7 +767,7 @@ public class QueryParser extends InputParser {
     final byte[] u = qc.modParsed.get(p);
     if(u != null) {
       if(!eq(uri, u)) throw error(WRONGMODULE_X_X, uri,
-          qc.context.user.has(Perm.ADMIN) ? io.path() : io.name());
+          qc.context.user().has(Perm.ADMIN) ? io.path() : io.name());
       return;
     }
     qc.modParsed.put(p, uri);
@@ -776,7 +777,7 @@ public class QueryParser extends InputParser {
     try {
       qu = string(io.read());
     } catch(final IOException ex) {
-      throw error(WHICHMODFILE_X, qc.context.user.has(Perm.ADMIN) ? io.path() : io.name());
+      throw error(WHICHMODFILE_X, qc.context.user().has(Perm.ADMIN) ? io.path() : io.name());
     }
 
     qc.modStack.push(p);

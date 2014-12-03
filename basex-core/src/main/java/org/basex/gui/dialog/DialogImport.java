@@ -1,6 +1,7 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
+import static org.basex.util.Strings.*;
 
 import java.awt.event.*;
 import java.io.*;
@@ -233,11 +234,11 @@ final class DialogImport extends BaseXBack {
     if(i != -1) {
       // analyze file suffix
       final String suf = path.substring(i).toLowerCase(Locale.ENGLISH);
-      if(Token.eq(suf, IO.XMLSUFFIXES) || Token.eq(suf, IO.XSLSUFFIXES)) type = MainParser.XML;
-      else if(Token.eq(suf, IO.HTMLSUFFIXES)) type = MainParser.HTML;
-      else if(Token.eq(suf, IO.CSVSUFFIX)) type = MainParser.CSV;
-      else if(Token.eq(suf, IO.TXTSUFFIXES)) type = MainParser.TEXT;
-      else if(Token.eq(suf, IO.JSONSUFFIX)) type = MainParser.JSON;
+      if(eq(suf, IO.XMLSUFFIXES) || eq(suf, IO.XSLSUFFIXES)) type = MainParser.XML;
+      else if(eq(suf, IO.HTMLSUFFIXES)) type = MainParser.HTML;
+      else if(eq(suf, IO.CSVSUFFIX)) type = MainParser.CSV;
+      else if(eq(suf, IO.TXTSUFFIXES)) type = MainParser.TEXT;
+      else if(eq(suf, IO.JSONSUFFIX)) type = MainParser.JSON;
     }
     // unknown suffix: analyze first bytes
     if(type == null) type = guess(io);

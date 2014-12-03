@@ -1,7 +1,6 @@
 package org.basex.query.up.primitives;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.util.Token.*;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -69,12 +68,12 @@ public final class DBOptions {
 
       final String value = entry.getValue();
       if(option instanceof NumberOption) {
-        final int v = toInt(value);
+        final int v = Strings.toInt(value);
         if(v < 0) throw BASX_VALUE_X_X.get(info, key, value);
         rOptions.put(option, v);
       } else if(option instanceof BooleanOption) {
-        final boolean yes = Util.yes(value);
-        if(!yes && !Util.no(value)) throw BASX_VALUE_X_X.get(info, key, value);
+        final boolean yes = Strings.yes(value);
+        if(!yes && !Strings.no(value)) throw BASX_VALUE_X_X.get(info, key, value);
         rOptions.put(option, yes);
       } else if(option instanceof EnumOption) {
         final EnumOption<?> eo = (EnumOption<?>) option;

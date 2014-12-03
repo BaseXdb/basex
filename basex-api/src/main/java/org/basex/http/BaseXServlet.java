@@ -26,6 +26,8 @@ public abstract class BaseXServlet extends HttpServlet {
   String user;
   /** Servlet-specific password. */
   String pass;
+  /** Servlet-specific authentication method. */
+  String auth;
 
   @Override
   public void init(final ServletConfig config) throws ServletException {
@@ -41,6 +43,8 @@ public abstract class BaseXServlet extends HttpServlet {
           user = val;
         } else if(key.equalsIgnoreCase(StaticOptions.PASSWORD.name())) {
           pass = val;
+        } else if(key.equalsIgnoreCase(StaticOptions.AUTHMETHOD.name())) {
+          auth = val;
         }
       }
     } catch(final IOException ex) {

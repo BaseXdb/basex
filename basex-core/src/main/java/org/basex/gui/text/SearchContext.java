@@ -187,7 +187,7 @@ final class SearchContext {
     if(!(obj instanceof SearchContext)) return false;
     final SearchContext s = (SearchContext) obj;
     return mcase == s.mcase && word == s.word && regex == s.regex && multi == s.multi &&
-        eq(search, s.search);
+        Strings.eq(search, s.search);
   }
 
   @Override

@@ -273,22 +273,4 @@ public final class Util {
       throw notExpected(ex);
     }
   }
-
-  /**
-   * Checks if the specified string is "yes", "true" or "on".
-   * @param string string to be checked
-   * @return result of check
-   */
-  public static boolean yes(final String string) {
-    return Token.eqic(string, YES, TRUE, ON);
-  }
-
-  /**
-   * Checks if the specified string is "no", "false" or "off".
-   * @param string string to be checked
-   * @return result of check
-   */
-  public static boolean no(final String string) {
-    return Token.eqic(string, NO, FALSE, OFF);
-  }
 }

@@ -42,7 +42,7 @@ public final class Set extends AGet {
 
     // check static options: only "debug" can be changed by admin users
     boolean debug = false;
-    if(context.user.has(Perm.ADMIN)) {
+    if(context.user().has(Perm.ADMIN)) {
       final Option<?> opt = soptions.option(name);
       if(opt == StaticOptions.DEBUG) {
         debug = true;

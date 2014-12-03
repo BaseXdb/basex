@@ -60,13 +60,14 @@ public class XQueryEval extends StandardFunc {
 
     // bind variables and context value
     final HashMap<String, Value> bindings = toBindings(1, qc);
-    final Perm tmp = qc.context.user.perm;
+    final User user = qc.context.user();
+    final Perm tmp = user.perm();
     Timer to = null;
 
     try(final QueryContext qctx = qc.proc(new QueryContext(qc))) {
       if(exprs.length > 2) {
         final Options opts = toOptions(2, Q_OPTIONS, new XQueryOptions(), qc);
-        qc.context.user.perm = Perm.get(opts.get(XQueryOptions.PERMISSION));
+        user.perm(Perm.get(opts.get(XQueryOptions.PERMISSION)));
 
         // initial memory consumption: perform garbage collection and calculate usage
         Performance.gc(2);
@@ -125,7 +126,7 @@ public class XQueryEval extends StandardFunc {
       }
 
     } finally {
-      qc.context.user.perm = tmp;
+      user.perm(tmp);
       qc.proc(null);
       if(to != null) to.cancel();
     }

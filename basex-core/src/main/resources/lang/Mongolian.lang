@@ -283,7 +283,6 @@ printing             = Хэвлэлт
 project              = Project
 properties           = Тохиргоонууд
 pw_changed_%         = Хэрэглэгчийн нууц үг '%' өөрчлөгдсөн.
-pw_not_valid         = Нууц үгийн оролтын утга буруу байна.
 query                = Квери
 query_executed_%_%   = % %-нд хөрвүүлэгдсэн.
 query_info           = Квери мэдээлэл

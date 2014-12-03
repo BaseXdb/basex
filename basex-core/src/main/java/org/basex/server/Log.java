@@ -124,7 +124,7 @@ public final class Log {
       final TokenBuilder tb = new TokenBuilder();
       tb.add(DateTime.format(date, DateTime.TIME));
       tb.add('\t').add(address);
-      tb.add('\t').add(user == null ? Text.S_ADMIN : user.name);
+      tb.add('\t').add(user == null ? Text.S_ADMIN : user.name());
       tb.add('\t').add(type);
       tb.add('\t').add(chop(normalize(token(info)), ml));
       if(perf != null) tb.add('\t').add(perf.toString());

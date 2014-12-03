@@ -299,7 +299,7 @@ public abstract class Formatter extends FormatUtil {
               final int fl = fp.primary.length;
               if(fl != 1 && fl != sl) s = frac(frac, fl);
             }
-            num = toLong(s);
+            num = Strings.toLong(s);
           }
           tb.add(formatInt(num, fp));
         }

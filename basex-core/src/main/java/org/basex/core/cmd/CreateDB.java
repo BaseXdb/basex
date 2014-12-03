@@ -164,7 +164,7 @@ public final class CreateDB extends ACreate {
       final boolean mem) throws IOException {
 
     // check permissions
-    if(!ctx.user.has(Perm.CREATE)) throw new BaseXException(PERM_REQUIRED_X, Perm.CREATE);
+    if(!ctx.user().has(Perm.CREATE)) throw new BaseXException(PERM_REQUIRED_X, Perm.CREATE);
 
     // create main memory database instance
     if(mem) return MemBuilder.build(name, parser);

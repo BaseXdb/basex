@@ -52,7 +52,9 @@ public final class StaticOptions extends Options {
   public static final StringOption USER = new StringOption("USER", "");
   /** Default password. */
   public static final StringOption PASSWORD = new StringOption("PASSWORD", "");
-
+  /** Default authorization method. */
+  public static final EnumOption<AuthMethod> AUTHMETHOD =
+      new EnumOption<>("AUTHMETHOD", AuthMethod.BASIC);
   /** Server: host, used for binding the server. Empty string for wildcard.*/
   public static final StringOption SERVERHOST = new StringOption("SERVERHOST", "");
   /** Server: proxy host (default: ignored). */
@@ -85,6 +87,18 @@ public final class StaticOptions extends Options {
   public static final BooleanOption HTTPLOCAL = new BooleanOption("HTTPLOCAL", false);
   /** Port for stopping the web server. */
   public static final NumberOption STOPPORT = new NumberOption("STOPPORT", 8985);
+
+  /** Authorization method. */
+  public enum AuthMethod {
+    /** Basic.  */ BASIC,
+    /** Digest. */ DIGEST;
+
+    @Override
+    public String toString() {
+      final String name = name();
+      return name.substring(0, 1) + name.substring(1).toLowerCase(Locale.ENGLISH);
+    }
+  }
 
   /**
    * Constructor, adopting system properties starting with "org.basex.".

@@ -84,7 +84,7 @@ public final class DialogExport extends BaseXDialog {
     // method (ignore last entry)
     final StringList sl = new StringList();
     for(final SerialMethod sm : SerialMethod.values()) sl.add(sm.name());
-    sl.deleteAt(sl.size() - 1);
+    sl.remove(sl.size() - 1);
     method = new BaseXCombo(this, sl.finish());
     method.setSelectedItem(sopts.get(SerializerOptions.METHOD).name());
 
@@ -141,7 +141,7 @@ public final class DialogExport extends BaseXDialog {
   static BaseXCombo encoding(final BaseXDialog dialog, final String encoding) {
     final BaseXCombo cb = new BaseXCombo(dialog, ENCODINGS);
     boolean f = false;
-    String enc = encoding == null ? Token.UTF8 : encoding;
+    String enc = encoding == null ? Strings.UTF8 : encoding;
     for(final String s : ENCODINGS) f |= s.equals(enc);
     if(!f) {
       enc = enc.toUpperCase(Locale.ENGLISH);

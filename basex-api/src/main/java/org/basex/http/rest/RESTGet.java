@@ -38,13 +38,13 @@ final class RESTGet {
       final String[] vals = param.getValue();
       final String val = vals[0];
 
-      if(Token.eqic(key, COMMAND, QUERY, RUN)) {
+      if(Strings.eqic(key, COMMAND, QUERY, RUN)) {
         if(op != null || vals.length > 1) throw HTTPCode.ONEOP.get();
         op = key;
         input = val;
       } else if(key.equalsIgnoreCase(WRAP)) {
         // wrapping flag
-        http.wrapping = Util.yes(val);
+        http.wrapping = Strings.yes(val);
       } else if(key.equalsIgnoreCase(CONTEXT)) {
         // context parameter
         value = val;

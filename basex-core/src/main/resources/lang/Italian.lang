@@ -283,7 +283,6 @@ printing             = Stampando
 project              = Project
 properties           = Informazioni
 pw_changed_%         = La parola chiave dell'utente '%' è stata cambiata.
-pw_not_valid         = La parola chiave non è un valido MD5 hash.
 query                = Interrogazione
 query_executed_%_%   = Interrogazione% eseguita in %.
 query_info           = Informazioni sull'interrogazione

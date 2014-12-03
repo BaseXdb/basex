@@ -22,7 +22,7 @@ public final class AdminWriteLog extends AdminFn {
     final String msg = Token.string(toToken(exprs[0], qc));
     final ClientListener cl = qc.context.listener;
     final String addr = cl == null ? Log.SERVER : cl.address();
-    final User user = cl == null ? qc.context.user : cl.context().user;
+    final User user = (cl == null ? qc.context : cl.context()).user();
     qc.context.log.write(addr, user, LogType.INFO, msg, null);
     return null;
   }

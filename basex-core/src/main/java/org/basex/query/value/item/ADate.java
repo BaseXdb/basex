@@ -107,8 +107,8 @@ public abstract class ADate extends ADateDur {
     yea = toLong(mt.group(1), false, ii);
     // +1 is added to BC values to simplify computations
     if(yea < 0) yea++;
-    mon = (byte) (Token.toInt(mt.group(3)) - 1);
-    day = (byte) (Token.toInt(mt.group(4)) - 1);
+    mon = (byte) (Strings.toInt(mt.group(3)) - 1);
+    day = (byte) (Strings.toInt(mt.group(4)) - 1);
 
     if(mon < 0 || mon >= 12 || day < 0 || day >= dpm(yea, mon)) throw dateError(d, e, ii);
     if(yea <= MIN_YEAR || yea > MAX_YEAR) throw DATERANGE_X_X.get(ii, type, chop(d, ii));
@@ -126,8 +126,8 @@ public abstract class ADate extends ADateDur {
     final Matcher mt = TIME.matcher(Token.string(d).trim());
     if(!mt.matches()) throw dateError(d, e, ii);
 
-    hou = (byte) Token.toInt(mt.group(1));
-    min = (byte) Token.toInt(mt.group(2));
+    hou = (byte) Strings.toInt(mt.group(1));
+    min = (byte) Strings.toInt(mt.group(2));
     sec = toDecimal(mt.group(3), false, ii);
     if(min >= 60 || sec.compareTo(BD60) >= 0 || hou > 24 ||
        hou == 24 && (min > 0 || sec.compareTo(BigDecimal.ZERO) > 0)) throw dateError(d, e, ii);
@@ -154,8 +154,8 @@ public abstract class ADate extends ADateDur {
     if("Z".equals(tz)) {
       zon = 0;
     } else {
-      final int th = Token.toInt(matcher.group(pos + 2));
-      final int tm = Token.toInt(matcher.group(pos + 3));
+      final int th = Strings.toInt(matcher.group(pos + 2));
+      final int tm = Strings.toInt(matcher.group(pos + 3));
       if(th > 14 || tm > 59 || th == 14 && tm != 0) throw INVALIDZONE_X.get(ii, value);
       final int mn = th * 60 + tm;
       zon = (short) ("-".equals(matcher.group(pos + 1)) ? -mn : mn);

@@ -72,11 +72,11 @@ public final class GDt extends ADate {
       if(yea < MIN_YEAR || yea >= MAX_YEAR) throw DATERANGE_X_X.get(ii, type, chop(date, ii));
     }
     if(i > 0 && i < 4) {
-      mon = (byte) (Token.toLong(mt.group(i == 1 ? 3 : 1)) - 1);
+      mon = (byte) (Strings.toLong(mt.group(i == 1 ? 3 : 1)) - 1);
       if(mon < 0 || mon > 11) throw dateError(date, EXAMPLES[i], ii);
     }
     if(i > 2) {
-      day = (byte) (Token.toLong(mt.group(i == 3 ? 2 : 1)) - 1);
+      day = (byte) (Strings.toLong(mt.group(i == 3 ? 2 : 1)) - 1);
       final int m = Math.max(mon, 0);
       if(day < 0 || day >= DAYS[m] + (m == 1 ? 1 : 0)) throw dateError(date, EXAMPLES[i], ii);
     }

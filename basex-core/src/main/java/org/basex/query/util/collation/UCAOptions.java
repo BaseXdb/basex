@@ -1,11 +1,12 @@
 package org.basex.query.util.collation;
 
 import static org.basex.util.Reflect.*;
-import static org.basex.util.Token.*;
+import static org.basex.util.Strings.*;
 
 import java.lang.reflect.*;
 import java.util.*;
 
+import org.basex.util.*;
 import org.basex.util.list.*;
 import org.basex.util.options.*;
 
@@ -140,7 +141,7 @@ public final class UCAOptions extends CollationOptions {
       final String v = get(REORDER);
       final IntList list = new IntList();
       final Method uscript = method(find("com.ibm.icu.lang.UScript"), "getCode", String.class);
-      for(final String code : v.split(",")) {
+      for(final String code : Strings.split(v, ',')) {
         if(code.equals("space")) list.add(0x1000);
         else if(code.equals("punct")) list.add(0x1001);
         else if(code.equals("symbol")) list.add(0x1002);

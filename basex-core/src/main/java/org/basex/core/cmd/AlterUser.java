@@ -25,15 +25,14 @@ public final class AlterUser extends AUser {
 
   @Override
   protected boolean run() {
-    final String user = args[0];
-    final String pass = args[1];
+    final String user = args[0], pass = args[1];
     if(!Databases.validName(user)) return error(NAME_INVALID_X, user);
-    return isMD5(pass) ? context.users.alter(user, pass) ? info(PW_CHANGED_X, user) :
-      error(UNKNOWN_USER_X, user) : error(PW_NOT_VALID);
+    return context.users.alter(user, pass) ? info(PW_CHANGED_X, user) : error(UNKNOWN_USER_X, user);
   }
 
   @Override
   public void build(final CmdBuilder cb) {
-    cb.init(Cmd.ALTER + " " + CmdAlter.USER).args();
+    cb.init(Cmd.ALTER + " " + CmdAlter.USER).arg(0);
+    if(!cb.conf()) cb.arg(1);
   }
 }

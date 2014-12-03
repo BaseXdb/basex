@@ -254,10 +254,10 @@ public final class BaseXList extends BaseXBack {
    * @return numeric value
    */
   public int getNum() {
-    final int i = Token.toInt(text.getText());
+    final int i = Strings.toInt(text.getText());
     if(i != Integer.MIN_VALUE) return i;
     final Object value = list.getSelectedValue();
-    return value != null ? Token.toInt(value.toString()) : 0;
+    return value != null ? Strings.toInt(value.toString()) : 0;
   }
 
   /**

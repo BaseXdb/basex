@@ -56,7 +56,7 @@ public class HTMLSerializer extends OutputSerializer {
       if(ch == '<' || ch == '&' && val[Math.min(v + 1, vl - 1)] == '{') {
         print(ch);
       } else if(ch == '"') {
-        print(E_QU);
+        print(E_QUOT);
       } else if(ch == 0x9 || ch == 0xA) {
         hex(ch);
       } else {

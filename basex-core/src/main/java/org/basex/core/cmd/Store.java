@@ -43,7 +43,7 @@ public final class Store extends ACreate {
 
   @Override
   protected boolean run() {
-    final boolean create = context.user.has(Perm.CREATE);
+    final boolean create = context.user().has(Perm.CREATE);
     String path = MetaData.normPath(args[0]);
     if(path == null || path.endsWith(".")) return error(PATH_INVALID_X, args[0]);
 

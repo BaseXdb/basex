@@ -715,8 +715,6 @@ public interface Text {
   String PW_CHANGED_X = lang("pw_changed_%");
   /** User unknown. */
   String USER_EXISTS_X = lang("user_exists_%");
-  /** Password is no valid MD5 hash. */
-  String PW_NOT_VALID = lang("pw_not_valid");
   /** Admin user. */
   String ADMIN_STATIC_X = lang("admin_static_%");
   /** Killed sessions. */

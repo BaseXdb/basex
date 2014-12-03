@@ -36,8 +36,7 @@ public final class SyntaxXQuery extends Syntax {
       // add query tokens
       for(final Field f : QueryText.class.getFields()) {
         if("IGNORE".equals(f.getName())) break;
-        final String s = (String) f.get(null);
-        Collections.addAll(KEYWORDS, s.split("-"));
+        Collections.addAll(KEYWORDS, ((String) f.get(null)).split("-"));
       }
     } catch(final Exception ex) {
       Util.stack(ex);

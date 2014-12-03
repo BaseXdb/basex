@@ -89,9 +89,9 @@ public class CommandTest extends SandboxTest {
   /** Command test. */
   @Test
   public final void alterUser() {
-    ok(new CreateUser(NAME2, md5(NAME2)));
-    ok(new AlterUser(NAME2, md5("test")));
-    no(new AlterUser(":", md5(NAME2)));
+    ok(new CreateUser(NAME2, NAME2));
+    ok(new AlterUser(NAME2, "test"));
+    no(new AlterUser(":", NAME2));
   }
 
   /** Command test. */
@@ -157,13 +157,13 @@ public class CommandTest extends SandboxTest {
   /** Command test. */
   @Test
   public final void createUser() {
-    ok(new CreateUser(NAME2, md5("test")));
-    no(new CreateUser(NAME2, md5("test")));
+    ok(new CreateUser(NAME2, "test"));
+    no(new CreateUser(NAME2, "test"));
     ok(new DropUser(NAME2));
     no(new CreateUser("", ""));
     no(new CreateUser(":", ""));
 
-    ok(new CreateUser(Databases.DBCHARS, md5("")));
+    ok(new CreateUser(Databases.DBCHARS, ""));
     ok(new DropUser(Databases.DBCHARS));
   }
 
@@ -217,8 +217,8 @@ public class CommandTest extends SandboxTest {
   /** Command test. */
   @Test
   public final void dropUser() {
-    ok(new CreateUser(NAME, md5(NAME)));
-    ok(new CreateUser(NAME2, md5(NAME)));
+    ok(new CreateUser(NAME, NAME));
+    ok(new CreateUser(NAME2, NAME));
 
     ok(new DropUser(NAME));
     ok(new DropUser(NAME2));
@@ -226,8 +226,8 @@ public class CommandTest extends SandboxTest {
     no(new DropUser(NAME2, ":"));
 
     ok(new CreateDB(NAME));
-    ok(new CreateUser(NAME, md5(NAME)));
-    ok(new CreateUser(NAME2, md5(NAME)));
+    ok(new CreateUser(NAME, NAME));
+    ok(new CreateUser(NAME2, NAME));
     ok(new DropUser(NAME2, NAME + '*'));
     ok(new DropUser(NAME + ',' + NAME2));
   }
@@ -272,8 +272,8 @@ public class CommandTest extends SandboxTest {
   /** Command test. */
   @Test
   public final void grant() {
-    ok(new CreateUser(NAME2, md5("test")));
-    ok(new CreateUser(NAME, md5("test")));
+    ok(new CreateUser(NAME2, "test"));
+    ok(new CreateUser(NAME, "test"));
     no(new Grant("something", NAME2));
     ok(new CreateDB(NAME));
     ok(new Grant("none", NAME + '*', NAME + '*'));
@@ -367,8 +367,7 @@ public class CommandTest extends SandboxTest {
   /** Command test. */
   @Test
   public final void password() {
-    ok(new Password(md5(Text.S_ADMIN)));
-    no(new Password(""));
+    ok(new Password(Text.S_ADMIN));
   }
 
   /** Command test. */
