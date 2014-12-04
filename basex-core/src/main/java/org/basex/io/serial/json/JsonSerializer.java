@@ -165,5 +165,6 @@ public abstract class JsonSerializer extends OutputSerializer {
   @Override
   public void close() throws IOException {
     if(!sep) print(NULL);
+    super.close();
   }
 }

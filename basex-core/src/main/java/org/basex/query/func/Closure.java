@@ -91,6 +91,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     this.nonLocal = nonLocal;
     this.scope = scope;
     this.sc = sc;
+    seqType = FuncType.ANY_FUN.seqType();
   }
 
   @Override
