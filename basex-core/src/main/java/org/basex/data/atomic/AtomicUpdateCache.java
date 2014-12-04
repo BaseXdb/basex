@@ -335,8 +335,10 @@ public final class AtomicUpdateCache {
    */
   private int calculateNewDistance(final int pre) {
     final int kind = data.kind(pre);
-    final int distanceBefore = data.dist(pre, kind);
+    int distanceBefore = data.dist(pre, kind);
     final int preBefore = calculatePreValue(pre, true);
+    // document distances are not stored in table but calculated on the fly (always pre+1)
+    if(kind == Data.DOC) distanceBefore = preBefore + 1;
     final int parentBefore = preBefore - distanceBefore;
     final int parentAfter = calculatePreValue(parentBefore, false);
     return pre - parentAfter;
