@@ -267,4 +267,15 @@ public final class FuncItemTest extends QueryPlanTest {
         + "return $f()",
         String.format("<a/>%n<b/>"));
   }
+
+  /** Checks that functions circularly referenced through function literals are compiled. */
+  @Test
+  public void gh1038() {
+    check("declare function local:a() { let $a := local:c() return () };"
+        + "declare function local:b() { let $a := function() { local:a() } return () };"
+        + "declare function local:c() { local:b#0() };"
+        + "local:c() ",
+        "",
+        "exists(//Empty)");
+  }
 }
