@@ -118,17 +118,41 @@ public final class Functions extends TokenSet {
   }
 
   /**
+   * Creates either a {@link FuncItem} or a {@link Closure} depending on when the method is called.
+   * At parse and compile time a closure is generated to enable inlining and compilation, at
+   * runtime we directly generate a function item.
+   * @param ann function annotations
+   * @param name function name, may be {@code null}
+   * @param params formal parameters
+   * @param ft function type
+   * @param expr function body
+   * @param scp variable scope
+   * @param sc static context
+   * @param ii input info
+   * @param runtime run-time flag
+   * @param updating flag for updating functions
+   * @return the function expression
+   */
+  private static Expr closureOrFItem(final Ann ann, final QNm name, final Var[] params,
+      final FuncType ft, final Expr expr, final VarScope scp, final StaticContext sc,
+      final InputInfo ii, final boolean runtime, final boolean updating) {
+    return runtime ? new FuncItem(sc, ann, name, params, ft, expr, scp.stackSize()) :
+      new Closure(ii, name, updating ? null : ft.retType, params, expr, ann, null, sc, scp);
+  }
+
+  /**
    * Gets a function literal for a known function.
    * @param name function name
    * @param arity number of arguments
    * @param qc query context
    * @param sc static context
    * @param ii input info
+   * @param runtime {@code true} if this method is called at run-time, {@code false} otherwise
    * @return function literal if found, {@code null} otherwise
    * @throws QueryException query exception
    */
   public static Expr getLiteral(final QNm name, final int arity, final QueryContext qc,
-      final StaticContext sc, final InputInfo ii) throws QueryException {
+      final StaticContext sc, final InputInfo ii, final boolean runtime) throws QueryException {
 
     // parse type constructors
     if(eq(name.uri(), XS_URI)) {
@@ -136,8 +160,9 @@ public final class Functions extends TokenSet {
       final VarScope scp = new VarScope(sc);
       final Var[] args = { scp.newLocal(qc, new QNm(ITEMM, ""), SeqType.AAT_ZO, true) };
       final Expr e = new Cast(sc, ii, new VarRef(ii, args[0]), type.seqType());
-      final FuncType tp = FuncType.get(e.seqType(), SeqType.AAT_ZO);
-      return new FuncItem(sc, new Ann(), name, args, tp, e, scp.stackSize());
+      final Ann ann = new Ann();
+      final FuncType ft = FuncType.get(ann, args, e.seqType());
+      return closureOrFItem(ann, name, args, ft, e, scp, sc, ii, runtime, false);
     }
 
     // built-in functions
@@ -156,12 +181,13 @@ public final class Functions extends TokenSet {
       }
 
       final StandardFunc sf = fn.get(sc, ii, calls);
-      if(sf.has(Flag.UPD)) {
+      final boolean upd = sf.has(Flag.UPD);
+      if(upd) {
         qc.updating();
         ann.add(Ann.Q_UPDATING, Empty.SEQ, ii);
       }
       if(!sf.has(Flag.CTX) && !sf.has(Flag.FCS))
-        return new FuncItem(sc, ann, name, args, ft, sf, scp.stackSize());
+        return closureOrFItem(ann, name, args, fn.type(arity, ann), sf, scp, sc, ii, runtime, upd);
 
       return new FuncLit(ann, name, args, sf, ft, scp, sc, ii);
     }
@@ -169,9 +195,20 @@ public final class Functions extends TokenSet {
     // user-defined function
     final StaticFunc sf = qc.funcs.get(name, arity, ii, true);
     if(sf != null) {
-      final FuncItem fi = getUser(sf, qc, sc, ii);
-      if(fi.annotations().contains(Ann.Q_UPDATING)) qc.updating();
-      return fi;
+      final FuncType ft = sf.funcType();
+      final VarScope scp = new VarScope(sc);
+      final Var[] args = new Var[arity];
+      final Expr[] calls = new Expr[arity];
+      for(int a = 0; a < arity; a++) {
+        args[a] = scp.newLocal(qc, sf.argName(a), ft.argTypes[a], true);
+        calls[a] = new VarRef(ii, args[a]);
+      }
+
+      final boolean upd = sf.updating;
+      final TypedFunc tf = qc.funcs.getFuncRef(sf.name, calls, sc, ii);
+      final Expr f = closureOrFItem(tf.ann, sf.name, args, ft, tf.fun, scp, sc, ii, runtime, upd);
+      if(upd) qc.updating();
+      return f;
     }
 
     // Java function (only allowed with administrator permissions)

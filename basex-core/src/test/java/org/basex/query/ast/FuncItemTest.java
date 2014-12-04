@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.junit.*;
@@ -114,7 +115,7 @@ public final class FuncItemTest extends QueryPlanTest {
     check("declare function local:Y($f) { $f(function() { $f }) };" +
         "for-each(function($x) { $x() }, local:Y#1)[2]",
         "",
-        "exists(//" + Util.className(FuncItem.class) + ')'
+        "exists(//" + Util.className(Empty.class) + ')'
     );
   }
 
@@ -124,7 +125,7 @@ public final class FuncItemTest extends QueryPlanTest {
     check("declare function local:Y($f) { $f(function() { $f }) };" +
         "let $f := for-each(function($x) { $x() }, local:Y#1) return $f[2]",
         "",
-        "exists(//" + Util.className(FuncItem.class) + ')'
+        "exists(//" + Util.className(Empty.class) + ')'
     );
   }
 
@@ -266,5 +267,16 @@ public final class FuncItemTest extends QueryPlanTest {
         + "let $f := function() as element()* { trace($n) }"
         + "return $f()",
         String.format("<a/>%n<b/>"));
+  }
+
+  /** Checks that functions circularly referenced through function literals are compiled. */
+  @Test
+  public void gh1038() {
+    check("declare function local:a() { let $a := local:c() return () };"
+        + "declare function local:b() { let $a := function() { local:a() } return () };"
+        + "declare function local:c() { local:b#0() };"
+        + "local:c() ",
+        "",
+        "exists(//" + Util.className(Empty.class) + ")");
   }
 }
