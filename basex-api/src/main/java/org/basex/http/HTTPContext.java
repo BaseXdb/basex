@@ -19,14 +19,13 @@ import org.basex.build.*;
 import org.basex.build.JsonOptions.JsonFormat;
 import org.basex.core.*;
 import org.basex.core.StaticOptions.AuthMethod;
-import org.basex.core.User.Code;
+import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.server.Log.LogType;
 import org.basex.server.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 import org.basex.util.options.*;
 
 /**
@@ -287,11 +286,12 @@ public final class HTTPContext {
       if(auth == AuthMethod.BASIC) {
         if(!us.matches(password)) throw new LoginException();
       } else {
+        // digest authentication
         final HashMap<String, String> map = digestHeaders();
-        final String qop = map.get("qop");
+        final String ha1 = us.code(Algorithm.DIGEST, Code.HASH);
+        final StringBuilder sresponse = new StringBuilder(ha1 + ":" + map.get("nonce") + ":");
 
-        final String digest = ctx.user().code(Code.DIGEST);
-        final StringBuilder sresponse = new StringBuilder(digest + ":" + map.get("nonce") + ":");
+        final String qop = map.get("qop");
         if(qop != null && !qop.isEmpty()) {
           sresponse.append(map.get("nc") + ":" + map.get("cnonce") + ":" + qop + ":");
         }
@@ -320,9 +320,9 @@ public final class HTTPContext {
   private HashMap<String, String> digestHeaders() {
     final HashMap<String, String> values = new HashMap<>();
     for(final String header : Strings.split(authDetails(), ',')) {
-      final StringList kv = Strings.split(header, '=', 2);
-      final String key = kv.get(0).trim();
-      if(!key.isEmpty() && kv.size() == 2) values.put(key, Strings.delete(kv.get(1), '"').trim());
+      final String[] kv = Strings.split(header, '=', 2);
+      final String key = kv[0].trim();
+      if(!key.isEmpty() && kv.length == 2) values.put(key, Strings.delete(kv[1], '"').trim());
     }
     return values;
   }

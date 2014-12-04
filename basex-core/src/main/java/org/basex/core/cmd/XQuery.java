@@ -1,6 +1,6 @@
 package org.basex.core.cmd;
 
-import org.basex.core.*;
+import org.basex.core.users.*;
 
 /**
  * Evaluates the 'xquery' command and processes an XQuery request.

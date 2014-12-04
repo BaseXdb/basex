@@ -7,6 +7,7 @@ import java.util.*;
 
 import org.basex.core.cmd.*;
 import org.basex.core.parse.*;
+import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.io.out.*;
 import org.basex.util.*;
@@ -212,10 +213,7 @@ public abstract class Command extends Proc {
 
   @Override
   public final String toString() {
-    /* log check
-    StackTraceElement[] st = Thread.currentThread().getStackTrace();
-    boolean conf = WRITE.equalsIgnoreCase(st[2].getMethodName());
-    */
+    // [CG] USERS: hide passwords
     final CmdBuilder cb = new CmdBuilder(this, false);
     build(cb);
     return cb.toString();

@@ -144,10 +144,6 @@ public interface Text {
 
   /** Localhost. */
   String S_LOCALHOST = "localhost";
-  /** User name. */
-  String[] S_USERINFO = { "Username", "Read", "Write", "Create", "Admin" };
-  /** Default admin user and password. */
-  String S_ADMIN = "admin";
 
   /** Command keyword. */
   String S_ALL = "ALL";

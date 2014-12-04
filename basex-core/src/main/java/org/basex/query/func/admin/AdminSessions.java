@@ -1,6 +1,6 @@
 package org.basex.query.func.admin;
 
-import org.basex.core.*;
+import org.basex.core.locks.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;

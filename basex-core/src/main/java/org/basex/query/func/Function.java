@@ -1382,7 +1382,7 @@ public enum Function {
   final String[] names() {
     final String names = desc.replaceFirst(".*?\\(", "").replace(",...",
         "").replaceAll("[\\[\\]\\)\\s]", "");
-    return names.isEmpty() ? new String[0] : Strings.split(names, ',').finish();
+    return names.isEmpty() ? new String[0] : Strings.split(names, ',');
   }
 
   /**

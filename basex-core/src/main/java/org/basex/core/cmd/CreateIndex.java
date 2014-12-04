@@ -9,6 +9,7 @@ import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.Cmd;
 import org.basex.core.parse.Commands.CmdCreate;
 import org.basex.core.parse.Commands.CmdIndex;
+import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.util.*;

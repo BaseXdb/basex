@@ -9,6 +9,7 @@ import org.basex.*;
 import org.basex.api.client.*;
 import org.basex.core.cmd.*;
 import org.basex.core.parse.Commands.CmdIndex;
+import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.util.*;
 import org.junit.*;
@@ -367,7 +368,7 @@ public class CommandTest extends SandboxTest {
   /** Command test. */
   @Test
   public final void password() {
-    ok(new Password(Text.S_ADMIN));
+    ok(new Password(UserText.ADMIN));
   }
 
   /** Command test. */

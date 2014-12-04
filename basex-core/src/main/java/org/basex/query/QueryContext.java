@@ -11,6 +11,8 @@ import org.basex.build.*;
 import org.basex.build.JsonOptions.JsonFormat;
 import org.basex.core.*;
 import org.basex.core.MainOptions.MainParser;
+import org.basex.core.locks.*;
+import org.basex.core.users.*;
 import org.basex.core.Context;
 import org.basex.data.*;
 import org.basex.io.*;

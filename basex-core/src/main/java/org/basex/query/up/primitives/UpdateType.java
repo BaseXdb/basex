@@ -49,6 +49,9 @@ public enum UpdateType {
   /** Delete resource.      */ DBDELETE,
   /** Optimize database.    */ DBOPTIMIZE,
   /** Flush database.       */ DBFLUSH,
+  /** Create user.          */ DBCREATEUSER,
+  /** Grant user.           */ DBGRANTUSER,
+  /** Drop user.            */ DBDROPUSER,
 
   // Database operations
 

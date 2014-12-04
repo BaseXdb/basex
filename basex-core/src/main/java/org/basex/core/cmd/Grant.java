@@ -4,9 +4,10 @@ import static org.basex.core.Text.*;
 
 import java.io.*;
 
-import org.basex.core.*;
+import org.basex.core.locks.*;
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.CmdPerm;
+import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.util.*;
 
@@ -62,7 +63,7 @@ public final class Grant extends AUser {
   @Override
   protected boolean run(final String user, final String db) {
     // admin cannot be modified
-    if(user.equals(S_ADMIN)) return !info(ADMIN_STATIC_X);
+    if(user.equals(UserText.ADMIN)) return !info(ADMIN_STATIC_X);
 
     // set global permissions
     if(db == null) {
@@ -82,13 +83,13 @@ public final class Grant extends AUser {
     // try to lock database
     if(!startUpdate(data)) return false;
 
-    User us = data.meta.users.get(user);
-    // add local user reference
+    final User us = data.meta.users.get(user);
     if(us == null) {
-      us = context.users.get(user).copy();
-      data.meta.users.create(us);
+      // copy global user
+      data.meta.users.add(new User(context.users.get(user).name(), prm));
+    } else {
+      us.perm(prm);
     }
-    us.perm(prm);
     data.meta.dirty = true;
     finishUpdate(data);
 

@@ -1,5 +1,6 @@
 package org.basex.http;
 
+import static org.basex.core.users.UserText.*;
 import static org.basex.http.HTTPMethod.*;
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
@@ -47,7 +48,7 @@ public abstract class HTTPTest extends SandboxTest {
 
     final StringList sl = new StringList();
     if(local) sl.add("-l");
-    sl.add("-p9996", "-e9997", "-h9998", "-s9999", "-z", "-U" + Text.S_ADMIN, "-P" + Text.S_ADMIN);
+    sl.add("-p9996", "-e9997", "-h9998", "-s9999", "-z", "-U" + ADMIN, "-P" + ADMIN);
     System.setOut(NULL);
     try {
       http = new BaseXHTTP(sl.toArray());
@@ -163,7 +164,7 @@ public abstract class HTTPTest extends SandboxTest {
     conn.setRequestMethod(POST.name());
     conn.setRequestProperty(MimeTypes.CONTENT_TYPE, type);
     // basic authentication
-    final String encoded = org.basex.util.Base64.encode(Text.S_ADMIN + ':' + Text.S_ADMIN);
+    final String encoded = org.basex.util.Base64.encode(ADMIN + ':' + ADMIN);
     conn.setRequestProperty(HTTPText.AUTHORIZATION, AuthMethod.BASIC + " " + encoded);
     // send query
     try(final OutputStream out = conn.getOutputStream()) {

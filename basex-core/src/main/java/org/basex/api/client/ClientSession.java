@@ -110,14 +110,19 @@ public class ClientSession extends Session {
     }
     sin = socket.getInputStream();
 
-    // receive timestamp
+    // receive server response
     final BufferInput bi = new BufferInput(sin);
-    final String ts = bi.readString();
+    final String[] response = Strings.split(bi.readString(), ':');
 
-    // send user name and hashed password/timestamp
+    // send user name and hashed password
     sout = PrintOutput.get(socket.getOutputStream());
     send(username);
-    send(Strings.md5(Strings.md5(password) + ts));
+
+    // support for cram-md5 (Version < 8.0) and digest authentication (later)
+    final int rl = response.length;
+    final String code = rl == 1 ? password : (username + ':' + response[0] + ':' + password);
+    final String nonce = response[rl - 1];
+    send(Strings.md5(Strings.md5(code) + nonce));
     sout.flush();
 
     // receive success flag

@@ -95,9 +95,9 @@ public final class Strings {
    * Splits a string around matches of the given separator.
    * @param string string to be split
    * @param sep separation character
-   * @return resulting list
+   * @return resulting strings
    */
-  public static StringList split(final String string, final char sep) {
+  public static String[] split(final String string, final char sep) {
     return split(string, sep, Integer.MAX_VALUE);
   }
 
@@ -106,9 +106,9 @@ public final class Strings {
    * @param string string to be split
    * @param sep separation character
    * @param limit maximum number of strings (must be 1 or larger)
-   * @return resulting list
+   * @return resulting strings
    */
-  public static StringList split(final String string, final char sep, final int limit) {
+  public static String[] split(final String string, final char sep, final int limit) {
     final StringList sl = new StringList(limit == Integer.MAX_VALUE ? Array.CAPACITY : limit);
     final int tl = string.length();
     int s = 0, c = 1;
@@ -119,7 +119,7 @@ public final class Strings {
         c++;
       }
     }
-    return sl.add(string.substring(s, tl));
+    return sl.add(string.substring(s, tl)).finish();
   }
 
   /**

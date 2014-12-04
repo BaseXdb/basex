@@ -1,5 +1,6 @@
-package org.basex.core;
+package org.basex.core.locks;
 
+import org.basex.core.*;
 import org.basex.util.list.*;
 
 /**
@@ -8,7 +9,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-interface Locking {
+public interface Locking {
   /**
    * Puts read and write locks the specified databases.
    * Store and return the {@code token} for unlocking these objects again.

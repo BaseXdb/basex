@@ -2,8 +2,8 @@ package org.basex.query.func.admin;
 
 import java.util.*;
 
-import org.basex.core.*;
-import org.basex.core.User.*;
+import org.basex.core.locks.*;
+import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -21,14 +21,16 @@ public final class AdminUsers extends AdminFn {
     checkAdmin(qc);
 
     final ValueBuilder vb = new ValueBuilder();
-    for(final User u : exprs.length == 0 ? qc.context.users.users(null) :
+    final boolean global = exprs.length == 0;
+    for(final User u : global ? qc.context.users.users(null) :
       checkData(qc).meta.users.users(qc.context.users)) {
       final String perm = u.perm().toString().toLowerCase(Locale.ENGLISH);
       final FElem elem = new FElem(USER).add(u.name()).add(PERMISSION, perm);
-      final String salt = u.code(Code.SALT);
-      final String salt256 = u.code(Code.SALT256);
-      if(salt != null) elem.add(SALT, u.code(Code.SALT));
-      if(salt256 != null) elem.add(PASSWORD, u.code(Code.SALT256));
+      if(global) {
+        elem.add(SALT, u.code(Algorithm.SALTED_SHA256, Code.SALT));
+        elem.add(HASH, u.code(Algorithm.SALTED_SHA256, Code.HASH));
+        elem.add(DIGEST, u.code(Algorithm.DIGEST, Code.HASH));
+      }
       vb.add(elem);
     }
     return vb;

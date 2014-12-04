@@ -11,6 +11,7 @@ import org.basex.api.client.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.cmd.List;
+import org.basex.core.users.*;
 import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.layout.*;
 import org.basex.util.*;
@@ -220,7 +221,7 @@ final class DialogUser extends BaseXBack {
     addUser.setEnabled(addUser.getSelectedIndex() > -1);
     boolean valdrop = true;
     for(final int r : table.getSelectedRows()) {
-      valdrop &= !table.data.value(r, 0).equals(S_ADMIN);
+      valdrop &= !table.data.value(r, 0).equals(UserText.ADMIN);
     }
     drop.setEnabled(valdrop && table.getSelectedRows().length > 0);
     valdrop |= table.getSelectedRows().length == 1;
@@ -259,7 +260,7 @@ final class DialogUser extends BaseXBack {
       final StringList adding = new StringList();
       for(final TokenList l : users.contents) {
         final String s = Token.string(l.get(0));
-        if(!s.equals(S_ADMIN) && !added.contains(s)) adding.add(s);
+        if(!s.equals(UserText.ADMIN) && !added.contains(s)) adding.add(s);
       }
       addUser.addItem(numberof(USERS, adding.size()));
       for(final String s : adding) addUser.addItem(s);

@@ -4,6 +4,8 @@ import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 
 import org.basex.core.*;
+import org.basex.core.locks.*;
+import org.basex.core.users.*;
 import org.basex.query.expr.path.*;
 import org.basex.util.*;
 import org.basex.util.list.*;

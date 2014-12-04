@@ -6,6 +6,7 @@ import java.io.*;
 import java.util.*;
 
 import org.basex.core.*;
+import org.basex.core.users.*;
 import org.basex.util.options.*;
 
 /**

@@ -3,9 +3,11 @@ package org.basex.core.cmd;
 import java.io.*;
 
 import org.basex.core.*;
+import org.basex.core.locks.*;
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.Cmd;
 import org.basex.core.parse.Commands.CmdShow;
+import org.basex.core.users.*;
 
 /**
  * Evaluates the 'show sessions' command and shows server sessions.

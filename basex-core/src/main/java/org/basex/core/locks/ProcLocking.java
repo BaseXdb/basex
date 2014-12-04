@@ -1,7 +1,8 @@
-package org.basex.core;
+package org.basex.core.locks;
 
 import java.util.*;
 
+import org.basex.core.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -16,7 +17,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-final class ProcLocking implements Locking {
+public final class ProcLocking implements Locking {
   /** Queue for all waiting processes. */
   private final LinkedList<Object> queue = new LinkedList<>();
   /** Mutex object. */
@@ -33,7 +34,7 @@ final class ProcLocking implements Locking {
    * Default constructor.
    * @param sopts static options
    */
-  ProcLocking(final StaticOptions sopts) {
+  public ProcLocking(final StaticOptions sopts) {
     this.sopts = sopts;
   }
 

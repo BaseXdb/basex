@@ -1,4 +1,4 @@
-package org.basex.core;
+package org.basex.core.locks;
 
 import static org.basex.util.Prop.*;
 
@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.*;
 
+import org.basex.core.*;
 import org.basex.util.list.*;
 
 /**

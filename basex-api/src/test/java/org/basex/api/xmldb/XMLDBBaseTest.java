@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.core.users.*;
 import org.basex.util.*;
 
 /**
@@ -24,9 +25,9 @@ public abstract class XMLDBBaseTest {
   /** Database/document path. */
   static final String PATH = URL + COLL;
   /** Optional login. */
-  static final String LOGIN = S_ADMIN;
+  static final String LOGIN = UserText.ADMIN;
   /** Optional password. */
-  static final String PW = S_ADMIN;
+  static final String PW = UserText.ADMIN;
   /** Test document. */
   static final String DOC1 = "first.xml";
   /** Test document. */

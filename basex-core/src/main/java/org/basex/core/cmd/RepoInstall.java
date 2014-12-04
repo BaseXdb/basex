@@ -2,10 +2,10 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
-import org.basex.core.*;
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.Cmd;
 import org.basex.core.parse.Commands.CmdRepo;
+import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.util.pkg.*;
 import org.basex.util.*;

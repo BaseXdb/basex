@@ -7,6 +7,7 @@ import java.util.regex.*;
 
 import org.basex.core.*;
 import org.basex.core.Context;
+import org.basex.core.locks.*;
 import org.basex.data.*;
 import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;

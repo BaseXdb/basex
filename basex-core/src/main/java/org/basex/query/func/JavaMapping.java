@@ -12,7 +12,8 @@ import java.net.*;
 import javax.xml.datatype.*;
 import javax.xml.namespace.*;
 
-import org.basex.core.*;
+import org.basex.core.locks.*;
+import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;

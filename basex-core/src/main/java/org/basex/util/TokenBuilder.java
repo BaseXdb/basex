@@ -50,7 +50,7 @@ public final class TokenBuilder {
    * @param string initial string
    */
   public TokenBuilder(final String string) {
-    this(token(string));
+    this(Token.token(string));
   }
 
   /**
@@ -250,7 +250,7 @@ public final class TokenBuilder {
    * @return self reference
    */
   public TokenBuilder addInt(final int value) {
-    return add(token(value));
+    return add(Token.token(value));
   }
 
   /**
@@ -259,7 +259,7 @@ public final class TokenBuilder {
    * @return self reference
    */
   public TokenBuilder addLong(final long value) {
-    return add(token(value));
+    return add(Token.token(value));
   }
 
   /**
@@ -294,7 +294,7 @@ public final class TokenBuilder {
    * @return self reference
    */
   public TokenBuilder add(final String string) {
-    return add(token(string));
+    return add(Token.token(string));
   }
 
   /**
@@ -313,42 +313,18 @@ public final class TokenBuilder {
   }
 
   /**
-   * Adds the string representation of an object:
-   * <ul>
-   *   <li> objects of type {@link Throwable} are converted to a string representation
-   *        via {@link Util#message}.</li>
-   *   <li> objects of type {@link Class} are converted via {@link Util#className(Class)}.</li>
-   *   <li> {@code null} references are replaced by the string {@code "null"}.</li>
-   *   <li> byte arrays are directly inserted as tokens.</li>
-   *   <li> for all other typed, {@link Object#toString} is called.</li>
-   * </ul>
+   * Adds the string representation of an object.
    * The specified string may contain {@code "%"} characters as place holders.
    * All place holders will be replaced by the specified extensions. If a digit is
    * specified after the place holder character, it will be interpreted as insertion
    * position.
    *
-   * @param object string to be extended
+   * @param object object to be extended
    * @param ext optional extensions
    * @return self reference
    */
   public TokenBuilder addExt(final Object object, final Object... ext) {
-    final byte[] t;
-    if(object instanceof byte[]) {
-      t = (byte[]) object;
-    } else {
-      final String s;
-      if(object == null) {
-        s = "null";
-      } else if(object instanceof Throwable) {
-        s = Util.message((Throwable) object);
-      } else if(object instanceof Class<?>) {
-        s = Util.className((Class<?>) object);
-      } else {
-        s = object.toString();
-      }
-      t = token(s);
-    }
-
+    final byte[] t = token(object);
     final int tl = t.length, el = ext.length;
     for(int i = 0, e = 0; i < tl; ++i) {
       if(t[i] != '%' || e == el) {
@@ -364,6 +340,36 @@ public final class TokenBuilder {
     }
     return this;
   }
+
+  /**
+   * Returns a token representation of the specified object.
+   * <ul>
+   *   <li> byte arrays are returns as is.</li>
+   *   <li> {@code null} references are replaced by the string "{@code null}".</li>
+   *   <li> objects of type {@link Throwable} are converted to a string representation via
+   *        {@link Util#message}.</li>
+   *   <li> objects of type {@link Class} are converted via {@link Util#className(Class)}.</li>
+   *   <li> for all other typer, {@link Object#toString} is called.</li>
+   * </ul>
+   * @param object object
+   * @return token
+   */
+  public static byte[] token(final Object object) {
+    if(object instanceof byte[]) return (byte[]) object;
+
+    final String s;
+    if(object == null) {
+      s = "null";
+    } else if(object instanceof Throwable) {
+      s = Util.message((Throwable) object);
+    } else if(object instanceof Class<?>) {
+      s = Util.className((Class<?>) object);
+    } else {
+      s = object.toString();
+    }
+    return Token.token(s);
+  }
+
 
   /**
    * Trims leading and trailing whitespaces.

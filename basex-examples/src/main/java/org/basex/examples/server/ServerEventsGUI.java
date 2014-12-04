@@ -1,7 +1,6 @@
 package org.basex.examples.server;
 
-import static org.basex.core.Text.*;
-
+import static org.basex.core.users.UserText.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -50,7 +49,7 @@ public final class ServerEventsGUI extends JFrame {
     server = new BaseXServer("-z");
 
     // initialization
-    try(ClientSession cs = new ClientSession(server.context, S_ADMIN, S_ADMIN)) {
+    try(ClientSession cs = new ClientSession(server.context, ADMIN, ADMIN)) {
       cs.execute("create event " + NAME);
       cs.execute("create db " + NAME + " <Application><Background/></Application>");
     }
@@ -102,7 +101,7 @@ public final class ServerEventsGUI extends JFrame {
     };
 
     // create session, open database and register event watcher
-    session = new ClientSession(server.context, S_ADMIN, S_ADMIN);
+    session = new ClientSession(server.context, ADMIN, ADMIN);
     session.execute("open " + NAME);
     session.watch(NAME, en);
 
@@ -150,7 +149,7 @@ public final class ServerEventsGUI extends JFrame {
       session.close();
       if(--open == 0) {
         // no sessions left: drop event and database and stop server
-        try(ClientSession css = new ClientSession(server.context, S_ADMIN, S_ADMIN)) {
+        try(ClientSession css = new ClientSession(server.context, ADMIN, ADMIN)) {
           css.execute("drop event " + NAME);
           css.execute("drop db " + NAME);
         }

@@ -32,7 +32,7 @@ public final class CsvStringConverter extends CsvConverter {
   private final boolean lax;
 
   /** XML string. */
-  private final XMLTokenBuilder xml = new XMLTokenBuilder();
+  private final XMLBuilder xml = new XMLBuilder();
   /** Record. */
   private boolean record;
   /** Current column. */

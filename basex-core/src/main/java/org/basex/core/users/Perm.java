@@ -1,4 +1,6 @@
-package org.basex.core;
+package org.basex.core.users;
+
+import java.util.*;
 
 /**
  * User permissions.
@@ -60,10 +62,15 @@ public enum Perm {
   /**
    * Returns a permission matching the specified string.
    * @param perm permission string
-   * @return permission, or {@link #ADMIN} if no match is found
+   * @return permission, or {@code null} if no match is found
    */
   public static Perm get(final String perm) {
     for(final Perm p : values()) if(p.name().equalsIgnoreCase(perm)) return p;
-    return ADMIN;
+    return null;
+  }
+
+  @Override
+  public String toString() {
+    return name().toLowerCase(Locale.ENGLISH);
   }
 }

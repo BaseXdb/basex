@@ -2,8 +2,8 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
-import org.basex.core.*;
 import org.basex.core.parse.*;
+import org.basex.core.users.*;
 
 /**
  * Evaluates the 'password' command and alters the user's password.
@@ -30,6 +30,6 @@ public final class Password extends AUser {
   @Override
   protected void build(final CmdBuilder cb) {
     cb.init();
-    if(cb.conf()) cb.arg(0);
+    if(!cb.conf()) cb.arg(0);
   }
 }

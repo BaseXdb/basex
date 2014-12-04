@@ -1,6 +1,5 @@
 package org.basex.core;
 
-import static org.basex.core.Text.*;
 import static org.junit.Assert.*;
 
 import java.io.*;
@@ -8,6 +7,7 @@ import java.io.*;
 import org.basex.*;
 import org.basex.api.client.*;
 import org.basex.core.cmd.*;
+import org.basex.core.users.*;
 import org.basex.util.*;
 import org.junit.*;
 import org.junit.Test;
@@ -53,8 +53,8 @@ public final class ServerCommandTest extends CommandTest {
    */
   @Test
   public void kill() throws IOException {
-    ok(new Kill(S_ADMIN));
-    ok(new Kill(S_ADMIN + '2'));
+    ok(new Kill(UserText.ADMIN));
+    ok(new Kill(UserText.ADMIN + '2'));
     ok(new Kill(Prop.NAME + '*'));
     ok(new CreateUser(NAME2, NAME2));
     try(final ClientSession cs = createClient(NAME2, NAME2)) {

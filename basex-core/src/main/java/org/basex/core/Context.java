@@ -1,7 +1,7 @@
 package org.basex.core;
 
-import static org.basex.core.Text.*;
-
+import org.basex.core.locks.*;
+import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.io.random.*;
 import org.basex.query.util.pkg.*;
@@ -113,7 +113,7 @@ public final class Context {
     users = new Users(soptions);
     repo = new Repo(soptions);
     log = new Log(soptions);
-    user = users.get(S_ADMIN);
+    user = users.get(UserText.ADMIN);
     listener = null;
   }
 

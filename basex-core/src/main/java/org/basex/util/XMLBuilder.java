@@ -11,21 +11,24 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class XMLTokenBuilder {
+public final class XMLBuilder {
   /** XML string. */
   private final TokenBuilder cache = new TokenBuilder();
   /** Element stack. */
   private final TokenList open = new TokenList();
   /** Indents the output. */
   private boolean indent;
+
   /** Current indentation flag. */
-  private boolean ind;
+  private boolean indenting;
+  /** Current opening flag. */
+  private boolean opening;
 
   /**
    * Activates indentation.
    * @return self reference
    */
-  public XMLTokenBuilder indent() {
+  public XMLBuilder indent() {
     indent = true;
     return this;
   }
@@ -33,41 +36,59 @@ public final class XMLTokenBuilder {
   /**
    * Opens an element.
    * @param name name of element
-   * @param atts attribute names and values
+   * @param attributes name and value pairs
+   * @return self reference
    */
-  public void open(final byte[] name, final byte[]... atts) {
+  public XMLBuilder open(final Object name, final Object... attributes) {
+    opening();
     ws();
     final TokenBuilder cch = cache;
-    cch.add('<').add(name);
-    final int al = atts.length;
+    cch.add('<').add(TokenBuilder.token(name));
+    final int al = attributes.length;
     for(int a = 0; a < al; a += 2) {
-      cch.add(' ').add(atts[a]).add('=').add('"');
-      attribute(atts[a + 1]);
+      cch.add(' ').add(TokenBuilder.token(attributes[a])).add('=').add('"');
+      attribute(TokenBuilder.token(attributes[a + 1]));
       cch.add('"');
     }
-    cch.add('>');
-    open.add(name);
-    ind = indent;
-  }
-
-  /**
-   * Closes an element.
-   */
-  public void close() {
-    final byte[] name = open.pop();
-    ws();
-    cache.add('<').add('/').add(name).add('>');
-    ind = indent;
+    open.add(TokenBuilder.token(name));
+    indenting = indent;
+    opening = true;
+    return this;
   }
 
   /**
    * Encodes the specified text.
    * @param value value to be encoded
+   * @return self reference
    */
-  public void text(final byte[] value) {
-    final int tl = value.length;
-    for(int k = 0; k < tl; k += cl(value, k)) add(cp(value, k));
-    ind = false;
+  public XMLBuilder text(final Object value) {
+    final byte[] token = TokenBuilder.token(value);
+    final int tl = token.length;
+    if(tl != 0) {
+      opening();
+      for(int k = 0; k < tl; k += cl(token, k)) add(cp(token, k));
+      indenting = false;
+    }
+    return this;
+  }
+
+  /**
+   * Closes an element.
+   * @return self reference
+   */
+  public XMLBuilder close() {
+    final TokenBuilder cch = cache;
+    final byte[] name = open.pop();
+    if(opening) {
+      cch.add('/');
+      opening = false;
+    } else {
+      ws();
+      cch.add('<').add('/').add(name);
+    }
+    cch.add('>');
+    indenting = indent;
+    return this;
   }
 
   /**
@@ -77,6 +98,16 @@ public final class XMLTokenBuilder {
   public byte[] finish() {
     while(!open.isEmpty()) close();
     return cache.finish();
+  }
+
+  /**
+   * Finishes an opening element.
+   */
+  private void opening() {
+    if(opening) {
+      cache.add('>');
+      opening = false;
+    }
   }
 
   /**
@@ -131,7 +162,7 @@ public final class XMLTokenBuilder {
    * Adds some indentation.
    */
   private void ws() {
-    if(ind) {
+    if(indenting) {
       final int os = open.size();
       if(os >= 0) {
         final TokenBuilder cch = cache;

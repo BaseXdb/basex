@@ -13,7 +13,6 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Bundles parameters of an HTTP request.
@@ -149,10 +148,10 @@ public final class HTTPParams {
    */
   private void addURLEncoded(final Map<String, Value> params) throws IOException {
     for(final String nv : Strings.split(body().toString(), '&')) {
-      final StringList parts = Strings.split(nv, '=', 2);
-      if(parts.size() == 2) {
-        final Atm i = new Atm(URLDecoder.decode(parts.get(1), Strings.UTF8));
-        final String k = parts.get(0);
+      final String[] parts = Strings.split(nv, '=', 2);
+      if(parts.length == 2) {
+        final Atm i = new Atm(URLDecoder.decode(parts[1], Strings.UTF8));
+        final String k = parts[0];
         final Value v = params.get(k);
         params.put(k, v == null ? i : new ValueBuilder().add(v).add(i).value());
       }

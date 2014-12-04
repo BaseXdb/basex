@@ -1,6 +1,6 @@
 package org.basex.core;
 
-import static org.basex.core.Text.*;
+import static org.basex.core.users.UserText.*;
 import static org.junit.Assert.*;
 
 import java.io.*;
@@ -254,14 +254,14 @@ public final class PermissionTest extends SandboxTest {
   /** Tests all commands where admin permission is needed. */
   @Test
   public void adminPermsNeeded() {
-    ok(new Grant(S_ADMIN, NAME), adminSession);
+    ok(new Grant(ADMIN, NAME), adminSession);
     if(server.context.users.get("test2") != null) {
       ok(new DropUser("test2"), testSession);
     }
     ok(new CreateUser("test2", NAME), testSession);
     ok(new CreateDB(NAME, "<xml/>"), testSession);
     ok(new ShowUsers(), testSession);
-    ok(new Grant(S_ADMIN, "test2"), testSession);
+    ok(new Grant(ADMIN, "test2"), testSession);
     ok(new Grant("create", "test2"), testSession);
     ok(new AlterUser(NAME, NAME), testSession);
     ok(new DropUser("test2"), testSession);

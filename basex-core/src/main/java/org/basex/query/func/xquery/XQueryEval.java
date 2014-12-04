@@ -7,6 +7,7 @@ import static org.basex.util.Token.*;
 import java.util.*;
 
 import org.basex.core.*;
+import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
@@ -29,12 +30,27 @@ public class XQueryEval extends StandardFunc {
   /** XQuery options. */
   public static class XQueryOptions extends Options {
     /** Permission. */
-    public static final StringOption PERMISSION = new StringOption("permission", Perm.ADMIN.name());
+    public static final EnumOption<Permission> PERMISSION = new EnumOption<>(
+        "permission", Permission.ADMIN);
     /** Timeout in seconds. */
     public static final NumberOption TIMEOUT = new NumberOption("timeout", 0);
     /** Maximum amount of megabytes that may be allocated by the query. */
     public static final NumberOption MEMORY = new NumberOption("memory", 0);
   }
+
+  /** Permissions. */
+  public enum Permission {
+    /** Admin.  */ ADMIN,
+    /** Create. */ CREATE,
+    /** Write.  */ WRITE,
+    /** Read.   */ READ,
+    /** None.   */ NONE;
+
+    @Override
+    public String toString() {
+      return name().toLowerCase(Locale.ENGLISH);
+    }
+  };
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
@@ -67,7 +83,7 @@ public class XQueryEval extends StandardFunc {
     try(final QueryContext qctx = qc.proc(new QueryContext(qc))) {
       if(exprs.length > 2) {
         final Options opts = toOptions(2, Q_OPTIONS, new XQueryOptions(), qc);
-        user.perm(Perm.get(opts.get(XQueryOptions.PERMISSION)));
+        user.perm(Perm.get(opts.get(XQueryOptions.PERMISSION).name()));
 
         // initial memory consumption: perform garbage collection and calculate usage
         Performance.gc(2);

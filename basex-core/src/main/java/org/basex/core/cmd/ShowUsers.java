@@ -5,9 +5,11 @@ import static org.basex.core.Text.*;
 import java.io.*;
 
 import org.basex.core.*;
+import org.basex.core.locks.*;
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.Cmd;
 import org.basex.core.parse.Commands.CmdShow;
+import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.util.*;
 

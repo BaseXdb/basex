@@ -10,6 +10,7 @@ import java.util.concurrent.*;
 import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.core.users.*;
 import org.basex.http.*;
 import org.basex.io.*;
 import org.basex.util.*;
@@ -177,7 +178,7 @@ public class RESTConcurrencyTest {
 
   /** Start BaseX HTTP. */
   private void startBaseXHTTP() {
-    basexHTTPServer = Util.start(BaseXHTTP.class, "-U" + Text.S_ADMIN, "-P" + Text.S_ADMIN);
+    basexHTTPServer = Util.start(BaseXHTTP.class, "-U" + UserText.ADMIN, "-P" + UserText.ADMIN);
     Performance.sleep(TIMEOUT); // give the server some time to stop
   }
 

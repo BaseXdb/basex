@@ -11,7 +11,6 @@ import org.apache.commons.fileupload.*;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.servlet.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 import com.bradmcevoy.http.*;
 import com.bradmcevoy.http.Response.ContentType;
@@ -181,12 +180,12 @@ final class BXServletRequest extends AbstractRequest {
   private static void parseQueryString(final Map<String, String> map, final String qs) {
     if(qs == null) return;
     for(final String nv : Strings.split(qs, '&')) {
-      final StringList parts = Strings.split(nv, '=', 2);
-      final String key = parts.get(0);
+      final String[] parts = Strings.split(nv, '=', 2);
+      final String key = parts[0];
       String val = null;
-      if(parts.size() > 1) {
+      if(parts.length > 1) {
         try {
-          val = URLDecoder.decode(parts.get(1), Strings.UTF8);
+          val = URLDecoder.decode(parts[1], Strings.UTF8);
         } catch(final UnsupportedEncodingException ex) {
           throw new RuntimeException(ex);
         }

@@ -6,6 +6,7 @@ import java.io.*;
 
 import org.basex.*;
 import org.basex.core.cmd.*;
+import org.basex.core.users.*;
 import org.basex.index.*;
 import org.basex.util.*;
 import org.junit.*;
@@ -156,7 +157,7 @@ public final class PinTest extends SandboxTest {
   @Test
   public void createDropAlterUser() {
     // create and alter users (open issue: allow this if other instances are opened?)
-    ok(new CreateUser(NAME, Text.S_ADMIN), context);
+    ok(new CreateUser(NAME, UserText.ADMIN), context);
     ok(new AlterUser(NAME, "abc"), context);
     // create databases and open by second context
     ok(new CreateDB(NAME), context);

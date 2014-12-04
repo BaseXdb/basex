@@ -7,6 +7,7 @@ import java.util.*;
 
 import org.basex.*;
 import org.basex.core.*;
+import org.basex.core.users.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
 import org.basex.server.*;
@@ -32,7 +33,7 @@ public final class XdmInfoTest extends SandboxTest {
   @BeforeClass
   public static void start() throws Exception {
     server = createServer();
-    session = new TestSession(Text.S_LOCALHOST, 9999, Text.S_ADMIN, Text.S_ADMIN);
+    session = new TestSession(Text.S_LOCALHOST, 9999, UserText.ADMIN, UserText.ADMIN);
   }
 
   /**

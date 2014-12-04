@@ -5,7 +5,7 @@ import static org.basex.query.expr.path.Axis.*;
 
 import java.util.*;
 
-import org.basex.core.*;
+import org.basex.core.locks.*;
 import org.basex.data.*;
 import org.basex.index.path.*;
 import org.basex.query.*;

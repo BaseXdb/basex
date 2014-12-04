@@ -1,7 +1,7 @@
 package org.basex.query.func.db;
 
-import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;

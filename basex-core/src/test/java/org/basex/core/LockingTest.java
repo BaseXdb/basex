@@ -7,6 +7,8 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import org.basex.*;
+import org.basex.core.locks.*;
+import org.basex.core.users.*;
 import org.basex.util.list.*;
 import org.junit.*;
 import org.junit.runner.*;

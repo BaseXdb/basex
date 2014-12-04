@@ -5,6 +5,7 @@ import java.io.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.parse.*;
+import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.server.*;
 

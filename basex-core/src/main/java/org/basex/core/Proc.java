@@ -2,6 +2,7 @@ package org.basex.core;
 
 import static org.basex.core.Text.*;
 
+import org.basex.core.locks.*;
 import org.basex.util.*;
 
 /**

@@ -4,7 +4,6 @@ import java.util.*;
 
 import org.basex.core.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 import org.basex.util.options.*;
 
 /**
@@ -38,9 +37,9 @@ public abstract class CollationOptions extends Options {
   String check(final String args) {
     String error = null;
     for(final String option : Strings.split(args, ';')) {
-      final StringList kv = Strings.split(option, '=', 2);
+      final String[] kv = Strings.split(option, '=', 2);
       try {
-        assign(kv.get(0), kv.size() == 2 ? kv.get(1) : "");
+        assign(kv[0], kv.length == 2 ? kv[1] : "");
       } catch(final BaseXException ex) {
         error = option;
       }

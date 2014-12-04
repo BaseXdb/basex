@@ -1,5 +1,6 @@
-package org.basex.core;
+package org.basex.core.locks;
 
+import org.basex.core.*;
 import org.basex.util.list.*;
 
 /**

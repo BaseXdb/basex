@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.*;
 import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
@@ -284,7 +285,7 @@ public final class MetaData {
       final String k = Token.string(in.readToken());
       if(k.isEmpty()) break;
       if(k.equals(DBPERM)) {
-        // legacy (Version <= 7.9)
+        // legacy (Version < 8)
         users.read(in);
       } else {
         final String v = Token.string(in.readToken());
@@ -329,9 +330,9 @@ public final class MetaData {
     corrupt = dbfile(DATAUPD).exists();
     // deactivate full-text index if obsolete trie structure was used
     if(wcindex) ftxtindex = false;
-
-    // [CG] USERS: read prm.basex
-    //users.read(dbfile(DATAPRM));
+    // check if local permissions exist
+    final IOFile file = dbfile(DATAPRM);
+    if(file.exists()) users.read(file, false);
   }
 
   /**
@@ -365,11 +366,8 @@ public final class MetaData {
     writeInfo(out, DBUPTODATE, uptodate);
     writeInfo(out, DBLASTID,   lastid);
     if(language != null) writeInfo(out, DBFTLN, language.toString());
-
-    // [CG] USERS: to be replaced with XML representation in extra file
-    out.writeToken(Token.token(DBPERM));
-    users.write(out);
     out.write(0);
+    users.write(dbfile(DATAPRM));
   }
 
   /**

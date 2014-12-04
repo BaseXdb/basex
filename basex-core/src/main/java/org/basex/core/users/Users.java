@@ -1,15 +1,18 @@
-package org.basex.core;
+package org.basex.core.users;
 
-import static org.basex.core.Text.*;
+import static org.basex.core.users.UserText.*;
+import static org.basex.util.XMLAccess.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
 import java.util.regex.*;
 
+import org.basex.build.*;
+import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.DataInput;
-import org.basex.io.out.DataOutput;
+import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -39,48 +42,86 @@ public final class Users {
 
     if(file.exists()) {
       try {
-        read(new DataInput(file));
+        final byte[] io = file.read();
+        final IOContent content = new IOContent(io, file.path());
+        if(startsWith(io, '<')) {
+          read(content, true);
+        } else {
+          // legacy (Version < 8)
+          read(new DataInput(content));
+        }
       } catch(final IOException ex) {
         Util.errln(ex);
       }
-    } else {
-      // define default admin user with all rights
-      list.add(new User(S_ADMIN, S_ADMIN, Perm.ADMIN));
     }
+
+    // ensure that default admin user exists
+    if(get(ADMIN) == null) list.add(new User(ADMIN, ADMIN, Perm.ADMIN));
   }
 
   /**
-   * Parses user permissions.
-   * @param f file to read from
+   * Parses user permissions as XML.
+   * @param input file to read from
+   * @param global global permissions
    * @throws IOException I/O error while reading from the file
    */
-  public synchronized void read(final IOFile f) throws IOException {
-    if(!f.exists()) return;
-    try(final DataInput in = new DataInput(f)) {
-      // ...
+  public synchronized void read(final IO input, final boolean global) throws IOException {
+    final MainOptions options = new MainOptions(false);
+    options.set(MainOptions.INTPARSE, true);
+    final ANode doc = new DBNode(Parser.singleParser(input, options, ""));
+    for(final ANode user : children(children(doc, USERS).next(), USER)) {
+      try {
+        // only accept users with complete data
+        list.add(new User(user, global));
+      } catch(final BaseXException ex) {
+        Util.errln(input.name() + ": " + ex.getLocalizedMessage());
+      }
     }
-  }
-
-  /**
-   * Reads users from disk.
-   * @param in input stream
-   * @throws IOException I/O exception
-   */
-  public synchronized void read(final DataInput in) throws IOException {
-    for(int u = in.readNum(); u > 0; --u) list.add(new User(in));
   }
 
   /**
    * Writes global permissions to disk.
    */
   public synchronized void write() {
-    if(file == null) return;
-    // [CG] USERS: write to XML
-    try(final DataOutput out = new DataOutput(file)) {
-      write(out);
-    } catch(final IOException ex) {
-      Util.debug(ex);
+    if(file != null) write(file);
+  }
+
+  /**
+   * Writes permissions to disk.
+   * @param output target file
+   */
+  public synchronized void write(final IOFile output) {
+    if(store()) {
+      try {
+        final XMLBuilder xml = new XMLBuilder().indent().open(USERS);
+        for(final User user : list) user.write(xml);
+        output.write(xml.finish());
+      } catch(final IOException ex) {
+        Util.errln(ex);
+      }
+    } else {
+      output.delete();
     }
+  }
+
+  /**
+   * Checks if permissions need to be stored.
+   * @return result of check
+   */
+  private synchronized boolean store() {
+    if(list.size() != 1) return !list.isEmpty();
+    final User user = list.get(0);
+    return !user.name().equals(ADMIN) ||
+           !user.code(Algorithm.DIGEST, Code.HASH).equals(User.digest(ADMIN, ADMIN));
+  }
+
+  /**
+   * Reads users from disk (legacy code, Version < 8; data will be ignored).
+   * @param in input stream
+   * @throws IOException I/O exception
+   */
+  public synchronized void read(final DataInput in) throws IOException {
+    for(int u = in.readNum(); u > 0; --u) { in.readToken(); in.readToken(); in.readNum(); }
   }
 
   /**
@@ -91,7 +132,7 @@ public final class Users {
    */
   public synchronized boolean create(final String username, final String password) {
     // check if user already exists
-    return get(username) == null && create(new User(username, password, Perm.NONE));
+    return get(username) == null && add(new User(username, password, Perm.NONE));
   }
 
   /**
@@ -99,7 +140,7 @@ public final class Users {
    * @param user user to be added
    * @return success of operation
    */
-  public synchronized boolean create(final User user) {
+  public synchronized boolean add(final User user) {
     list.add(user);
     write();
     return true;
@@ -157,23 +198,13 @@ public final class Users {
   }
 
   /**
-   * Writes permissions to disk.
-   * @param out output stream
-   * @throws IOException I/O exception
-   */
-  public synchronized void write(final DataOutput out) throws IOException {
-    out.writeNum(list.size());
-    for(final User user : list) user.write(out);
-  }
-
-  /**
    * Returns information on all users.
    * @param users optional global user list (for ignoring obsolete local users)
    * @return user information
    */
   public synchronized Table info(final Users users) {
     final Table table = new Table();
-    table.description = USERS_X;
+    table.description = Text.USERS_X;
 
     final int sz = file == null ? 3 : 5;
     for(int u = 0; u < sz; ++u) table.header.add(S_USERINFO[u]);
@@ -189,7 +220,7 @@ public final class Users {
       }
       table.contents.add(tl);
     }
-    return table.sort().toTop(token(S_ADMIN));
+    return table.sort().toTop(token(ADMIN));
   }
 
   /**

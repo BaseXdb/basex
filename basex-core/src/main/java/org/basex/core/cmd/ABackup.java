@@ -1,6 +1,8 @@
 package org.basex.core.cmd;
 
 import org.basex.core.*;
+import org.basex.core.locks.*;
+import org.basex.core.users.*;
 
 /**
  * Abstract class for database backup.

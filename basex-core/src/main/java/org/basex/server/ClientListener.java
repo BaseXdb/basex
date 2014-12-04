@@ -8,9 +8,9 @@ import java.util.*;
 
 import org.basex.*;
 import org.basex.core.*;
-import org.basex.core.User.Code;
 import org.basex.core.cmd.*;
 import org.basex.core.parse.*;
+import org.basex.core.users.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
@@ -171,25 +171,26 @@ public final class ClientListener extends Thread {
   }
 
   /**
-   * Initializes a session via cram-md5.
+   * Initializes a session via digest authentication.
    * @return success flag
    */
   private boolean authenticate() {
     try {
-      final String ts = Long.toString(System.nanoTime());
+      final String nonce = Long.toString(System.nanoTime());
       final byte[] address = socket.getInetAddress().getAddress();
 
-      // send {TIMESTAMP}0
+      // send {REALM:TIMESTAMP}0
       out = PrintOutput.get(socket.getOutputStream());
-      out.print(ts);
+      out.print(Prop.NAME + ':' + nonce);
       send(true);
 
       // evaluate login data
       in = new BufferInput(socket.getInputStream());
-      // receive {USER}0{PASSWORD}0
-      final String us = in.readString(), md5pwts = in.readString();
+      // receive {USER}0{DIGEST-HASH}0
+      final String us = in.readString(), hash = in.readString();
       final User user = context.users.get(us);
-      running = user != null && Strings.md5(user.code(Code.MD5) + ts).equals(md5pwts);
+      running = user != null &&
+          Strings.md5(user.code(Algorithm.DIGEST, Code.HASH) + nonce).equals(hash);
 
       // write log information
       if(running) {
