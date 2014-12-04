@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.junit.*;
@@ -114,7 +115,7 @@ public final class FuncItemTest extends QueryPlanTest {
     check("declare function local:Y($f) { $f(function() { $f }) };" +
         "for-each(function($x) { $x() }, local:Y#1)[2]",
         "",
-        "exists(//" + Util.className(FuncItem.class) + ')'
+        "exists(//" + Util.className(Empty.class) + ')'
     );
   }
 
@@ -124,7 +125,7 @@ public final class FuncItemTest extends QueryPlanTest {
     check("declare function local:Y($f) { $f(function() { $f }) };" +
         "let $f := for-each(function($x) { $x() }, local:Y#1) return $f[2]",
         "",
-        "exists(//" + Util.className(FuncItem.class) + ')'
+        "exists(//" + Util.className(Empty.class) + ')'
     );
   }
 
@@ -276,6 +277,6 @@ public final class FuncItemTest extends QueryPlanTest {
         + "declare function local:c() { local:b#0() };"
         + "local:c() ",
         "",
-        "exists(//Empty)");
+        "exists(//" + Util.className(Empty.class) + ")");
   }
 }

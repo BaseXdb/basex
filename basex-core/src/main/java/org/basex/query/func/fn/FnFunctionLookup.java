@@ -23,7 +23,7 @@ public final class FnFunctionLookup extends StandardFunc {
     if(arity < 0 || arity > Integer.MAX_VALUE) throw FUNCUNKNOWN_X.get(ii, name);
 
     try {
-      final Expr lit = Functions.getLiteral(name, (int) arity, qc, sc, ii);
+      final Expr lit = Functions.getLiteral(name, (int) arity, qc, sc, ii, true);
       return lit == null ? null : lit.item(qc, ii);
     } catch(final QueryException e) {
       // function not found (in most cases: XPST0017)
