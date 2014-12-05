@@ -13,16 +13,6 @@ abstract class AdminFn extends StandardFunc {
   static final String DATABASE = "database";
   /** QName: user. */
   static final String SESSION = "session";
-  /** QName: user. */
-  static final String USER = "user";
-  /** QName: permission. */
-  static final String PERMISSION = "permission";
-  /** QName: salt. */
-  static final String SALT = "salt";
-  /** QName: password. */
-  static final String HASH = "hash";
-  /** QName: digest. */
-  static final String DIGEST = "digest";
   /** QName: entry. */
   static final String ENTRY = "entry";
   /** Size element name. */

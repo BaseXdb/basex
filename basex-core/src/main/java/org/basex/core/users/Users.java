@@ -25,13 +25,19 @@ import org.basex.util.list.*;
 public final class Users {
   /** User array. */
   private final ArrayList<User> list = new ArrayList<>(0);
+  /** Global permissions. */
+  private boolean global;
   /** Filename; set to {@code null} if the instance handles local users. */
-  private IOFile file;
+  private final IOFile file;
 
   /**
    * Constructor for local users.
+   * @param file file
+   * @param global global flag
    */
-  public Users() {
+  public Users(final IOFile file, final boolean global) {
+    this.global = global;
+    this.file = file;
   }
 
   /**
@@ -39,84 +45,59 @@ public final class Users {
    * @param sopts static options
    */
   public Users(final StaticOptions sopts) {
-    // try to find permission file in database and home directory
-    final String perm = IO.BASEXSUFFIX + "perm";
-    file = new IOFile(sopts.dbpath(), perm);
-    if(!file.exists()) file = new IOFile(Prop.HOME, perm);
-
-    if(file.exists()) {
-      try {
-        final byte[] io = file.read();
-        final IOContent content = new IOContent(io, file.path());
-        if(startsWith(io, '<')) {
-          read(content, true);
-        } else {
-          // legacy (Version < 8)
-          read(new DataInput(content));
-        }
-      } catch(final IOException ex) {
-        Util.errln(ex);
-      }
-    }
-
+    this(globalPath(sopts), true);
     // ensure that default admin user exists
+    read();
     if(get(ADMIN) == null) list.add(new User(ADMIN, ADMIN, Perm.ADMIN));
   }
 
   /**
-   * Parses user permissions as XML.
-   * @param input file to read from
-   * @param global global permissions
-   * @throws IOException I/O error while reading from the file
+   * Reads user permissions.
    */
-  public synchronized void read(final IO input, final boolean global) throws IOException {
-    final MainOptions options = new MainOptions(false);
-    options.set(MainOptions.INTPARSE, true);
-    final ANode doc = new DBNode(Parser.singleParser(input, options, ""));
-    for(final ANode user : children(children(doc, USERS).next(), USER)) {
-      try {
-        // only accept users with complete data
-        list.add(new User(user, global));
-      } catch(final BaseXException ex) {
-        Util.errln(input.name() + ": " + ex.getLocalizedMessage());
-      }
-    }
-  }
+  public synchronized void read() {
+    if(file == null || !file.exists()) return;
 
-  /**
-   * Writes global permissions to disk.
-   */
-  public synchronized void write() {
-    if(file != null) write(file);
+    try {
+      final byte[] io = file.read();
+      final IOContent content = new IOContent(io, file.path());
+      if(startsWith(io, '<')) {
+        final MainOptions options = new MainOptions(false);
+        options.set(MainOptions.INTPARSE, true);
+        final ANode doc = new DBNode(Parser.singleParser(content, options, ""));
+        for(final ANode user : children(children(doc, USERS).next(), USER)) {
+          try {
+            // only accept users with complete data
+            list.add(new User(user, global));
+          } catch(final BaseXException ex) {
+            Util.errln(file.name() + ": " + ex.getLocalizedMessage());
+          }
+        }
+      } else {
+        // legacy (Version < 8)
+        read(new DataInput(content));
+      }
+    } catch(final IOException ex) {
+      Util.errln(ex);
+    }
   }
 
   /**
    * Writes permissions to disk.
-   * @param output target file
    */
-  public synchronized void write(final IOFile output) {
+  public synchronized void write() {
+    if(file == null) return;
+
     if(store()) {
       try {
         final XMLBuilder xml = new XMLBuilder().indent().open(USERS);
         for(final User user : list) user.write(xml);
-        output.write(xml.finish());
+        file.write(xml.finish());
       } catch(final IOException ex) {
         Util.errln(ex);
       }
     } else {
-      output.delete();
+      file.delete();
     }
-  }
-
-  /**
-   * Checks if permissions need to be stored.
-   * @return result of check
-   */
-  private synchronized boolean store() {
-    if(list.size() != 1) return !list.isEmpty();
-    final User user = list.get(0);
-    return !user.name().equals(ADMIN) ||
-           !user.code(Algorithm.DIGEST, Code.HASH).equals(User.digest(ADMIN, ADMIN));
   }
 
   /**
@@ -210,7 +191,7 @@ public final class Users {
     final Table table = new Table();
     table.description = Text.USERS_X;
 
-    final int sz = file == null ? 3 : 5;
+    final int sz = global ? 5 : 3;
     for(int u = 0; u < sz; ++u) table.header.add(S_USERINFO[u]);
 
     for(final User user : users(users)) {
@@ -218,7 +199,7 @@ public final class Users {
       tl.add(user.name());
       tl.add(user.has(Perm.READ) ? "X" : "");
       tl.add(user.has(Perm.WRITE) ? "X" : "");
-      if(sz == 5) {
+      if(global) {
         tl.add(user.has(Perm.CREATE) ? "X" : "");
         tl.add(user.has(Perm.ADMIN) ? "X" : "");
       }
@@ -238,5 +219,28 @@ public final class Users {
       if(users == null || users.get(user.name()) != null) al.add(user);
     }
     return al.toArray(new User[al.size()]);
+  }
+
+  /**
+   * Returns the path to the global permission file.
+   * @param sopts static options
+   * @return file reference
+   */
+  private static IOFile globalPath(final StaticOptions sopts) {
+    // try to find permission file in database and home directory
+    final String perm = IO.BASEXSUFFIX + "perm";
+    final IOFile file = new IOFile(sopts.dbpath(), perm);
+    return file.exists() ? file : new IOFile(Prop.HOME, perm);
+  }
+
+  /**
+   * Checks if permissions need to be stored.
+   * @return result of check
+   */
+  private synchronized boolean store() {
+    if(list.size() != 1) return !list.isEmpty();
+    final User user = list.get(0);
+    return !user.name().equals(ADMIN) ||
+           !user.code(Algorithm.DIGEST, Code.HASH).equals(User.digest(ADMIN, ADMIN));
   }
 }

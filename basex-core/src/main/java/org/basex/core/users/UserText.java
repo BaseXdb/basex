@@ -11,7 +11,7 @@ import static org.basex.util.Token.*;
 public interface UserText {
   /** User name. */
   String[] S_USERINFO = { "Username", "Read", "Write", "Create", "Admin" };
-  /** Default admin user and password. */
+  /** Default user and password. */
   String ADMIN = "admin";
 
   /** Users. */
@@ -25,5 +25,5 @@ public interface UserText {
   /** Password. */
   byte[] PASSWORD = token("password");
   /** Perm. */
-  byte[] PERM = token("perm");
+  byte[] PERMISSION = token("permission");
 }

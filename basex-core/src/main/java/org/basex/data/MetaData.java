@@ -134,7 +134,7 @@ public final class MetaData {
     maxcats = options.get(MainOptions.MAXCATS);
     stopwords = options.get(MainOptions.STOPWORDS);
     language = Language.get(options);
-    users = new Users();
+    users = new Users(path == null ? null : dbfile(DATAPRM), false);
   }
 
   // STATIC METHODS ==========================================================
@@ -330,9 +330,6 @@ public final class MetaData {
     corrupt = dbfile(DATAUPD).exists();
     // deactivate full-text index if obsolete trie structure was used
     if(wcindex) ftxtindex = false;
-    // check if local permissions exist
-    final IOFile file = dbfile(DATAPRM);
-    if(file.exists()) users.read(file, false);
   }
 
   /**
@@ -367,7 +364,6 @@ public final class MetaData {
     writeInfo(out, DBLASTID,   lastid);
     if(language != null) writeInfo(out, DBFTLN, language.toString());
     out.write(0);
-    users.write(dbfile(DATAPRM));
   }
 
   /**

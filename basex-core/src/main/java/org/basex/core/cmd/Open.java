@@ -1,7 +1,6 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
-import static org.basex.data.DataText.*;
 
 import java.io.*;
 
@@ -9,7 +8,6 @@ import org.basex.core.*;
 import org.basex.core.locks.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
-import org.basex.io.in.DataInput;
 import org.basex.util.*;
 
 /**
@@ -98,13 +96,12 @@ public final class Open extends Command {
         final MetaData meta = new MetaData(name, ctx);
         if(meta.updateFile().exists()) throw new BaseXException(Text.DB_UPDATED_X, meta.name);
 
-        // open meta data and database
-        try(final DataInput in = new DataInput(meta.dbfile(DATAINF))) {
-          meta.read(in);
-          // open database if user has permissions
-          if(!ctx.perm(Perm.READ, meta)) throw new BaseXException(PERM_REQUIRED_X, Perm.READ);
-          data = new DiskData(meta, in);
-        }
+        // check permissions
+        meta.users.read();
+        if(!ctx.perm(Perm.READ, meta)) throw new BaseXException(PERM_REQUIRED_X, Perm.READ);
+
+        // open database
+        data = new DiskData(meta);
         ctx.dbs.add(data);
       }
       return data;

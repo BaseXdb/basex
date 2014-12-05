@@ -53,20 +53,22 @@ public final class DiskData extends Data {
   /**
    * Default constructor, called from {@link Open#open}.
    * @param meta meta data
-   * @param in data input
    * @throws IOException I/O Exception
    */
-  public DiskData(final MetaData meta, final DataInput in) throws IOException {
+  public DiskData(final MetaData meta) throws IOException {
     super(meta);
 
-    while(true) {
-      final String k = string(in.readToken());
-      if(k.isEmpty()) break;
-      if(k.equals(DBTAGS))      elemNames = new Names(in, meta);
-      else if(k.equals(DBATTS)) attrNames = new Names(in, meta);
-      else if(k.equals(DBPATH)) paths = new PathSummary(this, in);
-      else if(k.equals(DBNS))   nspaces = new Namespaces(in);
-      else if(k.equals(DBDOCS)) resources.read(in);
+    try(final DataInput in = new DataInput(meta.dbfile(DATAINF))) {
+      meta.read(in);
+      while(true) {
+        final String k = string(in.readToken());
+        if(k.isEmpty()) break;
+        if(k.equals(DBTAGS))      elemNames = new Names(in, meta);
+        else if(k.equals(DBATTS)) attrNames = new Names(in, meta);
+        else if(k.equals(DBPATH)) paths = new PathSummary(this, in);
+        else if(k.equals(DBNS))   nspaces = new Namespaces(in);
+        else if(k.equals(DBDOCS)) resources.read(in);
+      }
     }
 
     // open data and indexes

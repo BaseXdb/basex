@@ -85,12 +85,11 @@ public final class Grant extends AUser {
 
     final User us = data.meta.users.get(user);
     if(us == null) {
-      // copy global user
+      // create new local user
       data.meta.users.add(new User(context.users.get(user).name(), prm));
     } else {
       us.perm(prm);
     }
-    data.meta.dirty = true;
     finishUpdate(data);
 
     Close.close(data, context);

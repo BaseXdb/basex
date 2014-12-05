@@ -67,10 +67,7 @@ public final class DropUser extends AUser {
     if(!startUpdate(data)) return false;
 
     // drop local user
-    if(data.meta.users.drop(data.meta.users.get(user))) {
-      info(USER_DROPPED_X_X, user, db);
-      data.meta.dirty = true;
-    }
+    if(data.meta.users.drop(data.meta.users.get(user))) info(USER_DROPPED_X_X, user, db);
     finishUpdate(data);
 
     Close.close(data, context);

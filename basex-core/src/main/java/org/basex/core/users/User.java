@@ -59,7 +59,7 @@ public final class User {
    */
   public User(final ANode user, final boolean global) throws BaseXException {
     name = string(attribute("Root", user, NAME));
-    perm = attribute(name, user, PERM, Perm.values());
+    perm = attribute(name, user, PERMISSION, Perm.values());
     if(!global) return;
 
     for(final ANode password : children(user, PASSWORD)) {
@@ -86,8 +86,8 @@ public final class User {
    * @param xml xml builder
    */
   public synchronized void write(final XMLBuilder xml) {
-    xml.open(USER, NAME, name, PERM, perm);
-    if(passwords != null) {
+    xml.open(USER, NAME, name, PERMISSION, perm);
+    if(passwords.size() != 0) {
       for(final Entry<Algorithm, EnumMap<Code, String>> algo : passwords.entrySet()) {
         xml.open(PASSWORD, ALGORITHM, algo.getKey());
         for(final Entry<Code, String> code : algo.getValue().entrySet()) {
@@ -130,6 +130,14 @@ public final class User {
    */
   public String code(final Algorithm alg, final Code code) {
     return passwords.get(alg).get(code);
+  }
+
+  /**
+   * Returns algorithms.
+   * @return algorithms
+   */
+  public EnumMap<Algorithm, EnumMap<Code, String>> alg() {
+    return passwords;
   }
 
   /**

@@ -1,5 +1,6 @@
 package org.basex.query.func.admin;
 
+import static org.basex.core.users.UserText.*;
 import org.basex.core.locks.*;
 import org.basex.data.*;
 import org.basex.query.*;

@@ -1,5 +1,6 @@
 package org.basex.query.func.admin;
 
+import static org.basex.core.users.UserText.*;
 import static org.basex.query.QueryError.*;
 
 import java.io.*;

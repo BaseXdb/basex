@@ -1,6 +1,9 @@
 package org.basex.query.func.admin;
 
+import static org.basex.core.users.UserText.*;
+
 import java.util.*;
+import java.util.Map.Entry;
 
 import org.basex.core.locks.*;
 import org.basex.core.users.*;
@@ -25,13 +28,17 @@ public final class AdminUsers extends AdminFn {
     for(final User u : global ? qc.context.users.users(null) :
       checkData(qc).meta.users.users(qc.context.users)) {
       final String perm = u.perm().toString().toLowerCase(Locale.ENGLISH);
-      final FElem elem = new FElem(USER).add(u.name()).add(PERMISSION, perm);
+      final FElem user = new FElem(USER).add(NAME, u.name()).add(PERMISSION, perm);
       if(global) {
-        elem.add(SALT, u.code(Algorithm.SALTED_SHA256, Code.SALT));
-        elem.add(HASH, u.code(Algorithm.SALTED_SHA256, Code.HASH));
-        elem.add(DIGEST, u.code(Algorithm.DIGEST, Code.HASH));
+        for(final Entry<Algorithm, EnumMap<Code, String>> codes : u.alg().entrySet()) {
+          final FElem password = new FElem(PASSWORD).add(ALGORITHM, codes.getKey().toString());
+          for(final Entry<Code, String> code : codes.getValue().entrySet()) {
+            password.add(new FElem(code.getKey().toString()).add(code.getValue()));
+          }
+          user.add(password);
+        }
       }
-      vb.add(elem);
+      vb.add(user);
     }
     return vb;
   }
