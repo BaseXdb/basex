@@ -65,7 +65,7 @@ public final class Add extends ACreate {
         auc.addInsert(data.meta.size, -1, clip);
         auc.execute(false);
 
-        finishUpdate();
+        if(!finishUpdate()) return false;
       }
       return info(RES_ADDED_X, perf);
     } finally {
@@ -112,13 +112,13 @@ public final class Add extends ACreate {
 
     try {
       final Data data = context.data();
-      final Parser parser = new DirParser(io, context, data.meta.path);
+      final Parser parser = new DirParser(io, options, data.meta.path);
       parser.target(target);
 
       // create random database name for disk-based creation
       if(cache(parser)) {
         clipDB = soptions.random(data.meta.name);
-        build = new DiskBuilder(clipDB, parser, context);
+        build = new DiskBuilder(clipDB, parser, soptions, options);
       } else {
         build = new MemBuilder(name, parser);
       }

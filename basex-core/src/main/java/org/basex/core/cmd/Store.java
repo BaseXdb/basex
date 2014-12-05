@@ -72,7 +72,7 @@ public final class Store extends ACreate {
       Util.debug(ex);
       return error(FILE_NOT_SAVED_X, file);
     } finally {
-      if(lock) finishUpdate();
+      if(lock && !finishUpdate()) return false;
     }
   }
 

@@ -75,9 +75,9 @@ public final class CreateDB extends ACreate {
       // create parser instance
       if(io != null) {
         if(!io.exists()) return error(RES_NOT_FOUND_X, io);
-        parser = new DirParser(io, context, soptions.dbpath(name));
+        parser = new DirParser(io, options, soptions.dbpath(name));
       } else if(parser == null) {
-        parser = Parser.emptyParser(context.options);
+        parser = Parser.emptyParser(options);
       }
 
       // close open database
@@ -92,7 +92,7 @@ public final class CreateDB extends ACreate {
         if(context.pinned(name)) return error(DB_PINNED_X, name);
 
         // create disk-based instance
-        proc(new DiskBuilder(name, parser, context)).build().close();
+        proc(new DiskBuilder(name, parser, soptions, options)).build().close();
 
         // second step: open database and create index structures
         final Open open = new Open(name);
@@ -112,9 +112,8 @@ public final class CreateDB extends ACreate {
             final Method m = Reflect.method(luceneClass, "luceneIndex", Context.class);
             Reflect.invoke(m, null, context);
           }
-
         } finally {
-          finishUpdate();
+          if(!finishUpdate()) return false;
         }
       }
       if(options.get(MainOptions.CREATEONLY)) new Close().run(context);
@@ -145,12 +144,13 @@ public final class CreateDB extends ACreate {
    * @param name name of the database
    * @param parser input parser
    * @param ctx database context
+   * @param options main options
    * @return new database instance
    * @throws IOException I/O exception
    */
-  public static synchronized Data create(final String name, final Parser parser, final Context ctx)
-      throws IOException {
-    return create(name, parser, ctx, ctx.options.get(MainOptions.MAINMEM));
+  public static synchronized Data create(final String name, final Parser parser, final Context ctx,
+      final MainOptions options) throws IOException {
+    return create(name, parser, ctx, options, options.get(MainOptions.MAINMEM));
   }
 
   /**
@@ -158,12 +158,13 @@ public final class CreateDB extends ACreate {
    * @param name name of the database
    * @param parser input parser
    * @param ctx database context
+   * @param options main options
    * @param mem create main-memory instance
    * @return new database instance
    * @throws IOException I/O exception
    */
   public static synchronized Data create(final String name, final Parser parser, final Context ctx,
-      final boolean mem) throws IOException {
+      final MainOptions options, final boolean mem) throws IOException {
 
     // check permissions
     if(!ctx.user().has(Perm.CREATE)) throw new BaseXException(PERM_REQUIRED_X, Perm.CREATE);
@@ -175,10 +176,9 @@ public final class CreateDB extends ACreate {
     if(ctx.pinned(name)) throw new BaseXException(DB_PINNED_X, name);
 
     // create disk-based instance
-    new DiskBuilder(name, parser, ctx).build().close();
+    new DiskBuilder(name, parser, ctx.soptions, options).build().close();
 
-    final Data data = Open.open(name, ctx);
-    final MainOptions options = ctx.options;
+    final Data data = Open.open(name, ctx, options);
     if(data.meta.createtext) create(IndexType.TEXT,      data, options, null);
     if(data.meta.createattr) create(IndexType.ATTRIBUTE, data, options, null);
     if(data.meta.createftxt) create(IndexType.FULLTEXT,  data, options, null);

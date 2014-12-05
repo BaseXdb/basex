@@ -58,7 +58,7 @@ public final class DropUser extends AUser {
 
     final Data data;
     try {
-      data = Open.open(db, context);
+      data = Open.open(db, context, options);
     } catch(final IOException ex) {
       return !info(Util.message(ex), db);
     }
@@ -68,7 +68,8 @@ public final class DropUser extends AUser {
 
     // drop local user
     if(data.meta.users.drop(data.meta.users.get(user))) info(USER_DROPPED_X_X, user, db);
-    finishUpdate(data);
+
+    if(!finishUpdate(data)) return false;
 
     Close.close(data, context);
     return true;

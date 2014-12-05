@@ -75,7 +75,7 @@ public final class Grant extends AUser {
     // set local permissions
     final Data data;
     try {
-      data = Open.open(db, context);
+      data = Open.open(db, context, options);
     } catch(final IOException ex) {
       return !info(Util.message(ex));
     }
@@ -90,7 +90,7 @@ public final class Grant extends AUser {
     } else {
       us.perm(prm);
     }
-    finishUpdate(data);
+    if(!finishUpdate(data)) return false;
 
     Close.close(data, context);
     return info(GRANTED_ON_X_X_X, args[0], user, db);

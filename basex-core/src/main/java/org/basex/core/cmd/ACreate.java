@@ -83,9 +83,10 @@ public abstract class ACreate extends Command {
 
   /**
    * Finalizes an update operation.
+   * @return success flag
    */
-  final void finishUpdate() {
-    finishUpdate(context.data());
+  final boolean finishUpdate() {
+    return finishUpdate(context.data());
   }
 
   /**

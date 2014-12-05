@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.util.*;
 
+import org.basex.core.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.io.*;
@@ -80,13 +81,14 @@ public final class DbListDetails extends DbList {
    * @return iterator
    */
   private Iter listDBs(final QueryContext qc) {
-    final StringList sl = qc.context.databases.listDBs();
+    final Context ctx = qc.context;
+    final StringList sl = ctx.databases.listDBs();
     return new Iter() {
       int pos;
       @Override
       public ANode get(final long i) throws QueryException {
         final String name = sl.get((int) i);
-        final MetaData meta = new MetaData(name, qc.context);
+        final MetaData meta = new MetaData(name, ctx.options, ctx.soptions);
         try {
           meta.read();
         } catch(final IOException ex) {
@@ -97,7 +99,7 @@ public final class DbListDetails extends DbList {
         res.add(RESOURCES, token(meta.ndocs.intValue()));
         res.add(MDATE, DateTime.format(new Date(meta.dbtime()), DateTime.FULL));
         res.add(SIZE, token(meta.dbsize()));
-        if(qc.context.perm(Perm.CREATE, meta)) res.add(PATH, meta.original);
+        if(ctx.perm(Perm.CREATE, meta)) res.add(PATH, meta.original);
         res.add(name);
         return res;
       }

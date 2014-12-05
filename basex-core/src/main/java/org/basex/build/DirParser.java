@@ -74,11 +74,11 @@ public final class DirParser extends Parser {
   /**
    * Constructor.
    * @param source source path
-   * @param context database context
+   * @param options main options
    * @param path future database path
    */
-  public DirParser(final IO source, final Context context, final IOFile path) {
-    this(source, context.options);
+  public DirParser(final IO source, final MainOptions options, final IOFile path) {
+    this(source, options);
     if(path != null && (addRaw || rawParser)) rawPath = new IOFile(path, IO.RAW);
   }
 

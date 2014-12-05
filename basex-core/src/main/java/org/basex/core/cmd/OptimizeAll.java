@@ -43,7 +43,7 @@ public final class OptimizeAll extends ACreate {
   protected boolean run() {
     final Data data = context.data();
     try {
-      optimizeAll(data, context, this);
+      optimizeAll(data, context, options, this);
     } catch(final IOException ex) {
       return error(Util.message(ex));
     } finally {
@@ -89,13 +89,14 @@ public final class OptimizeAll extends ACreate {
    * Optimizes all data structures and closes the database.
    * Recreates the database, drops the old instance and renames the recreated instance.
    * @param data disk data
-   * @param ctx database context
+   * @param context database context
+   * @param options main options
    * @param cmd command reference or {@code null}
    * @throws IOException I/O Exception during index rebuild
    * @throws BaseXException database exception
    */
-  public static void optimizeAll(final Data data, final Context ctx, final OptimizeAll cmd)
-      throws IOException {
+  public static void optimizeAll(final Data data, final Context context,
+      final MainOptions options, final OptimizeAll cmd) throws IOException {
 
     if(data.inMemory()) throw new BaseXException(NO_MAINMEM);
 
@@ -104,16 +105,13 @@ public final class OptimizeAll extends ACreate {
     final String name = ometa.name;
 
     // check if database is also pinned by other users
-    if(ctx.dbs.pins(ometa.name) > 1) throw new BaseXException(DB_PINNED_X, name);
-
-    // find unique temporary database name
-    final StaticOptions sopts = ctx.soptions;
-    final MainOptions options = ctx.options;
+    if(context.dbs.pins(ometa.name) > 1) throw new BaseXException(DB_PINNED_X, name);
 
     // adopt original meta information
     options.set(MainOptions.CHOP, ometa.chop);
     // adopt original index options
     options.set(MainOptions.UPDINDEX, ometa.updindex);
+    options.set(MainOptions.AUTOOPTIMIZE, ometa.autoopt);
     options.set(MainOptions.MAXCATS,  ometa.maxcats);
     options.set(MainOptions.MAXLEN,   ometa.maxlen);
     // adopt original full-text index options
@@ -125,9 +123,10 @@ public final class OptimizeAll extends ACreate {
 
     // build database and index structures
     if(cmd != null) cmd.size = ometa.size;
+    final StaticOptions sopts = context.soptions;
     final String tname = sopts.random(name);
     final DBParser parser = new DBParser(odata, options, cmd);
-    try(final DiskBuilder builder = new DiskBuilder(tname, parser, ctx)) {
+    try(final DiskBuilder builder = new DiskBuilder(tname, parser, sopts, options)) {
       final DiskData dt = builder.build();
       try {
         if(ometa.createtext) create(IndexType.TEXT, dt, options, cmd);
@@ -151,7 +150,7 @@ public final class OptimizeAll extends ACreate {
       }
     }
     // return database instance
-    Close.close(data, ctx);
+    Close.close(data, context);
 
     // drop old database and rename temporary to final name
     if(!DropDB.drop(name, sopts)) throw new BaseXException(DB_NOT_DROPPED_X, name);

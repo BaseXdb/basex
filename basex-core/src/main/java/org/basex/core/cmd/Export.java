@@ -43,7 +43,7 @@ public final class Export extends Command {
   protected boolean run() {
     try {
       final Data data = context.data();
-      export(data, args[0], context.options, this);
+      export(data, args[0], options, this);
       return info(DB_EXPORTED_X, data.meta.name, perf);
     } catch(final IOException ex) {
       return error(Util.message(ex));

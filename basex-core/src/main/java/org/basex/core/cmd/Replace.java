@@ -93,7 +93,7 @@ public final class Replace extends ACreate {
 
       return info(RES_REPLACED_X_X, ds + bs, perf);
     } finally {
-      finishUpdate();
+      if(!finishUpdate()) return false;
     }
   }
 }

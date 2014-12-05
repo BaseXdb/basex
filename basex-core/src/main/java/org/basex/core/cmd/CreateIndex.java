@@ -63,7 +63,7 @@ public final class CreateIndex extends ACreate {
     } catch(final IOException ex) {
       return error(Util.message(ex));
     } finally {
-      finishUpdate();
+      if(!finishUpdate()) return false;
     }
   }
 

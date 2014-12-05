@@ -76,7 +76,7 @@ public final class List extends Command {
       String file = null;
       long size = 0;
       int docs = 0;
-      final MetaData meta = new MetaData(name, context);
+      final MetaData meta = new MetaData(name, options, soptions);
       try {
         meta.read();
         size = meta.dbsize();
@@ -123,7 +123,7 @@ public final class List extends Command {
 
     try {
       // add xml documents
-      final Data data = Open.open(db, context);
+      final Data data = Open.open(db, context, options);
       final Resources res = data.resources;
       final IntList il = res.docs(path);
       final int ds = il.size();

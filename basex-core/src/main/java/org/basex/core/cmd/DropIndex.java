@@ -50,7 +50,7 @@ public final class DropIndex extends ACreate {
       return drop(type, data) ? info(INDEX_DROPPED_X_X, type, perf) :
         error(INDEX_NOT_DROPPED_X, type);
     } finally {
-      finishUpdate();
+      if(!finishUpdate()) return false;
     }
   }
 

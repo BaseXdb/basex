@@ -42,8 +42,8 @@ public final class DiskBuilder extends Builder implements AutoCloseable {
   /** Output stream for temporary values. */
   private DataOutput sout;
 
-  /** Database context. */
-  private final Context context;
+  /** Static options. */
+  private final StaticOptions sopts;
   /** Closed flag. */
   private boolean closed;
   /** Debug counter. */
@@ -52,38 +52,39 @@ public final class DiskBuilder extends Builder implements AutoCloseable {
   /**
    * Constructor.
    * @param name name of database
-   * @param parse parser
-   * @param context database context
+   * @param parser parser
+   * @param sopts static options
+   * @param opts main options
    */
-  public DiskBuilder(final String name, final Parser parse, final Context context) {
-    super(name, parse);
-    this.context = context;
+  public DiskBuilder(final String name, final Parser parser, final StaticOptions sopts,
+      final MainOptions opts) {
+    super(name, parser);
+    this.sopts = sopts;
+    meta = new MetaData(dbname, opts, sopts);
   }
 
   @Override
   public DiskData build() throws IOException {
-    final MetaData md = new MetaData(dbname, context);
-    md.assign(parser);
-    md.dirty = true;
+    meta.assign(parser);
+    meta.dirty = true;
 
     // calculate optimized output buffer sizes to reduce disk fragmentation
     final Runtime rt = Runtime.getRuntime();
-    int bs = (int) Math.min(md.filesize, Math.min(1 << 22, rt.maxMemory() - rt.freeMemory() >> 2));
+    final long max = Math.min(1 << 22, rt.maxMemory() - rt.freeMemory() >> 2);
+    int bs = (int) Math.min(meta.filesize, max);
     bs = Math.max(IO.BLOCKSIZE, bs - bs % IO.BLOCKSIZE);
 
     // drop old database (if available) and create new one
-    final StaticOptions sopts = context.soptions;
     DropDB.drop(dbname, sopts);
     sopts.dbpath(dbname).md();
 
-    meta = md;
-    elemNames = new Names(md);
-    attrNames = new Names(md);
+    elemNames = new Names(meta);
+    attrNames = new Names(meta);
     try {
-      tout = new DataOutput(new TableOutput(md, DATATBL));
-      xout = new DataOutput(md.dbfile(DATATXT), bs);
-      vout = new DataOutput(md.dbfile(DATAATV), bs);
-      sout = new DataOutput(md.dbfile(DATATMP), bs);
+      tout = new DataOutput(new TableOutput(meta, DATATBL));
+      xout = new DataOutput(meta.dbfile(DATATXT), bs);
+      vout = new DataOutput(meta.dbfile(DATAATV), bs);
+      sout = new DataOutput(meta.dbfile(DATATMP), bs);
 
       final Performance perf = Prop.debug ? new Performance() : null;
       Util.debug(tit() + DOTS);
@@ -97,15 +98,15 @@ public final class DiskBuilder extends Builder implements AutoCloseable {
     close();
 
     // copy temporary values into database table
-    try(final DataInput in = new DataInput(md.dbfile(DATATMP))) {
-      final TableAccess ta = new TableDiskAccess(md, true);
+    try(final DataInput in = new DataInput(meta.dbfile(DATATMP))) {
+      final TableAccess ta = new TableDiskAccess(meta, true);
       for(; spos < ssize; ++spos) ta.write4(in.readNum(), 8, in.readNum());
       ta.close();
     }
-    md.dbfile(DATATMP).delete();
+    meta.dbfile(DATATMP).delete();
 
     // return database instance
-    return new DiskData(md, elemNames, attrNames, path, ns);
+    return new DiskData(meta, elemNames, attrNames, path, ns);
   }
 
   @Override
@@ -115,7 +116,7 @@ public final class DiskBuilder extends Builder implements AutoCloseable {
     } catch(final IOException ex) {
       Util.debug(ex);
     }
-    if(meta != null) DropDB.drop(meta.name, context.soptions);
+    if(meta != null) DropDB.drop(meta.name, sopts);
   }
 
   @Override

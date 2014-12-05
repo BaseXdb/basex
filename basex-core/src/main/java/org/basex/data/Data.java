@@ -659,6 +659,9 @@ public abstract class Data {
       k = kind(par);
     }
 
+    // delete namespace nodes and propagate PRE value shifts (before node sizes are touched!)
+    nspaces.delete(pre, s, this);
+
     // reduce size of ancestors
     while(par > 0 && k != DOC) {
       par = parent(par, k);
@@ -678,9 +681,6 @@ public abstract class Data {
     table.delete(pre, s);
 
     if(!cache) updateDist(pre, -s);
-
-    // delete namespace nodes and propagate PRE value shifts
-    nspaces.delete(pre, s, this);
   }
 
   /**

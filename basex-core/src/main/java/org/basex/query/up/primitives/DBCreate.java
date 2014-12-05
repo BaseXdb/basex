@@ -52,23 +52,19 @@ public final class DBCreate extends NameUpdate {
   public void prepare() throws QueryException {
     if(add.inputs == null || add.inputs.isEmpty()) return;
 
-    final MainOptions opts = qc.context.options;
+    final MainOptions opts = new MainOptions(qc.context.options);
     options.assign(opts);
-    try {
-      add.addDocs(new MemData(opts), name);
-    } finally {
-      options.reset(opts);
-    }
+    add.addDocs(new MemData(opts), name, opts);
   }
 
   @Override
   public void apply() throws QueryException {
     close();
 
-    final MainOptions opts = qc.context.options;
+    final MainOptions opts = new MainOptions(qc.context.options);
     options.assign(opts);
     try {
-      final Data data = CreateDB.create(name, Parser.emptyParser(opts), qc.context);
+      final Data data = CreateDB.create(name, Parser.emptyParser(opts), qc.context, opts);
 
       // add initial documents and optimize database
       if(add.data != null) {
@@ -84,8 +80,6 @@ public final class DBCreate extends NameUpdate {
 
     } catch(final IOException ex) {
       throw UPDBOPTERR_X.get(info, ex);
-    } finally {
-      options.reset(opts);
     }
   }
 

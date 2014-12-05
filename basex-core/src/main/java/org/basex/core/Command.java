@@ -314,9 +314,17 @@ public abstract class Command extends Proc {
   /**
    * Finalizes an update operation.
    * @param data data reference
+   * @return success flag
    */
-  protected final void finishUpdate(final Data data) {
-    data.finishUpdate(options);
+  protected final boolean finishUpdate(final Data data) {
+    try {
+      if(data.meta.autoopt) Optimize.optimize(data, options, null);
+      data.finishUpdate(options);
+      return true;
+    } catch(final IOException ex) {
+      info(Util.message(ex));
+      return false;
+    }
   }
 
   /**

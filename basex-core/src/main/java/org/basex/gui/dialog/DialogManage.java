@@ -192,7 +192,7 @@ public final class DialogManage extends BaseXDialog {
       String info = "";
       if(active) {
         // refresh info view
-        final MetaData meta = new MetaData(db, ctx);
+        final MetaData meta = new MetaData(db, ctx.options, ctx.soptions);
         try {
           meta.read();
           info = InfoDB.db(meta, true, true, true);

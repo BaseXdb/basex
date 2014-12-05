@@ -21,7 +21,7 @@ public abstract class Parser extends Proc {
   protected final Atts atts = new Atts();
   /** Namespaces of currently parsed element. */
   protected final Atts nsp = new Atts();
-  /** Database options. */
+  /** Main options. */
   protected final MainOptions options;
   /** Target path (empty, or suffixed with a single slash). */
   String target = "";

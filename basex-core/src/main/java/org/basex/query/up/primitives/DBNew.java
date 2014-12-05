@@ -51,26 +51,25 @@ final class DBNew {
    * @throws QueryException query exception
    */
   void addDocs(final MemData md, final String name, final DBOptions options) throws QueryException {
-    final MainOptions opts = qc.context.options;
+    final MainOptions opts = new MainOptions(qc.context.options);
     options.assign(opts);
-    try {
-      addDocs(new MemData(md, opts), name);
-    } finally {
-      options.reset(opts);
-    }
+    addDocs(new MemData(md, opts), name, opts);
   }
 
   /**
    * Inserts all documents to be added to a temporary database.
    * @param dt target database
    * @param name name of database
+   * @param options main options
    * @throws QueryException query exception
    */
-  void addDocs(final MemData dt, final String name) throws QueryException {
+  void addDocs(final MemData dt, final String name, final MainOptions options)
+      throws QueryException {
+
     data = dt;
     final long ds = inputs.size();
     for(int i = 0; i < ds; i++) {
-      data.insert(data.meta.size, -1, data(inputs.get(i), name));
+      data.insert(data.meta.size, -1, data(inputs.get(i), name, options));
       // clear list to recover memory
       inputs.set(i, null);
     }
@@ -81,14 +80,17 @@ final class DBNew {
    * Creates a {@link DataClip} instance for the specified document.
    * @param ni new database input
    * @param dbname name of database
+   * @param options main options
    * @return database clip
    * @throws QueryException query exception
    */
-  DataClip data(final NewInput ni, final String dbname) throws QueryException {
+  DataClip data(final NewInput ni, final String dbname, final MainOptions options)
+      throws QueryException {
+
     // add document node
     final Context ctx = qc.context;
     if(ni.node != null) {
-      final MemData mdata = (MemData) ni.node.dbCopy(ctx.options).data;
+      final MemData mdata = (MemData) ni.node.dbCopy(options).data;
       mdata.update(0, Data.DOC, ni.path);
       return new DataClip(mdata);
     }
@@ -96,7 +98,7 @@ final class DBNew {
     // add input
     final IOFile dbpath = ctx.soptions.dbpath(string(ni.dbname));
     try {
-      final Parser parser = new DirParser(ni.io, ctx, dbpath).target(string(ni.path));
+      final Parser parser = new DirParser(ni.io, options, dbpath).target(string(ni.path));
       return new MemBuilder(dbname, parser).dataClip();
     } catch(final IOException ex) {
       throw IOERR_X.get(info, ex);

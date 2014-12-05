@@ -38,6 +38,8 @@ public interface DataText {
   String DBPTHIDX = "PTHINDEX";
   /** Automatic index update. */
   String DBUPDIDX = "UPDINDEX";
+  /** Automatic optimization. */
+  String DBAUTOOPT = "AUTOOPT";
   /** Text indexing. */
   String DBTXTIDX = "TXTINDEX";
   /** Attribute indexing. */
