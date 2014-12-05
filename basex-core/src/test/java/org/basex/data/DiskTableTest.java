@@ -54,7 +54,7 @@ public final class DiskTableTest extends SandboxTest {
   @Before
   public void setUp() throws Exception {
     final Parser parser = Parser.xmlParser(IO.get(TESTFILE));
-    data = new DiskBuilder(NAME, parser, context).build();
+    data = new DiskBuilder(NAME, parser, context.soptions, context.options).build();
     size = data.meta.size;
     data.close();
     tda = new TableDiskAccess(data.meta, true);

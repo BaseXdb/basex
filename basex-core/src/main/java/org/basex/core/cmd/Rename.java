@@ -61,7 +61,7 @@ public final class Rename extends ACreate {
     }
 
     // finish update
-    finishUpdate();
+    if(!finishUpdate()) return false;
 
     // return info message
     return info(RES_RENAMED_X_X, c, perf) && ok;

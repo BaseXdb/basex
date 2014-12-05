@@ -34,17 +34,17 @@ public final class Optimize extends ACreate {
   @Override
   protected boolean run() {
     final Data data = context.data();
-    final MetaData m = data.meta;
-    size = m.size;
+    final MetaData meta = data.meta;
+    size = meta.size;
 
     if(!startUpdate()) return false;
     try {
       optimize(data, options, this);
-      return info(DB_OPTIMIZED_X, m.name, perf);
+      return info(DB_OPTIMIZED_X, meta.name, perf);
     } catch(final IOException ex) {
       return error(Util.message(ex));
     } finally {
-      finishUpdate();
+      if(!finishUpdate()) return false;
     }
   }
 
@@ -79,13 +79,13 @@ public final class Optimize extends ACreate {
    * Optimizes the structures of a database.
    * @param data data
    * @param options main options
-   * @param rebuild rebuild all index structures
-   * @param rebuildFT rebuild full-text index
+   * @param enforce enforce index operation
+   * @param enforceFT enforce full-text index operation
    * @param cmd calling command instance (may be {@code null})
    * @throws IOException I/O Exception during index rebuild
    */
-  public static void optimize(final Data data, final MainOptions options, final boolean rebuild,
-      final boolean rebuildFT, final Optimize cmd) throws IOException {
+  public static void optimize(final Data data, final MainOptions options, final boolean enforce,
+      final boolean enforceFT, final Optimize cmd) throws IOException {
 
     // initialize structural indexes
     final MetaData md = data.meta;
@@ -134,30 +134,36 @@ public final class Optimize extends ACreate {
       md.uptodate = true;
     }
 
+    // reassign autooptimize flag
+    final boolean autoopt = options.get(MainOptions.AUTOOPTIMIZE);
+    if(autoopt != md.autoopt) {
+      md.autoopt = autoopt;
+      md.dirty = true;
+    }
+
     // rebuild value indexes
-    optimize(IndexType.ATTRIBUTE, data, options, md.createattr, md.attrindex, rebuild, cmd);
-    optimize(IndexType.TEXT,      data, options, md.createtext, md.textindex, rebuild, cmd);
-    optimize(IndexType.FULLTEXT,  data, options, md.createftxt, md.ftxtindex, rebuild || rebuildFT,
-        cmd);
+    optimize(IndexType.ATTRIBUTE, data, options, md.createattr, md.attrindex, enforce, cmd);
+    optimize(IndexType.TEXT,      data, options, md.createtext, md.textindex, enforce, cmd);
+    optimize(IndexType.FULLTEXT,  data, options, md.createftxt, md.ftxtindex, enforceFT, cmd);
   }
 
   /**
-   * Optimizes the specified index.
+   * Optimizes the specified index if the old and new state is different.
    * @param type index type
    * @param data data reference
    * @param options main options
-   * @param create create flag
+   * @param create new flag
    * @param old old flag
-   * @param rebuild rebuild all index structures
+   * @param force enforce operation
    * @param cmd calling command instance
    * @throws IOException I/O exception
    */
   private static void optimize(final IndexType type, final Data data, final MainOptions options,
-      final boolean create, final boolean old, final boolean rebuild, final Optimize cmd)
+      final boolean create, final boolean old, final boolean force, final Optimize cmd)
       throws IOException {
 
-    // check if flags are nothing has changed
-    if(!rebuild && create == old) return;
+    // check if flags have changed
+    if(create == old && !force) return;
 
     // create or drop index
     if(create) create(type, data, options, cmd);

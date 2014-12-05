@@ -42,7 +42,7 @@ public final class Open extends Command {
     if(data == null || !data.meta.name.equals(db)) {
       new Close().run(context);
       try {
-        data = open(db, context);
+        data = open(db, context, options);
         context.openDB(data);
 
         final String path = args[1];
@@ -71,22 +71,26 @@ public final class Open extends Command {
   /**
    * Opens the specified database.
    * @param name name of database
-   * @param ctx database context
+   * @param context database context
+   * @param options main options
    * @return data reference
    * @throws IOException I/O exception
    */
-  public static Data open(final String name, final Context ctx) throws IOException {
-    synchronized(ctx.dbs) {
-      Data data = ctx.dbs.pin(name);
+  public static Data open(final String name, final Context context, final MainOptions options)
+      throws IOException {
+
+    synchronized(context.dbs) {
+      Data data = context.dbs.pin(name);
       if(data == null) {
         // check if database exists
-        if(!ctx.soptions.dbexists(name)) throw new BaseXException(dbnf(name));
-        data = new DiskData(name, ctx);
-        ctx.dbs.add(data);
+        if(!context.soptions.dbexists(name)) throw new BaseXException(dbnf(name));
+
+        data = new DiskData(new MetaData(name, options, context.soptions));
+        context.dbs.add(data);
       }
       // check permissions
-      if(!ctx.perm(Perm.READ, data.meta)) {
-        Close.close(data, ctx);
+      if(!context.perm(Perm.READ, data.meta)) {
+        Close.close(data, context);
         throw new BaseXException(PERM_REQUIRED_X, Perm.READ);
       }
       return data;

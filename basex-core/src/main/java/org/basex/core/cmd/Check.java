@@ -60,7 +60,7 @@ public final class Check extends Command {
     if(!qi.input.exists()) return true;
 
     // compare timestamp of database input and specified file
-    final MetaData meta = new MetaData(qi.db, context);
+    final MetaData meta = new MetaData(qi.db, options, soptions);
     try {
       meta.read();
       return meta.time == qi.input.timeStamp();

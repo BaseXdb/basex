@@ -93,27 +93,25 @@ public abstract class ContextModifier {
     // apply initial updates based on database names
     for(final NameUpdates up : nameUpdates.values()) up.apply(true);
 
-    // collect data references to be locked
-    final Set<Data> datas = new HashSet<>();
-    for(final Data data : dbUpdates.keySet()) datas.add(data);
-
     // try to acquire write locks and keep track of the number of acquired locks in order to
     // release them in case of error. write locks prevent other JVMs from accessing currently
     // updated databases, but they cannot provide perfect safety.
-    int i = 0;
+    final Set<Data> datas = new HashSet<>();
     try {
-      for(final Data data : datas) {
+      for(final Data data : dbUpdates.keySet()) {
         data.startUpdate(qc.context.options);
-        i++;
+        datas.add(data);
       }
       // apply node and database update
-      for(final DataUpdates up : dbUpdates.values()) up.apply(qc);
+      for(final DataUpdates up : dbUpdates.values()) {
+        up.apply(qc);
+      }
     } catch(final IOException ex) {
       throw BXDB_LOCK_X.get(null, ex);
     } finally {
       // remove locks: in case of a crash, remove only already acquired write locks
       for(final Data data : datas) {
-        if(i-- > 0) data.finishUpdate(qc.context.options);
+        data.finishUpdate(qc.context.options);
       }
     }
 

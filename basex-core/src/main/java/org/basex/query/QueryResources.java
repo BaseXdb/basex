@@ -131,7 +131,8 @@ public final class QueryResources {
     }
     try {
       // open and add new data reference
-      return addData(Open.open(name, qc.context));
+      final Context ctx = qc.context;
+      return addData(Open.open(name, ctx, ctx.options));
     } catch(final IOException ex) {
       throw BXDB_OPEN_X.get(info, ex);
     }
@@ -352,7 +353,8 @@ public final class QueryResources {
     if(input.db != null) {
       try {
         // try to open database
-        return addData(Open.open(input.db, qc.context));
+        final Context ctx = qc.context;
+        return addData(Open.open(input.db, ctx, ctx.options));
       } catch(final IOException ex) { Util.debug(ex); }
     }
     return null;
@@ -385,7 +387,8 @@ public final class QueryResources {
     try {
       final boolean mem = !context.options.get(MainOptions.FORCECREATE);
       final MainOptions opts = new MainOptions(context.options);
-      return addData(CreateDB.create(source.dbname(), new DirParser(source, opts), context, mem));
+      return addData(CreateDB.create(source.dbname(),
+          new DirParser(source, opts), context, opts, mem));
     } catch(final IOException ex) {
       throw IOERR_X.get(info, ex);
     } finally {

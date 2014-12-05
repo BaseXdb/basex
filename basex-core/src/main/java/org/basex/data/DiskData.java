@@ -52,12 +52,11 @@ public final class DiskData extends Data {
 
   /**
    * Default constructor, called from {@link Open#open}.
-   * @param db name of database
-   * @param ctx database context
+   * @param meta meta data
    * @throws IOException I/O Exception
    */
-  public DiskData(final String db, final Context ctx) throws IOException {
-    meta = new MetaData(db, ctx);
+  public DiskData(final MetaData meta) throws IOException {
+    this.meta = meta;
 
     // don't open databases marked as updating
     if(updateFile().exists()) throw new BaseXException(Text.DB_UPDATED_X, meta.name);

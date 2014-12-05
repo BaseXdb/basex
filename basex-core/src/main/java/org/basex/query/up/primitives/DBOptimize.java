@@ -60,14 +60,13 @@ public final class DBOptimize extends DBUpdate {
 
   @Override
   public void apply() throws QueryException {
-    // assign database and query options to runtime options
+    final MainOptions opts = new MainOptions(qc.context.options);
     final MetaData meta = data.meta;
-    final MainOptions opts = qc.context.options;
-
-    options.assign(MainOptions.TEXTINDEX, meta.createtext);
-    options.assign(MainOptions.ATTRINDEX, meta.createattr);
-    options.assign(MainOptions.FTINDEX,   meta.createftxt);
-    options.assign(MainOptions.UPDINDEX,  meta.updindex);
+    options.assign(MainOptions.TEXTINDEX,    meta.createtext);
+    options.assign(MainOptions.ATTRINDEX,    meta.createattr);
+    options.assign(MainOptions.FTINDEX,      meta.createftxt);
+    options.assign(MainOptions.UPDINDEX,     meta.updindex);
+    options.assign(MainOptions.AUTOOPTIMIZE, meta.autoopt);
     options.assign(opts);
 
     // adopt runtime options
@@ -88,7 +87,7 @@ public final class DBOptimize extends DBUpdate {
     final String sw = opts.get(MainOptions.STOPWORDS);
     final Language ln = Language.get(opts);
     final boolean rebuildFT = rebuild || !ln.equals(meta.language) || st != meta.stemming ||
-        cs != meta.casesens ||  dc != meta.diacritics || !sw.equals(meta.stopwords);
+        cs != meta.casesens || dc != meta.diacritics || !sw.equals(meta.stopwords);
 
     meta.language   = ln;
     meta.stemming   = st;
@@ -99,17 +98,14 @@ public final class DBOptimize extends DBUpdate {
     meta.maxlen     = ml;
 
     try {
-      if(all) OptimizeAll.optimizeAll(data, qc.context, null);
+      if(all) OptimizeAll.optimizeAll(data, qc.context, opts, null);
       else Optimize.optimize(data, opts, rebuild, rebuildFT, null);
     } catch(final IOException ex) {
       throw UPDBOPTERR_X.get(info, ex);
-    } finally {
-      // reset runtime options to original values
-      options.reset(opts);
     }
 
     // remove old database reference
-    if(all) qc.resources.remove(data.meta.name);
+    if(all) qc.resources.remove(meta.name);
   }
 
   @Override

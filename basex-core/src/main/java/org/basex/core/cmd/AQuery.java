@@ -272,7 +272,7 @@ public abstract class AQuery extends Command {
     // show dot plan
     try {
       if(options.get(MainOptions.DOTPLAN)) {
-        final String path = context.options.get(MainOptions.QUERYPATH);
+        final String path = options.get(MainOptions.QUERYPATH);
         final String dot = path.isEmpty() ? "plan.dot" :
             new IOFile(path).name().replaceAll("\\..*?$", ".dot");
 

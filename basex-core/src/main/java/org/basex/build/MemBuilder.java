@@ -84,14 +84,13 @@ public final class MemBuilder extends Builder {
   public void init() {
     data = new MemData(path, ns, parser.options);
 
-    final MetaData md = data.meta;
-    md.name = dbname;
-    // all contents will be indexed in main memory mode
-    md.createtext = true;
-    md.createattr = true;
-    md.textindex = true;
-    md.attrindex = true;
     meta = data.meta;
+    meta.name = dbname;
+    // values are always indexed in main memory mode
+    meta.createtext = true;
+    meta.createattr = true;
+    meta.textindex = true;
+    meta.attrindex = true;
     elemNames = data.elemNames;
     attrNames = data.attrNames;
     path.data(data);

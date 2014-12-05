@@ -46,6 +46,8 @@ public final class MetaData {
   public volatile boolean chop;
   /** Flag for activated automatic index update. */
   public volatile boolean updindex;
+  /** Flag for automatic index updating. */
+  public volatile boolean autoopt;
   /** Indicates if a text index exists. */
   public volatile boolean textindex;
   /** Indicates if an attribute index exists. */
@@ -96,7 +98,7 @@ public final class MetaData {
   private volatile int scoring;
 
   /**
-   * Constructor, specifying the database options.
+   * Constructor for a main-memory database instance.
    * @param options database options
    */
   public MetaData(final MainOptions options) {
@@ -104,21 +106,12 @@ public final class MetaData {
   }
 
   /**
-   * Constructor, specifying the database name and context.
-   * @param name name of the database
-   * @param ctx database context
-   */
-  public MetaData(final String name, final Context ctx) {
-    this(name, ctx.options, ctx.soptions);
-  }
-
-  /**
-   * Constructor, specifying the database name.
+   * Constructor.
    * @param name name of the database
    * @param options database options
    * @param sopts static options
    */
-  private MetaData(final String name, final MainOptions options, final StaticOptions sopts) {
+  public MetaData(final String name, final MainOptions options, final StaticOptions sopts) {
     this.name = name;
     path = sopts != null ? sopts.dbpath(name) : null;
     chop = options.get(MainOptions.CHOP);
@@ -129,6 +122,7 @@ public final class MetaData {
     stemming = options.get(MainOptions.STEMMING);
     casesens = options.get(MainOptions.CASESENS);
     updindex = options.get(MainOptions.UPDINDEX);
+    autoopt = options.get(MainOptions.AUTOOPTIMIZE);
     maxlen = options.get(MainOptions.MAXLEN);
     maxcats = options.get(MainOptions.MAXCATS);
     stopwords = options.get(MainOptions.STOPWORDS);
@@ -296,6 +290,7 @@ public final class MetaData {
         else if(k.equals(DBFTDC))     diacritics = toBool(v);
         else if(k.equals(DBCHOP))     chop       = toBool(v);
         else if(k.equals(DBUPDIDX))   updindex   = toBool(v);
+        else if(k.equals(DBAUTOOPT))  autoopt    = toBool(v);
         else if(k.equals(DBTXTIDX))   textindex  = toBool(v);
         else if(k.equals(DBATVIDX))   attrindex  = toBool(v);
         else if(k.equals(DBFTXIDX))   ftxtindex  = toBool(v);
@@ -338,6 +333,7 @@ public final class MetaData {
     writeInfo(out, DBSIZE,     size);
     writeInfo(out, DBCHOP,     chop);
     writeInfo(out, DBUPDIDX,   updindex);
+    writeInfo(out, DBAUTOOPT,  autoopt);
     writeInfo(out, DBTXTIDX,   textindex);
     writeInfo(out, DBATVIDX,   attrindex);
     writeInfo(out, DBFTXIDX,   ftxtindex);

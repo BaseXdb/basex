@@ -86,6 +86,7 @@ public final class InfoDB extends AInfo {
         info(tb, MainOptions.DIACRITICS.name(), meta.diacritics);
         info(tb, MainOptions.STOPWORDS.name(), meta.stopwords);
         info(tb, MainOptions.UPDINDEX.name(), meta.updindex);
+        info(tb, MainOptions.AUTOOPTIMIZE.name(), meta.autoopt);
         info(tb, MainOptions.MAXCATS.name(), meta.maxcats);
         info(tb, MainOptions.MAXLEN.name(), meta.maxlen);
       }

@@ -42,7 +42,7 @@ public final class ShowUsers extends Command {
       out.println(context.users.info(null).finish());
     } else {
       try {
-        final Data data = Open.open(name, context);
+        final Data data = Open.open(name, context, options);
         out.println(data.meta.users.info(context.users).finish());
         Close.close(data, context);
         return true;

@@ -176,6 +176,16 @@ final class DataUpdates {
     // execute fn:put operations
     for(final Put put : puts.values()) put.apply();
 
+    // [CG] #1035 auto-optimize database
+    final MainOptions opts = qc.context.options;
+    if(data.meta.autoopt) {
+      try {
+        Optimize.optimize(data, opts, null);
+      } catch(final IOException ex) {
+        throw UPDBOPTERR_X.get(null, ex);
+      }
+    }
+
     /* optional: export file if...
      * - WRITEBACK option is turned on
      * - an original file path exists
@@ -188,8 +198,7 @@ final class DataUpdates {
         try {
           Export.export(data, original, qc.context.options, null);
         } catch(final IOException ex) {
-          Util.debug(ex);
-          throw UPPUTERR_X.get(null, original);
+          throw UPDBOPTERR_X.get(null, ex);
         }
       } else {
         FnTrace.dump(Token.token(original + ": Updates are not written back."), null, qc);
