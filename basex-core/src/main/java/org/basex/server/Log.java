@@ -57,10 +57,10 @@ public final class Log {
   /**
    * Writes a server entry to the log file.
    * @param type log type
-   * @param str strings to be written
+   * @param info info string (can be {@code null})
    */
-  public synchronized void writeServer(final LogType type, final String str) {
-    write(SERVER, null, type, str, null);
+  public synchronized void writeServer(final LogType type, final String info) {
+    write(SERVER, null, type, info, null);
   }
 
   /**
@@ -68,7 +68,7 @@ public final class Log {
    * @param address address string
    * @param user user ({@code admin} if null)
    * @param type type (HTTP status code)
-   * @param info info
+   * @param info info string (can be {@code null})
    * @param perf performance string
    */
   public synchronized void write(final String address, final User user, final int type,
@@ -81,7 +81,7 @@ public final class Log {
    * @param address address string
    * @param user user ({@code admin} if null)
    * @param type type (ERROR, OK, REQUEST, INFO)
-   * @param info info
+   * @param info info string (can be {@code null})
    * @param perf performance string
    */
   public synchronized void write(final String address, final User user, final LogType type,
@@ -94,7 +94,7 @@ public final class Log {
    * @param address address string
    * @param user user ({@code admin} if null)
    * @param type type (ERROR, OK, REQUEST, INFO, HTTP status code)
-   * @param info info
+   * @param info info string (can be {@code null})
    * @param perf performance string
    */
   private synchronized void write(final String address, final User user, final String type,
@@ -127,7 +127,7 @@ public final class Log {
       tb.add('\t').add(address);
       tb.add('\t').add(user == null ? UserText.ADMIN : user.name());
       tb.add('\t').add(type);
-      tb.add('\t').add(chop(normalize(token(info)), ml));
+      tb.add('\t').add(info == null ? EMPTY : chop(normalize(token(info)), ml));
       if(perf != null) tb.add('\t').add(perf.toString());
       tb.add(Prop.NL);
 

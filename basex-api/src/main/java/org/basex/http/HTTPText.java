@@ -29,4 +29,31 @@ public interface HTTPText {
   String WHICHAUTH = "Unsupported Authorization method '%'.";
   /** Error message. */
   String UNEXPECTED = "Unexpected error: %";
+
+  // Digest keys
+
+  /** User name. */
+  String USERNAME = "username";
+  /** Response. */
+  String RESPONSE = "respone";
+  /** Realm. */
+  String REALM = "realm";
+  /** Nonce. */
+  String NONCE = "nonce";
+  /** Client nonce. */
+  String CNONCE = "cnonce";
+  /** Nonce counter. */
+  String NC = "nc";
+  /** Algorithm. */
+  String ALGORITHM = "algorithm";
+  /** QOP. */
+  String MD5_SESS = "md5-sess";
+  /** URI. */
+  String URI = "uri";
+  /** QOP. */
+  String QOP = "qop";
+  /** Auth. */
+  String AUTH = "auth";
+  /** Auth-int. */
+  String AUTH_INT = "auth-int";
 }

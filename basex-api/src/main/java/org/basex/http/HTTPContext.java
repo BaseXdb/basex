@@ -103,16 +103,15 @@ public final class HTTPContext {
     final String value = req.getHeader(AUTHORIZATION);
     if(value != null) {
       // overwrite credentials with client data (basic or digest)
-      if(authMethod(value.split(" ", 2)[0]) == AuthMethod.BASIC) {
-        final String[] cred = org.basex.util.Base64.decode(authDetails()).split(":", 2);
+      if(authMethod(Strings.split(value, ' ', 2)[0]) == AuthMethod.BASIC) {
+        final String[] cred = Strings.split(org.basex.util.Base64.decode(authDetails()), ':', 2);
         if(cred.length != 2) throw new LoginException(NOCREDS);
         user = cred[0];
         password = cred[1];
       } else { // digest (other methods will be rejected)
         final HashMap<String, String> map = digestHeaders();
-        user = map.get("username");
-        password = map.get("response");
-        if(user == null || password == null) throw new LoginException(NOCREDS);
+        user = map.get(USERNAME);
+        password = map.get(RESPONSE);
       }
     }
   }
@@ -232,12 +231,12 @@ public final class HTTPContext {
       log(code, message);
       res.resetBuffer();
       if(code == SC_UNAUTHORIZED) {
-        final StringBuilder header = new StringBuilder(auth.name());
+        final StringBuilder header = new StringBuilder(auth.toString());
         if(auth == AuthMethod.DIGEST) {
-          header.append(auth + " realm=\"").append(Prop.NAME).append("\",");
-          header.append("qop=\"auth,auth-int\",");
-          header.append("nonce=\"").append(Strings.md5(Long.toString(System.nanoTime())));
-          header.append("\"");
+          header.append(" " + REALM + "=\"").append(Prop.NAME).append("\",");
+          header.append(QOP + "=\"" + AUTH + ',' + AUTH_INT + "\",");
+          header.append(NONCE + "=\"").append(Strings.md5(Long.toString(System.nanoTime())));
+          header.append('"');
         }
         res.setHeader(WWW_AUTHENTICATE, header.toString());
       }
@@ -282,28 +281,35 @@ public final class HTTPContext {
       final Context ctx = new Context(context(), null);
       final User us = ctx.users.get(user);
       if(us == null) throw new LoginException();
+      ctx.user(us);
 
       if(auth == AuthMethod.BASIC) {
         if(!us.matches(password)) throw new LoginException();
       } else {
         // digest authentication
         final HashMap<String, String> map = digestHeaders();
-        final String ha1 = us.code(Algorithm.DIGEST, Code.HASH);
-        final StringBuilder sresponse = new StringBuilder(ha1 + ":" + map.get("nonce") + ":");
 
-        final String qop = map.get("qop");
-        if(qop != null && !qop.isEmpty()) {
-          sresponse.append(map.get("nc") + ":" + map.get("cnonce") + ":" + qop + ":");
+        String ha1 = us.code(Algorithm.DIGEST, Code.HASH);
+        if(Strings.eq(map.get(ALGORITHM), MD5_SESS))
+          ha1 = Strings.md5(ha1 + ':' + map.get(NONCE) + ':' + map.get(CNONCE));
+
+        String h2 = method + ':' + map.get(URI);
+        final String qop = map.get(QOP);
+        if(Strings.eq(qop, AUTH_INT)) h2 += ':' + Strings.md5(params.body().toString());
+        String ha2 = Strings.md5(h2);
+
+        final StringBuilder sresponse = new StringBuilder(ha1).append(':').append(map.get(NONCE));
+        if(Strings.eq(qop, AUTH, AUTH_INT)) {
+          sresponse.append(':' + map.get(NC) + ':' + map.get(CNONCE) + ':' + qop);
         }
-        String ha2 = map.get("uri");
-        if("auth-int".equals(qop)) ha2 += Strings.md5(params.body().toString());
-        sresponse.append(Strings.md5(method + ":" + ha2));
+        sresponse.append(':' + ha2);
 
-        if(!Strings.md5(sresponse.toString()).equals(map.get("response")))
-          status(SC_UNAUTHORIZED, null, false);
+        if(!Strings.md5(sresponse.toString()).equals(map.get(RESPONSE))) {
+          throw new LoginException();
+          //status(SC_UNAUTHORIZED, null, false);
+        }
       }
 
-      ctx.user(us);
       context.blocker.remove(address);
       return ctx;
     } catch(final LoginException ex) {
@@ -386,7 +392,7 @@ public final class HTTPContext {
   /**
    * Writes a log message.
    * @param type log type
-   * @param info info message
+   * @param info info string (can be {@code null})
    */
   public void log(final int type, final String info) {
     context.log.write(address(), context.user(), type, info, perf);

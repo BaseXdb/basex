@@ -391,7 +391,9 @@ public class Options implements Iterable<Option<?>> {
       try {
         final String k = key.substring(DBPREFIX.length()).toUpperCase(Locale.ENGLISH);
         if(assign(k, v, -1, false)) Util.debug(k + Text.COLS + v);
-      } catch(final BaseXException ignore) { /* may belong to another Options instance */ }
+      } catch(final BaseXException ex) {
+        Util.errln(ex);
+      }
     }
   }
 
