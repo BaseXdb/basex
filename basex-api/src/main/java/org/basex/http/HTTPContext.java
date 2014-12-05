@@ -47,7 +47,7 @@ public final class HTTPContext {
   /** Request method. */
   public final HTTPParams params;
   /** Authentication method. */
-  public final AuthMethod auth;
+  public AuthMethod auth;
 
   /** Serialization parameters. */
   private SerializerOptions sopts;
@@ -75,10 +75,9 @@ public final class HTTPContext {
    * @param req request
    * @param res response
    * @param servlet calling servlet instance
-   * @throws IOException I/O exception
    */
   public HTTPContext(final HttpServletRequest req, final HttpServletResponse res,
-      final BaseXServlet servlet) throws IOException {
+      final BaseXServlet servlet) {
 
     this.req = req;
     this.res = res;
@@ -98,14 +97,24 @@ public final class HTTPContext {
     final StaticOptions mprop = context().soptions;
     user = servlet.user != null ? servlet.user : mprop.get(StaticOptions.USER);
     password = servlet.pass != null ? servlet.pass : mprop.get(StaticOptions.PASSWORD);
-    auth = servlet.auth != null ? authMethod(servlet.auth) : mprop.get(StaticOptions.AUTHMETHOD);
+    auth = servlet.auth != null ? servlet.auth : mprop.get(StaticOptions.AUTHMETHOD);
+  }
 
+  /**
+   * Authorizes a request.
+   * @throws BaseXException database exception
+   */
+  public void authorize() throws BaseXException {
     final String value = req.getHeader(AUTHORIZATION);
     if(value != null) {
+      final String meth = Strings.split(value, ' ', 2)[0];
+      final AuthMethod am = StaticOptions.AUTHMETHOD.get(meth);
+      if(am == null) throw new BaseXException(WHICHAUTH, meth);
+
       // overwrite credentials with client data (basic or digest)
-      if(authMethod(Strings.split(value, ' ', 2)[0]) == AuthMethod.BASIC) {
+      if(am == AuthMethod.BASIC) {
         final String[] cred = Strings.split(org.basex.util.Base64.decode(authDetails()), ':', 2);
-        if(cred.length != 2) throw new LoginException(NOCREDS);
+        if(cred.length != 2) throw new BaseXException(INVALIDCREDS);
         user = cred[0];
         password = cred[1];
       } else { // digest (other methods will be rejected)
@@ -275,8 +284,7 @@ public final class HTTPContext {
   public Context authenticate() throws IOException {
     final byte[] address = token(req.getRemoteAddr());
     try {
-      if(user == null || user.isEmpty() || password == null || password.isEmpty())
-        throw new LoginException(NOCREDS);
+      if(user == null || user.isEmpty()) throw new LoginException(INVALIDCREDS);
 
       final Context ctx = new Context(context(), null);
       final User us = ctx.users.get(user);
@@ -284,7 +292,7 @@ public final class HTTPContext {
       ctx.user(us);
 
       if(auth == AuthMethod.BASIC) {
-        if(!us.matches(password)) throw new LoginException();
+        if(password == null || !us.matches(password)) throw new LoginException();
       } else {
         // digest authentication
         final HashMap<String, String> map = digestHeaders();
@@ -303,11 +311,7 @@ public final class HTTPContext {
           sresponse.append(':' + map.get(NC) + ':' + map.get(CNONCE) + ':' + qop);
         }
         sresponse.append(':' + ha2);
-
-        if(!Strings.md5(sresponse.toString()).equals(map.get(RESPONSE))) {
-          throw new LoginException();
-          //status(SC_UNAUTHORIZED, null, false);
-        }
+        if(!Strings.md5(sresponse.toString()).equals(password)) throw new LoginException();
       }
 
       context.blocker.remove(address);
@@ -331,18 +335,6 @@ public final class HTTPContext {
       if(!key.isEmpty() && kv.length == 2) values.put(key, Strings.delete(kv[1], '"').trim());
     }
     return values;
-  }
-
-  /**
-   * Returns the authentication method as {@link AuthMethod} instance.
-   * @param meth authentication method
-   * @return method
-   * @throws LoginException login exception
-   */
-  private static AuthMethod authMethod(final String meth) throws LoginException {
-    final AuthMethod am = StaticOptions.AUTHMETHOD.get(meth);
-    if(am == null) throw new LoginException(WHICHAUTH, meth);
-    return am;
   }
 
   /**

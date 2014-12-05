@@ -24,9 +24,9 @@ public interface HTTPText {
   String WEBCONF = WEB_INF + "web.xml";
 
   /** Error: no password. */
-  String NOCREDS = "No username/password specified.";
+  String INVALIDCREDS = "No username/password specified.";
   /** Error: unsupported authorization method. */
-  String WHICHAUTH = "Unsupported Authorization method '%'.";
+  String WHICHAUTH = "Unsupported Authorization method: %.";
   /** Error message. */
   String UNEXPECTED = "Unexpected error: %";
 
@@ -35,7 +35,7 @@ public interface HTTPText {
   /** User name. */
   String USERNAME = "username";
   /** Response. */
-  String RESPONSE = "respone";
+  String RESPONSE = "response";
   /** Realm. */
   String REALM = "realm";
   /** Nonce. */
