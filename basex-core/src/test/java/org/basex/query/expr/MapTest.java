@@ -71,4 +71,9 @@ public final class MapTest extends AdvancedQueryTest {
   @Test public void gh1012() {
     error("map {}(())", EMPTYFOUND);
   }
+
+  /** Atomize key. */
+  @Test public void atomKey() {
+    query("{'x':42}(['x'])", 42);
+  }
 }

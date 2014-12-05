@@ -83,7 +83,7 @@ public final class Map extends FItem {
   @Override
   public Value invValue(final QueryContext qc, final InputInfo ii, final Value... args)
       throws QueryException {
-    final Item key = args[0].item(qc, ii);
+    final Item key = args[0].atomItem(qc, ii);
     if(key == null) throw EMPTYFOUND.get(ii);
     return get(key, ii);
   }
