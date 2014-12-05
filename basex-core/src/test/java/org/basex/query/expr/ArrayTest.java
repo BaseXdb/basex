@@ -238,4 +238,9 @@ public final class ArrayTest extends AdvancedQueryTest {
   private static void array(final String query, final String exp) {
     query(_ARRAY_SERIALIZE.args(' ' + query), exp);
   }
+
+  /** Atomize key. */
+  @Test public void atomKey() {
+    query("['x']([1])", "x");
+  }
 }
