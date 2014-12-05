@@ -122,7 +122,7 @@ public final class ClientListener extends Thread {
         // parse input and create command instance
         try {
           command = new CommandParser(cmd, context).parseSingle();
-          log(LogType.REQUEST, command.toString());
+          log(LogType.REQUEST, command.toString(true));
         } catch(final QueryException ex) {
           // log invalid command
           final String msg = ex.getMessage();

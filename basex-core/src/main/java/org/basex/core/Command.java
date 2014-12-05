@@ -211,12 +211,21 @@ public abstract class Command extends Proc {
     return false;
   }
 
-  @Override
-  public final String toString() {
-    // [CG] USERS: hide passwords
-    final CmdBuilder cb = new CmdBuilder(this, false);
+  /**
+   * Returns a string representation of the command.
+   * @param conf hide confidential information
+   * @return result of check
+   */
+  public final String toString(final boolean conf) {
+    final CmdBuilder cb = new CmdBuilder(this, conf);
     build(cb);
     return cb.toString();
+  }
+
+
+  @Override
+  public final String toString() {
+    return toString(false);
   }
 
   // PROTECTED METHODS ========================================================

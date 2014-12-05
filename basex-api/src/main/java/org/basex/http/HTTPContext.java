@@ -231,13 +231,13 @@ public final class HTTPContext {
   /**
    * Sets a status and sends an info message.
    * @param code status code
-   * @param message info message (can be {@code null})
+   * @param info info message (can be {@code null})
    * @param error treat as error (use web server standard output)
    * @throws IOException I/O exception
    */
-  public void status(final int code, final String message, final boolean error) throws IOException {
+  public void status(final int code, final String info, final boolean error) throws IOException {
     try {
-      log(code, message);
+      log(code, info);
       res.resetBuffer();
       if(code == SC_UNAUTHORIZED) {
         final StringBuilder header = new StringBuilder(auth.toString());
@@ -251,13 +251,13 @@ public final class HTTPContext {
       }
 
       if(error && code >= SC_BAD_REQUEST) {
-        res.sendError(code, message);
+        res.sendError(code, info);
       } else {
         res.setStatus(code);
-        if(message != null) {
+        if(info != null) {
           res.setContentType(TEXT_PLAIN);
           final ArrayOutput ao = new ArrayOutput();
-          ao.write(token(message));
+          ao.write(token(info));
           res.getOutputStream().write(ao.normalize().finish());
         }
       }
