@@ -2,7 +2,12 @@ package org.basex.core.users;
 
 import java.util.*;
 
-/** Algorithms. */
+/**
+ * Algorithms.
+ *
+ * @author BaseX Team 2005-14, BSD License
+ * @author Christian Gruen
+ */
 public enum Algorithm {
   /** Digest. */
   DIGEST(Code.HASH),

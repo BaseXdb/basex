@@ -38,12 +38,12 @@ public final class BaseXClient {
    * Constructor.
    * @param host server name
    * @param port server port
-   * @param user user name
-   * @param pass password
+   * @param username user name
+   * @param password password
    * @throws IOException Exception
    */
-  public BaseXClient(final String host, final int port, final String user, final String pass)
-      throws IOException {
+  public BaseXClient(final String host, final int port, final String username,
+      final String password) throws IOException {
 
     socket = new Socket();
     socket.connect(new InetSocketAddress(host, port), 5000);
@@ -51,11 +51,21 @@ public final class BaseXClient {
     out = socket.getOutputStream();
     ehost = host;
 
-    // receive timestamp
-    final String ts = receive();
-    // send {Username}0 and hashed {Password/Timestamp}0
-    send(user);
-    send(md5(md5(pass) + ts));
+    // receive server response
+    final String[] response = receive().split(":");
+    final String code, nonce;
+    if(response.length > 1) {
+      // support for digest authentication
+      code = username + ':' + response[0] + ':' + password;
+      nonce = response[1];
+    } else {
+      // support for cram-md5 (Version < 8.0)
+      code = password;
+      nonce = response[0];
+    }
+
+    send(username);
+    send(md5(md5(code) + nonce));
 
     // receive success flag
     if(!ok()) throw new IOException("Access denied.");

@@ -2,7 +2,12 @@ package org.basex.core.users;
 
 import java.util.*;
 
-/** Codes. */
+/**
+ * Codes.
+ *
+ * @author BaseX Team 2005-14, BSD License
+ * @author Christian Gruen
+ */
 public enum Code {
   /** Salt. */ SALT,
   /** Hash. */ HASH;

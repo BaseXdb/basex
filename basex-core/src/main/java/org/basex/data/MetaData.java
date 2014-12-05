@@ -134,7 +134,7 @@ public final class MetaData {
     maxcats = options.get(MainOptions.MAXCATS);
     stopwords = options.get(MainOptions.STOPWORDS);
     language = Language.get(options);
-    users = new Users(null);
+    users = new Users();
   }
 
   // STATIC METHODS ==========================================================

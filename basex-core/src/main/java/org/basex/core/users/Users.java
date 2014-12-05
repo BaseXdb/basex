@@ -29,12 +29,16 @@ public final class Users {
   private IOFile file;
 
   /**
+   * Constructor for local users.
+   */
+  public Users() {
+  }
+
+  /**
    * Constructor for global users.
-   * @param sopts static options ({@code null} if instance is local)
+   * @param sopts static options
    */
   public Users(final StaticOptions sopts) {
-    if(sopts == null) return;
-
     // try to find permission file in database and home directory
     final String perm = IO.BASEXSUFFIX + "perm";
     file = new IOFile(sopts.dbpath(), perm);
