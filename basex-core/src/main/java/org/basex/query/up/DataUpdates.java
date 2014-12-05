@@ -11,6 +11,7 @@ import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.data.atomic.*;
 import org.basex.query.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -182,12 +183,16 @@ final class DataUpdates {
      * - this data reference is not opened in the current context
      */
     final String original = data.meta.original;
-    if(writeback && data.inMemory() && !original.isEmpty() && data != qc.context.data()) {
-      try {
-        Export.export(data, original, qc.context.options, null);
-      } catch(final IOException ex) {
-        Util.debug(ex);
-        throw UPPUTERR_X.get(null, original);
+    if(data.inMemory() && !original.isEmpty() && data != qc.context.data()) {
+      if(writeback) {
+        try {
+          Export.export(data, original, qc.context.options, null);
+        } catch(final IOException ex) {
+          Util.debug(ex);
+          throw UPPUTERR_X.get(null, original);
+        }
+      } else {
+        FnTrace.dump(Token.token(original + ": Updates are not written back."), null, qc);
       }
     }
   }
