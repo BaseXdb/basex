@@ -2194,7 +2194,7 @@ public class QueryParser extends InputParser {
       final Expr ex = numericLiteral(true);
       if(!(ex instanceof Int)) return ex;
       final int card = (int) ((ANum) ex).itr();
-      final Expr lit = Functions.getLiteral(name, card, qc, sc, info());
+      final Expr lit = Functions.getLiteral(name, card, qc, sc, info(), false);
       return lit != null ? lit : FuncLit.unknown(name, card, qc, sc, info());
     }
 
@@ -2372,10 +2372,10 @@ public class QueryParser extends InputParser {
     final Expr ret;
     if(holes != null) {
       final int card = args.length + holes.length;
-      final Expr lit = Functions.getLiteral(name, card, qc, sc, ii);
+      final Expr lit = Functions.getLiteral(name, card, qc, sc, ii, false);
       final Expr f = lit != null ? lit : FuncLit.unknown(name, card, qc, sc, ii);
       ret = new PartFunc(sc, ii, f, args, holes);
-      if(lit != null && (lit instanceof FuncItem ? ((FuncItem) f).annotations() :
+      if(lit != null && (lit instanceof XQFunctionExpr ? ((XQFunctionExpr) f).annotations() :
         ((FuncLit) lit).annotations()).contains(Ann.Q_UPDATING)) qc.updating();
     } else {
       final TypedFunc f = Functions.get(name, args, qc, sc, ii);

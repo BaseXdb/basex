@@ -48,7 +48,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   /** Local variables in the scope of this function. */
   private final VarScope scope;
   /** Non-local variable bindings. */
-  private final HashMap<Var, Expr> nonLocal;
+  private final Map<Var, Expr> nonLocal;
 
   /**
    * Constructor.
@@ -62,7 +62,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
    * @param scope scope
    */
   public Closure(final InputInfo info, final SeqType ret, final Var[] args, final Expr expr,
-      final Ann ann, final HashMap<Var, Expr> nonLocal, final StaticContext sc,
+      final Ann ann, final Map<Var, Expr> nonLocal, final StaticContext sc,
       final VarScope scope) {
     this(info, null, ret, args, expr, ann, nonLocal, sc, scope);
   }
@@ -80,7 +80,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
    * @param scope variable scope
    */
   Closure(final InputInfo info, final QNm name, final SeqType ret, final Var[] args,
-      final Expr expr, final Ann ann, final HashMap<Var, Expr> nonLocal, final StaticContext sc,
+      final Expr expr, final Ann ann, final Map<Var, Expr> nonLocal, final StaticContext sc,
       final VarScope scope) {
     super(info, expr);
     this.name = name;
@@ -88,10 +88,9 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     this.ret = ret;
     this.ann = ann == null ? new Ann() : ann;
     updating = this.ann.contains(Ann.Q_UPDATING);
-    this.nonLocal = nonLocal;
+    this.nonLocal = nonLocal == null ? Collections.<Var, Expr>emptyMap() : nonLocal;
     this.scope = scope;
     this.sc = sc;
-    seqType = FuncType.ANY_FUN.seqType();
   }
 
   @Override
@@ -101,8 +100,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public QNm funcName() {
-    // inline functions have no name
-    return null;
+    return name;
   }
 
   @Override
@@ -270,7 +268,9 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public FuncItem item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final FuncType ft = (FuncType) seqType().type;
+    final Type type = seqType().type;
+    if(!(type instanceof FuncType)) Util.notExpected("Closure was not compiled: %", this);
+    final FuncType ft = (FuncType) type;
 
     final Expr body;
     if(!nonLocal.isEmpty()) {
@@ -307,7 +307,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       checked = new TypeCheck(sc, info, body, ret, true);
     }
 
-    return new FuncItem(sc, ann, null, args, ft, checked, scope.stackSize());
+    return new FuncItem(sc, ann, name, args, ft, checked, scope.stackSize());
   }
 
   @Override

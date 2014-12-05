@@ -1345,7 +1345,7 @@ public enum Function {
    * @param ann annotations
    * @return function type
    */
-  final FuncType type(final int arity, final Ann ann) {
+  public final FuncType type(final int arity, final Ann ann) {
     final SeqType[] arg = new SeqType[arity];
     if(arity != 0 && max == Integer.MAX_VALUE) {
       System.arraycopy(args, 0, arg, 0, args.length);
