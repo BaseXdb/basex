@@ -43,17 +43,17 @@ public final class AdminModuleTest extends AdvancedQueryTest {
   @Test
   public void users() throws BaseXException {
     // check if the admin user exists
-    query(_ADMIN_USERS.args() + "= 'admin'", "true");
+    query(_ADMIN_USERS.args() + "/@name = 'admin'", "true");
     // check if the temporarily created user is found
     new CreateUser(NAME, NAME).execute(context);
-    query(_ADMIN_USERS.args() + "= '" + NAME + '\'', "true");
+    query(_ADMIN_USERS.args() + "/@name = '" + NAME + '\'', "true");
     // check if local user is found
     new Grant(Perm.READ, NAME, NAME).execute(context);
-    query(_ADMIN_USERS.args(NAME) + "= '" + NAME + '\'', "true");
+    query(_ADMIN_USERS.args(NAME) + "/@name = '" + NAME + '\'', "true");
     // check if user has been removed
     new DropUser(NAME).execute(context);
-    query(_ADMIN_USERS.args(NAME) + "= '" + NAME + '\'', "false");
-    query(_ADMIN_USERS.args() + "= '" + NAME + '\'', "false");
+    query(_ADMIN_USERS.args(NAME) + "/@name = '" + NAME + '\'', "false");
+    query(_ADMIN_USERS.args() + "/@name = '" + NAME + '\'', "false");
   }
 
   /**

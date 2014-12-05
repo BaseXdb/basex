@@ -78,8 +78,6 @@ public final class Open extends Command {
    * @throws IOException I/O exception
    */
   public static Data open(final String name, final Context ctx) throws IOException {
-    // [CG] USERS: check permissions before opening database
-
     synchronized(ctx.dbs) {
       Data data = ctx.dbs.pin(name);
       if(data != null) {
