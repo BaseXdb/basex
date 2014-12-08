@@ -606,8 +606,8 @@ public class Options implements Iterable<Option<?>> {
    * @param val value of option
    * @param num number (optional)
    * @param error raise error if option is unknown
-   * @throws BaseXException database exception
    * @return success flag
+   * @throws BaseXException database exception
    */
   private synchronized boolean assign(final String name, final String val, final int num,
       final boolean error) throws BaseXException {

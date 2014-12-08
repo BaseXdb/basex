@@ -4,10 +4,10 @@ import java.util.*;
 
 /**
  * This class is used to iterate through objects of an array.
- * @param <E> generic object type
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
+ * @param <E> generic object type
  */
 public final class ArrayIterator<E> implements Iterator<E>, Iterable<E> {
   /** Array. */

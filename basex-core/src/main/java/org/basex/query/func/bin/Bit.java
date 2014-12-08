@@ -1,7 +1,7 @@
 package org.basex.query.func.bin;
 
 /**
- * Bit operation
+ * Bit operation.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen

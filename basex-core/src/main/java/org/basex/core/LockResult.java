@@ -4,10 +4,10 @@ import org.basex.util.list.*;
 
 /**
  * Result object for databases function.
- * @see Proc#databases(LockResult)
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Jens Erat
+ * @see Proc#databases(LockResult)
  */
 public class LockResult {
   /** List of databases to read lock. */
