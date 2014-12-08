@@ -6,7 +6,7 @@ import static org.basex.util.Token.*;
 import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.up.*;
-import org.basex.query.up.primitives.*;
+import org.basex.query.up.primitives.name.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.list.*;

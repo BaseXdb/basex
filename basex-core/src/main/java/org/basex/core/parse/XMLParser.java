@@ -63,8 +63,10 @@ final class XMLParser extends CmdParser {
       return new Add(value(root, PATH), xml(root));
     if(e.equals(ALTER_DB) && check(root, NAME, NEWNAME))
       return new AlterDB(value(root, NAME), value(root, NEWNAME));
-    if(e.equals(ALTER_USER) && check(root, NAME, '#' + PASSWORD + '?'))
-      return new AlterUser(value(root, NAME), password(root));
+    if(e.equals(ALTER_PASSWORD) && check(root, NAME, '#' + PASSWORD + '?'))
+      return new AlterPassword(value(root, NAME), password(root));
+    if(e.equals(ALTER_USER) && check(root, NAME, NEWNAME))
+      return new AlterUser(value(root, NAME), value(root, NEWNAME));
     if(e.equals(CHECK) && check(root, INPUT))
       return new Check(value(root, INPUT));
     if(e.equals(CLOSE) && check(root))

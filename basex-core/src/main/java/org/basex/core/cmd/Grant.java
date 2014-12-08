@@ -61,15 +61,17 @@ public final class Grant extends AUser {
   }
 
   @Override
-  protected boolean run(final String user, final String db) {
+  protected boolean run(final String name, final String db) {
     // admin cannot be modified
-    if(user.equals(UserText.ADMIN)) return !info(ADMIN_STATIC_X);
+    if(name.equals(UserText.ADMIN)) return !info(ADMIN_STATIC);
 
     // set global permissions
+    final Users users = context.users;
+    final User user = users.get(name);
     if(db == null) {
-      context.users.get(user).perm(prm);
-      context.users.write();
-      return info(GRANTED_X_X, args[0], user);
+      users.perm(user, prm);
+      users.write();
+      return info(GRANTED_X_X, args[0], name);
     }
 
     // set local permissions
@@ -83,17 +85,17 @@ public final class Grant extends AUser {
     // try to lock database
     if(!startUpdate(data)) return false;
 
-    final User us = data.meta.users.get(user);
+    final User us = data.meta.users.get(name);
     if(us == null) {
       // create new local user
-      data.meta.users.add(new User(context.users.get(user).name(), prm));
+      data.meta.users.add(new User(name, prm));
     } else {
       us.perm(prm);
     }
     if(!finishUpdate(data)) return false;
 
     Close.close(data, context);
-    return info(GRANTED_ON_X_X_X, args[0], user, db);
+    return info(GRANTED_ON_X_X_X, args[0], name, db);
   }
 
   @Override

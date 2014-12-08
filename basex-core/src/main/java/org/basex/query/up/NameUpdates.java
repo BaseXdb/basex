@@ -6,6 +6,7 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.up.primitives.*;
+import org.basex.query.up.primitives.name.*;
 import org.basex.util.list.*;
 
 /**

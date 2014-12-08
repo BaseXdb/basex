@@ -539,6 +539,8 @@ public interface QueryText {
   byte[] RANDOM_PREFIX = token("random");
   /** Repository token. */
   byte[] REPO_PREFIX = token("repo");
+  /** User token. */
+  byte[] USER_PREFIX = token("user");
   /** Validate token. */
   byte[] VLDT_PREFIX = token("validate");
   /** XQDoc token. */
@@ -661,6 +663,8 @@ public interface QueryText {
   byte[] STREAM_URI = token(BXMODULES_URI + "stream");
   /** Unit module URI. */
   byte[] UNIT_URI = token(BXMODULES_URI + "unit");
+  /** User module URI. */
+  byte[] USER_URI = token(BXMODULES_URI + "user");
   /** Validate module URI. */
   byte[] VALIDATE_URI = token(BXMODULES_URI + "validate");
   /** XQuery module URI. */

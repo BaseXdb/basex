@@ -17,6 +17,8 @@ public interface Commands {
   String ADD = "add";
   /** Command string: "alter-db". */
   String ALTER_DB = "alter-db";
+  /** Command string: "alter-password". */
+  String ALTER_PASSWORD = "alter-password";
   /** Command string: "alter-user". */
   String ALTER_USER = "alter-user";
   /** Command string: "check". */
@@ -166,7 +168,7 @@ public interface Commands {
   /** Index types. */
   enum CmdIndexInfo { NULL, TEXT, ATTRIBUTE, FULLTEXT, PATH, TAG, ATTNAME }
   /** Alter types. */
-  enum CmdAlter { DATABASE, DB, USER }
+  enum CmdAlter { DATABASE, DB, PASSWORD, USER }
   /** Repo types. */
   enum CmdRepo { INSTALL, DELETE, LIST }
 

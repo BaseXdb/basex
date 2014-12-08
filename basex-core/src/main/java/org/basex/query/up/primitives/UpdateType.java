@@ -49,15 +49,23 @@ public enum UpdateType {
   /** Delete resource.      */ DBDELETE,
   /** Optimize database.    */ DBOPTIMIZE,
   /** Flush database.       */ DBFLUSH,
-  /** Create user.          */ DBCREATEUSER,
-  /** Grant user.           */ DBGRANTUSER,
-  /** Drop user.            */ DBDROPUSER,
+
+  // User operations
+
+  /** Grant permissions.    */ DBUSERGRANT,
+  /** Drop user on db.      */ DBUSERDROP,
+
+  /** Change user name.     */ USERGRANT,
+  /** Change password.      */ USERPASSWORD,
+  /** Drop user.            */ USERDROP,
+  /** Change user name.     */ USERALTER,
+  /** Create user.          */ USERCREATE,
 
   // Database operations
 
   /** Copy database.        */ DBCOPY,
-  /** Alter database.       */ DBALTER,
   /** Drop database.        */ DBDROP,
+  /** Alter database.       */ DBALTER,
   /** Create database.      */ DBCREATE,
   /** Restore database.     */ DBRESTORE,
   /** Drop backup.          */ BACKUPDROP,

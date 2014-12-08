@@ -89,8 +89,10 @@ public final class StringParser extends CmdParser {
         switch(consume(CmdAlter.class, cmd)) {
           case DATABASE: case DB:
             return new AlterDB(name(cmd), name(cmd));
+          case PASSWORD:
+            return new AlterPassword(name(cmd), password());
           case USER:
-            return new AlterUser(name(cmd), password());
+            return new AlterUser(name(cmd), name(cmd));
         }
         break;
       case OPEN:

@@ -54,7 +54,7 @@ public final class UserExample {
     // Change user password to 'new' (MD5 encoded)
     System.out.println("\n* Alter a user's password.");
 
-    new AlterUser("testuser", "22af645d1859cb5ca6da0c484f1f37ea").execute(context);
+    new AlterPassword("testuser", "22af645d1859cb5ca6da0c484f1f37ea").execute(context);
 
     // Drop the database and user
     System.out.println("\n* Drop the user and database.");

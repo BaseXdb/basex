@@ -64,12 +64,17 @@ public final class Users {
         final MainOptions options = new MainOptions(false);
         options.set(MainOptions.INTPARSE, true);
         final ANode doc = new DBNode(Parser.singleParser(content, options, ""));
-        for(final ANode user : children(children(doc, USERS).next(), USER)) {
-          try {
-            // only accept users with complete data
-            list.add(new User(user, global));
-          } catch(final BaseXException ex) {
-            Util.errln(file.name() + ": " + ex.getLocalizedMessage());
+        final ANode users = children(doc, USERS).next();
+        if(users == null) {
+          Util.errln(file.name() + ": Missing 'users' root element.");
+        } else {
+          for(final ANode user : children(users, USER)) {
+            try {
+              // only accept users with complete data
+              list.add(new User(user, global));
+            } catch(final BaseXException ex) {
+              Util.errln(file.name() + ": " + ex.getLocalizedMessage());
+            }
           }
         }
       } else {
@@ -113,38 +118,48 @@ public final class Users {
    * Stores a user and encrypted password.
    * @param username user name
    * @param password password (plain text)
-   * @return success of operation
    */
-  public synchronized boolean create(final String username, final String password) {
-    // check if user already exists
-    return get(username) == null && add(new User(username, password, Perm.NONE));
+  public synchronized void create(final String username, final String password) {
+    add(new User(username, password, Perm.NONE));
   }
 
   /**
    * Adds the specified user.
    * @param user user to be added
-   * @return success of operation
    */
-  public synchronized boolean add(final User user) {
+  public synchronized void add(final User user) {
     list.add(user);
     write();
-    return true;
   }
 
   /**
    * Changes the password of a user.
-   * @param username user name
+   * @param user user
    * @param password password
-   * @return success of operation
    */
-  public synchronized boolean alter(final String username, final String password) {
-    // check if user already exists
-    final User user = get(username);
-    if(user == null) return false;
-
+  public synchronized void password(final User user, final String password) {
     user.password(password);
     write();
-    return true;
+  }
+
+  /**
+   * Sets the permission of a user.
+   * @param user user
+   * @param prm permission
+   */
+  public void perm(final User user, final Perm prm) {
+    user.perm(prm);
+    write();
+  }
+
+  /**
+   * Renames a user.
+   * @param user user reference
+   * @param name new name
+   */
+  public synchronized void alter(final User user, final String name) {
+    user.name(name);
+    write();
   }
 
   /**

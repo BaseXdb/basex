@@ -6,6 +6,7 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.up.primitives.*;
+import org.basex.query.up.primitives.node.*;
 
 /**
  * This container holds all update primitives for a specific database node.

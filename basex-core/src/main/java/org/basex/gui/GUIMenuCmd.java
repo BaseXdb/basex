@@ -105,15 +105,6 @@ public enum GUIMenuCmd implements GUICommand {
     }
   },
 
-  /** Server Dialog. */
-  C_SERVER(S_SERVER_ADMIN + DOTS, null, false, false) {
-    @Override
-    public void execute(final GUI gui) {
-      // open file chooser for XML creation
-      new DialogServer(gui);
-    }
-  },
-
   /** Creates a new file in the editor. */
   C_EDITNEW(NEW, "% T", false, false) {
     @Override

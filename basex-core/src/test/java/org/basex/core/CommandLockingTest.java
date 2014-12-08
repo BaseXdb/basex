@@ -62,7 +62,7 @@ public class CommandLockingTest extends SandboxTest {
   public final void databaseCommands() {
     ckDBs(new Add(FILE, FILE), true, CTX_LIST);
     ckDBs(new AlterDB(NAME, NAME2), true, new StringList(NAME, NAME2));
-    ckDBs(new AlterUser(NAME, NAME), true, ADMIN_LIST);
+    ckDBs(new AlterPassword(NAME, NAME), true, ADMIN_LIST);
     ckDBs(new Check(NAME), false, NAME_CTX);
     ckDBs(new Close(), false, CTX_LIST);
     ckDBs(new Copy(NAME2, NAME), new StringList(NAME2), NAME_LIST);

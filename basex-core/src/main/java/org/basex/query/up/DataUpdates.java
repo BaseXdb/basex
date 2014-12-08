@@ -13,6 +13,8 @@ import org.basex.data.atomic.*;
 import org.basex.query.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.up.primitives.*;
+import org.basex.query.up.primitives.db.*;
+import org.basex.query.up.primitives.node.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;

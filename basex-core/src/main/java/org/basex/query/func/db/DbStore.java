@@ -5,7 +5,7 @@ import static org.basex.query.QueryError.*;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.up.primitives.*;
+import org.basex.query.up.primitives.db.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 

@@ -24,17 +24,10 @@ public final class DialogPass extends BaseXDialog {
   private final BaseXLabel info;
 
   /**
-   * Default constructor creating invisible frame as main window.
-   */
-  public DialogPass() {
-    this(null);
-  }
-
-  /**
    * Default constructor.
    * @param main reference to the main window
    */
-  DialogPass(final GUI main) {
+  public DialogPass(final GUI main) {
     super(main, ALTER_PW);
 
     pass = new BaseXPassword(this);
@@ -55,8 +48,8 @@ public final class DialogPass extends BaseXDialog {
   @Override
   public void action(final Object cmp) {
     final String nm = password();
-    ok = !nm.isEmpty() && nm.matches("[^ ;'\"]*");
-    info.setText(ok || nm.isEmpty() ? null : Util.info(INVALID_X, PASSWORD), Msg.ERROR);
+    ok = nm.matches("[^ ;'\"]*");
+    info.setText(ok ? null : Util.info(INVALID_X, PASSWORD), Msg.ERROR);
     enableOK(buttons, B_OK, ok);
   }
 

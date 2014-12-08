@@ -13,14 +13,14 @@ public abstract class Update {
   /** Type of update primitive. */
   public final UpdateType type;
   /** Input info. */
-  final InputInfo info;
+  protected final InputInfo info;
 
   /**
    * Constructor.
    * @param type update primitive
    * @param info input info
    */
-  Update(final UpdateType type, final InputInfo info) {
+  protected Update(final UpdateType type, final InputInfo info) {
     this.type = type;
     this.info = info;
   }

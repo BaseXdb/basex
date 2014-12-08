@@ -244,6 +244,25 @@ public enum QueryError {
   /** UNIT0006. */
   UNIT_EMPTY_X(UNIT, 6, "Test function '%' returns items."),
 
+  // User Module
+
+  /** BXUS0001. */
+  BXUS_NAME_X(BXUS, 1, "Invalid user name '%'."),
+  /** BXUS0002. */
+  BXUS_EXISTS_X(BXUS, 2, "User '%' already exists."),
+  /** BXUS0003. */
+  BXUS_WHICH_X(BXUS, 3, "User '%' does not exist."),
+  /** BXUS0004. */
+  BXUS_ONCE_X_X(BXUS, 4, "User '%' can only be % once."),
+  /** BXUS0005. */
+  BXUS_ADMIN(BXUS, 5, "Admin user cannot be modified."),
+  /** BXUS0006. */
+  BXUS_PERM_X(BXUS, 6, "Unknown permission: %."),
+  /** BXUS0007. */
+  BXUS_ALTERDROP_X(BXUS, 7, "User '%' cannot be both altered and dropped."),
+  /** BXUS0008. */
+  BXUS_SAME_X(BXUS, 8, "Name of source and target user is equal: %."),
+
   // EXPath modules
 
   /** ARCH0001. */
@@ -1301,6 +1320,7 @@ public enum QueryError {
     /** BXRE Error type. */ BXRE(BXERR_PREFIX, BXERRORS_URI),
     /** BXSL Error type. */ BXSL(BXERR_PREFIX, BXERRORS_URI),
     /** BXSQ Error type. */ BXSQ(BXERR_PREFIX, BXERRORS_URI),
+    /** BXUS Error type. */ BXUS(BXERR_PREFIX, BXERRORS_URI),
     /** BXVA Error type. */ BXVA(BXERR_PREFIX, BXERRORS_URI),
     /** BXXQ Error type. */ BXXQ(BXERR_PREFIX, BXERRORS_URI),
     /** HASH Error type. */ HASH(BXERR_PREFIX, BXERRORS_URI),

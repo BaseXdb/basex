@@ -91,8 +91,8 @@ public class CommandTest extends SandboxTest {
   @Test
   public final void alterUser() {
     ok(new CreateUser(NAME2, NAME2));
-    ok(new AlterUser(NAME2, "test"));
-    no(new AlterUser(":", NAME2));
+    ok(new AlterPassword(NAME2, "test"));
+    no(new AlterPassword(":", NAME2));
   }
 
   /** Command test. */

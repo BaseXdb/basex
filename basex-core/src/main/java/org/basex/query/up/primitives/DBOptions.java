@@ -24,7 +24,7 @@ public final class DBOptions {
     MainOptions.CHOP, MainOptions.INTPARSE, MainOptions.STRIPNS, MainOptions.DTD,
     MainOptions.CATFILE };
   /** Indexing options. */
-  static final Option<?>[] INDEXING = { MainOptions.MAXCATS, MainOptions.MAXLEN,
+  public static final Option<?>[] INDEXING = { MainOptions.MAXCATS, MainOptions.MAXLEN,
     MainOptions.INDEXSPLITSIZE, MainOptions.FTINDEXSPLITSIZE, MainOptions.LANGUAGE,
     MainOptions.STOPWORDS, MainOptions.TEXTINDEX, MainOptions.ATTRINDEX, MainOptions.FTINDEX,
     MainOptions.STEMMING, MainOptions.CASESENS, MainOptions.DIACRITICS, MainOptions.UPDINDEX,
@@ -90,7 +90,7 @@ public final class DBOptions {
    * @param option option
    * @param value value
    */
-  void assign(final Option<?> option, final Object value) {
+  public void assign(final Option<?> option, final Object value) {
     if(!map.containsKey(option)) map.put(option, value);
   }
 

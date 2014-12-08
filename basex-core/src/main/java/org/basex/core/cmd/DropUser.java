@@ -45,14 +45,15 @@ public final class DropUser extends AUser {
   @Override
   protected boolean run(final String user, final String db) {
     // admin cannot be dropped
-    if(user.equals(UserText.ADMIN)) return !info(ADMIN_STATIC_X);
+    if(user.equals(UserText.ADMIN)) return !info(ADMIN_STATIC);
 
     // drop global user
+    final Users users = context.users;
     if(db == null) {
       for(final ClientListener s : context.sessions) {
         if(s.context().user().name().equals(user)) return !info(USER_LOGGED_IN_X, user);
       }
-      context.users.drop(context.users.get(user));
+      users.drop(users.get(user));
       return info(USER_DROPPED_X, user);
     }
 

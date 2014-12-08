@@ -5,7 +5,6 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.core.users.*;
 import org.basex.query.*;
 import org.junit.*;
 import org.junit.Test;
@@ -24,7 +23,6 @@ public final class AdminModuleTest extends AdvancedQueryTest {
   @BeforeClass
   public static void init() throws BaseXException {
     new CreateDB(NAME).execute(context);
-    new DropUser(NAME).execute(context);
   }
 
   /**
@@ -34,26 +32,6 @@ public final class AdminModuleTest extends AdvancedQueryTest {
   @AfterClass
   public static void finish() throws BaseXException {
     new DropDB(NAME).execute(context);
-  }
-
-  /**
-   * Test method.
-   * @throws BaseXException database exception
-   */
-  @Test
-  public void users() throws BaseXException {
-    // check if the admin user exists
-    query(_ADMIN_USERS.args() + "/@name = 'admin'", "true");
-    // check if the temporarily created user is found
-    new CreateUser(NAME, NAME).execute(context);
-    query(_ADMIN_USERS.args() + "/@name = '" + NAME + '\'', "true");
-    // check if local user is found
-    new Grant(Perm.READ, NAME, NAME).execute(context);
-    query(_ADMIN_USERS.args(NAME) + "/@name = '" + NAME + '\'', "true");
-    // check if user has been removed
-    new DropUser(NAME).execute(context);
-    query(_ADMIN_USERS.args(NAME) + "/@name = '" + NAME + '\'', "false");
-    query(_ADMIN_USERS.args() + "/@name = '" + NAME + '\'', "false");
   }
 
   /**

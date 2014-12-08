@@ -2,7 +2,7 @@ package org.basex.query.func.db;
 
 import org.basex.data.*;
 import org.basex.query.*;
-import org.basex.query.up.primitives.*;
+import org.basex.query.up.primitives.db.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.options.*;

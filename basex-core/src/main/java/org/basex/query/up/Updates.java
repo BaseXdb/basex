@@ -7,6 +7,7 @@ import org.basex.data.atomic.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.up.primitives.*;
+import org.basex.query.up.primitives.node.*;
 import org.basex.query.value.node.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;

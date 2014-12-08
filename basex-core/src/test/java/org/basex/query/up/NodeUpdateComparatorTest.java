@@ -10,6 +10,7 @@ import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.up.primitives.*;
+import org.basex.query.up.primitives.node.*;
 import org.basex.util.*;
 import org.junit.*;
 import org.junit.Test;

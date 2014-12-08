@@ -10,6 +10,7 @@ import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.up.primitives.*;
+import org.basex.query.up.primitives.name.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;

@@ -709,10 +709,12 @@ public interface Text {
   String USER_CREATED_X = lang("user_created_%");
   /** Password changed. */
   String PW_CHANGED_X = lang("pw_changed_%");
+  /** User altered. */
+  String USER_RENAMED_X_X = lang("user_renamed_%_%");
   /** User unknown. */
   String USER_EXISTS_X = lang("user_exists_%");
   /** Admin user. */
-  String ADMIN_STATIC_X = lang("admin_static_%");
+  String ADMIN_STATIC = lang("admin_static");
   /** Killed sessions. */
   String SESSIONS_KILLED_X = lang("sessions_killed_%");
   /** User kills itself. */
@@ -1372,47 +1374,6 @@ public interface Text {
   String H_HTML_PARSER = lang("h_html_parser");
   /** No HTML Parser. */
   String H_NO_HTML_PARSER = lang("h_no_html_parser");
-
-  // SERVER TEXTS =============================================================
-
-  /** Server. */
-  String S_LOCALSERVER = lang("s_localserver");
-  /** Users. */
-  String S_CONNECT = lang("s_connect");
-  /** Host. */
-  String S_HOST = lang("s_host");
-  /** PORT. */
-  String S_PORT = lang("s_port");
-  /** Local. */
-  String S_LOCALPORT = lang("s_localport");
-  /** Create user. */
-  String S_CREATEU = lang("s_createu");
-  /** Global permissions. */
-  String S_GLOBPERM = lang("s_globperm") + COLS;
-  /** Local permissions. */
-  String S_LOCPERM = lang("s_locperm") + COLS;
-  /** Question for dropping user. */
-  String S_DRQUESTION = lang("s_drquestion") + NL + ARE_YOU_SURE;
-  /** Question for revoking right from logged in user. */
-  String S_DBREVOKE = lang("s_dbrevoke") + NL + ARE_YOU_SURE;
-  /** Login. */
-  String S_ADLOGIN = lang("s_adlogin");
-  /** Connected. */
-  String S_CONNECTED = lang("s_connected");
-  /** Disconnected. */
-  String S_DISCONNECTED = lang("s_disconnected");
-  /** Server information. */
-  String S_INFO1 = lang("s_info1");
-  /** Server information. */
-  String S_INFO2 = lang("s_info2");
-  /** Sessions. */
-  String S_SESSIONS = lang("s_sessions");
-  /** Logs. */
-  String S_LOCALLOGS = lang("s_locallogs");
-  /** Button text for altering password. */
-  String S_ALTER = lang("s_alter") + DOTS;
-  /** Command info. */
-  String S_SERVER_ADMIN = lang("s_server_admin");
 
   /** Dummy string to check if all language strings have been assigned. */
   String DUMMY = lang(null);

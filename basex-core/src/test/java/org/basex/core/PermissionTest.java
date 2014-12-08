@@ -129,7 +129,7 @@ public final class PermissionTest extends SandboxTest {
     no(new ShowUsers("Users"), testSession);
     no(new Grant("read", NAME), testSession);
     no(new Grant("none", NAME), testSession);
-    no(new AlterUser(NAME, NAME), testSession);
+    no(new AlterPassword(NAME, NAME), testSession);
     no(new Flush(), testSession);
   }
 
@@ -171,7 +171,7 @@ public final class PermissionTest extends SandboxTest {
     no(new ShowUsers("Users"), testSession);
     no(new Grant("read", NAME), testSession);
     no(new Grant("none", NAME), testSession);
-    no(new AlterUser(NAME, NAME), testSession);
+    no(new AlterPassword(NAME, NAME), testSession);
     no(new Flush(), testSession);
     ok(new Close(), testSession);
   }
@@ -220,7 +220,7 @@ public final class PermissionTest extends SandboxTest {
     no(new ShowUsers("Users"), testSession);
     no(new Grant("read", NAME), testSession);
     no(new Grant("none", NAME), testSession);
-    no(new AlterUser(NAME, NAME), testSession);
+    no(new AlterPassword(NAME, NAME), testSession);
   }
 
   /** Tests all commands where create permission is needed. */
@@ -247,7 +247,7 @@ public final class PermissionTest extends SandboxTest {
     no(new ShowUsers("Users"), testSession);
     no(new Grant("read", NAME), testSession);
     no(new Grant("none", NAME), testSession);
-    no(new AlterUser(NAME, NAME), testSession);
+    no(new AlterPassword(NAME, NAME), testSession);
     no(new org.basex.core.cmd.Test(FOLDER + "tests-ok.xqm"), testSession);
   }
 
@@ -263,7 +263,7 @@ public final class PermissionTest extends SandboxTest {
     ok(new ShowUsers(), testSession);
     ok(new Grant(ADMIN, "test2"), testSession);
     ok(new Grant("create", "test2"), testSession);
-    ok(new AlterUser(NAME, NAME), testSession);
+    ok(new AlterPassword(NAME, NAME), testSession);
     ok(new DropUser("test2"), testSession);
     ok(new Close(), testSession);
     ok(new Close(), adminSession);

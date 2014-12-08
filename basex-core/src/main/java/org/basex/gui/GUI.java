@@ -103,13 +103,7 @@ public final class GUI extends JFrame {
   private int threadID;
 
   /** Password reader. */
-  private static final PasswordReader READER = new PasswordReader() {
-    @Override
-    public String password() {
-      final DialogPass dp = new DialogPass();
-      return dp.ok() ? dp.password() : "";
-    }
-  };
+  private static PasswordReader pwReader;
 
   /** Info listener. */
   private final InfoListener infoListener = new InfoListener() {
@@ -352,7 +346,14 @@ public final class GUI extends JFrame {
       try {
         // parse and execute all commands
         final CommandParser cp = new CommandParser(in.substring(exc ? 1 : 0), context);
-        cp.pwReader(READER);
+        if(pwReader == null) pwReader = new PasswordReader() {
+          @Override
+          public String password() {
+            final DialogPass dp = new DialogPass(GUI.this);
+            return dp.ok() ? dp.password() : "";
+          }
+        };
+        cp.pwReader(pwReader);
         execute(false, cp.parse());
       } catch(final QueryException ex) {
         if(!info.visible()) GUIMenuCmd.C_SHOWINFO.execute(this);

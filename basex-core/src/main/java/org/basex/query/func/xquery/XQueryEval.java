@@ -30,27 +30,12 @@ public class XQueryEval extends StandardFunc {
   /** XQuery options. */
   public static class XQueryOptions extends Options {
     /** Permission. */
-    public static final EnumOption<Permission> PERMISSION = new EnumOption<>(
-        "permission", Permission.ADMIN);
+    public static final EnumOption<Perm> PERMISSION = new EnumOption<>("permission", Perm.ADMIN);
     /** Timeout in seconds. */
     public static final NumberOption TIMEOUT = new NumberOption("timeout", 0);
     /** Maximum amount of megabytes that may be allocated by the query. */
     public static final NumberOption MEMORY = new NumberOption("memory", 0);
   }
-
-  /** Permissions. */
-  public enum Permission {
-    /** Admin.  */ ADMIN,
-    /** Create. */ CREATE,
-    /** Write.  */ WRITE,
-    /** Read.   */ READ,
-    /** None.   */ NONE;
-
-    @Override
-    public String toString() {
-      return name().toLowerCase(Locale.ENGLISH);
-    }
-  };
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {

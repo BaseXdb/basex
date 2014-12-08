@@ -6,6 +6,7 @@ import java.util.*;
 
 import org.basex.data.*;
 import org.basex.query.up.primitives.*;
+import org.basex.query.up.primitives.node.*;
 import org.basex.util.*;
 /**
  * <p>Comparator for {@link NodeUpdate}.</p>

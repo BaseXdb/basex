@@ -7,7 +7,7 @@ import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.up.*;
-import org.basex.query.up.primitives.*;
+import org.basex.query.up.primitives.db.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;

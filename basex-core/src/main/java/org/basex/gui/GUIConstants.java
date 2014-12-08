@@ -104,7 +104,6 @@ public final class GUIConstants {
   static final GUICommand[][] MENUITEMS = { {
     C_CREATE, C_OPEN_MANAGE, SEPARATOR,
     C_INFO, C_EXPORT, C_CLOSE, SEPARATOR,
-    C_SERVER, Prop.MAC ? null : SEPARATOR,
     Prop.MAC ? null : C_EXIT
   }, {
     C_EDITNEW, C_EDITOPEN, C_EDITREOPEN, C_EDITSAVE, C_EDITSAVEAS, C_EDITCLOSE,

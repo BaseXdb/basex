@@ -20,16 +20,16 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-final class DBNew {
+public final class DBNew {
   /** Query context. */
   final QueryContext qc;
   /** Input info. */
   final InputInfo info;
 
   /** Inputs to add. */
-  List<NewInput> inputs;
+  public List<NewInput> inputs;
   /** Insertion sequence. */
-  Data data;
+  public Data data;
 
   /**
    * Constructor.
@@ -37,7 +37,7 @@ final class DBNew {
    * @param inputs input
    * @param info input info
    */
-  DBNew(final QueryContext qc, final List<NewInput> inputs, final InputInfo info) {
+  public DBNew(final QueryContext qc, final List<NewInput> inputs, final InputInfo info) {
     this.qc = qc;
     this.inputs = inputs;
     this.info = info;
@@ -50,7 +50,9 @@ final class DBNew {
    * @param options database options
    * @throws QueryException query exception
    */
-  void addDocs(final MemData md, final String name, final DBOptions options) throws QueryException {
+  public void addDocs(final MemData md, final String name, final DBOptions options)
+      throws QueryException {
+
     final MainOptions opts = new MainOptions(qc.context.options);
     options.assign(opts);
     addDocs(new MemData(md, opts), name, opts);
@@ -63,7 +65,7 @@ final class DBNew {
    * @param options main options
    * @throws QueryException query exception
    */
-  void addDocs(final MemData dt, final String name, final MainOptions options)
+  public void addDocs(final MemData dt, final String name, final MainOptions options)
       throws QueryException {
 
     data = dt;
