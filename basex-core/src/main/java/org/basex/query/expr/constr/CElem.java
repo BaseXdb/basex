@@ -60,7 +60,7 @@ public final class CElem extends CName {
       for(int i = 0; i < nl; i++) ns.add(nspaces.name(i), nspaces.value(i));
 
       // create and check QName
-      final QNm nm = qname(qc, ii);
+      final QNm nm = qname(qc, true, ii);
       final byte[] cp = nm.prefix(), cu = nm.uri();
       if(eq(cp, XML) ^ eq(cu, XML_URI)) throw CEXML.get(info, cu, cp);
       if(eq(cu, XMLNS_URI)) throw CEINV_X.get(info, cu);
