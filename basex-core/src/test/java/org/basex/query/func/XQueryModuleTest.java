@@ -41,12 +41,12 @@ public final class XQueryModuleTest extends AdvancedQueryTest {
     query(_DB_CREATE.args('"' + NAME + '"'));
     query("try{ " + _XQUERY_EVAL.args("\"(1 to 10000000000000)[.=0]\"", " map{}",
         " map{ 'timeout':'1'}") + " } catch * { () }", "");
-    error(_XQUERY_EVAL.args("\"doc('" + NAME + "')\"", " map{}", " map{ 'permission':'none'}"),
+    error(_XQUERY_EVAL.args(" '" + DOC.args(NAME) + "'", " map{}", " map{ 'permission':'none'}"),
         BXXQ_PERM_X);
-    error(_XQUERY_EVAL.args("\"db:open('" + NAME + "')\"", " map{}", " map{ 'permission':'none'}"),
-        BXDB_OPEN_X);
-    error(_XQUERY_EVAL.args("\"file:exists('x')\"", " map{}", " map{ 'permission':'none'}"),
-        BXXQ_PERM_X);
+    error(_XQUERY_EVAL.args(" '" + _DB_OPEN.args(NAME) + "'", " map{}",
+        " map{ 'permission':'none'}"), BXDB_OPEN_X);
+    error(_XQUERY_EVAL.args(" '" + _FILE_EXISTS.args("x") + "'", " map{}",
+        " map{ 'permission':'none'}"), BXXQ_PERM_X);
     error(_XQUERY_EVAL.args("\"(1 to 10000000000000)[.=0]\"", " map{}", " map{ 'timeout':'1'}"),
         BXXQ_STOPPED);
     error(_XQUERY_EVAL.args("\"(1 to 10000000000000) ! <a/>\"", " map{}", " map{ 'memory':'10'}"),
@@ -57,7 +57,7 @@ public final class XQueryModuleTest extends AdvancedQueryTest {
   @Test
   public void update() {
     query(_XQUERY_UPDATE.args("delete node <a/>"));
-    query(_XQUERY_UPDATE.args("\"db:output('1')\""), "1");
+    query(_XQUERY_UPDATE.args(" '" + _DB_OUTPUT.args(1) + "'"), "1");
     query(_XQUERY_UPDATE.args(" '()'"));
     error(_XQUERY_UPDATE.args("1"), BXXQ_NOUPDATE);
   }

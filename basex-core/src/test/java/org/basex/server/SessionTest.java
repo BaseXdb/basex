@@ -102,9 +102,9 @@ public abstract class SessionTest extends SandboxTest {
   @Test
   public final void create() throws IOException {
     session.create(NAME, new ArrayInput(""));
-    assertEqual("", session.query("db:open('" + NAME + "')").execute());
+    assertEqual("", session.query(_DB_OPEN.args(NAME)).execute());
     session.create(NAME, new ArrayInput("<X/>"));
-    assertEqual("<X/>", session.query("db:open('" + NAME + "')").execute());
+    assertEqual("<X/>", session.query(_DB_OPEN.args(NAME)).execute());
   }
 
   /**

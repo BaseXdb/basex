@@ -1,6 +1,7 @@
 package org.basex.core;
 
 import static org.basex.core.users.UserText.*;
+import static org.basex.query.func.Function.*;
 import static org.junit.Assert.*;
 
 import java.io.*;
@@ -106,7 +107,7 @@ public final class PermissionTest extends SandboxTest {
     ok(new Get(MainOptions.QUERYINFO), testSession);
     ok(new Set(MainOptions.QUERYINFO, false), testSession);
 
-    // repo Stuff
+    // repo stuff
     no(new RepoInstall(REPO + "/pkg3.xar", null), testSession);
     ok(new RepoList(), testSession);
     no(new RepoDelete("http://www.pkg3.com", null), testSession);
@@ -149,14 +150,14 @@ public final class PermissionTest extends SandboxTest {
     ok(new XQuery("//xml"), testSession);
     ok(new Find(NAME), testSession);
 
-    // repo Stuff
+    // repo stuff
     no(new RepoInstall(REPO + "/pkg3.xar", null), testSession);
     ok(new RepoList(), testSession);
     no(new RepoDelete("http://www.pkg3.com", null), testSession);
 
     // XQuery update
-    no(new XQuery("for $item in doc('" + NAME + "')//xml return delete node $item"), testSession);
-    no(new XQuery("db:create('" + NAME + "')"), testSession);
+    no(new XQuery("for $n in " + DOC.args(NAME) + "//xml return delete node $n"), testSession);
+    no(new XQuery(_DB_CREATE.args(NAME)), testSession);
     no(new Optimize(), testSession);
     no(new CreateDB(NAME, "<xml/>"), testSession);
     no(new Replace(RENAMED, "<xml />"), testSession);
@@ -191,7 +192,7 @@ public final class PermissionTest extends SandboxTest {
     ok(new Optimize(), testSession);
     ok(new Replace(NAME + ".xml", "<xmlr>2</xmlr>"), testSession);
 
-    // repo Stuff
+    // repo stuff
     no(new RepoInstall(REPO + "/pkg3.xar", null), testSession);
     ok(new RepoList(), testSession);
     no(new RepoDelete("http://www.pkg3.com", null), testSession);
@@ -199,7 +200,7 @@ public final class PermissionTest extends SandboxTest {
     // XQuery Update
     ok(new XQuery("for $item in doc('" + NAME + "')//xml " +
         "return rename node $item as 'null'"), testSession);
-    no(new XQuery("db:create('" + NAME + "')"), testSession);
+    no(new XQuery(_DB_CREATE.args(NAME)), testSession);
 
     ok(new Optimize(), testSession);
     for(final CmdIndex cmd : CmdIndex.values()) {
@@ -227,7 +228,7 @@ public final class PermissionTest extends SandboxTest {
   @Test
   public void createPermsNeeded() {
     ok(new Grant("create", NAME), adminSession);
-    ok(new XQuery("db:create('" + NAME + "')"), testSession);
+    ok(new XQuery(_DB_CREATE.args(NAME)), testSession);
 
     ok(new Close(), testSession);
     ok(new CreateDB(NAME, "<xml/>"), testSession);
@@ -236,7 +237,7 @@ public final class PermissionTest extends SandboxTest {
     }
     ok(new Export(Prop.TMP + NAME), testSession);
 
-    // repo Stuff
+    // repo stuff
     ok(new RepoInstall(REPO + "/pkg3.xar", null), testSession);
     ok(new RepoList(), testSession);
     ok(new RepoDelete("http://www.pkg3.com", null), testSession);
@@ -269,7 +270,7 @@ public final class PermissionTest extends SandboxTest {
     ok(new Close(), adminSession);
     ok(new DropDB(NAME), adminSession);
 
-    // repo Stuff
+    // repo stuff
     ok(new RepoInstall(REPO + "/pkg3.xar", null), testSession);
     ok(new RepoList(), testSession);
     ok(new RepoDelete("http://www.pkg3.com", null), testSession);
