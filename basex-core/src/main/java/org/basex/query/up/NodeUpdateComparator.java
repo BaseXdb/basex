@@ -29,12 +29,12 @@ import org.basex.util.*;
  *
  * <ol>
  * <li> The PRE values of T1 and T2.
- * Consider D the document <DOC><N1/><N2/><DOC>. If P1 is a {@link DeleteNode} on N1
+ * Consider D the document {@code <DOC><N1/><N2/></DOC>}. If P1 is a {@link DeleteNode} on N1
  * and P2 is a {@link DeleteNode} on N2, it follows that T2>T1. P2 wins the comparison
  * and is therefore executed first.</li>
  *
  * <li> Whether the order of P1, P2 must be switched to get the desired result.
- * Consider D the document <DOC><N1><N2/><\/N1><DOC>. If P1 is an {@link InsertInto} on
+ * Consider D the document {@code <DOC><N1><N2/></N1></DOC>}. If P1 is an {@link InsertInto} on
  * N1 and P2 is an {@link InsertInto} on N2, it follows that T2>T1. Yet, executing P2
  * first would lead to the following problem:<br/>
  *
@@ -56,7 +56,7 @@ import org.basex.util.*;
  * order of insertion sequences (S2,S1) P1 must be executed first, hence P1>P2.</li>
  *
  * <li> The {@link UpdateType} of P1, P2.
- * Consider D the document <DOC><N1/><DOC> with T=N1. P1 is an {@link InsertBefore}
+ * Consider D the document {@code <DOC><N1/></DOC>} with T=N1. P1 is an {@link InsertBefore}
  * on T and P2 is an {@link InsertIntoAsFirst} on the same target T. As they both operate
  * on the same target, both have not to be re-located because of their type (see case 2),
  * hence only differ in their {@link UpdateType}, it follows that P2>P1 as nodes

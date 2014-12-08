@@ -101,8 +101,8 @@ public class XMLParser extends SingleParser {
 
   /**
    * Parses an XML element name.
-   * @throws IOException I/O exception
    * @return result of scanner step
+   * @throws IOException I/O exception
    */
   private boolean parseElement() throws IOException {
     // close element

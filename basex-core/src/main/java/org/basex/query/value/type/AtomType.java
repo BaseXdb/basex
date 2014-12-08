@@ -945,8 +945,8 @@ public enum AtomType implements Type {
    * Checks the validity of the specified name.
    * @param it value to be checked
    * @param ii input info
-   * @throws QueryException query exception
    * @return name
+   * @throws QueryException query exception
    */
   final byte[] checkName(final Item it, final InputInfo ii) throws QueryException {
     final byte[] v = normalize(it.string(ii));

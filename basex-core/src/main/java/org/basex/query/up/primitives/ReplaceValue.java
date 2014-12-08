@@ -18,7 +18,7 @@ import org.basex.util.*;
  * <p>If the target T is an element node this primitive represents a replaceElementContent
  * expression (see XQUF). The children of T are deleted and a single (optional) text node
  * is inserted as the only child of T. The primitive for replaceElementContent is
- * substituted by <delete children(T), insertInto(T)>.</p>
+ * substituted by [delete children(T), insertInto(T)].</p>
  *
  * <p>After the end of the snapshot, T has either no child node at all (if the given text
  * node has been empty), or the given (non-empty) text node as a single child. Attributes
@@ -78,9 +78,9 @@ public final class ReplaceValue extends NodeUpdate {
    * Checks if this primitive is substituted.
    *
    * If target T is an element node, the primitive is substituted by a sequence of
-   * <delete children(T), insertInto (T)>.
+   * [delete children(T), insertInto (T)].
    * If T is a text node and the new value is empty, the primitive is substituted by
-   * <delete T>, as empty text nodes are not allowed, see XDM.
+   * [delete T], as empty text nodes are not allowed, see XDM.
    *
    * @return true if primitive is substituted
    */

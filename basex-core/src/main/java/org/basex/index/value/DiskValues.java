@@ -122,14 +122,14 @@ public class DiskValues implements Index {
 
   /**
    * Add entries to the index.
-   * @param map a set of <key, id-list> pairs
+   * @param map a set of [key, id-list] pairs
    */
   @SuppressWarnings("unused")
   public void add(final TokenObjMap<IntList> map) { }
 
   /**
    * Deletes index entries from the index.
-   * @param map a set of <key, id-list> pairs
+   * @param map a set of [key, id-list] pairs
    */
   @SuppressWarnings("unused")
   public void delete(final TokenObjMap<IntList> map) { }

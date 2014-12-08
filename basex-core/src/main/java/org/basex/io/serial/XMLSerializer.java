@@ -2,6 +2,7 @@ package org.basex.io.serial;
 
 import static org.basex.data.DataText.*;
 import static org.basex.query.QueryError.*;
+import static org.basex.util.Token.*;
 
 import java.io.*;
 
@@ -18,6 +19,8 @@ import org.basex.query.value.item.*;
 public class XMLSerializer extends OutputSerializer {
   /** Root elements. */
   private boolean root;
+  /** Wrapper flag. */
+  private final boolean wrap;
 
   /**
    * Constructor, specifying serialization options.
@@ -27,6 +30,24 @@ public class XMLSerializer extends OutputSerializer {
    */
   XMLSerializer(final OutputStream os, final SerializerOptions sopts) throws IOException {
     super(os, sopts, V10, V11);
+
+    // open results element
+    wrap = wPre.length != 0;
+    if(wrap) {
+      openElement(concat(wPre, COLON, T_RESULTS));
+      namespace(wPre, wUri);
+    }
+  }
+
+  @Override
+  protected void openResult() throws IOException {
+    super.openResult();
+    if(wrap) openElement(wPre.length == 0 ? T_RESULT : concat(wPre, COLON, T_RESULT));
+  }
+
+  @Override
+  protected void closeResult() throws IOException {
+    if(wrap) closeElement();
   }
 
   @Override
@@ -48,6 +69,12 @@ public class XMLSerializer extends OutputSerializer {
   protected void atomic(final Item it, final boolean iter) throws IOException {
     if(elems.isEmpty()) check();
     super.atomic(it, iter);
+  }
+
+  @Override
+  public void close() throws IOException {
+    if(wrap) closeElement();
+    super.close();
   }
 
   /**

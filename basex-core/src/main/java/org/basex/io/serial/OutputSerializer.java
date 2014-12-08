@@ -89,9 +89,9 @@ public abstract class OutputSerializer extends Serializer {
   protected final char tab;
 
   /** Prefix for wrapped results. */
-  private final byte[] wPre;
-  /** Wrapper flag. */
-  private final boolean wrap;
+  protected final byte[] wPre;
+  /** URI for wrapped results. */
+  protected final byte[] wUri;
 
   /**
    * Constructor.
@@ -128,9 +128,9 @@ public abstract class OutputSerializer extends Serializer {
 
     // project specific options
     indents = opts.get(INDENTS);
-    tab     = opts.yes(TABULATOR) ? '\t' : ' ';
-    wPre    = token(opts.get(WRAP_PREFIX));
-    wrap    = wPre.length != 0;
+    tab = opts.yes(TABULATOR) ? '\t' : ' ';
+    wPre = token(opts.get(WRAP_PREFIX));
+    wUri = token(opts.get(WRAP_URI));
 
     nl = utf8(token(opts.get(NEWLINE).newline()), enc);
     itemsep = opts.contains(ITEM_SEPARATOR) ? token(opts.get(ITEM_SEPARATOR).replace("\\n", "\n").
@@ -219,12 +219,6 @@ public abstract class OutputSerializer extends Serializer {
         }
       }
     }
-
-    // open results element
-    if(wrap) {
-      openElement(concat(wPre, COLON, T_RESULTS));
-      namespace(wPre, token(opts.get(WRAP_URI)));
-    }
   }
 
   @Override
@@ -236,7 +230,6 @@ public abstract class OutputSerializer extends Serializer {
 
   @Override
   public void close() throws IOException {
-    if(wrap) closeElement();
     out.flush();
   }
 
@@ -263,12 +256,10 @@ public abstract class OutputSerializer extends Serializer {
         isep = true;
       }
     }
-    if(wrap) openElement(wPre.length == 0 ? T_RESULT : concat(wPre, COLON, T_RESULT));
   }
 
   @Override
   protected void closeResult() throws IOException {
-    if(wrap) closeElement();
   }
 
   @Override

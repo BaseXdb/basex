@@ -187,6 +187,8 @@ public final class SimpleTest extends QueryTest {
       { "Map 1", strings("c", "a"), "<a/> ! (('b'!'c'), name())" },
       { "Map 2", integers(5), "((1 to 100000) ! 5)[1]" },
       { "Map 3", strings("a", "b"), "<a><b/></a>/b ! ancestor-or-self::node() ! name()" },
+
+      { "Constructor 1", strings("1"), "<n xmlns='u'>{attribute{'a'}{1}}</n>/@a/string()" },
     };
   }
 }

@@ -75,11 +75,14 @@ public abstract class CName extends CNode {
   /**
    * Returns an updated name expression.
    * @param qc query context
+   * @param elem element
    * @param ii input info
    * @return result
    * @throws QueryException query exception
    */
-  final QNm qname(final QueryContext qc, final InputInfo ii) throws QueryException {
+  final QNm qname(final QueryContext qc, final boolean elem, final InputInfo ii)
+      throws QueryException {
+
     final Item it = checkNoEmpty(name.atomItem(qc, info), AtomType.QNM);
     final Type ip = it.type;
     if(ip == AtomType.QNM) return (QNm) it;
@@ -87,7 +90,9 @@ public abstract class CName extends CNode {
 
     // create and update namespace
     final byte[] str = it.string(ii);
-    if(XMLToken.isQName(str)) return new QNm(str, sc);
+    if(XMLToken.isQName(str)) {
+      return elem || Token.contains(str, ':') ? new QNm(str, sc) : new QNm(str);
+    }
     throw INVNAME_X.get(info, str);
   }
 

@@ -83,6 +83,7 @@ public final class JsonNodeSerializer extends JsonSerializer {
     } else {
       ser.serialize(node);
       ser.close();
+      ser.reset();
       string(cache.toArray());
       cache.reset();
     }

@@ -199,8 +199,8 @@ public final class Token {
   /**
    * Converts a token from the input encoding to UTF8.
    * @param token token to be converted
-   * @return byte array
    * @param encoding input encoding
+   * @return byte array
    */
   public static byte[] utf8(final byte[] token, final String encoding) {
     // UTF8 (comparison by ref.) or no special characters: return input

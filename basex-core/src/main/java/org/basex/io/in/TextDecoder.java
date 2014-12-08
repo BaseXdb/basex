@@ -50,8 +50,8 @@ abstract class TextDecoder {
   /**
    * Processes an invalid character. Throws an exception if input must be valid,
    * or returns a question mark as replacement.
-   * @throws IOException I/O exception
    * @return question mark
+   * @throws IOException I/O exception
    */
   int invalid() throws IOException {
     if(valid) throw new InputException();

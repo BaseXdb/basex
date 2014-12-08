@@ -42,8 +42,8 @@ abstract class Update extends Arr {
    * Checks if the new namespaces have conflicting namespaces.
    * @param list node list
    * @param targ target node
-   * @throws QueryException query exception
    * @return specified node list
+   * @throws QueryException query exception
    */
   final ANodeList checkNS(final ANodeList list, final ANode targ) throws QueryException {
     for(final ANode n : list) {

@@ -5,10 +5,10 @@ import org.basex.util.*;
 /**
  * This is an efficient and memory-saving hash map for storing tokens and objects.
  * {@link TokenSet hash set}.
- * @param <E> generic value type
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
+ * @param <E> generic value type
  */
 public final class TokenObjMap<E> extends TokenSet {
   /** Values. */
