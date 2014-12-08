@@ -431,10 +431,11 @@ h_used_mem           = メモリが少ない場合はBaseXを起動する際に�
 
 c_add1               = リソースの追加
 c_add2               = [%] を [%] としてデータベースに追加します。
-c_alter1             = データベース名、または、ユーザパスワードの変更。
-c_alter2             = データベースの名称、または、ユーザーパスワードを変更します:
+c_alter1             = Alter database or user data.
+c_alter2             = Alters the name of a database, user, or user password:
 c_alterdb            = データベースの名称を変更します。
 c_alterpw            = ユーザのパスワードを変更します。
+c_alteruser          = alters the name of a user.
 c_check1             = データベースのオープン、または、作成。
 c_check2             = 既存のデータベースを開くか、または、新しいインスタンスを作成します。
 c_close1             = 現在のデータベースを閉じる

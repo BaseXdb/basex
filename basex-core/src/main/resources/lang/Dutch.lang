@@ -431,10 +431,11 @@ h_used_mem           = Als er weinig geheugen beschikbaar is, start\nBaseX dan m
 
 c_add1               = Voeg resource aan database toe.
 c_add2               = Voegt [%] als [%] toe aan de database.
-c_alter1             = Wijzig gebruiker's wachtwoord of database naam.
-c_alter2             = Wijzigt gebruiker's wachtwoord of database naam:
+c_alter1             = Alter database or user data.
+c_alter2             = Alters the name of a database, user, or user password:
 c_alterdb            = wijzigt de naam of a database.
 c_alterpw            = wijzigt het wachtwoord van een gebruiker.
+c_alteruser          = wijzigt de naam van een gebruiker.
 c_check1             = Opent of maakt een database.
 c_check2             = Opent een bestaande database of maakt een nieuwe instantie.
 c_close1             = Sluit actuele database.

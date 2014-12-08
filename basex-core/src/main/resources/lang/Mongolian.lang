@@ -431,10 +431,11 @@ h_used_mem           = Хэрвээ санах ой багасвал, \nBaseX-г
 
 c_add1               = Өгөгдлийн санд документ үүсгэх.
 c_add2               = [%]-нд [%]-аар өгөгдлийн санд нэмэх.
-c_alter1             = Өгөгдлийн сангийн нэр эсвэл нууц үгийг өөрчлөх.
-c_alter2             = Өгөгдлийн сангийн нэр эсвэл нууц үгийг өөрчлөх:
+c_alter1             = Alter database or user data.
+c_alter2             = Alters the name of a database, user, or user password:
 c_alterdb            = Хэрэглэгчийн нэр өөрчлөх.
 c_alterpw            = Хэрэглэгчийн нууц үгийг өөрчлөх.
+c_alteruser          = alters the name of a user.
 c_check1             = Өгөгдлийн санг нээх эсвэл шинээр үүсгэх.
 c_check2             = Өмнө үүссэн өгөгдлийн санг нээх эсвэл шинээр тогтмолоор үүсгэх.
 c_close1             = Өгөгдлийн санг хаах.

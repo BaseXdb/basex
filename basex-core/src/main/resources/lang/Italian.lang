@@ -431,10 +431,11 @@ h_used_mem           = Se la memoria è insufficiente, avviare\nBaseX con l'opzi
 
 c_add1               = Aggiungi risorse.
 c_add2               = Aggiungi [%] come [%] alla base di dati.
-c_alter1             = Modifica il nome della base di dati o la parola chiave dell'utente.
-c_alter2             = Modifica il nome della base di dati o la parola chiave dell'utente:
+c_alter1             = Modifica dati delle basi di dati o utenti.
+c_alter2             = Modifica il nome della base di dati, il utente o la parola chiave:
 c_alterdb            = modifica il nome della base di dati
 c_alterpw            = cambia la parola chiave di un utente.
+c_alteruser          = cambia il nome di un utente.
 c_check1             = Apri o crea una base di dati.
 c_check2             = Apri una base di dati esistente o crea una nuova istanza.
 c_close1             = Chiudi la base di dati in uso.

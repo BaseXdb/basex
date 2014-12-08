@@ -431,10 +431,11 @@ h_used_mem           = Der verfügbare Speicher kann mit dem Java-Flag -Xmx<size
 
 c_add1               = Hinzufügen von Ressourcen.
 c_add2               = Fügt der Datenbank eine Ressource [%] als [%] hinzu.
-c_alter1             = Ändern von Benutzerpasswörtern oder Datenbanknamen.
-c_alter2             = Ändert ein Benutzerpasswort oder einen Datenbanknamen:
+c_alter1             = Ändern von Datenbank- oder Benutzerdaten.
+c_alter2             = Ändert der Namen einer Datenbank, einer Benutzers oder dessen Passwort:
 c_alterdb            = ändert den Namen einer Datenbank.
 c_alterpw            = ändert das Passwort eines Benutzers.
+c_alteruser          = ändert den Namen eines Benutzers.
 c_check1             = Öffnet oder erzeugt eine Datenbank.
 c_check2             = Öffnet eine existierende Datenbank oder erstellt eine neue Instanz.
 c_close1             = Schließen der Datenbank.

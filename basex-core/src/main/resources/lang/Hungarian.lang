@@ -431,10 +431,11 @@ h_used_mem           = Amikor kevés a memória, kérem futtassa\na BaseX-et a -
 
 c_add1               = Erőforrás hozzáadása az adatbázishoz.
 c_add2               = [%] hozzáadása mint [%] az adatbázishoz.
-c_alter1             = Adatbázis nevének vagy felhasználó jelszavának megváltoztatása.
-c_alter2             = Adatbázis nevének vagy felhasználó jelszavának változásai:
+c_alter1             = Alter database or user data.
+c_alter2             = Alters the name of a database, user, or user password:
 c_alterdb            = megváltoztatja az adatbázis nevét.
 c_alterpw            = megváltoztatja felhasználó jelszavát.
+c_alteruser          = megváltoztatja felhasználó nevét.
 c_check1             = Adatbázis megnyitása vagy létrehozása.
 c_check2             = Megnyitja a meglévő adatbázist vagy újat hoz létre.
 c_close1             = Jelenlegi adatbázis bezárása.

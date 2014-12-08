@@ -2,6 +2,7 @@ package org.basex.core;
 
 import static org.basex.core.Lang.*;
 
+import org.basex.core.parse.Commands.CmdAlter;
 import org.basex.core.parse.Commands.CmdCreate;
 import org.basex.core.parse.Commands.CmdDrop;
 import org.basex.core.parse.Commands.CmdIndex;
@@ -423,13 +424,15 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPALTER = {
-    "[" + CmdCreate.DATABASE + '|' + CmdCreate.USER + "] [...]",
+    "[" + CmdAlter.DATABASE + '|' + CmdAlter.PASSWORD + '|' + CmdAlter.USER + "] [...]",
     lang("c_alter1"),
     lang("c_alter2") + NL  +
-    LI + CmdCreate.DATABASE + " [" + S_NAME + "] [newname]" + NL +
+    LI + CmdAlter.DATABASE + " [" + S_NAME + "] [newname]" + NL +
     "  " + lang("c_alterdb") + NL +
-    LI + CmdCreate.USER  + " [" + S_NAME + "] ([" + S_PW + "]):" + NL +
-    "  " + lang("c_alterpw")
+    LI + CmdAlter.PASSWORD + " [" + S_NAME + "] [" + S_PW + "]" + NL +
+    "  " + lang("c_alterpw") + NL +
+    LI + CmdAlter.USER  + " [" + S_NAME + "] ([newname]):" + NL +
+    "  " + lang("c_alteruser")
   };
   /** Command help. */
   String[] HELPINSPECT = {

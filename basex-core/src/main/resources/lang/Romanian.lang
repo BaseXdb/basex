@@ -431,10 +431,11 @@ h_used_mem           = Dacă memoria este redusa, vă rugăm să lanseti\nBaseX 
 
 c_add1               = Adaugă resurse la baza de date.
 c_add2               = Adaugă [%] ca [%] la baza de date.
-c_alter1             = Modifica numele bazei de date sau parola de utilizator.
-c_alter2             = Modifică numele unei baze de date sau parola de utilizator:
+c_alter1             = Alter database or user data.
+c_alter2             = Alters the name of a database, user, or user password:
 c_alterdb            = Modifică numele unei baze de date.
 c_alterpw            = Modifica parola unui utilizator.
+c_alteruser          = alters the name of a user.
 c_check1             = Deschideţi sau creaţi baza de date.
 c_check2             = Deschide o bază de date existentă sau creează o nouă instanţă.
 c_close1             = Închideţi baza de date curentă.

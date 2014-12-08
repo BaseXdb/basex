@@ -431,10 +431,11 @@ h_used_mem           = Jika memori kurang, mohon jalankan\nBaseX dengan penanda 
 
 c_add1               = Tambahkan sumber ke dalam basisdata.
 c_add2               = Tambahkan [%] sebagai [%] ke dalam basisdata.
-c_alter1             = Ubah nama basisdata atau kata kunci pengguna.
-c_alter2             = Ubah nama basisdata atau kata kunci pengguna:
+c_alter1             = Alter database or user data.
+c_alter2             = Alters the name of a database, user, or user password:
 c_alterdb            = ubah nama basisdata.
 c_alterpw            = ubah kata kunci satu pengguna.
+c_alteruser          = ubah name satu pengguna.
 c_check1             = Buka atau buat basisdata.
 c_check2             = Buka satu basisdata yang sudah ada atau buat sesuatu yang baru.
 c_close1             = Tutup basisdata kini.

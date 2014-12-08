@@ -431,10 +431,11 @@ h_used_mem           = If memory is low, please launch\nBaseX with the Java flag
 
 c_add1               = Add resource to database.
 c_add2               = Adds [%] as [%] to the database.
-c_alter1             = Alter database name or user password.
-c_alter2             = Alters the name of a database or the user password:
+c_alter1             = Alter database or user data.
+c_alter2             = Alters the name of a database, user, or user password:
 c_alterdb            = alters the name of a database.
 c_alterpw            = alters the password of a user.
+c_alteruser          = alters the name of a user.
 c_check1             = Open or create database.
 c_check2             = Opens an existing database or creates a new instance.
 c_close1             = Close current database.
