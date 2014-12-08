@@ -32,17 +32,29 @@ public final class UserModuleTest extends AdvancedQueryTest {
    */
   @Test
   public void list() throws BaseXException {
-    // check if the admin user exists
-    query(_USER_LIST.args() + "/@name = 'admin'", "true");
+    query(_USER_LIST.args() + "[. = 'admin']", "admin");
     // check if the temporarily created user is found
     new CreateUser(NAME, NAME).execute(context);
-    query(_USER_LIST.args() + "/@name = '" + NAME + '\'', "true");
+    query(_USER_LIST.args() + "[. = '" + NAME + "']", NAME);
+  }
+
+  /**
+   * Test method.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void listDetails() throws BaseXException {
+    // check if the admin user exists
+    query(_USER_LIST_DETAILS.args() + "/@name = 'admin'", "true");
+    // check if the temporarily created user is found
+    new CreateUser(NAME, NAME).execute(context);
+    query(_USER_LIST_DETAILS.args() + "/@name = '" + NAME + '\'', "true");
     // check if local user is found
     new Grant(Perm.READ, NAME, NAME).execute(context);
-    query(_USER_LIST.args(NAME) + "/@name = '" + NAME + '\'', "true");
+    query(_USER_LIST_DETAILS.args(NAME) + "/@name = '" + NAME + '\'', "true");
     // check if user has been removed
     new DropUser(NAME).execute(context);
-    query(_USER_LIST.args(NAME) + "/@name = '" + NAME + '\'', "false");
-    query(_USER_LIST.args() + "/@name = '" + NAME + '\'', "false");
+    query(_USER_LIST_DETAILS.args(NAME) + "/@name = '" + NAME + '\'', "false");
+    query(_USER_LIST_DETAILS.args() + "/@name = '" + NAME + '\'', "false");
   }
 }

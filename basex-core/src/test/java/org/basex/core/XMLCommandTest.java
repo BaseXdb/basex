@@ -25,8 +25,10 @@ public class XMLCommandTest extends SandboxTest {
     ok("<add path='X'>X</add>");
     ok("<add path='X'><X/></add>");
 
-    ok("<alter-user name='X'/>");
-    ok("<alter-user name='X'>X</alter-user>");
+    ok("<alter-password name='X'/>");
+    ok("<alter-password name='X'>X</alter-password>");
+
+    ok("<alter-user name='X' newname='Y'/>");
 
     ok("<check input='X'/>");
 

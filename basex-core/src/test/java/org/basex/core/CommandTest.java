@@ -30,6 +30,8 @@ public class CommandTest extends SandboxTest {
   private static final String FILE = FOLDER + FN;
   /** Test name. */
   static final String NAME2 = NAME + '2';
+  /** Admin. */
+  static final String ADMIN = "admin";
   /** Socket reference. */
   static Session session;
 
@@ -79,9 +81,13 @@ public class CommandTest extends SandboxTest {
   /** Command test. */
   @Test
   public final void alterDB() {
+    no(new AlterDB("unknown", NAME));
+
     ok(new CreateDB(NAME));
     ok(new AlterDB(NAME, NAME2));
+    ok(new CreateDB(NAME));
     ok(new Close());
+    no(new AlterDB(NAME, NAME2));
     no(new AlterDB(NAME, NAME2));
     no(new AlterDB(NAME2, "?"));
     no(new AlterDB("?", NAME2));
@@ -89,10 +95,26 @@ public class CommandTest extends SandboxTest {
 
   /** Command test. */
   @Test
+  public final void alterPassword() {
+    ok(new CreateUser(NAME, NAME));
+    ok(new AlterPassword(NAME, "test"));
+    no(new AlterPassword(":", NAME));
+    no(new AlterPassword("unknown", NAME));
+  }
+
+  /** Command test. */
+  @Test
   public final void alterUser() {
-    ok(new CreateUser(NAME2, NAME2));
-    ok(new AlterPassword(NAME2, "test"));
-    no(new AlterPassword(":", NAME2));
+    no(new AlterUser(ADMIN, NAME));
+    no(new AlterUser(NAME, ADMIN));
+    no(new AlterUser(":", NAME));
+    no(new AlterUser(NAME, ":"));
+    no(new AlterUser("unknown", NAME));
+
+    ok(new CreateUser(NAME, NAME));
+    ok(new AlterUser(NAME, NAME2));
+    ok(new CreateUser(NAME, NAME));
+    no(new AlterUser(NAME, NAME2));
   }
 
   /** Command test. */
@@ -159,7 +181,7 @@ public class CommandTest extends SandboxTest {
   @Test
   public final void createUser() {
     ok(new CreateUser(NAME2, "test"));
-    no(new CreateUser(NAME2, "test"));
+    ok(new CreateUser(NAME2, "test"));
     ok(new DropUser(NAME2));
     no(new CreateUser("", ""));
     no(new CreateUser(":", ""));

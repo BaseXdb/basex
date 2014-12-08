@@ -1,5 +1,6 @@
 package org.basex.core;
 
+import static org.basex.query.func.Function.*;
 import static org.junit.Assert.*;
 
 import org.basex.*;
@@ -121,56 +122,56 @@ public class CommandLockingTest extends SandboxTest {
   @Test
   public void xquery() throws BaseXException {
     // Basic document access
-    ckDBs(new XQuery("collection('" + NAME + "')"), false, NAME_LIST);
-    ckDBs(new XQuery("collection()"), false, COLL_LIST);
+    ckDBs(new XQuery(COLLECTION.args(NAME)), false, NAME_LIST);
+    ckDBs(new XQuery(COLLECTION.args()), false, COLL_LIST);
     // fn:collection() always accesses the global context, no matter what local context is
-    ckDBs(new XQuery("<a/>/count(collection())"), false, COLL_LIST);
-    ckDBs(new XQuery("doc('" + NAME + "')"), false, NAME_LIST);
-    ckDBs(new XQuery("doc-available('" + NAME + "/foo.xml')"), false, NAME_LIST, null);
-    ckDBs(new XQuery("parse-xml('<foo/>')"), true, NONE);
-    ckDBs(new XQuery("parse-xml-fragment('<foo/>')"), true, NONE);
-    ckDBs(new XQuery("put(<foo/>, '" + NAME + "')"), true, NONE);
-    ckDBs(new XQuery("put(., '" + NAME + "')"), true, CTX_LIST);
-    ckDBs(new XQuery("root()"), false, CTX_LIST);
-    ckDBs(new XQuery("root(.)"), false, CTX_LIST);
-    ckDBs(new XQuery("root(./test)"), false, CTX_LIST);
-    ckDBs(new XQuery("serialize('<foo/>')"), true, NONE);
-    ckDBs(new XQuery("unparsed-text('" + FILE + "')"), false, NONE);
-    ckDBs(new XQuery("unparsed-text-available('" + FILE + "')"), false, NONE);
-    ckDBs(new XQuery("unparsed-text-lines('" + FILE + "')"), false, NONE);
-    ckDBs(new XQuery("uri-collection('" + NAME + "')"), false, NAME_LIST);
-    ckDBs(new XQuery("uri-collection()"), false, COLL_LIST);
+    ckDBs(new XQuery("<a/>/" + COUNT.args(COLLECTION.args())), false, COLL_LIST);
+    ckDBs(new XQuery(DOC.args(NAME)), false, NAME_LIST);
+    ckDBs(new XQuery(DOC_AVAILABLE.args(NAME + "/foo.xml")), false, NAME_LIST, null);
+    ckDBs(new XQuery(PARSE_XML.args("<foo/>")), true, NONE);
+    ckDBs(new XQuery(PARSE_XML_FRAGMENT.args("<foo/>")), true, NONE);
+    ckDBs(new XQuery(PUT.args("<foo/>", NAME)), true, NONE);
+    ckDBs(new XQuery(PUT.args(" .", NAME)), true, CTX_LIST);
+    ckDBs(new XQuery(ROOT.args()), false, CTX_LIST);
+    ckDBs(new XQuery(ROOT.args(" .")), false, CTX_LIST);
+    ckDBs(new XQuery(ROOT.args(" ./test")), false, CTX_LIST);
+    ckDBs(new XQuery(ROOT.args("<foo/>")), true, NONE);
+    ckDBs(new XQuery(UNPARSED_TEXT.args(FILE)), false, NONE);
+    ckDBs(new XQuery(UNPARSED_TEXT_AVAILABLE.args(FILE)), false, NONE);
+    ckDBs(new XQuery(UNPARSED_TEXT_LINES.args(FILE)), false, NONE);
+    ckDBs(new XQuery(URI_COLLECTION.args(NAME)), false, NAME_LIST);
+    ckDBs(new XQuery(URI_COLLECTION.args()), false, COLL_LIST);
 
     // Accessor and node functions
-    for(final String fn : new String[] { "data", "string", "number", "string-length",
-        "normalize-space", "document-uri", "nilled", "node-name", "local-name", "name",
-        "namespace-uri", "root", "base-uri", "generate-id", "has-children", "path"}) {
-      ckDBs(new XQuery(fn + "()"), false, CTX_LIST);
-      ckDBs(new XQuery("doc('" + NAME + "')/" + fn + "()"), false, NAME_LIST, NAME_CTX);
+    for(final Function fn : new Function[] { DATA, STRING, NUMBER, STRING_LENGTH, NORMALIZE_SPACE,
+        DOCUMENT_URI, NILLED, NODE_NAME, LOCAL_NAME, Function.NAME, NAMESPACE_URI, ROOT, BASE_URI,
+        GENERATE_ID, HAS_CHILDREN, PATH }) {
+      ckDBs(new XQuery(fn.args()), false, CTX_LIST);
+      ckDBs(new XQuery(DOC.args(NAME) + '/' + fn.args()), false, NAME_LIST, NAME_CTX);
     }
-    for(final String fn : new String[] { "data", "string", "number", "string-length",
-        "normalize-space", "document-uri", "nilled", "node-name", "local-name", "name",
-        "namespace-uri", "root", "base-uri", "generate-id", "has-children", "path"}) {
-      ckDBs(new XQuery(fn + "(doc('" + NAME + "'))"), false, NAME_LIST);
+    for(final Function fn : new Function[] { DATA, STRING, NUMBER, STRING_LENGTH, NORMALIZE_SPACE,
+        DOCUMENT_URI, NILLED, NODE_NAME, LOCAL_NAME, Function.NAME, NAMESPACE_URI, ROOT, BASE_URI,
+        GENERATE_ID, HAS_CHILDREN, PATH }) {
+      ckDBs(new XQuery(fn.args(DOC.args(NAME))), false, NAME_LIST);
     }
 
     // Others
     ckDBs(new XQuery("."), false, CTX_LIST);
-    ckDBs(new XQuery("error()"), false, NONE);
-    ckDBs(new XQuery("error(xs:QName('foo'))"), false, NONE);
-    ckDBs(new XQuery("error(xs:QName('foo'), 'bar')"), false, NONE);
-    ckDBs(new XQuery("error(xs:QName('foo'), 'bar', <batz/>)"), false, NONE);
-    ckDBs(new XQuery("random:integer()"), false, NONE);
+    ckDBs(new XQuery(ERROR.args()), false, NONE);
+    ckDBs(new XQuery(ERROR.args("xs:QName('foo')")), false, NONE);
+    ckDBs(new XQuery(ERROR.args("xs:QName('foo')", "bar")), false, NONE);
+    ckDBs(new XQuery(ERROR.args("xs:QName('foo')", "bar", "<batz/>")), false, NONE);
+    ckDBs(new XQuery(_RANDOM_INTEGER.args()), false, NONE);
 
     // User defined functions
     ckDBs(new XQuery("declare function local:a($a) {" +
         "if($a = 0) then $a else local:a($a idiv 2) };" +
         "local:a(5)"), false, NONE);
     ckDBs(new XQuery("declare function local:a($a) {" +
-        "if($a = 0) then collection() else local:a($a idiv 2) };" +
+        "if($a = 0) then " + COLLECTION.args() + " else local:a($a idiv 2) };" +
         "local:a(5)"), false, COLL_LIST);
     ckDBs(new XQuery("declare function local:a($a) {" +
-        "if($a = 0) then doc('" + NAME + "') else local:a($a idiv 2) };" +
+        "if($a = 0) then " + DOC.args(NAME) + " else local:a($a idiv 2) };" +
         "local:a(5)"), false, NAME_LIST);
 
     // Java module function test. Locks are added at compilation, so execute each query
@@ -190,107 +191,104 @@ public class CommandLockingTest extends SandboxTest {
   /** Test admin module. */
   @Test
   public void admin() {
-    ckDBs(new XQuery("admin:users()"), false, ADMIN_LIST);
-    ckDBs(new XQuery("admin:users('" + NAME + "')"), false, ADMIN_NAME);
-    ckDBs(new XQuery("admin:sessions()"), false, ADMIN_LIST);
-    ckDBs(new XQuery("admin:logs()"), false, NONE);
+    ckDBs(new XQuery(_ADMIN_SESSIONS.args()), false, ADMIN_LIST);
+    ckDBs(new XQuery(_ADMIN_LOGS.args()), false, NONE);
+  }
+
+  /** Test user module. */
+  @Test
+  public void user() {
+    ckDBs(new XQuery(_USER_LIST.args()), false, ADMIN_LIST);
+    ckDBs(new XQuery(_USER_LIST.args(NAME)), false, ADMIN_NAME);
+    ckDBs(new XQuery(_USER_LIST_DETAILS.args()), false, ADMIN_LIST);
+    ckDBs(new XQuery(_USER_LIST_DETAILS.args(NAME)), false, ADMIN_NAME);
   }
 
   /** Test database module. */
   @Test
   public void db() {
     // General Functions
-    ckDBs(new XQuery("db:info('" + NAME + "')"), false, NAME_LIST);
-    ckDBs(new XQuery("db:list('" + NAME + "')"), false, NAME_LIST);
-    ckDBs(new XQuery("db:list()"), false, null);
-    ckDBs(new XQuery("db:list-details('" + NAME + "')"), false, NAME_LIST);
-    ckDBs(new XQuery("db:list-details()"), false, null);
-    ckDBs(new XQuery("db:open('" + NAME + "')"), false, NAME_LIST);
-    ckDBs(new XQuery("db:open-id('" + NAME + "', 0)"), false, NAME_LIST);
-    ckDBs(new XQuery("db:open-pre('" + NAME + "', 0)"), false, NAME_LIST);
-    ckDBs(new XQuery("db:system()"), false, NONE);
+    ckDBs(new XQuery(_DB_INFO.args(NAME)), false, NAME_LIST);
+    ckDBs(new XQuery(_DB_LIST.args(NAME)), false, NAME_LIST);
+    ckDBs(new XQuery(_DB_INFO.args()), false, null);
+    ckDBs(new XQuery(_DB_LIST_DETAILS.args(NAME)), false, NAME_LIST);
+    ckDBs(new XQuery(_DB_LIST_DETAILS.args()), false, null);
+    ckDBs(new XQuery(_DB_OPEN.args(NAME)), false, NAME_LIST);
+    ckDBs(new XQuery(_DB_OPEN_ID.args(NAME, 0)), false, NAME_LIST);
+    ckDBs(new XQuery(_DB_OPEN_PRE.args(NAME, 0)), false, NAME_LIST);
+    ckDBs(new XQuery(_DB_SYSTEM.args()), false, NONE);
 
     // Read Operations
-    ckDBs(new XQuery("db:attribute('" + NAME + "', 'foo')"), false, NAME_LIST);
-    ckDBs(new XQuery("db:attribute-range('" + NAME + "', '23', '42')"), false, NAME_LIST);
-    ckDBs(new XQuery("db:node-id(.)"), false, CTX_LIST);
-    ckDBs(new XQuery("db:node-pre(.)"), false, CTX_LIST);
-    ckDBs(new XQuery("db:retrieve('" + NAME + "', 'foo')"), false, NAME_LIST);
-    ckDBs(new XQuery("db:text('" + NAME + "', 'foo')"), false, NAME_LIST);
-    ckDBs(new XQuery("db:text-range('" + NAME + "', '23', '42')"), false, NAME_LIST);
+    ckDBs(new XQuery(_DB_ATTRIBUTE.args(NAME, "foo")), false, NAME_LIST);
+    ckDBs(new XQuery(_DB_ATTRIBUTE.args(NAME, 23, 42)), false, NAME_LIST);
+    ckDBs(new XQuery(_DB_NODE_ID.args(" .")), false, CTX_LIST);
+    ckDBs(new XQuery(_DB_NODE_PRE.args(" .")), false, CTX_LIST);
+    ckDBs(new XQuery(_DB_RETRIEVE.args(NAME, "foo")), false, NAME_LIST);
+    ckDBs(new XQuery(_DB_TEXT.args(NAME, "foo")), false, NAME_LIST);
+    ckDBs(new XQuery(_DB_TEXT_RANGE.args(NAME, 23, 42)), false, NAME_LIST);
 
     // Updates
-    ckDBs(new XQuery("db:create('" + NAME + "')"), true, NAME_LIST);
-    ckDBs(new XQuery("db:create('" + NAME + "', '" + FILE + "')"), true, NAME_LIST);
-    ckDBs(new XQuery("db:create('" + NAME + "', '<foo/>', '" + FILE + "')"), true,
-        NAME_LIST);
-    ckDBs(new XQuery("db:create('" + NAME + "', '" + FILE + "', '" + FILE + "')"), true,
-        NAME_LIST);
-    ckDBs(new XQuery("db:drop('" + NAME + "')"), true, NAME_LIST);
-    ckDBs(new XQuery("db:add('" + NAME + "', '" + FILE + "')"), true, NAME_LIST);
-    ckDBs(new XQuery("db:add('" + NAME + "', '<foo/>', '" + FILE + "')"), true,
-        NAME_LIST);
-    ckDBs(new XQuery("db:add('" + NAME + "', '" + FILE + "', '" + FILE + "')"), true,
-        NAME_LIST);
-    ckDBs(new XQuery("db:delete('" + NAME + "', '" + FILE + "')"), true, NAME_LIST);
-    ckDBs(new XQuery("db:optimize('" + NAME + "')"), true, NAME_LIST);
-    ckDBs(new XQuery("db:optimize('" + NAME + "', true())"), true, NAME_LIST);
-    ckDBs(new XQuery("db:rename('" + NAME + "', '" + FILE + "', '" + FILE + "2')"), true,
-        NAME_LIST);
-    ckDBs(new XQuery("db:replace('" + NAME + "', '" + FILE + "', '" + FILE + "2')"), true,
-        NAME_LIST);
-    ckDBs(new XQuery("db:store('" + NAME + "', '" + FILE + "', 'foo')"), true, NAME_LIST);
-    ckDBs(new XQuery("db:output('foo')"), true, NONE);
-    ckDBs(new XQuery("db:flush('" + NAME + "')"), true, NAME_LIST);
+    ckDBs(new XQuery(_DB_CREATE.args(NAME)), true, NAME_LIST);
+    ckDBs(new XQuery(_DB_CREATE.args(NAME, FILE)), true, NAME_LIST);
+    ckDBs(new XQuery(_DB_CREATE.args(NAME, "<foo/>", FILE)), true, NAME_LIST);
+    ckDBs(new XQuery(_DB_CREATE.args(NAME, FILE, FILE)), true, NAME_LIST);
+    ckDBs(new XQuery(_DB_DROP.args(NAME)), true, NAME_LIST);
+    ckDBs(new XQuery(_DB_ADD.args(NAME, FILE)), true, NAME_LIST);
+    ckDBs(new XQuery(_DB_ADD.args(NAME, "<foo/>", FILE)), true, NAME_LIST);
+    ckDBs(new XQuery(_DB_ADD.args(NAME, FILE, FILE)), true, NAME_LIST);
+    ckDBs(new XQuery(_DB_DELETE.args(NAME, FILE)), true, NAME_LIST);
+    ckDBs(new XQuery(_DB_OPTIMIZE.args(NAME)), true, NAME_LIST);
+    ckDBs(new XQuery(_DB_OPTIMIZE.args(NAME, "true()")), true, NAME_LIST);
+    ckDBs(new XQuery(_DB_RENAME.args(NAME, FILE, FILE + '2')), true, NAME_LIST);
+    ckDBs(new XQuery(_DB_REPLACE.args(NAME, FILE, FILE + '2')), true, NAME_LIST);
+    ckDBs(new XQuery(_DB_STORE.args(NAME, FILE, "foo")), true, NAME_LIST);
+    ckDBs(new XQuery(_DB_OUTPUT.args("foo")), true, NONE);
+    ckDBs(new XQuery(_DB_FLUSH.args(NAME)), true, NAME_LIST);
 
     // Helper Functions
-    ckDBs(new XQuery("db:exists('" + NAME + "')"), false, NAME_LIST);
-    ckDBs(new XQuery("db:is-raw('" + NAME + "', '" + FILE + "')"), false, NAME_LIST);
-    ckDBs(new XQuery("db:is-xml('" + NAME + "', '" + FILE + "')"), false, NAME_LIST);
-    ckDBs(new XQuery("db:content-type('" + NAME + "', '" + FILE + "')"), false,
-        NAME_LIST);
-    ckDBs(new XQuery("db:event('foo', 'bar')"), false, NONE);
-    ckDBs(new XQuery("db:event('foo', doc('" + NAME + "'))"), false, NAME_LIST);
+    ckDBs(new XQuery(_DB_EXISTS.args(NAME)), false, NAME_LIST);
+    ckDBs(new XQuery(_DB_IS_RAW.args(NAME, FILE)), false, NAME_LIST);
+    ckDBs(new XQuery(_DB_IS_XML.args(NAME, FILE)), false, NAME_LIST);
+    ckDBs(new XQuery(_DB_CONTENT_TYPE.args(NAME, FILE)), false, NAME_LIST);
+    ckDBs(new XQuery(_DB_EVENT.args("foo", "bar")), false, NONE);
+    ckDBs(new XQuery(_DB_EVENT.args("foo", DOC.args(NAME))), false, NAME_LIST);
   }
 
   /** Test ft module. */
   @Test
   public void ft() {
-    ckDBs(new XQuery("ft:search('" + NAME + "', 'foo')"), false, NAME_LIST);
-    ckDBs(new XQuery("ft:tokens('" + NAME + "')"), false, NAME_LIST);
-    ckDBs(new XQuery("ft:tokens('" + NAME + "', 'foo')"), false, NAME_LIST);
-    ckDBs(new XQuery("ft:tokenize('foo')"), false, NONE);
+    ckDBs(new XQuery(_FT_SEARCH.args(NAME, "foo")), false, NAME_LIST);
+    ckDBs(new XQuery(_FT_TOKENS.args(NAME)), false, NAME_LIST);
+    ckDBs(new XQuery(_FT_TOKENS.args(NAME, "foo")), false, NAME_LIST);
+    ckDBs(new XQuery(_FT_TOKENIZE.args("foo")), false, NONE);
   }
 
   /** Test index module. */
   @Test
   public void index() {
-    ckDBs(new XQuery("index:facets('" + NAME + "')"), false, NAME_LIST);
-    ckDBs(new XQuery("index:texts('" + NAME + "')"), false, NAME_LIST);
-    ckDBs(new XQuery("index:texts('" + NAME + "', 'foo')"), false, NAME_LIST);
-    ckDBs(new XQuery("index:texts('" + NAME + "', 'foo', true())"), false, NAME_LIST);
-    ckDBs(new XQuery("index:attributes('" + NAME + "')"), false, NAME_LIST);
-    ckDBs(new XQuery("index:attributes('" + NAME + "', 'foo')"), false, NAME_LIST);
-    ckDBs(new XQuery("index:attributes('" + NAME + "', 'foo', true())"), false,
-        NAME_LIST);
-    ckDBs(new XQuery("index:element-names('" + NAME + "')"), false, NAME_LIST);
-    ckDBs(new XQuery("index:attribute-names('" + NAME + "')"), false, NAME_LIST);
+    ckDBs(new XQuery(_INDEX_FACETS.args(NAME)), false, NAME_LIST);
+    ckDBs(new XQuery(_INDEX_TEXTS.args(NAME)), false, NAME_LIST);
+    ckDBs(new XQuery(_INDEX_TEXTS.args(NAME, "foo")), false, NAME_LIST);
+    ckDBs(new XQuery(_INDEX_TEXTS.args(NAME, "foo", "true()")), false, NAME_LIST);
+    ckDBs(new XQuery(_INDEX_ATTRIBUTES.args(NAME)), false, NAME_LIST);
+    ckDBs(new XQuery(_INDEX_ATTRIBUTES.args(NAME, "foo")), false, NAME_LIST);
+    ckDBs(new XQuery(_INDEX_ATTRIBUTES.args(NAME, "foo", "true()")), false, NAME_LIST);
+    ckDBs(new XQuery(_INDEX_ELEMENT_NAMES.args(NAME)), false, NAME_LIST);
+    ckDBs(new XQuery(_INDEX_ATTRIBUTE_NAMES.args(NAME)), false, NAME_LIST);
   }
 
   /** Test repository module. */
   @Test
   public void repository() {
-//    ckDBs(new XQuery("repo:install('" + FILE + "')"), true, REPO_LIST);
-//    ckDBs(new XQuery("repo:install('foo')"), true, REPO_LIST);
-    ckDBs(new XQuery("repo:list()"), false, REPO_LIST);
+    ckDBs(new XQuery(_REPO_LIST.args()), false, REPO_LIST);
   }
 
   /** Test XQuery module. */
   @Test
   public void xqueryModule() {
-    ckDBs(new XQuery("xquery:eval('1')"), false, null);
-    ckDBs(new XQuery("xquery:eval('" + FILE + "')"), false, null);
-    ckDBs(new XQuery("xquery:type(doc('" + NAME + "'))"), false, NAME_LIST);
+    ckDBs(new XQuery(_XQUERY_EVAL.args(1)), false, null);
+    ckDBs(new XQuery(_XQUERY_EVAL.args(FILE)), false, null);
+    ckDBs(new XQuery(_XQUERY_TYPE.args(DOC.args(NAME))), false, NAME_LIST);
   }
 
   /**
