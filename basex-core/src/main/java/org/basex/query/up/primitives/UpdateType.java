@@ -52,9 +52,6 @@ public enum UpdateType {
 
   // User operations
 
-  /** Grant permissions.    */ DBUSERGRANT,
-  /** Drop user on db.      */ DBUSERDROP,
-
   /** Change user name.     */ USERGRANT,
   /** Change password.      */ USERPASSWORD,
   /** Drop user.            */ USERDROP,

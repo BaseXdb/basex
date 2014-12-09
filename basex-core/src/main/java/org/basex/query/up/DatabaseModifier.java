@@ -20,9 +20,10 @@ final class DatabaseModifier extends ContextModifier {
   void add(final Update update, final QueryContext qc) throws QueryException {
     // check permissions
     if(update instanceof NameUpdate) {
-      if(!qc.context.perm(Perm.CREATE, null)) throw BASX_PERM_X.get(update.info(), Perm.CREATE);
+      if(!qc.context.perm(Perm.CREATE, ((NameUpdate) update).name()))
+        throw BASX_PERM_X.get(update.info(), Perm.CREATE);
     } else if(update instanceof DataUpdate) {
-      if(!qc.context.perm(Perm.WRITE, ((DataUpdate) update).data().meta))
+      if(!qc.context.perm(Perm.WRITE, ((DataUpdate) update).data().meta.name))
         throw BASX_PERM_X.get(update.info(), Perm.WRITE);
     } else if(update instanceof UserUpdate) {
       if(!qc.context.perm(Perm.ADMIN, null)) throw BASX_PERM_X.get(update.info(), Perm.ADMIN);

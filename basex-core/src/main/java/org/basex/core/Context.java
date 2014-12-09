@@ -231,13 +231,11 @@ public final class Context {
   /**
    * Checks if the current user has the specified permission.
    * @param perm requested permission
-   * @param md optional meta data reference
+   * @param db database
    * @return result of check
    */
-  public boolean perm(final Perm perm, final MetaData md) {
-    final User us = md == null || perm == Perm.CREATE || perm == Perm.ADMIN ? null :
-      md.users.get(user.name());
-    return (us == null ? user : us).has(perm);
+  public boolean perm(final Perm perm, final String db) {
+    return user.has(perm, db);
   }
 
   /**

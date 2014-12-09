@@ -22,6 +22,8 @@ public final class User {
   /** Stored password codes. */
   private final EnumMap<Algorithm, EnumMap<Code, String>> passwords =
       new EnumMap<>(Algorithm.class);
+  /** Local permissions. */
+  private final HashMap<String, Perm> locals = new HashMap<>();
   /** User name. */
   private String name;
   /** Permission. */
@@ -34,7 +36,8 @@ public final class User {
    * @param perm rights
    */
   public User(final String name, final String password, final Perm perm) {
-    this(name, perm);
+    this.name = name;
+    this.perm = perm;
     for(final Algorithm algo : Algorithm.values()) {
       passwords.put(algo, new EnumMap<Code, String>(Code.class));
     }
@@ -42,25 +45,13 @@ public final class User {
   }
 
   /**
-   * Constructor.
-   * @param name user name
-   * @param perm rights
-   */
-  public User(final String name, final Perm perm) {
-    this.name = name;
-    this.perm = perm;
-  }
-
-  /**
    * Parses a single user from the specified node.
    * @param user user node
-   * @param global global permissions
    * @throws BaseXException database exception
    */
-  public User(final ANode user, final boolean global) throws BaseXException {
+  public User(final ANode user) throws BaseXException {
     name = string(attribute("Root", user, NAME));
     perm = attribute(name, user, PERMISSION, Perm.values());
-    if(!global) return;
 
     for(final ANode password : children(user, PASSWORD)) {
       final EnumMap<Code, String> ec = new EnumMap<>(Code.class);
@@ -85,6 +76,13 @@ public final class User {
     for(final Algorithm algo : Algorithm.values()) {
       if(passwords.get(algo) == null) throw new BaseXException(name + ": " + algo + " missing.");
     }
+
+    // parse local permissions
+    for(final ANode database : children(user, DATABASE)) {
+      final String nm = string(attribute(name, database, NAME));
+      final Perm prm = attribute(name, user, PERMISSION, Perm.values());
+      locals.put(nm, prm);
+    }
   }
 
   /**
@@ -102,6 +100,10 @@ public final class User {
         }
         xml.close();
       }
+      for(final Entry<String, Perm> local : locals.entrySet()) {
+        xml.open(DATABASE, NAME, local.getKey(), PERMISSION, local.getValue());
+        xml.close();
+      }
     }
     xml.close();
   }
@@ -112,6 +114,22 @@ public final class User {
    */
   public void name(final String nm) {
     name = nm;
+  }
+
+  /**
+   * Removes local permissions.
+   * @param db name of database
+   */
+  public void remove(final String db) {
+    locals.remove(db);
+  }
+
+  /**
+   * Returns the local permissions.
+   * @return local permissions
+   */
+  public HashMap<String, Perm> local() {
+    return locals;
   }
 
   /**
@@ -155,20 +173,29 @@ public final class User {
   }
 
   /**
-   * Returns the permission.
+   * Returns the global permission, or the permission for a specific database.
+   * @param db database (can be {@code null})
    * @return permission
    */
-  public Perm perm() {
-    return perm;
+  public Perm perm(final String db) {
+    if(db == null) return perm;
+    final Perm lp = locals.get(db);
+    return lp == null ? perm : lp;
   }
 
   /**
    * Sets the permission.
    * @param prm permission
+   * @param db database (can be {@code null})
    */
-  public void perm(final Perm prm) {
-    perm = prm;
+  public void perm(final Perm prm, final String db) {
+    if(db == null) {
+      perm = prm;
+    } else {
+      locals.put(db, prm);
+    }
   }
+
 
   /**
    * Tests if the user has the specified permission.
@@ -176,7 +203,17 @@ public final class User {
    * @return result of check
    */
   public boolean has(final Perm prm) {
-    return perm.num >= prm.num;
+    return has(prm, null);
+  }
+
+  /**
+   * Tests if the user has the specified permission.
+   * @param db database
+   * @param prm permission to be checked
+   * @return result of check
+   */
+  public boolean has(final Perm prm, final String db) {
+    return perm(db).num >= prm.num;
   }
 
   /**

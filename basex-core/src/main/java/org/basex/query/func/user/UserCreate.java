@@ -20,11 +20,12 @@ public final class UserCreate extends UserFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     checkAdmin(qc);
-    final String name = toName(exprs[0], qc);
+    final String name = checkSessions(toName(0, qc), qc);
     final String pw = Token.string(toToken(exprs[1], qc));
+    final Perm perm = exprs.length > 2 ? toPerm(2, qc) : null;
     if(name.equals(UserText.ADMIN)) throw BXUS_ADMIN.get(info);
 
-    qc.resources.updates().add(new Create(name, pw, qc, ii), qc);
+    qc.resources.updates().add(new Create(name, pw, perm, qc, ii), qc);
     return null;
   }
 
@@ -39,25 +40,29 @@ public final class UserCreate extends UserFn {
     private final String name;
     /** Password. */
     private final String pw;
+    /** Permission. */
+    private final Perm perm;
 
     /**
      * Constructor.
      * @param name user name
      * @param pw password
+     * @param perm permission
      * @param qc query context
      * @param info input info
      */
-    private Create(final String name, final String pw, final QueryContext qc,
+    private Create(final String name, final String pw, final Perm perm, final QueryContext qc,
         final InputInfo info) {
-      super(UpdateType.USERCREATE, null, qc, info);
+      super(UpdateType.USERCREATE, null, null, qc, info);
       this.name = name;
       this.pw = pw;
+      this.perm = perm;
     }
 
     @Override
     public void apply() {
-      if(user != null) users.drop(user);
-      users.create(name, pw);
+      if(user != null) users.drop(user, null);
+      users.create(name, pw, perm);
     }
 
     @Override

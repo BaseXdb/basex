@@ -23,18 +23,19 @@ public final class UserListDetails extends UserList {
     checkAdmin(qc);
 
     final ValueBuilder vb = new ValueBuilder();
-    final boolean global = exprs.length == 0;
-    for(final User us : users(global, qc)) {
-      final String perm = us.perm().toString().toLowerCase(Locale.ENGLISH);
+    for(final User us : qc.context.users.users(null)) {
+      final String perm = us.perm(null).toString().toLowerCase(Locale.ENGLISH);
       final FElem user = new FElem(USER).add(NAME, us.name()).add(PERMISSION, perm);
-      if(global) {
-        for(final Entry<Algorithm, EnumMap<Code, String>> codes : us.alg().entrySet()) {
-          final FElem password = new FElem(PASSWORD).add(ALGORITHM, codes.getKey().toString());
-          for(final Entry<Code, String> code : codes.getValue().entrySet()) {
-            password.add(new FElem(code.getKey().toString()).add(code.getValue()));
-          }
-          user.add(password);
+      for(final Entry<Algorithm, EnumMap<Code, String>> codes : us.alg().entrySet()) {
+        final FElem password = new FElem(PASSWORD).add(ALGORITHM, codes.getKey().toString());
+        for(final Entry<Code, String> code : codes.getValue().entrySet()) {
+          password.add(new FElem(code.getKey().toString()).add(code.getValue()));
         }
+        user.add(password);
+      }
+      for(final Entry<String, Perm> local : us.local().entrySet()) {
+        user.add(new FElem(DATABASE).add(NAME, local.getKey()).
+            add(PERMISSION, local.getValue().toString()));
       }
       vb.add(user);
     }

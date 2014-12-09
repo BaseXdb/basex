@@ -99,7 +99,7 @@ public final class DbListDetails extends DbList {
         res.add(RESOURCES, token(meta.ndocs.intValue()));
         res.add(MDATE, DateTime.format(new Date(meta.dbtime()), DateTime.FULL));
         res.add(SIZE, token(meta.dbsize()));
-        if(ctx.perm(Perm.CREATE, meta)) res.add(PATH, meta.original);
+        if(ctx.perm(Perm.CREATE, name)) res.add(PATH, meta.original);
         res.add(name);
         return res;
       }

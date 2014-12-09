@@ -86,7 +86,7 @@ public class CommandLockingTest extends SandboxTest {
     ckDBs(new Flush(), true, CTX_LIST);
     ckDBs(new Get("DBPATH"), false, NONE);
     ckDBs(new Grant("all", NAME), true, ADMIN_LIST);
-    ckDBs(new Grant("all", NAME, NAME), true, ADMIN_NAME);
+    ckDBs(new Grant("all", NAME, NAME), true, ADMIN_LIST);
     ckDBs(new Grant("all", NAME, NAME + '*'), true, null);
     ckDBs(new Help("HELP"), false, NONE);
     ckDBs(new Info(), false, NONE);
@@ -200,9 +200,9 @@ public class CommandLockingTest extends SandboxTest {
   @Test
   public void user() {
     ckDBs(new XQuery(_USER_LIST.args()), false, ADMIN_LIST);
-    ckDBs(new XQuery(_USER_LIST.args(NAME)), false, ADMIN_NAME);
+    ckDBs(new XQuery(_USER_LIST.args(NAME)), false, ADMIN_LIST);
     ckDBs(new XQuery(_USER_LIST_DETAILS.args()), false, ADMIN_LIST);
-    ckDBs(new XQuery(_USER_LIST_DETAILS.args(NAME)), false, ADMIN_NAME);
+    ckDBs(new XQuery(_USER_LIST_DETAILS.args(NAME)), false, ADMIN_LIST);
   }
 
   /** Test database module. */

@@ -1135,16 +1135,17 @@ public enum Function {
   /** XQuery function. */
   _USER_EXISTS(UserExists.class, "exists(name)", arg(STR), BLN, flag(NDT), USER_URI),
   /** XQuery function. */
-  _USER_LIST(UserList.class, "list([database])", arg(STR), ELM_ZM, flag(NDT), USER_URI),
+  _USER_LIST(UserList.class, "list()", arg(), ELM_ZM, flag(NDT), USER_URI),
   /** XQuery function. */
-  _USER_LIST_DETAILS(UserListDetails.class, "list-details([database])",
-      arg(STR), ELM_ZM, flag(NDT), USER_URI),
+  _USER_LIST_DETAILS(UserListDetails.class, "list-details()", arg(), ELM_ZM, flag(NDT), USER_URI),
   /** XQuery function. */
-  _USER_CREATE(UserCreate.class, "create(name,password)", arg(STR, STR), EMP, flag(UPD), USER_URI),
+  _USER_CREATE(UserCreate.class, "create(name,password[,permission])",
+      arg(STR, STR, STR), EMP, flag(UPD), USER_URI),
   /** XQuery function. */
-  _USER_DROP(UserDrop.class, "drop(name)", arg(STR), EMP, flag(UPD), USER_URI),
+  _USER_DROP(UserDrop.class, "drop(name[,database])", arg(STR, STR), EMP, flag(UPD), USER_URI),
   /** XQuery function. */
-  _USER_GRANT(UserGrant.class, "grant(name,permission)", arg(STR, STR), EMP, flag(UPD), USER_URI),
+  _USER_GRANT(UserGrant.class, "grant(name,permission[,database])",
+      arg(STR, STR, STR), EMP, flag(UPD), USER_URI),
   /** XQuery function. */
   _USER_ALTER(UserAlter.class, "alter(name,newname)", arg(STR, STR), EMP, flag(UPD), USER_URI),
   /** XQuery function. */

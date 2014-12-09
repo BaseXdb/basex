@@ -67,6 +67,7 @@ abstract class AUser extends Command {
         for(final String db : dbs) ok &= run(user, db);
       }
     }
+    context.users.write();
     return ok;
   }
 

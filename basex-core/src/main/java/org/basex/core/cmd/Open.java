@@ -81,25 +81,18 @@ public final class Open extends Command {
   public static Data open(final String name, final Context context, final MainOptions options)
       throws IOException {
 
+    // check permissions
+    if(!context.perm(Perm.READ, name)) throw new BaseXException(PERM_REQUIRED_X, Perm.READ);
+
     synchronized(context.dbs) {
       Data data = context.dbs.pin(name);
-      if(data != null) {
-        // check permissions in opened database
-        if(!context.perm(Perm.READ, data.meta)) {
-          context.dbs.unpin(data);
-          throw new BaseXException(PERM_REQUIRED_X, Perm.READ);
-        }
-      } else {
+      if(data == null) {
         // check if the addressed database exists
         if(!context.soptions.dbexists(name)) throw new BaseXException(dbnf(name));
 
         // do not open a database that is currently updated
         final MetaData meta = new MetaData(name, options, context.soptions);
         if(meta.updateFile().exists()) throw new BaseXException(Text.DB_UPDATED_X, meta.name);
-
-        // check permissions
-        meta.users.read();
-        if(!context.perm(Perm.READ, meta)) throw new BaseXException(PERM_REQUIRED_X, Perm.READ);
 
         // open database
         data = new DiskData(meta);

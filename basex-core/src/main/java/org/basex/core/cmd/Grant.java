@@ -2,14 +2,9 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
-import java.io.*;
-
-import org.basex.core.locks.*;
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.CmdPerm;
 import org.basex.core.users.*;
-import org.basex.data.*;
-import org.basex.util.*;
 
 /**
  * Evaluates the 'grant' command and grants permissions to users.
@@ -65,43 +60,11 @@ public final class Grant extends AUser {
     // admin cannot be modified
     if(name.equals(UserText.ADMIN)) return !info(ADMIN_STATIC);
 
-    // set global permissions
     final Users users = context.users;
     final User user = users.get(name);
-    if(db == null) {
-      users.perm(user, prm);
-      users.write();
-      return info(GRANTED_X_X, args[0], name);
-    }
-
-    // set local permissions
-    final Data data;
-    try {
-      data = Open.open(db, context, options);
-    } catch(final IOException ex) {
-      return !info(Util.message(ex));
-    }
-
-    // try to lock database
-    if(!startUpdate(data)) return false;
-
-    final User us = data.meta.users.get(name);
-    if(us == null) {
-      // create new local user
-      data.meta.users.add(new User(name, prm));
-    } else {
-      us.perm(prm);
-    }
-    if(!finishUpdate(data)) return false;
-
-    Close.close(data, context);
-    return info(GRANTED_ON_X_X_X, args[0], name, db);
-  }
-
-  @Override
-  public void databases(final LockResult lr) {
-    super.databases(lr);
-    if(!databases(lr.write, 2)) lr.writeAll = true;
+    users.perm(user, prm, db);
+    users.write();
+    return info(db == null ? GRANTED_X_X : GRANTED_ON_X_X_X, args[0], name, db);
   }
 
   @Override

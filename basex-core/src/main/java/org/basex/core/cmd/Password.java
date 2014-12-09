@@ -22,9 +22,11 @@ public final class Password extends AUser {
 
   @Override
   protected boolean run() {
+    final Users users = context.users;
     final User user = context.user();
     final String pass = args[0];
-    context.users.password(user, pass);
+    users.password(user, pass);
+    users.write();
     return info(PW_CHANGED_X, user.name());
   }
 

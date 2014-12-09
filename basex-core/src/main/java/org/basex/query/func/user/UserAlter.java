@@ -20,8 +20,8 @@ public final class UserAlter extends UserFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     checkAdmin(qc);
-    final User user = toUser(exprs[0], qc);
-    final String newname = toName(exprs[1], qc);
+    final User user = checkSessions(toUser(0, qc), qc);
+    final String newname = checkSessions(toName(1, qc), qc);
     if(Strings.eq(UserText.ADMIN, user.name(), newname)) throw BXUS_ADMIN.get(info);
 
     qc.resources.updates().add(new Alter(user, newname, qc, ii), qc);
@@ -47,14 +47,14 @@ public final class UserAlter extends UserFn {
      */
     private Alter(final User user, final String newname, final QueryContext qc,
         final InputInfo info) {
-      super(UpdateType.USERALTER, user, qc, info);
+      super(UpdateType.USERALTER, user, null, qc, info);
       this.newname = newname;
     }
 
     @Override
     public void apply() {
       final User old = users.get(newname);
-      if(old != null) users.drop(old);
+      if(old != null) users.drop(old, null);
       users.alter(user, newname);
     }
 

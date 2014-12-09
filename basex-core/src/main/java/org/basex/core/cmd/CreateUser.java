@@ -30,7 +30,9 @@ public final class CreateUser extends AUser {
     if(!Databases.validName(name)) return error(NAME_INVALID_X, name);
     if(name.equals(UserText.ADMIN)) return error(ADMIN_STATIC);
 
-    context.users.create(name, pw);
+    final Users users = context.users;
+    users.create(name, pw, null);
+    users.write();
     return info(USER_CREATED_X, args[0]);
   }
 

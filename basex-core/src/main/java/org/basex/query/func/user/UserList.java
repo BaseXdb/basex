@@ -1,5 +1,7 @@
 package org.basex.query.func.user;
 
+import java.util.*;
+
 import org.basex.core.locks.*;
 import org.basex.core.users.*;
 import org.basex.query.*;
@@ -26,9 +28,8 @@ public class UserList extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     checkAdmin(qc);
 
-    final boolean global = exprs.length == 0;
-    final User[] users = users(global, qc);
-    final TokenList tl = new TokenList(users.length);
+    final ArrayList<User> users = qc.context.users.users(null);
+    final TokenList tl = new TokenList(users.size());
     for(final User user : users) tl.add(user.name());
     return StrSeq.get(tl);
   }
@@ -37,17 +38,5 @@ public class UserList extends StandardFunc {
   public final boolean accept(final ASTVisitor visitor) {
     return visitor.lock(DBLocking.ADMIN) &&
         (exprs.length == 0 || dataLock(visitor, 0)) && super.accept(visitor);
-  }
-
-  /**
-   * Returns global or local users.
-   * @param global global/local flag
-   * @param qc query context
-   * @return users
-   * @throws QueryException query exception
-   */
-  public final User[] users(final boolean global, final QueryContext qc) throws QueryException {
-    return global ? qc.context.users.users(null) :
-      checkData(qc).meta.users.users(qc.context.users);
   }
 }

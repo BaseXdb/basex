@@ -20,15 +20,12 @@ public final class UserGrant extends UserFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     checkAdmin(qc);
-    final User user = toUser(exprs[0], qc);
-    final String perm = Token.string(toToken(exprs[1], qc));
-
+    final User user = checkSessions(toUser(0, qc), qc);
+    final Perm perm = toPerm(1, qc);
+    final String db = toDB(2, qc);
     if(user.name().equals(UserText.ADMIN)) throw BXUS_ADMIN.get(info);
 
-    final Perm p = Perm.get(perm);
-    if(p == null) throw BXUS_PERM_X.get(info, perm);
-
-    qc.resources.updates().add(new Grant(user, p, qc, ii), qc);
+    qc.resources.updates().add(new Grant(user, perm, db, qc, ii), qc);
     return null;
   }
 
@@ -46,17 +43,19 @@ public final class UserGrant extends UserFn {
      * Constructor.
      * @param user user
      * @param perm permission
+     * @param db database
      * @param qc query context
      * @param info input info
      */
-    private Grant(final User user, final Perm perm, final QueryContext qc, final InputInfo info) {
-      super(UpdateType.USERGRANT, user, qc, info);
+    private Grant(final User user, final Perm perm, final String db, final QueryContext qc,
+        final InputInfo info) {
+      super(UpdateType.USERGRANT, user, db, qc, info);
       this.perm = perm;
     }
 
     @Override
     public void apply() {
-      users.perm(user, perm);
+      for(final String db : databases) users.perm(user, perm, db);
     }
 
     @Override

@@ -10,7 +10,7 @@ import static org.basex.util.Token.*;
  */
 public interface UserText {
   /** User name. */
-  String[] S_USERINFO = { "Username", "Read", "Write", "Create", "Admin" };
+  String[] S_USERINFO = { "Username", "Permission" };
   /** Default user and password. */
   String ADMIN = "admin";
 
@@ -24,6 +24,8 @@ public interface UserText {
   byte[] ALGORITHM = token("algorithm");
   /** Password. */
   byte[] PASSWORD = token("password");
+  /** Database. */
+  byte[] DATABASE = token("database");
   /** Perm. */
   byte[] PERMISSION = token("permission");
 }

@@ -289,7 +289,7 @@ public final class QueryContext extends Proc implements AutoCloseable {
       // cache the initial context nodes
       final DBNodes nodes = context.current();
       if(nodes != null) {
-        if(!context.perm(Perm.READ, nodes.data.meta)) throw BASX_PERM_X.get(null, Perm.READ);
+        if(!context.perm(Perm.READ, nodes.data.meta.name)) throw BASX_PERM_X.get(null, Perm.READ);
         value = resources.compile(nodes);
       }
     }

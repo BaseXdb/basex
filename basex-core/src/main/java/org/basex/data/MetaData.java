@@ -10,7 +10,6 @@ import java.util.concurrent.atomic.*;
 import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
@@ -29,8 +28,6 @@ public final class MetaData {
 
   /** Database name. */
   public volatile String name;
-  /** Database users. */
-  public volatile Users users;
 
   /** Encoding of original document. */
   public volatile String encoding = UTF8;
@@ -128,7 +125,6 @@ public final class MetaData {
     maxcats = options.get(MainOptions.MAXCATS);
     stopwords = options.get(MainOptions.STOPWORDS);
     language = Language.get(options);
-    users = new Users(path == null ? null : dbfile(DATAPRM), false);
   }
 
   // STATIC METHODS ==========================================================
@@ -280,7 +276,7 @@ public final class MetaData {
       if(k.isEmpty()) break;
       if(k.equals(DBPERM)) {
         // legacy (Version < 8)
-        users.read(in);
+        for(int u = in.readNum(); u > 0; --u) { in.readToken(); in.readToken(); in.readNum(); }
       } else {
         final String v = Token.string(in.readToken());
         if(k.equals(DBSTR))           storage    = v;

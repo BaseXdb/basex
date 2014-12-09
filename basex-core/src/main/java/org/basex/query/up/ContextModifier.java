@@ -106,6 +106,7 @@ public abstract class ContextModifier {
    */
   final void apply(final QueryContext qc) throws QueryException {
     for(final UserUpdates up : userUpdates.values()) up.apply();
+    if(!userUpdates.isEmpty()) qc.context.users.write();
 
     // apply initial updates based on database names
     for(final NameUpdates up : nameUpdates.values()) up.apply(true);

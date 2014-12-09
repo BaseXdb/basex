@@ -249,19 +249,23 @@ public enum QueryError {
   /** BXUS0001. */
   BXUS_NAME_X(BXUS, 1, "Invalid user name '%'."),
   /** BXUS0002. */
-  BXUS_EXISTS_X(BXUS, 2, "User '%' already exists."),
+  BXUS_DB_X(BXUS, 2, "Invalid database name '%'."),
   /** BXUS0003. */
-  BXUS_WHICH_X(BXUS, 3, "User '%' does not exist."),
+  BXUS_EXISTS_X(BXUS, 3, "User '%' already exists."),
   /** BXUS0004. */
-  BXUS_ONCE_X_X(BXUS, 4, "User '%' can only be % once."),
+  BXUS_WHICH_X(BXUS, 4, "User '%' does not exist."),
   /** BXUS0005. */
-  BXUS_ADMIN(BXUS, 5, "Admin user cannot be modified."),
+  BXUS_ONCE_X_X(BXUS, 5, "User '%' can only be % once."),
   /** BXUS0006. */
-  BXUS_PERM_X(BXUS, 6, "Unknown permission: %."),
+  BXUS_ADMIN(BXUS, 6, "Admin user cannot be modified."),
   /** BXUS0007. */
-  BXUS_ALTERDROP_X(BXUS, 7, "User '%' cannot be both altered and dropped."),
+  BXUS_PERM_X(BXUS, 7, "Unknown permission: %."),
   /** BXUS0008. */
-  BXUS_SAME_X(BXUS, 8, "Name of source and target user is equal: %."),
+  BXUS_ALTERDROP_X(BXUS, 8, "User '%' cannot be both altered and dropped."),
+  /** BXUS0009. */
+  BXUS_SAME_X(BXUS, 9, "Name of source and target user is equal: %."),
+  /** BXUS0010. */
+  BXUS_SESSION_X(BXUS, 10, "User % is currently logged in."),
 
   // EXPath modules
 

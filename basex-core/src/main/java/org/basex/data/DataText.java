@@ -111,8 +111,6 @@ public interface DataText {
   String DATADOC = "doc";
   /** Database - ID->PRE mapping. */
   String DATAIDP = "idp";
-  /** Database - Permissions. */
-  String DATAPRM = "prm";
 
   // XML SERIALIZATION ============================================================================
 

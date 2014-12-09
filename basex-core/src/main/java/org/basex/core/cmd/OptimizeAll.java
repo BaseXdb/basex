@@ -137,7 +137,6 @@ public final class OptimizeAll extends ACreate {
         dt.meta.createattr = ometa.createattr;
         dt.meta.createftxt = ometa.createftxt;
         dt.meta.filesize   = ometa.filesize;
-        dt.meta.users      = ometa.users;
         dt.meta.dirty      = true;
 
         // move binary files

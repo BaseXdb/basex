@@ -78,11 +78,11 @@ public abstract class Command extends Proc {
    */
   public final void execute(final Context ctx, final OutputStream os) throws BaseXException {
     // check if data reference is available
-    final Data dt = ctx.data();
-    if(dt == null && openDB) throw new BaseXException(NO_DB_OPENED);
+    final Data data = ctx.data();
+    if(data == null && openDB) throw new BaseXException(NO_DB_OPENED);
 
     // check permissions
-    if(!ctx.perm(perm, dt != null ? dt.meta : null))
+    if(!ctx.perm(perm, data != null && !data.inMemory() ? data.meta.name : null))
       throw new BaseXException(PERM_REQUIRED_X, perm);
 
     // set updating flag
