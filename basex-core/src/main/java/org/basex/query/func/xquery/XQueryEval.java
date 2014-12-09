@@ -68,7 +68,7 @@ public class XQueryEval extends StandardFunc {
     try(final QueryContext qctx = qc.proc(new QueryContext(qc))) {
       if(exprs.length > 2) {
         final Options opts = toOptions(2, Q_OPTIONS, new XQueryOptions(), qc);
-        user.perm(Perm.get(opts.get(XQueryOptions.PERMISSION).name()), null);
+        user.perm(Perm.get(opts.get(XQueryOptions.PERMISSION).toString()), null);
 
         // initial memory consumption: perform garbage collection and calculate usage
         Performance.gc(2);

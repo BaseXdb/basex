@@ -21,10 +21,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-14, BSD License
  * @author Lukas Kircher
  */
-public class FNCryptoTest {
-  /** Database context. */
-  private static Context context;
-
+public class FNCryptoTest extends SandboxTest{
   /** User home directory. */
   private static final String KEYSTORE_DIR = System.getProperty("user.home");
   /** Java home directory. */
@@ -120,7 +117,6 @@ public class FNCryptoTest {
     Thread.sleep(2000); // give the keytool some time to finish
     if(proc.exitValue() != 0) throw new RuntimeException("Cannot initialize keystore.");
 
-    context = new Context();
     // turn off pretty printing
     final SerializerOptions sopts = new SerializerOptions();
     sopts.set(SerializerOptions.INDENT, YesNo.NO);
@@ -132,7 +128,6 @@ public class FNCryptoTest {
    */
   @AfterClass
   public static void finish() {
-    context.close();
     new File(KEYSTORE).delete();
   }
 

@@ -9,6 +9,7 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import org.basex.core.*;
+import org.basex.io.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 
@@ -22,8 +23,8 @@ public final class User {
   /** Stored password codes. */
   private final EnumMap<Algorithm, EnumMap<Code, String>> passwords =
       new EnumMap<>(Algorithm.class);
-  /** Local permissions. */
-  private final HashMap<String, Perm> locals = new HashMap<>();
+  /** Local permissions, using database names or glob patterns as key. */
+  private final LinkedHashMap<String, Perm> locals = new LinkedHashMap<>();
   /** User name. */
   private String name;
   /** Permission. */
@@ -56,25 +57,26 @@ public final class User {
     for(final ANode password : children(user, PASSWORD)) {
       final EnumMap<Code, String> ec = new EnumMap<>(Code.class);
       final Algorithm algo = attribute(name, password, ALGORITHM, Algorithm.values());
-      if(passwords.containsKey(algo))
-        throw new BaseXException(name + ": " + algo + " occurs more than once.");
+      if(passwords.containsKey(algo)) throw new BaseXException(
+          name + ": Algorithm \"" + algo + "\" supplied more than once.");
       passwords.put(algo, ec);
 
       for(final ANode code : children(password, null)) {
         final Code cd = value(name, code.qname().id(), algo.codes);
-        if(ec.containsKey(cd))
-          throw new BaseXException(name + ", " + algo + ": " + code + " occurs more than once.");
+        if(ec.containsKey(cd)) throw new BaseXException(
+            name + ", " + algo + ": Code \"" + code + "\" supplied more than once.");
         ec.put(cd, string(code.string()));
       }
       for(final Code code : algo.codes) {
         if(ec.get(code) == null)
-          throw new BaseXException(name + ", " + algo + ": " + code + " missing.");
+          throw new BaseXException(name + ", " + algo + ": Code \"" + code + "\" missing.");
       }
     }
 
     // create missing entries
     for(final Algorithm algo : Algorithm.values()) {
-      if(passwords.get(algo) == null) throw new BaseXException(name + ": " + algo + " missing.");
+      if(passwords.get(algo) == null) throw new BaseXException(
+          name + ": Algorithm \"" + algo + "\" missing.");
     }
 
     // parse local permissions
@@ -118,7 +120,7 @@ public final class User {
 
   /**
    * Removes local permissions.
-   * @param db name of database
+   * @param db database pattern
    */
   public void remove(final String db) {
     locals.remove(db);
@@ -128,7 +130,7 @@ public final class User {
    * Returns the local permissions.
    * @return local permissions
    */
-  public HashMap<String, Perm> local() {
+  public Map<String, Perm> locals() {
     return locals;
   }
 
@@ -178,15 +180,29 @@ public final class User {
    * @return permission
    */
   public Perm perm(final String db) {
-    if(db == null) return perm;
-    final Perm lp = locals.get(db);
-    return lp == null ? perm : lp;
+    if(db != null) {
+      final Entry<String, Perm> entry = find(db);
+      if(entry != null) return entry.getValue();
+    }
+    return perm;
+  }
+
+  /**
+   * Returns the first entry for the specific database.
+   * @param db database
+   * @return entry, or {@code null}
+   */
+  public Entry<String, Perm> find(final String db) {
+    for(final Entry<String, Perm> entry : locals.entrySet()) {
+      if(db.matches(IOFile.regex(entry.getKey()))) return entry;
+    }
+    return null;
   }
 
   /**
    * Sets the permission.
    * @param prm permission
-   * @param db database (can be {@code null})
+   * @param db database pattern (can be {@code null})
    */
   public void perm(final Perm prm, final String db) {
     if(db == null) {
@@ -208,12 +224,12 @@ public final class User {
 
   /**
    * Tests if the user has the specified permission.
-   * @param db database
    * @param prm permission to be checked
+   * @param db database (can be {@code null})
    * @return result of check
    */
   public boolean has(final Perm prm, final String db) {
-    return perm(db).num >= prm.num;
+    return perm(db).ordinal() >= prm.ordinal();
   }
 
   /**
@@ -234,5 +250,12 @@ public final class User {
    */
   public static String digest(final String name, final String password) {
     return md5(name + ':' + Prop.NAME + ':' + password);
+  }
+
+  @Override
+  public String toString() {
+    final XMLBuilder xml = new XMLBuilder().indent();
+    write(xml);
+    return xml.toString();
   }
 }

@@ -100,6 +100,11 @@ public final class XMLBuilder {
     return cache.finish();
   }
 
+  @Override
+  public String toString() {
+    return cache.toString();
+  }
+
   /**
    * Finishes an opening element.
    */

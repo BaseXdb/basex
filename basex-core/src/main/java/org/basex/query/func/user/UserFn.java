@@ -26,7 +26,7 @@ public abstract class UserFn extends StandardFunc {
   protected final String toDB(final int i, final QueryContext qc) throws QueryException {
     if(i >= exprs.length) return null;
     final String name = Token.string(toToken(exprs[i], qc));
-    if(!Databases.validName(name)) throw BXUS_DB_X.get(info, name);
+    if(!Databases.validName(name, true)) throw BXUS_DB_X.get(info, name);
     return name;
   }
 

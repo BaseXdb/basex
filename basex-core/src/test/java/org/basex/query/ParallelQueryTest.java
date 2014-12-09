@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import java.util.*;
 
-import org.basex.core.*;
+import org.basex.*;
 import org.junit.*;
 
 /**
@@ -13,12 +13,9 @@ import org.junit.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class ParallelQueryTest {
+public final class ParallelQueryTest extends SandboxTest {
   /** Query. */
   private static final String QUERY = "count((for $i in 1 to 50000 return <a><b/></a>)/b)";
-
-  /** Context. */
-  private final Context context = new Context();
   /** Error. */
   private Throwable error;
   /** Reference result. */

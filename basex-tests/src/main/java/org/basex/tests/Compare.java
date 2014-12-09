@@ -3,6 +3,7 @@ package org.basex.tests;
 import java.io.*;
 import java.util.*;
 
+import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
@@ -15,7 +16,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public abstract class Compare {
+public abstract class Compare extends SandboxTest {
   /** XSLT flag; not set to 'final' to circumvent dead-code warnings. */
   private static boolean xsltMode;
   /** Verbose mode. */
@@ -54,9 +55,6 @@ public abstract class Compare {
   };
   /** Selected processors. */
   private static final String[][] PROCS = xsltMode ? XSLTPROCS : XQUERYPROCS;
-
-  /** Database context. */
-  private static Context context = new Context();
 
   /**
    * Main method of the test class.

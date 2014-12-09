@@ -8,7 +8,7 @@ import java.net.*;
 import java.util.concurrent.*;
 
 import org.basex.*;
-import org.basex.core.*;
+import org.basex.api.client.*;
 import org.basex.core.cmd.*;
 import org.basex.core.users.*;
 import org.basex.http.*;
@@ -24,20 +24,13 @@ import org.junit.Test;
  * @author BaseX Team 2005-14, BSD License
  * @author Dimitar Popov
  */
-public class RESTConcurrencyTest {
+public class RESTConcurrencyTest extends SandboxTest {
   /** Time-out in (ms): increase if running on a slower system. */
   private static final long TIMEOUT = 600;
   /** Socket time-out in (ms). */
   private static final int SOCKET_TIMEOUT = 3000;
-  /** Test database name. */
-  private static final String DBNAME = Util.className(RESTConcurrencyTest.class);
-  /** Context to create and drop the test database. */
-  private static final Context CTX = new Context();
   /** BaseX HTTP base URL. */
-  static final String BASE_URL = "http://localhost:8984/rest/" + DBNAME;
-
-  /** BaseX HTTP server instance under test. */
-  private Process basexHTTPServer;
+  static final String BASE_URL = "http://localhost:8984/rest/" + NAME;
 
   /**
    * Create a test database and start BaseXHTTP.
@@ -45,8 +38,10 @@ public class RESTConcurrencyTest {
    */
   @Before
   public void setUp() throws Exception {
-    createTestDatabase(DBNAME);
     startBaseXHTTP();
+    try(final ClientSession cs = new ClientSession(context, UserText.ADMIN, UserText.ADMIN)) {
+      cs.execute(new CreateDB(NAME));
+    }
   }
 
   /**
@@ -55,8 +50,10 @@ public class RESTConcurrencyTest {
    */
   @After
   public void tearDown() throws Exception {
+    try(final ClientSession cs = new ClientSession(context, UserText.ADMIN, UserText.ADMIN)) {
+      cs.execute(new DropDB(NAME));
+    }
     stopBaseXHTTP();
-    dropTestDatabase(DBNAME);
   }
 
   /**
@@ -178,7 +175,7 @@ public class RESTConcurrencyTest {
 
   /** Start BaseX HTTP. */
   private void startBaseXHTTP() {
-    basexHTTPServer = Util.start(BaseXHTTP.class, "-U" + UserText.ADMIN, "-P" + UserText.ADMIN);
+    Util.start(BaseXHTTP.class, "-U" + UserText.ADMIN, "-P" + UserText.ADMIN);
     Performance.sleep(TIMEOUT); // give the server some time to stop
   }
 
@@ -186,27 +183,6 @@ public class RESTConcurrencyTest {
   private void stopBaseXHTTP() {
     Util.start(BaseXHTTP.class, "stop");
     Performance.sleep(TIMEOUT); // give the server some time to stop
-    basexHTTPServer.destroy();
-    Performance.sleep(TIMEOUT); // give the server some time to stop
-  }
-
-  /**
-   * Create a database with the given name.
-   * @param name database name
-   * @throws IOException error during database creation
-   */
-  private static void createTestDatabase(final String name) throws IOException {
-    new CreateDB(name).execute(CTX);
-    new Close().execute(CTX);
-  }
-
-  /**
-   * Drop a database with the given name.
-   * @param name database name
-   * @throws IOException error during database drop
-   */
-  private static void dropTestDatabase(final String name) throws IOException {
-    new DropDB(name).execute(CTX);
   }
 
   // REST API:

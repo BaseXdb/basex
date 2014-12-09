@@ -42,7 +42,6 @@ public abstract class HTTPTest extends SandboxTest {
    * @throws Exception exception
    */
   protected static void init(final String rt, final boolean local) throws Exception {
-    initContext(CONTEXT);
     assertTrue(new IOFile(CONTEXT.soptions.get(StaticOptions.WEBPATH)).md());
     root = rt;
 

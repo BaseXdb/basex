@@ -17,9 +17,9 @@ public final class Databases {
   /** Allowed characters for database names (additional to letters and digits).
    * The following characters are invalid:
    * <ul>
-   * <li> {@code ,?*}" are used by the glob syntax</li>
-   * <li> {@code ;} is reserved for separating commands.</li>
-   * <li> {@code :*?\"<>\/|}" are used for filenames and paths</li>
+   *   <li> {@code ,?*}" are used by the glob syntax</li>
+   *   <li> {@code ;} is reserved for separating commands.</li>
+   *   <li> {@code :*?\"<>\/|}" are used for filenames and paths</li>
    * </ul>
    */
   public static final String DBCHARS = "-+=~!#$%^&()[]{}@'`";

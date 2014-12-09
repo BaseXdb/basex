@@ -106,14 +106,19 @@ public class CommandTest extends SandboxTest {
   /** Command test. */
   @Test
   public final void alterUser() {
+    // admin cannot be renamed
     no(new AlterUser(ADMIN, NAME));
     no(new AlterUser(NAME, ADMIN));
+    // invalid name
     no(new AlterUser(":", NAME));
     no(new AlterUser(NAME, ":"));
+    // unknown user
     no(new AlterUser("unknown", NAME));
 
+    // create and rename user
     ok(new CreateUser(NAME, NAME));
     ok(new AlterUser(NAME, NAME2));
+    // rename to existing user
     ok(new CreateUser(NAME, NAME));
     no(new AlterUser(NAME, NAME2));
   }
@@ -561,7 +566,7 @@ public class CommandTest extends SandboxTest {
   @Test
   public final void showUsers() {
     ok(new ShowUsers());
-    no(new ShowUsers(NAME));
+    ok(new ShowUsers(NAME));
     ok(new CreateDB(NAME));
     ok(new ShowUsers(NAME));
     no(new ShowUsers(":"));

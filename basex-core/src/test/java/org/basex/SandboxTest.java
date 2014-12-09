@@ -13,6 +13,7 @@ import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
+import org.basex.util.options.*;
 import org.junit.*;
 
 /**
@@ -23,41 +24,25 @@ import org.junit.*;
  */
 public abstract class SandboxTest {
   /** Default output stream. */
-  static final PrintStream OUT = System.out;
+  public static final PrintStream OUT = System.out;
   /** Default error stream. */
-  protected static final PrintStream ERR = System.err;
+  public static final PrintStream ERR = System.err;
   /** Null output stream. */
-  protected static final PrintStream NULL = new PrintStream(new NullOutput());
+  public static final PrintStream NULL = new PrintStream(new NullOutput());
   /** Test name. */
   protected static final String NAME = Util.className(SandboxTest.class);
   /** Database context. */
   protected static Context context;
-  /** Clean up files. */
-  protected static boolean cleanup;
 
   /**
    * Creates the sandbox.
    */
   @BeforeClass
-  public static void createContext() {
+  public static void initSandbox() {
     final IOFile sb = sandbox();
     sb.delete();
     assertTrue("Sandbox could not be created.", sb.md());
-    context = new Context();
-    initContext(context);
-    cleanup = true;
-  }
-
-  /**
-   * Initializes the specified context.
-   * @param ctx context
-   */
-  protected static void initContext(final Context ctx) {
-    final IOFile sb = sandbox();
-    ctx.soptions.set(StaticOptions.DBPATH, sb.path() + "/data");
-    ctx.soptions.set(StaticOptions.WEBPATH, sb.path() + "/webapp");
-    ctx.soptions.set(StaticOptions.RESTXQPATH, sb.path() + "/webapp");
-    ctx.soptions.set(StaticOptions.REPOPATH, sb.path() + "/repo");
+    context = newContext();
   }
 
   /**
@@ -65,9 +50,27 @@ public abstract class SandboxTest {
    */
   @AfterClass
   public static void closeContext() {
-    if(cleanup) {
-      context.close();
-      assertTrue("Sandbox could not be deleted.", sandbox().delete());
+    context.close();
+    assertTrue("Sandbox could not be deleted.", sandbox().delete());
+  }
+
+  /**
+   * Creates a new specified context.
+   * @return context
+   */
+  public static Context newContext() {
+    final IOFile sb = sandbox();
+    Options.setSystem(StaticOptions.DBPATH.name(), sb.path() + "/data");
+    Options.setSystem(StaticOptions.WEBPATH.name(), sb.path() + "/webapp");
+    Options.setSystem(StaticOptions.RESTXQPATH.name(), sb.path() + "/webapp");
+    Options.setSystem(StaticOptions.REPOPATH.name(), sb.path() + "/repo");
+    try {
+      return new Context();
+    } finally {
+      Options.setSystem(StaticOptions.DBPATH.name(), "");
+      Options.setSystem(StaticOptions.WEBPATH.name(), "");
+      Options.setSystem(StaticOptions.RESTXQPATH.name(), "");
+      Options.setSystem(StaticOptions.REPOPATH.name(), "");
     }
   }
 
@@ -77,7 +80,7 @@ public abstract class SandboxTest {
    * @return server instance
    * @throws IOException I/O exception
    */
-  protected static BaseXServer createServer(final String... args) throws IOException {
+  public static BaseXServer createServer(final String... args) throws IOException {
     try {
       System.setOut(NULL);
       final StringList sl = new StringList().add("-z").add("-p9999").add("-e9998").add("-q");
@@ -95,7 +98,7 @@ public abstract class SandboxTest {
    * @param server server
    * @throws IOException I/O exception
    */
-  protected static void stopServer(final BaseXServer server) throws IOException {
+  public static void stopServer(final BaseXServer server) throws IOException {
     try {
       System.setOut(NULL);
       if(server != null) server.stop();
@@ -110,7 +113,7 @@ public abstract class SandboxTest {
    * @return client instance
    * @throws IOException I/O exception
    */
-  protected static ClientSession createClient(final String... login) throws IOException {
+  public static ClientSession createClient(final String... login) throws IOException {
     final String user = login.length > 0 ? login[0] : UserText.ADMIN;
     final String pass = login.length > 1 ? login[1] : UserText.ADMIN;
     return new ClientSession(S_LOCALHOST, 9999, user, pass);
@@ -120,7 +123,7 @@ public abstract class SandboxTest {
    * Returns the sandbox database path.
    * @return database path
    */
-  protected static IOFile sandbox() {
+  public static IOFile sandbox() {
     return new IOFile(Prop.TMP, NAME);
   }
 

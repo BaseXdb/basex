@@ -2,6 +2,7 @@ package org.basex.api.xmldb;
 
 import static org.basex.core.Text.*;
 
+import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.users.*;
@@ -9,10 +10,11 @@ import org.basex.util.*;
 
 /**
  * Base class for all XMLDB tests.
- * @author dimitar
  *
+ * @author BaseX Team 2005-14, BSD License
+ * @author Dimitar Popov
  */
-public abstract class XMLDBBaseTest {
+public abstract class XMLDBBaseTest extends SandboxTest {
   /** Test document. */
   static final String DOCPATH = "src/test/resources/";
   /** XMLDB driver. */

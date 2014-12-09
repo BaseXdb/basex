@@ -51,10 +51,10 @@ public final class UserModuleTest extends AdvancedQueryTest {
     query(_USER_LIST_DETAILS.args() + "/@name = '" + NAME + '\'', "true");
     // check if local user is found
     new Grant(Perm.READ, NAME, NAME).execute(context);
-    query(_USER_LIST_DETAILS.args(NAME) + "/@name = '" + NAME + '\'', "true");
+    query(_USER_LIST_DETAILS.args() + "/database/@name = '" + NAME + '\'', "true");
     // check if user has been removed
     new DropUser(NAME).execute(context);
-    query(_USER_LIST_DETAILS.args(NAME) + "/@name = '" + NAME + '\'', "false");
+    query(_USER_LIST_DETAILS.args() + "/database/@name = '" + NAME + '\'', "false");
     query(_USER_LIST_DETAILS.args() + "/@name = '" + NAME + '\'', "false");
   }
 }

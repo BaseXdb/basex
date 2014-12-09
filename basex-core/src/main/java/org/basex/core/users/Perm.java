@@ -10,35 +10,15 @@ import java.util.*;
  */
 public enum Perm {
   /** No permissions. */
-  NONE(0),
+  NONE,
   /** Read permission (local+global). */
-  READ(1),
+  READ,
   /** Write permission (local+global). */
-  WRITE(2),
+  WRITE,
   /** Create permission (global). */
-  CREATE(4),
+  CREATE,
   /** Admin permission (global). */
-  ADMIN(8);
-
-  /** Permission. */
-  public final int num;
-
-  /**
-   * Constructor.
-   * @param num numeric representation
-   */
-  Perm(final int num) {
-    this.num = num;
-  }
-
-  /**
-   * Returns the permission with less privileges.
-   * @param perm permission to be compared
-   * @return permission
-   */
-  public Perm min(final Perm perm) {
-    return num < perm.num ? this : perm;
-  }
+  ADMIN;
 
   /**
    * Returns the permission with more privileges.
@@ -46,17 +26,7 @@ public enum Perm {
    * @return permission
    */
   public Perm max(final Perm perm) {
-    return num > perm.num ? this : perm;
-  }
-
-  /**
-   * Returns a permission matching the specified number.
-   * @param num numeric representation
-   * @return permission, or {@link #ADMIN} if no match is found
-   */
-  static Perm get(final int num) {
-    for(final Perm p : values()) if(p.num == num) return p;
-    return ADMIN;
+    return ordinal() > perm.ordinal() ? this : perm;
   }
 
   /**
@@ -65,7 +35,7 @@ public enum Perm {
    * @return permission, or {@code null} if no match is found
    */
   public static Perm get(final String perm) {
-    for(final Perm p : values()) if(p.name().equalsIgnoreCase(perm)) return p;
+    for(final Perm p : values()) if(p.toString().equals(perm)) return p;
     return null;
   }
 

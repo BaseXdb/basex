@@ -463,7 +463,11 @@ public class Options implements Iterable<Option<?>> {
    */
   public static void setSystem(final String key, final Object val) {
     final String name = key.indexOf('.') == -1 ? DBPREFIX + key.toLowerCase(Locale.ENGLISH) : key;
-    if(System.getProperty(name) == null) System.setProperty(name, val.toString());
+    final String value = val.toString();
+    if(System.getProperty(name) == null) {
+      if(value.isEmpty()) System.clearProperty(name);
+      else System.setProperty(name, val.toString());
+    }
   }
 
   /**

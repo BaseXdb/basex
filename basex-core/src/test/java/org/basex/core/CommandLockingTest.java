@@ -43,8 +43,6 @@ public class CommandLockingTest extends SandboxTest {
   private static final StringList NAME_CTX = new StringList(NAME, DBLocking.CTX);
   /** StringList containing ADMIN lock string. */
   private static final StringList ADMIN_LIST = new StringList(DBLocking.ADMIN);
-  /** StringList containing ADMIN lock string and name. */
-  private static final StringList ADMIN_NAME = new StringList(DBLocking.ADMIN, NAME);
   /** StringList containing REPO lock string. */
   private static final StringList REPO_LIST = new StringList(DBLocking.REPO);
   /** StringList containing BACKUP lock string. */
@@ -87,7 +85,7 @@ public class CommandLockingTest extends SandboxTest {
     ckDBs(new Get("DBPATH"), false, NONE);
     ckDBs(new Grant("all", NAME), true, ADMIN_LIST);
     ckDBs(new Grant("all", NAME, NAME), true, ADMIN_LIST);
-    ckDBs(new Grant("all", NAME, NAME + '*'), true, null);
+    ckDBs(new Grant("all", NAME, NAME + '*'), true, ADMIN_LIST);
     ckDBs(new Help("HELP"), false, NONE);
     ckDBs(new Info(), false, NONE);
     ckDBs(new InfoDB(), false, CTX_LIST);
@@ -114,7 +112,7 @@ public class CommandLockingTest extends SandboxTest {
     ckDBs(new ShowEvents(), false, EVENT_LIST);
     ckDBs(new ShowSessions(), false, NONE);
     ckDBs(new ShowUsers(), false, ADMIN_LIST);
-    ckDBs(new ShowUsers(NAME), false, ADMIN_NAME);
+    ckDBs(new ShowUsers(NAME), false, ADMIN_LIST);
     ckDBs(new Store(FILE), true, CTX_LIST);
   }
 
@@ -200,9 +198,7 @@ public class CommandLockingTest extends SandboxTest {
   @Test
   public void user() {
     ckDBs(new XQuery(_USER_LIST.args()), false, ADMIN_LIST);
-    ckDBs(new XQuery(_USER_LIST.args(NAME)), false, ADMIN_LIST);
     ckDBs(new XQuery(_USER_LIST_DETAILS.args()), false, ADMIN_LIST);
-    ckDBs(new XQuery(_USER_LIST_DETAILS.args(NAME)), false, ADMIN_LIST);
   }
 
   /** Test database module. */

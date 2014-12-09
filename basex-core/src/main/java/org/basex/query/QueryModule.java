@@ -49,16 +49,16 @@ public abstract class QueryModule {
    * Permission required to call a function.
    */
   public enum Permission {
-    /** Admin permissions. */
-    ADMIN,
-    /** Create permissions. */
-    CREATE,
-    /** Write permissions. */
-    WRITE,
+    /** No permissions. */
+    NONE,
     /** Read permissions. */
     READ,
-    /** No permissions. */
-    NONE
+    /** Write permissions. */
+    WRITE,
+    /** Create permissions. */
+    CREATE,
+    /** Admin permissions. */
+    ADMIN
   }
 
   /**

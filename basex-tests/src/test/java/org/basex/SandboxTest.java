@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 import static org.junit.Assert.*;
 
 import java.io.*;
+import java.util.concurrent.*;
 
 import org.basex.api.client.*;
 import org.basex.core.*;
@@ -12,6 +13,7 @@ import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
+import org.basex.util.options.*;
 import org.junit.*;
 
 /**
@@ -28,34 +30,19 @@ public abstract class SandboxTest {
   /** Null output stream. */
   public static final PrintStream NULL = new PrintStream(new NullOutput());
   /** Test name. */
-  public static final String NAME = Util.className(SandboxTest.class);
+  protected static final String NAME = Util.className(SandboxTest.class);
   /** Database context. */
-  public static Context context;
-  /** Clean up files. */
-  public static boolean cleanup;
+  protected static Context context;
 
   /**
    * Creates the sandbox.
    */
   @BeforeClass
-  public static void createContext() {
+  public static void initSandbox() {
     final IOFile sb = sandbox();
     sb.delete();
     assertTrue("Sandbox could not be created.", sb.md());
-    context = new Context();
-    initContext(context);
-    cleanup = true;
-  }
-
-  /**
-   * Initializes the specified context.
-   * @param ctx context
-   */
-  protected static void initContext(final Context ctx) {
-    final IOFile sb = sandbox();
-    ctx.soptions.set(StaticOptions.DBPATH, sb.path() + "/data");
-    ctx.soptions.set(StaticOptions.WEBPATH, sb.path() + "/webapp");
-    ctx.soptions.set(StaticOptions.REPOPATH, sb.path() + "/repo");
+    context = newContext();
   }
 
   /**
@@ -63,9 +50,27 @@ public abstract class SandboxTest {
    */
   @AfterClass
   public static void closeContext() {
-    if(cleanup) {
-      context.close();
-      assertTrue("Sandbox could not be deleted.", sandbox().delete());
+    context.close();
+    assertTrue("Sandbox could not be deleted.", sandbox().delete());
+  }
+
+  /**
+   * Creates a new specified context.
+   * @return context
+   */
+  public static Context newContext() {
+    final IOFile sb = sandbox();
+    Options.setSystem(StaticOptions.DBPATH.name(), sb.path() + "/data");
+    Options.setSystem(StaticOptions.WEBPATH.name(), sb.path() + "/webapp");
+    Options.setSystem(StaticOptions.RESTXQPATH.name(), sb.path() + "/webapp");
+    Options.setSystem(StaticOptions.REPOPATH.name(), sb.path() + "/repo");
+    try {
+      return new Context();
+    } finally {
+      Options.setSystem(StaticOptions.DBPATH.name(), "");
+      Options.setSystem(StaticOptions.WEBPATH.name(), "");
+      Options.setSystem(StaticOptions.RESTXQPATH.name(), "");
+      Options.setSystem(StaticOptions.REPOPATH.name(), "");
     }
   }
 
@@ -75,12 +80,12 @@ public abstract class SandboxTest {
    * @return server instance
    * @throws IOException I/O exception
    */
-  protected static BaseXServer createServer(final String... args) throws IOException {
-    System.setOut(NULL);
+  public static BaseXServer createServer(final String... args) throws IOException {
     try {
+      System.setOut(NULL);
       final StringList sl = new StringList().add("-z").add("-p9999").add("-e9998").add("-q");
       for(final String a : args) sl.add(a);
-      final BaseXServer server = new BaseXServer(sl.toArray());
+      final BaseXServer server = new BaseXServer(sl.finish());
       server.context.soptions.set(StaticOptions.DBPATH, sandbox().path());
       return server;
     } finally {
@@ -93,9 +98,9 @@ public abstract class SandboxTest {
    * @param server server
    * @throws IOException I/O exception
    */
-  protected static void stopServer(final BaseXServer server) throws IOException {
-    System.setOut(NULL);
+  public static void stopServer(final BaseXServer server) throws IOException {
     try {
+      System.setOut(NULL);
       if(server != null) server.stop();
     } finally {
       System.setOut(OUT);
@@ -118,7 +123,51 @@ public abstract class SandboxTest {
    * Returns the sandbox database path.
    * @return database path
    */
-  protected static IOFile sandbox() {
+  public static IOFile sandbox() {
     return new IOFile(Prop.TMP, NAME);
+  }
+
+  /** Client. */
+  public static final class Client extends Thread {
+    /** Start signal. */
+    private final CountDownLatch startSignal;
+    /** Stop signal. */
+    private final CountDownLatch stopSignal;
+    /** Client session. */
+    private final ClientSession session;
+    /** Command string. */
+    private final Command cmd;
+    /** Fail flag. */
+    public String error;
+
+    /**
+     * Client constructor.
+     * @param c command string to execute
+     * @param start start signal
+     * @param stop stop signal
+     * @throws IOException I/O exception while establishing the session
+     */
+    public Client(final Command c, final CountDownLatch start, final CountDownLatch stop)
+        throws IOException {
+
+      session = createClient();
+      cmd = c;
+      startSignal = start;
+      stopSignal = stop;
+      start();
+    }
+
+    @Override
+    public void run() {
+      try {
+        if(startSignal != null) startSignal.await();
+        session.execute(cmd);
+        session.close();
+      } catch(final Throwable ex) {
+        error = "\n" + cmd + '\n' + ex;
+      } finally {
+        if(stopSignal != null) stopSignal.countDown();
+      }
+    }
   }
 }

@@ -9,7 +9,6 @@ import org.basex.core.locks.*;
 import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Abstract class for user commands.
@@ -42,39 +41,27 @@ abstract class AUser extends Command {
    * @return success flag
    */
   boolean run(final int off, final boolean opt) {
-    final String u = args[off];
-    final String d = off + 1 < args.length ? args[off + 1] : null;
+    final String name = args[off];
+    final String db = off + 1 < args.length ? args[off + 1] : null;
 
-    if(!Databases.validName(u, true)) return error(NAME_INVALID_X, u);
-    if(d != null && !Databases.validName(d, true)) return error(NAME_INVALID_X, d);
+    if(!Databases.validName(name, true)) return error(NAME_INVALID_X, name);
+    if(db != null && !Databases.validName(db, true)) return error(NAME_INVALID_X, db);
 
     // retrieve all users; stop if no user is found
-    final String[] users = users(u);
-    if(users.length == 0) return info(UNKNOWN_USER_X, u) && opt;
-    // retrieve all databases
-    StringList dbs = null;
-    if(d != null) {
-      dbs = context.databases.listDBs(d);
-      if(dbs.isEmpty()) return info(DB_NOT_FOUND_X, d) && opt;
-    }
+    final String[] users = users(name);
+    if(users.length == 0) return info(UNKNOWN_USER_X, name) && opt;
 
     // loop through all users
     boolean ok = true;
-    for(final String user : users) {
-      if(dbs == null) {
-        ok &= run(user, null);
-      } else {
-        for(final String db : dbs) ok &= run(user, db);
-      }
-    }
+    for(final String user : users) ok &= run(user, db);
     context.users.write();
     return ok;
   }
 
   /**
-   * Runs the command for the specified user and database.
+   * Runs the command for the specified user and database pattern.
    * @param user user to be modified
-   * @param db database to be modified
+   * @param db database pattern
    * @return success flag
    */
   @SuppressWarnings("unused")

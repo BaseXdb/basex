@@ -129,12 +129,12 @@ public final class StaticOptions extends Options {
   }
 
   /**
-   * Returns a reference to a database directory.
-   * @param db name of the database
+   * Returns a reference to a file or database in the database directory.
+   * @param name name of the file or database
    * @return database directory
    */
-  public IOFile dbpath(final String db) {
-    return new IOFile(get(DBPATH), db);
+  public IOFile dbpath(final String name) {
+    return new IOFile(get(DBPATH), name);
   }
 
   /**

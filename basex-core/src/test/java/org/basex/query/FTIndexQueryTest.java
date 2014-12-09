@@ -3,17 +3,12 @@ package org.basex.query;
 import static org.basex.query.func.Function.*;
 import static org.junit.Assert.*;
 
-import java.lang.annotation.*;
-
 import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.query.simple.*;
 import org.basex.util.*;
-import org.junit.*;
 import org.junit.Test;
-import org.junit.rules.*;
-import org.junit.runners.model.*;
 
 /**
  * Test if index and non-index full-text queries behave the same way.
@@ -21,62 +16,40 @@ import org.junit.runners.model.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Dimitar Popov
  */
-@InputData("<x>A x B</x>")
 public final class FTIndexQueryTest extends SandboxTest {
-  /** Name of database with full-text index. */
-  private static final String NAME_IX = NAME + "ix";
-  /** Context of database with full-text index. */
-  private static final Context CTX_IX = new Context();
-
-  /** Rule to create database without full-text index. */
-  @Rule
-  public final CreateDBRule createdb = new CreateDBRule(NAME, context);
-
-  /** Rule to create database with full-text index. */
-  @Rule
-  public final CreateDBRule createdbix = new CreateDBRule(NAME_IX, CTX_IX);
-
-  /** Static initialization. */
-  @BeforeClass
-  public static void setUpClass() {
-    context.options.set(MainOptions.FTINDEX, false);
-    CTX_IX.options.set(MainOptions.FTINDEX, true);
-    initContext(CTX_IX);
+  /**
+   * Initializes the test with the given input.
+   * @param input input
+   * @throws BaseXException database exception
+   */
+  private static void init(final String input) throws BaseXException {
+    new CreateDB(NAME, input).execute(SandboxTest.context);
+    new Set(MainOptions.FTINDEX, true).execute(SandboxTest.context);
+    new CreateDB(NAME + "ix", input).execute(SandboxTest.context);
   }
 
-  /** Static clean-up. */
-  @AfterClass
-  public static void cleanUpClass() {
-    CTX_IX.close();
-  }
-
-  /** Run all tests from {@link FTTest}. */
+  /**
+   * Run all tests from {@link FTTest}.
+   * @throws BaseXException database exception
+   */
   @Test
-  @InputData(FTTest.DOC)
-  public void testFTTest() {
-    for(final Object[] q : FTTest.QUERIES)
+  public void testFTTest() throws BaseXException {
+    init(FTTest.DOC);
+    for(final Object[] q : FTTest.QUERIES) {
       if(q.length == 3) assertQuery((String) q[2]);
+    }
   }
 
-  /** Word distance test. */
+  /**
+   * Word distance test.
+   * @throws BaseXException database exception
+   */
   @Test
-  public void testWordsDistance() {
-    assertQuery(
-        "//*[text() contains text 'A B' all words distance exactly 0 words]");
-  }
-
-  /** {@code ft:mark()} test with ft option {@code all words}. */
-  @Test
-  public void testFTMarkAllWords() {
-    assertQuery(
-        _FT_MARK.args(" //*[text() contains text {'A B'} all words], 'b'"));
-  }
-
-  /** {@code ft:mark()} test with {@code ftand}. */
-  @Test
-  public void testFTMarkFTAnd() {
-    assertQuery(
-        _FT_MARK.args(" //*[text() contains text 'A' ftand 'B'], 'b'"));
+  public void testWordsDistance() throws BaseXException {
+    init("<x>A x B</x>");
+    assertQuery("//*[text() contains text 'A B' all words distance exactly 0 words]");
+    assertQuery(_FT_MARK.args(" //*[text() contains text {'A B'} all words], 'b'"));
+    assertQuery(_FT_MARK.args(" //*[text() contains text 'A' ftand 'B'], 'b'"));
   }
 
   /**
@@ -85,60 +58,16 @@ public final class FTIndexQueryTest extends SandboxTest {
    */
   private static void assertQuery(final String q) {
     try {
-      assertEquals("Query failed:\n" + q + '\n',
-          new XQuery(q).execute(context), new XQuery(q).execute(CTX_IX));
+      new Open(NAME).execute(context);
+      final String result1 = new XQuery(q).execute(context);
+      new Open(NAME + "ix").execute(context);
+      final String result2 = new XQuery(q).execute(context);
+      assertEquals("Query failed:\n" + q + '\n', result1, result2);
     } catch(final BaseXException ex) {
       final AssertionError err = new AssertionError(
           "Query failed:\n" + q + "\nMessage: " + Util.message(ex));
       err.initCause(ex);
       throw err;
     }
-  }
-}
-
-/** Annotation to provide input data for a test. */
-@Retention(RetentionPolicy.RUNTIME)
-@interface InputData {
-  /**
-   * Input data.
-   * @return string
-   */
-  String value();
-}
-
-/**
- * Test rule, creating a database before executing each test method, which is
- * annotated with {@link InputData}.
- */
-class CreateDBRule implements MethodRule {
-  /** Database context. */
-  private final Context ctx;
-  /** Database name. */
-  private final String db;
-
-  /**
-   * Constructor.
-   * @param d database
-   * @param c database context
-   */
-  CreateDBRule(final String d, final Context c) {
-    db = d;
-    ctx = c;
-  }
-
-  @Override
-  public Statement apply(final Statement base, final FrameworkMethod method, final Object target) {
-    return new Statement() {
-      @Override
-      public void evaluate() throws Throwable {
-        InputData input = method.getAnnotation(InputData.class);
-        if(input == null) {
-          input = method.getMethod().getDeclaringClass().getAnnotation(InputData.class);
-        }
-        if(input != null) new CreateDB(db, input.value()).execute(ctx);
-        base.evaluate();
-        if(input != null) new DropDB(db).execute(ctx);
-      }
-    };
   }
 }

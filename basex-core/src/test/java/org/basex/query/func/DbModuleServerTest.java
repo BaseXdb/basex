@@ -2,7 +2,6 @@ package org.basex.query.func;
 
 import static org.basex.query.func.Function.*;
 import static org.junit.Assert.*;
-
 import java.io.*;
 import java.util.concurrent.*;
 

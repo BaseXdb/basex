@@ -8,6 +8,7 @@ import java.lang.reflect.*;
 import java.lang.reflect.Array;
 import java.math.*;
 import java.net.*;
+import java.util.*;
 
 import javax.xml.datatype.*;
 import javax.xml.namespace.*;
@@ -25,7 +26,6 @@ import org.basex.query.value.type.*;
 import org.basex.query.value.type.Type;
 import org.basex.util.*;
 import org.w3c.dom.*;
-import org.w3c.dom.Text;
 
 /**
  * This class contains common methods for executing Java code and mapping
@@ -185,7 +185,7 @@ public abstract class JavaMapping extends Arr {
     // check if user has sufficient permissions to call the function
     Perm perm = Perm.ADMIN;
     final QueryModule.Requires req = meth.getAnnotation(QueryModule.Requires.class);
-    if(req != null) perm = Perm.get(req.value().name());
+    if(req != null) perm = Perm.get(req.value().name().toLowerCase(Locale.ENGLISH));
     if(!qc.context.user().has(perm)) return null;
 
     // Add module locks to QueryContext.

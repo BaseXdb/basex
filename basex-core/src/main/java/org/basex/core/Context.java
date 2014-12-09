@@ -231,7 +231,7 @@ public final class Context {
   /**
    * Checks if the current user has the specified permission.
    * @param perm requested permission
-   * @param db database
+   * @param db database (can be {@code null})
    * @return result of check
    */
   public boolean perm(final Perm perm, final String db) {

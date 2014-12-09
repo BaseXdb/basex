@@ -44,7 +44,7 @@ public abstract class SessionTest extends SandboxTest {
   @After
   public final void stopSession() {
     try {
-      if(cleanup) session.execute(new DropDB(NAME));
+      session.execute(new DropDB(NAME));
       session.close();
     } catch(final IOException ex) {
       fail(Util.message(ex));

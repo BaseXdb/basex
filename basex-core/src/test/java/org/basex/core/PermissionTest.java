@@ -268,7 +268,7 @@ public final class PermissionTest extends SandboxTest {
     ok(new Grant(ADMIN, "test2"), testSession);
     ok(new Grant("create", "test2"), testSession);
     ok(new AlterPassword(NAME, NAME), testSession);
-    ok(new AlterUser("test2", "test3"), testSession);
+    ok(new AlterUser("test2", "test4"), testSession);
     ok(new DropUser("test3"), testSession);
     ok(new Close(), testSession);
     ok(new Close(), adminSession);

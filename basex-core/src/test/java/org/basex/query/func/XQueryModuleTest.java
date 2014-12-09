@@ -2,7 +2,6 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
-
 import org.basex.query.*;
 import org.junit.*;
 

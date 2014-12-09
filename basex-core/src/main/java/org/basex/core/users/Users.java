@@ -1,11 +1,12 @@
 package org.basex.core.users;
 
 import static org.basex.core.users.UserText.*;
-import static org.basex.util.XMLAccess.*;
 import static org.basex.util.Token.*;
+import static org.basex.util.XMLAccess.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.Map.*;
 import java.util.regex.*;
 
 import org.basex.build.*;
@@ -23,8 +24,8 @@ import org.basex.util.list.*;
  */
 public final class Users {
   /** User array. */
-  private final ArrayList<User> users = new ArrayList<>(0);
-  /** Filename; set to {@code null} if the instance handles local users. */
+  private final LinkedHashMap<String, User> users = new LinkedHashMap<>();
+  /** Filename. */
   private final IOFile file;
 
   /**
@@ -32,34 +33,37 @@ public final class Users {
    * @param sopts static options
    */
   public Users(final StaticOptions sopts) {
-    file = globalPath(sopts);
+    file = sopts.dbpath(Token.string(UserText.USERS) + IO.XMLSUFFIX);
     read();
     // ensure that default admin user exists
-    if(get(ADMIN) == null) users.add(new User(ADMIN, ADMIN, Perm.ADMIN));
+    if(get(ADMIN) == null) users.put(ADMIN, new User(ADMIN, ADMIN, Perm.ADMIN));
   }
 
   /**
    * Reads user permissions.
    */
   public synchronized void read() {
-    if(file == null || !file.exists()) return;
+    if(!file.exists()) return;
 
     try {
       final byte[] io = file.read();
       final IOContent content = new IOContent(io, file.path());
-      // legacy: ignore contents of older permission files
-      if(!startsWith(io, '<')) return;
-
       final MainOptions options = new MainOptions(false);
       options.set(MainOptions.INTPARSE, true);
       final ANode doc = new DBNode(Parser.singleParser(content, options, ""));
       final ANode root = children(doc, USERS).next();
       if(root == null) {
-        Util.errln(file.name() + ": Missing 'users' root element.");
+        Util.errln(file.name() + ": No 'users' root element.");
       } else {
         for(final ANode child : children(root, USER)) {
           try {
-            users.add(new User(child));
+            final User user = new User(child);
+            final String name = user.name();
+            if(users.get(name) != null) {
+              Util.errln(file.name() + ": User \"" + name + "\" supplied more than once.");
+            } else {
+              users.put(name, user);
+            }
           } catch(final BaseXException ex) {
             // reject users with faulty data
             Util.errln(file.name() + ": " + ex.getLocalizedMessage());
@@ -75,17 +79,15 @@ public final class Users {
    * Writes permissions to disk.
    */
   public synchronized void write() {
-    if(file == null) return;
-
     if(store()) {
       try {
         final XMLBuilder xml = new XMLBuilder().indent().open(USERS);
-        for(final User user : users) user.write(xml);
+        for(final User user : users.values()) user.write(xml);
         file.write(xml.finish());
       } catch(final IOException ex) {
         Util.errln(ex);
       }
-    } else {
+    } else if(file.exists()) {
       file.delete();
     }
   }
@@ -97,7 +99,7 @@ public final class Users {
    * @param perm permission (can be {@code null})
    */
   public synchronized void create(final String name, final String password, final Perm perm) {
-    users.add(new User(name, password, perm == null ? Perm.NONE : perm));
+    users.put(name, new User(name, password, perm == null ? Perm.NONE : perm));
   }
 
   /**
@@ -113,7 +115,7 @@ public final class Users {
    * Sets the permission of a user.
    * @param user user
    * @param prm permission
-   * @param db database (can be {@code null})
+   * @param db database pattern (can be {@code null})
    */
   public void perm(final User user, final Perm prm, final String db) {
     user.perm(prm, db);
@@ -125,18 +127,20 @@ public final class Users {
    * @param name new name
    */
   public synchronized void alter(final User user, final String name) {
+    users.remove(name);
+    users.put(name, user);
     user.name(name);
   }
 
   /**
    * Drops a user from the list.
    * @param user user reference
-   * @param db optional restriction to database
+   * @param db database pattern (can be {@code null})
    * @return success flag
    */
   public synchronized boolean drop(final User user, final String db) {
     if(db == null) {
-      if(!users.remove(user)) return false;
+      if(users.remove(user.name()) == null) return false;
     } else {
       user.remove(db);
     }
@@ -149,19 +153,17 @@ public final class Users {
    * @return success of operation
    */
   public synchronized User get(final String name) {
-    for(final User user : users) if(user.name().equals(name)) return user;
-    return null;
+    return users.get(name);
   }
 
   /**
-   * Returns all users that match the specified pattern.
-   * @param pattern user pattern
+   * Returns all user names that match the specified pattern.
+   * @param pattern glob pattern
    * @return user list
    */
   public synchronized String[] find(final Pattern pattern) {
     final StringList sl = new StringList();
-    for(final User u : users) {
-      final String name = u.name();
+    for(final String name : users.keySet()) {
       if(pattern.matcher(name).matches()) sl.add(name);
     }
     return sl.finish();
@@ -176,7 +178,7 @@ public final class Users {
     final Table table = new Table();
     table.description = Text.USERS_X;
 
-    for(int u = 0; u < 2; ++u) table.header.add(S_USERINFO[u]);
+    for(final String info : S_USERINFO) table.header.add(info);
     for(final User user : users(db)) {
       final TokenList tl = new TokenList();
       tl.add(user.name());
@@ -192,24 +194,16 @@ public final class Users {
    * @return user information
    */
   public synchronized ArrayList<User> users(final String db) {
-    if(db == null) return users;
     final ArrayList<User> tmp = new ArrayList<>();
-    for(final User user : users) {
-      if(user.local().containsKey(db)) tmp.add(user);
+    for(final User user : users.values()) {
+      if(db == null) {
+        tmp.add(user);
+      } else {
+        final Entry<String, Perm> entry = user.find(db);
+        if(entry != null) tmp.add(user);
+      }
     }
     return tmp;
-  }
-
-  /**
-   * Returns the path to the global permission file.
-   * @param sopts static options
-   * @return file reference
-   */
-  private static IOFile globalPath(final StaticOptions sopts) {
-    // try to find permission file in database and home directory
-    final String perm = IO.BASEXSUFFIX + "perm";
-    final IOFile file = new IOFile(sopts.dbpath(), perm);
-    return file.exists() ? file : new IOFile(Prop.HOME, perm);
   }
 
   /**
@@ -218,8 +212,15 @@ public final class Users {
    */
   private synchronized boolean store() {
     if(users.size() != 1) return !users.isEmpty();
-    final User user = users.get(0);
+    final User user = users.values().iterator().next();
     return !user.name().equals(ADMIN) ||
            !user.code(Algorithm.DIGEST, Code.HASH).equals(User.digest(ADMIN, ADMIN));
+  }
+
+  @Override
+  public String toString() {
+    final XMLBuilder xml = new XMLBuilder().indent().open(USERS);
+    for(final User user : users.values()) user.write(xml);
+    return xml.close().toString();
   }
 }
