@@ -530,8 +530,8 @@ public class QueryParser extends InputParser {
       if(!decl.add("S " + name)) throw error(OUTDUPL_X, name);
       try {
         qc.serialOpts.assign(name, string(val));
-        if(name.equals(SerializerOptions.USE_CHARACTER_MAPS.name()))
-          throw error(OUTMAP_X, val);
+        if(name.equals(SerializerOptions.USE_CHARACTER_MAPS.name()) &&
+            !eq(val, token(SerializerOptions.WEBDAV))) throw error(OUTMAP_X, val);
       } catch(final BaseXException ex) {
         for(final Option<?> o : qc.serialOpts) if(o.name().equals(name)) throw error(SER_X, ex);
         throw error(OUTINVALID_X, ex);
