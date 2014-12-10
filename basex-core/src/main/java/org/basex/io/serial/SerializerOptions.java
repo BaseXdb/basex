@@ -105,6 +105,9 @@ public final class SerializerOptions extends Options {
   public static final NumberOption LIMIT =
       new NumberOption("limit", -1);
 
+  /** Static Webdav character map. */
+  public static final String WEBDAV = "webdav";
+
   /** Newlines. */
   public enum Newline {
     /** NL.   */ NL("\\n", "\n"),

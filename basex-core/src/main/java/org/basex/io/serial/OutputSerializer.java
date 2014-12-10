@@ -144,7 +144,7 @@ public abstract class OutputSerializer extends Serializer {
     undecl  = opts.yes(UNDECLARE_PREFIXES);
     indent  = opts.yes(INDENT);
 
-    webdav = maps.equals("webdav");
+    webdav = maps.equals(WEBDAV);
     if(!webdav && !maps.isEmpty()) throw SERMAP_X.getIO(maps);
 
     if(docsys.isEmpty()) docsys = null;
