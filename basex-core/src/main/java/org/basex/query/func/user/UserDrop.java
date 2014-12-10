@@ -21,7 +21,7 @@ public final class UserDrop extends UserFn {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     checkAdmin(qc);
     final User user = checkSessions(toUser(0, qc), qc);
-    final String db = toDB(1, qc);
+    final String db = exprs.length > 1 ? toDB(1, qc) : null;
     if(user.name().equals(UserText.ADMIN)) throw BXUS_ADMIN.get(info);
     qc.resources.updates().add(new Drop(user, db, qc, ii), qc);
     return null;

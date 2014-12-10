@@ -18,13 +18,12 @@ import org.basex.util.*;
 public abstract class UserFn extends StandardFunc {
   /**
    * Checks if the specified expression is a valid database name.
-   * @param i expression index (may be out of bounds)
+   * @param i expression index
    * @param qc query context
-   * @return name of database, or {@code null} if index is out of bounds
+   * @return name of database
    * @throws QueryException query exception
    */
   protected final String toDB(final int i, final QueryContext qc) throws QueryException {
-    if(i >= exprs.length) return null;
     final String name = Token.string(toToken(exprs[i], qc));
     if(!Databases.validName(name, true)) throw BXUS_DB_X.get(info, name);
     return name;

@@ -22,7 +22,7 @@ public final class UserGrant extends UserFn {
     checkAdmin(qc);
     final User user = checkSessions(toUser(0, qc), qc);
     final Perm perm = toPerm(1, qc);
-    final String db = toDB(2, qc);
+    final String db = exprs.length > 2 ? toDB(2, qc) : null;
     if(user.name().equals(UserText.ADMIN)) throw BXUS_ADMIN.get(info);
 
     qc.resources.updates().add(new Grant(user, perm, db, qc, ii), qc);

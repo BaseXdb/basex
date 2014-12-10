@@ -21,8 +21,16 @@ public final class UserModuleTest extends AdvancedQueryTest {
    * @throws BaseXException database exception
    */
   @BeforeClass
-  public static void init() throws BaseXException {
+  public static void beforeClass() throws BaseXException {
     new CreateDB(NAME).execute(context);
+  }
+
+  /**
+   * Finish test.
+   * @throws BaseXException database exception
+   */
+  @After
+  public void after() throws BaseXException {
     new DropUser(NAME).execute(context);
   }
 
