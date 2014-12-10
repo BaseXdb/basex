@@ -266,6 +266,8 @@ public enum QueryError {
   BXUS_SAME_X(BXUS, 9, "Name of source and target user is equal: %."),
   /** BXUS0010. */
   BXUS_SESSION_X(BXUS, 10, "User % is currently logged in."),
+  /** BXUS0011. */
+  BXUS_LOCAL_X(BXUS, 11, "Local permission can only be 'none', 'read' or 'write'."),
 
   // EXPath modules
 

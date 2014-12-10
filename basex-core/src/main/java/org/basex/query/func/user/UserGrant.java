@@ -2,11 +2,9 @@ package org.basex.query.func.user;
 
 import static org.basex.query.QueryError.*;
 
-import org.basex.core.locks.*;
 import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.up.primitives.*;
-import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -24,14 +22,11 @@ public final class UserGrant extends UserFn {
     final Perm perm = toPerm(1, qc);
     final String db = exprs.length > 2 ? toDB(2, qc) : null;
     if(user.name().equals(UserText.ADMIN)) throw BXUS_ADMIN.get(info);
+    if(db != null && (perm == Perm.CREATE || perm == Perm.ADMIN))
+      throw BXUS_LOCAL_X.get(info);
 
     qc.resources.updates().add(new Grant(user, perm, db, qc, ii), qc);
     return null;
-  }
-
-  @Override
-  public boolean accept(final ASTVisitor visitor) {
-    return visitor.lock(DBLocking.ADMIN) && super.accept(visitor);
   }
 
   /** Update primitive. */

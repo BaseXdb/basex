@@ -36,7 +36,6 @@ public class UserList extends StandardFunc {
 
   @Override
   public final boolean accept(final ASTVisitor visitor) {
-    return visitor.lock(DBLocking.ADMIN) &&
-        (exprs.length == 0 || dataLock(visitor, 0)) && super.accept(visitor);
+    return visitor.lock(DBLocking.ADMIN) && super.accept(visitor);
   }
 }

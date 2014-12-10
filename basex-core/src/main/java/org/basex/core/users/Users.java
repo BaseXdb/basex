@@ -127,9 +127,9 @@ public final class Users {
    * @param name new name
    */
   public synchronized void alter(final User user, final String name) {
-    users.remove(name);
-    users.put(name, user);
+    users.remove(user.name());
     user.name(name);
+    users.put(name, user);
   }
 
   /**

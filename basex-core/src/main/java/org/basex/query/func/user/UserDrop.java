@@ -2,11 +2,9 @@ package org.basex.query.func.user;
 
 import static org.basex.query.QueryError.*;
 
-import org.basex.core.locks.*;
 import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.up.primitives.*;
-import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -25,11 +23,6 @@ public final class UserDrop extends UserFn {
     if(user.name().equals(UserText.ADMIN)) throw BXUS_ADMIN.get(info);
     qc.resources.updates().add(new Drop(user, db, qc, ii), qc);
     return null;
-  }
-
-  @Override
-  public boolean accept(final ASTVisitor visitor) {
-    return visitor.lock(DBLocking.ADMIN) && super.accept(visitor);
   }
 
   /** Update primitive. */

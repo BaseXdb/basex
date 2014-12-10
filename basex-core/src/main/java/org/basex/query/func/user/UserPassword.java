@@ -1,10 +1,8 @@
 package org.basex.query.func.user;
 
-import org.basex.core.locks.*;
 import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.up.primitives.*;
-import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -22,11 +20,6 @@ public final class UserPassword extends UserFn {
     final String pass = Token.string(toToken(exprs[1], qc));
     qc.resources.updates().add(new Password(user, pass, ii, qc), qc);
     return null;
-  }
-
-  @Override
-  public boolean accept(final ASTVisitor visitor) {
-    return visitor.lock(DBLocking.ADMIN) && super.accept(visitor);
   }
 
   /** Update primitive. */

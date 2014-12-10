@@ -2,11 +2,9 @@ package org.basex.query.func.user;
 
 import static org.basex.query.QueryError.*;
 
-import org.basex.core.locks.*;
 import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.up.primitives.*;
-import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -25,13 +23,8 @@ public final class UserCreate extends UserFn {
     final Perm perm = exprs.length > 2 ? toPerm(2, qc) : null;
     if(name.equals(UserText.ADMIN)) throw BXUS_ADMIN.get(info);
 
-    qc.resources.updates().add(new Create(name, pw, perm, qc, ii), qc);
+    qc.resources.updates().add(new Create(name, pw, perm, qc.context.users.get(name), qc, ii), qc);
     return null;
-  }
-
-  @Override
-  public boolean accept(final ASTVisitor visitor) {
-    return visitor.lock(DBLocking.ADMIN) && super.accept(visitor);
   }
 
   /** Update primitive. */
@@ -48,12 +41,13 @@ public final class UserCreate extends UserFn {
      * @param name user name
      * @param pw password
      * @param perm permission
+     * @param user old user (can be {@code null})
      * @param qc query context
      * @param info input info
      */
-    private Create(final String name, final String pw, final Perm perm, final QueryContext qc,
-        final InputInfo info) {
-      super(UpdateType.USERCREATE, null, null, qc, info);
+    private Create(final String name, final String pw, final Perm perm, final User user,
+        final QueryContext qc, final InputInfo info) {
+      super(UpdateType.USERCREATE, user, null, qc, info);
       this.name = name;
       this.pw = pw;
       this.perm = perm;

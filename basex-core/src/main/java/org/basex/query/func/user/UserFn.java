@@ -3,9 +3,11 @@ package org.basex.query.func.user;
 import static org.basex.query.QueryError.*;
 
 import org.basex.core.*;
+import org.basex.core.locks.*;
 import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
+import org.basex.query.util.*;
 import org.basex.server.*;
 import org.basex.util.*;
 
@@ -97,5 +99,10 @@ public abstract class UserFn extends StandardFunc {
       if(s.context().user().name().equals(name)) throw BXUS_SESSION_X.get(info, name);
     }
     return user;
+  }
+
+  @Override
+  public final boolean accept(final ASTVisitor visitor) {
+    return visitor.lock(DBLocking.ADMIN) && super.accept(visitor);
   }
 }
