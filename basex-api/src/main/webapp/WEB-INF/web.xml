@@ -8,10 +8,9 @@
   <display-name>BaseX: The XML Database and XQuery Processor</display-name>
   <description>HTTP Services</description>
 
-  <!-- BaseX options (HTTPLOCAL, TIMEOUT, LOG, etc.) can be overwritten
-       by prefixing the key with "org.basex." and specifying them in
-       <context-param/> elements, as shown below. Please checkout
-       http://docs.basex.org/wiki/Options for a list of all options. -->
+  <!-- All BaseX options can be overwritten  prefixing the key with "org.basex."
+       and specifying them in <context-param/> elements, as shown below. Please
+       check out http://docs.basex.org/wiki/Options for a list of all options. -->
 
   <!--
   <context-param>
@@ -26,6 +25,22 @@
     <param-name>org.basex.repopath</param-name>
     <param-value>WEB-INF/repo</param-value>
   </context-param>
+
+  <context-param>
+    <param-name>org.basex.user</param-name>
+    <param-value>admin</param-value>
+  </context-param>
+  <context-param>
+  <context-param>
+    <param-name>org.basex.password</param-name>
+    <param-value>admin</param-value>
+  </context-param>
+  <context-param>
+  <context-param>
+    <param-name>org.basex.authmethod</param-name>
+    <param-value>Digest</param-value>
+  </context-param>
+  <context-param>
 
   <context-param>
     <param-name>org.basex.httplocal</param-name>
