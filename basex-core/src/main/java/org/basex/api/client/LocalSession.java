@@ -28,6 +28,15 @@ public class LocalSession extends Session {
   }
 
   /**
+   * Constructor, specifying an output stream.
+   * @param context context
+   * @param output output stream
+   */
+  public LocalSession(final Context context, final OutputStream output) {
+    this(context, output, context.user());
+  }
+
+  /**
    * Constructor, specifying login data.
    * @param context context
    * @param username user name
@@ -47,24 +56,24 @@ public class LocalSession extends Session {
    * @param output output stream
    * @throws LoginException login exception
    */
-  private LocalSession(final Context context, final String username, final String password,
+  public LocalSession(final Context context, final String username, final String password,
       final OutputStream output) throws LoginException {
 
-    this(context, output);
-    final User user = ctx.users.get(username);
+    this(context, output, context.users.get(username));
+    final User user = ctx.user();
     if(user == null || !user.matches(password)) throw new LoginException();
-    ctx.user(user);
   }
 
   /**
    * Constructor, specifying an output stream.
    * @param context context
    * @param output output stream
+   * @param user user
    */
-  public LocalSession(final Context context, final OutputStream output) {
+  private LocalSession(final Context context, final OutputStream output, final User user) {
     super(output);
     ctx = new Context(context, null);
-    ctx.user(context.user());
+    ctx.user(user);
   }
 
   @Override
