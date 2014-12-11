@@ -245,19 +245,6 @@ public class TextPanel extends BaseXPanel {
   }
 
   /**
-   * Jumps to the end of the text.
-   */
-  public final void scrollToEnd() {
-    SwingUtilities.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        editor.pos(editor.size());
-        cursorCode.execute(2);
-      }
-    });
-  }
-
-  /**
    * Returns the output text.
    * @return output text
    */
@@ -792,7 +779,7 @@ public class TextPanel extends BaseXPanel {
   }
 
   /** Undo command. */
-  class UndoCmd extends GUIPopupCmd {
+  private class UndoCmd extends GUIPopupCmd {
     /** Constructor. */
     UndoCmd() { super(Text.UNDO, UNDOSTEP); }
 
@@ -810,7 +797,7 @@ public class TextPanel extends BaseXPanel {
   }
 
   /** Redo command. */
-  class RedoCmd extends GUIPopupCmd {
+  private class RedoCmd extends GUIPopupCmd {
     /** Constructor. */
     RedoCmd() { super(Text.REDO, REDOSTEP); }
 
@@ -828,7 +815,7 @@ public class TextPanel extends BaseXPanel {
   }
 
   /** Cut command. */
-  class CutCmd extends GUIPopupCmd {
+  private class CutCmd extends GUIPopupCmd {
     /** Constructor. */
     CutCmd() { super(Text.CUT, CUT1, CUT2); }
 
@@ -844,7 +831,7 @@ public class TextPanel extends BaseXPanel {
   }
 
   /** Copy command. */
-  class CopyCmd extends GUIPopupCmd {
+  private class CopyCmd extends GUIPopupCmd {
     /** Constructor. */
     CopyCmd() { super(Text.COPY, COPY1, COPY2); }
 
@@ -855,7 +842,7 @@ public class TextPanel extends BaseXPanel {
   }
 
   /** Paste command. */
-  class PasteCmd extends GUIPopupCmd {
+  private class PasteCmd extends GUIPopupCmd {
     /** Constructor. */
     PasteCmd() { super(Text.PASTE, PASTE1, PASTE2); }
 
@@ -873,7 +860,7 @@ public class TextPanel extends BaseXPanel {
   }
 
   /** Delete command. */
-  class DelCmd extends GUIPopupCmd {
+  private class DelCmd extends GUIPopupCmd {
     /** Constructor. */
     DelCmd() { super(Text.DELETE, DELNEXT); }
 
@@ -888,7 +875,7 @@ public class TextPanel extends BaseXPanel {
   }
 
   /** Select all command. */
-  class AllCmd extends GUIPopupCmd {
+  private class AllCmd extends GUIPopupCmd {
     /** Constructor. */
     AllCmd() { super(Text.SELECT_ALL, SELECTALL); }
 
@@ -897,7 +884,7 @@ public class TextPanel extends BaseXPanel {
   }
 
   /** Find next hit. */
-  class FindCmd extends GUIPopupCmd {
+  private class FindCmd extends GUIPopupCmd {
     /** Constructor. */
     FindCmd() { super(Text.FIND + Text.DOTS, FIND); }
 
@@ -908,7 +895,7 @@ public class TextPanel extends BaseXPanel {
   }
 
   /** Find next hit. */
-  class FindNextCmd extends GUIPopupCmd {
+  private class FindNextCmd extends GUIPopupCmd {
     /** Constructor. */
     FindNextCmd() { super(Text.FIND_NEXT, FINDNEXT1, FINDNEXT2); }
 
@@ -919,7 +906,7 @@ public class TextPanel extends BaseXPanel {
   }
 
   /** Find previous hit. */
-  class FindPrevCmd extends GUIPopupCmd {
+  private class FindPrevCmd extends GUIPopupCmd {
     /** Constructor. */
     FindPrevCmd() { super(Text.FIND_PREVIOUS, FINDPREV1, FINDPREV2); }
 
@@ -940,7 +927,7 @@ public class TextPanel extends BaseXPanel {
   }
 
   /** Go to line. */
-  class GotoCmd extends GUIPopupCmd {
+  private class GotoCmd extends GUIPopupCmd {
     /** Constructor. */
     GotoCmd() { super(Text.GO_TO_LINE + Text.DOTS, GOTOLINE); }
 

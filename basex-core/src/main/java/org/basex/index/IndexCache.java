@@ -3,7 +3,6 @@ package org.basex.index;
 import static org.basex.util.Token.*;
 
 import java.lang.ref.*;
-import java.util.*;
 import java.util.concurrent.locks.*;
 
 import org.basex.util.*;
@@ -112,14 +111,6 @@ public final class IndexCache {
     } finally {
       rwl.writeLock().unlock();
     }
-  }
-
-  /**
-   * Resets the data structure. Must be called when data structure is initialized.
-   */
-  public void clear() {
-    Arrays.fill(buckets, null);
-    size = 0;
   }
 
   /**

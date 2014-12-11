@@ -35,8 +35,6 @@ public final class UCAOptions extends CollationOptions {
   public static final StringOption CASELEVEL = new StringOption("caseLevel");
   /** Option: caseFirst. */
   public static final StringOption CASEFIRST = new StringOption("caseFirst");
-  /** Option: hiraganaQuaternary. */
-  public static final StringOption HIRAGANAQUATERNARY = new StringOption("hiraganaQuaternary");
   /** Option: numeric. */
   public static final StringOption NUMERIC = new StringOption("numeric");
   /** Option: reorder. */

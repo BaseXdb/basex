@@ -245,7 +245,7 @@ public final class DialogResources extends BaseXBack {
   }
 
   /** Delete command. */
-  final class DeleteCmd extends GUIPopupCmd {
+  private final class DeleteCmd extends GUIPopupCmd {
     /** Constructor. */
     DeleteCmd() { super(DELETE + DOTS, BaseXKeys.DELNEXT); }
 
@@ -271,7 +271,7 @@ public final class DialogResources extends BaseXBack {
   }
 
   /** Rename command. */
-  final class RenameCmd extends GUIPopupCmd {
+  private final class RenameCmd extends GUIPopupCmd {
     /** Constructor. */
     RenameCmd() { super(RENAME + DOTS, BaseXKeys.RENAME); }
 

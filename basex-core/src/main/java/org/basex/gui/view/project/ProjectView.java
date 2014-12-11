@@ -115,7 +115,7 @@ public final class ProjectView extends BaseXPanel {
    * Makes the list (in)visible.
    * @param vis visibility flag
    */
-  public void showList(final boolean vis) {
+  void showList(final boolean vis) {
     split.visible(vis);
   }
 
@@ -133,14 +133,14 @@ public final class ProjectView extends BaseXPanel {
   /**
    * Refreshes the filter view.
    */
-  public void refresh() {
+  void refresh() {
     filter.refresh(true);
   }
 
   /**
    * Resets the filter cache.
    */
-  public void reset() {
+  void reset() {
     filter.reset();
   }
 

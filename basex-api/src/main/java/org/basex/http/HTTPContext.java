@@ -46,9 +46,9 @@ public final class HTTPContext {
   public final String method;
   /** Request method. */
   public final HTTPParams params;
-  /** Authentication method. */
-  public AuthMethod auth;
 
+  /** Authentication method. */
+  private AuthMethod auth;
   /** Serialization parameters. */
   private SerializerOptions sopts;
   /** Result wrapping. */
@@ -452,11 +452,27 @@ public final class HTTPContext {
   }
 
   /**
+   * Decodes the specified path segments.
+   * @param segments strings to be decoded
+   * @return argument
+   * @throws IllegalArgumentException invalid path segments
+   */
+  public static String decode(final String segments) {
+    try {
+      return URLDecoder.decode(segments, Prop.ENCODING);
+    } catch(final UnsupportedEncodingException ex) {
+      throw new IllegalArgumentException(ex);
+    }
+  }
+
+  // PRIVATE METHODS ====================================================================
+
+  /**
    * Normalizes the path information.
    * @param path path, or {@code null}
    * @return normalized path
    */
-  public static String normalize(final String path) {
+  private static String normalize(final String path) {
     final TokenBuilder tmp = new TokenBuilder();
     if(path != null) {
       final TokenBuilder tb = new TokenBuilder();
@@ -476,22 +492,6 @@ public final class HTTPContext {
     if(tmp.isEmpty()) tmp.add('/');
     return tmp.toString();
   }
-
-  /**
-   * Decodes the specified path segments.
-   * @param segments strings to be decoded
-   * @return argument
-   * @throws IllegalArgumentException invalid path segments
-   */
-  public static String decode(final String segments) {
-    try {
-      return URLDecoder.decode(segments, Prop.ENCODING);
-    } catch(final UnsupportedEncodingException ex) {
-      throw new IllegalArgumentException(ex);
-    }
-  }
-
-  // PRIVATE METHODS ====================================================================
 
   /**
    * Returns a string with the remote user address.

@@ -116,8 +116,6 @@ public final class SeqType {
   public static final SeqType NUM = AtomType.NUM.seqType();
   /** Zero or one xs:numeric. */
   public static final SeqType NUM_ZO = new SeqType(AtomType.NUM, Occ.ZERO_ONE);
-  /** Zero or more xs:numeric. */
-  public static final SeqType NUM_ZM = new SeqType(AtomType.NUM, Occ.ZERO_MORE);
   /** Single xs:boolean. */
   public static final SeqType BLN = AtomType.BLN.seqType();
   /** Zero or one xs:boolean. */
@@ -140,8 +138,6 @@ public final class SeqType {
   public static final SeqType ITR_ZM = new SeqType(AtomType.ITR, Occ.ZERO_MORE);
   /** One or more integers. */
   public static final SeqType ITR_OM = new SeqType(AtomType.ITR, Occ.ONE_MORE);
-  /** One or more bytes. */
-  public static final SeqType BYT_OM = new SeqType(AtomType.BYT, Occ.ONE_MORE);
   /** Single node. */
   public static final SeqType NOD = NodeType.NOD.seqType();
   /** Zero or one nodes. */
@@ -200,8 +196,6 @@ public final class SeqType {
   public static final SeqType DOC_O = NodeType.DOC.seqType();
   /** Zero or one document node. */
   public static final SeqType DOC_ZO = new SeqType(NodeType.DOC, Occ.ZERO_ONE);
-  /** One or more document node. */
-  public static final SeqType DOC_OM = new SeqType(NodeType.DOC, Occ.ONE_MORE);
   /** Zero or more document node. */
   public static final SeqType DOC_ZM = new SeqType(NodeType.DOC, Occ.ZERO_MORE);
   /** One element node. */
@@ -238,8 +232,6 @@ public final class SeqType {
 
   /** Single binary. */
   public static final SeqType BIN = AtomType.BIN.seqType();
-  /** Zero or more binaries. */
-  public static final SeqType BIN_ZM = new SeqType(AtomType.BIN, Occ.ZERO_MORE);
 
   /** Item type. */
   public final Type type;

@@ -89,7 +89,7 @@ public final class EditorArea extends TextPanel {
    * Sets the modified flag.
    * @param mod modified flag
    */
-  public void modified(final boolean mod) {
+  void modified(final boolean mod) {
     modified = mod;
   }
 
@@ -105,7 +105,7 @@ public final class EditorArea extends TextPanel {
    * Initializes the text.
    * @param t text to be set
    */
-  public void initText(final byte[] t) {
+  void initText(final byte[] t) {
     last = t;
     super.setText(t);
     hist.init(getText());

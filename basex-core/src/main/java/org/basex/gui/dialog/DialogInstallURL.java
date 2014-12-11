@@ -76,7 +76,7 @@ public final class DialogInstallURL extends BaseXDialog {
    * Returns the url.
    * @return url
    */
-  public String url() {
+  String url() {
     return url.getText();
   }
 }

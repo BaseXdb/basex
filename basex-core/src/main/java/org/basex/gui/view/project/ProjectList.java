@@ -151,7 +151,7 @@ final class ProjectList extends JList<String> {
   }
 
   /** List cell renderer. */
-  class CellRenderer extends DefaultListCellRenderer {
+  private class CellRenderer extends DefaultListCellRenderer {
     /** Label. */
     private final BaseXLabel label;
     /** Current file. */

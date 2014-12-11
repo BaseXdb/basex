@@ -30,7 +30,7 @@ public class ProjectTree extends BaseXTree implements TreeWillExpandListener {
    * Constructor.
    * @param pv project view
    */
-  public ProjectTree(final ProjectView pv) {
+  ProjectTree(final ProjectView pv) {
     super(new DefaultMutableTreeNode(), pv.gui);
     view = pv;
 
@@ -79,7 +79,7 @@ public class ProjectTree extends BaseXTree implements TreeWillExpandListener {
    * @param path file path
    * @return {@code true} if file was found
    */
-  public boolean expand(final ProjectNode node, final String path) {
+  boolean expand(final ProjectNode node, final String path) {
     final TreePath tp = node.path();
     if(!isExpanded(tp)) expandPath(tp);
 
@@ -163,7 +163,7 @@ public class ProjectTree extends BaseXTree implements TreeWillExpandListener {
   // COMMANDS =====================================================================================
 
   /** Refresh command. */
-  final class RefreshCmd extends GUIPopupCmd {
+  private final class RefreshCmd extends GUIPopupCmd {
     /** Constructor. */
     RefreshCmd() { super(REFRESH, BaseXKeys.REFRESH); }
 
@@ -178,7 +178,7 @@ public class ProjectTree extends BaseXTree implements TreeWillExpandListener {
   }
 
   /** New directory command. */
-  final class NewDirCmd extends GUIPopupCmd {
+  private final class NewDirCmd extends GUIPopupCmd {
     /** Constructor. */
     NewDirCmd() { super(NEW_DIR, BaseXKeys.NEWDIR); }
 
@@ -213,7 +213,7 @@ public class ProjectTree extends BaseXTree implements TreeWillExpandListener {
   }
 
   /** Delete command. */
-  final class DeleteCmd extends GUIPopupCmd {
+  private final class DeleteCmd extends GUIPopupCmd {
     /** Constructor. */
     DeleteCmd() { super(DELETE + DOTS, BaseXKeys.DELNEXT); }
 
@@ -239,7 +239,7 @@ public class ProjectTree extends BaseXTree implements TreeWillExpandListener {
   }
 
   /** Rename command. */
-  final class RenameCmd extends GUIPopupCmd {
+  private final class RenameCmd extends GUIPopupCmd {
     /** Constructor. */
     RenameCmd() { super(RENAME, BaseXKeys.RENAME); }
 
@@ -255,7 +255,7 @@ public class ProjectTree extends BaseXTree implements TreeWillExpandListener {
   }
 
   /** Open command. */
-  final class OpenCmd extends GUIPopupCmd {
+  private final class OpenCmd extends GUIPopupCmd {
     /** Constructor. */
     OpenCmd() { super(OPEN, BaseXKeys.ENTER); }
 
@@ -272,7 +272,7 @@ public class ProjectTree extends BaseXTree implements TreeWillExpandListener {
   }
 
   /** Open externally command. */
-  final class OpenExternalCmd extends GUIPopupCmd {
+  private final class OpenExternalCmd extends GUIPopupCmd {
     /** Constructor. */
     OpenExternalCmd() { super(OPEN_EXTERNALLY, BaseXKeys.SHIFT_ENTER); }
 
@@ -288,7 +288,7 @@ public class ProjectTree extends BaseXTree implements TreeWillExpandListener {
   }
 
   /** Test command. */
-  final class TestCmd extends GUIPopupCmd {
+  private final class TestCmd extends GUIPopupCmd {
     /** Constructor. */
     TestCmd() { super(RUN_TESTS, BaseXKeys.UNIT); }
 
@@ -300,7 +300,7 @@ public class ProjectTree extends BaseXTree implements TreeWillExpandListener {
   }
 
   /** Copy path command. */
-  final class CopyPathCmd extends GUIPopupCmd {
+  private final class CopyPathCmd extends GUIPopupCmd {
     /** Constructor. */
     CopyPathCmd() { super(COPY_PATH, BaseXKeys.COPYPATH); }
 

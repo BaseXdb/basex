@@ -4,7 +4,6 @@ import static org.basex.util.Prop.*;
 
 import java.awt.*;
 
-import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
@@ -161,22 +160,6 @@ public final class GUIOptions extends Options {
   public static final StringOption DBNAME = new StringOption("DBNAME", "");
   /** Last insertion type. */
   public static final NumberOption LASTINSERT = new NumberOption("LASTINSERT", 1);
-
-  /** Comment: written to options file. */
-  public static final Comment C_SERVER = new Comment("Server Dialog");
-
-  /** Server: host, used for connecting new clients. */
-  public static final StringOption S_HOST = new StringOption("S_HOST", Text.S_LOCALHOST);
-  /** Server: port, used for connecting new clients. */
-  public static final NumberOption S_PORT = new NumberOption("S_PORT", 1984);
-  /** Server: port, used for binding the server. */
-  public static final NumberOption S_SERVERPORT = new NumberOption("S_SERVERPORT", 1984);
-  /** Server: port, used for sending events. */
-  public static final NumberOption S_EVENTPORT = new NumberOption("S_EVENTPORT", 1985);
-  /** Default user. */
-  public static final StringOption S_USER = new StringOption("S_USER", "");
-  /** Default password. */
-  public static final StringOption S_PASSWORD = new StringOption("S_PASSWORD", "");
 
   /** Comment: written to options file. */
   public static final Comment C_VISUALIZATIONS = new Comment("Visualizations");

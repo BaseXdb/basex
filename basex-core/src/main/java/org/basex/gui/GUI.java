@@ -62,15 +62,16 @@ public final class GUI extends JFrame {
   public boolean painting;
   /** Updating flag; if activated, operations accessing the data are skipped. */
   public boolean updating;
+
   /** Fullscreen flag. */
-  public boolean fullscreen;
+  boolean fullscreen;
+  /** Button panel. */
+  final BaseXBack buttons;
+  /** Navigation/input panel. */
+  final BaseXBack nav;
+
   /** Result panel. */
   private final GUIMenu menu;
-  /** Button panel. */
-  public final BaseXBack buttons;
-  /** Navigation/input panel. */
-  public final BaseXBack nav;
-
   /** Content panel, containing all views. */
   private final ViewContainer views;
   /** History button. */
@@ -603,7 +604,7 @@ public final class GUI extends JFrame {
    * @param show true if component is visible
    * @param layout component layout
    */
-  public void updateControl(final JComponent comp, final boolean show, final String layout) {
+  void updateControl(final JComponent comp, final boolean show, final String layout) {
     if(comp == status) {
       if(show) top.add(comp, layout);
       else top.remove(comp);
@@ -678,7 +679,7 @@ public final class GUI extends JFrame {
   /**
    * Toggles fullscreen mode.
    */
-  public void fullscreen() {
+  void fullscreen() {
     fullscreen ^= true;
     fullscreen(fullscreen);
   }

@@ -560,8 +560,6 @@ public interface Text {
   String NO_TOKENIZER_X = lang("no_tokenizer_%");
   /** No stemmer found. */
   String NO_STEMMER_X = lang("no_stemmer_%");
-  /** Points to a directory. */
-  String NO_DIR_ALLOWED_X = lang("no_dir_allowed_%");
 
   // DATABASE COMMANDS ========================================================
 
@@ -1023,13 +1021,7 @@ public interface Text {
   /** Button text for creating things. */
   String CREATE = lang("create");
   /** Button for starting the server. */
-  String START = lang("start");
-  /** Button for starting the server. */
   String STOP = lang("stop");
-  /** Button for connecting. */
-  String CONNECT = lang("connect");
-  /** Button for disconnecting. */
-  String DISCONNECT = lang("disconnect");
   /** Button for deleting all. */
   String DELETE_ALL = lang("delete_all");
   /** Button for adding. */
@@ -1158,8 +1150,6 @@ public interface Text {
   /** Dialog asking if a new database should be be created. */
   String NEW_DB_QUESTION = lang("no_db_found") + NL + lang("new_db_question");
 
-  /** Users. */
-  String USERS = lang("users");
   /** Users. */
   String USERS_X = lang("users_%");
   /** Confirmation . */

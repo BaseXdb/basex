@@ -195,7 +195,7 @@ public enum BaseXKeys {
    * Returns a shortcut string.
    * @return shortcut string
    */
-  public String shortCut() {
+  String shortCut() {
     final StringBuilder sb = new StringBuilder();
     if((modifiers & InputEvent.META_MASK) != 0) sb.append("meta").append(' ');
     if((modifiers & InputEvent.CTRL_MASK) != 0) sb.append("ctrl").append(' ');

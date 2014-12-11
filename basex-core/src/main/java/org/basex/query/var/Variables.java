@@ -84,16 +84,6 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
   }
 
   /**
-   * Checks if a variable with the given name was already declared.
-   * @param nm variable name
-   * @return result of check
-   */
-  public boolean declared(final QNm nm) {
-    final VarEntry entry = vars.get(nm);
-    return entry != null && entry.var != null;
-  }
-
-  /**
    * Returns a new reference to the (possibly not yet declared) variable with the given name.
    * @param ii input info
    * @param nm variable name

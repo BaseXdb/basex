@@ -51,18 +51,6 @@ public final class DBNodes implements Result {
     this.pres = pres;
   }
 
-  /**
-   * Constructor, specifying a database, pre values and full-text positions.
-   * @param data data reference
-   * @param all pre values comprise all documents of the database
-   * @param pres pre values
-   */
-  public DBNodes(final Data data, final boolean all, final int... pres) {
-    this.data = data;
-    this.all = all;
-    this.pres = pres;
-  }
-
   @Override
   public long size() {
     return pres.length;

@@ -22,10 +22,10 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class BaseXDialog extends JDialog {
-  /** Used mnemonics. */
-  public final StringBuilder mnem = new StringBuilder();
   /** Reference to main window. */
   public GUI gui;
+  /** Used mnemonics. */
+  protected final StringBuilder mnem = new StringBuilder();
   /** Remembers if the window was correctly closed. */
   protected boolean ok;
   /** Reference to the root panel. */
