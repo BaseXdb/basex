@@ -18,23 +18,23 @@ public abstract class UserUpdate extends Update {
   protected final Users users;
   /** User. */
   protected final User user;
-  /** Databases. */
-  protected final StringList databases = new StringList();
+  /** Database patterns. */
+  protected final StringList patterns = new StringList();
 
   /**
    * Constructor.
    * @param type type of this operation
    * @param user user
    * @param qc query context
-   * @param db database
+   * @param pattern pattern
    * @param info input info
    */
-  public UserUpdate(final UpdateType type, final User user, final String db, final QueryContext qc,
-      final InputInfo info) {
+  public UserUpdate(final UpdateType type, final User user, final String pattern,
+      final QueryContext qc, final InputInfo info) {
     super(type, info);
     this.user = user;
     users = qc.context.users;
-    databases.add(db);
+    patterns.add(pattern);
   }
 
   /**
@@ -64,8 +64,11 @@ public abstract class UserUpdate extends Update {
 
   @Override
   public final void merge(final Update update) throws QueryException {
-    final String db = ((UserUpdate) update).databases.get(0);
-    if(databases.contains(db)) throw BXUS_ONCE_X_X.get(info, name(), operation());
-    databases.add(db);
+    final String db = ((UserUpdate) update).patterns.get(0);
+    if(patterns.contains(db)) {
+      if(db == null) throw USER_UPDATE_X_X.get(info, name(), operation());
+      throw USER_UPDATE_X_X_X.get(info, db, name(), operation());
+    }
+    patterns.add(db);
   }
 }

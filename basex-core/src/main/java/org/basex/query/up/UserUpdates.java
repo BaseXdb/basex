@@ -28,7 +28,7 @@ final class UserUpdates {
     for(final UserUpdate o : userUpdates) {
       if(o.type == up.type) o.merge(up);
       if(drop && o.type == UpdateType.USERALTER || alter && o.type == UpdateType.USERDROP) {
-        throw BXUS_ALTERDROP_X.get(o.info(), o.name());
+        throw USER_CONFLICT_X.get(o.info(), o.name());
       }
     }
     userUpdates.add(up);

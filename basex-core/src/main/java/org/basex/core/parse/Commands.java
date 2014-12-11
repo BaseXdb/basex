@@ -126,6 +126,8 @@ public interface Commands {
   String PATH = "path";
   /** Command attribute: "name". */
   String NAME = "name";
+  /** Command attribute: "pattern". */
+  String PATTERN = "pattern";
   /** Command attribute: "newname". */
   String NEWNAME = "newname";
   /** Command attribute: "input". */

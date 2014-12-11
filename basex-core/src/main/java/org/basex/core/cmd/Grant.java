@@ -29,10 +29,10 @@ public final class Grant extends AUser {
    * Constructor, specifying a database.
    * @param permission permission
    * @param user user name
-   * @param db database
+   * @param pattern database pattern
    */
-  public Grant(final Object permission, final String user, final String db) {
-    super(permission.toString(), user, db);
+  public Grant(final Object permission, final String user, final String pattern) {
+    super(permission.toString(), user, pattern);
   }
 
   @Override
@@ -56,14 +56,14 @@ public final class Grant extends AUser {
   }
 
   @Override
-  protected boolean run(final String name, final String db) {
+  protected boolean run(final String name, final String pattern) {
     // admin cannot be modified
     if(name.equals(UserText.ADMIN)) return !info(ADMIN_STATIC);
 
     final Users users = context.users;
     final User user = users.get(name);
-    users.perm(user, prm, db);
-    return info(db == null ? GRANTED_X_X : GRANTED_ON_X_X_X, args[0], name, db);
+    users.perm(user, prm, pattern);
+    return info(pattern == null ? GRANTED_X_X : GRANTED_ON_X_X_X, args[0], name, pattern);
   }
 
   @Override

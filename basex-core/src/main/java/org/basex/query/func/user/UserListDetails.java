@@ -34,7 +34,7 @@ public final class UserListDetails extends UserList {
         user.add(password);
       }
       for(final Entry<String, Perm> local : us.locals().entrySet()) {
-        user.add(new FElem(DATABASE).add(NAME, local.getKey()).
+        user.add(new FElem(DATABASE).add(PATTERN, local.getKey()).
             add(PERMISSION, local.getValue().toString()));
       }
       vb.add(user);

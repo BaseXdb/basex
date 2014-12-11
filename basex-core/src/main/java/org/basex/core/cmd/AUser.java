@@ -42,10 +42,11 @@ abstract class AUser extends Command {
    */
   boolean run(final int off, final boolean opt) {
     final String name = args[off];
-    final String db = off + 1 < args.length ? args[off + 1] : null;
+    final String pattern = off + 1 < args.length ? args[off + 1] : null;
 
     if(!Databases.validName(name, true)) return error(NAME_INVALID_X, name);
-    if(db != null && !Databases.validName(db, true)) return error(NAME_INVALID_X, db);
+    if(pattern != null && !Databases.validName(pattern, true))
+      return error(NAME_INVALID_X, pattern);
 
     // retrieve all users; stop if no user is found
     final String[] users = users(name);
@@ -53,7 +54,7 @@ abstract class AUser extends Command {
 
     // loop through all users
     boolean ok = true;
-    for(final String user : users) ok &= run(user, db);
+    for(final String user : users) ok &= run(user, pattern);
     context.users.write();
     return ok;
   }
@@ -61,11 +62,11 @@ abstract class AUser extends Command {
   /**
    * Runs the command for the specified user and database pattern.
    * @param user user to be modified
-   * @param db database pattern
+   * @param pattern database pattern
    * @return success flag
    */
   @SuppressWarnings("unused")
-  boolean run(final String user, final String db) {
+  boolean run(final String user, final String pattern) {
     return true;
   }
 

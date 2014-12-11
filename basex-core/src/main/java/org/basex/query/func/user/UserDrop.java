@@ -18,9 +18,9 @@ public final class UserDrop extends UserFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     checkAdmin(qc);
-    final User user = checkSessions(toUser(0, qc), qc);
+    final User user = toSafeUser(0, qc);
     final String db = exprs.length > 1 ? toDB(1, qc) : null;
-    if(user.name().equals(UserText.ADMIN)) throw BXUS_ADMIN.get(info);
+    if(user.name().equals(UserText.ADMIN)) throw USER_ADMIN.get(info);
     qc.resources.updates().add(new Drop(user, db, qc, ii), qc);
     return null;
   }
@@ -41,11 +41,11 @@ public final class UserDrop extends UserFn {
     @Override
     public void apply() {
       boolean global = false;
-      for(final String db : databases) global |= db == null;
+      for(final String db : patterns) global |= db == null;
       if(global) {
         users.drop(user, null);
       } else {
-        for(final String db : databases) users.drop(user, db);
+        for(final String db : patterns) users.drop(user, db);
       }
     }
 

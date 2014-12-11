@@ -26,8 +26,8 @@ public abstract class UserFn extends StandardFunc {
    * @throws QueryException query exception
    */
   protected final String toDB(final int i, final QueryContext qc) throws QueryException {
-    final String name = Token.string(toToken(exprs[i], qc));
-    if(!Databases.validName(name, true)) throw BXUS_DB_X.get(info, name);
+    final String name = toString(i, qc);
+    if(!Databases.validName(name, true)) throw USER_PATTERN_X.get(info, name);
     return name;
   }
 
@@ -39,8 +39,8 @@ public abstract class UserFn extends StandardFunc {
    * @throws QueryException query exception
    */
   protected final String toName(final int i, final QueryContext qc) throws QueryException {
-    final String name = Token.string(toToken(exprs[i], qc));
-    if(!Databases.validName(name)) throw BXUS_NAME_X.get(info, name);
+    final String name = toString(i, qc);
+    if(!Databases.validName(name)) throw USER_NAME_X.get(info, name);
     return name;
   }
 
@@ -54,7 +54,7 @@ public abstract class UserFn extends StandardFunc {
   protected final User toUser(final int i, final QueryContext qc) throws QueryException {
     final String name = toName(i, qc);
     final User user = qc.context.users.get(name);
-    if(user == null) throw BXUS_WHICH_X.get(info, name);
+    if(user == null) throw USER_UNKNOWN_X.get(info, name);
     return user;
   }
 
@@ -68,35 +68,58 @@ public abstract class UserFn extends StandardFunc {
   protected final Perm toPerm(final int i, final QueryContext qc) throws QueryException {
     final String perm = Token.string(toToken(exprs[i], qc));
     final Perm p = Perm.get(perm);
-    if(p == null) throw BXUS_PERM_X.get(info, perm);
+    if(p == null) throw USER_PERMISSION_X.get(info, perm);
     return p;
   }
 
   /**
+   * Checks if the specified expression is a valid password.
+   * @param i expression index
+   * @param qc query context
+   * @return name of database
+   * @throws QueryException query exception
+   */
+  protected final String toString(final int i, final QueryContext qc) throws QueryException {
+    return Token.string(toToken(exprs[i], qc));
+  }
+
+  /**
    * Checks if the specified user is currently logged in.
-   * @param name name of user
+   * @param i expression index
    * @param qc query context
    * @return name
    * @throws QueryException query exception
    */
-  protected final String checkSessions(final String name, final QueryContext qc)
-      throws QueryException {
-    final User user = qc.context.users.get(name);
-    if(user != null) checkSessions(user, qc);
+  protected final String toSafeName(final int i, final QueryContext qc) throws QueryException {
+    final String name = toName(i, qc);
+    checkSafe(qc.context.users.get(name), qc);
     return name;
   }
 
   /**
    * Checks if the specified user is currently logged in.
-   * @param user user
+   * @param i expression index
    * @param qc query context
    * @return user
    * @throws QueryException query exception
    */
-  protected final User checkSessions(final User user, final QueryContext qc) throws QueryException {
-    final String name = user.name();
-    for(final ClientListener s : qc.context.sessions) {
-      if(s.context().user().name().equals(name)) throw BXUS_SESSION_X.get(info, name);
+  protected final User toSafeUser(final int i, final QueryContext qc) throws QueryException {
+    return checkSafe(toUser(i, qc), qc);
+  }
+
+  /**
+   * Checks if the specified user is currently logged in.
+   * @param user user (can be {@code null})
+   * @param qc query context
+   * @return specified user
+   * @throws QueryException query exception
+   */
+  private User checkSafe(final User user, final QueryContext qc) throws QueryException {
+    if(user != null) {
+      final String name = user.name();
+      for(final ClientListener s : qc.context.sessions) {
+        if(s.context().user().name().equals(name)) throw USER_LOGGEDIN_X.get(info, name);
+      }
     }
     return user;
   }

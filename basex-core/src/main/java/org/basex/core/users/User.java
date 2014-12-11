@@ -81,7 +81,7 @@ public final class User {
 
     // parse local permissions
     for(final ANode database : children(user, DATABASE)) {
-      final String nm = string(attribute(name, database, NAME));
+      final String nm = string(attribute(name, database, PATTERN));
       final Perm prm = attribute(name, user, PERMISSION, Perm.values());
       locals.put(nm, prm);
     }
@@ -103,7 +103,7 @@ public final class User {
         xml.close();
       }
       for(final Entry<String, Perm> local : locals.entrySet()) {
-        xml.open(DATABASE, NAME, local.getKey(), PERMISSION, local.getValue());
+        xml.open(DATABASE, PATTERN, local.getKey(), PERMISSION, local.getValue());
         xml.close();
       }
     }
@@ -120,10 +120,10 @@ public final class User {
 
   /**
    * Removes local permissions.
-   * @param db database pattern
+   * @param pattern database pattern
    */
-  public void remove(final String db) {
-    locals.remove(db);
+  public void remove(final String pattern) {
+    locals.remove(pattern);
   }
 
   /**
@@ -202,13 +202,13 @@ public final class User {
   /**
    * Sets the permission.
    * @param prm permission
-   * @param db database pattern (can be {@code null})
+   * @param pattern database pattern (can be {@code null})
    */
-  public void perm(final Perm prm, final String db) {
-    if(db == null) {
+  public void perm(final Perm prm, final String pattern) {
+    if(pattern == null) {
       perm = prm;
     } else {
-      locals.put(db, prm);
+      locals.put(pattern, prm);
     }
   }
 

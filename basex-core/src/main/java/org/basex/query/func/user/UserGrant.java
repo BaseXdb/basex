@@ -18,12 +18,12 @@ public final class UserGrant extends UserFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     checkAdmin(qc);
-    final User user = checkSessions(toUser(0, qc), qc);
+    final User user = toSafeUser(0, qc);
     final Perm perm = toPerm(1, qc);
     final String db = exprs.length > 2 ? toDB(2, qc) : null;
-    if(user.name().equals(UserText.ADMIN)) throw BXUS_ADMIN.get(info);
+    if(user.name().equals(UserText.ADMIN)) throw USER_ADMIN.get(info);
     if(db != null && (perm == Perm.CREATE || perm == Perm.ADMIN))
-      throw BXUS_LOCAL_X.get(info);
+      throw USER_LOCAL.get(info);
 
     qc.resources.updates().add(new Grant(user, perm, db, qc, ii), qc);
     return null;
@@ -50,7 +50,7 @@ public final class UserGrant extends UserFn {
 
     @Override
     public void apply() {
-      for(final String db : databases) users.perm(user, perm, db);
+      for(final String db : patterns) users.perm(user, perm, db);
     }
 
     @Override

@@ -16,9 +16,7 @@ public final class UserPassword extends UserFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     checkAdmin(qc);
-    final User user = toUser(0, qc);
-    final String pass = Token.string(toToken(exprs[1], qc));
-    qc.resources.updates().add(new Password(user, pass, ii, qc), qc);
+    qc.resources.updates().add(new Password(toUser(0, qc), toString(1, qc), ii, qc), qc);
     return null;
   }
 

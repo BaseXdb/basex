@@ -104,7 +104,7 @@ public class StringList extends ElementList implements Iterable<String> {
    * @return result of check
    */
   public final boolean contains(final String element) {
-    for(int i = 0; i < size; ++i) if(list[i].equals(element)) return true;
+    for(int i = 0; i < size; i++) if(Strings.eq(list[i], element)) return true;
     return false;
   }
 

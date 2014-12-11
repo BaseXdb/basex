@@ -350,7 +350,7 @@ public interface Text {
     LI + CmdDrop.INDEX + " [" + CmdIndex.TEXT + '|' +
       CmdIndex.ATTRIBUTE + '|' + CmdIndex.FULLTEXT + "]:" + NL +
       "  " + lang("c_drop22") + NL +
-    LI + CmdDrop.USER + " [" + S_NAME + "] (" + ON + " [database]): " + NL +
+    LI + CmdDrop.USER + " [" + S_NAME + "] (" + ON + " [pattern]): " + NL +
       "  " + lang("c_drop23")
   };
   /** Command help. */
@@ -417,7 +417,7 @@ public interface Text {
   /** Command help. */
   String[] HELPGRANT = {
     "[" + CmdPerm.NONE + '|' + CmdPerm.READ + '|' + CmdPerm.WRITE + '|' +
-    CmdPerm.CREATE + '|' + CmdPerm.ADMIN + "] (" + ON + " [database]) " + S_TO +
+    CmdPerm.CREATE + '|' + CmdPerm.ADMIN + "] (" + ON + " [pattern]) " + S_TO +
     " [user]",
     lang("c_grant1"),
     lang("c_grant2")

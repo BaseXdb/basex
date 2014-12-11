@@ -18,10 +18,10 @@ public final class UserCreate extends UserFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     checkAdmin(qc);
-    final String name = checkSessions(toName(0, qc), qc);
-    final String pw = Token.string(toToken(exprs[1], qc));
+    final String name = toSafeName(0, qc);
+    final String pw = toString(1, qc);
     final Perm perm = exprs.length > 2 ? toPerm(2, qc) : null;
-    if(name.equals(UserText.ADMIN)) throw BXUS_ADMIN.get(info);
+    if(name.equals(UserText.ADMIN)) throw USER_ADMIN.get(info);
 
     qc.resources.updates().add(new Create(name, pw, perm, qc.context.users.get(name), qc, ii), qc);
     return null;

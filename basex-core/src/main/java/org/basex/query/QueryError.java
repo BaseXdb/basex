@@ -246,28 +246,28 @@ public enum QueryError {
 
   // User Module
 
-  /** BXUS0001. */
-  BXUS_NAME_X(BXUS, 1, "Invalid user name '%'."),
-  /** BXUS0002. */
-  BXUS_DB_X(BXUS, 2, "Invalid database name '%'."),
-  /** BXUS0003. */
-  BXUS_EXISTS_X(BXUS, 3, "User '%' already exists."),
-  /** BXUS0004. */
-  BXUS_WHICH_X(BXUS, 4, "User '%' does not exist."),
-  /** BXUS0005. */
-  BXUS_ONCE_X_X(BXUS, 5, "User '%' can only be % once."),
-  /** BXUS0006. */
-  BXUS_ADMIN(BXUS, 6, "Admin user cannot be modified."),
-  /** BXUS0007. */
-  BXUS_PERM_X(BXUS, 7, "Unknown permission: %."),
-  /** BXUS0008. */
-  BXUS_ALTERDROP_X(BXUS, 8, "User '%' cannot be both altered and dropped."),
-  /** BXUS0009. */
-  BXUS_SAME_X(BXUS, 9, "Name of source and target user is equal: %."),
-  /** BXUS0010. */
-  BXUS_SESSION_X(BXUS, 10, "User % is currently logged in."),
-  /** BXUS0011. */
-  BXUS_LOCAL_X(BXUS, 11, "Local permission can only be 'none', 'read' or 'write'."),
+  /** User error. */
+  USER_NAME_X(USER, "name", "Invalid user name: %."),
+  /** User error. */
+  USER_PATTERN_X(USER, "pattern", "Invalid database pattern: %."),
+  /** User error. */
+  USER_PERMISSION_X(USER, "permission", "Invalid permission: %."),
+  /** User error. */
+  USER_UNKNOWN_X(USER, "unknown", "User '%' does not exist."),
+  /** User error. */
+  USER_ADMIN(USER, "admin", "User 'admin' cannot be modified."),
+  /** User error. */
+  USER_EQUAL_X(USER, "equal", "Name of old and new user is equal: %."),
+  /** User error. */
+  USER_LOCAL(USER, "local", "Local permission can only be 'none', 'read' or 'write'."),
+  /** User error. */
+  USER_LOGGEDIN_X(USER, "logged-in", "User '%' is currently logged in."),
+  /** User error. */
+  USER_UPDATE_X_X(USER, "update", "User '%' can only be % once."),
+  /** User error. */
+  USER_UPDATE_X_X_X(USER, "update", "Pattern '%' of user '%' can only be % once."),
+  /** User error. */
+  USER_CONFLICT_X(USER, "conflict", "User '%' cannot be both altered and dropped."),
 
   // EXPath modules
 
@@ -1326,11 +1326,11 @@ public enum QueryError {
     /** BXRE Error type. */ BXRE(BXERR_PREFIX, BXERRORS_URI),
     /** BXSL Error type. */ BXSL(BXERR_PREFIX, BXERRORS_URI),
     /** BXSQ Error type. */ BXSQ(BXERR_PREFIX, BXERRORS_URI),
-    /** BXUS Error type. */ BXUS(BXERR_PREFIX, BXERRORS_URI),
     /** BXVA Error type. */ BXVA(BXERR_PREFIX, BXERRORS_URI),
     /** BXXQ Error type. */ BXXQ(BXERR_PREFIX, BXERRORS_URI),
     /** HASH Error type. */ HASH(BXERR_PREFIX, BXERRORS_URI),
     /** UNIT Error type. */ UNIT(UNIT_PREFIX,  UNIT_URI),
+    /** USER Error type. */ USER(USER_PREFIX,  USER_URI),
 
     // EXPath errors
 

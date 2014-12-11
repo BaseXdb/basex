@@ -1142,10 +1142,10 @@ public enum Function {
   _USER_CREATE(UserCreate.class, "create(name,password[,permission])",
       arg(STR, STR, STR), EMP, flag(UPD), USER_URI),
   /** XQuery function. */
-  _USER_DROP(UserDrop.class, "drop(name[,database])", arg(STR, STR), EMP, flag(UPD), USER_URI),
-  /** XQuery function. */
-  _USER_GRANT(UserGrant.class, "grant(name,permission[,database])",
+  _USER_GRANT(UserGrant.class, "grant(name,permission[,pattern])",
       arg(STR, STR, STR), EMP, flag(UPD), USER_URI),
+  /** XQuery function. */
+  _USER_DROP(UserDrop.class, "drop(name[,pattern])", arg(STR, STR), EMP, flag(UPD), USER_URI),
   /** XQuery function. */
   _USER_ALTER(UserAlter.class, "alter(name,newname)", arg(STR, STR), EMP, flag(UPD), USER_URI),
   /** XQuery function. */

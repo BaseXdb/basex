@@ -38,7 +38,7 @@ public final class DropUser extends AUser {
   }
 
   @Override
-  protected boolean run(final String name, final String db) {
+  protected boolean run(final String name, final String pattern) {
     // admin cannot be dropped
     if(name.equals(UserText.ADMIN)) return !info(ADMIN_STATIC);
 
@@ -46,13 +46,13 @@ public final class DropUser extends AUser {
     final Users users = context.users;
     final User user = users.get(name);
     if(user != null) {
-      if(db == null) {
+      if(pattern == null) {
         for(final ClientListener s : context.sessions) {
           if(s.context().user().name().equals(name)) return !info(USER_LOGGED_IN_X, name);
         }
       }
-      users.drop(users.get(name), db);
-      return info(db == null ? USER_DROPPED_X : USER_DROPPED_X_X, name, db);
+      users.drop(users.get(name), pattern);
+      return info(pattern == null ? USER_DROPPED_X : USER_DROPPED_X_X, name, pattern);
     }
     return true;
   }

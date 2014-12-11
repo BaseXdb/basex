@@ -26,6 +26,8 @@ public interface UserText {
   byte[] PASSWORD = token("password");
   /** Database. */
   byte[] DATABASE = token("database");
-  /** Perm. */
+  /** Pattern. */
+  byte[] PATTERN = token("pattern");
+  /** Permission. */
   byte[] PERMISSION = token("permission");
 }

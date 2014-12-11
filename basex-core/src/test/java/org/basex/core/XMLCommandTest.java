@@ -59,7 +59,7 @@ public class XMLCommandTest extends SandboxTest {
 
     ok("<drop-index type='X'/>");
 
-    ok("<drop-user name='X' database='X'/>");
+    ok("<drop-user name='X' pattern='X'/>");
     ok("<drop-user name='X'/>");
 
     ok("<execute><info/><info/></execute>");
@@ -75,7 +75,7 @@ public class XMLCommandTest extends SandboxTest {
 
     ok("<get option='X'/>");
 
-    ok("<grant name='X' permission='X' database='X'/>");
+    ok("<grant name='X' permission='X' pattern='X'/>");
     ok("<grant name='X' permission='X'/>");
 
     ok("<help>X</help>");

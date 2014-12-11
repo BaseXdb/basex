@@ -115,10 +115,10 @@ public final class Users {
    * Sets the permission of a user.
    * @param user user
    * @param prm permission
-   * @param db database pattern (can be {@code null})
+   * @param pattern database pattern (can be {@code null})
    */
-  public void perm(final User user, final Perm prm, final String db) {
-    user.perm(prm, db);
+  public void perm(final User user, final Perm prm, final String pattern) {
+    user.perm(prm, pattern);
   }
 
   /**
@@ -135,14 +135,14 @@ public final class Users {
   /**
    * Drops a user from the list.
    * @param user user reference
-   * @param db database pattern (can be {@code null})
+   * @param pattern database pattern (can be {@code null})
    * @return success flag
    */
-  public synchronized boolean drop(final User user, final String db) {
-    if(db == null) {
+  public synchronized boolean drop(final User user, final String pattern) {
+    if(pattern == null) {
       if(users.remove(user.name()) == null) return false;
     } else {
-      user.remove(db);
+      user.remove(pattern);
     }
     return true;
   }
