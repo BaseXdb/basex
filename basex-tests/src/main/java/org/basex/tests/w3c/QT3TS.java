@@ -360,7 +360,7 @@ public final class QT3TS extends Main {
       result.value = query.value();
       result.sprop = query.serializer();
     } catch(final XQueryException ex) {
-      result.err = ex;
+      result.xqerror = ex;
       result.value = null;
     } catch(final Throwable ex) {
       // unexpected error (potential bug)
@@ -384,8 +384,8 @@ public final class QT3TS extends Main {
     try {
       if(result.error != null) {
         res = result.error.toString();
-      } else if(result.err != null) {
-        res = result.err.getCode() + ": " + result.err.getLocalizedMessage();
+      } else if(result.xqerror != null) {
+        res = result.xqerror.getCode() + ": " + result.xqerror.getLocalizedMessage();
       } else {
         result.sprop.set(SerializerOptions.OMIT_XML_DECLARATION, "yes");
         res = serialize(result.value, result.sprop);
@@ -394,8 +394,7 @@ public final class QT3TS extends Main {
       res = ex.getCode() + ": " + ex.getLocalizedMessage();
       err = true;
     } catch(final Throwable ex) {
-      res = "Unexpected: " + ex.toString();
-      err = true;
+      res = result.value.toString();
     }
 
     tmp.add(err ? "Error : " : "Result: ").add(noComments(res)).add(NL);
@@ -525,10 +524,10 @@ public final class QT3TS extends Main {
    */
   private String assertError(final QT3Result result, final XdmValue expect) {
     final String exp = asString('@' + CODE, expect);
-    if(result.err == null) return exp;
+    if(result.xqerror == null) return exp;
     if(!errors || exp.equals("*")) return null;
 
-    final QNm resErr = result.err.getException().qname();
+    final QNm resErr = result.xqerror.getException().qname();
 
     String name = exp, uri = string(QueryText.ERROR_URI);
     final Matcher m = BIND.matcher(exp);
@@ -882,7 +881,7 @@ public final class QT3TS extends Main {
         } else if(c == 'a') {
           all = true;
         } else if(c == 'd') {
-          ctx.soptions.set(StaticOptions.DEBUG, true);
+          Prop.debug = true;
         } else if(c == 'i') {
           ignoring = true;
         } else if(c == 'e') {
@@ -949,7 +948,7 @@ public final class QT3TS extends Main {
     /** Query result. */
     XdmValue value;
     /** Query exception. */
-    XQueryException err;
+    XQueryException xqerror;
     /** Query error. */
     Throwable error;
   }
