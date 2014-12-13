@@ -6,6 +6,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
+import org.basex.query.value.*;
 import org.basex.query.value.array.Array;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -66,7 +67,7 @@ public final class Constr {
       for(final Expr e : expr) {
         more = false;
         final Iter iter = qc.iter(e);
-        for(Item ch; (ch = iter.next()) != null && add(qc, ch););
+        for(Item it; (it = iter.next()) != null && add(qc, it););
       }
       if(!text.isEmpty()) children.add(new FTxt(text.toArray()));
       return this;
@@ -85,8 +86,8 @@ public final class Constr {
    */
   private boolean add(final QueryContext qc, final Item it) throws QueryException {
     if(it instanceof Array) {
-      for(final Item i : it.atomValue(info)) {
-        if(!add(qc, i)) return false;
+      for(final Value v : ((Array) it).members()) {
+        for(final Item i : v) if(!add(qc, i)) return false;
       }
       return true;
     }

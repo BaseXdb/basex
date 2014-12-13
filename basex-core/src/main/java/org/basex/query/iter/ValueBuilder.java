@@ -6,6 +6,7 @@ import org.basex.data.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.value.*;
+import org.basex.query.value.array.Array;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
@@ -79,6 +80,20 @@ public final class ValueBuilder extends ValueIter implements Result {
     size = s + 1;
     items = tmp;
     return this;
+  }
+
+  /**
+   * Adds flattened arrays.
+   * @param it current item
+   */
+  public void addFlattened(final Item it) {
+    if(it instanceof Array) {
+      for(final Value v : ((Array) it).members()) {
+        for(final Item i : v) addFlattened(i);
+      }
+    } else {
+      add(it);
+    }
   }
 
   @Override
