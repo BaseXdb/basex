@@ -102,19 +102,19 @@ function _:create(
 ) {
   web:check(),
   try {
-    if(web:eval('user:exists($n)', map { 'n' : $name })) then (
+    web:update("if(user:exists($name)) then (
       error((), 'User already exists: ' || $name || '.')
     ) else (
-      web:update("user:create($name, $pw, $perm)", map {
-        'name': $name,
-        'pw':   $pw,
-        'perm': $perm
-      }),
-      web:redirect($_:CAT, map {
-        'info': 'Created User: ' || $name,
-        'name': $name
-      })
-    )
+      user:create($name, $pw, $perm)
+    )", map {
+      'name': $name,
+      'pw':   $pw,
+      'perm': $perm
+    }),
+    web:redirect($_:CAT, map {
+      'info': 'Created User: ' || $name,
+      'name': $name
+    })
   } catch * {
     web:redirect("create-user", map {
       'error': $err:description,

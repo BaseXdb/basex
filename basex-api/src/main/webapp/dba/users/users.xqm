@@ -5,6 +5,8 @@
  :)
 module namespace _ = 'dba/users';
 
+import module namespace Sessions = 'http://basex.org/modules/sessions';
+import module namespace Session = 'http://basex.org/modules/session';
 import module namespace G = 'dba/global' at '../modules/global.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
 import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
@@ -68,17 +70,36 @@ function _:users(
       </td>
       <td class='vertical'/>
       <td width='49%'>
-        <h2>Sessions</h2>
+        <form action="{ $_:CAT }" method="post" class="update">
+        <h2>Browser Sessions</h2>
+        {
+          let $entries :=
+            for $id in Sessions:ids()
+            for $session in Sessions:get($id, $G:SESSION-KEY)
+            let $name := $session/name || ' (you)'[Session:id() = $id]
+            let $addr := (string-join($session/(host, port), ":")[.], 'local')[1]
+            let $access := format-dateTime(Sessions:accessed($id), '[Y]-[M2]-[D2], [H]:[m]:[s]')
+            return <e id='{ $id }' user='{ $name }' addr='{ $addr }' access='{ $access }'/>
+          let $headers := (
+            <id type='id'/>,
+            <user>User</user>,
+            <addr>Address</addr>,
+            <access>Last Access</access>
+          )
+          let $buttons := (
+            html:button('kill-dba', 'Kill', true())
+          )
+          return html:table($entries, $headers, $buttons)
+        }
+        </form>
+        <h2>Database Client Sessions</h2>
         {
           let $entries := $data/sessions/session/<e addr='{ @address }' user='{ @user }'/>
           let $headers := (
             <addr>{ html:label($entries, ('Session', 'Sessions')) }</addr>,
             <user>Address</user>
           )
-          let $buttons := (
-            (: html:button('kill', 'Kill', true()) :)
-          )
-          return html:table($entries, $headers, $buttons)
+          return html:table($entries, $headers, ())
         }
       </td>
     </tr>
@@ -88,7 +109,8 @@ function _:users(
 (:~
  : Redirects to the specified action.
  : @param  $action  action to perform
- : @param  $names   names of databases
+ : @param  $names   names of users
+ : @param  $ids     ids
  :)
 declare
   %updating
@@ -96,13 +118,16 @@ declare
   %rest:path("dba/users")
   %rest:query-param("action", "{$action}")
   %rest:query-param("name",   "{$names}")
+  %rest:query-param("id",     "{$ids}")
   %output:method("html")
 function _:action(
   $action  as xs:string,
-  $names   as xs:string*
+  $names   as xs:string*,
+  $ids     as xs:string*
 ) {
   web:redirect($action,
     if($action = 'create-user') then map { }
+    else if($action = 'kill-dba') then map { 'id': $ids }
     else map { 'name': $names, 'redirect': $_:CAT }
   )
 };

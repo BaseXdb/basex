@@ -16,7 +16,7 @@ function buttons() {
 
       if(s == "optimize" || s == "optimize-all" || s == "drop-backup" ||
          s == "drop-db" || s == "drop-pattern" || s == "drop-user" ||
-         s == "restore" || s == "backup" || s == "delete" ||
+         s == "kill-session" || s == "restore" || s == "backup" || s == "delete" ||
          s == "delete-log" || s == "kill") {
         e = c > 0;
       }
@@ -59,6 +59,7 @@ function query(wait, success, key, query, enforce, target) {
     if(wait) setWarning(wait);
     var req = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
     req.onreadystatechange = function() {
+      if(_d != d) return;
       if(req.readyState == 4) {
         if(req.status == 200) {
           target(req.responseText);

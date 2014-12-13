@@ -5,6 +5,7 @@
  :)
 module namespace tmpl = 'dba/tmpl';
 
+import module namespace G = 'dba/global' at 'global.xqm';
 import module namespace web = 'dba/web' at 'web.xqm';
 
 (:~
@@ -26,8 +27,8 @@ declare function tmpl:wrap(
  :   <li><b>error</b>: error string</li>
  :   <li><b>info</b>: info string</li>
  : </ul>
- : @param  $tr       tr elements
  : @param  $options  options
+ : @param  $tr       tr elements
  : @return page
  :)
 declare function tmpl:wrap(
@@ -44,7 +45,7 @@ declare function tmpl:wrap(
       <script type="text/javascript" src="files/js.js"/>
     </head>
     <body>
-      <div class="right"><img src="files/basex.svg"/></div>
+      <div class="right"><img style='padding-left:10px;padding-bottom:10px;' src="files/basex.svg"/></div>
       <h1>Database Administration</h1>
       <div>{
         let $emph := <span>{(element b {
@@ -55,14 +56,10 @@ declare function tmpl:wrap(
         })}</span>
         return try {
           web:check(),
-          let $cats := <cats>{
-            for $cat in ('Databases', 'Queries', 'Logs', 'Users', 'Settings', 'Logout')
-            return <cat name="{ lower-case($cat) }">{ $cat }</cat>
-          }</cats>
           let $cats := 
             let $top := $options('top')
-            for $cat in $cats/cat
-            let $link := <a href="{ $cat/@name/data() }">{ $cat/data() }</a>
+            for $cat in ('Databases', 'Queries', 'Logs', 'Users', 'Settings', 'Logout')
+            let $link := <a href="{ lower-case($cat) }">{ $cat }</a>
             return if($top = $link) then (
               <b>{ $link }</b>
             ) else (
@@ -73,7 +70,10 @@ declare function tmpl:wrap(
           $emph
         } catch basex:login {
           $emph
-        }
+        },
+        <span style='float:right'>User: <b>{
+          $G:SESSION/name/text()
+        }</b></span>[$G:SESSION]
       }</div>
       <hr/>
       <div class='small'/>

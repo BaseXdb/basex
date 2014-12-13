@@ -275,7 +275,7 @@ declare function html:table(
                 <input type="checkbox" name="{ $name }" value="{ $col }" onClick="buttons()"/>,
                 if(exists($link)) then (
                   html:link($value, $link($value), map:merge(($param, map { $name: $value })))
-                ) else (
+                ) else if($header/@type = 'id') then () else (
                   $value
                 )
               ) else (

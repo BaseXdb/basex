@@ -24,7 +24,7 @@ declare
   %rest:query-param("url",   "{$url}")
   %rest:query-param("error", "{$error}")
   %output:method("html")
-function _:login(
+function _:welcome(
   $name   as xs:string?,
   $url    as xs:string?,
   $error  as xs:string?
@@ -34,7 +34,7 @@ function _:login(
       <td>
         <form action="login-check" method="post">
           <div class='note'>
-            Please enter your credentials:
+            Enter your admin credentials:
           </div>
           <div class='small'/>
           <table>
@@ -80,71 +80,109 @@ function _:login(
  : @param  $name  user name
  : @param  $pass  password
  : @param  $url   url
+ : @return redirect
  :)
 declare
-  %updating
   %rest:path("dba/login-check")
   %rest:query-param("name", "{$name}")
   %rest:query-param("pass", "{$pass}")
   %rest:query-param("url",  "{$url}")
-function _:check(
+function _:login(
   $name  as xs:string,
   $pass  as xs:string,
   $url   as xs:string
-) {
+) as element(rest:redirect) {
   if($url) then (
     if(matches($url, '^.+:\d+/?$')) then (
       let $host := replace($url, ':.*$', '')
       let $port := replace($url, '^.*:|/$', '')
       return try {
-        client:close(client:connect($host, xs:integer($port), $name, $pass)),
-        Session:set($G:SESSION-KEY, $name),
-        Session:set($G:SESSION-REMOTE,
-          <remote>
-            <host>{ $host }</host>
-            <port>{ $port }</port>
-            <name>{ $name }</name>
-            <pass>{ $pass }</pass>
-          </remote>
-        ),
-        web:redirect('databases')
+        let $id := client:connect($host, xs:integer($port), $name, $pass)
+        return (
+          try {
+            (: check if user can perform admin operations :)
+            prof:void(client:query($id, 'admin:sessions()')),
+            _:accept($name, $pass, $host, $port)
+          } catch bxerr:BASX0001 {
+            _:reject($name, $url, 'Admin credentials required.')
+          },
+          client:close($id)
+        )
       } catch * {
-        web:redirect('login', map { 'name': $name, 'url': $url, 'error': $err:description })
+        _:reject($name, $url, $err:description)
       }
     ) else (
-      web:redirect('login', map {
-        'name': $name,
-        'url': $url,
-        'error': 'Please check the syntax of your URL.'
-      })
+      _:reject($name, $url, 'Please check the syntax of your URL.')
     )
   ) else (
-    let $server-pw := user:list-details()[@name = $name]/password[@algorithm = 'salted-sha256']
-    let $server-salt := $server-pw/salt
-    let $server-hash := $server-pw/hash
-    let $user-hash := lower-case(xs:string(xs:hexBinary(hash:sha256($server-salt || $pass))))
-    return if($server-hash = $user-hash) then (
-      Session:set($G:SESSION-KEY, $name),
-      admin:write-log('User was logged in: ' || $name),
-      web:redirect('databases')
+    let $user := user:list-details()[@name = $name]
+    let $pw := $user/password[@algorithm = 'salted-sha256']
+    let $salt := $pw/salt
+    let $hash := $pw/hash
+    let $user-hash := lower-case(xs:string(xs:hexBinary(hash:sha256($salt || $pass))))
+    return if($hash = $user-hash) then (
+      if($user/@permission eq 'admin') then (
+        _:accept($name, $pass, '', '')
+      ) else (
+        _:reject($name, $url, 'Admin credentials required.')
+      )
     ) else (
-      web:redirect('login', map {
-        'name': $name,
-        'error': 'Please check your login data.'
-      })
+      _:reject($name, $url, 'Please check your login data.')
     )
   )
 };
 
 (:~
  : Ends a session and redirects to the login page.
+ : @return redirect
  :)
-declare
-  %updating
-  %rest:path("dba/logout")
-function _:logout(
+declare %rest:path("dba/logout") function _:logout(
+) as element(rest:redirect) {
+  let $name := $G:SESSION/name
+  let $url := string-join($G:SESSION/(host, port), ':')
+  return (
+    admin:write-log('User was logged out: ' || $name),
+    Session:delete($G:SESSION-KEY),
+    Session:close(),
+    web:redirect-ro('login', map { 'nane': $name, 'url': $url })
+  )
+};
+
+(:~
+ : Accepts a user and redirects to the main page.
+ : @param  $name  entered user name
+ : @return redirect
+ :)
+declare %private function _:accept(
+  $name  as xs:string,
+  $pass  as xs:string,
+  $host  as xs:string,
+  $port  as xs:string
 ) {
-  admin:write-log('User was logged out: ' || $G:SESSION),
-  Session:close(),
-  web:redirect('login')
+  Session:set($G:SESSION-KEY,
+    element session {
+      element name { $name },
+      element pass { $pass },
+      element host { $host }[$host],
+      element port { $port }[$port]
+    }
+  ),
+  admin:write-log('User was logged in: ' || $name),
+  web:redirect-ro('databases')
+};
+
+(:~
+ : Rejects a user and redirects to the login page.
+ : @param  $name     entered user name
+ : @param  $url      entered url
+ : @param  $message  error message
+ : @return redirect
+ :)
+declare %private function _:reject(
+  $name     as xs:string,
+  $url      as xs:string,
+  $message  as xs:string
+) as element(rest:redirect) {
+  admin:write-log('Login was denied: ' || $name),
+  web:redirect-ro('login', map { 'name': $name, 'url': $url, 'error': $message })
 };

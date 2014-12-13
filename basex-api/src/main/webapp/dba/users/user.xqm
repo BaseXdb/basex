@@ -188,7 +188,11 @@ function _:create(
   try {
     web:update("
       let $old := user:list-details()[@name = $name] return (
-        if($name = $newname) then () else user:alter($name, $newname),
+        if($name = $newname) then () else if(user:exists($newname)) then (
+           error((), 'User already exists: ' || $newname || '.')
+         ) else (
+           user:alter($name, $newname)
+        ),
         if($pw = '') then () else user:password($name, $pw),
         if($perm = $old/@permission) then () else user:grant($name, $perm)
       )",
@@ -199,7 +203,7 @@ function _:create(
       'name': $newname
     })
   } catch * {
-    web:redirect("edit-user", map {
+    web:redirect($_:SUB, map {
       'error': $err:description,
       'name': $name,
       'newname': $newname,

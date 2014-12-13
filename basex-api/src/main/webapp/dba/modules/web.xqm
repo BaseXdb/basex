@@ -47,29 +47,51 @@ declare function web:mime-type(
 };
 
 (:~
- : Creates a RESTXQ (HTTP) redirect header for the specified link.
- : @param  $location  page to forward to
- : @return redirect header
+ : Creates a RESTXQ (HTTP) redirect header for the specified page.
+ : @param  $page  page to forward to
  :)
 declare %updating function web:redirect(
-  $location  as xs:string
+  $page  as xs:string
 ) {
-  web:redirect($location, map { })
+  web:redirect($page, map { })
 };
 
 (:~
- : Creates a RESTXQ (HTTP) redirect header for the specified link and parameters.
- : @param  $redirect  page to forward to
- : @param  $params    map with query parameters
- : @return redirect header
+ : Creates a RESTXQ (HTTP) redirect header for the specified page and parameters.
+ : @param  $page    page to forward to
+ : @param  $params  map with query parameters
  :)
 declare %updating function web:redirect(
-  $redirect  as xs:string,
-  $params    as map(*)
+  $page    as xs:string,
+  $params  as map(*)
 ) {
   db:output(
-    element rest:redirect { web:create-url($redirect, $params) }
+    web:redirect-ro($page, $params)
   )
+};
+
+(:~
+ : Creates a RESTXQ (HTTP) redirect header for the specified page.
+ : @param  $page    page to forward to
+ : @return redirect header
+ :)
+declare function web:redirect-ro(
+  $page    as xs:string
+) as element(rest:redirect) {
+  web:redirect-ro($page, map {})
+};
+
+(:~
+ : Creates a RESTXQ (HTTP) redirect header for the specified page and parameters.
+ : @param  $page    page to forward to
+ : @param  $params  map with query parameters
+ : @return redirect header
+ :)
+declare function web:redirect-ro(
+  $page    as xs:string,
+  $params  as map(*)
+) as element(rest:redirect) {
+  element rest:redirect { web:create-url($page, $params) }
 };
 
 (:~
@@ -160,7 +182,7 @@ declare function web:eval(
   let $query := string-join((
     map:keys($vars) ! ('declare variable $' || . || ' external;'), $query
   ))
-  return if($G:REMOTE) then (
+  return if($G:SESSION/host) then (
     web:remote-query($query, $vars)
   ) else (
     xquery:eval($query, $vars)
@@ -179,7 +201,7 @@ declare %updating function web:update(
   let $query := string-join((
     map:keys($vars) ! ('declare variable $' || . || ' external;'), $query
   ))
-  return if($G:REMOTE) then (
+  return if($G:SESSION/host) then (
     prof:void(web:remote-query($query, $vars))
   ) else (
     xquery:update($query, $vars)
@@ -196,8 +218,7 @@ declare %private function web:remote-query(
   $query  as xs:string,
   $vars   as map(*)
 ) as item()* {
-  let $xml := $G:REMOTE
-  let $id := client:connect($xml/host, $xml/port, $xml/name, $xml/pass)
+  let $id := client:connect($G:SESSION/host, $G:SESSION/port, $G:SESSION/name, $G:SESSION/pass)
   return (
     client:query($id, $query, $vars),
     client:close($id)

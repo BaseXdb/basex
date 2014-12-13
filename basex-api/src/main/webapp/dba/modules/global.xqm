@@ -12,14 +12,10 @@ declare variable $G:LOGIN-ERROR := xs:QName("basex:login");
 (:~ An error occured while retrieving data. :)
 declare variable $G:DATA-ERROR := 'Could not retrieve data';
 
-(:~ Name of server session. :)
+(:~ Session key. :)
 declare variable $G:SESSION-KEY := "session";
-(:~ Remote port. :)
-declare variable $G:SESSION-REMOTE := "remote";
 (:~ Current session. :)
 declare variable $G:SESSION := Session:get($G:SESSION-KEY);
-(:~ Remote settings. :)
-declare variable $G:REMOTE := Session:get($G:SESSION-REMOTE);
 
 (:~ Configuration file. :)
 declare variable $G:CONFIG-XML := file:base-dir() || '../files/config.xml';

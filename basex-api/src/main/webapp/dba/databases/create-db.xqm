@@ -103,21 +103,18 @@ function _:create(
 ) {
   web:check(),
   try {
-    if(web:eval('db:exists($n)', map { 'n' : $name })) then (
+    web:update("if(db:exists($name)) then (
       error((), 'Database already exists: ' || $name || '.')
     ) else (
-      web:update("db:create($name, (), (), map:merge((
-  (('textindex','attrindex','ftindex','stemming','casesens','diacritics','updindex') !
-    map:entry(., $opts = .)),
-    $lang ! map:entry('language', .)
-  )
-))", map { 'name': $name, 'lang': $lang, 'opts': $opts }
-      ),
-      web:redirect($_:SUB, map {
-        'info': 'Created Database: ' || $name,
-        'name': $name
-      })
-    )
+      db:create($name, (), (), map:merge((
+      (('textindex','attrindex','ftindex','stemming','casesens','diacritics','updindex') !
+         map:entry(., $opts = .)), $lang ! map:entry('language', .))
+      ))
+    )", map { 'name': $name, 'lang': $lang, 'opts': $opts }),
+    web:redirect($_:SUB, map {
+      'info': 'Created Database: ' || $name,
+      'name': $name
+    })
   } catch * {
     web:redirect("create-db", map {
       'error': $err:description,
