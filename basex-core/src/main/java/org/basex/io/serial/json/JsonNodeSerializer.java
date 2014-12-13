@@ -39,7 +39,7 @@ public final class JsonNodeSerializer extends JsonSerializer {
   private final boolean lax;
   /** Attributes flag. */
   private final boolean atts;
-  /** Escape special characters. */
+  /** Node serializer. */
   private final Serializer ser;
   /** Node output cache. */
   private final ArrayOutput cache = new ArrayOutput();
@@ -63,6 +63,7 @@ public final class JsonNodeSerializer extends JsonSerializer {
     final SerializerOptions so = new SerializerOptions();
     so.set(SerializerOptions.METHOD, opts.get(SerializerOptions.JSON_NODE_OUTPUT_METHOD));
     so.set(SerializerOptions.OMIT_XML_DECLARATION, YesNo.YES);
+    so.set(SerializerOptions.INDENT, YesNo.NO);
     ser = Serializer.get(cache, so);
 
     final int tl = typeCache.length;
