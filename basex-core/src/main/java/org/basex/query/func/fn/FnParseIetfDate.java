@@ -323,7 +323,7 @@ public final class FnParseIetfDate extends StandardFunc {
      */
     private boolean skipWs() {
       if(!more() || !ws(curr())) return false;
-      consume();
+      do consume(); while(more() && ws(curr()));
       return true;
     }
 
