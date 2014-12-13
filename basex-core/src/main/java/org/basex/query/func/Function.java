@@ -466,6 +466,8 @@ public enum Function {
   /** XQuery function. */
   _ARRAY_JOIN(ArrayJoin.class, "join(array)", arg(ARRAY_ZM), ITEM_ZM, ARRAY_URI),
   /** XQuery function. */
+  _ARRAY_FLATTEN(ArrayFlatten.class, "flatten(item()*)", arg(ITEM_ZM), ITEM_ZM, ARRAY_URI),
+  /** XQuery function. */
   _ARRAY_FOR_EACH(ArrayForEach.class, "for-each(array,function)",
       arg(ARRAY_O, FuncType.get(ITEM_ZM, ITEM_ZM).seqType()), ARRAY_O, flag(HOF),
       ARRAY_URI),
