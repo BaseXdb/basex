@@ -57,7 +57,7 @@ public final class MapTest extends AdvancedQueryTest {
 
   /** Stack overflow bug. */
   @Test public void so() {
-    query("let $x := map { 'f': { 1: 1, 2: 2 } } "
+    query("let $x := map { 'f': map { 1: 1, 2: 2 } } "
         + "return (every $k in map:keys($x('f')) satisfies $k eq $x('f')($k))", true);
   }
 
@@ -74,6 +74,6 @@ public final class MapTest extends AdvancedQueryTest {
 
   /** Atomize key. */
   @Test public void atomKey() {
-    query("{'x':42}(['x'])", 42);
+    query("map {'x':42}(['x'])", 42);
   }
 }

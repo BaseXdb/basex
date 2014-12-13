@@ -542,12 +542,12 @@ public final class DbModuleTest extends AdvancedQueryTest {
         "casesens", "diacritics" };
     for(final String k : bopt) {
       for(final boolean v : new boolean[] { true, false }) {
-        query(_DB_OPTIMIZE.args(NAME, false, " map { '" + k + "':=" + v + "() }"));
+        query(_DB_OPTIMIZE.args(NAME, false, " map { '" + k + "':" + v + "() }"));
       }
     }
     final String[] sopt = { "language", "stopwords" };
     for(final String k : sopt) {
-      query(_DB_OPTIMIZE.args(NAME, false, " map { '" + k + "':='' }"));
+      query(_DB_OPTIMIZE.args(NAME, false, " map { '" + k + "':'' }"));
     }
     assertEquals(context.options.get(MainOptions.TEXTINDEX), true);
 
@@ -586,7 +586,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
     query(_DB_INFO.args(NAME) + "//ftindex/text()", "false");
 
     query(_DB_OPTIMIZE.args(NAME, true,
-        " map { 'textindex':=true(),'attrindex':=true(),'ftindex':=true(),'updindex':=true() }"));
+        " map { 'textindex':true(),'attrindex':true(),'ftindex':true(),'updindex':true() }"));
     query(_DB_INFO.args(NAME) + "//textindex/text()", "true");
     query(_DB_INFO.args(NAME) + "//attrindex/text()", "true");
     query(_DB_INFO.args(NAME) + "//ftindex/text()", "true");

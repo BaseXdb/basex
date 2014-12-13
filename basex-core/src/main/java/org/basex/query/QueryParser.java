@@ -2075,8 +2075,8 @@ public class QueryParser extends InputParser {
     // ordered expression
     if(wsConsumeWs(ORDERED, CURLY1, INCOMPLETE) || wsConsumeWs(UNORDERED, CURLY1, INCOMPLETE))
       return enclosed(NOENCLEXPR);
-    // map (including legacy syntax)
-    if(wsConsumeWs(MAPSTR, CURLY1, INCOMPLETE) || curr('{')) return new CMap(info(), keyValues());
+    // map
+    if(wsConsumeWs(MAPSTR, CURLY1, INCOMPLETE)) return new CMap(info(), keyValues());
     // square array constructor
     if(wsConsumeWs(SQUARE1)) return new CArray(info(), false, values());
     // curly array constructor
@@ -2131,7 +2131,7 @@ public class QueryParser extends InputParser {
     if(!wsConsume(CURLY2)) {
       do {
         add(el, check(single(), INVMAPKEY));
-        if(!wsConsume(ASSIGN)) check(':');
+        if(!wsConsume(COL)) throw error(WRONGCHAR_X_X, COL, found());
         add(el, check(single(), INVMAPVAL));
       } while(wsConsume(COMMA));
       wsCheck(CURLY2);
