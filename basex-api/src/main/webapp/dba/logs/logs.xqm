@@ -97,6 +97,8 @@ function _:query(
   $query    as xs:string?,
   $loglist  as xs:string?
 ) as element()* {
+  web:check(),
+
   let $logs := try {
     web:eval("admin:logs($n, true())[matches(., $q, 'i')]",
       map { 'n': $name, 'q': $query }
@@ -134,6 +136,8 @@ function _:loglist(
   $sort   as xs:string?,
   $query  as xs:string?
 ) as element()* {
+  web:check(),
+
   let $logs := try {
     web:eval("for $a in admin:logs()
       let $n := $a/(@date,text())/string()
