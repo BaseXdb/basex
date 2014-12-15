@@ -63,7 +63,7 @@ public final class Rename extends Update {
     if(targ.type == NodeType.ELM || targ.type == NodeType.ATT) {
       final byte[] rp = rename.prefix();
       final byte[] ru = rename.uri();
-      final Atts at = targ.nsScope();
+      final Atts at = targ.nsScope(sc);
       final int as = at.size();
       for(int a = 0; a < as; a++) {
         if(eq(at.name(a), rp) && !eq(at.value(a), ru)) throw UPNSCONFL.get(info);

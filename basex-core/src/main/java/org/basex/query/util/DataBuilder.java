@@ -221,7 +221,7 @@ public final class DataBuilder {
 
     // add new namespaces
     data.nspaces.prepare();
-    final Atts ns = par == -1 ? node.nsScope() : node.namespaces();
+    final Atts ns = par == -1 ? node.nsScope(null) : node.namespaces();
     final int nl = ns.size();
     for(int n = 0; n < nl; n++) data.nspaces.add(ns.name(n), ns.value(n), ds);
 

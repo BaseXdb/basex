@@ -120,8 +120,8 @@ public final class ArrayTest extends AdvancedQueryTest {
     query("element a { [] }", "<a/>");
     query("element a { [()] }", "<a/>");
     query("element a { [1] }", "<a>1</a>");
-    query("element a { [ <b>c</b> ] }", "<a>c</a>");
-    query("element a { [ <b>c</b>, <b>d</b> ] }", "<a>c d</a>");
+    query("element a { [ <b>c</b> ] }", "<a><b>c</b></a>");
+    query("element a { [ <b>c</b>, <b>d</b> ] }", "<a><b>c</b><b>d</b></a>");
 
     query("element { ['a'] } { }", "<a/>");
 

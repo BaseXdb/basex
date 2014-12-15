@@ -27,7 +27,8 @@ public final class FnResolveQName extends StandardFunc {
 
     final QNm nm = new QNm(name);
     final byte[] pref = nm.prefix();
-    final byte[] uri = base.uri(pref);
+    byte[] uri = base.uri(pref);
+    if(uri == null) uri = sc.ns.uri(pref);
     if(uri == null) throw NSDECL_X.get(info, pref);
     nm.uri(uri);
     return nm;

@@ -105,4 +105,17 @@ public final class NSContext {
     if(stack == null) stack = new Atts();
     return stack;
   }
+
+  /**
+   * Adds the namespaces that are currently in scope.
+   * @param atts namespaces
+   */
+  public void inScope(final Atts atts) {
+    if(stack != null) {
+      for(int s = stack.size() - 1; s >= 0; s--) {
+        final byte[] nm = stack.name(s);
+        if(!atts.contains(nm)) atts.add(nm, stack.value(s));
+      }
+    }
+  }
 }

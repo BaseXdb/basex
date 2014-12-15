@@ -124,4 +124,15 @@ public final class FnTest extends AdvancedQueryTest {
     query(JSON_DOC.args("src/test/resources/example.json") + "('address')('state')", "NY");
     query(JSON_DOC.args("src/test/resources/example.json") + "?address?state", "NY");
   }
+
+  /** Namespace functions. */
+  @Test
+  public void ns() {
+    query("sort(<e xmlns:p='u'>{"
+        + "  in-scope-prefixes(<e/>),"
+        + "  namespace-uri-for-prefix('p', <e/>), "
+        + "  resolve-QName('p:p', <p/>)"
+        + "}</e>/text()/tokenize(.))",
+        "p p:p u xml");
+  }
 }

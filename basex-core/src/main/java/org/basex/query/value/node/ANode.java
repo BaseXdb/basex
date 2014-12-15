@@ -153,9 +153,10 @@ public abstract class ANode extends Item {
 
   /**
    * Returns a copy of the namespace hierarchy.
+   * @param sc static context
    * @return namespaces
    */
-  public final Atts nsScope() {
+  public final Atts nsScope(final StaticContext sc) {
     final Atts ns = new Atts();
     ANode node = this;
     do {
@@ -168,6 +169,7 @@ public abstract class ANode extends Item {
       }
       node = node.parent();
     } while(node != null && node.type == NodeType.ELM);
+    if(sc != null) sc.ns.inScope(ns);
     return ns;
   }
 
