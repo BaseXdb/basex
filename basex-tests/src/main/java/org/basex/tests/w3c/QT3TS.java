@@ -443,7 +443,7 @@ public final class QT3TS extends Main {
       // skip limits
       "@type = 'limits' and @value = ('big_integer') or " +
       // skip non-XQuery tests
-      "@type = 'spec' and not(matches(@value, 'XQ3|XQ\\d\\d\\+'))" +
+      "@type = 'spec' and not(matches(@value, 'XQ\\d\\d\\+'))" +
       "]", ctx).context(test).value().size() == 0;
   }
 
