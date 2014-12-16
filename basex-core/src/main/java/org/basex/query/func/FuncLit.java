@@ -38,19 +38,19 @@ public final class FuncLit extends Single implements Scope {
    * Constructor.
    * @param ann annotations
    * @param name function name
-   * @param arg formal parameters
+   * @param args formal parameters
    * @param expr function body
    * @param ft function type
    * @param scope variable scope
    * @param sc static context
    * @param info input info
    */
-  public FuncLit(final Ann ann, final QNm name, final Var[] arg, final Expr expr, final FuncType ft,
-      final VarScope scope, final StaticContext sc, final InputInfo info) {
+  public FuncLit(final Ann ann, final QNm name, final Var[] args, final Expr expr,
+      final FuncType ft, final VarScope scope, final StaticContext sc, final InputInfo info) {
     super(info, expr);
     this.ann = ann;
     this.name = name;
-    args = arg;
+    this.args = args;
     this.scope = scope;
     this.sc = sc;
     check = ft == null;

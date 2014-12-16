@@ -102,6 +102,8 @@ public final class QueryContext extends Proc implements AutoCloseable {
   public Item time;
   /** Current timezone. */
   public Item zone;
+  /** Current nanoseconds. */
+  public long nano;
 
   /** Strings to lock defined by lock:read option. */
   public final StringList readLocks = new StringList(0);
@@ -802,6 +804,7 @@ public final class QueryContext extends Proc implements AutoCloseable {
       date = new Dat(token(ymd + zn), null);
       dtm = new Dtm(token(ymd + 'T' + hms + zn), null);
       zone = new DTDur(Strings.toInt(zon.substring(0, 3)), Strings.toInt(zon.substring(3)));
+      nano = System.nanoTime();
     }
     return this;
   }
