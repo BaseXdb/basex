@@ -8,12 +8,14 @@ import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.*;
+import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
  * Abstract super class for function items.
+ * This class is inherited by either {@link Map}, {@link Array}, or {@link FuncItem}.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
