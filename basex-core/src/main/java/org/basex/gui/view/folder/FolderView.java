@@ -207,7 +207,7 @@ public final class FolderView extends View {
     final int kind = data.kind(pre);
     final boolean elem = kind == Data.ELEM || kind == Data.DOC;
 
-    Color col = Color.black;
+    Color col = GUIConstants.FORE;
     Font fnt = font;
     if(marked.find(pre) >= 0) {
       // mark node
@@ -321,16 +321,14 @@ public final class FolderView extends View {
     /* Empty Box. */
     final BufferedImage emptyBox = new BufferedImage(boxW + 1, boxW + 1,
             BufferedImage.TYPE_INT_ARGB);
-    Graphics2D g = emptyBox.createGraphics();
-    smooth(g);
+    Graphics2D g = BaseXLayout.antiAlias(emptyBox.createGraphics());
     g.setColor(color4);
     g.fillOval((boxW >> 2) - 1, (boxW >> 2) + 1, boxW >> 1, boxW >> 1);
     g.setColor(color3);
     g.fillOval((boxW >> 2) - 2, boxW >> 2, boxW >> 1, boxW >> 1);
 
     openedMarker = new BufferedImage(boxW + 1, boxW + 1, BufferedImage.TYPE_INT_ARGB);
-    g = openedMarker.createGraphics();
-    smooth(g);
+    g = BaseXLayout.antiAlias(openedMarker.createGraphics());
 
     Polygon p = new Polygon(new int[] { 0, boxW, boxW >> 1 }, new int[] {
         boxW - sp >> 1, boxW - sp >> 1, boxW }, 3);
@@ -342,8 +340,7 @@ public final class FolderView extends View {
     g.fillPolygon(p);
 
     closedMarker = new BufferedImage(boxW + 1, boxW + 1, BufferedImage.TYPE_INT_ARGB);
-    g = closedMarker.createGraphics();
-    smooth(g);
+    g = BaseXLayout.antiAlias(closedMarker.createGraphics());
 
     p = new Polygon(new int[] { boxW - sp >> 1, boxW, boxW - sp >> 1 },
         new int[] { 0, boxW >> 1, boxW }, 3);

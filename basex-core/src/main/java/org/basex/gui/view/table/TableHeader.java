@@ -11,7 +11,6 @@ import java.awt.event.*;
 import javax.swing.*;
 
 import org.basex.data.*;
-import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.view.table.TableData.TableCol;
@@ -47,7 +46,8 @@ final class TableHeader extends BaseXPanel {
    */
   TableHeader(final TableView v) {
     super(v.gui);
-    mode(Fill.NONE).setFocusable(true);
+    setOpaque(false);
+    setFocusable(true);
     tdata = v.tdata;
     view = v;
     refreshLayout();
@@ -86,7 +86,7 @@ final class TableHeader extends BaseXPanel {
     super.paintComponent(g);
 
     g.setFont(font);
-    g.setColor(Color.black);
+    g.setColor(GUIConstants.FORE);
     if(tdata.rows == null) {
       BaseXLayout.drawCenter(g, NO_DATA, getWidth(), getHeight() / 2);
       return;
@@ -111,14 +111,14 @@ final class TableHeader extends BaseXPanel {
       final boolean clicked = n == clickCol && moveC == -1 && header;
       BaseXLayout.drawCell(g, (int) x, (int) ce + 1, 0, hh, clicked);
       // input field
-      g.setColor(Color.white);
+      g.setColor(GUIConstants.BACK);
       g.fillRect((int) x + 1, hh, (int) ce - (int) x - 2, hh - 2);
       g.drawLine((int) ce - 1, hh - 1, (int) ce - 1, h - 2);
-      g.setColor(GRAY);
+      g.setColor(gray);
       g.drawLine((int) ce, hh - 1, (int) ce, h - 2);
 
       // draw headers
-      g.setColor(Color.black);
+      g.setColor(GUIConstants.FORE);
       g.setFont(bfont);
 
       final int off = clicked ? 1 : 0;
@@ -136,7 +136,7 @@ final class TableHeader extends BaseXPanel {
       if(box != null && inputCol == n) {
         box.paint(g, (int) x, hh, (int) ce - (int) x, hh);
       } else {
-        g.setColor(Color.black);
+        g.setColor(GUIConstants.FORE);
         g.setFont(font);
         g.drawString(tdata.cols[n].filter, (int) x + 5, h - 7);
       }
@@ -146,11 +146,11 @@ final class TableHeader extends BaseXPanel {
     final boolean clicked = nc == clickCol;
     BaseXLayout.drawCell(g, (int) x, w + bs, 0, hh, clicked && header);
     BaseXLayout.drawCell(g, (int) x, w + bs, hh - 1, h, clicked && !header);
-    smooth(g);
+    BaseXLayout.antiAlias(g);
 
     int o = header && clicked ? 1 : 0;
     final int xo = (int) (4 * SCALE), yo = (int) (6 * SCALE);
-    g.setColor(Color.black);
+    g.setColor(GUIConstants.FORE);
     g.fillPolygon(
         new int[] { (int) x + o + xo, (int) x + o + bs - xo, (int) x + o + bs / 2 },
         new int[] { o + yo, o + yo, o + bs - yo }, 3);

@@ -10,7 +10,6 @@ import java.net.*;
 import javax.swing.*;
 
 import org.basex.gui.*;
-import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.dialog.*;
 import org.basex.util.*;
@@ -178,7 +177,7 @@ public abstract class BaseXDialog extends JDialog {
    */
   public BaseXBack newButtons(final Object... buttons) {
     // horizontal/vertical layout
-    final BaseXBack pnl = new BaseXBack(Fill.NONE).
+    final BaseXBack pnl = new BaseXBack(false).
       border(12, 0, 0, 0).layout(new TableLayout(1, buttons.length, 8, 0));
 
     for(final Object obj : buttons) {
@@ -191,7 +190,7 @@ public abstract class BaseXDialog extends JDialog {
       pnl.add(b);
     }
 
-    final BaseXBack but = new BaseXBack(Fill.NONE).layout(new BorderLayout());
+    final BaseXBack but = new BaseXBack(false).layout(new BorderLayout());
     but.add(pnl, BorderLayout.EAST);
     return but;
   }

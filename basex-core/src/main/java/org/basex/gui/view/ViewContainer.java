@@ -7,7 +7,6 @@ import java.awt.*;
 import java.util.*;
 
 import org.basex.gui.*;
-import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.*;
 import org.basex.util.*;
 
@@ -57,9 +56,10 @@ public final class ViewContainer extends BaseXBack {
    * @param v view panels
    */
   public ViewContainer(final GUI main, final View... v) {
-    layout(new BorderLayout()).mode(Fill.PLAIN);
+    layout(new BorderLayout());
+    setOpaque(true);
     logo = BaseXImages.get("logo");
-    setBackground(Color.white);
+    setBackground(GUIConstants.BACK);
 
     final int vl = v.length;
     views = new ViewPanel[vl];
@@ -99,11 +99,6 @@ public final class ViewContainer extends BaseXBack {
     final int w = getWidth();
     final int h = getHeight();
     final int hh = Math.max(220, Math.min(700, h));
-    final Insets i = getInsets();
-
-    if(gui.gopts.get(GUIOptions.GRADIENT)) {
-      BaseXLayout.fill(g, Color.white, color1, i.left, i.top, w - i.right, h - i.bottom);
-    }
     if(w < 150 || h < 160) return;
 
     final int lh = logo.getHeight(this);
@@ -111,7 +106,7 @@ public final class ViewContainer extends BaseXBack {
     g.drawImage(logo, (w - logo.getWidth(this)) / 2, y, this);
     if(w < 200 || h < 200) return;
 
-    g.setColor(DGRAY);
+    g.setColor(dgray);
     g.setFont(lfont);
     BaseXLayout.drawCenter(g, VERSINFO + ' ' + Prop.VERSION, w, y + 20 + lh);
   }

@@ -9,6 +9,7 @@ import java.util.*;
 
 import org.basex.core.*;
 import org.basex.data.*;
+import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.util.ft.*;
 import org.basex.util.list.*;
@@ -362,7 +363,7 @@ final class MapRenderer {
         }
 
         if(draw) {
-          g.setColor(Color.black);
+          g.setColor(GUIConstants.FORE);
           g.fillRect(xx + ll, yy, (int) r.thumbsw, r.thumbfh);
           g.setColor(textc);
         }
@@ -441,7 +442,7 @@ final class MapRenderer {
       if(psl < dl1 && sl == data1[psl]) {
         // new sentence, draw dot
         if(draw) {
-          g.setColor(Color.black);
+          g.setColor(GUIConstants.FORE);
           g.fillRect((int) (xx + ll), yy, (int) r.thumbsw, r.thumbfh);
           g.setColor(textc);
         }

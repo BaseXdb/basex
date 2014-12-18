@@ -9,7 +9,6 @@ import javax.swing.text.*;
 
 import org.basex.core.cmd.*;
 import org.basex.data.*;
-import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.index.name.*;
@@ -52,7 +51,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
     super(m.gui);
     main = m;
 
-    layout(new BorderLayout(0, 5)).mode(Fill.NONE);
+    layout(new BorderLayout(0, 5)).setOpaque(false);
 
     all = new BaseXTextField(gui);
     all.addKeyListener(main);
@@ -64,7 +63,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
     });
     add(all, BorderLayout.NORTH);
 
-    panel = new BaseXBack(Fill.NONE).layout(new TableLayout(32, 2, 10, 5));
+    panel = new BaseXBack(false).layout(new TableLayout(32, 2, 10, 5));
     add(panel, BorderLayout.CENTER);
   }
 

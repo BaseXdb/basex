@@ -5,6 +5,7 @@ import static org.basex.gui.GUIConstants.*;
 import java.awt.*;
 import java.awt.event.*;
 
+import org.basex.gui.*;
 import org.basex.gui.dialog.*;
 import org.basex.util.*;
 
@@ -60,9 +61,9 @@ public final class BaseXMem extends BaseXPanel {
     final int hh = getHeight();
 
     // draw memory box
-    g.setColor(Color.white);
+    g.setColor(GUIConstants.BACK);
     g.fillRect(0, 0, ww - 3, hh - 3);
-    g.setColor(GRAY);
+    g.setColor(gray);
     g.drawLine(0, 0, ww - 4, 0);
     g.drawLine(0, 0, 0, hh - 4);
     g.drawLine(ww - 3, 0, ww - 3, hh - 3);
@@ -82,7 +83,7 @@ public final class BaseXMem extends BaseXPanel {
     final String sz = Performance.format(used, true);
     final int fw = (ww - fm.stringWidth(sz)) / 2;
     final int h = fm.getHeight() - 3;
-    g.setColor(full ? colormark3 : DGRAY);
+    g.setColor(full ? colormark3 : dgray);
     g.drawString(sz, fw, h);
   }
 

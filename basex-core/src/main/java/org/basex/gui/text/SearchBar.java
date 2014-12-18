@@ -9,7 +9,6 @@ import javax.swing.*;
 
 import org.basex.core.*;
 import org.basex.gui.*;
-import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXLayout.DropHandler;
 import org.basex.gui.text.TextPanel.SearchDir;
@@ -61,7 +60,7 @@ public final class SearchBar extends BaseXBack {
    */
   SearchBar(final GUI main) {
     layout(new BorderLayout(2, 0));
-    mode(Fill.NONE);
+    setOpaque(false);
     setVisible(false);
 
     gui = main;
@@ -153,17 +152,17 @@ public final class SearchBar extends BaseXBack {
     final boolean ed = e.isEditable();
     if(editor == null || ed != editor.isEditable()) {
       removeAll();
-      final BaseXBack wst = new BaseXBack(Fill.NONE).layout(new TableLayout(1, 4, 1, 0));
+      final BaseXBack wst = new BaseXBack(false).layout(new TableLayout(1, 4, 1, 0));
       wst.add(mcase);
       wst.add(word);
       wst.add(regex);
       wst.add(multi);
 
-      final BaseXBack ctr = new BaseXBack(Fill.NONE).layout(new GridLayout(1, 2, 2, 0));
+      final BaseXBack ctr = new BaseXBack(false).layout(new GridLayout(1, 2, 2, 0));
       ctr.add(search);
       if(ed) ctr.add(replace);
 
-      final BaseXBack est = new BaseXBack(Fill.NONE).layout(new TableLayout(1, 3, 1, 0));
+      final BaseXBack est = new BaseXBack(false).layout(new TableLayout(1, 3, 1, 0));
       if(ed) est.add(rplc);
       est.add(cls);
 
@@ -281,7 +280,7 @@ public final class SearchBar extends BaseXBack {
     final boolean nohits = sc.nr == 0;
     final boolean empty = sc.search.isEmpty();
     rplc.setEnabled(!nohits && !empty);
-    search.setBackground(nohits && !empty ? GUIConstants.LRED : Color.white);
+    search.setBackground(nohits && !empty ? GUIConstants.LRED : GUIConstants.BACK);
   }
 
   // PRIVATE METHODS ====================================================================

@@ -57,14 +57,25 @@ public final class BaseXLayout {
    * @param g graphics reference
    */
   public static void hints(final Graphics g) {
-    if(hints) {
+    if(HINTS != null && hints) {
       try {
         ((Graphics2D) g).addRenderingHints(HINTS);
       } catch(final Exception ex) {
-        Util.debug(ex);
+        Util.stack(ex);
         hints = false;
       }
     }
+  }
+
+  /**
+   * Activates graphics anti-aliasing.
+   * @param g graphics reference
+   * @return graphics reference
+   */
+  public static Graphics2D antiAlias(final Graphics g) {
+    final Graphics2D g2 = (Graphics2D) g;
+    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    return g2;
   }
 
   /**
@@ -330,43 +341,6 @@ public final class BaseXLayout {
   }
 
   /**
-   * Fills the specified area with a color gradient.
-   * @param gg graphics reference
-   * @param c1 first color
-   * @param c2 second color
-   * @param xs horizontal start position
-   * @param ys vertical start position
-   * @param xe horizontal end position
-   * @param ye vertical end position
-   */
-  public static void fill(final Graphics gg, final Color c1, final Color c2, final int xs,
-      final int ys, final int xe, final int ye) {
-
-    final int w = xe - xs, h = ye - ys;
-    final int r = c1.getRed(), g = c1.getGreen(), b = c1.getBlue();
-    final float rf = (c2.getRed() - r) / (float) h;
-    final float gf = (c2.getGreen() - g) / (float) h;
-    final float bf = (c2.getBlue() - b) / (float) h;
-
-    int hh = 0;
-    for(int y = 0, cr = 0, cg = 0, cb = 0; y < h; ++y) {
-      final int nr = r + (int) (rf * y);
-      final int ng = g + (int) (gf * y);
-      final int nb = b + (int) (bf * y);
-      if(nr != cr || ng != cg || nb != cb) {
-        gg.setColor(new Color(nr, ng, nb));
-        gg.fillRect(xs, ys + y - hh, w, hh);
-        hh = 0;
-      }
-      cr = nr;
-      cg = ng;
-      cb = nb;
-      ++hh;
-    }
-    gg.fillRect(xs, ys + h - hh, w, hh);
-  }
-
-  /**
    * Draws a colored cell.
    * @param g graphics reference
    * @param xs horizontal start position
@@ -378,11 +352,12 @@ public final class BaseXLayout {
   public static void drawCell(final Graphics g, final int xs, final int xe, final int ys,
       final int ye, final boolean focus) {
 
-    g.setColor(GRAY);
+    g.setColor(gray);
     g.drawRect(xs, ys, xe - xs - 1, ye - ys - 1);
-    g.setColor(Color.white);
+    g.setColor(BACK);
     g.drawRect(xs + 1, ys + 1, xe - xs - 3, ye - ys - 3);
-    fill(g, focus ? LGRAY : Color.white, LGRAY, xs + 1, ys + 1, xe - 1, ye - 1);
+    g.setColor(focus ? lgray : BACK);
+    g.fillRect(xs + 1, ys + 1, xe - xs - 2, ye - ys - 2);
   }
 
   /**
@@ -412,7 +387,7 @@ public final class BaseXLayout {
     final int xx = Math.min(w - tw - 8, x);
     g.setColor(color(c));
     g.fillRect(xx - 1, y - th, tw + 4, th);
-    g.setColor(Color.white);
+    g.setColor(BACK);
     g.drawString(tt, xx, y - 4);
   }
 

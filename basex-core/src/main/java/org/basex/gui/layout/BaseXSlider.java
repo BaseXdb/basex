@@ -6,7 +6,6 @@ import java.awt.*;
 import java.awt.event.*;
 
 import org.basex.gui.*;
-import org.basex.gui.GUIConstants.Fill;
 import org.basex.util.options.*;
 
 /**
@@ -67,7 +66,8 @@ public final class BaseXSlider extends BaseXPanel {
     max = mx;
     value = i;
     dialog = w instanceof BaseXDialog ? (BaseXDialog) w : null;
-    mode(Fill.NONE).setFocusable(true);
+    setOpaque(false);
+    setFocusable(true);
 
     setPreferredSize(new Dimension(DWIDTH, (int) (getFont().getSize() * 1.2)));
     addFocusListener(new FocusAdapter() {
@@ -111,12 +111,12 @@ public final class BaseXSlider extends BaseXPanel {
     final int hh = h / 2;
     final int s = (int) (3 * GUIConstants.SCALE);
 
-    g.setColor(hasFocus() ? Color.white : GUIConstants.LGRAY);
+    g.setColor(hasFocus() ? GUIConstants.BACK : GUIConstants.lgray);
     g.fillRect(0, hh - s, w, s * 2 - 1);
-    g.setColor(Color.black);
+    g.setColor(GUIConstants.FORE);
     g.drawLine(0, hh - s, w, hh - s);
     g.drawLine(0, hh - s, 0, hh + s - 1);
-    g.setColor(GUIConstants.GRAY);
+    g.setColor(GUIConstants.gray);
     g.drawLine(w - 1, hh - s, w - 1, hh + s - 1);
     g.drawLine(0, hh + s - 1, w, hh + s - 1);
 

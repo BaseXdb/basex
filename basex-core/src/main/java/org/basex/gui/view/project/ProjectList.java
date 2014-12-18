@@ -172,14 +172,14 @@ final class ProjectList extends JList<String> {
           int x = (int) label.getPreferredSize().getWidth() + 2;
 
           final String s = file.name();
-          g.setColor(label.getForeground());
+          g.setColor(GUIConstants.FORE);
           g.drawString(s, x, y);
           x += fm.stringWidth(s);
 
           final String[] names = file.file().getParent().split("/|\\\\");
           final StringBuilder sb = new StringBuilder(" ");
           for(int n = names.length - 1; n >= 0; n--) sb.append('/').append(names[n]);
-          g.setColor(GUIConstants.GRAY);
+          g.setColor(GUIConstants.gray);
           g.drawString(sb.toString(), x, y);
         }
       };
@@ -199,8 +199,8 @@ final class ProjectList extends JList<String> {
         label.setBackground(getSelectionBackground());
         label.setForeground(getSelectionForeground());
       } else {
-        label.setBackground(Color.WHITE);
-        label.setForeground(getForeground());
+        label.setBackground(GUIConstants.BACK);
+        label.setForeground(GUIConstants.FORE);
       }
       return label;
     }

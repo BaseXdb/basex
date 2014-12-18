@@ -14,7 +14,6 @@ import javax.swing.border.*;
 
 import org.basex.core.*;
 import org.basex.gui.*;
-import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.dialog.*;
 import org.basex.gui.layout.*;
 import org.basex.io.*;
@@ -122,10 +121,10 @@ public class TextPanel extends BaseXPanel {
     hist = new History(editable ? editor.text() : null);
 
     if(editable) {
-      setBackground(Color.white);
+      setBackground(GUIConstants.BACK);
       setBorder(new MatteBorder(1, 1, 0, 0, GUIConstants.color(6)));
     } else {
-      mode(Fill.NONE);
+      setOpaque(false);
     }
 
     new BaseXPopup(this, editable ?

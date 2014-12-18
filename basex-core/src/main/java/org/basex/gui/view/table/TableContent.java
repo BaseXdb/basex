@@ -8,7 +8,6 @@ import java.awt.*;
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.gui.*;
-import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.*;
 import org.basex.util.*;
 
@@ -38,7 +37,7 @@ final class TableContent extends BaseXBack {
     tdata = d;
     gui = scr.gui;
     layout(new BorderLayout());
-    mode(gui.gopts.get(GUIOptions.GRADIENT) ? Fill.GRADIENT : Fill.NONE);
+    setOpaque(false);
     add(scroll, BorderLayout.EAST);
   }
 
@@ -87,7 +86,7 @@ final class TableContent extends BaseXBack {
       // draw line
       g.setColor(GUIConstants.color2);
       g.drawLine(0, posY + rowH - 1, w, posY + rowH - 1);
-      g.setColor(Color.white);
+      g.setColor(GUIConstants.BACK);
       g.drawLine(0, posY + rowH, w, posY + rowH);
 
       // verify if current node is marked or focused
@@ -100,7 +99,7 @@ final class TableContent extends BaseXBack {
         g.setColor(GUIConstants.color(col + 4));
         g.drawLine(0, posY - 1, w, posY - 1);
       }
-      g.setColor(Color.black);
+      g.setColor(GUIConstants.FORE);
 
       // skip drawing of text during animation
       if(rowH < fsz) continue;
@@ -152,7 +151,7 @@ final class TableContent extends BaseXBack {
         if(fx > w - sw - 2) fx = w - sw - 2;
         g.setColor(GUIConstants.color(col + 2));
         g.fillRect(fx - 2, posY, sw, rowH - 1);
-        g.setColor(Color.black);
+        g.setColor(GUIConstants.FORE);
         BaseXLayout.chopString(g, focusStr, fx + 1, posY + 2, sw, fsz);
 
         // cache focused string

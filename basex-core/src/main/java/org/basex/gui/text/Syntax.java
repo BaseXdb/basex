@@ -1,10 +1,9 @@
 package org.basex.gui.text;
 
+import static org.basex.gui.GUIConstants.*;
 import static org.basex.util.Token.*;
 
 import java.awt.*;
-
-import org.basex.gui.*;
 
 /**
  * This abstract class defines a framework for a simple syntax
@@ -15,15 +14,15 @@ import org.basex.gui.*;
  */
 abstract class Syntax {
   /** Comment color. */
-  static final Color COMMENT = new Color(0, 160, 160);
+  static final Color COMMENT = CYAN;
   /** String color. */
-  static final Color STRING = GUIConstants.RED;
+  static final Color STRING = RED;
   /** Keyword color. */
-  static final Color KEYWORD = GUIConstants.BLUE;
+  static final Color KEYWORD = BLUE;
   /** Function color. */
-  static final Color FUNCTION = new Color(160, 0, 160);
+  static final Color FUNCTION = PURPLE;
   /** Variable color. */
-  static final Color VARIABLE = GUIConstants.GREEN;
+  static final Color VARIABLE = GREEN;
   /** Standard color. */
   Color plain;
 

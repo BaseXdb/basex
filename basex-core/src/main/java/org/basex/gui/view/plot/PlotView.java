@@ -12,7 +12,6 @@ import java.util.*;
 import javax.swing.*;
 
 import org.basex.data.*;
-import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.view.*;
@@ -100,7 +99,7 @@ public final class PlotView extends View {
     super(PLOTVIEW, man);
     border(5).layout(new BorderLayout());
 
-    final BaseXBack panel = new BaseXBack(Fill.NONE).layout(new BorderLayout());
+    final BaseXBack panel = new BaseXBack(false).layout(new BorderLayout());
 
     Box box = new Box(BoxLayout.X_AXIS);
     xLog = new BaseXCheckBox(PLOTLOG, false, gui);
@@ -228,9 +227,7 @@ public final class PlotView extends View {
         gui.gopts.get(GUIOptions.PLOTDOTS) - (focus ? 2 : marked || markedSub ? 4 : 6));
     final BufferedImage img = new BufferedImage(size, size, Transparency.TRANSLUCENT);
 
-    final Graphics g = img.getGraphics();
-    smooth(g);
-
+    final Graphics g = BaseXLayout.antiAlias(img.getGraphics());
     Color c = color1A;
     if(marked) c = colormark1A;
     if(markedSub) c = colormark2A;
@@ -246,8 +243,7 @@ public final class PlotView extends View {
    */
   private void createPlotImage() {
     plotImg = new BufferedImage(getWidth(), getHeight(), Transparency.BITMASK);
-    final Graphics g = plotImg.getGraphics();
-    smooth(g);
+    final Graphics g = BaseXLayout.antiAlias(plotImg.getGraphics());
 
     // draw axis and grid
     drawAxis(g, true);
@@ -277,7 +273,7 @@ public final class PlotView extends View {
     final int sz = sizeFactor();
 
     g.setFont(font);
-    g.setColor(Color.black);
+    g.setColor(GUIConstants.FORE);
     final Data data = gui.context.data();
     if(data == null || plotWidth - sz < 0 || plotHeight - sz < 0) {
       BaseXLayout.drawCenter(g, data == null ? NO_DATA : NO_PIXELS, w, h / 2 - MARGIN[0]);
@@ -363,14 +359,14 @@ public final class PlotView extends View {
 
     // draw selection box
     if(dragging) {
-      g.setColor(color2A);
       final int selW = selectionBox.w;
       final int selH = selectionBox.h;
       final int x1 = selectionBox.x;
       final int y1 = selectionBox.y;
+      g.setColor(colormark2A);
       g.fillRect(selW > 0 ? x1 : x1 + selW, selH > 0 ? y1 : y1 + selH,
           Math.abs(selW), Math.abs(selH));
-      g.setColor(color3A);
+      g.setColor(colormark1A);
       g.drawRect(selW > 0 ? x1 : x1 + selW, selH > 0 ? y1 : y1 + selH,
           Math.abs(selW), Math.abs(selH));
     }
@@ -385,8 +381,7 @@ public final class PlotView extends View {
   private void createMarkedNodes() {
     final Data data = gui.context.data();
     markedImg = new BufferedImage(getWidth(), getHeight(), Transparency.BITMASK);
-    final Graphics gi = markedImg.getGraphics();
-    smooth(gi);
+    final Graphics gi = BaseXLayout.antiAlias(markedImg.getGraphics());
 
     final DBNodes marked = gui.context.marked;
     if(marked.size() == 0) return;
@@ -460,13 +455,11 @@ public final class PlotView extends View {
   }
 
   /**
-   * Draws the x axis of the plot.
+   * Draws an axis of the plot.
    * @param g graphics reference
    * @param drawX drawn axis is x axis
    */
   private void drawAxis(final Graphics g, final boolean drawX) {
-    g.setColor(color2A);
-
     final int sz = sizeFactor();
     // the painting space provided for items which lack no value
     final int pWidth = plotWidth - sz;
@@ -480,8 +473,7 @@ public final class PlotView extends View {
         if(plotData.pres.length > 0) axis.calcCaption(pWidth);
         final StatsType type = plotData.xAxis.type;
         xLog.setEnabled((type == StatsType.DOUBLE ||
-            type == StatsType.INTEGER) &&
-            Math.abs(axis.min - axis.max) >= 1);
+            type == StatsType.INTEGER) && Math.abs(axis.min - axis.max) >= 1);
       }
     } else {
       // drawing vertical axis line
@@ -489,8 +481,7 @@ public final class PlotView extends View {
         if(plotData.pres.length > 0) axis.calcCaption(pHeight);
         final StatsType type = plotData.yAxis.type;
         yLog.setEnabled((type == StatsType.DOUBLE ||
-            type == StatsType.INTEGER) &&
-            Math.abs(axis.min - axis.max) >= 1);
+            type == StatsType.INTEGER) && Math.abs(axis.min - axis.max) >= 1);
       }
     }
     if(plotData.pres.length < 1) {
@@ -671,6 +662,7 @@ public final class PlotView extends View {
    */
   private void drawCaptionAndGrid(final Graphics g, final boolean drawX, final String caption,
       final double d) {
+
     String cap = caption;
     // if label is too long, it is is chopped to the first characters
     if(cap.length() > MAXL) cap = cap.substring(0, CUTOFF) + "..";
@@ -685,7 +677,7 @@ public final class PlotView extends View {
 
     // ... after that
     // the image and the grid line are drawn beside x / y axis
-    g.setColor(color2A);
+    g.setColor(color(2));
     if(drawX) {
       final int y = h - MARGIN[2];
       g.drawImage(img, pos - imgW + textH - fs + 3, y, this);
@@ -716,11 +708,10 @@ public final class PlotView extends View {
     // image is created which displays the rotated label ...
     final int imgH = 160;
     final BufferedImage img = new BufferedImage(imgW, imgH, Transparency.BITMASK);
-    final Graphics2D g2d = img.createGraphics();
-    smooth(g2d);
+    final Graphics2D g2d = BaseXLayout.antiAlias(img.createGraphics());
     g2d.rotate(ROTATE, imgW, textH);
     g2d.setFont(font);
-    g2d.setColor(im ? color3 : Color.black);
+    g2d.setColor(im ? color3 : GUIConstants.FORE);
     g2d.drawString(caption, fs, fs);
     return img;
   }
@@ -734,13 +725,14 @@ public final class PlotView extends View {
    */
   private void drawIntermediateGridLine(final Graphics g, final boolean drawX, final double d,
       final String caption) {
+
     String cap = caption;
     final int pos = calcCoordinate(drawX, d);
     final int h = getHeight();
     final int w = getWidth();
     final int fs = fontSize;
     final int sf = sizeFactor();
-    g.setColor(color2A);
+    g.setColor(color(2));
 
     if(cap != null) {
       if(cap.length() > MAXL) cap = cap.substring(0, CUTOFF) + "..";

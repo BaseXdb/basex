@@ -10,7 +10,6 @@ import javax.swing.border.*;
 
 import org.basex.core.*;
 import org.basex.gui.*;
-import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.*;
 import org.basex.util.*;
 
@@ -37,7 +36,7 @@ public final class DialogAbout extends BaseXDialog {
 
     p.add(label, BorderLayout.WEST);
 
-    final BaseXBack pp = new BaseXBack(Fill.NONE).layout(new TableLayout(17, 1));
+    final BaseXBack pp = new BaseXBack(false).layout(new TableLayout(17, 1));
 
     pp.add(new BaseXLabel(Prop.TITLE, false, true));
     final BaseXLabel url = new BaseXLabel("<html><u>" + Prop.URL + "</u></html>");

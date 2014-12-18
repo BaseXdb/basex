@@ -94,8 +94,8 @@ final class DialogXmlParser extends DialogParser {
     pp.add(cr);
     if(!rsen) {
       final BaseXBack rs = new BaseXBack(new TableLayout(2, 1));
-      rs.add(new BaseXLabel(HELP1_USE_CATALOG).color(GUIConstants.DGRAY));
-      rs.add(new BaseXLabel(HELP2_USE_CATALOG).color(GUIConstants.DGRAY));
+      rs.add(new BaseXLabel(HELP1_USE_CATALOG).color(GUIConstants.dgray));
+      rs.add(new BaseXLabel(HELP2_USE_CATALOG).color(GUIConstants.dgray));
       pp.add(rs);
     }
 

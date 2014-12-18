@@ -55,8 +55,6 @@ public final class GUIOptions extends Options {
   public static final NumberOption COLORGREEN = new NumberOption("COLORGREEN", 11);
   /** Blue GUI color factor. */
   public static final NumberOption COLORBLUE = new NumberOption("COLORBLUE", 6);
-  /** Paint gradients as background. */
-  public static final BooleanOption GRADIENT = new BooleanOption("GRADIENT", true);
 
   /** Comment: written to options file. */
   public static final Comment C_WINDOWS = new Comment("Windows");

@@ -17,7 +17,7 @@ public class BaseXHeader extends BaseXLabel {
    */
   public BaseXHeader(final String string) {
     super(string, true, false);
-    setForeground(GRAY);
+    setForeground(gray);
   }
 
   /**

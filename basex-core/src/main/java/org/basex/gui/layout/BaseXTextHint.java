@@ -29,7 +29,7 @@ final class BaseXTextHint extends JLabel implements DocumentListener {
     super(text);
     component = comp;
 
-    setForeground(GUIConstants.GRAY);
+    setForeground(GUIConstants.gray);
     setBorder(new EmptyBorder(comp.getInsets()));
     setFont(comp.getFont());
 

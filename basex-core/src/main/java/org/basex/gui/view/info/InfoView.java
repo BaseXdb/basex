@@ -11,7 +11,6 @@ import javax.swing.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.gui.*;
-import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.*;
 import org.basex.gui.text.*;
 import org.basex.gui.view.*;
@@ -67,24 +66,24 @@ public final class InfoView extends View implements LinkListener {
     header = new BaseXHeader(QUERY_INFO);
 
     timer = new BaseXLabel(" ", true, false);
-    timer.setForeground(GUIConstants.DGRAY);
+    timer.setForeground(GUIConstants.dgray);
 
     area = new TextPanel(false, gui);
     area.setLinkListener(this);
     editor = new SearchEditor(gui, area);
 
     final AbstractButton find = editor.button(FIND);
-    final BaseXBack buttons = new BaseXBack(Fill.NONE);
+    final BaseXBack buttons = new BaseXBack(false);
     buttons.layout(new TableLayout(1, 3, 8, 0)).border(0, 0, 4, 0);
     buttons.add(find);
     buttons.add(timer);
 
-    final BaseXBack b = new BaseXBack(Fill.NONE).layout(new BorderLayout());
+    final BaseXBack b = new BaseXBack(false).layout(new BorderLayout());
     b.add(buttons, BorderLayout.WEST);
     b.add(header, BorderLayout.EAST);
     add(b, BorderLayout.NORTH);
 
-    final BaseXBack center = new BaseXBack(Fill.NONE).layout(new BorderLayout());
+    final BaseXBack center = new BaseXBack(false).layout(new BorderLayout());
     add(editor, BorderLayout.CENTER);
 
     center.add(area, BorderLayout.CENTER);

@@ -9,7 +9,6 @@ import java.awt.event.*;
 import javax.swing.*;
 
 import org.basex.data.*;
-import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.view.*;
@@ -41,11 +40,11 @@ public final class ExploreView extends View {
     filter = BaseXButton.command(GUIMenuCmd.C_FILTER, gui);
     filter.addKeyListener(this);
 
-    final BaseXBack buttons = new BaseXBack(Fill.NONE);
+    final BaseXBack buttons = new BaseXBack(false);
     buttons.layout(new TableLayout(1, 1, 1, 0)).border(0, 0, 4, 0);
     buttons.add(filter);
 
-    final BaseXBack b = new BaseXBack(Fill.NONE).layout(new BorderLayout());
+    final BaseXBack b = new BaseXBack(false).layout(new BorderLayout());
     b.add(buttons, BorderLayout.WEST);
     b.add(header, BorderLayout.EAST);
     add(b, BorderLayout.NORTH);

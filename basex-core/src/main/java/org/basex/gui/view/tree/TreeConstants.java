@@ -1,7 +1,5 @@
 package org.basex.gui.view.tree;
 
-import java.awt.*;
-
 /**
  * This interface contains tree view constants.
  *
@@ -19,8 +17,6 @@ interface TreeConstants {
   int LEFT_AND_RIGHT_MARGIN = 4;
   /** Changes Color until given level. */
   int CHANGE_COLOR_TILL = 4;
-  /** Highlight Color small space. */
-  Color SMALL_SPACE_COLOR = Color.GREEN;
 
   /** Minimum rectangle space for text. */
   int MIN_TXT_SPACE = 4;

@@ -4,7 +4,6 @@ import java.awt.*;
 import java.awt.event.*;
 
 import org.basex.gui.*;
-import org.basex.gui.GUIConstants.Fill;
 import org.basex.util.*;
 
 /**
@@ -71,7 +70,7 @@ public final class BaseXScrollBar extends BaseXPanel {
     addMouseListener(this);
     addKeyListener(this);
     addMouseMotionListener(this);
-    mode(Fill.NONE);
+    setOpaque(false);
     setPreferredSize(new Dimension(SIZE, getPreferredSize().height));
     ww = SIZE;
   }
@@ -117,13 +116,13 @@ public final class BaseXScrollBar extends BaseXPanel {
     final float factor = (barH - barOffset) / (float) height;
     int size = (int) (hh * factor);
     // define minimum size for scrollbar mover
-    barOffset = size < MINSIZE ? MINSIZE - size : 0;
+    barOffset = Math.max(0, MINSIZE - size);
     size += barOffset;
     barSize = Math.min(size, barH - 1);
     barPos = (int) Math.max(0, Math.min(pos * factor, barH - barSize));
 
     // paint scrollbar background
-    g.setColor(GUIConstants.LGRAY);
+    g.setColor(GUIConstants.lgray);
     g.fillRect(0, 0, ww, hh);
 
     // draw scroll slider
@@ -132,11 +131,11 @@ public final class BaseXScrollBar extends BaseXPanel {
 
     final int d = (int) (2 * GUIConstants.SCALE);
     bh += barSize / 2;
-    g.setColor(GUIConstants.DGRAY);
+    g.setColor(GUIConstants.dgray);
     g.drawLine(5, bh, ww - 6, bh);
     g.drawLine(5, bh - d, ww - 6, bh - d);
     g.drawLine(5, bh + d, ww - 6, bh + d);
-    smooth(g);
+    BaseXLayout.antiAlias(g);
 
     // draw scroll buttons
     drawButton(g, new int[][] { { 0, 6, 3 }, { 6, 6, 0 } }, 0, button && up);
@@ -144,7 +143,7 @@ public final class BaseXScrollBar extends BaseXPanel {
         button && down);
 
     // paint scrollbar lines
-    g.setColor(GUIConstants.GRAY);
+    g.setColor(GUIConstants.gray);
     g.drawLine(0, 0, 0, hh);
     g.drawLine(ww - 1, 0, ww - 1, hh);
   }
@@ -163,7 +162,7 @@ public final class BaseXScrollBar extends BaseXPanel {
       pol[0][i] += SIZE / 2 - 3;
       pol[1][i] += y + SIZE / 2 - 3;
     }
-    g.setColor(focus ? Color.black : GUIConstants.DGRAY);
+    g.setColor(focus ? GUIConstants.FORE : GUIConstants.dgray);
     g.fillPolygon(pol[0], pol[1], 3);
   }
 

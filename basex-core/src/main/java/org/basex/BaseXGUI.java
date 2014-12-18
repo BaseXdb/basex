@@ -114,25 +114,16 @@ public final class BaseXGUI extends Main {
    * @param opts gui options
    */
   private static void init(final GUIOptions opts) {
-    // added to handle possible JDK 1.6 bug (thanks to Makoto Yui)
-    final LookAndFeelInfo[] lafis = UIManager.getInstalledLookAndFeels();
-
-    final String laf = opts.get(GUIOptions.LOOKANDFEEL);
     try {
       // refresh views when windows are resized
       Toolkit.getDefaultToolkit().setDynamicLayout(true);
-      // set specified look & feel
-      if(laf.equals("Metal")) {
-        // use non-bold fonts in Java's look & feel
-        final UIDefaults def = UIManager.getDefaults();
-        for(final Map.Entry<Object, Object> entry : def.entrySet()) {
-          final Object value = entry.getValue();
-          if(value instanceof Font) def.put(entry.getKey(), ((Font) value).deriveFont(Font.PLAIN));
-        }
-      } else if(laf.isEmpty()) {
+
+      // set look and feel
+      final String laf = opts.get(GUIOptions.LOOKANDFEEL);
+      if(laf.isEmpty()) {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
       } else {
-        for(final LookAndFeelInfo lafi : lafis) {
+        for(final LookAndFeelInfo lafi : UIManager.getInstalledLookAndFeels()) {
           if(lafi.getName().equals(laf)) {
             UIManager.setLookAndFeel(lafi.getClassName());
             break;

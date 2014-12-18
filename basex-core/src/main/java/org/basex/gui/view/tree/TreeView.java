@@ -153,9 +153,9 @@ public final class TreeView extends View implements TreeConstants {
     final Context c = gui.context;
     final Data data = c.data();
     if(data == null) return;
+
     if(showAttsChanged()) paintType = Refresh.INIT;
-    if(slimToTextChanged() && paintType == Refresh.VOID)
-      paintType = Refresh.RESIZE;
+    else if(slimToTextChanged() && paintType == Refresh.VOID) paintType = Refresh.RESIZE;
 
     super.paintComponent(g);
     gui.painting = true;
@@ -173,7 +173,7 @@ public final class TreeView extends View implements TreeConstants {
       }
     }
 
-    smooth(g);
+    BaseXLayout.antiAlias(g);
     g.setFont(font);
     fontHeight = g.getFontMetrics().getHeight();
 
@@ -248,7 +248,7 @@ public final class TreeView extends View implements TreeConstants {
     final Graphics tg = treeImage.getGraphics();
     final int rl = roots.length;
     tg.setFont(font);
-    smooth(tg);
+    BaseXLayout.antiAlias(tg);
 
     for(int rn = 0; rn < rl; ++rn) {
       final int h = sub.subtreeHeight(rn);
@@ -294,7 +294,7 @@ public final class TreeView extends View implements TreeConstants {
     }
     final int x = mw - (BaseXLayout.width(g, message) >> 1);
     final int y = mh + fontHeight;
-    g.setColor(Color.BLACK);
+    g.setColor(GUIConstants.FORE);
     g.drawString(message, x, y);
   }
 
@@ -309,10 +309,11 @@ public final class TreeView extends View implements TreeConstants {
   private void drawBigRectSquares(final Graphics g, final int lv, final int x, final int w,
       final int ss) {
 
+    System.out.println("?");
     int xx = x;
     final int y = getYperLevel(lv);
     int nh = nodeHeight;
-    g.setColor(color2A);
+    g.setColor(color(7));
     while(nh > 0) {
       nh -= ss;
       if(nh < 0) nh = 0;
@@ -367,7 +368,7 @@ public final class TreeView extends View implements TreeConstants {
 
     Color borderColor = null;
     Color fillColor;
-    Color textColor = Color.BLACK;
+    Color textColor = GUIConstants.FORE;
 
     switch(t) {
       case RECTANGLE:
@@ -379,7 +380,7 @@ public final class TreeView extends View implements TreeConstants {
       case HIGHLIGHT:
         borderColor = color4;
         final int alpha = 0xDD000000;
-        final int rgb = GUIConstants.LGRAY.getRGB();
+        final int rgb = GUIConstants.lgray.getRGB();
         fillColor = new Color(rgb + alpha, true);
         if(h > 4) border = true;
         fill = !br && !marked;
@@ -395,11 +396,11 @@ public final class TreeView extends View implements TreeConstants {
         final int rgbD = color(6).getRGB();
         fillColor = new Color(rgbD + alphaD, true);
         borderColor = color(8);
-        textColor = Color.WHITE;
+        textColor = GUIConstants.BACK;
         fill = !marked;
         border = true;
         if(h < 4) {
-          fillColor = SMALL_SPACE_COLOR;
+          fillColor = color(7);
           borderColor = fillColor;
           txt = false;
         }
@@ -407,11 +408,11 @@ public final class TreeView extends View implements TreeConstants {
       case PARENT:
       default:
         fillColor = color(6);
-        textColor = Color.WHITE;
+        textColor = GUIConstants.BACK;
         fill = !br && !marked;
         border = !br;
         if(h < 4) {
-          fillColor = SMALL_SPACE_COLOR;
+          fillColor = color(7);
           borderColor = color(8);
           txt = false;
         }
@@ -462,7 +463,7 @@ public final class TreeView extends View implements TreeConstants {
   }
 
   /**
-   * Returns draw Color.
+   * Returns draw color.
    * @param l the current level
    * @param fill if true it returns fill color, rectangle color else
    * @return draw color
@@ -544,7 +545,7 @@ public final class TreeView extends View implements TreeConstants {
   private void markNodes() {
     markedImage = createImage();
     final Graphics mg = markedImage.getGraphics();
-    smooth(mg);
+    BaseXLayout.antiAlias(mg);
     mg.setFont(font);
 
     final int[] mark = gui.context.marked.pres;
@@ -621,7 +622,7 @@ public final class TreeView extends View implements TreeConstants {
 
     final int y = getYperLevel(lv);
     final int np = getBigRectPosition(rn, lv, pre, r);
-    g.setColor(nodeHeight < 4 ? SMALL_SPACE_COLOR : color(7));
+    g.setColor(color(7));
     g.drawLine(np, y, np, y + nodeHeight);
     return np;
   }
@@ -689,8 +690,8 @@ public final class TreeView extends View implements TreeConstants {
     }
 
     // if there are descendants draw them
-    if((t == Draw.CONNECTION || t == Draw.HIGHLIGHT) && size > 1 &&
-        lv + 1 < height) highlightDescendants(g, rn, lv, r, pre, rc, t);
+    if((t == Draw.CONNECTION || t == Draw.HIGHLIGHT) && size > 1 && lv + 1 < height)
+      highlightDescendants(g, rn, lv, r, pre, rc, t);
 
     // draws node text
     if(t == Draw.HIGHLIGHT) drawThumbnails(g, lv, pre, r, root);
@@ -720,13 +721,13 @@ public final class TreeView extends View implements TreeConstants {
       g.fillRect(x, y + h, w + 2, fh + 2);
       g.setColor(color(6));
       g.drawRect(x - 1, y + h + 1, w + 3, fh + 1);
-      g.setColor(Color.WHITE);
+      g.setColor(GUIConstants.BACK);
       g.drawString(s, r.x + 1, (int) (y + h + (float) fh) - 2);
     } else {
       g.fillRect(r.x, y - fh, w + 2, fh);
       g.setColor(color(6));
       g.drawRect(r.x - 1, y - fh - 1, w + 3, fh + 1);
-      g.setColor(Color.WHITE);
+      g.setColor(GUIConstants.BACK);
       g.drawString(s, r.x + 1, (int) (y - h / (float) fh) - 2);
     }
   }
@@ -824,10 +825,7 @@ public final class TreeView extends View implements TreeConstants {
         case CONNECTION:
           break;
         default:
-          final int rgb = color(7).getRGB();
-          final int alpha = 0x33000000;
-          g.setColor(nodeHeight < 4 ? SMALL_SPACE_COLOR : new Color(
-              rgb + alpha, false));
+          g.setColor(color(7));
           if(nodeHeight > 2) {
             g.drawRect(df, getYperLevel(lvv) + 1, ww, nodeHeight - 2);
           } else {
@@ -835,8 +833,7 @@ public final class TreeView extends View implements TreeConstants {
           }
       }
 
-      if(lvv + 1 < sub.subtreeHeight(rn)
-          && !tr.bigRect(sub, rn, lvv + 1)) {
+      if(lvv + 1 < sub.subtreeHeight(rn) && !tr.bigRect(sub, rn, lvv + 1)) {
         final Data d = gui.context.data();
         for(int j = start; j < start + bo.size; ++j) {
           final int pre = sub.prePerIndex(rn, lvv, j);
@@ -857,19 +854,17 @@ public final class TreeView extends View implements TreeConstants {
    * @return color
    */
   private static Color getConnectionColor(final Draw t) {
-    final int alpha;
-    final int rgb;
-
+    final int alpha, index;
     switch(t) {
       case CONNECTION:
         alpha = 0x20000000;
-        rgb = color(4).getRGB();
-        return new Color(rgb + alpha, true);
-      default:
+        index = 4;
+        break;
+     default:
         alpha = 0x60000000;
-        rgb = color(8).getRGB();
-        return new Color(rgb + alpha, true);
+        index = 8;
     }
+    return new Color(color(index).getRGB() + alpha, true);
   }
 
   /**

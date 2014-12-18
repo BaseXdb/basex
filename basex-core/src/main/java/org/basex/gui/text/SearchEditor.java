@@ -5,7 +5,6 @@ import java.awt.*;
 import javax.swing.*;
 
 import org.basex.gui.*;
-import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.*;
 
 /**
@@ -34,7 +33,7 @@ public final class SearchEditor extends BaseXBack {
    * @param editor editor (may be {@code null})
    */
   public SearchEditor(final GUI gui, final JComponent center, final TextPanel editor) {
-    super(Fill.NONE);
+    super(false);
     search = new SearchBar(gui);
     layout(new BorderLayout(0, 2));
     add(center, BorderLayout.CENTER);

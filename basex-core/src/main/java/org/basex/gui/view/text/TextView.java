@@ -13,7 +13,6 @@ import javax.swing.*;
 import org.basex.core.*;
 import org.basex.core.parse.*;
 import org.basex.data.*;
-import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXFileChooser.Mode;
@@ -67,13 +66,13 @@ public final class TextView extends View {
     final AbstractButton save = BaseXButton.get("c_save", SAVE, false, gui);
     final AbstractButton find = search.button(FIND);
 
-    final BaseXBack buttons = new BaseXBack(Fill.NONE);
+    final BaseXBack buttons = new BaseXBack(false);
     buttons.layout(new TableLayout(1, 3, 1, 0)).border(0, 0, 4, 0);
     buttons.add(save);
     buttons.add(home);
     buttons.add(find);
 
-    final BaseXBack b = new BaseXBack(Fill.NONE).layout(new BorderLayout());
+    final BaseXBack b = new BaseXBack(false).layout(new BorderLayout());
     b.add(buttons, BorderLayout.WEST);
     b.add(header, BorderLayout.EAST);
     add(b, BorderLayout.NORTH);

@@ -360,7 +360,7 @@ public final class MapView extends View implements Runnable {
 
       // draw element label
       g.setFont(font);
-      smooth(g);
+      BaseXLayout.antiAlias(g);
       if(data.kind(f.pre) == Data.ELEM) {
         String tt = Token.string(ViewData.name(gopts, data, f.pre));
         if(tt.length() > 32) tt = tt.substring(0, 30) + DOTS;
@@ -446,7 +446,7 @@ public final class MapView extends View implements Runnable {
    */
   private void drawMap(final BufferedImage map, final MapRects rects, final float sc) {
     final Graphics g = map.getGraphics();
-    smooth(g);
+    BaseXLayout.antiAlias(g);
     painter.drawRectangles(g, rects, sc);
   }
 

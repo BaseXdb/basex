@@ -10,7 +10,6 @@ import javax.swing.*;
 import javax.swing.border.*;
 
 import org.basex.gui.*;
-import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXFileChooser.Mode;
 import org.basex.gui.view.editor.*;
@@ -68,7 +67,7 @@ public final class ProjectView extends BaseXPanel {
     BaseXLayout.addInteraction(list, gui);
 
     final BaseXBack back = new BaseXBack().layout(new BorderLayout(2, 2));
-    back.setBorder(new CompoundBorder(new MatteBorder(0, 0, 1, 0, GUIConstants.GRAY),
+    back.setBorder(new CompoundBorder(new MatteBorder(0, 0, 1, 0, GUIConstants.gray),
         BaseXLayout.border(3, 1, 3, 2)));
 
     path = new BaseXTextField(gui);
@@ -96,7 +95,7 @@ public final class ProjectView extends BaseXPanel {
     tscroll.setBorder(BaseXLayout.border(0, 0, 0, 0));
 
     split = new BaseXSplit(false);
-    split.mode(Fill.NONE);
+    split.setOpaque(false);
     split.add(lscroll);
     split.add(tscroll);
     split.init(new double[] { 0.3, 0.7}, new double[] { 0, 1});

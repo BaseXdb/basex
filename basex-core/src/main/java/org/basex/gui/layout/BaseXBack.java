@@ -5,9 +5,6 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
-import org.basex.gui.*;
-import org.basex.gui.GUIConstants.Fill;
-
 /**
  * Panel background, extending the {@link JPanel}.
  *
@@ -15,22 +12,18 @@ import org.basex.gui.GUIConstants.Fill;
  * @author Christian Gruen
  */
 public class BaseXBack extends JPanel {
-  /** Fill mode. */
-  private Fill mode;
-
   /**
    * Default constructor.
    */
   public BaseXBack() {
-    this(Fill.PLAIN);
   }
 
   /**
-   * Constructor, specifying the fill mode.
-   * @param m visualization mode
+   * Constructor, specifying the opaque flag.
+   * @param opaque opaque flag
    */
-  public BaseXBack(final Fill m) {
-    mode(m);
+  public BaseXBack(final boolean opaque) {
+    setOpaque(opaque);
   }
 
   /**
@@ -38,31 +31,12 @@ public class BaseXBack extends JPanel {
    * @param lm layout manager
    */
   public BaseXBack(final LayoutManager lm) {
-    this();
-    layout(lm);
-  }
-
-  /**
-   * Sets the specified fill mode.
-   * @param m visualization mode
-   * @return self reference
-   */
-  public final BaseXBack mode(final Fill m) {
-    mode = m;
-    final boolean o = mode != Fill.NONE;
-    if(isOpaque() != o) setOpaque(o);
-    return this;
+    setLayout(lm);
   }
 
   @Override
   public void paintComponent(final Graphics g) {
-    if(mode == Fill.GRADIENT) {
-      final Color c1 = Color.white;
-      final Color c2 = GUIConstants.color1;
-      BaseXLayout.fill(g, c1, c2, 0, 0, getWidth(), getHeight());
-    } else {
-      super.paintComponent(g);
-    }
+    super.paintComponent(g);
     BaseXLayout.hints(g);
   }
 
@@ -96,14 +70,5 @@ public class BaseXBack extends JPanel {
   public final BaseXBack layout(final LayoutManager lm) {
     setLayout(lm);
     return this;
-  }
-
-  /**
-   * Activates graphics anti-aliasing.
-   * @param g graphics reference
-   */
-  protected static void smooth(final Graphics g) {
-    ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-        RenderingHints.VALUE_ANTIALIAS_ON);
   }
 }

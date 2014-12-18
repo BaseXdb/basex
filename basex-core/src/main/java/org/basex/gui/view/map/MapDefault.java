@@ -82,7 +82,7 @@ final class MapDefault extends MapPainter {
 
       final int kind = data.kind(pre);
       if(kind == Data.ELEM || kind == Data.DOC) {
-        g.setColor(Color.black);
+        g.setColor(GUIConstants.FORE);
         g.setFont(GUIConstants.font);
         BaseXLayout.chopString(g, ViewData.name(gopts, data, pre), r.x, r.y, r.w, fsz);
       } else {
