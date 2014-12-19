@@ -404,6 +404,9 @@ public enum QueryError {
 
   // W3 Functions
 
+  /** FOAP0001. */
+  APPLY_X_X(FOAP, 1, "Arity and number of array members differs: % vs. %"),
+
   /** FOAR0001. */
   DIVZERO_X(FOAR, 1, "% cannot be divided by zero."),
   /** FOAR0002. */
@@ -1342,6 +1345,7 @@ public enum QueryError {
 
     // W3 errors
 
+    /** FOAP Error type. */ FOAP,
     /** FOAR Error type. */ FOAR,
     /** FOAY Error type. */ FOAY,
     /** FOCA Error type. */ FOCA,

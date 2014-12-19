@@ -77,6 +77,8 @@ public enum Function {
   ANALYZE_STRING(FnAnalyzeString.class, "analyze-string(input,pattern[,mod])",
       arg(STR_ZO, STR, STR), ELM, flag(CNS)),
   /** XQuery function. */
+  APPLY(FnApply.class, "apply(function,args)", arg(FUN_O, ARRAY_O), ITEM_ZM),
+  /** XQuery function. */
   AVAILABLE_ENVIRONMENT_VARIABLES(FnAvailableEnvironmentVariables.class,
       "available-environment-variables()", arg(), STR_ZM),
   /** XQuery function. */

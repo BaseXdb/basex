@@ -153,4 +153,20 @@ public final class FnTest extends AdvancedQueryTest {
         + "  deep-equal($m1('permute')($seq), $m2('permute')($seq))"
         + ") satisfies true()", "true");
   }
+
+  /** Tests for the {@code apply} function. */
+  @Test
+  public void apply() {
+    query(APPLY.args(" true#0", " []"), "true");
+    query(APPLY.args(" count#1", " [(1,2,3)]"));
+    query(APPLY.args(" string-join#1", " [ reverse(1 to 5) ! string() ]"), "54321");
+    query("let $func := function($a,$b,$c) { $a + $b + $c } "
+        + "let $args := [ 1, 2, 3 ] "
+        + "return fn:apply($func, $args)", "6");
+    query("for $a in 2 to 3 "
+        + "let $f := function-lookup(xs:QName('fn:concat'), $a) "
+        + "return " + APPLY.args("$f", " array { 1 to $a }"), "12 123");
+    error(APPLY.args(" false#0", " ['x']"), APPLY_X_X);
+    error(APPLY.args(" string-length#1", " [ ('a','b') ]"), INVTREAT_X_X_X);
+  }
 }
