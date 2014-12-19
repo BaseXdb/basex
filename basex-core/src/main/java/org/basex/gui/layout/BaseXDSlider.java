@@ -210,7 +210,7 @@ public final class BaseXDSlider extends BaseXPanel {
     final boolean focus = hasFocus();
     g.setColor(GUIConstants.BACK);
     g.fillRect(0, hc - s, w, s * 2);
-    g.setColor(GUIConstants.FORE);
+    g.setColor(GUIConstants.TEXT);
     g.drawLine(0, hc - s, w - 1, hc - s);
     g.drawLine(0, hc - s, 0, hc + s);
     g.setColor(color2);
@@ -242,7 +242,7 @@ public final class BaseXDSlider extends BaseXPanel {
     pol.xpoints = new int[] { r.xe + 5, r.xe + 12, r.xe + 12, r.xe + 5 };
     g.fillPolygon(pol);
 
-    g.setColor(focus ? GUIConstants.FORE : dgray);
+    g.setColor(focus ? GUIConstants.TEXT : dgray);
     g.drawLine(r.xs + 11, hc - 5, r.xs + 11, hc + 4);
     g.drawLine(r.xs + 11, hc - 5, r.xs + 6, hc - 1);
     g.drawLine(r.xe + 5, hc - 5, r.xe + 5, hc + 4);
@@ -253,7 +253,7 @@ public final class BaseXDSlider extends BaseXPanel {
     g.drawLine(r.xe + 6, hc + 4, r.xe + 11, hc + 1);
 
     // draw range info
-    g.setColor(GUIConstants.FORE);
+    g.setColor(GUIConstants.TEXT);
     final double mn = (long) (min * 100) / 100.0;
     final double mx = (long) (max * 100) / 100.0;
 

@@ -99,7 +99,7 @@ final class TableContent extends BaseXBack {
         g.setColor(GUIConstants.color(col + 4));
         g.drawLine(0, posY - 1, w, posY - 1);
       }
-      g.setColor(GUIConstants.FORE);
+      g.setColor(GUIConstants.TEXT);
 
       // skip drawing of text during animation
       if(rowH < fsz) continue;
@@ -151,7 +151,7 @@ final class TableContent extends BaseXBack {
         if(fx > w - sw - 2) fx = w - sw - 2;
         g.setColor(GUIConstants.color(col + 2));
         g.fillRect(fx - 2, posY, sw, rowH - 1);
-        g.setColor(GUIConstants.FORE);
+        g.setColor(GUIConstants.TEXT);
         BaseXLayout.chopString(g, focusStr, fx + 1, posY + 2, sw, fsz);
 
         // cache focused string

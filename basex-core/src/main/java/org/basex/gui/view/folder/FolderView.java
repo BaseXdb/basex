@@ -207,7 +207,7 @@ public final class FolderView extends View {
     final int kind = data.kind(pre);
     final boolean elem = kind == Data.ELEM || kind == Data.DOC;
 
-    Color col = GUIConstants.FORE;
+    Color col = GUIConstants.TEXT;
     Font fnt = font;
     if(marked.find(pre) >= 0) {
       // mark node

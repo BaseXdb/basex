@@ -273,7 +273,7 @@ public final class PlotView extends View {
     final int sz = sizeFactor();
 
     g.setFont(font);
-    g.setColor(GUIConstants.FORE);
+    g.setColor(GUIConstants.TEXT);
     final Data data = gui.context.data();
     if(data == null || plotWidth - sz < 0 || plotHeight - sz < 0) {
       BaseXLayout.drawCenter(g, data == null ? NO_DATA : NO_PIXELS, w, h / 2 - MARGIN[0]);
@@ -711,7 +711,7 @@ public final class PlotView extends View {
     final Graphics2D g2d = BaseXLayout.antiAlias(img.createGraphics());
     g2d.rotate(ROTATE, imgW, textH);
     g2d.setFont(font);
-    g2d.setColor(im ? color3 : GUIConstants.FORE);
+    g2d.setColor(im ? color3 : GUIConstants.TEXT);
     g2d.drawString(caption, fs, fs);
     return img;
   }

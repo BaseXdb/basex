@@ -398,9 +398,12 @@ final class TextRenderer extends BaseXBack {
   private void write(final TextIterator iter, final Graphics g) {
     if(x == offset) markLine(g);
 
+    // choose color for enabled text, depending on highlighting, link, or current syntax
+    final Color color = isEnabled() ? highlighted ? GUIConstants.GREEN : link ?
+      GUIConstants.color4 : syntax.getColor(iter) : GUIConstants.gray;
+
     // retrieve first character of current token
     final int ch = iter.curr();
-    final boolean hl = highlighted;
     highlighted = ch == TokenBuilder.MARK;
 
     final int cp = iter.pos();
@@ -450,9 +453,6 @@ final class TextRenderer extends BaseXBack {
         g.drawLine(xe - as, yy - as, xe, yy);
         g.drawLine(xe - as, yy + as, xe, yy);
       } else if(ch > ' ') {
-        // choose color for enabled text, depending on highlighting, link, or current syntax
-        final Color color = isEnabled() ? hl ? GUIConstants.GREEN : link ?
-          GUIConstants.color4 : syntax.getColor(iter) : GUIConstants.gray;
         g.setColor(color);
         String n = iter.nextString();
         int ww = width - x;

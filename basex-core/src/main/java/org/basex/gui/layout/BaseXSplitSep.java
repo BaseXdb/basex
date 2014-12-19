@@ -46,7 +46,7 @@ final class BaseXSplitSep extends BaseXBack {
     final int w = getWidth();
     final int h = getHeight();
 
-    g.setColor(GUIConstants.bgray);
+    g.setColor(GUIConstants.PANEL);
     g.fillRect(0, 0, w, h);
     g.setColor(GUIConstants.gray);
     g.drawLine(0, 0, l ? 0 : w, l ? h : 0);

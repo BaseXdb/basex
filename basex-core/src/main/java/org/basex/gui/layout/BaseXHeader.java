@@ -17,14 +17,14 @@ public class BaseXHeader extends BaseXLabel {
    */
   public BaseXHeader(final String string) {
     super(string, true, false);
-    setForeground(gray);
+    setForeground(dgray);
   }
 
   /**
    * Called when GUI design has changed.
    */
   public void refreshLayout() {
-    setBorder(new EmptyBorder(-6, 0, -LABEL.getFontMetrics(lfont).getLeading() / 2, 2));
+    setBorder(new EmptyBorder(-4, 0, -LABEL.getFontMetrics(lfont).getLeading() / 2, 2));
     setFont(lfont);
   }
 }

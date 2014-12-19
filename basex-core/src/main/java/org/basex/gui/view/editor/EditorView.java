@@ -86,6 +86,7 @@ public final class EditorView extends View {
   public EditorView(final ViewNotifier man) {
     super(EDITORVIEW, man);
     layout(new BorderLayout());
+    setBackground(GUIConstants.PANEL);
 
     header = new BaseXHeader(EDITOR);
 

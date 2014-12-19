@@ -188,8 +188,10 @@ public final class GUIConstants {
 
   /** Background color. */
   public static final Color BACK = TEXTFIELD.getBackground();
-  /** Background color. */
-  public static final Color FORE = TEXTFIELD.getForeground();
+  /** Text color. */
+  public static final Color TEXT = TEXTFIELD.getForeground();
+  /** Panel color. */
+  public static final Color PANEL = LABEL.getBackground();
 
   /** Dark theme. */
   public static final boolean INVERT = BACK.getRed() + BACK.getGreen() + BACK.getBlue() < 384;
@@ -207,8 +209,6 @@ public final class GUIConstants {
   /** Color: purple. */
   public static final Color PURPLE = color(160, 0, 160);
 
-  /** Cell color. */
-  public static Color bgray;
   /** Cell color. */
   public static Color lgray;
   /** Button color. */
@@ -311,7 +311,6 @@ public final class GUIConstants {
    * @param opts gui options
    */
   public static void init(final GUIOptions opts) {
-    bgray = color(240, 240, 240);
     lgray = color(224, 224, 224);
     gray = color(160, 160, 160);
     dgray = color(64, 64, 64);

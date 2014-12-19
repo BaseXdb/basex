@@ -55,7 +55,7 @@ final class TableInput implements Runnable {
   void paint(final Graphics g, final int x, final int y, final int w, final int h) {
     g.setColor(GUIConstants.color4);
     g.drawRect(x, y - 1, w - 1, h);
-    g.setColor(GUIConstants.FORE);
+    g.setColor(GUIConstants.TEXT);
     g.setFont(GUIConstants.font);
     g.drawString(text, x + 5, y + h - 7);
     final int xx = x + BaseXLayout.width(g, text.substring(0, pos)) + 5;

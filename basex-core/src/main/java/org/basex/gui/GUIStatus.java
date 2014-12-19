@@ -39,7 +39,7 @@ public final class GUIStatus extends BaseXPanel {
    */
   public void setText(final String txt) {
     label.setText(txt);
-    label.setForeground(GUIConstants.FORE);
+    label.setForeground(GUIConstants.TEXT);
   }
 
   /**

@@ -294,7 +294,7 @@ public final class TreeView extends View implements TreeConstants {
     }
     final int x = mw - (BaseXLayout.width(g, message) >> 1);
     final int y = mh + fontHeight;
-    g.setColor(GUIConstants.FORE);
+    g.setColor(GUIConstants.TEXT);
     g.drawString(message, x, y);
   }
 
@@ -368,7 +368,7 @@ public final class TreeView extends View implements TreeConstants {
 
     Color borderColor = null;
     Color fillColor;
-    Color textColor = GUIConstants.FORE;
+    Color textColor = GUIConstants.TEXT;
 
     switch(t) {
       case RECTANGLE:

@@ -363,7 +363,7 @@ final class MapRenderer {
         }
 
         if(draw) {
-          g.setColor(GUIConstants.FORE);
+          g.setColor(GUIConstants.TEXT);
           g.fillRect(xx + ll, yy, (int) r.thumbsw, r.thumbfh);
           g.setColor(textc);
         }
@@ -442,7 +442,7 @@ final class MapRenderer {
       if(psl < dl1 && sl == data1[psl]) {
         // new sentence, draw dot
         if(draw) {
-          g.setColor(GUIConstants.FORE);
+          g.setColor(GUIConstants.TEXT);
           g.fillRect((int) (xx + ll), yy, (int) r.thumbsw, r.thumbfh);
           g.setColor(textc);
         }

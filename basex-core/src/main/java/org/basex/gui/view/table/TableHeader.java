@@ -86,7 +86,7 @@ final class TableHeader extends BaseXPanel {
     super.paintComponent(g);
 
     g.setFont(font);
-    g.setColor(GUIConstants.FORE);
+    g.setColor(GUIConstants.TEXT);
     if(tdata.rows == null) {
       BaseXLayout.drawCenter(g, NO_DATA, getWidth(), getHeight() / 2);
       return;
@@ -118,7 +118,7 @@ final class TableHeader extends BaseXPanel {
       g.drawLine((int) ce, hh - 1, (int) ce, h - 2);
 
       // draw headers
-      g.setColor(GUIConstants.FORE);
+      g.setColor(GUIConstants.TEXT);
       g.setFont(bfont);
 
       final int off = clicked ? 1 : 0;
@@ -136,7 +136,7 @@ final class TableHeader extends BaseXPanel {
       if(box != null && inputCol == n) {
         box.paint(g, (int) x, hh, (int) ce - (int) x, hh);
       } else {
-        g.setColor(GUIConstants.FORE);
+        g.setColor(GUIConstants.TEXT);
         g.setFont(font);
         g.drawString(tdata.cols[n].filter, (int) x + 5, h - 7);
       }
@@ -150,7 +150,7 @@ final class TableHeader extends BaseXPanel {
 
     int o = header && clicked ? 1 : 0;
     final int xo = (int) (4 * SCALE), yo = (int) (6 * SCALE);
-    g.setColor(GUIConstants.FORE);
+    g.setColor(GUIConstants.TEXT);
     g.fillPolygon(
         new int[] { (int) x + o + xo, (int) x + o + bs - xo, (int) x + o + bs / 2 },
         new int[] { o + yo, o + yo, o + bs - yo }, 3);
