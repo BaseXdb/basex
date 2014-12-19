@@ -268,6 +268,7 @@ public class CommandTest extends SandboxTest {
     no(new Export(io.path()));
     ok(new CreateDB(NAME, FILE));
     ok(new Export("."));
+    ok(new Export("."));
     ok(io.exists());
     ok(io.delete());
   }

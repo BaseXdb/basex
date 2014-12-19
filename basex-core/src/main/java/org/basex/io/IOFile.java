@@ -270,7 +270,7 @@ public final class IOFile extends IO {
   public void copyTo(final IOFile target) throws IOException {
     // create parent directory of target file
     target.parent().md();
-    Files.copy(toPath(), target.toPath());
+    Files.copy(toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
   }
 
   @Override
