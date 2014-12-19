@@ -187,11 +187,11 @@ public final class GUIConstants {
   // COLORS ===================================================================
 
   /** Background color. */
-  public static final Color BACK = TEXTFIELD.getBackground();
+  public static final Color BACK = new Color(TEXTFIELD.getBackground().getRGB());
   /** Text color. */
-  public static final Color TEXT = TEXTFIELD.getForeground();
+  public static final Color TEXT = new Color(TEXTFIELD.getForeground().getRGB());
   /** Panel color. */
-  public static final Color PANEL = LABEL.getBackground();
+  public static final Color PANEL = new Color(LABEL.getBackground().getRGB());
 
   /** Dark theme. */
   public static final boolean INVERT = BACK.getRed() + BACK.getGreen() + BACK.getBlue() < 384;
