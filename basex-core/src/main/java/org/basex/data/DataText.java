@@ -108,7 +108,7 @@ public interface DataText {
   /** Database - Updating flag. */
   String DATAUPD = "upd";
   /** Database - Document path index. */
-  String DATADOC = "doc";
+  String DATAPTH = "pth";
   /** Database - ID->PRE mapping. */
   String DATAIDP = "idp";
 

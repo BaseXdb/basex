@@ -58,7 +58,7 @@ final class Docs {
    */
   synchronized void read(final DataInput in) throws IOException {
     docList = in.readDiffs();
-    pathIndex = data.meta.dbfile(DATADOC).exists();
+    pathIndex = data.meta.dbfile(DATAPTH).exists();
   }
 
   /**
@@ -69,9 +69,10 @@ final class Docs {
   void write(final DataOutput out) throws IOException {
     out.writeDiffs(docs());
     if(dirty && pathIndex) {
+      // retrieve paths (must be called before file is opened for writing!)
+      final TokenList paths = paths();
       // write paths
-      try(final DataOutput doc = new DataOutput(data.meta.dbfile(DATADOC))) {
-        final TokenList paths = paths();
+      try(final DataOutput doc = new DataOutput(data.meta.dbfile(DATAPTH))) {
         doc.writeNum(paths.size());
         for(final byte[] path : paths) doc.writeToken(path);
       }
@@ -105,7 +106,7 @@ final class Docs {
   private synchronized TokenList paths() {
     if(pathList == null && pathIndex) {
       // try to read paths from disk
-      try(final DataInput in = new DataInput(data.meta.dbfile(DATADOC))) {
+      try(final DataInput in = new DataInput(data.meta.dbfile(DATAPTH))) {
         pathList = new TokenList(in.readTokens());
       } catch(final IOException ignore) { }
     }
