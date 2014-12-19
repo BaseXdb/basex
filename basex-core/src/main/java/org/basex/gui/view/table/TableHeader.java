@@ -99,7 +99,7 @@ final class TableHeader extends BaseXPanel {
     g.setColor(color2);
     g.drawLine(0, h - 1, w, h - 1);
 
-    final int bs = BaseXScrollBar.SIZE;
+    final int bs = view.scroll.getWidth();
     w -= bs;
     double x = 0;
     final int nc = tdata.cols.length;
@@ -169,7 +169,7 @@ final class TableHeader extends BaseXPanel {
     Cursor cursor = CURSORARROW;
     mouseX = e.getX();
 
-    final int w = getWidth() - BaseXScrollBar.SIZE;
+    final int w = getWidth() - view.scroll.getWidth();
     if(header(e.getY())) {
       moveC = colSep(w, mouseX);
       if(moveC != -1) cursor = CURSORMOVEH;
@@ -207,7 +207,7 @@ final class TableHeader extends BaseXPanel {
 
     if(moveC != -1) {
       final int x = e.getX();
-      final double p = (double) (x - mouseX) / (getWidth() - BaseXScrollBar.SIZE);
+      final double p = (double) (x - mouseX) / (getWidth() - view.scroll.getWidth());
       final double[] ww = new double[tdata.cols.length];
       final int wl = ww.length;
       for(int w = 0; w < wl; ++w) ww[w] = tdata.cols[w].width;
@@ -224,7 +224,7 @@ final class TableHeader extends BaseXPanel {
 
       for(int w = 0; w < wl; ++w) tdata.cols[w].width = ww[w];
     } else if(clickCol != -1) {
-      int c = tdata.column(getWidth() - BaseXScrollBar.SIZE, e.getX());
+      int c = tdata.column(getWidth() - view.scroll.getWidth(), e.getX());
       if(c == -1) c = tdata.cols.length;
       if(c != clickCol || header != header(e.getY())) clickCol = -1;
     }
@@ -243,7 +243,7 @@ final class TableHeader extends BaseXPanel {
   public void mousePressed(final MouseEvent e) {
     if(tdata.rows == null || !SwingUtilities.isLeftMouseButton(e)) return;
 
-    clickCol = tdata.column(getWidth() - BaseXScrollBar.SIZE, mouseX);
+    clickCol = tdata.column(getWidth() - view.scroll.getWidth(), mouseX);
     if(clickCol == -1) clickCol = tdata.cols.length;
     header = header(e.getY());
     repaint();

@@ -309,7 +309,6 @@ public final class TreeView extends View implements TreeConstants {
   private void drawBigRectSquares(final Graphics g, final int lv, final int x, final int w,
       final int ss) {
 
-    System.out.println("?");
     int xx = x;
     final int y = getYperLevel(lv);
     int nh = nodeHeight;

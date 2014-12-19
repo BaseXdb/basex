@@ -84,17 +84,19 @@ final class TextRenderer extends BaseXBack {
 
   /**
    * Constructor.
-   * @param t text to be drawn
-   * @param s scrollbar reference
-   * @param editable editable flag
-   * @param main reference to the main window
+   * @param text text to be drawn
+   * @param scroll scrollbar reference
+   * @param edit editable flag
+   * @param gui reference to the main window
    */
-  TextRenderer(final TextEditor t, final BaseXScrollBar s, final boolean editable, final GUI main) {
+  TextRenderer(final TextEditor text, final BaseXScrollBar scroll, final boolean edit,
+      final GUI gui) {
+
     setOpaque(false);
-    text = t;
-    scroll = s;
-    edit = editable;
-    gui = main;
+    this.text = text;
+    this.scroll = scroll;
+    this.edit = edit;
+    this.gui = gui;
     font(GUIConstants.dmfont);
   }
 

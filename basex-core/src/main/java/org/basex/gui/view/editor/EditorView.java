@@ -288,7 +288,7 @@ public final class EditorView extends View {
   @Override
   public void refreshLayout() {
     header.refreshLayout();
-    for(final EditorArea edit : editors()) edit.setFont(mfont);
+    for(final EditorArea edit : editors()) edit.refreshLayout(mfont);
     search.refreshLayout();
     final Font f = GUIConstants.font.deriveFont((float) ((FONTSIZE * SCALE + fontSize) / 2));
     info.setFont(f);

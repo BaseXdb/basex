@@ -14,8 +14,6 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class BaseXScrollBar extends BaseXPanel {
-  /** Scaled Scrollbar size. */
-  public static final int SIZE = (int) (16 * GUIConstants.SCALE);
   /** Maximum scrolling speed. */
   private static final int MAXSTEP = 15;
   /** Animated scrollbar zooming steps. */
@@ -26,13 +24,13 @@ public final class BaseXScrollBar extends BaseXPanel {
 
   /** Reference to the scrolled component. */
   private final BaseXPanel comp;
-  /** Scrollbar width. */
-  private final int ww;
 
   /** Current scrolling speed. */
   private int step = STEPS.length / 2;
   /** Flag reporting if the scrollbar animation is running. */
   private boolean animated;
+  /** Scrollbar width. */
+  private int ww;
   /** Scrollbar height. */
   private int hh;
   /** Scrollbar slider position. */
@@ -71,8 +69,15 @@ public final class BaseXScrollBar extends BaseXPanel {
     addKeyListener(this);
     addMouseMotionListener(this);
     setOpaque(false);
-    setPreferredSize(new Dimension(SIZE, getPreferredSize().height));
-    ww = SIZE;
+    refreshLayout();
+  }
+
+  /**
+   * Refreshes the layout.
+   */
+  public void refreshLayout() {
+    ww = 10 + (GUIConstants.fontSize / 2);
+    setPreferredSize(new Dimension(ww, getPreferredSize().height));
   }
 
   /**
@@ -139,8 +144,7 @@ public final class BaseXScrollBar extends BaseXPanel {
 
     // draw scroll buttons
     drawButton(g, new int[][] { { 0, 6, 3 }, { 6, 6, 0 } }, 0, button && up);
-    drawButton(g, new int[][] { { 0, 6, 3 }, { 0, 0, 6 } }, Math.max(SIZE, hh - ww),
-        button && down);
+    drawButton(g, new int[][] { { 0, 6, 3 }, { 0, 0, 6 } }, hh - ww, button && down);
 
     // paint scrollbar lines
     g.setColor(GUIConstants.gray);
@@ -159,8 +163,8 @@ public final class BaseXScrollBar extends BaseXPanel {
     BaseXLayout.drawCell(g, 0, ww, y, y + ww, focus);
     final int pl = pol[0].length;
     for(int i = 0; i < pl; ++i) {
-      pol[0][i] += SIZE / 2 - 3;
-      pol[1][i] += y + SIZE / 2 - 3;
+      pol[0][i] += ww / 2 - 3;
+      pol[1][i] += y + ww / 2 - 3;
     }
     g.setColor(focus ? GUIConstants.TEXT : GUIConstants.dgray);
     g.fillPolygon(pol[0], pol[1], 3);

@@ -585,7 +585,8 @@ public final class GUI extends JFrame {
     if(n == 0 && n2 == 2) {
       views.border(0);
     } else {
-      views.setBorder(new CompoundBorder(BaseXLayout.border(3, 1, 3, 1), new EtchedBorder()));
+      views.setBorder(new CompoundBorder(BaseXLayout.border(3, 1, 3, 1),
+          BorderFactory.createEtchedBorder(EtchedBorder.LOWERED)));
     }
   }
 
