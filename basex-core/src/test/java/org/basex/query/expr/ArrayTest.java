@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
+import org.basex.query.value.array.*;
 import org.junit.*;
 
 /**
@@ -242,5 +243,11 @@ public final class ArrayTest extends AdvancedQueryTest {
   /** Atomize key. */
   @Test public void atomKey() {
     query("['x']([1])", "x");
+  }
+
+  /** Tests if {@link Array#members()} uses the array's offset correctly. */
+  @Test public void gh1047() {
+    query("array:head(array:for-each(array:subarray([1,2,3], 2), function($x) { $x }))", "2");
+    query("array:fold-left(array:tail([1,2,3]), (), function($res, $fn) { ($res, $fn) })", "2 3");
   }
 }

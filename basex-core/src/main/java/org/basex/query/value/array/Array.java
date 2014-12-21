@@ -135,7 +135,7 @@ public final class Array extends FItem {
    * @return iterator
    */
   public ArrayIterator<Value> members() {
-    return new ArrayIterator<>(members, 0, size);
+    return new ArrayIterator<>(members, start, start + size);
   }
 
   /**
