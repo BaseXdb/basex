@@ -289,9 +289,9 @@ final class Unit {
       qctx.parse(input, file.path(), null);
       qctx.mainModule(new MainModule(find(qctx, func), new Expr[0]));
       qctx.compile();
-
+      // ignore results
       final Iter iter = qctx.iter();
-      if(iter.next() != null) throw UNIT_EMPTY_X.get(null, func.name.local());
+      while(iter.next() != null);
     } finally {
       proc.proc(null);
     }

@@ -241,8 +241,6 @@ public enum QueryError {
   UNIT_TWICE_X_X(UNIT, 4, "Annotation %:% was declare twice."),
   /** UNIT0005. */
   UNIT_ANN_X_X(UNIT, 5, "Annotation '%%' has invalid arguments."),
-  /** UNIT0006. */
-  UNIT_EMPTY_X(UNIT, 6, "Test function '%' returns items."),
 
   // User Module
 
