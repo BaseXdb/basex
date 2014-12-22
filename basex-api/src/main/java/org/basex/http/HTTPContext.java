@@ -76,7 +76,7 @@ public final class HTTPContext {
    * @param res response
    * @param servlet calling servlet instance
    */
-  public HTTPContext(final HttpServletRequest req, final HttpServletResponse res,
+  HTTPContext(final HttpServletRequest req, final HttpServletResponse res,
       final BaseXServlet servlet) {
 
     this.req = req;
@@ -104,7 +104,7 @@ public final class HTTPContext {
    * Authorizes a request.
    * @throws BaseXException database exception
    */
-  public void authorize() throws BaseXException {
+  void authorize() throws BaseXException {
     final String value = req.getHeader(AUTHORIZATION);
     if(value != null) {
       final String meth = Strings.split(value, ' ', 2)[0];
@@ -138,7 +138,7 @@ public final class HTTPContext {
    * Returns the content type extension of a request (without an optional encoding).
    * @return content type
    */
-  public String contentTypeExt() {
+  String contentTypeExt() {
     final String ct = req.getContentType();
     return ct != null ? ct.replaceFirst("^.*?;\\s*", "") : null;
   }
@@ -386,7 +386,7 @@ public final class HTTPContext {
    * @param type log type
    * @param info info string (can be {@code null})
    */
-  public void log(final int type, final String info) {
+  void log(final int type, final String info) {
     context.log.write(address(), context.user(), type, info, perf);
   }
 

@@ -61,7 +61,7 @@ public final class BitArray {
   }
 
   /** Initialize the bit array with an empty array. */
-  public void init() {
+  void init() {
     init(new long[1], 0);
   }
 
@@ -70,7 +70,7 @@ public final class BitArray {
    * @param a array with bits
    * @param l number of used bits
    */
-  public void init(final long[] a, final int l) {
+  void init(final long[] a, final int l) {
     words = a;
     size = l;
   }

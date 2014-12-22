@@ -77,7 +77,7 @@ public final class PkgValidator {
    * @param dep dependency
    * @return result
    */
-  public byte[] depPkg(final Dependency dep) {
+  byte[] depPkg(final Dependency dep) {
     // get installed versions of secondary package
     final TokenSet instVers = new TokenSet();
     for(final byte[] nextPkg : repo.pkgDict()) {

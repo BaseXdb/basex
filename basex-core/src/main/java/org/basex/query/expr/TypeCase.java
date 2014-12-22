@@ -97,7 +97,7 @@ public final class TypeCase extends Single {
    * @param val value to be matched
    * @return {@code true} if it matches, {@code false} otherwise
    */
-  public boolean matches(final Value val) {
+  boolean matches(final Value val) {
     if(types.length == 0) return true;
     for(final SeqType t : types) if(t.instance(val)) return true;
     return false;

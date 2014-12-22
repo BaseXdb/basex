@@ -20,7 +20,7 @@ import org.basex.util.list.*;
  */
 public class QueryException extends Exception {
   /** Static exception. */
-  public static final QueryException ERROR = new QueryException("") {
+  static final QueryException ERROR = new QueryException("") {
     @Override
     public synchronized Throwable fillInStackTrace() { return this; }
   };
@@ -187,7 +187,7 @@ public class QueryException extends Exception {
    * @param err error
    * @return self reference
    */
-  public QueryException error(final QueryError err) {
+  QueryException error(final QueryError err) {
     error = err;
     return this;
   }

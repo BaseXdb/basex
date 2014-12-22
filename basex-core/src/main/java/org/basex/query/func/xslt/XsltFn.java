@@ -12,7 +12,7 @@ import org.basex.query.func.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public abstract class XsltFn extends StandardFunc {
+abstract class XsltFn extends StandardFunc {
   /** XSLT implementations. */
   static final String[] IMPL = {
     "", "Java", "1.0",

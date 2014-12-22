@@ -57,7 +57,7 @@ public final class MainModule extends StaticScope {
    * @param sc static context
    * @param info input info
    */
-  public MainModule(final Expr expr, final VarScope scope, final SeqType declType, final String doc,
+  MainModule(final Expr expr, final VarScope scope, final SeqType declType, final String doc,
       final StaticContext sc, final InputInfo info) {
 
     super(scope, doc, sc, info);
@@ -82,7 +82,7 @@ public final class MainModule extends StaticScope {
    * @return result
    * @throws QueryException evaluation exception
    */
-  public ValueBuilder cache(final QueryContext qc) throws QueryException {
+  ValueBuilder cache(final QueryContext qc) throws QueryException {
     final int fp = scope.enter(qc);
     try {
       final Iter iter = expr.iter(qc);
@@ -107,7 +107,7 @@ public final class MainModule extends StaticScope {
    * @return result iterator
    * @throws QueryException query exception
    */
-  public Iter iter(final QueryContext qc) throws QueryException {
+  Iter iter(final QueryContext qc) throws QueryException {
     if(declType != null) return cache(qc);
 
     final int fp = scope.enter(qc);
@@ -154,7 +154,7 @@ public final class MainModule extends StaticScope {
    * @return result of check
    * @see Proc#databases(LockResult)
    */
-  public boolean databases(final LockResult lr, final QueryContext qc) {
+  boolean databases(final LockResult lr, final QueryContext qc) {
     return expr.accept(new LockVisitor(lr, qc));
   }
 
@@ -162,7 +162,7 @@ public final class MainModule extends StaticScope {
    * Lock visitor.
    * @author Leo Woerteler
    */
-  static class LockVisitor extends ASTVisitor {
+  private static final class LockVisitor extends ASTVisitor {
     /** Already visited scopes. */
     private final IdentityHashMap<Scope, Object> funcs = new IdentityHashMap<>();
     /** List of databases to be locked. */
@@ -175,7 +175,7 @@ public final class MainModule extends StaticScope {
      * @param lr lock result
      * @param qc query context
      */
-    LockVisitor(final LockResult lr, final QueryContext qc) {
+    private LockVisitor(final LockResult lr, final QueryContext qc) {
       sl = qc.updating ? lr.write : lr.read;
       level = qc.ctxItem == null ? 0 : 1;
     }

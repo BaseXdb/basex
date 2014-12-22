@@ -12,7 +12,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class ZIPIn extends ArchiveIn {
+final class ZIPIn extends ArchiveIn {
   /** ZIP input stream. */
   private final ZipInputStream zis;
   /** Current entry. */
@@ -22,7 +22,7 @@ public final class ZIPIn extends ArchiveIn {
    * Constructor.
    * @param is input stream
    */
-  public ZIPIn(final InputStream is) {
+  ZIPIn(final InputStream is) {
     zis = new ZipInputStream(is);
   }
 

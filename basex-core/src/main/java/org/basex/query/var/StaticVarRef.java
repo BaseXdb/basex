@@ -18,7 +18,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
-public final class StaticVarRef extends ParseExpr {
+final class StaticVarRef extends ParseExpr {
   /** Variable name. */
   private final QNm name;
   /** Referenced variable. */
@@ -32,7 +32,7 @@ public final class StaticVarRef extends ParseExpr {
    * @param name variable name
    * @param sc static context
    */
-  public StaticVarRef(final InputInfo info, final QNm name, final StaticContext sc) {
+  StaticVarRef(final InputInfo info, final QNm name, final StaticContext sc) {
     super(info);
     this.name = name;
     this.sc = sc;
@@ -112,7 +112,7 @@ public final class StaticVarRef extends ParseExpr {
    * @param vr variable
    * @throws QueryException query exception
    */
-  public void init(final StaticVar vr) throws QueryException {
+  void init(final StaticVar vr) throws QueryException {
     if(vr.ann.contains(Ann.Q_PRIVATE) && !Token.eq(sc.baseURI().string(),
        vr.sc.baseURI().string())) throw VARPRIVATE_X.get(info, vr);
     var = vr;

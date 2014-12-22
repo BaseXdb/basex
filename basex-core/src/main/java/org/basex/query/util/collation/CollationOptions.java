@@ -12,7 +12,7 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public abstract class CollationOptions extends Options {
+abstract class CollationOptions extends Options {
   /** Initialization of locales. */
   protected static class Locales {
     /** Available locales, indexed by language code. */

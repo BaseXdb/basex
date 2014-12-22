@@ -25,7 +25,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public abstract class RESTCmd extends Command {
+abstract class RESTCmd extends Command {
   /** REST session. */
   final RESTSession session;
   /** Command. */
@@ -36,12 +36,12 @@ public abstract class RESTCmd extends Command {
 
   /**
    * Constructor.
-   * @param rs REST session
+   * @param session REST session
    */
-  RESTCmd(final RESTSession rs) {
-    super(max(rs.cmds));
-    cmds = rs.cmds;
-    session = rs;
+  RESTCmd(final RESTSession session) {
+    super(max(session.cmds));
+    this.session = session;
+    cmds = session.cmds;
   }
 
   @Override
@@ -130,11 +130,11 @@ public abstract class RESTCmd extends Command {
 
   /**
    * Adds a command or opening the addressed database.
-   * @param rs REST session
+   * @param session REST session
    */
-  static void open(final RESTSession rs) {
-    final String db = rs.http.db();
-    if(!db.isEmpty()) rs.add(new Open(db, rs.http.dbpath()));
+  static void open(final RESTSession session) {
+    final String db = session.http.db();
+    if(!db.isEmpty()) session.add(new Open(db, session.http.dbpath()));
   }
 
   /**
@@ -164,28 +164,28 @@ public abstract class RESTCmd extends Command {
 
   /**
    * Parses and sets database options.
-   * @param rs REST session
+   * @param session REST session
    * Throws an exception if an option is unknown.
    * @throws IOException I/O exception
    */
-  static void parseOptions(final RESTSession rs) throws IOException {
-    for(final Entry<String, String[]> param : rs.http.params.map().entrySet())
-      parseOption(rs, param, true);
+  static void parseOptions(final RESTSession session) throws IOException {
+    for(final Entry<String, String[]> param : session.http.params.map().entrySet())
+      parseOption(session, param, true);
   }
 
   /**
    * Parses and sets a single database option.
-   * @param rs REST session
+   * @param session REST session
    * @param param current parameter
    * @param force force execution
    * @return success flag, indicates if value was found
    * @throws BaseXException database exception
    */
-  static boolean parseOption(final RESTSession rs, final Entry<String, String[]> param,
+  static boolean parseOption(final RESTSession session, final Entry<String, String[]> param,
       final boolean force) throws BaseXException {
 
     final String key = param.getKey().toUpperCase(Locale.ENGLISH);
-    final MainOptions options = rs.context.options;
+    final MainOptions options = session.context.options;
     final boolean found = options.option(key) != null;
     if(found || force) options.assign(key, param.getValue()[0]);
     return found;

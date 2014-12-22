@@ -19,7 +19,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Lukas Kircher
  */
-public final class Encryption {
+final class Encryption {
   /** Input info. */
   private final InputInfo info;
   /** Token. */
@@ -56,7 +56,7 @@ public final class Encryption {
    *
    * @param info input info
    */
-  public Encryption(final InputInfo info) {
+  Encryption(final InputInfo info) {
     this.info = info;
   }
 
@@ -70,8 +70,8 @@ public final class Encryption {
    * @return encrypted or decrypted input
    * @throws QueryException query exception
    */
-  public Str encryption(final byte[] in, final byte[] s, final byte[] k, final byte[] a,
-      final boolean ec) throws QueryException {
+  Str encryption(final byte[] in, final byte[] s, final byte[] k, final byte[] a, final boolean ec)
+      throws QueryException {
 
     final boolean symmetric = eq(lc(s), SYM) || s.length == 0;
     final byte[] aa = a.length == 0 ? DES : a;
@@ -173,7 +173,7 @@ public final class Encryption {
    * @return MAC
    * @throws QueryException query exception
    */
-  public Item hmac(final byte[] msg, final byte[] k, final byte[] a, final byte[] enc)
+  Item hmac(final byte[] msg, final byte[] k, final byte[] a, final byte[] enc)
       throws QueryException {
 
     // create hash value from input message

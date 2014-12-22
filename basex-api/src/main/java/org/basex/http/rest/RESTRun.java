@@ -19,21 +19,21 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class RESTRun extends RESTQuery {
+final class RESTRun extends RESTQuery {
   /** Path. */
   private final String path;
 
   /**
    * Constructor.
-   * @param rs REST session
+   * @param session REST session
    * @param vars external variables
    * @param val context value
-   * @param pth path to query file
+   * @param path path to query file
    */
-  private RESTRun(final RESTSession rs, final Map<String, String[]> vars, final String val,
-                  final String pth) {
-    super(rs, vars, val);
-    path = pth;
+  private RESTRun(final RESTSession session, final Map<String, String[]> vars, final String val,
+      final String path) {
+    super(session, vars, val);
+    this.path = path;
   }
 
   @Override
@@ -43,18 +43,18 @@ public final class RESTRun extends RESTQuery {
 
   /**
    * Creates a new instance of this command.
-   * @param rs REST session
+   * @param session REST session
    * @param path relative path to query input
    * @param vars external variables
    * @param val context value
    * @return command
    * @throws IOException I/O exception
    */
-  static RESTQuery get(final RESTSession rs, final String path, final Map<String, String[]> vars,
-      final String val) throws IOException {
+  static RESTQuery get(final RESTSession session, final String path,
+      final Map<String, String[]> vars, final String val) throws IOException {
 
     // get root directory for files
-    final IOFile root = new IOFile(rs.context.soptions.get(StaticOptions.WEBPATH));
+    final IOFile root = new IOFile(session.context.soptions.get(StaticOptions.WEBPATH));
 
     // check if file is not found, is a folder or points to parent folder
     final IOFile file = new IOFile(root, path);
@@ -66,16 +66,16 @@ public final class RESTRun extends RESTQuery {
     // interpret as commands if input ends with command script suffix
     if(file.hasSuffix(IO.BXSSUFFIX)) {
       try {
-        for(final Command cmd : new CommandParser(input, rs.context).parse()) rs.add(cmd);
+        for(final Command cmd : new CommandParser(input, session.context).parse()) session.add(cmd);
       } catch(final QueryException ex) {
         throw new IOException(ex);
       }
     } else {
       // otherwise, interpret input as xquery
-      rs.add(new XQuery(input));
+      session.add(new XQuery(input));
     }
 
     // perform query
-    return new RESTRun(rs, vars, val, file.path());
+    return new RESTRun(session, vars, val, file.path());
   }
 }

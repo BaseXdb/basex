@@ -151,7 +151,7 @@ public final class PathNode {
    * @param nodes node list
    * @param nm name id
    */
-  public void addDesc(final ArrayList<PathNode> nodes, final int nm) {
+  void addDesc(final ArrayList<PathNode> nodes, final int nm) {
     if(kind == Data.ELEM && nm == name) nodes.add(this);
     for(final PathNode child : children) child.addDesc(nodes, nm);
   }

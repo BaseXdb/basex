@@ -36,7 +36,7 @@ public final class HTTPParams {
    * Returns an immutable map with all query parameters.
    * @param http HTTP context
    */
-  public HTTPParams(final HTTPContext http) {
+  HTTPParams(final HTTPContext http) {
     this.http = http;
   }
 
@@ -111,7 +111,7 @@ public final class HTTPParams {
    * @return value
    * @throws IOException I/O exception
    */
-  public IOContent body() throws IOException {
+  IOContent body() throws IOException {
     if(content == null) {
       content = new IOContent(new BufferInput(http.req.getInputStream()).content());
       content.name(http.method + IO.XMLSUFFIX);

@@ -20,7 +20,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public abstract class ArchiveFn extends StandardFunc {
+abstract class ArchiveFn extends StandardFunc {
   /**
    * Checks if the specified item is a string or element.
    * @param it item to be checked

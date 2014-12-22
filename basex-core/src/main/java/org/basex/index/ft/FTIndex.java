@@ -456,20 +456,20 @@ public final class FTIndex implements Index {
   /**
    * Full-text cache.
    */
-  static final class FTCache {
+  private static final class FTCache {
     /** Order. */
-    final int[] order;
+    private final int[] order;
     /** Pre values. */
-    final IntList pre;
+    private final IntList pre;
     /** Pos values. */
-    final IntList pos;
+    private final IntList pos;
 
     /**
      * Constructor.
      * @param pr pre values
      * @param ps positions
      */
-    FTCache(final IntList pr, final IntList ps) {
+    private FTCache(final IntList pr, final IntList ps) {
       final int s = pr.size();
       final double[] v = new double[s];
       for(int i = 0; i < s; i++) v[i] = (long) pr.get(i) << 32 | ps.get(i);

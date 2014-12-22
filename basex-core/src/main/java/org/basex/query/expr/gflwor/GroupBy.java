@@ -338,7 +338,7 @@ public final class GroupBy extends GFLWOR.Clause {
     /** Occlusion flag, {@code true} if another grouping variable shadows this one. */
     public boolean occluded;
     /** Collation. */
-    public final Collation coll;
+    private final Collation coll;
 
     /**
      * Constructor.

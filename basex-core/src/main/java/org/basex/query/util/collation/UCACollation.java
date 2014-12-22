@@ -15,7 +15,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class UCACollation extends Collation {
+final class UCACollation extends Collation {
   /** Name of the Collator class. */
   private static final Class<?> CEI = Reflect.find("com.ibm.icu.text.CollationElementIterator");
   /** Method. */

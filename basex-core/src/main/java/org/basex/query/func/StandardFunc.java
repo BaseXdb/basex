@@ -57,7 +57,7 @@ public abstract class StandardFunc extends Arr {
    * @param args function arguments
    * @return self reference
    */
-  public StandardFunc init(final StaticContext sctx, final InputInfo ii, final Function f,
+  StandardFunc init(final StaticContext sctx, final InputInfo ii, final Function f,
       final Expr[] args) {
     sc = sctx;
     func = f;

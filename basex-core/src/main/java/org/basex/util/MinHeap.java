@@ -130,7 +130,7 @@ public final class MinHeap<K, V> {
    * Verifies the inner structure of the heap.
    * @throws IllegalStateException if the invariants don't hold
    */
-  public void verify() {
+  void verify() {
     verify(0);
   }
 

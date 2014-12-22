@@ -17,12 +17,12 @@ import com.bradmcevoy.http.exceptions.*;
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
-public final class BXRoot extends BXFolder {
+final class BXRoot extends BXFolder {
   /**
    * Constructor.
    * @param s service
    */
-  public BXRoot(final WebDAVService<BXAbstractResource> s) {
+  BXRoot(final WebDAVService<BXAbstractResource> s) {
     super(new ResourceMetaData(), s);
   }
 

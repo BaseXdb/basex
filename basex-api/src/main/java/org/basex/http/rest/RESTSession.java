@@ -12,22 +12,22 @@ import org.basex.http.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class RESTSession {
+final class RESTSession {
   /** HTTP context. */
-  public final HTTPContext http;
+  final HTTPContext http;
   /** Commands to be executed. */
-  public final ArrayList<Command> cmds = new ArrayList<>();
+  final ArrayList<Command> cmds = new ArrayList<>();
   /** Database context. */
-  public final Context context;
+  final Context context;
 
   /**
    * Constructor, specifying login data and an output stream.
-   * @param hc HTTP context
-   * @param ctx context
+   * @param http HTTP context
+   * @param context context
    */
-  public RESTSession(final HTTPContext hc, final Context ctx) {
-    http = hc;
-    context = ctx;
+  RESTSession(final HTTPContext http, final Context context) {
+    this.http = http;
+    this.context = context;
   }
 
   /**
@@ -35,7 +35,7 @@ public final class RESTSession {
    * @param cmd command
    * @return self reference
    */
-  public RESTSession add(final Command cmd) {
+  RESTSession add(final Command cmd) {
     cmds.add(cmd);
     return this;
   }
@@ -46,7 +46,7 @@ public final class RESTSession {
    * @param is input stream
    * @return self reference
    */
-  public RESTSession add(final Command cmd, final InputStream is) {
+  RESTSession add(final Command cmd, final InputStream is) {
     cmds.add(cmd);
     cmd.setInput(is);
     return this;

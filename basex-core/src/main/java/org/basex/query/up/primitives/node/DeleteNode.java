@@ -36,7 +36,7 @@ public final class DeleteNode extends NodeUpdate {
    * @param ii input info
    * @param rec this delete is a product of a replaceElementContent substitution
    */
-  public DeleteNode(final int pre, final Data data, final InputInfo ii, final boolean rec) {
+  DeleteNode(final int pre, final Data data, final InputInfo ii, final boolean rec) {
     super(UpdateType.DELETENODE, pre, data, ii);
     this.rec = rec;
   }

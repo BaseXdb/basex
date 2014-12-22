@@ -59,19 +59,6 @@ public final class ValueList extends ElementList {
   }
 
   /**
-   * Adds elements to the array.
-   * @param elements elements to be added
-   * @return self reference
-   */
-  public ValueList add(final Value... elements) {
-    final int l = elements.length, s = size, ns = s + l;
-    if(ns > list.length) resize(newSize(ns));
-    System.arraycopy(elements, 0, list, s, l);
-    size = ns;
-    return this;
-  }
-
-  /**
    * Resizes the array.
    * @param sz new size
    */

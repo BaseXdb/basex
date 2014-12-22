@@ -31,12 +31,12 @@ final class RESTPost {
 
   /**
    * Creates REST code.
-   * @param rs REST session
+   * @param session REST session
    * @return code
    * @throws IOException I/O exception
    */
-  public static RESTCmd get(final RESTSession rs) throws IOException {
-    final HTTPContext http = rs.http;
+  public static RESTCmd get(final RESTSession session) throws IOException {
+    final HTTPContext http = session.http;
     String enc = http.req.getCharacterEncoding();
     if(enc == null) enc = Strings.UTF8;
 
@@ -44,7 +44,7 @@ final class RESTPost {
     final byte[] input = new NewlineInput(http.req.getInputStream()).encoding(enc).content();
     validate(input);
 
-    final Context ctx = rs.context;
+    final Context ctx = session.context;
     final DBNode doc;
     try {
       doc = new DBNode(new IOContent(input));
@@ -103,9 +103,9 @@ final class RESTPost {
       final String request = value("local-name(*)", doc, ctx);
       final String text = value("*/*:text/text()", doc, ctx);
 
-      if(request.equals(COMMAND)) return RESTCommand.get(rs, text);
-      if(request.equals(RUN)) return RESTRun.get(rs, text, vars, val);
-      return RESTQuery.get(rs, text, vars, val);
+      if(request.equals(COMMAND)) return RESTCommand.get(session, text);
+      if(request.equals(RUN)) return RESTRun.get(session, text, vars, val);
+      return RESTQuery.get(session, text, vars, val);
 
     } catch(final QueryException ex) {
       throw HTTPCode.BAD_REQUEST_X.get(ex);

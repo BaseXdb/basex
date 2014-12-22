@@ -28,13 +28,13 @@ import org.basex.util.hash.*;
  */
 public final class CmpR extends Single {
   /** Minimum. */
-  public final double min;
+  final double min;
   /** Include minimum value. */
-  public final boolean mni;
+  final boolean mni;
   /** Maximum. */
-  public final double max;
+  final double max;
   /** Include maximum value. */
-  public final boolean mxi;
+  final boolean mxi;
   /** Flag for atomic evaluation. */
   private final boolean atomic;
 

@@ -61,7 +61,7 @@ public abstract class ADate extends ADateDur {
   short zon = Short.MAX_VALUE;
 
   /** Data factory. */
-  public static DatatypeFactory df;
+  static DatatypeFactory df;
   static {
     try {
       df = DatatypeFactory.newInstance();

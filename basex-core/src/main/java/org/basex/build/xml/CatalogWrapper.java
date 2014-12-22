@@ -44,7 +44,7 @@ public final class CatalogWrapper {
    * @param reader XML reader
    * @param cat path to catalog file
    */
-  public static void set(final XMLReader reader, final String cat) {
+  static void set(final XMLReader reader, final String cat) {
     if(CM == null) return;
     invoke(method(CMP, "setIgnoreMissingProperties", boolean.class), CM, true);
     invoke(method(CMP, "setCatalogFiles", String.class), CM, cat);

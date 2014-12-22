@@ -424,7 +424,7 @@ public final class Window extends Clause {
      * Number of non-{@code null} variables in this condition.
      * @return number of variables
      */
-    int nVars() {
+    private int nVars() {
       int i = 0;
       if(item != null) i++;
       if(pos  != null) i++;
@@ -437,7 +437,7 @@ public final class Window extends Clause {
      * Checks if this condition binds the item following the current one in the input.
      * @return result of check
      */
-    boolean usesNext() {
+    private boolean usesNext() {
       return next != null;
     }
 
@@ -447,7 +447,7 @@ public final class Window extends Clause {
      * @param arr array to write to
      * @param p start position
      */
-    void writeVars(final Var[] arr, final int p) {
+    private void writeVars(final Var[] arr, final int p) {
       int i = p;
       if(item != null) arr[i++] = item;
       if(pos  != null) arr[i++] = pos;
@@ -465,7 +465,7 @@ public final class Window extends Clause {
      * @return {@code true} if {@code it} matches the condition, {@code false} otherwise
      * @throws QueryException query exception
      */
-    boolean matches(final QueryContext qc, final Item it, final long p, final Item pr,
+    private boolean matches(final QueryContext qc, final Item it, final long p, final Item pr,
         final Item nx) throws QueryException {
       // bind variables
       bind(qc, it, p, pr, nx);
@@ -483,8 +483,8 @@ public final class Window extends Clause {
      * @param nx next item
      * @throws QueryException query exception
      */
-    void bind(final QueryContext qc, final Item it, final long p, final Item pr, final Item nx)
-        throws QueryException {
+    private void bind(final QueryContext qc, final Item it, final long p, final Item pr,
+        final Item nx) throws QueryException {
       if(item != null) qc.set(item, it == null ? Empty.SEQ : it, info);
       if(pos  != null) qc.set(pos,  Int.get(p),                  info);
       if(prev != null) qc.set(prev, pr == null ? Empty.SEQ : pr, info);
@@ -542,9 +542,9 @@ public final class Window extends Clause {
    * @author BaseX Team 2005-14, BSD License
    * @author Leo Woerteler
    */
-  abstract class WindowEval implements Eval {
+  private abstract class WindowEval implements Eval {
     /** Expression iterator. */
-    Iter iter;
+    private Iter iter;
     /** Previous item. */
     Item prev;
     /** Current position. */
@@ -585,13 +585,13 @@ public final class Window extends Clause {
    * @author BaseX Team 2005-14, BSD License
    * @author Leo Woerteler
    */
-  abstract class TumblingEval extends WindowEval {
+  private abstract class TumblingEval extends WindowEval {
+    /** If the next item is used. */
+    private final boolean popNext = start.usesNext() || end != null && end.usesNext();
     /** Current item. */
     Item curr;
     /** Next item. */
     Item next;
-    /** If the next item is used. */
-    final boolean popNext = start.usesNext() || end != null && end.usesNext();
 
     /**
      * Reads a new current item and populates the {@code nxt} variable if it's used.

@@ -99,17 +99,7 @@ public abstract class Serializer {
    * @throws IOException I/O exception
    */
   public void serialize(final Item item) throws IOException {
-    serialize(item, false);
-  }
-
-  /**
-   * Serializes the specified item, which may be a node or an atomic value.
-   * @param item item to be serialized
-   * @param atts also serialize attributes and namespaces
-   * @throws IOException I/O exception
-   */
-  public void serialize(final Item item, final boolean atts) throws IOException {
-    serialize(item, atts, false);
+    serialize(item, false, false);
   }
 
   /**

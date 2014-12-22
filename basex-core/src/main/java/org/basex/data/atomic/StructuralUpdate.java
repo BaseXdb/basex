@@ -1,13 +1,11 @@
 package org.basex.data.atomic;
 
 /**
- * Base class for structural updates that add to/remove from the table and introduce
- * shifts.
+ * Base class for structural updates that add to/remove from the table and introduce shifts.
  * @author BaseX Team 2005-14, BSD License
  * @author Lukas Kircher
- *
  */
-public abstract class StructuralUpdate extends BasicUpdate {
+abstract class StructuralUpdate extends BasicUpdate {
   /** PRE value shifts introduced by this atomic update due to structural changes. */
   final int shifts;
   /** PRE value of the first node for which the distance must be updated due to PRE value

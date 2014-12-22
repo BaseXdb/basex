@@ -19,7 +19,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class TextParser extends SingleParser {
+final class TextParser extends SingleParser {
   /** Text element. */
   private static final byte[] TEXT = token("text");
   /** Line element. */
@@ -35,7 +35,7 @@ public final class TextParser extends SingleParser {
    * @param source document source
    * @param opts database options
    */
-  public TextParser(final IO source, final MainOptions opts) {
+  TextParser(final IO source, final MainOptions opts) {
     super(source, opts);
     final TextOptions tp = opts.get(MainOptions.TEXTPARSER);
     lines = tp.get(TextOptions.LINES);

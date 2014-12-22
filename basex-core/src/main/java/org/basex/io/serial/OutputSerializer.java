@@ -39,7 +39,7 @@ public abstract class OutputSerializer extends Serializer {
   /** Separator flag (used for formatting). */
   protected boolean sep;
   /** Normalization form. */
-  protected final Form form;
+  private final Form form;
   /** Item separator flag (used for formatting). */
   private boolean isep;
   /** Script flag. */

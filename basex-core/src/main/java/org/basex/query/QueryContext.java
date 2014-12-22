@@ -70,9 +70,9 @@ public final class QueryContext extends Proc implements AutoCloseable {
   /** Cached thesaurus files. */
   public HashMap<String, IO> thes;
   /** Global database options (will be reassigned after query execution). */
-  public final HashMap<Option<?>, Object> staticOpts = new HashMap<>();
+  final HashMap<Option<?>, Object> staticOpts = new HashMap<>();
   /** Temporary query options (key/value pairs), supplied by option declarations. */
-  public final StringList tempOpts = new StringList();
+  final StringList tempOpts = new StringList();
 
   /** Current context value. */
   public Value value;
@@ -132,7 +132,7 @@ public final class QueryContext extends Proc implements AutoCloseable {
   /** Serializer options. */
   SerializerOptions serialOpts;
   /** Initial context value. */
-  public MainModule ctxItem;
+  MainModule ctxItem;
 
   /** Root expression of the query. */
   public MainModule root;

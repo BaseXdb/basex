@@ -16,7 +16,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public abstract class Logical extends Arr {
+abstract class Logical extends Arr {
   /**
    * Constructor.
    * @param info input info

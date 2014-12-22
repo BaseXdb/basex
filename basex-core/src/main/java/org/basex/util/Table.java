@@ -84,32 +84,6 @@ public final class Table {
   }
 
   /**
-   * Returns the value for the specified table position.
-   * @param row row
-   * @param column column
-   * @return value
-   */
-  public String value(final int row, final int column) {
-    return string(contents.get(row).get(column));
-  }
-
-  /**
-   * Returns the number of rows.
-   * @return number of rows
-   */
-  public int rows() {
-    return contents.size();
-  }
-
-  /**
-   * Returns the number of columns.
-   * @return number of columns
-   */
-  public int cols() {
-    return header.size();
-  }
-
-  /**
    * Moves the specified string to top.
    * @param top entry to be moved to the top
    * @return self reference

@@ -22,16 +22,16 @@ final class RESTGet {
 
   /**
    * Creates REST code.
-   * @param rs REST session
+   * @param session REST session
    * @return code
    * @throws IOException I/O exception
    */
-  public static RESTCmd get(final RESTSession rs) throws IOException {
+  public static RESTCmd get(final RESTSession session) throws IOException {
     final Map<String, String[]> vars = new HashMap<>();
 
     // parse query string
     String op = null, input = null, value = null;
-    final HTTPContext http = rs.http;
+    final HTTPContext http = session.http;
     final SerializerOptions sopts = http.sopts();
     for(final Entry<String, String[]> param : http.params.map().entrySet()) {
       final String key = param.getKey();
@@ -51,15 +51,15 @@ final class RESTGet {
       } else if(sopts.option(key) != null) {
         // serialization parameters
         for(final String v : vals) sopts.assign(key, v);
-      } else if(!RESTCmd.parseOption(rs, param, false)) {
+      } else if(!RESTCmd.parseOption(session, param, false)) {
         // options or (if not found) external variables
         vars.put(key, new String[] { val });
       }
     }
 
-    if(op == null) return RESTRetrieve.get(rs);
-    if(op.equals(QUERY)) return RESTQuery.get(rs, input, vars, value);
-    if(op.equals(RUN)) return RESTRun.get(rs, input, vars, value);
-    return RESTCommand.get(rs, input);
+    if(op == null) return RESTRetrieve.get(session);
+    if(op.equals(QUERY)) return RESTQuery.get(session, input, vars, value);
+    if(op.equals(RUN)) return RESTRun.get(session, input, vars, value);
+    return RESTCommand.get(session, input);
   }
 }

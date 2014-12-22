@@ -125,7 +125,7 @@ final class DataFTBuilder {
   }
 
   /** Data full-text marker. */
-  static class DataFTMarker {
+  static final class DataFTMarker {
     /** Token. */
     byte[] token;
     /** Marker flag. */
@@ -136,7 +136,7 @@ final class DataFTBuilder {
      * @param token text
      * @param mark marker flag
      */
-    DataFTMarker(final byte[] token, final boolean mark) {
+    private DataFTMarker(final byte[] token, final boolean mark) {
       this.token = token;
       this.mark = mark;
     }

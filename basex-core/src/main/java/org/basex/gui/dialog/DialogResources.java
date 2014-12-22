@@ -24,7 +24,7 @@ import org.basex.gui.layout.TreeNode;
  * @author BaseX Team 2005-14, BSD License
  * @author Lukas Kircher
  */
-public final class DialogResources extends BaseXBack {
+final class DialogResources extends BaseXBack {
   /** Search text field. */
   private final BaseXTextField filterText;
   /** Database/root node. */

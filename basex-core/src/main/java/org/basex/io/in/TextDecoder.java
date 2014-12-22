@@ -59,7 +59,7 @@ abstract class TextDecoder {
   }
 
   /** UTF8 Decoder. */
-  static class UTF8 extends TextDecoder {
+  private static class UTF8 extends TextDecoder {
     /** UTF8 cache. */
     private final byte[] cache = new byte[4];
 
@@ -80,7 +80,7 @@ abstract class TextDecoder {
   }
 
   /** UTF16LE Decoder. */
-  static class UTF16LE extends TextDecoder {
+  private static class UTF16LE extends TextDecoder {
     @Override
     int read(final TextInput ti) throws IOException {
       final int a = ti.readByte();
@@ -92,7 +92,7 @@ abstract class TextDecoder {
   }
 
   /** UTF16BE Decoder. */
-  static class UTF16BE extends TextDecoder {
+  private static class UTF16BE extends TextDecoder {
     @Override
     int read(final TextInput ti) throws IOException {
       final int a = ti.readByte();
@@ -104,7 +104,7 @@ abstract class TextDecoder {
   }
 
   /** UTF32 Decoder. */
-  static class UTF32 extends TextDecoder {
+  private static class UTF32 extends TextDecoder {
     @Override
     int read(final TextInput ti) throws IOException {
       final int a = ti.readByte();
@@ -120,7 +120,7 @@ abstract class TextDecoder {
   }
 
   /** Generic Decoder. */
-  static class Generic extends TextDecoder {
+  private static final class Generic extends TextDecoder {
     /** Input cache. */
     private final byte[] cache = new byte[4];
     /** Input buffer. */
@@ -135,7 +135,7 @@ abstract class TextDecoder {
      * @param enc encoding
      * @throws IOException I/O exception
      */
-    Generic(final String enc) throws IOException {
+    private Generic(final String enc) throws IOException {
       try {
         csd = Charset.forName(enc).newDecoder();
       } catch(final Exception ex) {

@@ -16,7 +16,7 @@ public final class BXAttr extends BXNode implements Attr {
    * Constructor.
    * @param node node reference
    */
-  public BXAttr(final ANode node) {
+  BXAttr(final ANode node) {
     super(node);
   }
 

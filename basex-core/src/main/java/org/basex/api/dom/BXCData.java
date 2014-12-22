@@ -9,12 +9,12 @@ import org.w3c.dom.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class BXCData extends BXText implements CDATASection {
+final class BXCData extends BXText implements CDATASection {
   /**
    * Constructor.
    * @param node node reference
    */
-  public BXCData(final ANode node) {
+  BXCData(final ANode node) {
     super(node);
   }
 

@@ -42,22 +42,22 @@ public final class Thesaurus {
   }
 
   /** Thesaurus node. */
-  static class ThesNode {
+  private static class ThesNode {
     /** Related nodes. */
-    ThesNode[] nodes = new ThesNode[1];
+    private ThesNode[] nodes = new ThesNode[1];
     /** Relationships. */
-    byte[][] rs = new byte[1][];
+    private byte[][] rs = new byte[1][];
     /** Term. */
-    byte[] term;
+    private byte[] term;
     /** Entries. */
-    int size;
+    private int size;
 
     /**
      * Adds a relationship to the node.
      * @param n target node
      * @param r relationship
      */
-    void add(final ThesNode n, final byte[] r) {
+    private void add(final ThesNode n, final byte[] r) {
       if(size == nodes.length) {
         final int s = Array.newSize(size);
         nodes = Array.copy(nodes, new ThesNode[s]);

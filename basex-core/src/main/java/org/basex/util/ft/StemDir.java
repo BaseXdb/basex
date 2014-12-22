@@ -39,7 +39,7 @@ public final class StemDir extends TokenMap {
    * @param word word to be stemmed
    * @return resulting token
    */
-  public byte[] stem(final byte[] word) {
+  byte[] stem(final byte[] word) {
     final byte[] sn = get(word);
     return sn != null ? sn : word;
   }

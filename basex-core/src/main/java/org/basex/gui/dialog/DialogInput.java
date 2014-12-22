@@ -17,7 +17,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class DialogInput extends BaseXDialog {
+final class DialogInput extends BaseXDialog {
   /** User input. */
   private final BaseXTextField input;
   /** Old input. */
@@ -38,7 +38,7 @@ public final class DialogInput extends BaseXDialog {
    * @param d dialog window
    * @param t type of dialog: 0 = rename database, 1 = drop documents, 2 = copy database
    */
-  public DialogInput(final String o, final String tit, final BaseXDialog d, final int t) {
+  DialogInput(final String o, final String tit, final BaseXDialog d, final int t) {
     super(d, tit);
     old = o;
     db = d.gui.context.databases.listDBs();
@@ -73,7 +73,7 @@ public final class DialogInput extends BaseXDialog {
    * Returns the user input.
    * @return input
    */
-  public String input() {
+  String input() {
     return input.getText().trim();
   }
 

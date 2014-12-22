@@ -19,15 +19,15 @@ import com.bradmcevoy.http.exceptions.*;
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
-public class BXFolder extends BXAbstractResource implements FolderResource,
-    DeletableCollectionResource, LockingCollectionResource {
+class BXFolder extends BXAbstractResource implements FolderResource, DeletableCollectionResource,
+  LockingCollectionResource {
 
   /**
    * Constructor.
    * @param d resource meta data
    * @param s service implementation
    */
-  public BXFolder(final ResourceMetaData d, final WebDAVService<BXAbstractResource> s) {
+  BXFolder(final ResourceMetaData d, final WebDAVService<BXAbstractResource> s) {
     super(d, s);
   }
 

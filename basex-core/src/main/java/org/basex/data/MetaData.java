@@ -99,7 +99,7 @@ public final class MetaData {
    * Constructor for a main-memory database instance.
    * @param options database options
    */
-  public MetaData(final MainOptions options) {
+  MetaData(final MainOptions options) {
     this("", options, null);
   }
 
@@ -269,7 +269,7 @@ public final class MetaData {
    * @param in input stream
    * @throws IOException I/O exception
    */
-  public void read(final DataInput in) throws IOException {
+  void read(final DataInput in) throws IOException {
     String storage = "", istorage = "";
     while(true) {
       final String k = Token.string(in.readToken());

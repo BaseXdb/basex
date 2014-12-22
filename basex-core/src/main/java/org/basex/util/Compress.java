@@ -204,13 +204,13 @@ public final class Compress {
   }
 
   /** Local ByteList implementation to make protected fields accessible. */
-  static final class MyByteList extends ByteList {
+  private static final class MyByteList extends ByteList {
     /**
      * Exchanges the actual byte array backing this list instance.
      * @param newList the new value for ByteList.list, including
      *   setting ByteList.size to list.size.
      */
-    void set(final byte[] newList) {
+    private void set(final byte[] newList) {
       list = newList;
       size = newList.length;
     }
@@ -219,7 +219,7 @@ public final class Compress {
      * Direct access to the backing byte array.
      * @return ByteList.list
      */
-    byte[] get() {
+    private byte[] get() {
       return list;
     }
   }

@@ -18,10 +18,10 @@ import org.basex.util.*;
 final class RESTList extends RESTCmd {
   /**
    * Constructor.
-   * @param rs REST session
+   * @param session REST session
    */
-  RESTList(final RESTSession rs) {
-    super(rs);
+  RESTList(final RESTSession session) {
+    super(session);
   }
 
   @Override

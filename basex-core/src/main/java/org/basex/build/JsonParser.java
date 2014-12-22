@@ -24,7 +24,7 @@ public final class JsonParser extends XMLParser {
    * @param opts database options
    * @throws IOException I/O exception
    */
-  public JsonParser(final IO source, final MainOptions opts) throws IOException {
+  JsonParser(final IO source, final MainOptions opts) throws IOException {
     this(source, opts, opts.get(MainOptions.JSONPARSER));
   }
 

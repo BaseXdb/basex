@@ -406,20 +406,20 @@ public final class DecFormatter extends FormatUtil {
   }
 
   /** Picture variables. */
-  static final class Picture {
+  private static final class Picture {
     /** Prefix/suffix. */
-    final TokenBuilder[] xyzfix = { new TokenBuilder(), new TokenBuilder() };
+    private final TokenBuilder[] xyzfix = { new TokenBuilder(), new TokenBuilder() };
     /** Integer/fractional-part-grouping-positions. */
-    final int[][] group = { {}, {} };
+    private final int[][] group = { {}, {} };
     /** Minimum-integer/fractional-part-size. */
-    final int[] min = { 0, 0 };
+    private final int[] min = { 0, 0 };
     /** Maximum-fractional-part-size. */
-    int maxFrac;
+    private int maxFrac;
     /** Minimum-exponent-size. */
-    int minExp;
+    private int minExp;
     /** Percent flag. */
-    boolean pc;
+    private boolean pc;
     /** Per-mille flag. */
-    boolean pm;
+    private boolean pm;
   }
 }

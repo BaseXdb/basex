@@ -23,7 +23,7 @@ public final class FnParseIetfDate extends StandardFunc {
   }
 
   /** Date parser. */
-  static class DateParser extends InputParser {
+  private static final class DateParser extends InputParser {
     /** Days. */
     private static final String[] DAYS = {
       "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday",
@@ -67,7 +67,7 @@ public final class FnParseIetfDate extends StandardFunc {
      * @param input input
      * @param info input info
      */
-    DateParser(final byte[] input, final InputInfo info) {
+    private DateParser(final byte[] input, final InputInfo info) {
       super(Token.string(lc(input)).trim());
       original = input;
       this.info = info;

@@ -15,7 +15,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class BaseXCollation extends Collation {
+final class BaseXCollation extends Collation {
   /** Collator. */
   private final Comparator<Object> collator;
 

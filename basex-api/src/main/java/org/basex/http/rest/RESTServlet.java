@@ -15,10 +15,10 @@ import org.basex.http.*;
 public final class RESTServlet extends BaseXServlet {
   @Override
   protected void run(final HTTPContext http) throws IOException {
-    final RESTSession rs = new RESTSession(http, http.authenticate());
-    final RESTCmd cmd = code(rs);
+    final RESTSession session = new RESTSession(http, http.authenticate());
+    final RESTCmd cmd = code(session);
     try {
-      cmd.execute(rs.context);
+      cmd.execute(session.context);
     } catch(final BaseXException ex) {
       // catch "database not found" message
       final String msg = Open.dbnf(http.db());
@@ -32,16 +32,16 @@ public final class RESTServlet extends BaseXServlet {
 
   /**
    * Returns the correct code for the specified HTTP method, or an exception.
-   * @param rs session
+   * @param session session
    * @return code
    * @throws IOException I/O exception
    */
-  private static RESTCmd code(final RESTSession rs) throws IOException {
-    final String mth = rs.http.method;
-    if(mth.equals(HTTPMethod.GET.name()))    return RESTGet.get(rs);
-    if(mth.equals(HTTPMethod.POST.name()))   return RESTPost.get(rs);
-    if(mth.equals(HTTPMethod.PUT.name()))    return RESTPut.get(rs);
-    if(mth.equals(HTTPMethod.DELETE.name())) return RESTDelete.get(rs);
-    throw HTTPCode.NOT_IMPLEMENTED_X.get(rs.http.req.getMethod());
+  private static RESTCmd code(final RESTSession session) throws IOException {
+    final String mth = session.http.method;
+    if(mth.equals(HTTPMethod.GET.name()))    return RESTGet.get(session);
+    if(mth.equals(HTTPMethod.POST.name()))   return RESTPost.get(session);
+    if(mth.equals(HTTPMethod.PUT.name()))    return RESTPut.get(session);
+    if(mth.equals(HTTPMethod.DELETE.name())) return RESTDelete.get(session);
+    throw HTTPCode.NOT_IMPLEMENTED_X.get(session.http.req.getMethod());
   }
 }

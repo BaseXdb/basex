@@ -20,7 +20,7 @@ public final class LibraryModule extends StaticScope {
    * @param doc documentation
    * @param sc static context
    */
-  public LibraryModule(final QNm name, final String doc, final StaticContext sc) {
+  LibraryModule(final QNm name, final String doc, final StaticContext sc) {
     super(null, doc, sc, null);
     this.name = name;
   }

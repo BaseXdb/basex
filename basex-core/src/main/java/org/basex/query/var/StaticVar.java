@@ -85,7 +85,7 @@ public final class StaticVar extends StaticDecl {
    * @return value of this variable
    * @throws QueryException query exception
    */
-  public Value value(final QueryContext qc) throws QueryException {
+  Value value(final QueryContext qc) throws QueryException {
     if(dontEnter) throw circVarError(this);
     if(lazy) {
       if(!compiled) throw Util.notExpected(this + " was not compiled.");
@@ -118,7 +118,7 @@ public final class StaticVar extends StaticDecl {
    * Checks for the correct placement of updating expressions in this variable.
    * @throws QueryException query exception
    */
-  public void checkUp() throws QueryException {
+  void checkUp() throws QueryException {
     if(expr != null && expr.has(Flag.UPD)) throw UPNOT_X.get(info, description());
   }
 
@@ -128,7 +128,7 @@ public final class StaticVar extends StaticDecl {
    * @param qc query context
    * @throws QueryException query exception
    */
-  public void bind(final Value value, final QueryContext qc) throws QueryException {
+  void bind(final Value value, final QueryContext qc) throws QueryException {
     if(!external || compiled) return;
     bind(declType == null || declType.instance(value) ? value : declType.cast(value, qc, sc, info));
   }
@@ -180,7 +180,7 @@ public final class StaticVar extends StaticDecl {
    * @param flag flag to check for
    * @return {@code true} if the expression has the given flag, {@code false} otherwise
    */
-  public boolean has(final Flag flag) {
+  boolean has(final Flag flag) {
     if(dontEnter || expr == null) return false;
     dontEnter = true;
     final boolean res = expr.has(flag);

@@ -125,15 +125,15 @@ abstract class JsonXmlConverter extends JsonConverter {
    * A simple container for all elements having the same name.
    * @author Leo Woerteler
    */
-  static final class TypeCache {
+  private static final class TypeCache {
     /** Shared JSON type. */
-    public final byte[] type;
+    private final byte[] type;
     /** JSON name. */
-    public final byte[] name;
+    private final byte[] name;
     /** Nodes. */
-    public FElem[] vals = new FElem[8];
+    private FElem[] vals = new FElem[8];
     /** Logical size of {@link #vals}.  */
-    public int size;
+    private int size;
 
     /**
      * Constructor.
@@ -141,7 +141,7 @@ abstract class JsonXmlConverter extends JsonConverter {
      * @param tp JSON type
      * @param nd element
      */
-    TypeCache(final byte[] nm, final byte[] tp, final FElem nd) {
+    private TypeCache(final byte[] nm, final byte[] tp, final FElem nd) {
       name = nm;
       type = tp;
       vals[0] = nd;
@@ -152,7 +152,7 @@ abstract class JsonXmlConverter extends JsonConverter {
      * Adds a new element to the list.
      * @param nd element to add
      */
-    public void add(final FElem nd) {
+    private void add(final FElem nd) {
       if(size == vals.length) vals = Array.copy(vals, new FElem[Array.newSize(size)]);
       vals[size++] = nd;
     }

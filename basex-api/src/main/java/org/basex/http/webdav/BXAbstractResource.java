@@ -21,8 +21,8 @@ import com.bradmcevoy.http.exceptions.*;
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
-public abstract class BXAbstractResource implements CopyableResource, DeletableResource,
-    MoveableResource, LockableResource {
+abstract class BXAbstractResource implements CopyableResource, DeletableResource, MoveableResource,
+  LockableResource {
 
   /** Resource meta data. */
   final ResourceMetaData meta;
@@ -31,12 +31,12 @@ public abstract class BXAbstractResource implements CopyableResource, DeletableR
 
   /**
    * Constructor.
-   * @param m resource meta data
-   * @param s service
+   * @param meta resource meta data
+   * @param service service
    */
-  BXAbstractResource(final ResourceMetaData m, final WebDAVService<BXAbstractResource> s) {
-    meta = m;
-    service = s;
+  BXAbstractResource(final ResourceMetaData meta, final WebDAVService<BXAbstractResource> service) {
+    this.meta = meta;
+    this.service = service;
   }
 
   @Override

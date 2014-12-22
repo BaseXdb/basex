@@ -59,7 +59,7 @@ public final class JsonDirectConverter extends JsonXmlConverter {
    * Constructor.
    * @param opts json options
    */
-  public JsonDirectConverter(final JsonParserOptions opts) {
+  JsonDirectConverter(final JsonParserOptions opts) {
     super(opts);
     lax = jopts.get(JsonOptions.LAX);
   }

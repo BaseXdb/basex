@@ -45,8 +45,9 @@ public final class FuncLit extends Single implements Scope {
    * @param sc static context
    * @param info input info
    */
-  public FuncLit(final Ann ann, final QNm name, final Var[] args, final Expr expr,
-      final FuncType ft, final VarScope scope, final StaticContext sc, final InputInfo info) {
+  FuncLit(final Ann ann, final QNm name, final Var[] args, final Expr expr, final FuncType ft,
+      final VarScope scope, final StaticContext sc, final InputInfo info) {
+
     super(info, expr);
     this.ann = ann;
     this.name = name;

@@ -21,7 +21,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class XQDoc extends Inspect {
+final class XQDoc extends Inspect {
   /** Namespace uri. */
   private static final byte[] URI = token("http://www.xqdoc.org/1.0");
   /** Prefix. */
@@ -35,7 +35,7 @@ public final class XQDoc extends Inspect {
    * @param qc query context
    * @param info input info
    */
-  public XQDoc(final QueryContext qc, final InputInfo info) {
+  XQDoc(final QueryContext qc, final InputInfo info) {
     super(qc, info);
   }
 

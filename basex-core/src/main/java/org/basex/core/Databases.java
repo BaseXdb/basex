@@ -22,7 +22,7 @@ public final class Databases {
    *   <li> {@code :*?\"<>\/|}" are used for filenames and paths</li>
    * </ul>
    */
-  public static final String DBCHARS = "-+=~!#$%^&()[]{}@'`";
+  static final String DBCHARS = "-+=~!#$%^&()[]{}@'`";
   /** Regex representation of allowed database characters. */
   public static final String REGEXCHARS = DBCHARS.replaceAll("(.)", "\\\\$1");
 

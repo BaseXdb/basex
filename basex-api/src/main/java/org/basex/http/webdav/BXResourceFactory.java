@@ -19,7 +19,7 @@ import com.bradmcevoy.http.*;
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
-public final class BXResourceFactory implements ResourceFactory,
+final class BXResourceFactory implements ResourceFactory,
     ResourceMetaDataFactory<BXAbstractResource> {
 
   /** HTTP Context. */

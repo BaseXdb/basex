@@ -19,7 +19,7 @@ public final class ReplaceContent extends InsertInto {
    * @param ii input info
    * @param nodes node copy insertion sequence
    */
-  public ReplaceContent(final int pre, final Data data, final InputInfo ii, final ANodeList nodes) {
+  ReplaceContent(final int pre, final Data data, final InputInfo ii, final ANodeList nodes) {
     super(pre, data, ii, nodes);
   }
 

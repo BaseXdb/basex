@@ -23,17 +23,17 @@ final class RESTPut {
 
   /**
    * Creates REST code.
-   * @param rs REST session
+   * @param session REST session
    * @return code
    * @throws IOException I/O exception
    */
-  public static RESTExec get(final RESTSession rs) throws IOException {
+  public static RESTExec get(final RESTSession session) throws IOException {
     // create new database or update resource
-    final HTTPContext http = rs.http;
+    final HTTPContext http = session.http;
     final String db = http.db();
     if(db.isEmpty()) throw HTTPCode.NO_PATH.get();
 
-    RESTCmd.parseOptions(rs);
+    RESTCmd.parseOptions(session);
 
     boolean xml = true;
     final InputStream is = http.req.getInputStream();
@@ -45,7 +45,7 @@ final class RESTPut {
       if(APP_JSONML.equals(ct)) {
         final JsonParserOptions jopts = new JsonParserOptions();
         jopts.set(JsonOptions.FORMAT, JsonFormat.JSONML);
-        rs.context.options.set(MainOptions.JSONPARSER, jopts);
+        session.context.options.set(MainOptions.JSONPARSER, jopts);
       }
     } else if(TEXT_CSV.equals(ct)) {
       parser = MainParser.CSV;
@@ -56,27 +56,27 @@ final class RESTPut {
     } else if(ct != null && !isXML(ct)) {
       xml = false;
     }
-    if(parser != null) rs.context.options.set(MainOptions.PARSER, parser);
+    if(parser != null) session.context.options.set(MainOptions.PARSER, parser);
 
     // store data as XML or raw file, depending on content type
     final String path = http.dbpath();
     if(path.isEmpty()) {
       if(xml) {
-        rs.add(new CreateDB(db), is);
+        session.add(new CreateDB(db), is);
       } else {
-        rs.add(new CreateDB(db));
-        rs.add(new Store(db), is);
+        session.add(new CreateDB(db));
+        session.add(new Store(db), is);
       }
     } else {
-      rs.add(new Open(db));
+      session.add(new Open(db));
       if(xml) {
-        rs.add(new Replace(path), is);
+        session.add(new Replace(path), is);
       } else {
-        rs.add(new Delete(path));
-        rs.add(new Store(path), is);
+        session.add(new Delete(path));
+        session.add(new Store(path), is);
       }
     }
-    final RESTExec cmd = new RESTExec(rs);
+    final RESTExec cmd = new RESTExec(session);
     cmd.code = HTTPCode.CREATED_X;
     return cmd;
   }

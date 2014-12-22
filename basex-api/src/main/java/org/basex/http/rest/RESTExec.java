@@ -14,10 +14,10 @@ import org.basex.util.*;
 final class RESTExec extends RESTCmd {
   /**
    * Constructor.
-   * @param rs REST session
+   * @param session REST session
    */
-  RESTExec(final RESTSession rs) {
-    super(rs);
+  RESTExec(final RESTSession session) {
+    super(session);
   }
 
   @Override

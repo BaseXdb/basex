@@ -247,7 +247,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   /**
    * Namespace declaration.
    */
-  static class NSDecl {
+  private static final class NSDecl {
     /** Parent namespace declarations. */
     private final NSDecl parent;
     /** Namespace declarations. */
@@ -257,7 +257,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
      * Constructor.
      * @param parent parent declarations
      */
-    NSDecl(final NSDecl parent) {
+    private NSDecl(final NSDecl parent) {
       this.parent = parent;
     }
 
@@ -265,7 +265,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
      * Returns the parent declarations.
      * @return parent declarations
      */
-    NSDecl getParent() {
+    private NSDecl getParent() {
       return parent;
     }
 
@@ -274,7 +274,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
      * @param prefix prefix
      * @param uri namespace uri
      */
-    void put(final byte[] prefix, final byte[] uri) {
+    private void put(final byte[] prefix, final byte[] uri) {
       if(decls == null) decls = new Atts();
       decls.add(prefix, uri);
     }
@@ -284,7 +284,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
      * @param prefix prefix to be found
      * @return namespace uri
      */
-    byte[] get(final byte[] prefix) {
+    private byte[] get(final byte[] prefix) {
       for(NSDecl c = this; c != null; c = c.parent) {
         if(c.decls != null) {
           final byte[] ns = c.decls.value(prefix);

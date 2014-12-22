@@ -11,7 +11,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class ZIPOut extends ArchiveOut {
+final class ZIPOut extends ArchiveOut {
   /** ZIP output stream. */
   private final ZipOutputStream zos;
 

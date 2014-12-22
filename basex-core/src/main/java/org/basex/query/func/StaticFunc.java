@@ -30,7 +30,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   /** Arguments. */
   public final Var[] args;
   /** Updating flag. */
-  public final boolean updating;
+  final boolean updating;
 
   /** Map with requested function properties. */
   private final EnumMap<Flag, Boolean> map = new EnumMap<>(Flag.class);
@@ -49,7 +49,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    * @param doc current xqdoc cache
    * @param info input info
    */
-  public StaticFunc(final Ann ann, final QNm name, final Var[] args, final SeqType type,
+  StaticFunc(final Ann ann, final QNm name, final Var[] args, final SeqType type,
       final Expr expr, final StaticContext sc, final VarScope scope, final String doc,
       final InputInfo info) {
 
@@ -218,7 +218,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    * Checks if all updating expressions in the function are correctly declared and placed.
    * @throws QueryException query exception
    */
-  public void checkUp() throws QueryException {
+  void checkUp() throws QueryException {
     final boolean u = expr.has(Flag.UPD);
     if(u) expr.checkUp();
     final InputInfo ii = expr instanceof ParseExpr ? ((ParseExpr) expr).info : info;
@@ -246,7 +246,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    * @return result of check
    * @see Expr#has(Flag)
    */
-  public boolean has(final Flag flag) {
+  boolean has(final Flag flag) {
     // handle recursive calls: set dummy value, eventually replace it with final value
     Boolean b = map.get(flag);
     if(b == null) {

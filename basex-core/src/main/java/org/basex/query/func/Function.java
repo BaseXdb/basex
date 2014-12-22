@@ -1363,7 +1363,7 @@ public enum Function {
    * @return result of check
    * @see Expr#has(Flag)
     */
-  public boolean has(final Flag flag) {
+  boolean has(final Flag flag) {
     return flags.contains(flag);
   }
 
@@ -1373,7 +1373,7 @@ public enum Function {
    * @param ann annotations
    * @return function type
    */
-  public final FuncType type(final int arity, final Ann ann) {
+  final FuncType type(final int arity, final Ann ann) {
     final SeqType[] arg = new SeqType[arity];
     if(arity != 0 && max == Integer.MAX_VALUE) {
       System.arraycopy(args, 0, arg, 0, args.length);
@@ -1418,7 +1418,7 @@ public enum Function {
    * @param arity number of arguments
    * @return array of argument names
    */
-  public final QNm[] argNames(final int arity) {
+  final QNm[] argNames(final int arity) {
     final String[] names = names();
     final QNm[] res = new QNm[arity];
     for(int i = Math.min(arity, names.length); --i >= 0;) res[i] = new QNm(names[i]);

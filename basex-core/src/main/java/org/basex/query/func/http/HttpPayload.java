@@ -65,7 +65,7 @@ public final class HttpPayload {
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  public FElem parse(final boolean error, final String ctype, final String utype)
+  FElem parse(final boolean error, final String ctype, final String utype)
       throws IOException, QueryException {
 
     // error: use text/plain as content type
@@ -96,7 +96,7 @@ public final class HttpPayload {
    * Returns all payloads.
    * @return payloads
    */
-  public Value payloads() {
+  Value payloads() {
     return payloads.value();
   }
 

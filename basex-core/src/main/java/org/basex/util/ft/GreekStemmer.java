@@ -11,7 +11,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public class GreekStemmer extends InternalStemmer {
+final class GreekStemmer extends InternalStemmer {
   /**
    * Constructor.
    * @param fti full-text iterator

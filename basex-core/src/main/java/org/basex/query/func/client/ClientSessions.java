@@ -14,7 +14,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class ClientSessions implements QueryResource {
+final class ClientSessions implements QueryResource {
   /** Last inserted id. */
   private int lastId = -1;
   /** Map with all open sessions and their ids. */
@@ -25,7 +25,7 @@ public final class ClientSessions implements QueryResource {
    * @param cs client session
    * @return session id
    */
-  public Uri add(final ClientSession cs) {
+  Uri add(final ClientSession cs) {
     final byte[] uri = Token.token(Prop.PROJECT_NAME + "://" + cs + '/' + ++lastId);
     conns.put(uri, cs);
     return Uri.uri(uri);
@@ -36,7 +36,7 @@ public final class ClientSessions implements QueryResource {
    * @param id session id
    * @return session
    */
-  public ClientSession get(final Uri id) {
+  ClientSession get(final Uri id) {
     return conns.get(id.string());
   }
 
@@ -44,7 +44,7 @@ public final class ClientSessions implements QueryResource {
    * Removes a session.
    * @param id session id
    */
-  public void remove(final Uri id) {
+  void remove(final Uri id) {
     conns.delete(id.string());
   }
 

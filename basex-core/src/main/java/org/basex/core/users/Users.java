@@ -42,7 +42,7 @@ public final class Users {
   /**
    * Reads user permissions.
    */
-  public synchronized void read() {
+  private synchronized void read() {
     if(!file.exists()) return;
 
     try {

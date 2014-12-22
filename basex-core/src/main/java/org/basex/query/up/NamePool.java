@@ -94,14 +94,14 @@ public final class NamePool {
   }
 
   /** Name cache. */
-  static final class NameCache {
+  private static final class NameCache {
     /** Name. */
-    QNm name;
+    private QNm name;
     /** Attribute/element flag. */
-    boolean attr;
+    private boolean attr;
     /** Counts the number of times the name is added. */
-    int add;
+    private int add;
     /** States if the name is deleted. */
-    boolean del;
+    private boolean del;
   }
 }

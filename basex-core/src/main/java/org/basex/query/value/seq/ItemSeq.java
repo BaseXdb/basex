@@ -18,7 +18,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class ItemSeq extends Seq {
+final class ItemSeq extends Seq {
   /** Item array. */
   private final Item[] items;
   /** Item Types. */

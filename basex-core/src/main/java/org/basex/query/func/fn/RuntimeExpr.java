@@ -16,7 +16,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public abstract class RuntimeExpr extends ParseExpr {
+abstract class RuntimeExpr extends ParseExpr {
   /** Arguments. */
   Var[] params;
 

@@ -53,7 +53,7 @@ public final class Compare {
    * @param flag flag
    * @return self reference
    */
-  public Compare flag(final Mode flag) {
+  Compare flag(final Mode flag) {
     flags.add(flag);
     return this;
   }

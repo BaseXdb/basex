@@ -10,7 +10,7 @@ import java.util.*;
  */
 public abstract class Tokenizer extends LanguageImpl {
   /** List of available tokenizers. */
-  public static final ArrayList<Tokenizer> IMPL = new ArrayList<>();
+  static final ArrayList<Tokenizer> IMPL = new ArrayList<>();
 
   /** Also return non-fulltext tokens. */
   boolean all;

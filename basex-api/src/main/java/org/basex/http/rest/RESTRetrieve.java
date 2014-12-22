@@ -22,16 +22,16 @@ import org.basex.util.*;
 final class RESTRetrieve extends RESTCmd {
   /**
    * Constructor.
-   * @param rs REST session
+   * @param session REST session
    */
-  private RESTRetrieve(final RESTSession rs) {
-    super(rs);
+  private RESTRetrieve(final RESTSession session) {
+    super(session);
   }
 
   @Override
   protected void run0() throws IOException {
     // open addressed database
-    for(final Command c : cmds) run(c);
+    for(final Command cmd : cmds) run(cmd);
 
     final HTTPContext http = session.http;
     if(run(query(_DB_EXISTS)).equals(Text.TRUE)) {
@@ -75,13 +75,13 @@ final class RESTRetrieve extends RESTCmd {
 
   /**
    * Creates a new instance of this command.
-   * @param rs REST session
+   * @param session REST session
    * @return command
    */
-  static RESTCmd get(final RESTSession rs) {
-    final HTTPContext http = rs.http;
+  static RESTCmd get(final RESTSession session) {
+    final HTTPContext http = session.http;
     final String db = http.db();
-    if(db.isEmpty()) return new RESTList(rs.add(new List()));
-    return new RESTRetrieve(rs.add(new Open(db)));
+    if(db.isEmpty()) return new RESTList(session.add(new List()));
+    return new RESTRetrieve(session.add(new Open(db)));
   }
 }

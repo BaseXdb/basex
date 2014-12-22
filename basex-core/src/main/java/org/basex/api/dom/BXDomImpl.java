@@ -9,7 +9,7 @@ import org.w3c.dom.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class BXDomImpl implements DOMImplementation {
+final class BXDomImpl implements DOMImplementation {
   /** Singleton instance. */
   private static final BXDomImpl INSTANCE = new BXDomImpl();
 
@@ -17,7 +17,7 @@ public final class BXDomImpl implements DOMImplementation {
    * Returns the only instance of this class.
    * @return instance
    */
-  public static BXDomImpl get() {
+  static BXDomImpl get() {
     return INSTANCE;
   }
 

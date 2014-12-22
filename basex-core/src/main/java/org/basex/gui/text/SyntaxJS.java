@@ -13,7 +13,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class SyntaxJS extends Syntax {
+final class SyntaxJS extends Syntax {
   /** Keywords. */
   private static final HashSet<String> KEYWORDS = new HashSet<>();
 

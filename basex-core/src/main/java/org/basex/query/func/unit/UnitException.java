@@ -10,7 +10,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public class UnitException extends QueryException {
+class UnitException extends QueryException {
   /** Expected item. */
   final Item expected;
   /** Returned item. */
@@ -26,7 +26,7 @@ public class UnitException extends QueryException {
    * @param returned returned result
    * @param count item count
    */
-  public UnitException(final InputInfo info, final QueryError err, final Item returned,
+  UnitException(final InputInfo info, final QueryError err, final Item returned,
       final Item expected, final int count) {
     super(info, err, count, expected == null ? "()" : expected, returned == null ? "()" : returned);
     this.expected = expected;

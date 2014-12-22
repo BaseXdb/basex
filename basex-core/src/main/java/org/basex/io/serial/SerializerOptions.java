@@ -151,7 +151,7 @@ public final class SerializerOptions extends Options {
    * @param option option
    * @return value
    */
-  public boolean yes(final EnumOption<YesNo> option) {
+  boolean yes(final EnumOption<YesNo> option) {
     return get(option) == YesNo.YES;
   }
 

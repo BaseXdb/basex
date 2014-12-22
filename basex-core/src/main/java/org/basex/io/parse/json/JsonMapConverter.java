@@ -44,7 +44,7 @@ public final class JsonMapConverter extends JsonConverter {
    * Constructor.
    * @param opts json options
    */
-  public JsonMapConverter(final JsonParserOptions opts) {
+  JsonMapConverter(final JsonParserOptions opts) {
     super(opts);
   }
 

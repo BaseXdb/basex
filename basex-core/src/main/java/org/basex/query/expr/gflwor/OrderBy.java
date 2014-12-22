@@ -238,11 +238,11 @@ public final class OrderBy extends GFLWOR.Clause {
    */
   public static final class Key extends Single {
     /** Descending order flag. */
-    final boolean desc;
+    private final boolean desc;
     /** Position of empty sort keys. */
-    final boolean least;
+    private final boolean least;
     /** Collation. */
-    final Collation coll;
+    private final Collation coll;
 
     /**
      * Constructor.

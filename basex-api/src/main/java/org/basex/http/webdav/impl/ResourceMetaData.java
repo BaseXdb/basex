@@ -44,26 +44,26 @@ public final class ResourceMetaData {
    * @param p resource path
    * @param m resource last modification date in milliseconds
    */
-  public ResourceMetaData(final String d, final String p, final long m) {
+  ResourceMetaData(final String d, final String p, final long m) {
     this(d, p, m, false, null,  null);
   }
 
   /**
    * Constructor.
-   * @param d database owning the resource
-   * @param p resource path
-   * @param m resource last modification date in milliseconds
-   * @param r raw binary file flag
-   * @param c resource content type
+   * @param db database owning the resource
+   * @param path resource path
+   * @param ms resource last modification date in milliseconds
+   * @param raw raw binary file flag
+   * @param ctype resource content type
    * @param s resource size in bytes
    */
-  public ResourceMetaData(final String d, final String p, final long m, final boolean r,
-      final String c, final Long s) {
-    db = d;
-    path = stripLeadingSlash(p);
-    raw = r;
-    ctype = c;
-    size = s;
-    mdate = m == -1 ? null : new Date(m);
+  ResourceMetaData(final String db, final String path, final long ms, final boolean raw,
+      final String ctype, final Long s) {
+    this.db = db;
+    this.path = stripLeadingSlash(path);
+    this.raw = raw;
+    this.ctype = ctype;
+    this.size = s;
+    mdate = ms == -1 ? null : new Date(ms);
   }
 }

@@ -31,7 +31,7 @@ public final class DBOptions {
     MainOptions.AUTOOPTIMIZE };
 
   /** Runtime options. */
-  public final HashMap<Option<?>, Object> map = new HashMap<>();
+  private final HashMap<Option<?>, Object> map = new HashMap<>();
 
   /**
    * Constructor.

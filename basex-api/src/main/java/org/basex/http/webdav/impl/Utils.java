@@ -25,7 +25,7 @@ public final class Utils {
    * @param s string to modify
    * @return string without leading slash
    */
-  public static String stripLeadingSlash(final String s) {
+  static String stripLeadingSlash(final String s) {
     return s == null || s.isEmpty() || s.charAt(0) != SEP ? s : s.substring(1);
   }
 
@@ -53,7 +53,7 @@ public final class Utils {
    * @return the next byte in the buffer
    * @throws IOException I/O exception
    */
-  public static int peek(final BufferInput bi) throws IOException {
+  static int peek(final BufferInput bi) throws IOException {
     final TextInput ti = new TextInput(bi);
     final int c = ti.read();
     try {

@@ -32,7 +32,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class StringParser extends CmdParser {
+final class StringParser extends CmdParser {
   /** Current parser. */
   private InputParser parser;
 
@@ -41,7 +41,7 @@ public final class StringParser extends CmdParser {
    * @param input input
    * @param context database context
    */
-  public StringParser(final String input, final Context context) {
+  StringParser(final String input, final Context context) {
     super(input, context);
   }
 

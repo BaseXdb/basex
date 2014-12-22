@@ -111,9 +111,9 @@ public final class CmpG extends Cmp {
   }
 
   /** Static context. */
-  public final StaticContext sc;
+  final StaticContext sc;
   /** Comparator. */
-  public OpG op;
+  OpG op;
   /** Flag for atomic evaluation. */
   private boolean atomic;
 

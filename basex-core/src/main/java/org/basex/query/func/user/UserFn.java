@@ -17,7 +17,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public abstract class UserFn extends StandardFunc {
+abstract class UserFn extends StandardFunc {
   /**
    * Checks if the specified expression is a valid database name.
    * @param i expression index

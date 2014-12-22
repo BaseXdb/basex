@@ -150,7 +150,7 @@ public final class CmpV extends Cmp {
   /** Static context. */
   private final StaticContext sc;
   /** Comparator. */
-  public OpV op;
+  OpV op;
 
   /**
    * Constructor.

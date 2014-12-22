@@ -18,7 +18,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public abstract class DbNew extends DbAccess {
+abstract class DbNew extends DbAccess {
   /** Element: parameters. */
   static final QNm Q_OPTIONS = QNm.get("options");
 

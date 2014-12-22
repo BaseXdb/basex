@@ -19,7 +19,7 @@ public final class HTTPException extends IOException {
    * @param err error
    * @param ext message extension
    */
-  public HTTPException(final HTTPCode err, final Object... ext) {
+  HTTPException(final HTTPCode err, final Object... ext) {
     super(Util.info(err.desc, ext));
     status = err.code;
   }

@@ -16,7 +16,7 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class UCAOptions extends CollationOptions {
+final class UCAOptions extends CollationOptions {
   /** Option: fallback. */
   public static final EnumOption<YesNo> FALLBACK = new EnumOption<>("fallback", YesNo.YES);
   /** Option: language. */

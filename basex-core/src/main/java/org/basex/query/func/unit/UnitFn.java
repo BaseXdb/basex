@@ -12,7 +12,7 @@ import org.basex.query.value.item.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public abstract class UnitFn extends StandardFunc {
+abstract class UnitFn extends StandardFunc {
   /**
    * Returns an error with the specified item as value.
    * @param it item (may be {@code null})

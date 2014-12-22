@@ -40,7 +40,7 @@ public final class FuncOptions {
    * @param root name of root node
    * @param info input info
    */
-  public FuncOptions(final QNm root, final InputInfo info) {
+  FuncOptions(final QNm root, final InputInfo info) {
     test = new NodeTest(root);
     this.root = root;
     this.info = info;
@@ -52,7 +52,7 @@ public final class FuncOptions {
    * @param options options
    * @throws QueryException query exception
    */
-  public void parse(final Item it, final Options options) throws QueryException {
+  void parse(final Item it, final Options options) throws QueryException {
     parse(it, options, INVALIDOPT_X);
   }
 

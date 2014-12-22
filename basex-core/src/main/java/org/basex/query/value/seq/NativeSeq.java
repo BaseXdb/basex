@@ -15,7 +15,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public abstract class NativeSeq extends Seq {
+abstract class NativeSeq extends Seq {
   /**
    * Constructor.
    * @param size number of items

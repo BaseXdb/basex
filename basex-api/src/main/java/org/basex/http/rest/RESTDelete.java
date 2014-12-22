@@ -17,23 +17,23 @@ final class RESTDelete {
 
   /**
    * Creates a new instance of this command.
-   * @param rs REST session
+   * @param session REST session
    * @return command
    * @throws IOException I/O exception
    */
-  static RESTExec get(final RESTSession rs) throws IOException {
-    RESTCmd.parseOptions(rs);
+  static RESTExec get(final RESTSession session) throws IOException {
+    RESTCmd.parseOptions(session);
 
-    final HTTPContext http = rs.http;
+    final HTTPContext http = session.http;
     final String db = http.db();
     if(db.isEmpty()) throw HTTPCode.NO_PATH.get();
 
     // open database to ensure it exists
-    rs.add(new Open(db));
+    session.add(new Open(db));
     final String path = http.dbpath();
-    if(path.isEmpty()) rs.add(new DropDB(db));
-    else rs.add(new Delete(path));
+    if(path.isEmpty()) session.add(new DropDB(db));
+    else session.add(new Delete(path));
 
-    return new RESTExec(rs);
+    return new RESTExec(session);
   }
 }

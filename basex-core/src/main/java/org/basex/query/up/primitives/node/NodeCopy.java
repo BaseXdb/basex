@@ -17,7 +17,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Lukas Kircher
  */
-public abstract class NodeCopy extends NodeUpdate {
+abstract class NodeCopy extends NodeUpdate {
   /** Nodes to be inserted. */
   ANodeList nodes;
   /** Insertion sequence data clip (will be populated by {@link #prepare}). */

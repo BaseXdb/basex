@@ -25,7 +25,7 @@ public final class MixedPath extends Path {
    * @param root root expression; can be a {@code null} reference
    * @param steps axis steps
    */
-  public MixedPath(final InputInfo info, final Expr root, final Expr... steps) {
+  MixedPath(final InputInfo info, final Expr root, final Expr... steps) {
     super(info, root, steps);
   }
 

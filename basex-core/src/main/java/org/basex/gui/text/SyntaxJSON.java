@@ -8,7 +8,7 @@ import java.awt.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class SyntaxJSON extends Syntax {
+final class SyntaxJSON extends Syntax {
   /** Quoted flag. */
   private boolean quoted;
 

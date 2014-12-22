@@ -27,7 +27,7 @@ import org.xml.sax.*;
  * @author Michael Seiferle
  * @author Marco Lettere (greedy/verbose validation)
  */
-public abstract class ValidateFn extends StandardFunc {
+abstract class ValidateFn extends StandardFunc {
   /**
    * Runs the specified validator.
    * @param v validator code

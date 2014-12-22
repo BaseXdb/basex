@@ -22,7 +22,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public class ProjectTree extends BaseXTree implements TreeWillExpandListener {
+final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
   /** Project view. */
   private final ProjectView view;
 

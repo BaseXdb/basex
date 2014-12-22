@@ -17,20 +17,20 @@ import org.basex.query.value.type.*;
  */
 class RESTQuery extends RESTCmd {
   /** External variables. */
-  private final Map<String, String[]> variables;
+  private final Map<String, String[]> vars;
   /** Optional context value. */
   private final String value;
 
   /**
    * Constructor.
-   * @param rs REST Session
+   * @param session REST Session
    * @param vars external variables
-   * @param val context value
+   * @param value context value
    */
-  RESTQuery(final RESTSession rs, final Map<String, String[]> vars, final String val) {
-    super(rs);
-    variables = vars;
-    value = val;
+  RESTQuery(final RESTSession session, final Map<String, String[]> vars, final String value) {
+    super(session);
+    this.vars = vars;
+    this.value = value;
   }
 
   @Override
@@ -61,7 +61,7 @@ class RESTQuery extends RESTCmd {
 
         // bind HTTP context and external variables
         xq.http(http);
-        for(final Entry<String, String[]> e : variables.entrySet()) {
+        for(final Entry<String, String[]> e : vars.entrySet()) {
           final String key = e.getKey();
           final String[] val = e.getValue();
           if(val.length == 2) xq.bind(key, val[0], val[1]);
@@ -82,7 +82,7 @@ class RESTQuery extends RESTCmd {
 
   /**
    * Creates a new instance of this command.
-   * @param rs REST session
+   * @param session REST session
    * @param query query
    * @param vars external variables
    * @param val context value
@@ -90,11 +90,11 @@ class RESTQuery extends RESTCmd {
    * @throws IOException I/O exception
    */
   @SuppressWarnings("unused")
-  static RESTQuery get(final RESTSession rs, final String query, final Map<String, String[]> vars,
-      final String val) throws IOException {
+  static RESTQuery get(final RESTSession session, final String query,
+      final Map<String, String[]> vars, final String val) throws IOException {
 
-    open(rs);
-    rs.add(new XQuery(query));
-    return new RESTQuery(rs, vars, val);
+    open(session);
+    session.add(new XQuery(query));
+    return new RESTQuery(session, vars, val);
   }
 }

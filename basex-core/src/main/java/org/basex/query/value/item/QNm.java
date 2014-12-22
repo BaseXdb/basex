@@ -23,7 +23,7 @@ import org.basex.util.list.*;
  */
 public final class QNm extends Item {
   /** URL pattern (matching Clark and EQName notation). */
-  public static final Pattern BIND = Pattern.compile("^((\"|')(.*?)\\2:|Q?(\\{(.*?)\\}))(.+)$");
+  private static final Pattern BIND = Pattern.compile("^((\"|')(.*?)\\2:|Q?(\\{(.*?)\\}))(.+)$");
   /** Singleton instance. */
   private static final QNmMap CACHE = new QNmMap();
 

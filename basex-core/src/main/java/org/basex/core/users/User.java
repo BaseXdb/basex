@@ -36,7 +36,7 @@ public final class User {
    * @param password password
    * @param perm rights
    */
-  public User(final String name, final String password, final Perm perm) {
+  User(final String name, final String password, final Perm perm) {
     this.name = name;
     this.perm = perm;
     for(final Algorithm algo : Algorithm.values()) {
@@ -50,7 +50,7 @@ public final class User {
    * @param user user node
    * @throws BaseXException database exception
    */
-  public User(final ANode user) throws BaseXException {
+  User(final ANode user) throws BaseXException {
     name = string(attribute("Root", user, NAME));
     perm = attribute(name, user, PERMISSION, Perm.values());
 
@@ -91,7 +91,7 @@ public final class User {
    * Writes permissions to the specified XML file.
    * @param xml xml builder
    */
-  public synchronized void write(final XMLBuilder xml) {
+  synchronized void write(final XMLBuilder xml) {
     xml.open(USER, NAME, name, PERMISSION, perm);
     if(passwords.size() != 0) {
       for(final Entry<Algorithm, EnumMap<Code, String>> algo : passwords.entrySet()) {
@@ -114,7 +114,7 @@ public final class User {
    * Sets the user name.
    * @param nm name
    */
-  public void name(final String nm) {
+  void name(final String nm) {
     name = nm;
   }
 
@@ -122,7 +122,7 @@ public final class User {
    * Removes local permissions.
    * @param pattern database pattern
    */
-  public void remove(final String pattern) {
+  void remove(final String pattern) {
     locals.remove(pattern);
   }
 
@@ -146,7 +146,7 @@ public final class User {
    * Computes new password hashes.
    * @param password password (plain text)
    */
-  public void password(final String password) {
+  void password(final String password) {
     EnumMap<Code, String> codes = passwords.get(Algorithm.DIGEST);
     codes.put(Code.HASH, digest(name, password));
 
@@ -192,7 +192,7 @@ public final class User {
    * @param db database
    * @return entry, or {@code null}
    */
-  public Entry<String, Perm> find(final String db) {
+  Entry<String, Perm> find(final String db) {
     for(final Entry<String, Perm> entry : locals.entrySet()) {
       if(db.matches(IOFile.regex(entry.getKey()))) return entry;
     }
@@ -248,7 +248,7 @@ public final class User {
    * @param password password
    * @return digest digest hash
    */
-  public static String digest(final String name, final String password) {
+  static String digest(final String name, final String password) {
     return md5(name + ':' + Prop.NAME + ':' + password);
   }
 

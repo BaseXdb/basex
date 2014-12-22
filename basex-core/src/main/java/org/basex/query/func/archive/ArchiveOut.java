@@ -17,7 +17,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public abstract class ArchiveOut implements AutoCloseable {
+abstract class ArchiveOut implements AutoCloseable {
   /** Output. */
   final ArrayOutput ao = new ArrayOutput();
   /** Buffer. */
@@ -30,7 +30,7 @@ public abstract class ArchiveOut implements AutoCloseable {
    * @return writer
    * @throws QueryException query exception
    */
-  public static ArchiveOut get(final String format, final InputInfo info) throws QueryException {
+  static ArchiveOut get(final String format, final InputInfo info) throws QueryException {
     try {
       if(format.equals(ZIP)) return new ZIPOut();
       if(format.equals(GZIP)) return new GZIPOut();
@@ -68,7 +68,7 @@ public abstract class ArchiveOut implements AutoCloseable {
    * Returns the output as byte array.
    * @return byte array
    */
-  public final byte[] toArray() {
+  final byte[] toArray() {
     return ao.toArray();
   }
 }

@@ -11,7 +11,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class NoCaseCollation extends Collation {
+final class NoCaseCollation extends Collation {
   @Override
   public int compare(final byte[] string, final byte[] compare) {
     final String str = string(string), cmp = string(compare);

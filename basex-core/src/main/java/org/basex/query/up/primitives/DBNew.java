@@ -22,9 +22,9 @@ import org.basex.util.*;
  */
 public final class DBNew {
   /** Query context. */
-  final QueryContext qc;
+  private final QueryContext qc;
   /** Input info. */
-  final InputInfo info;
+  private final InputInfo info;
 
   /** Inputs to add. */
   public List<NewInput> inputs;
@@ -86,7 +86,7 @@ public final class DBNew {
    * @return database clip
    * @throws QueryException query exception
    */
-  DataClip data(final NewInput ni, final String dbname, final MainOptions options)
+  private DataClip data(final NewInput ni, final String dbname, final MainOptions options)
       throws QueryException {
 
     // add document node

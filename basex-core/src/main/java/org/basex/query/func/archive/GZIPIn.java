@@ -12,7 +12,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class GZIPIn extends ArchiveIn {
+final class GZIPIn extends ArchiveIn {
   /** GZIP input stream. */
   private final GZIPInputStream zis;
   /** Flag. */
@@ -23,7 +23,7 @@ public final class GZIPIn extends ArchiveIn {
    * @param is input stream
    * @throws IOException I/O exception
    */
-  public GZIPIn(final InputStream is) throws IOException {
+  GZIPIn(final InputStream is) throws IOException {
     zis = new GZIPInputStream(is);
   }
 

@@ -64,7 +64,7 @@ public final class Repo {
    * @param pkg package
    * @return file reference
    */
-  public IOFile path(final String pkg) {
+  IOFile path(final String pkg) {
     return new IOFile(init().path, pkg);
   }
 

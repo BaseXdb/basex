@@ -25,15 +25,15 @@ public final class Constr {
   /** Attribute array. */
   public final ANodeList atts = new ANodeList();
   /** Namespace array. */
-  public final Atts nspaces = new Atts();
+  final Atts nspaces = new Atts();
   /** Error: attribute position. */
   public boolean errAtt;
   /** Error: namespace position. */
-  public boolean errNS;
+  boolean errNS;
   /** Error: duplicate attribute. */
   public byte[] duplAtt;
   /** Error: duplicate namespace. */
-  public byte[] duplNS;
+  byte[] duplNS;
 
   /** Static context. */
   private final StaticContext sc;

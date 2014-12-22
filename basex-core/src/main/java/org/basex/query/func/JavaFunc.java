@@ -20,7 +20,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class JavaFunc extends JavaMapping {
+final class JavaFunc extends JavaMapping {
   /** Java class. */
   private final Class<?> clazz;
   /** Java method. */

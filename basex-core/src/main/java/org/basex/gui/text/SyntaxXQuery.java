@@ -15,7 +15,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class SyntaxXQuery extends Syntax {
+final class SyntaxXQuery extends Syntax {
   /** Opening brackets. */
   private static final String OPENING = "{(";
   /** Closing brackets. */

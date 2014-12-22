@@ -21,13 +21,13 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class PlainDoc extends Inspect {
+final class PlainDoc extends Inspect {
   /**
    * Constructor.
    * @param qc query context
    * @param info input info
    */
-  public PlainDoc(final QueryContext qc, final InputInfo info) {
+  PlainDoc(final QueryContext qc, final InputInfo info) {
     super(qc, info);
   }
 
@@ -36,7 +36,7 @@ public final class PlainDoc extends Inspect {
    * @return inspection element
    * @throws QueryException query exception
    */
-  public FElem context() throws QueryException {
+  FElem context() throws QueryException {
     final FElem context = elem("context", null);
 
     for(final StaticVar sv : qc.vars) {
@@ -94,7 +94,7 @@ public final class PlainDoc extends Inspect {
    * @return resulting value
    * @throws QueryException query exception
    */
-  public FElem function(final QNm fname, final StaticFunc sf, final FuncType ftype,
+  FElem function(final QNm fname, final StaticFunc sf, final FuncType ftype,
         final Ann ann, final FElem parent) throws QueryException {
 
     final FElem function = elem("function", parent);

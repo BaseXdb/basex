@@ -197,7 +197,7 @@ public final class Escape extends RegExp {
    * @param cp code point
    * @return char representation
    */
-  public static char[] escape(final int cp) {
+  static char[] escape(final int cp) {
     switch(cp) {
       case '[':
       case ']':

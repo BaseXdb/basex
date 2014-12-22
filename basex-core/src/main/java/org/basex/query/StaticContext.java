@@ -34,20 +34,20 @@ public final class StaticContext {
   /** Default function namespace. */
   public byte[] funcNS = FN_URI;
   /** Static type of context value. */
-  public SeqType contextType;
+  SeqType contextType;
 
   /** Construction mode. */
-  public boolean strip;
+  boolean strip;
   /** Ordering mode. */
-  public boolean ordered;
+  boolean ordered;
   /** Default order for empty sequences. */
-  public boolean orderGreatest;
+  boolean orderGreatest;
   /** Boundary-space policy. */
-  public boolean spaces;
+  boolean spaces;
   /** Copy-namespaces mode: (no-)preserve. */
-  public boolean preserveNS = true;
+  boolean preserveNS = true;
   /** Copy-namespaces mode: (no-)inherit. */
-  public boolean inheritNS = true;
+  boolean inheritNS = true;
 
   /** Static Base URI. */
   private Uri baseURI = Uri.EMPTY;
@@ -69,7 +69,7 @@ public final class StaticContext {
    * @param uri namespace URI
    * @throws QueryException query exception
    */
-  public void namespace(final String prefix, final String uri) throws QueryException {
+  void namespace(final String prefix, final String uri) throws QueryException {
     if(prefix.isEmpty()) {
       elemNS = uri.isEmpty() ? null : token(uri);
     } else if(uri.isEmpty()) {
@@ -94,7 +94,7 @@ public final class StaticContext {
    * @param path file path
    * @return io reference
    */
-  public IO io(final String path) {
+  IO io(final String path) {
     final IO base = baseIO();
     return base != null ? base.merge(path) : IO.get(path);
   }

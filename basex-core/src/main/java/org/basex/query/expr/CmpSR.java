@@ -22,7 +22,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class CmpSR extends Single {
+final class CmpSR extends Single {
   /** Collation. */
   private final Collation coll;
   /** Minimum. */

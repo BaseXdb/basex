@@ -35,7 +35,7 @@ import org.xml.sax.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Lukas Kircher
  */
-public final class DigitalSignature {
+final class DigitalSignature {
   /** Canonicalization algorithms. */
   private static final TokenMap CANONICALIZATIONS = new TokenMap();
   /** Signature digest algorithms. */
@@ -84,7 +84,7 @@ public final class DigitalSignature {
    * Constructor.
    * @param info input info
    */
-  public DigitalSignature(final InputInfo info) {
+  DigitalSignature(final InputInfo info) {
     this.info = info;
   }
 
@@ -104,7 +104,7 @@ public final class DigitalSignature {
    * @return signed node
    * @throws QueryException query exception
    */
-  public Item generateSignature(final ANode node, final byte[] c, final byte[] d, final byte[] sig,
+  Item generateSignature(final ANode node, final byte[] c, final byte[] d, final byte[] sig,
       final byte[] ns, final byte[] t, final byte[] expr, final ANode ce, final QueryContext qc,
       final InputInfo ii) throws QueryException {
 
@@ -276,7 +276,7 @@ public final class DigitalSignature {
    * @return true if signature valid
    * @throws QueryException query exception
    */
-  public Item validateSignature(final ANode node) throws QueryException {
+  Item validateSignature(final ANode node) throws QueryException {
     try {
       final Document doc = toDOMNode(node);
       final DOMValidateContext valContext = new DOMValidateContext(new MyKeySelector(), doc);

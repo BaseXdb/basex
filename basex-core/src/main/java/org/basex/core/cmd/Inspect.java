@@ -80,17 +80,17 @@ public final class Inspect extends Command {
   }
 
   /** Contains information on single check. */
-  static final class Check {
+  private static final class Check {
     /** Number of invalid. */
-    int invalid;
+    private int invalid;
     /** First invalid hit. */
-    int first = -1;
+    private int first = -1;
 
     /**
      * Adds an entry.
      * @param pre pre value
      */
-    void add(final int pre) {
+    private void add(final int pre) {
       invalid++;
       if(first == -1) first = pre;
     }
@@ -100,7 +100,7 @@ public final class Inspect extends Command {
      * @param info info label
      * @return info string
      */
-    String info(final String info) {
+    private String info(final String info) {
       final StringBuilder sb = new StringBuilder("- % " + info);
       if(invalid > 0) sb.append(" (pre: %,..)");
       return Util.info(sb, invalid, first) + Prop.NL;

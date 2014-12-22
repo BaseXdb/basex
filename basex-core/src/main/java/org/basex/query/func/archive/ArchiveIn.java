@@ -17,7 +17,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public abstract class ArchiveIn implements AutoCloseable {
+abstract class ArchiveIn implements AutoCloseable {
   /** Buffer. */
   private final byte[] data = new byte[IO.BLOCKSIZE];
 
@@ -28,7 +28,7 @@ public abstract class ArchiveIn implements AutoCloseable {
    * @return reader
    * @throws QueryException query exception
    */
-  public static ArchiveIn get(final BufferInput bi, final InputInfo info) throws QueryException {
+  static ArchiveIn get(final BufferInput bi, final InputInfo info) throws QueryException {
     try {
       final LookupInput li = new LookupInput(bi);
       if(li.lookup() == 0x50) return new ZIPIn(li);
@@ -72,7 +72,7 @@ public abstract class ArchiveIn implements AutoCloseable {
    * @return entry
    * @throws IOException I/O exception
    */
-  public byte[] read() throws IOException {
+  byte[] read() throws IOException {
     final ArrayOutput ao = new ArrayOutput();
     for(int c; (c = read(data)) != -1;) ao.write(data, 0, c);
     return ao.finish();

@@ -19,7 +19,7 @@ import org.basex.util.*;
  * @author Christian Gruen
  * @author Leo Woerteler
  */
-public class JsonMLConverter extends JsonXmlConverter {
+class JsonMLConverter extends JsonXmlConverter {
   /** Element stack. */
   private final Stack<FElem> stack = new Stack<>();
   /** Current attribute name. */
@@ -29,7 +29,7 @@ public class JsonMLConverter extends JsonXmlConverter {
    * Constructor.
    * @param opts json options
    */
-  public JsonMLConverter(final JsonParserOptions opts) {
+  JsonMLConverter(final JsonParserOptions opts) {
     super(opts);
   }
 

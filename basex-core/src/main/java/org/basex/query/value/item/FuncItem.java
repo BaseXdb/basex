@@ -30,7 +30,7 @@ public final class FuncItem extends FItem implements Scope {
   /** Function name (may be {@code null}). */
   private final QNm name;
   /** Formal parameters. */
-  public final Var[] params;
+  private final Var[] params;
   /** Function expression. */
   public final Expr expr;
 

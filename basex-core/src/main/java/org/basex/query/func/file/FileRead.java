@@ -14,7 +14,7 @@ import org.basex.query.value.item.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public abstract class FileRead extends FileFn {
+abstract class FileRead extends FileFn {
   /**
    * Reads the contents of a file.
    * @param qc query context

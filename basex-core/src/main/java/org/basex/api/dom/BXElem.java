@@ -16,7 +16,7 @@ public final class BXElem extends BXNode implements Element {
    * Constructor.
    * @param node node reference
    */
-  public BXElem(final ANode node) {
+  BXElem(final ANode node) {
     super(node);
   }
 

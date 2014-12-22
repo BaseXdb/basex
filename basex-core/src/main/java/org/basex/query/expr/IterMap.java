@@ -14,7 +14,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class IterMap extends SimpleMap {
+final class IterMap extends SimpleMap {
   /**
    * Constructor.
    * @param info input info

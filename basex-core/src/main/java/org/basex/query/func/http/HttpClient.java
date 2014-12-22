@@ -53,7 +53,7 @@ public final class HttpClient {
    * @return HTTP response
    * @throws QueryException query exception
    */
-  public Iter sendRequest(final byte[] href, final ANode request, final ValueBuilder bodies)
+  Iter sendRequest(final byte[] href, final ANode request, final ValueBuilder bodies)
       throws QueryException {
 
     try {

@@ -8,9 +8,9 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Rositsa Shadura
  */
-public final class JarDesc {
+final class JarDesc {
   /** List of jar files. */
-  public final TokenList jars = new TokenList();
+  final TokenList jars = new TokenList();
   /** List of public classes. */
   final TokenList classes = new TokenList();
 }

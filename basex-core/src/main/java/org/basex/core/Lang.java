@@ -149,7 +149,7 @@ public final class Lang {
   /**
    * Checks the existing language files for correctness and completeness.
    */
-  public static void check() {
+  static void check() {
     read("English");
     final StringBuilder sb = new StringBuilder();
     final HashSet<String> set = new HashSet<>();

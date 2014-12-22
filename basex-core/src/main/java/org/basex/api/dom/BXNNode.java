@@ -10,12 +10,12 @@ import org.w3c.dom.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class BXNNode extends BXNList implements NamedNodeMap {
+final class BXNNode extends BXNList implements NamedNodeMap {
   /**
    * Constructor.
    * @param nodes nodes
    */
-  public BXNNode(final ANodeList nodes) {
+  BXNNode(final ANodeList nodes) {
     super(nodes);
   }
 

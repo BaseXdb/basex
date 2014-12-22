@@ -17,14 +17,14 @@ import com.bradmcevoy.http.exceptions.*;
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
-public final class BXFile extends BXAbstractResource implements FileResource {
+final class BXFile extends BXAbstractResource implements FileResource {
   /**
    * Constructor.
-   * @param d resource meta data
-   * @param s service implementation
+   * @param meta resource meta data
+   * @param service service implementation
    */
-  public  BXFile(final ResourceMetaData d, final WebDAVService<BXAbstractResource> s) {
-    super(d, s);
+  BXFile(final ResourceMetaData meta, final WebDAVService<BXAbstractResource> service) {
+    super(meta, service);
   }
 
   @Override

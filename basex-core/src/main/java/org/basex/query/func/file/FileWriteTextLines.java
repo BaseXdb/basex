@@ -22,7 +22,7 @@ import org.basex.util.*;
  */
 public class FileWriteTextLines extends FileFn {
   /** Line separator. */
-  static final byte[] NL = token(Prop.NL);
+  private static final byte[] NL = token(Prop.NL);
 
   @Override
   public Item item(final QueryContext qc) throws IOException, QueryException {

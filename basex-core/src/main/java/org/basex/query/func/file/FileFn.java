@@ -17,7 +17,7 @@ import org.basex.util.*;
  * @author Rositsa Shadura
  * @author Christian Gruen
  */
-public abstract class FileFn extends StandardFunc {
+abstract class FileFn extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     checkCreate(qc);

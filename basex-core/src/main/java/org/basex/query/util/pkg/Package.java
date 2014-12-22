@@ -15,11 +15,11 @@ import org.basex.util.*;
  */
 public final class Package {
   /** List of dependencies. */
-  public final ArrayList<Dependency> dep = new ArrayList<>();
+  final ArrayList<Dependency> dep = new ArrayList<>();
   /** Package components. */
-  public final ArrayList<Component> comps = new ArrayList<>();
+  final ArrayList<Component> comps = new ArrayList<>();
   /** Package short name. */
-  public byte[] abbrev;
+  byte[] abbrev;
   /** Package uri. */
   byte[] name;
   /** Package version. */

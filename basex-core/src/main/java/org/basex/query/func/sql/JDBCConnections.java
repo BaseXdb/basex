@@ -12,7 +12,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Rositsa Shadura
  */
-public final class JDBCConnections implements QueryResource {
+final class JDBCConnections implements QueryResource {
   /** Last inserted id. */
   private int lastId = -1;
   /** Map with all open connections and prepared statements with unique ids. */
@@ -23,7 +23,7 @@ public final class JDBCConnections implements QueryResource {
    * @param obj connection or prepared statement
    * @return connection/prepared statement id
    */
-  public int add(final Object obj) {
+  int add(final Object obj) {
     conns.put(++lastId, obj);
     return lastId;
   }
@@ -33,7 +33,7 @@ public final class JDBCConnections implements QueryResource {
    * @param id id
    * @return connection or prepared statement
    */
-  public Object get(final int id) {
+  Object get(final int id) {
     return conns.get(id);
   }
 
@@ -41,7 +41,7 @@ public final class JDBCConnections implements QueryResource {
    * Removes either a connection or a prepared statement from the depot.
    * @param id connection/prepared statement id
    */
-  public void remove(final int id) {
+  void remove(final int id) {
     conns.delete(id);
   }
 

@@ -102,20 +102,12 @@ public abstract class Collation {
     }
 
     try {
-      return opts.get(args).uri(uri);
+      final Collation coll = opts.get(args);
+      coll.uri = uri;
+      return coll;
     } catch(final IllegalArgumentException ex) {
       throw err.get(info, ex);
     }
-  }
-
-  /**
-   * Assigns the specified URI.
-   * @param u uri
-   * @return self reference
-   */
-  public final Collation uri(final byte[] u) {
-    uri = u;
-    return this;
   }
 
   /**

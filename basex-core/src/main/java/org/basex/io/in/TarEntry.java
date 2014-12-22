@@ -20,7 +20,7 @@ public final class TarEntry {
    * Constructor.
    * @param buffer header buffer
    */
-  public TarEntry(final byte[] buffer) {
+  TarEntry(final byte[] buffer) {
     // file name
     final ByteList result = new ByteList();
     for(int i = 0; i < 100; ++i) {

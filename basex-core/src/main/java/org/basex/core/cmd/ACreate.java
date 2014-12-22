@@ -18,7 +18,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public abstract class ACreate extends Command {
+abstract class ACreate extends Command {
   /** Flag for closing a data instances before executing the command. */
   private boolean newData;
 

@@ -120,7 +120,7 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
    * @param dialog reference to the dialog window
    * @param cmds commands to be run
    */
-  public static void execute(final BaseXDialog dialog, final Command... cmds) {
+  static void execute(final BaseXDialog dialog, final Command... cmds) {
     execute(dialog, null, cmds);
   }
 
@@ -141,7 +141,7 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
    * @param post post-processing step
    * @param cmds commands to be run
    */
-  public static void execute(final BaseXDialog dialog, final Runnable post, final Command... cmds) {
+  static void execute(final BaseXDialog dialog, final Runnable post, final Command... cmds) {
     execute(dialog.gui, dialog, post, cmds);
   }
 

@@ -14,7 +14,7 @@ import org.basex.query.value.item.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public abstract class HashFn extends StandardFunc {
+abstract class HashFn extends StandardFunc {
   /**
    * Creates the hash of a string, using the given algorithm.
    * @param algo hashing algorithm

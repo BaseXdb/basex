@@ -10,7 +10,7 @@ import org.basex.query.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Rositsa Shadura
  */
-public abstract class RepoFn extends StandardFunc {
+abstract class RepoFn extends StandardFunc {
   @Override
   public final boolean accept(final ASTVisitor visitor) {
     return visitor.lock(DBLocking.REPO) && super.accept(visitor);

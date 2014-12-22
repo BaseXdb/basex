@@ -9,12 +9,12 @@ import org.w3c.dom.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public final class BXDocFrag extends BXNode implements DocumentFragment {
+final class BXDocFrag extends BXNode implements DocumentFragment {
   /**
    * Constructor.
    * @param node node reference
    */
-  public BXDocFrag(final ANode node) {
+  BXDocFrag(final ANode node) {
     super(node);
   }
 

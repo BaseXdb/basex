@@ -16,7 +16,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Toshio HIRAI
  */
-public class JapaneseTokenizer extends Tokenizer {
+final class JapaneseTokenizer extends Tokenizer {
   /** Flag available. */
   private static boolean available = true;
 
@@ -139,7 +139,7 @@ public class JapaneseTokenizer extends Tokenizer {
    * Constructor.
    * @param fto (optional) full-text options
    */
-  public JapaneseTokenizer(final FTOpt fto) {
+  JapaneseTokenizer(final FTOpt fto) {
     cs = fto != null && fto.cs != null ? fto.cs : FTCase.INSENSITIVE;
     wc = fto != null && fto.is(WC);
     dc = fto != null && fto.is(DC);
@@ -479,33 +479,33 @@ public class JapaneseTokenizer extends Tokenizer {
   }
 
   /** Morpheme class. */
-  static class Morpheme {
+  private static final class Morpheme {
     /** A part of speech in the context, NEISHI(Noun). */
-    static final int HINSHI_MEISHI = 1;
+    private static final int HINSHI_MEISHI = 1;
     /** A part of speech in the context, RENTAISHI(Pre-noun Adjectival). */
-    static final int HINSHI_RENTAISHI = 2;
+    private static final int HINSHI_RENTAISHI = 2;
     /** A part of speech in the context, HUKUSHI(Adverb). */
-    static final int HINSHI_HUKUSHI = 3;
+    private static final int HINSHI_HUKUSHI = 3;
     /** A part of speech in the context, DOUSHI(Verb). */
-    static final int HINSHI_DOUSHI = 4;
+    private static final int HINSHI_DOUSHI = 4;
     /** A part of speech in the context, SETSUZOKUSHI(Conjunction). */
-    static final int HINSHI_SETSUZOKUSHI = 5;
+    private static final int HINSHI_SETSUZOKUSHI = 5;
     /** A part of speech in the context, JYODOUSHI(Modal verbs). */
-    static final int HINSHI_JYODOUSHI = 6;
+    private static final int HINSHI_JYODOUSHI = 6;
     /** A part of speech in the context, JYOSHI(Postpositional particle). */
-    static final int HINSHI_JYOSHI = 7;
+    private static final int HINSHI_JYOSHI = 7;
     /** A part of speech in the context, KEIYOUSHI(Adjective). */
-    static final int HINSHI_KEIYOUSHI = 8;
+    private static final int HINSHI_KEIYOUSHI = 8;
     /** A part of speech in the context, KIGOU(Mark). */
-    static final int HINSHI_KIGOU = 9;
+    private static final int HINSHI_KIGOU = 9;
     /** A part of speech in the context, KANDOUSHI(Interjection). */
-    static final int HINSHI_KANDOUSHI = 10;
+    private static final int HINSHI_KANDOUSHI = 10;
     /** A part of speech in the context, FILLER(Filler). */
-    static final int HINSHI_FILLER = 11;
+    private static final int HINSHI_FILLER = 11;
     /** A part of speech in the context, SETTOUSHI(Prefix). */
-    static final int HINSHI_SETTOUSHI = 12;
+    private static final int HINSHI_SETTOUSHI = 12;
     /** A part of speech in the context, Others. */
-    static final int HINSHI_SONOTA = 0;
+    private static final int HINSHI_SONOTA = 0;
 
     /** Surface of morpheme. */
     private final String mSurface;
@@ -517,7 +517,7 @@ public class JapaneseTokenizer extends Tokenizer {
      * @param srfc surface
      * @param ftr feature
     */
-    Morpheme(final String srfc, final String ftr) {
+    private Morpheme(final String srfc, final String ftr) {
       mSurface = srfc;
       mFeature = ftr;
     }

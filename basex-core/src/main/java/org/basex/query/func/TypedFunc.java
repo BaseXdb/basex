@@ -20,7 +20,7 @@ public final class TypedFunc {
    * @param fun function expression
    * @param ann annotations
    */
-  public TypedFunc(final Expr fun, final Ann ann) {
+  TypedFunc(final Expr fun, final Ann ann) {
     this.fun = fun;
     this.ann = ann;
   }
@@ -30,7 +30,7 @@ public final class TypedFunc {
    * @param cast cast expression
    * @return typed function
    */
-  public static TypedFunc constr(final Cast cast) {
+  static TypedFunc constr(final Cast cast) {
     return new TypedFunc(cast, new Ann());
   }
 
@@ -39,7 +39,7 @@ public final class TypedFunc {
    * @param f java function
    * @return typed function
    */
-  public static TypedFunc java(final JavaMapping f) {
+  static TypedFunc java(final JavaMapping f) {
     return new TypedFunc(f, new Ann());
   }
 }
