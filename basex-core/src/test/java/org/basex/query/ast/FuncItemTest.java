@@ -212,6 +212,20 @@ public final class FuncItemTest extends QueryPlanTest {
         "return $f(function() { 1, 2 })", INVTREAT_X_X_X);
   }
 
+  /** Checks if nested closures are inlined. */
+  @Test
+  public void nestedClosures() {
+    check("for $i in 1 to 3 "
+        + "let $f := function($x) { $i * $x },"
+        + "    $g := function($y) { 2 * $f($y) }"
+        + "return $g($g(42))",
+
+        "168 672 1512",
+
+        "count(//" + Util.className(Closure.class) + ") eq 1"
+    );
+  }
+
   /** Tests if all functions are compiled when reflection takes places. */
   @Test
   public void gh839() {

@@ -342,6 +342,10 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   @Override
   public void plan(final FElem plan) {
     final FElem el = planElem();
+    for(final Entry<Var, Expr> e : nonLocal.entrySet()) {
+      e.getKey().plan(el);
+      e.getValue().plan(el);
+    }
     addPlan(plan, el, expr);
     final int al = args.length;
     for(int a = 0; a < al; a++) el.add(planAttr(ARG + a, args[a].name.string()));
