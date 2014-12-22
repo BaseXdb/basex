@@ -6,6 +6,7 @@ import static org.basex.query.QueryText.*;
 import java.util.*;
 import java.util.Map.Entry;
 
+import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.gflwor.*;
@@ -123,27 +124,6 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     compile(qc, null);
   }
 
-  /**
-   * Removes and returns all static bindings from this function's closure.
-   * @return static variable bindings
-   */
-  private Collection<Entry<Var, Value>> staticBindings() {
-    Collection<Entry<Var, Value>> propagate = null;
-    final Iterator<Entry<Var, Expr>> cls = nonLocal.entrySet().iterator();
-    while(cls.hasNext()) {
-      final Entry<Var, Expr> e = cls.next();
-      final Expr c = e.getValue();
-      if(c instanceof Value) {
-        @SuppressWarnings({ "unchecked", "rawtypes"})
-        final Entry<Var, Value> e2 = (Entry) e;
-        if(propagate == null) propagate = new ArrayList<>();
-        propagate.add(e2);
-        cls.remove();
-      }
-    }
-    return propagate == null ? Collections.<Entry<Var, Value>>emptyList() : propagate;
-  }
-
   @Override
   public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
     if(compiled) return this;
@@ -179,11 +159,40 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
     try {
       // inline all values in the closure
-      for(final Entry<Var, Value> e : staticBindings()) {
+      final Iterator<Entry<Var, Expr>> cls = nonLocal.entrySet().iterator();
+      Map<Var, Expr> add = null;
+      while(cls.hasNext()) {
+        final Entry<Var, Expr> e = cls.next();
         final Var v = e.getKey();
-        final Expr inlined = expr.inline(qc, scope, v, v.checkType(e.getValue(), qc, info, true));
-        if (inlined != null) expr = inlined;
+        final Expr c = e.getValue();
+        if(c instanceof Value) {
+          // values are always inlined into the closure
+          final Expr inlined = expr.inline(qc, scope, v, v.checkType((Value) c, qc, info, true));
+          if (inlined != null) expr = inlined;
+          cls.remove();
+        } else if(c instanceof Closure) {
+          // nested closures are inlined if their size and number of closed-over variables is small
+          final Closure cl = (Closure) c;
+          if(!cl.has(Flag.NDT) && cl.nonLocal.size() < 5
+              && expr.count(v) != VarUsage.MORE_THAN_ONCE
+              && cl.exprSize() < qc.context.options.get(MainOptions.INLINELIMIT)) {
+            qc.compInfo(OPTINLINE, e);
+            for(final Entry<Var, Expr> e2 : cl.nonLocal.entrySet()) {
+              final Var v2 = e2.getKey(), v2c = scope.newCopyOf(qc, v2);
+              if(add == null) add = new HashMap<>();
+              add.put(v2c, e2.getValue());
+              e2.setValue(new VarRef(cl.info, v2c));
+            }
+
+            final Expr inlined = expr.inline(qc, scope, v, cl);
+            if(inlined != null) expr = inlined;
+            cls.remove();
+          }
+        }
       }
+
+      // add all newly added bindings
+      if(add != null) nonLocal.putAll(add);
     } catch(final QueryException qe) {
       expr = FnError.get(qe, ret != null ? ret : expr.seqType());
     } finally {
