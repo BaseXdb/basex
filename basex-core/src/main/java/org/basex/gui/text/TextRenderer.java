@@ -277,7 +277,7 @@ final class TextRenderer extends BaseXBack {
    */
   private TextIterator init(final Graphics g, final boolean start) {
     font = defaultFont;
-    syntax.init(getForeground());
+    syntax.init(GUIConstants.TEXT);
 
     final TextIterator iter = new TextIterator(text);
     link = false;

@@ -18,7 +18,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-14, BSD License
  * @author Jens Erat
  */
-public class CommandLockingTest extends SandboxTest {
+public final class CommandLockingTest extends SandboxTest {
   /** Static dummy context so we do not have to create a new one every time. */
   private static final Context DUMMY_CONTEXT = new Context();
   /** Test file name. */
@@ -58,7 +58,7 @@ public class CommandLockingTest extends SandboxTest {
    * Test commands affecting databases.
    */
   @Test
-  public final void databaseCommands() {
+  public void databaseCommands() {
     ckDBs(new Add(FILE, FILE), true, CTX_LIST);
     ckDBs(new AlterDB(NAME, NAME2), true, new StringList(NAME, NAME2));
     ckDBs(new AlterPassword(NAME, NAME), true, ADMIN_LIST);

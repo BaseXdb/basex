@@ -14,7 +14,7 @@ import org.xmldb.api.modules.*;
  * @author Christian Gruen
  */
 @SuppressWarnings("all")
-public class XPathQueryServiceTest extends XMLDBBaseTest {
+public final class XPathQueryServiceTest extends XMLDBBaseTest {
   /** Collection. */
   private Collection coll;
   /** Resource. */

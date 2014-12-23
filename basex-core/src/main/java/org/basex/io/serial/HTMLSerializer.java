@@ -15,7 +15,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public class HTMLSerializer extends OutputSerializer {
+final class HTMLSerializer extends OutputSerializer {
   /** (X)HTML: elements with an empty content model. */
   static final TokenList EMPTIES = new TokenList();
   /** HTML5: elements with an empty content model. */

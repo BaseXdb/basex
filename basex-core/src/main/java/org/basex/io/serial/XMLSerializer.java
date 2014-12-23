@@ -16,7 +16,7 @@ import org.basex.query.value.item.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public class XMLSerializer extends OutputSerializer {
+public final class XMLSerializer extends OutputSerializer {
   /** Root elements. */
   private boolean root;
   /** Wrapper flag. */

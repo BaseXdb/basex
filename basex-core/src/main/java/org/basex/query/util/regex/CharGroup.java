@@ -6,7 +6,7 @@ package org.basex.query.util.regex;
  * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
-public class CharGroup extends RegExp {
+public final class CharGroup extends RegExp {
   /** Negation flag, set after construction. */
   public boolean negative;
   /** Sub-ranges. */

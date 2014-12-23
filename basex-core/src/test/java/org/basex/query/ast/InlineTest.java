@@ -9,7 +9,7 @@ import org.junit.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
-public class InlineTest extends QueryPlanTest {
+public final class InlineTest extends QueryPlanTest {
   /** Tests if inlining works in {@link Arith} expressions. */
   @Test public void plusTest() {
     check("let $x := 21 return $x + 21", "42", "empty(//GFLWOR)");

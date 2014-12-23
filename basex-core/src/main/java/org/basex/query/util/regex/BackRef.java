@@ -6,7 +6,7 @@ package org.basex.query.util.regex;
  * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
-public class BackRef extends RegExp {
+public final class BackRef extends RegExp {
   /** Capture group number. */
   private final int num;
 

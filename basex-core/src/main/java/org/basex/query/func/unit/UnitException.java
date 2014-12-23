@@ -10,7 +10,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-class UnitException extends QueryException {
+final class UnitException extends QueryException {
   /** Expected item. */
   final Item expected;
   /** Returned item. */

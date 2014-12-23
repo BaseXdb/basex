@@ -18,7 +18,7 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public class ReplaceDoc extends NodeUpdate {
+public final class ReplaceDoc extends NodeUpdate {
   /** Container for new database documents. */
   private final DBNew replace;
   /** Database update options. */

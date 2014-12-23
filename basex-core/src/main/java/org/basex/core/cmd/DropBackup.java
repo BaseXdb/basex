@@ -15,7 +15,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public class DropBackup extends ABackup {
+public final class DropBackup extends ABackup {
   /**
    * Default constructor.
    * @param name name of database

@@ -9,7 +9,7 @@ import org.basex.query.iter.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public class FtExtract extends FtMark {
+public final class FtExtract extends FtMark {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     return mark(qc, true);

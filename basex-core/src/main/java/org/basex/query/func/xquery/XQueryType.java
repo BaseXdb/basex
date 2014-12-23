@@ -17,14 +17,14 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public class XQueryType extends StandardFunc {
+public final class XQueryType extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     return value(qc).iter();
   }
 
   @Override
-  public final Value value(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     return type(qc).value(qc);
   }
 

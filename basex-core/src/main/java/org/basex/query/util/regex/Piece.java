@@ -6,7 +6,7 @@ package org.basex.query.util.regex;
  * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
-public class Piece extends RegExp {
+public final class Piece extends RegExp {
   /** Wrapped atom. */
   private final RegExp atom;
   /** Quantifier. */

@@ -23,7 +23,7 @@ import org.junit.rules.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Lukas Kircher
  */
-public class NodeUpdateComparatorTest extends AdvancedQueryTest {
+public final class NodeUpdateComparatorTest extends AdvancedQueryTest {
   /** Expected exception. */
   @Rule
   public final ExpectedException thrown = ExpectedException.none();

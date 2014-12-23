@@ -14,7 +14,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Lukas Kircher
  */
-public class InsertIntoAsLast extends NodeCopy {
+public final class InsertIntoAsLast extends NodeCopy {
   /**
    * Constructor for an insertInto which is part of a replaceElementContent substitution.
    * @param pre target pre value

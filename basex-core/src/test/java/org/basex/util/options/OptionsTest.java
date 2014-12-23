@@ -3,10 +3,17 @@ package org.basex.util.options;
 import static org.junit.Assert.*;
 
 import org.basex.*;
+import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
+import org.basex.query.func.archive.*;
+import org.basex.query.func.ft.*;
+import org.basex.query.func.xquery.XQueryEval.XQueryOptions;
+import org.basex.query.util.collation.*;
 import org.basex.util.*;
+import org.basex.util.ft.*;
+import org.junit.*;
 import org.junit.Test;
 
 /**
@@ -15,7 +22,29 @@ import org.junit.Test;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public class OptionsTest extends SandboxTest {
+public final class OptionsTest extends SandboxTest {
+  /** Initializes various options. */
+  @AfterClass
+  public static void init() {
+    // instantiate options at least once
+    new UCAOptions();
+    new CsvOptions();
+    new CsvParserOptions();
+    new HtmlOptions();
+    new JsonOptions();
+    new JsonParserOptions();
+    new JsonSerialOptions();
+    new TextOptions();
+    new ArchOptions();
+    new FtIndexOptions();
+    new FtOptions();
+    new XQueryOptions();
+    new BaseXCollationOptions();
+    new FTDistanceOptions();
+    new FTScopeOptions();
+    new FTWindowOptions();
+  }
+
   /** Tests the effect of setting system properties. */
   @Test
   public void systemProperty() {
@@ -55,4 +84,5 @@ public class OptionsTest extends SandboxTest {
     new XQuery("delete node doc('" + file + "')/a").execute(context);
     assertEquals(input, Token.string(file.read()));
   }
+
 }

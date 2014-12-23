@@ -15,7 +15,7 @@ import org.junit.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public class SessionTest extends HTTPTest {
+public final class SessionTest extends HTTPTest {
   /** Root path. */
   private static final String ROOT = "http://" + Text.S_LOCALHOST + ":9998/rest/";
 

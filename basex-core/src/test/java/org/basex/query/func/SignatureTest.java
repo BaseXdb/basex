@@ -17,7 +17,7 @@ import org.junit.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public class SignatureTest extends AdvancedQueryTest {
+public final class SignatureTest extends AdvancedQueryTest {
   /**
    * Tests the validity of all function signatures.
    * @throws Exception exception

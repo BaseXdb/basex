@@ -6,7 +6,7 @@ package org.basex.query.util.regex;
  * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
-public class CharRange extends RegExp {
+public final class CharRange extends RegExp {
   /** Left character. */
   private final int left;
   /** Right character. */

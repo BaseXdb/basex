@@ -12,7 +12,7 @@ import org.basex.query.value.item.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public class FileDelete extends FileFn {
+public final class FileDelete extends FileFn {
   @Override
   public Item item(final QueryContext qc) throws QueryException, IOException {
     final Path path = toPath(0, qc);

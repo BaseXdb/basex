@@ -13,7 +13,7 @@ import org.xmldb.api.modules.*;
  * @author Christian Gruen
  */
 @SuppressWarnings("all")
-public class CollectionManagementServiceTest extends XMLDBBaseTest {
+public final class CollectionManagementServiceTest extends XMLDBBaseTest {
   /** CollectionManagementService string. */
   private static final String CMS = "CollectionManagementService";
   /** Temporary collection. */

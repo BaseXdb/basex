@@ -13,9 +13,9 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
-public class MapMerge extends StandardFunc {
+public final class MapMerge extends StandardFunc {
   @Override
-  public final Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // legacy code (obsolete, as only required by map:new)...
     if(exprs.length == 0) return Map.EMPTY;
 

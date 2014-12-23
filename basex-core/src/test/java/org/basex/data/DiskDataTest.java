@@ -11,7 +11,7 @@ import org.junit.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Dimitar Popov
  */
-public class DiskDataTest extends MemDataTest {
+public final class DiskDataTest extends MemDataTest {
   /** Test database name. */
   private final String dbname = Util.className(DiskDataTest.class);
 

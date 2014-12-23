@@ -6,7 +6,7 @@ package org.basex.query.util.regex;
  * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
-public class Branch extends RegExp {
+public final class Branch extends RegExp {
   /** Pieces of the regex. */
   private final RegExp[] pieces;
 

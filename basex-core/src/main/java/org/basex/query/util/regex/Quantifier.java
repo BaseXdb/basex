@@ -6,7 +6,7 @@ package org.basex.query.util.regex;
  * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
-public class Quantifier extends RegExp {
+public final class Quantifier extends RegExp {
   /** Minimum occurrence. */
   private final int min;
   /** Maximum occurrence, {@code -1} for infinity. */

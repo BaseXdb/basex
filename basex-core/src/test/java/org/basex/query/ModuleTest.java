@@ -14,7 +14,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
-public class ModuleTest extends SandboxTest {
+public final class ModuleTest extends SandboxTest {
   /**
    * Tests the {@link QueryContext#parseLibrary(String, String, StaticContext)}
    * method.

@@ -11,7 +11,7 @@ import java.io.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-class XHTMLSerializer extends OutputSerializer {
+public final class XHTMLSerializer extends OutputSerializer {
   /**
    * Constructor, specifying serialization options.
    * @param os output stream reference

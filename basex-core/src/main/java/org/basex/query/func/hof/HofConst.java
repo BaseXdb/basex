@@ -6,5 +6,5 @@ package org.basex.query.func.hof;
  * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
-public class HofConst extends HofId {
+public final class HofConst extends HofId {
 }

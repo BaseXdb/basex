@@ -6,7 +6,7 @@ package org.basex.query.util.regex;
  * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
-public class Literal extends RegExp {
+public final class Literal extends RegExp {
   /** Code point. */
   private final int codepoint;
 

@@ -15,7 +15,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public class CsvSerialize extends CsvFn {
+public final class CsvSerialize extends CsvFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter iter = qc.iter(exprs[0]);

@@ -36,14 +36,14 @@ public class JsonOptions extends Options {
   /**
    * Default constructor.
    */
-  JsonOptions() {
+  public JsonOptions() {
   }
 
   /**
    * Constructor with options to be copied.
    * @param opts options
    */
-  JsonOptions(final JsonOptions opts) {
+  public JsonOptions(final JsonOptions opts) {
     super(opts);
   }
 }

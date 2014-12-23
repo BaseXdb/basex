@@ -17,7 +17,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public class DBCopy extends NameUpdate {
+public final class DBCopy extends NameUpdate {
   /** Name of the new database. */
   private final String newName;
 

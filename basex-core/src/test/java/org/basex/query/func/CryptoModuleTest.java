@@ -11,7 +11,7 @@ import org.junit.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Lukas Kircher
  */
-public class CryptoModuleTest extends AdvancedQueryTest {
+public final class CryptoModuleTest extends AdvancedQueryTest {
   /** Set higher log level to avoid INFO output. */
   public CryptoModuleTest() {
     Logger.getLogger("com.sun.org.apache.xml.internal").setLevel(Level.WARNING);

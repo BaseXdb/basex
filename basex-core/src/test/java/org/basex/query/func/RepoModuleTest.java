@@ -14,7 +14,7 @@ import org.junit.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Rositsa Shadura
  */
-public class RepoModuleTest extends AdvancedQueryTest {
+public final class RepoModuleTest extends AdvancedQueryTest {
   /** Test repository. */
   private static final String REPO = "src/test/resources/repo/";
   /** Pkg3 name. */

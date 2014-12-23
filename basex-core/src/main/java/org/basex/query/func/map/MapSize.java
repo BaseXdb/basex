@@ -11,9 +11,9 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
-public class MapSize extends StandardFunc {
+public final class MapSize extends StandardFunc {
   @Override
-  public final Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     return Int.get(toMap(exprs[0], qc).mapSize());
   }
 }

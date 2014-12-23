@@ -16,7 +16,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public class Restore extends ABackup {
+public final class Restore extends ABackup {
   /** States if current database was closed. */
   private boolean closed;
 

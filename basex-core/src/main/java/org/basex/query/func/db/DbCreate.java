@@ -23,7 +23,7 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public class DbCreate extends DbNew {
+public final class DbCreate extends DbNew {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final String name = string(toToken(exprs[0], qc));

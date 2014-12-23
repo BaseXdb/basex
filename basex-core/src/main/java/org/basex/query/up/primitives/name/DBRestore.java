@@ -16,7 +16,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Lukas Kircher
  */
-public class DBRestore extends NameUpdate {
+public final class DBRestore extends NameUpdate {
   /** Backup to restore. */
   private final String backup;
 

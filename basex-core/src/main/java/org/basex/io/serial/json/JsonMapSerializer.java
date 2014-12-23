@@ -12,7 +12,7 @@ import org.basex.io.serial.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public class JsonMapSerializer extends JsonSerializer {
+public final class JsonMapSerializer extends JsonSerializer {
   /**
    * Constructor.
    * @param os output stream reference

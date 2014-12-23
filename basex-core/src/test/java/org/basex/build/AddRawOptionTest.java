@@ -20,7 +20,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-14, BSD License
  * @author Dimitar Popov
  */
-public class AddRawOptionTest extends SandboxTest {
+public final class AddRawOptionTest extends SandboxTest {
   /** Test directory. */
   private static final String DIR = "src/test/resources/dir";
   /** Test files from {@link AddRawOptionTest#DIR}}. */

@@ -17,7 +17,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public class DialogMem extends BaseXDialog {
+public final class DialogMem extends BaseXDialog {
   /** Info text. */
   private final TextPanel text;
 

@@ -22,7 +22,7 @@ import org.xmldb.api.modules.*;
  * @author Christian Gruen
  */
 @SuppressWarnings("all")
-public class XMLResourceTest extends XMLDBBaseTest {
+public final class XMLResourceTest extends XMLDBBaseTest {
   /** Collection. */
   private Collection coll;
   /** Resource. */

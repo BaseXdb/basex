@@ -13,7 +13,7 @@ import org.junit.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
-public class FnHofTest extends QueryPlanTest {
+public final class FnHofTest extends QueryPlanTest {
   /** Tests if {@code fn:fold-left} is unrolled if the sequence has less than 10 items. */
   @Test
   public void unrollFoldLeft() {

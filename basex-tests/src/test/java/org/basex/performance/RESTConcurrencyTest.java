@@ -24,7 +24,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-14, BSD License
  * @author Dimitar Popov
  */
-public class RESTConcurrencyTest extends SandboxTest {
+public final class RESTConcurrencyTest extends SandboxTest {
   /** Time-out in (ms): increase if running on a slower system. */
   private static final long TIMEOUT = 600;
   /** Socket time-out in (ms). */

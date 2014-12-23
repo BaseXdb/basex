@@ -16,7 +16,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Lukas Kircher
  */
-public class BackupCreate extends NameUpdate {
+public final class BackupCreate extends NameUpdate {
   /**
    * Constructor.
    * @param name name of database to be backed up

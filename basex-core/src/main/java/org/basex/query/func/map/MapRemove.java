@@ -11,9 +11,9 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
-public class MapRemove extends StandardFunc {
+public final class MapRemove extends StandardFunc {
   @Override
-  public final Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     return toMap(exprs[0], qc).delete(toAtomItem(exprs[1], qc), ii);
   }
 }

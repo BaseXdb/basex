@@ -16,7 +16,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Lukas Kircher
  */
-class DialogAdd extends BaseXBack {
+final class DialogAdd extends BaseXBack {
   /** Dialog reference. */
   private final DialogProps dialog;
   /** Target path. */

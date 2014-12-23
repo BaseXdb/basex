@@ -11,7 +11,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public class NodeTest extends Test {
+public final class NodeTest extends Test {
   /** Extended type. */
   private final Type ext;
   /** Strip flag (only relevant if specified type is {@code xs:untyped}). */

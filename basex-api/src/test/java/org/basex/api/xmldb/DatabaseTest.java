@@ -13,7 +13,7 @@ import org.xmldb.api.base.*;
  * @author Christian Gruen
  */
 @SuppressWarnings("all")
-public class DatabaseTest extends XMLDBBaseTest {
+public final class DatabaseTest extends XMLDBBaseTest {
   /** Database. */
   private Database database;
 

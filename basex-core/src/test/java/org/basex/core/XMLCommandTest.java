@@ -14,10 +14,10 @@ import org.junit.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public class XMLCommandTest extends SandboxTest {
+public final class XMLCommandTest extends SandboxTest {
   /** Check syntax of all commands. */
   @Test
-  public final void commands() {
+  public void commands() {
     // surrounded by <commands/> element (required to process more than one command)
     ok("<commands><add>x</add></commands>");
 
@@ -142,7 +142,7 @@ public class XMLCommandTest extends SandboxTest {
 
   /** Evaluates some commands with invalid syntax. */
   @Test
-  public final void failing() {
+  public void failing() {
     no("<add/>");
     no("<add x='X'>X</add>");
     no("<add path='X' x='X'>X</add>");

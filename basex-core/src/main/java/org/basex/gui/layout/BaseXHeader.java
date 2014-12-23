@@ -10,7 +10,7 @@ import javax.swing.border.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public class BaseXHeader extends BaseXLabel {
+public final class BaseXHeader extends BaseXLabel {
   /**
    * Constructor.
    * @param string string

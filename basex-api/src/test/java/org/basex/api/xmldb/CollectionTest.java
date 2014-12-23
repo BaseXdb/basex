@@ -20,7 +20,7 @@ import org.xmldb.api.modules.*;
  * @author Christian Gruen
  */
 @SuppressWarnings("all")
-public class CollectionTest extends XMLDBBaseTest {
+public final class CollectionTest extends XMLDBBaseTest {
   /** Collection. */
   Collection coll;
 

@@ -12,9 +12,9 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
-public class MapEntry extends StandardFunc {
+public final class MapEntry extends StandardFunc {
   @Override
-  public final Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     return Map.EMPTY.put(toAtomItem(exprs[0], qc), qc.value(exprs[1]), ii);
   }
 }

@@ -17,7 +17,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public class CsvParse extends CsvFn {
+public final class CsvParse extends CsvFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] input = toToken(exprs[0], qc);

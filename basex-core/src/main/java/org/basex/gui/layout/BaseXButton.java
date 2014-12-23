@@ -16,7 +16,7 @@ import org.basex.gui.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public class BaseXButton extends JButton {
+public final class BaseXButton extends JButton {
   /** Button template. */
   private static final AbstractButton TEMPLATE = style(new JToggleButton());
 

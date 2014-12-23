@@ -20,7 +20,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public class CsvMapSerializer extends CsvSerializer {
+public final class CsvMapSerializer extends CsvSerializer {
   /**
    * Constructor.
    * @param os output stream reference

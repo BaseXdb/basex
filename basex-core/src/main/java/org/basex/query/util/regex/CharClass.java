@@ -6,7 +6,7 @@ package org.basex.query.util.regex;
  * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
-public class CharClass extends RegExp {
+public final class CharClass extends RegExp {
   /** Char group of this class. */
   private final CharGroup group;
   /** Excluded char class, possibly {@code null}. */

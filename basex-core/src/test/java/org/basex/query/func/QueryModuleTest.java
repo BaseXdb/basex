@@ -10,7 +10,7 @@ import org.basex.query.value.item.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public class QueryModuleTest extends QueryModule {
+public final class QueryModuleTest extends QueryModule {
   /** Fruits array. */
   private static final String[] FRUITS = { "Apple", "Banana", "Cherry" };
   /** Lock string. */

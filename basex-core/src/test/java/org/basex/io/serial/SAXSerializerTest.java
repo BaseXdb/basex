@@ -20,7 +20,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-14, BSD License
  * @author Michael Hedenus
  */
-public class SAXSerializerTest extends SandboxTest {
+public final class SAXSerializerTest extends SandboxTest {
   /**
    * Tests the (un)marshalling of objects.
    * @throws Exception exception

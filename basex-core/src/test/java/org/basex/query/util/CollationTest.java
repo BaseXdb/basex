@@ -12,7 +12,7 @@ import org.junit.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public class CollationTest extends AdvancedQueryTest {
+public final class CollationTest extends AdvancedQueryTest {
   /** Collation arguments used in the tests. */
   private static final String ARGS = "lang=de;strength=primary";
   /** Collation used in the tests. */

@@ -6,7 +6,7 @@ package org.basex.query.util.regex;
  * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
-public class Group extends RegExp {
+public final class Group extends RegExp {
   /** Enclosed expression. */
   private final RegExp encl;
   /** Capture flag. */

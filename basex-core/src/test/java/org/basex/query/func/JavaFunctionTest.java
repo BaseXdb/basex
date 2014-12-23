@@ -11,7 +11,7 @@ import org.junit.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
-public class JavaFunctionTest extends AdvancedQueryTest {
+public final class JavaFunctionTest extends AdvancedQueryTest {
   /** Tests calling some Java constructors from XQuery. */
   @Test
   public void constr() {

@@ -8,7 +8,7 @@ import org.junit.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public class ServerRESTTest extends RESTTest {
+public final class ServerRESTTest extends RESTTest {
   /**
    * Start server.
    * @throws Exception exception

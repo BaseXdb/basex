@@ -12,7 +12,7 @@ import org.junit.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Leo Woerteler
  */
-public class TCOTest extends QueryPlanTest {
+public final class TCOTest extends QueryPlanTest {
   /** Checks if tail-call optimization was applied. */
   @Test
   public void facTest() {

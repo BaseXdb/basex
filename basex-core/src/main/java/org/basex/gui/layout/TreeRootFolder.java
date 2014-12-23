@@ -10,7 +10,7 @@ import org.basex.data.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Lukas Kircher
  */
-public class TreeRootFolder extends TreeFolder {
+public final class TreeRootFolder extends TreeFolder {
   /**
    * Constructor.
    * @param nm name
