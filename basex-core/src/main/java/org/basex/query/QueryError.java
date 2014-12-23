@@ -220,8 +220,10 @@ public enum QueryError {
   BXXQ_UPDATING(BXXQ, 1, "No updating expression allowed."),
   /** BXXQ0002. */
   BXXQ_NOUPDATE(BXXQ, 2, "Updating expression expected."),
-  /** BXXQ0002. */
+  /** BXXQ0003. */
   BXXQ_PERM_X(BXXQ, 3, "%"),
+  /** BXXQ0003. */
+  BXXQ_PERM2_X(BASX, 3, "% permission required."),
   /** BXXQ0004. */
   BXXQ_STOPPED(BXXQ, 4, "Timeout or assigned memory was exceeded."),
 
