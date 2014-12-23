@@ -52,7 +52,7 @@ public class TextPanel extends BaseXPanel {
   }
 
   /** Text editor. */
-  protected final TextEditor editor;
+  public final TextEditor editor;
   /** Undo history. */
   public final History hist;
   /** Search bar. */
@@ -707,6 +707,17 @@ public class TextPanel extends BaseXPanel {
   // EDITOR COMMANDS ==========================================================
 
   /**
+   * Pastes a string.
+   * @param string string to be pasted
+   */
+  public void paste(final String string) {
+    final int pos = editor.pos();
+    if(editor.selected()) editor.delete();
+    editor.add(string);
+    finish(pos);
+  }
+
+  /**
    * Copies the selected text to the clipboard.
    * @return true if text was copied
    */
@@ -851,12 +862,8 @@ public class TextPanel extends BaseXPanel {
 
     @Override
     public void execute() {
-      final int pos = editor.pos();
       final String clip = clip();
-      if(clip == null) return;
-      if(editor.selected()) editor.delete();
-      editor.add(clip);
-      finish(pos);
+      if(clip != null) paste(clip);
     }
     @Override
     public boolean enabled(final GUI main) { return hist.active() && clip() != null; }

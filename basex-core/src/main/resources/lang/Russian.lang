@@ -4,6 +4,7 @@
 about_%              = О %
 access_denied        = Доступ запрещен
 add                  = Добавить
+add_as_import        = Add as import
 add_raw_files        = Добавить другие файлы в исходном виде
 add_resources        = Добавить ресурсы
 adjust_nodes         = Подгонять размер узла к ширине текста

@@ -4,6 +4,7 @@
 about_%              = % névjegye
 access_denied        = Hozzáférés megtagadva.
 add                  = Hozzáadás
+add_as_import        = Add as import
 add_raw_files        = A többi fájl raw fájlként történő hozzáadása
 add_resources        = Erőforrások hozzáadása
 adjust_nodes         = Csomópontok szöveggé alakítása

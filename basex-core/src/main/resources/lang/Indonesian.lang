@@ -4,6 +4,7 @@
 about_%              = Perihal %
 access_denied        = Akses ditolak.
 add                  = Tambah
+add_as_import        = Add as import
 add_raw_files        = Tambah berkas lainnya sebagai berkas mentah
 add_resources        = Tambah sumber daya
 adjust_nodes         = Sesuaikan simpul menjadi teks

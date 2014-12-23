@@ -888,6 +888,8 @@ public interface Text {
   /** Command info. */
   String COPY_PATH = lang("copy_path");
   /** Command info. */
+  String ADD_AS_IMPORT = lang("add_as_import");
+  /** Command info. */
   String NEW = lang("new");
   /** Command info. */
   String DELETE = lang("delete");

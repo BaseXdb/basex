@@ -4,6 +4,7 @@
 about_%              = Despre %
 access_denied        = Acces refuzat.
 add                  = Adăugare
+add_as_import        = Add as import
 add_raw_files        = Adăugaţi fişiere rămase ca fişiere RAW
 add_resources        = Adăugaţi resurse
 adjust_nodes         = Reglaţi noduri la text

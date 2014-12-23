@@ -336,6 +336,19 @@ public final class IOFile extends IO {
     }
   }
 
+  /**
+   * Returns a path to the specified path. If rewriting fails, the absolute path is returned.
+   * @param path relative path
+   * @return path
+   */
+  public String relative(final IOFile path) {
+    try {
+      return toPath().relativize(path.toPath()).toString();
+    } catch(final Exception ex) {
+      return path.path();
+    }
+  }
+
   // STATIC METHODS ===============================================================================
 
   /**

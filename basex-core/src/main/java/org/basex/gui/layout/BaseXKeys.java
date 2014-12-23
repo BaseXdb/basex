@@ -104,6 +104,7 @@ public enum BaseXKeys {
   /** Escape.                */ ESCAPE(NO_MOD, VK_ESCAPE),
   /** Context menu.          */ CONTEXT(NO_MOD, VK_CONTEXT_MENU),
   /** Copy path.             */ COPYPATH(META | SHIFT, VK_C),
+  /** Add as import.         */ ADDIMPORT(META | SHIFT, VK_I),
 
   /** Refresh.               */ REFRESH(NO_MOD, VK_F5),
   /** Rename.                */ RENAME(NO_MOD, VK_F2),

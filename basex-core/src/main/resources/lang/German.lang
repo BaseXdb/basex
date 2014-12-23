@@ -4,6 +4,7 @@
 about_%              = Über %
 access_denied        = Der Zugriff wurde verweigert.
 add                  = Hinzufügen
+add_as_import        = Als Import hinzufügen
 add_raw_files        = Speichere andere Dateien im Binärformat
 add_resources        = Neue Ressourcen
 adjust_nodes         = Knoten an Text anpassen

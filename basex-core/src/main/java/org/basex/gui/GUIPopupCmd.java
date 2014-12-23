@@ -16,12 +16,12 @@ public abstract class GUIPopupCmd implements GUICommand {
 
   /**
    * Constructor.
-   * @param lbl label
-   * @param sc shortcut
+   * @param label label
+   * @param shortcut shortcut
    */
-  protected GUIPopupCmd(final String lbl, final BaseXKeys... sc) {
-    label = lbl;
-    shortcut = sc;
+  protected GUIPopupCmd(final String label, final BaseXKeys... shortcut) {
+    this.label = label;
+    this.shortcut = shortcut;
   }
 
   /**

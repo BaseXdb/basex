@@ -4,6 +4,7 @@
 about_%              = Over %
 access_denied        = Toegang geweigerd.
 add                  = Toevoegen
+add_as_import        = Add as import
 add_raw_files        = Voeg overige bestanden onbewerkt toe
 add_resources        = Voeg Resources toe
 adjust_nodes         = Pas nodes aan tekst aan

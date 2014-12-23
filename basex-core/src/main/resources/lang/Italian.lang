@@ -4,6 +4,7 @@
 about_%              = Su %
 access_denied        = Accesso negato.
 add                  = Aggiungi
+add_as_import        = Add as import
 add_raw_files        = Aggiungi i risorse rimanenti come 'binaries'
 add_resources        = Aggiungi risorse
 adjust_nodes         = Adegua i nodi al testo

@@ -56,7 +56,7 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
     new BaseXPopup(this, pv.gui,
       new OpenCmd(), new OpenExternalCmd(), new TestCmd(), null,
       new DeleteCmd(), new RenameCmd(), new NewDirCmd(), null,
-      new RefreshCmd(), new CopyPathCmd()
+      new RefreshCmd(), null, new AddImportCmd(), new CopyPathCmd()
     );
   }
 
@@ -310,6 +310,21 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
 
     @Override public boolean enabled(final GUI main) {
       return selectedNode() != null;
+    }
+  }
+
+  /** Add as import command. */
+  private final class AddImportCmd extends GUIPopupCmd {
+    /** Constructor. */
+    AddImportCmd() { super(ADD_AS_IMPORT, BaseXKeys.ADDIMPORT); }
+
+    @Override public void execute() {
+      view.addImport(selectedNode().file);
+    }
+
+    @Override public boolean enabled(final GUI main) {
+      final ProjectNode node = selectedNode();
+      return node != null && node.file.hasSuffix(IO.XQSUFFIXES);
     }
   }
 }

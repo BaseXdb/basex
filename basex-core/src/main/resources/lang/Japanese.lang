@@ -4,6 +4,7 @@
 about_%              = %について
 access_denied        = アクセスが拒否されました。
 add                  = 追加
+add_as_import        = Add as import
 add_raw_files        = 残りのファイルをRAWファイルとして追加します
 add_resources        = リソースの追加
 adjust_nodes         = ノードをテキストに調整

@@ -4,6 +4,7 @@
 about_%              = % тухай
 access_denied        = Хандалт амжилтгүй.
 add                  = Нэмэх
+add_as_import        = Add as import
 add_raw_files        = Үлдсэн боловсруулагдаагүй файлуудыг нэмэх
 add_resources        = Add Resources
 adjust_nodes         = Зангилаанаас текстрүү өөрчлөх

@@ -9,11 +9,13 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
+import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXFileChooser.Mode;
 import org.basex.gui.view.editor.*;
 import org.basex.io.*;
+import org.basex.query.*;
 import org.basex.util.*;
 
 /**
@@ -249,6 +251,27 @@ public final class ProjectView extends BaseXPanel {
         ea.jump(search);
       }
     });
+  }
+
+  /**
+   * Adds an import statement to the currently edited file.
+   * @param file file to be opened
+   */
+  void addImport(final IOFile file) {
+    final EditorArea edit = editor.getEditor();
+    final Context ctx = gui.context;
+    final String relative = edit.file().parent().relative(file).replace('\\', '/');
+
+    try(final QueryContext qc = new QueryContext(ctx)) {
+      final LibraryModule lm = qc.parseLibrary(file.string(), file.path(), null);
+      final TokenBuilder tmp = new TokenBuilder("import module namespace ");
+      tmp.add(lm.name.string()).add(" = \"").add(lm.name.uri());
+      tmp.add("\" at \"").add(relative).add("\";\n");
+      edit.paste(tmp.toString());
+
+    } catch(final Exception ex) {
+      BaseXDialog.error(gui, Util.message(ex));
+    }
   }
 
   /**
