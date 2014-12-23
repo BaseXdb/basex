@@ -47,8 +47,7 @@ final class RestXqResponse {
     String redirect = null, forward = null;
     RestXqRespBuilder resp = null;
     try {
-      // compile and evaluate query
-      query.compile();
+      // evaluate query
       final Iter iter = query.iter();
       Item item = iter.next();
 

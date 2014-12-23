@@ -23,7 +23,7 @@ public abstract class QueryPlanTest extends AdvancedQueryTest {
    */
   protected static void check(final String qu, final String res, final String... pr) {
     try(final QueryProcessor qp = new QueryProcessor(qu, context)) {
-      // parse and compile query plan
+      // compile query
       qp.compile();
       // retrieve compiled query plan
       final FDoc plan = qp.plan();

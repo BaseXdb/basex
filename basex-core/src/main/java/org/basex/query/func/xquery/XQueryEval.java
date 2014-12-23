@@ -114,7 +114,6 @@ public class XQueryEval extends StandardFunc {
         } else {
           if(qctx.updating) throw BXXQ_UPDATING.get(info);
         }
-        qctx.compile();
 
         final ValueBuilder vb = new ValueBuilder();
         cache(qctx.iter(), vb, qctx);

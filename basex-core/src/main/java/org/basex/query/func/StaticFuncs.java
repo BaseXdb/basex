@@ -227,8 +227,9 @@ public final class StaticFuncs extends ExprInfo {
     if(!funcs.isEmpty()) {
       final FElem el = planElem();
       plan.add(el);
-      for(final StaticFunc f : funcs())
-        if(f != null && f.compiled()) f.plan(el);
+      for(final StaticFunc f : funcs()) {
+        if(f != null) f.plan(el);
+      }
     }
   }
 

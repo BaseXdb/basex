@@ -258,16 +258,24 @@ public final class QNm extends Item {
 
   /**
    * Returns a unique representation of the QName.
+   * @return unique representation
+   */
+  public byte[] prefixId() {
+    return prefixId(null);
+  }
+
+  /**
+   * Returns a unique representation of the QName.
    * <ul>
    *   <li> Skips the prefix if the namespace of the QName equals the specified one.</li>
    *   <li> Uses a prefix if its namespace URI is statically known.</li>
    *   <li> Otherwise, {@link #id()} is called.</li>
    * </ul>
-   * @param ns default uri (optional)
+   * @param ns default uri (can be {@code null})
    * @return unique representation
    */
   public byte[] prefixId(final byte[] ns) {
-    if(Token.eq(uri(), ns)) return local();
+    if(ns != null && Token.eq(uri(), ns)) return local();
     final byte[] p = NSGlobal.prefix(uri());
     return p.length == 0 ? id() : concat(p, token(":"), local());
   }

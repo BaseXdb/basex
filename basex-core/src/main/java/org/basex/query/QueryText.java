@@ -704,6 +704,8 @@ public interface QueryText {
 
   /** Query Info: Plan. */
   byte[] PLAN = token("QueryPlan");
+  /** Query Info: compiled. */
+  byte[] COMPILED = token("compiled");
   /** Query Plan. */
   byte[] OP = token("op");
   /** Query Plan. */

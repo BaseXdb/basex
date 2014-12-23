@@ -17,7 +17,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 
 /**
- * This class is an entry point for evaluating XQuery implementations.
+ * This class is an entry point for evaluating XQuery strings.
  *
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
@@ -35,8 +35,6 @@ public final class QueryProcessor extends Proc implements AutoCloseable {
   private final String query;
   /** Parsed flag. */
   private boolean parsed;
-  /** Compilation flag. */
-  private boolean compiled;
 
   /**
    * Default constructor.
@@ -65,8 +63,6 @@ public final class QueryProcessor extends Proc implements AutoCloseable {
    * @throws QueryException query exception
    */
   public void compile() throws QueryException {
-    if(compiled) return;
-    compiled = true;
     parse();
     qc.compile();
   }
@@ -77,7 +73,7 @@ public final class QueryProcessor extends Proc implements AutoCloseable {
    * @throws QueryException query exception
    */
   public Iter iter() throws QueryException {
-    compile();
+    parse();
     return qc.iter();
   }
 
@@ -87,7 +83,7 @@ public final class QueryProcessor extends Proc implements AutoCloseable {
    * @throws QueryException query exception
    */
   public Value value() throws QueryException {
-    compile();
+    parse();
     return qc.iter().value();
   }
 
@@ -97,7 +93,7 @@ public final class QueryProcessor extends Proc implements AutoCloseable {
    * @throws QueryException query exception
    */
   public Result execute() throws QueryException {
-    compile();
+    parse();
     return qc.execute();
   }
 
@@ -309,9 +305,7 @@ public final class QueryProcessor extends Proc implements AutoCloseable {
    * @return root node
    */
   public FDoc plan() {
-    final FDoc doc = new FDoc();
-    qc.plan(doc);
-    return doc;
+    return new FDoc().add(qc.plan());
   }
 
   @Override
