@@ -6,7 +6,6 @@ import java.awt.*;
 import java.util.*;
 
 import javax.swing.*;
-import javax.swing.UIManager.LookAndFeelInfo;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
@@ -117,19 +116,9 @@ public final class BaseXGUI extends Main {
     try {
       // refresh views when windows are resized
       Toolkit.getDefaultToolkit().setDynamicLayout(true);
-
       // set look and feel
       final String laf = opts.get(GUIOptions.LOOKANDFEEL);
-      if(laf.isEmpty()) {
-        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-      } else {
-        for(final LookAndFeelInfo lafi : UIManager.getInstalledLookAndFeels()) {
-          if(lafi.getName().equals(laf)) {
-            UIManager.setLookAndFeel(lafi.getClassName());
-            break;
-          }
-        }
-      }
+      UIManager.setLookAndFeel(laf.isEmpty() ? UIManager.getSystemLookAndFeelClassName() : laf);
     } catch(final Exception ex) {
       Util.stack(ex);
     }
