@@ -168,6 +168,7 @@ gui_interactions     = Графический интерфейс и интера
 help                 = Помощь
 help1_use_catalog    = Перед включением механизма поиска по каталогу убедитесь, что
 help2_use_catalog    = Apache XML Commons Resolver доступен в путях к классам
+hidden_files         = Show hidden files
 hit_s                = Попаданий
 include_strings      = Добавлять строковый тип
 indentation_size     = Отступ

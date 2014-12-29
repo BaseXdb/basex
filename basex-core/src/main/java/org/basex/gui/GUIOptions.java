@@ -218,6 +218,9 @@ public final class GUIOptions extends Options {
   /** Last XQuery inputs. */
   public static final StringsOption XQUERY = new StringsOption("XQUERY");
 
+  /** Flag for activated project structure. */
+  public static final BooleanOption HIDDENFILES = new BooleanOption("HIDDENFILES", true);
+
   /**
    * Constructor.
    */

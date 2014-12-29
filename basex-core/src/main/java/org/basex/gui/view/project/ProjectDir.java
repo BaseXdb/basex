@@ -35,7 +35,10 @@ final class ProjectDir extends ProjectNode {
     // cache and sort directories and files
     final ArrayList<IOFile> dirs = new ArrayList<>();
     final ArrayList<IOFile> files = new ArrayList<>();
-    for(final IOFile f : file.children()) (f.isDir() ? dirs : files).add(f);
+    for(final IOFile f : file.children()) {
+      if (project.isHiddenFiles() || !f.file().isHidden())
+        (f.isDir() ? dirs : files).add(f);
+    }
     Collections.sort(dirs, COMP);
     Collections.sort(files, COMP);
     // create child nodes

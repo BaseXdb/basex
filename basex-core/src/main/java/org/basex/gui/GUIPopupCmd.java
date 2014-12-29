@@ -35,7 +35,7 @@ public abstract class GUIPopupCmd implements GUICommand {
   }
 
   @Override
-  public final boolean toggle() {
+  public boolean toggle() {
     return false;
   }
 

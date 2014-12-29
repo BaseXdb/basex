@@ -168,6 +168,7 @@ gui_interactions     = GUI & interakciók
 help                 = Súgó
 help1_use_catalog    = A katalógusmegoldások bekapcsolásához ellenőrizze, hogy 
 help2_use_catalog    = osztályútvonala tartalmazza az Apache XML Commons Resolver-t.
+hidden_files         = Show hidden files
 hit_s                = Találat(ok)
 include_strings      = Karakterlánc típust is tartalmazza
 indentation_size     = Behúzás mértéke

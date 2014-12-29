@@ -168,6 +168,7 @@ gui_interactions     = Interacţiuni GUI
 help                 = Ajutor
 help1_use_catalog    = Pentru a permite rezolvarea catalogului asiguraţi-vă că
 help2_use_catalog    = Apache XML Commons Resolver este in classpathul dumneavoastră.
+hidden_files         = Show hidden files
 hit_s                = Afisari
 include_strings      = Include string type
 indentation_size     = Indentation size

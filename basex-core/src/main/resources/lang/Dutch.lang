@@ -168,6 +168,7 @@ gui_interactions     = GUI & interacties
 help                 = Help
 help1_use_catalog    = Om 'catalog resolving' te kunnen gebruiken moet de
 help2_use_catalog    = Apache XML Commons Resolver in je classpath staan.
+hidden_files         = Show hidden files
 hit_s                = Hit(s)
 include_strings      = Include string type
 indentation_size     = Inspringgrootte
