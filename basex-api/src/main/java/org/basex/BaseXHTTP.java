@@ -284,7 +284,9 @@ public final class BaseXHTTP extends Main {
             Options.setSystem(StaticOptions.HTTPLOCAL, true);
             break;
           case 'n': // parse host name
-            Options.setSystem(StaticOptions.HOST, arg.string());
+            final String n = arg.string();
+            Options.setSystem(StaticOptions.HOST, n);
+            Options.setSystem(StaticOptions.SERVERHOST, n);
             break;
           case 'p': // parse server port
             final int p = arg.number();
