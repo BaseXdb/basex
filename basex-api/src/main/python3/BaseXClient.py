@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Python 2.7.3 and 3.x client for BaseX.
-Works with BaseX 7.x (but not with BaseX 8.0 and later)
+Works with BaseX 8.0 and later
 
 Requires Python 3.x or Python 2.x having some backports like bytearray.
 (I've tested Python 3.2.3, and Python 2.7.3 on Fedora 16 linux x86_64.)
@@ -15,6 +15,7 @@ LIMITATIONS:
 Documentation: http://docs.basex.org/wiki/Clients
 
 (C) 2012, Hiroaki Itoh. BSD License
+    updated 2014 by Marc van Grootel
 
 """
 
@@ -117,13 +118,20 @@ class Session(object):
         self.__event_callbacks = {}
 
         # receive timestamp
-        timestamp = self.recv_c_str()
+        response = self.recv_c_str().split(':')
 
         # send username and hashed password/timestamp
         hfun = hashlib.md5()
-        #FIXME: should we allow to customize password encoding?
-        hfun.update(hashlib.md5(password.encode('us-ascii')).hexdigest().encode('us-ascii'))
-        hfun.update(timestamp.encode('us-ascii'))
+
+        if len(response) > 1:
+            code = "%s:%s:%s" % (user,response[0],password)
+            nonce = response[1]
+        else:
+            code = password
+            nonce = response[0]
+
+        hfun.update(hashlib.md5(code.encode('us-ascii')).hexdigest().encode('us-ascii'))
+        hfun.update(nonce.encode('us-ascii'))
         self.send(user + chr(0) + hfun.hexdigest())
 
         # evaluate success flag
