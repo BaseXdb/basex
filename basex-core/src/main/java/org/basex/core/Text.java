@@ -969,6 +969,8 @@ public interface Text {
   String SAVE_AS = lang("save_as");
   /** Command info. */
   String PACKAGES = lang("packages");
+  /** Command info. */
+  String HIDDEN_FILES = lang("hidden_files");
 
   /** Command info. */
   String FONTS_D = lang("fonts") + DOTS;

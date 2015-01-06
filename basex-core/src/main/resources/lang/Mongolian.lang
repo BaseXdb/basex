@@ -168,6 +168,7 @@ gui_interactions     = GUI & Харилцах цонх
 help                 = Тусламж
 help1_use_catalog    = Каталогыг бий болгохын тулд дараах байдлаар хандана
 help2_use_catalog    = Apache XML журам тухайн хаягын байршилд суусан байх.
+hidden_files         = Show hidden files
 hit_s                = Амжилттай
 include_strings      = Include string type
 indentation_size     = Indentation size

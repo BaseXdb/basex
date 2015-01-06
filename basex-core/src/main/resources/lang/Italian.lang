@@ -168,6 +168,7 @@ gui_interactions     = GUI & Interazioni
 help                 = Aiuto
 help1_use_catalog    = Per abilitare la risoluzione del catalogo assicurati che
 help2_use_catalog    = l'Apache XML Commons Resolver stia nel tuo percorso classpath.
+hidden_files         = Show hidden files
 hit_s                = Trovati
 include_strings      = Include string type
 indentation_size     = Indentation size

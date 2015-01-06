@@ -168,6 +168,7 @@ gui_interactions     = ユーザーインターフェース
 help                 = ヘルプ
 help1_use_catalog    = カタログの解決を有効にするために
 help2_use_catalog    = Apache XML Commons Resolver がクラスパス上にあることを確認してください
+hidden_files         = Show hidden files
 hit_s                = ヒット
 include_strings      = 文字列タイプを含む
 indentation_size     = インデントサイズ

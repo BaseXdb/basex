@@ -168,6 +168,7 @@ gui_interactions     = GUI & Interaktionen
 help                 = Hilfe
 help1_use_catalog    = Zur Aktivierung des Catalog-Resolvers muss sich der
 help2_use_catalog    = Apache XML Commons Resolver im Klassenpfad befinden.
+hidden_files         = Versteckte Dateien anzeigen
 hit_s                = Treffer
 include_strings      = Berücksichtige String-Typ
 indentation_size     = Einrückungsgröße

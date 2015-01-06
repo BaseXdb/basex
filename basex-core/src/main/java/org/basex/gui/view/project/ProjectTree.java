@@ -54,8 +54,8 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
 
     // add popup
     new BaseXPopup(this, pv.gui,
-      new OpenCmd(), new OpenExternalCmd(), new TestCmd(), null,
-      new DeleteCmd(), new RenameCmd(), new NewDirCmd(), null,
+      new OpenCmd(), new OpenExternalCmd(), new TestCmd(), new HiddenFilesCmd(),
+      null, new DeleteCmd(), new RenameCmd(), new NewDirCmd(), null,
       new RefreshCmd(), null, new AddImportCmd(), new CopyPathCmd()
     );
   }
@@ -325,6 +325,25 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
     @Override public boolean enabled(final GUI main) {
       final ProjectNode node = selectedNode();
       return node != null && node.file.hasSuffix(IO.XQSUFFIXES);
+    }
+  }
+
+  /** Hidden files command. */
+  private final class HiddenFilesCmd extends GUIPopupCmd {
+    /** Constructor. */
+    HiddenFilesCmd() { super(HIDDEN_FILES, BaseXKeys.HIDDENFILES); }
+
+    @Override
+    public boolean toggle() { return true; }
+
+    @Override
+    public boolean selected(final GUI gui) {
+      return view.gui.gopts.get(GUIOptions.HIDDENFILES);
+    }
+
+    @Override public void execute() {
+      view.gui.gopts.invert(GUIOptions.HIDDENFILES);
+      view.root.refresh();
     }
   }
 }

@@ -302,4 +302,12 @@ public final class ProjectView extends BaseXPanel {
       gui.gopts.write();
     }
   }
+
+  /**
+   * Return whether hidden files should be display or not
+   * @return show hidden files
+   */
+  public boolean isHiddenFiles() {
+    return gui.gopts.get(GUIOptions.HIDDENFILES);
+  }
 }

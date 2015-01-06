@@ -168,6 +168,7 @@ gui_interactions     = Interface graphique & Interactions
 help                 = Aide
 help1_use_catalog    = Pour activer la résolution de catalogue, assurez-vous que le
 help2_use_catalog    = Apache XML Commons Resolver est dans votre classpath.
+hidden_files         = Show hidden files
 hit_s                = Hit(s)
 include_strings      = Inclure le type de chaîne de caractères
 indentation_size     = Taille d'indentation

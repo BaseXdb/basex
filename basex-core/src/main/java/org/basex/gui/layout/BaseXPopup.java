@@ -79,7 +79,8 @@ public final class BaseXPopup extends JPopupMenu {
       if(cmd == null) {
         addSeparator();
       } else {
-        final JMenuItem item = add(cmd.label());
+        final String desc = cmd.label();
+        final JMenuItem item = add(cmd.toggle() ? new JCheckBoxMenuItem(desc) : new JMenuItem(desc));
         item.addActionListener(new ActionListener() {
           @Override
           public void actionPerformed(final ActionEvent e) {
