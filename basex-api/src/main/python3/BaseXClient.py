@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Python 2.7.3 and 3.x client for BaseX.
-Works with BaseX 7.0 and later
+Works with BaseX 7.x (but not with BaseX 8.0 and later)
 
 Requires Python 3.x or Python 2.x having some backports like bytearray.
 (I've tested Python 3.2.3, and Python 2.7.3 on Fedora 16 linux x86_64.)

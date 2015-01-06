@@ -5,7 +5,7 @@ import java.util._
 
 /**
  * Scala client for BaseX.
- * Works with BaseX 7.0 and later
+ * Works with BaseX 7.x (but not with BaseX 8.0 and later)
  * Does not support all bindings yet; your extensions are welcome.
  *
  * Documentation: http://docs.basex.org/wiki/Clients

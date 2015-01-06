@@ -1,6 +1,6 @@
 /*
  * Language Binding for BaseX.
- * Works with BaseX 7.0 and later
+ * Works with BaseX 7.x (but not with BaseX 8.0 and later)
  *
  * Documentation: http://docs.basex.org/wiki/Clients
  *
