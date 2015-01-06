@@ -132,4 +132,12 @@ public class LocalSession extends Session {
     command.execute(ctx, output);
     info = command.info();
   }
+
+  /**
+   * Returns the associated database context.
+   * @return database context
+   */
+  public Context context() {
+    return ctx;
+  }
 }
