@@ -198,7 +198,8 @@ namespace BaseXClient
       {
         byte b = Read();
         if (b == 0) break;
-        ms.WriteByte(b);
+        // read next byte if 0xFF is received
+        ms.WriteByte(b == 0xFF ? Read() : b);
       }
     }
 
