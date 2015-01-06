@@ -2,6 +2,7 @@ package org.basex.gui.view.project;
 
 import java.util.*;
 
+import org.basex.gui.*;
 import org.basex.io.*;
 
 /**
@@ -35,9 +36,9 @@ final class ProjectDir extends ProjectNode {
     // cache and sort directories and files
     final ArrayList<IOFile> dirs = new ArrayList<>();
     final ArrayList<IOFile> files = new ArrayList<>();
+    final boolean hidden = project.gui.gopts.get(GUIOptions.HIDDENFILES);
     for(final IOFile f : file.children()) {
-      if (project.isHiddenFiles() || !f.file().isHidden())
-        (f.isDir() ? dirs : files).add(f);
+      if(hidden || !f.file().isHidden()) (f.isDir() ? dirs : files).add(f);
     }
     Collections.sort(dirs, COMP);
     Collections.sort(files, COMP);

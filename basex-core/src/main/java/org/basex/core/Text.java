@@ -970,7 +970,7 @@ public interface Text {
   /** Command info. */
   String PACKAGES = lang("packages");
   /** Command info. */
-  String HIDDEN_FILES = lang("hidden_files");
+  String SHOW_HIDDEN_FILES = lang("show_hidden_files");
 
   /** Command info. */
   String FONTS_D = lang("fonts") + DOTS;

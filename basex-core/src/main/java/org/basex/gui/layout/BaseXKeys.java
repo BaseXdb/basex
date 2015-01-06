@@ -105,7 +105,6 @@ public enum BaseXKeys {
   /** Context menu.          */ CONTEXT(NO_MOD, VK_CONTEXT_MENU),
   /** Copy path.             */ COPYPATH(META | SHIFT, VK_C),
   /** Add as import.         */ ADDIMPORT(META | SHIFT, VK_I),
-  /** Show hidden files.     */ HIDDENFILES(META, VK_H),
 
   /** Refresh.               */ REFRESH(NO_MOD, VK_F5),
   /** Rename.                */ RENAME(NO_MOD, VK_F2),

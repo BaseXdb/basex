@@ -16,7 +16,7 @@ import org.junit.*;
  */
 public final class LangTest extends SandboxTest {
   /**
-   * Tests all language files.
+   * Tests files.
    */
   @Test
   public void test() {

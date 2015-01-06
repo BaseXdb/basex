@@ -191,6 +191,7 @@ public final class ProjectView extends BaseXPanel {
    */
   public void refreshLayout() {
     filter.refreshLayout();
+    root.refresh();
   }
 
   /**
@@ -301,13 +302,5 @@ public final class ProjectView extends BaseXPanel {
       gui.gopts.set(GUIOptions.PROJECTPATH, io.path());
       gui.gopts.write();
     }
-  }
-
-  /**
-   * Return whether hidden files should be display or not
-   * @return show hidden files
-   */
-  public boolean isHiddenFiles() {
-    return gui.gopts.get(GUIOptions.HIDDENFILES);
   }
 }

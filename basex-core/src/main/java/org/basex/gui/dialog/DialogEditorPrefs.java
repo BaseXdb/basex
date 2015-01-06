@@ -34,6 +34,8 @@ final class DialogEditorPrefs extends BaseXBack {
   private final BaseXCheckBox auto;
   /** Default file filter. */
   private final BaseXTextField files;
+  /** Show hidden files. */
+  private final BaseXCheckBox showHidden;
 
   /**
    * Default constructor.
@@ -53,6 +55,7 @@ final class DialogEditorPrefs extends BaseXBack {
     auto = new BaseXCheckBox(AUTO_ADD_CHARS, GUIOptions.AUTO, gopts, d);
     saverun = new BaseXCheckBox(SAVE_BEFORE_EXECUTE, GUIOptions.SAVERUN, gopts, d);
     files = new BaseXTextField(GUIOptions.FILES, gopts, d);
+    showHidden = new BaseXCheckBox(SHOW_HIDDEN_FILES, GUIOptions.HIDDENFILES, gopts, d);
     margin.setColumns(4);
     indent.setColumns(3);
     files.setColumns(18);
@@ -71,7 +74,7 @@ final class DialogEditorPrefs extends BaseXBack {
     p.add(files);
     add(p);
 
-    final BaseXBack pv = new BaseXBack().layout(new TableLayout(2, 1, 0, 8));
+    final BaseXBack pv = new BaseXBack().layout(new TableLayout(3, 1, 0, 8));
     p = new BaseXBack().layout(new TableLayout(4, 1));
     p.add(new BaseXLabel(EDIT + COL, true, true));
     pp = new BaseXBack().layout(new TableLayout(1, 2, 8, 0));
@@ -85,6 +88,11 @@ final class DialogEditorPrefs extends BaseXBack {
     p = new BaseXBack().layout(new TableLayout(2, 1));
     p.add(new BaseXLabel(EVALUATING + COL, true, true));
     p.add(saverun);
+    pv.add(p);
+
+    p = new BaseXBack().layout(new TableLayout(2, 1));
+    p.add(new BaseXLabel(PROJECT + COL, true, true));
+    p.add(showHidden);
     pv.add(p);
     add(pv);
   }
@@ -106,5 +114,6 @@ final class DialogEditorPrefs extends BaseXBack {
     indent.assign();
     auto.assign();
     saverun.assign();
+    showHidden.assign();
   }
 }
