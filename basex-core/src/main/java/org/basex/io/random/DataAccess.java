@@ -15,9 +15,9 @@ public final class DataAccess implements AutoCloseable {
   /** Buffer manager. */
   private final Buffers bm = new Buffers();
   /** Reference to the data input stream. */
-  private final RandomAccessFile file;
+  private final RandomAccessFile raf;
   /** File length. */
-  private long len;
+  private long length;
   /** Changed flag. */
   private boolean changed;
   /** Offset. */
@@ -25,15 +25,15 @@ public final class DataAccess implements AutoCloseable {
 
   /**
    * Constructor, initializing the file reader.
-   * @param fl the file to be read
+   * @param file the file to be read
    * @throws IOException I/O Exception
    */
-  public DataAccess(final IOFile fl) throws IOException {
+  public DataAccess(final IOFile file) throws IOException {
     RandomAccessFile f = null;
     try {
-      f = new RandomAccessFile(fl.file(), "rw");
-      len = f.length();
-      file = f;
+      f = new RandomAccessFile(file.file(), "rw");
+      length = f.length();
+      raf = f;
       cursor(0);
     } catch(final IOException ex) {
       if(f != null) f.close();
@@ -48,7 +48,7 @@ public final class DataAccess implements AutoCloseable {
     try {
       for(final Buffer b : bm.all()) if(b.dirty) writeBlock(b);
       if(changed) {
-        file.setLength(len);
+        raf.setLength(length);
         changed = false;
       }
     } catch(final IOException ex) {
@@ -60,7 +60,7 @@ public final class DataAccess implements AutoCloseable {
   public synchronized void close() {
     flush();
     try {
-      file.close();
+      raf.close();
     } catch(final IOException ex) {
       Util.stack(ex);
     }
@@ -79,7 +79,7 @@ public final class DataAccess implements AutoCloseable {
    * @return file length
    */
   public long length() {
-    return len;
+    return length;
   }
 
   /**
@@ -87,16 +87,16 @@ public final class DataAccess implements AutoCloseable {
    * @return result of check
    */
   public boolean more() {
-    return cursor() < len;
+    return cursor() < length;
   }
 
   /**
    * Reads a byte value from the specified position.
-   * @param p position
+   * @param pos position
    * @return integer value
    */
-  public synchronized byte read1(final long p) {
-    cursor(p);
+  public synchronized byte read1(final long pos) {
+    cursor(pos);
     return read1();
   }
 
@@ -110,11 +110,11 @@ public final class DataAccess implements AutoCloseable {
 
   /**
    * Reads an integer value from the specified position.
-   * @param p position
+   * @param pos position
    * @return integer value
    */
-  public synchronized int read4(final long p) {
-    cursor(p);
+  public synchronized int read4(final long pos) {
+    cursor(pos);
     return read4();
   }
 
@@ -128,11 +128,11 @@ public final class DataAccess implements AutoCloseable {
 
   /**
    * Reads a 5-byte value from the specified file offset.
-   * @param p position
+   * @param pos position
    * @return long value
    */
-  public synchronized long read5(final long p) {
-    cursor(p);
+  public synchronized long read5(final long pos) {
+    cursor(pos);
     return read5();
   }
 
@@ -175,22 +175,22 @@ public final class DataAccess implements AutoCloseable {
 
   /**
    * Reads a number of bytes from the specified offset.
-   * @param p position
-   * @param l length
+   * @param pos position
+   * @param len length
    * @return byte array
    */
-  public synchronized byte[] readBytes(final long p, final int l) {
-    cursor(p);
-    return readBytes(l);
+  public synchronized byte[] readBytes(final long pos, final int len) {
+    cursor(pos);
+    return readBytes(len);
   }
 
   /**
    * Reads a number of bytes.
-   * @param n length
+   * @param len length
    * @return byte array
    */
-  public synchronized byte[] readBytes(final int n) {
-    int l = n;
+  public synchronized byte[] readBytes(final int len) {
+    int l = len;
     int ll = IO.BLOCKSIZE - off;
     final byte[] b = new byte[l];
 
@@ -210,20 +210,20 @@ public final class DataAccess implements AutoCloseable {
 
   /**
    * Sets the disk cursor.
-   * @param p read position
+   * @param pos read position
    */
-  public void cursor(final long p) {
-    off = (int) (p & IO.BLOCKSIZE - 1);
-    final long b = p - off;
+  public void cursor(final long pos) {
+    off = (int) (pos & IO.BLOCKSIZE - 1);
+    final long b = pos - off;
     if(!bm.cursor(b)) return;
 
     final Buffer bf = bm.current();
     try {
       if(bf.dirty) writeBlock(bf);
       bf.pos = b;
-      file.seek(bf.pos);
-      if(bf.pos < file.length())
-        file.readFully(bf.data, 0, (int) Math.min(len - bf.pos, IO.BLOCKSIZE));
+      raf.seek(bf.pos);
+      if(bf.pos < raf.length())
+        raf.readFully(bf.data, 0, (int) Math.min(length - bf.pos, IO.BLOCKSIZE));
     } catch(final IOException ex) {
       Util.stack(ex);
     }
@@ -234,14 +234,14 @@ public final class DataAccess implements AutoCloseable {
    * @return next integer
    */
   public synchronized int readNum() {
-    final int v = read();
-    switch(v & 0xC0) {
+    final int value = read();
+    switch(value & 0xC0) {
     case 0:
-      return v;
+      return value;
     case 0x40:
-      return (v - 0x40 << 8) + read();
+      return (value - 0x40 << 8) + read();
     case 0x80:
-      return (v - 0x80 << 24) + (read() << 16) + (read() << 8) + read();
+      return (value - 0x80 << 24) + (read() << 16) + (read() << 8) + read();
     default:
       return (read() << 24) + (read() << 16) + (read() << 8) + read();
     }
@@ -249,74 +249,74 @@ public final class DataAccess implements AutoCloseable {
 
   /**
    * Writes a 5-byte value to the specified position.
-   * @param p position in the file
-   * @param v value to be written
+   * @param pos position in the file
+   * @param value value to be written
    */
-  public void write5(final long p, final long v) {
-    cursor(p);
-    write((byte) (v >>> 32));
-    write((byte) (v >>> 24));
-    write((byte) (v >>> 16));
-    write((byte) (v >>> 8));
-    write((byte) v);
+  public void write5(final long pos, final long value) {
+    cursor(pos);
+    write((byte) (value >>> 32));
+    write((byte) (value >>> 24));
+    write((byte) (value >>> 16));
+    write((byte) (value >>> 8));
+    write((byte) value);
   }
 
   /**
    * Writes an integer value to the specified position.
-   * @param p write position
-   * @param v byte array to be appended
+   * @param pos write position
+   * @param value byte array to be appended
    */
-  public void write4(final long p, final int v) {
-    cursor(p);
-    write4(v);
+  public void write4(final long pos, final int value) {
+    cursor(pos);
+    write4(value);
   }
 
   /**
    * Writes an integer value to the current position.
-   * @param v value to be written
+   * @param value value to be written
    */
-  public void write4(final int v) {
-    write(v >>> 24);
-    write(v >>> 16);
-    write(v >>>  8);
-    write(v);
+  public void write4(final int value) {
+    write(value >>> 24);
+    write(value >>> 16);
+    write(value >>>  8);
+    write(value);
   }
 
   /**
    * Write a value to the file.
-   * @param p write position
-   * @param v value to be written
+   * @param pos write position
+   * @param value value to be written
    */
-  public void writeNum(final long p, final int v) {
-    cursor(p);
-    writeNum(v);
+  public void writeNum(final long pos, final int value) {
+    cursor(pos);
+    writeNum(value);
   }
 
   /**
    * Writes integers to the file in compressed form.
    * @param p write position
-   * @param v integer values
+   * @param values integer values
    */
-  public void writeNums(final long p, final int[] v) {
+  public void writeNums(final long p, final int[] values) {
     cursor(p);
-    writeNum(v.length);
-    for(final int n : v) writeNum(n);
+    writeNum(values.length);
+    for(final int n : values) writeNum(n);
   }
 
   /**
    * Writes a byte array to the file.
-   * @param buf buffer containing the token
+   * @param buffer buffer containing the token
    * @param offset offset in the buffer where the token starts
-   * @param length token length
+   * @param len token length
    */
-  public void writeBytes(final byte[] buf, final int offset, final int length) {
-    final int last = offset + length;
+  public void writeBytes(final byte[] buffer, final int offset, final int len) {
+    final int last = offset + len;
     int o = offset;
 
     while(o < last) {
       final Buffer bf = buffer();
       final int l = Math.min(last - o, IO.BLOCKSIZE - off);
-      System.arraycopy(buf, o, bf.data, off, l);
+      System.arraycopy(buffer, o, bf.data, off, l);
       bf.dirty = true;
       off += l;
       o += l;
@@ -324,17 +324,17 @@ public final class DataAccess implements AutoCloseable {
 
     // adjust file size if needed
     final long nl = bm.current().pos + off;
-    if(nl > len) length(nl);
+    if(nl > length) length(nl);
   }
 
   /**
    * Appends a value to the file and return it's offset.
-   * @param p write position
-   * @param v byte array to be appended
+   * @param pos write position
+   * @param values byte array to be appended
    */
-  public void writeToken(final long p, final byte[] v) {
-    cursor(p);
-    writeToken(v, 0, v.length);
+  public void writeToken(final long pos, final byte[] values) {
+    cursor(pos);
+    writeToken(values, 0, values.length);
   }
 
   /**
@@ -351,21 +351,21 @@ public final class DataAccess implements AutoCloseable {
 
     // extend available space by subsequent zero-bytes
     cursor(pos + os);
-    for(; pos + os < len && os < size && read() == 0xFF; os++);
+    for(; pos + os < length && os < size && read() == 0xFF; os++);
 
     long o = pos;
-    if(pos + os == len) {
+    if(pos + os == length) {
       // entry is placed last: reset file length (discard last entry)
       length(pos);
     } else {
       int t = size;
       if(os < size) {
         // gap is too small for new entry...
-        // reset cursor to overwrite entry with zero-bytes
+        // reset cursor to overwrite entry
         cursor(pos);
         t = 0;
         // place new entry after last entry
-        o = len;
+        o = length;
       } else {
         // gap is large enough: set cursor to overwrite remaining bytes
         cursor(pos + size);
@@ -378,12 +378,12 @@ public final class DataAccess implements AutoCloseable {
 
   /**
    * Sets the file length.
-   * @param l file length
+   * @param len file length
    */
-  private synchronized void length(final long l) {
-    if(l != len) {
+  private synchronized void length(final long len) {
+    if(len != length) {
       changed = true;
-      len = l;
+      length = len;
     }
   }
 
@@ -400,53 +400,54 @@ public final class DataAccess implements AutoCloseable {
 
   /**
    * Writes the next byte.
-   * @param b byte to be written
+   * @param value byte to be written
    */
-  private void write(final int b) {
+  private void write(final int value) {
     final Buffer bf = buffer();
     bf.dirty = true;
-    bf.data[off++] = (byte) b;
+    bf.data[off++] = (byte) value;
     final long nl = bf.pos + off;
-    if(nl > len) length(nl);
+    if(nl > length) length(nl);
   }
 
   /**
    * Write a token to the file.
-   * @param buf buffer containing the token
+   * @param buffer buffer containing the token
    * @param offset offset in the buffer where the token starts
-   * @param length token length
+   * @param len token length
    */
-  private void writeToken(final byte[] buf, final int offset, final int length) {
-    writeNum(length);
-    writeBytes(buf, offset, length);
+  private void writeToken(final byte[] buffer, final int offset, final int len) {
+    writeNum(len);
+    writeBytes(buffer, offset, len);
   }
 
   /**
    * Appends a value to the file and return it's offset.
-   * @param v number to be appended
+   * @param value number to be appended
    */
-  private void writeNum(final int v) {
-    if(v < 0 || v > 0x3FFFFFFF) {
-      write(0xC0); write(v >>> 24); write(v >>> 16); write(v >>> 8); write(v);
-    } else if(v > 0x3FFF) {
-      write(v >>> 24 | 0x80); write(v >>> 16);
-      write(v >>> 8); write(v);
-    } else if(v > 0x3F) {
-      write(v >>> 8 | 0x40); write(v);
+  private void writeNum(final int value) {
+    if(value < 0 || value > 0x3FFFFFFF) {
+      write(0xC0); write(value >>> 24); write(value >>> 16); write(value >>> 8); write(value);
+    } else if(value > 0x3FFF) {
+      write(value >>> 24 | 0x80); write(value >>> 16);
+      write(value >>> 8); write(value);
+    } else if(value > 0x3F) {
+      write(value >>> 8 | 0x40); write(value);
     } else {
-      write(v);
+      write(value);
     }
   }
 
   /**
    * Writes the specified block to disk.
-   * @param bf buffer to write
+   * @param buffer buffer to write
    * @throws IOException I/O exception
    */
-  private void writeBlock(final Buffer bf) throws IOException {
-    file.seek(bf.pos);
-    file.write(bf.data, 0, (int) Math.min(IO.BLOCKSIZE, len - bf.pos));
-    bf.dirty = false;
+  private void writeBlock(final Buffer buffer) throws IOException {
+    final long pos = buffer.pos;
+    raf.seek(pos);
+    raf.write(buffer.data, 0, (int) Math.min(IO.BLOCKSIZE, length - pos));
+    buffer.dirty = false;
   }
 
   /**
