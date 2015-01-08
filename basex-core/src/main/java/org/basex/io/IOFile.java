@@ -372,7 +372,7 @@ public final class IOFile extends IO {
   }
 
   /**
-   * Converts a file filter (glob) to a regular expression.
+   * Converts a name filter (glob) to a regular expression.
    * @param glob filter
    * @return regular expression
    */

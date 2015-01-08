@@ -2,13 +2,9 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
-import java.util.regex.*;
-
 import org.basex.core.*;
 import org.basex.core.locks.*;
 import org.basex.core.users.*;
-import org.basex.io.*;
-import org.basex.util.*;
 
 /**
  * Abstract class for user commands.
@@ -78,9 +74,7 @@ abstract class AUser extends Command {
    * @return array with database names
    */
   private String[] users(final String name) {
-    final String pat = name.matches(".*[*?,].*") ? IOFile.regex(name) :
-      name.replaceAll("([" + Databases.REGEXCHARS + "])", "\\\\$1");
-    return context.users.find(Pattern.compile(pat, Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE));
+    return context.users.find(Databases.regex(name));
   }
 
   @Override

@@ -77,15 +77,7 @@ public final class Databases {
    * @return database and backups list
    */
   private StringList list(final boolean db, final boolean backup, final String name) {
-    final Pattern pt;
-    if(name != null) {
-      final String nm = REGEX.matcher(name).matches() ? IOFile.regex(name) :
-        name.replaceAll("([" + REGEXCHARS + "])", "\\\\$1");
-      pt = Pattern.compile(nm, Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE);
-    } else {
-      pt = null;
-    }
-
+    final Pattern pt = name == null ? null : regex(name);
     final IOFile[] children = soptions.dbpath().children();
     final StringList list = new StringList(children.length);
     final HashSet<String> map = new HashSet<>(children.length);
@@ -104,6 +96,28 @@ public final class Databases {
       }
     }
     return list.sort(false);
+  }
+
+  /**
+   * Returns a regular expression for the specified name pattern.
+   * @param pattern pattern
+   * @return regular expression
+   */
+  public static Pattern regex(final String pattern) {
+    return regex(pattern, "");
+  }
+
+  /**
+   * Returns a regular expression for the specified name pattern.
+   * @param pattern pattern (can be {@code null})
+   * @param suffix regular expression suffix
+   * @return regular expression
+   */
+  public static Pattern regex(final String pattern, final String suffix) {
+    if(pattern == null) return null;
+    final String nm = REGEX.matcher(pattern).matches() ? IOFile.regex(pattern) :
+      pattern.replaceAll("([" + REGEXCHARS + "])", "\\\\$1") + suffix;
+    return Pattern.compile(nm, Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE);
   }
 
   /**
@@ -131,11 +145,10 @@ public final class Databases {
     if(file.exists()) {
       backups.add(db);
     } else {
-      final String regex = db.replaceAll("([" + REGEXCHARS + "])", "\\\\$1") +
-          DateTime.PATTERN + IO.ZIPSUFFIX;
+      final Pattern regex = regex(db, DateTime.PATTERN + '\\' + IO.ZIPSUFFIX);
       for(final IOFile f : soptions.dbpath().children()) {
         final String n = f.name();
-        if(n.matches(regex)) backups.add(n.substring(0, n.lastIndexOf('.')));
+        if(regex.matcher(n).matches()) backups.add(n.substring(0, n.lastIndexOf('.')));
       }
     }
     return backups.sort(Prop.CASE, false);

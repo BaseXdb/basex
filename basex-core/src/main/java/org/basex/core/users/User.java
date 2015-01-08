@@ -2,14 +2,13 @@ package org.basex.core.users;
 
 import static org.basex.core.users.UserText.*;
 import static org.basex.util.Strings.*;
-import static org.basex.util.XMLAccess.*;
 import static org.basex.util.Token.*;
+import static org.basex.util.XMLAccess.*;
 
 import java.util.*;
 import java.util.Map.Entry;
 
 import org.basex.core.*;
-import org.basex.io.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 
@@ -175,7 +174,7 @@ public final class User {
   }
 
   /**
-   * Returns the global permission, or the permission for a specific database.
+   * Returns the global permission, or the permission for the specified database.
    * @param db database (can be {@code null})
    * @return permission
    */
@@ -188,13 +187,13 @@ public final class User {
   }
 
   /**
-   * Returns the first entry for the specific database.
+   * Returns the first entry for the specified database.
    * @param db database
    * @return entry, or {@code null}
    */
   Entry<String, Perm> find(final String db) {
     for(final Entry<String, Perm> entry : locals.entrySet()) {
-      if(db.matches(IOFile.regex(entry.getKey()))) return entry;
+      if(Databases.regex(entry.getKey()).matcher(db).matches()) return entry;
     }
     return null;
   }
