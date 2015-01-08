@@ -2,12 +2,9 @@ package org.basex.query.func.user;
 
 import java.util.*;
 
-import org.basex.core.locks.*;
 import org.basex.core.users.*;
 import org.basex.query.*;
-import org.basex.query.func.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.list.*;
@@ -18,7 +15,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public class UserList extends StandardFunc {
+public class UserList extends UserFn {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     return value(qc).iter();
@@ -32,10 +29,5 @@ public class UserList extends StandardFunc {
     final TokenList tl = new TokenList(users.size());
     for(final User user : users) tl.add(user.name());
     return StrSeq.get(tl);
-  }
-
-  @Override
-  public final boolean accept(final ASTVisitor visitor) {
-    return visitor.lock(DBLocking.ADMIN) && super.accept(visitor);
   }
 }

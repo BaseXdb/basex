@@ -61,6 +61,9 @@ public final class UserModuleTest extends AdvancedQueryTest {
     query(_USER_DROP.args(NAME));
     query(_USER_LIST_DETAILS.args() + "/database/@pattern = '" + NAME + '\'', "false");
     query(_USER_LIST_DETAILS.args() + "/@name = '" + NAME + '\'', "false");
+    // specify user
+    query(EXISTS.args(_USER_LIST_DETAILS.args("admin")), "true");
+    error(EXISTS.args(_USER_LIST_DETAILS.args("unknown")), USER_UNKNOWN_X);
   }
 
   /** Test method. */

@@ -1142,7 +1142,8 @@ public enum Function {
   /** XQuery function. */
   _USER_LIST(UserList.class, "list()", arg(), ELM_ZM, flag(NDT), USER_URI),
   /** XQuery function. */
-  _USER_LIST_DETAILS(UserListDetails.class, "list-details()", arg(), ELM_ZM, flag(NDT), USER_URI),
+  _USER_LIST_DETAILS(UserListDetails.class, "list-details([name])",
+      arg(STR), ELM_ZM, flag(NDT), USER_URI),
   /** XQuery function. */
   _USER_CREATE(UserCreate.class, "create(name,password[,permission])",
       arg(STR, STR, STR), EMP, flag(UPD), USER_URI),
