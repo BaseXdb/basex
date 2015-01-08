@@ -3,8 +3,8 @@ package org.basex.io.parse.json;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
-import org.basex.build.*;
-import org.basex.build.JsonParserOptions.JsonDuplicates;
+import org.basex.build.json.*;
+import org.basex.build.json.JsonParserOptions.*;
 import org.basex.query.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;

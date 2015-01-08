@@ -2,7 +2,7 @@ package org.basex.io.parse.json;
 
 import java.io.*;
 
-import org.basex.build.*;
+import org.basex.build.json.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
@@ -31,10 +31,11 @@ public abstract class JsonConverter {
    * Converts the specified input to XML.
    * @param input input stream
    * @throws IOException I/O exception
+   * @return result
    */
-  public void convert(final IO input) throws IOException {
+  public Item convert(final IO input) throws IOException {
     final String encoding = jopts.get(JsonParserOptions.ENCODING);
-    convert(new NewlineInput(input).encoding(encoding).content(), input.path());
+    return convert(new NewlineInput(input).encoding(encoding).content(), input.path());
   }
 
   /**
@@ -42,9 +43,11 @@ public abstract class JsonConverter {
    * @param input input
    * @param path input path (can be {@code null)}
    * @throws QueryIOException query I/O exception
+   * @return result
    */
-  public void convert(final byte[] input, final String path) throws QueryIOException {
+  public Item convert(final byte[] input, final String path) throws QueryIOException {
     JsonParser.parse(Token.string(input), path, jopts, this);
+    return finish();
   }
 
   /**
@@ -164,5 +167,5 @@ public abstract class JsonConverter {
    * Returns the resulting XQuery value.
    * @return result
    */
-  public abstract Item finish();
+  abstract Item finish();
 }

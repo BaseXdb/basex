@@ -6,7 +6,8 @@ import static org.junit.Assert.*;
 import java.io.*;
 
 import org.basex.*;
-import org.basex.build.CsvOptions.CsvFormat;
+import org.basex.build.csv.*;
+import org.basex.build.csv.CsvOptions.*;
 import org.basex.core.*;
 import org.basex.core.MainOptions.MainParser;
 import org.basex.core.cmd.*;
@@ -120,7 +121,7 @@ public final class CsvParserTest extends SandboxTest {
 
     copts.set(CsvOptions.QUOTES, false);
     new CreateDB(NAME, FILE).execute(context);
-    assertEquals("\"H", new XQuery("(//Props[1])/text()").execute(context));
+    assertEquals("\"H ", new XQuery("(//Props[1])/text()").execute(context));
 
     copts.set(CsvOptions.QUOTES, true);
     new CreateDB(NAME, FILE).execute(context);

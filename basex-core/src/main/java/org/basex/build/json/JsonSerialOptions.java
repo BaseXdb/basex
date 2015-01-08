@@ -1,4 +1,4 @@
-package org.basex.build;
+package org.basex.build.json;
 
 import org.basex.util.options.*;
 

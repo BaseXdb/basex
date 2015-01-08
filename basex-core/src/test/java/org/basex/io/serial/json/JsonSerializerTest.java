@@ -4,8 +4,8 @@ import static org.basex.query.QueryError.*;
 import static org.junit.Assert.*;
 
 import org.basex.*;
-import org.basex.build.*;
-import org.basex.build.JsonOptions.JsonFormat;
+import org.basex.build.json.*;
+import org.basex.build.json.JsonOptions.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;

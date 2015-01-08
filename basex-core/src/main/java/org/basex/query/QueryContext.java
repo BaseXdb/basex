@@ -7,8 +7,8 @@ import static org.basex.util.Token.*;
 import java.util.*;
 import java.util.Map.Entry;
 
-import org.basex.build.*;
-import org.basex.build.JsonOptions.JsonFormat;
+import org.basex.build.json.*;
+import org.basex.build.json.JsonOptions.*;
 import org.basex.core.*;
 import org.basex.core.MainOptions.MainParser;
 import org.basex.core.locks.*;
@@ -697,8 +697,7 @@ public final class QueryContext extends Proc implements AutoCloseable {
         final JsonParserOptions jp = new JsonParserOptions();
         jp.set(JsonOptions.FORMAT, JsonFormat.MAP);
         final JsonConverter conv = JsonConverter.get(jp);
-        conv.convert(token(vl.toString()), null);
-        return conv.finish();
+        return conv.convert(token(vl.toString()), null);
       } catch(final QueryIOException ex) {
         throw ex.getCause();
       }

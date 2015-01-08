@@ -1,15 +1,12 @@
 package org.basex.io.parse.csv;
 
-import static org.basex.util.Token.*;
-
 import java.util.*;
 
-import org.basex.build.*;
+import org.basex.build.csv.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.Map;
-import org.basex.util.list.*;
 
 /**
  * This class converts CSV data to an XQuery map.
@@ -18,18 +15,10 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 final class CsvMapConverter extends CsvConverter {
-  /** CSV token. */
-  private static final byte[] ENTRY = token("entry");
-
-  /** Headers. */
-  private final TokenList headers = new TokenList(1);
   /** All records. */
   private final ArrayList<ValueBuilder> records = new ArrayList<>(1);
-
   /** Current record. */
   private ValueBuilder record = new ValueBuilder();
-  /** Current column. */
-  private int col;
 
   /**
    * Constructor.
@@ -40,12 +29,12 @@ final class CsvMapConverter extends CsvConverter {
   }
 
   @Override
-  public void header(final byte[] string) {
+  protected void header(final byte[] string) {
     headers.add(string);
   }
 
   @Override
-  public void record() {
+  protected void record() {
     record = new ValueBuilder();
     if(!headers.isEmpty()) record.add(Map.EMPTY);
     records.add(record);
@@ -53,7 +42,7 @@ final class CsvMapConverter extends CsvConverter {
   }
 
   @Override
-  public void entry(final byte[] value) throws QueryIOException {
+  protected void entry(final byte[] value) throws QueryIOException {
     if(headers.isEmpty()) {
       record.add(Str.get(value));
     } else {
@@ -68,7 +57,7 @@ final class CsvMapConverter extends CsvConverter {
   }
 
   @Override
-  public Map finish() throws QueryIOException {
+  protected Map finish() throws QueryIOException {
     try {
       Map map = Map.EMPTY;
       int row = 1;

@@ -2,9 +2,8 @@ package org.basex.io.parse.csv;
 
 import java.io.*;
 
-import org.basex.build.*;
+import org.basex.build.csv.*;
 import org.basex.io.in.*;
-import org.basex.query.*;
 import org.basex.util.*;
 
 /**
@@ -143,9 +142,9 @@ final class CsvParser {
    * Adds a new record and entry.
    * @param entry entry to be added
    * @param record add new record
-   * @throws QueryIOException query I/O exception
+   * @throws IOException I/O exception
    */
-  private void record(final TokenBuilder entry, final boolean record) throws QueryIOException {
+  private void record(final TokenBuilder entry, final boolean record) throws IOException {
     if(record && first && data) conv.record();
     if(record || !first) {
       if(data) {

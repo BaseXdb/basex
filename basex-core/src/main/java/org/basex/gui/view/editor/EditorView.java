@@ -13,7 +13,7 @@ import java.util.regex.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
-import org.basex.build.*;
+import org.basex.build.json.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.parse.*;

@@ -4,7 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import java.util.*;
 
-import org.basex.build.*;
+import org.basex.build.json.*;
 import org.basex.query.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;

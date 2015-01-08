@@ -3,7 +3,10 @@ package org.basex.util.options;
 import static org.junit.Assert.*;
 
 import org.basex.*;
-import org.basex.build.*;
+import org.basex.build.csv.*;
+import org.basex.build.html.*;
+import org.basex.build.json.*;
+import org.basex.build.text.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;

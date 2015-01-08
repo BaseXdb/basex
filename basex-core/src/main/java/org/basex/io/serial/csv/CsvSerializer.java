@@ -4,7 +4,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
-import org.basex.build.*;
+import org.basex.build.csv.*;
 import org.basex.io.serial.*;
 import org.basex.util.*;
 import org.basex.util.list.*;

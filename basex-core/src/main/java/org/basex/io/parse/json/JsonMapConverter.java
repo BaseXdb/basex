@@ -2,7 +2,7 @@ package org.basex.io.parse.json;
 
 import java.util.*;
 
-import org.basex.build.*;
+import org.basex.build.json.*;
 import org.basex.query.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;

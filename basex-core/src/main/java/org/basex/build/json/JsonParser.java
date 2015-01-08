@@ -1,4 +1,4 @@
-package org.basex.build;
+package org.basex.build.json;
 
 import java.io.*;
 
@@ -24,7 +24,7 @@ public final class JsonParser extends XMLParser {
    * @param opts database options
    * @throws IOException I/O exception
    */
-  JsonParser(final IO source, final MainOptions opts) throws IOException {
+  public JsonParser(final IO source, final MainOptions opts) throws IOException {
     this(source, opts, opts.get(MainOptions.JSONPARSER));
   }
 
@@ -49,8 +49,7 @@ public final class JsonParser extends XMLParser {
    */
   public static IOContent toXML(final IO io, final JsonParserOptions options) throws IOException {
     final JsonConverter conv = JsonConverter.get(options);
-    conv.convert(io);
-    final IOContent xml = new IOContent(conv.finish().serialize().finish());
+    final IOContent xml = new IOContent(conv.convert(io).serialize().finish());
     xml.name(io.name());
     return xml;
   }

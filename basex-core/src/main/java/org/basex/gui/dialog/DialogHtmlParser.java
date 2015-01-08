@@ -5,7 +5,7 @@ import static org.basex.core.Text.*;
 import java.awt.*;
 import java.io.*;
 
-import org.basex.build.*;
+import org.basex.build.html.*;
 import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Msg;

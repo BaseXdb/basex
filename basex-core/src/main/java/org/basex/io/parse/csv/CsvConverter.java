@@ -1,12 +1,16 @@
 package org.basex.io.parse.csv;
 
+import static org.basex.util.Token.*;
+
 import java.io.*;
 
-import org.basex.build.*;
+import org.basex.build.csv.*;
+import org.basex.build.csv.CsvOptions.*;
+import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
-import org.basex.query.*;
 import org.basex.query.value.item.*;
+import org.basex.util.list.*;
 
 /**
  * <p>This class converts CSV input to XML.</p>
@@ -14,27 +18,51 @@ import org.basex.query.value.item.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-public abstract class CsvConverter {
+public abstract class CsvConverter extends Proc {
+  /** CSV token. */
+  public static final byte[] CSV = token("csv");
+  /** CSV token. */
+  public static final byte[] RECORD = token("record");
+  /** CSV token. */
+  public static final byte[] ENTRY = token("entry");
+  /** CSV token. */
+  public static final byte[] NAME = token("name");
+
+  /** Headers. */
+  protected final TokenList headers = new TokenList(1);
+  /** Attributes format. */
+  protected final boolean ats;
+  /** Lax QName conversion. */
+  protected final boolean lax;
+  /** Current column. */
+  protected int col;
   /** CSV options. */
   private final CsvParserOptions copts;
+  /** Current input. */
+  protected NewlineInput nli;
 
   /**
    * Constructor.
-   * @param opts json options
+   * @param copts json options
    */
-  CsvConverter(final CsvParserOptions opts) {
-    copts = opts;
+  protected CsvConverter(final CsvParserOptions copts) {
+    this.copts = copts;
+    lax = copts.get(CsvOptions.LAX);
+    ats = copts.get(CsvOptions.FORMAT) == CsvFormat.ATTRIBUTES;
   }
 
   /**
    * Converts the specified input to XML.
    * @param input input
+   * @return result
    * @throws IOException I/O exception
    */
-  public void convert(final IO input) throws IOException {
+  public Item convert(final IO input) throws IOException {
     try(final NewlineInput in = new NewlineInput(input)) {
+      nli = in;
       CsvParser.parse(in.encoding(copts.get(CsvParserOptions.ENCODING)), copts, this);
     }
+    return finish();
   }
 
   /**
@@ -53,24 +81,25 @@ public abstract class CsvConverter {
    * Adds a new header.
    * @param string string
    */
-  abstract void header(final byte[] string);
+  protected abstract void header(final byte[] string);
 
   /**
    * Adds a new record.
+   * @throws IOException I/O exception
    */
-  abstract void record();
+  protected abstract void record() throws IOException;
 
   /**
    * Called when an entry is encountered.
    * @param value string
-   * @throws QueryIOException query exception
+   * @throws IOException I/O exception
    */
-  abstract void entry(final byte[] value) throws QueryIOException;
+  protected abstract void entry(final byte[] value) throws IOException;
 
   /**
    * Returns the resulting byte array.
    * @return result
-   * @throws QueryIOException query exception
+   * @throws IOException I/O exception
    */
-  public abstract Item finish() throws QueryIOException;
+  protected abstract Item finish() throws IOException;
 }

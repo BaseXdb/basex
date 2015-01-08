@@ -3,8 +3,8 @@ package org.basex.query.func.fn;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
-import org.basex.build.*;
-import org.basex.build.JsonOptions.*;
+import org.basex.build.json.*;
+import org.basex.build.json.JsonOptions.*;
 import org.basex.io.parse.json.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
@@ -42,8 +42,7 @@ public class FnParseJson extends Parse {
     opts.set(JsonOptions.FORMAT, JsonFormat.MAP);
     try {
       final JsonConverter conv = JsonConverter.get(opts);
-      conv.convert(json, null);
-      return conv.finish();
+      return conv.convert(json, null);
     } catch(final QueryIOException ex) {
       Util.debug(ex);
       final QueryException qe = ex.getCause(info);

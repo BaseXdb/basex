@@ -1,9 +1,10 @@
-package org.basex.build;
+package org.basex.build.text;
 
 import static org.basex.util.Token.*;
 
 import java.io.*;
 
+import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
@@ -19,7 +20,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-14, BSD License
  * @author Christian Gruen
  */
-final class TextParser extends SingleParser {
+public final class TextParser extends SingleParser {
   /** Text element. */
   private static final byte[] TEXT = token("text");
   /** Line element. */
@@ -35,7 +36,7 @@ final class TextParser extends SingleParser {
    * @param source document source
    * @param opts database options
    */
-  TextParser(final IO source, final MainOptions opts) {
+  public TextParser(final IO source, final MainOptions opts) {
     super(source, opts);
     final TextOptions tp = opts.get(MainOptions.TEXTPARSER);
     lines = tp.get(TextOptions.LINES);

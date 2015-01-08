@@ -1,4 +1,4 @@
-package org.basex.build;
+package org.basex.build.html;
 
 import static org.basex.util.Token.*;
 

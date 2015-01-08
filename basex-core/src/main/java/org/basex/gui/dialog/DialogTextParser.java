@@ -4,7 +4,7 @@ import static org.basex.core.Text.*;
 
 import java.awt.*;
 
-import org.basex.build.*;
+import org.basex.build.text.*;
 import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;

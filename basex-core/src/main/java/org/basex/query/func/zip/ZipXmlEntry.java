@@ -5,6 +5,7 @@ import static org.basex.query.QueryError.*;
 import java.io.*;
 
 import org.basex.build.*;
+import org.basex.build.html.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;

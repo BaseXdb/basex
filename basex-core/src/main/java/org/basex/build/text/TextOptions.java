@@ -1,4 +1,4 @@
-package org.basex.build;
+package org.basex.build.text;
 
 import org.basex.util.options.*;
 

@@ -1,6 +1,7 @@
 package org.basex.io.serial;
 
-import org.basex.build.*;
+import org.basex.build.csv.*;
+import org.basex.build.json.*;
 import org.basex.core.*;
 import org.basex.util.*;
 import org.basex.util.options.*;

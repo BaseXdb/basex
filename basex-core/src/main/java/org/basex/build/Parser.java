@@ -2,6 +2,10 @@ package org.basex.build;
 
 import java.io.*;
 
+import org.basex.build.csv.*;
+import org.basex.build.html.*;
+import org.basex.build.json.*;
+import org.basex.build.text.*;
 import org.basex.build.xml.*;
 import org.basex.core.*;
 import org.basex.core.MainOptions.MainParser;
@@ -29,20 +33,20 @@ public abstract class Parser extends Proc {
   /**
    * Constructor.
    * @param source document source or {@code null}
-   * @param opts database options
+   * @param options main options
    */
-  protected Parser(final String source, final MainOptions opts) {
-    this(source == null ? null : IO.get(source), opts);
+  protected Parser(final String source, final MainOptions options) {
+    this(source == null ? null : IO.get(source), options);
   }
 
   /**
    * Constructor.
    * @param source document source or {@code null}
-   * @param opts database options
+   * @param options main options
    */
-  protected Parser(final IO source, final MainOptions opts) {
+  protected Parser(final IO source, final MainOptions options) {
     this.source = source;
-    this.options = opts;
+    this.options = options;
   }
 
   /**

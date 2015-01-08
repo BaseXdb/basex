@@ -2,7 +2,10 @@ package org.basex.core;
 
 import java.util.*;
 
-import org.basex.build.*;
+import org.basex.build.csv.*;
+import org.basex.build.html.*;
+import org.basex.build.json.*;
+import org.basex.build.text.*;
 import org.basex.io.serial.*;
 import org.basex.util.options.*;
 

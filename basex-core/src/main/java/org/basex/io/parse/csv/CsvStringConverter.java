@@ -1,12 +1,8 @@
 package org.basex.io.parse.csv;
 
-import static org.basex.util.Token.*;
-
-import org.basex.build.*;
-import org.basex.build.CsvOptions.CsvFormat;
+import org.basex.build.csv.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * This class converts CSV data to XML, using direct or attributes conversion.
@@ -15,28 +11,10 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class CsvStringConverter extends CsvConverter {
-  /** CSV token. */
-  private static final byte[] CSV = token("csv");
-  /** CSV token. */
-  private static final byte[] RECORD = token("record");
-  /** CSV token. */
-  private static final byte[] ENTRY = token("entry");
-  /** CSV token. */
-  private static final byte[] NAME = token("name");
-
-  /** Headers. */
-  private final TokenList headers = new TokenList();
-  /** Attributes format. */
-  private final boolean atts;
-  /** Lax QName conversion. */
-  private final boolean lax;
-
   /** XML string. */
   private final XMLBuilder xml = new XMLBuilder();
   /** Record. */
   private boolean record;
-  /** Current column. */
-  private int col;
 
   /**
    * Constructor.
@@ -44,13 +22,11 @@ public final class CsvStringConverter extends CsvConverter {
    */
   public CsvStringConverter(final CsvParserOptions opts) {
     super(opts);
-    lax = opts.get(CsvOptions.LAX);
-    atts = opts.get(CsvOptions.FORMAT) == CsvFormat.ATTRIBUTES;
     xml.open(CSV);
   }
 
   @Override
-  public void record() {
+  protected void record() {
     if(record) xml.close();
     xml.open(RECORD);
     record = true;
@@ -58,14 +34,14 @@ public final class CsvStringConverter extends CsvConverter {
   }
 
   @Override
-  public void header(final byte[] value) {
-    headers.add(atts ? value : XMLToken.encode(value, lax));
+  protected void header(final byte[] value) {
+    headers.add(ats ? value : XMLToken.encode(value, lax));
   }
 
   @Override
-  public void entry(final byte[] entry) {
+  protected void entry(final byte[] entry) {
     final byte[] elem = ENTRY, name = headers.get(col++);
-    if(atts) {
+    if(ats) {
       if(name == null) xml.open(elem);
       else xml.open(elem, NAME, name);
     } else {
@@ -76,7 +52,7 @@ public final class CsvStringConverter extends CsvConverter {
   }
 
   @Override
-  public Str finish() {
+  protected Str finish() {
     return Str.get(xml.finish());
   }
 }

@@ -2,7 +2,7 @@ package org.basex.query.func.csv;
 
 import static org.basex.query.QueryError.*;
 
-import org.basex.build.*;
+import org.basex.build.csv.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;

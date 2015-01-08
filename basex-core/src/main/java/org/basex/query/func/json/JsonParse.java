@@ -1,6 +1,6 @@
 package org.basex.query.func.json;
 
-import org.basex.build.*;
+import org.basex.build.json.*;
 import org.basex.io.parse.json.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
@@ -18,9 +18,7 @@ public final class JsonParse extends JsonFn {
     final byte[] input = toToken(exprs[0], qc);
     final JsonParserOptions opts = toOptions(1, Q_OPTIONS, new JsonParserOptions(), qc);
     try {
-      final JsonConverter conv = JsonConverter.get(opts);
-      conv.convert(input, null);
-      return conv.finish();
+      return JsonConverter.get(opts).convert(input, null);
     } catch(final QueryIOException ex) {
       throw ex.getCause(info);
     }

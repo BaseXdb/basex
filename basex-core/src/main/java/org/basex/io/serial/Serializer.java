@@ -7,9 +7,10 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
-import org.basex.build.*;
-import org.basex.build.CsvOptions.CsvFormat;
-import org.basex.build.JsonOptions.JsonFormat;
+import org.basex.build.csv.*;
+import org.basex.build.csv.CsvOptions.*;
+import org.basex.build.json.*;
+import org.basex.build.json.JsonOptions.*;
 import org.basex.data.*;
 import org.basex.io.serial.csv.*;
 import org.basex.io.serial.json.*;

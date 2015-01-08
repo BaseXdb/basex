@@ -2,7 +2,7 @@ package org.basex.query.func.json;
 
 import static org.basex.query.QueryError.*;
 
-import org.basex.build.*;
+import org.basex.build.json.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;

@@ -4,7 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import java.io.*;
 
-import org.basex.build.*;
+import org.basex.build.csv.*;
 import org.basex.io.*;
 import org.basex.io.parse.csv.*;
 import org.basex.query.*;
@@ -23,9 +23,7 @@ public final class CsvParse extends CsvFn {
     final byte[] input = toToken(exprs[0], qc);
     final CsvParserOptions opts = toOptions(1, Q_OPTIONS, new CsvParserOptions(), qc);
     try {
-      final CsvConverter conv = CsvConverter.get(opts);
-      conv.convert(new IOContent(input));
-      return conv.finish();
+      return CsvConverter.get(opts).convert(new IOContent(input));
     } catch(final IOException ex) {
       throw BXCS_PARSE_X.get(info, ex);
     }
