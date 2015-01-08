@@ -320,11 +320,10 @@ public final class DataAccess implements AutoCloseable {
       bf.dirty = true;
       off += l;
       o += l;
+      // adjust file size
+      final long nl = bf.pos + off;
+      if(nl > length) length(nl);
     }
-
-    // adjust file size if needed
-    final long nl = bm.current().pos + off;
-    if(nl > length) length(nl);
   }
 
   /**
@@ -444,9 +443,9 @@ public final class DataAccess implements AutoCloseable {
    * @throws IOException I/O exception
    */
   private void writeBlock(final Buffer buffer) throws IOException {
-    final long pos = buffer.pos;
+    final long pos = buffer.pos, len = Math.min(IO.BLOCKSIZE, length - pos);
     raf.seek(pos);
-    raf.write(buffer.data, 0, (int) Math.min(IO.BLOCKSIZE, length - pos));
+    raf.write(buffer.data, 0, (int) len);
     buffer.dirty = false;
   }
 
