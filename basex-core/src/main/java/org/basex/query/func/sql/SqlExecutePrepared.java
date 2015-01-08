@@ -10,6 +10,7 @@ import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 
 /**
@@ -50,10 +51,6 @@ public final class SqlExecutePrepared extends SqlExecute {
   public Iter iter(final QueryContext qc) throws QueryException {
     checkCreate(qc);
     final int id = (int) toLong(exprs[0], qc);
-    final Object obj = jdbc(qc).get(id);
-    if(!(obj instanceof PreparedStatement)) throw BXSQ_STATE_X.get(info, id);
-
-    // Get parameters for prepared statement
     long c = 0;
     ANode params = null;
     if(exprs.length > 1) {
@@ -62,12 +59,14 @@ public final class SqlExecutePrepared extends SqlExecute {
       c = countParams(params);
     }
 
+    final Object obj = jdbc(qc).get(id);
+    if(!(obj instanceof PreparedStatement)) throw BXSQ_STATE_X.get(info, id);
     try {
       final PreparedStatement stmt = (PreparedStatement) obj;
       // Check if number of parameters equals number of place holders
       if(c != stmt.getParameterMetaData().getParameterCount()) throw BXSQ_PARAMS.get(info);
       if(params != null) setParameters(params.children(), stmt);
-      return stmt.execute() ? buildResult(stmt.getResultSet()) : new NodeSeqBuilder();
+      return stmt.execute() ? iter(stmt, false) : Empty.ITER;
     } catch(final SQLException ex) {
       throw BXSQ_ERROR_X.get(info, ex);
     }
@@ -80,10 +79,10 @@ public final class SqlExecutePrepared extends SqlExecute {
    */
   private static long countParams(final ANode params) {
     final AxisIter ch = params.children();
-    long c = ch.size();
-    if(c == -1) do ++c;
+    long n = ch.size();
+    if(n == -1) do ++n;
     while(ch.next() != null);
-    return c;
+    return n;
   }
 
   /**

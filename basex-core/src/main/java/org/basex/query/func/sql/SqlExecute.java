@@ -12,6 +12,7 @@ import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -32,59 +33,74 @@ public class SqlExecute extends SqlFn {
   public Iter iter(final QueryContext qc) throws QueryException {
     checkCreate(qc);
     final int id = (int) toLong(exprs[0], qc);
+    final String query = string(toToken(exprs[1], qc));
+
     final Object obj = jdbc(qc).get(id);
     if(!(obj instanceof Connection)) throw BXSQ_CONN_X.get(info, id);
-
-    final String query = string(toToken(exprs[1], qc));
-    try(final Statement stmt = ((Connection) obj).createStatement()) {
-      return stmt.execute(query) ? buildResult(stmt.getResultSet()) : new NodeSeqBuilder();
+    try {
+      final Statement stmt = ((Connection) obj).createStatement();
+      return stmt.execute(query) ? iter(stmt, true) : Empty.ITER;
     } catch(final SQLException ex) {
       throw BXSQ_ERROR_X.get(info, ex);
     }
   }
 
   /**
-   * Builds a sequence of elements from a query's result set.
-   * @param rs result set
-   * @return sequence of elements <tuple/> each of which represents a row from the result set
+   * Returns a result iterator.
+   * @param stmt SQL statement
+   * @param close close statement after last result
+   * @return iterator
    * @throws QueryException query exception
    */
-  final NodeSeqBuilder buildResult(final ResultSet rs) throws QueryException {
+  final Iter iter(final Statement stmt, final boolean close) throws QueryException {
     try {
-      final ResultSetMetaData metadata = rs.getMetaData();
-      final int cc = metadata.getColumnCount();
-      final NodeSeqBuilder rows = new NodeSeqBuilder();
-      while(rs.next()) {
-        final FElem row = new FElem(Q_ROW);
-        rows.add(row);
-        for(int k = 1; k <= cc; k++) {
-          // for each row add column values as children
-          final String name = metadata.getColumnLabel(k);
-          final Object value = rs.getObject(k);
-          // null values are ignored
-          if(value == null) continue;
-
-          // element <sql:column name='...'>...</sql:column>
-          final FElem col = new FElem(Q_COLUMN).add(NAME, name);
-          row.add(col);
-
-          if(value instanceof SQLXML) {
-            // add XML value as child element
-            final String xml = ((SQLXML) value).getString();
-            try {
-              col.add(new DBNode(new IOContent(xml)).children().next());
-            } catch(final IOException ex) {
-              // fallback: add string representation
-              Util.debug(ex);
-              col.add(xml);
+      final ResultSet rs = stmt.getResultSet();
+      final ResultSetMetaData md = rs.getMetaData();
+      final int cc = md.getColumnCount();
+      return new Iter() {
+        @Override
+        public Item next() throws QueryException {
+          try {
+            if(!rs.next()) {
+              rs.close();
+              if(close) stmt.close();
+              return null;
             }
-          } else {
-            // add string representation of other values
-            col.add(value.toString());
+
+            final FElem row = new FElem(Q_ROW);
+            for(int k = 1; k <= cc; k++) {
+              // for each row add column values as children
+              final String name = md.getColumnLabel(k);
+              final Object value = rs.getObject(k);
+              // null values are ignored
+              if(value == null) continue;
+
+              // element <sql:column name='...'>...</sql:column>
+              final FElem col = new FElem(Q_COLUMN).add(NAME, name);
+              row.add(col);
+
+              if(value instanceof SQLXML) {
+                // add XML value as child element
+                final String xml = ((SQLXML) value).getString();
+                try {
+                  col.add(new DBNode(new IOContent(xml)).children().next());
+                } catch(final IOException ex) {
+                  // fallback: add string representation
+                  Util.debug(ex);
+                  col.add(xml);
+                }
+              } else {
+                // add string representation of other values
+                col.add(value.toString());
+              }
+            }
+            return row;
+          } catch(final SQLException ex) {
+            throw BXSQ_ERROR_X.get(info, ex);
           }
         }
-      }
-      return rows;
+      };
+
     } catch(final SQLException ex) {
       throw BXSQ_ERROR_X.get(info, ex);
     }
