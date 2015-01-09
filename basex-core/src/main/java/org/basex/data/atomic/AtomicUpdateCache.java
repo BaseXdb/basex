@@ -42,7 +42,7 @@ import org.basex.util.hash.*;
  * remembered. This avoids additional traversals of the AUC during consistency checks and
  * further optimizations.</p>
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Lukas Kircher
  */
 public final class AtomicUpdateCache {

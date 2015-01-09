@@ -18,7 +18,7 @@ import org.basex.util.list.*;
 /**
  * This module contains functions for processing server-side session data.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class Session extends QueryModule {

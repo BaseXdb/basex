@@ -7,7 +7,7 @@ import org.basex.util.*;
 /**
  * Simple node kind test.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 class KindTest extends Test {

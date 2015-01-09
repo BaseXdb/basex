@@ -11,7 +11,7 @@ import com.bradmcevoy.http.Request.Method;
 /**
  * Dummy resource to be returned when no authorization is provided.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */

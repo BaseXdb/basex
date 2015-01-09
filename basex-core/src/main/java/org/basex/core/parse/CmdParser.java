@@ -8,7 +8,7 @@ import org.basex.query.*;
 /**
  * This is an interface for parsing database commands.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 abstract class CmdParser {

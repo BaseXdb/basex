@@ -18,7 +18,7 @@ import org.junit.Test;
 /**
  * This class tests the update functionality of the block storage.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Tim Petrowsky
  */
 public final class DiskTableTest extends SandboxTest {

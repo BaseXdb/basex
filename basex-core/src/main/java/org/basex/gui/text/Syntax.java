@@ -9,7 +9,7 @@ import java.awt.*;
  * This abstract class defines a framework for a simple syntax
  * highlighting in text panels.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 abstract class Syntax {

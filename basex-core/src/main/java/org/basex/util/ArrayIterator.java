@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * This class is used to iterate through objects of an array.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  * @param <E> generic object type
  */

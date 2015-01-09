@@ -9,7 +9,7 @@ import org.junit.*;
 /**
  * Tests for proper tail-calls.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
 public final class TCOTest extends QueryPlanTest {

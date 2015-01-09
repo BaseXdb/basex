@@ -10,7 +10,7 @@ import org.basex.util.hash.*;
 /**
  * Axis component of the scatter plot visualization.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Lukas Kircher
  */
 final class PlotAxis {

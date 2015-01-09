@@ -19,7 +19,7 @@ import org.basex.query.value.node.*;
 /**
  * This class is an entry point for evaluating XQuery strings.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class QueryProcessor extends Proc implements AutoCloseable {

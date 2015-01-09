@@ -3,7 +3,7 @@ package org.basex.util.options;
 /**
  * Option containing an integer value.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class NumberOption extends Option<Integer> {

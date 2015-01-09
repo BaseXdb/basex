@@ -16,7 +16,7 @@ import org.basex.util.*;
 /**
  * Dialog window for displaying information about the project.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class DialogAbout extends BaseXDialog {

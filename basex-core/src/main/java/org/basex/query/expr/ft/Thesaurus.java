@@ -18,7 +18,7 @@ import org.basex.util.list.*;
 /**
  * Simple Thesaurus for full-text requests.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class Thesaurus {

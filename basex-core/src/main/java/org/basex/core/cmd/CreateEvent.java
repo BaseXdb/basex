@@ -9,7 +9,7 @@ import org.basex.core.parse.Commands.CmdCreate;
 /**
  * Evaluates the 'create event' command and creates a new event.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Roman Raedle
  * @author Andreas Weiler
  */

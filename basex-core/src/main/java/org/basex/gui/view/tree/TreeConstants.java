@@ -3,7 +3,7 @@ package org.basex.gui.view.tree;
 /**
  * This interface contains tree view constants.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Wolfgang Miller
  */
 interface TreeConstants {

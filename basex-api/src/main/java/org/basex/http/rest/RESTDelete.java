@@ -8,7 +8,7 @@ import org.basex.http.*;
 /**
  * REST-based evaluation of DELETE operations.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 final class RESTDelete {

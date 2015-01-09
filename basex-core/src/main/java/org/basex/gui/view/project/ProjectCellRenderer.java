@@ -10,7 +10,7 @@ import org.basex.gui.layout.*;
 /**
  * Custom tree cell renderer to distinguish between raw and xml leaf nodes.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 final class ProjectCellRenderer extends DefaultTreeCellRenderer {

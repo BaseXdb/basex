@@ -22,7 +22,7 @@ import org.basex.util.list.*;
 /**
  * FTWords expression.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class FTWords extends FTExpr {

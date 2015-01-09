@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * Abstract update primitive which holds a copy of nodes to be inserted.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Lukas Kircher
  */
 abstract class NodeCopy extends NodeUpdate {

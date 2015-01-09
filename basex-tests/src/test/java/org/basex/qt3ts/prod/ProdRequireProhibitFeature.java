@@ -6,7 +6,7 @@ import org.basex.tests.qt3ts.*;
 /**
  * Tests for the require-feature and prohibit-feature options..
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
 @SuppressWarnings("all")

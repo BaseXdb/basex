@@ -22,7 +22,7 @@ import org.junit.Test;
 /**
  * Tests on options.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class OptionsTest extends SandboxTest {

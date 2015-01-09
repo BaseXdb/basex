@@ -7,7 +7,7 @@ import org.basex.http.webdav.impl.*;
 /**
  * WebDAV resource representing a collection database.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */

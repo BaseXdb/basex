@@ -44,7 +44,7 @@ import org.basex.util.*;
  * </ol></li>
  * </ol>
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  * @author Leo Woerteler
  */

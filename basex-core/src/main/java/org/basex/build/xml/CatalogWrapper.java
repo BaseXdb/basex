@@ -12,7 +12,7 @@ import org.xml.sax.*;
  * {@code org.apache.xml.resolver.tools.CatalogResolver} or
  * {@code code com.sun.org.apache.xml.internal.resolver.tools.CatalogResolver}.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Michael Seiferle
  */
 public final class CatalogWrapper {

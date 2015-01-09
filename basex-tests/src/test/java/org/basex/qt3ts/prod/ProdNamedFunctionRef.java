@@ -8,7 +8,7 @@ import org.basex.tests.qt3ts.*;
  *    Created by Michael Kay by automatic conversion of the tests for function-lookup
  *    produced (mainly) by Tim Mills.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
 @SuppressWarnings("all")

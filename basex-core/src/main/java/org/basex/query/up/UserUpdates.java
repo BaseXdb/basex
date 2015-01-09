@@ -10,7 +10,7 @@ import org.basex.query.up.primitives.*;
 /**
  * This class 'caches' all update operations that use a user name as reference.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 final class UserUpdates {

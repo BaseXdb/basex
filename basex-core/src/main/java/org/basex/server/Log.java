@@ -23,7 +23,7 @@ import org.basex.util.*;
  *   <li><b>Performance</b>: Measured time in milliseconds</li>
  * </ul>
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class Log {

@@ -15,7 +15,7 @@ import org.basex.util.list.*;
 /**
  * Dialog window for specifying options for creating a new database.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class DialogNew extends BaseXDialog {

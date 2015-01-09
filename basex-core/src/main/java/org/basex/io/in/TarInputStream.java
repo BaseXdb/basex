@@ -7,7 +7,7 @@ import org.basex.util.*;
 /**
  * Input stream filter for reading files in the TAR file format.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class TarInputStream extends FilterInputStream {

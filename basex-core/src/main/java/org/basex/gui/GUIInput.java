@@ -19,7 +19,7 @@ import org.basex.util.options.*;
 /**
  * This class offers a text field for keyword and XQuery input.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class GUIInput extends BaseXTextField {

@@ -14,7 +14,7 @@ import org.basex.util.hash.*;
 /**
  * Context value.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class Context extends Simple {

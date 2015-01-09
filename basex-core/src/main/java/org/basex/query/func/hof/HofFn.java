@@ -10,7 +10,7 @@ import org.basex.query.value.seq.*;
 /**
  * Higher-order function.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
 abstract class HofFn extends StandardFunc {

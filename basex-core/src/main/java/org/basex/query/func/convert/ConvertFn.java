@@ -22,7 +22,7 @@ import org.basex.util.list.*;
 /**
  * Functions for converting data to other formats.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public abstract class ConvertFn extends StandardFunc {

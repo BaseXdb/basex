@@ -10,7 +10,7 @@ import org.basex.util.list.*;
  * This class provides a container for query full-text positions,
  * which is evaluated by the visualizations.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  * @author Sebastian Gath
  */

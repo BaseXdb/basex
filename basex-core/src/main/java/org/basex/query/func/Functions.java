@@ -19,7 +19,7 @@ import org.basex.util.hash.*;
 /**
  * This class provides access to built-in and user-defined functions.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class Functions extends TokenSet {

@@ -8,7 +8,7 @@ import java.util.jar.*;
 /**
  * Utility class to retrieve the manifest attributes of a JAR in the classpath.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Dimitar Popov
  */
 final class JarManifest {

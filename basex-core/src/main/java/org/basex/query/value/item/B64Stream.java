@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * Streamable base64 item ({@code xs:base64Binary}).
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class B64Stream extends B64 {

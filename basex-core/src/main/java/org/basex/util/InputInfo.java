@@ -7,7 +7,7 @@ import org.basex.query.expr.*;
  * This class contains information on the original query, which will be evaluated for
  * error feedback and debugging purposes.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class InputInfo {

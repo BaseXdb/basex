@@ -9,7 +9,7 @@ import org.basex.util.hash.*;
 /**
  * JDBC connections.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Rositsa Shadura
  */
 final class JDBCConnections implements QueryResource {

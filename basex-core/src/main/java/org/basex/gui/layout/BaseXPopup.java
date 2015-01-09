@@ -12,7 +12,7 @@ import org.basex.gui.*;
 /**
  * Project specific Popup menu implementation.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  * @author Lukas Kircher
  */

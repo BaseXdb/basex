@@ -3,7 +3,7 @@ package org.basex.query.util.regex;
 /**
  * An atom together with a quantifier.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
 public final class Piece extends RegExp {

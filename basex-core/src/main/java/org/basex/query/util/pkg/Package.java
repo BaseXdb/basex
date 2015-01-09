@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * Package.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Rositsa Shadura
  */
 public final class Package {
@@ -58,7 +58,7 @@ public final class Package {
 
   /**
    * Package dependency.
-   * @author BaseX Team 2005-14, BSD License
+   * @author BaseX Team 2005-15, BSD License
    * @author Rositsa Shadura
    */
   static final class Dependency {
@@ -88,7 +88,7 @@ public final class Package {
 
   /**
    * Package component.
-   * @author BaseX Team 2005-14, BSD License
+   * @author BaseX Team 2005-15, BSD License
    * @author Rositsa Shadura
    */
   static final class Component {

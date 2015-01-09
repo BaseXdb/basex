@@ -9,7 +9,7 @@ import org.basex.data.*;
 /**
  * Replaces a node in the database with an insertion sequence.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Lukas Kircher
  */
 final class Replace extends StructuralUpdate {

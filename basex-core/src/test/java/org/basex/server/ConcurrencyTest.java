@@ -16,7 +16,7 @@ import org.junit.Test;
 /**
  * This class tests the execution of parallel commands.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Andreas Weiler
  */
 public final class ConcurrencyTest extends SandboxTest {

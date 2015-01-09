@@ -6,7 +6,7 @@ import org.junit.*;
 /**
  * This class tests the local session API with an output stream.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class LocalSessionOutTest extends LocalSessionTest {

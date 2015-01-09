@@ -17,7 +17,7 @@ import org.junit.Test;
 
 /**
  * Tests for the {@link MainOptions#ADDRAW} option.
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Dimitar Popov
  */
 public final class AddRawOptionTest extends SandboxTest {

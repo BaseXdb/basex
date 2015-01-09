@@ -16,7 +16,7 @@ import org.basex.util.*;
 /**
  * This class tests the event mechanism with a gui.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  */
 public final class ServerEventsGUI extends JFrame {
   /** Name of test database and user. */

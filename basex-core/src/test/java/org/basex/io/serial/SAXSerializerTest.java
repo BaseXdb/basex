@@ -17,7 +17,7 @@ import org.junit.Test;
 /**
  * Tests the SAXSerializer.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Michael Hedenus
  */
 public final class SAXSerializerTest extends SandboxTest {

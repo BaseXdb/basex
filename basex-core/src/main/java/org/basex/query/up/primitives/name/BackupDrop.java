@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * Update primitive for the {@link Function#_DB_DROP_BACKUP} function.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class BackupDrop extends NameUpdate {

@@ -6,7 +6,7 @@ import org.basex.tests.qt3ts.*;
 /**
  * Tests for the date-less-than() function.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
 @SuppressWarnings("all")
@@ -782,7 +782,7 @@ public class OpDateLessThan extends QT3TestSet {
   @org.junit.Test
   public void opDateLessThan3() {
     final XQuery query = new XQuery(
-      "fn:not((xs:date(\"2005-14-25Z\") lt xs:date(\"2005-14-26Z\")))",
+      "fn:not((xs:date(\"2005-15-25Z\") lt xs:date(\"2005-15-26Z\")))",
       ctx);
     try {
       result = new QT3Result(query.value());

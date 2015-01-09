@@ -7,7 +7,7 @@ import org.basex.core.*;
 /**
  * This class parses command-line arguments provided by a class with main method.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class MainParser {

@@ -13,7 +13,7 @@ import org.basex.util.*;
  * This is an efficient and memory-saving hash set for storing tokens.
  * The first entry of the token set (offset 0) is always empty.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public class TokenSet extends ASet implements Iterable<byte[]> {

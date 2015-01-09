@@ -7,7 +7,7 @@ import org.basex.util.*;
 /**
  * This is an interface for indexing and retrieving items in a set.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public interface ItemSet extends Iterable<Item> {

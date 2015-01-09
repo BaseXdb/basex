@@ -6,7 +6,7 @@ import org.basex.util.list.*;
 /**
  * This is a container for full-text tokens.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class FTTokens extends ElementList {

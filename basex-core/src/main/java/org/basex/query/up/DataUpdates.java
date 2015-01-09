@@ -26,7 +26,7 @@ import org.basex.util.list.*;
  * are initiated within a snapshot. Regarding the XQUF specification it fulfills the purpose of
  * a 'pending update list'.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Lukas Kircher
  */
 final class DataUpdates {

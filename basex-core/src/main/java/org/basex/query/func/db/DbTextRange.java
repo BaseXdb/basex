@@ -9,7 +9,7 @@ import org.basex.query.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public class DbTextRange extends DbAccess {

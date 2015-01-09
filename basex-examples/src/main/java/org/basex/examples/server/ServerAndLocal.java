@@ -14,7 +14,7 @@ import org.basex.examples.local.*;
  * For more information on server functionalities, see {@link ServerCommands}
  * For more information on local query processing, see {@link RunQueries}.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  */
 public final class ServerAndLocal {
   /**

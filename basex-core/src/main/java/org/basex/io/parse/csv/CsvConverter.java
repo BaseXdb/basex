@@ -15,7 +15,7 @@ import org.basex.util.list.*;
 /**
  * <p>This class converts CSV input to XML.</p>
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public abstract class CsvConverter extends Proc {

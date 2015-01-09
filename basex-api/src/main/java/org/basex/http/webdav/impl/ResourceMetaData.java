@@ -7,7 +7,7 @@ import java.util.*;
 /**
  * Resource meta data.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Dimitar Popov
  */
 public final class ResourceMetaData {

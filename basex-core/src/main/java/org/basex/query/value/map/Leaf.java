@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * A single binding of a {@link Map}.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
 final class Leaf extends TrieNode {

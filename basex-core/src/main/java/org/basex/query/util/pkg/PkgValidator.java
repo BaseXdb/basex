@@ -18,7 +18,7 @@ import org.basex.util.hash.*;
  * Package validator. This class executes some essential checks before the
  * installation of a package.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Rositsa Shadura
  */
 public final class PkgValidator {

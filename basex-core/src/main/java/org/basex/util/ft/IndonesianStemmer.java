@@ -10,7 +10,7 @@ import org.basex.util.*;
  * Information Retrieval in Bahasa Indonesia" by Fadillah Z Tala.
  * http://www.illc.uva.nl/Publications/ResearchReports/MoL-2003-02.text.pdf
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Andria Arisal
  */
 final class IndonesianStemmer extends InternalStemmer {

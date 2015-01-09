@@ -16,7 +16,7 @@ import org.basex.util.list.*;
  * all operations, as it organizes concurrent data access, ensuring that no
  * process will concurrently write to the same data instances.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class Context {

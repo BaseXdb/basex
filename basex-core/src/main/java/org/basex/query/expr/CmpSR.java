@@ -19,7 +19,7 @@ import org.basex.util.hash.*;
 /**
  * String range expression.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 final class CmpSR extends Single {

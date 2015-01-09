@@ -8,7 +8,7 @@ import org.basex.core.cmd.*;
 /**
  * This class demonstrates database access via the client/server architecture.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  */
 public final class ServerCommands {
   /**

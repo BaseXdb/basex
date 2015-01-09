@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * Rename node primitive.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Lukas Kircher
  */
 public final class RenameNode extends NodeUpdate {

@@ -13,7 +13,7 @@ import org.basex.util.*;
 /**
  * This class processes GET requests sent to the REST server.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 final class RESTGet {

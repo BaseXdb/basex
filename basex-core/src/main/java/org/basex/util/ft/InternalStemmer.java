@@ -4,7 +4,7 @@ package org.basex.util.ft;
  * Internal stemmer implementation.
  * The names of the implementations
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 abstract class InternalStemmer extends Stemmer {

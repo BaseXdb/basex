@@ -11,7 +11,7 @@ import org.junit.Test;
  * This test replaces texts in-place and checks if the database text files increase
  * in size. Currently, the actual test is wrapped in comments.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class ReplaceInPlaceTest extends SandboxTest {

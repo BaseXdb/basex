@@ -26,7 +26,7 @@ import org.basex.util.options.Options.YesNoOmit;
 /**
  * This class serializes data to an output stream.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public abstract class OutputSerializer extends Serializer {

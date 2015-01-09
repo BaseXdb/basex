@@ -10,7 +10,7 @@ import org.basex.query.value.type.*;
 /**
  * Contains helper functions for retrieving XML contents.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class XMLAccess {

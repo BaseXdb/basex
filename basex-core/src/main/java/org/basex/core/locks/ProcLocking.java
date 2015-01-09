@@ -14,7 +14,7 @@ import org.basex.util.list.*;
  * Since Version 7.6, this locking class has been replaced by {@link DBLocking}.
  * It can still be activated by setting {@link StaticOptions#GLOBALLOCK} to {@code true}.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class ProcLocking implements Locking {

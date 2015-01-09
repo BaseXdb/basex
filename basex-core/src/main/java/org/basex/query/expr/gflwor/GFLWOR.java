@@ -21,7 +21,7 @@ import org.basex.util.hash.*;
 /**
  * General FLWOR expression.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
 public final class GFLWOR extends ParseExpr {
@@ -798,7 +798,7 @@ public final class GFLWOR extends ParseExpr {
   /**
    * Evaluator for FLWOR clauses.
    *
-   * @author BaseX Team 2005-14, BSD License
+   * @author BaseX Team 2005-15, BSD License
    * @author Leo Woerteler
    */
   interface Eval {
@@ -815,7 +815,7 @@ public final class GFLWOR extends ParseExpr {
   /**
    * A FLWOR clause.
    *
-   * @author BaseX Team 2005-14, BSD License
+   * @author BaseX Team 2005-15, BSD License
    * @author Leo Woerteler
    */
   public abstract static class Clause extends ParseExpr {

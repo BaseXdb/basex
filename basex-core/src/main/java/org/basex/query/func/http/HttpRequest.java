@@ -8,7 +8,7 @@ import org.basex.util.hash.*;
 /**
  * Container for parsed data from {@code <http:request/>}.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Rositsa Shadura
  */
 public final class HttpRequest {
@@ -27,7 +27,7 @@ public final class HttpRequest {
 
   /**
    * Container for parsed data from <part/> element.
-   * @author BaseX Team 2005-14, BSD License
+   * @author BaseX Team 2005-15, BSD License
    * @author Rositsa Shadura
    */
   public static class Part {

@@ -11,7 +11,7 @@ import org.junit.*;
 /**
  * This class tests the XML syntax of the database commands.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class XMLCommandTest extends SandboxTest {

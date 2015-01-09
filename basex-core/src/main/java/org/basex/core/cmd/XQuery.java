@@ -5,7 +5,7 @@ import org.basex.core.users.*;
 /**
  * Evaluates the 'xquery' command and processes an XQuery request.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class XQuery extends AQuery {

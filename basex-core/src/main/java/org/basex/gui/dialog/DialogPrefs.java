@@ -10,7 +10,7 @@ import org.basex.gui.layout.*;
 /**
  * Dialog window for changing some project's preferences.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class DialogPrefs extends BaseXDialog {

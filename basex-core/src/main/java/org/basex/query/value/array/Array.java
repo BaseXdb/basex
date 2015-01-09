@@ -21,7 +21,7 @@ import org.basex.util.*;
 /**
  * Array item.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class Array extends FItem {

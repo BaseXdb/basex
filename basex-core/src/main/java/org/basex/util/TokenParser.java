@@ -7,7 +7,7 @@ import org.basex.util.list.*;
 /**
  * <p>This class can be used to iterate through all codepoints of a token.</p>
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public class TokenParser {

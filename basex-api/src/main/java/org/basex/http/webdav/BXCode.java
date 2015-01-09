@@ -11,7 +11,7 @@ import com.bradmcevoy.http.exceptions.*;
  * Code container.
  *
  * @param <E> return type
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 abstract class BXCode<E> {

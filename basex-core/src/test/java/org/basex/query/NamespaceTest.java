@@ -20,7 +20,7 @@ import org.junit.Test;
 /**
  * This class tests namespaces.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Lukas Kircher
  */
 public final class NamespaceTest extends AdvancedQueryTest {

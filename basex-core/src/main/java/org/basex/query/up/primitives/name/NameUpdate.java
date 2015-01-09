@@ -11,7 +11,7 @@ import org.basex.util.list.*;
  * Update operation that references databases by their name. The targeted database need not
  * be opened.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Lukas Kircher
  */
 public abstract class NameUpdate extends Update implements Comparable<NameUpdate> {

@@ -25,7 +25,7 @@ import org.basex.util.list.*;
  * This locking can be deactivated by setting {@link StaticOptions#GLOBALLOCK} to
  * {@code true}.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Jens Erat
  */
 public final class DBLocking implements Locking {

@@ -7,7 +7,7 @@ import org.basex.io.*;
 /**
  * This class uses a byte buffer to speed up output stream processing.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  * @author Tim Petrowsky
  */

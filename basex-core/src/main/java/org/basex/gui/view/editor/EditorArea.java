@@ -18,7 +18,7 @@ import org.basex.util.*;
 /**
  * This class extends the text panel by editor features.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class EditorArea extends TextPanel {

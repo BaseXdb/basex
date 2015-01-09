@@ -8,7 +8,7 @@ import org.basex.query.value.item.*;
 /**
  * Archive constants.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 interface ArchiveText {

@@ -12,7 +12,7 @@ import org.basex.util.options.*;
 /**
  * Evaluates the 'get' command and return the value of a database option.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class Get extends AGet {

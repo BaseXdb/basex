@@ -7,7 +7,7 @@ import org.basex.query.value.item.*;
  * This is a simple demo module called by {link {@link FruitsExample}.
  * It is derived from the {@link QueryModule} class.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  */
 public class FruitsModule extends QueryModule {
   /** Fruits array. */

@@ -12,7 +12,7 @@ import org.junit.*;
 /**
  * This class sends parallel GET requests to the REST API.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class RESTParallelGetTest extends HTTPTest {

@@ -10,7 +10,7 @@ import org.basex.core.parse.Commands.CmdShow;
 /**
  * Evaluates the 'show events' command and lists all existing events.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Roman Raedle
  * @author Andreas Weiler
  */

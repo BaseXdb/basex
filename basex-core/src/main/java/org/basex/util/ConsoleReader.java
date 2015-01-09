@@ -11,7 +11,7 @@ import org.basex.io.*;
 /**
  * Console reader.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Dimitar Popov
  */
 public abstract class ConsoleReader {

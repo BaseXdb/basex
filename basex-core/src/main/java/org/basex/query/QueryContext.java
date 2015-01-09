@@ -40,7 +40,7 @@ import org.basex.util.options.*;
  * This class organizes both static and dynamic properties that are specific to a
  * single query.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class QueryContext extends Proc implements AutoCloseable {

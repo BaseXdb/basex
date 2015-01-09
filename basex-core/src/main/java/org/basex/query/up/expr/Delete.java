@@ -17,7 +17,7 @@ import org.basex.util.hash.*;
 /**
  * Delete expression.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Lukas Kircher
  */
 public final class Delete extends Update {

@@ -7,7 +7,7 @@ import org.basex.util.*;
  * Atomic update operation that replaces the value of a single text, comment, pi or
  * attribute node.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Lukas Kircher
  */
 final class UpdateValue extends BasicUpdate {

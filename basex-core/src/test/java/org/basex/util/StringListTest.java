@@ -8,7 +8,7 @@ import org.junit.*;
 /**
  * Tests for the {@link StringList} implementation.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  */
 public class StringListTest {
   /** Tests {@code containsAll(l)} function. */

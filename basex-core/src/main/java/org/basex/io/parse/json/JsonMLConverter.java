@@ -15,7 +15,7 @@ import org.basex.util.*;
  * The specified JSON input is first transformed into a tree representation
  * and then converted to an XML document.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  * @author Leo Woerteler
  */

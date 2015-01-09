@@ -6,7 +6,7 @@ import static org.basex.util.Token.*;
 /**
  * Abstract class for parsing various inputs, such as database commands or queries.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public class InputParser {

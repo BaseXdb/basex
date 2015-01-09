@@ -22,7 +22,7 @@ import org.junit.*;
 /**
  * This class contains common methods for the HTTP services.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public abstract class HTTPTest extends SandboxTest {

@@ -18,7 +18,7 @@ import org.junit.runners.Parameterized.Parameters;
 /**
  * Tests for {@link DBLocking}.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Jens Erat
  */
 @RunWith(Parameterized.class)

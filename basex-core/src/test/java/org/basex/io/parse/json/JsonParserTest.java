@@ -8,7 +8,7 @@ import org.junit.*;
 /**
  * Tests for the {@link JsonParser} class.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
 public final class JsonParserTest {

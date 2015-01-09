@@ -9,7 +9,7 @@ import org.basex.util.*;
 /**
  * This exception is thrown if a wrong user/password combination was specified.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class LoginException extends IOException {

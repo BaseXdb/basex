@@ -26,7 +26,7 @@ import org.basex.util.list.*;
  * for textual content in a compressed disk structure.
  * The table mapping is documented in {@link Data}.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  * @author Tim Petrowsky
  */

@@ -9,7 +9,7 @@ import org.basex.query.func.*;
 /**
  * Functions for performing XSLT transformations.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 abstract class XsltFn extends StandardFunc {

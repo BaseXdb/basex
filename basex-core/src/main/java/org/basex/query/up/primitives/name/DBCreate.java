@@ -20,7 +20,7 @@ import org.basex.util.options.*;
 /**
  * Update primitive for the {@link Function#_DB_CREATE} function.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Lukas Kircher
  */
 public final class DBCreate extends NameUpdate {

@@ -6,7 +6,7 @@ import org.basex.tests.qt3ts.*;
 /**
  * Tests for the cast expression.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
 @SuppressWarnings("all")
@@ -52433,7 +52433,7 @@ public class ProdCastExpr extends QT3TestSet {
       "                xs:decimal(\"2.0\"), xs:integer(\"16\"), xs:nonPositiveInteger(\"0\"), xs:negativeInteger(\"-4\"), xs:long(\"5\"),\n" +
       "                xs:int(\"6\"), xs:short(\"7\"), xs:byte(\"8\"), xs:nonNegativeInteger(\"9\"), xs:unsignedLong(\"10\"),\n" +
       "                xs:unsignedInt(\"11\"), xs:unsignedShort(\"12\"), xs:unsignedByte(\"13\"), xs:positiveInteger(\"14\"),\n" +
-      "                xs:gYearMonth(\"1976-02Z\"), xs:gYear(\"2005-14:00\"), xs:gMonthDay(\"--12-25-14:00\"),\n" +
+      "                xs:gYearMonth(\"1976-02Z\"), xs:gYear(\"2005-15:00\"), xs:gMonthDay(\"--12-25-14:00\"),\n" +
       "                xs:gDay(\"---25-14:00\"), xs:gMonth(\"--12-14:00\"), xs:boolean(\"true\"), xs:base64Binary(\"aaaa\"),\n" +
       "                xs:hexBinary(\"FFFF\"), xs:anyURI(\"http://example.com/\"), xs:QName(\"localName\"),\n" +
       "                xs:string(\"An xs:string\"), xs:normalizedString(\"normalizedString\"), xs:token(\"token\"),\n" +
@@ -52448,7 +52448,7 @@ public class ProdCastExpr extends QT3TestSet {
       query.close();
     }
     test(
-      assertStringValue(true, "\n             xs:untypedAtomic 2002-10-10T23:02:12Z 2002-10-10Z 23:02:12Z P1Y PT1S P1M 3000 40000 2 16 0\n             -4 5 6 7 8 9 10 11 12 13 14 1976-02Z 2005-14:00 --12-25-14:00 ---25-14:00 --12-14:00 true\n             aaaa FFFF http://example.com/ localName An xs:string normalizedString token language\n             NMTOKEN Name NCName ID IDREF ENTITY")
+      assertStringValue(true, "\n             xs:untypedAtomic 2002-10-10T23:02:12Z 2002-10-10Z 23:02:12Z P1Y PT1S P1M 3000 40000 2 16 0\n             -4 5 6 7 8 9 10 11 12 13 14 1976-02Z 2005-15:00 --12-25-14:00 ---25-14:00 --12-14:00 true\n             aaaa FFFF http://example.com/ localName An xs:string normalizedString token language\n             NMTOKEN Name NCName ID IDREF ENTITY")
     );
   }
 

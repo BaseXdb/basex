@@ -7,7 +7,7 @@ import org.junit.*;
 /**
  * URI tests.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Dimitar Popov
  */
 public class UriTest {

@@ -11,7 +11,7 @@ import org.basex.core.parse.Commands.CmdAlter;
 /**
  * Evaluates the 'alter database' command and renames a database.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class AlterDB extends ACreate {

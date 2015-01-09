@@ -6,7 +6,7 @@ import org.basex.tests.qt3ts.*;
 /**
  * Tests features of XSD 1.1 floats.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
 @SuppressWarnings("all")

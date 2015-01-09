@@ -8,7 +8,7 @@ import org.junit.*;
 /**
  * Test index updates when using disk storage ({@link DiskData}).
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Dimitar Popov
  */
 public final class DiskDataTest extends MemDataTest {

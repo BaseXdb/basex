@@ -12,7 +12,7 @@ import net.xqj.basex.*;
  *
  * Part 1: An XQJ Introduction.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  */
 public final class Part1 extends Main {
   /**

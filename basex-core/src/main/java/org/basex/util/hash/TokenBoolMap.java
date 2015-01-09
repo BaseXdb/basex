@@ -7,7 +7,7 @@ import org.basex.util.*;
 /**
  * This is an efficient and memory-saving hash map for storing tokens and booleans.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class TokenBoolMap extends TokenSet {

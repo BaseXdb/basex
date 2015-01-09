@@ -5,7 +5,7 @@ import org.basex.query.func.*;
 /**
  * Admin function.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 abstract class AdminFn extends StandardFunc {

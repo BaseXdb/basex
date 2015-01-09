@@ -25,7 +25,7 @@ import org.junit.Test;
 /**
  * This class tests the client/server query API.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public abstract class SessionTest extends SandboxTest {

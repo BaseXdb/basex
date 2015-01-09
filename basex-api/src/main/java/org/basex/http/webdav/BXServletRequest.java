@@ -23,7 +23,7 @@ import com.bradmcevoy.http.Cookie;
  * the source is integrated into BaseX.
  *
  * @author Milton Development Team
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
@@ -222,7 +222,7 @@ final class BXServletRequest extends AbstractRequest {
  * the few classes which is needed from that library, the source is integrated
  * into BaseX.
  * @author Milton Development Team
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */

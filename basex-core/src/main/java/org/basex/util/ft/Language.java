@@ -10,7 +10,7 @@ import org.basex.core.*;
  * As specified by W3C, the values of the attribute are language identifiers as
  * defined by IETF BCP 47, Tags for the Identification of Languages.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Dimitar Popov
  * @author Jens Erat
  *

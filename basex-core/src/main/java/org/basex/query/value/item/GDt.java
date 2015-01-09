@@ -14,7 +14,7 @@ import org.basex.util.*;
  * Simple date item, used for {@code xs:gYearMonth}, {@code xs:gYear},
  * {@code xs:gMonthDay}, {@code xs:gDay} and {@code xs:gMonth}.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class GDt extends ADate {

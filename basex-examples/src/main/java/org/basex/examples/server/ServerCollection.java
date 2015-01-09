@@ -12,7 +12,7 @@ import org.basex.examples.local.*;
  * It shows how to add and modify files.
  * For further options see {@link QueryCollection}.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  */
 public final class ServerCollection {
   /**

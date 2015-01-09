@@ -7,7 +7,7 @@ import org.basex.query.util.*;
 /**
  * Functions on EXPath packages.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Rositsa Shadura
  */
 abstract class RepoFn extends StandardFunc {

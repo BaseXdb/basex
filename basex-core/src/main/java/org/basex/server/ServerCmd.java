@@ -3,7 +3,7 @@ package org.basex.server;
 /**
  * This class defines the available command-line commands.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public enum ServerCmd {

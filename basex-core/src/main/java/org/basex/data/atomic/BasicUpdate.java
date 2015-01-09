@@ -6,7 +6,7 @@ import org.basex.data.*;
  * Abstract atomic update.
  * Atomic updates can only be initialized via {@link AtomicUpdateCache}.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Lukas Kircher
  */
 public abstract class BasicUpdate {

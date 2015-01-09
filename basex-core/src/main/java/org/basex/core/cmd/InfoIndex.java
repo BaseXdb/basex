@@ -18,7 +18,7 @@ import org.basex.util.*;
  * Evaluates the 'info index' command and returns information on the indexes
  * of the currently opened database.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class InfoIndex extends AInfo {

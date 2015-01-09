@@ -15,7 +15,7 @@ import org.basex.util.*;
 /**
  * This class organizes all known events.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  * @author Roman Raedle
  * @author Andreas Weiler

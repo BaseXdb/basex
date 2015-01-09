@@ -10,7 +10,7 @@ import org.basex.util.*;
  * after all updates on the database have been made effective in the order of the
  * {@link UpdateType}. Hence, changes made during a snapshot will be reflected by this task.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Lukas Kircher
  */
 public abstract class DBUpdate extends DataUpdate implements Comparable<DBUpdate> {

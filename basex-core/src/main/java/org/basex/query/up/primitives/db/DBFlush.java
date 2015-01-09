@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * Update primitive for the {@link Function#_DB_FLUSH} function.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class DBFlush extends DBUpdate {

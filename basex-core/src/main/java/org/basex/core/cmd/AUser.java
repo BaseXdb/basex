@@ -9,7 +9,7 @@ import org.basex.core.users.*;
 /**
  * Abstract class for user commands.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 abstract class AUser extends Command {

@@ -16,7 +16,7 @@ import org.basex.util.hash.*;
 /**
  * This class encrypts and decrypts textual inputs.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Lukas Kircher
  */
 final class Encryption {

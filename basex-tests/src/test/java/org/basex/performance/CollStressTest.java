@@ -9,7 +9,7 @@ import org.junit.Test;
 /**
  * This class adds and retrieves documents in a collection.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class CollStressTest extends SandboxTest {

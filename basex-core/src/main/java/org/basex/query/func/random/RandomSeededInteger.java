@@ -12,7 +12,7 @@ import org.basex.query.value.item.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Dirk Kirsten
  */
 public final class RandomSeededInteger extends StandardFunc {

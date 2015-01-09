@@ -11,7 +11,7 @@ import org.basex.server.*;
  * This class defines all methods for iteratively evaluating queries locally.
  * All data is interpreted by the {@link ServerQuery}.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public class LocalQuery extends Query {

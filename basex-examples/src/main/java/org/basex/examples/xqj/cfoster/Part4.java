@@ -17,7 +17,7 @@ import org.w3c.dom.*;
  *
  * Part 4: XDM Model within XQJ.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  */
 public final class Part4 extends Main {
   /**

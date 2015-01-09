@@ -11,7 +11,7 @@ import org.junit.*;
 /**
  * This class tests the functions of the Repository Module.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Rositsa Shadura
  */
 public final class RepoModuleTest extends AdvancedQueryTest {

@@ -8,7 +8,7 @@ import org.basex.util.list.*;
  *
  * NOTE: this class is not thread-safe.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  * @author Wolfgang Kronberg
  */

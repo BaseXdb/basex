@@ -6,7 +6,7 @@ import java.awt.*;
  * This LayoutManager is similar to the GridLayout. The added components
  * keep their minimum size even when the parent container is resized.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class TableLayout implements LayoutManager {

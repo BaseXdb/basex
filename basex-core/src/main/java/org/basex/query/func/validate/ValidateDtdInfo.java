@@ -31,7 +31,7 @@ import org.xml.sax.*;
  *  file containing the document type definitions. </li>
  *  </ul>
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public class ValidateDtdInfo extends ValidateFn {

@@ -15,7 +15,7 @@ import org.basex.io.out.*;
  *
  * <p>The class is implemented by the {@link ClientSession} and {@link LocalSession} classes.</p>
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public abstract class Session implements AutoCloseable {

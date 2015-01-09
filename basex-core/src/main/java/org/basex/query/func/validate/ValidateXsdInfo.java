@@ -38,7 +38,7 @@ import org.xml.sax.*;
  *  file containing the schema definitions. </li>
  * </ul>
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public class ValidateXsdInfo extends ValidateFn {

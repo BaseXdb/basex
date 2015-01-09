@@ -14,7 +14,7 @@ import org.basex.util.list.*;
 /**
  * Dialog with a single text field.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 final class DialogInput extends BaseXDialog {

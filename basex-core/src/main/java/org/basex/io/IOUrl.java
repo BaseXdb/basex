@@ -15,7 +15,7 @@ import org.xml.sax.*;
 /**
  * {@link IO} reference, representing a URL.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class IOUrl extends IO {

@@ -17,7 +17,7 @@ import org.xmldb.api.modules.*;
 /**
  * Abstract QueryService definition for the XMLDB:API.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 final class BXQueryService implements XPathQueryService, BXXMLDBText {
