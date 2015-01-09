@@ -1,5 +1,6 @@
 package org.basex.query.expr;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
@@ -54,28 +55,20 @@ public final class Range extends Arr {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final long[] v = range(qc);
-    return v == null ? Empty.SEQ : RangeSeq.get(v[0], v[1] - v[0] + 1, true);
+    final Item it1 = exprs[0].atomItem(qc, info);
+    if(it1 == null) return Empty.SEQ;
+    final Item it2 = exprs[1].atomItem(qc, info);
+    if(it2 == null) return Empty.SEQ;
+    final long s = toLong(it1), e = toLong(it2);
+    if(s > e) return Empty.SEQ;
+    final long n = e - s + 1;
+    if(n > 0) return RangeSeq.get(s, n, true);
+    throw RANGE_X.get(info, e);
   }
 
   @Override
   public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
     return new Range(info, exprs[0].copy(qc, scp, vs), exprs[1].copy(qc, scp, vs));
-  }
-
-  /**
-   * Returns the start and end value of the range operator or {@code null}
-   * if the range could not be evaluated.
-   * @param qc query context
-   * @return value array
-   * @throws QueryException query exception
-   */
-  private long[] range(final QueryContext qc) throws QueryException {
-    final Item it1 = exprs[0].atomItem(qc, info);
-    if(it1 == null) return null;
-    final Item it2 = exprs[1].atomItem(qc, info);
-    if(it2 == null) return null;
-    return new long[] { toLong(it1), toLong(it2) };
   }
 
   @Override

@@ -176,6 +176,8 @@ public final class SimpleTest extends QueryTest {
       { "Limits 8", "-9223372036854775808 idiv -1" },
       { "Limits 9", "-9223372036854775807 - 1024" },
       { "Limits 10", "-9223372036854775808 - 1" },
+      { "Limits 11", "0 to 9223372036854775807" },
+      { "Limits 11", "-9223372036854775807 to 9223372036854775807" },
 
       { "Empty 1", strings(""), "format-integer(let $x := random:integer() return (), '0')" },
       { "Empty 2", empty(), "math:sin(let $x := random:integer() return ())" },
