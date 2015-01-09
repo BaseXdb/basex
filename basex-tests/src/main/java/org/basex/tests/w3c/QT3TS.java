@@ -1,7 +1,7 @@
 package org.basex.tests.w3c;
 
 import static org.basex.tests.w3c.QT3Constants.*;
-import static org.basex.util.Prop.*;
+import static org.basex.util.Prop.NL;
 import static org.basex.util.Token.*;
 
 import java.io.*;
@@ -336,7 +336,7 @@ public final class QT3TS extends Main {
         }
         // bind resources
         for(final HashMap<String, String> src : env.resources) {
-          query.addResource(src.get(URI), file(base, src.get(FILE)), src.get(Prop.ENCODING));
+          query.addResource(src.get(URI), file(base, src.get(FILE)), src.get(ENCODING));
         }
         // bind collections
         query.addCollection(env.collURI, env.collSources.toArray());
