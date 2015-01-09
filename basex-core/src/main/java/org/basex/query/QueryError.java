@@ -876,8 +876,6 @@ public enum QueryError {
   /** XPST0003. */
   UPDATINGVAR(XPST, 3, "Variable cannot be updating."),
   /** XPST0003. */
-  NSNOTALL(XPST, 3, "Namespace axis is not available in XQuery."),
-  /** XPST0003. */
   SIMPLETYPE_X(XPST, 3, "Simple type expected, '%(' found."),
   /** XPST0003. */
   KEYSPEC(XPST, 3, "Expecting specifier after '?'."),
@@ -1152,6 +1150,8 @@ public enum QueryError {
   DECLOPTION_X(XQST, 123, "Unknown option: %."),
   /** XQST0125. */
   INVISIBLE(XQST, 125, "No visibility annotation allowed in inline function."),
+  /** XQST034. */
+  NSAXIS(XQST, 134, "Namespace axis is not supported."),
 
   /** XQTY0024. */
   NOATTALL(XQTY, 24, "Attribute must follow the root element."),

@@ -1910,7 +1910,7 @@ public class QueryParser extends InputParser {
       if(axis == null) {
         axis = Axis.CHILD;
         test = nodeTest(false, true);
-        if(test == Test.NSP) throw error(NSNOTALL);
+        if(test == Test.NSP) throw error(NSAXIS);
         if(test != null && test.type == NodeType.ATT) axis = Axis.ATTR;
         checkTest(test, axis == Axis.ATTR);
       }
