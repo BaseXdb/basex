@@ -81,7 +81,7 @@ public final class User {
     // parse local permissions
     for(final ANode database : children(user, DATABASE)) {
       final String nm = string(attribute(name, database, PATTERN));
-      final Perm prm = attribute(name, user, PERMISSION, Perm.values());
+      final Perm prm = attribute(name, database, PERMISSION, Perm.values());
       locals.put(nm, prm);
     }
   }
