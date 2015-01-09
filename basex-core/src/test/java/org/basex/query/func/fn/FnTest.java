@@ -57,6 +57,9 @@ public final class FnTest extends AdvancedQueryTest {
     query("sum(1 to 3037000499)", "4611686016981624750");
     query("sum(1 to 3037000500)", "4611686020018625250");
     query("sum(1 to 4294967295)", "9223372034707292160");
+    query("sum(2 to 10)", "54");
+    query("sum(9 to 10)", "19");
+    query("sum(-3037000500 to 3037000500)", "0");
     query("sum((), ())", "");
     error("sum(1, 'x')", SUM_X_X);
     error("sum((), (1,2))", SEQFOUND_X);

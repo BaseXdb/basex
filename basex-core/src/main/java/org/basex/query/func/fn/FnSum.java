@@ -25,12 +25,17 @@ public final class FnSum extends Aggr {
     // partial sum calculation (Little Gauss)
     if(exprs[0] instanceof RangeSeq) {
       final RangeSeq rs = (RangeSeq) exprs[0];
-      final long s = rs.start();
-      if(s == 0 || s == 1) {
-        final long n = rs.size();
-        return Int.get(n < 3037000500L ? n * (n + 1) / 2 : BigInteger.valueOf(n).multiply(
-            BigInteger.valueOf(n + 1)).divide(BigInteger.valueOf(2)).longValue());
-      }
+      final long s = rs.start(), e = s + rs.size() - 1;
+      // range is small enough to be computed with long values
+      if(e < 3037000500L) return Int.get((s + e) * (e - s + 1) / 2);
+      // compute larger ranges
+      final BigInteger bs = BigInteger.valueOf(s), be = BigInteger.valueOf(e);
+      final BigInteger bi = bs.add(be).multiply(be.subtract(bs).add(BigInteger.ONE)).
+          divide(BigInteger.valueOf(2));
+      final long l = bi.longValue();
+      // check if result is small enough to be represented as long value
+      if(bi.equals(BigInteger.valueOf(l))) return Int.get(l);
+      throw RANGE_X.get(ii, bi);
     }
 
     final Iter iter = exprs[0].atomIter(qc, ii);
