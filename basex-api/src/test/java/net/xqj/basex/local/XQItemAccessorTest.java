@@ -15,6 +15,7 @@ import org.w3c.dom.*;
  *
  * @author Charles Foster
  */
+@Ignore
 public final class XQItemAccessorTest extends XQJBaseTest {
   // --------------------------------------------------------------------------
   // Atomic Tests
