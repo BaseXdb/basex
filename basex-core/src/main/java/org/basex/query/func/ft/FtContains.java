@@ -21,22 +21,31 @@ public final class FtContains extends FtAccess {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Value input = qc.value(exprs[0]);
     final Value query = qc.value(exprs[1]);
-    final FtOptions opts = toOptions(2, Q_OPTIONS, new FtOptions(), qc);
+    final FtContainsOptions opts = toOptions(2, Q_OPTIONS, new FtContainsOptions(), qc);
 
-    final FTOpt opt = new FTOpt();
+    final FTOpt tmp = qc.ftOpt();
+    final FTOpt opt = new FTOpt().copy(tmp);
     final FTMode mode = opts.get(FtIndexOptions.MODE);
     opt.set(FZ, opts.get(FtIndexOptions.FUZZY));
     opt.set(WC, opts.get(FtIndexOptions.WILDCARDS));
-    opt.set(DC, opts.get(FtOptions.DIACRITICS) == FTDiacritics.SENSITIVE);
-    opt.set(ST, opts.get(FtOptions.STEMMING));
-    opt.ln = Language.get(opts.get(FtOptions.LANGUAGE));
-    opt.cs = opts.get(FtOptions.CASE);
     if(opt.is(FZ) && opt.is(WC)) throw BXFT_MATCH.get(info, this);
 
-    final FTOpt tmp = qc.ftOpt();
+    final FTDiacritics dc = opts.get(FtContainsOptions.DIACRITICS);
+    if(dc != null) opt.set(DC, dc == FTDiacritics.SENSITIVE);
+    final Boolean st = opts.get(FtContainsOptions.STEMMING);
+    if(st != null) opt.set(ST, st);
+    final String ln = opts.get(FtContainsOptions.LANGUAGE);
+    if(ln != null) opt.ln = Language.get(ln);
+    final FTCase cs = opts.get(FtContainsOptions.CASE);
+    if(cs != null) opt.cs = cs;
+
     qc.ftOpt(opt);
-    final FTExpr fte = new FTWords(info, query, mode, null).compile(qc, null);
-    qc.ftOpt(tmp);
+    final FTExpr fte;
+    try {
+      fte = new FTWords(info, query, mode, null).compile(qc, null);
+    } finally {
+      qc.ftOpt(tmp);
+    }
     return new FTContains(input, options(fte, opts), info).item(qc, info);
   }
 }

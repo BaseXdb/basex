@@ -938,7 +938,7 @@ public enum Function {
   _FT_TOKENS(FtTokens.class, "tokens(database[,prefix])", arg(STR, STR), ITEM_ZM, flag(NDT),
       FT_URI),
   /** XQuery function. */
-  _FT_TOKENIZE(FtTokenize.class, "tokenize(string)", arg(STR), STR_ZM, FT_URI),
+  _FT_TOKENIZE(FtTokenize.class, "tokenize(string[,options])", arg(STR, ITEM), STR_ZM, FT_URI),
 
   /* Hash Module. */
 

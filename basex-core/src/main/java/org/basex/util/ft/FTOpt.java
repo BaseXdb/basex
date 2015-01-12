@@ -33,7 +33,7 @@ public final class FTOpt extends ExprInfo {
   public Language ln;
 
   /**
-   * Initializes the full-text options, inheriting the options of the argument.
+   * Adopts the options of the specified argument.
    * @param opt parent full-text options
    * @return self reference
    */

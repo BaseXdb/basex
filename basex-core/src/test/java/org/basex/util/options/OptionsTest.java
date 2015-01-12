@@ -40,7 +40,7 @@ public final class OptionsTest extends SandboxTest {
     new TextOptions();
     new ArchOptions();
     new FtIndexOptions();
-    new FtOptions();
+    new FtContainsOptions();
     new XQueryOptions();
     new BaseXCollationOptions();
     new FTDistanceOptions();

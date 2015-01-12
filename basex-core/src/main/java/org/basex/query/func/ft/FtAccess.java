@@ -21,7 +21,7 @@ abstract class FtAccess extends StandardFunc {
    * @param opts full-text options
    * @return expressions
    */
-  final FTExpr options(final FTExpr ftexpr, final FtOptions opts) {
+  final FTExpr options(final FTExpr ftexpr, final FtIndexOptions opts) {
     FTExpr fte = ftexpr;
     if(opts != null) {
       if(opts.get(FtIndexOptions.ORDERED)) {

@@ -25,7 +25,7 @@ public final class FtSearch extends FtAccess {
   public Iter iter(final QueryContext qc) throws QueryException {
     final Data data = checkData(qc);
     final Value terms = qc.value(exprs[1]);
-    final FtOptions opts = toOptions(2, Q_OPTIONS, new FtOptions(), qc);
+    final FtIndexOptions opts = toOptions(2, Q_OPTIONS, new FtIndexOptions(), qc);
 
     final IndexContext ic = new IndexContext(data, false);
     if(!data.meta.ftxtindex) throw BXDB_INDEX_X.get(info, data.meta.name,
