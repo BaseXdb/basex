@@ -81,6 +81,19 @@ public abstract class SimpleMap extends Arr {
   }
 
   @Override
+  public VarUsage count(final Var var) {
+    final VarUsage left = exprs[0].count(var);
+    final long expr0 = exprs[0].size();
+    return left == VarUsage.MORE_THAN_ONCE || expr0 == 0 ? left :
+      left.plus(exprs[1].count(var).times(expr0));
+  }
+
+  @Override
+  public boolean removable(final Var var) {
+    return exprs[0].removable(var) && !exprs[1].uses(var);
+  }
+
+  @Override
   public final String toString() {
     final StringBuilder sb = new StringBuilder().append('(');
     for(final Expr s : exprs) {

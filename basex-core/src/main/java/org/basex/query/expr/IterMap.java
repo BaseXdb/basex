@@ -69,18 +69,6 @@ final class IterMap extends SimpleMap {
   }
 
   @Override
-  public VarUsage count(final Var var) {
-    final VarUsage left = exprs[0].count(var);
-    return left == VarUsage.MORE_THAN_ONCE || exprs[0].size() == 0 ? left :
-      left.plus(exprs[1].count(var).times(exprs[0].size()));
-  }
-
-  @Override
-  public boolean removable(final Var var) {
-    return exprs[0].removable(var) && !exprs[1].uses(var);
-  }
-
-  @Override
   public IterMap copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
     return copyType(new IterMap(info, Arr.copyAll(qc, scp, vs, exprs)));
   }
