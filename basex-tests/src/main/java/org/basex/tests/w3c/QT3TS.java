@@ -129,7 +129,7 @@ public final class QT3TS extends Main {
     final XdmValue doc = new XQuery("doc('" + file(false, CATALOG) + "')", ctx).value();
     final String version = asString("*:catalog/@version", doc);
     Util.outln(NL + "QT3 Test Suite " + version);
-    Util.outln("Test directory: " + new File(".").getCanonicalPath());
+    Util.outln("Test directory: " + file(false, "."));
     Util.out("Parsing queries");
 
     for(final XdmItem ienv : new XQuery("*:catalog/*:environment", ctx).context(doc))
