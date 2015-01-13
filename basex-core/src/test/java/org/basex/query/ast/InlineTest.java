@@ -57,4 +57,17 @@ public final class InlineTest extends QueryPlanTest {
         "empty(//GFLWOR)",
         "empty(//Var)");
   }
+
+  /** Checks that the simple map operator prohibits inlining a context item into its RHS. */
+  @Test public void gh1055() {
+    check("let $d := for-each(1 to 100, function($a) { $a }) "
+        + "return count((1 to 2) ! $d)",
+        "200",
+        "exists(//Let)");
+
+    check("for $x in (<x/>, <x/>) where (1, 2) ! $x return $x",
+        String.format("<x/>%n<x/>"),
+        "exists(//IterMap)",
+        "empty(//Context)");
+  }
 }
