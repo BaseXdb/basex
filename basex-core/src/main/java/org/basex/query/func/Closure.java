@@ -33,9 +33,9 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   /** Arguments. */
   private final Var[] args;
   /** Return type. */
-  private final SeqType ret;
+  private SeqType ret;
   /** Annotations. */
-  private final Ann ann;
+  private Ann ann;
   /** Updating flag. */
   private final boolean updating;
 
@@ -437,5 +437,43 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
    */
   public Iterator<Entry<Var, Expr>> nonLocalBindings() {
     return nonLocal.entrySet().iterator();
+  }
+
+  /**
+   * Fixes the function type of this closure after it was generated for a function literal during
+   * parsing.
+   * @param ft function type
+   */
+  public void adoptSignature(final FuncType ft) {
+    ann = ft.ann;
+    for(int i = 0; i < args.length; i++) {
+      final Var v = args[i];
+      v.declType = ft.argTypes[i];
+    }
+    if(ft.retType != null && !ft.retType.eq(SeqType.ITEM_ZM)) ret = ft.retType;
+  }
+
+  /**
+   * Creates a function literal for a function that was not yet encountered while parsing.
+   * @param name function name
+   * @param arity function arity
+   * @param qc query context
+   * @param sc static context
+   * @param ii input info
+   * @return function literal
+   * @throws QueryException query exception
+   */
+  public static Closure unknownLit(final QNm name, final int arity, final QueryContext qc,
+      final StaticContext sc, final InputInfo ii) throws QueryException {
+
+    final VarScope scp = new VarScope(sc);
+    final Var[] arg = new Var[arity];
+    final Expr[] refs = new Expr[arity];
+    for(int a = 0; a < arity; a++) {
+      arg[a] = scp.newLocal(qc, new QNm(QueryText.ARG + (a + 1), ""), SeqType.ITEM_ZM, true);
+      refs[a] = new VarRef(ii, arg[a]);
+    }
+    final TypedFunc call = qc.funcs.getFuncRef(name, refs, sc, ii);
+    return new Closure(ii, name, SeqType.ITEM_ZM, arg, call.fun, null, null, sc, scp);
   }
 }

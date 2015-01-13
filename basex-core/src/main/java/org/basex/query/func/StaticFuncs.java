@@ -73,7 +73,7 @@ public final class StaticFuncs extends ExprInfo {
    * @param args optional arguments
    * @param sc static context
    * @param ii input info
-   * @return reference if the function is known, {@code false} otherwise
+   * @return reference if the function is known, {@code null} otherwise
    * @throws QueryException query exception
    */
   TypedFunc getRef(final QNm name, final Expr[] args, final StaticContext sc,
@@ -103,6 +103,20 @@ public final class StaticFuncs extends ExprInfo {
     final byte[] sig = sig(name, args.length);
     if(!funcs.contains(sig)) funcs.put(sig, new FuncCache(null));
     return getRef(name, args, sc, ii);
+  }
+
+  /**
+   * Registers a literal for a function that was not yet encountered during parsing.
+   * @param lit the literal
+   */
+  public void registerFuncLit(final Closure lit) {
+    final byte[] sig = sig(lit.funcName(), lit.arity());
+    FuncCache cache = funcs.get(sig);
+    if(cache == null) {
+      cache = new FuncCache(null);
+      funcs.put(sig, cache);
+    }
+    cache.lits.add(lit);
   }
 
   /**
@@ -260,6 +274,8 @@ public final class StaticFuncs extends ExprInfo {
   private static class FuncCache {
     /** Function calls. */
     final ArrayList<StaticFuncCall> calls = new ArrayList<>(0);
+    /** Function literals. */
+    final ArrayList<Closure> lits = new ArrayList<>(0);
     /** Function. */
     StaticFunc func;
 
@@ -280,6 +296,8 @@ public final class StaticFuncs extends ExprInfo {
       if(func != null) throw FUNCDEFINED_X.get(fn.info, fn.name.string());
       func = fn;
       for(final StaticFuncCall call : calls) call.init(fn);
+      final FuncType ft = fn.funcType();
+      for(final Closure lit : lits) lit.adoptSignature(ft);
     }
 
     /**
