@@ -1,6 +1,8 @@
 package org.basex.query.ast;
 
 import org.basex.query.expr.*;
+import org.basex.query.value.item.*;
+import org.basex.util.*;
 import org.junit.*;
 
 /**
@@ -56,6 +58,27 @@ public final class InlineTest extends QueryPlanTest {
         "true",
         "empty(//GFLWOR)",
         "empty(//Var)");
+  }
+
+  /** Checks if forward-referencing function literals are inlined. */
+  @Test public void gh1052() {
+    check("declare function local:a() { local:b#1(42) };"
+        + "declare function local:b($a) { $a };"
+        + "local:a()",
+        "42",
+        "exists(/*/" + Util.className(Int.class) + "[@value = '42'])");
+
+    check("declare function local:a() { local:b(?)(42) };"
+        + "declare function local:b($a) { $a };"
+        + "local:a()",
+        "42",
+        "exists(/*/" + Util.className(Int.class) + "[@value = '42'])");
+
+    check("declare function local:a() { local:b#1(?)(42) };"
+        + "declare function local:b($a) { $a };"
+        + "local:a()",
+        "42",
+        "exists(/*/" + Util.className(Int.class) + "[@value = '42'])");
   }
 
   /** Checks that the simple map operator prohibits inlining a context item into its RHS. */
