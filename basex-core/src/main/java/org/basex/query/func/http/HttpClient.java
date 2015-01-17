@@ -161,17 +161,75 @@ public final class HttpClient {
    * @param conn HTTP connection
    * @param r request data
    * @throws QueryException query exception
+   * @throws IOException
    */
-  private void setRequestHeaders(final HttpURLConnection conn, final HttpRequest r)
-      throws QueryException {
+  private void setRequestHeaders(HttpURLConnection conn, final HttpRequest r)
+      throws QueryException, IOException {
 
     for(final byte[] headers : r.headers)
       conn.addRequestProperty(string(headers), string(r.headers.get(headers)));
-    // HTTP Basic Authentication
+
     final byte[] sendAuth = r.attrs.get(SEND_AUTHORIZATION);
-    if(sendAuth != null && Bln.parse(sendAuth, info))
+    final byte[] am = r.attrs.get(AUTH_METHOD);
+    System.out.println(string(am));
+    if(!string(am).equals(null) && string(am).equals(BASIC)) {
+   // HTTP Basic Authentication
+      if(sendAuth != null && Bln.parse(sendAuth, info))
       conn.setRequestProperty(AUTHORIZATION,
       encodeCredentials(string(r.attrs.get(USERNAME)), string(r.attrs.get(PASSWORD))));
+  } else if(!string(am).equals(null) && string(am).equals(DIGEST)) {
+   // HTTP Digest Authentication
+      if(sendAuth != null && Bln.parse(sendAuth, info))
+      //try {
+        conn.setRequestProperty(AUTHORIZATION, DIGEST);
+        String sr = conn.getHeaderField(WWW_AUTHENTICATE);
+        System.out.println(sr);
+        HashMap<String, String> headerValues = parseHeader(sr);
+        String realm = headerValues.get("realm");
+        String nonce = headerValues.get("nonce");
+        String qop = headerValues.get("qop");
+
+     // Client request
+        String username = string(r.attrs.get(USERNAME));
+        String password = string(r.attrs.get(PASSWORD));
+        String cnonce = "0a4f113b";
+        String nc = "00000001";
+        String uri = "/uri";
+        String ha1 = Strings.md5(username + ":" + realm + ":" + password);
+        String ha2 = Strings.md5("GET:" + uri);
+        String response = Strings.md5(ha1 + ":" + nonce + ":" + nc + ":" + cnonce + ":" + qop + ":" + ha2);
+
+        String creds = "username=" + username + ", " + "realm=" + realm + ", " + "nonce=" + nonce
+            + ", " + "uri=" + uri + ", " + "qop=" + qop + ", " + "nc=" + nc + ", " + "cnonce=" + cnonce
+            + ", " + "response=" + response;
+
+        conn = openConnection(string(r.attrs.get(HREF)));
+        conn.setAllowUserInteraction(true);
+        System.out.println(creds);
+        conn.setRequestProperty(AUTHORIZATION, DIGEST + ' ' + creds);
+  } else {
+    System.out.println("Specify Authentication");
+  }
+    }
+
+  /**
+   * Parses Authentication Header.
+   * @param headerString response header
+   * @return headerValues
+   */
+  private static HashMap<String, String> parseHeader(final String headerString) {
+
+    String headerStringWithoutScheme = headerString.substring(headerString.indexOf(" ") + 1).trim();
+    HashMap<String, String> values = new HashMap<>();
+    String[] keyValueArray = headerStringWithoutScheme.split(",");
+    for(String keyval : keyValueArray) {
+      if(keyval.contains("=")) {
+        String key = keyval.substring(0, keyval.indexOf("="));
+        String value = keyval.substring(keyval.indexOf("=") + 1);
+        values.put(key.trim(), value.replaceAll("\"", "").trim());
+      }
+    }
+    return values;
   }
 
   /**

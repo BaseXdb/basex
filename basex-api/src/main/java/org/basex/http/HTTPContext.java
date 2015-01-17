@@ -106,6 +106,7 @@ public final class HTTPContext {
    */
   void authorize() throws BaseXException {
     final String value = req.getHeader(AUTHORIZATION);
+    System.out.println(value);
     if(value != null) {
       final String meth = Strings.split(value, ' ', 2)[0];
       final AuthMethod am = StaticOptions.AUTHMETHOD.get(meth);
@@ -311,6 +312,7 @@ public final class HTTPContext {
           sresponse.append(':' + map.get(NC) + ':' + map.get(CNONCE) + ':' + qop);
         }
         sresponse.append(':' + ha2);
+        System.out.println(Strings.md5(sresponse.toString())+ ' '+password);
         if(!Strings.md5(sresponse.toString()).equals(password)) throw new LoginException();
       }
 

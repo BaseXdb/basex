@@ -14,8 +14,12 @@ import org.basex.query.value.item.*;
 public interface HttpText {
   /** HTTP header: Authorization. */
   String AUTHORIZATION = "Authorization";
+  /** WWW-Authentication string. */
+  String WWW_AUTHENTICATE = "WWW-Authenticate";
   /** HTTP basic authentication. */
   String BASIC = "Basic";
+  /** HTTP Digest authentication. */
+  String DIGEST = "Digest";
 
   /** Content-Disposition. */
   byte[] CONTENT_DISPOSITION = token("Content-Disposition");
@@ -47,7 +51,8 @@ public interface HttpText {
   byte[] PASSWORD = token("password");
   /** Request attribute: send-authorization. */
   byte[] SEND_AUTHORIZATION = token("send-authorization");
-
+  /** Request attribute: auth-method. */
+  byte[] AUTH_METHOD = token("auth-method");
   /** Request attribute: href. */
   byte[] HREF = token("href");
   /** Request attribute: status-only. */
