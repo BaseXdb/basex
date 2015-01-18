@@ -236,10 +236,10 @@ public enum Calc {
 
   /**
    * Constructor.
-   * @param n name
+   * @param name name
    */
-  Calc(final String n) {
-    name = n;
+  Calc(final String name) {
+    this.name = name;
   }
 
   /**

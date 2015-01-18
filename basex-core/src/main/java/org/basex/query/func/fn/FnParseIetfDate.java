@@ -18,8 +18,8 @@ import org.basex.util.*;
 public final class FnParseIetfDate extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final DateParser parser = new DateParser(toEmptyToken(exprs[0], qc), info);
-    return parser.parse();
+    final Item it = exprs[0].atomItem(qc, info);
+    return it == null ? null : new DateParser(toToken(it), info).parse();
   }
 
   /** Date parser. */
@@ -60,7 +60,7 @@ public final class FnParseIetfDate extends StandardFunc {
     /** Seconds. */
     private BigDecimal seconds = BigDecimal.ZERO;
     /** Timezone. */
-    private int zone;
+    private Integer zone;
 
     /**
      * Constructor.
@@ -91,18 +91,18 @@ public final class FnParseIetfDate extends StandardFunc {
       if(seconds.scale() > 0) {
         tb.add(seconds.subtract(BigDecimal.valueOf(sec)).toString().substring(1));
       }
-      if(zone != 0) {
-        tb.add(zone < 0 ? '-' : '+');
-        addNumber(tb, Math.abs(zone / 60), 2).add(':');
-        addNumber(tb, Math.abs(zone % 60), 2);
+      final int z = zone == null ? 0 : zone;
+      if(z != 0) {
+        tb.add(z < 0 ? '-' : '+');
+        addNumber(tb, Math.abs(z / 60), 2).add(':');
+        addNumber(tb, Math.abs(z % 60), 2);
       } else {
         tb.add('Z');
       }
       try {
         return new Dtm(tb.finish(), info);
       } catch(final QueryException ex) {
-        //throw Err.IETF_INIT_X.get(info, original);
-        throw QueryError.IETF_INIT_X.get(info, ex);
+        throw QueryError.IETF_INV_X.get(info, original);
       }
     }
 
@@ -112,9 +112,15 @@ public final class FnParseIetfDate extends StandardFunc {
      */
     private void input() throws QueryException {
       skipWs();
-      for(final String d : DAYS) if(consume(d)) break;
+      boolean f = false;
+      for(final String d : DAYS) {
+        if(consume(d)) {
+          f = true;
+          break;
+        }
+      }
       consume(',');
-      skipWs();
+      if(f && !skipWs()) throw error("whitespace");
       if(datespec()) {
         if(!skipWs()) throw error("whitespace");
         if(!time()) throw error("time");
@@ -270,12 +276,15 @@ public final class FnParseIetfDate extends StandardFunc {
     private boolean timezone() throws QueryException {
       if(tzname()) return true;
       if(!tzoffset()) return false;
+      final int ip = pos;
       skipWs();
       if(consume('(')) {
         skipWs();
         if(!tzname()) throw error("timezone");
         skipWs();
         if(!consume(')')) throw error("')'");
+      } else {
+        pos = ip;
       }
       return true;
     }
@@ -289,7 +298,7 @@ public final class FnParseIetfDate extends StandardFunc {
       int t = -1;
       while(++t < tl && !consume(TZNAMES[t]));
       if(t == tl) return false;
-      zone = TIMES[t];
+      if(zone == null) zone = TIMES[t];
       return true;
     }
 

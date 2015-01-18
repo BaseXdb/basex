@@ -49,6 +49,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Definitions of all built-in XQuery functions.
@@ -1225,16 +1226,15 @@ public enum Function {
   _ZIP_UPDATE_ENTRIES(ZipUpdateEntries.class, "update-entries(zip,output)",
       arg(ELM, STR), EMP, flag(NDT), ZIP_URI);
 
-  /**
-   * Mapping between function classes and namespace URIs.
-   * If no mapping exists, {@link QueryText#FN_URI} will be assumed as default mapping.
-   */
-  public static final HashMap<Class<? extends StandardFunc>, byte[]> URIS = new HashMap<>();
+  /** Pre-defined modules. */
+  public static final TokenSet URIS = new TokenSet();
 
   // initialization of class/uri mappings
   static {
     for(final Function f : values()) {
-      if(f.uri != null) URIS.put(f.func, f.uri);
+      final byte[] u = f.uri;
+      if(u != null) continue;
+      URIS.add(u);
     }
   }
 
@@ -1301,7 +1301,7 @@ public enum Function {
    */
   Function(final Class<? extends StandardFunc> clz, final String dsc, final SeqType[] typ,
       final SeqType rtn, final EnumSet<Flag> flg) {
-    this(clz, dsc, typ, rtn, flg, null);
+    this(clz, dsc, typ, rtn, flg, FN_URI);
   }
 
   /**
@@ -1355,8 +1355,7 @@ public enum Function {
    * @return function
    */
   final byte[] uri() {
-    final byte[] u = URIS.get(func);
-    return u == null ? FN_URI : u;
+    return uri;
   }
 
   /**

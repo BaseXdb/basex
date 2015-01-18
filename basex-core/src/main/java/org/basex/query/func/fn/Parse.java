@@ -11,6 +11,7 @@ import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
+import org.basex.query.QueryError.ErrType;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
@@ -46,7 +47,9 @@ public abstract class Parse extends StandardFunc {
       if(!Uri.uri(p).isValid()) throw INVURL_X.get(info, p);
 
       IO io = base.merge(p);
-      final String[] rp = qc.resources.texts.get(io.path());
+      String[] rp = qc.resources.texts.get(p);
+      if(rp == null) rp = qc.resources.texts.get(io.path());
+
       if(rp != null && rp.length > 0) {
         io = IO.get(rp[0]);
         if(rp.length > 1) enc = rp[1];

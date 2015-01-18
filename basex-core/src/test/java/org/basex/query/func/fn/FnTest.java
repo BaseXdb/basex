@@ -101,7 +101,7 @@ public final class FnTest extends AdvancedQueryTest {
     error("parse-ietf-date('Wed, 99 Jun 94 07:29:35 0500')", IETF_PARSE_X_X_X);
     error("parse-ietf-date('Wed, 99 Jun 94 07:29:35 +5')", IETF_PARSE_X_X_X);
     error("parse-ietf-date('Wed, 99 Jun 94 07:29:35 -050')", IETF_PARSE_X_X_X);
-    error("parse-ietf-date('Wed, 99 Jun 94 07:29:35 +0500')", IETF_INIT_X);
+    error("parse-ietf-date('Wed, 99 Jun 94 07:29:35 +0500')", IETF_INV_X);
   }
 
   /** Tests for the {@code sort} function. */

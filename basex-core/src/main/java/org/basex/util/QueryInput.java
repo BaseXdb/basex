@@ -21,21 +21,21 @@ public final class QueryInput {
 
   /**
    * Constructor.
-   * @param in input path
+   * @param original original input
    */
-  public QueryInput(final String in) {
-    original = in;
-    input = IO.get(in);
+  public QueryInput(final String original) {
+    this.original = original;
+    input = IO.get(original);
 
     // checks if the specified input reference is a valid database name
-    if(Databases.validName(in)) {
-      db = in;
+    if(Databases.validName(original)) {
+      db = original;
     } else {
-      final int s = in.indexOf('/');
-      if(s > 0 && in.indexOf(':') == -1) {
-        final String n = in.substring(0, s);
+      final int s = original.indexOf('/');
+      if(s > 0 && original.indexOf(':') == -1) {
+        final String n = original.substring(0, s);
         if(Databases.validName(n)) {
-          path = in.substring(s + 1);
+          path = original.substring(s + 1);
           db = n;
         }
       }

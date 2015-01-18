@@ -199,7 +199,6 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
    * @return the function call
    */
   public StandardFunc funcCall(final String fName, final Expr... args) {
-    if(!fName.equals("fn:doc")) System.out.print(" FUNC: " + fName);
     final QNm qName = new QNm(fName);
     qName.uri(qName.hasPrefix() ? NSGlobal.uri(qName.prefix()) : qp.sc.funcNS);
     try {

@@ -587,7 +587,7 @@ public enum QueryError {
   /** FORG0010. */
   IETF_PARSE_X_X_X(FORG, 10, "Invalid input (% expected, '%' found): '%'."),
   /** FORG0010. */
-  IETF_INIT_X(FORG, 10, "%"),
+  IETF_INV_X(FORG, 10, "Invalid input: '%'."),
 
   /** FORX0001. */
   REGMOD_X(FORX, 1, "Invalid regular modifier: '%'."),
