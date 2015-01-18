@@ -91,7 +91,8 @@ final class RESTPost {
 
       // handle input
       String val = null;
-      try(final QueryProcessor qp = new QueryProcessor("*/*:context/node()", ctx).context(doc)) {
+      try(final QueryProcessor qp = new QueryProcessor(
+          "*/*:context/(*, text()[normalize-space()])", ctx).context(doc)) {
         for(final Item it : qp.value()) {
           if(val != null) throw HTTPCode.MULTIPLE_CONTEXT_X.get();
           // create main memory instance of the specified node
