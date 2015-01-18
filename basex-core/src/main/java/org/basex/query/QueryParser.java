@@ -44,6 +44,7 @@ import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.hash.*;
+import org.basex.util.list.*;
 import org.basex.util.options.*;
 
 /**
@@ -73,6 +74,9 @@ public class QueryParser extends InputParser {
 
   /** Modules loaded by the current file. */
   public final TokenSet modules = new TokenSet();
+  /** List of modules to be parsed. */
+  public ArrayList<ModImport> mods = new ArrayList<>();
+
   /** Parsed variables. */
   public final ArrayList<StaticVar> vars = new ArrayList<>();
   /** Parsed functions. */
@@ -180,6 +184,7 @@ public class QueryParser extends InputParser {
       pos = i;
 
       prolog1();
+      importModules();
       prolog2();
 
       pushVarContext(null);
@@ -216,6 +221,7 @@ public class QueryParser extends InputParser {
       wsCheck(IS);
       final byte[] uri = stringLiteral();
       if(uri.length == 0) throw error(NSMODURI);
+
       module = new QNm(pref, uri);
       sc.ns.add(pref, uri, info());
       namespaces.put(pref, uri);
@@ -223,13 +229,13 @@ public class QueryParser extends InputParser {
 
       // get absolute path
       final IO base = sc.baseIO();
-      final byte[] p = token(base == null ? "" : base.path());
-      qc.modParsed.put(p, uri);
+      final byte[] path = token(base == null ? "" : base.path());
+      qc.modParsed.put(path, uri);
+      qc.modStack.push(path);
 
-      qc.modStack.push(p);
       prolog1();
+      importModules();
       prolog2();
-
       finish(null, check);
 
       qc.modStack.pop();
@@ -730,28 +736,49 @@ public class QueryParser extends InputParser {
       namespaces.put(pref, uri);
     }
 
+    final ModImport mi = new ModImport();
+    mi.info = info();
+    mi.uri = uri;
+    mods.add(mi);
+
     // check modules at specified locations
     if(wsConsumeWs(AT)) {
-      do {
-        module(stringLiteral(), uri);
-      } while(wsConsumeWs(COMMA));
-      return;
+      do mi.paths.add(stringLiteral()); while(wsConsumeWs(COMMA));
+    } else {
+      // check module files that have been pre-declared by a test API
+      final byte[] path = qc.modDeclared.get(uri);
+      if(path != null) mi.paths.add(path);
     }
+  }
 
-    // check pre-declared module files
-    final byte[] path = qc.modDeclared.get(uri);
-    if(path != null) {
-      module(path, uri);
-      return;
+  /** Module import structure. */
+  private static final class ModImport {
+    /** Paths. */
+    private final TokenList paths = new TokenList(1);
+    /** URI. */
+    private byte[] uri;
+    /** Input info. */
+    private InputInfo info;
+  }
+
+  /**
+   * Parses the "ModuleImport" rule.
+   * @throws QueryException query exception
+   */
+  private void importModules() throws QueryException {
+    for(final ModImport mi : mods) {
+      final byte[] uri = mi.uri;
+      if(mi.paths.isEmpty()) {
+        // skip statically available modules
+        for(final byte[] u : Function.URIS) if(eq(uri, u)) return;
+        // try to resolve module uri
+        if(qc.resources.modules().addImport(uri, mi.info, this)) return;
+        // module not found
+        throw error(WHICHMODULE_X, uri);
+      }
+      // parse supplied paths
+      for(final byte[] path : mi.paths) module(path, uri);
     }
-
-    // skip built-in modules
-    for(final byte[] u : Function.URIS) if(eq(uri, u)) return;
-
-    // resolve module uri
-    if(qc.resources.modules().addImport(uri, info(), this)) return;
-
-    throw error(WHICHMODULE_X, uri);
   }
 
   /**

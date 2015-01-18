@@ -122,7 +122,7 @@ public final class QueryContext extends Proc implements AutoCloseable {
   /** Counter for variable IDs. */
   public int varIDs;
 
-  /** Pre-declared modules, containing module uri and their file paths. */
+  /** Pre-declared modules, containing module uri and their file paths (required for test APIs). */
   final TokenMap modDeclared = new TokenMap();
   /** Parsed modules, containing the file path and module uri. */
   final TokenMap modParsed = new TokenMap();
