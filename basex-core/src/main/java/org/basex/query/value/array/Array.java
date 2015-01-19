@@ -7,7 +7,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -41,7 +40,7 @@ public final class Array extends FItem {
    * @param size number of members
    */
   private Array(final Value[] members, final int start, final int size) {
-    super(SeqType.ANY_ARRAY, new Ann());
+    super(SeqType.ANY_ARRAY, new AnnList());
     this.members = members;
     this.start = start;
     this.size = size;

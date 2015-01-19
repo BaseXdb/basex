@@ -55,11 +55,11 @@ public class IntList extends ElementList {
    */
   public final IntList add(final int element) {
     int[] lst = list;
-    int s = size;
+    final int s = size;
     if(s == lst.length) lst = Arrays.copyOf(lst, newSize());
-    lst[s++] = element;
+    lst[s] = element;
     list = lst;
-    size = s;
+    size = s + 1;
     return this;
   }
 

@@ -11,6 +11,7 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -47,22 +48,22 @@ public final class FuncItem extends FItem implements Scope {
   /**
    * Constructor.
    * @param sc static context
-   * @param ann function annotations
+   * @param anns function annotations
    * @param name function name (may be {@code null})
    * @param params function arguments
    * @param type function type
    * @param expr function body
    * @param stackSize stack-frame size
    */
-  public FuncItem(final StaticContext sc, final Ann ann, final QNm name, final Var[] params,
+  public FuncItem(final StaticContext sc, final AnnList anns, final QNm name, final Var[] params,
       final FuncType type, final Expr expr, final int stackSize) {
-    this(sc, ann, name, params, type, expr, null, 0, 0, stackSize);
+    this(sc, anns, name, params, type, expr, null, 0, 0, stackSize);
   }
 
   /**
    * Constructor.
    * @param sc static context
-   * @param ann function annotations
+   * @param anns function annotations
    * @param name function name (may be {@code null})
    * @param params function arguments
    * @param type function type
@@ -72,11 +73,11 @@ public final class FuncItem extends FItem implements Scope {
    * @param size context size
    * @param stackSize stack-frame size
    */
-  public FuncItem(final StaticContext sc, final Ann ann, final QNm name, final Var[] params,
+  public FuncItem(final StaticContext sc, final AnnList anns, final QNm name, final Var[] params,
       final FuncType type, final Expr expr, final Value ctxValue, final long pos, final long size,
       final int stackSize) {
 
-    super(type, ann);
+    super(type, anns);
     this.name = name;
     this.params = params;
     this.expr = expr;
@@ -178,7 +179,7 @@ public final class FuncItem extends FItem implements Scope {
       checked = opt ? tc.optimize(qc, vsc) : tc;
     }
     checked.markTailCalls(null);
-    return new FuncItem(sc, ann, name, vs, ft, checked, vsc.stackSize());
+    return new FuncItem(sc, anns, name, vs, ft, checked, vsc.stackSize());
   }
 
   @Override
@@ -254,8 +255,7 @@ public final class FuncItem extends FItem implements Scope {
     final FuncType ft = (FuncType) type;
     final TokenBuilder tb = new TokenBuilder();
     if(name != null) tb.add("(: ").add(name.prefixId()).add("#").addInt(arity()).add(" :) ");
-    tb.addExt(ann).add(FUNCTION);
-    tb.add('(');
+    tb.addExt(anns).add(FUNCTION).add('(');
     final int pl = params.length;
     for(final Var v : params) tb.addExt(v).add(v == params[pl - 1] ? "" : ", ");
     tb.add(')').add(ft.retType != null ? " as " + ft.retType : "");

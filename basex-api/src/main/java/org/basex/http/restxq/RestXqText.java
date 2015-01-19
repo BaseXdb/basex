@@ -66,13 +66,11 @@ public interface RestXqText {
   /** Error message. */
   String ANN_BODYVAR = "More than one body request variable specified.";
   /** Error message. */
-  String ANN_TWICE = "Annotation %% is specified more than once.";
+  String ANN_TWICE = "Annotation %% is specified twice.";
   /** Error message. */
   String ANN_UNKNOWN = "Annotation %% is invalid or not supported.";
   /** Error message. */
   String ANN_ATLEAST = "Annotation %% requires at least % parameter(s).";
-  /** Error message. */
-  String ANN_STRING = "Single string expected for %%, found: %.";
   /** Error message. */
   String INV_TEMPLATE = "Invalid path template: \"%\".";
   /** Error message. */

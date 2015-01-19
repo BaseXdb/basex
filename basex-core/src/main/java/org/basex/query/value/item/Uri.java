@@ -59,6 +59,15 @@ public final class Uri extends AStr {
   }
 
   /**
+   * Checks the URIs for equality.
+   * @param uri to be compared
+   * @return result of check
+   */
+  public boolean eq(final Uri uri) {
+    return Token.eq(string(), uri.string());
+  }
+
+  /**
    * Appends the specified address. If one of the URIs is invalid,
    * the original uri is returned.
    * @param add address to be appended

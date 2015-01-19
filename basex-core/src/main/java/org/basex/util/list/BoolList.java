@@ -36,11 +36,11 @@ public final class BoolList extends ElementList {
    */
   public BoolList add(final boolean element) {
     boolean[] lst = list;
-    int s = size;
+    final int s = size;
     if(s == lst.length) lst = Arrays.copyOf(lst, newSize());
-    lst[s++] = element;
+    lst[s] = element;
     list = lst;
-    size = s;
+    size = s + 1;
     return this;
   }
 

@@ -3,6 +3,7 @@ package org.basex.query.func.fn;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -35,7 +36,7 @@ abstract class RuntimeExpr extends ParseExpr {
     final Var[] params = new Var[args];
     for(int p = 0; p < args; p++) params[p] = vsc.newLocal(qc, null, null, true);
     expr.params = params;
-    return new FuncItem(sc, new Ann(), null, expr.params, FuncType.ANY_FUN, expr,
+    return new FuncItem(sc, new AnnList(), null, expr.params, FuncType.ANY_FUN, expr,
         qc.value, qc.pos, qc.size, args);
   }
 

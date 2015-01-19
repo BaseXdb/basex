@@ -4,10 +4,12 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
+import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.Expr.Flag;
 import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -21,9 +23,6 @@ import org.basex.util.*;
  * @author Leo Woerteler
  */
 public final class StaticVar extends StaticDecl {
-  /** Annotation for lazy evaluation. */
-  private static final QNm LAZY = new QNm(QueryText.LAZY, BASEX_URI);
-
   /** If this variable can be bound from outside the query. */
   private final boolean external;
   /** Flag for lazy evaluation. */
@@ -36,7 +35,7 @@ public final class StaticVar extends StaticDecl {
    * Constructor for a variable declared in a query.
    * @param sc static context
    * @param scope variable scope
-   * @param ann annotations
+   * @param anns annotations
    * @param name variable name
    * @param type declared variable type
    * @param expr expression to be bound
@@ -44,13 +43,13 @@ public final class StaticVar extends StaticDecl {
    * @param doc current xqdoc cache
    * @param info input info
    */
-  StaticVar(final StaticContext sc, final VarScope scope, final Ann ann, final QNm name,
+  StaticVar(final StaticContext sc, final VarScope scope, final AnnList anns, final QNm name,
       final SeqType type, final Expr expr, final boolean external, final String doc,
       final InputInfo info) {
-    super(sc, ann, name, type, scope, doc, info);
+    super(sc, anns, name, type, scope, doc, info);
     this.expr = expr;
     this.external = external;
-    lazy = ann != null && ann.contains(LAZY);
+    lazy = anns.contains(Annotation._BASEX_LAZY);
   }
 
   @Override
@@ -160,14 +159,12 @@ public final class StaticVar extends StaticDecl {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(DECLARE).append(' ');
-    if(!ann.isEmpty()) sb.append(ann);
-    sb.append(VARIABLE).append(' ').append(DOLLAR).append(
-        Token.string(name.string())).append(' ');
-    if(declType != null) sb.append(AS).append(' ').append(declType).append(' ');
-    if(expr != null) sb.append(ASSIGN).append(' ').append(expr);
-    else sb.append(EXTERNAL);
-    return sb.append(';').toString();
+    final TokenBuilder tb = new TokenBuilder(DECLARE).add(' ').addExt(anns);
+    tb.add(VARIABLE).add(' ').add(DOLLAR).add(name.string());
+    if(declType != null) tb.add(' ').add(AS).add(' ').addExt(declType);
+    if(external) tb.add(' ').add(EXTERNAL);
+    if(expr != null) tb.add(' ').add(ASSIGN).add(' ').addExt(expr);
+    return tb.add(';').toString();
   }
 
   @Override

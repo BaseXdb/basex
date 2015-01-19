@@ -8,11 +8,13 @@ import java.util.Map.Entry;
 
 import org.basex.core.*;
 import org.basex.query.*;
+import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -35,7 +37,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   /** Return type. */
   private SeqType ret;
   /** Annotations. */
-  private Ann ann;
+  private AnnList anns;
   /** Updating flag. */
   private final boolean updating;
 
@@ -57,15 +59,15 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
    * @param ret return type
    * @param args arguments
    * @param expr function body
-   * @param ann annotations
+   * @param anns annotations
    * @param nonLocal bindings for non-local variables
    * @param sc static context
    * @param scope scope
    */
   public Closure(final InputInfo info, final SeqType ret, final Var[] args, final Expr expr,
-      final Ann ann, final Map<Var, Expr> nonLocal, final StaticContext sc,
+      final AnnList anns, final Map<Var, Expr> nonLocal, final StaticContext sc,
       final VarScope scope) {
-    this(info, null, ret, args, expr, ann, nonLocal, sc, scope);
+    this(info, null, ret, args, expr, anns, nonLocal, sc, scope);
   }
 
   /**
@@ -75,23 +77,23 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
    * @param ret return type
    * @param args argument variables
    * @param expr function expression
-   * @param ann annotations
+   * @param anns annotations
    * @param nonLocal bindings for non-local variables
    * @param sc static context
    * @param scope variable scope
    */
   Closure(final InputInfo info, final QNm name, final SeqType ret, final Var[] args,
-      final Expr expr, final Ann ann, final Map<Var, Expr> nonLocal, final StaticContext sc,
+      final Expr expr, final AnnList anns, final Map<Var, Expr> nonLocal, final StaticContext sc,
       final VarScope scope) {
     super(info, expr);
     this.name = name;
     this.args = args;
     this.ret = ret;
-    this.ann = ann == null ? new Ann() : ann;
-    updating = this.ann.contains(Ann.Q_UPDATING);
+    this.anns = anns;
     this.nonLocal = nonLocal == null ? Collections.<Var, Expr>emptyMap() : nonLocal;
     this.scope = scope;
     this.sc = sc;
+    updating = anns.contains(Annotation.UPDATING);
   }
 
   @Override
@@ -111,12 +113,12 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public FuncType funcType() {
-    return FuncType.get(ann, args, ret);
+    return FuncType.get(anns, args, ret);
   }
 
   @Override
-  public Ann annotations() {
-    return ann;
+  public AnnList annotations() {
+    return anns;
   }
 
   @Override
@@ -154,7 +156,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     final SeqType r = expr.seqType();
     final SeqType rt = updating ? SeqType.EMP : ret == null || r.instanceOf(ret) ? r : ret;
-    seqType = FuncType.get(ann, args, rt).seqType();
+    seqType = FuncType.get(anns, args, rt).seqType();
     size = 1;
 
     try {
@@ -241,7 +243,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     for(int a = 0; a < al; a++) vars[a] = vs.get(vars[a].id);
     final Expr e = expr.copy(qc, v, vs);
     e.markTailCalls(null);
-    return copyType(new Closure(info, name, ret, vars, e, ann, nl, sc, v));
+    return copyType(new Closure(info, name, ret, vars, e, anns, nl, sc, v));
   }
 
   @Override
@@ -316,7 +318,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       checked = new TypeCheck(sc, info, body, ret, true);
     }
 
-    return new FuncItem(sc, ann, name, args, ft, checked, scope.stackSize());
+    return new FuncItem(sc, anns, name, args, ft, checked, scope.stackSize());
   }
 
   @Override
@@ -445,11 +447,9 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
    * @param ft function type
    */
   public void adoptSignature(final FuncType ft) {
-    ann = ft.ann;
-    for(int i = 0; i < args.length; i++) {
-      final Var v = args[i];
-      v.declType = ft.argTypes[i];
-    }
+    anns = ft.anns;
+    final int al = args.length;
+    for(int a = 0; a < al; a++) args[a].declType = ft.argTypes[a];
     if(ft.retType != null && !ft.retType.eq(SeqType.ITEM_ZM)) ret = ft.retType;
   }
 
@@ -474,6 +474,6 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       refs[a] = new VarRef(ii, arg[a]);
     }
     final TypedFunc call = qc.funcs.getFuncRef(name, refs, sc, ii);
-    return new Closure(ii, name, SeqType.ITEM_ZM, arg, call.fun, null, null, sc, scp);
+    return new Closure(ii, name, SeqType.ITEM_ZM, arg, call.fun, new AnnList(), null, sc, scp);
   }
 }

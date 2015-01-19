@@ -3,10 +3,11 @@ package org.basex.query.value.item;
 import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
+import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
-import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
@@ -22,21 +23,21 @@ import org.basex.util.*;
  */
 public abstract class FItem extends Item implements XQFunction {
   /** Annotations. */
-  final Ann ann;
+  final AnnList anns;
 
   /**
    * Constructor.
    * @param type type
-   * @param ann this function item's annotations
+   * @param anns this function item's annotations
    */
-  protected FItem(final FuncType type, final Ann ann) {
+  protected FItem(final FuncType type, final AnnList anns) {
     super(type);
-    this.ann = ann;
+    this.anns = anns;
   }
 
   @Override
-  public final Ann annotations() {
-    return ann;
+  public final AnnList annotations() {
+    return anns;
   }
 
   @Override
@@ -76,7 +77,7 @@ public abstract class FItem extends Item implements XQFunction {
 
   @Override
   public boolean has(final Flag flag) {
-    return flag == Flag.UPD && annotations().contains(Ann.Q_UPDATING) || super.has(flag);
+    return flag == Flag.UPD && annotations().contains(Annotation.UPDATING) || super.has(flag);
   }
 
   @Override

@@ -9,25 +9,6 @@ import static org.basex.util.Token.*;
  * @author Christian Gruen
  */
 public interface Constants {
-  /** Annotation: test. */
-  byte[] TEST = token("test");
-  /** Annotation: skipped. */
-  byte[] IGNORE = token("ignore");
-  /** Annotation: before. */
-  byte[] BEFORE = token("before");
-  /** Annotation: before. */
-  byte[] AFTER = token("after");
-  /** Annotation: before. */
-  byte[] BEFORE_MODULE = token("before-module");
-  /** Annotation: before. */
-  byte[] AFTER_MODULE = token("after-module");
-  /** Annotation: expected. */
-  byte[] EXPECTED = token("expected");
-  /** Name: returned. */
-  byte[] RETURNED = token("returned");
-  /** Name: info. */
-  byte[] INFO = token("info");
-
   /** Name: testsuites. */
   byte[] TESTSUITES = token("testsuites");
   /** Name: testsuite. */
@@ -46,6 +27,12 @@ public interface Constants {
   byte[] URI = token("uri");
   /** Name: error. */
   byte[] ERROR = token("error");
+  /** Name: expected. */
+  byte[] EXPECTED = token("expected");
+  /** Name: returned. */
+  byte[] RETURNED = token("returned");
+  /** Name: info. */
+  byte[] INFO = token("info");
   /** Name: failures. */
   byte[] FAILURES = token("failures");
   /** Name: error. */

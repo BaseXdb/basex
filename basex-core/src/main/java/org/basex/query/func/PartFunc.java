@@ -5,8 +5,9 @@ import static org.basex.query.QueryError.*;
 import java.util.*;
 
 import org.basex.query.*;
+import org.basex.query.ann.*;
 import org.basex.query.expr.*;
-import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -92,10 +93,10 @@ public final class PartFunc extends Arr {
     final int al = args.length;
     while(++a < al) args[a] = exprs[a - hl].value(qc);
 
-    final Ann ann = f.annotations();
-    final FuncType tp = FuncType.get(ann, vars, ft.retType);
-    final DynFuncCall fc = new DynFuncCall(info, sc, ann.contains(Ann.Q_UPDATING), f, args);
-    return new FuncItem(sc, ann, null, vars, tp, fc, qc.value, qc.pos, qc.size, scp.stackSize());
+    final AnnList anns = f.annotations();
+    final FuncType tp = FuncType.get(anns, vars, ft.retType);
+    final DynFuncCall fc = new DynFuncCall(info, sc, anns.contains(Annotation.UPDATING), f, args);
+    return new FuncItem(sc, anns, null, vars, tp, fc, qc.value, qc.pos, qc.size, scp.stackSize());
   }
 
   @Override
@@ -147,7 +148,7 @@ public final class PartFunc extends Arr {
    * Returns the function annotations.
    * @return annotations
    */
-  public Ann annotations() {
+  public AnnList annotations() {
     final Expr fn = exprs[exprs.length - 1];
     if(!(fn instanceof FItem)) return null;
     return ((FItem) fn).annotations();

@@ -9,6 +9,7 @@ import java.io.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -79,20 +80,19 @@ public abstract class Inspect {
 
   /**
    * Creates annotation child elements.
-   * @param ann annotations
+   * @param anns annotations
    * @param parent parent element
    * @param uri include uri
    * @throws QueryException query exception
    */
-  final void annotation(final Ann ann, final FElem parent, final boolean uri)
+  final void annotation(final AnnList anns, final FElem parent, final boolean uri)
       throws QueryException {
 
-    final int as = ann.size();
-    for(int a = 0; a < as; a++) {
+    for(final Ann ann : anns) {
       final FElem annotation = elem("annotation", parent);
-      annotation.add("name", ann.names[a].string());
-      if(uri) annotation.add("uri", ann.names[a].uri());
-      for(final Item it : ann.values[a]) {
+      annotation.add("name", ann.sig.prefixId());
+      if(uri) annotation.add("uri", ann.sig.uri);
+      for(final Item it : ann.args) {
         final FElem literal = elem("literal", annotation);
         literal.add("type", it.type.toString()).add(it.string(null));
       }

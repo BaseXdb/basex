@@ -38,7 +38,7 @@ import org.basex.util.options.*;
  */
 public abstract class StandardFunc extends Arr {
   /** Function signature. */
-  public Function func;
+  public Function sig;
   /** Static context. */
   public StaticContext sc;
 
@@ -60,7 +60,7 @@ public abstract class StandardFunc extends Arr {
   StandardFunc init(final StaticContext sctx, final InputInfo ii, final Function f,
       final Expr[] args) {
     sc = sctx;
-    func = f;
+    sig = f;
     info = ii;
     exprs = args;
     seqType = f.ret;
@@ -78,7 +78,7 @@ public abstract class StandardFunc extends Arr {
   public final Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     // skip context-based or non-deterministic functions, and non-values
     return optPre(has(Flag.CTX) || has(Flag.NDT) || has(Flag.HOF) || has(Flag.UPD) ||
-        !allAreValues() ? opt(qc, scp) : func.ret.zeroOrOne() ? item(qc, info) : value(qc), qc);
+        !allAreValues() ? opt(qc, scp) : sig.ret.zeroOrOne() ? item(qc, info) : value(qc), qc);
   }
 
   /**
@@ -99,7 +99,7 @@ public abstract class StandardFunc extends Arr {
     final int es = exprs.length;
     final Expr[] arg = new Expr[es];
     for(int e = 0; e < es; e++) arg[e] = exprs[e].copy(qc, scp, vs);
-    return func.get(sc, info, arg);
+    return sig.get(sc, info, arg);
   }
 
   /**
@@ -128,12 +128,12 @@ public abstract class StandardFunc extends Arr {
 
   @Override
   public boolean has(final Flag flag) {
-    return func.has(flag) || flag != Flag.HOF && super.has(flag);
+    return sig.has(flag) || flag != Flag.HOF && super.has(flag);
   }
 
   @Override
   public final boolean isFunction(final Function f) {
-    return func == f;
+    return sig == f;
   }
 
   @Override
@@ -143,19 +143,17 @@ public abstract class StandardFunc extends Arr {
 
   @Override
   public final String description() {
-    return func.toString();
+    return sig.toString();
   }
 
   @Override
   public final void plan(final FElem plan) {
-    addPlan(plan, planElem(NAM, func.desc), exprs);
+    addPlan(plan, planElem(NAM, sig.desc), exprs);
   }
 
   @Override
   public final String toString() {
-    final String desc = func.toString();
-    return new TokenBuilder(desc.substring(0,
-       desc.indexOf('(') + 1)).addSep(exprs, SEP).add(PAREN2).toString();
+    return new TokenBuilder(sig.id()).add('(').addSep(exprs, SEP).add(')').toString();
   }
 
   /**

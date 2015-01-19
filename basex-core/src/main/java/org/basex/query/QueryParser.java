@@ -14,6 +14,7 @@ import org.basex.core.locks.*;
 import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
+import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.CmpG.OpG;
 import org.basex.query.expr.CmpN.OpN;
@@ -395,25 +396,14 @@ public class QueryParser extends InputParser {
       } else if(wsConsumeWs(DEFAULT)) {
         throw error(PROLOGORDER);
       } else {
-        final Ann ann = new Ann();
-        while(true) {
-          if(wsConsumeWs(UPDATING)) {
-            ann.add(Ann.Q_UPDATING, Empty.SEQ, info());
-          } else if(consume('%')) {
-            annotation(ann);
-          } else {
-            break;
-          }
-        }
+        final AnnList anns = annotations(true);
         if(wsConsumeWs(VARIABLE)) {
           // variables cannot be updating
-          if(ann.contains(Ann.Q_UPDATING)) throw error(UPDATINGVAR);
-          ann.check(true);
-          varDecl(ann);
+          if(anns.contains(Annotation.UPDATING)) throw error(UPDATINGVAR);
+          varDecl(anns.check(true));
         } else if(wsConsumeWs(FUNCTION)) {
-          ann.check(false);
-          functionDecl(ann);
-        } else if(!ann.isEmpty()) {
+          functionDecl(anns.check(false));
+        } else if(!anns.isEmpty()) {
           throw error(VARFUNC);
         } else {
           pos = i;
@@ -428,38 +418,60 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "Annotation" rule.
+   * @param updating updating flag
    * @return annotations
    * @throws QueryException query exception
    */
-  private Ann annotations() throws QueryException {
-    final Ann ann = new Ann();
-    while(wsConsume("%")) annotation(ann);
-    ann.check(false);
-    skipWs();
-    return ann;
-  }
+  private AnnList annotations(final boolean updating) throws QueryException {
+    final AnnList anns = new AnnList();
+    while(true) {
+      if(updating && wsConsumeWs(UPDATING)) {
+        anns.add(new Ann(info(), Annotation.UPDATING));
+      } else if(consume('%')) {
+        skipWs();
+        final InputInfo info = info();
+        final QNm name = eQName(QNAME_X, XQ_URI);
 
-  /**
-   * Parses a single annotation.
-   * @param ann annotations
-   * @throws QueryException query exception
-   */
-  private void annotation(final Ann ann) throws QueryException {
-    skipWs();
-    final InputInfo info = info();
-    final QNm name = eQName(QNAME_X, XQ_URI);
+        final ValueBuilder vb = new ValueBuilder();
+        if(wsConsumeWs(PAREN1)) {
+          do {
+            final Expr ex = literal();
+            if(!(ex instanceof Item)) throw error(ANNVALUE);
+            vb.add((Item) ex);
+          } while(wsConsumeWs(COMMA));
+          wsCheck(PAREN2);
+        }
+        skipWs();
+        final Annotation sig = Annotation.get(name);
+        if(sig == null) {
+          // reject unknown annotations with pre-defined namespaces, ignore others
+          final byte[] uri = name.uri();
+          if(NSGlobal.prefix(uri).length == 0 || eq(uri, LOCAL_URI, ERROR_URI)) continue;
+          throw (NSGlobal.reserved(uri) ? ANNWHICH_X_X : BASX_ANNOT_X_X).get(
+              info, '%', name.string());
+        }
+        // check if annotation is specified more than once
+        if(sig.single && anns.contains(sig)) throw BASX_TWICE_X_X.get(info, '%', sig.prefixId());
 
-    final ValueBuilder vb = new ValueBuilder();
-    if(wsConsumeWs(PAREN1)) {
-      do {
-        final Expr ex = literal();
-        if(!(ex instanceof Item)) throw error(ANNVALUE);
-        vb.add((Item) ex);
-      } while(wsConsumeWs(COMMA));
-      wsCheck(PAREN2);
+        final long arity = vb.size();
+        if(arity < sig.minMax[0] || arity > sig.minMax[1])
+          throw BASX_ANNNUM_X_X_X.get(info, sig, arity, arity == 1 ? "" : "s");
+        final int al = sig.args.length;
+        for(int a = 0; a < arity; a++) {
+          final SeqType st = sig.args[Math.min(al - 1, a)];
+          final Item it = vb.get(a);
+          if(!st.instance(it)) throw BASX_ANNTYPE_X_X_X.get(info, sig, st, it.seqType());
+        }
+
+        final Item[] args = new Item[(int) vb.size()];
+        vb.value().writeTo(args, 0);
+        anns.add(new Ann(info, sig, args));
+      } else {
+        break;
+      }
     }
     skipWs();
-    ann.add(name, vb.value(), info);
+    return anns;
   }
 
   /**
@@ -867,10 +879,10 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "VarDecl" rule.
-   * @param ann annotations
+   * @param anns annotations
    * @throws QueryException query exception
    */
-  private void varDecl(final Ann ann) throws QueryException {
+  private void varDecl(final AnnList anns) throws QueryException {
     final QNm vn = varName();
     final SeqType tp = optAsType();
     if(module != null && !eq(vn.uri(), module.uri())) throw error(MODULENS_X, vn);
@@ -886,7 +898,7 @@ public class QueryParser extends InputParser {
     }
 
     final VarScope scope = popVarContext();
-    vars.add(qc.vars.declare(vn, tp, ann, bind, external, sc, scope, currDoc.toString(), info()));
+    vars.add(qc.vars.declare(vn, tp, anns, bind, external, sc, scope, currDoc.toString(), info()));
   }
 
   /**
@@ -910,10 +922,10 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "FunctionDecl" rule.
-   * @param ann annotations
+   * @param anns annotations
    * @throws QueryException query exception
    */
-  private void functionDecl(final Ann ann) throws QueryException {
+  private void functionDecl(final AnnList anns) throws QueryException {
     final InputInfo ii = info();
     final QNm name = eQName(FUNCNAME, sc.funcNS);
     if(keyword(name)) throw error(RESERVED_X, name.local());
@@ -924,10 +936,10 @@ public class QueryParser extends InputParser {
     final Var[] args = paramList();
     wsCheck(PAREN2);
     final SeqType type = optAsType();
-    if(ann.contains(Ann.Q_UPDATING)) qc.updating();
+    if(anns.contains(Annotation.UPDATING)) qc.updating();
     final Expr expr = wsConsumeWs(EXTERNAL) ? null : enclosed(NOFUNBODY);
     final VarScope scope = popVarContext();
-    funcs.add(qc.funcs.declare(ann, name, args, type, expr, sc, scope, currDoc.toString(), ii));
+    funcs.add(qc.funcs.declare(anns, name, args, type, expr, sc, scope, currDoc.toString(), ii));
   }
 
   /**
@@ -2044,11 +2056,11 @@ public class QueryParser extends InputParser {
           final int[] holes = argumentList(argList, e);
           final Expr[] args = argList.finish();
           // only set updating flag if updating and non-updating expressions are mixed
-          Ann ann = null;
-          if(e instanceof FuncItem) ann = ((FuncItem) e).annotations();
-          else if(e instanceof FuncLit) ann = ((FuncLit) e).annotations();
-          else if(e instanceof PartFunc) ann = ((PartFunc) e).annotations();
-          final boolean up = sc.mixUpdates && ann != null && ann.contains(Ann.Q_UPDATING);
+          AnnList anns = null;
+          if(e instanceof FuncItem) anns = ((FuncItem) e).annotations();
+          else if(e instanceof FuncLit) anns = ((FuncLit) e).annotations();
+          else if(e instanceof PartFunc) anns = ((PartFunc) e).annotations();
+          final boolean up = sc.mixUpdates && anns != null && anns.contains(Annotation.UPDATING);
           if(up) qc.updating();
           e = holes == null ? new DynFuncCall(ii, sc, up, e, args) :
             new PartFunc(sc, ii, e, args, holes);
@@ -2206,12 +2218,11 @@ public class QueryParser extends InputParser {
     final int ip = pos;
 
     // parse annotations; will only be visited for XQuery 3.0 expressions
-    final Ann ann = curr('%') ? annotations() : null;
+    final AnnList anns = annotations(false).check(false);
     // inline function
     if(wsConsume(FUNCTION) && wsConsume(PAREN1)) {
-      if(ann != null) {
-        if(ann.contains(Ann.Q_PRIVATE) || ann.contains(Ann.Q_PUBLIC)) throw error(INVISIBLE);
-      }
+      if(anns.contains(Annotation.PRIVATE) || anns.contains(Annotation.PUBLIC))
+        throw error(INVISIBLE);
       final HashMap<Var, Expr> nonLocal = new HashMap<>();
       pushVarContext(nonLocal);
       final Var[] args = paramList();
@@ -2219,10 +2230,10 @@ public class QueryParser extends InputParser {
       final SeqType type = optAsType();
       final Expr body = enclosed(NOFUNBODY);
       final VarScope scope = popVarContext();
-      return new Closure(info(), type, args, body, ann, nonLocal, sc, scope);
+      return new Closure(info(), type, args, body, anns, nonLocal, sc, scope);
     }
     // annotations not allowed here
-    if(ann != null) throw error(NOANN);
+    if(!anns.isEmpty()) throw error(NOANN);
 
     // named function reference
     pos = ip;
@@ -2429,13 +2440,13 @@ public class QueryParser extends InputParser {
       final Expr f = lit != null ? lit : unknownLit(name, card, ii);
       ret = new PartFunc(sc, ii, f, args, holes);
       if(lit != null && (lit instanceof XQFunctionExpr ? ((XQFunctionExpr) f).annotations() :
-        ((FuncLit) lit).annotations()).contains(Ann.Q_UPDATING)) qc.updating();
+        ((FuncLit) lit).annotations()).contains(Annotation.UPDATING)) qc.updating();
     } else {
       final TypedFunc f = Functions.get(name, args, qc, sc, ii);
       if(f == null) {
         ret = null;
       } else {
-        if(f.ann.contains(Ann.Q_UPDATING)) qc.updating();
+        if(f.anns.contains(Annotation.UPDATING)) qc.updating();
         ret = f.fun;
       }
     }
@@ -2957,7 +2968,7 @@ public class QueryParser extends InputParser {
     }
 
     // parse optional annotation and type name
-    final Ann ann = curr('%') ? annotations() : null;
+    final AnnList anns = annotations(false).check(false);
     final QNm name = eQName(TYPEINVALID, null);
     skipWs();
     // check if name is followed by parentheses
@@ -2974,7 +2985,7 @@ public class QueryParser extends InputParser {
       // function types
       if(t == null) {
         t = FuncType.find(name);
-        if(t != null) return functionTest(ann, t).seqType();
+        if(t != null) return functionTest(anns, t).seqType();
       }
       // no type found
       if(t == null) throw error(WHICHTYPE_X, name.prefixId(XML));
@@ -2988,7 +2999,7 @@ public class QueryParser extends InputParser {
     }
 
     // annotations are not allowed for remaining types
-    if(ann != null) throw error(NOANN);
+    if(!anns.isEmpty()) throw error(NOANN);
 
     // atomic value, or closing parenthesis
     if(!func || wsConsume(PAREN2)) return t.seqType();
@@ -3002,12 +3013,12 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "FunctionTest" rule.
-   * @param ann annotations
+   * @param anns annotations
    * @param t function type
    * @return resulting type
    * @throws QueryException query exception
    */
-  private Type functionTest(final Ann ann, final Type t) throws QueryException {
+  private Type functionTest(final AnnList anns, final Type t) throws QueryException {
     // wildcard
     if(wsConsume(ASTERISK)) {
       wsCheck(PAREN2);
@@ -3038,8 +3049,7 @@ public class QueryParser extends InputParser {
       wsCheck(PAREN2);
     }
     wsCheck(AS);
-    final SeqType st = sequenceType();
-    return FuncType.get(ann, st, args);
+    return FuncType.get(anns, sequenceType(), args);
   }
 
   /**

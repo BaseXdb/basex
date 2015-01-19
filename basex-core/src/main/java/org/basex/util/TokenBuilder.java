@@ -236,11 +236,11 @@ public final class TokenBuilder {
    */
   public TokenBuilder addByte(final byte value) {
     byte[] chrs = chars;
-    int s = size;
+    final int s = size;
     if(s == chrs.length) chrs = Arrays.copyOf(chrs, Array.newSize(s));
-    chrs[s++] = value;
+    chrs[s] = value;
     chars = chrs;
-    size = s;
+    size = s + 1;
     return this;
   }
 

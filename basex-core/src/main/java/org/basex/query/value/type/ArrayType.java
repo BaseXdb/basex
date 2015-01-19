@@ -4,7 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
-import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.array.Array;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -21,7 +21,7 @@ public final class ArrayType extends FuncType {
    * @param rt return type
    */
   ArrayType(final SeqType rt) {
-    super(new Ann(), new SeqType[] { SeqType.ITR }, rt);
+    super(new AnnList(), new SeqType[] { SeqType.ITR }, rt);
   }
 
   @Override

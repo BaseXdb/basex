@@ -48,7 +48,9 @@ public final class InspectModuleTest extends AdvancedQueryTest {
     query(func + "/return/@type/data()", "xs:integer");
     query(func + "/return/@occurrence/data()", "");
 
-    query(_INSPECT_FUNCTION.args(" %db:f function() {()}") + "/annotation/@name = 'db:f'", "true");
+    // unknown annotations disappear
+    query("declare namespace x='x';" +
+      _INSPECT_FUNCTION.args(" %x:x function() {()}") + "/annotation", "");
   }
 
   /** Test method. */

@@ -14,7 +14,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public class Str extends AStr {
+public final class Str extends AStr {
   /** Wildcard string. */
   public static final Str WC = new Str(new byte[] { '*' });
   /** Zero-length string. */
@@ -81,7 +81,7 @@ public class Str extends AStr {
   }
 
   @Override
-  public final byte[] string(final InputInfo ii) {
+  public byte[] string(final InputInfo ii) {
     return value;
   }
 
@@ -89,19 +89,19 @@ public class Str extends AStr {
    * Returns the string value.
    * @return string value
    */
-  public final byte[] string() {
+  public byte[] string() {
     return value;
   }
 
   @Override
-  public final boolean sameAs(final Expr cmp) {
+  public boolean sameAs(final Expr cmp) {
     if(!(cmp instanceof Str)) return false;
     final Str i = (Str) cmp;
     return type == i.type && Token.eq(value, i.value);
   }
 
   @Override
-  public final String toJava() {
+  public String toJava() {
     return Token.string(value);
   }
 }

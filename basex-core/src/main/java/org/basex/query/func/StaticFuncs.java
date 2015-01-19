@@ -9,6 +9,7 @@ import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -39,7 +40,7 @@ public final class StaticFuncs extends ExprInfo {
 
   /**
    * Declares a new user-defined function.
-   * @param ann annotations
+   * @param anns annotations
    * @param nm function name
    * @param args formal parameters
    * @param type declared return type
@@ -51,7 +52,7 @@ public final class StaticFuncs extends ExprInfo {
    * @return static function reference
    * @throws QueryException query exception
    */
-  public StaticFunc declare(final Ann ann, final QNm nm, final Var[] args, final SeqType type,
+  public StaticFunc declare(final AnnList anns, final QNm nm, final Var[] args, final SeqType type,
       final Expr expr, final StaticContext sc, final VarScope scope, final String doc,
       final InputInfo ii) throws QueryException {
 
@@ -59,7 +60,7 @@ public final class StaticFuncs extends ExprInfo {
     if(uri.length == 0) throw FUNNONS_X.get(ii, nm.string());
     if(NSGlobal.reserved(uri)) throw NAMERES_X.get(ii, nm.string());
 
-    final StaticFunc fn = new StaticFunc(ann, nm, args, type, expr, sc, scope, doc, ii);
+    final StaticFunc fn = new StaticFunc(anns, nm, args, type, expr, sc, scope, doc, ii);
     final byte[] sig = fn.id();
     final FuncCache fc = funcs.get(sig);
     if(fc != null) fc.setFunc(fn);
@@ -316,9 +317,9 @@ public final class StaticFuncs extends ExprInfo {
 
       if(func == null) {
         // [LW] should be deferred until the actual types are known (i.e. compile time)
-        return new TypedFunc(call, new Ann());
+        return new TypedFunc(call, new AnnList());
       }
-      return new TypedFunc(call.init(func), func.ann);
+      return new TypedFunc(call.init(func), func.anns);
     }
 
     /**

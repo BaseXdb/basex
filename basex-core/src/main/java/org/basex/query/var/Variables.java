@@ -7,7 +7,7 @@ import java.util.Map.Entry;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -28,7 +28,7 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
    * Declares a new static variable.
    * @param nm variable name
    * @param type declared type
-   * @param ann annotations
+   * @param anns annotations
    * @param expr bound expression, possibly {@code null}
    * @param ext {@code external} flag
    * @param sc static context
@@ -38,11 +38,11 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
    * @return static variable reference
    * @throws QueryException query exception
    */
-  public StaticVar declare(final QNm nm, final SeqType type, final Ann ann, final Expr expr,
+  public StaticVar declare(final QNm nm, final SeqType type, final AnnList anns, final Expr expr,
       final boolean ext, final StaticContext sc, final VarScope scope, final String doc,
       final InputInfo ii) throws QueryException {
 
-    final StaticVar var = new StaticVar(sc, scope, ann, nm, type, expr, ext, doc, ii);
+    final StaticVar var = new StaticVar(sc, scope, anns, nm, type, expr, ext, doc, ii);
     final VarEntry ve = vars.get(nm);
     if(ve != null) ve.setVar(var);
     else vars.put(nm, new VarEntry(var));

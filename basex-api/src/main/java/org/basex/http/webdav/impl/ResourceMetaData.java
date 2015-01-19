@@ -55,15 +55,15 @@ public final class ResourceMetaData {
    * @param ms resource last modification date in milliseconds
    * @param raw raw binary file flag
    * @param ctype resource content type
-   * @param s resource size in bytes
+   * @param size resource size in bytes
    */
   ResourceMetaData(final String db, final String path, final long ms, final boolean raw,
-      final String ctype, final Long s) {
+      final String ctype, final Long size) {
     this.db = db;
     this.path = stripLeadingSlash(path);
     this.raw = raw;
     this.ctype = ctype;
-    this.size = s;
+    this.size = size;
     mdate = ms == -1 ? null : new Date(ms);
   }
 }

@@ -68,11 +68,11 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
    */
   public TokenList add(final byte[] element) {
     byte[][] lst = list;
-    int s = size;
+    final int s = size;
     if(s == lst.length) lst = Array.copyOf(lst, newSize());
-    lst[s++] = element;
+    lst[s] = element;
     list = lst;
-    size = s;
+    size = s + 1;
     return this;
   }
 

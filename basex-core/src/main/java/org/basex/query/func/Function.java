@@ -46,6 +46,7 @@ import org.basex.query.func.xquery.*;
 import org.basex.query.func.xslt.*;
 import org.basex.query.func.zip.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -1226,10 +1227,9 @@ public enum Function {
   _ZIP_UPDATE_ENTRIES(ZipUpdateEntries.class, "update-entries(zip,output)",
       arg(ELM, STR), EMP, flag(NDT), ZIP_URI);
 
-  /** Pre-defined modules. */
+  /** URIs of built-in functions. */
   public static final TokenSet URIS = new TokenSet();
 
-  // initialization of class/uri mappings
   static {
     for(final Function f : values()) {
       final byte[] u = f.uri;
@@ -1244,10 +1244,8 @@ public enum Function {
 
   /** Cached enums (faster). */
   public static final Function[] VALUES = values();
-  /** Minimum number of arguments. */
-  public final int min;
-  /** Maximum number of arguments. */
-  public final int max;
+  /** Minimum and maximum number of arguments. */
+  public final int[] minMax;
   /** Argument types. */
   public final SeqType[] args;
 
@@ -1266,42 +1264,42 @@ public enum Function {
   /**
    * Constructs a function signature; calls
    * {@link #Function(Class, String, SeqType[], SeqType, EnumSet)}.
-   * @param clz reference to the class containing the function implementation
-   * @param dsc descriptive function string
-   * @param typ types of the function arguments
-   * @param rtn return type
+   * @param func reference to the class containing the function implementation
+   * @param desc descriptive function string
+   * @param args types of the function arguments
+   * @param ret return type
    */
-  Function(final Class<? extends StandardFunc> clz, final String dsc, final SeqType[] typ,
-      final SeqType rtn) {
-    this(clz, dsc, typ, rtn, EnumSet.noneOf(Flag.class));
+  Function(final Class<? extends StandardFunc> func, final String desc, final SeqType[] args,
+      final SeqType ret) {
+    this(func, desc, args, ret, EnumSet.noneOf(Flag.class));
   }
 
   /**
    * Constructs a function signature; calls
    * {@link #Function(Class, String, SeqType[], SeqType, EnumSet)}.
-   * @param clz reference to the class containing the function implementation
-   * @param dsc descriptive function string
-   * @param typ types of the function arguments
-   * @param rtn return type
+   * @param func reference to the class containing the function implementation
+   * @param desc descriptive function string
+   * @param args types of the function arguments
+   * @param ret return type
    * @param uri uri
    */
-  Function(final Class<? extends StandardFunc> clz, final String dsc, final SeqType[] typ,
-      final SeqType rtn, final byte[] uri) {
-    this(clz, dsc, typ, rtn, EnumSet.noneOf(Flag.class), uri);
+  Function(final Class<? extends StandardFunc> func, final String desc, final SeqType[] args,
+      final SeqType ret, final byte[] uri) {
+    this(func, desc, args, ret, EnumSet.noneOf(Flag.class), uri);
   }
 
   /**
    * Constructs a function signature; calls
    * {@link #Function(Class, String, SeqType[], SeqType, EnumSet)}.
-   * @param clz reference to the class containing the function implementation
-   * @param dsc descriptive function string
-   * @param typ types of the function arguments
-   * @param rtn return type
-   * @param flg static function properties
+   * @param func reference to the class containing the function implementation
+   * @param desc descriptive function string
+   * @param args types of the function arguments
+   * @param ret return type
+   * @param flag static function properties
    */
-  Function(final Class<? extends StandardFunc> clz, final String dsc, final SeqType[] typ,
-      final SeqType rtn, final EnumSet<Flag> flg) {
-    this(clz, dsc, typ, rtn, flg, FN_URI);
+  Function(final Class<? extends StandardFunc> func, final String desc, final SeqType[] args,
+      final SeqType ret, final EnumSet<Flag> flag) {
+    this(func, desc, args, ret, flag, FN_URI);
   }
 
   /**
@@ -1325,18 +1323,23 @@ public enum Function {
     this.args = args;
     this.flags = flag;
     this.uri = uri;
+    minMax = minMax(desc, args);
+  }
 
-    // count number of minimum and maximum arguments by analyzing the function string
-    final int b = desc.indexOf('[');
-    if(b == -1) {
-      min = args.length;
-      max = args.length;
-    } else {
-      int c = b + 1 < desc.length() && desc.charAt(b + 1) == ',' ? 1 : 0;
-      for(int i = 0; i < b; i++) if(desc.charAt(i) == ',') c++;
-      min = c;
-      max = desc.contains("...") ? Integer.MAX_VALUE : args.length;
-    }
+  /**
+   * Computes the minimum and maximum number of arguments by analyzing the description string.
+   * @param desc description
+   * @param args arguments
+   * @return min/max values
+   */
+  public static int[] minMax(final String desc, final SeqType[] args) {
+    // count number of minimum and maximum arguments by analyzing the description
+    final int b = desc.indexOf('['), al = args.length;
+    if(b == -1) return new int[] { al, al };
+
+    int c = b + 1 < desc.length() && desc.charAt(b + 1) == ',' ? 1 : 0;
+    for(int i = 0; i < b; i++) if(desc.charAt(i) == ',') c++;
+    return new int[] { c, desc.contains("...") ? Integer.MAX_VALUE : al };
   }
 
   /**
@@ -1371,19 +1374,20 @@ public enum Function {
   /**
    * Returns the function type of this function with the given arity.
    * @param arity number of arguments
-   * @param ann annotations
+   * @param anns annotations
    * @return function type
    */
-  final FuncType type(final int arity, final Ann ann) {
-    final SeqType[] arg = new SeqType[arity];
-    if(arity != 0 && max == Integer.MAX_VALUE) {
-      System.arraycopy(args, 0, arg, 0, args.length);
-      final SeqType var = args[args.length - 1];
-      for(int a = args.length; a < arity; a++) arg[a] = var;
+  final FuncType type(final int arity, final AnnList anns) {
+    final SeqType[] st = new SeqType[arity];
+    if(arity != 0 && minMax[1] == Integer.MAX_VALUE) {
+      final int al = args.length;
+      System.arraycopy(args, 0, st, 0, al);
+      final SeqType var = args[al - 1];
+      for(int a = al; a < arity; a++) st[a] = var;
     } else {
-      System.arraycopy(args, 0, arg, 0, arity);
+      System.arraycopy(args, 0, st, 0, arity);
     }
-    return FuncType.get(ann, ret, arg);
+    return FuncType.get(anns, ret, st);
   }
 
   /**
@@ -1409,9 +1413,17 @@ public enum Function {
    * @return array of variable names
    */
   final String[] names() {
-    final String names = desc.replaceFirst(".*?\\(", "").replace(",...",
-        "").replaceAll("[\\[\\]\\)\\s]", "");
+    final String names = desc.replaceFirst(".*?\\(", "").replace(",...", "").
+        replaceAll("[\\[\\]\\)\\s]", "");
     return names.isEmpty() ? new String[0] : Strings.split(names, ',');
+  }
+
+  /**
+   * Returns the local name of the function.
+   * @return name
+   */
+  public byte[] id() {
+    return new TokenBuilder(desc.substring(0, desc.indexOf('('))).finish();
   }
 
   /**
@@ -1422,12 +1434,12 @@ public enum Function {
   final QNm[] argNames(final int arity) {
     final String[] names = names();
     final QNm[] res = new QNm[arity];
-    for(int i = Math.min(arity, names.length); --i >= 0;) res[i] = new QNm(names[i]);
-    if(arity > names.length) {
-      final String[] parts = names[names.length - 1].split("(?=\\d+$)", 2);
+    final int nl = names.length;
+    for(int i = Math.min(arity, nl); --i >= 0;) res[i] = new QNm(names[i]);
+    if(arity > nl) {
+      final String[] parts = names[nl - 1].split("(?=\\d+$)", 2);
       final int start = Integer.parseInt(parts[1]);
-      for(int i = names.length; i < arity; i++)
-        res[i] = new QNm(parts[0] + (start + i - names.length + 1), "");
+      for(int i = nl; i < arity; i++) res[i] = new QNm(parts[0] + (start + i - nl + 1), "");
     }
     return res;
   }
@@ -1462,7 +1474,7 @@ public enum Function {
 
   @Override
   public final String toString() {
-    return new TokenBuilder(NSGlobal.prefix(uri())).add(':').add(desc).toString();
+    return new TokenBuilder(NSGlobal.prefix(uri)).add(':').add(desc).toString();
   }
 
   /*

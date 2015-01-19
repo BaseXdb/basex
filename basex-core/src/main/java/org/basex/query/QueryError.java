@@ -36,9 +36,14 @@ public enum QueryError {
   /** BASX0005. */
   BASX_STACKOVERFLOW(BASX, 5, "Stack Overflow: Try tail recursion?"),
   /** BASX0006. */
-  BASX_ANNOT_X_X(BASX, 6, "Annotation %% is invalid or not supported."),
+  BASX_ANNOT_X_X(BASX, 6, "Annotation %% is unknown."),
   /** BASX0006. */
-  BASX_ANNOTARGS_X_X(BASX, 6, "Annotation %% has invalid arguments."),
+  BASX_ANNNUM_X_X_X(BASX, 6, "%: % argument% supplied."),
+  /** BASX0006. */
+  BASX_ANNTYPE_X_X_X(BASX, 6, "%: % expected, % found."),
+  /** BASX0007. */
+  BASX_TWICE_X_X(BASX, 6, "Annotation %% was declared twice."),
+
   /** XUST0002. */
   BASEX_MOD(XUST, 2, "All transform expressions must be updating or return an empty sequence."),
 
@@ -239,10 +244,6 @@ public enum QueryError {
   UNIT_ARGS_X(UNIT, 2, "Test function '%' must have no arguments."),
   /** UNIT0003. */
   UNIT_PRIVATE_X(UNIT, 3, "Test function '%' must be public."),
-  /** UNIT0004. */
-  UNIT_TWICE_X_X(UNIT, 4, "Annotation %:% was declare twice."),
-  /** UNIT0005. */
-  UNIT_ANN_X_X(UNIT, 5, "Annotation '%%' has invalid arguments."),
 
   // User Module
 
@@ -872,7 +873,7 @@ public enum QueryError {
   /** XPST0003. */
   NOCATCH(XPST, 3, "Expecting catch clause."),
   /** XPST0003. */
-  ANNVALUE(XPST, 3, "Literal expected after annotation."),
+  ANNVALUE(XPST, 3, "Literal expected, ')' found."),
   /** XPST0003. */
   UPDATINGVAR(XPST, 3, "Variable cannot be updating."),
   /** XPST0003. */
@@ -898,7 +899,7 @@ public enum QueryError {
   /** XPST0017. */
   FUNCSIMILAR_X_X(XPST, 17, "Unknown function '%'; similar: '%'."),
   /** XPST0017. */
-  FUNCARGS_X_X_X(XPST, 17, "%: % argument% supplied."),
+  FUNCARGNUM_X_X_X(XPST, 17, "%: % argument% supplied."),
   /** XPST0017. */
   FUNCTYPES_X_X_X_X(XPST, 17, "%: % argument% supplied (% expected)."),
   /** XPST0017. */
@@ -1043,7 +1044,7 @@ public enum QueryError {
   /** XQST0045. */
   NAMERES_X(XQST, 45, "Function '%' is in reserved namespace."),
   /** XQST0045. */
-  ANNRES_X_X(XQST, 45, "Annotation %% is in reserved namespace."),
+  ANNWHICH_X_X(XQST, 45, "Annotation %% is unknown."),
   /** XQST0046. */
   INVURI_X(XQST, 46, "URI '%' is invalid."),
   /** XQST0047. */
@@ -1125,7 +1126,7 @@ public enum QueryError {
   /** XQST0106. */
   DUPLUPD(XQST, 106, "More than one updating annotation declared."),
   /** XQST0106. */
-  DUPLVIS(XQST, 106, "More than one visibility annotation declared."),
+  DUPLFUNVIS(XQST, 106, "More than one visibility annotation declared."),
   /** XQST0108. */
   MODOUT(XQST, 108, "No output declarations allowed in library modules."),
   /** XQST0109. */

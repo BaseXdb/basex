@@ -54,7 +54,7 @@ abstract class Docs extends StandardFunc {
   @Override
   public final boolean accept(final ASTVisitor visitor) {
     if(exprs.length == 0) {
-      if(oneOf(func, COLLECTION, URI_COLLECTION) && !visitor.lock(DBLocking.COLL)) return false;
+      if(oneOf(sig, COLLECTION, URI_COLLECTION) && !visitor.lock(DBLocking.COLL)) return false;
     } else if(!(exprs[0] instanceof Str)) {
       if(!visitor.lock(null)) return false;
     } else {

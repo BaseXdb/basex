@@ -6,7 +6,7 @@ import static org.basex.util.Token.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -43,7 +43,7 @@ final class PlainDoc extends Inspect {
       variable(sv, context);
     }
     for(final StaticFunc sf : qc.funcs.funcs()) {
-      function(sf.name, sf, sf.funcType(), sf.ann, context);
+      function(sf.name, sf, sf.funcType(), sf.anns, context);
     }
 
     return context;
@@ -63,7 +63,7 @@ final class PlainDoc extends Inspect {
     if(doc != null) comment(doc, mod);
 
     for(final StaticVar sv : qp.vars) variable(sv, mod);
-    for(final StaticFunc sf : qp.funcs) function(sf.name, sf, sf.funcType(), sf.ann, mod);
+    for(final StaticFunc sf : qp.funcs) function(sf.name, sf, sf.funcType(), sf.anns, mod);
     return mod;
   }
 
@@ -80,7 +80,7 @@ final class PlainDoc extends Inspect {
     if(sv.name.uri().length != 0) variable.add("uri", sv.name.uri());
     type(sv.seqType(), variable);
     comment(sv, variable);
-    annotation(sv.ann, variable, true);
+    annotation(sv.anns, variable, true);
     return variable;
   }
 
@@ -89,13 +89,13 @@ final class PlainDoc extends Inspect {
    * @param fname name of function
    * @param sf function reference
    * @param ftype function type
-   * @param ann annotations
+   * @param anns annotations
    * @param parent node
    * @return resulting value
    * @throws QueryException query exception
    */
-  FElem function(final QNm fname, final StaticFunc sf, final FuncType ftype,
-        final Ann ann, final FElem parent) throws QueryException {
+  FElem function(final QNm fname, final StaticFunc sf, final FuncType ftype, final AnnList anns,
+      final FElem parent) throws QueryException {
 
     final FElem function = elem("function", parent);
     if(fname != null) {
@@ -125,7 +125,7 @@ final class PlainDoc extends Inspect {
       type(ftype.argTypes[a], argument);
     }
 
-    annotation(ann, function, true);
+    annotation(anns, function, true);
 
     if(doc != null) {
       for(final byte[] key : doc) {

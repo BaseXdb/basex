@@ -45,11 +45,11 @@ public class StringList extends ElementList implements Iterable<String> {
    */
   public final StringList add(final String element) {
     String[] lst = list;
-    int s = size;
+    final int s = size;
     if(s == lst.length) lst = Array.copyOf(lst, newSize());
-    lst[s++] = element;
+    lst[s] = element;
     list = lst;
-    size = s;
+    size = s + 1;
     return this;
   }
 

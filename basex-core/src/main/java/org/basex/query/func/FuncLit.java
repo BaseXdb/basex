@@ -6,6 +6,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -24,7 +25,7 @@ public final class FuncLit extends Single implements Scope {
   /** Static context. */
   private final StaticContext sc;
   /** Annotations. */
-  private Ann ann;
+  private AnnList anns;
   /** Function name. */
   private final QNm name;
   /** Formal parameters. */
@@ -36,7 +37,7 @@ public final class FuncLit extends Single implements Scope {
 
   /**
    * Constructor.
-   * @param ann annotations
+   * @param anns annotations
    * @param name function name
    * @param args formal parameters
    * @param expr function body
@@ -45,11 +46,11 @@ public final class FuncLit extends Single implements Scope {
    * @param sc static context
    * @param info input info
    */
-  FuncLit(final Ann ann, final QNm name, final Var[] args, final Expr expr, final FuncType ft,
+  FuncLit(final AnnList anns, final QNm name, final Var[] args, final Expr expr, final FuncType ft,
       final VarScope scope, final StaticContext sc, final InputInfo info) {
 
     super(info, expr);
-    this.ann = ann;
+    this.anns = anns;
     this.name = name;
     this.args = args;
     this.scope = scope;
@@ -66,7 +67,7 @@ public final class FuncLit extends Single implements Scope {
     if(check) {
       final StaticFunc sf = qc.funcs.get(name, args.length, info, true);
       if(sf == null) throw FUNCUNKNOWN_X.get(info, name.string());
-      ann = sf.ann;
+      anns = sf.anns;
       seqType = sf.funcType().seqType();
     }
 
@@ -88,23 +89,18 @@ public final class FuncLit extends Single implements Scope {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) {
-    return new FuncItem(sc, ann == null ? new Ann() : ann, name, args, (FuncType) seqType.type,
-        expr, qc.value, qc.pos, qc.size, scope.stackSize());
+    return new FuncItem(sc, anns, name, args, (FuncType) seqType.type, expr, qc.value, qc.pos,
+        qc.size, scope.stackSize());
   }
 
   @Override
   public Expr copy(final QueryContext qc, final VarScope o, final IntObjMap<Var> vs) {
-    final Ann an = ann == null ? null : new Ann();
-    if(an != null) {
-      final int al = ann.size();
-      for(int a = 0; a < al; a++) an.add(ann.names[a], ann.values[a], info);
-    }
     final VarScope scp = new VarScope(sc);
     final int al = args.length;
     final Var[] arg = new Var[al];
     for(int a = 0; a < al; a++) vs.put(args[a].id, arg[a] = scp.newCopyOf(qc, args[a]));
     final Expr call = expr.copy(qc, scp, vs);
-    return new FuncLit(an, name, arg, call, (FuncType) seqType.type, scp, sc, info);
+    return new FuncLit(anns, name, arg, call, (FuncType) seqType.type, scp, sc, info);
   }
 
   @Override
@@ -137,7 +133,7 @@ public final class FuncLit extends Single implements Scope {
    * Returns annotations.
    * @return annotations
    */
-  public Ann annotations() {
-    return ann;
+  public AnnList annotations() {
+    return anns;
   }
 }

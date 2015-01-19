@@ -7,6 +7,7 @@ import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -75,7 +76,7 @@ final class XQDoc extends Inspect {
       elem("name", variable).add(sv.name.string());
       if(sv.name.hasPrefix()) nsCache.put(sv.name.prefix(), sv.name.uri());
       comment(sv, variable);
-      annotations(sv.ann, variable);
+      annotations(sv.anns, variable);
       type(sv.seqType(), variable);
     }
 
@@ -89,9 +90,9 @@ final class XQDoc extends Inspect {
       comment(sf, function);
       elem("name", function).add(name.string());
       if(name.hasPrefix()) nsCache.put(name.prefix(), name.uri());
-      annotations(sf.ann, function);
+      annotations(sf.anns, function);
 
-      final TokenBuilder tb = new TokenBuilder(DECLARE).add(' ').addExt(sf.ann);
+      final TokenBuilder tb = new TokenBuilder(DECLARE).add(' ').addExt(sf.anns);
       tb.add(FUNCTION).add(' ').add(name.string()).add(PAREN1);
       for(int i = 0; i < al; i++) {
         final Var v = sf.args[i];
@@ -148,16 +149,16 @@ final class XQDoc extends Inspect {
 
   /**
    * Creates annotation elements.
-   * @param ann annotations
+   * @param anns annotations
    * @param parent parent node
    * @throws QueryException query exception
    */
-  private void annotations(final Ann ann, final FElem parent) throws QueryException {
-    if(!ann.isEmpty()) annotation(ann, elem("annotations", parent), false);
-    final int al = ann.size();
+  private void annotations(final AnnList anns, final FElem parent) throws QueryException {
+    if(!anns.isEmpty()) annotation(anns, elem("annotations", parent), false);
+    final int al = anns.size();
     for(int a = 0; a < al; a++) {
-      final QNm name = ann.names[a];
-      if(name.hasPrefix()) nsCache.put(name.prefix(), name.uri());
+      final byte[] uri = anns.get(a).sig.uri;
+      if(uri.length > 0) nsCache.put(NSGlobal.prefix(uri), uri);
     }
   }
 

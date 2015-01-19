@@ -7,11 +7,13 @@ import java.util.*;
 
 import org.basex.core.*;
 import org.basex.query.*;
+import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.Expr.Flag;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -39,7 +41,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
   /**
    * Function constructor.
-   * @param ann annotations
+   * @param anns annotations
    * @param name function name
    * @param args arguments
    * @param type declared return type
@@ -49,14 +51,14 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    * @param doc current xqdoc cache
    * @param info input info
    */
-  StaticFunc(final Ann ann, final QNm name, final Var[] args, final SeqType type,
+  StaticFunc(final AnnList anns, final QNm name, final Var[] args, final SeqType type,
       final Expr expr, final StaticContext sc, final VarScope scope, final String doc,
       final InputInfo info) {
 
-    super(sc, ann, name, type, scope, doc, info);
+    super(sc, anns, name, type, scope, doc, info);
     this.args = args;
     this.expr = expr;
-    updating = ann != null && ann.contains(Ann.Q_UPDATING);
+    updating = anns.contains(Annotation.UPDATING);
   }
 
   @Override
@@ -113,7 +115,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(DECLARE).add(' ').addExt(ann);
+    final TokenBuilder tb = new TokenBuilder(DECLARE).add(' ').addExt(anns);
     tb.add(FUNCTION).add(' ').add(name.string());
     tb.add(PAREN1).addSep(args, SEP).add(PAREN2);
     if(declType != null) tb.add(' ' + AS + ' ' + declType);
@@ -157,7 +159,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
   @Override
   public FuncType funcType() {
-    return FuncType.get(ann, args, declType);
+    return FuncType.get(anns, args, declType);
   }
 
   @Override
@@ -166,8 +168,8 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   }
 
   @Override
-  public Ann annotations() {
-    return ann;
+  public AnnList annotations() {
+    return anns;
   }
 
   @Override

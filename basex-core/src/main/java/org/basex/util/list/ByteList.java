@@ -40,9 +40,9 @@ public class ByteList extends ElementList {
     byte[] lst = list;
     int s = size;
     if(s == lst.length) lst = Arrays.copyOf(lst, newSize());
-    lst[s++] = (byte) element;
+    lst[s] = (byte) element;
     list = lst;
-    size = s;
+    size = s + 1;
     return this;
   }
 

@@ -29,10 +29,11 @@ public final class NSGlobal {
     NS.add(ANN_PREFIX, XQ_URI);
     RESERVED = NS.size();
 
-    // implementation-defined pre-declarations
+    // additional XQuery namespaces
     NS.add(LOCAL_PREFIX, LOCAL_URI);
     NS.add(OUTPUT_PREFIX, OUTPUT_URI);
     NS.add(ERR_PREFIX, ERROR_URI);
+
     // EXPath namespaces
     NS.add(EXPERR_PREFIX, EXPERROR_URI);
     NS.add(BIN_PREFIX, BIN_URI);
@@ -47,7 +48,7 @@ public final class NSGlobal {
     // BaseX namespaces
     NS.add(BXERR_PREFIX, BXERRORS_URI);
     NS.add(BASEX_PREFIX, BASEX_URI);
-
+    // namespaces of built-in modules
     NS.add(ADMIN_PREFIX, ADMIN_URI);
     NS.add(ARCHIVE_PREFIX, ARCHIVE_URI);
     NS.add(CLIENT_PREFIX, CLIENT_URI);

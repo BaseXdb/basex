@@ -8,6 +8,7 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -20,10 +21,10 @@ import org.basex.util.*;
  */
 public class FuncType implements Type {
   /** Any function type. */
-  public static final FuncType ANY_FUN = new FuncType(null, null, null);
+  public static final FuncType ANY_FUN = new FuncType(new AnnList(), null, null);
 
   /** Annotations. */
-  public final Ann ann;
+  public final AnnList anns;
   /** Argument types. */
   public final SeqType[] argTypes;
   /** Return type. */
@@ -34,12 +35,12 @@ public class FuncType implements Type {
 
   /**
    * Constructor.
-   * @param ann annotations
+   * @param anns annotations (can be {@code null})
    * @param argTypes argument types
    * @param retType return type
    */
-  FuncType(final Ann ann, final SeqType[] argTypes, final SeqType retType) {
-    this.ann = ann != null ? ann : new Ann();
+  FuncType(final AnnList anns, final SeqType[] argTypes, final SeqType retType) {
+    this.anns = anns;
     this.argTypes = argTypes;
     this.retType = retType;
   }
@@ -103,11 +104,9 @@ public class FuncType implements Type {
     final FuncType ft = (FuncType) t;
 
     // check annotations
-    final int as = ann.size();
-    if(as != ft.ann.size()) return false;
-    for(int a = 0; a < as; a++) {
-      if(!ann.contains(ft.ann.names[a], ft.ann.values[a])) return false;
-    }
+    final int as = anns.size();
+    if(as != ft.anns.size()) return false;
+    for(final Ann ann : ft.anns) if(!anns.contains(ann)) return false;
 
     if(this == ANY_FUN || ft == ANY_FUN || argTypes.length != ft.argTypes.length) return false;
     final int al = argTypes.length;
@@ -125,10 +124,7 @@ public class FuncType implements Type {
 
     // check annotations
     final FuncType ft = (FuncType) t;
-    final int as = ft.ann.size();
-    for(int a = 0; a < as; a++) {
-      if(!ann.contains(ft.ann.names[a], ft.ann.values[a])) return false;
-    }
+    for(final Ann ann : ft.anns) if(!anns.contains(ann)) return false;
 
     // takes care of FunType.ANY
     if(this == ft || ft == ANY_FUN) return true;
@@ -157,7 +153,7 @@ public class FuncType implements Type {
       arg[a] = argTypes[a].intersect(ft.argTypes[a]);
       if(arg[a] == null) return ANY_FUN;
     }
-    return get(ann.intersect(ft.ann), retType.union(ft.retType), arg);
+    return get(anns.intersect(ft.anns), retType.union(ft.retType), arg);
   }
 
   @Override
@@ -177,7 +173,7 @@ public class FuncType implements Type {
       if(rt != null && al == ft.argTypes.length) {
         final SeqType[] arg = new SeqType[al];
         for(int a = 0; a < al; a++) arg[a] = argTypes[a].union(ft.argTypes[a]);
-        final Ann a = ann.union(ft.ann);
+        final AnnList a = anns.union(ft.anns);
         return a == null ? null : get(a, rt, arg);
       }
     }
@@ -186,13 +182,13 @@ public class FuncType implements Type {
 
   /**
    * Getter for function types.
-   * @param ann annotations
+   * @param anns annotations
    * @param ret return type
    * @param args argument types
    * @return function type
    */
-  public static FuncType get(final Ann ann, final SeqType ret, final SeqType... args) {
-    return args == null || ret == null ? ANY_FUN : new FuncType(ann, args, ret);
+  public static FuncType get(final AnnList anns, final SeqType ret, final SeqType... args) {
+    return args == null || ret == null ? ANY_FUN : new FuncType(anns, args, ret);
   }
 
   /**
@@ -202,7 +198,7 @@ public class FuncType implements Type {
    * @return function type
    */
   public static FuncType get(final SeqType ret, final SeqType... args) {
-    return get(new Ann(), ret, args);
+    return get(new AnnList(), ret, args);
   }
 
   /**
@@ -228,21 +224,21 @@ public class FuncType implements Type {
   public static FuncType arity(final int a) {
     final SeqType[] args = new SeqType[a];
     Arrays.fill(args, SeqType.ITEM_ZM);
-    return get(null, SeqType.ITEM_ZM, args);
+    return get(new AnnList(), SeqType.ITEM_ZM, args);
   }
 
   /**
    * Getter for a function's type.
-   * @param an annotations
+   * @param anns annotations
    * @param args formal parameters
    * @param ret return type
    * @return function type
    */
-  public static FuncType get(final Ann an, final Var[] args, final SeqType ret) {
+  public static FuncType get(final AnnList anns, final Var[] args, final SeqType ret) {
     final int al = args.length;
     final SeqType[] at = new SeqType[al];
     for(int a = 0; a < al; a++) at[a] = args[a] == null ? SeqType.ITEM_ZM : args[a].declaredType();
-    return new FuncType(an, at, ret == null ? SeqType.ITEM_ZM : ret);
+    return new FuncType(anns, at, ret == null ? SeqType.ITEM_ZM : ret);
   }
 
   @Override
@@ -252,7 +248,7 @@ public class FuncType implements Type {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(ann.toString()).add(FUNCTION).add('(');
+    final TokenBuilder tb = new TokenBuilder(anns.toString()).add(FUNCTION).add('(');
     if(this == ANY_FUN) {
       tb.add('*').add(')');
     } else {

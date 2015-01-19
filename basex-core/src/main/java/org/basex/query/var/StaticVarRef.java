@@ -3,6 +3,7 @@ package org.basex.query.var;
 import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
+import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -113,8 +114,8 @@ final class StaticVarRef extends ParseExpr {
    * @throws QueryException query exception
    */
   void init(final StaticVar vr) throws QueryException {
-    if(vr.ann.contains(Ann.Q_PRIVATE) && !Token.eq(sc.baseURI().string(),
-       vr.sc.baseURI().string())) throw VARPRIVATE_X.get(info, vr);
+    if(vr.anns.contains(Annotation.PRIVATE) && !sc.baseURI().eq(vr.sc.baseURI()))
+      throw VARPRIVATE_X.get(info, vr);
     var = vr;
   }
 }

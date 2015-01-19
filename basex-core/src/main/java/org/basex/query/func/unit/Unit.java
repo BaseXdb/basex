@@ -2,6 +2,7 @@ package org.basex.query.func.unit;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.unit.Constants.*;
+import static org.basex.query.ann.Annotation.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
@@ -11,10 +12,12 @@ import org.basex.core.*;
 import org.basex.core.Context;
 import org.basex.io.*;
 import org.basex.query.*;
+import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -83,30 +86,28 @@ final class Unit {
       // loop through all functions
       for(final StaticFunc sf : qc.funcs.funcs()) {
         // find Unit annotations
-        final int as = sf.ann.size();
+        final AnnList anns = sf.anns;
         boolean xq = false;
-        for(int a = 0; !xq && a < as; a++) {
-          xq |= eq(sf.ann.names[a].uri(), QueryText.UNIT_URI);
-        }
+        for(final Ann ann : anns) xq |= eq(ann.sig.uri, QueryText.UNIT_URI);
         if(!xq) continue;
 
         // Unit function:
-        if(sf.ann.contains(Ann.Q_PRIVATE)) throw UNIT_PRIVATE_X.get(null, sf.name.local());
+        if(anns.contains(PRIVATE)) throw UNIT_PRIVATE_X.get(null, sf.name.local());
         if(sf.args.length > 0) throw UNIT_ARGS_X.get(null, sf.name.local());
 
-        if(indexOf(sf, BEFORE_MODULE) != -1) beforeModule.add(sf);
-        if(indexOf(sf, AFTER_MODULE) != -1) afterModule.add(sf);
-        int i = indexOf(sf, BEFORE);
-        if(i != -1) {
+        if(anns.contains(_UNIT_BEFORE_MODULE)) beforeModule.add(sf);
+        if(anns.contains(_UNIT_AFTER_MODULE)) afterModule.add(sf);
+        final Ann b = anns.get(_UNIT_BEFORE);
+        if(b != null) {
           before.add(sf);
-          beforeFilter.add(name(sf, i));
+          beforeFilter.add(name(sf, b));
         }
-        i = indexOf(sf, AFTER);
-        if(i != -1) {
+        final Ann a = anns.get(_UNIT_AFTER);
+        if(a != null) {
           after.add(sf);
-          afterFilter.add(name(sf, i));
+          afterFilter.add(name(sf, a));
         }
-        if(indexOf(sf, TEST) != -1) test.add(sf);
+        if(anns.contains(_UNIT_TEST)) test.add(sf);
       }
 
       // call initializing functions before first test
@@ -114,25 +115,25 @@ final class Unit {
 
       for(final StaticFunc sf : test) {
         // check arguments
-        final Value values = sf.ann.values[indexOf(sf, TEST)];
-        final long vs = values.size();
+        final AnnList anns = sf.anns;
+        final Ann ann = anns.get(_UNIT_TEST);
+        final Item[] args = ann.args;
+        final int vs = args.length;
 
         // expected error code
         byte[] code = null;
-        if(vs != 0) {
-          if(vs == 2 && eq(EXPECTED, values.itemAt(0).string(null))) {
-            code = values.itemAt(1).string(null);
-          } else {
-            throw UNIT_ANN_X_X.get(null, '%', sf.ann.names[0]);
-          }
+        if(vs == 2 && eq(EXPECTED, args[0].string(null))) {
+          code = args[1].string(null);
+        } else if(vs != 0) {
+          throw BASX_ANNNUM_X_X_X.get(ann.info, ann, vs, vs == 1 ? "" : "s");
         }
 
         final FElem testcase = new FElem(TESTCASE).add(NAME, sf.name.local());
         tests++;
 
         final Performance perf2 = new Performance();
-        final int skip = indexOf(sf, IGNORE);
-        if(skip == -1) {
+        final Ann ignore = anns.get(Annotation._UNIT_IGNORE);
+        if(ignore == null) {
           try {
             // call functions marked with "before"
             int l = before.size();
@@ -158,8 +159,7 @@ final class Unit {
           }
         } else {
           // skip test
-          final Value sv = sf.ann.values[skip];
-          testcase.add(SKIPPED, sv.isEmpty() ? EMPTY : sv.itemAt(0).string(null));
+          testcase.add(SKIPPED, ignore.args.length == 0 ? EMPTY : ignore.args[0].string(null));
           skipped++;
         }
         testcase.add(TIME, time(perf2));
@@ -192,15 +192,15 @@ final class Unit {
   }
 
   /**
-   * Returns an annotation argument at the specified offset as QName.
+   * Returns an annotation argument as QName.
    * @param sf static function
-   * @param i index
+   * @param ann annotation
    * @return QName
    * @throws QueryException query exception
    */
-  private QNm name(final StaticFunc sf, final int i) throws QueryException {
-    if(!sf.ann.values[i].isEmpty()) {
-      final byte[] name = sf.ann.values[i].itemAt(i).string(null);
+  private QNm name(final StaticFunc sf, final Ann ann) throws QueryException {
+    if(ann.args.length != 0) {
+      final byte[] name = ann.args[0].string(null);
       if(name.length != 0) return QNm.resolve(name, sf.name.uri(), sf.sc, sf.info);
     }
     return null;
@@ -307,29 +307,6 @@ final class Unit {
       if(func.info.equals(sf.info)) return sf;
     }
     return null;
-  }
-
-  /**
-   * Checks if the specified unit annotation has been specified.
-   * If positive, returns its offset in the annotation array.
-   *
-   * @param func user function
-   * @param name name of annotation to be found
-   * @return value
-   * @throws QueryException query exception
-   */
-  private static int indexOf(final StaticFunc func, final byte[] name) throws QueryException {
-    final Ann ann = func.ann;
-    final int as = ann.size();
-    int pos = -1;
-    for(int a = 0; a < as; a++) {
-      final QNm nm = ann.names[a];
-      if(eq(nm.uri(), QueryText.UNIT_URI) && eq(nm.local(), name)) {
-        if(pos != -1) throw UNIT_TWICE_X_X.get(null, '%', nm.local());
-        pos = a;
-      }
-    }
-    return pos;
   }
 
   /**

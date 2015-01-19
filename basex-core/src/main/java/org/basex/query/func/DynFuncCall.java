@@ -7,6 +7,7 @@ import static org.basex.util.Array.*;
 import java.util.*;
 
 import org.basex.query.*;
+import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -76,7 +77,7 @@ public final class DynFuncCall extends FuncCall {
       // try to inline the function
       final XQFunctionExpr fe = (XQFunctionExpr) f;
       if(!(f instanceof FuncItem && comesFrom((FuncItem) f))) {
-        if(!sc.mixUpdates && updating != fe.annotations().contains(Ann.Q_UPDATING))
+        if(!sc.mixUpdates && updating != fe.annotations().contains(Annotation.UPDATING))
           throw (updating ? UPFUNCNOTUP : UPFUNCUP).get(info);
 
         final Expr[] args = Arrays.copyOf(exprs, ar);
@@ -170,7 +171,7 @@ public final class DynFuncCall extends FuncCall {
       final Expr e = f instanceof FuncItem ? ((FuncItem) f).expr : f;
       throw INVARITY_X_X_X_X.get(info, e, ar, ar == 1 ? "" : "s", f.arity());
     }
-    if(!sc.mixUpdates && updating != f.annotations().contains(Ann.Q_UPDATING))
+    if(!sc.mixUpdates && updating != f.annotations().contains(Annotation.UPDATING))
       throw (updating ? UPFUNCNOTUP : UPFUNCUP).get(info);
 
     return f;

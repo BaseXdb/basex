@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
+import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -60,8 +61,8 @@ public final class StaticFuncCall extends FuncCall {
     super.compile(qc, scp);
 
     // disallow call of private functions from module with different uri
-    if(func.ann.contains(Ann.Q_PRIVATE) && !Token.eq(func.sc.baseURI().string(),
-        sc.baseURI().string())) throw FUNCPRIVATE_X.get(info, name.string());
+    if(func.anns.contains(Annotation.PRIVATE) && !func.sc.baseURI().eq(sc.baseURI()))
+      throw FUNCPRIVATE_X.get(info, name.string());
 
     // compile mutually recursive functions
     func.compile(qc);
@@ -90,14 +91,14 @@ public final class StaticFuncCall extends FuncCall {
 
   /**
    * Initializes the function and checks for visibility.
-   * @param f function reference
+   * @param sf function reference
    * @return self reference
    * @throws QueryException query exception
    */
-  public StaticFuncCall init(final StaticFunc f) throws QueryException {
-    func = f;
-    if(f.ann.contains(Ann.Q_PRIVATE) && !Token.eq(sc.baseURI().string(),
-        f.sc.baseURI().string())) throw FUNCPRIVATE_X.get(info, f.name.string());
+  public StaticFuncCall init(final StaticFunc sf) throws QueryException {
+    func = sf;
+    if(sf.anns.contains(Annotation.PRIVATE) && !sc.baseURI().eq(sf.sc.baseURI()))
+      throw FUNCPRIVATE_X.get(info, sf.name.string());
     return this;
   }
 

@@ -4,7 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
-import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.util.*;
@@ -25,7 +25,7 @@ public final class MapType extends FuncType {
    * @param rt return type
    */
   MapType(final AtomType type, final SeqType rt) {
-    super(new Ann(), new SeqType[] { type.seqType() }, rt);
+    super(new AnnList(), new SeqType[] { type.seqType() }, rt);
     keyType = type;
   }
 

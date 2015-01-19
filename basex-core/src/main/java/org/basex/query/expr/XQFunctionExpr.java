@@ -1,7 +1,7 @@
 package org.basex.query.expr;
 
 import org.basex.query.*;
-import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -43,7 +43,7 @@ public interface XQFunctionExpr {
    * Annotations of this function.
    * @return this function's annotations
    */
-  Ann annotations();
+  AnnList annotations();
 
   /**
    * Tries to inline this function with the given argument expressions.

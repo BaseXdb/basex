@@ -8,8 +8,8 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.Array;
 import org.basex.query.value.item.*;
@@ -44,7 +44,7 @@ public final class Map extends FItem {
    * @param dt number of date/time entries (negative: without timezone)
    */
   private Map(final TrieNode root, final int dt) {
-    super(SeqType.ANY_MAP, new Ann());
+    super(SeqType.ANY_MAP, new AnnList());
     this.root = root;
     this.dt = dt;
   }
