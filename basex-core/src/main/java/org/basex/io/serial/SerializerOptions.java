@@ -45,7 +45,7 @@ public final class SerializerOptions extends Options {
       new StringOption("media-type", "");
   /** Serialization parameter: xml/xhtml/html/text/json/csv/adaptive. */
   public static final EnumOption<SerialMethod> METHOD =
-      new EnumOption<>("method", SerialMethod.class);
+      new EnumOption<>("method", SerialMethod.ADAPTIVE);
   /** Serialization parameter: NFC/NFD/NFKC/NKFD/fully-normalized/none. */
   public static final StringOption NORMALIZATION_FORM =
       new StringOption("normalization-form", Text.NONE);

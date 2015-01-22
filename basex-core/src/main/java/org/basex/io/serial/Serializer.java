@@ -84,9 +84,7 @@ public abstract class Serializer {
     po.setLimit(so.get(SerializerOptions.LIMIT));
 
     // no parameters given: serialize adaptively
-    SerialMethod method = so.get(SerializerOptions.METHOD);
-    if(method == null) method = SerialMethod.ADAPTIVE;
-    switch(method) {
+    switch(so.get(SerializerOptions.METHOD)) {
       case XHTML: return new XHTMLSerializer(po, so);
       case HTML:  return new HTMLSerializer(po, so);
       case TEXT:  return new TextSerializer(po, so);

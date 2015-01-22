@@ -90,8 +90,6 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     this.qc = qc;
     this.module = module;
     output = qc.serParams();
-    if(!output.contains(SerializerOptions.METHOD))
-      output.set(SerializerOptions.METHOD, SerialMethod.XML);
   }
 
   /**
