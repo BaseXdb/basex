@@ -44,7 +44,7 @@ final class RESTRetrieve extends RESTCmd {
       }
       http.initResponse();
 
-      context.options.set(MainOptions.SERIALIZER, serial(http));
+      context.options.set(MainOptions.SERIALIZER, http.sopts());
       run(query(raw ? _DB_RETRIEVE : _DB_OPEN), http.res.getOutputStream());
 
     } else {

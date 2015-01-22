@@ -74,7 +74,7 @@ public final class BinModuleTest extends AdvancedQueryTest {
     query(_BIN_TO_OCTETS.args(base64("")),     "");
     query(_BIN_TO_OCTETS.args(base64("00")),   "0");
     query(_BIN_TO_OCTETS.args(base64("FF")),   "255");
-    query(_BIN_TO_OCTETS.args(base64("1122")), "17 34");
+    query(_BIN_TO_OCTETS.args(base64("1122")), "17\n34");
   }
 
   /** Test method. */

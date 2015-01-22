@@ -48,7 +48,7 @@ public final class FuncItemTest extends QueryPlanTest {
   public void partApp2Test() {
     check("for $sub in ('foo', 'bar')" +
         "return starts-with(?, $sub)('foobar')",
-        "true false",
+        "true\nfalse",
         "exists(//" + Util.className(PartFunc.class) + ')'
     );
   }
@@ -219,9 +219,7 @@ public final class FuncItemTest extends QueryPlanTest {
         + "let $f := function($x) { $i * $x },"
         + "    $g := function($y) { 2 * $f($y) }"
         + "return $g($g(42))",
-
-        "168 672 1512",
-
+        "168\n672\n1512",
         "count(//" + Util.className(Closure.class) + ") eq 1"
     );
   }
@@ -249,8 +247,7 @@ public final class FuncItemTest extends QueryPlanTest {
         "  return $go($go, $root)" +
         "};" +
         "local:foo(document { <foo ID=\"a\"><foo ID=\"b\"/></foo> })",
-
-        "a b",
+        "a\nb",
         "empty(//" + Util.className(StaticFuncCall.class) + ')',
         "exists(//" + Util.className(DynFuncCall.class) + ')',
         "exists(//" + Util.className(FuncItem.class) + ')'
@@ -262,8 +259,7 @@ public final class FuncItemTest extends QueryPlanTest {
   public void gh953() {
     check("declare function local:go ($n) { $n, for-each($n/*, local:go(?)) };" +
         "let $source := <a><b/></a> return local:go($source)",
-
-        String.format("<a>%n  <b/>%n</a>%n<b/>")
+        "<a>\n<b/>\n</a>\n<b/>"
     );
   }
 
@@ -280,7 +276,7 @@ public final class FuncItemTest extends QueryPlanTest {
     check("for $n in (<a/>, <b/>)"
         + "let $f := function() as element()* { trace($n) }"
         + "return $f()",
-        String.format("<a/>%n<b/>"));
+        "<a/>\n<b/>");
   }
 
   /** Checks that functions circularly referenced through function literals are compiled. */

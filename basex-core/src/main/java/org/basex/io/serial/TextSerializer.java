@@ -2,46 +2,29 @@ package org.basex.io.serial;
 
 import java.io.*;
 
+import org.basex.data.*;
+import org.basex.io.out.*;
+
 /**
- * This class serializes data as text.
+ * This class serializes items as text.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-final class TextSerializer extends OutputSerializer {
+final class TextSerializer extends StandardSerializer {
   /**
    * Constructor, specifying serialization options.
-   * @param os output stream reference
+   * @param out print output
    * @param sopts serialization parameters
    * @throws IOException I/O exception
    */
-  TextSerializer(final OutputStream os, final SerializerOptions sopts) throws IOException {
-    super(os, sopts);
+  TextSerializer(final PrintOutput out, final SerializerOptions sopts) throws IOException {
+    super(out, sopts);
   }
 
   @Override
-  protected void attribute(final byte[] name, final byte[] value) throws IOException { }
-
-  @Override
-  protected void comment(final byte[] value) throws IOException { }
-
-  @Override
-  protected void pi(final byte[] name, final byte[] value) throws IOException { }
-
-  @Override
-  protected void startOpen(final byte[] name) throws IOException { }
-
-  @Override
-  protected void finishOpen() throws IOException { }
-
-  @Override
-  protected void finishEmpty() throws IOException { }
-
-  @Override
-  protected void finishClose() throws IOException { }
-
-  @Override
-  protected void encode(final int cp) throws IOException {
-    printChar(cp);
+  protected void text(final byte[] value, final FTPos ftp) throws IOException {
+    printChars(norm(value));
+    sep = false;
   }
 }

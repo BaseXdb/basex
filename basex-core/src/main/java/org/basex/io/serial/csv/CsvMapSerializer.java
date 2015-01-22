@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import java.io.*;
 
+import org.basex.io.out.*;
 import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
@@ -23,17 +24,19 @@ import org.basex.util.list.*;
 public final class CsvMapSerializer extends CsvSerializer {
   /**
    * Constructor.
-   * @param os output stream reference
+   * @param out print output
    * @param opts serialization parameters
    * @throws IOException I/O exception
    */
-  public CsvMapSerializer(final OutputStream os, final SerializerOptions opts) throws IOException {
-    super(os, opts);
+  public CsvMapSerializer(final PrintOutput out, final SerializerOptions opts) throws IOException {
+    super(out, opts);
   }
 
   @Override
-  public void serialize(final Item item) throws IOException {
-    if(sep && lvl == 0) print(' ');
+  public void serialize(final Item item, final boolean atts, final boolean iter)
+      throws IOException {
+
+    if(sep && level == 0) out.print(' ');
 
     if(!(item instanceof Map))
       throw BXCS_SERIAL_X.getIO("Top level must be a map; " + item.type + " found");

@@ -34,7 +34,7 @@ public final class Test extends Command {
         context.user().has(Perm.CREATE) ? root : args[0]);
 
     try {
-      final XMLSerializer ser = Serializer.get(out);
+      final Serializer ser = Serializer.get(out);
       final Suite suite = new Suite();
       ser.serialize(suite.test(root, context, this));
       out.print(NL);

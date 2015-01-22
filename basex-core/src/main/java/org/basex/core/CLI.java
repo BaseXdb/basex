@@ -1,7 +1,6 @@
 package org.basex.core;
 
 import static org.basex.core.Text.*;
-import static org.basex.util.Token.*;
 
 import java.io.*;
 
@@ -25,8 +24,6 @@ public abstract class CLI extends Main {
   protected OutputStream out = System.out;
   /** Verbose mode. */
   protected boolean verbose;
-  /** Separate serialized items with newlines. */
-  protected boolean newline;
 
   /** Password reader. */
   private final PasswordReader pwReader = new PasswordReader() {
@@ -104,7 +101,6 @@ public abstract class CLI extends Main {
   protected final void execute(final Command cmd, final boolean info) throws IOException {
     final Session ss = session();
     ss.execute(cmd);
-    if(newline && cmd instanceof XQuery) out.write(token(NL));
     if(info) Util.out(ss.info());
   }
 

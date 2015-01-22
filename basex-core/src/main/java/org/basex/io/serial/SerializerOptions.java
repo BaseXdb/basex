@@ -43,9 +43,9 @@ public final class SerializerOptions extends Options {
   /** Serialization parameter. */
   public static final StringOption MEDIA_TYPE =
       new StringOption("media-type", "");
-  /** Serialization parameter: xml/xhtml/html/text. */
+  /** Serialization parameter: xml/xhtml/html/text/json/csv/adaptive. */
   public static final EnumOption<SerialMethod> METHOD =
-      new EnumOption<>("method", SerialMethod.XML);
+      new EnumOption<>("method", SerialMethod.class);
   /** Serialization parameter: NFC/NFD/NFKC/NKFD/fully-normalized/none. */
   public static final StringOption NORMALIZATION_FORM =
       new StringOption("normalization-form", Text.NONE);
@@ -80,6 +80,12 @@ public final class SerializerOptions extends Options {
   public static final EnumOption<SerialMethod> JSON_NODE_OUTPUT_METHOD =
       new EnumOption<>("json-node-output-method", SerialMethod.XML);
 
+  /** Specific serialization parameter. */
+  public static final OptionsOption<CsvOptions> CSV =
+      new OptionsOption<>("csv", new CsvOptions());
+  /** Specific serialization parameter. */
+  public static final OptionsOption<JsonSerialOptions> JSON =
+      new OptionsOption<>("json", new JsonSerialOptions());
   /** Specific serialization parameter: newline. */
   public static final EnumOption<Newline> NEWLINE =
       new EnumOption<>("newline",
@@ -90,23 +96,11 @@ public final class SerializerOptions extends Options {
   /** Specific serialization parameter: number of spaces to indent. */
   public static final NumberOption INDENTS =
       new NumberOption("indents", 2);
-  /** Specific serialization parameter: prefix of result wrapper. */
-  public static final StringOption WRAP_PREFIX =
-      new StringOption("wrap-prefix", "");
-  /** Specific serialization parameter: URI of result wrapper. */
-  public static final StringOption WRAP_URI =
-      new StringOption("wrap-uri", "");
-  /** Specific serialization parameter. */
-  public static final OptionsOption<CsvOptions> CSV =
-      new OptionsOption<>("csv", new CsvOptions());
-  /** Specific serialization parameter. */
-  public static final OptionsOption<JsonSerialOptions> JSON =
-      new OptionsOption<>("json", new JsonSerialOptions());
-  /** Specific serialization parameter: limit. */
+  /** Specific serialization parameter: maximum number of bytes to serialize. */
   public static final NumberOption LIMIT =
       new NumberOption("limit", -1);
 
-  /** Static Webdav character map. */
+  /** Static WebDAV character map. */
   public static final String WEBDAV = "webdav";
 
   /** Newlines. */
@@ -152,7 +146,7 @@ public final class SerializerOptions extends Options {
    * @param option option
    * @return value
    */
-  boolean yes(final EnumOption<YesNo> option) {
+  public boolean yes(final EnumOption<YesNo> option) {
     return get(option) == YesNo.YES;
   }
 

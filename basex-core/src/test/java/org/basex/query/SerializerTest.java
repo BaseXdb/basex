@@ -38,9 +38,9 @@ public final class SerializerTest extends AdvancedQueryTest {
     for(final String e : empties) query(option + '<' + e + "/>", '<' + e + '>');
 
     query(option + "<html><script>&lt;</script></html>",
-        "<html><script><</script></html>");
+        "<html>\n<script><</script>\n</html>");
     query(option + "<html><style>{ serialize(<a/>) }</style></html>",
-        "<html><style><a/></style></html>");
+        "<html>\n<style><a/></style>\n</html>");
     query(option + "<a b='&lt;'/>", "<a b=\"<\"></a>");
     error(option + "<a>&#x90;</a>", SERILL_X);
 
@@ -55,13 +55,13 @@ public final class SerializerTest extends AdvancedQueryTest {
   public void version50() {
     final String option = "declare option output:method 'html';" +
         "declare option output:version '5.0';";
-    query(option + "<html/>", "<!DOCTYPE html><html></html>");
+    query(option + "<html/>", "<!DOCTYPE html>\n<html></html>");
     final String[] empties = { "area", "base", "br", "col", "command", "embed", "hr",
         "img", "input", "keygen", "link", "meta", "param", "source", "track", "wbr" };
     for(final String e : empties) {
-      query(option + '<' + e + "/>", "<!DOCTYPE html><" + e + '>');
+      query(option + '<' + e + "/>", "<!DOCTYPE html>\n<" + e + '>');
     }
-    query(option + "<a>&#x90;</a>", "<!DOCTYPE html><a>&#x90;</a>");
+    query(option + "<a>&#x90;</a>", "<!DOCTYPE html>\n<a>&#x90;</a>");
   }
 
   /** Test: method=html, html-version=5.0. */
@@ -69,7 +69,7 @@ public final class SerializerTest extends AdvancedQueryTest {
   public void htmlVersion50() {
     final String option = "declare option output:method 'html';" +
         "declare option output:html-version '5.0';";
-    query(option + "<html/>", "<!DOCTYPE html><html></html>");
+    query(option + "<html/>", "<!DOCTYPE html>\n<html></html>");
   }
 
   /** Test: method=text. */

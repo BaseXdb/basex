@@ -33,10 +33,6 @@ public abstract class SessionTest extends SandboxTest {
   private static final String RAW = "declare option output:method 'raw';";
   /** Output stream. */
   ArrayOutput out;
-  /** Serialization parameters to wrap query result with an element. */
-  private static final String WRAPPER =
-    "declare option output:wrap-prefix 'db';" +
-    "declare option output:wrap-uri 'ns';";
   /** Client session. */
   Session session;
 
@@ -57,26 +53,7 @@ public abstract class SessionTest extends SandboxTest {
    */
   @Test
   public final void command() throws IOException {
-    session.execute("set serializer wrap-prefix=,wrap-uri=");
     assertEqual("A", session.execute("xquery 'A'"));
-  }
-
-  /** Runs a query command and wraps the result.
-   * @throws IOException I/O exception */
-  @Test
-  public final void commandSerial1() throws IOException {
-    session.execute("set serializer wrap-prefix=db,wrap-uri=ns");
-    assertEqual("<db:results xmlns:db=\"ns\"/>", session.execute("xquery ()"));
-  }
-
-  /** Runs a query command and wraps the result.
-   * @throws IOException I/O exception */
-  @Test
-  public final void commandSerial2() throws IOException {
-    assertEqual("<db:results xmlns:db=\"ns\">" +
-          "  <db:result>1</db:result>" +
-          "</db:results>",
-          session.execute("xquery " + WRAPPER + '1'));
   }
 
   /** Runs an erroneous query command.
@@ -217,8 +194,8 @@ public abstract class SessionTest extends SandboxTest {
   public void storeBinary() throws IOException {
     session.execute("create db " + NAME);
     session.store("X", new ArrayInput(new byte[] { -128, -2, -1, 0, 1, 127 }));
-    assertEqual("-128 -2 -1 0 1 127", session.query(
-        _CONVERT_BINARY_TO_BYTES.args(_DB_RETRIEVE.args(NAME, "X"))).execute());
+    final Query query = session.query(_CONVERT_BINARY_TO_BYTES.args(_DB_RETRIEVE.args(NAME, "X")));
+    assertEqual("-128\n-2\n-1\n0\n1\n127", query.execute());
   }
 
   /**
@@ -389,27 +366,6 @@ public abstract class SessionTest extends SandboxTest {
       assertEqual("2", query.next());
       assertNull(query.next());
     }
-  }
-
-  /** Runs a query with additional serialization parameters.
-   * @throws IOException I/O exception */
-  @Test
-  public void querySerial1() throws IOException {
-    session.execute("set serializer wrap-prefix=db,wrap-uri=ns");
-    final Query query = session.query(WRAPPER + "()");
-    assertTrue("Result expected.", query.more());
-    assertEqual("<db:results xmlns:db=\"ns\"/>", query.next());
-    assertFalse("No result expected.", query.more());
-  }
-
-  /** Runs a query with additional serialization parameters.
-   * @throws IOException I/O exception */
-  @Test
-  public void querySerial2() throws IOException {
-    final Query query = session.query(WRAPPER + "1 to 2");
-    assertTrue("Result expected.", query.more());
-    assertEqual("<db:results xmlns:db=\"ns\">  <db:result>1</db:result>" +
-        "  <db:result>2</db:result></db:results>", query.next());
   }
 
   /** Runs a query with an external variable declaration.
@@ -686,7 +642,7 @@ public abstract class SessionTest extends SandboxTest {
     final String var = "declare variable $x external;",
         map = "{\"foo\":[1,2,3],\"bar\":{\"a\":null,\"\":false}}";
     final String[][] tests = {
-        {"for $k in map:keys($x) order by $k descending return $k", "foo bar"},
+        {"for $k in map:keys($x) order by $k descending return $k", "foo\nbar"},
         {"every $k in $x('foo')?* satisfies $k eq $x('foo')(xs:integer($k))", "true"},
         {"empty($x('bar')('a')) and not($x('bar')(''))", "true"},
     };
@@ -714,6 +670,6 @@ public abstract class SessionTest extends SandboxTest {
   private void assertEqual(final Object exp, final Object ret) {
     final String result = (out != null ? out : ret).toString();
     if(out != null) out.reset();
-    assertEquals(exp.toString(), result.replaceAll("\\r|\\n", ""));
+    assertEquals(exp.toString(), normNL(result));
   }
 }

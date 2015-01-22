@@ -462,7 +462,7 @@ public enum QueryError {
   /** FODF1280. */
   FORMNUM_X(FODF, 1280, "Unknown decimal format: '%'."),
   /** FODF1310. */
-  PICEMPTY(FODF, 1310, "The picture string may not be empty."),
+  PICEMPTY(FODF, 1310, "The picture string must not be empty: '%'"),
   /** FODF1310. */
   PICNUM_X(FODF, 1310, "Invalid picture string: '%'."),
   /** FODF1310. */
@@ -545,6 +545,8 @@ public enum QueryError {
   NOTCMP_X(FORG, 6, "Items of type % cannot be compared."),
   /** FORG0006. */
   EBV_X(FORG, 6, "Effective boolean value not defined for %."),
+  /** FORG0006. */
+  EBV_X_X(FORG, 6, "Effective boolean value not defined for %: %."),
   /** FORG0006. */
   SUM_X_X(FORG, 6, "Argument type % is invalid: %."),
   /** FORG0006. */
@@ -702,14 +704,14 @@ public enum QueryError {
   SEROPTION_X(SEPM, 17, "Serialization parameter '%' is invalid."),
   /** SERE0020. */
   SERNUMBER_X(SERE, 20, "Numeric value cannot be represented: '%'"),
+  /** SENR0001. */
+  SERJSONFUNC_X(SERE, 21, "Items of type % cannot be serialized."),
   /** SERE0022. */
   SERDUPL_X(SERE, 22, "Duplicate name found: '%'"),
   /** SERE0023. */
   SERJSON(SERE, 23, "Only one item can be serialized with JSON."),
   /** SERE0023. */
-  SERMAPSEQ(SERE, 23, "Map value has more than one item."),
-  /** SERE0023. */
-  SERARRAYSEQ(SERE, 23, "Array has more than one member."),
+  SERJSONSEQ(SERE, 23, "Value has more than one item."),
 
   /** XPDY0002. */
   NOCTX_X(XPDY, 2, "%: no context value bound."),
@@ -775,7 +777,7 @@ public enum QueryError {
   /** XPST0003. */
   PREDMISSING(XPST, 3, "Expecting expression before predicate."),
   /** XPST0003. */
-  NOVARNAME(XPST, 3, "Expecting variable name."),
+  NOVARNAME(XPST, 3, "Variable name expected, '%' found."),
   /** XPST0003. */
   NOVARDECL(XPST, 3, "Expecting variable declaration."),
   /** XPST0003. */
@@ -863,7 +865,7 @@ public enum QueryError {
   /** XPST0003. */
   FTMATCH_X(XPST, 3, "Unknown match option '%...'."),
   /** XPST0003. */
-  INVALPI(XPST, 3, "Processing instruction has invalid name."),
+  INVALPI(XPST, 3, "Processing instruction has invalid name: '%' found."),
   /** XPST0003. */
   INTEXP(XPST, 3, "Integer expected."),
   /** XPST0003. */
@@ -879,9 +881,9 @@ public enum QueryError {
   /** XPST0003. */
   SIMPLETYPE_X(XPST, 3, "Simple type expected, '%(' found."),
   /** XPST0003. */
-  KEYSPEC(XPST, 3, "Expecting specifier after '?'."),
+  KEYSPEC(XPST, 3, "No specifier after lookup operator: '%'."),
   /** XPST0003. */
-  ARROWSPEC(XPST, 3, "Expecting specifier after '=>'."),
+  ARROWSPEC(XPST, 3, "No specifier after arrow operator: '%'."),
 
   /** XPST0008. */
   VARUNDEF_X(XPST, 8, "Undefined variable %."),
@@ -997,7 +999,7 @@ public enum QueryError {
   /** XQDY0064. */
   CPIXML_X(XQDY, 64, "Processing instruction has illegal name: '%'."),
   /** XQDY0072. */
-  COMINVALID(XQDY, 72, "Invalid comment."),
+  COMINVALID(XQDY, 72, "Comment must not contain '--' or end with '-'."),
   /** XQDY0074. */
   INVNSNAME_X(XQDY, 74, "Invalid namespace prefix: '%'."),
   /** XQDY0074. */
@@ -1005,7 +1007,7 @@ public enum QueryError {
   /** XQDY0074. */
   INVPREF_X(XQDY, 74, "No namespace declared for %."),
   /** XQDY0096. */
-  CEXML(XQDY, 96, "XML prefix and namespace cannot be rebound."),
+  CEXML(XQDY, 96, "XML prefix or namespace cannot be rebound: '%'/'%'."),
   /** XQDY0096. */
   CEINV_X(XQDY, 96, "Invalid element prefix/namespace '%'."),
   /** XQDY0101. */

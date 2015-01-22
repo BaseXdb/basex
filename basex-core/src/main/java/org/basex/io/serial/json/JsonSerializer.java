@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 import java.io.*;
 
 import org.basex.build.json.*;
+import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
@@ -23,9 +24,12 @@ import org.basex.util.options.Options.YesNo;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public abstract class JsonSerializer extends OutputSerializer {
+public abstract class JsonSerializer extends StandardSerializer {
   /** JSON options. */
   final JsonSerialOptions jopts;
+  /** Adaptive serializer. */
+  AdaptiveSerializer adaptive;
+
   /** Escape special characters. */
   private final boolean escape;
   /** Allow duplicate names. */
@@ -33,138 +37,160 @@ public abstract class JsonSerializer extends OutputSerializer {
 
   /**
    * Constructor.
-   * @param os output stream reference
+   * @param out print output
    * @param opts serialization parameters
    * @throws IOException I/O exception
    */
-  JsonSerializer(final OutputStream os, final SerializerOptions opts) throws IOException {
-    super(os, opts);
+  JsonSerializer(final PrintOutput out, final SerializerOptions opts) throws IOException {
+    super(out, opts);
     jopts = opts.get(SerializerOptions.JSON);
     escape = jopts.get(JsonSerialOptions.ESCAPE);
     nodups = opts.get(SerializerOptions.ALLOW_DUPLICATE_NAMES) == YesNo.NO;
   }
 
   @Override
-  public final void serialize(final Item item) throws IOException {
-    if(sep) throw SERJSON.getIO();
-    if(lvl == 0) openResult();
+  public void serialize(final Item item, final boolean atts, final boolean iter)
+      throws IOException {
 
+    if(sep) throw SERJSON.getIO();
     try {
       if(item instanceof Map) {
-        lvl++;
-        print('{');
+        level++;
+        out.print('{');
 
         boolean s = false;
         final TokenSet set = nodups ? new TokenSet() : null;
         final Map map = (Map) item;
         for(final Item key : map.keys()) {
           final byte[] name = key.string(null);
-          if(set != null) {
-            if(set.contains(name)) throw SERDUPL_X.getIO(name);
-            set.put(name);
+          if(nodups) {
+            if(set.contains(name)) {
+              if(adaptive == null) throw SERDUPL_X.getIO(name);
+            } else {
+              set.put(name);
+            }
           }
-          if(s) print(',');
+          if(s) out.print(',');
           indent();
           string(name);
-          print(':');
-          if(indent) print(' ');
-          final Value v = map.get(key, null);
-          if(v.size() > 1) throw SERMAPSEQ.getIO();
-          sep = false;
-          serialize(v.isEmpty() ? null : (Item) v);
+          out.print(':');
+          if(indent) out.print(' ');
+          serialize(map.get(key, null));
           s = true;
         }
 
-        lvl--;
+        level--;
         indent();
-        print('}');
+        out.print('}');
 
       } else if(item instanceof Array) {
-        lvl++;
-        print('[');
+        level++;
+        out.print('[');
 
         boolean s = false;
         for(final Value v : ((Array) item).members()) {
-          if(s) print(',');
+          if(s) out.print(',');
           indent();
-          if(v.size() > 1) throw SERARRAYSEQ.getIO();
-          sep = false;
-          serialize(v.isEmpty() ? null : (Item) v);
+          serialize(v);
           s = true;
         }
 
-        lvl--;
+        level--;
         indent();
-        print(']');
+        out.print(']');
+
+      } else if(item instanceof FItem) {
+        if(adaptive != null) {
+          adaptive.serialize(item);
+        } else {
+          throw SERJSONFUNC_X.getIO(item.type);
+        }
 
       } else if(item instanceof ANode) {
         serialize((ANode) item);
 
       } else if(item == null) {
         // empty sequence
-        print(NULL);
+        out.print(NULL);
 
-      } else if(item.type.isNumber()) {
+      } else {
+        atomic(item, false);
+      }
+    } catch(final QueryException ex) {
+      throw new QueryIOException(ex);
+    }
+    sep = true;
+  }
+
+  /**
+   * Serializes a value.
+   * @param value value
+   * @throws IOException I/O exception
+   */
+  private void serialize(final Value value) throws IOException {
+    if(value.size() > 1) {
+      if(adaptive != null) {
+        adaptive.serialize(value);
+      } else {
+        throw SERJSONSEQ.getIO();
+      }
+    } else {
+      sep = false;
+      serialize(value.isEmpty() ? null : (Item) value);
+    }
+  }
+
+  @Override
+  protected void atomic(final Item item, final boolean iter) throws IOException {
+    try {
+      if(item.type.isNumber()) {
         final byte[] str = item.string(null);
-        if(eq(str, NAN, INF, NINF)) throw SERNUMBER_X.getIO(str);
-        print(str);
-
+        if(eq(str, NAN, INF, NINF) && adaptive == null) throw SERNUMBER_X.getIO(str);
+        out.print(str);
       } else if(item.type == AtomType.BLN) {
-        print(item.string(null));
-
+        out.print(item.string(null));
       } else {
         string(item.string(null));
       }
     } catch(final QueryException ex) {
       throw new QueryIOException(ex);
     }
-
-    sep = true;
-    if(lvl == 0) closeResult();
   }
 
   /**
-   * Serialize a JSON string.
+   * Serializes a JSON string.
    * @param string string
    * @throws IOException I/O exception
    */
   protected final void string(final byte[] string) throws IOException {
-    print('"');
+    out.print('"');
     final byte[] str = norm(string);
     final int sl = str.length;
     for(int s = 0; s < sl; s += cl(str, s)) encode(cp(str, s));
-    print('"');
+    out.print('"');
   }
 
   @Override
   protected final void encode(final int cp) throws IOException {
     if(escape) {
       switch(cp) {
-        case '\b': print("\\b"); break;
-        case '\f': print("\\f"); break;
-        case '\n': print("\\n"); break;
-        case '\r': print("\\r"); break;
-        case '\t': print("\\t"); break;
-        case '"': print("\\\""); break;
-        case '\\': print("\\\\"); break;
-        default: print(cp); break;
+        case '\b': out.print("\\b"); break;
+        case '\f': out.print("\\f"); break;
+        case '\n': out.print("\\n"); break;
+        case '\r': out.print("\\r"); break;
+        case '\t': out.print("\\t"); break;
+        case '"': out.print("\\\""); break;
+        case '\\': out.print("\\\\"); break;
+        default: out.print(cp); break;
       }
     } else {
-      print(cp);
+      out.print(cp);
     }
   }
 
   @Override
-  protected final void indent() throws IOException {
-    if(!indent) return;
-    print(nl);
-    final int ls = lvl * indents;
-    for(int l = 0; l < ls; ++l) print(tab);
-  }
-
-  @Override
   public void close() throws IOException {
-    if(!sep) print(NULL);
+    if(!sep) out.print(NULL);
     super.close();
   }
 }

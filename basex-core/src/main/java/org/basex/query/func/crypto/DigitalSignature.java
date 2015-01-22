@@ -25,7 +25,6 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
-import org.basex.util.options.Options.YesNo;
 import org.w3c.dom.*;
 import org.xml.sax.*;
 
@@ -297,33 +296,31 @@ final class DigitalSignature {
 
   /**
    * Serializes the given XML node to a byte array.
-   * @param n node to be serialized
+   * @param node node to be serialized
    * @return byte array containing XML
    * @throws IOException exception
    */
-  private static byte[] nodeToBytes(final ANode n) throws IOException {
+  private static byte[] nodeToBytes(final ANode node) throws IOException {
     final ArrayOutput ao = new ArrayOutput();
-    final SerializerOptions sopts = new SerializerOptions();
-    sopts.set(SerializerOptions.INDENT, YesNo.NO);
-    final Serializer ser = Serializer.get(ao, sopts);
-    ser.serialize(n);
+    final Serializer ser = Serializer.get(ao, SerializerOptions.get(false));
+    ser.serialize(node);
     ser.close();
     return ao.finish();
   }
 
   /**
    * Creates a DOM node for the given input node.
-   * @param n node
+   * @param node node
    * @return DOM node representation of input node
    * @throws SAXException exception
    * @throws IOException exception
    * @throws ParserConfigurationException exception
    */
-  private static Document toDOMNode(final ANode n)
+  private static Document toDOMNode(final ANode node)
       throws SAXException, IOException, ParserConfigurationException {
 
     final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
     dbf.setNamespaceAware(true);
-    return dbf.newDocumentBuilder().parse(new ByteArrayInputStream(nodeToBytes(n)));
+    return dbf.newDocumentBuilder().parse(new ByteArrayInputStream(nodeToBytes(node)));
   }
 }

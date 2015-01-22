@@ -155,17 +155,6 @@ public abstract class BaseXTest extends MainTest {
   }
 
   /**
-   * Test trailing newline.
-   * @throws IOException I/O exception
-   */
-  @Test
-  public void newline() throws IOException {
-    equals("1", "-q1");
-    equals('1' + Prop.NL, "-L", "-q1");
-    equals('1' + Prop.NL + '2' + Prop.NL, "-L", "-q1", "-q2");
-  }
-
-  /**
    * Test serialization parameters.
    * @throws IOException I/O exception
    */

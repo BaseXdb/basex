@@ -18,8 +18,7 @@ public final class GFLWOROptimizeTest extends QueryPlanTest {
         "for $i in 1 to 2 " +
         "let $m := $b " +
         "return $m/text()",
-
-        "aa",
+        "a\na",
         Util.info("every $l in //% satisfies $l << //%", Let.class, For.class)
     );
   }
@@ -31,8 +30,7 @@ public final class GFLWOROptimizeTest extends QueryPlanTest {
         "for $j in $i + 1 to count($seq) " +
         "let $a as xs:string := $seq[$i] " +
         "return concat($i, $j, $a, $a)",
-
-        "12aa 13aa 23bb",
+        "12aa\n13aa\n23bb",
         "let $a := //Let[Var/@name eq '$a'] return " +
         "//For[Var/@name eq '$i'] << $a and $a << //For[Var/@name eq '$j']"
     );
@@ -45,8 +43,7 @@ public final class GFLWOROptimizeTest extends QueryPlanTest {
         "for $j in $i + 1 to count($seq) " +
         "let $b as xs:string := $seq[$j] " +
         "return concat($i, $j, $b, $b)",
-
-        "12bb 13cc 23cc",
+        "12bb\n13cc\n23cc",
         Util.info("every $f in //% satisfies $f << //%[starts-with(Var/@name, '$b')]",
             For.class, Let.class)
     );
@@ -56,7 +53,7 @@ public final class GFLWOROptimizeTest extends QueryPlanTest {
   @Test public void dontMove2() {
     check("let $a := <a/>, $b := <b/>, $c := ($a,$a)[1] " +
         "for $i in 1 to 2 return ($c,$b)",
-        "<a/>" + Prop.NL + "<b/>" + Prop.NL + "<a/>" + Prop.NL + "<b/>",
+        "<a/>\n<b/>\n<a/>\n<b/>",
         Util.info("//Let[Var/@name='$a'] << //Let[Var/@name='$b'] and " +
             "//Let[Var/@name='$b'] << //Let[Var/@name='$c']")
     );
@@ -68,8 +65,7 @@ public final class GFLWOROptimizeTest extends QueryPlanTest {
         "for $a in 1 to 2 " +
         "for $b as element(x) in $x " +
         "return ($b, $b)[1]",
-
-        "<x/>" + Prop.NL + "<x/>",
+        "<x/>\n<x/>",
         "//(For | Let)[Var/@name='$b'] << //For[Var/@name='$a']",
         "every $let in //Let, $for in //For satisfies $let << $for"
     );
@@ -81,15 +77,13 @@ public final class GFLWOROptimizeTest extends QueryPlanTest {
         "let $sum as xs:integer := sum(1 to $i * $i) " +
         "where $i lt 5 " +
         "return ($sum,$sum)[1]",
-
-        "1 10 45 136",
+        "1\n10\n45\n136",
         "//For << //Where and //Where << //Let"
     );
 
     check("for $len in 1 to 3 " +
         "for sliding window $w in 1 to 3 start at $p when true() only " +
         "end at $q when $q - $p + 1 eq $len where $len > 2 return <window>{$w}</window>",
-
         "<window>1 2 3</window>",
         "//For << //Window and exists(//For/*[ends-with(name(), 'Filter')])"
     );
@@ -118,7 +112,7 @@ public final class GFLWOROptimizeTest extends QueryPlanTest {
     check("for $i in 1 to 3 " +
         "where count(for $j in 1 to $i group by $k := $j mod 2 return $i) > 1 " +
         "return $i",
-        "2 3",
+        "2\n3",
         "empty(//Where) and exists(//*[ends-with(name(), 'Filter')])"
     );
   }
@@ -127,22 +121,19 @@ public final class GFLWOROptimizeTest extends QueryPlanTest {
   @Test public void slideLet() {
     check("for $i in 0 to 3, $j in 0 to 3 where (<x/>)[$i + $j] " +
         "let $foo := $i * $i return $foo * $foo",
-        "0 1",
+        "0\n1",
         "every $let in //Let satisfies $let << exactly-one(//Where)"
     );
-
     check("<x/>/(for $i in 1 to 3 let $x := .  where $x return $x)",
         "<x/>",
         "//GFLWOR/*[1] is //Let"
     );
-
     check("for $len in 1 to 3 " +
         "for sliding window $w in 1 to 3 start at $p when true() only " +
         "end at $q when $q - $p + 1 eq $len " +
         "let $x := $len div 2 " +
         "return count($w) div ($x + $x)",
-
-        "1 1 1 1 1 1",
+        "1\n1\n1\n1\n1\n1",
         "//For << //Let and //Let << //Window"
     );
   }
@@ -153,7 +144,7 @@ public final class GFLWOROptimizeTest extends QueryPlanTest {
         "let $a as xs:integer := 3 * $i, " +
         "    $b as xs:integer := 2 * $i " +
         "return $a * $a + $b * $b",
-        "13 13 52 52",
+        "13\n13\n52\n52",
         "exists(//For[every $let in //Let satisfies . << $let])",
         "exists(//For[every $let in //Let satisfies . >> $let])",
         "//Let[Var/@name='$a'] << //Let[Var/@name='$b']"
@@ -187,15 +178,13 @@ public final class GFLWOROptimizeTest extends QueryPlanTest {
   /** Tests is where clauses are rewritten to if. */
   @Test public void whereToIfTest() {
     check("(1 to 3) ! (for $j in 1 to 5 where . eq 1 return $j)",
-        "1 2 3 4 5",
+        "1\n2\n3\n4\n5",
         "exists(//If) and empty(//GFLWOR)"
     );
-
     check("(1 to 3) ! (for $j at $p in 1 to 5 where . eq 1 return $j * $p)",
-        "1 4 9 16 25",
+        "1\n4\n9\n16\n25",
         "exists(//If) and exists(//GFLWOR)"
     );
-
     check("let $x := 0 where $x != <x>0</x> return 42 idiv $x", "",
         "exists(//If) and starts-with(//If/*[2]/@name, 'error(')");
   }
@@ -203,7 +192,7 @@ public final class GFLWOROptimizeTest extends QueryPlanTest {
   /** Tests if {@code for $x in E return $x} is rewritten to {@code E} inside FLWORs. */
   @Test public void inlineForTest() {
     check("let $x := <x>5</x> for $i in 1 to $x return $i",
-        "1 2 3 4 5",
+        "1\n2\n3\n4\n5",
         "empty(//For)"
     );
   }
@@ -211,7 +200,7 @@ public final class GFLWOROptimizeTest extends QueryPlanTest {
   /** Tests if {@link And} expressions inside {@code where} are split. */
   @Test public void splitWhereTest() {
     check("for $i in 1 to 5, $j in 1 to 5 where $i < 3 and $j < 3 return $i * $j",
-        "1 2 2 4",
+        "1\n2\n2\n4",
         "empty(//Where)",
         "every $for in //For satisfies exists($for/*[ends-with(name(), 'Filter')])"
     );
@@ -220,7 +209,7 @@ public final class GFLWOROptimizeTest extends QueryPlanTest {
   /** Tests if redundant FLWOR expressions are eliminated. */
   @Test public void eliminateFLWORTest() {
     check("let $x := (23, 42) where true() for $y in $x return $y",
-        "23 42",
+        "23\n42",
         "empty(//GFLWOR)"
     );
   }
@@ -230,10 +219,9 @@ public final class GFLWOROptimizeTest extends QueryPlanTest {
     check("copy $x := <x/> modify " +
         "  for $i in 1 to 3 let $y := <y>{$i}</y> return insert node $y into $x " +
         "return $x",
-        String.format("<x>%1$s  <y>1</y>%1$s  <y>2</y>%1$s  <y>3</y>%1$s</x>", Prop.NL),
+        "<x>\n<y>1</y>\n<y>2</y>\n<y>3</y>\n</x>",
         "exists(//GFLWOR) and exists(//Insert)"
     );
-
     check("for $i in 1 to 3 let $x := $i * $i return error()",
         null,
         "exists(//GFLWOR)"

@@ -9,7 +9,6 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.serial.*;
 import org.basex.util.*;
-import org.basex.util.options.Options.YesNo;
 import org.junit.*;
 import org.junit.Test;
 
@@ -118,9 +117,7 @@ public final class FNCryptoTest extends SandboxTest{
     if(proc.exitValue() != 0) throw new RuntimeException("Cannot initialize keystore.");
 
     // turn off pretty printing
-    final SerializerOptions sopts = new SerializerOptions();
-    sopts.set(SerializerOptions.INDENT, YesNo.NO);
-    new Set(MainOptions.SERIALIZER, sopts).execute(context);
+    new Set(MainOptions.SERIALIZER, SerializerOptions.get(false)).execute(context);
   }
 
   /**

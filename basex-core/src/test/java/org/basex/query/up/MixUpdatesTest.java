@@ -44,20 +44,20 @@ public final class MixUpdatesTest extends AdvancedQueryTest {
   /** Update test. */
   @Test
   public void list() {
-    query("delete node <a/>, 1, db:output('2')", "1 2");
+    query("delete node <a/>, 1, db:output('2')", "1\n2");
   }
 
   /** Update test. */
   @Test
   public void update() {
     query(_XQUERY_UPDATE.args("1"), "1");
-    query(_XQUERY_UPDATE.args("1") + ",2", "1 2");
+    query(_XQUERY_UPDATE.args("1") + ",2", "1\n2");
   }
 
   /** Test method. */
   @Test
   public void output() {
-    query(_DB_OUTPUT.args("x") + ",1", "1 x");
+    query(_DB_OUTPUT.args("x") + ",1", "1\nx");
   }
 
   /** Annotations. */
@@ -69,11 +69,6 @@ public final class MixUpdatesTest extends AdvancedQueryTest {
   /** Updating functions. */
   @Test
   public void updatingFunctions() {
-    error("db:output(?)", SERFUNC_X);
-    error("db:output#1", SERFUNC_X);
-    error("declare updating function local:a() { () }; local:a#0", SERFUNC_X);
-    error("declare function local:a() { local:b#0 };"
-        + "declare updating function local:b() { db:output('1') }; local:a()", SERFUNC_X);
     query("declare function local:not-used() { local:b#0 };"
         + "declare updating function local:b() { db:output('1') }; local:b()", "1");
 

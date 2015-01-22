@@ -26,6 +26,7 @@ public abstract class AdvancedQueryTest extends SandboxTest {
       ser.close();
       return ao.toString().replaceAll("(\\r|\\n)\\s*", "");
     } catch(final Exception ex) {
+      ex.printStackTrace();
       final AssertionError err = new AssertionError("Query failed:\n" + query);
       err.initCause(ex);
       throw err;

@@ -127,6 +127,15 @@ public abstract class SandboxTest {
     return new IOFile(Prop.TMP, NAME);
   }
 
+  /**
+   * Normalizes newlines in a query result.
+   * @param result input string
+   * @return normalized string
+   */
+  public static String normNL(final Object result) {
+    return result.toString().replaceAll("(\r?\n|\r) *", "\n");
+  }
+
   /** Client. */
   public static final class Client extends Thread {
     /** Start signal. */

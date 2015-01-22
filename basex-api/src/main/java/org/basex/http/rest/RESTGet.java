@@ -42,9 +42,6 @@ final class RESTGet {
         if(op != null || vals.length > 1) throw HTTPCode.ONEOP.get();
         op = key;
         input = val;
-      } else if(key.equalsIgnoreCase(WRAP)) {
-        // wrapping flag
-        http.wrapping = Strings.yes(val);
       } else if(key.equalsIgnoreCase(CONTEXT)) {
         // context parameter
         value = val;

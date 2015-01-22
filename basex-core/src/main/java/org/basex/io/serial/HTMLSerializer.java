@@ -6,16 +6,17 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
+import org.basex.io.out.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
- * This class serializes data as HTML.
+ * This class serializes items as HTML.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-final class HTMLSerializer extends OutputSerializer {
+final class HTMLSerializer extends MarkupSerializer {
   /** (X)HTML: elements with an empty content model. */
   static final TokenList EMPTIES = new TokenList();
   /** HTML5: elements with an empty content model. */
@@ -30,18 +31,18 @@ final class HTMLSerializer extends OutputSerializer {
 
   /**
    * Constructor, specifying serialization options.
-   * @param os output stream reference
+   * @param out print output
    * @param sopts serialization parameters
    * @throws IOException I/O exception
    */
-  HTMLSerializer(final OutputStream os, final SerializerOptions sopts) throws IOException {
-    super(os, sopts, V40, V401, V50);
+  HTMLSerializer(final PrintOutput out, final SerializerOptions sopts) throws IOException {
+    super(out, sopts, V40, V401, V50);
   }
 
   @Override
   protected void attribute(final byte[] name, final byte[] value) throws IOException {
-    print(' ');
-    print(name);
+    out.print(' ');
+    out.print(name);
 
     // don't append value for boolean attributes
     final byte[] nm = concat(lc(elem), COLON, lc(name));
@@ -49,47 +50,47 @@ final class HTMLSerializer extends OutputSerializer {
     // escape URI attributes
     final byte[] val = escuri && URIS.contains(nm) ? escape(value) : value;
 
-    print(ATT1);
+    out.print(ATT1);
     final int vl = val.length;
     for(int v = 0; v < vl; v += cl(val, v)) {
       final int ch = cp(val, v);
       if(ch == '<' || ch == '&' && val[Math.min(v + 1, vl - 1)] == '{') {
-        print(ch);
+        out.print(ch);
       } else if(ch == '"') {
-        print(E_QUOT);
+        out.print(E_QUOT);
       } else if(ch == 0x9 || ch == 0xA) {
         hex(ch);
       } else {
         encode(ch);
       }
     }
-    print(ATT2);
+    out.print(ATT2);
   }
 
   @Override
   protected void comment(final byte[] value) throws IOException {
     if(sep) indent();
-    print(COMM_O);
-    print(value);
-    print(COMM_C);
+    out.print(COMM_O);
+    out.print(value);
+    out.print(COMM_C);
   }
 
   @Override
   protected void pi(final byte[] name, final byte[] value) throws IOException {
     if(sep) indent();
     if(contains(value, '>')) throw SERPI.getIO();
-    print(PI_O);
-    print(name);
-    print(' ');
-    print(value);
-    print(ELEM_C);
+    out.print(PI_O);
+    out.print(name);
+    out.print(' ');
+    out.print(value);
+    out.print(ELEM_C);
   }
 
   @Override
   protected void encode(final int cp) throws IOException {
     if(script) printChar(cp);
     else if(cp > 0x7F && cp < 0xA0 && !html5) throw SERILL_X.getIO(Integer.toHexString(cp));
-    else if(cp == 0xA0) print(E_NBSP);
+    else if(cp == 0xA0) out.print(E_NBSP);
     else super.encode(cp);
   }
 
@@ -97,8 +98,8 @@ final class HTMLSerializer extends OutputSerializer {
   protected void startOpen(final byte[] name) throws IOException {
     doctype(null);
     if(sep) indent();
-    print(ELEM_O);
-    print(name);
+    out.print(ELEM_O);
+    out.print(name);
     sep = indent;
     script = SCRIPTS.contains(lc(name));
     if(content && eq(lc(elem), HEAD)) ct++;
@@ -113,7 +114,7 @@ final class HTMLSerializer extends OutputSerializer {
   @Override
   protected void finishEmpty() throws IOException {
     if(ct(true, true)) return;
-    print(ELEM_C);
+    out.print(ELEM_C);
     if(html5) {
       if(EMPTIES5.contains(lc(elem))) return;
     } else {
@@ -134,14 +135,14 @@ final class HTMLSerializer extends OutputSerializer {
 
   @Override
   boolean doctype(final byte[] type) throws IOException {
-    if(lvl != 0) return false;
+    if(level != 0) return false;
     if(!super.doctype(type) && html5) {
       if(sep) indent();
-      print(DOCTYPE);
-      if(type == null) print(HTML);
-      else print(type);
-      print(ELEM_C);
-      if(indent) print(nl);
+      out.print(DOCTYPE);
+      if(type == null) out.print(HTML);
+      else out.print(type);
+      out.print(ELEM_C);
+      if(indent) newline();
     }
     return true;
   }

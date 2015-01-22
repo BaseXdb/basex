@@ -34,10 +34,10 @@ public class PrintOutput extends OutputStream {
 
   /**
    * Constructor, given an output stream.
-   * @param out output stream reference
+   * @param os output stream reference
    */
-  private PrintOutput(final OutputStream out) {
-    os = out;
+  protected PrintOutput(final OutputStream os) {
+    this.os = os;
   }
 
   /**
@@ -58,7 +58,7 @@ public class PrintOutput extends OutputStream {
    * Note that the limit might break unicode characters.
    * @param limit maximum
    */
-  public void setLimit(final int limit) {
+  public final void setLimit(final int limit) {
     max = limit < 0 ? Long.MAX_VALUE : limit;
   }
 
@@ -68,45 +68,26 @@ public class PrintOutput extends OutputStream {
   }
 
   /**
-   * Prints a unicode character.
-   * @param ch character to be printed
+   * Prints a single codepoint.
+   * @param cp codepoint to be printed
    * @throws IOException I/O exception
    */
-  public void print(final int ch) throws IOException {
-    if(ch <= 0x7F) {
-      write(ch);
-    } else if(ch <= 0x7FF) {
-      write(ch >>  6 & 0x1F | 0xC0);
-      write(ch & 0x3F | 0x80);
-    } else if(ch <= 0xFFFF) {
-      write(ch >> 12 & 0x0F | 0xE0);
-      write(ch >>  6 & 0x3F | 0x80);
-      write(ch & 0x3F | 0x80);
+  public void print(final int cp) throws IOException {
+    if(cp <= 0x7F) {
+      write(cp);
+    } else if(cp <= 0x7FF) {
+      write(cp >>  6 & 0x1F | 0xC0);
+      write(cp & 0x3F | 0x80);
+    } else if(cp <= 0xFFFF) {
+      write(cp >> 12 & 0x0F | 0xE0);
+      write(cp >>  6 & 0x3F | 0x80);
+      write(cp & 0x3F | 0x80);
     } else {
-      write(ch >> 18 & 0x07 | 0xF0);
-      write(ch >> 12 & 0x3F | 0x80);
-      write(ch >>  6 & 0x3F | 0x80);
-      write(ch & 0x3F | 0x80);
+      write(cp >> 18 & 0x07 | 0xF0);
+      write(cp >> 12 & 0x3F | 0x80);
+      write(cp >>  6 & 0x3F | 0x80);
+      write(cp & 0x3F | 0x80);
     }
-  }
-
-  /**
-   * Prints a string to the output stream.
-   * @param str string to be written
-   * @throws IOException I/O exception
-   */
-  public final void print(final String str) throws IOException {
-    print(Token.token(str));
-  }
-
-  /**
-   * Prints a string and newline to the output stream.
-   * @param str string to be written
-   * @throws IOException I/O exception
-   */
-  public final void println(final String str) throws IOException {
-    print(str);
-    print(Prop.NL);
   }
 
   /**
@@ -114,8 +95,27 @@ public class PrintOutput extends OutputStream {
    * @param token token to be written
    * @throws IOException I/O exception
    */
-  public final void print(final byte[] token) throws IOException {
-    for(final byte t : token) write(t);
+  public void print(final byte[] token) throws IOException {
+    for(final byte cp : token) write(cp);
+  }
+
+  /**
+   * Prints a string to the output stream.
+   * @param string string to be written
+   * @throws IOException I/O exception
+   */
+  public void print(final String string) throws IOException {
+    print(Token.token(string));
+  }
+
+  /**
+   * Prints a string and newline to the output stream.
+   * @param string string to be written
+   * @throws IOException I/O exception
+   */
+  public final void println(final String string) throws IOException {
+    print(string);
+    print(Prop.NL);
   }
 
   /**
@@ -156,5 +156,13 @@ public class PrintOutput extends OutputStream {
    */
   public boolean finished() {
     return false;
+  }
+
+  /**
+   * Returns the encoding.
+   * @return encoding
+   */
+  public String encoding() {
+    return Strings.UTF8;
   }
 }

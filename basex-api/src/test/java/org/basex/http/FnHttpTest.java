@@ -99,9 +99,9 @@ public class FnHttpTest extends HTTPTest {
         "<http:request method='post'>"
         + "<http:body media-type='application/xml'>"
         + "<query xmlns='" + Prop.URL + "/rest'>"
-        + "<text>1</text>"
-        + "<parameter name='wrap' value='yes'/>"
-        + "</query>" + "</http:body>"
+        + "<text><![CDATA[<x>1</x>]]></text>"
+        + "</query>"
+        + "</http:body>"
         + "</http:request>", RESTURL), ctx)) {
         checkResponse(qp.execute(), HttpURLConnection.HTTP_OK, 2);
     }
@@ -109,11 +109,11 @@ public class FnHttpTest extends HTTPTest {
     // Execute the same query but with content set from $bodies
     try(final QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
        "<http:request method='post'>"
-        + "<http:body media-type='application/xml'/></http:request>",
+        + "<http:body media-type='application/xml'/>"
+        + "</http:request>",
         RESTURL,
         "<query xmlns='" + Prop.URL + "/rest'>"
-        + "<text>1</text>"
-        + "<parameter name='wrap' value='yes'/>"
+        + "<text><![CDATA[<x>1</x>]]></text>"
         + "</query>"), ctx)) {
       checkResponse(qp.execute(), HttpURLConnection.HTTP_OK, 2);
     }
@@ -426,7 +426,6 @@ public class FnHttpTest extends HTTPTest {
    */
   @Test
   public void writeMultipartMessage() throws IOException {
-
     final HttpRequest req = new HttpRequest();
     req.isMultipart = true;
     req.payloadAttrs.put(token("media-type"), token("multipart/alternative"));
@@ -810,10 +809,8 @@ public class FnHttpTest extends HTTPTest {
     assertTrue(res.get(0) instanceof FElem);
     final FElem response = (FElem) res.get(0);
     assertNotNull(response.attributes());
-    for(final ANode attr : response.attributes()) {
-      if(eq(attr.name(), STATUS) && !eq(attr.string(), token(expStatus))) {
-        fail("Expected: " + expStatus + "\nFound: " + string(attr.string()));
-      }
+    if(!eq(response.attribute(STATUS), token(expStatus))) {
+      fail("Expected: " + expStatus + "\nFound: " + response);
     }
   }
 }

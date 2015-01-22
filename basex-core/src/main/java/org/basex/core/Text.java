@@ -55,13 +55,12 @@ public interface Text {
   String S_STANDALONE = "Standalone";
   /** Start information. */
   String  S_LOCALINFO =
-    " [-bcdiLoqrRsuvVwxXz] [input]" + NL +
+    " [-bcdioqrRsuvVwxXz] [input]" + NL +
     "  [input]     XQuery or command file, or query string" + NL +
     "  -b<pars>    Bind external query variables" + NL +
     "  -c<input>   Execute commands from file or string" + NL +
     "  -d          Activate debugging mode" + NL +
     "  -i<input>   Open initial file or database" + NL +
-    "  -L          Append newlines to query results" + NL +
     "  -o<output>  Write output to file" + NL +
     "  -q<expr>    Execute XQuery expression" + NL +
     "  -r<num>     Set number of query executions" + NL +
@@ -79,13 +78,12 @@ public interface Text {
   String S_CLIENT = "Client";
   /** Client start information. */
   String S_CLIENTINFO =
-    " [-bcdiLnopPqrRsUvVwxz] [input]" + NL +
+    " [-bcdinopPqrRsUvVwxz] [input]" + NL +
     "  [input]     XQuery or command file, or query string" + NL +
     "  -b<pars>    Bind external query variables" + NL +
     "  -c<input>   Execute commands from file or string" + NL +
     "  -d          Activate debugging mode" + NL +
     "  -i<input>   Open initial file or database" + NL +
-    "  -L          Append newlines to query results" + NL +
     "  -n<name>    Set server (host) name" + NL +
     "  -o<output>  Write output to file" + NL +
     "  -p<port>    Set server port" + NL +
@@ -342,11 +340,11 @@ public interface Text {
     lang("c_drop1"),
     lang("c_drop2") + NL +
     LI + CmdDrop.BACKUP + " [" + S_NAME + "]:" + NL +
-      "  " + lang("c_drop24", S_NAME) + NL +
+      "  " + lang("c_drop24") + NL +
     LI + CmdDrop.DATABASE + " [" + S_NAME + "]:" + NL +
       "  " + lang("c_drop21") + NL +
     LI + CmdDrop.EVENT + " [" + S_NAME + "]:" + NL +
-      "  " + lang("c_drop25", S_NAME) + NL +
+      "  " + lang("c_drop25") + NL +
     LI + CmdDrop.INDEX + " [" + CmdIndex.TEXT + '|' +
       CmdIndex.ATTRIBUTE + '|' + CmdIndex.FULLTEXT + "]:" + NL +
       "  " + lang("c_drop22") + NL +
@@ -440,13 +438,11 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPSET = {
-    "[option] ([value])",
-    lang("c_set1", "info"),
-    lang("c_set2", "option", "value")
+    "[option] ([value])", lang("c_set1"), lang("c_set2")
   };
   /** Command help. */
   String[] HELPGET = {
-    "[option]", lang("c_get1", "info"), lang("c_get2", "option")
+    "[option]", lang("c_get1"), lang("c_get2")
   };
   /** Command help. */
   String[] HELPPASSWORD = {
@@ -470,7 +466,7 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPEXIT = {
-    "", lang("c_exit1", Prop.NAME), lang("c_exit2", Prop.NAME)
+    "", lang("c_exit1"), lang("c_exit2")
   };
 
   // COMMAND INFOS ============================================================

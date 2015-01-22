@@ -2,52 +2,32 @@ package org.basex.io.serial;
 
 import static org.basex.data.DataText.*;
 import static org.basex.query.QueryError.*;
-import static org.basex.util.Token.*;
 
 import java.io.*;
 
 import org.basex.data.*;
+import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 
 /**
- * This class serializes data as XML.
+ * This class serializes items as XML.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public final class XMLSerializer extends OutputSerializer {
-  /** Root elements. */
+final class XMLSerializer extends MarkupSerializer {
+  /** Indicates if root element has been serialized. */
   private boolean root;
-  /** Wrapper flag. */
-  private final boolean wrap;
 
   /**
    * Constructor, specifying serialization options.
-   * @param os output stream reference
+   * @param out print output
    * @param sopts serialization parameters
    * @throws IOException I/O exception
    */
-  XMLSerializer(final OutputStream os, final SerializerOptions sopts) throws IOException {
-    super(os, sopts, V10, V11);
-
-    // open results element
-    wrap = wPre.length != 0;
-    if(wrap) {
-      openElement(concat(wPre, COLON, T_RESULTS));
-      namespace(wPre, wUri);
-    }
-  }
-
-  @Override
-  protected void openResult() throws IOException {
-    super.openResult();
-    if(wrap) openElement(wPre.length == 0 ? T_RESULT : concat(wPre, COLON, T_RESULT));
-  }
-
-  @Override
-  protected void closeResult() throws IOException {
-    if(wrap) closeElement();
+  XMLSerializer(final PrintOutput out, final SerializerOptions sopts) throws IOException {
+    super(out, sopts, V10, V11);
   }
 
   @Override
@@ -69,12 +49,6 @@ public final class XMLSerializer extends OutputSerializer {
   protected void atomic(final Item it, final boolean iter) throws IOException {
     if(elems.isEmpty()) check();
     super.atomic(it, iter);
-  }
-
-  @Override
-  public void close() throws IOException {
-    if(wrap) closeElement();
-    super.close();
   }
 
   /**

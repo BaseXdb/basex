@@ -15,8 +15,7 @@ public final class OutModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void nl() {
-    // query() function removes all newlines..
-    query(_OUT_NL.args(), "");
+    query(_OUT_NL.args(), "\n");
   }
 
   /** Test method. */

@@ -6,16 +6,16 @@ import static org.basex.util.Token.*;
 import java.io.*;
 
 import org.basex.build.csv.*;
-import org.basex.build.csv.CsvOptions.*;
+import org.basex.build.csv.CsvOptions.CsvFormat;
 import org.basex.data.*;
+import org.basex.io.out.*;
 import org.basex.io.serial.*;
-import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
- * This class serializes data as CSV.
+ * This class serializes items as CSV.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
@@ -37,14 +37,14 @@ public final class CsvDirectSerializer extends CsvSerializer {
 
   /**
    * Constructor.
-   * @param os output stream reference
+   * @param out print output
    * @param opts serialization parameters
    * @throws IOException I/O exception
    */
-  public CsvDirectSerializer(final OutputStream os, final SerializerOptions opts)
+  public CsvDirectSerializer(final PrintOutput out, final SerializerOptions opts)
       throws IOException {
 
-    super(os, opts);
+    super(out, opts);
     header = copts.get(CsvOptions.HEADER);
     headers = header ? new TokenList() : null;
     atts = copts.get(CsvOptions.FORMAT) == CsvFormat.ATTRIBUTES;
@@ -53,29 +53,25 @@ public final class CsvDirectSerializer extends CsvSerializer {
 
   @Override
   protected void startOpen(final byte[] name) {
-    if(lvl == 1) data = new TokenMap();
+    if(level == 1) data = new TokenMap();
     attv = null;
-  }
-
-  @Override
-  protected void finishOpen() {
   }
 
   @Override
   protected void finishEmpty() throws IOException {
     finishOpen();
-    if(lvl == 2) cache(EMPTY);
+    if(level == 2) cache(EMPTY);
     finishClose();
   }
 
   @Override
   protected void text(final byte[] value, final FTPos ftp) throws IOException {
-    if(lvl == 3) cache(value);
+    if(level == 3) cache(value);
   }
 
   @Override
   protected void finishClose() throws IOException {
-    if(lvl != 1) return;
+    if(level != 1) return;
 
     if(headers != null) {
       final int s = headers.size();
@@ -101,22 +97,6 @@ public final class CsvDirectSerializer extends CsvSerializer {
   @Override
   protected void attribute(final byte[] name, final byte[] value) {
     attv = value;
-  }
-
-  @Override
-  protected void comment(final byte[] value) { }
-
-  @Override
-  protected void pi(final byte[] name, final byte[] value) { }
-
-  @Override
-  protected void atomic(final Item value, final boolean iter) throws IOException {
-    error("Atomic values cannot be serialized");
-  }
-
-  @Override
-  protected void encode(final int cp) throws IOException {
-    printChar(cp);
   }
 
   /**

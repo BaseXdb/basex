@@ -113,7 +113,7 @@ public final class RequestTest extends HTTPTest {
   @Test
   public void parameter() throws Exception {
     assertEquals("b", get("?query=" + request("R:parameter('a')") + "&a=b"));
-    assertEquals("b c", get("?query=" + request("R:parameter('a')") + "&a=b&a=c"));
+    assertEquals("b\nc", get("?query=" + request("R:parameter('a')") + "&a=b&a=c"));
     assertEquals("b", get("?query=" + request("R:parameter('a','c')") + "&a=b"));
     assertEquals("c", get("?query=" + request("R:parameter('x','c')") + "&a=b"));
   }
@@ -125,7 +125,7 @@ public final class RequestTest extends HTTPTest {
   @Test
   public void headerNames() throws Exception {
     final String query = "R:header-names()";
-    assertEquals("Host Accept Connection User-Agent", get("?query=" + request(query)));
+    assertEquals("Host\nAccept\nConnection\nUser-Agent", get("?query=" + request(query)));
   }
 
   /**

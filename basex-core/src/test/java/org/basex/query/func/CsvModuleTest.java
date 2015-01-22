@@ -17,15 +17,15 @@ public final class CsvModuleTest extends AdvancedQueryTest {
   @Test
   public void parse() {
     parse("", "", "<csv/>");
-    parse("X", "", "<csv><record><entry>X</entry></record></csv>");
+    parse("X", "", "<csv>\n<record>\n<entry>X</entry>\n</record>\n</csv>");
     parse(" '\"X\"\"Y\"'", "", "...<entry>X\"Y</entry>");
-    parse(" '\"X\",Y'", "", "...<entry>X</entry><entry>Y</entry>");
+    parse(" '\"X\",Y'", "", "...<entry>X</entry>\n<entry>Y</entry>");
 
-    parse("X;Y", "'separator':';'", "...<entry>X</entry><entry>Y</entry>");
-    parse("X,Y", "", "...<entry>X</entry><entry>Y</entry>");
+    parse("X;Y", "'separator':';'", "...<entry>X</entry>\n<entry>Y</entry>");
+    parse("X,Y", "", "...<entry>X</entry>\n<entry>Y</entry>");
 
-    parse("X\nY", "'header':true()", "<csv><record><X>Y</X></record></csv>");
-    parse("A,B,C\nX,Y,Z", "'header':true()", "...<A>X</A><B>Y</B><C>Z</C>");
+    parse("X\nY", "'header':true()", "<csv>\n<record>\n<X>Y</X>\n</record>\n</csv>");
+    parse("A,B,C\nX,Y,Z", "'header':true()", "...<A>X</A>\n<B>Y</B>\n<C>Z</C>");
 
     parse("X\nY", "'format':'attributes','header':true()", "...<entry name=\"X\">Y</entry>");
 
@@ -38,45 +38,46 @@ public final class CsvModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void serialize() {
-    serial("<csv><record><A__>1</A__></record></csv>", "'header':true(),'lax':false()", "A_1");
-    serial("<csv><record><_>1</_></record></csv>", "'header':true(),'lax':false()", "1");
-    serial("<csv><record><A_0020B>1</A_0020B></record></csv>", "'header':'yes','lax':'no'", "A B1");
-
-    serial("<csv><record><_A_>1</_A_></record></csv>", "'header':true(),'lax':true()", "_A_1");
-    serial("<csv><record><_>1</_></record></csv>", "'header':true(),'lax':true()", "_1");
-    serial("<csv><record><__>1</__></record></csv>", "'header':true(),'lax':true()", "__1");
+    serial("<csv><record><A__>1</A__></record></csv>", "'header':true(),'lax':false()", "A_\n1\n");
+    serial("<csv><record><_>1</_></record></csv>", "'header':true(),'lax':false()", "\n1\n");
     serial("<csv><record><A_0020B>1</A_0020B></record></csv>",
-        "'header':'yes','lax':'yes'", "A_0020B1");
+        "'header':'yes','lax':'no'", "A B\n1\n");
+
+    serial("<csv><record><_A_>1</_A_></record></csv>", "'header':true(),'lax':true()", "_A_\n1\n");
+    serial("<csv><record><_>1</_></record></csv>", "'header':true(),'lax':true()", "_\n1\n");
+    serial("<csv><record><__>1</__></record></csv>", "'header':true(),'lax':true()", "__\n1\n");
+    serial("<csv><record><A_0020B>1</A_0020B></record></csv>",
+        "'header':'yes','lax':'yes'", "A_0020B\n1\n");
 
     serial("<csv/>", "", "");
 
-    serial("<csv><record/></csv>", "", "");
-    serial("<csv><record/></csv>", "'header':'yes'", "");
+    serial("<csv><record/></csv>", "", "\n");
+    serial("<csv><record/></csv>", "'header':'yes'", "\n\n");
 
-    serial("<csv><record><entry>A</entry></record></csv>", "", "A");
-    serial("<csv><record><entry>A</entry></record></csv>", "'header':'yes'", "entryA");
-    serial("<csv><record><entry>A</entry><entry>B</entry></record></csv>", "", "A,B");
-    serial("<csv><record><_>A</_><_>B</_></record></csv>", "'separator':';'", "A;B");
-    serial("<csv><record><_>A</_><_/><_>B</_></record></csv>", "", "A,,B");
-    serial("<csv><record><_>A</_><_><X>X</X></_></record></csv>", "", "A");
+    serial("<csv><record><entry>A</entry></record></csv>", "", "A\n");
+    serial("<csv><record><entry>A</entry></record></csv>", "'header':'yes'", "entry\nA\n");
+    serial("<csv><record><entry>A</entry><entry>B</entry></record></csv>", "", "A,B\n");
+    serial("<csv><record><_>A</_><_>B</_></record></csv>", "'separator':';'", "A;B\n");
+    serial("<csv><record><_>A</_><_/><_>B</_></record></csv>", "", "A,,B\n");
+    serial("<csv><record><_>A</_><_><X>X</X></_></record></csv>", "", "A\n");
 
     serial("<csv><record><A>1</A></record><record><A>2</A></record></csv>",
-        "'header':'yes'", "A12");
+        "'header':'yes'", "A\n1\n2\n");
 
-    serial("<csv><record><A_B>1</A_B></record></csv>", "'header':'yes'", "A_B1");
-    serial("<csv><record><A__B>1</A__B></record></csv>", "'header':true()", "A__B1");
+    serial("<csv><record><A_B>1</A_B></record></csv>", "'header':'yes'", "A_B\n1\n");
+    serial("<csv><record><A__B>1</A__B></record></csv>", "'header':true()", "A__B\n1\n");
 
-    serial("<csv><record><A>1\n2</A></record></csv>", "'header':'yes'", "A\"12\"");
-    serial("<csv><record><A>\"</A></record></csv>", "'header':'yes'", "A\"\"\"\"");
-    serial("<csv><record><A>1,2</A></record></csv>", "'header':'yes'", "A\"1,2\"");
-    serial("<csv><record><A>1</A></record></csv>", "'header':'yes'", "A1");
-    serial("<csv><record><A>1</A><B>2</B></record></csv>", "'header':'yes'", "A,B1,2");
+    serial("<csv><record><A>1\n2</A></record></csv>", "'header':'yes'", "A\n\"1\n2\"\n");
+    serial("<csv><record><A>\"</A></record></csv>", "'header':'yes'", "A\n\"\"\"\"\n");
+    serial("<csv><record><A>1,2</A></record></csv>", "'header':'yes'", "A\n\"1,2\"\n");
+    serial("<csv><record><A>1</A></record></csv>", "'header':'yes'", "A\n1\n");
+    serial("<csv><record><A>1</A><B>2</B></record></csv>", "'header':'yes'", "A,B\n1,2\n");
     serial("<csv><record><A/><A>1</A><A>1</A><A/></record></csv>",
-        "'header':'yes','separator':';'", "A1,1");
+        "'header':'yes','separator':';'", "A\n1,1\n");
 
     serial("<csv><record><entry name='X'>1</entry></record></csv>",
-        "'format':'attributes','header':true()", "X1");
-    serial("<C><R><E name='X'>1</E></R></C>", "'format':'attributes','header':true()", "X1");
+        "'format':'attributes','header':true()", "X\n1\n");
+    serial("<C><R><E name='X'>1</E></R></C>", "'format':'attributes','header':true()", "X\n1\n");
 
     serialError("<csv/>", "'x':'y'");
     serialError("<csv><record><A>1</A></record></csv>", "'separator':''");

@@ -87,13 +87,11 @@ public final class InlineTest extends QueryPlanTest {
         + "return count((1 to 2) ! $d)",
         "200",
         "exists(//Let)");
-
     check("let $d := for-each(1 to 10, function($a) { $a }) return count((1 to 2) ! $d[1])",
         "2",
         "exists(//CachedMap)");
-
     check("for $x in (<x/>, <x/>) where (1, 2) ! $x return $x",
-        String.format("<x/>%n<x/>"),
+        "<x/>\n<x/>",
         "exists(//IterMap)",
         "empty(//Context)");
   }

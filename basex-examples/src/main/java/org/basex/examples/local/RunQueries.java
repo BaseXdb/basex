@@ -74,7 +74,7 @@ public final class RunQueries {
 
   /**
    * This method uses the {@link QueryProcessor} to evaluate a query.
-   * The resulting items are passed on to an {@link XMLSerializer} instance.
+   * The resulting items are passed on to a serializer.
    * @param query query to be evaluated
    * @throws QueryException if an error occurs while evaluating the query
    */
@@ -112,9 +112,8 @@ public final class RunQueries {
 
   /**
    * This method uses the {@link QueryProcessor} to evaluate a query.
-   * The results are iterated one by one and passed on to an
-   * {@link XMLSerializer} instance. This variant is especially
-   * efficient if large result sets are expected.
+   * The results are iterated one by one and passed on to an serializer.
+   * This variant is especially efficient if large result sets are expected.
    * @param query query to be evaluated
    * @throws QueryException if an error occurs while evaluating the query
    * @throws IOException if an error occurs while serializing the results

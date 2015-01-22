@@ -33,32 +33,33 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
     // IDENTICAL: 0 value updates
     query(transform("<doc><tree/></doc>",
         "replace node $input//tree with <tree/>"),
-        "<doc><tree/></doc>");
+        "<doc>\n<tree/>\n</doc>");
     // FAIL: different size of trees
     query(transform("<doc><tree><n/></tree></doc>",
         "replace node $input//tree with <tree/>"),
-        "<doc><tree/></doc>");
+        "<doc>\n<tree/>\n</doc>");
     // FAIL: kind
     query(transform("<doc><tree><n/></tree></doc>",
         "replace node $input//tree with <tree>text</tree>"),
-        "<doc><tree>text</tree></doc>");
+        "<doc>\n<tree>text</tree>\n</doc>");
     // FAIL: distance (size would've already failed on ancestor axis)
     query(transform("<doc><tree><n/></tree></doc>",
         "replace node $input//tree with <tree/>"),
-        "<doc><tree/></doc>");
+        "<doc>\n<tree/>\n</doc>");
     // FAIL: replace attribute w/ sequence of attributes
     query(transform("<doc><tree id=\"0\"/></doc>",
         "replace node $input//@id with (attribute id {\"1\"}, attribute id2 {\"2\"})"),
-        "<doc><tree id=\"1\" id2=\"2\"/></doc>");
+        "<doc>\n<tree id=\"1\" id2=\"2\"/>\n</doc>");
     // LAZY REPLACE: 8 value updates -> element, attribute, text, comment, processing instruction
-    query(transform("<doc><tree1 a='0'>text1<a/><!--comm1--><a/><?p1 i1?><?p11?></tree1></doc>",
+    query(transform("<doc><tree1 a='0'>text1<a/><!--comm1--><a/><?p1 i1?><?p11?></tree1></doc> ",
         "replace node $input//tree1 with " +
         "<tree2 b='1'>text2<a/><!--comm2--><a/><?p2 i2?><?p22?></tree2>"),
-        "<doc><tree2 b=\"1\">text2<a/><!--comm2--><a/><?p2 i2?><?p22 ?></tree2></doc>");
+        "<doc>\n<tree2 b=\"1\">text2<a/>\n<!--comm2-->\n<a/>\n" +
+        "<?p2 i2?>\n<?p22 ?>\n</tree2>\n</doc>");
     // LAZY REPLACE: 2 value updates -> single attribute
     query(transform("<doc><tree id1=\"0\"/></doc>",
         "replace node $input//@id1 with attribute id2 {\"1\"}"),
-        "<doc><tree id2=\"1\"/></doc>");
+        "<doc>\n<tree id2=\"1\"/>\n</doc>");
   }
 
   /**
@@ -116,7 +117,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
     auc.addInsert(3, 1, clipE(m, "<d/>", false));
     assertEquals(1, auc.updatesSize());
     query(transform(doc, "insert node <d/> into $input, insert node <c/> into $input/b,"
-        + "delete node $input/b"), "<a><d/></a>");
+        + "delete node $input/b"), "<a>\n<d/>\n</a>");
   }
 
   /**
@@ -131,7 +132,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
     auc.addInsert(3, 1, clipE(m, "<d/>", false));
     assertEquals(2, auc.updatesSize());
     query(transform(doc, "insert node <d/> into $input,"
-        + "replace node $input/b with <newb/>"), "<a><newb/><d/></a>");
+        + "replace node $input/b with <newb/>"), "<a>\n<newb/>\n<d/>\n</a>");
   }
 
   /**
@@ -147,7 +148,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
     auc.addInsert(3, 2, clipE(m, "<c/>", false));
     assertEquals(1, auc.updatesSize());
     query(transform(doc, "insert node <c/> into $input/b,"
-        + "replace node $input/b with <newb/>"), "<a><newb/></a>");
+        + "replace node $input/b with <newb/>"), "<a>\n<newb/>\n</a>");
   }
 
   /**
@@ -189,7 +190,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
     auc.addInsert(3, 2, clipE(m, "<d/>", false));
     assertEquals(2, auc.updatesSize());
     query(transform(doc, "insert node <c/> into $input/b,insert node <d/> into $input/b"),
-        "<a><b><c/><d/></b></a>");
+        "<a>\n<b>\n<c/>\n<d/>\n</b>\n</a>");
 
     // delete(x) -> insert(x+1)
     auc = atomics(doc);
@@ -197,7 +198,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
     auc.addInsert(3, 1, clipE(m, "<d/>", false));
     assertEquals(1, auc.updatesSize());
     query(transform(doc, "insert node <d/> into $input,delete node $input/b"),
-        "<a><d/></a>");
+        "<a>\n<d/>\n</a>");
 
     // delete(x) -> insert(x+1) with affecting insert before x
     auc = atomics("<a><b/><c/></a>");
@@ -206,15 +207,14 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
     auc.addInsert(4, 1, clipE(m, "<d/>", false));
     assertEquals(2, auc.updatesSize());
     query(transform("<a><b/><c/></a>", "insert node <d/> into $input," +
-        "delete node $input/c,delete node $input/b"), "<a><d/></a>");
+        "delete node $input/c,delete node $input/b"), "<a>\n<d/>\n</a>");
 
     // insert(x) <- delete(x)
     auc = atomics(doc);
     auc.addInsert(2, 1, clipE(m, "<d/>", false));
     auc.addDelete(2);
     assertEquals(1, auc.updatesSize());
-    query(transform(doc, "insert node <d/> into $input,delete node $input/b"),
-        "<a><d/></a>");
+    query(transform(doc, "insert node <d/> into $input,delete node $input/b"), "<a>\n<d/>\n</a>");
   }
 
   /**

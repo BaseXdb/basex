@@ -22,7 +22,7 @@ public final class XQueryModuleTest extends AdvancedQueryTest {
     query(_XQUERY_EVAL.args("1 + 2"), 3);
     query(_XQUERY_EVAL.args("\"declare variable $a external; $a\"", " map { '$a': 'b' }"), "b");
     query(_XQUERY_EVAL.args("\"declare variable $a external; $a\"", " map { 'a': 'b' }"), "b");
-    query(_XQUERY_EVAL.args("\"declare variable $a external; $a\"", " map { 'a': (1,2) }"), "1 2");
+    query(_XQUERY_EVAL.args("\"declare variable $a external; $a\"", " map { 'a': (1,2) }"), "1\n2");
     query(_XQUERY_EVAL.args("\"declare variable $local:a external; $local:a\"",
         " map { xs:QName('local:a'): 1 }"), "1");
     query(_XQUERY_EVAL.args(".", " map { '': 1 }"), "1");
@@ -95,8 +95,8 @@ public final class XQueryModuleTest extends AdvancedQueryTest {
       System.setErr(NULL);
       query(_XQUERY_TYPE.args("()"), "");
       query(_XQUERY_TYPE.args("1"), "1");
-      query(_XQUERY_TYPE.args("(1, 2, 3)"), "1 2 3");
-      query(_XQUERY_TYPE.args("<x a='1' b='2' c='3'/>/@*/data()"), "1 2 3");
+      query(_XQUERY_TYPE.args("(1, 2, 3)"), "1\n2\n3");
+      query(_XQUERY_TYPE.args("<x a='1' b='2' c='3'/>/@*/data()"), "1\n2\n3");
     } finally {
       System.setErr(ERR);
     }

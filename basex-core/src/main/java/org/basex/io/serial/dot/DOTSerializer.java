@@ -8,6 +8,7 @@ import java.io.*;
 import java.util.*;
 
 import org.basex.data.*;
+import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
@@ -15,7 +16,7 @@ import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
- * This class serializes data in the DOT syntax.
+ * This class serializes items in the DOT syntax.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
@@ -40,15 +41,15 @@ public final class DOTSerializer extends OutputSerializer {
    * @throws IOException I/O exception
    */
   public DOTSerializer(final OutputStream os, final boolean compact) throws IOException {
-    super(os, SerializerOptions.get(true));
+    super(PrintOutput.get(os), SerializerOptions.get(true));
     this.compact = compact;
-    print(HEADER);
+    out.print(HEADER);
   }
 
   @Override
   public void close() throws IOException {
     indent();
-    print(FOOTER);
+    out.print(FOOTER);
   }
 
   @Override
@@ -77,12 +78,12 @@ public final class DOTSerializer extends OutputSerializer {
 
   @Override
   protected void finishClose() throws IOException {
-    final int c = nodes.get(lvl);
-    final IntList il = child(lvl);
+    final int c = nodes.get(level);
+    final IntList il = child(level);
     final int is = il.size();
     for(int i = 0; i < is; ++i) {
       indent();
-      print(Util.info(DOTLINK, c, il.get(i)));
+      out.print(Util.info(DOTLINK, c, il.get(i)));
     }
     il.reset();
   }
@@ -121,9 +122,9 @@ public final class DOTSerializer extends OutputSerializer {
     String txt = string(chop(value, 60)).replaceAll("\"|\\r|\\n", "'");
     if(compact) txt = txt.replaceAll("\\\\n\\w+:", "\\\\n");
     indent();
-    print(Util.info(DOTNODE, count, txt, col));
-    nodes.set(lvl, count);
-    if(lvl > 0) child(lvl - 1).add(count);
+    out.print(Util.info(DOTNODE, count, txt, col));
+    nodes.set(level, count);
+    if(level > 0) child(level - 1).add(count);
     ++count;
   }
 

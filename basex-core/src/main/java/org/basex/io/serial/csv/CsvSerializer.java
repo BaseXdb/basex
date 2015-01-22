@@ -5,17 +5,18 @@ import static org.basex.util.Token.*;
 import java.io.*;
 
 import org.basex.build.csv.*;
+import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
- * This class serializes data as CSV.
+ * This class serializes items as CSV.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-abstract class CsvSerializer extends OutputSerializer {
+abstract class CsvSerializer extends StandardSerializer {
   /** CSV options. */
   final CsvOptions copts;
   /** Separator. */
@@ -27,12 +28,12 @@ abstract class CsvSerializer extends OutputSerializer {
 
   /**
    * Constructor.
-   * @param os output stream reference
+   * @param out print output
    * @param opts serialization parameters
    * @throws IOException I/O exception
    */
-  CsvSerializer(final OutputStream os, final SerializerOptions opts) throws IOException {
-    super(os, opts);
+  CsvSerializer(final PrintOutput out, final SerializerOptions opts) throws IOException {
+    super(out, opts);
     copts = opts.get(SerializerOptions.CSV);
     quotes = copts.get(CsvOptions.QUOTES);
     backslashes = copts.get(CsvOptions.BACKSLASHES);
@@ -49,7 +50,7 @@ abstract class CsvSerializer extends OutputSerializer {
     final int fs = fields.size();
     for(int i = 0; i < fs; i++) {
       final byte[] v = fields.get(i);
-      if(i != 0) print(separator);
+      if(i != 0) out.print(separator);
 
       byte[] txt = v == null ? EMPTY : v;
       if(contains(txt, separator) || (quotes || backslashes) &&
@@ -65,8 +66,8 @@ abstract class CsvSerializer extends OutputSerializer {
         if(quotes) tb.add('"');
         txt = tb.finish();
       }
-      print(txt);
+      out.print(txt);
     }
-    print(nl);
+    newline();
   }
 }

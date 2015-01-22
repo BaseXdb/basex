@@ -62,8 +62,7 @@ public abstract class QueryTest extends SandboxTest {
         if(correct || msg == null || msg.contains("mailman")) {
           final String cp = correct && cmp.data() != null ? cmp.toString() : "()";
           sb.append("[" + qu[0] + "] " + query + "\n[E] " + cp + "\n[F] "
-              + (msg == null ? Util.className(ex) : msg.replaceAll("\r\n?|\n", " ")) + ' '
-              + details() + '\n');
+              + (msg == null ? Util.className(ex) : normNL(msg)) + ' ' + details() + '\n');
           ex.printStackTrace();
           ++fail;
         }

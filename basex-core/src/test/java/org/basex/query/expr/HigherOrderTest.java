@@ -61,7 +61,7 @@ public final class HigherOrderTest extends AdvancedQueryTest {
       "};" +
       "local:before-first((<h1/>, <p/>, <h1/>, <h2/>, <h3/>)," +
       "  function($it) { name($it) = 'h2' })",
-      "<h1/><p/><h1/>");
+      "<h1/>\n<p/>\n<h1/>");
   }
 
   /**
@@ -81,7 +81,7 @@ public final class HigherOrderTest extends AdvancedQueryTest {
   @Test
   public void closureTest() {
     query("for $n in (<a/>, <b/>) let $f := function() as element()* { trace($n) } return $f()",
-        "<a/><b/>");
+        "<a/>\n<b/>");
   }
 
   /**  Test for name heavy currying. */

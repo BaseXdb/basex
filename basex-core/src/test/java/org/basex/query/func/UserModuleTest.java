@@ -46,7 +46,7 @@ public final class UserModuleTest extends AdvancedQueryTest {
 
   /** Test method. */
   @Test public void list() {
-    query(_USER_LIST.args(), UserText.ADMIN + ' ' + NAME);
+    query(_USER_LIST.args(), UserText.ADMIN + '\n' + NAME);
   }
 
   /** Test method. */

@@ -24,7 +24,7 @@ public final class ArrowTest extends AdvancedQueryTest {
     query("(for $i in ('a', 'b') return $i => string-length()) => count()", "2");
     query("let $string := 'a b c' "
         + "let $result := $string=>upper-case()=>normalize-unicode()=>tokenize('\\s+')"
-        + "return ($result, count($result))", "A B C 3");
+        + "return ($result, count($result))", "A\nB\nC\n3");
   }
 
   /** Test. */

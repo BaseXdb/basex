@@ -81,7 +81,7 @@ public final class ArrayModuleTest extends AdvancedQueryTest {
   @Test public void head() {
     query(_ARRAY_HEAD.args(" [1]"), "1");
     query(_ARRAY_HEAD.args(" array { 1 to 5 }"), "1");
-    query(_ARRAY_HEAD.args(" [1 to 2, 3]"), "1 2");
+    query(_ARRAY_HEAD.args(" [1 to 2, 3]"), "1\n2");
 
     error(_ARRAY_HEAD.args(" []"), ARRAYEMPTY);
   }
@@ -135,7 +135,7 @@ public final class ArrayModuleTest extends AdvancedQueryTest {
 
   /** Test method. */
   @Test public void foldRight() {
-    query(_ARRAY_FOLD_RIGHT.args(" [1,2]", "()", "function($a,$b) { $b,$a }"), "2 1");
+    query(_ARRAY_FOLD_RIGHT.args(" [1,2]", "()", "function($a,$b) { $b,$a }"), "2\n1");
   }
 
   /** Test method. */

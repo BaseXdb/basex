@@ -144,7 +144,7 @@ public final class PathTest extends SandboxTest {
       " count(collection('" + WEEK2 +
       "/week/tuesday')/root/monday/text[text() = 'text']) ";
     try(final QueryProcessor qp = new QueryProcessor(count, context)) {
-      assertEquals("3 1", qp.execute().toString());
+      assertEquals("3\n1", normNL(qp.execute()));
     }
   }
 }

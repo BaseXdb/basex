@@ -6,7 +6,6 @@ import java.io.*;
 
 import org.basex.build.*;
 import org.basex.data.*;
-import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
@@ -37,17 +36,8 @@ public class BuilderSerializer extends Serializer {
   }
 
   @Override
-  protected void startOpen(final byte[] name) throws IOException {
-  }
-
-  @Override
   protected final void pi(final byte[] name, final byte[] value) throws IOException {
     build.pi(concat(name, SPACE, value));
-  }
-
-  @Override
-  protected final void atomic(final Item it, final boolean iter) {
-    throw Util.notExpected();
   }
 
   @Override

@@ -6,7 +6,6 @@ import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.serial.*;
-import org.basex.util.options.Options.YesNo;
 import org.junit.*;
 import org.junit.Test;
 
@@ -88,9 +87,7 @@ public final class XMLParserTest extends SandboxTest {
   @Test
   public void parse() throws Exception {
     context.options.set(MainOptions.STRIPNS, true);
-    final SerializerOptions sopts = new SerializerOptions();
-    sopts.set(SerializerOptions.INDENT, YesNo.NO);
-    context.options.set(MainOptions.SERIALIZER, sopts);
+    context.options.set(MainOptions.SERIALIZER, SerializerOptions.get(false));
 
     final String doc = "<e xmlns='A'><b:f xmlns:b='B'/></e>";
     for(final boolean b : new boolean[] { false, true }) {
@@ -109,9 +106,7 @@ public final class XMLParserTest extends SandboxTest {
    */
   @Test
   public void xmlSpace() throws Exception {
-    final SerializerOptions sopts = new SerializerOptions();
-    sopts.set(SerializerOptions.INDENT, YesNo.NO);
-    context.options.set(MainOptions.SERIALIZER, sopts);
+    context.options.set(MainOptions.SERIALIZER, SerializerOptions.get(false));
 
     final String in = "<x><a xml:space='default'> </a><a> </a>" +
         "<a xml:space='preserve'> </a></x>";

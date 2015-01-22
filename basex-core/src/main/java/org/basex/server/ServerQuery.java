@@ -1,7 +1,6 @@
 package org.basex.server;
 
 import static org.basex.core.Text.*;
-import static org.basex.io.serial.SerializerOptions.*;
 import static org.basex.query.QueryError.*;
 
 import java.io.*;
@@ -13,7 +12,6 @@ import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.util.*;
 
 /**
@@ -128,19 +126,13 @@ public final class ServerQuery extends Proc {
       final Iter ir = qp.iter();
       qi.evaluating = perf.time();
       parameters();
-      final boolean wrap = !parameters.get(WRAP_PREFIX).isEmpty();
 
       // iterate through results
       final PrintOutput po = PrintOutput.get(encode ? new EncodingOutput(out) : out);
-      if(iter && wrap) {
-        final FElem elem = new FElem("");
-        po.write(full ? elem.xdmInfo() : elem.typeId().bytes());
-      }
-
       final Serializer ser = Serializer.get(po, full ? null : parameters);
       int c = 0;
       for(Item it; (it = ir.next()) != null;) {
-        if(iter && !wrap) {
+        if(iter) {
           po.write(full ? it.xdmInfo() : it.typeId().bytes());
           ser.reset();
           ser.serialize(it, full, true);
@@ -152,7 +144,6 @@ public final class ServerQuery extends Proc {
         c++;
       }
       ser.close();
-      if(iter && wrap) out.write(0);
       qi.serializing = perf.time();
 
       // generate query info

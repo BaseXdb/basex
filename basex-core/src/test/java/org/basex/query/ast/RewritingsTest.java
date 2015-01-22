@@ -95,14 +95,14 @@ public final class RewritingsTest extends QueryPlanTest {
   public void iterPath() throws BaseXException {
     new CreateDB(NAME, "<a id='0' x:id='' x='' xmlns:x='x'><b id='1'/><c id='2'/>"
         + "<d id='3'/><e id='4'/></a>").execute(context);
-    check("(/a/*/../*) ! name()", "b c d e", "empty(//IterPath)");
-    check("(exactly-one(/a/b)/../*) ! name()", "b c d e", "exists(//IterPath)");
-    check("(/a/*/following::*) ! name()", "c d e", "empty(//IterPath)");
-    check("(exactly-one(/a/b)/following::*) ! name()", "c d e", "exists(//IterPath)");
-    check("(/a/*/following-sibling::*) ! name()", "c d e", "empty(//IterPath)");
-    check("(exactly-one(/a/b)/following-sibling::*) ! name()", "c d e", "exists(//IterPath)");
-    check("(/*/@id/../*) ! name()", "b c d e", "empty(//IterPath)");
-    check("(exactly-one(/a)/@id/../*) ! name()", "b c d e", "exists(//IterPath)");
+    check("(/a/*/../*) ! name()", "b\nc\nd\ne", "empty(//IterPath)");
+    check("(exactly-one(/a/b)/../*) ! name()", "b\nc\nd\ne", "exists(//IterPath)");
+    check("(/a/*/following::*) ! name()", "c\nd\ne", "empty(//IterPath)");
+    check("(exactly-one(/a/b)/following::*) ! name()", "c\nd\ne", "exists(//IterPath)");
+    check("(/a/*/following-sibling::*) ! name()", "c\nd\ne", "empty(//IterPath)");
+    check("(exactly-one(/a/b)/following-sibling::*) ! name()", "c\nd\ne", "exists(//IterPath)");
+    check("(/*/@id/../*) ! name()", "b\nc\nd\ne", "empty(//IterPath)");
+    check("(exactly-one(/a)/@id/../*) ! name()", "b\nc\nd\ne", "exists(//IterPath)");
     new DropDB(NAME).execute(context);
   };
 

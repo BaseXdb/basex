@@ -49,7 +49,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   public void delete() {
     query(transform("<n><a><b/></a><c/><d><e><f/></e><g/></d></n>",
         "delete node $input//b, delete node $input//f, delete node $input//e"),
-        "<n><a/><c/><d><g/></d></n>");
+        "<n>\n<a/>\n<c/>\n<d>\n<g/>\n</d>\n</n>");
   }
 
   /**
@@ -58,7 +58,8 @@ public final class UpdateTest extends AdvancedQueryTest {
   @Test
   public void delete2() {
     query(transform("<a><b/><c/><d/></a>",
-        "delete node $input//b, delete node $input//c"), "<a><d/></a>");
+        "delete node $input//b, delete node $input//c"),
+        "<a>\n<d/>\n</a>");
   }
 
   /**
@@ -71,7 +72,7 @@ public final class UpdateTest extends AdvancedQueryTest {
             "<n2/><n3/><n4/><n5/><n6/><n7/><n8/><n9/><n10/><n11/>" +
         "</n1>";
     query(transform(doc, "delete node ($input//n3, $input//n5, $input//n7)"),
-        "<n1><n2/><n4/><n6/><n8/><n9/><n10/><n11/></n1>");
+        "<n1>\n<n2/>\n<n4/>\n<n6/>\n<n8/>\n<n9/>\n<n10/>\n<n11/>\n</n1>");
   }
 
   /** Transform expression shadowing another variable. */
@@ -104,9 +105,13 @@ public final class UpdateTest extends AdvancedQueryTest {
         "$xml update (" +
         "for $i in 1 to 2 return " +
         "insert node $xml/instance/data/vocable[@hits = '1'] into ./instance))",
-        "<instance><data><vocable hits=\"1\"/></data><vocable hits=\"1\"/>" +
-        "<vocable hits=\"1\"/></instance><instance><data>" +
-        "<vocable hits=\"1\"/></data><vocable hits=\"1\"/><vocable hits=\"1\"/></instance>");
+        "<instance>\n<data>\n" +
+        "<vocable hits=\"1\"/>\n</data>\n" +
+        "<vocable hits=\"1\"/>\n" +
+        "<vocable hits=\"1\"/>\n</instance>\n<instance>\n<data>\n" +
+        "<vocable hits=\"1\"/>\n</data>\n" +
+        "<vocable hits=\"1\"/>\n" +
+        "<vocable hits=\"1\"/>\n</instance>");
     new Set("mainmem", "off").execute(context);
   }
 
@@ -117,7 +122,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   public void insertinto() {
     query(transform("<n><a/></n>",
         "insert node <x2/> into $input, insert node <x1/> into $input//a"),
-        "<n><a><x1/></a><x2/></n>");
+        "<n>\n<a>\n<x1/>\n</a>\n<x2/>\n</n>");
   }
 
   /**
@@ -127,7 +132,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   public void insertinto2() {
     query(transform("<n><a/><b/></n>",
         "insert node <x1/> into $input//a, insert node <x2/> into $input//b"),
-        "<n><a><x1/></a><b><x2/></b></n>");
+        "<n>\n<a>\n<x1/>\n</a>\n<b>\n<x2/>\n</b>\n</n>");
   }
 
   /**
@@ -137,7 +142,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   public void insertIntoAsFirst() {
     query(transform("<a att='0'/>",
         "insert node <b/> as first into $input, delete node $input/@att"),
-        "<a><b/></a>");
+        "<a>\n<b/>\n</a>");
   }
 
   /**
@@ -148,7 +153,7 @@ public final class UpdateTest extends AdvancedQueryTest {
     query(transform("<a att='0'/>",
         "insert node <b/> as first into $input, replace node $input/@att with " +
         "(attribute {'att1'}{0}, attribute {'att2'}{0})"),
-        "<a att1=\"0\" att2=\"0\"><b/></a>");
+        "<a att1=\"0\" att2=\"0\">\n<b/>\n</a>");
   }
 
   /**
@@ -158,19 +163,16 @@ public final class UpdateTest extends AdvancedQueryTest {
   public void insertSequenceMerging() {
     query(transform("<n/>",
         "insert node <e1/> into $input, insert node <e2/> into $input"),
-        "<n><e1/><e2/></n>");
-
+        "<n>\n<e1/>\n<e2/>\n</n>");
     query(transform("<n/>",
         "insert node <e1/> as last into $input, insert node <e2/> as last into $input"),
-        "<n><e1/><e2/></n>");
-
+        "<n>\n<e1/>\n<e2/>\n</n>");
     query(transform("<n/>",
         "insert node <e1/> into $input, insert node <e2/> as last into $input"),
-        "<n><e1/><e2/></n>");
-
+        "<n>\n<e1/>\n<e2/>\n</n>");
     query(transform("<n/>",
         "insert node <e1/> as last into $input, insert node <e2/> into $input"),
-        "<n><e2/><e1/></n>");
+        "<n>\n<e2/>\n<e1/>\n</n>");
   }
 
   /**
@@ -178,8 +180,7 @@ public final class UpdateTest extends AdvancedQueryTest {
    */
   @Test
   public void deleteLastNode() {
-    query(transform("<a><b/><c/></a>", "delete node $input//c"),
-        "<a><b/></a>");
+    query(transform("<a><b/><c/></a>", "delete node $input//c"), "<a>\n<b/>\n</a>");
   }
 
   /**
@@ -188,10 +189,9 @@ public final class UpdateTest extends AdvancedQueryTest {
   @Test
   public void lazyReplace() {
     query(transform("<n><r>a</r></n>", "replace node $input/r with <r>b</r>"),
-        "<n><r>b</r></n>");
-
+        "<n>\n<r>b</r>\n</n>");
     query(transform("<n><r>a</r></n>", "replace node $input/r with <r>b</r>"),
-        "<n><r>b</r></n>");
+        "<n>\n<r>b</r>\n</n>");
   }
 
   /**
@@ -263,7 +263,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   @Test
   public void replaceLastNode() {
     query(transform("<a><b/><c><d/><d/><d/></c></a>", "replace node $input//c with <c/>"),
-        "<a><b/><c/></a>");
+        "<a>\n<b/>\n<c/>\n</a>");
   }
 
   /**
@@ -284,7 +284,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   public void replaceAttribute2() {
     query(transform("<a><b att0='0'/><c/></a>",
         "replace node $input/b/@att0 with attribute att1 {'1'}"),
-        "<a><b att1=\"1\"/><c/></a>");
+        "<a>\n<b att1=\"1\"/>\n<c/>\n</a>");
   }
 
   /**
@@ -317,7 +317,7 @@ public final class UpdateTest extends AdvancedQueryTest {
     query(transform("<n>text<doNotDelete/></n>",
         "replace value of node $input//text() with \"\", " +
         "delete node $input//text()"),
-        "<n><doNotDelete/></n>");
+        "<n>\n<doNotDelete/>\n</n>");
   }
 
   /**
@@ -417,7 +417,7 @@ public final class UpdateTest extends AdvancedQueryTest {
    */
   @Test
   public void replaceelementcontent8() {
-    testBothSequences("<n><A><B/></A></n>", "<n><newA/></n>",
+    testBothSequences("<n><A><B/></A></n>", "<n>\n<newA/>\n</n>",
         "replace node $input/A with <newA/>",
         "replace value of node $input/A/B with 'newContentForA'");
   }
@@ -427,7 +427,7 @@ public final class UpdateTest extends AdvancedQueryTest {
    */
   @Test
   public void replaceelementcontent9() {
-    testBothSequences("<n><A/></n>", "<n><newA/></n>",
+    testBothSequences("<n><A/></n>", "<n>\n<newA/>\n</n>",
         "replace node $input/A with <newA/>",
         "replace value of node $input/A with 'newContentForA'");
   }
@@ -437,7 +437,7 @@ public final class UpdateTest extends AdvancedQueryTest {
    */
   @Test
   public void deleteAndReplaceOnSameTarget() {
-    testBothSequences("<a><b/></a>", "<a><newB/></a>",
+    testBothSequences("<a><b/></a>", "<a>\n<newB/>\n</a>",
         "replace node $input/b with <newB/>", "delete node $input/b");
   }
 
@@ -474,7 +474,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   public void emptyInsert1() {
     query(
       "copy $x := <X/> modify insert nodes <A/> into $x return $x",
-      "<X><A/></X>");
+      "<X>\n<A/>\n</X>");
   }
 
   /**
@@ -560,7 +560,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   public void textMerging00() {
     query(transform("<a>AA<b/>CC</a>", "delete node $input//b",
         "($input,count($input//text()))"),
-        "<a>AACC</a>1");
+        "<a>AACC</a>\n1");
   }
 
   /**
@@ -601,7 +601,7 @@ public final class UpdateTest extends AdvancedQueryTest {
       "insert node 'foo' into $i/quantity)");
     query("let $i := //item[@id='item0'] return " +
       "(($i/location/text())[1], ($i/quantity/text())[1])",
-      "fooUnited States1foo");
+      "fooUnited States\n1foo");
   }
 
   /**
@@ -665,7 +665,7 @@ public final class UpdateTest extends AdvancedQueryTest {
       "(insert node 'foo' after $i, insert node 'faa' before $i, insert " +
       "node 'faa' into $i, delete node $i/text())");
     query("let $i := //item[@id='item0']/location return ($i/text(), ($i/../text())[2])",
-        "faafoofoo");
+        "faa\nfoofoo");
   }
 
   /**
@@ -675,7 +675,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   public void textMerging09() {
     query(transform("<n>aa<d/><d/>cc</n>",
         "delete node $input//d, insert node 'bb' after ($input//d)[1]",
-        "count($input//text()), $input//text()"), "1aabbcc");
+        "count($input//text()), $input//text()"), "1\naabbcc");
   }
 
   /**
@@ -685,7 +685,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   public void textMerging10() {
     query("copy $c := <n>aa<d/><d/>cc</n> " +
       "modify (delete node $c//d, insert node 'bb' before ($c//d)[2]) " +
-      "return (count($c//text()), $c//text())", "1aabbcc");
+      "return (count($c//text()), $c//text())", "1\naabbcc");
   }
 
   /**
@@ -696,7 +696,7 @@ public final class UpdateTest extends AdvancedQueryTest {
     query(
       "copy $c := <n>aa<d/><d/>cc</n> " +
       "modify (delete node $c//d, insert node 'bb' before ($c//d)[2]) " +
-      "return (count($c//text()), $c//text())", "1aabbcc");
+      "return (count($c//text()), $c//text())", "1\naabbcc");
   }
 
   /**
@@ -744,7 +744,7 @@ public final class UpdateTest extends AdvancedQueryTest {
    */
   @Test
   public void delayedDistanceAdjustment000() {
-    query(transform("<a><b/><c/></a>", "delete node $input/b"), "<a><c/></a>");
+    query(transform("<a><b/><c/></a>", "delete node $input/b"), "<a>\n<c/>\n</a>");
   }
 
   /**
@@ -753,7 +753,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   @Test
   public void delayedDistanceAdjustment00() {
     query(transform("<a><b/><c/><d/></a>", "delete node ($input/b, $input/c)"),
-        "<a><d/></a>");
+        "<a>\n<d/>\n</a>");
   }
 
   /**
@@ -765,7 +765,7 @@ public final class UpdateTest extends AdvancedQueryTest {
     query("copy $c := <n><a/><n><a/><n/><a/></n><a/><n/><a/></n> " +
           "modify for $a in $c//a return replace node $a with <b/> " +
           "return $c",
-          "<n><b/><n><b/><n/><b/></n><b/><n/><b/></n>");
+          "<n>\n<b/>\n<n>\n<b/>\n<n/>\n<b/>\n</n>\n<b/>\n<n/>\n<b/>\n</n>");
   }
 
   /**
@@ -777,7 +777,7 @@ public final class UpdateTest extends AdvancedQueryTest {
     query("copy $c := <n><a/><a/></n> " +
         "modify for $a in $c//a return replace node $a with <b/> " +
         "return $c",
-        "<n><b/><b/></n>");
+        "<n>\n<b/>\n<b/>\n</n>");
   }
 
   /**
@@ -789,7 +789,7 @@ public final class UpdateTest extends AdvancedQueryTest {
     createDB("<A><B><C/></B><D/></A>");
     query("insert node <XB/> before //B, insert node <XC/> before //C, " +
         "insert node <XD/> before //D");
-    query("/", "<A><XB/><B><XC/><C/></B><XD/><D/></A>");
+    query("/", "<A>\n<XB/>\n<B>\n<XC/>\n<C/>\n</B>\n<XD/>\n<D/>\n</A>");
   }
 
   /**
@@ -801,7 +801,7 @@ public final class UpdateTest extends AdvancedQueryTest {
     createDB("<A><B><C/></B><D><E/></D></A>");
     query("insert node <XB/> before //B, insert node <XC/> before //C, " +
         "insert node <XD/> before //D, insert node <XE/> before //E");
-    query("/", "<A><XB/><B><XC/><C/></B><XD/><D><XE/><E/></D></A>");
+    query("/", "<A>\n<XB/>\n<B>\n<XC/>\n<C/>\n</B>\n<XD/>\n<D>\n<XE/>\n<E/>\n</D>\n</A>");
   }
 
   /**
@@ -813,7 +813,7 @@ public final class UpdateTest extends AdvancedQueryTest {
     createDB("<A><B><C/><D/></B></A>");
     query("insert node <XB/> before //B, insert node <XC/> before //C, " +
         "insert node <XXC/> into //C");
-    query("/", "<A><XB/><B><XC/><C><XXC/></C><D/></B></A>");
+    query("/", "<A>\n<XB/>\n<B>\n<XC/>\n<C>\n<XXC/>\n</C>\n<D/>\n</B>\n</A>");
   }
 
   /**
@@ -825,7 +825,7 @@ public final class UpdateTest extends AdvancedQueryTest {
     createDB("<A><B><C/><D/></B><E/></A>");
     query("insert node <XB/> before //B, insert node <XC/> before //C, " +
         "insert node <XXC/> into //C");
-    query("/", "<A><XB/><B><XC/><C><XXC/></C><D/></B><E/></A>");
+    query("/", "<A>\n<XB/>\n<B>\n<XC/>\n<C>\n<XXC/>\n</C>\n<D/>\n</B>\n<E/>\n</A>");
   }
 
   /**
@@ -836,7 +836,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   public void delayedDistanceAdjustment5() throws BaseXException {
     createDB("<A><B><C/></B></A>");
     query("insert node <XB/> before //B, insert node <XC/> before //C");
-    query("/", "<A><XB/><B><XC/><C/></B></A>");
+    query("/", "<A>\n<XB/>\n<B>\n<XC/>\n<C/>\n</B>\n</A>");
   }
 
   /**
@@ -847,7 +847,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   public void delayedDistanceAdjustment6() throws BaseXException {
     createDB("<A><B/><C/></A>");
     query("delete node //B");
-    query("/", "<A><C/></A>");
+    query("/", "<A>\n<C/>\n</A>");
   }
 
   /**
@@ -858,7 +858,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   public void delayedDistanceAdjustment7() throws BaseXException {
     createDB("<A><B/><C/><D/><E/></A>");
     query("delete node (//B,//D)");
-    query("/", "<A><C/><E/></A>");
+    query("/", "<A>\n<C/>\n<E/>\n</A>");
   }
 
   /**
@@ -869,7 +869,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   public void delayedDistanceAdjustment8() throws BaseXException {
     createDB("<A><B/><C><D/><E/></C></A>");
     query("delete node (//B,//D)");
-    query("/", "<A><C><E/></C></A>");
+    query("/", "<A>\n<C>\n<E/>\n</C>\n</A>");
   }
 
   /**
@@ -880,7 +880,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   public void delayedDistanceAdjustment9() throws BaseXException {
     createDB("<A><B/><C><D/><E/><F/></C></A>");
     query("delete node (//B,//D)");
-    query("/", "<A><C><E/><F/></C></A>");
+    query("/", "<A>\n<C>\n<E/>\n<F/>\n</C>\n</A>");
   }
 
   /**
@@ -891,7 +891,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   public void delayedDistanceAdjustment10() throws BaseXException {
     createDB("<A><B/><C><D/><E/></C><F/></A>");
     query("delete node (//B,//D)");
-    query("/", "<A><C><E/></C><F/></A>");
+    query("/", "<A>\n<C>\n<E/>\n</C>\n<F/>\n</A>");
   }
 
   /**
@@ -902,7 +902,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   public void delayedDistanceAdjustment11() throws BaseXException {
     createDB("<A><B/><C/><D/><E/></A>");
     query("delete node (//C,//D)");
-    query("/", "<A><B/><E/></A>");
+    query("/", "<A>\n<B/>\n<E/>\n</A>");
   }
 
   /**
@@ -913,7 +913,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   public void delayedDistanceAdjustment12() throws BaseXException {
     createDB("<A><B/><C/><D/><E/></A>");
     query("delete node (//B, //C), insert node <CNEW><X/></CNEW> before //D");
-    query("/", "<A><CNEW><X/></CNEW><D/><E/></A>");
+    query("/", "<A>\n<CNEW>\n<X/>\n</CNEW>\n<D/>\n<E/>\n</A>");
   }
 
   /**
@@ -926,7 +926,7 @@ public final class UpdateTest extends AdvancedQueryTest {
     query("insert node <X/> into //C," +
         "insert node <X><Y/></X> before //C," +
         "insert node <X/> after //D");
-    query("/", "<A><B><X><Y/></X><C><X/></C><D/><X/></B></A>");
+    query("/", "<A>\n<B>\n<X>\n<Y/>\n</X>\n<C>\n<X/>\n</C>\n<D/>\n<X/>\n</B>\n</A>");
   }
 
   /**
@@ -939,7 +939,8 @@ public final class UpdateTest extends AdvancedQueryTest {
     query("insert node <X><Y/></X> into //C," +
         "insert node <X><Y/></X> before //C," +
         "insert node <X><Y/></X> after //D");
-    query("/", "<A><B><X><Y/></X><C><X><Y/></X></C><D/><X><Y/></X></B></A>");
+    query("/", "<A>\n<B>\n<X>\n<Y/>\n</X>\n<C>\n<X>\n<Y/>\n</X>\n" +
+        "</C>\n<D/>\n<X>\n<Y/>\n</X>\n</B>\n</A>");
   }
 
   /**
@@ -951,7 +952,7 @@ public final class UpdateTest extends AdvancedQueryTest {
     createDB("<A><B/><C/></A>");
     query("insert node <X2/> before //C," +
         "insert node <X1/> after //B");
-    query("/", "<A><B/><X1/><X2/><C/></A>");
+    query("/", "<A>\n<B/>\n<X1/>\n<X2/>\n<C/>\n</A>");
   }
 
   /**
@@ -963,7 +964,7 @@ public final class UpdateTest extends AdvancedQueryTest {
     createDB("<A><B/><C><D/></C><E/></A>");
     query("insert node <X1/> into //C," +
         "insert node <X2/> as last into //C");
-    query("/", "<A><B/><C><D/><X1/><X2/></C><E/></A>");
+    query("/", "<A>\n<B/>\n<C>\n<D/>\n<X1/>\n<X2/>\n</C>\n<E/>\n</A>");
   }
 
   /**
@@ -974,7 +975,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   public void delayedDistanceAdjustment17() throws BaseXException {
     createDB("<A><B/><C/><D/></A>");
     query("insert node <X/> after //B, delete node //C");
-    query("/", "<A><B/><X/><D/></A>");
+    query("/", "<A>\n<B/>\n<X/>\n<D/>\n</A>");
   }
 
   /**
@@ -985,7 +986,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   public void delayedDistanceAdjustment18() throws BaseXException {
     createDB("<A><B/><C/><D/></A>");
     query("insert node <X/> before //D, delete node //C");
-    query("/", "<A><B/><X/><D/></A>");
+    query("/", "<A>\n<B/>\n<X/>\n<D/>\n</A>");
   }
 
   /**
@@ -996,7 +997,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   public void delayedDistanceAdjustment19() throws BaseXException {
     createDB("<A><B/><C/><D/></A>");
     query("replace node //C with <X/>");
-    query("/", "<A><B/><X/><D/></A>");
+    query("/", "<A>\n<B/>\n<X/>\n<D/>\n</A>");
   }
 
   /**
@@ -1037,7 +1038,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   public void delayedDistanceAdjustment22() throws BaseXException {
     createDB("<A><B><C/><D/></B><E/></A>");
     query("insert node <X/> into //D, delete node //B");
-    query("/", "<A><E/></A>");
+    query("/", "<A>\n<E/>\n</A>");
   }
 
   /**
@@ -1049,7 +1050,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   public void delayedDistanceAdjustment23() throws BaseXException {
     createDB("<A><B/></A>");
     query("insert node <P2/> into //B, insert node <P3/> into //A");
-    query("/", "<A><B><P2/></B><P3/></A>");
+    query("/", "<A>\n<B>\n<P2/>\n</B>\n<P3/>\n</A>");
   }
 
   /**
@@ -1060,7 +1061,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   public void delayedDistanceAdjustment24() throws BaseXException {
     createDB("<A><B/><C/><D/><E/></A>");
     query("insert node <X/> into //B, delete node //C");
-    query("/", "<A><B><X/></B><D/><E/></A>");
+    query("/", "<A>\n<B>\n<X/>\n</B>\n<D/>\n<E/>\n</A>");
   }
 
   /**
@@ -1071,7 +1072,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   public void delayedDistanceAdjustment25() throws BaseXException {
     createDB("<A><B><C/></B><D/><E/></A>");
     query("insert node <X/> into //B, delete node //C");
-    query("/", "<A><B><X/></B><D/><E/></A>");
+    query("/", "<A>\n<B>\n<X/>\n</B>\n<D/>\n<E/>\n</A>");
   }
 
   /**
@@ -1085,7 +1086,7 @@ public final class UpdateTest extends AdvancedQueryTest {
         "delete node .//@at1," +
         "delete node .//@at3," +
         "rename node (.//@at2)[1] as 'at2x')",
-        "<n><x at2x=\"0\"/><y/><b/></n>");
+        "<n>\n<x at2x=\"0\"/>\n<y/>\n<b/>\n</n>");
   }
 
   /**
@@ -1149,7 +1150,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   @Test
   public void modify() {
     query("let $c := <x/> return $c update ()", "<x/>");
-    query("let $c := <x/> return $c update insert node <y/> into .", "<x><y/></x>");
+    query("let $c := <x/> return $c update insert node <y/> into .", "<x>\n<y/>\n</x>");
   }
 
   /**
@@ -1180,11 +1181,12 @@ public final class UpdateTest extends AdvancedQueryTest {
    */
   @Test
   public void updatingFuncItems() {
-    error("db:output(?)", SERFUNC_X);
-    error("db:output#1", SERFUNC_X);
-    error("declare updating function local:a() { () }; local:a#0", SERFUNC_X);
-    error("declare function local:a() { local:b#0 };"
-        + "declare updating function local:b() { db:output('1') }; local:a()", SERFUNC_X);
+    query("db:output(?)", "function (anonymous)#1");
+    query("db:output#1", "function db:output#1");
+    query("declare updating function local:a() { () }; local:a#0", "function local:a#0");
+    query("declare function local:a() { local:a#0 };"
+        + "declare updating function local:b() { db:output('1') }; local:a()",
+        "function local:a#0");
     query("declare function local:not-used() { local:b#0 };"
         + "declare updating function local:b() { db:output('1') }; local:b()", "1");
 

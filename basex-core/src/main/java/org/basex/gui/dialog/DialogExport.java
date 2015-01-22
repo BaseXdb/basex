@@ -87,7 +87,8 @@ public final class DialogExport extends BaseXDialog {
     for(final SerialMethod sm : SerialMethod.values()) sl.add(sm.name());
     sl.remove(sl.size() - 1);
     method = new BaseXCombo(this, sl.finish());
-    method.setSelectedItem(sopts.get(SerializerOptions.METHOD).name());
+    final SerialMethod sm = sopts.get(SerializerOptions.METHOD);
+    method.setSelectedItem((sm == null ? SerialMethod.ADAPTIVE : sm).name());
 
     mparams = new BaseXTextField(this);
     mparams.setColumns(24);

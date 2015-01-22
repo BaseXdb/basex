@@ -23,7 +23,7 @@ public final class HofModuleTest extends QueryPlanTest {
   public void idTest() {
     query(_HOF_ID.args("()"), "");
     query(_HOF_ID.args("<x/>"), "<x/>");
-    query("hof:id(1 to 10)", "1 2 3 4 5 6 7 8 9 10");
+    query("hof:id(1 to 10)", "1\n2\n3\n4\n5\n6\n7\n8\n9\n10");
   }
 
   /** Test method. */
@@ -31,14 +31,14 @@ public final class HofModuleTest extends QueryPlanTest {
   public void constTest() {
     query(_HOF_CONST.args("(), error()"), "");
     query(_HOF_CONST.args("<x/>, 123"), "<x/>");
-    query("hof:const(1 to 10, error('foo'))", "1 2 3 4 5 6 7 8 9 10");
+    query("hof:const(1 to 10, error('foo'))", "1\n2\n3\n4\n5\n6\n7\n8\n9\n10");
   }
 
   /** Test method. */
   @Test
   public void sortWithTest() {
     query("hof:sort-with((), function($a, $b) { $a < $b })", "");
-    query("hof:sort-with(1 to 5, function($a, $b) { $a > $b })", "5 4 3 2 1");
+    query("hof:sort-with(1 to 5, function($a, $b) { $a > $b })", "5\n4\n3\n2\n1");
     error("hof:sort-with(1 to 5, <x/>)", INVCAST_X_X_X);
   }
 
@@ -70,7 +70,7 @@ public final class HofModuleTest extends QueryPlanTest {
   @Test
   public void untilTest() {
     query("hof:until(function($x) { $x >= 1000 }, function($x) { $x * 2 }, 1)", "1024");
-    query("hof:until(function($xs) {count($xs)>3}, function($x) {$x,$x}, 1)", "1 1 1 1");
+    query("hof:until(function($xs) {count($xs)>3}, function($x) {$x,$x}, 1)", "1\n1\n1\n1");
   }
 
   /** Test method. */
@@ -78,7 +78,7 @@ public final class HofModuleTest extends QueryPlanTest {
   public void topKByTest() {
     query("hof:top-k-by(1 to 1000, function($x) {-$x}, 0)", "");
     query("hof:top-k-by((), function($x) {-$x}, 5)", "");
-    query("hof:top-k-by(1 to 1000, function($x) {-$x}, 5)", "1 2 3 4 5");
+    query("hof:top-k-by(1 to 1000, function($x) {-$x}, 5)", "1\n2\n3\n4\n5");
   }
 
   /** Test method. */
@@ -86,6 +86,6 @@ public final class HofModuleTest extends QueryPlanTest {
   public void topKWithTest() {
     query("hof:top-k-with(1 to 1000, function($x,$y) {$x > $y}, 0)", "");
     query("hof:top-k-with((), function($x,$y) {$x > $y}, 5)", "");
-    query("hof:top-k-with(1 to 5, function($x,$y) {$x > $y}, 5)", "1 2 3 4 5");
+    query("hof:top-k-with(1 to 5, function($x,$y) {$x > $y}, 5)", "1\n2\n3\n4\n5");
   }
 }

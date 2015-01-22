@@ -58,7 +58,7 @@ public final class ClientModuleTest extends AdvancedQueryTest {
     contains(_CLIENT_EXECUTE.args(conn(), new ShowUsers()), S_USERINFO[0]);
     query("let $a := " + conn() + ", $b := " + conn() + " return (" +
         _CLIENT_EXECUTE.args("$a", new XQuery("1")) + ',' +
-        _CLIENT_EXECUTE.args("$b", new XQuery("2")) + ')', "1 2");
+        _CLIENT_EXECUTE.args("$b", new XQuery("2")) + ')', "1\n2");
     // BXCL0004: connection errors
     error(_CLIENT_EXECUTE.args(conn(), "x"), BXCL_COMMAND_X);
   }
@@ -85,7 +85,7 @@ public final class ClientModuleTest extends AdvancedQueryTest {
     query(_CLIENT_QUERY.args(conn(), "\"declare variable $a external; count($a)\"",
         " map { 'a': (1 to 5) }"), "5");
     query(_CLIENT_QUERY.args(conn(), "\"declare variable $a external; $a\"",
-        " map { 'a': (1,<a/>,'a') }"), "1<a/>a");
+        " map { 'a': (1,<a/>,'a') }"), "1\n<a/>\na");
     // query errors
     error(_CLIENT_QUERY.args(conn(), "x"), NOCTX_X);
   }

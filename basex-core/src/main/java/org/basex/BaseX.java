@@ -97,12 +97,6 @@ public class BaseX extends CLI {
           execute(new Set(MainOptions.MAINMEM, true), false);
           execute(new Check(val), verbose);
           execute(new Set(MainOptions.MAINMEM, false), false);
-        } else if(c == 'L') {
-          // toggle newline separators
-          newline ^= true;
-          if(sopts == null) sopts = new SerializerOptions();
-          sopts.set(SerializerOptions.ITEM_SEPARATOR, "\\n");
-          execute(new Set(MainOptions.SERIALIZER, sopts), false);
         } else if(c == 'o') {
           // change output stream
           if(out != System.out) out.close();
@@ -234,7 +228,7 @@ public class BaseX extends CLI {
             c == 'r' || c == 's' || c == 't' && local()) {
           // options followed by a string
           v = arg.string();
-        } else if(c == 'd' || c == 'D' && local() || c == 'L' || c == 'u' && local() || c == 'R' ||
+        } else if(c == 'd' || c == 'D' && local() || c == 'u' && local() || c == 'R' ||
             c == 'v' || c == 'V' || c == 'w' || c == 'x' || c == 'X' || c == 'z') {
           // options to be toggled
           v = "";

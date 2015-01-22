@@ -22,8 +22,7 @@ public final class RESTPostTest extends RESTTest {
   @Test
   public void post1() throws IOException {
     assertEquals("123",
-        post("", "<query xmlns=\"" + URI + "\">" +
-          "<text>123</text><parameter name='wrap' value='no'/></query>", APP_XML));
+      post("", "<query xmlns=\"" + URI + "\"><text>123</text></query>", APP_XML));
   }
 
   /**
@@ -33,8 +32,7 @@ public final class RESTPostTest extends RESTTest {
   @Test
   public void post2() throws IOException {
     assertEquals("",
-        post("", "<query xmlns=\"" + URI + "\">" +
-          "<text>()</text><parameter name='wrap' value='no'/></query>", APP_XML));
+      post("", "<query xmlns=\"" + URI + "\"><text>()</text></query>", APP_XML));
   }
 
   /**
@@ -44,10 +42,9 @@ public final class RESTPostTest extends RESTTest {
   @Test
   public void post3() throws IOException {
     assertEquals(
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>123",
-        post("", "<query xmlns=\"" + URI + "\">" +
-          "<text>123</text><parameter name='wrap' value='no'/>" +
-          "<parameter name='omit-xml-declaration' value='no'/></query>", APP_XML));
+      "<?xml version=\"1.0\" encoding=\"UTF-8\"?>123",
+      post("", "<query xmlns=\"" + URI + "\">" +
+        "<text>123</text><parameter name='omit-xml-declaration' value='no'/></query>", APP_XML));
   }
 
   /**
@@ -57,13 +54,11 @@ public final class RESTPostTest extends RESTTest {
   @Test
   public void post4() throws IOException {
     assertEquals("<html></html>",
-        post("", "<query xmlns=\"" + URI + "\">" +
-        "<text><![CDATA[<html/>]]></text>" +
-        "<parameter name='wrap' value='yes'/>" +
-        "<parameter name='wrap' value='no'/>" +
-        "<parameter name='omit-xml-declaration' value='no'/>" +
-        "<parameter name='omit-xml-declaration' value='yes'/>" +
-        "<parameter name='method' value='xhtml'/>" + "</query>", APP_XML));
+      post("", "<query xmlns=\"" + URI + "\">" +
+      "<text><![CDATA[<html/>]]></text>" +
+      "<parameter name='omit-xml-declaration' value='no'/>" +
+      "<parameter name='omit-xml-declaration' value='yes'/>" +
+      "<parameter name='method' value='xhtml'/>" + "</query>", APP_XML));
   }
 
   /**
@@ -73,12 +68,11 @@ public final class RESTPostTest extends RESTTest {
   @Test
   public void post5() throws IOException {
     assertEquals("123", post("",
-        "<query xmlns=\"" + URI + "\">" +
-        "<text>123</text>" +
-        "<parameter name='wrap' value='no'/>" +
-        "<parameter name='omit-xml-declaration' value='no'/>" +
-        "<parameter name='omit-xml-declaration' value='yes'/>" +
-        "</query>", APP_XML));
+      "<query xmlns=\"" + URI + "\">" +
+      "<text>123</text>" +
+      "<parameter name='omit-xml-declaration' value='no'/>" +
+      "<parameter name='omit-xml-declaration' value='yes'/>" +
+      "</query>", APP_XML));
   }
 
   /**
@@ -88,10 +82,10 @@ public final class RESTPostTest extends RESTTest {
   @Test
   public void post6() throws IOException {
     assertEquals("<a/>", post("",
-        "<query xmlns=\"" + URI + "\">" +
-        "<text>.</text>" +
-        "<context><a/></context>" +
-        "</query>", APP_XML));
+      "<query xmlns=\"" + URI + "\">" +
+      "<text>.</text>" +
+      "<context><a/></context>" +
+      "</query>", APP_XML));
   }
 
   /**

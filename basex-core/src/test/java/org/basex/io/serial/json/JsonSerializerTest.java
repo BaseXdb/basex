@@ -122,14 +122,16 @@ public final class JsonSerializerTest extends SandboxTest {
     error("map { 'A': -1 div 0.0e0 }", format, SERNUMBER_X);
     error("map { 'A': 0 div 0.0e0 }", format, SERNUMBER_X);
 
-    error("map { true(): true#0 }", format, FIATOM_X);
-    error("map { 'A': ('B','C') }", format, SERMAPSEQ);
+    error("map { true(): true#0 }", format, SERJSONFUNC_X);
+    error("map { 'A': ('B','C') }", format, SERJSONSEQ);
 
     // arrays
     serialize("[()]", "[null]", format);
     serialize("[2]", "[2]", format);
     serialize("[2, 3]", "[2,3]", format);
     serialize("[2, (), 4]", "[2,null,4]", format);
+
+    error("[ (1,2) ]", format, SERJSONSEQ);
 
     // mixed
     serialize("map { 'A':map {} }", "{'A':{}}", format);
@@ -196,8 +198,8 @@ public final class JsonSerializerTest extends SandboxTest {
       jopts.set(JsonOptions.FORMAT, format);
 
       final SerializerOptions sopts = new SerializerOptions();
-      sopts.set(SerializerOptions.INDENT, YesNo.NO);
       sopts.set(SerializerOptions.METHOD, SerialMethod.JSON);
+      sopts.set(SerializerOptions.INDENT, YesNo.NO);
       sopts.set(SerializerOptions.JSON, jopts);
 
       final Serializer ser = Serializer.get(ao, sopts);

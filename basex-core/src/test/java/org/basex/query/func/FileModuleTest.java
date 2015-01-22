@@ -380,7 +380,7 @@ public final class FileModuleTest extends AdvancedQueryTest {
     query(_FILE_APPEND_TEXT_LINES.args(PATH1, "('y','z')"));
     query(_FILE_SIZE.args(PATH1), 3 * (1 + Prop.NL.length()));
     query(_FILE_APPEND_TEXT_LINES.args(PATH1, "\u00fc", "US-ASCII"));
-    query(_FILE_READ_TEXT_LINES.args(PATH1), "x y z ?");
+    query(_FILE_READ_TEXT_LINES.args(PATH1), "x\ny\nz\n?");
     query(_FILE_DELETE.args(PATH1));
   }
 

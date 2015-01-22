@@ -136,17 +136,17 @@ public final class TextView extends View {
 
   /**
    * Serializes the specified nodes.
-   * @param n nodes to display
+   * @param nodes nodes to display
    */
-  private void setText(final DBNodes n) {
+  private void setText(final DBNodes nodes) {
     if(visible()) {
       try {
         final ArrayOutput ao = new ArrayOutput();
         ao.setLimit(gui.gopts.get(GUIOptions.MAXTEXT));
-        if(n != null) n.serialize(Serializer.get(ao));
+        if(nodes != null) nodes.serialize(Serializer.get(ao));
         setText(ao);
         cmd = null;
-        ns = ao.finished() ? n : null;
+        ns = ao.finished() ? nodes : null;
       } catch(final IOException ex) {
         Util.debug(ex);
       }

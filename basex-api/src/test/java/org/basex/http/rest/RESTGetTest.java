@@ -25,8 +25,7 @@ public final class RESTGetTest extends RESTTest {
   @Test
   public void basic() throws Exception {
     assertEquals("1", get("?query=1"));
-    assertEquals("1 2 3", get("?query=1+to+3&wrap=no"));
-    assertEquals(WRAP, get("?query=()&wrap=yes"));
+    assertEquals("1\n2\n3", get("?query=1+to+3"));
 
     put(NAME, new ArrayInput("<a/>"));
     put(NAME + "/raw", new ArrayInput("XXX"), APP_OCTET);
@@ -59,9 +58,9 @@ public final class RESTGetTest extends RESTTest {
   public void bind() throws IOException {
     assertEquals("123", get('?'
         + "query=declare+variable+$x+as+xs:integer+external;$x&$x=123"));
-    assertEquals("124", get("?wrap=no&$x=123&"
+    assertEquals("124", get("?$x=123&"
         + "query=declare+variable+$x+as+xs:integer+external;$x%2b1"));
-    assertEquals("6", get("?wrap=no&"
+    assertEquals("6", get("?"
         + "query=declare+variable+$a++as+xs:integer+external;"
         + "declare+variable+$b+as+xs:integer+external;"
         + "declare+variable+$c+as+xs:integer+external;" + "$a*$b*$c&"

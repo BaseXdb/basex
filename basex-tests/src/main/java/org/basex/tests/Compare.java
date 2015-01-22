@@ -91,7 +91,7 @@ public abstract class Compare extends SandboxTest {
     try {
       result = new XQuery(query).execute(context);
     } catch(final BaseXException ex) {
-      result = ex.getMessage().replaceAll("[\\r\\n]+", " ");
+      result = ex.getMessage().replaceAll("\r?\n *", "\n");
     }
 
     // write XQuery or XSLT to temporary file
@@ -139,7 +139,7 @@ public abstract class Compare extends SandboxTest {
         if(t == -1) break;
         bl.add(t);
       }
-      return bl.toString().replaceAll("[\\r\\n ]+", " ");
+      return bl.toString().replaceAll("\r?\n *", "\n");
     } catch(final IOException ex) {
       return ex.getMessage();
     }

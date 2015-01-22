@@ -27,7 +27,6 @@ public final class RESTPost {
     String request =
       "<query xmlns='http://basex.org/rest'>\n" +
       "  <text>(//city/name)[position() le 3]</text>\n" +
-      "  <parameter name='wrap' value='yes'/>\n" +
       "</query>";
     System.out.println("\n* Query:\n" + request);
 

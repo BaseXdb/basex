@@ -12,7 +12,6 @@ import org.basex.query.up.primitives.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
-import org.basex.util.options.Options.YesNo;
 
 /**
  * Fn:put operation primitive.
@@ -50,9 +49,7 @@ public final class Put extends DBUpdate {
       final DBNode node = new DBNode(data, pre);
       try(final PrintOutput po = new PrintOutput(u)) {
         // try to reproduce non-chopped documents correctly
-        final SerializerOptions pr = new SerializerOptions();
-        pr.set(SerializerOptions.INDENT, node.data.meta.chop ? YesNo.YES : YesNo.NO);
-        final Serializer ser = Serializer.get(po, pr);
+        final Serializer ser = Serializer.get(po, SerializerOptions.get(node.data.meta.chop));
         ser.serialize(node);
         ser.close();
       } catch(final IOException ex) {

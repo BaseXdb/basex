@@ -118,9 +118,9 @@ public final class DbModuleTest extends AdvancedQueryTest {
   public void textRange() throws BaseXException {
     // run function without and with index
     new DropIndex(Commands.CmdIndex.TEXT).execute(context);
-    query(_DB_TEXT_RANGE.args(NAME, "Exercise", "Fun"), "Exercise 1Exercise 2");
+    query(_DB_TEXT_RANGE.args(NAME, "Exercise", "Fun"), "Exercise 1\nExercise 2");
     new CreateIndex(Commands.CmdIndex.TEXT).execute(context);
-    query(_DB_TEXT_RANGE.args(NAME, "Exercise", "Fun"), "Exercise 1Exercise 2");
+    query(_DB_TEXT_RANGE.args(NAME, "Exercise", "Fun"), "Exercise 1\nExercise 2");
     query(_DB_TEXT_RANGE.args(NAME, "XXX", "XXX"), "");
   }
 
@@ -148,9 +148,9 @@ public final class DbModuleTest extends AdvancedQueryTest {
   public void attributeRange() throws BaseXException {
     // run function without and with index
     new CreateIndex(Commands.CmdIndex.ATTRIBUTE).execute(context);
-    query(_DB_ATTRIBUTE_RANGE.args(NAME, "0", "9") + "/data()", "0 1");
+    query(_DB_ATTRIBUTE_RANGE.args(NAME, "0", "9") + "/data()", "0\n1");
     new CreateIndex(Commands.CmdIndex.ATTRIBUTE).execute(context);
-    query(_DB_ATTRIBUTE_RANGE.args(NAME, "0", "9") + "/data()", "0 1");
+    query(_DB_ATTRIBUTE_RANGE.args(NAME, "0", "9") + "/data()", "0\n1");
     query(_DB_ATTRIBUTE_RANGE.args(NAME, "XXX", "XXX"), "");
   }
 
@@ -171,7 +171,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
     // create two other database and compare substring
     new CreateDB(NAME + 1).execute(context);
     new CreateDB(NAME + 2).execute(context);
-    contains(_DB_LIST.args(), NAME + 1 + ' ' + NAME + 2);
+    contains(_DB_LIST.args(), NAME + 1 + '\n' + NAME + 2);
     new DropDB(NAME + 1).execute(context);
     new DropDB(NAME + 2).execute(context);
   }
@@ -233,14 +233,14 @@ public final class DbModuleTest extends AdvancedQueryTest {
   @Test
   public void nodeID() {
     query(_DB_NODE_ID.args(" /html"), "1");
-    query(_DB_NODE_ID.args(" / | /html"), "0 1");
+    query(_DB_NODE_ID.args(" / | /html"), "0\n1");
   }
 
   /** Test method. */
   @Test
   public void nodePre() {
     query(_DB_NODE_PRE.args(" /html"), "1");
-    query(_DB_NODE_PRE.args(" / | /html"), "0 1");
+    query(_DB_NODE_PRE.args(" / | /html"), "0\n1");
   }
 
   /** Test method. */
@@ -253,7 +253,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
   @Test
   public void output() {
     query(_DB_OUTPUT.args("x"), "x");
-    query(_DB_OUTPUT.args("('x','y')"), "x y");
+    query(_DB_OUTPUT.args("('x','y')"), "x\ny");
     query(_DB_OUTPUT.args("<a/>"), "<a/>");
     error(_DB_OUTPUT.args("x") + ",1", UPALL_X);
     error(_DB_OUTPUT.args(" count#1"), FISTRING_X);

@@ -103,9 +103,9 @@ public final class ArchiveModuleTest extends AdvancedQueryTest {
   public void options() {
     // read entries
     query(_ARCHIVE_OPTIONS.args(_FILE_READ_BINARY.args(ZIP)) + "//@value/data()",
-        "zip deflate");
+        "zip\ndeflate");
     query(_ARCHIVE_OPTIONS.args(_FILE_READ_BINARY.args(GZIP)) + "//@value/data()",
-        "gzip deflate");
+        "gzip\ndeflate");
   }
 
   /** Test method. */
@@ -167,7 +167,7 @@ public final class ArchiveModuleTest extends AdvancedQueryTest {
         COUNT.args(_ARCHIVE_ENTRIES.args(" .")), 6);
     query(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "X") + " ! " +
         _ARCHIVE_UPDATE.args(" .", "<archive:entry>Y</archive:entry>", "Y") + " ! " +
-        _ARCHIVE_EXTRACT_TEXT.args(" ."), "X Y");
+        _ARCHIVE_EXTRACT_TEXT.args(" ."), "X\nY");
     // updates an existing entry
     query(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "X") + " ! " +
         _ARCHIVE_UPDATE.args(" .", "<archive:entry>X</archive:entry>", "Y") + " ! " +

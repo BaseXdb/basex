@@ -83,7 +83,7 @@ public final class FtModuleTest extends AdvancedQueryTest {
   public void search() throws BaseXException {
     // check index results
     query(_FT_SEARCH.args(NAME, "assignments"), "Assignments");
-    query(_FT_SEARCH.args(NAME, " ('exercise','1')"), "Exercise 1Exercise 2");
+    query(_FT_SEARCH.args(NAME, " ('exercise','1')"), "Exercise 1\nExercise 2");
     query(_FT_SEARCH.args(NAME, "<x>1</x>"), "Exercise 1");
     query(_FT_SEARCH.args(NAME, "1"), "Exercise 1");
     query(_FT_SEARCH.args(NAME, "XXX"), "");
@@ -104,7 +104,7 @@ public final class FtModuleTest extends AdvancedQueryTest {
     query(_FT_SEARCH.args(NAME, "1 Exercise", " map { 'mode':'all' }"), "");
     query(_FT_SEARCH.args(NAME, "1 Exercise", " map { 'mode':'any' }"), "");
     query(_FT_SEARCH.args(NAME, "1 Exercise", " map { 'mode':'any word' }"),
-        "Exercise 1Exercise 2");
+        "Exercise 1\nExercise 2");
     query(_FT_SEARCH.args(NAME, "1 Exercise", " map { 'mode':'all words' }"),
         "Exercise 1");
 
@@ -128,7 +128,7 @@ public final class FtModuleTest extends AdvancedQueryTest {
     query(_FT_COUNT.args(" //*[text() contains text '1']"), "1");
     query(_FT_COUNT.args(" //li[text() contains text 'exercise']"), "2");
     query("for $i in //li[text() contains text 'exercise'] return " +
-       _FT_COUNT.args("$i[text() contains text 'exercise']"), "1 1");
+       _FT_COUNT.args("$i[text() contains text 'exercise']"), "1\n1");
   }
 
   /**
@@ -138,24 +138,23 @@ public final class FtModuleTest extends AdvancedQueryTest {
   @Test
   public void mark() throws IOException {
     query(_FT_MARK.args(" //*[text() contains text '1']"),
-      "<li>Exercise <mark>1</mark></li>");
+      "<li>Exercise <mark>1</mark>\n</li>");
     query(_FT_MARK.args(" //*[text() contains text '2'], 'b'"),
-      "<li>Exercise <b>2</b></li>");
+      "<li>Exercise <b>2</b>\n</li>");
     contains(_FT_MARK.args(" //*[text() contains text 'Exercise']"),
-      "<li><mark>Exercise</mark> 1</li>");
+      "<li>\n<mark>Exercise</mark> 1</li>");
     query("copy $a := text { 'a b' } modify () return " +
-        _FT_MARK.args("$a[. contains text 'a']", "b"), "<b>a</b> b");
+        _FT_MARK.args("$a[. contains text 'a']", "b"), "<b>a</b>\nb");
     query("copy $a := text { 'ab' } modify () return " +
         _FT_MARK.args("$a[. contains text 'ab'], 'b'"), "<b>ab</b>");
     query("copy $a := text { 'a b' } modify () return " +
-        _FT_MARK.args("$a[. contains text 'a b'], 'b'"), "<b>a</b> <b>b</b>");
+        _FT_MARK.args("$a[. contains text 'a b'], 'b'"), "<b>a</b>\n\n<b>b</b>");
 
-    query(COUNT.args(_FT_MARK.args(" //*[text() contains text '1']/../../../../..")),
-        "1");
+    query(COUNT.args(_FT_MARK.args(" //*[text() contains text '1']/../../../../..")), "1");
 
     new CreateDB(NAME, "<a:a xmlns:a='A'>C</a:a>").execute(context);
     query(_FT_MARK.args(" /descendant::*[text() contains text 'C']", 'b'),
-        "<a:a xmlns:a=\"A\"><b>C</b></a:a>");
+        "<a:a xmlns:a=\"A\">\n<b>C</b>\n</a:a>");
     new DropDB(NAME).execute(context);
     query("copy $c := <A xmlns='A'>A</A> modify () return <X>{ " +
         _FT_MARK.args(" $c[text() contains text 'A']") + " }</X>/*");
@@ -165,11 +164,11 @@ public final class FtModuleTest extends AdvancedQueryTest {
   @Test
   public void extract() {
     query(_FT_EXTRACT.args(" //*[text() contains text '1']"),
-      "<li>Exercise <mark>1</mark></li>");
+      "<li>Exercise <mark>1</mark>\n</li>");
     query(_FT_EXTRACT.args(" //*[text() contains text '2'], 'b', 20"),
-      "<li>Exercise <b>2</b></li>");
+      "<li>Exercise <b>2</b>\n</li>");
     query(_FT_EXTRACT.args(" //*[text() contains text '2'], '_o_', 1"),
-      "<li>...<_o_>2</_o_></li>");
+      "<li>...<_o_>2</_o_>\n</li>");
     contains(_FT_EXTRACT.args(" //*[text() contains text 'Exercise'], 'b', 1"),
       "<li>...</li>");
   }
@@ -178,7 +177,7 @@ public final class FtModuleTest extends AdvancedQueryTest {
   @Test
   public void score() {
     query(_FT_SCORE.args(_FT_SEARCH.args(NAME, "2")), "1");
-    query(_FT_SCORE.args(_FT_SEARCH.args(NAME, "XML")), "1 0.5");
+    query(_FT_SCORE.args(_FT_SEARCH.args(NAME, "XML")), "1\n0.5");
   }
 
   /**
@@ -203,8 +202,8 @@ public final class FtModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void tokenize() {
-    query(_FT_TOKENIZE.args("A bc"), "a bc");
-    query(_FT_TOKENIZE.args("A bc", " map { 'case': 'sensitive' }"), "A bc");
+    query(_FT_TOKENIZE.args("A bc"), "a\nbc");
+    query(_FT_TOKENIZE.args("A bc", " map { 'case': 'sensitive' }"), "A\nbc");
     query(_FT_TOKENIZE.args("\u00e4", " map { 'diacritics': 'sensitive' }"), "\u00e4");
     query(_FT_TOKENIZE.args("gifts", " map { 'stemming': 'true' }"), "gift");
 

@@ -2,18 +2,20 @@ package org.basex.io.serial;
 
 import static org.basex.data.DataText.*;
 import static org.basex.query.QueryError.*;
-import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
+import java.nio.charset.*;
 
 import org.basex.build.csv.*;
-import org.basex.build.csv.CsvOptions.*;
+import org.basex.build.csv.CsvOptions.CsvFormat;
 import org.basex.build.json.*;
-import org.basex.build.json.JsonOptions.*;
+import org.basex.build.json.JsonOptions.JsonFormat;
 import org.basex.data.*;
+import org.basex.io.out.*;
 import org.basex.io.serial.csv.*;
 import org.basex.io.serial.json.*;
+import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -32,16 +34,14 @@ public abstract class Serializer {
   /** Stack with names of opened elements. */
   protected final TokenList elems = new TokenList();
   /** Current level. */
-  protected int lvl;
+  protected int level;
   /** Current element name. */
   protected byte[] elem;
-  /** Undeclare prefixes. */
-  boolean undecl;
   /** Indentation flag. */
   protected boolean indent;
 
   /** Stack with currently available namespaces. */
-  private final Atts nspaces = new Atts(XML, XML_URI).add(EMPTY, EMPTY);
+  private final Atts nspaces = new Atts(XML, QueryText.XML_URI).add(EMPTY, EMPTY);
   /** Stack with namespace size pointers. */
   private final IntList nstack = new IntList();
 
@@ -49,13 +49,13 @@ public abstract class Serializer {
   private boolean opening;
 
   /**
-   * Returns an XML serializer.
+   * Returns an adaptive serializer.
    * @param os output stream reference
    * @return serializer
    * @throws IOException I/O exception
    */
-  public static XMLSerializer get(final OutputStream os) throws IOException {
-    return new XMLSerializer(os, SerializerOptions.get(true));
+  public static Serializer get(final OutputStream os) throws IOException {
+    return get(os, null);
   }
 
   /**
@@ -68,27 +68,43 @@ public abstract class Serializer {
   public static Serializer get(final OutputStream os, final SerializerOptions sopts)
       throws IOException {
 
-    // no parameters given: serialize as XML
-    if(sopts == null) return get(os);
+    // create print output
+    final SerializerOptions so = sopts == null ? SerializerOptions.get(true) : sopts;
+    final String enc = Strings.normEncoding(so.get(SerializerOptions.ENCODING), true);
+    final PrintOutput po;
+    if(enc == Strings.UTF8) {
+      po = PrintOutput.get(os);
+    } else {
+      try {
+        po = new EncoderOutput(os, Charset.forName(enc));
+      } catch(final Exception ex) {
+        throw SERENCODING_X.getIO(enc);
+      }
+    }
+    po.setLimit(so.get(SerializerOptions.LIMIT));
 
-    // standard types: XHTML, HTML, text
-    switch(sopts.get(SerializerOptions.METHOD)) {
-      case XHTML: return new XHTMLSerializer(os, sopts);
-      case HTML:  return new HTMLSerializer(os, sopts);
-      case TEXT:  return new TextSerializer(os, sopts);
-      case RAW:   return new RawSerializer(os, sopts);
+    // no parameters given: serialize adaptively
+    SerialMethod method = so.get(SerializerOptions.METHOD);
+    if(method == null) method = SerialMethod.ADAPTIVE;
+    switch(method) {
+      case XHTML: return new XHTMLSerializer(po, so);
+      case HTML:  return new HTMLSerializer(po, so);
+      case TEXT:  return new TextSerializer(po, so);
+      case RAW:   return new RawSerializer(po, so);
       case CSV:
-        final CsvOptions copts = sopts.get(SerializerOptions.CSV);
-        final CsvFormat cform = copts.get(CsvOptions.FORMAT);
-        return cform == CsvFormat.MAP ? new CsvMapSerializer(os, sopts) :
-               new CsvDirectSerializer(os, sopts);
+        final CsvOptions copts = so.get(SerializerOptions.CSV);
+        return copts.get(CsvOptions.FORMAT) == CsvFormat.MAP
+               ? new CsvMapSerializer(po, so)
+               : new CsvDirectSerializer(po, so);
       case JSON:
-        final JsonSerialOptions jopts = sopts.get(SerializerOptions.JSON);
-        final JsonFormat jform = jopts.get(JsonOptions.FORMAT);
-        return jform == JsonFormat.JSONML ? new JsonMLSerializer(os, sopts) :
-               jform == JsonFormat.MAP ? new JsonMapSerializer(os, sopts) :
-               new JsonNodeSerializer(os, sopts);
-      default: return new XMLSerializer(os, sopts);
+        final JsonSerialOptions jopts = so.get(SerializerOptions.JSON);
+        return jopts.get(JsonOptions.FORMAT) == JsonFormat.JSONML
+               ? new JsonMLSerializer(po, so)
+               : new JsonNodeSerializer(po, so);
+      case XML:
+        return new XMLSerializer(po, so);
+      default:
+        return new AdaptiveSerializer(po, so);
     }
   }
 
@@ -99,7 +115,7 @@ public abstract class Serializer {
    * @param item item to be serialized
    * @throws IOException I/O exception
    */
-  public void serialize(final Item item) throws IOException {
+  public final void serialize(final Item item) throws IOException {
     serialize(item, false, false);
   }
 
@@ -113,7 +129,6 @@ public abstract class Serializer {
   public void serialize(final Item item, final boolean atts, final boolean iter)
       throws IOException {
 
-    openResult();
     if(item instanceof ANode) {
       final Type type = item.type;
       if(!atts) {
@@ -127,7 +142,6 @@ public abstract class Serializer {
       prepare();
       atomic(item, iter);
     }
-    closeResult();
   }
 
   /**
@@ -151,157 +165,6 @@ public abstract class Serializer {
   public void reset() { }
 
   // PROTECTED METHODS ==================================================================
-
-  /**
-   * Opens an element.
-   * @param name element name
-   * @throws IOException I/O exception
-   */
-  final void openElement(final byte[] name) throws IOException {
-    prepare();
-    nstack.push(nspaces.size());
-    opening = true;
-    elem = name;
-    startOpen(name);
-  }
-
-  /**
-   * Closes an element.
-   * @throws IOException I/O exception
-   */
-  final void closeElement() throws IOException {
-    nspaces.size(nstack.pop());
-    if(opening) {
-      finishEmpty();
-      opening = false;
-    } else {
-      elem = elems.pop();
-      lvl--;
-      finishClose();
-    }
-  }
-
-  /**
-   * Gets the namespace URI currently bound by the given prefix.
-   * @param prefix namespace prefix
-   * @return URI if found, {@code null} otherwise
-   */
-  final byte[] nsUri(final byte[] prefix) {
-    for(int n = nspaces.size() - 1; n >= 0; n--) {
-      if(eq(nspaces.name(n), prefix)) return nspaces.value(n);
-    }
-    return null;
-  }
-
-  /**
-   * Serializes a namespace if it has not been serialized by an ancestor yet.
-   * @param prefix prefix
-   * @param uri namespace URI
-   * @throws IOException I/O exception
-   */
-  protected void namespace(final byte[] prefix, final byte[] uri) throws IOException {
-    if(!undecl && prefix.length != 0 && uri.length == 0) return;
-    final byte[] u = nsUri(prefix);
-    if(u == null || !eq(u, uri)) {
-      attribute(prefix.length == 0 ? XMLNS : concat(XMLNSC, prefix), uri);
-      nspaces.add(prefix, uri);
-    }
-  }
-
-  /**
-   * Starts a result.
-   * @throws IOException I/O exception
-   */
-  @SuppressWarnings("unused")
-  void openResult() throws IOException { }
-
-  /**
-   * Closes a result.
-   * @throws IOException I/O exception
-   */
-  @SuppressWarnings("unused")
-  void closeResult() throws IOException { }
-
-  /**
-   * Opens a document.
-   * @param name name
-   * @throws IOException I/O exception
-   */
-  @SuppressWarnings("unused")
-  void openDoc(final byte[] name) throws IOException { }
-
-  /**
-   * Closes a document.
-   * @throws IOException I/O exception
-   */
-  @SuppressWarnings("unused")
-  void closeDoc() throws IOException { }
-
-  /**
-   * Serializes an attribute.
-   * @param name name
-   * @param value value
-   * @throws IOException I/O exception
-   */
-  protected abstract void attribute(final byte[] name, final byte[] value) throws IOException;
-
-  /**
-   * Starts an element.
-   * @param name element name
-   * @throws IOException I/O exception
-   */
-  protected abstract void startOpen(final byte[] name) throws IOException;
-
-  /**
-   * Finishes an opening element node.
-   * @throws IOException I/O exception
-   */
-  protected abstract void finishOpen() throws IOException;
-
-  /**
-   * Closes an empty element.
-   * @throws IOException I/O exception
-   */
-  protected abstract void finishEmpty() throws IOException;
-
-  /**
-   * Closes an element.
-   * @throws IOException I/O exception
-   */
-  protected abstract void finishClose() throws IOException;
-
-  /**
-   * Serializes a text.
-   * @param value value
-   * @param ftp full-text positions, used for visualization highlighting
-   * @throws IOException I/O exception
-   */
-  protected abstract void text(final byte[] value, final FTPos ftp) throws IOException;
-
-  /**
-   * Serializes a comment.
-   * @param value value
-   * @throws IOException I/O exception
-   */
-  protected abstract void comment(final byte[] value) throws IOException;
-
-  /**
-   * Serializes a processing instruction.
-   * @param name name
-   * @param value value
-   * @throws IOException I/O exception
-   */
-  protected abstract void pi(final byte[] name, final byte[] value) throws IOException;
-
-  /**
-   * Serializes an atomic value.
-   * @param item item
-   * @param iter iterative evaluation
-   * @throws IOException I/O exception
-   */
-  protected abstract void atomic(final Item item, final boolean iter) throws IOException;
-
-  // PRIVATE METHODS ==========================================================
 
   /**
    * Serializes the specified node.
@@ -334,9 +197,7 @@ public abstract class Serializer {
 
         // serialize declared namespaces
         final Atts nsp = node.namespaces();
-        for(int p = nsp.size() - 1; p >= 0; p--) {
-          namespace(nsp.name(p), nsp.value(p));
-        }
+        for(int p = nsp.size() - 1; p >= 0; p--) namespace(nsp.name(p), nsp.value(p));
         // add new or updated namespace
         namespace(name.prefix(), name.uri());
 
@@ -357,6 +218,151 @@ public abstract class Serializer {
       }
     }
   }
+
+  /**
+   * Opens an element.
+   * @param name element name
+   * @throws IOException I/O exception
+   */
+  protected final void openElement(final byte[] name) throws IOException {
+    prepare();
+    opening = true;
+    elem = name;
+    startOpen(name);
+    nstack.push(nspaces.size());
+  }
+
+  /**
+   * Closes an element.
+   * @throws IOException I/O exception
+   */
+  protected final void closeElement() throws IOException {
+    nspaces.size(nstack.pop());
+    if(opening) {
+      finishEmpty();
+      opening = false;
+    } else {
+      elem = elems.pop();
+      level--;
+      finishClose();
+    }
+  }
+
+  /**
+   * Opens a document.
+   * @param name name
+   * @throws IOException I/O exception
+   */
+  @SuppressWarnings("unused")
+  protected void openDoc(final byte[] name) throws IOException { }
+
+  /**
+   * Closes a document.
+   * @throws IOException I/O exception
+   */
+  @SuppressWarnings("unused")
+  protected void closeDoc() throws IOException { }
+
+  /**
+   * Serializes a namespace.
+   * @param prefix prefix
+   * @param uri uri
+   * @throws IOException I/O exception
+   */
+  protected void namespace(final byte[] prefix, final byte[] uri) throws IOException {
+    final byte[] u = nsUri(prefix);
+    if(u == null || !eq(u, uri)) {
+      attribute(prefix.length == 0 ? XMLNS : concat(XMLNSC, prefix), uri);
+      nspaces.add(prefix, uri);
+    }
+  }
+
+  /**
+   * Gets the namespace URI currently bound by the given prefix.
+   * @param prefix namespace prefix
+   * @return URI if found, {@code null} otherwise
+   */
+  protected final byte[] nsUri(final byte[] prefix) {
+    for(int n = nspaces.size() - 1; n >= 0; n--) {
+      if(eq(nspaces.name(n), prefix)) return nspaces.value(n);
+    }
+    return null;
+  }
+
+  /**
+   * Serializes an attribute.
+   * @param name name
+   * @param value value
+   * @throws IOException I/O exception
+   */
+  @SuppressWarnings("unused")
+  protected void attribute(final byte[] name, final byte[] value) throws IOException { }
+
+  /**
+   * Starts an element.
+   * @param name element name
+   * @throws IOException I/O exception
+   */
+  @SuppressWarnings("unused")
+  protected void startOpen(final byte[] name) throws IOException { }
+
+  /**
+   * Finishes an opening element node.
+   * @throws IOException I/O exception
+   */
+  @SuppressWarnings("unused")
+  protected void finishOpen() throws IOException { }
+
+  /**
+   * Closes an empty element.
+   * @throws IOException I/O exception
+   */
+  @SuppressWarnings("unused")
+  protected void finishEmpty() throws IOException { }
+
+  /**
+   * Closes an element.
+   * @throws IOException I/O exception
+   */
+  @SuppressWarnings("unused")
+  protected void finishClose() throws IOException { }
+
+  /**
+   * Serializes a text.
+   * @param value value
+   * @param ftp full-text positions, used for visualization highlighting
+   * @throws IOException I/O exception
+   */
+  @SuppressWarnings("unused")
+  protected void text(final byte[] value, final FTPos ftp) throws IOException { }
+
+  /**
+   * Serializes a comment.
+   * @param value value
+   * @throws IOException I/O exception
+   */
+  @SuppressWarnings("unused")
+  protected void comment(final byte[] value) throws IOException { }
+
+  /**
+   * Serializes a processing instruction.
+   * @param name name
+   * @param value value
+   * @throws IOException I/O exception
+   */
+  @SuppressWarnings("unused")
+  protected void pi(final byte[] name, final byte[] value) throws IOException { }
+
+  /**
+   * Serializes an atomic value.
+   * @param item item
+   * @param iter iterative evaluation
+   * @throws IOException I/O exception
+   */
+  @SuppressWarnings("unused")
+  protected void atomic(final Item item, final boolean iter) throws IOException { }
+
+  // PRIVATE METHODS ==========================================================
 
   /**
    * Serializes a node of the specified data reference.
@@ -423,7 +429,7 @@ public abstract class Serializer {
                 if(nsp.add(pref)) namespace(pref, ns.value(n));
               }
               // check ancestors only on top level
-              if(lvl != 0) break;
+              if(level != 0) break;
 
               pp = data.parent(pp, data.kind(pp));
             } while(pp >= 0 && data.kind(pp) == Data.ELEM);
@@ -493,6 +499,6 @@ public abstract class Serializer {
     opening = false;
     finishOpen();
     elems.push(elem);
-    lvl++;
+    level++;
   }
 }

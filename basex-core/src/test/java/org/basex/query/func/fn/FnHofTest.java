@@ -59,18 +59,18 @@ public final class FnHofTest extends QueryPlanTest {
   public void unrollForEach() {
     // should be unrolled and evaluated at compile time
     check("fn:for-each(0 to 8, function($x) {$x+1})",
-        "1 2 3 4 5 6 7 8 9",
+        "1\n2\n3\n4\n5\n6\n7\n8\n9",
         "empty(//" + Util.className(FnForEach.class) + ')',
         "exists(*/" + Util.className(IntSeq.class) + ')');
     // should be unrolled but not evaluated at compile time
     check("fn:for-each(1 to 9, function($x) {0*random:integer()+$x})",
-        "1 2 3 4 5 6 7 8 9",
+        "1\n2\n3\n4\n5\n6\n7\n8\n9",
         "empty(//" + Util.className(FnForEach.class) + ')',
         "empty(*/" + Util.className(IntSeq.class) + ')',
         "count(//" + Util.className(Arith.class) + "[@op = '+']) eq 9");
     // should not be unrolled
     check("fn:for-each(0 to 9, function($x) {$x+1})",
-        "1 2 3 4 5 6 7 8 9 10",
+        "1\n2\n3\n4\n5\n6\n7\n8\n9\n10",
         "exists(//" + Util.className(FnForEach.class) + "[contains(@name, 'for-each')])");
   }
 }

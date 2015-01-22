@@ -23,9 +23,6 @@ public abstract class RESTTest extends HTTPTest {
 
   /** REST URI. */
   static final String URI = RESTText.REST_URI;
-  /** Opening result. */
-  static final String WRAP =
-      '<' + REST + ":results xmlns:" + REST + "=\"" + URI + "\"/>";
   /** Input file. */
   static final String FILE = "src/test/resources/input.xml";
 

@@ -9,13 +9,14 @@ import java.util.*;
  * @author Christian Gruen
  */
 public enum SerialMethod {
-  /** XML.   */ XML,
-  /** XHTML. */ XHTML,
-  /** HTML.  */ HTML,
-  /** Text.  */ TEXT,
-  /** Json.  */ JSON,
-  /** CSV.   */ CSV,
-  /** RAW.   */ RAW;
+  /** XML.      */ XML,
+  /** XHTML.    */ XHTML,
+  /** HTML.     */ HTML,
+  /** JSON.     */ JSON,
+  /** CSV.      */ CSV,
+  /** Text.     */ TEXT,
+  /** Raw.      */ RAW,
+  /** Adaptive. */ ADAPTIVE;
 
   @Override
   public String toString() {

@@ -40,10 +40,10 @@ public final class SAXSerializer extends Serializer implements XMLReader {
 
   /**
    * Constructor.
-   * @param it item to be serialized
+   * @param item item to be serialized
    */
-  public SAXSerializer(final Item it) {
-    item = it;
+  public SAXSerializer(final Item item) {
+    this.item = item;
   }
 
   // XMLReader ==========================================================================
@@ -123,14 +123,12 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   }
 
   @Override
-  public void setFeature(final String name, final boolean value)
-      throws SAXNotRecognizedException {
+  public void setFeature(final String name, final boolean value) throws SAXNotRecognizedException {
     throw new SAXNotRecognizedException();
   }
 
   @Override
-  public void setProperty(final String name, final Object value)
-      throws SAXNotRecognizedException {
+  public void setProperty(final String name, final Object value) throws SAXNotRecognizedException {
     throw new SAXNotRecognizedException();
   }
 
@@ -237,11 +235,6 @@ public final class SAXSerializer extends Serializer implements XMLReader {
     } catch(final SAXException ex) {
       throw new IOException(ex);
     }
-  }
-
-  @Override
-  protected void atomic(final Item it, final boolean iter) {
-    // ignored
   }
 
   /**

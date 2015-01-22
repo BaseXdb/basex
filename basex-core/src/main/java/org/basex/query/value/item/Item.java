@@ -84,7 +84,7 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   public boolean bool(final InputInfo ii) throws QueryException {
-    throw EBV_X.get(ii, type, this);
+    throw EBV_X_X.get(ii, type, this);
   }
 
   /**

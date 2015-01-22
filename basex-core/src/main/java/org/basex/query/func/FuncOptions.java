@@ -140,11 +140,13 @@ public final class FuncOptions {
    */
   public static SerializerOptions serializer(final Item it, final InputInfo info)
       throws QueryException {
-    return serializer(it, new SerializerOptions(), info);
+    final SerializerOptions so = new SerializerOptions();
+    so.set(SerializerOptions.METHOD, SerialMethod.XML);
+    return serializer(it, so, info);
   }
 
   /**
-   * Converts the specified output parameter item to a map.
+   * Converts the specified output parameter item to serialization parameters.
    * @param it input item
    * @param sopts serialization parameters
    * @param info input info

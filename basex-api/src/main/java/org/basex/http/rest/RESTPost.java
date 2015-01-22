@@ -61,8 +61,6 @@ final class RESTPost {
           final String value = value("@value", param, ctx);
           if(sopts.option(name) != null) {
             sopts.assign(name, value);
-          } else if(name.equals(WRAP)) {
-            http.wrapping = Strings.yes(value);
           } else {
             throw HTTPCode.UNKNOWN_PARAM_X.get(name);
           }

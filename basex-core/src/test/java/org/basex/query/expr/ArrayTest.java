@@ -40,7 +40,7 @@ public final class ArrayTest extends AdvancedQueryTest {
   @Test public void lookup() {
     query("[1](1)", "1");
     query("[1, 2, 3](2)", "2");
-    query("[1 to 2](1)", "1 2");
+    query("[1 to 2](1)", "1\n2");
     query("array { 1 to 2 }(2)", "2");
     array("[[1]](1)", "[1]");
     query("[[[1]]](1)(1)(1)", "1");
@@ -57,7 +57,7 @@ public final class ArrayTest extends AdvancedQueryTest {
   /** Constructor. */
   @Test public void function() {
     query("declare function local:x($x as array(*)) { array:head($x) }; local:x([1, 2])", "1");
-    query("declare function local:x($x as xs:integer*) { $x }; local:x([1, 2])", "1 2");
+    query("declare function local:x($x as xs:integer*) { $x }; local:x([1, 2])", "1\n2");
   }
 
   /** Arithmetics. */
@@ -121,8 +121,8 @@ public final class ArrayTest extends AdvancedQueryTest {
     query("element a { [] }", "<a/>");
     query("element a { [()] }", "<a/>");
     query("element a { [1] }", "<a>1</a>");
-    query("element a { [ <b>c</b> ] }", "<a><b>c</b></a>");
-    query("element a { [ <b>c</b>, <b>d</b> ] }", "<a><b>c</b><b>d</b></a>");
+    query("element a { [ <b>c</b> ] }", "<a>\n<b>c</b>\n</a>");
+    query("element a { [ <b>c</b>, <b>d</b> ] }", "<a>\n<b>c</b>\n<b>d</b>\n</a>");
 
     query("element { ['a'] } { }", "<a/>");
 
@@ -183,16 +183,16 @@ public final class ArrayTest extends AdvancedQueryTest {
 
   /** Group by clause. */
   @Test public void groupBy() {
-    query("for $a in ('A','B') group by $b := ['a'] return $a", "A B");
-    query("for $a in ('A','B') group by $b := [] return $a", "A B");
+    query("for $a in ('A','B') group by $b := ['a'] return $a", "A\nB");
+    query("for $a in ('A','B') group by $b := [] return $a", "A\nB");
 
     error("for $a in ('A','B') group by $b := ['a','b'] return $a", SEQFOUND_X);
   }
 
   /** Order by clause. */
   @Test public void orderBy() {
-    query("for $a in ('A','B') order by ['a'] return $a", "A B");
-    query("for $a in ('A','B') order by [] return $a", "A B");
+    query("for $a in ('A','B') order by ['a'] return $a", "A\nB");
+    query("for $a in ('A','B') order by [] return $a", "A\nB");
 
     error("for $a in ('A','B') order by ['a','b'] return $a", SEQFOUND_X);
   }
@@ -201,7 +201,7 @@ public final class ArrayTest extends AdvancedQueryTest {
   @Test public void swtch() {
     query("switch([]) case 'a' return 'a' default return 'b'", "b");
     query("switch(['a']) case 'a' return 'a' default return 'b'", "a");
-    query("for $a in ('a',['a']) return switch($a) case 'a' return 'a' default return 'b'", "a a");
+    query("for $a in ('a',['a']) return switch($a) case 'a' return 'a' default return 'b'", "a\na");
 
     error("switch(['a', 'b']) case 'a' return 'a' default return 'b'", SEQFOUND_X);
   }
@@ -248,6 +248,6 @@ public final class ArrayTest extends AdvancedQueryTest {
   /** Tests if {@link Array#members()} uses the array's offset correctly. */
   @Test public void gh1047() {
     query("array:head(array:for-each(array:subarray([1,2,3], 2), function($x) { $x }))", "2");
-    query("array:fold-left(array:tail([1,2,3]), (), function($res, $fn) { ($res, $fn) })", "2 3");
+    query("array:fold-left(array:tail([1,2,3]), (), function($res, $fn) { ($res, $fn) })", "2\n3");
   }
 }

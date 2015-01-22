@@ -79,13 +79,12 @@ public final class CollationTest extends AdvancedQueryTest {
   @Test
   public void orderBy() {
     // identical strings
-    query(PROLOG + "for $a in ('b', 'b') order by $a return $a", "b b");
-    query("for $a in ('b', 'b') order by $a collation '" + COLLATION + "'return $a",
-        "b b");
+    query(PROLOG + "for $a in ('b', 'b') order by $a return $a", "b\nb");
+    query("for $a in ('b', 'b') order by $a collation '" + COLLATION + "'return $a", "b\nb");
     // different strings
-    query(PROLOG + "for $a in ('\u00c4', 'b') order by $a return $a", "\u00c4 b");
+    query(PROLOG + "for $a in ('\u00c4', 'b') order by $a return $a", "\u00c4\nb");
     query("for $a in ('\u00c4', 'b') order by $a collation '" + COLLATION + "'return $a",
-        "\u00c4 b");
+        "\u00c4\nb");
     query("for $a in ( '\u00c4', 'A' ) " +
         "group by $b := $a collation '?lang=de;strength=primary' " +
         "return count($a)", 2);

@@ -39,19 +39,17 @@ public abstract class AdvancedQueryTest extends SandboxTest {
   /**
    * Checks if a query yields the specified string.
    * @param query query string
-   * @param result expected query result
+   * @param expected expected query result
    */
-  protected static void query(final String query, final Object result) {
+  protected static void query(final String query, final Object expected) {
     final String res = query(query);
-    final String exp = result.toString();
-    if(!res.equals(exp))
-      fail("Wrong result:\n[Q] " + query + "\n[E] \u00bb" + result +
-          "\u00ab\n[F] \u00bb" + res + '\u00ab');
+    final String exp = expected.toString();
+    assertEquals("Wrong result:\n[Q] " + query + "\n[E] \u00bb" + exp +
+        "\u00ab\n[F] \u00bb" + res + "\u00ab\n", exp, res);
   }
 
   /**
    * Creates a transform expression from a given input, modification and return clause.
-   *
    * @param input input XML fragment, target of the updating expression
    * @param modification updating expression, make sure to address all target nodes via
    * the $input variable, i.e. delete node $input/a
@@ -168,6 +166,6 @@ public abstract class AdvancedQueryTest extends SandboxTest {
       qp.execute().serialize(ser);
       ser.close();
     }
-    return ao.toString().replaceAll("(\\r|\\n)+ *", "");
+    return normNL(ao);
   }
 }

@@ -22,6 +22,7 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
+import org.basex.util.options.Options.*;
 
 /**
  * XQuery Test Suite wrapper.
@@ -122,6 +123,11 @@ public abstract class W3CTS extends Main {
     testid = nm.substring(0, 4);
     pathlog = testid.toLowerCase(Locale.ENGLISH) + ".log";
     context.soptions.set(StaticOptions.DBPATH, sandbox().path() + "/data");
+
+    final SerializerOptions sopts = new SerializerOptions();
+    sopts.set(SerializerOptions.METHOD, SerialMethod.XML);
+    sopts.set(SerializerOptions.INDENT, YesNo.NO);
+    context.options.set(MainOptions.SERIALIZER, sopts);
   }
 
   /**
@@ -309,9 +315,7 @@ public abstract class W3CTS extends Main {
           value = qp.value();
 
           // serialize query
-          final SerializerOptions sp = new SerializerOptions();
-          sp.set(SerializerOptions.INDENT, NO);
-          final Serializer ser = Serializer.get(ao, sp);
+          final Serializer ser = Serializer.get(ao, context.options.get(MainOptions.SERIALIZER));
           for(final Item it : value) ser.serialize(it);
           ser.close();
 

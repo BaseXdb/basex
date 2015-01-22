@@ -139,7 +139,7 @@ public final class IndexOptimizeTest extends AdvancedQueryTest {
     createDoc();
     new Open(NAME).execute(context);
     check("data(//*[text() contains text '1'])", "1");
-    check("data(//*[text() contains text '1 2' any word])", "1 2 3");
+    check("data(//*[text() contains text '1 2' any word])", "1\n2 3");
     check("//*[text() contains text {'2','4'} all]", "");
     check("//*[text() contains text {'2','3'} all words]", "<a>2 3</a>");
     check("//*[text() contains text {'2','4'} all words]", "");
@@ -199,9 +199,9 @@ public final class IndexOptimizeTest extends AdvancedQueryTest {
     query("//a[. = '']", "<a/>");
     query("//a[. = <x/>]", "<a/>");
 
-    query("//a[not(text() = '')]/text()", "12 3");
-    query("//text()[not(. = '')]", "12 3");
-    query("//a[not(. = '')]/text()", "12 3");
+    query("//a[not(text() = '')]/text()", "1\n2 3");
+    query("//text()[not(. = '')]", "1\n2 3");
+    query("//a[not(. = '')]/text()", "1\n2 3");
 }
 
   /**
@@ -245,7 +245,7 @@ public final class IndexOptimizeTest extends AdvancedQueryTest {
     try {
       try(QueryProcessor qp = new QueryProcessor(query, context)) {
         final String string = qp.execute().serialize();
-        if(result != null) assertEquals(result, string.replaceAll("\\r?\\n", ""));
+        if(result != null) assertEquals(result, normNL(string));
 
         // fetch query plan
         plan = qp.plan().serialize().toString();

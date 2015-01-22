@@ -51,8 +51,6 @@ public final class HTTPContext {
   private AuthMethod auth;
   /** Serialization parameters. */
   private SerializerOptions sopts;
-  /** Result wrapping. */
-  public boolean wrapping;
   /** User name. */
   public String user;
   /** Password (plain text). */
@@ -168,7 +166,7 @@ public final class HTTPContext {
     // determine content type dependent on output method
     final SerialMethod sm = sopts.get(SerializerOptions.METHOD);
     if(sm == SerialMethod.RAW) return APP_OCTET;
-    if(sm == SerialMethod.XML) return APP_XML;
+    if(sm == null || sm == SerialMethod.XML) return APP_XML;
     if(sm == SerialMethod.XHTML || sm == SerialMethod.HTML) return TEXT_HTML;
     if(sm == SerialMethod.JSON) {
       final JsonSerialOptions jprop = sopts.get(SerializerOptions.JSON);

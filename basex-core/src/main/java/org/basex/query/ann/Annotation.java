@@ -83,10 +83,6 @@ public enum Annotation {
   _OUTPUT_USE_CHARACTER_MAPS("use-character-maps(value)", arg(STR), OUTPUT_URI),
   /** XQuery annotation. */
   _OUTPUT_VERSION("version(value)", arg(STR), OUTPUT_URI),
-  /** XQuery annotation. */
-  _OUTPUT_WRAP_PREFIX("wrap-prefix(value)", arg(STR), OUTPUT_URI),
-  /** XQuery annotation. */
-  _OUTPUT_WRAP_URI("wrap-uri(value)", arg(STR), OUTPUT_URI),
 
   /** XQuery annotation. */
   _REST_PATH("path(path)", arg(STR), REST_URI),

@@ -35,8 +35,6 @@ interface RESTText {
   /** Query operation. */
   String QUERY = "query";
 
-  /** Wrap parameter. */
-  String WRAP = "wrap";
   /** Initial context. */
   String CONTEXT = "context";
 }

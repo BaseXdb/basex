@@ -73,11 +73,11 @@ public final class MapModuleTest extends AdvancedQueryTest {
   public void keys() {
     query("for $i in " + _MAP_KEYS.args(
         _MAP_MERGE.args(" for $i in 1 to 3 return " +
-        _MAP_ENTRY.args("$i", "$i+1"))) + " order by $i return $i", "1 2 3");
+        _MAP_ENTRY.args("$i", "$i+1"))) + " order by $i return $i", "1\n2\n3");
     query("let $map := " + _MAP_MERGE.args(" for $i in 1 to 3 return " +
         _MAP_ENTRY.args("$i", "$i + 1")) +
         "for $k in " + _MAP_KEYS.args("$map") + " order by $k return " +
-        _MAP_GET.args("$map", "$k"), "2 3 4");
+        _MAP_GET.args("$map", "$k"), "2\n3\n4");
   }
 
   /** Test method. */
@@ -85,7 +85,7 @@ public final class MapModuleTest extends AdvancedQueryTest {
   public void forEach() {
     query(_MAP_FOR_EACH.args(" map{}", "function($a, $b) { 1 }"), "");
     query(_MAP_FOR_EACH.args(" map{1:2}", "function($a, $b) { $a+$b }"), "3");
-    query(_MAP_FOR_EACH.args(" map{'a':1, 'b':2}", "function($a, $b) { $b }"), "1 2");
+    query(_MAP_FOR_EACH.args(" map{'a':1, 'b':2}", "function($a, $b) { $b }"), "1\n2");
   }
 
   /**

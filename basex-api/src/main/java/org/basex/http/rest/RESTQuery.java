@@ -48,7 +48,7 @@ class RESTQuery extends RESTCmd {
     // set base path and serialization parameters
     final HTTPContext http = session.http;
     context.options.set(MainOptions.QUERYPATH, path);
-    context.options.set(MainOptions.SERIALIZER, serial(http));
+    context.options.set(MainOptions.SERIALIZER, http.sopts());
     http.initResponse();
 
     final int cs = cmds.size();

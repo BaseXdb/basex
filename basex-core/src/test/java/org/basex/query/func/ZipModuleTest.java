@@ -65,7 +65,7 @@ public final class ZipModuleTest extends AdvancedQueryTest {
     query(_ZIP_TEXT_ENTRY.args(ZIP, ENTRY1, "US-ASCII"));
     error(_ZIP_TEXT_ENTRY.args(ZIP, ENTRY1, "xyz"), ZIP_FAIL_X);
     // newlines are removed from the result..
-    contains(_ZIP_TEXT_ENTRY.args(ZIP, ENTRY1), "aaboutab");
+    contains(_ZIP_TEXT_ENTRY.args(ZIP, ENTRY1), "a\nabout\nabove\n");
   }
 
   /** Test method. */

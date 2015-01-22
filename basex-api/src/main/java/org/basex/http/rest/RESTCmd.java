@@ -1,6 +1,5 @@
 package org.basex.http.rest;
 
-import static org.basex.http.rest.RESTText.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
@@ -13,7 +12,6 @@ import org.basex.core.locks.*;
 import org.basex.core.users.*;
 import org.basex.http.*;
 import org.basex.io.out.*;
-import org.basex.io.serial.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -135,20 +133,6 @@ abstract class RESTCmd extends Command {
   static void open(final RESTSession session) {
     final String db = session.http.db();
     if(!db.isEmpty()) session.add(new Open(db, session.http.dbpath()));
-  }
-
-  /**
-   * Returns serialization parameters.
-   * @param http HTTP context
-   * @return serialization parameters
-   */
-  static SerializerOptions serial(final HTTPContext http) {
-    final SerializerOptions sopts = http.sopts();
-    if(http.wrapping) {
-      sopts.set(SerializerOptions.WRAP_PREFIX, REST_PREFIX);
-      sopts.set(SerializerOptions.WRAP_URI, REST_URI);
-    }
-    return sopts;
   }
 
   /**

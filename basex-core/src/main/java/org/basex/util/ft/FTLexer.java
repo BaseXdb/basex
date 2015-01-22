@@ -5,7 +5,6 @@ import java.util.*;
 
 import org.basex.index.*;
 import org.basex.index.query.*;
-import org.basex.io.serial.*;
 import org.basex.query.expr.ft.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -35,8 +34,8 @@ public final class FTLexer extends FTIterator implements IndexToken {
   private byte[] ctxt;
 
   /**
-   * Constructor, using the default full-text options. Called by the
-   * {@link XMLSerializer}, {@link FTFilter}, and the map visualizations.
+   * Constructor, using the default full-text options. Called by the serializer,
+   * {@link FTFilter}, and the map visualizations.
    */
   public FTLexer() {
     this(null);

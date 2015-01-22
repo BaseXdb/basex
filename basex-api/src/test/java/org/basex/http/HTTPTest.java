@@ -137,7 +137,7 @@ public abstract class HTTPTest extends SandboxTest {
     final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
     try {
       conn.setRequestMethod(method);
-      return read(new BufferInput(conn.getInputStream())).replaceAll("\r?\n *", "");
+      return normNL(read(new BufferInput(conn.getInputStream())));
     } catch(final IOException ex) {
       throw error(conn, ex);
     } finally {

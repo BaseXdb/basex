@@ -131,7 +131,7 @@ public class ZipZipFile extends ZipFn {
             } else {
               // serialize new nodes
               try {
-                final Serializer ser = Serializer.get(zos, serPar(node));
+                final Serializer ser = Serializer.get(zos, so(node));
                 do {
                   ser.serialize(DataBuilder.stripNS(n, ZIP_URI, qc.context));
                 } while((n = ch.next()) != null);
@@ -170,7 +170,7 @@ public class ZipZipFile extends ZipFn {
    * @return parameters
    * @throws BaseXException database exception
    */
-  private static SerializerOptions serPar(final ANode node) throws BaseXException {
+  private static SerializerOptions so(final ANode node) throws BaseXException {
     // interpret query parameters
     final SerializerOptions sopts = new SerializerOptions();
     final AxisIter ati = node.attributes();

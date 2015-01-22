@@ -122,6 +122,7 @@ public final class QT3TS extends Main {
     ctx.options.set(MainOptions.CHOP, false);
 
     final SerializerOptions sopts = new SerializerOptions();
+    sopts.set(SerializerOptions.METHOD, SerialMethod.XML);
     sopts.set(SerializerOptions.INDENT, YesNo.NO);
     sopts.set(SerializerOptions.OMIT_XML_DECLARATION, YesNo.NO);
     ctx.options.set(MainOptions.SERIALIZER, sopts);
@@ -673,10 +674,11 @@ public final class QT3TS extends Main {
       exp = normNL(exp);
       if(norm) exp = string(normalize(token(exp)));
 
-      final String res = normNL(asString("serialize(., map{ 'indent':'no' })", value));
+      final String res = normNL(
+          asString("serialize(., map{ 'indent':'no','method':'xml' })", value));
       if(exp.equals(res)) return null;
       final String r = normNL(asString(
-          "serialize(., map{ 'indent':'no', 'omit-xml-declaration':'no' })", value));
+          "serialize(., map{ 'indent':'no','method':'xml','omit-xml-declaration':'no' })", value));
       if(exp.equals(r)) return null;
 
       // include check for comments, processing instructions and namespaces

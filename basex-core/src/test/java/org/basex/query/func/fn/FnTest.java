@@ -107,9 +107,9 @@ public final class FnTest extends AdvancedQueryTest {
   /** Tests for the {@code sort} function. */
   @Test
   public void sort() {
-    query(SORT.args("(1, 4, 6, 5, 3)"), "1 3 4 5 6");
-    query(SORT.args("(1,-2,5,10,-10,10,8)", " abs#1"), "1 -2 5 8 10 -10 10");
-    query(SORT.args("((1,0), (1,1), (0,1), (0,0))"), "0 0 0 0 1 1 1 1");
+    query(SORT.args("(1, 4, 6, 5, 3)"), "1\n3\n4\n5\n6");
+    query(SORT.args("(1,-2,5,10,-10,10,8)", " abs#1"), "1\n-2\n5\n8\n10\n-10\n10");
+    query(SORT.args("((1,0), (1,1), (0,1), (0,0))"), "0\n0\n0\n0\n1\n1\n1\n1");
   }
 
   /** Tests for the {@code outermost} and {@code innermost} functions. */
@@ -140,7 +140,7 @@ public final class FnTest extends AdvancedQueryTest {
         + "  namespace-uri-for-prefix('p', <e/>), "
         + "  resolve-QName('p:p', <p/>)"
         + "}</e>/text()/tokenize(.))",
-        "p p:p u xml");
+        "p\np:p\nu\nxml");
   }
 
   /** Tests for the {@code random-number-generator} function. */
@@ -171,7 +171,7 @@ public final class FnTest extends AdvancedQueryTest {
         + "return fn:apply($func, $args)", "6");
     query("for $a in 2 to 3 "
         + "let $f := function-lookup(xs:QName('fn:concat'), $a) "
-        + "return " + APPLY.args("$f", " array { 1 to $a }"), "12 123");
+        + "return " + APPLY.args("$f", " array { 1 to $a }"), "12\n123");
     error(APPLY.args(" false#0", " ['x']"), APPLY_X_X);
     error(APPLY.args(" string-length#1", " [ ('a','b') ]"), INVTREAT_X_X_X);
   }
