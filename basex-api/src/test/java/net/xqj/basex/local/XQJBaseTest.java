@@ -11,7 +11,6 @@ import org.junit.*;
  *
  * @author Charles Foster
  */
-@Ignore
 public abstract class XQJBaseTest {
   /** Data source. */
   BaseXXQDataSource xqds;

@@ -14,7 +14,6 @@ import com.xqj2.*;
  *
  * @author Charles Foster
  */
-@Ignore
 public final class InsertTest extends XQJBaseTest {
   /** Name of test database. */
   private static final String DB = "xqj-test-database";

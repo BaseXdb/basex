@@ -20,7 +20,6 @@ import com.xqj2.*;
  *
  * @author Charles Foster
  */
-@Ignore
 public final class XQJConcurrencyTest extends XQJBaseTest {
   /** Number of threads used when executing read only queries. */
   private static final int CONCURRENT_READ_THREADS = 256;
