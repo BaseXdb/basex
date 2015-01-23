@@ -8,7 +8,7 @@ import java.util.*;
 
 /**
  * Java client for BaseX.
- * Works with BaseX 7.0 and later
+ * Works with BaseX 8.0 and later
  *
  * Documentation: http://docs.basex.org/wiki/Clients
  *
