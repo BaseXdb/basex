@@ -18,7 +18,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <project.lib.directory>lib</project.lib.directory>
-    <jettyVersion>8.1.14.v20131031</jettyVersion>
+    <jettyVersion>8.1.16.v20140903</jettyVersion>
   </properties>
 
   <dependencyManagement>
@@ -131,8 +131,8 @@
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-nop</artifactId>
-        <version>1.7.7</version>
+        <artifactId>slf4j-simple</artifactId>
+        <version>1.7.10</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
