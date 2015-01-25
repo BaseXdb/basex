@@ -55,9 +55,9 @@ final class RESTRetrieve extends RESTCmd {
       list(table, el, RESTText.Q_RESOURCE, 0);
 
       http.initResponse();
-      final Serializer ser = Serializer.get(http.res.getOutputStream(), http.sopts());
-      ser.serialize(el);
-      ser.close();
+      try(final Serializer ser = Serializer.get(http.res.getOutputStream(), http.sopts())) {
+        ser.serialize(el);
+      }
     }
   }
 

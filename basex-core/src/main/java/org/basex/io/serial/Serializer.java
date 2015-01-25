@@ -30,7 +30,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public abstract class Serializer {
+public abstract class Serializer implements AutoCloseable {
   /** Stack with names of opened elements. */
   protected final TokenList elems = new TokenList();
   /** Current level. */
@@ -146,7 +146,7 @@ public abstract class Serializer {
    * Closes the serializer.
    * @throws IOException I/O exception
    */
-  @SuppressWarnings("unused")
+  @Override
   public void close() throws IOException { }
 
   /**

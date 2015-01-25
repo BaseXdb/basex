@@ -30,9 +30,9 @@ public final class ArrowTest extends AdvancedQueryTest {
   /** Test. */
   @Test public void dynamic() {
     query("1 => (count#1)()", "1");
-    query("'ab' => substring(?)(2)", "b");
+    query("('ab' => substring(?))(2)", "b");
     query("'ab' => (substring(?, 2))()", "b");
-    query("'ab' => (substring(?, ?))(?)(2)", "b");
+    query("('ab' => (substring(?, ?))(?))(2)", "b");
     query("let $a := count#1 return 1 => $a()", "1");
   }
 

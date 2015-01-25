@@ -202,9 +202,9 @@ public final class JsonSerializerTest extends SandboxTest {
       sopts.set(SerializerOptions.INDENT, YesNo.NO);
       sopts.set(SerializerOptions.JSON, jopts);
 
-      final Serializer ser = Serializer.get(ao, sopts);
-      for(final Item it : qp.value()) ser.serialize(it);
-      ser.close();
+      try(final Serializer ser = Serializer.get(ao, sopts)) {
+        for(final Item it : qp.value()) ser.serialize(it);
+      }
     }
     // replace quotes with apostrophes to increase legibility of tests
     return ao.toString().replace("\"", "'");

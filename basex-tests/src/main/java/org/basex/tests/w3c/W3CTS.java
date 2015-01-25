@@ -315,9 +315,10 @@ public abstract class W3CTS extends Main {
           value = qp.value();
 
           // serialize query
-          final Serializer ser = Serializer.get(ao, context.options.get(MainOptions.SERIALIZER));
-          for(final Item it : value) ser.serialize(it);
-          ser.close();
+          final SerializerOptions options = context.options.get(MainOptions.SERIALIZER);
+          try(final Serializer ser = Serializer.get(ao, options)) {
+            for(final Item it : value) ser.serialize(it);
+          }
 
         } catch(final Exception ex) {
           if(!(ex instanceof QueryException || ex instanceof IOException)) {

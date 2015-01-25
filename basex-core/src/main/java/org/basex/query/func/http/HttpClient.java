@@ -265,11 +265,8 @@ public final class HttpClient {
     }
 
     // serialize items according to the parameters
-    final Serializer ser = Serializer.get(out, sopts);
-    try {
+    try(final Serializer ser = Serializer.get(out, sopts)) {
       payload.serialize(ser);
-    } finally {
-      ser.close();
     }
   }
 

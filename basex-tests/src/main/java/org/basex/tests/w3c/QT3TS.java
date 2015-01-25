@@ -757,9 +757,9 @@ public final class QT3TS extends Main {
       throws IOException {
 
     final ArrayOutput ao = new ArrayOutput();
-    final Serializer ser = Serializer.get(ao, sprop);
-    for(final Item it : value.internal()) ser.serialize(it);
-    ser.close();
+    try(final Serializer ser = Serializer.get(ao, sprop)) {
+      for(final Item it : value.internal()) ser.serialize(it);
+    }
     return ao.toString();
   }
 

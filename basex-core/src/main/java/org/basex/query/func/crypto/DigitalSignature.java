@@ -302,9 +302,9 @@ final class DigitalSignature {
    */
   private static byte[] nodeToBytes(final ANode node) throws IOException {
     final ArrayOutput ao = new ArrayOutput();
-    final Serializer ser = Serializer.get(ao, SerializerOptions.get(false));
-    ser.serialize(node);
-    ser.close();
+    try(final Serializer ser = Serializer.get(ao, SerializerOptions.get(false))) {
+      ser.serialize(node);
+    }
     return ao.finish();
   }
 

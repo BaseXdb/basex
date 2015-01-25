@@ -162,9 +162,9 @@ public abstract class AdvancedQueryTest extends SandboxTest {
     final ArrayOutput ao = new ArrayOutput();
     try(final QueryProcessor qp = new QueryProcessor(query, context)) {
       qp.sc.baseURI(BASEURI);
-      final Serializer ser = qp.getSerializer(ao);
-      qp.execute().serialize(ser);
-      ser.close();
+      try(final Serializer ser = qp.getSerializer(ao)) {
+        qp.execute().serialize(ser);
+      }
     }
     return normNL(ao);
   }

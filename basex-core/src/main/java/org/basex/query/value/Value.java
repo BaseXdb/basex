@@ -188,10 +188,9 @@ public abstract class Value extends Expr implements Iterable<Item> {
   public final ArrayOutput serialize(final SerializerOptions options) throws QueryIOException {
     final ArrayOutput ao = new ArrayOutput();
     try {
-      final Serializer ser = Serializer.get(ao, options);
-      final ValueIter vi = iter();
-      for(Item it; (it = vi.next()) != null;) ser.serialize(it);
-      ser.close();
+      try(final Serializer ser = Serializer.get(ao, options)) {
+        for(Item it : this) ser.serialize(it);
+      }
     } catch(final QueryIOException ex) {
       throw ex;
     } catch(final IOException ex) {

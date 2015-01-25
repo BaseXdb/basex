@@ -130,12 +130,10 @@ public class ZipZipFile extends ZipFn {
               zos.write((hex ? new Hex(bytes) : new B64(bytes)).toJava());
             } else {
               // serialize new nodes
-              try {
-                final Serializer ser = Serializer.get(zos, so(node));
+              try(final Serializer ser = Serializer.get(zos, so(node))) {
                 do {
                   ser.serialize(DataBuilder.stripNS(n, ZIP_URI, qc.context));
                 } while((n = ch.next()) != null);
-                ser.close();
               } catch(final QueryIOException ex) {
                 throw ex.getCause(info);
               }

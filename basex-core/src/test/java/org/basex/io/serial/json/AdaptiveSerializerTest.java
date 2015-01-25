@@ -68,9 +68,9 @@ public final class AdaptiveSerializerTest extends SandboxTest {
       sopts.set(SerializerOptions.METHOD, SerialMethod.ADAPTIVE);
       sopts.set(SerializerOptions.INDENT, YesNo.NO);
 
-      final Serializer ser = Serializer.get(ao, sopts);
-      for(final Item it : qp.value()) ser.serialize(it);
-      ser.close();
+      try(final Serializer ser = Serializer.get(ao, sopts)) {
+        for(final Item it : qp.value()) ser.serialize(it);
+      }
 
       final String actual = normNL(ao.toString().replace("\"", "'"));
       assertEquals("\n[E] " + expected + "\n[F] " + actual + '\n', expected, actual);

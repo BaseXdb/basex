@@ -112,14 +112,14 @@ public final class XdmInfoTest extends SandboxTest {
      */
     @SuppressWarnings("resource")
     byte[] exec(final ServerCmd cmd, final String arg) throws IOException {
-      final ArrayOutput o = new ArrayOutput();
+      final ArrayOutput ao = new ArrayOutput();
       sout.write(cmd.code);
       send(arg);
       sout.flush();
       final BufferInput bi = new BufferInput(sin);
-      ClientSession.receive(bi, o);
+      ClientSession.receive(bi, ao);
       if(!ClientSession.ok(bi)) throw new BaseXException(bi.readString());
-      return o.toArray();
+      return ao.toArray();
     }
   }
 

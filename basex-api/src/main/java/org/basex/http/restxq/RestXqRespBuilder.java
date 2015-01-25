@@ -102,8 +102,8 @@ final class RestXqRespBuilder {
     // cache result
     http.sopts(sp);
     http.initResponse();
-    final Serializer ser = Serializer.get(cache, sp);
-    for(; item != null; item = iter.next()) ser.serialize(item);
-    ser.close();
+    try(final Serializer ser = Serializer.get(cache, sp)) {
+      for(; item != null; item = iter.next()) ser.serialize(item);
+    }
   }
 }

@@ -78,28 +78,23 @@ public abstract class AQuery extends Command {
           if(!run) continue;
 
           final PrintOutput po = r == 0 && serial ? out : new NullOutput();
-          final Serializer ser;
-
-          if(options.get(MainOptions.CACHEQUERY)) {
-            result = qp.execute();
-            info.evaluating += p.time();
-            ser = qp.getSerializer(po);
-            result.serialize(ser);
-            hits = result.size();
-          } else {
-            hits = 0;
-            final Iter ir = qp.iter();
-            info.evaluating += p.time();
-            Item it = ir.next();
-            ser = qp.getSerializer(po);
-            while(it != null) {
-              checkStop();
-              ser.serialize(it);
-              it = ir.next();
-              ++hits;
+          try(final Serializer ser = qp.getSerializer(po)) {
+            if(options.get(MainOptions.CACHEQUERY)) {
+              result = qp.execute();
+              info.evaluating += p.time();
+              result.serialize(ser);
+              hits = result.size();
+            } else {
+              hits = 0;
+              final Iter ir = qp.iter();
+              info.evaluating += p.time();
+              for(Item it; (it = ir.next()) != null;) {
+                ser.serialize(it);
+                ++hits;
+                checkStop();
+              }
             }
           }
-          ser.close();
           qp.close();
           info.serializing += p.time();
         }
@@ -279,9 +274,9 @@ public abstract class AQuery extends Command {
             new IOFile(path).name().replaceAll("\\..*?$", ".dot");
 
         try(final BufferOutput bo = new BufferOutput(dot)) {
-          final DOTSerializer d = new DOTSerializer(bo, options.get(MainOptions.DOTCOMPACT));
-          d.serialize(qp.plan());
-          d.close();
+          try(final DOTSerializer d = new DOTSerializer(bo, options.get(MainOptions.DOTCOMPACT))) {
+            d.serialize(qp.plan());
+          }
         }
       }
 

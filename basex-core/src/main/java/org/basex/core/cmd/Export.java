@@ -119,9 +119,9 @@ public final class Export extends Command {
 
       // serialize file
       try(final PrintOutput po = new PrintOutput(unique(exported, fl.path()))) {
-        final Serializer ser = Serializer.get(po, sopts);
-        ser.serialize(new DBNode(data, pre));
-        ser.close();
+        try(final Serializer ser = Serializer.get(po, sopts)) {
+          ser.serialize(new DBNode(data, pre));
+        }
       }
     }
 

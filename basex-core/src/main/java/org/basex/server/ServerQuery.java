@@ -128,22 +128,22 @@ public final class ServerQuery extends Proc {
       parameters();
 
       // iterate through results
-      final PrintOutput po = PrintOutput.get(encode ? new EncodingOutput(out) : out);
-      final Serializer ser = Serializer.get(po, full ? null : parameters);
       int c = 0;
-      for(Item it; (it = ir.next()) != null;) {
-        if(iter) {
-          po.write(full ? it.xdmInfo() : it.typeId().bytes());
-          ser.reset();
-          ser.serialize(it, full, true);
-          po.flush();
-          out.write(0);
-        } else {
-          ser.serialize(it, full, false);
+      final PrintOutput po = PrintOutput.get(encode ? new EncodingOutput(out) : out);
+      try(final Serializer ser = Serializer.get(po, full ? null : parameters)) {
+        for(Item it; (it = ir.next()) != null;) {
+          if(iter) {
+            po.write(full ? it.xdmInfo() : it.typeId().bytes());
+            ser.reset();
+            ser.serialize(it, full, true);
+            po.flush();
+            out.write(0);
+          } else {
+            ser.serialize(it, full, false);
+          }
+          c++;
         }
-        c++;
       }
-      ser.close();
       qi.serializing = perf.time();
 
       // generate query info

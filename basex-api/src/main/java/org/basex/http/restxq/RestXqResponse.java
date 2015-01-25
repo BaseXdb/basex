@@ -83,9 +83,9 @@ final class RestXqResponse {
       final SerializerOptions sp = function.output;
       http.sopts(sp);
       http.initResponse();
-      final Serializer ser = Serializer.get(http.res.getOutputStream(), sp);
-      for(; item != null; item = iter.next()) ser.serialize(item);
-      ser.close();
+      try(final Serializer ser = Serializer.get(http.res.getOutputStream(), sp)) {
+        for(; item != null; item = iter.next()) ser.serialize(item);
+      }
 
     } finally {
       query.close();

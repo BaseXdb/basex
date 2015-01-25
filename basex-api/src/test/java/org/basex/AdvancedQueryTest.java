@@ -21,9 +21,9 @@ public abstract class AdvancedQueryTest extends SandboxTest {
   private static String query(final String query) {
     try(final QueryProcessor qp = new QueryProcessor(query, context)) {
       final ArrayOutput ao = new ArrayOutput();
-      final Serializer ser = qp.getSerializer(ao);
-      qp.execute().serialize(ser);
-      ser.close();
+      try(final Serializer ser = qp.getSerializer(ao)) {
+        qp.execute().serialize(ser);
+      }
       return ao.toString().replaceAll("(\\r|\\n)\\s*", "");
     } catch(final Exception ex) {
       ex.printStackTrace();
