@@ -84,8 +84,12 @@ public final class SerializerTest extends AdvancedQueryTest {
   /** Test: item-separator. */
   @Test
   public void itemSeparator() {
-    query("declare option output:item-separator '-'; 1,2", "1-2");
-    query("declare option output:item-separator ''; 1,2", "12");
-    query("declare option output:item-separator 'ABC'; 1 to 3", "1ABC2ABC3");
+    final String option = "declare option output:item-separator ";
+    query(option + "'-'; 1,2", "1-2");
+    query(option + "''; 1,2", "12");
+    query(option + "'ABC'; 1 to 3", "1ABC2ABC3");
+
+    query(option + "'&#xa;'; <a/>,<b/>", "<a/>\n<b/>");
+    query(option + "'&#xa;'; declare option output:method 'text'; 1,2", "1\n2");
   }
 }

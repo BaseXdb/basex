@@ -27,6 +27,8 @@ public abstract class StandardSerializer extends OutputSerializer {
 
   /** Normalization form. */
   private final Form form;
+  /** Indicates if more than one item was serialized. */
+  private boolean more;
 
   /**
    * Constructor.
@@ -38,7 +40,8 @@ public abstract class StandardSerializer extends OutputSerializer {
       throws IOException {
 
     super(out, sopts);
-    indent  = sopts.yes(INDENT);
+    indent = sopts.yes(INDENT);
+    itemsep(sopts, null);
 
     // normalization form
     final String norm = sopts.get(NORMALIZATION_FORM);
@@ -56,9 +59,26 @@ public abstract class StandardSerializer extends OutputSerializer {
   }
 
   @Override
+  public void serialize(final Item item, final boolean atts, final boolean iter)
+      throws IOException {
+
+    final byte[] sp = itemsep;
+    if(sp != null) {
+      if(more) {
+        printChars(sp);
+        sep = false;
+      } else {
+        more = true;
+      }
+    }
+    super.serialize(item, atts, iter);
+  }
+
+  @Override
   public void reset() {
     sep = false;
     atomic = false;
+    more = false;
   }
 
   // PROTECTED METHODS ============================================================================

@@ -11,7 +11,6 @@ import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
-import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.hash.*;
@@ -34,8 +33,6 @@ abstract class MarkupSerializer extends StandardSerializer {
 
   /** Script flag. */
   boolean script;
-  /** Item separator flag (used for formatting). */
-  boolean isep;
 
   /** HTML5 flag. */
   final boolean html5;
@@ -69,7 +66,6 @@ abstract class MarkupSerializer extends StandardSerializer {
       final String... versions) throws IOException {
 
     super(out, sopts);
-    itemsep(sopts, null);
 
     final String ver = supported(VERSION, sopts, versions);
     final String htmlver = supported(HTML_VERSION, sopts, V40, V401, V50);
@@ -147,33 +143,11 @@ abstract class MarkupSerializer extends StandardSerializer {
     }
   }
 
-  @Override
-  public void serialize(final Item item, final boolean atts, final boolean iter)
-      throws IOException {
-
-    final byte[] sp = itemsep;
-    if(sp != null) {
-      if(isep) {
-        printChars(sp);
-        sep = false;
-      } else {
-        isep = true;
-      }
-    }
-    super.serialize(item, atts, iter);
-  }
-
   // PROTECTED METHODS ============================================================================
 
   @Override
   protected void namespace(final byte[] prefix, final byte[] uri) throws IOException {
     if(undecl || prefix.length == 0 || uri.length != 0) super.namespace(prefix, uri);
-  }
-
-  @Override
-  public final void reset() {
-    super.reset();
-    isep = false;
   }
 
   @Override
