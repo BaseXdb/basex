@@ -1705,7 +1705,6 @@ public class QueryParser extends InputParser {
         wsCheck(PAREN1);
 
         if(ex instanceof QNm) {
-          System.out.println("? " + e);
           final QNm name = (QNm) ex;
           if(keyword(name)) throw error(RESERVED_X, name.local());
           e = function(name, e);
