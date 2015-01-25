@@ -1685,10 +1685,41 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr cast() throws QueryException {
-    final Expr e = unary();
+    final Expr e = arrow();
     if(!wsConsumeWs(CAST)) return e;
     wsCheck(AS);
     return new Cast(sc, info(), e, simpleType());
+  }
+
+  /**
+   * Parses the "ArrowExpr" rule.
+   * @return query expression (may be {@code null})
+   * @throws QueryException query exception
+   */
+  private Expr arrow() throws QueryException {
+    Expr e = unary();
+    if(e != null) {
+      while(wsConsume(ARROW)) {
+        final Expr ex = wsConsume(PAREN1) ? parenthesized() : curr() == '$'
+            ? resolveVar(varName(), info()) : eQName(ARROWSPEC, sc.funcNS);
+        wsCheck(PAREN1);
+
+        if(ex instanceof QNm) {
+          System.out.println("? " + e);
+          final QNm name = (QNm) ex;
+          if(keyword(name)) throw error(RESERVED_X, name.local());
+          e = function(name, e);
+        } else {
+          final InputInfo ii = info();
+          final ExprList argList = new ExprList(e);
+          final int[] holes = argumentList(argList, e);
+          final Expr[] args = argList.finish();
+          e = holes == null ? new DynFuncCall(ii, sc, false, ex, args) :
+            new PartFunc(sc, ii, ex, args, holes);
+        }
+      }
+    }
+    return e;
   }
 
   /**
@@ -2067,22 +2098,6 @@ public class QueryParser extends InputParser {
         } else if(consume(QUESTION)) {
           // parses the "Lookup" rule
           e = new Lookup(info(), keySpecifier(), e);
-        } else if(consume(ARROW)) {
-          final Expr ex = arrowPostfix();
-          wsCheck(PAREN1);
-
-          if(ex instanceof QNm) {
-            final QNm name = (QNm) ex;
-            if(keyword(name)) throw error(RESERVED_X, name.local());
-            e = function(name, e);
-          } else {
-            final InputInfo ii = info();
-            final ExprList argList = new ExprList(e);
-            final int[] holes = argumentList(argList, e);
-            final Expr[] args = argList.finish();
-            e = holes == null ? new DynFuncCall(ii, sc, false, ex, args) :
-              new PartFunc(sc, ii, ex, args, holes);
-          }
         }
       } while(e != old);
     }
@@ -2158,16 +2173,6 @@ public class QueryParser extends InputParser {
       consume(PAREN1) ? parenthesized() :
       digit(curr()) ? numericLiteral(true) :
       Str.get(ncName(KEYSPEC));
-  }
-
-  /**
-   * Parses the "ArrowPostfix" rule.
-   * @return function specifier
-   * @throws QueryException query exception
-   */
-  private Expr arrowPostfix() throws QueryException {
-    return wsConsume(PAREN1) ? parenthesized() : curr() == '$' ? resolveVar(varName(), info()) :
-      eQName(ARROWSPEC, sc.funcNS);
   }
 
   /**
