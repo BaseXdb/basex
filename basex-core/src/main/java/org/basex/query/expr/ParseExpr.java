@@ -493,7 +493,7 @@ public abstract class ParseExpr extends Expr {
 
   /**
    * Checks if the specified expression yields a binary item.
-   * Returns the item or throws an exception.
+   * Returns the binary item or throws an exception.
    * @param ex expression to be evaluated
    * @param qc query context
    * @return binary item
@@ -505,12 +505,12 @@ public abstract class ParseExpr extends Expr {
 
   /**
    * Checks if the specified item is a binary item.
-   * Returns the item or throws an exception.
+   * Returns the binary item or throws an exception.
    * @param it item to be checked
    * @return binary item
    * @throws QueryException query exception
    */
-  private Bin toBin(final Item it) throws QueryException {
+  protected Bin toBin(final Item it) throws QueryException {
     if(checkNoEmpty(it) instanceof Bin) return (Bin) it;
     throw BINARY_X.get(info, it.type);
   }
@@ -522,8 +522,8 @@ public abstract class ParseExpr extends Expr {
    * @return byte array
    * @throws QueryException query exception
    */
-  protected final byte[] toBinary(final Expr ex, final QueryContext qc) throws QueryException {
-    return toBinary(ex.atomItem(qc, info));
+  protected final byte[] toBytes(final Expr ex, final QueryContext qc) throws QueryException {
+    return toBytes(ex.atomItem(qc, info));
   }
 
   /**
@@ -559,8 +559,8 @@ public abstract class ParseExpr extends Expr {
    * @return byte array
    * @throws QueryException query exception
    */
-  protected final byte[] toBinary(final Item it) throws QueryException {
-    if(it instanceof AStr) return it.string(info);
+  protected final byte[] toBytes(final Item it) throws QueryException {
+    if(checkNoEmpty(it) instanceof AStr) return it.string(info);
     if(it instanceof Bin) return ((Bin) it).binary(info);
     throw STRBIN_X_X.get(info, it.type, it);
   }

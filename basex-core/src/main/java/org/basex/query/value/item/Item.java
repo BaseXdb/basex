@@ -188,7 +188,7 @@ public abstract class Item extends Value {
     return new ArrayInput(string(ii));
   }
 
-  // Overridden by B64Stream, StrStream and Jav.
+  // Overridden by B64Stream, StrStream, Jav and Array.
   @Override
   public Item materialize(final InputInfo ii) throws QueryException {
     return this;
@@ -212,8 +212,9 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   // Overridden by FItem and ANode.
+  @SuppressWarnings("unused")
   public Item atomItem(final InputInfo ii) throws QueryException {
-    return materialize(ii);
+    return this;
   }
 
   @Override

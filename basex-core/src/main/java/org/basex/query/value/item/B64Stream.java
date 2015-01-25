@@ -49,7 +49,7 @@ public final class B64Stream extends B64 {
   }
 
   @Override
-  public Item materialize(final InputInfo ii) throws QueryException {
+  public B64 materialize(final InputInfo ii) throws QueryException {
     return new B64(binary(ii));
   }
 

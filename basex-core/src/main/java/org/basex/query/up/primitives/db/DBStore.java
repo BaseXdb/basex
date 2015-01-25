@@ -7,6 +7,7 @@ import java.io.*;
 
 import org.basex.data.*;
 import org.basex.io.*;
+import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.up.primitives.*;
@@ -22,7 +23,7 @@ import org.basex.util.hash.*;
  */
 public final class DBStore extends DBUpdate {
   /** Keys. */
-  private final TokenObjMap<Object> map = new TokenObjMap<>();
+  private final TokenObjMap<Item> map = new TokenObjMap<>();
 
   /**
    * Constructor.
@@ -31,7 +32,7 @@ public final class DBStore extends DBUpdate {
    * @param it item to be stored
    * @param inf input info
    */
-  public DBStore(final Data data, final String path, final Object it, final InputInfo inf) {
+  public DBStore(final Data data, final String path, final Item it, final InputInfo inf) {
     super(UpdateType.DBSTORE, data, inf);
     map.put(token(path), it);
   }
@@ -49,9 +50,9 @@ public final class DBStore extends DBUpdate {
         final IOFile file = data.meta.binary(string(path));
         if(file.isDir()) file.delete();
         file.parent().md();
-        final Object item = map.get(path);
-        file.write(item instanceof Item ? ((Item) item).input(info) :
-          ((QueryInput) item).input.inputStream());
+        try(final BufferInput bi = map.get(path).input(info)) {
+          file.write(bi);
+        }
       } catch(final IOException ex) {
         Util.debug(ex);
         throw UPDBPUT_X.get(info, path);

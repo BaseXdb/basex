@@ -1,9 +1,5 @@
 package org.basex.query.func.convert;
 
-import static org.basex.query.QueryError.*;
-
-import java.io.*;
-
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
@@ -24,10 +20,6 @@ public final class ConvertBinaryToBytes extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    try {
-      return BytSeq.get(toBin(exprs[0], qc).input(info).content());
-    } catch(final IOException ex) {
-      throw BXCO_STRING_X.get(info, ex);
-    }
+    return BytSeq.get(toBytes(exprs[0], qc));
   }
 }

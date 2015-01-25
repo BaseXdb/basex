@@ -119,9 +119,9 @@ public final class JavaFunctionTest extends AdvancedQueryTest {
     query("declare namespace uri = 'java.net.URI'; uri:get-path(uri:new('http://a/b'))", "/b");
   }
 
-  /** Atomizing Java items. */
+  /** Atomize Java items. */
   @Test
   public void data() {
-    query("data(Q{java:java.lang.Object}new()) instance of xs:anyAtomicType", "true");
+    query("stream:materialize(Q{java:java.lang.Object}new()) instance of xs:anyAtomicType", "true");
   }
 }

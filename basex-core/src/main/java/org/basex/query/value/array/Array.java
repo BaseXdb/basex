@@ -155,7 +155,7 @@ public final class Array extends FItem {
   }
 
   @Override
-  public Item materialize(final InputInfo ii) throws QueryException {
+  public Array materialize(final InputInfo ii) throws QueryException {
     final ValueList vl = new ValueList(size);
     for(int a = 0; a < size; a++) vl.add(get(a).materialize(ii));
     return vl.array();

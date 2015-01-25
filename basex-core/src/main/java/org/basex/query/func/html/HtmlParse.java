@@ -25,7 +25,7 @@ public final class HtmlParse extends StandardFunc {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] in = toBinary(exprs[0], qc);
+    final byte[] in = toBytes(exprs[0], qc);
     final HtmlOptions opts = toOptions(1, Q_OPTIONS, new HtmlOptions(), qc);
     try {
       return new DBNode(new org.basex.build.html.HtmlParser(new IOContent(in),

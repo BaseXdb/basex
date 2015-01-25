@@ -35,7 +35,7 @@ final class RawSerializer extends StandardSerializer {
   protected void atomic(final Item it, final boolean iter) throws IOException {
     try(final InputStream is = it.input(null)) {
       final PrintOutput po = out;
-      for(int i; (i = is.read()) != -1;) po.write(i);
+      for(int b; (b = is.read()) != -1;) po.write(b);
     } catch(final QueryException ex) {
       throw new QueryIOException(ex);
     }

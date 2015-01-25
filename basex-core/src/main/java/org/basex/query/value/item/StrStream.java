@@ -69,7 +69,7 @@ public final class StrStream extends AStr {
   }
 
   @Override
-  public Item materialize(final InputInfo ii) throws QueryException {
+  public Str materialize(final InputInfo ii) throws QueryException {
     return Str.get(string(ii));
   }
 

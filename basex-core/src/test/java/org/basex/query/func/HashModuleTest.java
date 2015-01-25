@@ -45,6 +45,15 @@ public final class HashModuleTest extends AdvancedQueryTest {
     query(_HASH_HASH.args("", "SHA-256"), "47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=");
     query(_HASH_HASH.args("xs:base64Binary('')", "md5"), "1B2M2Y8AsgTpgAmY7PhCfg==");
     query(_HASH_HASH.args("xs:hexBinary('')", "md5"), "1B2M2Y8AsgTpgAmY7PhCfg==");
+
+    final String file = sandbox() + "/hash";
+    try {
+      query(_FILE_WRITE.args(file, "BaseX"));
+      query(_HASH_HASH.args(_FILE_READ_BINARY.args(file), "md5"), "DWUYXJ4pYxHAoiABeeR5og==");
+    } finally {
+      query(_FILE_DELETE.args(file));
+    }
+
     error(_HASH_HASH.args("", ""), HASH_ALG_X);
   }
 }
