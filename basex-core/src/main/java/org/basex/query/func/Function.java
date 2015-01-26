@@ -1233,8 +1233,7 @@ public enum Function {
   static {
     for(final Function f : values()) {
       final byte[] u = f.uri;
-      if(u != null) continue;
-      URIS.add(u);
+      if(u != null) URIS.add(u);
     }
   }
 

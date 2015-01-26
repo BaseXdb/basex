@@ -16,14 +16,25 @@ import org.junit.Test;
  */
 public final class ModuleTest extends SandboxTest {
   /**
+   * Imports a built-in module.
+   * @throws Exception exception
+   */
+  @Test
+  public void builtIn() throws Exception {
+    final String query = "import module namespace xquery = 'http://basex.org/modules/xquery'; 1";
+    try(final QueryProcessor qp = new QueryProcessor(query, context)) {
+      qp.execute();
+    }
+  }
+
+  /**
    * Tests the {@link QueryContext#parseLibrary(String, String, StaticContext)}
    * method.
    */
   @Test
   public void module() {
     try(final QueryContext qc = new QueryContext(context)) {
-      qc.parseLibrary("module namespace m='foo'; declare function m:foo() { m:bar() }; ",
-          "", null);
+      qc.parseLibrary("module namespace m='foo'; declare function m:foo() { m:bar() }; ", "", null);
       fail("Unknown function 'm:bar()' was not detected.");
     } catch(final QueryException e) {
       assertSame(QueryError.FUNCUNKNOWN_X, e.error());
