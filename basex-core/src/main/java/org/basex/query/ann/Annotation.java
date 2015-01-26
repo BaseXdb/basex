@@ -29,7 +29,7 @@ public enum Annotation {
   /** XQuery annotation. */
   _BASEX_LAZY("lazy()", arg(), BASEX_URI),
   /** XQuery annotation. */
-  _BASEX_INLINE("inline()", arg(), BASEX_URI),
+  _BASEX_INLINE("inline([limit])", arg(ITR), BASEX_URI),
 
   /** XQuery annotation. */
   _OUTPUT_ALLOW_DUPLICATE_NAMES("allow-duplicate-names(value)", arg(STR), OUTPUT_URI),

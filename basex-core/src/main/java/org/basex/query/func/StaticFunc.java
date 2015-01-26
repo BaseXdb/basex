@@ -264,7 +264,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   public Expr inlineExpr(final Expr[] exprs, final QueryContext qc, final VarScope scp,
       final InputInfo ii) throws QueryException {
 
-    if(!inline(qc)) return null;
+    if(!inline(qc, anns, expr) || has(Flag.CTX) || compiling || selfRecursive()) return null;
     qc.compInfo(OPTINLINE, id());
 
     // create let bindings for all variables
@@ -284,13 +284,17 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   }
 
   /**
-   * Checks if this function can be inlined.
+   * Checks if inlining conditions are given.
    * @param qc query context
+   * @param anns annotations
+   * @param expr expression
    * @return result of check
    */
-  private boolean inline(final QueryContext qc) {
-    return expr.isValue() || anns.contains(Annotation._BASEX_INLINE) ||
-        expr.exprSize() < qc.context.options.get(MainOptions.INLINELIMIT) &&
-        !(compiling || has(Flag.CTX) || selfRecursive());
+  public static boolean inline(final QueryContext qc, final AnnList anns, final Expr expr) {
+    final Ann ann = anns.get(Annotation._BASEX_INLINE);
+    final long limit = ann != null
+        ? ann.args.length > 0 ? ((ANum) ann.args[0]).itr() : Long.MAX_VALUE
+        : qc.context.options.get(MainOptions.INLINELIMIT);
+    return expr.isValue() || expr.exprSize() < limit;
   }
 }

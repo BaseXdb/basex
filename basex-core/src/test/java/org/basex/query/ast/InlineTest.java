@@ -1,5 +1,6 @@
 package org.basex.query.ast;
 
+import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -94,5 +95,29 @@ public final class InlineTest extends QueryPlanTest {
         "<x/>\n<x/>",
         "exists(//IterMap)",
         "empty(//Context)");
+  }
+
+  /**
+   * Tests the annotation {@link Annotation#_BASEX_INLINE}.
+   */
+  @Test public void annotation() {
+    // deactivate inlining globally, activate locally
+    check("declare option db:inlinelimit '0';"
+        + "declare %basex:inline function local:x($x) { $x }; local:x(123)",
+        "123",
+        "empty(//StaticFunc)",
+        "exists(//Int)");
+
+    // deactivate inlining globally and locally
+    check("declare option db:inlinelimit '0';"
+        + "declare %basex:inline(0) function local:x($x) { $x }; local:x(123)",
+        "123",
+        "exists(//StaticFunc)");
+
+    // activate inlining globally, deactivate locally
+    check("declare option db:inlinelimit '1000';"
+        + "declare %basex:inline(0) function local:x($x) { $x }; local:x(123)",
+        "123",
+        "exists(//StaticFunc)");
   }
 }

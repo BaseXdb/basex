@@ -5,7 +5,6 @@ import static org.basex.query.QueryText.*;
 
 import java.util.*;
 
-import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.gflwor.*;
@@ -212,7 +211,7 @@ public final class FuncItem extends FItem implements Scope {
   public Expr inlineExpr(final Expr[] exprs, final QueryContext qc, final VarScope scp,
       final InputInfo ii) throws QueryException {
 
-    if(!(inline(qc))) return null;
+    if(!StaticFunc.inline(qc, anns, expr) || has(Flag.CTX)) return null;
     qc.compInfo(OPTINLINE, this);
 
     // create let bindings for all variables
@@ -242,16 +241,6 @@ public final class FuncItem extends FItem implements Scope {
       }
     });
     return cls == null ? rt : new GFLWOR(ii, cls, rt).optimize(qc, scp);
-  }
-
-  /**
-   * Checks if this function can be inlined.
-   * @param qc query context
-   * @return result of check
-   */
-  private boolean inline(final QueryContext qc) {
-    return expr.isValue() || expr.exprSize() < qc.context.options.get(MainOptions.INLINELIMIT) &&
-        !expr.has(Flag.CTX);
   }
 
   @Override
