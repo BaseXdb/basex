@@ -9,6 +9,7 @@ import java.net.*;
 
 import javax.swing.*;
 
+import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.dialog.*;
@@ -215,7 +216,7 @@ public abstract class BaseXDialog extends JDialog {
   }
 
   /**
-   * Static yes/no dialog. Returns a {@code null} reference if the dialog was canceled.
+   * Static yes/no/cancel dialog. Returns {@code null} if the dialog was canceled.
    * @param gui parent reference
    * @param text text
    * @param buttons additional buttons
@@ -232,7 +233,7 @@ public abstract class BaseXDialog extends JDialog {
    * @return true if dialog was confirmed
    */
   public static boolean confirm(final GUI gui, final String text) {
-    return new DialogMessage(gui, text.trim(), Msg.QUESTION).ok();
+    return Text.B_YES.equals(new DialogMessage(gui, text.trim(), Msg.QUESTION).action());
   }
 
   /**
