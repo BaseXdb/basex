@@ -12,6 +12,8 @@ import org.basex.core.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 
 /**
  * This class serializes items to an output stream.
@@ -20,15 +22,13 @@ import org.basex.query.value.item.*;
  * @author Christian Gruen
  */
 public abstract class StandardSerializer extends OutputSerializer {
-  /** Separator flag. */
+  /** Normalization form. */
+  protected final Form form;
+
+  /** Include separator. */
   protected boolean sep;
   /** Atomic flag. */
   protected boolean atomic;
-
-  /** Normalization form. */
-  private final Form form;
-  /** Indicates if more than one item was serialized. */
-  private boolean more;
 
   /**
    * Constructor.
@@ -45,43 +45,70 @@ public abstract class StandardSerializer extends OutputSerializer {
 
     // normalization form
     final String norm = sopts.get(NORMALIZATION_FORM);
-    final Form frm;
     if(norm.equals(Text.NONE)) {
-      frm = null;
+      form = null;
     } else {
       try {
-        frm = Form.valueOf(norm);
+        form = Form.valueOf(norm);
       } catch(final IllegalArgumentException ex) {
         throw SERNORM_X.getIO(norm);
       }
     }
-    form = frm;
   }
 
   @Override
-  public void serialize(final Item item, final boolean atts, final boolean iter)
-      throws IOException {
-
+  public void serialize(final Item item) throws IOException {
     final byte[] sp = itemsep;
     if(sp != null) {
       if(more) {
         printChars(sp);
         sep = false;
-      } else {
-        more = true;
       }
     }
-    super.serialize(item, atts, iter);
+    super.serialize(item);
   }
 
   @Override
   public void reset() {
     sep = false;
     atomic = false;
-    more = false;
+    super.reset();
+  }
+
+  @Override
+  protected void node(final ANode item) throws IOException {
+    final Type type = item.type;
+    if(type == NodeType.ATT) throw SERATTR_X.getIO(item);
+    if(type == NodeType.NSP) throw SERNS_X.getIO(item);
+    super.node(item);
+  }
+
+  @Override
+  protected void function(final FItem item) throws IOException {
+    throw SERFUNC_X.getIO(item.seqType());
   }
 
   // PROTECTED METHODS ============================================================================
+
+  @Override
+  protected void atomic(final Item item) throws IOException {
+    if(sep && atomic) out.print(' ');
+    try {
+      if(item instanceof StrStream && form == null) {
+        try(final InputStream ni = ((StrStream) item).input(null)) {
+          for(int cp; (cp = ni.read()) != -1;) encode(cp);
+        }
+      } else {
+        final byte[] str = norm(item.string(null));
+        final int al = str.length;
+        for(int a = 0; a < al; a += cl(str, a)) encode(cp(str, a));
+      }
+    } catch(final QueryException ex) {
+      throw new QueryIOException(ex);
+    }
+    sep = true;
+    atomic = true;
+  }
 
   /**
    * Normalizes the specified text.
@@ -90,30 +117,6 @@ public abstract class StandardSerializer extends OutputSerializer {
    */
   protected byte[] norm(final byte[] text) {
     return form == null || ascii(text) ? text : token(Normalizer.normalize(string(text), form));
-  }
-
-  @Override
-  protected void atomic(final Item item, final boolean iter) throws IOException {
-    if(sep && atomic) out.print(' ');
-    try {
-      if(item instanceof StrStream && form == null) {
-        try(final InputStream ni = ((StrStream) item).input(null)) {
-          for(int cp; (cp = ni.read()) != -1;) if(iter) out.print(cp); else encode(cp);
-        }
-      } else {
-        final byte[] str = norm(item.string(null));
-        final int al = str.length;
-        if(iter) {
-          out.print(str);
-        } else {
-          for(int a = 0; a < al; a += cl(str, a)) encode(cp(str, a));
-        }
-      }
-    } catch(final QueryException ex) {
-      throw new QueryIOException(ex);
-    }
-    sep = true;
-    atomic = true;
   }
 
   /**

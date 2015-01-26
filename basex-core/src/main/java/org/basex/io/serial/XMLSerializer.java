@@ -46,9 +46,9 @@ final class XMLSerializer extends MarkupSerializer {
   }
 
   @Override
-  protected void atomic(final Item it, final boolean iter) throws IOException {
+  protected void atomic(final Item it) throws IOException {
     if(elems.isEmpty()) check();
-    super.atomic(it, iter);
+    super.atomic(it);
   }
 
   /**

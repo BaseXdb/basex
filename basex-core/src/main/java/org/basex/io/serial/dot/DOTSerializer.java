@@ -104,7 +104,7 @@ public final class DOTSerializer extends OutputSerializer {
   }
 
   @Override
-  protected void atomic(final Item it, final boolean iter) throws IOException {
+  protected void atomic(final Item it) throws IOException {
     try {
       print(normalize(it.string(null)), ITEM);
     } catch(final QueryException ex) {

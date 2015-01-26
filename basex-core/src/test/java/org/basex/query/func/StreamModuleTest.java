@@ -18,9 +18,9 @@ public final class StreamModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void materialize() {
-    query(_FILE_READ_TEXT.args(FILE), "&lt;");
+    query(_FILE_READ_TEXT.args(FILE), "<");
     query(_STREAM_MATERIALIZE.args(_FILE_READ_BINARY.args(FILE)), "PA==");
-    query(_STREAM_MATERIALIZE.args(_FILE_READ_TEXT.args(FILE)), "&lt;");
+    query(_STREAM_MATERIALIZE.args(_FILE_READ_TEXT.args(FILE)), "<");
   }
 
   /** Test method. */

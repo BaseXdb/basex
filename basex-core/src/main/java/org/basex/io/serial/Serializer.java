@@ -45,6 +45,8 @@ public abstract class Serializer implements AutoCloseable {
   /** Stack with namespace size pointers. */
   private final IntList nstack = new IntList();
 
+  /** Indicates if more than one item was serialized. */
+  protected boolean more;
   /** Indicates if an element is currently being opened. */
   private boolean opening;
 
@@ -113,33 +115,15 @@ public abstract class Serializer implements AutoCloseable {
    * @param item item to be serialized
    * @throws IOException I/O exception
    */
-  public final void serialize(final Item item) throws IOException {
-    serialize(item, false, false);
-  }
-
-  /**
-   * Serializes the specified item, which may be a node or an atomic value.
-   * @param item item to be serialized
-   * @param atts also serialize attributes and namespaces
-   * @param iter iterative evaluation
-   * @throws IOException I/O exception
-   */
-  public void serialize(final Item item, final boolean atts, final boolean iter)
-      throws IOException {
-
+  public void serialize(final Item item) throws IOException {
     if(item instanceof ANode) {
-      final Type type = item.type;
-      if(!atts) {
-        if(type == NodeType.ATT) throw SERATTR_X.getIO(item);
-        if(type == NodeType.NSP) throw SERNS_X.getIO(item);
-      }
-      serialize((ANode) item);
+      node((ANode) item);
     } else if(item instanceof FItem) {
-      throw SERFUNC_X.getIO(item.seqType());
+      function((FItem) item);
     } else {
-      prepare();
-      atomic(item, iter);
+      atomic(item);
     }
+    more = true;
   }
 
   /**
@@ -169,9 +153,9 @@ public abstract class Serializer implements AutoCloseable {
    * @param node node to be serialized
    * @throws IOException I/O exception
    */
-  protected void serialize(final ANode node) throws IOException {
+  protected void node(final ANode node) throws IOException {
     if(node instanceof DBNode) {
-      serialize((DBNode) node);
+      node((DBNode) node);
     } else {
       final Type type = node.type;
       if(type == NodeType.COM) {
@@ -186,7 +170,7 @@ public abstract class Serializer implements AutoCloseable {
         namespace(node.name(), node.string());
       } else if(type == NodeType.DOC) {
         openDoc(node.baseURI());
-        for(final ANode n : node.children()) serialize(n);
+        for(final ANode n : node.children()) node(n);
         closeDoc();
       } else {
         // serialize elements (code will never be called for attributes)
@@ -210,7 +194,7 @@ public abstract class Serializer implements AutoCloseable {
         }
         // serialize children
         ai = node.children();
-        for(ANode n; (n = ai.next()) != null;) serialize(n);
+        for(ANode n; (n = ai.next()) != null;) node(n);
         indent = i;
         closeElement();
       }
@@ -354,11 +338,18 @@ public abstract class Serializer implements AutoCloseable {
   /**
    * Serializes an atomic value.
    * @param item item
-   * @param iter iterative evaluation
    * @throws IOException I/O exception
    */
   @SuppressWarnings("unused")
-  protected void atomic(final Item item, final boolean iter) throws IOException { }
+  protected void atomic(final Item item) throws IOException { }
+
+  /**
+   * Serializes a function item.
+   * @param item item
+   * @throws IOException I/O exception
+   */
+  @SuppressWarnings("unused")
+  protected void function(final FItem item) throws IOException { }
 
   // PRIVATE METHODS ==========================================================
 
@@ -367,7 +358,7 @@ public abstract class Serializer implements AutoCloseable {
    * @param node database node
    * @throws IOException I/O exception
    */
-  private void serialize(final DBNode node) throws IOException {
+  private void node(final DBNode node) throws IOException {
     final FTPosData ft = node instanceof FTPosNode ? ((FTPosNode) node).ftpos : null;
     final Data data = node.data;
     int p = node.pre;

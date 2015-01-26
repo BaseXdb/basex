@@ -662,6 +662,14 @@ public abstract class SessionTest extends SandboxTest {
     assertEqual("&<>'\"", query.next());
   }
 
+  /** Runs a query and retrieves JSON.
+   * @throws IOException I/O exception */
+  @Test
+  public void queryJSON() throws IOException {
+    final Query query = session.query("declare option output:indent 'no'; map { 'a': '\n' }");
+    assertEqual("{\"a\":\"\\n\"}", query.next());
+  }
+
   /**
    * Checks if the most recent output equals the specified string.
    * @param exp expected string

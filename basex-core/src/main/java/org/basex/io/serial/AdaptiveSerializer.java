@@ -4,11 +4,13 @@ import java.io.*;
 
 import org.basex.io.out.*;
 import org.basex.io.serial.json.*;
+import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.Array;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -22,9 +24,6 @@ public final class AdaptiveSerializer extends OutputSerializer {
   private final XMLSerializer xml;
   /** JSON serializer. */
   private final JsonNodeSerializer json;
-
-  /** Indicates if more than one item is serialized. */
-  private boolean sep;
 
   /**
    * Constructor, specifying serialization options.
@@ -47,43 +46,46 @@ public final class AdaptiveSerializer extends OutputSerializer {
    * @throws IOException I/O exception
    */
   public void serialize(final Value value) throws IOException {
-    final boolean s = sep;
-    for(final Item it : value) serialize(it, false, false);
-    sep = s;
+    more = false;
+    for(final Item it : value) serialize(it);
   }
 
   @Override
-  public void serialize(final Item item, final boolean atts, final boolean iter)
-      throws IOException {
+  public void serialize(final Item item) throws IOException {
+    if(more) xml.printChars(itemsep);
+    super.serialize(item);
+  }
 
-    if(sep) xml.printChars(itemsep);
+  @Override
+  protected void node(final ANode item) throws IOException {
+    final Type type = item.type;
+    if(type == NodeType.ATT) xml.attribute(item.name(), item.string());
+    else if(type == NodeType.NSP) xml.namespace(item.name(), item.string());
+    else xml.node(item);
+    xml.reset();
+  }
 
-    if(item instanceof FItem) {
-      if(item instanceof Map || item instanceof Array) {
-        json.serialize(item);
-        json.reset();
-      } else {
-        final FItem fi = (FItem) item;
-        final TokenBuilder tb = new TokenBuilder("function ");
-        final QNm fn = fi.funcName();
-        if(fn == null) tb.add("(anonymous)");
-        else tb.add(fn.string());
-        xml.out.print(tb.add('#').addInt(fi.arity()).finish());
-      }
+  @Override
+  protected void function(final FItem item) throws IOException {
+    if(item instanceof Map || item instanceof Array) {
+      json.function(item);
+      json.reset();
     } else {
-      if(item instanceof ANode) {
-        xml.serialize((ANode) item);
-      } else {
-        xml.serialize(item, atts, iter);
-      }
-      xml.reset();
+      final TokenBuilder tb = new TokenBuilder("function ");
+      final QNm fn = item.funcName();
+      if(fn == null) tb.add("(anonymous)");
+      else tb.add(fn.string());
+      xml.out.print(tb.add('#').addInt(item.arity()).finish());
     }
-    sep = true;
   }
 
   @Override
-  public void reset() {
-    sep = false;
+  protected void atomic(final Item item) throws IOException {
+    try {
+      xml.out.print(item.string(null));
+    } catch(final QueryException ex) {
+      throw new QueryIOException(ex);
+    }
   }
 
   @Override

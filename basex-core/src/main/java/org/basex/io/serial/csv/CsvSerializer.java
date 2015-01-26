@@ -1,5 +1,6 @@
 package org.basex.io.serial.csv;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
@@ -7,6 +8,7 @@ import java.io.*;
 import org.basex.build.csv.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
+import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -69,5 +71,10 @@ abstract class CsvSerializer extends StandardSerializer {
       out.print(txt);
     }
     newline();
+  }
+
+  @Override
+  protected void atomic(final Item value) throws IOException {
+    throw BXCS_SERIAL_X.getIO("Atomic values cannot be serialized");
   }
 }

@@ -6,8 +6,7 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 
 /**
- * Iterator interface, extending the default iterator with a {@link #more}
- * method.
+ * Iterator interface, extending the default iterator with a {@link #more()} method.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen

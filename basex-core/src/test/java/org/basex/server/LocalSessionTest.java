@@ -1,5 +1,7 @@
 package org.basex.server;
 
+import java.io.*;
+
 import org.basex.api.client.*;
 import org.junit.*;
 
@@ -14,5 +16,13 @@ public class LocalSessionTest extends SessionTest {
   @Before
   public void startSession() {
     session = new LocalSession(context, out);
+  }
+
+  /** Runs a query and retrieves JSON.
+   * @throws IOException I/O exception */
+  @Test
+  public void x() throws IOException {
+    final Query query = session.query("declare option output:indent 'no'; map { 'a': '\n' }");
+    System.out.println(query.next());
   }
 }

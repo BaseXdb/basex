@@ -21,8 +21,8 @@ public final class FnTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void unparsedText() {
-    contains(UNPARSED_TEXT.args(TEXT), "&lt;html");
-    contains(UNPARSED_TEXT.args(TEXT, "US-ASCII"), "&lt;html");
+    contains(UNPARSED_TEXT.args(TEXT), "<html");
+    contains(UNPARSED_TEXT.args(TEXT, "US-ASCII"), "<html");
     error(UNPARSED_TEXT.args(TEXT, "xyz"), ENCODING_X);
   }
 
@@ -35,8 +35,8 @@ public final class FnTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void serialize() {
-    contains(SERIALIZE.args("<x/>"), "&lt;x/&gt;");
-    contains(SERIALIZE.args("<x/>", serialParams("")), "&lt;x/&gt;");
+    contains(SERIALIZE.args("<x/>"), "<x/>");
+    contains(SERIALIZE.args("<x/>", serialParams("")), "<x/>");
     contains(SERIALIZE.args("<x>a</x>", serialParams("<method value='text'/>")), "a");
   }
 

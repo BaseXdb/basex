@@ -135,11 +135,11 @@ public final class ServerQuery extends Proc {
           if(iter) {
             po.write(full ? it.xdmInfo() : it.typeId().bytes());
             ser.reset();
-            ser.serialize(it, full, true);
+            ser.serialize(it);
             po.flush();
             out.write(0);
           } else {
-            ser.serialize(it, full, false);
+            ser.serialize(it);
           }
           c++;
         }

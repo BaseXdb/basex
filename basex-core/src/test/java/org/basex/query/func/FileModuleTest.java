@@ -208,7 +208,7 @@ public final class FileModuleTest extends AdvancedQueryTest {
     assertEquals(3, query(_FILE_READ_TEXT.args(PATH1, "CP1252")).length());
     query(_FILE_WRITE_BINARY.args(PATH1, "xs:hexBinary('00')"));
     error(_FILE_READ_TEXT.args(PATH1), FILE_IO_ERROR_X);
-    query("declare option db:checkstrings 'off';" + _FILE_READ_TEXT.args(PATH1), "&#x0;");
+    query("declare option db:checkstrings 'off';" + _FILE_READ_TEXT.args(PATH1), "\u0000");
     query(_FILE_DELETE.args(PATH1));
   }
 
@@ -257,7 +257,7 @@ public final class FileModuleTest extends AdvancedQueryTest {
     query(_FILE_READ_TEXT.args(PATH1, "CP1252"), "a\u00e4");
 
     query(_FILE_WRITE.args(PATH1, "\"<a/>\"", serialParams("<method value='text'/>")));
-    query(_FILE_READ_TEXT.args(PATH1), "&lt;a/&gt;");
+    query(_FILE_READ_TEXT.args(PATH1), "<a/>");
     query(_FILE_DELETE.args(PATH1));
 
     // test spaces in filename
@@ -290,7 +290,7 @@ public final class FileModuleTest extends AdvancedQueryTest {
     query(_FILE_DELETE.args(PATH1));
 
     query(_FILE_APPEND.args(PATH1, "\"<a/>\"", serialParams("<method value='text'/>")));
-    query(_FILE_READ_TEXT.args(PATH1), "&lt;a/&gt;");
+    query(_FILE_READ_TEXT.args(PATH1), "<a/>");
     query(_FILE_DELETE.args(PATH1));
   }
 

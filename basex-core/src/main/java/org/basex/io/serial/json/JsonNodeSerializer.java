@@ -85,13 +85,13 @@ public final class JsonNodeSerializer extends JsonSerializer {
   }
 
   @Override
-  protected void serialize(final ANode node) throws IOException {
+  protected void node(final ANode node) throws IOException {
     final boolean doc = node.type == NodeType.DOC;
     final boolean elm = node.type == NodeType.ELM && eq(JSON, node.name());
     if(custom || doc || elm) {
       final boolean c = custom;
       if(!custom) custom = elm;
-      super.serialize(node);
+      super.node(node);
       custom = c;
     } else {
       ser.serialize(node);

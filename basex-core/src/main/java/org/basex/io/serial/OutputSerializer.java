@@ -41,6 +41,11 @@ public abstract class OutputSerializer extends Serializer {
   }
 
   @Override
+  public void reset() {
+    more = false;
+  }
+
+  @Override
   public final boolean finished() {
     return out.finished();
   }

@@ -13,7 +13,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.hash.*;
 import org.basex.util.options.Options.YesNo;
@@ -49,10 +48,36 @@ public abstract class JsonSerializer extends StandardSerializer {
   }
 
   @Override
-  public void serialize(final Item item, final boolean atts, final boolean iter)
-      throws IOException {
-
+  public void serialize(final Item item) throws IOException {
     if(sep) throw SERJSON.getIO();
+    if(item == null) {
+      out.print(NULL);
+    } else {
+      super.serialize(item);
+    }
+    sep = true;
+  }
+
+  /**
+   * Serializes a value.
+   * @param value value
+   * @throws IOException I/O exception
+   */
+  private void serialize(final Value value) throws IOException {
+    if(value.size() > 1) {
+      if(adaptive != null) {
+        adaptive.serialize(value);
+      } else {
+        throw SERJSONSEQ.getIO();
+      }
+    } else {
+      sep = false;
+      serialize(value.isEmpty() ? null : (Item) value);
+    }
+  }
+
+  @Override
+  public void function(final FItem item) throws IOException {
     try {
       if(item instanceof Map) {
         level++;
@@ -99,22 +124,12 @@ public abstract class JsonSerializer extends StandardSerializer {
         indent();
         out.print(']');
 
-      } else if(item instanceof FItem) {
+      } else {
         if(adaptive != null) {
           adaptive.serialize(item);
         } else {
           throw SERJSONFUNC_X.getIO(item.type);
         }
-
-      } else if(item instanceof ANode) {
-        serialize((ANode) item);
-
-      } else if(item == null) {
-        // empty sequence
-        out.print(NULL);
-
-      } else {
-        atomic(item, false);
       }
     } catch(final QueryException ex) {
       throw new QueryIOException(ex);
@@ -122,26 +137,8 @@ public abstract class JsonSerializer extends StandardSerializer {
     sep = true;
   }
 
-  /**
-   * Serializes a value.
-   * @param value value
-   * @throws IOException I/O exception
-   */
-  private void serialize(final Value value) throws IOException {
-    if(value.size() > 1) {
-      if(adaptive != null) {
-        adaptive.serialize(value);
-      } else {
-        throw SERJSONSEQ.getIO();
-      }
-    } else {
-      sep = false;
-      serialize(value.isEmpty() ? null : (Item) value);
-    }
-  }
-
   @Override
-  protected void atomic(final Item item, final boolean iter) throws IOException {
+  protected void atomic(final Item item) throws IOException {
     try {
       if(item.type.isNumber()) {
         final byte[] str = item.string(null);

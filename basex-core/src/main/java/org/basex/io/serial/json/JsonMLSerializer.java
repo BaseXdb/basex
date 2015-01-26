@@ -88,7 +88,7 @@ public final class JsonMLSerializer extends JsonSerializer {
   }
 
   @Override
-  protected void atomic(final Item value, final boolean iter) throws IOException {
+  protected void atomic(final Item value) throws IOException {
     throw BXJS_SERIAL_X.getIO("Atomic values cannot be serialized");
   }
 }

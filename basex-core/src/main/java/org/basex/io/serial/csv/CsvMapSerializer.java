@@ -33,9 +33,7 @@ public final class CsvMapSerializer extends CsvSerializer {
   }
 
   @Override
-  public void serialize(final Item item, final boolean atts, final boolean iter)
-      throws IOException {
-
+  public void serialize(final Item item) throws IOException {
     if(sep && level == 0) out.print(' ');
 
     if(!(item instanceof Map))
