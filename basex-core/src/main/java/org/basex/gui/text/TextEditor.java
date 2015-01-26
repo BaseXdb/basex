@@ -514,7 +514,7 @@ public final class TextEditor {
     if(p == pos) return;
 
     // find insertion candidates
-    final LinkedHashMap<String, String> tmp = new LinkedHashMap<>();
+    final TreeMap<String, String> tmp = new TreeMap<>();
     for(final Map.Entry<String, String> entry : REPLACE.entrySet()) {
       final String key = entry.getKey();
       if(key.startsWith(prefix)) tmp.put(key, entry.getValue());
@@ -1196,7 +1196,7 @@ public final class TextEditor {
   }
 
   /** Index for all replacements. */
-  private static final LinkedHashMap<String, String> REPLACE = new LinkedHashMap<>();
+  private static final HashMap<String, String> REPLACE = new HashMap<>();
 
   /** Reads in the property file. */
   static {
