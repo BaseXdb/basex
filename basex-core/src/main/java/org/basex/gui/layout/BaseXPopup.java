@@ -57,6 +57,7 @@ public final class BaseXPopup extends JPopupMenu {
       @Override
       public void keyPressed(final KeyEvent e) {
         if(!gui.updating && CONTEXT.is(e)) {
+          System.out.println("[1]");
           show(e.getComponent(), 10, 10);
         } else {
           for(final GUICommand cmd : cmds) {

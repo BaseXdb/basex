@@ -665,7 +665,8 @@ public class TextPanel extends BaseXPanel {
 
   @Override
   public void keyTyped(final KeyEvent e) {
-    if(!hist.active() || control(e) || DELNEXT.is(e) || DELPREV.is(e) || ESCAPE.is(e)) return;
+    if(!hist.active() || control(e) || DELNEXT.is(e) || DELPREV.is(e) || ESCAPE.is(e) || CUT2.is(e))
+      return;
 
     final int caret = editor.pos();
 
