@@ -120,7 +120,7 @@ public final class WesternTokenizer extends Tokenizer {
     if(--next < 0) hasNext();
 
     byte[] t = token();
-    if(all) return t;
+    if(original) return t;
 
     final boolean a = ascii(t);
     if(!a && !diacritics) t = noDiacritics(t);

@@ -12,7 +12,9 @@ public abstract class Tokenizer extends LanguageImpl {
   /** List of available tokenizers. */
   static final ArrayList<Tokenizer> IMPL = new ArrayList<>();
 
-  /** Also return non-fulltext tokens. */
+  /** Return original tokens. */
+  boolean original;
+  /** Return all tokens. */
   boolean all;
 
   /** Load tokenizer classes and order them by precedence. */

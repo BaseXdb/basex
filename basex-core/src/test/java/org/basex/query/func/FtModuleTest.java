@@ -211,4 +211,17 @@ public final class FtModuleTest extends AdvancedQueryTest {
     query("count(" + _FT_TOKENIZE.args("") + ')', "0");
     query("count(" + _FT_TOKENIZE.args("a!b:c") + ')', "3");
   }
+
+  /** Test method. */
+  @Test
+  public void normalize() {
+    query(_FT_NORMALIZE.args("A bc"), "a bc");
+    query(_FT_NORMALIZE.args("A bc", " map { 'case': 'sensitive' }"), "A bc");
+    query(_FT_NORMALIZE.args("\u00e4", " map { 'diacritics': 'sensitive' }"), "\u00e4");
+    query(_FT_NORMALIZE.args("gifts", " map { 'stemming': 'true' }"), "gift");
+
+    query("declare ft-option using stemming; " + _FT_NORMALIZE.args("Gifts"), "gift");
+    query(_FT_NORMALIZE.args(""), "");
+    query(_FT_NORMALIZE.args("a!b:c"), "a!b:c");
+  }
 }

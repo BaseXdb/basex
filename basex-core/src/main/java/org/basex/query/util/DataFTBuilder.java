@@ -52,7 +52,7 @@ final class DataFTBuilder {
     final TokenBuilder token = new TokenBuilder();
     // indicates if the currently parsed text is marked
     final byte[] string = node.string();
-    for(final FTLexer lex = new FTLexer().all().init(string); lex.hasNext();) {
+    for(final FTLexer lex = new FTLexer().original().init(string); lex.hasNext();) {
       final FTSpan span = lex.next();
       // check if current text is still to be marked or already marked
       if(!span.del && ftp.contains(span.pos)) {

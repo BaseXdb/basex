@@ -352,7 +352,7 @@ final class JapaneseTokenizer extends Tokenizer {
   }
 
   /**
-   * Returns the token which contains special character.
+   * Returns the token which contains special characters.
    * @return token
    */
   private byte[] getSC() {
@@ -369,7 +369,7 @@ final class JapaneseTokenizer extends Tokenizer {
 
   @Override
   public byte[] nextToken() {
-    return all ? getSC() : get();
+    return original ? getSC() : get();
   }
 
   @Override

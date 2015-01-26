@@ -941,6 +941,8 @@ public enum Function {
       FT_URI),
   /** XQuery function. */
   _FT_TOKENIZE(FtTokenize.class, "tokenize(string[,options])", arg(STR, ITEM), STR_ZM, FT_URI),
+  /** XQuery function. */
+  _FT_NORMALIZE(FtNormalize.class, "normalize(string[,options])", arg(STR, ITEM), STR, FT_URI),
 
   /* Hash Module. */
 

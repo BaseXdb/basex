@@ -82,6 +82,15 @@ public final class FTLexer extends FTIterator implements IndexToken {
   }
 
   /**
+   * If called, the original tokens will be returned (including non-fulltext tokens).
+   * @return self reference
+   */
+  public FTLexer original() {
+    tok.original = true;
+    return all();
+  }
+
+  /**
    * If called, all tokens will be returned (including non-fulltext tokens).
    * @return self reference
    */
