@@ -179,6 +179,7 @@ index_not_dropped_%  = インデックスを削除できませんでした。
 index_text           = テキストインデックスを作成中です。
 indexes              = インデックス
 information          = 情報
+input                = 入力
 input_bar            = 入力フィールド
 input_format         = 入力形式
 input_history        = 入力履歴

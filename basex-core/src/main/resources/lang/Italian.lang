@@ -179,6 +179,7 @@ index_not_dropped_%  = Impossibile cancellare gli indici '%'.
 index_text           = Sto indicizzando il testo
 indexes              = Indici
 information          = Informazione
+input                = Input
 input_bar            = Campo di inserimento
 input_format         = Inserisci formato
 input_history        = Input history

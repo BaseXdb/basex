@@ -38,7 +38,7 @@ public class ByteList extends ElementList {
    */
   public ByteList add(final int element) {
     byte[] lst = list;
-    int s = size;
+    final int s = size;
     if(s == lst.length) lst = Arrays.copyOf(lst, newSize());
     lst[s] = (byte) element;
     list = lst;

@@ -179,6 +179,7 @@ index_not_dropped_%  = El Índice '%' no pudo ser borrado.
 index_text           = Indizando texto
 indexes              = Índices
 information          = Información
+input                = Entrada
 input_bar            = Barra de entrada
 input_format         = Formato de entrada
 input_history        = Historial de entrada

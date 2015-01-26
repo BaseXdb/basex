@@ -179,6 +179,7 @@ index_not_dropped_%  = Indeks '%' tidak dapat dihancurkan.
 index_text           = Mengindeks Teks
 indexes              = Indeks
 information          = Informasi
+input                = Masukan
 input_bar            = Balok masukan
 input_format         = Format masukan
 input_history        = Sejarah masukan

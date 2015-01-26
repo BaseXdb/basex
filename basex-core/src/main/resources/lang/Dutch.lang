@@ -179,6 +179,7 @@ index_not_dropped_%  = Index '%' kon niet verwijderd worden.
 index_text           = Text indexeren
 indexes              = Indexen
 information          = Informatie
+input                = Input
 input_bar            = Invoerveld
 input_format         = Input format
 input_history        = Input history

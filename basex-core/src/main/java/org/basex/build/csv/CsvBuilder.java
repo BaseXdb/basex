@@ -23,7 +23,7 @@ public final class CsvBuilder extends CsvConverter {
   /** Record. */
   private boolean record;
   /** Builder. */
-  private Builder builder;
+  private final Builder builder;
   /** Current line. */
   private int line;
 

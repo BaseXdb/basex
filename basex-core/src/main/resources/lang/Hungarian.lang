@@ -179,6 +179,7 @@ index_not_dropped_%  = '%' indexet nem sikerült eldobni.
 index_text           = Szöveg indexelése folyamatban
 indexes              = Indexek
 information          = Információk
+input                = Bemeneti
 input_bar            = Bemeneti sor
 input_format         = Bemeneti formátum
 input_history        = Bemeneti történelem

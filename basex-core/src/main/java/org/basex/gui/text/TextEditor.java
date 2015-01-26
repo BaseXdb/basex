@@ -1,11 +1,15 @@
 package org.basex.gui.text;
 
-import static org.basex.util.Token.*;
 import static org.basex.util.FTToken.*;
+import static org.basex.util.Token.*;
 
+import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 
+import javax.swing.*;
+
+import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.text.TextPanel.SearchDir;
 import org.basex.io.*;
@@ -498,48 +502,72 @@ public final class TextEditor {
 
   /**
    * Code completion.
+   * @param tp text panel
    */
-  void complete() {
+  void complete(final TextPanel tp) {
     if(selected()) return;
 
-    // ignore space before cursor
-    final boolean space = pos > 0 && ws(text[pos - 1]);
-    if(space) pos--;
-
-    // replace pre-defined completion strings
-    final int rs = REPLACE.size();
-    for(int s = 0; s < rs; s += 2) {
-      final String key = REPLACE.get(s);
-      if(!find(key)) continue;
-      // key found
-      String value = REPLACE.get(s + 1);
-      final int p = pos - key.length(), car = value.indexOf('_');
-      if(car != -1) value = value.replace("_", "");
-      // adopt current indentation
-      final int ind = open();
-      if(ind != 0) {
-        final StringBuilder spaces = new StringBuilder();
-        for(int i = 0; i < ind; i++) spaces.append(' ');
-        value = new TokenBuilder().addSep(value.split("\n"), "\n" + spaces).toString();
-      }
-      // delete old string, add new one
-      replace(p, pos + (space ? 1 : 0), value);
-      // adjust cursor
-      if(car != -1) pos = p + car;
-    }
-
-    // replace entities
+    // find first character
     int p = pos;
-    while(--p >= 0 && XMLToken.isChar(text[p]));
-    ++p;
-    final String key = string(text, p, pos - p);
-    final byte[] value = XMLToken.getEntity(token(key));
-    if(value != null) {
-      replace(p, pos + (space ? 1 : 0), string(value));
-      return;
+    while(p > 0 && !ws(text[p - 1])) --p;
+    final String prefix = string(substring(text, p, pos));
+    if(p == pos) return;
+
+    // find insertion candidates
+    final LinkedHashMap<String, String> tmp = new LinkedHashMap<>();
+    for(final Map.Entry<String, String> entry : REPLACE.entrySet()) {
+      final String key = entry.getKey();
+      if(key.startsWith(prefix)) tmp.put(key, entry.getValue());
     }
 
-    if(space) pos++;
+    if(tmp.size() == 1) {
+      // insert single candidate
+      complete(tmp.values().iterator().next(), p);
+    } else if(!tmp.isEmpty()) {
+      // show popup menu
+      final int startPos = p;
+      final JPopupMenu pm = new JPopupMenu();
+      final ActionListener al = new ActionListener() {
+        @Override
+        public void actionPerformed(final ActionEvent ae) {
+          complete(ae.getActionCommand().replaceAll("^.*?\\] ", ""), startPos);
+        }
+      };
+
+      JMenuItem mi = new JMenuItem(Text.INPUT + Text.COLS + prefix);
+      mi.setEnabled(false);
+      pm.add(mi);
+      for(final Map.Entry<String, String> entry : tmp.entrySet()) {
+        mi = new JMenuItem("[" + entry.getKey() + "] " + entry.getValue());
+        pm.add(mi);
+        mi.addActionListener(al);
+      }
+      final int[] cursor = tp.rend.cursor();
+      pm.show(tp, cursor[0], cursor[1]);
+    }
+  }
+
+  /**
+   * Inserts the specified value and updates the cursor position.
+   * @param value value
+   * @param p position to start completion from
+   */
+  void complete(final String value, final int p) {
+    // key found
+    String v = value;
+    final int car = v.indexOf('_');
+    if(car != -1) v = v.replace("_", "");
+    // adopt current indentation
+    final int ind = open();
+    if(ind != 0) {
+      final StringBuilder spaces = new StringBuilder();
+      for(int i = 0; i < ind; i++) spaces.append(' ');
+      v = new TokenBuilder().addSep(v.split("\n"), "\n" + spaces).toString();
+    }
+    // delete old string, add new one
+    replace(p, pos, v);
+    // adjust cursor
+    if(car != -1) pos = p + car;
   }
 
   /**
@@ -874,17 +902,6 @@ public final class TextEditor {
   }
 
   /**
-   * Checks if the specified key is found before the current cursor position.
-   * @param key string to be found
-   * @return result of check
-   */
-  private boolean find(final String key) {
-    final byte[] k = token(key);
-    final int s = pos - k.length;
-    return s >= 0 && indexOf(text, k, s) == s && (s == 0 || !XMLToken.isChar(text[s - 1]));
-  }
-
-  /**
    * Extends the current selection to the beginning of the first and the end of the last line.
    * @return if text is selected
    */
@@ -1179,7 +1196,7 @@ public final class TextEditor {
   }
 
   /** Index for all replacements. */
-  private static final StringList REPLACE = new StringList();
+  private static final LinkedHashMap<String, String> REPLACE = new LinkedHashMap<>();
 
   /** Reads in the property file. */
   static {
@@ -1193,8 +1210,7 @@ public final class TextEditor {
           for(String line; (line = nli.readLine()) != null;) {
             final int i = line.indexOf('=');
             if(i == -1 || line.startsWith("#")) continue;
-            REPLACE.add(line.substring(0, i));
-            REPLACE.add(line.substring(i + 1).replace("\\n", "\n"));
+            REPLACE.put(line.substring(0, i), line.substring(i + 1).replace("\\n", "\n"));
           }
         }
       }

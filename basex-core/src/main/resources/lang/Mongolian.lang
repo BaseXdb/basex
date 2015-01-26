@@ -179,6 +179,7 @@ index_not_dropped_%  = Индекс '%' нь устгагдсангүй.
 index_text           = Текст индексжүүлэлт
 indexes              = Индексүүд
 information          = Мэдээлэл
+input                = Оролтын
 input_bar            = Оролтын комманд хэсэг
 input_format         = Оролтын хэлбэр
 input_history        = Input history

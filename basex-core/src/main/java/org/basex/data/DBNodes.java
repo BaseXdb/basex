@@ -28,7 +28,7 @@ public final class DBNodes implements Result {
   /** Sorted pre values. */
   public int[] sorted;
   /** Full-text position data (for visualization). */
-  private FTPosData ftpos;
+  private final FTPosData ftpos;
 
   /**
    * Constructor, specifying a database and pre values.

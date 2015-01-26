@@ -55,11 +55,12 @@ public class TextPanel extends BaseXPanel {
   public final TextEditor editor;
   /** Undo history. */
   public final History hist;
+
   /** Search bar. */
   protected SearchBar search;
-
   /** Renderer reference. */
-  private final TextRenderer rend;
+  protected final TextRenderer rend;
+
   /** Scrollbar reference. */
   private final BaseXScrollBar scroll;
   /** Editable flag. */
@@ -600,7 +601,7 @@ public class TextPanel extends BaseXPanel {
       } else if(MOVEUP.is(e)) {
         editor.move(false);
       } else if(COMPLETE.is(e)) {
-        editor.complete();
+        editor.complete(this);
       } else if(DELLINE.is(e)) {
         editor.deleteLine();
       } else if(DELNEXTWORD.is(e)) {

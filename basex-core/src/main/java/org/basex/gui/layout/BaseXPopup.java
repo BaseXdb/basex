@@ -25,21 +25,21 @@ public final class BaseXPopup extends JPopupMenu {
   /**
    * Constructor.
    * @param comp component reference
-   * @param cmds popup reference
+   * @param commands associated commands
    */
-  public BaseXPopup(final BaseXPanel comp, final GUICommand... cmds) {
-    this(comp, comp.gui, cmds);
+  public BaseXPopup(final BaseXPanel comp, final GUICommand... commands) {
+    this(comp, comp.gui, commands);
   }
 
   /**
    * Constructor.
    * @param comp component reference
-   * @param g gui reference
-   * @param cmds popup reference
+   * @param gui gui reference
+   * @param commands associated commands
    */
-  public BaseXPopup(final JComponent comp, final GUI g, final GUICommand... cmds) {
-    commands = cmds;
-    gui = g;
+  public BaseXPopup(final JComponent comp, final GUI gui, final GUICommand... commands) {
+    this.commands = commands;
+    this.gui = gui;
 
     // both listeners must be implemented to support different platforms
     comp.addMouseListener(new MouseAdapter() {
@@ -59,11 +59,11 @@ public final class BaseXPopup extends JPopupMenu {
         if(!gui.updating && CONTEXT.is(e)) {
           show(e.getComponent(), 10, 10);
         } else {
-          for(final GUICommand cmd : cmds) {
+          for(final GUICommand cmd : commands) {
             if(cmd instanceof GUIPopupCmd) {
               for(final BaseXKeys sc : ((GUIPopupCmd) cmd).shortcuts()) {
                 if(sc.is(e)) {
-                  cmd.execute(g);
+                  cmd.execute(gui);
                   e.consume();
                   return;
                 }
@@ -75,7 +75,7 @@ public final class BaseXPopup extends JPopupMenu {
     });
 
     final StringBuilder mnemCache = new StringBuilder();
-    for(final GUICommand cmd : cmds) {
+    for(final GUICommand cmd : commands) {
       if(cmd == null) {
         addSeparator();
       } else {

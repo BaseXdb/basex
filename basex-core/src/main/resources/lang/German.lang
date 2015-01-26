@@ -179,6 +179,7 @@ index_not_dropped_%  = Index '%' konnte nicht gelöscht werden.
 index_text           = Indiziere Texte
 indexes              = Indizes
 information          = Information
+input                = Eingabe
 input_bar            = Eingabeleiste
 input_format         = Eingabe-Format
 input_history        = Eingabehistorie

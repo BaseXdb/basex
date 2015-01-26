@@ -106,13 +106,13 @@ final class DataFTBuilder {
 
       // still too much text: remove hits
       for(int m = ms - 1; m >= 0 && ln > 0; m--) {
-        DataFTMarker dm = marks.get(m);
+        final DataFTMarker dm = marks.get(m);
         if(dm.mark) ln -= marks.remove(m).token.length;
       }
 
       // merge adjacent text nodes
       for(int m = marks.size() - 2; m >= 0; m--) {
-        DataFTMarker dm1 = marks.get(m), dm2 = marks.get(m + 1);
+        final DataFTMarker dm1 = marks.get(m), dm2 = marks.get(m + 1);
         if(!dm1.mark && !dm2.mark) {
           if(!(eq(dm1.token, DOTS) && eq(dm2.token, DOTS))) {
             dm1.token = concat(dm1.token, dm2.token);

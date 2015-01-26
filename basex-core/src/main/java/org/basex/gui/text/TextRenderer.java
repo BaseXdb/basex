@@ -73,6 +73,9 @@ final class TextRenderer extends BaseXBack {
   /** Indicates if the cursor is located in the current line. */
   private boolean lineC;
 
+  /** Cursor position. */
+  private final int[] cursor = new int[2];
+
   /** Vertical start position. */
   private Syntax syntax = Syntax.SIMPLE;
   /** Visibility of text cursor. */
@@ -197,6 +200,14 @@ final class TextRenderer extends BaseXBack {
    */
   int[] replace(final ReplaceContext rc) {
     return text.replace(rc);
+  }
+
+  /**
+   * Returns the cursor coordinates.
+   * @return coordinates
+   */
+  int[] cursor() {
+    return cursor;
   }
 
   /**
@@ -519,6 +530,8 @@ final class TextRenderer extends BaseXBack {
   private void drawCaret(final Graphics g, final int xx) {
     g.setColor(GUIConstants.dgray);
     g.fillRect(xx, lineY, 2, fontHeight);
+    cursor[0] = xx;
+    cursor[1] = lineY + fontHeight;
   }
 
   /**

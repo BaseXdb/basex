@@ -76,7 +76,7 @@ public final class BaseXScrollBar extends BaseXPanel {
    * Refreshes the layout.
    */
   public void refreshLayout() {
-    ww = 10 + (GUIConstants.fontSize / 2);
+    ww = 10 + GUIConstants.fontSize / 2;
     setPreferredSize(new Dimension(ww, getPreferredSize().height));
   }
 

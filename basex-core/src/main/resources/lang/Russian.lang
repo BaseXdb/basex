@@ -179,6 +179,7 @@ index_not_dropped_%  = Невозможно удалить индекс '%'
 index_text           = Индексируется текст
 indexes              = Индексы
 information          = Информация
+input                = Исходный
 input_bar            = Строка ввода
 input_format         = Исходный формат
 input_history        = История

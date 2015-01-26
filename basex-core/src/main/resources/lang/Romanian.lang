@@ -179,6 +179,7 @@ index_not_dropped_%  = Indexul '%' nu a putut fi sters.
 index_text           = Indexare text
 indexes              = Indecsi
 information          = Informații
+input                = Input
 input_bar            = Bara de inserare
 input_format         = Formatare intrari
 input_history        = Input history

@@ -189,7 +189,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
     final ArrayOutput ao = new ArrayOutput();
     try {
       try(final Serializer ser = Serializer.get(ao, options)) {
-        for(Item it : this) ser.serialize(it);
+        for(final Item it : this) ser.serialize(it);
       }
     } catch(final QueryIOException ex) {
       throw ex;

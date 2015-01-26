@@ -179,6 +179,7 @@ index_not_dropped_%  = Impossible d'effacer l'index '%'.
 index_text           = Indexation du texte en cours
 indexes              = Index
 information          = Information
+input                = Entrée
 input_bar            = Champ de saisie
 input_format         = Format d'entrée
 input_history        = Historique des inputs
