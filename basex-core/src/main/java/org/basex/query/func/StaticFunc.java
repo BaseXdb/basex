@@ -95,16 +95,6 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     compiling = false;
   }
 
-  /**
-   * Checks if this function can be inlined.
-   * @param qc query context
-   * @return result of check
-   */
-  private boolean inline(final QueryContext qc) {
-    return expr.isValue() || expr.exprSize() < qc.context.options.get(MainOptions.INLINELIMIT) &&
-        !(compiling || has(Flag.CTX) || selfRecursive());
-  }
-
   @Override
   public void plan(final FElem plan) {
     final FElem el = planElem(NAM, name.string());
@@ -291,5 +281,16 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     // copy the function body
     final Expr cpy = expr.copy(qc, scp, vs);
     return cls == null ? cpy : new GFLWOR(info, cls, cpy).optimize(qc, scp);
+  }
+
+  /**
+   * Checks if this function can be inlined.
+   * @param qc query context
+   * @return result of check
+   */
+  private boolean inline(final QueryContext qc) {
+    return expr.isValue() || anns.contains(Annotation._BASEX_INLINE) ||
+        expr.exprSize() < qc.context.options.get(MainOptions.INLINELIMIT) &&
+        !(compiling || has(Flag.CTX) || selfRecursive());
   }
 }

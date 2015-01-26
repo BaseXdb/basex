@@ -86,27 +86,22 @@ public final class StaticVar extends StaticDecl {
    */
   Value value(final QueryContext qc) throws QueryException {
     if(dontEnter) throw circVarError(this);
+
     if(lazy) {
       if(!compiled) throw Util.notExpected(this + " was not compiled.");
-      if(val != null) return val;
-      dontEnter = true;
-      final int fp = scope.enter(qc);
-      try {
-        return bind(expr.value(qc));
-      } catch(final QueryException qe) {
-        throw qe.notCatchable();
-      } finally {
-        scope.exit(qc, fp);
-        dontEnter = false;
-      }
+    } else {
+      if(expr == null) throw VAREMPTY_X.get(info, this);
     }
 
     if(val != null) return val;
-    if(expr == null) throw VAREMPTY_X.get(info, this);
     dontEnter = true;
+
     final int fp = scope.enter(qc);
     try {
       return bind(expr.value(qc));
+    } catch(final QueryException qe) {
+      if(lazy) qe.notCatchable();
+      throw qe;
     } finally {
       scope.exit(qc, fp);
       dontEnter = false;

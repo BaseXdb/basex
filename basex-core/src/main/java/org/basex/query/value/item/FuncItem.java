@@ -212,8 +212,7 @@ public final class FuncItem extends FItem implements Scope {
   public Expr inlineExpr(final Expr[] exprs, final QueryContext qc, final VarScope scp,
       final InputInfo ii) throws QueryException {
 
-    if(!(expr.isValue() || expr.exprSize() < qc.context.options.get(MainOptions.INLINELIMIT) &&
-        !expr.has(Flag.CTX) && !expr.has(Flag.UPD))) return null;
+    if(!(inline(qc))) return null;
     qc.compInfo(OPTINLINE, this);
 
     // create let bindings for all variables
@@ -243,6 +242,16 @@ public final class FuncItem extends FItem implements Scope {
       }
     });
     return cls == null ? rt : new GFLWOR(ii, cls, rt).optimize(qc, scp);
+  }
+
+  /**
+   * Checks if this function can be inlined.
+   * @param qc query context
+   * @return result of check
+   */
+  private boolean inline(final QueryContext qc) {
+    return expr.isValue() || expr.exprSize() < qc.context.options.get(MainOptions.INLINELIMIT) &&
+        !expr.has(Flag.CTX);
   }
 
   @Override
