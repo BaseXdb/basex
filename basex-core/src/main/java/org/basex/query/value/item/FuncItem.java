@@ -211,7 +211,7 @@ public final class FuncItem extends FItem implements Scope {
   public Expr inlineExpr(final Expr[] exprs, final QueryContext qc, final VarScope scp,
       final InputInfo ii) throws QueryException {
 
-    if(!StaticFunc.inline(qc, anns, expr) || has(Flag.CTX)) return null;
+    if(!StaticFunc.inline(qc, anns, expr) || expr.has(Flag.CTX)) return null;
     qc.compInfo(OPTINLINE, this);
 
     // create let bindings for all variables
