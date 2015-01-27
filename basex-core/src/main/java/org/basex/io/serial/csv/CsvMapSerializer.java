@@ -41,10 +41,10 @@ public final class CsvMapSerializer extends CsvSerializer {
 
     try {
       final TokenList tl = new TokenList();
-      final Map map = (Map) item;
+      final Map m = (Map) item;
 
       // check validity of keys
-      final Value keys = map.keys();
+      final Value keys = m.keys();
       long rows = 0;
       for(final Item key : keys) {
         if(key.type != AtomType.ITR) throw BXCS_SERIAL_X.getIO("Key " + key + " is not numeric");
@@ -55,7 +55,7 @@ public final class CsvMapSerializer extends CsvSerializer {
 
       // iterate through all rows
       for(int i = 0; i < rows; i++) {
-        final Value row = map.get(Int.get(i + 1), null);
+        final Value row = m.get(Int.get(i + 1), null);
         if(row.size() == 1 && row instanceof Map) {
           final Map r = (Map) row;
           if(i == 0) {

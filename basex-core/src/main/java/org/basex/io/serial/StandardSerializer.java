@@ -14,6 +14,8 @@ import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * This class serializes items to an output stream.
@@ -24,6 +26,8 @@ import org.basex.query.value.type.*;
 public abstract class StandardSerializer extends OutputSerializer {
   /** Normalization form. */
   protected final Form form;
+  /** WebDAV flag. */
+  protected final IntObjMap<byte[]> map;
 
   /** Include separator. */
   protected boolean sep;
@@ -41,7 +45,7 @@ public abstract class StandardSerializer extends OutputSerializer {
 
     super(out, sopts);
     indent = sopts.yes(INDENT);
-    itemsep(sopts, null);
+    itemsep(null);
 
     // normalization form
     final String norm = sopts.get(NORMALIZATION_FORM);
@@ -52,6 +56,18 @@ public abstract class StandardSerializer extends OutputSerializer {
         form = Form.valueOf(norm);
       } catch(final IllegalArgumentException ex) {
         throw SERNORM_X.getIO(norm);
+      }
+    }
+
+    final String maps = sopts.get(USE_CHARACTER_MAPS);
+    if(maps.isEmpty()) {
+      map = null;
+    } else {
+      map = new IntObjMap<>();
+      for(final String s : Strings.split(maps, ',')) {
+        final String[] kv = Strings.split(s, '=', 2);
+        if(kv.length < 2) throw SERMAP_X.getIO(maps);
+        map.put(kv[0].charAt(0), token(kv[1]));
       }
     }
   }

@@ -37,7 +37,6 @@ import org.basex.query.util.collation.*;
 import org.basex.query.util.format.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
@@ -549,32 +548,11 @@ public class QueryParser extends InputParser {
         qc.serialOpts = new SerializerOptions(qc.context.options.get(MainOptions.SERIALIZER));
       }
       if(!decl.add("S " + name)) throw error(OUTDUPL_X, name);
-      try {
-        qc.serialOpts.assign(name, string(val));
-        if(name.equals(SerializerOptions.USE_CHARACTER_MAPS.name()) &&
-            !eq(val, token(SerializerOptions.WEBDAV))) throw error(OUTMAP_X, val);
-      } catch(final BaseXException ex) {
-        for(final Option<?> o : qc.serialOpts) if(o.name().equals(name)) throw error(SER_X, ex);
-        throw error(OUTINVALID_X, ex);
-      }
+      qc.serialOpts.parse(name, val, sc, info());
 
-      if(name.equals(SerializerOptions.PARAMETER_DOCUMENT.name())) {
-        final IO io = IO.get(string(resolvedUri(val).string()));
-        try {
-          // check parameters and add values to serialization parameters
-          final InputInfo info = info();
-          FuncOptions.serializer(new DBNode(io).children().next(), qc.serialOpts, info);
-
-          final HashMap<String, String> free = qc.serialOpts.free();
-          if(!free.isEmpty()) throw SEROPTION_X.get(info, free.keySet().iterator().next());
-          final StringOption cm = SerializerOptions.USE_CHARACTER_MAPS;
-          if(!qc.serialOpts.get(cm).isEmpty()) throw SEROPTION_X.get(info, cm.name());
-        } catch(final IOException ex) {
-          throw error(OUTDOC_X, val);
-        }
-      }
     } else if(eq(qnm.uri(), XQ_URI)) {
       throw error(DECLOPTION_X, qnm);
+
     } else if(eq(qnm.uri(), DB_URI)) {
       // project-specific declaration
       final String ukey = name.toUpperCase(Locale.ENGLISH);
@@ -583,6 +561,7 @@ public class QueryParser extends InputParser {
       // cache old value (to be reset after query evaluation)
       qc.staticOpts.put(opt, qc.context.options.get(opt));
       qc.tempOpts.add(name).add(string(val));
+
     } else if(eq(qnm.uri(), QUERY_URI)) {
       // query-specific options
       if(name.equals(READ_LOCK)) {
@@ -2353,18 +2332,6 @@ public class QueryParser extends InputParser {
       tok.add(del);
     }
     return tok.toArray();
-  }
-
-  /**
-   * Resolves a relative URI literal against the base uri.
-   * @param string uri string
-   * @return resolved URI
-   * @throws QueryException query exception
-   */
-  private Uri resolvedUri(final byte[] string) throws QueryException {
-    final Uri uri = Uri.uri(string);
-    if(!uri.isValid()) throw error(INVURI_X, string);
-    return uri.isAbsolute() ? uri : sc.baseURI().resolve(uri, info());
   }
 
   /**

@@ -37,7 +37,7 @@ public final class AdaptiveSerializer extends OutputSerializer {
     super(out, sopts);
     xml = new XMLSerializer(out, sopts);
     json = new JsonNodeSerializer(out, sopts, this);
-    itemsep(sopts, Token.token("\n"));
+    itemsep(Token.token("\n"));
   }
 
   /**

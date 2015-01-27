@@ -1,8 +1,19 @@
 package org.basex.io.serial;
 
+import static org.basex.query.QueryError.*;
+import static org.basex.util.Token.*;
+
+import java.io.*;
+import java.util.*;
+
 import org.basex.build.csv.*;
 import org.basex.build.json.*;
 import org.basex.core.*;
+import org.basex.io.*;
+import org.basex.query.*;
+import org.basex.query.func.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
 
@@ -101,7 +112,7 @@ public final class SerializerOptions extends Options {
       new NumberOption("limit", -1);
 
   /** Static WebDAV character map. */
-  public static final String WEBDAV = "webdav";
+  public static final String WEBDAV = "\u00a0=&#xA0;";
 
   /** Newlines. */
   public enum Newline {
@@ -177,5 +188,59 @@ public final class SerializerOptions extends Options {
    */
   public SerializerOptions(final SerializerOptions opts) {
     super(opts);
+  }
+
+  /**
+   * Parses options.
+   * @param name name of option
+   * @param val value
+   * @param sc static context
+   * @param info input info
+   * @throws QueryException query exception
+   */
+  public void parse(final String name,
+      final byte[] val, final StaticContext sc, final InputInfo info) throws QueryException {
+
+    try {
+      if(name.equals(USE_CHARACTER_MAPS.name()) && !eq(val, token(WEBDAV)))
+        throw OUTMAP_X.get(info, val);
+      assign(name, string(val));
+    } catch(final BaseXException ex) {
+      for(final Option<?> o : this) if(o.name().equals(name)) throw SER_X.get(info, ex);
+      throw OUTINVALID_X.get(info, ex);
+    }
+
+    if(name.equals(PARAMETER_DOCUMENT.name())) {
+      Uri uri = Uri.uri(val);
+      if(!uri.isValid()) throw INVURI_X.get(info, val);
+      if(!uri.isAbsolute()) uri = sc.baseURI().resolve(uri, info);
+      final IO io = IO.get(string(uri.string()));
+      try {
+        // check parameters and add values to serialization parameters
+        final ANode root = new DBNode(io).children().next();
+        FuncOptions.serializer(root, this, info);
+
+        final HashMap<String, String> free = free();
+        if(!free.isEmpty()) throw SEROPTION_X.get(info, free.keySet().iterator().next());
+
+        final StringOption ucm = USE_CHARACTER_MAPS;
+        final byte[] mapsId = QNm.get(ucm.name(), QueryText.OUTPUT_URI).id();
+        final byte[] mapId = QNm.get("character-map", QueryText.OUTPUT_URI).id();
+        if(!get(ucm).isEmpty()) {
+          final TokenBuilder value = new TokenBuilder();
+          for(final ANode option : XMLAccess.children(root, mapsId)) {
+            for(final ANode child : XMLAccess.children(option, mapId)) {
+              if(!value.isEmpty()) value.add(',');
+              value.add(child.attribute("character")).add('=').add(child.attribute("map-string"));
+            }
+          }
+          set(ucm, value.toString());
+        }
+
+      } catch(final IOException ex) {
+        Util.debug(ex);
+        throw OUTDOC_X.get(info, val);
+      }
+    }
   }
 }

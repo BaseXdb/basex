@@ -85,8 +85,8 @@ public abstract class JsonSerializer extends StandardSerializer {
 
         boolean s = false;
         final TokenSet set = nodups ? new TokenSet() : null;
-        final Map map = (Map) item;
-        for(final Item key : map.keys()) {
+        final Map m = (Map) item;
+        for(final Item key : m.keys()) {
           final byte[] name = key.string(null);
           if(nodups) {
             if(set.contains(name)) {
@@ -100,7 +100,7 @@ public abstract class JsonSerializer extends StandardSerializer {
           string(name);
           out.print(':');
           if(indent) out.print(' ');
-          serialize(map.get(key, null));
+          serialize(m.get(key, null));
           s = true;
         }
 
@@ -169,6 +169,15 @@ public abstract class JsonSerializer extends StandardSerializer {
 
   @Override
   protected final void encode(final int cp) throws IOException {
+    if(map != null) {
+      // character map
+      final byte[] value = map.get(cp);
+      if(value != null) {
+        out.print(value);
+        return;
+      }
+    }
+
     if(escape) {
       switch(cp) {
         case '\b': out.print("\\b"); break;

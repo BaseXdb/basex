@@ -16,6 +16,8 @@ import org.basex.io.out.*;
 public abstract class OutputSerializer extends Serializer {
   /** Output stream. */
   protected final PrintOutput out;
+  /** Serializer options. */
+  protected final SerializerOptions sopts;
   /** Item separator. */
   protected byte[] itemsep;
 
@@ -33,6 +35,7 @@ public abstract class OutputSerializer extends Serializer {
    */
   protected OutputSerializer(final PrintOutput out, final SerializerOptions sopts) {
     this.out = out;
+    this.sopts = sopts;
 
     // project-specific options
     indents = sopts.get(INDENTS);
@@ -77,10 +80,9 @@ public abstract class OutputSerializer extends Serializer {
 
   /**
    * Sets the item separator.
-   * @param sopts serialization options
    * @param def default separator
    */
-  protected final void itemsep(final SerializerOptions sopts, final byte[] def) {
+  protected final void itemsep(final byte[] def) {
     itemsep = sopts.contains(ITEM_SEPARATOR) ? token(sopts.get(ITEM_SEPARATOR).replace("\\n", "\n").
       replace("\\r", "\r").replace("\\t", "\t")) : def;
   }

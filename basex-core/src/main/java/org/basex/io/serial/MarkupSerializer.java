@@ -52,8 +52,6 @@ abstract class MarkupSerializer extends StandardSerializer {
 
   /** Media type. */
   private final String media;
-  /** WebDAV flag. */
-  private final boolean webdav;
 
   /**
    * Constructor.
@@ -82,10 +80,6 @@ abstract class MarkupSerializer extends StandardSerializer {
     escuri  = sopts.yes(ESCAPE_URI_ATTRIBUTES);
     content = sopts.yes(INCLUDE_CONTENT_TYPE);
     undecl  = sopts.yes(UNDECLARE_PREFIXES);
-
-    final String maps = sopts.get(USE_CHARACTER_MAPS);
-    webdav = maps.equals(WEBDAV);
-    if(!webdav && !maps.isEmpty()) throw SERMAP_X.getIO(maps);
 
     if(docsys.isEmpty()) docsys = null;
     if(docpub.isEmpty()) docpub = null;
@@ -263,7 +257,16 @@ abstract class MarkupSerializer extends StandardSerializer {
 
   @Override
   protected void encode(final int cp) throws IOException {
-    if(cp < ' ' && cp != '\n' && cp != '\t' || cp >= 0x7F && cp < 0xA0 || webdav && cp == 0xA0) {
+    // character map
+    if(map != null) {
+      final byte[] value = map.get(cp);
+      if(value != null) {
+        out.print(value);
+        return;
+      }
+    }
+
+    if(cp < ' ' && cp != '\n' && cp != '\t' || cp >= 0x7F && cp < 0xA0) {
       hex(cp);
     } else if(cp == '&') {
       out.print(E_AMP);

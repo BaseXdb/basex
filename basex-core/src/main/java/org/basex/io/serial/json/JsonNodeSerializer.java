@@ -38,8 +38,6 @@ public final class JsonNodeSerializer extends JsonSerializer {
   private final boolean lax;
   /** Attributes flag. */
   private final boolean atts;
-  /** Node serializer. */
-  private final Serializer ser;
   /** Node output cache. */
   private final ArrayOutput cache = new ArrayOutput();
 
@@ -47,6 +45,8 @@ public final class JsonNodeSerializer extends JsonSerializer {
   private byte[] key;
   /** Custom serialization. */
   private boolean custom;
+  /** Node serializer. */
+  private Serializer nodeSerializer;
 
   /**
    * Constructor.
@@ -71,13 +71,6 @@ public final class JsonNodeSerializer extends JsonSerializer {
       throws IOException {
 
     super(out, opts);
-
-    final SerializerOptions so = new SerializerOptions();
-    so.set(SerializerOptions.METHOD, opts.get(SerializerOptions.JSON_NODE_OUTPUT_METHOD));
-    so.set(SerializerOptions.OMIT_XML_DECLARATION, YesNo.YES);
-    so.set(SerializerOptions.INDENT, YesNo.NO);
-    ser = Serializer.get(cache, so);
-
     final int tl = typeCache.length;
     for(int t = 0; t < tl; t++) typeCache[t] = new TokenMap();
     atts = jopts.get(JsonOptions.FORMAT) == JsonFormat.ATTRIBUTES;
@@ -94,9 +87,10 @@ public final class JsonNodeSerializer extends JsonSerializer {
       super.node(node);
       custom = c;
     } else {
-      ser.serialize(node);
-      ser.close();
-      ser.reset();
+      try(final Serializer ser = nodeSerializer()) {
+        ser.serialize(node);
+        ser.reset();
+      }
       string(cache.toArray());
       cache.reset();
     }
@@ -235,5 +229,21 @@ public final class JsonNodeSerializer extends JsonSerializer {
    */
   private static QueryIOException error(final String msg, final Object... ext) {
     return BXJS_SERIAL_X.getIO(Util.inf(msg, ext));
+  }
+
+  /**
+   * Returns a node serializer.
+   * @return serializer
+   * @throws IOException I/O exception
+   */
+  private Serializer nodeSerializer() throws IOException {
+    if(nodeSerializer == null) {
+      final SerializerOptions so = new SerializerOptions();
+      so.set(SerializerOptions.METHOD, sopts.get(SerializerOptions.JSON_NODE_OUTPUT_METHOD));
+      so.set(SerializerOptions.OMIT_XML_DECLARATION, YesNo.YES);
+      so.set(SerializerOptions.INDENT, YesNo.NO);
+      nodeSerializer = Serializer.get(cache, so);
+    }
+    return nodeSerializer;
   }
 }
