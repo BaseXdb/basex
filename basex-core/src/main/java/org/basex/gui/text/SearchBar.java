@@ -11,7 +11,6 @@ import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXLayout.DropHandler;
-import org.basex.gui.text.TextPanel.SearchDir;
 import org.basex.util.options.*;
 
 /**
@@ -21,6 +20,16 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public final class SearchBar extends BaseXBack {
+  /** Search direction. */
+  public enum SearchDir {
+    /** Current hit. */
+    CURRENT,
+    /** Next hit. */
+    FORWARD,
+    /** Previous hit. */
+    BACKWARD,
+  }
+
   /** Escape key listener. */
   private final KeyAdapter escape = new KeyAdapter() {
     @Override

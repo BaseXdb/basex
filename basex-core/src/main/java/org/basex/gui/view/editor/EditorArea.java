@@ -12,6 +12,7 @@ import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.text.*;
+import org.basex.gui.text.SearchBar.SearchDir;
 import org.basex.io.*;
 import org.basex.util.*;
 

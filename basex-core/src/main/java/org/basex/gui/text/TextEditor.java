@@ -3,17 +3,10 @@ package org.basex.gui.text;
 import static org.basex.util.FTToken.*;
 import static org.basex.util.Token.*;
 
-import java.awt.event.*;
-import java.io.*;
 import java.util.*;
 
-import javax.swing.*;
-
-import org.basex.core.*;
 import org.basex.gui.*;
-import org.basex.gui.text.TextPanel.SearchDir;
-import org.basex.io.*;
-import org.basex.io.in.*;
+import org.basex.gui.text.SearchBar.SearchDir;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -201,6 +194,16 @@ public final class TextEditor {
       if(pos != 0) next();
     }
     if(select) endSelection();
+  }
+
+  /**
+   * Returns the position of first character of the current auto-completion input.
+   * @return position
+   */
+  int completionStart() {
+    int p = pos;
+    while(p > 0 && !ws(text[p - 1])) --p;
+    return p;
   }
 
   /**
@@ -497,53 +500,6 @@ public final class TextEditor {
       for(int i = pos; i < s && c < ts; i++) tmp[c++] = text[i];
       text(tmp);
       select(pos, pos + e - s);
-    }
-  }
-
-  /**
-   * Code completion.
-   * @param tp text panel
-   */
-  void complete(final TextPanel tp) {
-    if(selected()) return;
-
-    // find first character
-    int p = pos;
-    while(p > 0 && !ws(text[p - 1])) --p;
-    final String prefix = string(substring(text, p, pos));
-    if(p == pos) return;
-
-    // find insertion candidates
-    final TreeMap<String, String> tmp = new TreeMap<>();
-    for(final Map.Entry<String, String> entry : REPLACE.entrySet()) {
-      final String key = entry.getKey();
-      if(key.startsWith(prefix)) tmp.put(key, entry.getValue());
-    }
-
-    if(tmp.size() == 1) {
-      // insert single candidate
-      complete(tmp.values().iterator().next(), p);
-    } else if(!tmp.isEmpty()) {
-      // show popup menu
-      final int startPos = p;
-      final JPopupMenu pm = new JPopupMenu();
-      final ActionListener al = new ActionListener() {
-        @Override
-        public void actionPerformed(final ActionEvent ae) {
-          complete(ae.getActionCommand().replaceAll("^.*?\\] ", ""), startPos);
-        }
-      };
-
-      JMenuItem mi = new JMenuItem(Text.INPUT + Text.COLS + prefix);
-      mi.setEnabled(false);
-      pm.add(mi);
-      for(final Map.Entry<String, String> entry : tmp.entrySet()) {
-        mi = new JMenuItem("[" + entry.getKey() + "] " + entry.getValue());
-        pm.add(mi);
-        mi.addActionListener(al);
-      }
-      final int[] cursor = tp.rend.cursor();
-      pm.show(tp, cursor[0], cursor[1]);
     }
   }
 
@@ -1193,29 +1149,5 @@ public final class TextEditor {
   @Override
   public String toString() {
     return copy();
-  }
-
-  /** Index for all replacements. */
-  private static final HashMap<String, String> REPLACE = new HashMap<>();
-
-  /** Reads in the property file. */
-  static {
-    try {
-      final String file = "/completions.properties";
-      final InputStream is = MimeTypes.class.getResourceAsStream(file);
-      if(is == null) {
-        Util.errln(file + " not found.");
-      } else {
-        try(final NewlineInput nli = new NewlineInput(is)) {
-          for(String line; (line = nli.readLine()) != null;) {
-            final int i = line.indexOf('=');
-            if(i == -1 || line.startsWith("#")) continue;
-            REPLACE.put(line.substring(0, i), line.substring(i + 1).replace("\\n", "\n"));
-          }
-        }
-      }
-    } catch(final IOException ex) {
-      Util.errln(ex);
-    }
   }
 }

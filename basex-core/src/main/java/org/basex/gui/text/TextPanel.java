@@ -7,6 +7,7 @@ import static org.basex.util.Token.*;
 import java.awt.*;
 import java.awt.datatransfer.*;
 import java.awt.event.*;
+import java.io.*;
 import java.util.*;
 
 import javax.swing.*;
@@ -16,7 +17,9 @@ import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.dialog.*;
 import org.basex.gui.layout.*;
+import org.basex.gui.text.SearchBar.SearchDir;
 import org.basex.io.*;
+import org.basex.io.in.*;
 import org.basex.util.*;
 
 /**
@@ -28,16 +31,6 @@ import org.basex.util.*;
 public class TextPanel extends BaseXPanel {
   /** Delay for highlighting an error. */
   private static final int ERROR_DELAY = 500;
-
-  /** Search direction. */
-  public enum SearchDir {
-    /** Current hit. */
-    CURRENT,
-    /** Next hit. */
-    FORWARD,
-    /** Previous hit. */
-    BACKWARD,
-  }
 
   /** Editor action. */
   public enum Action {
@@ -56,15 +49,15 @@ public class TextPanel extends BaseXPanel {
   /** Undo history. */
   public final History hist;
 
-  /** Search bar. */
-  protected SearchBar search;
   /** Renderer reference. */
-  protected final TextRenderer rend;
-
+  private final TextRenderer rend;
   /** Scrollbar reference. */
   private final BaseXScrollBar scroll;
   /** Editable flag. */
   private final boolean editable;
+
+  /** Search bar. */
+  protected SearchBar search;
   /** Link listener. */
   private LinkListener linkListener;
 
@@ -596,12 +589,15 @@ public class TextPanel extends BaseXPanel {
 
     // edit text
     if(hist.active()) {
+      if(COMPLETE.is(e)) {
+        complete();
+        return;
+      }
+
       if(MOVEDOWN.is(e)) {
         editor.move(true);
       } else if(MOVEUP.is(e)) {
         editor.move(false);
-      } else if(COMPLETE.is(e)) {
-        editor.complete(this);
       } else if(DELLINE.is(e)) {
         editor.deleteLine();
       } else if(DELNEXTWORD.is(e)) {
@@ -972,5 +968,86 @@ public class TextPanel extends BaseXPanel {
     }
     setCaret(p);
     gui.editor.posCode.invokeLater();
+  }
+
+  /**
+   * Code completion.
+   */
+  private void complete() {
+    if(selected()) return;
+
+    // find first character
+    final int caret = editor.pos(), startPos = editor.completionStart();
+    final String prefix = string(substring(editor.text(), startPos, caret));
+    if(prefix.isEmpty()) return;
+
+    // find insertion candidates
+    final TreeMap<String, String> tmp = new TreeMap<>();
+    for(final Map.Entry<String, String> entry : REPLACE.entrySet()) {
+      final String key = entry.getKey();
+      if(key.startsWith(prefix)) tmp.put(key, entry.getValue());
+    }
+
+    if(tmp.size() == 1) {
+      // insert single candidate
+      complete(tmp.values().iterator().next(), startPos);
+    } else if(!tmp.isEmpty()) {
+      // show popup menu
+      final JPopupMenu pm = new JPopupMenu();
+      final ActionListener al = new ActionListener() {
+        @Override
+        public void actionPerformed(final ActionEvent ae) {
+          complete(ae.getActionCommand().replaceAll("^.*?\\] ", ""), startPos);
+        }
+      };
+
+      JMenuItem mi = new JMenuItem(Text.INPUT + Text.COLS + prefix);
+      mi.setEnabled(false);
+      pm.add(mi);
+      pm.addSeparator();
+      for(final Map.Entry<String, String> entry : tmp.entrySet()) {
+        mi = new JMenuItem("[" + entry.getKey() + "] " + entry.getValue());
+        pm.add(mi);
+        mi.addActionListener(al);
+      }
+      final int[] cursor = rend.cursor();
+      pm.show(this, cursor[0], cursor[1]);
+    }
+  }
+
+  /**
+   * Auto-completes a string at the specified position.
+   * @param string string
+   * @param start start position
+   */
+  private void complete(final String string, final int start) {
+    final int caret = editor.pos();
+    editor.complete(string, start);
+    hist.store(editor.text(), caret, editor.pos());
+    scrollCode.invokeLater(true);
+  }
+
+  /** Index for all replacements. */
+  private static final HashMap<String, String> REPLACE = new HashMap<>();
+
+  /** Reads in the property file. */
+  static {
+    try {
+      final String file = "/completions.properties";
+      final InputStream is = MimeTypes.class.getResourceAsStream(file);
+      if(is == null) {
+        Util.errln(file + " not found.");
+      } else {
+        try(final NewlineInput nli = new NewlineInput(is)) {
+          for(String line; (line = nli.readLine()) != null;) {
+            final int i = line.indexOf('=');
+            if(i == -1 || line.startsWith("#")) continue;
+            REPLACE.put(line.substring(0, i), line.substring(i + 1).replace("\\n", "\n"));
+          }
+        }
+      }
+    } catch(final IOException ex) {
+      Util.errln(ex);
+    }
   }
 }
