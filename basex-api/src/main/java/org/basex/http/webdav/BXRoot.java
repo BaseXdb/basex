@@ -20,10 +20,10 @@ import com.bradmcevoy.http.exceptions.*;
 final class BXRoot extends BXFolder {
   /**
    * Constructor.
-   * @param s service
+   * @param service service
    */
-  BXRoot(final WebDAVService<BXAbstractResource> s) {
-    super(new ResourceMetaData(), s);
+  BXRoot(final WebDAVService<BXAbstractResource> service) {
+    super(new ResourceMetaData(), service);
   }
 
   @Override

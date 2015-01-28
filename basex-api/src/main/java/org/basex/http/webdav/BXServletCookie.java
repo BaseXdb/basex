@@ -20,9 +20,12 @@ final class BXServletCookie implements Cookie {
   public final javax.servlet.http.Cookie cookie;
   /**
    * Constructor.
-   * @param c servlet cookie
+   * @param cookie servlet cookie
    */
-  BXServletCookie(final javax.servlet.http.Cookie c) { cookie = c; }
+  BXServletCookie(final javax.servlet.http.Cookie cookie) {
+    this.cookie = cookie;
+  }
+
   @Override
   public int getVersion() { return cookie.getVersion(); }
   @Override

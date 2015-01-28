@@ -24,11 +24,11 @@ class BXFolder extends BXAbstractResource implements FolderResource, DeletableCo
 
   /**
    * Constructor.
-   * @param d resource meta data
-   * @param s service implementation
+   * @param meta resource meta data
+   * @param service service implementation
    */
-  BXFolder(final ResourceMetaData d, final WebDAVService<BXAbstractResource> s) {
-    super(d, s);
+  BXFolder(final ResourceMetaData meta, final WebDAVService<BXAbstractResource> service) {
+    super(meta, service);
   }
 
   @Override

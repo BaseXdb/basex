@@ -62,13 +62,13 @@ final class BXServletRequest extends AbstractRequest {
 
   /**
    * Constructor.
-   * @param r HTTP servlet request
+   * @param req HTTP servlet request
    */
-  BXServletRequest(final HttpServletRequest r) {
-    req = r;
-    method = Method.valueOf(r.getMethod());
-    url = r.getRequestURL().toString(); // MiltonUtils.stripContext(r);
-    REQUEST.set(r);
+  BXServletRequest(final HttpServletRequest req) {
+    this.req = req;
+    method = Method.valueOf(req.getMethod());
+    url = req.getRequestURL().toString(); // MiltonUtils.stripContext(r);
+    REQUEST.set(req);
   }
 
   @Override

@@ -16,10 +16,10 @@ final class WebDAVQuery {
 
   /**
    * Constructor.
-   * @param qu query string
+   * @param query query string
    */
-  WebDAVQuery(final String qu) {
-    query = qu;
+  WebDAVQuery(final String query) {
+    this.query = query;
   }
 
   /**

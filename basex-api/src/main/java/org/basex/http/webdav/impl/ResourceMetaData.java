@@ -31,21 +31,21 @@ public final class ResourceMetaData {
 
   /**
    * Constructor.
-   * @param d database owning the resource
-   * @param m resource last modification date in milliseconds
+   * @param db database owning the resource
+   * @param ms resource last modification date in milliseconds
    */
-  public ResourceMetaData(final String d, final long m) {
-    this(d, "", m);
+  public ResourceMetaData(final String db, final long ms) {
+    this(db, "", ms);
   }
 
   /**
    * Constructor.
-   * @param d database owning the resource
-   * @param p resource path
-   * @param m resource last modification date in milliseconds
+   * @param db database owning the resource
+   * @param path resource path
+   * @param ms resource last modification date in milliseconds
    */
-  ResourceMetaData(final String d, final String p, final long m) {
-    this(d, p, m, false, null,  null);
+  ResourceMetaData(final String db, final String path, final long ms) {
+    this(db, path, ms, false, null,  null);
   }
 
   /**

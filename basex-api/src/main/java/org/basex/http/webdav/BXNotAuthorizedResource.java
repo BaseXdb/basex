@@ -20,8 +20,7 @@ final class BXNotAuthorizedResource implements FolderResource, LockableResource 
   public static final Resource NOAUTH = new BXNotAuthorizedResource();
 
   /** Constructor. */
-  private BXNotAuthorizedResource() {
-  }
+  private BXNotAuthorizedResource() { }
 
   @Override
   public String getRealm() {

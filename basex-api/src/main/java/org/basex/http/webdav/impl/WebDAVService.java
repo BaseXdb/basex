@@ -30,6 +30,7 @@ import org.basex.util.list.*;
 public final class WebDAVService<T> {
   /** Name of the database with the WebDAV locks. */
   private static final String WEBDAV_DB = "~webdav";
+
   /** HTTP context. */
   private final HTTPContext http;
   /** Resource factory. */
@@ -41,12 +42,12 @@ public final class WebDAVService<T> {
 
   /**
    * Constructor.
-   * @param f resource factory
-   * @param h http context
+   * @param factory resource factory
+   * @param http http context
    */
-  public WebDAVService(final ResourceMetaDataFactory<T> f, final HTTPContext h) {
-    factory = f;
-    http = h;
+  public WebDAVService(final ResourceMetaDataFactory<T> factory, final HTTPContext http) {
+    this.factory = factory;
+    this.http = http;
     locking = new WebDAVLockService(http);
   }
 
@@ -251,7 +252,7 @@ public final class WebDAVService<T> {
     final WebDAVQuery query = new WebDAVQuery(
       "declare option output:" + (raw ?
       "method 'raw'; " + _DB_RETRIEVE.args("$db", "$path") :
-      "use-character-maps 'webdav'; " + _DB_OPEN.args("$db", "$path")));
+      "use-character-maps '&#xA0;=&amp;#xA0;'; " + _DB_OPEN.args("$db", "$path")));
     query.bind("db", db);
     query.bind("path", path);
     execute(query);

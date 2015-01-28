@@ -20,10 +20,10 @@ abstract class BXCode<E> {
 
   /**
    * Constructor.
-   * @param res resource
+   * @param resource resource
    */
-  BXCode(final BXAbstractResource res) {
-    resource = res;
+  BXCode(final BXAbstractResource resource) {
+    this.resource = resource;
   }
 
   /**

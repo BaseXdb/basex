@@ -22,17 +22,14 @@ import com.bradmcevoy.http.*;
 final class BXResourceFactory implements ResourceFactory,
     ResourceMetaDataFactory<BXAbstractResource> {
 
-  /** HTTP Context. */
-  private final HTTPContext http;
   /** WebDAV service. */
-  private final WebDAVService<BXAbstractResource> service;
+  private WebDAVService<BXAbstractResource> service;
 
   /**
-   * Constructor.
-   * @param ht http context
+   * Creates a new service.
+   * @param http http context
    */
-  BXResourceFactory(final HTTPContext ht) {
-    http = ht;
+  void init(final HTTPContext http) {
     service = new WebDAVService<>(this, http);
   }
 
@@ -45,9 +42,6 @@ final class BXResourceFactory implements ResourceFactory,
 
   @Override
   public Resource getResource(final String host, final String dbpath) {
-    final Auth a = HttpManager.request().getAuthorization();
-    if(a != null) http.credentials(a.getUser(), a.getPassword());
-
     try {
       final HttpServletRequest r = getRequest();
       Path p = Path.path(dbpath);

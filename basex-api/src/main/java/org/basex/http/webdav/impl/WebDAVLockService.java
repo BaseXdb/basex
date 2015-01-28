@@ -31,10 +31,10 @@ public final class WebDAVLockService {
 
   /**
    * Constructor.
-   * @param h HTTP context
+   * @param http HTTP context
    */
-  WebDAVLockService(final HTTPContext h) {
-    http = h;
+  WebDAVLockService(final HTTPContext http) {
+    this.http = http;
   }
 
   /**
