@@ -39,6 +39,14 @@ public final class FileModuleTest extends AdvancedQueryTest {
     new IOFile(PATH1).delete();
   }
 
+  /**
+   * Test method.
+   */
+  @Test
+  public void lineSeparator() {
+    assertFalse(query(_FILE_LINE_SEPARATOR.args()).isEmpty());
+  }
+
   /** Test method. */
   @Test
   public void dirSeparator() {

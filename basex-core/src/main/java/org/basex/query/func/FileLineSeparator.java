@@ -10,7 +10,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-final class FileLineSeparator extends StandardFunc {
+public final class FileLineSeparator extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) {
     return Str.get(Prop.NL);
