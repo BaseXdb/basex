@@ -180,28 +180,31 @@ final class HTMLSerializer extends MarkupSerializer {
     // elements with an empty content model
     EMPTIES.add("area");
     EMPTIES.add("base");
+    EMPTIES.add("basefont");
     EMPTIES.add("br");
     EMPTIES.add("col");
     EMPTIES.add("embed");
+    EMPTIES.add("frame");
     EMPTIES.add("hr");
     EMPTIES.add("img");
     EMPTIES.add("input");
+    EMPTIES.add("isindex");
     EMPTIES.add("link");
     EMPTIES.add("meta");
-    EMPTIES.add("basefont");
-    EMPTIES.add("frame");
-    EMPTIES.add("isindex");
     EMPTIES.add("param");
     // elements with an empty content model
     EMPTIES5.add("area");
     EMPTIES5.add("base");
+    EMPTIES5.add("basefont");
     EMPTIES5.add("br");
     EMPTIES5.add("col");
     EMPTIES5.add("command");
     EMPTIES5.add("embed");
+    EMPTIES5.add("frame");
     EMPTIES5.add("hr");
     EMPTIES5.add("img");
     EMPTIES5.add("input");
+    EMPTIES5.add("isindex");
     EMPTIES5.add("keygen");
     EMPTIES5.add("link");
     EMPTIES5.add("meta");
@@ -209,9 +212,6 @@ final class HTMLSerializer extends MarkupSerializer {
     EMPTIES5.add("source");
     EMPTIES5.add("track");
     EMPTIES5.add("wbr");
-    EMPTIES5.add("basefont");
-    EMPTIES5.add("frame");
-    EMPTIES5.add("isindex");
     // URI attributes
     URIS.add("a:href");
     URIS.add("a:name");

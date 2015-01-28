@@ -154,6 +154,8 @@ public abstract class Serializer implements AutoCloseable {
    * @throws IOException I/O exception
    */
   protected void node(final ANode node) throws IOException {
+    if(ignore(node)) return;
+
     if(node instanceof DBNode) {
       node((DBNode) node);
     } else {
@@ -192,6 +194,7 @@ public abstract class Serializer implements AutoCloseable {
           attribute(n, v);
           if(eq(n, XML_SPACE) && indent) indent = eq(v, DataText.DEFAULT);
         }
+
         // serialize children
         ai = node.children();
         for(ANode n; (n = ai.next()) != null;) node(n);
@@ -269,6 +272,16 @@ public abstract class Serializer implements AutoCloseable {
       if(eq(nspaces.name(n), prefix)) return nspaces.value(n);
     }
     return null;
+  }
+
+  /**
+   * Checks if an element should be ignored.
+   * @param node node to be serialized
+   * @return result of check
+   */
+  @SuppressWarnings("unused")
+  protected boolean ignore(final ANode node) {
+    return false;
   }
 
   /**

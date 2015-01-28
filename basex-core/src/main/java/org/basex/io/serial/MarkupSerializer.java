@@ -11,6 +11,7 @@ import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
+import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.hash.*;
@@ -350,6 +351,11 @@ abstract class MarkupSerializer extends StandardSerializer {
     level--;
     if(empty) finishClose();
     return true;
+  }
+
+  @Override
+  protected boolean ignore(final ANode node) {
+    return ct > 0 && eq(node.name(), META) && node.attribute(HTTPEQUIV) != null;
   }
 
   // PRIVATE METHODS ==============================================================================
