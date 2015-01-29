@@ -248,6 +248,7 @@ open                 = Нээх
 open_externally      = Open externally
 open_manage          = Удирдах
 optimize             = Шинэчлэх
+optimize_all         = Optimize All
 optimized_query      = Квери
 options              = Тохиргоонууд
 out_of_date          = Шинэчлэгдээгүй байна, шинэчлэгдэх шаардлагатай

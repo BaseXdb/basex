@@ -248,6 +248,7 @@ open                 = Open
 open_externally      = Open extern
 open_manage          = Manage
 optimize             = Optimaliseer
+optimize_all         = Optimaliseer alles
 optimized_query      = Geoptimaliseerde Query
 options              = Opties
 out_of_date          = verouderd

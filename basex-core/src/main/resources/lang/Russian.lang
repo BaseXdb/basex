@@ -248,6 +248,7 @@ open                 = Открыть
 open_externally      = Открыть системой
 open_manage          = Открыть и Администрировать
 optimize             = Оптимизировать
+optimize_all         = Optimize All
 optimized_query      = Оптимизированный запрос
 options              = Параметры
 out_of_date          = не актуальное состояние

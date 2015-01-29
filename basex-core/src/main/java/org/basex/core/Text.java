@@ -1012,6 +1012,8 @@ public interface Text {
   String DROP = lang("drop");
   /** Button text for optimization. */
   String OPTIMIZE = lang("optimize");
+  /** Button text for optimization. */
+  String OPTIMIZE_ALL = lang("optimize_all");
   /** Button text for renaming databases. */
   String RENAME = lang("rename");
   /** Button text for restoring databases. */

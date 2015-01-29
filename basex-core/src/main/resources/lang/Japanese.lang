@@ -248,6 +248,7 @@ open                 = 開く
 open_externally      = 外部で開く
 open_manage          = 管理
 optimize             = 最適化
+optimize_all         = Optimize All
 optimized_query      = クエリー
 options              = オプション
 out_of_date          = 期限切れ

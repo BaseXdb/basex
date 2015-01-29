@@ -248,6 +248,7 @@ open                 = Apri
 open_externally      = Open externally
 open_manage          = Gestisci
 optimize             = Ottimizza
+optimize_all         = Ottimizza tutto
 optimized_query      = Interrogazione ottimizzata
 options              = Opzioni
 out_of_date          = non aggiornato

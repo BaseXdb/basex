@@ -248,6 +248,7 @@ open                 = Megnyitás
 open_externally      = Megnyitás külsőleg
 open_manage          = Megnyitás & kezelése
 optimize             = Optimalizálás
+optimize_all         = Optimize All
 optimized_query      = Optimalizált lekérdezés
 options              = Beállítások
 out_of_date          = elavult

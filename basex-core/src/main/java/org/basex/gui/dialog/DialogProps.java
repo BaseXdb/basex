@@ -222,9 +222,9 @@ public final class DialogProps extends BaseXDialog {
         if(cmp != indxs[l]) continue;
         final String label = indxs[l].getText();
         final Command cmd;
-        if(label.equals(OPTIMIZE + DOTS)) {
+        if(label.equals(OPTIMIZE)) {
           cmd = new Optimize();
-        } else if(label.equals(DROP + DOTS)) {
+        } else if(label.equals(DROP)) {
           cmd = new DropIndex(TYPES[l]);
         } else {
           cmd = new CreateIndex(TYPES[l]);
@@ -256,7 +256,7 @@ public final class DialogProps extends BaseXDialog {
         labels[l].setText(lbl);
         // update button (label, disable/enable)
         if(indxs[l] != null) {
-          indxs[l].setText((struct ? OPTIMIZE : val[l] ? DROP : CREATE) + DOTS);
+          indxs[l].setText(struct ? OPTIMIZE : val[l] ? DROP : CREATE);
           if(struct) indxs[l].setEnabled(!utd);
         }
       }

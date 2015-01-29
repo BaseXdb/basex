@@ -248,6 +248,7 @@ open                 = Buka
 open_externally      = Buka secara eksternal
 open_manage          = Buka & Kelola
 optimize             = Optimasi
+optimize_all         = Optimize All
 optimized_query      = Kueri teroptimasi
 options              = Opsi
 out_of_date          = ketinggalan jaman
