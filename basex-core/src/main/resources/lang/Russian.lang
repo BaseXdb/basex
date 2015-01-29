@@ -126,6 +126,7 @@ exit                 = Выход
 expecting_cmd        = Ожидается команда
 explorer             = Обозреватель
 export               = Экспорт
+external_variables   = External Variables
 file                 = файл
 file_exists_%        = "%" уже существует.\nЗаменить его?
 file_filter          = File Filter

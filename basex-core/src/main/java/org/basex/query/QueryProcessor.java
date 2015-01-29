@@ -3,6 +3,7 @@ package org.basex.query;
 import static org.basex.core.Text.*;
 
 import java.io.*;
+import java.util.*;
 import java.util.regex.*;
 
 import org.basex.core.*;
@@ -298,6 +299,45 @@ public final class QueryProcessor extends Proc implements AutoCloseable {
     }
     if(sb.length() >= max) sb.append("...");
     return sb.toString().trim();
+  }
+
+  /**
+   * Returns a map with variable bindings.
+   * @param opts main options
+   * @return bindings
+   */
+  public static HashMap<String, String> bindings(final MainOptions opts) {
+    final HashMap<String, String> bindings = new HashMap<>();
+    final String bind = opts.get(MainOptions.BINDINGS).trim();
+    final StringBuilder key = new StringBuilder();
+    final StringBuilder val = new StringBuilder();
+    boolean first = true;
+    final int sl = bind.length();
+    for(int s = 0; s < sl; s++) {
+      final char ch = bind.charAt(s);
+      if(first) {
+        if(ch == '=') {
+          first = false;
+        } else {
+          key.append(ch);
+        }
+      } else {
+        if(ch == ',') {
+          if(s + 1 == sl || bind.charAt(s + 1) != ',') {
+            bindings.put(key.toString().trim(), val.toString());
+            key.setLength(0);
+            val.setLength(0);
+            first = true;
+            continue;
+          }
+          // literal commas are escaped by a second comma
+          s++;
+        }
+        val.append(ch);
+      }
+    }
+    if(key.length() != 0) bindings.put(key.toString().trim(), val.toString());
+    return bindings;
   }
 
   /**

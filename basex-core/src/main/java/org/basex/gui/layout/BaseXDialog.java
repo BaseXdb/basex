@@ -136,8 +136,7 @@ public abstract class BaseXDialog extends JDialog {
   }
 
   /**
-   * Closes the dialog and stores the location of the dialog window;
-   * can be overwritten.
+   * Closes the dialog and stores the location of the dialog window; can be overwritten.
    */
   public void close() {
     ok = true;

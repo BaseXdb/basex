@@ -105,6 +105,8 @@ public final class GUIOptions extends Options {
   public static final NumbersOption FONTSLOC = new NumbersOption("FONTSLOC", 10, 530);
   /** Dialog location. */
   public static final NumbersOption COLORSLOC = new NumbersOption("COLORSLOC", 530, 620);
+  /** Dialog location. */
+  public static final NumbersOption BINDINGSLOC = new NumbersOption("BINDINGSLOC", 100, 230);
 
   /** Preferences tab. */
   public static final NumberOption PREFTAB = new NumberOption("PREFTAB", 0);

@@ -15,6 +15,9 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public final class DialogColors extends BaseXDialog {
+  /** Dialog. */
+  private static Dialog dialog;
+
   /** Maximum color range. */
   private static final int MAXCOLOR = 32;
   /** Slider reference. */
@@ -28,7 +31,7 @@ public final class DialogColors extends BaseXDialog {
    * Default constructor.
    * @param main reference to the main window
    */
-  public DialogColors(final GUI main) {
+  private DialogColors(final GUI main) {
     super(main, COLOR_SCHEMA, false);
 
     final GUIOptions gopts = gui.gopts;
@@ -50,6 +53,15 @@ public final class DialogColors extends BaseXDialog {
     set(newButtons(RESET), BorderLayout.SOUTH);
 
     finish(gopts.get(GUIOptions.COLORSLOC));
+  }
+
+  /**
+   * Activates the dialog window.
+   * @param main reference to the main window
+   */
+  public static void show(final GUI main) {
+    if(dialog == null) dialog = new DialogColors(main);
+    dialog.setVisible(true);
   }
 
   /**

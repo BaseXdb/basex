@@ -126,6 +126,7 @@ exit                 = Keluar
 expecting_cmd        = Mengharapkan perintah.
 explorer             = Penelusur
 export               = Ekspor
+external_variables   = External Variables
 file                 = Berkas
 file_exists_%        = "%" sudah ada.\nApakah anda ingin menggantinya?
 file_filter          = File Filter

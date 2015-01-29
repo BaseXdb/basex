@@ -126,6 +126,7 @@ exit                 = Kilépés
 expecting_cmd        = Parancs az elvárt.
 explorer             = Intéző
 export               = Export
+external_variables   = External Variables
 file                 = fájl
 file_exists_%        = "%" már létezik.\nLecseréli?
 file_filter          = Fájlszűrő

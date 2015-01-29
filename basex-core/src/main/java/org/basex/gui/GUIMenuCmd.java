@@ -693,7 +693,7 @@ public enum GUIMenuCmd implements GUICommand {
   C_COLOR(COLORS + DOTS, null, false, false) {
     @Override
     public void execute(final GUI gui) {
-      new DialogColors(gui);
+      DialogColors.show(gui);
     }
   },
 
@@ -701,7 +701,7 @@ public enum GUIMenuCmd implements GUICommand {
   C_FONTS(FONTS_D, null, false, false) {
     @Override
     public void execute(final GUI gui) {
-      new DialogFonts(gui);
+      DialogFonts.show(gui);
     }
   },
 
@@ -709,7 +709,7 @@ public enum GUIMenuCmd implements GUICommand {
   C_PREFS(PREFERENCES + DOTS, Prop.MAC ? "% COMMA" : "% shift P", false, false) {
     @Override
     public void execute(final GUI gui) {
-      new DialogPrefs(gui);
+      DialogPrefs.show(gui);
     }
   },
 

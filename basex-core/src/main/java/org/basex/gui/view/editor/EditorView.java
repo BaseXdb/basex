@@ -19,6 +19,7 @@ import org.basex.core.cmd.*;
 import org.basex.core.parse.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Msg;
+import org.basex.gui.dialog.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXFileChooser.Mode;
 import org.basex.gui.layout.BaseXLayout.DropHandler;
@@ -55,6 +56,8 @@ public final class EditorView extends View {
   private final AbstractButton stop;
   /** Go button. */
   private final AbstractButton go;
+  /** Variables button. */
+  private final AbstractButton vars;
   /** Test button. */
   private final AbstractButton test;
   /** Search bar. */
@@ -110,12 +113,14 @@ public final class EditorView extends View {
     go = BaseXButton.get("c_go", BaseXLayout.addShortcut(RUN_QUERY,
         BaseXKeys.EXEC1.toString()), false, gui);
     go.addKeyListener(this);
+    vars = BaseXButton.get("c_vars", EXTERNAL_VARIABLES, false, gui);
+    vars.addKeyListener(this);
     test = BaseXButton.get("c_test", BaseXLayout.addShortcut(RUN_TESTS,
         BaseXKeys.UNIT.toString()), false, gui);
     test.addKeyListener(this);
 
     final BaseXBack buttons = new BaseXBack(false);
-    buttons.layout(new TableLayout(1, 8, 1, 0)).border(0, 0, 8, 0);
+    buttons.layout(new TableLayout(1, 9, 1, 0)).border(0, 0, 8, 0);
     buttons.add(openB);
     buttons.add(saveB);
     buttons.add(hist);
@@ -123,6 +128,7 @@ public final class EditorView extends View {
     buttons.add(Box.createHorizontalStrut(6));
     buttons.add(stop);
     buttons.add(go);
+    buttons.add(vars);
     buttons.add(test);
 
     final BaseXBack north = new BaseXBack(false).layout(new BorderLayout());
@@ -239,6 +245,12 @@ public final class EditorView extends View {
       @Override
       public void actionPerformed(final ActionEvent e) {
         run(getEditor(), Action.EXECUTE);
+      }
+    });
+    vars.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(final ActionEvent e) {
+        DialogBindings.show(gui);
       }
     });
     test.addActionListener(new ActionListener() {

@@ -18,8 +18,6 @@ import org.basex.util.*;
 public final class BaseXMem extends BaseXPanel {
   /** Default width of the memory status box. */
   private static final int DWIDTH = 70;
-  /** Dialog window with memory consumption. */
-  private static DialogMem mem;
 
   /**
    * Constructor.
@@ -89,8 +87,7 @@ public final class BaseXMem extends BaseXPanel {
 
   @Override
   public void mousePressed(final MouseEvent e) {
-    if(mem == null) mem = new DialogMem(gui);
-    else mem.setVisible(true);
+    DialogMem.show(gui);
     repaint();
   }
 }

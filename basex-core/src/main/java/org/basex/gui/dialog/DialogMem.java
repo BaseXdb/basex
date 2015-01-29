@@ -18,6 +18,9 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class DialogMem extends BaseXDialog {
+  /** Dialog. */
+  private static Dialog dialog;
+
   /** Info text. */
   private final TextPanel text;
 
@@ -25,7 +28,7 @@ public final class DialogMem extends BaseXDialog {
    * Default constructor.
    * @param main reference to the main window
    */
-  public DialogMem(final GUI main) {
+  private DialogMem(final GUI main) {
     super(main, USED_MEM, false);
     panel.setLayout(new BorderLayout());
 
@@ -43,8 +46,16 @@ public final class DialogMem extends BaseXDialog {
         gc.requestFocusInWindow();
       }
     });
-
     finish(null);
+  }
+
+  /**
+   * Activates the dialog window.
+   * @param main reference to the main window
+   */
+  public static void show(final GUI main) {
+    if(dialog == null) dialog = new DialogMem(main);
+    dialog.setVisible(true);
   }
 
   @Override

@@ -126,6 +126,7 @@ exit                 = Stop
 expecting_cmd        = Commando verwacht.
 explorer             = Verkenner
 export               = Exporteer
+external_variables   = External Variables
 file                 = bestand
 file_exists_%        = "%" bestaat al.\nWil je het vervangen?
 file_filter          = File Filter

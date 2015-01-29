@@ -126,6 +126,7 @@ exit                 = Хаах
 expecting_cmd        = Коммандаас гадуур байна.
 explorer             = Нээгч
 export               = экспортлох
+external_variables   = External Variables
 file                 = Файл
 file_exists_%        = "%" аль хэдийнэ үүссэн байна.\nҮүнийг шинээр үүсгэх үү?
 file_filter          = File Filter

@@ -126,6 +126,7 @@ exit                 = 終了
 expecting_cmd        = 予想されるコマンド
 explorer             = エクスプローラ
 export               = エクスポート
+external_variables   = External Variables
 file                 = ファイル
 file_exists_%        = ファイル "%" は既に存在します。\n置換してよろしいですか？
 file_filter          = File Filter

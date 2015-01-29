@@ -14,6 +14,9 @@ import org.basex.gui.layout.*;
  * @author Christian Gruen
  */
 public final class DialogPrefs extends BaseXDialog {
+  /** Dialog. */
+  private static Dialog dialog;
+
   /** General preferences. */
   private final DialogGeneralPrefs general;
   /** Editor preferences. */
@@ -45,17 +48,21 @@ public final class DialogPrefs extends BaseXDialog {
     finish(null);
   }
 
+  /**
+   * Activates the dialog window.
+   * @param main reference to the main window
+   */
+  public static void show(final GUI main) {
+    if(dialog == null) dialog = new DialogPrefs(main);
+    dialog.setVisible(true);
+  }
+
   @Override
   public void action(final Object cmp) {
     general.action(cmp);
     editor.action();
     visual.action();
     gui.notify.layout();
-  }
-
-  @Override
-  public void close() {
-    cancel();
   }
 
   @Override

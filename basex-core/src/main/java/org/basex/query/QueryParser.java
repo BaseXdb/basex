@@ -134,36 +134,10 @@ public class QueryParser extends InputParser {
     if(!bi.isEmpty()) sctx.baseURI(bi);
     this.sc = sctx;
 
-    // parse pre-defined external variables
-    final String bind = opts.get(MainOptions.BINDINGS).trim();
-    final StringBuilder key = new StringBuilder();
-    final StringBuilder val = new StringBuilder();
-    boolean first = true;
-    final int sl = bind.length();
-    for(int s = 0; s < sl; s++) {
-      final char ch = bind.charAt(s);
-      if(first) {
-        if(ch == '=') {
-          first = false;
-        } else {
-          key.append(ch);
-        }
-      } else {
-        if(ch == ',') {
-          if(s + 1 == sl || bind.charAt(s + 1) != ',') {
-            qc.bind(key.toString().trim(), new Atm(val.toString()), sc);
-            key.setLength(0);
-            val.setLength(0);
-            first = true;
-            continue;
-          }
-          // literal commas are escaped by a second comma
-          s++;
-        }
-        val.append(ch);
-      }
+    // bind external variables
+    for(final Map.Entry<String, String> entry : QueryProcessor.bindings(opts).entrySet()) {
+      qc.bind(entry.getKey(), new Atm(entry.getValue()), sc);
     }
-    if(key.length() != 0) qc.bind(key.toString().trim(), new Atm(val.toString()), sc);
   }
 
   /**

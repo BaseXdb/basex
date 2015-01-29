@@ -787,6 +787,8 @@ public interface Text {
   String PATH = lang("path");
   /** Input. */
   String INPUT = lang("input");
+  /** External Variables. */
+  String EXTERNAL_VARIABLES = lang("external_variables");
 
   /** Command info. */
   String RECENTLY_OPENED = lang("recently_opened");

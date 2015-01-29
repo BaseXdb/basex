@@ -126,6 +126,7 @@ exit                 = Beenden
 expecting_cmd        = Befehl erwartet.
 explorer             = Explorer
 export               = Exportieren
+external_variables   = Externe Variablen
 file                 = Datei
 file_exists_%        = "%" besteht bereits.\nMöchten Sie sie ersetzen?
 file_filter          = Datei-Filter
