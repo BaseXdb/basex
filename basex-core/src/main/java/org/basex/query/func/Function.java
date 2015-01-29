@@ -1423,8 +1423,18 @@ public enum Function {
    * Returns the local name of the function.
    * @return name
    */
-  public byte[] id() {
+  public byte[] local() {
     return new TokenBuilder(desc.substring(0, desc.indexOf('('))).finish();
+  }
+
+  /**
+   * Returns the prefixed name of the annotation.
+   * @return name
+   */
+  public byte[] id() {
+    final TokenBuilder tb = new TokenBuilder();
+    if(!Token.eq(uri, QueryText.FN_URI)) tb.add(NSGlobal.prefix(uri)).add(':');
+    return tb.add(local()).finish();
   }
 
   /**

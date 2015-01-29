@@ -156,7 +156,7 @@ public enum Annotation {
 
   static {
     for(final Annotation sig : Annotation.VALUES) {
-      MAP.put(new QNm(sig.id(), sig.uri).id(), sig);
+      MAP.put(new QNm(sig.local(), sig.uri).id(), sig);
     }
   }
 
@@ -205,18 +205,18 @@ public enum Annotation {
    * Returns the local name of the annotation.
    * @return name
    */
-  public byte[] id() {
+  public byte[] local() {
     return new TokenBuilder(desc.substring(0, desc.indexOf('('))).finish();
   }
 
   /**
-   * Returns the name of the annotation.
+   * Returns the prefixed name of the annotation.
    * @return name
    */
-  public byte[] prefixId() {
+  public byte[] id() {
     final TokenBuilder tb = new TokenBuilder();
     if(!eq(uri, QueryText.XQ_URI)) tb.add(NSGlobal.prefix(uri)).add(':');
-    return tb.add(id()).finish();
+    return tb.add(local()).finish();
   }
 
   @Override

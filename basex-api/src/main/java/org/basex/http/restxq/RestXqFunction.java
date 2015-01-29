@@ -149,13 +149,13 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
         addMethod(mth, body, declared, ann.info);
       } else if(eq(ann.sig.uri, QueryText.REST_URI)) {
         final Item body = args.length == 0 ? null : args[0];
-        addMethod(string(ann.sig.id()), body, declared, ann.info);
+        addMethod(string(ann.sig.local()), body, declared, ann.info);
       } else if(eq(ann.sig.uri, QueryText.OUTPUT_URI)) {
         // serialization parameters
         try {
-          output.assign(string(ann.sig.id()), toString(args[0]));
+          output.assign(string(ann.sig.local()), toString(args[0]));
         } catch(final BaseXException ex) {
-          throw error(ann.info, UNKNOWN_SER, ann.sig.id());
+          throw error(ann.info, UNKNOWN_SER, ann.sig.local());
         }
       }
     }

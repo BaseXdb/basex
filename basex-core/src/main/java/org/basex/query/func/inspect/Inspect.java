@@ -90,7 +90,7 @@ public abstract class Inspect {
 
     for(final Ann ann : anns) {
       final FElem annotation = elem("annotation", parent);
-      annotation.add("name", ann.sig.prefixId());
+      annotation.add("name", ann.sig.id());
       if(uri) annotation.add("uri", ann.sig.uri);
       for(final Item it : ann.args) {
         final FElem literal = elem("literal", annotation);

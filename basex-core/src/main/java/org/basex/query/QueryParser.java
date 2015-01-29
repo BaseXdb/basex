@@ -441,6 +441,7 @@ public class QueryParser extends InputParser {
           wsCheck(PAREN2);
         }
         skipWs();
+
         final Annotation sig = Annotation.get(name);
         if(sig == null) {
           // reject unknown annotations with pre-defined namespaces, ignore others
@@ -450,7 +451,7 @@ public class QueryParser extends InputParser {
               info, '%', name.string());
         }
         // check if annotation is specified more than once
-        if(sig.single && anns.contains(sig)) throw BASX_TWICE_X_X.get(info, '%', sig.prefixId());
+        if(sig.single && anns.contains(sig)) throw BASX_TWICE_X_X.get(info, '%', sig.id());
 
         final long arity = vb.size();
         if(arity < sig.minMax[0] || arity > sig.minMax[1])
