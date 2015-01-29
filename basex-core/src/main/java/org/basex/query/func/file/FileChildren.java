@@ -26,9 +26,7 @@ public final class FileChildren extends FileRead {
         for(final Path child : paths) children.add(get(child, Files.isDirectory(child)).string());
       }
       return StrSeq.get(children).iter();
-    } catch(final NoSuchFileException ex) {
-      throw FILE_NOT_FOUND_X.get(info, ex);
-    } catch(final NotDirectoryException ex) {
+    } catch(final NoSuchFileException | NotDirectoryException ex) {
       throw FILE_NO_DIR_X.get(info, ex);
     } catch(final AccessDeniedException ex) {
       throw FILE_IE_ERROR_ACCESS_X.get(info, ex);

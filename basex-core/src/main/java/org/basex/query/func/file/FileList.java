@@ -34,9 +34,7 @@ public final class FileList extends FileRead {
       final TokenList list = new TokenList();
       list(dir.getNameCount(), dir, list, rec, pat);
       return StrSeq.get(list).iter();
-    } catch(final NoSuchFileException ex) {
-      throw FILE_NOT_FOUND_X.get(info, ex);
-    } catch(final NotDirectoryException ex) {
+    } catch(final NoSuchFileException | NotDirectoryException ex) {
       throw FILE_NO_DIR_X.get(info, ex);
     } catch(final AccessDeniedException ex) {
       throw FILE_IE_ERROR_ACCESS_X.get(info, ex);
@@ -56,7 +54,7 @@ public final class FileList extends FileRead {
    * @throws IOException I/O exception
    */
   private static void list(final int index, final Path dir, final TokenList list, final boolean rec,
-                           final Pattern pat) throws QueryException, IOException {
+      final Pattern pat) throws QueryException, IOException {
 
     // skip invalid directories
     final ArrayList<Path> children = new ArrayList<>();
