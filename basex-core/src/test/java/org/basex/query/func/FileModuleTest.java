@@ -153,7 +153,7 @@ public final class FileModuleTest extends AdvancedQueryTest {
   public void list() {
     query(_FILE_WRITE.args(PATH1, "abcd"));
     error(_FILE_LIST.args(PATH1), FILE_NO_DIR_X);
-    error(_FILE_LIST.args(PATH1 + NAME), FILE_NOT_FOUND_X);
+    error(_FILE_LIST.args(PATH1 + NAME), FILE_NO_DIR_X);
     query(_FILE_WRITE.args(PATH1, "()"));
     error(_FILE_LIST.args(PATH1), FILE_NO_DIR_X);
     query(_FILE_LIST.args(PATH), NAME);
@@ -174,7 +174,7 @@ public final class FileModuleTest extends AdvancedQueryTest {
   public void children() {
     query(_FILE_WRITE.args(PATH1, "abcd"));
     error(_FILE_CHILDREN.args(PATH1), FILE_NO_DIR_X);
-    error(_FILE_CHILDREN.args(PATH1 + NAME), FILE_NOT_FOUND_X);
+    error(_FILE_CHILDREN.args(PATH1 + NAME), FILE_NO_DIR_X);
     query(_FILE_WRITE.args(PATH1, "()"));
     error(_FILE_CHILDREN.args(PATH1), FILE_NO_DIR_X);
     contains(_FILE_CHILDREN.args(PATH), NAME);
