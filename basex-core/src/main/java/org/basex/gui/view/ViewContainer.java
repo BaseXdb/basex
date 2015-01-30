@@ -58,7 +58,7 @@ public final class ViewContainer extends BaseXBack {
   public ViewContainer(final GUI main, final View... v) {
     layout(new BorderLayout());
     setOpaque(true);
-    logo = BaseXImages.get("logo");
+    logo = BaseXImages.get("logo_transparent");
     setBackground(GUIConstants.BACK);
 
     final int vl = v.length;

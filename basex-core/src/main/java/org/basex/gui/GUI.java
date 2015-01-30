@@ -123,7 +123,7 @@ public final class GUI extends JFrame {
     this.context = ctx;
     this.gopts = opts;
 
-    setIconImage(BaseXImages.get("icon"));
+    setIconImage(BaseXImages.get("logo_64"));
     setTitle();
 
     GUIMacOSX.enableOSXFullscreen(this);
