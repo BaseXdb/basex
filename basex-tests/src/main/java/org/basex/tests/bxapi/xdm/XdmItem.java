@@ -1,5 +1,7 @@
 package org.basex.tests.bxapi.xdm;
 
+import static org.basex.query.QueryError.*;
+
 import java.util.*;
 
 import org.basex.query.*;
@@ -39,8 +41,11 @@ public abstract class XdmItem extends XdmValue {
    * @throws XQueryException exception
    */
   public boolean equal(final XdmItem item) {
+    if(item == null) return false;
+    final Item it1 = internal(), it2 = item.internal();
     try {
-      return item != null && internal().eq(item.internal(), null, null, null);
+      if(!it1.comparable(it2)) throw diffError(null, it1, it2);
+      return it1.eq(it2, null, null, null);
     } catch(final QueryException ex) {
       throw new XQueryException(ex);
     }
