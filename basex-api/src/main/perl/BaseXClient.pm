@@ -1,5 +1,5 @@
 # Perl client for BaseX.
-# Works with BaseX 7.x (but not with BaseX 8.0 and later)
+# Works with BaseX 7.x and later
 #
 # Documentation: http://docs.basex.org/wiki/Clients
 # 
@@ -25,12 +25,22 @@ sub new {
     PeerAddr => $host, PeerPort => $port, Proto => "tcp") or
     die "Can't communicate with the server.";
 
-  # receive timestamp
-  my $ts = $self->_receive();
+  # receive server response
+  my $code; my $nonce;
+  my @response = split(':', $self->_receive());
+  if(@response > 1) {
+    # support for digest authentication
+    $code = "$user:$response[0]:$pw";
+    $nonce = $response[1];
+  } else {
+    # support for cram-md5 (Version < 8.0)
+    $code = $pw;
+    $nonce = $response[0];
+  }
 
   # send username and hashed password/timestamp
-  my $pwmd5 = Digest::MD5->new()->add($pw)->hexdigest();
-  my $complete = Digest::MD5->new()->add($pwmd5.$ts)->hexdigest();
+  my $codemd5 = Digest::MD5->new()->add($code)->hexdigest();
+  my $complete = Digest::MD5->new()->add($codemd5.$nonce)->hexdigest();
   $self->send($user.chr(0).$complete);
 
   # evaluate success flag
