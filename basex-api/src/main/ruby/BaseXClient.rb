@@ -14,14 +14,18 @@ module BaseXClient
 
       # create server connection
       @socket = TCPSocket.open(host, port)
-      
+                  
       # authenticate
-      rec = receive.split(':')
-      realm = rec[0]
-      nonce = rec[1]
       hash = Digest::MD5.new
-      hash.update(hash.hexdigest([username, realm, pw].join(':')))
-      hash.update(nonce)
+      # response either {nonce} or {realm:nonce}
+      rec = receive.split(':')
+      if rec.length == 1
+        hash.update(hash.hexdigest(pw))
+        hash.update(rec[0])
+      else
+        hash.update(hash.hexdigest([username, rec[0], pw].join(':')))
+        hash.update(rec[1])
+      end
       send(username)
       send(hash.hexdigest())
 
