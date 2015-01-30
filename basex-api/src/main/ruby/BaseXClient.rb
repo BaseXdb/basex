@@ -14,14 +14,14 @@ module BaseXClient
 
       # create server connection
       @socket = TCPSocket.open(host, port)
-
-      # receive timestamp
-      ts = receive
+      
+      # authenticate
+      rec = receive.split(':')
+      realm = rec[0]
+      nonce = rec[1]
       hash = Digest::MD5.new
-      hash.update(hash.hexdigest(pw))
-      hash.update(ts)
-
-      # send username and hashed password/timestamp
+      hash.update(hash.hexdigest([username, realm, pw].join(':')))
+      hash.update(nonce)
       send(username)
       send(hash.hexdigest())
 
