@@ -25,7 +25,7 @@ public class BaseXTree extends JTree {
     addMouseListener(new MouseAdapter() {
       @Override
       public void mousePressed(final MouseEvent e) {
-        if(SwingUtilities.isRightMouseButton(e))
+        if(SwingUtilities.isRightMouseButton(e) || SwingUtilities.isLeftMouseButton(e))
           setSelectionRow(getClosestRowForLocation(e.getX(), e.getY()));
       }
     });
