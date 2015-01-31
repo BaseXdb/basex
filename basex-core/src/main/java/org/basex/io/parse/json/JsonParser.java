@@ -372,11 +372,9 @@ final class JsonParser extends InputParser {
   /**
    * Adds the specified character.
    * @param ch character
-   * @throws QueryIOException exception
    */
-  private void add(final int ch) throws QueryIOException {
-    if(!XMLToken.valid(ch)) throw error(BXJS_INVALID_X, "Character \\u% is invalid.", ch);
-    tb.add(ch);
+  private void add(final int ch) {
+    tb.add(XMLToken.valid(ch) ? ch : '\uFFFD');
   }
 
   /** Consumes all whitespace characters from the remaining query. */
@@ -405,13 +403,12 @@ final class JsonParser extends InputParser {
    * @throws QueryIOException parse error
    */
   private boolean consumeWs(final char ch, final boolean err) throws QueryIOException {
-    if(consume() != ch) {
-      pos--;
-      if(err) throw error("Expected '%', found '%'", ch, curr());
-      return false;
+    if(consume(ch)) {
+      skipWs();
+      return true;
     }
-    skipWs();
-    return true;
+    if(err) throw error("Expected '%', found '%'", ch, curr());
+    return false;
   }
 
   /**

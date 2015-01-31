@@ -289,7 +289,7 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
    */
   public static String string(final String query, final XdmValue value, final Context context) {
     final XdmValue xv = new XQuery(query, context).context(value).value();
-    return xv.size() == 0 ? "" : xv.iterator().next().getString();
+    return xv.size() == 0 ? "" : xv.getString();
   }
 
   @Override

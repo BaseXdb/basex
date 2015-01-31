@@ -49,7 +49,6 @@ public class FnParseJson extends Parse {
       final QueryError error = qe.error();
       final String message = ex.getLocalizedMessage();
       if(error == BXJS_PARSE_X_X_X) throw JSON_PARSE_X.get(ii, message);
-      if(error == BXJS_INVALID_X) throw JSON_INVALID_X.get(ii, message);
       if(error == BXJS_DUPLICATE_X) throw JSON_DUPLICATE_X.get(ii, message);
       throw qe;
     }

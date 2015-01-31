@@ -12,9 +12,9 @@ import org.basex.util.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-final class XdmAtomic extends XdmItem {
+public final class XdmAtomic extends XdmItem {
   /** Wrapped item. */
-  private final Item item;
+  public final Item item;
 
   /**
    * Constructor.

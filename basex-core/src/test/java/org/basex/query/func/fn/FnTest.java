@@ -122,7 +122,7 @@ public final class FnTest extends AdvancedQueryTest {
   /** Tests for the {@code parse-json} function. */
   @Test
   public void parseJson() {
-    error(PARSE_JSON.args("\"\"\"x\\u0000\"\"\""), JSON_INVALID_X);
+    query(PARSE_JSON.args("\"\"\"x\\u0000\"\"\""), "x\uFFFD");
   }
 
   /** Tests for the {@code json-doc} function. */

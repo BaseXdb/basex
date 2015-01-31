@@ -145,8 +145,6 @@ public enum QueryError {
   /** BXJS0001. */
   BXJS_DUPLICATE_X(BXJS, 1, "JSON parser: (%:%): %."),
   /** BXJS0001. */
-  BXJS_INVALID_X(BXJS, 1, "JSON parser: (%:%): %."),
-  /** BXJS0001. */
   BXJS_PARSEML_X(BXJS, 1, "JsonML parser: %."),
   /** BXJS0002. */
   BXJS_SERIAL_X(BXJS, 2, "JSON serializer: %."),
@@ -510,12 +508,9 @@ public enum QueryError {
   PICINVCOMP_X_X(FOFD, 1350, "Component '[%]' not applicable to % values."),
 
   /** BXJS0001. */
-  JSON_PARSE_X(BXJS, 1, "%"),
-  /** BXJS0002. */
-  JSON_INVALID_X(BXJS, 2, "%"),
+  JSON_PARSE_X(FOJS, 1, "%"),
   /** BXJS0003. */
-  JSON_DUPLICATE_X(BXJS, 3, "%"),
-
+  JSON_DUPLICATE_X(FOJS, 3, "%"),
 
   /** FONS0004. */
   NSDECL_X(FONS, 4, "No namespace declared for prefix '%'."),
@@ -1358,6 +1353,7 @@ public enum QueryError {
     /** FODT Error type. */ FODT,
     /** FOFD Error type. */ FOFD,
     /** FOER Error type. */ FOER,
+    /** FOJS Error type. */ FOJS,
     /** FONS Error type. */ FONS,
     /** FORG Error type. */ FORG,
     /** FORX Error type. */ FORX,

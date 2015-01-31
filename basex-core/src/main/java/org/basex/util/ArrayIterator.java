@@ -11,11 +11,11 @@ import java.util.*;
  */
 public final class ArrayIterator<E> implements Iterator<E>, Iterable<E> {
   /** Array. */
-  private final Object[] a;
+  private final Object[] array;
   /** Index + 1 of last object to return. */
-  private final int e;
+  private final int end;
   /** Current index. */
-  private int s;
+  private int start;
 
   /**
    * Constructor.
@@ -33,9 +33,9 @@ public final class ArrayIterator<E> implements Iterator<E>, Iterable<E> {
    * @param end index + 1 of last object to return
    */
   public ArrayIterator(final Object[] array, final int start, final int end) {
-    a = array;
-    s = start;
-    e = end;
+    this.array = array;
+    this.start = start;
+    this.end = end;
   }
 
   @Override
@@ -45,13 +45,13 @@ public final class ArrayIterator<E> implements Iterator<E>, Iterable<E> {
 
   @Override
   public boolean hasNext() {
-    return s < e;
+    return start < end;
   }
 
   @Override
   @SuppressWarnings("unchecked")
   public E next() {
-    return (E) a[s++];
+    return (E) array[start++];
   }
 
   @Override
