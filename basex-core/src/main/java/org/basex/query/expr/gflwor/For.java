@@ -176,21 +176,16 @@ public final class For extends ForLet {
 
   /**
    * Adds a predicate to the loop expression.
-   * @param qc query context
-   * @param scp variable scope
    * @param pred predicate
-   * @throws QueryException query exception
    */
-  void addPredicate(final QueryContext qc, final VarScope scp, final Expr pred)
-      throws QueryException {
-
+  void addPredicate(final Expr pred) {
     // add to clause expression
     if(expr instanceof AxisPath) {
-      expr = ((AxisPath) expr).addPreds(pred).optimize(qc, scp);
+      expr = ((AxisPath) expr).addPreds(pred);
     } else if(expr instanceof Filter) {
-      expr = ((Filter) expr).addPred(pred).optimize(qc, scp);
+      expr = ((Filter) expr).addPred(pred);
     } else {
-      expr = Filter.get(info, expr, pred).optimize(qc, scp);
+      expr = Filter.get(info, expr, pred);
     }
   }
 
@@ -224,7 +219,7 @@ public final class For extends ForLet {
     // attach predicates to axis path or filter, or create a new filter
     if(pred.seqType().mayBeNumber()) pred = Function.BOOLEAN.get(null, info, pred);
 
-    addPredicate(qc, scp, pred);
+    addPredicate(pred);
     return true;
   }
 

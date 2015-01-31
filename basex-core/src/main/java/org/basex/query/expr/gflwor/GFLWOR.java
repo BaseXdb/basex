@@ -492,6 +492,7 @@ public final class GFLWOR extends ParseExpr {
    */
   private boolean optimizeWhere(final QueryContext qc, final VarScope scp) throws QueryException {
     boolean changed = false;
+    final HashSet<For> fors = new HashSet<>();
     for(int i = 0; i < clauses.size(); i++) {
       final Clause clause = clauses.get(i);
       if(!(clause instanceof Where) || clause.has(Flag.NDT) || clause.has(Flag.UPD)) continue;
@@ -527,10 +528,14 @@ public final class GFLWOR extends ParseExpr {
         final int newPos = insert < 0 ? i : insert;
         for(int b4 = newPos; --b4 >= 0;) {
           final Clause before = clauses.get(b4);
-          if(before instanceof For && ((For) before).toPredicate(qc, scp, wh.expr)) {
-            clauses.remove(newPos);
-            i--;
-            changed = true;
+          if(before instanceof For) {
+            final For f = (For) before;
+            if(f.toPredicate(qc, scp, wh.expr)) {
+              fors.add((For) before);
+              clauses.remove(newPos);
+              i--;
+              changed = true;
+            }
           } else if(before instanceof Where) {
             continue;
           }
@@ -538,6 +543,8 @@ public final class GFLWOR extends ParseExpr {
         }
       }
     }
+    // trigger optimizations on rewritten expressions
+    for(final For f : fors) f.expr = f.expr.optimize(qc, scp);
     if(changed) qc.compInfo(QueryText.OPTWHERE2);
     return changed;
   }
@@ -562,7 +569,7 @@ public final class GFLWOR extends ParseExpr {
       for(int i = c + 1; i < clauses.size(); i++) {
         final Clause cl = clauses.get(i);
         if(!(cl instanceof Where)) {
-          // skip group by, count, ...
+          // stop if clause is no for or let expression, is non-deterministic, or updating
           if(!(cl instanceof For || cl instanceof Let) || cl.has(Flag.NDT) || cl.has(Flag.UPD))
             break;
           continue;
@@ -575,7 +582,8 @@ public final class GFLWOR extends ParseExpr {
         // remove clause and ensure that the positional variable is only used once
         clauses.remove(i);
         if(count(pos.pos, c) == VarUsage.NEVER) {
-          pos.addPredicate(qc, scp, Pos.get(cmp));
+          pos.addPredicate(Pos.get(cmp));
+          pos.expr = pos.expr.optimize(qc, scp);
           qc.compInfo(QueryText.OPTPRED, cmp);
           changed = true;
         } else {

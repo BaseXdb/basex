@@ -1,5 +1,7 @@
 package org.basex.query.expr;
 
+import static org.basex.query.expr.path.Axis.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
@@ -42,23 +44,25 @@ public abstract class Filter extends Preds {
    * @return filter expression
    */
   public static Expr get(final InputInfo info, final Expr root, final Expr... preds) {
-    return path(root, preds) ? ((AxisPath) root).addPreds(preds) :
-      new CachedFilter(info, root, preds);
+    final Path p = path(root, preds);
+    return p == null ? new CachedFilter(info, root, preds) : p;
   }
 
   /**
-   * Checks if the specified filter input can be rewritten to a path.
+   * Checks if the specified filter input can be rewritten to an axis path.
    * @param root root expression
    * @param preds predicate expressions
    * @return filter expression
    */
-  private static boolean path(final Expr root, final Expr... preds) {
-    if(!(root instanceof AxisPath)) return false;
-    // predicate must not be numeric
-    for(final Expr pred : preds) {
-      if(pred.seqType().mayBeNumber() || pred.has(Flag.FCS)) return false;
+  private static Path path(final Expr root, final Expr... preds) {
+    if(root instanceof AxisPath) {
+      // predicate must not be numeric
+      for(final Expr pred : preds) {
+        if(pred.seqType().mayBeNumber() || pred.has(Flag.FCS)) return null;
+      }
+      return ((AxisPath) root).addPreds(preds);
     }
-    return true;
+    return null;
   }
 
   @Override
@@ -114,11 +118,12 @@ public abstract class Filter extends Preds {
       qc.value = cv;
     }
 
-    // no predicates.. return root; otherwise, do some advanced compilations
+    // no predicates left.. return root
     if(preds.length == 0) return root;
 
-    // convert filter to path
-    if(path(root, preds)) return ((AxisPath) root).addPreds(preds).optimize(qc, scp);
+    // if possible, convert filter to path
+    final Path p = path(root, preds);
+    if(p != null) return p.optimize(qc, scp);
 
     // determine type and number of results
     final SeqType st = root.seqType();
@@ -134,6 +139,13 @@ public abstract class Filter extends Preds {
       // no results will remain: return empty sequence
       if(size == 0) return optPre(qc);
       seqType = SeqType.get(st.type, size);
+    }
+
+    // try to rewrite filter to index access
+    if(root instanceof Context || root instanceof Value && root.data() != null) {
+      final Path ip = Path.get(info, root, Step.get(info, SELF, Test.NOD, preds));
+      final Expr ie = ip.index(qc, Path.initial(qc, root));
+      if(ie != ip) return ie;
     }
 
     // no numeric predicates.. use simple iterator

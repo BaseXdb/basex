@@ -56,6 +56,7 @@ public final class IndexOptimizeTest extends AdvancedQueryTest {
     check("//*[text() contains text '1']");
     check("//a[. = '1']");
     check("//xml[a = '1']");
+    check(".[.//text() contains text '1']");
   }
 
   /**
@@ -71,6 +72,7 @@ public final class IndexOptimizeTest extends AdvancedQueryTest {
     check("//*[text() contains text '1']");
     check("//a[. = '1']");
     check("//xml[a = '1']");
+    check(".[.//text() contains text '1']");
   }
 
   /**
@@ -80,11 +82,13 @@ public final class IndexOptimizeTest extends AdvancedQueryTest {
   @Test
   public void docTest() throws Exception {
     createDoc();
-    final String doc = DOC.args(NAME);
-    check(doc + "//*[text() = '1']");
-    check(doc + "//*[text() contains text '2']");
-    check(doc + "//a[. = '1']");
-    check(doc + "//xml[a = '1']");
+    final String func = DOC.args(NAME);
+    check(func + "//*[text() = '1']");
+    check(func + "//*[text() contains text '2']");
+    check(func + "//a[. = '1']");
+    check(func + "//xml[a = '1']");
+    check(func + "/.[.//text() contains text '1']");
+    check(func + "[.//text() contains text '1']");
   }
 
   /**
@@ -94,11 +98,13 @@ public final class IndexOptimizeTest extends AdvancedQueryTest {
   @Test
   public void collTest() throws Exception {
     createColl();
-    final String doc = COLLECTION.args(NAME);
-    check(doc + "//*[text() = '1']");
-    check(doc + "//*[text() contains text '2']");
-    check(doc + "//a[. = '1']");
-    check(doc + "//xml[a = '1']");
+    final String func = COLLECTION.args(NAME);
+    check(func + "//*[text() = '1']");
+    check(func + "//*[text() contains text '2']");
+    check(func + "//a[. = '1']");
+    check(func + "//xml[a = '1']");
+    check(func + "/.[.//text() contains text '1']");
+    check(func + "[.//text() contains text '1']");
   }
 
   /**
@@ -108,11 +114,11 @@ public final class IndexOptimizeTest extends AdvancedQueryTest {
   @Test
   public void dbOpenTest() throws Exception {
     createColl();
-    final String doc = _DB_OPEN.args(NAME);
-    check(doc + "//*[text() = '1']");
-    check(doc + "//*[text() contains text '2']");
-    check(doc + "//a[. = '1']");
-    check(doc + "//xml[a = '1']");
+    final String func = _DB_OPEN.args(NAME);
+    check(func + "//*[text() = '1']");
+    check(func + "//*[text() contains text '2']");
+    check(func + "//a[. = '1']");
+    check(func + "//xml[a = '1']");
   }
 
   /**
@@ -122,12 +128,12 @@ public final class IndexOptimizeTest extends AdvancedQueryTest {
   @Test
   public void dbOpenExtTest() throws Exception {
     createColl();
-    final String doc = _DB_OPEN.args(NAME, "two");
-    check(doc + "//*[text() = '1']", "");
-    check(doc + "//*[text() contains text '2']", "");
-    check(doc + "//a[. = '1']", "");
-    check(doc + "//xml[a = '1']", "");
-    check(doc + "//*[text() = '4']", "<a>4</a>");
+    final String func = _DB_OPEN.args(NAME, "two");
+    check(func + "//*[text() = '1']", "");
+    check(func + "//*[text() contains text '2']", "");
+    check(func + "//a[. = '1']", "");
+    check(func + "//xml[a = '1']", "");
+    check(func + "//*[text() = '4']", "<a>4</a>");
   }
 
   /**
@@ -234,8 +240,7 @@ public final class IndexOptimizeTest extends AdvancedQueryTest {
   }
 
   /**
-   * Checks if specified query was rewritten for index access, and checks the
-   * query result.
+   * Checks if specified query was rewritten for index access, and checks the query result.
    * @param query query to be tested
    * @param result expected query result
    */

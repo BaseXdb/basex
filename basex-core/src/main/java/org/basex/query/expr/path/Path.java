@@ -11,7 +11,6 @@ import org.basex.index.path.*;
 import org.basex.query.*;
 import org.basex.query.expr.constr.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.Context;
 import org.basex.query.expr.List;
 import org.basex.query.expr.path.Test.*;
 import org.basex.query.util.*;
@@ -601,12 +600,13 @@ public abstract class Path extends ParseExpr {
    * Queries of type 1, 3, 5 will not yield any results if the string to be compared is empty.
    *
    * @param qc query context
-   * @param rt root value
+   * @param rt root value (can be {@code null})
    * @return original or new expression
    * @throws QueryException query exception
    */
-  private Expr index(final QueryContext qc, final Value rt) throws QueryException {
+  public Expr index(final QueryContext qc, final Value rt) throws QueryException {
     // only rewrite paths with data reference
+    if(rt == null) return this;
     final Data data = rt.data();
     if(data == null) return this;
 
@@ -619,6 +619,7 @@ public abstract class Path extends ParseExpr {
     final int sl = steps.length;
     for(int s = 0; s < sl; s++) {
       // only accept descendant steps without positional predicates
+      // Example for position predicate: child:x[1] != parent::x[1]
       final Step step = axisStep(s);
       if(step == null || !step.axis.down || step.has(Flag.FCS)) break;
 
@@ -651,17 +652,8 @@ public abstract class Path extends ParseExpr {
     // rewrite for index access
     qc.compInfo(index.info);
 
-    // replace expressions for index access
-    final Step indexStep = index.step;
-
-    // collect remaining predicates
-    final int pl = indexStep.preds.length;
-    final ExprList newPreds = new ExprList(pl - 1);
-    for(int p = 0; p < pl; p++) {
-      if(p != iPred) newPreds.add(indexStep.preds[p]);
-    }
-
     // invert steps that occur before index step and add them as predicate
+    final ExprList newPreds = new ExprList();
     final Test test = InvDocTest.get(rt);
     final ExprList invSteps = new ExprList();
     if(test != Test.DOC || !data.meta.uptodate || predSteps(data, iStep)) {
@@ -678,6 +670,13 @@ public abstract class Path extends ParseExpr {
       }
     }
     if(!invSteps.isEmpty()) newPreds.add(get(info, null, invSteps.finish()));
+
+    // add remaining predicates
+    final Step indexStep = index.step;
+    final int pl = indexStep.preds.length;
+    for(int p = 0; p < pl; p++) {
+      if(p != iPred) newPreds.add(indexStep.preds[p]);
+    }
 
     // create resulting expression
     final ExprList resultSteps = new ExprList();
