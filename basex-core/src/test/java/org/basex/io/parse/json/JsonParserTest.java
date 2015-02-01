@@ -72,6 +72,12 @@ public final class JsonParserTest {
     parse("\"\\u000a\"", "\"\\n\"", false);
     parse("\"\\u000A\"", "\"\\n\"", false);
     parse("\"\n\"", "\"\\n\"", true);
+    parse("\"\uD834\"", "\"\uFFFD\"", false);
+    parse("\"\uD853\uFFFF\"", "\"\uFFFD\uFFFD\"", false);
+    parse("\"\uFFFF\"", "\"\uFFFD\"", false);
+    parse("\"\uD853a\"", "\"\uFFFDa\"", false);
+    parse("\"\\b\\f\\t\\r\\n\"", "\"\uFFFD\uFFFD\\t\\r\\n\"", false);
+    parse("\"\\u0000\\u001F\"", "\"\uFFFD\uFFFD\"", false);
 
     unescape("\"\\b\\f\\t\\r\\n\"", "\"\\\\b\\\\f\\\\t\\\\r\\\\n\"");
     // Unicode in JSON notation
@@ -91,13 +97,6 @@ public final class JsonParserTest {
     error("\"test", false);
     error("\"\uD800", false);
     error("\"\n\"", false);
-
-    error("\"\uD834\"", false);
-    error("\"\uD853\uFFFF\"", false);
-    error("\"\uFFFF\"", false);
-    error("\"\uD853a\"", false);
-    error("\"\\b\\f\\t\\r\\n\"", false);
-    error("\"\\u0000\\u001F\"", false);
   }
 
   /**

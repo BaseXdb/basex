@@ -44,8 +44,9 @@ public final class CMap extends Arr {
       if(!(key instanceof Item)) throw SEQFOUND_X.get(ii, key);
       final Item k = (Item) key;
       final Value v = qc.value(exprs[e + 1]);
-      if(map.contains(k, ii)) throw MAPDUPLKEY_X_X_X.get(ii, k, map.get(k, ii), v);
+      final boolean c = map.contains(k, ii);
       map = map.put(k, v, ii);
+      if(c) throw MAPDUPLKEY_X_X_X.get(ii, k, map.get(k, ii), v);
     }
     return map;
   }

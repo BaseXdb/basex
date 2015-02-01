@@ -1015,8 +1015,8 @@ public enum QueryError {
   DUPLNSCONS_X(XQDY, 102, "Duplicate namespace declaration: '%'."),
   /** XQDY0137. */
   MAPDUPLKEY_X_X_X(XQDY, 137, "Key % already exists in map (values: % vs. %)."),
-  /** XQDY0138. */
-  MAPTZ(XQDY, 138, "Map contains keys with and without timezone."),
+  /** XPDY0139. */
+  MAPTZ(XPDY, 139, "Map contains keys with and without timezone."),
 
   /** XQST0009. */
   IMPLSCHEMA(XQST, 9, "Schema import not supported."),
