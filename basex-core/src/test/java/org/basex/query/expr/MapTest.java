@@ -38,21 +38,21 @@ public final class MapTest extends AdvancedQueryTest {
     error("let $k1 := xs:time('01:01:01')"
         + "let $k2 := xs:dateTime('2001-01-01T01:01:01+01:00')"
         + "let $m := map { $k1:1 }"
-        + "return map:put($m, $k2, 2)($k2)", MAPTZ);
+        + "return map:put($m, $k2, 2)($k2)", MAP_TZ);
     query("let $k1 := xs:time('01:01:01')"
         + "let $k2 := xs:time('01:01:02+01:00')"
         + "let $m := map { $k1:1 }"
         + "return map:put(map:remove($m, $k1), $k2, 2)($k2)", "2");
     error("let $k1 := xs:time('01:01:01')"
-        + "let $k2 := xs:time('01:01:02+01:00')"
+        + "let $k2 := xs:time('01:01:02')"
         + "let $k3 := xs:time('01:01:03+01:00')"
         + "let $m := map { $k1:1, $k2:2 }"
-        + "return map:put(map:remove($m,$k1), $k3, 3)($k3)", MAPTZ);
+        + "return map:put(map:remove($m,$k2), $k3, 3)", MAP_TZ);
     error("let $k1 := xs:time('01:01:01')"
-        + "let $k2 := xs:time('01:01:02+01:00')"
-        + "let $k3 := xs:time('01:01:03+01:00')"
+        + "let $k2 := xs:time('01:01:02')"
+        + "let $k3 := xs:time('01:01:02+01:00')"
         + "let $m := map { $k1:1, $k2:2 }"
-        + "return map:merge((map:remove($m, $k1), map { $k3: 3}))($k3)", MAPTZ);
+        + "return map:merge((map:remove($m, $k2), map { $k3:3 }))", MAP_TZ);
   }
 
   /** Stack overflow bug. */

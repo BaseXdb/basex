@@ -43,10 +43,10 @@ public final class CMap extends Arr {
       final Value key = exprs[e].atomValue(qc, ii);
       if(!(key instanceof Item)) throw SEQFOUND_X.get(ii, key);
       final Item k = (Item) key;
+      if(!map.checkTz(k)) throw MAPTZ.get(ii);
       final Value v = qc.value(exprs[e + 1]);
-      final boolean c = map.contains(k, ii);
+      if(map.contains(k, ii)) throw MAPDUPLKEY_X_X_X.get(ii, k, map.get(k, ii), v);
       map = map.put(k, v, ii);
-      if(c) throw MAPDUPLKEY_X_X_X.get(ii, k, map.get(k, ii), v);
     }
     return map;
   }

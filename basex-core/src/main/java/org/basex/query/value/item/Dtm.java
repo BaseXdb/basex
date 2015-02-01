@@ -44,9 +44,9 @@ public final class Dtm extends ADate {
     hou = time.hou;
     min = time.min;
     sec = time.sec;
-    if(zon == Short.MAX_VALUE) {
-      zon = time.zon;
-    } else if(zon != time.zon && time.zon != Short.MAX_VALUE) {
+    if(tz == Short.MAX_VALUE) {
+      tz = time.tz;
+    } else if(tz != time.tz && time.tz != Short.MAX_VALUE) {
       throw FUNZONE_X_X.get(ii, date, time);
     }
   }
@@ -96,9 +96,9 @@ public final class Dtm extends ADate {
   }
 
   @Override
-  public void timeZone(final DTDur tz, final boolean spec, final InputInfo ii)
+  public void timeZone(final DTDur zone, final boolean spec, final InputInfo ii)
       throws QueryException {
-    tz(tz, spec, ii);
+    tz(zone, spec, ii);
   }
 
   @Override
@@ -106,7 +106,7 @@ public final class Dtm extends ADate {
     if(!(cmp instanceof Dtm)) return false;
     final Dtm dtm = (Dtm) cmp;
     return type == dtm.type && yea == dtm.yea && mon == dtm.mon && day == dtm.day &&
-        hou == dtm.hou && min == dtm.min && zon == dtm.zon &&
+        hou == dtm.hou && min == dtm.min && tz == dtm.tz &&
         sec == null ? dtm.sec == null : sec.equals(dtm.sec);
   }
 }

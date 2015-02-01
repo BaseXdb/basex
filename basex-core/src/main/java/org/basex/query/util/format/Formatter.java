@@ -232,7 +232,7 @@ public abstract class Formatter extends FormatUtil {
             break;
           case 'Z':
           case 'z':
-            num = date.zon();
+            num = date.tz();
             pres = token("01:01");
             break;
           case 'C':

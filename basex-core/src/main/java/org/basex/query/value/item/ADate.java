@@ -58,7 +58,7 @@ public abstract class ADate extends ADateDur {
   /** Minute ({@code 0-59}). {@code -1}: undefined. */
   byte min = -1;
   /** Timezone in minutes ({@code -14*60-14*60}). {@link Short#MAX_VALUE}: undefined. */
-  short zon = Short.MAX_VALUE;
+  short tz = Short.MAX_VALUE;
 
   /** Data factory. */
   static DatatypeFactory df;
@@ -83,7 +83,7 @@ public abstract class ADate extends ADateDur {
     hou = date.hou;
     min = date.min;
     sec = date.sec;
-    zon = date.zon;
+    tz = date.tz;
   }
 
   /**
@@ -149,16 +149,16 @@ public abstract class ADate extends ADateDur {
   final void zone(final Matcher matcher, final int pos, final byte[] value, final InputInfo ii)
       throws QueryException {
 
-    final String tz = matcher.group(pos);
-    if(tz == null) return;
-    if("Z".equals(tz)) {
-      zon = 0;
+    final String z = matcher.group(pos);
+    if(z == null) return;
+    if("Z".equals(z)) {
+      tz = 0;
     } else {
       final int th = Strings.toInt(matcher.group(pos + 2));
       final int tm = Strings.toInt(matcher.group(pos + 3));
       if(th > 14 || tm > 59 || th == 14 && tm != 0) throw INVALIDZONE_X.get(ii, value);
       final int mn = th * 60 + tm;
-      zon = (short) ("-".equals(matcher.group(pos + 1)) ? -mn : mn);
+      tz = (short) ("-".equals(matcher.group(pos + 1)) ? -mn : mn);
     }
   }
 
@@ -232,39 +232,39 @@ public abstract class ADate extends ADateDur {
 
   /**
    * Adjusts the timezone.
-   * @param tz timezone
+   * @param zone timezone
    * @param spec indicates if zone has been specified (may be {@code null})
    * @param ii input info
    * @throws QueryException query exception
    */
-  public abstract void timeZone(final DTDur tz, final boolean spec, final InputInfo ii)
+  public abstract void timeZone(final DTDur zone, final boolean spec, final InputInfo ii)
       throws QueryException;
 
   /**
    * Adjusts the timezone.
-   * @param tz timezone
+   * @param zone timezone
    * @param spec indicates if zone has been specified (may be {@code null})
    * @param ii input info
    * @throws QueryException query exception
    */
-  void tz(final DTDur tz, final boolean spec, final InputInfo ii) throws QueryException {
+  void tz(final DTDur zone, final boolean spec, final InputInfo ii) throws QueryException {
     final short t;
-    if(spec && tz == null) {
+    if(spec && zone == null) {
       t = Short.MAX_VALUE;
     } else {
-      if(tz == null) {
+      if(zone == null) {
         final Calendar c = Calendar.getInstance();
         t = (short) ((c.get(Calendar.ZONE_OFFSET) + c.get(Calendar.DST_OFFSET)) / 60000);
       } else {
-        t = (short) (tz.min() + tz.hou() * 60);
-        if(tz.sec().signum() != 0) throw ZONESEC_X.get(ii, tz);
-        if(Math.abs(t) > 60 * 14 || tz.day() != 0) throw INVALZONE_X.get(ii, tz);
+        t = (short) (zone.min() + zone.hou() * 60);
+        if(zone.sec().signum() != 0) throw ZONESEC_X.get(ii, zone);
+        if(Math.abs(t) > 60 * 14 || zone.day() != 0) throw INVALZONE_X.get(ii, zone);
       }
 
       // change time if two competing time zones exist
-      if(zon != Short.MAX_VALUE) add(BigDecimal.valueOf(60L * (t - zon)));
+      if(tz != Short.MAX_VALUE) add(BigDecimal.valueOf(60L * (t - tz)));
     }
-    zon = t;
+    tz = t;
   }
 
   @Override
@@ -301,8 +301,16 @@ public abstract class ADate extends ADateDur {
    * Returns the timezone in minutes.
    * @return time zone
    */
-  public final int zon() {
-    return zon;
+  public final int tz() {
+    return tz;
+  }
+
+  /**
+   * Returns if the timezone is defined.
+   * @return time zone
+   */
+  public final boolean tzDefined() {
+    return tz != Short.MAX_VALUE;
   }
 
   @Override
@@ -335,14 +343,14 @@ public abstract class ADate extends ADateDur {
    * @param tb token builder
    */
   void zone(final TokenBuilder tb) {
-    if(zon == Short.MAX_VALUE) return;
-    if(zon == 0) {
+    if(tz == Short.MAX_VALUE) return;
+    if(tz == 0) {
       tb.add('Z');
     } else {
-      tb.add(zon > 0 ? '+' : '-');
-      prefix(tb, Math.abs(zon) / 60, 2);
+      tb.add(tz > 0 ? '+' : '-');
+      prefix(tb, Math.abs(tz) / 60, 2);
       tb.add(':');
-      prefix(tb, Math.abs(zon) % 60, 2);
+      prefix(tb, Math.abs(tz) % 60, 2);
     }
   }
 
@@ -391,7 +399,7 @@ public abstract class ADate extends ADateDur {
       min >= 0 ? min : Integer.MIN_VALUE,
       sec != null ? sec.intValue() : Integer.MIN_VALUE,
       sec != null ? sec.remainder(BigDecimal.ONE) : null,
-      zon == Short.MAX_VALUE ? Integer.MIN_VALUE : zon);
+      tz == Short.MAX_VALUE ? Integer.MIN_VALUE : tz);
   }
 
   /**
@@ -399,7 +407,7 @@ public abstract class ADate extends ADateDur {
    * @return seconds
    */
   final BigDecimal seconds() {
-    int z = zon;
+    int z = tz;
     if(z == Short.MAX_VALUE) {
       // [CG] XQuery, DateTime: may be removed
       final long n = System.currentTimeMillis();

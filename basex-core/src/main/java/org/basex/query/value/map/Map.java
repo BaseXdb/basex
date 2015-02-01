@@ -97,15 +97,8 @@ public final class Map extends FItem {
    */
   public Map delete(final Item key, final InputInfo ii) throws QueryException {
     final TrieNode del = root.delete(key.hash(ii), key, 0, ii);
-    if(del == root) return this;
-    if(del == null) return EMPTY;
-    // update date counter
-    int t = dt;
-    if(key instanceof ADate) {
-      final boolean tz = ((ADate) key).zon() != Short.MAX_VALUE;
-      t += tz ? -1 : +1;
-    }
-    return new Map(del, t);
+    return del == root ? this : del == null ? EMPTY :
+      new Map(del, dt + (key instanceof ADate ? ((ADate) key).tzDefined() ? -1 : 1 : 0));
   }
 
   /**
@@ -140,10 +133,9 @@ public final class Map extends FItem {
    */
   public Map addAll(final Map map, final InputInfo ii) throws QueryException {
     if(map == EMPTY) return this;
+    if(map.dt != 0 && dt != 0 && (map.dt > 0 ? dt < 0 : dt > 0)) throw MAP_TZ.get(ii);
     final TrieNode upd = root.addAll(map.root, 0, ii);
-    if(upd == map.root) return map;
-    if(map.dt != 0 && dt != 0 && (map.dt > 0 ? dt < 0 : dt > 0)) throw MAPTZ.get(ii);
-    return new Map(upd, map.dt + dt);
+    return upd == map.root ? map : new Map(upd, map.dt + dt);
   }
 
   /**
@@ -173,14 +165,17 @@ public final class Map extends FItem {
    */
   public Map put(final Item key, final Value value, final InputInfo ii) throws QueryException {
     final TrieNode ins = root.put(key.hash(ii), key, value, 0, ii);
-    // update date counter
-    int t = dt;
-    if(key instanceof ADate) {
-      final boolean tz = ((ADate) key).zon() != Short.MAX_VALUE;
-      if(tz ? t < 0 : t > 0) throw MAPTZ.get(ii);
-      t += tz ? 1 : -1;
-    }
-    return ins == root ? this : new Map(ins, t);
+    return ins == root ? this :
+      new Map(ins, dt + (key instanceof ADate ? ((ADate) key).tzDefined() ? 1 : -1 : 0));
+  }
+
+  /**
+   * Checks if the specified key has a different timezone than the stored keys.
+   * @param key key to check
+   * @return result of check
+   */
+  public boolean checkTz(final Item key) {
+    return !(key instanceof ADate) || (((ADate) key).tzDefined() ? dt >= 0 : dt <= 0);
   }
 
   /**

@@ -512,6 +512,9 @@ public enum QueryError {
   /** BXJS0003. */
   JSON_DUPLICATE_X(FOJS, 3, "%"),
 
+  /** FOMP0001. */
+  MAP_TZ(FOMP, 1, "Map cannot contain keys with and without timezone."),
+
   /** FONS0004. */
   NSDECL_X(FONS, 4, "No namespace declared for prefix '%'."),
 
@@ -1016,7 +1019,7 @@ public enum QueryError {
   /** XQDY0137. */
   MAPDUPLKEY_X_X_X(XQDY, 137, "Key % already exists in map (values: % vs. %)."),
   /** XPDY0139. */
-  MAPTZ(XPDY, 139, "Map contains keys with and without timezone."),
+  MAPTZ(XPDY, 139, "Map cannot contains keys with and without timezone."),
 
   /** XQST0009. */
   IMPLSCHEMA(XQST, 9, "Schema import not supported."),
@@ -1354,6 +1357,7 @@ public enum QueryError {
     /** FOFD Error type. */ FOFD,
     /** FOER Error type. */ FOER,
     /** FOJS Error type. */ FOJS,
+    /** FOMP Error type. */ FOMP,
     /** FONS Error type. */ FONS,
     /** FORG Error type. */ FORG,
     /** FORX Error type. */ FORX,
