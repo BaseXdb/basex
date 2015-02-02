@@ -35,7 +35,7 @@ public final class DialogFonts extends BaseXDialog {
    * Default constructor.
    * @param main reference to the main window
    */
-  public DialogFonts(final GUI main) {
+  private DialogFonts(final GUI main) {
     super(main, CHOOSE_FONT, false);
 
     final String[] fonts = GraphicsEnvironment.getLocalGraphicsEnvironment().

@@ -18,22 +18,6 @@ public interface RestXqText {
   byte[] ERROR = token("error");
   /** Token "path". */
   byte[] PATH = token("path");
-  /** Token "produces". */
-  byte[] PRODUCES = token("produces");
-  /** Token "consumes". */
-  byte[] CONSUMES = token("consumes");
-  /** Token "query-param". */
-  byte[] QUERY_PARAM = token("query-param");
-  /** Token "form-param". */
-  byte[] FORM_PARAM = token("form-param");
-  /** Token "header-param". */
-  byte[] HEADER_PARAM = token("header-param");
-  /** Token "cookie-param". */
-  byte[] COOKIE_PARAM = token("cookie-param");
-  /** Token "query-param". */
-  byte[] ERROR_PARAM = token("error-param");
-  /** Token "method". */
-  byte[] METHOD = token("method");
 
   /** Token "header". */
   byte[] HEADER = token("header");
@@ -67,10 +51,6 @@ public interface RestXqText {
   String ANN_BODYVAR = "More than one body request variable specified.";
   /** Error message. */
   String ANN_TWICE = "Annotation %% is specified twice.";
-  /** Error message. */
-  String ANN_UNKNOWN = "Annotation %% is invalid or not supported.";
-  /** Error message. */
-  String ANN_ATLEAST = "Annotation %% requires at least % parameter(s).";
   /** Error message. */
   String INV_TEMPLATE = "Invalid path template: \"%\".";
   /** Error message. */

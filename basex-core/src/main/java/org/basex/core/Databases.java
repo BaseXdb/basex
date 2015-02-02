@@ -23,9 +23,9 @@ public final class Databases {
    * </ul>
    */
   static final String DBCHARS = "-+=~!#$%^&()[]{}@'`";
-  /** Regex representation of allowed database characters. */
-  public static final String REGEXCHARS = DBCHARS.replaceAll("(.)", "\\\\$1");
 
+  /** Regex representation of allowed database characters. */
+  private static final String REGEXCHARS = DBCHARS.replaceAll("(.)", "\\\\$1");
   /** Pattern to extract the database name from a backup file name. */
   private static final Pattern ZIPPATTERN =
       Pattern.compile(DateTime.PATTERN + '\\' + IO.ZIPSUFFIX + '$');

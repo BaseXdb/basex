@@ -118,7 +118,7 @@ public final class BaseXScrollBar extends BaseXPanel {
 
     // calculate bar size
     final int barH = hh - ww * 2 + 4;
-    final float factor = (barH - barOffset) / (float) height;
+    final double factor = (barH - barOffset) / (double) height;
     int size = (int) (hh * factor);
     // define minimum size for scrollbar mover
     barOffset = Math.max(0, MINSIZE - size);

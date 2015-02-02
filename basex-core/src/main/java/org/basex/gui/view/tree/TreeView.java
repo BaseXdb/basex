@@ -446,7 +446,7 @@ public final class TreeView extends View implements TreeConstants {
 
     final int x = r.x;
     final int y = getYperLevel(lv);
-    final int rm = x + (int) (r.w / 2f);
+    final int rm = x + r.w / 2;
 
     int tw = BaseXLayout.width(g, s);
 
@@ -721,13 +721,13 @@ public final class TreeView extends View implements TreeConstants {
       g.setColor(color(6));
       g.drawRect(x - 1, y + h + 1, w + 3, fh + 1);
       g.setColor(GUIConstants.BACK);
-      g.drawString(s, r.x + 1, (int) (y + h + (float) fh) - 2);
+      g.drawString(s, r.x + 1, (int) (y + h + (double) fh) - 2);
     } else {
       g.fillRect(r.x, y - fh, w + 2, fh);
       g.setColor(color(6));
       g.drawRect(r.x - 1, y - fh - 1, w + 3, fh + 1);
       g.setColor(GUIConstants.BACK);
-      g.drawString(s, r.x + 1, (int) (y - h / (float) fh) - 2);
+      g.drawString(s, r.x + 1, (int) (y - h / (double) fh) - 2);
     }
   }
 
@@ -985,8 +985,8 @@ public final class TreeView extends View implements TreeConstants {
    * @return the level if inside a node rectangle, -1 else
    */
   private int getLevelPerY(final int y) {
-    final double f = (y - topMargin) / ((float) levelDistance + nodeHeight);
-    final double b = nodeHeight / (float) (levelDistance + nodeHeight);
+    final double f = (y - topMargin) / ((double) levelDistance + nodeHeight);
+    final double b = nodeHeight / (double) (levelDistance + nodeHeight);
     return f <= (int) f + b ? (int) f : -1;
   }
 

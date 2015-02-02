@@ -17,7 +17,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-abstract class ArchiveIn implements AutoCloseable {
+abstract class ArchiveIn implements Closeable {
   /** Buffer. */
   private final byte[] data = new byte[IO.BLOCKSIZE];
 

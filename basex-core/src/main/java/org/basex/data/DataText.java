@@ -158,10 +158,6 @@ public interface DataText {
   /** HTML: Non-breaking space entity. */
   byte[] E_NBSP = token("&nbsp;");
 
-  /** Token: results. */
-  byte[] T_RESULTS = token("results");
-  /** Token: result. */
-  byte[] T_RESULT = token("result");
   /** Token: name. */
   byte[] T_NAME = token("name");
   /** Token: size. */

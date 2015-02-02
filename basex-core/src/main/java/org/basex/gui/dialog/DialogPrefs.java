@@ -30,7 +30,7 @@ public final class DialogPrefs extends BaseXDialog {
    * Default constructor.
    * @param main reference to the main window
    */
-  public DialogPrefs(final GUI main) {
+  private DialogPrefs(final GUI main) {
     super(main, PREFERENCES, false);
 
     tabs = new BaseXTabs(this);

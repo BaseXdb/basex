@@ -126,15 +126,12 @@ public final class RunQueries {
       Iter iter = proc.iter();
 
       // Create a serializer instance
-      Serializer ser = proc.getSerializer(System.out);
-
-      // Iterate through all items and serialize contents
-      for(Item item; (item = iter.next()) != null;) {
-        ser.serialize(item);
+      try(Serializer ser = proc.getSerializer(System.out)) {
+        // Iterate through all items and serialize contents
+        for(Item item; (item = iter.next()) != null;) {
+          ser.serialize(item);
+        }
       }
-
-      // Close the serializer
-      ser.close();
       System.out.println();
     }
   }

@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
+import java.io.*;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -43,7 +44,7 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public final class QueryContext extends Proc implements AutoCloseable {
+public final class QueryContext extends Proc implements Closeable {
   /** The evaluation stack. */
   public final QueryStack stack = new QueryStack();
   /** Static variables. */

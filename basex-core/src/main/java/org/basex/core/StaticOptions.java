@@ -118,7 +118,7 @@ public final class StaticOptions extends Options {
       setSystem("https.proxyHost", ph);
     }
     final String pp = Integer.toString(get(PROXYPORT));
-    if(!pp.equals(0)) {
+    if(!pp.equals("0")) {
       setSystem("http.proxyPort", pp);
       setSystem("https.proxyPort", pp);
     }

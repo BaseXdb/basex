@@ -17,7 +17,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-abstract class ArchiveOut implements AutoCloseable {
+abstract class ArchiveOut implements Closeable {
   /** Output. */
   final ArrayOutput ao = new ArrayOutput();
   /** Buffer. */

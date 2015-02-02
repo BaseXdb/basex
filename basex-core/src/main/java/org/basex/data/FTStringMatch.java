@@ -20,14 +20,14 @@ public final class FTStringMatch implements Comparable<FTStringMatch> {
 
   /**
    * Constructor.
-   * @param st start position
-   * @param en end position
-   * @param qp query pos
+   * @param start start position
+   * @param end end position
+   * @param pos query pos
    */
-  FTStringMatch(final int st, final int en, final int qp) {
-    start = st;
-    end = en;
-    pos = qp;
+  FTStringMatch(final int start, final int end, final int pos) {
+    this.start = start;
+    this.end = end;
+    this.pos = pos;
   }
 
   /**

@@ -18,7 +18,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public abstract class Query implements AutoCloseable {
+public abstract class Query implements Closeable {
   /** Client output stream. */
   protected OutputStream out;
   /** Cached results. */
@@ -152,11 +152,4 @@ public abstract class Query implements AutoCloseable {
    * @throws IOException I/O exception
    */
   public abstract String info() throws IOException;
-
-  /**
-   * Closes the query.
-   * @throws IOException I/O exception
-   */
-  @Override
-  public abstract void close() throws IOException;
 }

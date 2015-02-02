@@ -135,6 +135,7 @@ public class LocalSession extends Session {
 
   /**
    * Returns the associated database context.
+   * Called from the XQJ driver.
    * @return database context
    */
   public Context context() {

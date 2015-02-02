@@ -516,7 +516,7 @@ final class XMLScanner extends Proc {
 
   /**
    * Scans a PEReference. [69]
-   * @return entity
+   * @return entity, or {@code null}
    * @throws IOException I/O exception
    */
   private byte[] peRef() throws IOException {
@@ -525,8 +525,7 @@ final class XMLScanner extends Proc {
     consume(';');
 
     final byte[] en = pents.get(name);
-    if(en != null) return en;
-    return name;
+    return en == null ? name : en;
   }
 
   /**
@@ -615,7 +614,7 @@ final class XMLScanner extends Proc {
   /**
    * Consumes an XML name. [5]
    * @param force force parsing
-   * @return name
+   * @return name, or {@code null}
    * @throws IOException I/O exception
    */
   private byte[] name(final boolean force) throws IOException {
@@ -666,7 +665,7 @@ final class XMLScanner extends Proc {
    * Scans an external ID.
    * @param full full flag
    * @param root root flag
-   * @return id
+   * @return id, or {@code null}
    * @throws IOException I/O exception
    */
   private byte[] externalID(final boolean full, final boolean root) throws IOException {
@@ -912,7 +911,7 @@ final class XMLScanner extends Proc {
   /**
    * Scans an entity value. [9]
    * @param p pe reference flag
-   * @return value
+   * @return value, or {@code null}
    * @throws IOException I/O exception
    */
   private byte[] entityValue(final boolean p) throws IOException {
@@ -957,7 +956,7 @@ final class XMLScanner extends Proc {
 
   /**
    * Scans a document encoding.
-   * @return encoding
+   * @return encoding, or {@code null}
    * @throws IOException I/O exception
    */
   private String encoding() throws IOException {
@@ -985,7 +984,7 @@ final class XMLScanner extends Proc {
 
   /**
    * Scans a standalone flag.
-   * @return flag
+   * @return flag, or {@code null}
    * @throws IOException I/O exception
    */
   private byte[] sddecl() throws IOException {

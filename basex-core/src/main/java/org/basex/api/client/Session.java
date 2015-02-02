@@ -18,7 +18,7 @@ import org.basex.io.out.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public abstract class Session implements AutoCloseable {
+public abstract class Session implements Closeable {
   /** Client output stream. */
   protected OutputStream out;
   /** Command info. */
@@ -115,13 +115,6 @@ public abstract class Session implements AutoCloseable {
   public OutputStream getOutputStream() {
     return out;
   }
-
-  /**
-   * Closes the session.
-   * @throws IOException I/O exception
-   */
-  @Override
-  public abstract void close() throws IOException;
 
   // PROTECTED METHODS ========================================================
 

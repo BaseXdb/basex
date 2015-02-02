@@ -11,7 +11,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public final class DataAccess implements AutoCloseable {
+public final class DataAccess implements Closeable {
   /** Buffer manager. */
   private final Buffers bm = new Buffers();
   /** Reference to the data input stream. */

@@ -102,7 +102,7 @@ public final class BaseXServer extends CLI implements Runnable {
 
     try {
       // execute initial command-line arguments
-      for(final String c : commands) execute(c);
+      for(final String cmd : commands) execute(cmd);
 
       socket = new ServerSocket();
       socket.setReuseAddress(true);

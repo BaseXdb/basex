@@ -24,7 +24,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public final class DiskBuilder extends Builder implements AutoCloseable {
+public final class DiskBuilder extends Builder implements Closeable {
   /** Text compressor. */
   private static final ThreadLocal<Compress> COMP = new ThreadLocal<Compress>() {
     @Override

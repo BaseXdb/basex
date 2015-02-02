@@ -365,7 +365,7 @@ public abstract class Data {
    * Finds the specified attribute and returns its value.
    * @param att the attribute id of the attribute to be found
    * @param pre pre value
-   * @return attribute value
+   * @return attribute value, or {@code null}
    */
   public final byte[] attValue(final int att, final int pre) {
     final int a = pre + attSize(pre, kind(pre));

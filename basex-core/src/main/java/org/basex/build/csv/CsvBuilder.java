@@ -15,7 +15,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public final class CsvBuilder extends CsvConverter {
+final class CsvBuilder extends CsvConverter {
   /** Attributes. */
   private final Atts atts = new Atts();
   /** Namespaces. */
