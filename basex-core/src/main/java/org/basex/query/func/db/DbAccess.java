@@ -54,7 +54,7 @@ abstract class DbAccess extends DbFn {
     final QNm nm = new QNm(toToken(exprs[a], qc), sc);
     if(!nm.hasPrefix()) nm.uri(sc.ns.uri(Token.EMPTY));
 
-    final NameTest nt = new NameTest(nm, NameTest.Kind.URI_NAME, true, sc.elemNS);
+    final NameTest nt = new NameTest(nm, Test.Kind.URI_NAME, true, sc.elemNS);
     // return empty sequence if test will yield no results
     if(!nt.optimize(qc)) return Empty.ITER;
 

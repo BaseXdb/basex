@@ -37,7 +37,7 @@ public final class LineBorder extends RegExp {
   }
 
   @Override
-  StringBuilder toRegEx(final StringBuilder sb) {
-    return sb.append(start ? "^" : multi ? "$" : "(?:$(?!\\s))");
+  void toRegEx(final StringBuilder sb) {
+    sb.append(start ? "^" : multi ? "$" : "(?:$(?!\\s))");
   }
 }

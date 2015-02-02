@@ -19,8 +19,8 @@ public final class Literal extends RegExp {
   }
 
   @Override
-  StringBuilder toRegEx(final StringBuilder sb) {
-    return sb.append(escape(codepoint));
+  void toRegEx(final StringBuilder sb) {
+    sb.append(escape(codepoint));
   }
 
   /**

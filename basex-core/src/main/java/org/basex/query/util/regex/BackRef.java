@@ -19,7 +19,7 @@ public final class BackRef extends RegExp {
   }
 
   @Override
-  StringBuilder toRegEx(final StringBuilder sb) {
-    return sb.append('\\').append(num);
+  void toRegEx(final StringBuilder sb) {
+    sb.append('\\').append(num);
   }
 }

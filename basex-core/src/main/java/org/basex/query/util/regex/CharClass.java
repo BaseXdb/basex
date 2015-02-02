@@ -23,13 +23,13 @@ public final class CharClass extends RegExp {
   }
 
   @Override
-  StringBuilder toRegEx(final StringBuilder sb) {
+  void toRegEx(final StringBuilder sb) {
     group.toRegEx(sb.append('['));
     if(subtract != null) {
       subtract.group.negative ^= true;
       subtract.toRegEx(sb.append("&&"));
       subtract.group.negative ^= true;
     }
-    return sb.append(']');
+    sb.append(']');
   }
 }

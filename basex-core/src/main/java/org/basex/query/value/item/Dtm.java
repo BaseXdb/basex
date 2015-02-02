@@ -107,6 +107,6 @@ public final class Dtm extends ADate {
     final Dtm dtm = (Dtm) cmp;
     return type == dtm.type && yea == dtm.yea && mon == dtm.mon && day == dtm.day &&
         hou == dtm.hou && min == dtm.min && tz == dtm.tz &&
-        sec == null ? dtm.sec == null : sec.equals(dtm.sec);
+        sec == null ? dtm.sec == null : sec.compareTo(dtm.sec) == 0;
   }
 }

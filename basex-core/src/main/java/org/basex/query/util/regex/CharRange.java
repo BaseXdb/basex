@@ -23,7 +23,7 @@ public final class CharRange extends RegExp {
   }
 
   @Override
-  StringBuilder toRegEx(final StringBuilder sb) {
-    return sb.append(Escape.escape(left)).append('-').append(Escape.escape(right));
+  void toRegEx(final StringBuilder sb) {
+    sb.append(Escape.escape(left)).append('-').append(Escape.escape(right));
   }
 }

@@ -23,7 +23,9 @@ public final class Group extends RegExp {
   }
 
   @Override
-  StringBuilder toRegEx(final StringBuilder sb) {
-    return encl.toRegEx(sb.append(capture ? "(" : "(?:")).append(')');
+  void toRegEx(final StringBuilder sb) {
+    sb.append(capture ? "(" : "(?:");
+    encl.toRegEx(sb);
+    sb.append(')');
   }
 }

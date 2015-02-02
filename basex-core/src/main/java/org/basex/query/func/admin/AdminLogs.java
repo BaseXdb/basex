@@ -47,7 +47,7 @@ public final class AdminLogs extends AdminFn {
         final LogEntry l1 = logs.get(s);
         final FElem elem = new FElem(ENTRY);
         if(l1.address != null) {
-          if(merge && l1.ms.equals(BigDecimal.ZERO) &&
+          if(merge && l1.ms.compareTo(BigDecimal.ZERO) == 0 &&
               !Strings.eq(l1.address, Log.SERVER, Log.STANDALONE)) {
             for(int l = s + 1; l < logs.size(); l++) {
               final LogEntry l2 = logs.get(l);
@@ -64,7 +64,7 @@ public final class AdminLogs extends AdminFn {
           }
           elem.add(TIME, l1.time).add(ADDRESS, l1.address).add(USER, l1.user);
           if(l1.type != null) elem.add(TYPE, l1.type);
-          if(!l1.ms.equals(BigDecimal.ZERO)) elem.add(MS, l1.ms.toString());
+          if(!(l1.ms.compareTo(BigDecimal.ZERO) == 0)) elem.add(MS, l1.ms.toString());
           if(l1.message != null) elem.add(l1.message);
         } else {
           elem.add(l1.message);

@@ -27,8 +27,8 @@ public final class Quantifier extends RegExp {
   }
 
   @Override
-  StringBuilder toRegEx(final StringBuilder sb) {
-    return sb.append(string()).append(lazy ? "?" : "");
+  void toRegEx(final StringBuilder sb) {
+    sb.append(string()).append(lazy ? "?" : "");
   }
 
   /**

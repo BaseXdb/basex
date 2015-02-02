@@ -288,7 +288,7 @@ public abstract class Formatter extends FormatUtil {
           }
         } else {
           // output fractional component
-          if(frac != null && !frac.equals(BigDecimal.ZERO)) {
+          if(frac != null && !(frac.compareTo(BigDecimal.ZERO) == 0)) {
             String s = frac.toString().replace("0.", "");
             final int sl = s.length();
             if(fp.min > sl) {

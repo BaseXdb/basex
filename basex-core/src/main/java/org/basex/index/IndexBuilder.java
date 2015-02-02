@@ -118,6 +118,6 @@ public abstract class IndexBuilder extends Proc {
 
   @Override
   public final double prog() {
-    return (double) pre / (size + (splits > 0 ? size / 50 : 0));
+    return pre / (size + (splits > 0 ? size / 50d : 0d));
   }
 }

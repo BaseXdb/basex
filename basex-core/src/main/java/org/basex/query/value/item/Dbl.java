@@ -127,7 +127,7 @@ public final class Dbl extends ANum {
     }
 
     final boolean n = v < 0;
-    final double f = Math.pow(10, s + 1);
+    final double f = StrictMath.pow(10, s + 1);
     v = (n ? -v : v) * f;
     if(Double.isInfinite(v)) {
       final int m = e ? BigDecimal.ROUND_HALF_EVEN : BigDecimal.ROUND_HALF_UP;

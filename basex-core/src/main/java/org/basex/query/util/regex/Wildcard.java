@@ -33,7 +33,7 @@ public final class Wildcard extends RegExp {
   }
 
   @Override
-  StringBuilder toRegEx(final StringBuilder sb) {
-    return sb.append(nl ? "." : "[^\r\n]");
+  void toRegEx(final StringBuilder sb) {
+    sb.append(nl ? "." : "[^\r\n]");
   }
 }

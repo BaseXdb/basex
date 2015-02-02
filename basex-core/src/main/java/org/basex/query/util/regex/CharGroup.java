@@ -20,9 +20,8 @@ public final class CharGroup extends RegExp {
   }
 
   @Override
-  StringBuilder toRegEx(final StringBuilder sb) {
+  void toRegEx(final StringBuilder sb) {
     sb.append(negative ? "^" : "");
     for(final RegExp sub : subs) sub.toRegEx(sb);
-    return sb;
   }
 }

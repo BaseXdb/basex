@@ -23,8 +23,8 @@ public final class Piece extends RegExp {
   }
 
   @Override
-  StringBuilder toRegEx(final StringBuilder sb) {
-    return quant.toRegEx(atom.toRegEx(sb));
+  void toRegEx(final StringBuilder sb) {
+    atom.toRegEx(sb);
+    quant.toRegEx(sb);
   }
-
 }

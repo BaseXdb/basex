@@ -19,8 +19,7 @@ public final class Branch extends RegExp {
   }
 
   @Override
-  StringBuilder toRegEx(final StringBuilder sb) {
+  void toRegEx(final StringBuilder sb) {
     for(final RegExp piece : pieces) piece.toRegEx(sb);
-    return sb;
   }
 }
