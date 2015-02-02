@@ -36,9 +36,7 @@ public final class ExploreView extends View {
     border(5).layout(new BorderLayout(0, 4));
 
     header = new BaseXHeader(EXPLORER);
-
     filter = BaseXButton.command(GUIMenuCmd.C_FILTER, gui);
-    filter.addKeyListener(this);
 
     final BaseXBack buttons = new BaseXBack(false);
     buttons.layout(new TableLayout(1, 1, 1, 0)).border(0, 0, 4, 0);

@@ -454,8 +454,7 @@ public class FnHttpTest extends HTTPTest {
 
     final FakeHttpConnection fakeConn = new FakeHttpConnection(new URL(
         "http://www.test.com"));
-    final HttpClient hc = new HttpClient(null, ctx.options);
-    hc.setRequestContent(fakeConn.getOutputStream(), req);
+    HttpClient.setRequestContent(fakeConn.getOutputStream(), req);
     final String expResult = "--boundary42" + CRLF
         + "Content-Type: text/plain; charset=us-ascii" + CRLF + CRLF
         + plain + Prop.NL + CRLF
@@ -487,8 +486,7 @@ public class FnHttpTest extends HTTPTest {
     req1.bodyContent.add(e1);
     // String item child
     req1.bodyContent.add(Str.get("<b>b</b>"));
-    HttpClient hc = new HttpClient(null, ctx.options);
-    hc.setRequestContent(fakeConn1.getOutputStream(), req1);
+    HttpClient.setRequestContent(fakeConn1.getOutputStream(), req1);
     assertEquals("<a>a</a>&lt;b&gt;b&lt;/b&gt;", fakeConn1.out.toString());
 
     // Case 2: No method, media-type='text/plain'
@@ -501,8 +499,7 @@ public class FnHttpTest extends HTTPTest {
     req2.bodyContent.add(e2);
     // String item child
     req2.bodyContent.add(Str.get("<b>b</b>"));
-    hc = new HttpClient(null, ctx.options);
-    hc.setRequestContent(fakeConn2.getOutputStream(), req2);
+    HttpClient.setRequestContent(fakeConn2.getOutputStream(), req2);
     assertEquals("a<b>b</b>", fakeConn2.out.toString());
 
     // Case 3: method='text', media-type='text/xml'
@@ -516,8 +513,7 @@ public class FnHttpTest extends HTTPTest {
     req3.bodyContent.add(e3);
     // String item child
     req3.bodyContent.add(Str.get("<b>b</b>"));
-    hc = new HttpClient(null, ctx.options);
-    hc.setRequestContent(fakeConn3.getOutputStream(), req3);
+    HttpClient.setRequestContent(fakeConn3.getOutputStream(), req3);
     assertEquals("a<b>b</b>", fakeConn3.out.toString());
   }
 
@@ -533,8 +529,7 @@ public class FnHttpTest extends HTTPTest {
 
     req1.bodyContent.add(new B64(token("dGVzdA==")));
     final FakeHttpConnection fakeConn1 = new FakeHttpConnection(new URL("http://www.test.com"));
-    HttpClient hc = new HttpClient(null, ctx.options);
-    hc.setRequestContent(fakeConn1.getOutputStream(), req1);
+    HttpClient.setRequestContent(fakeConn1.getOutputStream(), req1);
     assertEquals(fakeConn1.out.toString(), "dGVzdA==");
 
     // Case 2: content is a node
@@ -543,8 +538,7 @@ public class FnHttpTest extends HTTPTest {
     final FElem e3 = new FElem("a").add("dGVzdA==");
     req2.bodyContent.add(e3);
     final FakeHttpConnection fakeConn2 = new FakeHttpConnection(new URL("http://www.test.com"));
-    hc = new HttpClient(null, ctx.options);
-    hc.setRequestContent(fakeConn2.getOutputStream(), req2);
+    HttpClient.setRequestContent(fakeConn2.getOutputStream(), req2);
     assertEquals(fakeConn2.out.toString(), "dGVzdA==");
   }
 
@@ -559,8 +553,7 @@ public class FnHttpTest extends HTTPTest {
     req1.payloadAttrs.put("method", "raw");
     req1.bodyContent.add(new Hex(token("74657374")));
     final FakeHttpConnection fakeConn1 = new FakeHttpConnection(new URL("http://www.test.com"));
-    HttpClient hc = new HttpClient(null, ctx.options);
-    hc.setRequestContent(fakeConn1.getOutputStream(), req1);
+    HttpClient.setRequestContent(fakeConn1.getOutputStream(), req1);
     assertEquals(fakeConn1.out.toString(), "74657374");
 
     // Case 2: content is a node
@@ -569,8 +562,7 @@ public class FnHttpTest extends HTTPTest {
     final FElem e3 = new FElem("a").add("74657374");
     req2.bodyContent.add(e3);
     final FakeHttpConnection fakeConn2 = new FakeHttpConnection(new URL("http://www.test.com"));
-    hc = new HttpClient(null, ctx.options);
-    hc.setRequestContent(fakeConn2.getOutputStream(), req2);
+    HttpClient.setRequestContent(fakeConn2.getOutputStream(), req2);
     assertEquals(fakeConn2.out.toString(), "74657374");
   }
 
@@ -590,8 +582,7 @@ public class FnHttpTest extends HTTPTest {
     req.payloadAttrs.put("method", "binary");
     // HTTP connection
     final FakeHttpConnection fakeConn = new FakeHttpConnection(new URL("http://www.test.com"));
-    final HttpClient hc = new HttpClient(null, ctx.options);
-    hc.setRequestContent(fakeConn.getOutputStream(), req);
+    HttpClient.setRequestContent(fakeConn.getOutputStream(), req);
 
     // Delete file
     file.delete();

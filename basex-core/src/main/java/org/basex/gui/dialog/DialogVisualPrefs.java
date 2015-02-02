@@ -147,7 +147,7 @@ final class DialogVisualPrefs extends BaseXBack {
    * Returns available look and feels.
    * @return string list
    */
-  private StringList lf() {
+  private static StringList lf() {
     final StringList sl = new StringList();
     for(final LookAndFeelInfo laf : UIManager.getInstalledLookAndFeels()) {
       sl.add(laf.getClassName());

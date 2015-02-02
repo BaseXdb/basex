@@ -561,32 +561,20 @@ final class JapaneseTokenizer extends Tokenizer {
         hinshi = HINSHI_KIGOU;
       } else {
         final String h = getPos();
-        if(h.equals(MEISHI)) {
-          hinshi = HINSHI_MEISHI;
-        } else if(h.equals(RENTAISHI)) {
-          hinshi = HINSHI_RENTAISHI;
-        } else if(h.equals(HUKUSHI)) {
-          hinshi = HINSHI_HUKUSHI;
-        } else if(h.equals(DOUSHI)) {
-          hinshi = HINSHI_DOUSHI;
-        } else if(h.equals(SETSUZOKUSHI)) {
-          hinshi = HINSHI_SETSUZOKUSHI;
-        } else if(h.equals(SETTOUSHI)) {
-          hinshi = HINSHI_SETTOUSHI;
-        } else if(h.equals(JYODOUSHI)) {
-          hinshi = HINSHI_JYODOUSHI;
-        } else if(h.equals(JYOSHI)) {
-          hinshi = HINSHI_JYOSHI;
-        } else if(h.equals(KEIYOUSHI)) {
-          hinshi = HINSHI_KEIYOUSHI;
-        } else if(h.equals(KIGOU)) {
-          hinshi = HINSHI_KIGOU;
-        } else if(h.equals(KANDOUSHI)) {
-          hinshi = HINSHI_KANDOUSHI;
-        } else if(h.equals(FILLER)) {
-          hinshi = HINSHI_FILLER;
-        } else {
-          hinshi = HINSHI_SONOTA;
+        switch (h) {
+          case MEISHI:       hinshi = HINSHI_MEISHI; break;
+          case RENTAISHI:    hinshi = HINSHI_RENTAISHI; break;
+          case HUKUSHI:      hinshi = HINSHI_HUKUSHI; break;
+          case DOUSHI:       hinshi = HINSHI_DOUSHI; break;
+          case SETSUZOKUSHI: hinshi = HINSHI_SETSUZOKUSHI; break;
+          case SETTOUSHI:    hinshi = HINSHI_SETTOUSHI; break;
+          case JYODOUSHI:    hinshi = HINSHI_JYODOUSHI; break;
+          case JYOSHI:       hinshi = HINSHI_JYOSHI; break;
+          case KEIYOUSHI:    hinshi = HINSHI_KEIYOUSHI; break;
+          case KIGOU:        hinshi = HINSHI_KIGOU; break;
+          case KANDOUSHI:    hinshi = HINSHI_KANDOUSHI; break;
+          case FILLER:       hinshi = HINSHI_FILLER; break;
+          default:           hinshi = HINSHI_SONOTA; break;
         }
       }
       return hinshi;

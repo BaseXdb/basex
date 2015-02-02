@@ -61,10 +61,10 @@ public abstract class ADate extends ADateDur {
   short tz = Short.MAX_VALUE;
 
   /** Data factory. */
-  static DatatypeFactory df;
+  static final DatatypeFactory DF;
   static {
     try {
-      df = DatatypeFactory.newInstance();
+      DF = DatatypeFactory.newInstance();
     } catch(final Exception ex) {
       throw Util.notExpected(ex);
     }
@@ -391,7 +391,7 @@ public abstract class ADate extends ADateDur {
 
   @Override
   public final XMLGregorianCalendar toJava() {
-    return df.newXMLGregorianCalendar(
+    return DF.newXMLGregorianCalendar(
       yea == Long.MAX_VALUE ? null : BigInteger.valueOf(yea > 0 ? yea : yea - 1),
       mon >= 0 ? mon + 1 : Integer.MIN_VALUE,
       day >= 0 ? day + 1 : Integer.MIN_VALUE,

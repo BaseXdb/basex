@@ -38,7 +38,7 @@ public final class HtmlParser extends XMLParser {
   private static final Constructor<?> WRITER = Reflect.find(Reflect.find(WCLASS), Writer.class);
   /** XML writer output property method. */
   private static final Method METHOD = Reflect.method(
-    Reflect.find(WCLASS), "setOutputProperty", new Class[] { String.class, String.class });
+    Reflect.find(WCLASS), "setOutputProperty", String.class, String.class);
 
   /**
    * Checks if a CatalogResolver is available.

@@ -198,7 +198,7 @@ final class Unit {
    * @return QName
    * @throws QueryException query exception
    */
-  private QNm name(final StaticFunc sf, final Ann ann) throws QueryException {
+  private static QNm name(final StaticFunc sf, final Ann ann) throws QueryException {
     if(ann.args.length != 0) {
       final byte[] name = ann.args[0].string(null);
       if(name.length != 0) return QNm.resolve(name, sf.name.uri(), sf.sc, sf.info);

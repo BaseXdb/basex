@@ -117,7 +117,7 @@ public final class Users {
    * @param prm permission
    * @param pattern database pattern (can be {@code null})
    */
-  public void perm(final User user, final Perm prm, final String pattern) {
+  public static void perm(final User user, final Perm prm, final String pattern) {
     user.perm(prm, pattern);
   }
 

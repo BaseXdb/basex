@@ -43,7 +43,7 @@ public final class BinToOctets extends StandardFunc {
    * @param bytes bytes to be wrapped in a value
    * @return value
    */
-  private Value toValue(final byte[] bytes) {
+  private static Value toValue(final byte[] bytes) {
     final int bl = bytes.length;
     final long[] tmp = new long[bl];
     for(int b = 0; b < bl; b++) tmp[b] = bytes[b] & 0xFF;

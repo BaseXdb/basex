@@ -180,7 +180,9 @@ public final class HttpClient {
    * @param r request data
    * @throws IOException I/O exception
    */
-  public void setRequestContent(final OutputStream out, final HttpRequest r) throws IOException {
+  public static void setRequestContent(final OutputStream out, final HttpRequest r)
+      throws IOException {
+
     if(r.isMultipart) {
       writeMultipart(r, out);
     } else {

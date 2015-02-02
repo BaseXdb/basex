@@ -511,8 +511,7 @@ public final class ClientListener extends Thread {
       // send 0 as success flag
       out.write(0);
       // write log file
-      log(LogType.OK, new StringBuilder(sc.toString()).append('[').
-          append(arg).append("] ").append(info).toString());
+      log(LogType.OK, sc.toString() + '[' + arg + "] " + info);
 
     } catch(final Throwable ex) {
       // log exception (static or runtime)

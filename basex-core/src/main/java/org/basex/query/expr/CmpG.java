@@ -299,7 +299,7 @@ public final class CmpG extends Cmp {
     final Expr list = new List(info, exprs[1], g.exprs[1]).optimize(qc, scp);
     final CmpG cmp = new CmpG(exprs[0], list, op, coll, sc, info);
     final SeqType st = list.seqType();
-    cmp.atomic = atomic && st.zeroOrOne() && !st.mayBeArray();;
+    cmp.atomic = atomic && st.zeroOrOne() && !st.mayBeArray();
     return cmp;
   }
 

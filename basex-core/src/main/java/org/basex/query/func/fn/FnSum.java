@@ -39,7 +39,7 @@ public final class FnSum extends Aggr {
     }
 
     final Iter iter = exprs[0].atomIter(qc, ii);
-    Item def = null;
+    Item def;
     if(exprs.length == 2) {
       def = exprs[1].atomItem(qc, ii);
       if(def != null) {

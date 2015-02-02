@@ -52,48 +52,60 @@ public final class Replace extends ACreate {
     if(bin == null) return error(PATH_INVALID_X, args[0]);
 
     if(!startUpdate()) return false;
+    boolean ok = true;
     try {
-      // retrieve old list of resources
-      final AtomicUpdateCache auc = new AtomicUpdateCache(data);
-
-      final IntList docs = data.resources.docs(path);
-      int d = 0, bs = 0;
-      if(bin.exists()) {
-        // replace binary file if it already exists
-        final Store store = new Store(path);
-        store.setInput(in);
-        store.lock = false;
-        if(!store.run(context)) return error(store.info());
-        bs = 1;
-      } else {
-        // otherwise, add new document as xml
-        final Add add = new Add(path);
-        try {
-          add.setInput(in);
-          add.init(context, out);
-          if(!add.build()) return error(add.info());
-
-          if(docs.isEmpty()) {
-            auc.addInsert(data.meta.size, -1, add.clip);
-          } else {
-            auc.addReplace(docs.get(0), add.clip);
-            d = 1;
-          }
-
-          context.invalidate();
-        } finally {
-          add.close();
-        }
-      }
-
-      // delete old documents
-      final int ds = docs.size();
-      for(; d < ds; d++) auc.addDelete(docs.get(d));
-      auc.execute(false);
-
-      return info(RES_REPLACED_X_X, ds + bs, perf);
+      ok = replace(data, bin, path);
     } finally {
-      if(!finishUpdate()) return false;
+      ok &= finishUpdate();
     }
+    return ok;
+  }
+
+  /**
+   * Replaces files in the specified database.
+   * @param data database
+   * @param bin binary file
+   * @param path target path
+   * @return success flag
+   */
+  private boolean replace(final Data data, final IOFile bin, final String path) {
+    // retrieve old list of resources
+    final AtomicUpdateCache auc = new AtomicUpdateCache(data);
+
+    final IntList docs = data.resources.docs(path);
+    int d = 0, bs = 0;
+    if(bin.exists()) {
+      // replace binary file if it already exists
+      final Store store = new Store(path);
+      store.setInput(in);
+      store.lock = false;
+      if(!store.run(context)) return error(store.info());
+      bs = 1;
+    } else {
+      // otherwise, add new document as xml
+      final Add add = new Add(path);
+      try {
+        add.setInput(in);
+        add.init(context, out);
+        if(!add.build()) return error(add.info());
+
+        if(docs.isEmpty()) {
+          auc.addInsert(data.meta.size, -1, add.clip);
+        } else {
+          auc.addReplace(docs.get(0), add.clip);
+          d = 1;
+        }
+        context.invalidate();
+      } finally {
+        add.close();
+      }
+    }
+
+    // delete old documents
+    final int ds = docs.size();
+    for(; d < ds; d++) auc.addDelete(docs.get(d));
+    auc.execute(false);
+
+    return info(RES_REPLACED_X_X, ds + bs, perf);
   }
 }

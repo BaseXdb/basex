@@ -3,6 +3,8 @@ package org.basex.gui.dialog;
 import static org.basex.core.Text.*;
 
 import java.awt.*;
+import java.util.*;
+import java.util.Timer;
 
 import javax.swing.*;
 
@@ -66,17 +68,16 @@ public final class DialogMem extends BaseXDialog {
     super.setVisible(v);
     if(vis) return;
 
-    final Thread t = new Thread() {
+    // regularly refresh panel
+    final Timer timer = new Timer(true);
+    timer.scheduleAtFixedRate(new TimerTask() {
       @Override
       public void run() {
         while(isVisible()) {
           if(!text.selected()) text.setText(info());
-          Performance.sleep(500);
         }
       }
-    };
-    t.setDaemon(true);
-    t.start();
+    }, 0, 500);
   }
 
   @Override

@@ -4,6 +4,7 @@ import static org.basex.gui.GUIConstants.*;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
 
 import org.basex.gui.*;
 import org.basex.gui.dialog.*;
@@ -34,17 +35,12 @@ public final class BaseXMem extends BaseXPanel {
       addMouseMotionListener(this);
     }
 
-    final Thread t = new Thread() {
+    // regularly refresh panel
+    final Timer timer = new Timer(true);
+    timer.scheduleAtFixedRate(new TimerTask() {
       @Override
-      public void run() {
-        while(true) {
-          repaint();
-          Performance.sleep(5000);
-        }
-      }
-    };
-    t.setDaemon(true);
-    t.start();
+      public void run() { repaint(); }
+    }, 0, 5000);
   }
 
   @Override

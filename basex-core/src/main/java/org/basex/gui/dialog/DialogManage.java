@@ -87,7 +87,7 @@ public final class DialogManage extends BaseXDialog {
     doc2 = new BaseXLabel(" ").border(0, 0, 6, 0);
     doc2.setFont(doc1.getFont());
 
-    backups = new BaseXList(new String[] { }, this);
+    backups = new BaseXList(new String[0], this);
     backups.setSize(400, 400);
 
     // backup buttons

@@ -22,7 +22,7 @@ public final class ArchiveOptions extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final B64 archive = toB64(exprs[0], qc, false);
-    String format = null;
+    String format;
     int level = -1;
 
     try(final ArchiveIn arch = ArchiveIn.get(archive.input(info), info)) {

@@ -51,11 +51,9 @@ class RESTQuery extends RESTCmd {
     context.options.set(MainOptions.SERIALIZER, http.sopts());
     http.initResponse();
 
-    final int cs = cmds.size();
-    for(int c = 0; c < cs; c++) {
-      final Command cmd = cmds.get(c);
+    for(final Command cmd : cmds) {
       if(cmd instanceof XQuery) {
-        final XQuery xq = (XQuery) cmds.get(c);
+        final XQuery xq = (XQuery) cmd;
         // create query instance
         if(value != null) xq.bind(null, value, NodeType.DOC.toString());
 
@@ -71,12 +69,9 @@ class RESTQuery extends RESTCmd {
         // initializes the response with query serialization options
         http.sopts().parse(xq.parameters(context));
         http.initResponse();
-
-        // run query
-        run(xq, http.res.getOutputStream());
-      } else {
-        run(cmd, http.res.getOutputStream());
       }
+      // run command
+      run(cmd, http.res.getOutputStream());
     }
   }
 

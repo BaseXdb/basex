@@ -412,25 +412,25 @@ final class MapRenderer {
     int sl = 0, pl = 0;
     int psl = 0, ppl = 0;
     final int[] data0 = data[0], data1 = data[1], data2 = data[2];
-    final int dl0 = data0.length, dl1 = data1.length, dl2 = data2.length;
-    for(int i = 0; i < dl0; ++i) {
-      int wl = (int) (data0[i] * r.thumbf); // word length
-      e += data0[i] * r.thumbf - wl;
+    final int dl1 = data1.length, dl2 = data2.length;
+    for(final int ad0 : data0) {
+      int wl = (int) (ad0 * r.thumbf); // word length
+      e += ad0 * r.thumbf - wl;
 
-      if(e >= 1) {
+      if (e >= 1) {
         wl += (int) e;
         e -= (int) e;
       }
-      sl += data0[i];
-      pl += data0[i];
+      sl += ad0;
+      pl += ad0;
       // check if rectangle fits in line - don't split token and dot
-      if(ll + wl + r.thumbsw * (psl < dl1 && sl == data1[psl] ? 1 : 0) >= ww) {
+      if (ll + wl + r.thumbsw * (psl < dl1 && sl == data1[psl] ? 1 : 0) >= ww) {
         yy += r.thumblh;
         ll = 0;
-        if(wl >= ww) return r.h + 3;
+        if (wl >= ww) return r.h + 3;
       }
 
-      if(draw) {
+      if (draw) {
         // draw word
         g.setColor(ftp != null && ftp.contains(count) ? GREEN : textc);
         g.fillRect((int) (xx + ll), yy, wl, r.thumbfh);
@@ -439,9 +439,9 @@ final class MapRenderer {
       ll += wl;
       ++count;
 
-      if(psl < dl1 && sl == data1[psl]) {
+      if (psl < dl1 && sl == data1[psl]) {
         // new sentence, draw dot
-        if(draw) {
+        if (draw) {
           g.setColor(GUIConstants.TEXT);
           g.fillRect((int) (xx + ll), yy, (int) r.thumbsw, r.thumbfh);
           g.setColor(textc);
@@ -452,7 +452,7 @@ final class MapRenderer {
       }
 
       ll += r.thumbf;
-      if(ppl < dl2 && pl == data2[ppl]) {
+      if (ppl < dl2 && pl == data2[ppl]) {
         // new paragraph
         yy += r.thumblh;
         ll = 0;

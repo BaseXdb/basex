@@ -48,7 +48,7 @@ public final class HTTPContext {
   public final HTTPParams params;
 
   /** Authentication method. */
-  private AuthMethod auth;
+  private final AuthMethod auth;
   /** Serialization parameters. */
   private SerializerOptions sopts;
   /** User name. */
@@ -306,9 +306,10 @@ public final class HTTPContext {
 
         final StringBuilder sresponse = new StringBuilder(ha1).append(':').append(map.get(NONCE));
         if(Strings.eq(qop, AUTH, AUTH_INT)) {
-          sresponse.append(':' + map.get(NC) + ':' + map.get(CNONCE) + ':' + qop);
+          sresponse.append(':').append(map.get(NC)).append(':').append(map.get(CNONCE));
+          sresponse.append(':').append(qop);
         }
-        sresponse.append(':' + ha2);
+        sresponse.append(':').append(ha2);
         if(!Strings.md5(sresponse.toString()).equals(password)) throw new LoginException();
       }
 
@@ -350,7 +351,7 @@ public final class HTTPContext {
    * Returns the database context.
    * @return context
    */
-  public Context context() {
+  public static Context context() {
     return context;
   }
 

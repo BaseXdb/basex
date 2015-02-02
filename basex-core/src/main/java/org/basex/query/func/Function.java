@@ -1291,7 +1291,7 @@ public enum Function {
 
   /**
    * Constructs a function signature; calls
-   * {@link #Function(Class, String, SeqType[], SeqType, EnumSet)}.
+   * {@link #Function(Class, String, SeqType[], SeqType, EnumSet, byte[])}.
    * @param func reference to the class containing the function implementation
    * @param desc descriptive function string
    * @param args types of the function arguments

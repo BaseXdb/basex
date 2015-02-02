@@ -14,11 +14,11 @@ import org.basex.util.*;
  */
 public final class Ann {
   /** Input info. */
-  public InputInfo info;
+  public final InputInfo info;
   /** Annotation signature. */
-  public Annotation sig;
+  public final Annotation sig;
   /** Arguments. */
-  public Item[] args;
+  public final Item[] args;
 
   /**
    * Constructor.

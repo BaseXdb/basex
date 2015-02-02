@@ -98,8 +98,8 @@ final class RestXqWadl {
    * @param xqdoc documentation
    * @param func function
    */
-  private void addParam(final String name, final String style, final FElem root,
-      final TokenObjMap<TokenList> xqdoc, final RestXqFunction func) {
+  private static void addParam(final String name, final String style, final FElem root,
+                               final TokenObjMap<TokenList> xqdoc, final RestXqFunction func) {
 
     final FElem param = elem("param", root);
     param.add("name", name).add("style", style);

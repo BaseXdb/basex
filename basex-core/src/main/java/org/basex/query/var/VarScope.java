@@ -81,7 +81,7 @@ public final class VarScope {
    * @param qc query context
    * @param fp frame pointer
    */
-  public void exit(final QueryContext qc, final int fp) {
+  public static void exit(final QueryContext qc, final int fp) {
     qc.stack.exitFrame(fp);
   }
 

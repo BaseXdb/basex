@@ -49,10 +49,10 @@ public final class DialogMessage extends BaseXDialog {
     if(ic == Msg.QUESTION || ic == Msg.YESNOCANCEL) {
       list.add(Text.B_YES);
       list.add(Text.B_NO);
-      for(final String b : buttons) list.add(b);
+      Collections.addAll(list, buttons);
       if(ic == Msg.YESNOCANCEL) list.add(Text.CANCEL);
     } else {
-      for(final String b : buttons) list.add(b);
+      Collections.addAll(list, buttons);
       list.add(Text.B_OK);
     }
     final BaseXBack bttns = newButtons(list.toArray(new Object[list.size()]));

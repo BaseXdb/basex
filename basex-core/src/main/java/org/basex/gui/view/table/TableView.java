@@ -142,7 +142,7 @@ public final class TableView extends View implements Runnable {
 
   @Override
   public void run() {
-    /* Current zoom step. */
+    // current zoom step
     int zoomstep = ZOOM.length;
     while(--zoomstep >= 0) {
       scroll.height(tdata.rows.size() * tdata.rowH(ZOOM[zoomstep]));

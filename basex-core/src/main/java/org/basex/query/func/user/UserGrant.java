@@ -50,7 +50,7 @@ public final class UserGrant extends UserFn {
 
     @Override
     public void apply() {
-      for(final String db : patterns) users.perm(user, perm, db);
+      for(final String db : patterns) Users.perm(user, perm, db);
     }
 
     @Override

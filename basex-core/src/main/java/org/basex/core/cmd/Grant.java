@@ -62,7 +62,7 @@ public final class Grant extends AUser {
 
     final Users users = context.users;
     final User user = users.get(name);
-    users.perm(user, prm, pattern);
+    Users.perm(user, prm, pattern);
     return info(pattern == null ? GRANTED_X_X : GRANTED_ON_X_X_X, args[0], name, pattern);
   }
 

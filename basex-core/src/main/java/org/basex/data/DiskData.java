@@ -63,11 +63,13 @@ public final class DiskData extends Data {
       while(true) {
         final String k = string(in.readToken());
         if(k.isEmpty()) break;
-        if(k.equals(DBTAGS))      elemNames = new Names(in, meta);
-        else if(k.equals(DBATTS)) attrNames = new Names(in, meta);
-        else if(k.equals(DBPATH)) paths = new PathSummary(this, in);
-        else if(k.equals(DBNS))   nspaces = new Namespaces(in);
-        else if(k.equals(DBDOCS)) resources.read(in);
+        switch(k) {
+          case DBTAGS: elemNames = new Names(in, meta); break;
+          case DBATTS: attrNames = new Names(in, meta); break;
+          case DBPATH: paths = new PathSummary(this, in); break;
+          case DBNS:   nspaces = new Namespaces(in); break;
+          case DBDOCS: resources.read(in); break;
+        }
       }
     }
 

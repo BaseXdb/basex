@@ -122,7 +122,7 @@ public final class QNm extends Item {
 
     // check for namespace declaration
     final Matcher m = BIND.matcher(Token.string(name));
-    byte[] uri = EMPTY, nm = name;
+    byte[] uri, nm = name;
     if(m.find()) {
       final String u = m.group(3);
       uri = token(u == null ? m.group(5) : u);

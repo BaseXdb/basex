@@ -1022,7 +1022,7 @@ public final class TreeView extends View implements TreeConstants {
   private boolean showAttsChanged() {
     final GUIOptions gopts = gui.gopts;
     if(gopts.get(GUIOptions.TREEATTS) == showAtts) return false;
-    showAtts =  !showAtts;
+    showAtts = !showAtts;
     return true;
   }
 

@@ -195,7 +195,7 @@ public final class CmpR extends Single {
         step = st == 0 ? ii.step : path.step(st - 1);
         if(step.test.kind != Kind.NAME) return null;
       } else {
-        step =  path.step(st);
+        step = path.step(st);
         if(!step.simple(Axis.ATTR, true)) return null;
       }
       name = ((NameTest) step.test).local;

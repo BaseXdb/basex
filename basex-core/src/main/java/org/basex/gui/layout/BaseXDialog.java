@@ -25,7 +25,7 @@ public abstract class BaseXDialog extends JDialog {
   /** Reference to main window. */
   public GUI gui;
   /** Used mnemonics. */
-  protected final StringBuilder mnem = new StringBuilder();
+  final StringBuilder mnem = new StringBuilder();
   /** Remembers if the window was correctly closed. */
   protected boolean ok;
   /** Reference to the root panel. */

@@ -64,7 +64,7 @@ public final class FnSort extends StandardFunc {
   public static Integer[] sort(final ValueList vl, final StandardFunc sf) throws QueryException {
     final int al = vl.size();
     final Integer[] order = new Integer[al];
-    for(int o = 0; o < al; o++) order[o] = Integer.valueOf(o);
+    for(int o = 0; o < al; o++) order[o] = o;
     try {
       Arrays.sort(order, new Comparator<Integer>() {
         @Override

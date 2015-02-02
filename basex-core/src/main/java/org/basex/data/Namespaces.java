@@ -326,11 +326,8 @@ public final class Namespaces {
    * @param curr current namespace node
    * @param list list with namespace nodes
    * @param pre pre value
-   * @return list with namespace nodes
    */
-  private static List<NSNode> addNSNodes(final NSNode curr, final List<NSNode> list,
-      final int pre) {
-
+  private static void addNSNodes(final NSNode curr, final List<NSNode> list, final int pre) {
     final int sz = curr.sz;
     int s = find(curr, pre);
     while(s > 0 && (s == sz || curr.children[s].pr >= pre)) s--;
@@ -339,7 +336,6 @@ public final class Namespaces {
       if(ch.pr >= pre) list.add(ch);
       addNSNodes(ch, list, pre);
     }
-    return list;
   }
 
   /**

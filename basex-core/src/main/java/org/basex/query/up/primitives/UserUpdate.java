@@ -47,9 +47,8 @@ public abstract class UserUpdate extends Update {
 
   /**
    * Applies this operation.
-   * @throws QueryException exception
    */
-  public abstract void apply() throws QueryException;
+  public abstract void apply();
 
   /**
    * Returns an info string.

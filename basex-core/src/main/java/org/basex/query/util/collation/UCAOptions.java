@@ -47,9 +47,6 @@ public final class UCAOptions extends CollationOptions {
   /** Name of the Collator class. */
   static final Class<?> RBC = find("com.ibm.icu.text.RuleBasedCollator");
 
-  /** Rule-based collator. */
-  private Object coll;
-
   @Override
   @SuppressWarnings("unchecked")
   Collation get(final String args) {
@@ -61,12 +58,13 @@ public final class UCAOptions extends CollationOptions {
 
     Locale locale = Locale.US;
     if(contains(LANG)) {
-      locale = Locales.map.get(get(LANG));
+      locale = Locales.MAP.get(get(LANG));
       if(locale == null) throw error(LANG);
     }
 
     final Method m = method(COLLATOR, "getInstance", Locale.class);
-    coll = invoke(m, null, locale);
+    /* Rule-based collator. */
+    Object coll = invoke(m, null, locale);
 
     if(!coll.getClass().equals(RBC)) throw new IllegalArgumentException(
         "Invalid collator \"" + coll.getClass().getName() + "\"");
@@ -140,15 +138,17 @@ public final class UCAOptions extends CollationOptions {
       final IntList list = new IntList();
       final Method uscript = method(find("com.ibm.icu.lang.UScript"), "getCode", String.class);
       for(final String code : Strings.split(v, ',')) {
-        if(code.equals("space")) list.add(0x1000);
-        else if(code.equals("punct")) list.add(0x1001);
-        else if(code.equals("symbol")) list.add(0x1002);
-        else if(code.equals("currency")) list.add(0x1003);
-        else if(code.equals("digit")) list.add(0x1004);
-        else {
-          final int[] c = code.length() == 4 ? (int[]) invoke(uscript, null, code) : null;
-          if(c != null) list.add(c[0]);
-          else if(nomercy) throw error(REORDER);
+        switch (code) {
+          case "space":    list.add(0x1000); break;
+          case "punct":    list.add(0x1001); break;
+          case "symbol":   list.add(0x1002); break;
+          case "currency": list.add(0x1003); break;
+          case "digit":    list.add(0x1004); break;
+          default:
+            final int[] c = code.length() == 4 ? (int[]) invoke(uscript, null, code) : null;
+            if (c != null) list.add(c[0]);
+            else if (nomercy) throw error(REORDER);
+            break;
         }
       }
       if(!list.isEmpty()) invoke(method(RBC, "setReorderCodes", int[].class), coll, list.finish());

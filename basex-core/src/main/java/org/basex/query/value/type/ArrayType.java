@@ -41,9 +41,7 @@ public final class ArrayType extends FuncType {
 
   @Override
   public boolean eq(final Type t) {
-    if(this == t) return true;
-    if(!(t instanceof ArrayType)) return false;
-    return retType.eq(((ArrayType) t).retType);
+    return this == t || t instanceof ArrayType && retType.eq(((ArrayType) t).retType);
   }
 
   @Override

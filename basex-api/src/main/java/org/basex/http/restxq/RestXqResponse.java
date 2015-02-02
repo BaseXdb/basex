@@ -20,6 +20,9 @@ import org.basex.query.value.type.*;
  * @author Christian Gruen
  */
 final class RestXqResponse {
+  /** Private constructor. */
+  private RestXqResponse() { }
+
   /**
    * Evaluates the specified function and creates a response.
    * @param function function to be evaluated
@@ -28,8 +31,8 @@ final class RestXqResponse {
    * @param error optional query error
    * @throws Exception exception (including unexpected ones)
    */
-  void create(final RestXqFunction function, final QueryContext query, final HTTPContext http,
-      final QueryException error) throws Exception {
+  static void create(final RestXqFunction function, final QueryContext query,
+      final HTTPContext http, final QueryException error) throws Exception {
 
     // bind variables
     final StaticFunc sf = function.function;

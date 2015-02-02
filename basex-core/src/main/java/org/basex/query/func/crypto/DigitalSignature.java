@@ -258,12 +258,11 @@ final class DigitalSignature {
       throw CX_KSEXC.get(info, e);
     } catch(final MarshalException |  XMLSignatureException e) {
       throw CX_SIGEXC.get(info, e);
-    } catch(final NoSuchAlgorithmException | CertificateException e) {
+    } catch(final NoSuchAlgorithmException | CertificateException |
+        InvalidAlgorithmParameterException e) {
       throw CX_ALGEXC.get(info, e);
     } catch(final UnrecoverableKeyException | KeyException e) {
       throw CX_NOKEY.get(info, e);
-    } catch(final InvalidAlgorithmParameterException e) {
-      throw CX_ALGEXC.get(info, e);
     }
     return signedNode;
   }

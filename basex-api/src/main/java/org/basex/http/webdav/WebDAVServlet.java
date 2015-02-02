@@ -16,9 +16,9 @@ import com.bradmcevoy.http.*;
  */
 public final class WebDAVServlet extends BaseXServlet {
   /** Resource factory. */
-  BXResourceFactory resources;
+  private BXResourceFactory resources;
   /** Http Manager (must be a singleton). */
-  HttpManager manager;
+  private HttpManager manager;
 
   @Override
   public void init(final ServletConfig config) throws ServletException {

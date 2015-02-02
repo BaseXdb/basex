@@ -65,15 +65,17 @@ public final class Store extends ACreate {
 
     // start update
     if(lock && !startUpdate()) return false;
+    boolean ok = true;
     try {
       store(in, file);
-      return info(QUERY_EXECUTED_X_X, "", perf);
+      ok = info(QUERY_EXECUTED_X_X, "", perf);
     } catch(final IOException ex) {
       Util.debug(ex);
-      return error(FILE_NOT_SAVED_X, file);
+      ok = error(FILE_NOT_SAVED_X, file);
     } finally {
-      if(lock && !finishUpdate()) return false;
+      if(lock) ok &= finishUpdate();
     }
+    return ok;
   }
 
   /**

@@ -27,7 +27,7 @@ public final class QueryModuleTest extends QueryModule {
    */
   @Requires(Permission.NONE)
   @Deterministic
-  public String convenient(final int fruit) {
+  public static String convenient(final int fruit) {
     final int i = fruit;
     return FRUITS[i % FRUITS.length];
   }
@@ -41,7 +41,7 @@ public final class QueryModuleTest extends QueryModule {
    */
   @Requires(Permission.NONE)
   @Deterministic
-  public Str fast(final Int fruit) {
+  public static Str fast(final Int fruit) {
     final int i = (int) fruit.itr();
     final String f = FRUITS[i % FRUITS.length];
     return Str.get(f);
@@ -73,7 +73,7 @@ public final class QueryModuleTest extends QueryModule {
    * Throws an exception.
    * @throws QueryException query exception
    */
-  public void error() throws QueryException {
+  public static void error() throws QueryException {
     throw new QueryException("Stopped with an error.");
   }
 }

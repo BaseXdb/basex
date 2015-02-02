@@ -122,8 +122,8 @@ final class StringParser extends CmdParser {
           case INDEX:
             return new InfoIndex(consume(CmdIndexInfo.class, null));
           case STORAGE:
-            String arg1 = number(null);
-            final String arg2 = arg1 != null ? number(null) : null;
+            String arg1 = number();
+            final String arg2 = arg1 != null ? number() : null;
             if(arg1 == null) arg1 = xquery(null);
             return new InfoStorage(arg1, arg2);
         }
@@ -296,17 +296,16 @@ final class StringParser extends CmdParser {
 
   /**
    * Parses and returns a command. A command is limited to letters.
-   * @param cmd referring command; if specified, the result must not be empty
    * @return name
    * @throws QueryException query exception
    */
-  private String command(final Cmd cmd) throws QueryException {
+  private String command() throws QueryException {
     consumeWS();
     final StringBuilder sb = new StringBuilder();
     while(!eoc() && !ws(parser.curr())) {
       sb.append(parser.consume());
     }
-    return finish(sb, cmd);
+    return finish(sb, null);
   }
 
   /**
@@ -386,16 +385,15 @@ final class StringParser extends CmdParser {
 
   /**
    * Parses and returns a number.
-   * @param cmd referring command; if specified, the result must not be empty
    * @return name
    * @throws QueryException query exception
    */
-  private String number(final Cmd cmd) throws QueryException {
+  private String number() throws QueryException {
     consumeWS();
     final StringBuilder sb = new StringBuilder();
     if(parser.curr() == '-') sb.append(parser.consume());
     while(digit(parser.curr())) sb.append(parser.consume());
-    return finish(eoc() || ws(parser.curr()) ? sb : null, cmd);
+    return finish(eoc() || ws(parser.curr()) ? sb : null, null);
   }
 
   /**
@@ -416,10 +414,8 @@ final class StringParser extends CmdParser {
    * @return index
    * @throws QueryException query exception
    */
-  private <E extends Enum<E>> E consume(final Class<E> cmp, final Cmd par)
-      throws QueryException {
-
-    final String token = command(null);
+  private <E extends Enum<E>> E consume(final Class<E> cmp, final Cmd par) throws QueryException {
+    final String token = command();
     if(!suggest || token == null || !token.isEmpty()) {
       try {
         // return command reference; allow empty strings as input ("NULL")

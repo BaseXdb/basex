@@ -117,7 +117,7 @@ public final class FnSubsequence extends StandardFunc {
 
     // end flag: compute length
     if(el > 3 && toBoolean(exprs[3], qc)) len = len - start + 1;
-    return min ? len == Long.MAX_VALUE ? ALL : null : new long[] { start, len };
+    return new long[] { start, len };
   }
 
 

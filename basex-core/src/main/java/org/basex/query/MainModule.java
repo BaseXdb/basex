@@ -97,7 +97,7 @@ public final class MainModule extends StaticScope {
       return cache;
 
     } finally {
-      scope.exit(qc, fp);
+      VarScope.exit(qc, fp);
     }
   }
 
@@ -116,7 +116,7 @@ public final class MainModule extends StaticScope {
       @Override
       public Item next() throws QueryException {
         final Item it = iter.next();
-        if(it == null) scope.exit(qc, fp);
+        if(it == null) VarScope.exit(qc, fp);
         return it;
       }
 

@@ -1,6 +1,5 @@
 package org.basex.http.restxq;
 
-import static org.basex.http.HTTPMethod.*;
 import static org.basex.http.restxq.RestXqText.*;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
@@ -185,7 +184,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
       final InputInfo info) throws QueryException {
 
     if(body != null && !body.isEmpty()) {
-      final HTTPMethod m = get(method);
+      final HTTPMethod m = HTTPMethod.get(method);
       if(m != null && !m.body) throw error(info, METHOD_VALUE, m);
       if(requestBody != null) throw error(info, ANN_BODYVAR);
       requestBody = checkVariable(toString(body), declared);
@@ -438,7 +437,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @param item item
    * @return string
    */
-  private String toString(final Item item) {
+  private static String toString(final Item item) {
     return ((Str) item).toJava();
   }
 
@@ -447,7 +446,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @param ann annotation
    * @param list list to add values to
    */
-  private void strings(final Ann ann, final StringList list) {
+  private static void strings(final Ann ann, final StringList list) {
     for(final Item it : ann.args) list.add(toString(it));
   }
 

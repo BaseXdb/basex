@@ -344,7 +344,7 @@ public final class FnParseIetfDate extends StandardFunc {
      * @param digits minimum number of digits to add
      * @return token builder
      */
-    private TokenBuilder addNumber(final TokenBuilder tb, final int num, final int digits) {
+    private static TokenBuilder addNumber(final TokenBuilder tb, final int num, final int digits) {
       final byte[] tmp = token(num);
       for(int n = tmp.length; n < digits; n++) tb.add('0');
       return tb.add(tmp);

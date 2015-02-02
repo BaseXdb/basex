@@ -52,7 +52,7 @@ public final class FreeSlots {
   public String toString() {
     final StringBuilder sb = new StringBuilder(free.size() + " entries:\n");
     for(final Map.Entry<Integer, LinkedList<Long>> entry : free.entrySet()) {
-      sb.append("- " + entry.getKey() + ": " + entry.getValue() + '\n');
+      sb.append("- ").append(entry.getKey()).append(": ").append(entry.getValue()).append('\n');
     }
     return sb.toString();
   }

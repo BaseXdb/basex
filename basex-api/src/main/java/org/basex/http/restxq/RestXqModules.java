@@ -94,7 +94,9 @@ public final class RestXqModules {
    * @param http http context
    * @return best function, or {@code null} if more than one function exists
    */
-  private RestXqFunction bestQf(final ArrayList<RestXqFunction> list, final HTTPContext http) {
+  private static RestXqFunction bestQf(final ArrayList<RestXqFunction> list,
+      final HTTPContext http) {
+
     // mime types accepted by the client
     final HTTPAccept[] accepts = http.accepts();
 
@@ -130,7 +132,7 @@ public final class RestXqModules {
   private synchronized void cache(final HTTPContext http) throws Exception {
     // initialize RESTXQ directory (may be relative against WEBPATH)
     if(restxq == null) {
-      final StaticOptions sopts = http.context().soptions;
+      final StaticOptions sopts = HTTPContext.context().soptions;
       final String webpath = sopts.get(StaticOptions.WEBPATH);
       final String rxqpath = sopts.get(StaticOptions.RESTXQPATH);
       restxq = new IOFile(webpath).resolve(rxqpath);
@@ -167,7 +169,7 @@ public final class RestXqModules {
             module = new RestXqModule(file);
           }
           // add module if it has been parsed, and if it contains annotations
-          if(parsed || module.parse(http)) {
+          if(parsed || module.parse()) {
             module.touch();
             cache.put(path, module);
           }

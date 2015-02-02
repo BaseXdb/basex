@@ -75,7 +75,7 @@ public class QueryParser extends InputParser {
   /** Modules loaded by the current file. */
   public final TokenSet modules = new TokenSet();
   /** List of modules to be parsed. */
-  public ArrayList<ModInfo> mods = new ArrayList<>();
+  public final ArrayList<ModInfo> mods = new ArrayList<>();
 
   /** Parsed variables. */
   public final ArrayList<StaticVar> vars = new ArrayList<>();
@@ -539,14 +539,17 @@ public class QueryParser extends InputParser {
 
     } else if(eq(qnm.uri(), QUERY_URI)) {
       // query-specific options
-      if(name.equals(READ_LOCK)) {
-        for(final byte[] lock : split(val, ','))
-          qc.readLocks.add(DBLocking.USER_PREFIX + string(lock).trim());
-      } else if(name.equals(WRITE_LOCK)) {
-        for(final byte[] lock : split(val, ','))
-          qc.writeLocks.add(DBLocking.USER_PREFIX + string(lock).trim());
-      } else {
-        throw error(BASX_OPTIONS_X, name);
+      switch (name) {
+        case READ_LOCK:
+          for(final byte[] lock : split(val, ','))
+            qc.readLocks.add(DBLocking.USER_PREFIX + string(lock).trim());
+          break;
+        case WRITE_LOCK:
+          for(final byte[] lock : split(val, ','))
+            qc.writeLocks.add(DBLocking.USER_PREFIX + string(lock).trim());
+          break;
+        default:
+          throw error(BASX_OPTIONS_X, name);
       }
     }
     // ignore unknown options

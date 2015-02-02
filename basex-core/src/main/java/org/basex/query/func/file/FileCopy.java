@@ -61,12 +61,9 @@ public class FileCopy extends FileFn {
    * Recursively copies files.
    * @param src source path
    * @param trg target path
-   * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private synchronized void copy(final Path src, final Path trg)
-      throws QueryException, IOException {
-
+  private synchronized void copy(final Path src, final Path trg) throws IOException {
     if(Files.isDirectory(src)) {
       Files.createDirectory(trg);
       try(DirectoryStream<Path> paths = Files.newDirectoryStream(src)) {

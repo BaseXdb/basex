@@ -47,7 +47,6 @@ final class BaseXCollation extends Collation {
     do {
       // find first equal character
       for(int elemS; (elemS = next(iterS)) != elemC;) {
-        if(elemS == elemC) break;
         if(elemS == -1 || mode == Mode.STARTS_WITH) return -1;
       }
 

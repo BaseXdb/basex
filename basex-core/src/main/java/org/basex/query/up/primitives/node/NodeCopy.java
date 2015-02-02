@@ -104,7 +104,7 @@ abstract class NodeCopy extends NodeUpdate {
 
   @Override
   public final String toString() {
-    return new StringBuilder(Util.className(this)).append('[').append(']').
-        append(", ").append(insseq != null ? size() : nodes.size()).append(" ops]").toString();
+    return Util.className(this) + '[' + ']' + ", " +
+        (insseq != null ? size() : nodes.size()) + " ops]";
   }
 }

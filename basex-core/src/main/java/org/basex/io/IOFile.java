@@ -177,7 +177,7 @@ public final class IOFile extends IO {
    */
   public IOFile[] children(final String regex) {
     final File[] ch = file.listFiles();
-    if(ch == null) return new IOFile[] {};
+    if(ch == null) return new IOFile[0];
 
     final ArrayList<IOFile> io = new ArrayList<>(ch.length);
     final Pattern p = Pattern.compile(regex, Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE);

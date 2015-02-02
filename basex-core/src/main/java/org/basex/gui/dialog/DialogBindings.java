@@ -39,7 +39,7 @@ public final class DialogBindings extends BaseXDialog {
     final BaseXBack table = new BaseXBack(new TableLayout((2 + cl) / 2, 2, 8, 4));
     table.add(new BaseXLabel(NAME + COLS, false, true));
     table.add(new BaseXLabel(VALUE + COLS, false, true));
-    for(int c = 0; c < cl; c++) table.add(context[c]);
+    for(final BaseXTextField ctx : context) table.add(ctx);
     set(table, BorderLayout.CENTER);
 
     fill();

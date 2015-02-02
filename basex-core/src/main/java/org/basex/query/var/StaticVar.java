@@ -103,7 +103,7 @@ public final class StaticVar extends StaticDecl {
       if(lazy) qe.notCatchable();
       throw qe;
     } finally {
-      scope.exit(qc, fp);
+      VarScope.exit(qc, fp);
       dontEnter = false;
     }
   }

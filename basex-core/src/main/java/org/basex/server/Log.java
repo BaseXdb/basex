@@ -37,7 +37,7 @@ public final class Log {
     /** Info.    */ INFO,
     /** Error.   */ ERROR,
     /** OK.      */ OK
-  };
+  }
 
   /** Static options. */
   private final StaticOptions sopts;

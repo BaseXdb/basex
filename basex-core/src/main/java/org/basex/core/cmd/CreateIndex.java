@@ -57,14 +57,16 @@ public final class CreateIndex extends ACreate {
     }
 
     if(!startUpdate()) return false;
+    boolean ok = true;
     try {
       create(type, data, options, this);
-      return info(INDEX_CREATED_X_X, type, perf);
+      ok = info(INDEX_CREATED_X_X, type, perf);
     } catch(final IOException ex) {
-      return error(Util.message(ex));
+      ok = error(Util.message(ex));
     } finally {
-      if(!finishUpdate()) return false;
+      ok &= finishUpdate();
     }
+    return ok;
   }
 
   @Override

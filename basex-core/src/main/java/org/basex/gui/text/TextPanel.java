@@ -9,9 +9,9 @@ import java.awt.datatransfer.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
+import java.util.Timer;
 
 import javax.swing.*;
-import javax.swing.Timer;
 
 import org.basex.core.*;
 import org.basex.gui.*;
@@ -276,13 +276,11 @@ public class TextPanel extends BaseXPanel {
   public final void error(final int pos) {
     final int eid = ++errorID;
     editor.error(pos);
-    new Thread() {
+
+    new Timer(true).schedule(new TimerTask() {
       @Override
-      public void run() {
-        Performance.sleep(ERROR_DELAY);
-        if(eid == errorID) rend.repaint();
-      }
-    }.start();
+      public void run() { if(eid == errorID) rend.repaint(); }
+    }, ERROR_DELAY);
   }
 
   /**
@@ -736,7 +734,10 @@ public class TextPanel extends BaseXPanel {
     // copy selection to clipboard
     final Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
     final Transferable tr = clip.getContents(null);
-    if(tr != null) for(final Object o : BaseXLayout.contents(tr)) return o.toString();
+    if(tr != null) {
+      final ArrayList<Object> contents = BaseXLayout.contents(tr);
+      if(!contents.isEmpty()) return contents.get(0).toString();
+    }
     return null;
   }
 
@@ -751,7 +752,7 @@ public class TextPanel extends BaseXPanel {
   }
 
   /** Text caret. */
-  private final Timer caretTimer = new Timer(500, new ActionListener() {
+  private final javax.swing.Timer caretTimer = new javax.swing.Timer(500, new ActionListener() {
     @Override
     public void actionPerformed(final ActionEvent e) {
       rend.caret(!rend.caret());

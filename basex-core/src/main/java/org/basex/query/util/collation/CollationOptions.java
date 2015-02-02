@@ -16,9 +16,9 @@ abstract class CollationOptions extends Options {
   /** Initialization of locales. */
   protected static class Locales {
     /** Available locales, indexed by language code. */
-    static HashMap<String, Locale> map = new HashMap<>();
+    static final HashMap<String, Locale> MAP = new HashMap<>();
     static {
-      for(final Locale l : Locale.getAvailableLocales()) map.put(l.toString().replace('_', '-'), l);
+      for(final Locale l : Locale.getAvailableLocales()) MAP.put(l.toString().replace('_', '-'), l);
     }
   }
 

@@ -75,11 +75,11 @@ public abstract class Path extends ParseExpr {
     if(rt instanceof Context) rt = null;
 
     // add steps of input array
-    for(int s = 0; s < sl; s++) {
-      Expr step = steps[s];
+    for(final Expr expr : steps) {
+      Expr step = expr;
       if(step instanceof Context) {
         // remove redundant context references
-        if(sl > 1) continue;
+        if (sl > 1) continue;
         // single step: rewrite to axis step (required to sort results of path)
         step = Step.get(((Context) step).info, SELF, Test.NOD);
       } else if(step instanceof Filter) {
@@ -291,9 +291,8 @@ public abstract class Path extends ParseExpr {
     boolean atMostOne = size == 0 || size == 1 || tp.zeroOrOne();
     boolean sameDepth = atMostOne || tp.type == NodeType.DOC || tp.type == NodeType.DEL;
 
-    final int sl = steps.length;
-    for(int s = 0; s < sl; ++s) {
-      final Step step = (Step) steps[s];
+    for(final Expr expr : steps) {
+      final Step step = (Step) expr;
       switch(step.axis) {
         case ANC:
         case ANCORSELF:
@@ -788,7 +787,7 @@ public abstract class Path extends ParseExpr {
    * @param expr input expression
    * @return rewriting flag
    */
-  private Expr mergeList(final Expr expr) {
+  private static Expr mergeList(final Expr expr) {
     if(expr instanceof Union || expr instanceof List) {
       final Arr next = (Arr) expr;
       if(childSteps(next)) {
@@ -804,7 +803,7 @@ public abstract class Path extends ParseExpr {
    * @param list array to be checked
    * @return result of check
    */
-  private boolean childSteps(final Arr list) {
+  private static boolean childSteps(final Arr list) {
     for(final Expr e : list.exprs) {
       if(!(e instanceof Path)) return false;
       final Path p = (Path) e;

@@ -147,7 +147,7 @@ public final class WebDAVLockService {
     if(s == null) throw new IOException("WebDAV module not found");
     final byte[] module = new IOStream(s).read();
 
-    try(final QueryProcessor qp = new QueryProcessor(query.toString(), http.context())) {
+    try(final QueryProcessor qp = new QueryProcessor(query.toString(), HTTPContext.context())) {
       for(final Entry<String, Object> entry : query.entries()) {
         qp.bind(entry.getKey(), entry.getValue());
       }

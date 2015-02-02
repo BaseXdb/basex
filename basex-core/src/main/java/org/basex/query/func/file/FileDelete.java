@@ -27,10 +27,9 @@ public final class FileDelete extends FileFn {
   /**
    * Recursively deletes a file path.
    * @param path path to be deleted
-   * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private synchronized void delete(final Path path) throws QueryException, IOException {
+  private synchronized void delete(final Path path) throws IOException {
     if(Files.isDirectory(path)) {
       try(DirectoryStream<Path> paths = Files.newDirectoryStream(path)) {
         for(final Path p : paths) delete(p);

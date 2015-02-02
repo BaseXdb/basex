@@ -129,7 +129,7 @@ final class DataFTBuilder {
     /** Token. */
     byte[] token;
     /** Marker flag. */
-    boolean mark;
+    final boolean mark;
 
     /**
      * Constructor.

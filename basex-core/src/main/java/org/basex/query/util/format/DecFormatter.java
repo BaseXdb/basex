@@ -77,18 +77,20 @@ public final class DecFormatter extends FormatUtil {
           nan = v;
         } else if(v.length != 0 && cl(v, 0) == v.length) {
           final int cp = cp(v, 0);
-          if(k.equals(DF_DEC)) decimal = cp;
-          else if(k.equals(DF_GRP)) grouping = cp;
-          else if(k.equals(DF_EXP)) exponent = cp;
-          else if(k.equals(DF_PAT)) pattern = cp;
-          else if(k.equals(DF_MIN)) minus = cp;
-          else if(k.equals(DF_DIG)) optional = cp;
-          else if(k.equals(DF_PC)) percent = cp;
-          else if(k.equals(DF_PM)) permille = cp;
-          else if(k.equals(DF_ZG)) {
-            z = zeroes(cp);
-            if(z == -1) throw INVDECFORM_X_X.get(info, k, v);
-            if(z != cp) throw INVDECZERO_X.get(info, (char)  cp);
+          switch (k) {
+            case DF_DEC: decimal  = cp; break;
+            case DF_GRP: grouping = cp; break;
+            case DF_EXP: exponent = cp; break;
+            case DF_PAT: pattern  = cp; break;
+            case DF_MIN: minus    = cp; break;
+            case DF_DIG: optional = cp; break;
+            case DF_PC:  percent  = cp; break;
+            case DF_PM:  permille = cp; break;
+            case DF_ZG:
+              z = zeroes(cp);
+              if (z == -1) throw INVDECFORM_X_X.get(info, k, v);
+              if (z != cp) throw INVDECZERO_X.get(info, (char) cp);
+              break;
           }
         } else {
           // signs must have single character

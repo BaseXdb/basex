@@ -62,7 +62,7 @@ public final class HTTPParams {
    * @throws QueryException query exception
    */
   public Value content() throws QueryException, IOException {
-    return HttpPayload.value(body(), http.context().options, http.contentType(),
+    return HttpPayload.value(body(), HTTPContext.context().options, http.contentType(),
         http.contentTypeExt());
   }
 
@@ -131,7 +131,7 @@ public final class HTTPParams {
   private void addMultipart(final Map<String, Value> params, final String ext)
       throws QueryException, IOException {
 
-    final MainOptions opts = http.context().options;
+    final MainOptions opts = HTTPContext.context().options;
     try(final InputStream is = body().inputStream()) {
       final HttpPayload hp = new HttpPayload(is, true, null, opts);
       final HashMap<String, Value> mp = hp.multiForm(ext);

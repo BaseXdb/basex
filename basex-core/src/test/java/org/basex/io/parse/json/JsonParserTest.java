@@ -178,7 +178,7 @@ public final class JsonParserTest {
    * @param liberal liberal parsing
    * @throws QueryIOException parse error
    */
-  private void parse(final String json, final boolean liberal) throws QueryIOException {
+  private static void parse(final String json, final boolean liberal) throws QueryIOException {
     parse(json, json, liberal);
   }
 
@@ -189,7 +189,7 @@ public final class JsonParserTest {
    * @param liberal liberal parsing
    * @throws QueryIOException parse error
    */
-  private void parse(final String json, final String exp, final boolean liberal)
+  private static void parse(final String json, final String exp, final boolean liberal)
       throws QueryIOException {
     assertEquals(exp, JsonStringConverter.toString(json, liberal, true));
   }
@@ -201,7 +201,7 @@ public final class JsonParserTest {
    * @param exp expected output
    * @throws QueryIOException parse error
    */
-  private void unescape(final String json, final String exp) throws QueryIOException {
+  private static void unescape(final String json, final String exp) throws QueryIOException {
     assertEquals(exp, JsonStringConverter.toString(json, false, false));
   }
 }

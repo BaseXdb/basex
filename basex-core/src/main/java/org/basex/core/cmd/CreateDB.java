@@ -3,7 +3,6 @@ package org.basex.core.cmd;
 import static org.basex.core.Text.*;
 
 import java.io.*;
-import java.lang.reflect.*;
 
 import org.basex.build.*;
 import org.basex.core.*;
@@ -100,21 +99,15 @@ public final class CreateDB extends ACreate {
 
         final Data data = context.data();
         if(!startUpdate()) return false;
+        final boolean ok;
         try {
           if(data.meta.createtext) create(IndexType.TEXT,      data, options, this);
           if(data.meta.createattr) create(IndexType.ATTRIBUTE, data, options, this);
           if(data.meta.createftxt) create(IndexType.FULLTEXT,  data, options, this);
-
-          // for testing purposes
-          final Class<?> luceneClass = Reflect.find("org.basex.modules.LuceneIndex");
-          if(luceneClass != null) {
-            Util.errln("Creating Lucene Index...");
-            final Method m = Reflect.method(luceneClass, "luceneIndex", Context.class);
-            Reflect.invoke(m, null, context);
-          }
         } finally {
-          if(!finishUpdate()) return false;
+          ok = finishUpdate();
         }
+        if(!ok) return false;
       }
       if(options.get(MainOptions.CREATEONLY)) new Close().run(context);
 

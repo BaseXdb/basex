@@ -128,8 +128,8 @@ public final class FTAnd extends FTExpr {
     final int es = exprs.length;
     final boolean[] ng = new boolean[es];
     int costs = 0;
-    for(int e = 0; e < es; ++e) {
-      if(!exprs[e].indexAccessible(ii)) return false;
+    for(final FTExpr expr : exprs) {
+      if(!expr.indexAccessible(ii)) return false;
       // use worst costs for estimation, as all index results may need to be scanned
       if(costs < ii.costs) costs = ii.costs;
     }

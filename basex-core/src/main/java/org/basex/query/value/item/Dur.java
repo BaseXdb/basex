@@ -221,7 +221,7 @@ public class Dur extends ADateDur {
 
   @Override
   public final Duration toJava() {
-    return ADate.df.newDuration(Token.string(string(null)));
+    return ADate.DF.newDuration(Token.string(string(null)));
   }
 
   @Override

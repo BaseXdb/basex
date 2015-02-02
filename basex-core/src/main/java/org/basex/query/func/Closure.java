@@ -280,7 +280,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   @Override
   public FuncItem item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Type type = seqType().type;
-    if(!(type instanceof FuncType)) Util.notExpected("Closure was not compiled: %", this);
+    if(!(type instanceof FuncType)) throw Util.notExpected("Closure was not compiled: %", this);
     final FuncType ft = (FuncType) type;
 
     final Expr body;

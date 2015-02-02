@@ -9,8 +9,6 @@ import java.util.*;
 
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.util.pkg.Package.Component;
-import org.basex.query.util.pkg.Package.Dependency;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 

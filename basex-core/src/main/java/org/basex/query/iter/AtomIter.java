@@ -43,13 +43,13 @@ public final class AtomIter extends Iter {
     if(size != -1) {
       qc.checkStop();
       final Item it = iter.next();
-      return it == null ? it : it.atomItem(info);
+      return it == null ? null : it.atomItem(info);
     }
 
     while(true) {
       if(atom == null) {
         final Item it = iter.next();
-        if(it == null) return it;
+        if(it == null) return null;
         atom = it.atomValue(info).iter();
       }
       qc.checkStop();

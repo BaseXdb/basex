@@ -35,7 +35,7 @@ public final class BaseXLayout {
 
   /** Shortcut string for meta key. */
   private static final String META = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() ==
-      Event.META_MASK ? "meta" : "ctrl";
+      InputEvent.META_MASK ? "meta" : "ctrl";
   /** Key listener for global shortcuts. */
   private static KeyAdapter keys;
 

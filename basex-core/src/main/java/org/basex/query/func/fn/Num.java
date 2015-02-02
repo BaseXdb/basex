@@ -106,7 +106,7 @@ abstract class Num extends StandardFunc {
    * @param type to check
    * @return result of check
    */
-  private boolean instanceOf(final Type tr, final Type ti, final Type type) {
+  private static boolean instanceOf(final Type tr, final Type ti, final Type type) {
     return tr.instanceOf(type) && ti.instanceOf(type);
   }
 }

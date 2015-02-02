@@ -2,8 +2,9 @@ package org.basex.core;
 
 import static org.basex.core.Text.*;
 
+import java.util.*;
+
 import org.basex.core.locks.*;
-import org.basex.util.*;
 
 /**
  * This class is implemented by all kinds of processes.
@@ -23,8 +24,8 @@ public abstract class Proc {
   boolean registered;
   /** Stopped flag. */
   private boolean stopped;
-  /** Timeout thread. */
-  private Thread timeout;
+  /** Timer. */
+  private Timer timer;
   /** Sub process. */
   private Proc sub;
 
@@ -109,24 +110,20 @@ public abstract class Proc {
   public final void startTimeout(final long ms) {
     if(ms == 0) return;
 
-    timeout = new Thread() {
+    timer = new Timer(true);
+    timer.schedule(new TimerTask() {
       @Override
-      public void run() {
-        Performance.sleep(ms);
-        Proc.this.stop();
-      }
-    };
-    timeout.setDaemon(true);
-    timeout.start();
+      public void run() { Proc.this.stop(); }
+    }, ms);
   }
 
   /**
    * Stops the timeout thread.
    */
   public final void stopTimeout() {
-    if(timeout != null) {
-      timeout.interrupt();
-      timeout = null;
+    if(timer != null) {
+      timer.cancel();
+      timer = null;
     }
   }
 

@@ -36,9 +36,8 @@ final class UserUpdates {
 
   /**
    * Applies all updates.
-   * @throws QueryException query exception
    */
-  void apply() throws QueryException {
+  void apply() {
     for(final UserUpdate up : userUpdates) up.apply();
   }
 

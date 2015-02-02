@@ -50,11 +50,10 @@ public final class FileList extends FileRead {
    * @param list file list
    * @param rec recursive flag
    * @param pat file name pattern; ignored if {@code null}
-   * @throws QueryException query exception
    * @throws IOException I/O exception
    */
   private static void list(final int index, final Path dir, final TokenList list, final boolean rec,
-      final Pattern pat) throws QueryException, IOException {
+      final Pattern pat) throws IOException {
 
     // skip invalid directories
     final ArrayList<Path> children = new ArrayList<>();
@@ -68,7 +67,7 @@ public final class FileList extends FileRead {
     // parse directories, do not follow links
     if(rec) {
       for(final Path child : children) {
-        if(Files.isDirectory(child)) list(index, child, list, rec, pat);
+        if(Files.isDirectory(child)) list(index, child, list, true, pat);
       }
     }
 

@@ -50,7 +50,7 @@ public final class Bln extends Item {
    * @return item
    */
   public static Bln get(final boolean value, final double score) {
-    return value && score != 0 ? new Bln(value, score) : get(value);
+    return value && score != 0 ? new Bln(true, score) : get(value);
   }
 
   /**

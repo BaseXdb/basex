@@ -113,7 +113,7 @@ public final class FTOpt extends ExprInfo {
     else if(cs == FTCase.SENSITIVE) s.append(' ' + USING + ' ' + CASE + ' ' + SENSITIVE);
     if(is(DC)) s.append(' ' + USING + ' ' + DIACRITICS + ' ' + SENSITIVE);
     if(is(ST) || sd != null) s.append(' ' + USING + ' ' + STEMMING);
-    if(ln != null) s.append(' ' + USING + ' ' + LANGUAGE + " '" + ln + '\'');
+    if(ln != null) s.append(' ' + USING + ' ' + LANGUAGE + " '").append(ln).append('\'');
     if(th != null) s.append(' ' + USING + ' ' + THESAURUS);
     return s.toString();
   }

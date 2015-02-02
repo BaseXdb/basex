@@ -98,7 +98,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
   @Override
   public String[] listChildCollections() throws XMLDBException {
     check();
-    return new String[] {};
+    return new String[0];
   }
 
   @Override

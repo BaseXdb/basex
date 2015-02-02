@@ -104,7 +104,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("(/*/@id/../*) ! name()", "b\nc\nd\ne", "empty(//IterPath)");
     check("(exactly-one(/a)/@id/../*) ! name()", "b\nc\nd\ne", "exists(//IterPath)");
     new DropDB(NAME).execute(context);
-  };
+  }
 
   /**
    * Checks OR optimizations.

@@ -8,6 +8,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
+import java.util.Timer;
 import java.util.regex.*;
 
 import javax.swing.*;
@@ -18,7 +19,6 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.parse.*;
 import org.basex.gui.*;
-import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.dialog.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXFileChooser.Mode;
@@ -56,8 +56,6 @@ public final class EditorView extends View {
   private final AbstractButton stop;
   /** Go button. */
   private final AbstractButton go;
-  /** Variables button. */
-  private final AbstractButton vars;
   /** Test button. */
   private final AbstractButton test;
   /** Search bar. */
@@ -104,20 +102,15 @@ public final class EditorView extends View {
     final AbstractButton openB = BaseXButton.command(GUIMenuCmd.C_EDITOPEN, gui);
     final AbstractButton saveB = BaseXButton.get("c_save", SAVE, false, gui);
     final AbstractButton find = search.button(FIND_REPLACE);
+    final AbstractButton vars = BaseXButton.get("c_vars", EXTERNAL_VARIABLES, false, gui);
+
     hist = BaseXButton.get("c_hist", RECENTLY_OPENED, false, gui);
-
     stop = BaseXButton.get("c_stop", STOP, false, gui);
-    stop.addKeyListener(this);
     stop.setEnabled(false);
-
     go = BaseXButton.get("c_go", BaseXLayout.addShortcut(RUN_QUERY,
         BaseXKeys.EXEC1.toString()), false, gui);
-    go.addKeyListener(this);
-    vars = BaseXButton.get("c_vars", EXTERNAL_VARIABLES, false, gui);
-    vars.addKeyListener(this);
     test = BaseXButton.get("c_test", BaseXLayout.addShortcut(RUN_TESTS,
         BaseXKeys.UNIT.toString()), false, gui);
-    test.addKeyListener(this);
 
     final BaseXBack buttons = new BaseXBack(false);
     buttons.layout(new TableLayout(1, 9, 1, 0)).border(0, 0, 8, 0);
@@ -703,16 +696,15 @@ public final class EditorView extends View {
    */
   public void start() {
     final int thread = threadID;
-    new Thread() {
+    new Timer(true).schedule(new TimerTask() {
       @Override
       public void run() {
-        Performance.sleep(200);
         if(thread == threadID) {
           info.setText(PLEASE_WAIT_D, Msg.SUCCESS).setToolTipText(null);
           stop.setEnabled(true);
         }
       }
-    }.start();
+    }, 200);
   }
 
   /**

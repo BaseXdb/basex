@@ -266,7 +266,7 @@ public final class DataBuilder {
     while(ai.next() != null) ++s;
     if(!att) {
       ai = node.children();
-      for(ANode i; (i = ai.next()) != null;) s += size(i, att);
+      for(ANode i; (i = ai.next()) != null;) s += size(i, false);
     }
     return s;
   }

@@ -75,9 +75,9 @@ public final class FTToken {
    */
   public static int noDiacritics(final int cp) {
     if(cp < 0xC0) return cp;
-    if(cp < 0x500) return norm0000[cp - 0xC0];
-    if(cp > 0x1e00 && cp < 0x2000) return norm1E00[cp - 0x1E00];
-    final int c = normXXXX.get(cp);
+    if(cp < 0x500) return NORM_0000[cp - 0xC0];
+    if(cp > 0x1e00 && cp < 0x2000) return NORM_1E00[cp - 0x1E00];
+    final int c = NORM_XXXX.get(cp);
     return c == Integer.MIN_VALUE ? cp : c;
   }
 
@@ -327,22 +327,22 @@ public final class FTToken {
     char[] norm = new char[0x440];
     for(int n = 0; n < 0x440; n++) norm[n] = (char) (n + 0xC0);
     for(final char[] aNC : NC0000) norm[aNC[0] - 0xC0] = aNC[1];
-    norm0000 = norm;
+    NORM_0000 = norm;
 
     norm = new char[0x200];
     for(int n = 0; n < 0x200; n++) norm[n] = (char) (n + 1E00);
     for(final char[] aNC : NC1E00) norm[aNC[0] - 0x1E00] = aNC[1];
-    norm1E00 = norm;
+    NORM_1E00 = norm;
 
     final IntMap map = new IntMap();
     for(final char[] aNC : NCXXXX) map.put(aNC[0], aNC[1]);
-    normXXXX = map;
+    NORM_XXXX = map;
   }
 
   /** Mapping table for codepoints from 0000-0500. */
-  private static char[] norm0000;
+  private static final char[] NORM_0000;
   /** Mapping table for codepoints from 1E00-2000. */
-  private static char[] norm1E00;
+  private static final char[] NORM_1E00;
   /** Additionally mapped codepoints. */
-  private static IntMap normXXXX;
+  private static final IntMap NORM_XXXX;
 }

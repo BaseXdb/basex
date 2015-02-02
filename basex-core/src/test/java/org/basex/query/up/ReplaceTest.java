@@ -78,7 +78,7 @@ public final class ReplaceTest extends AdvancedQueryTest {
    * @param docs documents to add
    * @throws BaseXException database exception
    */
-  private void prepare(final String... docs) throws BaseXException {
+  private static void prepare(final String... docs) throws BaseXException {
     new CreateDB(NAME).execute(context);
     for(final String doc : docs) {
       // choose first letter of input as document name

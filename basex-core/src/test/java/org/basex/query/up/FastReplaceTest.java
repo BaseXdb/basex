@@ -67,7 +67,7 @@ public final class FastReplaceTest extends AdvancedQueryTest {
 
     query("for $i in //item return replace node $i " +
         "with (//item[@id='" + id + "'])[1]");
-    final String count2 =  query("count(//item[@id='" + id + "'])");
+    final String count2 = query("count(//item[@id='" + id + "'])");
 
     assertEquals(count1, count2);
   }

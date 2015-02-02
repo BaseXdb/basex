@@ -189,9 +189,4 @@ final class SearchContext {
     return mcase == s.mcase && word == s.word && regex == s.regex && multi == s.multi &&
         Strings.eq(search, s.search);
   }
-
-  @Override
-  public int hashCode() {
-    return super.hashCode();
-  }
 }

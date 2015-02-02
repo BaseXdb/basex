@@ -39,14 +39,16 @@ public final class Optimize extends ACreate {
     size = meta.size;
 
     if(!startUpdate()) return false;
+    boolean ok = true;
     try {
       optimize(data, options, this);
-      return info(DB_OPTIMIZED_X, meta.name, perf);
+      ok = info(DB_OPTIMIZED_X, meta.name, perf);
     } catch(final IOException ex) {
-      return error(Util.message(ex));
+      ok = error(Util.message(ex));
     } finally {
-      if(!finishUpdate()) return false;
+      ok &= finishUpdate();
     }
+    return ok;
   }
 
   @Override

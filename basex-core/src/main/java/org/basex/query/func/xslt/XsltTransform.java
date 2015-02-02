@@ -99,7 +99,7 @@ public class XsltTransform extends XsltFn {
 
     // create transformer
     final TransformerFactory tc = TransformerFactory.newInstance();
-    final Transformer tr =  tc.newTransformer(xsl.streamSource());
+    final Transformer tr = tc.newTransformer(xsl.streamSource());
 
     // bind parameters
     for(final Entry<String, String> entry : par.entrySet())

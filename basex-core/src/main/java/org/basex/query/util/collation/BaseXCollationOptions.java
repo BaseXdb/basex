@@ -74,7 +74,7 @@ public final class BaseXCollationOptions extends CollationOptions {
 
     Locale locale = Locale.US;
     if(contains(LANG)) {
-      locale = Locales.map.get(get(LANG));
+      locale = Locales.MAP.get(get(LANG));
       if(locale == null) throw error(LANG);
     }
 

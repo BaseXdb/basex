@@ -39,7 +39,7 @@ public final class ReplaceDoc extends NodeUpdate {
 
     super(UpdateType.REPLACENODE, pre, data, info);
     options = new DBOptions(opts, DBOptions.PARSING, info);
-    replace = new DBNew(qc, Arrays.asList(input), info);
+    replace = new DBNew(qc, Collections.singletonList(input), info);
   }
 
   @Override

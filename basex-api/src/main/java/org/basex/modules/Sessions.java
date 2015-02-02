@@ -25,7 +25,7 @@ public final class Sessions extends QueryModule {
    * Returns the ids of all registered sessions.
    * @return session ids
    */
-  public Value ids() {
+  public static Value ids() {
     final HashMap<String, HttpSession> http = SessionListener.sessions();
     final TokenList tl = new TokenList(http.size());
     for(final String s : http.keySet()) tl.add(s);

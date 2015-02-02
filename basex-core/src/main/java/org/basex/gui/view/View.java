@@ -102,11 +102,9 @@ public abstract class View extends BaseXPanel {
   @Override
   public void keyPressed(final KeyEvent e) {
     if(gui.updating) return;
-    if(ESCAPE.is(e)) {
-      gui.fullscreen(false);
-    }
-    if(gui.context.data() == null) return;
+    if(ESCAPE.is(e)) gui.fullscreen(false);
 
+    if(gui.context.data() == null) return;
     if(SPACE.is(e)) {
       gui.notify.mark(sc(e) ? 2 : e.isShiftDown() ? 1 : 0, null);
     } else if(ENTER.is(e)) {

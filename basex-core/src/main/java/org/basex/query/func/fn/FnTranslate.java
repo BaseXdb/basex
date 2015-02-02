@@ -16,9 +16,9 @@ import org.basex.util.*;
 public final class FnTranslate extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final int[] tok =  cps(toEmptyToken(exprs[0], qc));
+    final int[] tok = cps(toEmptyToken(exprs[0], qc));
     final int[] srch = cps(toToken(exprs[1], qc));
-    final int[] rep =  cps(toToken(exprs[2], qc));
+    final int[] rep = cps(toToken(exprs[2], qc));
 
     final TokenBuilder tb = new TokenBuilder(tok.length);
     for(final int t : tok) {
