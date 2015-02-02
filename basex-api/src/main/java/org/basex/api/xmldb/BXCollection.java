@@ -104,18 +104,18 @@ public final class BXCollection implements Collection, BXXMLDBText {
   @Override
   public int getResourceCount() throws XMLDBException {
     check();
-    return ctx.data().resources.docs().size();
+    return ctx.data().meta.ndocs.get();
   }
 
   @Override
   public String[] listResources() throws XMLDBException {
     check();
-    final StringList sl = new StringList();
     final Data data = ctx.data();
-    final IntList il = data.resources.docs();
-    final int is = il.size();
-    for(int i = 0; i < is; i++) sl.add(Token.string(data.text(il.get(i), true)));
-    return sl.toArray();
+    final IntList docs = data.resources.docs();
+    final int ds = docs.size();
+    final StringList sl = new StringList(ds);
+    for(int d = 0; d < ds; d++) sl.add(Token.string(data.text(docs.get(d), true)));
+    return sl.finish();
   }
 
   @Override

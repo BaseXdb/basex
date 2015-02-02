@@ -72,11 +72,11 @@ public enum GUIMenuCmd implements GUICommand {
       if(root.exists()) {
         IOFile file = null;
         boolean overwrite = false;
-        final Data d = gui.context.data();
-        final IntList il = d.resources.docs();
-        final int is = il.size();
-        for(int i = 0; i < is; i++) {
-          file = root.resolve(Token.string(d.text(il.get(i), true)));
+        final Data data = gui.context.data();
+        final IntList docs = data.resources.docs();
+        final int ds = docs.size();
+        for(int d = 0; d < ds; d++) {
+          file = root.resolve(Token.string(data.text(docs.get(d), true)));
           if(file.exists()) {
             if(overwrite) {
               // more than one file will be overwritten; check remaining tests

@@ -60,13 +60,13 @@ public final class MemBuilder extends Builder {
   @Override
   public MemData build() throws IOException {
     dataClip();
-    data.meta.assign(parser);
     return data;
   }
 
   @Override
   public DataClip dataClip() throws IOException {
     init();
+    data.meta.assign(parser);
     try {
       parse();
     } catch(final IOException ex) {

@@ -153,7 +153,7 @@ public final class QueryResources {
 
     // favor default database
     final Data gd = globalData();
-    if(qc.context.options.get(MainOptions.DEFAULTDB) && gd != null) {
+    if(gd != null && qc.context.options.get(MainOptions.DEFAULTDB)) {
       final int pre = gd.resources.doc(qi.original);
       if(pre != -1) return new DBNode(gd, pre, Data.DOC);
     }
@@ -161,7 +161,7 @@ public final class QueryResources {
     // check currently opened databases
     for(final Data data : datas) {
       // check if database has a single document with an identical input path
-      if(data.resources.docs().size() == 1 && IO.get(data.meta.original).eq(qi.input))
+      if(data.meta.ndocs.get() == 1 && IO.get(data.meta.original).eq(qi.input))
         return new DBNode(data, 0, Data.DOC);
 
       // check if database and input have identical name
