@@ -43,10 +43,10 @@ public final class Escape extends RegExp {
 
   /**
    * Constructor.
-   * @param str image string
+   * @param img image string
    */
-  private Escape(final String str) {
-    img = str;
+  private Escape(final String img) {
+    this.img = img;
   }
 
   /**

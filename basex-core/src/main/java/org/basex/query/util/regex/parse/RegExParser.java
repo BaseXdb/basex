@@ -3,7 +3,6 @@ package org.basex.query.util.regex.parse;
 
 import static org.basex.query.QueryError.*;
 
-import java.util.ArrayList;
 import java.util.regex.*;
 
 import org.basex.query.*;
@@ -44,6 +43,7 @@ public class RegExParser implements RegExParserConstants {
    */
   public static Pattern parse(final byte[] regex, final byte[] mod, final InputInfo ii,
       final boolean check) throws QueryException {
+
     // process modifiers
     int m = 0;
     boolean strip = false;
@@ -74,10 +74,12 @@ public class RegExParser implements RegExParserConstants {
         if(p.matcher("").matches()) throw REGROUP.get(ii);
       }
       return pattern;
-    } catch(final ParseException pe) {
-      throw REGPAT_X.get(ii, pe.getMessage());
+    } catch(final ParseException ex) {
+      Util.debug(ex);
+      throw REGPAT_X.get(ii, regex);
     } catch(final TokenMgrError err) {
-      throw REGPAT_X.get(ii, err.getMessage());
+      Util.debug(err);
+      throw REGPAT_X.get(ii, regex);
     }
   }
 
@@ -114,10 +116,8 @@ public class RegExParser implements RegExParserConstants {
    * @throws ParseException parsing exception
    */
   final public RegExp regExp() throws ParseException {
-    RegExp nd;
-    RegExp[] brs = null;
-    nd = branch();
-        brs = new RegExp[] { nd };
+    final RegExpList brs = new RegExpList();
+        brs.add(branch());
     label_1:
     while (true) {
       switch (jj_ntk==-1?jj_ntk():jj_ntk) {
@@ -129,13 +129,9 @@ public class RegExParser implements RegExParserConstants {
         break label_1;
       }
       jj_consume_token(OR);
-      nd = branch();
-          final RegExp[] nw = new RegExp[brs.length + 1];
-          System.arraycopy(brs, 0, nw, 0, brs.length);
-          nw[brs.length] = nd;
-          brs = nw;
+               brs.add(branch());
     }
-      {if (true) return brs.length == 1 ? nd : new Disjunction(brs);}
+      {if (true) return brs.size() == 1 ? brs.get(0) : new Disjunction(brs.finish());}
     throw new Error("Missing return statement in function");
   }
 
@@ -147,7 +143,7 @@ public class RegExParser implements RegExParserConstants {
    */
   final public RegExp branch() throws ParseException {
     RegExp atom;
-    RegExp[] pieces = new RegExp[0];
+    final RegExpList pieces = new RegExpList();
     Quantifier qu = null;
     label_2:
     while (true) {
@@ -182,13 +178,10 @@ public class RegExParser implements RegExParserConstants {
         jj_la1[2] = jj_gen;
         ;
       }
-        final RegExp[] nw = new RegExp[pieces.length + 1];
-        System.arraycopy(pieces, 0, nw, 0, pieces.length);
-        nw[pieces.length] = qu == null ? atom : new Piece(atom, qu);
-        pieces = nw;
+        pieces.add(qu == null ? atom : new Piece(atom, qu));
         qu = null;
     }
-      {if (true) return pieces.length == 1 ? pieces[0] : new Branch(pieces);}
+      {if (true) return pieces.size() == 1 ? pieces.get(0) : new Branch(pieces.finish());}
     throw new Error("Missing return statement in function");
   }
 
@@ -266,8 +259,8 @@ public class RegExParser implements RegExParserConstants {
           } catch(final NumberFormatException ex) {
             {if (true) throw new ParseException("Number in quantifier is too large");}
           }
-          if(qty[0] > qty[1]) {if (true) throw new ParseException("Illegal quantifier, " +
-              "lower > upper bound: {" + qty[0] + "," + qty[1] + "}");}
+          if(qty[0] > qty[1]) {if (true) throw new ParseException("Illegal quantifier: " +
+              qty[0] + " > " + qty[1]);}
         break;
       default:
         jj_la1[5] = jj_gen;
@@ -485,7 +478,7 @@ public class RegExParser implements RegExParserConstants {
    * @throws ParseException parsing exception
    */
   final public CharGroup posCharGroup() throws ParseException {
-    final ArrayList<RegExp> cg = new ArrayList<RegExp>();
+    final RegExpList cg = new RegExpList();
     RegExp sub = null;
     label_4:
     while (true) {
@@ -526,7 +519,7 @@ public class RegExParser implements RegExParserConstants {
         break label_4;
       }
     }
-      {if (true) return new CharGroup(cg.toArray(new RegExp[cg.size()]));}
+      {if (true) return new CharGroup(cg.finish());}
     throw new Error("Missing return statement in function");
   }
 
@@ -541,8 +534,8 @@ public class RegExParser implements RegExParserConstants {
       a = charOrEsc();
       jj_consume_token(CHAR);
       b = charOrEsc();
-        if(a > b) {if (true) throw new ParseException("Illegal range, " +
-            "lower > upper bound: " + Literal.escape(a) + "-" + Literal.escape(b));}
+        if(a > b) {if (true) throw new ParseException("Illegal range: " +
+            Literal.escape(a) + " > " + Literal.escape(b));}
     } else {
       switch (jj_ntk==-1?jj_ntk():jj_ntk) {
       case CHAR:
@@ -634,6 +627,31 @@ public class RegExParser implements RegExParserConstants {
     finally { jj_save(3, xla); }
   }
 
+  private boolean jj_3R_13() {
+    if (jj_scan_token(SINGLE_ESC)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_12() {
+    if (jj_3R_11()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_10() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_12()) {
+    jj_scanpos = xsp;
+    if (jj_3R_13()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3_2() {
+    if (jj_3R_5()) return true;
+    return false;
+  }
+
   private boolean jj_3R_11() {
     Token xsp;
     xsp = jj_scanpos;
@@ -709,31 +727,6 @@ public class RegExParser implements RegExParserConstants {
     jj_scanpos = xsp;
     if (jj_3R_9()) return true;
     }
-    return false;
-  }
-
-  private boolean jj_3R_13() {
-    if (jj_scan_token(SINGLE_ESC)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_12() {
-    if (jj_3R_11()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_10() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_12()) {
-    jj_scanpos = xsp;
-    if (jj_3R_13()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3_2() {
-    if (jj_3R_5()) return true;
     return false;
   }
 

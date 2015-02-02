@@ -12,10 +12,10 @@ public final class BackRef extends RegExp {
 
   /**
    * Constructor.
-   * @param n capture group number
+   * @param num capture group number
    */
-  public BackRef(final int n) {
-    num = n;
+  public BackRef(final int num) {
+    this.num = num;
   }
 
   @Override

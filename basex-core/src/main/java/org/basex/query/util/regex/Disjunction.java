@@ -12,10 +12,10 @@ public final class Disjunction extends RegExp {
 
   /**
    * Constructor.
-   * @param br branches
+   * @param branches branches
    */
-  public Disjunction(final RegExp[] br) {
-    branches = br;
+  public Disjunction(final RegExp[] branches) {
+    this.branches = branches;
   }
 
   @Override

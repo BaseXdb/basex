@@ -12,10 +12,10 @@ public final class Literal extends RegExp {
 
   /**
    * Constructor.
-   * @param cp Unicode code point
+   * @param codepoint Unicode code point
    */
-  public Literal(final int cp) {
-    codepoint = cp;
+  public Literal(final int codepoint) {
+    this.codepoint = codepoint;
   }
 
   @Override

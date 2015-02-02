@@ -16,15 +16,16 @@ public final class Quantifier extends RegExp {
 
   /**
    * Constructor.
-   * @param mn minimum occurrences
-   * @param mx maximum occurrences
-   * @param lzy reluctance flag
+   * @param min minimum occurrences
+   * @param max maximum occurrences
+   * @param lazy reluctance flag
    */
-  public Quantifier(final int mn, final int mx, final boolean lzy) {
-    min = mn;
-    max = mx;
-    lazy = lzy;
+  public Quantifier(final int min, final int max, final boolean lazy) {
+    this.min = min;
+    this.max = max;
+    this.lazy = lazy;
   }
+
   @Override
   StringBuilder toRegEx(final StringBuilder sb) {
     return sb.append(string()).append(lazy ? "?" : "");

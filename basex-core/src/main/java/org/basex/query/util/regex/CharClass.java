@@ -14,12 +14,12 @@ public final class CharClass extends RegExp {
 
   /**
    * Constructor.
-   * @param grp char group
-   * @param sub excluded char class, possibly {@code null}
+   * @param group char group
+   * @param subtract excluded char class, possibly {@code null}
    */
-  public CharClass(final CharGroup grp, final CharClass sub) {
-    group = grp;
-    subtract = sub;
+  public CharClass(final CharGroup group, final CharClass subtract) {
+    this.group = group;
+    this.subtract = subtract;
   }
 
   @Override

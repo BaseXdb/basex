@@ -21,7 +21,7 @@ public final class DialogBindings extends BaseXDialog {
   private static Dialog dialog;
 
   /** Variables. */
-  private BaseXTextField[] context = new BaseXTextField[16];
+  private final BaseXTextField[] context = new BaseXTextField[16];
 
   /**
    * Default constructor.

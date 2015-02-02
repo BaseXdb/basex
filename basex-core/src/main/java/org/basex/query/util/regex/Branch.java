@@ -12,10 +12,10 @@ public final class Branch extends RegExp {
 
   /**
    * Constructor.
-   * @param pcs pieces
+   * @param pieces pieces
    */
-  public Branch(final RegExp[] pcs) {
-    pieces = pcs;
+  public Branch(final RegExp[] pieces) {
+    this.pieces = pieces;
   }
 
   @Override

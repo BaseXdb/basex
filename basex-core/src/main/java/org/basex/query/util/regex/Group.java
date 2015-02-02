@@ -14,12 +14,12 @@ public final class Group extends RegExp {
 
   /**
    * Constructor.
-   * @param sub enclosed expression
-   * @param capt capture flag
+   * @param encl enclosed expression
+   * @param capture capture flag
    */
-  public Group(final RegExp sub, final boolean capt) {
-    encl = sub;
-    capture = capt;
+  public Group(final RegExp encl, final boolean capture) {
+    this.encl = encl;
+    this.capture = capture;
   }
 
   @Override

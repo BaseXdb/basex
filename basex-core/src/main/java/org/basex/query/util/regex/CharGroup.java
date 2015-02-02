@@ -13,10 +13,10 @@ public final class CharGroup extends RegExp {
   private final RegExp[] subs;
   /**
    * Constructor.
-   * @param sub sub-ranges
+   * @param subs sub-ranges
    */
-  public CharGroup(final RegExp[] sub) {
-    subs = sub;
+  public CharGroup(final RegExp[] subs) {
+    this.subs = subs;
   }
 
   @Override

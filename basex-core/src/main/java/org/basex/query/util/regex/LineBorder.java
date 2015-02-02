@@ -16,12 +16,12 @@ public final class LineBorder extends RegExp {
 
   /**
    * Constructor.
-   * @param st start flag
-   * @param mul multi-line flag
+   * @param start start flag
+   * @param multi multi-line flag
    */
-  private LineBorder(final boolean st, final boolean mul) {
-    start = st;
-    multi = mul;
+  private LineBorder(final boolean start, final boolean multi) {
+    this.start = start;
+    this.multi = multi;
   }
 
   /**

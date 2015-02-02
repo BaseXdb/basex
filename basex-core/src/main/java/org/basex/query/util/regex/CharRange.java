@@ -14,12 +14,12 @@ public final class CharRange extends RegExp {
 
   /**
    * Constructor.
-   * @param a left character
-   * @param b right character
+   * @param left left character
+   * @param right right character
    */
-  public CharRange(final int a, final int b) {
-    left = a;
-    right = b;
+  public CharRange(final int left, final int right) {
+    this.left = left;
+    this.right = right;
   }
 
   @Override

@@ -17,10 +17,10 @@ public final class Wildcard extends RegExp {
 
   /**
    * Private constructor.
-   * @param a match-all flag
+   * @param nl match-all flag
    */
-  private Wildcard(final boolean a) {
-    nl = a;
+  private Wildcard(final boolean nl) {
+    this.nl = nl;
   }
 
   /**

@@ -12,7 +12,6 @@ package org.basex.query.util.regex.parse;
 
 import static org.basex.query.QueryError.*;
 
-import java.util.ArrayList;
 import java.util.regex.*;
 
 import org.basex.query.*;
@@ -53,6 +52,7 @@ public class RegExParser {
    */
   public static Pattern parse(final byte[] regex, final byte[] mod, final InputInfo ii,
       final boolean check) throws QueryException {
+
     // process modifiers
     int m = 0;
     boolean strip = false;
@@ -83,10 +83,12 @@ public class RegExParser {
         if(p.matcher("").matches()) throw REGROUP.get(ii);
       }
       return pattern;
-    } catch(final ParseException pe) {
-      throw REGPAT_X.get(ii, pe.getMessage());
-    } catch(final TokenMgrError err) {
-      throw REGPAT_X.get(ii, err.getMessage());
+    } catch(final ParseException ex) {
+      Util.debug(ex);
+      throw REGPAT_X.get(ii, regex);
+    } catch(final TokenMgrError ex) {
+      Util.debug(ex);
+      throw REGPAT_X.get(ii, regex);
     }
   }
 
@@ -126,23 +128,15 @@ PARSER_END(RegExParser)
    * @throws ParseException parsing exception
    */
   RegExp regExp() : {
-    RegExp nd;
-    RegExp[] brs = null;
+    final RegExpList brs = new RegExpList();
   } {
     (
-      nd = branch() {
-        brs = new RegExp[] { nd };
-      }
+      { brs.add(branch()); }
       (
-        <OR> nd = branch() {
-          final RegExp[] nw = new RegExp[brs.length + 1];
-          System.arraycopy(brs, 0, nw, 0, brs.length);
-          nw[brs.length] = nd;
-          brs = nw;
-        }
+        <OR> { brs.add(branch()); }
       )*
     ) {
-      return brs.length == 1 ? nd : new Disjunction(brs);
+      return brs.size() == 1 ? brs.get(0) : new Disjunction(brs.finish());
     }
   }
 
@@ -154,19 +148,16 @@ PARSER_END(RegExParser)
    */
   RegExp branch() : {
     RegExp atom;
-    RegExp[] pieces = new RegExp[0];
+    final RegExpList pieces = new RegExpList();
     Quantifier qu = null;
   } {
     (
       ( atom = atom() [ qu = quantifier() ] ) {
-        final RegExp[] nw = new RegExp[pieces.length + 1];
-        System.arraycopy(pieces, 0, nw, 0, pieces.length);
-        nw[pieces.length] = qu == null ? atom : new Piece(atom, qu);
-        pieces = nw;
+        pieces.add(qu == null ? atom : new Piece(atom, qu));
         qu = null;
       }
     )* {
-      return pieces.length == 1 ? pieces[0] : new Branch(pieces);
+      return pieces.size() == 1 ? pieces.get(0) : new Branch(pieces.finish());
     }
   }
 
@@ -217,8 +208,8 @@ PARSER_END(RegExParser)
           } catch(final NumberFormatException ex) {
             throw new ParseException("Number in quantifier is too large");
           }
-          if(qty[0] > qty[1]) throw new ParseException("Illegal quantifier, " +
-              "lower > upper bound: {" + qty[0] + "," + qty[1] + "}");
+          if(qty[0] > qty[1]) throw new ParseException("Illegal quantifier: " +
+              qty[0] + " > " + qty[1]);
         }
       ]
     ] {
@@ -349,7 +340,7 @@ PARSER_END(RegExParser)
    * @throws ParseException parsing exception
    */
   CharGroup posCharGroup() : {
-    final ArrayList<RegExp> cg = new ArrayList<RegExp>();
+    final RegExpList cg = new RegExpList();
     RegExp sub = null;
   } {
     ( LOOKAHEAD(3) sub = charRange() { cg.add(sub); }
@@ -357,7 +348,7 @@ PARSER_END(RegExParser)
         for(final RegExp re : Escape.inGroup(token.image)) cg.add(re);
       }
     )+ {
-      return new CharGroup(cg.toArray(new RegExp[cg.size()]));
+      return new CharGroup(cg.finish());
     }
   }
 
@@ -371,8 +362,8 @@ PARSER_END(RegExParser)
   } {
     ( LOOKAHEAD({ getToken(2).kind == CHAR && "-".equals(getToken(2).image) })
       (a = charOrEsc() <CHAR> b = charOrEsc()) {
-        if(a > b) throw new ParseException("Illegal range, " +
-            "lower > upper bound: " + Literal.escape(a) + "-" + Literal.escape(b));
+        if(a > b) throw new ParseException("Illegal range: " +
+            Literal.escape(a) + " > " + Literal.escape(b));
       }
     | a = XmlChar()
     ) {

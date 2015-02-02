@@ -14,12 +14,12 @@ public final class Piece extends RegExp {
 
   /**
    * Constructor.
-   * @param at atom
-   * @param qu quantifier
+   * @param atom atom
+   * @param quant quantifier
    */
-  public Piece(final RegExp at, final Quantifier qu) {
-    atom = at;
-    quant = qu;
+  public Piece(final RegExp atom, final Quantifier quant) {
+    this.atom = atom;
+    this.quant = quant;
   }
 
   @Override

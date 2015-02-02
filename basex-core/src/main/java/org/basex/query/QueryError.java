@@ -591,9 +591,9 @@ public enum QueryError {
   IETF_INV_X(FORG, 10, "Invalid input: '%'."),
 
   /** FORX0001. */
-  REGMOD_X(FORX, 1, "Invalid regular modifier: '%'."),
+  REGMOD_X(FORX, 1, "Invalid regular flag: '%'."),
   /** FORX0002. */
-  REGPAT_X(FORX, 2, "Invalid pattern: %."),
+  REGPAT_X(FORX, 2, "Invalid regular expression: %."),
   /** FORX0003. */
   REGROUP(FORX, 3, "Pattern matches empty string."),
   /** FORX0004. */
