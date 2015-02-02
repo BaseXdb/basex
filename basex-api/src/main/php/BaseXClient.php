@@ -1,11 +1,11 @@
 <?php
 /*
  * PHP client for BaseX.
- * Works with BaseX 7.x (but not with BaseX 8.0 and later)
+ * Works with BaseX 7.x and BaseX 8.0
  *
  * Documentation: http://docs.basex.org/wiki/Clients
  * 
- * (C) BaseX Team 2005-12, BSD License
+ * (C) BaseX Team 2005-14, BSD License
  */
 class Session {
   // class variables.
@@ -20,10 +20,18 @@ class Session {
 
     // receive timestamp
     $ts = $this->readString();
+	// Hash container
+      if (false !== strpos($ts, ':')) {
+          // digest-auth
+          $challenge = explode(':', $ts, 2);
+          $md5 = hash("md5", hash("md5", $user . ':' . $challenge[0] . ':' . $pw) . $challenge[1]);
+      } else {
+          // Legacy: cram-md5
+          $md5 = hash("md5", hash("md5", $pw) . $ts);
+      }
 
     // send username and hashed password/timestamp
-    $md5 = hash("md5", hash("md5", $pw).$ts);
-    socket_write($this->socket, $user.chr(0).$md5.chr(0));
+    socket_write($this->socket, $user . chr(0) . $md5 . chr(0));
 
     // receives success flag
     if(socket_read($this->socket, 1) != chr(0)) {
@@ -118,7 +126,7 @@ class Session {
 
 class Query {
   var $session, $id, $open, $cache;
- 
+
   public function __construct($s, $q) {
     $this->session = $s;
     $this->id = $this->exec(chr(0), $q);
@@ -167,7 +175,7 @@ class Query {
   }
 
   public function close() {
-    $this->exec(chr(2), $this->id);   
+    $this->exec(chr(2), $this->id);
   }
 
   public function exec($cmd, $arg) {
