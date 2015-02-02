@@ -32,8 +32,8 @@ public final class FetchXml extends StandardFunc {
     final Options opts = toOptions(1, Q_OPTIONS, new Options(), qc);
     if(!Uri.uri(in).isValid()) throw INVDOC_X.get(info, in);
 
-    final MainOptions mo = new MainOptions(qc.context.options);
-    new DBOptions(opts, DBOptions.PARSING, info).assign(mo);
+    final MainOptions mo = MainOptions.get();
+    new DBOptions(opts, DBOptions.PARSING, info).assignTo(mo);
     try {
       return new DBNode(Parser.singleParser(IO.get(string(in)), mo, ""));
     } catch(final IOException ex) {

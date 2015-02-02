@@ -95,10 +95,10 @@ public final class DBOptions {
   }
 
   /**
-   * Caches original options and assigns runtime options to the specified main options.
+   * Assigns runtime options to the specified main options.
    * @param opts main options
    */
-  public void assign(final MainOptions opts) {
+  public void assignTo(final MainOptions opts) {
     for(final Map.Entry<Option<?>, Object> entry : map.entrySet()) {
       opts.put(entry.getKey(), entry.getValue());
     }

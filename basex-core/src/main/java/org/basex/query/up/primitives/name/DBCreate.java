@@ -54,7 +54,7 @@ public final class DBCreate extends NameUpdate {
     if(add.inputs == null || add.inputs.isEmpty()) return;
 
     final MainOptions opts = new MainOptions(qc.context.options);
-    options.assign(opts);
+    options.assignTo(opts);
     add.addDocs(new MemData(opts), name, opts);
   }
 
@@ -63,7 +63,7 @@ public final class DBCreate extends NameUpdate {
     close();
 
     final MainOptions opts = new MainOptions(qc.context.options);
-    options.assign(opts);
+    options.assignTo(opts);
     try {
       final Data data = CreateDB.create(name, Parser.emptyParser(opts), qc.context, opts);
 

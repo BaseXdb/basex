@@ -90,9 +90,7 @@ public abstract class Parse extends StandardFunc {
     try {
       final Parser parser;
       if(frag) {
-        final MainOptions opts = new MainOptions();
-        opts.set(MainOptions.CHOP, false);
-        parser = new XMLParser(io, opts, true);
+        parser = new XMLParser(io, MainOptions.get(), true);
       } else {
         parser = Parser.xmlParser(io);
       }

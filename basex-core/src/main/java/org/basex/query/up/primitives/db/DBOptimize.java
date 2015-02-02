@@ -68,7 +68,7 @@ public final class DBOptimize extends DBUpdate {
     options.assign(MainOptions.FTINDEX,      meta.createftxt);
     options.assign(MainOptions.UPDINDEX,     meta.updindex);
     options.assign(MainOptions.AUTOOPTIMIZE, meta.autoopt);
-    options.assign(opts);
+    options.assignTo(opts);
 
     // adopt runtime options
     meta.createtext = opts.get(MainOptions.TEXTINDEX);

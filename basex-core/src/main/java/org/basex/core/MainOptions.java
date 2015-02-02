@@ -207,4 +207,15 @@ public final class MainOptions extends Options {
     this(false);
     for(final Option<?> o : PARENT) put(o, options.get(o));
   }
+
+  /**
+   * Creates an options instance with whitespace chopping turned off.
+   * The returned instance should not be modified.
+   * @return main options
+   */
+  public static MainOptions get() {
+    final MainOptions mo = new MainOptions(false);
+    mo.set(CHOP, false);
+    return mo;
+  }
 }

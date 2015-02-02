@@ -28,9 +28,8 @@ public final class HtmlParse extends StandardFunc {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] in = toBytes(exprs[0], qc);
     final HtmlOptions hopts = toOptions(1, Q_OPTIONS, new HtmlOptions(), qc);
+    final MainOptions opts = MainOptions.get();
     try {
-      final MainOptions opts = new MainOptions();
-      opts.set(MainOptions.CHOP, false);
       return new DBNode(new org.basex.build.html.HtmlParser(new IOContent(in), opts, hopts));
     } catch(final IOException ex) {
       throw BXHL_IO_X.get(info, ex);

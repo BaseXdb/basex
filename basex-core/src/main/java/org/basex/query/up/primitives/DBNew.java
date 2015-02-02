@@ -54,7 +54,7 @@ public final class DBNew {
       throws QueryException {
 
     final MainOptions opts = new MainOptions(qc.context.options);
-    options.assign(opts);
+    options.assignTo(opts);
     addDocs(new MemData(md, opts), name, opts);
   }
 

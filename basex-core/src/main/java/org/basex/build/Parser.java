@@ -101,9 +101,7 @@ public abstract class Parser extends Proc {
    * @return xml parser
    */
   public static SAXWrapper xmlParser(final IO source) {
-    final MainOptions opts = new MainOptions();
-    opts.set(MainOptions.CHOP, false);
-    return new SAXWrapper(source, opts);
+    return new SAXWrapper(source, MainOptions.get());
   }
 
   /**
