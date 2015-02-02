@@ -6,6 +6,7 @@ import static org.basex.query.QueryText.*;
 import java.io.*;
 
 import org.basex.build.html.*;
+import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
@@ -26,10 +27,11 @@ public final class HtmlParse extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] in = toBytes(exprs[0], qc);
-    final HtmlOptions opts = toOptions(1, Q_OPTIONS, new HtmlOptions(), qc);
+    final HtmlOptions hopts = toOptions(1, Q_OPTIONS, new HtmlOptions(), qc);
     try {
-      return new DBNode(new org.basex.build.html.HtmlParser(new IOContent(in),
-          qc.context.options, opts));
+      final MainOptions opts = new MainOptions();
+      opts.set(MainOptions.CHOP, false);
+      return new DBNode(new org.basex.build.html.HtmlParser(new IOContent(in), opts, hopts));
     } catch(final IOException ex) {
       throw BXHL_IO_X.get(info, ex);
     }
