@@ -84,8 +84,8 @@ public final class Dbl extends ANum {
   @Override
   public BigDecimal dec(final InputInfo ii) throws QueryException {
     if(Double.isNaN(value) || Double.isInfinite(value))
-      throw valueError(ii, AtomType.DEC, string());
-    return BigDecimal.valueOf(value);
+     throw valueError(ii, AtomType.DEC, string());
+    return new BigDecimal(value);
   }
 
   @Override

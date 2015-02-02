@@ -4,6 +4,8 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
+import java.math.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
@@ -345,7 +347,7 @@ public final class DecFormatter extends FormatUtil {
 
       // convert positive number to string, chop leading zero
       final String s = (num instanceof Dbl || num instanceof Flt ?
-          Dec.get(num.dbl(ii)) : num).toString();
+          Dec.get(BigDecimal.valueOf(num.dbl(ii))) : num).toString();
 
       // integer/fractional separator
       final int sep = s.indexOf('.');

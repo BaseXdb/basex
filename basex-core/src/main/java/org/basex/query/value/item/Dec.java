@@ -47,7 +47,7 @@ public final class Dec extends ANum {
    * @return value
    */
   public static Dec get(final double value) {
-    return get(BigDecimal.valueOf(value));
+    return get(new BigDecimal(value));
   }
 
   @Override
