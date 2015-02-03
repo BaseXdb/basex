@@ -43,8 +43,7 @@ public final class AdminStressTest extends SandboxTest {
   }
 
   /**
-   * Start simultaneously clients which create events and clients which list all
-   * events.
+   * Start simultaneously clients which create events and clients which list all events.
    * @throws Exception exception
    */
   @Test

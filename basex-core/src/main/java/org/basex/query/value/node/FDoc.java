@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.type.*;
+import org.basex.query.value.type.Type.ID;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
@@ -125,7 +126,7 @@ public final class FDoc extends FNode {
   }
 
   @Override
-  public Type.ID typeId() {
+  public ID typeId() {
     // check if a document has a single element as child
     return children.size() == 1 && children.get(0).type == NodeType.ELM ?
       NodeType.DEL.id() : type.id();

@@ -6,7 +6,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
-import org.basex.gui.*;
 import org.basex.gui.dialog.*;
 import org.basex.util.*;
 
@@ -55,7 +54,7 @@ public final class BaseXMem extends BaseXPanel {
     final int hh = getHeight();
 
     // draw memory box
-    g.setColor(GUIConstants.BACK);
+    g.setColor(BACK);
     g.fillRect(0, 0, ww - 3, hh - 3);
     g.setColor(gray);
     g.drawLine(0, 0, ww - 4, 0);

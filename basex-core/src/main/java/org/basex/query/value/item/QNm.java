@@ -122,18 +122,19 @@ public final class QNm extends Item {
 
     // check for namespace declaration
     final Matcher m = BIND.matcher(Token.string(name));
-    byte[] uri, nm = name;
+    final byte[] uri;
+    byte[] nm = name;
     if(m.find()) {
       final String u = m.group(3);
       uri = token(u == null ? m.group(5) : u);
       nm = token(m.group(6));
     } else {
       final int i = indexOf(nm, ':');
-      if(i != -1) {
+      if(i == -1) {
+        uri = def;
+      } else {
         uri = sc.ns.uri(substring(nm, 0, i));
         if(uri == null) throw NOURI_X.get(info, name);
-      } else {
-        uri = def;
       }
     }
     if(!XMLToken.isQName(nm)) throw BINDNAME_X.get(info, name);

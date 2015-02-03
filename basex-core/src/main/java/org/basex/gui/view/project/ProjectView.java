@@ -225,13 +225,12 @@ public final class ProjectView extends BaseXPanel {
       final IOFile old = node.file;
       final IOFile updated = new IOFile(old.file().getParent(), name);
       // rename file or show error dialog
-      if(!old.rename(updated)) {
-        BaseXDialog.error(gui, Util.info(FILE_NOT_RENAMED_X, old));
-      } else {
+      if(old.rename(updated)) {
         // update tab references if file or directory could be renamed
         gui.editor.rename(old, updated);
         return updated;
       }
+      BaseXDialog.error(gui, Util.info(FILE_NOT_RENAMED_X, old));
     }
     return null;
   }

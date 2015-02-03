@@ -86,7 +86,7 @@ final class TableHeader extends BaseXPanel {
     super.paintComponent(g);
 
     g.setFont(font);
-    g.setColor(GUIConstants.TEXT);
+    g.setColor(TEXT);
     if(tdata.rows == null) {
       BaseXLayout.drawCenter(g, NO_DATA, getWidth(), getHeight() / 2);
       return;
@@ -111,14 +111,14 @@ final class TableHeader extends BaseXPanel {
       final boolean clicked = n == clickCol && moveC == -1 && header;
       BaseXLayout.drawCell(g, (int) x, (int) ce + 1, 0, hh, clicked);
       // input field
-      g.setColor(GUIConstants.BACK);
+      g.setColor(BACK);
       g.fillRect((int) x + 1, hh, (int) ce - (int) x - 2, hh - 2);
       g.drawLine((int) ce - 1, hh - 1, (int) ce - 1, h - 2);
       g.setColor(gray);
       g.drawLine((int) ce, hh - 1, (int) ce, h - 2);
 
       // draw headers
-      g.setColor(GUIConstants.TEXT);
+      g.setColor(TEXT);
       g.setFont(bfont);
 
       final int off = clicked ? 1 : 0;
@@ -136,7 +136,7 @@ final class TableHeader extends BaseXPanel {
       if(box != null && inputCol == n) {
         box.paint(g, (int) x, hh, (int) ce - (int) x, hh);
       } else {
-        g.setColor(GUIConstants.TEXT);
+        g.setColor(TEXT);
         g.setFont(font);
         g.drawString(tdata.cols[n].filter, (int) x + 5, h - 7);
       }
@@ -150,7 +150,7 @@ final class TableHeader extends BaseXPanel {
 
     int o = header && clicked ? 1 : 0;
     final int xo = (int) (4 * SCALE), yo = (int) (6 * SCALE);
-    g.setColor(GUIConstants.TEXT);
+    g.setColor(TEXT);
     g.fillPolygon(
         new int[] { (int) x + o + xo, (int) x + o + bs - xo, (int) x + o + bs / 2 },
         new int[] { o + yo, o + yo, o + bs - yo }, 3);
@@ -378,7 +378,7 @@ final class TableHeader extends BaseXPanel {
       final DBNodes marked = view.gui.context.marked;
       if(marked.size() != 0) view.gui.notify.context(marked, false, null);
     } else if(TAB.is(e)) {
-      tdata.cols[inputCol].filter = box.text;
+      tdata.cols[inputCol].filter = box.text();
       box.stop();
       final int in = inputCol + (e.isShiftDown() ? -1 : 1);
       if(in < 0) {
@@ -399,7 +399,7 @@ final class TableHeader extends BaseXPanel {
   public void keyTyped(final KeyEvent e) {
     if(tdata.roots.isEmpty() || box == null || inputCol == -1 ||
         control(e) || !box.add(e)) return;
-    tdata.cols[inputCol].filter = box.text;
+    tdata.cols[inputCol].filter = box.text();
     view.query();
   }
 }

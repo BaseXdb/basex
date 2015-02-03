@@ -87,19 +87,19 @@ public final class Dec extends ANum {
 
   @Override
   public Dec ceiling() {
-    return get(value.setScale(0, BigDecimal.ROUND_CEILING));
+    return get(value.setScale(0, RoundingMode.CEILING));
   }
 
   @Override
   public Dec floor() {
-    return get(value.setScale(0, BigDecimal.ROUND_FLOOR));
+    return get(value.setScale(0, RoundingMode.FLOOR));
   }
 
   @Override
   public Dec round(final int scale, final boolean even) {
     final int s = value.signum();
-    return s == 0 ? this : get(value.setScale(scale, even ? BigDecimal.ROUND_HALF_EVEN :
-    s == 1 ? BigDecimal.ROUND_HALF_UP : BigDecimal.ROUND_HALF_DOWN));
+    return s == 0 ? this : get(value.setScale(scale, even ? RoundingMode.HALF_EVEN :
+           s == 1 ? RoundingMode.HALF_UP : RoundingMode.HALF_DOWN));
   }
 
   @Override

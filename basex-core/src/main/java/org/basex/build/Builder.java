@@ -94,7 +94,7 @@ public abstract class Builder extends Proc {
   public final void closeDoc() throws IOException {
     final int pre = pstack.get(--level);
     setSize(pre, meta.size - pre);
-    meta.ndocs.incrementAndGet();
+    ++meta.ndocs;
     ns.close(meta.size);
   }
 

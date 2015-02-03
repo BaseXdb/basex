@@ -104,7 +104,7 @@ public final class Switch extends ParseExpr {
         }
       }
       // return default branch (last one) if all others were discarded
-      if(sl == 1 && tmp.size() == 0) return ret;
+      if(sl == 1 && tmp.isEmpty()) return ret;
       // build list of branches (add default branch and those that could not be pre-evaluated)
       if(sl == 1 || el.size() > 1) {
         sc.exprs = el.finish();

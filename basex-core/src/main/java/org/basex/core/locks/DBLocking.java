@@ -3,6 +3,7 @@ package org.basex.core.locks;
 import static org.basex.util.Prop.*;
 
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.*;
 
@@ -123,8 +124,7 @@ public final class DBLocking implements Locking {
     }
 
     // Global write lock if write StringList is not set
-    if(write == null) writeAll.writeLock().lock();
-    else writeAll.readLock().lock();
+    (write == null ? writeAll.writeLock() : writeAll.readLock()).lock();
 
     synchronized(globalLock) {
       // local write locking
@@ -284,7 +284,7 @@ public final class DBLocking implements Locking {
     sb.append(ind + "Transactions running: " + transactions + NL);
     sb.append(ind + "Transaction queue: " + queue + NL);
     sb.append(ind + "Held locks by object:" + NL);
-    for(final Map.Entry<String, ReentrantReadWriteLock> e : locks.entrySet())
+    for(final Entry<String, ReentrantReadWriteLock> e : locks.entrySet())
       sb.append(ind + ind + e.getKey() + " -> " + e.getValue() + NL);
     sb.append(ind + "Held write locks by transaction:" + NL);
     for(final Long thread : writeLocked.keySet())

@@ -3,7 +3,7 @@ package org.basex.query.func.hof;
 import java.util.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.*;
+import org.basex.query.expr.CmpV.OpV;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
@@ -34,7 +34,7 @@ public final class HofTopKBy extends StandardFunc {
       @Override
       public int compare(final Item it1, final Item it2) {
         try {
-          return CmpV.OpV.LT.eval(it1, it2, sc.collation, sc, info) ? -1 : 1;
+          return OpV.LT.eval(it1, it2, sc.collation, sc, info) ? -1 : 1;
         } catch(final QueryException qe) {
           throw new QueryRTException(qe);
         }

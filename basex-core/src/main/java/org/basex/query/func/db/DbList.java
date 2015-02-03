@@ -8,7 +8,6 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -28,7 +27,7 @@ public class DbList extends DbFn {
     }
 
     final Data data = checkData(qc);
-    final String path = string(exprs.length == 1 ? Token.EMPTY : toToken(exprs[1], qc));
+    final String path = string(exprs.length == 1 ? EMPTY : toToken(exprs[1], qc));
     final IntList il = data.resources.docs(path);
     final TokenList tl = data.resources.binaries(path);
     return new Iter() {

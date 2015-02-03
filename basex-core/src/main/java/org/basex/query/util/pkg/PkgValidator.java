@@ -192,7 +192,7 @@ public final class PkgValidator {
     if(pkgs == null) return false;
 
     for(final byte[] nextPkg : pkgs) {
-      if(nextPkg != null && !eq(Package.name(nextPkg), name)) {
+      if(nextPkg != null && !eq(name(nextPkg), name)) {
         // installed package is a different one, not just a different version
         // of the current one
         final String pkgDir = string(repo.pkgDict().get(nextPkg));

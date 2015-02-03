@@ -155,7 +155,7 @@ public final class XMLToken {
 
     for(int n = 0; n < nl; n += cl(nm, n)) {
       int cp = cp(nm, n);
-      if(cp == '_' || !(n == 0 ? isNCStartChar(cp) : isNCChar(cp))) {
+      if(cp == '_' || (n == 0 ? !isNCStartChar(cp) : !isNCChar(cp))) {
         final TokenBuilder tb = new TokenBuilder(nl << 1).add(nm, 0, n);
         for(int m = n; m < nl; m += cl(nm, m)) {
           cp = cp(nm, m);

@@ -130,7 +130,7 @@ public final class Dbl extends ANum {
     final double f = StrictMath.pow(10, s + 1);
     v = (n ? -v : v) * f;
     if(Double.isInfinite(v)) {
-      final int m = e ? BigDecimal.ROUND_HALF_EVEN : BigDecimal.ROUND_HALF_UP;
+      final RoundingMode m = e ? RoundingMode.HALF_EVEN : RoundingMode.HALF_UP;
       v = new BigDecimal(value).setScale(s, m).doubleValue();
     } else {
       final double r = v % 10;

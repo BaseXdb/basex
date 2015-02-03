@@ -64,7 +64,7 @@ public final class AdminLogs extends AdminFn {
           }
           elem.add(TIME, l1.time).add(ADDRESS, l1.address).add(USER, l1.user);
           if(l1.type != null) elem.add(TYPE, l1.type);
-          if(!(l1.ms.compareTo(BigDecimal.ZERO) == 0)) elem.add(MS, l1.ms.toString());
+          if(l1.ms.compareTo(BigDecimal.ZERO) != 0) elem.add(MS, l1.ms.toString());
           if(l1.message != null) elem.add(l1.message);
         } else {
           elem.add(l1.message);

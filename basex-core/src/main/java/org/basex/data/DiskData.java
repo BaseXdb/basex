@@ -92,17 +92,17 @@ public final class DiskData extends Data {
    * @param elemNames element names
    * @param attrNames attribute names
    * @param paths path summary
-   * @param n namespaces
+   * @param nspaces namespaces
    * @throws IOException I/O Exception
    */
   public DiskData(final MetaData meta, final Names elemNames, final Names attrNames,
-      final PathSummary paths, final Namespaces n) throws IOException {
+      final PathSummary paths, final Namespaces nspaces) throws IOException {
 
     super(meta);
     this.elemNames = elemNames;
     this.attrNames = attrNames;
     this.paths = paths;
-    this.nspaces = n;
+    this.nspaces = nspaces;
     paths.data(this);
     if(meta.updindex) idmap = new IdPreMap(meta.lastid);
     init();
@@ -343,10 +343,7 @@ public final class DiskData extends Data {
 
     // new entry (offset or value)
     final long v = toSimpleInt(value);
-    if(v != Integer.MIN_VALUE) {
-      // inline integer value
-      textOff(pre, v | IO.OFFNUM);
-    } else {
+    if(v == Integer.MIN_VALUE) {
       // text to be stored (possibly packed)
       final byte[] val = COMP.get().pack(value);
       // old entry (offset or value)
@@ -365,6 +362,9 @@ public final class DiskData extends Data {
 
       store.writeToken(off, val);
       textOff(pre, val == value ? off : off | IO.OFFCOMP);
+    } else {
+      // inline integer value
+      textOff(pre, v | IO.OFFNUM);
     }
   }
 

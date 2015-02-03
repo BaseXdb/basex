@@ -5,7 +5,6 @@ import static org.basex.util.Prop.*;
 import java.awt.*;
 
 import org.basex.io.*;
-import org.basex.util.*;
 import org.basex.util.options.*;
 
 /**
@@ -43,7 +42,7 @@ public final class GUIOptions extends Options {
   public static final StringOption FONT = new StringOption("FONT", Font.SANS_SERIF);
   /** Default GUI Monospace Font. */
   public static final StringOption MONOFONT = new StringOption("MONOFONT",
-      Prop.WIN ? "Consolas" : Font.MONOSPACED);
+      WIN ? "Consolas" : Font.MONOSPACED);
   /** Font TYPE = plain, bold, italics). */
   public static final NumberOption FONTTYPE = new NumberOption("FONTTYPE", 0);
   /** Font size. */
@@ -61,7 +60,7 @@ public final class GUIOptions extends Options {
 
   /** Last updated version. */
   public static final StringOption UPDATEVERSION = new StringOption("UPDATEVERSION",
-    Prop.VERSION.replaceAll(" .*", ""));
+    VERSION.replaceAll(" .*", ""));
 
   /** GUI Layout. */
   public static final StringOption VIEWS = new StringOption("VIEWS", GUIConstants.VIEWS);

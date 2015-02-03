@@ -165,7 +165,7 @@ public class BufferInput extends InputStream {
   }
 
   @Override
-  public synchronized void mark(final int m) {
+  public final synchronized void mark(final int m) {
     bmark = bpos;
   }
 

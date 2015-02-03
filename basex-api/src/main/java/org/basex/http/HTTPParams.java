@@ -3,6 +3,7 @@ package org.basex.http;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.Map.Entry;
 
 import org.basex.core.*;
 import org.basex.io.*;
@@ -95,7 +96,7 @@ public final class HTTPParams {
   public Map<String, Value> query() throws IOException {
     if(query == null) {
       query = new HashMap<>();
-      for(final Map.Entry<String, String[]> entry : map().entrySet()) {
+      for(final Entry<String, String[]> entry : map().entrySet()) {
         final String key = entry.getKey();
         final String[] values = entry.getValue();
         final ValueBuilder vb = new ValueBuilder(values.length);
@@ -135,7 +136,7 @@ public final class HTTPParams {
     try(final InputStream is = body().inputStream()) {
       final HttpPayload hp = new HttpPayload(is, true, null, opts);
       final HashMap<String, Value> mp = hp.multiForm(ext);
-      for(final Map.Entry<String, Value> entry : mp.entrySet()) {
+      for(final Entry<String, Value> entry : mp.entrySet()) {
         params.put(entry.getKey(), entry.getValue());
       }
     }

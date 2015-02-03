@@ -167,7 +167,7 @@ public final class CmpR extends Single {
 
     // don't use index if min/max values are infinite
     if(min == Double.NEGATIVE_INFINITY && max == Double.POSITIVE_INFINITY ||
-        Token.token((int) nr.min).length != Token.token((int) nr.max).length) return false;
+        token((int) nr.min).length != token((int) nr.max).length) return false;
 
     final TokenBuilder tb = new TokenBuilder();
     tb.add(mni ? '[' : '(').addExt(min).add(',').addExt(max).add(mxi ? ']' : ')');

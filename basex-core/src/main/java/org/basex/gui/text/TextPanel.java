@@ -9,6 +9,7 @@ import java.awt.datatransfer.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.Timer;
 
 import javax.swing.*;
@@ -984,7 +985,7 @@ public class TextPanel extends BaseXPanel {
 
     // find insertion candidates
     final TreeMap<String, String> tmp = new TreeMap<>();
-    for(final Map.Entry<String, String> entry : REPLACE.entrySet()) {
+    for(final Entry<String, String> entry : REPLACE.entrySet()) {
       final String key = entry.getKey();
       if(key.startsWith(prefix)) tmp.put(key, entry.getValue());
     }
@@ -1006,7 +1007,7 @@ public class TextPanel extends BaseXPanel {
       mi.setEnabled(false);
       pm.add(mi);
       pm.addSeparator();
-      for(final Map.Entry<String, String> entry : tmp.entrySet()) {
+      for(final Entry<String, String> entry : tmp.entrySet()) {
         mi = new JMenuItem("[" + entry.getKey() + "] " + entry.getValue());
         pm.add(mi);
         mi.addActionListener(al);

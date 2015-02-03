@@ -92,7 +92,7 @@ public final class User {
    */
   synchronized void write(final XMLBuilder xml) {
     xml.open(USER, NAME, name, PERMISSION, perm);
-    if(passwords.size() != 0) {
+    if(!passwords.isEmpty()) {
       for(final Entry<Algorithm, EnumMap<Code, String>> algo : passwords.entrySet()) {
         xml.open(PASSWORD, ALGORITHM, algo.getKey());
         for(final Entry<Code, String> code : algo.getValue().entrySet()) {

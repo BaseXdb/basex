@@ -294,7 +294,7 @@ public final class TreeView extends View implements TreeConstants {
     }
     final int x = mw - (BaseXLayout.width(g, message) >> 1);
     final int y = mh + fontHeight;
-    g.setColor(GUIConstants.TEXT);
+    g.setColor(TEXT);
     g.drawString(message, x, y);
   }
 
@@ -367,7 +367,7 @@ public final class TreeView extends View implements TreeConstants {
 
     Color borderColor = null;
     Color fillColor;
-    Color textColor = GUIConstants.TEXT;
+    Color textColor = TEXT;
 
     switch(t) {
       case RECTANGLE:
@@ -379,7 +379,7 @@ public final class TreeView extends View implements TreeConstants {
       case HIGHLIGHT:
         borderColor = color4;
         final int alpha = 0xDD000000;
-        final int rgb = GUIConstants.lgray.getRGB();
+        final int rgb = lgray.getRGB();
         fillColor = new Color(rgb + alpha, true);
         if(h > 4) border = true;
         fill = !br && !marked;
@@ -395,7 +395,7 @@ public final class TreeView extends View implements TreeConstants {
         final int rgbD = color(6).getRGB();
         fillColor = new Color(rgbD + alphaD, true);
         borderColor = color(8);
-        textColor = GUIConstants.BACK;
+        textColor = BACK;
         fill = !marked;
         border = true;
         if(h < 4) {
@@ -407,7 +407,7 @@ public final class TreeView extends View implements TreeConstants {
       case PARENT:
       default:
         fillColor = color(6);
-        textColor = GUIConstants.BACK;
+        textColor = BACK;
         fill = !br && !marked;
         border = !br;
         if(h < 4) {
@@ -720,13 +720,13 @@ public final class TreeView extends View implements TreeConstants {
       g.fillRect(x, y + h, w + 2, fh + 2);
       g.setColor(color(6));
       g.drawRect(x - 1, y + h + 1, w + 3, fh + 1);
-      g.setColor(GUIConstants.BACK);
+      g.setColor(BACK);
       g.drawString(s, r.x + 1, (int) (y + h + (double) fh) - 2);
     } else {
       g.fillRect(r.x, y - fh, w + 2, fh);
       g.setColor(color(6));
       g.drawRect(r.x - 1, y - fh - 1, w + 3, fh + 1);
-      g.setColor(GUIConstants.BACK);
+      g.setColor(BACK);
       g.drawString(s, r.x + 1, (int) (y - h / (double) fh) - 2);
     }
   }

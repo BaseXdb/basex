@@ -265,7 +265,7 @@ public abstract class SessionTest extends SandboxTest {
    * @throws IOException I/O exception */
   @Test
   public void queryClose() throws IOException {
-    Query q;
+    final Query q;
     try(final Query query = session.query("()")) {
       q = query;
     }

@@ -142,20 +142,9 @@ final class IndonesianStemmer extends InternalStemmer {
   private void remParticle(final TokenBuilder tb) {
     final int tl = tb.size();
     if(tl > 3) {
-      final int c1 = tb.get(tl - 1);
-      final int c2 = tb.get(tl - 2);
-      final int c3 = tb.get(tl - 3);
-
-      if(c3 == 'k' && c2 == 'a' && c1 == 'h') {
-        numSyllables--;
-        tb.size(tl - 3);
-      } else if(c3 == 'l' && c2 == 'a' && c1 == 'h') {
-        numSyllables--;
-        tb.size(tl - 3);
-      } else if(c3 == 'p' && c2 == 'u' && c1 == 'n') {
-        numSyllables--;
-        tb.size(tl - 3);
-      } else if(c3 == 't' && c2 == 'a' && c1 == 'h') {
+      final int c1 = tb.get(tl - 1), c2 = tb.get(tl - 2), c3 = tb.get(tl - 3);
+      if(c3 == 'k' && c2 == 'a' && c1 == 'h' || c3 == 'l' && c2 == 'a' && c1 == 'h' ||
+         c3 == 'p' && c2 == 'u' && c1 == 'n' || c3 == 't' && c2 == 'a' && c1 == 'h') {
         numSyllables--;
         tb.size(tl - 3);
       }
@@ -174,10 +163,7 @@ final class IndonesianStemmer extends InternalStemmer {
       final int c2 = tb.get(tl - 2);
       final int c3 = tb.get(tl - 3);
 
-      if(c2 == 'k' && c1 == 'u') {
-        numSyllables--;
-        tb.size(tl - 2);
-      } else if(c2 == 'm' && c1 == 'u') {
+      if(c2 == 'k' && c1 == 'u' || c2 == 'm' && c1 == 'u') {
         numSyllables--;
         tb.size(tl - 2);
       } else if(c3 == 'n' && c2 == 'y' && c1 == 'a') {

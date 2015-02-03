@@ -164,7 +164,7 @@ public final class BaseXImages {
     if(Prop.WIN && !LARGE) {
       // retrieve system icons (only supported on Windows)
       final int p = path.lastIndexOf(path, '.');
-      final String suffix = p != -1 ? path.substring(p + 1) : null;
+      final String suffix = p == -1 ? null : path.substring(p + 1);
       Icon icon = null;
       if(suffix != null) icon = FILES.get(suffix);
       if(icon == null) {

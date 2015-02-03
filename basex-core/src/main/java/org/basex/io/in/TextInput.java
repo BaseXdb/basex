@@ -52,20 +52,20 @@ public class TextInput extends BufferInput {
       final int b = readByte();
       final int c = readByte();
       final int d = readByte();
-      String e = Strings.UTF8;
+      String e = UTF8;
       int skip = 0;
       if(a == 0xFF && b == 0xFE) { // BOM: FF FE
-        e = Strings.UTF16LE;
+        e = UTF16LE;
         skip = 2;
       } else if(a == 0xFE && b == 0xFF) { // BOM: FE FF
-        e = Strings.UTF16BE;
+        e = UTF16BE;
         skip = 2;
       } else if(a == 0xEF && b == 0xBB && c == 0xBF) { // BOM: EF BB BF
         skip = 3;
       } else if(a == '<' && b == 0 && c == '?' && d == 0) {
-        e = Strings.UTF16LE;
+        e = UTF16LE;
       } else if(a == 0 && b == '<' && c == 0 && d == '?') {
-        e = Strings.UTF16BE;
+        e = UTF16BE;
       }
       reset();
       for(int s = 0; s < skip; s++) readByte();

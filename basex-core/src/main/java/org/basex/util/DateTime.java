@@ -37,7 +37,7 @@ public final class DateTime {
    */
   public static long parse(final String date) {
     try {
-      return parse(date, FULL).getTime();
+      synchronized(FULL) { return parse(date, FULL).getTime(); }
     } catch(final ParseException ex) {
       Util.errln(ex);
       return 0;

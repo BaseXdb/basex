@@ -61,7 +61,8 @@ public class ClientQuery extends Query {
     cache = null;
 
     final Object vl = value  instanceof BXNode ? ((BXNode) value).getNode() : value;
-    String t = type == null ? "" : type, v;
+    String t = type == null ? "" : type;
+    final String v;
     if(vl instanceof Value) {
       final Value val = (Value) vl;
       final Type tp = val.type;

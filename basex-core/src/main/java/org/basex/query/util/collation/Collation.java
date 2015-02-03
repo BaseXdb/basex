@@ -28,7 +28,7 @@ public abstract class Collation {
   private byte[] uri = EMPTY;
 
   /** Search modes. */
-  protected static enum Mode {
+  protected enum Mode {
     /** Default. */      INDEX_OF,
     /** End position. */ INDEX_AFTER,
     /** Starts-with. */  STARTS_WITH,

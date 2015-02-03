@@ -105,12 +105,9 @@ final class GermanStemmer extends InternalStemmer {
    */
   private TokenBuilder strip(final TokenBuilder tb) {
     while(tb.size() > 3) {
-      final int tl = tb.size();
-      final int c1 = tb.get(tl - 1);
-      final int c2 = tb.get(tl - 2);
-      if(tl + subst > 5 && c2 == 'n' && c1 == 'd') {
-        tb.size(tl - 2);
-      } else if(tl + subst > 4 && c2 == 'e' && (c1 == 'm' || c1 == 'r')) {
+      final int tl = tb.size(), c1 = tb.get(tl - 1), c2 = tb.get(tl - 2);
+      if(tl + subst > 5 && c2 == 'n' && c1 == 'd' ||
+         tl + subst > 4 && c2 == 'e' && (c1 == 'm' || c1 == 'r')) {
         tb.size(tl - 2);
       } else if(c1 == 'e' || c1 == 's' || c1 == 'n' || c1 == 't') {
         tb.size(tl - 1);

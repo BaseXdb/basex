@@ -4,6 +4,7 @@ import java.io.*;
 
 import org.basex.io.in.*;
 import org.basex.query.value.type.*;
+import org.basex.query.value.type.Type.ID;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -104,7 +105,7 @@ public abstract class Query implements Closeable {
    * @return item type
    */
   public final Type type() {
-    return Type.ID.getType(types.get(pos - 1));
+    return ID.getType(types.get(pos - 1));
   }
 
   /**

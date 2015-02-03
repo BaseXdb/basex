@@ -4,7 +4,6 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.value.type.SeqType.*;
 import static org.basex.util.Token.*;
 
-import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
@@ -155,9 +154,7 @@ public enum Annotation {
   private static final TokenObjMap<Annotation> MAP = new TokenObjMap<>();
 
   static {
-    for(final Annotation sig : Annotation.VALUES) {
-      MAP.put(new QNm(sig.local(), sig.uri).id(), sig);
-    }
+    for(final Annotation sig : VALUES) MAP.put(new QNm(sig.local(), sig.uri).id(), sig);
   }
 
   /**
@@ -215,14 +212,14 @@ public enum Annotation {
    */
   public byte[] id() {
     final TokenBuilder tb = new TokenBuilder();
-    if(!eq(uri, QueryText.XQ_URI)) tb.add(NSGlobal.prefix(uri)).add(':');
+    if(!eq(uri, XQ_URI)) tb.add(NSGlobal.prefix(uri)).add(':');
     return tb.add(local()).finish();
   }
 
   @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder().add('%');
-    if(!eq(uri, QueryText.XQ_URI)) tb.add(NSGlobal.prefix(uri)).add(':');
+    if(!eq(uri, XQ_URI)) tb.add(NSGlobal.prefix(uri)).add(':');
     return tb.add(desc.replace("()", "")).toString();
   }
 }

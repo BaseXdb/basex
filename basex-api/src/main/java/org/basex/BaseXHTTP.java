@@ -378,10 +378,12 @@ public final class BaseXHTTP extends Main {
       // create connection
       new URL((ssl ? "https://" : "http://") + host + ':' + port).openConnection().getInputStream();
       return true;
-    } catch(final IOException ex) {
+    } catch(final FileNotFoundException | SSLHandshakeException ex) {
       // if page is not found, server is running
       // if SSL handshake failed server is running, otherwise SSLException
-      return ex instanceof FileNotFoundException || ex instanceof SSLHandshakeException;
+      return true;
+    } catch(final IOException ex) {
+      return false;
     }
   }
 

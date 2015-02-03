@@ -43,13 +43,13 @@ public final class FTLexer extends FTIterator implements IndexToken {
 
   /**
    * Default constructor.
-   * @param ftoptions full-text options
+   * @param ftopt full-text options
    */
-  public FTLexer(final FTOpt ftoptions) {
-    this.ftopt = ftoptions;
+  public FTLexer(final FTOpt ftopt) {
+    this.ftopt = ftopt;
 
     // check if language option is provided:
-    Language lang = ftoptions != null ? ftoptions.ln : null;
+    Language lang = ftopt != null ? ftopt.ln : null;
     if(lang == null) lang = Language.def();
 
     // use default tokenizer if specific tokenizer is not available.
@@ -60,12 +60,12 @@ public final class FTLexer extends FTIterator implements IndexToken {
         break;
       }
     }
-    tok = tk.get(ftoptions);
+    tok = tk.get(ftopt);
     iter = tok;
 
     // wrap original iterator
-    if(ftoptions != null && ftoptions.is(FTFlag.ST)) {
-      if(ftoptions.sd == null) {
+    if(ftopt != null && ftopt.is(FTFlag.ST)) {
+      if(ftopt.sd == null) {
         // use default stemmer if specific stemmer is not available.
         Stemmer st = Stemmer.IMPL.get(0);
         for(final Stemmer stem : Stemmer.IMPL) {
@@ -76,7 +76,7 @@ public final class FTLexer extends FTIterator implements IndexToken {
         }
         iter = st.get(lang, iter);
       } else {
-        iter = new DictionaryStemmer(ftoptions.sd, iter);
+        iter = new DictionaryStemmer(ftopt.sd, iter);
       }
     }
   }

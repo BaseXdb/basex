@@ -116,12 +116,12 @@ public final class GUI extends JFrame {
 
   /**
    * Default constructor.
-   * @param ctx database context
-   * @param opts gui options
+   * @param context database context
+   * @param gopts gui options
    */
-  public GUI(final Context ctx, final GUIOptions opts) {
-    this.context = ctx;
-    this.gopts = opts;
+  public GUI(final Context context, final GUIOptions gopts) {
+    this.context = context;
+    this.gopts = gopts;
 
     setIconImage(BaseXImages.get("logo_64"));
     setTitle();
@@ -130,12 +130,12 @@ public final class GUI extends JFrame {
 
     // set window size
     final Dimension scr = Toolkit.getDefaultToolkit().getScreenSize();
-    final int[] loc = gopts.get(GUIOptions.GUILOC);
-    final int[] size = gopts.get(GUIOptions.GUISIZE);
+    final int[] loc = this.gopts.get(GUIOptions.GUILOC);
+    final int[] size = this.gopts.get(GUIOptions.GUISIZE);
     final int x = Math.max(0, Math.min(scr.width - size[0], loc[0]));
     final int y = Math.max(0, Math.min(scr.height - size[1], loc[1]));
     setBounds(x, y, size[0], size[1]);
-    if(gopts.get(GUIOptions.MAXSTATE)) {
+    if(this.gopts.get(GUIOptions.MAXSTATE)) {
       setExtendedState(MAXIMIZED_HORIZ);
       setExtendedState(MAXIMIZED_VERT);
       setExtendedState(MAXIMIZED_BOTH);
@@ -162,7 +162,7 @@ public final class GUI extends JFrame {
     b.add(hits);
 
     buttons.add(b, BorderLayout.EAST);
-    if(gopts.get(GUIOptions.SHOWBUTTONS)) control.add(buttons, BorderLayout.CENTER);
+    if(this.gopts.get(GUIOptions.SHOWBUTTONS)) control.add(buttons, BorderLayout.CENTER);
 
     nav = new BaseXBack(new BorderLayout(5, 0)).border(2, 2, 0, 2);
 
@@ -200,7 +200,7 @@ public final class GUI extends JFrame {
         };
         final int i = context.data() == null ? 2 : gopts.get(GUIOptions.SEARCHMODE);
         final String[] hs = gopts.get(
-            i == 0 ? GUIOptions.SEARCH : i == 1 ? GUIOptions.XQUERY : GUIOptions.COMMANDS);
+          i == 0 ? GUIOptions.SEARCH : i == 1 ? GUIOptions.XQUERY : GUIOptions.COMMANDS);
         for(final String en : hs) {
           final JMenuItem jmi = new JMenuItem(en);
           jmi.addActionListener(al);
@@ -244,7 +244,7 @@ public final class GUI extends JFrame {
     b.add(filter);
     nav.add(b, BorderLayout.EAST);
 
-    if(gopts.get(GUIOptions.SHOWINPUT)) control.add(nav, BorderLayout.SOUTH);
+    if(this.gopts.get(GUIOptions.SHOWINPUT)) control.add(nav, BorderLayout.SOUTH);
     top.add(control, BorderLayout.NORTH);
 
     // create views
@@ -263,7 +263,7 @@ public final class GUI extends JFrame {
 
     // add status bar
     status = new GUIStatus(this);
-    if(gopts.get(GUIOptions.SHOWSTATUS)) top.add(status, BorderLayout.SOUTH);
+    if(this.gopts.get(GUIOptions.SHOWSTATUS)) top.add(status, BorderLayout.SOUTH);
 
     setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     add(top);

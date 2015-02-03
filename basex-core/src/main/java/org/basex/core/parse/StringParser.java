@@ -100,11 +100,11 @@ final class StringParser extends CmdParser {
       case CHECK:
         return new Check(string(cmd));
       case ADD:
-        String arg = key(S_TO, null) ? string(cmd) : null;
-        return new Add(arg, remaining(cmd));
+        final String aa = key(S_TO, null) ? string(cmd) : null;
+        return new Add(aa, remaining(cmd));
       case STORE:
-        arg = key(S_TO, null) ? string(cmd) : null;
-        return new Store(arg, remaining(cmd));
+        final String sa = key(S_TO, null) ? string(cmd) : null;
+        return new Store(sa, remaining(cmd));
       case RETRIEVE:
         return new Retrieve(string(cmd));
       case DELETE:

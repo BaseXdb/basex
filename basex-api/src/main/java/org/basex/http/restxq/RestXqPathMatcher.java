@@ -35,15 +35,15 @@ final class RestXqPathMatcher {
    * Constructor.
    * @param regex regular expression which matches paths defined by the path annotation
    * @param vars variable names defined in the path template
-   * @param segmentCount segment count
-   * @param varPos variable position
+   * @param segments segment count
+   * @param varsPos variable position
    */
-  private RestXqPathMatcher(final String regex, final List<QNm> vars, final int segmentCount,
-    final BigInteger varPos) {
+  private RestXqPathMatcher(final String regex, final List<QNm> vars, final int segments,
+    final BigInteger varsPos) {
     this.vars = vars;
-    this.pattern = Pattern.compile(regex);
-    this.segments = segmentCount;
-    this.varsPos = varPos;
+    this.segments = segments;
+    this.varsPos = varsPos;
+    pattern = Pattern.compile(regex);
   }
 
   /**
@@ -218,7 +218,7 @@ final class RestXqPathMatcher {
      */
     CharIterator(final String input) {
       this.input = input;
-      this.len = input.length();
+      len = input.length();
     }
 
     /**

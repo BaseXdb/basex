@@ -525,8 +525,7 @@ public final class LockingTest extends SandboxTest {
             final CountDownLatch latch = new CountDownLatch(1);
             final String[] read = randomSubset(objects, true);
             final String[] write = randomSubset(objects, true);
-            final LockTester th = new LockTester(null, read,
-                write, latch);
+            final LockTester th = new LockTester(null, read, write, latch);
             th.start();
             try {
               Thread.sleep(HOLD_TIME);

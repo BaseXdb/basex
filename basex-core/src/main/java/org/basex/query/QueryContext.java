@@ -667,11 +667,11 @@ public final class QueryContext extends Proc implements Closeable {
       final String string = (String) vl;
       final StringList strings = new StringList(1);
       // strings containing multiple items (value \1 ...)
-      if(string.indexOf('\1') != -1) {
+      if(string.indexOf('\1') == -1) {
+        strings.add(string);
+      } else {
         strings.add(string.split("\1"));
         vl = strings.toArray();
-      } else {
-        strings.add(string);
       }
 
       // sub types overriding the global value (value \2 type)

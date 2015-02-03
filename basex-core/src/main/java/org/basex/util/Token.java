@@ -380,7 +380,13 @@ public final class Token {
     if(b != null) return b;
 
     final double a = Math.abs(dbl);
-    return chopNumber(token(a >= 1e-6 && a < 1e6 ? DD.format(dbl) : SD.format(dbl)));
+    final String s;
+    if(a >= 1e-6 && a < 1e6) {
+      synchronized(DD) { s = DD.format(dbl); }
+    } else {
+      synchronized(SD) { s = SD.format(dbl); }
+    }
+    return chopNumber(token(s));
   }
 
   /**
@@ -398,7 +404,12 @@ public final class Token {
     for(int i = 0; i < fl; ++i) if(flt == FLT[i]) return FLTSTR[i];
     final float a = Math.abs(flt);
     final boolean small = a >= 1e-6f && a < 1e6f;
-    String s1 = small ? DF.format(flt) : SF.format(flt);
+    String s1;
+    if(small) {
+      synchronized(DF) { s1 = DF.format(flt); }
+    } else {
+      synchronized(SF) { s1 = SF.format(flt); }
+    }
     final String s2 = Float.toString(flt);
     if(s2.length() < s1.length() && (!s2.contains("E") || !small)) s1 = s2;
     return chopNumber(token(s1));

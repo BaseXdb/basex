@@ -2,6 +2,7 @@ package org.basex.query.expr.gflwor;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.gflwor.GFLWOR.Clause;
 import org.basex.query.expr.gflwor.GFLWOR.Eval;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
@@ -16,7 +17,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
-public final class Where extends GFLWOR.Clause {
+public final class Where extends Clause {
   /** Predicate expression. */
   Expr expr;
 
@@ -81,7 +82,7 @@ public final class Where extends GFLWOR.Clause {
   }
 
   @Override
-  public GFLWOR.Clause inline(final QueryContext qc, final VarScope scp, final Var var,
+  public Clause inline(final QueryContext qc, final VarScope scp, final Var var,
       final Expr ex) throws QueryException {
     final Expr sub = expr.inline(qc, scp, var, ex);
     if(sub == null) return null;
@@ -100,7 +101,7 @@ public final class Where extends GFLWOR.Clause {
   }
 
   @Override
-  boolean skippable(final GFLWOR.Clause cl) {
+  boolean skippable(final Clause cl) {
     return true;
   }
 

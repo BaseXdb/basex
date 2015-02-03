@@ -6,6 +6,10 @@ import static org.basex.http.webdav.impl.Utils.*;
 import java.io.*;
 import java.util.*;
 
+import com.bradmcevoy.http.LockInfo.LockDepth;
+import com.bradmcevoy.http.LockInfo.LockScope;
+import com.bradmcevoy.http.LockInfo.LockType;
+import com.bradmcevoy.http.Request.Method;
 import org.basex.http.webdav.impl.*;
 import org.basex.util.*;
 import org.xml.sax.*;
@@ -52,7 +56,7 @@ abstract class BXAbstractResource implements CopyableResource, DeletableResource
   }
 
   @Override
-  public boolean authorise(final Request request, final Request.Method method, final Auth auth) {
+  public boolean authorise(final Request request, final Method method, final Auth auth) {
     return auth != null && auth.getTag() != null && WebDAVService.authorize(meta.db);
   }
 
@@ -341,11 +345,11 @@ abstract class BXAbstractResource implements CopyableResource, DeletableResource
       if("token".equals(elementName))
         lockToken.tokenId = v;
       else if("scope".equals(elementName))
-        lockToken.info.scope = LockInfo.LockScope.valueOf(v.toUpperCase(Locale.ENGLISH));
+        lockToken.info.scope = LockScope.valueOf(v.toUpperCase(Locale.ENGLISH));
       else if("type".equals(elementName))
-        lockToken.info.type = LockInfo.LockType.valueOf(v.toUpperCase(Locale.ENGLISH));
+        lockToken.info.type = LockType.valueOf(v.toUpperCase(Locale.ENGLISH));
       else if("depth".equals(elementName))
-        lockToken.info.depth = LockInfo.LockDepth.valueOf(v.toUpperCase(Locale.ENGLISH));
+        lockToken.info.depth = LockDepth.valueOf(v.toUpperCase(Locale.ENGLISH));
       else if("owner".equals(elementName))
         lockToken.info.lockedByUser = v;
       else if("timeout".equals(elementName))

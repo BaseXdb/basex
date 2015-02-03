@@ -1,6 +1,7 @@
 package org.basex.http.webdav.impl;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * Query builder.
@@ -37,7 +38,7 @@ final class WebDAVQuery {
    * Returns the hash map entries.
    * @return self reference
    */
-  Set<Map.Entry<String, Object>> entries() {
+  Set<Entry<String, Object>> entries() {
     return bindings.entrySet();
   }
 

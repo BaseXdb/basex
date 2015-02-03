@@ -73,7 +73,7 @@ final class TreeNodeCache implements TreeConstants {
    */
   TreeBorder[] subtree(final Data d, final int pre) {
     final TreeBorder[] bo = new TreeBorder[maxLevel];
-    if(pre == 0 && d.meta.ndocs.get() == 1) {
+    if(pre == 0 && d.meta.ndocs == 1) {
       for(int i = 0; i < maxLevel; ++i) bo[i] = new TreeBorder(i, 0, nodes[i].size());
       return bo;
     }

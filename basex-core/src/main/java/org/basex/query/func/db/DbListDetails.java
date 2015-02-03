@@ -45,7 +45,7 @@ public final class DbListDetails extends DbList {
     if(exprs.length == 0) return listDBs(qc);
 
     final Data data = checkData(qc);
-    final String path = string(exprs.length == 1 ? Token.EMPTY : toToken(exprs[1], qc));
+    final String path = string(exprs.length == 1 ? EMPTY : toToken(exprs[1], qc));
     final IntList il = data.resources.docs(path);
     final TokenList tl = data.resources.binaries(path);
 
@@ -96,7 +96,7 @@ public final class DbListDetails extends DbList {
         }
 
         final FElem res = new FElem(DATABASE);
-        res.add(RESOURCES, token(meta.ndocs.intValue()));
+        res.add(RESOURCES, token(meta.ndocs));
         res.add(MDATE, DateTime.format(new Date(meta.dbtime()), DateTime.FULL));
         res.add(SIZE, token(meta.dbsize()));
         if(ctx.perm(Perm.CREATE, name)) res.add(PATH, meta.original);

@@ -28,7 +28,7 @@ final class RestXqPath implements Comparable<RestXqPath> {
    */
   RestXqPath(final String path, final InputInfo info) throws QueryException {
     this.path = path;
-    this.matcher = RestXqPathMatcher.parse(path, info);
+    matcher = RestXqPathMatcher.parse(path, info);
   }
 
   /**

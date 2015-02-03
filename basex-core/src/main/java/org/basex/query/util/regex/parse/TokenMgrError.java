@@ -50,7 +50,7 @@ public class TokenMgrError extends Error {
   protected static String addEscapes(final String str) {
     final StringBuilder retval = new StringBuilder();
     for (int i = 0; i < str.length(); i++) {
-      char ch;
+      final char ch;
       switch (str.charAt(i)) {
         case 0 :
           continue;

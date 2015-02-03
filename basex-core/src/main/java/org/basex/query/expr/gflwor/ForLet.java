@@ -12,7 +12,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-abstract class ForLet extends GFLWOR.Clause {
+abstract class ForLet extends Clause {
   /** Item variable. */
   public final Var var;
   /** Bound expression. */

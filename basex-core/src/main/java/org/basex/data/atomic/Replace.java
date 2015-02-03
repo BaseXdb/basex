@@ -111,19 +111,19 @@ final class Replace extends StructuralUpdate {
             break;
           case Data.ATTR:
             // check attribute values
-            byte[] srcValue = src.text(s, false);
-            if(!eq(data.text(t, false), srcValue))
-              valueUpdates.add(UpdateValue.getInstance(data, t, srcValue));
+            final byte[] av = src.text(s, false);
+            if(!eq(data.text(t, false), av))
+              valueUpdates.add(UpdateValue.getInstance(data, t, av));
             break;
           case Data.PI:
             // check processing instruction value
             final byte[] srcText = src.text(s, true);
             final byte[] trgText = data.text(t, true);
             final int i = indexOf(srcText, ' ');
-            srcValue = i == -1 ? EMPTY : substring(srcText, i + 1);
-            if(!eq(srcValue, indexOf(trgText, ' ') == -1 ? EMPTY :
+            final byte[] pv = i == -1 ? EMPTY : substring(srcText, i + 1);
+            if(!eq(pv, indexOf(trgText, ' ') == -1 ? EMPTY :
               substring(trgText, i + 1))) {
-              valueUpdates.add(UpdateValue.getInstance(data, t, srcValue));
+              valueUpdates.add(UpdateValue.getInstance(data, t, pv));
             }
             break;
         }

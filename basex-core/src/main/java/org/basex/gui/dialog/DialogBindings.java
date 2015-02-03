@@ -3,7 +3,7 @@ package org.basex.gui.dialog;
 import static org.basex.core.Text.*;
 
 import java.awt.*;
-import java.util.*;
+import java.util.Map.Entry;
 
 import org.basex.core.*;
 import org.basex.gui.*;
@@ -62,7 +62,7 @@ public final class DialogBindings extends BaseXDialog {
     final MainOptions opts = gui.context.options;
     final int cl = context.length;
     int c = 0;
-    for(final Map.Entry<String, String> entry : QueryProcessor.bindings(opts).entrySet()) {
+    for(final Entry<String, String> entry : QueryProcessor.bindings(opts).entrySet()) {
       context[c++].setText('$' + entry.getKey());
       context[c++].setText(entry.getValue());
       if(c == cl) break;

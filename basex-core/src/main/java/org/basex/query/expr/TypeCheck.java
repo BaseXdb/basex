@@ -8,6 +8,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.value.type.SeqType.Occ;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -70,7 +71,7 @@ public final class TypeCheck extends Single {
 
     // check at each call
     if(argType.type.instanceOf(seqType.type) && !expr.has(Flag.NDT) && !expr.has(Flag.UPD)) {
-      final SeqType.Occ occ = argType.occ.intersect(seqType.occ);
+      final Occ occ = argType.occ.intersect(seqType.occ);
       if(occ == null) throw INVCAST_X_X.get(info, argType, seqType);
     }
 

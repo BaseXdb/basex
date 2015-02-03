@@ -6,6 +6,7 @@ import static org.basex.query.QueryText.*;
 import org.basex.data.*;
 import org.basex.index.query.*;
 import org.basex.query.*;
+import org.basex.query.expr.CmpG.OpG;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
@@ -130,7 +131,7 @@ final class CmpSR extends Single {
       if(d > 0) return Bln.FALSE;
       if(d == 0) {
         // return simplified comparison for exact hit, or false if value is not included
-        return mni && mxi ? new CmpG(expr, Str.get(mn), CmpG.OpG.EQ, null, null, info) : Bln.FALSE;
+        return mni && mxi ? new CmpG(expr, Str.get(mn), OpG.EQ, null, null, info) : Bln.FALSE;
       }
     }
     return new CmpSR(c.expr, mn, mni && c.mni, mx, mxi && c.mxi, null, info);

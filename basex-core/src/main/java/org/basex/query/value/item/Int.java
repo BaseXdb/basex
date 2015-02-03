@@ -103,7 +103,7 @@ public final class Int extends ANum {
 
   @Override
   public Int abs() {
-    return value < 0 ? get(-value) : type != AtomType.ITR ? get(value) : this;
+    return value < 0 ? get(-value) : type == AtomType.ITR ? this : get(value);
   }
 
   @Override

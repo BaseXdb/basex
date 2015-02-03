@@ -51,7 +51,7 @@ public final class FreeSlots {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(free.size() + " entries:\n");
-    for(final Map.Entry<Integer, LinkedList<Long>> entry : free.entrySet()) {
+    for(final Entry<Integer, LinkedList<Long>> entry : free.entrySet()) {
       sb.append("- ").append(entry.getKey()).append(": ").append(entry.getValue()).append('\n');
     }
     return sb.toString();

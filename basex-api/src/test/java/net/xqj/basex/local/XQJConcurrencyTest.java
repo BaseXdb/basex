@@ -6,6 +6,7 @@ import static org.junit.Assert.*;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.*;
+import java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy;
 
 import javax.xml.xquery.*;
 
@@ -67,7 +68,7 @@ public final class XQJConcurrencyTest extends XQJBaseTest {
           CONCURRENT_WRITE_THREADS, CONCURRENT_WRITE_THREADS, 4L,
           TimeUnit.SECONDS,
           new ArrayBlockingQueue<Runnable>(CONCURRENT_READ_THREADS),
-          new ThreadPoolExecutor.CallerRunsPolicy());
+          new CallerRunsPolicy());
 
       final ArrayList<Future<?>> futures = new ArrayList<>();
 

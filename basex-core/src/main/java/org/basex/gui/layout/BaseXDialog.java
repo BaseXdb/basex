@@ -9,7 +9,6 @@ import java.net.*;
 
 import javax.swing.*;
 
-import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.dialog.*;
@@ -232,7 +231,7 @@ public abstract class BaseXDialog extends JDialog {
    * @return true if dialog was confirmed
    */
   public static boolean confirm(final GUI gui, final String text) {
-    return Text.B_YES.equals(new DialogMessage(gui, text.trim(), Msg.QUESTION).action());
+    return B_YES.equals(new DialogMessage(gui, text.trim(), Msg.QUESTION).action());
   }
 
   /**

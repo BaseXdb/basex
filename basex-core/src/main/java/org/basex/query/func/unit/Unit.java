@@ -12,7 +12,6 @@ import org.basex.core.*;
 import org.basex.core.Context;
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
@@ -132,7 +131,7 @@ final class Unit {
         tests++;
 
         final Performance perf2 = new Performance();
-        final Ann ignore = anns.get(Annotation._UNIT_IGNORE);
+        final Ann ignore = anns.get(_UNIT_IGNORE);
         if(ignore == null) {
           try {
             // call functions marked with "before"

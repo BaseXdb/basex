@@ -5,7 +5,6 @@ import static org.basex.query.func.Function.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.query.*;
-import org.basex.query.func.*;
 import org.junit.*;
 import org.junit.Test;
 
@@ -37,9 +36,9 @@ public final class IndexTest extends AdvancedQueryTest {
     for(int i = 0; i < 5; i++) {
       run(new Replace("x.xml", "<x><a>A</a><a>B</a></x>"));
     }
-    query(Function._DB_TEXT.args(NAME, "A"), "A");
-    query(Function._DB_TEXT.args(NAME, "B"), "B");
-    query(Function._DB_INFO.args(NAME) + "//textindex/text()", "true");
+    query(_DB_TEXT.args(NAME, "A"), "A");
+    query(_DB_TEXT.args(NAME, "B"), "B");
+    query(_DB_INFO.args(NAME) + "//textindex/text()", "true");
   }
 
   /**
@@ -54,10 +53,10 @@ public final class IndexTest extends AdvancedQueryTest {
       run(new Replace("x.xml", "<x><a>A</a><a>B</a></x>"));
       run(new Replace("x.xml", "<x><a>A</a><a>C</a></x>"));
     }
-    query(Function._DB_TEXT.args(NAME, "A"), "A");
-    query(Function._DB_TEXT.args(NAME, "C"), "C");
-    query(Function._DB_TEXT.args(NAME, "B"), "");
-    query(Function._DB_INFO.args(NAME) + "//textindex/text()", "true");
+    query(_DB_TEXT.args(NAME, "A"), "A");
+    query(_DB_TEXT.args(NAME, "C"), "C");
+    query(_DB_TEXT.args(NAME, "B"), "");
+    query(_DB_INFO.args(NAME) + "//textindex/text()", "true");
   }
 
   /**
@@ -71,10 +70,10 @@ public final class IndexTest extends AdvancedQueryTest {
     for(int i = 0; i < 5; i++) {
       run(new Replace("x.xml", "<x><a>A</a><a>BC</a><a>DEF</a></x>"));
     }
-    query(Function._DB_TEXT.args(NAME, "A"), "A");
-    query(Function._DB_TEXT.args(NAME, "BC"), "BC");
-    query(Function._DB_TEXT.args(NAME, "DEF"), "DEF");
-    query(Function._DB_INFO.args(NAME) + "//textindex/text()", "true");
+    query(_DB_TEXT.args(NAME, "A"), "A");
+    query(_DB_TEXT.args(NAME, "BC"), "BC");
+    query(_DB_TEXT.args(NAME, "DEF"), "DEF");
+    query(_DB_INFO.args(NAME) + "//textindex/text()", "true");
   }
 
   /**
@@ -90,9 +89,9 @@ public final class IndexTest extends AdvancedQueryTest {
       run(new Replace("x.xml", "<x><a>A</a><a>BC</a></x>"));
       run(new Close());
     }
-    query(Function._DB_TEXT.args(NAME, "A"), "A");
-    query(Function._DB_TEXT.args(NAME, "BC"), "BC");
-    query(Function._DB_INFO.args(NAME) + "//textindex/text()", "true");
+    query(_DB_TEXT.args(NAME, "A"), "A");
+    query(_DB_TEXT.args(NAME, "BC"), "BC");
+    query(_DB_INFO.args(NAME) + "//textindex/text()", "true");
   }
 
   /**
@@ -108,10 +107,10 @@ public final class IndexTest extends AdvancedQueryTest {
       run(new Add("a", "<x a='a' b='b'/>"));
       run(new Replace("a", "<x/>"));
     }
-    query(Function._DB_ATTRIBUTE.args(NAME, "a"), "");
-    query(Function._DB_ATTRIBUTE.args(NAME, "b"), "");
-    query(Function._DB_ATTRIBUTE.args(NAME, "c"), "");
-    query(Function._DB_INFO.args(NAME) + "//textindex/text()", "true");
+    query(_DB_ATTRIBUTE.args(NAME, "a"), "");
+    query(_DB_ATTRIBUTE.args(NAME, "b"), "");
+    query(_DB_ATTRIBUTE.args(NAME, "c"), "");
+    query(_DB_INFO.args(NAME) + "//textindex/text()", "true");
   }
 
   /**
@@ -123,7 +122,7 @@ public final class IndexTest extends AdvancedQueryTest {
     run(new Set(MainOptions.UPDINDEX, true));
     run(new CreateDB(NAME, "<X><A>q</A><B>q</B></X>"));
     query("replace node /X/A with 'x', replace node /X/B with 'y'", "");
-    query(Function._DB_INFO.args(NAME) + "//textindex/text()", "true");
+    query(_DB_INFO.args(NAME) + "//textindex/text()", "true");
   }
 
   /**
@@ -138,7 +137,7 @@ public final class IndexTest extends AdvancedQueryTest {
     run(new Replace("B", "<a a='1'/>"));
     run(new Replace("C", "<a a='1'/>"));
     run(new Replace("A", "<a a='1'/>"));
-    query(Function._DB_INFO.args(NAME) + "//textindex/text()", "true");
+    query(_DB_INFO.args(NAME) + "//textindex/text()", "true");
     run(new Close());
     run(new Open(NAME));
     run(new Delete("A"));
@@ -153,21 +152,21 @@ public final class IndexTest extends AdvancedQueryTest {
   public void autooptimize() throws BaseXException {
     run(new Set(MainOptions.AUTOOPTIMIZE, true));
     run(new CreateDB(NAME));
-    query(Function._DB_INFO.args(NAME) + "//textindex/text()", "true");
+    query(_DB_INFO.args(NAME) + "//textindex/text()", "true");
     run(new Replace("x.xml", "<a>A</a>"));
-    query(Function._DB_INFO.args(NAME) + "//textindex/text()", "true");
+    query(_DB_INFO.args(NAME) + "//textindex/text()", "true");
     query(_DB_REPLACE.args(NAME, "x.xml", "<a>B</a>"));
-    query(Function._DB_INFO.args(NAME) + "//textindex/text()", "true");
+    query(_DB_INFO.args(NAME) + "//textindex/text()", "true");
 
     run(new Set(MainOptions.AUTOOPTIMIZE, false));
     run(new Optimize());
     run(new Replace("x.xml", "<a>C</a>"));
-    query(Function._DB_INFO.args(NAME) + "//textindex/text()", "false");
+    query(_DB_INFO.args(NAME) + "//textindex/text()", "false");
 
     run(new Optimize());
-    query(Function._DB_INFO.args(NAME) + "//textindex/text()", "true");
+    query(_DB_INFO.args(NAME) + "//textindex/text()", "true");
     query(_DB_REPLACE.args(NAME, "x.xml", "<a>D</a>"));
-    query(Function._DB_INFO.args(NAME) + "//textindex/text()", "false");
+    query(_DB_INFO.args(NAME) + "//textindex/text()", "false");
   }
 
   /**

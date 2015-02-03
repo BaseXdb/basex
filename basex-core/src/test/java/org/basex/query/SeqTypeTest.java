@@ -57,8 +57,8 @@ public final class SeqTypeTest {
   @Test public void occInstanceOfTest() {
     final Occ[] occs = { ZERO, ZERO_ONE, ONE, ZERO_MORE, ONE_MORE };
 
-    assertTrue(Occ.ONE.instanceOf(ZERO_MORE));
-    assertFalse(Occ.ZERO_MORE.instanceOf(ONE));
+    assertTrue(ONE.instanceOf(ZERO_MORE));
+    assertFalse(ZERO_MORE.instanceOf(ONE));
     final int bits = 0x014F90E1;
 
     final int ol = occs.length;

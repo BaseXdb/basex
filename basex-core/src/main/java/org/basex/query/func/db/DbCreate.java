@@ -49,7 +49,7 @@ public final class DbCreate extends DbNew {
       if(ps != 0 && is != ps) throw BXDB_CREATEARGS_X_X.get(info, is, ps);
 
       for(int i = 0; i < is; i++) {
-        final byte[] path = i < ps ? paths.get(i) : Token.EMPTY;
+        final byte[] path = i < ps ? paths.get(i) : EMPTY;
         inputs.add(checkInput(val.itemAt(i), path));
       }
     }

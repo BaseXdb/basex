@@ -16,6 +16,8 @@ import javax.xml.namespace.*;
 import org.basex.core.locks.*;
 import org.basex.core.users.*;
 import org.basex.query.*;
+import org.basex.query.QueryModule.Lock;
+import org.basex.query.QueryModule.Requires;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.pkg.*;
@@ -184,12 +186,12 @@ public abstract class JavaMapping extends Arr {
 
     // check if user has sufficient permissions to call the function
     Perm perm = Perm.ADMIN;
-    final QueryModule.Requires req = meth.getAnnotation(QueryModule.Requires.class);
+    final Requires req = meth.getAnnotation(Requires.class);
     if(req != null) perm = Perm.get(req.value().name().toLowerCase(Locale.ENGLISH));
     if(!qc.context.user().has(perm)) return null;
 
     // Add module locks to QueryContext.
-    final QueryModule.Lock lock = meth.getAnnotation(QueryModule.Lock.class);
+    final Lock lock = meth.getAnnotation(Lock.class);
     if(lock != null) {
       for(final String read : lock.read()) qc.readLocks.add(DBLocking.MODULE_PREFIX + read);
       for(final String write : lock.write()) qc.writeLocks.add(DBLocking.MODULE_PREFIX + write);

@@ -7,12 +7,12 @@ import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
+import org.basex.query.expr.path.Test.Kind;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -52,9 +52,9 @@ abstract class DbAccess extends DbFn {
 
     // parse and compile the name test
     final QNm nm = new QNm(toToken(exprs[a], qc), sc);
-    if(!nm.hasPrefix()) nm.uri(sc.ns.uri(Token.EMPTY));
+    if(!nm.hasPrefix()) nm.uri(sc.ns.uri(EMPTY));
 
-    final NameTest nt = new NameTest(nm, Test.Kind.URI_NAME, true, sc.elemNS);
+    final NameTest nt = new NameTest(nm, Kind.URI_NAME, true, sc.elemNS);
     // return empty sequence if test will yield no results
     if(!nt.optimize(qc)) return Empty.ITER;
 

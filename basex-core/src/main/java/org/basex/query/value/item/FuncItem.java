@@ -8,6 +8,7 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.gflwor.*;
+import org.basex.query.expr.gflwor.GFLWOR.Clause;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -215,8 +216,8 @@ public final class FuncItem extends FItem implements Scope {
     qc.compInfo(OPTINLINE, this);
 
     // create let bindings for all variables
-    final LinkedList<GFLWOR.Clause> cls =
-        exprs.length == 0 ? null : new LinkedList<GFLWOR.Clause>();
+    final LinkedList<Clause> cls =
+        exprs.length == 0 ? null : new LinkedList<Clause>();
     final IntObjMap<Var> vs = new IntObjMap<>();
     final int pl = params.length;
     for(int p = 0; p < pl; p++) {

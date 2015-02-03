@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.gflwor.GFLWOR.Clause;
 import org.basex.query.expr.gflwor.GFLWOR.Eval;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
@@ -24,7 +25,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
-public final class OrderBy extends GFLWOR.Clause {
+public final class OrderBy extends Clause {
   /** References to the variables to be sorted. */
   private VarRef[] refs;
   /** Sort keys. */
@@ -172,7 +173,7 @@ public final class OrderBy extends GFLWOR.Clause {
   }
 
   @Override
-  public GFLWOR.Clause inline(final QueryContext qc, final VarScope scp, final Var var,
+  public Clause inline(final QueryContext qc, final VarScope scp, final Var var,
       final Expr ex) throws QueryException {
     for(int r = refs.length; --r >= 0;) {
       if(var.is(refs[r].var)) refs = Array.delete(refs, r);
@@ -209,7 +210,7 @@ public final class OrderBy extends GFLWOR.Clause {
   }
 
   @Override
-  boolean skippable(final GFLWOR.Clause cl) {
+  boolean skippable(final Clause cl) {
     return cl instanceof Where;
   }
 

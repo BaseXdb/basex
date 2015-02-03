@@ -574,13 +574,13 @@ public abstract class Data {
         case DOC:
           // add document
           doc(pre, ssize, data.text(spre, true));
-          meta.ndocs.incrementAndGet();
+          ++meta.ndocs;
           break;
         case ELEM:
           // add element
-          byte[] nm = data.name(spre, kind);
-          elem(dist, elemNames.index(nm, null, false), data.attSize(spre, kind), ssize,
-              nspaces.uri(nm, true), false);
+          final byte[] en = data.name(spre, kind);
+          elem(dist, elemNames.index(en, null, false), data.attSize(spre, kind), ssize,
+              nspaces.uri(en, true), false);
           break;
         case TEXT:
         case COMM:
@@ -590,9 +590,9 @@ public abstract class Data {
           break;
         case ATTR:
           // add attribute
-          nm = data.name(spre, kind);
-          attr(pre, dist, attrNames.index(nm, null, false), data.text(spre, false),
-              nspaces.uri(nm, false), false);
+          final byte[] an = data.name(spre, kind);
+          attr(pre, dist, attrNames.index(an, null, false), data.text(spre, false),
+              nspaces.uri(an, false), false);
           break;
       }
     }
@@ -670,7 +670,7 @@ public abstract class Data {
     }
 
     // preserve empty root node
-    if(kind(pre) == DOC) meta.ndocs.decrementAndGet();
+    if(kind(pre) == DOC) --meta.ndocs;
 
     if(meta.updindex) {
       // delete node and descendants from ID -> PRE map:
@@ -757,7 +757,7 @@ public abstract class Data {
           // add document
           nspaces.prepare();
           doc(pre, ssize, data.text(spre, true));
-          meta.ndocs.incrementAndGet();
+          ++meta.ndocs;
           preStack.push(pre);
           break;
         case ELEM:
@@ -776,9 +776,9 @@ public abstract class Data {
               }
             }
           }
-          byte[] nm = data.name(spre, kind);
-          elem(dist, elemNames.index(nm, null, false), data.attSize(spre, kind), ssize,
-              nspaces.uri(nm, true), ne);
+          final byte[] en = data.name(spre, kind);
+          elem(dist, elemNames.index(en, null, false), data.attSize(spre, kind), ssize,
+              nspaces.uri(en, true), ne);
           preStack.push(pre);
           break;
         case TEXT:
@@ -789,9 +789,9 @@ public abstract class Data {
           break;
         case ATTR:
           // add attribute
-          nm = data.name(spre, kind);
+          final byte[] an = data.name(spre, kind);
           // check if prefix already in nsScope or not
-          final byte[] attPref = prefix(nm);
+          final byte[] attPref = prefix(an);
           if(data.nsFlag(spre) && nsScope.get(attPref) == null) {
             // add declaration to parent node
             nspaces.add(nsPre, preStack.isEmpty() ? -1 : preStack.peek(), attPref,
@@ -800,8 +800,8 @@ public abstract class Data {
             // here as direct table access would interfere with the buffer
             flagPres.add(nsPre);
           }
-          attr(pre, dist, attrNames.index(nm, null, false), data.text(spre, false),
-              nspaces.uri(nm, false), false);
+          attr(pre, dist, attrNames.index(an, null, false), data.text(spre, false),
+              nspaces.uri(an, false), false);
           break;
       }
       // propagate PRE value shifts to keep namespace structure valid

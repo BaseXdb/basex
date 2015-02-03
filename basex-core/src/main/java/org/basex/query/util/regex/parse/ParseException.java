@@ -107,7 +107,7 @@ public class ParseException extends Exception {
     }
     String retval = "Encountered \"";
     Token tok = curr.next;
-    for (int i = 0; i < maxSize; i++) {
+    for(int i = 0; i < maxSize; i++) {
       if(i != 0) retval += " ";
       if(tok.kind == 0) {
         retval += img[0];
@@ -121,7 +121,7 @@ public class ParseException extends Exception {
     }
     retval += "\" at line " + curr.next.beginLine + ", column " + curr.next.beginColumn;
     retval += '.' + eol;
-    if (exps.length == 1) {
+    if(exps.length == 1) {
       retval += "Was expecting:" + eol + "    ";
     } else {
       retval += "Was expecting one of:" + eol + "    ";

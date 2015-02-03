@@ -79,7 +79,7 @@ public abstract class Path extends ParseExpr {
       Expr step = expr;
       if(step instanceof Context) {
         // remove redundant context references
-        if (sl > 1) continue;
+        if(sl > 1) continue;
         // single step: rewrite to axis step (required to sort results of path)
         step = Step.get(((Context) step).info, SELF, Test.NOD);
       } else if(step instanceof Filter) {
@@ -384,7 +384,7 @@ public abstract class Path extends ParseExpr {
     final Data data = rt.data();
     // skip computation if no database instance is available, is out-of-date or
     // if context does not contain all database nodes
-    if(data == null || !data.meta.uptodate || data.meta.ndocs.get() != rt.size()) return -1;
+    if(data == null || !data.meta.uptodate || data.meta.ndocs != rt.size()) return -1;
 
     ArrayList<PathNode> nodes = data.paths.root();
     long m = 1;
@@ -690,7 +690,7 @@ public abstract class Path extends ParseExpr {
 
     if(!newPreds.isEmpty()) {
       int ls = resultSteps.size() - 1;
-      Step step;
+      final Step step;
       if(ls < 0 || !(resultSteps.get(ls) instanceof Step)) {
         // add at least one self axis step
         step = Step.get(info, SELF, Test.NOD);

@@ -5,6 +5,7 @@ import static org.basex.core.Text.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.Map.Entry;
 
 import org.basex.util.list.*;
 
@@ -259,7 +260,7 @@ public final class Util {
         "-cp", System.getProperty("java.class.path") };
     final StringList sl = new StringList().add(largs);
 
-    for(final Map.Entry<Object, Object> o : System.getProperties().entrySet()) {
+    for(final Entry<Object, Object> o : System.getProperties().entrySet()) {
       final String k = o.getKey().toString();
       if(k.startsWith(Prop.DBPREFIX)) sl.add("-D" + o.getValue());
     }

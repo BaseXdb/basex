@@ -318,7 +318,7 @@ public abstract class Formatter extends FormatUtil {
    * @return string representation
    */
   private static String frac(final BigDecimal num, final int len) {
-    final String s = num.setScale(len, BigDecimal.ROUND_HALF_UP).toString();
+    final String s = num.setScale(len, RoundingMode.HALF_UP).toString();
     final int d = s.indexOf('.');
     return d == -1 ? s : s.substring(d + 1);
   }

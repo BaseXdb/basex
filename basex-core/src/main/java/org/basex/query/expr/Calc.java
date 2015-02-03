@@ -144,12 +144,12 @@ public enum Calc {
           final BigDecimal bd = BigDecimal.valueOf(((YMDur) it2).ymd());
           if(bd.doubleValue() == .0) throw zeroError(ii, it1);
           return Dec.get(BigDecimal.valueOf(((YMDur) it1).ymd()).divide(
-              bd, 20, BigDecimal.ROUND_HALF_EVEN));
+              bd, 20, RoundingMode.HALF_EVEN));
         }
         if(t1 == DTD) {
           final BigDecimal bd = ((DTDur) it2).dtd();
           if(bd.doubleValue() == .0) throw zeroError(ii, it1);
-          return Dec.get(((DTDur) it1).dtd().divide(bd, 20, BigDecimal.ROUND_HALF_EVEN));
+          return Dec.get(((DTDur) it1).dtd().divide(bd, 20, RoundingMode.HALF_EVEN));
         }
       }
       if(t1 == YMD) {
@@ -221,7 +221,7 @@ public enum Calc {
 
       final BigDecimal b1 = it1.dec(ii), b2 = it2.dec(ii);
       if(b2.signum() == 0) throw zeroError(ii, it1);
-      final BigDecimal q = b1.divide(b2, 0, BigDecimal.ROUND_DOWN);
+      final BigDecimal q = b1.divide(b2, 0, RoundingMode.DOWN);
       return Dec.get(b1.subtract(q.multiply(b2)));
     }
   };

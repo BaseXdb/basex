@@ -12,6 +12,7 @@ import org.basex.query.util.collation.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.value.type.Type.ID;
 import org.basex.util.*;
 
 /**
@@ -297,7 +298,7 @@ public abstract class Item extends Value {
    * Returns a type id.
    * @return type string
    */
-  public Type.ID typeId() {
+  public ID typeId() {
     return type.id();
   }
 }

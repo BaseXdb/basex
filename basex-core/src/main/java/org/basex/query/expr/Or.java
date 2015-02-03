@@ -32,7 +32,7 @@ public final class Or extends Logical {
   public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
     // remove atomic values
     final Expr c = super.compile(qc, scp);
-    return c != this ? c : optimize(qc, scp);
+    return c == this ? optimize(qc, scp) : c;
   }
 
   @Override

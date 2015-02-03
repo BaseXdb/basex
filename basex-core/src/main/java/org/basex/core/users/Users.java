@@ -33,7 +33,7 @@ public final class Users {
    * @param sopts static options
    */
   public Users(final StaticOptions sopts) {
-    file = sopts.dbpath(Token.string(UserText.USERS) + IO.XMLSUFFIX);
+    file = sopts.dbpath(string(USERS) + IO.XMLSUFFIX);
     read();
     // ensure that default admin user exists
     if(get(ADMIN) == null) users.put(ADMIN, new User(ADMIN, ADMIN, Perm.ADMIN));

@@ -6,6 +6,7 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.gflwor.GFLWOR.Clause;
 import org.basex.query.expr.gflwor.GFLWOR.Eval;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -25,7 +26,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
-public final class GroupBy extends GFLWOR.Clause {
+public final class GroupBy extends Clause {
   /** Grouping specs. */
   private final Spec[] specs;
   /** Non-grouping variable expressions. */
@@ -236,7 +237,7 @@ public final class GroupBy extends GFLWOR.Clause {
   }
 
   @Override
-  public GFLWOR.Clause inline(final QueryContext qc, final VarScope scp, final Var var,
+  public Clause inline(final QueryContext qc, final VarScope scp, final Var var,
       final Expr ex) throws QueryException {
     final boolean b = inlineAll(qc, scp, specs, var, ex), p = inlineAll(qc, scp, preExpr, var, ex);
     return b || p ? optimize(qc, scp) : null;
@@ -282,7 +283,7 @@ public final class GroupBy extends GFLWOR.Clause {
   }
 
   @Override
-  boolean skippable(final GFLWOR.Clause cl) {
+  boolean skippable(final Clause cl) {
     return false;
   }
 

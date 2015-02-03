@@ -35,7 +35,7 @@ abstract class BXCode<E> {
   public final E eval() throws BadRequestException, NotAuthorizedException {
     try {
       final E ret = get();
-      if (ret == null) run();
+      if(ret == null) run();
       return ret;
     } catch(final LoginException ex) {
       throw new NotAuthorizedException(resource);

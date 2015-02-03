@@ -1312,17 +1312,17 @@ public enum Function {
    *             function is not limited
    * @param args types of the function arguments
    * @param ret return type
-   * @param flag static function properties
+   * @param flags static function properties
    * @param uri uri
    */
   Function(final Class<? extends StandardFunc> func, final String desc, final SeqType[] args,
-      final SeqType ret, final EnumSet<Flag> flag, final byte[] uri) {
+      final SeqType ret, final EnumSet<Flag> flags, final byte[] uri) {
 
     this.func = func;
     this.desc = desc;
     this.ret = ret;
     this.args = args;
-    this.flags = flag;
+    this.flags = flags;
     this.uri = uri;
     minMax = minMax(desc, args);
   }
@@ -1433,7 +1433,7 @@ public enum Function {
    */
   public byte[] id() {
     final TokenBuilder tb = new TokenBuilder();
-    if(!Token.eq(uri, QueryText.FN_URI)) tb.add(NSGlobal.prefix(uri)).add(':');
+    if(!Token.eq(uri, FN_URI)) tb.add(NSGlobal.prefix(uri)).add(':');
     return tb.add(local()).finish();
   }
 

@@ -10,7 +10,7 @@ import java.util.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.core.parse.*;
+import org.basex.core.parse.Commands.CmdIndex;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.util.*;
@@ -103,9 +103,9 @@ public final class DbModuleTest extends AdvancedQueryTest {
   @Test
   public void text() throws BaseXException {
     // run function without and with index
-    new DropIndex(Commands.CmdIndex.TEXT).execute(context);
+    new DropIndex(CmdIndex.TEXT).execute(context);
     query(_DB_TEXT.args(NAME, "XML"), "XML");
-    new CreateIndex(Commands.CmdIndex.TEXT).execute(context);
+    new CreateIndex(CmdIndex.TEXT).execute(context);
     query(_DB_TEXT.args(NAME, "XML"), "XML");
     query(_DB_TEXT.args(NAME, "XXX"), "");
   }
@@ -117,9 +117,9 @@ public final class DbModuleTest extends AdvancedQueryTest {
   @Test
   public void textRange() throws BaseXException {
     // run function without and with index
-    new DropIndex(Commands.CmdIndex.TEXT).execute(context);
+    new DropIndex(CmdIndex.TEXT).execute(context);
     query(_DB_TEXT_RANGE.args(NAME, "Exercise", "Fun"), "Exercise 1\nExercise 2");
-    new CreateIndex(Commands.CmdIndex.TEXT).execute(context);
+    new CreateIndex(CmdIndex.TEXT).execute(context);
     query(_DB_TEXT_RANGE.args(NAME, "Exercise", "Fun"), "Exercise 1\nExercise 2");
     query(_DB_TEXT_RANGE.args(NAME, "XXX", "XXX"), "");
   }
@@ -131,9 +131,9 @@ public final class DbModuleTest extends AdvancedQueryTest {
   @Test
   public void attribute() throws BaseXException {
     // run function without and with index
-    new DropIndex(Commands.CmdIndex.ATTRIBUTE).execute(context);
+    new DropIndex(CmdIndex.ATTRIBUTE).execute(context);
     query(DATA.args(_DB_ATTRIBUTE.args(NAME, "0")), "0");
-    new CreateIndex(Commands.CmdIndex.ATTRIBUTE).execute(context);
+    new CreateIndex(CmdIndex.ATTRIBUTE).execute(context);
     query(DATA.args(_DB_ATTRIBUTE.args(NAME, "0")), "0");
     query(DATA.args(_DB_ATTRIBUTE.args(NAME, "0", "id")), "0");
     query(DATA.args(_DB_ATTRIBUTE.args(NAME, "0", "XXX")), "");
@@ -147,9 +147,9 @@ public final class DbModuleTest extends AdvancedQueryTest {
   @Test
   public void attributeRange() throws BaseXException {
     // run function without and with index
-    new CreateIndex(Commands.CmdIndex.ATTRIBUTE).execute(context);
+    new CreateIndex(CmdIndex.ATTRIBUTE).execute(context);
     query(_DB_ATTRIBUTE_RANGE.args(NAME, "0", "9") + "/data()", "0\n1");
-    new CreateIndex(Commands.CmdIndex.ATTRIBUTE).execute(context);
+    new CreateIndex(CmdIndex.ATTRIBUTE).execute(context);
     query(_DB_ATTRIBUTE_RANGE.args(NAME, "0", "9") + "/data()", "0\n1");
     query(_DB_ATTRIBUTE_RANGE.args(NAME, "XXX", "XXX"), "");
   }
@@ -564,9 +564,9 @@ public final class DbModuleTest extends AdvancedQueryTest {
     query(_DB_INFO.args(NAME) + "//ftindex/text()", "false");
 
     new Open(NAME).execute(context);
-    new CreateIndex(Commands.CmdIndex.TEXT).execute(context);
-    new CreateIndex(Commands.CmdIndex.ATTRIBUTE).execute(context);
-    new CreateIndex(Commands.CmdIndex.FULLTEXT).execute(context);
+    new CreateIndex(CmdIndex.TEXT).execute(context);
+    new CreateIndex(CmdIndex.ATTRIBUTE).execute(context);
+    new CreateIndex(CmdIndex.FULLTEXT).execute(context);
     new Close().execute(context);
 
     query(_DB_OPTIMIZE.args(NAME));
@@ -575,9 +575,9 @@ public final class DbModuleTest extends AdvancedQueryTest {
     query(_DB_INFO.args(NAME) + "//ftindex/text()", "true");
 
     new Open(NAME).execute(context);
-    new DropIndex(Commands.CmdIndex.TEXT).execute(context);
-    new DropIndex(Commands.CmdIndex.ATTRIBUTE).execute(context);
-    new DropIndex(Commands.CmdIndex.FULLTEXT).execute(context);
+    new DropIndex(CmdIndex.TEXT).execute(context);
+    new DropIndex(CmdIndex.ATTRIBUTE).execute(context);
+    new DropIndex(CmdIndex.FULLTEXT).execute(context);
     new Close().execute(context);
 
     query(_DB_OPTIMIZE.args(NAME));

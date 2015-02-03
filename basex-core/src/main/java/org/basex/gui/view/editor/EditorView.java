@@ -87,7 +87,7 @@ public final class EditorView extends View {
   public EditorView(final ViewNotifier man) {
     super(EDITORVIEW, man);
     layout(new BorderLayout());
-    setBackground(GUIConstants.PANEL);
+    setBackground(PANEL);
 
     header = new BaseXHeader(EDITOR);
 
@@ -295,7 +295,7 @@ public final class EditorView extends View {
     header.refreshLayout();
     for(final EditorArea edit : editors()) edit.refreshLayout(mfont);
     search.refreshLayout();
-    final Font f = GUIConstants.font.deriveFont((float) ((FONTSIZE * SCALE + fontSize) / 2));
+    final Font f = font.deriveFont((float) ((FONTSIZE * SCALE + fontSize) / 2));
     info.setFont(f);
     pos.setFont(f);
     project.refreshLayout();
@@ -380,7 +380,7 @@ public final class EditorView extends View {
     for(final IOFile file : files) open(file);
 
     // initialize project root with path of first file
-    final IOFile f = fs.length != 0 ? new IOFile(fs[0]) : !files.isEmpty() ? files.get(0) : null;
+    final IOFile f = fs.length == 0 ? files.isEmpty() ? null : files.get(0) : new IOFile(fs[0]);
     if(f != null) project.changeRoot(f.parent(), false);
 
     gui.setTitle();

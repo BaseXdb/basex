@@ -3,7 +3,7 @@ package org.basex.query.func.client;
 import static org.basex.query.QueryError.*;
 
 import java.io.*;
-import java.util.*;
+import java.util.Map.Entry;
 import java.util.regex.*;
 
 import org.basex.api.client.*;
@@ -37,7 +37,7 @@ public final class ClientQuery extends ClientFn {
     final ValueBuilder vb = new ValueBuilder();
     try(org.basex.api.client.ClientQuery cq = cs.query(query)) {
       // bind variables and context value
-      for(final Map.Entry<String, Value> binding : toBindings(2, qc).entrySet()) {
+      for(final Entry<String, Value> binding : toBindings(2, qc).entrySet()) {
         final String k = binding.getKey();
         final Value value = binding.getValue();
         if(k.isEmpty()) cq.context(value);

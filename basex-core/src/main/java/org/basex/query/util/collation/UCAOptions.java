@@ -6,7 +6,6 @@ import static org.basex.util.Strings.*;
 import java.lang.reflect.*;
 import java.util.*;
 
-import org.basex.util.*;
 import org.basex.util.list.*;
 import org.basex.util.options.*;
 
@@ -137,7 +136,7 @@ public final class UCAOptions extends CollationOptions {
       final String v = get(REORDER);
       final IntList list = new IntList();
       final Method uscript = method(find("com.ibm.icu.lang.UScript"), "getCode", String.class);
-      for(final String code : Strings.split(v, ',')) {
+      for(final String code : split(v, ',')) {
         switch (code) {
           case "space":    list.add(0x1000); break;
           case "punct":    list.add(0x1001); break;
@@ -146,8 +145,8 @@ public final class UCAOptions extends CollationOptions {
           case "digit":    list.add(0x1004); break;
           default:
             final int[] c = code.length() == 4 ? (int[]) invoke(uscript, null, code) : null;
-            if (c != null) list.add(c[0]);
-            else if (nomercy) throw error(REORDER);
+            if(c != null) list.add(c[0]);
+            else if(nomercy) throw error(REORDER);
             break;
         }
       }

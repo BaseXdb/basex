@@ -6,8 +6,6 @@ import static org.basex.gui.layout.BaseXKeys.*;
 import java.awt.*;
 import java.awt.event.*;
 
-import org.basex.gui.*;
-
 /**
  * DoubleSlider implementation.
  *
@@ -208,9 +206,9 @@ public final class BaseXDSlider extends BaseXPanel {
     final int s = (int) (4 * ASCALE);
 
     final boolean focus = hasFocus();
-    g.setColor(GUIConstants.BACK);
+    g.setColor(BACK);
     g.fillRect(0, hc - s, w, s * 2);
-    g.setColor(GUIConstants.TEXT);
+    g.setColor(TEXT);
     g.drawLine(0, hc - s, w - 1, hc - s);
     g.drawLine(0, hc - s, 0, hc + s);
     g.setColor(color2);
@@ -224,7 +222,7 @@ public final class BaseXDSlider extends BaseXPanel {
       g.setColor(color4);
       g.drawLine(r.xs + ARROW, 3, r.xs + ARROW, h - 4);
       g.drawLine(r.xe - 1, 3, r.xe - 1, h - 4);
-      g.setColor(GUIConstants.BACK);
+      g.setColor(BACK);
       if(r.xs + ARROW + 2 < r.xe) {
         g.drawLine(r.xs + ARROW + 1, 4, r.xs + ARROW + 1, h - 5);
         g.drawLine(r.xe, 4, r.xe, h - 5);
@@ -242,18 +240,18 @@ public final class BaseXDSlider extends BaseXPanel {
     pol.xpoints = new int[] { r.xe + 5, r.xe + 12, r.xe + 12, r.xe + 5 };
     g.fillPolygon(pol);
 
-    g.setColor(focus ? GUIConstants.TEXT : dgray);
+    g.setColor(focus ? TEXT : dgray);
     g.drawLine(r.xs + 11, hc - 5, r.xs + 11, hc + 4);
     g.drawLine(r.xs + 11, hc - 5, r.xs + 6, hc - 1);
     g.drawLine(r.xe + 5, hc - 5, r.xe + 5, hc + 4);
     g.drawLine(r.xe + 5, hc - 5, r.xe + 11, hc - 1);
 
-    g.setColor(GUIConstants.BACK);
+    g.setColor(BACK);
     g.drawLine(r.xs + 10, hc + 4, r.xs + 6, hc + 1);
     g.drawLine(r.xe + 6, hc + 4, r.xe + 11, hc + 1);
 
     // draw range info
-    g.setColor(GUIConstants.TEXT);
+    g.setColor(TEXT);
     final double mn = (long) (min * 100) / 100.0;
     final double mx = (long) (max * 100) / 100.0;
 

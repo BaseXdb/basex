@@ -133,7 +133,7 @@ public final class Optimize extends ACreate {
         }
         if(cmd != null) cmd.pre = pre;
       }
-      md.ndocs.set(n);
+      md.ndocs = n;
       md.uptodate = true;
     }
 

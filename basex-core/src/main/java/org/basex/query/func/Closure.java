@@ -11,6 +11,7 @@ import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.gflwor.*;
+import org.basex.query.expr.gflwor.GFLWOR.Clause;
 import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -19,6 +20,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.value.type.SeqType.Occ;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -170,7 +172,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
         if(c instanceof Value) {
           // values are always inlined into the closure
           final Expr inlined = expr.inline(qc, scope, v, v.checkType((Value) c, qc, info, true));
-          if (inlined != null) expr = inlined;
+          if(inlined != null) expr = inlined;
           cls.remove();
         } else if(c instanceof Closure) {
           // nested closures are inlined if their size and number of closed-over variables is small
@@ -254,8 +256,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
     qc.compInfo(OPTINLINE, this);
     // create let bindings for all variables
-    final LinkedList<GFLWOR.Clause> cls =
-        exprs.length == 0 && nonLocal.isEmpty() ? null : new LinkedList<GFLWOR.Clause>();
+    final LinkedList<Clause> cls =
+        exprs.length == 0 && nonLocal.isEmpty() ? null : new LinkedList<Clause>();
     final IntObjMap<Var> vs = new IntObjMap<>();
     final int al = args.length;
     for(int a = 0; a < al; a++) {
@@ -284,14 +286,14 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     final FuncType ft = (FuncType) type;
 
     final Expr body;
-    if(!nonLocal.isEmpty()) {
+    if(nonLocal.isEmpty()) {
+      body = expr;
+    } else {
       // collect closure
-      final LinkedList<GFLWOR.Clause> cls = new LinkedList<>();
+      final LinkedList<Clause> cls = new LinkedList<>();
       for(final Entry<Var, Expr> e : nonLocal.entrySet())
         cls.add(new Let(e.getKey(), e.getValue().value(qc), false, ii));
       body = new GFLWOR(ii, cls, expr);
-    } else {
-      body = expr;
     }
 
     final SeqType argType = body.seqType();
@@ -312,7 +314,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       // check at each call
       if(argType.type.instanceOf(ret.type) && !body.has(Flag.NDT) && !body.has(Flag.UPD)) {
         // reject impossible arities
-        final SeqType.Occ occ = argType.occ.intersect(ret.occ);
+        final Occ occ = argType.occ.intersect(ret.occ);
         if(occ == null) throw INVTREAT_X_X.get(info, argType, ret);
       }
       checked = new TypeCheck(sc, info, body, ret, true);
@@ -373,9 +375,9 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    if (!nonLocal.isEmpty()) {
+    if(!nonLocal.isEmpty()) {
       sb.append("((: inline-closure :) ");
-      for (final Entry<Var, Expr> e : nonLocal.entrySet()) {
+      for(final Entry<Var, Expr> e : nonLocal.entrySet()) {
         sb.append("let ").append(e.getKey()).append(" := ").append(e.getValue()).append(' ');
       }
       sb.append(RETURN).append(' ');
@@ -470,7 +472,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     final Var[] arg = new Var[arity];
     final Expr[] refs = new Expr[arity];
     for(int a = 0; a < arity; a++) {
-      arg[a] = scp.newLocal(qc, new QNm(QueryText.ARG + (a + 1), ""), SeqType.ITEM_ZM, true);
+      arg[a] = scp.newLocal(qc, new QNm(ARG + (a + 1), ""), SeqType.ITEM_ZM, true);
       refs[a] = new VarRef(ii, arg[a]);
     }
     final TypedFunc call = qc.funcs.getFuncRef(name, refs, sc, ii);

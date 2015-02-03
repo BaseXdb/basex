@@ -11,6 +11,7 @@ import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.Expr.Flag;
 import org.basex.query.expr.gflwor.*;
+import org.basex.query.expr.gflwor.GFLWOR.Clause;
 import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -268,8 +269,8 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     qc.compInfo(OPTINLINE, id());
 
     // create let bindings for all variables
-    final LinkedList<GFLWOR.Clause> cls = exprs.length == 0 ? null :
-      new LinkedList<GFLWOR.Clause>();
+    final LinkedList<Clause> cls = exprs.length == 0 ? null :
+      new LinkedList<Clause>();
     final IntObjMap<Var> vs = new IntObjMap<>();
     final int al = args.length;
     for(int a = 0; a < al; a++) {

@@ -113,7 +113,7 @@ public abstract class Proc {
     timer = new Timer(true);
     timer.schedule(new TimerTask() {
       @Override
-      public void run() { Proc.this.stop(); }
+      public void run() { stop(); }
     }, ms);
   }
 

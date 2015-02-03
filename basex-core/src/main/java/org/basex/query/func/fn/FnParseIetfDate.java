@@ -68,7 +68,7 @@ public final class FnParseIetfDate extends StandardFunc {
      * @param info input info
      */
     private DateParser(final byte[] input, final InputInfo info) {
-      super(Token.string(lc(input)).trim());
+      super(string(lc(input)).trim());
       original = input;
       this.info = info;
     }
@@ -92,12 +92,12 @@ public final class FnParseIetfDate extends StandardFunc {
         tb.add(seconds.subtract(BigDecimal.valueOf(sec)).toString().substring(1));
       }
       final int z = zone == null ? 0 : zone;
-      if(z != 0) {
+      if(z == 0) {
+        tb.add('Z');
+      } else {
         tb.add(z < 0 ? '-' : '+');
         addNumber(tb, Math.abs(z / 60), 2).add(':');
         addNumber(tb, Math.abs(z % 60), 2);
-      } else {
-        tb.add('Z');
       }
       try {
         return new Dtm(tb.finish(), info);

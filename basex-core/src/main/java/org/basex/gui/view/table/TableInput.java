@@ -4,10 +4,10 @@ import static org.basex.gui.layout.BaseXKeys.*;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
 
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
-import org.basex.util.*;
 
 /**
  * This class allows simple text input for the table headers.
@@ -15,11 +15,14 @@ import org.basex.util.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-final class TableInput implements Runnable {
-  /** Input text. */
-  String text;
+final class TableInput {
   /** Panel reference. */
   private final BaseXPanel panel;
+  /** Timer. */
+  private final Timer timer;
+
+  /** Input text. */
+  private String text;
   /** Flashing cursor. */
   private boolean flashing;
   /** Flashing cursor. */
@@ -27,21 +30,31 @@ final class TableInput implements Runnable {
 
   /**
    * Constructor.
-   * @param p panel reference
-   * @param t text
+   * @param panel panel reference
+   * @param text text
    */
-  TableInput(final BaseXPanel p, final String t) {
-    panel = p;
-    text = t;
+  TableInput(final BaseXPanel panel, final String text) {
+    this.panel = panel;
+    this.text = text;
     pos = text.length();
-    new Thread(this).start();
+
+    timer = new Timer(true);
+    timer.scheduleAtFixedRate(new TimerTask() {
+      @Override
+      public void run() {
+        flashing ^= true;
+        panel.repaint();
+      }
+    }, 0, 500);
   }
 
   /**
    * Stops the box input.
    */
   void stop() {
-    text = null;
+    timer.cancel();
+    flashing = false;
+    panel.repaint();
   }
 
   /**
@@ -104,14 +117,11 @@ final class TableInput implements Runnable {
     return true;
   }
 
-  @Override
-  public void run() {
-    while(text != null) {
-      flashing ^= true;
-      panel.repaint();
-      Performance.sleep(500);
-    }
-    flashing = false;
-    panel.repaint();
+  /**
+   * Returns the entered text.
+   * @return text
+   */
+  String text() {
+    return text;
   }
 }

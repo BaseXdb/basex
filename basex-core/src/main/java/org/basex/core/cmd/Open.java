@@ -92,7 +92,7 @@ public final class Open extends Command {
 
         // do not open a database that is currently updated
         final MetaData meta = new MetaData(name, options, context.soptions);
-        if(meta.updateFile().exists()) throw new BaseXException(Text.DB_UPDATED_X, meta.name);
+        if(meta.updateFile().exists()) throw new BaseXException(DB_UPDATED_X, meta.name);
 
         // open database
         data = new DiskData(meta);

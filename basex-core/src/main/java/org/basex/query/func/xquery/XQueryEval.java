@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 import org.basex.core.*;
 import org.basex.core.users.*;
@@ -102,7 +103,7 @@ public class XQueryEval extends StandardFunc {
       // evaluate query
       try {
         final StaticContext sctx = new StaticContext(qctx.context);
-        for(final Map.Entry<String, Value> it : bindings.entrySet()) {
+        for(final Entry<String, Value> it : bindings.entrySet()) {
           final String key = it.getKey();
           final Value val = it.getValue();
           if(key.isEmpty()) qctx.context(val, sctx);

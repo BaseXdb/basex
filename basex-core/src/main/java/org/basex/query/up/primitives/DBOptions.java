@@ -99,7 +99,7 @@ public final class DBOptions {
    * @param opts main options
    */
   public void assignTo(final MainOptions opts) {
-    for(final Map.Entry<Option<?>, Object> entry : map.entrySet()) {
+    for(final Entry<Option<?>, Object> entry : map.entrySet()) {
       opts.put(entry.getKey(), entry.getValue());
     }
   }

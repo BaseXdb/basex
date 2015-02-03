@@ -9,7 +9,6 @@ import java.util.*;
 
 import org.basex.core.*;
 import org.basex.data.*;
-import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.util.ft.*;
 import org.basex.util.list.*;
@@ -363,7 +362,7 @@ final class MapRenderer {
         }
 
         if(draw) {
-          g.setColor(GUIConstants.TEXT);
+          g.setColor(TEXT);
           g.fillRect(xx + ll, yy, (int) r.thumbsw, r.thumbfh);
           g.setColor(textc);
         }
@@ -417,20 +416,20 @@ final class MapRenderer {
       int wl = (int) (ad0 * r.thumbf); // word length
       e += ad0 * r.thumbf - wl;
 
-      if (e >= 1) {
+      if(e >= 1) {
         wl += (int) e;
         e -= (int) e;
       }
       sl += ad0;
       pl += ad0;
       // check if rectangle fits in line - don't split token and dot
-      if (ll + wl + r.thumbsw * (psl < dl1 && sl == data1[psl] ? 1 : 0) >= ww) {
+      if(ll + wl + r.thumbsw * (psl < dl1 && sl == data1[psl] ? 1 : 0) >= ww) {
         yy += r.thumblh;
         ll = 0;
-        if (wl >= ww) return r.h + 3;
+        if(wl >= ww) return r.h + 3;
       }
 
-      if (draw) {
+      if(draw) {
         // draw word
         g.setColor(ftp != null && ftp.contains(count) ? GREEN : textc);
         g.fillRect((int) (xx + ll), yy, wl, r.thumbfh);
@@ -439,10 +438,10 @@ final class MapRenderer {
       ll += wl;
       ++count;
 
-      if (psl < dl1 && sl == data1[psl]) {
+      if(psl < dl1 && sl == data1[psl]) {
         // new sentence, draw dot
-        if (draw) {
-          g.setColor(GUIConstants.TEXT);
+        if(draw) {
+          g.setColor(TEXT);
           g.fillRect((int) (xx + ll), yy, (int) r.thumbsw, r.thumbfh);
           g.setColor(textc);
         }
@@ -452,7 +451,7 @@ final class MapRenderer {
       }
 
       ll += r.thumbf;
-      if (ppl < dl2 && pl == data2[ppl]) {
+      if(ppl < dl2 && pl == data2[ppl]) {
         // new paragraph
         yy += r.thumblh;
         ll = 0;

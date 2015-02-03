@@ -222,12 +222,12 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
       if(BaseXDialog.confirm(view.gui, Util.info(DELETE_FILE_X, node.file))) {
         final ProjectNode parent = (ProjectNode) node.getParent();
         // delete file or show error dialog
-        if(!view.editor.delete(node.file)) {
-          BaseXDialog.error(view.gui, Util.info(FILE_NOT_DELETED_X, node.file));
-        } else {
+        if(view.editor.delete(node.file)) {
           parent.refresh();
           setSelectionPath(parent.path());
           view.reset();
+        } else {
+          BaseXDialog.error(view.gui, Util.info(FILE_NOT_DELETED_X, node.file));
         }
       }
     }

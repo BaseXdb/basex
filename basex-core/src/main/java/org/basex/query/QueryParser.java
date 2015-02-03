@@ -8,6 +8,7 @@ import static org.basex.util.ft.FTFlag.*;
 import java.io.*;
 import java.math.*;
 import java.util.*;
+import java.util.Map.Entry;
 
 import org.basex.core.*;
 import org.basex.core.locks.*;
@@ -26,8 +27,11 @@ import org.basex.query.expr.constr.*;
 import org.basex.query.expr.ft.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.gflwor.GFLWOR.Clause;
+import org.basex.query.expr.gflwor.GroupBy.Spec;
+import org.basex.query.expr.gflwor.OrderBy.Key;
 import org.basex.query.expr.gflwor.Window.Condition;
 import org.basex.query.expr.path.*;
+import org.basex.query.expr.path.Test.Kind;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
@@ -135,7 +139,7 @@ public class QueryParser extends InputParser {
     this.sc = sctx;
 
     // bind external variables
-    for(final Map.Entry<String, String> entry : QueryProcessor.bindings(opts).entrySet()) {
+    for(final Entry<String, String> entry : QueryProcessor.bindings(opts).entrySet()) {
       qc.bind(entry.getKey(), new Atm(entry.getValue()), sc);
     }
   }
@@ -1023,14 +1027,14 @@ public class QueryParser extends InputParser {
         wsCheck(BY);
         skipWs();
         alterPos = pos;
-        final GroupBy.Spec[] specs = groupSpecs(clauses);
+        final Spec[] specs = groupSpecs(clauses);
 
         // find all non-grouping variables that aren't shadowed
         final ArrayList<VarRef> ng = new ArrayList<>();
-        for(final GroupBy.Spec spec : specs) curr.put(spec.var.name.id(), spec.var);
+        for(final Spec spec : specs) curr.put(spec.var.name.id(), spec.var);
         vars:
         for(final Var v : curr.values()) {
-          for(final GroupBy.Spec spec : specs) if(spec.var.is(v)) continue vars;
+          for(final Spec spec : specs) if(spec.var.is(v)) continue vars;
           ng.add(new VarRef(specs[0].info, v));
         }
 
@@ -1059,10 +1063,10 @@ public class QueryParser extends InputParser {
       if(stable || wsConsumeWs(ORDER)) {
         wsCheck(BY);
         alterPos = pos;
-        OrderBy.Key[] ob = null;
+        Key[] ob = null;
         do {
-          final OrderBy.Key key = orderSpec();
-          ob = ob == null ? new OrderBy.Key[] { key } : Array.add(ob, key);
+          final Key key = orderSpec();
+          ob = ob == null ? new Key[] { key } : Array.add(ob, key);
         } while(wsConsume(COMMA));
 
         final VarRef[] vs = new VarRef[curr.size()];
@@ -1219,7 +1223,7 @@ public class QueryParser extends InputParser {
    * @return new order key
    * @throws QueryException query exception
    */
-  private OrderBy.Key orderSpec() throws QueryException {
+  private Key orderSpec() throws QueryException {
     final Expr e = check(single(), ORDERBY);
 
     boolean desc = false;
@@ -1231,7 +1235,7 @@ public class QueryParser extends InputParser {
     }
     final Collation coll = wsConsumeWs(COLLATION) ?
       Collation.get(stringLiteral(), qc, sc, info(), FLWORCOLL_X) : sc.collation;
-    return new OrderBy.Key(info(), e, desc, least, coll);
+    return new Key(info(), e, desc, least, coll);
   }
 
   /**
@@ -1240,8 +1244,8 @@ public class QueryParser extends InputParser {
    * @return new group specification
    * @throws QueryException query exception
    */
-  private GroupBy.Spec[] groupSpecs(final LinkedList<Clause> cl) throws QueryException {
-    GroupBy.Spec[] specs = null;
+  private Spec[] groupSpecs(final LinkedList<Clause> cl) throws QueryException {
+    Spec[] specs = null;
     do {
       final InputInfo ii = info();
       final QNm name = varName();
@@ -1266,7 +1270,7 @@ public class QueryParser extends InputParser {
 
           // check other grouping variables
           if(!dec && specs != null) {
-            for(final GroupBy.Spec spec : specs) {
+            for(final Spec spec : specs) {
               if(spec.var.is(vr.var)) {
                 dec = true;
                 break;
@@ -1280,9 +1284,9 @@ public class QueryParser extends InputParser {
 
       final Collation coll = wsConsumeWs(COLLATION) ? Collation.get(stringLiteral(),
           qc, sc, info(), FLWORCOLL_X) : sc.collation;
-      final GroupBy.Spec spec = new GroupBy.Spec(ii, addVar(name, declType, false), by, coll);
+      final Spec spec = new Spec(ii, addVar(name, declType, false), by, coll);
       if(specs == null) {
-        specs = new GroupBy.Spec[] { spec };
+        specs = new Spec[] { spec };
       } else {
         for(int i = specs.length; --i >= 0;) {
           if(specs[i].var.name.eq(spec.var.name)) {
@@ -1978,7 +1982,7 @@ public class QueryParser extends InputParser {
       // name test: *
       if(!consume(':')) return new NameTest(att);
       // name test: *:name
-      return new NameTest(new QNm(ncName(QNAME_X)), Test.Kind.NAME, att, sc.elemNS);
+      return new NameTest(new QNm(ncName(QNAME_X)), Kind.NAME, att, sc.elemNS);
     }
 
     if(consume(EQNAME)) {
@@ -1986,7 +1990,7 @@ public class QueryParser extends InputParser {
       final byte[] uri = bracedURILiteral();
       if(consume('*')) {
         final QNm nm = new QNm(COLON, uri);
-        return new NameTest(nm, Test.Kind.URI, att, sc.elemNS);
+        return new NameTest(nm, Kind.URI, att, sc.elemNS);
       }
     }
     pos = i;
@@ -2003,13 +2007,13 @@ public class QueryParser extends InputParser {
         if(name.hasPrefix() || !consume(':')) {
           skipWs();
           names.add(new QNmCheck(name, !att));
-          return new NameTest(name, Test.Kind.URI_NAME, att, sc.elemNS);
+          return new NameTest(name, Kind.URI_NAME, att, sc.elemNS);
         }
         // name test: prefix:*
         if(consume('*')) {
           final QNm nm = new QNm(concat(name.string(), COLON));
           names.add(new QNmCheck(nm, !att));
-          return new NameTest(nm, Test.Kind.URI, att, sc.elemNS);
+          return new NameTest(nm, Kind.URI, att, sc.elemNS);
         }
       }
     }

@@ -315,21 +315,7 @@ public final class CmpG extends Cmp {
     final Data data = ii.ic.data;
     final Expr arg = exprs[1];
     final ParseExpr root;
-    if(!arg.isValue()) {
-      /* index access is not possible if returned type is not a string or untyped; if
-         expression depends on context; or if it is non-deterministic. examples:
-         for $x in ('a', 1) return //*[text() = $x]
-         //*[text() = .]
-         //*[text() = (if(random:double() < .5) then 'X' else 'Y')]
-       */
-      if(!arg.seqType().type.isStringOrUntyped() || arg.has(Flag.CTX) || arg.has(Flag.NDT) ||
-          arg.has(Flag.UPD)) return false;
-
-      // estimate costs (tend to worst case)
-      ii.costs = Math.max(1, data.meta.size / 10);
-      root = new ValueAccess(info, arg, ii.text, ii.name, ii.ic);
-
-    } else {
+    if(arg.isValue()) {
       // loop through all items
       ii.costs = 0;
       final Iter ir = arg.iter(ii.qc);
@@ -355,6 +341,20 @@ public final class CmpG extends Cmp {
       // more than one string - merge index results
       final int vs = va.size();
       root = vs == 1 ? va.get(0) : new Union(info, va.toArray(new ValueAccess[vs]));
+    } else {
+      /* index access is not possible if returned type is not a string or untyped; if
+         expression depends on context; or if it is non-deterministic. examples:
+         for $x in ('a', 1) return //*[text() = $x]
+         //*[text() = .]
+         //*[text() = (if(random:double() < .5) then 'X' else 'Y')]
+       */
+      if(!arg.seqType().type.isStringOrUntyped() || arg.has(Flag.CTX) || arg.has(Flag.NDT) ||
+        arg.has(Flag.UPD)) return false;
+
+      // estimate costs (tend to worst case)
+      ii.costs = Math.max(1, data.meta.size / 10);
+      root = new ValueAccess(info, arg, ii.text, ii.name, ii.ic);
+
     }
 
     ii.create(root, info, Util.info(ii.text ? OPTTXTINDEX : OPTATVINDEX, arg), false);

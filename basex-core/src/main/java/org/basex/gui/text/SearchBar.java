@@ -193,7 +193,7 @@ public final class SearchBar extends BaseXBack {
    * @return button
    */
   public AbstractButton button(final String help) {
-    button = BaseXButton.get("c_find", BaseXLayout.addShortcut(help, BaseXKeys.FIND.toString()),
+    button = BaseXButton.get("c_find", BaseXLayout.addShortcut(help, FIND.toString()),
         true, gui);
     button.addActionListener(new ActionListener() {
       @Override
