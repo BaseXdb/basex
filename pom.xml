@@ -67,7 +67,7 @@
       <dependency>
         <groupId>net.xqj</groupId>
         <artifactId>basex-xqj</artifactId>
-        <version>1.4.0-SNAPSHOT</version>
+        <version>1.4.0</version>
       </dependency>
       <dependency>
         <groupId>org.xmldb</groupId>
