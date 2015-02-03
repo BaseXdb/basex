@@ -44,17 +44,17 @@ public final class XQJTest extends SandboxTest {
    */
   @Test
   public void basicTest() throws Exception {
-    XQDataSource xqds = new BaseXXQDataSource();
+    final XQDataSource xqds = new BaseXXQDataSource();
     xqds.setProperty("serverName", "localhost");
     xqds.setProperty("port", "9999");
 
-    XQConnection conn = xqds.getConnection("admin", "admin");
+    final XQConnection conn = xqds.getConnection("admin", "admin");
     try {
-      XQPreparedExpression xqpe =
+      final XQPreparedExpression xqpe =
           conn.prepareExpression("declare variable $x as xs:string external; $x");
       xqpe.bindString(new QName("x"), "Hello World!", null);
 
-      XQResultSequence rs = xqpe.executeQuery();
+      final XQResultSequence rs = xqpe.executeQuery();
       assertTrue(rs.next());
       assertEquals(rs.getItemAsString(null), "Hello World!");
     } finally {
@@ -68,17 +68,17 @@ public final class XQJTest extends SandboxTest {
    */
   @Test
   public void entityTest() throws Exception {
-    XQDataSource xqds = new BaseXXQDataSource();
+    final XQDataSource xqds = new BaseXXQDataSource();
     xqds.setProperty("serverName", "localhost");
     xqds.setProperty("port", "9999");
 
-    XQConnection conn = xqds.getConnection("admin", "admin");
+    final XQConnection conn = xqds.getConnection("admin", "admin");
     try {
-      XQPreparedExpression xqpe =
+      final XQPreparedExpression xqpe =
           conn.prepareExpression("declare variable $x as xs:string external; $x");
       xqpe.bindString(new QName("x"), "&amp;", null);
 
-      XQResultSequence rs = xqpe.executeQuery();
+      final XQResultSequence rs = xqpe.executeQuery();
       assertTrue(rs.next());
       assertEquals(rs.getItemAsString(null), "&");
     } finally {

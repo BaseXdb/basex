@@ -302,7 +302,7 @@ public final class HTTPContext {
         String h2 = method + ':' + map.get(URI);
         final String qop = map.get(QOP);
         if(Strings.eq(qop, AUTH_INT)) h2 += ':' + Strings.md5(params.body().toString());
-        String ha2 = Strings.md5(h2);
+        final String ha2 = Strings.md5(h2);
 
         final StringBuilder sresponse = new StringBuilder(ha1).append(':').append(map.get(NONCE));
         if(Strings.eq(qop, AUTH, AUTH_INT)) {
@@ -341,7 +341,7 @@ public final class HTTPContext {
    * @return method
    */
   private String authDetails() {
-    String value = req.getHeader(AUTHORIZATION);
+    final String value = req.getHeader(AUTHORIZATION);
     if(value == null) return "";
     final String[] parts = req.getHeader(AUTHORIZATION).split(" ", 2);
     return parts.length == 1 ? "" : parts[1];

@@ -401,7 +401,7 @@ public enum AtomType implements Type {
       final Item it = value instanceof Item ? (Item) value : Str.get(value.toString());
       final BigDecimal v = checkNum(it, ii).dec(ii), i = v.setScale(0, BigDecimal.ROUND_DOWN);
       if(v.signum() < 0 || v.compareTo(Uln.MAXULN) > 0 ||
-        it.type.isStringOrUntyped() && !(v.compareTo(i) == 0)) throw funCastError(ii, this, it);
+        it.type.isStringOrUntyped() && !v.equals(i)) throw funCastError(ii, this, it);
       return Uln.get(i.toBigInteger());
     }
   },

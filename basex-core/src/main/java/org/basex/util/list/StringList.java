@@ -115,12 +115,12 @@ public class StringList extends ElementList implements Iterable<String> {
    * @return result of check
    */
   public final boolean containsAll(final StringList elements) {
-    if(isEmpty() && !elements.isEmpty()) return false;
+    if(isEmpty()) return elements.isEmpty();
     int i = 0;
+    final int s = size;
     for(final String e : elements) {
-      int result;
-      while((result = list[i].compareTo(e)) != 0) {
-        if(++i >= size() || result > 0) return false;
+      for(int d; (d = list[i].compareTo(e)) != 0;) {
+        if(++i >= s || d > 0) return false;
       }
     }
     return true;
