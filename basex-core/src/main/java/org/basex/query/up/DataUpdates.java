@@ -178,7 +178,7 @@ final class DataUpdates {
     // execute fn:put operations
     for(final Put put : puts.values()) put.apply();
 
-    // [CG] #1035 auto-optimize database
+    // Feature #1035: auto-optimize database
     final MainOptions opts = qc.context.options;
     if(data.meta.autoopt) {
       try {
@@ -192,10 +192,9 @@ final class DataUpdates {
      * - WRITEBACK option is turned on
      * - an original file path exists
      * - data is a main-memory instance
-     * - this data reference is not opened in the current context
      */
     final String original = data.meta.original;
-    if(data.inMemory() && !original.isEmpty() && data != qc.context.data()) {
+    if(!original.isEmpty() && data.inMemory()) {
       if(writeback) {
         try {
           Export.export(data, original, qc.context.options, null);
