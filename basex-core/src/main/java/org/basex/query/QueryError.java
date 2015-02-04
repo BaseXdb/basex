@@ -507,10 +507,12 @@ public enum QueryError {
   /** FOFD1350. */
   PICINVCOMP_X_X(FOFD, 1350, "Component '[%]' not applicable to % values."),
 
-  /** BXJS0001. */
+  /** FOJS0001. */
   JSON_PARSE_X(FOJS, 1, "%"),
-  /** BXJS0003. */
+  /** FOJS0003. */
   JSON_DUPLICATE_X(FOJS, 3, "%"),
+  /** FOJS0004. */
+  JSON_OPT_X(FOJS, 4, "%"),
 
   /** FOMP0001. */
   MAP_TZ(FOMP, 1, "Map cannot contain keys with and without timezone."),

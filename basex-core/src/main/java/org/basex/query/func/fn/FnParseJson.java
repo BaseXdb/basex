@@ -4,7 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import org.basex.build.json.*;
-import org.basex.build.json.JsonOptions.*;
+import org.basex.build.json.JsonOptions.JsonFormat;
 import org.basex.io.parse.json.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
@@ -38,11 +38,12 @@ public class FnParseJson extends Parse {
   final Item parse(final byte[] json, final QueryContext qc, final InputInfo ii)
       throws QueryException {
 
-    final JsonParserOptions opts = toOptions(1, Q_OPTIONS, new JsonParserOptions(), qc);
-    opts.set(JsonOptions.FORMAT, JsonFormat.MAP);
     try {
-      final JsonConverter conv = JsonConverter.get(opts);
-      return conv.convert(json, null);
+      final JsonParserOptions opts = toOptions(1, Q_OPTIONS, new JsonParserOptions(), qc);
+      opts.set(JsonOptions.FORMAT, JsonFormat.MAP);
+      return JsonConverter.get(opts).convert(json, null);
+    } catch(final QueryException ex) {
+      throw ex.error() == INVALIDOPT_X ? JSON_OPT_X.get(ii, ex.getLocalizedMessage()) : ex;
     } catch(final QueryIOException ex) {
       Util.debug(ex);
       final QueryException qe = ex.getCause(info);
