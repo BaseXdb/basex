@@ -62,16 +62,16 @@ public final class HttpPayload {
    * Parses the HTTP payload and returns a result body element.
    * @param error error flag
    * @param ctype content type defined in the connection
-   * @param utype content type specified by the user
+   * @param mtype content type (can be {@code null})
    * @return body element
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  FElem parse(final boolean error, final String ctype, final String utype)
+  FElem parse(final boolean error, final String ctype, final String mtype)
       throws IOException, QueryException {
 
     // error: use text/plain as content type
-    final String ct = utype == null || error ? contentType(ctype) : utype;
+    final String ct = mtype == null || error ? contentType(ctype) : mtype;
 
     final FElem body;
     if(isMultipart(ct)) {

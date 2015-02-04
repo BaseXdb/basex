@@ -9,7 +9,6 @@ import java.net.*;
 import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 
@@ -39,15 +38,15 @@ public final class HttpResponse {
   /**
    * Constructs http:response element and reads HTTP response content.
    * @param conn HTTP connection
-   * @param status indicates if content is required
-   * @param utype content type provided by the user to interpret the response content
+   * @param body also return body
+   * @param mtype media type provided by the user (can be {@code null})
    * @return result sequence of <http:response/> and content items
    * @throws IOException I/O Exception
    * @throws QueryException query exception
    */
   @SuppressWarnings("resource")
-  public ValueIter getResponse(final HttpURLConnection conn, final byte[] status,
-      final String utype) throws IOException, QueryException {
+  public ValueIter getResponse(final HttpURLConnection conn, final boolean body, final byte[] mtype)
+      throws IOException, QueryException {
 
     // check content type
     final String type = conn.getContentType();
@@ -59,10 +58,8 @@ public final class HttpResponse {
       Util.debug(ex);
     }
 
-    // result
-    final ValueBuilder vb = new ValueBuilder();
-
     // construct <http:response/>
+    final ValueBuilder vb = new ValueBuilder();
     final FElem response = new FElem(Q_RESPONSE).declareNS();
     final String msg = conn.getResponseMessage();
     response.add(STATUS, token(conn.getResponseCode()));
@@ -78,11 +75,10 @@ public final class HttpResponse {
     vb.add(response);
 
     // construct <http:body/>
-    final boolean body = status == null || !Bln.parse(status, info);
     if(is != null) {
       try {
         final HttpPayload hp = new HttpPayload(is, body, info, options);
-        response.add(hp.parse(error, type, utype));
+        response.add(hp.parse(error, type, mtype == null ? null : string(mtype)));
         if(body) vb.add(hp.payloads());
       } finally {
         is.close();

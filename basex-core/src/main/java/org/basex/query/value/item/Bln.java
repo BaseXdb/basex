@@ -101,8 +101,8 @@ public final class Bln extends Item {
   }
 
   @Override
-  public boolean eq(final Item it, final Collation coll, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
+  public boolean eq(final Item it, final Collation coll, final StaticContext sc, final InputInfo ii)
+      throws QueryException {
     return value == (it.type == type ? it.bool(ii) : parse(it.string(ii), ii));
   }
 
@@ -138,6 +138,6 @@ public final class Bln extends Item {
     final byte[] v = Token.trim(value);
     if(Token.eq(v, Token.TRUE) || Token.eq(v, Token.ONE)) return true;
     if(Token.eq(v, Token.FALSE) || Token.eq(v, Token.ZERO)) return false;
-    throw funCastError(ii, AtomType.B64, v);
+    throw funCastError(ii, AtomType.BLN, v);
   }
 }

@@ -607,8 +607,7 @@ public class FnHttpTest extends HTTPTest {
     // set content encoded in CP1251
     final String test = "\u0442\u0435\u0441\u0442";
     conn.content = Charset.forName("CP1251").encode(test).array();
-    final Iter i = new HttpResponse(null, ctx.options).getResponse(
-        conn, Bln.FALSE.string(), null);
+    final Iter i = new HttpResponse(null, ctx.options).getResponse(conn, true, null);
     // compare results
     assertEquals(test, string(i.get(1).string(null)));
   }
@@ -651,8 +650,7 @@ public class FnHttpTest extends HTTPTest {
         + "--boundary42" + CRLF + "Content-Type: text/x-whatever" + CRLF + CRLF
         + ".... fanciest formatted version of same  "
         + "message  goes  here" + CRLF + "..."  + CRLF + "--boundary42--");
-    final ValueIter expIter = new HttpResponse(null, ctx.options).
-        getResponse(conn, Bln.FALSE.string(), null);
+    final ValueIter expIter = new HttpResponse(null, ctx.options).getResponse(conn, true, null);
 
     // Construct expected result
     final ValueBuilder resultIter = new ValueBuilder();
@@ -743,8 +741,7 @@ public class FnHttpTest extends HTTPTest {
         +  CRLF + "--simple boundary--" + CRLF
         + "This is the epilogue.  It is also to be ignored.");
     // Get response as sequence of XQuery items
-    final ValueIter expIter = new HttpResponse(null, ctx.options).
-        getResponse(conn, Bln.FALSE.string(), null);
+    final ValueIter expIter = new HttpResponse(null, ctx.options).getResponse(conn, true, null);
 
     // Construct expected result
     final ValueBuilder resultIter = new ValueBuilder();
