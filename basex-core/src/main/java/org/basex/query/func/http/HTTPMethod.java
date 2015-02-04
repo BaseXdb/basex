@@ -1,7 +1,7 @@
-package org.basex.http;
+package org.basex.query.func.http;
 
 /**
- * This enumeration contains the supported HTTP methods.
+ * This enumeration contains basic HTTP methods.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen

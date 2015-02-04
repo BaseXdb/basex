@@ -71,11 +71,6 @@ public final class ArrayOutput extends PrintOutput {
     return s == 0 ? EMPTY : s == bffr.length ? bffr : Arrays.copyOf(bffr, s);
   }
 
-  @Override
-  public boolean finished() {
-    return size == max;
-  }
-
   /**
    * Returns the internal buffer.
    * @return buffer

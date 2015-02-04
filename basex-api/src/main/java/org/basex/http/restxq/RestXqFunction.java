@@ -22,6 +22,7 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.expr.path.Test.Kind;
 import org.basex.query.func.*;
+import org.basex.query.func.http.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;

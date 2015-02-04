@@ -83,7 +83,8 @@ public abstract class Serializer implements Closeable {
         throw SERENCODING_X.getIO(enc);
       }
     }
-    po.setLimit(so.get(SerializerOptions.LIMIT));
+    final int limit = so.get(SerializerOptions.LIMIT);
+    if(limit != -1) po.setLimit(so.get(SerializerOptions.LIMIT));
 
     // no parameters given: serialize adaptively
     switch(so.get(SerializerOptions.METHOD)) {

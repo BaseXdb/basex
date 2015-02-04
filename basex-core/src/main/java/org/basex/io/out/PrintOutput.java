@@ -54,12 +54,11 @@ public class PrintOutput extends OutputStream {
 
   /**
    * Sets the maximum number of bytes to be written.
-   * If the number is negative, all bytes will be written.
    * Note that the limit might break unicode characters.
    * @param limit maximum
    */
   public final void setLimit(final int limit) {
-    max = limit < 0 ? Long.MAX_VALUE : limit;
+    max = limit;
   }
 
   @Override
@@ -154,8 +153,8 @@ public class PrintOutput extends OutputStream {
    * interrupt streaming at some point.
    * @return result of check
    */
-  public boolean finished() {
-    return false;
+  public final boolean finished() {
+    return size == max;
   }
 
   /**

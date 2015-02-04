@@ -1,6 +1,6 @@
 package org.basex.performance;
 
-import static org.basex.http.HTTPMethod.*;
+import static org.basex.query.func.http.HTTPMethod.*;
 import static org.junit.Assert.*;
 
 import java.io.*;
@@ -11,8 +11,8 @@ import org.basex.*;
 import org.basex.api.client.*;
 import org.basex.core.cmd.*;
 import org.basex.core.users.*;
-import org.basex.http.*;
 import org.basex.io.*;
+import org.basex.query.func.http.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 import org.junit.*;

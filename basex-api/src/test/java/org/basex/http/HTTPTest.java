@@ -1,7 +1,7 @@
 package org.basex.http;
 
 import static org.basex.core.users.UserText.*;
-import static org.basex.http.HTTPMethod.*;
+import static org.basex.query.func.http.HTTPMethod.*;
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 
@@ -15,6 +15,7 @@ import org.basex.core.StaticOptions.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
+import org.basex.query.func.http.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 import org.junit.*;

@@ -59,7 +59,7 @@ public final class HttpClient {
     try {
       if(request == null) {
         if(href == null || href.length == 0) throw HC_PARAMS.get(info);
-        final HttpURLConnection conn = openConnection(string(href));
+        final HttpURLConnection conn = connect(string(href), null);
         try {
           return new HttpResponse(info, options).getResponse(conn, Bln.FALSE.string(), null);
         } finally {
@@ -71,20 +71,20 @@ public final class HttpClient {
       final byte[] dest = href == null ? r.attrs.get(HREF) : href;
       if(dest == null) throw HC_URL.get(info);
 
-      final HttpURLConnection conn = openConnection(string(dest));
+      HttpURLConnection conn = null;
       try {
-        setConnectionProps(conn, r);
-        setRequestHeaders(conn, r);
+        conn = connect(string(dest), r);
+        authenticate(conn, r);
 
         if(r.bodyContent.size() != 0 || !r.parts.isEmpty()) {
           setContentType(conn, r);
           setRequestContent(conn.getOutputStream(), r);
         }
-        final byte[] mt = r.attrs.get(OVERRIDE_MEDIA_TYPE);
-        return new HttpResponse(info, options).getResponse(conn, r.attrs.get(STATUS_ONLY),
-            mt == null ? null : string(mt));
+
+        final byte[] m = r.attrs.get(OVERRIDE_MEDIA_TYPE), s = r.attrs.get(STATUS_ONLY);
+        return new HttpResponse(info, options).getResponse(conn, s, m == null ? null : string(m));
       } finally {
-        conn.disconnect();
+        if(conn != null) conn.disconnect();
       }
     } catch(final IOException ex) {
       throw HC_ERROR_X.get(info, ex);
@@ -94,16 +94,54 @@ public final class HttpClient {
   /**
    * Opens an HTTP connection.
    * @param url HTTP URL to open connection to
-   * @return HHTP connection
+   * @param r request
+   * @return HTTP connection
    * @throws QueryException query exception
    * @throws IOException I/O Exception
    * @throws MalformedURLException incorrect url
    */
-  private HttpURLConnection openConnection(final String url) throws QueryException, IOException {
-    final URLConnection conn = new IOUrl(url).connection();
-    if(conn instanceof HttpURLConnection) return (HttpURLConnection) conn;
-    throw HC_ERROR_X.get(info, "Invalid URL: " + url);
+  private HttpURLConnection connect(final String url, final HttpRequest r)
+      throws QueryException, IOException {
+
+    final HttpURLConnection conn = connection(url, r);
+    if(r != null) {
+      // HTTP Basic Authentication
+      final byte[] sendAuth = r.attrs.get(SEND_AUTHORIZATION);
+      if(sendAuth != null && Bln.parse(sendAuth, info)) {
+        conn.setRequestProperty(AUTHORIZATION,
+        encodeCredentials(string(r.attrs.get(USERNAME)), string(r.attrs.get(PASSWORD))));
+      }
+    }
+
+    return conn;
   }
+
+  /**
+   * Returns a new HTTP connection.
+   * @param url HTTP URL to open connection to
+   * @param r request
+   * @return HTTP connection
+   * @throws QueryException query exception
+   * @throws IOException I/O Exception
+   * @throws MalformedURLException incorrect url
+   */
+  private HttpURLConnection connection(final String url, final HttpRequest r)
+      throws QueryException, IOException {
+
+    final URLConnection conn = new IOUrl(url).connection();
+    if(!(conn instanceof HttpURLConnection)) throw HC_ERROR_X.get(info, "Invalid URL: " + url);
+
+    final HttpURLConnection uc = (HttpURLConnection) conn;
+    if(r != null) {
+      setConnectionProps(uc, r);
+
+      for(final byte[] headers : r.headers) {
+        conn.addRequestProperty(string(headers), string(r.headers.get(headers)));
+      }
+    }
+    return uc;
+  }
+
 
   /**
    * Sets the connection properties.
@@ -115,14 +153,17 @@ public final class HttpClient {
   private void setConnectionProps(final HttpURLConnection conn, final HttpRequest r)
       throws ProtocolException, QueryException {
 
-    conn.setDoOutput(true);
     final String method = string(r.attrs.get(METHOD)).toUpperCase(Locale.ENGLISH);
+    final HTTPMethod mth = HTTPMethod.get(method);
+    if(mth == HTTPMethod.POST || mth == HTTPMethod.PUT) conn.setDoOutput(true);
+
     try {
       // set field via reflection to circumvent string check
       final Field f = conn.getClass().getSuperclass().getDeclaredField("method");
       f.setAccessible(true);
       f.set(conn, method);
     } catch(final Throwable th) {
+      Util.debug(th);
       conn.setRequestMethod(method);
     }
 
@@ -162,7 +203,7 @@ public final class HttpClient {
    * @param r request data
    * @throws QueryException query exception
    */
-  private void setRequestHeaders(final HttpURLConnection conn, final HttpRequest r)
+  private void authenticate(final HttpURLConnection conn, final HttpRequest r)
       throws QueryException {
 
     for(final byte[] headers : r.headers)
