@@ -4,8 +4,8 @@
  * Works with BaseX 7.0 and later
  *
  * Documentation: http://docs.basex.org/wiki/Clients
- * 
- * (C) BaseX Team 2005-14, BSD License
+ *
+ * (C) BaseX Team 2005-15, BSD License
  */
 class Session {
   // class variables.
@@ -20,15 +20,15 @@ class Session {
 
     // receive timestamp
     $ts = $this->readString();
-	// Hash container
-      if (false !== strpos($ts, ':')) {
-          // digest-auth
-          $challenge = explode(':', $ts, 2);
-          $md5 = hash("md5", hash("md5", $user . ':' . $challenge[0] . ':' . $pw) . $challenge[1]);
-      } else {
-          // Legacy: cram-md5
-          $md5 = hash("md5", hash("md5", $pw) . $ts);
-      }
+	  // Hash container
+    if (false !== strpos($ts, ':')) {
+      // digest-auth
+      $challenge = explode(':', $ts, 2);
+      $md5 = hash("md5", hash("md5", $user . ':' . $challenge[0] . ':' . $pw) . $challenge[1]);
+    } else {
+      // Legacy: cram-md5
+      $md5 = hash("md5", hash("md5", $pw) . $ts);
+    }
 
     // send username and hashed password/timestamp
     socket_write($this->socket, $user . chr(0) . $md5 . chr(0));
