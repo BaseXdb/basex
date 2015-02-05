@@ -79,6 +79,7 @@ final class CsvParser {
             if(ch == -1) break;
           } else if(ch == '"') {
             quoted = false;
+            ch = input.read();
             continue;
           }
         } else {

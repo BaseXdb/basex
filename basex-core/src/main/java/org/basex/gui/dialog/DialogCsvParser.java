@@ -26,7 +26,7 @@ import org.basex.util.list.*;
  */
 final class DialogCsvParser extends DialogParser {
   /** CSV example string. */
-  private static final String EXAMPLE = "Name,Born?_\n\"John, Adam\",1984";
+  private static final String EXAMPLE = "Name,Born?_\n\"John, Adam\\\",1984";
 
   /** Options. */
   private final CsvParserOptions copts;
