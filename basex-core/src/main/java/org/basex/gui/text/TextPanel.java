@@ -1044,7 +1044,10 @@ public class TextPanel extends BaseXPanel {
           for(String line; (line = nli.readLine()) != null;) {
             final int i = line.indexOf('=');
             if(i == -1 || line.startsWith("#")) continue;
-            REPLACE.put(line.substring(0, i), line.substring(i + 1).replace("\\n", "\n"));
+            final String key = line.substring(0, i), value = line.substring(i + 1);
+            if(REPLACE.put(key, value.replace("\\n", "\n")) != null) {
+              Util.errln(file + ": " + key + " was assigned twice");
+            }
           }
         }
       }
