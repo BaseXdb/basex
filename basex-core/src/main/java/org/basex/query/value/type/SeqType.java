@@ -312,6 +312,15 @@ public final class SeqType {
   }
 
   /**
+   * Returns a version of this sequence type that is adapted to the given {@link Occ}.
+   * @param o occurrence indicator
+   * @return sequence type
+   */
+  public SeqType withSize(final long o) {
+    return withOcc(o == 0 ? Occ.ZERO : o == 1 ? Occ.ONE : o > 1 ? Occ.ONE_MORE : Occ.ZERO_MORE);
+  }
+
+  /**
    * Matches a value against this sequence type.
    * @param val value to be checked
    * @return result of check

@@ -128,9 +128,13 @@ public abstract class Filter extends Preds {
     // determine type and number of results
     final SeqType st = root.seqType();
     final long s = root.size();
+    final boolean iter = posIterator();
     if(s == -1) {
-      seqType = SeqType.get(st.type, st.zeroOrOne() ? Occ.ZERO_ONE : Occ.ZERO_MORE);
+      // unknown input size: positional access tells if there will be at most 1 result
+      final boolean zo = last || pos != null && pos.min == pos.max;
+      seqType = st.withOcc(zo ? Occ.ZERO_ONE : Occ.ZERO_MORE);
     } else {
+      // known input size: number of results can be computed in advance
       if(pos != null) {
         size = Math.max(0, s + 1 - pos.min) - Math.max(0, s - pos.max);
       } else if(last) {
@@ -138,7 +142,7 @@ public abstract class Filter extends Preds {
       }
       // no results will remain: return empty sequence
       if(size == 0) return optPre(qc);
-      seqType = SeqType.get(st.type, size);
+      seqType = st.withSize(size);
     }
 
     // try to rewrite filter to index access
@@ -151,10 +155,9 @@ public abstract class Filter extends Preds {
     // no numeric predicates.. use simple iterator
     if(!super.has(Flag.FCS)) return copy(new IterFilter(info, root, preds));
 
-    boolean iter = false, index = false;
+    boolean index = false;
     if(preds.length == 1) {
       // pre-evaluate if root is value and if one single position() or last() function is specified
-      iter = posIterator();
       if(root.isValue()) {
         final Value v = (Value) root;
         if(last) return optPre(SubSeq.get(v, v.size() - 1, 1), qc);
