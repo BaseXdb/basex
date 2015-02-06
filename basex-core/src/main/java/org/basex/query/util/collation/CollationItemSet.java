@@ -22,10 +22,10 @@ public final class CollationItemSet implements ItemSet {
 
   /**
    * Constructor.
-   * @param cl collation
+   * @param coll collation
    */
-  public CollationItemSet(final Collation cl) {
-    coll = cl;
+  public CollationItemSet(final Collation coll) {
+    this.coll = coll;
   }
 
   @Override

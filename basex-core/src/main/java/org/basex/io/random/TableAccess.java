@@ -20,10 +20,10 @@ public abstract class TableAccess {
 
   /**
    * Constructor.
-   * @param md meta data
+   * @param meta meta data
    */
-  TableAccess(final MetaData md) {
-    meta = md;
+  TableAccess(final MetaData meta) {
+    this.meta = meta;
   }
 
   /**

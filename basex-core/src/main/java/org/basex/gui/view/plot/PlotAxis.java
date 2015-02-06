@@ -54,10 +54,10 @@ final class PlotAxis {
 
   /**
    * Constructor.
-   * @param data plot data reference
+   * @param plotData plot data reference
    */
-  PlotAxis(final PlotData data) {
-    plotData = data;
+  PlotAxis(final PlotData plotData) {
+    this.plotData = plotData;
   }
 
   /**

@@ -13,7 +13,7 @@ import org.basex.query.*;
  */
 abstract class CmdParser {
   /** Input string. */
-  final String string;
+  final String input;
   /** Context. */
   final Context ctx;
 
@@ -26,12 +26,12 @@ abstract class CmdParser {
 
   /**
    * Constructor.
-   * @param input input
-   * @param context context
+   * @param input input string
+   * @param ctx database context
    */
-  CmdParser(final String input, final Context context) {
-    ctx = context;
-    string = input;
+  CmdParser(final String input, final Context ctx) {
+    this.ctx = ctx;
+    this.input = input;
   }
 
   /**

@@ -19,13 +19,13 @@ final class RestXqParam {
 
   /**
    * Constructor.
-   * @param nm variable name
-   * @param param name of parameter
-   * @param def default value
+   * @param name variable name
+   * @param key name of parameter
+   * @param value default value
    */
-  RestXqParam(final QNm nm, final String param, final Value def) {
-    name = nm;
-    key = param;
-    value = def;
+  RestXqParam(final QNm name, final String key, final Value value) {
+    this.name = name;
+    this.key = key;
+    this.value = value;
   }
 }

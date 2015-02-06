@@ -38,10 +38,10 @@ public final class Language implements Comparable<Language> {
 
   /**
    * Private Constructor.
-   * @param loc locale
+   * @param locale locale
    */
-  private Language(final Locale loc) {
-    locale = loc;
+  private Language(final Locale locale) {
+    this.locale = locale;
   }
 
   /**

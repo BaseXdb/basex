@@ -13,7 +13,7 @@ import org.basex.util.list.*;
  */
 public class BufferInput extends InputStream {
   /** Byte buffer. */
-  final byte[] buffer;
+  final byte[] array;
   /** Current buffer position. */
   int bpos;
   /** Current buffer size. */
@@ -55,7 +55,7 @@ public class BufferInput extends InputStream {
    * @param bs buffer size
    */
   public BufferInput(final InputStream is, final int bs) {
-    buffer = new byte[bs];
+    array = new byte[bs];
     length = -1;
     in = is;
   }
@@ -65,7 +65,7 @@ public class BufferInput extends InputStream {
    * @param array array input
    */
   BufferInput(final byte[] array) {
-    buffer = array;
+    this.array = array;
     bsize = array.length;
     length = bsize;
     in = null;
@@ -98,8 +98,8 @@ public class BufferInput extends InputStream {
    * @see InputStream#read()
    */
   int readByte() throws IOException {
-    final int blen = buffer.length;
-    final byte[] buf = buffer;
+    final int blen = array.length;
+    final byte[] buf = array;
     if(bpos >= bsize) {
       read += bsize;
       if(bsize == blen) {

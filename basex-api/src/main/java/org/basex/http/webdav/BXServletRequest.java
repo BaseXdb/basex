@@ -228,43 +228,43 @@ final class BXServletRequest extends AbstractRequest {
  */
 class FileItemWrapper implements com.bradmcevoy.http.FileItem {
   /** Wrapped file item. */
-  private final FileItem wrapped;
+  private final FileItem file;
   /** File name. */
   private final String name;
 
   /**
    * Strip path information provided by IE.
-   * @param s string
+   * @param string string
    * @return stripped string
    */
-  private static String fixIEFileName(final String s) {
-    final int pos = s.lastIndexOf('\\');
-    return pos < 0 ? s : s.substring(pos + 1);
+  private static String fixIEFileName(final String string) {
+    final int pos = string.lastIndexOf('\\');
+    return pos < 0 ? string : string.substring(pos + 1);
   }
 
   /**
    * Constructor.
-   * @param f file item
+   * @param file file item
    */
-  FileItemWrapper(final FileItem f) {
-    wrapped = f;
-    name = fixIEFileName(wrapped.getName());
+  FileItemWrapper(final FileItem file) {
+    this.file = file;
+    name = fixIEFileName(file.getName());
   }
 
   @Override
   public String getContentType() {
-    return wrapped.getContentType();
+    return file.getContentType();
   }
 
   @Override
   public String getFieldName() {
-    return wrapped.getFieldName();
+    return file.getFieldName();
   }
 
   @Override
   public InputStream getInputStream() {
     try {
-      return wrapped.getInputStream();
+      return file.getInputStream();
     } catch(final IOException ex) {
       throw new RuntimeException(ex);
     }
@@ -273,7 +273,7 @@ class FileItemWrapper implements com.bradmcevoy.http.FileItem {
   @Override
   public OutputStream getOutputStream() {
     try {
-      return wrapped.getOutputStream();
+      return file.getOutputStream();
     } catch(final IOException ex) {
       throw new RuntimeException(ex);
     }
@@ -286,6 +286,6 @@ class FileItemWrapper implements com.bradmcevoy.http.FileItem {
 
   @Override
   public long getSize() {
-    return wrapped.getSize();
+    return file.getSize();
   }
 }

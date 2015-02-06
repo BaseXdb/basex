@@ -21,10 +21,10 @@ public final class DataOutput extends OutputStream {
 
   /**
    * Constructor, specifying an output stream.
-   * @param out output stream to operate on
+   * @param os output stream to operate on
    */
-  public DataOutput(final OutputStream out) {
-    os = out;
+  public DataOutput(final OutputStream os) {
+    this.os = os;
   }
 
   /**

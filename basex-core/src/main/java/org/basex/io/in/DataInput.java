@@ -40,9 +40,9 @@ public final class DataInput extends BufferInput {
   public byte[] readToken() throws IOException {
     final int l = readNum();
     if(l == 0) return Token.EMPTY;
-    final byte[] array = new byte[l];
-    for(int i = 0; i < l; ++i) array[i] = (byte) read();
-    return array;
+    final byte[] tmp = new byte[l];
+    for(int i = 0; i < l; ++i) tmp[i] = (byte) read();
+    return tmp;
   }
 
   /**
@@ -60,10 +60,10 @@ public final class DataInput extends BufferInput {
    * @throws IOException I/O Exception
    */
   public IntList readDiffs() throws IOException {
-    final int[] array = new int[readNum()];
-    final int al = array.length;
-    for(int a = 0; a < al; ++a) array[a] = (a == 0 ? 0 : array[a - 1]) + readNum();
-    return new IntList(array);
+    final int[] tmp = new int[readNum()];
+    final int al = tmp.length;
+    for(int a = 0; a < al; ++a) tmp[a] = (a == 0 ? 0 : tmp[a - 1]) + readNum();
+    return new IntList(tmp);
   }
 
   /**
@@ -82,9 +82,9 @@ public final class DataInput extends BufferInput {
    * @throws IOException I/O Exception
    */
   private int[] readNums(final int s) throws IOException {
-    final int[] array = new int[s];
-    for(int a = 0; a < s; ++a) array[a] = readNum();
-    return array;
+    final int[] tmp = new int[s];
+    for(int a = 0; a < s; ++a) tmp[a] = readNum();
+    return tmp;
   }
 
   /**
@@ -94,9 +94,9 @@ public final class DataInput extends BufferInput {
    */
   public byte[][] readTokens() throws IOException {
     final int l = readNum();
-    final byte[][] array = new byte[l][];
-    for(int i = 0; i < l; ++i) array[i] = readToken();
-    return array;
+    final byte[][] tmp = new byte[l][];
+    for(int i = 0; i < l; ++i) tmp[i] = readToken();
+    return tmp;
   }
 
   /**
@@ -126,9 +126,9 @@ public final class DataInput extends BufferInput {
    * @throws IOException I/O Exception
    */
   public long[] readLongs(final int s) throws IOException {
-    final long[] array = new long[s];
-    for(int a = 0; a < s; ++a) array[a] = read8();
-    return array;
+    final long[] tmp = new long[s];
+    for(int a = 0; a < s; ++a) tmp[a] = read8();
+    return tmp;
   }
 
   /**

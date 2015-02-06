@@ -40,18 +40,18 @@ public final class ViewNotifier {
 
   /**
    * Constructor.
-   * @param main reference to the main window
+   * @param gui reference to the main window
    */
-  public ViewNotifier(final GUI main) {
-    gui = main;
+  public ViewNotifier(final GUI gui) {
+    this.gui = gui;
   }
 
   /**
    * Adds a new view.
-   * @param v view to be added
+   * @param vw view to be added
    */
-  void add(final View v) {
-    view = Array.add(view, v);
+  void add(final View vw) {
+    view = Array.add(view, vw);
   }
 
   /**

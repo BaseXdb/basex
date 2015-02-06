@@ -29,13 +29,13 @@ final class TableContent extends BaseXBack {
 
   /**
    * Default constructor.
-   * @param d table data
-   * @param scr scrollbar reference
+   * @param tdata table data
+   * @param scroll scrollbar reference
    */
-  TableContent(final TableData d, final BaseXScrollBar scr) {
-    scroll = scr;
-    tdata = d;
-    gui = scr.gui;
+  TableContent(final TableData tdata, final BaseXScrollBar scroll) {
+    this.scroll = scroll;
+    this.tdata = tdata;
+    gui = scroll.gui;
     layout(new BorderLayout());
     setOpaque(false);
     add(scroll, BorderLayout.EAST);
@@ -55,7 +55,7 @@ final class TableContent extends BaseXBack {
     final int h = getHeight();
     final int fsz = GUIConstants.fontSize;
 
-    final Context context = tdata.context;
+    final Context context = tdata.ctx;
     final Data data = context.data();
     final int focus = gui.context.focused;
     final int rfocus = tdata.getRoot(data, focus);

@@ -26,7 +26,7 @@ final class TableData {
   private static final byte[] MAXNUM = token(Double.MAX_VALUE);
 
   /** Database context. */
-  final Context context;
+  final Context ctx;
   /** Root nodes. */
   TokenList roots;
   /** Rows of the main table. */
@@ -74,11 +74,11 @@ final class TableData {
   /**
    * Initializes the table data.
    * @param ctx database context
-   * @param opts gui options
+   * @param gopts gui options
    */
-  TableData(final Context ctx, final GUIOptions opts) {
-    context = ctx;
-    gopts = opts;
+  TableData(final Context ctx, final GUIOptions gopts) {
+    this.ctx = ctx;
+    this.gopts = gopts;
   }
 
   /**
@@ -131,7 +131,7 @@ final class TableData {
   void context(final boolean create) {
     if(cols.length == 0) return;
 
-    final boolean rt = context.root();
+    final boolean rt = ctx.root();
     if(!create && rt && rootRows != null) {
       rows = rootRows;
       sortCol = -1;
@@ -148,7 +148,7 @@ final class TableData {
    * @param elem element flag
    */
   private void addCol(final byte[] name, final boolean elem) {
-    final Data data = context.data();
+    final Data data = ctx.data();
     final int id = (elem ? data.elemNames : data.attrNames).id(name);
     if(id == 0) return;
     final TableCol col = new TableCol();
@@ -162,9 +162,9 @@ final class TableData {
    * Creates the row list for the specified nodes.
    */
   private void createRows() {
-    final Data data = context.data();
+    final Data data = ctx.data();
     rows = new IntList();
-    for(int p : context.current().pres) {
+    for(int p : ctx.current().pres) {
       if(p >= data.meta.size) break;
       final int s = p + data.size(p, data.kind(p));
       // find first root element name
@@ -188,7 +188,7 @@ final class TableData {
   private void calcWidths() {
     if(cols.length == 0) return;
 
-    final Data data = context.data();
+    final Data data = ctx.data();
     final int cs = cols.length;
 
     // scan first MAXROWS root elements
@@ -241,7 +241,7 @@ final class TableData {
     final int c = cols[sortCol].id;
     final boolean e = cols[sortCol].elem;
 
-    final Data data = context.data();
+    final Data data = ctx.data();
     final Names index = e ? data.elemNames : data.attrNames;
     final StatsType type = index.stat(c).type;
     final boolean num = type == StatsType.INTEGER || type == StatsType.DOUBLE;
@@ -312,7 +312,7 @@ final class TableData {
    * @return query
    */
   String find() {
-    final Data data = context.data();
+    final Data data = ctx.data();
     final boolean r = rows == rootRows;
     final StringList filters = new StringList();
     final TokenList names = new TokenList();

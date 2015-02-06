@@ -30,10 +30,10 @@ public final class Levenshtein {
 
   /**
    * Constructor.
-   * @param err allowed errors
+   * @param error allowed errors
    */
-  public Levenshtein(final int err) {
-    error = err;
+  public Levenshtein(final int error) {
+    this.error = error;
   }
 
   /**

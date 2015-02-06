@@ -20,10 +20,10 @@ public class TokenParser {
 
   /**
    * Constructor.
-   * @param tok token
+   * @param token token
    */
-  public TokenParser(final byte[] tok) {
-    token = tok;
+  public TokenParser(final byte[] token) {
+    this.token = token;
     size = token.length;
   }
 

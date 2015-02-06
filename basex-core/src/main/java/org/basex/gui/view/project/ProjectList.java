@@ -64,10 +64,10 @@ final class ProjectList extends JList<String> {
 
   /**
    * Constructor.
-   * @param view project view
+   * @param project project view
    */
-  ProjectList(final ProjectView view) {
-    project = view;
+  ProjectList(final ProjectView project) {
+    this.project = project;
     setBorder(BaseXLayout.border(4, 4, 4, 4));
     setCellRenderer(new CellRenderer());
     addMouseListener(new MouseAdapter() {
@@ -76,7 +76,7 @@ final class ProjectList extends JList<String> {
         if(SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) open();
       }
     });
-    new BaseXPopup(this, view.gui, commands);
+    new BaseXPopup(this, project.gui, commands);
   }
 
   /**

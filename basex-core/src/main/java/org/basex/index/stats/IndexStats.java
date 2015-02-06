@@ -28,15 +28,15 @@ public final class IndexStats {
 
   /**
    * Default constructor.
-   * @param size maximum number of index occurrences to print
+   * @param max maximum number of index occurrences to print
    */
-  public IndexStats(final int size) {
-    max = size;
-    occMin = new int[size];
-    occMax = new int[size];
-    txtMin = new byte[size][];
-    txtMax = new byte[size][];
-    for(int t = 0; t < size; ++t) {
+  public IndexStats(final int max) {
+    this.max = max;
+    occMin = new int[max];
+    occMax = new int[max];
+    txtMin = new byte[max][];
+    txtMax = new byte[max][];
+    for(int t = 0; t < max; ++t) {
       txtMin[t] = Token.EMPTY;
       txtMax[t] = Token.EMPTY;
       occMin[t] = Integer.MAX_VALUE;

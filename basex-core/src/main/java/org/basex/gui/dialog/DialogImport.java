@@ -55,11 +55,11 @@ final class DialogImport extends BaseXBack {
    * Constructor.
    * @param dial dialog reference
    * @param panel feature panel
-   * @param parse parsing dialog
+   * @param parsing parsing dialog
    */
-  DialogImport(final BaseXDialog dial, final BaseXBack panel, final DialogParsing parse) {
+  DialogImport(final BaseXDialog dial, final BaseXBack panel, final DialogParsing parsing) {
     gui = dial.gui;
-    parsing = parse;
+    this.parsing = parsing;
 
     layout(new TableLayout(10, 1));
     border(8);

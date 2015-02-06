@@ -97,11 +97,11 @@ public final class ServerStressTest extends SandboxTest {
 
     /**
      * Constructor.
-     * @param r number of runs
+     * @param runs number of runs
      * @throws Exception exception
      */
-    public Client(final int r) throws Exception {
-      runs = r;
+    public Client(final int runs) throws Exception {
+      this.runs = runs;
       session = createClient();
     }
 

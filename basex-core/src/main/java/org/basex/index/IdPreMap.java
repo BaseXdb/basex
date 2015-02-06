@@ -66,11 +66,11 @@ public class IdPreMap {
 
   /**
    * Write the map to the specified file.
-   * @param f file to write to
+   * @param file file to write to
    * @throws IOException I/O error while writing to the file
    */
-  public void write(final IOFile f) throws IOException {
-    try(final DataOutput out = new DataOutput(f)) {
+  public void write(final IOFile file) throws IOException {
+    try(final DataOutput out = new DataOutput(file)) {
       out.writeNum(baseid);
       out.writeNum(rows);
       out.writeNums(pres);

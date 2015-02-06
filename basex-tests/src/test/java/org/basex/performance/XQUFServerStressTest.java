@@ -120,14 +120,14 @@ public final class XQUFServerStressTest extends SandboxTest {
 
     /**
      * Default constructor.
-     * @param qu query string
-     * @param r number of runs
+     * @param query query string
+     * @param runs number of runs
      * @throws Exception exception
      */
-    Client(final String qu, final int r) throws Exception {
+    Client(final String query, final int runs) throws Exception {
       session = createClient();
-      query = qu;
-      runs = r;
+      this.query = query;
+      this.runs = runs;
     }
 
     @Override

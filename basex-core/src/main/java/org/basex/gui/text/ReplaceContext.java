@@ -20,10 +20,10 @@ final class ReplaceContext {
 
   /**
    * Constructor.
-   * @param rplc replacement text
+   * @param replace replacement text
    */
-  ReplaceContext(final String rplc) {
-    replace = rplc;
+  ReplaceContext(final String replace) {
+    this.replace = replace;
   }
 
   /**

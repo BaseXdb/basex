@@ -38,12 +38,12 @@ public enum HTTPCode {
 
   /**
    * Constructor.
-   * @param c status code
-   * @param d description
+   * @param code status code
+   * @param desc description
    */
-  HTTPCode(final int c, final String d) {
-    code = c;
-    desc = d;
+  HTTPCode(final int code, final String desc) {
+    this.code = code;
+    this.desc = desc;
   }
 
   /**

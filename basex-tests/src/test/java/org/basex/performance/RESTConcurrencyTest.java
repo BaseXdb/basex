@@ -75,7 +75,6 @@ public final class RESTConcurrencyTest extends SandboxTest {
     final Get fastAction = new Get(fastQuery);
 
     final ExecutorService exec = Executors.newFixedThreadPool(2);
-
     exec.submit(slowAction);
     Performance.sleep(TIMEOUT); // delay in order to be sure that the reader has started
     final Future<HTTPResponse> fast = exec.submit(fastAction);

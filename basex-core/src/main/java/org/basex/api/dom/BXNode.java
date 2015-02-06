@@ -32,10 +32,10 @@ public abstract class BXNode implements Node {
 
   /**
    * Constructor.
-   * @param node node reference
+   * @param nd node reference
    */
-  BXNode(final ANode node) {
-    nd = node;
+  BXNode(final ANode nd) {
+    this.nd = nd;
   }
 
   /**

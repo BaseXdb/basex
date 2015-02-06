@@ -21,10 +21,10 @@ public final class DecodingInput extends InputStream {
 
   /**
    * Constructor.
-   * @param in buffer input to be wrapped
+   * @param input buffer input to be wrapped
    */
-  public DecodingInput(final InputStream in) {
-    input = in;
+  public DecodingInput(final InputStream input) {
+    this.input = input;
   }
 
   @Override

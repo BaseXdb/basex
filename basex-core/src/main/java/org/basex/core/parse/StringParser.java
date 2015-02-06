@@ -47,7 +47,7 @@ final class StringParser extends CmdParser {
 
   @Override
   protected void parse(final ArrayList<Command> cmds) throws QueryException {
-    final Scanner sc = new Scanner(string).useDelimiter(single ? "\0" : "\r\n?|\n");
+    final Scanner sc = new Scanner(input).useDelimiter(single ? "\0" : "\r\n?|\n");
     while(sc.hasNext()) {
       final String line = sc.next().trim();
       if(line.isEmpty() || line.startsWith("#")) continue;
@@ -372,13 +372,13 @@ final class StringParser extends CmdParser {
 
   /**
    * Parses and returns a string result.
-   * @param input input string or {@code null} if invalid
+   * @param string input string or {@code null} if invalid
    * @param cmd referring command; if specified, the result must not be empty
    * @return string result or {@code null}
    * @throws QueryException query exception
    */
-  private String finish(final StringBuilder input, final Cmd cmd) throws QueryException {
-    if(input != null && input.length() != 0) return input.toString();
+  private String finish(final StringBuilder string, final Cmd cmd) throws QueryException {
+    if(string != null && string.length() != 0) return string.toString();
     if(cmd != null) throw help(null, cmd);
     return null;
   }

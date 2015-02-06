@@ -28,10 +28,10 @@ final class RestXqWadl {
 
   /**
    * Constructor.
-   * @param hc HTTP context
+   * @param http HTTP context
    */
-  RestXqWadl(final HTTPContext hc) {
-    http = hc;
+  RestXqWadl(final HTTPContext http) {
+    this.http = http;
   }
 
   /**

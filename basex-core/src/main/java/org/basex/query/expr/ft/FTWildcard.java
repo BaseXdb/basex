@@ -27,10 +27,10 @@ public final class FTWildcard {
 
   /**
    * Constructor.
-   * @param qu query
+   * @param query query
    */
-  public FTWildcard(final byte[] qu) {
-    query = qu;
+  public FTWildcard(final byte[] query) {
+    this.query = query;
   }
 
   /**

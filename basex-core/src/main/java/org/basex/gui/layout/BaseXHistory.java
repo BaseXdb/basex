@@ -20,12 +20,12 @@ public final class BaseXHistory {
 
   /**
    * Constructor.
-   * @param main main window
-   * @param option option
+   * @param gui main window
+   * @param history history values
    */
-  public BaseXHistory(final GUI main, final StringsOption option) {
-    history = option;
-    gui = main;
+  public BaseXHistory(final GUI gui, final StringsOption history) {
+    this.history = history;
+    this.gui = gui;
   }
 
   /**

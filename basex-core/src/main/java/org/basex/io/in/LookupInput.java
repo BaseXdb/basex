@@ -17,11 +17,11 @@ public final class LookupInput extends InputStream {
 
   /**
    * Constructor.
-   * @param in buffer input to be wrapped
+   * @param input buffer input to be wrapped
    * @throws IOException I/O exception
    */
-  public LookupInput(final InputStream in) throws IOException {
-    input = in;
+  public LookupInput(final InputStream input) throws IOException {
+    this.input = input;
     read();
   }
 

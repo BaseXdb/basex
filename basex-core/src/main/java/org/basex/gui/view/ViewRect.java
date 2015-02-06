@@ -29,16 +29,16 @@ public class ViewRect {
 
   /**
    * Simple rectangle constructor.
-   * @param xx x position
-   * @param yy y position
-   * @param ww width
-   * @param hh height
+   * @param x x position
+   * @param y y position
+   * @param w width
+   * @param h height
    */
-  protected ViewRect(final int xx, final int yy, final int ww, final int hh) {
-    x = xx;
-    y = yy;
-    w = ww;
-    h = hh;
+  protected ViewRect(final int x, final int y, final int w, final int h) {
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
   }
 
   /**

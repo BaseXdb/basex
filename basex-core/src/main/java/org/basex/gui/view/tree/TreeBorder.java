@@ -16,14 +16,14 @@ final class TreeBorder {
 
   /**
    * Stores subtree borders.
-   * @param lv level
-   * @param st start
-   * @param si size
+   * @param level level
+   * @param start start
+   * @param size size
    */
-  TreeBorder(final int lv, final int st, final int si) {
-    level = lv;
-    start = st;
-    size = si;
+  TreeBorder(final int level, final int start, final int size) {
+    this.level = level;
+    this.start = start;
+    this.size = size;
   }
 
   /**

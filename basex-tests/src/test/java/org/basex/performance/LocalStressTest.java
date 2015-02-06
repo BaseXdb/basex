@@ -9,8 +9,7 @@ import org.basex.util.*;
 import org.junit.Test;
 
 /**
- * This class performs a local stress tests with a specified
- * number of threads and queries.
+ * This class performs a local stress tests with a specified number of threads and queries.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
@@ -24,7 +23,7 @@ public final class LocalStressTest extends SandboxTest {
   private static final int MAX = 1000;
 
   /** Random number generator. */
-  static final Random RND = new Random();
+  static final Random RND = new Random(123);
   /** Result counter. */
   static int counter;
 
@@ -92,10 +91,10 @@ public final class LocalStressTest extends SandboxTest {
 
     /**
      * Constructor.
-     * @param r number of runs
+     * @param runs number of runs
      */
-    Client(final int r) {
-      runs = r;
+    Client(final int runs) {
+      this.runs = runs;
     }
 
     @Override

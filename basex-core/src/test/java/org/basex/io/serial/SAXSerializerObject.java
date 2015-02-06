@@ -25,12 +25,12 @@ class SAXSerializerObject {
 
   /**
    * Empty constructor, specifying initial values.
-   * @param nm name
-   * @param val value
+   * @param name name
+   * @param value value
    */
-  public SAXSerializerObject(final String nm, final long val) {
-    name = nm;
-    value = val;
+  public SAXSerializerObject(final String name, final long value) {
+    this.name = name;
+    this.value = value;
   }
 
   /**

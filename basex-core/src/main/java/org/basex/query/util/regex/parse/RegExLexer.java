@@ -41,11 +41,11 @@ public class RegExLexer implements TokenManager, RegExParserConstants {
 
   /**
    * Constructor.
-   * @param regex input string
+   * @param input input string
    * @param strip strip whitespace
    */
-  public RegExLexer(final byte[] regex, final boolean strip) {
-    input = regex;
+  public RegExLexer(final byte[] input, final boolean strip) {
+    this.input = input;
     IntList ls = null;
     final int il = input.length;
     for(int i = 0; i < il; i++) {

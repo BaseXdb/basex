@@ -20,48 +20,48 @@ public class BuilderSerializer extends Serializer {
   /** Namespace cache. */
   private final Atts nsp = new Atts();
   /** The builder. */
-  private final Builder build;
+  private final Builder builder;
 
   /**
    * Constructor taking a Builder.
    * @param builder builder to be used
    */
   public BuilderSerializer(final Builder builder) {
-    build = builder;
+    this.builder = builder;
   }
 
   @Override
   protected final void text(final byte[] value, final FTPos ftp) throws IOException {
-    build.text(value);
+    builder.text(value);
   }
 
   @Override
   protected final void pi(final byte[] name, final byte[] value) throws IOException {
-    build.pi(concat(name, SPACE, value));
+    builder.pi(concat(name, SPACE, value));
   }
 
   @Override
   protected final void finishOpen() throws IOException {
-    build.openElem(elem, atts, nsp);
+    builder.openElem(elem, atts, nsp);
     atts.clear();
     nsp.clear();
   }
 
   @Override
   protected void finishEmpty() throws IOException {
-    build.emptyElem(elem, atts, nsp);
+    builder.emptyElem(elem, atts, nsp);
     atts.clear();
     nsp.clear();
   }
 
   @Override
   protected void finishClose() throws IOException {
-    build.closeElem();
+    builder.closeElem();
   }
 
   @Override
   protected final void comment(final byte[] value) throws IOException {
-    build.comment(value);
+    builder.comment(value);
   }
 
   @Override
@@ -81,11 +81,11 @@ public class BuilderSerializer extends Serializer {
 
   @Override
   protected void openDoc(final byte[] name) throws IOException {
-    build.openDoc(name);
+    builder.openDoc(name);
   }
 
   @Override
   protected final void closeDoc() throws IOException {
-    build.closeDoc();
+    builder.closeDoc();
   }
 }

@@ -28,16 +28,16 @@ public abstract class TreeNode extends DefaultMutableTreeNode implements TreeWil
 
   /**
    * Constructor.
-   * @param nm displayed node name
-   * @param pth folder path
-   * @param bxt tree reference
-   * @param d data reference
+   * @param name displayed node name
+   * @param path folder path
+   * @param text tree reference
+   * @param data data reference
    */
-  TreeNode(final byte[] nm, final byte[] pth, final BaseXTree bxt, final Data d) {
-    name = nm;
-    path = pth;
-    tree = bxt;
-    data = d;
+  TreeNode(final byte[] name, final byte[] path, final BaseXTree text, final Data data) {
+    this.name = name;
+    this.path = path;
+    this.tree = text;
+    this.data = data;
     tree.addTreeWillExpandListener(this);
   }
 

@@ -37,8 +37,6 @@ public final class ReplaceInPlaceTest extends SandboxTest {
         "<A>x.xxxxxxxxxxxxxxxxxx</A>" +
         "<A>x.xxxxxxxxxxxxxxxxxx</A></X>").execute(context);
 
-    //final long len1 = CONTEXT.data().meta.dbfile(DataText.DATATXT).length();
-
     // replace texts with random doubles
     final Random rnd = new Random();
     for(int i = 0; i < NQUERIES; i++) {
@@ -49,9 +47,6 @@ public final class ReplaceInPlaceTest extends SandboxTest {
 
     // perform final, flushed replacement
     new Flush().execute(context);
-
-    //final long len2 = CONTEXT.data().meta.dbfile(DataText.DATATXT).length();
-    //assertEquals(len1, len2);
 
     // Drop database
     new DropDB(NAME).execute(context);

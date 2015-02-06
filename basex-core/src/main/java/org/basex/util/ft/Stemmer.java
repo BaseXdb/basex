@@ -43,10 +43,10 @@ public abstract class Stemmer extends LanguageImpl {
 
   /**
    * Constructor.
-   * @param ft full-text iterator.
+   * @param iter full-text iterator.
    */
-  Stemmer(final FTIterator ft) {
-    iter = ft;
+  Stemmer(final FTIterator iter) {
+    this.iter = iter;
   }
 
   /**

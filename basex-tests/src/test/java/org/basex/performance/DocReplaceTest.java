@@ -29,12 +29,12 @@ public final class DocReplaceTest extends SandboxTest {
     // create test database
     new CreateDB(NAME).execute(context);
 
-    // replace nodes
+    // add documents
     for(int i = 0; i < NQUERIES; i++) {
       new Add(i + IO.XMLSUFFIX, "<a/>").execute(context);
     }
 
-    // replace nodes with same content
+    // replace documents with same content
     for(int i = 0; i < NQUERIES; i++) {
       new Replace(i + IO.XMLSUFFIX, "<a/>").execute(context);
     }

@@ -21,10 +21,10 @@ public abstract class JsonConverter {
 
   /**
    * Constructor.
-   * @param opts json options
+   * @param jopts json options
    */
-  JsonConverter(final JsonParserOptions opts) {
-    jopts = opts;
+  JsonConverter(final JsonParserOptions jopts) {
+    this.jopts = jopts;
   }
 
   /**

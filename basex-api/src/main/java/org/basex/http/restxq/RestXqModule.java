@@ -27,11 +27,11 @@ final class RestXqModule {
 
   /**
    * Constructor.
-   * @param in xquery module
+   * @param file xquery file
    */
-  RestXqModule(final IOFile in) {
-    file = in;
-    time = in.timeStamp();
+  RestXqModule(final IOFile file) {
+    this.file = file;
+    time = file.timeStamp();
   }
 
   /**

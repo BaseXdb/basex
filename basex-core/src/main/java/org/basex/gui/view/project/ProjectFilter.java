@@ -48,16 +48,16 @@ final class ProjectFilter extends BaseXBack {
 
   /**
    * Constructor.
-   * @param view project view
+   * @param project project view
    */
-  public ProjectFilter(final ProjectView view) {
-    project = view;
+  public ProjectFilter(final ProjectView project) {
+    this.project = project;
 
     layout(new BorderLayout(0, 2));
-    files = new BaseXTextField(view.gui);
+    files = new BaseXTextField(project.gui);
     files.addFocusListener(project.lastfocus);
 
-    contents = new BaseXTextField(view.gui);
+    contents = new BaseXTextField(project.gui);
     contents.hint(Text.FIND_CONTENTS + Text.DOTS);
     contents.addFocusListener(project.lastfocus);
 
@@ -75,7 +75,7 @@ final class ProjectFilter extends BaseXBack {
             if(cmd == null) continue;
             for(final BaseXKeys sc : cmd.shortcuts()) {
               if(sc.is(e)) {
-                cmd.execute(view.gui);
+                cmd.execute(project.gui);
                 e.consume();
                 return;
               }

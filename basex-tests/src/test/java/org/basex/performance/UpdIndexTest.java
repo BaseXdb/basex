@@ -39,14 +39,14 @@ public final class UpdIndexTest extends SandboxTest {
   private static final int MAX = 2000 / STEPS;
 
   /** Incremental index update flag. */
-  private final boolean ixupdate;
+  private final boolean updindex;
 
   /**
    * Constructor.
-   * @param u incremental index update flag.
+   * @param updindex incremental index update flag.
    */
-  public UpdIndexTest(final boolean u) {
-    ixupdate = u;
+  public UpdIndexTest(final boolean updindex) {
+    this.updindex = updindex;
   }
 
   /**
@@ -55,7 +55,7 @@ public final class UpdIndexTest extends SandboxTest {
    */
   @Before
   public void init() throws Exception {
-    new Set(MainOptions.UPDINDEX, ixupdate).execute(context);
+    new Set(MainOptions.UPDINDEX, updindex).execute(context);
     new CreateDB(NAME, "<xml/>").execute(context);
     new Set(MainOptions.AUTOFLUSH, false).execute(context);
   }

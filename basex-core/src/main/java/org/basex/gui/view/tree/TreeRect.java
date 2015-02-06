@@ -13,12 +13,12 @@ final class TreeRect {
 
   /**
    * Initializes TreeRect.
-   * @param xx x position
-   * @param ww width
+   * @param x x position
+   * @param w width
    */
-  TreeRect(final int xx, final int ww) {
-    x = xx;
-    w = ww;
+  TreeRect(final int x, final int w) {
+    this.x = x;
+    this.w = w;
   }
 
   /**
