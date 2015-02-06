@@ -12,6 +12,7 @@ import org.basex.data.*;
 import org.basex.index.resource.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
+import org.basex.query.func.http.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -118,7 +119,7 @@ public final class List extends Command {
     table.description = RESOURCES;
     table.header.add(INPUT_PATH);
     table.header.add(TYPE);
-    table.header.add(MimeTypes.CONTENT_TYPE);
+    table.header.add(HttpText.CONTENT_TYPE);
     table.header.add(SIZE);
 
     try {

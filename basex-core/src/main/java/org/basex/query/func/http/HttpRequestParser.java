@@ -6,13 +6,14 @@ import static org.basex.util.Token.*;
 
 import java.util.*;
 
+import org.basex.core.*;
+import org.basex.io.serial.*;
 import org.basex.query.*;
-import org.basex.query.func.http.HttpRequest.*;
+import org.basex.query.func.http.HttpRequest.Part;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 
 /**
  * Request parser.
@@ -34,41 +35,46 @@ public final class HttpRequestParser {
 
   /**
    * Parses an <http:request/> element.
-   * @param request request element
+   * @param request request element (can be {@code null})
    * @param bodies content items
    * @return parsed request
    * @throws QueryException query exception
    */
-  public HttpRequest parse(final ANode request, final ValueBuilder bodies)
-      throws QueryException {
+  public HttpRequest parse(final ANode request, final ValueBuilder bodies) throws QueryException {
+    final HttpRequest req = new HttpRequest();
 
-    final HttpRequest r = new HttpRequest();
-    parseAttrs(request, r.attrs);
-    checkRequest(r);
+    if(request != null) {
+      for(final ANode attr : request.attributes()) {
+        final String key = string(attr.name());
+        final Request r = Request.get(key);
+        if(r == null) throw HC_REQ_X.get(info, "Unknown attribute: " + key);
+        req.attributes.put(r, string(attr.string()));
+      }
+      checkRequest(req);
 
-    final ANode payload = parseHdrs(request.children(), r.headers);
-    final byte[] method = lc(r.attrs.get(METHOD));
+      // it is an error if content is set for HTTP verbs which must be empty
+      final ANode payload = parseHdrs(request.children(), req.headers);
+      final String method = req.attribute(Request.METHOD);
+      if(Strings.eq(method, TRACE, DELETE) && (payload != null || bodies != null))
+        throw HC_REQ_X.get(info, "Body not expected for method " + method);
 
-    // it is an error if content is set for HTTP verbs which must be empty
-    if(eq(method, TRACE, DELETE) && (payload != null || bodies != null))
-      throw HC_REQ_X.get(info, "Body not expected for method " + string(method));
-
-    if(payload != null) {
-      final QNm pl = payload.qname();
-      // single part request
-      if(pl.eq(Q_BODY)) {
-        final Item it = bodies != null ? bodies.next() : null;
-        parseBody(payload, it, r.payloadAttrs, r.bodyContent);
-        r.isMultipart = false;
-        // multipart request
-      } else if(pl.eq(Q_MULTIPART)) {
-        parseMultipart(payload, bodies, r.payloadAttrs, r.parts);
-        r.isMultipart = true;
-      } else {
-        throw HC_REQ_X.get(info, "Unknown payload element " + payload.qname());
+      if(payload != null) {
+        final QNm pl = payload.qname();
+        // single part request
+        if(pl.eq(Q_BODY)) {
+          final Item it = bodies != null ? bodies.next() : null;
+          parseBody(payload, it, req.payloadAttrs, req.bodyContent);
+          req.isMultipart = false;
+          // multipart request
+        } else if(pl.eq(Q_MULTIPART)) {
+          parseMultipart(payload, bodies, req.payloadAttrs, req.parts);
+          req.isMultipart = true;
+        } else {
+          throw HC_REQ_X.get(info, "Unknown payload element: " + payload.qname());
+        }
       }
     }
-    return r;
+    return req;
   }
 
   /**
@@ -76,44 +82,35 @@ public final class HttpRequestParser {
    * @param element element
    * @param attrs map for parsed attributes
    */
-  private static void parseAttrs(final ANode element, final TokenMap attrs) {
-    final AxisIter elAttrs = element.attributes();
-    for(ANode attr; (attr = elAttrs.next()) != null;) {
-      attrs.put(attr.name(), attr.string());
+  private static void parseAttrs(final ANode element, final HashMap<String, String> attrs) {
+    for(final ANode attr : element.attributes()) {
+      attrs.put(string(attr.name()), string(attr.string()));
     }
   }
 
   /**
    * Parses <http:header/> children of requests and parts.
-   * @param i iterator on request/part children
+   * @param iter iterator on request/part children
    * @param hdrs map for parsed headers
    * @return body or multipart
    */
-  private static ANode parseHdrs(final AxisIter i, final TokenMap hdrs) {
-    ANode n;
-    while(true) {
-      n = i.next();
-      if(n == null) break;
-      final QNm nm = n.qname();
+  private static ANode parseHdrs(final AxisIter iter, final HashMap<String, String> hdrs) {
+    for(final ANode node : iter) {
+      final QNm nm = node.qname();
       if(nm == null) continue;
-      if(!nm.eq(Q_HEADER)) break;
+      if(!nm.eq(Q_HEADER)) return node;
 
-      final AxisIter hdrAttrs = n.attributes();
-      byte[] name = null;
-      byte[] value = null;
-
-      for(ANode attr; (attr = hdrAttrs.next()) != null;) {
+      byte[] name = null, value = null;
+      for(final ANode attr : node.attributes()) {
         final byte[] qn = attr.qname().local();
         if(eq(qn, NAME)) name = attr.string();
-        if(eq(qn, VALUE)) value = attr.string();
-
-        if(name != null && name.length != 0 && value != null && value.length != 0) {
-          hdrs.put(name, value);
-          break;
-        }
+        else if(eq(qn, VALUE)) value = attr.string();
+      }
+      if(name != null && name.length != 0 && value != null && value.length != 0) {
+        hdrs.put(string(name), string(value));
       }
     }
-    return n;
+    return null;
   }
 
   /**
@@ -124,7 +121,7 @@ public final class HttpRequestParser {
    * @param bodyContent item cache for parsed body content
    * @throws QueryException query exception
    */
-  private void parseBody(final ANode body, final Item contItem, final TokenMap attrs,
+  private void parseBody(final ANode body, final Item contItem, final HashMap<String, String> attrs,
       final ValueBuilder bodyContent) throws QueryException {
 
     parseAttrs(body, attrs);
@@ -151,10 +148,10 @@ public final class HttpRequestParser {
    * @throws QueryException query exception
    */
   private void parseMultipart(final ANode multipart, final ValueBuilder contItems,
-      final TokenMap attrs, final ArrayList<Part> parts) throws QueryException {
+      final HashMap<String, String> attrs, final ArrayList<Part> parts) throws QueryException {
 
     parseAttrs(multipart, attrs);
-    if(attrs.get(MEDIA_TYPE) == null)
+    if(attrs.get(SerializerOptions.MEDIA_TYPE.name()) == null)
       throw HC_REQ_X.get(info, "Attribute media-type of http:multipart is mandatory");
 
     final AxisIter prts = multipart.children();
@@ -171,20 +168,46 @@ public final class HttpRequestParser {
 
   /**
    * Checks consistency of attributes for <http:request/>.
-   * @param r request
+   * @param req request
    * @throws QueryException query exception
    */
-  private void checkRequest(final HttpRequest r) throws QueryException {
-    // @method denotes the HTTP verb and is mandatory
-    if(r.attrs.get(METHOD) == null) throw HC_REQ_X.get(info, "Attribute method is mandatory");
+  private void checkRequest(final HttpRequest req) throws QueryException {
+    // method denotes the HTTP verb and is mandatory
+    final String mth = req.attribute(Request.METHOD);
+    if(mth == null) throw HC_REQ_X.get(info, "Missing attribute: " + Request.METHOD);
+    req.attributes.put(Request.METHOD, mth.toUpperCase(Locale.ENGLISH));
 
     // check parameters needed in case of authorization
-    final byte[] sendAuth = r.attrs.get(SEND_AUTHORIZATION);
-    if(sendAuth != null && Boolean.parseBoolean(string(sendAuth))) {
-      final byte[] un = r.attrs.get(USERNAME);
-      final byte[] pw = r.attrs.get(PASSWORD);
-      if(un == null || pw == null) throw HC_REQ_X.get(info, "Provided credentials are invalid");
+    final String sendAuth = req.attribute(Request.SEND_AUTHORIZATION);
+    if(sendAuth != null && Strings.yes(sendAuth)) {
+      final String us = req.attribute(Request.USERNAME);
+      if(us == null) throw HC_REQ_X.get(info, "Missing attribute: " + Request.USERNAME);
+      final String pw = req.attribute(Request.PASSWORD);
+      if(pw == null) throw HC_REQ_X.get(info, "Missing attribute: " + Request.PASSWORD);
+      final String am = req.attribute(Request.AUTH_METHOD);
+      if(am != null && !am.isEmpty()) {
+        req.authMethod = StaticOptions.AUTHMETHOD.get(am);
+        if(req.authMethod == null) throw HC_REQ_X.get(info, "Invalid authentication method: " + am);
+      }
+    } else {
+      req.attributes.remove(Request.USERNAME);
+      req.attributes.remove(Request.PASSWORD);
+      req.attributes.remove(Request.AUTH_METHOD);
     }
+
+    // check other parameters
+    final String timeout = req.attribute(Request.TIMEOUT);
+    if(timeout != null && Strings.toInt(timeout) < 0)
+      throw HC_REQ_X.get(info, "Invalid timeout: " + timeout);
+
+    for(final Request r : new Request[] {
+        Request.FOLLOW_REDIRECT, Request.STATUS_ONLY, Request.SEND_AUTHORIZATION
+    }) {
+      final String s = req.attribute(r);
+      if(s != null && !Strings.eq(s, Text.TRUE, Text.FALSE))
+        throw HC_REQ_X.get(info, "Value of '" + r + "' attribute is no boolean: " + s);
+    }
+
   }
 
   /**
@@ -193,9 +216,11 @@ public final class HttpRequestParser {
    * @param bodyAttrs body attributes
    * @throws QueryException query exception
    */
-  private void checkBody(final ANode body, final TokenMap bodyAttrs) throws QueryException {
+  private void checkBody(final ANode body, final HashMap<String, String> bodyAttrs)
+      throws QueryException {
+
     // @media-type is mandatory
-    if(bodyAttrs.get(MEDIA_TYPE) == null)
+    if(bodyAttrs.get(SerializerOptions.MEDIA_TYPE.name()) == null)
       throw HC_REQ_X.get(info, "Attribute media-type of http:body is mandatory");
 
     // if src attribute is used to set the content of the body, no

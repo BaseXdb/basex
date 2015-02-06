@@ -386,7 +386,7 @@ public enum QueryError {
   /** HC0003. */
   HC_ATTR(HC, 3, "No attribute allowed beside 'src' and 'media-type'."),
   /** HC0004. */
-  HC_REQ_X(HC, 4, "Invalid request element: %."),
+  HC_REQ_X(HC, 4, "%."),
   /** HC0005. */
   HC_URL(HC, 5, "No URL supplied."),
   /** HC0006. */

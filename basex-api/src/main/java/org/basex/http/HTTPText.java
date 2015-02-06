@@ -7,13 +7,6 @@ package org.basex.http;
  * @author Christian Gruen
  */
 public interface HTTPText {
-  /** WWW-Authentication string. */
-  String WWW_AUTHENTICATE = "WWW-Authenticate";
-  /** HTTP header: Authorization. */
-  String AUTHORIZATION = "Authorization";
-  /** HTTP header: Accept. */
-  String ACCEPT = "Accept";
-
   /** HTTP String. */
   String HTTP = "HTTP";
   /** WEB-INF directory. */
@@ -23,37 +16,12 @@ public interface HTTPText {
   /** Path to web configuration file. */
   String WEBCONF = WEB_INF + "web.xml";
 
-  /** Error: no password. */
-  String INVALIDCREDS = "No username/password specified.";
+  /** Error: credentials missing. */
+  String NOUSERNAME = "No username specified.";
   /** Error: unsupported authorization method. */
-  String WHICHAUTH = "Unsupported Authorization method: %.";
+  String WHICHAUTH = "Unsupported authentication method: %.";
+  /** Error: digest authorization. */
+  String DIGESTAUTH = "Digest authentication expected.";
   /** Error message. */
   String UNEXPECTED = "Unexpected error: %";
-
-  // Digest keys
-
-  /** User name. */
-  String USERNAME = "username";
-  /** Response. */
-  String RESPONSE = "response";
-  /** Realm. */
-  String REALM = "realm";
-  /** Nonce. */
-  String NONCE = "nonce";
-  /** Client nonce. */
-  String CNONCE = "cnonce";
-  /** Nonce counter. */
-  String NC = "nc";
-  /** Algorithm. */
-  String ALGORITHM = "algorithm";
-  /** QOP. */
-  String MD5_SESS = "md5-sess";
-  /** URI. */
-  String URI = "uri";
-  /** QOP. */
-  String QOP = "qop";
-  /** Auth. */
-  String AUTH = "auth";
-  /** Auth-int. */
-  String AUTH_INT = "auth-int";
 }

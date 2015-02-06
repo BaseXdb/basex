@@ -33,7 +33,7 @@ public final class XdmInfoTest extends SandboxTest {
   @BeforeClass
   public static void start() throws Exception {
     server = createServer();
-    session = new TestSession(Text.S_LOCALHOST, 9999, UserText.ADMIN, UserText.ADMIN);
+    session = new TestSession(Text.S_LOCALHOST, DB_PORT, UserText.ADMIN, UserText.ADMIN);
   }
 
   /**

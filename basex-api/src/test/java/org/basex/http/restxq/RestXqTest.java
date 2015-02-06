@@ -1,6 +1,5 @@
 package org.basex.http.restxq;
 
-import static org.basex.core.Text.*;
 import static org.junit.Assert.*;
 
 import java.io.*;
@@ -18,8 +17,6 @@ import org.junit.*;
  * @author Christian Gruen
  */
 public abstract class RestXqTest extends HTTPTest {
-  /** Root path. */
-  private static final String ROOT = "http://" + S_LOCALHOST + ":9998/";
   /** Query header. */
   private static final String HEADER =
     "module  namespace m = 'http://basex.org/modules/restxq/test';" + Prop.NL +
@@ -33,7 +30,7 @@ public abstract class RestXqTest extends HTTPTest {
    */
   @BeforeClass
   public static void start() throws Exception {
-    init(ROOT, true);
+    init(RESTXQ_ROOT, true);
   }
 
   /**

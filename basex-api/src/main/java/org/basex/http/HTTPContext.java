@@ -2,6 +2,7 @@ package org.basex.http;
 
 import static javax.servlet.http.HttpServletResponse.*;
 import static org.basex.data.DataText.*;
+import static org.basex.query.func.http.HttpText.*;
 import static org.basex.http.HTTPText.*;
 import static org.basex.io.MimeTypes.*;
 import static org.basex.util.Token.*;
@@ -23,6 +24,7 @@ import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
+import org.basex.query.func.http.*;
 import org.basex.server.Log.LogType;
 import org.basex.server.*;
 import org.basex.util.*;
@@ -48,11 +50,11 @@ public final class HTTPContext {
   public final HTTPParams params;
 
   /** Authentication method. */
-  private final AuthMethod auth;
+  private AuthMethod auth;
   /** Serialization parameters. */
   private SerializerOptions sopts;
   /** User name. */
-  public String user;
+  public String username;
   /** Password (plain text). */
   public String password;
 
@@ -93,9 +95,14 @@ public final class HTTPContext {
 
     // adopt servlet-specific credentials or use global ones
     final StaticOptions mprop = context().soptions;
-    user = servlet.user != null ? servlet.user : mprop.get(StaticOptions.USER);
+    username = servlet.user != null ? servlet.user : mprop.get(StaticOptions.USER);
     password = servlet.pass != null ? servlet.pass : mprop.get(StaticOptions.PASSWORD);
-    auth = servlet.auth != null ? servlet.auth : mprop.get(StaticOptions.AUTHMETHOD);
+
+    // choose safest authorization method with safer method
+    final String value = req.getHeader(AUTHORIZATION);
+    final String am = value == null ? AuthMethod.BASIC.toString() : Strings.split(value, ' ', 2)[0];
+    auth = StaticOptions.AUTHMETHOD.get(am) == AuthMethod.DIGEST ? AuthMethod.DIGEST :
+      servlet.auth != null ? servlet.auth : mprop.get(StaticOptions.AUTHMETHOD);
   }
 
   /**
@@ -104,22 +111,23 @@ public final class HTTPContext {
    */
   void authorize() throws BaseXException {
     final String value = req.getHeader(AUTHORIZATION);
-    if(value != null) {
-      final String meth = Strings.split(value, ' ', 2)[0];
-      final AuthMethod am = StaticOptions.AUTHMETHOD.get(meth);
-      if(am == null) throw new BaseXException(WHICHAUTH, meth);
+    if(value == null) return;
 
-      // overwrite credentials with client data (basic or digest)
-      if(am == AuthMethod.BASIC) {
-        final String[] cred = Strings.split(org.basex.util.Base64.decode(authDetails()), ':', 2);
-        if(cred.length != 2) throw new BaseXException(INVALIDCREDS);
-        user = cred[0];
-        password = cred[1];
-      } else { // digest (other methods will be rejected)
-        final HashMap<String, String> map = digestHeaders();
-        user = map.get(USERNAME);
-        password = map.get(RESPONSE);
-      }
+    final String[] ams = Strings.split(value, ' ', 2);
+    final AuthMethod am = StaticOptions.AUTHMETHOD.get(ams[0]);
+    if(am == null) throw new BaseXException(WHICHAUTH, value);
+
+    // overwrite credentials with client data (basic or digest)
+    if(am == AuthMethod.BASIC) {
+      final String details = ams.length > 1 ? ams[1] : "";
+      final String[] cred = Strings.split(org.basex.util.Base64.decode(details), ':', 2);
+      if(cred.length != 2) throw new BaseXException(NOUSERNAME);
+      username = cred[0];
+      password = cred[1];
+    } else { // (will always be) digest
+      final EnumMap<Request, String> map = HttpClient.digestHeaders(value);
+      username = map.get(Request.USERNAME);
+      password = map.get(Request.RESPONSE);
     }
   }
 
@@ -240,10 +248,10 @@ public final class HTTPContext {
       if(code == SC_UNAUTHORIZED) {
         final StringBuilder header = new StringBuilder(auth.toString());
         if(auth == AuthMethod.DIGEST) {
-          header.append(" " + REALM + "=\"").append(Prop.NAME).append("\",");
-          header.append(QOP + "=\"" + AUTH + ',' + AUTH_INT + "\",");
-          header.append(NONCE + "=\"").append(Strings.md5(Long.toString(System.nanoTime())));
-          header.append('"');
+          header.append(" " + Request.REALM + "=\"").append(Prop.NAME).append("\",");
+          header.append(Request.QOP).append("=\"").append(AUTH).append(',');
+          header.append(AUTH_INT).append("\",").append(Request.NONCE + "=\"");
+          header.append(Strings.md5(Long.toString(System.nanoTime()))).append('"');
         }
         res.setHeader(WWW_AUTHENTICATE, header.toString());
       }
@@ -266,12 +274,12 @@ public final class HTTPContext {
 
   /**
    * Updates the credentials.
-   * @param u user
-   * @param p password
+   * @param user user
+   * @param pass password
    */
-  public void credentials(final String u, final String p) {
-    user = u;
-    password = p;
+  public void credentials(final String user, final String pass) {
+    username = user;
+    password = pass;
   }
 
   /**
@@ -282,10 +290,10 @@ public final class HTTPContext {
   public Context authenticate() throws IOException {
     final byte[] address = token(req.getRemoteAddr());
     try {
-      if(user == null || user.isEmpty()) throw new LoginException(INVALIDCREDS);
+      if(username == null || username.isEmpty()) throw new LoginException(NOUSERNAME);
 
       final Context ctx = new Context(context(), null);
-      final User us = ctx.users.get(user);
+      final User us = ctx.users.get(username);
       if(us == null) throw new LoginException();
       ctx.user(us);
 
@@ -293,58 +301,37 @@ public final class HTTPContext {
         if(password == null || !us.matches(password)) throw new LoginException();
       } else {
         // digest authentication
-        final HashMap<String, String> map = digestHeaders();
+        final EnumMap<Request, String> map = HttpClient.digestHeaders(req.getHeader(AUTHORIZATION));
+        final String am = map.get(Request.AUTH_METHOD);
+        if(!AuthMethod.DIGEST.toString().equals(am)) throw new LoginException(DIGESTAUTH);
 
         String ha1 = us.code(Algorithm.DIGEST, Code.HASH);
-        if(Strings.eq(map.get(ALGORITHM), MD5_SESS))
-          ha1 = Strings.md5(ha1 + ':' + map.get(NONCE) + ':' + map.get(CNONCE));
+        if(Strings.eq(map.get(Request.ALGORITHM), MD5_SESS))
+          ha1 = Strings.md5(ha1 + ':' + map.get(Request.NONCE) + ':' + map.get(Request.CNONCE));
 
-        String h2 = method + ':' + map.get(URI);
-        final String qop = map.get(QOP);
+        String h2 = method + ':' + map.get(Request.URI);
+        final String qop = map.get(Request.QOP);
         if(Strings.eq(qop, AUTH_INT)) h2 += ':' + Strings.md5(params.body().toString());
         final String ha2 = Strings.md5(h2);
 
-        final StringBuilder sresponse = new StringBuilder(ha1).append(':').append(map.get(NONCE));
+        final StringBuilder rsp = new StringBuilder(ha1).append(':').append(map.get(Request.NONCE));
         if(Strings.eq(qop, AUTH, AUTH_INT)) {
-          sresponse.append(':').append(map.get(NC)).append(':').append(map.get(CNONCE));
-          sresponse.append(':').append(qop);
+          rsp.append(':').append(map.get(Request.NC));
+          rsp.append(':').append(map.get(Request.CNONCE));
+          rsp.append(':').append(qop);
         }
-        sresponse.append(':').append(ha2);
-        if(!Strings.md5(sresponse.toString()).equals(password)) throw new LoginException();
+        rsp.append(':').append(ha2);
+
+        if(!Strings.md5(rsp.toString()).equals(password)) throw new LoginException();
       }
 
       context.blocker.remove(address);
       return ctx;
     } catch(final LoginException ex) {
       // delay users with wrong passwords
-      for(int d = context.blocker.delay(address); d > 0; d--) Performance.sleep(100);
+      context.blocker.delay(address);
       throw ex;
     }
-  }
-
-  /**
-   * Parsing header for digest authentication.
-   * @return values values
-   */
-  private HashMap<String, String> digestHeaders() {
-    final HashMap<String, String> values = new HashMap<>();
-    for(final String header : Strings.split(authDetails(), ',')) {
-      final String[] kv = Strings.split(header, '=', 2);
-      final String key = kv[0].trim();
-      if(!key.isEmpty() && kv.length == 2) values.put(key, Strings.delete(kv[1], '"').trim());
-    }
-    return values;
-  }
-
-  /**
-   * Returns authentication details.
-   * @return method
-   */
-  private String authDetails() {
-    final String value = req.getHeader(AUTHORIZATION);
-    if(value == null) return "";
-    final String[] parts = req.getHeader(AUTHORIZATION).split(" ", 2);
-    return parts.length == 1 ? "" : parts[1];
   }
 
   /**

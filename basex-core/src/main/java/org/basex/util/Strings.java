@@ -246,20 +246,20 @@ public final class Strings {
   }
 
   /**
-   * Checks if the specified string is "yes", "true" or "on".
+   * Checks if the specified string is "yes", "true", "on" or "1".
    * @param string string to be checked
    * @return result of check
    */
   public static boolean yes(final String string) {
-    return eqic(string, Text.YES, Text.TRUE, Text.ON);
+    return eqic(string, Text.YES, Text.TRUE, Text.ON, "1");
   }
 
   /**
-   * Checks if the specified string is "no", "false" or "off".
+   * Checks if the specified string is "no", "false", "off" or "0".
    * @param string string to be checked
    * @return result of check
    */
   public static boolean no(final String string) {
-    return eqic(string, Text.NO, Text.FALSE, Text.OFF);
+    return eqic(string, Text.NO, Text.FALSE, Text.OFF, "0");
   }
 }

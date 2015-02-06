@@ -263,7 +263,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
       try {
         hc.setDoOutput(true);
         hc.setRequestMethod(method.name());
-        hc.setRequestProperty(MimeTypes.CONTENT_TYPE, MimeTypes.APP_XML);
+        hc.setRequestProperty(HttpText.CONTENT_TYPE, MimeTypes.APP_XML);
         hc.getOutputStream().write(content);
         hc.getOutputStream().close();
 

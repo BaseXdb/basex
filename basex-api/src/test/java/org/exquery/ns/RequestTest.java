@@ -4,7 +4,6 @@ import static org.junit.Assert.*;
 
 import java.net.*;
 
-import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.util.*;
 import org.junit.*;
@@ -16,16 +15,13 @@ import org.junit.*;
  * @author Christian Gruen
  */
 public final class RequestTest extends HTTPTest {
-  /** Root path. */
-  private static final String ROOT = "http://" + Text.S_LOCALHOST + ":9998/rest/";
-
   /**
    * Start server.
    * @throws Exception exception
    */
   @BeforeClass
   public static void start() throws Exception {
-    init(ROOT, true);
+    init(REST_ROOT, true);
   }
 
   /**
@@ -52,7 +48,7 @@ public final class RequestTest extends HTTPTest {
    */
   @Test
   public void port() throws Exception {
-    assertEquals("9998", get("?query=" + request("R:port()")));
+    assertEquals(String.valueOf(HTTP_PORT), get("?query=" + request("R:port()")));
   }
 
   /**
@@ -134,7 +130,7 @@ public final class RequestTest extends HTTPTest {
    */
   @Test
   public void header() throws Exception {
-    assertEquals("localhost:9998", get("?query=" + request("R:header('Host')")));
+    assertEquals("localhost:" + HTTP_PORT, get("?query=" + request("R:header('Host')")));
     assertEquals("def", get("?query=" + request("R:header('ABC', 'def')")));
   }
 

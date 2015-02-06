@@ -23,6 +23,11 @@ import org.junit.*;
  * @author Christian Gruen
  */
 public abstract class SandboxTest {
+  /** Database port. */
+  protected static final int DB_PORT = 9996;
+  /** Event port. */
+  protected static final int EVENT_PORT = 9997;
+
   /** Default output stream. */
   public static final PrintStream OUT = System.out;
   /** Default error stream. */
@@ -83,8 +88,8 @@ public abstract class SandboxTest {
   public static BaseXServer createServer(final String... args) throws IOException {
     try {
       System.setOut(NULL);
-      final StringList sl = new StringList().add("-z").add("-p9999").add("-e9998").add("-q");
-      for(final String a : args) sl.add(a);
+      final StringList sl = new StringList("-z", "-p" + DB_PORT, "-e" + EVENT_PORT, "-q");
+      for(final String arg : args) sl.add(arg);
       final BaseXServer server = new BaseXServer(sl.finish());
       server.context.soptions.set(StaticOptions.DBPATH, sandbox().path());
       return server;
@@ -116,7 +121,7 @@ public abstract class SandboxTest {
   public static ClientSession createClient(final String... login) throws IOException {
     final String user = login.length > 0 ? login[0] : UserText.ADMIN;
     final String pass = login.length > 1 ? login[1] : UserText.ADMIN;
-    return new ClientSession(S_LOCALHOST, 9999, user, pass);
+    return new ClientSession(S_LOCALHOST, DB_PORT, user, pass);
   }
 
   /**
@@ -125,6 +130,15 @@ public abstract class SandboxTest {
    */
   public static IOFile sandbox() {
     return new IOFile(Prop.TMP, NAME);
+  }
+
+  /**
+   * Normalizes newlines in a query result.
+   * @param result input string
+   * @return normalized string
+   */
+  public static String normNL(final Object result) {
+    return result.toString().replaceAll("(\r?\n|\r) *", "\n");
   }
 
   /** Client. */

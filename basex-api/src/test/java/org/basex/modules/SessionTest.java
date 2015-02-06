@@ -4,7 +4,6 @@ import static org.junit.Assert.*;
 
 import java.net.*;
 
-import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.util.*;
 import org.junit.*;
@@ -16,16 +15,13 @@ import org.junit.*;
  * @author Christian Gruen
  */
 public final class SessionTest extends HTTPTest {
-  /** Root path. */
-  private static final String ROOT = "http://" + Text.S_LOCALHOST + ":9998/rest/";
-
   /**
    * Start server.
    * @throws Exception exception
    */
   @BeforeClass
   public static void start() throws Exception {
-    init(ROOT, true);
+    init(REST_ROOT, true);
   }
 
   /**

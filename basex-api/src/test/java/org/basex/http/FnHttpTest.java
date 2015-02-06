@@ -2,6 +2,7 @@ package org.basex.http;
 
 import static org.basex.core.Text.*;
 import static org.basex.query.func.Function.*;
+import static org.basex.query.func.http.HttpText.*;
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 
@@ -15,6 +16,7 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.io.*;
+import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.QueryError.*;
 import org.basex.query.func.fn.*;
@@ -36,14 +38,8 @@ import org.junit.Test;
  */
 public class FnHttpTest extends HTTPTest {
   /** Example url. */
-  private static final String ROOT = "http://" + S_LOCALHOST + ":9998/rest/";
-  /** Example url. */
-  static final String RESTURL = ROOT + NAME;
+  static final String RESTURL = REST_ROOT + NAME;
 
-  /** Status code. */
-  private static final byte[] STATUS = token("status");
-  /** Body attribute media-type. */
-  private static final byte[] MEDIATYPE = token("media-type");
   /** Books document. */
   private static final String BOOKS = "<books>" + "<book id='1'>"
       + "<name>Sherlock Holmes</name>" + "<author>Doyle</author>" + "</book>"
@@ -127,7 +123,7 @@ public class FnHttpTest extends HTTPTest {
   public void postGet() throws Exception {
     // GET1 - just send a GET request
     try(final QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
-        "<http:request method='get' href='" + ROOT + "'/>"), ctx)) {
+        "<http:request method='get' href='" + REST_ROOT + "'/>"), ctx)) {
       final Result r = qp.execute();
       checkResponse(r, HttpURLConnection.HTTP_OK, 2);
 
@@ -136,7 +132,7 @@ public class FnHttpTest extends HTTPTest {
 
     // GET2 - with override-media-type='text/plain'
     try(final QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
-        "<http:request method='get' override-media-type='text/plain'/>", ROOT), ctx)) {
+        "<http:request method='get' override-media-type='text/plain'/>", REST_ROOT), ctx)) {
       final Result r = qp.execute();
       checkResponse(r, HttpURLConnection.HTTP_OK, 2);
 
@@ -145,7 +141,7 @@ public class FnHttpTest extends HTTPTest {
 
     // Get3 - with status-only='true'
     try(final QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
-        "<http:request method='get' status-only='true'/>", ROOT), ctx)) {
+        "<http:request method='get' status-only='true'/>", REST_ROOT), ctx)) {
       checkResponse(qp.execute(), HttpURLConnection.HTTP_OK, 1);
     }
   }
@@ -180,7 +176,7 @@ public class FnHttpTest extends HTTPTest {
     try {
       new XQuery(_HTTP_SEND_REQUEST.args("<http:request/>")).execute(ctx);
     } catch(final BaseXException ex) {
-      assertTrue(contains(token(ex.getMessage()), token(ErrType.HC.toString())));
+      assertTrue(ex.getMessage().contains(ErrType.HC.toString()));
     }
   }
 
@@ -193,7 +189,7 @@ public class FnHttpTest extends HTTPTest {
     try {
       c.execute(ctx);
     } catch(final BaseXException ex) {
-      assertTrue(contains(token(ex.getMessage()), token(ErrType.HC.toString())));
+      assertTrue(ex.getMessage().contains(ErrType.HC.toString()));
     }
   }
 
@@ -228,7 +224,7 @@ public class FnHttpTest extends HTTPTest {
     final HttpRequestParser rp = new HttpRequestParser(null);
     final HttpRequest r = rp.parse(dbNode.children().next(), null);
 
-    assertEquals(2, r.attrs.size());
+    assertEquals(2, r.attributes.size());
     assertEquals(2, r.headers.size());
     assertTrue(r.bodyContent.size() != 0);
     assertEquals(1, r.payloadAttrs.size());
@@ -260,7 +256,7 @@ public class FnHttpTest extends HTTPTest {
     final HttpRequestParser rp = new HttpRequestParser(null);
     final HttpRequest r = rp.parse(dbNode1.children().next(), null);
 
-    assertEquals(2, r.attrs.size());
+    assertEquals(2, r.attributes.size());
     assertEquals(2, r.headers.size());
     assertTrue(r.isMultipart);
     assertEquals(3, r.parts.size());
@@ -314,7 +310,7 @@ public class FnHttpTest extends HTTPTest {
     final HttpRequestParser rp = new HttpRequestParser(null);
     final HttpRequest r = rp.parse(dbNode1.children().next(), bodies);
 
-    assertEquals(2, r.attrs.size());
+    assertEquals(2, r.attributes.size());
     assertEquals(2, r.headers.size());
     assertTrue(r.isMultipart);
     assertEquals(3, r.parts.size());
@@ -335,6 +331,23 @@ public class FnHttpTest extends HTTPTest {
     assertEquals(0, part.headers.size());
     assertEquals(1, part.bodyContent.size());
     assertEquals(1, part.bodyAttrs.size());
+  }
+
+  /**
+   * Tests the authorization.
+   * @throws Exception Exception
+   */
+  @Test
+  public void authorize() throws Exception {
+    // Test Basic authentication
+    final byte[] req = token("<http:request "
+        + "xmlns:http='http://expath.org/ns/http-client' "
+        + "method='GET' href='http://basex.org' "
+        + "send-authorization='true' auth-method='Basic' username='admin' password='admin'/>");
+
+    final DBNode dbNode = new DBNode(new IOContent(req));
+    final HttpRequestParser rp = new HttpRequestParser(null);
+    rp.parse(dbNode.children().next(), null);
   }
 
   /**
@@ -414,7 +427,7 @@ public class FnHttpTest extends HTTPTest {
         rp.parse(dbNode.children().next(), null);
         fail("Exception not thrown");
       } catch (final QueryException ex) {
-        assertTrue(contains(token(ex.getMessage()), token(ErrType.HC.toString())));
+        assertTrue(ex.getMessage().contains(ErrType.HC.toString()));
       }
     }
 
@@ -428,23 +441,23 @@ public class FnHttpTest extends HTTPTest {
   public void writeMultipartMessage() throws IOException {
     final HttpRequest req = new HttpRequest();
     req.isMultipart = true;
-    req.payloadAttrs.put(token("media-type"), token("multipart/alternative"));
-    req.payloadAttrs.put(token("boundary"), token("boundary42"));
+    req.payloadAttrs.put("media-type", "multipart/alternative");
+    req.payloadAttrs.put("boundary", "boundary42");
     final Part p1 = new Part();
-    p1.headers.put(token("Content-Type"), token("text/plain; charset=us-ascii"));
-    p1.bodyAttrs.put(token("media-type"), token("text/plain"));
+    p1.headers.put("Content-Type", "text/plain; charset=us-ascii");
+    p1.bodyAttrs.put("media-type", "text/plain");
     final String plain = "...plain text....";
     p1.bodyContent.add(Str.get(plain + '\n'));
 
     final Part p2 = new Part();
-    p2.headers.put(token("Content-Type"), token("text/richtext"));
-    p2.bodyAttrs.put(token("media-type"), token("text/richtext"));
+    p2.headers.put("Content-Type", "text/richtext");
+    p2.bodyAttrs.put("media-type", "text/richtext");
     final String rich = ".... richtext version...";
     p2.bodyContent.add(Str.get(rich));
 
     final Part p3 = new Part();
-    p3.headers.put(token("Content-Type"), token("text/x-whatever"));
-    p3.bodyAttrs.put(token("media-type"), token("text/x-whatever"));
+    p3.headers.put("Content-Type", "text/x-whatever");
+    p3.bodyAttrs.put("media-type", "text/x-whatever");
     final String fancy = ".... fanciest formatted version...";
     p3.bodyContent.add(Str.get(fancy));
 
@@ -452,8 +465,7 @@ public class FnHttpTest extends HTTPTest {
     req.parts.add(p2);
     req.parts.add(p3);
 
-    final FakeHttpConnection fakeConn = new FakeHttpConnection(new URL(
-        "http://www.test.com"));
+    final FakeHttpConnection fakeConn = new FakeHttpConnection(new URL("http://www.test.com"));
     HttpClient.setRequestContent(fakeConn.getOutputStream(), req);
     final String expResult = "--boundary42" + CRLF
         + "Content-Type: text/plain; charset=us-ascii" + CRLF + CRLF
@@ -478,9 +490,8 @@ public class FnHttpTest extends HTTPTest {
   public void writeMessage() throws IOException {
     // Case 1: No method, media-type='text/xml'
     final HttpRequest req1 = new HttpRequest();
-    final FakeHttpConnection fakeConn1 = new FakeHttpConnection(new URL(
-        "http://www.test.com"));
-    req1.payloadAttrs.put(MEDIATYPE, token("text/xml"));
+    final FakeHttpConnection fakeConn1 = new FakeHttpConnection(new URL("http://www.test.com"));
+    req1.payloadAttrs.put(SerializerOptions.MEDIA_TYPE.name(), "text/xml");
     // Node child
     final FElem e1 = new FElem("a").add("a");
     req1.bodyContent.add(e1);
@@ -491,9 +502,8 @@ public class FnHttpTest extends HTTPTest {
 
     // Case 2: No method, media-type='text/plain'
     final HttpRequest req2 = new HttpRequest();
-    final FakeHttpConnection fakeConn2 = new FakeHttpConnection(new URL(
-        "http://www.test.com"));
-    req2.payloadAttrs.put(MEDIATYPE, token("text/plain"));
+    final FakeHttpConnection fakeConn2 = new FakeHttpConnection(new URL("http://www.test.com"));
+    req2.payloadAttrs.put(SerializerOptions.MEDIA_TYPE.name(), "text/plain");
     // Node child
     final FElem e2 = new FElem("a").add("a");
     req2.bodyContent.add(e2);
@@ -504,10 +514,9 @@ public class FnHttpTest extends HTTPTest {
 
     // Case 3: method='text', media-type='text/xml'
     final HttpRequest req3 = new HttpRequest();
-    final FakeHttpConnection fakeConn3 = new FakeHttpConnection(new URL(
-        "http://www.test.com"));
-    req3.payloadAttrs.put(MEDIATYPE, token("text/xml"));
-    req3.payloadAttrs.put(token("method"), token("text"));
+    final FakeHttpConnection fakeConn3 = new FakeHttpConnection(new URL("http://www.test.com"));
+    req3.payloadAttrs.put(SerializerOptions.MEDIA_TYPE.name(), "text/xml");
+    req3.payloadAttrs.put("method", "text");
     // Node child
     final FElem e3 = new FElem("a").add("a");
     req3.bodyContent.add(e3);
@@ -599,9 +608,7 @@ public class FnHttpTest extends HTTPTest {
   @Test
   public void responseWithCharset() throws IOException, QueryException {
     // Create fake HTTP connection
-    final FakeHttpConnection conn = new FakeHttpConnection(new URL(
-        "http://www.test.com"));
-
+    final FakeHttpConnection conn = new FakeHttpConnection(new URL("http://www.test.com"));
     // Set content type
     conn.contentType = "text/plain; charset=CP1251";
     // set content encoded in CP1251
@@ -698,10 +705,8 @@ public class FnHttpTest extends HTTPTest {
    */
   @Test
   public void multipartRespPreamble() throws IOException, QueryException {
-
     // Create fake HTTP connection
-    final FakeHttpConnection conn = new FakeHttpConnection(new URL(
-        "http://www.test.com"));
+    final FakeHttpConnection conn = new FakeHttpConnection(new URL("http://www.test.com"));
     final Map<String, List<String>> hdrs = new HashMap<>();
     final List<String> fromVal = new ArrayList<>();
     fromVal.add("Nathaniel Borenstein <nsb@bellcore.com>");
@@ -809,23 +814,21 @@ public class FnHttpTest extends HTTPTest {
  * @author Rositsa Shadura
  */
 final class FakeHttpConnection extends HttpURLConnection {
+  /** Connection output stream. */
+  final ByteArrayOutputStream out = new ByteArrayOutputStream();
   /** Request headers. */
-  Map<String, List<String>> headers;
+  Map<String, List<String>> headers = new HashMap<>();
   /** Content-type. */
   String contentType;
   /** Content. */
   byte[] content;
-  /** Connection output stream. */
-  final ByteArrayOutputStream out;
 
   /**
    * Constructor.
-   * @param u uri
+   * @param uri uri
    */
-  FakeHttpConnection(final URL u) {
-    super(u);
-    out = new ByteArrayOutputStream();
-    headers = new HashMap<>();
+  FakeHttpConnection(final URL uri) {
+    super(uri);
   }
 
   @Override

@@ -15,9 +15,6 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class MimeTypes {
-  /** Content-Type. */
-  public static final String CONTENT_TYPE = "Content-Type";
-
   /** Text type. */
   private static final String TEXT = "text/";
   /** Multipart type. */

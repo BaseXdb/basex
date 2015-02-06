@@ -16,6 +16,7 @@ import org.basex.build.json.JsonOptions.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
+import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
@@ -79,13 +80,14 @@ public final class HttpPayload {
       final byte[] boundary = boundary(ctype);
       if(boundary == null) throw HC_REQ_X.get(info, "No separation boundary specified");
 
-      body = new FElem(Q_MULTIPART).add(MEDIA_TYPE, ct).add(BOUNDARY, boundary);
+      body = new FElem(Q_MULTIPART).add(SerializerOptions.MEDIA_TYPE.name(), ct);
+      body.add(BOUNDARY, boundary);
       final ANodeList parts = new ANodeList();
       extractParts(concat(DASHES, boundary), parts);
       for(final ANode node : parts) body.add(node);
     } else {
       // single part response
-      body = new FElem(Q_BODY).add(MEDIA_TYPE, ct);
+      body = new FElem(Q_BODY).add(SerializerOptions.MEDIA_TYPE.name(), ct);
       if(payloads != null) {
         final byte[] pl = extract(ct, charset(ctype));
         payloads.add(parse(pl, ct));
@@ -103,8 +105,7 @@ public final class HttpPayload {
   }
 
   /**
-   * Extracts payload from HTTP message and returns it as a byte array encoded
-   * in UTF-8.
+   * Extracts payload from HTTP message and returns it as a byte array encoded in UTF-8.
    * @param ctype content type
    * @param ce response content charset
    * @return payload as byte array
@@ -198,7 +199,7 @@ public final class HttpPayload {
       }
       l = readLine();
     }
-    if(parts != null) parts.add(new FElem(Q_BODY).add(MEDIA_TYPE, ctype));
+    if(parts != null) parts.add(new FElem(Q_BODY).add(SerializerOptions.MEDIA_TYPE.name(), ctype));
 
     final byte[] pl = extractPart(sep, end, enc);
     if(payloads != null) payloads.add(parse(pl, ct));

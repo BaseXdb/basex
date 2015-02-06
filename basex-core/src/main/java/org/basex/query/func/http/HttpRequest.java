@@ -2,8 +2,9 @@ package org.basex.query.func.http;
 
 import java.util.*;
 
+import org.basex.core.StaticOptions.AuthMethod;
+import org.basex.query.func.http.HttpText.Request;
 import org.basex.query.iter.*;
-import org.basex.util.hash.*;
 
 /**
  * Container for parsed data from {@code <http:request/>}.
@@ -13,17 +14,29 @@ import org.basex.util.hash.*;
  */
 public final class HttpRequest {
   /** Request attributes. */
-  public final TokenMap attrs = new TokenMap();
+  public final EnumMap<Request, String> attributes = new EnumMap<>(Request.class);
   /** Request headers. */
-  public final TokenMap headers = new TokenMap();
+  public final HashMap<String, String> headers = new HashMap<>();
   /** Body or multipart attributes. */
-  public final TokenMap payloadAttrs = new TokenMap();
+  public final HashMap<String, String> payloadAttrs = new HashMap<>();
   /** Body content. */
   public final ValueBuilder bodyContent = new ValueBuilder();
   /** Parts in case of multipart request. */
   public final ArrayList<Part> parts = new ArrayList<>();
   /** Indicator for multipart request. */
   public boolean isMultipart;
+
+  /** Authentication method (Default: basic authentication). */
+  public AuthMethod authMethod = AuthMethod.BASIC;
+
+  /**
+   * Returns the value of the specified attribute.
+   * @param name name of request attribute
+   * @return value
+   */
+  public String attribute(final Request name) {
+    return attributes.get(name);
+  }
 
   /**
    * Container for parsed data from <part/> element.
@@ -32,9 +45,9 @@ public final class HttpRequest {
    */
   public static class Part {
     /** Part headers. */
-    public final TokenMap headers = new TokenMap();
+    public final HashMap<String, String> headers = new HashMap<>();
     /** Attributes of part body. */
-    public final TokenMap bodyAttrs = new TokenMap();
+    public final HashMap<String, String> bodyAttrs = new HashMap<>();
     /** Content of part body. */
     public final ValueBuilder bodyContent = new ValueBuilder();
   }

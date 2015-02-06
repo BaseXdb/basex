@@ -46,7 +46,7 @@ public final class XQJTest extends SandboxTest {
   public void basicTest() throws Exception {
     final XQDataSource xqds = new BaseXXQDataSource();
     xqds.setProperty("serverName", "localhost");
-    xqds.setProperty("port", "9999");
+    xqds.setProperty("port", String.valueOf(DB_PORT));
 
     final XQConnection conn = xqds.getConnection("admin", "admin");
     try {
@@ -70,7 +70,7 @@ public final class XQJTest extends SandboxTest {
   public void entityTest() throws Exception {
     final XQDataSource xqds = new BaseXXQDataSource();
     xqds.setProperty("serverName", "localhost");
-    xqds.setProperty("port", "9999");
+    xqds.setProperty("port", String.valueOf(DB_PORT));
 
     final XQConnection conn = xqds.getConnection("admin", "admin");
     try {

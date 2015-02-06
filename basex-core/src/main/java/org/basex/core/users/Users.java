@@ -83,6 +83,8 @@ public final class Users {
       try {
         final XMLBuilder xml = new XMLBuilder().indent().open(USERS);
         for(final User user : users.values()) user.write(xml);
+        final IOFile dir = file.parent();
+        if(!dir.exists()) dir.md();
         file.write(xml.finish());
       } catch(final IOException ex) {
         Util.errln(ex);

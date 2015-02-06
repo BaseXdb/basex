@@ -4,7 +4,6 @@ import static org.junit.Assert.*;
 
 import java.io.*;
 
-import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.io.in.*;
 import org.basex.util.*;
@@ -17,10 +16,6 @@ import org.junit.*;
  * @author Christian Gruen
  */
 public final class RESTParallelPutTest extends HTTPTest {
-  /** REST identifier. */
-  private static final String REST = "rest";
-  /** Root path. */
-  private static final String ROOT = "http://" + Text.S_LOCALHOST + ":9998/" + REST + '/';
   /** Client count. */
   private static final int CLIENTS = 10;
   /** Runs per client. */
@@ -36,7 +31,7 @@ public final class RESTParallelPutTest extends HTTPTest {
    */
   @BeforeClass
   public static void start() throws Exception {
-    init(ROOT, true);
+    init(REST_ROOT, true);
   }
 
   // TEST METHODS =============================================================

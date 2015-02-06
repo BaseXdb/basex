@@ -4,7 +4,6 @@ import static org.basex.http.restxq.RestXqText.*;
 import static org.basex.util.Token.*;
 
 import org.basex.http.*;
-import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.func.*;
@@ -70,7 +69,7 @@ final class RestXqRespBuilder {
             if(nam != null && val != null) {
               final String key = string(nam);
               final String value = string(val);
-              if(key.equals(MimeTypes.CONTENT_TYPE)) {
+              if(key.equals(HttpText.CONTENT_TYPE)) {
                 cType = value;
               } else {
                 http.res.setHeader(key, value);

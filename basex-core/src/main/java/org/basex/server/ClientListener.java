@@ -202,7 +202,7 @@ public final class ClientListener extends Thread {
       } else {
         if(!us.isEmpty()) log(LogType.ERROR, ACCESS_DENIED);
         // delay users with wrong passwords
-        for(int d = context.blocker.delay(address); d > 0; d--) Performance.sleep(100);
+        context.blocker.delay(address);
         send(false);
       }
     } catch(final IOException ex) {

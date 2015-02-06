@@ -15,6 +15,6 @@ public final class ServerRESTTest extends RESTTest {
    */
   @BeforeClass
   public static void start() throws Exception {
-    init(ROOT, false);
+    init(REST_ROOT, false);
   }
 }

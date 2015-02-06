@@ -119,12 +119,12 @@ public enum Axis {
 
   /**
    * Constructor.
-   * @param n axis string
-   * @param d descendant flag
+   * @param name axis string
+   * @param down descendant flag
    */
-  Axis(final String n, final boolean d) {
-    name = n;
-    down = d;
+  Axis(final String name, final boolean down) {
+    this.name = name;
+    this.down = down;
   }
 
   /**

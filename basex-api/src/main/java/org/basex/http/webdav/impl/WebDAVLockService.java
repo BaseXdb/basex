@@ -124,7 +124,7 @@ public final class WebDAVLockService {
         "<w:scope>exclusive</w:scope>" +
         "<w:depth>infinite</w:depth>" +
         "<w:owner>{ $owner }</w:owner>" +
-        "</w:lockinfo>)").bind("path", db + SEP + p).bind("owner", http.user)).isEmpty();
+        "</w:lockinfo>)").bind("path", db + SEP + p).bind("owner", http.username)).isEmpty();
   }
 
   /**

@@ -3,6 +3,8 @@ package org.basex.query.func.http;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
+import java.util.*;
+
 import org.basex.query.value.item.*;
 
 /**
@@ -12,10 +14,19 @@ import org.basex.query.value.item.*;
  * @author Rositsa Shadura
  */
 public interface HttpText {
+  /** HTTP header: WWW-Authentication string. */
+  String WWW_AUTHENTICATE = "WWW-Authenticate";
   /** HTTP header: Authorization. */
   String AUTHORIZATION = "Authorization";
+  /** HTTP header: Content-Type. */
+  String CONTENT_TYPE = "Content-Type";
+  /** HTTP header: Accept. */
+  String ACCEPT = "Accept";
+
   /** HTTP basic authentication. */
   String BASIC = "Basic";
+  /** HTTP digest authentication. */
+  String DIGEST = "Digest";
 
   /** Content-Disposition. */
   byte[] CONTENT_DISPOSITION = token("Content-Disposition");
@@ -30,6 +41,24 @@ public interface HttpText {
   /** Filename string. */
   String FILENAME_IS = "filename=";
 
+  /** Default multipart boundary. */
+  String DEFAULT_BOUNDARY = "1BEF0A57BE110FD467A";
+  /** boundary marker. */
+  String BOUNDARY = "boundary";
+  /** HTTP method TRACE. */
+  String TRACE = "TRACE";
+  /** HTTP method DELETE. */
+  String DELETE = "DELETE";
+  /** Body attribute: src. */
+  String SRC = "src";
+
+  /** QOP. */
+  String MD5_SESS = "md5-sess";
+  /** Auth. */
+  String AUTH = "auth";
+  /** Auth-int. */
+  String AUTH_INT = "auth-int";
+
   /** QName. */
   QNm Q_BODY = QNm.get(HTTP_PREFIX, "body", HTTP_URI);
   /** QName. */
@@ -39,41 +68,8 @@ public interface HttpText {
   /** QName. */
   QNm Q_MULTIPART = QNm.get(HTTP_PREFIX, "multipart", HTTP_URI);
 
-  /** Request attribute: HTTP method. */
-  byte[] METHOD = token("method");
-  /** Request attribute: username. */
-  byte[] USERNAME = token("username");
-  /** Request attribute: password. */
-  byte[] PASSWORD = token("password");
-  /** Request attribute: send-authorization. */
-  byte[] SEND_AUTHORIZATION = token("send-authorization");
-
-  /** Request attribute: href. */
-  byte[] HREF = token("href");
-  /** Request attribute: status-only. */
-  byte[] STATUS_ONLY = token("status-only");
-  /** Request attribute: override-media-type. */
-  byte[] OVERRIDE_MEDIA_TYPE = token("override-media-type");
-  /** Request attribute: follow-redirect. */
-  byte[] FOLLOW_REDIRECT = token("follow-redirect");
-  /** Request attribute: timeout. */
-  byte[] TIMEOUT = token("timeout");
-  /** Body attribute: src. */
-  byte[] SRC = token("src");
-  /** Body attribute: media-type. */
-  byte[] MEDIA_TYPE = token("media-type");
-  /** boundary marker. */
-  byte[] BOUNDARY = token("boundary");
-
-  /** HTTP method TRACE. */
-  byte[] TRACE = token("trace");
-  /** HTTP method DELETE. */
-  byte[] DELETE = token("delete");
-
   /** Carriage return/line feed. */
   byte[] CRLF = { '\r', '\n' };
-  /** Default multipart boundary. */
-  byte[] DEFAULT_BOUND = token("1BEF0A57BE110FD467A");
 
   /** HTTP header Content-Type lower case. */
   byte[] CONTENT_TYPE_LC = token("content-type");
@@ -90,4 +86,47 @@ public interface HttpText {
 
   /** Method binary. */
   String BINARY = "binary";
+
+  /** Request attributes. */
+  public enum Request {
+    /** NC. */ NC,
+    /** QOP. */ QOP,
+    /** URI. */ URI,
+    /** Href. */ HREF,
+    /** Nonce. */ NONCE,
+    /** Realm. */ REALM,
+    /** Opaque. */ OPAQUE,
+    /** Cnonce .*/ CNONCE,
+    /** Method. */ METHOD,
+    /** Timeout. */ TIMEOUT,
+    /** Response. */ RESPONSE,
+    /** Password. */ PASSWORD,
+    /** Username. */ USERNAME,
+    /** Algorithm. */ ALGORITHM,
+    /** Auth-method. */ AUTH_METHOD,
+    /** Status-only. */ STATUS_ONLY,
+    /** Follow-redirect. */ FOLLOW_REDIRECT,
+    /** Send-authorization. */ SEND_AUTHORIZATION,
+    /** Override-media-type. */ OVERRIDE_MEDIA_TYPE;
+
+    /** Cached enums (faster). */
+    public static final Request[] VALUES = values();
+
+    /**
+     * Returns an enum for the specified string.
+     * @param key key
+     * @return enum
+     */
+    public static Request get(final String key) {
+      for(final Request r : VALUES) {
+        if(key.equals(r.toString())) return r;
+      }
+      return null;
+    }
+
+    @Override
+    public String toString() {
+      return name().toLowerCase(Locale.ENGLISH).replace('_', '-');
+    }
+  }
 }

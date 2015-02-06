@@ -11,6 +11,7 @@ import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
+import org.basex.query.func.http.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
@@ -338,7 +339,7 @@ abstract class MarkupSerializer extends StandardSerializer {
     if(empty) finishOpen();
     level++;
     startOpen(META);
-    attribute(HTTPEQUIV, token(MimeTypes.CONTENT_TYPE));
+    attribute(HTTPEQUIV, token(HttpText.CONTENT_TYPE));
     attribute(CONTENT, new TokenBuilder(media.isEmpty() ? MimeTypes.TEXT_HTML : media).
         add(CHARSET).addExt(out.encoding()).finish());
     if(html) {

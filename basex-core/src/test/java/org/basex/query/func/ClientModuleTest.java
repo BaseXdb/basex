@@ -48,8 +48,8 @@ public final class ClientModuleTest extends AdvancedQueryTest {
     query(conn());
     query(EXISTS.args(' ' + conn()));
     // BXCL0001: connection errors
-    error(_CLIENT_CONNECT.args(Text.S_LOCALHOST, 9999, ADMIN, ""), BXCL_CONN_X);
-    error(_CLIENT_CONNECT.args("xxx", 9999, ADMIN, ADMIN), BXCL_CONN_X);
+    error(_CLIENT_CONNECT.args(Text.S_LOCALHOST, DB_PORT, ADMIN, ""), BXCL_CONN_X);
+    error(_CLIENT_CONNECT.args("xxx", DB_PORT, ADMIN, ADMIN), BXCL_CONN_X);
   }
 
   /** Test method. */
@@ -116,6 +116,6 @@ public final class ClientModuleTest extends AdvancedQueryTest {
    * @return connect string
    */
   private static String conn() {
-    return _CLIENT_CONNECT.args(Text.S_LOCALHOST, 9999, ADMIN, ADMIN);
+    return _CLIENT_CONNECT.args(Text.S_LOCALHOST, DB_PORT, ADMIN, ADMIN);
   }
 }

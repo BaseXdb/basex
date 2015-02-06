@@ -45,7 +45,7 @@ public final class HttpResponse {
    * @throws QueryException query exception
    */
   @SuppressWarnings("resource")
-  public ValueIter getResponse(final HttpURLConnection conn, final boolean body, final byte[] mtype)
+  public ValueIter getResponse(final HttpURLConnection conn, final boolean body, final String mtype)
       throws IOException, QueryException {
 
     // check content type
@@ -78,7 +78,7 @@ public final class HttpResponse {
     if(is != null) {
       try {
         final HttpPayload hp = new HttpPayload(is, body, info, options);
-        response.add(hp.parse(error, type, mtype == null ? null : string(mtype)));
+        response.add(hp.parse(error, type, mtype));
         if(body) vb.add(hp.payloads());
       } finally {
         is.close();

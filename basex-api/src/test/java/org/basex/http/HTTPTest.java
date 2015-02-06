@@ -27,6 +27,17 @@ import org.junit.*;
  * @author Christian Gruen
  */
 public abstract class HTTPTest extends SandboxTest {
+  /** HTTP stop port. */
+  protected static final int STOP_PORT = 9999;
+  /** HTTP port. */
+  protected static final int HTTP_PORT = 9998;
+  /** REST identifier. */
+  protected static final String REST = "rest";
+  /** Root path. */
+  protected static final String RESTXQ_ROOT = "http://" + Text.S_LOCALHOST + ':' + HTTP_PORT + '/';
+  /** Root path. */
+  protected static final String REST_ROOT = RESTXQ_ROOT + REST + '/';
+
   /** Database context. */
   private static final Context CONTEXT = HTTPContext.init();
   /** Start servers. */
@@ -48,7 +59,8 @@ public abstract class HTTPTest extends SandboxTest {
 
     final StringList sl = new StringList();
     if(local) sl.add("-l");
-    sl.add("-p9996", "-e9997", "-h9998", "-s9999", "-z", "-U" + ADMIN, "-P" + ADMIN);
+    sl.add("-p" + DB_PORT, "-e" + EVENT_PORT, "-h" + HTTP_PORT, "-s" + STOP_PORT, "-z");
+    sl.add("-U" + ADMIN, "-P" + ADMIN);
     System.setOut(NULL);
     try {
       http = new BaseXHTTP(sl.toArray());
@@ -162,10 +174,10 @@ public abstract class HTTPTest extends SandboxTest {
     final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
     conn.setDoOutput(true);
     conn.setRequestMethod(POST.name());
-    conn.setRequestProperty(MimeTypes.CONTENT_TYPE, type);
+    conn.setRequestProperty(HttpText.CONTENT_TYPE, type);
     // basic authentication
     final String encoded = org.basex.util.Base64.encode(ADMIN + ':' + ADMIN);
-    conn.setRequestProperty(HTTPText.AUTHORIZATION, AuthMethod.BASIC + " " + encoded);
+    conn.setRequestProperty(HttpText.AUTHORIZATION, AuthMethod.BASIC + " " + encoded);
     // send query
     try(final OutputStream out = conn.getOutputStream()) {
       out.write(token(request));
@@ -234,7 +246,7 @@ public abstract class HTTPTest extends SandboxTest {
     final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
     conn.setDoOutput(true);
     conn.setRequestMethod(PUT.name());
-    if(ctype != null) conn.setRequestProperty(MimeTypes.CONTENT_TYPE, ctype);
+    if(ctype != null) conn.setRequestProperty(HttpText.CONTENT_TYPE, ctype);
     try(final OutputStream bos = new BufferedOutputStream(conn.getOutputStream())) {
       if(is != null) {
         // send input stream if it not empty

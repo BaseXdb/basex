@@ -138,15 +138,15 @@ final class BXServletRequest extends AbstractRequest {
   @Override
   public List<Cookie> getCookies() {
     final List<Cookie> list = new ArrayList<>();
-    for(final javax.servlet.http.Cookie c : req.getCookies())
+    for(final javax.servlet.http.Cookie c : req.getCookies()) {
       list.add(new BXServletCookie(c));
+    }
     return list;
   }
 
   @Override
   public void parseRequestParameters(final Map<String, String> params,
-      final Map<String, com.bradmcevoy.http.FileItem> files)
-      throws RequestParseException {
+      final Map<String, com.bradmcevoy.http.FileItem> files) throws RequestParseException {
     try {
       if(isMultiPart()) {
         parseQueryString(params, req.getQueryString());
