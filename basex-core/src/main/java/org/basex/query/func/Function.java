@@ -13,6 +13,7 @@ import org.basex.query.expr.Expr.Flag;
 import org.basex.query.func.admin.*;
 import org.basex.query.func.archive.*;
 import org.basex.query.func.array.*;
+import org.basex.query.func.basex.*;
 import org.basex.query.func.bin.*;
 import org.basex.query.func.client.*;
 import org.basex.query.func.convert.*;
@@ -128,9 +129,6 @@ public enum Function {
   /** XQuery function. */
   DEEP_EQUAL(FnDeepEqual.class, "deep-equal(items1,items2[,collation])",
       arg(ITEM_ZM, ITEM_ZM, STR), BLN),
-  /** XQuery function. */
-  DEEP_EQUAL_OPT(FnDeepEqualOpt.class, "deep-equal-opt(items1,items2[,options])",
-      arg(ITEM_ZM, ITEM_ZM, ITEM), BLN),
   /** XQuery function. */
   DEFAULT_COLLATION(FnDefaultCollation.class, "default-collation()", arg(), STR),
   /** XQuery function. */
@@ -572,6 +570,16 @@ public enum Function {
   /** XQuery function. */
   _ARCHIVE_WRITE(ArchiveWrite.class, "write(path,archive[,entries])",
       arg(STR, B64, ITEM_ZM), EMP, ARCHIVE_URI),
+
+  /* BaseX Module. */
+
+  /** XQuery function. */
+  _BASEX_DEEP_EQUAL(BaseXDeepEqual.class, "deep-equal(items1,items2[,options])",
+      arg(ITEM_ZM, ITEM_ZM, ITEM), BLN, BASEX_URI),
+  /** XQuery function. */
+  _BASEX_ITEM_AT(BaseXItemAt.class, "item-at(items,pos)", arg(ITEM_ZM, DBL), ITEM_ZO, BASEX_URI),
+  /** XQuery function. */
+  _BASEX_LAST_FROM(BaseXLastFrom.class, "last-from(items)", arg(ITEM_ZM), ITEM_ZO, BASEX_URI),
 
   /* Binary Module. */
 

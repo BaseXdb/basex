@@ -1,10 +1,11 @@
-package org.basex.query.func.fn;
+package org.basex.query.func.basex;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.func.fn.Compare.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -15,7 +16,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public final class FnDeepEqualOpt extends StandardFunc {
+public final class BaseXDeepEqual extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Compare cmp = new Compare(info);

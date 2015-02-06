@@ -10,7 +10,8 @@ import org.basex.index.name.*;
 import org.basex.index.path.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.path.Test.*;
+import org.basex.query.expr.path.Test.Kind;
+import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
@@ -75,9 +76,15 @@ public abstract class Step extends Preds {
     final Expr e = super.optimize(qc, scp);
     if(e != this) return e;
 
-    // no numeric predicates: use simple iterator
-    return has(Flag.FCS) ? this instanceof IterPosStep || !posIterator() ? this :
-      new IterPosStep(this) : new IterStep(info, axis, test, preds);
+    // check for numeric predicates
+    if(!has(Flag.FCS)) return new IterStep(info, axis, test, preds);
+
+    if(preds.length == 1) {
+      if(preds[0].isFunction(Function.LAST)) return new IterLastStep(this);
+      final Pos pos = posIterator();
+      if(pos != null) return new IterPosStep(this, pos);
+    }
+    return this;
   }
 
   @Override

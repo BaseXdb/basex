@@ -127,8 +127,10 @@ public abstract class Filter extends Preds {
 
     // determine type and number of results
     final SeqType st = root.seqType();
+    final boolean last = preds.length == 1 && preds[0].isFunction(Function.LAST);
+    final Pos pos = posIterator();
+
     final long s = root.size();
-    final boolean iter = posIterator();
     if(s == -1) {
       // unknown input size: positional access tells if there will be at most 1 result
       final boolean zo = last || pos != null && pos.min == pos.max;
@@ -153,9 +155,9 @@ public abstract class Filter extends Preds {
     }
 
     // no numeric predicates.. use simple iterator
-    if(!super.has(Flag.FCS)) return copy(new IterFilter(info, root, preds));
+    if(!super.has(Flag.FCS)) return copyType(new IterFilter(info, root, preds));
 
-    boolean index = false;
+    Expr e = this;
     if(preds.length == 1) {
       // pre-evaluate if root is value and if one single position() or last() function is specified
       if(root.isValue()) {
@@ -164,31 +166,28 @@ public abstract class Filter extends Preds {
         if(pos != null) return optPre(SubSeq.get(v, pos.min - 1, pos.max - pos.min + 1), qc);
       }
 
-      final Expr pred = preds[0];
-      if(num(pred)) {
-        // only choose deterministic and context-independent offsets; e.g., skip:
-        // (1 to 10)[random:integer(10)]  or  (1 to 10)[.]
-        seqType = SeqType.get(seqType.type, Occ.ZERO_ONE);
-        index = true;
-      } else if(pred instanceof CmpG) {
-        // rewrite positional range predicate to fn:subsequence(root, start, end, true())
-        final CmpG cmp = (CmpG) pred;
-        if(cmp.exprs[0].isFunction(Function.POSITION)) {
-          final Expr e2 = cmp.exprs[1];
-          if(e2 instanceof Range) {
-            final Range r = (Range) e2;
-            if(num(r.exprs[0]) && num(r.exprs[1])) {
-              qc.compInfo(QueryText.OPTWRITE, this);
-              final Expr[] args = { root, r.exprs[0], r.exprs[1], Bln.TRUE };
-              return Function.SUBSEQUENCE.get(null, info, args);
-            }
-          }
-        }
+      if(last) {
+        // rewrite positional predicate to basex:item-at
+        e = Function._BASEX_LAST_FROM.get(null, info, root).optimize(qc, scp);
+
+      } else if(pos != null) {
+        /* rewrite positional predicate to fn:subsequence or basex:item-at
+         * example: expr[pos] -> subsequence(root, pos.min, pos.max, true()) */
+        e = pos.min == pos.max ? Function._BASEX_ITEM_AT.get(null, info, root, Int.get(pos.min)) :
+          Function.SUBSEQUENCE.get(null, info, root, Int.get(pos.min), Int.get(pos.max), Bln.TRUE);
+
+      } else if(num(preds[0])) {
+        /* - rewrite positional predicate to basex:item-at
+         *   example: expr[pos] -> basex:item-at(expr, pos)
+         * - only choose deterministic and context-independent offsets.
+         *   example: (1 to 10)[random:integer(10)]  or  (1 to 10)[.] */
+        e = Function._BASEX_ITEM_AT.get(null, info, root, preds[0]);
       }
     }
-
-    // evaluation of positional predicates
-    if(index || iter) return copy(new IterPosFilter(info, index, root, preds));
+    if(e != this) {
+      qc.compInfo(QueryText.OPTWRITE, this);
+      return e.optimize(qc, scp);
+    }
 
     // standard iterator
     return get(info, root, preds);

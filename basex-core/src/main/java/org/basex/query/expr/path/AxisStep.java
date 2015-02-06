@@ -64,6 +64,6 @@ final class AxisStep extends Step {
     final int pl = preds.length;
     final Expr[] pred = new Expr[pl];
     for(int p = 0; p < pl; p++) pred[p] = preds[p].copy(qc, scp, vs);
-    return copy(new AxisStep(info, axis, test.copy(), pred));
+    return copyType(new AxisStep(info, axis, test.copy(), pred));
   }
 }

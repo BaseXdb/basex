@@ -78,7 +78,8 @@ final class CachedFilter extends Filter {
 
   @Override
   public Filter copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return copy(new CachedFilter(info, root.copy(qc, scp, vs), Arr.copyAll(qc, scp, vs, preds)));
+    return copyType(new CachedFilter(info, root.copy(qc, scp, vs),
+        Arr.copyAll(qc, scp, vs, preds)));
   }
 
   @Override

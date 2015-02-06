@@ -164,7 +164,7 @@ public abstract class QT3TestSet {
     // include check for comments, processing instructions and namespaces
     String flags = "'" + Mode.ALLNODES + "'";
     if(!ignorePref) flags += ",'" + Mode.NAMESPACES + "'";
-    final String query = Function.DEEP_EQUAL_OPT.args("<X>" + expect + "</X>",
+    final String query = Function._BASEX_DEEP_EQUAL.args("<X>" + expect + "</X>",
         "<X>" + res + "</X>" , "(" + flags + ")");
     return result(asBoolean(query, null), expect);
   }

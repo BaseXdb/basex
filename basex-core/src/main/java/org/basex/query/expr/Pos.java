@@ -104,7 +104,7 @@ public final class Pos extends Simple {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     ctxValue(qc);
-    return Bln.get(qc.pos >= min && qc.pos <= max);
+    return Bln.get(matches(qc.pos));
   }
 
   @Override
@@ -114,11 +114,20 @@ public final class Pos extends Simple {
 
   /**
    * Returns false if no more results can be expected.
-   * @param qc query context
+   * @param pos current position
    * @return result of check
    */
-  public boolean skip(final QueryContext qc) {
-    return qc.pos >= max;
+  public boolean skip(final long pos) {
+    return pos >= max;
+  }
+
+  /**
+   * Checks if the current position lies within the given position.
+   * @param pos current position
+   * @return result of check
+   */
+  public boolean matches(final long pos) {
+    return pos >= min && pos <= max;
   }
 
   /**

@@ -34,12 +34,13 @@ final class IterStep extends Step {
       @Override
       public ANode next() throws QueryException {
         if(ai == null) ai = axis.iter(checkNode(qc));
+        final Test tst = test;
         while(true) {
           qc.checkStop();
           final ANode node = ai.next();
           if(node == null) return null;
           // evaluate node test and predicates
-          if(test.eq(node) && preds(node, qc)) return node.finish();
+          if(tst.eq(node) && preds(node, qc)) return node.finish();
         }
       }
     };
@@ -47,6 +48,6 @@ final class IterStep extends Step {
 
   @Override
   public IterStep copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return copy(new IterStep(info, axis, test.copy(), Arr.copyAll(qc, scp, vs, preds)));
+    return copyType(new IterStep(info, axis, test.copy(), Arr.copyAll(qc, scp, vs, preds)));
   }
 }

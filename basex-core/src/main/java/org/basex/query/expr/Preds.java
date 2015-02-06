@@ -30,10 +30,6 @@ import org.basex.util.ft.*;
 public abstract class Preds extends ParseExpr {
   /** Predicates. */
   public Expr[] preds;
-  /** Compilation: first predicate uses last function. */
-  public boolean last;
-  /** Compilation: first predicate uses position. */
-  public Pos pos;
 
   /**
    * Constructor.
@@ -127,16 +123,15 @@ public abstract class Preds extends ParseExpr {
    * evaluated if no predicate or only the first is positional.
    * @return result of check
    */
-  protected final boolean posIterator() {
+  protected final Pos posIterator() {
     // check if first predicate is numeric
     if(preds.length == 1) {
       Expr p = preds[0];
       if(p instanceof Int) p = Pos.get(((Int) p).itr(), info);
-      pos = p instanceof Pos ? (Pos) p : null;
-      last = p.isFunction(Function.LAST);
       preds[0] = p;
+      if(p instanceof Pos) return (Pos) p;
     }
-    return pos != null || last;
+    return null;
   }
 
   /**
@@ -246,18 +241,6 @@ public abstract class Preds extends ParseExpr {
   @Override
   public VarUsage count(final Var var) {
     return VarUsage.sum(var, preds);
-  }
-
-  /**
-   * Copies fields to the given object.
-   * @param <T> object type
-   * @param p copy
-   * @return the copy
-   */
-  protected final <T extends Preds> T copy(final T p) {
-    p.last = last;
-    p.pos = pos;
-    return copyType(p);
   }
 
   @Override

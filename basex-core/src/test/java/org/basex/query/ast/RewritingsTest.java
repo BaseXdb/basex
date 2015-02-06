@@ -2,6 +2,8 @@ package org.basex.query.ast;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.query.func.basex.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.junit.Test;
@@ -134,12 +136,19 @@ public final class RewritingsTest extends QueryPlanTest {
     check("('x' = 'x' and <x>x</x> = 'x')", "true", "empty(//And)");
 
     // {@link Pos} rewritings
-    check("(<a/>,<b/>)[position() > 1 and position() < 3]", "<b/>", "count(//Pos) = 1");
+    check("(<a/>,<b/>)[last()]", "<b/>",
+        "count(//" + Util.className(BaseXLastFrom.class) + ") = 1");
+    check("(<a/>,<b/>)[position() > 1 and position() < 3]", "<b/>",
+        "count(//" + Util.className(BaseXItemAt.class) + ") = 1");
+    check("(<a/>,<b/>)[position() > 1 and position() < 4]", "<b/>",
+        "count(//" + Util.className(FnSubsequence.class) + ") = 1");
     check("(<a/>,<b/>)[position() > 1 and position() < 3 and <b/>]", "<b/>", "count(//Pos) = 1");
+
     // {@link CmpR} rewritings
     check("<a>5</a>[text() > 1 and text() < 9]", "<a>5</a>", "count(//CmpR) = 1");
     check("<a>5</a>[text() > 1 and text() < 9 and <b/>]", "<a>5</a>", "count(//CmpR) = 1");
     check("<a>5</a>[text() > 1 and . < 9]", "<a>5</a>", "count(//CmpG) = 1 and count(//CmpR) = 1");
+
     // {@link CmpSR} rewritings
     check("<a>5</a>[text() > '1' and text() < '9']", "<a>5</a>", "count(//CmpSR) = 1");
     check("<a>5</a>[text() > '1' and text() < '9' and <b/>]", "<a>5</a>", "count(//CmpSR) = 1");
