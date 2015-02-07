@@ -307,13 +307,12 @@ public final class AtomicUpdateCache {
    * updated) is only touched once.
    */
   private void adjustDistances() {
-    final IntSet updatedNodes = new IntSet();
-
-    // checks if any nodes are shifted
+    // checks if any distances have changed
     int shifts = 0;
     for(final StructuralUpdate update : struct) shifts += update.accumulatedShifts;
     if(shifts == 0) return;
 
+    final IntSet updatedNodes = new IntSet();
     for(final StructuralUpdate update : struct) {
       /* Update distance for the affected node and all following siblings of nodes
        * on the ancestor-or-self axis. */
