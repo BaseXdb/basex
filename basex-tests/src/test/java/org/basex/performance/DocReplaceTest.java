@@ -34,6 +34,7 @@ public final class DocReplaceTest extends SandboxTest {
     for(int i = 0; i < NQUERIES; i++) {
       new Add(i + IO.XMLSUFFIX, "<a/>").execute(context);
     }
+    new Flush().execute(context);
 
     // replace documents with same content
     for(int i = 0; i < NQUERIES; i++) {

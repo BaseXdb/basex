@@ -138,9 +138,8 @@ public final class AtomicUpdateCache {
       return;
     }
 
-    if(candidate instanceof StructuralUpdate) {
-      ((StructuralUpdate) candidate).accumulatedShifts +=
-          recentStruct == null ? 0 : recentStruct.accumulatedShifts();
+    if(candidate instanceof StructuralUpdate && recentStruct != null) {
+      ((StructuralUpdate) candidate).accumulatedShifts += recentStruct.accumulatedShifts();
     }
 
     // prepare & optimize incoming update
@@ -308,33 +307,33 @@ public final class AtomicUpdateCache {
    * updated) is only touched once.
    */
   private void adjustDistances() {
-    final IntSet alreadyUpdatedNodes = new IntSet();
+    final IntSet updatedNodes = new IntSet();
+
+    // checks if any nodes are shifted
+    int shifts = 0;
+    for(final StructuralUpdate update : struct) shifts += update.accumulatedShifts;
+    if(shifts == 0) return;
 
     for(final StructuralUpdate update : struct) {
-      int newPreOfAffectedNode = update.preOfAffectedNode + update.accumulatedShifts;
-
       /* Update distance for the affected node and all following siblings of nodes
        * on the ancestor-or-self axis. */
-      while(newPreOfAffectedNode < data.meta.size) {
-        if(alreadyUpdatedNodes.contains(newPreOfAffectedNode)) break;
-        data.dist(newPreOfAffectedNode, data.kind(newPreOfAffectedNode),
-            calculateNewDistance(newPreOfAffectedNode));
-        alreadyUpdatedNodes.add(newPreOfAffectedNode);
-        newPreOfAffectedNode +=
-            data.size(newPreOfAffectedNode, data.kind(newPreOfAffectedNode));
+      int pre = update.preOfAffectedNode + update.accumulatedShifts;
+      while(pre < data.meta.size && !updatedNodes.contains(pre)) {
+        final int kind = data.kind(pre);
+        data.dist(pre, kind, calculateNewDistance(pre, kind));
+        updatedNodes.add(pre);
+        pre += data.size(pre, kind);
       }
     }
   }
 
   /**
-   * Calculates the new distance value for the given node after updates have been
-   * applied.
-   * @param pre the new PRE value of the node after structural updates have
-   * been applied
+   * Calculates the new distance value for the given node after updates have been applied.
+   * @param pre the new PRE value of the node after structural updates have been applied
+   * @param kind the KIND value
    * @return new distance for the given PRE node
    */
-  private int calculateNewDistance(final int pre) {
-    final int kind = data.kind(pre);
+  private int calculateNewDistance(final int pre, final int kind) {
     int distanceBefore = data.dist(pre, kind);
     final int preBefore = calculatePreValue(pre, true);
     // document distances are not stored in table but calculated on the fly (always pre+1)

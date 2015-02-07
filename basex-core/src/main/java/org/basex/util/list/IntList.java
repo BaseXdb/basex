@@ -244,7 +244,8 @@ public class IntList extends ElementList {
    * @return self reference
    */
   public IntList sort() {
-    Arrays.sort(list, 0, size);
+    final int s = size;
+    if(s > 1) Arrays.sort(list, 0, s);
     return this;
   }
 
