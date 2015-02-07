@@ -307,10 +307,15 @@ public final class AtomicUpdateCache {
    * updated) is only touched once.
    */
   private void adjustDistances() {
-    // checks if any distances have changed
-    int shifts = 0;
-    for(final StructuralUpdate update : struct) shifts += update.accumulatedShifts;
-    if(shifts == 0) return;
+    // check if any distance has changed at all
+    boolean shifts = false;
+    for(final StructuralUpdate update : struct) {
+      if(update.accumulatedShifts != 0) {
+        shifts = true;
+        break;
+      }
+    }
+    if(shifts) return;
 
     final IntSet updatedNodes = new IntSet();
     for(final StructuralUpdate update : struct) {
