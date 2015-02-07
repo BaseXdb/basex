@@ -40,7 +40,7 @@ public abstract class HTTPTest extends SandboxTest {
 
   /** Database context. */
   private static final Context CONTEXT = HTTPContext.init();
-  /** Start servers. */
+  /** HTTP server. */
   private static BaseXHTTP http;
   /** Root path. */
   private static String root;
