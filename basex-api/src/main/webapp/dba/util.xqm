@@ -17,7 +17,7 @@ declare
   %rest:path("dba")
 function _:redirect(
 ) {
-  web:redirect('/dba/databases')
+  web:redirect('dba/databases')
 };
 
 (:~
