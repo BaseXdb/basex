@@ -44,12 +44,12 @@ public abstract class BaseXDialog extends JDialog {
 
   /**
    * Constructor, called from a dialog window.
-   * @param d calling dialog
+   * @param dialog calling dialog
    * @param title dialog title
    */
-  protected BaseXDialog(final BaseXDialog d, final String title) {
-    super(d, title, true);
-    init(d.gui);
+  protected BaseXDialog(final BaseXDialog dialog, final String title) {
+    super(dialog, title, true);
+    init(dialog.gui);
   }
 
   /**

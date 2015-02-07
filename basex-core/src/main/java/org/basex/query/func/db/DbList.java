@@ -2,6 +2,8 @@ package org.basex.query.func.db;
 
 import static org.basex.util.Token.*;
 
+import org.basex.core.*;
+import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
@@ -21,8 +23,10 @@ public class DbList extends DbFn {
   public Iter iter(final QueryContext qc) throws QueryException {
     final int el = exprs.length;
     if(el == 0) {
-      final TokenList tl = new TokenList();
-      for(final String s : qc.context.databases.listDBs()) tl.add(s);
+      final Context ctx = qc.context;
+      final StringList dbs = ctx.filter(Perm.READ, ctx.databases.listDBs());
+      final TokenList tl = new TokenList(dbs.size());
+      for(final String name : dbs) tl.add(name);
       return StrSeq.get(tl).iter();
     }
 

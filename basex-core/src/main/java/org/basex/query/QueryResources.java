@@ -78,7 +78,7 @@ public final class QueryResources {
     final Value coll = all ? value : DBNodeSeq.get(data.resources.docs(), data, true, true);
     addCollection(coll, data.meta.name);
     addData(data);
-    synchronized(qc.context.dbs) { qc.context.dbs.pin(data); }
+    synchronized(qc.context.datas) { qc.context.datas.pin(data); }
 
     globalData = true;
     return value;

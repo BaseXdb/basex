@@ -11,6 +11,7 @@ import org.basex.core.locks.*;
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.Cmd;
 import org.basex.core.parse.Commands.CmdCreate;
+import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.util.*;
@@ -37,14 +38,12 @@ public final class CreateBackup extends ABackup {
     if(!Databases.validName(name, true)) return error(NAME_INVALID_X, name);
 
     // retrieve all databases
-    final StringList dbs = context.databases.listDBs(name);
+    final StringList dbs = context.filter(Perm.READ, context.databases.listDBs(name));
     if(dbs.isEmpty()) return error(DB_NOT_FOUND_X, name);
 
     // loop through all databases
     boolean ok = true;
     for(final String db : dbs) {
-      if(!soptions.dbpath(db).isDir()) continue;
-
       // don't open databases marked as updating
       if(MetaData.file(soptions.dbpath(db), DATAUPD).exists()) {
         // reject backups of databases that are currently being updated (or corrupt)

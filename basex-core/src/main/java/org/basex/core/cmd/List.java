@@ -73,33 +73,30 @@ public final class List extends Command {
     table.header.add(SIZE);
     if(create) table.header.add(INPUT_PATH);
 
-    for(final String name : context.databases.listDBs()) {
+    for(final String name : context.filter(Perm.READ, context.databases.listDBs())) {
       String file = null;
       long size = 0;
       int docs = 0;
+
       final MetaData meta = new MetaData(name, options, soptions);
       try {
         meta.read();
         size = meta.dbsize();
         docs = meta.ndocs;
-        if(context.perm(Perm.READ, name)) file = meta.original;
+        file = meta.original;
       } catch(final IOException ex) {
         file = ERROR;
       }
-
       // count number of raw files
-      final IOFile dir = new IOFile(soptions.dbpath(name), IO.RAW);
-      final int bin = dir.descendants().size();
+      final int bin = new IOFile(soptions.dbpath(name), IO.RAW).descendants().size();
 
       // create entry
-      if(file != null) {
-        final TokenList tl = new TokenList(4);
-        tl.add(name);
-        tl.add(docs + bin);
-        tl.add(size);
-        if(create) tl.add(file);
-        table.contents.add(tl);
-      }
+      final TokenList tl = new TokenList(create ? 4 : 3);
+      tl.add(name);
+      tl.add(docs + bin);
+      tl.add(size);
+      if(create) tl.add(file);
+      table.contents.add(tl);
     }
     out.println(table.sort().finish());
     return true;

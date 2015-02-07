@@ -93,7 +93,7 @@ public final class PoolTest extends SandboxTest {
    * @param name name of database
    */
   private static void pins(final int pin, final String name) {
-    assertEquals(pin, server.context.dbs.pins(name));
+    assertEquals(pin, server.context.datas.pins(name));
   }
 
   /**

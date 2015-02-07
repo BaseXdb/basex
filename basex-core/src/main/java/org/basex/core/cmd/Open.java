@@ -84,8 +84,8 @@ public final class Open extends Command {
     // check permissions
     if(!context.perm(Perm.READ, name)) throw new BaseXException(PERM_REQUIRED_X, Perm.READ);
 
-    synchronized(context.dbs) {
-      Data data = context.dbs.pin(name);
+    synchronized(context.datas) {
+      Data data = context.datas.pin(name);
       if(data == null) {
         // check if the addressed database exists
         if(!context.soptions.dbexists(name)) throw new BaseXException(dbnf(name));
@@ -96,7 +96,7 @@ public final class Open extends Command {
 
         // open database
         data = new DiskData(meta);
-        context.dbs.add(data);
+        context.datas.add(data);
       }
       return data;
     }

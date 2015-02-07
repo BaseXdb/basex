@@ -82,12 +82,12 @@ public final class DbListDetails extends DbList {
    */
   private Iter listDBs(final QueryContext qc) {
     final Context ctx = qc.context;
-    final StringList sl = ctx.databases.listDBs();
+    final StringList dbs = ctx.filter(Perm.READ, ctx.databases.listDBs());
     return new Iter() {
       int pos;
       @Override
       public ANode get(final long i) throws QueryException {
-        final String name = sl.get((int) i);
+        final String name = dbs.get((int) i);
         final MetaData meta = new MetaData(name, ctx.options, ctx.soptions);
         try {
           meta.read();
@@ -106,7 +106,7 @@ public final class DbListDetails extends DbList {
       @Override
       public ANode next() throws QueryException { return pos < size() ? get(pos++) : null; }
       @Override
-      public long size() { return sl.size(); }
+      public long size() { return dbs.size(); }
     };
   }
 

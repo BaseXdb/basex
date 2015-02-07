@@ -33,7 +33,7 @@ public final class Context {
   /** Event pool. */
   public final Events events;
   /** Opened databases. */
-  public final Datas dbs;
+  public final Datas datas;
   /** Users. */
   public final Users users;
   /** Package repository. */
@@ -86,7 +86,7 @@ public final class Context {
   public Context(final Context ctx, final ClientListener listener) {
     this.listener = listener;
     soptions = ctx.soptions;
-    dbs = ctx.dbs;
+    datas = ctx.datas;
     events = ctx.events;
     sessions = ctx.sessions;
     databases = ctx.databases;
@@ -103,7 +103,7 @@ public final class Context {
    */
   private Context(final StaticOptions soptions) {
     this.soptions = soptions;
-    dbs = new Datas();
+    datas = new Datas();
     events = new Events();
     sessions = new Sessions();
     blocker = new ClientBlocker();
@@ -140,7 +140,7 @@ public final class Context {
    */
   public synchronized void close() {
     while(!sessions.isEmpty()) sessions.get(0).quit();
-    dbs.close();
+    datas.close();
     log.close();
   }
 
@@ -225,7 +225,7 @@ public final class Context {
    * @return result of check
    */
   public boolean pinned(final String db) {
-    return dbs.pinned(db) || TableDiskAccess.locked(db, this);
+    return datas.pinned(db) || TableDiskAccess.locked(db, this);
   }
 
   /**
@@ -236,6 +236,18 @@ public final class Context {
    */
   public boolean perm(final Perm perm, final String db) {
     return user.has(perm, db);
+  }
+
+  /**
+   * Filters databases to the ones that have the specified permission.
+   * @param perm requested permission
+   * @param dbs list of databases
+   * @return resulting list
+   */
+  public StringList filter(final Perm perm, final StringList dbs) {
+    final StringList sl = new StringList(dbs.size());
+    for(final String db : dbs) if(perm(perm, db)) sl.add(db);
+    return sl;
   }
 
   /**

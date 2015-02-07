@@ -350,7 +350,7 @@ public abstract class Command extends Proc {
    */
   protected static boolean close(final Context ctx, final String db) {
     final boolean close = ctx.data() != null && db.equals(ctx.data().meta.name)
-        && ctx.dbs.pins(db) == 1;
+        && ctx.datas.pins(db) == 1;
     return close && new Close().run(ctx);
   }
 

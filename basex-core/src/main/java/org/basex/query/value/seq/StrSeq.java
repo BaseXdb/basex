@@ -59,12 +59,12 @@ public final class StrSeq extends NativeSeq {
 
   /**
    * Creates a sequence with the specified items.
-   * @param items items
+   * @param items items (will be invalidated by this call)
    * @return value
    */
   public static Value get(final TokenList items) {
     return items.isEmpty() ? Empty.SEQ : items.size() == 1 ? Str.get(items.get(0)) :
-      new StrSeq(items.toArray());
+      new StrSeq(items.finish());
   }
 
   /**

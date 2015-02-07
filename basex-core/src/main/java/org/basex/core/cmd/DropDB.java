@@ -7,6 +7,7 @@ import org.basex.core.locks.*;
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.Cmd;
 import org.basex.core.parse.Commands.CmdDrop;
+import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.util.list.*;
 
@@ -30,7 +31,7 @@ public final class DropDB extends ACreate {
     if(!Databases.validName(args[0], true)) return error(NAME_INVALID_X, args[0]);
 
     // retrieve all databases; return true if no database is found (no error)
-    final StringList dbs = context.databases.listDBs(args[0]);
+    final StringList dbs = context.filter(Perm.READ, context.databases.listDBs(args[0]));
     if(dbs.isEmpty()) return info(NO_DB_DROPPED, args[0]);
 
     // loop through all databases

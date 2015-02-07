@@ -105,7 +105,7 @@ public final class OptimizeAll extends ACreate {
     final String name = ometa.name;
 
     // check if database is also pinned by other users
-    if(context.dbs.pins(ometa.name) > 1) throw new BaseXException(DB_PINNED_X, name);
+    if(context.datas.pins(ometa.name) > 1) throw new BaseXException(DB_PINNED_X, name);
 
     // adopt original meta information
     options.set(MainOptions.CHOP, ometa.chop);
