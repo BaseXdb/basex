@@ -32,7 +32,7 @@ public final class WebDAVService<T> {
   private static final String WEBDAV_DB = "~webdav";
 
   /** HTTP context. */
-  private final HTTPContext http;
+  public final HTTPContext http;
   /** Resource factory. */
   private final ResourceMetaDataFactory<T> factory;
   /** Locking service. */
@@ -71,7 +71,7 @@ public final class WebDAVService<T> {
 
   /**
    * Checks if the user is authorized to perform the given action.
-   * @param db database
+   * @param db database (can be {@code null})
    * @return {@code true} if the user is authorized
    */
   public static boolean authorize(final String db) {

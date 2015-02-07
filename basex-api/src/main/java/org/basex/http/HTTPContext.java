@@ -40,6 +40,13 @@ public final class HTTPContext {
   /** Quality factor pattern. */
   private static final Pattern QF = Pattern.compile("^(.*);\\s*q\\s*=(.*)$");
 
+  /** Global static database context. */
+  private static Context context;
+  /** Initialization flag. */
+  private static boolean init;
+  /** Initialized failed. */
+  private static IOException exception;
+
   /** Servlet request. */
   public final HttpServletRequest req;
   /** Servlet response. */
@@ -50,25 +57,19 @@ public final class HTTPContext {
   public final HTTPParams params;
 
   /** Authentication method. */
-  private AuthMethod auth;
-  /** Serialization parameters. */
-  private SerializerOptions sopts;
+  public AuthMethod auth;
   /** User name. */
   public String username;
   /** Password (plain text). */
   public String password;
 
-  /** Global static database context. */
-  private static Context context;
-  /** Initialization flag. */
-  private static boolean init;
-  /** Initialized failed. */
-  private static IOException exception;
-
   /** Performance. */
   private final Performance perf = new Performance();
   /** Path, starting with a slash. */
   private final String path;
+
+  /** Serialization parameters. */
+  private SerializerOptions sopts;
 
   /**
    * Constructor.
@@ -93,12 +94,18 @@ public final class HTTPContext {
     res.setCharacterEncoding(Strings.UTF8);
     path = decode(normalize(req.getPathInfo()));
 
-    // adopt servlet-specific credentials or use global ones
     final StaticOptions mprop = context().soptions;
-    username = servlet.user != null ? servlet.user : mprop.get(StaticOptions.USER);
-    password = servlet.pass != null ? servlet.pass : mprop.get(StaticOptions.PASSWORD);
+    if(servlet.username.isEmpty()) {
+      // adopt existing servlet-specific credentials
+      username = mprop.get(StaticOptions.USER);
+      password = mprop.get(StaticOptions.PASSWORD);
+    } else {
+      // otherwise, adopt global credentials
+      username = servlet.username;
+      password = servlet.password;
+    }
 
-    // choose safest authorization method with safer method
+    // prefer safest authorization method
     final String value = req.getHeader(AUTHORIZATION);
     final String am = value == null ? AuthMethod.BASIC.toString() : Strings.split(value, ' ', 2)[0];
     auth = StaticOptions.AUTHMETHOD.get(am) == AuthMethod.DIGEST ? AuthMethod.DIGEST :

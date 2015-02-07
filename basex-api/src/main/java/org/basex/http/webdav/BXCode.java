@@ -38,10 +38,9 @@ abstract class BXCode<E> {
       if(ret == null) run();
       return ret;
     } catch(final LoginException ex) {
-      throw new NotAuthorizedException(resource);
+      throw new NotAuthorizedException(Util.message(ex), resource);
     } catch(final IOException ex) {
-      Util.errln(ex);
-      throw new BadRequestException(resource, ex.getMessage());
+      throw new BadRequestException(resource, Util.message(ex));
     }
   }
 

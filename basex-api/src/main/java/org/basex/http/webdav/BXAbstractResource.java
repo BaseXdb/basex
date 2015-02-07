@@ -10,6 +10,9 @@ import com.bradmcevoy.http.LockInfo.LockDepth;
 import com.bradmcevoy.http.LockInfo.LockScope;
 import com.bradmcevoy.http.LockInfo.LockType;
 import com.bradmcevoy.http.Request.Method;
+
+import org.basex.core.StaticOptions.AuthMethod;
+import org.basex.http.*;
 import org.basex.http.webdav.impl.*;
 import org.basex.util.*;
 import org.xml.sax.*;
@@ -57,7 +60,12 @@ abstract class BXAbstractResource implements CopyableResource, DeletableResource
 
   @Override
   public boolean authorise(final Request request, final Method method, final Auth auth) {
-    return auth != null && auth.getTag() != null && WebDAVService.authorize(meta.db);
+    // use WebDAV authorization if no default user exists or if digest authentication is specified
+    final HTTPContext http = service.http;
+    if(http.username.isEmpty() || http.auth == AuthMethod.DIGEST) {
+      if(auth == null || auth.getTag() == null) return false;
+    }
+    return WebDAVService.authorize(meta.db);
   }
 
   @Override

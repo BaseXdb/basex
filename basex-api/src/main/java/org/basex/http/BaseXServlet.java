@@ -24,9 +24,9 @@ import org.basex.util.*;
  */
 public abstract class BaseXServlet extends HttpServlet {
   /** Servlet-specific user. */
-  String user;
+  String username = "";
   /** Servlet-specific password. */
-  String pass;
+  String password = "";
   /** Servlet-specific authentication method. */
   AuthMethod auth;
 
@@ -41,9 +41,9 @@ public abstract class BaseXServlet extends HttpServlet {
         final String val = config.getInitParameter(key);
         if(key.startsWith(Prop.DBPREFIX)) key = key.substring(Prop.DBPREFIX.length());
         if(key.equalsIgnoreCase(StaticOptions.USER.name())) {
-          user = val;
+          username = val;
         } else if(key.equalsIgnoreCase(StaticOptions.PASSWORD.name())) {
-          pass = val;
+          password = val;
         } else if(key.equalsIgnoreCase(StaticOptions.AUTHMETHOD.name())) {
           auth = AuthMethod.valueOf(val);
         }
