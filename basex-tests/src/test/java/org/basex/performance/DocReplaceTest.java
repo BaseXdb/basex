@@ -25,6 +25,7 @@ public final class DocReplaceTest extends SandboxTest {
     context.options.set(MainOptions.TEXTINDEX, false);
     context.options.set(MainOptions.ATTRINDEX, false);
     context.options.set(MainOptions.AUTOFLUSH, false);
+    context.options.set(MainOptions.INTPARSE, true);
 
     // create test database
     new CreateDB(NAME).execute(context);
