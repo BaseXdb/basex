@@ -315,7 +315,7 @@ public final class AtomicUpdateCache {
         break;
       }
     }
-    if(shifts) return;
+    if(!shifts) return;
 
     final IntSet updatedNodes = new IntSet();
     for(final StructuralUpdate update : struct) {
