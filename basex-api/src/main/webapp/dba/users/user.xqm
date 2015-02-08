@@ -47,7 +47,7 @@ function _:user(
 
   let $data := try {
     web:eval('element result {
-      user:list-details()[@name = $n]
+      user:list-details($n)
     }', map { 'n': $name })
   } catch * {
     element error { $G:DATA-ERROR || ': ' || $err:description }
@@ -187,7 +187,7 @@ function _:create(
   web:check(),
   try {
     web:update("
-      let $old := user:list-details()[@name = $name] return (
+      let $old := user:list-details($name) return (
         if($name = $newname) then () else if(user:exists($newname)) then (
            error((), 'User already exists: ' || $newname || '.')
          ) else (
