@@ -400,7 +400,6 @@ visualization        = Megjelenítés
 watching_event_%     = '%' esemény figyelése.
 whole_word           = Egész szó
 write_locking        = Írási zárolása
-xquery               = XQuery
 yes                  = Igen
 
 # Help texts
@@ -444,11 +443,11 @@ c_copy1              = Adatbázis másolása.
 c_copy2              = Másolja az adatbázist.
 c_create1            = Adatbázis, index, felhasználó, biztonsági másolat vagy esemény létrehozása.
 c_create2            = Adatbázis, index, felhasználó, biztonsági másolat vagy esemény létrehozása:
-c_create3            = létrehozza az adatbázist [%] egy választható beállítással [%]
-c_create4            = létrehozza az adatbázis egy biztonsági másolatát [%]
-c_create5            = létrehozza a kívánt indexet
-c_create8            = létrehozza a kívánt felhasználót
-c_create9            = létrehozza az eseményt
+c_create21           = létrehozza az adatbázist [%] egy választható beállítással [%]
+c_create22           = létrehozza az adatbázis egy biztonsági másolatát [%]
+c_create23           = létrehozza a kívánt indexet
+c_create24           = létrehozza a kívánt felhasználót
+c_create25           = létrehozza az eseményt
 c_delete1            = Erőforrások törlése az adatbázisból.
 c_delete2            = Törli az erőforrásokat a jelenleg megnyitott adatbázisból.
 c_drop1              = Adatbázis, index, felhasználó, biztonsági másolat vagy esemény eldobása.

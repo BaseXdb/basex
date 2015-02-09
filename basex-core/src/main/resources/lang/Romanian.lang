@@ -400,7 +400,6 @@ visualization        = Visualization
 watching_event_%     = Uita-te la evenimentul '%'.
 whole_word           = Cuvantul intreg
 write_locking        = Write Locking
-xquery               = XQuery
 yes                  = Da
 
 # Help texts
@@ -444,11 +443,11 @@ c_copy1              = Copiaţi baza de date.
 c_copy2              = Copiază o bază de date.
 c_create1            = Creaza baze de date, index, utilizator, copie de rezervă sau eveniment.
 c_create2            = Creează o nouă bază de date, index, utilizator,\ncopie de rezervă sau eveniment:
-c_create3            = Creează baza de date [%], cu un [%] opţional
-c_create4            = Creează o copie de rezervă a bazei de date [%]
-c_create5            = Creează indicele specificat
-c_create8            = Creează utilizatorul specificat
-c_create9            = Creeaza eveniment
+c_create21           = Creează baza de date [%], cu un [%] opţional
+c_create22           = Creează o copie de rezervă a bazei de date [%]
+c_create23           = Creează indicele specificat
+c_create24           = Creează utilizatorul specificat
+c_create25           = Creeaza eveniment
 c_delete1            = Ştergeţi resurse din baza de date.
 c_delete2            = Şterge resursele din baza de date în prezent deschise.
 c_drop1              = Sterge baze de date, index, utilizator, copie de rezervă sau eveniment.

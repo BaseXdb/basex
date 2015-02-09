@@ -400,7 +400,6 @@ visualization        = Visualisatie
 watching_event_%     = Monitor event '%'.
 whole_word           = Heel woord
 write_locking        = Write Locking
-xquery               = XQuery
 yes                  = Ja
 
 # Help texts
@@ -444,11 +443,11 @@ c_copy1              = Kopieer database.
 c_copy2              = Kopieert een database.
 c_create1            = Maak database, index, gebruiker, backup of event.
 c_create2            = Maakt een nieuwe database, index, gebruiker, backup of event:
-c_create3            = Maakt de database [%] met een optionele [%]
-c_create4            = Maakt een backup van database [%]
-c_create5            = Maakt de opgegeven index
-c_create8            = Creeert de opgegeven gebruiker
-c_create9            = Creeert het event
+c_create21           = Maakt de database [%] met een optionele [%]
+c_create22           = Maakt een backup van database [%]
+c_create23           = Maakt de opgegeven index
+c_create24           = Creeert de opgegeven gebruiker
+c_create25           = Creeert het event
 c_delete1            = Verwijder resources uit de database.
 c_delete2            = Verwijdert resources uit de actuele database.
 c_drop1              = Verwijder database, index, gebruiker, backup of event.

@@ -271,16 +271,16 @@ public interface Text {
     lang("c_create1"),
     lang("c_create2") + NL +
     LI + CmdDrop.BACKUP + " [" + S_NAME + "]:" + NL +
-    "  " + lang("c_create4", S_NAME) + NL +
+    "  " + lang("c_create22", S_NAME) + NL +
     LI + CmdCreate.DATABASE + " [" + S_NAME + "] ([" + S_INPUT + "]):"  + NL +
-    "  " + lang("c_create3", S_NAME, S_INPUT) + NL +
+    "  " + lang("c_create21", S_NAME, S_INPUT) + NL +
     LI + CmdCreate.EVENT + " [" + S_NAME + "]: " + NL +
-    "  " + lang("c_create9") + NL +
+    "  " + lang("c_create25") + NL +
     LI + CmdCreate.INDEX + " [" + CmdIndex.TEXT + '|' + CmdIndex.ATTRIBUTE +
     '|' + CmdIndex.FULLTEXT + "]:" + NL +
-    "  " + lang("c_create5") + NL +
+    "  " + lang("c_create23") + NL +
     LI + CmdCreate.USER + " [" + S_NAME + "] ([" + S_PW + "]):" + NL +
-    "  " + lang("c_create8")
+    "  " + lang("c_create24")
   };
 
   /** Command help. */
@@ -988,7 +988,7 @@ public interface Text {
   /** Button for refreshing. */
   String REFRESH = lang("refresh");
 
-  /** "Search". */
+  /** "Find". */
   String FIND = lang("find");
   /** "Find files". */
   String FIND_FILES = lang("find_files");
@@ -1005,10 +1005,10 @@ public interface Text {
 
   /** "Command". */
   String COMMAND = lang("command");
-  /** "XQuery". */
-  String XQUERY = lang("xquery");
   /** "Backup". */
   String BACKUP = lang("backup");
+  /** "XQuery". */
+  String XQUERY = "XQuery";
 
   /** Button text for deleting files. */
   String DROP = lang("drop");
