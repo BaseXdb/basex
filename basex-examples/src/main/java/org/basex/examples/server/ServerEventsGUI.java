@@ -1,7 +1,6 @@
 package org.basex.examples.server;
 
-import static org.basex.core.Text.*;
-
+import static org.basex.core.users.UserText.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -10,13 +9,14 @@ import javax.swing.*;
 import javax.swing.border.*;
 
 import org.basex.*;
+import org.basex.api.client.*;
 import org.basex.server.*;
 import org.basex.util.*;
 
 /**
  * This class tests the event mechanism with a gui.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  */
 public final class ServerEventsGUI extends JFrame {
   /** Name of test database and user. */
@@ -49,10 +49,10 @@ public final class ServerEventsGUI extends JFrame {
     server = new BaseXServer("-z");
 
     // initialization
-    final ClientSession cs = new ClientSession(server.context, S_ADMIN, S_ADMIN);
-    cs.execute("create event " + NAME);
-    cs.execute("create db " + NAME + " <Application><Background/></Application>");
-    cs.close();
+    try(ClientSession cs = new ClientSession(server.context, ADMIN, ADMIN)) {
+      cs.execute("create event " + NAME);
+      cs.execute("create db " + NAME + " <Application><Background/></Application>");
+    }
 
     for(int i = 0; i < CLIENTS; i++) new ServerEventsGUI(i);
   }
@@ -65,7 +65,7 @@ public final class ServerEventsGUI extends JFrame {
   private ServerEventsGUI(final int count) throws IOException {
     super("Window " + (count + 1));
 
-    final JPanel buttons = new JPanel();
+    JPanel buttons = new JPanel();
     buttons.setLayout(new FlowLayout());
     buttons.setOpaque(false);
 
@@ -81,7 +81,7 @@ public final class ServerEventsGUI extends JFrame {
       public void notify(final String value) {
         // use event feedback to repaint background
         Color c = Color.WHITE;
-        final String tmp = value.replaceAll("\"", "");
+        String tmp = value.replaceAll("\"", "");
         if(tmp.equals(RED)) {
           c = Color.RED;
         } else if(tmp.equals(BLUE)) {
@@ -92,16 +92,16 @@ public final class ServerEventsGUI extends JFrame {
         main.setBackground(c);
 
         // display updated XML fragment
-        try {
-          area.setText(session.query("/").execute());
-        } catch(final IOException ex) {
+        try(final ClientQuery cq = session.query("/")) {
+          area.setText(cq.execute());
+        } catch(IOException ex) {
           ex.printStackTrace();
         }
       }
     };
 
     // create session, open database and register event watcher
-    session = new ClientSession(server.context, S_ADMIN, S_ADMIN);
+    session = new ClientSession(server.context, ADMIN, ADMIN);
     session.execute("open " + NAME);
     session.watch(NAME, en);
 
@@ -114,12 +114,14 @@ public final class ServerEventsGUI extends JFrame {
         public void actionPerformed(final ActionEvent e) {
           try {
             // send update query and event
-            final String query =
+            String query =
               "let $color := '" + color + "' return " +
               "(replace value of node /Application/Background with $color," +
               " db:event('" + NAME + "', $color))";
-            session.query(query).execute();
-          } catch(final IOException ex) {
+            try(ClientQuery cq = session.query(query)) {
+              cq.execute();
+            }
+          } catch(IOException ex) {
             ex.printStackTrace();
           }
           en.notify(b.getText());
@@ -147,15 +149,14 @@ public final class ServerEventsGUI extends JFrame {
       session.close();
       if(--open == 0) {
         // no sessions left: drop event and database and stop server
-        final ClientSession css =
-          new ClientSession(server.context, S_ADMIN, S_ADMIN);
-        css.execute("drop event " + NAME);
-        css.execute("drop db " + NAME);
-        css.close();
+        try(ClientSession css = new ClientSession(server.context, ADMIN, ADMIN)) {
+          css.execute("drop event " + NAME);
+          css.execute("drop db " + NAME);
+        }
         server.stop();
       }
       super.dispose();
-    } catch(final Exception ex) {
+    } catch(Exception ex) {
       ex.printStackTrace();
     }
   }

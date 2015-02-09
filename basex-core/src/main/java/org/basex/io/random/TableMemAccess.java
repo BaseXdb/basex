@@ -11,7 +11,7 @@ import org.basex.util.*;
  *
  * NOTE: this class is not thread-safe.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class TableMemAccess extends TableAccess {
@@ -29,15 +29,13 @@ public final class TableMemAccess extends TableAccess {
   }
 
   @Override
-  public void flush() { }
+  public void flush(final boolean all) { }
 
   @Override
   public void close() { }
 
   @Override
-  public boolean lock(final boolean lock) {
-    return true;
-  }
+  public boolean lock(final boolean lock) { return true; }
 
   @Override
   public int read1(final int p, final int o) {

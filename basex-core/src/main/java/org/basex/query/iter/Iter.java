@@ -9,7 +9,7 @@ import org.basex.util.*;
 /**
  * Iterator interface.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public abstract class Iter {
@@ -23,8 +23,7 @@ public abstract class Iter {
   /**
    * Returns the specified item, or an arbitrary item if the index is invalid.
    * This method needs to be implemented - and should only be called - if
-   * {@link Iter#size()} returns the correct number of results. A calling method
-   * should call {@link #reset} after the last items has been retrieved.
+   * {@link Iter#size()} returns the correct number of results.
    * @param i value offset
    * @return specified item
    * @throws QueryException query exception
@@ -45,16 +44,7 @@ public abstract class Iter {
   }
 
   /**
-   * Resets the iterator and returns {@code true} if operation was successful.
-   * {@code false} is returned if the iterator cannot be reset.
-   * @return true if operator could be reset
-   */
-  public boolean reset() {
-    return false;
-  }
-
-  /**
-   * Returns a sequence with all iterator values.
+   * Returns a value with all iterated items.
    * Must only be called if {@link #next} has not been called before.
    * @return sequence
    * @throws QueryException query exception

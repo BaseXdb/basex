@@ -21,7 +21,7 @@ import org.junit.*;
  * <p>Write operations are tested by writing a value at a specified random
  * position.</p>
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Dimitar Popov
  */
 public class DataAccessTest {
@@ -77,12 +77,9 @@ public class DataAccessTest {
    */
   @Before
   public void setUp() throws IOException {
-    file = new IOFile(File.createTempFile("page", IO.BASEXSUFFIX));
-    final RandomAccessFile f = new RandomAccessFile(file.file(), "rw");
-    try {
+    file = new IOFile(Prop.TMP, "page" + IO.BASEXSUFFIX);
+    try(final RandomAccessFile f = new RandomAccessFile(file.file(), "rw")) {
       initialContent(f);
-    } finally {
-      f.close();
     }
     da = new DataAccess(file);
   }
@@ -356,13 +353,9 @@ public class DataAccessTest {
    * @throws IOException I/O exception
    */
   private void assertContent(final long pos, final int[] bytes) throws IOException {
-    final RandomAccessFile f = new RandomAccessFile(file.file(), "r");
-    try {
+    try(final RandomAccessFile f = new RandomAccessFile(file.file(), "r")) {
       f.seek(pos);
-      for(final int b : bytes)
-        assertEquals(b, f.read());
-    } finally {
-      f.close();
+      for(final int b : bytes) assertEquals(b, f.read());
     }
   }
 
@@ -432,13 +425,13 @@ public class DataAccessTest {
    */
   private static int[] stringToByteArray(final String s) {
     final byte[] token = Token.token(s);
-    final int[] len = numToByteArray(token.length);
+    final int tl = token.length;
+    final int[] len = numToByteArray(tl);
 
-    final int[] bytes = new int[len.length + token.length];
-    System.arraycopy(len, 0, bytes, 0, len.length);
-    for(int i = 0; i < token.length; ++i)
-      bytes[len.length + i] = toUnsignedByte(token[i]);
-
+    final int ll = len.length;
+    final int[] bytes = new int[ll + tl];
+    System.arraycopy(len, 0, bytes, 0, ll);
+    for(int t = 0; t < tl; ++t) bytes[ll + t] = toUnsignedByte(token[t]);
     return bytes;
   }
 

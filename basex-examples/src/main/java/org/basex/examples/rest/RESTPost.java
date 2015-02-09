@@ -9,7 +9,7 @@ import org.basex.*;
  * This class is a simple example to demonstrate the REST implementation.
  * It shows the function of the HTTP DELETE method.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  */
 public final class RESTPost {
   /**
@@ -27,7 +27,6 @@ public final class RESTPost {
     String request =
       "<query xmlns='http://basex.org/rest'>\n" +
       "  <text>(//city/name)[position() le 3]</text>\n" +
-      "  <parameter name='wrap' value='yes'/>\n" +
       "</query>";
     System.out.println("\n* Query:\n" + request);
 
@@ -41,11 +40,10 @@ public final class RESTPost {
     conn.setRequestProperty("Content-Type", "application/query+xml");
 
     // Get and cache output stream
-    OutputStream out = conn.getOutputStream();
-
-    // Send UTF-8 encoded query to server
-    out.write(request.getBytes("UTF-8"));
-    out.close();
+    try(OutputStream out = conn.getOutputStream()) {
+      // Send UTF-8 encoded query to server
+      out.write(request.getBytes("UTF-8"));
+    }
 
     // Print the HTTP response code
     int code = conn.getResponseCode();
@@ -58,14 +56,14 @@ public final class RESTPost {
       System.out.println("\n* Result:");
 
       // Get and cache input as UTF-8 encoded stream
-      BufferedReader br = new BufferedReader(new InputStreamReader(
-          conn.getInputStream(), "UTF-8"));
+      try(BufferedReader br = new BufferedReader(
+          new InputStreamReader(conn.getInputStream(), "UTF-8"))) {
 
-      // Print all lines of the result
-      for(String line; (line = br.readLine()) != null;) {
-        System.out.println(line);
+        // Print all lines of the result
+        for(String line; (line = br.readLine()) != null;) {
+          System.out.println(line);
+        }
       }
-      br.close();
     }
 
     // Close connection

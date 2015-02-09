@@ -17,7 +17,7 @@ import org.w3c.dom.*;
  *
  * Part 8: Binding External Variables.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  */
 public final class Part8 extends Main {
   /**
@@ -104,19 +104,19 @@ public final class Part8 extends Main {
 
     // Bind via StAX
     XMLInputFactory xif = XMLInputFactory.newInstance();
-    FileInputStream fis = new FileInputStream(path + "/orders.xml");
-    XMLStreamReader reader = xif.createXMLStreamReader(fis);
+    try(FileInputStream fis = new FileInputStream(path + "/orders.xml")) {
+      XMLStreamReader reader = xif.createXMLStreamReader(fis);
 
-    xqp = xqc.prepareExpression("declare variable $e external; $e");
-    xqp.bindDocument(new QName("e"), reader, null);
-    fis.close();
+      xqp = xqc.prepareExpression("declare variable $e external; $e");
+      xqp.bindDocument(new QName("e"), reader, null);
+    }
     print("Bind via StAX", xqp);
 
     // Bind via input stream
     xqp = xqc.prepareExpression("declare variable $e external; $e");
-    fis = new FileInputStream(path + "/orders.xml");
-    xqp.bindDocument(new QName("e"), fis, null, null);
-    fis.close();
+    try(FileInputStream fis = new FileInputStream(path + "/orders.xml")) {
+      xqp.bindDocument(new QName("e"), fis, null, null);
+    }
     print("Bind via input stream", xqp);
 
     // Close the connection

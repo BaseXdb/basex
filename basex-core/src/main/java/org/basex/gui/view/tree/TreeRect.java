@@ -2,7 +2,7 @@ package org.basex.gui.view.tree;
 
 /**
  * This is class is used to handle rectangles.
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Wolfgang Miller
  */
 final class TreeRect {
@@ -13,12 +13,12 @@ final class TreeRect {
 
   /**
    * Initializes TreeRect.
-   * @param xx x position
-   * @param ww width
+   * @param x x position
+   * @param w width
    */
-  TreeRect(final int xx, final int ww) {
-    x = xx;
-    w = ww;
+  TreeRect(final int x, final int w) {
+    this.x = x;
+    this.w = w;
   }
 
   /**

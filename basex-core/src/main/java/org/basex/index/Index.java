@@ -1,12 +1,13 @@
 package org.basex.index;
 
+import org.basex.core.*;
 import org.basex.index.query.*;
 
 /**
  * This interface defines the methods which have to be implemented
  * by an index structure.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public interface Index {
@@ -17,9 +18,10 @@ public interface Index {
 
   /**
    * Returns information on the index structure.
+   * @param options main options
    * @return info
    */
-  byte[] info();
+  byte[] info(final MainOptions options);
 
   /**
    * Returns all entries that match the specified token.
@@ -47,4 +49,10 @@ public interface Index {
    * Closes the index.
    */
   void close();
+
+  /**
+   * Drops the index.
+   * @return success flag
+   */
+  boolean drop();
 }

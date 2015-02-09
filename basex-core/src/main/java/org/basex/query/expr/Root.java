@@ -1,8 +1,8 @@
 package org.basex.query.expr;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 
-import org.basex.core.*;
+import org.basex.core.locks.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -17,27 +17,27 @@ import org.basex.util.hash.*;
 /**
  * Root node.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class Root extends Simple {
   /**
    * Constructor.
-   * @param ii input info
+   * @param info input info
    */
-  public Root(final InputInfo ii) {
-    super(ii);
-    type = SeqType.DOC_ZM;
+  public Root(final InputInfo info) {
+    super(info);
+    seqType = SeqType.DOC_ZM;
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) {
-    return ctx.value != null && ctx.value.type == NodeType.DOC ? ctx.value : this;
+  public Expr compile(final QueryContext qc, final VarScope scp) {
+    return qc.value != null && qc.value.type == NodeType.DOC ? qc.value : this;
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    final Iter iter = checkCtx(ctx).iter();
+  public Iter iter(final QueryContext qc) throws QueryException {
+    final Iter iter = ctxValue(qc).iter();
     final NodeSeqBuilder nc = new NodeSeqBuilder().check();
     for(Item i; (i = iter.next()) != null;) {
       final ANode n = root(i);
@@ -48,7 +48,7 @@ public final class Root extends Simple {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
     return new Root(info);
   }
 

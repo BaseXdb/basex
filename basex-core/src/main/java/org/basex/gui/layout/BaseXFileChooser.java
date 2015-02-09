@@ -16,7 +16,7 @@ import org.basex.util.*;
 /**
  * Project specific File Chooser implementation.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class BaseXFileChooser {
@@ -45,13 +45,13 @@ public final class BaseXFileChooser {
    * @param main reference to main window
    */
   public BaseXFileChooser(final String title, final String path, final GUI main) {
+    final IOFile file = new IOFile(path);
     if(main.gopts.get(GUIOptions.SIMPLEFD)) {
       fd = new FileDialog(main, title);
-      fd.setDirectory(new File(path).getPath());
+      fd.setDirectory(file.path());
     } else {
       fc = new JFileChooser(path);
-      final File file = new File(path);
-      if(!file.isDirectory()) fc.setSelectedFile(file);
+      if(!file.isDir()) fc.setSelectedFile(file.file());
       fc.setDialogTitle(title);
       gui = main;
     }
@@ -108,7 +108,7 @@ public final class BaseXFileChooser {
   /**
    * Selects a file or directory.
    * @param mode type defined by {@link Mode}
-   * @return resulting input reference, or {@code null} if no file was selected
+   * @return resulting input reference or {@code null} if no file was selected
    */
   public IOFile select(final Mode mode) {
     final IOFile[] files = selectAll(mode);
@@ -153,22 +153,24 @@ public final class BaseXFileChooser {
     }
     if(state != JFileChooser.APPROVE_OPTION) return new IOFile[0];
 
-    final File[] fl = fc.isMultiSelectionEnabled() ? fc.getSelectedFiles() :
+    final File[] fls = fc.isMultiSelectionEnabled() ? fc.getSelectedFiles() :
       new File[] { fc.getSelectedFile() };
-    final IOFile[] files = new IOFile[fl.length];
-    for(int f = 0; f < fl.length; f++) files[f] = new IOFile(fl[f].getPath());
+    final int fl = fls.length;
+    final IOFile[] files = new IOFile[fl];
+    for(int f = 0; f < fl; f++) files[f] = new IOFile(fls[f].getPath());
 
     if(mode == Mode.FSAVE) {
       // add file suffix to files
       final FileFilter ff = fc.getFileFilter();
       if(suffix != null) {
-        for(int f = 0; f < files.length; f++) {
+        for(int f = 0; f < fl; f++) {
           final String path = files[f].path();
           if(!path.contains(".")) files[f] = new IOFile(path + suffix);
         }
       } else if(ff instanceof Filter) {
         final String[] sufs = ((Filter) ff).sufs;
-        for(int f = 0; f < files.length && sufs.length != 0; f++) {
+        final int sl = sufs.length;
+        for(int f = 0; f < fl && sl != 0; f++) {
           final String path = files[f].path();
           if(!path.contains(".")) files[f] = new IOFile(path + sufs[0]);
         }

@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * Option containing an integer array value.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class NumbersOption extends Option<int[]> {
@@ -14,12 +14,12 @@ public final class NumbersOption extends Option<int[]> {
 
   /**
    * Default constructor.
-   * @param n name
-   * @param v value
+   * @param name name
+   * @param value value
    */
-  public NumbersOption(final String n, final int... v) {
-    super(n);
-    value = v;
+  public NumbersOption(final String name, final int... value) {
+    super(name);
+    this.value = value;
   }
 
   @Override

@@ -1,132 +1,174 @@
 package org.basex.query.value.item;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 
 import java.math.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.util.*;
+import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
  * Integer item ({@code xs:int}, {@code xs:integer}, {@code xs:short}, etc.).
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class Int extends ANum {
   /** Constant values. */
   private static final Int[] NUMS;
   /** Integer value. */
-  private final long val;
+  private final long value;
 
   // caches the first 128 integers
   static {
-    NUMS = new Int[128];
-    for(int i = 0; i < NUMS.length; ++i) NUMS[i] = new Int(i);
+    final int nl = 128;
+    NUMS = new Int[nl];
+    for(int n = 0; n < nl; n++) NUMS[n] = new Int(n);
   }
 
   /**
    * Constructor.
-   * @param v value
+   * @param value value
    */
-  private Int(final long v) {
-    this(v, AtomType.ITR);
+  private Int(final long value) {
+    this(value, AtomType.ITR);
   }
 
   /**
    * Constructor.
-   * @param v value
-   * @param t data type
+   * @param value value
+   * @param type item type
    */
-  public Int(final long v, final Type t) {
-    super(t);
-    val = v;
+  public Int(final long value, final Type type) {
+    super(type);
+    this.value = value;
   }
 
   /**
    * Returns an instance of this class.
-   * @param v value
+   * @param value value
    * @return instance
    */
-  public static Int get(final long v) {
-    return v >= 0 && v < NUMS.length ? NUMS[(int) v] : new Int(v);
+  public static Int get(final long value) {
+    return value >= 0 && value < NUMS.length ? NUMS[(int) value] : new Int(value);
   }
 
   /**
    * Returns an instance of this class.
-   * @param v value
-   * @param t data type
+   * @param value value
+   * @param type item type
    * @return instance
    */
-  public static Int get(final long v, final Type t) {
-    return t == AtomType.ITR ? get(v) : new Int(v, t);
+  public static Int get(final long value, final Type type) {
+    return type == AtomType.ITR ? get(value) : new Int(value, type);
   }
 
   @Override
   public byte[] string() {
-    return val == 0 ? Token.ZERO : Token.token(val);
+    return value == 0 ? Token.ZERO : Token.token(value);
   }
 
   @Override
   public boolean bool(final InputInfo ii) {
-    return val != 0;
+    return value != 0;
   }
 
   @Override
   public long itr() {
-    return val;
+    return value;
   }
 
   @Override
   public float flt() {
-    return val;
+    return value;
   }
 
   @Override
   public double dbl() {
-    return val;
+    return value;
   }
 
   @Override
-  public Item test(final QueryContext ctx, final InputInfo ii) {
-    return val == ctx.pos ? this : null;
+  public Item test(final QueryContext qc, final InputInfo ii) {
+    return value == qc.pos ? this : null;
   }
 
   @Override
   public BigDecimal dec(final InputInfo ii) {
-    return BigDecimal.valueOf(val);
+    return BigDecimal.valueOf(value);
   }
 
   @Override
-  public boolean eq(final Item it, final Collation coll, final InputInfo ii)
-      throws QueryException {
-    return it instanceof Int ? val == ((Int) it).val : val == it.dbl(ii);
+  public Int abs() {
+    return value < 0 ? get(-value) : type == AtomType.ITR ? this : get(value);
   }
 
   @Override
-  public int diff(final Item it, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  public Int ceiling() {
+    return this;
+  }
+
+  @Override
+  public Int floor() {
+    return this;
+  }
+
+  @Override
+  public ANum round(final int scale, final boolean even) {
+    final long v = rnd(scale, even);
+    return v == value ? this : get(v);
+  }
+
+  /**
+   * Returns a rounded value.
+   * @param s scale
+   * @param e half-to-even flag
+   * @return result
+   */
+  private long rnd(final int s, final boolean e) {
+    long v = value;
+    if(s >= 0 || v == 0) return v;
+    if(s < -15) return Dec.get(new BigDecimal(v)).round(s, e).itr();
+
+    long f = 1;
+    final int c = -s;
+    for(long i = 0; i < c; i++) f = (f << 3) + (f << 1);
+    final boolean n = v < 0;
+    final long a = n ? -v : v, m = a % f, d = m << 1;
+    v = a - m;
+    if(e ? d > f || d == f && v % (f << 1) != 0 : n ? d > f : d >= f) v += f;
+    return n ? -v : v;
+  }
+
+  @Override
+  public boolean eq(final Item it, final Collation coll, final StaticContext sc,
+      final InputInfo ii) throws QueryException {
+    return it instanceof Int ? value == ((Int) it).value : value == it.dbl(ii);
+  }
+
+  @Override
+  public int diff(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
     if(it instanceof Int) {
-      final long i = ((Int) it).val;
-      return val < i ? -1 : val > i ? 1 : 0;
+      final long i = ((Int) it).value;
+      return value < i ? -1 : value > i ? 1 : 0;
     }
     final double n = it.dbl(ii);
-    return Double.isNaN(n) ? UNDEF : val < n ? -1 : val > n ? 1 : 0;
+    return Double.isNaN(n) ? UNDEF : value < n ? -1 : value > n ? 1 : 0;
   }
 
   @Override
   public Object toJava() {
     switch((AtomType) type) {
-      case BYT: return (byte) val;
+      case BYT: return (byte) value;
       case SHR:
-      case UBY: return (short) val;
+      case UBY: return (short) value;
       case INT:
-      case USH: return (int) val;
+      case USH: return (int) value;
       case LNG:
-      case UIN: return val;
+      case UIN: return value;
       default:  return new BigInteger(toString());
     }
   }
@@ -135,25 +177,31 @@ public final class Int extends ANum {
   public boolean sameAs(final Expr cmp) {
     if(!(cmp instanceof Int)) return false;
     final Int i = (Int) cmp;
-    return type == i.type && val == i.val;
+    return type == i.type && value == i.value;
   }
 
   /**
    * Converts the given item into a long value.
-   * @param val value to be converted
+   * @param value value to be converted
    * @param ii input info
    * @return long value
    * @throws QueryException query exception
    */
-  public static long parse(final byte[] val, final InputInfo ii) throws QueryException {
-    // try fast conversion
-    final long l = Token.toLong(val);
-    if(l != Long.MIN_VALUE) return l;
-    // fails; choose default conversion
-    try {
-      return Long.parseLong(Token.string(val).trim());
-    } catch(final NumberFormatException ex) {
-      throw FUNCAST.get(ii, NUMS[0].type, chop(val));
+  public static long parse(final byte[] value, final InputInfo ii) throws QueryException {
+    final byte[] val = Token.trim(value);
+    // fast check for valid characters
+    boolean valid = true;
+    for(final byte v : val) {
+      if(!Token.digit(v) && v != '+' && v != '-') {
+        valid = false;
+        break;
+      }
     }
+    // valid: try fast conversion
+    if(valid) {
+      final long l = Token.toLong(val);
+      if(l != Long.MIN_VALUE || Token.eq(val, Token.MINLONG)) return l;
+    }
+    throw funCastError(ii, AtomType.INT, val);
   }
 }

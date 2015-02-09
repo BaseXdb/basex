@@ -2,6 +2,7 @@ package org.basex.util;
 
 import java.io.*;
 import java.net.*;
+import java.nio.file.*;
 import java.security.*;
 import java.util.*;
 
@@ -11,7 +12,7 @@ import org.basex.io.*;
 /**
  * This class contains constants and system properties which are used all around the project.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class Prop {
@@ -41,7 +42,7 @@ public final class Prop {
   /** Project name. */
   public static final String NAME = "BaseX";
   /** Code version (may contain major, minor and optional patch number). */
-  public static final String VERSION = version("7.9.1 beta");
+  public static final String VERSION = version("8.0");
   /** Main author. */
   public static final String AUTHOR = "Christian Gr\u00FCn";
   /** Co-authors (1). */
@@ -69,7 +70,7 @@ public final class Prop {
   /** Title and version. */
   public static final String TITLE = NAME + ' ' + VERSION;
 
-  /** New line string. */
+  /** System-specific newline string. */
   public static final String NL = System.getProperty("line.separator");
   /** Returns the system's default encoding. */
   public static final String ENCODING = System.getProperty("file.encoding");
@@ -111,15 +112,15 @@ public final class Prop {
    * <p>Determines the project's home directory for storing property files
    * and directories. The directory is chosen as follows:</p>
    * <ol>
-   * <li>First, the <b>system property</b> {@code "org.basex.path"} is checked.
-   *   If it contains a value, it is adopted as home directory.</li>
-   * <li>If not, the <b>current working directory</b> (defined by the system
-   *   property {@code "user.dir"}) is chosen if the file {@code .basex} or
-   *   {@code .basexhome} is found in this directory.</li>
-   * <li>Otherwise, the files are searched in the <b>application directory</b>
-   *   (the folder in which the application code is located).</li>
-   * <li>Otherwise, the <b>user's home directory</b> (defined in
-   *   {@code "user.home"}) is chosen.</li>
+   *   <li> First, the <b>system property</b> {@code "org.basex.path"} is checked.
+   *        If it contains a value, it is adopted as home directory.</li>
+   *   <li> If not, the <b>current working directory</b> (defined by the system
+   *        property {@code "user.dir"}) is chosen if the file {@code .basex} or
+   *        {@code .basexhome} is found in this directory.</li>
+   *   <li> Otherwise, the files are searched in the <b>application directory</b>
+   *        (the folder in which the application code is located).</li>
+   *   <li> Otherwise, the <b>user's home directory</b> (defined in
+   *        {@code "user.home"}) is chosen.</li>
    * </ol>
    * @return home directory
    */
@@ -131,53 +132,24 @@ public final class Prop {
     // not found; check working directory for property file
     dir = System.getProperty("user.dir");
     final String home = IO.BASEXSUFFIX + "home";
-    File file = new File(dir, home);
-    if(!file.exists()) file = new File(dir, IO.BASEXSUFFIX);
-    if(file.exists()) return file.getParent();
+    IOFile file = new IOFile(dir, home);
+    if(!file.exists()) file = new IOFile(dir, IO.BASEXSUFFIX);
+    if(file.exists()) return file.dir();
 
     // not found; check application directory
-    dir = applicationPath();
-    if(dir != null) {
-      file = new File(dir);
-      dir = file.isFile() ? file.getParent() : file.getPath();
-      file = new File(dir, home);
-      if(!file.exists()) file = new File(dir, IO.BASEXSUFFIX);
-      if(file.exists()) return file.getParent();
+    if(LOCATION != null) {
+      try {
+        dir = new IOFile(Paths.get(LOCATION.toURI()).toString()).dir();
+        file = new IOFile(dir, home);
+        if(!file.exists()) file = new IOFile(dir, IO.BASEXSUFFIX);
+        if(file.exists()) return file.dir();
+      } catch(final Exception ex) {
+        Util.stack(ex);
+      }
     }
 
     // not found; choose user home directory as default
     return USERHOME;
-  }
-
-  /**
-   * Returns the absolute path to this application, or {@code null} if the
-   * path cannot be evaluated.
-   * @return application path.
-   */
-  private static String applicationPath() {
-    if(LOCATION == null) return null;
-
-    // decode path; URLDecode returns wrong results
-    final String path = LOCATION.getPath();
-    final TokenBuilder tb = new TokenBuilder();
-    final int pl = path.length();
-    for(int p = 0; p < pl; ++p) {
-      final char ch = path.charAt(p);
-      if(ch == '%' && p + 2 < pl) {
-        tb.addByte((byte) Integer.parseInt(path.substring(p + 1, p + 3), 16));
-        p += 2;
-      } else {
-        tb.add(ch);
-      }
-    }
-    try {
-      // return path, using the correct encoding
-      return new String(tb.finish(), ENCODING);
-    } catch(final Exception ex) {
-      // return default path; not expected to occur
-      Util.stack(ex);
-      return tb.toString();
-    }
   }
 
   /**

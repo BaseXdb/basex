@@ -1,12 +1,16 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
+
 import java.io.*;
 import java.util.*;
 
 import org.basex.core.*;
+import org.basex.core.locks.*;
 import org.basex.core.parse.*;
-import org.basex.core.parse.Commands.*;
+import org.basex.core.parse.Commands.Cmd;
+import org.basex.core.parse.Commands.CmdInfo;
+import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.util.*;
 
@@ -14,7 +18,7 @@ import org.basex.util.*;
  * Evaluates the 'info database' command and returns information on the
  * currently opened database.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class InfoDB extends AInfo {
@@ -27,7 +31,7 @@ public final class InfoDB extends AInfo {
 
   @Override
   protected boolean run() throws IOException {
-    final boolean create = context.user.has(Perm.CREATE);
+    final boolean create = context.user().has(Perm.CREATE);
     out.print(db(context.data().meta, false, true, create));
     return true;
   }
@@ -84,6 +88,7 @@ public final class InfoDB extends AInfo {
         info(tb, MainOptions.DIACRITICS.name(), meta.diacritics);
         info(tb, MainOptions.STOPWORDS.name(), meta.stopwords);
         info(tb, MainOptions.UPDINDEX.name(), meta.updindex);
+        info(tb, MainOptions.AUTOOPTIMIZE.name(), meta.autoopt);
         info(tb, MainOptions.MAXCATS.name(), meta.maxcats);
         info(tb, MainOptions.MAXLEN.name(), meta.maxlen);
       }

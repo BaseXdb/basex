@@ -14,7 +14,6 @@ import org.basex.core.*;
 import org.basex.core.parse.*;
 import org.basex.data.*;
 import org.basex.gui.*;
-import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXFileChooser.Mode;
 import org.basex.gui.text.*;
@@ -28,7 +27,7 @@ import org.basex.util.*;
 /**
  * This class offers a fast text view, using the {@link TextPanel} class.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class TextView extends View {
@@ -36,7 +35,7 @@ public final class TextView extends View {
   private final SearchEditor search;
 
   /** Header string. */
-  private final BaseXLabel label;
+  private final BaseXHeader header;
   /** Home button. */
   private final AbstractButton home;
   /** Text Area. */
@@ -45,7 +44,7 @@ public final class TextView extends View {
   /** Result command. */
   private Command cmd;
   /** Result nodes. */
-  private Nodes ns;
+  private DBNodes ns;
 
   /**
    * Default constructor.
@@ -55,8 +54,7 @@ public final class TextView extends View {
     super(TEXTVIEW, man);
     border(5).layout(new BorderLayout(0, 5));
 
-    label = new BaseXLabel(RESULT, true, false);
-    label.setForeground(GRAY);
+    header = new BaseXHeader(RESULT);
 
     home = BaseXButton.command(GUIMenuCmd.C_HOME, gui);
     home.setEnabled(false);
@@ -68,15 +66,15 @@ public final class TextView extends View {
     final AbstractButton save = BaseXButton.get("c_save", SAVE, false, gui);
     final AbstractButton find = search.button(FIND);
 
-    final BaseXBack buttons = new BaseXBack(Fill.NONE);
+    final BaseXBack buttons = new BaseXBack(false);
     buttons.layout(new TableLayout(1, 3, 1, 0)).border(0, 0, 4, 0);
     buttons.add(save);
     buttons.add(home);
     buttons.add(find);
 
-    final BaseXBack b = new BaseXBack(Fill.NONE).layout(new BorderLayout());
+    final BaseXBack b = new BaseXBack(false).layout(new BorderLayout());
     b.add(buttons, BorderLayout.WEST);
-    b.add(label, BorderLayout.EAST);
+    b.add(header, BorderLayout.EAST);
     add(b, BorderLayout.NORTH);
 
     add(search, BorderLayout.CENTER);
@@ -111,7 +109,7 @@ public final class TextView extends View {
 
   @Override
   public void refreshLayout() {
-    label.border(-6, 0, 0, 2).setFont(lfont);
+    header.refreshLayout();
     text.setFont(mfont);
     search.bar().refreshLayout();
   }
@@ -138,17 +136,17 @@ public final class TextView extends View {
 
   /**
    * Serializes the specified nodes.
-   * @param n nodes to display
+   * @param nodes nodes to display
    */
-  private void setText(final Nodes n) {
+  private void setText(final DBNodes nodes) {
     if(visible()) {
       try {
         final ArrayOutput ao = new ArrayOutput();
         ao.setLimit(gui.gopts.get(GUIOptions.MAXTEXT));
-        if(n != null) n.serialize(Serializer.get(ao));
+        if(nodes != null) nodes.serialize(Serializer.get(ao));
         setText(ao);
         cmd = null;
-        ns = ao.finished() ? n : null;
+        ns = ao.finished() ? nodes : null;
       } catch(final IOException ex) {
         Util.debug(ex);
       }
@@ -176,7 +174,7 @@ public final class TextView extends View {
     if(mh >= 0 && r != null && r.size() >= mh) {
       parse = true;
     } else if(out.finished()) {
-      if(r instanceof Nodes) ns = (Nodes) r;
+      if(r instanceof DBNodes) ns = (DBNodes) r;
       else parse = true;
     }
     // create new command instance
@@ -195,7 +193,7 @@ public final class TextView extends View {
       System.arraycopy(chop, 0, buf, size - chop.length, chop.length);
     }
     text.setText(buf, size);
-    label.setText((out.finished() ? CHOPPED : "") + RESULT);
+    header.setText((out.finished() ? CHOPPED : "") + RESULT);
     home.setEnabled(gui.context.data() != null);
   }
 
@@ -216,9 +214,7 @@ public final class TextView extends View {
     opts.set(MainOptions.MAXHITS, -1);
     opts.set(MainOptions.CACHEQUERY, false);
 
-    PrintOutput out = null;
-    try {
-      out = new PrintOutput(file.toString());
+    try(final PrintOutput out = new PrintOutput(file.toString())) {
       if(cmd != null) {
         cmd.execute(gui.context, out);
       } else if(ns != null) {
@@ -230,7 +226,6 @@ public final class TextView extends View {
     } catch(final IOException ex) {
       BaseXDialog.error(gui, Util.info(FILE_NOT_SAVED_X, file));
     } finally {
-      if(out != null) try { out.close(); } catch(final IOException ignored) { }
       opts.set(MainOptions.MAXHITS, mh);
       opts.set(MainOptions.CACHEQUERY, true);
       gui.cursor(CURSORARROW, true);

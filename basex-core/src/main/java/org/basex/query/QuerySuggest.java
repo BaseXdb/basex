@@ -6,8 +6,7 @@ import java.util.*;
 
 import org.basex.data.*;
 import org.basex.index.path.*;
-import org.basex.query.path.*;
-import org.basex.query.util.*;
+import org.basex.query.expr.path.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -15,7 +14,7 @@ import org.basex.util.list.*;
  * This class analyzes the current path and gives suggestions for code
  * completions.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class QuerySuggest extends QueryParser {
@@ -29,20 +28,20 @@ public final class QuerySuggest extends QueryParser {
   private ArrayList<PathNode> curr;
   /** Hide flag. */
   private boolean show;
-  /** Last tag name. */
-  private byte[] tag;
+  /** Last element name. */
+  private byte[] name;
 
   /**
    * Constructor.
-   * @param q query
-   * @param c query context
-   * @param d data reference
+   * @param query query string
+   * @param qc query context
+   * @param data data reference
    * @throws QueryException query exception
    */
-  public QuerySuggest(final String q, final QueryContext c, final Data d)
+  public QuerySuggest(final String query, final QueryContext qc, final Data data)
       throws QueryException {
-    super(q, null, c, null);
-    data = d;
+    super(query, null, qc, null);
+    this.data = data;
     checkInit();
   }
 
@@ -57,7 +56,7 @@ public final class QuerySuggest extends QueryParser {
         final String nm = string(n.token(data));
         if(!nm.isEmpty() && !sl.contains(nm)) sl.add(nm);
       }
-      sl.sort(true);
+      sl.sort();
     }
     return sl;
   }
@@ -67,11 +66,11 @@ public final class QuerySuggest extends QueryParser {
     if(stack != null && !stack.empty()) return;
     all = data.paths.root();
     curr = all;
-    stack = new Stack<ArrayList<PathNode>>();
+    stack = new Stack<>();
   }
 
   @Override
-  protected void checkAxis(final Axis axis) {
+  void checkAxis(final Axis axis) {
     all = axis != Axis.CHILD && axis != Axis.DESC ?
       new ArrayList<PathNode>() : PathSummary.desc(curr, axis == Axis.DESC);
     curr = all;
@@ -83,28 +82,28 @@ public final class QuerySuggest extends QueryParser {
     final TokenBuilder tb = new TokenBuilder();
     if(attr) tb.add('@');
     if(test != null) tb.add(test.toString().replaceAll("\\*:", ""));
-    tag = tb.finish();
-    // use inexact matching only, if the tag is at the end:
+    name = tb.finish();
+    // use inexact matching only if the element is at the end:
     checkTest(pos < length);
   }
 
   /**
-   * Checks the tag name.
+   * Checks the element name.
    * @param eq equality test
    */
   private void checkTest(final boolean eq) {
-    if(tag == null) return;
+    if(name == null) return;
 
-    final ArrayList<PathNode> tmp = new ArrayList<PathNode>();
+    final ArrayList<PathNode> tmp = new ArrayList<>();
     boolean s = false;
     for(final PathNode p : all) {
       final byte[] nm = p.token(data);
-      if(startsWith(nm, tag)) {
-        if(!eq || eq(nm, tag)) tmp.add(p);
-        s |= !eq(tag, nm);
+      if(startsWith(nm, name)) {
+        if(!eq || eq(nm, name)) tmp.add(p);
+        s |= !eq(name, nm);
       }
     }
-    show = tag.length == 0 || s;
+    show = name.length == 0 || s;
     curr = tmp;
   }
 
@@ -113,7 +112,7 @@ public final class QuerySuggest extends QueryParser {
     if(stack == null) return;
     if(open) {
       checkTest(true);
-      final ArrayList<PathNode> tmp = new ArrayList<PathNode>();
+      final ArrayList<PathNode> tmp = new ArrayList<>();
       for(final PathNode p : curr) tmp.add(p);
       stack.add(tmp);
       checkAxis(Axis.CHILD);
@@ -125,7 +124,7 @@ public final class QuerySuggest extends QueryParser {
   }
 
   @Override
-  public QueryException error(final Err err, final Object... arg) {
-    return new QueryException(info(), err, arg).suggest(this, complete());
+  public QueryException error(final QueryError err, final Object... arg) {
+    return err.get(info(), arg).suggest(this, complete());
   }
 }

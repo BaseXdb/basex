@@ -1,6 +1,6 @@
 package org.basex.query.util.pkg;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 import static org.basex.query.util.pkg.PkgText.*;
 import static org.basex.util.Token.*;
 
@@ -19,23 +19,19 @@ import org.basex.util.*;
 /**
  * Parses the package descriptors and performs schema checks.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Rositsa Shadura
  */
 public final class PkgParser {
-  /** Repository context. */
-  private final Repo repo;
   /** Input info. */
   private final InputInfo info;
 
   /**
    * Constructor.
-   * @param r repository context
-   * @param ii input info
+   * @param info input info
    */
-  public PkgParser(final Repo r, final InputInfo ii) {
-    repo = r;
-    info = ii;
+  public PkgParser(final InputInfo info) {
+    this.info = info;
   }
 
   /**
@@ -47,20 +43,16 @@ public final class PkgParser {
   public Package parse(final IO io) throws QueryException {
     final Package pkg = new Package();
     try {
-      final byte[] content = io.read();
-
-      final DBNode doc = new DBNode(new IOContent(content), repo.context.options);
-      final ANode node = childElements(doc).next();
-
       // checks root node
+      final ANode node = childElements(new DBNode(new IOContent(io.read()))).next();
       if(!eqNS(PACKAGE, node.qname()))
-        throw BXRE_DESC.get(info, Util.info(WHICHELEM, node.qname()));
+        throw BXRE_DESC_X.get(info, Util.info(WHICHELEM, node.qname()));
 
       parseAttributes(node, pkg, PACKAGE);
       parseChildren(node, pkg);
       return pkg;
     } catch(final IOException ex) {
-      throw BXRE_PARSE.get(info, io.name(), ex);
+      throw BXRE_PARSE_X_X.get(info, io.name(), ex);
     }
   }
 
@@ -81,18 +73,18 @@ public final class PkgParser {
       else if(eq(A_ABBREV, name))  p.abbrev = next.string();
       else if(eq(A_VERSION, name)) p.version = next.string();
       else if(eq(A_SPEC, name))    p.spec = next.string();
-      else throw BXRE_DESC.get(info, Util.info(WHICHATTR, name));
+      else throw BXRE_DESC_X.get(info, Util.info(WHICHATTR, name));
     }
 
     // check mandatory attributes
     if(p.name == null)
-      throw BXRE_DESC.get(info, Util.info(MISSATTR, A_NAME, root));
+      throw BXRE_DESC_X.get(info, Util.info(MISSATTR, A_NAME, root));
     if(p.version == null)
-      throw BXRE_DESC.get(info, Util.info(MISSATTR, A_VERSION, root));
+      throw BXRE_DESC_X.get(info, Util.info(MISSATTR, A_VERSION, root));
     if(p.abbrev == null)
-      throw BXRE_DESC.get(info, Util.info(MISSATTR, A_ABBREV, root));
+      throw BXRE_DESC_X.get(info, Util.info(MISSATTR, A_ABBREV, root));
     if(p.spec == null)
-      throw BXRE_DESC.get(info, Util.info(MISSATTR, A_SPEC, root));
+      throw BXRE_DESC_X.get(info, Util.info(MISSATTR, A_SPEC, root));
   }
 
   /**
@@ -127,7 +119,7 @@ public final class PkgParser {
       else if(eq(A_SEMVER, name))    d.semver = next.string();
       else if(eq(A_SEMVER_MIN, name)) d.semverMin = next.string();
       else if(eq(A_SEMVER_MAX, name)) d.semverMax = next.string();
-      else throw BXRE_DESC.get(info, Util.info(WHICHATTR, name));
+      else throw BXRE_DESC_X.get(info, Util.info(WHICHATTR, name));
     }
     return d;
   }
@@ -145,12 +137,12 @@ public final class PkgParser {
       final QNm name = next.qname();
       if(eqNS(A_NAMESPACE, name)) c.uri = next.string();
       else if(eqNS(A_FILE, name)) c.file = next.string();
-      else throw BXRE_DESC.get(info, Util.info(WHICHELEM, name));
+      else throw BXRE_DESC_X.get(info, Util.info(WHICHELEM, name));
     }
 
     // check mandatory children
-    if(c.uri == null) throw BXRE_DESC.get(info, Util.info(MISSCOMP, A_NAMESPACE));
-    if(c.file == null) throw BXRE_DESC.get(info, Util.info(MISSCOMP, A_FILE));
+    if(c.uri == null) throw BXRE_DESC_X.get(info, Util.info(MISSCOMP, A_NAMESPACE));
+    if(c.file == null) throw BXRE_DESC_X.get(info, Util.info(MISSCOMP, A_FILE));
     return c;
   }
 
@@ -183,6 +175,6 @@ public final class PkgParser {
    * @return result of check
    */
   private static boolean eqNS(final byte[] cmp, final QNm name) {
-    return name.eq(new QNm(cmp, QueryText.PKGURI));
+    return name.eq(new QNm(cmp, QueryText.PKG_URI));
   }
 }

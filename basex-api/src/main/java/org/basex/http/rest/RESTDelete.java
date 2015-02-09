@@ -8,7 +8,7 @@ import org.basex.http.*;
 /**
  * REST-based evaluation of DELETE operations.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 final class RESTDelete {
@@ -17,21 +17,23 @@ final class RESTDelete {
 
   /**
    * Creates a new instance of this command.
-   * @param rs REST session
+   * @param session REST session
    * @return command
    * @throws IOException I/O exception
    */
-  static RESTExec get(final RESTSession rs) throws IOException {
-    RESTCmd.parseOptions(rs);
+  static RESTExec get(final RESTSession session) throws IOException {
+    RESTCmd.parseOptions(session);
 
-    final HTTPContext http = rs.http;
-    if(http.depth() == 0) throw HTTPCode.NO_PATH.get();
+    final HTTPContext http = session.http;
+    final String db = http.db();
+    if(db.isEmpty()) throw HTTPCode.NO_PATH.get();
 
     // open database to ensure it exists
-    rs.add(new Open(http.db()));
-    if(http.depth() == 1) rs.add(new DropDB(http.db()));
-    else rs.add(new Delete(http.dbpath()));
+    session.add(new Open(db));
+    final String path = http.dbpath();
+    if(path.isEmpty()) session.add(new DropDB(db));
+    else session.add(new Delete(path));
 
-    return new RESTExec(rs);
+    return new RESTExec(session);
   }
 }

@@ -13,7 +13,7 @@ import org.basex.util.hash.*;
 /**
  * Pragma extension.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
 public final class Extension extends Single {
@@ -22,13 +22,13 @@ public final class Extension extends Single {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param prag pragmas
-   * @param e enclosed expression
+   * @param info input info
+   * @param pragmas pragmas
+   * @param expr enclosed expression
    */
-  public Extension(final InputInfo ii, final Pragma[] prag, final Expr e) {
-    super(ii, e);
-    pragmas = prag;
+  public Extension(final InputInfo info, final Pragma[] pragmas, final Expr expr) {
+    super(info, expr);
+    this.pragmas = pragmas;
   }
 
   @Override
@@ -37,38 +37,44 @@ public final class Extension extends Single {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
     try {
-      for(final Pragma p : pragmas) p.init(ctx, info);
-      expr = expr.compile(ctx, scp);
-      type = expr.type();
-      size = expr.size();
+      for(final Pragma p : pragmas) p.init(qc, info);
+      expr = expr.compile(qc, scp);
     } finally {
-      for(final Pragma p : pragmas) p.finish(ctx);
+      for(final Pragma p : pragmas) p.finish(qc);
     }
+    return optimize(qc, scp);
+  }
+
+  @Override
+  public Expr optimize(final QueryContext qc, final VarScope scp) {
+    seqType = expr.seqType();
+    size = expr.size();
     return this;
   }
 
   @Override
-  public ValueIter iter(final QueryContext ctx) throws QueryException {
-    return value(ctx).iter(ctx);
+  public ValueIter iter(final QueryContext qc) throws QueryException {
+    return value(qc).iter(qc);
   }
 
   @Override
-  public Value value(final QueryContext ctx) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     try {
-      for(final Pragma p : pragmas) p.init(ctx, info);
-      return ctx.value(expr);
+      for(final Pragma p : pragmas) p.init(qc, info);
+      return qc.value(expr);
     } finally {
-      for(final Pragma p : pragmas) p.finish(ctx);
+      for(final Pragma p : pragmas) p.finish(qc);
     }
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
     final Pragma[] prag = pragmas.clone();
-    for(int i = 0; i < prag.length; i++) prag[i] = prag[i].copy();
-    return copyType(new Extension(info, prag, expr.copy(ctx, scp, vs)));
+    final int pl = prag.length;
+    for(int p = 0; p < pl; p++) prag[p] = prag[p].copy();
+    return copyType(new Extension(info, prag, expr.copy(qc, scp, vs)));
   }
 
   @Override
@@ -80,6 +86,6 @@ public final class Extension extends Single {
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     for(final Pragma p : pragmas) sb.append(p).append(' ');
-    return sb.append(BRACE1 + ' ').append(expr).append(' ').append(BRACE2).toString();
+    return sb.append(CURLY1 + ' ').append(expr).append(' ').append(CURLY2).toString();
   }
 }

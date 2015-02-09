@@ -18,7 +18,7 @@ import org.basex.gui.view.*;
 /**
  * This view offers a folder visualization of the database contents.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class FolderView extends View {
@@ -112,7 +112,7 @@ public final class FolderView extends View {
     startY = 0;
     scroll.pos(0);
 
-    final Nodes curr = gui.context.current();
+    final DBNodes curr = gui.context.current();
     if(more && curr.size() != 0) jumpTo(curr.pres[0], true);
     refreshHeight();
     repaint();
@@ -120,10 +120,12 @@ public final class FolderView extends View {
 
   @Override
   public void refreshLayout() {
+    scroll.refreshLayout();
     createBoxes();
     if(opened == null) return;
     refreshOpenedNodes();
     refreshHeight();
+    revalidate();
     repaint();
   }
 
@@ -138,7 +140,7 @@ public final class FolderView extends View {
     startY = 0;
     scroll.pos(0);
 
-    final Nodes marked = gui.context.marked;
+    final DBNodes marked = gui.context.marked;
     if(marked.size() != 0) jumpTo(marked.pres[0], true);
     refreshHeight();
     repaint();
@@ -188,7 +190,7 @@ public final class FolderView extends View {
       final int kind = data.kind(it.pre);
       final boolean elem = kind == Data.ELEM || kind == Data.DOC;
       final int x = OFFX + it.level * (lineH >> 1) + (elem ? lineH : boxW);
-      drawString(g, it.pre, x, it.y + boxW);
+      drawEntry(g, it.pre, x, it.y + boxW);
     }
     gui.painting = false;
   }
@@ -200,14 +202,14 @@ public final class FolderView extends View {
    * @param x horizontal coordinate
    * @param y vertical coordinate
    */
-  private void drawString(final Graphics g, final int pre, final int x, final int y) {
+  private void drawEntry(final Graphics g, final int pre, final int x, final int y) {
     final Data data = gui.context.data();
-    final Nodes marked = gui.context.marked;
+    final DBNodes marked = gui.context.marked;
 
     final int kind = data.kind(pre);
     final boolean elem = kind == Data.ELEM || kind == Data.DOC;
 
-    Color col = Color.black;
+    Color col = TEXT;
     Font fnt = font;
     if(marked.find(pre) >= 0) {
       // mark node
@@ -228,9 +230,8 @@ public final class FolderView extends View {
       g.fillRect(0, y - boxW - boxMargin, totalW, lineH + 1);
     }
 
-    final int fsz = fontSize;
     if(elem) {
-      final int yy = y - boxW - (fsz > 20 ? 6 : 3);
+      final int yy = y - boxW;
       final Image marker = opened[pre] ? openedMarker : closedMarker;
       g.drawImage(marker, x - lineH, yy, this);
     }
@@ -239,7 +240,7 @@ public final class FolderView extends View {
     g.setColor(col);
 
     final int tw = totalW + 6;
-    BaseXLayout.chopString(g, name, x, y - fsz, tw - x - 10, fsz);
+    BaseXLayout.chopString(g, name, x, y - fontSize, tw - x - 10, fontSize);
 
     if(gui.context.focused == pre) {
       g.setColor(color4);
@@ -321,16 +322,14 @@ public final class FolderView extends View {
     /* Empty Box. */
     final BufferedImage emptyBox = new BufferedImage(boxW + 1, boxW + 1,
             BufferedImage.TYPE_INT_ARGB);
-    Graphics2D g = emptyBox.createGraphics();
-    smooth(g);
+    Graphics2D g = BaseXLayout.antiAlias(emptyBox.createGraphics());
     g.setColor(color4);
     g.fillOval((boxW >> 2) - 1, (boxW >> 2) + 1, boxW >> 1, boxW >> 1);
     g.setColor(color3);
     g.fillOval((boxW >> 2) - 2, boxW >> 2, boxW >> 1, boxW >> 1);
 
     openedMarker = new BufferedImage(boxW + 1, boxW + 1, BufferedImage.TYPE_INT_ARGB);
-    g = openedMarker.createGraphics();
-    smooth(g);
+    g = BaseXLayout.antiAlias(openedMarker.createGraphics());
 
     Polygon p = new Polygon(new int[] { 0, boxW, boxW >> 1 }, new int[] {
         boxW - sp >> 1, boxW - sp >> 1, boxW }, 3);
@@ -342,8 +341,7 @@ public final class FolderView extends View {
     g.fillPolygon(p);
 
     closedMarker = new BufferedImage(boxW + 1, boxW + 1, BufferedImage.TYPE_INT_ARGB);
-    g = closedMarker.createGraphics();
-    smooth(g);
+    g = BaseXLayout.antiAlias(closedMarker.createGraphics());
 
     p = new Polygon(new int[] { boxW - sp >> 1, boxW, boxW - sp >> 1 },
         new int[] { 0, boxW >> 1, boxW }, 3);
@@ -371,7 +369,7 @@ public final class FolderView extends View {
     if(!focus(e.getX(), e.getY())) return;
 
     // add or remove marked node
-    final Nodes marked = gui.context.marked;
+    final DBNodes marked = gui.context.marked;
     if(e.getClickCount() == 2) {
       gui.notify.context(marked, false, null);
     } else if(e.isShiftDown()) {
@@ -462,7 +460,7 @@ public final class FolderView extends View {
 
     // calculate new tree position
     gui.context.focused = -1;
-    final Nodes curr = gui.context.current();
+    final DBNodes curr = gui.context.current();
     int pre = curr.pres[0];
     final FolderIterator it = new FolderIterator(this);
     while(it.more() && focus-- != 0) pre = it.pre;

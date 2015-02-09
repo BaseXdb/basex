@@ -1,7 +1,7 @@
 package org.basex.query.util.pkg;
 
 import static org.basex.core.Text.*;
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 import static org.basex.query.util.pkg.PkgText.*;
 import static org.basex.util.Token.*;
 
@@ -20,33 +20,33 @@ import org.basex.util.list.*;
 /**
  * Repository manager.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Rositsa Shadura
  */
 public final class RepoManager {
   /** Main-class pattern. */
   private static final Pattern MAIN_CLASS = Pattern.compile("^Main-Class: *(.+?) *$");
-  /** Repository context. */
-  private final Repo repo;
+  /** Context. */
+  private final Context context;
   /** Input info. */
   private InputInfo info;
 
   /**
    * Constructor.
-   * @param ctx database context
+   * @param context database context
    */
-  public RepoManager(final Context ctx) {
-    repo = ctx.repo;
+  public RepoManager(final Context context) {
+    this.context = context;
   }
 
   /**
    * Constructor.
-   * @param ctx database context
-   * @param ii input info
+   * @param context database context
+   * @param info input info
    */
-  public RepoManager(final Context ctx, final InputInfo ii) {
-    this(ctx);
-    info = ii;
+  public RepoManager(final Context context, final InputInfo info) {
+    this(context);
+    this.info = info;
   }
 
   /**
@@ -63,7 +63,7 @@ public final class RepoManager {
       cont = io.read();
     } catch(final IOException ex) {
       Util.debug(ex);
-      throw BXRE_WHICH.get(info, path);
+      throw BXRE_WHICH_X.get(info, path);
     }
 
     try {
@@ -71,7 +71,7 @@ public final class RepoManager {
       if(io.hasSuffix(IO.JARSUFFIX)) return installJAR(cont);
       return installXAR(cont);
     } catch(final IOException ex) {
-      throw BXRE_PARSE.get(info, io.name(), ex);
+      throw BXRE_PARSE_X_X.get(info, io.name(), ex);
     }
   }
 
@@ -87,6 +87,7 @@ public final class RepoManager {
     t.header.add(TYPE);
     t.header.add(PATH);
 
+    final Repo repo = context.repo;
     final TokenMap pkg = repo.pkgDict();
     // traverse EXPath packages
     for(final byte[] p : pkg) {
@@ -134,6 +135,7 @@ public final class RepoManager {
    * @return packages
    */
   public StringList list() {
+    final Repo repo = context.repo;
     final StringList sl = new StringList();
     // traverse EXPath packages
     for(final byte[] p : repo.pkgDict()) {
@@ -161,6 +163,7 @@ public final class RepoManager {
    */
   public void delete(final String pkg) throws QueryException {
     boolean found = false;
+    final Repo repo = context.repo;
     final TokenMap dict = repo.pkgDict();
     final byte[] pp = token(pkg);
     for(final byte[] nextPkg : dict) {
@@ -169,13 +172,13 @@ public final class RepoManager {
       if(eq(nextPkg, pp) || eq(Package.name(nextPkg), pp)) {
         // check if package to be deleted participates in a dependency
         final byte[] primPkg = primary(nextPkg);
-        if(primPkg != null) throw BXRE_DEP.get(info, string(primPkg), pkg);
+        if(primPkg != null) throw BXRE_DEP_X_X.get(info, string(primPkg), pkg);
 
         // clean package repository
         final IOFile f = repo.path(string(dict.get(nextPkg)));
-        repo.delete(new PkgParser(repo, info).parse(new IOFile(f, DESCRIPTOR)));
+        repo.delete(new PkgParser(info).parse(new IOFile(f, DESCRIPTOR)));
         // package does not participate in a dependency => delete it
-        if(!f.delete()) throw BXRE_DELETE.get(info, f);
+        if(!f.delete()) throw BXRE_DELETE_X.get(info, f);
         found = true;
       }
     }
@@ -183,29 +186,29 @@ public final class RepoManager {
     // traverse all files
     final IOFile file = file(pkg, repo);
     if(file != null) {
-      if(!file.delete()) throw BXRE_DELETE.get(info, file);
+      if(!file.delete()) throw BXRE_DELETE_X.get(info, file);
       return;
     }
 
-    if(!found) throw BXRE_WHICH.get(info, pkg);
+    if(!found) throw BXRE_WHICH_X.get(info, pkg);
   }
 
   /**
    * Looks for a file with the specified name.
    * @param name name
    * @param repo repository
-   * @return file, or {@code null}
+   * @return file or {@code null}
    */
   public static IOFile file(final String name, final Repo repo) {
     // traverse all files, find exact matches
     IOFile path = new IOFile(repo.path(), name);
-    for(final IOFile ch : path.dir().children()) {
+    for(final IOFile ch : path.parent().children()) {
       if(ch.name().equals(path.name())) return ch;
     }
     // traverse all files, find prefix matches
     path = new IOFile(repo.path(), name.replace('.', '/'));
     final String start = path.name() + '.';
-    for(final IOFile ch : path.dir().children()) {
+    for(final IOFile ch : path.parent().children()) {
       if(ch.name().startsWith(start)) return ch;
     }
     return null;
@@ -225,13 +228,13 @@ public final class RepoManager {
       throws QueryException, IOException {
 
     // parse module to find namespace uri
-    final Context ctx = repo.context;
-    final byte[] uri = new QueryContext(ctx).parseLibrary(string(content), path, null).name.uri();
-
-    // copy file to rewritten URI file path
-    final String uriPath = ModuleLoader.uri2path(string(uri));
-    if(uriPath == null) throw BXRE_URI.get(info, uri);
-    return write(uriPath + IO.XQMSUFFIX, content);
+    try(final QueryContext qc = new QueryContext(context)) {
+      final byte[] uri = qc.parseLibrary(string(content), path, null).name.uri();
+      // copy file to rewritten URI file path
+      final String uriPath = ModuleLoader.uri2path(string(uri));
+      if(uriPath == null) throw BXRE_URI_X.get(info, uri);
+      return write(uriPath + IO.XQMSUFFIX, content);
+    }
   }
 
   /**
@@ -260,10 +263,10 @@ public final class RepoManager {
    * @throws IOException I/O exception
    */
   private boolean write(final String path, final byte[] content) throws IOException {
-    final IOFile rp = new IOFile(repo.context.globalopts.get(GlobalOptions.REPOPATH));
+    final IOFile rp = new IOFile(context.soptions.get(StaticOptions.REPOPATH));
     final IOFile target = new IOFile(rp, path);
     final boolean exists = target.exists();
-    target.dir().md();
+    target.parent().md();
     target.write(content);
     return exists;
   }
@@ -279,10 +282,11 @@ public final class RepoManager {
     final Zip zip = new Zip(new IOContent(content));
     // parse and validate descriptor file
     final IOContent dsc = new IOContent(zip.read(DESCRIPTOR));
-    final Package pkg = new PkgParser(repo, info).parse(dsc);
+    final Package pkg = new PkgParser(info).parse(dsc);
 
     // remove existing package
     final byte[] name = pkg.uniqueName();
+    final Repo repo = context.repo;
     final boolean exists = repo.pkgDict().get(name) != null;
     if(exists) delete(string(name));
     new PkgValidator(repo, info).check(pkg);
@@ -303,7 +307,7 @@ public final class RepoManager {
     String nm = name;
     int c = 0;
     do {
-      final IOFile io = repo.path(nm);
+      final IOFile io = context.repo.path(nm);
       if(!io.exists()) return io;
       nm = name + '-' + ++c;
     } while(true);
@@ -316,12 +320,13 @@ public final class RepoManager {
    * @throws QueryException query exception
    */
   private byte[] primary(final byte[] pkgName) throws QueryException {
+    final Repo repo = context.repo;
     final TokenMap dict = repo.pkgDict();
     for(final byte[] nextPkg : dict) {
       if(nextPkg != null && !eq(nextPkg, pkgName)) {
         // check only packages different from the current one
         final IOFile desc = new IOFile(repo.path(string(dict.get(nextPkg))), DESCRIPTOR);
-        final Package pkg = new PkgParser(repo, info).parse(desc);
+        final Package pkg = new PkgParser(info).parse(desc);
         final byte[] name = Package.name(pkgName);
         for(final Dependency dep : pkg.dep)
           // Check only package dependencies

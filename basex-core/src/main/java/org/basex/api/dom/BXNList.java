@@ -1,36 +1,36 @@
 package org.basex.api.dom;
 
-import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.node.*;
 import org.w3c.dom.*;
 
 /**
  * DOM - Node list implementation.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 class BXNList implements NodeList {
   /** XQuery node set. */
-  final ANodeList nl;
+  final ANodeList nodes;
 
   /**
    * Constructor.
-   * @param nb nodes
+   * @param nodes nodes
    */
-  BXNList(final ANodeList nb) {
-    nl = nb;
+  BXNList(final ANodeList nodes) {
+    this.nodes = nodes;
   }
 
   @Override
-  public BXNode item(final int i) {
+  public BXNode item(final int index) {
     ANode n = null;
-    if(i < nl.size()) n = nl.get(i);
+    if(index < nodes.size()) n = nodes.get(index);
     return n != null ? BXNode.get(n) : null;
   }
 
   @Override
   public int getLength() {
-    return nl.size();
+    return nodes.size();
   }
 }

@@ -10,7 +10,7 @@ import org.basex.query.value.item.*;
  * This is a parser for command strings, creating {@link Command} instances.
  * Several commands can be formulated in one string and separated by semicolons.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class CommandParser {
@@ -19,11 +19,11 @@ public final class CommandParser {
 
   /**
    * Constructor.
-   * @param in input
-   * @param c context
+   * @param input input
+   * @param ctx context
    */
-  public CommandParser(final String in, final Context c) {
-    parser = in.startsWith("<") ? new XMLParser(in, c) : new StringParser(in, c);
+  public CommandParser(final String input, final Context ctx) {
+    parser = input.startsWith("<") ? new XMLParser(input, ctx) : new StringParser(input, ctx);
   }
 
   /**
@@ -71,7 +71,7 @@ public final class CommandParser {
    * @throws QueryException query exception
    */
   private Command[] parse(final boolean single, final boolean suggest) throws QueryException {
-    final ArrayList<Command> cmds = new ArrayList<Command>();
+    final ArrayList<Command> cmds = new ArrayList<>();
     parser.parse(cmds, single, suggest);
     if(!single || cmds.size() == 1) return cmds.toArray(new Command[cmds.size()]);
     throw new QueryException(null, new QNm(), Text.SINGLE_CMD);

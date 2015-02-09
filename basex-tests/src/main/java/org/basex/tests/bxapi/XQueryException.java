@@ -7,7 +7,7 @@ import org.basex.util.*;
  * XQuery error. Inherited from {@link RuntimeException} to provide
  * generic iterators.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class XQueryException extends RuntimeException {
@@ -17,6 +17,7 @@ public final class XQueryException extends RuntimeException {
    */
   public XQueryException(final QueryException ex) {
     super(ex);
+    Util.debug(ex);
   }
 
   /**

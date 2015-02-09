@@ -3,8 +3,10 @@ package org.basex.query;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
+import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.util.*;
+import org.basex.query.util.collation.*;
 import org.basex.query.util.format.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -14,48 +16,49 @@ import org.basex.util.hash.*;
 /**
  * This class contains the static context of an expression.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class StaticContext {
   /** Decimal formats. */
-  public final TokenObjMap<DecFormatter> decFormats = new TokenObjMap<DecFormatter>();
+  public final TokenObjMap<DecFormatter> decFormats = new TokenObjMap<>();
   /** Static and dynamic namespaces. */
   public final NSContext ns = new NSContext();
+  /** Mix updates flag. */
+  public final boolean mixUpdates;
 
-  /** Default collation (default collection ({@link QueryText#COLLATIONURI}): {@code null}). */
+  /** Default collation (default collection ({@link QueryText#COLLATION_URI}): {@code null}). */
   public Collation collation;
   /** Default element/type namespace. */
   public byte[] elemNS;
   /** Default function namespace. */
-  public byte[] funcNS = FNURI;
-  /** Context item static type. */
-  public SeqType initType;
+  public byte[] funcNS = FN_URI;
+  /** Static type of context value. */
+  SeqType contextType;
 
   /** Construction mode. */
-  public boolean strip;
+  boolean strip;
   /** Ordering mode. */
-  public boolean ordered;
+  boolean ordered;
   /** Default order for empty sequences. */
-  public boolean orderGreatest;
+  boolean orderGreatest;
   /** Boundary-space policy. */
-  public boolean spaces;
+  boolean spaces;
   /** Copy-namespaces mode: (no-)preserve. */
-  public boolean preserveNS = true;
+  boolean preserveNS = true;
   /** Copy-namespaces mode: (no-)inherit. */
-  public boolean inheritNS = true;
-  /** XQuery version flag. */
-  boolean xquery3;
+  boolean inheritNS = true;
 
   /** Static Base URI. */
   private Uri baseURI = Uri.EMPTY;
 
   /**
    * Constructor setting the XQuery version.
-   * @param xq30 XQuery 3.0 flag
+   * @param ctx database context
    */
-  public StaticContext(final boolean xq30) {
-    xquery3 = xq30;
+  public StaticContext(final Context ctx) {
+    final MainOptions opts = ctx.options;
+    mixUpdates = opts.get(MainOptions.MIXUPDATES);
   }
 
   /**
@@ -66,7 +69,7 @@ public final class StaticContext {
    * @param uri namespace URI
    * @throws QueryException query exception
    */
-  public void namespace(final String prefix, final String uri) throws QueryException {
+  void namespace(final String prefix, final String uri) throws QueryException {
     if(prefix.isEmpty()) {
       elemNS = uri.isEmpty() ? null : token(uri);
     } else if(uri.isEmpty()) {
@@ -77,11 +80,11 @@ public final class StaticContext {
   }
 
   /**
-   * Returns an IO representation of the static base URI, or {@code null}.
+   * Returns an IO representation of the static base URI or {@code null}.
    * @return IO reference
    */
   public IO baseIO() {
-    return baseURI == Uri.EMPTY ? null : IO.get(Token.string(baseURI.string()));
+    return baseURI == Uri.EMPTY ? null : IO.get(string(baseURI.string()));
   }
 
   /**
@@ -91,7 +94,7 @@ public final class StaticContext {
    * @param path file path
    * @return io reference
    */
-  public IO io(final String path) {
+  IO io(final String path) {
     final IO base = baseIO();
     return base != null ? base.merge(path) : IO.get(path);
   }
@@ -119,14 +122,6 @@ public final class StaticContext {
     } else {
       baseURI = Uri.uri(baseIO().merge(uri).url());
     }
-  }
-
-  /**
-   * Checks if XQuery 3.0 features are allowed.
-   * @return {@code true} if XQuery 3.0 is allowed, {@code false} otherwise
-   */
-  public boolean xquery3() {
-    return xquery3;
   }
 
   @Override

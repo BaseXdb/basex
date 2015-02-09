@@ -1,7 +1,7 @@
 package org.basex.query.value.seq;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
-import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * Sequence, containing at least two items.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public abstract class Seq extends Value {
@@ -23,41 +23,50 @@ public abstract class Seq extends Value {
 
   /**
    * Constructor.
-   * @param s size
+   * @param size size
    */
-  Seq(final long s) {
-    this(s, AtomType.ITEM);
+  Seq(final long size) {
+    this(size, AtomType.ITEM);
   }
 
   /**
    * Constructor, specifying a type.
-   * @param s size
-   * @param t type
+   * @param size size
+   * @param type type
    */
-  Seq(final long s, final Type t) {
-    super(t);
-    size = s;
+  Seq(final long size, final Type type) {
+    super(type);
+    this.size = size;
   }
 
   /**
    * Returns a value representation of the specified items.
-   * @param v value
-   * @param s size
+   * @param value value
    * @return resulting item or sequence
    */
-  public static Value get(final Item[] v, final int s) {
-    return get(v, s, null);
+  public static Value get(final Item[] value) {
+    return get(value, value.length);
   }
 
   /**
    * Returns a value representation of the specified items.
-   * @param v value
-   * @param s size
-   * @param t sequence type
+   * @param value value
+   * @param size size
    * @return resulting item or sequence
    */
-  public static Value get(final Item[] v, final int s, final Type t) {
-    return s == 0 ? Empty.SEQ : s == 1 ? v[0] : new ItemSeq(v, s, t);
+  public static Value get(final Item[] value, final int size) {
+    return get(value, size, null);
+  }
+
+  /**
+   * Returns a value representation of the specified items.
+   * @param value value
+   * @param size size
+   * @param type sequence type
+   * @return resulting item or sequence
+   */
+  public static Value get(final Item[] value, final int size, final Type type) {
+    return size == 0 ? Empty.SEQ : size == 1 ? value[0] : new ItemSeq(value, size, type);
   }
 
   @Override
@@ -73,13 +82,13 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  public final Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    throw SEQCAST.get(ii, this);
+  public final Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    throw SEQFOUND_X.get(ii, this);
   }
 
   @Override
-  public final Item test(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    return ebv(ctx, ii);
+  public final Item test(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return ebv(qc, ii);
   }
 
   @Override
@@ -90,8 +99,6 @@ public abstract class Seq extends Value {
       public Item get(final long i) { return itemAt(i); }
       @Override
       public Item next() { return c < size ? itemAt(c++) : null; }
-      @Override
-      public boolean reset() { c = 0; return true; }
       @Override
       public long size() { return size; }
       @Override
@@ -110,6 +117,11 @@ public abstract class Seq extends Value {
     return h;
   }
 
+  @Override
+  public final Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
+    throw SEQFOUND_X.get(ii, this);
+  }
+
   /**
    * Returns a sequence in reverse order.
    * @return sequence
@@ -124,7 +136,7 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  public String toErrorString() {
+  public final String toErrorString() {
     return toString(true);
   }
 
@@ -139,16 +151,16 @@ public abstract class Seq extends Value {
    * @return string
    */
   private String toString(final boolean error) {
-    final StringBuilder sb = new StringBuilder(PAR1);
+    final StringBuilder sb = new StringBuilder(PAREN1);
     for(int i = 0; i < size; ++i) {
       sb.append(i == 0 ? "" : SEP);
       final Item it = itemAt(i);
       sb.append(error ? it.toErrorString() : it.toString());
-      if(sb.length() <= 32 || i + 1 == size) continue;
+      if(sb.length() <= 16 || i + 1 == size) continue;
       // output is chopped to prevent too long error strings
-      sb.append(SEP + DOTS);
+      sb.append(SEP).append(DOTS);
       break;
     }
-    return sb.append(PAR2).toString();
+    return sb.append(PAREN2).toString();
   }
 }

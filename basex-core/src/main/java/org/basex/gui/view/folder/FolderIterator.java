@@ -6,7 +6,7 @@ import org.basex.util.list.*;
 /**
  * This is an iterator for the folder nodes.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 final class FolderIterator {
@@ -92,7 +92,7 @@ final class FolderIterator {
    * @return true for more data
    */
   private boolean moreCS() {
-    final Nodes current = view.gui.context.current();
+    final DBNodes current = view.gui.context.current();
     if(current == null || ++cp >= current.size()) return false;
     par = current.pres[cp];
     pre = par;

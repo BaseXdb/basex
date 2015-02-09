@@ -5,7 +5,7 @@ import org.junit.*;
 /**
  * This test contains RESTXQ filters.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class RestXqFilterTest extends RestXqTest {
@@ -18,9 +18,8 @@ public final class RestXqFilterTest extends RestXqTest {
     // correct syntax
     get("declare %R:path('') %R:consumes('text/plain') function m:f() {1};", "", "1");
     get("declare %R:path('') %R:consumes('*/*') function m:f() {1};", "", "1");
-    // duplicate annotations
-    get("declare %R:path('') %R:consumes('text/plain','*/*') function m:f() {1};",
-        "", "1");
+    // multiple types
+    get("declare %R:path('') %R:consumes('text/plain','*/*') function m:f() {1};", "", "1");
     get("declare %R:path('') %R:consumes('text/plain') %R:consumes('*/*') " +
         "function m:f() {1};", "", "1");
     // invalid content type: ignored as no content type has been specified by user
@@ -36,13 +35,10 @@ public final class RestXqFilterTest extends RestXqTest {
     // correct syntax
     get("declare %R:path('') %R:produces('text/plain') function m:f() {1};", "", "1");
     get("declare %R:path('') %R:produces('*/*') function m:f() {1};", "", "1");
-    // duplicate annotations
-    get("declare %R:path('') %R:produces('text/plain','*/*') function m:f() {1};",
-        "", "1");
+    // multiple types
+    get("declare %R:path('') %R:produces('text/plain','*/*') function m:f() {1};", "", "1");
     get("declare %R:path('') %R:produces('text/plain') %R:produces('*/*') " +
         "function m:f() {1};", "", "1");
-    // invalid content type
-    getE("declare %R:path('') %R:produces('X') function m:f() {1};", "");
   }
 
   /**

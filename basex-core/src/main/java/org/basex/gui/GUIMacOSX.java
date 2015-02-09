@@ -9,7 +9,7 @@ import org.basex.util.*;
 /**
  * Sets some Mac OS X specific interface options.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Bastian Lemke
  */
 public final class GUIMacOSX {
@@ -81,7 +81,7 @@ public final class GUIMacOSX {
    * @throws Exception if any error occurs.
    */
   private void addDockIcon() throws Exception {
-    invoke(appObj, "setDockIconImage", Image.class, BaseXImages.get("logo"));
+    invoke(appObj, "setDockIconImage", Image.class, BaseXImages.get("logo_256"));
   }
 
   /**
@@ -125,7 +125,7 @@ public final class GUIMacOSX {
     /** Called when the user selects the About item in the application menu. */
     public void handleAbout() {
       // explicit cast to circumvent Java compiler bug
-      ((GUICommand) GUIMenuCmd.C_ABOUT).execute(main);
+      GUIMenuCmd.C_ABOUT.execute(main);
     }
 
     /**
@@ -139,7 +139,8 @@ public final class GUIMacOSX {
      * Finder or another application.
      * @param obj application event
      */
-    public void handleOpenFile(@SuppressWarnings("unused") final Object obj) {
+    @SuppressWarnings("unused")
+    public void handleOpenFile(final Object obj) {
       // get the associated filename:
       // final String name = (String) GUIMacOSX.invoke(obj, "getFilename");
     }
@@ -147,7 +148,7 @@ public final class GUIMacOSX {
     /** Called when the Preference item in the application menu is selected. */
     public void handlePreferences() {
       // explicit cast to circumvent Java compiler bug
-      ((GUICommand) GUIMenuCmd.C_PREFS).execute(main);
+      GUIMenuCmd.C_PREFS.execute(main);
     }
 
     /**
@@ -165,7 +166,7 @@ public final class GUIMacOSX {
      * @see com.apple.eawt.ApplicationListener#handleQuit
      * @return always false
      */
-    @SuppressWarnings({ "all" }) // ApplicationListener is deprecated
+    @SuppressWarnings("all") // ApplicationListener is deprecated
     public boolean handleQuit() {
       // explicit cast to circumvent Java compiler bug
       ((GUICommand) GUIMenuCmd.C_EXIT).execute(main);
@@ -252,8 +253,7 @@ public final class GUIMacOSX {
   /**
    * Invokes a method on the given object that expects multiple arguments.
    * @param clazz class object to get the method from
-   * @param obj object on which the method should be invoked. Can be
-   *          {@code null} for static methods
+   * @param obj object on which the method should be invoked. Can be {@code null} for static methods
    * @param method name of the method to invoke
    * @param argClasses "types" of the arguments
    * @param argObjects argument values

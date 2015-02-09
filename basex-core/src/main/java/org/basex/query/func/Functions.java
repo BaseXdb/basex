@@ -1,15 +1,16 @@
 package org.basex.query.func;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
-import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import org.basex.query.*;
+import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.Expr.Flag;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
 import org.basex.query.var.*;
@@ -17,9 +18,9 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * This class provides access to statically available functions.
+ * This class provides access to built-in and user-defined functions.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class Functions extends TokenSet {
@@ -37,15 +38,15 @@ public final class Functions extends TokenSet {
   }
 
   /**
-   * Constructor, registering statically available XQuery functions.
+   * Constructor, registering built-in XQuery functions.
    */
   private Functions() {
-    for(final Function def : Function.VALUES) {
-      final String dsc = def.desc;
-      final byte[] ln = token(dsc.substring(0, dsc.indexOf(PAR1)));
-      final int i = put(new QNm(ln, def.uri()).id());
-      if(funcs[i] != null) throw Util.notExpected("Function defined twice: " + def);
-      funcs[i] = def;
+    for(final Function sig : Function.VALUES) {
+      final String desc = sig.desc;
+      final byte[] ln = token(desc.substring(0, desc.indexOf('(')));
+      final int i = put(new QNm(ln, sig.uri()).id());
+      if(funcs[i] != null) throw Util.notExpected("Function defined twice: " + sig);
+      funcs[i] = sig;
     }
   }
 
@@ -67,19 +68,19 @@ public final class Functions extends TokenSet {
     // no constructor function found, or abstract type specified
     if(type != null && type != AtomType.NOT && type != AtomType.AAT) {
       if(arity == 1) return type;
-      throw FUNCTYPEPL.get(ii, name.string(), arity, 1);
+      throw FUNCTYPES_X_X_X_X.get(ii, name.string(), arity, "s", 1);
     }
 
     // include similar function name in error message
     final Levenshtein ls = new Levenshtein();
     for(final AtomType t : AtomType.VALUES) {
-      if(t.par == null) continue;
+      if(t.parent == null) continue;
       final byte[] u = t.name.uri();
-      if(eq(u, XSURI) && t != AtomType.NOT && t != AtomType.AAT && ls.similar(
-          lc(ln), lc(t.string()))) throw FUNCSIMILAR.get(ii, name.string(), t.string());
+      if(eq(u, XS_URI) && t != AtomType.NOT && t != AtomType.AAT && ls.similar(
+          lc(ln), lc(t.string()))) throw FUNCSIMILAR_X_X.get(ii, name.string(), t.string());
     }
     // no similar name: constructor function found, or abstract type specified
-    throw FUNCUNKNOWN.get(ii, name.string());
+    throw FUNCUNKNOWN_X.get(ii, name.string());
   }
 
   /**
@@ -98,8 +99,8 @@ public final class Functions extends TokenSet {
     final Function fl = funcs[id];
     if(!eq(fl.uri(), name.uri())) return null;
     // check number of arguments
-    if(arity >= fl.min && arity <= fl.max) return fl;
-    throw (arity == 1 ? FUNCARGSG : FUNCARGPL).get(ii, fl, arity);
+    if(arity >= fl.minMax[0] && arity <= fl.minMax[1]) return fl;
+    throw FUNCARGNUM_X_X_X.get(ii, fl, arity, arity == 1 ? "" : "s");
   }
 
   /**
@@ -112,100 +113,143 @@ public final class Functions extends TokenSet {
    * @throws QueryException query exception
    */
   public StandardFunc get(final QNm name, final Expr[] args, final StaticContext sc,
-                           final InputInfo ii) throws QueryException {
+      final InputInfo ii) throws QueryException {
     final Function fl = getBuiltIn(name, args.length, ii);
     return fl == null ? null : fl.get(sc, ii, args);
+  }
+
+  /**
+   * Creates either a {@link FuncItem} or a {@link Closure} depending on when the method is called.
+   * At parse and compile time a closure is generated to enable inlining and compilation, at
+   * runtime we directly generate a function item.
+   * @param anns function annotations
+   * @param name function name, may be {@code null}
+   * @param params formal parameters
+   * @param ft function type
+   * @param expr function body
+   * @param scp variable scope
+   * @param sc static context
+   * @param ii input info
+   * @param runtime run-time flag
+   * @param updating flag for updating functions
+   * @return the function expression
+   */
+  private static Expr closureOrFItem(final AnnList anns, final QNm name, final Var[] params,
+      final FuncType ft, final Expr expr, final VarScope scp, final StaticContext sc,
+      final InputInfo ii, final boolean runtime, final boolean updating) {
+    return runtime ? new FuncItem(sc, anns, name, params, ft, expr, scp.stackSize()) :
+      new Closure(ii, name, updating ? null : ft.retType, params, expr, anns, null, sc, scp);
   }
 
   /**
    * Gets a function literal for a known function.
    * @param name function name
    * @param arity number of arguments
-   * @param ctx query context
+   * @param qc query context
    * @param sc static context
    * @param ii input info
+   * @param runtime {@code true} if this method is called at run-time, {@code false} otherwise
    * @return function literal if found, {@code null} otherwise
    * @throws QueryException query exception
    */
-  public static Expr getLiteral(final QNm name, final int arity, final QueryContext ctx,
-      final StaticContext sc, final InputInfo ii) throws QueryException {
+  public static Expr getLiteral(final QNm name, final int arity, final QueryContext qc,
+      final StaticContext sc, final InputInfo ii, final boolean runtime) throws QueryException {
 
-    // parse data type constructors
-    if(eq(name.uri(), XSURI)) {
+    // parse type constructors
+    if(eq(name.uri(), XS_URI)) {
       final Type type = getCast(name, arity, ii);
       final VarScope scp = new VarScope(sc);
-      final Var[] args = { scp.newLocal(ctx, new QNm(QueryText.ITEMM, ""), SeqType.AAT_ZO, true) };
+      final Var[] args = { scp.newLocal(qc, new QNm(ITEMM, ""), SeqType.AAT_ZO, true) };
       final Expr e = new Cast(sc, ii, new VarRef(ii, args[0]), type.seqType());
-      final FuncType tp = FuncType.get(e.type(), SeqType.AAT_ZO);
-      return new FuncItem(sc, new Ann(), name, args, tp, e, scp.stackSize());
+      final AnnList anns = new AnnList();
+      final FuncType ft = FuncType.get(anns, args, e.seqType());
+      return closureOrFItem(anns, name, args, ft, e, scp, sc, ii, runtime, false);
     }
 
-    // pre-defined functions
+    // built-in functions
     final Function fn = get().getBuiltIn(name, arity, ii);
     if(fn != null) {
-      final Ann a = new Ann();
-      if(fn.has(Flag.UPD)) a.add(Ann.Q_UPDATING, Empty.SEQ, ii);
+      final AnnList anns = new AnnList();
       final VarScope scp = new VarScope(sc);
-      final FuncType ft = fn.type(arity);
+      final FuncType ft = fn.type(arity, anns);
       final QNm[] argNames = fn.argNames(arity);
 
       final Var[] args = new Var[arity];
       final Expr[] calls = new Expr[arity];
       for(int i = 0; i < arity; i++) {
-        args[i] = scp.newLocal(ctx, argNames[i], ft.args[i], true);
+        args[i] = scp.newLocal(qc, argNames[i], ft.argTypes[i], true);
         calls[i] = new VarRef(ii, args[i]);
       }
 
-      final StandardFunc f = fn.get(sc, calls);
-      if(!f.has(Flag.CTX) && !f.has(Flag.FCS))
-        return new FuncItem(sc, a, name, args, ft, f, scp.stackSize());
+      final StandardFunc sf = fn.get(sc, ii, calls);
+      final boolean upd = sf.has(Flag.UPD);
+      if(upd) {
+        qc.updating();
+        anns.add(new Ann(ii, Annotation.UPDATING));
+      }
+      if(!sf.has(Flag.CTX) && !sf.has(Flag.FCS)) return closureOrFItem(
+          anns, name, args, fn.type(arity, anns), sf, scp, sc, ii, runtime, upd);
 
-      return new FuncLit(a, name, args, f, ft, scp, sc, ii);
+      return new FuncLit(anns, name, args, sf, ft, scp, sc, ii);
     }
 
     // user-defined function
-    final StaticFunc sf = ctx.funcs.get(name, arity, ii, true);
-    if(sf != null) return getUser(sf, ctx, sc, ii);
+    final StaticFunc sf = qc.funcs.get(name, arity, ii, true);
+    if(sf != null) {
+      final FuncType ft = sf.funcType();
+      final VarScope scp = new VarScope(sc);
+      final Var[] args = new Var[arity];
+      final Expr[] calls = new Expr[arity];
+      for(int a = 0; a < arity; a++) {
+        args[a] = scp.newLocal(qc, sf.argName(a), ft.argTypes[a], true);
+        calls[a] = new VarRef(ii, args[a]);
+      }
+
+      final boolean upd = sf.updating;
+      final TypedFunc tf = qc.funcs.getFuncRef(sf.name, calls, sc, ii);
+      final Expr f = closureOrFItem(tf.anns, sf.name, args, ft, tf.fun, scp, sc, ii, runtime, upd);
+      if(upd) qc.updating();
+      return f;
+    }
 
     // Java function (only allowed with administrator permissions)
     final VarScope scp = new VarScope(sc);
     final FuncType jt = FuncType.arity(arity);
     final Var[] vs = new Var[arity];
     final Expr[] refs = new Expr[vs.length];
-    for(int i = 0; i < vs.length; i++) {
-      vs[i] = scp.newLocal(ctx, new QNm(ARG + (i + 1), ""), SeqType.ITEM_ZM, true);
-      refs[i] = new VarRef(ii, vs[i]);
+    final int vl = vs.length;
+    for(int v = 0; v < vl; v++) {
+      vs[v] = scp.newLocal(qc, new QNm(ARG + (v + 1), ""), SeqType.ITEM_ZM, true);
+      refs[v] = new VarRef(ii, vs[v]);
     }
-    final Expr jm = JavaMapping.get(name, refs, ctx, sc, ii);
-    if(jm != null) return new FuncLit(new Ann(), name, vs, jm, jt, scp, sc, ii);
-
-    return null;
+    final Expr jm = JavaMapping.get(name, refs, qc, sc, ii);
+    return jm == null ? null : new FuncLit(new AnnList(), name, vs, jm, jt, scp, sc, ii);
   }
-
 
   /**
    * Returns a function item for a user-defined function.
    * @param sf static function
-   * @param ctx query context
+   * @param qc query context
    * @param sc static context
    * @param info input info
    * @return resulting value
    * @throws QueryException query exception
    */
-  public static FuncItem getUser(final StaticFunc sf, final QueryContext ctx,
+  public static FuncItem getUser(final StaticFunc sf, final QueryContext qc,
       final StaticContext sc, final InputInfo info) throws QueryException {
 
     final FuncType ft = sf.funcType();
     final VarScope scp = new VarScope(sc);
     final int arity = sf.args.length;
     final Var[] args = new Var[arity];
-    final Expr[] calls = new Expr[args.length];
-    for(int i = 0; i < args.length; i++) {
-      args[i] = scp.newLocal(ctx, sf.argName(i), ft.args[i], true);
-      calls[i] = new VarRef(info, args[i]);
+    final int al = args.length;
+    final Expr[] calls = new Expr[al];
+    for(int a = 0; a < al; a++) {
+      args[a] = scp.newLocal(qc, sf.argName(a), ft.argTypes[a], true);
+      calls[a] = new VarRef(info, args[a]);
     }
-    final TypedFunc tf = ctx.funcs.getFuncRef(sf.name, calls, sc, info);
-    return new FuncItem(sc, tf.ann, sf.name, args, ft, tf.fun, scp.stackSize());
+    final TypedFunc tf = qc.funcs.getFuncRef(sf.name, calls, sc, info);
+    return new FuncItem(sc, tf.anns, sf.name, args, ft, tf.fun, scp.stackSize());
   }
 
   /**
@@ -213,73 +257,89 @@ public final class Functions extends TokenSet {
    * or {@code null}.
    * @param name name of the function
    * @param args optional arguments
-   * @param dyn compile-/run-time flag
-   * @param ctx query context
+   * @param qc query context
    * @param sc static context
    * @param ii input info
    * @return function instance
    * @throws QueryException query exception
    */
-  public static TypedFunc get(final QNm name, final Expr[] args, final boolean dyn,
-      final QueryContext ctx, final StaticContext sc, final InputInfo ii) throws QueryException {
+  public static TypedFunc get(final QNm name, final Expr[] args, final QueryContext qc,
+      final StaticContext sc, final InputInfo ii) throws QueryException {
 
     // get namespace and local name
-    // parse data type constructors
-    if(eq(name.uri(), XSURI)) {
+    // parse type constructors
+    if(eq(name.uri(), XS_URI)) {
       final Type type = getCast(name, args.length, ii);
       final SeqType to = SeqType.get(type, Occ.ZERO_ONE);
       return TypedFunc.constr(new Cast(sc, ii, args[0], to));
     }
 
-    // pre-defined functions
+    // built-in functions
     final StandardFunc fun = get().get(name, args, sc, ii);
     if(fun != null) {
-      if(!sc.xquery3() && fun.has(Flag.X30)) throw FUNC30.get(ii);
-      if(fun.sig.has(Flag.UPD)) ctx.updating(true);
-      // [LW] correct annotations
-      return new TypedFunc(fun, new Ann());
+      final AnnList anns = new AnnList();
+      if(fun.sig.has(Flag.UPD)) {
+        qc.updating();
+        anns.add(new Ann(ii, Annotation.UPDATING));
+      }
+      return new TypedFunc(fun, anns);
     }
 
     // user-defined function
-    final TypedFunc tf = ctx.funcs.getRef(name, args, sc, ii);
+    final TypedFunc tf = qc.funcs.getRef(name, args, sc, ii);
     if(tf != null) return tf;
 
     // Java function (only allowed with administrator permissions)
-    final JavaMapping jf = JavaMapping.get(name, args, ctx, sc, ii);
+    final JavaMapping jf = JavaMapping.get(name, args, qc, sc, ii);
     if(jf != null) return TypedFunc.java(jf);
 
     // add user-defined function that has not been declared yet
-    if(!dyn && FuncType.find(name) == null) {
-      return ctx.funcs.getFuncRef(name, args, sc, ii);
-    }
+    if(FuncType.find(name) == null) return qc.funcs.getFuncRef(name, args, sc, ii);
 
     // no function found
     return null;
   }
 
   /**
-   * Returns an exception if the name of a pre-defined function is similar to the
-   * specified function name.
-   * @param name function name
+   * Returns an exception if the name of a built-in function is similar to the specified name.
+   * @param name name of input function
    * @param ii input info
-   * @return query exception
+   * @return query exception or {@code null}
    */
   QueryException similarError(final QNm name, final InputInfo ii) {
-    // compare specified name with names of predefined functions
-    final byte[] ln = name.local();
+    // find functions with identical URIs and similar local names
+    final byte[] local = name.local(), uri = name.uri();
     final Levenshtein ls = new Levenshtein();
-    for(int k = 1; k < size; ++k) {
-      final int i = indexOf(keys[k], '}');
-      final byte[] u = substring(keys[k], 2, i);
-      final byte[] l = substring(keys[k], i + 1);
-      if(eq(ln, l)) {
-        return FUNCSIMILAR.get(ii, name.prefixId(FNURI),
-            new TokenBuilder(NSGlobal.prefix(u)).add(':').add(l));
-      } else if(ls.similar(ln, l)) {
-        return FUNCSIMILAR.get(ii, name.string(), l);
-      }
+    for(final byte[] key : this) {
+      final int i = indexOf(key, '}');
+      if(eq(uri, substring(key, 2, i)) && ls.similar(local, substring(key, i + 1)))
+        return similarError(name, ii, key);
+    }
+    // find functions with identical local names
+    for(final byte[] key : this) {
+      final int i = indexOf(key, '}');
+      if(eq(local, substring(key, i + 1))) return similarError(name, ii, key);
+    }
+    // find functions with identical URIs and local names that start with the specified name
+    for(final byte[] key : this) {
+      final int i = indexOf(key, '}');
+      if(eq(uri, substring(key, 2, i)) && startsWith(substring(key, i + 1), local))
+        return similarError(name, ii, key);
     }
     return null;
+  }
+
+  /**
+   * Returns an exception for the specified function.
+   * @param name name of input function
+   * @param ii input info
+   * @param key key of built-in function
+   * @return query exception
+   */
+  private static QueryException similarError(final QNm name, final InputInfo ii, final byte[] key) {
+    final int i = indexOf(key, '}');
+    return FUNCSIMILAR_X_X.get(ii, name.prefixId(FN_URI), new TokenBuilder(
+        NSGlobal.prefix(substring(key, 2, i))).add(':').add(substring(key, i + 1)).finish());
   }
 
   @Override

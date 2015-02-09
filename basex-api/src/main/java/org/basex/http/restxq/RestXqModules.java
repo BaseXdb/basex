@@ -2,7 +2,6 @@ package org.basex.http.restxq;
 
 import static org.basex.http.restxq.RestXqText.*;
 
-import java.io.*;
 import java.util.*;
 
 import org.basex.core.*;
@@ -15,7 +14,7 @@ import org.basex.util.*;
 /**
  * This class caches RESTXQ modules found in the HTTP root directory.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class RestXqModules {
@@ -23,7 +22,7 @@ public final class RestXqModules {
   private static final RestXqModules INSTANCE = new RestXqModules();
 
   /** Module cache. */
-  private HashMap<String, RestXqModule> modules = new HashMap<String, RestXqModule>();
+  private HashMap<String, RestXqModule> modules = new HashMap<>();
   /** RESTXQ path. */
   private IOFile restxq;
   /** Private constructor. */
@@ -56,8 +55,9 @@ public final class RestXqModules {
    */
   RestXqFunction find(final HTTPContext http, final QNm error) throws Exception {
     cache(http);
+
     // collect all functions
-    final ArrayList<RestXqFunction> list = new ArrayList<RestXqFunction>();
+    final ArrayList<RestXqFunction> list = new ArrayList<>();
     for(final RestXqModule mod : modules.values()) {
       for(final RestXqFunction rxf : mod.functions()) {
         if(rxf.matches(http, error)) list.add(rxf);
@@ -65,26 +65,63 @@ public final class RestXqModules {
     }
     // no path matches
     if(list.isEmpty()) return null;
-    // choose most appropriate function
-    RestXqFunction first = list.get(0);
-    if(list.size() > 1) {
-      // sort by specifity
-      Collections.sort(list);
-      first = list.get(0);
-      // disallow more than one path with the same specifity
-      if(first.compareTo(list.get(1)) == 0) {
-        final TokenBuilder tb = new TokenBuilder();
-        for(final RestXqFunction rxf : list) {
-          if(first.compareTo(rxf) != 0) break;
-          tb.add(Prop.NL).add(rxf.function.info.toString());
+
+    // sort by relevance
+    Collections.sort(list);
+
+    // return best matching function
+    final RestXqFunction best = list.get(0);
+    if(list.size() == 1 || best.compareTo(list.get(1)) != 0) return best;
+
+    final RestXqFunction bestQf = bestQf(list, http);
+    if(bestQf != null) return bestQf;
+
+    // show error if more than one path with the same specifity exists
+    final TokenBuilder tb = new TokenBuilder();
+    for(final RestXqFunction rxf : list) {
+      if(best.compareTo(rxf) != 0) break;
+      tb.add(Prop.NL).add(rxf.function.info.toString());
+    }
+    throw best.path == null ?
+      best.error(ERROR_CONFLICT, error, tb) :
+      best.error(PATH_CONFLICT, best.path, tb);
+  }
+
+  /**
+   * Returns the function that has a mime type the quality factor of which matches the HTTP request
+   * best.
+   * @param list list of functions
+   * @param http http context
+   * @return best function, or {@code null} if more than one function exists
+   */
+  private static RestXqFunction bestQf(final ArrayList<RestXqFunction> list,
+      final HTTPContext http) {
+
+    // mime types accepted by the client
+    final HTTPAccept[] accepts = http.accepts();
+
+    double bestQf = 0;
+    RestXqFunction best = list.get(0);
+    for(final RestXqFunction rxf : list) {
+      // skip remaining functions with a weaker specifity
+      if(best.compareTo(rxf) != 0) break;
+      if(rxf.produces.isEmpty()) return null;
+
+      for(final String p : rxf.produces) {
+        for(final HTTPAccept accept : accepts) {
+          final double qf = accept.qf;
+          if(MimeTypes.matches(p, accept.type)) {
+            // multiple functions with the same quality factor
+            if(bestQf == qf) return null;
+            if(bestQf < qf) {
+              bestQf = qf;
+              best = rxf;
+            }
+          }
         }
-        throw first.path == null ?
-          first.error(ERROR_CONFLICT, error, tb) :
-          first.error(PATH_CONFLICT, first.path, tb);
       }
     }
-    // choose most specific function
-    return first;
+    return best;
   }
 
   /**
@@ -95,12 +132,13 @@ public final class RestXqModules {
   private synchronized void cache(final HTTPContext http) throws Exception {
     // initialize RESTXQ directory (may be relative against WEBPATH)
     if(restxq == null) {
-      final File fl = new File(http.context().globalopts.get(GlobalOptions.RESTXQPATH));
-      restxq = fl.isAbsolute() ? new IOFile(fl) :
-        new IOFile(http.context().globalopts.get(GlobalOptions.WEBPATH), fl.getPath());
+      final StaticOptions sopts = HTTPContext.context().soptions;
+      final String webpath = sopts.get(StaticOptions.WEBPATH);
+      final String rxqpath = sopts.get(StaticOptions.RESTXQPATH);
+      restxq = new IOFile(webpath).resolve(rxqpath);
     }
     // create new cache
-    final HashMap<String, RestXqModule> cache = new HashMap<String, RestXqModule>();
+    final HashMap<String, RestXqModule> cache = new HashMap<>();
     cache(http, restxq, cache);
     modules = cache;
   }
@@ -131,7 +169,7 @@ public final class RestXqModules {
             module = new RestXqModule(file);
           }
           // add module if it has been parsed, and if it contains annotations
-          if(parsed || module.parse(http)) {
+          if(parsed || module.parse()) {
             module.touch();
             cache.put(path, module);
           }

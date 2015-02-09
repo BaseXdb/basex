@@ -5,13 +5,14 @@ import static org.basex.core.Text.*;
 import java.io.*;
 
 import org.basex.core.*;
+import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.util.*;
 
 /**
  * Evaluates the 'run' command and processes an input file.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class Run extends Execute {
@@ -37,7 +38,7 @@ public final class Run extends Execute {
       // check file reference
       file = IO.get(args[0]);
       if(!file.exists() || file.isDir()) {
-        error = Util.info(RES_NOT_FOUND_X, ctx.user.has(Perm.CREATE) ? file : args[0]);
+        error = Util.info(RES_NOT_FOUND_X, ctx.user().has(Perm.CREATE) ? file : args[0]);
       } else {
         try {
           // retrieve file contents

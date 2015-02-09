@@ -1,6 +1,6 @@
 package org.basex.qt3ts.fn;
 
-import org.basex.tests.bxapi.XQuery;
+import org.basex.tests.bxapi.*;
 import org.basex.tests.qt3ts.*;
 
 /**
@@ -12,7 +12,7 @@ import org.basex.tests.qt3ts.*;
  *             Because the tests have been generated to use non-capturing groups, they require
  *             support for XPath 3.0 regular expressions..
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
 @SuppressWarnings("all")

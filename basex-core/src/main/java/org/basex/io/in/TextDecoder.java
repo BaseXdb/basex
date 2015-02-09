@@ -1,6 +1,6 @@
 package org.basex.io.in;
 
-import static org.basex.util.Token.*;
+import static org.basex.util.Strings.*;
 
 import java.io.*;
 import java.nio.*;
@@ -13,7 +13,7 @@ import org.basex.util.*;
  * The inheriting classes are optimized for performance and faster than Java's
  * default decoders.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 abstract class TextDecoder {
@@ -32,7 +32,7 @@ abstract class TextDecoder {
 
   /**
    * Returns a decoder for the specified encoding.
-   * @param enc encoding, normalized via {@link Token#normEncoding}.
+   * @param enc encoding, normalized via {@link Strings#normEncoding}.
    * @return decoder
    * @throws IOException I/O exception
    */
@@ -50,8 +50,8 @@ abstract class TextDecoder {
   /**
    * Processes an invalid character. Throws an exception if input must be valid,
    * or returns a question mark as replacement.
-   * @throws IOException I/O exception
    * @return question mark
+   * @throws IOException I/O exception
    */
   int invalid() throws IOException {
     if(valid) throw new InputException();
@@ -59,7 +59,7 @@ abstract class TextDecoder {
   }
 
   /** UTF8 Decoder. */
-  static class UTF8 extends TextDecoder {
+  private static class UTF8 extends TextDecoder {
     /** UTF8 cache. */
     private final byte[] cache = new byte[4];
 
@@ -69,18 +69,18 @@ abstract class TextDecoder {
       if(ch < 0x80) return ch;
       if(ch < 0xC0) return invalid();
       cache[0] = (byte) ch;
-      final int cl = cl((byte) ch);
+      final int cl = Token.cl((byte) ch);
       for(int c = 1; c < cl; ++c) {
         ch = ti.readByte();
         if(ch < 0x80) return invalid();
         cache[c] = (byte) ch;
       }
-      return cp(cache, 0);
+      return Token.cp(cache, 0);
     }
   }
 
   /** UTF16LE Decoder. */
-  static class UTF16LE extends TextDecoder {
+  private static class UTF16LE extends TextDecoder {
     @Override
     int read(final TextInput ti) throws IOException {
       final int a = ti.readByte();
@@ -92,7 +92,7 @@ abstract class TextDecoder {
   }
 
   /** UTF16BE Decoder. */
-  static class UTF16BE extends TextDecoder {
+  private static class UTF16BE extends TextDecoder {
     @Override
     int read(final TextInput ti) throws IOException {
       final int a = ti.readByte();
@@ -104,7 +104,7 @@ abstract class TextDecoder {
   }
 
   /** UTF32 Decoder. */
-  static class UTF32 extends TextDecoder {
+  private static class UTF32 extends TextDecoder {
     @Override
     int read(final TextInput ti) throws IOException {
       final int a = ti.readByte();
@@ -120,7 +120,7 @@ abstract class TextDecoder {
   }
 
   /** Generic Decoder. */
-  static class Generic extends TextDecoder {
+  private static final class Generic extends TextDecoder {
     /** Input cache. */
     private final byte[] cache = new byte[4];
     /** Input buffer. */
@@ -135,7 +135,7 @@ abstract class TextDecoder {
      * @param enc encoding
      * @throws IOException I/O exception
      */
-    Generic(final String enc) throws IOException {
+    private Generic(final String enc) throws IOException {
       try {
         csd = Charset.forName(enc).newDecoder();
       } catch(final Exception ex) {

@@ -5,10 +5,10 @@ import java.io.*;
 /**
  * This example demonstrates how to trigger and receive database events.
  *
- * This example required a running database server instance.
+ * This example requires a running database server instance.
  * Documentation: http://docs.basex.org/wiki/Clients
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  */
 public final class EventExample {
   /**

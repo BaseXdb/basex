@@ -4,10 +4,10 @@ import static org.basex.http.restxq.RestXqText.*;
 import static org.basex.util.Token.*;
 
 import org.basex.http.*;
-import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.func.*;
+import org.basex.query.func.http.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -15,7 +15,7 @@ import org.basex.query.value.node.*;
 /**
  * This class holds information on a custom RESTXQ response.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 final class RestXqRespBuilder {
@@ -69,7 +69,7 @@ final class RestXqRespBuilder {
             if(nam != null && val != null) {
               final String key = string(nam);
               final String value = string(val);
-              if(key.equals(MimeTypes.CONTENT_TYPE)) {
+              if(key.equals(HttpText.CONTENT_TYPE)) {
                 cType = value;
               } else {
                 http.res.setHeader(key, value);
@@ -102,8 +102,8 @@ final class RestXqRespBuilder {
     // cache result
     http.sopts(sp);
     http.initResponse();
-    final Serializer ser = Serializer.get(cache, sp);
-    for(; item != null; item = iter.next()) ser.serialize(item);
-    ser.close();
+    try(final Serializer ser = Serializer.get(cache, sp)) {
+      for(; item != null; item = iter.next()) ser.serialize(item);
+    }
   }
 }

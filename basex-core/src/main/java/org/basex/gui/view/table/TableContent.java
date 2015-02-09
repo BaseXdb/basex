@@ -8,14 +8,13 @@ import java.awt.*;
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.gui.*;
-import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.*;
 import org.basex.util.*;
 
 /**
  * This is the content area of the table view.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 final class TableContent extends BaseXBack {
@@ -30,15 +29,15 @@ final class TableContent extends BaseXBack {
 
   /**
    * Default constructor.
-   * @param d table data
-   * @param scr scrollbar reference
+   * @param tdata table data
+   * @param scroll scrollbar reference
    */
-  TableContent(final TableData d, final BaseXScrollBar scr) {
-    scroll = scr;
-    tdata = d;
-    gui = scr.gui;
+  TableContent(final TableData tdata, final BaseXScrollBar scroll) {
+    this.scroll = scroll;
+    this.tdata = tdata;
+    gui = scroll.gui;
     layout(new BorderLayout());
-    mode(gui.gopts.get(GUIOptions.GRADIENT) ? Fill.GRADIENT : Fill.NONE);
+    setOpaque(false);
     add(scroll, BorderLayout.EAST);
   }
 
@@ -56,7 +55,7 @@ final class TableContent extends BaseXBack {
     final int h = getHeight();
     final int fsz = GUIConstants.fontSize;
 
-    final Context context = tdata.context;
+    final Context context = tdata.ctx;
     final Data data = context.data();
     final int focus = gui.context.focused;
     final int rfocus = tdata.getRoot(data, focus);
@@ -70,7 +69,7 @@ final class TableContent extends BaseXBack {
     for(int i = 0; i < nCols; ++i) tb[i] = new TokenBuilder();
 
     focusedString = null;
-    final Nodes marked = context.marked;
+    final DBNodes marked = context.marked;
     int l = scroll.pos() / rowH - 1;
     int posY = -scroll.pos() + l * rowH;
 
@@ -81,12 +80,13 @@ final class TableContent extends BaseXBack {
       posY += rowH;
 
       final int pre = tdata.rows.get(l);
-      while(mpos < marked.size() && marked.pres[mpos] < pre) ++mpos;
+      final long ms = marked.size();
+      while(mpos < ms && marked.pres[mpos] < pre) ++mpos;
 
       // draw line
       g.setColor(GUIConstants.color2);
       g.drawLine(0, posY + rowH - 1, w, posY + rowH - 1);
-      g.setColor(Color.white);
+      g.setColor(GUIConstants.BACK);
       g.drawLine(0, posY + rowH, w, posY + rowH);
 
       // verify if current node is marked or focused
@@ -99,7 +99,7 @@ final class TableContent extends BaseXBack {
         g.setColor(GUIConstants.color(col + 4));
         g.drawLine(0, posY - 1, w, posY - 1);
       }
-      g.setColor(Color.black);
+      g.setColor(GUIConstants.TEXT);
 
       // skip drawing of text during animation
       if(rowH < fsz) continue;
@@ -132,7 +132,7 @@ final class TableContent extends BaseXBack {
         final double ce = x + cw;
 
         if(ce != 0) {
-          final byte[] str = tb[c].isEmpty() ? null : tb[c].finish();
+          final byte[] str = tb[c].isEmpty() ? null : tb[c].toArray();
           if(str != null) {
             if(tdata.mouseX > x && tdata.mouseX < ce || fcol == c) {
               fx = (int) x;
@@ -151,7 +151,7 @@ final class TableContent extends BaseXBack {
         if(fx > w - sw - 2) fx = w - sw - 2;
         g.setColor(GUIConstants.color(col + 2));
         g.fillRect(fx - 2, posY, sw, rowH - 1);
-        g.setColor(Color.black);
+        g.setColor(GUIConstants.TEXT);
         BaseXLayout.chopString(g, focusStr, fx + 1, posY + 2, sw, fsz);
 
         // cache focused string

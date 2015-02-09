@@ -3,9 +3,8 @@ package org.basex.gui.text;
 import java.awt.*;
 
 import org.basex.gui.*;
-import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.*;
-import org.basex.gui.text.TextPanel.*;
+import org.basex.gui.text.SearchBar.SearchDir;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -13,7 +12,7 @@ import org.basex.util.list.*;
  * Text renderer, supporting syntax highlighting and highlighting of selected, erroneous
  * or linked text.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 final class TextRenderer extends BaseXBack {
@@ -40,7 +39,7 @@ final class TextRenderer extends BaseXBack {
   /** Font height. */
   private int fontHeight;
   /** Character widths. */
-  private int[] charWidths = GUIConstants.mfwidth;
+  private int[] charWidths;
   /** Width of current word. */
   private int wordWidth;
   /** Show invisible characters. */
@@ -74,6 +73,9 @@ final class TextRenderer extends BaseXBack {
   /** Indicates if the cursor is located in the current line. */
   private boolean lineC;
 
+  /** Cursor position. */
+  private final int[] cursor = new int[2];
+
   /** Vertical start position. */
   private Syntax syntax = Syntax.SIMPLE;
   /** Visibility of text cursor. */
@@ -85,17 +87,20 @@ final class TextRenderer extends BaseXBack {
 
   /**
    * Constructor.
-   * @param t text to be drawn
-   * @param s scrollbar reference
-   * @param editable editable flag
-   * @param main reference to the main window
+   * @param text text to be drawn
+   * @param scroll scrollbar reference
+   * @param edit editable flag
+   * @param gui reference to the main window
    */
-  TextRenderer(final TextEditor t, final BaseXScrollBar s, final boolean editable, final GUI main) {
-    mode(Fill.NONE);
-    text = t;
-    scroll = s;
-    edit = editable;
-    gui = main;
+  TextRenderer(final TextEditor text, final BaseXScrollBar scroll, final boolean edit,
+      final GUI gui) {
+
+    setOpaque(false);
+    this.text = text;
+    this.scroll = scroll;
+    this.edit = edit;
+    this.gui = gui;
+    font(GUIConstants.dmfont);
   }
 
   @Override
@@ -118,7 +123,6 @@ final class TextRenderer extends BaseXBack {
   @Override
   public void paintComponent(final Graphics g) {
     super.paintComponent(g);
-
     pars.reset();
     final TextIterator iter = init(g, false);
     int oldL = 0;
@@ -146,7 +150,7 @@ final class TextRenderer extends BaseXBack {
    */
   private void drawLineNumber(final Graphics g) {
     if(edit && showLines) {
-      g.setColor(GUIConstants.GRAY);
+      g.setColor(GUIConstants.gray);
       final String s = Integer.toString(line);
       g.drawString(s, offset - fontWidth(g, s) - OFFSET * 2, y);
     }
@@ -169,13 +173,13 @@ final class TextRenderer extends BaseXBack {
     if(edit) {
       if(showLines) {
         final int lx = offset - OFFSET * 3 / 2;
-        g.setColor(GUIConstants.LGRAY);
+        g.setColor(GUIConstants.lgray);
         g.drawLine(lx, 0, lx, height);
       }
       if(margin != -1) {
         // line margin
         final int lx = offset + fontWidth(g, ' ') * margin;
-        g.setColor(GUIConstants.LGRAY);
+        g.setColor(GUIConstants.lgray);
         g.drawLine(lx, 0, lx, height);
       }
     }
@@ -196,6 +200,14 @@ final class TextRenderer extends BaseXBack {
    */
   int[] replace(final ReplaceContext rc) {
     return text.replace(rc);
+  }
+
+  /**
+   * Returns the cursor coordinates.
+   * @return coordinates
+   */
+  int[] cursor() {
+    return cursor;
   }
 
   /**
@@ -276,7 +288,7 @@ final class TextRenderer extends BaseXBack {
    */
   private TextIterator init(final Graphics g, final boolean start) {
     font = defaultFont;
-    syntax.init(getForeground());
+    syntax.init(GUIConstants.TEXT);
 
     final TextIterator iter = new TextIterator(text);
     link = false;
@@ -369,7 +381,7 @@ final class TextRenderer extends BaseXBack {
    */
   private void markLine(final Graphics g) {
     if(lineC && markline) {
-      g.setColor(GUIConstants.color4A);
+      g.setColor(GUIConstants.color3A);
       g.fillRect(0, lineY, width + offset, fontHeight);
     }
   }
@@ -401,7 +413,7 @@ final class TextRenderer extends BaseXBack {
 
     // choose color for enabled text, depending on highlighting, link, or current syntax
     final Color color = isEnabled() ? highlighted ? GUIConstants.GREEN : link ?
-      GUIConstants.color4 : syntax.getColor(iter) : Color.gray;
+      GUIConstants.color4 : syntax.getColor(iter) : GUIConstants.gray;
 
     // retrieve first character of current token
     final int ch = iter.curr();
@@ -416,7 +428,7 @@ final class TextRenderer extends BaseXBack {
         while(!iter.inSelect() && iter.more()) xx += fontWidth(g, iter.next());
         int cw = 0;
         while(iter.inSelect() && iter.more()) cw += fontWidth(g, iter.next());
-        g.setColor(GUIConstants.color(3));
+        g.setColor(GUIConstants.color2A);
         g.fillRect(xx, lineY, cw, fontHeight);
         iter.pos(cp);
       }
@@ -438,23 +450,22 @@ final class TextRenderer extends BaseXBack {
 
       // don't write whitespaces
       if(ch == '\n' && showNL) {
-        g.setColor(GUIConstants.GRAY);
+        g.setColor(GUIConstants.gray);
         g.drawString("\u00b6", x, y);
       } else if((ch == '\u00a0' || ch >= 0x2000 && ch <= 0x200A) && showInvisible) {
         final int s = fontHeight / 12 + 1;
-        g.setColor(GUIConstants.GRAY);
+        g.setColor(GUIConstants.gray);
         g.fillRect(x + (wordWidth >> 1), y - fontHeight * 3 / 10, s, s);
       } else if(ch == '\t' && showInvisible) {
         final int yy = y - fontHeight * 3 / 10;
         final int s = 1 + fontHeight / 12;
         final int xe = x + fontWidth(g, '\t') - s;
         final int as = s * 2 - 1;
-        g.setColor(GUIConstants.GRAY);
+        g.setColor(GUIConstants.gray);
         g.drawLine(x + s, yy, xe, yy);
         g.drawLine(xe - as, yy - as, xe, yy);
         g.drawLine(xe - as, yy + as, xe, yy);
       } else if(ch > ' ') {
-        // choose color for enabled text, depending on highlighting, link, or current syntax
         g.setColor(color);
         String n = iter.nextString();
         int ww = width - x;
@@ -517,8 +528,10 @@ final class TextRenderer extends BaseXBack {
    * @param xx x position
    */
   private void drawCaret(final Graphics g, final int xx) {
-    g.setColor(GUIConstants.DGRAY);
+    g.setColor(GUIConstants.dgray);
     g.fillRect(xx, lineY, 2, fontHeight);
+    cursor[0] = xx;
+    cursor[1] = lineY + fontHeight;
   }
 
   /**
@@ -544,7 +557,7 @@ final class TextRenderer extends BaseXBack {
    * @return width
    */
   private int fontWidth(final Graphics g, final int cp) {
-    return cp < ' ' || g == null ?  cp == '\t' ?
+    return cp < ' ' || g == null ? cp == '\t' ?
       charWidths[' '] * indent : 0 : cp < 256 ? charWidths[cp] :
       cp >= 0xD800 && cp <= 0xDC00 ? 0 : g.getFontMetrics().charWidth(cp);
   }

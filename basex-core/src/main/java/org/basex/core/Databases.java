@@ -8,39 +8,39 @@ import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
- * Manages a two-way-map of all available databases and backups. Used for locking.
+ * Provides central access to all databases and backups.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Jens Erat
  */
 public final class Databases {
   /** Allowed characters for database names (additional to letters and digits).
    * The following characters are invalid:
    * <ul>
-   * <li> {@code ,?*}" are used by the glob syntax</li>
-   * <li> {@code ;} is reserved for separating commands.</li>
-   * <li> {@code :*?\"<>\/|}" are used for filenames and paths</li>
+   *   <li> {@code ,?*}" are used by the glob syntax</li>
+   *   <li> {@code ;} is reserved for separating commands.</li>
+   *   <li> {@code :*?\"<>\/|}" are used for filenames and paths</li>
    * </ul>
    */
-  public static final String DBCHARS = "-+=~!#$%^&()[]{}@'`";
-  /** Regex representation of allowed database characters. */
-  public static final String REGEXCHARS = DBCHARS.replaceAll("(.)", "\\\\$1");
+  static final String DBCHARS = "-+=~!#$%^&()[]{}@'`";
 
+  /** Regex representation of allowed database characters. */
+  private static final String REGEXCHARS = DBCHARS.replaceAll("(.)", "\\\\$1");
   /** Pattern to extract the database name from a backup file name. */
   private static final Pattern ZIPPATTERN =
       Pattern.compile(DateTime.PATTERN + '\\' + IO.ZIPSUFFIX + '$');
   /** Regex indicator. */
   private static final Pattern REGEX = Pattern.compile(".*[*?,].*");
 
-  /** Global options. */
-  private final GlobalOptions gopts;
+  /** Static options. */
+  private final StaticOptions soptions;
 
   /**
    * Creates a new instance and loads available databases.
-   * @param c Database context
+   * @param soptions static options
    */
-  Databases(final Context c) {
-    gopts = c.globalopts;
+  Databases(final StaticOptions soptions) {
+    this.soptions = soptions;
   }
 
   /**
@@ -56,12 +56,12 @@ public final class Databases {
    * @return database list
    */
   public StringList listDBs() {
-    return list(true, false, null);
+    return listDBs(null);
   }
 
   /**
    * Lists all available databases matching the given name. Supports glob patterns.
-   * @param name database name, glob patterns allowed
+   * @param name database name, glob patterns allowed (may be {@code null})
    * @return database list
    */
   public StringList listDBs(final String name) {
@@ -77,18 +77,10 @@ public final class Databases {
    * @return database and backups list
    */
   private StringList list(final boolean db, final boolean backup, final String name) {
-    final Pattern pt;
-    if(name != null) {
-      final String nm = REGEX.matcher(name).matches() ? IOFile.regex(name) :
-        name.replaceAll("([" + REGEXCHARS + "])", "\\\\$1");
-      pt = Pattern.compile(nm, Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE);
-    } else {
-      pt = null;
-    }
-
-    final IOFile[] children = gopts.dbpath().children();
+    final Pattern pt = name == null ? null : regex(name);
+    final IOFile[] children = soptions.dbpath().children();
     final StringList list = new StringList(children.length);
-    final HashSet<String> map = new HashSet<String>(children.length);
+    final HashSet<String> map = new HashSet<>(children.length);
     for(final IOFile f : children) {
       final String fn = f.name();
       String add = null;
@@ -107,12 +99,34 @@ public final class Databases {
   }
 
   /**
+   * Returns a regular expression for the specified name pattern.
+   * @param pattern pattern
+   * @return regular expression
+   */
+  public static Pattern regex(final String pattern) {
+    return regex(pattern, "");
+  }
+
+  /**
+   * Returns a regular expression for the specified name pattern.
+   * @param pattern pattern (can be {@code null})
+   * @param suffix regular expression suffix
+   * @return regular expression
+   */
+  public static Pattern regex(final String pattern, final String suffix) {
+    if(pattern == null) return null;
+    final String nm = REGEX.matcher(pattern).matches() ? IOFile.regex(pattern) :
+      pattern.replaceAll("([" + REGEXCHARS + "])", "\\\\$1") + suffix;
+    return Pattern.compile(nm, Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE);
+  }
+
+  /**
    * Returns the names of all backups.
    * @return backups
    */
   public StringList backups() {
     final StringList backups = new StringList();
-    for(final IOFile f : gopts.dbpath().children()) {
+    for(final IOFile f : soptions.dbpath().children()) {
       final String n = f.name();
       if(n.endsWith(IO.ZIPSUFFIX)) backups.add(n.substring(0, n.lastIndexOf('.')));
     }
@@ -127,15 +141,14 @@ public final class Databases {
    */
   public StringList backups(final String db) {
     final StringList backups = new StringList();
-    final IOFile file = gopts.dbpath(db + IO.ZIPSUFFIX);
+    final IOFile file = soptions.dbpath(db + IO.ZIPSUFFIX);
     if(file.exists()) {
       backups.add(db);
     } else {
-      final String regex = db.replaceAll("([" + REGEXCHARS + "])", "\\\\$1") +
-          DateTime.PATTERN + IO.ZIPSUFFIX;
-      for(final IOFile f : gopts.dbpath().children()) {
+      final Pattern regex = regex(db, DateTime.PATTERN + '\\' + IO.ZIPSUFFIX);
+      for(final IOFile f : soptions.dbpath().children()) {
         final String n = f.name();
-        if(n.matches(regex)) backups.add(n.substring(0, n.lastIndexOf('.')));
+        if(regex.matcher(n).matches()) backups.add(n.substring(0, n.lastIndexOf('.')));
       }
     }
     return backups.sort(Prop.CASE, false);

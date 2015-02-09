@@ -1,7 +1,7 @@
 package org.basex.query.value.item;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
-import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
 import org.basex.query.value.type.*;
@@ -10,45 +10,45 @@ import org.basex.util.*;
 /**
  * Date item ({@code xs:date}).
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class Dat extends ADate {
   /**
    * Constructor.
-   * @param date date
+   * @param value date
    */
-  public Dat(final ADate date) {
-    super(AtomType.DAT, date);
+  public Dat(final ADate value) {
+    super(AtomType.DAT, value);
     clean();
   }
 
   /**
    * Constructor.
-   * @param date date
+   * @param value date
    * @param ii input info
    * @throws QueryException query exception
    */
-  public Dat(final byte[] date, final InputInfo ii) throws QueryException {
+  public Dat(final byte[] value, final InputInfo ii) throws QueryException {
     super(AtomType.DAT);
-    date(date, XDATE, ii);
+    date(value, XDATE, ii);
   }
 
   /**
    * Constructor.
-   * @param date date
+   * @param value date
    * @param dur duration
    * @param plus plus/minus flag
    * @param ii input info
    * @throws QueryException query exception
    */
-  public Dat(final Dat date, final Dur dur, final boolean plus, final InputInfo ii)
+  public Dat(final Dat value, final Dur dur, final boolean plus, final InputInfo ii)
       throws QueryException {
 
-    this(date);
+    this(value);
     if(dur instanceof DTDur) {
       calc((DTDur) dur, plus);
-      if(yea <= MIN_YEAR || yea > MAX_YEAR) throw YEARRANGE.get(ii, yea);
+      if(yea <= MIN_YEAR || yea > MAX_YEAR) throw YEARRANGE_X.get(ii, yea);
     } else {
       calc((YMDur) dur, plus, ii);
     }
@@ -56,9 +56,9 @@ public final class Dat extends ADate {
   }
 
   @Override
-  public void timeZone(final DTDur tz, final boolean spec, final InputInfo ii)
+  public void timeZone(final DTDur zone, final boolean spec, final InputInfo ii)
       throws QueryException {
-    tz(tz, spec, ii);
+    tz(zone, spec, ii);
     clean();
   }
 

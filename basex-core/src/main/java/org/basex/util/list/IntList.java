@@ -7,7 +7,7 @@ import org.basex.util.*;
 /**
  * This is a simple container for native integers.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public class IntList extends ElementList {
@@ -51,10 +51,31 @@ public class IntList extends ElementList {
   /**
    * Adds an element to the array.
    * @param element element to be added
+   * @return self reference
    */
-  public final void add(final int element) {
-    if(size == list.length) list = Arrays.copyOf(list, newSize());
-    list[size++] = element;
+  public final IntList add(final int element) {
+    int[] lst = list;
+    final int s = size;
+    if(s == lst.length) lst = Arrays.copyOf(lst, newSize());
+    lst[s] = element;
+    list = lst;
+    size = s + 1;
+    return this;
+  }
+
+  /**
+   * Adds elements to the array.
+   * @param elements elements to be added
+   * @return self reference
+   */
+  public final IntList add(final int... elements) {
+    int[] lst = list;
+    final int l = elements.length, s = size, ns = s + l;
+    if(ns > lst.length) lst = Arrays.copyOf(lst, newSize(ns));
+    System.arraycopy(elements, 0, lst, s, l);
+    list = lst;
+    size = ns;
+    return this;
   }
 
   /**
@@ -83,7 +104,9 @@ public class IntList extends ElementList {
    * @return result of check
    */
   public final boolean contains(final int element) {
-    for(int i = 0; i < size; ++i) if(list[i] == element) return true;
+    final int s = size;
+    final int[] lst = list;
+    for(int i = 0; i < s; ++i) if(lst[i] == element) return true;
     return false;
   }
 
@@ -106,9 +129,11 @@ public class IntList extends ElementList {
    * @param element element to be removed
    */
   public final void delete(final int element) {
+    final int[] lst = list;
+    final int sz = size;
     int s = 0;
-    for(int i = 0; i < size; ++i) {
-      if(list[i] != element) list[s++] = list[i];
+    for(int i = 0; i < sz; ++i) {
+      if(lst[i] != element) lst[s++] = lst[i];
     }
     size = s;
   }
@@ -118,9 +143,10 @@ public class IntList extends ElementList {
    * @param index index of the element to delete
    * @return deleted element
    */
-  public final int deleteAt(final int index) {
-    final int l = list[index];
-    Array.move(list, index + 1, -1, --size - index);
+  public final int remove(final int index) {
+    final int[] lst = list;
+    final int l = lst[index];
+    Array.move(lst, index + 1, -1, --size - index);
     return l;
   }
 
@@ -129,8 +155,10 @@ public class IntList extends ElementList {
    * @param diff difference
    * @param index index of the first element
    */
-  public final void move(final int diff, final int index) {
-    for(int a = index; a < size; a++) list[a] += diff;
+  public final void incFrom(final int diff, final int index) {
+    final int[] lst = list;
+    final int sz = size;
+    for(int a = index; a < sz; a++) lst[a] += diff;
   }
 
   /**
@@ -176,11 +204,48 @@ public class IntList extends ElementList {
   }
 
   /**
+   * Returns an array with all elements and resets the array size.
+   * @return array
+   */
+  public int[] next() {
+    final int[] lst = Arrays.copyOf(list, size);
+    reset();
+    return lst;
+  }
+
+  /**
+   * Returns an array with all elements and invalidates the internal array.
+   * Warning: the function must only be called if the list is discarded afterwards.
+   * @return array (internal representation!)
+   */
+  public int[] finish() {
+    final int[] lst = list;
+    list = null;
+    final int s = size;
+    return s == lst.length ? lst : Arrays.copyOf(lst, s);
+  }
+
+  /**
+   * Removes duplicate entries from a sorted list.
+   * @return self reference
+   */
+  public IntList distinct() {
+    int i = 1;
+    for(int j = 1; j < size; ++j) {
+      while(j < size && list[i - 1] == list[j]) j++;
+      if(j < size) list[i++] = list[j];
+    }
+    size = i;
+    return this;
+  }
+
+  /**
    * Sorts the data.
    * @return self reference
    */
   public IntList sort() {
-    Arrays.sort(list, 0, size);
+    final int s = size;
+    if(s > 1) Arrays.sort(list, 0, s);
     return this;
   }
 

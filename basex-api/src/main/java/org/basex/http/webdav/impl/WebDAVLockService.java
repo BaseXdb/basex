@@ -1,28 +1,26 @@
 package org.basex.http.webdav.impl;
 
-import org.basex.core.BaseXException;
-import org.basex.data.Result;
-import org.basex.http.HTTPContext;
-import org.basex.io.IOStream;
-import org.basex.io.out.ArrayOutput;
-import org.basex.io.serial.Serializer;
-import org.basex.query.QueryException;
-import org.basex.query.QueryProcessor;
-import org.basex.util.Util;
-import org.basex.util.list.StringList;
+import static org.basex.http.webdav.impl.Utils.*;
+import static org.basex.util.Token.*;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.*;
+import java.io.*;
 import java.util.Map.Entry;
+import java.util.*;
 
-import static org.basex.http.webdav.impl.Utils.SEP;
-import static org.basex.util.Token.string;
+import org.basex.core.*;
+import org.basex.http.*;
+import org.basex.io.*;
+import org.basex.io.out.*;
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.value.item.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Service managing the WebDAV locks.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Dimitar Popov
  */
 public final class WebDAVLockService {
@@ -33,10 +31,10 @@ public final class WebDAVLockService {
 
   /**
    * Constructor.
-   * @param h HTTP context
+   * @param http HTTP context
    */
-  WebDAVLockService(final HTTPContext h) {
-    http = h;
+  WebDAVLockService(final HTTPContext http) {
+    this.http = http;
   }
 
   /**
@@ -76,14 +74,14 @@ public final class WebDAVLockService {
     final String token = UUID.randomUUID().toString();
 
     final WebDAVQuery query = new WebDAVQuery("w:create-lock(" +
-        "$path, $token, $scope, $type, $depth, $owner,$timeout)");
+        "$path, $token, $scope, $type, $depth, $owner, $timeout)");
     query.bind("path", db + SEP + p);
     query.bind("token", token);
     query.bind("scope", scope);
     query.bind("type", type);
     query.bind("depth", depth);
     query.bind("owner", user);
-    query.bind("timeout", to == null ? Long.MAX_VALUE : to);
+    query.bind("timeout", to == null ? Long.valueOf(Long.MAX_VALUE) : to);
     execute(query);
     return token;
   }
@@ -120,17 +118,17 @@ public final class WebDAVLockService {
    * @throws IOException I/O exception
    */
   public boolean conflictingLocks(final String db, final String p) throws IOException {
-    return execute(new WebDAVQuery("w:conflicting-locks(" +
+    return !execute(new WebDAVQuery("w:conflicting-locks(" +
         "<w:lockinfo>" +
         "<w:path>{ $path }</w:path>" +
         "<w:scope>exclusive</w:scope>" +
         "<w:depth>infinite</w:depth>" +
         "<w:owner>{ $owner }</w:owner>" +
-        "</w:lockinfo>)").bind("path", db + SEP + p).bind("owner", http.user)).isEmpty();
+        "</w:lockinfo>)").bind("path", db + SEP + p).bind("owner", http.username)).isEmpty();
   }
 
   /**
-   * Creates the lock database, if it does not exist.
+   * Creates the lock database if it does not exist.
    * @throws IOException I/O exception
    */
   private void initLockDb() throws IOException {
@@ -149,20 +147,19 @@ public final class WebDAVLockService {
     if(s == null) throw new IOException("WebDAV module not found");
     final byte[] module = new IOStream(s).read();
 
-    final QueryProcessor qp = new QueryProcessor(query.toString(), http.context());
-    try {
+    try(final QueryProcessor qp = new QueryProcessor(query.toString(), HTTPContext.context())) {
       for(final Entry<String, Object> entry : query.entries()) {
         qp.bind(entry.getKey(), entry.getValue());
       }
-      qp.ctx.parseLibrary(string(module), FILE, qp.sc);
+      qp.qc.parseLibrary(string(module), FILE, qp.sc);
 
-      final Result r = qp.execute();
-      final int n = (int) r.size();
-      final StringList items = new StringList(n);
-      for(int i = 0; i < n; i++) {
-        final ArrayOutput ao = new ArrayOutput();
-        r.serialize(Serializer.get(ao), 0);
+      final StringList items = new StringList();
+      final ArrayOutput ao = new ArrayOutput();
+      final Serializer ser = qp.getSerializer(ao);
+      for(final Item it : qp.value()) {
+        ser.serialize(it);
         items.add(ao.toString());
+        ao.reset();
       }
       return items;
     } catch(final QueryException ex) {
@@ -170,8 +167,6 @@ public final class WebDAVLockService {
     } catch(final Exception ex) {
       Util.debug(ex);
       throw new BaseXException(ex);
-    } finally {
-      qp.close();
     }
   }
 }

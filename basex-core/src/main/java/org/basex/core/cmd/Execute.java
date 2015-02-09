@@ -5,7 +5,9 @@ import static org.basex.core.Text.*;
 import java.util.*;
 
 import org.basex.core.*;
+import org.basex.core.locks.*;
 import org.basex.core.parse.*;
+import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.util.*;
 
@@ -13,12 +15,12 @@ import org.basex.util.*;
  * Evaluates the 'execute' command and runs a command script.
  * This command can be used to run multiple commands as a single transaction.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public class Execute extends Command {
   /** Commands to execute. */
-  final ArrayList<Command> list = new ArrayList<Command>();
+  final ArrayList<Command> list = new ArrayList<>();
   /** Error message. */
   String error;
 

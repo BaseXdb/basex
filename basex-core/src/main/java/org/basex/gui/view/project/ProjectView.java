@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.io.*;
 import java.util.*;
 
 import javax.swing.*;
@@ -12,18 +11,17 @@ import javax.swing.border.*;
 
 import org.basex.core.*;
 import org.basex.gui.*;
-import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXFileChooser.Mode;
 import org.basex.gui.view.editor.*;
 import org.basex.io.*;
+import org.basex.query.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Project file tree.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class ProjectView extends BaseXPanel {
@@ -34,7 +32,7 @@ public final class ProjectView extends BaseXPanel {
   /** Editor view. */
   final EditorView editor;
   /** Filter field. */
-  final ProjectFilter filter;
+  private final ProjectFilter filter;
   /** Filter list. */
   final ProjectList list;
   /** Root path. */
@@ -62,7 +60,8 @@ public final class ProjectView extends BaseXPanel {
     setLayout(new BorderLayout());
 
     tree = new ProjectTree(this);
-    root = new ProjectDir(new IOFile(root()), this);
+    final String proj = gui.gopts.get(GUIOptions.PROJECTPATH);
+    root = new ProjectDir(new IOFile(proj.isEmpty() ? Prop.HOME : proj), this);
     tree.init(root);
 
     filter = new ProjectFilter(this);
@@ -70,8 +69,8 @@ public final class ProjectView extends BaseXPanel {
     BaseXLayout.addInteraction(list, gui);
 
     final BaseXBack back = new BaseXBack().layout(new BorderLayout(2, 2));
-    back.setBorder(new CompoundBorder(new MatteBorder(0, 0, 1, 0, GUIConstants.GRAY),
-        new EmptyBorder(3, 1, 3, 2)));
+    back.setBorder(new CompoundBorder(new MatteBorder(0, 0, 1, 0, GUIConstants.gray),
+        BaseXLayout.border(3, 1, 3, 2)));
 
     path = new BaseXTextField(gui);
     path.setText(root.file.path());
@@ -93,12 +92,12 @@ public final class ProjectView extends BaseXPanel {
 
     // add scroll bars
     final JScrollPane lscroll = new JScrollPane(list);
-    lscroll.setBorder(new EmptyBorder(0, 0, 0, 0));
+    lscroll.setBorder(BaseXLayout.border(0, 0, 0, 0));
     final JScrollPane tscroll = new JScrollPane(tree);
-    tscroll.setBorder(new EmptyBorder(0, 0, 0, 0));
+    tscroll.setBorder(BaseXLayout.border(0, 0, 0, 0));
 
     split = new BaseXSplit(false);
-    split.mode(Fill.NONE);
+    split.setOpaque(false);
     split.add(lscroll);
     split.add(tscroll);
     split.init(new double[] { 0.3, 0.7}, new double[] { 0, 1});
@@ -117,18 +116,33 @@ public final class ProjectView extends BaseXPanel {
    * Makes the list (in)visible.
    * @param vis visibility flag
    */
-  public void showList(final boolean vis) {
+  void showList(final boolean vis) {
     split.visible(vis);
   }
 
   /**
    * Refreshes the specified file node.
    * @param file file to be opened
-   * @param tr refresh tree
+   * @param rename file has been renamed
    */
-  public void refresh(final IOFile file, final boolean tr) {
-    if(tr) refresh(file);
+  public void save(final IOFile file, final boolean rename) {
+    refresh(file);
+    if(rename) reset();
+    refresh();
+  }
+
+  /**
+   * Refreshes the filter view.
+   */
+  void refresh() {
     filter.refresh(true);
+  }
+
+  /**
+   * Resets the filter cache.
+   */
+  void reset() {
+    filter.reset();
   }
 
   /**
@@ -136,13 +150,13 @@ public final class ProjectView extends BaseXPanel {
    * @param file file to be focused
    */
   public void jump(final IOFile file) {
-    final IOFile fl = new IOFile(canonical(file.file()));
+    final IOFile fl = file.normalize();
     if(fl.path().startsWith(root.file.path())) tree.expand(root, fl.path());
     tree.requestFocusInWindow();
   }
 
   /**
-   * Refreshes the specified file node, or its parent.
+   * Refreshes the visualization of the specified file, or its parent, in the tree.
    * @param file file to be refreshed
    */
   private void refresh(final IOFile file) {
@@ -150,19 +164,18 @@ public final class ProjectView extends BaseXPanel {
     if(node != null) {
       node.refresh();
     } else {
-      final File parent = file.file().getParentFile();
-      if(parent == null) return;
-      refresh(new IOFile(parent));
+      final IOFile parent = file.parent();
+      if(parent != null) refresh(parent);
     }
   }
 
   /**
    * Returns the node for the specified file.
    * @param file file to be found
-   * @return node, or {@code null}
+   * @return node or {@code null}
    */
   private ProjectNode find(final IOFile file) {
-    final IOFile fl = new IOFile(canonical(file.file()));
+    final IOFile fl = file.normalize();
     if(fl.path().startsWith(root.file.path())) {
       final Enumeration<?> en = root.depthFirstEnumeration();
       while(en.hasMoreElements()) {
@@ -178,6 +191,7 @@ public final class ProjectView extends BaseXPanel {
    */
   public void refreshLayout() {
     filter.refreshLayout();
+    root.refresh();
   }
 
   /**
@@ -203,7 +217,7 @@ public final class ProjectView extends BaseXPanel {
    * Renames a file or directory in the tree.
    * @param node source node
    * @param name new name of file or directory
-   * @return new file reference, or {@code null} if operation failed
+   * @return new file reference or {@code null} if operation failed
    */
   IOFile rename(final ProjectNode node, final String name) {
     // check if chosen file name is valid
@@ -211,49 +225,14 @@ public final class ProjectView extends BaseXPanel {
       final IOFile old = node.file;
       final IOFile updated = new IOFile(old.file().getParent(), name);
       // rename file or show error dialog
-      if(!old.rename(updated)) {
-        BaseXDialog.error(gui, Util.info(FILE_NOT_RENAMED_X, old));
-      } else {
+      if(old.rename(updated)) {
         // update tab references if file or directory could be renamed
         gui.editor.rename(old, updated);
         return updated;
       }
+      BaseXDialog.error(gui, Util.info(FILE_NOT_RENAMED_X, old));
     }
     return null;
-  }
-
-  /**
-   * Returns a common parent directory.
-   * @return root directory
-   */
-  private String root() {
-    final GlobalOptions gopts = gui.context.globalopts;
-    final String proj = gui.gopts.get(GUIOptions.PROJECTPATH);
-    if(!proj.isEmpty()) return proj;
-
-    final File io1 = new File(gopts.get(GlobalOptions.REPOPATH));
-    final File io2 = new File(gopts.get(GlobalOptions.WEBPATH));
-    final File fl = new File(gopts.get(GlobalOptions.RESTXQPATH));
-    final File io3 = fl.isAbsolute() ? fl : new File(io2, fl.getPath());
-    final StringList sl = new StringList();
-    for(final File f : new File[] { io1, io2, io3}) {
-      final String p = canonical(f).getParent();
-      if(!sl.contains(p)) sl.add(p);
-    }
-    return sl.unique().get(0);
-  }
-
-  /**
-   * Returns the canonical or (if not possible) the absolute file reference.
-   * @param f file reference
-   * @return file
-   */
-  private static File canonical(final File f) {
-    try {
-      return f.getCanonicalFile();
-    } catch(final IOException ex) {
-      return f.getAbsoluteFile();
-    }
   }
 
   /**
@@ -275,18 +254,52 @@ public final class ProjectView extends BaseXPanel {
   }
 
   /**
+   * Adds an import statement to the currently edited file.
+   * @param file file to be opened
+   */
+  void addImport(final IOFile file) {
+    final EditorArea edit = editor.getEditor();
+    final Context ctx = gui.context;
+    final String relative = edit.file().parent().relative(file).replace('\\', '/');
+
+    try(final QueryContext qc = new QueryContext(ctx)) {
+      final LibraryModule lm = qc.parseLibrary(file.string(), file.path(), null);
+      final TokenBuilder tmp = new TokenBuilder("import module namespace ");
+      tmp.add(lm.name.string()).add(" = \"").add(lm.name.uri());
+      tmp.add("\" at \"").add(relative).add("\";\n");
+      edit.paste(tmp.toString());
+
+    } catch(final Exception ex) {
+      BaseXDialog.error(gui, Util.message(ex));
+    }
+  }
+
+  /**
    * Changes the root directory.
    */
   private void change() {
     final ProjectNode child = tree.selectedNode();
-    final BaseXFileChooser fc = new BaseXFileChooser(CHOOSE_DIR, child.file.path(), gui);
+    final IOFile file = (child != null ? child : root).file;
+    final BaseXFileChooser fc = new BaseXFileChooser(CHOOSE_DIR, file.path(), gui);
     final IOFile io = fc.select(Mode.DOPEN);
-    if(io != null) {
-      root.file = io;
-      root.refresh();
-      filter.reset();
-      path.setText(io.path());
+    if(io != null) changeRoot(io, true);
+  }
+
+  /**
+   * Changes the root directory.
+   * @param io root directory
+   * @param force enforce directory and setting change
+   */
+  public void changeRoot(final IOFile io, final boolean force) {
+    final String project = gui.gopts.get(GUIOptions.PROJECTPATH);
+    if(!force && !project.isEmpty()) return;
+    root.file = io;
+    root.refresh();
+    filter.reset();
+    path.setText(io.path());
+    if(force) {
       gui.gopts.set(GUIOptions.PROJECTPATH, io.path());
+      gui.gopts.write();
     }
   }
 }

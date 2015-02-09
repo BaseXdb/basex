@@ -7,16 +7,16 @@ import org.w3c.dom.*;
 /**
  * DOM - Text implementation.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public class BXText extends BXChar implements Text {
   /**
    * Constructor.
-   * @param n node reference
+   * @param node node reference
    */
-  public BXText(final ANode n) {
-    super(n);
+  BXText(final ANode node) {
+    super(node);
   }
 
   @Override
@@ -26,16 +26,16 @@ public class BXText extends BXChar implements Text {
 
   @Override
   public boolean isElementContentWhitespace() {
-    return Token.ws(node.string());
+    return Token.ws(nd.string());
   }
 
   @Override
-  public BXText replaceWholeText(final String content) {
+  public BXText replaceWholeText(final String value) {
     throw readOnly();
   }
 
   @Override
-  public BXText splitText(final int off) {
+  public BXText splitText(final int offset) {
     throw readOnly();
   }
 }

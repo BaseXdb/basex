@@ -1,14 +1,18 @@
 package org.basex.util;
 
+import org.basex.query.*;
+import org.basex.query.expr.*;
 
 /**
- * This class contains the original query, its file reference, and line/column
- * information.
+ * This class contains information on the original query, which will be evaluated for
+ * error feedback and debugging purposes.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class InputInfo {
+  /** Indicates if a raised error should be static. */
+  private boolean check;
   /** Input path. */
   private final String path;
   /** Input query. */
@@ -32,14 +36,14 @@ public final class InputInfo {
 
   /**
    * Constructor.
-   * @param p input path
-   * @param l line
-   * @param c column
+   * @param path input path
+   * @param line line
+   * @param col column
    */
-  public InputInfo(final String p, final int l, final int c) {
-    path = p;
-    line = l;
-    col = c;
+  public InputInfo(final String path, final int line, final int col) {
+    this.path = path;
+    this.line = line;
+    this.col = col;
   }
 
   /**
@@ -81,6 +85,22 @@ public final class InputInfo {
     }
     line = l;
     col = c;
+  }
+
+  /**
+   * Returns the check flag (invoked by {@link QueryError#get(InputInfo, Object...)}).
+   * @return check flag
+   */
+  public boolean check() {
+    return check;
+  }
+
+  /**
+   * Sets the check flag (invoked e.g. by {@link Castable#optimize}).
+   * @param value value to set
+   */
+  public void check(final boolean value) {
+    check = value;
   }
 
   @Override

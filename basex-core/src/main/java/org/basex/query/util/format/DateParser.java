@@ -1,6 +1,6 @@
 package org.basex.query.util.format;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
 import org.basex.util.*;
@@ -8,7 +8,7 @@ import org.basex.util.*;
 /**
  * Parser for formatting dates.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 final class DateParser extends TokenParser {
@@ -17,12 +17,12 @@ final class DateParser extends TokenParser {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param p picture
+   * @param info input info
+   * @param picture picture
    */
-  DateParser(final InputInfo ii, final byte[] p) {
-    super(p);
-    info = ii;
+  DateParser(final InputInfo info, final byte[] picture) {
+    super(picture);
+    this.info = info;
   }
 
   /**
@@ -33,10 +33,10 @@ final class DateParser extends TokenParser {
   int literal() throws QueryException {
     final int ch = next();
     if(ch == '[') { // check begin of variable marker
-      if(!more()) throw PICDATE.get(info, token); // [$
+      if(!more()) throw PICDATE_X.get(info, token); // [$
       if(!consume('[')) return -1; // [...
     } else if(ch == ']') { // check end of variable marker
-      if(!consume(']')) throw PICDATE.get(info, token); // ]$ or ]...
+      if(!consume(']')) throw PICDATE_X.get(info, token); // ]$ or ]...
     }
     return ch;
   }
@@ -53,6 +53,6 @@ final class DateParser extends TokenParser {
       if(ch == ']') return tb.finish();
       if(!Character.isWhitespace(ch)) tb.add(ch);
     }
-    throw PICDATE.get(info, token);
+    throw PICDATE_X.get(info, token);
   }
 }

@@ -4,10 +4,11 @@ import static org.basex.core.Text.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.ft.*;
+import org.basex.query.expr.constr.*;
+import org.basex.query.expr.ft.*;
+import org.basex.query.expr.gflwor.*;
+import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
-import org.basex.query.gflwor.*;
-import org.basex.query.path.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.var.*;
@@ -16,7 +17,7 @@ import org.basex.util.*;
 /**
  * This class contains formatting information for the DOT output.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 final class DOTData {
@@ -87,17 +88,18 @@ final class DOTData {
   };
 
   /**
-   * Returns the color for the specified string, or {@code null}.
-   * @param s string string
+   * Returns the color for the specified string or {@code null}.
+   * @param string string string
    * @return color
    */
-  static String color(final byte[] s) {
+  static String color(final byte[] string) {
     for(final Object[] color : COLORS) {
-      for(int c = 1; c < color.length; c++) {
+      final int cl = color.length;
+      for(int c = 1; c < cl; c++) {
         final Object o = color[c];
-        final byte[] cl = o instanceof byte[] ? (byte[]) o :
+        final byte[] col = o instanceof byte[] ? (byte[]) o :
           Token.token(o instanceof Class ? Util.className((Class<?>) o) : o.toString());
-        if(Token.eq(cl, s)) return color[0].toString();
+        if(Token.eq(col, string)) return color[0].toString();
       }
     }
     return null;

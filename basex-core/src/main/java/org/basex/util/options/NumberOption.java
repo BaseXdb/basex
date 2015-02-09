@@ -3,7 +3,7 @@ package org.basex.util.options;
 /**
  * Option containing an integer value.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class NumberOption extends Option<Integer> {
@@ -12,20 +12,20 @@ public final class NumberOption extends Option<Integer> {
 
   /**
    * Default constructor.
-   * @param n name
-   * @param v value
+   * @param name name
+   * @param value value
    */
-  public NumberOption(final String n, final int v) {
-    super(n);
-    value = v;
+  public NumberOption(final String name, final int value) {
+    super(name);
+    this.value = value;
   }
 
   /**
    * Constructor without default value.
-   * @param n name
+   * @param name name
    */
-  public NumberOption(final String n) {
-    super(n);
+  public NumberOption(final String name) {
+    super(name);
     value = null;
   }
 

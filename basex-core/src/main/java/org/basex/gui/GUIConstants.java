@@ -1,6 +1,5 @@
 package org.basex.gui;
 
-import static org.basex.gui.GUIPopupCmd.*;
 import static org.basex.gui.GUIMenuCmd.*;
 
 import java.awt.*;
@@ -44,10 +43,18 @@ import org.basex.util.*;
  *   {@link #MENUITEMS} menu structure</li>
  * </ul>
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class GUIConstants {
+
+  // DUMMY OBJECTS ============================================================
+
+  /** Dummy textfield. */
+  public static final JTextField TEXTFIELD = new JTextField();
+  /** Dummy label, used for size calculations. */
+  public static final JLabel LABEL = new JLabel();
+
   // VIEW NAMES ===============================================================
 
   /** Internal name of the Map View. */
@@ -104,7 +111,6 @@ public final class GUIConstants {
   static final GUICommand[][] MENUITEMS = { {
     C_CREATE, C_OPEN_MANAGE, SEPARATOR,
     C_INFO, C_EXPORT, C_CLOSE, SEPARATOR,
-    C_SERVER, Prop.MAC ? null : SEPARATOR,
     Prop.MAC ? null : C_EXIT
   }, {
     C_EDITNEW, C_EDITOPEN, C_EDITREOPEN, C_EDITSAVE, C_EDITSAVEAS, C_EDITCLOSE,
@@ -177,30 +183,40 @@ public final class GUIConstants {
     }
   }
 
-  /** Background fill options. */
-  public enum Fill {
-    /** Opaque fill mode.  */ PLAIN,
-    /** Transparent mode.  */ NONE,
-    /** Downward gradient. */ GRADIENT
-  }
-
   // COLORS ===================================================================
 
-  /** Cell color. */
-  public static final Color LGRAY = new Color(224, 224, 224);
-  /** Button color. */
-  public static final Color GRAY = new Color(160, 160, 160);
   /** Background color. */
-  public static final Color DGRAY = new Color(64, 64, 64);
+  public static final Color BACK = new Color(TEXTFIELD.getBackground().getRGB());
+  /** Text color. */
+  public static final Color TEXT = new Color(TEXTFIELD.getForeground().getRGB());
+  /** Panel color. */
+  public static final Color PANEL = new Color(LABEL.getBackground().getRGB());
 
-  /** Color for control characters. */
-  public static final Color RED = new Color(208, 0, 0);
-  /** Color for highlighting errors. */
-  public static final Color LRED = new Color(255, 216, 216);
-  /** Color for highlighting full-text hits. */
-  public static final Color GREEN = new Color(0, 176, 0);
-  /** Color for highlighting quotes. */
-  public static final Color BLUE = new Color(0, 64, 192);
+  /** Dark theme. */
+  public static final boolean INVERT = BACK.getRed() + BACK.getGreen() + BACK.getBlue() < 384;
+
+  /** Color: red. */
+  public static final Color RED = color(208, 0, 0);
+  /** Color: light red. */
+  public static final Color LRED = color(255, 216, 216);
+  /** Color: green. */
+  public static final Color GREEN = color(0, 160, 0);
+  /** Color: blue. */
+  public static final Color BLUE = color(0, 64, 192);
+  /** Color: cyan. */
+  public static final Color CYAN = color(0, 160, 160);
+  /** Color: purple. */
+  public static final Color PURPLE = color(160, 0, 160);
+
+  /** Cell color. */
+  public static Color lgray;
+  /** Button color. */
+  public static Color gray;
+  /** Background color. */
+  public static Color dgray;
+
+  /** Cached color gradient. */
+  private static final Color[] COLORS = new Color[100];
 
   /** Second bright GUI color. */
   public static Color color1;
@@ -224,22 +240,25 @@ public final class GUIConstants {
   public static Color color1A;
   /** Transparent background color. */
   public static Color color2A;
-  /** Transparent frame color. */
-  public static Color color3A;
   /** Cursor background color. */
-  public static Color color4A;
+  public static Color color3A;
   /** Mark color, custom alpha value. */
   public static Color colormark1A;
   /** Second mark color, custom alpha value. */
   public static Color colormark2A;
 
-  /** Cached color gradient. */
-  private static final Color[] COLORS = new Color[100];
-
   // FONTS ====================================================================
 
-  /** Font of text area. */
-  private static final Font TFONT = UIManager.getFont("TextArea.font");
+  /** Standard font size (unscaled). */
+  public static final int FONTSIZE = 13;
+
+  /** Standard line height. */
+  public static final int HEIGHT;
+  /** Standard scale factor (>= 1). */
+  public static final double SCALE;
+  /** Adapted scale factor. */
+  public static final double ASCALE;
+
   /** Large font. */
   public static Font lfont;
   /** Font. */
@@ -262,10 +281,12 @@ public final class GUIConstants {
   /** Bold character widths. */
   private static int[] bwidth;
   /** Monospace character widths. */
-  public static int[] mfwidth;
+  private static int[] mfwidth;
 
   // KEYS =====================================================================
 
+  /** No modifier. */
+  public static final int NO_MOD = 0;
   /** Shift key. */
   public static final int SHIFT = Event.SHIFT_MASK;
   /** Alt key. */
@@ -275,6 +296,12 @@ public final class GUIConstants {
   /** Shortcut key (CTRL/META). */
   public static final int META = Prop.MAC ? Event.META_MASK : Event.CTRL_MASK;
 
+  static {
+    HEIGHT = LABEL.getFontMetrics(LABEL.getFont()).getHeight();
+    SCALE = Math.max(1, (HEIGHT - 16) / 10d + 1);
+    ASCALE = 1 + (SCALE - 1) / 2;
+  }
+
   /** Private constructor, preventing class instantiation. */
   private GUIConstants() { }
 
@@ -283,50 +310,51 @@ public final class GUIConstants {
    * @param opts gui options
    */
   public static void init(final GUIOptions opts) {
+    lgray = color(224, 224, 224);
+    gray = color(160, 160, 160);
+    dgray = color(64, 64, 64);
+
+    // create color array
     final int r = opts.get(GUIOptions.COLORRED);
     final int g = opts.get(GUIOptions.COLORGREEN);
     final int b = opts.get(GUIOptions.COLORBLUE);
-
-    // calculate color c:
-    // c = (255 - expectedColor) * 10 / factor (= GUIRED/BLUE/GREEN)
-    color1 = new Color(col(r, 24), col(g, 25), col(b, 40));
-    color2 = new Color(col(r, 32), col(g, 32), col(b, 44));
-    color3 = new Color(col(r, 48), col(g, 50), col(b, 40));
-    color4 = new Color(col(r, 140), col(g, 100), col(b, 70));
-    color1A = new Color(col(r, 110), col(g, 150), col(b, 160), 100);
-
-    colormark1A = new Color(col(r, 32), col(g, 160), col(b, 320), 100);
-    colormark2A = new Color(col(r, 12), col(g, 60), col(b, 120), 100);
-    colormark1 = new Color(col(r, 16), col(g, 120), col(b, 240));
-    colormark2 = new Color(col(r, 16), col(g, 80), col(b, 160));
-    colormark3 = new Color(col(r, 32), col(g, 160), col(b, 320));
-    colormark4 = new Color(col(r, 1), col(g, 40), col(b, 80));
-
-    // create color array
-    for(int l = 1; l < COLORS.length + 1; ++l) {
-      COLORS[l - 1] = new Color(Math.max(255 - l * r, 0),
-        Math.max(255 - l * g, 0), Math.max(255 - l * b, 0));
+    final int cl = COLORS.length;
+    for(int c = 1; c < cl + 1; ++c) {
+      COLORS[c - 1] = color(Math.max(255 - c * r, 0),
+        Math.max(255 - c * g, 0), Math.max(255 - c * b, 0));
     }
-    final Color c = COLORS[16];
-    color2A = new Color(c.getRed(), c.getGreen(), c.getBlue(), 40);
-    color3A = new Color(c.getRed(), c.getGreen(), c.getBlue(), 100);
-    color4A = new Color(c.getRed(), c.getGreen(), c.getBlue(), 20);
 
-    final String f = opts.get(GUIOptions.FONT);
+    color1 = color(darker(r, 24), darker(g, 25), darker(b, 40));
+    color2 = color(darker(r, 32), darker(g, 32), darker(b, 44));
+    color3 = color(darker(r, 48), darker(g, 50), darker(b, 40));
+    color4 = color(darker(r, 140), darker(g, 100), darker(b, 70));
+    colormark1 = color(darker(r, 16), darker(g, 120), darker(b, 240));
+    colormark2 = color(darker(r, 16), darker(g, 80), darker(b, 160));
+    colormark3 = color(darker(r, 32), darker(g, 160), darker(b, 320));
+    colormark4 = color(darker(r, 1), darker(g, 40), darker(b, 80));
+
+    final Color col = COLORS[16];
+    color1A = color(darker(r, 110), darker(g, 150), darker(b, 160), 100);
+    color2A = color(col.getRed(), col.getGreen(), col.getBlue(), 50);
+    color3A = color(col.getRed(), col.getGreen(), col.getBlue(), 30);
+    colormark1A = color(darker(r, 32), darker(g, 160), darker(b, 320), 100);
+    colormark2A = color(darker(r, 12), darker(g, 60), darker(b, 120), 100);
+
+    final String name = opts.get(GUIOptions.FONT);
     final int type = opts.get(GUIOptions.FONTTYPE);
-    fontSize = opts.get(GUIOptions.FONTSIZE);
-    font  = new Font(f, type, fontSize);
-    mfont = new Font(opts.get(GUIOptions.MONOFONT), type, fontSize);
-    bfont = new Font(f, Font.BOLD, fontSize);
-    lfont = new Font(f, type, 18 + (fontSize >> 1));
-    dmfont = new Font(opts.get(GUIOptions.MONOFONT), 0, TFONT.getSize() - 1);
 
-    final Container comp = new Container();
-    dwidth  = comp.getFontMetrics(dmfont).getWidths();
-    fwidth  = comp.getFontMetrics(font).getWidths();
-    lwidth  = comp.getFontMetrics(lfont).getWidths();
-    mfwidth = comp.getFontMetrics(mfont).getWidths();
-    bwidth  = comp.getFontMetrics(bfont).getWidths();
+    fontSize = (int) (opts.get(GUIOptions.FONTSIZE) * SCALE);
+    font  = new Font(name, type, fontSize);
+    mfont = new Font(opts.get(GUIOptions.MONOFONT), type, fontSize);
+    bfont = new Font(name, Font.BOLD, fontSize);
+    lfont = new Font(name, type, (int) (FONTSIZE * ASCALE * 1.5 + fontSize / 2.0));
+    dmfont = new Font(opts.get(GUIOptions.MONOFONT), 0, (int) (HEIGHT * 0.8));
+
+    dwidth  = LABEL.getFontMetrics(dmfont).getWidths();
+    fwidth  = LABEL.getFontMetrics(font).getWidths();
+    lwidth  = LABEL.getFontMetrics(lfont).getWidths();
+    mfwidth = LABEL.getFontMetrics(mfont).getWidths();
+    bwidth  = LABEL.getFontMetrics(bfont).getWidths();
   }
 
   /**
@@ -349,16 +377,41 @@ public final class GUIConstants {
     if(f == bfont) return bwidth;
     if(f == lfont) return lwidth;
     if(f == dmfont) return dwidth;
-    return new Container().getFontMetrics(f).getWidths();
+    return LABEL.getFontMetrics(f).getWidths();
   }
 
   /**
-   * Converts color value with specified factor.
+   * Combines the color value with specified factor and returns a new value.
    * @param c color
    * @param f factor
    * @return converted color value
    */
-  private static int col(final int c, final int f) {
+  private static int darker(final int c, final int f) {
     return Math.max(0, 255 - c * f / 10);
+  }
+
+  /**
+   * Returns the specified color with the specified RGB values, or its inverted version
+   * if {@link #INVERT} is true.
+   * @param r red component
+   * @param g green component
+   * @param b blue component
+   * @return converted color
+   */
+  private static Color color(final int r, final int g, final int b) {
+    return INVERT ? new Color(255 - r, 255 - g, 255 - b) : new Color(r, g, b);
+  }
+
+  /**
+   * Returns the specified color with the specified RGB and alpha values, or its inverted version
+   * if {@link #INVERT} is true.
+   * @param r red component
+   * @param g green component
+   * @param b blue component
+   * @param a alpha component
+   * @return converted color
+   */
+  private static Color color(final int r, final int g, final int b, final int a) {
+    return INVERT ? new Color(255 - r, 255 - g, 255 - b, 255 - a) : new Color(r, g, b, a);
   }
 }

@@ -14,58 +14,60 @@ import org.basex.util.hash.*;
 /**
  * Castable expression.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class Castable extends Single {
   /** Static context. */
   private final StaticContext sc;
-  /** Instance. */
-  private final SeqType seq;
+  /** Sequence type to check for. */
+  private final SeqType type;
 
   /**
    * Constructor.
-   * @param sctx static context
-   * @param ii input info
-   * @param e expression
-   * @param s sequence type
+   * @param sc static context
+   * @param info input info
+   * @param expr expression
+   * @param type sequence type to check for
    */
-  public Castable(final StaticContext sctx, final InputInfo ii, final Expr e, final SeqType s) {
-    super(ii, e);
-    sc = sctx;
-    seq = s;
-    type = SeqType.BLN;
+  public Castable(final StaticContext sc, final InputInfo info, final Expr expr,
+      final SeqType type) {
+    super(info, expr);
+    this.sc = sc;
+    this.type = type;
+    seqType = SeqType.BLN;
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    super.compile(ctx, scp);
-    return expr.isValue() ? preEval(ctx) : this;
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    super.compile(qc, scp);
+    return optimize(qc, scp);
   }
 
   @Override
-  public Bln item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final Value v = expr.value(ctx);
-    try {
-      seq.cast(v, ctx, sc, ii, this);
-      return Bln.TRUE;
-    } catch(final QueryException ex) {
-      return Bln.FALSE;
-    }
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+    return expr.isValue() ? preEval(qc) : this;
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Castable(sc, info, expr.copy(ctx, scp, vs), seq);
+  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final Value v = expr.value(qc);
+    return Bln.get(type.occ.check(v.size()) &&
+        (v.isEmpty() || type.cast((Item) v, qc, sc, info, false) != null));
+  }
+
+  @Override
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new Castable(sc, info, expr.copy(qc, scp, vs), type);
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(TYP, seq), expr);
+    addPlan(plan, planElem(TYP, type), expr);
   }
 
   @Override
   public String toString() {
-    return expr + " " + CASTABLE + ' ' + AS + ' ' + seq;
+    return expr + " " + CASTABLE + ' ' + AS + ' ' + type;
   }
 }

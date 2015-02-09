@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * Sequence of items of type {@link Int xs:byte}, containing at least two of them.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class BytSeq extends NativeSeq {
@@ -19,11 +19,11 @@ public final class BytSeq extends NativeSeq {
 
   /**
    * Constructor.
-   * @param vals bytes
+   * @param values bytes
    */
-  private BytSeq(final byte[] vals) {
-    super(vals.length, AtomType.BYT);
-    values = vals;
+  private BytSeq(final byte[] values) {
+    super(values.length, AtomType.BYT);
+    this.values = values;
   }
 
   @Override
@@ -57,26 +57,24 @@ public final class BytSeq extends NativeSeq {
    * @return value
    */
   public static Value get(final byte[] items) {
-    return items.length == 0 ? Empty.SEQ : items.length == 1 ?
-        Int.get(items[0], AtomType.BYT) : new BytSeq(items);
+    return items.length == 0 ? Empty.SEQ : items.length == 1 ? Int.get(items[0], AtomType.BYT) :
+      new BytSeq(items);
   }
 
   /**
    * Creates a sequence with the items in the specified expressions.
-   * @param vals values
+   * @param values values
    * @param size size of resulting sequence
    * @return value
    * @throws QueryException query exception
    */
-  public static Value get(final Value[] vals, final int size) throws QueryException {
+  public static Value get(final Value[] values, final int size) throws QueryException {
     final byte[] tmp = new byte[size];
     int t = 0;
-    for(final Value val : vals) {
+    for(final Value val : values) {
       // speed up construction, depending on input
       final int vs = (int) val.size();
-      if(val instanceof Item) {
-        tmp[t++] = (byte) ((Item) val).itr(null);
-      } else if(val instanceof BytSeq) {
+      if(val instanceof BytSeq) {
         final BytSeq sq = (BytSeq) val;
         System.arraycopy(sq.values, 0, tmp, t, vs);
         t += vs;

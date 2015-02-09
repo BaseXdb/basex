@@ -12,7 +12,6 @@ import java.util.*;
 import javax.swing.*;
 
 import org.basex.data.*;
-import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.view.*;
@@ -22,7 +21,7 @@ import org.basex.util.list.*;
 /**
  * A scatter plot visualization of the database.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Lukas Kircher
  */
 public final class PlotView extends View {
@@ -90,7 +89,7 @@ public final class PlotView extends View {
   private boolean rightClick;
   /** Context which is displayed in the plot after a context change which was
    * triggered by the plot itself. */
-  private Nodes nextContext;
+  private DBNodes nextContext;
 
   /**
    * Default constructor.
@@ -100,7 +99,7 @@ public final class PlotView extends View {
     super(PLOTVIEW, man);
     border(5).layout(new BorderLayout());
 
-    final BaseXBack panel = new BaseXBack(Fill.NONE).layout(new BorderLayout());
+    final BaseXBack panel = new BaseXBack(false).layout(new BorderLayout());
 
     Box box = new Box(BoxLayout.X_AXIS);
     xLog = new BaseXCheckBox(PLOTLOG, false, gui);
@@ -163,10 +162,9 @@ public final class PlotView extends View {
           plotChanged = true;
           markingChanged = true;
 
-          final String[] keys =
-            plotData.getCategories(token(item)).toStringArray();
-          xCombo.setModel(new DefaultComboBoxModel(keys));
-          yCombo.setModel(new DefaultComboBoxModel(keys));
+          final String[] keys = plotData.getCategories(token(item)).toStringArray();
+          xCombo.setModel(new DefaultComboBoxModel<>(keys));
+          yCombo.setModel(new DefaultComboBoxModel<>(keys));
           if(keys.length > 0) {
             // choose name category as default for horizontal axis
             xCombo.setSelectedIndex(Math.min(1, keys.length));
@@ -229,9 +227,7 @@ public final class PlotView extends View {
         gui.gopts.get(GUIOptions.PLOTDOTS) - (focus ? 2 : marked || markedSub ? 4 : 6));
     final BufferedImage img = new BufferedImage(size, size, Transparency.TRANSLUCENT);
 
-    final Graphics g = img.getGraphics();
-    smooth(g);
-
+    final Graphics g = BaseXLayout.antiAlias(img.getGraphics());
     Color c = color1A;
     if(marked) c = colormark1A;
     if(markedSub) c = colormark2A;
@@ -247,8 +243,7 @@ public final class PlotView extends View {
    */
   private void createPlotImage() {
     plotImg = new BufferedImage(getWidth(), getHeight(), Transparency.BITMASK);
-    final Graphics g = plotImg.getGraphics();
-    smooth(g);
+    final Graphics g = BaseXLayout.antiAlias(plotImg.getGraphics());
 
     // draw axis and grid
     drawAxis(g, true);
@@ -256,8 +251,9 @@ public final class PlotView extends View {
 
     // draw items
     g.setColor(color4);
-    for(int i = 0; i < plotData.pres.length; ++i) {
-      drawItem(g, plotData.xAxis.co[i], plotData.yAxis.co[i], false, false, false);
+    final int pl = plotData.pres.length;
+    for(int p = 0; p < pl; p++) {
+      drawItem(g, plotData.xAxis.co[p], plotData.yAxis.co[p], false, false, false);
     }
   }
 
@@ -277,11 +273,10 @@ public final class PlotView extends View {
     final int sz = sizeFactor();
 
     g.setFont(font);
-    g.setColor(Color.black);
+    g.setColor(TEXT);
     final Data data = gui.context.data();
-    final boolean nd = data == null;
-    if(nd || plotWidth - sz < 0 || plotHeight - sz < 0) {
-      BaseXLayout.drawCenter(g, nd ? NO_DATA : NO_PIXELS, w, h / 2 - MARGIN[0]);
+    if(data == null || plotWidth - sz < 0 || plotHeight - sz < 0) {
+      BaseXLayout.drawCenter(g, data == null ? NO_DATA : NO_PIXELS, w, h / 2 - MARGIN[0]);
       return;
     }
 
@@ -303,7 +298,7 @@ public final class PlotView extends View {
      */
     int focused = gui.context.focused;
     if(focused != -1) {
-      final int itmID = data.tagindex.id(plotData.item);
+      final int itmID = data.elemNames.id(plotData.item);
       int k = data.kind(focused);
       int name = data.name(focused);
       while(focused > 0 && itmID != name) {
@@ -364,14 +359,14 @@ public final class PlotView extends View {
 
     // draw selection box
     if(dragging) {
-      g.setColor(color2A);
       final int selW = selectionBox.w;
       final int selH = selectionBox.h;
       final int x1 = selectionBox.x;
       final int y1 = selectionBox.y;
+      g.setColor(colormark2A);
       g.fillRect(selW > 0 ? x1 : x1 + selW, selH > 0 ? y1 : y1 + selH,
           Math.abs(selW), Math.abs(selH));
-      g.setColor(color3A);
+      g.setColor(colormark1A);
       g.drawRect(selW > 0 ? x1 : x1 + selW, selH > 0 ? y1 : y1 + selH,
           Math.abs(selW), Math.abs(selH));
     }
@@ -386,17 +381,17 @@ public final class PlotView extends View {
   private void createMarkedNodes() {
     final Data data = gui.context.data();
     markedImg = new BufferedImage(getWidth(), getHeight(), Transparency.BITMASK);
-    final Graphics gi = markedImg.getGraphics();
-    smooth(gi);
+    final Graphics gi = BaseXLayout.antiAlias(markedImg.getGraphics());
 
-    final Nodes marked = gui.context.marked;
+    final DBNodes marked = gui.context.marked;
     if(marked.size() == 0) return;
     final int[] m = Arrays.copyOf(marked.pres, marked.pres.length);
     int i = 0;
 
     // no child nodes of the marked context nodes are marked
     if(!drawSubNodes) {
-      while(i < m.length) {
+      final int ml = m.length;
+      while(i < ml) {
         final int pi = plotData.findPre(m[i]);
         if(pi > -1) drawItem(gi, plotData.xAxis.co[pi], plotData.yAxis.co[pi], false, true, false);
         ++i;
@@ -422,9 +417,9 @@ public final class PlotView extends View {
     // context change (triggered by another view).
     // descendants of marked node set are also checked for intersection
     // with currently plotted nodes
-    while(i < m.length && k < p.length) {
-      final int a = m[i];
-      final int b = p[k];
+    final int ml = m.length, pl = p.length;
+    while(i < ml && k < pl) {
+      final int a = m[i], b = p[k];
       final int ns = data.size(a, data.kind(a)) - 1;
       if(a == b) {
         drawItem(gi, plotData.xAxis.co[k], plotData.yAxis.co[k], false, true, false);
@@ -460,13 +455,11 @@ public final class PlotView extends View {
   }
 
   /**
-   * Draws the x axis of the plot.
+   * Draws an axis of the plot.
    * @param g graphics reference
    * @param drawX drawn axis is x axis
    */
   private void drawAxis(final Graphics g, final boolean drawX) {
-    g.setColor(color2A);
-
     final int sz = sizeFactor();
     // the painting space provided for items which lack no value
     final int pWidth = plotWidth - sz;
@@ -480,8 +473,7 @@ public final class PlotView extends View {
         if(plotData.pres.length > 0) axis.calcCaption(pWidth);
         final StatsType type = plotData.xAxis.type;
         xLog.setEnabled((type == StatsType.DOUBLE ||
-            type == StatsType.INTEGER) &&
-            Math.abs(axis.min - axis.max) >= 1);
+            type == StatsType.INTEGER) && Math.abs(axis.min - axis.max) >= 1);
       }
     } else {
       // drawing vertical axis line
@@ -489,8 +481,7 @@ public final class PlotView extends View {
         if(plotData.pres.length > 0) axis.calcCaption(pHeight);
         final StatsType type = plotData.yAxis.type;
         yLog.setEnabled((type == StatsType.DOUBLE ||
-            type == StatsType.INTEGER) &&
-            Math.abs(axis.min - axis.max) >= 1);
+            type == StatsType.INTEGER) && Math.abs(axis.min - axis.max) >= 1);
       }
     }
     if(plotData.pres.length < 1) {
@@ -533,7 +524,8 @@ public final class PlotView extends View {
 
           int j = 0;
           // find value for given plot position
-          while(j < axis.co.length && axis.co[j] != op) ++j;
+          final int al = axis.co.length;
+          while(j < al && axis.co[j] != op) ++j;
           drawCaptionAndGrid(g, drawX, string(axis.getValue(plotData.pres[j])), op);
           // increase to next optimum caption position
           op += capRange;
@@ -544,7 +536,8 @@ public final class PlotView extends View {
         op = .5d;
         int j = 0;
         // find value for given plot position
-        while(j < axis.co.length && axis.co[j] != op) ++j;
+        final int al = axis.co.length;
+        while(j < al && axis.co[j] != op) ++j;
         drawCaptionAndGrid(g, drawX, string(axis.getValue(plotData.pres[j])), op);
       }
       // axis is drawn for numerical data, type INT/DBL
@@ -669,6 +662,7 @@ public final class PlotView extends View {
    */
   private void drawCaptionAndGrid(final Graphics g, final boolean drawX, final String caption,
       final double d) {
+
     String cap = caption;
     // if label is too long, it is is chopped to the first characters
     if(cap.length() > MAXL) cap = cap.substring(0, CUTOFF) + "..";
@@ -683,7 +677,7 @@ public final class PlotView extends View {
 
     // ... after that
     // the image and the grid line are drawn beside x / y axis
-    g.setColor(color2A);
+    g.setColor(color(2));
     if(drawX) {
       final int y = h - MARGIN[2];
       g.drawImage(img, pos - imgW + textH - fs + 3, y, this);
@@ -714,11 +708,10 @@ public final class PlotView extends View {
     // image is created which displays the rotated label ...
     final int imgH = 160;
     final BufferedImage img = new BufferedImage(imgW, imgH, Transparency.BITMASK);
-    final Graphics2D g2d = img.createGraphics();
-    smooth(g2d);
+    final Graphics2D g2d = BaseXLayout.antiAlias(img.createGraphics());
     g2d.rotate(ROTATE, imgW, textH);
     g2d.setFont(font);
-    g2d.setColor(im ? color3 : Color.black);
+    g2d.setColor(im ? color3 : TEXT);
     g2d.drawString(caption, fs, fs);
     return img;
   }
@@ -732,13 +725,14 @@ public final class PlotView extends View {
    */
   private void drawIntermediateGridLine(final Graphics g, final boolean drawX, final double d,
       final String caption) {
+
     String cap = caption;
     final int pos = calcCoordinate(drawX, d);
     final int h = getHeight();
     final int w = getWidth();
     final int fs = fontSize;
     final int sf = sizeFactor();
-    g.setColor(color2A);
+    g.setColor(color(2));
 
     if(cap != null) {
       if(cap.length() > MAXL) cap = cap.substring(0, CUTOFF) + "..";
@@ -817,7 +811,7 @@ public final class PlotView extends View {
     plotData = new PlotData(gui.context);
 
     final String[] items = plotData.getItems().toStringArray();
-    itemCombo.setModel(new DefaultComboBoxModel(items));
+    itemCombo.setModel(new DefaultComboBoxModel<>(items));
 
     // set first item and trigger assignment of axis assignments
     if(items.length > 0) itemCombo.setSelectedIndex(0);
@@ -880,7 +874,7 @@ public final class PlotView extends View {
     final int size = itemImg.getWidth() / 2;
     int focusedPre = gui.context.focused;
     // if mouse pointer is outside of the plot the focused item is set to -1,
-    // focus may be refreshed, if necessary
+    // focus may be refreshed if necessary
     if(mouseX < MARGIN[1] ||
         mouseX > getWidth() - MARGIN[3] + size ||
         mouseY < MARGIN[0] - size || mouseY > getHeight() - MARGIN[2]) {
@@ -896,7 +890,8 @@ public final class PlotView extends View {
     focusedPre = -1;
     int dist = Integer.MAX_VALUE;
     // all displayed items are tested for focus
-    for(int i = 0; i < plotData.pres.length && dist != 0; ++i) {
+    final int pl = plotData.pres.length;
+    for(int i = 0; i < pl && dist != 0; ++i) {
       // coordinates and distances for current tested item are calculated
       final int x = calcCoordinate(true, plotData.xAxis.co[i]);
       final int y = calcCoordinate(false, plotData.yAxis.co[i]);
@@ -935,15 +930,14 @@ public final class PlotView extends View {
     // get coordinates for focused item
     final int mx = calcCoordinate(true, plotData.xAxis.co[pre]);
     final int my = calcCoordinate(false, plotData.yAxis.co[pre]);
-    for(int i = 0; i < plotData.pres.length; ++i) {
+    final int pl = plotData.pres.length;
+    for(int p = 0; p < pl; p++) {
       // get coordinates for current item
-      final int x = calcCoordinate(true, plotData.xAxis.co[i]);
-      final int y = calcCoordinate(false, plotData.yAxis.co[i]);
-      if(mx == x && my == y) {
-        il.add(plotData.pres[i]);
-      }
+      final int x = calcCoordinate(true, plotData.xAxis.co[p]);
+      final int y = calcCoordinate(false, plotData.yAxis.co[p]);
+      if(mx == x && my == y) il.add(plotData.pres[p]);
     }
-    return il.toArray();
+    return il.finish();
   }
 
   /**
@@ -1040,13 +1034,13 @@ public final class PlotView extends View {
 
     // searches for items located in the selection box
     final IntList il = new IntList();
-    for(int i = 0; i < plotData.pres.length; ++i) {
-      x = calcCoordinate(true, plotData.xAxis.co[i]);
-      y = calcCoordinate(false, plotData.yAxis.co[i]);
-      if(selectionBox.contains(x, y)) il.add(plotData.pres[i]);
+    final int pl = plotData.pres.length;
+    for(int p = 0; p < pl; p++) {
+      x = calcCoordinate(true, plotData.xAxis.co[p]);
+      y = calcCoordinate(false, plotData.yAxis.co[p]);
+      if(selectionBox.contains(x, y)) il.add(plotData.pres[p]);
     }
-
-    gui.notify.mark(new Nodes(il.toArray(), gui.context.data()), this);
+    gui.notify.mark(new DBNodes(gui.context.data(), il.finish()), this);
     nextContext = gui.context.marked;
     drawSubNodes = false;
     markingChanged = true;
@@ -1074,7 +1068,7 @@ public final class PlotView extends View {
     if(r) { rightClick = true; return; }
     // no item is focused. no nodes marked after mouse click
     if(gui.context.focused == -1) {
-      gui.notify.mark(new Nodes(gui.context.data()), this);
+      gui.notify.mark(new DBNodes(gui.context.data()), this);
       return;
     }
 
@@ -1084,19 +1078,19 @@ public final class PlotView extends View {
     final int[] il = overlappingNodes(pre);
     // right mouse or shift down
     if(e.isShiftDown()) {
-      final Nodes marked = gui.context.marked;
+      final DBNodes marked = gui.context.marked;
       marked.union(il);
       gui.notify.mark(marked, this);
       // double click
     } else if(e.getClickCount() == 2) {
       // context change also self implied, thus right click set to true
       rightClick = true;
-      final Nodes marked = new Nodes(gui.context.data());
+      final DBNodes marked = new DBNodes(gui.context.data());
       marked.union(il);
       gui.notify.context(marked, false, null);
       // simple mouse click
     } else {
-      final Nodes marked = new Nodes(il, gui.context.data());
+      final DBNodes marked = new DBNodes(gui.context.data(), il);
       gui.notify.mark(marked, this);
     }
     nextContext = gui.context.marked;

@@ -1,12 +1,12 @@
 package org.basex.qt3ts.fn;
 
-import org.basex.tests.bxapi.XQuery;
+import org.basex.tests.bxapi.*;
 import org.basex.tests.qt3ts.*;
 
 /**
  * Tests for the distinct-values() function.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
 @SuppressWarnings("all")
@@ -389,7 +389,6 @@ public class FnDistinctValues extends QT3TestSet {
    */
   @org.junit.Test
   public void cbclDistinctValues002() {
-    xquery10();
     final XQuery query = new XQuery(
       "\n" +
       "      \tdeclare function local:create($arg) as xs:anyAtomicType* {\n" +

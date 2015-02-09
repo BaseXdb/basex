@@ -2,13 +2,13 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
-import org.basex.core.*;
+import org.basex.core.locks.*;
 import org.basex.server.*;
 
 /**
  * Evaluates the 'kill' command and stops user sessions.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class Kill extends AUser {
@@ -54,7 +54,7 @@ public final class Kill extends AUser {
     for(int s = ss.size() - 1; s >= 0; --s) {
       final ClientListener cl = ss.get(s);
       // don't kill own sessions
-      if(cl.context() != context && user.equals(cl.context().user.name)) {
+      if(cl.context() != context && user.equals(cl.context().user().name())) {
         cl.quit();
         count++;
       }

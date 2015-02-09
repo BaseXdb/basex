@@ -2,7 +2,7 @@ package org.basex.modules;
 
 /**
  * This is an example for a module that can be added to the BaseX repository.
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  */
 public class Hello {
   /**

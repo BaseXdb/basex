@@ -8,7 +8,7 @@ import java.util.*;
 import java.util.regex.*;
 
 import org.basex.http.*;
-import org.basex.query.util.inspect.*;
+import org.basex.query.func.inspect.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
@@ -19,7 +19,7 @@ import org.basex.util.list.*;
  * This class returns a Web Application Description Language (WADL) file,
  * listing all available RESTXQ services.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 final class RestXqWadl {
@@ -28,10 +28,10 @@ final class RestXqWadl {
 
   /**
    * Constructor.
-   * @param hc HTTP context
+   * @param http HTTP context
    */
-  RestXqWadl(final HTTPContext hc) {
-    http = hc;
+  RestXqWadl(final HTTPContext http) {
+    this.http = http;
   }
 
   /**
@@ -46,7 +46,7 @@ final class RestXqWadl {
     final FElem resources = elem("resources", application).add("base", base);
 
     // create children
-    final TreeMap<String, FElem> map = new TreeMap<String, FElem>();
+    final TreeMap<String, FElem> map = new TreeMap<>();
     for(final RestXqModule mod : modules.values()) {
       for(final RestXqFunction func : mod.functions()) {
         if(func.path == null) continue;
@@ -98,8 +98,8 @@ final class RestXqWadl {
    * @param xqdoc documentation
    * @param func function
    */
-  private void addParam(final String name, final String style, final FElem root,
-      final TokenObjMap<TokenList> xqdoc, final RestXqFunction func) {
+  private static void addParam(final String name, final String style, final FElem root,
+                               final TokenObjMap<TokenList> xqdoc, final RestXqFunction func) {
 
     final FElem param = elem("param", root);
     param.add("name", name).add("style", style);
@@ -129,10 +129,10 @@ final class RestXqWadl {
    * @param xqdoc documentation (may be {@code null})
    * @param parent parent node
    */
-  private void addDoc(final byte[] xqdoc, final FElem parent) {
+  private static void addDoc(final byte[] xqdoc, final FElem parent) {
     if(xqdoc == null) return;
     final FElem doc = elem("doc", parent);
     doc.namespaces().add(EMPTY, token(XHTML_URL));
-    Inspect.add(xqdoc, http.context(), doc);
+    Inspect.add(xqdoc, doc);
   }
 }

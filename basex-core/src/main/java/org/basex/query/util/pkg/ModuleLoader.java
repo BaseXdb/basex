@@ -1,10 +1,9 @@
 package org.basex.query.util.pkg;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
-import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import java.lang.reflect.*;
 import java.net.*;
 import java.util.*;
 
@@ -19,34 +18,45 @@ import org.basex.util.hash.*;
 /**
  * Module loader.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class ModuleLoader {
   /** Default class loader. */
   private static final ClassLoader LOADER = Thread.currentThread().getContextClassLoader();
-  /** Cached URLs to be added to the class loader. */
-  private final ArrayList<URL> urls = new ArrayList<URL>();
-  /** Current class loader. */
-  private ClassLoader loader = LOADER;
-  /** Java modules. */
-  private HashMap<Object, ArrayList<Method>> javaModules;
+
   /** Database context. */
   private final Context context;
+  /** Cached URLs to be added to the class loader. */
+  private final ArrayList<URL> urls = new ArrayList<>(0);
+  /** Current class loader. */
+  private ClassLoader loader = LOADER;
+
+  /** Java modules. */
+  private HashSet<Object> javaModules;
 
   /**
    * Constructor.
-   * @param ctx database context
+   * @param context database context
    */
-  public ModuleLoader(final Context ctx) {
-    context = ctx;
+  public ModuleLoader(final Context context) {
+    this.context = context;
   }
 
   /**
-   * Closes opened jar files.
+   * Closes opened jar files, and calls close method of {@link QueryModule} instances
+   * implementing {@link QueryResource}.
    */
   public void close() {
     if(loader instanceof JarLoader) ((JarLoader) loader).close();
+    if(javaModules != null) {
+      for(final Object jm : javaModules) {
+        for(final Class<?> c : jm.getClass().getInterfaces()) {
+          if(c != QueryResource.class) continue;
+          Reflect.invoke(Reflect.method(QueryResource.class, "close"), jm);
+        }
+      }
+    }
   }
 
   /**
@@ -85,7 +95,7 @@ public final class ModuleLoader {
 
     if(!java) {
       // no "java:" prefix: first try to import module as XQuery
-      final String path = context.globalopts.get(GlobalOptions.REPOPATH) + uriPath;
+      final String path = context.soptions.get(StaticOptions.REPOPATH) + uriPath;
       // check for any file with XQuery suffix
       for(final String suf : IO.XQSUFFIXES) {
         final IOFile file = new IOFile(path + suf);
@@ -96,21 +106,37 @@ public final class ModuleLoader {
       }
     }
 
-    // "java:" prefix, or no XQuery package found: try to load Java module
+    // try to load Java module
     uriPath = capitalize(uriPath);
-    final String path = context.globalopts.get(GlobalOptions.REPOPATH) + uriPath;
+    final String path = context.soptions.get(StaticOptions.REPOPATH) + uriPath;
     final IOFile file = new IOFile(path + IO.JARSUFFIX);
     if(file.exists()) addURL(file);
 
     // try to create Java class instance
-    addJava(uriPath, ii);
+    final String cp = Strings.camelCase(uriPath.replace('/', '.').substring(1));
+    final Class<?> clz;
+    try {
+      clz = findClass(cp);
+    } catch(final ClassNotFoundException ex) {
+      if(java) throw WHICHCLASS_X.get(ii, ex.getMessage());
+      return false;
+    } catch(final Throwable th) {
+      throw MODINITERR_X.get(ii, th);
+    }
+
+    // add new instance to module cache
+    final Object jm = Reflect.get(clz);
+    if(jm == null) throw INSTERR_X.get(ii, cp);
+
+    if(javaModules == null) javaModules = new HashSet<>();
+    javaModules.add(jm);
     return true;
   }
 
   /**
    * Returns a reference to the specified class.
    * @param name fully classified class name
-   * @return found class, or {@code null}
+   * @return found class or {@code null}
    * @throws Throwable any exception or error: {@link ClassNotFoundException},
    *   {@link LinkageError} or {@link ExceptionInInitializerError}.
    */
@@ -128,12 +154,12 @@ public final class ModuleLoader {
   /**
    * Returns an instance of the specified Java module class.
    * @param clz class to be found
-   * @return instance, or {@code null}
+   * @return instance or {@code null}
    */
   public Object findImport(final String clz) {
     // check if class was imported as Java module
     if(javaModules != null) {
-      for(final Object jm : javaModules.keySet()) {
+      for(final Object jm : javaModules) {
         if(jm.getClass().getName().equals(clz)) return jm;
       }
     }
@@ -147,15 +173,14 @@ public final class ModuleLoader {
    * URI transformation
    * (http://www.zorba-xquery.com/html/documentation/2.2.0/zorba/uriresolvers):</p>
    * <ul>
-   * <li>In the URI authority, the order of all substrings separated by dots is reversed.
-   *     </li>
+   * <li>In the URI authority, the order of all substrings separated by dots is reversed.</li>
    * <li>Dots in the authority and the path are replaced by slashes.
    *     If no path exists, a single slash is appended.</li>
    * <li>If the resulting string ends with a slash, "index" is appended.</li>
    * <li>{@code null} is returned if the URI has an invalid syntax.</li>
    * </ul>
    * @param uri namespace uri
-   * @return path, or {@code null}
+   * @return path or {@code null}
    */
   public static String uri2path(final String uri) {
     try {
@@ -200,40 +225,6 @@ public final class ModuleLoader {
   // PRIVATE METHODS ====================================================================
 
   /**
-   * Loads a Java class.
-   * @param path file path
-   * @param ii input info
-   * @throws QueryException query exception
-   */
-  private void addJava(final String path, final InputInfo ii) throws QueryException {
-    final String cp = camelCase(path.replace('/', '.').substring(1));
-    final Class<?> clz;
-    try {
-      clz = findClass(cp);
-    } catch(final ClassNotFoundException ex) {
-      throw WHICHCLASS.get(ii, ex.getMessage());
-      // expected exception
-    } catch(final Throwable th) {
-      throw MODINITERR.get(ii, th);
-    }
-
-    final boolean qm = clz.getSuperclass() == QueryModule.class;
-    final Object jm = Reflect.get(clz);
-    if(jm == null) throw INSTERR.get(ii, cp);
-
-    // add all public methods of the class (ignore methods from super classes)
-    final ArrayList<Method> list = new ArrayList<Method>();
-    for(final Method m : clz.getMethods()) {
-      // if class is inherited from {@link QueryModule}, no super methods are accepted
-      if(!qm || m.getDeclaringClass() == clz) list.add(m);
-    }
-
-    // add class and its methods to module cache
-    if(javaModules == null) javaModules = new HashMap<Object, ArrayList<Method>>();
-    javaModules.put(jm, list);
-  }
-
-  /**
    * Adds a package from the package repository.
    * @param name package name
    * @param toLoad list with packages to be loaded
@@ -250,14 +241,14 @@ public final class ModuleLoader {
 
     // find package in package dictionary
     final byte[] pDir = context.repo.pkgDict().get(name);
-    if(pDir == null) throw BXRE_NOTINST.get(ii, name);
+    if(pDir == null) throw BXRE_NOTINST_X.get(ii, name);
     final IOFile pkgDir = context.repo.path(string(pDir));
 
     // parse package descriptor
     final IO pkgDesc = new IOFile(pkgDir, PkgText.DESCRIPTOR);
     if(!pkgDesc.exists()) Util.debug(PkgText.MISSDESC, string(name));
 
-    final Package pkg = new PkgParser(context.repo, ii).parse(pkgDesc);
+    final Package pkg = new PkgParser(ii).parse(pkgDesc);
     // check if package contains a jar descriptor
     final IOFile jarDesc = new IOFile(pkgDir, PkgText.JARDESC);
     // add jars to classpath
@@ -270,7 +261,7 @@ public final class ModuleLoader {
       if(d.pkg != null) {
         // we consider only package dependencies here
         final byte[] depPkg = new PkgValidator(context.repo, ii).depPkg(d);
-        if(depPkg == null) throw BXRE_NOTINST.get(ii, string(d.pkg));
+        if(depPkg == null) throw BXRE_NOTINST_X.get(ii, string(d.pkg));
         if(toLoad.contains(depPkg)) throw CIRCMODULE.get(ii);
         addRepo(depPkg, toLoad, loaded, ii, qp);
       }
@@ -295,10 +286,8 @@ public final class ModuleLoader {
       final InputInfo ii) throws QueryException {
 
     // add new URLs
-    final JarDesc desc = new JarParser(context, ii).parse(jarDesc);
-    for(final byte[] u : desc.jars) {
-      addURL(new IOFile(new IOFile(pkgDir, modDir), string(u)));
-    }
+    final JarDesc desc = new JarParser(ii).parse(jarDesc);
+    for(final byte[] u : desc.jars) addURL(new IOFile(new IOFile(pkgDir, modDir), string(u)));
   }
 
   /**

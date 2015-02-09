@@ -1,12 +1,12 @@
 package org.basex.qt3ts.misc;
 
-import org.basex.tests.bxapi.XQuery;
+import org.basex.tests.bxapi.*;
 import org.basex.tests.qt3ts.*;
 
 /**
  * Tests for the CombinedErrorCodes operator.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
 @SuppressWarnings("all")
@@ -3005,7 +3005,6 @@ public class MiscCombinedErrorCodes extends QT3TestSet {
    */
   @org.junit.Test
   public void xPTY000445() {
-    xquery10();
     final XQuery query = new XQuery(
       "concat('prefix:', 'localname') cast as xs:QName",
       ctx);
@@ -4174,7 +4173,6 @@ public class MiscCombinedErrorCodes extends QT3TestSet {
    */
   @org.junit.Test
   public void xQST0054() {
-    xquery10();
     final XQuery query = new XQuery(
       "declare namespace foo = \"http://www.example.org/\"; declare variable $a := foo:bar(); declare function foo:bar() { $a + 1 }; $a",
       ctx);
@@ -4799,7 +4797,6 @@ public class MiscCombinedErrorCodes extends QT3TestSet {
    */
   @org.junit.Test
   public void xQST0093() {
-    xquery10();
     final XQuery query = new XQuery(
       "import module namespace foo=\"http://www.example.org/foo\"; $foo:variable2",
       ctx);

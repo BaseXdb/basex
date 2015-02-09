@@ -8,18 +8,19 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import org.basex.data.*;
-import org.basex.query.ft.*;
+import org.basex.query.expr.*;
+import org.basex.query.expr.ft.*;
 import org.basex.query.value.node.*;
 
 /**
  * This class contains all full-text options.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class FTOpt extends ExprInfo {
   /** Flag values. */
-  private final EnumMap<FTFlag, Boolean> map = new EnumMap<FTFlag, Boolean>(FTFlag.class);
+  private final EnumMap<FTFlag, Boolean> map = new EnumMap<>(FTFlag.class);
   /** Case. */
   public FTCase cs;
   /** Stemming dictionary. */
@@ -32,7 +33,7 @@ public final class FTOpt extends ExprInfo {
   public Language ln;
 
   /**
-   * Initializes the full-text options, inheriting the options of the argument.
+   * Adopts the options of the specified argument.
    * @param opt parent full-text options
    * @return self reference
    */
@@ -65,29 +66,29 @@ public final class FTOpt extends ExprInfo {
 
   /**
    * Sets the specified flag.
-   * @param f flag to be set
-   * @param v value
+   * @param flag flag to be set
+   * @param value value
    */
-  public void set(final FTFlag f, final boolean v) {
-    map.put(f, v);
+  public void set(final FTFlag flag, final boolean value) {
+    map.put(flag, value);
   }
 
   /**
    * Tests if the specified flag has been set.
-   * @param f flag index
+   * @param flag flag index
    * @return true if flag has been set
    */
-  public boolean isSet(final FTFlag f) {
-    return map.get(f) != null;
+  public boolean isSet(final FTFlag flag) {
+    return map.get(flag) != null;
   }
 
   /**
    * Returns the specified flag.
-   * @param f flag index
+   * @param flag flag index
    * @return flag
    */
-  public boolean is(final FTFlag f) {
-    final Boolean b = map.get(f);
+  public boolean is(final FTFlag flag) {
+    final Boolean b = map.get(flag);
     return b != null && b;
   }
 
@@ -112,7 +113,7 @@ public final class FTOpt extends ExprInfo {
     else if(cs == FTCase.SENSITIVE) s.append(' ' + USING + ' ' + CASE + ' ' + SENSITIVE);
     if(is(DC)) s.append(' ' + USING + ' ' + DIACRITICS + ' ' + SENSITIVE);
     if(is(ST) || sd != null) s.append(' ' + USING + ' ' + STEMMING);
-    if(ln != null) s.append(' ' + USING + ' ' + LANGUAGE + " '" + ln + '\'');
+    if(ln != null) s.append(' ' + USING + ' ' + LANGUAGE + " '").append(ln).append('\'');
     if(th != null) s.append(' ' + USING + ' ' + THESAURUS);
     return s.toString();
   }

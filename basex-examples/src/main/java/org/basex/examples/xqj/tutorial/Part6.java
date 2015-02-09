@@ -10,7 +10,7 @@ import javax.xml.xquery.*;
  *
  * Part 6: Manipulating Static Context.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  */
 public final class Part6 extends Main {
   /**

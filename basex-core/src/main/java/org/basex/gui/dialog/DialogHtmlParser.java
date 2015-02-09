@@ -5,17 +5,17 @@ import static org.basex.core.Text.*;
 import java.awt.*;
 import java.io.*;
 
-import org.basex.build.*;
+import org.basex.build.html.*;
 import org.basex.core.*;
 import org.basex.gui.*;
-import org.basex.gui.GUIConstants.*;
+import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.layout.*;
 import org.basex.util.options.*;
 
 /**
  * CSV parser panel.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 final class DialogHtmlParser extends DialogParser {
@@ -33,7 +33,7 @@ final class DialogHtmlParser extends DialogParser {
    */
   DialogHtmlParser(final BaseXDialog d, final MainOptions opts) {
     super(d);
-    hopts = opts.get(MainOptions.HTMLPARSER);
+    hopts = new HtmlOptions(opts.get(MainOptions.HTMLPARSER));
 
     final boolean avl = HtmlParser.available();
     final BaseXBack pp  = new BaseXBack(new TableLayout(3, 1, 0, 8));

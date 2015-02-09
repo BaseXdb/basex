@@ -13,7 +13,7 @@ import org.basex.util.list.*;
 /**
  * An additional layer which prepares the data for the scatter plot.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Lukas Kircher
  */
 final class PlotData {
@@ -62,7 +62,7 @@ final class PlotData {
     final Data data = context.data();
     final TokenList tl = new TokenList();
     for(final byte[] k : data.paths.desc(it, true, false)) {
-      final Names nm = startsWith(k, '@') ? data.atnindex : data.tagindex;
+      final Names nm = startsWith(k, '@') ? data.attrNames : data.elemNames;
       if(nm.stat(nm.id(delete(k, '@'))).type != StatsType.NONE) tl.add(k);
     }
     return tl;
@@ -90,10 +90,10 @@ final class PlotData {
    * @param nodes nodes to be displayed
    * @param sub determine descendant nodes of given context nodes
    */
-  void refreshItems(final Nodes nodes, final boolean sub) {
+  void refreshItems(final DBNodes nodes, final boolean sub) {
     final Data data = context.data();
-    final IntList tmpPres = new IntList();
-    final int itmID = data.tagindex.id(item);
+    final IntList il = new IntList();
+    final int itmID = data.elemNames.id(item);
 
     if(!sub) {
       pres = nodes.pres;
@@ -108,14 +108,14 @@ final class PlotData {
       while(p < nl) {
         final int kind = data.kind(p);
         if(kind == Data.ELEM) {
-          if(data.name(p) == itmID) tmpPres.add(p);
+          if(data.name(p) == itmID) il.add(p);
           p += data.attSize(p, Data.ELEM);
         } else {
           ++p;
         }
       }
     }
-    pres = tmpPres.toArray();
+    pres = il.finish();
     Arrays.sort(pres);
   }
 

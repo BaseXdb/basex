@@ -9,7 +9,7 @@ import org.basex.util.*;
  * This class simplifies the composition of the string representation of
  * a database command.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class CmdBuilder {
@@ -17,13 +17,17 @@ public final class CmdBuilder {
   private final TokenBuilder tb = new TokenBuilder();
   /** Command to be output. */
   private final Command cmd;
+  /** Confidential flag. */
+  private final boolean conf;
 
   /**
    * Constructor.
-   * @param c command
+   * @param cmd command
+   * @param conf confidential flag
    */
-  public CmdBuilder(final Command c) {
-    cmd = c;
+  public CmdBuilder(final Command cmd, final boolean conf) {
+    this.cmd = cmd;
+    this.conf = conf;
   }
 
   /**
@@ -37,12 +41,11 @@ public final class CmdBuilder {
 
   /**
    * Initializes the builder with the specified string.
-   * @param s command string
+   * @param string command string
    * @return self instance
    */
-  public CmdBuilder init(final String s) {
-    tb.reset();
-    tb.add(s);
+  public CmdBuilder init(final String string) {
+    tb.reset().add(string);
     return this;
   }
 
@@ -64,6 +67,14 @@ public final class CmdBuilder {
   public CmdBuilder xquery(final int arg) {
     tb.add(' ').add(cmd.args[arg]);
     return this;
+  }
+
+  /**
+   * Returns the confidential flag.
+   * @return flag
+   */
+  public boolean conf() {
+    return conf;
   }
 
   /**

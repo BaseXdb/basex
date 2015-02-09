@@ -11,7 +11,7 @@ import com.bradmcevoy.http.*;
  * into BaseX.
  *
  * @author Milton Development Team
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
@@ -20,9 +20,12 @@ final class BXServletCookie implements Cookie {
   public final javax.servlet.http.Cookie cookie;
   /**
    * Constructor.
-   * @param c servlet cookie
+   * @param cookie servlet cookie
    */
-  BXServletCookie(final javax.servlet.http.Cookie c) { cookie = c; }
+  BXServletCookie(final javax.servlet.http.Cookie cookie) {
+    this.cookie = cookie;
+  }
+
   @Override
   public int getVersion() { return cookie.getVersion(); }
   @Override

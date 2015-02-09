@@ -2,18 +2,18 @@ package org.basex.http.restxq;
 
 import java.util.*;
 
-import org.basex.query.path.*;
+import org.basex.query.expr.path.*;
 import org.basex.query.value.item.*;
 
 /**
  * This class catches RESTXQ errors with the same priority.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 final class RestXqError implements Comparable<RestXqError> {
   /** Error tests. */
-  private final ArrayList<NameTest> tests = new ArrayList<NameTest>(1);
+  private final ArrayList<NameTest> tests = new ArrayList<>(1);
 
   /**
    * Adds a test if it has not been specified before.

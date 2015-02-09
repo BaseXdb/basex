@@ -3,6 +3,8 @@ package org.basex.core.cmd;
 import java.io.*;
 
 import org.basex.core.*;
+import org.basex.core.locks.*;
+import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.util.*;
 
@@ -10,7 +12,7 @@ import org.basex.util.*;
  * Evaluates the 'check' command: opens an existing database or
  * creates a new one.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class Check extends Command {
@@ -53,14 +55,14 @@ public final class Check extends Command {
    */
   private boolean open(final QueryInput qi) {
     // minimum permissions: create
-    if(!context.user.has(Perm.CREATE)) return true;
+    if(!context.user().has(Perm.CREATE)) return true;
     // database with given name does not exist
-    if(!goptions.dbpath(qi.db).exists()) return false;
+    if(!soptions.dbpath(qi.db).exists()) return false;
     // open database if addressed file does not exist
     if(!qi.input.exists()) return true;
 
     // compare timestamp of database input and specified file
-    final MetaData meta = new MetaData(qi.db, context);
+    final MetaData meta = new MetaData(qi.db, options, soptions);
     try {
       meta.read();
       return meta.time == qi.input.timeStamp();

@@ -7,7 +7,7 @@ import org.basex.util.*;
 /**
  * This class contains a single full-text token.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Jens Erat
  */
 public final class FTSpan {
@@ -15,19 +15,19 @@ public final class FTSpan {
   public byte[] text;
   /** Token position. */
   public final int pos;
-  /** Special character flag. */
-  public final boolean special;
+  /** Delimiter flag. */
+  public final boolean del;
 
   /**
    * Constructor.
-   * @param t token text
-   * @param p number of tokens parsed before the current token
-   * @param sc is a special character
+   * @param text token text
+   * @param pos number of tokens parsed before the current token
+   * @param del the token contains delimiters
    */
-  FTSpan(final byte[] t, final int p, final boolean sc) {
-    text = t;
-    pos = p;
-    special = sc;
+  FTSpan(final byte[] text, final int pos, final boolean del) {
+    this.text = text;
+    this.pos = pos;
+    this.del = del;
   }
 
   @Override

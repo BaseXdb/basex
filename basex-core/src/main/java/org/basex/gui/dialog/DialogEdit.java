@@ -17,7 +17,7 @@ import org.basex.util.list.*;
 /**
  * Dialog window for editing XML nodes.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class DialogEdit extends BaseXDialog {
@@ -88,7 +88,8 @@ public final class DialogEdit extends BaseXDialog {
     if(old3 != null) {
       input3 = new TextPanel(old3, true, this);
       input3.addKeyListener(keys);
-      input3.setPreferredSize(new Dimension(500, 350));
+      BaseXLayout.setWidth(input3, BaseXTextField.DWIDTH);
+      BaseXLayout.setHeight(input3, 350);
       b.add(new SearchEditor(main, input3), BorderLayout.CENTER);
       setResizable(true);
     }

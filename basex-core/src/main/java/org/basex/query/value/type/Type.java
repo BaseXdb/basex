@@ -6,9 +6,9 @@ import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
- * XQuery data types.
+ * XQuery item types.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public interface Type {
@@ -85,6 +85,7 @@ public interface Type {
     /** xs:anyURI.                */ URI(81),
     /** xs:QName.                 */ QNM(82),
     /** xs:NOTATION.              */ NOT(83),
+    /** xs:numeric.               */ NUM(84),
     /** java().                   */ JAVA(86);
 
     /** Cached enums (faster). */
@@ -94,10 +95,10 @@ public interface Type {
 
     /**
      * Constructor.
-     * @param i type id
+     * @param id type id
      */
-    ID(final int i) {
-      id = (byte) i;
+    ID(final int id) {
+      this.id = (byte) id;
     }
 
     /**
@@ -141,43 +142,43 @@ public interface Type {
   }
 
   /**
-   * Casts the specified item to the XQuery data type.
-   * @param it item to be converted
-   * @param ctx query context
+   * Casts the specified item to this item type.
+   * @param item item to be converted
+   * @param qc query context
    * @param sc static context
    * @param ii input info
    * @return new item
    * @throws QueryException query exception
    */
-  Value cast(final Item it, final QueryContext ctx, final StaticContext sc, final InputInfo ii)
+  Value cast(final Item item, final QueryContext qc, final StaticContext sc, final InputInfo ii)
       throws QueryException;
 
   /**
-   * Casts the specified Java object to the XQuery data type.
-   * @param o Java object
-   * @param ctx query context
+   * Casts the specified Java value to this item type.
+   * @param value Java value
+   * @param qc query context
    * @param sc static context
    * @param ii input info
    * @return new item
    * @throws QueryException query exception
    */
-  Value cast(final Object o, QueryContext ctx, final StaticContext sc, final InputInfo ii)
+  Value cast(final Object value, QueryContext qc, final StaticContext sc, final InputInfo ii)
       throws QueryException;
 
   /**
-   * Casts the specified string to the XQuery data type.
-   * @param s string object
-   * @param ctx query context
+   * Casts the specified string to this item type.
+   * @param value string object
+   * @param qc query context
    * @param sc static context
    * @param ii input info
    * @return new item
    * @throws QueryException query exception
    */
-  Value castString(final String s, QueryContext ctx, final StaticContext sc, final InputInfo ii)
+  Value castString(final String value, QueryContext qc, final StaticContext sc, final InputInfo ii)
       throws QueryException;
 
   /**
-   * Returns the sequence type of this data type.
+   * Returns a sequence type with this item type.
    * @return sequence type
    */
   SeqType seqType();
@@ -186,40 +187,34 @@ public interface Type {
 
   /**
    * Checks if this type is equal to the given one.
-   * @param t other type
+   * @param type other type
    * @return {@code true} if both types are equal, {@code false} otherwise
    */
-  boolean eq(final Type t);
+  boolean eq(final Type type);
 
   /**
    * Checks if the current type is an instance of the specified type.
-   * @param t type to be checked
+   * @param type type to be checked
    * @return result of check
    */
-  boolean instanceOf(final Type t);
+  boolean instanceOf(final Type type);
 
   /**
    * Computes the union between this type and the given one, i.e. the least common
    * ancestor of both types in the type hierarchy.
-   * @param t other type
+   * @param type other type
    * @return union type
    */
-  Type union(final Type t);
+  Type union(final Type type);
 
   /**
    * Computes the intersection between this type and the given one, i.e. the least
    * specific type that is sub-type of both types. If no such type exists, {@code null} is
    * returned.
-   * @param t other type
+   * @param type other type
    * @return intersection type or {@code null}
    */
-  Type intersect(final Type t);
-
-  /**
-   * Checks if the type refers to a node.
-   * @return result of check
-   */
-  boolean isNode();
+  Type intersect(final Type type);
 
   /**
    * Checks if the type refers to a number.
@@ -258,12 +253,12 @@ public interface Type {
    */
   ID id();
 
-  @Override
-  String toString();
-
   /**
    * Checks if the type is namespace-sensitive.
    * @return result of check
    */
   boolean nsSensitive();
+
+  @Override
+  String toString();
 }

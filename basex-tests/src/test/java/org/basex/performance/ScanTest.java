@@ -15,7 +15,7 @@ import org.junit.Test;
 /**
  * This class benchmarks simple table scans.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class ScanTest extends SandboxTest {
@@ -37,12 +37,11 @@ public final class ScanTest extends SandboxTest {
      * </XML>
      */
     final IOFile dbfile = new IOFile(sandbox(), NAME);
-    final BufferOutput bo = new BufferOutput(dbfile.path());
-    final int max = 16;
-    final byte[] cache = new byte[max];
-    // use constant seed to create same test document every time
-    final Random rnd = new Random(0);
-    try {
+    try(final BufferOutput bo = new BufferOutput(dbfile.path())) {
+      final int max = 16;
+      final byte[] cache = new byte[max];
+      // use constant seed to create same test document every time
+      final Random rnd = new Random(0);
       bo.write(Token.token("<XML>"));
       final byte[] start = Token.token("<SUB>");
       final byte[] end = Token.token("</SUB>");
@@ -54,8 +53,6 @@ public final class ScanTest extends SandboxTest {
         bo.write(end);
       }
       bo.write(Token.token("</XML>"));
-    } finally {
-      bo.close();
     }
 
     // create database

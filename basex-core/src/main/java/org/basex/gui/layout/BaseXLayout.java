@@ -13,6 +13,7 @@ import java.util.*;
 import java.util.List;
 
 import javax.swing.*;
+import javax.swing.border.*;
 
 import org.basex.gui.*;
 import org.basex.gui.text.*;
@@ -22,7 +23,7 @@ import org.basex.util.*;
  * This class provides static layout and paint helper methods which are used all over
  * the GUI.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class BaseXLayout {
@@ -34,7 +35,7 @@ public final class BaseXLayout {
 
   /** Shortcut string for meta key. */
   private static final String META = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() ==
-      Event.META_MASK ? "meta" : "ctrl";
+      InputEvent.META_MASK ? "meta" : "ctrl";
   /** Key listener for global shortcuts. */
   private static KeyAdapter keys;
 
@@ -56,14 +57,25 @@ public final class BaseXLayout {
    * @param g graphics reference
    */
   public static void hints(final Graphics g) {
-    if(hints) {
+    if(HINTS != null && hints) {
       try {
         ((Graphics2D) g).addRenderingHints(HINTS);
       } catch(final Exception ex) {
-        Util.debug(ex);
+        Util.stack(ex);
         hints = false;
       }
     }
+  }
+
+  /**
+   * Activates graphics anti-aliasing.
+   * @param g graphics reference
+   * @return graphics reference
+   */
+  public static Graphics2D antiAlias(final Graphics g) {
+    final Graphics2D g2 = (Graphics2D) g;
+    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    return g2;
   }
 
   /**
@@ -77,31 +89,34 @@ public final class BaseXLayout {
   }
 
   /**
-   * Sets the component width, adopting the original component height.
+   * Sets the scaled component width, adopting the original component height.
    * @param comp component
    * @param w width
    */
   public static void setWidth(final Component comp, final int w) {
-    comp.setPreferredSize(new Dimension(w, comp.getPreferredSize().height));
+    comp.setPreferredSize(new Dimension((int) (w * SCALE), comp.getPreferredSize().height));
   }
 
   /**
-   * Sets the component height, adopting the original component width.
+   * Sets the scaled component height, adopting the original component width.
    * @param comp component
    * @param h height
    */
   public static void setHeight(final Component comp, final int h) {
-    comp.setPreferredSize(new Dimension(comp.getPreferredSize().width, h));
+    comp.setPreferredSize(new Dimension(comp.getPreferredSize().width, (int) (h * SCALE)));
   }
 
   /**
-   * Sets the component size.
-   * @param comp component
-   * @param w width
-   * @param h height
+   * Returns a border with the specified insets.
+   * @param t top distance
+   * @param l left distance
+   * @param b bottom distance
+   * @param r right distance
+   * @return border
    */
-  static void setSize(final Component comp, final int w, final int h) {
-    comp.setPreferredSize(new Dimension(w, h));
+  public static EmptyBorder border(final int t, final int l, final int b, final int r) {
+    return new EmptyBorder((int) (t * ASCALE), (int) (l * ASCALE),
+        (int) (b * ASCALE), (int) (r * ASCALE));
   }
 
   /**
@@ -154,7 +169,8 @@ public final class BaseXLayout {
 
     // find and assign unused mnemomic
     final String label = b.getText();
-    for(int l = 0; l < label.length(); l++) {
+    final int ll = label.length();
+    for(int l = 0; l < ll; l++) {
       final char ch = Character.toLowerCase(label.charAt(l));
       if(!letter(ch) || mnem.indexOf(Character.toString(ch)) != -1)
         continue;
@@ -171,7 +187,7 @@ public final class BaseXLayout {
    */
   @SuppressWarnings("unchecked")
   public static ArrayList<Object> contents(final Transferable tr) {
-    final ArrayList<Object> list = new ArrayList<Object>();
+    final ArrayList<Object> list = new ArrayList<>();
     try {
       if(tr.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
         for(final File fl : (List<File>)
@@ -195,7 +211,7 @@ public final class BaseXLayout {
 
   /**
    * Drag and drop handler.
-   * @author BaseX Team 2005-14, BSD License
+   * @author BaseX Team 2005-15, BSD License
    * @author Christian Gruen
    */
   public interface DropHandler {
@@ -226,7 +242,7 @@ public final class BaseXLayout {
         @Override
         public void keyPressed(final KeyEvent e) {
           final Object s = e.getSource();
-          if(s instanceof BaseXCombo && ((JComboBox) s).isPopupVisible()) return;
+          if(s instanceof BaseXCombo && ((BaseXCombo) s).isPopupVisible()) return;
 
           // do not key close dialog of button or editor is focused
           if(ENTER.is(e) && !(s instanceof BaseXButton || s instanceof TextPanel)) {
@@ -309,7 +325,7 @@ public final class BaseXLayout {
     final StringBuilder sb = new StringBuilder();
     for(final String s : sc.split(" ")) {
       String t = "%".equals(s) ? Prop.MAC ? "meta" : "control" : s;
-      if(t.length() != 1) t = Toolkit.getProperty("AWT." + t.toLowerCase(), t);
+      if(t.length() != 1) t = Toolkit.getProperty("AWT." + t.toLowerCase(Locale.ENGLISH), t);
       sb.append('+').append(t);
     }
     return str + " (" + sb.substring(1) + ')';
@@ -325,43 +341,6 @@ public final class BaseXLayout {
   }
 
   /**
-   * Fills the specified area with a color gradient.
-   * @param gg graphics reference
-   * @param c1 first color
-   * @param c2 second color
-   * @param xs horizontal start position
-   * @param ys vertical start position
-   * @param xe horizontal end position
-   * @param ye vertical end position
-   */
-  public static void fill(final Graphics gg, final Color c1, final Color c2, final int xs,
-      final int ys, final int xe, final int ye) {
-
-    final int w = xe - xs, h = ye - ys;
-    final int r = c1.getRed(), g = c1.getGreen(), b = c1.getBlue();
-    final float rf = (c2.getRed() - r) / (float) h;
-    final float gf = (c2.getGreen() - g) / (float) h;
-    final float bf = (c2.getBlue() - b) / (float) h;
-
-    int hh = 0;
-    for(int y = 0, cr = 0, cg = 0, cb = 0; y < h; ++y) {
-      final int nr = r + (int) (rf * y);
-      final int ng = g + (int) (gf * y);
-      final int nb = b + (int) (bf * y);
-      if(nr != cr || ng != cg || nb != cb) {
-        gg.setColor(new Color(nr, ng, nb));
-        gg.fillRect(xs, ys + y - hh, w, hh);
-        hh = 0;
-      }
-      cr = nr;
-      cg = ng;
-      cb = nb;
-      ++hh;
-    }
-    gg.fillRect(xs, ys + h - hh, w, hh);
-  }
-
-  /**
    * Draws a colored cell.
    * @param g graphics reference
    * @param xs horizontal start position
@@ -373,12 +352,12 @@ public final class BaseXLayout {
   public static void drawCell(final Graphics g, final int xs, final int xe, final int ys,
       final int ye, final boolean focus) {
 
-    g.setColor(GRAY);
+    g.setColor(gray);
     g.drawRect(xs, ys, xe - xs - 1, ye - ys - 1);
-    g.setColor(Color.white);
+    g.setColor(BACK);
     g.drawRect(xs + 1, ys + 1, xe - xs - 3, ye - ys - 3);
-
-    fill(g, focus ? LGRAY : Color.white, LGRAY, xs + 2, ys + 2, xe - 1, ye - 1);
+    g.setColor(focus ? lgray : BACK);
+    g.fillRect(xs + 1, ys + 1, xe - xs - 2, ye - ys - 2);
   }
 
   /**
@@ -408,7 +387,7 @@ public final class BaseXLayout {
     final int xx = Math.min(w - tw - 8, x);
     g.setColor(color(c));
     g.fillRect(xx - 1, y - th, tw + 4, th);
-    g.setColor(Color.white);
+    g.setColor(BACK);
     g.drawString(tt, xx, y - 4);
   }
 

@@ -9,7 +9,7 @@ import java.awt.event.*;
 /**
  * This class offers system-dependent key mappings.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  * @author Leo Woerteler
  */
@@ -17,119 +17,120 @@ public enum BaseXKeys {
 
   // Cursor
 
-  /** Left.                  */ PREVCHAR(VK_LEFT),
-  /** Right.                 */ NEXTCHAR(VK_RIGHT),
-  /** Word left.             */ PREVWORD(MAC ? ALT : META, VK_LEFT),
-  /** Word right.            */ NEXTWORD(MAC ? ALT : META, VK_RIGHT),
-  /** Beginning of line.     */ LINESTART(MAC ? META : 0, MAC ? VK_LEFT : VK_HOME),
-  /** End of line.           */ LINEEND(MAC ? META : 0, MAC ? VK_RIGHT : VK_END),
+  /** Left.                  */ PREVCHAR(NO_MOD, VK_LEFT, SHIFT),
+  /** Right.                 */ NEXTCHAR(NO_MOD, VK_RIGHT, SHIFT),
+  /** Word left.             */ PREVWORD(MAC ? ALT : META, VK_LEFT, SHIFT),
+  /** Word right.            */ NEXTWORD(MAC ? ALT : META, VK_RIGHT, SHIFT),
+  /** Beginning of line.     */ LINESTART(MAC ? META : NO_MOD, MAC ? VK_LEFT : VK_HOME, SHIFT),
+  /** End of line.           */ LINEEND(MAC ? META : NO_MOD, MAC ? VK_RIGHT : VK_END, SHIFT),
 
-  /** Up.                    */ PREVLINE(VK_UP),
-  /** Down.                  */ NEXTLINE(VK_DOWN),
-  /** Page up.               */ PREVPAGE(VK_PAGE_UP),
-  /** Page down.             */ NEXTPAGE(VK_PAGE_DOWN),
-  /** Beginning of text.     */ TEXTSTART(META, MAC ? VK_UP : VK_HOME),
-  /** End of text.           */ TEXTEND(META, MAC ? VK_DOWN : VK_END),
-  /** Scroll up.             */ SCROLLUP(MAC ? ALT : META, VK_UP, true),
-  /** Scroll down.           */ SCROLLDOWN(MAC ? ALT : META, VK_DOWN, true),
+  /** Up.                    */ PREVLINE(NO_MOD, VK_UP, SHIFT),
+  /** Down.                  */ NEXTLINE(NO_MOD, VK_DOWN, SHIFT),
+  /** Page up.               */ PREVPAGE(NO_MOD, VK_PAGE_UP, SHIFT),
+  /** Page down.             */ NEXTPAGE(NO_MOD, VK_PAGE_DOWN, SHIFT),
+  /** Beginning of text.     */ TEXTSTART(META, MAC ? VK_UP : VK_HOME, SHIFT),
+  /** End of text.           */ TEXTEND(META, MAC ? VK_DOWN : VK_END, SHIFT),
+  /** Scroll up.             */ SCROLLUP(MAC ? ALT : META, VK_UP),
+  /** Scroll down.           */ SCROLLDOWN(MAC ? ALT : META, VK_DOWN),
 
-  /** Tab key.               */ TAB(VK_TAB),
+  /** Tab key.               */ TAB(NO_MOD, VK_TAB, SHIFT),
 
-  /** Page up (read-only).   */ PREVPAGE_RO(SHIFT, VK_SPACE, true),
-  /** Page down (read-only). */ NEXTPAGE_RO(VK_SPACE, true),
+  /** Page up (read-only).   */ PREVPAGE_RO(SHIFT, VK_SPACE),
+  /** Page down (read-only). */ NEXTPAGE_RO(NO_MOD, VK_SPACE),
 
   // Editing
 
-  /** Delete backwards.      */ DELPREV(VK_BACK_SPACE),
-  /** Delete.                */ DELNEXT(VK_DELETE),
+  /** Delete backwards.      */ DELPREV(NO_MOD, VK_BACK_SPACE, SHIFT),
+  /** Delete.                */ DELNEXT(NO_MOD, VK_DELETE),
 
-  /** Undo.                  */ UNDOSTEP(META, VK_Z, true),
-  /** Redo.                  */ REDOSTEP(MAC ? META | SHIFT : META, MAC ? VK_Z : VK_Y, true),
+  /** Undo.                  */ UNDOSTEP(META, VK_Z),
+  /** Redo.                  */ REDOSTEP(MAC ? META | SHIFT : META, MAC ? VK_Z : VK_Y),
 
-  /** Cut.                   */ CUT1(META, VK_X, true),
-  /** Cut.                   */ CUT2(SHIFT, VK_DELETE, true),
-  /** Copy.                  */ COPY1(META, VK_C, true),
-  /** Copy.                  */ COPY2(META, VK_INSERT, true),
-  /** Paste.                 */ PASTE1(META, VK_V, true),
-  /** Paste.                 */ PASTE2(SHIFT, VK_INSERT, true),
-  /** Select all.            */ SELECTALL(META, VK_A, true),
+  /** Cut.                   */ CUT1(META, VK_X),
+  /** Cut.                   */ CUT2(SHIFT, VK_DELETE),
+  /** Copy.                  */ COPY1(META, VK_C),
+  /** Copy.                  */ COPY2(META, VK_INSERT),
+  /** Paste.                 */ PASTE1(META, VK_V),
+  /** Paste.                 */ PASTE2(SHIFT, VK_INSERT),
+  /** Select all.            */ SELECTALL(META, VK_A),
 
-  /** Move line(s) down.     */ MOVEDOWN(MAC ? ALT | SHIFT : ALT, VK_DOWN, true),
-  /** Move line(s) up.       */ MOVEUP(MAC ? ALT | SHIFT : ALT, VK_UP, true),
+  /** Move line(s) down.     */ MOVEDOWN(MAC ? ALT | SHIFT : ALT, VK_DOWN),
+  /** Move line(s) up.       */ MOVEUP(MAC ? ALT | SHIFT : ALT, VK_UP),
 
-  /** Code completion.       */ COMPLETE(CTRL, VK_SPACE, true),
+  /** Code completion.       */ COMPLETE(CTRL, VK_SPACE),
 
-  /** Delete word backwards. */ DELPREVWORD(MAC ? ALT : META, VK_BACK_SPACE, true),
-  /** Delete word.           */ DELNEXTWORD(MAC ? ALT : META, VK_DELETE, true),
-  /** Delete line to begin.  */ DELLINESTART(META | (MAC ? 0 : SHIFT), VK_BACK_SPACE, true),
-  /** Delete line to end.    */ DELLINEEND(META | (MAC ? 0 : SHIFT), VK_DELETE, true),
-  /** Delete complete line.  */ DELLINE(META | SHIFT, VK_D, true),
+  /** Delete word backwards. */ DELPREVWORD(MAC ? ALT : META, VK_BACK_SPACE),
+  /** Delete word.           */ DELNEXTWORD(MAC ? ALT : META, VK_DELETE),
+  /** Delete line to begin.  */ DELLINESTART(META | (MAC ? NO_MOD : SHIFT), VK_BACK_SPACE),
+  /** Delete line to end.    */ DELLINEEND(META | (MAC ? NO_MOD : SHIFT), VK_DELETE),
+  /** Delete complete line.  */ DELLINE(META | SHIFT, VK_D),
 
   // Navigation
 
-  /** Jump to input bar.     */ INPUTBAR(MAC ? META : 0, VK_F6, true),
-  /** Next tab.              */ NEXTTAB(CTRL, VK_TAB, true),
-  /** Previous tab.          */ PREVTAB(CTRL | SHIFT, VK_TAB, true),
-  /** Close tab.             */ CLOSETAB(META, VK_F4, true),
+  /** Jump to input bar.     */ INPUTBAR(MAC ? META : NO_MOD, VK_F6),
+  /** Next tab.              */ NEXTTAB(CTRL, VK_TAB),
+  /** Previous tab.          */ PREVTAB(CTRL | SHIFT, VK_TAB),
+  /** Close tab.             */ CLOSETAB(META, VK_F4),
 
-  /** Browse back.           */ GOBACK(MAC ? META : ALT, VK_LEFT, true),
-  /** Browse back.           */ GOBACK2(VK_BACK_SPACE, true),
-  /** Browse forward.        */ GOFORWARD(MAC ? META : ALT, VK_RIGHT, true),
-  /** Browse up.             */ GOUP(MAC ? META : ALT, VK_UP, true),
-  /** Browse home.           */ GOHOME(MAC ? META : ALT, VK_HOME, true),
+  /** Browse back.           */ GOBACK(MAC ? META : ALT, VK_LEFT),
+  /** Browse back.           */ GOBACK2(VK_BACK_SPACE, NO_MOD),
+  /** Browse forward.        */ GOFORWARD(MAC ? META : ALT, VK_RIGHT),
+  /** Browse up.             */ GOUP(MAC ? META : ALT, VK_UP),
+  /** Browse home.           */ GOHOME(MAC ? META : ALT, VK_HOME),
 
-  /** Go to line.            */ GOTOLINE(META, VK_L, true),
+  /** Go to line.            */ GOTOLINE(META, VK_L),
 
   // Find
 
-  /** Find search term.      */ FIND(META, VK_F, true),
-  /** Find next hit.         */ FINDNEXT1(MAC ? META : 0, VK_F3, true),
-  /** Find next hit.         */ FINDNEXT2(META, VK_G, true),
-  /** Find previous hit.     */ FINDPREV1(MAC ? META | SHIFT : SHIFT, VK_F3, true),
-  /** Find previous hit.     */ FINDPREV2(META | SHIFT, VK_G, true),
+  /** Find search term.      */ FIND(META, VK_F),
+  /** Find next hit.         */ FINDNEXT1(MAC ? META : NO_MOD, VK_F3),
+  /** Find next hit.         */ FINDNEXT2(META, VK_G),
+  /** Find previous hit.     */ FINDPREV1(MAC ? META | SHIFT : SHIFT, VK_F3),
+  /** Find previous hit.     */ FINDPREV2(META | SHIFT, VK_G),
 
   // Font
 
-  /** Increment size.        */ INCFONT1(META, VK_PLUS, true),
-  /** Increment size.        */ INCFONT2(META, VK_EQUALS, true),
-  /** Decrease size.         */ DECFONT(META, VK_MINUS, true),
-  /** Standard size.         */ NORMFONT(META, VK_0, true),
+  /** Increment size.        */ INCFONT1(META, VK_PLUS),
+  /** Increment size.        */ INCFONT2(META, VK_EQUALS),
+  /** Decrease size.         */ DECFONT(META, VK_MINUS),
+  /** Standard size.         */ NORMFONT(META, VK_0),
 
   // General
 
-  /** Execute.               */ EXEC1(META, VK_ENTER, true),
-  /** Execute.               */ EXEC2(META, VK_F11, true),
-  /** Test.                  */ UNIT(META | SHIFT, VK_ENTER, true),
+  /** Execute.               */ EXEC1(META, VK_ENTER),
+  /** Execute.               */ EXEC2(META, VK_F11),
+  /** Test.                  */ UNIT(META | SHIFT, VK_ENTER),
 
-  /** Escape.                */ ESCAPE(VK_ESCAPE, true),
-  /** Context menu.          */ CONTEXT(VK_CONTEXT_MENU, true),
-  /** Copy path.             */ COPYPATH(META | SHIFT, VK_C, true),
+  /** Escape.                */ ESCAPE(NO_MOD, VK_ESCAPE),
+  /** Context menu.          */ CONTEXT(NO_MOD, VK_CONTEXT_MENU),
+  /** Copy path.             */ COPYPATH(META | SHIFT, VK_C),
+  /** Add as import.         */ ADDIMPORT(META | SHIFT, VK_I),
 
-  /** Refresh.               */ REFRESH(VK_F5, true),
-  /** Rename.                */ RENAME(VK_F2, true),
-  /** New directory.         */ NEWDIR(META | SHIFT, VK_N, true),
+  /** Refresh.               */ REFRESH(NO_MOD, VK_F5),
+  /** Rename.                */ RENAME(NO_MOD, VK_F2),
+  /** New directory.         */ NEWDIR(META | SHIFT, VK_N),
 
-  /** Space key.             */ SPACE(VK_SPACE, true),
-  /** Enter.                 */ ENTER(VK_ENTER, true),
-  /** Shift Enter.           */ OPEN(SHIFT, VK_ENTER, true);
+  /** Space key.             */ SPACE(NO_MOD, VK_SPACE),
+  /** Enter.                 */ ENTER(NO_MOD, VK_ENTER),
+  /** Shift Enter.           */ SHIFT_ENTER(SHIFT, VK_ENTER);
 
   /** Modifiers. */
-  private final int mod;
+  private final int modifiers;
   /** Key. */
   private final int key;
   /** Exclusive modifiers flag. */
-  private final boolean excl;
+  private final int allowed;
 
   /**
    * Constructor.
-   * @param m modifiers
-   * @param k key code
-   * @param ex modifiers exclusive
+   * @param modifiers modifiers (shift, control, meta, alt key)
+   * @param key key code
+   * @param allowed additionally allowed modifiers
    */
-  BaseXKeys(final int m, final int k, final boolean ex) {
-    mod = m;
-    key = k;
-    excl = ex;
+  BaseXKeys(final int modifiers, final int key, final int allowed) {
+    this.modifiers = modifiers;
+    this.key = key;
+    this.allowed = allowed;
   }
 
   /**
@@ -138,24 +139,7 @@ public enum BaseXKeys {
    * @param k key code
    */
   BaseXKeys(final int m, final int k) {
-    this(m, k, false);
-  }
-
-  /**
-   * Constructor for ignoring modifiers.
-   * @param k key code
-   * @param ig ignore modifiers
-   */
-  BaseXKeys(final int k, final boolean ig) {
-    this(0, k, ig);
-  }
-
-  /**
-   * Constructor without modifiers.
-   * @param k key code
-   */
-  BaseXKeys(final int k) {
-    this(0, k);
+    this(m, k, NO_MOD);
   }
 
   /**
@@ -165,9 +149,8 @@ public enum BaseXKeys {
    */
   public boolean is(final KeyEvent e) {
     final int c = e.getKeyCode();
-    int m = e.getModifiers();
-    if(!excl) m &= mod;
-    return m == mod && (c == 0 ? e.getKeyChar() : c) == key;
+    final int m = e.getModifiers() | allowed;
+    return m == (modifiers | allowed) && (c == 0 ? e.getKeyChar() : c) == key;
   }
 
   /**
@@ -204,26 +187,27 @@ public enum BaseXKeys {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(getKeyModifiersText(mod));
+    final StringBuilder sb = new StringBuilder(getKeyModifiersText(modifiers));
     if(sb.length() != 0) sb.append('+');
-    return sb.append(KeyEvent.getKeyText(key)).toString();
+    return sb.append(getKeyText(key)).toString();
   }
 
   /**
    * Returns a shortcut string.
    * @return shortcut string
    */
-  public String shortCut() {
+  String shortCut() {
     final StringBuilder sb = new StringBuilder();
-    if((mod & InputEvent.META_MASK) != 0) sb.append("meta").append(' ');
-    if((mod & InputEvent.CTRL_MASK) != 0) sb.append("ctrl").append(' ');
-    if((mod & InputEvent.ALT_MASK) != 0) sb.append("alt").append(' ');
-    if((mod & InputEvent.SHIFT_MASK) != 0) sb.append("shift").append(' ');
+    if((modifiers & InputEvent.META_MASK) != 0) sb.append("meta").append(' ');
+    if((modifiers & InputEvent.CTRL_MASK) != 0) sb.append("ctrl").append(' ');
+    if((modifiers & InputEvent.ALT_MASK) != 0) sb.append("alt").append(' ');
+    if((modifiers & InputEvent.SHIFT_MASK) != 0) sb.append("shift").append(' ');
 
-    if(key == KeyEvent.VK_ENTER) sb.append("ENTER");
-    else if(key == KeyEvent.VK_DELETE) sb.append("DELETE");
-    else if(key == KeyEvent.VK_PERIOD) sb.append("PERIOD");
-    else sb.append(KeyEvent.getKeyText(key));
+    if(key == VK_ENTER) sb.append("ENTER");
+    else if(key == VK_DELETE) sb.append("DELETE");
+    else if(key == VK_PERIOD) sb.append("PERIOD");
+    else sb.append(getKeyText(key));
     return sb.toString();
   }
 }
+

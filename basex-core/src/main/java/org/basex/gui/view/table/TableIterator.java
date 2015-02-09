@@ -1,11 +1,12 @@
 package org.basex.gui.view.table;
 
 import org.basex.data.*;
+import org.basex.gui.view.table.TableData.TableCol;
 
 /**
  * This is an iterator for parsing the rows' contents.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 final class TableIterator {
@@ -13,12 +14,12 @@ final class TableIterator {
   private final TableData tdata;
   /** Data reference. */
   private final Data data;
-  /** Last pre value. */
+  /** Current pre value. */
   private int last;
-  /** Last tag. */
-  private int tag;
-  /** Root tag. */
-  private int rootTag;
+  /** Current element. */
+  private int elem;
+  /** Root element. */
+  private int rootElem;
 
   /** Current pre value. */
   int pre;
@@ -43,9 +44,9 @@ final class TableIterator {
    */
   void init(final int p) {
     last = p + data.size(p, data.kind(p));
-    rootTag = data.name(p);
+    rootElem = data.name(p);
     pre = p;
-    tag = -1;
+    elem = -1;
   }
 
   /**
@@ -59,17 +60,17 @@ final class TableIterator {
 
       // content found...
       if(text || k == Data.ATTR) {
-        final int id = text ? tag : data.name(pre);
+        final int id = text ? elem : data.name(pre);
         // find correct column...
-        for(col = 0; col < tdata.cols.length; ++col) {
-          if(tdata.cols[col].id == id && tdata.cols[col].elem == text) {
-            return true;
-          }
+        final TableCol[] cols = tdata.cols;
+        final int cl = cols.length;
+        for(col = 0; col < cl; ++col) {
+          if(cols[col].id == id && cols[col].elem == text) return true;
         }
       } else if(k == Data.ELEM) {
-        // remember last tag
-        tag = data.name(pre);
-        if(tag == rootTag) return false;
+        // remember name of last element
+        elem = data.name(pre);
+        if(elem == rootElem) return false;
       }
     }
     return false;

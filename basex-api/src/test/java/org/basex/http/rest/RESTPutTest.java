@@ -13,7 +13,7 @@ import org.junit.*;
 /**
  * This class tests the embedded REST API and the PUT method.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class RESTPutTest extends RESTTest {
@@ -77,10 +77,9 @@ public final class RESTPutTest extends RESTTest {
     put(NAME + '?' + MainOptions.CHOP.name() + "=false", new FileInputStream(FILE));
     assertEquals("22", get(NAME + "?query=count(//text())"));
 
-    try {
-      put(NAME + "?xxx=yyy", new FileInputStream(FILE));
+    try(final FileInputStream fis = new FileInputStream(FILE)) {
+      put(NAME + "?xxx=yyy", fis);
       fail("Error expected.");
-    } catch(final IOException ignored) {
-    }
+    } catch(final IOException ignored) { }
   }
 }

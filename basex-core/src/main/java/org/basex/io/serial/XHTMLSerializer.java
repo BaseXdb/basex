@@ -5,35 +5,37 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
+import org.basex.io.out.*;
+
 /**
- * This class serializes data as XHTML.
+ * This class serializes items as XHTML.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public class XHTMLSerializer extends OutputSerializer {
+final class XHTMLSerializer extends MarkupSerializer {
   /**
    * Constructor, specifying serialization options.
-   * @param os output stream reference
+   * @param po print output
    * @param sopts serialization parameters
    * @throws IOException I/O exception
    */
-  XHTMLSerializer(final OutputStream os, final SerializerOptions sopts) throws IOException {
-    super(os, sopts, V10, V11);
+  XHTMLSerializer(final PrintOutput po, final SerializerOptions sopts) throws IOException {
+    super(po, sopts, V10, V11);
   }
 
   @Override
-  protected void attribute(final byte[] n, final byte[] v) throws IOException {
+  protected void attribute(final byte[] name, final byte[] value) throws IOException {
     // escape URI attributes
-    final byte[] tagatt = concat(lc(tag), COLON, lc(n));
-    final byte[] val = escuri && HTMLSerializer.URIS.contains(tagatt) ? escape(v) : v;
-    super.attribute(n, val);
+    final byte[] nm = concat(lc(elem), COLON, lc(name));
+    final byte[] val = escuri && HTMLSerializer.URIS.contains(nm) ? escape(value) : value;
+    super.attribute(name, val);
   }
 
   @Override
-  protected void startOpen(final byte[] t) throws IOException {
-    super.startOpen(t);
-    if(content && eq(lc(tag), HEAD)) ct++;
+  protected void startOpen(final byte[] value) throws IOException {
+    super.startOpen(value);
+    if(content && eq(lc(elem), HEAD)) ct++;
   }
 
   @Override
@@ -45,26 +47,26 @@ public class XHTMLSerializer extends OutputSerializer {
   @Override
   protected void finishEmpty() throws IOException {
     if(ct(true, false)) return;
-    if((html5 ? HTMLSerializer.EMPTIES5 : HTMLSerializer.EMPTIES).contains(lc(tag))) {
-      print(' ');
-      print(ELEM_SC);
+    if((html5 ? HTMLSerializer.EMPTIES5 : HTMLSerializer.EMPTIES).contains(lc(elem))) {
+      out.print(' ');
+      out.print(ELEM_SC);
     } else {
-      print(ELEM_C);
+      out.print(ELEM_C);
       sep = false;
       finishClose();
     }
   }
 
   @Override
-  protected boolean doctype(final byte[] dt) throws IOException {
+  protected boolean doctype(final byte[] type) throws IOException {
     if(level != 0) return false;
-    if(!super.doctype(dt) && html5) {
+    if(!super.doctype(type) && html5) {
       if(sep) indent();
-      print(DOCTYPE);
-      if(dt == null) print(HTML);
-      else print(dt);
-      print(ELEM_C);
-      print(nl);
+      out.print(DOCTYPE);
+      if(type == null) out.print(HTML);
+      else out.print(type);
+      out.print(ELEM_C);
+      newline();
     }
     return true;
   }

@@ -2,6 +2,7 @@ package org.basex.http;
 
 import static javax.servlet.http.HttpServletResponse.*;
 import static org.basex.data.DataText.*;
+import static org.basex.query.func.http.HttpText.*;
 import static org.basex.http.HTTPText.*;
 import static org.basex.io.MimeTypes.*;
 import static org.basex.util.Token.*;
@@ -9,28 +10,43 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.regex.*;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
 
 import org.basex.*;
-import org.basex.build.*;
-import org.basex.build.JsonOptions.JsonFormat;
+import org.basex.build.json.*;
+import org.basex.build.json.JsonOptions.*;
 import org.basex.core.*;
+import org.basex.core.StaticOptions.AuthMethod;
+import org.basex.core.users.*;
 import org.basex.io.*;
+import org.basex.io.out.*;
 import org.basex.io.serial.*;
+import org.basex.query.func.http.*;
+import org.basex.server.Log.LogType;
 import org.basex.server.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 import org.basex.util.options.*;
 
 /**
  * Bundles context-based information on a single HTTP operation.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class HTTPContext {
+  /** Quality factor pattern. */
+  private static final Pattern QF = Pattern.compile("^(.*);\\s*q\\s*=(.*)$");
+
+  /** Global static database context. */
+  private static Context context;
+  /** Initialization flag. */
+  private static boolean init;
+  /** Initialized failed. */
+  private static IOException exception;
+
   /** Servlet request. */
   public final HttpServletRequest req;
   /** Servlet response. */
@@ -40,67 +56,85 @@ public final class HTTPContext {
   /** Request method. */
   public final HTTPParams params;
 
-  /** Serialization parameters. */
-  private SerializerOptions sopts;
-  /** Result wrapping. */
-  public boolean wrapping;
+  /** Authentication method. */
+  public AuthMethod auth;
   /** User name. */
-  public String user;
-  /** Password. */
-  public String pass;
-
-  /** Global static database context. */
-  private static Context context;
-  /** Initialization flag. */
-  private static boolean init;
+  public String username;
+  /** Password (plain text). */
+  public String password;
 
   /** Performance. */
   private final Performance perf = new Performance();
-  /** Segments. */
-  private final String[] segments;
+  /** Path, starting with a slash. */
+  private final String path;
+
+  /** Serialization parameters. */
+  private SerializerOptions sopts;
 
   /**
    * Constructor.
-   * @param rq request
-   * @param rs response
+   * @param req request
+   * @param res response
    * @param servlet calling servlet instance
-   * @throws IOException I/O exception
    */
-  public HTTPContext(final HttpServletRequest rq, final HttpServletResponse rs,
-      final BaseXServlet servlet) throws IOException {
+  HTTPContext(final HttpServletRequest req, final HttpServletResponse res,
+      final BaseXServlet servlet) {
 
-    req = rq;
-    res = rs;
+    this.req = req;
+    this.res = res;
     params = new HTTPParams(this);
-
-    method = rq.getMethod();
+    method = req.getMethod();
 
     final StringBuilder uri = new StringBuilder(req.getRequestURL());
     final String qs = req.getQueryString();
     if(qs != null) uri.append('?').append(qs);
-    log('[' + method + "] " + uri, null);
+    context.log.write(address(), context.user(), LogType.REQUEST, '[' + method + "] " + uri, null);
 
     // set UTF8 as default encoding (can be overwritten)
-    res.setCharacterEncoding(UTF8);
-    segments = decode(toSegments(req.getPathInfo()));
+    res.setCharacterEncoding(Strings.UTF8);
+    path = decode(normalize(req.getPathInfo()));
 
-    // adopt servlet-specific credentials or use global ones
-    final GlobalOptions mprop = context().globalopts;
-    user = servlet.user != null ? servlet.user : mprop.get(GlobalOptions.USER);
-    pass = servlet.pass != null ? servlet.pass : mprop.get(GlobalOptions.PASSWORD);
+    final StaticOptions mprop = context().soptions;
+    if(servlet.username.isEmpty()) {
+      // adopt existing servlet-specific credentials
+      username = mprop.get(StaticOptions.USER);
+      password = mprop.get(StaticOptions.PASSWORD);
+    } else {
+      // otherwise, adopt global credentials
+      username = servlet.username;
+      password = servlet.password;
+    }
 
-    // overwrite credentials with session-specific data
-    final String auth = req.getHeader(AUTHORIZATION);
-    if(auth != null) {
-      final String[] values = auth.split(" ");
-      if(values[0].equals(BASIC)) {
-        final String[] cred = Base64.decode(values[1]).split(":", 2);
-        if(cred.length != 2) throw new LoginException(NOPASSWD);
-        user = cred[0];
-        pass = cred[1];
-      } else {
-        throw new LoginException(WHICHAUTH, values[0]);
-      }
+    // prefer safest authorization method
+    final String value = req.getHeader(AUTHORIZATION);
+    final String am = value == null ? AuthMethod.BASIC.toString() : Strings.split(value, ' ', 2)[0];
+    auth = StaticOptions.AUTHMETHOD.get(am) == AuthMethod.DIGEST ? AuthMethod.DIGEST :
+      servlet.auth != null ? servlet.auth : mprop.get(StaticOptions.AUTHMETHOD);
+  }
+
+  /**
+   * Authorizes a request.
+   * @throws BaseXException database exception
+   */
+  void authorize() throws BaseXException {
+    final String value = req.getHeader(AUTHORIZATION);
+    if(value == null) return;
+
+    final String[] ams = Strings.split(value, ' ', 2);
+    final AuthMethod am = StaticOptions.AUTHMETHOD.get(ams[0]);
+    if(am == null) throw new BaseXException(WHICHAUTH, value);
+
+    // overwrite credentials with client data (basic or digest)
+    if(am == AuthMethod.BASIC) {
+      final String details = ams.length > 1 ? ams[1] : "";
+      final String[] cred = Strings.split(org.basex.util.Base64.decode(details), ':', 2);
+      if(cred.length != 2) throw new BaseXException(NOUSERNAME);
+      username = cred[0];
+      password = cred[1];
+    } else { // (will always be) digest
+      final EnumMap<Request, String> map = HttpClient.digestHeaders(value);
+      username = map.get(Request.USERNAME);
+      password = map.get(Request.RESPONSE);
     }
   }
 
@@ -117,7 +151,7 @@ public final class HTTPContext {
    * Returns the content type extension of a request (without an optional encoding).
    * @return content type
    */
-  public String contentTypeExt() {
+  String contentTypeExt() {
     final String ct = req.getContentType();
     return ct != null ? ct.replaceFirst("^.*?;\\s*", "") : null;
   }
@@ -147,7 +181,7 @@ public final class HTTPContext {
     // determine content type dependent on output method
     final SerialMethod sm = sopts.get(SerializerOptions.METHOD);
     if(sm == SerialMethod.RAW) return APP_OCTET;
-    if(sm == SerialMethod.XML) return APP_XML;
+    if(sm == SerialMethod.ADAPTIVE || sm == SerialMethod.XML) return APP_XML;
     if(sm == SerialMethod.XHTML || sm == SerialMethod.HTML) return TEXT_HTML;
     if(sm == SerialMethod.JSON) {
       final JsonSerialOptions jprop = sopts.get(SerializerOptions.JSON);
@@ -157,115 +191,152 @@ public final class HTTPContext {
   }
 
   /**
-   * Returns the path depth.
-   * @return path depth
+   * Returns the URL path.
+   * @return path path
    */
-  public int depth() {
-    return segments.length;
-  }
-
-  /**
-   * Returns a single path segment.
-   * @param i index
-   * @return segment
-   */
-  public String segment(final int i) {
-    return segments[i];
+  public String path() {
+    return path;
   }
 
   /**
    * Returns the database path (i.e., all path entries except for the first).
-   * @return path depth
+   * @return database path
    */
   public String dbpath() {
-    final TokenBuilder tb = new TokenBuilder();
-    final int ps = segments.length;
-    for(int p = 1; p < ps; p++) {
-      if(!tb.isEmpty()) tb.add('/');
-      tb.add(segments[p]);
-    }
-    return tb.toString();
+    final int s = path.indexOf('/', 1);
+    return s == -1 ? "" : path.substring(s + 1);
   }
 
   /**
-   * Returns the addressed database (i.e., the first path entry), or {@code null}
-   * if the root directory was specified.
-   * @return database
+   * Returns the addressed database (i.e., the first path entry).
+   * @return database, or {@code null} if the root directory was specified.
    */
   public String db() {
-    return depth() == 0 ? null : segments[0];
+    final int s = path.indexOf('/', 1);
+    return path.substring(1, s == -1 ? path.length() : s);
   }
 
   /**
-   * Returns an array with all accepted content types.
-   * if the root directory was specified.
-   * @return database
+   * Returns all accepted media types.
+   * @return accepted media types
    */
-  public String[] produces() {
-    final String accept = req.getHeader("Accept");
-    if(accept == null) return new String[0];
+  public HTTPAccept[] accepts() {
+    final String accept = req.getHeader(ACCEPT);
+    if(accept == null) return new HTTPAccept[0];
 
-    final String[] acc = accept.split("\\s*,\\s*");
-    final int as = acc.length;
-    for(int a = 0; a < as; a++) {
-      if(acc[a].indexOf(';') != -1) acc[a] = acc[a].replaceAll("\\w*;.*", "");
+    final ArrayList<HTTPAccept> list = new ArrayList<>();
+    for(final String produce : accept.split("\\s*,\\s*")) {
+      final HTTPAccept acc = new HTTPAccept();
+      // check if quality factor was specified
+      final Matcher m = QF.matcher(produce);
+      if(m.find()) {
+        acc.type = m.group(1);
+        acc.qf = toDouble(token(m.group(2)));
+      } else {
+        acc.type = produce;
+      }
+      // only accept valid double values
+      if(acc.qf > 0 && acc.qf <= 1) list.add(acc);
     }
-    return acc;
+    return list.toArray(new HTTPAccept[list.size()]);
   }
 
   /**
    * Sets a status and sends an info message.
    * @param code status code
-   * @param message info message
+   * @param info info message (can be {@code null})
    * @param error treat as error (use web server standard output)
    * @throws IOException I/O exception
    */
-  public void status(final int code, final String message, final boolean error) throws IOException {
+  public void status(final int code, final String info, final boolean error) throws IOException {
     try {
-      log(message, code);
+      log(code, info);
       res.resetBuffer();
-      if(code == SC_UNAUTHORIZED) res.setHeader(WWW_AUTHENTICATE, BASIC);
+      if(code == SC_UNAUTHORIZED) {
+        final StringBuilder header = new StringBuilder(auth.toString());
+        if(auth == AuthMethod.DIGEST) {
+          header.append(" " + Request.REALM + "=\"").append(Prop.NAME).append("\",");
+          header.append(Request.QOP).append("=\"").append(AUTH).append(',');
+          header.append(AUTH_INT).append("\",").append(Request.NONCE + "=\"");
+          header.append(Strings.md5(Long.toString(System.nanoTime()))).append('"');
+        }
+        res.setHeader(WWW_AUTHENTICATE, header.toString());
+      }
 
       if(error && code >= SC_BAD_REQUEST) {
-        res.sendError(code, message);
+        res.sendError(code, info);
       } else {
         res.setStatus(code);
-        if(message != null) res.getOutputStream().write(token(message));
+        if(info != null) {
+          res.setContentType(TEXT_PLAIN);
+          final ArrayOutput ao = new ArrayOutput();
+          ao.write(token(info));
+          res.getOutputStream().write(ao.normalize().finish());
+        }
       }
     } catch(final IllegalStateException ex) {
-      log(Util.message(ex), SC_INTERNAL_SERVER_ERROR);
+      log(SC_INTERNAL_SERVER_ERROR, Util.message(ex));
     }
   }
 
   /**
    * Updates the credentials.
-   * @param u user
-   * @param p password
+   * @param user user
+   * @param pass password
    */
-  public void credentials(final String u, final String p) {
-    user = u;
-    pass = p;
+  public void credentials(final String user, final String pass) {
+    username = user;
+    password = pass;
   }
 
   /**
-   * Authenticate the user and returns a new client {@link Context} instance.
+   * Authenticates the user and returns a new client {@link Context} instance.
    * @return client context
-   * @throws LoginException login exception
+   * @throws IOException I/O exception
    */
-  public Context authenticate() throws LoginException {
+  public Context authenticate() throws IOException {
     final byte[] address = token(req.getRemoteAddr());
     try {
-      if(user == null || user.isEmpty() || pass == null || pass.isEmpty())
-        throw new LoginException(NOPASSWD);
+      if(username == null || username.isEmpty()) throw new LoginException(NOUSERNAME);
+
       final Context ctx = new Context(context(), null);
-      ctx.user = ctx.users.get(user);
-      if(ctx.user == null || !ctx.user.password.equals(md5(pass))) throw new LoginException();
+      final User us = ctx.users.get(username);
+      if(us == null) throw new LoginException();
+      ctx.user(us);
+
+      if(auth == AuthMethod.BASIC) {
+        if(password == null || !us.matches(password)) throw new LoginException();
+      } else {
+        // digest authentication
+        final EnumMap<Request, String> map = HttpClient.digestHeaders(req.getHeader(AUTHORIZATION));
+        final String am = map.get(Request.AUTH_METHOD);
+        if(!AuthMethod.DIGEST.toString().equals(am)) throw new LoginException(DIGESTAUTH);
+
+        String ha1 = us.code(Algorithm.DIGEST, Code.HASH);
+        if(Strings.eq(map.get(Request.ALGORITHM), MD5_SESS))
+          ha1 = Strings.md5(ha1 + ':' + map.get(Request.NONCE) + ':' + map.get(Request.CNONCE));
+
+        String h2 = method + ':' + map.get(Request.URI);
+        final String qop = map.get(Request.QOP);
+        if(Strings.eq(qop, AUTH_INT)) h2 += ':' + Strings.md5(params.body().toString());
+        final String ha2 = Strings.md5(h2);
+
+        final StringBuilder rsp = new StringBuilder(ha1).append(':').append(map.get(Request.NONCE));
+        if(Strings.eq(qop, AUTH, AUTH_INT)) {
+          rsp.append(':').append(map.get(Request.NC));
+          rsp.append(':').append(map.get(Request.CNONCE));
+          rsp.append(':').append(qop);
+        }
+        rsp.append(':').append(ha2);
+
+        if(!Strings.md5(rsp.toString()).equals(password)) throw new LoginException();
+      }
 
       context.blocker.remove(address);
       return ctx;
     } catch(final LoginException ex) {
       // delay users with wrong passwords
-      for(int d = context.blocker.delay(address); d > 0; d--) Performance.sleep(100);
+      context.blocker.delay(address);
       throw ex;
     }
   }
@@ -274,8 +345,16 @@ public final class HTTPContext {
    * Returns the database context.
    * @return context
    */
-  public Context context() {
+  public static Context context() {
     return context;
+  }
+
+  /**
+   * Returns an exception that may have been caught by the initialization of the database server.
+   * @return exception
+   */
+  public static IOException exception() {
+    return exception;
   }
 
   /**
@@ -297,14 +376,11 @@ public final class HTTPContext {
 
   /**
    * Writes a log message.
-   * @param info message info
-   * @param type message type (true/false/null: OK, ERROR, REQUEST, Error Code)
+   * @param type log type
+   * @param info info string (can be {@code null})
    */
-  public void log(final String info, final Object type) {
-    // add evaluation time if any type is specified
-    context.log.write(type != null ?
-      new Object[] { address(), context.user.name, type, info, perf } :
-      new Object[] { address(), context.user.name, null, info });
+  void log(final int type, final String info) {
+    context.log.write(address(), context.user(), type, info, perf);
   }
 
   // STATIC METHODS =====================================================================
@@ -332,7 +408,7 @@ public final class HTTPContext {
     // set web application path as home directory and HTTPPATH
     final String webapp = sc.getRealPath("/");
     Options.setSystem(Prop.PATH, webapp);
-    Options.setSystem(GlobalOptions.WEBPATH, webapp);
+    Options.setSystem(StaticOptions.WEBPATH, webapp);
 
     // bind all parameters that start with "org.basex." to system properties
     final Enumeration<String> en = sc.getInitParameterNames();
@@ -340,67 +416,32 @@ public final class HTTPContext {
       final String key = en.nextElement();
       if(!key.startsWith(Prop.DBPREFIX)) continue;
 
-      // legacy: rewrite obsolete options. will be removed some versions later
-      final String val = sc.getInitParameter(key);
-      String k = key;
-      String v = val;
-      if(key.equals(Prop.DBPREFIX + "httppath")) {
-        k = Prop.DBPREFIX + GlobalOptions.RESTXQPATH.name();
-      } else if(key.equals(Prop.DBPREFIX + "mode")) {
-        k = Prop.DBPREFIX + GlobalOptions.HTTPLOCAL.name();
-        v = Boolean.toString("local".equals(v));
-      } else if(key.equals(Prop.DBPREFIX + "server")) {
-        k = Prop.DBPREFIX + GlobalOptions.HTTPLOCAL.name();
-        v = Boolean.toString(!Boolean.parseBoolean(v));
+      String val = sc.getInitParameter(key);
+      if(key.endsWith("path") && !new File(val).isAbsolute()) {
+        // prefix relative path with absolute servlet path
+        Util.debug(key.toUpperCase(Locale.ENGLISH) + ": " + val);
+        val = new IOFile(webapp, val).path();
       }
-      k = k.toLowerCase(Locale.ENGLISH);
-      if(!k.equals(key) || !v.equals(val)) {
-        Util.errln("Warning! Outdated option: " +
-          key + '=' + val + " => " + k + '=' + v);
-      }
-
-      // prefix relative paths with absolute servlet path
-      if(k.endsWith("path") && !new File(v).isAbsolute()) {
-        Util.debug(k.toUpperCase(Locale.ENGLISH) + ": " + v);
-        v = new IOFile(webapp, v).path();
-      }
-      Options.setSystem(k, v);
+      Options.setSystem(key, val);
     }
 
     // create context, update options
     if(context == null) {
       context = new Context(false);
     } else {
-      context.globalopts.setSystem();
+      context.soptions.setSystem();
       context.options.setSystem();
     }
 
     // start server instance
-    if(!context.globalopts.get(GlobalOptions.HTTPLOCAL)) new BaseXServer(context);
-  }
-
-  /**
-   * Converts the path to a string array, containing the single segments.
-   * @param path path, or {@code null}
-   * @return path depth
-   */
-  public static String[] toSegments(final String path) {
-    final StringList sl = new StringList();
-    if(path != null) {
-      final TokenBuilder tb = new TokenBuilder();
-      for(int s = 0; s < path.length(); s++) {
-        final char ch = path.charAt(s);
-        if(ch == '/') {
-          if(tb.isEmpty()) continue;
-          sl.add(tb.toString());
-          tb.reset();
-        } else {
-          tb.add(ch);
-        }
+    if(!context.soptions.get(StaticOptions.HTTPLOCAL)) {
+      try {
+        new BaseXServer(context);
+      } catch(final IOException ex) {
+        exception = ex;
+        throw ex;
       }
-      if(!tb.isEmpty()) sl.add(tb.toString());
     }
-    return sl.toArray();
   }
 
   /**
@@ -409,19 +450,41 @@ public final class HTTPContext {
    * @return argument
    * @throws IllegalArgumentException invalid path segments
    */
-  public static String[] decode(final String[] segments) {
+  public static String decode(final String segments) {
     try {
-      final int sl = segments.length;
-      for(int s = 0; s < sl; s++) {
-        segments[s] = URLDecoder.decode(segments[s], Prop.ENCODING);
-      }
-      return segments;
+      return URLDecoder.decode(segments, Prop.ENCODING);
     } catch(final UnsupportedEncodingException ex) {
       throw new IllegalArgumentException(ex);
     }
   }
 
   // PRIVATE METHODS ====================================================================
+
+  /**
+   * Normalizes the path information.
+   * @param path path, or {@code null}
+   * @return normalized path
+   */
+  private static String normalize(final String path) {
+    final TokenBuilder tmp = new TokenBuilder();
+    if(path != null) {
+      final TokenBuilder tb = new TokenBuilder();
+      final int pl = path.length();
+      for(int p = 0; p < pl; p++) {
+        final char ch = path.charAt(p);
+        if(ch == '/') {
+          if(tb.isEmpty()) continue;
+          tmp.add('/').add(tb.toArray());
+          tb.reset();
+        } else {
+          tb.add(ch);
+        }
+      }
+      if(!tb.isEmpty()) tmp.add('/').add(tb.finish());
+    }
+    if(tmp.isEmpty()) tmp.add('/');
+    return tmp.toString();
+  }
 
   /**
    * Returns a string with the remote user address.

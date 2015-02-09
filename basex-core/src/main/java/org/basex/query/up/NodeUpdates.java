@@ -1,49 +1,44 @@
 package org.basex.query.up;
 
 import static org.basex.query.up.primitives.UpdateType.*;
+
 import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.up.primitives.*;
+import org.basex.query.up.primitives.node.*;
 
 /**
  * This container holds all update primitives for a specific database node.
  * It is identified by its target node's PRE value and data reference.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Lukas Kircher
  */
 final class NodeUpdates {
   /** Container for update primitives. */
-  List<NodeUpdate> updates = new ArrayList<NodeUpdate>(1);
+  List<NodeUpdate> updates = new ArrayList<>(1);
 
   /**
    * Adds an update to this container.
-   * @param up node update
+   * @param update node update
    * @throws QueryException query exception
    */
-  void add(final NodeUpdate up) throws QueryException {
+  void add(final NodeUpdate update) throws QueryException {
     // Primitives can be merged eventually ...
-    final int typeIndex = index(up.type);
-    if(typeIndex == -1) {
-      updates.add(up);
+    final int index = indexOf(update.type);
+    if(index == -1) {
+      updates.add(update);
     } else {
-      final NodeUpdate nodeUp = updates.get(typeIndex);
-      // but an insertInto could be part of a substitute of a replaceElementContent,
-      // then we cannot merge them, as this would insert unwanted nodes
-      if(nodeUp instanceof InsertInto) {
-        final InsertInto oprim = (InsertInto) nodeUp;
-        final InsertInto nprim = (InsertInto) up;
-        // if the new primitive substitutes, than replace the old one with the new one
-        if(nprim instanceof ReplaceContent) {
-          updates.set(typeIndex, nprim);
-        } else if(!(oprim instanceof ReplaceContent)) {
-          // if neither substitutes, merge them.
-          nodeUp.merge(up);
-        }
+      final NodeUpdate oldUpdate = updates.get(index);
+      // if an insertInto is part of a substitute of a replaceElementContent,
+      // we cannot merge them, as this would insert unwanted nodes.
+      // if the new primitive substitutes, then replace the old one with the new one
+      if(oldUpdate instanceof InsertInto && update instanceof ReplaceContent) {
+        updates.set(index, update);
       } else {
         // all other primitives can be merged regardless
-        nodeUp.merge(up);
+        oldUpdate.merge(update);
       }
     }
   }
@@ -66,7 +61,7 @@ final class NodeUpdates {
    * @param t PrimitiveType
    * @return index of primitive with given type or -1 if not found
    */
-  private int index(final UpdateType t) {
+  private int indexOf(final UpdateType t) {
     final int us = updates.size();
     for(int u = 0; u < us; u++) {
       if(updates.get(u).type == t) return u;
@@ -82,7 +77,7 @@ final class NodeUpdates {
    * This method can only be once, as the internal update list will eventually be removed.
    */
   List<NodeUpdate> finish() {
-    List<NodeUpdate> primnew = new ArrayList<NodeUpdate>();
+    List<NodeUpdate> primnew = new ArrayList<>();
 
     /* Check if target node T is deleted and remove superfluous primitives. */
     final DeleteNode del = (DeleteNode) find(DELETENODE);
@@ -98,7 +93,7 @@ final class NodeUpdates {
 
     // If T is replaced, all primitives other than InsertBefore and InsertAfter can be
     // removed.
-    final ReplaceNode replace = (ReplaceNode) find(REPLACENODE);
+    final NodeUpdate replace = find(REPLACENODE);
     if(replace != null) {
       for(final NodeUpdate p : updates) {
         if(p.type == REPLACENODE || p.type == INSERTBEFORE || p.type == INSERTAFTER)

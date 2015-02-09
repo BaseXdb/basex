@@ -7,39 +7,38 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.expr.CmpG.OpG;
 import org.basex.query.expr.CmpV.OpV;
+import org.basex.query.expr.ft.*;
+import org.basex.query.expr.gflwor.*;
+import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
-import org.basex.query.path.*;
-import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.ft.*;
 
 /**
- * Abstract predicate expression, implemented by {@link Filter} and
- * {@link Step}.
+ * Abstract predicate expression, implemented by {@link Filter} and {@link Step}.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public abstract class Preds extends ParseExpr {
   /** Predicates. */
   public Expr[] preds;
-  /** Compilation: first predicate uses last function. */
-  public boolean last;
-  /** Compilation: first predicate uses position. */
-  public Pos pos;
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param p predicates
+   * @param info input info
+   * @param preds predicates
    */
-  protected Preds(final InputInfo ii, final Expr[] p) {
-    super(ii);
-    preds = p;
+  protected Preds(final InputInfo info, final Expr[] preds) {
+    super(info);
+    this.preds = preds;
   }
 
   @Override
@@ -48,52 +47,72 @@ public abstract class Preds extends ParseExpr {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    for(int p = 0; p < preds.length; ++p)
-      preds[p] = preds[p].compile(ctx, scp).compEbv(ctx);
-    return optimize(ctx, scp);
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    final Value init = qc.value;
+    // never compile predicates with empty sequence as context value (#1016)
+    if(init != null && init.isEmpty()) qc.value = null;
+    try {
+      final int pl = preds.length;
+      for(int p = 0; p < pl; ++p) preds[p] = preds[p].compile(qc, scp).optimizeEbv(qc, scp);
+      return this;
+    } finally {
+      qc.value = init;
+    }
   }
 
   @Override
-  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
-    for(int p = 0; p < preds.length; ++p) {
-      Expr pr = Pos.get(OpV.EQ, preds[p], preds[p], info);
-
-      // position() = last() -> last()
-      if(pr instanceof CmpG || pr instanceof CmpV) {
-        final Cmp cmp = (Cmp) pr;
-        if(cmp.expr[0].isFunction(Function.POSITION) &&
-           cmp.expr[1].isFunction(Function.LAST)) {
-          if(cmp instanceof CmpG && ((CmpG) cmp).op == OpG.EQ ||
-             cmp instanceof CmpV && ((CmpV) cmp).op == OpV.EQ) {
-            ctx.compInfo(OPTWRITE, pr);
-            pr = cmp.expr[1];
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+    // number of predicates may change in loop
+    for(int p = 0; p < preds.length; p++) {
+      final Expr pred = preds[p];
+      if(pred instanceof CmpG || pred instanceof CmpV) {
+        final Cmp cmp = (Cmp) pred;
+        if(cmp.exprs[0].isFunction(Function.POSITION)) {
+          final Expr e2 = cmp.exprs[1];
+          final SeqType st2 = e2.seqType();
+          // position() = last() -> last()
+          // position() = $n (numeric) -> $n
+          if(e2.isFunction(Function.LAST) || st2.one() && st2.type.isNumber()) {
+            if(cmp instanceof CmpG && ((CmpG) cmp).op == OpG.EQ ||
+               cmp instanceof CmpV && ((CmpV) cmp).op == OpV.EQ) {
+              qc.compInfo(OPTWRITE, pred);
+              preds[p] = e2;
+            }
           }
         }
-      }
-
-      if(pr.isValue()) {
-        if(!pr.ebv(ctx, info).bool(info)) {
-          ctx.compInfo(OPTREMOVE, this, pr);
+      } else if(pred instanceof And) {
+        if(!pred.has(Flag.FCS)) {
+          // replace AND expression with predicates (don't swap position tests)
+          qc.compInfo(OPTPRED, pred);
+          final Expr[] and = ((Arr) pred).exprs;
+          final int m = and.length - 1;
+          final ExprList el = new ExprList(preds.length + m);
+          for(final Expr e : Arrays.asList(preds).subList(0, p)) el.add(e);
+          for(final Expr a : and) {
+            // wrap test with boolean() if the result is numeric
+            el.add(Function.BOOLEAN.get(null, info, a).optimizeEbv(qc, scp));
+          }
+          for(final Expr e : Arrays.asList(preds).subList(p + 1, preds.length)) el.add(e);
+          preds = el.finish();
+        }
+      } else if(pred instanceof ANum) {
+        final ANum it = (ANum) pred;
+        final long i = it.itr();
+        if(i == it.dbl()) {
+          preds[p] = Pos.get(i, info);
+        } else {
+          qc.compInfo(OPTREMOVE, this, pred);
           return Empty.SEQ;
         }
-        ctx.compInfo(OPTREMOVE, this, pr);
-        preds = Array.delete(preds, p--);
-      } else if(pr instanceof And && !pr.has(Flag.FCS)) {
-        // replace AND expression with predicates (don't swap position tests)
-        ctx.compInfo(OPTPRED, pr);
-        final Expr[] and = ((Arr) pr).expr;
-        final int m = and.length - 1;
-        final ExprList tmp = new ExprList(preds.length + m);
-        for(final Expr e : Arrays.asList(preds).subList(0, p)) tmp.add(e);
-        for(final Expr a : and) {
-          // wrap test with boolean() if the result is numeric
-          tmp.add(Function.BOOLEAN.get(null, info, a).compEbv(ctx));
+      } else if(pred.isValue()) {
+        if(pred.ebv(qc, info).bool(info)) {
+          qc.compInfo(OPTREMOVE, this, pred);
+          preds = Array.delete(preds, p--);
+        } else {
+          // handle statically known predicates
+          qc.compInfo(OPTREMOVE, this, pred);
+          return Empty.SEQ;
         }
-        for(final Expr e : Arrays.asList(preds).subList(p + 1, preds.length)) tmp.add(e);
-        preds = tmp.finish();
-      } else {
-        preds[p] = pr;
       }
     }
     return this;
@@ -104,67 +123,124 @@ public abstract class Preds extends ParseExpr {
    * evaluated if no predicate or only the first is positional.
    * @return result of check
    */
-  protected final boolean posIterator() {
+  protected final Pos posIterator() {
     // check if first predicate is numeric
     if(preds.length == 1) {
-      if(preds[0] instanceof Int) {
-        final long p = ((Int) preds[0]).itr();
-        preds[0] = Pos.get(p, p, info);
-      }
-      pos = preds[0] instanceof Pos ? (Pos) preds[0] : null;
-      last = preds[0].isFunction(Function.LAST);
+      Expr p = preds[0];
+      if(p instanceof Int) p = Pos.get(((Int) p).itr(), info);
+      preds[0] = p;
+      if(p instanceof Pos) return (Pos) p;
     }
-    return pos != null || last;
+    return null;
   }
 
   /**
    * Checks if the predicates are successful for the specified item.
    * @param it item to be checked
-   * @param ctx query context
+   * @param qc query context
    * @return result of check
    * @throws QueryException query exception
    */
-  protected final boolean preds(final Item it, final QueryContext ctx) throws QueryException {
+  protected final boolean preds(final Item it, final QueryContext qc) throws QueryException {
     if(preds.length == 0) return true;
 
-    // set context item and position
-    final Value cv = ctx.value;
+    // set context value and position
+    final Value cv = qc.value;
     try {
-      for(final Expr p : preds) {
-        ctx.value = it;
-        final Item i = p.test(ctx, info);
-        if(i == null) return false;
-        it.score(i.score());
+      if(qc.scoring) {
+        double s = 0;
+        for(final Expr p : preds) {
+          qc.value = it;
+          final Item i = p.test(qc, info);
+          if(i == null) return false;
+          s += i.score();
+        }
+        it.score(Scoring.avg(s, preds.length));
+      } else {
+        for(final Expr p : preds) {
+          qc.value = it;
+          if(p.test(qc, info) == null) return false;
+        }
       }
       return true;
     } finally {
-      ctx.value = cv;
+      qc.value = cv;
     }
+  }
+
+  /**
+   * Merges a single predicate with the root expression and returns the resulting expression,
+   * or returns a self reference if the expression cannot be merged.
+   * This function is e.g. called by {@link Where#optimize}.
+   * @param qc query context
+   * @param scp variable scope
+   * @param root root expression
+   * @return expression
+   * @throws QueryException query exception
+   */
+  public Expr merge(final Expr root, final QueryContext qc, final VarScope scp)
+      throws QueryException {
+
+    // only one predicate can be rewritten; root expression must yield nodes
+    if(preds.length != 1 || !(root.seqType().type instanceof NodeType)) return this;
+
+    final Expr pred = preds[0];
+    // a[.] -> a
+    if(pred instanceof Context) return root;
+
+    if(!pred.seqType().mayBeNumber()) {
+      // a[b] -> a/b
+      if(pred instanceof Path) return Path.get(info, root, pred).optimize(qc, scp);
+
+      if(pred instanceof CmpG) {
+        final CmpG cmp = (CmpG) pred;
+        final Expr expr1 = cmp.exprs[0], expr2 = cmp.exprs[1];
+        // only first operand can depend on context
+        if(!expr2.has(Flag.CTX)) {
+          Expr path = null;
+          // a[. = 'x'] -> a = 'x'
+          if(expr1 instanceof Context) path = root;
+          // a[text() = 'x'] -> a/text() = 'x'
+          if(expr1 instanceof Path) path = Path.get(info, root, expr1).optimize(qc, scp);
+          if(path != null) return new CmpG(path, expr2, cmp.op, cmp.coll, cmp.sc, cmp.info);
+        }
+      }
+
+      if(pred instanceof FTContains) {
+        final FTContains cmp = (FTContains) pred;
+        final FTExpr ftexpr = cmp.ftexpr;
+        // only first operand can depend on context
+        if(!ftexpr.has(Flag.CTX)) {
+          final Expr expr = cmp.expr;
+          Expr path = null;
+          // a[. contains text 'x'] -> a contains text 'x'
+          if(expr instanceof Context) path = root;
+          // [text() contains text 'x'] -> a/text() contains text 'x'
+          if(expr instanceof Path) path = Path.get(info, root, expr).optimize(qc, scp);
+          if(path != null) return new FTContains(path, ftexpr, cmp.info);
+        }
+      }
+    }
+    return this;
   }
 
   @Override
   public boolean has(final Flag flag) {
-    for(final Expr p : preds) {
-      if(flag == Flag.FCS && p.type().mayBeNumber() || p.has(flag)) return true;
+    for(final Expr pred : preds) {
+      if(flag == Flag.FCS && pred.seqType().mayBeNumber() || pred.has(flag)) return true;
     }
     return false;
   }
 
   @Override
-  public boolean removable(final Var v) {
-    for(final Expr p : preds) if(p.uses(v)) return false;
+  public boolean removable(final Var var) {
+    for(final Expr p : preds) if(p.uses(var)) return false;
     return true;
   }
 
   @Override
-  public VarUsage count(final Var v) {
-    return VarUsage.sum(v, preds);
-  }
-
-  @Override
-  public Expr inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e)
-      throws QueryException {
-    return inlineAll(ctx, scp, preds, v, e) ? optimize(ctx, scp) : null;
+  public VarUsage count(final Var var) {
+    return VarUsage.sum(var, preds);
   }
 
   @Override
@@ -177,17 +253,5 @@ public abstract class Preds extends ParseExpr {
     final StringBuilder sb = new StringBuilder();
     for(final Expr e : preds) sb.append('[').append(e).append(']');
     return sb.toString();
-  }
-
-  /**
-   * Copies fields to the given object.
-   * @param <T> object type
-   * @param p copy
-   * @return the copy
-   */
-  protected final <T extends Preds> T copy(final T p) {
-    p.last = last;
-    p.pos = pos;
-    return copyType(p);
   }
 }

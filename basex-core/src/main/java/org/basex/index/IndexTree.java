@@ -8,7 +8,7 @@ import org.basex.util.list.*;
  * This class indexes keys in a balanced binary tree, including their id
  * values. Iterator methods are available to traverse through the tree.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  * @author Sebastian Gath
  */

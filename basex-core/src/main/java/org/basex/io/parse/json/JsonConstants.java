@@ -5,7 +5,7 @@ import static org.basex.util.Token.*;
 /**
  * This class contains constants used for parsing and serializing JSON.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public interface JsonConstants {

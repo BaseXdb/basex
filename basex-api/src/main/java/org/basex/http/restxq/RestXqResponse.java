@@ -8,56 +8,40 @@ import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.func.http.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
-import org.basex.query.var.*;
 
 /**
  * This class creates a new HTTP response.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 final class RestXqResponse {
-  /** Function to be evaluated. */
-  private final RestXqFunction function;
-  /** Query context. */
-  private final QueryContext query;
-  /** HTTP context. */
-  private final HTTPContext http;
-  /** Optional query error. */
-  private final QueryException error;
-
-  /**
-   * Constructor.
-   * @param rxf function to be evaluated
-   * @param ctx query context
-   * @param hc HTTP context
-   * @param err optional query error
-   */
-  RestXqResponse(final RestXqFunction rxf, final QueryContext ctx, final HTTPContext hc,
-      final QueryException err) {
-    function = rxf;
-    query = ctx;
-    http = hc;
-    error = err;
-  }
+  /** Private constructor. */
+  private RestXqResponse() { }
 
   /**
    * Evaluates the specified function and creates a response.
+   * @param function function to be evaluated
+   * @param query query context
+   * @param http HTTP context
+   * @param error optional query error
    * @throws Exception exception (including unexpected ones)
    */
-  void create() throws Exception {
+  static void create(final RestXqFunction function, final QueryContext query,
+      final HTTPContext http, final QueryException error) throws Exception {
+
     // bind variables
-    final StaticFunc uf = function.function;
-    final Expr[] args = new Expr[uf.args.length];
+    final StaticFunc sf = function.function;
+    final Expr[] args = new Expr[sf.args.length];
     function.bind(http, args, error);
 
     // wrap function with a function call
-    final StaticFuncCall sfc = new StaticFuncCall(uf.name, args, uf.sc, uf.info).init(uf);
-    final MainModule mm = new MainModule(sfc, new VarScope(uf.sc), null, uf.sc);
+    final MainModule mm = new MainModule(sf, args);
 
     // assign main module and http context and register process
     query.mainModule(mm);
@@ -67,13 +51,12 @@ final class RestXqResponse {
     String redirect = null, forward = null;
     RestXqRespBuilder resp = null;
     try {
-      // compile and evaluate query
-      query.compile();
+      // evaluate query
       final Iter iter = query.iter();
       Item item = iter.next();
 
       // handle response element
-      if(item != null && item.type.isNode()) {
+      if(item instanceof ANode) {
         final ANode node = (ANode) item;
         // send redirect to browser
         if(REST_REDIRECT.eq(node)) {
@@ -104,9 +87,9 @@ final class RestXqResponse {
       final SerializerOptions sp = function.output;
       http.sopts(sp);
       http.initResponse();
-      final Serializer ser = Serializer.get(http.res.getOutputStream(), sp);
-      for(; item != null; item = iter.next()) ser.serialize(item);
-      ser.close();
+      try(final Serializer ser = Serializer.get(http.res.getOutputStream(), sp)) {
+        for(; item != null; item = iter.next()) ser.serialize(item);
+      }
 
     } finally {
       query.close();

@@ -1,6 +1,6 @@
 package org.basex.http.restxq;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
@@ -14,12 +14,12 @@ import org.basex.query.func.*;
 /**
  * This class caches information on a single XQuery module with RESTXQ annotations.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 final class RestXqModule {
   /** Supported methods. */
-  private final ArrayList<RestXqFunction> functions = new ArrayList<RestXqFunction>();
+  private final ArrayList<RestXqFunction> functions = new ArrayList<>();
   /** File reference. */
   private final IOFile file;
   /** Parsing timestamp. */
@@ -27,34 +27,32 @@ final class RestXqModule {
 
   /**
    * Constructor.
-   * @param in xquery module
+   * @param file xquery file
    */
-  RestXqModule(final IOFile in) {
-    file = in;
-    time = in.timeStamp();
+  RestXqModule(final IOFile file) {
+    this.file = file;
+    time = file.timeStamp();
   }
 
   /**
    * Checks the module for RESTXQ annotations.
-   * @param http http context
    * @return {@code true} if module contains relevant annotations
    * @throws Exception exception (including unexpected ones)
    */
-  boolean parse(final HTTPContext http) throws Exception {
+  boolean parse() throws Exception {
     functions.clear();
 
     // loop through all functions
-    final QueryContext qc = parseModule(http);
-    try {
+    try(final QueryContext qc = qc()) {
       // loop through all functions
+      final String name = file.name();
       for(final StaticFunc uf : qc.funcs.funcs()) {
-        // consider only functions that are defined in this module
-        if(!file.name().equals(new IOFile(uf.info.path()).name())) continue;
-        final RestXqFunction rxf = new RestXqFunction(uf, qc, this);
-        if(rxf.parse()) functions.add(rxf);
+        // only add functions that are defined in the same module (file)
+        if(name.equals(new IOFile(uf.info.path()).name())) {
+          final RestXqFunction rxf = new RestXqFunction(uf, qc, this);
+          if(rxf.parse()) functions.add(rxf);
+        }
       }
-    } finally {
-      qc.close();
     }
     return !functions.isEmpty();
   }
@@ -93,38 +91,41 @@ final class RestXqModule {
       throws Exception {
 
     // create new XQuery instance
-    final QueryContext qc = parseModule(http);
-    try {
-      // loop through all functions
-      for(final StaticFunc uf : qc.funcs.funcs()) {
-        // compare input info
-        if(func.function.info.equals(uf.info)) {
-          final RestXqFunction rxf = new RestXqFunction(uf, qc, this);
-          rxf.parse();
-          new RestXqResponse(rxf, qc, http, error).create();
-          break;
-        }
-      }
-    } finally {
-      qc.close();
+    try(final QueryContext qc = qc()) {
+      final RestXqFunction rxf = new RestXqFunction(find(qc, func.function), qc, this);
+      rxf.parse();
+      RestXqResponse.create(rxf, qc, http, error);
     }
   }
 
   // PRIVATE METHODS ====================================================================
 
   /**
-   * Parses the module and returns the query context.
-   * @param http http context
+   * Retrieves a query context for the given module.
    * @return query context
    * @throws QueryException query exception
    */
-  private QueryContext parseModule(final HTTPContext http) throws QueryException {
-    final QueryContext qc = new QueryContext(http.context());
+  private QueryContext qc() throws QueryException {
+    final QueryContext qc = new QueryContext(HTTPContext.context());
     try {
       qc.parse(string(file.read()), file.path(), null);
       return qc;
     } catch(final IOException ex) {
-      throw IOERR.get(null, ex);
+      // may be triggered when reading the file
+      throw IOERR_X.get(null, ex);
     }
+  }
+
+  /**
+   * Returns the specified function from the given query context.
+   * @param qctx query context.
+   * @param func function to be found
+   * @return function
+   */
+  private static StaticFunc find(final QueryContext qctx, final StaticFunc func) {
+    for(final StaticFunc sf : qctx.funcs.funcs()) {
+      if(func.info.equals(sf.info)) return sf;
+    }
+    return null;
   }
 }

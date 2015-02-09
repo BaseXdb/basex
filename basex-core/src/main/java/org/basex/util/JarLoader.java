@@ -10,7 +10,7 @@ import java.util.zip.*;
  * does not offer a fine and easy way to delete open jars:
  * http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5041014
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  * @author Rositsa Shadura
  */
@@ -24,9 +24,7 @@ public final class JarLoader extends URLClassLoader {
     super(urls, parent);
   }
 
-  /**
-   * Closes the class loader.
-   */
+  @Override
   public void close() {
     try {
       final Field ucp = URLClassLoader.class.getDeclaredField("ucp");

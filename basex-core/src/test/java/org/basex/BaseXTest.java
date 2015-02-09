@@ -12,7 +12,7 @@ import org.junit.*;
 /**
  * Tests the command-line arguments of the starter class.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public abstract class BaseXTest extends MainTest {
@@ -152,17 +152,6 @@ public abstract class BaseXTest extends MainTest {
   @Test(expected = BaseXException.class)
   public void runErr() throws IOException {
     run("-rx", "-q2");
-  }
-
-  /**
-   * Test trailing newline.
-   * @throws IOException I/O exception
-   */
-  @Test
-  public void newline() throws IOException {
-    equals("1", "-q1");
-    equals('1' + Prop.NL, "-L", "-q1");
-    equals('1' + Prop.NL + '2' + Prop.NL, "-L", "-q1", "-q2");
   }
 
   /**

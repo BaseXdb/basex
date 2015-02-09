@@ -1,6 +1,6 @@
 package org.basex.query;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 
 import java.util.*;
 
@@ -15,7 +15,7 @@ import org.basex.util.list.*;
  * This class compiles all components of the query that are needed in an order that
  * maximizes the amount of inlining possible.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
 final class QueryCompiler {
@@ -23,10 +23,10 @@ final class QueryCompiler {
   private static final int MAP_THRESHOLD = 16;
 
   /** Query context. */
-  private final QueryContext ctx;
+  private final QueryContext qc;
 
   /** Result list. */
-  private final ArrayList<Scope[]> result = new ArrayList<Scope[]>();
+  private final ArrayList<Scope[]> result = new ArrayList<>();
   /** Node stack. */
   private final IntList stack = new IntList();
   /** Index and lowlink list. */
@@ -35,19 +35,19 @@ final class QueryCompiler {
   private int next;
 
   /** Adjacency list. */
-  private final ArrayList<int[]> adjacent = new ArrayList<int[]>();
+  private final ArrayList<int[]> adjacent = new ArrayList<>();
   /** Declaration list. */
-  private final ArrayList<Scope> scopes = new ArrayList<Scope>();
+  private final ArrayList<Scope> scopes = new ArrayList<>();
   /** Declaration list. */
   private IdentityHashMap<Scope, Integer> ids;
 
   /**
    * Constructor.
-   * @param cx query context
+   * @param qc query context
    * @param root root expression
    */
-  private QueryCompiler(final QueryContext cx, final Scope root) {
-    ctx = cx;
+  private QueryCompiler(final QueryContext qc, final Scope root) {
+    this.qc = qc;
     add(root);
   }
 
@@ -57,8 +57,8 @@ final class QueryCompiler {
    * @return list of all declarations that the main module uses
    */
   public static List<StaticDecl> usedDecls(final MainModule main) {
-    final List<StaticDecl> scopes = new ArrayList<StaticDecl>();
-    final IdentityHashMap<Scope, Object> map = new IdentityHashMap<Scope, Object>();
+    final List<StaticDecl> scopes = new ArrayList<>();
+    final IdentityHashMap<Scope, Object> map = new IdentityHashMap<>();
     main.visit(new ASTVisitor() {
       @Override
       public boolean staticVar(final StaticVar var) {
@@ -96,13 +96,12 @@ final class QueryCompiler {
 
   /**
    * Compiles all necessary parts of this query.
-   * @param ctx query context
+   * @param qc query context
    * @param root root expression
    * @throws QueryException compilation errors
    */
-  public static void compile(final QueryContext ctx, final MainModule root)
-      throws QueryException {
-    if(!root.compiled()) new QueryCompiler(ctx, root).compile();
+  public static void compile(final QueryContext qc, final MainModule root) throws QueryException {
+    if(!root.compiled()) new QueryCompiler(qc, root).compile();
   }
 
   /**
@@ -111,10 +110,10 @@ final class QueryCompiler {
    */
   private void compile() throws QueryException {
     // compile the used scopes only
-    for(final Scope[] comp : components(0)) circCheck(comp).compile(ctx);
+    for(final Scope[] comp : components(0)) circCheck(comp).compile(qc);
 
     // check for circular variable declarations without compiling the unused scopes
-    for(final StaticVar v : ctx.vars) {
+    for(final StaticVar v : qc.vars) {
       if(id(v) == -1) for(final Scope[] comp : components(add(v))) circCheck(comp);
     }
   }
@@ -195,7 +194,8 @@ final class QueryCompiler {
       return id == null ? -1 : id;
     }
 
-    for(int i = 0; i < scopes.size(); i++) if(scopes.get(i) == scp) return i;
+    final int ss = scopes.size();
+    for(int s = 0; s < ss; s++) if(scopes.get(s) == scp) return s;
     return -1;
   }
 
@@ -207,7 +207,7 @@ final class QueryCompiler {
   private int add(final Scope scp) {
     final int id = scopes.size();
     if(id == MAP_THRESHOLD) {
-      ids = new IdentityHashMap<Scope, Integer>();
+      ids = new IdentityHashMap<>();
       for(final Scope s : scopes) ids.put(s, ids.size());
     }
 
@@ -239,27 +239,16 @@ final class QueryCompiler {
    * @throws QueryException if a variable directly calls itself
    */
   private int[] neighbors(final Scope curr) throws QueryException {
-    final IntList adj = new IntList();
+    final IntList adj = new IntList(0);
     final boolean ok = curr.visit(new ASTVisitor() {
       @Override
-      public boolean staticVar(final StaticVar var) {
-        return var != curr && neighbor(var);
-      }
-
+      public boolean staticVar(final StaticVar var) { return var != curr && neighbor(var); }
       @Override
-      public boolean staticFuncCall(final StaticFuncCall call) {
-        return neighbor(call.func());
-      }
-
+      public boolean staticFuncCall(final StaticFuncCall call) { return neighbor(call.func()); }
       @Override
-      public boolean inlineFunc(final Scope sub) {
-        return sub.visit(this);
-      }
-
+      public boolean inlineFunc(final Scope sub) { return sub.visit(this); }
       @Override
-      public boolean funcItem(final FuncItem func) {
-        return neighbor(func);
-      }
+      public boolean funcItem(final FuncItem func) { return neighbor(func); }
 
       /**
        * Adds a neighbor of the currently inspected scope.
@@ -272,10 +261,11 @@ final class QueryCompiler {
         return true;
       }
     });
+
     if(!ok) {
       final StaticVar var = (StaticVar) curr;
-      throw Err.CIRCREF.get(var.info, "$" + var.name);
+      throw CIRCREF_X.get(var.info, "$" + var.name);
     }
-    return adj.toArray();
+    return adj.finish();
   }
 }

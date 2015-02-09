@@ -1,10 +1,13 @@
 package org.basex.query.up;
 
+import java.util.*;
+
 import org.basex.data.*;
 import org.basex.data.atomic.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.up.primitives.*;
+import org.basex.query.up.primitives.node.*;
 import org.basex.query.value.node.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
@@ -50,7 +53,7 @@ import org.basex.util.list.*;
  *      merging.</li>
  * </ol>
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Lukas Kircher
  */
 public final class Updates {
@@ -61,17 +64,17 @@ public final class Updates {
 
   /** Mapping between fragment IDs and the temporary data instances
    * to apply updates on the corresponding fragments. */
-  private final IntObjMap<MemData> fragmentIDs = new IntObjMap<MemData>();
+  private final IntObjMap<MemData> fragmentIDs = new IntObjMap<>();
 
   /**
    * Adds an update primitive to the current context modifier.
    * @param up update primitive
-   * @param ctx query context
+   * @param qc query context
    * @throws QueryException query exception
    */
-  public void add(final Update up, final QueryContext ctx) throws QueryException {
+  public void add(final Update up, final QueryContext qc) throws QueryException {
     if(mod == null) mod = new DatabaseModifier();
-    mod.add(up, ctx);
+    mod.add(up, qc);
   }
 
   /**
@@ -82,10 +85,10 @@ public final class Updates {
    * database table are calculated. Otherwise a new data instance is created.
    *
    * @param target target fragment
-   * @param ctx query context
+   * @param qc query context
    * @return database node created from input fragment
    */
-  public DBNode determineDataRef(final ANode target, final QueryContext ctx) {
+  public DBNode determineDataRef(final ANode target, final QueryContext qc) {
     if(target instanceof DBNode) return (DBNode) target;
 
     // determine highest ancestor node
@@ -100,7 +103,7 @@ public final class Updates {
     MemData data = fragmentIDs.get(ancID);
     // if data doesn't exist, create a new one
     if(data == null) {
-      data =  (MemData) anc.dbCopy(ctx.context.options).data;
+      data = (MemData) anc.dbCopy(qc.context.options).data;
       // create a mapping between the fragment id and the data reference
       fragmentIDs.put(ancID, data);
     }
@@ -111,15 +114,28 @@ public final class Updates {
   }
 
   /**
-   * Executes all updates.
+   * Prepares update operations.
+   * @param qc query context
+   * @return updated data references
    * @throws QueryException query exception
    */
-  public void apply() throws QueryException {
-    if(mod != null) mod.apply();
+  public HashSet<Data> prepare(final QueryContext qc) throws QueryException {
+    final HashSet<Data> datas = new HashSet<>();
+    if(mod != null) mod.prepare(datas, qc);
+    return datas;
   }
 
   /**
-   * Adds all databases to be updated to the specified list.
+   * Executes all updates.
+   * @param qc query context
+   * @throws QueryException query exception
+   */
+  public void apply(final QueryContext qc) throws QueryException {
+    if(mod != null) mod.apply(qc);
+  }
+
+  /**
+   * Returns the names of all databases that will be updated.
    * @return databases
    */
   public StringList databases() {

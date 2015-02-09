@@ -12,80 +12,75 @@ import org.basex.util.hash.*;
 /**
  * Abstract array expression.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public abstract class Arr extends ParseExpr {
-  /** Expression list. */
-  public Expr[] expr;
+  /** Expressions. */
+  public Expr[] exprs;
 
   /**
    * Constructor.
    * @param info input info
-   * @param expr expression list
+   * @param exprs expressions
    */
-  protected Arr(final InputInfo info, final Expr... expr) {
+  protected Arr(final InputInfo info, final Expr... exprs) {
     super(info);
-    this.expr = expr;
+    this.exprs = exprs;
   }
 
   @Override
   public void checkUp() throws QueryException {
-    checkNoneUp(expr);
+    checkNoneUp(exprs);
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    final int es = expr.length;
-    for(int e = 0; e < es; e++) expr[e] = expr[e].compile(ctx, scp);
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    final int el = exprs.length;
+    for(int e = 0; e < el; e++) exprs[e] = exprs[e].compile(qc, scp);
     return this;
   }
 
   @Override
   public boolean has(final Flag flag) {
-    for(final Expr e : expr) if(e.has(flag)) return true;
+    for(final Expr e : exprs) if(e.has(flag)) return true;
     return false;
   }
 
   @Override
-  public boolean removable(final Var v) {
-    for(final Expr e : expr) if(!e.removable(v)) return false;
+  public boolean removable(final Var var) {
+    for(final Expr e : exprs) if(!e.removable(var)) return false;
     return true;
   }
 
   @Override
-  public VarUsage count(final Var v) {
-    return VarUsage.sum(v, expr);
+  public VarUsage count(final Var var) {
+    return VarUsage.sum(var, exprs);
   }
 
   @Override
-  public Expr inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e)
+  public Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
       throws QueryException {
-    return inlineAll(ctx, scp, expr, v, e) ? optimize(ctx, scp) : null;
+    return inlineAll(qc, scp, exprs, var, ex) ? optimize(qc, scp) : null;
   }
 
   /**
    * Creates a deep copy of the given array.
    * @param <T> element type
-   * @param ctx query context
+   * @param qc query context
    * @param scp variable scope
    * @param vs variable mapping
    * @param arr array to copy
    * @return deep copy of the array
    */
   @SuppressWarnings("unchecked")
-  public static <T extends Expr> T[] copyAll(final QueryContext ctx, final VarScope scp,
+  public static <T extends Expr> T[] copyAll(final QueryContext qc, final VarScope scp,
       final IntObjMap<Var> vs, final T[] arr) {
-    final T[] copy = arr.clone();
-    for(int i = 0; i < copy.length; i++) copy[i] = (T) copy[i].copy(ctx, scp, vs);
-    return copy;
-  }
 
-  @Override
-  public Expr indexEquivalent(final IndexCosts ic) throws QueryException {
-    final int es = expr.length;
-    for(int e = 0; e < es; ++e) expr[e] = expr[e].indexEquivalent(ic);
-    return this;
+    final T[] copy = arr.clone();
+    final int cl = copy.length;
+    for(int c = 0; c < cl; c++) copy[c] = (T) copy[c].copy(qc, scp, vs);
+    return copy;
   }
 
   /**
@@ -93,7 +88,7 @@ public abstract class Arr extends ParseExpr {
    * @return result of check
    */
   protected final boolean allAreValues() {
-    for(final Expr e : expr) if(!e.isValue()) return false;
+    for(final Expr e : exprs) if(!e.isValue()) return false;
     return true;
   }
 
@@ -101,14 +96,14 @@ public abstract class Arr extends ParseExpr {
    * Returns true if at least one argument is empty or will yield 0 results.
    * @return result of check
    */
-  final boolean oneIsEmpty() {
-    for(final Expr e : expr) if(e.isEmpty()) return true;
+  protected final boolean oneIsEmpty() {
+    for(final Expr e : exprs) if(e.isEmpty()) return true;
     return false;
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(), expr);
+    addPlan(plan, planElem(), exprs);
   }
 
   /**
@@ -117,18 +112,18 @@ public abstract class Arr extends ParseExpr {
    * @return string representation
    */
   protected String toString(final String sep) {
-    return new TokenBuilder(PAR1).addSep(expr, sep).add(PAR2).toString();
+    return new TokenBuilder(PAREN1).addSep(exprs, sep).add(PAREN2).toString();
   }
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return visitAll(visitor, expr);
+    return visitAll(visitor, exprs);
   }
 
   @Override
   public int exprSize() {
     int sz = 1;
-    for(final Expr e : expr) sz += e.exprSize();
+    for(final Expr e : exprs) sz += e.exprSize();
     return sz;
   }
 }

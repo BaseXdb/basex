@@ -5,9 +5,7 @@ import static org.basex.http.webdav.BXServletRequest.*;
 import javax.servlet.http.*;
 
 import org.basex.http.*;
-import org.basex.http.webdav.impl.ResourceMetaData;
-import org.basex.http.webdav.impl.ResourceMetaDataFactory;
-import org.basex.http.webdav.impl.WebDAVService;
+import org.basex.http.webdav.impl.*;
 import org.basex.server.*;
 import org.basex.util.*;
 
@@ -17,25 +15,22 @@ import com.bradmcevoy.http.*;
 /**
  * WebDAV resource factory. Main class for generating WebDAV resources.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
-public final class BXResourceFactory implements ResourceFactory,
+final class BXResourceFactory implements ResourceFactory,
     ResourceMetaDataFactory<BXAbstractResource> {
 
-  /** HTTP Context. */
-  private final HTTPContext http;
   /** WebDAV service. */
-  private final WebDAVService<BXAbstractResource> service;
+  private WebDAVService<BXAbstractResource> service;
 
   /**
-   * Constructor.
-   * @param ht http context
+   * Creates a new service.
+   * @param http http context
    */
-  BXResourceFactory(final HTTPContext ht) {
-    http = ht;
-    service = new WebDAVService<BXAbstractResource>(this, http);
+  void init(final HTTPContext http) {
+    service = new WebDAVService<>(this, http);
   }
 
   /**
@@ -47,9 +42,6 @@ public final class BXResourceFactory implements ResourceFactory,
 
   @Override
   public Resource getResource(final String host, final String dbpath) {
-    final Auth a = HttpManager.request().getAuthorization();
-    if(a != null) http.credentials(a.getUser(), a.getPassword());
-
     try {
       final HttpServletRequest r = getRequest();
       Path p = Path.path(dbpath);

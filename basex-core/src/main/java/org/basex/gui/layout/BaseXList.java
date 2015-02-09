@@ -5,6 +5,7 @@ import static org.basex.gui.layout.BaseXKeys.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import java.util.List;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -19,7 +20,7 @@ import org.basex.util.list.*;
  * of the typed in text. Moreover, the cursor keys can be used to scroll
  * through the list, and list entries can be chosen with mouse clicks.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class BaseXList extends BaseXBack {
@@ -28,7 +29,7 @@ public final class BaseXList extends BaseXBack {
   /** Text field. */
   private final BaseXTextField text;
   /** List. */
-  private final JList list;
+  private final JList<String> list;
   /** Scroll pane. */
   private final JScrollPane scroll;
 
@@ -36,7 +37,6 @@ public final class BaseXList extends BaseXBack {
   private String[] values;
   /** Numeric list. */
   private boolean num = true;
-
 
   /**
    * Default constructor.
@@ -97,15 +97,15 @@ public final class BaseXList extends BaseXBack {
         final int nv = op2 == np2 ? np1 : np2;
         final String val = values[nv];
         list.setSelectedValue(val, true);
+        multi = il.size() > 1;
         if(e.isShiftDown() && !single) {
-          list.setSelectedIndices(il.toArray());
+          list.setSelectedIndices(il.finish());
           text.setText("");
         } else {
           list.setSelectedIndex(nv);
           text.setText(val);
           text.selectAll();
         }
-        multi = il.size() > 1;
       }
 
       @Override
@@ -128,7 +128,8 @@ public final class BaseXList extends BaseXBack {
           final String regex = glob ? IOFile.regex(txt, false) : null;
 
           final IntList il = new IntList();
-          for(int v = 0; v < values.length; ++v) {
+          final int vl = values.length;
+          for(int v = 0; v < vl; ++v) {
             final String value = values[v].trim().toLowerCase(Locale.ENGLISH);
             if(glob) {
               if(value.matches(regex)) il.add(v);
@@ -146,7 +147,7 @@ public final class BaseXList extends BaseXBack {
           if(!il.isEmpty()) {
             list.setSelectedValue(values[il.get(il.size() - 1)], true);
           }
-          list.setSelectedIndices(il.toArray());
+          list.setSelectedIndices(il.finish());
         }
         d.action(BaseXList.this);
         typed = false;
@@ -162,8 +163,8 @@ public final class BaseXList extends BaseXBack {
       }
       @Override
       public void mousePressed(final MouseEvent e) {
-        final Object[] i = list.getSelectedValues();
-        text.setText(i.length == 1 ? i[0].toString() : "");
+        final List<String> vals = list.getSelectedValuesList();
+        text.setText(vals.size() == 1 ? vals.get(0) : "");
         text.requestFocusInWindow();
         text.selectAll();
         d.action(BaseXList.this);
@@ -180,13 +181,13 @@ public final class BaseXList extends BaseXBack {
       }
     };
 
-    list = new JList(choice);
+    list = new JList<>(choice);
     list.setFocusable(false);
     if(s) list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     list.addMouseListener(mouse);
     list.addMouseMotionListener(mouse);
     text.setFont(list.getFont());
-    BaseXLayout.setWidth(text, list.getWidth());
+    text.setPreferredSize(new Dimension(list.getWidth(), text.getPreferredSize().height));
     BaseXLayout.addInteraction(list, d);
 
     scroll = new JScrollPane(list);
@@ -233,8 +234,8 @@ public final class BaseXList extends BaseXBack {
    * @return text field value
    */
   public String getValue() {
-    final Object[] vals = list.getSelectedValues();
-    return vals.length == 1 ? vals[0].toString() : "";
+    final List<String> vals = list.getSelectedValuesList();
+    return vals.size() == 1 ? vals.get(0) : "";
   }
 
   /**
@@ -243,7 +244,7 @@ public final class BaseXList extends BaseXBack {
    */
   public StringList getValues() {
     final StringList sl = new StringList();
-    for(final Object o : list.getSelectedValues()) sl.add(o.toString());
+    for(final String val : list.getSelectedValuesList()) sl.add(val);
     return sl;
   }
 
@@ -253,10 +254,10 @@ public final class BaseXList extends BaseXBack {
    * @return numeric value
    */
   public int getNum() {
-    final int i = Token.toInt(text.getText());
+    final int i = Strings.toInt(text.getText());
     if(i != Integer.MIN_VALUE) return i;
     final Object value = list.getSelectedValue();
-    return value != null ? Token.toInt(value.toString()) : 0;
+    return value != null ? Strings.toInt(value.toString()) : 0;
   }
 
   /**
@@ -278,8 +279,8 @@ public final class BaseXList extends BaseXBack {
 
   @Override
   public void setSize(final int w, final int h) {
-    BaseXLayout.setWidth(text, w);
-    BaseXLayout.setSize(scroll, w, h);
+    setWidth(w);
+    BaseXLayout.setHeight(scroll, h);
   }
 
   /**

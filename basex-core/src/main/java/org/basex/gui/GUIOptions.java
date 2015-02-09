@@ -4,16 +4,14 @@ import static org.basex.util.Prop.*;
 
 import java.awt.*;
 
-import org.basex.core.*;
 import org.basex.io.*;
-import org.basex.util.*;
 import org.basex.util.options.*;
 
 /**
  * This class contains options which are used in the GUI.
  * They are also stored in the project's home directory.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class GUIOptions extends Options {
@@ -43,11 +41,12 @@ public final class GUIOptions extends Options {
   /** Default GUI Font. */
   public static final StringOption FONT = new StringOption("FONT", Font.SANS_SERIF);
   /** Default GUI Monospace Font. */
-  public static final StringOption MONOFONT = new StringOption("MONOFONT", Font.MONOSPACED);
+  public static final StringOption MONOFONT = new StringOption("MONOFONT",
+      WIN ? "Consolas" : Font.MONOSPACED);
   /** Font TYPE = plain, bold, italics). */
   public static final NumberOption FONTTYPE = new NumberOption("FONTTYPE", 0);
   /** Font size. */
-  public static final NumberOption FONTSIZE = new NumberOption("FONTSIZE", 13);
+  public static final NumberOption FONTSIZE = new NumberOption("FONTSIZE", GUIConstants.FONTSIZE);
 
   /** Red GUI color factor. */
   public static final NumberOption COLORRED = new NumberOption("COLORRED", 15);
@@ -55,15 +54,13 @@ public final class GUIOptions extends Options {
   public static final NumberOption COLORGREEN = new NumberOption("COLORGREEN", 11);
   /** Blue GUI color factor. */
   public static final NumberOption COLORBLUE = new NumberOption("COLORBLUE", 6);
-  /** Paint gradients as background. */
-  public static final BooleanOption GRADIENT = new BooleanOption("GRADIENT", true);
 
   /** Comment: written to options file. */
   public static final Comment C_WINDOWS = new Comment("Windows");
 
   /** Last updated version. */
   public static final StringOption UPDATEVERSION = new StringOption("UPDATEVERSION",
-    Prop.VERSION.replaceAll(" .*", ""));
+    VERSION.replaceAll(" .*", ""));
 
   /** GUI Layout. */
   public static final StringOption VIEWS = new StringOption("VIEWS", GUIConstants.VIEWS);
@@ -107,6 +104,8 @@ public final class GUIOptions extends Options {
   public static final NumbersOption FONTSLOC = new NumbersOption("FONTSLOC", 10, 530);
   /** Dialog location. */
   public static final NumbersOption COLORSLOC = new NumbersOption("COLORSLOC", 530, 620);
+  /** Dialog location. */
+  public static final NumbersOption BINDINGSLOC = new NumbersOption("BINDINGSLOC", 100, 230);
 
   /** Preferences tab. */
   public static final NumberOption PREFTAB = new NumberOption("PREFTAB", 0);
@@ -148,6 +147,8 @@ public final class GUIOptions extends Options {
   public static final BooleanOption AUTO = new BooleanOption("AUTO", true);
   /** Default file filter. */
   public static final StringOption FILES = new StringOption("FILES", "*.xml, *.xq*");
+  /** Flag for activated project structure. */
+  public static final BooleanOption HIDDENFILES = new BooleanOption("HIDDENFILES", true);
 
   /** Current input mode in global text field (Search, XQuery, Command). */
   public static final NumberOption SEARCHMODE = new NumberOption("SEARCHMODE", 0);
@@ -160,22 +161,6 @@ public final class GUIOptions extends Options {
   public static final StringOption DBNAME = new StringOption("DBNAME", "");
   /** Last insertion type. */
   public static final NumberOption LASTINSERT = new NumberOption("LASTINSERT", 1);
-
-  /** Comment: written to options file. */
-  public static final Comment C_SERVER = new Comment("Server Dialog");
-
-  /** Server: host, used for connecting new clients. */
-  public static final StringOption S_HOST = new StringOption("S_HOST", Text.S_LOCALHOST);
-  /** Server: port, used for connecting new clients. */
-  public static final NumberOption S_PORT = new NumberOption("S_PORT", 1984);
-  /** Server: port, used for binding the server. */
-  public static final NumberOption S_SERVERPORT = new NumberOption("S_SERVERPORT", 1984);
-  /** Server: port, used for sending events. */
-  public static final NumberOption S_EVENTPORT = new NumberOption("S_EVENTPORT", 1985);
-  /** Default user. */
-  public static final StringOption S_USER = new StringOption("S_USER", "");
-  /** Default password. */
-  public static final StringOption S_PASSWORD = new StringOption("S_PASSWORD", "");
 
   /** Comment: written to options file. */
   public static final Comment C_VISUALIZATIONS = new Comment("Visualizations");

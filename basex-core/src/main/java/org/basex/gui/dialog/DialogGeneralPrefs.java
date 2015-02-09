@@ -14,7 +14,7 @@ import org.basex.io.*;
 /**
  * General preferences.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 final class DialogGeneralPrefs extends BaseXBack {
@@ -55,7 +55,7 @@ final class DialogGeneralPrefs extends BaseXBack {
     border(8).setLayout(new TableLayout(8, 1));
     gui = d.gui;
 
-    final GlobalOptions opts = gui.context.globalopts;
+    final StaticOptions opts = gui.context.soptions;
     final GUIOptions gopts = gui.gopts;
     path = new BaseXTextField(opts.dbpath().path(), d);
 
@@ -64,7 +64,7 @@ final class DialogGeneralPrefs extends BaseXBack {
       @Override
       public void actionPerformed(final ActionEvent e) {
         final IOFile dir = new BaseXFileChooser(CHOOSE_DIR, path.getText(), gui).select(Mode.DOPEN);
-        if(dir != null) path.setText(dir.dirPath());
+        if(dir != null) path.setText(dir.dir());
       }
     });
 
@@ -78,7 +78,7 @@ final class DialogGeneralPrefs extends BaseXBack {
     });
     label = new BaseXLabel(" ");
     lang = new BaseXCombo(d, LANGS[0]);
-    lang.setSelectedItem(opts.get(GlobalOptions.LANG));
+    lang.setSelectedItem(opts.get(StaticOptions.LANG));
     creds = new BaseXLabel(" ");
 
     add(new BaseXLabel(DATABASE_PATH + COL, true, true));
@@ -126,8 +126,9 @@ final class DialogGeneralPrefs extends BaseXBack {
    * @return credits
    */
   static String creds(final String lng) {
-    for(int i = 0; i < LANGS[0].length; ++i) {
-      if(LANGS[0][i].equals(lng)) return LANGS[1][i];
+    final int ll = LANGS[0].length;
+    for(int l = 0; l < ll; l++) {
+      if(LANGS[0][l].equals(lng)) return LANGS[1][l];
     }
     return "";
   }
@@ -141,16 +142,16 @@ final class DialogGeneralPrefs extends BaseXBack {
     simplefd.assign();
 
     // new database path: close opened database
-    final GlobalOptions opts = gui.context.globalopts;
+    final StaticOptions opts = gui.context.soptions;
     if(source == path || source == button) {
       final String dbpath = path.getText();
-      if(!opts.get(GlobalOptions.DBPATH).equals(dbpath) && gui.context.data() != null) {
+      if(!opts.get(StaticOptions.DBPATH).equals(dbpath) && gui.context.data() != null) {
         new Close().run(gui.context);
         gui.notify.init();
       }
-      opts.set(GlobalOptions.DBPATH, dbpath);
+      opts.set(StaticOptions.DBPATH, dbpath);
     }
-    opts.set(GlobalOptions.LANG, lang.getSelectedItem());
+    opts.set(StaticOptions.LANG, lang.getSelectedItem());
 
     gui.gopts.set(GUIOptions.MAXHITS, HITS[limit.getValue()]);
 

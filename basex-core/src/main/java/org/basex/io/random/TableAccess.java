@@ -9,7 +9,7 @@ import org.basex.io.*;
  * This abstract class defines the methods for accessing the
  * database table representation.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public abstract class TableAccess {
@@ -20,17 +20,18 @@ public abstract class TableAccess {
 
   /**
    * Constructor.
-   * @param md meta data
+   * @param meta meta data
    */
-  TableAccess(final MetaData md) {
-    meta = md;
+  TableAccess(final MetaData meta) {
+    this.meta = meta;
   }
 
   /**
    * Flushes the table contents.
+   * @param all flush all contents or only buffers
    * @throws IOException I/O exception
    */
-  public abstract void flush() throws IOException;
+  public abstract void flush(final boolean all) throws IOException;
 
   /**
    * Closes the table access.
@@ -40,10 +41,10 @@ public abstract class TableAccess {
 
   /**
    * Tries to acquires a lock on the table. If a lock exists, it is first released.
-   * @param excl exclusive/shared lock
+   * @param write write/read lock
    * @return success flag
    */
-  public abstract boolean lock(final boolean excl);
+  public abstract boolean lock(final boolean write);
 
   /**
    * Reads a byte value and returns it as an integer value.

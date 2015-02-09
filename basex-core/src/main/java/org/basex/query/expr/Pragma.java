@@ -2,7 +2,6 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -11,7 +10,7 @@ import org.basex.util.*;
 /**
  * Abstract pragma expression.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
 public abstract class Pragma extends ExprInfo {
@@ -37,17 +36,17 @@ public abstract class Pragma extends ExprInfo {
 
   /**
    * Initializes the pragma expression.
-   * @param ctx query context
+   * @param qc query context
    * @param info input info
    * @throws QueryException query exception
    */
-  abstract void init(final QueryContext ctx, final InputInfo info) throws QueryException;
+  abstract void init(final QueryContext qc, final InputInfo info) throws QueryException;
 
   /**
    * Finalizes the pragma expression.
-   * @param ctx query context
+   * @param qc query context
    */
-  abstract void finish(final QueryContext ctx);
+  abstract void finish(final QueryContext qc);
 
   @Override
   public final String toString() {

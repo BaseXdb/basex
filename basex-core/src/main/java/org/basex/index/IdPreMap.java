@@ -12,7 +12,7 @@ import org.basex.util.list.*;
 /**
  * ID -> PRE mapping.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Dimitar Popov
  */
 public class IdPreMap {
@@ -53,8 +53,7 @@ public class IdPreMap {
    * @throws IOException I/O error while reading from the file
    */
   public IdPreMap(final IOFile f) throws IOException {
-    final DataInput in = new DataInput(f);
-    try {
+    try(final DataInput in = new DataInput(f)) {
       baseid = in.readNum();
       rows = in.readNum();
       pres = in.readNums();
@@ -62,19 +61,16 @@ public class IdPreMap {
       nids = in.readNums();
       incs = in.readNums();
       oids = in.readNums();
-    } finally {
-      in.close();
     }
   }
 
   /**
    * Write the map to the specified file.
-   * @param f file to write to
+   * @param file file to write to
    * @throws IOException I/O error while writing to the file
    */
-  public void write(final IOFile f) throws IOException {
-    final DataOutput out = new DataOutput(f);
-    try {
+  public void write(final IOFile file) throws IOException {
+    try(final DataOutput out = new DataOutput(file)) {
       out.writeNum(baseid);
       out.writeNum(rows);
       out.writeNums(pres);
@@ -82,8 +78,6 @@ public class IdPreMap {
       out.writeNums(nids);
       out.writeNums(incs);
       out.writeNums(oids);
-    } finally {
-      out.close();
     }
   }
 
@@ -118,9 +112,9 @@ public class IdPreMap {
    * @return a sorted array of PRE values
    */
   public int[] pre(final int[] ids, final int off, final int len) {
-    final IntList p = new IntList(ids.length);
-    for(int i = off; i < len; ++i) p.add(pre(ids[i]));
-    return p.sort().toArray();
+    final IntList il = new IntList(len - off);
+    for(int i = off; i < len; ++i) il.add(pre(ids[i]));
+    return il.sort().finish();
   }
 
   /**
@@ -290,23 +284,6 @@ public class IdPreMap {
     }
   }
 
-  @Override
-  public String toString() {
-    final StringBuilder b = new StringBuilder();
-
-    b.append("pres, fids, nids, incs, oids");
-    for(int i = 0; i < rows; i++) {
-      b.append('\n');
-      b.append(pres[i]); b.append(", ");
-      b.append(fids[i]); b.append(", ");
-      b.append(nids[i]); b.append(", ");
-      b.append(incs[i]); b.append(", ");
-      b.append(oids[i]);
-    }
-
-    return b.toString();
-  }
-
   /**
    * Size of the map.
    * @return number of stored tuples.
@@ -318,8 +295,7 @@ public class IdPreMap {
   /**
    * Search for a given pre value.
    * @param pre pre value
-   * @return index of the record where the pre is found, or the insertion point, if not
-   * found
+   * @return index of the record where the pre is found, or the insertion point if not found
    */
   private int findPre(final int pre) {
     int low = 0;
@@ -402,5 +378,27 @@ public class IdPreMap {
       System.arraycopy(oids, last, oids, s, length);
       rows -= last - s;
     }
+  }
+
+  @Override
+  public String toString() {
+    final Table t = new Table();
+    t.header.add("pres");
+    t.header.add("fids");
+    t.header.add("nids");
+    t.header.add("incs");
+    t.header.add("oids");
+    for(int i = 0; i < 5; ++i) t.align.add(true);
+
+    for(int i = 0; i < rows; i++) {
+      final TokenList tl = new TokenList();
+      tl.add(Token.token(pres[i]));
+      tl.add(Token.token(fids[i]));
+      tl.add(Token.token(nids[i]));
+      tl.add(Token.token(incs[i]));
+      tl.add(Token.token(oids[i]));
+      t.contents.add(tl);
+    }
+    return t.toString();
   }
 }

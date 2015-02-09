@@ -4,15 +4,15 @@ import static org.basex.core.Text.*;
 
 import java.io.*;
 
+import org.basex.api.client.*;
 import org.basex.core.*;
-import org.basex.server.*;
 import org.basex.util.*;
 
 /**
  * This is the starter class for the client console mode.
  * All input is sent to the server instance.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class BaseXClient extends BaseX {
@@ -40,15 +40,15 @@ public final class BaseXClient extends BaseX {
   }
 
   @Override
-  protected boolean sa() {
+  protected boolean local() {
     return false;
   }
 
   @Override
   protected Session init() throws IOException {
     // user/password input
-    String user = context.globalopts.get(GlobalOptions.USER);
-    String pass = context.globalopts.get(GlobalOptions.PASSWORD);
+    String user = context.soptions.get(StaticOptions.USER);
+    String pass = context.soptions.get(StaticOptions.PASSWORD);
     while(user.isEmpty()) {
       Util.out(USERNAME + COLS);
       user = Util.input();

@@ -1,23 +1,24 @@
 package org.basex.query.value.item;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
-import static org.basex.query.util.Err.*;
 
 import java.math.*;
 
 import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
+import org.basex.query.util.collation.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.value.type.Type.ID;
 import org.basex.util.*;
 
 /**
  * Abstract super class for all items.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public abstract class Item extends Value {
@@ -28,10 +29,10 @@ public abstract class Item extends Value {
 
   /**
    * Constructor.
-   * @param t data type
+   * @param type item type
    */
-  protected Item(final Type t) {
-    super(t);
+  protected Item(final Type type) {
+    super(type);
   }
 
   @Override
@@ -45,14 +46,12 @@ public abstract class Item extends Value {
       @Override
       public Item get(final long i) { return Item.this; }
       @Override
-      public boolean reset() { req = false; return true; }
-      @Override
       public Value value() { return Item.this; }
     };
   }
 
   @Override
-  public final Item item(final QueryContext ctx, final InputInfo ii) {
+  public final Item item(final QueryContext qc, final InputInfo ii) {
     return this;
   }
 
@@ -62,18 +61,13 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public final Item ebv(final QueryContext ctx, final InputInfo ii) {
+  public final Item ebv(final QueryContext qc, final InputInfo ii) {
     return this;
   }
 
   @Override
-  public Item test(final QueryContext ctx, final InputInfo ii) throws QueryException {
+  public Item test(final QueryContext qc, final InputInfo ii) throws QueryException {
     return bool(ii) ? this : null;
-  }
-
-  @Override
-  public final boolean isItem() {
-    return true;
   }
 
   /**
@@ -91,7 +85,7 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   public boolean bool(final InputInfo ii) throws QueryException {
-    throw CONDTYPE.get(ii, type, this);
+    throw EBV_X_X.get(ii, type, this);
   }
 
   /**
@@ -140,24 +134,22 @@ public abstract class Item extends Value {
    * @return result of check
    */
   public final boolean comparable(final Item it) {
-    final Type t1 = type;
-    final Type t2 = it.type;
-    return t1 == t2 ||
-      this instanceof ANum && it instanceof ANum ||
-      t1.isStringOrUntyped() && t2.isStringOrUntyped() ||
-      this instanceof Dur && it instanceof Dur;
+    final Type t1 = type, t2 = it.type;
+    return t1 == t2 || this instanceof ANum && it instanceof ANum ||
+      t1.isStringOrUntyped() && t2.isStringOrUntyped() || this instanceof Dur && it instanceof Dur;
   }
 
   /**
    * Checks the items for equality.
    * @param it item to be compared
    * @param coll collation
+   * @param sc static context
    * @param ii input info
    * @return result of check
    * @throws QueryException query exception
    */
-  public abstract boolean eq(final Item it, final Collation coll, final InputInfo ii)
-      throws QueryException;
+  public abstract boolean eq(final Item it, final Collation coll, final StaticContext sc,
+      final InputInfo ii) throws QueryException;
 
   /**
    * Checks the items for equivalence.
@@ -170,8 +162,8 @@ public abstract class Item extends Value {
   public final boolean equiv(final Item it, final Collation coll, final InputInfo ii)
       throws QueryException {
     // check if both values are NaN, or if values are equal..
-    return (this == Dbl.NAN || this == Flt.NAN) && it instanceof ANum &&
-        Double.isNaN(it.dbl(ii)) || comparable(it) && eq(it, coll, ii);
+    return (this == Dbl.NAN || this == Flt.NAN) && it instanceof ANum && Double.isNaN(it.dbl(ii)) ||
+        comparable(it) && eq(it, coll, null, ii);
   }
 
   /**
@@ -184,7 +176,7 @@ public abstract class Item extends Value {
    */
   @SuppressWarnings("unused")
   public int diff(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
-    throw (this == it ? TYPECMP : INVTYPECMP).get(ii, type, it.type);
+    throw (type == it.type ? CMPTYPE_X : CMPTYPES_X_X).get(ii, type, it.type);
   }
 
   /**
@@ -197,19 +189,42 @@ public abstract class Item extends Value {
     return new ArrayInput(string(ii));
   }
 
-  /**
-   * Materializes streamable values, or returns a self reference.
-   * @param ii input info
-   * @return materialized item
-   * @throws QueryException query exception
-   */
-  @SuppressWarnings("unused")
+  // Overridden by B64Stream, StrStream, Jav and Array.
+  @Override
   public Item materialize(final InputInfo ii) throws QueryException {
     return this;
   }
 
+  // Overridden by Array.
   @Override
-  public final SeqType type() {
+  public Value atomValue(final InputInfo ii) throws QueryException {
+    return atomItem(ii);
+  }
+
+  @Override
+  public final Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return atomItem(ii);
+  }
+
+  /**
+   * Evaluates the expression and returns the atomized items.
+   * @param ii input info
+   * @return materialized item
+   * @throws QueryException query exception
+   */
+  // Overridden by FItem and ANode.
+  @SuppressWarnings("unused")
+  public Item atomItem(final InputInfo ii) throws QueryException {
+    return this;
+  }
+
+  @Override
+  public long atomSize() {
+    return 1;
+  }
+
+  @Override
+  public final SeqType seqType() {
     return type.seqType();
   }
 
@@ -261,8 +276,8 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public final int writeTo(final Item[] arr, final int start) {
-    arr[start] = this;
+  public final int writeTo(final Item[] arr, final int index) {
+    arr[index] = this;
     return 1;
   }
 
@@ -283,7 +298,7 @@ public abstract class Item extends Value {
    * Returns a type id.
    * @return type string
    */
-  public Type.ID typeId() {
+  public ID typeId() {
     return type.id();
   }
 }

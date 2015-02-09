@@ -16,7 +16,7 @@ import org.basex.util.hash.*;
 /**
  * Simple stop words set for full-text requests.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class StopWords extends TokenSet {
@@ -29,14 +29,15 @@ public final class StopWords extends TokenSet {
    * Constructor, reading stopword list from disk.
    * And creating database stopword file.
    * @param data data reference
-   * @param file stopword list file
+   * @param options main options
    * @throws IOException I/O exception
    */
-  public StopWords(final Data data, final String file) throws IOException {
-    if(!data.meta.options.get(MainOptions.STOPWORDS).isEmpty()) read(IO.get(file), false);
-    final DataOutput out = new DataOutput(data.meta.dbfile(DATASWL));
-    write(out);
-    out.close();
+  public StopWords(final Data data, final MainOptions options) throws IOException {
+    final String file = options.get(MainOptions.STOPWORDS);
+    if(!file.isEmpty()) read(IO.get(file), false);
+    try(final DataOutput out = new DataOutput(data.meta.dbfile(DATASWL))) {
+      write(out);
+    }
   }
 
   /**
@@ -48,15 +49,10 @@ public final class StopWords extends TokenSet {
     if(data == null || size() != 0 || data.inMemory()) return;
 
     // try to parse the stop words file of the current database
-    try {
-      final IOFile file = data.meta.dbfile(DATASWL);
-      if(!file.exists()) return;
-      final DataInput in = new DataInput(data.meta.dbfile(DATASWL));
-      try {
-        read(in);
-      } finally {
-        in.close();
-      }
+    final IOFile file = data.meta.dbfile(DATASWL);
+    if(!file.exists()) return;
+    try(final DataInput in = new DataInput(data.meta.dbfile(DATASWL))) {
+      read(in);
     } catch(final Exception ex) {
       Util.debug(ex);
     }
@@ -70,7 +66,7 @@ public final class StopWords extends TokenSet {
    */
   public boolean read(final IO file, final boolean exclude) {
     try {
-      final byte[] content = norm(file.read());
+      final byte[] content = normalize(file.read());
       final int s = Token.contains(content, ' ') ? ' ' : '\n';
       for(final byte[] sl : split(content, s)) {
         if(exclude) delete(sl);

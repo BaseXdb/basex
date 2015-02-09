@@ -6,7 +6,7 @@ import org.basex.util.*;
  * This is an efficient and memory-saving hash map for storing tokens.
  * It extends the {@link TokenSet} class.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public class TokenMap extends TokenSet {
@@ -55,13 +55,13 @@ public class TokenMap extends TokenSet {
    * @return iterator
    */
   public final Iterable<byte[]> values() {
-    return new ArrayIterator<byte[]>(values, 1, size);
+    return new ArrayIterator<>(values, 1, size);
   }
 
   @Override
-  protected final void rehash(final int s) {
-    super.rehash(s);
-    values = Array.copyOf(values, s);
+  protected final void rehash(final int sz) {
+    super.rehash(sz);
+    values = Array.copyOf(values, sz);
   }
 
   @Override

@@ -2,18 +2,16 @@ package org.basex.gui.view;
 
 import static org.basex.gui.layout.BaseXKeys.*;
 
-import java.awt.*;
 import java.awt.event.*;
 
 import org.basex.gui.*;
-import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.*;
 
 /**
  * View observer pattern. All inheriting classes are attached to the
  * views array
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public abstract class View extends BaseXPanel {
@@ -24,9 +22,8 @@ public abstract class View extends BaseXPanel {
    */
   protected View(final String name, final ViewNotifier man) {
     super(man.gui);
-    mode(man.gui.gopts.get(GUIOptions.GRADIENT) ? Fill.GRADIENT : Fill.PLAIN);
     setFocusable(true);
-    setBackground(Color.white);
+    setBackground(GUIConstants.BACK);
     setName(name);
     addMouseListener(this);
     addMouseMotionListener(this);
@@ -105,11 +102,9 @@ public abstract class View extends BaseXPanel {
   @Override
   public void keyPressed(final KeyEvent e) {
     if(gui.updating) return;
-    if(ESCAPE.is(e)) {
-      gui.fullscreen(false);
-    }
-    if(gui.context.data() == null) return;
+    if(ESCAPE.is(e)) gui.fullscreen(false);
 
+    if(gui.context.data() == null) return;
     if(SPACE.is(e)) {
       gui.notify.mark(sc(e) ? 2 : e.isShiftDown() ? 1 : 0, null);
     } else if(ENTER.is(e)) {

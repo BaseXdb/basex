@@ -1,11 +1,13 @@
 package org.basex.http.restxq;
 
-import static org.basex.http.HTTPMethod.*;
 import static org.basex.http.restxq.RestXqText.*;
+import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
+import static org.basex.query.ann.Annotation.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.*;
 
@@ -17,10 +19,11 @@ import org.basex.io.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.path.*;
+import org.basex.query.expr.path.Test.Kind;
 import org.basex.query.func.*;
+import org.basex.query.func.http.*;
 import org.basex.query.iter.*;
-import org.basex.query.path.*;
-import org.basex.query.path.Test.Kind;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -33,7 +36,7 @@ import org.basex.util.list.*;
 /**
  * This class represents a single RESTXQ function.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 final class RestXqFunction implements Comparable<RestXqFunction> {
@@ -43,7 +46,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
   private static final Pattern EQNAME = Pattern.compile("^Q\\{(.*?)\\}(.*)$");
 
   /** Supported methods. */
-  final Set<String> methods = new HashSet<String>();
+  final Set<String> methods = new HashSet<>();
   /** Serialization parameters. */
   final SerializerOptions output;
   /** Associated function. */
@@ -54,38 +57,38 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
   RestXqPath path;
 
   /** Error. */
-  RestXqError error;
+  private RestXqError error;
   /** Query parameters. */
-  private final ArrayList<RestXqParam> errorParams = new ArrayList<RestXqParam>();
+  private final ArrayList<RestXqParam> errorParams = new ArrayList<>();
 
   /** Query parameters. */
-  final ArrayList<RestXqParam> queryParams = new ArrayList<RestXqParam>();
+  final ArrayList<RestXqParam> queryParams = new ArrayList<>();
   /** Form parameters. */
-  final ArrayList<RestXqParam> formParams = new ArrayList<RestXqParam>();
+  final ArrayList<RestXqParam> formParams = new ArrayList<>();
   /** Header parameters. */
-  final ArrayList<RestXqParam> headerParams = new ArrayList<RestXqParam>();
+  final ArrayList<RestXqParam> headerParams = new ArrayList<>();
   /** Cookie parameters. */
-  private final ArrayList<RestXqParam> cookieParams = new ArrayList<RestXqParam>();
+  private final ArrayList<RestXqParam> cookieParams = new ArrayList<>();
 
   /** Query context. */
-  private final QueryContext context;
+  private final QueryContext qc;
   /** Consumed media types. */
   private final StringList consumes = new StringList();
   /** Returned media types. */
-  private final StringList produces = new StringList();
+  final StringList produces = new StringList();
   /** Post/Put variable. */
   private QNm requestBody;
 
   /**
    * Constructor.
-   * @param uf associated user function
+   * @param function associated user function
    * @param qc query context
-   * @param m associated module
+   * @param module associated module
    */
-  RestXqFunction(final StaticFunc uf, final QueryContext qc, final RestXqModule m) {
-    function = uf;
-    context = qc;
-    module = m;
+  RestXqFunction(final StaticFunc function, final QueryContext qc, final RestXqModule module) {
+    this.function = function;
+    this.qc = qc;
+    this.module = module;
     output = qc.serParams();
   }
 
@@ -114,80 +117,57 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     // parse all annotations
     final boolean[] declared = new boolean[function.args.length];
     boolean found = false;
-    final int as = function.ann.size();
-    for(int a = 0; a < as; a++) {
-      final QNm name = function.ann.names[a];
-      final Value value = function.ann.values[a];
-      final InputInfo info = function.ann.infos[a];
-      final byte[] local = name.local();
-      final byte[] uri = name.uri();
-      final boolean rexq = eq(uri, QueryText.RESTURI);
-      if(rexq) {
-        if(eq(PATH, local)) {
-          // annotation "path"
-          if(path != null) throw error(info, ANN_TWICE, "%", name.string());
-          try {
-            path = new RestXqPath(toString(value, name));
-          } catch(final IllegalArgumentException ex) {
-            throw error(info, ex.getMessage());
-          }
-          for(int s = 0; s < path.size; s++) {
-            if(path.isTemplate(s)) checkVariable(path.segment[s], AtomType.AAT, declared);
-          }
-        } else if(eq(ERROR, local)) {
-          // annotation "error"
-          error(value, name);
-        } else if(eq(CONSUMES, local)) {
-          // annotation "consumes"
-          strings(value, name, consumes);
-        } else if(eq(PRODUCES, local)) {
-          // annotation "produces"
-          strings(value, name, produces);
-        } else if(eq(QUERY_PARAM, local)) {
-          // annotation "query-param"
-          queryParams.add(param(value, name, declared));
-        } else if(eq(FORM_PARAM, local)) {
-          // annotation "form-param"
-          formParams.add(param(value, name, declared));
-        } else if(eq(HEADER_PARAM, local)) {
-          // annotation "header-param"
-          headerParams.add(param(value, name, declared));
-        } else if(eq(COOKIE_PARAM, local)) {
-          // annotation "cookie-param"
-          cookieParams.add(param(value, name, declared));
-        } else if(eq(ERROR_PARAM, local)) {
-          // annotation "error-param"
-          errorParams.add(param(value, name, declared));
-        } else if(eq(METHOD, local)) {
-          // annotation "method"
-          if(value.size() < 1) throw error(function.info, ANN_ATLEAST, "%", name.string(), 1);
-          final String mth = toString(value.itemAt(0), name).toUpperCase(Locale.ENGLISH);
-          final Value body = value.size() > 1 ? value.itemAt(1) : null;
-          addMethod(mth, body, name, declared, info);
-        } else {
-          // method annotations
-          final String mth = string(local);
-          if(get(mth) == null) throw error(info, ANN_UNKNOWN, "%", name.string());
-          addMethod(mth, value, name, declared, info);
+    for(final Ann ann : function.anns) {
+      found |= eq(ann.sig.uri, QueryText.REST_URI);
+      final Item[] args = ann.args;
+      if(ann.sig == _REST_PATH) {
+        try {
+          path = new RestXqPath(toString(args[0]), ann.info);
+        } catch(final IllegalArgumentException ex) {
+          throw error(ann.info, ex.getMessage());
         }
-      } else if(eq(uri, QueryText.OUTPUTURI)) {
+        for(final QNm v : path.vars()) checkVariable(v, AtomType.AAT, declared);
+      } else if(ann.sig == _REST_ERROR) {
+        error(ann);
+      } else if(ann.sig == _REST_CONSUMES) {
+        strings(ann, consumes);
+      } else if(ann.sig == _REST_PRODUCES) {
+        strings(ann, produces);
+      } else if(ann.sig == _REST_QUERY_PARAM) {
+        queryParams.add(param(ann, declared));
+      } else if(ann.sig == _REST_FORM_PARAM) {
+        formParams.add(param(ann, declared));
+      } else if(ann.sig == _REST_HEADER_PARAM) {
+        headerParams.add(param(ann, declared));
+      } else if(ann.sig == _REST_COOKIE_PARAM) {
+        cookieParams.add(param(ann, declared));
+      } else if(ann.sig == _REST_ERROR_PARAM) {
+        errorParams.add(param(ann, declared));
+      } else if(ann.sig == _REST_METHOD) {
+        final String mth = toString(args[0]).toUpperCase(Locale.ENGLISH);
+        final Item body = args.length > 1 ? args[1] : null;
+        addMethod(mth, body, declared, ann.info);
+      } else if(eq(ann.sig.uri, QueryText.REST_URI)) {
+        final Item body = args.length == 0 ? null : args[0];
+        addMethod(string(ann.sig.local()), body, declared, ann.info);
+      } else if(eq(ann.sig.uri, QueryText.OUTPUT_URI)) {
         // serialization parameters
         try {
-          output.assign(string(local), toString(value, name));
+          output.assign(string(ann.sig.local()), toString(args[0]));
         } catch(final BaseXException ex) {
-          throw error(info, UNKNOWN_SER, local);
+          throw error(ann.info, UNKNOWN_SER, ann.sig.local());
         }
       }
-      found |= rexq;
     }
 
     if(found) {
       if(path == null && error == null)
         throw error(function.info, ANN_MISSING, '%', PATH, '%', ERROR);
 
-      for(int i = 0; i < declared.length; i++) {
-        if(declared[i]) continue;
-        throw error(function.info, VAR_UNDEFINED, function.args[i].name.string());
+      final int dl = declared.length;
+      for(int d = 0; d < dl; d++) {
+        if(declared[d]) continue;
+        throw error(function.info, VAR_UNDEFINED, function.args[d].name.string());
       }
     }
     return found;
@@ -197,21 +177,20 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * Add a HTTP method to the list of supported methods by this RESTXQ function.
    * @param method HTTP method as a string
    * @param body variable to which the HTTP request body to be bound (optional)
-   * @param ann RESTXQ annotation specifying the HTTP method
    * @param declared variable declaration flags
    * @param info input info
    * @throws QueryException query exception
    */
-  private void addMethod(final String method, final Value body, final QNm ann,
-      final boolean[] declared, final InputInfo info) throws QueryException {
+  private void addMethod(final String method, final Item body, final boolean[] declared,
+      final InputInfo info) throws QueryException {
 
     if(body != null && !body.isEmpty()) {
-      final HTTPMethod m = get(method);
+      final HTTPMethod m = HTTPMethod.get(method);
       if(m != null && !m.body) throw error(info, METHOD_VALUE, m);
       if(requestBody != null) throw error(info, ANN_BODYVAR);
-      requestBody = checkVariable(toString(body, ann), declared);
+      requestBody = checkVariable(toString(body), declared);
     }
-    if(methods.contains(method)) throw error(info, ANN_TWICE, "%", ann.string());
+    if(methods.contains(method)) throw error(info, ANN_TWICE, "%", method);
     methods.add(method);
   }
 
@@ -241,13 +220,10 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
 
     // bind variables from segments
     if(path != null) {
-      for(int s = 0; s < path.size; s++) {
-        final Matcher m = TEMPLATE.matcher(path.segment[s]);
-        if(m.find()) {
-          final QNm qnm = new QNm(token(m.group(1)), function.sc);
-          if(function.sc.elemNS != null && eq(qnm.uri(), function.sc.elemNS)) qnm.uri(EMPTY);
-          bind(qnm, arg, new Atm(http.segment(s)));
-        }
+      for(final Entry<QNm, String> entry : path.values(http).entrySet()) {
+        final QNm qnm = new QNm(entry.getKey().string(), function.sc);
+        if(function.sc.elemNS != null && eq(qnm.uri(), function.sc.elemNS)) qnm.uri(EMPTY);
+        bind(qnm, arg, new Atm(entry.getValue()));
       }
     }
 
@@ -287,12 +263,12 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     }
 
     // bind errors
-    final Map<String, Value> errs = new HashMap<String, Value>();
+    final Map<String, Value> errs = new HashMap<>();
     if(err != null) {
       final Value[] values = Catch.values(err);
-      for(int v = 0; v < Catch.NAMES.length; v++) {
-        errs.put(string(Catch.NAMES[v].local()), values[v]);
-      }
+      final QNm[] names = Catch.NAMES;
+      final int nl = names.length;
+      for(int n = 0; n < nl; n++) errs.put(string(names[n].local()), values[n]);
     }
     for(final RestXqParam rxp : errorParams) bind(rxp, arg, errs.get(rxp.key));
   }
@@ -315,7 +291,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @return exception
    */
   private static QueryException error(final InputInfo info, final String msg, final Object... ext) {
-    return new QueryException(info, Err.BASX_RESTXQ, Util.info(msg, ext));
+    return BASX_RESTXQ_X.get(info, Util.info(msg, ext));
   }
 
   @Override
@@ -347,20 +323,39 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
   private QNm checkVariable(final String tmp, final Type type, final boolean... declared)
       throws QueryException {
 
-    final Var[] args = function.args;
     final Matcher m = TEMPLATE.matcher(tmp);
     if(!m.find()) throw error(INV_TEMPLATE, tmp);
     final byte[] vn = token(m.group(1));
     if(!XMLToken.isQName(vn)) throw error(INV_VARNAME, vn);
     final QNm name = new QNm(vn);
+    return checkVariable(name, type, declared);
+  }
+
+  /**
+   * Checks if the specified variable exists in the current function.
+   * @param name variable
+   * @param type allowed type
+   * @param declared variable declaration flags
+   * @return resulting variable
+   * @throws QueryException query exception
+   */
+  private QNm checkVariable(final QNm name, final Type type, final boolean[] declared)
+      throws QueryException {
+
     if(name.hasPrefix()) name.uri(function.sc.ns.uri(name.prefix()));
-    int r = -1;
-    while(++r < args.length && !args[r].name.eq(name));
-    if(r == args.length) throw error(UNKNOWN_VAR, vn);
-    if(declared[r]) throw error(VAR_ASSIGNED, vn);
-    final SeqType st = args[r].declaredType();
-    if(args[r].checksType() && !st.type.instanceOf(type)) throw error(INV_VARTYPE, vn, type);
-    declared[r] = true;
+    int a = -1;
+    final Var[] args = function.args;
+    final int al = args.length;
+    while(++a < al && !args[a].name.eq(name));
+
+    if(a == args.length) throw error(UNKNOWN_VAR, name.string());
+    if(declared[a]) throw error(VAR_ASSIGNED, name.string());
+
+    final SeqType st = args[a].declaredType();
+    if(args[a].checksType() && !st.type.instanceOf(type))
+      throw error(INV_VARTYPE, name.string(), type);
+
+    declared[a] = true;
     return name;
   }
 
@@ -383,7 +378,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
   }
 
   /**
-   * Checks if the produced content type matches.
+   * Checks if the produced media type matches.
    * @param http http context
    * @return result of check
    */
@@ -391,9 +386,9 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     // return true if no type is given
     if(produces.isEmpty()) return true;
     // check if any combination matches
-    for(final String pr : http.produces()) {
+    for(final HTTPAccept accept : http.accepts()) {
       for(final String p : produces) {
-        if(MimeTypes.matches(p, pr)) return true;
+        if(MimeTypes.matches(p, accept.type)) return true;
       }
     }
     return false;
@@ -423,84 +418,72 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     // skip nulled values
     if(value == null) return;
 
-    for(int i = 0; i < function.args.length; i++) {
-      final Var var = function.args[i];
+    final Var[] fargs = function.args;
+    final int fl = fargs.length;
+    for(int f = 0; f < fl; f++) {
+      final Var var = fargs[f];
       if(var.name.eq(name)) {
         // casts and binds the value
         final SeqType decl = var.declaredType();
-        final Value val = value.type().instanceOf(decl) ? value :
-          decl.cast(value, context, function.sc, null, var);
-        args[i] = var.checkType(val, context, null, false);
+        final Value val = value.seqType().instanceOf(decl) ? value :
+          decl.cast(value, qc, function.sc, null);
+        args[f] = var.checkType(val, qc, null, false);
         break;
       }
     }
   }
 
   /**
-   * Returns the specified value as a string.
-   * @param value value
-   * @param name name
+   * Returns the specified item as a string.
+   * @param item item
    * @return string
-   * @throws QueryException HTTP exception
    */
-  private String toString(final Value value, final QNm name) throws QueryException {
-    if(value instanceof Str) return ((Str) value).toJava();
-    throw error(function.info, ANN_STRING, "%", name.string(), value);
+  private static String toString(final Item item) {
+    return ((Str) item).toJava();
   }
 
   /**
    * Adds items to the specified list.
-   * @param value value
-   * @param name name
+   * @param ann annotation
    * @param list list to add values to
-   * @throws QueryException HTTP exception
    */
-  private void strings(final Value value, final QNm name, final StringList list)
-      throws QueryException {
-
-    final long vs = value.size();
-    for(int v = 0; v < vs; v++) list.add(toString(value.itemAt(v), name));
+  private static void strings(final Ann ann, final StringList list) {
+    for(final Item it : ann.args) list.add(toString(it));
   }
 
   /**
    * Returns a parameter.
-   * @param value value
-   * @param name name
+   * @param ann annotation
    * @param declared variable declaration flags
    * @return parameter
    * @throws QueryException HTTP exception
    */
-  private RestXqParam param(final Value value, final QNm name, final boolean... declared)
-      throws QueryException {
-
-    final long vs = value.size();
-    if(vs < 2) throw error(function.info, ANN_ATLEAST, "%", name.string(), 2);
+  private RestXqParam param(final Ann ann, final boolean... declared) throws QueryException {
     // name of parameter
-    final String key = toString(value.itemAt(0), name);
+    final Item[] args = ann.args;
+    final String key = toString(args[0]);
     // variable template
-    final QNm qnm = checkVariable(toString(value.itemAt(1), name), declared);
+    final QNm qnm = checkVariable(toString(args[1]), declared);
     // default value
-    final ValueBuilder vb = new ValueBuilder();
-    for(int v = 2; v < vs; v++) vb.add(value.itemAt(v));
+    final int al = args.length;
+    final ValueBuilder vb = new ValueBuilder(al);
+    for(int a = 2; a < al; a++) vb.add(args[a]);
     return new RestXqParam(qnm, key, vb.value());
   }
 
   /**
    * Returns an error.
-   * @param value value
-   * @param name name
+   * @param ann annotation
    * @throws QueryException HTTP exception
    */
-  private void error(final Value value, final QNm name) throws QueryException {
-    if(value.isEmpty()) throw error(function.info, ANN_ATLEAST, "%", name.string(), 1);
-
+  private void error(final Ann ann) throws QueryException {
     if(error == null) error = new RestXqError();
 
     // name of parameter
-    final int s = (int) value.size();
+    final int al = ann.args.length;
     NameTest last = error.get(0);
-    for(int i = 0; i < s; i++) {
-      final String err = toString(value.itemAt(i), name);
+    for(int a = 0; a < al; a++) {
+      final String err = toString(ann.args[a]);
       final Kind kind;
       QNm qnm = null;
       if(err.equals("*")) {

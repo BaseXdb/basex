@@ -1,15 +1,17 @@
 package org.basex.query.value.map;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
-import static org.basex.query.util.Err.*;
 
 import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
+import org.basex.query.util.collation.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
+import org.basex.query.value.array.Array;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -20,12 +22,12 @@ import org.basex.util.*;
 /**
  * The map item.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
 public final class Map extends FItem {
   /** The empty map. */
-  public static final Map EMPTY = new Map(TrieNode.EMPTY);
+  public static final Map EMPTY = new Map(TrieNode.EMPTY, 0);
   /** Number of bits per level, maximum is 5 because {@code 1 << 5 == 32}. */
   static final int BITS = 5;
 
@@ -33,14 +35,18 @@ public final class Map extends FItem {
   private final TrieNode root;
   /** Key sequence. */
   private Value keys;
+  /** Date/time entries (negative: without timezone). */
+  private final int dt;
 
   /**
    * Constructor.
-   * @param m map
+   * @param root map
+   * @param dt number of date/time entries (negative: without timezone)
    */
-  private Map(final TrieNode m) {
-    super(SeqType.ANY_MAP, new Ann());
-    root = m;
+  private Map(final TrieNode root, final int dt) {
+    super(SeqType.ANY_MAP, new AnnList());
+    this.root = root;
+    this.dt = dt;
   }
 
   @Override
@@ -69,123 +75,107 @@ public final class Map extends FItem {
   }
 
   @Override
-  public Item invItem(final QueryContext ctx, final InputInfo ii, final Value... args)
+  public Item invItem(final QueryContext qc, final InputInfo ii, final Value... args)
       throws QueryException {
-    return get(args[0].item(ctx, ii), ii).item(ctx, ii);
+    return invValue(qc, ii, args).item(qc, ii);
   }
 
   @Override
-  public Value invValue(final QueryContext ctx, final InputInfo ii, final Value... args)
+  public Value invValue(final QueryContext qc, final InputInfo ii, final Value... args)
       throws QueryException {
-    return get(args[0].item(ctx, ii), ii);
-  }
-
-  /**
-   * Checks the key item.
-   * @param it item
-   * @param ii input info
-   * @return possibly atomized item if non {@code NaN}, {@code null} otherwise
-   * @throws QueryException query exception
-   */
-  private Item key(final Item it, final InputInfo ii) throws QueryException {
-    // no empty sequence allowed
-    if(it == null) throw INVEMPTY.get(ii, description());
-
-    // function items can't be keys
-    if(it instanceof FItem) throw FIATOM.get(ii, it.type);
-
-    // NaN can't be stored as key, as it isn't equal to anything
-    if(it == Flt.NAN || it == Dbl.NAN) return null;
-
-    // untyped items are converted to strings
-   return it.type.isUntyped() ? Str.get(it.string(ii)) : it;
+    final Item key = args[0].atomItem(qc, ii);
+    if(key == null) throw EMPTYFOUND.get(ii);
+    return get(key, ii);
   }
 
   /**
    * Deletes a key from this map.
-   * @param key key to delete
+   * @param key key to delete (must not be {@code null})
    * @param ii input info
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
   public Map delete(final Item key, final InputInfo ii) throws QueryException {
-    final Item k = key(key, ii);
-    if(k == null) return this;
-
-    final TrieNode del = root.delete(k.hash(ii), k, 0, ii);
-    return del == root ? this : del != null ? new Map(del) : EMPTY;
+    final TrieNode del = root.delete(key.hash(ii), key, 0, ii);
+    return del == root ? this : del == null ? EMPTY :
+      new Map(del, dt + (key instanceof ADate ? ((ADate) key).tzDefined() ? -1 : 1 : 0));
   }
 
   /**
    * Gets the value from this map.
-   * @param key key to look for
+   * @param key key to look for (must not be {@code null})
    * @param ii input info
    * @return bound value if found, the empty sequence {@code ()} otherwise
    * @throws QueryException query exception
    */
   public Value get(final Item key, final InputInfo ii) throws QueryException {
-    final Item k = key(key, ii);
-    if(k == null) return Empty.SEQ;
-
-    final Value val = root.get(k.hash(ii), k, 0, ii);
-    return val == null ? Empty.SEQ : val;
+    final Value v = root.get(key.hash(ii), key, 0, ii);
+    return v == null ? Empty.SEQ : v;
   }
 
   /**
    * Checks if the given key exists in the map.
-   * @param k key to look for
+   * @param key key to look for (must not be {@code null})
    * @param ii input info
-   * @return {@code true()}, if the key exists, {@code false()} otherwise
+   * @return {@code true()} if the key exists, {@code false()} otherwise
    * @throws QueryException query exception
    */
-  public boolean contains(final Item k, final InputInfo ii) throws QueryException {
-    final Item key = key(k, ii);
-    return key != null && root.contains(key.hash(ii), key, 0, ii);
+  public boolean contains(final Item key, final InputInfo ii) throws QueryException {
+    return root.contains(key.hash(ii), key, 0, ii);
   }
 
   /**
    * Adds all bindings from the given map into {@code this}.
-   * @param other map to add
+   * @param map map to add
    * @param ii input info
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  public Map addAll(final Map other, final InputInfo ii) throws QueryException {
-    if(other == EMPTY) return this;
-    final TrieNode upd = root.addAll(other.root, 0, ii);
-    return upd == other.root ? other : new Map(upd);
+  public Map addAll(final Map map, final InputInfo ii) throws QueryException {
+    if(map == EMPTY) return this;
+    if(map.dt != 0 && dt != 0 && (map.dt > 0 ? dt < 0 : dt > 0)) throw MAP_TZ.get(ii);
+    final TrieNode upd = root.addAll(map.root, 0, ii);
+    return upd == map.root ? map : new Map(upd, map.dt + dt);
   }
 
   /**
    * Checks if the map has the given type.
-   * @param t type
+   * @param mt type
    * @return {@code true} if the type fits, {@code false} otherwise
    */
-  public boolean hasType(final MapType t) {
-    return root.hasType(t.keyType == AtomType.AAT ? null : t.keyType,
-        t.ret.eq(SeqType.ITEM_ZM) ? null : t.ret);
+  public boolean hasType(final MapType mt) {
+    return root.hasType(mt.keyType == AtomType.AAT ? null : mt.keyType,
+        mt.retType.eq(SeqType.ITEM_ZM) ? null : mt.retType);
   }
 
   @Override
-  public Map coerceTo(final FuncType ft, final QueryContext ctx, final InputInfo ii,
+  public Map coerceTo(final FuncType ft, final QueryContext qc, final InputInfo ii,
       final boolean opt) throws QueryException {
-    if(!(ft instanceof MapType) || !hasType((MapType) ft)) throw castError(ii, ft, this);
+    if(!(ft instanceof MapType) || !hasType((MapType) ft)) throw castError(ii, this, ft);
     return this;
   }
 
   /**
-   * Inserts the given value into this map.
-   * @param k key to insert
-   * @param v value to insert
+   * Puts the given value into this map and replaces existing keys.
+   * @param key key to insert (must not be {@code null})
+   * @param value value to insert
    * @param ii input info
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  public Map insert(final Item k, final Value v, final InputInfo ii) throws QueryException {
-    final Item key = key(k, ii);
-    if(key == null) return this;
-    final TrieNode ins = root.insert(key.hash(ii), key, v, 0, ii);
-    return ins == root ? this : new Map(ins);
+  public Map put(final Item key, final Value value, final InputInfo ii) throws QueryException {
+    final TrieNode ins = root.put(key.hash(ii), key, value, 0, ii);
+    return ins == root ? this :
+      new Map(ins, dt + (key instanceof ADate ? ((ADate) key).tzDefined() ? 1 : -1 : 0));
+  }
+
+  /**
+   * Checks if the specified key has a different timezone than the stored keys.
+   * @param key key to check
+   * @return result of check
+   */
+  public boolean checkTz(final Item key) {
+    return !(key instanceof ADate) || (((ADate) key).tzDefined() ? dt >= 0 : dt <= 0);
   }
 
   /**
@@ -210,22 +200,36 @@ public final class Map extends FItem {
   }
 
   /**
-   * Collation of this map.
-   * @return collation
+   * All values defined in this map.
+   * @return list of keys
    */
-  public Str collation() {
-    return Str.get(COLLATIONURI);
+  public ValueBuilder values() {
+    final ValueBuilder res = new ValueBuilder(root.size);
+    root.values(res);
+    return res;
   }
 
   /**
-   * Checks if the this map is deep-equal to the given one.
+   * Applies a function on all entries.
+   * @param func function to apply on keys and values
+   * @param qc query context
    * @param ii input info
-   * @param o other map
-   * @return result of check
+   * @return resulting value
    * @throws QueryException query exception
    */
-  public boolean deep(final InputInfo ii, final Map o) throws QueryException {
-    return root.deep(ii, o.root);
+  public ValueBuilder apply(final FItem func, final QueryContext qc, final InputInfo ii)
+      throws QueryException {
+    final ValueBuilder vb = new ValueBuilder(root.size);
+    root.apply(vb, func, qc, ii);
+    return vb;
+  }
+
+  @Override
+  public boolean deep(final Item item, final InputInfo ii, final Collation coll)
+      throws QueryException {
+
+    if(item instanceof Map) return root.deep(ii, ((Map) item).root, coll);
+    return item instanceof FItem && !(item instanceof Array) && super.deep(item, ii, coll);
   }
 
   /**
@@ -242,7 +246,7 @@ public final class Map extends FItem {
 
   @Override
   public HashMap<Object, Object> toJava() throws QueryException {
-    final HashMap<Object, Object> map = new HashMap<Object, Object>();
+    final HashMap<Object, Object> map = new HashMap<>();
     final ValueIter vi = keys().iter();
     for(Item k; (k = vi.next()) != null;) {
       map.put(k.toJava(), get(k, null).toJava());
@@ -257,7 +261,7 @@ public final class Map extends FItem {
 
   @Override
   public String description() {
-    return BRACE1 + DOTS + BRACE2;
+    return CURLY1 + DOTS + CURLY2;
   }
 
   @Override
@@ -286,7 +290,7 @@ public final class Map extends FItem {
    * @param ii input info
    * @throws QueryException query exception
    */
-  private void string(final TokenBuilder tb, final int level, final InputInfo ii)
+  public void string(final TokenBuilder tb, final int level, final InputInfo ii)
       throws QueryException {
 
     tb.add("{");
@@ -303,6 +307,7 @@ public final class Map extends FItem {
       for(final Item it : v) {
         if(cc++ > 0) tb.add(", ");
         if(it instanceof Map) ((Map) it).string(tb, level + 1, ii);
+        else if(it instanceof Array) ((Array) it).string(tb, ii);
         else tb.add(it.toString());
       }
       if(v.size() != 1) tb.add(')');
@@ -322,16 +327,16 @@ public final class Map extends FItem {
   }
 
   @Override
+  public Expr inlineExpr(final Expr[] exprs, final QueryContext qc, final VarScope scp,
+      final InputInfo ii) {
+    return null;
+  }
+
+  @Override
   public String toString() {
     final StringBuilder sb = root.toString(new StringBuilder(MAPSTR).append(" { "));
     // remove superfluous comma
     if(root.size > 0) sb.deleteCharAt(sb.length() - 2);
     return sb.append('}').toString();
-  }
-
-  @Override
-  public Expr inlineExpr(final Expr[] exprs, final QueryContext ctx, final VarScope scp,
-      final InputInfo ii) {
-    return null;
   }
 }

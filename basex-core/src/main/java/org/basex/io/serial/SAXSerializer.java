@@ -4,6 +4,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
+import org.basex.data.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.xml.sax.*;
@@ -19,7 +20,7 @@ import org.xml.sax.helpers.*;
  *   <li>notify endDocument()</li>
  * </ol>
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Michael Hedenus
  */
 public final class SAXSerializer extends Serializer implements XMLReader {
@@ -39,10 +40,10 @@ public final class SAXSerializer extends Serializer implements XMLReader {
 
   /**
    * Constructor.
-   * @param it item to be serialized
+   * @param item item to be serialized
    */
-  public SAXSerializer(final Item it) {
-    item = it;
+  public SAXSerializer(final Item item) {
+    this.item = item;
   }
 
   // XMLReader ==========================================================================
@@ -122,14 +123,12 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   }
 
   @Override
-  public void setFeature(final String name, final boolean value)
-      throws SAXNotRecognizedException {
+  public void setFeature(final String name, final boolean value) throws SAXNotRecognizedException {
     throw new SAXNotRecognizedException();
   }
 
   @Override
-  public void setProperty(final String name, final Object value)
-      throws SAXNotRecognizedException {
+  public void setProperty(final String name, final Object value) throws SAXNotRecognizedException {
     throw new SAXNotRecognizedException();
   }
 
@@ -141,26 +140,26 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   private NSDecl namespaces;
 
   @Override
-  protected void startOpen(final byte[] n) {
+  protected void startOpen(final byte[] name) {
     namespaces = new NSDecl(namespaces);
     attributes.clear();
   }
 
   @Override
-  protected void attribute(final byte[] n, final byte[] v) {
+  protected void attribute(final byte[] name, final byte[] value) {
     byte[] prefix = null;
-    if(startsWith(n, XMLNS)) {
-      if(n.length == 5) {
+    if(startsWith(name, XMLNS)) {
+      if(name.length == 5) {
         prefix = EMPTY;
-      } else if(n[5] == ':') {
-        prefix = substring(n, 6);
+      } else if(name[5] == ':') {
+        prefix = substring(name, 6);
       }
     }
 
     if(prefix != null) {
-      namespaces.put(prefix, v);
+      namespaces.put(prefix, value);
     } else {
-      attributes.add(n, v);
+      attributes.add(name, value);
     }
   }
 
@@ -178,9 +177,9 @@ public final class SAXSerializer extends Serializer implements XMLReader {
         attrs.addAttribute(uri, lname, rname, null, value);
       }
 
-      final String uri = string(namespaces.get(prefix(tag)));
-      final String lname = string(local(tag));
-      final String rname = string(tag);
+      final String uri = string(namespaces.get(prefix(elem)));
+      final String lname = string(local(elem));
+      final String rname = string(elem);
       contentHandler.startElement(uri, lname, rname, attrs);
 
     } catch(final SAXException ex) {
@@ -197,7 +196,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   @Override
   protected void finishClose() throws IOException {
     try {
-      final String name = string(tag);
+      final String name = string(elem);
       contentHandler.endElement("", name, name);
       namespaces = namespaces.getParent();
     } catch(final SAXException ex) {
@@ -206,9 +205,9 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   }
 
   @Override
-  protected void finishText(final byte[] text) throws IOException {
+  protected void text(final byte[] value, final FTPos ftp) throws IOException {
     try {
-      final String s = string(text);
+      final String s = string(value);
       final char[] c = s.toCharArray();
       contentHandler.characters(c, 0, c.length);
     } catch(final SAXException ex) {
@@ -217,10 +216,10 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   }
 
   @Override
-  protected void finishComment(final byte[] comment) throws IOException {
+  protected void comment(final byte[] value) throws IOException {
     if(lexicalHandler != null) {
       try {
-        final String s = string(comment);
+        final String s = string(value);
         final char[] c = s.toCharArray();
         lexicalHandler.comment(c, 0, c.length);
       } catch(final SAXException ex) {
@@ -230,23 +229,18 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   }
 
   @Override
-  protected void finishPi(final byte[] n, final byte[] v) throws IOException {
+  protected void pi(final byte[] name, final byte[] value) throws IOException {
     try {
-      contentHandler.processingInstruction(string(n), string(v));
+      contentHandler.processingInstruction(string(name), string(value));
     } catch(final SAXException ex) {
       throw new IOException(ex);
     }
   }
 
-  @Override
-  protected void atomic(final Item i, final boolean iter) {
-    // ignored
-  }
-
   /**
    * Namespace declaration.
    */
-  static class NSDecl {
+  private static final class NSDecl {
     /** Parent namespace declarations. */
     private final NSDecl parent;
     /** Namespace declarations. */
@@ -254,17 +248,17 @@ public final class SAXSerializer extends Serializer implements XMLReader {
 
     /**
      * Constructor.
-     * @param par parent declarations
+     * @param parent parent declarations
      */
-    NSDecl(final NSDecl par) {
-      parent = par;
+    private NSDecl(final NSDecl parent) {
+      this.parent = parent;
     }
 
     /**
      * Returns the parent declarations.
      * @return parent declarations
      */
-    NSDecl getParent() {
+    private NSDecl getParent() {
       return parent;
     }
 
@@ -273,7 +267,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
      * @param prefix prefix
      * @param uri namespace uri
      */
-    void put(final byte[] prefix, final byte[] uri) {
+    private void put(final byte[] prefix, final byte[] uri) {
       if(decls == null) decls = new Atts();
       decls.add(prefix, uri);
     }
@@ -283,7 +277,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
      * @param prefix prefix to be found
      * @return namespace uri
      */
-    byte[] get(final byte[] prefix) {
+    private byte[] get(final byte[] prefix) {
       for(NSDecl c = this; c != null; c = c.parent) {
         if(c.decls != null) {
           final byte[] ns = c.decls.value(prefix);

@@ -3,8 +3,7 @@ package org.basex.performance;
 import java.util.*;
 
 import org.basex.*;
-import org.basex.server.*;
-import org.basex.SandboxTest;
+import org.basex.api.client.*;
 import org.basex.util.*;
 import org.junit.*;
 
@@ -12,7 +11,7 @@ import org.junit.*;
  * This class performs a client/server stress tests with a specified
  * number of threads and queries.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class ServerStressTest extends SandboxTest {
@@ -76,16 +75,16 @@ public final class ServerStressTest extends SandboxTest {
     // run server instance
     server = createServer();
     // create test database
-    final ClientSession cs = createClient();
-    cs.execute("create db test " + INPUT);
-    // run clients
-    final Client[] cl = new Client[clients];
-    for(int i = 0; i < clients; ++i) cl[i] = new Client(runs);
-    for(final Client c : cl) c.start();
-    for(final Client c : cl) c.join();
-    // drop database and stop server
-    cs.execute("drop db test");
-    cs.close();
+    try(final ClientSession cs = createClient()) {
+      cs.execute("create db test " + INPUT);
+      // run clients
+      final Client[] cl = new Client[clients];
+      for(int i = 0; i < clients; ++i) cl[i] = new Client(runs);
+      for(final Client c : cl) c.start();
+      for(final Client c : cl) c.join();
+      // drop database and stop server
+      cs.execute("drop db test");
+    }
     stopServer(server);
   }
 
@@ -98,11 +97,11 @@ public final class ServerStressTest extends SandboxTest {
 
     /**
      * Constructor.
-     * @param r number of runs
+     * @param runs number of runs
      * @throws Exception exception
      */
-    public Client(final int r) throws Exception {
-      runs = r;
+    public Client(final int runs) throws Exception {
+      this.runs = runs;
       session = createClient();
     }
 

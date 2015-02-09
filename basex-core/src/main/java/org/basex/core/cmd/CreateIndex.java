@@ -6,7 +6,10 @@ import java.io.*;
 
 import org.basex.core.*;
 import org.basex.core.parse.*;
-import org.basex.core.parse.Commands.*;
+import org.basex.core.parse.Commands.Cmd;
+import org.basex.core.parse.Commands.CmdCreate;
+import org.basex.core.parse.Commands.CmdIndex;
+import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.util.*;
@@ -15,7 +18,7 @@ import org.basex.util.ft.*;
 /**
  * Evaluates the 'create db' command and creates a new index.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class CreateIndex extends ACreate {
@@ -30,42 +33,40 @@ public final class CreateIndex extends ACreate {
   @Override
   protected boolean run() {
     final Data data = context.data();
-    if(data.inMemory()) return error(NO_MAINMEM);
 
     final CmdIndex ci = getOption(CmdIndex.class);
     if(ci == null) return error(UNKNOWN_CMD_X, this);
-    final IndexType index;
-    switch(ci) {
-      case TEXT:
-        data.meta.createtext = true;
-        index = IndexType.TEXT;
-        break;
-      case ATTRIBUTE:
-        data.meta.createattr = true;
-        index = IndexType.ATTRIBUTE;
-        break;
-      case FULLTEXT:
-        data.meta.createftxt = true;
-        data.meta.stemming = options.get(MainOptions.STEMMING);
-        data.meta.casesens = options.get(MainOptions.CASESENS);
-        data.meta.diacritics = options.get(MainOptions.DIACRITICS);
-        data.meta.language = Language.get(options);
-        data.meta.stopwords = options.get(MainOptions.STOPWORDS);
-        index = IndexType.FULLTEXT;
-        break;
-      default:
-        return error(UNKNOWN_CMD_X, this);
+    final IndexType type;
+    if(ci == CmdIndex.TEXT) {
+      data.meta.createtext = true;
+      type = IndexType.TEXT;
+    } else if(ci == CmdIndex.ATTRIBUTE) {
+      data.meta.createattr = true;
+      type = IndexType.ATTRIBUTE;
+    } else if(ci == CmdIndex.FULLTEXT) {
+      if(data.inMemory()) return error(NO_MAINMEM);
+      data.meta.createftxt = true;
+      data.meta.stemming = options.get(MainOptions.STEMMING);
+      data.meta.casesens = options.get(MainOptions.CASESENS);
+      data.meta.diacritics = options.get(MainOptions.DIACRITICS);
+      data.meta.language = Language.get(options);
+      data.meta.stopwords = options.get(MainOptions.STOPWORDS);
+      type = IndexType.FULLTEXT;
+    } else {
+      return error(UNKNOWN_CMD_X, this);
     }
 
-    if(!data.startUpdate()) return error(DB_PINNED_X, data.meta.name);
+    if(!startUpdate()) return false;
+    boolean ok = true;
     try {
-      create(index, data, this);
-      return info(INDEX_CREATED_X_X, index, perf);
+      create(type, data, options, this);
+      ok = info(INDEX_CREATED_X_X, type, perf);
     } catch(final IOException ex) {
-      return error(Util.message(ex));
+      ok = error(Util.message(ex));
     } finally {
-      data.finishUpdate();
+      ok &= finishUpdate();
     }
+    return ok;
   }
 
   @Override

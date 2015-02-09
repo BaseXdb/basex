@@ -13,7 +13,7 @@ import org.basex.util.*;
  * This class can be used to build new node sequences.
  * At the same time, it serves as an iterator.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class NodeSeqBuilder extends AxisIter {
@@ -37,12 +37,12 @@ public final class NodeSeqBuilder extends AxisIter {
 
   /**
    * Lightweight constructor, assigning the specified array of sorted nodes.
-   * @param it node array
-   * @param s size
+   * @param nodes node array
+   * @param size size
    */
-  public NodeSeqBuilder(final ANode[] it, final int s) {
-    nodes = it;
-    size = s;
+  public NodeSeqBuilder(final ANode[] nodes, final int size) {
+    this.nodes = nodes;
+    this.size = size;
   }
 
   /**
@@ -82,12 +82,6 @@ public final class NodeSeqBuilder extends AxisIter {
   }
 
   @Override
-  public boolean reset() {
-    pos = -1;
-    return true;
-  }
-
-  @Override
   public ANode next() {
     if(check) sort(sort);
     return ++pos < size ? nodes[pos] : null;
@@ -95,11 +89,13 @@ public final class NodeSeqBuilder extends AxisIter {
 
   @Override
   public ANode get(final long i) {
+    if(check) sort(sort);
     return i < size ? nodes[(int) i] : null;
   }
 
   @Override
   public long size() {
+    if(check) sort(sort);
     return size;
   }
 
@@ -138,9 +134,9 @@ public final class NodeSeqBuilder extends AxisIter {
    * @return position, or {@code -1}
    */
   public int indexOf(final ANode n, final boolean db) {
-    if(db) return n instanceof DBNode ?
-        Math.max(binarySearch((DBNode) n, 0, size), -1) : -1;
-    for(int s = 0; s < size(); ++s) if(nodes[s].is(n)) return s;
+    if(db) return n instanceof DBNode ? Math.max(binarySearch((DBNode) n, 0, size), -1) : -1;
+    final long sz = size();
+    for(int s = 0; s < sz; ++s) if(nodes[s].is(n)) return s;
     return -1;
   }
 
@@ -167,7 +163,7 @@ public final class NodeSeqBuilder extends AxisIter {
   }
 
   /**
-   * Sorts the nodes, if necessary.
+   * Sorts the nodes if necessary.
    * @return self reference
    */
   public NodeSeqBuilder sort() {
@@ -287,17 +283,5 @@ public final class NodeSeqBuilder extends AxisIter {
   @Override
   public String toString() {
     return Util.className(this) + Arrays.toString(Arrays.copyOf(nodes, size));
-  }
-
-  /**
-   * Creates a copy of this sequence builder.
-   * @return copy
-   */
-  public NodeSeqBuilder copy() {
-    final NodeSeqBuilder b = new NodeSeqBuilder(nodes.clone(), size);
-    b.pos = pos;
-    b.sort = sort;
-    b.check = check;
-    return b;
   }
 }

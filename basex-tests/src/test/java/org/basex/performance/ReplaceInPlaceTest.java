@@ -11,7 +11,7 @@ import org.junit.Test;
  * This test replaces texts in-place and checks if the database text files increase
  * in size. Currently, the actual test is wrapped in comments.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class ReplaceInPlaceTest extends SandboxTest {
@@ -37,8 +37,6 @@ public final class ReplaceInPlaceTest extends SandboxTest {
         "<A>x.xxxxxxxxxxxxxxxxxx</A>" +
         "<A>x.xxxxxxxxxxxxxxxxxx</A></X>").execute(context);
 
-    //final long len1 = CONTEXT.data().meta.dbfile(DataText.DATATXT).length();
-
     // replace texts with random doubles
     final Random rnd = new Random();
     for(int i = 0; i < NQUERIES; i++) {
@@ -49,9 +47,6 @@ public final class ReplaceInPlaceTest extends SandboxTest {
 
     // perform final, flushed replacement
     new Flush().execute(context);
-
-    //final long len2 = CONTEXT.data().meta.dbfile(DataText.DATATXT).length();
-    //assertEquals(len1, len2);
 
     // Drop database
     new DropDB(NAME).execute(context);

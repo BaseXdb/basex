@@ -10,12 +10,12 @@ import org.basex.util.list.*;
 /**
  * Contains methods for zipping and unzipping archives.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class Zip extends Proc {
   /** Archive. */
-  private final IO archive;
+  private final IO file;
   /** Total files in a zip operation. */
   private int total;
   /** Current file in a zip operation. */
@@ -26,7 +26,7 @@ public final class Zip extends Proc {
    * @param file archive file
    */
   public Zip(final IO file) {
-    archive = file;
+    this.file = file;
   }
 
   /**
@@ -35,13 +35,10 @@ public final class Zip extends Proc {
    * @throws IOException I/O exception
    */
   private int size() throws IOException {
-    final ZipInputStream in = new ZipInputStream(archive.inputStream());
-    try {
+    try(final ZipInputStream in = new ZipInputStream(file.inputStream())) {
       int c = 0;
       while(in.getNextEntry() != null) c++;
       return c;
-    } finally {
-      in.close();
     }
   }
 
@@ -52,13 +49,10 @@ public final class Zip extends Proc {
    * @throws IOException I/O exception
    */
   public byte[] read(final String path) throws IOException {
-    final ZipInputStream in = new ZipInputStream(archive.inputStream());
-    try {
+    try(final ZipInputStream in = new ZipInputStream(file.inputStream())) {
       final byte[] cont = getEntry(in, path);
       if(cont == null) throw new FileNotFoundException(path);
       return cont;
-    } finally {
-      in.close();
     }
   }
 
@@ -68,10 +62,9 @@ public final class Zip extends Proc {
    * @throws IOException I/O exception
    */
   public void unzip(final IOFile target) throws IOException {
-    final ZipInputStream in = new ZipInputStream(archive.inputStream());
     total = size();
     curr = 0;
-    try {
+    try(final ZipInputStream in = new ZipInputStream(file.inputStream())) {
       final byte[] data = new byte[IO.BLOCKSIZE];
       for(ZipEntry ze; (ze = in.getNextEntry()) != null;) {
         curr++;
@@ -79,17 +72,12 @@ public final class Zip extends Proc {
         if(ze.isDirectory()) {
           trg.md();
         } else {
-          trg.dir().md();
-          final OutputStream out = new FileOutputStream(trg.path());
-          try {
+          trg.parent().md();
+          try(final OutputStream out = new FileOutputStream(trg.path())) {
             for(int c; (c = in.read(data)) != -1;) out.write(data, 0, c);
-          } finally {
-            out.close();
           }
         }
       }
-    } finally {
-      in.close();
     }
   }
 
@@ -100,32 +88,25 @@ public final class Zip extends Proc {
    * @throws IOException I/O exception
    */
   public void zip(final IOFile root, final StringList files) throws IOException {
-    if(!(archive instanceof IOFile)) throw new FileNotFoundException(archive.path());
+    if(!(file instanceof IOFile)) throw new FileNotFoundException(file.path());
 
-    final ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(
-        new FileOutputStream(archive.path())));
     curr = 0;
-
-    try {
+    try(final ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(
+        new FileOutputStream(file.path())))) {
       // use simple, fast compression
       out.setLevel(1);
       // loop through all files
       total = files.size();
       final byte[] data = new byte[IO.BLOCKSIZE];
-      for(final String file : files) {
+      for(final String f : files) {
         curr++;
-        final FileInputStream in = new FileInputStream(new File(root.file(), file));
-        try {
-          final String fl = Prop.WIN ? file.replace('\\', '/') : file;
+        try(final FileInputStream in = new FileInputStream(new File(root.file(), f))) {
+          final String fl = Prop.WIN ? f.replace('\\', '/') : f;
           out.putNextEntry(new ZipEntry(root.name() + '/' + fl));
           for(int c; (c = in.read(data)) != -1;) out.write(data, 0, c);
           out.closeEntry();
-        } finally {
-          in.close();
         }
       }
-    } finally {
-      out.close();
     }
   }
 
@@ -135,7 +116,7 @@ public final class Zip extends Proc {
   }
 
   /**
-   * Returns the contents of the specified entry, or {@code null}.
+   * Returns the contents of the specified entry or {@code null}.
    * @param in input stream
    * @param entry entry to be found
    * @return entry
@@ -156,7 +137,7 @@ public final class Zip extends Proc {
       final byte[] data = new byte[IO.BLOCKSIZE];
       final ByteList bl = new ByteList();
       for(int c; (c = in.read(data)) != -1;) bl.add(data, 0, c);
-      return bl.toArray();
+      return bl.finish();
     }
     return null;
   }

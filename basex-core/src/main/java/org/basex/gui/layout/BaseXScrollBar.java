@@ -4,19 +4,16 @@ import java.awt.*;
 import java.awt.event.*;
 
 import org.basex.gui.*;
-import org.basex.gui.GUIConstants.Fill;
 import org.basex.util.*;
 
 /**
  * This is a scrollbar implementation, supporting arbitrary
  * panel heights without increasing the memory consumption.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class BaseXScrollBar extends BaseXPanel {
-  /** Scrollbar size. */
-  public static final int SIZE = 16;
   /** Maximum scrolling speed. */
   private static final int MAXSTEP = 15;
   /** Animated scrollbar zooming steps. */
@@ -27,13 +24,13 @@ public final class BaseXScrollBar extends BaseXPanel {
 
   /** Reference to the scrolled component. */
   private final BaseXPanel comp;
-  /** Scrollbar width. */
-  private final int ww;
 
   /** Current scrolling speed. */
   private int step = STEPS.length / 2;
   /** Flag reporting if the scrollbar animation is running. */
   private boolean animated;
+  /** Scrollbar width. */
+  private int ww;
   /** Scrollbar height. */
   private int hh;
   /** Scrollbar slider position. */
@@ -71,9 +68,16 @@ public final class BaseXScrollBar extends BaseXPanel {
     addMouseListener(this);
     addKeyListener(this);
     addMouseMotionListener(this);
-    mode(Fill.NONE);
-    BaseXLayout.setWidth(this, SIZE);
-    ww = SIZE;
+    setOpaque(false);
+    refreshLayout();
+  }
+
+  /**
+   * Refreshes the layout.
+   */
+  public void refreshLayout() {
+    ww = 10 + GUIConstants.fontSize / 2;
+    setPreferredSize(new Dimension(ww, getPreferredSize().height));
   }
 
   /**
@@ -114,36 +118,36 @@ public final class BaseXScrollBar extends BaseXPanel {
 
     // calculate bar size
     final int barH = hh - ww * 2 + 4;
-    final float factor = (barH - barOffset) / (float) height;
+    final double factor = (barH - barOffset) / (double) height;
     int size = (int) (hh * factor);
     // define minimum size for scrollbar mover
-    barOffset = size < MINSIZE ? MINSIZE - size : 0;
+    barOffset = Math.max(0, MINSIZE - size);
     size += barOffset;
     barSize = Math.min(size, barH - 1);
     barPos = (int) Math.max(0, Math.min(pos * factor, barH - barSize));
 
     // paint scrollbar background
-    g.setColor(GUIConstants.LGRAY);
+    g.setColor(GUIConstants.PANEL);
     g.fillRect(0, 0, ww, hh);
 
     // draw scroll slider
     int bh = ww - 2 + barPos;
     BaseXLayout.drawCell(g, 0, ww, bh, bh + barSize, false);
 
-    bh += barSize >> 1;
-    g.setColor(GUIConstants.DGRAY);
+    final int d = (int) (2 * GUIConstants.SCALE);
+    bh += barSize / 2;
+    g.setColor(GUIConstants.dgray);
     g.drawLine(5, bh, ww - 6, bh);
-    g.drawLine(5, bh - 2, ww - 6, bh - 2);
-    g.drawLine(5, bh + 2, ww - 6, bh + 2);
-    smooth(g);
+    g.drawLine(5, bh - d, ww - 6, bh - d);
+    g.drawLine(5, bh + d, ww - 6, bh + d);
+    BaseXLayout.antiAlias(g);
 
     // draw scroll buttons
     drawButton(g, new int[][] { { 0, 6, 3 }, { 6, 6, 0 } }, 0, button && up);
-    drawButton(g, new int[][] { { 0, 6, 3 }, { 0, 0, 6 } }, Math.max(SIZE, hh - ww),
-        button && down);
+    drawButton(g, new int[][] { { 0, 6, 3 }, { 0, 0, 6 } }, hh - ww, button && down);
 
     // paint scrollbar lines
-    g.setColor(GUIConstants.GRAY);
+    g.setColor(GUIConstants.gray);
     g.drawLine(0, 0, 0, hh);
     g.drawLine(ww - 1, 0, ww - 1, hh);
   }
@@ -157,11 +161,12 @@ public final class BaseXScrollBar extends BaseXPanel {
    */
   private void drawButton(final Graphics g, final int[][] pol, final int y, final boolean focus) {
     BaseXLayout.drawCell(g, 0, ww, y, y + ww, focus);
-    for(int i = 0; i < pol[0].length; ++i) {
-      pol[0][i] += SIZE / 2 - 3;
-      pol[1][i] += y + SIZE / 2 - 3;
+    final int pl = pol[0].length;
+    for(int i = 0; i < pl; ++i) {
+      pol[0][i] += ww / 2 - 3;
+      pol[1][i] += y + ww / 2 - 3;
     }
-    g.setColor(focus ? Color.black : GUIConstants.DGRAY);
+    g.setColor(focus ? GUIConstants.TEXT : GUIConstants.dgray);
     g.fillPolygon(pol[0], pol[1], 3);
   }
 

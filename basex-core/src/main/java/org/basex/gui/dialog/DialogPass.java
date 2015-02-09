@@ -12,7 +12,7 @@ import org.basex.util.*;
 /**
  * Password dialog.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class DialogPass extends BaseXDialog {
@@ -24,17 +24,10 @@ public final class DialogPass extends BaseXDialog {
   private final BaseXLabel info;
 
   /**
-   * Default constructor creating invisible frame as main window.
-   */
-  public DialogPass() {
-    this(null);
-  }
-
-  /**
    * Default constructor.
    * @param main reference to the main window
    */
-  DialogPass(final GUI main) {
+  public DialogPass(final GUI main) {
     super(main, ALTER_PW);
 
     pass = new BaseXPassword(this);
@@ -54,9 +47,9 @@ public final class DialogPass extends BaseXDialog {
 
   @Override
   public void action(final Object cmp) {
-    final String nm = pass();
-    ok = !nm.isEmpty() && nm.matches("[^ ;'\"]*");
-    info.setText(ok || nm.isEmpty() ? null : Util.info(INVALID_X, PASSWORD), Msg.ERROR);
+    final String nm = password();
+    ok = nm.matches("[^ ;'\"]*");
+    info.setText(ok ? null : Util.info(INVALID_X, PASSWORD), Msg.ERROR);
     enableOK(buttons, B_OK, ok);
   }
 
@@ -70,7 +63,7 @@ public final class DialogPass extends BaseXDialog {
    * Returns the password.
    * @return password
    */
-  public String pass() {
+  public String password() {
     return new String(pass.getPassword());
   }
 }

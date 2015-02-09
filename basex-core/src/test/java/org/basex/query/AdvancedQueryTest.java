@@ -7,13 +7,12 @@ import java.io.*;
 import org.basex.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
-import org.basex.query.util.*;
 import org.basex.util.*;
 
 /**
  * This class contains some methods for performing advanced query tests.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public abstract class AdvancedQueryTest extends SandboxTest {
@@ -28,30 +27,29 @@ public abstract class AdvancedQueryTest extends SandboxTest {
   protected static String query(final String query) {
     try {
       return run(query);
-    } catch(final Exception ex) {
+    } catch(final QueryException | IOException ex) {
+      Util.errln(Util.message(ex));
+      Util.stack(12);
       final AssertionError err = new AssertionError("Query failed:\n" + query);
       err.initCause(ex);
       throw err;
     }
   }
 
-
   /**
    * Checks if a query yields the specified string.
    * @param query query string
-   * @param result expected query result
+   * @param expected expected query result
    */
-  protected static void query(final String query, final Object result) {
+  protected static void query(final String query, final Object expected) {
     final String res = query(query);
-    final String exp = result.toString();
-    if(!res.equals(exp))
-      fail("Wrong result:\n[Q] " + query + "\n[E] \u00bb" + result +
-          "\u00ab\n[F] \u00bb" + res + '\u00ab');
+    final String exp = expected.toString();
+    assertEquals("Wrong result:\n[Q] " + query + "\n[E] \u00bb" + exp +
+        "\u00ab\n[F] \u00bb" + res + "\u00ab\n", exp, res);
   }
 
   /**
    * Creates a transform expression from a given input, modification and return clause.
-   *
    * @param input input XML fragment, target of the updating expression
    * @param modification updating expression, make sure to address all target nodes via
    * the $input variable, i.e. delete node $input/a
@@ -95,12 +93,12 @@ public abstract class AdvancedQueryTest extends SandboxTest {
    * @param query query string
    * @param error expected error
    */
-  protected static void error(final String query, final Err... error) {
+  protected static void error(final String query, final QueryError... error) {
     try {
       final String res = run(query);
       final StringBuilder sb = new StringBuilder("Query did not fail:\n");
       sb.append(query).append("\n[E]");
-      for(final Err e : error) sb.append(' ').append(e);
+      for(final QueryError e : error) sb.append(' ').append(e);
       fail(sb.append("\n[F] ").append(res).toString());
     } catch(final QueryIOException ex) {
       check(query, ex.getCause(), error);
@@ -116,12 +114,14 @@ public abstract class AdvancedQueryTest extends SandboxTest {
    * Checks if an exception yields one of the specified error codes.
    * @param query query
    * @param ex resulting query exception
-   * @param error expected errors
+   * @param errors expected errors
    */
-  protected static void check(final String query, final QueryException ex, final Err... error) {
+  protected static void check(final String query, final QueryException ex,
+      final QueryError... errors) {
+
     boolean found = false;
-    final Err err = ex.err();
-    for(final Err e : error) found |= err != null ? err == e : e.qname().eq(ex.qname());
+    final QueryError err = ex.error();
+    for(final QueryError e : errors) found |= err != null ? err == e : e.qname().eq(ex.qname());
 
     if(!found) {
       final TokenBuilder tb = new TokenBuilder("\n");
@@ -129,11 +129,12 @@ public abstract class AdvancedQueryTest extends SandboxTest {
       tb.add("Error(s): ");
       if(err != null) {
         int c = 0;
-        for(final Err er : error) tb.add(c++ == 0 ? "" : "/").add(er.name());
+        for(final QueryError er : errors) tb.add(c++ == 0 ? "" : "/").add(er.name());
+        ex.printStackTrace();
         fail(tb.add("\nResult: ").add(err.name() + " (" + err.qname() + ')').toString());
       } else {
         int c = 0;
-        for(final Err er : error) tb.add(c++ == 0 ? "" : "/").add(er.qname().local());
+        for(final QueryError er : errors) tb.add(c++ == 0 ? "" : "/").add(er.qname().local());
         fail(tb.add("\nResult: ").add(ex.qname().string()).toString());
       }
     }
@@ -154,19 +155,17 @@ public abstract class AdvancedQueryTest extends SandboxTest {
    * Runs the specified query and normalizes newlines.
    * @param query query string
    * @return result
-   * @throws Exception exception
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
-  private static String run(final String query) throws Exception {
-    final QueryProcessor qp = new QueryProcessor(query, context);
-    qp.sc.baseURI(BASEURI);
-    try {
-      final ArrayOutput ao = new ArrayOutput();
-      final Serializer ser = qp.getSerializer(ao);
-      qp.execute().serialize(ser);
-      ser.close();
-      return ao.toString().replaceAll("(\\r|\\n)+ *", "");
-    } finally {
-      qp.close();
+  private static String run(final String query) throws QueryException, IOException {
+    final ArrayOutput ao = new ArrayOutput();
+    try(final QueryProcessor qp = new QueryProcessor(query, context)) {
+      qp.sc.baseURI(BASEURI);
+      try(final Serializer ser = qp.getSerializer(ao)) {
+        qp.execute().serialize(ser);
+      }
     }
+    return normNL(ao);
   }
 }

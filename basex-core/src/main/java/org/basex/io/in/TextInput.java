@@ -1,6 +1,6 @@
 package org.basex.io.in;
 
-import static org.basex.util.Token.*;
+import static org.basex.util.Strings.*;
 
 import java.io.*;
 
@@ -13,7 +13,7 @@ import org.basex.util.*;
  * it can also be explicitly set by calling {@link #encoding()}.
  * UTF-8 will be used as default encoding.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public class TextInput extends BufferInput {

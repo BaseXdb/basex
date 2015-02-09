@@ -7,26 +7,26 @@ import org.w3c.dom.*;
 /**
  * DOM - Processing instruction implementation.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class BXPI extends BXNode implements ProcessingInstruction {
   /**
    * Constructor.
-   * @param n node reference
+   * @param node node reference
    */
-  public BXPI(final ANode n) {
-    super(n);
+  BXPI(final ANode node) {
+    super(node);
   }
 
   @Override
   public String getNodeValue() {
-    return Token.string(node.string());
+    return Token.string(nd.string());
   }
 
   @Override
   public String getNodeName() {
-    return Token.string(node.name());
+    return Token.string(nd.name());
   }
 
   @Override
@@ -40,7 +40,7 @@ public final class BXPI extends BXNode implements ProcessingInstruction {
   }
 
   @Override
-  public void setData(final String dat) {
+  public void setData(final String value) {
     throw readOnly();
   }
 }

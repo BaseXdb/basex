@@ -1,6 +1,6 @@
 package org.basex.query.value.node;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import org.basex.query.*;
@@ -11,7 +11,7 @@ import org.w3c.dom.*;
 /**
  * Comment node fragment.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class FComm extends FNode {
@@ -20,38 +20,38 @@ public final class FComm extends FNode {
 
   /**
    * Constructor.
-   * @param t text value
+   * @param value text value
    */
-  public FComm(final String t) {
-    this(token(t));
+  public FComm(final String value) {
+    this(token(value));
   }
 
   /**
    * Constructor.
-   * @param t text value
+   * @param value text value
    */
-  public FComm(final byte[] t) {
+  public FComm(final byte[] value) {
     super(NodeType.COM);
-    val = t;
+    this.value = value;
   }
 
   /**
    * Constructor for creating a comment from a DOM node.
    * Originally provided by Erdal Karaca.
-   * @param com DOM node
+   * @param comment DOM node
    */
-  public FComm(final Comment com) {
-    this(com.getData());
+  public FComm(final Comment comment) {
+    this(comment.getData());
   }
 
   @Override
   public FNode copy() {
-    return new FComm(val).parent(par);
+    return new FComm(value).parent(parent);
   }
 
   @Override
   public String toString() {
-    return Util.info("<!--%-->", val);
+    return Util.info("<!--%-->", value);
   }
 
   /**
@@ -62,7 +62,7 @@ public final class FComm extends FNode {
    * @throws QueryException query exception
    */
   public static byte[] parse(final byte[] str, final InputInfo ii) throws QueryException {
-    if(contains(str, DASHES) || endsWith(str, '-')) throw COMINVALID.get(ii, str);
+    if(contains(str, DASHES) || endsWith(str, '-')) throw COMINVALID.get(ii);
     return str;
   }
 }

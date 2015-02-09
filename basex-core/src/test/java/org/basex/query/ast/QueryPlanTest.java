@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * Abstract test class for properties on the Query Plan.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
 public abstract class QueryPlanTest extends AdvancedQueryTest {
@@ -22,14 +22,13 @@ public abstract class QueryPlanTest extends AdvancedQueryTest {
    * @param pr queries on the query plan
    */
   protected static void check(final String qu, final String res, final String... pr) {
-    final QueryProcessor qp = new QueryProcessor(qu, context);
-    try {
-      // parse and compile query plan
+    try(final QueryProcessor qp = new QueryProcessor(qu, context)) {
+      // compile query
       qp.compile();
       // retrieve compiled query plan
       final FDoc plan = qp.plan();
       // compare results
-      if(res != null) assertEquals(res, qp.execute().toString());
+      if(res != null) assertEquals(res, normNL(qp.execute()));
 
       for(final String p : pr) {
         if(new QueryProcessor(p, context).context(plan).value() != Bln.TRUE) {
@@ -37,12 +36,10 @@ public abstract class QueryPlanTest extends AdvancedQueryTest {
               "- Plan: " + plan.serialize());
         }
       }
-    } catch(final Exception ex) {
+    } catch(final QueryException | QueryIOException ex) {
       final AssertionError err = new AssertionError(Util.message(ex));
       err.initCause(ex);
       throw err;
-    } finally {
-      qp.close();
     }
   }
 }

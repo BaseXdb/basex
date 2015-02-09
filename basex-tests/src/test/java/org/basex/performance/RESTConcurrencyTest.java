@@ -1,17 +1,19 @@
 package org.basex.performance;
 
-import static org.basex.http.HTTPMethod.*;
+import static org.basex.query.func.http.HTTPMethod.*;
 import static org.junit.Assert.*;
 
 import java.io.*;
 import java.net.*;
+import java.util.*;
 import java.util.concurrent.*;
 
 import org.basex.*;
-import org.basex.core.*;
+import org.basex.api.client.*;
 import org.basex.core.cmd.*;
-import org.basex.http.*;
+import org.basex.core.users.*;
 import org.basex.io.*;
+import org.basex.query.func.http.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 import org.junit.*;
@@ -20,42 +22,42 @@ import org.junit.Test;
 /**
  * Concurrency tests of BaseX REST API.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Dimitar Popov
  */
-public class RESTConcurrencyTest {
+public final class RESTConcurrencyTest extends SandboxTest {
+  /** HTTP server. */
+  private static BaseXHTTP http;
+
   /** Time-out in (ms): increase if running on a slower system. */
   private static final long TIMEOUT = 600;
   /** Socket time-out in (ms). */
   private static final int SOCKET_TIMEOUT = 3000;
-  /** Test database name. */
-  private static final String DBNAME = Util.className(RESTConcurrencyTest.class);
-  /** Context to create and drop the test database. */
-  private static final Context CTX = new Context();
   /** BaseX HTTP base URL. */
-  static final String BASE_URL = "http://localhost:8984/rest/" + DBNAME;
-
-  /** BaseX HTTP server instance under test. */
-  private Process basexHTTPServer;
+  static final String BASE_URL = "http://localhost:8984/rest/" + NAME;
 
   /**
    * Create a test database and start BaseXHTTP.
    * @throws Exception if database cannot be created or server cannot be started
    */
-  @Before
-  public void setUp() throws Exception {
-    createTestDatabase(DBNAME);
-    startBaseXHTTP();
+  @BeforeClass
+  public static void setUp() throws Exception {
+    http = new BaseXHTTP("-U" + UserText.ADMIN, "-P" + UserText.ADMIN);
+    try(final ClientSession cs = new ClientSession(context, UserText.ADMIN, UserText.ADMIN)) {
+      cs.execute(new CreateDB(NAME));
+    }
   }
 
   /**
    * Drop the test database and stop BaseXHTTP.
    * @throws Exception if database cannot be dropped or server cannot be stopped
    */
-  @After
-  public void tearDown() throws Exception {
-    stopBaseXHTTP();
-    dropTestDatabase(DBNAME);
+  @AfterClass
+  public static void tearDown() throws Exception {
+    try(final ClientSession cs = new ClientSession(context, UserText.ADMIN, UserText.ADMIN)) {
+      cs.execute(new DropDB(NAME));
+    }
+    http.stop();
   }
 
   /**
@@ -70,24 +72,24 @@ public class RESTConcurrencyTest {
   @Test
   public void testMultipleReaders() throws Exception {
     final String number = "63177";
-    final String slowQuery = "?query=(1%20to%20100000000000000)%5b.=1%5d";
+    final String slowQuery = "?query=(1%20to%20100000000000)%5b.=0%5d";
     final String fastQuery = "?query=" + number;
 
     final Get slowAction = new Get(slowQuery);
     final Get fastAction = new Get(fastQuery);
 
     final ExecutorService exec = Executors.newFixedThreadPool(2);
-
-    exec.submit(slowAction);
+    final Future<HTTPResponse> slow = exec.submit(slowAction);
     Performance.sleep(TIMEOUT); // delay in order to be sure that the reader has started
     final Future<HTTPResponse> fast = exec.submit(fastAction);
 
     try {
-      final HTTPResponse result = fast.get(TIMEOUT, TimeUnit.MILLISECONDS);
+      final HTTPResponse result = fast.get();
       assertEquals(HTTPCode.OK, result.status);
       assertEquals(number, result.data);
     } finally {
       slowAction.stop = true;
+      slow.get();
     }
   }
 
@@ -105,7 +107,7 @@ public class RESTConcurrencyTest {
   @Test
   @Ignore("There is no way to stop a query on the server!")
   public void testReaderWriter() throws Exception {
-    final String readerQuery = "?query=(1%20to%20100000000000000)%5b.=1%5d";
+    final String readerQuery = "?query=(1%20to%20100000000000000)%5b.=0%5d";
     final String writerQuery = "/test.xml";
     final byte[] content = Token.token("<a/>");
 
@@ -156,56 +158,19 @@ public class RESTConcurrencyTest {
         "ADD TO %1$d <node id=\"%1$d\"/>" +
         "]]></text></command>";
 
-    @SuppressWarnings("unchecked")
-    final
-    Future<HTTPResponse>[] tasks = new Future[count];
+    final ArrayList<Future<HTTPResponse>> tasks = new ArrayList<>();
     final ExecutorService exec = Executors.newFixedThreadPool(count);
 
     // start all writers (not at the same time, but still in parallel)
     for(int i = 0; i < count; i++) {
       final String command = String.format(template, i);
-      tasks[i] = exec.submit(new Post("", Token.token(command)));
+      tasks.add(exec.submit(new Post("", Token.token(command))));
     }
 
     // check if all have finished successfully
     for(final Future<HTTPResponse> task : tasks) {
       assertEquals(HTTPCode.OK, task.get(TIMEOUT, TimeUnit.MILLISECONDS).status);
     }
-  }
-
-  // private methods
-
-  /** Start BaseX HTTP. */
-  private void startBaseXHTTP() {
-    basexHTTPServer = Util.start(BaseXHTTP.class, "-U" + Text.S_ADMIN, "-P" + Text.S_ADMIN);
-    Performance.sleep(TIMEOUT); // give the server some time to stop
-  }
-
-  /** Stop BaseX HTTP. */
-  private void stopBaseXHTTP() {
-    Util.start(BaseXHTTP.class, "stop");
-    Performance.sleep(TIMEOUT); // give the server some time to stop
-    basexHTTPServer.destroy();
-    Performance.sleep(TIMEOUT); // give the server some time to stop
-  }
-
-  /**
-   * Create a database with the given name.
-   * @param name database name
-   * @throws IOException error during database creation
-   */
-  private static void createTestDatabase(final String name) throws IOException {
-    new CreateDB(name).execute(CTX);
-    new Close().execute(CTX);
-  }
-
-  /**
-   * Drop a database with the given name.
-   * @param name database name
-   * @throws IOException error during database drop
-   */
-  private static void dropTestDatabase(final String name) throws IOException {
-    new DropDB(name).execute(CTX);
   }
 
   // REST API:
@@ -253,7 +218,7 @@ public class RESTConcurrencyTest {
     /** Request URI. */
     private final URI uri;
     /** Content to send to the server. */
-    private final byte[] content;
+    private final byte[] data;
     /** HTTP method. */
     protected HTTPMethod method;
     /** Stop signal. */
@@ -272,12 +237,12 @@ public class RESTConcurrencyTest {
      * Construct a new request.
      * @param request request string without the base URI
      * @param data data to send to the server
-     * @param m HTTP method
+     * @param method HTTP method
      */
-    protected Put(final String request, final byte[] data, final HTTPMethod m) {
+    protected Put(final String request, final byte[] data, final HTTPMethod method) {
+      this.data = data;
+      this.method = method;
       uri = URI.create(BASE_URL + request);
-      content = data;
-      method = m;
     }
 
     @Override
@@ -286,8 +251,8 @@ public class RESTConcurrencyTest {
       try {
         hc.setDoOutput(true);
         hc.setRequestMethod(method.name());
-        hc.setRequestProperty(MimeTypes.CONTENT_TYPE, MimeTypes.APP_XML);
-        hc.getOutputStream().write(content);
+        hc.setRequestProperty(HttpText.CONTENT_TYPE, MimeTypes.APP_XML);
+        hc.getOutputStream().write(data);
         hc.getOutputStream().close();
 
         hc.setReadTimeout(SOCKET_TIMEOUT);
@@ -335,11 +300,11 @@ public class RESTConcurrencyTest {
     /**
      * Constructor.
      * @param code HTTP response status code
-     * @param d data
+     * @param data data
      */
-    public HTTPResponse(final int code, final String d) {
+    public HTTPResponse(final int code, final String data) {
+      this.data = data;
       status = HTTPCode.valueOf(code);
-      data = d;
     }
   }
 
@@ -367,12 +332,12 @@ public class RESTConcurrencyTest {
 
     /**
      * Constructor.
-     * @param c code
-     * @param m message
+     * @param code code
+     * @param message message
      */
-    private HTTPCode(final int c, final String m) {
-      code = c;
-      message = m;
+    private HTTPCode(final int code, final String message) {
+      this.code = code;
+      this.message = message;
     }
 
     /**

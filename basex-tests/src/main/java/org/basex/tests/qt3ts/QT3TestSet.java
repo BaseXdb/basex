@@ -11,7 +11,7 @@ import org.basex.core.cmd.Set;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.util.Compare.Mode;
+import org.basex.query.func.fn.Compare.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.tests.bxapi.*;
@@ -32,7 +32,7 @@ public abstract class QT3TestSet {
   public Context ctx;
 
   /** Expected results. */
-  public final ArrayList<String> expected = new ArrayList<String>();
+  public final ArrayList<String> expected = new ArrayList<>();
 
   /** QT3TS path, possibly {@code null}. */
   public static final String QT3TS = System.getenv("QT3TS");
@@ -48,8 +48,6 @@ public abstract class QT3TestSet {
   public void buildUp() throws BaseXException {
     ctx = new Context();
     new Set(MainOptions.CHOP, false).execute(ctx);
-    new Set(MainOptions.INTPARSE, false).execute(ctx);
-    new Set(MainOptions.XQUERY3, true).execute(ctx);
     result = null;
   }
 
@@ -59,11 +57,6 @@ public abstract class QT3TestSet {
     ctx.close();
     ctx = null;
     result = null;
-  }
-
-  /** Sets the XQuery version to 1.0. */
-  protected void xquery10() {
-    ctx.options.set(MainOptions.XQUERY3, false);
   }
 
   /**
@@ -135,10 +128,10 @@ public abstract class QT3TestSet {
     final XdmValue value = result.value;
     if(value == null) return fail(Util.info("Permutation of: '%'", expect));
     // cache expected results
-    final HashSet<String> exp = new HashSet<String>();
+    final HashSet<String> exp = new HashSet<>();
     for(final XdmItem it : new XQuery(expect, ctx)) exp.add(it.getString());
     // cache actual results
-    final HashSet<String> res = new HashSet<String>();
+    final HashSet<String> res = new HashSet<>();
     for(final XdmItem it : value) res.add(it.getString());
 
     if(exp.size() != res.size())
@@ -171,7 +164,7 @@ public abstract class QT3TestSet {
     // include check for comments, processing instructions and namespaces
     String flags = "'" + Mode.ALLNODES + "'";
     if(!ignorePref) flags += ",'" + Mode.NAMESPACES + "'";
-    final String query = Function.DEEP_EQUAL_OPT.args("<X>" + expect + "</X>",
+    final String query = Function._BASEX_DEEP_EQUAL.args("<X>" + expect + "</X>",
         "<X>" + res + "</X>" , "(" + flags + ")");
     return result(asBoolean(query, null), expect);
   }
@@ -203,7 +196,7 @@ public abstract class QT3TestSet {
     if(result.value != null) return fail(Util.info("Error: '%'", code));
     if(code.equals("*")) return true;
 
-    String name = code, uri = string(QueryText.ERRORURI);
+    String name = code, uri = string(QueryText.ERROR_URI);
     final Matcher m = BIND.matcher(code);
     if(m.find()) {
       uri = m.group(1);
@@ -213,7 +206,7 @@ public abstract class QT3TestSet {
 
     if(result.exc != null) {
       final QueryException qe = result.exc.getException();
-      final QNm qn = qe.err() != null ? qe.err().qname() : qe.qname();
+      final QNm qn = qe.error() != null ? qe.error().qname() : qe.qname();
       if(qn != null) return result(err.eq(qn), Util.info("% (found: %)", err, qn));
       return fail(Util.info("% (found: %)", err, "?"));
     }
@@ -241,7 +234,7 @@ public abstract class QT3TestSet {
       tb.add(it.getString());
       c++;
     }
-    return result(exp.equals(norm ? string(norm(tb.finish())) : tb.toString()), exp);
+    return result(exp.equals(norm ? string(normalize(tb.finish())) : tb.toString()), exp);
   }
 
   /**
@@ -293,7 +286,8 @@ public abstract class QT3TestSet {
     final XdmValue value = result.value;
     if(value == null) return fail(Util.info("Matches: '%'", pat));
     final XQuery match = new XQuery("fn:matches($in, $pat, $flags)", ctx);
-    match.bind("in", value.toString()).bind("pat", pat).bind("flags", flags);
+    match.bind("in", value).bind("pat", XdmItem.get(Str.get(pat)));
+    match.bind("flags", XdmItem.get(Str.get(flags)));
     return result(match.next().getBoolean(), Util.info("Matches: '%'", pat));
   }
 
@@ -401,14 +395,13 @@ public abstract class QT3TestSet {
     if(!qt3.canRead()) return null;
     try {
       f.createNewFile();
-      final BufferedInputStream in = new BufferedInputStream(new FileInputStream(qt3));
-      final BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(f));
-      final byte[] buffer = new byte[1 << 13];
-      for(int len; (len = in.read(buffer)) >= 0;) {
-        out.write(buffer, 0, len);
+      try(final BufferedInputStream in = new BufferedInputStream(new FileInputStream(qt3));
+          final BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(f))) {
+        final byte[] buffer = new byte[1 << 13];
+        for(int len; (len = in.read(buffer)) >= 0;) {
+          out.write(buffer, 0, len);
+        }
       }
-      in.close();
-      out.close();
       return f.getPath();
     } catch(IOException e) {
       e.printStackTrace();

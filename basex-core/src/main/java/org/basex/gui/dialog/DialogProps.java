@@ -20,7 +20,7 @@ import org.basex.util.list.*;
 /**
  * Database properties dialog.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class DialogProps extends BaseXDialog {
@@ -85,14 +85,16 @@ public final class DialogProps extends BaseXDialog {
     final BaseXBack tabRes = add.border(8);
 
     final Data data = main.context.data();
-    for(int i = 0; i < LABELS.length; ++i) {
-      labels[i] = new BaseXLabel(LABELS[i]).large();
-      panels[i] = new BaseXBack(new BorderLayout(0, 4));
-      infos[i] = new TextPanel(Token.token(PLEASE_WAIT_D), false, this);
-      BaseXLayout.setHeight(infos[i], 200);
-      if(i != 1) {
-        indxs[i] = new BaseXButton(" ", this);
-        indxs[i].setEnabled(!data.inMemory());
+    final int ll = LABELS.length;
+    for(int l = 0; l < ll; ++l) {
+      labels[l] = new BaseXLabel(LABELS[l]).large();
+      panels[l] = new BaseXBack(new BorderLayout(0, 4));
+      infos[l] = new TextPanel(Token.token(PLEASE_WAIT_D), false, this);
+      infos[l].setFont(dmfont);
+      BaseXLayout.setHeight(infos[l], 200);
+      if(l != 1) {
+        indxs[l] = new BaseXButton(" ", this);
+        indxs[l].setEnabled(!data.inMemory());
       }
     }
 
@@ -176,16 +178,19 @@ public final class DialogProps extends BaseXDialog {
     }
 
     final Data data = gui.context.data();
-    final boolean[] val = { true, true, true, data.meta.textindex, data.meta.attrindex,
-        data.meta.ftxtindex };
-    for(int i = 0; i < il.size(); i++) {
+    final boolean[] val = {
+      true, true, true, data.meta.textindex, data.meta.attrindex, data.meta.ftxtindex
+    };
+    final int is = il.size();
+    for(int i = 0; i < is; i++) {
       final int idx = il.get(i);
       if(updated.contains(idx)) continue;
       updated.add(idx);
       new Thread() {
         @Override
         public void run() {
-          infos[idx].setText(val[idx] ? data.info(TYPES[idx]) : Token.token(HELP[idx]));
+          infos[idx].setText(val[idx] ? data.info(TYPES[idx], gui.context.options) :
+            Token.token(HELP[idx]));
           updated.delete(idx);
         }
       }.start();
@@ -212,19 +217,20 @@ public final class DialogProps extends BaseXDialog {
   @Override
   public void action(final Object cmp) {
     if(cmp != null) {
-      for(int i = 0; i < LABELS.length; i++) {
-        if(cmp != indxs[i]) continue;
-        final String label = indxs[i].getText();
+      final int ll = LABELS.length;
+      for(int l = 0; l < ll; l++) {
+        if(cmp != indxs[l]) continue;
+        final String label = indxs[l].getText();
         final Command cmd;
-        if(label.equals(OPTIMIZE + DOTS)) {
+        if(label.equals(OPTIMIZE)) {
           cmd = new Optimize();
-        } else if(label.equals(DROP + DOTS)) {
-          cmd = new DropIndex(TYPES[i]);
+        } else if(label.equals(DROP)) {
+          cmd = new DropIndex(TYPES[l]);
         } else {
-          cmd = new CreateIndex(TYPES[i]);
+          cmd = new CreateIndex(TYPES[l]);
           ft.setOptions();
         }
-        infos[i].setText(PLEASE_WAIT_D);
+        infos[l].setText(PLEASE_WAIT_D);
         DialogProgress.execute(this, cmd);
         return;
       }
@@ -240,17 +246,18 @@ public final class DialogProps extends BaseXDialog {
 
     if(cmp == this) {
       final boolean utd = data.meta.uptodate;
-      for(int i = 0; i < LABELS.length; ++i) {
+      final int ll = LABELS.length;
+      for(int l = 0; l < ll; ++l) {
         // structural index/statistics?
-        final boolean struct = i < 3;
-        String lbl = LABELS[i];
+        final boolean struct = l < 3;
+        String lbl = LABELS[l];
         if(struct && !utd) lbl += " (" + OUT_OF_DATE + ')';
         // updates labels and infos
-        labels[i].setText(lbl);
+        labels[l].setText(lbl);
         // update button (label, disable/enable)
-        if(indxs[i] != null) {
-          indxs[i].setText((struct ? OPTIMIZE : val[i] ? DROP : CREATE) + DOTS);
-          if(struct) indxs[i].setEnabled(!utd);
+        if(indxs[l] != null) {
+          indxs[l].setText(struct ? OPTIMIZE : val[l] ? DROP : CREATE);
+          if(struct) indxs[l].setEnabled(!utd);
         }
       }
       // full-text options

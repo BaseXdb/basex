@@ -1,13 +1,15 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 
 import java.io.*;
 import java.util.*;
 
 import org.basex.core.*;
+import org.basex.core.locks.*;
 import org.basex.core.parse.*;
+import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
@@ -21,15 +23,12 @@ import org.basex.util.*;
 /**
  * Abstract class for database queries.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public abstract class AQuery extends Command {
-  /** Query result. */
-  Result result;
-
   /** Variables. */
-  private final HashMap<String, String[]> vars = new HashMap<String, String[]>();
+  private final HashMap<String, String[]> vars = new HashMap<>();
   /** HTTP context. */
   private Object http;
   /** Query processor. */
@@ -37,14 +36,17 @@ public abstract class AQuery extends Command {
   /** Query info. */
   private QueryInfo info;
 
+  /** Query result. */
+  private Result result;
+
   /**
    * Protected constructor.
-   * @param p required permission
-   * @param d requires opened database
-   * @param arg arguments
+   * @param perm required permission
+   * @param openDB requires opened database
+   * @param args arguments
    */
-  AQuery(final Perm p, final boolean d, final String... arg) {
-    super(p, d, arg);
+  AQuery(final Perm perm, final boolean openDB, final String... args) {
+    super(perm, openDB, args);
   }
 
   /**
@@ -54,9 +56,9 @@ public abstract class AQuery extends Command {
    */
   final boolean query(final String query) {
     final Performance p = new Performance();
-    String err;
+    String error;
     if(cause != null) {
-      err = Util.message(cause);
+      error = Util.message(cause);
     } else {
       try {
         long hits = 0;
@@ -76,51 +78,43 @@ public abstract class AQuery extends Command {
           if(!run) continue;
 
           final PrintOutput po = r == 0 && serial ? out : new NullOutput();
-          final Serializer ser;
-
-          if(options.get(MainOptions.CACHEQUERY)) {
-            result = qp.execute();
-            info.evaluating += p.time();
-            ser = qp.getSerializer(po);
-            result.serialize(ser);
-            hits = result.size();
-          } else {
-            hits = 0;
-            final Iter ir = qp.iter();
-            info.evaluating += p.time();
-            Item it = ir.next();
-            ser = qp.getSerializer(po);
-            while(it != null) {
-              checkStop();
-              ser.serialize(it);
-              it = ir.next();
-              ++hits;
+          try(final Serializer ser = qp.getSerializer(po)) {
+            if(options.get(MainOptions.CACHEQUERY)) {
+              result = qp.execute();
+              info.evaluating += p.time();
+              result.serialize(ser);
+              hits = result.size();
+            } else {
+              hits = 0;
+              final Iter ir = qp.iter();
+              info.evaluating += p.time();
+              for(Item it; (it = ir.next()) != null;) {
+                ser.serialize(it);
+                ++hits;
+                checkStop();
+              }
             }
           }
-          ser.close();
           qp.close();
           info.serializing += p.time();
         }
         // dump some query info
         out.flush();
         // remove string list if global locking is used and if query is updating
-        if(goptions.get(GlobalOptions.GLOBALLOCK) && qp.updating) {
+        if(soptions.get(StaticOptions.GLOBALLOCK) && qp.updating) {
           info.readLocked = null;
           info.writeLocked = null;
         }
         return info(info.toString(qp, out.size(), hits, options.get(MainOptions.QUERYINFO)));
 
-      } catch(final QueryException ex) {
+      } catch(final QueryException | IOException ex) {
         cause = ex;
-        err = Util.message(ex);
-      } catch(final IOException ex) {
-        cause = ex;
-        err = Util.message(ex);
+        error = Util.message(ex);
       } catch(final ProcException ex) {
-        err = INTERRUPTED;
+        error = INTERRUPTED;
       } catch(final StackOverflowError ex) {
         Util.debug(ex);
-        err = BASX_STACKOVERFLOW.desc;
+        error = BASX_STACKOVERFLOW.desc;
       } catch(final RuntimeException ex) {
         extError("");
         Util.debug(info());
@@ -130,7 +124,7 @@ public abstract class AQuery extends Command {
         if(qp != null) qp.close();
       }
     }
-    return extError(err);
+    return extError(error);
   }
 
   /**
@@ -150,15 +144,15 @@ public abstract class AQuery extends Command {
   }
 
   /**
-   * Checks if the query might perform updates.
+   * Checks if the query possibly performs updates.
    * @param ctx database context
-   * @param qu query
+   * @param query query string
    * @return result of check
    */
-  final boolean updating(final Context ctx, final String qu) {
+  final boolean updating(final Context ctx, final String query) {
     try {
       final Performance p = new Performance();
-      qp(qu, ctx);
+      qp(query, ctx);
       parse(p);
       return qp.updating;
     } catch(final QueryException ex) {
@@ -170,17 +164,22 @@ public abstract class AQuery extends Command {
   }
 
   /**
-   * Parses the XQuery and returns a node set.
+   * Evaluates the query and returns the result as {@link DBNodes} instance.
+   * @return result or {@code null} if result cannot be represented as {@link DBNodes} instance.
    */
-  final void queryNodes() {
+  final DBNodes dbNodes() {
     try {
-      result = qp(args[0], context).queryNodes();
-      qp.close();
+      final Result res = qp(args[0], context).execute();
+      if(res instanceof DBNodes) return (DBNodes) res;
+      // return empty result set
+      if(res.size() == 0) return new DBNodes(context.data());
     } catch(final QueryException ex) {
+      error(Util.message(ex));
+    } finally {
       qp.close();
       qp = null;
-      error(Util.message(ex));
     }
+    return null;
   }
 
   /**
@@ -192,7 +191,7 @@ public abstract class AQuery extends Command {
   private QueryProcessor qp(final String query, final Context ctx) {
     if(qp == null) {
       qp = proc(new QueryProcessor(query, ctx));
-      if(info == null) info = qp.ctx.info;
+      if(info == null) info = qp.qc.info;
     }
     return qp;
   }
@@ -202,17 +201,17 @@ public abstract class AQuery extends Command {
    * @param ctx context
    * @return serialization parameters
    */
-  public SerializerOptions parameters(final Context ctx) {
-    SerializerOptions params = Serializer.OPTIONS;
+  public String parameters(final Context ctx) {
     try {
       qp(args[0], ctx);
       parse(null);
-      params = qp.ctx.serParams();
+      return qp.qc.serParams().toString();
     } catch(final QueryException ex) {
       error(Util.message(ex));
+    } finally {
+      qp = null;
     }
-    qp = null;
-    return params;
+    return SerializerOptions.get(true).toString();
   }
 
   /**
@@ -268,18 +267,19 @@ public abstract class AQuery extends Command {
     if(comp != options.get(MainOptions.COMPPLAN)) return;
 
     // show dot plan
-    BufferOutput bo = null;
     try {
       if(options.get(MainOptions.DOTPLAN)) {
-        final String path = context.options.get(MainOptions.QUERYPATH);
+        final String path = options.get(MainOptions.QUERYPATH);
         final String dot = path.isEmpty() ? "plan.dot" :
             new IOFile(path).name().replaceAll("\\..*?$", ".dot");
 
-        bo = new BufferOutput(dot);
-        final DOTSerializer d = new DOTSerializer(bo, options.get(MainOptions.DOTCOMPACT));
-        d.serialize(qp.plan());
-        d.close();
+        try(final BufferOutput bo = new BufferOutput(dot)) {
+          try(final DOTSerializer d = new DOTSerializer(bo, options.get(MainOptions.DOTCOMPACT))) {
+            d.serialize(qp.plan());
+          }
+        }
       }
+
       // show XML plan
       if(options.get(MainOptions.XMLPLAN)) {
         info(NL + QUERY_PLAN + COL);
@@ -287,8 +287,6 @@ public abstract class AQuery extends Command {
       }
     } catch(final Exception ex) {
       Util.stack(ex);
-    } finally {
-      if(bo != null) try { bo.close(); } catch(final IOException ignored) { }
     }
   }
 
@@ -324,7 +322,7 @@ public abstract class AQuery extends Command {
   }
 
   @Override
-  public final Result result() {
+  public final Result finish() {
     final Result r = result;
     result = null;
     return r;

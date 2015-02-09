@@ -18,7 +18,7 @@ import org.basex.util.list.*;
  * tolerant alternative to Java's internal SAX parser, which is used by the
  * {@link SAXWrapper} class.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public class XMLParser extends SingleParser {
@@ -27,14 +27,14 @@ public class XMLParser extends SingleParser {
   /** Scanner reference. */
   private final XMLScanner scanner;
   /** Names of opened elements. */
-  private final TokenList tags = new TokenList();
+  private final TokenList elms = new TokenList();
   /** Whitespace handling. */
   private final BoolList chops = new BoolList();
   /** Chop whitespaces. */
   private final boolean chop;
   /** Allow document fragment as input. */
   private final boolean fragment;
-  /** Closed root tag. */
+  /** Closed root element. */
   private boolean closed;
 
   /**
@@ -69,21 +69,21 @@ public class XMLParser extends SingleParser {
     scanner.more();
     while(true) {
       if(scanner.type == Type.TEXT) {
-        final byte[] text = scanner.token.finish();
-        if(!tags.isEmpty() || fragment || !ws(text)) {
+        final byte[] text = scanner.token.toArray();
+        if(!elms.isEmpty() || fragment || !ws(text)) {
           if(chops.peek()) scanner.token.trim();
-          builder.text(scanner.token.finish());
+          builder.text(scanner.token.toArray());
         }
       } else if(scanner.type == Type.COMMENT) {
-        builder.comment(scanner.token.finish());
+        builder.comment(scanner.token.toArray());
       } else if(scanner.type == Type.PI) {
-        builder.pi(scanner.token.finish());
+        builder.pi(scanner.token.toArray());
       } else if(scanner.type == Type.EOF) {
         break;
       } else if(scanner.type != Type.DTD) {
         // L_BR, L_BR_CLOSE
         if(!fragment && closed) throw new BuildException(MOREROOTS, det());
-        if(!parseTag()) break;
+        if(!parseElement()) break;
         continue;
       }
       if(!scanner.more()) break;
@@ -91,7 +91,7 @@ public class XMLParser extends SingleParser {
     scanner.close();
     builder.encoding(scanner.encoding);
 
-    if(!tags.isEmpty()) throw new BuildException(DOCOPEN, det(), tags.pop());
+    if(!elms.isEmpty()) throw new BuildException(DOCOPEN, det(), elms.pop());
   }
 
   @Override
@@ -100,27 +100,27 @@ public class XMLParser extends SingleParser {
   }
 
   /**
-   * Parses an XML tag.
-   * @throws IOException I/O exception
+   * Parses an XML element name.
    * @return result of scanner step
+   * @throws IOException I/O exception
    */
-  private boolean parseTag() throws IOException {
+  private boolean parseElement() throws IOException {
     // close element
     if(scanner.type == Type.L_BR_CLOSE) {
       scanner.more();
 
-      // get tag name
-      byte[] tag = consumeToken(Type.ELEMNAME);
-      if(stripNS) tag = local(tag);
+      // get element name
+      byte[] name = consumeToken(Type.ELEMNAME);
+      if(stripNS) name = local(name);
       skipSpace();
 
-      if(tags.isEmpty()) throw new BuildException(OPEN, det(), tag);
-      final byte[] open = tags.pop();
-      if(!eq(open, tag)) throw new BuildException(CLOSINGELEM, det(), tag, open);
+      if(elms.isEmpty()) throw new BuildException(OPEN, det(), name);
+      final byte[] open = elms.pop();
+      if(!eq(open, name)) throw new BuildException(CLOSINGELEM, det(), name, open);
       chops.pop();
 
       builder.closeElem();
-      if(tags.isEmpty()) closed = true;
+      if(elms.isEmpty()) closed = true;
       return consume(Type.R_BR);
     }
 
@@ -142,7 +142,7 @@ public class XMLParser extends SingleParser {
       consume(Type.QUOTE);
       byte[] av = EMPTY;
       if(scanner.type == Type.ATTVALUE) {
-        av = scanner.token.finish();
+        av = scanner.token.toArray();
         scanner.more();
       }
       consume(Type.QUOTE);
@@ -166,13 +166,13 @@ public class XMLParser extends SingleParser {
     // send empty element to builder
     if(scanner.type == Type.CLOSE_R_BR) {
       builder.emptyElem(en, atts, nsp);
-      if(tags.isEmpty()) closed = true;
+      if(elms.isEmpty()) closed = true;
       return scanner.more();
     }
 
     // send start element
     builder.openElem(en, atts, nsp);
-    tags.push(en);
+    elms.push(en);
     boolean c = chops.peek();
     if(chop) {
       final int a = atts.get(DataText.XML_SPACE);
@@ -188,29 +188,29 @@ public class XMLParser extends SingleParser {
 
   /**
    * Checks if the current token matches the specified type.
-   * @param t token type to be checked
+   * @param type token type to be checked
    * @return result of scanner step
    * @throws IOException I/O exception
    */
-  private boolean consume(final Type t) throws IOException {
-    if(scanner.type == t) return scanner.more();
-    throw new BuildException(PARSEINV, det(), t.string, scanner.type.string);
+  private boolean consume(final Type type) throws IOException {
+    if(scanner.type == type) return scanner.more();
+    throw new BuildException(PARSEINV, det(), type.string, scanner.type.string);
   }
 
   /**
    * Returns the token for the specified token type. If the current token type
    * is wrong, a {@code null} reference is returned.
-   * @param t token type
+   * @param type token type
    * @return token or {@code null} if the token type is wrong
    * @throws IOException I/O exception
    */
-  private byte[] consumeToken(final Type t) throws IOException {
-    if(scanner.type == t) {
-      final byte[] tok = scanner.token.finish();
+  private byte[] consumeToken(final Type type) throws IOException {
+    if(scanner.type == type) {
+      final byte[] tok = scanner.token.toArray();
       scanner.more();
       return tok;
     }
-    throw new BuildException(PARSEINV, det(), t.string, scanner.type.string);
+    throw new BuildException(PARSEINV, det(), type.string, scanner.type.string);
   }
 
   /**

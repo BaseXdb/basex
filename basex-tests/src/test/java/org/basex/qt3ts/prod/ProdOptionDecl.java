@@ -1,12 +1,12 @@
 package org.basex.qt3ts.prod;
 
-import org.basex.tests.bxapi.XQuery;
+import org.basex.tests.bxapi.*;
 import org.basex.tests.qt3ts.*;
 
 /**
  * Tests for the OptionDecl production.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
 @SuppressWarnings("all")
@@ -17,7 +17,6 @@ public class ProdOptionDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void kOptionDeclarationProlog1() {
-    xquery10();
     final XQuery query = new XQuery(
       "declare option myopt \"option value\"; 1",
       ctx);
@@ -34,8 +33,8 @@ public class ProdOptionDecl extends QT3TestSet {
   }
 
   /**
-   * 
-   *       	The name of an option need not be a full QName in XQuery 3.0. 
+   *
+   *       	The name of an option need not be a full QName in XQuery 3.0.
    *       .
    */
   @org.junit.Test

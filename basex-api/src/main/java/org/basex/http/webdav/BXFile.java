@@ -5,8 +5,7 @@ import static org.basex.http.webdav.impl.Utils.*;
 import java.io.*;
 import java.util.*;
 
-import org.basex.http.webdav.impl.ResourceMetaData;
-import org.basex.http.webdav.impl.WebDAVService;
+import org.basex.http.webdav.impl.*;
 
 import com.bradmcevoy.http.*;
 import com.bradmcevoy.http.exceptions.*;
@@ -14,18 +13,18 @@ import com.bradmcevoy.http.exceptions.*;
 /**
  * WebDAV resource representing a file.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
-public final class BXFile extends BXAbstractResource implements FileResource {
+final class BXFile extends BXAbstractResource implements FileResource {
   /**
    * Constructor.
-   * @param d resource meta data
-   * @param s service implementation
+   * @param meta resource meta data
+   * @param service service implementation
    */
-  public  BXFile(final ResourceMetaData d, final WebDAVService<BXAbstractResource> s) {
-    super(d, s);
+  BXFile(final ResourceMetaData meta, final WebDAVService<BXAbstractResource> service) {
+    super(meta, service);
   }
 
   @Override

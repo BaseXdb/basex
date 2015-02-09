@@ -1,12 +1,13 @@
 package org.basex.query.value.item;
 
-import static org.junit.Assert.assertEquals;
-import org.junit.Test;
+import static org.junit.Assert.*;
+
+import org.junit.*;
 
 /**
  * URI tests.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Dimitar Popov
  */
 public class UriTest {
@@ -46,7 +47,8 @@ public class UriTest {
    * @param expected expected value
    */
   private static void assertUriIsValid(final String uri, final boolean expected) {
-    assertEquals("Uri validation failed for '" + uri + "'" + uri, expected, Uri.uri(uri).isValid());
+    assertEquals("Uri validation failed for '" + uri + '\'' + uri, expected,
+        Uri.uri(uri).isValid());
   }
 
   /**
@@ -55,7 +57,7 @@ public class UriTest {
    * @param expected expected value
    */
   private static void assertUriIsAbsolute(final String uri, final boolean expected) {
-    assertEquals("Uri absolute check failed for '" + uri + "'", expected,
+    assertEquals("Uri absolute check failed for '" + uri + '\'', expected,
         Uri.uri(uri).isAbsolute());
   }
 }

@@ -1,7 +1,7 @@
 package org.basex.query.func;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
-import static org.basex.query.util.Err.*;
 
 import java.lang.reflect.*;
 
@@ -17,49 +17,49 @@ import org.basex.util.hash.*;
 /**
  * Java function binding.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public final class JavaFunc extends JavaMapping {
+final class JavaFunc extends JavaMapping {
   /** Java class. */
-  private final Class<?> cls;
+  private final Class<?> clazz;
   /** Java method. */
-  private final String mth;
+  private final String method;
 
   /**
    * Constructor.
-   * @param sctx static context
-   * @param ii input info
-   * @param c Java class
-   * @param m Java method/field
-   * @param a arguments
+   * @param sc static context
+   * @param info input info
+   * @param clazz Java class
+   * @param method Java method/field
+   * @param args arguments
    */
-  JavaFunc(final StaticContext sctx, final InputInfo ii, final Class<?> c, final String m,
-      final Expr[] a) {
-    super(sctx, ii, a);
-    cls = c;
-    mth = m;
+  JavaFunc(final StaticContext sc, final InputInfo info, final Class<?> clazz, final String method,
+      final Expr[] args) {
+    super(sc, info, args);
+    this.clazz = clazz;
+    this.method = method;
   }
 
   @Override
-  protected Object eval(final Value[] args, final QueryContext ctx) throws QueryException {
+  protected Object eval(final Value[] args, final QueryContext qc) throws QueryException {
     try {
-      return mth.equals(NEW) ? constructor(args) : method(args, ctx);
+      return method.equals(NEW) ? constructor(args) : method(args, qc);
     } catch(final InvocationTargetException ex) {
       final Throwable cause = ex.getCause();
       throw cause instanceof QueryException ? ((QueryException) cause).info(info) :
-        JAVAERR.get(info, cause);
+        JAVAERROR_X.get(info, cause);
     } catch(final QueryException ex) {
       throw ex;
     } catch(final Throwable ex) {
       Util.debug(ex);
-      throw JAVAFUN.get(info, name(), foundArgs(args));
+      throw JAVACALL_X_X.get(info, name(), foundArgs(args));
     }
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new JavaFunc(sc, info, cls, mth, copyAll(ctx, scp, vs, expr));
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new JavaFunc(sc, info, clazz, method, copyAll(qc, scp, vs, exprs));
   }
 
   /**
@@ -69,32 +69,32 @@ public final class JavaFunc extends JavaMapping {
    * @throws Exception exception
    */
   private Object constructor(final Value[] ar) throws Exception {
-    for(final Constructor<?> con : cls.getConstructors()) {
+    for(final Constructor<?> con : clazz.getConstructors()) {
       final Object[] arg = args(con.getParameterTypes(), null, ar, true);
       if(arg != null) return con.newInstance(arg);
     }
-    throw JAVACON.get(info, name(), foundArgs(ar));
+    throw JAVACONSTR_X_X.get(info, name(), foundArgs(ar));
   }
 
   /**
    * Calls a method.
    * @param ar arguments
-   * @param ctx query context
+   * @param qc query context
    * @return resulting object
    * @throws Exception exception
    */
-  private Object method(final Value[] ar, final QueryContext ctx) throws Exception {
+  private Object method(final Value[] ar, final QueryContext qc) throws Exception {
     // check if a field with the specified name exists
     try {
-      final Field f = cls.getField(mth);
+      final Field f = clazz.getField(method);
       final boolean st = Modifier.isStatic(f.getModifiers());
       if(ar.length == (st ? 0 : 1)) {
         return f.get(st ? null : instObj(ar[0]));
       }
     } catch(final NoSuchFieldException ex) { /* ignored */ }
 
-    for(final Method meth : cls.getMethods()) {
-      if(!meth.getName().equals(mth)) continue;
+    for(final Method meth : clazz.getMethods()) {
+      if(!meth.getName().equals(method)) continue;
       final boolean st = Modifier.isStatic(meth.getModifiers());
       final Object[] arg = args(meth.getParameterTypes(), null, ar, st);
       if(arg != null) {
@@ -104,13 +104,13 @@ public final class JavaFunc extends JavaMapping {
           if(inst instanceof QueryModule) {
             final QueryModule mod = (QueryModule) inst;
             mod.staticContext = sc;
-            mod.queryContext = ctx;
+            mod.queryContext = qc;
           }
         }
         return meth.invoke(inst, arg);
       }
     }
-    throw JAVAMTH.get(info, name(), foundArgs(ar));
+    throw JAVAMETHOD_X_X.get(info, name(), foundArgs(ar));
   }
 
   /**
@@ -121,7 +121,7 @@ public final class JavaFunc extends JavaMapping {
    * @throws QueryException query exception
    */
   private Object instObj(final Value v) throws QueryException {
-    return cls.isInstance(v) ? v : v.toJava();
+    return clazz.isInstance(v) ? v : v.toJava();
   }
 
   /**
@@ -131,7 +131,7 @@ public final class JavaFunc extends JavaMapping {
    * @param vTypes value types
    * @param args arguments
    * @param stat static flag
-   * @return argument array, or {@code null}
+   * @return argument array or {@code null}
    * @throws QueryException query exception
    */
   static Object[] args(final Class<?>[] params, final boolean[] vTypes, final Value[] args,
@@ -178,13 +178,13 @@ public final class JavaFunc extends JavaMapping {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(NAM, cls.getName() + '.' + mth), expr);
+    addPlan(plan, planElem(NAM, clazz.getName() + '.' + method), exprs);
   }
 
   @Override
   public String description() {
     final StringBuilder sb = new StringBuilder();
-    if(mth.equals(NEW)) sb.append(NEW).append(' ').append(Util.className(cls));
+    if(method.equals(NEW)) sb.append(NEW).append(' ').append(Util.className(clazz));
     else sb.append(name());
     return sb.append("(...)").toString();
   }
@@ -194,11 +194,11 @@ public final class JavaFunc extends JavaMapping {
    * @return string
    */
   private String name() {
-    return Util.className(cls) + '.' + mth;
+    return Util.className(clazz) + '.' + method;
   }
 
   @Override
   public String toString() {
-    return cls + "." + mth + PAR1 + toString(SEP) + PAR2;
+    return clazz + "." + method + PAREN1 + toString(SEP) + PAREN2;
   }
 }

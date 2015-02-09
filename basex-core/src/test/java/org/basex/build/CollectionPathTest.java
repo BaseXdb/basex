@@ -12,7 +12,7 @@ import org.junit.Test;
 /**
  * Tests queries on collections.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Michael Seiferle
  */
 public final class CollectionPathTest extends SandboxTest {
@@ -57,9 +57,9 @@ public final class CollectionPathTest extends SandboxTest {
       "for $x in collection('" + NAME + '/' + DIR + "xmark.xml') " +
       "where $x//location contains text 'uzbekistan' " +
       "return $x";
-    final QueryProcessor qp = new QueryProcessor(find, context);
-    assertEquals(1, qp.execute().size());
-    qp.close();
+    try(final QueryProcessor qp = new QueryProcessor(find, context)) {
+      assertEquals(1, qp.execute().size());
+    }
   }
 
   /**
@@ -69,9 +69,9 @@ public final class CollectionPathTest extends SandboxTest {
   @Test
   public void findDocs() throws Exception {
     final String find = "collection('" + NAME + "/test/zipped') ";
-    final QueryProcessor qp = new QueryProcessor(find, context);
-    assertEquals(4, qp.execute().size());
-    qp.close();
+    try(final QueryProcessor qp = new QueryProcessor(find, context)) {
+      assertEquals(4, qp.execute().size());
+    }
   }
 
   /**
@@ -81,11 +81,8 @@ public final class CollectionPathTest extends SandboxTest {
   @Test
   public void baseUri() throws Exception {
     final String find = "base-uri(collection('" + NAME + '/' + DIR + "xmark.xml'))";
-    final QueryProcessor qp = new QueryProcessor(find, context);
-    try {
+    try(final QueryProcessor qp = new QueryProcessor(find, context)) {
       assertEquals(NAME + '/' + FILES[1], qp.execute().toString());
-    } finally {
-      qp.close();
     }
   }
 }

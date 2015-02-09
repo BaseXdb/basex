@@ -17,7 +17,7 @@ import org.basex.util.list.*;
 /**
  * This module contains functions for processing global sessions.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class Sessions extends QueryModule {
@@ -25,7 +25,7 @@ public final class Sessions extends QueryModule {
    * Returns the ids of all registered sessions.
    * @return session ids
    */
-  public Value ids() {
+  public static Value ids() {
     final HashMap<String, HttpSession> http = SessionListener.sessions();
     final TokenList tl = new TokenList(http.size());
     for(final String s : http.keySet()) tl.add(s);

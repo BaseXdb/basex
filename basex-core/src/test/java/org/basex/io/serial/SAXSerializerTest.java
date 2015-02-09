@@ -1,26 +1,26 @@
 package org.basex.io.serial;
 
+import static org.junit.Assert.*;
+
 import javax.xml.bind.*;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.*;
 import javax.xml.transform.sax.*;
 
-import junit.framework.Assert;
-
+import org.basex.*;
 import org.basex.core.cmd.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
-import org.basex.*;
 import org.junit.Test;
 
 /**
  * Tests the SAXSerializer.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Michael Hedenus
  */
-public class SAXSerializerTest extends SandboxTest {
+public final class SAXSerializerTest extends SandboxTest {
   /**
    * Tests the (un)marshalling of objects.
    * @throws Exception exception
@@ -36,19 +36,17 @@ public class SAXSerializerTest extends SandboxTest {
     new CreateDB(NAME, marshalled.toString()).execute(context);
 
     // get object from DB
-    final QueryProcessor queryProcessor = new QueryProcessor(
-        "//domain-object[@name='Object1']", context);
-    final Item item = queryProcessor.iter().next();
+    try(final QueryProcessor queryProcessor = new QueryProcessor(
+        "//domain-object[@name='Object1']", context)) {
+      final Item item = queryProcessor.iter().next();
 
-    final SAXSerializer saxSerializer = new SAXSerializer(item);
-    final SAXSource saxSource = new SAXSource(saxSerializer, null);
+      final SAXSerializer saxSerializer = new SAXSerializer(item);
+      final SAXSource saxSource = new SAXSource(saxSerializer, null);
 
-    final SAXSerializerObject dom = jaxbContext.createUnmarshaller().unmarshal(saxSource,
-        SAXSerializerObject.class).getValue();
-
-    queryProcessor.close();
-
-    Assert.assertEquals(42, dom.getValue());
+      final SAXSerializerObject dom = jaxbContext.createUnmarshaller().unmarshal(saxSource,
+          SAXSerializerObject.class).getValue();
+      assertEquals(42, dom.getValue());
+    }
   }
 
   /**
@@ -57,16 +55,15 @@ public class SAXSerializerTest extends SandboxTest {
    */
   @Test
   public void namespaces() throws Exception {
-    final QueryProcessor queryProcessor = new QueryProcessor("<a xmlns='x'/>", context);
-    final Item item = queryProcessor.iter().next();
+    try(final QueryProcessor queryProcessor = new QueryProcessor("<a xmlns='x'/>", context)) {
+      final Item item = queryProcessor.iter().next();
 
-    final SAXSerializer saxSerializer = new SAXSerializer(item);
-    final SAXSource saxSource = new SAXSource(saxSerializer, null);
+      final SAXSerializer saxSerializer = new SAXSerializer(item);
+      final SAXSource saxSource = new SAXSource(saxSerializer, null);
 
-    final DOMResult result = new DOMResult();
-    TransformerFactory.newInstance().newTransformer().transform(saxSource, result);
-    Assert.assertEquals("x", result.getNode().getFirstChild().getNamespaceURI());
-
-    queryProcessor.close();
+      final DOMResult result = new DOMResult();
+      TransformerFactory.newInstance().newTransformer().transform(saxSource, result);
+      assertEquals("x", result.getNode().getFirstChild().getNamespaceURI());
+    }
   }
 }

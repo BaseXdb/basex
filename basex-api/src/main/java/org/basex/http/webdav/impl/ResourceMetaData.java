@@ -1,13 +1,13 @@
 package org.basex.http.webdav.impl;
 
-import java.util.Date;
+import static org.basex.http.webdav.impl.Utils.*;
 
-import static org.basex.http.webdav.impl.Utils.stripLeadingSlash;
+import java.util.*;
 
 /**
  * Resource meta data.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Dimitar Popov
  */
 public final class ResourceMetaData {
@@ -31,39 +31,39 @@ public final class ResourceMetaData {
 
   /**
    * Constructor.
-   * @param d database owning the resource
-   * @param m resource last modification date in milliseconds
+   * @param db database owning the resource
+   * @param ms resource last modification date in milliseconds
    */
-  public ResourceMetaData(final String d, final long m) {
-    this(d, "", m);
+  public ResourceMetaData(final String db, final long ms) {
+    this(db, "", ms);
   }
 
   /**
    * Constructor.
-   * @param d database owning the resource
-   * @param p resource path
-   * @param m resource last modification date in milliseconds
+   * @param db database owning the resource
+   * @param path resource path
+   * @param ms resource last modification date in milliseconds
    */
-  public ResourceMetaData(final String d, final String p, final long m) {
-    this(d, p, m, false, null,  null);
+  ResourceMetaData(final String db, final String path, final long ms) {
+    this(db, path, ms, false, null,  null);
   }
 
   /**
    * Constructor.
-   * @param d database owning the resource
-   * @param p resource path
-   * @param m resource last modification date in milliseconds
-   * @param r raw binary file flag
-   * @param c resource content type
-   * @param s resource size in bytes
+   * @param db database owning the resource
+   * @param path resource path
+   * @param ms resource last modification date in milliseconds
+   * @param raw raw binary file flag
+   * @param ctype resource content type
+   * @param size resource size in bytes
    */
-  public ResourceMetaData(final String d, final String p, final long m, final boolean r,
-      final String c, final Long s) {
-    db = d;
-    path = stripLeadingSlash(p);
-    raw = r;
-    ctype = c;
-    size = s;
-    mdate = m == -1 ? null : new Date(m);
+  ResourceMetaData(final String db, final String path, final long ms, final boolean raw,
+      final String ctype, final Long size) {
+    this.db = db;
+    this.path = stripLeadingSlash(path);
+    this.raw = raw;
+    this.ctype = ctype;
+    this.size = size;
+    mdate = ms == -1 ? null : new Date(ms);
   }
 }

@@ -1,18 +1,19 @@
 package org.basex.util;
 
 import static org.basex.util.Token.*;
+
 import org.basex.util.hash.*;
 
 /**
  * This class provides convenience operations for XML-specific character
  * operations.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class XMLToken {
   /** Index for all HTML entities (lazy initialization). */
-  private static final TokenMap HTMLENTS = new TokenMap();
+  private static final TokenMap ENTITIESMAP = new TokenMap();
   /** The underscore. */
   private static final byte[] UNDERSCORE = { '_' };
 
@@ -77,23 +78,23 @@ public final class XMLToken {
 
   /**
    * Checks if the specified token is a valid NCName.
-   * @param v value to be checked
+   * @param value value to be checked
    * @return result of check
    */
-  public static boolean isNCName(final byte[] v) {
-    final int l = v.length;
-    return l != 0 && ncName(v, 0) == l;
+  public static boolean isNCName(final byte[] value) {
+    final int l = value.length;
+    return l != 0 && ncName(value, 0) == l;
   }
 
   /**
    * Checks if the specified token is a valid name.
-   * @param v value to be checked
+   * @param value value to be checked
    * @return result of check
    */
-  public static boolean isName(final byte[] v) {
-    final int l = v.length;
-    for(int i = 0; i < l; i += cl(v, i)) {
-      final int c = cp(v, i);
+  public static boolean isName(final byte[] value) {
+    final int l = value.length;
+    for(int i = 0; i < l; i += cl(value, i)) {
+      final int c = cp(value, i);
       if(i == 0 ? !isStartChar(c) : !isChar(c)) return false;
     }
     return l != 0;
@@ -101,70 +102,71 @@ public final class XMLToken {
 
   /**
    * Checks if the specified token is a valid NMToken.
-   * @param v value to be checked
+   * @param value value to be checked
    * @return result of check
    */
-  public static boolean isNMToken(final byte[] v) {
-    final int l = v.length;
-    for(int i = 0; i < l; i += cl(v, i)) if(!isChar(cp(v, i))) return false;
+  public static boolean isNMToken(final byte[] value) {
+    final int l = value.length;
+    for(int i = 0; i < l; i += cl(value, i)) if(!isChar(cp(value, i))) return false;
     return l != 0;
   }
 
   /**
    * Checks if the specified token is a valid QName.
-   * @param val value to be checked
+   * @param value value to be checked
    * @return result of check
    */
-  public static boolean isQName(final byte[] val) {
-    final int l = val.length;
+  public static boolean isQName(final byte[] value) {
+    final int l = value.length;
     if(l == 0) return false;
-    final int i = ncName(val, 0);
+    final int i = ncName(value, 0);
     if(i == l) return true;
-    if(i == 0 || val[i] != ':') return false;
-    final int j = ncName(val, i + 1);
+    if(i == 0 || value[i] != ':') return false;
+    final int j = ncName(value, i + 1);
     return j == l && j != i + 1;
   }
 
   /**
    * Checks the specified token as an NCName.
-   * @param v value to be checked
-   * @param p start position
+   * @param value value to be checked
+   * @param start start position
    * @return end position
    */
-  private static int ncName(final byte[] v, final int p) {
-    final int l = v.length;
-    for(int i = p; i < l; i += cl(v, i)) {
-      final int c = cp(v, i);
-      if(i == p ? !isNCStartChar(c) : !isNCChar(c)) return i;
+  private static int ncName(final byte[] value, final int start) {
+    final int l = value.length;
+    for(int i = start; i < l; i += cl(value, i)) {
+      final int c = cp(value, i);
+      if(i == start ? !isNCStartChar(c) : !isNCChar(c)) return i;
     }
     return l;
   }
 
   /**
    * Encodes a string to a valid NCName.
-   * @param nm token to be encoded
+   * @param name token to be encoded
    * @param lax lax encoding (lossy, but better readable)
    * @return valid NCName
    */
-  public static byte[] encode(final byte[] nm, final boolean lax) {
+  public static byte[] encode(final byte[] name, final boolean lax) {
     // lax encoding: trim whitespaces
-    final byte[] name = lax ? trim(nm) : nm;
-    if(name.length == 0) return UNDERSCORE;
+    final byte[] nm = lax ? trim(name) : name;
+    final int nl = nm.length;
+    if(nl == 0) return UNDERSCORE;
 
-    for(int i = 0; i < name.length; i += cl(name, i)) {
-      int cp = cp(name, i);
-      if(cp == '_' || !(i == 0 ? isNCStartChar(cp) : isNCChar(cp))) {
-        final TokenBuilder tb = new TokenBuilder(name.length << 1).add(name, 0, i);
-        for(int j = i; j < name.length; j += cl(name, j)) {
-          cp = cp(name, j);
+    for(int n = 0; n < nl; n += cl(nm, n)) {
+      int cp = cp(nm, n);
+      if(cp == '_' || (n == 0 ? !isNCStartChar(cp) : !isNCChar(cp))) {
+        final TokenBuilder tb = new TokenBuilder(nl << 1).add(nm, 0, n);
+        for(int m = n; m < nl; m += cl(nm, m)) {
+          cp = cp(nm, m);
           if(lax) {
             final boolean nc = isNCChar(cp);
             // prefix invalid start chars (numbers, dashes, dots) with underscore
-            if(j == 0 && nc && !isNCStartChar(cp)) tb.add('_');
+            if(m == 0 && nc && !isNCStartChar(cp)) tb.add('_');
             tb.add(nc ? cp : '_');
           } else if(cp == '_') {
             tb.add('_').add('_');
-          } else if(j == 0 ? isNCStartChar(cp) : isNCChar(cp)) {
+          } else if(m == 0 ? isNCStartChar(cp) : isNCChar(cp)) {
             tb.add(cp);
           } else if(cp < 0x10000) {
             addEsc(tb, cp);
@@ -177,7 +179,7 @@ public final class XMLToken {
         return tb.finish();
       }
     }
-    return name;
+    return nm;
   }
 
   /**
@@ -212,7 +214,8 @@ public final class XMLToken {
 
     // mode: 0=normal, 1=unicode, 2=underscore, 3=building unicode
     int mode = 0;
-    for(int n = 0; n < name.length;) {
+    final int nl = name.length;
+    for(int n = 0; n < nl;) {
       final int cp = cp(name, n);
       if(mode >= 3) {
         uc <<= 4;
@@ -332,16 +335,17 @@ public final class XMLToken {
     "Zeta", "\u0396", "zeta", "\u03b6", "zwj", "\u200d", "zwnj", "\u200c" };
 
   /**
-   * Returns the unicode for the specified entity, or {@code null}.
+   * Returns the unicode for the specified entity or {@code null}.
    * @param key key
    * @return unicode
    */
   public static byte[] getEntity(final byte[] key) {
-    if(HTMLENTS.isEmpty()) {
-      for(int s = 0; s < HTMLENTITIES.length; s += 2) {
-        HTMLENTS.put(HTMLENTITIES[s], HTMLENTITIES[s + 1]);
-      }
+    final TokenMap map = ENTITIESMAP;
+    if(map.isEmpty()) {
+      final String[] ents = HTMLENTITIES;
+      final int el = ents.length;
+      for(int e = 0; e < el; e += 2) map.put(ents[e], ents[e + 1]);
     }
-    return HTMLENTS.get(key);
+    return map.get(key);
   }
 }

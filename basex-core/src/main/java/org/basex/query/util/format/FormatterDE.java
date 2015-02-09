@@ -7,7 +7,7 @@ import org.basex.util.*;
 /**
  * English language formatter. Can be instantiated via {@link Formatter#get}.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 final class FormatterDE extends Formatter {
@@ -83,8 +83,7 @@ final class FormatterDE extends Formatter {
       word(tb, n, ord);
     }
     // create title case
-    final TokenParser tp = new TokenParser(tb.finish());
-    tb.reset();
+    final TokenParser tp = new TokenParser(tb.next());
     for(boolean u = true; tp.more(); u = false) {
       tb.add(u ? uc(tp.next()) : lc(tp.next()));
     }

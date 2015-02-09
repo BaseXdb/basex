@@ -1,6 +1,7 @@
 package org.basex.util;
 
 import static org.basex.util.Token.*;
+import static org.basex.util.FTToken.*;
 
 /**
  * Damerau-Levenshtein implementation. Based on the publications from
@@ -8,7 +9,7 @@ import static org.basex.util.Token.*;
  * and deletions of ones, and Damerau (1964): A technique for computer
  * detection and correction of spelling errors.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class Levenshtein {
@@ -29,10 +30,10 @@ public final class Levenshtein {
 
   /**
    * Constructor.
-   * @param err allowed errors
+   * @param error allowed errors
    */
-  public Levenshtein(final int err) {
-    error = err;
+  public Levenshtein(final int error) {
+    this.error = error;
   }
 
   /**
@@ -53,18 +54,18 @@ public final class Levenshtein {
    * @return true if the arrays are similar
    */
   public boolean similar(final byte[] token, final byte[] sub, final int err) {
-    int sl = 0;
-    for(int s = 0; s < sub.length; s += cl(sub, s)) ++sl;
-    int tl = 0;
-    for(int t = 0; t < token.length; t += cl(token, t)) ++tl;
-    if(tl == 0) return false;
+    final int sl = sub.length, tl = token.length;
+    int slen = 0, tlen = 0;
+    for(int s = 0; s < sl; s += cl(sub, s)) ++slen;
+    for(int t = 0; t < tl; t += cl(token, t)) ++tlen;
+    if(tlen == 0) return false;
 
     // use exact search for too short and too long values
-    if(sl < 4 || tl > MAX || sl > MAX) return sl == tl && same(token, sub);
+    if(err == 0 && slen < 4 || tlen > MAX || slen > MAX) return slen == tlen && same(token, sub);
 
     // skip different tokens with too different lengths
-    final int k = err == 0 ? Math.max(1, sl >> 2) : err;
-    return Math.abs(sl - tl) <= k && ls(token, tl, sub, sl, k);
+    final int k = err == 0 ? Math.max(1, slen >> 2) : err;
+    return Math.abs(slen - tlen) <= k && ls(token, tlen, sub, slen, k);
   }
 
   /**
@@ -77,32 +78,33 @@ public final class Levenshtein {
    * @return true if the arrays are similar
    */
   private boolean ls(final byte[] tk, final int tl, final byte[] sb, final int sl, final int k) {
-    int[][] m = matrix;
-    if(m == null) {
-      m = new int[MAX + 2][MAX + 2];
-      for(int i = 0; i < m.length; ++i) {
-        m[0][i] = i;
-        m[i][0] = i;
+    int[][] mx = matrix;
+    if(mx == null) {
+      mx = new int[MAX + 2][MAX + 2];
+      final int ml = mx.length;
+      for(int m = 0; m < ml; ++m) {
+        mx[0][m] = m;
+        mx[m][0] = m;
       }
-      matrix = m;
+      matrix = mx;
     }
 
     int e2 = -1, f2 = -1;
     for(int t = 0; t < tl; t += cl(tk, t)) {
-      final int e = norm(lc(cp(tk, t)));
+      final int e = noDiacritics(lc(cp(tk, t)));
       int d = Integer.MAX_VALUE;
       for(int s = 0; s < sl; s += cl(sb, s)) {
-        final int f = norm(lc(cp(sb, s)));
-        int c = m(m[t][s + 1] + 1, m[t + 1][s] + 1, m[t][s] + (e == f ? 0 : 1));
-        if(e == f2 && f == e2) c = m[t][s];
-        m[t + 1][s + 1] = c;
+        final int f = noDiacritics(lc(cp(sb, s)));
+        int c = m(mx[t][s + 1] + 1, mx[t + 1][s] + 1, mx[t][s] + (e == f ? 0 : 1));
+        if(e == f2 && f == e2) c = mx[t][s];
+        mx[t + 1][s + 1] = c;
         d = Math.min(d, c);
         f2 = f;
       }
       if(d > k) return false;
       e2 = e;
     }
-    return m[tl][sl] <= k;
+    return mx[tl][sl] <= k;
   }
 
   /**
@@ -124,9 +126,9 @@ public final class Levenshtein {
    * @return true if the arrays are equal
    */
   private static boolean same(final byte[] tk, final byte[] sb) {
-    int t = 0;
-    for(int s = 0; t < tk.length && s < sb.length; t += cl(tk, t), s += cl(sb, s)) {
-      if(lc(norm(cp(tk, t))) != lc(norm(cp(sb, t)))) return false;
+    final int tl = tk.length, sl = sb.length;
+    for(int s = 0, t = 0; t < tl && s < sl; t += cl(tk, t), s += cl(sb, s)) {
+      if(lc(noDiacritics(cp(tk, t))) != lc(noDiacritics(cp(sb, t)))) return false;
     }
     return true;
   }

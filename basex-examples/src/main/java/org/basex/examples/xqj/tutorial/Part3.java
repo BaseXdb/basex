@@ -16,7 +16,7 @@ import org.w3c.dom.*;
  *
  * Part 3: Querying Data from XML Files or Java XML APIs.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  */
 public final class Part3 extends Main {
   /**
@@ -72,10 +72,10 @@ public final class Part3 extends Main {
     if(xqs.next()) print("Query: " + query, xqs);
 
     // Execute a query from a file input stream
-    InputStream is = new FileInputStream(path + "/orders.xq");
-    xqs = xqe.executeQuery(is);
-    if(xqs.next()) print("Query from input stream", xqs);
-    is.close();
+    try(InputStream is = new FileInputStream(path + "/orders.xq")) {
+      xqs = xqe.executeQuery(is);
+      if(xqs.next()) print("Query from input stream", xqs);
+    }
 
     // Close the connection
     close(xqc);

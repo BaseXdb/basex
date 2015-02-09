@@ -3,11 +3,11 @@ package org.basex.query;
 import java.util.*;
 
 import org.basex.core.*;
+import org.basex.core.locks.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -18,7 +18,7 @@ import org.basex.util.list.*;
 /**
  * An XQuery main module.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
 public final class MainModule extends StaticScope {
@@ -26,77 +26,97 @@ public final class MainModule extends StaticScope {
   private final SeqType declType;
 
   /**
-   * Constructor.
-   * @param rt root expression
-   * @param scp variable scope
-   * @param xqdoc documentation
-   * @param sctx static context
+   * Constructor for a function call.
+   * @param sf static function
+   * @param args function arguments
+   * @throws QueryException query exception
    */
-  public MainModule(final Expr rt, final VarScope scp, final String xqdoc,
-      final StaticContext sctx) {
-    this(rt, scp, null, xqdoc, sctx, null);
+  public MainModule(final StaticFunc sf, final Expr[] args) throws QueryException {
+    this(new StaticFuncCall(sf.name, args, sf.sc, sf.info).init(sf),
+        new VarScope(sf.sc), null, sf.sc);
   }
 
   /**
    * Constructor.
-   * @param rt root expression
-   * @param scp variable scope
-   * @param xqdoc documentation
-   * @param type optional type
-   * @param sctx static context
-   * @param ii input info
+   * @param expr root expression
+   * @param scope variable scope
+   * @param doc xqdoc documentation
+   * @param sc static context
    */
-  public MainModule(final Expr rt, final VarScope scp, final SeqType type, final String xqdoc,
-      final StaticContext sctx, final InputInfo ii) {
+  public MainModule(final Expr expr, final VarScope scope, final String doc,
+      final StaticContext sc) {
+    this(expr, scope, null, doc, sc, null);
+  }
 
-    super(scp, xqdoc, sctx, ii);
-    expr = rt;
-    declType = type;
+  /**
+   * Constructor.
+   * @param expr root expression
+   * @param scope variable scope
+   * @param doc xqdoc documentation
+   * @param declType declared type (optional)
+   * @param sc static context
+   * @param info input info
+   */
+  MainModule(final Expr expr, final VarScope scope, final SeqType declType, final String doc,
+      final StaticContext sc, final InputInfo info) {
+
+    super(scope, doc, sc, info);
+    this.expr = expr;
+    this.declType = declType;
   }
 
   @Override
-  public void compile(final QueryContext ctx) throws QueryException {
+  public void compile(final QueryContext qc) throws QueryException {
     if(compiled) return;
     try {
       compiled = true;
-      expr = expr.compile(ctx, scope);
+      expr = expr.compile(qc, scope);
     } finally {
       scope.cleanUp(this);
     }
   }
 
   /**
-   * Evaluates this module and returns the result as a value.
-   * @param ctx query context
+   * Evaluates this module and returns the result as a cached value iterator.
+   * @param qc query context
    * @return result
    * @throws QueryException evaluation exception
    */
-  public Value value(final QueryContext ctx) throws QueryException {
-    final int fp = scope.enter(ctx);
+  ValueBuilder cache(final QueryContext qc) throws QueryException {
+    final int fp = scope.enter(qc);
     try {
-      final Value v = ctx.value(expr);
-      return declType != null ? declType.treat(v, info) : v;
+      final Iter iter = expr.iter(qc);
+      final ValueBuilder cache;
+      if(iter instanceof ValueBuilder) {
+        cache = (ValueBuilder) iter;
+      } else {
+        cache = new ValueBuilder(Math.max(1, (int) iter.size()));
+        for(Item it; (it = iter.next()) != null;) cache.add(it);
+      }
+      if(declType != null) declType.treat(cache.value(), info);
+      return cache;
+
     } finally {
-      scope.exit(ctx, fp);
+      VarScope.exit(qc, fp);
     }
   }
 
   /**
    * Creates a result iterator which lazily evaluates this module.
-   * @param ctx query context
+   * @param qc query context
    * @return result iterator
    * @throws QueryException query exception
    */
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    if(declType != null) return value(ctx).iter();
+  Iter iter(final QueryContext qc) throws QueryException {
+    if(declType != null) return cache(qc);
 
-    final int fp = scope.enter(ctx);
-    final Iter iter = expr.iter(ctx);
+    final int fp = scope.enter(qc);
+    final Iter iter = expr.iter(qc);
     return new Iter() {
       @Override
       public Item next() throws QueryException {
         final Item it = iter.next();
-        if(it == null) scope.exit(ctx, fp);
+        if(it == null) VarScope.exit(qc, fp);
         return it;
       }
 
@@ -108,11 +128,6 @@ public final class MainModule extends StaticScope {
       @Override
       public Item get(final long i) throws QueryException {
         return iter.get(i);
-      }
-
-      @Override
-      public boolean reset() {
-        return iter.reset();
       }
     };
   }
@@ -135,21 +150,21 @@ public final class MainModule extends StaticScope {
   /**
    * Adds the names of the databases that may be touched by the module.
    * @param lr lock result
-   * @param ctx query context
+   * @param qc query context
    * @return result of check
    * @see Proc#databases(LockResult)
    */
-  public boolean databases(final LockResult lr, final QueryContext ctx) {
-    return expr.accept(new LockVisitor(lr, ctx));
+  boolean databases(final LockResult lr, final QueryContext qc) {
+    return expr.accept(new LockVisitor(lr, qc));
   }
 
   /**
    * Lock visitor.
    * @author Leo Woerteler
    */
-  static class LockVisitor extends ASTVisitor {
+  private static final class LockVisitor extends ASTVisitor {
     /** Already visited scopes. */
-    private final IdentityHashMap<Scope, Object> funcs = new IdentityHashMap<Scope, Object>();
+    private final IdentityHashMap<Scope, Object> funcs = new IdentityHashMap<>();
     /** List of databases to be locked. */
     private final StringList sl;
     /** Focus level. */
@@ -158,11 +173,11 @@ public final class MainModule extends StaticScope {
     /**
      * Constructor.
      * @param lr lock result
-     * @param ctx query context
+     * @param qc query context
      */
-    LockVisitor(final LockResult lr, final QueryContext ctx) {
-      sl = ctx.updating ? lr.write : lr.read;
-      level = ctx.ctxItem == null ? 0 : 1;
+    private LockVisitor(final LockResult lr, final QueryContext qc) {
+      sl = qc.updating ? lr.write : lr.read;
+      level = qc.ctxItem == null ? 0 : 1;
     }
 
     @Override

@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.basex</groupId>
     <artifactId>basex-parent</artifactId>
-    <version>7.9.1-SNAPSHOT</version>
+    <version>8.0</version>
     <relativePath>..</relativePath>
   </parent>
 
@@ -49,15 +49,15 @@
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-nop</artifactId>
+      <artifactId>slf4j-simple</artifactId>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
     </dependency>
     <dependency>
-    	<groupId>com.vividsolutions</groupId>
-    	<artifactId>jts</artifactId>
+      <groupId>com.vividsolutions</groupId>
+      <artifactId>jts</artifactId>
     </dependency>
   </dependencies>
 
@@ -89,7 +89,7 @@
         <configuration>
           <jettyXml>${basedir}/src/main/webapp/WEB-INF/jetty.xml</jettyXml>
           <!-- Key and port for stopping Jetty
-          <stopKey>keyToStopJetty</stopKey> 
+          <stopKey>keyToStopJetty</stopKey>
           <stopPort>8985</stopPort> -->
         </configuration>
       </plugin>

@@ -5,7 +5,7 @@ import static org.basex.core.Text.*;
 /**
  * This class defines the available command-line commands.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 @SuppressWarnings("all")
@@ -17,6 +17,8 @@ public interface Commands {
   String ADD = "add";
   /** Command string: "alter-db". */
   String ALTER_DB = "alter-db";
+  /** Command string: "alter-password". */
+  String ALTER_PASSWORD = "alter-password";
   /** Command string: "alter-user". */
   String ALTER_USER = "alter-user";
   /** Command string: "check". */
@@ -35,8 +37,6 @@ public interface Commands {
   String CREATE_INDEX = "create-index";
   /** Command string: "create-user". */
   String CREATE_USER = "create-user";
-  /** Command string: "cs". */
-  String CS = "cs";
   /** Command string: "delete". */
   String DELETE = "delete";
   /** Command string: "drop-backup". */
@@ -85,6 +85,8 @@ public interface Commands {
   String OPTIMIZE_ALL = "optimize-all";
   /** Command string: "password". */
   String PASSWORD = "password";
+  /** Command string: "quit". */
+  String QUIT = "quit";
   /** Command string: "rename". */
   String RENAME = "rename";
   /** Command string: "replace". */
@@ -124,6 +126,8 @@ public interface Commands {
   String PATH = "path";
   /** Command attribute: "name". */
   String NAME = "name";
+  /** Command attribute: "pattern". */
+  String PATTERN = "pattern";
   /** Command attribute: "newname". */
   String NEWNAME = "newname";
   /** Command attribute: "input". */
@@ -166,30 +170,30 @@ public interface Commands {
   /** Index types. */
   enum CmdIndexInfo { NULL, TEXT, ATTRIBUTE, FULLTEXT, PATH, TAG, ATTNAME }
   /** Alter types. */
-  enum CmdAlter { DATABASE, DB, USER }
+  enum CmdAlter { DATABASE, DB, PASSWORD, USER }
   /** Repo types. */
   enum CmdRepo { INSTALL, DELETE, LIST }
 
   /** Command definitions. */
   enum Cmd {
     ADD(HELPADD), ALTER(HELPALTER), CHECK(HELPCHECK), CLOSE(HELPCLOSE), COPY(HELPCOPY),
-    CREATE(HELPCREATE), CS(HELPCS), DELETE(HELPDELETE), DROP(HELPDROP), EXIT(HELPEXIT),
+    CREATE(HELPCREATE), DELETE(HELPDELETE), DROP(HELPDROP), EXIT(HELPEXIT),
     EXPORT(HELPEXPORT), FIND(HELPFIND), FLUSH(HELPFLUSH), GET(HELPGET), GRANT(HELPGRANT),
     HELP(HELPHELP), INFO(HELPINFO), INSPECT(HELPINSPECT), KILL(HELPKILL), LIST(HELPLIST),
-    OPEN(HELPOPEN), OPTIMIZE(HELPOPTIMIZE), PASSWORD(HELPPASSWORD), RENAME(HELPRENAME),
-    REPLACE(HELPREPLACE), REPO(HELPREPO), RESTORE(HELPRESTORE), RETRIEVE(HELPRETRIEVE),
-    RUN(HELPRUN), EXECUTE(HELPEXECUTE), SET(HELPSET), SHOW(HELPSHOW), STORE(HELPSTORE),
-    TEST(HELPTEST), XQUERY(HELPXQUERY);
+    OPEN(HELPOPEN), OPTIMIZE(HELPOPTIMIZE), PASSWORD(HELPPASSWORD), QUIT(HELPEXIT),
+    RENAME(HELPRENAME), REPLACE(HELPREPLACE), REPO(HELPREPO), RESTORE(HELPRESTORE),
+    RETRIEVE(HELPRETRIEVE), RUN(HELPRUN), EXECUTE(HELPEXECUTE), SET(HELPSET),
+    SHOW(HELPSHOW), STORE(HELPSTORE), TEST(HELPTEST), XQUERY(HELPXQUERY);
 
     /** Help texts. */
     private final String[] help;
 
     /**
      * Default constructor.
-     * @param h help texts, or {@code null} if command is hidden.
+     * @param help help texts or {@code null} if command is hidden.
      */
-    Cmd(final String... h) {
-      help = h;
+    Cmd(final String... help) {
+      this.help = help;
     }
 
     /**

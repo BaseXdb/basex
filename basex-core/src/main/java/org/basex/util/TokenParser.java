@@ -7,7 +7,7 @@ import org.basex.util.list.*;
 /**
  * <p>This class can be used to iterate through all codepoints of a token.</p>
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public class TokenParser {
@@ -20,10 +20,10 @@ public class TokenParser {
 
   /**
    * Constructor.
-   * @param tok token
+   * @param token token
    */
-  public TokenParser(final byte[] tok) {
-    token = tok;
+  public TokenParser(final byte[] token) {
+    this.token = token;
     size = token.length;
   }
 

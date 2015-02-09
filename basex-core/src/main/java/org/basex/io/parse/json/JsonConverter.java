@@ -2,7 +2,7 @@ package org.basex.io.parse.json;
 
 import java.io.*;
 
-import org.basex.build.*;
+import org.basex.build.json.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
@@ -12,7 +12,7 @@ import org.basex.util.*;
 /**
  * Interface for converters from JSON to XQuery values.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
 public abstract class JsonConverter {
@@ -21,36 +21,39 @@ public abstract class JsonConverter {
 
   /**
    * Constructor.
-   * @param opts json options
+   * @param jopts json options
    */
-  JsonConverter(final JsonParserOptions opts) {
-    jopts = opts;
+  JsonConverter(final JsonParserOptions jopts) {
+    this.jopts = jopts;
   }
 
   /**
    * Converts the specified input to XML.
    * @param input input stream
    * @throws IOException I/O exception
+   * @return result
    */
-  public void convert(final IO input) throws IOException {
+  public Item convert(final IO input) throws IOException {
     final String encoding = jopts.get(JsonParserOptions.ENCODING);
-    convert(new NewlineInput(input).encoding(encoding).content(), input.path());
+    return convert(new NewlineInput(input).encoding(encoding).content(), input.path());
   }
 
   /**
    * Converts the specified input to an XQuery item.
    * @param input input
-   * @param path input path (may be {@code null)}
+   * @param path input path (can be {@code null)}
    * @throws QueryIOException query I/O exception
+   * @return result
    */
-  public void convert(final byte[] input, final String path) throws QueryIOException {
+  public Item convert(final byte[] input, final String path) throws QueryIOException {
     JsonParser.parse(Token.string(input), path, jopts, this);
+    return finish();
   }
 
   /**
-   * Returns a  for the given configuration.
+   * Returns a JSON converter for the given configuration.
    * @param jopts options
-   * @return a JSON converter
+   * @return JSON converter
    */
   public static JsonConverter get(final JsonParserOptions jopts) {
     switch(jopts.get(JsonOptions.FORMAT)) {
@@ -76,9 +79,10 @@ public abstract class JsonConverter {
 
   /**
    * Called when a pair of a JSON object is closed.
+   * @param add add pair
    * @throws QueryIOException query exception
    */
-  abstract void closePair() throws QueryIOException;
+  abstract void closePair(boolean add) throws QueryIOException;
 
   /**
    * Called when a JSON object is closed.
@@ -163,5 +167,5 @@ public abstract class JsonConverter {
    * Returns the resulting XQuery value.
    * @return result
    */
-  public abstract Item finish();
+  abstract Item finish();
 }

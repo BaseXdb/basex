@@ -1,10 +1,14 @@
 package org.basex.query.expr;
 
+import static org.basex.query.expr.path.Axis.*;
+
 import org.basex.query.*;
-import org.basex.query.path.*;
+import org.basex.query.expr.gflwor.*;
+import org.basex.query.expr.path.*;
+import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
-import org.basex.query.value.node.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
@@ -14,7 +18,7 @@ import org.basex.util.*;
 /**
  * Abstract filter expression.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public abstract class Filter extends Preds {
@@ -23,24 +27,42 @@ public abstract class Filter extends Preds {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param r expression
-   * @param p predicates
+   * @param info input info
+   * @param root root expression
+   * @param preds predicates
    */
-  Filter(final InputInfo ii, final Expr r, final Expr... p) {
-    super(ii, p);
-    root = r;
+  Filter(final InputInfo info, final Expr root, final Expr... preds) {
+    super(info, preds);
+    this.root = root;
   }
 
   /**
-   * Creates a filter expression for the given root and predicates.
-   * @param ii input info
-   * @param r root expression
-   * @param p predicate expressions
+   * Creates a filter or path expression for the given root and predicates.
+   * @param info input info
+   * @param root root expression
+   * @param preds predicate expressions
    * @return filter expression
    */
-  public static Filter get(final InputInfo ii, final Expr r, final Expr... p) {
-    return new CachedFilter(ii, r, p);
+  public static Expr get(final InputInfo info, final Expr root, final Expr... preds) {
+    final Path p = path(root, preds);
+    return p == null ? new CachedFilter(info, root, preds) : p;
+  }
+
+  /**
+   * Checks if the specified filter input can be rewritten to an axis path.
+   * @param root root expression
+   * @param preds predicate expressions
+   * @return filter expression
+   */
+  private static Path path(final Expr root, final Expr... preds) {
+    if(root instanceof AxisPath) {
+      // predicate must not be numeric
+      for(final Expr pred : preds) {
+        if(pred.seqType().mayBeNumber() || pred.has(Flag.FCS)) return null;
+      }
+      return ((AxisPath) root).addPreds(preds);
+    }
+    return null;
   }
 
   @Override
@@ -50,106 +72,135 @@ public abstract class Filter extends Preds {
   }
 
   @Override
-  public final Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+  public final Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    root = root.compile(qc, scp);
     // invalidate current context value (will be overwritten by filter)
-    final Value cv = ctx.value;
+    final Value init = qc.value;
+    qc.value = Path.initial(qc, root);
     try {
-      root = root.compile(ctx, scp);
-      // return empty root
-      if(root.isEmpty()) return optPre(null, ctx);
-      // convert filters without numeric predicates to axis paths
-      if(root instanceof AxisPath && !super.has(Flag.FCS))
-        return ((Path) root.copy(ctx, scp)).addPreds(ctx, scp, preds).compile(ctx, scp);
-
-      // optimize filter expressions
-      ctx.value = null;
-      final Expr e = super.compile(ctx, scp);
-      if(e != this) return e;
-
-      // no predicates.. return root; otherwise, do some advanced compilations
-      return preds.length == 0 ? root : opt(ctx);
+      super.compile(qc, scp);
     } finally {
-      ctx.value = cv;
+      qc.value = init;
     }
+    return optimize(qc, scp);
+  }
+
+  @Override
+  public final Expr optimizeEbv(final QueryContext qc, final VarScope scp) throws QueryException {
+    final Expr e = merge(root, qc, scp);
+    if(e != this) qc.compInfo(QueryText.OPTWRITE, this);
+    return e;
   }
 
   /**
-   * Compiles the filter expression, excluding the root node.
-   * @param ctx query context
-   * @return compiled expression
+   * Adds a predicate to the filter.
+   * This function is e.g. called by {@link For#addPredicate}.
+   * @param p predicate to be added
+   * @return self reference
    */
-  private Expr opt(final QueryContext ctx) {
-    // evaluate return type
-    final SeqType t = root.type();
+  public Expr addPred(final Expr p) {
+    preds = Array.add(preds, new Expr[preds.length + 1], p);
+    return new CachedFilter(info, root, preds);
+  }
 
-    // determine number of results and type
+  @Override
+  public final Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+    // return empty root
+    if(root.isEmpty()) return optPre(qc);
+
+    // invalidate current context value (will be overwritten by filter)
+    final Value cv = qc.value;
+    try {
+      qc.value = Path.initial(qc, root);
+      final Expr e = super.optimize(qc, scp);
+      if(e != this) return e;
+    } finally {
+      qc.value = cv;
+    }
+
+    // no predicates left.. return root
+    if(preds.length == 0) return root;
+
+    // if possible, convert filter to path
+    final Path p = path(root, preds);
+    if(p != null) return p.optimize(qc, scp);
+
+    // determine type and number of results
+    final SeqType st = root.seqType();
+    final boolean last = preds.length == 1 && preds[0].isFunction(Function.LAST);
+    final Pos pos = posIterator();
+
     final long s = root.size();
     if(s == -1) {
-      type = SeqType.get(t.type, t.zeroOrOne() ? Occ.ZERO_ONE : Occ.ZERO_MORE);
+      // unknown input size: positional access tells if there will be at most 1 result
+      final boolean zo = last || pos != null && pos.min == pos.max;
+      seqType = st.withOcc(zo ? Occ.ZERO_ONE : Occ.ZERO_MORE);
     } else {
+      // known input size: number of results can be computed in advance
       if(pos != null) {
         size = Math.max(0, s + 1 - pos.min) - Math.max(0, s - pos.max);
       } else if(last) {
         size = s > 0 ? 1 : 0;
       }
       // no results will remain: return empty sequence
-      if(size == 0) return optPre(null, ctx);
-      type = SeqType.get(t.type, size);
+      if(size == 0) return optPre(qc);
+      seqType = st.withSize(size);
+    }
+
+    // try to rewrite filter to index access
+    if(root instanceof Context || root instanceof Value && root.data() != null) {
+      final Path ip = Path.get(info, root, Step.get(info, SELF, Test.NOD, preds));
+      final Expr ie = ip.index(qc, Path.initial(qc, root));
+      if(ie != ip) return ie;
     }
 
     // no numeric predicates.. use simple iterator
-    if(!super.has(Flag.FCS)) return new IterFilter(this);
+    if(!super.has(Flag.FCS)) return copyType(new IterFilter(info, root, preds));
 
-    // pre-evaluate if root is value and if one single position() or last() function is specified
-    final boolean iter = posIterator();
-    if(preds.length == 1 && (last || pos != null) && root.isValue()) {
-      final Value v = (Value) root;
-      final long from = last ? v.size() - 1 : pos.min - 1;
-      final long len = last ? 1 : pos.max - from;
-      return optPre(SubSeq.get(v, from, len), ctx);
-    }
-
-    // only choose deterministic and context-independent offsets; e.g., skip:
-    // (1 to 10)[random:integer(10)]  or  (1 to 10)[.]
-    boolean off = false;
+    Expr e = this;
     if(preds.length == 1) {
-      final Expr p = preds[0];
-      final SeqType st = p.type();
-      off = st.type.isNumber() && st.zeroOrOne() && !p.has(Flag.CTX) && !p.has(Flag.NDT);
-      if(off) type = SeqType.get(type.type, Occ.ZERO_ONE);
+      // pre-evaluate if root is value and if one single position() or last() function is specified
+      if(root.isValue()) {
+        final Value v = (Value) root;
+        if(last) return optPre(SubSeq.get(v, v.size() - 1, 1), qc);
+        if(pos != null) return optPre(SubSeq.get(v, pos.min - 1, pos.max - pos.min + 1), qc);
+      }
+
+      if(last) {
+        // rewrite positional predicate to basex:item-at
+        e = Function._BASEX_LAST_FROM.get(null, info, root).optimize(qc, scp);
+
+      } else if(pos != null) {
+        /* rewrite positional predicate to fn:subsequence or basex:item-at
+         * example: expr[pos] -> subsequence(root, pos.min, pos.max, true()) */
+        e = pos.min == pos.max ? Function._BASEX_ITEM_AT.get(null, info, root, Int.get(pos.min)) :
+          Function.SUBSEQUENCE.get(null, info, root, Int.get(pos.min), Int.get(pos.max), Bln.TRUE);
+
+      } else if(num(preds[0])) {
+        /* - rewrite positional predicate to basex:item-at
+         *   example: expr[pos] -> basex:item-at(expr, pos)
+         * - only choose deterministic and context-independent offsets.
+         *   example: (1 to 10)[random:integer(10)]  or  (1 to 10)[.] */
+        e = Function._BASEX_ITEM_AT.get(null, info, root, preds[0]);
+      }
+    }
+    if(e != this) {
+      qc.compInfo(QueryText.OPTWRITE, this);
+      return e.optimize(qc, scp);
     }
 
-    // iterator for simple numeric predicate
-    return off || iter ? new IterPosFilter(this, off) : this;
+    // standard iterator
+    return get(info, root, preds);
   }
 
   /**
-   * Adds a predicate to the filter.
-   * @param ctx query context
-   * @param scp variable scope
-   * @param p predicate to be added
-   * @return self reference
-   * @throws QueryException query exception
+   * Checks if the specified expression returns a deterministic numeric value.
+   * @param expr expression
+   * @return result of check
    */
-  public abstract Filter addPred(final QueryContext ctx, final VarScope scp, final Expr p)
-      throws QueryException;
-
-  @Override
-  public final Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
-    // invalidate current context value (will be overwritten by filter)
-    final Value cv = ctx.value;
-    try {
-      // return empty root
-      if(root.isEmpty()) return optPre(null, ctx);
-      // convert filters without numeric predicates to axis paths
-      if(root instanceof AxisPath && !super.has(Flag.FCS))
-        return ((Path) root.copy(ctx, scp)).addPreds(ctx, scp, preds);
-
-      // no predicates.. return root; otherwise, do some advanced compilations
-      return preds.length == 0 ? root : opt(ctx);
-    } finally {
-      ctx.value = cv;
-    }
+  private static boolean num(final Expr expr) {
+    final SeqType pt = expr.seqType();
+    return pt.type.isNumber() && pt.zeroOrOne() && !expr.has(Flag.CTX) && !expr.has(Flag.NDT);
   }
 
   @Override
@@ -158,39 +209,28 @@ public abstract class Filter extends Preds {
   }
 
   @Override
-  public final boolean removable(final Var v) {
-    return root.removable(v) && super.removable(v);
+  public final boolean removable(final Var var) {
+    return root.removable(var) && super.removable(var);
   }
 
   @Override
-  public VarUsage count(final Var v) {
-    final VarUsage inPreds = super.count(v), inRoot = root.count(v);
+  public VarUsage count(final Var var) {
+    final VarUsage inPreds = super.count(var), inRoot = root.count(var);
     if(inPreds == VarUsage.NEVER) return inRoot;
     final long sz = root.size();
-    return sz >= 0 && sz <= 1 || root.type().zeroOrOne()
-        ? inRoot.plus(inPreds) : VarUsage.MORE_THAN_ONCE;
+    return sz >= 0 && sz <= 1 || root.seqType().zeroOrOne() ? inRoot.plus(inPreds) :
+      VarUsage.MORE_THAN_ONCE;
   }
 
   @Override
-  public Expr inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e)
+  public Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
       throws QueryException {
 
-    final boolean pr = super.inline(ctx, scp, v, e) != null;
-    final Expr rt = root == null ? null : root.inline(ctx, scp, v, e);
+    final Expr rt = root == null ? null : root.inline(qc, scp, var, ex);
     if(rt != null) root = rt;
-    return pr || rt != null ? optimize(ctx, scp) : null;
-  }
 
-  @Override
-  public final void plan(final FElem plan) {
-    final FElem el = planElem();
-    addPlan(plan, el, root);
-    super.plan(el);
-  }
-
-  @Override
-  public final String toString() {
-    return root + super.toString();
+    final boolean pr = inlineAll(qc, scp, preds, var, ex);
+    return pr || rt != null ? optimize(qc, scp) : null;
   }
 
   @Override
@@ -208,5 +248,10 @@ public abstract class Filter extends Preds {
     int sz = 1;
     for(final Expr e : preds) sz += e.exprSize();
     return sz + root.exprSize();
+  }
+
+  @Override
+  public final String toString() {
+    return "(" + root + ")" + super.toString();
   }
 }

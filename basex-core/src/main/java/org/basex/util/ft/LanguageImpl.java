@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * Abstract class for stemmer and tokenizer implementations.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Jens Erat
  */
 abstract class LanguageImpl extends FTIterator implements Comparable<LanguageImpl> {
@@ -32,7 +32,7 @@ abstract class LanguageImpl extends FTIterator implements Comparable<LanguageImp
    * @return collection
    */
   static Collection<Language> collection(final String ln) {
-    final HashSet<Language> coll = new HashSet<Language>();
+    final HashSet<Language> coll = new HashSet<>();
     final Language lang = Language.get(ln);
     if(lang != null) coll.add(lang);
     return coll;

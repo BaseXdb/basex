@@ -21,7 +21,7 @@ import org.basex.util.list.*;
 /**
  * This class offers a real tree view.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Wolfgang Miller
  */
 public final class TreeView extends View implements TreeConstants {
@@ -153,18 +153,19 @@ public final class TreeView extends View implements TreeConstants {
     final Context c = gui.context;
     final Data data = c.data();
     if(data == null) return;
+
     if(showAttsChanged()) paintType = Refresh.INIT;
-    if(slimToTextChanged() && paintType == Refresh.VOID)
-      paintType = Refresh.RESIZE;
+    else if(slimToTextChanged() && paintType == Refresh.VOID) paintType = Refresh.RESIZE;
 
     super.paintComponent(g);
     gui.painting = true;
 
-    final Nodes nodes = gui.context.current();
+    final DBNodes nodes = gui.context.current();
     roots = nodes.pres;
-    if(roots.length == 0) return;
+    final int rl = roots.length;
+    if(rl == 0) return;
 
-    for(int i = 0; !showAtts && i < roots.length; ++i) {
+    for(int i = 0; !showAtts && i < rl; ++i) {
       if(roots[i] >= data.meta.size) break;
       if(data.kind(roots[i]) == Data.ATTR) {
         drawMessage(g, NO_ATTS);
@@ -172,7 +173,7 @@ public final class TreeView extends View implements TreeConstants {
       }
     }
 
-    smooth(g);
+    BaseXLayout.antiAlias(g);
     g.setFont(font);
     fontHeight = g.getFontMetrics().getHeight();
 
@@ -247,7 +248,7 @@ public final class TreeView extends View implements TreeConstants {
     final Graphics tg = treeImage.getGraphics();
     final int rl = roots.length;
     tg.setFont(font);
-    smooth(tg);
+    BaseXLayout.antiAlias(tg);
 
     for(int rn = 0; rn < rl; ++rn) {
       final int h = sub.subtreeHeight(rn);
@@ -255,8 +256,8 @@ public final class TreeView extends View implements TreeConstants {
       for(int lv = 0; lv < h; ++lv) {
         final boolean br = tr.bigRect(sub, rn, lv);
         final TreeRect[] lr = tr.getTreeRectsPerLevel(rn, lv);
-
-        for(int i = 0; i < lr.length; ++i) {
+        final int ll = lr.length;
+        for(int i = 0; i < ll; ++i) {
           final TreeRect r = lr[i];
           final int pre = sub.prePerIndex(rn, lv, i);
           drawRectangle(tg, rn, lv, r, pre, Draw.RECTANGLE);
@@ -293,7 +294,7 @@ public final class TreeView extends View implements TreeConstants {
     }
     final int x = mw - (BaseXLayout.width(g, message) >> 1);
     final int y = mh + fontHeight;
-    g.setColor(Color.BLACK);
+    g.setColor(TEXT);
     g.drawString(message, x, y);
   }
 
@@ -311,7 +312,7 @@ public final class TreeView extends View implements TreeConstants {
     int xx = x;
     final int y = getYperLevel(lv);
     int nh = nodeHeight;
-    g.setColor(color2A);
+    g.setColor(color(7));
     while(nh > 0) {
       nh -= ss;
       if(nh < 0) nh = 0;
@@ -366,7 +367,7 @@ public final class TreeView extends View implements TreeConstants {
 
     Color borderColor = null;
     Color fillColor;
-    Color textColor = Color.BLACK;
+    Color textColor = TEXT;
 
     switch(t) {
       case RECTANGLE:
@@ -378,7 +379,7 @@ public final class TreeView extends View implements TreeConstants {
       case HIGHLIGHT:
         borderColor = color4;
         final int alpha = 0xDD000000;
-        final int rgb = GUIConstants.LGRAY.getRGB();
+        final int rgb = lgray.getRGB();
         fillColor = new Color(rgb + alpha, true);
         if(h > 4) border = true;
         fill = !br && !marked;
@@ -394,11 +395,11 @@ public final class TreeView extends View implements TreeConstants {
         final int rgbD = color(6).getRGB();
         fillColor = new Color(rgbD + alphaD, true);
         borderColor = color(8);
-        textColor = Color.WHITE;
+        textColor = BACK;
         fill = !marked;
         border = true;
         if(h < 4) {
-          fillColor = SMALL_SPACE_COLOR;
+          fillColor = color(7);
           borderColor = fillColor;
           txt = false;
         }
@@ -406,11 +407,11 @@ public final class TreeView extends View implements TreeConstants {
       case PARENT:
       default:
         fillColor = color(6);
-        textColor = Color.WHITE;
+        textColor = BACK;
         fill = !br && !marked;
         border = !br;
         if(h < 4) {
-          fillColor = SMALL_SPACE_COLOR;
+          fillColor = color(7);
           borderColor = color(8);
           txt = false;
         }
@@ -445,7 +446,7 @@ public final class TreeView extends View implements TreeConstants {
 
     final int x = r.x;
     final int y = getYperLevel(lv);
-    final int rm = x + (int) (r.w / 2f);
+    final int rm = x + r.w / 2;
 
     int tw = BaseXLayout.width(g, s);
 
@@ -456,12 +457,12 @@ public final class TreeView extends View implements TreeConstants {
         s = s.substring(0, (s.length() - 2) / 2) + "..";
       }
     }
-    final int yy = (int) (y + (nodeHeight + fontHeight - 4) / 2d);
-    g.drawString(s, (int) (rm - tw / 2d + BORDER_PADDING), yy);
+    final double yy = y + (nodeHeight + fontHeight * .5) / 2;
+    g.drawString(s, (int) (rm - tw / 2d + BORDER_PADDING), (int) yy);
   }
 
   /**
-   * Returns draw Color.
+   * Returns draw color.
    * @param l the current level
    * @param fill if true it returns fill color, rectangle color else
    * @return draw color
@@ -526,7 +527,7 @@ public final class TreeView extends View implements TreeConstants {
         }
       }
     }
-    gui.notify.mark(new Nodes(list.toArray(), gui.context.data()), this);
+    gui.notify.mark(new DBNodes(gui.context.data(), list.finish()), this);
   }
 
   /**
@@ -543,17 +544,18 @@ public final class TreeView extends View implements TreeConstants {
   private void markNodes() {
     markedImage = createImage();
     final Graphics mg = markedImage.getGraphics();
-    smooth(mg);
+    BaseXLayout.antiAlias(mg);
     mg.setFont(font);
 
     final int[] mark = gui.context.marked.pres;
     if(mark.length == 0) return;
 
     int rn = 0;
-    while(rn < roots.length) {
-      final LinkedList<Integer> marklink = new LinkedList<Integer>();
-      for(int i = 0; i < mark.length; ++i)
-        marklink.add(i, mark[i]);
+    final int rl = roots.length;
+    while(rn < rl) {
+      final int ml = mark.length;
+      final LinkedList<Integer> marklink = new LinkedList<>();
+      for(int m = 0; m < ml; ++m) marklink.add(m, mark[m]);
 
       for(int lv = 0; lv < sub.subtreeHeight(rn); ++lv) {
         final int y = getYperLevel(lv);
@@ -619,7 +621,7 @@ public final class TreeView extends View implements TreeConstants {
 
     final int y = getYperLevel(lv);
     final int np = getBigRectPosition(rn, lv, pre, r);
-    g.setColor(nodeHeight < 4 ? SMALL_SPACE_COLOR : color(7));
+    g.setColor(color(7));
     g.drawLine(np, y, np, y + nodeHeight);
     return np;
   }
@@ -687,8 +689,8 @@ public final class TreeView extends View implements TreeConstants {
     }
 
     // if there are descendants draw them
-    if((t == Draw.CONNECTION || t == Draw.HIGHLIGHT) && size > 1 &&
-        lv + 1 < height) highlightDescendants(g, rn, lv, r, pre, rc, t);
+    if((t == Draw.CONNECTION || t == Draw.HIGHLIGHT) && size > 1 && lv + 1 < height)
+      highlightDescendants(g, rn, lv, r, pre, rc, t);
 
     // draws node text
     if(t == Draw.HIGHLIGHT) drawThumbnails(g, lv, pre, r, root);
@@ -718,14 +720,14 @@ public final class TreeView extends View implements TreeConstants {
       g.fillRect(x, y + h, w + 2, fh + 2);
       g.setColor(color(6));
       g.drawRect(x - 1, y + h + 1, w + 3, fh + 1);
-      g.setColor(Color.WHITE);
-      g.drawString(s, r.x + 1, (int) (y + h + (float) fh) - 2);
+      g.setColor(BACK);
+      g.drawString(s, r.x + 1, (int) (y + h + (double) fh) - 2);
     } else {
       g.fillRect(r.x, y - fh, w + 2, fh);
       g.setColor(color(6));
       g.drawRect(r.x - 1, y - fh - 1, w + 3, fh + 1);
-      g.setColor(Color.WHITE);
-      g.drawString(s, r.x + 1, (int) (y - h / (float) fh) - 2);
+      g.setColor(BACK);
+      g.drawString(s, r.x + 1, (int) (y - h / (double) fh) - 2);
     }
   }
 
@@ -801,7 +803,8 @@ public final class TreeView extends View implements TreeConstants {
     int lvv = lv;
     int cen = parc;
 
-    for(int i = 1; i < subt.length && tr.bigRect(sub, rn, lvv); ++i) {
+    final int sl = subt.length;
+    for(int i = 1; i < sl && tr.bigRect(sub, rn, lvv); ++i) {
       final TreeBorder bos = sub.treeBorder(rn, lvv);
       final TreeBorder bo = subt[i];
 
@@ -821,10 +824,7 @@ public final class TreeView extends View implements TreeConstants {
         case CONNECTION:
           break;
         default:
-          final int rgb = color(7).getRGB();
-          final int alpha = 0x33000000;
-          g.setColor(nodeHeight < 4 ? SMALL_SPACE_COLOR : new Color(
-              rgb + alpha, false));
+          g.setColor(color(7));
           if(nodeHeight > 2) {
             g.drawRect(df, getYperLevel(lvv) + 1, ww, nodeHeight - 2);
           } else {
@@ -832,8 +832,7 @@ public final class TreeView extends View implements TreeConstants {
           }
       }
 
-      if(lvv + 1 < sub.subtreeHeight(rn)
-          && !tr.bigRect(sub, rn, lvv + 1)) {
+      if(lvv + 1 < sub.subtreeHeight(rn) && !tr.bigRect(sub, rn, lvv + 1)) {
         final Data d = gui.context.data();
         for(int j = start; j < start + bo.size; ++j) {
           final int pre = sub.prePerIndex(rn, lvv, j);
@@ -854,19 +853,17 @@ public final class TreeView extends View implements TreeConstants {
    * @return color
    */
   private static Color getConnectionColor(final Draw t) {
-    final int alpha;
-    final int rgb;
-
+    final int alpha, index;
     switch(t) {
       case CONNECTION:
         alpha = 0x20000000;
-        rgb = color(4).getRGB();
-        return new Color(rgb + alpha, true);
-      default:
+        index = 4;
+        break;
+     default:
         alpha = 0x60000000;
-        rgb = color(8).getRGB();
-        return new Color(rgb + alpha, true);
+        index = 8;
     }
+    return new Color(color(index).getRGB() + alpha, true);
   }
 
   /**
@@ -904,7 +901,8 @@ public final class TreeView extends View implements TreeConstants {
     if(refreshedFocus) {
       fpre = gui.context.focused;
 
-      for(int r = 0; r < roots.length; ++r) {
+      final int rl = roots.length;
+      for(int r = 0; r < rl; ++r) {
         for(int i = 0; i < sub.subtreeHeight(r); ++i) {
           if(tr.bigRect(sub, r, i)) {
             final int index = sub.preIndex(r, i, fpre);
@@ -937,9 +935,9 @@ public final class TreeView extends View implements TreeConstants {
       if(h < 0 || lv >= h) return false;
 
       final TreeRect[] rL = tr.getTreeRectsPerLevel(rn, lv);
-
-      for(int i = 0; i < rL.length; ++i) {
-        final TreeRect r = rL[i];
+      final int rl = rL.length;
+      for(int l = 0; l < rl; l++) {
+        final TreeRect r = rL[l];
 
         if(r.contains(mx)) {
           frect = r;
@@ -950,7 +948,7 @@ public final class TreeView extends View implements TreeConstants {
           if(tr.bigRect(sub, rn, lv)) {
             pre = tr.getPrePerXPos(sub, rn, lv, mx);
           } else {
-            pre = sub.prePerIndex(rn, lv, i);
+            pre = sub.prePerIndex(rn, lv, l);
           }
           fpre = pre;
           gui.notify.focus(pre, this);
@@ -987,8 +985,8 @@ public final class TreeView extends View implements TreeConstants {
    * @return the level if inside a node rectangle, -1 else
    */
   private int getLevelPerY(final int y) {
-    final double f = (y - topMargin) / ((float) levelDistance + nodeHeight);
-    final double b = nodeHeight / (float) (levelDistance + nodeHeight);
+    final double f = (y - topMargin) / ((double) levelDistance + nodeHeight);
+    final double b = nodeHeight / (double) (levelDistance + nodeHeight);
     return f <= (int) f + b ? (int) f : -1;
   }
 
@@ -998,22 +996,23 @@ public final class TreeView extends View implements TreeConstants {
   private void setLevelDistance() {
     final int h = wheight - BOTTOM_MARGIN;
     int lvs = 0;
-    for(int i = 0; i < roots.length; ++i) {
-      final int th = sub.subtreeHeight(i);
+    final int rl = roots.length;
+    for(int r = 0; r < rl; ++r) {
+      final int th = sub.subtreeHeight(r);
       if(th > lvs) lvs = th;
     }
-    nodeHeight = MAX_NODE_HEIGHT;
-    int lD;
-    while((lD = (int) ((h - lvs * nodeHeight) / (double) (lvs - 1))) <
-        (nodeHeight <= BEST_NODE_HEIGHT ? MIN_LEVEL_DISTANCE
-        : BEST_LEVEL_DISTANCE)
-        && nodeHeight >= MIN_NODE_HEIGHT)
-      nodeHeight--;
-    levelDistance = lD < MIN_LEVEL_DISTANCE ? MIN_LEVEL_DISTANCE
-        : lD > MAX_LEVEL_DISTANCE ? MAX_LEVEL_DISTANCE : lD;
-    final int ih = (int) ((h - (levelDistance * (lvs - 1) + lvs * nodeHeight))
-        / 2d);
-    topMargin = ih < TOP_MARGIN ? TOP_MARGIN : ih;
+    int nh = (int) (fontSize * 1.4);
+    final int dist = nh <= BEST_NODE_HEIGHT ? MIN_LEVEL_DISTANCE : BEST_LEVEL_DISTANCE;
+    while(true) {
+      final double ld = (h - lvs * nh) / (lvs - 1d);
+      if(ld >= dist || nh < MIN_NODE_HEIGHT) {
+        levelDistance = Math.max(MIN_LEVEL_DISTANCE, Math.min(MAX_LEVEL_DISTANCE, (int) ld));
+        break;
+      }
+      nh--;
+    }
+    nodeHeight = nh;
+    topMargin = Math.max(TOP_MARGIN, (h - (levelDistance * (lvs - 1) + lvs * nh)) / 2);
   }
 
   /**
@@ -1023,7 +1022,7 @@ public final class TreeView extends View implements TreeConstants {
   private boolean showAttsChanged() {
     final GUIOptions gopts = gui.gopts;
     if(gopts.get(GUIOptions.TREEATTS) == showAtts) return false;
-    showAtts =  !showAtts;
+    showAtts = !showAtts;
     return true;
   }
 
@@ -1111,7 +1110,7 @@ public final class TreeView extends View implements TreeConstants {
       if(flv >= sub.subtreeHeight(frn)) return;
 
       if(tr.bigRect(sub, frn, flv)) {
-        final Nodes ns = new Nodes(gui.context.data());
+        final DBNodes ns = new DBNodes(gui.context.data());
         int sum = getHitBigRectNodesNum(frn, flv, frect);
         final int fix = sub.preIndex(frn, flv, fpre);
         if(fix + sum + 1 == sub.levelSize(frn, flv)) ++sum;
@@ -1140,8 +1139,8 @@ public final class TreeView extends View implements TreeConstants {
   @Override
   public void mouseWheelMoved(final MouseWheelEvent e) {
     if(gui.updating || gui.context.focused == -1) return;
-    if(e.getWheelRotation() <= 0) gui.notify.context(new Nodes(
-        gui.context.focused, gui.context.data()), false, null);
+    if(e.getWheelRotation() <= 0) gui.notify.context(new DBNodes(
+        gui.context.data(), gui.context.focused), false, null);
     else gui.notify.hist(false);
   }
 

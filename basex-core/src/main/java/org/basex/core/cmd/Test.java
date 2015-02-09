@@ -5,15 +5,17 @@ import static org.basex.core.Text.*;
 import java.io.*;
 
 import org.basex.core.*;
+import org.basex.core.locks.*;
+import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
-import org.basex.query.util.unit.*;
+import org.basex.query.func.unit.*;
 import org.basex.util.*;
 
 /**
  * Evaluates the 'test' command and processes an input file.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class Test extends Command {
@@ -29,12 +31,12 @@ public final class Test extends Command {
   protected boolean run() {
     final IOFile root = new IOFile(args[0]);
     if(!root.exists()) return error(RES_NOT_FOUND_X,
-        context.user.has(Perm.CREATE) ? root : args[0]);
+        context.user().has(Perm.CREATE) ? root : args[0]);
 
     try {
-      final XMLSerializer ser = Serializer.get(out);
+      final Serializer ser = Serializer.get(out);
       final Suite suite = new Suite();
-      ser.serialize(suite.test(root, context));
+      ser.serialize(suite.test(root, context, this));
       out.print(NL);
       out.flush();
 
@@ -56,7 +58,7 @@ public final class Test extends Command {
    * @param string string
    * @param number number
    */
-  private void add(final StringBuilder sb, final String string, final int number) {
+  private static void add(final StringBuilder sb, final String string, final int number) {
     sb.append(number).append(' ').append(string);
     if(number != 1) sb.append('s');
     sb.append(", ");

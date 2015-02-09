@@ -2,12 +2,12 @@ package org.basex.server;
 
 import static org.basex.query.func.Function.*;
 import static org.junit.Assert.*;
-
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
 
 import org.basex.*;
+import org.basex.api.client.*;
 import org.basex.core.*;
 import org.basex.util.*;
 import org.junit.*;
@@ -15,7 +15,7 @@ import org.junit.*;
 /**
  * This class tests the event API.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Roman Raedle
  * @author Andreas Weiler
  */
@@ -50,12 +50,13 @@ public final class EventTest extends SandboxTest {
   @Before
   public void startSessions() throws IOException {
     session = createClient();
-    // drop event, if not done yet
+    // drop event if not done yet
     try {
       session.execute("drop event " + NAME);
     } catch(final IOException ignored) { }
 
-    for(int i = 0; i < sessions.length; i++) sessions[i] = createClient();
+    final int sl = sessions.length;
+    for(int i = 0; i < sl; i++) sessions[i] = createClient();
   }
 
   /**
@@ -91,7 +92,7 @@ public final class EventTest extends SandboxTest {
       for(final String e : events) session.execute("create event " + e);
 
       // query must return all events
-      final HashSet<String> names = new HashSet<String>();
+      final HashSet<String> names = new HashSet<>();
       final String result = session.execute("show events");
       for(final String line : result.split("\\r?\\n|\\r"))
         if(line.startsWith("- ")) names.add(line.substring(2));
@@ -228,8 +229,8 @@ public final class EventTest extends SandboxTest {
 
     // fire events
     final Client[] clients = new Client[CLIENTS];
-    for(int i = 0; i < sessions.length; i++) {
-      clients[i] = new Client(i % 2 == 0, RETURN);
+    for(int c = 0; c < CLIENTS; c++) {
+      clients[c] = new Client(c % 2 == 0, RETURN);
     }
     for(final Client c : clients) c.start();
     for(final Client c : clients) c.join();

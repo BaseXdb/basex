@@ -1,15 +1,13 @@
 package org.basex.io.in;
 
-import java.io.FilterInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
 import org.basex.util.*;
 
 /**
  * Input stream filter for reading files in the TAR file format.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class TarInputStream extends FilterInputStream {
@@ -58,12 +56,12 @@ public final class TarInputStream extends FilterInputStream {
 
   @Override
   public synchronized void mark(final int limit) {
-    Util.notImplemented();
+    throw Util.notExpected();
   }
 
   @Override
   public synchronized void reset() {
-    Util.notImplemented();
+    throw Util.notExpected();
   }
 
   /**

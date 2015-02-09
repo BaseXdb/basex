@@ -3,7 +3,7 @@ package org.basex.server;
 /**
  * This class defines the available command-line commands.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public enum ServerCmd {
@@ -35,7 +35,7 @@ public enum ServerCmd {
   REPLACE(12),
   /** Code for storing raw data in a database: {path}0{input}0. */
   STORE(13),
-  /** Code for binding a context item: {id}0{val}0{type}0. */
+  /** Code for binding a context value: {id}0{val}0{type}0. */
   CONTEXT(14),
   /** Code for returning the update flag: {id}0. */
   UPDATING(30),
@@ -49,20 +49,20 @@ public enum ServerCmd {
 
   /**
    * Constructor.
-   * @param c control code
+   * @param code control code
    */
-  ServerCmd(final int c) {
-    code = c;
+  ServerCmd(final int code) {
+    this.code = code;
   }
 
   /**
    * Returns the server command for the specified control byte
    * (soon obsolete).
-   * @param b control byte
+   * @param code control code
    * @return server command
    */
-  static ServerCmd get(final int b) {
-    for(final ServerCmd s : values()) if(s.code == b) return s;
+  static ServerCmd get(final int code) {
+    for(final ServerCmd s : values()) if(s.code == code) return s;
     // current default for unknown codes: database command.
     return COMMAND;
   }

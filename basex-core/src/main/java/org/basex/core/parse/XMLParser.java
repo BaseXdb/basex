@@ -19,7 +19,7 @@ import org.basex.util.*;
 /**
  * This is a parser for XML input, creating {@link Command} instances.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 final class XMLParser extends CmdParser {
@@ -35,7 +35,7 @@ final class XMLParser extends CmdParser {
   @Override
   protected void parse(final ArrayList<Command> cmds) throws QueryException {
     try {
-      final DBNode node = new DBNode(IO.get(input), ctx.options);
+      final DBNode node = new DBNode(IO.get(input));
       String query = "/*";
       if(!execute(COMMANDS, node).isEmpty()) {
         query = COMMANDS + query;
@@ -43,8 +43,9 @@ final class XMLParser extends CmdParser {
         if(!execute(COMMANDS + "/text()/string()", node).trim().isEmpty())
           throw error(Text.SYNTAX_X, '<' + COMMANDS + "><...></" + COMMANDS + '>');
       }
-      final QueryProcessor qa = new QueryProcessor(query, ctx).context(node);
-      for(final Item ia : qa.value()) cmds.add(command(ia));
+      try(final QueryProcessor qp = new QueryProcessor(query, ctx).context(node)) {
+        for(final Item ia : qp.value()) cmds.add(command(ia));
+      }
     } catch(final IOException ex) {
       throw error(Text.STOPPED_AT + '%', ex);
     }
@@ -62,8 +63,10 @@ final class XMLParser extends CmdParser {
       return new Add(value(root, PATH), xml(root));
     if(e.equals(ALTER_DB) && check(root, NAME, NEWNAME))
       return new AlterDB(value(root, NAME), value(root, NEWNAME));
-    if(e.equals(ALTER_USER) && check(root, NAME, '#' + PASSWORD + '?'))
-      return new AlterUser(value(root, NAME), password(root));
+    if(e.equals(ALTER_PASSWORD) && check(root, NAME, '#' + PASSWORD + '?'))
+      return new AlterPassword(value(root, NAME), password(root));
+    if(e.equals(ALTER_USER) && check(root, NAME, NEWNAME))
+      return new AlterUser(value(root, NAME), value(root, NEWNAME));
     if(e.equals(CHECK) && check(root, INPUT))
       return new Check(value(root, INPUT));
     if(e.equals(CLOSE) && check(root))
@@ -80,8 +83,6 @@ final class XMLParser extends CmdParser {
       return new CreateIndex(value(root, TYPE));
     if(e.equals(CREATE_USER) && check(root, NAME, '#' + PASSWORD + '?'))
       return new CreateUser(value(root, NAME), password(root));
-    if(e.equals(CS) && check(root, '#' + QUERY))
-      return new Cs(value(root));
     if(e.equals(DELETE) && check(root, PATH))
       return new Delete(value(root, PATH));
     if(e.equals(DROP_BACKUP) && check(root, NAME))
@@ -92,8 +93,8 @@ final class XMLParser extends CmdParser {
       return new DropEvent(value(root, NAME));
     if(e.equals(DROP_INDEX) && check(root, TYPE))
       return new DropIndex(value(root, TYPE));
-    if(e.equals(DROP_USER) && check(root, NAME, DATABASE + '?'))
-      return new DropUser(value(root, NAME), value(root, DATABASE));
+    if(e.equals(DROP_USER) && check(root, NAME, PATTERN + '?'))
+      return new DropUser(value(root, NAME), value(root, PATTERN));
     if(e.equals(EXIT) && check(root))
       return new Exit();
     if(e.equals(EXPORT) && check(root, PATH))
@@ -104,8 +105,8 @@ final class XMLParser extends CmdParser {
       return new Flush();
     if(e.equals(GET) && check(root, OPTION + '?'))
       return new Get(value(root, OPTION));
-    if(e.equals(GRANT) && check(root, NAME, PERMISSION, DATABASE + '?'))
-      return new Grant(value(root, PERMISSION), value(root, NAME), value(root, DATABASE));
+    if(e.equals(GRANT) && check(root, NAME, PERMISSION, PATTERN + '?'))
+      return new Grant(value(root, PERMISSION), value(root, NAME), value(root, PATTERN));
     if(e.equals(HELP) && check(root, '#' + COMMAND + '?'))
       return new Help(value(root));
     if(e.equals(INFO) && check(root))
@@ -120,14 +121,16 @@ final class XMLParser extends CmdParser {
       return new Kill(value(root, TARGET));
     if(e.equals(LIST) && check(root, NAME + '?', PATH + '?'))
       return new List(value(root, NAME), value(root, PATH));
-    if(e.equals(OPEN) && check(root, NAME))
-      return new Open(value(root, NAME));
+    if(e.equals(OPEN) && check(root, NAME, PATH + '?'))
+      return new Open(value(root, NAME), value(root, PATH));
     if(e.equals(OPTIMIZE) && check(root))
       return new Optimize();
     if(e.equals(OPTIMIZE_ALL) && check(root))
       return new OptimizeAll();
     if(e.equals(PASSWORD) && check(root, '#' + PASSWORD + '?'))
       return new Password(password(root));
+    if(e.equals(QUIT) && check(root))
+      return new Exit();
     if(e.equals(RENAME) && check(root, PATH, NEWPATH))
       return new Rename(value(root, PATH), value(root, NEWPATH));
     if(e.equals(REPLACE) && check(root, PATH, '<' + INPUT))
@@ -206,7 +209,9 @@ final class XMLParser extends CmdParser {
    * @throws QueryException query exception
    */
   private String xml(final Item root) throws QueryException {
-    return new QueryProcessor("node()", ctx).context(root).execute().toString().trim();
+    try(final QueryProcessor qp = new QueryProcessor("node()", ctx)) {
+      return qp.context(root).execute().toString().trim();
+    }
   }
 
   /**
@@ -217,26 +222,26 @@ final class XMLParser extends CmdParser {
    * @throws QueryException query exception
    */
   private String execute(final String query, final Item context) throws QueryException {
-    final QueryProcessor qp = new QueryProcessor(query, ctx).context(context);
-    final Iter ir = qp.iter();
-    final Item it = ir.next();
-    return it == null ? "" : it.toJava().toString().trim();
+    try(final QueryProcessor qp = new QueryProcessor(query, ctx).context(context)) {
+      final Iter ir = qp.iter();
+      final Item it = ir.next();
+      return it == null ? "" : it.toJava().toString().trim();
+    }
   }
 
   /**
-   * Checks the syntax of the specified command. Returns an error with the expected
-   * syntax if the check fails. The passed on strings describe the arguments of a
-   * command. They may be:
+   * Checks the syntax of the specified command. Returns an error with the expected syntax if the
+   * check fails. The passed on strings describe the arguments of a command. They may be:
    * <ul>
-   * <li> attribute names</li>
-   * <li> labels for text nodes, if prefixed with "#"</li>
-   * <li> labels for text or descendant nodes, if prefixed with "<"</li>
+   *   <li> attribute names</li>
+   *   <li> labels for text nodes if prefixed with "#"</li>
+   *   <li> labels for text or descendant nodes if prefixed with "<"</li>
    * </ul>
-   * Arguments are optional, if they suffixed with "?". Examples:
+   * Arguments are optional if they suffixed with "?". Examples:
    * <ul>
-   * <li> <code>{"name","#input?"}</code> indicates that the command must have one "name"
-   *   attribute and may have one text node, but nothing else</li>
-   * <li> <code>{}</code> means that the command must not have any arguments }</li>
+   *   <li> <code>{"name","#input?"}</code> indicates that the command must have one "name"
+   *     attribute and may have one text node, but nothing else</li>
+   *   <li> <code>{}</code> means that the command must not have any arguments }</li>
    * </ul>
    * @param root root node
    * @param checks checks to be performed.
@@ -284,10 +289,10 @@ final class XMLParser extends CmdParser {
     }
 
     // run query
-    final QueryProcessor qp = new QueryProcessor(tb.toString(), ctx).context(root);
-    qp.bind("A", ma).bind("O", oa);
-    if(!qp.execute().toString().isEmpty()) return true;
-
+    try(final QueryProcessor qp = new QueryProcessor(tb.toString(), ctx).context(root)) {
+      qp.bind("A", ma.value()).bind("O", oa.value());
+      if(!qp.execute().toString().isEmpty()) return true;
+    }
     // build error string
     final TokenBuilder syntax = new TokenBuilder();
     final byte[] nm = ((ANode) root).qname().string();

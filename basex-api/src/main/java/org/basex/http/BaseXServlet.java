@@ -10,6 +10,7 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 
 import org.basex.core.*;
+import org.basex.core.StaticOptions.*;
 import org.basex.http.restxq.*;
 import org.basex.query.*;
 import org.basex.server.*;
@@ -18,14 +19,16 @@ import org.basex.util.*;
 /**
  * <p>Base class for all servlets.</p>
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public abstract class BaseXServlet extends HttpServlet {
   /** Servlet-specific user. */
-  String user;
+  String username = "";
   /** Servlet-specific password. */
-  String pass;
+  String password = "";
+  /** Servlet-specific authentication method. */
+  AuthMethod auth;
 
   @Override
   public void init(final ServletConfig config) throws ServletException {
@@ -37,10 +40,12 @@ public abstract class BaseXServlet extends HttpServlet {
         String key = en.nextElement().toLowerCase(Locale.ENGLISH);
         final String val = config.getInitParameter(key);
         if(key.startsWith(Prop.DBPREFIX)) key = key.substring(Prop.DBPREFIX.length());
-        if(key.equalsIgnoreCase(GlobalOptions.USER.name())) {
-          user = val;
-        } else if(key.equalsIgnoreCase(GlobalOptions.PASSWORD.name())) {
-          pass = val;
+        if(key.equalsIgnoreCase(StaticOptions.USER.name())) {
+          username = val;
+        } else if(key.equalsIgnoreCase(StaticOptions.PASSWORD.name())) {
+          password = val;
+        } else if(key.equalsIgnoreCase(StaticOptions.AUTHMETHOD.name())) {
+          auth = AuthMethod.valueOf(val);
         }
       }
     } catch(final IOException ex) {
@@ -55,18 +60,17 @@ public abstract class BaseXServlet extends HttpServlet {
     final HTTPContext http = new HTTPContext(req, res, this);
     final boolean restxq = this instanceof RestXqServlet;
     try {
+      http.authorize();
       run(http);
-      http.log("", SC_OK);
+      http.log(SC_OK, "");
     } catch(final HTTPException ex) {
       http.status(ex.getStatus(), Util.message(ex), restxq);
     } catch(final LoginException ex) {
       http.status(SC_UNAUTHORIZED, Util.message(ex), restxq);
-    } catch(final IOException ex) {
+    } catch(final IOException | QueryException ex) {
       http.status(SC_BAD_REQUEST, Util.message(ex), restxq);
     } catch(final ProcException ex) {
       http.status(SC_BAD_REQUEST, Text.INTERRUPTED, restxq);
-    } catch(final QueryException ex) {
-      http.status(SC_BAD_REQUEST, Util.message(ex), restxq);
     } catch(final Exception ex) {
       final String msg = Util.bug(ex);
       Util.errln(msg);

@@ -10,7 +10,7 @@ import java.io.*;
  * <li>{@code 0x00} is sent to indicate the end of a stream</li>
  * </ul>
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class EncodingOutput extends OutputStream {
@@ -19,10 +19,10 @@ public final class EncodingOutput extends OutputStream {
 
   /**
    * Constructor.
-   * @param out output stream to be wrapped
+   * @param os output stream to be wrapped
    */
-  public EncodingOutput(final OutputStream out) {
-    os = out;
+  public EncodingOutput(final OutputStream os) {
+    this.os = os;
   }
 
   @Override

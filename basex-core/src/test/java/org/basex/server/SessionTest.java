@@ -7,11 +7,17 @@ import static org.junit.Assert.*;
 import java.io.*;
 
 import org.basex.*;
+import org.basex.api.client.*;
+import org.basex.api.dom.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.junit.*;
 import org.junit.Test;
@@ -19,7 +25,7 @@ import org.junit.Test;
 /**
  * This class tests the client/server query API.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public abstract class SessionTest extends SandboxTest {
@@ -27,10 +33,6 @@ public abstract class SessionTest extends SandboxTest {
   private static final String RAW = "declare option output:method 'raw';";
   /** Output stream. */
   ArrayOutput out;
-  /** Serialization parameters to wrap query result with an element. */
-  private static final String WRAPPER =
-    "declare option output:wrap-prefix 'db';" +
-    "declare option output:wrap-uri 'ns';";
   /** Client session. */
   Session session;
 
@@ -38,7 +40,7 @@ public abstract class SessionTest extends SandboxTest {
   @After
   public final void stopSession() {
     try {
-      if(cleanup) session.execute(new DropDB(NAME));
+      session.execute(new DropDB(NAME));
       session.close();
     } catch(final IOException ex) {
       fail(Util.message(ex));
@@ -51,26 +53,7 @@ public abstract class SessionTest extends SandboxTest {
    */
   @Test
   public final void command() throws IOException {
-    session.execute("set serializer wrap-prefix=,wrap-uri=");
     assertEqual("A", session.execute("xquery 'A'"));
-  }
-
-  /** Runs a query command and wraps the result.
-   * @throws IOException I/O exception */
-  @Test
-  public final void commandSerial1() throws IOException {
-    session.execute("set serializer wrap-prefix=db,wrap-uri=ns");
-    assertEqual("<db:results xmlns:db=\"ns\"/>", session.execute("xquery ()"));
-  }
-
-  /** Runs a query command and wraps the result.
-   * @throws IOException I/O exception */
-  @Test
-  public final void commandSerial2() throws IOException {
-    assertEqual("<db:results xmlns:db=\"ns\">" +
-          "  <db:result>1</db:result>" +
-          "</db:results>",
-          session.execute("xquery " + WRAPPER + '1'));
   }
 
   /** Runs an erroneous query command.
@@ -96,9 +79,9 @@ public abstract class SessionTest extends SandboxTest {
   @Test
   public final void create() throws IOException {
     session.create(NAME, new ArrayInput(""));
-    assertEqual("", session.query("db:open('" + NAME + "')").execute());
+    assertEqual("", session.query(_DB_OPEN.args(NAME)).execute());
     session.create(NAME, new ArrayInput("<X/>"));
-    assertEqual("<X/>", session.query("db:open('" + NAME + "')").execute());
+    assertEqual("<X/>", session.query(_DB_OPEN.args(NAME)).execute());
   }
 
   /**
@@ -211,8 +194,8 @@ public abstract class SessionTest extends SandboxTest {
   public void storeBinary() throws IOException {
     session.execute("create db " + NAME);
     session.store("X", new ArrayInput(new byte[] { -128, -2, -1, 0, 1, 127 }));
-    assertEqual("-128 -2 -1 0 1 127", session.query(
-        _CONVERT_BINARY_TO_BYTES.args(_DB_RETRIEVE.args(NAME, "X"))).execute());
+    final Query query = session.query(_CONVERT_BINARY_TO_BYTES.args(_DB_RETRIEVE.args(NAME, "X")));
+    assertEqual("-128\n-2\n-1\n0\n1\n127", query.execute());
   }
 
   /**
@@ -273,18 +256,20 @@ public abstract class SessionTest extends SandboxTest {
    * @throws IOException I/O exception */
   @Test
   public void queryNoResult() throws IOException {
-    final Query query = session.query("()");
-    assertFalse("No result was expected.", query.more());
-    query.close();
+    try(final Query query = session.query("()")) {
+      assertFalse("No result was expected.", query.more());
+    }
   }
 
   /** Tolerate multiple close calls.
    * @throws IOException I/O exception */
   @Test
   public void queryClose() throws IOException {
-    final Query query = session.query("()");
-    query.close();
-    query.close();
+    final Query q;
+    try(final Query query = session.query("()")) {
+      q = query;
+    }
+    q.close();
   }
 
   /** Runs a query, using more().
@@ -299,10 +284,10 @@ public abstract class SessionTest extends SandboxTest {
    * @throws IOException I/O exception */
   @Test
   public void queryMore() throws IOException {
-    final Query query = session.query("1 to 3");
-    int c = 0;
-    while(query.more()) assertEqual(++c, query.next());
-    query.close();
+    try(final Query query = session.query("1 to 3")) {
+      int c = 0;
+      while(query.more()) assertEqual(++c, query.next());
+    }
   }
 
   /** Queries binary content.
@@ -376,46 +361,25 @@ public abstract class SessionTest extends SandboxTest {
    * @throws IOException I/O exception */
   @Test
   public void queryNoMore() throws IOException {
-    final Query query = session.query("1 to 2");
-    assertEqual("1", query.next());
-    assertEqual("2", query.next());
-    assertNull(query.next());
-    query.close();
-  }
-
-  /** Runs a query with additional serialization parameters.
-   * @throws IOException I/O exception */
-  @Test
-  public void querySerial1() throws IOException {
-    session.execute("set serializer wrap-prefix=db,wrap-uri=ns");
-    final Query query = session.query(WRAPPER + "()");
-    assertTrue("Result expected.", query.more());
-    assertEqual("<db:results xmlns:db=\"ns\"/>", query.next());
-    assertFalse("No result expected.", query.more());
-  }
-
-  /** Runs a query with additional serialization parameters.
-   * @throws IOException I/O exception */
-  @Test
-  public void querySerial2() throws IOException {
-    final Query query = session.query(WRAPPER + "1 to 2");
-    assertTrue("Result expected.", query.more());
-    assertEqual("<db:results xmlns:db=\"ns\">  <db:result>1</db:result>" +
-        "  <db:result>2</db:result></db:results>", query.next());
+    try(final Query query = session.query("1 to 2")) {
+      assertEqual("1", query.next());
+      assertEqual("2", query.next());
+      assertNull(query.next());
+    }
   }
 
   /** Runs a query with an external variable declaration.
    * @throws IOException I/O exception */
   @Test
   public void queryBind() throws IOException {
-    final Query query = session.query("declare variable $a external; $a");
-    query.bind("$a", "4");
-    assertEqual("4", query.execute());
-    query.bind("$a", "5");
-    assertEqual("5", query.next());
-    query.bind("$a", "6");
-    assertEqual("6", query.next());
-    query.close();
+    try(final Query query = session.query("declare variable $a external; $a")) {
+      query.bind("$a", "4");
+      assertEqual("4", query.execute());
+      query.bind("$a", "5");
+      assertEqual("5", query.next());
+      query.bind("$a", "6");
+      assertEqual("6", query.next());
+    }
   }
 
   /** Runs a query with an external variable declaration.
@@ -430,90 +394,177 @@ public abstract class SessionTest extends SandboxTest {
    * @throws IOException I/O exception */
   @Test
   public void queryBindURI() throws IOException {
-    final Query query = session.query("declare variable $a external; $a");
-    query.bind("$a", "X", "xs:anyURI");
-    assertEqual("X", query.next());
-    query.close();
+    try(final Query query = session.query("declare variable $a external; $a")) {
+      query.bind("$a", "X", "xs:anyURI");
+      assertEqual("X", query.next());
+    }
+  }
+
+  /** Runs a query with an external variable declaration.
+   * @throws IOException I/O exception */
+  @Test
+  public void queryBindEmptySequence() throws IOException {
+    try(final Query query = session.query("declare variable $a external; $a")) {
+      query.bind("a", "()", "empty-sequence()");
+      assertNull(query.next());
+    }
   }
 
   /** Runs a query with an external variable declaration.
    * @throws IOException I/O exception */
   @Test
   public void queryBindInt() throws IOException {
-    final Query query = session.query("declare variable $a as xs:integer external; $a");
-    query.bind("a", "5", "xs:integer");
-    assertEqual("5", query.next());
-    query.close();
+    try(Query query = session.query("declare variable $a as xs:integer external; $a")) {
+      query.bind("a", "5", "xs:integer");
+      assertEqual("5", query.next());
+    }
+
+    try(Query query = session.query("declare variable $a external; $a")) {
+      query.bind("a", Int.get(1), "xs:integer");
+      assertEqual("1", query.next());
+    }
+  }
+
+  /** Runs a query with an external variable declaration.
+   * @throws IOException I/O exception */
+  @Test
+  public void queryBindSequence() throws IOException {
+    try(Query query = session.query("declare variable $a external; $a")) {
+      query.bind("a", "1\u00012", "xs:integer");
+      assertEqual("1", query.next());
+      assertEqual("2", query.next());
+    }
+
+    try(Query query = session.query("declare variable $a external; $a")) {
+      query.bind("a", "09\u0002xs:hexBinary\u00012", "xs:integer");
+      assertEqual("09", query.next());
+      assertEqual("2", query.next());
+    }
+
+    try(Query query = session.query("declare variable $a external; $a")) {
+      query.bind("a", Seq.get(new Item[] { Int.get(1), Str.get("X") }));
+      assertEqual("1", query.next());
+      assertEqual("X", query.next());
+    }
+
+    try(Query query = session.query("declare variable $a external; $a")) {
+      query.bind("a", IntSeq.get(new long[] { 1, 2 }, AtomType.INT));
+      assertEqual("1", query.next());
+      assertEqual("2", query.next());
+    }
+
+    try(Query query = session.query("declare variable $a external; $a")) {
+      query.bind("a", IntSeq.get(new long[] { 1, 2 }, AtomType.INT), "xs:integer");
+      assertEqual("1", query.next());
+      assertEqual("2", query.next());
+    }
   }
 
   /** Runs a query with an external variable declaration.
    * @throws IOException I/O exception */
   @Test
   public void queryBindDynamic() throws IOException {
-    final Query query = session.query("declare variable $a as xs:integer external; $a");
-    query.bind("a", "1");
-    assertEqual("1", query.execute());
-    query.close();
+    try(final Query query = session.query("declare variable $a as xs:integer external; $a")) {
+      query.bind("a", "1");
+      assertEqual("1", query.execute());
+    }
   }
 
   /** Binds a document node to an external variable.
    * @throws IOException I/O exception */
   @Test
   public void queryBindDoc() throws IOException {
-    final Query query = session.query("declare variable $a external; $a//text()");
-    query.bind("$a", "<a>XML</a>", "document-node()");
-    assertEqual("XML", query.execute());
+    try(final Query query = session.query("declare variable $a external; $a//text()")) {
+      query.bind("$a", "<a>XML</a>", "document-node()");
+      assertEqual("XML", query.execute());
+    }
   }
 
-  /** Runs a query with a bound context item.
+  /** Binds a node to an external variable.
+   * @throws IOException I/O exception */
+  @Test
+  public void queryBindBXNode() throws IOException {
+    try(Query query = session.query("declare variable $a as element() external; $a")) {
+      query.bind("$a", BXNode.get(new FElem("a")));
+      assertEqual("<a/>", query.execute());
+    }
+
+    final String string = "declare variable $a external; $a";
+    try(Query query = session.query(string)) {
+      query.bind("$a", BXNode.get(new FElem("a")));
+      assertEqual("<a/>", query.execute());
+    }
+
+    try(Query query = session.query(string)) {
+      query.bind("$a", BXNode.get(new FDoc().add(new FElem("a"))));
+      assertEqual("<a/>", query.execute());
+    }
+
+    try(Query query = session.query(string)) {
+      query.bind("$a", BXNode.get(new FTxt("a")));
+      assertEqual("a", query.execute());
+    }
+
+    try(Query query = session.query(string)) {
+      query.bind("$a", BXNode.get(new FPI("a", "b")));
+      assertEqual("<?a b?>", query.execute());
+    }
+
+    try(Query query = session.query(string)) {
+      query.bind("$a", BXNode.get(new FComm("a")));
+      assertEqual("<!--a-->", query.execute());
+    }
+  }
+
+  /** Runs a query with a bound context value.
    * @throws IOException I/O exception */
   @Test
   public void queryContext() throws IOException {
-    final Query query = session.query(".");
-    query.context("5");
-    assertEqual("5", query.next());
-    query.close();
+    try(final Query query = session.query(".")) {
+      query.context("5");
+      assertEqual("5", query.next());
+    }
   }
 
-  /** Runs a query with a bound context item.
+  /** Runs a query with a bound context value.
    * @throws IOException I/O exception */
   @Test
   public void queryContextInt() throws IOException {
-    final Query query = session.query(". * 2");
-    query.context("6", "xs:integer");
-    assertEqual("12", query.next());
-    query.close();
+    try(final Query query = session.query(". * 2")) {
+      query.context("6", "xs:integer");
+      assertEqual("12", query.next());
+    }
   }
 
-  /** Runs a query with a bound context item.
+  /** Runs a query with a bound context value.
    * @throws IOException I/O exception */
   @Test
   public void queryContextVar() throws IOException {
-    final Query query = session.query("declare variable $a := .; $a");
-    query.context("<a/>", "element()");
-    assertEqual("<a/>", query.next());
-    query.close();
+    try(final Query query = session.query("declare variable $a := .; $a")) {
+      query.context("<a/>", "element()");
+      assertEqual("<a/>", query.next());
+    }
   }
 
   /** Runs a query, omitting more().
    * @throws IOException I/O exception */
   @Test
   public void queryInfo() throws IOException {
-    final Query query = session.query("1 to 2");
-    query.execute();
-    query.close();
+    try(final Query query = session.query("1 to 2")) {
+      query.execute();
+    }
   }
 
   /** Runs a query and checks the serialization parameters.
    * @throws IOException I/O exception */
   @Test
   public void queryOptions() throws IOException {
-    final Query query = session.query("declare option output:encoding 'US-ASCII';()");
-    query.execute();
-    final SerializerOptions sp = new SerializerOptions();
-    sp.parse(query.options());
-    assertEquals("US-ASCII", sp.get(SerializerOptions.ENCODING));
-    query.close();
+    try(final Query query = session.query("declare option output:encoding 'US-ASCII';()")) {
+      query.execute();
+      final SerializerOptions sp = new SerializerOptions();
+      sp.parse(query.options());
+      assertEquals("US-ASCII", sp.get(SerializerOptions.ENCODING));
+    }
   }
 
   /** Runs a query and checks the updating flag.
@@ -521,18 +572,18 @@ public abstract class SessionTest extends SandboxTest {
   @Test
   public void queryUpdating() throws IOException {
     // test non-updating query
-    Query query = session.query("12345678");
-    assertFalse(query.updating());
-    assertEqual("12345678", query.execute());
-    assertFalse(query.updating());
-    query.close();
+    try(Query query = session.query("12345678")) {
+      assertFalse(query.updating());
+      assertEqual("12345678", query.execute());
+      assertFalse(query.updating());
+    }
 
     // test updating query
-    query = session.query("insert node <a/> into <b/>");
-    assertTrue(query.updating());
-    assertEqual("", query.execute());
-    assertTrue(query.updating());
-    query.close();
+    try(Query query = session.query("insert node <a/> into <b/>")) {
+      assertTrue(query.updating());
+      assertEqual("", query.execute());
+      assertTrue(query.updating());
+    }
   }
 
   /** Runs an erroneous query.
@@ -562,16 +613,15 @@ public abstract class SessionTest extends SandboxTest {
    * @throws IOException I/O exception */
   @Test
   public void queryParallel() throws IOException {
-    final Query query1 = session.query("1 to 2");
-    final Query query2 = session.query("reverse(3 to 4)");
-    assertEqual("1", query1.next());
-    assertEqual("4", query2.next());
-    assertEqual("2", query1.next());
-    assertEqual("3", query2.next());
-    assertNull(query1.next());
-    assertNull(query2.next());
-    query1.close();
-    query2.close();
+    try(final Query query1 = session.query("1 to 2");
+        final Query query2 = session.query("reverse(3 to 4)")) {
+      assertEqual("1", query1.next());
+      assertEqual("4", query2.next());
+      assertEqual("2", query1.next());
+      assertEqual("3", query2.next());
+      assertNull(query1.next());
+      assertNull(query2.next());
+    }
   }
 
   /** Runs 5 queries in parallel.
@@ -592,17 +642,15 @@ public abstract class SessionTest extends SandboxTest {
     final String var = "declare variable $x external;",
         map = "{\"foo\":[1,2,3],\"bar\":{\"a\":null,\"\":false}}";
     final String[][] tests = {
-        {"for $k in map:keys($x) order by $k descending return $k", "foo bar"},
-        {"every $k in map:keys($x('foo')) satisfies $k eq $x('foo')($k)",
-          "true"},
+        {"for $k in map:keys($x) order by $k descending return $k", "foo\nbar"},
+        {"every $k in $x('foo')?* satisfies $k eq $x('foo')(xs:integer($k))", "true"},
         {"empty($x('bar')('a')) and not($x('bar')(''))", "true"},
     };
     for(final String[] test : tests) {
-      final Query q = session.query(var + test[0]);
-      try {
-        q.bind("$x", map, "json");
-        assertEqual(test[1], q.execute());
-      } finally { q.close(); }
+      try(final Query qu = session.query(var + test[0])) {
+        qu.bind("$x", map, "json");
+        assertEqual(test[1], qu.execute());
+      }
     }
   }
 
@@ -614,6 +662,14 @@ public abstract class SessionTest extends SandboxTest {
     assertEqual("&<>'\"", query.next());
   }
 
+  /** Runs a query and retrieves JSON.
+   * @throws IOException I/O exception */
+  @Test
+  public void queryJSON() throws IOException {
+    final Query query = session.query("declare option output:indent 'no'; map { 'a': '\n' }");
+    assertEqual("{\"a\":\"\\n\"}", query.next());
+  }
+
   /**
    * Checks if the most recent output equals the specified string.
    * @param exp expected string
@@ -622,6 +678,6 @@ public abstract class SessionTest extends SandboxTest {
   private void assertEqual(final Object exp, final Object ret) {
     final String result = (out != null ? out : ret).toString();
     if(out != null) out.reset();
-    assertEquals(exp.toString(), result.replaceAll("\\r|\\n", ""));
+    assertEquals(exp.toString(), normNL(result));
   }
 }

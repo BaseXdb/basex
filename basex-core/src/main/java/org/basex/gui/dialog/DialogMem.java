@@ -3,6 +3,8 @@ package org.basex.gui.dialog;
 import static org.basex.core.Text.*;
 
 import java.awt.*;
+import java.util.*;
+import java.util.Timer;
 
 import javax.swing.*;
 
@@ -14,10 +16,13 @@ import org.basex.util.*;
 /**
  * Dialog with a single text field.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public class DialogMem extends BaseXDialog {
+public final class DialogMem extends BaseXDialog {
+  /** Dialog. */
+  private static Dialog dialog;
+
   /** Info text. */
   private final TextPanel text;
 
@@ -25,7 +30,7 @@ public class DialogMem extends BaseXDialog {
    * Default constructor.
    * @param main reference to the main window
    */
-  public DialogMem(final GUI main) {
+  private DialogMem(final GUI main) {
     super(main, USED_MEM, false);
     panel.setLayout(new BorderLayout());
 
@@ -43,8 +48,16 @@ public class DialogMem extends BaseXDialog {
         gc.requestFocusInWindow();
       }
     });
-
     finish(null);
+  }
+
+  /**
+   * Activates the dialog window.
+   * @param main reference to the main window
+   */
+  public static void show(final GUI main) {
+    if(dialog == null) dialog = new DialogMem(main);
+    dialog.setVisible(true);
   }
 
   @Override
@@ -55,17 +68,16 @@ public class DialogMem extends BaseXDialog {
     super.setVisible(v);
     if(vis) return;
 
-    final Thread t = new Thread() {
+    // regularly refresh panel
+    final Timer timer = new Timer(true);
+    timer.scheduleAtFixedRate(new TimerTask() {
       @Override
       public void run() {
         while(isVisible()) {
           if(!text.selected()) text.setText(info());
-          Performance.sleep(500);
         }
       }
-    };
-    t.setDaemon(true);
-    t.start();
+    }, 0, 500);
   }
 
   @Override

@@ -12,15 +12,14 @@ import org.basex.util.*;
  * The Snowball stemmers were written by Dr Martin Porter and Richard Boulton
  * and is based on the BSD License: {@code http://snowball.tartarus.org/}.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Dimitar Popov
  */
 final class SnowballStemmer extends Stemmer {
   /** Name of the package with all Snowball stemmers. */
   private static final String PATTERN = "org.tartarus.snowball.ext.%Stemmer";
   /** Stemmer classes which the Snowball library provides. */
-  private static final HashMap<Language, StemmerClass> CLASSES =
-      new HashMap<Language, StemmerClass>();
+  private static final HashMap<Language, StemmerClass> CLASSES = new HashMap<>();
 
   /** Stemmer class corresponding to the required properties. */
   private StemmerClass clazz;
@@ -69,8 +68,8 @@ final class SnowballStemmer extends Stemmer {
   }
 
   @Override
-  Stemmer get(final Language l, final FTIterator fti) {
-    return new SnowballStemmer(l, fti);
+  Stemmer get(final Language lang, final FTIterator fti) {
+    return new SnowballStemmer(lang, fti);
   }
 
   @Override
@@ -109,17 +108,17 @@ final class SnowballStemmer extends Stemmer {
 
     /**
      * Constructor.
-     * @param sc class implementing the stemmer
-     * @param s method {@code setCurrent}
-     * @param stm method {@code stem}
-     * @param g method {@code getCurrent}
+     * @param clz class implementing the stemmer
+     * @param setCurrent method {@code setCurrent}
+     * @param stem method {@code stem}
+     * @param getCurrent method {@code getCurrent}
      */
-    StemmerClass(final Class<?> sc, final Method s, final Method stm,
-        final Method g) {
-      clz = sc;
-      setCurrent = s;
-      stem = stm;
-      getCurrent = g;
+    StemmerClass(final Class<?> clz, final Method setCurrent, final Method stem,
+        final Method getCurrent) {
+      this.clz = clz;
+      this.setCurrent = setCurrent;
+      this.stem = stem;
+      this.getCurrent = getCurrent;
     }
   }
 }

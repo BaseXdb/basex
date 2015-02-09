@@ -12,7 +12,7 @@ import org.xml.sax.*;
  * {@code org.apache.xml.resolver.tools.CatalogResolver} or
  * {@code code com.sun.org.apache.xml.internal.resolver.tools.CatalogResolver}.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Michael Seiferle
  */
 public final class CatalogWrapper {
@@ -44,7 +44,7 @@ public final class CatalogWrapper {
    * @param reader XML reader
    * @param cat path to catalog file
    */
-  public static void set(final XMLReader reader, final String cat) {
+  static void set(final XMLReader reader, final String cat) {
     if(CM == null) return;
     invoke(method(CMP, "setIgnoreMissingProperties", boolean.class), CM, true);
     invoke(method(CMP, "setCatalogFiles", String.class), CM, cat);

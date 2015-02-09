@@ -9,19 +9,19 @@ import org.basex.util.*;
 /**
  * Wrapper for representing XQuery items.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-final class XdmAtomic extends XdmItem {
+public final class XdmAtomic extends XdmItem {
   /** Wrapped item. */
-  private final Item item;
+  public final Item item;
 
   /**
    * Constructor.
-   * @param it item
+   * @param item item
    */
-  XdmAtomic(final Item it) {
-    item = it;
+  XdmAtomic(final Item item) {
+    this.item = item;
   }
 
   @Override
@@ -44,18 +44,16 @@ final class XdmAtomic extends XdmItem {
 
   @Override
   public SeqType getType() {
-    return item.type();
+    return item.seqType();
+  }
+
+  @Override
+  public Item internal() {
+    return item;
   }
 
   @Override
   public String toString() {
     return item.toString();
-  }
-
-  // PACKAGE PROTECTED METHODS ================================================
-
-  @Override
-  public Item internal() {
-    return item;
   }
 }

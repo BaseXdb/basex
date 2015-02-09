@@ -1,12 +1,12 @@
 package org.basex.qt3ts.fn;
 
-import org.basex.tests.bxapi.XQuery;
+import org.basex.tests.bxapi.*;
 import org.basex.tests.qt3ts.*;
 
 /**
  * Tests for the namespace-uri-from-qname() function.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
 @SuppressWarnings("all")
@@ -285,12 +285,11 @@ public class FnNamespaceUriFromQName extends QT3TestSet {
   }
 
   /**
-   *  Test function fn:namespace-uri-from-QName. 
+   *  Test function fn:namespace-uri-from-QName.
    *       				Error case - invalid parameter type (simple type) .
    */
   @org.junit.Test
   public void namespaceURIFromQNameFunc015() {
-    xquery10();
     final XQuery query = new XQuery(
       "fn:namespace-uri-from-QName((//Folder)[1])",
       ctx);
@@ -308,7 +307,7 @@ public class FnNamespaceUriFromQName extends QT3TestSet {
   }
 
   /**
-   *  Test function fn:namespace-uri-from-QName. 
+   *  Test function fn:namespace-uri-from-QName.
    *       				Error case - invalid parameter type (simple type) .
    */
   @org.junit.Test

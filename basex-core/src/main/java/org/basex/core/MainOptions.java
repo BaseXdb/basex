@@ -2,14 +2,17 @@ package org.basex.core;
 
 import java.util.*;
 
-import org.basex.build.*;
+import org.basex.build.csv.*;
+import org.basex.build.html.*;
+import org.basex.build.json.*;
+import org.basex.build.text.*;
 import org.basex.io.serial.*;
 import org.basex.util.options.*;
 
 /**
  * This class contains database options which are used all around the project.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class MainOptions extends Options {
@@ -30,23 +33,21 @@ public final class MainOptions extends Options {
   public static final BooleanOption SKIPCORRUPT = new BooleanOption("SKIPCORRUPT", false);
   /** Flag for adding remaining files as raw files. */
   public static final BooleanOption ADDRAW = new BooleanOption("ADDRAW", false);
-  /** Cache new documents before adding them to a database. */
-  public static final BooleanOption ADDCACHE = new BooleanOption("ADDCACHE", false);
   /** Define CSV parser options. */
   public static final OptionsOption<CsvParserOptions> CSVPARSER =
-      new OptionsOption<CsvParserOptions>("CSVPARSER", new CsvParserOptions());
+      new OptionsOption<>("CSVPARSER", new CsvParserOptions());
   /** Define text parser options. */
   public static final OptionsOption<TextOptions> TEXTPARSER =
-      new OptionsOption<TextOptions>("TEXTPARSER", new TextOptions());
+      new OptionsOption<>("TEXTPARSER", new TextOptions());
   /** Define JSON parser options. */
   public static final OptionsOption<JsonParserOptions> JSONPARSER =
-      new OptionsOption<JsonParserOptions>("JSONPARSER", new JsonParserOptions());
+      new OptionsOption<>("JSONPARSER", new JsonParserOptions());
   /** Define TagSoup HTML options. */
   public static final OptionsOption<HtmlOptions> HTMLPARSER =
-      new OptionsOption<HtmlOptions>("HTMLPARSER", new HtmlOptions());
+      new OptionsOption<>("HTMLPARSER", new HtmlOptions());
   /** Define import parser. */
   public static final EnumOption<MainParser> PARSER =
-      new EnumOption<MainParser>("PARSER", MainParser.XML);
+      new EnumOption<>("PARSER", MainParser.XML);
 
   // XML Parsing
 
@@ -56,10 +57,17 @@ public final class MainOptions extends Options {
   public static final BooleanOption INTPARSE = new BooleanOption("INTPARSE", false);
   /** Strips namespaces. */
   public static final BooleanOption STRIPNS = new BooleanOption("STRIPNS", false);
-  /** Flag for parsing DTDs in internal parser. */
+  /** Flag for parsing DTDs. */
   public static final BooleanOption DTD = new BooleanOption("DTD", false);
+  /** Flag for using XInclude. */
+  public static final BooleanOption XINCLUDE = new BooleanOption("XINCLUDE", true);
   /** Path to XML Catalog file. */
   public static final StringOption CATFILE = new StringOption("CATFILE", "");
+
+  // Adding documents
+
+  /** Cache new documents before adding them to a database. */
+  public static final BooleanOption ADDCACHE = new BooleanOption("ADDCACHE", false);
 
   // Indexing
 
@@ -70,8 +78,7 @@ public final class MainOptions extends Options {
   /** Flag for creating a full-text index. */
   public static final BooleanOption FTINDEX = new BooleanOption("FTINDEX", false);
 
-  /** Maximum number of text/attribute index entries
-   *  to keep in memory during index creation. */
+  /** Maximum number of text/attribute index entries to keep in memory during index creation. */
   public static final NumberOption INDEXSPLITSIZE = new NumberOption("INDEXSPLITSIZE", 0);
   /** Maximum number of fulltext index entries to keep in memory during index creation. */
   public static final NumberOption FTINDEXSPLITSIZE = new NumberOption("FTINDEXSPLITSIZE", 0);
@@ -80,8 +87,10 @@ public final class MainOptions extends Options {
   public static final NumberOption MAXLEN = new NumberOption("MAXLEN", 96);
   /** Maximum number of name categories. */
   public static final NumberOption MAXCATS = new NumberOption("MAXCATS", 100);
-  /** Flag for automatic index update. */
+  /** Flag for activating incremental index structures. */
   public static final BooleanOption UPDINDEX = new BooleanOption("UPDINDEX", false);
+  /** Flag for automatic index updates. */
+  public static final BooleanOption AUTOOPTIMIZE = new BooleanOption("AUTOOPTIMIZE", false);
 
   // Full-Text
 
@@ -100,8 +109,8 @@ public final class MainOptions extends Options {
 
   /** Detailed query information. */
   public static final BooleanOption QUERYINFO = new BooleanOption("QUERYINFO", false);
-  /** Default XQuery version. */
-  public static final BooleanOption XQUERY3 = new BooleanOption("XQUERY3", true);
+  /** Flag for mixing updates and items. */
+  public static final BooleanOption MIXUPDATES = new BooleanOption("MIXUPDATES", false);
   /** External variables, separated by commas. */
   public static final StringOption BINDINGS = new StringOption("BINDINGS", "");
   /** Path to current query. */
@@ -131,10 +140,10 @@ public final class MainOptions extends Options {
   public static final BooleanOption SERIALIZE = new BooleanOption("SERIALIZE", true);
   /** Serialization parameters. */
   public static final OptionsOption<SerializerOptions> SERIALIZER =
-      new OptionsOption<SerializerOptions>("SERIALIZER", new SerializerOptions());
+      new OptionsOption<>("SERIALIZER", new SerializerOptions());
   /** Exporter serialization parameters. */
   public static final OptionsOption<SerializerOptions> EXPORTER =
-      new OptionsOption<SerializerOptions>("EXPORTER", new SerializerOptions());
+      new OptionsOption<>("EXPORTER", new SerializerOptions());
 
   /** Prints an XML plan. */
   public static final BooleanOption XMLPLAN = new BooleanOption("XMLPLAN", false);
@@ -157,6 +166,9 @@ public final class MainOptions extends Options {
   /** Hidden: maximum number of hits to be displayed in the GUI (will be overwritten). */
   public static final NumberOption MAXHITS = new NumberOption("MAXHITS", -1);
 
+  /** Options that are adopted from parent options. */
+  private static final Option<?>[] PARENT = { CHOP, INTPARSE, STRIPNS, DTD, XINCLUDE, CATFILE };
+
   /** Parser. */
   public enum MainParser {
     /** XML.  */ XML,
@@ -173,9 +185,37 @@ public final class MainOptions extends Options {
   }
 
   /**
-   * Constructor.
+   * Default constructor.
    */
   public MainOptions() {
-    setSystem();
+    this(true);
+  }
+
+  /**
+   * Default constructor.
+   * @param system parse system properties
+   */
+  public MainOptions(final boolean system) {
+    if(system) setSystem();
+  }
+
+  /**
+   * Constructor.
+   * @param options parent options
+   */
+  public MainOptions(final MainOptions options) {
+    this(false);
+    for(final Option<?> o : PARENT) put(o, options.get(o));
+  }
+
+  /**
+   * Creates an options instance with whitespace chopping turned off.
+   * The returned instance should not be modified.
+   * @return main options
+   */
+  public static MainOptions get() {
+    final MainOptions mo = new MainOptions(false);
+    mo.set(CHOP, false);
+    return mo;
   }
 }

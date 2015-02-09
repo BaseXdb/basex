@@ -18,7 +18,7 @@ import org.basex.util.*;
  *
  * NOTE: this class is not thread-safe.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  * @author Tim Petrowsky
  */
@@ -52,41 +52,39 @@ public final class TableDiskAccess extends TableAccess {
   /**
    * Constructor.
    * @param md meta data
-   * @param lock exclusive access
+   * @param write write lock
    * @throws IOException I/O exception
    */
-  public TableDiskAccess(final MetaData md, final boolean lock) throws IOException {
+  public TableDiskAccess(final MetaData md, final boolean write) throws IOException {
     super(md);
 
     // read meta and index data
-    final DataInput in = new DataInput(meta.dbfile(DATATBL + 'i'));
-    final int b = in.readNum();
-    blocks = b;
+    try(final DataInput in = new DataInput(meta.dbfile(DATATBL + 'i'))) {
+      final int b = in.readNum();
+      blocks = b;
 
-    // check if page index is regular and can be calculated (0: no pages)
-    final int u = in.readNum();
-    final boolean regular = u == 0 || u == Integer.MAX_VALUE;
-    if(regular) {
-      used = u == 0 ? 0 : b;
-    } else {
-      // read page index and first pre values from disk
-      used = u;
-      fpres = in.readNums();
-      pages = in.readNums();
-    }
+      // check if page index is regular and can be calculated (0: no pages)
+      final int u = in.readNum();
+      final boolean regular = u == 0 || u == Integer.MAX_VALUE;
+      if(regular) {
+        used = u == 0 ? 0 : b;
+      } else {
+        // read page index and first pre values from disk
+        used = u;
+        fpres = in.readNums();
+        pages = in.readNums();
+      }
 
-    // read block bitmap
-    if(!regular) {
-      final int psize = in.readNum();
-      usedPages = new BitArray(in.readLongs(psize), used);
+      // read block bitmap
+      if(!regular) {
+        final int psize = in.readNum();
+        usedPages = new BitArray(in.readLongs(psize), used);
+      }
     }
-    in.close();
 
     // initialize data file
     file = new RandomAccessFile(meta.dbfile(DATATBL).file(), "rw");
-    if(lock) exclusiveLock();
-    else sharedLock();
-    if(fl == null) throw new BaseXException(Text.DB_PINNED_X, md.name);
+    if(!lock(write)) throw new BaseXException(Text.DB_PINNED_X, md.name);
   }
 
   /**
@@ -96,97 +94,53 @@ public final class TableDiskAccess extends TableAccess {
    * @return result of check
    */
   public static boolean locked(final String db, final Context ctx) {
-    final IOFile table = MetaData.file(ctx.globalopts.dbpath(db), DATATBL);
+    final IOFile table = MetaData.file(ctx.soptions.dbpath(db), DATATBL);
     if(!table.exists()) return false;
 
-    try {
-      final RandomAccessFile file = new RandomAccessFile(table.file(), "rw");
-      try {
-        return file.getChannel().tryLock() == null;
-      } finally {
-        file.close();
-      }
-    } catch(final OverlappingFileLockException ex) {
-      return true;
-    } catch(final ClosedChannelException ex) {
-      return false;
+    try(final RandomAccessFile file = new RandomAccessFile(table.file(), "rw")) {
+      return file.getChannel().tryLock() == null;
     } catch(final IOException ex) {
       return true;
     }
   }
 
   @Override
-  public synchronized void flush() throws IOException {
+  public synchronized void flush(final boolean all) throws IOException {
     for(final Buffer b : bm.all()) if(b.dirty) writeBlock(b);
-    if(!dirty) return;
+    if(!dirty || !all) return;
 
-    final DataOutput out = new DataOutput(meta.dbfile(DATATBL + 'i'));
-    out.writeNum(blocks);
-    out.writeNum(used);
+    try(final DataOutput out = new DataOutput(meta.dbfile(DATATBL + 'i'))) {
+      final int blcks = blocks;
+      out.writeNum(blcks);
+      out.writeNum(used);
 
-    // due to legacy issues, number of blocks is written several times
-    out.writeNum(blocks);
-    for(int a = 0; a < blocks; a++) out.writeNum(fpres[a]);
-    out.writeNum(blocks);
-    for(int a = 0; a < blocks; a++) out.writeNum(pages[a]);
+      // due to legacy issues, number of blocks is written several times
+      out.writeNum(blcks);
+      for(int a = 0; a < blocks; a++) out.writeNum(fpres[a]);
+      out.writeNum(blcks);
+      for(int a = 0; a < blocks; a++) out.writeNum(pages[a]);
 
-    out.writeLongs(usedPages.toArray());
-    out.close();
+      out.writeLongs(usedPages.toArray());
+    }
     dirty = false;
   }
 
   @Override
   public synchronized void close() throws IOException {
-    flush();
+    flush(true);
     file.close();
   }
 
   @Override
-  public boolean lock(final boolean lock) {
+  public boolean lock(final boolean write) {
     try {
-      if(lock) {
-        if(exclusiveLock()) return true;
-        if(sharedLock()) return false;
-      } else {
-        if(sharedLock()) return true;
-      }
+      if(fl != null && write != fl.isShared()) return true;
+      if(fl != null) fl.release();
+      fl = file.getChannel().tryLock(0, Long.MAX_VALUE, !write);
+      return fl != null;
     } catch(final IOException ex) {
-      Util.stack(ex);
+      throw Util.notExpected(ex);
     }
-    throw Util.notExpected((lock ? "Exclusive" : "Shared") +
-        " lock could not be acquired.");
-  }
-
-  /**
-   * Acquires an exclusive lock on the file.
-   * @return success flag
-   * @throws IOException I/O exception
-   */
-  private boolean exclusiveLock() throws IOException {
-    return lck(false);
-  }
-
-  /**
-   * Acquires a shared lock on the file.
-   * @return success flag
-   * @throws IOException I/O exception
-   */
-  private boolean sharedLock() throws IOException {
-    return lck(true);
-  }
-
-  /**
-   * Acquires a lock on the file. Does nothing if the correct lock has already been
-   * acquired. Otherwise, releases an existing lock.
-   * @param shared shared/exclusive lock
-   * @return success flag
-   * @throws IOException I/O exception
-   */
-  private boolean lck(final boolean shared) throws IOException {
-    if(fl != null && shared == fl.isShared()) return true;
-    if(fl != null) fl.release();
-    fl = file.getChannel().tryLock(0, Long.MAX_VALUE, shared);
-    return fl != null;
   }
 
   @Override

@@ -3,7 +3,7 @@ package org.basex.util;
 /**
  * This class contains methods for performance measurements.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class Performance {
@@ -109,10 +109,10 @@ public final class Performance {
    * Performs some garbage collection.
    * GC behavior in Java is a pretty complex task. Still, garbage collection
    * can be forced by calling it several times.
-   * @param n number of times to execute garbage collection
+   * @param number number of times to execute garbage collection
    */
-  public static void gc(final int n) {
-    for(int i = 0; i < n; ++i) System.gc();
+  public static void gc(final int number) {
+    for(int i = 0; i < number; ++i) System.gc();
   }
 
   /**

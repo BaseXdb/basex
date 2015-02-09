@@ -12,7 +12,7 @@ import org.basex.util.*;
  * {@code QT3TS} property set to the path of the test suite files, e.g. by setting
  * {@code -DQT3TS=...} on the JVM.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
 public final class QT3TSGenerator {

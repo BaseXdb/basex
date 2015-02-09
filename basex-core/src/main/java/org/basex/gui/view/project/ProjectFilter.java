@@ -20,7 +20,7 @@ import org.basex.util.list.*;
 /**
  * Project filter.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 final class ProjectFilter extends BaseXBack {
@@ -48,16 +48,16 @@ final class ProjectFilter extends BaseXBack {
 
   /**
    * Constructor.
-   * @param view project view
+   * @param project project view
    */
-  public ProjectFilter(final ProjectView view) {
-    project = view;
+  public ProjectFilter(final ProjectView project) {
+    this.project = project;
 
     layout(new BorderLayout(0, 2));
-    files = new BaseXTextField(view.gui);
+    files = new BaseXTextField(project.gui);
     files.addFocusListener(project.lastfocus);
 
-    contents = new BaseXTextField(view.gui);
+    contents = new BaseXTextField(project.gui);
     contents.hint(Text.FIND_CONTENTS + Text.DOTS);
     contents.addFocusListener(project.lastfocus);
 
@@ -75,7 +75,7 @@ final class ProjectFilter extends BaseXBack {
             if(cmd == null) continue;
             for(final BaseXKeys sc : cmd.shortcuts()) {
               if(sc.is(e)) {
-                cmd.execute(view.gui);
+                cmd.execute(project.gui);
                 e.consume();
                 return;
               }
@@ -159,7 +159,7 @@ final class ProjectFilter extends BaseXBack {
     final IntList il = new IntList();
     final TokenParser tp = new TokenParser(Token.token(content));
     while(tp.more()) il.add(Token.lc(tp.next()));
-    if(filter(file, il.toArray(), thread, results)) {
+    if(filter(file, il.finish(), thread, results)) {
       project.list.setElements(results, content.isEmpty() ? null : content);
     }
 
@@ -314,7 +314,9 @@ final class ProjectFilter extends BaseXBack {
    * @param results search result
    * @return maximum number of results reached
    */
-  private boolean filterContent(final byte[] path, final int[] search, final TokenSet results) {
+  private static boolean filterContent(final byte[] path, final int[] search,
+      final TokenSet results) {
+
     // accept file; check file contents
     if(filterContent(path, search) && !results.contains(path)) {
       results.add(path);
@@ -333,31 +335,26 @@ final class ProjectFilter extends BaseXBack {
     final int cl = search.length;
     if(cl == 0) return true;
 
-    try {
-      final TextInput ti = new TextInput(new IOFile(Token.string(path)));
-      try {
-        final IntList il = new IntList(cl - 1);
-        int c = 0;
+    try(final TextInput ti = new TextInput(new IOFile(Token.string(path)))) {
+      final IntList il = new IntList(cl - 1);
+      int c = 0;
+      while(true) {
+        if(!il.isEmpty()) {
+          if(il.remove(0) == search[c++]) continue;
+          c = 0;
+        }
         while(true) {
-          if(!il.isEmpty()) {
-            if(il.deleteAt(0) == search[c++]) continue;
+          final int cp = ti.read();
+          if(cp == -1 || !XMLToken.valid(cp)) return false;
+          final int lc = Token.lc(cp);
+          if(c > 0) il.add(lc);
+          if(lc == search[c]) {
+            if(++c == cl) return true;
+          } else {
             c = 0;
-          }
-          while(true) {
-            final int cp = ti.read();
-            if(cp == -1 || !XMLToken.valid(cp)) return false;
-            final int lc = Token.lc(cp);
-            if(c > 0) il.add(lc);
-            if(lc == search[c]) {
-              if(++c == cl) return true;
-            } else {
-              c = 0;
-              break;
-            }
+            break;
           }
         }
-      } finally {
-        ti.close();
       }
     } catch(final IOException ex) {
       // file may not be accessible

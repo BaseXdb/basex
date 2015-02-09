@@ -1,6 +1,6 @@
 package org.basex.query.expr;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import org.basex.core.*;
@@ -12,7 +12,7 @@ import org.basex.util.options.*;
 /**
  * Pragma for database options.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
 public final class DBPragma extends Pragma {
@@ -33,18 +33,18 @@ public final class DBPragma extends Pragma {
   }
 
   @Override
-  void init(final QueryContext ctx, final InputInfo info) throws QueryException {
-    old = ctx.context.options.get(option);
+  void init(final QueryContext qc, final InputInfo info) throws QueryException {
+    old = qc.context.options.get(option);
     try {
-      ctx.context.options.assign(option.name(), string(value));
+      qc.context.options.assign(option.name(), string(value));
     } catch(final BaseXException ex) {
-      throw BASX_VALUE.get(info, option.name(), value);
+      throw BASX_VALUE_X_X.get(info, option.name(), value);
     }
   }
 
   @Override
-  void finish(final QueryContext ctx) {
-    ctx.context.options.put(option, old);
+  void finish(final QueryContext qc) {
+    qc.context.options.put(option, old);
   }
 
   @Override

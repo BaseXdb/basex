@@ -1,13 +1,14 @@
 package org.basex.query.expr;
 
-import org.basex.query.util.*;
+import static org.basex.query.QueryError.*;
+
 import org.basex.query.*;
 import org.junit.*;
 
 /**
  * Higher-order function tests.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
 public final class HigherOrderTest extends AdvancedQueryTest {
@@ -60,7 +61,7 @@ public final class HigherOrderTest extends AdvancedQueryTest {
       "};" +
       "local:before-first((<h1/>, <p/>, <h1/>, <h2/>, <h3/>)," +
       "  function($it) { name($it) = 'h2' })",
-      "<h1/><p/><h1/>");
+      "<h1/>\n<p/>\n<h1/>");
   }
 
   /**
@@ -76,16 +77,23 @@ public final class HigherOrderTest extends AdvancedQueryTest {
       "true");
   }
 
+  /** Closure test (#1023). */
+  @Test
+  public void closureTest() {
+    query("for $n in (<a/>, <b/>) let $f := function() as element()* { trace($n) } return $f()",
+        "<a/>\n<b/>");
+  }
+
   /**  Test for name heavy currying. */
   @Test
   public void placeHolderTest() {
-    error("string-join(('a', 'b'), )(',')", Err.FUNCMISS);
+    error("string-join(('a', 'b'), )(',')", FUNCMISS_X);
   }
 
   /**  Test for empty-sequence() as function item. */
   @Test
   public void emptyFunTest() {
-    error("()()", Err.INVEMPTY);
+    error("()()", EMPTYFOUND);
   }
 
   /**  Tests the creation of a cast function as function item. */
@@ -97,12 +105,12 @@ public final class HigherOrderTest extends AdvancedQueryTest {
   /**  Tests the creation of a cast function as function item. */
   @Test
   public void wrongArityTest() {
-    error("count(concat#2('1','2','3'))", Err.INVARITY);
+    error("count(concat#2('1','2','3'))", INVARITY_X_X_X_X);
   }
 
-  /** Tests using a partial function application as the context item (see GH-579). */
+  /** Tests using a partial function application as the context value (see GH-579). */
   @Test
-  public void ctxItemTest() {
+  public void ctxValueTest() {
     query("declare context item := contains(?, \"a\"); .(\"abc\")", "true");
   }
 

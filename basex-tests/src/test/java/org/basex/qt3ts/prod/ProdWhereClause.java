@@ -1,12 +1,12 @@
 package org.basex.qt3ts.prod;
 
-import org.basex.tests.bxapi.XQuery;
+import org.basex.tests.bxapi.*;
 import org.basex.tests.qt3ts.*;
 
 /**
  * Tests for the WhereClause production.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
 @SuppressWarnings("all")
@@ -237,7 +237,6 @@ public class ProdWhereClause extends QT3TestSet {
    */
   @org.junit.Test
   public void k2WhereExpr1() {
-    xquery10();
     final XQuery query = new XQuery(
       "for $a in 1 where true() where true() return $a",
       ctx);
@@ -667,7 +666,6 @@ public class ProdWhereClause extends QT3TestSet {
    */
   @org.junit.Test
   public void whereExpr020() {
-    xquery10();
     final XQuery query = new XQuery(
       "for $file in (//Folder)[1]/File where true() where false() return $file/FileName",
       ctx);
@@ -710,7 +708,6 @@ public class ProdWhereClause extends QT3TestSet {
    */
   @org.junit.Test
   public void whereExpr021() {
-    xquery10();
     final XQuery query = new XQuery(
       "for $file in (//Folder)[1]/File where (. instance of element(File)) return $file/FileName",
       ctx);

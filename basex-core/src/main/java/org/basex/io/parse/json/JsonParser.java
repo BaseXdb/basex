@@ -1,17 +1,18 @@
 package org.basex.io.parse.json;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
-import org.basex.build.*;
-import org.basex.build.JsonOptions.JsonSpec;
+import org.basex.build.json.*;
+import org.basex.build.json.JsonParserOptions.*;
 import org.basex.query.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * A JSON parser generating parse events similar to a SAX XML parser.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
 final class JsonParser extends InputParser {
@@ -27,9 +28,11 @@ final class JsonParser extends InputParser {
   /** Converter. */
   private final JsonConverter conv;
   /** Spec. */
-  private final JsonSpec spec;
+  private final boolean liberal;
   /** Unescape flag. */
   private final boolean unescape;
+  /** Duplicates. */
+  private final JsonDuplicates duplicates;
   /** Token builder for string literals. */
   private final TokenBuilder tb = new TokenBuilder();
 
@@ -41,8 +44,9 @@ final class JsonParser extends InputParser {
    */
   private JsonParser(final String in, final JsonParserOptions opts, final JsonConverter cnv) {
     super(in);
-    spec = opts.get(JsonOptions.SPEC);
+    liberal = opts.get(JsonParserOptions.LIBERAL);
     unescape = opts.get(JsonParserOptions.UNESCAPE);
+    duplicates = opts.get(JsonParserOptions.DUPLICATES);
     conv = cnv;
   }
 
@@ -50,7 +54,7 @@ final class JsonParser extends InputParser {
    * Parses the input string, directs the parse events to the given handler and returns
    * the resulting value.
    * @param input input string
-   * @param path input path (may be {@code null)}
+   * @param path input path (can be {@code null)}
    * @param opts options
    * @param conv converter
    * @throws QueryIOException parse exception
@@ -68,8 +72,6 @@ final class JsonParser extends InputParser {
    */
   private void parse() throws QueryIOException {
     skipWs();
-    if(spec == JsonSpec.RFC4627 && !(curr() == '{' || curr() == '['))
-      throw error("Expected '{' or '[', found %", rest());
     value();
     if(more()) throw error("Unexpected trailing content: %", rest());
   }
@@ -110,8 +112,7 @@ final class JsonParser extends InputParser {
         if(consume("true")) conv.booleanLit(TRUE);
         else if(consume("false")) conv.booleanLit(FALSE);
         else if(consume("null")) conv.nullLit();
-        else if(spec == JsonSpec.LIBERAL && consume("new") &&
-            Character.isWhitespace(curr())) constr();
+        else if(liberal && consume("new") && Character.isWhitespace(curr())) constr();
         else throw error("Unexpected JSON value: '%'", rest());
         skipWs();
     }
@@ -125,12 +126,19 @@ final class JsonParser extends InputParser {
     consumeWs('{', true);
     conv.openObject();
     if(!consumeWs('}', false)) {
+      final TokenSet set = new TokenSet();
       do {
-        conv.openPair(spec != JsonSpec.LIBERAL || curr() == '"' ? string() : unquoted());
+        final byte[] key = !liberal || curr() == '"' ? string() : unquoted();
+        final boolean dupl = set.contains(key);
+        if(dupl && duplicates == JsonDuplicates.REJECT)
+          throw error(BXJS_DUPLICATE_X, "Key '%' occurs more than once.", key);
+
+        conv.openPair(key);
         consumeWs(':', true);
         value();
-        conv.closePair();
-      } while(consumeWs(',', false) && !(spec == JsonSpec.LIBERAL && curr() == '}'));
+        conv.closePair(!dupl || duplicates == JsonDuplicates.USE_LAST);
+        set.put(key);
+      } while(consumeWs(',', false) && !(liberal && curr() == '}'));
       consumeWs('}', true);
     }
     conv.closeObject();
@@ -148,7 +156,7 @@ final class JsonParser extends InputParser {
         conv.openItem();
         value();
         conv.closeItem();
-      } while(consumeWs(',', false) && !(spec == JsonSpec.LIBERAL && curr() == ']'));
+      } while(consumeWs(',', false) && !(liberal && curr() == ']'));
       consumeWs(']', true);
     }
     conv.closeArray();
@@ -189,11 +197,11 @@ final class JsonParser extends InputParser {
       throw error("Expected unquoted string, found %", rest());
     tb.reset();
     do {
-      tb.add(cp);
+      add(cp);
       cp = input.codePointAt(pos += cp < 0x10000 ? 1 : 2);
     } while(Character.isJavaIdentifierPart(cp));
     skipWs();
-    return tb.finish();
+    return tb.toArray();
   }
 
   /**
@@ -206,11 +214,11 @@ final class JsonParser extends InputParser {
 
     // integral part
     int ch = consume();
-    tb.addByte((byte) ch);
+    add(ch);
     if(ch == '-') {
       ch = consume();
       if(ch < '0' || ch > '9') throw error("Number expected after '-'");
-      tb.addByte((byte) ch);
+      add(ch);
     }
 
     final boolean zero = ch == '0';
@@ -228,7 +236,7 @@ final class JsonParser extends InputParser {
         case '7':
         case '8':
         case '9':
-          tb.addByte((byte) ch);
+          add(ch);
           pos++;
           ch = curr();
           break;
@@ -238,38 +246,38 @@ final class JsonParser extends InputParser {
           break loop;
         default:
           skipWs();
-          return tb.finish();
+          return tb.toArray();
       }
     }
 
     if(consume('.')) {
-      tb.addByte((byte) '.');
+      add('.');
       ch = curr();
       if(ch < '0' || ch > '9') throw error("Number expected after '.'");
       do {
-        tb.addByte((byte) ch);
+        add(ch);
         pos++;
         ch = curr();
       } while(ch >= '0' && ch <= '9');
       if(ch != 'e' && ch != 'E') {
         skipWs();
-        return tb.finish();
+        return tb.toArray();
       }
     }
 
     // 'e' or 'E'
-    tb.addByte((byte) consume());
+    add(consume());
     ch = curr();
     if(ch == '-' || ch == '+') {
-      tb.addByte((byte) consume());
+      add(consume());
       ch = curr();
     }
 
     if(ch < '0' || ch > '9') throw error("Exponent expected");
-    do tb.addByte((byte) consume());
+    do add(consume());
     while((ch = curr()) >= '0' && ch <= '9');
     skipWs();
-    return tb.finish();
+    return tb.toArray();
   }
 
   /**
@@ -284,18 +292,18 @@ final class JsonParser extends InputParser {
     while(pos < length) {
       int ch = consume();
       if(ch == '"') {
-        if(hi != 0) tb.add(hi);
+        if(hi != 0) add(hi);
         skipWs();
-        return tb.finish();
+        return tb.toArray();
       }
 
       if(ch == '\\') {
         if(!unescape) {
           if(hi != 0) {
-            tb.add(hi);
+            add(hi);
             hi = 0;
           }
-          tb.addByte((byte) '\\');
+          add('\\');
         }
 
         final int n = consume();
@@ -332,11 +340,11 @@ final class JsonParser extends InputParser {
                 else throw error("Illegal hexadecimal digit: '%'", x);
               }
             } else {
-              tb.addByte((byte) 'u');
+              add('u');
               for(int i = 0; i < 4; i++) {
                 final char x = consume();
                 if(x >= '0' && x <= '9' || x >= 'a' && x <= 'f' || x >= 'A' && x <= 'F') {
-                  if(i < 3) tb.addByte((byte) x);
+                  if(i < 3) add(x);
                   else ch = x;
                 } else throw error("Illegal hexadecimal digit: '%'", x);
               }
@@ -345,21 +353,28 @@ final class JsonParser extends InputParser {
           default:
             throw error("Unknown character escape: '\\%'", n);
         }
-      } else if(spec != JsonSpec.LIBERAL && ch <= 0x1F) {
+      } else if(!liberal && ch <= 0x1F) {
         throw error("Non-escaped control character: '\\%'", CTRL[ch]);
       }
 
       if(hi != 0) {
-        if(ch >= 0xDC00 && ch <= 0xDFFF)
-          ch = (hi - 0xD800 << 10) + ch - 0xDC00 + 0x10000;
-        else tb.add(hi);
+        if(ch >= 0xDC00 && ch <= 0xDFFF) ch = (hi - 0xD800 << 10) + ch - 0xDC00 + 0x10000;
+        else add(hi);
         hi = 0;
       }
 
       if(ch >= 0xD800 && ch <= 0xDBFF) hi = (char) ch;
-      else tb.add(ch);
+      else add(ch);
     }
     throw eof(" in string literal");
+  }
+
+  /**
+   * Adds the specified character.
+   * @param ch character
+   */
+  private void add(final int ch) {
+    tb.add(XMLToken.valid(ch) ? ch : '\uFFFD');
   }
 
   /** Consumes all whitespace characters from the remaining query. */
@@ -388,13 +403,12 @@ final class JsonParser extends InputParser {
    * @throws QueryIOException parse error
    */
   private boolean consumeWs(final char ch, final boolean err) throws QueryIOException {
-    if(consume() != ch) {
-      pos--;
-      if(err) throw error("Expected '%', found '%'", ch, curr());
-      return false;
+    if(consume(ch)) {
+      skipWs();
+      return true;
     }
-    skipWs();
-    return true;
+    if(err) throw error("Expected '%', found '%'", ch, curr());
+    return false;
   }
 
   /**
@@ -412,11 +426,20 @@ final class JsonParser extends InputParser {
    * @param msg error message
    * @param ext error details
    * @return build exception
-   * @throws QueryIOException query I/O exception
    */
-  private QueryIOException error(final String msg, final Object... ext) throws QueryIOException {
+  private QueryIOException error(final String msg, final Object... ext) {
+    return error(BXJS_PARSE_X_X_X, msg, ext);
+  }
+
+  /**
+   * Raises an error with the specified message.
+   * @param msg error message
+   * @param ext error details
+   * @param err error code
+   * @return build exception
+   */
+  private QueryIOException error(final QueryError err, final String msg, final Object... ext) {
     final InputInfo info = new InputInfo(this);
-    final QueryException qe = BXJS_PARSE.get(info, info.line(), info.column(), Util.inf(msg, ext));
-    throw new QueryIOException(qe);
+    return new QueryIOException(err.get(info, info.line(), info.column(), Util.inf(msg, ext)));
   }
 }

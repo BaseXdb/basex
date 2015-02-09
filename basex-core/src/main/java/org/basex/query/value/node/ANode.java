@@ -8,6 +8,8 @@ import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.util.collation.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -15,7 +17,7 @@ import org.basex.util.*;
 /**
  * Abstract node type.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public abstract class ANode extends Item {
@@ -31,16 +33,16 @@ public abstract class ANode extends Item {
   public final int id = ID.incrementAndGet();
 
   /** Cached string value. */
-  byte[] val;
+  byte[] value;
   /** Parent node. */
-  ANode par;
+  ANode parent;
 
   /**
    * Constructor.
-   * @param t data type
+   * @param type item type
    */
-  ANode(final NodeType t) {
-    super(t);
+  ANode(final NodeType type) {
+    super(type);
   }
 
   @Override
@@ -60,10 +62,10 @@ public abstract class ANode extends Item {
   public abstract byte[] string();
 
   @Override
-  public final boolean eq(final Item it, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  public final boolean eq(final Item it, final Collation coll, final StaticContext sc,
+      final InputInfo ii) throws QueryException {
     return it.type.isUntyped() ? coll == null ? Token.eq(string(), it.string(ii)) :
-      coll.compare(string(), it.string(ii)) == 0 : it.eq(this, coll, ii);
+      coll.compare(string(), it.string(ii)) == 0 : it.eq(this, coll, sc, ii);
   }
 
   @Override
@@ -71,6 +73,11 @@ public abstract class ANode extends Item {
       throws QueryException {
     return it.type.isUntyped() ? coll == null ? Token.diff(string(), it.string(ii)) :
       coll.compare(string(), it.string(ii)) : -it.diff(this, coll, ii);
+  }
+
+  @Override
+  public final Item atomItem(final InputInfo ii) {
+    return type == NodeType.PI || type == NodeType.COM ? Str.get(string()) : new Atm(string());
   }
 
   /**
@@ -81,13 +88,14 @@ public abstract class ANode extends Item {
 
   /**
    * Returns a deep copy of the node.
+   * @param opts main options
    * @return node copy
    */
-  public abstract ANode deepCopy();
+  public abstract ANode deepCopy(final MainOptions opts);
 
   /**
    * Returns a database node representation of the node.
-   * @param opts database options
+   * @param opts main options
    * @return database node
    */
   public DBNode dbCopy(final MainOptions opts) {
@@ -97,8 +105,7 @@ public abstract class ANode extends Item {
   }
 
   /**
-   * Returns the name of the node, composed of an optional prefix
-   * and the local name.
+   * Returns the name of the node, composed of an optional prefix and the local name.
    * This function must only be called for element and attribute nodes.
    * It is more efficient than calling {@link #qname}, as no {@link QNm}
    * instance is created.
@@ -146,9 +153,10 @@ public abstract class ANode extends Item {
 
   /**
    * Returns a copy of the namespace hierarchy.
+   * @param sc static context
    * @return namespaces
    */
-  public final Atts nsScope() {
+  public final Atts nsScope(final StaticContext sc) {
     final Atts ns = new Atts();
     ANode node = this;
     do {
@@ -161,6 +169,7 @@ public abstract class ANode extends Item {
       }
       node = node.parent();
     } while(node != null && node.type == NodeType.ELM);
+    if(sc != null) sc.ns.inScope(ns);
     return ns;
   }
 
@@ -269,7 +278,7 @@ public abstract class ANode extends Item {
   public abstract boolean hasChildren();
 
   /**
-   * Returns the value of the specified attribute, or {@code null}.
+   * Returns the value of the specified attribute or {@code null}.
    * @param name attribute to be found
    * @return attribute value
    */
@@ -278,7 +287,7 @@ public abstract class ANode extends Item {
   }
 
   /**
-   * Returns the value of the specified attribute, or {@code null}.
+   * Returns the value of the specified attribute or {@code null}.
    * @param name attribute to be found
    * @return attribute value
    */
@@ -287,7 +296,7 @@ public abstract class ANode extends Item {
   }
 
   /**
-   * Returns the value of the specified attribute, or {@code null}.
+   * Returns the value of the specified attribute or {@code null}.
    * @param name attribute to be found
    * @return attribute value
    */
@@ -486,7 +495,7 @@ public abstract class ANode extends Item {
 
   @Override
   public final BXNode toJava() {
-    return BXNode.get(deepCopy());
+    return BXNode.get(deepCopy(new MainOptions()));
   }
 
   /**

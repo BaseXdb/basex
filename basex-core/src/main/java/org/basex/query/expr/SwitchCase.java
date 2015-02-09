@@ -3,7 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
-import org.basex.query.func.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -11,72 +11,72 @@ import org.basex.util.hash.*;
 /**
  * Single case of a switch expression.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class SwitchCase extends Arr {
   /**
    * Constructor.
-   * @param ii input info
-   * @param e return expression (placed first) and cases
+   * @param info input info
+   * @param exprs return expression (placed first) and cases (default branch has 0 cases)
    */
-  public SwitchCase(final InputInfo ii, final Expr... e) {
-    super(ii, e);
+  public SwitchCase(final InputInfo info, final Expr... exprs) {
+    super(info, exprs);
   }
 
   @Override
   public void checkUp() throws QueryException {
-    final int es = expr.length;
-    for(int e = 1; e < es; ++e) checkNoUp(expr[e]);
+    final int es = exprs.length;
+    for(int e = 1; e < es; ++e) checkNoUp(exprs[e]);
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) {
+  public Expr compile(final QueryContext qc, final VarScope scp) {
     // compile and simplify branches
-    final int es = expr.length;
+    final int es = exprs.length;
     for(int e = 0; e < es; e++) {
       try {
-        expr[e] = expr[e].compile(ctx, scp);
+        exprs[e] = exprs[e].compile(qc, scp);
       } catch(final QueryException ex) {
         // replace original expression with error
-        expr[e] = FNInfo.error(ex, expr[e].type());
+        exprs[e] = FnError.get(ex, exprs[e].seqType());
       }
     }
     return this;
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new SwitchCase(info, copyAll(ctx, scp, vs, expr));
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new SwitchCase(info, copyAll(qc, scp, vs, exprs));
   }
 
   @Override
-  public Expr inline(final QueryContext ctx, final VarScope scp, final Var v,
-      final Expr e) throws QueryException {
+  public Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
+      throws QueryException {
     boolean change = false;
-    final int es = expr.length;
+    final int es = exprs.length;
     for(int i = 0; i < es; i++) {
       Expr nw;
       try {
-        nw = expr[i].inline(ctx, scp, v, e);
+        nw = exprs[i].inline(qc, scp, var, ex);
       } catch(final QueryException qe) {
-        nw = FNInfo.error(qe, expr[i].type());
+        nw = FnError.get(qe, exprs[i].seqType());
       }
       if(nw != null) {
-        expr[i] = nw;
+        exprs[i] = nw;
         change = true;
       }
     }
-    return change ? optimize(ctx, scp) : null;
+    return change ? optimize(qc, scp) : null;
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    final int es = expr.length;
-    for(int e = 1; e < es; ++e) sb.append(' ' + CASE + ' ' + expr[e]);
+    final int es = exprs.length;
+    for(int e = 1; e < es; ++e) sb.append(' ' + CASE + ' ' + exprs[e]);
     if(es == 1) sb.append(' ' + DEFAULT);
-    sb.append(' ' + RETURN + ' ' + expr[0]);
+    sb.append(' ' + RETURN + ' ' + exprs[0]);
     return sb.toString();
   }
 
@@ -85,28 +85,28 @@ public final class SwitchCase extends Arr {
    * This method counts only the occurrences in the return expression.
    */
   @Override
-  public VarUsage count(final Var v) {
-    return expr[0].count(v);
+  public VarUsage count(final Var var) {
+    return exprs[0].count(var);
   }
 
   /**
    * Checks how often a variable is used in this expression.
    * This method counts only the occurrences in the case expressions.
-   * @param v variable to look for
+   * @param var variable to look for
    * @return number of occurrences
    */
-  VarUsage countCases(final Var v) {
+  VarUsage countCases(final Var var) {
     VarUsage all = VarUsage.NEVER;
-    final int es = expr.length;
+    final int es = exprs.length;
     for(int i = 1; i < es; i++)
-      if((all = all.plus(expr[i].count(v))) == VarUsage.MORE_THAN_ONCE) break;
+      if((all = all.plus(exprs[i].count(var))) == VarUsage.MORE_THAN_ONCE) break;
     return all;
   }
 
   @Override
   public int exprSize() {
     int sz = 0;
-    for(final Expr e : expr) sz += e.exprSize();
+    for(final Expr e : exprs) sz += e.exprSize();
     return sz;
   }
 }

@@ -9,7 +9,7 @@ import org.basex.util.*;
 /**
  * Abstract single expression.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public abstract class Single extends ParseExpr {
@@ -18,12 +18,12 @@ public abstract class Single extends ParseExpr {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param e expression
+   * @param info input info
+   * @param expr expression
    */
-  protected Single(final InputInfo ii, final Expr e) {
-    super(ii);
-    expr = e;
+  protected Single(final InputInfo info, final Expr expr) {
+    super(info);
+    this.expr = expr;
   }
 
   @Override
@@ -32,8 +32,8 @@ public abstract class Single extends ParseExpr {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    expr = expr.compile(ctx, scp);
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    expr = expr.compile(qc, scp);
     return this;
   }
 
@@ -43,22 +43,22 @@ public abstract class Single extends ParseExpr {
   }
 
   @Override
-  public boolean removable(final Var v) {
-    return expr.removable(v);
+  public boolean removable(final Var var) {
+    return expr.removable(var);
   }
 
   @Override
-  public VarUsage count(final Var v) {
-    return expr.count(v);
+  public VarUsage count(final Var var) {
+    return expr.count(var);
   }
 
   @Override
-  public Expr inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e)
+  public Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
       throws QueryException {
-    final Expr sub = expr.inline(ctx, scp, v, e);
+    final Expr sub = expr.inline(qc, scp, var, ex);
     if(sub == null) return null;
     expr = sub;
-    return optimize(ctx, scp);
+    return optimize(qc, scp);
   }
 
   @Override

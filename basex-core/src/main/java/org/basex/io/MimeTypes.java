@@ -1,7 +1,5 @@
 package org.basex.io;
 
-import static org.basex.util.Token.*;
-
 import java.io.*;
 import java.util.*;
 
@@ -13,13 +11,10 @@ import org.basex.util.*;
  * determined by Java, or statically resolved by requesting the mappings in
  * the {@code mime.txt} project file.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class MimeTypes {
-  /** Content-Type. */
-  public static final String CONTENT_TYPE = "Content-Type";
-
   /** Text type. */
   private static final String TEXT = "text/";
   /** Multipart type. */
@@ -77,8 +72,8 @@ public final class MimeTypes {
   }
 
   /**
-   * Checks if the content type is an XQuery content type.
-   * @param type content type
+   * Checks if the mime type is an XQuery mime type.
+   * @param type mime type
    * @return result of check
    */
   public static boolean isXQuery(final String type) {
@@ -86,26 +81,27 @@ public final class MimeTypes {
   }
 
   /**
-   * Checks if the content type is an XML content type.
-   * @param type content type
+   * Checks if the mime type is an XML mime type.
+   * @param type mime type
    * @return result of check
    */
   public static boolean isXML(final String type) {
-    return eq(type, TEXT_XML, TEXT_XML_EXT, APP_XML, APP_XML_EXTERNAL) || type.endsWith(XML_SUFFIX);
+    return Strings.eq(type, TEXT_XML, TEXT_XML_EXT, APP_XML, APP_XML_EXTERNAL) ||
+        type.endsWith(XML_SUFFIX);
   }
 
   /**
-   * Checks if the content type is an JSON content type.
-   * @param type content type
+   * Checks if the mime type is a JSON mime type.
+   * @param type mime type
    * @return result of check
    */
   public static boolean isJSON(final String type) {
-    return eq(type, APP_JSON, APP_JSONML);
+    return Strings.eq(type, APP_JSON, APP_JSONML);
   }
 
   /**
-   * Checks if the main part of the content type is {@code "text"}.
-   * @param type content type
+   * Checks if the main part of the mime type is {@code "text"}.
+   * @param type mime type
    * @return result of check
    */
   public static boolean isText(final String type) {
@@ -113,8 +109,8 @@ public final class MimeTypes {
   }
 
   /**
-   * Checks if the content type is a multipart content type.
-   * @param type content type
+   * Checks if the mime type is a multipart mime type.
+   * @param type mime type
    * @return result of check
    */
   public static boolean isMultipart(final String type) {
@@ -122,21 +118,37 @@ public final class MimeTypes {
   }
 
   /**
-   * Checks if a content type is accepted by the specified pattern.
-   * @param type content type
+   * Checks if a mime type is accepted by the specified pattern.
+   * @param type mime type
    * @param pattern pattern
    * @return result of check
    */
   public static boolean matches(final String type, final String pattern) {
-    final String[] t = type.split("/", 2);
-    final String[] p = pattern.split("/", 2);
-    return t.length == 2 && p.length == 2 &&
-        ("*".equals(p[0]) || p[0].equals(t[0])) &&
-        ("*".equals(p[1]) || p[1].equals(t[1]));
+    final String[] t = prepareType(type), p = prepareType(pattern);
+    return Strings.eq(p[0], t[0], "*") && Strings.eq(p[1], t[1], "*");
+  }
+
+  /**
+   * Prepares the specified mime type for comparison.
+   * @param type mime type
+   * @return mime type array
+   */
+  private static String[] prepareType(final String type) {
+    final String[] t = { type, "" };
+    if(type.equals("*")) {
+      t[1] = type;
+    } else {
+      final int i = type.indexOf('/');
+      if(i != -1) {
+        t[0] = type.substring(i);
+        t[1] = type.substring(i + 1);
+      }
+    }
+    return t;
   }
 
   /** Hash map containing all assignments. */
-  private static final HashMap<String, String> TYPES = new HashMap<String, String>();
+  private static final HashMap<String, String> TYPES = new HashMap<>();
 
   /** Reads in the mime-types. */
   static {
@@ -146,15 +158,12 @@ public final class MimeTypes {
       if(is == null) {
         Util.errln(file + " not found.");
       } else {
-        final NewlineInput nli = new NewlineInput(is);
-        try {
+        try(final NewlineInput nli = new NewlineInput(is)) {
           for(String line; (line = nli.readLine()) != null;) {
             final int i = line.indexOf('=');
             if(i == -1 || line.startsWith("#")) continue;
             TYPES.put(line.substring(0, i), line.substring(i + 1));
           }
-        } finally {
-          nli.close();
         }
       }
     } catch(final IOException ex) {

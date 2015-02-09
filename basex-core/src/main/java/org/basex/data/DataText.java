@@ -5,7 +5,7 @@ import static org.basex.util.Token.*;
 /**
  * This class assembles texts which are used in the data classes.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public interface DataText {
@@ -38,6 +38,8 @@ public interface DataText {
   String DBPTHIDX = "PTHINDEX";
   /** Automatic index update. */
   String DBUPDIDX = "UPDINDEX";
+  /** Automatic optimization. */
+  String DBAUTOOPT = "AUTOOPT";
   /** Text indexing. */
   String DBTXTIDX = "TXTINDEX";
   /** Attribute indexing. */
@@ -105,6 +107,10 @@ public interface DataText {
   String DATASWL = "swl";
   /** Database - Updating flag. */
   String DATAUPD = "upd";
+  /** Database - Document path index. */
+  String DATAPTH = "pth";
+  /** Database - ID->PRE mapping. */
+  String DATAIDP = "idp";
 
   // XML SERIALIZATION ============================================================================
 
@@ -138,7 +144,7 @@ public interface DataText {
   /** Ampersand entity. */
   byte[] E_AMP = token("&amp;");
   /** Quote entity. */
-  byte[] E_QU = token("&quot;");
+  byte[] E_QUOT = token("&quot;");
   /** GreaterThan entity. */
   byte[] E_GT = token("&gt;");
   /** LessThan entity. */
@@ -152,10 +158,6 @@ public interface DataText {
   /** HTML: Non-breaking space entity. */
   byte[] E_NBSP = token("&nbsp;");
 
-  /** Token: results. */
-  byte[] T_RESULTS = token("results");
-  /** Token: result. */
-  byte[] T_RESULT = token("result");
   /** Token: name. */
   byte[] T_NAME = token("name");
   /** Token: size. */
@@ -169,6 +171,10 @@ public interface DataText {
   byte[] XQCOMM_O = token("(:");
   /** XQuery comment. */
   byte[] XQCOMM_C = token(":)");
+  /** Javascript comment. */
+  byte[] JSCOMM_O = token("/*");
+  /** Javascript comment. */
+  byte[] JSCOMM_C = token("*/");
 
   /** PI output. */
   byte[] PI_O = token("<?");
@@ -247,6 +253,4 @@ public interface DataText {
   byte[] TABLEURI = token("URI");
   /** Table kinds. */
   byte[][] TABLEKINDS = tokens("DOC ", "ELEM", "TEXT", "ATTR", "COMM", "PI  ");
-  /** Database - ID->PRE mapping. */
-  String DATAIDP = "idp";
 }

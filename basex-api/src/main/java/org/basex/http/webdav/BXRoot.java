@@ -3,10 +3,9 @@ package org.basex.http.webdav;
 import static org.basex.http.webdav.impl.Utils.*;
 
 import java.io.*;
-import java.util.List;
+import java.util.*;
 
-import org.basex.http.webdav.impl.ResourceMetaData;
-import org.basex.http.webdav.impl.WebDAVService;
+import org.basex.http.webdav.impl.*;
 
 import com.bradmcevoy.http.*;
 import com.bradmcevoy.http.exceptions.*;
@@ -14,17 +13,17 @@ import com.bradmcevoy.http.exceptions.*;
 /**
  * WebDAV resource representing the list of all databases.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
-public final class BXRoot extends BXFolder {
+final class BXRoot extends BXFolder {
   /**
    * Constructor.
-   * @param s service
+   * @param service service
    */
-  public BXRoot(final WebDAVService<BXAbstractResource> s) {
-    super(new ResourceMetaData(), s);
+  BXRoot(final WebDAVService<BXAbstractResource> service) {
+    super(new ResourceMetaData(), service);
   }
 
   @Override

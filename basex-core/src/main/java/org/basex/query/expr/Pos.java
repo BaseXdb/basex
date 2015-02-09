@@ -6,6 +6,7 @@ import org.basex.query.*;
 import org.basex.query.expr.CmpV.OpV;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -14,7 +15,7 @@ import org.basex.util.hash.*;
 /**
  * Pos expression.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class Pos extends Simple {
@@ -25,46 +26,71 @@ public final class Pos extends Simple {
 
   /**
    * Constructor.
-   * @param mn minimum value
-   * @param mx minimum value
-   * @param ii input info
+   * @param min minimum value (1 or larger)
+   * @param max minimum value (1 or larger)
+   * @param info input info
    */
-  private Pos(final long mn, final long mx, final InputInfo ii) {
-    super(ii);
-    min = mn;
-    max = mx;
-    type = SeqType.BLN;
+  private Pos(final long min, final long max, final InputInfo info) {
+    super(info);
+    this.min = min;
+    this.max = max;
+    seqType = SeqType.BLN;
   }
 
   /**
-   * Returns a position expression, or an optimized boolean item.
-   * @param mn minimum value
-   * @param mx minimum value
-   * @param ii input info
+   * Returns a position expression for the specified index, or an optimized boolean item.
+   * @param index index position
+   * @param info input info
    * @return expression
    */
-  public static Expr get(final long mn, final long mx, final InputInfo ii) {
-    // suppose that positions always fit in long values..
-    return mn > mx || mx < 1 ? Bln.FALSE : mn <= 1 && mx == Long.MAX_VALUE ?
-      Bln.TRUE : new Pos(mn, mx, ii);
+  public static Expr get(final long index, final InputInfo info) {
+    return get(index, index, info);
   }
 
   /**
-   * Returns an instance of this class, if possible, and the input expression
-   * otherwise.
-   * @param cmp comparator
-   * @param a argument
-   * @param o original expression
-   * @param ii input info
-   * @return resulting expression, or {@code null}
+   * Returns a position expression for the specified range, or an optimized boolean item.
+   * @param min minimum value
+   * @param max minimum value
+   * @param info input info
+   * @return expression
    */
-  public static Expr get(final OpV cmp, final Expr a, final Expr o, final InputInfo ii) {
-    if(a instanceof ANum) {
-      final ANum it = (ANum) a;
+  public static Expr get(final long min, final long max, final InputInfo info) {
+    // suppose that positions always fit in long values..
+    return min > max || max < 1 ? Bln.FALSE : min <= 1 && max == Long.MAX_VALUE ? Bln.TRUE :
+      new Pos(Math.max(1, min), Math.max(1, max), info);
+  }
+
+  /**
+   * Returns a position expression for the specified range comparison.
+   * @param expr range comparison
+   * @return expression
+   */
+  public static Expr get(final CmpR expr) {
+    final double min = expr.min, max = expr.max;
+    final long mn = (long) (expr.mni ? (long) Math.ceil(min) : Math.floor(min + 1));
+    final long mx = (long) (expr.mxi ? (long) Math.floor(max) : Math.ceil(max - 1));
+    return get(mn, mx, expr.info);
+  }
+
+  /**
+   * Returns an instance of this class if possible, and the input expression otherwise.
+   * @param cmp comparator
+   * @param expr argument
+   * @param fallback fallback expression (optional, may be {@code null})
+   * @param ii input info
+   * @return resulting or fallback expression
+   */
+  public static Expr get(final OpV cmp, final Expr expr, final Expr fallback, final InputInfo ii) {
+    if(expr instanceof RangeSeq && cmp == OpV.EQ) {
+      final RangeSeq rs = (RangeSeq) expr;
+      return get(rs.start(), rs.end(), ii);
+    }
+    if(expr instanceof ANum) {
+      final ANum it = (ANum) expr;
       final long p = it.itr();
       final boolean ex = p == it.dbl();
       switch(cmp) {
-        case EQ: return ex ? get(p, p, ii) : Bln.FALSE;
+        case EQ: return ex ? get(p, ii) : Bln.FALSE;
         case GE: return get(ex ? p : p + 1, Long.MAX_VALUE, ii);
         case GT: return get(p + 1, Long.MAX_VALUE, ii);
         case LE: return get(1, p, ii);
@@ -72,27 +98,36 @@ public final class Pos extends Simple {
         default:
       }
     }
-    return o;
+    return fallback;
   }
 
   @Override
-  public Bln item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    checkCtx(ctx);
-    return Bln.get(ctx.pos >= min && ctx.pos <= max);
+  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    ctxValue(qc);
+    return Bln.get(matches(qc.pos));
   }
 
   @Override
-  public Pos copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
+  public Pos copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
     return new Pos(min, max, info);
   }
 
   /**
    * Returns false if no more results can be expected.
-   * @param ctx query context
+   * @param pos current position
    * @return result of check
    */
-  public boolean skip(final QueryContext ctx) {
-    return ctx.pos >= max;
+  public boolean skip(final long pos) {
+    return pos >= max;
+  }
+
+  /**
+   * Checks if the current position lies within the given position.
+   * @param pos current position
+   * @return result of check
+   */
+  public boolean matches(final long pos) {
+    return pos >= min && pos <= max;
   }
 
   /**

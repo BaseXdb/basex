@@ -13,12 +13,12 @@ import org.junit.Test;
 /**
  * This class tests String <-> Token conversions.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
 public final class UTF8Test extends SandboxTest {
   /** UTF8 character set. */
-  private static final Charset CS_UTF8 = Charset.availableCharsets().get(UTF8);
+  private static final Charset CS_UTF8 = Charset.availableCharsets().get(Strings.UTF8);
 
   /**
    * Tests for all valid code points if characters are properly converted.

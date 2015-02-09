@@ -1,15 +1,14 @@
 package org.basex.qt3ts;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
-
 import org.basex.qt3ts.misc.*;
+import org.junit.runner.*;
+import org.junit.runners.*;
+import org.junit.runners.Suite.SuiteClasses;
 
 /**
  * Test suite for the "misc" test group.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
 @RunWith(Suite.class)

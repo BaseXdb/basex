@@ -1,12 +1,12 @@
 package org.basex.qt3ts.fn;
 
-import org.basex.tests.bxapi.XQuery;
+import org.basex.tests.bxapi.*;
 import org.basex.tests.qt3ts.*;
 
 /**
  * Tests for the node-name() function.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
 @SuppressWarnings("all")
@@ -17,7 +17,6 @@ public class FnNodeName extends QT3TestSet {
    */
   @org.junit.Test
   public void kNodeNameFunc1() {
-    xquery10();
     final XQuery query = new XQuery(
       "node-name()",
       ctx);

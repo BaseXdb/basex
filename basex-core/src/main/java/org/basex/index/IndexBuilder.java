@@ -12,7 +12,7 @@ import org.basex.util.*;
  * This interface defines the functions which are needed for building
  * new index structures.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public abstract class IndexBuilder extends Proc {
@@ -34,6 +34,18 @@ public abstract class IndexBuilder extends Proc {
   protected int splits;
   /** Threshold for freeing memory when estimating main memory consumption. */
   private int gcCount;
+
+  /**
+   * Constructor.
+   * @param data reference
+   * @param max maximum number of operations per partial index
+   */
+  protected IndexBuilder(final Data data, final int max) {
+    this.data = data;
+    size = data.meta.size;
+    splitSize = max;
+    if(Performance.memory() >= maxMem) Performance.gc(1);
+  }
 
   /**
    * Builds the index structure and returns an index instance.
@@ -79,7 +91,7 @@ public abstract class IndexBuilder extends Proc {
   }
 
   /**
-   * Performs memory cleanup after writing partial memory, if necessary.
+   * Performs memory cleanup after writing partial memory if necessary.
    */
   protected final void finishSplit() {
     if(splitSize <= 0) Performance.gc(1);
@@ -99,18 +111,6 @@ public abstract class IndexBuilder extends Proc {
     Util.errln(sb);
   }
 
-  /**
-   * Constructor.
-   * @param d reference
-   * @param max maximum number of operations per partial index
-   */
-  protected IndexBuilder(final Data d, final int max) {
-    data = d;
-    size = data.meta.size;
-    splitSize = max;
-    if(Performance.memory() >= maxMem) Performance.gc(1);
-  }
-
   @Override
   public final String tit() {
     return CREATING_INDEXES;
@@ -118,6 +118,6 @@ public abstract class IndexBuilder extends Proc {
 
   @Override
   public final double prog() {
-    return (double) pre / (size + (splits > 0 ? size / 50 : 0));
+    return pre / (size + (splits > 0 ? size / 50d : 0d));
   }
 }

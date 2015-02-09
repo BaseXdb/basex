@@ -7,15 +7,14 @@ import java.util.*;
  * This class contains static, thread-safe methods for parsing and formatting
  * dates and times.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class DateTime {
   /** Date pattern. */
   public static final String PATTERN = "-\\d{4}-\\d{2}-\\d{2}-\\d{2}-\\d{2}-\\d{2}";
   /** Full date format. */
-  public static final SimpleDateFormat FULL =
-      new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+  public static final SimpleDateFormat FULL = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
   /** Date format without milliseconds and timestamp. */
   public static final SimpleDateFormat DATETIME = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
   /** Date format. */
@@ -38,7 +37,7 @@ public final class DateTime {
    */
   public static long parse(final String date) {
     try {
-      return parse(date, FULL).getTime();
+      synchronized(FULL) { return parse(date, FULL).getTime(); }
     } catch(final ParseException ex) {
       Util.errln(ex);
       return 0;

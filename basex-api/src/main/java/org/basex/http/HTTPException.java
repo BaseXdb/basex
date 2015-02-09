@@ -7,7 +7,7 @@ import org.basex.util.*;
 /**
  * HTTP exception. Also thrown to pass on correct status codes.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class HTTPException extends IOException {
@@ -19,7 +19,7 @@ public final class HTTPException extends IOException {
    * @param err error
    * @param ext message extension
    */
-  public HTTPException(final HTTPCode err, final Object... ext) {
+  HTTPException(final HTTPCode err, final Object... ext) {
     super(Util.info(err.desc, ext));
     status = err.code;
   }

@@ -1,21 +1,23 @@
 package org.basex.core.cmd;
 
 import org.basex.core.*;
+import org.basex.core.locks.*;
+import org.basex.core.users.*;
 
 /**
  * Abstract class for repository commands.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Jens Erat
  */
 abstract class ARepo extends Command {
   /**
    * Constructor for repository commands.
-   * @param p required permission
-   * @param arg arguments
+   * @param perm required permission
+   * @param args arguments
    */
-  ARepo(final Perm p, final String... arg) {
-    super(p, arg);
+  ARepo(final Perm perm, final String... args) {
+    super(perm, args);
   }
 
   @Override

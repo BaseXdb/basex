@@ -1,6 +1,7 @@
 package org.basex.query;
 
 import static org.basex.core.Text.*;
+import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 
@@ -8,8 +9,7 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
-import org.basex.io.serial.SerializerOptions.YesNo;
-import org.basex.query.up.primitives.*;
+import org.basex.query.up.primitives.node.*;
 import org.basex.query.util.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -19,7 +19,7 @@ import org.junit.Test;
 /**
  * This class tests namespaces.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Lukas Kircher
  */
 public final class NamespaceTest extends AdvancedQueryTest {
@@ -47,6 +47,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
     { "d18", "<n xmlns:ns='ns'><a/></n>"},
     { "d19", "<x:n xmlns:x='X'/>"},
     { "d20", "<x:a xmlns:x='A'><x:b xmlns:x='B'/><x:c/></x:a>"},
+    { "d21", "<n><a xmlns:p1='u1'><b xmlns:p2='u2'/></a><c/></n>"}
   };
 
   /**
@@ -164,6 +165,19 @@ public final class NamespaceTest extends AdvancedQueryTest {
     query("delete node doc('d11')/*:a/*:b",
         "doc('d11')/*:a",
         "<a xmlns='A'><c xmlns:ns1='AA'><d/></c></a>");
+  }
+
+  /**
+   * Tests if a namespace node is deleted.
+   * @throws Exception exception
+   */
+  @Test
+  public void delete2() throws Exception {
+    create(21);
+    query("delete node //b");
+    assertEquals(NL +
+        "  Pre[2] xmlns:p1=\"u1\" ",
+        context.data().nspaces.toString());
   }
 
   /** Test query. */
@@ -465,9 +479,9 @@ public final class NamespaceTest extends AdvancedQueryTest {
   @Test
   public void deleteDocumentNode() throws Exception {
     create(2);
-    context.data().startUpdate();
+    context.data().startUpdate(context.options);
     context.data().delete(0);
-    context.data().finishUpdate();
+    context.data().finishUpdate(context.options);
     final byte[] ns = context.data().nspaces.globalNS();
     assertTrue(ns != null && ns.length == 0);
   }
@@ -563,7 +577,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
       "copy $a := <a xmlns:p='A' a='v'/> " +
       "modify rename node $a/@a as QName('uri', 'p:a') " +
       "return $a",
-      Err.UPNSCONFL);
+      UPNSCONFL);
   }
 
   /**
@@ -590,7 +604,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
       "modify for $el in $a/descendant-or-self::element() return " +
       "rename node $el as QName('',local-name($el)) " +
       "return $a",
-      Err.UPNSCONFL);
+      UPNSCONFL);
   }
 
   /**
@@ -712,10 +726,10 @@ public final class NamespaceTest extends AdvancedQueryTest {
   @Test
   public void stripNS() throws Exception {
     final IO io = IO.get("<a xmlns:a='a'><b><c/><c/><c/></b></a>");
-    final ANode root = new DBNode(io, context.options);
-    final QueryProcessor qp = new QueryProcessor("/*:a/*:b", context).context(root);
-    final ANode sub = (ANode) qp.iter().next();
-    DataBuilder.stripNS(sub, token("a"), context);
+    try(final QueryProcessor qp = new QueryProcessor("/*:a/*:b", context).context(new DBNode(io))) {
+      final ANode sub = (ANode) qp.iter().next();
+      DataBuilder.stripNS(sub, token("a"), context);
+    }
   }
 
   /**
@@ -725,14 +739,15 @@ public final class NamespaceTest extends AdvancedQueryTest {
   @Test
   @Ignore
   public void xuty0004() {
-    try {
-      new QueryProcessor("declare variable $input-context external;" +
-          "let $source as node()* := (" +
-          "    <status>on leave</status>," +
-          "    <!-- for 6 months -->" +
-          "  )," +
-          "  $target := $input-context/works[1]/employee[1]" +
-          "return insert nodes $source into $target", context).execute();
+    final String query = "declare variable $input-context external;" +
+        "let $source as node()* := (" +
+        "    <status>on leave</status>," +
+        "    <!-- for 6 months -->" +
+        "  )," +
+        "  $target := $input-context/works[1]/employee[1]" +
+        "return insert nodes $source into $target";
+    try(final QueryProcessor qp = new QueryProcessor(query, context)) {
+      qp.execute();
     } catch(final QueryException ex) {
       assertEquals("XUTY0004", string(ex.qname().local()));
     }
@@ -768,7 +783,6 @@ public final class NamespaceTest extends AdvancedQueryTest {
    * @throws Exception exception
    */
   @Test
-  @Ignore
   public void defaultNS() throws Exception {
     create(1);
     query("<h xmlns='U'>{ doc('d1')/x }</h>/*", "");
@@ -798,7 +812,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
     create(1);
     query("insert node attribute xml:space { 'preserve' } into /x", "");
     query(".", "<x xml:space='preserve'/>");
-    error("insert node attribute xml:space { 'preserve' } into /x", Err.UPATTDUPL);
+    error("insert node attribute xml:space { 'preserve' } into /x", UPATTDUPL_X);
   }
 
   /**
@@ -813,7 +827,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
     error("copy $c := <a xmlns='X'/> modify (" +
         "  rename node $c as QName('Y','b')," +
         "  insert node attribute c{'a'} into $c" +
-        ") return $c", Err.UPNSCONFL);
+        ") return $c", UPNSCONFL);
     query("copy $c := <a/> modify (" +
         "  rename node $c as QName('X','b')," +
         "  insert node attribute c{'a'} into $c" +
@@ -838,9 +852,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
   @BeforeClass
   public static void start() throws BaseXException {
     // turn off pretty printing
-    final SerializerOptions sopts = new SerializerOptions();
-    sopts.set(SerializerOptions.INDENT, YesNo.NO);
-    new Set(MainOptions.SERIALIZER, sopts).execute(context);
+    new Set(MainOptions.SERIALIZER, SerializerOptions.get(false)).execute(context);
   }
 
   /**

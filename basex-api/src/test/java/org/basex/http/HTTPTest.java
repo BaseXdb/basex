@@ -1,6 +1,7 @@
 package org.basex.http;
 
-import static org.basex.http.HTTPMethod.*;
+import static org.basex.core.users.UserText.*;
+import static org.basex.query.func.http.HTTPMethod.*;
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 
@@ -10,24 +11,36 @@ import java.util.*;
 
 import org.basex.*;
 import org.basex.core.*;
+import org.basex.core.StaticOptions.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
+import org.basex.query.func.http.*;
 import org.basex.util.*;
-import org.basex.util.Base64;
 import org.basex.util.list.*;
 import org.junit.*;
 
 /**
  * This class contains common methods for the HTTP services.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public abstract class HTTPTest extends SandboxTest {
+  /** HTTP stop port. */
+  protected static final int STOP_PORT = 9999;
+  /** HTTP port. */
+  protected static final int HTTP_PORT = 9998;
+  /** REST identifier. */
+  protected static final String REST = "rest";
+  /** Root path. */
+  protected static final String RESTXQ_ROOT = "http://" + Text.S_LOCALHOST + ':' + HTTP_PORT + '/';
+  /** Root path. */
+  protected static final String REST_ROOT = RESTXQ_ROOT + REST + '/';
+
   /** Database context. */
   private static final Context CONTEXT = HTTPContext.init();
-  /** Start servers. */
+  /** HTTP server. */
   private static BaseXHTTP http;
   /** Root path. */
   private static String root;
@@ -41,13 +54,13 @@ public abstract class HTTPTest extends SandboxTest {
    * @throws Exception exception
    */
   protected static void init(final String rt, final boolean local) throws Exception {
-    initContext(CONTEXT);
-    assertTrue(new IOFile(CONTEXT.globalopts.get(GlobalOptions.WEBPATH)).md());
+    assertTrue(new IOFile(CONTEXT.soptions.get(StaticOptions.WEBPATH)).md());
     root = rt;
 
     final StringList sl = new StringList();
     if(local) sl.add("-l");
-    sl.add("-p9996", "-e9997", "-h9998", "-s9999", "-z", "-U" + Text.S_ADMIN, "-P" + Text.S_ADMIN);
+    sl.add("-p" + DB_PORT, "-e" + EVENT_PORT, "-h" + HTTP_PORT, "-s" + STOP_PORT, "-z");
+    sl.add("-U" + ADMIN, "-P" + ADMIN);
     System.setOut(NULL);
     try {
       http = new BaseXHTTP(sl.toArray());
@@ -137,7 +150,7 @@ public abstract class HTTPTest extends SandboxTest {
     final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
     try {
       conn.setRequestMethod(method);
-      return read(new BufferInput(conn.getInputStream())).replaceAll("\r?\n *", "");
+      return normNL(read(new BufferInput(conn.getInputStream())));
     } catch(final IOException ex) {
       throw error(conn, ex);
     } finally {
@@ -161,14 +174,14 @@ public abstract class HTTPTest extends SandboxTest {
     final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
     conn.setDoOutput(true);
     conn.setRequestMethod(POST.name());
-    conn.setRequestProperty(MimeTypes.CONTENT_TYPE, type);
+    conn.setRequestProperty(HttpText.CONTENT_TYPE, type);
     // basic authentication
-    final String encoded = Base64.encode(Text.S_ADMIN + ':' + Text.S_ADMIN);
-    conn.setRequestProperty(HTTPText.AUTHORIZATION, HTTPText.BASIC + ' ' + encoded);
+    final String encoded = org.basex.util.Base64.encode(ADMIN + ':' + ADMIN);
+    conn.setRequestProperty(HttpText.AUTHORIZATION, AuthMethod.BASIC + " " + encoded);
     // send query
-    final OutputStream out = conn.getOutputStream();
-    out.write(token(request));
-    out.close();
+    try(final OutputStream out = conn.getOutputStream()) {
+      out.write(token(request));
+    }
 
     try {
       return read(conn.getInputStream()).replaceAll("\r?\n *", "");
@@ -202,9 +215,9 @@ public abstract class HTTPTest extends SandboxTest {
   protected static String read(final InputStream is) throws IOException {
     final ArrayOutput ao = new ArrayOutput();
     if(is != null) {
-      final BufferInput bi = new BufferInput(is);
-      for(int i; (i = bi.read()) != -1;) ao.write(i);
-      bi.close();
+      try(final BufferInput bi = new BufferInput(is)) {
+        for(int i; (i = bi.read()) != -1;) ao.write(i);
+      }
     }
     return ao.toString();
   }
@@ -233,14 +246,14 @@ public abstract class HTTPTest extends SandboxTest {
     final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
     conn.setDoOutput(true);
     conn.setRequestMethod(PUT.name());
-    if(ctype != null) conn.setRequestProperty(MimeTypes.CONTENT_TYPE, ctype);
-    final OutputStream bos = new BufferedOutputStream(conn.getOutputStream());
-    if(is != null) {
-      // send input stream if it not empty
-      final BufferedInputStream bis = new BufferedInputStream(is);
-      for(int i; (i = bis.read()) != -1;) bos.write(i);
-      bis.close();
-      bos.close();
+    if(ctype != null) conn.setRequestProperty(HttpText.CONTENT_TYPE, ctype);
+    try(final OutputStream bos = new BufferedOutputStream(conn.getOutputStream())) {
+      if(is != null) {
+        // send input stream if it not empty
+        try(final BufferedInputStream bis = new BufferedInputStream(is)) {
+          for(int i; (i = bis.read()) != -1;) bos.write(i);
+        }
+      }
     }
     try {
       read(conn.getInputStream());

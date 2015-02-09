@@ -3,14 +3,14 @@ package org.basex.http.restxq;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
+import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
-import org.basex.query.path.*;
 import org.basex.query.value.item.*;
 
 /**
  * This class assembles texts which are used in the HTTP classes.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public interface RestXqText {
@@ -18,22 +18,6 @@ public interface RestXqText {
   byte[] ERROR = token("error");
   /** Token "path". */
   byte[] PATH = token("path");
-  /** Token "produces". */
-  byte[] PRODUCES = token("produces");
-  /** Token "consumes". */
-  byte[] CONSUMES = token("consumes");
-  /** Token "query-param". */
-  byte[] QUERY_PARAM = token("query-param");
-  /** Token "form-param". */
-  byte[] FORM_PARAM = token("form-param");
-  /** Token "header-param". */
-  byte[] HEADER_PARAM = token("header-param");
-  /** Token "cookie-param". */
-  byte[] COOKIE_PARAM = token("cookie-param");
-  /** Token "query-param". */
-  byte[] ERROR_PARAM = token("error-param");
-  /** Token "method". */
-  byte[] METHOD = token("method");
 
   /** Token "header". */
   byte[] HEADER = token("header");
@@ -66,13 +50,7 @@ public interface RestXqText {
   /** Error message. */
   String ANN_BODYVAR = "More than one body request variable specified.";
   /** Error message. */
-  String ANN_TWICE = "Annotation %% is specified more than once.";
-  /** Error message. */
-  String ANN_UNKNOWN = "Annotation %% is invalid or not supported.";
-  /** Error message. */
-  String ANN_ATLEAST = "Annotation %% requires at least % parameter(s).";
-  /** Error message. */
-  String ANN_STRING = "Single string expected for %%, found: %.";
+  String ANN_TWICE = "Annotation %% is specified twice.";
   /** Error message. */
   String INV_TEMPLATE = "Invalid path template: \"%\".";
   /** Error message. */
@@ -124,13 +102,13 @@ public interface RestXqText {
   /** Serializer node test. */
   NodeTest OUTPUT_SERIAL = new NodeTest(FuncOptions.Q_SPARAM);
   /** HTTP Response test. */
-  NodeTest HTTP_RESPONSE = new NodeTest(QNm.get(RESPONSE, HTTPURI));
+  NodeTest HTTP_RESPONSE = new NodeTest(QNm.get(RESPONSE, HTTP_URI));
   /** RESTXQ Response test. */
-  NodeTest REST_RESPONSE = new NodeTest(QNm.get(RESPONSE, RESTURI));
+  NodeTest REST_RESPONSE = new NodeTest(QNm.get(RESPONSE, REST_URI));
   /** RESTXQ Redirect test. */
-  NodeTest REST_REDIRECT = new NodeTest(QNm.get(REDIRECT, RESTURI));
+  NodeTest REST_REDIRECT = new NodeTest(QNm.get(REDIRECT, REST_URI));
   /** RESTXQ Forward test. */
-  NodeTest REST_FORWARD = new NodeTest(QNm.get(FORWARD, RESTURI));
+  NodeTest REST_FORWARD = new NodeTest(QNm.get(FORWARD, REST_URI));
   /** HTTP Header test. */
-  NodeTest HTTP_HEADER = new NodeTest(QNm.get(HEADER, HTTPURI));
+  NodeTest HTTP_HEADER = new NodeTest(QNm.get(HEADER, HTTP_URI));
 }

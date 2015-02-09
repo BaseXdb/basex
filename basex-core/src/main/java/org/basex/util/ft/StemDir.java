@@ -10,7 +10,7 @@ import org.basex.util.hash.*;
 /**
  * Simple stemming directory for full-text requests.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class StemDir extends TokenMap {
@@ -23,7 +23,7 @@ public final class StemDir extends TokenMap {
     try {
       for(final byte[] sl : split(fl.read(), '\n')) {
         byte[] val = null;
-        for(final byte[] st : split(norm(sl), ' ')) {
+        for(final byte[] st : split(normalize(sl), ' ')) {
           if(val == null) val = st;
           else put(st, val);
         }
@@ -39,7 +39,7 @@ public final class StemDir extends TokenMap {
    * @param word word to be stemmed
    * @return resulting token
    */
-  public byte[] stem(final byte[] word) {
+  byte[] stem(final byte[] word) {
     final byte[] sn = get(word);
     return sn != null ? sn : word;
   }

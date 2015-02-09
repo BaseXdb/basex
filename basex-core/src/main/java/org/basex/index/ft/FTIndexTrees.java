@@ -4,7 +4,7 @@ package org.basex.index.ft;
  * This class provides an array with several {@link FTIndexTree} instances,
  * one for each token length.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  * @author Sebastian Gath
  */
@@ -57,7 +57,8 @@ final class FTIndexTrees {
    */
   boolean more(final int cf) {
     if(ctree != -1 && trees[ctree].more(cf)) return true;
-    while(++ctree < trees.length) if(trees[ctree] != null) return more(cf);
+    final int tl = trees.length;
+    while(++ctree < tl) if(trees[ctree] != null) return more(cf);
     return false;
   }
 

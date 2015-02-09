@@ -1,14 +1,14 @@
 package org.basex.query.var;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 
 import java.util.*;
 import java.util.Map.Entry;
 
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.util.*;
+import org.basex.query.util.list.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -17,32 +17,32 @@ import org.basex.util.*;
 /**
  * Container of global variables of a module.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
 public final class Variables extends ExprInfo implements Iterable<StaticVar> {
   /** The variables. */
-  private final HashMap<QNm, VarEntry> vars = new HashMap<QNm, VarEntry>();
+  private final HashMap<QNm, VarEntry> vars = new HashMap<>();
 
   /**
    * Declares a new static variable.
    * @param nm variable name
-   * @param t type
-   * @param a annotations
-   * @param e bound expression, possibly {@code null}
+   * @param type declared type
+   * @param anns annotations
+   * @param expr bound expression, possibly {@code null}
    * @param ext {@code external} flag
-   * @param sctx static context
-   * @param scp variable scope
-   * @param xqdoc current xqdoc cache
+   * @param sc static context
+   * @param scope variable scope
+   * @param doc current xqdoc cache
    * @param ii input info
    * @return static variable reference
    * @throws QueryException query exception
    */
-  public StaticVar declare(final QNm nm, final SeqType t, final Ann a, final Expr e,
-      final boolean ext, final StaticContext sctx, final VarScope scp, final String xqdoc,
+  public StaticVar declare(final QNm nm, final SeqType type, final AnnList anns, final Expr expr,
+      final boolean ext, final StaticContext sc, final VarScope scope, final String doc,
       final InputInfo ii) throws QueryException {
 
-    final StaticVar var = new StaticVar(sctx, scp, a, nm, t, e, ext, xqdoc, ii);
+    final StaticVar var = new StaticVar(sc, scope, anns, nm, type, expr, ext, doc, ii);
     final VarEntry ve = vars.get(nm);
     if(ve != null) ve.setVar(var);
     else vars.put(nm, new VarEntry(var));
@@ -64,7 +64,7 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
   public void check() throws QueryException {
     for(final Entry<QNm, VarEntry> e : vars.entrySet()) {
       final VarEntry ve = e.getValue();
-      if(ve.var == null) throw VARUNDEF.get(ve.refs[0].info, ve.refs[0]);
+      if(ve.var == null) throw VARUNDEF_X.get(ve.refs[0].info, ve.refs[0]);
     }
   }
 
@@ -84,27 +84,17 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
   }
 
   /**
-   * Checks if a variable with the given name was already declared.
-   * @param nm variable name
-   * @return result of check
-   */
-  public boolean declared(final QNm nm) {
-    final VarEntry entry = vars.get(nm);
-    return entry != null && entry.var != null;
-  }
-
-  /**
    * Returns a new reference to the (possibly not yet declared) variable with the given name.
    * @param ii input info
    * @param nm variable name
-   * @param sctx static context
+   * @param sc static context
    * @return reference
    * @throws QueryException if the variable is not visible
    */
-  public StaticVarRef newRef(final QNm nm, final StaticContext sctx, final InputInfo ii)
+  public StaticVarRef newRef(final QNm nm, final StaticContext sc, final InputInfo ii)
       throws QueryException {
 
-    final StaticVarRef ref = new StaticVarRef(ii, nm, sctx);
+    final StaticVarRef ref = new StaticVarRef(ii, nm, sc);
     final VarEntry e = vars.get(nm), entry = e != null ? e : new VarEntry(null);
     if(e == null) vars.put(nm, entry);
     entry.addRef(ref);
@@ -113,16 +103,16 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
 
   /**
    * Binds all external variables.
-   * @param ctx query context
+   * @param qc query context
    * @param bindings variable bindings
    * @throws QueryException query exception
    */
-  public void bindExternal(final QueryContext ctx, final HashMap<QNm, Expr> bindings)
+  public void bindExternal(final QueryContext qc, final HashMap<QNm, Value> bindings)
       throws QueryException {
 
-    for(final Entry<QNm, Expr> e : bindings.entrySet()) {
-      final VarEntry ve = vars.get(e.getKey());
-      if(ve != null) ve.var.bind(e.getValue(), ctx);
+    for(final Entry<QNm, Value> entry : bindings.entrySet()) {
+      final VarEntry ve = vars.get(entry.getKey());
+      if(ve != null) ve.var.bind(entry.getValue(), qc);
     }
   }
 
@@ -168,7 +158,7 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
      * @throws QueryException if the variable was already declared
      */
     void setVar(final StaticVar vr) throws QueryException {
-      if(var != null) throw VARDUPL.get(vr.info, var.name.string());
+      if(var != null) throw VARDUPL_X.get(vr.info, var.name.string());
       var = vr;
       for(final StaticVarRef ref : refs) ref.init(var);
     }

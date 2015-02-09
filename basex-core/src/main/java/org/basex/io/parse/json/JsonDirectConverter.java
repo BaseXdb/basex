@@ -3,7 +3,7 @@ package org.basex.io.parse.json;
 import static org.basex.io.parse.json.JsonConstants.*;
 import static org.basex.util.Token.*;
 
-import org.basex.build.*;
+import org.basex.build.json.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 
@@ -44,7 +44,7 @@ import org.basex.util.*;
  * </ol></li>
  * </ol>
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  * @author Leo Woerteler
  */
@@ -59,7 +59,7 @@ public final class JsonDirectConverter extends JsonXmlConverter {
    * Constructor.
    * @param opts json options
    */
-  public JsonDirectConverter(final JsonParserOptions opts) {
+  JsonDirectConverter(final JsonParserOptions opts) {
     super(opts);
     lax = jopts.get(JsonOptions.LAX);
   }
@@ -73,15 +73,15 @@ public final class JsonDirectConverter extends JsonXmlConverter {
     final FElem e = new FElem(name);
     addType(e, e.name(), type);
 
-    if(elem != null) elem.add(e);
-    else elem = e;
+    if(curr != null) curr.add(e);
+    else curr = e;
     name = null;
     return e;
   }
 
   @Override
   void openObject() {
-    elem = addElem(OBJECT);
+    curr = addElem(OBJECT);
   }
 
   @Override
@@ -90,17 +90,17 @@ public final class JsonDirectConverter extends JsonXmlConverter {
   }
 
   @Override
-  void closePair() { }
+  void closePair(final boolean add) { }
 
   @Override
   void closeObject() {
-    final FElem par = (FElem) elem.parent();
-    if(par != null) elem = par;
+    final FElem par = (FElem) curr.parent();
+    if(par != null) curr = par;
   }
 
   @Override
   void openArray() {
-    elem = addElem(ARRAY);
+    curr = addElem(ARRAY);
   }
 
   @Override
@@ -137,7 +137,7 @@ public final class JsonDirectConverter extends JsonXmlConverter {
   @Override
   public void closeConstr() {
     closeArray();
-    closePair();
+    closePair(true);
     closeObject();
   }
 
@@ -157,7 +157,7 @@ public final class JsonDirectConverter extends JsonXmlConverter {
   }
 
   @Override
-  public void booleanLit(final byte[] b) {
-    addElem(BOOLEAN).add(b);
+  public void booleanLit(final byte[] value) {
+    addElem(BOOLEAN).add(value);
   }
 }

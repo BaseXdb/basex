@@ -14,7 +14,7 @@ import javax.xml.xquery.*;
  *
  * Part 11: Processing Large Inputs.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  */
 public final class Part11 extends Main {
   /**

@@ -11,7 +11,6 @@ import javax.swing.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.gui.*;
-import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.*;
 import org.basex.gui.text.*;
 import org.basex.gui.view.*;
@@ -21,7 +20,7 @@ import org.basex.util.list.*;
 /**
  * This view displays query information.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class InfoView extends View implements LinkListener {
@@ -31,7 +30,7 @@ public final class InfoView extends View implements LinkListener {
   /** Current text. */
   private final TokenBuilder text = new TokenBuilder();
   /** Header label. */
-  private final BaseXLabel label;
+  private final BaseXHeader header;
   /** Timer label. */
   private final BaseXLabel timer;
   /** Text Area. */
@@ -64,28 +63,27 @@ public final class InfoView extends View implements LinkListener {
     super(GUIConstants.INFOVIEW, man);
     border(5).layout(new BorderLayout(0, 5));
 
-    label = new BaseXLabel(QUERY_INFO);
-    label.setForeground(GUIConstants.GRAY);
+    header = new BaseXHeader(QUERY_INFO);
 
     timer = new BaseXLabel(" ", true, false);
-    timer.setForeground(GUIConstants.DGRAY);
+    timer.setForeground(GUIConstants.dgray);
 
     area = new TextPanel(false, gui);
     area.setLinkListener(this);
     editor = new SearchEditor(gui, area);
 
     final AbstractButton find = editor.button(FIND);
-    final BaseXBack buttons = new BaseXBack(Fill.NONE);
+    final BaseXBack buttons = new BaseXBack(false);
     buttons.layout(new TableLayout(1, 3, 8, 0)).border(0, 0, 4, 0);
     buttons.add(find);
     buttons.add(timer);
 
-    final BaseXBack b = new BaseXBack(Fill.NONE).layout(new BorderLayout());
+    final BaseXBack b = new BaseXBack(false).layout(new BorderLayout());
     b.add(buttons, BorderLayout.WEST);
-    b.add(label, BorderLayout.EAST);
+    b.add(header, BorderLayout.EAST);
     add(b, BorderLayout.NORTH);
 
-    final BaseXBack center = new BaseXBack(Fill.NONE).layout(new BorderLayout());
+    final BaseXBack center = new BaseXBack(false).layout(new BorderLayout());
     add(editor, BorderLayout.CENTER);
 
     center.add(area, BorderLayout.CENTER);
@@ -111,7 +109,7 @@ public final class InfoView extends View implements LinkListener {
 
   @Override
   public void refreshLayout() {
-    label.border(-6, 0, 0, 2).setFont(GUIConstants.lfont);
+    header.refreshLayout();
     timer.setFont(GUIConstants.font);
     area.setFont(GUIConstants.font);
     editor.bar().refreshLayout();
@@ -159,7 +157,7 @@ public final class InfoView extends View implements LinkListener {
     final StringList plan = new StringList(1);
     final StringList result = new StringList(1);
     final StringList stack = new StringList(1);
-    final StringList err = new StringList(1);
+    final StringList error = new StringList(1);
     final StringList origqu = new StringList(1);
     final StringList optqu = new StringList(1);
     final StringList command = new StringList(1);
@@ -169,16 +167,17 @@ public final class InfoView extends View implements LinkListener {
 
     final int runs = Math.max(1, gui.context.options.get(MainOptions.RUNS));
     final String[] split = info.split(NL);
-    for(int i = 0; i < split.length; ++i) {
-      final String line = split[i];
+    final int sl = split.length;
+    for(int s = 0; s < sl; s++) {
+      final String line = split[s];
       if(line.startsWith(PARSING_CC) || line.startsWith(COMPILING_CC) ||
           line.startsWith(EVALUATING_CC) || line.startsWith(PRINTING_CC) ||
           line.startsWith(TOTAL_TIME_CC)) {
         final int t = line.indexOf(" ms");
-        final int s = line.indexOf(':');
-        final int tm = (int) (Double.parseDouble(line.substring(s + 1, t)) * 100);
+        final int d = line.indexOf(':');
+        final int tm = (int) (Double.parseDouble(line.substring(d + 1, t)) * 100);
         times.add(tm);
-        final String key = line.substring(0, s).trim();
+        final String key = line.substring(0, d).trim();
         final String val = Performance.getTime(tm * 10000L * runs, runs);
         timings.add(LI + key + COLS + val);
       } else if(line.startsWith(HITS_X_CC) || line.startsWith(UPDATED_CC) ||
@@ -186,31 +185,31 @@ public final class InfoView extends View implements LinkListener {
           line.startsWith(WRITE_LOCKING_CC)) {
         result.add(LI + line);
       } else if(line.equals(COMPILING + COL)) {
-        while(++i < split.length && !split[i].isEmpty()) comp.add(split[i]);
+        while(++s < sl && !split[s].isEmpty()) comp.add(split[s]);
       } else if(line.equals(QUERY + COL)) {
-        while(++i < split.length && !split[i].isEmpty()) origqu.add(split[i]);
+        while(++s < sl && !split[s].isEmpty()) origqu.add(split[s]);
       } else if(line.equals(OPTIMIZED_QUERY + COL)) {
-        while(++i < split.length && !split[i].isEmpty()) optqu.add(split[i]);
+        while(++s < sl && !split[s].isEmpty()) optqu.add(split[s]);
       } else if(line.startsWith(EVALUATING)) {
-        while(++i < split.length && split[i].startsWith(LI)) eval.add(split[i]);
+        while(++s < sl && split[s].startsWith(LI)) eval.add(split[s]);
       } else if(line.equals(QUERY_PLAN + COL)) {
-        while(++i < split.length && !split[i].isEmpty()) plan.add(split[i]);
+        while(++s < sl && !split[s].isEmpty()) plan.add(split[s]);
       } else if(line.equals(Text.ERROR + COL)) {
-        while(++i < split.length && !split[i].isEmpty()) {
+        while(++s < sl && !split[s].isEmpty()) {
           final Pattern p = Pattern.compile(STOPPED_AT + "(.*)" + COL);
-          final Matcher m = p.matcher(split[i]);
+          final Matcher m = p.matcher(split[s]);
           if(m.find()) {
             final TokenBuilder tb = new TokenBuilder();
             tb.add(STOPPED_AT).uline().add(m.group(1)).uline().add(COL);
-            split[i] = tb.toString();
+            split[s] = tb.toString();
           }
-          err.add(split[i]);
+          error.add(split[s]);
         }
       } else if(line.equals(STACK_TRACE + COL)) {
-        while(++i < split.length && !split[i].isEmpty()) {
+        while(++s < sl && !split[s].isEmpty()) {
           final TokenBuilder tb = new TokenBuilder();
-          final String sp = split[i].replaceAll("<.*", "");
-          final boolean last = !sp.equals(split[i]);
+          final String sp = split[s].replaceAll("<.*", "");
+          final boolean last = !sp.equals(split[s]);
           if(sp.startsWith(LI)) {
             tb.add(LI).uline().add(sp.substring(2)).uline();
           } else {
@@ -220,7 +219,7 @@ public final class InfoView extends View implements LinkListener {
           if(last) break;
         }
       } else if(!ok && !line.isEmpty()) {
-        err.add(line);
+        error.add(line);
       }
     }
 
@@ -239,7 +238,7 @@ public final class InfoView extends View implements LinkListener {
     }
 
     add(COMMAND + COL, command);
-    add(Text.ERROR + COL, err);
+    add(Text.ERROR + COL, error);
     add(STACK_TRACE + COL, stack);
     add(EVALUATING + COL, eval);
     add(COMPILING + COL, comp);
@@ -299,7 +298,7 @@ public final class InfoView extends View implements LinkListener {
   @Override
   public void paintComponent(final Graphics g) {
     if(changed) {
-      area.setText(text.finish());
+      area.setText(text.toArray());
       changed = false;
     }
 
@@ -308,8 +307,8 @@ public final class InfoView extends View implements LinkListener {
     if(l == 0) return;
 
     final int fs = GUIConstants.fontSize;
-    h = label.getHeight() + 4;
-    w = (int) (getWidth() * .98 - fs / 2 - label.getWidth());
+    h = header.getHeight() + 4;
+    w = (int) (getWidth() * .98 - fs / 2d - header.getWidth());
     bw = fs * 2 + w / 10;
     bs = bw / (l - 1);
 

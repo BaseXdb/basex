@@ -4,12 +4,11 @@ import java.awt.*;
 import java.awt.event.*;
 
 import javax.swing.*;
-import javax.swing.border.*;
 
 /**
  * Project specific RadioButton implementation.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class BaseXRadio extends JRadioButton {
@@ -22,7 +21,7 @@ public final class BaseXRadio extends JRadioButton {
   public BaseXRadio(final String label, final boolean sel, final Window win) {
     super(label, sel);
     setOpaque(false);
-    setBorder(new EmptyBorder(0, 0, 0, 16));
+    setBorder(BaseXLayout.border(0, 0, 0, 16));
     BaseXLayout.addInteraction(this, win);
 
     if(!(win instanceof BaseXDialog)) return;

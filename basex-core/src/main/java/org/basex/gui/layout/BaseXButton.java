@@ -13,10 +13,10 @@ import org.basex.gui.*;
 /**
  * Project specific button implementation.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public class BaseXButton extends JButton {
+public final class BaseXButton extends JButton {
   /** Button template. */
   private static final AbstractButton TEMPLATE = style(new JToggleButton());
 
@@ -116,7 +116,7 @@ public class BaseXButton extends JButton {
    */
   public static AbstractButton command(final GUICommand cmd, final GUI gui) {
     final String name = cmd.toString().toLowerCase(Locale.ENGLISH);
-    final AbstractButton button = get(name, cmd.shortcut(), cmd.toggle(), gui);
+    final AbstractButton button = get(name, cmd.shortCut(), cmd.toggle(), gui);
     button.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {

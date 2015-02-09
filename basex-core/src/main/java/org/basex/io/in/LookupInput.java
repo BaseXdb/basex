@@ -6,7 +6,7 @@ import java.io.*;
  * This input stream allows a lookup of the next byte to be returned
  * by an {@link InputStream} reference.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class LookupInput extends InputStream {
@@ -17,11 +17,11 @@ public final class LookupInput extends InputStream {
 
   /**
    * Constructor.
-   * @param in buffer input to be wrapped
+   * @param input buffer input to be wrapped
    * @throws IOException I/O exception
    */
-  public LookupInput(final InputStream in) throws IOException {
-    input = in;
+  public LookupInput(final InputStream input) throws IOException {
+    this.input = input;
     read();
   }
 

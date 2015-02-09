@@ -1,24 +1,24 @@
 package org.basex.http;
 
-import static org.basex.util.Token.*;
-
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.Map.Entry;
 
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
+import org.basex.query.func.http.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.http.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.util.*;
 
 /**
  * Bundles parameters of an HTTP request.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class HTTPParams {
@@ -37,7 +37,7 @@ public final class HTTPParams {
    * Returns an immutable map with all query parameters.
    * @param http HTTP context
    */
-  public HTTPParams(final HTTPContext http) {
+  HTTPParams(final HTTPContext http) {
     this.http = http;
   }
 
@@ -63,7 +63,7 @@ public final class HTTPParams {
    * @throws QueryException query exception
    */
   public Value content() throws QueryException, IOException {
-    return HTTPPayload.value(body(), http.context().options, http.contentType(),
+    return HttpPayload.value(body(), HTTPContext.context().options, http.contentType(),
         http.contentTypeExt());
   }
 
@@ -75,7 +75,7 @@ public final class HTTPParams {
    */
   public Map<String, Value> form() throws QueryException, IOException {
     if(form == null) {
-      form = new HashMap<String, Value>();
+      form = new HashMap<>();
       final String ct = http.contentType();
       if(MimeTypes.MULTIPART_FORM_DATA.equals(ct)) {
         // convert multipart parameters encoded in a form
@@ -95,8 +95,8 @@ public final class HTTPParams {
    */
   public Map<String, Value> query() throws IOException {
     if(query == null) {
-      query = new HashMap<String, Value>();
-      for(final Map.Entry<String, String[]> entry : map().entrySet()) {
+      query = new HashMap<>();
+      for(final Entry<String, String[]> entry : map().entrySet()) {
         final String key = entry.getKey();
         final String[] values = entry.getValue();
         final ValueBuilder vb = new ValueBuilder(values.length);
@@ -105,6 +105,19 @@ public final class HTTPParams {
       }
     }
     return query;
+  }
+
+  /**
+   * Returns the cached body.
+   * @return value
+   * @throws IOException I/O exception
+   */
+  IOContent body() throws IOException {
+    if(content == null) {
+      content = new IOContent(new BufferInput(http.req.getInputStream()).content());
+      content.name(http.method + IO.XMLSUFFIX);
+    }
+    return content;
   }
 
   // PRIVATE FUNCTIONS ============================================================================
@@ -119,11 +132,13 @@ public final class HTTPParams {
   private void addMultipart(final Map<String, Value> params, final String ext)
       throws QueryException, IOException {
 
-    final MainOptions opts = http.context().options;
-    final HTTPPayload hp = new HTTPPayload(body().inputStream(), true, null, opts);
-    final HashMap<String, Value> mp = hp.multiForm(ext);
-    for(final Map.Entry<String, Value> entry : mp.entrySet()) {
-      params.put(entry.getKey(), entry.getValue());
+    final MainOptions opts = HTTPContext.context().options;
+    try(final InputStream is = body().inputStream()) {
+      final HttpPayload hp = new HttpPayload(is, true, null, opts);
+      final HashMap<String, Value> mp = hp.multiForm(ext);
+      for(final Entry<String, Value> entry : mp.entrySet()) {
+        params.put(entry.getKey(), entry.getValue());
+      }
     }
   }
 
@@ -133,22 +148,14 @@ public final class HTTPParams {
    * @throws IOException I/O exception
    */
   private void addURLEncoded(final Map<String, Value> params) throws IOException {
-    for(final String nv : body().toString().split("&")) {
-      final String[] parts = nv.split("=", 2);
-      if(parts.length == 2) params.put(parts[0], Str.get(URLDecoder.decode(parts[1], UTF8)));
+    for(final String nv : Strings.split(body().toString(), '&')) {
+      final String[] parts = Strings.split(nv, '=', 2);
+      if(parts.length == 2) {
+        final Atm i = new Atm(URLDecoder.decode(parts[1], Strings.UTF8));
+        final String k = parts[0];
+        final Value v = params.get(k);
+        params.put(k, v == null ? i : new ValueBuilder().add(v).add(i).value());
+      }
     }
-  }
-
-  /**
-   * Returns the cached body.
-   * @return value
-   * @throws IOException I/O exception
-   */
-  private IOContent body() throws IOException {
-    if(content == null) {
-      content = new IOContent(new BufferInput(http.req.getInputStream()).content());
-      content.name(http.method + IO.XMLSUFFIX);
-    }
-    return content;
   }
 }

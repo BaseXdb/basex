@@ -31,10 +31,10 @@ import org.basex.util.hash.*;
  *      on the same node.</li>
  * <li> more than one {@link Rename} or {@link UpdateValue} operating
  *      on the same node.</li>
- * <li> sequences like <delete X, insert N at X>: This sequence would be carried out back
+ * <li> sequences like [delete X, insert N at X]: This sequence would be carried out back
  * to front: first the insert, then the delete. This would lead to the inserted node N
- * being deleted by the 'delete X' statement. The correct order for this sequqence would
- * be <insert N at X, delete X>. </li>
+ * being deleted by the 'delete X' statement. The correct order for this sequence would
+ * be [insert N at X, delete X]. </li>
  * <li> and so forth ... see check() function for details. </li>
  * </ul>
  *
@@ -42,14 +42,14 @@ import org.basex.util.hash.*;
  * remembered. This avoids additional traversals of the AUC during consistency checks and
  * further optimizations.</p>
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Lukas Kircher
  */
 public final class AtomicUpdateCache {
   /** List of structural updates (nodes are inserted to / deleted from the table. */
-  private final List<StructuralUpdate> struct;
+  private final List<StructuralUpdate> struct = new ArrayList<>(1);
   /** Value / non-structural updates like rename. */
-  private final List<BasicUpdate> val;
+  private final List<BasicUpdate> val = new ArrayList<>(1);
   /** Most recently added update buffer. Used to merge/discard updates and to detect
    * inconsistencies on-the-fly eliminating the need to traverse all updates. */
   private BasicUpdate recent;
@@ -61,12 +61,10 @@ public final class AtomicUpdateCache {
 
   /**
    * Constructor.
-   * @param d target data reference
+   * @param data target data reference
    */
-  public AtomicUpdateCache(final Data d) {
-    struct = new ArrayList<StructuralUpdate>();
-    val = new ArrayList<BasicUpdate>();
-    data = d;
+  public AtomicUpdateCache(final Data data) {
+    this.data = data;
   }
 
   /**
@@ -82,12 +80,10 @@ public final class AtomicUpdateCache {
    * @param pre PRE value of the target node/update location
    * @param par new parent of the inserted nodes
    * @param clip insertion sequence data clip
-   * @param attr insert attribute if true or a node of any other kind if false
    */
-  public void addInsert(final int pre, final int par, final DataClip clip,
-      final boolean attr) {
-    considerAtomic(attr ? InsertAttr.getInstance(pre, par, clip) :
-      Insert.getInstance(pre, par, clip), false);
+  public void addInsert(final int pre, final int par, final DataClip clip) {
+    considerAtomic(clip.data.kind(clip.start) == Data.ATTR
+        ? InsertAttr.getInstance(pre, par, clip) : Insert.getInstance(pre, par, clip), false);
   }
 
   /**
@@ -102,20 +98,20 @@ public final class AtomicUpdateCache {
   /**
    * Adds a rename atomic to the list.
    * @param pre PRE value of the target node/update location
-   * @param n new name for the target node
-   * @param u new uri for the target node
+   * @param name new name for the target node
+   * @param uri new uri for the target node
    */
-  public void addRename(final int pre, final byte[] n, final byte[] u) {
-    considerAtomic(Rename.getInstance(data, pre, n, u), false);
+  public void addRename(final int pre, final byte[] name, final byte[] uri) {
+    considerAtomic(Rename.getInstance(data, pre, name, uri), false);
   }
 
   /**
    * Adds an updateValue atomic to the list.
    * @param pre PRE value of the target node/update location
-   * @param v new value for the target node
+   * @param value new value for the target node
    */
-  public void addUpdateValue(final int pre, final byte[] v) {
-    considerAtomic(UpdateValue.getInstance(data, pre, v), false);
+  public void addUpdateValue(final int pre, final byte[] value) {
+    considerAtomic(UpdateValue.getInstance(data, pre, value), false);
   }
 
   /**
@@ -142,9 +138,8 @@ public final class AtomicUpdateCache {
       return;
     }
 
-    if(candidate instanceof StructuralUpdate) {
-      ((StructuralUpdate) candidate).accumulatedShifts +=
-          recentStruct == null ? 0 : recentStruct.accumulatedShifts();
+    if(candidate instanceof StructuralUpdate && recentStruct != null) {
+      ((StructuralUpdate) candidate).accumulatedShifts += recentStruct.accumulatedShifts();
     }
 
     // prepare & optimize incoming update
@@ -165,20 +160,20 @@ public final class AtomicUpdateCache {
    * Adds the given update to the updates/buffer depending on the type and whether it's
    * been merged or not.
    *
-   * @param u update
+   * @param bu update
    * @param merged if true, the given update has been merged w/ the recent one
    */
-  private void add(final BasicUpdate u, final boolean merged) {
-    if(u == null) return;
+  private void add(final BasicUpdate bu, final boolean merged) {
+    if(bu == null) return;
 
     if(!merged) {
       if(recent instanceof StructuralUpdate)
         struct.add((StructuralUpdate) recent);
       else val.add(recent);
     }
-    recent = u;
-    if(u instanceof StructuralUpdate)
-      recentStruct = u;
+    recent = bu;
+    if(bu instanceof StructuralUpdate)
+      recentStruct = bu;
   }
 
   /**
@@ -213,65 +208,63 @@ public final class AtomicUpdateCache {
    * A single node must not be affected by more than one destructive operation. These
    * operations include {@link Replace}, {@link Delete}.
    *
-   * @param a first update in sequence
-   * @param b second update in sequence
+   * @param bu1 first update in sequence
+   * @param bu2 second update in sequence
    */
-  private static void check(final BasicUpdate a, final BasicUpdate b) {
+  private static void check(final BasicUpdate bu1, final BasicUpdate bu2) {
     // check order of location PRE, must be strictly ordered low-to-high
-    if(b.location < a.location)
-      throw Util.notExpected("Invalid order at location " + a.location);
+    if(bu2.location < bu1.location)
+      throw Util.notExpected("Invalid order at location " + bu1.location);
 
-    if(b.location == a.location) {
+    if(bu2.location == bu1.location) {
       // check invalid sequence of {@link Delete}, {@link Insert}
       // - the inserted node would directly be deleted without this restriction
-      if(b instanceof Insert || b instanceof InsertAttr)
-        if(a instanceof Delete)
-          throw Util.notExpected("Invalid sequence of delete, insert at location "
-          + a.location);
-        else if(a instanceof Replace)
-          throw Util.notExpected("Invalid sequence of replace, insert at location "
-              + a.location);
+      if(bu2 instanceof Insert || bu2 instanceof InsertAttr)
+        if(bu1 instanceof Delete)
+          throw Util.notExpected("Invalid sequence of delete, insert at location " + bu1.location);
+        else if(bu1 instanceof Replace)
+          throw Util.notExpected("Invalid sequence of replace, insert at location " + bu1.location);
 
       // check multiple {@link Delete}, {@link Replace}
-      if(b.destructive() && a.destructive())
-        throw Util.notExpected("Multiple deletes/replaces on node " + a.location);
+      if(bu2.destructive() && bu1.destructive())
+        throw Util.notExpected("Multiple deletes/replaces on node " + bu1.location);
 
       // check multiple {@link Rename}
-      if(b instanceof Rename && a instanceof Rename)
-        throw Util.notExpected("Multiple renames on node " + a.location);
+      if(bu2 instanceof Rename && bu1 instanceof Rename)
+        throw Util.notExpected("Multiple renames on node " + bu1.location);
 
       // check multiple {@link UpdateValue}
-      if(b instanceof UpdateValue && a instanceof UpdateValue)
-        throw Util.notExpected("Multiple updates on node " + a.location);
+      if(bu2 instanceof UpdateValue && bu1 instanceof UpdateValue)
+        throw Util.notExpected("Multiple updates on node " + bu1.location);
 
       /* Check invalid order of destructive/non-destructive updates to support TAU
        *  cases like: <rename X, delete X>: node X would be deleted and then X+1 renamed,
        *  as this shifts down to X.
        */
-      if(b.destructive() && !(a instanceof StructuralUpdate))
+      if(bu2.destructive() && !(bu1 instanceof StructuralUpdate))
         throw Util.notExpected("Invalid sequence of value update and destructive update at" +
-            " location " + a.location);
+            " location " + bu1.location);
     }
   }
 
   /**
    * Checks if the second update is superfluous. An update is considered to be superfluous
    * if it targets a position in the subtree of a to-be-removed node.
-   * @param a first update in sequence
-   * @param b second update in sequence
+   * @param bu1 first update in sequence
+   * @param bu2 second update in sequence
    * @return true if second update superfluous
    */
-  private boolean treeAwareUpdates(final BasicUpdate a, final BasicUpdate b) {
-    if(a.destructive()) {
+  private boolean treeAwareUpdates(final BasicUpdate bu1, final BasicUpdate bu2) {
+    if(bu1.destructive()) {
       // we determine the lowest and highest PRE values of a superfluous update
-      final int pre = a.location;
+      final int pre = bu1.location;
       final int fol = pre + data.size(pre, data.kind(pre));
       /* CASE 1: candidate operates on the subtree of T and appends a node to the end of
        * the subtree (target PRE may be equal)...
        * CASE 2: operates within subtree of T */
-      if(b.location <= fol && (b instanceof Insert || b instanceof InsertAttr) &&
-          b.parent >= pre && b.parent < fol ||
-        b.location < fol) {
+      if(bu2.location <= fol && (bu2 instanceof Insert || bu2 instanceof InsertAttr) &&
+          bu2.parent >= pre && bu2.parent < fol ||
+        bu2.location < fol) {
         return true;
       }
     }
@@ -287,8 +280,7 @@ public final class AtomicUpdateCache {
     data.cache = true;
     applyUpdates();
     adjustDistances();
-    if(mergeTexts)
-      resolveTextAdjacency();
+    if(mergeTexts) resolveTextAdjacency();
     data.cache = false;
     clear();
   }
@@ -299,13 +291,10 @@ public final class AtomicUpdateCache {
   public void applyUpdates() {
     // check if previous update still in buffer
     flush();
-
     // value updates applied front-to-back, doens't matter as there are no row shifts
-    for(final BasicUpdate u : val)
-      u.apply(data);
+    for(final BasicUpdate u : val) u.apply(data);
     // structural updates are applied back-to-front
-    for(int i = struct.size() - 1; i >= 0; i--)
-      struct.get(i).apply(data);
+    for(int i = struct.size() - 1; i >= 0; i--) struct.get(i).apply(data);
   }
 
   /**
@@ -318,35 +307,41 @@ public final class AtomicUpdateCache {
    * updated) is only touched once.
    */
   private void adjustDistances() {
-    final IntSet alreadyUpdatedNodes = new IntSet();
-
+    // check if any distance has changed at all
+    boolean shifts = false;
     for(final StructuralUpdate update : struct) {
-      int newPreOfAffectedNode = update.preOfAffectedNode + update.accumulatedShifts;
+      if(update.accumulatedShifts != 0) {
+        shifts = true;
+        break;
+      }
+    }
+    if(!shifts) return;
 
+    final IntSet updatedNodes = new IntSet();
+    for(final StructuralUpdate update : struct) {
       /* Update distance for the affected node and all following siblings of nodes
        * on the ancestor-or-self axis. */
-      while(newPreOfAffectedNode < data.meta.size) {
-        if(alreadyUpdatedNodes.contains(newPreOfAffectedNode)) break;
-        data.dist(newPreOfAffectedNode, data.kind(newPreOfAffectedNode),
-            calculateNewDistance(newPreOfAffectedNode));
-        alreadyUpdatedNodes.add(newPreOfAffectedNode);
-        newPreOfAffectedNode +=
-            data.size(newPreOfAffectedNode, data.kind(newPreOfAffectedNode));
+      int pre = update.preOfAffectedNode + update.accumulatedShifts;
+      while(pre < data.meta.size && !updatedNodes.contains(pre)) {
+        final int kind = data.kind(pre);
+        data.dist(pre, kind, calculateNewDistance(pre, kind));
+        updatedNodes.add(pre);
+        pre += data.size(pre, kind);
       }
     }
   }
 
   /**
-   * Calculates the new distance value for the given node after updates have been
-   * applied.
-   * @param pre the new PRE value of the node after structural updates have
-   * been applied
+   * Calculates the new distance value for the given node after updates have been applied.
+   * @param pre the new PRE value of the node after structural updates have been applied
+   * @param kind the KIND value
    * @return new distance for the given PRE node
    */
-  private int calculateNewDistance(final int pre) {
-    final int kind = data.kind(pre);
-    final int distanceBefore = data.dist(pre, kind);
+  private int calculateNewDistance(final int pre, final int kind) {
+    int distanceBefore = data.dist(pre, kind);
     final int preBefore = calculatePreValue(pre, true);
+    // document distances are not stored in table but calculated on the fly (always pre+1)
+    if(kind == Data.DOC) distanceBefore = preBefore + 1;
     final int parentBefore = preBefore - distanceBefore;
     final int parentAfter = calculatePreValue(parentBefore, false);
     return pre - parentAfter;
@@ -421,31 +416,32 @@ public final class AtomicUpdateCache {
   /**
    * Finds the update with the lowest index in the given list that affects the same
    * PRE value as the update with the given index.
-   * @param l list of updates
+   * @param updates list of updates
    * @param index of update
    * @param beforeUpdates find update for PRE values before updates have been applied
    * @return update with the highest index that invalidates the distance of the given
    * node
    */
-  private static int refine(final List<StructuralUpdate> l, final int index,
+  private static int refine(final List<StructuralUpdate> updates, final int index,
       final boolean beforeUpdates) {
-    int i = index;
-    final int value = c(l, i++, beforeUpdates);
-    while(i < l.size() && c(l, i, beforeUpdates) == value) i++;
-    return i - 1;
+    int u = index;
+    final int value = c(updates, u++, beforeUpdates);
+    final int us = updates.size();
+    while(u < us && c(updates, u, beforeUpdates) == value) u++;
+    return u - 1;
   }
 
   /**
    * Recalculates the PRE value of the first node whose distance is affected by the
    * given update.
-   * @param l list of updates
+   * @param updates list of updates
    * @param index index of the update
    * @param beforeUpdates calculate PRE value before or after updates
    * @return PRE value
    */
-  private static int c(final List<StructuralUpdate> l, final int index,
+  private static int c(final List<StructuralUpdate> updates, final int index,
       final boolean beforeUpdates) {
-    final StructuralUpdate u = l.get(index);
+    final StructuralUpdate u = updates.get(index);
     return u.preOfAffectedNode + (beforeUpdates ? u.accumulatedShifts : 0);
   }
 
@@ -456,7 +452,7 @@ public final class AtomicUpdateCache {
    */
   private void resolveTextAdjacency() {
     // Text node merges are also gathered on a separate list to leverage optimizations.
-    final List<Delete> deletes = new LinkedList<Delete>();
+    final List<Delete> deletes = new LinkedList<>();
 
     // keep track of the visited locations to avoid superfluous checks
     int smallestVisited = Integer.MAX_VALUE;
@@ -489,32 +485,32 @@ public final class AtomicUpdateCache {
       }
     }
 
-    final AtomicUpdateCache atomicDeletes = new AtomicUpdateCache(data);
-    for(final Delete delete : deletes) atomicDeletes.considerAtomic(delete, true);
+    final AtomicUpdateCache auc = new AtomicUpdateCache(data);
+    for(final Delete delete : deletes) auc.considerAtomic(delete, true);
     deletes.clear();
-    atomicDeletes.applyUpdates();
-    atomicDeletes.adjustDistances();
-    atomicDeletes.clear();
+    auc.applyUpdates();
+    auc.adjustDistances();
+    auc.clear();
   }
 
   /**
    * Returns atomic text node merging operations if necessary for the given node PRE and
    * its right neighbor PRE+1.
-   * @param a node PRE value
+   * @param pre node PRE value
    * @return list of text merging operations
    */
-  private Delete mergeTextNodes(final int a) {
+  private Delete mergeTextNodes(final int pre) {
     final int s = data.meta.size;
-    final int b = a + 1;
+    final int b = pre + 1;
     // don't leave table
-    if(a >= s || b >= s || a < 0 || b < 0) return null;
+    if(pre >= s || b >= s || pre < 0 || b < 0) return null;
     // only merge texts
-    if(data.kind(a) != Data.TEXT || data.kind(b) != Data.TEXT) return null;
+    if(data.kind(pre) != Data.TEXT || data.kind(b) != Data.TEXT) return null;
     // only merge neighboring texts
-    if(data.parent(a, Data.TEXT) != data.parent(b, Data.TEXT)) return null;
+    if(data.parent(pre, Data.TEXT) != data.parent(b, Data.TEXT)) return null;
 
     // apply text node updates on the fly and throw them away
-    UpdateValue.getInstance(data, a, Token.concat(data.text(a, true),
+    UpdateValue.getInstance(data, pre, Token.concat(data.text(pre, true),
         data.text(b, true))).
       apply(data);
     // deletes must be cached to add them front-to-back to atomic update list

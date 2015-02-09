@@ -1,9 +1,10 @@
 package org.basex.query.value.seq;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -14,48 +15,39 @@ import org.basex.util.*;
 /**
  * Sequence, containing at least two items.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public final class ItemSeq extends Seq {
+final class ItemSeq extends Seq {
   /** Item array. */
-  private final Item[] item;
+  private final Item[] items;
   /** Item Types. */
   private Type ret;
 
   /**
    * Constructor.
-   * @param it items
-   * @param s size
+   * @param items items
+   * @param size size
+   * @param ret sequence type
    */
-  private ItemSeq(final Item[] it, final int s) {
-    super(s);
-    item = it;
-  }
-
-  /**
-   * Constructor.
-   * @param it items
-   * @param s size
-   * @param t sequence type
-   */
-  ItemSeq(final Item[] it, final int s, final Type t) {
-    this(it, s);
-    ret = t;
+  ItemSeq(final Item[] items, final int size, final Type ret) {
+    super(size);
+    this.items = items;
+    this.ret = ret;
   }
 
   @Override
-  public Item ebv(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    if(item[0] instanceof ANode) return item[0];
-    throw CONDTYPE.get(ii, this);
+  public Item ebv(final QueryContext qc, final InputInfo ii) throws QueryException {
+    if(items[0] instanceof ANode) return items[0];
+    throw EBV_X.get(ii, this);
   }
 
   @Override
-  public SeqType type() {
+  public SeqType seqType() {
     if(ret == null) {
-      Type t = item[0].type;
+      Type t = items[0].type;
       for(int s = 1; s < size; s++) {
-        if(t != item[s].type) {
+        if(t != items[s].type) {
           t = AtomType.ITEM;
           break;
         }
@@ -75,18 +67,18 @@ public final class ItemSeq extends Seq {
   public boolean sameAs(final Expr cmp) {
     if(!(cmp instanceof ItemSeq)) return false;
     final ItemSeq is = (ItemSeq) cmp;
-    return item == is.item && size == is.size;
+    return items == is.items && size == is.size;
   }
 
   @Override
-  public int writeTo(final Item[] arr, final int start) {
-    System.arraycopy(item, 0, arr, start, (int) size);
+  public int writeTo(final Item[] arr, final int index) {
+    System.arraycopy(items, 0, arr, index, (int) size);
     return (int) size;
   }
 
   @Override
   public Item itemAt(final long pos) {
-    return item[(int) pos];
+    return items[(int) pos];
   }
 
   @Override
@@ -96,9 +88,42 @@ public final class ItemSeq extends Seq {
 
   @Override
   public Value reverse() {
-    final int s = item.length;
+    final int s = items.length;
     final Item[] tmp = new Item[s];
-    for(int l = 0, r = s - 1; l < s; l++, r--) tmp[l] = item[r];
+    for(int l = 0, r = s - 1; l < s; l++, r--) tmp[l] = items[r];
     return get(tmp, s, type);
+  }
+
+  @Override
+  public boolean has(final Flag flag) {
+    if(flag == Flag.UPD) {
+      for(int l = 0; l < size; l++) {
+        if(items[l].has(Flag.UPD)) return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
+  public Value materialize(final InputInfo ii) throws QueryException {
+    final int s = (int) size;
+    final ValueBuilder vb = new ValueBuilder(s);
+    for(int i = 0; i < s; i++) vb.add(itemAt(i).materialize(ii));
+    return vb.value();
+  }
+
+  @Override
+  public Value atomValue(final InputInfo ii) throws QueryException {
+    final int s = (int) size;
+    final ValueBuilder vb = new ValueBuilder(s);
+    for(int i = 0; i < s; i++) vb.add(itemAt(i).atomValue(ii));
+    return vb.value();
+  }
+
+  @Override
+  public long atomSize() {
+    long s = 0;
+    for(int i = 0; i < size; i++) s += itemAt(i).atomSize();
+    return s;
   }
 }

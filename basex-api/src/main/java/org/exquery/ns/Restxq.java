@@ -9,7 +9,7 @@ import org.basex.query.value.node.*;
 /**
  * This module contains standard RESTXQ functions.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class Restxq extends QueryModule {
@@ -29,7 +29,7 @@ public final class Restxq extends QueryModule {
    */
   public Uri baseUri() throws QueryException {
     final HTTPContext http = http();
-    return Uri.uri(http.req.getRequestURI().replaceAll(http.req.getPathInfo(), ""));
+    return Uri.uri(http.req.getRequestURI().replace(http.req.getPathInfo(), ""));
   }
 
   /**

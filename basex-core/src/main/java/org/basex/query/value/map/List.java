@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.collation.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -12,7 +13,7 @@ import org.basex.util.*;
 /**
  * Leaf that contains a collision list of keys with the same hash code.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
 final class List extends TrieNode {
@@ -27,28 +28,28 @@ final class List extends TrieNode {
   /**
    * Constructor.
    *
-   * @param h hash value
-   * @param ks key array
-   * @param vs value array
+   * @param hash hash value
+   * @param keys key array
+   * @param values value array
    */
-  List(final int h, final Item[] ks, final Value[] vs) {
-    super(ks.length);
-    keys = ks;
-    values = vs;
-    hash = h;
+  List(final int hash, final Item[] keys, final Value[] values) {
+    super(keys.length);
+    this.keys = keys;
+    this.values = values;
+    this.hash = hash;
     assert verify();
   }
 
   /**
    * Constructor for creating a collision list from two bindings.
-   * @param h hash value
-   * @param k1 first key
-   * @param v1 first value
-   * @param k2 second key
-   * @param v2 second value
+   * @param hash hash value
+   * @param key1 first key
+   * @param value1 first value
+   * @param key2 second key
+   * @param value2 second value
    */
-  List(final int h, final Item k1, final Value v1, final Item k2, final Value v2) {
-    this(h, new Item[]{ k1, k2 }, new Value[]{ v1, v2 });
+  List(final int hash, final Item key1, final Value value1, final Item key2, final Value value2) {
+    this(hash, new Item[]{ key1, key2 }, new Value[]{ value1, value2 });
   }
 
   @Override
@@ -73,8 +74,9 @@ final class List extends TrieNode {
   }
 
   @Override
-  TrieNode insert(final int h, final Item k, final Value v, final int l,
-      final InputInfo ii) throws QueryException {
+  TrieNode put(final int h, final Item k, final Value v, final int l, final InputInfo ii)
+      throws QueryException {
+
     // same hash, replace or merge
     if(h == hash) {
       for(int i = keys.length; i-- > 0;) {
@@ -93,7 +95,7 @@ final class List extends TrieNode {
     final int a = key(h, l), b = key(hash, l);
     final int used;
     if(a == b) {
-      ch[a] = insert(h, k, v, l + 1, ii);
+      ch[a] = put(h, k, v, l + 1, ii);
       used = 1 << a;
     } else {
       ch[a] = new Leaf(h, k, v);
@@ -121,11 +123,10 @@ final class List extends TrieNode {
 
   @Override
   StringBuilder toString(final StringBuilder sb, final String ind) {
-    sb.append(ind).append("`-- Collision (").append(
-        Integer.toHexString(hash)).append("):\n");
-    for(int i = 0; i < keys.length; i++) {
-      sb.append(ind).append("      ").append(keys[i]).append(" => ").append(
-          values[i]).append('\n');
+    sb.append(ind).append("`-- Collision (").append(Integer.toHexString(hash)).append("):\n");
+    final int kl = keys.length;
+    for(int k = 0; k < kl; k++) {
+      sb.append(ind).append("      ").append(keys[k]).append(" => ").append(values[k]).append('\n');
     }
     return sb;
   }
@@ -222,6 +223,19 @@ final class List extends TrieNode {
   }
 
   @Override
+  void values(final ValueBuilder vs) {
+    for(final Value v : values) vs.add(v);
+  }
+
+  @Override
+  void apply(final ValueBuilder vb, final FItem func, final QueryContext qc, final InputInfo ii)
+      throws QueryException {
+    for(int i = 0; i < size; i++) {
+      vb.add(func.invokeValue(qc, ii, keys[i], values[i]));
+    }
+  }
+
+  @Override
   boolean hasType(final AtomType kt, final SeqType vt) {
     if(kt != null)
       for(final Item k : keys) if(!k.type.instanceOf(kt)) return false;
@@ -240,7 +254,7 @@ final class List extends TrieNode {
   }
 
   @Override
-  boolean deep(final InputInfo ii, final TrieNode o) throws QueryException {
+  boolean deep(final InputInfo ii, final TrieNode o, final Collation coll) throws QueryException {
     if(!(o instanceof List) || size != o.size) return false;
     final List ol = (List) o;
 
@@ -250,7 +264,7 @@ final class List extends TrieNode {
       for(int j = 0; j < size; j++) {
         if(eq(k, ol.keys[i], ii)) {
           // check bound value, too
-          if(!deep(values[i], ol.values[j], ii)) return false;
+          if(!deep(values[i], ol.values[j], coll, ii)) return false;
           // value matched, continue with next key
           continue outer;
         }

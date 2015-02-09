@@ -11,7 +11,7 @@ import org.junit.Test;
  * Stress Testing the fast replace feature where blocks on disk are directly
  * overwritten.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Lukas Kircher
  */
 public final class FastReplaceTest extends AdvancedQueryTest {
@@ -67,7 +67,7 @@ public final class FastReplaceTest extends AdvancedQueryTest {
 
     query("for $i in //item return replace node $i " +
         "with (//item[@id='" + id + "'])[1]");
-    final String count2 =  query("count(//item[@id='" + id + "'])");
+    final String count2 = query("count(//item[@id='" + id + "'])");
 
     assertEquals(count1, count2);
   }
@@ -128,7 +128,7 @@ public final class FastReplaceTest extends AdvancedQueryTest {
   public void replaceAttribute() {
     query("replace node (//item)[1]/attribute() with " +
       "(attribute att1 {'0'}, attribute att2 {'1'})");
-    query("(//item)[1]/attribute()/string()", "0 1");
+    query("(//item)[1]/attribute()/string()", "0\n1");
   }
 
   /**

@@ -1,22 +1,23 @@
 package org.basex.io.serial.csv;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
 
-import org.basex.build.*;
-import org.basex.build.CsvOptions.*;
+import org.basex.build.csv.*;
+import org.basex.build.csv.CsvOptions.CsvFormat;
+import org.basex.data.*;
+import org.basex.io.out.*;
 import org.basex.io.serial.*;
-import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
- * This class serializes data as CSV.
+ * This class serializes items as CSV.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class CsvDirectSerializer extends CsvSerializer {
@@ -36,14 +37,14 @@ public final class CsvDirectSerializer extends CsvSerializer {
 
   /**
    * Constructor.
-   * @param os output stream reference
+   * @param out print output
    * @param opts serialization parameters
    * @throws IOException I/O exception
    */
-  public CsvDirectSerializer(final OutputStream os, final SerializerOptions opts)
+  public CsvDirectSerializer(final PrintOutput out, final SerializerOptions opts)
       throws IOException {
 
-    super(os, opts);
+    super(out, opts);
     header = copts.get(CsvOptions.HEADER);
     headers = header ? new TokenList() : null;
     atts = copts.get(CsvOptions.FORMAT) == CsvFormat.ATTRIBUTES;
@@ -57,10 +58,6 @@ public final class CsvDirectSerializer extends CsvSerializer {
   }
 
   @Override
-  protected void finishOpen() {
-  }
-
-  @Override
   protected void finishEmpty() throws IOException {
     finishOpen();
     if(level == 2) cache(EMPTY);
@@ -68,8 +65,8 @@ public final class CsvDirectSerializer extends CsvSerializer {
   }
 
   @Override
-  protected void finishText(final byte[] text) throws IOException {
-    if(level == 3) cache(text);
+  protected void text(final byte[] value, final FTPos ftp) throws IOException {
+    if(level == 3) cache(value);
   }
 
   @Override
@@ -98,43 +95,27 @@ public final class CsvDirectSerializer extends CsvSerializer {
   }
 
   @Override
-  protected void attribute(final byte[] n, final byte[] v) {
-    attv = v;
-  }
-
-  @Override
-  protected void finishComment(final byte[] n) { }
-
-  @Override
-  protected void finishPi(final byte[] n, final byte[] v) { }
-
-  @Override
-  protected void atomic(final Item value, final boolean iter) throws IOException {
-    error("Atomic values cannot be serialized");
-  }
-
-  @Override
-  protected void encode(final int ch) throws IOException {
-    printChar(ch);
+  protected void attribute(final byte[] name, final byte[] value) {
+    attv = value;
   }
 
   /**
    * Caches the specified text and its header.
-   * @param text text to be cached
+   * @param value text to be cached
    * @throws IOException I/O exception
    */
-  private void cache(final byte[] text) throws IOException {
+  private void cache(final byte[] value) throws IOException {
     if(headers != null) {
-      final byte[] key = atts && attv != null ? attv : tag;
+      final byte[] key = atts && attv != null ? attv : elem;
       final byte[] name = XMLToken.decode(key, lax);
       if(name == null) error("Invalid element name <%>", key);
       if(!headers.contains(name)) headers.add(name);
       final byte[] old = data.get(name);
-      final byte[] txt = old == null || old.length == 0 ? text :
-        text.length == 0 ? old : new TokenBuilder(old).add(',').add(text).finish();
+      final byte[] txt = old == null || old.length == 0 ? value :
+        value.length == 0 ? old : new TokenBuilder(old).add(',').add(value).finish();
       data.put(name, txt);
     } else {
-      data.put(token(data.size()), text);
+      data.put(token(data.size()), value);
     }
   }
 
@@ -145,6 +126,6 @@ public final class CsvDirectSerializer extends CsvSerializer {
    * @throws IOException I/O exception
    */
   private static void error(final String msg, final Object... ext) throws IOException {
-    throw BXCS_SERIAL.getIO(Util.inf(msg, ext));
+    throw BXCS_SERIAL_X.getIO(Util.inf(msg, ext));
   }
 }

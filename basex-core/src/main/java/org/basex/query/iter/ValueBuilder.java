@@ -6,15 +6,16 @@ import org.basex.data.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.value.*;
+import org.basex.query.value.array.Array;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
  * This class can be used to build new sequences.
- * At the same time, it serves as an iterator.
+ * At the same time, it may serve as an iterator.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class ValueBuilder extends ValueIter implements Result {
@@ -34,54 +35,65 @@ public final class ValueBuilder extends ValueIter implements Result {
 
   /**
    * Constructor.
-   * @param c initial capacity
+   * @param capacity initial capacity
    */
-  public ValueBuilder(final int c) {
-    items = new Item[c];
+  public ValueBuilder(final int capacity) {
+    items = new Item[capacity];
   }
 
   /**
    * Constructor.
-   * @param arr initial array
-   * @param s initial size
+   * @param items initial items
+   * @param size initial size
    */
-  public ValueBuilder(final Item[] arr, final int s) {
-    items = arr;
-    size = s;
+  public ValueBuilder(final Item[] items, final int size) {
+    this.items = items;
+    this.size = size;
   }
 
   /**
    * Adds the contents of a value.
-   * @param val value to be added
+   * @param value value to be added
    * @return self reference
    */
-  public ValueBuilder add(final Value val) {
-    for(final long sz = val.size(); items.length - size < sz;) items = extend(items);
-    size += val.writeTo(items, size);
+  public ValueBuilder add(final Value value) {
+    if(value instanceof Item) return add((Item) value);
+
+    final int s = size;
+    Item[] tmp = items;
+    for(final long sz = value.size(); tmp.length - s < sz;) tmp = extend(tmp);
+    size = s + value.writeTo(tmp, s);
+    items = tmp;
     return this;
   }
 
   /**
    * Adds a single item.
-   * @param it item to be added
+   * @param item item to be added
    * @return self reference
    */
-  public ValueBuilder add(final Item it) {
-    if(size == items.length) items = extend(items);
-    items[size++] = it;
+  public ValueBuilder add(final Item item) {
+    final int s = size;
+    Item[] tmp = items;
+    if(s == tmp.length) tmp = extend(tmp);
+    tmp[s] = item;
+    size = s + 1;
+    items = tmp;
     return this;
   }
 
-  @Override
-  public boolean sameAs(final Result v) {
-    if(!(v instanceof ValueBuilder)) return false;
-
-    final ValueBuilder vb = (ValueBuilder) v;
-    if(size != vb.size) return false;
-    for(int i = 0; i < size; ++i) {
-      if(items[i].type != vb.items[i].type || !items[i].sameAs(vb.items[i])) return false;
+  /**
+   * Adds flattened arrays.
+   * @param it current item
+   */
+  public void addFlattened(final Item it) {
+    if(it instanceof Array) {
+      for(final Value v : ((Array) it).members()) {
+        for(final Item i : v) addFlattened(i);
+      }
+    } else {
+      add(it);
     }
-    return true;
   }
 
   @Override
@@ -108,12 +120,6 @@ public final class ValueBuilder extends ValueIter implements Result {
   }
 
   @Override
-  public boolean reset() {
-    pos = -1;
-    return true;
-  }
-
-  @Override
   public long size() {
     return size;
   }
@@ -133,29 +139,33 @@ public final class ValueBuilder extends ValueIter implements Result {
 
   /**
    * Sets an item to the specified position.
-   * @param i item to be set
-   * @param p position
+   * @param i index
+   * @param item item to be set
    */
-  public void set(final Item i, final int p) {
-    items[p] = i;
+  public void set(final int i, final Item item) {
+    items[i] = item;
   }
 
+  /**
+   * Returns the cached items as value.
+   * @return sequence (internal representation!)
+   */
   @Override
   public Value value() {
     return Seq.get(items, size);
   }
 
   @Override
-  public ArrayOutput serialize() throws IOException {
+  public String serialize() throws IOException {
     final ArrayOutput ao = new ArrayOutput();
     serialize(Serializer.get(ao));
-    return ao;
+    return ao.toString();
   }
 
   @Override
   public String toString() {
     try {
-      return serialize().toString();
+      return serialize();
     } catch(final IOException ex) {
       throw Util.notExpected(ex);
     }

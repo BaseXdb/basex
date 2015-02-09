@@ -1,6 +1,7 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
+import static org.basex.util.Strings.*;
 
 import java.awt.event.*;
 import java.io.*;
@@ -22,7 +23,7 @@ import org.basex.util.list.*;
 /**
  * Panel for importing new database resources.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Lukas Kircher
  */
 final class DialogImport extends BaseXBack {
@@ -54,11 +55,11 @@ final class DialogImport extends BaseXBack {
    * Constructor.
    * @param dial dialog reference
    * @param panel feature panel
-   * @param parse parsing dialog
+   * @param parsing parsing dialog
    */
-  DialogImport(final BaseXDialog dial, final BaseXBack panel, final DialogParsing parse) {
+  DialogImport(final BaseXDialog dial, final BaseXBack panel, final DialogParsing parsing) {
     gui = dial.gui;
-    parsing = parse;
+    this.parsing = parsing;
 
     layout(new TableLayout(10, 1));
     border(8);
@@ -90,12 +91,11 @@ final class DialogImport extends BaseXBack {
     final MainOptions opts = gui.context.options;
     final StringList ps = new StringList();
     for(final MainParser mp : MainParser.values()) ps.add(mp.name());
-
-    parsers = new BaseXCombo(dial, ps.toArray());
+    parsers = new BaseXCombo(dial, ps.finish());
     parsers.setSelectedItem(opts.get(MainOptions.PARSER).name());
 
     filter = new BaseXTextField(opts.get(MainOptions.CREATEFILTER), dial);
-    BaseXLayout.setWidth(filter, 200);
+    filter.setColumns(30);
 
     addRaw = new BaseXCheckBox(ADD_RAW_FILES, MainOptions.ADDRAW, opts, dial);
     skipCorrupt = new BaseXCheckBox(SKIP_CORRUPT_FILES, MainOptions.SKIPCORRUPT, opts, dial);
@@ -234,11 +234,11 @@ final class DialogImport extends BaseXBack {
     if(i != -1) {
       // analyze file suffix
       final String suf = path.substring(i).toLowerCase(Locale.ENGLISH);
-      if(Token.eq(suf, IO.XMLSUFFIXES) || Token.eq(suf, IO.XSLSUFFIXES)) type = MainParser.XML;
-      else if(Token.eq(suf, IO.HTMLSUFFIXES)) type = MainParser.HTML;
-      else if(Token.eq(suf, IO.CSVSUFFIX)) type = MainParser.CSV;
-      else if(Token.eq(suf, IO.TXTSUFFIXES)) type = MainParser.TEXT;
-      else if(Token.eq(suf, IO.JSONSUFFIX)) type = MainParser.JSON;
+      if(eq(suf, IO.XMLSUFFIXES) || eq(suf, IO.XSLSUFFIXES)) type = MainParser.XML;
+      else if(eq(suf, IO.HTMLSUFFIXES)) type = MainParser.HTML;
+      else if(eq(suf, IO.CSVSUFFIX)) type = MainParser.CSV;
+      else if(eq(suf, IO.TXTSUFFIXES)) type = MainParser.TEXT;
+      else if(eq(suf, IO.JSONSUFFIX)) type = MainParser.JSON;
     }
     // unknown suffix: analyze first bytes
     if(type == null) type = guess(io);
@@ -257,9 +257,7 @@ final class DialogImport extends BaseXBack {
   private static MainParser guess(final IO in) {
     if(!in.exists() || in instanceof IOUrl) return null;
 
-    BufferInput ti = null;
-    try {
-      ti = new BufferInput(in);
+    try(final BufferInput ti = new BufferInput(in)) {
       int b = ti.read();
       // input starts with opening bracket: may be xml
       if(b == '<') return MainParser.XML;
@@ -271,10 +269,7 @@ final class DialogImport extends BaseXBack {
       }
       // all characters were of type ascii
       return MainParser.TEXT;
-    } catch(final IOException ignored) {
-    } finally {
-      if(ti != null) try { ti.close(); } catch(final IOException ignored) { }
-    }
+    } catch(final IOException ignored) { }
     // could not evaluate type
     return null;
   }

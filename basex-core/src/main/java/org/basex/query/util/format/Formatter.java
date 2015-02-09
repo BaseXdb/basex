@@ -1,6 +1,6 @@
 package org.basex.query.util.format;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.math.*;
@@ -17,7 +17,7 @@ import org.basex.util.list.*;
 /**
  * Abstract class for formatting data in different languages.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public abstract class Formatter extends FormatUtil {
@@ -35,7 +35,7 @@ public abstract class Formatter extends FormatUtil {
   /** Default language: English. */
   private static final byte[] EN = token("en");
   /** Formatter instances. */
-  private static final TokenObjMap<Formatter> MAP = new TokenObjMap<Formatter>();
+  private static final TokenObjMap<Formatter> MAP = new TokenObjMap<>();
 
   // initialize hash map with English formatter as default
   static {
@@ -133,7 +133,7 @@ public abstract class Formatter extends FormatUtil {
     boolean iso = false;
     if(cal.length != 0) {
       final Matcher m = CALENDAR.matcher(string(cal));
-      if(!m.matches()) throw CALQNAME.get(ii, cal);
+      if(!m.matches()) throw CALQNAME_X.get(ii, cal);
       final QNm qnm = new QNm(m.group(3), m.group(1) == null ||
           m.group(2).isEmpty() ? null : m.group(2));
       if(!qnm.hasURI()) {
@@ -141,7 +141,7 @@ public abstract class Formatter extends FormatUtil {
         final byte[] ln = qnm.local();
         final int cl = CALENDARS.length;
         while(++c < cl && !eq(CALENDARS[c], ln));
-        if(c == cl) throw CALWHICH.get(ii, cal);
+        if(c == cl) throw CALWHICH_X.get(ii, cal);
         if(c > 1) tb.add("[Calendar: AD]");
         iso = c == 0;
       }
@@ -154,7 +154,7 @@ public abstract class Formatter extends FormatUtil {
       if(ch == -1) {
         // retrieve variable marker
         final byte[] marker = dp.marker();
-        if(marker.length == 0) throw PICDATE.get(ii, pic);
+        if(marker.length == 0) throw PICDATE_X.get(ii, pic);
 
         // parse component specifier
         final int compSpec = ch(marker, 0);
@@ -232,7 +232,7 @@ public abstract class Formatter extends FormatUtil {
             break;
           case 'Z':
           case 'z':
-            num = date.zon();
+            num = date.tz();
             pres = token("01:01");
             break;
           case 'C':
@@ -244,9 +244,9 @@ public abstract class Formatter extends FormatUtil {
             err = tim;
             break;
           default:
-            throw INVCOMPSPEC.get(ii, marker);
+            throw INVCOMPSPEC_X.get(ii, marker);
         }
-        if(err) throw PICINVCOMP.get(ii, marker, date.type);
+        if(err) throw PICINVCOMP_X_X.get(ii, marker, date.type);
         if(pres == null) continue;
 
         // parse presentation modifier(s) and width modifier
@@ -254,7 +254,8 @@ public abstract class Formatter extends FormatUtil {
         if(max) {
           // limit maximum length of numeric output
           int mx = 0;
-          for(int s = 0; s < fp.primary.length; s += cl(fp.primary, s)) mx++;
+          final int fl = fp.primary.length;
+          for(int s = 0; s < fl; s += cl(fp.primary, s)) mx++;
           if(mx > 1) fp.max = mx;
         }
 
@@ -287,7 +288,7 @@ public abstract class Formatter extends FormatUtil {
           }
         } else {
           // output fractional component
-          if(frac != null && !frac.equals(BigDecimal.ZERO)) {
+          if(frac != null && frac.compareTo(BigDecimal.ZERO) != 0) {
             String s = frac.toString().replace("0.", "");
             final int sl = s.length();
             if(fp.min > sl) {
@@ -298,7 +299,7 @@ public abstract class Formatter extends FormatUtil {
               final int fl = fp.primary.length;
               if(fl != 1 && fl != sl) s = frac(frac, fl);
             }
-            num = toLong(s);
+            num = Strings.toLong(s);
           }
           tb.add(formatInt(num, fp));
         }
@@ -317,7 +318,7 @@ public abstract class Formatter extends FormatUtil {
    * @return string representation
    */
   private static String frac(final BigDecimal num, final int len) {
-    final String s = num.setScale(len, BigDecimal.ROUND_HALF_UP).toString();
+    final String s = num.setScale(len, RoundingMode.HALF_UP).toString();
     final int d = s.indexOf('.');
     return d == -1 ? s : s.substring(d + 1);
   }
@@ -336,7 +337,6 @@ public abstract class Formatter extends FormatUtil {
 
     final TokenBuilder tb = new TokenBuilder();
     final int ch = fp.first;
-
     if(ch == 'w') {
       tb.add(word(n, fp.ordinal));
     } else if(ch == KANJI[1]) {
@@ -436,7 +436,7 @@ public abstract class Formatter extends FormatUtil {
 
     int n = c == 0 ? num / 60 : num % 60;
     if(num < 0) n = -n;
-    return number(n, new IntFormat(format.finish(), null), zeroes(format.cp(0)));
+    return number(n, new IntFormat(format.toArray(), null), zeroes(format.cp(0)));
   }
 
   /**

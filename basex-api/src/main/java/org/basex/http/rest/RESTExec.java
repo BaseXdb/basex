@@ -8,16 +8,16 @@ import org.basex.util.*;
 /**
  * Executes a simple REST operation.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 final class RESTExec extends RESTCmd {
   /**
    * Constructor.
-   * @param rs REST session
+   * @param session REST session
    */
-  RESTExec(final RESTSession rs) {
-    super(rs);
+  RESTExec(final RESTSession session) {
+    super(session);
   }
 
   @Override

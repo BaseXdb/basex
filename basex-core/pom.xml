@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.basex</groupId>
     <artifactId>basex-parent</artifactId>
-    <version>7.9.1-SNAPSHOT</version>
+    <version>8.0</version>
     <relativePath>..</relativePath>
   </parent>
 
@@ -101,16 +101,16 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-deploy-plugin</artifactId>
       </plugin>
-      <!--<plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-      </plugin>-->
+      </plugin>
       <!-- Temporarily removed (takes some time)
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
-          <excludes>org/basex/query/regex/parse/**.java</excludes>
+          <excludes>org/basex/query/util/regex/parse/**.java</excludes>
         </configuration>
       </plugin>-->
     </plugins>

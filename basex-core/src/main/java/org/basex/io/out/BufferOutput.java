@@ -7,7 +7,7 @@ import org.basex.io.*;
 /**
  * This class uses a byte buffer to speed up output stream processing.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  * @author Tim Petrowsky
  */
@@ -32,19 +32,19 @@ public final class BufferOutput extends OutputStream {
 
   /**
    * Constructor with a default buffer size.
-   * @param out the stream to write to
+   * @param os the stream to write to
    */
-  public BufferOutput(final OutputStream out) {
-    this(out, IO.BLOCKSIZE);
+  public BufferOutput(final OutputStream os) {
+    this(os, IO.BLOCKSIZE);
   }
 
   /**
    * Constructor with a specific buffer size.
-   * @param out the stream to write to
+   * @param os the stream to write to
    * @param bufs buffer size
    */
-  public BufferOutput(final OutputStream out, final int bufs) {
-    os = out;
+  public BufferOutput(final OutputStream os, final int bufs) {
+    this.os = os;
     buffer = new byte[bufs];
     bufsize = bufs;
   }

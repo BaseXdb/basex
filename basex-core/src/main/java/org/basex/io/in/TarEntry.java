@@ -5,7 +5,7 @@ import org.basex.util.list.*;
 /**
  * Representation of a single TAR entry.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class TarEntry {
@@ -20,7 +20,7 @@ public final class TarEntry {
    * Constructor.
    * @param buffer header buffer
    */
-  public TarEntry(final byte[] buffer) {
+  TarEntry(final byte[] buffer) {
     // file name
     final ByteList result = new ByteList();
     for(int i = 0; i < 100; ++i) {

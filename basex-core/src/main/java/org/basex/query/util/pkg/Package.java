@@ -10,16 +10,16 @@ import org.basex.util.*;
 /**
  * Package.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Rositsa Shadura
  */
 public final class Package {
   /** List of dependencies. */
-  public final ArrayList<Dependency> dep = new ArrayList<Dependency>();
+  final ArrayList<Dependency> dep = new ArrayList<>();
   /** Package components. */
-  public final ArrayList<Component> comps = new ArrayList<Component>();
+  final ArrayList<Component> comps = new ArrayList<>();
   /** Package short name. */
-  public byte[] abbrev;
+  byte[] abbrev;
   /** Package uri. */
   byte[] name;
   /** Package version. */
@@ -58,7 +58,7 @@ public final class Package {
 
   /**
    * Package dependency.
-   * @author BaseX Team 2005-14, BSD License
+   * @author BaseX Team 2005-15, BSD License
    * @author Rositsa Shadura
    */
   static final class Dependency {
@@ -88,7 +88,7 @@ public final class Package {
 
   /**
    * Package component.
-   * @author BaseX Team 2005-14, BSD License
+   * @author BaseX Team 2005-15, BSD License
    * @author Rositsa Shadura
    */
   static final class Component {

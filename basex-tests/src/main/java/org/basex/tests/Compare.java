@@ -3,6 +3,7 @@ package org.basex.tests;
 import java.io.*;
 import java.util.*;
 
+import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
@@ -12,10 +13,10 @@ import org.basex.util.list.*;
 /**
  * This class compares query results with other query processors.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public abstract class Compare {
+public abstract class Compare extends SandboxTest {
   /** XSLT flag; not set to 'final' to circumvent dead-code warnings. */
   private static boolean xsltMode;
   /** Verbose mode. */
@@ -55,9 +56,6 @@ public abstract class Compare {
   /** Selected processors. */
   private static final String[][] PROCS = xsltMode ? XSLTPROCS : XQUERYPROCS;
 
-  /** Database context. */
-  private static Context context = new Context();
-
   /**
    * Main method of the test class.
    * @param args command-line arguments
@@ -68,14 +66,14 @@ public abstract class Compare {
     if(xsltMode) new IOFile(TMPCTX).write(Token.token("<x/>"));
 
     // loop through all queries
-    final BufferedReader br = new BufferedReader(
-        new InputStreamReader(new FileInputStream(QUERIES), Token.UTF8));
-    while(true) {
-      final String line = br.readLine();
-      if(line == null) break;
-      if(!line.isEmpty() && line.charAt(0) != '#') query(line);
+    try(final BufferedReader br = new BufferedReader(
+        new InputStreamReader(new FileInputStream(QUERIES), Strings.UTF8))) {
+      while(true) {
+        final String line = br.readLine();
+        if(line == null) break;
+        if(!line.isEmpty() && line.charAt(0) != '#') query(line);
+      }
     }
-    br.close();
 
     // delete temporary files
     new IOFile(TMP).delete();
@@ -93,7 +91,7 @@ public abstract class Compare {
     try {
       result = new XQuery(query).execute(context);
     } catch(final BaseXException ex) {
-      result = ex.getMessage().replaceAll("[\\r\\n]+", " ");
+      result = ex.getMessage().replaceAll("\r?\n *", "\n");
     }
 
     // write XQuery or XSLT to temporary file
@@ -128,7 +126,7 @@ public abstract class Compare {
    */
   private static String execute(final String[] proc) {
     try {
-      final ArrayList<String> al = new ArrayList<String>();
+      final ArrayList<String> al = new ArrayList<>();
       al.addAll(Arrays.asList(proc).subList(1, proc.length));
 
       final ProcessBuilder pb = new ProcessBuilder(al);
@@ -141,7 +139,7 @@ public abstract class Compare {
         if(t == -1) break;
         bl.add(t);
       }
-      return bl.toString().replaceAll("[\\r\\n ]+", " ");
+      return bl.toString().replaceAll("\r?\n *", "\n");
     } catch(final IOException ex) {
       return ex.getMessage();
     }

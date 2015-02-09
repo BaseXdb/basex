@@ -1,7 +1,7 @@
 package org.basex.query.up;
 
-import static org.junit.Assert.*;
 import static org.basex.util.Token.*;
+import static org.junit.Assert.*;
 
 import java.io.*;
 
@@ -13,12 +13,11 @@ import org.basex.query.*;
 import org.basex.util.*;
 import org.junit.*;
 import org.junit.rules.*;
-import org.junit.Test;
 
 /**
  * Test the {@link AtomicUpdateCache}.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Lukas Kircher
  */
 public final class AtomicUpdatesTest extends AdvancedQueryTest {
@@ -33,33 +32,34 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   public void lazyReplace() {
     // IDENTICAL: 0 value updates
     query(transform("<doc><tree/></doc>",
-            "replace node $input//tree with <tree/>"),
-        "<doc><tree/></doc>");
+        "replace node $input//tree with <tree/>"),
+        "<doc>\n<tree/>\n</doc>");
     // FAIL: different size of trees
     query(transform("<doc><tree><n/></tree></doc>",
-            "replace node $input//tree with <tree/>"),
-        "<doc><tree/></doc>");
+        "replace node $input//tree with <tree/>"),
+        "<doc>\n<tree/>\n</doc>");
     // FAIL: kind
     query(transform("<doc><tree><n/></tree></doc>",
-            "replace node $input//tree with <tree>text</tree>"),
-        "<doc><tree>text</tree></doc>");
+        "replace node $input//tree with <tree>text</tree>"),
+        "<doc>\n<tree>text</tree>\n</doc>");
     // FAIL: distance (size would've already failed on ancestor axis)
     query(transform("<doc><tree><n/></tree></doc>",
-            "replace node $input//tree with <tree/>"),
-        "<doc><tree/></doc>");
+        "replace node $input//tree with <tree/>"),
+        "<doc>\n<tree/>\n</doc>");
     // FAIL: replace attribute w/ sequence of attributes
     query(transform("<doc><tree id=\"0\"/></doc>",
         "replace node $input//@id with (attribute id {\"1\"}, attribute id2 {\"2\"})"),
-    "<doc><tree id=\"1\" id2=\"2\"/></doc>");
+        "<doc>\n<tree id=\"1\" id2=\"2\"/>\n</doc>");
     // LAZY REPLACE: 8 value updates -> element, attribute, text, comment, processing instruction
-    query(transform("<doc><tree1 a='0'>text1<a/><!--comm1--><a/><?p1 i1?><?p11?></tree1></doc>",
-            "replace node $input//tree1 with " +
-            "<tree2 b='1'>text2<a/><!--comm2--><a/><?p2 i2?><?p22?></tree2>"),
-        "<doc><tree2 b=\"1\">text2<a/><!--comm2--><a/><?p2 i2?><?p22 ?></tree2></doc>");
+    query(transform("<doc><tree1 a='0'>text1<a/><!--comm1--><a/><?p1 i1?><?p11?></tree1></doc> ",
+        "replace node $input//tree1 with " +
+        "<tree2 b='1'>text2<a/><!--comm2--><a/><?p2 i2?><?p22?></tree2>"),
+        "<doc>\n<tree2 b=\"1\">text2<a/>\n<!--comm2-->\n<a/>\n" +
+        "<?p2 i2?>\n<?p22 ?>\n</tree2>\n</doc>");
     // LAZY REPLACE: 2 value updates -> single attribute
     query(transform("<doc><tree id1=\"0\"/></doc>",
-            "replace node $input//@id1 with attribute id2 {\"1\"}"),
-        "<doc><tree id2=\"1\"/></doc>");
+        "replace node $input//@id1 with attribute id2 {\"1\"}"),
+        "<doc>\n<tree id2=\"1\"/>\n</doc>");
   }
 
   /**
@@ -68,25 +68,25 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   @Test
   public void treeAwareUpdates0() {
     final String doc = "<n1>" + "<n2 att3='0'><n4/><n5><n6/></n5></n2>" + "</n1>";
-    final AtomicUpdateCache l = atomics(doc);
-    final MemData m = new MemData(l.data);
+    final AtomicUpdateCache auc = atomics(doc);
+    final MemData m = new MemData(auc.data, context.options);
     final DataClip ins = clipE(m, "<d/>", false);
-    l.addDelete(2);
-    l.addInsert(3, 2, ins, true);
-    l.addInsert(6, 5, ins, false);
-    l.addReplace(6, ins);
-    l.addInsert(7, 6, ins, false);
-    assertEquals(1, l.updatesSize());
+    auc.addDelete(2);
+    auc.addInsert(3, 2, ins);
+    auc.addInsert(6, 5, ins);
+    auc.addReplace(6, ins);
+    auc.addInsert(7, 6, ins);
+    assertEquals(1, auc.updatesSize());
 
-    l.clear();
-    l.addInsert(2, 2, ins, true);
-    l.addDelete(3);
-    l.addInsert(4, 2, ins, true);
-    l.addInsert(6, 5, ins, false);
-    l.addReplace(6, ins);
-    l.addInsert(7, 6, ins, false);
-    l.addInsert(7, 5, ins, false);
-    assertEquals(6, l.updatesSize());
+    auc.clear();
+    auc.addInsert(2, 2, ins);
+    auc.addDelete(3);
+    auc.addInsert(4, 2, ins);
+    auc.addInsert(6, 5, ins);
+    auc.addReplace(6, ins);
+    auc.addInsert(7, 6, ins);
+    auc.addInsert(7, 5, ins);
+    assertEquals(6, auc.updatesSize());
   }
 
   /**
@@ -95,11 +95,11 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   @Test
   public void treeAwareUpdates1() {
     final String doc = "<a><b/></a>";
-    final AtomicUpdateCache l = atomics(doc);
-    final MemData m = new MemData(l.data);
-    l.addDelete(2);
-    l.addInsert(3, 2, clipE(m, "<c/>", false), false);
-    assertEquals(1, l.updatesSize());
+    final AtomicUpdateCache auc = atomics(doc);
+    final MemData m = new MemData(auc.data, context.options);
+    auc.addDelete(2);
+    auc.addInsert(3, 2, clipE(m, "<c/>", false));
+    assertEquals(1, auc.updatesSize());
     query(transform(doc, "insert node <c/> into $input/b, delete node $input/b"), "<a/>");
   }
 
@@ -110,14 +110,14 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   @Test
   public void treeAwareUpdates2() {
     final String doc = "<a><b/></a>";
-    final AtomicUpdateCache l = atomics(doc);
-    final MemData m = new MemData(l.data);
-    l.addDelete(2);
-    l.addInsert(3, 2, clipE(m, "<c/>", false), false);
-    l.addInsert(3, 1, clipE(m, "<d/>", false), false);
-    assertEquals(1, l.updatesSize());
+    final AtomicUpdateCache auc = atomics(doc);
+    final MemData m = new MemData(auc.data, context.options);
+    auc.addDelete(2);
+    auc.addInsert(3, 2, clipE(m, "<c/>", false));
+    auc.addInsert(3, 1, clipE(m, "<d/>", false));
+    assertEquals(1, auc.updatesSize());
     query(transform(doc, "insert node <d/> into $input, insert node <c/> into $input/b,"
-        + "delete node $input/b"), "<a><d/></a>");
+        + "delete node $input/b"), "<a>\n<d/>\n</a>");
   }
 
   /**
@@ -126,13 +126,13 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   @Test
   public void treeAwareUpdates3() {
     final String doc = "<a><b/></a>";
-    final AtomicUpdateCache l = atomics(doc);
-    final MemData m = new MemData(l.data);
-    l.addReplace(2, clipE(m, "<newb/>", false));
-    l.addInsert(3, 1, clipE(m, "<d/>", false), false);
-    assertEquals(2, l.updatesSize());
+    final AtomicUpdateCache auc = atomics(doc);
+    final MemData m = new MemData(auc.data, context.options);
+    auc.addReplace(2, clipE(m, "<newb/>", false));
+    auc.addInsert(3, 1, clipE(m, "<d/>", false));
+    assertEquals(2, auc.updatesSize());
     query(transform(doc, "insert node <d/> into $input,"
-        + "replace node $input/b with <newb/>"), "<a><newb/><d/></a>");
+        + "replace node $input/b with <newb/>"), "<a>\n<newb/>\n<d/>\n</a>");
   }
 
   /**
@@ -142,13 +142,13 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   @Test
   public void treeAwareUpdates4() {
     final String doc = "<a><b/></a>";
-    final AtomicUpdateCache l = atomics(doc);
-    final MemData m = new MemData(l.data);
-    l.addReplace(2, clipE(m, "<newb/>", false));
-    l.addInsert(3, 2, clipE(m, "<c/>", false), false);
-    assertEquals(1, l.updatesSize());
+    final AtomicUpdateCache auc = atomics(doc);
+    final MemData m = new MemData(auc.data, context.options);
+    auc.addReplace(2, clipE(m, "<newb/>", false));
+    auc.addInsert(3, 2, clipE(m, "<c/>", false));
+    assertEquals(1, auc.updatesSize());
     query(transform(doc, "insert node <c/> into $input/b,"
-        + "replace node $input/b with <newb/>"), "<a><newb/></a>");
+        + "replace node $input/b with <newb/>"), "<a>\n<newb/>\n</a>");
   }
 
   /**
@@ -157,10 +157,10 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   @Test
   public void treeAwareUpdates5() {
     final String doc = "<a><b/></a>";
-    final AtomicUpdateCache l = atomics(doc);
-    l.addDelete(2);
-    l.addRename(2, token("bb"), EMPTY);
-    assertEquals(1, l.updatesSize());
+    final AtomicUpdateCache auc = atomics(doc);
+    auc.addDelete(2);
+    auc.addRename(2, token("bb"), EMPTY);
+    assertEquals(1, auc.updatesSize());
   }
 
   /**
@@ -169,10 +169,10 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   @Test
   public void treeAwareUpdates6() {
     final String doc = "<a><b id='1'/></a>";
-    final AtomicUpdateCache l = atomics(doc);
-    l.addDelete(3);
-    l.addRename(3, token("idx"), EMPTY);
-    assertEquals(1, l.updatesSize());
+    final AtomicUpdateCache auc = atomics(doc);
+    auc.addDelete(3);
+    auc.addRename(3, token("idx"), EMPTY);
+    assertEquals(1, auc.updatesSize());
   }
 
   /**
@@ -184,38 +184,37 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
     final String doc = "<a><b/></a>";
 
     // two inserts cannot be merged!
-    AtomicUpdateCache l = atomics(doc);
-    final MemData m = new MemData(l.data);
-    l.addInsert(3, 2, clipE(m, "<c/>", false), false);
-    l.addInsert(3, 2, clipE(m, "<d/>", false), false);
-    assertEquals(2, l.updatesSize());
+    AtomicUpdateCache auc = atomics(doc);
+    final MemData m = new MemData(auc.data, context.options);
+    auc.addInsert(3, 2, clipE(m, "<c/>", false));
+    auc.addInsert(3, 2, clipE(m, "<d/>", false));
+    assertEquals(2, auc.updatesSize());
     query(transform(doc, "insert node <c/> into $input/b,insert node <d/> into $input/b"),
-        "<a><b><c/><d/></b></a>");
+        "<a>\n<b>\n<c/>\n<d/>\n</b>\n</a>");
 
     // delete(x) -> insert(x+1)
-    l = atomics(doc);
-    l.addDelete(2);
-    l.addInsert(3, 1, clipE(m, "<d/>", false), false);
-    assertEquals(1, l.updatesSize());
+    auc = atomics(doc);
+    auc.addDelete(2);
+    auc.addInsert(3, 1, clipE(m, "<d/>", false));
+    assertEquals(1, auc.updatesSize());
     query(transform(doc, "insert node <d/> into $input,delete node $input/b"),
-        "<a><d/></a>");
+        "<a>\n<d/>\n</a>");
 
     // delete(x) -> insert(x+1) with affecting insert before x
-    l = atomics("<a><b/><c/></a>");
-    l.addDelete(2);
-    l.addDelete(3);
-    l.addInsert(4, 1, clipE(m, "<d/>", false), false);
-    assertEquals(2, l.updatesSize());
+    auc = atomics("<a><b/><c/></a>");
+    auc.addDelete(2);
+    auc.addDelete(3);
+    auc.addInsert(4, 1, clipE(m, "<d/>", false));
+    assertEquals(2, auc.updatesSize());
     query(transform("<a><b/><c/></a>", "insert node <d/> into $input," +
-        "delete node $input/c,delete node $input/b"), "<a><d/></a>");
+        "delete node $input/c,delete node $input/b"), "<a>\n<d/>\n</a>");
 
     // insert(x) <- delete(x)
-    l = atomics(doc);
-    l.addInsert(2, 1, clipE(m, "<d/>", false), false);
-    l.addDelete(2);
-    assertEquals(1, l.updatesSize());
-    query(transform(doc, "insert node <d/> into $input,delete node $input/b"),
-        "<a><d/></a>");
+    auc = atomics(doc);
+    auc.addInsert(2, 1, clipE(m, "<d/>", false));
+    auc.addDelete(2);
+    assertEquals(1, auc.updatesSize());
+    query(transform(doc, "insert node <d/> into $input,delete node $input/b"), "<a>\n<d/>\n</a>");
   }
 
   /**
@@ -236,7 +235,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   @Test
   public void updateSequence02() {
     final AtomicUpdateCache l = atomics("<a><b/></a>");
-    final MemData m = new MemData(l.data);
+    final MemData m = new MemData(l.data, context.options);
     l.addDelete(2);
     thrown.expect(RuntimeException.class);
     thrown.expectMessage("Multiple deletes/replaces on node");
@@ -249,7 +248,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   @Test
   public void updateSequence03() {
     final AtomicUpdateCache l = atomics("<a><b/></a>");
-    final MemData m = new MemData(l.data);
+    final MemData m = new MemData(l.data, context.options);
     l.addReplace(2, clipE(m, "<newb/>", false));
     thrown.expect(RuntimeException.class);
     thrown.expectMessage("Multiple deletes/replaces on node");
@@ -311,11 +310,11 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   @Test
   public void updateSequence08() {
     final AtomicUpdateCache l = atomics("<a><b/></a>");
-    final MemData m = new MemData(l.data);
+    final MemData m = new MemData(l.data, context.options);
     l.addDelete(2);
     thrown.expect(RuntimeException.class);
     thrown.expectMessage("Invalid sequence of delete, insert at location 2");
-    l.addInsert(2, 1, clipE(m, "<dummy/>", false), false);
+    l.addInsert(2, 1, clipE(m, "<dummy/>", false));
   }
 
   /**
@@ -324,11 +323,11 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   @Test
   public void updateSequence09() {
     final AtomicUpdateCache l = atomics("<a><b id='0'/></a>");
-    final MemData m = new MemData(l.data);
+    final MemData m = new MemData(l.data, context.options);
     l.addDelete(3);
     thrown.expect(RuntimeException.class);
     thrown.expectMessage("Invalid sequence of delete, insert at location 3");
-    l.addInsert(3, 2, clipA(m, "id", "1"), true);
+    l.addInsert(3, 2, clipA(m, "id", "1"));
   }
 
   /**
@@ -337,11 +336,11 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   @Test
   public void updateSequence10() {
     final AtomicUpdateCache l = atomics("<a><b/></a>");
-    final MemData m = new MemData(l.data);
+    final MemData m = new MemData(l.data, context.options);
     l.addReplace(2, clipE(m, "<bb/>", false));
     thrown.expect(RuntimeException.class);
     thrown.expectMessage("Invalid sequence of replace, insert at location 2");
-    l.addInsert(2, 1, clipE(m, "<dummy/>", false), false);
+    l.addInsert(2, 1, clipE(m, "<dummy/>", false));
   }
 
   /**
@@ -350,11 +349,11 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   @Test
   public void updateSequence11() {
     final AtomicUpdateCache l = atomics("<a><b id='0'/></a>");
-    final MemData m = new MemData(l.data);
+    final MemData m = new MemData(l.data, context.options);
     l.addReplace(3, clipA(m, "id", "11"));
     thrown.expect(RuntimeException.class);
     thrown.expectMessage("Invalid sequence of replace, insert at location 3");
-    l.addInsert(3, 2, clipA(m, "id", "1"), true);
+    l.addInsert(3, 2, clipA(m, "id", "1"));
   }
 
   /**
@@ -366,58 +365,58 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
         "<n1>" +
             "<n2/><n3/><n4/><n5/><n6/><n7/><n8/><n9/><n10/><n11/>" +
         "</n1>";
-    AtomicUpdateCache l = atomics(doc);
-    l.addDelete(3);
-    l.applyUpdates();
-    assertEquals(2, l.calculatePreValue(2, false));
-    assertEquals(3, l.calculatePreValue(3, false));
-    assertEquals(3, l.calculatePreValue(4, false));
-    assertEquals(4, l.calculatePreValue(5, false));
-    assertEquals(2, l.calculatePreValue(2, true));
-    assertEquals(4, l.calculatePreValue(3, true));
-    assertEquals(5, l.calculatePreValue(4, true));
-    assertEquals(6, l.calculatePreValue(5, true));
+    AtomicUpdateCache auc = atomics(doc);
+    auc.addDelete(3);
+    auc.applyUpdates();
+    assertEquals(2, auc.calculatePreValue(2, false));
+    assertEquals(3, auc.calculatePreValue(3, false));
+    assertEquals(3, auc.calculatePreValue(4, false));
+    assertEquals(4, auc.calculatePreValue(5, false));
+    assertEquals(2, auc.calculatePreValue(2, true));
+    assertEquals(4, auc.calculatePreValue(3, true));
+    assertEquals(5, auc.calculatePreValue(4, true));
+    assertEquals(6, auc.calculatePreValue(5, true));
 
-    l = atomics(doc);
-    l.addDelete(3);
-    l.addDelete(5);
-    l.addDelete(7);
-    l.applyUpdates();
-    assertEquals(2, l.calculatePreValue(2, false));
-    assertEquals(3, l.calculatePreValue(3, false));
-    assertEquals(3, l.calculatePreValue(4, false));
-    assertEquals(4, l.calculatePreValue(5, false));
-    assertEquals(4, l.calculatePreValue(6, false));
-    assertEquals(5, l.calculatePreValue(7, false));
-    assertEquals(5, l.calculatePreValue(8, false));
-    assertEquals(2, l.calculatePreValue(2, true));
-    assertEquals(4, l.calculatePreValue(3, true));
-    assertEquals(6, l.calculatePreValue(4, true));
-    assertEquals(8, l.calculatePreValue(5, true));
-    assertEquals(9, l.calculatePreValue(6, true));
-    assertEquals(10, l.calculatePreValue(7, true));
-    assertEquals(11, l.calculatePreValue(8, true));
+    auc = atomics(doc);
+    auc.addDelete(3);
+    auc.addDelete(5);
+    auc.addDelete(7);
+    auc.applyUpdates();
+    assertEquals(2, auc.calculatePreValue(2, false));
+    assertEquals(3, auc.calculatePreValue(3, false));
+    assertEquals(3, auc.calculatePreValue(4, false));
+    assertEquals(4, auc.calculatePreValue(5, false));
+    assertEquals(4, auc.calculatePreValue(6, false));
+    assertEquals(5, auc.calculatePreValue(7, false));
+    assertEquals(5, auc.calculatePreValue(8, false));
+    assertEquals(2, auc.calculatePreValue(2, true));
+    assertEquals(4, auc.calculatePreValue(3, true));
+    assertEquals(6, auc.calculatePreValue(4, true));
+    assertEquals(8, auc.calculatePreValue(5, true));
+    assertEquals(9, auc.calculatePreValue(6, true));
+    assertEquals(10, auc.calculatePreValue(7, true));
+    assertEquals(11, auc.calculatePreValue(8, true));
 
-    l = atomics(doc);
+    auc = atomics(doc);
     // mind that dummy insert data instance size==2!
-    final MemData m = new MemData(l.data);
-    l.addInsert(3, 1, clipE(m, "<dummy3/>", true), false);
-    l.addInsert(3, 1, clipE(m, "<dummy4/>", true), false);
-    l.addDelete(3);
-    l.applyUpdates();
-    assertEquals(1, l.calculatePreValue(1, false));
-    assertEquals(2, l.calculatePreValue(2, false));
-    assertEquals(5, l.calculatePreValue(3, false));
-    assertEquals(7, l.calculatePreValue(4, false));
-    assertEquals(8, l.calculatePreValue(5, false));
-    assertEquals(9, l.calculatePreValue(6, false));
-    assertEquals(1, l.calculatePreValue(1, true));
-    assertEquals(2, l.calculatePreValue(2, true));
+    final MemData m = new MemData(auc.data, context.options);
+    auc.addInsert(3, 1, clipE(m, "<dummy3/>", true));
+    auc.addInsert(3, 1, clipE(m, "<dummy4/>", true));
+    auc.addDelete(3);
+    auc.applyUpdates();
+    assertEquals(1, auc.calculatePreValue(1, false));
+    assertEquals(2, auc.calculatePreValue(2, false));
+    assertEquals(5, auc.calculatePreValue(3, false));
+    assertEquals(7, auc.calculatePreValue(4, false));
+    assertEquals(8, auc.calculatePreValue(5, false));
+    assertEquals(9, auc.calculatePreValue(6, false));
+    assertEquals(1, auc.calculatePreValue(1, true));
+    assertEquals(2, auc.calculatePreValue(2, true));
     // nodes like 3,4 that have not existed prior to insert are not recalculated
-    assertEquals(3, l.calculatePreValue(3, true));
-    assertEquals(4, l.calculatePreValue(4, true));
-    assertEquals(3, l.calculatePreValue(5, true));
-    assertEquals(4, l.calculatePreValue(6, true));
+    assertEquals(3, auc.calculatePreValue(3, true));
+    assertEquals(4, auc.calculatePreValue(4, true));
+    assertEquals(3, auc.calculatePreValue(5, true));
+    assertEquals(4, auc.calculatePreValue(6, true));
   }
 
   /**
@@ -427,15 +426,15 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   public void distanceCaching() {
     final String doc = "<n1>" + "<n2>T3</n2>T4<n5/>T6<n7/>"
         + "<n8><n9><n10><n11/><n12/></n10></n9></n8><n13/><n14/>" + "</n1>";
-    final AtomicUpdateCache l = atomics(doc);
-    final MemData m = new MemData(l.data);
-    l.addDelete(3);
-    l.addReplace(5, clipE(m, "dummy1", true));
-    l.addInsert(11, 10, clipE(m, "dummy2", true), false);
-    l.addInsert(13, 10, clipE(m, "dummy3", true), false);
-    l.addDelete(13);
-    l.execute(true);
-    checkDistances(l.data, new int[][] { new int[] { 17, 1}, new int[] { 16, 15},
+    final AtomicUpdateCache auc = atomics(doc);
+    final MemData m = new MemData(auc.data, context.options);
+    auc.addDelete(3);
+    auc.addReplace(5, clipE(m, "dummy1", true));
+    auc.addInsert(11, 10, clipE(m, "dummy2", true));
+    auc.addInsert(13, 10, clipE(m, "dummy3", true));
+    auc.addDelete(13);
+    auc.execute(true);
+    checkDistances(auc.data, new int[][] { new int[] { 17, 1}, new int[] { 16, 15},
         new int[] { 15, 10}, new int[] { 14, 10}, new int[] { 13, 10},
         new int[] { 12, 11}, new int[] { 11, 10}, new int[] { 10, 9}, new int[] { 9, 8},
         new int[] { 8, 1}, new int[] { 7, 1}, new int[] { 6, 1}, new int[] { 5, 4},
@@ -459,19 +458,19 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   @Test
   public void textMerging() {
     final String doc = "<n1>" + "<n2>T3</n2>T4<n5/>T6<n7/>" + "</n1>";
-    final AtomicUpdateCache l = atomics(doc);
+    final AtomicUpdateCache auc = atomics(doc);
     // MemData needed to build valid DataClip object
-    final MemData m = new MemData(l.data);
-    l.addInsert(3, 2, clipT(m, "Tx0"), false);
-    l.addDelete(3);
-    l.addInsert(4, 2, clipT(m, "Tx01"), false);
-    l.addDelete(5);
-    l.addReplace(6, clipT(m, "T6new"));
-    l.addInsert(8, 7, clipT(m, "Tx1"), false);
-    l.addInsert(8, 7, clipT(m, "Tx2"), false);
-    l.addInsert(8, 1, clipT(m, "Tx3"), false);
-    l.execute(true);
-    checkTextAdjacency(l.data, new byte[][] { token("Tx0Tx01"), token("T4T6new"),
+    final MemData m = new MemData(auc.data, context.options);
+    auc.addInsert(3, 2, clipT(m, "Tx0"));
+    auc.addDelete(3);
+    auc.addInsert(4, 2, clipT(m, "Tx01"));
+    auc.addDelete(5);
+    auc.addReplace(6, clipT(m, "T6new"));
+    auc.addInsert(8, 7, clipT(m, "Tx1"));
+    auc.addInsert(8, 7, clipT(m, "Tx2"));
+    auc.addInsert(8, 1, clipT(m, "Tx3"));
+    auc.execute(true);
+    checkTextAdjacency(auc.data, new byte[][] { token("Tx0Tx01"), token("T4T6new"),
         token("Tx1Tx2"), token("Tx3")});
   }
 
@@ -528,7 +527,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
    */
   private static DataClip clipA(final Data d, final String name, final String value) {
     final int s = d.meta.size;
-    d.attr(s, s + 1, d.atnindex.index(token(name), null, false), token(value), -1, false);
+    d.attr(s, s + 1, d.attrNames.index(token(name), null, false), token(value), -1, false);
     d.insert(s);
     return new DataClip(d, s, d.meta.size);
   }
@@ -537,15 +536,15 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
    * Creates a small insertion sequence data containing 2 nodes.
    * @param d parent data instance
    * @param n name of the elements to be inserted
-   * @param b add tree w/ size==2, if false add tree w/ size==1
+   * @param b add tree w/ size==2 if false add tree w/ size==1
    * @return insertion sequence data instance
    */
   private static DataClip clipE(final Data d, final String n, final boolean b) {
     final int s = d.meta.size;
-    d.elem(s + 1, d.tagindex.index(token(n), null, false), 1, b ? 2 : 1, 0, false);
+    d.elem(s + 1, d.elemNames.index(token(n), null, false), 1, b ? 2 : 1, 0, false);
     d.insert(s);
     if(b) {
-      d.elem(1, d.tagindex.index(token(n), null, false), 1, 1, 0, false);
+      d.elem(1, d.elemNames.index(token(n), null, false), 1, 1, 0, false);
       d.insert(s + 1);
     }
     return new DataClip(d, s, d.meta.size);
@@ -558,7 +557,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
    */
   private static AtomicUpdateCache atomics(final String doc) {
     try {
-      return new AtomicUpdateCache(MemBuilder.build(new IOContent(doc), context));
+      return new AtomicUpdateCache(MemBuilder.build(new IOContent(doc)));
     } catch(final IOException ex) {
       fail(Util.message(ex));
       return null;

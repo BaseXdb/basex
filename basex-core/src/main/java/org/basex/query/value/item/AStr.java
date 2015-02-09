@@ -3,7 +3,7 @@ package org.basex.query.value.item;
 import static org.basex.data.DataText.*;
 
 import org.basex.query.*;
-import org.basex.query.util.*;
+import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -11,7 +11,7 @@ import org.basex.util.list.*;
 /**
  * Abstract string item.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public abstract class AStr extends Item {
@@ -24,10 +24,10 @@ public abstract class AStr extends Item {
 
   /**
    * Constructor, specifying a type.
-   * @param t atomic type
+   * @param type atomic type
    */
-  AStr(final AtomType t) {
-    super(t);
+  AStr(final AtomType type) {
+    super(type);
   }
 
   @Override
@@ -36,8 +36,8 @@ public abstract class AStr extends Item {
   }
 
   @Override
-  public final boolean eq(final Item it, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  public final boolean eq(final Item it, final Collation coll, final StaticContext sc,
+      final InputInfo ii) throws QueryException {
     return coll == null ? Token.eq(string(ii), it.string(ii)) :
       coll.compare(string(ii), it.string(ii)) == 0;
   }

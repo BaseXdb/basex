@@ -5,9 +5,9 @@ import java.util.*;
 import org.basex.util.list.*;
 
 /**
- * Convenience methods for handling arrays; serves as an extension to Java's {@link Arrays} class.
+ * Convenience functions for handling arrays; serves as an extension to Java's {@link Arrays} class.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class Array {
@@ -142,7 +142,7 @@ public final class Array {
       final boolean ascending) {
     final IntList il = number(values.length);
     il.sort(values, numeric, ascending);
-    return il.toArray();
+    return il.finish();
   }
 
   /**
@@ -154,7 +154,7 @@ public final class Array {
   public static int[] createOrder(final double[] values, final boolean ascending) {
     final IntList il = number(values.length);
     il.sort(values, ascending);
-    return il.toArray();
+    return il.finish();
   }
 
   /**
@@ -166,7 +166,7 @@ public final class Array {
   public static int[] createOrder(final int[] values, final boolean ascending) {
     final IntList il = number(values.length);
     il.sort(values, ascending);
-    return il.toArray();
+    return il.finish();
   }
 
   /**

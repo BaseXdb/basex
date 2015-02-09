@@ -9,11 +9,11 @@ import org.xmldb.api.modules.*;
 /**
  * This class tests the XMLDB/API CollectionManagementService implementation.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 @SuppressWarnings("all")
-public class CollectionManagementServiceTest extends XMLDBBaseTest {
+public final class CollectionManagementServiceTest extends XMLDBBaseTest {
   /** CollectionManagementService string. */
   private static final String CMS = "CollectionManagementService";
   /** Temporary collection. */

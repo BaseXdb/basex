@@ -15,7 +15,7 @@ import org.w3c.dom.Text;
 /**
  * This class converts an DOM document instance to a database representation.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class DOMWrapper extends Parser {
@@ -25,8 +25,6 @@ public final class DOMWrapper extends Parser {
   private final String filename;
   /** Root document. */
   private final Node root;
-  /** Chop whitespaces. */
-  private final boolean chop;
   /** Element counter. */
   private int nodes;
 
@@ -40,7 +38,6 @@ public final class DOMWrapper extends Parser {
     super(fn, opts);
     root = doc;
     filename = fn;
-    chop = opts.get(MainOptions.CHOP);
     stripNS = opts.get(MainOptions.STRIPNS);
   }
 
@@ -48,7 +45,7 @@ public final class DOMWrapper extends Parser {
   public void parse(final Builder builder) throws IOException {
     builder.openDoc(token(filename));
 
-    final Stack<NodeIterator> stack = new Stack<NodeIterator>();
+    final Stack<NodeIterator> stack = new Stack<>();
     stack.push(new NodeIterator(root));
 
     while(!stack.empty()) {
@@ -77,8 +74,7 @@ public final class DOMWrapper extends Parser {
           final byte[] en = token(n.getNodeName());
           builder.openElem(stripNS ? local(en) : en, atts, nsp);
         } else if(n instanceof Text) {
-          final String s = n.getNodeValue();
-          builder.text(token(chop ? s.trim() : s));
+          builder.text(token(n.getNodeValue()));
         } else if(n instanceof Comment) {
           builder.comment(token(n.getNodeValue()));
         } else if(n instanceof ProcessingInstruction) {
@@ -113,10 +109,10 @@ public final class DOMWrapper extends Parser {
 
     /**
      * Constructor.
-     * @param n input node
+     * @param node input node
      */
-    NodeIterator(final Node n) {
-      nl = n.getChildNodes();
+    NodeIterator(final Node node) {
+      nl = node.getChildNodes();
     }
 
     /**
@@ -126,6 +122,7 @@ public final class DOMWrapper extends Parser {
     boolean more() {
       return ++i < nl.getLength();
     }
+
     /**
      * Returns the current node.
      * @return current node

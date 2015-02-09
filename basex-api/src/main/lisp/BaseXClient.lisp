@@ -1,5 +1,5 @@
 ; Lisp client for BaseX.
-; Works with BaseX 6.1
+; Works with BaseX 6.x (but not with BaseX 7 and later)
 ;
 ; Documentation: http://docs.basex.org/wiki/Clients
 ; 

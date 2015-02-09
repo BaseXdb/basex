@@ -9,19 +9,27 @@ import javax.swing.*;
 
 import org.basex.core.*;
 import org.basex.gui.*;
-import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXLayout.DropHandler;
-import org.basex.gui.text.TextPanel.*;
 import org.basex.util.options.*;
 
 /**
  * This panel provides search and replace facilities.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class SearchBar extends BaseXBack {
+  /** Search direction. */
+  public enum SearchDir {
+    /** Current hit. */
+    CURRENT,
+    /** Next hit. */
+    FORWARD,
+    /** Previous hit. */
+    BACKWARD,
+  }
+
   /** Escape key listener. */
   private final KeyAdapter escape = new KeyAdapter() {
     @Override
@@ -61,7 +69,7 @@ public final class SearchBar extends BaseXBack {
    */
   SearchBar(final GUI main) {
     layout(new BorderLayout(2, 0));
-    mode(Fill.NONE);
+    setOpaque(false);
     setVisible(false);
 
     gui = main;
@@ -95,7 +103,9 @@ public final class SearchBar extends BaseXBack {
         } else if(ESCAPE.is(e)) {
           deactivate(search.getText().isEmpty());
         } else if(ENTER.is(e)) {
-          editor.jump(e.isShiftDown() ? SearchDir.BACKWARD : SearchDir.FORWARD, true);
+          editor.jump(SearchDir.FORWARD, true);
+        } else if(SHIFT_ENTER.is(e)) {
+          editor.jump(SearchDir.BACKWARD, true);
         }
       }
       @Override
@@ -151,17 +161,17 @@ public final class SearchBar extends BaseXBack {
     final boolean ed = e.isEditable();
     if(editor == null || ed != editor.isEditable()) {
       removeAll();
-      final BaseXBack wst = new BaseXBack(Fill.NONE).layout(new TableLayout(1, 4, 1, 0));
+      final BaseXBack wst = new BaseXBack(false).layout(new TableLayout(1, 4, 1, 0));
       wst.add(mcase);
       wst.add(word);
       wst.add(regex);
       wst.add(multi);
 
-      final BaseXBack ctr = new BaseXBack(Fill.NONE).layout(new GridLayout(1, 2, 2, 0));
+      final BaseXBack ctr = new BaseXBack(false).layout(new GridLayout(1, 2, 2, 0));
       ctr.add(search);
       if(ed) ctr.add(replace);
 
-      final BaseXBack est = new BaseXBack(Fill.NONE).layout(new TableLayout(1, 3, 1, 0));
+      final BaseXBack est = new BaseXBack(false).layout(new TableLayout(1, 3, 1, 0));
       if(ed) est.add(rplc);
       est.add(cls);
 
@@ -183,7 +193,7 @@ public final class SearchBar extends BaseXBack {
    * @return button
    */
   public AbstractButton button(final String help) {
-    button = BaseXButton.get("c_find", BaseXLayout.addShortcut(help, BaseXKeys.FIND.toString()),
+    button = BaseXButton.get("c_find", BaseXLayout.addShortcut(help, FIND.toString()),
         true, gui);
     button.addActionListener(new ActionListener() {
       @Override
@@ -279,7 +289,7 @@ public final class SearchBar extends BaseXBack {
     final boolean nohits = sc.nr == 0;
     final boolean empty = sc.search.isEmpty();
     rplc.setEnabled(!nohits && !empty);
-    search.setBackground(nohits && !empty ? GUIConstants.LRED : Color.white);
+    search.setBackground(nohits && !empty ? GUIConstants.LRED : GUIConstants.BACK);
   }
 
   // PRIVATE METHODS ====================================================================
@@ -321,7 +331,8 @@ public final class SearchBar extends BaseXBack {
   private static String decode(final String in) {
     final StringBuilder sb = new StringBuilder();
     boolean bs = false;
-    for(int i = 0; i < in.length(); i++) {
+    final int is = in.length();
+    for(int i = 0; i < is; i++) {
       final char ch = in.charAt(i);
       if(bs) {
         if(ch == 'n') {

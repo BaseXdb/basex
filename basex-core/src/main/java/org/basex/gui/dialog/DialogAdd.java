@@ -13,10 +13,10 @@ import org.basex.util.*;
 /**
  * Panel for adding new resources.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Lukas Kircher
  */
-class DialogAdd extends BaseXBack {
+final class DialogAdd extends BaseXBack {
   /** Dialog reference. */
   private final DialogProps dialog;
   /** Target path. */
@@ -28,6 +28,8 @@ class DialogAdd extends BaseXBack {
   private final BaseXButton add;
   /** Optimize button. */
   private final BaseXButton optimize;
+  /** Optimize all button. */
+  private final BaseXButton optimizeAll;
 
   /**
    * Constructor.
@@ -56,9 +58,10 @@ class DialogAdd extends BaseXBack {
 
     // buttons
     add = new BaseXButton(ADD + DOTS, d);
-    optimize = new BaseXButton(OPTIMIZE + DOTS, d);
+    optimize = new BaseXButton(OPTIMIZE, d);
+    optimizeAll = new BaseXButton(OPTIMIZE_ALL, d);
 
-    add(d.newButtons(add, optimize), BorderLayout.SOUTH);
+    add(d.newButtons(add, optimize, optimizeAll), BorderLayout.SOUTH);
     action(general.parsers);
   }
 
@@ -82,6 +85,9 @@ class DialogAdd extends BaseXBack {
 
     } else if(comp == optimize) {
       DialogProgress.execute(dialog, new Optimize());
+
+    } else if(comp == optimizeAll) {
+      DialogProgress.execute(dialog, new OptimizeAll());
 
     } else {
       boolean ok = general.action(comp, false);

@@ -23,9 +23,9 @@ import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
- * Database nodes.
+ * Database node.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public class DBNode extends ANode {
@@ -38,53 +38,52 @@ public class DBNode extends ANode {
 
   /**
    * Constructor, creating a document node from the specified data reference.
-   * @param d data reference
+   * @param data data reference
    */
-  public DBNode(final Data d) {
-    this(d, 0);
+  public DBNode(final Data data) {
+    this(data, 0);
   }
 
   /**
    * Constructor, creating a node from the specified data reference.
-   * @param d data reference
-   * @param p pre value
+   * @param data data reference
+   * @param pre pre value
    */
-  public DBNode(final Data d, final int p) {
-    this(d, p, d.kind(p));
+  public DBNode(final Data data, final int pre) {
+    this(data, pre, data.kind(pre));
   }
 
   /**
    * Constructor, specifying full node information.
-   * @param d data reference
-   * @param p pre value
-   * @param k node kind
+   * @param data data reference
+   * @param pre pre value
+   * @param kind node kind
    */
-  public DBNode(final Data d, final int p, final int k) {
-    this(d, p, null, type(k));
+  public DBNode(final Data data, final int pre, final int kind) {
+    this(data, pre, null, type(kind));
   }
 
   /**
    * Constructor, specifying full node information.
-   * @param d data reference
-   * @param p pre value
-   * @param r parent reference
-   * @param t node type
+   * @param data data reference
+   * @param pre pre value
+   * @param par parent reference
+   * @param type node type
    */
-  DBNode(final Data d, final int p, final ANode r, final NodeType t) {
-    super(t);
-    data = d;
-    pre = p;
-    par = r;
+  DBNode(final Data data, final int pre, final ANode par, final NodeType type) {
+    super(type);
+    this.data = data;
+    this.pre = pre;
+    parent = par;
   }
 
   /**
    * Constructor, specifying an XML input reference.
    * @param input input reference
-   * @param opts database options
    * @throws IOException I/O exception
    */
-  public DBNode(final IO input, final MainOptions opts) throws IOException {
-    this(Parser.xmlParser(input, opts));
+  public DBNode(final IO input) throws IOException {
+    this(Parser.xmlParser(input));
   }
 
   /**
@@ -103,8 +102,8 @@ public class DBNode extends ANode {
    */
   private void set(final int p, final int k) {
     type = type(k);
-    par = null;
-    val = null;
+    parent = null;
+    value = null;
     nsp = null;
     pre = p;
   }
@@ -116,15 +115,20 @@ public class DBNode extends ANode {
 
   @Override
   public final byte[] string() {
-    if(val == null) val = data.atom(pre);
-    return val;
+    if(value == null) value = data.atom(pre);
+    return value;
   }
 
   @Override
   public final long itr(final InputInfo ii) throws QueryException {
-    final boolean txt = type == NodeType.TXT || type == NodeType.COM;
-    if(txt || type == NodeType.ATT) {
-      final long l = data.textItr(pre, txt);
+    if(type == NodeType.ELM) {
+      final int as = data.attSize(pre, Data.ELEM);
+      if(data.size(pre, Data.ELEM) - as == 1 && data.kind(pre + as) == Data.TEXT) {
+        final long l = data.textItr(pre + as, true);
+        if(l != Long.MIN_VALUE) return l;
+      }
+    } else if(type == NodeType.TXT || type == NodeType.ATT) {
+      final long l = data.textItr(pre, type == NodeType.TXT);
       if(l != Long.MIN_VALUE) return l;
     }
     return Int.parse(data.atom(pre), ii);
@@ -132,10 +136,13 @@ public class DBNode extends ANode {
 
   @Override
   public final double dbl(final InputInfo ii) throws QueryException {
-    final boolean txt = type == NodeType.TXT || type == NodeType.COM;
-    if(txt || type == NodeType.ATT) {
-      final double d = data.textDbl(pre, txt);
-      if(!Double.isNaN(d)) return d;
+    if(type == NodeType.ELM) {
+      final int as = data.attSize(pre, Data.ELEM);
+      if(data.size(pre, Data.ELEM) - as == 1 && data.kind(pre + as) == Data.TEXT) {
+        return data.textDbl(pre + as, true);
+      }
+    } else if(type == NodeType.TXT || type == NodeType.ATT) {
+      return data.textDbl(pre, type == NodeType.TXT);
     }
     return Dbl.parse(data.atom(pre), ii);
   }
@@ -186,7 +193,7 @@ public class DBNode extends ANode {
       }
       return new TokenBuilder(data.meta.name).add('/').add(base).finish();
     }
-    final byte[] b = attribute(new QNm(BASE, XMLURI));
+    final byte[] b = attribute(new QNm(BASE, XML_URI));
     return b != null ? b : Token.EMPTY;
   }
 
@@ -211,14 +218,13 @@ public class DBNode extends ANode {
 
   @Override
   public final DBNode copy() {
-    final DBNode n = new DBNode(data, pre, par, nodeType());
+    final DBNode n = new DBNode(data, pre, parent, nodeType());
     n.score = score;
     return n;
   }
 
   @Override
-  public final Value copy(final QueryContext ctx, final VarScope scp,
-      final IntObjMap<Var> vs) {
+  public final Value copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
     return copy();
   }
 
@@ -226,12 +232,12 @@ public class DBNode extends ANode {
   public final DBNode dbCopy(final MainOptions opts) {
     final MemData md = new MemData(opts);
     new DataBuilder(md).build(this);
-    return new DBNode(md).parent(par);
+    return new DBNode(md).parent(parent);
   }
 
   @Override
-  public final DBNode deepCopy() {
-    return dbCopy(data.meta.options);
+  public final DBNode deepCopy(final MainOptions options) {
+    return dbCopy(options);
   }
 
   @Override
@@ -241,7 +247,7 @@ public class DBNode extends ANode {
 
   @Override
   public final ANode parent() {
-    if(par != null) return par;
+    if(parent != null) return parent;
     final int p = data.parent(pre, data.kind(pre));
     if(p == -1) return null;
 
@@ -252,7 +258,7 @@ public class DBNode extends ANode {
 
   @Override
   protected final DBNode parent(final ANode p) {
-    par = p;
+    parent = p;
     return this;
   }
 
@@ -446,7 +452,7 @@ public class DBNode extends ANode {
     final ByteList bl = new ByteList().add(typeId().bytes());
     if(type == NodeType.DOC) bl.add(baseURI()).add(0);
     else if(type == NodeType.ATT) bl.add(qname().uri()).add(0);
-    return bl.toArray();
+    return bl.finish();
   }
 
   @Override
@@ -459,7 +465,6 @@ public class DBNode extends ANode {
     }
     return t;
   }
-
 
   @Override
   public String toErrorString() {

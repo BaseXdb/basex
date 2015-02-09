@@ -5,32 +5,39 @@ import static org.junit.Assert.*;
 import org.basex.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
-import org.basex.query.util.*;
 import org.basex.util.*;
 import org.junit.Test;
 
 /**
  * Module tests.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
-public class ModuleTest extends SandboxTest {
+public final class ModuleTest extends SandboxTest {
+  /**
+   * Imports a built-in module.
+   * @throws Exception exception
+   */
+  @Test
+  public void builtIn() throws Exception {
+    final String query = "import module namespace xquery = 'http://basex.org/modules/xquery'; 1";
+    try(final QueryProcessor qp = new QueryProcessor(query, context)) {
+      qp.execute();
+    }
+  }
+
   /**
    * Tests the {@link QueryContext#parseLibrary(String, String, StaticContext)}
    * method.
    */
   @Test
   public void module() {
-    final QueryContext qc = new QueryContext(context);
-    try {
-      qc.parseLibrary("module namespace m='foo'; declare function m:foo() { m:bar() }; ",
-          "", null);
+    try(final QueryContext qc = new QueryContext(context)) {
+      qc.parseLibrary("module namespace m='foo'; declare function m:foo() { m:bar() }; ", "", null);
       fail("Unknown function 'm:bar()' was not detected.");
     } catch(final QueryException e) {
-      assertSame(Err.FUNCUNKNOWN, e.err());
-    } finally {
-      qc.close();
+      assertSame(QueryError.FUNCUNKNOWN_X, e.error());
     }
   }
 
@@ -40,9 +47,10 @@ public class ModuleTest extends SandboxTest {
    */
   @Test
   public void module2() throws Exception {
-    final QueryContext qc = new QueryContext(context);
     final IOFile a = new IOFile("src/test/resources/recmod/a.xqm");
-    qc.parseLibrary(Token.string(a.read()), a.path(), null);
+    try(final QueryContext qc = new QueryContext(context)) {
+      qc.parseLibrary(Token.string(a.read()), a.path(), null);
+    }
   }
 
   /**
@@ -69,6 +77,8 @@ public class ModuleTest extends SandboxTest {
     new IOFile(repo, "b.xqm").write(Token.token("module namespace b='b';"
         + "import module namespace a='a'; declare function b:b(){a:a()};"));
 
-    new QueryContext(context).parseMain("import module namespace a='a'; ()", null, null);
+    try(final QueryContext qc = new QueryContext(context)) {
+      qc.parseMain("import module namespace a='a'; ()", null, null);
+    }
   }
 }

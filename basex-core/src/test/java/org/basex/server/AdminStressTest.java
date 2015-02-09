@@ -6,6 +6,7 @@ import java.io.*;
 import java.util.concurrent.*;
 
 import org.basex.*;
+import org.basex.api.client.*;
 import org.basex.core.cmd.*;
 import org.basex.util.*;
 import org.junit.*;
@@ -14,7 +15,7 @@ import org.junit.Test;
 /**
  * Admin stress test.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Dimitar Popov
  */
 public final class AdminStressTest extends SandboxTest {
@@ -42,8 +43,7 @@ public final class AdminStressTest extends SandboxTest {
   }
 
   /**
-   * Start simultaneously clients which create events and clients which list all
-   * events.
+   * Start simultaneously clients which create events and clients which list all events.
    * @throws Exception exception
    */
   @Test
@@ -61,9 +61,9 @@ public final class AdminStressTest extends SandboxTest {
     stop.await();
 
     Performance.sleep(200);
-    final ClientSession cs = createClient();
-    for(int i = 0; i < NUM; ++i) cs.execute("drop event " + NAME + i);
-    cs.close();
+    try(final ClientSession cs = createClient()) {
+      for(int i = 0; i < NUM; ++i) cs.execute("drop event " + NAME + i);
+    }
 
     for(final Client c : c1) if(c.error != null) fail(c.error);
     for(final Client c : c2) if(c.error != null) fail(c.error);

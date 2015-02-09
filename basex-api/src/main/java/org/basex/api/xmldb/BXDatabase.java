@@ -14,12 +14,12 @@ import org.xmldb.api.base.Collection;
 /**
  * Implementation of the Database Interface for the XMLDB:API.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public final class BXDatabase implements Database, BXXMLDBText {
+final class BXDatabase implements Database, BXXMLDBText {
   /** Database context. */
-  public final Context ctx = new Context();
+  final Context ctx = new Context();
 
   @Override
   public boolean acceptsURI(final String uri) throws XMLDBException {
@@ -28,12 +28,11 @@ public final class BXDatabase implements Database, BXXMLDBText {
   }
 
   @Override
-  public Collection getCollection(final String uri, final String user,
-      final String password) throws XMLDBException {
-
+  public Collection getCollection(final String uri, final String user, final String password)
+      throws XMLDBException {
     // create database context
     final String name = getCollectionName(uri);
-    final boolean exists = ctx.globalopts.dbexists(name);
+    final boolean exists = ctx.soptions.dbexists(name);
     return exists ? new BXCollection(name, true, this) : null;
   }
 
@@ -48,20 +47,20 @@ public final class BXDatabase implements Database, BXXMLDBText {
   }
 
   @Override
-  public String getProperty(final String key) {
+  public String getProperty(final String name) {
     try {
-      return Get.get(key.toUpperCase(Locale.ENGLISH), ctx);
+      return Get.get(name.toUpperCase(Locale.ENGLISH), ctx);
     } catch(final BaseXException ex) {
       return null;
     }
   }
 
   @Override
-  public void setProperty(final String key, final String value) throws XMLDBException {
+  public void setProperty(final String name, final String value) throws XMLDBException {
     try {
-      new Set(key, value).execute(ctx);
+      new Set(name, value).execute(ctx);
     } catch(final BaseXException ex) {
-      throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_PROP + key);
+      throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_PROP + name);
     }
   }
 
@@ -78,7 +77,7 @@ public final class BXDatabase implements Database, BXXMLDBText {
       if(main.startsWith(XMLDBURI)) {
         final String host = main.substring(XMLDBURI.length());
         final String localhost = S_LOCALHOST + ':' +
-            ctx.globalopts.get(GlobalOptions.SERVERPORT) + '/';
+            ctx.soptions.get(StaticOptions.SERVERPORT) + '/';
         if(host.startsWith(localhost)) return host.substring(localhost.length());
       }
     }

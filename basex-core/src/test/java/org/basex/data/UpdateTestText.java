@@ -10,7 +10,7 @@ import org.junit.*;
 /**
  * This class tests the update features of the {@link Data} class.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Tim Petrowsky
  */
 public final class UpdateTestText extends UpdateTest {
@@ -206,13 +206,14 @@ public final class UpdateTestText extends UpdateTest {
 
   /**
    * Tests updateText.
+   * @throws IOException I/O exception
    */
   @Test
-  public void updateText() {
+  public void updateText() throws IOException {
     final Data data = context.data();
-    data.startUpdate();
+    data.startUpdate(context.options);
     data.update(10, Data.TEXT, T_JUNIT);
-    data.finishUpdate();
+    data.finishUpdate(context.options);
     assertEquals(Data.TEXT, data.kind(10));
     assertArraysEquals(T_JUNIT, data.text(10, true));
     reload();
@@ -246,11 +247,11 @@ public final class UpdateTestText extends UpdateTest {
         data.kind(pre - 1)) == par && data.kind(pre - 1) == Data.TEXT))
       throw new IOException("May not insert TEXT before/after TEXT!");
 
-    final MemData md = new MemData(context.data());
+    final MemData md = new MemData(context.data(), context.options);
     md.text(0, pre - par, val, kind);
     md.insert(0);
-    data.startUpdate();
+    data.startUpdate(context.options);
     data.insert(pre, par, new DataClip(md));
-    data.finishUpdate();
+    data.finishUpdate(context.options);
   }
 }

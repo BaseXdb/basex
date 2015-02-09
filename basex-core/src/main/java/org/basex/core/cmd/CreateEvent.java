@@ -3,12 +3,13 @@ package org.basex.core.cmd;
 import static org.basex.core.Text.*;
 
 import org.basex.core.parse.*;
-import org.basex.core.parse.Commands.*;
+import org.basex.core.parse.Commands.Cmd;
+import org.basex.core.parse.Commands.CmdCreate;
 
 /**
  * Evaluates the 'create event' command and creates a new event.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Roman Raedle
  * @author Andreas Weiler
  */
@@ -24,8 +25,7 @@ public final class CreateEvent extends AEvent {
   @Override
   protected boolean run() {
     final String name = args[0];
-    return context.events.create(name) ?
-        info(EVENT_CREATED_X, name) : error(EVENT_EXISTS_X, name);
+    return context.events.create(name) ? info(EVENT_CREATED_X, name) : error(EVENT_EXISTS_X, name);
   }
 
   @Override

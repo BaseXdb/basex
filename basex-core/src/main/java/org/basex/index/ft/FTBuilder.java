@@ -17,7 +17,7 @@ import org.basex.util.list.*;
 /**
  * This class contains common methods for full-text index builders.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class FTBuilder extends IndexBuilder {
@@ -30,24 +30,24 @@ public final class FTBuilder extends IndexBuilder {
 
   /**
    * Constructor.
-   * @param d data reference
+   * @param data data reference
+   * @param options options
    * @throws IOException IOException
    */
-  public FTBuilder(final Data d) throws IOException {
-    super(d, d.meta.options.get(MainOptions.FTINDEXSPLITSIZE));
-    tree = new FTIndexTrees(d.meta.maxlen);
+  public FTBuilder(final Data data, final MainOptions options) throws IOException {
+    super(data, options.get(MainOptions.FTINDEXSPLITSIZE));
+    tree = new FTIndexTrees(data.meta.maxlen);
 
-    final MainOptions opts = d.meta.options;
     final FTOpt fto = new FTOpt();
-    fto.set(FTFlag.DC, opts.get(MainOptions.DIACRITICS));
-    fto.set(FTFlag.ST, opts.get(MainOptions.STEMMING));
-    fto.cs = opts.get(MainOptions.CASESENS) ? FTCase.SENSITIVE : FTCase.INSENSITIVE;
-    fto.sw = new StopWords(d, opts.get(MainOptions.STOPWORDS));
-    fto.ln = Language.get(opts);
+    fto.set(FTFlag.DC, options.get(MainOptions.DIACRITICS));
+    fto.set(FTFlag.ST, options.get(MainOptions.STEMMING));
+    fto.cs = options.get(MainOptions.CASESENS) ? FTCase.SENSITIVE : FTCase.INSENSITIVE;
+    fto.sw = new StopWords(data, options);
+    fto.ln = Language.get(options);
 
     if(!Tokenizer.supportFor(fto.ln))
       throw new BaseXException(NO_TOKENIZER_X, fto.ln);
-    if(opts.get(MainOptions.STEMMING) && !Stemmer.supportFor(fto.ln))
+    if(options.get(MainOptions.STEMMING) && !Stemmer.supportFor(fto.ln))
       throw new BaseXException(NO_STEMMER_X, fto.ln);
 
     lex = new FTLexer(fto);
@@ -113,51 +113,49 @@ public final class FTBuilder extends IndexBuilder {
     if(!partial) return;
 
     // merges temporary index files
-    final DataOutput outX = new DataOutput(data.meta.dbfile(DATAFTX + 'x'));
-    final DataOutput outY = new DataOutput(data.meta.dbfile(DATAFTX + 'y'));
-    final DataOutput outZ = new DataOutput(data.meta.dbfile(DATAFTX + 'z'));
-    final IntList ind = new IntList();
+    try(final DataOutput outX = new DataOutput(data.meta.dbfile(DATAFTX + 'x'));
+        final DataOutput outY = new DataOutput(data.meta.dbfile(DATAFTX + 'y'));
+        final DataOutput outZ = new DataOutput(data.meta.dbfile(DATAFTX + 'z'))) {
 
-    // open all temporary sorted lists
-    final FTList[] v = new FTList[splits];
-    for(int b = 0; b < splits; ++b) v[b] = new FTList(data, b);
+      final IntList ind = new IntList();
 
-    final IntList il = new IntList();
-    while(check(v)) {
-      il.reset();
-      int m = 0;
-      il.add(m);
-      // find next token to write on disk
-      for(int i = 0; i < splits; ++i) {
-        if(m == i || v[i].tok.length == 0) continue;
-        final int l = v[i].tok.length - v[m].tok.length;
-        final int d = diff(v[m].tok, v[i].tok);
-        if(l < 0 || l == 0 && d > 0 || v[m].tok.length == 0) {
-          m = i;
-          il.reset();
-          il.add(m);
-        } else if(d == 0 && v[i].tok.length > 0) {
-          il.add(i);
+      // open all temporary sorted lists
+      final FTList[] v = new FTList[splits];
+      for(int b = 0; b < splits; ++b) v[b] = new FTList(data, b);
+
+      final IntList il = new IntList();
+      while(check(v)) {
+        il.reset();
+        int m = 0;
+        il.add(m);
+        // find next token to write on disk
+        for(int i = 0; i < splits; ++i) {
+          if(m == i || v[i].tok.length == 0) continue;
+          final int l = v[i].tok.length - v[m].tok.length;
+          final int d = diff(v[m].tok, v[i].tok);
+          if(l < 0 || l == 0 && d > 0 || v[m].tok.length == 0) {
+            m = i;
+            il.reset();
+            il.add(m);
+          } else if(d == 0 && v[i].tok.length > 0) {
+            il.add(i);
+          }
         }
-      }
 
-      if(ind.isEmpty() || ind.get(ind.size() - 2) < v[m].tok.length) {
-        ind.add(v[m].tok.length);
-        ind.add((int) outY.size());
-      }
+        if(ind.isEmpty() || ind.get(ind.size() - 2) < v[m].tok.length) {
+          ind.add(v[m].tok.length);
+          ind.add((int) outY.size());
+        }
 
-      // write token
-      outY.writeBytes(v[m].tok);
-      // pointer on full-text data
-      outY.write5(outZ.size());
-      // merge and write data size
-      outY.write4(merge(outZ, il, v));
+        // write token
+        outY.writeBytes(v[m].tok);
+        // pointer on full-text data
+        outY.write5(outZ.size());
+        // merge and write data size
+        outY.write4(merge(outZ, il, v));
+      }
+      writeInd(outX, ind, ind.get(ind.size() - 2) + 1, (int) outY.size());
     }
-    writeInd(outX, ind, ind.get(ind.size() - 2) + 1, (int) outY.size());
-
-    outX.close();
-    outY.close();
-    outZ.close();
   }
 
   /**
@@ -188,42 +186,39 @@ public final class FTBuilder extends IndexBuilder {
    */
   private void writeIndex(final boolean partial) throws IOException {
     final String name = DATAFTX + (partial ? splits : "");
-    final DataOutput outX = new DataOutput(data.meta.dbfile(name + 'x'));
-    final DataOutput outY = new DataOutput(data.meta.dbfile(name + 'y'));
-    final DataOutput outZ = new DataOutput(data.meta.dbfile(name + 'z'));
+    try(final DataOutput outX = new DataOutput(data.meta.dbfile(name + 'x'));
+        final DataOutput outY = new DataOutput(data.meta.dbfile(name + 'y'));
+        final DataOutput outZ = new DataOutput(data.meta.dbfile(name + 'z'))) {
 
-    final IntList ind = new IntList();
-    tree.init();
-    long dr = 0;
-    int tr = 0;
-    int j = 0;
-    while(tree.more(splits)) {
-      final FTIndexTree t = tree.nextTree();
-      t.next();
-      final byte[] key = t.nextTok();
+      final IntList ind = new IntList();
+      tree.init();
+      long dr = 0;
+      int tr = 0;
+      int j = 0;
+      while(tree.more(splits)) {
+        final FTIndexTree t = tree.nextTree();
+        t.next();
+        final byte[] key = t.nextTok();
 
-      if(j < key.length) {
-        j = key.length;
-        // write index and pointer on first token
-        ind.add(j);
-        ind.add(tr);
+        if(j < key.length) {
+          j = key.length;
+          // write index and pointer on first token
+          ind.add(j);
+          ind.add(tr);
+        }
+        for(int i = 0; i < j; ++i) outY.write1(key[i]);
+        // write pointer on full-text data
+        outY.write5(dr);
+        // write full-text data size (number of pre values)
+        outY.write4(t.nextNumPre());
+        // write compressed pre and pos arrays
+        writeFTData(outZ, t.nextPres(), t.nextPoss());
+
+        dr = outZ.size();
+        tr = (int) outY.size();
       }
-      for(int i = 0; i < j; ++i) outY.write1(key[i]);
-      // write pointer on full-text data
-      outY.write5(dr);
-      // write full-text data size (number of pre values)
-      outY.write4(t.nextNumPre());
-      // write compressed pre and pos arrays
-      writeFTData(outZ, t.nextPres(), t.nextPoss());
-
-      dr = outZ.size();
-      tr = (int) outY.size();
+      writeInd(outX, ind, ++j, tr);
     }
-    writeInd(outX, ind, ++j, tr);
-
-    outX.close();
-    outY.close();
-    outZ.close();
     tree.initFT();
 
     // increase split counter
@@ -247,7 +242,8 @@ public final class FTBuilder extends IndexBuilder {
     tbo.add(new byte[4]);
     // merge full-text data of all sorted lists with the same token
     int s = 0;
-    for(int j = 0; j < il.size(); ++j) {
+    final int is = il.size();
+    for(int j = 0; j < is; ++j) {
       final int m = il.get(j);
       for(final int p : v[m].prv) tbp.add(Num.num(p));
       for(final int p : v[m].pov) tbo.add(Num.num(p));
@@ -281,10 +277,8 @@ public final class FTBuilder extends IndexBuilder {
     while(np < ns) {
       // full-text data is stored here, with -scoreU, pre1, pos1, ...,
       // -scoreU, preU, posU
-      for(final int l = np + Num.length(vpre, np); np < l; ++np)
-        out.write(vpre[np]);
-      for(final int l = pp + Num.length(vpos, pp); pp < l; ++pp)
-        out.write(vpos[pp]);
+      for(final int l = np + Num.length(vpre, np); np < l; ++np) out.write(vpre[np]);
+      for(final int l = pp + Num.length(vpos, pp); pp < l; ++pp) out.write(vpos[pp]);
     }
   }
 

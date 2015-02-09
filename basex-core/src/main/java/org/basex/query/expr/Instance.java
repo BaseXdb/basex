@@ -13,48 +13,48 @@ import org.basex.util.hash.*;
 /**
  * Instance test.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class Instance extends Single {
-  /** Sequence type. */
-  private final SeqType seq;
+  /** Sequence type to check for. */
+  private final SeqType type;
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param e expression
-   * @param s sequence type
+   * @param info input info
+   * @param expr expression
+   * @param type sequence type to check for
    */
-  public Instance(final InputInfo ii, final Expr e, final SeqType s) {
-    super(ii, e);
-    seq = s;
-    type = SeqType.BLN;
+  public Instance(final InputInfo info, final Expr expr, final SeqType type) {
+    super(info, expr);
+    this.type = type;
+    seqType = SeqType.BLN;
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    super.compile(ctx, scp);
-    return expr.isValue() ? preEval(ctx) : this;
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    super.compile(qc, scp);
+    return expr.isValue() ? preEval(qc) : this;
   }
 
   @Override
-  public Bln item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    return Bln.get(seq.instance(ctx.value(expr)));
+  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return Bln.get(type.instance(qc.value(expr)));
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Instance(info, expr.copy(ctx, scp, vs), seq);
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new Instance(info, expr.copy(qc, scp, vs), type);
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(TYP, seq), expr);
+    addPlan(plan, planElem(TYP, type), expr);
   }
 
   @Override
   public String toString() {
-    return Util.info("% instance of %", expr, seq);
+    return Util.info("% instance of %", expr, type);
   }
 }

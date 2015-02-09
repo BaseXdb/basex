@@ -12,7 +12,7 @@ import org.basex.io.random.*;
 /**
  * This class provides temporary access to sorted list data.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Sebastian Gath
  */
 final class FTList {
@@ -53,26 +53,27 @@ final class FTList {
 
   /**
    * Constructor, initializing the index structure.
-   * @param d data
-   * @param cf prefix
+   * @param data data
+   * @param prefix prefix
    * @throws IOException I/O exception
    */
-  FTList(final Data d, final int cf) throws IOException {
-    files = d.meta.dbfile(DATAFTX + cf + 'y');
-    filed = d.meta.dbfile(DATAFTX + cf + 'z');
+  FTList(final Data data, final int prefix) throws IOException {
+    files = data.meta.dbfile(DATAFTX + prefix + 'y');
+    filed = data.meta.dbfile(DATAFTX + prefix + 'z');
     str = new DataAccess(files);
     dat = new DataAccess(filed);
-    tp = new int[d.meta.maxlen + 3];
-    for(int i = 0; i < tp.length; ++i) tp[i] = -1;
-    sizes = d.meta.dbfile(DATAFTX + cf + 'x');
-    final DataAccess li = new DataAccess(sizes);
-    int is = li.readNum();
-    while(--is >= 0) {
-      final int p = li.readNum();
-      tp[p] = li.read4();
+    tp = new int[data.meta.maxlen + 3];
+    final int tl = tp.length;
+    for(int t = 0; t < tl; t++) tp[t] = -1;
+    sizes = data.meta.dbfile(DATAFTX + prefix + 'x');
+    try(final DataAccess li = new DataAccess(sizes)) {
+      int is = li.readNum();
+      while(--is >= 0) {
+        final int p = li.readNum();
+        tp[p] = li.read4();
+      }
+      tp[tl - 1] = (int) str.length();
     }
-    tp[tp.length - 1] = (int) str.length();
-    li.close();
     next();
   }
 

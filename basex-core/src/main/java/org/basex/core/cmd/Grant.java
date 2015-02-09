@@ -2,18 +2,14 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
-import java.io.*;
-
-import org.basex.core.*;
 import org.basex.core.parse.*;
-import org.basex.core.parse.Commands.*;
-import org.basex.data.*;
-import org.basex.util.*;
+import org.basex.core.parse.Commands.CmdPerm;
+import org.basex.core.users.*;
 
 /**
  * Evaluates the 'grant' command and grants permissions to users.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class Grant extends AUser {
@@ -33,10 +29,10 @@ public final class Grant extends AUser {
    * Constructor, specifying a database.
    * @param permission permission
    * @param user user name
-   * @param db database
+   * @param pattern database pattern
    */
-  public Grant(final Object permission, final String user, final String db) {
-    super(permission.toString(), user, db);
+  public Grant(final Object permission, final String user, final String pattern) {
+    super(permission.toString(), user, pattern);
   }
 
   @Override
@@ -60,45 +56,14 @@ public final class Grant extends AUser {
   }
 
   @Override
-  protected boolean run(final String user, final String db) {
+  protected boolean run(final String name, final String pattern) {
     // admin cannot be modified
-    if(user.equals(S_ADMIN)) return !info(ADMIN_STATIC_X);
+    if(name.equals(UserText.ADMIN)) return !info(ADMIN_STATIC);
 
-    // set global permissions
-    if(db == null) {
-      context.users.get(user).perm = prm;
-      context.users.write();
-      return info(GRANTED_X_X, args[0], user);
-    }
-
-    // set local permissions
-    final Data data;
-    try {
-      data = Open.open(db, context);
-    } catch(final IOException ex) {
-      return !info(Util.message(ex));
-    }
-
-    // try to lock database
-    if(!data.startUpdate()) return !info(DB_PINNED_X, data.meta.name);
-
-    User u = data.meta.users.get(user);
-    // add local user reference
-    if(u == null) {
-      u = context.users.get(user).copy();
-      data.meta.users.create(u);
-    }
-    u.perm = prm;
-    data.meta.dirty = true;
-    data.finishUpdate();
-    Close.close(data, context);
-    return info(GRANTED_ON_X_X_X, args[0], user, db);
-  }
-
-  @Override
-  public void databases(final LockResult lr) {
-    super.databases(lr);
-    if(!databases(lr.write, 2)) lr.writeAll = true;
+    final Users users = context.users;
+    final User user = users.get(name);
+    Users.perm(user, prm, pattern);
+    return info(pattern == null ? GRANTED_X_X : GRANTED_ON_X_X_X, args[0], name, pattern);
   }
 
   @Override

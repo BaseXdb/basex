@@ -1,13 +1,13 @@
 package org.basex.performance;
 
-import org.basex.core.cmd.*;
 import org.basex.*;
+import org.basex.core.cmd.*;
 import org.junit.Test;
 
 /**
  * Performs bulk updates with standalone version.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Lukas Kircher
  */
 public final class XQUFStressTest extends SandboxTest {

@@ -4,19 +4,19 @@ import static org.junit.Assert.*;
 
 import java.io.*;
 
-import org.basex.io.out.*;
 import org.basex.*;
+import org.basex.io.out.*;
 import org.junit.*;
 
 /**
  * This class tests the completeness and correctness of the language files.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class LangTest extends SandboxTest {
   /**
-   * Tests all language files.
+   * Tests files.
    */
   @Test
   public void test() {

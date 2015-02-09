@@ -5,7 +5,7 @@ import org.basex.index.*;
 /**
  * This class contains information for returning index entries.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class IndexEntries implements IndexToken {
@@ -20,32 +20,32 @@ public final class IndexEntries implements IndexToken {
 
   /**
    * Private constructor.
-   * @param it index type
-   * @param tok token
+   * @param type index type
+   * @param text token
    */
-  private IndexEntries(final IndexType it, final byte[] tok) {
-    type = it;
-    text = tok;
+  private IndexEntries(final IndexType type, final byte[] text) {
+    this.type = type;
+    this.text = text;
   }
 
   /**
    * Constructor for prefix search.
-   * @param tok token
-   * @param it index type
+   * @param text token
+   * @param type index type
    */
-  public IndexEntries(final byte[] tok, final IndexType it) {
-    this(it, tok);
+  public IndexEntries(final byte[] text, final IndexType type) {
+    this(type, text);
     prefix = true;
   }
 
   /**
    * Constructor for traversing entries.
-   * @param tok token to start with
+   * @param text token to start with
    * @param asc return results in ascending order
-   * @param it index type
+   * @param type index type
    */
-  public IndexEntries(final byte[] tok, final boolean asc, final IndexType it) {
-    this(it, tok);
+  public IndexEntries(final byte[] text, final boolean asc, final IndexType type) {
+    this(type, text);
     descending = !asc;
   }
 

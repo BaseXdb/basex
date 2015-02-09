@@ -8,7 +8,7 @@ import org.basex.util.list.*;
 /**
  * Match full-text container, referencing several {@link FTStringMatch} instances.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class FTMatch extends ElementList implements Iterable<FTStringMatch> {
@@ -31,34 +31,34 @@ public final class FTMatch extends ElementList implements Iterable<FTStringMatch
   }
 
   /**
-   * Adds a all matches of a full-text match.
-   * @param m match to be added
+   * Adds all matches of a full-text match.
+   * @param ftm match to be added
    * @return self reference
    */
-  public FTMatch add(final FTMatch m) {
-    for(final FTStringMatch sm : m) add(sm);
+  public FTMatch add(final FTMatch ftm) {
+    for(final FTStringMatch sm : ftm) add(sm);
     return this;
   }
 
   /**
    * Adds a single string match.
-   * @param m match to be added
+   * @param ftm match to be added
    * @return self reference
    */
-  public FTMatch add(final FTStringMatch m) {
+  public FTMatch add(final FTStringMatch ftm) {
     if(size == match.length) match = Array.copy(match, new FTStringMatch[newSize()]);
-    match[size++] = m;
+    match[size++] = ftm;
     return this;
   }
 
   /**
    * Checks if the full-text match is not part of the specified match.
-   * @param m match to be checked
+   * @param ftm match to be checked
    * @return result of check
    */
-  public boolean notin(final FTMatch m) {
+  public boolean notin(final FTMatch ftm) {
     for(final FTStringMatch s : this) {
-      for(final FTStringMatch sm : m) if(!s.in(sm)) return true;
+      for(final FTStringMatch sm : ftm) if(!s.in(sm)) return true;
     }
     return false;
   }
@@ -81,7 +81,7 @@ public final class FTMatch extends ElementList implements Iterable<FTStringMatch
 
   @Override
   public Iterator<FTStringMatch> iterator() {
-    return new ArrayIterator<FTStringMatch>(match, size);
+    return new ArrayIterator<>(match, size);
   }
 
   @Override

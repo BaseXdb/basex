@@ -13,10 +13,9 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * This class indexes and organizes the tags or attribute names,
- * used in an XML document.
+ * This class indexes and organizes the element or attribute names used in an XML document.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  * @author Lukas Kircher
  */
@@ -55,18 +54,18 @@ public final class Names extends TokenSet implements Index {
 
   /**
    * Indexes a name and returns its unique id.
-   * @param n name to be added
-   * @param v value, added to statistics
-   * @param st statistics flag
+   * @param name name to be added
+   * @param value value, added to statistics
+   * @param stat statistics flag
    * @return name id
    */
-  public int index(final byte[] n, final byte[] v, final boolean st) {
-    final int id = put(n);
-    if(st) {
+  public int index(final byte[] name, final byte[] value, final boolean stat) {
+    final int id = put(name);
+    if(stat) {
       if(stats[id] == null) stats[id] = new Stats();
-      final Stats stat = stats[id];
-      if(v != null) stat.add(v, meta);
-      stat.count++;
+      final Stats s = stats[id];
+      if(value != null) s.add(value, meta);
+      s.count++;
     }
     return id;
   }
@@ -74,11 +73,11 @@ public final class Names extends TokenSet implements Index {
   /**
    * Adds a value to the statistics of the specified key.
    * Evaluates the value for the specified key id.
-   * @param n name id
-   * @param v value, added to statistics
+   * @param name name id
+   * @param value value, added to statistics
    */
-  public void index(final int n, final byte[] v) {
-    stats[n].add(v, meta);
+  public void index(final int name, final byte[] value) {
+    stats[name].add(value, meta);
   }
 
   @Override
@@ -100,7 +99,7 @@ public final class Names extends TokenSet implements Index {
   }
 
   @Override
-  public byte[] info() {
+  public byte[] info(final MainOptions options) {
     final int[] tl = new int[size];
     tl[0] = 0;
     int len = 0;
@@ -121,9 +120,9 @@ public final class Names extends TokenSet implements Index {
       final int s = ids[i];
       if(stats[s] == null) continue;
       final byte[] key = keys[s];
-      tb.add("  ");
-      tb.add(key);
-      for(int j = 0; j < len - key.length; ++j) tb.add(' ');
+      tb.add("  ").add(key);
+      final int kl = len - key.length;
+      for(int k = 0; k < kl; ++k) tb.add(' ');
       tb.add(stats[s] + Text.NL);
     }
     return tb.finish();
@@ -148,6 +147,11 @@ public final class Names extends TokenSet implements Index {
   public void close() { }
 
   // Unsupported methods ======================================================
+
+  @Override
+  public boolean drop() {
+    throw Util.notExpected();
+  }
 
   @Override
   public IndexIterator iter(final IndexToken token) {

@@ -1,16 +1,20 @@
 package org.basex.query.func;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
-import static org.basex.query.util.Err.*;
 
 import java.util.*;
 
 import org.basex.core.*;
 import org.basex.query.*;
+import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.Expr.Flag;
-import org.basex.query.gflwor.*;
+import org.basex.query.expr.gflwor.*;
+import org.basex.query.expr.gflwor.GFLWOR.Clause;
+import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -22,100 +26,89 @@ import org.basex.util.hash.*;
 /**
  * A static user-defined function.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
 public final class StaticFunc extends StaticDecl implements XQFunction {
   /** Arguments. */
   public final Var[] args;
   /** Updating flag. */
-  public final boolean updating;
+  final boolean updating;
 
   /** Map with requested function properties. */
-  private final EnumMap<Flag, Boolean> map = new EnumMap<Flag, Boolean>(Flag.class);
+  private final EnumMap<Flag, Boolean> map = new EnumMap<>(Flag.class);
   /** Flag that is turned on during compilation and prevents premature inlining. */
   private boolean compiling;
 
   /**
    * Function constructor.
-   * @param a annotations
-   * @param n function name
-   * @param v arguments
-   * @param r return type
-   * @param e function body
-   * @param stc static context
-   * @param scp variable scope
-   * @param xqdoc current xqdoc cache
-   * @param ii input info
+   * @param anns annotations
+   * @param name function name
+   * @param args arguments
+   * @param type declared return type
+   * @param expr function body
+   * @param sc static context
+   * @param scope variable scope
+   * @param doc current xqdoc cache
+   * @param info input info
    */
-  public StaticFunc(final Ann a, final QNm n, final Var[] v, final SeqType r, final Expr e,
-      final StaticContext stc, final VarScope scp, final String xqdoc, final InputInfo ii) {
+  StaticFunc(final AnnList anns, final QNm name, final Var[] args, final SeqType type,
+      final Expr expr, final StaticContext sc, final VarScope scope, final String doc,
+      final InputInfo info) {
 
-    super(stc, a, n, r, scp, xqdoc, ii);
-    args = v;
-    expr = e;
-    updating = ann.contains(Ann.Q_UPDATING);
+    super(sc, anns, name, type, scope, doc, info);
+    this.args = args;
+    this.expr = expr;
+    updating = anns.contains(Annotation.UPDATING);
   }
 
   @Override
-  public void compile(final QueryContext ctx) {
+  public void compile(final QueryContext qc) {
     if(compiled) return;
     compiling = compiled = true;
 
-    final Value cv = ctx.value;
-    ctx.value = null;
+    final Value cv = qc.value;
+    qc.value = null;
 
     try {
-      expr = expr.compile(ctx, scope);
+      expr = expr.compile(qc, scope);
 
       if(declType != null) {
         // remove redundant casts
         if((declType.type == AtomType.BLN || declType.type == AtomType.FLT ||
             declType.type == AtomType.DBL || declType.type == AtomType.QNM ||
-            declType.type == AtomType.URI) && declType.eq(expr.type())) {
-          ctx.compInfo(OPTCAST, declType);
+            declType.type == AtomType.URI) && declType.eq(expr.seqType())) {
+          qc.compInfo(OPTCAST, declType);
         } else {
-          expr = new TypeCheck(sc, info, expr, declType, true).optimize(ctx, scope);
+          expr = new TypeCheck(sc, info, expr, declType, true).optimize(qc, scope);
         }
       }
     } catch(final QueryException qe) {
-      expr = FNInfo.error(qe, expr.type());
+      expr = FnError.get(qe, expr.seqType());
     } finally {
       scope.cleanUp(this);
-      ctx.value = cv;
+      qc.value = cv;
     }
 
     // convert all function calls in tail position to proper tail calls
-    expr.markTailCalls(ctx);
+    expr.markTailCalls(qc);
 
     compiling = false;
-  }
-
-  /**
-   * Checks if this function can be inlined.
-   * @param ctx query context
-   * @return result of check
-   */
-  private boolean inline(final QueryContext ctx) {
-    return expr.isValue() || expr.exprSize() < ctx.context.options.get(MainOptions.INLINELIMIT) &&
-        !(compiling || has(Flag.CTX) || selfRecursive());
   }
 
   @Override
   public void plan(final FElem plan) {
     final FElem el = planElem(NAM, name.string());
     addPlan(plan, el, expr);
-    for(int i = 0; i < args.length; ++i) {
-      el.add(planAttr(ARG + i, args[i].name.string()));
-    }
+    final int al = args.length;
+    for(int a = 0; a < al; ++a) el.add(planAttr(ARG + a, args[a].name.string()));
   }
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(DECLARE).add(' ').addExt(ann);
-    if(updating) tb.add(UPDATING).add(' ');
+    final TokenBuilder tb = new TokenBuilder(DECLARE).add(' ').addExt(anns);
     tb.add(FUNCTION).add(' ').add(name.string());
-    tb.add(PAR1).addSep(args, SEP).add(PAR2);
+    tb.add(PAREN1).addSep(args, SEP).add(PAREN2);
     if(declType != null) tb.add(' ' + AS + ' ' + declType);
     if(expr != null) tb.add(" { ").addExt(expr).add(" }; ");
     else tb.add(" external; ");
@@ -157,7 +150,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
   @Override
   public FuncType funcType() {
-    return FuncType.get(ann, args, declType);
+    return FuncType.get(anns, args, declType);
   }
 
   @Override
@@ -166,67 +159,69 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   }
 
   @Override
-  public Ann annotations() {
-    return ann;
+  public AnnList annotations() {
+    return anns;
   }
 
   @Override
-  public Item invItem(final QueryContext ctx, final InputInfo ii, final Value... arg)
+  public Item invItem(final QueryContext qc, final InputInfo ii, final Value... arg)
       throws QueryException {
 
     // reset context and evaluate function
-    final Value cv = ctx.value;
-    ctx.value = null;
+    final Value cv = qc.value;
+    qc.value = null;
     try {
-      for(int i = 0; i < args.length; i++) ctx.set(args[i], arg[i], ii);
-      return expr.item(ctx, ii);
+      final int al = args.length;
+      for(int a = 0; a < al; a++) qc.set(args[a], arg[a], ii);
+      return expr.item(qc, ii);
     } finally {
-      ctx.value = cv;
+      qc.value = cv;
     }
   }
 
   @Override
-  public Value invValue(final QueryContext ctx, final InputInfo ii, final Value... arg)
+  public Value invValue(final QueryContext qc, final InputInfo ii, final Value... arg)
       throws QueryException {
 
     // reset context and evaluate function
-    final Value cv = ctx.value;
-    ctx.value = null;
+    final Value cv = qc.value;
+    qc.value = null;
     try {
-      for(int i = 0; i < args.length; i++) ctx.set(args[i], arg[i], ii);
-      return ctx.value(expr);
+      final int al = args.length;
+      for(int a = 0; a < al; a++) qc.set(args[a], arg[a], ii);
+      return qc.value(expr);
     } finally {
-      ctx.value = cv;
+      qc.value = cv;
     }
   }
 
   @Override
-  public Value invokeValue(final QueryContext ctx, final InputInfo ii, final Value... arg)
+  public Value invokeValue(final QueryContext qc, final InputInfo ii, final Value... arg)
       throws QueryException {
-    return FuncCall.value(this, arg, ctx, ii);
+    return FuncCall.value(this, arg, qc, ii);
   }
 
   @Override
-  public Item invokeItem(final QueryContext ctx, final InputInfo ii, final Value... arg)
+  public Item invokeItem(final QueryContext qc, final InputInfo ii, final Value... arg)
       throws QueryException {
-    return FuncCall.item(this, arg, ctx, ii);
+    return FuncCall.item(this, arg, qc, ii);
   }
 
   /**
    * Checks if all updating expressions in the function are correctly declared and placed.
    * @throws QueryException query exception
    */
-  public void checkUp() throws QueryException {
+  void checkUp() throws QueryException {
     final boolean u = expr.has(Flag.UPD);
     if(u) expr.checkUp();
     final InputInfo ii = expr instanceof ParseExpr ? ((ParseExpr) expr).info : info;
     if(updating) {
       // updating function
-      if(declType != null) throw UPFUNCTYPE.get(info);
+      if(declType != null) throw UUPFUNCTYPE.get(info);
       if(!u && !expr.isVacuous()) throw UPEXPECTF.get(ii);
     } else if(u) {
       // uses updates, but is not declared as such
-      throw UPNOT.get(ii, description());
+      throw UPNOT_X.get(ii, description());
     }
   }
 
@@ -244,7 +239,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    * @return result of check
    * @see Expr#has(Flag)
    */
-  public boolean has(final Flag flag) {
+  boolean has(final Flag flag) {
     // handle recursive calls: set dummy value, eventually replace it with final value
     Boolean b = map.get(flag);
     if(b == null) {
@@ -267,24 +262,39 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   }
 
   @Override
-  public Expr inlineExpr(final Expr[] exprs, final QueryContext ctx, final VarScope scp,
+  public Expr inlineExpr(final Expr[] exprs, final QueryContext qc, final VarScope scp,
       final InputInfo ii) throws QueryException {
 
-    if(!inline(ctx)) return null;
-    ctx.compInfo(OPTINLINE, id());
+    if(!inline(qc, anns, expr) || has(Flag.CTX) || compiling || selfRecursive()) return null;
+    qc.compInfo(OPTINLINE, id());
+
     // create let bindings for all variables
-    final LinkedList<GFLWOR.Clause> cls = exprs.length == 0 ? null :
-      new LinkedList<GFLWOR.Clause>();
-    final IntObjMap<Var> vs = new IntObjMap<Var>();
-    for(int i = 0; i < args.length; i++) {
-      final Var old = args[i], v = scp.newCopyOf(ctx, old);
+    final LinkedList<Clause> cls = exprs.length == 0 ? null : new LinkedList<Clause>();
+    final IntObjMap<Var> vs = new IntObjMap<>();
+    final int al = args.length;
+    for(int a = 0; a < al; a++) {
+      final Var old = args[a], v = scp.newCopyOf(qc, old);
       vs.put(old.id, v);
-      cls.add(new Let(v, exprs[i], false, info).optimize(ctx, scp));
+      cls.add(new Let(v, exprs[a], false, info).optimize(qc, scp));
     }
 
     // copy the function body
-    final Expr cpy = expr.copy(ctx, scp, vs);
+    final Expr cpy = expr.copy(qc, scp, vs);
+    return cls == null ? cpy : new GFLWOR(info, cls, cpy).optimize(qc, scp);
+  }
 
-    return cls == null ? cpy : new GFLWOR(info, cls, cpy).optimize(ctx, scp);
+  /**
+   * Checks if inlining conditions are given.
+   * @param qc query context
+   * @param anns annotations
+   * @param expr expression
+   * @return result of check
+   */
+  public static boolean inline(final QueryContext qc, final AnnList anns, final Expr expr) {
+    final Ann ann = anns.get(Annotation._BASEX_INLINE);
+    final long limit = ann != null
+        ? ann.args.length > 0 ? ((ANum) ann.args[0]).itr() : Long.MAX_VALUE
+        : qc.context.options.get(MainOptions.INLINELIMIT);
+    return expr.isValue() || expr.exprSize() < limit;
   }
 }

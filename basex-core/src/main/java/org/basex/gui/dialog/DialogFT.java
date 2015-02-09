@@ -12,12 +12,11 @@ import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXFileChooser.Mode;
 import org.basex.io.*;
 import org.basex.util.ft.*;
-import org.basex.util.list.*;
 
 /**
  * Full-text creation dialog.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 final class DialogFT extends BaseXBack {
@@ -65,20 +64,21 @@ final class DialogFT extends BaseXBack {
       opts.get(MainOptions.CASESENS), opts.get(MainOptions.DIACRITICS), !sw.isEmpty() };
 
     final BaseXLabel[] labels = new BaseXLabel[FLAGS];
-    for(int f = 0; f < check.length; ++f) {
-      check[f] = new BaseXCheckBox(cb[f], val[f], d);
+    final int cl = check.length;
+    for(int c = 0; c < cl; ++c) {
+      check[c] = new BaseXCheckBox(cb[c], val[c], d);
       if(create) {
-        check[f].setToolTipText(desc[f]);
+        check[c].setToolTipText(desc[c]);
       } else {
-        check[f].bold();
-        labels[f] = new BaseXLabel(desc[f], true, false);
+        check[c].bold();
+        labels[c] = new BaseXLabel(desc[c], true, false);
       }
     }
 
     final BaseXBack b1 = new BaseXBack(new TableLayout(1, 2, 8, 0));
     b1.add(check[F_LANG]);
-    final StringList langs = FTLexer.languages();
-    language = new BaseXCombo(d, langs.toArray());
+    final String[] langs = FTLexer.languages().finish();
+    language = new BaseXCombo(d, langs);
     final Language ln = Language.get(opts);
     for(final String l : langs) {
       final String s = l.replaceFirst(" \\(.*", "");

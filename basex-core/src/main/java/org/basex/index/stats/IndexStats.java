@@ -7,7 +7,7 @@ import org.basex.util.*;
 /**
  * This class assembles some index statistics.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class IndexStats {
@@ -28,18 +28,18 @@ public final class IndexStats {
 
   /**
    * Default constructor.
-   * @param maxstat maximum number of index occurrences to print
+   * @param max maximum number of index occurrences to print
    */
-  public IndexStats(final int maxstat) {
-    max = maxstat;
+  public IndexStats(final int max) {
+    this.max = max;
     occMin = new int[max];
     occMax = new int[max];
     txtMin = new byte[max][];
     txtMax = new byte[max][];
-    for(int o = 0; o < txtMin.length; ++o) {
-      txtMin[o] = Token.EMPTY;
-      txtMax[o] = Token.EMPTY;
-      occMin[o] = Integer.MAX_VALUE;
+    for(int t = 0; t < max; ++t) {
+      txtMin[t] = Token.EMPTY;
+      txtMax[t] = Token.EMPTY;
+      occMin[t] = Integer.MAX_VALUE;
     }
   }
 
@@ -78,7 +78,7 @@ public final class IndexStats {
    * @param tb token builder reference
    */
   public void print(final TokenBuilder tb) {
-    tb.add(LI_ENTRIES + size + NL);
+    tb.add(LI_ENTRIES).addInt(size).add(NL);
     int m = 0;
     int c = 0;
     for(int o = 0; o < max; ++o) {
@@ -91,7 +91,7 @@ public final class IndexStats {
     }
 
     print(tb, txtMax, occMax, m + 2);
-    if(c == 0) tb.add("  " + DOTS + NL);
+    if(c == 0) tb.add("  ").add(DOTS).add(NL);
     print(tb, txtMin, occMin, m + 2);
   }
 
@@ -105,10 +105,13 @@ public final class IndexStats {
   private static void print(final TokenBuilder tb, final byte[][] txt, final int[] ocs,
       final int len) {
 
-    for(int o = 0; o < ocs.length; ++o) {
-      if(txt[o].length == 0) continue;
+    final int ol = ocs.length;
+    for(int o = 0; o < ol; ++o) {
+      final int tl = txt[o].length;
+      if(tl == 0) continue;
       tb.add("  ").add(txt[o]);
-      for(int j = 0; j < len - txt[o].length; ++j) tb.add(' ');
+      final int jl = len - tl;
+      for(int j = 0; j < jl; j++) tb.add(' ');
       tb.addInt(ocs[o]).add('x').add(NL);
     }
   }

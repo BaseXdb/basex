@@ -1,6 +1,5 @@
 package org.basex.server;
 
-import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
@@ -8,6 +7,7 @@ import java.math.*;
 import java.util.*;
 
 import org.basex.core.*;
+import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.util.*;
 
@@ -18,24 +18,29 @@ import org.basex.util.*;
  *   <li><b>Time</b>: timestamp (format: {@code xs:time})</li>
  *   <li><b>Address</b>: host name and port of the requesting client</li>
  *   <li><b>User</b>: user name</li>
- *   <li><b>Type</b>: Type of logging message: REQUEST, OK or ERROR</li>
- *   <li><b>Info</b>: Logging message</li>
+ *   <li><b>Type</b>: Type of log message: REQUEST, OK or ERROR</li>
+ *   <li><b>Info</b>: Log message</li>
  *   <li><b>Performance</b>: Measured time in milliseconds</li>
  * </ul>
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class Log {
-  /** SERVER string. */
+  /** Server string. */
   public static final String SERVER = "SERVER";
-  /** ERROR string. */
-  private static final String ERROR = "ERROR";
-  /** REQUEST string. */
-  public static final String REQUEST = "REQUEST";
+  /** Standalone string. */
+  public static final String STANDALONE = "STANDALONE";
+  /** Log types. */
+  public enum LogType {
+    /** Request. */ REQUEST,
+    /** Info.    */ INFO,
+    /** Error.   */ ERROR,
+    /** OK.      */ OK
+  }
 
-  /** Global options. */
-  private final GlobalOptions gopts;
+  /** Static options. */
+  private final StaticOptions sopts;
   /** Start date of log. */
   private String start;
   /** Output stream. */
@@ -43,38 +48,59 @@ public final class Log {
 
   /**
    * Constructor.
-   * @param ctx database context
+   * @param sopts static options
    */
-  public Log(final Context ctx) {
-    gopts = ctx.globalopts;
-  }
-
-  /**
-   * Writes an error to the log file.
-   * @param th throwable
-   */
-  public synchronized void writeError(final Throwable th) {
-    writeServer(ERROR, Util.message(th));
+  public Log(final StaticOptions sopts) {
+    this.sopts = sopts;
   }
 
   /**
    * Writes a server entry to the log file.
-   * @param str strings to be written
+   * @param type log type
+   * @param info info string (can be {@code null})
    */
-  public synchronized void writeServer(final Object... str) {
-    final Object[] tmp = new Object[str.length + 2];
-    tmp[0] = SERVER;
-    tmp[1] = S_ADMIN;
-    System.arraycopy(str, 0, tmp, 2, str.length);
-    write(tmp);
+  public synchronized void writeServer(final LogType type, final String info) {
+    write(SERVER, null, type, info, null);
   }
 
   /**
    * Writes an entry to the log file.
-   * @param str strings to be written
+   * @param address address string
+   * @param user user ({@code admin} if null)
+   * @param type type (HTTP status code)
+   * @param info info string (can be {@code null})
+   * @param perf performance string
    */
-  public synchronized void write(final Object... str) {
-    if(!gopts.get(GlobalOptions.LOG)) {
+  public synchronized void write(final String address, final User user, final int type,
+      final String info, final Performance perf) {
+    write(address, user, Integer.toString(type), info, perf);
+  }
+
+  /**
+   * Writes an entry to the log file.
+   * @param address address string
+   * @param user user ({@code admin} if null)
+   * @param type type (ERROR, OK, REQUEST, INFO)
+   * @param info info string (can be {@code null})
+   * @param perf performance string
+   */
+  public synchronized void write(final String address, final User user, final LogType type,
+      final String info, final Performance perf) {
+    write(address, user, type.toString(), info, perf);
+  }
+
+  /**
+   * Writes an entry to the log file.
+   * @param address address string
+   * @param user user ({@code admin} if null)
+   * @param type type (ERROR, OK, REQUEST, INFO, HTTP status code)
+   * @param info info string (can be {@code null})
+   * @param perf performance string
+   */
+  private synchronized void write(final String address, final User user, final String type,
+      final String info, final Performance perf) {
+
+    if(!sopts.get(StaticOptions.LOG)) {
       close();
       return;
     }
@@ -95,17 +121,14 @@ public final class Log {
       }
 
       // construct log text
-      final int ml = gopts.get(GlobalOptions.LOGMSGMAXLEN);
-      final TokenBuilder tb = new TokenBuilder(DateTime.format(date, DateTime.TIME));
-      for(final Object s : str) {
-        tb.add('\t');
-        final String st;
-        if(s == null) st = REQUEST;
-        else if(s instanceof Boolean) st = (Boolean) s ? OK : ERROR;
-        else if(s instanceof Throwable) st = Util.message((Throwable) s);
-        else st = s.toString();
-        tb.add(chop(token(st.replaceAll("\\s+", " ").trim()), ml));
-      }
+      final int ml = sopts.get(StaticOptions.LOGMSGMAXLEN);
+      final TokenBuilder tb = new TokenBuilder();
+      tb.add(DateTime.format(date, DateTime.TIME));
+      tb.add('\t').add(address);
+      tb.add('\t').add(user == null ? UserText.ADMIN : user.name());
+      tb.add('\t').add(type);
+      tb.add('\t').add(info == null ? EMPTY : chop(normalize(token(info)), ml));
+      if(perf != null) tb.add('\t').add(perf.toString());
       tb.add(Prop.NL);
 
       // write and flush text
@@ -135,7 +158,7 @@ public final class Log {
    */
   public synchronized IOFile dir() {
     // log suffix, plural
-    return gopts.dbpath(IO.LOGSUFFIX + 's');
+    return sopts.dbpath(IO.LOGSUFFIX + 's');
   }
 
   /**

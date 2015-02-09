@@ -14,7 +14,7 @@ import org.basex.util.list.*;
 /**
  * This is a container for the table data.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 final class TableData {
@@ -26,7 +26,7 @@ final class TableData {
   private static final byte[] MAXNUM = token(Double.MAX_VALUE);
 
   /** Database context. */
-  final Context context;
+  final Context ctx;
   /** Root nodes. */
   TokenList roots;
   /** Rows of the main table. */
@@ -47,7 +47,7 @@ final class TableData {
   int mouseX;
   /** Mouse Y position. */
   int mouseY;
-  /** ID of the table root tag. */
+  /** ID of the table root element. */
   int root;
 
   /** GUI options. */
@@ -57,11 +57,11 @@ final class TableData {
 
   /** Table Column. */
   static final class TableCol {
-    /** Tag/Attribute flag. */
+    /** Element/attribute name. */
     byte[] name;
     /** Column IDs. */
     int id;
-    /** Tag/Attribute flags. */
+    /** Element/attribute flag. */
     boolean elem;
     /** Column width. */
     double width;
@@ -74,11 +74,11 @@ final class TableData {
   /**
    * Initializes the table data.
    * @param ctx database context
-   * @param opts gui options
+   * @param gopts gui options
    */
-  TableData(final Context ctx, final GUIOptions opts) {
-    context = ctx;
-    gopts = opts;
+  TableData(final Context ctx, final GUIOptions gopts) {
+    this.ctx = ctx;
+    this.gopts = gopts;
   }
 
   /**
@@ -91,7 +91,7 @@ final class TableData {
     for(final byte[] k : data.paths.desc(EMPTY, true, true)) {
       int c = 0;
       for(final byte[] kk : data.paths.desc(k, true, false)) {
-        final Names nm = startsWith(kk, '@') ? data.atnindex : data.tagindex;
+        final Names nm = startsWith(kk, '@') ? data.attrNames : data.elemNames;
         if(nm.stat(nm.id(delete(kk, '@'))).isLeaf()) ++c;
       }
       // add keys with a minimum of three columns
@@ -102,22 +102,22 @@ final class TableData {
 
   /**
    * Initializes the table data.
-   * @param r optional root node (ignored if -1)
-   * @param data data reference
+   * @param rt optional root node (ignored if -1)
+   * @param dt data reference
    */
-  void init(final Data data, final int r) {
+  void init(final Data dt, final int rt) {
     cols = new TableCol[0];
-    root = r;
+    root = rt;
     sortCol = -1;
     last = "";
     rowH = 1;
 
-    if(r == -1 && roots.isEmpty()) return;
-    if(root == -1) root = data.tagindex.id(roots.get(0));
-    for(final byte[] k : data.paths.desc(data.tagindex.key(root), true, true)) {
+    if(rt == -1 && roots.isEmpty()) return;
+    if(root == -1) root = dt.elemNames.id(roots.get(0));
+    for(final byte[] k : dt.paths.desc(dt.elemNames.key(root), true, true)) {
       final boolean elem = !startsWith(k, '@');
       final byte[] key = delete(k, '@');
-      final Names index = elem ? data.tagindex : data.atnindex;
+      final Names index = elem ? dt.elemNames : dt.attrNames;
       if(index.stat(index.id(key)).isLeaf()) addCol(key, elem);
     }
 
@@ -131,7 +131,7 @@ final class TableData {
   void context(final boolean create) {
     if(cols.length == 0) return;
 
-    final boolean rt = context.root();
+    final boolean rt = ctx.root();
     if(!create && rt && rootRows != null) {
       rows = rootRows;
       sortCol = -1;
@@ -143,13 +143,13 @@ final class TableData {
   }
 
   /**
-   * Adds the specified tag or attribute as column if it exists in the data.
-   * @param name tag/attribute to be added
+   * Adds the specified element or attribute as column if it exists in the data.
+   * @param name element/attribute name to be added
    * @param elem element flag
    */
   private void addCol(final byte[] name, final boolean elem) {
-    final Data data = context.data();
-    final int id = (elem ? data.tagindex : data.atnindex).id(name);
+    final Data data = ctx.data();
+    final int id = (elem ? data.elemNames : data.attrNames).id(name);
     if(id == 0) return;
     final TableCol col = new TableCol();
     col.id = id;
@@ -162,17 +162,17 @@ final class TableData {
    * Creates the row list for the specified nodes.
    */
   private void createRows() {
-    final Data data = context.data();
+    final Data data = ctx.data();
     rows = new IntList();
-    for(int p : context.current().pres) {
+    for(int p : ctx.current().pres) {
       if(p >= data.meta.size) break;
       final int s = p + data.size(p, data.kind(p));
-      // find first root tag
+      // find first root element name
       do {
         if(data.kind(p) == Data.ELEM && data.name(p) == root) break;
       } while(++p < s);
 
-      // parse whole document and collect root tags
+      // parse whole document and collect root element names
       while(p < s) {
         final int k = data.kind(p);
         if(k == Data.ELEM && data.name(p) == root) rows.add(p);
@@ -188,10 +188,10 @@ final class TableData {
   private void calcWidths() {
     if(cols.length == 0) return;
 
-    final Data data = context.data();
+    final Data data = ctx.data();
     final int cs = cols.length;
 
-    // scan first MAXROWS root tags
+    // scan first MAXROWS root elements
     final int nRows = rows.size();
     final TableIterator ti = new TableIterator(data, this);
 
@@ -241,8 +241,8 @@ final class TableData {
     final int c = cols[sortCol].id;
     final boolean e = cols[sortCol].elem;
 
-    final Data data = context.data();
-    final Names index = e ? data.tagindex : data.atnindex;
+    final Data data = ctx.data();
+    final Names index = e ? data.elemNames : data.attrNames;
     final StatsType type = index.stat(c).type;
     final boolean num = type == StatsType.INTEGER || type == StatsType.DOUBLE;
 
@@ -267,10 +267,10 @@ final class TableData {
   }
 
   /**
-   * Returns possible root tag.
+   * Returns pre value of possible root element.
    * @param data data reference
    * @param pre pre value to start with
-   * @return root
+   * @return pre value of root element
    */
   int getRoot(final Data data, final int pre) {
     if(pre == -1) return -1;
@@ -291,10 +291,10 @@ final class TableData {
    */
   int column(final int w, final int mx) {
     double cs = 0;
-    for(int i = 0; i < cols.length; ++i) {
-      final double cw = w * cols[i].width;
-      final double ce = cs + cw;
-      if(mx > cs && mx < ce) return i;
+    final int cl = cols.length;
+    for(int c = 0; c < cl; c++) {
+      final double cw = w * cols[c].width, ce = cs + cw;
+      if(mx > cs && mx < ce) return c;
       cs = ce;
     }
     return -1;
@@ -312,7 +312,7 @@ final class TableData {
    * @return query
    */
   String find() {
-    final Data data = context.data();
+    final Data data = ctx.data();
     final boolean r = rows == rootRows;
     final StringList filters = new StringList();
     final TokenList names = new TokenList();
@@ -322,7 +322,7 @@ final class TableData {
       names.add(col.name);
       elems.add(col.elem);
     }
-    final String query = Find.findTable(filters, names, elems, data.tagindex.key(root),
+    final String query = Find.findTable(filters, names, elems, data.elemNames.key(root),
         gopts.get(GUIOptions.FILTERRT) || r);
     if(query.equals(last)) return null;
     last = query;

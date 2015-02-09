@@ -2,14 +2,16 @@ package org.basex.core.cmd;
 
 import java.io.*;
 
-import org.basex.core.*;
+import org.basex.core.locks.*;
 import org.basex.core.parse.*;
-import org.basex.core.parse.Commands.*;
+import org.basex.core.parse.Commands.Cmd;
+import org.basex.core.parse.Commands.CmdRepo;
+import org.basex.core.users.*;
 import org.basex.query.util.pkg.*;
 
 /**
  * Evaluates the 'repo list' command.
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Rositsa Shadura
  */
 public final class RepoList extends ARepo {

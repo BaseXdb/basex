@@ -1,14 +1,13 @@
 package org.basex.io.parse.json;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 
 import java.util.*;
 
-import org.basex.build.*;
+import org.basex.build.json.*;
 import org.basex.query.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
-
 
 /**
  * <p>This class converts a <a href="http://jsonml.org">JsonML</a>
@@ -16,13 +15,13 @@ import org.basex.util.*;
  * The specified JSON input is first transformed into a tree representation
  * and then converted to an XML document.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  * @author Leo Woerteler
  */
-public class JsonMLConverter extends JsonXmlConverter {
+final class JsonMLConverter extends JsonXmlConverter {
   /** Element stack. */
-  private final Stack<FElem> stack = new Stack<FElem>();
+  private final Stack<FElem> stack = new Stack<>();
   /** Current attribute name. */
   private byte[] attName;
 
@@ -30,7 +29,7 @@ public class JsonMLConverter extends JsonXmlConverter {
    * Constructor.
    * @param opts json options
    */
-  public JsonMLConverter(final JsonParserOptions opts) {
+  JsonMLConverter(final JsonParserOptions opts) {
     super(opts);
   }
 
@@ -46,7 +45,7 @@ public class JsonMLConverter extends JsonXmlConverter {
    * @throws QueryIOException query I/O exception
    */
   private static void error(final String msg, final Object... ext) throws QueryIOException {
-    throw BXJS_PARSEML.getIO(Util.inf(msg, ext));
+    throw BXJS_PARSEML_X.getIO(Util.inf(msg, ext));
   }
 
   /**
@@ -63,7 +62,7 @@ public class JsonMLConverter extends JsonXmlConverter {
 
   @Override
   public void openObject() throws QueryIOException {
-    if(elem == null || attName != null || stack.peek() != null)
+    if(curr == null || attName != null || stack.peek() != null)
       error("No object allowed at this stage");
   }
 
@@ -73,42 +72,42 @@ public class JsonMLConverter extends JsonXmlConverter {
   }
 
   @Override
-  public void closePair() throws QueryIOException { }
+  public void closePair(final boolean add) { }
 
   @Override
   public void closeObject() {
     stack.pop();
-    stack.push(elem);
-    elem = null;
+    stack.push(curr);
+    curr = null;
   }
 
   @Override
   public void openArray() throws QueryIOException {
     if(!stack.isEmpty()) {
-      if(attName == null && elem != null && stack.peek() == null) {
+      if(attName == null && curr != null && stack.peek() == null) {
         stack.pop();
-        stack.push(elem);
-        elem = null;
-      } else if(attName != null || elem != null || stack.peek() == null) {
+        stack.push(curr);
+        curr = null;
+      } else if(attName != null || curr != null || stack.peek() == null) {
         error("No array allowed at this stage");
       }
     }
     stack.push(null);
-    elem = null;
+    curr = null;
   }
 
   @Override
   public void openItem() { }
 
   @Override
-  public void closeItem() throws QueryIOException { }
+  public void closeItem() { }
 
   @Override
   public void closeArray() throws QueryIOException {
     FElem val = stack.pop();
     if(val == null) {
-      val = elem;
-      elem = null;
+      val = curr;
+      curr = null;
     }
 
     if(val == null) error("Missing element name");
@@ -118,19 +117,19 @@ public class JsonMLConverter extends JsonXmlConverter {
   }
 
   @Override
-  public void stringLit(final byte[] val) throws QueryIOException {
-    if(attName == null && elem != null && stack.peek() == null) {
+  public void stringLit(final byte[] value) throws QueryIOException {
+    if(attName == null && curr != null && stack.peek() == null) {
       stack.pop();
-      stack.push(elem);
-      elem = null;
+      stack.push(curr);
+      curr = null;
     }
 
-    if(elem == null) {
+    if(curr == null) {
       final FElem e = stack.isEmpty() ? null : stack.peek();
-      if(e == null) elem = new FElem(check(val));
-      else e.add(new FTxt(val));
+      if(e == null) curr = new FElem(check(value));
+      else e.add(new FTxt(value));
     } else if(attName != null) {
-      elem.add(attName, val);
+      curr.add(attName, value);
       attName = null;
     } else {
       error("No string allowed at this stage");
@@ -159,7 +158,7 @@ public class JsonMLConverter extends JsonXmlConverter {
 
   @Override public void openArg() { }
 
-  @Override public void closeArg() throws QueryIOException { }
+  @Override public void closeArg() { }
 
-  @Override public void closeConstr() throws QueryIOException { }
+  @Override public void closeConstr() { }
 }

@@ -1,21 +1,19 @@
 package org.basex.gui.text;
 
+import static org.basex.util.FTToken.*;
 import static org.basex.util.Token.*;
 
-import java.io.*;
 import java.util.*;
 
 import org.basex.gui.*;
-import org.basex.gui.text.TextPanel.SearchDir;
-import org.basex.io.*;
-import org.basex.io.in.*;
+import org.basex.gui.text.SearchBar.SearchDir;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
  * Provides methods for editing a text that is visualized by the {@link TextPanel}.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class TextEditor {
@@ -59,10 +57,12 @@ public final class TextEditor {
    */
   boolean text(final byte[] txt) {
     if(eq(txt, text)) return false;
+    final int tl = txt.length;
     text = txt;
     lines = -1;
     noSelect();
     if(search != null) searchPos = search.search(txt);
+    if(pos > tl) pos = tl;
     return true;
   }
 
@@ -194,6 +194,16 @@ public final class TextEditor {
       if(pos != 0) next();
     }
     if(select) endSelection();
+  }
+
+  /**
+   * Returns the position of first character of the current auto-completion input.
+   * @return position
+   */
+  int completionStart() {
+    int p = pos;
+    while(p > 0 && !ws(text[p - 1])) --p;
+    return p;
   }
 
   /**
@@ -494,48 +504,26 @@ public final class TextEditor {
   }
 
   /**
-   * Code completion.
+   * Inserts the specified value and updates the cursor position.
+   * @param value value
+   * @param p position to start completion from
    */
-  void complete() {
-    if(selected()) return;
-
-    // ignore space before cursor
-    final boolean space = pos > 0 && ws(text[pos - 1]);
-    if(space) pos--;
-
-    // replace pre-defined completion strings
-    for(int s = 0; s < REPLACE.size(); s += 2) {
-      final String key = REPLACE.get(s);
-      if(!find(key)) continue;
-      // key found
-      String value = REPLACE.get(s + 1);
-      final int p = pos - key.length(), car = value.indexOf('_');
-      if(car != -1) value = value.replace("_", "");
-      // adopt current indentation
-      final int ind = open();
-      if(ind != 0) {
-        final StringBuilder spaces = new StringBuilder();
-        for(int i = 0; i < ind; i++) spaces.append(' ');
-        value = new TokenBuilder().addSep(value.split("\n"), "\n" + spaces).toString();
-      }
-      // delete old string, add new one
-      replace(p, pos + (space ? 1 : 0), value);
-      // adjust cursor
-      if(car != -1) pos = p + car;
+  void complete(final String value, final int p) {
+    // key found
+    String v = value;
+    final int car = v.indexOf('_');
+    if(car != -1) v = v.replace("_", "");
+    // adopt current indentation
+    final int ind = open();
+    if(ind != 0) {
+      final StringBuilder spaces = new StringBuilder();
+      for(int i = 0; i < ind; i++) spaces.append(' ');
+      v = new TokenBuilder().addSep(v.split("\n"), "\n" + spaces).toString();
     }
-
-    // replace entities
-    int p = pos;
-    while(--p >= 0 && XMLToken.isChar(text[p]));
-    ++p;
-    final String key = Token.string(text, p, pos - p);
-    final byte[] value = XMLToken.getEntity(token(key));
-    if(value != null) {
-      replace(p, pos + (space ? 1 : 0), string(value));
-      return;
-    }
-
-    if(space) pos++;
+    // delete old string, add new one
+    replace(p, pos, v);
+    // adjust cursor
+    if(car != -1) pos = p + car;
   }
 
   /**
@@ -568,15 +556,14 @@ public final class TextEditor {
     for(int i = s; i < e; i++) {
       final byte ch = tmp[i];
       if(ch == '\n') {
-        tl.add(bl.toArray());
-        bl.reset();
+        tl.add(bl.next());
       } else {
         bl.add(ch);
       }
     }
 
     // sort data and merge duplicate lines
-    if(!bl.isEmpty()) tl.add(bl.toArray());
+    if(!bl.isEmpty()) tl.add(bl.finish());
     tl.sort(gopts.get(GUIOptions.CASESORT), gopts.get(GUIOptions.ASCSORT));
     if(gopts.get(GUIOptions.MERGEDUPL)) tl.unique();
 
@@ -871,17 +858,6 @@ public final class TextEditor {
   }
 
   /**
-   * Checks if the specified key is found before the current cursor position.
-   * @param key string to be found
-   * @return result of check
-   */
-  private boolean find(final String key) {
-    final byte[] k = token(key);
-    final int s = pos - k.length;
-    return s >= 0 && indexOf(text, k, s) == s && (s == 0 || !XMLToken.isChar(text[s - 1]));
-  }
-
-  /**
    * Extends the current selection to the beginning of the first and the end of the last line.
    * @return if text is selected
    */
@@ -1072,10 +1048,10 @@ public final class TextEditor {
    * Selects the word at the cursor position.
    */
   void selectWord() {
-    final boolean ch = ftChar(curr());
+    final boolean ch = valid(curr());
     while(pos() > 0) {
       final int cp = back(true);
-      if(cp == '\n' || ch != ftChar(cp)) {
+      if(cp == '\n' || ch != valid(cp)) {
         forward(true);
         break;
       }
@@ -1083,7 +1059,7 @@ public final class TextEditor {
     startSelect();
     while(pos() < size()) {
       final int cp = curr();
-      if(cp == '\n' || ch != ftChar(cp)) break;
+      if(cp == '\n' || ch != valid(cp)) break;
       forward(true);
     }
     endSelection();
@@ -1173,33 +1149,5 @@ public final class TextEditor {
   @Override
   public String toString() {
     return copy();
-  }
-
-  /** Index for all replacements. */
-  private static final StringList REPLACE = new StringList();
-
-  /** Reads in the property file. */
-  static {
-    try {
-      final String file = "/completions.properties";
-      final InputStream is = MimeTypes.class.getResourceAsStream(file);
-      if(is == null) {
-        Util.errln(file + " not found.");
-      } else {
-        final NewlineInput nli = new NewlineInput(is);
-        try {
-          for(String line; (line = nli.readLine()) != null;) {
-            final int i = line.indexOf('=');
-            if(i == -1 || line.startsWith("#")) continue;
-            REPLACE.add(line.substring(0, i));
-            REPLACE.add(line.substring(i + 1).replace("\\n", "\n"));
-          }
-        } finally {
-          nli.close();
-        }
-      }
-    } catch(final IOException ex) {
-      Util.errln(ex);
-    }
   }
 }

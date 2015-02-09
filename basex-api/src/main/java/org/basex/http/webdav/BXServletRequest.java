@@ -23,7 +23,7 @@ import com.bradmcevoy.http.Cookie;
  * the source is integrated into BaseX.
  *
  * @author Milton Development Team
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
@@ -37,11 +37,9 @@ final class BXServletRequest extends AbstractRequest {
   /** Authentication. */
   private Auth auth;
   /** Content types map. */
-  private static final Map<ContentType, String> CONTENT_TYPES =
-      new EnumMap<ContentType, String>(ContentType.class);
+  private static final Map<ContentType, String> CONTENT_TYPES = new EnumMap<>(ContentType.class);
   /** Type contents map. */
-  private static final Map<String, ContentType> TYPE_CONTENTS =
-      new HashMap<String, ContentType>();
+  private static final Map<String, ContentType> TYPE_CONTENTS = new HashMap<>();
 
   static {
     CONTENT_TYPES.put(ContentType.HTTP, Response.HTTP);
@@ -52,8 +50,7 @@ final class BXServletRequest extends AbstractRequest {
   }
 
   /** Thread local variable to hold the current request. */
-  private static final ThreadLocal<HttpServletRequest> REQUEST =
-      new ThreadLocal<HttpServletRequest>();
+  private static final ThreadLocal<HttpServletRequest> REQUEST = new ThreadLocal<>();
 
   /**
    * Get the current request.
@@ -65,13 +62,13 @@ final class BXServletRequest extends AbstractRequest {
 
   /**
    * Constructor.
-   * @param r HTTP servlet request
+   * @param req HTTP servlet request
    */
-  BXServletRequest(final HttpServletRequest r) {
-    req = r;
-    method = Method.valueOf(r.getMethod());
-    url = r.getRequestURL().toString(); // MiltonUtils.stripContext(r);
-    REQUEST.set(r);
+  BXServletRequest(final HttpServletRequest req) {
+    this.req = req;
+    method = Method.valueOf(req.getMethod());
+    url = req.getRequestURL().toString(); // MiltonUtils.stripContext(r);
+    REQUEST.set(req);
   }
 
   @Override
@@ -120,7 +117,7 @@ final class BXServletRequest extends AbstractRequest {
 
   @Override
   public Map<String, String> getHeaders() {
-    final Map<String, String> map = new HashMap<String, String>();
+    final Map<String, String> map = new HashMap<>();
     final Enumeration<String> en = req.getHeaderNames();
     while(en.hasMoreElements()) {
       final String name = en.nextElement();
@@ -140,20 +137,19 @@ final class BXServletRequest extends AbstractRequest {
 
   @Override
   public List<Cookie> getCookies() {
-    final List<Cookie> list = new ArrayList<Cookie>();
-    for(final javax.servlet.http.Cookie c : req.getCookies())
+    final List<Cookie> list = new ArrayList<>();
+    for(final javax.servlet.http.Cookie c : req.getCookies()) {
       list.add(new BXServletCookie(c));
+    }
     return list;
   }
 
   @Override
   public void parseRequestParameters(final Map<String, String> params,
-      final Map<String, com.bradmcevoy.http.FileItem> files)
-      throws RequestParseException {
+      final Map<String, com.bradmcevoy.http.FileItem> files) throws RequestParseException {
     try {
       if(isMultiPart()) {
         parseQueryString(params, req.getQueryString());
-        @SuppressWarnings("unchecked")
         final List<FileItem> items = new ServletFileUpload().parseRequest(req);
         for(final FileItem item : items) {
           if(item.isFormField())
@@ -183,18 +179,15 @@ final class BXServletRequest extends AbstractRequest {
    */
   private static void parseQueryString(final Map<String, String> map, final String qs) {
     if(qs == null) return;
-    for(final String nv : qs.split("&")) {
-      final String[] parts = nv.split("=");
+    for(final String nv : Strings.split(qs, '&')) {
+      final String[] parts = Strings.split(nv, '=', 2);
       final String key = parts[0];
       String val = null;
       if(parts.length > 1) {
-        val = parts[1];
-        if(val != null) {
-          try {
-            val = URLDecoder.decode(val, Token.UTF8);
-          } catch(final UnsupportedEncodingException ex) {
-            throw new RuntimeException(ex);
-          }
+        try {
+          val = URLDecoder.decode(parts[1], Strings.UTF8);
+        } catch(final UnsupportedEncodingException ex) {
+          throw new RuntimeException(ex);
         }
       }
       map.put(key, val);
@@ -229,49 +222,49 @@ final class BXServletRequest extends AbstractRequest {
  * the few classes which is needed from that library, the source is integrated
  * into BaseX.
  * @author Milton Development Team
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
 class FileItemWrapper implements com.bradmcevoy.http.FileItem {
   /** Wrapped file item. */
-  private final FileItem wrapped;
+  private final FileItem file;
   /** File name. */
   private final String name;
 
   /**
    * Strip path information provided by IE.
-   * @param s string
+   * @param string string
    * @return stripped string
    */
-  private static String fixIEFileName(final String s) {
-    final int pos = s.lastIndexOf('\\');
-    return pos < 0 ? s : s.substring(pos + 1);
+  private static String fixIEFileName(final String string) {
+    final int pos = string.lastIndexOf('\\');
+    return pos < 0 ? string : string.substring(pos + 1);
   }
 
   /**
    * Constructor.
-   * @param f file item
+   * @param file file item
    */
-  FileItemWrapper(final FileItem f) {
-    wrapped = f;
-    name = fixIEFileName(wrapped.getName());
+  FileItemWrapper(final FileItem file) {
+    this.file = file;
+    name = fixIEFileName(file.getName());
   }
 
   @Override
   public String getContentType() {
-    return wrapped.getContentType();
+    return file.getContentType();
   }
 
   @Override
   public String getFieldName() {
-    return wrapped.getFieldName();
+    return file.getFieldName();
   }
 
   @Override
   public InputStream getInputStream() {
     try {
-      return wrapped.getInputStream();
+      return file.getInputStream();
     } catch(final IOException ex) {
       throw new RuntimeException(ex);
     }
@@ -280,7 +273,7 @@ class FileItemWrapper implements com.bradmcevoy.http.FileItem {
   @Override
   public OutputStream getOutputStream() {
     try {
-      return wrapped.getOutputStream();
+      return file.getOutputStream();
     } catch(final IOException ex) {
       throw new RuntimeException(ex);
     }
@@ -293,6 +286,6 @@ class FileItemWrapper implements com.bradmcevoy.http.FileItem {
 
   @Override
   public long getSize() {
-    return wrapped.getSize();
+    return file.getSize();
   }
 }

@@ -1,16 +1,17 @@
 package org.basex.core;
 
+import static org.basex.query.func.Function.*;
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 
 import java.io.*;
 
-import org.basex.core.cmd.*;
-import org.basex.core.parse.Commands.*;
-import org.basex.data.*;
-import org.basex.io.*;
-import org.basex.server.*;
 import org.basex.*;
+import org.basex.api.client.*;
+import org.basex.core.cmd.*;
+import org.basex.core.parse.Commands.CmdIndex;
+import org.basex.core.users.*;
+import org.basex.io.*;
 import org.basex.util.*;
 import org.junit.*;
 import org.junit.Test;
@@ -18,7 +19,7 @@ import org.junit.Test;
 /**
  * This class tests the database commands.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public class CommandTest extends SandboxTest {
@@ -30,12 +31,14 @@ public class CommandTest extends SandboxTest {
   private static final String FILE = FOLDER + FN;
   /** Test name. */
   static final String NAME2 = NAME + '2';
+  /** Admin. */
+  static final String ADMIN = "admin";
   /** Socket reference. */
   static Session session;
 
   /** Starts the server.
    * @throws IOException I/O exception
-  */
+   */
   @BeforeClass
   public static void start() throws IOException {
     session = new LocalSession(context);
@@ -79,9 +82,13 @@ public class CommandTest extends SandboxTest {
   /** Command test. */
   @Test
   public final void alterDB() {
+    no(new AlterDB("unknown", NAME));
+
     ok(new CreateDB(NAME));
     ok(new AlterDB(NAME, NAME2));
+    ok(new CreateDB(NAME));
     ok(new Close());
+    no(new AlterDB(NAME, NAME2));
     no(new AlterDB(NAME, NAME2));
     no(new AlterDB(NAME2, "?"));
     no(new AlterDB("?", NAME2));
@@ -89,10 +96,31 @@ public class CommandTest extends SandboxTest {
 
   /** Command test. */
   @Test
+  public final void alterPassword() {
+    ok(new CreateUser(NAME, NAME));
+    ok(new AlterPassword(NAME, "test"));
+    no(new AlterPassword(":", NAME));
+    no(new AlterPassword("unknown", NAME));
+  }
+
+  /** Command test. */
+  @Test
   public final void alterUser() {
-    ok(new CreateUser(NAME2, md5(NAME2)));
-    ok(new AlterUser(NAME2, md5("test")));
-    no(new AlterUser(":", md5(NAME2)));
+    // admin cannot be renamed
+    no(new AlterUser(ADMIN, NAME));
+    no(new AlterUser(NAME, ADMIN));
+    // invalid name
+    no(new AlterUser(":", NAME));
+    no(new AlterUser(NAME, ":"));
+    // unknown user
+    no(new AlterUser("unknown", NAME));
+
+    // create and rename user
+    ok(new CreateUser(NAME, NAME));
+    ok(new AlterUser(NAME, NAME2));
+    // rename to existing user
+    ok(new CreateUser(NAME, NAME));
+    no(new AlterUser(NAME, NAME2));
   }
 
   /** Command test. */
@@ -158,27 +186,14 @@ public class CommandTest extends SandboxTest {
   /** Command test. */
   @Test
   public final void createUser() {
-    ok(new CreateUser(NAME2, md5("test")));
-    no(new CreateUser(NAME2, md5("test")));
+    ok(new CreateUser(NAME2, "test"));
+    ok(new CreateUser(NAME2, "test"));
     ok(new DropUser(NAME2));
     no(new CreateUser("", ""));
     no(new CreateUser(":", ""));
 
-    ok(new CreateUser(Databases.DBCHARS, md5("")));
+    ok(new CreateUser(Databases.DBCHARS, ""));
     ok(new DropUser(Databases.DBCHARS));
-  }
-
-  /** Command test. */
-  @Test
-  public final void cs() {
-    no(new Cs("//li"));
-    ok(new CreateDB(NAME, FILE));
-    ok(new Cs("//  li"));
-    ok(context.current(), 2);
-    ok(new Cs("."));
-    ok(context.current(), 2);
-    ok(new Cs("/"));
-    ok(context.current(), 1);
   }
 
   /** Command test. */
@@ -231,8 +246,8 @@ public class CommandTest extends SandboxTest {
   /** Command test. */
   @Test
   public final void dropUser() {
-    ok(new CreateUser(NAME, md5(NAME)));
-    ok(new CreateUser(NAME2, md5(NAME)));
+    ok(new CreateUser(NAME, NAME));
+    ok(new CreateUser(NAME2, NAME));
 
     ok(new DropUser(NAME));
     ok(new DropUser(NAME2));
@@ -240,8 +255,8 @@ public class CommandTest extends SandboxTest {
     no(new DropUser(NAME2, ":"));
 
     ok(new CreateDB(NAME));
-    ok(new CreateUser(NAME, md5(NAME)));
-    ok(new CreateUser(NAME2, md5(NAME)));
+    ok(new CreateUser(NAME, NAME));
+    ok(new CreateUser(NAME2, NAME));
     ok(new DropUser(NAME2, NAME + '*'));
     ok(new DropUser(NAME + ',' + NAME2));
   }
@@ -252,6 +267,7 @@ public class CommandTest extends SandboxTest {
     final IOFile io = new IOFile(FN);
     no(new Export(io.path()));
     ok(new CreateDB(NAME, FILE));
+    ok(new Export("."));
     ok(new Export("."));
     ok(io.exists());
     ok(io.delete());
@@ -286,8 +302,8 @@ public class CommandTest extends SandboxTest {
   /** Command test. */
   @Test
   public final void grant() {
-    ok(new CreateUser(NAME2, md5("test")));
-    ok(new CreateUser(NAME, md5("test")));
+    ok(new CreateUser(NAME2, "test"));
+    ok(new CreateUser(NAME, "test"));
     no(new Grant("something", NAME2));
     ok(new CreateDB(NAME));
     ok(new Grant("none", NAME + '*', NAME + '*'));
@@ -362,6 +378,8 @@ public class CommandTest extends SandboxTest {
     ok(new CreateDB(NAME, FILE));
     ok(new Open(NAME));
     ok(new Open(NAME));
+    ok(new Open(NAME, FILE));
+    ok(new Open(NAME, "abc"));
     no(new Open(":"));
   }
 
@@ -379,8 +397,7 @@ public class CommandTest extends SandboxTest {
   /** Command test. */
   @Test
   public final void password() {
-    ok(new Password(md5(Text.S_ADMIN)));
-    no(new Password(""));
+    ok(new Password(UserText.ADMIN));
   }
 
   /** Command test. */
@@ -402,7 +419,7 @@ public class CommandTest extends SandboxTest {
   @Test
   public final void replace() {
     // query to count number of documents
-    final String count = "count(db:open('" + NAME + "'))";
+    final String count = COUNT.args(_DB_OPEN.args(NAME));
     // database must be opened to replace resources
     no(new Replace(FILE, "xxx"));
     ok(new CreateDB(NAME, FILE));
@@ -417,10 +434,10 @@ public class CommandTest extends SandboxTest {
     no(new Replace(FN, ""));
     assertEquals("1", ok(new XQuery(count)));
     // create and replace binary file
-    ok(new XQuery("db:store('" + NAME + "', 'a', 'a')"));
+    ok(new XQuery(_DB_STORE.args(NAME, "a", "a")));
     ok(new Replace("a", "<b/>"));
-    assertFalse(ok(new XQuery("db:open('" + NAME + "')")).isEmpty());
-    ok(new XQuery("db:retrieve('" + NAME + "', 'a')"));
+    assertFalse(ok(new XQuery(_DB_OPEN.args(NAME))).isEmpty());
+    ok(new XQuery(_DB_RETRIEVE.args(NAME, "a")));
     // a failing replace should not remove existing documents
     no(new Replace(FN, "<a>"));
     assertEquals("1", ok(new XQuery(count)));
@@ -550,7 +567,7 @@ public class CommandTest extends SandboxTest {
   @Test
   public final void showUsers() {
     ok(new ShowUsers());
-    no(new ShowUsers(NAME));
+    ok(new ShowUsers(NAME));
     ok(new CreateDB(NAME));
     ok(new ShowUsers(NAME));
     no(new ShowUsers(":"));
@@ -580,15 +597,6 @@ public class CommandTest extends SandboxTest {
    */
   private static void ok(final boolean flag) {
     assertTrue(flag);
-  }
-
-  /**
-   * Assumes that the nodes have the specified number of nodes.
-   * @param nodes context nodes
-   * @param size expected size
-   */
-  private static void ok(final Nodes nodes, final int size) {
-    if(nodes != null) assertEquals(size, nodes.size());
   }
 
   /**

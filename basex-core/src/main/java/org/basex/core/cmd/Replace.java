@@ -4,7 +4,7 @@ import static org.basex.core.Text.*;
 
 import java.io.*;
 
-import org.basex.core.*;
+import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.data.atomic.*;
 import org.basex.io.*;
@@ -13,7 +13,7 @@ import org.basex.util.list.*;
 /**
  * Evaluates the 'replace' command and replaces documents in a collection.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class Replace extends ACreate {
@@ -45,37 +45,67 @@ public final class Replace extends ACreate {
     }
 
     final String path = MetaData.normPath(args[0]);
-    if(path == null || path.isEmpty()) return error(NO_DIR_ALLOWED_X, args[0]);
+    if(path == null || path.isEmpty() || path.endsWith(".")) return error(PATH_INVALID_X, args[0]);
 
     final Data data = context.data();
-    final IntList pre = data.resources.docs(path, true);
+    final IOFile bin = data.meta.binary(path);
+    if(bin == null) return error(PATH_INVALID_X, args[0]);
 
-    if(!data.startUpdate()) return error(DB_PINNED_X, data.meta.name);
+    if(!startUpdate()) return false;
+    boolean ok = true;
     try {
-      final boolean ok;
-      final IOFile file = data.meta.binary(path);
-      if(file != null && file.exists()) {
-        // replace binary file if it already exists
-        final Store store = new Store(path);
-        store.setInput(in);
-        ok = store.run(context) || error(store.info());
-      } else {
-        // otherwise, add new document as xml
-        final Add add = new Add(path);
-        add.setInput(in);
-        add.lock = false;
-        ok = add.run(context) || error(add.info());
-        // delete old documents if addition was successful
-        if(ok) {
-          final AtomicUpdateCache atomics = new AtomicUpdateCache(data);
-          final int ps = pre.size();
-          for(int p = 0; p < ps; p++) atomics.addDelete(pre.get(p));
-          atomics.execute(false);
-        }
-      }
-      return ok && info(RES_REPLACED_X_X, 1, perf);
+      ok = replace(data, bin, path);
     } finally {
-      data.finishUpdate();
+      ok &= finishUpdate();
     }
+    return ok;
+  }
+
+  /**
+   * Replaces files in the specified database.
+   * @param data database
+   * @param bin binary file
+   * @param path target path
+   * @return success flag
+   */
+  private boolean replace(final Data data, final IOFile bin, final String path) {
+    // retrieve old list of resources
+    final AtomicUpdateCache auc = new AtomicUpdateCache(data);
+
+    final IntList docs = data.resources.docs(path);
+    int d = 0, bs = 0;
+    if(bin.exists()) {
+      // replace binary file if it already exists
+      final Store store = new Store(path);
+      store.setInput(in);
+      store.lock = false;
+      if(!store.run(context)) return error(store.info());
+      bs = 1;
+    } else {
+      // otherwise, add new document as xml
+      final Add add = new Add(path);
+      try {
+        add.setInput(in);
+        add.init(context, out);
+        if(!add.build()) return error(add.info());
+
+        if(docs.isEmpty()) {
+          auc.addInsert(data.meta.size, -1, add.clip);
+        } else {
+          auc.addReplace(docs.get(0), add.clip);
+          d = 1;
+        }
+        context.invalidate();
+      } finally {
+        add.close();
+      }
+    }
+
+    // delete old documents
+    final int ds = docs.size();
+    for(; d < ds; d++) auc.addDelete(docs.get(d));
+    auc.execute(false);
+
+    return info(RES_REPLACED_X_X, ds + bs, perf);
   }
 }

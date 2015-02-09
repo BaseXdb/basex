@@ -3,39 +3,41 @@ package org.basex.query.expr;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.query.var.*;
+import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
  * Iterative filter expression without numeric predicates.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 final class IterFilter extends Filter {
   /**
    * Constructor.
-   * @param f original filter
+   * @param info input info
+   * @param root root expression
+   * @param preds predicates
    */
-  IterFilter(final Filter f) {
-    super(f.info, f.root, f.preds);
-    type = f.type;
+  IterFilter(final InputInfo info, final Expr root, final Expr... preds) {
+    super(info, root, preds);
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) {
+  public Iter iter(final QueryContext qc) {
     return new Iter() {
-      /** Iterator. */
       Iter iter;
 
       @Override
       public Item next() throws QueryException {
         // first call - initialize iterator
-        if(iter == null) iter = ctx.iter(root);
+        if(iter == null) iter = qc.iter(root);
         // filter sequence
         for(Item it; (it = iter.next()) != null;) {
-          ctx.checkStop();
-          if(preds(it, ctx)) return it;
+          qc.checkStop();
+          if(preds(it, qc)) return it;
         }
         return null;
       }
@@ -43,18 +45,14 @@ final class IterFilter extends Filter {
   }
 
   @Override
-  public Filter copy(final QueryContext ctx, final VarScope scp,
-      final IntObjMap<Var> vs) {
-    final Filter f = new CachedFilter(info, root == null ? null : root.copy(ctx, scp, vs),
-        Arr.copyAll(ctx, scp, vs, preds));
-    return copy(new IterFilter(f));
+  public IterFilter copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return copyType(new IterFilter(info, root.copy(qc, scp, vs), Arr.copyAll(qc, scp, vs, preds)));
   }
 
   @Override
-  public Filter addPred(final QueryContext ctx, final VarScope scp, final Expr p)
-      throws QueryException {
-    // [LW] should be fixed
-    return ((Filter) new CachedFilter(info, root, preds).copy(ctx, scp)
-        ).addPred(ctx, scp, p);
+  public void plan(final FElem plan) {
+    final FElem el = planElem();
+    addPlan(plan, el, root);
+    super.plan(el);
   }
 }

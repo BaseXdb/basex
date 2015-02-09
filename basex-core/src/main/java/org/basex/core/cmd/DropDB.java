@@ -3,16 +3,18 @@ package org.basex.core.cmd;
 import static org.basex.core.Text.*;
 
 import org.basex.core.*;
+import org.basex.core.locks.*;
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.Cmd;
 import org.basex.core.parse.Commands.CmdDrop;
+import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.util.list.*;
 
 /**
  * Evaluates the 'drop database' command and deletes a database.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class DropDB extends ACreate {
@@ -29,7 +31,7 @@ public final class DropDB extends ACreate {
     if(!Databases.validName(args[0], true)) return error(NAME_INVALID_X, args[0]);
 
     // retrieve all databases; return true if no database is found (no error)
-    final StringList dbs = context.databases.listDBs(args[0]);
+    final StringList dbs = context.filter(Perm.READ, context.databases.listDBs(args[0]));
     if(dbs.isEmpty()) return info(NO_DB_DROPPED, args[0]);
 
     // loop through all databases
@@ -41,7 +43,7 @@ public final class DropDB extends ACreate {
       if(context.pinned(db)) {
         info(DB_PINNED_X, db);
         ok = false;
-      } else if(!drop(db, context)) {
+      } else if(!drop(db, soptions)) {
         // dropping was not successful
         info(DB_NOT_DROPPED_X, db);
         ok = false;
@@ -55,21 +57,12 @@ public final class DropDB extends ACreate {
   /**
    * Deletes the specified database.
    * @param db name of the database
-   * @param ctx database context
+   * @param sopts static options
    * @return success flag
    */
-  public static synchronized boolean drop(final String db, final Context ctx) {
-    final IOFile dbpath = ctx.globalopts.dbpath(db);
-    return dbpath.exists() && drop(dbpath);
-  }
-
-  /**
-   * Drops a database directory.
-   * @param path database path
-   * @return success of operation
-   */
-  private static synchronized boolean drop(final IOFile path) {
-    return path.exists() && path.delete();
+  public static synchronized boolean drop(final String db, final StaticOptions sopts) {
+    final IOFile dbpath = sopts.dbpath(db);
+    return dbpath.exists() && dbpath.delete();
   }
 
   /**

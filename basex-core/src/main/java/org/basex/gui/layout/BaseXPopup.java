@@ -12,7 +12,7 @@ import org.basex.gui.*;
 /**
  * Project specific Popup menu implementation.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  * @author Lukas Kircher
  */
@@ -25,21 +25,21 @@ public final class BaseXPopup extends JPopupMenu {
   /**
    * Constructor.
    * @param comp component reference
-   * @param cmds popup reference
+   * @param commands associated commands
    */
-  public BaseXPopup(final BaseXPanel comp, final GUICommand... cmds) {
-    this(comp, comp.gui, cmds);
+  public BaseXPopup(final BaseXPanel comp, final GUICommand... commands) {
+    this(comp, comp.gui, commands);
   }
 
   /**
    * Constructor.
    * @param comp component reference
-   * @param g gui reference
-   * @param cmds popup reference
+   * @param gui gui reference
+   * @param commands associated commands
    */
-  public BaseXPopup(final JComponent comp, final GUI g, final GUICommand... cmds) {
-    commands = cmds;
-    gui = g;
+  public BaseXPopup(final JComponent comp, final GUI gui, final GUICommand... commands) {
+    this.commands = commands;
+    this.gui = gui;
 
     // both listeners must be implemented to support different platforms
     comp.addMouseListener(new MouseAdapter() {
@@ -59,11 +59,11 @@ public final class BaseXPopup extends JPopupMenu {
         if(!gui.updating && CONTEXT.is(e)) {
           show(e.getComponent(), 10, 10);
         } else {
-          for(final GUICommand cmd : cmds) {
+          for(final GUICommand cmd : commands) {
             if(cmd instanceof GUIPopupCmd) {
               for(final BaseXKeys sc : ((GUIPopupCmd) cmd).shortcuts()) {
                 if(sc.is(e)) {
-                  cmd.execute(g);
+                  cmd.execute(gui);
                   e.consume();
                   return;
                 }
@@ -75,30 +75,32 @@ public final class BaseXPopup extends JPopupMenu {
     });
 
     final StringBuilder mnemCache = new StringBuilder();
-    for(final GUICommand cmd : cmds) {
+    for(final GUICommand cmd : commands) {
       if(cmd == null) {
         addSeparator();
       } else {
-        final JMenuItem item = add(cmd.label());
-        item.addActionListener(new ActionListener() {
+        final String desc = cmd.label();
+        final JMenuItem jmi = add(cmd.toggle() ? new JCheckBoxMenuItem(desc) : new JMenuItem(desc));
+        jmi.addActionListener(new ActionListener() {
           @Override
           public void actionPerformed(final ActionEvent e) {
             if(!gui.updating) cmd.execute(gui);
           }
         });
-        BaseXLayout.setMnemonic(item, mnemCache);
-        item.setAccelerator(BaseXLayout.keyStroke(cmd));
+        BaseXLayout.setMnemonic(jmi, mnemCache);
+        jmi.setAccelerator(BaseXLayout.keyStroke(cmd));
       }
     }
   }
 
   @Override
   public void show(final Component comp, final int x, final int y) {
-    for(int b = 0; b < commands.length; ++b) {
-      if(commands[b] != null) {
-        final AbstractButton button = (AbstractButton) getComponent(b);
-        button.setEnabled(commands[b].enabled(gui));
-        button.setSelected(commands[b].selected(gui));
+    final int cl = commands.length;
+    for(int c = 0; c < cl; c++) {
+      if(commands[c] != null) {
+        final AbstractButton button = (AbstractButton) getComponent(c);
+        button.setEnabled(commands[c].enabled(gui));
+        button.setSelected(commands[c].selected(gui));
       }
     }
     super.show(comp, x, y);

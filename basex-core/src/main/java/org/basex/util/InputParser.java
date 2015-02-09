@@ -6,7 +6,7 @@ import static org.basex.util.Token.*;
 /**
  * Abstract class for parsing various inputs, such as database commands or queries.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public class InputParser {
@@ -27,11 +27,11 @@ public class InputParser {
 
   /**
    * Constructor.
-   * @param in input
+   * @param input input
    */
-  public InputParser(final String in) {
-    input = in;
-    length = in.length();
+  public InputParser(final String input) {
+    this.input = input;
+    length = input.length();
   }
 
   /**
@@ -70,7 +70,7 @@ public class InputParser {
 
   /**
    * Returns the next character.
-   * @return result of check
+   * @return next character, or {@code 0} if string is exhausted
    */
   protected final char next() {
     final int i = pos + 1;
@@ -78,8 +78,8 @@ public class InputParser {
   }
 
   /**
-   * Returns next character.
-   * @return next character
+   * Consumes the next character.
+   * @return next character, or {@code 0} if string is exhausted
    */
   public final char consume() {
     return pos < length ? input.charAt(pos++) : 0;

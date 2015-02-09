@@ -11,37 +11,38 @@ import org.basex.util.hash.*;
 /**
  * Intersect expression.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class InterSect extends Set {
   /**
    * Constructor.
-   * @param ii input info
-   * @param l expression list
+   * @param info input info
+   * @param exprs expressions
    */
-  public InterSect(final InputInfo ii, final Expr[] l) {
-    super(ii, l);
+  public InterSect(final InputInfo info, final Expr[] exprs) {
+    super(info, exprs);
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    super.compile(ctx, scp);
-    return oneIsEmpty() ? optPre(null, ctx) : this;
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+    super.optimize(qc, scp);
+    return oneIsEmpty() ? optPre(qc) : this;
   }
 
   @Override
   protected NodeSeqBuilder eval(final Iter[] iter) throws QueryException {
     NodeSeqBuilder nc = new NodeSeqBuilder();
 
-    for(Item it; (it = iter[0].next()) != null;) nc.add(checkNode(it));
+    for(Item it; (it = iter[0].next()) != null;) nc.add(toNode(it));
     final boolean db = nc.dbnodes();
 
-    for(int e = 1; e != expr.length && nc.size() != 0; ++e) {
+    final int el = exprs.length;
+    for(int e = 1; e < el && nc.size() != 0; ++e) {
       final NodeSeqBuilder nt = new NodeSeqBuilder().check();
       final Iter ir = iter[e];
       for(Item it; (it = ir.next()) != null;) {
-        final ANode n = checkNode(it);
+        final ANode n = toNode(it);
         final int i = nc.indexOf(n, db);
         if(i != -1) nt.add(n);
       }
@@ -51,8 +52,8 @@ public final class InterSect extends Set {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    final InterSect is = new InterSect(info, copyAll(ctx, scp, vs, expr));
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    final InterSect is = new InterSect(info, copyAll(qc, scp, vs, exprs));
     is.iterable = iterable;
     return copyType(is);
   }
@@ -62,11 +63,13 @@ public final class InterSect extends Set {
     return new SetIter(iter) {
       @Override
       public ANode next() throws QueryException {
-        if(item == null) item = new ANode[iter.length];
+        final int irl = iter.length;
+        if(item == null) item = new ANode[irl];
 
-        for(int i = 0; i != iter.length; ++i) if(!next(i)) return null;
+        for(int i = 0; i < irl; i++) if(!next(i)) return null;
 
-        for(int i = 1; i != item.length;) {
+        final int il = item.length;
+        for(int i = 1; i < il;) {
           final int d = item[0].diff(item[i]);
           if(d > 0) {
             if(!next(i)) return null;

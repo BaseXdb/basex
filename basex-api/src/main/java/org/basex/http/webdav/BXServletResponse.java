@@ -15,29 +15,28 @@ import com.bradmcevoy.http.Cookie;
  * the source was integrated into BaseX.
  *
  * @author Milton Development Team
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
 final class BXServletResponse extends AbstractResponse {
   /** Thread local variable to hold the current response. */
-  private static final ThreadLocal<HttpServletResponse> RESPONSE =
-      new ThreadLocal<HttpServletResponse>();
+  private static final ThreadLocal<HttpServletResponse> RESPONSE = new ThreadLocal<>();
 
   /** HTTP servlet response. */
   private final HttpServletResponse res;
   /** Response headers. */
-  private final Map<String, String> headers = new HashMap<String, String>();
+  private final Map<String, String> headers = new HashMap<>();
   /** Response status. */
   private Status status;
 
   /**
    * Constructor.
-   * @param r HTTP servlet response
+   * @param res HTTP servlet response
    */
-  BXServletResponse(final HttpServletResponse r) {
-    res = r;
-    RESPONSE.set(r);
+  BXServletResponse(final HttpServletResponse res) {
+    this.res = res;
+    RESPONSE.set(res);
   }
 
   @Override

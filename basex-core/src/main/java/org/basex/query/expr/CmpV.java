@@ -1,11 +1,11 @@
 package org.basex.query.expr;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
-import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.util.*;
+import org.basex.query.util.collation.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -17,18 +17,18 @@ import org.basex.util.hash.*;
 /**
  * Value comparison.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class CmpV extends Cmp {
   /** Comparators. */
   public enum OpV {
-    /** Item comparison:less or equal. */
+    /** Item comparison: less or equal. */
     LE("le") {
       @Override
-      public boolean eval(final Item a, final Item b, final Collation coll,
-          final InputInfo ii) throws QueryException {
-        final int v = a.diff(b, coll, ii);
+      public boolean eval(final Item it1, final Item it2, final Collation coll,
+          final StaticContext sc, final InputInfo ii) throws QueryException {
+        final int v = it1.diff(it2, coll, ii);
         return v != Item.UNDEF && v <= 0;
       }
       @Override
@@ -37,12 +37,12 @@ public final class CmpV extends Cmp {
       public OpV invert() { return GT; }
     },
 
-    /** Item comparison:less. */
+    /** Item comparison: less. */
     LT("lt") {
       @Override
-      public boolean eval(final Item a, final Item b, final Collation coll,
-          final InputInfo ii) throws QueryException {
-        final int v = a.diff(b, coll, ii);
+      public boolean eval(final Item it1, final Item it2, final Collation coll,
+          final StaticContext sc, final InputInfo ii) throws QueryException {
+        final int v = it1.diff(it2, coll, ii);
         return v != Item.UNDEF && v < 0;
       }
       @Override
@@ -51,12 +51,12 @@ public final class CmpV extends Cmp {
       public OpV invert() { return GE; }
     },
 
-    /** Item comparison:greater of equal. */
+    /** Item comparison: greater of equal. */
     GE("ge") {
       @Override
-      public boolean eval(final Item a, final Item b, final Collation coll,
-          final InputInfo ii) throws QueryException {
-        final int v = a.diff(b, coll, ii);
+      public boolean eval(final Item it1, final Item it2, final Collation coll,
+          final StaticContext sc, final InputInfo ii) throws QueryException {
+        final int v = it1.diff(it2, coll, ii);
         return v != Item.UNDEF && v >= 0;
       }
       @Override
@@ -65,12 +65,12 @@ public final class CmpV extends Cmp {
       public OpV invert() { return LT; }
     },
 
-    /** Item comparison:greater. */
+    /** Item comparison: greater. */
     GT("gt") {
       @Override
-      public boolean eval(final Item a, final Item b, final Collation coll,
-          final InputInfo ii) throws QueryException {
-        final int v = a.diff(b, coll, ii);
+      public boolean eval(final Item it1, final Item it2, final Collation coll,
+          final StaticContext sc, final InputInfo ii) throws QueryException {
+        final int v = it1.diff(it2, coll, ii);
         return v != Item.UNDEF && v > 0;
       }
       @Override
@@ -79,12 +79,12 @@ public final class CmpV extends Cmp {
       public OpV invert() { return LE; }
     },
 
-    /** Item comparison:equal. */
+    /** Item comparison: equal. */
     EQ("eq") {
       @Override
-      public boolean eval(final Item a, final Item b, final Collation coll,
-          final InputInfo ii) throws QueryException {
-        return a.eq(b, coll, ii);
+      public boolean eval(final Item it1, final Item it2, final Collation coll,
+          final StaticContext sc, final InputInfo ii) throws QueryException {
+        return it1.eq(it2, coll, sc, ii);
       }
       @Override
       public OpV swap() { return EQ; }
@@ -92,12 +92,12 @@ public final class CmpV extends Cmp {
       public OpV invert() { return NE; }
     },
 
-    /** Item comparison:not equal. */
+    /** Item comparison: not equal. */
     NE("ne") {
       @Override
-      public boolean eval(final Item a, final Item b, final Collation coll,
-          final InputInfo ii) throws QueryException {
-        return !a.eq(b, coll, ii);
+      public boolean eval(final Item it1, final Item it2, final Collation coll,
+          final StaticContext sc, final InputInfo ii) throws QueryException {
+        return !it1.eq(it2, coll, sc, ii);
       }
       @Override
       public OpV swap() { return NE; }
@@ -112,21 +112,24 @@ public final class CmpV extends Cmp {
 
     /**
      * Constructor.
-     * @param n string representation
+     * @param name string representation
      */
-    OpV(final String n) { name = n; }
+    OpV(final String name) {
+      this.name = name;
+    }
 
     /**
      * Evaluates the expression.
-     * @param a first item
-     * @param b second item
+     * @param it1 first item
+     * @param it2 second item
      * @param coll query context
+     * @param sc static context
      * @param ii input info
      * @return result
      * @throws QueryException query exception
      */
-    public abstract boolean eval(final Item a, final Item b, final Collation coll,
-        final InputInfo ii) throws QueryException;
+    public abstract boolean eval(final Item it1, final Item it2, final Collation coll,
+        final StaticContext sc, final InputInfo ii) throws QueryException;
 
     /**
      * Swaps the comparator.
@@ -144,55 +147,59 @@ public final class CmpV extends Cmp {
     public String toString() { return name; }
   }
 
+  /** Static context. */
+  private final StaticContext sc;
   /** Comparator. */
   OpV op;
 
   /**
    * Constructor.
-   * @param e1 first expression
-   * @param e2 second expression
-   * @param o operator
+   * @param expr1 first expression
+   * @param expr2 second expression
+   * @param op operator
    * @param coll collation
-   * @param ii input info
+   * @param sc static context
+   * @param info input info
    */
-  public CmpV(final Expr e1, final Expr e2, final OpV o, final Collation coll,
-      final InputInfo ii) {
-    super(ii, e1, e2, coll);
-    op = o;
+  public CmpV(final Expr expr1, final Expr expr2, final OpV op, final Collation coll,
+      final StaticContext sc, final InputInfo info) {
+    super(info, expr1, expr2, coll);
+    this.op = op;
+    this.sc = sc;
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    super.compile(ctx, scp);
-    return optimize(ctx, scp);
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    super.compile(qc, scp);
+    return optimize(qc, scp);
   }
 
   @Override
-  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     // swap expressions
     if(swap()) {
       op = op.swap();
-      ctx.compInfo(OPTSWAP, this);
+      qc.compInfo(OPTSWAP, this);
     }
 
-    final Expr e1 = expr[0];
-    final Expr e2 = expr[1];
-    type = SeqType.get(AtomType.BLN, e1.size() == 1 && e2.size() == 1 ?
-        Occ.ONE : Occ.ZERO_ONE);
+    final Expr e1 = exprs[0], e2 = exprs[1];
+    final SeqType st1 = e1.seqType(), st2 = e2.seqType();
+    seqType = SeqType.get(AtomType.BLN, st1.one() && !st1.mayBeArray() &&
+        st2.one() && !st2.mayBeArray() ? Occ.ONE : Occ.ZERO_ONE);
 
     Expr e = this;
     if(oneIsEmpty()) {
-      e = optPre(null, ctx);
+      e = optPre(qc);
     } else if(allAreValues()) {
-      e = preEval(ctx);
+      e = preEval(qc);
     } else if(e1.isFunction(Function.COUNT)) {
       e = compCount(op);
-      if(e != this) ctx.compInfo(e instanceof Bln ? OPTPRE : OPTWRITE, this);
+      if(e != this) qc.compInfo(e instanceof Bln ? OPTPRE : OPTWRITE, this);
     } else if(e1.isFunction(Function.POSITION)) {
       // position() CMP number
       e = Pos.get(op, e2, e, info);
-      if(e != this) ctx.compInfo(OPTWRITE, this);
-    } else if(e1.type().eq(SeqType.BLN) && (op == OpV.EQ && e2 == Bln.FALSE ||
+      if(e != this) qc.compInfo(OPTWRITE, this);
+    } else if(st1.eq(SeqType.BLN) && (op == OpV.EQ && e2 == Bln.FALSE ||
         op == OpV.NE && e2 == Bln.TRUE)) {
       // (A eq false()) -> not(A)
       e = Function.NOT.get(null, info, e1);
@@ -201,42 +208,41 @@ public final class CmpV extends Cmp {
   }
 
   @Override
-  public Expr compEbv(final QueryContext ctx) {
+  public Expr optimizeEbv(final QueryContext qc, final VarScope scp) {
     // e.g.: if($x eq true()) -> if($x)
     // checking one direction is sufficient, as operators may have been swapped
-    return (op == OpV.EQ && expr[1] == Bln.TRUE ||
-            op == OpV.NE && expr[1] == Bln.FALSE) &&
-      expr[0].type().eq(SeqType.BLN) ? expr[0] : this;
+    return (op == OpV.EQ && exprs[1] == Bln.TRUE || op == OpV.NE && exprs[1] == Bln.FALSE) &&
+      exprs[0].seqType().eq(SeqType.BLN) ? exprs[0] : this;
   }
 
   @Override
-  public Bln item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final Item a = expr[0].item(ctx, info);
-    if(a == null) return null;
-    final Item b = expr[1].item(ctx, info);
-    if(b == null) return null;
-    if(a.comparable(b)) return Bln.get(op.eval(a, b, collation, info));
+  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final Item it1 = exprs[0].atomItem(qc, ii);
+    if(it1 == null) return null;
+    final Item it2 = exprs[1].atomItem(qc, ii);
+    if(it2 == null) return null;
+    if(it1.comparable(it2)) return Bln.get(op.eval(it1, it2, coll, sc, info));
 
-    if(a instanceof FItem) throw FIEQ.get(info, a.type);
-    if(b instanceof FItem) throw FIEQ.get(info, b.type);
-    throw INVTYPECMP.get(info, a.type, b.type);
+    if(it1 instanceof FItem) throw FIEQ_X.get(info, it1.type);
+    if(it2 instanceof FItem) throw FIEQ_X.get(info, it2.type);
+    throw diffError(info, it1, it2);
   }
 
   @Override
   public CmpV invert() {
-    return expr[0].size() != 1 || expr[1].size() != 1 ? this :
-      new CmpV(expr[0], expr[1], op.invert(), collation, info);
+    final Expr e1 = exprs[0], e2 = exprs[1];
+    return e1.size() != 1 || e1.seqType().mayBeArray() || e2.size() != 1 ||
+        e2.seqType().mayBeArray() ? this : new CmpV(e1, e2, op.invert(), coll, sc, info);
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    final Expr a = expr[0].copy(ctx, scp, vs), b = expr[1].copy(ctx, scp, vs);
-    return new CmpV(a, b, op, collation, info);
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new CmpV(exprs[0].copy(qc, scp, vs), exprs[1].copy(qc, scp, vs), op, coll, sc, info);
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(OP, op.name), expr);
+    addPlan(plan, planElem(OP, op.name), exprs);
   }
 
   @Override

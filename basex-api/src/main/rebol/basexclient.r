@@ -8,7 +8,7 @@ Rebol [
  License: "Perl Artistic License 2.0"
  LicenseTextUrl: http://www.perlfoundation.org/artistic_license_2_0
  
- Purpose: {"BaseX Rebol client; works with BaseX 6.1"} 
+ Purpose: {"BaseX Rebol client; works with BaseX 6.x (but not with BaseX 7.0 and later)"} 
 
  ;following data are for www.rebol.org library 
  ;you can find a lot of rebol script there 

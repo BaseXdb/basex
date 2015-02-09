@@ -9,7 +9,7 @@ import org.w3c.dom.*;
 /**
  * Text node fragment.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class FTxt extends FNode {
@@ -27,7 +27,7 @@ public final class FTxt extends FNode {
    */
   public FTxt(final byte[] t) {
     super(NodeType.TXT);
-    val = t;
+    value = t;
   }
 
   /**
@@ -41,16 +41,16 @@ public final class FTxt extends FNode {
 
   @Override
   public FNode copy() {
-    return new FTxt(val).parent(par);
+    return new FTxt(value).parent(parent);
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(VAL, val));
+    addPlan(plan, planElem(VAL, value));
   }
 
   @Override
   public String toString() {
-    return Token.string(val);
+    return Token.string(value);
   }
 }

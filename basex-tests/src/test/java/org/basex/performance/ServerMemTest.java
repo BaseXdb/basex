@@ -1,15 +1,14 @@
 package org.basex.performance;
 
 import org.basex.*;
-import org.basex.server.*;
-import org.basex.SandboxTest;
+import org.basex.api.client.*;
 import org.junit.*;
 
 /**
  * This class performs a client/server memory stress tests with a specified
  * number of threads and queries.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class ServerMemTest extends SandboxTest {

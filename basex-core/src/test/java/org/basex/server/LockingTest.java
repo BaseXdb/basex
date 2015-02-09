@@ -1,7 +1,6 @@
 package org.basex.server;
 
 import static org.junit.Assert.*;
-
 import java.io.*;
 import java.util.*;
 import java.util.List;
@@ -11,17 +10,17 @@ import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.junit.*;
+import org.junit.Test;
 import org.junit.runner.*;
 import org.junit.runners.*;
 import org.junit.runners.Parameterized.Parameters;
-import org.junit.Test;
 
 /**
  * This class tests database locking inside BaseX. For this purpose, two queries are
  * forced to be executed in parallel. If this fails, locking prevents these queries to
  * run in parallel.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Jens Erat
  */
 @RunWith(Parameterized.class)
@@ -30,9 +29,9 @@ public final class LockingTest extends SandboxTest {
   private static final int REPEAT = 1;
 
   /** Maximum sleep time in ms. */
-  private static final int SLEEP = 200;
+  private static final long SLEEP = 200L;
   /** Additional allowed holding time for client creation overhead, ... in ms. */
-  private static final int SYNC = 100;
+  private static final long SYNC = 100L;
 
   /** Test document. */
   private static final String DOC = "src/test/resources/test.xml";
@@ -62,7 +61,7 @@ public final class LockingTest extends SandboxTest {
    */
   @Parameters
   public static Collection<Object[]> generateParams() {
-    final List<Object[]> params = new ArrayList<Object[]>();
+    final List<Object[]> params = new ArrayList<>();
     for(int i = 1; i <= REPEAT; i++) {
       params.add(new Object[0]);
     }
@@ -203,7 +202,7 @@ public final class LockingTest extends SandboxTest {
   @Test
   public void loadTests() throws Exception {
     final int totalQueries = RUN_COUNT * QUERIES.length;
-    final ArrayList<Client> clients = new ArrayList<Client>(totalQueries);
+    final ArrayList<Client> clients = new ArrayList<>(totalQueries);
     final CountDownLatch allDone = new CountDownLatch(totalQueries);
 
     for(int i = 0; i < RUN_COUNT; i++)

@@ -1,7 +1,7 @@
 package org.basex.query.value.node;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
-import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import org.basex.query.*;
@@ -13,7 +13,7 @@ import org.w3c.dom.*;
 /**
  * PI node fragment.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class FPI extends FNode {
@@ -25,22 +25,22 @@ public final class FPI extends FNode {
 
   /**
    * Constructor for creating a processing instruction.
-   * @param n name
-   * @param v value
+   * @param name name
+   * @param value value
    */
-  public FPI(final String n, final String v) {
-    this(QNm.get(n), token(v));
+  public FPI(final String name, final String value) {
+    this(QNm.get(name), token(value));
   }
 
   /**
    * Constructor for creating a processing instruction.
-   * @param n name
-   * @param v value
+   * @param name name
+   * @param value value
    */
-  public FPI(final QNm n, final byte[] v) {
+  public FPI(final QNm name, final byte[] value) {
     super(NodeType.PI);
-    name = n;
-    val = v;
+    this.name = name;
+    this.value = value;
   }
 
   /**
@@ -64,17 +64,17 @@ public final class FPI extends FNode {
 
   @Override
   public FNode copy() {
-    return new FPI(name, val).parent(par);
+    return new FPI(name, value).parent(parent);
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(NAM, name.string(), VAL, val));
+    addPlan(plan, planElem(NAM, name.string(), VAL, value));
   }
 
   @Override
   public String toString() {
-    return Util.info("<?% %?>", name.string(), val);
+    return Util.info("<?% %?>", name.string(), value);
   }
 
   /**
@@ -85,7 +85,7 @@ public final class FPI extends FNode {
    * @throws QueryException query exception
    */
   public static byte[] parse(final byte[] atom, final InputInfo ii) throws QueryException {
-    if(contains(atom, CLOSE)) throw CPICONT.get(ii, atom);
+    if(contains(atom, CLOSE)) throw CPICONT_X.get(ii, atom);
     return atom;
   }
 }

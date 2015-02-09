@@ -6,7 +6,7 @@ import org.basex.data.*;
  * Abstract atomic update.
  * Atomic updates can only be initialized via {@link AtomicUpdateCache}.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Lukas Kircher
  */
 public abstract class BasicUpdate {
@@ -17,12 +17,12 @@ public abstract class BasicUpdate {
 
   /**
    * Constructor.
-   * @param l target node location PRE
-   * @param p parent node PRE value
+   * @param location target node location PRE
+   * @param parent parent node PRE value
    */
-  BasicUpdate(final int l, final int p) {
-    location = l;
-    parent = p;
+  BasicUpdate(final int location, final int parent) {
+    this.location = location;
+    this.parent = parent;
   }
 
   /**
@@ -35,9 +35,9 @@ public abstract class BasicUpdate {
 
   /**
    * Applies the update to the given data instance.
-   * @param d data instance on which to execute the update
+   * @param data data instance on which to execute the update
    */
-  abstract void apply(final Data d);
+  abstract void apply(final Data data);
 
   /**
    * Returns the data to be inserted (for inserts,...).
@@ -48,18 +48,18 @@ public abstract class BasicUpdate {
   /**
    * Returns whether this updates destroys the target nodes identity. Used to determine
    * superfluous operations on the subtree of the target.
-   * @return true, if target node identity destroyed
+   * @return {@code true} if target node identity destroyed
    */
   abstract boolean destructive();
 
   /**
    * Merges the given update and this update if possible.
    * @param data data reference
-   * @param u update to merge with
+   * @param bu update to merge with
    * @return merged atomic update or null if merge not possible
    */
   @SuppressWarnings("unused")
-  public BasicUpdate merge(final Data data, final BasicUpdate u) {
+  public BasicUpdate merge(final Data data, final BasicUpdate bu) {
     return null;
   }
 

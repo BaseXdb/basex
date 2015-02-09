@@ -10,7 +10,7 @@ import org.basex.gui.layout.*;
 /**
  * Dialog window for changing the used fonts.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class DialogFonts extends BaseXDialog {
@@ -18,6 +18,9 @@ public final class DialogFonts extends BaseXDialog {
   private static final String[] FTSZ =
     { "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20",
       "22", "24", "26", "28", "30", "33", "36", "40" };
+
+  /** Dialog. */
+  private static Dialog dialog;
 
   /** Font name chooser. */
   private final BaseXList font;
@@ -32,7 +35,7 @@ public final class DialogFonts extends BaseXDialog {
    * Default constructor.
    * @param main reference to the main window
    */
-  public DialogFonts(final GUI main) {
+  private DialogFonts(final GUI main) {
     super(main, CHOOSE_FONT, false);
 
     final String[] fonts = GraphicsEnvironment.getLocalGraphicsEnvironment().
@@ -58,6 +61,15 @@ public final class DialogFonts extends BaseXDialog {
 
     set(p, BorderLayout.CENTER);
     finish(gopts.get(GUIOptions.FONTSLOC));
+  }
+
+  /**
+   * Activates the dialog window.
+   * @param main reference to the main window
+   */
+  public static void show(final GUI main) {
+    if(dialog == null) dialog = new DialogFonts(main);
+    dialog.setVisible(true);
   }
 
   @Override

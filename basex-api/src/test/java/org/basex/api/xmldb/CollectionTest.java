@@ -16,11 +16,11 @@ import org.xmldb.api.modules.*;
 /**
  * This class tests the XMLDB/API Collection implementation.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 @SuppressWarnings("all")
-public class CollectionTest extends XMLDBBaseTest {
+public final class CollectionTest extends XMLDBBaseTest {
   /** Collection. */
   Collection coll;
 
@@ -218,7 +218,7 @@ public class CollectionTest extends XMLDBBaseTest {
         DOC2, XMLResource.RESOURCE_TYPE);
     final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     final DocumentBuilder builder = factory.newDocumentBuilder();
-    final Node node = builder.parse(new File(DOCPATH + DOC2));
+    final Node node = builder.parse(new File(DOCPATH, DOC2));
     xml1.setContentAsDOM(node);
     coll.storeResource(xml1);
 

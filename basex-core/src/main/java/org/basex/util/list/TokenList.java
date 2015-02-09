@@ -10,7 +10,7 @@ import org.basex.util.hash.*;
 /**
  * This is a simple container for tokens (byte arrays).
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class TokenList extends ElementList implements Iterable<byte[]> {
@@ -53,12 +53,42 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
   }
 
   /**
+   * Lightweight constructor, assigning the specified array.
+   * @param elements initial array
+   */
+  public TokenList(final byte[]... elements) {
+    list = elements;
+    size = elements.length;
+  }
+
+  /**
    * Adds an element.
    * @param element element to be added
+   * @return self reference
    */
-  public void add(final byte[] element) {
-    if(size == list.length) list = Array.copyOf(list, newSize());
-    list[size++] = element;
+  public TokenList add(final byte[] element) {
+    byte[][] lst = list;
+    final int s = size;
+    if(s == lst.length) lst = Array.copyOf(lst, newSize());
+    lst[s] = element;
+    list = lst;
+    size = s + 1;
+    return this;
+  }
+
+  /**
+   * Adds elements to the array.
+   * @param elements elements to be added
+   * @return self reference
+   */
+  public TokenList add(final byte[]... elements) {
+    byte[][] lst = list;
+    final int l = elements.length, s = size, ns = s + l;
+    if(ns > lst.length) lst = Array.copyOf(lst, newSize(ns));
+    System.arraycopy(elements, 0, lst, s, l);
+    list = lst;
+    size = ns;
+    return this;
   }
 
   /**
@@ -97,7 +127,7 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
    * @param index index of the element to delete
    * @return deleted element
    */
-  public byte[] deleteAt(final int index) {
+  public byte[] remove(final int index) {
     final byte[] l = list[index];
     Array.move(list, index + 1, -1, --size - index);
     return l;
@@ -166,6 +196,28 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
   }
 
   /**
+   * Returns an array with all elements and resets the array size.
+   * @return array
+   */
+  public byte[][] next() {
+    final byte[][] lst = Array.copyOf(list, size);
+    reset();
+    return lst;
+  }
+
+  /**
+   * Returns the token as byte array, and invalidates the internal array.
+   * Warning: the function must only be called if the list is discarded afterwards.
+   * @return token
+   */
+  public byte[][] finish() {
+    final byte[][] lst = list;
+    list = null;
+    final int s = size;
+    return s == lst.length ? lst : Array.copyOf(lst, s);
+  }
+
+  /**
    * Returns an array with all elements as strings.
    * @return array
    */
@@ -216,7 +268,7 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
 
   @Override
   public Iterator<byte[]> iterator() {
-    return new ArrayIterator<byte[]>(list, size);
+    return new ArrayIterator<>(list, size);
   }
 
   @Override
@@ -224,19 +276,8 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
     final TokenBuilder tb = new TokenBuilder(Util.className(this) + '[');
     for(int i = 0; i < size; ++i) {
       if(i != 0) tb.add(", ");
-      tb.add(list[i]);
+      tb.addExt(list[i]);
     }
     return tb.add(']').toString();
-  }
-
-  /**
-   * Creates a copy of this list.
-   * @return copy of this list
-   */
-  public TokenList copy() {
-    final TokenList tl = new TokenList(list.length);
-    tl.factor = factor;
-    for(int i = 0; i < size; i++) tl.add(list[i].clone());
-    return tl;
   }
 }

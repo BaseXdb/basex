@@ -8,7 +8,8 @@ import java.io.*;
 import java.nio.charset.*;
 import java.util.*;
 
-import org.basex.build.*;
+import org.basex.build.csv.*;
+import org.basex.build.json.*;
 import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Msg;
@@ -24,7 +25,7 @@ import org.basex.util.options.*;
 /**
  * Dialog window for changing some project's preferences.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class DialogExport extends BaseXDialog {
@@ -84,12 +85,13 @@ public final class DialogExport extends BaseXDialog {
     // method (ignore last entry)
     final StringList sl = new StringList();
     for(final SerialMethod sm : SerialMethod.values()) sl.add(sm.name());
-    sl.deleteAt(sl.size() - 1);
-    method = new BaseXCombo(this, sl.toArray());
-    method.setSelectedItem(sopts.get(SerializerOptions.METHOD).name());
+    sl.remove(sl.size() - 1);
+    method = new BaseXCombo(this, sl.finish());
+    final SerialMethod sm = sopts.get(SerializerOptions.METHOD);
+    method.setSelectedItem((sm == null ? SerialMethod.ADAPTIVE : sm).name());
 
     mparams = new BaseXTextField(this);
-    BaseXLayout.setWidth(mparams, BaseXTextField.DWIDTH * 2 / 3);
+    mparams.setColumns(24);
 
     final BaseXBack mth = new BaseXBack(new TableLayout(1, 2, 8, 0));
     mth.add(method);
@@ -106,7 +108,7 @@ public final class DialogExport extends BaseXDialog {
     encoding.setSelectedItem(f ? enc : sopts.get(SerializerOptions.ENCODING));
 
     params = new BaseXTextField(sopts.toString(), this);
-    params.setToolTipText(tooltip(Serializer.OPTIONS));
+    params.setToolTipText(tooltip(SerializerOptions.get(true)));
 
     pp = new BaseXBack(new TableLayout(3, 2, 16, 6)).border(8, 0, 8, 0);
     pp.add(new BaseXLabel(METHOD + COL, true, true));
@@ -141,7 +143,7 @@ public final class DialogExport extends BaseXDialog {
   static BaseXCombo encoding(final BaseXDialog dialog, final String encoding) {
     final BaseXCombo cb = new BaseXCombo(dialog, ENCODINGS);
     boolean f = false;
-    String enc = encoding == null ? Token.UTF8 : encoding;
+    String enc = encoding == null ? Strings.UTF8 : encoding;
     for(final String s : ENCODINGS) f |= s.equals(enc);
     if(!f) {
       enc = enc.toUpperCase(Locale.ENGLISH);
@@ -207,12 +209,10 @@ public final class DialogExport extends BaseXDialog {
 
   @Override
   public void close() {
-    if(!ok) return;
-
-    final SerialMethod mth = SerialMethod.valueOf(method.getSelectedItem());
     try {
-      gui.set(MainOptions.EXPORTER, options(mth));
+      gui.set(MainOptions.EXPORTER, options(SerialMethod.valueOf(method.getSelectedItem())));
     } catch(final BaseXException ex) { throw Util.notExpected(ex); }
+    if(!ok) return;
 
     super.close();
     path.store();

@@ -4,7 +4,6 @@ import static org.junit.Assert.*;
 
 import java.net.*;
 
-import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.util.*;
 import org.junit.*;
@@ -12,20 +11,17 @@ import org.junit.*;
 /**
  * This class tests the Request Module.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class RequestTest extends HTTPTest {
-  /** Root path. */
-  private static final String ROOT = "http://" + Text.S_LOCALHOST + ":9998/rest/";
-
   /**
    * Start server.
    * @throws Exception exception
    */
   @BeforeClass
   public static void start() throws Exception {
-    init(ROOT, true);
+    init(REST_ROOT, true);
   }
 
   /**
@@ -52,7 +48,7 @@ public final class RequestTest extends HTTPTest {
    */
   @Test
   public void port() throws Exception {
-    assertEquals("9998", get("?query=" + request("R:port()")));
+    assertEquals(String.valueOf(HTTP_PORT), get("?query=" + request("R:port()")));
   }
 
   /**
@@ -113,7 +109,7 @@ public final class RequestTest extends HTTPTest {
   @Test
   public void parameter() throws Exception {
     assertEquals("b", get("?query=" + request("R:parameter('a')") + "&a=b"));
-    assertEquals("b c", get("?query=" + request("R:parameter('a')") + "&a=b&a=c"));
+    assertEquals("b\nc", get("?query=" + request("R:parameter('a')") + "&a=b&a=c"));
     assertEquals("b", get("?query=" + request("R:parameter('a','c')") + "&a=b"));
     assertEquals("c", get("?query=" + request("R:parameter('x','c')") + "&a=b"));
   }
@@ -125,7 +121,7 @@ public final class RequestTest extends HTTPTest {
   @Test
   public void headerNames() throws Exception {
     final String query = "R:header-names()";
-    assertEquals("Host Accept Connection User-Agent", get("?query=" + request(query)));
+    assertEquals("Host\nAccept\nConnection\nUser-Agent", get("?query=" + request(query)));
   }
 
   /**
@@ -134,7 +130,7 @@ public final class RequestTest extends HTTPTest {
    */
   @Test
   public void header() throws Exception {
-    assertEquals("localhost:9998", get("?query=" + request("R:header('Host')")));
+    assertEquals("localhost:" + HTTP_PORT, get("?query=" + request("R:header('Host')")));
     assertEquals("def", get("?query=" + request("R:header('ABC', 'def')")));
   }
 
@@ -168,6 +164,6 @@ public final class RequestTest extends HTTPTest {
    */
   private static String request(final String query) throws Exception {
     return URLEncoder.encode(
-        "import module namespace R='http://exquery.org/ns/request';" + query, Token.UTF8);
+        "import module namespace R='http://exquery.org/ns/request';" + query, Strings.UTF8);
   }
 }

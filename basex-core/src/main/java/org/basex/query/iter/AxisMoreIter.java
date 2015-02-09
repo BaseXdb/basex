@@ -6,10 +6,9 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 
 /**
- * Iterator interface, extending the default iterator with a {@link #more}
- * method.
+ * Iterator interface, extending the default iterator with a {@link #more()} method.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public abstract class AxisMoreIter extends AxisIter {
@@ -19,7 +18,6 @@ public abstract class AxisMoreIter extends AxisIter {
     @Override public ANode next() { return null; }
     @Override public Item get(final long i) { return null; }
     @Override public long size() { return 0; }
-    @Override public boolean reset() { return true; }
     @Override public Value value() { return Empty.SEQ; }
   };
 

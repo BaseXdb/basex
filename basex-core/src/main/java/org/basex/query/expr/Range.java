@@ -1,5 +1,6 @@
 package org.basex.query.expr;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
@@ -15,67 +16,59 @@ import org.basex.util.hash.*;
 /**
  * Range expression.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class Range extends Arr {
   /**
    * Constructor.
-   * @param ii input info
-   * @param e1 first expression
-   * @param e2 second expression
+   * @param info input info
+   * @param expr1 first expression
+   * @param expr2 second expression
    */
-  public Range(final InputInfo ii, final Expr e1, final Expr e2) {
-    super(ii, e1, e2);
-    type = SeqType.ITR_ZM;
+  public Range(final InputInfo info, final Expr expr1, final Expr expr2) {
+    super(info, expr1, expr2);
+    seqType = SeqType.ITR_ZM;
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    super.compile(ctx, scp);
-    return optimize(ctx, scp);
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    super.compile(qc, scp);
+    return optimize(qc, scp);
   }
 
   @Override
-  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     Expr e = this;
     if(oneIsEmpty()) {
       e = Empty.SEQ;
     } else if(allAreValues()) {
-      e = value(ctx);
+      e = value(qc);
     }
-    return optPre(e, ctx);
+    return optPre(e, qc);
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    return value(ctx).iter();
+  public Iter iter(final QueryContext qc) throws QueryException {
+    return value(qc).iter();
   }
 
   @Override
-  public Value value(final QueryContext ctx) throws QueryException {
-    final long[] v = rng(ctx);
-    return v == null ? Empty.SEQ : RangeSeq.get(v[0], v[1] - v[0] + 1, true);
+  public Value value(final QueryContext qc) throws QueryException {
+    final Item it1 = exprs[0].atomItem(qc, info);
+    if(it1 == null) return Empty.SEQ;
+    final Item it2 = exprs[1].atomItem(qc, info);
+    if(it2 == null) return Empty.SEQ;
+    final long s = toLong(it1), e = toLong(it2);
+    if(s > e) return Empty.SEQ;
+    final long n = e - s + 1;
+    if(n > 0) return RangeSeq.get(s, n, true);
+    throw RANGE_X.get(info, e);
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Range(info, expr[0].copy(ctx, scp, vs), expr[1].copy(ctx, scp, vs));
-  }
-
-  /**
-   * Returns the start and end value of the range operator, or {@code null}
-   * if the range could not be evaluated.
-   * @param ctx query context
-   * @return value array
-   * @throws QueryException query exception
-   */
-  private long[] rng(final QueryContext ctx) throws QueryException {
-    final Item a = expr[0].item(ctx, info);
-    if(a == null) return null;
-    final Item b = expr[1].item(ctx, info);
-    if(b == null) return null;
-    return new long[] { checkItr(a), checkItr(b) };
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new Range(info, exprs[0].copy(qc, scp, vs), exprs[1].copy(qc, scp, vs));
   }
 
   @Override

@@ -7,6 +7,8 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.util.*;
 
+import org.basex.data.*;
+import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
@@ -14,9 +16,9 @@ import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
- * This class serializes data in the DOT syntax.
+ * This class serializes items in the DOT syntax.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class DOTSerializer extends OutputSerializer {
@@ -24,7 +26,7 @@ public final class DOTSerializer extends OutputSerializer {
   private final boolean compact;
 
   /** Cached children. */
-  private final ArrayList<IntList> children = new ArrayList<IntList>();
+  private final ArrayList<IntList> children = new ArrayList<>(1);
   /** Cached attributes. */
   private final TokenBuilder tb = new TokenBuilder();
   /** Cached nodes. */
@@ -35,37 +37,37 @@ public final class DOTSerializer extends OutputSerializer {
   /**
    * Constructor, defining colors for the dot output.
    * @param os output stream
-   * @param c compact representation
+   * @param compact compact representation
    * @throws IOException I/O exception
    */
-  public DOTSerializer(final OutputStream os, final boolean c) throws IOException {
-    super(os, OPTIONS);
-    compact = c;
-    print(HEADER);
+  public DOTSerializer(final OutputStream os, final boolean compact) throws IOException {
+    super(PrintOutput.get(os), SerializerOptions.get(true));
+    this.compact = compact;
+    out.print(HEADER);
   }
 
   @Override
   public void close() throws IOException {
     indent();
-    print(FOOTER);
+    out.print(FOOTER);
   }
 
   @Override
-  protected void startOpen(final byte[] t) {
+  protected void startOpen(final byte[] name) {
     tb.reset();
   }
 
   @Override
-  protected void attribute(final byte[] n, final byte[] v) {
-    tb.addExt(DOTATTR, n, v);
+  protected void attribute(final byte[] name, final byte[] value) {
+    tb.addExt(DOTATTR, name, value);
   }
 
   @Override
   protected void finishOpen() throws IOException {
-    final byte[] attr = tb.finish();
-    String color = color(tag);
+    final byte[] attr = tb.toArray();
+    String color = color(elem);
     if(color == null) color = attr.length == 0 ? ELEM1 : ELEM2;
-    print(concat(tag, attr), color);
+    print(concat(elem, attr), color);
   }
 
   @Override
@@ -81,30 +83,30 @@ public final class DOTSerializer extends OutputSerializer {
     final int is = il.size();
     for(int i = 0; i < is; ++i) {
       indent();
-      print(Util.info(DOTLINK, c, il.get(i)));
+      out.print(Util.info(DOTLINK, c, il.get(i)));
     }
     il.reset();
   }
 
   @Override
-  protected void finishText(final byte[] t) throws IOException {
-    print(norm(t), DOTData.TEXT);
+  protected void text(final byte[] value, final FTPos ftp) throws IOException {
+    print(normalize(value), DOTData.TEXT);
   }
 
   @Override
-  protected void finishComment(final byte[] t) throws IOException {
-    print(new TokenBuilder(COMM_O).add(norm(t)).add(COMM_C).finish(), COMM);
+  protected void comment(final byte[] value) throws IOException {
+    print(new TokenBuilder(COMM_O).add(normalize(value)).add(COMM_C).finish(), COMM);
   }
 
   @Override
-  protected void finishPi(final byte[] n, final byte[] v) throws IOException {
-    print(new TokenBuilder(PI_O).add(n).add(SPACE).add(v).add(PI_C).finish(), DOTData.PI);
+  protected void pi(final byte[] name, final byte[] value) throws IOException {
+    print(new TokenBuilder(PI_O).add(name).add(SPACE).add(value).add(PI_C).finish(), DOTData.PI);
   }
 
   @Override
-  protected void atomic(final Item it, final boolean iter) throws IOException {
+  protected void atomic(final Item it) throws IOException {
     try {
-      print(norm(it.string(null)), ITEM);
+      print(normalize(it.string(null)), ITEM);
     } catch(final QueryException ex) {
       throw new QueryIOException(ex);
     }
@@ -112,15 +114,15 @@ public final class DOTSerializer extends OutputSerializer {
 
   /**
    * Prints a single node.
-   * @param t text
+   * @param value text
    * @param col color
    * @throws IOException I/O exception
    */
-  private void print(final byte[] t, final String col) throws IOException {
-    String txt = string(chop(t, 60)).replaceAll("\"|\\r|\\n", "'");
+  private void print(final byte[] value, final String col) throws IOException {
+    String txt = string(chop(value, 60)).replaceAll("\"|\\r|\\n", "'");
     if(compact) txt = txt.replaceAll("\\\\n\\w+:", "\\\\n");
     indent();
-    print(Util.info(DOTNODE, count, txt, col));
+    out.print(Util.info(DOTNODE, count, txt, col));
     nodes.set(level, count);
     if(level > 0) child(level - 1).add(count);
     ++count;
@@ -128,11 +130,11 @@ public final class DOTSerializer extends OutputSerializer {
 
   /**
    * Returns the children from the stack.
-   * @param i index
+   * @param index index
    * @return children
    */
-  private IntList child(final int i) {
-    while(i >= children.size()) children.add(new IntList());
-    return children.get(i);
+  private IntList child(final int index) {
+    while(index >= children.size()) children.add(new IntList());
+    return children.get(index);
   }
 }

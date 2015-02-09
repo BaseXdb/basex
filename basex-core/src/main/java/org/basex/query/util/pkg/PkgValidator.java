@@ -1,6 +1,6 @@
 package org.basex.query.util.pkg;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 import static org.basex.query.util.pkg.Package.*;
 import static org.basex.query.util.pkg.PkgText.*;
 import static org.basex.util.Token.*;
@@ -9,8 +9,6 @@ import java.util.*;
 
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.util.pkg.Package.Component;
-import org.basex.query.util.pkg.Package.Dependency;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
@@ -18,7 +16,7 @@ import org.basex.util.hash.*;
  * Package validator. This class executes some essential checks before the
  * installation of a package.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Rositsa Shadura
  */
 public final class PkgValidator {
@@ -29,12 +27,12 @@ public final class PkgValidator {
 
   /**
    * Constructor.
-   * @param r repository context
-   * @param ii input info
+   * @param repo repository context
+   * @param info input info
    */
-  public PkgValidator(final Repo r, final InputInfo ii) {
-    repo = r;
-    info = ii;
+  public PkgValidator(final Repo repo, final InputInfo info) {
+    this.repo = repo;
+    this.info = info;
   }
 
   /**
@@ -51,20 +49,20 @@ public final class PkgValidator {
   }
 
   /**
-   * Checks dependency elements, if packages involved in dependencies are
+   * Checks dependency elements if packages involved in dependencies are
    * already installed and if processor dependencies are fulfilled.
    * @param pkg package
    * @throws QueryException query exception
    */
   private void checkDepends(final Package pkg) throws QueryException {
-    final ArrayList<Dependency> procs = new ArrayList<Dependency>();
+    final ArrayList<Dependency> procs = new ArrayList<>();
     for(final Dependency dep : pkg.dep) {
       // first check of dependency elements are consistently defined in the
       // descriptor
-      if(dep.pkg == null && dep.processor == null) throw BXRE_DESC.get(info, MISSSECOND);
+      if(dep.pkg == null && dep.processor == null) throw BXRE_DESC_X.get(info, MISSSECOND);
       // if dependency involves a package, check if this package or an
       // appropriate version of it is installed
-      if(dep.pkg != null && depPkg(dep) == null) throw BXRE_NOTINST.get(info, dep.pkg);
+      if(dep.pkg != null && depPkg(dep) == null) throw BXRE_NOTINST_X.get(info, dep.pkg);
       // if dependency involves a processor, add it to the list with processor
       // dependencies
       if(dep.processor != null) procs.add(dep);
@@ -73,12 +71,11 @@ public final class PkgValidator {
   }
 
   /**
-   * Checks if secondary package, i.e. package involved in a dependency is
-   * already installed.
+   * Checks if secondary package, i.e. package involved in a dependency is already installed.
    * @param dep dependency
    * @return result
    */
-  public byte[] depPkg(final Dependency dep) {
+  byte[] depPkg(final Dependency dep) {
     // get installed versions of secondary package
     final TokenSet instVers = new TokenSet();
     for(final byte[] nextPkg : repo.pkgDict()) {
@@ -116,7 +113,7 @@ public final class PkgValidator {
    * Checks compatibility of dependency version with installed version.
    * @param dep dependency
    * @param versions current versions - either currently installed versions
-   *        for a package or current version of BaseX
+   * for a package or current version of BaseX
    * @return available appropriate version
    */
   private static byte[] availVersion(final Dependency dep, final TokenSet versions) {
@@ -177,7 +174,7 @@ public final class PkgValidator {
   private void checkComps(final Package pkg) throws QueryException {
     // modules other than xquery could be supported in future
     for(final Component comp : pkg.comps) {
-      if(isInstalled(comp, pkg.name)) throw BXRE_INST.get(info, comp.name());
+      if(isInstalled(comp, pkg.name)) throw BXRE_INST_X.get(info, comp.name());
     }
   }
 
@@ -195,12 +192,12 @@ public final class PkgValidator {
     if(pkgs == null) return false;
 
     for(final byte[] nextPkg : pkgs) {
-      if(nextPkg != null && !eq(Package.name(nextPkg), name)) {
+      if(nextPkg != null && !eq(name(nextPkg), name)) {
         // installed package is a different one, not just a different version
         // of the current one
         final String pkgDir = string(repo.pkgDict().get(nextPkg));
         final IO pkgDesc = new IOFile(repo.path(pkgDir), DESCRIPTOR);
-        final Package pkg = new PkgParser(repo, info).parse(pkgDesc);
+        final Package pkg = new PkgParser(info).parse(pkgDesc);
         for(final Component nextComp : pkg.comps) {
           if(nextComp.name().equals(comp.name())) return true;
         }

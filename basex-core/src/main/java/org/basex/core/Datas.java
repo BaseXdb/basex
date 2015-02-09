@@ -7,12 +7,12 @@ import org.basex.data.*;
 /**
  * This class organizes all currently opened databases.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class Datas {
   /** List of data references. */
-  private final ArrayList<Data> list = new ArrayList<Data>();
+  private final ArrayList<Data> list = new ArrayList<>();
 
   /**
    * Pins and returns an existing data reference for the specified database, or
@@ -57,10 +57,10 @@ public final class Datas {
 
   /**
    * Adds an already pinned data reference to the pool.
-   * @param d data reference
+   * @param data data reference
    */
-  public synchronized void add(final Data d) {
-    list.add(d);
+  public synchronized void add(final Data data) {
+    list.add(data);
   }
 
   /**

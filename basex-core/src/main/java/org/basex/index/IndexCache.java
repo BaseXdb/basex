@@ -8,14 +8,14 @@ import java.util.concurrent.locks.*;
 import org.basex.util.*;
 
 /**
- * This class caches sizes and pointers from index results.
+ * This class caches sizes and offsets from index results.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Dimitar Popov
  */
 public final class IndexCache {
   /** Queue used to collect unused keys. */
-  private final ReferenceQueue<IndexEntry> queue = new ReferenceQueue<IndexEntry>();
+  private final ReferenceQueue<IndexEntry> queue = new ReferenceQueue<>();
   /** Read-write lock. */
   private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock(true);
   /** Hash table buckets. */
@@ -51,35 +51,32 @@ public final class IndexCache {
    * Adds a new cache entry. If an entry with the specified key already exists,
    * it will be updated.
    * @param key key
-   * @param s number of index hits
-   * @param p pointer to id list
+   * @param sz number of index hits
+   * @param off offset to id list
    * @return cache entry
    */
-  public IndexEntry add(final byte[] key, final int s, final long p) {
+  public IndexEntry add(final byte[] key, final int sz, final long off) {
     final int hash = hash(key);
     rwl.writeLock().lock();
 
     try {
       purge();
-
       final int i = indexFor(hash, buckets.length);
-
-      BucketEntry current = buckets[i];
-      BucketEntry prev = current;
+      BucketEntry current = buckets[i], prev = current;
       while(current != null) {
         final BucketEntry next = current.next;
         final IndexEntry entry = current.get();
         if(entry == null) {
           delete(i, current, prev, next);
         } else if(current.hash == hash && eq(entry.key, key)) {
-          update(entry, s, p);
+          update(entry, sz, off);
           return entry;
         }
         prev = current;
         current = next;
       }
 
-      final IndexEntry entry = new IndexEntry(key, s, p);
+      final IndexEntry entry = new IndexEntry(key, sz, off);
       add(i, hash, entry);
       return entry;
     } finally {
@@ -97,11 +94,8 @@ public final class IndexCache {
 
     try {
       purge();
-
       final int i = indexFor(hash, buckets.length);
-
-      BucketEntry e = buckets[i];
-      BucketEntry prev = e;
+      BucketEntry e = buckets[i], prev = e;
       while(e != null) {
         final BucketEntry next = e.next;
         final IndexEntry entry = e.get();
@@ -126,9 +120,7 @@ public final class IndexCache {
     for(Object x; (x = queue.poll()) != null;) {
       final BucketEntry e = (BucketEntry) x;
       final int i = indexFor(e.hash, buckets.length);
-
-      BucketEntry prev = buckets[i];
-      BucketEntry p = prev;
+      BucketEntry prev = buckets[i], p = prev;
       while(p != null) {
         final BucketEntry next = p.next;
         if(p == e) {
@@ -156,11 +148,11 @@ public final class IndexCache {
    * Update an existing index entry.
    * @param entry index entry to update
    * @param sz new size
-   * @param poi new pointer
+   * @param off new offset
    */
-  private static void update(final IndexEntry entry, final int sz, final long poi) {
+  private static void update(final IndexEntry entry, final int sz, final long off) {
     entry.size = sz;
-    entry.pointer = poi;
+    entry.offset = off;
   }
 
   /**
@@ -170,8 +162,7 @@ public final class IndexCache {
    * @param p previous cache entry
    * @param n next cache entry
    */
-  private void delete(final int i, final BucketEntry e, final BucketEntry p,
-      final BucketEntry n) {
+  private void delete(final int i, final BucketEntry e, final BucketEntry p, final BucketEntry n) {
     if(p == e) buckets[i] = n;
     else p.next = n;
     e.next = null;

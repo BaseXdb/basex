@@ -1,7 +1,9 @@
 package org.basex.query.var;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
+
 import org.basex.query.*;
+import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -14,10 +16,10 @@ import org.basex.util.hash.*;
 /**
  * Reference to a static variable.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
-public final class StaticVarRef extends ParseExpr {
+final class StaticVarRef extends ParseExpr {
   /** Variable name. */
   private final QNm name;
   /** Referenced variable. */
@@ -27,14 +29,14 @@ public final class StaticVarRef extends ParseExpr {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param nm variable name
-   * @param sctx static context
+   * @param info input info
+   * @param name variable name
+   * @param sc static context
    */
-  public StaticVarRef(final InputInfo ii, final QNm nm, final StaticContext sctx) {
-    super(ii);
-    name = nm;
-    sc = sctx;
+  StaticVarRef(final InputInfo info, final QNm name, final StaticContext sc) {
+    super(info);
+    this.name = name;
+    this.sc = sc;
   }
 
   @Override
@@ -42,20 +44,20 @@ public final class StaticVarRef extends ParseExpr {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope o) throws QueryException {
-    var.compile(ctx);
-    type = var.type();
-    return var.value != null ? var.value : this;
+  public Expr compile(final QueryContext qc, final VarScope o) throws QueryException {
+    var.compile(qc);
+    seqType = var.seqType();
+    return var.val != null ? var.val : this;
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    return value(ctx).iter();
+  public Iter iter(final QueryContext qc) throws QueryException {
+    return value(qc).iter();
   }
 
   @Override
-  public Value value(final QueryContext ctx) throws QueryException {
-    return var.value(ctx);
+  public Value value(final QueryContext qc) throws QueryException {
+    return var.value(qc);
   }
 
   @Override
@@ -69,7 +71,7 @@ public final class StaticVarRef extends ParseExpr {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
     final StaticVarRef ref = new StaticVarRef(info, name, sc);
     ref.var = var;
     return ref;
@@ -97,8 +99,7 @@ public final class StaticVarRef extends ParseExpr {
   }
 
   @Override
-  public Expr inline(final QueryContext ctx, final VarScope scp, final Var v,
-      final Expr e) {
+  public Expr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr ex) {
     return null;
   }
 
@@ -112,9 +113,9 @@ public final class StaticVarRef extends ParseExpr {
    * @param vr variable
    * @throws QueryException query exception
    */
-  public void init(final StaticVar vr) throws QueryException {
-    if(vr.ann.contains(Ann.Q_PRIVATE) && !Token.eq(sc.baseURI().string(),
-       vr.sc.baseURI().string())) throw VARPRIVATE.get(info, vr);
+  void init(final StaticVar vr) throws QueryException {
+    if(vr.anns.contains(Annotation.PRIVATE) && !sc.baseURI().eq(vr.sc.baseURI()))
+      throw VARPRIVATE_X.get(info, vr);
     var = vr;
   }
 }

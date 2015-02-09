@@ -8,7 +8,6 @@ import java.security.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.serial.*;
-import org.basex.io.serial.SerializerOptions.*;
 import org.basex.util.*;
 import org.junit.*;
 import org.junit.Test;
@@ -18,13 +17,10 @@ import org.junit.Test;
  * in basex-test package are only executable after a java keystore has been
  * created.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Lukas Kircher
  */
-public class FNCryptoTest {
-  /** Database context. */
-  private static Context context;
-
+public final class FNCryptoTest extends SandboxTest{
   /** User home directory. */
   private static final String KEYSTORE_DIR = System.getProperty("user.home");
   /** Java home directory. */
@@ -120,11 +116,8 @@ public class FNCryptoTest {
     Thread.sleep(2000); // give the keytool some time to finish
     if(proc.exitValue() != 0) throw new RuntimeException("Cannot initialize keystore.");
 
-    context = new Context();
     // turn off pretty printing
-    final SerializerOptions sopts = new SerializerOptions();
-    sopts.set(SerializerOptions.INDENT, YesNo.NO);
-    new Set(MainOptions.SERIALIZER, sopts).execute(context);
+    new Set(MainOptions.SERIALIZER, SerializerOptions.get(false)).execute(context);
   }
 
   /**
@@ -132,7 +125,6 @@ public class FNCryptoTest {
    */
   @AfterClass
   public static void finish() {
-    context.close();
     new File(KEYSTORE).delete();
   }
 

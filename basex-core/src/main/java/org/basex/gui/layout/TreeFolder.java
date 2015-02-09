@@ -15,7 +15,7 @@ import org.basex.util.list.*;
 /**
  * JTree node which represents a folder.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Lukas Kircher
  */
 public class TreeFolder extends TreeNode {
@@ -69,7 +69,7 @@ public class TreeFolder extends TreeNode {
    */
   public int addLeaves(final byte[] filter, final int cmax, final TreeFolder target) {
     final TokenBoolMap tbm = data.resources.children(subfolder(), false);
-    final List<byte[]> keys = new ArrayList<byte[]>(tbm.size());
+    final List<byte[]> keys = new ArrayList<>(tbm.size());
 
     // get desired leaves, depending on the given filter
     for(final byte[] b : tbm) {
@@ -84,9 +84,10 @@ public class TreeFolder extends TreeNode {
 
     // finally add the necessary leaves
     final byte[] sub = subfolder();
-    int i = 0, m = cmax;
-    while(i < keys.size() && m-- > 0) {
-      final byte[] nm = keys.get(i++);
+    int k = 0, m = cmax;
+    final int ks = keys.size();
+    while(k < ks && m-- > 0) {
+      final byte[] nm = keys.get(k++);
       target.add(new TreeLeaf(nm, sub, tbm.get(nm), false, tree, data));
     }
 

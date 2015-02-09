@@ -7,12 +7,12 @@ import org.basex.util.*;
 /**
  * Implementation of common stemmer methods.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Dimitar Popov
  */
 public abstract class Stemmer extends LanguageImpl {
   /** List of available stemmers. */
-  static final LinkedList<Stemmer> IMPL = new LinkedList<Stemmer>();
+  static final ArrayList<Stemmer> IMPL = new ArrayList<>();
 
   /** Load stemmers and order them by precedence. */
   static {
@@ -43,10 +43,10 @@ public abstract class Stemmer extends LanguageImpl {
 
   /**
    * Constructor.
-   * @param ft full-text iterator.
+   * @param iter full-text iterator.
    */
-  Stemmer(final FTIterator ft) {
-    iter = ft;
+  Stemmer(final FTIterator iter) {
+    this.iter = iter;
   }
 
   /**
@@ -61,11 +61,11 @@ public abstract class Stemmer extends LanguageImpl {
 
   /**
    * Factory method.
-   * @param l language
+   * @param lang language
    * @param fti full-text iterator
    * @return stemmer
    */
-  abstract Stemmer get(final Language l, final FTIterator fti);
+  abstract Stemmer get(final Language lang, final FTIterator fti);
 
   /**
    * Stems a word.

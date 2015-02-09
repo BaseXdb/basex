@@ -8,12 +8,12 @@ import org.basex.util.list.*;
 /**
  * This class uses an internal buffer to speed up input stream processing.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public class BufferInput extends InputStream {
   /** Byte buffer. */
-  final byte[] buffer;
+  final byte[] array;
   /** Current buffer position. */
   int bpos;
   /** Current buffer size. */
@@ -55,7 +55,7 @@ public class BufferInput extends InputStream {
    * @param bs buffer size
    */
   public BufferInput(final InputStream is, final int bs) {
-    buffer = new byte[bs];
+    array = new byte[bs];
     length = -1;
     in = is;
   }
@@ -65,14 +65,14 @@ public class BufferInput extends InputStream {
    * @param array array input
    */
   BufferInput(final byte[] array) {
-    buffer = array;
+    this.array = array;
     bsize = array.length;
     length = bsize;
     in = null;
   }
 
   /**
-   * Returns the IO reference, or {@code null}.
+   * Returns the IO reference or {@code null}.
    * @return file reference
    */
   public IO io() {
@@ -98,8 +98,8 @@ public class BufferInput extends InputStream {
    * @see InputStream#read()
    */
   int readByte() throws IOException {
-    final int blen = buffer.length;
-    final byte[] buf = buffer;
+    final int blen = array.length;
+    final byte[] buf = array;
     if(bpos >= bsize) {
       read += bsize;
       if(bsize == blen) {
@@ -135,7 +135,7 @@ public class BufferInput extends InputStream {
   public final byte[] readBytes() throws IOException {
     final ByteList bl = new ByteList();
     for(int l; (l = readByte()) > 0;) bl.add(l);
-    return bl.toArray();
+    return bl.finish();
   }
 
   @Override
@@ -152,7 +152,7 @@ public class BufferInput extends InputStream {
   }
 
   /**
-   * Returns the input length (may be {@code -1}).
+   * Returns the input length (can be {@code -1}).
    * @return input length
    */
   public final long length() {
@@ -165,7 +165,7 @@ public class BufferInput extends InputStream {
   }
 
   @Override
-  public synchronized void mark(final int m) {
+  public final synchronized void mark(final int m) {
     bmark = bpos;
   }
 
@@ -192,7 +192,7 @@ public class BufferInput extends InputStream {
       // parse until end of stream
       final ByteList bl = new ByteList();
       for(int ch; (ch = readByte()) != -1;) bl.add(ch);
-      return bl.toArray();
+      return bl.finish();
     } finally {
       close();
     }

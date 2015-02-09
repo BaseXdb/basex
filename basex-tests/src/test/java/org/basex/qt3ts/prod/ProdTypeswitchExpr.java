@@ -1,12 +1,12 @@
 package org.basex.qt3ts.prod;
 
-import org.basex.tests.bxapi.XQuery;
+import org.basex.tests.bxapi.*;
 import org.basex.tests.qt3ts.*;
 
 /**
  * Tests for the TypeswitchExpr production.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
 @SuppressWarnings("all")
@@ -798,7 +798,6 @@ public class ProdTypeswitchExpr extends QT3TestSet {
    */
   @org.junit.Test
   public void typeswitchUnionInXquery10() {
-    xquery10();
     final XQuery query = new XQuery(
       "\n" +
       "\t for $x in (<e/>, 1, \"x\") return\n" +

@@ -8,7 +8,7 @@ import org.basex.util.list.*;
 /**
  * This class determines nodes per level and caches them.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Wolfgang Miller
  */
 final class TreeNodeCache implements TreeConstants {
@@ -23,7 +23,7 @@ final class TreeNodeCache implements TreeConstants {
    * @param atts show attributes
    */
   TreeNodeCache(final Data data, final boolean atts) {
-    final ArrayList<IntList> alil = new ArrayList<IntList>();
+    final ArrayList<IntList> alil = new ArrayList<>();
 
     final int ts = data.meta.size;
     final IntList roots = data.resources.docs();
@@ -32,7 +32,7 @@ final class TreeNodeCache implements TreeConstants {
     for(int i = 0; i < rs; ++i) {
       final int root = roots.get(i);
       alil.get(0).add(root);
-      final int sh = i + 1 == roots.size() ? ts : roots.get(i + 1);
+      final int sh = i + 1 == rs ? ts : roots.get(i + 1);
       for(int p = root + 1; p < sh; ++p) {
         final int k = data.kind(p);
         if(!atts && k == Data.ATTR) continue;
@@ -73,7 +73,7 @@ final class TreeNodeCache implements TreeConstants {
    */
   TreeBorder[] subtree(final Data d, final int pre) {
     final TreeBorder[] bo = new TreeBorder[maxLevel];
-    if(pre == 0 && d.resources.docs().size() == 1) {
+    if(pre == 0 && d.meta.ndocs == 1) {
       for(int i = 0; i < maxLevel; ++i) bo[i] = new TreeBorder(i, 0, nodes[i].size());
       return bo;
     }
@@ -91,9 +91,11 @@ final class TreeNodeCache implements TreeConstants {
       final int min = getMinIndex(i, pre, np);
       if(min == -1) break;
       int c = 0;
-      for(int j = min; j < nodes[i].size(); ++j)
+      final int ns = nodes[i].size();
+      for(int j = min; j < ns; ++j) {
         if(nodes[i].get(j) < np) ++c;
         else break;
+      }
       bo[i] = new TreeBorder(i, min, c);
       ++h;
     }
@@ -129,14 +131,6 @@ final class TreeNodeCache implements TreeConstants {
   int searchPreArrayPos(final int lv, final int l, final int r, final int pre) {
     return searchPreIndex(lv, pre, pre, l, r);
   }
-
-  /**
-   * Returns pre by given index.
-   * @param bo border
-   * @param ix index
-   * @return pre int getPrePerIndex(final TreeBorder bo, final int ix) { return
-   *         nodes[bo.level].get(bo.start + ix); }
-   */
 
   /**
    * Searches for pre value or pre range.

@@ -14,7 +14,7 @@ import org.basex.util.hash.*;
 /**
  * Arithmetic expression.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class Arith extends Arr {
@@ -23,56 +23,56 @@ public final class Arith extends Arr {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param e1 first expression
-   * @param e2 second expression
-   * @param c calculation operator
+   * @param info input info
+   * @param expr1 first expression
+   * @param expr2 second expression
+   * @param calc calculation operator
    */
-  public Arith(final InputInfo ii, final Expr e1, final Expr e2, final Calc c) {
-    super(ii, e1, e2);
-    calc = c;
-    type = SeqType.ITEM_ZO;
+  public Arith(final InputInfo info, final Expr expr1, final Expr expr2, final Calc calc) {
+    super(info, expr1, expr2);
+    this.calc = calc;
+    seqType = SeqType.ITEM_ZO;
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    super.compile(ctx, scp);
-    return optimize(ctx, scp);
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    super.compile(qc, scp);
+    return optimize(qc, scp);
   }
 
   @Override
-  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
-    final SeqType s0 = expr[0].type();
-    final SeqType s1 = expr[1].type();
-    final Type t0 = s0.type;
-    final Type t1 = s1.type;
-    if(t0.isNumberOrUntyped() && t1.isNumberOrUntyped()) {
-      final Occ occ = s0.one() && s1.one() ? Occ.ONE : Occ.ZERO_ONE;
-      type = SeqType.get(Calc.type(t0, t1), occ);
-    } else if(s0.one() && s1.one()) {
-      type = SeqType.ITEM;
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+    final SeqType st1 = exprs[0].seqType();
+    final SeqType st2 = exprs[1].seqType();
+    final Type t1 = st1.type, t2 = st2.type;
+    final boolean o1 = st1.one() && !st1.mayBeArray();
+    final boolean o2 = st2.one() && !st2.mayBeArray();
+    if(t1.isNumberOrUntyped() && t2.isNumberOrUntyped()) {
+      final Occ occ = o1 && o2 ? Occ.ONE : Occ.ZERO_ONE;
+      seqType = SeqType.get(Calc.type(t1, t2), occ);
+    } else if(o1 && o2) {
+      seqType = SeqType.ITEM;
     }
-    return optPre(oneIsEmpty() ? null : allAreValues() ? item(ctx, info) : this, ctx);
+    return optPre(oneIsEmpty() ? null : allAreValues() ? item(qc, info) : this, qc);
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final Item a = expr[0].item(ctx, info);
-    if(a == null) return null;
-    final Item b = expr[1].item(ctx, info);
-    if(b == null) return null;
-    return calc.ev(info, a, b);
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final Item it1 = exprs[0].atomItem(qc, ii);
+    if(it1 == null) return null;
+    final Item it2 = exprs[1].atomItem(qc, ii);
+    if(it2 == null) return null;
+    return calc.ev(info, it1, it2);
   }
 
   @Override
-  public Arith copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    final Expr a = expr[0].copy(ctx, scp, vs), b = expr[1].copy(ctx, scp, vs);
-    return copyType(new Arith(info, a, b, calc));
+  public Arith copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return copyType(new Arith(info, exprs[0].copy(qc, scp, vs), exprs[1].copy(qc, scp, vs), calc));
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(OP, calc.name), expr);
+    addPlan(plan, planElem(OP, calc.name), exprs);
   }
 
   @Override

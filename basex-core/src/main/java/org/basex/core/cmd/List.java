@@ -6,17 +6,20 @@ import static org.basex.util.Token.*;
 import java.io.*;
 
 import org.basex.core.*;
+import org.basex.core.locks.*;
+import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.index.resource.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
+import org.basex.query.func.http.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
  * Evaluates the 'list' command and shows all available databases.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class List extends Command {
@@ -64,39 +67,36 @@ public final class List extends Command {
     final Table table = new Table();
     table.description = DATABASES_X;
 
-    final boolean create = context.user.has(Perm.CREATE);
+    final boolean create = context.user().has(Perm.CREATE);
     table.header.add(NAME);
     table.header.add(RESOURCES);
     table.header.add(SIZE);
     if(create) table.header.add(INPUT_PATH);
 
-    for(final String name : context.databases.listDBs()) {
+    for(final String name : context.filter(Perm.READ, context.databases.listDBs())) {
       String file = null;
       long size = 0;
       int docs = 0;
-      final MetaData meta = new MetaData(name, context);
+
+      final MetaData meta = new MetaData(name, options, soptions);
       try {
         meta.read();
         size = meta.dbsize();
         docs = meta.ndocs;
-        if(context.perm(Perm.READ, meta)) file = meta.original;
+        file = meta.original;
       } catch(final IOException ex) {
         file = ERROR;
       }
-
       // count number of raw files
-      final IOFile dir = new IOFile(goptions.dbpath(name), IO.RAW);
-      final int bin = dir.descendants().size();
+      final int bin = new IOFile(soptions.dbpath(name), IO.RAW).descendants().size();
 
       // create entry
-      if(file != null) {
-        final TokenList tl = new TokenList(4);
-        tl.add(name);
-        tl.add(docs + bin);
-        tl.add(size);
-        if(create) tl.add(file);
-        table.contents.add(tl);
-      }
+      final TokenList tl = new TokenList(create ? 4 : 3);
+      tl.add(name);
+      tl.add(docs + bin);
+      tl.add(size);
+      if(create) tl.add(file);
+      table.contents.add(tl);
     }
     out.println(table.sort().finish());
     return true;
@@ -116,12 +116,12 @@ public final class List extends Command {
     table.description = RESOURCES;
     table.header.add(INPUT_PATH);
     table.header.add(TYPE);
-    table.header.add(MimeTypes.CONTENT_TYPE);
+    table.header.add(HttpText.CONTENT_TYPE);
     table.header.add(SIZE);
 
     try {
       // add xml documents
-      final Data data = Open.open(db, context);
+      final Data data = Open.open(db, context, options);
       final Resources res = data.resources;
       final IntList il = res.docs(path);
       final int ds = il.size();
@@ -155,12 +155,12 @@ public final class List extends Command {
 
   /**
    * Returns a list of all databases.
-   * @param ctx database context
+   * @param sopts static options
    * @return list of databases
    */
-  public static StringList list(final Context ctx) {
+  public static StringList list(final StaticOptions sopts) {
     final StringList db = new StringList();
-    for(final IOFile f : ctx.globalopts.dbpath().children()) {
+    for(final IOFile f : sopts.dbpath().children()) {
       final String name = f.name();
       if(f.isDir() && !name.startsWith(".")) db.add(name);
     }

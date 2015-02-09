@@ -1,6 +1,2 @@
-/**
- * <body>
- * XQuery data types.
- * </body>
- */
+/** XQuery values. */
 package org.basex.query.value;

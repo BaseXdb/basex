@@ -7,13 +7,12 @@ import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.util.*;
 import org.basex.util.*;
 
 /**
  * Streamable string item ({@code xs:string}).
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class StrStream extends AStr {
@@ -22,22 +21,24 @@ public final class StrStream extends AStr {
   /** Encoding (optional). */
   private final String encoding;
   /** Error message. */
-  private final Err error;
+  private final QueryError error;
   /** Validation flag. */
   private final boolean validate;
 
   /**
    * Constructor.
-   * @param io input
-   * @param enc encoding (may be null)
-   * @param ctx query context
-   * @param err error message to be thrown
+   * @param input input
+   * @param encoding encoding (may be null)
+   * @param qc query context
+   * @param error error message to be thrown
    */
-  public StrStream(final IO io, final String enc, final Err err, final QueryContext ctx) {
-    input = io;
-    encoding = enc;
-    error = err;
-    validate = ctx.context.options.get(MainOptions.CHECKSTRINGS);
+  public StrStream(final IO input, final String encoding, final QueryError error,
+      final QueryContext qc) {
+
+    this.input = input;
+    this.encoding = encoding;
+    this.error = error;
+    validate = qc.context.options.get(MainOptions.CHECKSTRINGS);
   }
 
   @Override
@@ -68,7 +69,7 @@ public final class StrStream extends AStr {
   }
 
   @Override
-  public Item materialize(final InputInfo ii) throws QueryException {
+  public Str materialize(final InputInfo ii) throws QueryException {
     return Str.get(string(ii));
   }
 

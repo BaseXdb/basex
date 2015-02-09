@@ -1,14 +1,16 @@
 package org.basex.util.hash;
 
+import java.util.*;
+
 import org.basex.util.*;
 
 /**
  * This is an efficient and memory-saving hash map for storing primitive integers
  * and objects. It extends the {@link IntSet} class.
- * @param <E> generic value type
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
+ * @param <E> generic value type
  */
 public final class IntObjMap<E> extends IntSet {
   /** Values. */
@@ -19,17 +21,21 @@ public final class IntObjMap<E> extends IntSet {
    * If the key already exists, the value is updated.
    * @param key key
    * @param value value
+   * @return old value
    */
-  public void put(final int key, final E value) {
+  @SuppressWarnings("unchecked")
+  public E put(final int key, final E value) {
     // array bounds are checked before array is resized..
     final int i = put(key);
+    final Object v = values[i];
     values[i] = value;
+    return (E) v;
   }
 
   /**
    * Returns the value for the specified key.
    * @param key key to be looked up
-   * @return value, or {@code null} if the key was not found
+   * @return value or {@code null} if the key was not found
    */
   @SuppressWarnings("unchecked")
   public E get(final int key) {
@@ -41,13 +47,13 @@ public final class IntObjMap<E> extends IntSet {
    * @return iterator
    */
   public Iterable<E> values() {
-    return new ArrayIterator<E>(values, 1, size);
+    return new ArrayIterator<>(values, 1, size);
   }
 
   @Override
-  protected void rehash(final int s) {
-    super.rehash(s);
-    values = Array.copy(values, new Object[s]);
+  protected void rehash(final int sz) {
+    super.rehash(sz);
+    values = Array.copy(values, new Object[sz]);
   }
 
   @Override
@@ -55,6 +61,12 @@ public final class IntObjMap<E> extends IntSet {
     final int i = super.delete(key);
     if(i != 0) values[i] = null;
     return i;
+  }
+
+  @Override
+  public void clear() {
+    super.clear();
+    Arrays.fill(values, null);
   }
 
   @Override

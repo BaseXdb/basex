@@ -5,16 +5,15 @@ import static org.basex.core.Text.*;
 import java.io.*;
 
 import org.basex.*;
+import org.basex.api.client.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.server.*;
-import org.basex.SandboxTest;
 import org.junit.*;
 
 /**
  * This class offers utility methods to perform simple benchmarks.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public abstract class Benchmark extends SandboxTest {
@@ -34,7 +33,7 @@ public abstract class Benchmark extends SandboxTest {
   @BeforeClass
   public static void init() throws IOException {
     // check if server is (not) running
-    final int sp = context.globalopts.get(GlobalOptions.SERVERPORT);
+    final int sp = context.soptions.get(StaticOptions.SERVERPORT);
     server = local || BaseXServer.ping(S_LOCALHOST, sp) ? null : createServer();
     session = local ? new LocalSession(context) : createClient();
 

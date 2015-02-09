@@ -9,7 +9,7 @@ import org.basex.*;
  * This class is a simple example to demonstrate the REST implementation.
  * It shows the function of the HTTP GET method.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  */
 public final class RESTGet {
   /**
@@ -39,14 +39,14 @@ public final class RESTGet {
       System.out.println("\n* Result:");
 
       // Get and cache input as UTF-8 encoded stream
-      BufferedReader br = new BufferedReader(new InputStreamReader(
-          conn.getInputStream(), "UTF-8"));
+      try(final BufferedReader br = new BufferedReader(
+          new InputStreamReader(conn.getInputStream(), "UTF-8"))) {
 
-      // Print all lines of the result
-      for(String line; (line = br.readLine()) != null;) {
-        System.out.println(line);
+        // Print all lines of the result
+        for(String line; (line = br.readLine()) != null;) {
+          System.out.println(line);
+        }
       }
-      br.close();
     }
 
     // Close connection

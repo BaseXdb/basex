@@ -1,19 +1,23 @@
 package org.basex.query.func;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
-import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.lang.reflect.*;
 import java.lang.reflect.Array;
 import java.math.*;
 import java.net.*;
+import java.util.*;
 
 import javax.xml.datatype.*;
 import javax.xml.namespace.*;
 
-import org.basex.core.*;
+import org.basex.core.locks.*;
+import org.basex.core.users.*;
 import org.basex.query.*;
+import org.basex.query.QueryModule.Lock;
+import org.basex.query.QueryModule.Requires;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.pkg.*;
@@ -24,13 +28,12 @@ import org.basex.query.value.type.*;
 import org.basex.query.value.type.Type;
 import org.basex.util.*;
 import org.w3c.dom.*;
-import org.w3c.dom.Text;
 
 /**
  * This class contains common methods for executing Java code and mapping
  * Java objects to XQuery values.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public abstract class JavaMapping extends Arr {
@@ -58,47 +61,47 @@ public abstract class JavaMapping extends Arr {
 
   /**
    * Constructor.
-   * @param sctx static context
-   * @param ii input info
-   * @param a arguments
+   * @param sc static context
+   * @param info input info
+   * @param args arguments
    */
-  JavaMapping(final StaticContext sctx, final InputInfo ii, final Expr[] a) {
-    super(ii, a);
-    sc = sctx;
+  JavaMapping(final StaticContext sc, final InputInfo info, final Expr[] args) {
+    super(info, args);
+    this.sc = sc;
   }
 
   @Override
-  public final Iter iter(final QueryContext ctx) throws QueryException {
-    return value(ctx).iter();
+  public final Iter iter(final QueryContext qc) throws QueryException {
+    return value(qc).iter();
   }
 
   @Override
-  public final Value value(final QueryContext ctx) throws QueryException {
-    final int es = expr.length;
+  public final Value value(final QueryContext qc) throws QueryException {
+    final int es = exprs.length;
     final Value[] args = new Value[es];
-    for(int e = 0; e < es; ++e) args[e] = ctx.value(expr[e]);
-    return toValue(eval(args, ctx), ctx, sc);
+    for(int e = 0; e < es; ++e) args[e] = qc.value(exprs[e]);
+    return toValue(eval(args, qc), qc, sc);
   }
 
   /**
    * Returns the result of the evaluated Java function.
    * @param args arguments
-   * @param ctx query context
+   * @param qc query context
    * @return arguments
    * @throws QueryException query exception
    */
-  protected abstract Object eval(final Value[] args, final QueryContext ctx)
+  protected abstract Object eval(final Value[] args, final QueryContext qc)
       throws QueryException;
 
   /**
    * Converts the specified result to an XQuery value.
    * @param obj result object
-   * @param ctx query context
+   * @param qc query context
    * @param sc static context
    * @return value
    * @throws QueryException query exception
    */
-  public static Value toValue(final Object obj, final QueryContext ctx, final StaticContext sc)
+  public static Value toValue(final Object obj, final QueryContext qc, final StaticContext sc)
       throws QueryException {
 
     if(obj == null) return Empty.SEQ;
@@ -106,7 +109,7 @@ public abstract class JavaMapping extends Arr {
     if(obj instanceof Iter) return ((Iter) obj).value();
     // find XQuery mapping for specified type
     final Type type = type(obj);
-    if(type != null) return type.cast(obj, ctx, sc, null);
+    if(type != null) return type.cast(obj, qc, sc, null);
 
     // primitive arrays
     if(obj instanceof byte[])    return BytSeq.get((byte[]) obj);
@@ -117,7 +120,7 @@ public abstract class JavaMapping extends Arr {
     if(obj instanceof float[])   return FltSeq.get((float[]) obj);
 
     // no array: return Java type
-    if(!obj.getClass().isArray()) return new Jav(obj, ctx);
+    if(!obj.getClass().isArray()) return new Jav(obj, qc);
 
     // empty array
     final int s = Array.getLength(obj);
@@ -153,7 +156,7 @@ public abstract class JavaMapping extends Arr {
     // any other array (also nested ones)
     final Object[] objs = (Object[]) obj;
     final ValueBuilder vb = new ValueBuilder(objs.length);
-    for(final Object o : objs) vb.add(toValue(o, ctx, sc));
+    for(final Object o : objs) vb.add(toValue(o, qc, sc));
     return vb.value();
   }
 
@@ -163,35 +166,35 @@ public abstract class JavaMapping extends Arr {
    * @param path path of the module
    * @param name method name
    * @param arity number of arguments
-   * @param ctx query context
+   * @param qc query context
    * @param ii input info
    * @return method if found, {@code null} otherwise
    * @throws QueryException query exception
    */
   private static Method getModMethod(final Object mod, final String path, final String name,
-      final long arity, final QueryContext ctx, final InputInfo ii) throws QueryException {
+      final long arity, final QueryContext qc, final InputInfo ii) throws QueryException {
 
     // find method with identical name and arity
     Method meth = null;
     for(final Method m : mod.getClass().getMethods()) {
       if(m.getName().equals(name) && m.getParameterTypes().length == arity) {
-        if(meth != null) throw JAVAAMBIG.get(ii, "Q{" + path + '}' + name + '#' + arity);
+        if(meth != null) throw JAVAAMBIG_X.get(ii, "Q{" + path + '}' + name + '#' + arity);
         meth = m;
       }
     }
-    if(meth == null) throw FUNCJAVA.get(ii, path + ':' + name);
+    if(meth == null) throw FUNCJAVA_X.get(ii, path + ':' + name);
 
     // check if user has sufficient permissions to call the function
     Perm perm = Perm.ADMIN;
-    final QueryModule.Requires req = meth.getAnnotation(QueryModule.Requires.class);
-    if(req != null) perm = Perm.get(req.value().name());
-    if(!ctx.context.user.has(perm)) return null;
+    final Requires req = meth.getAnnotation(Requires.class);
+    if(req != null) perm = Perm.get(req.value().name().toLowerCase(Locale.ENGLISH));
+    if(!qc.context.user().has(perm)) return null;
 
     // Add module locks to QueryContext.
-    final QueryModule.Lock lock = meth.getAnnotation(QueryModule.Lock.class);
+    final Lock lock = meth.getAnnotation(Lock.class);
     if(lock != null) {
-      for(final String read : lock.read()) ctx.readLocks.add(DBLocking.MODULE_PREFIX + read);
-      for(final String write : lock.write()) ctx.writeLocks.add(DBLocking.MODULE_PREFIX + write);
+      for(final String read : lock.read()) qc.readLocks.add(DBLocking.MODULE_PREFIX + read);
+      for(final String write : lock.write()) qc.writeLocks.add(DBLocking.MODULE_PREFIX + write);
     }
 
     return meth;
@@ -209,45 +212,45 @@ public abstract class JavaMapping extends Arr {
 
   /**
    * Returns a new Java function instance.
-   * @param qname function name
+   * @param name function name
    * @param args arguments
-   * @param ctx query context
-   * @param sctx static context
+   * @param qc query context
+   * @param sc static context
    * @param ii input info
-   * @return Java function, or {@code null}
+   * @return Java function or {@code null}
    * @throws QueryException query exception
    */
-  static JavaMapping get(final QNm qname, final Expr[] args, final QueryContext ctx,
-      final StaticContext sctx, final InputInfo ii) throws QueryException {
+  static JavaMapping get(final QNm name, final Expr[] args, final QueryContext qc,
+      final StaticContext sc, final InputInfo ii) throws QueryException {
 
-    final byte[] uri = qname.uri();
+    final byte[] uri = name.uri();
     // check if URI starts with "java:" prefix (if yes, module must be Java code)
     final boolean java = startsWith(uri, JAVAPREF);
 
     // rewrite function name: convert dashes to upper-case initials
-    final String name = camelCase(string(qname.local()));
+    final String local = Strings.camelCase(string(name.local()));
 
     // check imported Java modules
-    final String path = camelCase(toPath(java ? substring(uri, JAVAPREF.length) : uri));
+    final String path = Strings.camelCase(toPath(java ? substring(uri, JAVAPREF.length) : uri));
 
-    final ModuleLoader modules = ctx.modules();
+    final ModuleLoader modules = qc.resources.modules();
     final Object jm  = modules.findImport(path);
     if(jm != null) {
-      final Method meth = getModMethod(jm, path, name, args.length, ctx, ii);
-      if(meth != null) return new JavaModuleFunc(sctx, ii, jm, meth, args);
+      final Method meth = getModMethod(jm, path, local, args.length, qc, ii);
+      if(meth != null) return new JavaModuleFunc(sc, ii, jm, meth, args);
     }
 
     // only allowed with administrator permissions
-    if(!ctx.context.user.has(Perm.ADMIN)) return null;
+    if(!qc.context.user().has(Perm.ADMIN)) return null;
 
     // check addressed class
     try {
-      return new JavaFunc(sctx, ii, modules.findClass(path), name, args);
+      return new JavaFunc(sc, ii, modules.findClass(path), local, args);
     } catch(final ClassNotFoundException ex) {
       // only throw exception if "java:" prefix was explicitly specified
-      if(java) throw FUNCJAVA.get(ii, path);
+      if(java) throw FUNCJAVA_X.get(ii, path);
     } catch(final Throwable th) {
-      throw JAVAINIT.get(ii, th);
+      throw JAVAINIT_X.get(ii, th);
     }
 
     // no function found
@@ -255,9 +258,9 @@ public abstract class JavaMapping extends Arr {
   }
 
   /**
-   * Returns an appropriate XQuery data type for the specified Java object.
+   * Returns an appropriate XQuery type for the specified Java object.
    * @param o object
-   * @return xquery type, or {@code null} if no appropriate type was found
+   * @return item type or {@code null} if no appropriate type was found
    */
   private static Type type(final Object o) {
     final Type t = type(o.getClass());
@@ -294,14 +297,13 @@ public abstract class JavaMapping extends Arr {
   }
 
   /**
-   * Returns an appropriate XQuery data type for the specified Java class.
+   * Returns an appropriate XQuery type for the specified Java class.
    * @param type Java type
-   * @return xquery type
+   * @return item type or {@code null} if no appropriate type was found
    */
   static Type type(final Class<?> type) {
-    for(int j = 0; j < JAVA.length; ++j) {
-      if(JAVA[j] == type) return XQUERY[j];
-    }
+    final int jl = JAVA.length;
+    for(int j = 0; j < jl; ++j) if(JAVA[j] == type) return XQUERY[j];
     return null;
   }
 
@@ -315,7 +317,7 @@ public abstract class JavaMapping extends Arr {
     final StringBuilder sb = new StringBuilder();
     for(final Value v : args) {
       if(sb.length() != 0) sb.append(", ");
-      sb.append(v instanceof Jav ? Util.className(((Jav) v).toJava()) : v.type());
+      sb.append(v instanceof Jav ? Util.className(((Jav) v).toJava()) : v.seqType());
     }
     return sb.toString();
   }

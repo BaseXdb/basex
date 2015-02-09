@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * This class serves as a container for updated names.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class NamePool {
@@ -41,7 +41,7 @@ public final class NamePool {
   }
 
   /**
-   * Returns the name of a duplicate attribute, or {@code null}.
+   * Returns the name of a duplicate attribute or {@code null}.
    * @return name of duplicate attribute
    */
   QNm duplicate() {
@@ -94,14 +94,14 @@ public final class NamePool {
   }
 
   /** Name cache. */
-  static final class NameCache {
+  private static final class NameCache {
     /** Name. */
-    QNm name;
+    private QNm name;
     /** Attribute/element flag. */
-    boolean attr;
+    private boolean attr;
     /** Counts the number of times the name is added. */
-    int add;
+    private int add;
     /** States if the name is deleted. */
-    boolean del;
+    private boolean del;
   }
 }

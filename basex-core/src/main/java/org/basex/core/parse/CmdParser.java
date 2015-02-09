@@ -8,11 +8,11 @@ import org.basex.query.*;
 /**
  * This is an interface for parsing database commands.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 abstract class CmdParser {
-  /** Input lines. */
+  /** Input string. */
   final String input;
   /** Context. */
   final Context ctx;
@@ -26,11 +26,11 @@ abstract class CmdParser {
 
   /**
    * Constructor.
-   * @param input input
-   * @param context context
+   * @param input input string
+   * @param ctx database context
    */
-  CmdParser(final String input, final Context context) {
-    ctx = context;
+  CmdParser(final String input, final Context ctx) {
+    this.ctx = ctx;
     this.input = input;
   }
 

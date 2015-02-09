@@ -20,7 +20,7 @@ import org.basex.util.list.*;
 /**
  * Open database dialog.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class DialogPackages extends BaseXDialog {
@@ -56,7 +56,7 @@ public final class DialogPackages extends BaseXDialog {
     panel.setLayout(new BorderLayout(8, 0));
 
     // create package chooser
-    packages = new BaseXList(new String[] {}, this, false);
+    packages = new BaseXList(new String[0], this, false);
     packages.setSize(270, 220);
 
     title = new BaseXLabel(" ").large().border(0, 5, 5, 0);
@@ -84,7 +84,7 @@ public final class DialogPackages extends BaseXDialog {
     p.add(packages, BorderLayout.CENTER);
     final BaseXBack ss = new BaseXBack(new TableLayout(1, 2, 8, 0)).border(8, 0, 0, 0);
     ss.add(new BaseXLabel(PATH + COL, true, true), BorderLayout.NORTH);
-    ss.add(new BaseXLabel(main.context.globalopts.get(GlobalOptions.REPOPATH)));
+    ss.add(new BaseXLabel(main.context.soptions.get(StaticOptions.REPOPATH)));
     p.add(ss, BorderLayout.SOUTH);
     set(p, BorderLayout.CENTER);
 
@@ -105,13 +105,13 @@ public final class DialogPackages extends BaseXDialog {
     final Context ctx = gui.context;
     if(refresh) {
       // rebuild databases and focus list chooser
-      packages.setData(new RepoManager(ctx).list().toArray());
+      packages.setData(new RepoManager(ctx).list().finish());
       packages.requestFocusInWindow();
       refresh = false;
     }
 
     final StringList pkgs = packages.getValues();
-    final ArrayList<Command> cmds = new ArrayList<Command>();
+    final ArrayList<Command> cmds = new ArrayList<>();
 
     if(cmp == installURL) {
       final DialogInstallURL dialog = new DialogInstallURL(this);

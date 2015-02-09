@@ -1,25 +1,26 @@
 package org.basex.http.webdav.impl;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * Query builder.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 final class WebDAVQuery {
   /** String query. */
   private final String query;
   /** Bindings. */
-  private final HashMap<String, Object> bindings = new HashMap<String, Object>();
+  private final HashMap<String, Object> bindings = new HashMap<>();
 
   /**
    * Constructor.
-   * @param qu query string
+   * @param query query string
    */
-  WebDAVQuery(final String qu) {
-    query = qu;
+  WebDAVQuery(final String query) {
+    this.query = query;
   }
 
   /**
@@ -37,7 +38,7 @@ final class WebDAVQuery {
    * Returns the hash map entries.
    * @return self reference
    */
-  Set<Map.Entry<String, Object>> entries() {
+  Set<Entry<String, Object>> entries() {
     return bindings.entrySet();
   }
 

@@ -5,6 +5,7 @@ import static org.basex.core.Text.*;
 import java.io.*;
 
 import org.basex.core.*;
+import org.basex.core.locks.*;
 import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -12,10 +13,10 @@ import org.basex.util.list.*;
 /**
  * Evaluates the 'restore' command and restores a backup of a database.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public class Restore extends ABackup {
+public final class Restore extends ABackup {
   /** States if current database was closed. */
   private boolean closed;
 
@@ -46,7 +47,7 @@ public class Restore extends ABackup {
 
     // try to restore database
     try {
-      restore(db, backup, this, context);
+      restore(db, backup, soptions, this);
       return !closed || new Open(db).run(context) ?
         info(DB_RESTORED_X, backup, perf) : error(DB_NOT_RESTORED_X, db);
     } catch(final IOException ex) {
@@ -67,17 +68,17 @@ public class Restore extends ABackup {
    * Restores the specified database.
    * @param db name of database
    * @param backup name of backup
+   * @param sopts static options
    * @param cmd calling command instance
-   * @param context database context
-   * @throws IOException  I/O exception
+   * @throws IOException I/O exception
    */
-  public static void restore(final String db, final String backup, final Restore cmd,
-      final Context context) throws IOException {
+  public static void restore(final String db, final String backup, final StaticOptions sopts,
+      final Restore cmd) throws IOException {
 
     // drop target database
-    DropDB.drop(db, context);
+    DropDB.drop(db, sopts);
 
-    final IOFile dbpath = context.globalopts.dbpath();
+    final IOFile dbpath = sopts.dbpath();
     final Zip zip = new Zip(new IOFile(dbpath, backup + IO.ZIPSUFFIX));
     if(cmd != null) cmd.proc(zip);
     zip.unzip(dbpath);

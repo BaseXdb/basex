@@ -6,57 +6,48 @@ import static org.junit.Assert.*;
 import java.io.*;
 import java.util.concurrent.*;
 
+import org.basex.api.client.*;
 import org.basex.core.*;
+import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
-import org.basex.server.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
+import org.basex.util.options.*;
 import org.junit.*;
 
 /**
  * If this class is extended, tests will be run in a sandbox.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public abstract class SandboxTest {
+  /** Database port. */
+  protected static final int DB_PORT = 9996;
+  /** Event port. */
+  protected static final int EVENT_PORT = 9997;
+
   /** Default output stream. */
-  static final PrintStream OUT = System.out;
+  public static final PrintStream OUT = System.out;
   /** Default error stream. */
-  protected static final PrintStream ERR = System.err;
+  public static final PrintStream ERR = System.err;
   /** Null output stream. */
-  protected static final PrintStream NULL = new PrintStream(new NullOutput());
+  public static final PrintStream NULL = new PrintStream(new NullOutput());
   /** Test name. */
   protected static final String NAME = Util.className(SandboxTest.class);
   /** Database context. */
   protected static Context context;
-  /** Clean up files. */
-  protected static boolean cleanup;
 
   /**
    * Creates the sandbox.
    */
   @BeforeClass
-  public static void createContext() {
+  public static void initSandbox() {
     final IOFile sb = sandbox();
     sb.delete();
     assertTrue("Sandbox could not be created.", sb.md());
-    context = new Context();
-    initContext(context);
-    cleanup = true;
-  }
-
-  /**
-   * Initializes the specified context.
-   * @param ctx context
-   */
-  protected static void initContext(final Context ctx) {
-    final IOFile sb = sandbox();
-    ctx.globalopts.set(GlobalOptions.DBPATH, sb.path() + "/data");
-    ctx.globalopts.set(GlobalOptions.WEBPATH, sb.path() + "/webapp");
-    ctx.globalopts.set(GlobalOptions.RESTXQPATH, sb.path() + "/webapp");
-    ctx.globalopts.set(GlobalOptions.REPOPATH, sb.path() + "/repo");
+    context = newContext();
   }
 
   /**
@@ -64,9 +55,27 @@ public abstract class SandboxTest {
    */
   @AfterClass
   public static void closeContext() {
-    if(cleanup) {
-      context.close();
-      assertTrue("Sandbox could not be deleted.", sandbox().delete());
+    context.close();
+    assertTrue("Sandbox could not be deleted.", sandbox().delete());
+  }
+
+  /**
+   * Creates a new specified context.
+   * @return context
+   */
+  public static Context newContext() {
+    final IOFile sb = sandbox();
+    Options.setSystem(StaticOptions.DBPATH.name(), sb.path() + "/data");
+    Options.setSystem(StaticOptions.WEBPATH.name(), sb.path() + "/webapp");
+    Options.setSystem(StaticOptions.RESTXQPATH.name(), sb.path() + "/webapp");
+    Options.setSystem(StaticOptions.REPOPATH.name(), sb.path() + "/repo");
+    try {
+      return new Context();
+    } finally {
+      Options.setSystem(StaticOptions.DBPATH.name(), "");
+      Options.setSystem(StaticOptions.WEBPATH.name(), "");
+      Options.setSystem(StaticOptions.RESTXQPATH.name(), "");
+      Options.setSystem(StaticOptions.REPOPATH.name(), "");
     }
   }
 
@@ -76,13 +85,13 @@ public abstract class SandboxTest {
    * @return server instance
    * @throws IOException I/O exception
    */
-  protected static BaseXServer createServer(final String... args) throws IOException {
+  public static BaseXServer createServer(final String... args) throws IOException {
     try {
       System.setOut(NULL);
-      final StringList sl = new StringList().add("-z").add("-p9999").add("-e9998");
-      for(final String a : args) sl.add(a);
-      final BaseXServer server = new BaseXServer(sl.toArray());
-      server.context.globalopts.set(GlobalOptions.DBPATH, sandbox().path());
+      final StringList sl = new StringList("-z", "-p" + DB_PORT, "-e" + EVENT_PORT, "-q");
+      for(final String arg : args) sl.add(arg);
+      final BaseXServer server = new BaseXServer(sl.finish());
+      server.context.soptions.set(StaticOptions.DBPATH, sandbox().path());
       return server;
     } finally {
       System.setOut(OUT);
@@ -94,7 +103,7 @@ public abstract class SandboxTest {
    * @param server server
    * @throws IOException I/O exception
    */
-  protected static void stopServer(final BaseXServer server) throws IOException {
+  public static void stopServer(final BaseXServer server) throws IOException {
     try {
       System.setOut(NULL);
       if(server != null) server.stop();
@@ -109,18 +118,27 @@ public abstract class SandboxTest {
    * @return client instance
    * @throws IOException I/O exception
    */
-  protected static ClientSession createClient(final String... login) throws IOException {
-    final String user = login.length > 0 ? login[0] : S_ADMIN;
-    final String pass = login.length > 1 ? login[1] : S_ADMIN;
-    return new ClientSession(S_LOCALHOST, 9999, user, pass);
+  public static ClientSession createClient(final String... login) throws IOException {
+    final String user = login.length > 0 ? login[0] : UserText.ADMIN;
+    final String pass = login.length > 1 ? login[1] : UserText.ADMIN;
+    return new ClientSession(S_LOCALHOST, DB_PORT, user, pass);
   }
 
   /**
    * Returns the sandbox database path.
    * @return database path
    */
-  protected static IOFile sandbox() {
+  public static IOFile sandbox() {
     return new IOFile(Prop.TMP, NAME);
+  }
+
+  /**
+   * Normalizes newlines in a query result.
+   * @param result input string
+   * @return normalized string
+   */
+  public static String normNL(final Object result) {
+    return result.toString().replaceAll("(\r?\n|\r) *", "\n");
   }
 
   /** Client. */

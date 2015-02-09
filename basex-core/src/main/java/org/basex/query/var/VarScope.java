@@ -4,18 +4,18 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import org.basex.query.*;
-import org.basex.query.value.item.*;
-import org.basex.query.value.type.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
  * The scope of variables, either the query, a user-defined or an inline function.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
 public final class VarScope {
@@ -23,14 +23,14 @@ public final class VarScope {
   private final StaticContext sc;
 
   /** Local variables in this scope. */
-  private final ArrayList<Var> vars = new ArrayList<Var>();
+  private final ArrayList<Var> vars = new ArrayList<>();
 
   /**
    * Constructor for a top-level module.
-   * @param sctx static context
+   * @param sc static context
    */
-  public VarScope(final StaticContext sctx) {
-    sc = sctx;
+  public VarScope(final StaticContext sc) {
+    this.sc = sc;
   }
 
   /**
@@ -46,43 +46,43 @@ public final class VarScope {
 
   /**
    * Creates a new local variable in this scope.
-   * @param ctx query context
+   * @param qc query context
    * @param name variable name
    * @param typ type of the variable
    * @param param function parameter flag
    * @return the variable
    */
-  public Var newLocal(final QueryContext ctx, final QNm name, final SeqType typ,
+  public Var newLocal(final QueryContext qc, final QNm name, final SeqType typ,
       final boolean param) {
-    return add(new Var(ctx, sc, name, typ, param));
+    return add(new Var(qc, sc, name, typ, param));
   }
 
   /**
    * Creates a new copy of the given variable in this scope.
-   * @param ctx query context
+   * @param qc query context
    * @param var variable to copy
    * @return the variable
    */
-  public Var newCopyOf(final QueryContext ctx, final Var var) {
-    return add(new Var(ctx, sc, var));
+  public Var newCopyOf(final QueryContext qc, final Var var) {
+    return add(new Var(qc, sc, var));
   }
 
   /**
    * Enters this scope.
-   * @param ctx query context
+   * @param qc query context
    * @return old frame pointer
    */
-  public int enter(final QueryContext ctx) {
-    return ctx.stack.enterFrame(vars.size());
+  public int enter(final QueryContext qc) {
+    return qc.stack.enterFrame(vars.size());
   }
 
   /**
    * Exits this scope.
-   * @param ctx query context
+   * @param qc query context
    * @param fp frame pointer
    */
-  public void exit(final QueryContext ctx, final int fp) {
-    ctx.stack.exitFrame(fp);
+  public static void exit(final QueryContext qc, final int fp) {
+    qc.stack.exitFrame(fp);
   }
 
   /**
@@ -150,13 +150,13 @@ public final class VarScope {
 
   /**
    * Copies this VarScope.
-   * @param ctx query context
+   * @param qc query context
    * @param vs variable mapping
    * @return copied scope
    */
-  public VarScope copy(final QueryContext ctx, final IntObjMap<Var> vs) {
+  public VarScope copy(final QueryContext qc, final IntObjMap<Var> vs) {
     final VarScope cscp = new VarScope(sc);
-    for(final Var v : vars) vs.put(v.id, cscp.newCopyOf(ctx, v));
+    for(final Var v : vars) vs.put(v.id, cscp.newCopyOf(qc, v));
     return cscp;
   }
 }

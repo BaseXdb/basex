@@ -11,7 +11,7 @@ import org.junit.Test;
 /**
  * This class tests the stability of the database text store.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class StoreTest extends SandboxTest {
@@ -19,7 +19,7 @@ public final class StoreTest extends SandboxTest {
   private static final int NQUERIES = 100;
 
   /**
-   * Initializes the test.
+   * Initializes the tests.
    * @throws Exception exception
    */
   @BeforeClass
@@ -31,19 +31,6 @@ public final class StoreTest extends SandboxTest {
   }
 
   /**
-   * Finishes the test.
-   * @throws BaseXException database exception
-   */
-  @AfterClass
-  public static void finish() throws BaseXException {
-    run(new DropDB(NAME));
-    run(new Set(MainOptions.TEXTINDEX, true));
-    run(new Set(MainOptions.ATTRINDEX, true));
-    run(new Set(MainOptions.AUTOFLUSH, true));
-    run(new Set(MainOptions.UPDINDEX, false));
-  }
-
-  /**
    * Replaces text nodes with random double values.
    * @throws BaseXException database exception
    */
@@ -52,11 +39,7 @@ public final class StoreTest extends SandboxTest {
     run(new CreateDB(NAME, "<X><A>q</A><A>q</A></X>"));
     final long size = context.data().meta.dbfile(DataText.DATATXT).length();
     for(int n = 0; n < NQUERIES; n++) {
-      final String qu =
-          "for $a in //text() " +
-          "let $d := random:double() " +
-          "return replace node $a with $d";
-      run(new XQuery(qu));
+      run(new XQuery("for $a in //text() return replace node $a with random:double()"));
     }
     check(size);
   }
@@ -98,22 +81,30 @@ public final class StoreTest extends SandboxTest {
   }
 
   /**
-   * Tests the {@link MainOptions#UPDINDEX} and {@link MainOptions#AUTOFLUSH} flags in
-   * combination. Reaction on a bug (incremental value index was not correctly closed)
+   * Tests the {@link MainOptions#UPDINDEX} and {@link MainOptions#AUTOFLUSH} flags in combination.
+   * Reaction on a bug (incremental value index was not correctly closed)
    * @throws BaseXException database exception
    */
   @Test
   public void updIndexFlush() throws BaseXException {
-    run(new Set(MainOptions.TEXTINDEX, true));
-    run(new Set(MainOptions.AUTOFLUSH, false));
-    run(new Set(MainOptions.UPDINDEX, true));
-    run(new CreateDB(NAME));
-    final String input = "<a>0</a>";
-    run(new Add("a.xml", input));
-    final String query = "doc('" + NAME + "')//*[text()='0']";
-    assertEquals(input, run(new XQuery(query)));
-    run(new Close());
-    assertEquals(input, run(new XQuery(query)));
+    try {
+      for(int a = 0; a < 1; a++) {
+        for(int b = 0; b < 1; b++) {
+          run(new Set(MainOptions.TEXTINDEX, a == 0));
+          run(new Set(MainOptions.UPDINDEX, b == 0));
+          run(new CreateDB(NAME));
+          final String input = "<a>0</a>";
+          run(new Add("a.xml", input));
+          final String query = "doc('" + NAME + "')//*[text()='0']";
+          assertEquals(input, run(new XQuery(query)));
+          run(new Close());
+          assertEquals(input, run(new XQuery(query)));
+        }
+      }
+    } finally {
+      run(new Set(MainOptions.TEXTINDEX, false));
+      run(new Set(MainOptions.UPDINDEX, false));
+    }
   }
 
   /**

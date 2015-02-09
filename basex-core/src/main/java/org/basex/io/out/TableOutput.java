@@ -8,7 +8,7 @@ import org.basex.io.*;
 /**
  * This class allows a blockwise output of the database table.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  * @author Tim Petrowsky
  */
@@ -64,13 +64,10 @@ public final class TableOutput extends OutputStream {
     os.close();
 
     // create table info file
-    final DataOutput out = new DataOutput(meta.dbfile(file + 'i'));
-    try {
+    try(final DataOutput out = new DataOutput(meta.dbfile(file + 'i'))) {
       out.writeNum(pages);
       // max value indicates that regular page table is not stored on disk
       out.writeNum(empty ? 0 : Integer.MAX_VALUE);
-    } finally {
-      out.close();
     }
   }
 }

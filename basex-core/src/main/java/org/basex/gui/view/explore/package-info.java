@@ -1,6 +1,6 @@
 /**
  * <body>
- * GUI Explorer View
+ * GUI Explorer View.
  * </body>
  */
 package org.basex.gui.view.explore;

@@ -17,7 +17,7 @@ import org.basex.util.list.*;
 /**
  * This class remembers descriptive query information sent back to the client.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class QueryInfo {
@@ -36,9 +36,9 @@ public final class QueryInfo {
   public long evaluating;
   /** Serialization time. */
   public long serializing;
-  /** Query. */
-  public String query;
 
+  /** Query. */
+  String query;
   /** Runtime flag. */
   boolean runtime;
   /** Compilation info. */
@@ -74,7 +74,7 @@ public final class QueryInfo {
    * Adds some evaluation info.
    * @param string evaluation info
    */
-  public void evalInfo(final String string) {
+  void evalInfo(final String string) {
     if(verbose) evaluate.add(token(string.replaceAll("\r?\n\\s*", " ")));
   }
 
@@ -89,12 +89,12 @@ public final class QueryInfo {
   public String toString(final QueryProcessor qp, final long printed, final long hits,
       final boolean detailed) {
 
-    final int runs = Math.max(1, qp.ctx.context.options.get(MainOptions.RUNS));
+    final int runs = Math.max(1, qp.qc.context.options.get(MainOptions.RUNS));
     final TokenBuilder tb = new TokenBuilder();
     final long total = parsing + compiling + evaluating + serializing;
     if(detailed) {
       final int up = qp.updates();
-      tb.add(toString(qp.ctx)).add(NL);
+      tb.add(toString(qp.qc)).add(NL);
       tb.add(PARSING_CC).add(Performance.getTime(parsing, runs)).add(NL);
       tb.add(COMPILING_CC).add(Performance.getTime(compiling, runs)).add(NL);
       tb.add(EVALUATING_CC).add(Performance.getTime(evaluating, runs)).add(NL);
@@ -124,7 +124,7 @@ public final class QueryInfo {
    * @param qc query context
    * @return string
    */
-  public String toString(final QueryContext qc) {
+  String toString(final QueryContext qc) {
     final TokenBuilder tb = new TokenBuilder();
     if(query != null) {
       final String qu = QueryProcessor.removeComments(query, Integer.MAX_VALUE);
@@ -148,8 +148,8 @@ public final class QueryInfo {
    * @param mod module to start from
    * @return the string representation
    */
-  private String usedDecls(final MainModule mod) {
-    final IdentityHashMap<Scope, Object> map = new IdentityHashMap<Scope, Object>();
+  private static String usedDecls(final MainModule mod) {
+    final IdentityHashMap<Scope, Object> map = new IdentityHashMap<>();
     final StringBuilder sb = new StringBuilder();
     mod.visit(new ASTVisitor() {
       @Override

@@ -1,33 +1,35 @@
 package org.basex.http.webdav;
 
-import static org.basex.http.webdav.impl.Utils.*;
 import static com.bradmcevoy.http.LockResult.*;
+import static org.basex.http.webdav.impl.Utils.*;
+
 import java.io.*;
 import java.util.*;
 
-import org.basex.http.webdav.impl.ResourceMetaData;
-import org.basex.http.webdav.impl.WebDAVService;
-import org.basex.server.LoginException;
+import com.bradmcevoy.http.LockInfo.LockDepth;
+import com.bradmcevoy.http.LockInfo.LockScope;
+import com.bradmcevoy.http.LockInfo.LockType;
+import com.bradmcevoy.http.Request.Method;
+
+import org.basex.core.StaticOptions.AuthMethod;
+import org.basex.http.*;
+import org.basex.http.webdav.impl.*;
 import org.basex.util.*;
+import org.xml.sax.*;
+import org.xml.sax.helpers.*;
 
 import com.bradmcevoy.http.*;
 import com.bradmcevoy.http.exceptions.*;
-import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.DefaultHandler;
-import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
  * WebDAV resource representing an abstract folder within a collection database.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
-public abstract class BXAbstractResource implements CopyableResource, DeletableResource,
-    MoveableResource, LockableResource {
+abstract class BXAbstractResource implements CopyableResource, DeletableResource, MoveableResource,
+  LockableResource {
 
   /** Resource meta data. */
   final ResourceMetaData meta;
@@ -36,12 +38,12 @@ public abstract class BXAbstractResource implements CopyableResource, DeletableR
 
   /**
    * Constructor.
-   * @param m resource meta data
-   * @param s service
+   * @param meta resource meta data
+   * @param service service
    */
-  BXAbstractResource(final ResourceMetaData m, final WebDAVService<BXAbstractResource> s) {
-    meta = m;
-    service = s;
+  BXAbstractResource(final ResourceMetaData meta, final WebDAVService<BXAbstractResource> service) {
+    this.meta = meta;
+    this.service = service;
   }
 
   @Override
@@ -49,7 +51,7 @@ public abstract class BXAbstractResource implements CopyableResource, DeletableR
     if(user == null) return null;
     return new BXCode<Object>(this) {
       @Override
-      public String get() throws LoginException {
+      public String get() throws IOException {
         service.authenticate(user, pass);
         return user;
       }
@@ -57,8 +59,13 @@ public abstract class BXAbstractResource implements CopyableResource, DeletableR
   }
 
   @Override
-  public boolean authorise(final Request request, final Request.Method method, final Auth auth) {
-    return auth != null && auth.getTag() != null && WebDAVService.authorize(meta.db);
+  public boolean authorise(final Request request, final Method method, final Auth auth) {
+    // use WebDAV authorization if no default user exists or if digest authentication is specified
+    final HTTPContext http = service.http;
+    if(http.username.isEmpty() || http.auth == AuthMethod.DIGEST) {
+      if(auth == null || auth.getTag() == null) return false;
+    }
+    return WebDAVService.authorize(meta.db);
   }
 
   @Override
@@ -182,7 +189,7 @@ public abstract class BXAbstractResource implements CopyableResource, DeletableR
 
   /**
    * Get the active lock for the current resource.
-   * @return - the current lock, if the resource is locked, or null
+   * @return - the current lock if the resource is locked, or null
    */
   @Override
   public LockToken getCurrentLock() {
@@ -346,11 +353,11 @@ public abstract class BXAbstractResource implements CopyableResource, DeletableR
       if("token".equals(elementName))
         lockToken.tokenId = v;
       else if("scope".equals(elementName))
-        lockToken.info.scope = LockInfo.LockScope.valueOf(v.toUpperCase(Locale.ENGLISH));
+        lockToken.info.scope = LockScope.valueOf(v.toUpperCase(Locale.ENGLISH));
       else if("type".equals(elementName))
-        lockToken.info.type = LockInfo.LockType.valueOf(v.toUpperCase(Locale.ENGLISH));
+        lockToken.info.type = LockType.valueOf(v.toUpperCase(Locale.ENGLISH));
       else if("depth".equals(elementName))
-        lockToken.info.depth = LockInfo.LockDepth.valueOf(v.toUpperCase(Locale.ENGLISH));
+        lockToken.info.depth = LockDepth.valueOf(v.toUpperCase(Locale.ENGLISH));
       else if("owner".equals(elementName))
         lockToken.info.lockedByUser = v;
       else if("timeout".equals(elementName))

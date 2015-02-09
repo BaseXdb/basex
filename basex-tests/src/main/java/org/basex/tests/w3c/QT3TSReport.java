@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * QT3TS Report builder.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class QT3TSReport {
@@ -55,7 +55,7 @@ public final class QT3TSReport {
   private static final String URI = "http://www.w3.org/2012/08/qt-fots-results";
   /** List of test sets and test cases (test sets only consist of a name; test cases
    * consist of a name and a result (pass/fail). */
-  private final ArrayList<String[]> tests = new ArrayList<String[]>();
+  private final ArrayList<String[]> tests = new ArrayList<>();
 
   /**
    * Adds the name of a test set.
@@ -139,7 +139,7 @@ public final class QT3TSReport {
    * @param name name of element
    * @return element node
    */
-  private FElem element(final String name) {
+  private static FElem element(final String name) {
     return new FElem(name, URI).declareNS();
   }
 
@@ -149,7 +149,7 @@ public final class QT3TSReport {
    * @param parent parent node
    * @return element node
    */
-  private FElem element(final String name, final FElem parent) {
+  private static FElem element(final String name, final FElem parent) {
     final FElem elem = new FElem(name, URI);
     parent.add(elem);
     return elem;

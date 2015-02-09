@@ -14,7 +14,7 @@ import org.basex.util.hash.*;
 /**
  * Node comparison.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class CmpN extends Cmp {
@@ -23,24 +23,24 @@ public final class CmpN extends Cmp {
     /** Node comparison: same. */
     EQ("is") {
       @Override
-      public boolean eval(final ANode a, final ANode b) {
-        return a.is(b);
+      public boolean eval(final ANode it1, final ANode it2) {
+        return it1.is(it2);
       }
     },
 
     /** Node comparison: before. */
     ET("<<") {
       @Override
-      public boolean eval(final ANode a, final ANode b) {
-        return a.diff(b) < 0;
+      public boolean eval(final ANode it1, final ANode it2) {
+        return it1.diff(it2) < 0;
       }
     },
 
     /** Node comparison: after. */
     GT(">>") {
       @Override
-      public boolean eval(final ANode a, final ANode b) {
-        return a.diff(b) > 0;
+      public boolean eval(final ANode it1, final ANode it2) {
+        return it1.diff(it2) > 0;
       }
     };
 
@@ -51,19 +51,19 @@ public final class CmpN extends Cmp {
 
     /**
      * Constructor.
-     * @param n string representation
+     * @param name string representation
      */
-    OpN(final String n) {
-      name = n;
+    OpN(final String name) {
+      this.name = name;
     }
 
     /**
      * Evaluates the expression.
-     * @param a first node
-     * @param b second node
+     * @param it1 first node
+     * @param it2 second node
      * @return result
      */
-    public abstract boolean eval(ANode a, ANode b);
+    public abstract boolean eval(ANode it1, ANode it2);
 
     @Override
     public String toString() {
@@ -76,38 +76,37 @@ public final class CmpN extends Cmp {
 
   /**
    * Constructor.
-   * @param e1 first expression
-   * @param e2 second expression
-   * @param o comparator
-   * @param ii input info
+   * @param expr1 first expression
+   * @param expr2 second expression
+   * @param op comparator
+   * @param info input info
    */
-  public CmpN(final Expr e1, final Expr e2, final OpN o, final InputInfo ii) {
-    super(ii, e1, e2, null);
-    op = o;
-    type = SeqType.BLN_ZO;
+  public CmpN(final Expr expr1, final Expr expr2, final OpN op, final InputInfo info) {
+    super(info, expr1, expr2, null);
+    this.op = op;
+    seqType = SeqType.BLN_ZO;
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    super.compile(ctx, scp);
-    return optimize(ctx, scp);
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    super.compile(qc, scp);
+    return optimize(qc, scp);
   }
 
   @Override
-  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
-    type = SeqType.get(AtomType.BLN, expr[0].size() == 1 && expr[1].size() == 1 ?
-        Occ.ONE : Occ.ZERO_ONE);
-
-    return optPre(oneIsEmpty() ? null : allAreValues() ? item(ctx, info) : this, ctx);
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+    seqType = SeqType.get(AtomType.BLN,
+        exprs[0].size() == 1 && exprs[1].size() == 1 ? Occ.ONE : Occ.ZERO_ONE);
+    return optPre(oneIsEmpty() ? null : allAreValues() ? item(qc, info) : this, qc);
   }
 
   @Override
-  public Bln item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final Item a = expr[0].item(ctx, info);
-    if(a == null) return null;
-    final Item b = expr[1].item(ctx, info);
-    if(b == null) return null;
-    return Bln.get(op.eval(checkNode(a), checkNode(b)));
+  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final ANode n1 = toEmptyNode(exprs[0], qc);
+    if(n1 == null) return null;
+    final ANode n2 = toEmptyNode(exprs[1], qc);
+    if(n2 == null) return null;
+    return Bln.get(op.eval(n1, n2));
   }
 
   @Override
@@ -116,13 +115,13 @@ public final class CmpN extends Cmp {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new CmpN(expr[0].copy(ctx, scp, vs), expr[1].copy(ctx, scp, vs), op, info);
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new CmpN(exprs[0].copy(qc, scp, vs), exprs[1].copy(qc, scp, vs), op, info);
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(OP, op.name), expr);
+    addPlan(plan, planElem(OP, op.name), exprs);
   }
 
   @Override

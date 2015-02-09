@@ -10,8 +10,9 @@ import java.lang.annotation.*;
  * <p>If a class extends the {@link QueryModule} class, it inherits the {@link #queryContext}
  * and {@link #staticContext} variables, which provide access to all properties of the
  * current query. E.g., they provide access to the current {@link QueryContext#value
- * context item} or the {@link StaticContext#ns declared namespaces} of a query.
- * Next, the following default properties of functions can be changed via annotations:</p>
+ * context value} or the {@link StaticContext#ns declared namespaces} of a query.</p>
+ *
+ * <p>The default properties of functions can be overwritten via annotations:</p>
  * <ul>
  *   <li>Java functions can only be executed by users with {@code ADMIN} permissions.
  *       You may annotate a function with {@link Requires}({@link Permission}) to
@@ -24,9 +25,13 @@ import java.lang.annotation.*;
  *       the specified {@link #queryContext}, it should be annotated as
  *       {@link ContextDependent}.</li>
  *   <li>Java code is treated as "focus-independent". If a function accesses
- *       the current context item, position or size, it should be annotated as
+ *       the current context value, position or size, it should be annotated as
  *       {@link FocusDependent}.</li>
  * </ul>
+ *
+ * If the {@link QueryResource} is implemented, its {@link QueryResource#close()} method will be
+ * called after the query has been evaluated. It should always be implemented if a module opens
+ * connections, resources, etc. that eventually need to be closed.
  *
  * <p>Please visit our documentation to find more details on
  * <a href="http://docs.basex.org/wiki/Packaging">Packaging</a>,
@@ -36,7 +41,7 @@ import java.lang.annotation.*;
  * <a href="http://www.w3.org/TR/xpath-functions-30/#properties-of-functions">function
  * properties</a>.</p>
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public abstract class QueryModule {
@@ -44,16 +49,16 @@ public abstract class QueryModule {
    * Permission required to call a function.
    */
   public enum Permission {
-    /** Admin permissions. */
-    ADMIN,
-    /** Create permissions. */
-    CREATE,
-    /** Write permissions. */
-    WRITE,
+    /** No permissions. */
+    NONE,
     /** Read permissions. */
     READ,
-    /** No permissions. */
-    NONE
+    /** Write permissions. */
+    WRITE,
+    /** Create permissions. */
+    CREATE,
+    /** Admin permissions. */
+    ADMIN
   }
 
   /**
@@ -90,7 +95,7 @@ public abstract class QueryModule {
 
   /**
    * Java code is treated as "focus-independent". If a function accesses the current
-   * context item, position or size, it should be annotated as {@link FocusDependent}.
+   * context value, position or size, it should be annotated as {@link FocusDependent}.
    */
   @Retention(RetentionPolicy.RUNTIME)
   @Target(ElementType.METHOD)

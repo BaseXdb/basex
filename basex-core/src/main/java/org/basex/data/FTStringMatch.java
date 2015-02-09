@@ -3,7 +3,7 @@ package org.basex.data;
 /**
  * Single full-text string match.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class FTStringMatch implements Comparable<FTStringMatch> {
@@ -20,14 +20,14 @@ public final class FTStringMatch implements Comparable<FTStringMatch> {
 
   /**
    * Constructor.
-   * @param st start position
-   * @param en end position
-   * @param qp query pos
+   * @param start start position
+   * @param end end position
+   * @param pos query pos
    */
-  FTStringMatch(final int st, final int en, final int qp) {
-    start = st;
-    end = en;
-    pos = qp;
+  FTStringMatch(final int start, final int end, final int pos) {
+    this.start = start;
+    this.end = end;
+    this.pos = pos;
   }
 
   /**
@@ -40,9 +40,9 @@ public final class FTStringMatch implements Comparable<FTStringMatch> {
   }
 
   @Override
-  public boolean equals(final Object o) {
-    if(!(o instanceof FTStringMatch)) return false;
-    final FTStringMatch sm = (FTStringMatch) o;
+  public boolean equals(final Object ftm) {
+    if(!(ftm instanceof FTStringMatch)) return false;
+    final FTStringMatch sm = (FTStringMatch) ftm;
     return start == sm.start && end == sm.end;
   }
 

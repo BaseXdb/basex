@@ -1,6 +1,5 @@
 package org.basex.http.restxq;
 
-import static org.basex.core.Text.*;
 import static org.junit.Assert.*;
 
 import java.io.*;
@@ -14,12 +13,10 @@ import org.junit.*;
 /**
  * This class contains RESTXQ tests.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public abstract class RestXqTest extends HTTPTest {
-  /** Root path. */
-  private static final String ROOT = "http://" + S_LOCALHOST + ":9998/";
   /** Query header. */
   private static final String HEADER =
     "module  namespace m = 'http://basex.org/modules/restxq/test';" + Prop.NL +
@@ -33,7 +30,7 @@ public abstract class RestXqTest extends HTTPTest {
    */
   @BeforeClass
   public static void start() throws Exception {
-    init(ROOT, true);
+    init(RESTXQ_ROOT, true);
   }
 
   /**
@@ -71,7 +68,7 @@ public abstract class RestXqTest extends HTTPTest {
    */
   protected static void install(final String function) throws IOException {
     // delete old module
-    final String path = context.globalopts.get(GlobalOptions.WEBPATH);
+    final String path = context.soptions.get(StaticOptions.WEBPATH);
     for(final IOFile f : new IOFile(path).children()) assertTrue(f.delete());
     // create new module
     module().write(new TokenBuilder(HEADER).add(function).finish());
@@ -82,7 +79,7 @@ public abstract class RestXqTest extends HTTPTest {
    * @return test module
    */
   private static IOFile module() {
-    final String path = context.globalopts.get(GlobalOptions.WEBPATH);
+    final String path = context.soptions.get(StaticOptions.WEBPATH);
     return new IOFile(path, NAME + count++ + IO.XQMSUFFIX);
   }
 }

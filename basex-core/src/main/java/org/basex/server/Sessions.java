@@ -10,7 +10,7 @@ import org.basex.util.list.*;
 /**
  * This class organizes all currently opened database sessions.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class Sessions extends CopyOnWriteArrayList<ClientListener> {
@@ -24,9 +24,9 @@ public final class Sessions extends CopyOnWriteArrayList<ClientListener> {
 
     final StringList sl = new StringList();
     for(final ClientListener sp : this) {
-      sl.add(sp.context().user.name + ' ' + sp);
+      sl.add(sp.context().user().name() + ' ' + sp);
     }
-    for(final String sp : sl.sort(true)) tb.add(NL).add(LI).add(sp);
+    for(final String sp : sl.sort()) tb.add(NL).add(LI).add(sp);
     return tb.toString();
   }
 }

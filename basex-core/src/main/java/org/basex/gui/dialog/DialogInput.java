@@ -14,10 +14,10 @@ import org.basex.util.list.*;
 /**
  * Dialog with a single text field.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public final class DialogInput extends BaseXDialog {
+final class DialogInput extends BaseXDialog {
   /** User input. */
   private final BaseXTextField input;
   /** Old input. */
@@ -33,29 +33,29 @@ public final class DialogInput extends BaseXDialog {
 
   /**
    * Default constructor.
-   * @param o old input
-   * @param tit title string
-   * @param d dialog window
-   * @param t type of dialog: 0 = rename database, 1 = drop documents, 2 = copy database
+   * @param old old input
+   * @param title title string
+   * @param dialog dialog window
+   * @param type type of dialog: 0 = rename database, 1 = drop documents, 2 = copy database
    */
-  public DialogInput(final String o, final String tit, final BaseXDialog d, final int t) {
-    super(d, tit);
-    old = o;
-    db = d.gui.context.databases.listDBs();
-    type = t;
+  DialogInput(final String old, final String title, final BaseXDialog dialog, final int type) {
+    super(dialog, title);
+    this.old = old;
+    this.type = type;
+    db = dialog.gui.context.databases.listDBs();
 
-    String title = "";
+    String t = "";
     if(type == 0) {
-      title = TARGET_PATH + COLS;
+      t = TARGET_PATH + COLS;
     } else if(type == 1) {
-      title = NAME_OF_DB + COLS;
+      t = NAME_OF_DB + COLS;
     } else if(type == 2) {
-      title = NAME_OF_DB_COPY + COLS;
+      t = NAME_OF_DB_COPY + COLS;
     }
 
-    set(new BaseXLabel(title, false, true).border(0, 0, 6, 0), BorderLayout.NORTH);
+    set(new BaseXLabel(t, false, true).border(0, 0, 6, 0), BorderLayout.NORTH);
 
-    input = new BaseXTextField(o, this);
+    input = new BaseXTextField(old, this);
     info = new BaseXLabel(" ");
 
     final BaseXBack p = new BaseXBack(new BorderLayout(0, 8));
@@ -73,7 +73,7 @@ public final class DialogInput extends BaseXDialog {
    * Returns the user input.
    * @return input
    */
-  public String input() {
+  String input() {
     return input.getText().trim();
   }
 

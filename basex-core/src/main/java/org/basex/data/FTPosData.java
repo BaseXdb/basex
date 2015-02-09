@@ -10,7 +10,7 @@ import org.basex.util.list.*;
  * This class provides a container for query full-text positions,
  * which is evaluated by the visualizations.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  * @author Sebastian Gath
  */
@@ -18,25 +18,25 @@ public final class FTPosData {
   /** Position references. */
   private FTPos[] pos = new FTPos[1];
   /** Data reference. */
-  private Data data;
+  private Data dt;
   /** Number of values. */
   private int size;
 
   /**
    * Adds position data.
    *
-   * @param d data reference
+   * @param data data reference
    * @param pre pre value
    * @param all full-text matches
    */
-  public void add(final Data d, final int pre, final FTMatches all) {
-    if(data == null) data = d;
-    else if(data != d) return;
+  public void add(final Data data, final int pre, final FTMatches all) {
+    if(dt == null) dt = data;
+    else if(dt != data) return;
 
     // cache all positions
     final IntSet set = new IntSet();
-    for(final FTMatch m : all) {
-      for(final FTStringMatch sm : m) {
+    for(final FTMatch ftm : all) {
+      for(final FTStringMatch sm : ftm) {
         for(int s = sm.start; s <= sm.end; ++s) set.add(s);
       }
     }
@@ -59,13 +59,13 @@ public final class FTPosData {
    * If no data is stored for a pre value, {@code null} is returned.
    * int[0] : [pos0, ..., posn]
    * int[1] : [poi0, ..., poin]
-   * @param d data reference
-   * @param p int pre value
+   * @param data data reference
+   * @param pre int pre value
    * @return int[2][n] full-text data or {@code null}
    */
-  public FTPos get(final Data d, final int p) {
-    final int i = find(p);
-    return i < 0 || data != d ? null : pos[i];
+  public FTPos get(final Data data, final int pre) {
+    final int p = find(pre);
+    return p < 0 || dt != data ? null : pos[p];
   }
 
   /**
@@ -78,49 +78,33 @@ public final class FTPosData {
     return c;
   }
 
-  /**
-   * Compares full-text data for equality.
-   * @param ft reference to compare to
-   * @return boolean same()
-   */
-  boolean sameAs(final FTPosData ft) {
+  @Override
+  public boolean equals(final Object obj) {
+    if(!(obj instanceof FTPosData)) return false;
+    final FTPosData ft = (FTPosData) obj;
     if(size != ft.size) return false;
     for(int i = 0; i < size; ++i) {
       if(pos[i].pre != ft.pos[i].pre || !Arrays.equals(
-          pos[i].pos.toArray(), ft.pos[i].pos.toArray())) return false;
+          pos[i].list.toArray(), ft.pos[i].list.toArray())) return false;
     }
     return true;
   }
 
   /**
    * Returns the index of the specified pre value.
-   * @param p int pre value
+   * @param pre int pre value
    * @return index, or negative index - 1 if pre value is not found
    */
-  private int find(final int p) {
+  private int find(final int pre) {
     // binary search
     int l = 0, h = size - 1;
     while(l <= h) {
       final int m = l + h >>> 1;
-      final int c = pos[m].pre - p;
+      final int c = pos[m].pre - pre;
       if(c == 0) return m;
       if(c < 0) l = m + 1;
       else h = m - 1;
     }
     return -l - 1;
-  }
-
-  /**
-   * Creates a copy.
-   * @return copy
-   */
-  public FTPosData copy() {
-    final FTPosData ftpos = new FTPosData();
-    ftpos.data = data;
-    ftpos.size = size;
-    ftpos.pos = pos.clone();
-    for(int i = 0; i < ftpos.pos.length; i++)
-      if(ftpos.pos[i] != null) ftpos.pos[i] = ftpos.pos[i].copy();
-    return ftpos;
   }
 }

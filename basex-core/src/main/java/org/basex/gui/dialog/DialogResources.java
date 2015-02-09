@@ -21,10 +21,10 @@ import org.basex.gui.layout.TreeNode;
  * content including raw files and documents. The search field allows to
  * quickly access specific files/documents.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Lukas Kircher
  */
-public final class DialogResources extends BaseXBack {
+final class DialogResources extends BaseXBack {
   /** Search text field. */
   private final BaseXTextField filterText;
   /** Database/root node. */
@@ -54,6 +54,7 @@ public final class DialogResources extends BaseXBack {
     tree = new BaseXTree(rootNode, dp).border(4, 4, 4, 4);
     tree.setRootVisible(false);
     tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+    tree.setRowHeight(getFontMetrics(getFont()).getHeight());
 
     tree.setCellRenderer(new TreeNodeRenderer());
     tree.addTreeSelectionListener(new TreeSelectionListener() {
@@ -228,7 +229,7 @@ public final class DialogResources extends BaseXBack {
 
   /**
    * Custom tree cell renderer to distinguish between raw and xml leaf nodes.
-   * @author BaseX Team 2005-14, BSD License
+   * @author BaseX Team 2005-15, BSD License
    * @author Lukas Kircher
    */
   private static final class TreeNodeRenderer extends DefaultTreeCellRenderer {
@@ -244,7 +245,7 @@ public final class DialogResources extends BaseXBack {
   }
 
   /** Delete command. */
-  final class DeleteCmd extends GUIPopupCmd {
+  private final class DeleteCmd extends GUIPopupCmd {
     /** Constructor. */
     DeleteCmd() { super(DELETE + DOTS, BaseXKeys.DELNEXT); }
 
@@ -270,7 +271,7 @@ public final class DialogResources extends BaseXBack {
   }
 
   /** Rename command. */
-  final class RenameCmd extends GUIPopupCmd {
+  private final class RenameCmd extends GUIPopupCmd {
     /** Constructor. */
     RenameCmd() { super(RENAME + DOTS, BaseXKeys.RENAME); }
 

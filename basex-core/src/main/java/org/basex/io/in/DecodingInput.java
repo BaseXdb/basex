@@ -10,7 +10,7 @@ import java.io.*;
  * <li> {@code 0xFF} is treated as encoding flag and skipped</li>
  * </ul>
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class DecodingInput extends InputStream {
@@ -21,10 +21,10 @@ public final class DecodingInput extends InputStream {
 
   /**
    * Constructor.
-   * @param in buffer input to be wrapped
+   * @param input buffer input to be wrapped
    */
-  public DecodingInput(final InputStream in) {
-    input = in;
+  public DecodingInput(final InputStream input) {
+    this.input = input;
   }
 
   @Override

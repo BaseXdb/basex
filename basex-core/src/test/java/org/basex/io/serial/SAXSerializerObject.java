@@ -1,14 +1,11 @@
 package org.basex.io.serial;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.*;
 
 /**
  * Class for testing the (un)marshalling and serialization of objects.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Michael Hedenus
  */
 @XmlRootElement(name = "domain-object")
@@ -16,8 +13,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 class SAXSerializerObject {
   /** Name of the object. */
   @XmlAttribute
-  private
-  String name;
+  private String name;
   /** Value. */
   private long value;
 
@@ -29,12 +25,12 @@ class SAXSerializerObject {
 
   /**
    * Empty constructor, specifying initial values.
-   * @param nm name
-   * @param val value
+   * @param name name
+   * @param value value
    */
-  public SAXSerializerObject(final String nm, final long val) {
-    name = nm;
-    value = val;
+  public SAXSerializerObject(final String name, final long value) {
+    this.name = name;
+    this.value = value;
   }
 
   /**

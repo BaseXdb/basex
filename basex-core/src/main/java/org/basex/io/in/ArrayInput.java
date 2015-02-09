@@ -5,7 +5,7 @@ import org.basex.util.*;
 /**
  * This class allows reading from a cached byte array.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class ArrayInput extends BufferInput {
@@ -27,6 +27,6 @@ public final class ArrayInput extends BufferInput {
 
   @Override
   protected int readByte() {
-    return bpos < bsize ? buffer[bpos++] & 0xFF : -1;
+    return bpos < bsize ? array[bpos++] & 0xFF : -1;
   }
 }

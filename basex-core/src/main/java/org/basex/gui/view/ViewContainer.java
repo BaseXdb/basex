@@ -7,7 +7,6 @@ import java.awt.*;
 import java.util.*;
 
 import org.basex.gui.*;
-import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.*;
 import org.basex.util.*;
 
@@ -15,7 +14,7 @@ import org.basex.util.*;
  * This class manages all visible and invisible views and allows drag and
  * drop operations inside the panel.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class ViewContainer extends BaseXBack {
@@ -31,7 +30,7 @@ public final class ViewContainer extends BaseXBack {
   }
 
   /** Reference to main window. */
-  private final AGUI gui;
+  private final GUI gui;
   /** View Layout. */
   private ViewAlignment layout;
   /** Current layout string. */
@@ -56,13 +55,15 @@ public final class ViewContainer extends BaseXBack {
    * @param main reference to the main window
    * @param v view panels
    */
-  public ViewContainer(final AGUI main, final View... v) {
-    layout(new BorderLayout()).mode(Fill.PLAIN);
-    logo = BaseXImages.get("logo");
-    setBackground(Color.white);
+  public ViewContainer(final GUI main, final View... v) {
+    layout(new BorderLayout());
+    setOpaque(true);
+    logo = BaseXImages.get("logo_transparent");
+    setBackground(BACK);
 
-    views = new ViewPanel[v.length];
-    for(int i = 0; i < v.length; ++i) views[i] = new ViewPanel(v[i]);
+    final int vl = v.length;
+    views = new ViewPanel[vl];
+    for(int i = 0; i < vl; ++i) views[i] = new ViewPanel(v[i]);
     gui = main;
     // build layout or use default if something goes wrong
     if(!buildLayout(gui.gopts.get(GUIOptions.VIEWS)) && !buildLayout(VIEWS)) {
@@ -98,11 +99,6 @@ public final class ViewContainer extends BaseXBack {
     final int w = getWidth();
     final int h = getHeight();
     final int hh = Math.max(220, Math.min(700, h));
-    final Insets i = getInsets();
-
-    if(gui.gopts.get(GUIOptions.GRADIENT)) {
-      BaseXLayout.fill(g, Color.white, color1, i.left, i.top, w - i.right, h - i.bottom);
-    }
     if(w < 150 || h < 160) return;
 
     final int lh = logo.getHeight(this);
@@ -110,7 +106,7 @@ public final class ViewContainer extends BaseXBack {
     g.drawImage(logo, (w - logo.getWidth(this)) / 2, y, this);
     if(w < 200 || h < 200) return;
 
-    g.setColor(DGRAY);
+    g.setColor(dgray);
     g.setFont(lfont);
     BaseXLayout.drawCenter(g, VERSINFO + ' ' + Prop.VERSION, w, y + 20 + lh);
   }
@@ -349,7 +345,7 @@ public final class ViewContainer extends BaseXBack {
       int nv = 0;
       while(st.hasMoreTokens()) {
         final String t = st.nextToken();
-        if(Token.eq(t, "H", "V")) {
+        if(Strings.eq(t, "H", "V")) {
           l[lvl + 1] = new ViewAlignment("H".equals(t));
           if(layout == null) {
             layout = l[0];

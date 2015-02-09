@@ -10,7 +10,6 @@ import java.net.*;
 import javax.swing.*;
 
 import org.basex.gui.*;
-import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.dialog.*;
 import org.basex.util.*;
@@ -18,14 +17,14 @@ import org.basex.util.*;
 /**
  * This superclass in inherited by all dialog windows.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public abstract class BaseXDialog extends JDialog {
-  /** Used mnemonics. */
-  public final StringBuilder mnem = new StringBuilder();
   /** Reference to main window. */
   public GUI gui;
+  /** Used mnemonics. */
+  final StringBuilder mnem = new StringBuilder();
   /** Remembers if the window was correctly closed. */
   protected boolean ok;
   /** Reference to the root panel. */
@@ -45,12 +44,12 @@ public abstract class BaseXDialog extends JDialog {
 
   /**
    * Constructor, called from a dialog window.
-   * @param d calling dialog
+   * @param dialog calling dialog
    * @param title dialog title
    */
-  protected BaseXDialog(final BaseXDialog d, final String title) {
-    super(d, title, true);
-    init(d.gui);
+  protected BaseXDialog(final BaseXDialog dialog, final String title) {
+    super(dialog, title, true);
+    init(dialog.gui);
   }
 
   /**
@@ -136,8 +135,7 @@ public abstract class BaseXDialog extends JDialog {
   }
 
   /**
-   * Closes the dialog and stores the location of the dialog window;
-   * can be overwritten.
+   * Closes the dialog and stores the location of the dialog window; can be overwritten.
    */
   public void close() {
     ok = true;
@@ -150,9 +148,9 @@ public abstract class BaseXDialog extends JDialog {
       final Container par = getParent();
       loc[0] = getX() - par.getX();
       loc[1] = getY() - par.getY();
-      gui.gopts.write();
     }
     super.dispose();
+    gui.gopts.write();
   }
 
   /**
@@ -178,7 +176,7 @@ public abstract class BaseXDialog extends JDialog {
    */
   public BaseXBack newButtons(final Object... buttons) {
     // horizontal/vertical layout
-    final BaseXBack pnl = new BaseXBack(Fill.NONE).
+    final BaseXBack pnl = new BaseXBack(false).
       border(12, 0, 0, 0).layout(new TableLayout(1, buttons.length, 8, 0));
 
     for(final Object obj : buttons) {
@@ -191,7 +189,7 @@ public abstract class BaseXDialog extends JDialog {
       pnl.add(b);
     }
 
-    final BaseXBack but = new BaseXBack(Fill.NONE).layout(new BorderLayout());
+    final BaseXBack but = new BaseXBack(false).layout(new BorderLayout());
     but.add(pnl, BorderLayout.EAST);
     return but;
   }
@@ -216,15 +214,14 @@ public abstract class BaseXDialog extends JDialog {
   }
 
   /**
-   * Static yes/no dialog. Returns a {@code null} reference if the dialog
-   * was canceled.
+   * Static yes/no/cancel dialog. Returns {@code null} if the dialog was canceled.
    * @param gui parent reference
    * @param text text
+   * @param buttons additional buttons
    * @return true if dialog was confirmed
    */
-  public static Boolean yesNoCancel(final GUI gui, final String text) {
-    final DialogMessage msg = new DialogMessage(gui, text.trim(), Msg.YESNOCANCEL);
-    return msg.canceled() ? null : msg.ok();
+  public static String yesNoCancel(final GUI gui, final String text, final String... buttons) {
+    return new DialogMessage(gui, text.trim(), Msg.YESNOCANCEL, buttons).action();
   }
 
   /**
@@ -234,7 +231,7 @@ public abstract class BaseXDialog extends JDialog {
    * @return true if dialog was confirmed
    */
   public static boolean confirm(final GUI gui, final String text) {
-    return new DialogMessage(gui, text.trim(), Msg.QUESTION).ok();
+    return B_YES.equals(new DialogMessage(gui, text.trim(), Msg.QUESTION).action());
   }
 
   /**

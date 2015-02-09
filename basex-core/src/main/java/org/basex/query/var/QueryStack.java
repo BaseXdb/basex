@@ -1,14 +1,13 @@
 package org.basex.query.var;
 
 import org.basex.query.*;
-import org.basex.query.value.Value;
-import org.basex.util.InputInfo;
-import org.basex.util.Util;
+import org.basex.query.value.*;
+import org.basex.util.*;
 
 /**
  * The query stack, containing local variable bindings of all active scopes.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
 public final class QueryStack {
@@ -78,12 +77,12 @@ public final class QueryStack {
 
   /**
    * Calculates the position of the given variable on the stack.
-   * @param v variable
+   * @param var variable
    * @return position
    */
-  private int pos(final Var v) {
-    final int pos = fp + v.slot;
-    if(pos < fp || sl <= pos) throw Util.notExpected(v);
+  private int pos(final Var var) {
+    final int pos = fp + var.slot;
+    if(pos < fp || sl <= pos) throw Util.notExpected(var);
     return pos;
   }
 
@@ -100,13 +99,13 @@ public final class QueryStack {
    * Sets the value of the given variable in the current stack frame.
    * @param var variable to bind the value to
    * @param val value to bind
-   * @param ctx query context
+   * @param qc query context
    * @param ii input info
    * @throws QueryException if the value does not have the right type
    */
-  public void set(final Var var, final Value val, final QueryContext ctx,
-      final InputInfo ii) throws QueryException {
-    stack[pos(var)] = var.checkType(val, ctx, ii, false);
+  public void set(final Var var, final Value val, final QueryContext qc, final InputInfo ii)
+      throws QueryException {
+    stack[pos(var)] = var.checkType(val, qc, ii, false);
   }
 
   @Override

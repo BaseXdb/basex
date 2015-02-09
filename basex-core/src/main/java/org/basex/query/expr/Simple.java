@@ -9,16 +9,16 @@ import org.basex.util.*;
 /**
  * Simple expression without arguments.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public abstract class Simple extends ParseExpr {
   /**
    * Constructor.
-   * @param ii input info
+   * @param info input info
    */
-  protected Simple(final InputInfo ii) {
-    super(ii);
+  protected Simple(final InputInfo info) {
+    super(info);
   }
 
   @Override
@@ -26,7 +26,7 @@ public abstract class Simple extends ParseExpr {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) {
+  public Expr compile(final QueryContext qc, final VarScope scp) {
     return this;
   }
 
@@ -36,18 +36,18 @@ public abstract class Simple extends ParseExpr {
   }
 
   @Override
-  public boolean removable(final Var v) {
+  public boolean removable(final Var var) {
     return true;
   }
 
   @Override
-  public VarUsage count(final Var v) {
+  public VarUsage count(final Var var) {
     return VarUsage.NEVER;
   }
 
   @Override
-  public Expr inline(final QueryContext ctx, final VarScope scp,
-      final Var v, final Expr e) throws QueryException {
+  public Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
+      throws QueryException {
     return null;
   }
 

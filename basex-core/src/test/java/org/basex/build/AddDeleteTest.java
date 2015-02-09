@@ -4,10 +4,10 @@ import static org.junit.Assert.*;
 
 import java.io.*;
 
+import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
-import org.basex.*;
 import org.basex.util.*;
 import org.junit.*;
 import org.junit.Test;
@@ -15,7 +15,7 @@ import org.junit.Test;
 /**
  * Tests adding files/folders/zip files/urls to collections.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Michael Seiferle
  */
 public final class AddDeleteTest extends SandboxTest {

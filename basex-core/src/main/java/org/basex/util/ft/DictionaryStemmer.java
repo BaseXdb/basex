@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * Dictionary-based stemmer.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Dimitar Popov
  */
 final class DictionaryStemmer extends Stemmer {
@@ -14,16 +14,16 @@ final class DictionaryStemmer extends Stemmer {
 
   /**
    * Constructor.
-   * @param d stem dictionary
+   * @param dict stem dictionary
    * @param fti full-text iterator
    */
-  DictionaryStemmer(final StemDir d, final FTIterator fti) {
+  DictionaryStemmer(final StemDir dict, final FTIterator fti) {
     super(fti);
-    dict = d;
+    this.dict = dict;
   }
 
   @Override
-  Stemmer get(final Language l, final FTIterator fti) {
+  Stemmer get(final Language lang, final FTIterator fti) {
     return new DictionaryStemmer(dict, fti);
   }
 

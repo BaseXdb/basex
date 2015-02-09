@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * Dummy stemmer for languages that do not require stemming.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Toshio HIRAI
  */
 final class DummyStemmer extends InternalStemmer {
@@ -18,7 +18,7 @@ final class DummyStemmer extends InternalStemmer {
   }
 
   @Override
-  Stemmer get(final Language l, final FTIterator fti) {
+  Stemmer get(final Language lang, final FTIterator fti) {
     return new DummyStemmer(fti);
   }
 

@@ -8,7 +8,7 @@ import org.junit.*;
 /**
  * EXPath package API: Version tests.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Rositsa Shadura
  */
 public final class VersionTest {

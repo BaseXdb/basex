@@ -7,15 +7,15 @@ import org.basex.util.*;
 /**
  * This module contains static error functions for the Geo module.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Masoumeh Seydi
  */
 final class GeoErrors {
   /** Error namespace. */
-  private static final byte[] NS = QueryText.EXPERROR;
+  private static final byte[] NS = QueryText.EXPERROR_URI;
   /** Namespace and error code prefix. */
   private static final String PREFIX =
-      new TokenBuilder(QueryText.EXPERR).add(":GEO").toString();
+      new TokenBuilder(QueryText.EXPERR_PREFIX).add(":GEO").toString();
 
   /** Private constructor, preventing instantiation. */
   private GeoErrors() { }

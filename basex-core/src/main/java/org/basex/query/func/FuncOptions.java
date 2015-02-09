@@ -1,14 +1,13 @@
 package org.basex.query.func;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
-import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import org.basex.core.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
-import org.basex.query.path.*;
-import org.basex.query.util.*;
+import org.basex.query.expr.path.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -20,12 +19,12 @@ import org.basex.util.options.*;
 /**
  * This class parses options specified in function arguments.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 public final class FuncOptions {
   /** QName. */
-  public static final QNm Q_SPARAM = QNm.get("serialization-parameters", OUTPUTURI);
+  public static final QNm Q_SPARAM = QNm.get("serialization-parameters", OUTPUT_URI);
   /** Value. */
   private static final String VALUE = "value";
 
@@ -38,13 +37,13 @@ public final class FuncOptions {
 
   /**
    * Constructor.
-   * @param name name of root node
-   * @param ii input info
+   * @param root name of root node
+   * @param info input info
    */
-  public FuncOptions(final QNm name, final InputInfo ii) {
-    test = new NodeTest(name);
-    root = name;
-    info = ii;
+  FuncOptions(final QNm root, final InputInfo info) {
+    test = new NodeTest(root);
+    this.root = root;
+    this.info = info;
   }
 
   /**
@@ -53,8 +52,8 @@ public final class FuncOptions {
    * @param options options
    * @throws QueryException query exception
    */
-  public void parse(final Item it, final Options options) throws QueryException {
-    parse(it, options, INVALIDOPT);
+  void parse(final Item it, final Options options) throws QueryException {
+    parse(it, options, INVALIDOPT_X);
   }
 
   /**
@@ -64,13 +63,14 @@ public final class FuncOptions {
    * @param error raise error if parameter is unknown
    * @throws QueryException query exception
    */
-  private void parse(final Item item, final Options options, final Err error)
+  private void parse(final Item item, final Options options, final QueryError error)
       throws QueryException {
 
     final TokenBuilder tb = new TokenBuilder();
     if(item != null) {
       try {
-        if(!(item instanceof Map || test.eq(item))) throw ELMMAPTYPE.get(info, root, item.type);
+        if(!(item instanceof Map || test.eq(item)))
+          throw ELMMAP_X_X_X.get(info, root.prefixId(XML), item.type, item);
         options.parse(tb.add(optString(item)).toString());
       } catch(final BaseXException ex) {
         throw error.get(info, ex);
@@ -90,11 +90,10 @@ public final class FuncOptions {
     if(item instanceof Map) {
       final Map map = (Map) item;
       for(final Item it : map.keys()) {
-        if(!(it instanceof AStr))
-          throw FUNCMP.get(info, map.description(), AtomType.STR, it.type);
+        if(!(it instanceof AStr)) throw EXPTYPE_X_X_X.get(info, AtomType.STR, it.type, it);
         tb.add(it.string(info)).add('=');
         final Value val = map.get(it, info);
-        if(!val.isItem()) throw FUNCMP.get(info, map.description(), AtomType.ITEM, val);
+        if(!(val instanceof Item)) throw EXPTYPE_X_X_X.get(info, AtomType.ITEM, val.seqType(), val);
         tb.add(optString((Item) val).replace(",", ",,")).add(',');
       }
     } else if(item.type == NodeType.ELM) {
@@ -141,11 +140,13 @@ public final class FuncOptions {
    */
   public static SerializerOptions serializer(final Item it, final InputInfo info)
       throws QueryException {
-    return serializer(it, new SerializerOptions(), info);
+    final SerializerOptions so = new SerializerOptions();
+    so.set(SerializerOptions.METHOD, SerialMethod.XML);
+    return serializer(it, so, info);
   }
 
   /**
-   * Converts the specified output parameter item to a map.
+   * Converts the specified output parameter item to serialization parameters.
    * @param it input item
    * @param sopts serialization parameters
    * @param info input info
@@ -154,7 +155,7 @@ public final class FuncOptions {
    */
   public static SerializerOptions serializer(final Item it, final SerializerOptions sopts,
       final InputInfo info) throws QueryException {
-    new FuncOptions(Q_SPARAM, info).parse(it, sopts, SEROPT);
+    new FuncOptions(Q_SPARAM, info).parse(it, sopts, SEROPT_X);
     return sopts;
   }
 }

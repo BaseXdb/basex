@@ -1,5 +1,6 @@
 package org.basex.gui.text;
 
+import static org.basex.util.FTToken.*;
 import static org.basex.util.Token.*;
 
 import org.basex.util.*;
@@ -8,7 +9,7 @@ import org.basex.util.list.*;
 /**
  * Returns an iterator for the visualized text.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
 final class TextIterator {
@@ -62,10 +63,10 @@ final class TextIterator {
     // find next token boundary
     int ch = cp(text, p);
     p += cl(text, p);
-    if(ftChar(ch)) {
+    if(valid(ch)) {
       while(p < length) {
         ch = cp(text, p);
-        if(!ftChar(ch)) break;
+        if(!valid(ch)) break;
         p += cl(text, p);
       }
     }
@@ -230,6 +231,6 @@ final class TextIterator {
     int ls = pos, le = ls;
     while(ls > 0 && text[ls - 1] != TokenBuilder.ULINE) ls--;
     while(le < length && text[le] != TokenBuilder.ULINE) le++;
-    return Token.string(text, ls, le - ls);
+    return string(text, ls, le - ls);
   }
 }
