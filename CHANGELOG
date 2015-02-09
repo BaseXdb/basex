@@ -1,3 +1,34 @@
+VERSION 8.0 (February 9, 2015) -----------------------------------------
+
+ XQUERY
+ - Support for XQuery 3.1 (nearly complete)
+ - New default serialization ("adaptive")
+ - MIXUPDATES option: update items and return results at the same time
+ - Improved index rewritings, more precise cost estimations
+ - New modules: Array and User Module
+ - New annotations: %basex:inline, %basex:lazy
+ - 13 of our modules were updated and extended
+
+ STORAGE
+ - Existing documents will be overwritten in-place whenever possible
+ - Updatable index structures now take much less space
+ - Faster document index (storing paths to all XML documents)
+ - AUTOOPTIMIZE option: optimize after each update
+ - XINCLUDE option: resolve or ignore XInclude tags
+
+ SECURITY
+ - Revised user management; users are stored as XML
+ - Digest authentication, Salted SHA256
+ - Language bindings updated
+
+ WEB APPLICATIONS
+ - Integrated application: DBA, Database Administration
+ - AUTHMETHOD option: Basic vs. Digest authentication
+ - RESTXQ: regular expressions in paths, quality factor support
+
+ GUI
+ - Better code completions
+
 VERSION 7.9 (June 27, 2014) --------------------------------------------
 
  XQUNIT
