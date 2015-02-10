@@ -182,18 +182,20 @@ public abstract class Path extends ParseExpr {
   @Override
   public Expr optimizeEbv(final QueryContext qc, final VarScope scp) throws QueryException {
     final int sl = steps.length;
-    if(!(steps[sl - 1] instanceof Step)) return this;
-    final Step step = (Step) steps[sl - 1];
-    if(step.preds.length == 1 && step.seqType().type instanceof NodeType &&
-        !step.preds[0].seqType().mayBeNumber()) {
-      final Expr s = step.merge(this, qc, scp);
-      if(s != step) {
-        qc.compInfo(OPTWRITE, this);
-        step.preds = new Expr[0];
-        return s;
+    if(steps[sl - 1] instanceof Step) {
+      final Step step = (Step) steps[sl - 1];
+      if(step.preds.length == 1 && step.seqType().type instanceof NodeType &&
+          !step.preds[0].seqType().mayBeNumber()) {
+        // merge nested predicates. example: if(a[b]) ->  if(a/b)
+        final Expr s = step.merge(this, qc, scp);
+        if(s != step) {
+          qc.compInfo(OPTWRITE, this);
+          step.preds = new Expr[0];
+          return s;
+        }
       }
     }
-    return this;
+    return super.optimizeEbv(qc, scp);
   }
 
   @Override

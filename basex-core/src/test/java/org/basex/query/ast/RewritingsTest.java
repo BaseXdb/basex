@@ -3,7 +3,6 @@ package org.basex.query.ast;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.query.func.basex.*;
-import org.basex.query.func.fn.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.junit.Test;
@@ -83,7 +82,8 @@ public final class RewritingsTest extends QueryPlanTest {
 
     check("if(<a>X</a>[text()]) then 1 else 2", null, "//@axis = 'child'");
     check("<a>X</a>[text()] and <a/>", null, "//@axis = 'child'");
-    check("<a>X</a>[text()] or <a/>", null, "//@axis = 'child'");
+    check("<a>X</a>[text()] or <a/>", null, "//Bln/@value = 'true'");
+    check("<a>X</a>[text()] or <a/>[text()]", null, "//@axis = 'child'");
     check("for $a in <a>X</a> where $a[text()] return $a", null, "//@axis = 'child'");
 
     check("empty(<a>X</a>/.[text()])", null, "//@axis = 'child'");
@@ -141,8 +141,9 @@ public final class RewritingsTest extends QueryPlanTest {
     check("(<a/>,<b/>)[position() > 1 and position() < 3]", "<b/>",
         "count(//" + Util.className(BaseXItemAt.class) + ") = 1");
     check("(<a/>,<b/>)[position() > 1 and position() < 4]", "<b/>",
-        "count(//" + Util.className(FnSubsequence.class) + ") = 1");
-    check("(<a/>,<b/>)[position() > 1 and position() < 3 and <b/>]", "<b/>", "count(//Pos) = 1");
+        "count(//" + Util.className(BaseXItemRange.class) + ") = 1");
+    check("(<a/>,<b/>)[position() > 1 and position() < 3 and <b/>]", "<b/>",
+        "count(//" + Util.className(BaseXItemAt.class) + ") = 1");
 
     // {@link CmpR} rewritings
     check("<a>5</a>[text() > 1 and text() < 9]", "<a>5</a>", "count(//CmpR) = 1");
