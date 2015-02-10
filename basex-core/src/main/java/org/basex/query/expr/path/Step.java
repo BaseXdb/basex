@@ -80,9 +80,9 @@ public abstract class Step extends Preds {
     if(!has(Flag.FCS)) return new IterStep(info, axis, test, preds);
 
     if(preds.length == 1) {
-      if(preds[0].isFunction(Function.LAST)) return new IterLastStep(this);
-      final Pos pos = posIterator();
-      if(pos != null) return new IterPosStep(this, pos);
+      final Expr pred = preds[0];
+      if(pred.isFunction(Function.LAST)) return new IterLastStep(this);
+      if(pred instanceof Pos) return new IterPosStep(this, (Pos) pred);
     }
     return this;
   }

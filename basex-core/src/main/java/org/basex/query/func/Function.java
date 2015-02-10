@@ -366,7 +366,7 @@ public enum Function {
   STRING_TO_CODEPOINTS(FnStringToCodepoints.class, "string-to-codepoints(string)",
       arg(STR_ZO), ITR_ZM),
   /** XQuery function. */
-  SUBSEQUENCE(FnSubsequence.class, "subsequence(items,start[,len])",
+  SUBSEQUENCE(FnSubsequence.class, "subsequence(items,first[,len])",
       arg(ITEM_ZM, DBL, DBL), ITEM_ZM),
   /** XQuery function. */
   SUBSTRING(FnSubstring.class, "substring(string,start[,len])", arg(STR_ZO, DBL, DBL), STR),
@@ -578,6 +578,9 @@ public enum Function {
       arg(ITEM_ZM, ITEM_ZM, ITEM), BLN, BASEX_URI),
   /** XQuery function. */
   _BASEX_ITEM_AT(BaseXItemAt.class, "item-at(items,pos)", arg(ITEM_ZM, DBL), ITEM_ZO, BASEX_URI),
+  /** XQuery function. */
+  _BASEX_ITEM_RANGE(BaseXItemRange.class, "item-range(items,first,last)",
+      arg(ITEM_ZM, DBL, DBL), ITEM_ZM, BASEX_URI),
   /** XQuery function. */
   _BASEX_LAST_FROM(BaseXLastFrom.class, "last-from(items)", arg(ITEM_ZM), ITEM_ZO, BASEX_URI),
 

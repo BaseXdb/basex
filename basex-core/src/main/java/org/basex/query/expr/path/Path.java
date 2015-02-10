@@ -351,7 +351,7 @@ public abstract class Path extends ParseExpr {
   }
 
   /**
-   * Returns the initial context value for the given root, or {@code null}.
+   * Returns a context value for the given root, or {@code null}.
    * @param qc query context (may be @code null)
    * @param root root expression
    * @return root

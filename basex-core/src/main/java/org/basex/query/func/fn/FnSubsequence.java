@@ -3,6 +3,7 @@ package org.basex.query.func.fn;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.func.basex.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -17,7 +18,7 @@ import org.basex.query.var.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public final class FnSubsequence extends StandardFunc {
+public class FnSubsequence extends StandardFunc {
   /** Return all values. */
   private static final long[] ALL = {};
 
@@ -116,7 +117,7 @@ public final class FnSubsequence extends StandardFunc {
     if(min) return len == Long.MAX_VALUE ? ALL : null;
 
     // end flag: compute length
-    if(el > 3 && toBoolean(exprs[3], qc)) len = len - start + 1;
+    if(this instanceof BaseXItemRange) len = len - start + 1;
     return new long[] { start, len };
   }
 

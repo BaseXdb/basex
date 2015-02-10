@@ -44,7 +44,7 @@ public abstract class Filter extends Preds {
    * @return filter expression
    */
   public static Expr get(final InputInfo info, final Expr root, final Expr... preds) {
-    final Path p = path(root, preds);
+    final Expr p = path(root, preds);
     return p == null ? new CachedFilter(info, root, preds) : p;
   }
 
@@ -54,7 +54,10 @@ public abstract class Filter extends Preds {
    * @param preds predicate expressions
    * @return filter expression
    */
-  private static Path path(final Expr root, final Expr... preds) {
+  private static Expr path(final Expr root, final Expr... preds) {
+    // no predicates: return root
+    if(preds.length == 0) return root;
+    // axis path
     if(root instanceof AxisPath) {
       // predicate must not be numeric
       for(final Expr pred : preds) {
@@ -108,7 +111,7 @@ public abstract class Filter extends Preds {
     // return empty root
     if(root.isEmpty()) return optPre(qc);
 
-    // invalidate current context value (will be overwritten by filter)
+    // remember current context value (will be temporarily overwritten)
     final Value cv = qc.value;
     try {
       qc.value = Path.initial(qc, root);
@@ -118,34 +121,44 @@ public abstract class Filter extends Preds {
       qc.value = cv;
     }
 
-    // no predicates left.. return root
-    if(preds.length == 0) return root;
-
-    // if possible, convert filter to path
-    final Path p = path(root, preds);
-    if(p != null) return p.optimize(qc, scp);
-
     // determine type and number of results
     final SeqType st = root.seqType();
-    final boolean last = preds.length == 1 && preds[0].isFunction(Function.LAST);
-    final Pos pos = posIterator();
+    // -1: number of results can only be guessed
+    long max = root.size();
+    boolean exact = max != -1;
+    if(!exact) max = Long.MAX_VALUE;
 
-    final long s = root.size();
-    if(s == -1) {
-      // unknown input size: positional access tells if there will be at most 1 result
-      final boolean zo = last || pos != null && pos.min == pos.max;
-      seqType = st.withOcc(zo ? Occ.ZERO_ONE : Occ.ZERO_MORE);
-    } else {
-      // known input size: number of results can be computed in advance
-      if(pos != null) {
-        size = Math.max(0, s + 1 - pos.min) - Math.max(0, s - pos.max);
-      } else if(last) {
-        size = s > 0 ? 1 : 0;
+    // evaluate positional predicates
+    for(final Expr pred : preds) {
+      if(pred.isFunction(Function.LAST)) {
+        // use minimum of old value and 1
+        max = Math.min(max, 1);
+      } else if(pred instanceof Pos) {
+        final Pos pos = (Pos) pred;
+        // subtract start position. example: ...[1 to 2][2] -> (2 ->) 1
+        if(max != Long.MAX_VALUE) max = Math.max(0, max - pos.min + 1);
+        // use minimum of old value and range. example: ...[1 to 5] -> 5
+        max = Math.min(max, pos.max - pos.min + 1);
+      } else {
+        // resulting size will be unknown for any other filter
+        exact = false;
       }
-      // no results will remain: return empty sequence
-      if(size == 0) return optPre(qc);
-      seqType = st.withSize(size);
     }
+    // no results will remain: return empty sequence
+    if(max == 0) return optPre(qc);
+
+    if(exact) {
+      seqType = st.withSize(size);
+      size = max;
+    } else {
+      // we only know if there will be at most 1 result
+      seqType = st.withOcc(max == 1 ? Occ.ZERO_ONE : Occ.ZERO_MORE);
+      size = -1;
+    }
+
+    // if possible, convert filter to path
+    final Expr ex = path(root, preds);
+    if(ex != null) return ex.optimize(qc, scp);
 
     // try to rewrite filter to index access
     if(root instanceof Context || root instanceof Value && root.data() != null) {
@@ -157,34 +170,50 @@ public abstract class Filter extends Preds {
     // no numeric predicates.. use simple iterator
     if(!super.has(Flag.FCS)) return copyType(new IterFilter(info, root, preds));
 
-    Expr e = this;
-    if(preds.length == 1) {
-      // pre-evaluate if root is value and if one single position() or last() function is specified
-      if(root.isValue()) {
-        final Value v = (Value) root;
-        if(last) return optPre(SubSeq.get(v, v.size() - 1, 1), qc);
-        if(pos != null) return optPre(SubSeq.get(v, pos.min - 1, pos.max - pos.min + 1), qc);
-      }
+    // evaluate positional predicates
+    Expr e = root;
+    boolean opt = false;
+    final int pl = preds.length;
+    for(int p = 0; p < pl; p++) {
+      final Expr pred = preds[p];
+      final Pos pos = pred instanceof Pos ? (Pos) pred : null;
+      final boolean last = pred.isFunction(Function.LAST);
 
       if(last) {
-        // rewrite positional predicate to basex:item-at
-        e = Function._BASEX_LAST_FROM.get(null, info, root).optimize(qc, scp);
-
+        if(e.isValue()) {
+          // return sub-sequence
+          e = SubSeq.get((Value) e, e.size() - 1, 1);
+        } else {
+          // rewrite positional predicate to basex:last-from
+          e = Function._BASEX_LAST_FROM.get(null, info, e);
+        }
+        opt = true;
       } else if(pos != null) {
-        /* rewrite positional predicate to fn:subsequence or basex:item-at
-         * example: expr[pos] -> subsequence(root, pos.min, pos.max, true()) */
-        e = pos.min == pos.max ? Function._BASEX_ITEM_AT.get(null, info, root, Int.get(pos.min)) :
-          Function.SUBSEQUENCE.get(null, info, root, Int.get(pos.min), Int.get(pos.max), Bln.TRUE);
-
-      } else if(num(preds[0])) {
+        if(e.isValue()) {
+          // return sub-sequence
+          e = SubSeq.get((Value) e, pos.min - 1, pos.max - pos.min + 1);
+        } else if(pos.min == pos.max) {
+          // example: expr[pos] -> basex:item-at(expr, pos.min)
+          e = Function._BASEX_ITEM_AT.get(null, info, e, Int.get(pos.min));
+        } else {
+          // example: expr[pos] -> basex:item-range(expr, pos.min, pos.max)
+          e = Function._BASEX_ITEM_RANGE.get(null, info, e, Int.get(pos.min), Int.get(pos.max));
+        }
+        opt = true;
+      } else if(num(pred)) {
         /* - rewrite positional predicate to basex:item-at
          *   example: expr[pos] -> basex:item-at(expr, pos)
          * - only choose deterministic and context-independent offsets.
          *   example: (1 to 10)[random:integer(10)]  or  (1 to 10)[.] */
-        e = Function._BASEX_ITEM_AT.get(null, info, root, preds[0]);
+        e = Function._BASEX_ITEM_AT.get(null, info, e, pred);
+        opt = true;
+      } else {
+        // rebuild filter if no optimization can be applied
+        e = e instanceof Filter ? ((Filter) e).addPred(pred) : Filter.get(info, e, pred);
       }
     }
-    if(e != this) {
+
+    if(opt) {
       qc.compInfo(QueryText.OPTWRITE, this);
       return e.optimize(qc, scp);
     }
@@ -199,8 +228,8 @@ public abstract class Filter extends Preds {
    * @return result of check
    */
   private static boolean num(final Expr expr) {
-    final SeqType pt = expr.seqType();
-    return pt.type.isNumber() && pt.zeroOrOne() && !expr.has(Flag.CTX) && !expr.has(Flag.NDT);
+    final SeqType st = expr.seqType();
+    return st.type.isNumber() && st.zeroOrOne() && !expr.has(Flag.CTX) && !expr.has(Flag.NDT);
   }
 
   @Override

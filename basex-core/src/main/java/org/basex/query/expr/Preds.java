@@ -15,7 +15,6 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -64,14 +63,14 @@ public abstract class Preds extends ParseExpr {
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     // number of predicates may change in loop
     for(int p = 0; p < preds.length; p++) {
-      final Expr pred = preds[p];
+      Expr pred = preds[p];
       if(pred instanceof CmpG || pred instanceof CmpV) {
         final Cmp cmp = (Cmp) pred;
         if(cmp.exprs[0].isFunction(Function.POSITION)) {
           final Expr e2 = cmp.exprs[1];
           final SeqType st2 = e2.seqType();
           // position() = last() -> last()
-          // position() = $n (numeric) -> $n
+          // position() = $n (xs:numeric) -> $n
           if(e2.isFunction(Function.LAST) || st2.one() && st2.type.isNumber()) {
             if(cmp instanceof CmpG && ((CmpG) cmp).op == OpG.EQ ||
                cmp instanceof CmpV && ((CmpV) cmp).op == OpV.EQ) {
@@ -98,40 +97,24 @@ public abstract class Preds extends ParseExpr {
       } else if(pred instanceof ANum) {
         final ANum it = (ANum) pred;
         final long i = it.itr();
-        if(i == it.dbl()) {
-          preds[p] = Pos.get(i, info);
-        } else {
-          qc.compInfo(OPTREMOVE, this, pred);
-          return Empty.SEQ;
-        }
+        // example: ....[position() = 1.2]
+        if(i != it.dbl()) return optPre(qc);
+        pred = Pos.get(i, info);
+        // example: ....[position() = 0]
+        if(!(pred instanceof Pos)) return optPre(qc);
+        preds[p] = pred;
       } else if(pred.isValue()) {
         if(pred.ebv(qc, info).bool(info)) {
+          // example: ....[true()]
           qc.compInfo(OPTREMOVE, this, pred);
           preds = Array.delete(preds, p--);
         } else {
-          // handle statically known predicates
-          qc.compInfo(OPTREMOVE, this, pred);
-          return Empty.SEQ;
+          // example: ....[false()]
+          return optPre(qc);
         }
       }
     }
     return this;
-  }
-
-  /**
-   * Prepares this expression for iterative evaluation. The expression can be iteratively
-   * evaluated if no predicate or only the first is positional.
-   * @return result of check
-   */
-  protected final Pos posIterator() {
-    // check if first predicate is numeric
-    if(preds.length == 1) {
-      Expr p = preds[0];
-      if(p instanceof Int) p = Pos.get(((Int) p).itr(), info);
-      preds[0] = p;
-      if(p instanceof Pos) return (Pos) p;
-    }
-    return null;
   }
 
   /**
