@@ -38,18 +38,18 @@ final class CachedStep extends Step {
 
     // evaluate predicates
     final boolean scoring = qc.scoring;
-    for(final Expr p : preds) {
-      qc.size = nc.size();
+    for(final Expr pred : preds) {
+      final long nl = nc.size();
+      qc.size = nl;
       qc.pos = 1;
       int c = 0;
-      final long nl = nc.size();
       for(int n = 0; n < nl; ++n) {
         qc.value = nc.get(n);
-        final Item i = p.test(qc, info);
-        if(i != null) {
+        final Item it = pred.test(qc, info);
+        if(it != null) {
           // assign score value
           final ANode node = nc.get(n);
-          if(scoring) node.score(i.score());
+          if(scoring) node.score(it.score());
           nc.nodes[c++] = node;
         }
         qc.pos++;

@@ -438,8 +438,7 @@ public class DBNode extends ANode {
 
   @Override
   public final boolean sameAs(final Expr cmp) {
-    return cmp instanceof DBNode && data == ((DBNode) cmp).data &&
-      pre == ((DBNode) cmp).pre;
+    return cmp instanceof DBNode && data == ((DBNode) cmp).data && pre == ((DBNode) cmp).pre;
   }
 
   @Override

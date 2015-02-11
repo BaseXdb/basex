@@ -145,8 +145,8 @@ public final class CmpG extends Cmp {
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     // swap expressions; add text() to location paths to simplify optimizations
     if(swap()) {
-      op = op.swap();
       qc.compInfo(OPTSWAP, this);
+      op = op.swap();
     }
 
     // check if both arguments will always yield one result
@@ -155,6 +155,7 @@ public final class CmpG extends Cmp {
 
     // one value is empty (e.g.: () = local:expensive() )
     if(oneIsEmpty()) return optPre(Bln.FALSE, qc);
+
     // rewrite count() function
     if(e1.isFunction(Function.COUNT)) {
       final Expr e = compCount(op.op);
@@ -163,6 +164,7 @@ public final class CmpG extends Cmp {
         return e;
       }
     }
+
     // position() CMP expr
     if(e1.isFunction(Function.POSITION)) {
       final Expr e = Pos.get(op.op, e2, this, info);
@@ -171,6 +173,7 @@ public final class CmpG extends Cmp {
         return e;
       }
     }
+
     // (A = false()) -> not(A)
     if(st1.eq(SeqType.BLN) && (op == OpG.EQ && e2 == Bln.FALSE || op == OpG.NE && e2 == Bln.TRUE)) {
       qc.compInfo(OPTWRITE, this);
@@ -187,12 +190,24 @@ public final class CmpG extends Cmp {
       return allAreValues() ? e.preEval(qc) : e;
     }
 
+    // choose evaluation strategy
     final SeqType st2 = e2.seqType();
     if(st1.zeroOrOne() && !st1.mayBeArray() && st2.zeroOrOne() && !st2.mayBeArray()) {
       atomic = true;
       qc.compInfo(OPTATOMIC, this);
     }
-    return allAreValues() ? preEval(qc) : this;
+
+    // pre-evaluate values
+    if(allAreValues()) return preEval(qc);
+
+    // pre-evaluate equality test if operands are equal, deterministic, and can be compared
+    if(op == OpG.EQ && e1.sameAs(e2) && !e1.has(Flag.NDT) &&
+        !e1.has(Flag.UPD) && (!e1.has(Flag.CTX) || qc.value != null)) {
+      // currently limited to strings (function items are invalid, numbers may be NaN)
+      final SeqType st = e1.seqType();
+      if(st.occ.min > 0 && st.type.isStringOrUntyped()) return optPre(Bln.TRUE, qc);
+    }
+    return this;
   }
 
   @Override

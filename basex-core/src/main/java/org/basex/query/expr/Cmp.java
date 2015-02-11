@@ -4,6 +4,7 @@ import org.basex.query.*;
 import org.basex.query.expr.CmpV.OpV;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -39,7 +40,8 @@ public abstract class Cmp extends Arr {
     // move value or path without root to second position
     final boolean swap = exprs[0].isValue() && !exprs[1].isValue() ||
         exprs[1] instanceof Path && ((Path) exprs[1]).root == null &&
-        (!(exprs[0] instanceof Path) || ((Path) exprs[0]).root != null);
+        (!(exprs[0] instanceof Path) || ((Path) exprs[0]).root != null) ||
+        exprs[1] instanceof FnPosition;
 
     if(swap) {
       final Expr tmp = exprs[0];

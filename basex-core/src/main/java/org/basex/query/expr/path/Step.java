@@ -34,7 +34,7 @@ public abstract class Step extends Preds {
   public final Test test;
 
   /**
-   * This method creates a step instance.
+   * This method returns the most appropriate step implementation.
    * @param info input info
    * @param axis axis
    * @param test node test
@@ -44,12 +44,22 @@ public abstract class Step extends Preds {
   public static Step get(final InputInfo info, final Axis axis, final Test test,
       final Expr... preds) {
 
-    for(final Expr pr : preds) {
-      if(pr.seqType().mayBeNumber() || pr.has(Flag.FCS)) {
+    // optimize single last() functions
+    if(preds.length == 1 && preds[0].isFunction(Function.LAST))
+      return new IterLastStep(info, axis, test, preds);
+
+    // check for simple positional predicates
+    boolean pos = false;
+    for(final Expr pred : preds) {
+      if(pred instanceof Pos || num(pred)) {
+        pos = true;
+      } else if(pred.seqType().mayBeNumber() || pred.has(Flag.FCS)) {
+        // positional checks may be nested or non-deterministic: choose full evaluation
         return new CachedStep(info, axis, test, preds);
       }
     }
-    return new IterStep(info, axis, test, preds);
+    return pos ? new IterPosStep(info, axis, test, preds) :
+                 new IterStep(info, axis, test, preds);
   }
 
   /**
@@ -74,21 +84,19 @@ public abstract class Step extends Preds {
 
   @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
-    // check if test will yield no results
+    // check if test will never yield results
     if(!test.optimize(qc)) return Empty.SEQ;
 
+    // optimize predicates
     final Expr e = super.optimize(qc, scp);
     if(e != this) return e;
 
-    // check for numeric predicates
-    if(!has(Flag.FCS)) return new IterStep(info, axis, test, preds);
+    // compute result size
+    seqType(seqType, Long.MAX_VALUE);
+    if(size == 0) return optPre(qc);
 
-    if(preds.length == 1) {
-      final Expr pred = preds[0];
-      if(pred.isFunction(Function.LAST)) return new IterLastStep(this);
-      if(pred instanceof Pos) return new IterPosStep(this, (Pos) pred);
-    }
-    return this;
+    // choose best implementation
+    return copyType(get(info, axis, test, preds));
   }
 
   @Override
@@ -180,7 +188,7 @@ public abstract class Step extends Preds {
    * @return resulting step instance
    */
   final Step addPreds(final Expr... prds) {
-    for(final Expr p : prds) preds = Array.add(preds, p);
+    for(final Expr pred : prds) preds = Array.add(preds, pred);
     return get(info, axis, test, preds);
   }
 
@@ -208,9 +216,9 @@ public abstract class Step extends Preds {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    for(final Expr e : preds) {
+    for(final Expr pred : preds) {
       visitor.enterFocus();
-      if(!e.accept(visitor)) return false;
+      if(!pred.accept(visitor)) return false;
       visitor.exitFocus();
     }
     return true;
@@ -219,7 +227,7 @@ public abstract class Step extends Preds {
   @Override
   public int exprSize() {
     int sz = 1;
-    for(final Expr e : preds) sz += e.exprSize();
+    for(final Expr pred : preds) sz += pred.exprSize();
     return sz;
   }
 

@@ -178,8 +178,8 @@ public final class CmpV extends Cmp {
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     // swap expressions
     if(swap()) {
-      op = op.swap();
       qc.compInfo(OPTSWAP, this);
+      op = op.swap();
     }
 
     final Expr e1 = exprs[0], e2 = exprs[1];

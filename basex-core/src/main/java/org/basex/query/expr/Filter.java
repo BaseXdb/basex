@@ -10,8 +10,6 @@ import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.Occ;
 import org.basex.query.var.*;
 import org.basex.util.*;
 
@@ -124,40 +122,9 @@ public abstract class Filter extends Preds {
       qc.value = cv;
     }
 
-    // determine type and number of results
-    final SeqType st = root.seqType();
-    // -1: number of results can only be guessed
-    long max = root.size();
-    boolean exact = max != -1;
-    if(!exact) max = Long.MAX_VALUE;
-
-    // evaluate positional predicates
-    for(final Expr pred : preds) {
-      if(pred.isFunction(Function.LAST)) {
-        // use minimum of old value and 1
-        max = Math.min(max, 1);
-      } else if(pred instanceof Pos) {
-        final Pos pos = (Pos) pred;
-        // subtract start position. example: ...[1 to 2][2] -> (2 ->) 1
-        if(max != Long.MAX_VALUE) max = Math.max(0, max - pos.min + 1);
-        // use minimum of old value and range. example: ...[1 to 5] -> 5
-        max = Math.min(max, pos.max - pos.min + 1);
-      } else {
-        // resulting size will be unknown for any other filter
-        exact = false;
-      }
-    }
-    // no results will remain: return empty sequence
-    if(max == 0) return optPre(qc);
-
-    if(exact) {
-      seqType = st.withSize(size);
-      size = max;
-    } else {
-      // we only know if there will be at most 1 result
-      seqType = st.withOcc(max == 1 ? Occ.ZERO_ONE : Occ.ZERO_MORE);
-      size = -1;
-    }
+    // check result size
+    seqType(root.seqType(), root.size());
+    if(size == 0) return optPre(qc);
 
     // if possible, convert filter to path
     final Expr ex = path(root, preds);
@@ -223,16 +190,6 @@ public abstract class Filter extends Preds {
 
     // standard iterator
     return get(info, root, preds);
-  }
-
-  /**
-   * Checks if the specified expression returns a deterministic numeric value.
-   * @param expr expression
-   * @return result of check
-   */
-  private static boolean num(final Expr expr) {
-    final SeqType st = expr.seqType();
-    return st.type.isNumber() && st.zeroOrOne() && !expr.has(Flag.CTX) && !expr.has(Flag.NDT);
   }
 
   @Override
