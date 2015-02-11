@@ -16,14 +16,14 @@ public final class FilterTest extends AdvancedQueryTest {
   @Test public void onePredicate() {
     // empty sequence
     query("()['x']", "");
-    query("()[<a/>]", "");
+    query("()[<a b='{random:integer()}'/>]", "");
     query("()[1]", "");
     query("()[last()]", "");
 
     // single item
     query("1['']", "");
     query("1['a']", "1");
-    query("1[<a/>]", "1");
+    query("1[<a b='{random:integer()}'/>]", "1");
 
     query("1[0]", "");
     query("1[1]", "1");
@@ -33,7 +33,7 @@ public final class FilterTest extends AdvancedQueryTest {
     // numeric sequence
     query("(1 to 3)['']", "");
     query("(1 to 3)['a']", "1\n2\n3");
-    query("(1 to 3)[<a/>]", "1\n2\n3");
+    query("(1 to 3)[<a b='{random:integer()}'/>]", "1\n2\n3");
 
     query("(1 to 3)[0]", "");
     query("(1 to 3)[1]", "1");
@@ -44,7 +44,7 @@ public final class FilterTest extends AdvancedQueryTest {
     // XML sequence
     query("((1 to 2) ! <a b='{.}'/>)['']", "");
     query("((1 to 2) ! <a b='{.}'/>)['a']", "<a b=\"1\"/>\n<a b=\"2\"/>");
-    query("((1 to 2) ! <a b='{.}'/>)[<a/>]", "<a b=\"1\"/>\n<a b=\"2\"/>");
+    query("((1 to 2) ! <a b='{.}'/>)[<a b='{random:integer()}'/>]", "<a b=\"1\"/>\n<a b=\"2\"/>");
 
     query("((1 to 2) ! <a b='{.}'/>)[0]", "");
     query("((1 to 2) ! <a b='{.}'/>)[1]", "<a b=\"1\"/>");
@@ -59,14 +59,14 @@ public final class FilterTest extends AdvancedQueryTest {
   @Test public void singlePosAsLastPredicate() {
     // empty sequence
     query("()['x'][1]", "");
-    query("()[<a/>][1]", "");
+    query("()[<a b='{random:integer()}'/>][1]", "");
     query("()[1][1]", "");
     query("()[last()][1]", "");
 
     // single item
     query("1[''][1]", "");
     query("1['a'][1]", "1");
-    query("1[<a/>][1]", "1");
+    query("1[<a b='{random:integer()}'/>][1]", "1");
 
     query("1[0][1]", "");
     query("1[1][1]", "1");
@@ -76,7 +76,7 @@ public final class FilterTest extends AdvancedQueryTest {
     // numeric sequence
     query("(1 to 3)[''][1]", "");
     query("(1 to 3)['a'][1]", "1");
-    query("(1 to 3)[<a/>][1]", "1");
+    query("(1 to 3)[<a b='{random:integer()}'/>][1]", "1");
 
     query("(1 to 3)[0][1]", "");
     query("(1 to 3)[1][1]", "1");
@@ -87,7 +87,7 @@ public final class FilterTest extends AdvancedQueryTest {
     // XML sequence
     query("((1 to 2) ! <a b='{.}'/>)[''][1]", "");
     query("((1 to 2) ! <a b='{.}'/>)['a'][1]", "<a b=\"1\"/>");
-    query("((1 to 2) ! <a b='{.}'/>)[<a/>][1]", "<a b=\"1\"/>");
+    query("((1 to 2) ! <a b='{.}'/>)[<a b='{random:integer()}'/>][1]", "<a b=\"1\"/>");
 
     query("((1 to 2) ! <a b='{.}'/>)[0][1]", "");
     query("((1 to 2) ! <a b='{.}'/>)[1][1]", "<a b=\"1\"/>");
@@ -102,14 +102,14 @@ public final class FilterTest extends AdvancedQueryTest {
   @Test public void singlePosAsFirstPredicate() {
     // empty sequence
     query("()[1]['x']", "");
-    query("()[1][<a/>]", "");
+    query("()[1][<a b='{random:integer()}'/>]", "");
     query("()[1][1]", "");
     query("()[1][last()]", "");
 
     // single item
     query("1[1]['']", "");
     query("1[1]['a']", "1");
-    query("1[1][<a/>]", "1");
+    query("1[1][<a b='{random:integer()}'/>]", "1");
 
     query("1[1][0]", "");
     query("1[1][1]", "1");
@@ -119,7 +119,7 @@ public final class FilterTest extends AdvancedQueryTest {
     // numeric sequence
     query("(1 to 3)[1]['']", "");
     query("(1 to 3)[1]['a']", "1");
-    query("(1 to 3)[1][<a/>]", "1");
+    query("(1 to 3)[1][<a b='{random:integer()}'/>]", "1");
 
     query("(1 to 3)[1][0]", "");
     query("(1 to 3)[1][1]", "1");
@@ -129,7 +129,7 @@ public final class FilterTest extends AdvancedQueryTest {
     // XML sequence
     query("((1 to 2) ! <a b='{.}'/>)[1]['']", "");
     query("((1 to 2) ! <a b='{.}'/>)[1]['a']", "<a b=\"1\"/>");
-    query("((1 to 2) ! <a b='{.}'/>)[1][<a/>]", "<a b=\"1\"/>");
+    query("((1 to 2) ! <a b='{.}'/>)[1][<a b='{random:integer()}'/>]", "<a b=\"1\"/>");
 
     query("((1 to 2) ! <a b='{.}'/>)[1][0]", "");
     query("((1 to 2) ! <a b='{.}'/>)[1][1]", "<a b=\"1\"/>");
@@ -143,14 +143,14 @@ public final class FilterTest extends AdvancedQueryTest {
   @Test public void multiplePosAsLastPredicate() {
     // empty sequence
     query("()['x'][position() = 1 to 2]", "");
-    query("()[<a/>][position() = 1 to 2]", "");
+    query("()[<a b='{random:integer()}'/>][position() = 1 to 2]", "");
     query("()[1][position() = 1 to 2]", "");
     query("()[last()][position() = 1 to 2]", "");
 
     // single item
     query("1[''][position() = 1 to 2]", "");
     query("1['a'][position() = 1 to 2]", "1");
-    query("1[<a/>][position() = 1 to 2]", "1");
+    query("1[<a b='{random:integer()}'/>][position() = 1 to 2]", "1");
 
     query("1[0][position() = 1 to 2]", "");
     query("1[1][position() = 1 to 2]", "1");
@@ -160,7 +160,7 @@ public final class FilterTest extends AdvancedQueryTest {
     // numeric sequence
     query("(1 to 3)[''][position() = 1 to 2]", "");
     query("(1 to 3)['a'][position() = 1 to 2]", "1\n2");
-    query("(1 to 3)[<a/>][position() = 1 to 2]", "1\n2");
+    query("(1 to 3)[<a b='{random:integer()}'/>][position() = 1 to 2]", "1\n2");
 
     query("(1 to 3)[0][position() = 1 to 2]", "");
     query("(1 to 3)[1][position() = 1 to 2]", "1");
@@ -171,7 +171,8 @@ public final class FilterTest extends AdvancedQueryTest {
     // XML sequence
     query("((1 to 2) ! <a b='{.}'/>)[''][position() = 1 to 2]", "");
     query("((1 to 2) ! <a b='{.}'/>)['a'][position() = 1 to 2]", "<a b=\"1\"/>\n<a b=\"2\"/>");
-    query("((1 to 2) ! <a b='{.}'/>)[<a/>][position() = 1 to 2]", "<a b=\"1\"/>\n<a b=\"2\"/>");
+    query("((1 to 2) ! <a b='{.}'/>)[<a b='{random:integer()}'/>][position() = 1 to 2]",
+        "<a b=\"1\"/>\n<a b=\"2\"/>");
 
     query("((1 to 2) ! <a b='{.}'/>)[0][position() = 1 to 2]", "");
     query("((1 to 2) ! <a b='{.}'/>)[1][position() = 1 to 2]", "<a b=\"1\"/>");
@@ -186,14 +187,14 @@ public final class FilterTest extends AdvancedQueryTest {
   @Test public void variablePosAsFirstPredicate() {
     // empty sequence
     query("for $i in 1 to 2 return ()[$i]['x']", "");
-    query("for $i in 1 to 2 return ()[$i][<a/>]", "");
+    query("for $i in 1 to 2 return ()[$i][<a b='{random:integer()}'/>]", "");
     query("for $i in 1 to 2 return ()[$i][1]", "");
     query("for $i in 1 to 2 return ()[$i][last()]", "");
 
     // single item
     query("for $i in 1 to 2 return 1[$i]['']", "");
     query("for $i in 1 to 2 return 1[$i]['a']", "1");
-    query("for $i in 1 to 2 return 1[$i][<a/>]", "1");
+    query("for $i in 1 to 2 return 1[$i][<a b='{random:integer()}'/>]", "1");
 
     query("for $i in 1 to 2 return 1[$i][0]", "");
     query("for $i in 1 to 2 return 1[$i][1]", "1");
@@ -203,7 +204,7 @@ public final class FilterTest extends AdvancedQueryTest {
     // numeric sequence
     query("for $i in 1 to 2 return (1 to 3)[$i]['']", "");
     query("for $i in 1 to 2 return (1 to 3)[$i]['a']", "1\n2");
-    query("for $i in 1 to 2 return (1 to 3)[$i][<a/>]", "1\n2");
+    query("for $i in 1 to 2 return (1 to 3)[$i][<a b='{random:integer()}'/>]", "1\n2");
 
     query("for $i in 1 to 2 return (1 to 3)[$i][0]", "");
     query("for $i in 1 to 2 return (1 to 3)[$i][1]", "1\n2");
@@ -214,7 +215,7 @@ public final class FilterTest extends AdvancedQueryTest {
     query("for $i in 1 to 2 return ((1 to 2) ! <a b='{.}'/>)[$i]['']", "");
     query("for $i in 1 to 2 return ((1 to 2) ! <a b='{.}'/>)[$i]['a']",
         "<a b=\"1\"/>\n<a b=\"2\"/>");
-    query("for $i in 1 to 2 return ((1 to 2) ! <a b='{.}'/>)[$i][<a/>]",
+    query("for $i in 1 to 2 return ((1 to 2) ! <a b='{.}'/>)[$i][<a b='{random:integer()}'/>]",
         "<a b=\"1\"/>\n<a b=\"2\"/>");
 
     query("for $i in 1 to 2 return ((1 to 2) ! <a b='{.}'/>)[$i][0]", "");
@@ -231,14 +232,14 @@ public final class FilterTest extends AdvancedQueryTest {
   @Test public void variablePosAsLastPredicate() {
     // empty sequence
     query("for $i in 1 to 2 return ()['x'][$i]", "");
-    query("for $i in 1 to 2 return ()[<a/>][$i]", "");
+    query("for $i in 1 to 2 return ()[<a b='{random:integer()}'/>][$i]", "");
     query("for $i in 1 to 2 return ()[1][$i]", "");
     query("for $i in 1 to 2 return ()[last()][$i]", "");
 
     // single item
     query("for $i in 1 to 2 return 1[''][$i]", "");
     query("for $i in 1 to 2 return 1['a'][$i]", "1");
-    query("for $i in 1 to 2 return 1[<a/>][$i]", "1");
+    query("for $i in 1 to 2 return 1[<a b='{random:integer()}'/>][$i]", "1");
 
     query("for $i in 1 to 2 return 1[0][$i]", "");
     query("for $i in 1 to 2 return 1[1][$i]", "1");
@@ -248,7 +249,7 @@ public final class FilterTest extends AdvancedQueryTest {
     // numeric sequence
     query("for $i in 1 to 2 return (1 to 3)[''][$i]", "");
     query("for $i in 1 to 2 return (1 to 3)['a'][$i]", "1\n2");
-    query("for $i in 1 to 2 return (1 to 3)[<a/>][$i]", "1\n2");
+    query("for $i in 1 to 2 return (1 to 3)[<a b='{random:integer()}'/>][$i]", "1\n2");
 
     query("for $i in 1 to 2 return (1 to 3)[0][$i]", "");
     query("for $i in 1 to 2 return (1 to 3)[1][$i]", "1");
@@ -260,7 +261,7 @@ public final class FilterTest extends AdvancedQueryTest {
     query("for $i in 1 to 2 return ((1 to 2) ! <a b='{.}'/>)[''][$i]", "");
     query("for $i in 1 to 2 return ((1 to 2) ! <a b='{.}'/>)['a'][$i]",
         "<a b=\"1\"/>\n<a b=\"2\"/>");
-    query("for $i in 1 to 2 return ((1 to 2) ! <a b='{.}'/>)[<a/>][$i]",
+    query("for $i in 1 to 2 return ((1 to 2) ! <a b='{.}'/>)[<a b='{random:integer()}'/>][$i]",
         "<a b=\"1\"/>\n<a b=\"2\"/>");
 
     query("for $i in 1 to 2 return ((1 to 2) ! <a b='{.}'/>)[0][$i]", "");
@@ -276,7 +277,10 @@ public final class FilterTest extends AdvancedQueryTest {
   @Test public void variablePreds() {
     // empty sequence
     query("for $i in (1,'a',2) return <a b='{$i}'/>[$i]", "<a b=\"1\"/>\n<a b=\"a\"/>");
-    query("for $i in (1,'a',2) return <a b='{$i}'/>[<b/>][$i]", "<a b=\"1\"/>\n<a b=\"a\"/>");
-    query("for $i in (1,'a',2) return <a b='{$i}'/>[<b/>][<c/>][$i]", "<a b=\"1\"/>\n<a b=\"a\"/>");
+    query("for $i in (1,'a',2) return <a b='{$i}'/>[<b c='{random:integer()}'/>][$i]",
+        "<a b=\"1\"/>\n<a b=\"a\"/>");
+    query("for $i in (1,'a',2) "
+        + "return <a b='{$i}'/>[<a b='{random:integer()}'/>][<b c='{random:integer()}'/>][$i]",
+        "<a b=\"1\"/>\n<a b=\"a\"/>");
   }
 }
