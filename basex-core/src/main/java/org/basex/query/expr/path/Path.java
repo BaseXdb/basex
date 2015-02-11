@@ -724,7 +724,7 @@ public abstract class Path extends ParseExpr {
 
     // add remaining steps
     for(int s = iStep + 1; s < sl; s++) resultSteps.add(steps[s]);
-    return get(info, resultRoot, resultSteps.finish());
+    return resultSteps.isEmpty() ? resultRoot : get(info, resultRoot, resultSteps.finish());
   }
 
   /**
@@ -797,7 +797,7 @@ public abstract class Path extends ParseExpr {
 
     if(opt) {
       qc.compInfo(OPTDESC);
-      return get(info, root, stps.finish());
+      return stps.isEmpty() ? root : get(info, root, stps.finish());
     }
     return this;
   }
