@@ -20,6 +20,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.query.value.type.SeqType.Occ;
 import org.basex.query.var.*;
 import org.basex.util.*;
 
@@ -31,8 +32,8 @@ import org.basex.util.*;
  */
 public abstract class Path extends ParseExpr {
   /** XPath axes that are expected to be expensive when at the start of a path. */
-  private static final EnumSet<Axis> EXPENSIVE = EnumSet.of(DESC, DESCORSELF, PREC, PRECSIBL,
-      FOLL, FOLLSIBL);
+  private static final EnumSet<Axis> EXPENSIVE =
+      EnumSet.of(DESC, DESCORSELF, PREC, PRECSIBL, FOLL, FOLLSIBL);
 
   /** Root expression. */
   public Expr root;
@@ -157,19 +158,29 @@ public abstract class Path extends ParseExpr {
 
     // merge descendant steps
     Expr e = mergeSteps(qc);
-    if(e == this && v != null && v.type == NodeType.DOC) {
+    if(e != this) return e.optimize(qc, scp);
+
+    if(v != null && v.type == NodeType.DOC) {
       // check index access
       e = index(qc, v);
-      // rewrite descendant to child steps
-      if(e == this) e = children(qc, v);
+      // recompile path
+      if(e != this) return e.optimize(qc, scp);
+
+      /* rewrite descendant to child steps. this optimization is located after the index rewriting,
+       * as it is cheaper to invert a descendant step. examples:
+       * - //C[. = '...']     ->  IA('...', C)
+       * - /A/B/C[. = '...']  ->  IA('...', C)/parent::B/parent::A
+       */
+      e = children(qc, v);
+      if(e != this) return e.optimize(qc, scp);
     }
-    // recompile path if it has changed
-    if(e != this) return e.compile(qc, scp);
 
     // set atomic type for single attribute steps to speed up predicate tests
     if(root == null && steps.length == 1 && steps[0] instanceof Step) {
-      final Step curr = (Step) steps[0];
-      if(curr.axis == ATTR && curr.test.kind == Kind.URI_NAME) curr.seqType(SeqType.NOD_ZO);
+      final Step step = (Step) steps[0];
+      if(step.axis == ATTR && step.test.kind == Kind.URI_NAME) {
+        step.seqType(SeqType.NOD_ZO);
+      }
     }
 
     // choose best path implementation and set type information
@@ -589,7 +600,7 @@ public abstract class Path extends ParseExpr {
    * is used, which will be rewritten to {@link ValueAccess} instances):
    *
    * <pre>
-   * 1. A[text() = '...']    -> IA('...')
+   * 1. A[text() = '...']    -> IA('...', A)
    * 2. A[. = '...']         -> IA('...', A)
    * 3. text()[. = '...']    -> IA('...')
    * 4. A[B = '...']         -> IA('...', B)/parent::A
@@ -688,6 +699,13 @@ public abstract class Path extends ParseExpr {
       resultSteps.add(p.steps);
     } else {
       resultRoot = index.expr;
+    }
+
+    // only one hit:
+    if(index.costs == 1) {
+      // set sequence type
+      if(resultRoot instanceof IndexAccess) ((IndexAccess) resultRoot).size(1);
+      else ((ParseExpr) resultRoot).seqType(resultRoot.seqType().withOcc(Occ.ZERO_ONE));
     }
 
     if(!newPreds.isEmpty()) {

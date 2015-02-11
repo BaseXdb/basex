@@ -32,16 +32,16 @@ public final class NameTest extends Test {
   /**
    * Constructor.
    * @param name name (may be {@code null})
-   * @param mode type of name test
+   * @param kind kind of name test
    * @param attr attribute flag
    * @param elemNS default element namespace (may be {@code null})
    */
-  public NameTest(final QNm name, final Kind mode, final boolean attr, final byte[] elemNS) {
+  public NameTest(final QNm name, final Kind kind, final boolean attr, final byte[] elemNS) {
+    this.name = name;
+    this.kind = kind;
     type = attr ? NodeType.ATT : NodeType.ELM;
     local = name != null ? name.local() : null;
     defElemNS = elemNS != null ? elemNS : Token.EMPTY;
-    this.name = name;
-    kind = mode;
   }
 
   @Override

@@ -47,7 +47,7 @@ final class IterLastStep extends Step {
 
   @Override
   public IterLastStep copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    final AxisStep step = new AxisStep(info, axis, test.copy(), Arr.copyAll(qc, scp, vs, preds));
-    return copyType(new IterLastStep(step));
+    return copyType(new IterLastStep(
+        new CachedStep(info, axis, test.copy(), Arr.copyAll(qc, scp, vs, preds))));
   }
 }

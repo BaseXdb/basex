@@ -31,7 +31,7 @@ public abstract class Filter extends Preds {
    * @param root root expression
    * @param preds predicates
    */
-  Filter(final InputInfo info, final Expr root, final Expr... preds) {
+  protected Filter(final InputInfo info, final Expr root, final Expr... preds) {
     super(info, preds);
     this.root = root;
   }
@@ -212,7 +212,7 @@ public abstract class Filter extends Preds {
         opt = true;
       } else {
         // rebuild filter if no optimization can be applied
-        e = e instanceof Filter ? ((Filter) e).addPred(pred) : Filter.get(info, e, pred);
+        e = e instanceof Filter ? ((Filter) e).addPred(pred) : get(info, e, pred);
       }
     }
 

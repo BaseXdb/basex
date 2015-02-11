@@ -10,12 +10,12 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Axis step expression.
+ * Step expression, caching all results.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-final class AxisStep extends Step {
+final class CachedStep extends Step {
   /**
    * Constructor.
    * @param info input info
@@ -23,7 +23,7 @@ final class AxisStep extends Step {
    * @param test node test
    * @param preds predicates
    */
-  AxisStep(final InputInfo info, final Axis axis, final Test test, final Expr[] preds) {
+  CachedStep(final InputInfo info, final Axis axis, final Test test, final Expr[] preds) {
     super(info, axis, test, preds);
   }
 
@@ -64,6 +64,6 @@ final class AxisStep extends Step {
     final int pl = preds.length;
     final Expr[] pred = new Expr[pl];
     for(int p = 0; p < pl; p++) pred[p] = preds[p].copy(qc, scp, vs);
-    return copyType(new AxisStep(info, axis, test.copy(), pred));
+    return copyType(new CachedStep(info, axis, test.copy(), pred));
   }
 }

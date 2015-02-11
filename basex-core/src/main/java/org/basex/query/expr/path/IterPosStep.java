@@ -15,7 +15,7 @@ import org.basex.util.hash.*;
  */
 final class IterPosStep extends Step {
   /** Positional predicate. */
-  private Pos pos;
+  private final Pos pos;
 
   /**
    * Constructor.
@@ -54,7 +54,7 @@ final class IterPosStep extends Step {
 
   @Override
   public IterPosStep copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    final AxisStep step = new AxisStep(info, axis, test.copy(), Arr.copyAll(qc, scp, vs, preds));
-    return copyType(new IterPosStep(step, pos));
+    return copyType(new IterPosStep(
+        new CachedStep(info, axis, test.copy(), Arr.copyAll(qc, scp, vs, preds)), pos));
   }
 }

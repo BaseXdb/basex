@@ -57,6 +57,7 @@ public final class IndexOptimizeTest extends AdvancedQueryTest {
     check("//a[. = '1']");
     check("//xml[a = '1']");
     check(".[.//text() contains text '1']");
+    check("for $s in ('x', '') return //*[text() = $s]", "");
   }
 
   /**
@@ -73,6 +74,7 @@ public final class IndexOptimizeTest extends AdvancedQueryTest {
     check("//a[. = '1']");
     check("//xml[a = '1']");
     check(".[.//text() contains text '1']");
+    check("for $s in ('x', '') return //*[text() = $s]", "");
   }
 
   /**
@@ -89,6 +91,7 @@ public final class IndexOptimizeTest extends AdvancedQueryTest {
     check(func + "//xml[a = '1']");
     check(func + "/.[.//text() contains text '1']");
     check(func + "[.//text() contains text '1']");
+    check("for $s in ('x', '') return " + func + "//*[text() = $s]", "");
   }
 
   /**
@@ -105,6 +108,8 @@ public final class IndexOptimizeTest extends AdvancedQueryTest {
     check(func + "//xml[a = '1']");
     check(func + "/.[.//text() contains text '1']");
     check(func + "[.//text() contains text '1']");
+    check("for $s in ('x', '', string-join((1 to 513) ! 'a'))"
+        + "return " + func + "//*[text() = $s]", "");
   }
 
   /**
@@ -119,6 +124,8 @@ public final class IndexOptimizeTest extends AdvancedQueryTest {
     check(func + "//*[text() contains text '2']");
     check(func + "//a[. = '1']");
     check(func + "//xml[a = '1']");
+    check("for $s in ('x', '', string-join((1 to 513) ! 'a'))"
+        + "return " + func + "//*[text() = $s]", "");
   }
 
   /**
@@ -134,6 +141,8 @@ public final class IndexOptimizeTest extends AdvancedQueryTest {
     check(func + "//a[. = '1']", "");
     check(func + "//xml[a = '1']", "");
     check(func + "//*[text() = '4']", "<a>4</a>");
+    check("for $s in ('x', '', string-join((1 to 513) ! 'a'))"
+        + "return " + func + "//*[text() = $s]", "");
   }
 
   /**

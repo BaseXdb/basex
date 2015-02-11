@@ -16,6 +16,7 @@ import org.basex.query.util.collation.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.value.type.SeqType.Occ;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -319,7 +320,7 @@ public final class CmpG extends Cmp {
       // loop through all items
       ii.costs = 0;
       final Iter ir = arg.iter(ii.qc);
-      final ArrayList<ValueAccess> va = new ArrayList<>();
+      final ArrayList<ValueAccess> tmp = new ArrayList<>();
       final TokenSet strings = new TokenSet();
       for(Item it; (it = ir.next()) != null;) {
         // only strings and untyped items are supported
@@ -333,14 +334,16 @@ public final class CmpG extends Cmp {
           strings.put(string);
           final int costs = data.costs(new StringToken(ii.text, string));
           if(costs != 0) {
-            va.add(new ValueAccess(info, it, ii.text, ii.name, ii.ic));
+            final ValueAccess va = new ValueAccess(info, it, ii.text, ii.test, ii.ic);
+            tmp.add(va);
+            if(costs == 1) va.seqType(va.seqType().withOcc(Occ.ZERO_ONE));
             ii.costs += costs;
           }
         }
       }
       // more than one string - merge index results
-      final int vs = va.size();
-      root = vs == 1 ? va.get(0) : new Union(info, va.toArray(new ValueAccess[vs]));
+      final int vs = tmp.size();
+      root = vs == 1 ? tmp.get(0) : new Union(info, tmp.toArray(new ValueAccess[vs]));
     } else {
       /* index access is not possible if returned type is not a string or untyped; if
          expression depends on context; or if it is non-deterministic. examples:
@@ -352,9 +355,8 @@ public final class CmpG extends Cmp {
         arg.has(Flag.UPD)) return false;
 
       // estimate costs (tend to worst case)
-      ii.costs = Math.max(1, data.meta.size / 10);
-      root = new ValueAccess(info, arg, ii.text, ii.name, ii.ic);
-
+      ii.costs = Math.max(2, data.meta.size / 10);
+      root = new ValueAccess(info, arg, ii.text, ii.test, ii.ic);
     }
 
     ii.create(root, info, Util.info(ii.text ? OPTTXTINDEX : OPTATVINDEX, arg), false);

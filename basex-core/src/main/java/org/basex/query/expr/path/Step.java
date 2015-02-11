@@ -43,9 +43,13 @@ public abstract class Step extends Preds {
    */
   public static Step get(final InputInfo info, final Axis axis, final Test test,
       final Expr... preds) {
-    boolean num = false;
-    for(final Expr pr : preds) num |= pr.seqType().mayBeNumber() || pr.has(Flag.FCS);
-    return num ? new AxisStep(info, axis, test, preds) : new IterStep(info, axis, test, preds);
+
+    for(final Expr pr : preds) {
+      if(pr.seqType().mayBeNumber() || pr.has(Flag.FCS)) {
+        return new CachedStep(info, axis, test, preds);
+      }
+    }
+    return new IterStep(info, axis, test, preds);
   }
 
   /**

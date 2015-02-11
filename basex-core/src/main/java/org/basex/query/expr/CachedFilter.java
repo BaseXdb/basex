@@ -10,7 +10,7 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Filter expression.
+ * Filter expression, caching all results.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen

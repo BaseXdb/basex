@@ -162,8 +162,8 @@ public final class CmpR extends Single {
     final int mxl = max >= 0 && (long) max == max ? token(max).length : -1;
     if(mnl != mxl || mnl == -1) return false;
 
-    // estimate costs (you conservative value)
-    ii.costs = Math.max(1, data.meta.size / 3);
+    // estimate costs (conservative value)
+    ii.costs = Math.max(2, data.meta.size / 3);
 
     // don't use index if min/max values are infinite
     if(min == Double.NEGATIVE_INFINITY && max == Double.POSITIVE_INFINITY ||
@@ -186,8 +186,8 @@ public final class CmpR extends Single {
     final Data data = ii.ic.data;
     if(!data.meta.uptodate || data.nspaces.size() != 0 || !(expr instanceof AxisPath)) return null;
 
-    byte[] name = ii.name;
-    if(name == null) {
+    NameTest test = ii.test;
+    if(test == null) {
       final Step step;
       final AxisPath path = (AxisPath) expr;
       final int st = path.steps.length - 1;
@@ -198,11 +198,11 @@ public final class CmpR extends Single {
         step = path.step(st);
         if(!step.simple(Axis.ATTR, true)) return null;
       }
-      name = ((NameTest) step.test).local;
+      test = (NameTest) step.test;
     }
 
     final Names names = text ? data.elemNames : data.attrNames;
-    final Stats key = names.stat(names.id(name));
+    final Stats key = names.stat(names.id(test.name.local()));
     return key == null || key.type == StatsType.INTEGER ||
         key.type == StatsType.DOUBLE ? key : null;
   }
