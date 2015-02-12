@@ -467,9 +467,9 @@ public final class Window extends Clause {
      */
     private boolean matches(final QueryContext qc, final Item it, final long p, final Item pr,
         final Item nx) throws QueryException {
+
       // bind variables
       bind(qc, it, p, pr, nx);
-
       // evaluate as effective boolean value
       return expr.ebv(qc, info).bool(info);
     }

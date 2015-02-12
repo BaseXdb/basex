@@ -145,7 +145,7 @@ public abstract class Expr extends ExprInfo {
   public abstract Item ebv(final QueryContext qc, final InputInfo ii) throws QueryException;
 
   /**
-   * Performs a predicate test and returns the item if test was successful.
+   * Performs a predicate test and returns the item the if test was successful.
    * @param qc query context
    * @param ii input info
    * @return item

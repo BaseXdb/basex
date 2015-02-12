@@ -44,12 +44,12 @@ final class CachedStep extends Step {
       qc.pos = 1;
       int c = 0;
       for(int n = 0; n < nl; ++n) {
-        qc.value = nc.get(n);
-        final Item it = pred.test(qc, info);
-        if(it != null) {
+        final ANode node = nc.get(n);
+        qc.value = node;
+        final Item tst = pred.test(qc, info);
+        if(tst != null) {
           // assign score value
-          final ANode node = nc.get(n);
-          if(scoring) node.score(it.score());
+          if(scoring) node.score(tst.score());
           nc.nodes[c++] = node;
         }
         qc.pos++;

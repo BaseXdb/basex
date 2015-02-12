@@ -162,27 +162,17 @@ public abstract class Preds extends ParseExpr {
    * @throws QueryException query exception
    */
   protected final boolean preds(final Item item, final QueryContext qc) throws QueryException {
-    final int pl = preds.length;
-    if(pl == 0) return true;
-
     // set context value and position
     final Value cv = qc.value;
+    qc.value = item;
     try {
-      if(qc.scoring) {
-        double s = 0;
-        for(final Expr pred : preds) {
-          qc.value = item;
-          final Item it = pred.test(qc, info);
-          if(it == null) return false;
-          s += it.score();
-        }
-        item.score(Scoring.avg(s, pl));
-      } else {
-        for(final Expr pred : preds) {
-          qc.value = item;
-          if(pred.test(qc, info) == null) return false;
-        }
+      double s = qc.scoring ? 0 : -1;
+      for(final Expr pred : preds) {
+        final Item test = pred.test(qc, info);
+        if(test == null) return false;
+        if(s != -1) s += test.score();
       }
+      if(s > 0) item.score(Scoring.avg(s, preds.length));
       return true;
     } finally {
       qc.value = cv;

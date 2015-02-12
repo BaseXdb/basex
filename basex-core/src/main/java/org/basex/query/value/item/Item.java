@@ -243,15 +243,16 @@ public abstract class Item extends Value {
    * @return score value
    */
   public double score() {
-    return score == null ? 0 : score;
+    final Double s = score;
+    return s == null ? 0 : s;
   }
 
   /**
-   * Sets a new score value.
+   * Sets a new score value (do not assign if value is 0).
    * @param s score value
    */
   public final void score(final double s) {
-    if(score != null || s != 0) score = s;
+    if(s != 0) score = s;
   }
 
   @Override

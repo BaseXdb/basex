@@ -3,9 +3,12 @@ package org.basex.query.expr.path;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.ft.*;
 import org.basex.util.hash.*;
 
 /**
@@ -70,18 +73,27 @@ final class IterPosStep extends Step {
        * @throws QueryException query exception
        */
       private boolean preds(final ANode node) throws QueryException {
-        final int pl = preds.length;
-        for(int p = 0; p < pl; p++) {
-          final Expr pred = preds[p];
-          final Pos pos = posExpr[p];
-          if(pos == null) {
-            qc.value = node;
-            if(pred.test(qc, info) == null) return false;
-          } else {
-            final long ps = ++cPos[p];
-            if(!pos.matches(ps)) return false;
-            if(pos.skip(ps)) skip = true;
+        final Value cv = qc.value;
+        qc.value = node;
+        try {
+          double s = qc.scoring ? 0 : -1;
+          final int pl = preds.length;
+          for(int p = 0; p < pl; p++) {
+            final Expr pred = preds[p];
+            final Pos pos = posExpr[p];
+            if(pos == null) {
+              final Item tst = pred.test(qc, info);
+              if(tst == null) return false;
+              if(s != -1) s += tst.score();
+            } else {
+              final long ps = ++cPos[p];
+              if(!pos.matches(ps)) return false;
+              if(pos.skip(ps)) skip = true;
+            }
           }
+          if(s > 0) node.score(Scoring.avg(s, preds.length));
+        } finally {
+          qc.value = cv;
         }
         return true;
       }
