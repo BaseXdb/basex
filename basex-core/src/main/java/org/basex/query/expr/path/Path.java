@@ -13,6 +13,7 @@ import org.basex.query.expr.constr.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.List;
 import org.basex.query.expr.path.Test.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -130,13 +131,16 @@ public abstract class Path extends ParseExpr {
     try {
       final int sl = steps.length;
       for(int s = 0; s < sl; s++) {
-        final Expr e = steps[s];
-
+        final Expr step = steps[s];
         // axis step: if input is a document, its type is temporarily generalized
-        final boolean as = e instanceof Step;
+        final boolean as = step instanceof Step;
         if(as && s == 0 && doc) cv.type = NodeType.NOD;
-        steps[s] = e.compile(qc, scp);
-
+        try {
+          steps[s] = step.compile(qc, scp);
+        } catch(final QueryException ex) {
+          // replace original expression with error
+          steps[s] = FnError.get(ex, seqType);
+        }
         // no axis step: invalidate context value
         if(!as) qc.value = null;
       }

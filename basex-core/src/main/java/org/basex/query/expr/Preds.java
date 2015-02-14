@@ -11,6 +11,7 @@ import org.basex.query.expr.ft.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -53,7 +54,14 @@ public abstract class Preds extends ParseExpr {
     if(init != null && init.isEmpty()) qc.value = null;
     try {
       final int pl = preds.length;
-      for(int p = 0; p < pl; ++p) preds[p] = preds[p].compile(qc, scp).optimizeEbv(qc, scp);
+      for(int p = 0; p < pl; ++p) {
+        try {
+          preds[p] = preds[p].compile(qc, scp).optimizeEbv(qc, scp);
+        } catch(final QueryException ex) {
+          // replace original expression with error
+          preds[p] = FnError.get(ex, seqType);
+        }
+      }
       return this;
     } finally {
       qc.value = init;
