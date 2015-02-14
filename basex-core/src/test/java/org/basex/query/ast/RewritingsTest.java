@@ -1,8 +1,12 @@
 package org.basex.query.ast;
 
+import static org.basex.query.func.Function.*;
+
 import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.basex.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.junit.Test;
@@ -154,5 +158,38 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a>5</a>[text() > '1' and text() < '9']", "<a>5</a>", "count(//CmpSR) = 1");
     check("<a>5</a>[text() > '1' and text() < '9' and <b/>]", "<a>5</a>", "count(//CmpSR) = 1");
     check("<a>5</a>[text() > '1' and . < '9']", "<a>5</a>", "count(//CmpSR) = 2");
+  }
+
+  /**
+   * Checks string-length optimizations.
+   */
+  @Test
+  public void stringLength() {
+    final String filter = Util.className(IterFilter.class);
+    final String string = Util.className(FnString.class);
+    final String stringLength = Util.className(FnStringLength.class);
+
+    check("<a/>[" + STRING_LENGTH.args() + " >  -1]", "<a/>", "empty(//" + filter + ")");
+    check("<a/>[" + STRING_LENGTH.args() + " != -1]", "<a/>", "empty(//" + filter + ")");
+    check("<a/>[" + STRING_LENGTH.args() + " ge  0]", "<a/>", "empty(//" + filter + ")");
+    check("<a/>[" + STRING_LENGTH.args() + " ne 1.1]", "<a/>", "empty(//" + filter + ")");
+
+    check("<a/>[" + STRING_LENGTH.args() + " <   0]", "", "empty(//" + filter + ")");
+    check("<a/>[" + STRING_LENGTH.args() + " <= -1]", "", "empty(//" + filter + ")");
+    check("<a/>[" + STRING_LENGTH.args() + " eq -1]", "", "empty(//" + filter + ")");
+    check("<a/>[" + STRING_LENGTH.args() + " eq 1.1]", "", "empty(//" + filter + ")");
+
+    check("<a/>[" + STRING_LENGTH.args() + " >  0]", "", "exists(//" + string + ")");
+    check("<a/>[" + STRING_LENGTH.args() + " >= 0.5]", "", "exists(//" + string + ")");
+    check("<a/>[" + STRING_LENGTH.args() + " ne 0]", "", "exists(//" + string + ")");
+
+    check("<a/>[" + STRING_LENGTH.args() + " <  0.5]", "<a/>", "exists(//" + string + ")");
+    check("<a/>[" + STRING_LENGTH.args() + " <= 0.5]", "<a/>", "exists(//" + string + ")");
+    check("<a/>[" + STRING_LENGTH.args() + " eq 0]", "<a/>", "exists(//" + string + ")");
+
+    check("<a/>[" + STRING_LENGTH.args() + " gt 1]", "", "exists(//" + stringLength + ")");
+
+    check("<a/>[" + STRING_LENGTH.args() + " = <a>1</a>]", "", "exists(//" + stringLength + ")");
+
   }
 }

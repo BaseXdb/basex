@@ -195,6 +195,9 @@ public final class CmpV extends Cmp {
     } else if(e1.isFunction(Function.COUNT)) {
       e = compCount(op);
       if(e != this) qc.compInfo(e instanceof Bln ? OPTPRE : OPTWRITE, this);
+    } else if(e1.isFunction(Function.STRING_LENGTH)) {
+      e = compStringLength(op);
+      if(e != this) qc.compInfo(e instanceof Bln ? OPTPRE : OPTWRITE, this);
     } else if(e1.isFunction(Function.POSITION)) {
       // position() CMP number
       e = Pos.get(op, e2, e, info);

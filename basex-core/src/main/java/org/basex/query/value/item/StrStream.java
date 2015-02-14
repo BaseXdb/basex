@@ -57,13 +57,13 @@ public final class StrStream extends AStr {
 
   @Override
   public TextInput input(final InputInfo ii) throws QueryException {
-    TextInput nli = null;
+    TextInput ti = null;
     try {
-      nli = new TextInput(input);
-      nli.encoding(encoding).validate(validate);
-      return nli;
+      ti = new TextInput(input);
+      ti.encoding(encoding).validate(validate);
+      return ti;
     } catch(final IOException ex) {
-      if(nli != null) try { nli.close(); } catch(final IOException ignored) { }
+      if(ti != null) try { ti.close(); } catch(final IOException ignored) { }
       throw error.get(ii, ex);
     }
   }

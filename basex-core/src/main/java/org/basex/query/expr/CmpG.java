@@ -165,6 +165,15 @@ public final class CmpG extends Cmp {
       }
     }
 
+    // rewrite string-length() function
+    if(e1.isFunction(Function.STRING_LENGTH)) {
+      final Expr e = compStringLength(op.op);
+      if(e != this) {
+        qc.compInfo(e instanceof Bln ? OPTPRE : OPTWRITE, this);
+        return e;
+      }
+    }
+
     // position() CMP expr
     if(e1.isFunction(Function.POSITION)) {
       final Expr e = Pos.get(op.op, e2, this, info);
