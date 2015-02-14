@@ -60,6 +60,11 @@ public final class CmpR extends Single {
     atomic = st.zeroOrOne() && !st.mayBeArray();
   }
 
+  @Override
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+    return expr.isValue() ? optPre(item(qc, info), qc) : this;
+  }
+
   /**
    * Tries to convert the specified expression into a range expression.
    * @param cmp expression to be converted
