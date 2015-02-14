@@ -105,7 +105,7 @@ function _:add-post(
         web:update('db:store($n, $p, $c)', map { 'n': $name, 'p': $path, 'c': $content })
       ) else (
         let $xml := try {
-          parse-xml(convert:binary-to-string($content))
+          convert:binary-to-string($content)
         } catch * { error($err:code, replace($err:description, '^.*\): ', '')) }
         return web:update('db:add($n, $x, $p)', map { 'n': $name, 'x': $xml, 'p': $path })
       ),

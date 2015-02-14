@@ -90,7 +90,7 @@ function _:replace-upload(
         let $i := if($raw) then (
           $content
         ) else (
-          parse-xml(convert:binary-to-string($content))
+          convert:binary-to-string($content)
         )
         return web:update("db:replace($n, $r, $i)",
           map { 'n': $name, 'r': $resource, 'i': $i }
