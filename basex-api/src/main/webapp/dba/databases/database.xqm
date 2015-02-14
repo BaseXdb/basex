@@ -42,16 +42,16 @@ function _:database(
   (: request data in a single step :)
   let $data := try {
     web:eval('element result {
-      let $found := db:exists($n)
+      let $found := db:exists($name)
       return (
         element found { $found },
         if($found) then (
-          element databases { db:list-details($n) },
-          element info { db:info($n) }
+          element databases { db:list-details($name)[position() = 1 to $max] },
+          element info { db:info($name) }
         ) else (),
-        element backups { db:backups($n) }
+        element backups { db:backups($name) }
       )
-    }', map { 'n': $name })
+    }', map { 'name': $name, 'max': $G:MAX-ROWS + 1 })
   } catch * {
     element error { $G:DATA-ERROR || ': ' || $err:description }
   }
