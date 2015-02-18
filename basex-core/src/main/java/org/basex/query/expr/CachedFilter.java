@@ -10,7 +10,7 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Filter expression.
+ * Filter expression, caching all results.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
@@ -36,15 +36,20 @@ final class CachedFilter extends Filter {
     try {
       // evaluate first predicate, based on incoming value
       final ValueBuilder vb = new ValueBuilder();
-      Expr p = preds[0];
-      long is = val.size();
-      qc.size = is;
+      Expr pred = preds[0];
+      long vs = val.size();
+      qc.size = vs;
       qc.pos = 1;
-      for(int s = 0; s < is; ++s) {
-        final Item it = val.itemAt(s);
-        qc.value = it;
-        final Item i = p.test(qc, info);
-        if(i != null) vb.add(it);
+
+      final boolean scoring = qc.scoring;
+      for(int s = 0; s < vs; s++) {
+        final Item item = val.itemAt(s);
+        qc.value = item;
+        final Item test = pred.test(qc, info);
+        if(test != null) {
+          if(scoring) item.score(test.score());
+          vb.add(item);
+        }
         qc.pos++;
       }
       // save memory
@@ -53,15 +58,19 @@ final class CachedFilter extends Filter {
       // evaluate remaining predicates, based on value builder
       final int pl = preds.length;
       for(int i = 1; i < pl; i++) {
-        is = vb.size();
-        p = preds[i];
-        qc.size = is;
+        vs = vb.size();
+        pred = preds[i];
+        qc.size = vs;
         qc.pos = 1;
         int c = 0;
-        for(int s = 0; s < is; ++s) {
-          final Item it = vb.get(s);
-          qc.value = it;
-          if(p.test(qc, info) != null) vb.set(c++, it);
+        for(int s = 0; s < vs; ++s) {
+          final Item item = vb.get(s);
+          qc.value = item;
+          final Item test = pred.test(qc, info);
+          if(test != null) {
+            if(scoring) item.score(test.score());
+            vb.set(c++, item);
+          }
           qc.pos++;
         }
         vb.size(c);

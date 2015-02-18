@@ -61,6 +61,11 @@ final class CmpSR extends Single {
     atomic = st.zeroOrOne() && !st.mayBeArray();
   }
 
+  @Override
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+    return expr.isValue() ? optPre(item(qc, info), qc) : this;
+  }
+
   /**
    * Tries to convert the specified expression into a range expression.
    * @param cmp expression to be converted
@@ -149,7 +154,7 @@ final class CmpSR extends Single {
 
     // create range access
     final StringRange sr = new StringRange(ii.text, min, mni, max, mxi);
-    ii.costs = Math.max(1, data.meta.size / 10);
+    ii.costs = Math.max(2, data.meta.size / 10);
     final TokenBuilder tb = new TokenBuilder();
     tb.add(mni ? '[' : '(').addExt(min).add(',').addExt(max).add(mxi ? ']' : ')');
     ii.create(new StringRangeAccess(info, sr, ii.ic), info, Util.info(OPTSRNGINDEX, tb), true);

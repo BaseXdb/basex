@@ -1,3 +1,4 @@
+
 package org.basex.query.expr.path;
 
 import org.basex.query.*;
@@ -34,14 +35,11 @@ final class IterStep extends Step {
       @Override
       public ANode next() throws QueryException {
         if(ai == null) ai = axis.iter(checkNode(qc));
-        final Test tst = test;
-        while(true) {
+        for(ANode node; (node = ai.next()) != null;) {
           qc.checkStop();
-          final ANode node = ai.next();
-          if(node == null) return null;
-          // evaluate node test and predicates
-          if(tst.eq(node) && preds(node, qc)) return node.finish();
+          if(test.eq(node) && preds(node, qc)) return node.finish();
         }
+        return null;
       }
     };
   }

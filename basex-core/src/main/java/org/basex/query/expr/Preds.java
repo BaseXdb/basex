@@ -11,12 +11,13 @@ import org.basex.query.expr.ft.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.query.value.type.SeqType.Occ;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
@@ -53,7 +54,14 @@ public abstract class Preds extends ParseExpr {
     if(init != null && init.isEmpty()) qc.value = null;
     try {
       final int pl = preds.length;
-      for(int p = 0; p < pl; ++p) preds[p] = preds[p].compile(qc, scp).optimizeEbv(qc, scp);
+      for(int p = 0; p < pl; ++p) {
+        try {
+          preds[p] = preds[p].compile(qc, scp).optimizeEbv(qc, scp);
+        } catch(final QueryException ex) {
+          // replace original expression with error
+          preds[p] = FnError.get(ex, seqType);
+        }
+      }
       return this;
     } finally {
       qc.value = init;
@@ -64,14 +72,14 @@ public abstract class Preds extends ParseExpr {
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     // number of predicates may change in loop
     for(int p = 0; p < preds.length; p++) {
-      final Expr pred = preds[p];
+      Expr pred = preds[p];
       if(pred instanceof CmpG || pred instanceof CmpV) {
         final Cmp cmp = (Cmp) pred;
-        if(cmp.exprs[0].isFunction(Function.POSITION)) {
-          final Expr e2 = cmp.exprs[1];
+        final Expr e1 = cmp.exprs[0], e2 = cmp.exprs[1];
+        if(e1.isFunction(Function.POSITION)) {
           final SeqType st2 = e2.seqType();
           // position() = last() -> last()
-          // position() = $n (numeric) -> $n
+          // position() = $n (xs:numeric) -> $n
           if(e2.isFunction(Function.LAST) || st2.one() && st2.type.isNumber()) {
             if(cmp instanceof CmpG && ((CmpG) cmp).op == OpG.EQ ||
                cmp instanceof CmpV && ((CmpV) cmp).op == OpV.EQ) {
@@ -98,20 +106,20 @@ public abstract class Preds extends ParseExpr {
       } else if(pred instanceof ANum) {
         final ANum it = (ANum) pred;
         final long i = it.itr();
-        if(i == it.dbl()) {
-          preds[p] = Pos.get(i, info);
-        } else {
-          qc.compInfo(OPTREMOVE, this, pred);
-          return Empty.SEQ;
-        }
+        // example: ....[position() = 1.2]
+        if(i != it.dbl()) return optPre(qc);
+        pred = Pos.get(i, info);
+        // example: ....[position() = 0]
+        if(!(pred instanceof Pos)) return optPre(qc);
+        preds[p] = pred;
       } else if(pred.isValue()) {
         if(pred.ebv(qc, info).bool(info)) {
+          // example: ....[true()]
           qc.compInfo(OPTREMOVE, this, pred);
           preds = Array.delete(preds, p--);
         } else {
-          // handle statically known predicates
-          qc.compInfo(OPTREMOVE, this, pred);
-          return Empty.SEQ;
+          // example: ....[false()]
+          return optPre(qc);
         }
       }
     }
@@ -119,49 +127,60 @@ public abstract class Preds extends ParseExpr {
   }
 
   /**
-   * Prepares this expression for iterative evaluation. The expression can be iteratively
-   * evaluated if no predicate or only the first is positional.
-   * @return result of check
+   * Assigns the sequence type and {@link #size} value.
+   * @param st sequence type of input
+   * @param s size of input ({@code -1} if unknown)
    */
-  protected final Pos posIterator() {
-    // check if first predicate is numeric
-    if(preds.length == 1) {
-      Expr p = preds[0];
-      if(p instanceof Int) p = Pos.get(((Int) p).itr(), info);
-      preds[0] = p;
-      if(p instanceof Pos) return (Pos) p;
+  protected final void seqType(final SeqType st, final long s) {
+    boolean exact = s != -1;
+    long max = exact ? s : Long.MAX_VALUE;
+
+    // evaluate positional predicates
+    for(final Expr pred : preds) {
+      if(pred.isFunction(Function.LAST)) {
+        // use minimum of old value and 1
+        max = Math.min(max, 1);
+      } else if(pred instanceof Pos) {
+        final Pos pos = (Pos) pred;
+        // subtract start position. example: ...[1 to 2][2] -> (2 ->) 1
+        if(max != Long.MAX_VALUE) max = Math.max(0, max - pos.min + 1);
+        // use minimum of old value and range. example: ...[1 to 5] -> 5
+        max = Math.min(max, pos.max - pos.min + 1);
+      } else {
+        // resulting size will be unknown for any other filter
+        exact = false;
+      }
     }
-    return null;
+
+    if(exact || max == 0) {
+      seqType = st.withSize(max);
+      size = max;
+    } else {
+      // we only know if there will be at most 1 result
+      seqType = st.withOcc(max == 1 ? Occ.ZERO_ONE : Occ.ZERO_MORE);
+      size = -1;
+    }
   }
 
   /**
    * Checks if the predicates are successful for the specified item.
-   * @param it item to be checked
+   * @param item item to be checked
    * @param qc query context
    * @return result of check
    * @throws QueryException query exception
    */
-  protected final boolean preds(final Item it, final QueryContext qc) throws QueryException {
-    if(preds.length == 0) return true;
-
+  protected final boolean preds(final Item item, final QueryContext qc) throws QueryException {
     // set context value and position
     final Value cv = qc.value;
+    qc.value = item;
     try {
-      if(qc.scoring) {
-        double s = 0;
-        for(final Expr p : preds) {
-          qc.value = it;
-          final Item i = p.test(qc, info);
-          if(i == null) return false;
-          s += i.score();
-        }
-        it.score(Scoring.avg(s, preds.length));
-      } else {
-        for(final Expr p : preds) {
-          qc.value = it;
-          if(p.test(qc, info) == null) return false;
-        }
+      double s = qc.scoring ? 0 : -1;
+      for(final Expr pred : preds) {
+        final Item test = pred.test(qc, info);
+        if(test == null) return false;
+        if(s != -1) s += test.score();
       }
+      if(s > 0) item.score(Scoring.avg(s, preds.length));
       return true;
     } finally {
       qc.value = cv;
@@ -222,6 +241,16 @@ public abstract class Preds extends ParseExpr {
       }
     }
     return this;
+  }
+
+  /**
+   * Checks if the specified expression returns a deterministic numeric value.
+   * @param expr expression
+   * @return result of check
+   */
+  protected static boolean num(final Expr expr) {
+    final SeqType st = expr.seqType();
+    return st.type.isNumber() && st.zeroOrOne() && !expr.has(Flag.CTX) && !expr.has(Flag.NDT);
   }
 
   @Override

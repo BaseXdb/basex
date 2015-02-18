@@ -43,7 +43,7 @@ public abstract class Test {
 
   /** Node kind. */
   public NodeType type;
-  /** Type of name test. Set to {@code null} for other kind tests. */
+  /** Kind of name test. Set to {@code null} for other kind tests. */
   public Kind kind;
   /** Name test. Set to {@code null} for other kind tests. */
   public QNm name;

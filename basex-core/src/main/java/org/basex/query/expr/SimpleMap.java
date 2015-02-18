@@ -1,6 +1,7 @@
 package org.basex.query.expr;
 
 import org.basex.query.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.type.*;
@@ -50,9 +51,12 @@ public abstract class SimpleMap extends Arr {
     try {
       final int el = exprs.length;
       for(int e = 0; e < el; e++) {
-        final Expr ex = exprs[e].compile(qc, scp);
-        if(ex.isEmpty()) return optPre(qc);
-        exprs[e] = ex;
+        try {
+          exprs[e] = exprs[e].compile(qc, scp);
+        } catch(final QueryException ex) {
+          // replace original expression with error
+          exprs[e] = FnError.get(ex, seqType);
+        }
         qc.value = null;
       }
     } finally {
@@ -64,6 +68,10 @@ public abstract class SimpleMap extends Arr {
   @Override
   public final Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     seqType = SeqType.get(exprs[exprs.length - 1].seqType().type, Occ.ZERO_MORE);
+
+    // rewrite path with empty steps
+    for(final Expr expr : exprs) if(expr.isEmpty()) return optPre(qc);
+
     return allAreValues() ? optPre(value(qc), qc) : this;
   }
 

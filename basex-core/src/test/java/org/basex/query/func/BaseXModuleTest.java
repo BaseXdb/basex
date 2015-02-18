@@ -34,6 +34,26 @@ public final class BaseXModuleTest extends AdvancedQueryTest {
 
   /** Test method. */
   @Test
+  public void itemRange() {
+    query(_BASEX_ITEM_RANGE.args("()", " 1", " 2"), "");
+    query(_BASEX_ITEM_RANGE.args("1", " 1", " 2"), 1);
+    query(_BASEX_ITEM_RANGE.args("1", " 0", " 2"), "1");
+    query(_BASEX_ITEM_RANGE.args("1", " 2", " 2"), "");
+    query(_BASEX_ITEM_RANGE.args(" 1 to 2", " 2", " 2"), "2");
+    query(_BASEX_ITEM_RANGE.args(" 1 to 2", " 3", " 2"), "");
+    query(_BASEX_ITEM_RANGE.args(" 1 to 2", " 0", " 2"), "1\n2");
+    query(_BASEX_ITEM_RANGE.args(" 1 to 2", " -1", " 2"), "1\n2");
+    query(_BASEX_ITEM_RANGE.args(" 1 to 2", " 1.5", " 2"), "2");
+
+    query("for $i in 1 to 2 return " + _BASEX_ITEM_RANGE.args("$i", " 1", " 2"), "1\n2");
+    query(_BASEX_ITEM_RANGE.args(" (<a/>,<b/>)", " 0", " 2"), "<a/>\n<b/>");
+    query(_BASEX_ITEM_RANGE.args(" (<a/>,<b/>)", " 1", " 2"), "<a/>\n<b/>");
+    query(_BASEX_ITEM_RANGE.args(" (<a/>,<b/>)", " 2.5", " 3.5"), "");
+    query(_BASEX_ITEM_RANGE.args(" (<a/>,<b/>)", " 3", " 4"), "");
+  }
+
+  /** Test method. */
+  @Test
   public void lastFrom() {
     query(_BASEX_LAST_FROM.args("()"), "");
     query(_BASEX_LAST_FROM.args("1"), 1);

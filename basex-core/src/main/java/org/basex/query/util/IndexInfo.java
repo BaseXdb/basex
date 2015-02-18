@@ -7,7 +7,6 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.expr.path.Test.Kind;
 import org.basex.query.util.list.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -25,8 +24,8 @@ public final class IndexInfo {
   /** Step with predicate that can be rewritten for index access. */
   public final Step step;
 
-  /** Name of parent element. */
-  public byte[] name;
+  /** Name test of parent element. */
+  public NameTest test;
 
   /** Flag for text index access. */
   public boolean text;
@@ -37,7 +36,8 @@ public final class IndexInfo {
   public String info;
   /** Index expression. */
   public Expr expr;
-  /** Costs of index access: smaller is better, 0 means no results. */
+  /** Costs of index access. 0 = no results; 1 = exactly one results;
+   * all other values may be estimates (the smaller, the better). */
   public int costs;
 
   /** Original expression. */
@@ -83,8 +83,8 @@ public final class IndexInfo {
     if(elem) {
       // only do check if database is up-to-date if no namespaces occur and if name test is used
       if(!data.meta.uptodate || data.nspaces.size() != 0 || s.test.kind != Kind.NAME) return false;
-      name = s.test.name.local();
-      final Stats stats = data.elemNames.stat(data.elemNames.id(name));
+      test = (NameTest) s.test;
+      final Stats stats = data.elemNames.stat(data.elemNames.id(test.name.local()));
       if(stats == null || !stats.isLeaf()) return false;
     }
 
@@ -107,13 +107,8 @@ public final class IndexInfo {
   public void create(final ParseExpr root, final InputInfo ii, final String opt,
       final boolean parent) {
 
-    ParseExpr rt = root;
-    if(parent && name != null) {
-      final NameTest test = new NameTest(new QNm(name), Kind.NAME, false, null);
-      final Step s = Step.get(ii, Axis.PARENT, test);
-      rt = Path.get(ii, rt, s);
-    }
-    expr = invert(rt);
+    expr = invert(test == null || !parent ? root :
+      Path.get(ii, root, Step.get(ii, Axis.PARENT, test)));
     info = opt;
   }
 

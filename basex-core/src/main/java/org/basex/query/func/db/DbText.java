@@ -24,8 +24,7 @@ public class DbText extends DbAccess {
    * @return index accessor
    * @throws QueryException query exception
    */
-  final ValueAccess valueAccess(final boolean text, final QueryContext qc)
-      throws QueryException {
+  final ValueAccess valueAccess(final boolean text, final QueryContext qc) throws QueryException {
     return new ValueAccess(info, exprs[1], text, null, new IndexContext(checkData(qc), false));
   }
 }

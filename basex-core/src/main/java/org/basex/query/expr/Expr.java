@@ -1,5 +1,7 @@
 package org.basex.query.expr;
 
+import static org.basex.query.QueryText.*;
+
 import java.util.*;
 
 import org.basex.data.*;
@@ -143,7 +145,7 @@ public abstract class Expr extends ExprInfo {
   public abstract Item ebv(final QueryContext qc, final InputInfo ii) throws QueryException;
 
   /**
-   * Performs a predicate test and returns the item if test was successful.
+   * Performs a predicate test and returns the item the if test was successful.
    * @param qc query context
    * @param ii input info
    * @return item
@@ -306,6 +308,12 @@ public abstract class Expr extends ExprInfo {
    */
   @SuppressWarnings("unused")
   public Expr optimizeEbv(final QueryContext qc, final VarScope scp) throws QueryException {
+    // return true if a deterministic expression returns at least one node
+    final SeqType st = seqType();
+    if(st.type instanceof NodeType && st.occ.min >= 1 && !has(Flag.UPD) && !has(Flag.NDT)) {
+      qc.compInfo(OPTWRITE, this);
+      return Bln.TRUE;
+    }
     return this;
   }
 

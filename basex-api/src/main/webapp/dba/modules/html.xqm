@@ -251,7 +251,7 @@ declare function html:table(
         )
 
         for $entry at $c in $entries
-        return if($c < $G:MAX-ROWS) then (
+        return if($c <= $G:MAX-ROWS) then (
           <tr>{
             for $header at $pos in $headers
             let $name := $header/name()
@@ -283,7 +283,7 @@ declare function html:table(
               )
             }
           }</tr>
-        ) else if($c = $G:MAX-ROWS) then (
+        ) else if($c = $G:MAX-ROWS + 1) then (
           <tr>
             <td>{
               if($buttons) then <input type="checkbox" disabled=""/> else ()

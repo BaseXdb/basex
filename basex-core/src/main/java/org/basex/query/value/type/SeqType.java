@@ -295,11 +295,11 @@ public final class SeqType {
    * Returns a sequence type.
    * @param type type
    * @param occ occurrences
-   * @param test kind test
+   * @param kind kind test
    * @return sequence type
    */
-  public static SeqType get(final Type type, final Occ occ, final Test test) {
-    return test == null ? get(type, occ) : new SeqType(type, occ, test);
+  public static SeqType get(final Type type, final Occ occ, final Test kind) {
+    return kind == null ? get(type, occ) : new SeqType(type, occ, kind);
   }
 
   /**

@@ -3,7 +3,6 @@ package org.basex.query.expr;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -14,7 +13,7 @@ import org.basex.util.*;
  */
 public abstract class IndexAccess extends Simple {
   /** Index context. */
-  final IndexContext ictx;
+  public final IndexContext ictx;
 
   /**
    * Constructor.
@@ -24,7 +23,15 @@ public abstract class IndexAccess extends Simple {
   IndexAccess(final IndexContext ictx, final InputInfo info) {
     super(info);
     this.ictx = ictx;
-    seqType = SeqType.NOD_ZM;
+  }
+
+  /**
+   * Sets the number of results.
+   * @param s number of results
+   */
+  public void size(final long s) {
+    this.size = s;
+    seqType = seqType().withSize(s);
   }
 
   @Override
@@ -32,6 +39,6 @@ public abstract class IndexAccess extends Simple {
 
   @Override
   public final boolean iterable() {
-    return ictx.iterable;
+    return ictx.iterable || seqType().zeroOrOne();
   }
 }

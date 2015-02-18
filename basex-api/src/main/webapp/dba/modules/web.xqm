@@ -128,7 +128,7 @@ declare function web:query(
   let $limit := $G:MAX-CHARS
   let $query := if($query) then $query else '()'
   let $q := "xquery:eval($query, map {" || $map || "}, " || web:query-options() || ")"
-  let $s := "serialize(" || $q || ", map{ 'limit': $limit*2 })"
+  let $s := "serialize(" || $q || ", map{ 'limit': $limit*2, 'method': 'adaptive' })"
   return web:eval(
     $s ||
     "! (if(string-length(.) > $limit) then substring(., 1, $limit) || '...' else .)",

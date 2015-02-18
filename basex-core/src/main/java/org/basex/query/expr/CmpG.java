@@ -16,6 +16,7 @@ import org.basex.query.util.collation.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.value.type.SeqType.Occ;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -144,8 +145,8 @@ public final class CmpG extends Cmp {
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     // swap expressions; add text() to location paths to simplify optimizations
     if(swap()) {
-      op = op.swap();
       qc.compInfo(OPTSWAP, this);
+      op = op.swap();
     }
 
     // check if both arguments will always yield one result
@@ -154,6 +155,7 @@ public final class CmpG extends Cmp {
 
     // one value is empty (e.g.: () = local:expensive() )
     if(oneIsEmpty()) return optPre(Bln.FALSE, qc);
+
     // rewrite count() function
     if(e1.isFunction(Function.COUNT)) {
       final Expr e = compCount(op.op);
@@ -162,6 +164,16 @@ public final class CmpG extends Cmp {
         return e;
       }
     }
+
+    // rewrite string-length() function
+    if(e1.isFunction(Function.STRING_LENGTH)) {
+      final Expr e = compStringLength(op.op);
+      if(e != this) {
+        qc.compInfo(e instanceof Bln ? OPTPRE : OPTWRITE, this);
+        return e;
+      }
+    }
+
     // position() CMP expr
     if(e1.isFunction(Function.POSITION)) {
       final Expr e = Pos.get(op.op, e2, this, info);
@@ -170,6 +182,7 @@ public final class CmpG extends Cmp {
         return e;
       }
     }
+
     // (A = false()) -> not(A)
     if(st1.eq(SeqType.BLN) && (op == OpG.EQ && e2 == Bln.FALSE || op == OpG.NE && e2 == Bln.TRUE)) {
       qc.compInfo(OPTWRITE, this);
@@ -186,12 +199,24 @@ public final class CmpG extends Cmp {
       return allAreValues() ? e.preEval(qc) : e;
     }
 
+    // choose evaluation strategy
     final SeqType st2 = e2.seqType();
     if(st1.zeroOrOne() && !st1.mayBeArray() && st2.zeroOrOne() && !st2.mayBeArray()) {
       atomic = true;
       qc.compInfo(OPTATOMIC, this);
     }
-    return allAreValues() ? preEval(qc) : this;
+
+    // pre-evaluate values
+    if(allAreValues()) return preEval(qc);
+
+    // pre-evaluate equality test if operands are equal, deterministic, and can be compared
+    if(op == OpG.EQ && e1.sameAs(e2) && !e1.has(Flag.NDT) &&
+        !e1.has(Flag.UPD) && (!e1.has(Flag.CTX) || qc.value != null)) {
+      // currently limited to strings (function items are invalid, numbers may be NaN)
+      final SeqType st = e1.seqType();
+      if(st.occ.min > 0 && st.type.isStringOrUntyped()) return optPre(Bln.TRUE, qc);
+    }
+    return this;
   }
 
   @Override
@@ -319,7 +344,7 @@ public final class CmpG extends Cmp {
       // loop through all items
       ii.costs = 0;
       final Iter ir = arg.iter(ii.qc);
-      final ArrayList<ValueAccess> va = new ArrayList<>();
+      final ArrayList<ValueAccess> tmp = new ArrayList<>();
       final TokenSet strings = new TokenSet();
       for(Item it; (it = ir.next()) != null;) {
         // only strings and untyped items are supported
@@ -333,14 +358,16 @@ public final class CmpG extends Cmp {
           strings.put(string);
           final int costs = data.costs(new StringToken(ii.text, string));
           if(costs != 0) {
-            va.add(new ValueAccess(info, it, ii.text, ii.name, ii.ic));
+            final ValueAccess va = new ValueAccess(info, it, ii.text, ii.test, ii.ic);
+            tmp.add(va);
+            if(costs == 1) va.seqType(va.seqType().withOcc(Occ.ZERO_ONE));
             ii.costs += costs;
           }
         }
       }
       // more than one string - merge index results
-      final int vs = va.size();
-      root = vs == 1 ? va.get(0) : new Union(info, va.toArray(new ValueAccess[vs]));
+      final int vs = tmp.size();
+      root = vs == 1 ? tmp.get(0) : new Union(info, tmp.toArray(new ValueAccess[vs]));
     } else {
       /* index access is not possible if returned type is not a string or untyped; if
          expression depends on context; or if it is non-deterministic. examples:
@@ -352,9 +379,8 @@ public final class CmpG extends Cmp {
         arg.has(Flag.UPD)) return false;
 
       // estimate costs (tend to worst case)
-      ii.costs = Math.max(1, data.meta.size / 10);
-      root = new ValueAccess(info, arg, ii.text, ii.name, ii.ic);
-
+      ii.costs = Math.max(2, data.meta.size / 10);
+      root = new ValueAccess(info, arg, ii.text, ii.test, ii.ic);
     }
 
     ii.create(root, info, Util.info(ii.text ? OPTTXTINDEX : OPTATVINDEX, arg), false);

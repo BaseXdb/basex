@@ -191,7 +191,7 @@ public final class Token {
       final char ch = arr[c];
       tb.add(Character.isHighSurrogate(ch) && c < al - 1
           && Character.isLowSurrogate(arr[c + 1])
-          ? Character.toCodePoint(ch, arr[++c]) : ch);
+           ? Character.toCodePoint(ch, arr[++c]) : ch);
     }
     return tb.finish();
   }
@@ -281,8 +281,9 @@ public final class Token {
    * @return number of codepoints
    */
   public static int length(final byte[] token) {
-    int l = 0;
     final int tl = token.length;
+    if(ascii(token)) return tl;
+    int l = 0;
     for(int t = 0; t < tl; t += cl(token, t)) ++l;
     return l;
   }

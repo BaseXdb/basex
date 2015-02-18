@@ -35,23 +35,23 @@ final class FTTokenizer {
 
   /**
    * Constructor.
-   * @param w full-text words
+   * @param words full-text words
    * @param qc query context
    */
-  FTTokenizer(final FTWords w, final QueryContext qc) {
-    this(w, qc.ftOpt(), new Levenshtein(qc.context.options.get(MainOptions.LSERROR)));
+  FTTokenizer(final FTWords words, final QueryContext qc) {
+    this(words, qc.ftOpt(), new Levenshtein(qc.context.options.get(MainOptions.LSERROR)));
   }
 
   /**
    * Constructor.
-   * @param w full-text words
-   * @param o full-text options
-   * @param l Levenshtein distance calculation
+   * @param words full-text words
+   * @param opt full-text options
+   * @param ls Levenshtein distance calculation
    */
-  private FTTokenizer(final FTWords w, final FTOpt o, final Levenshtein l) {
-    words = w;
-    opt = o;
-    ls = l;
+  private FTTokenizer(final FTWords words, final FTOpt opt, final Levenshtein ls) {
+    this.words = words;
+    this.opt = opt;
+    this.ls = ls;
 
     cmp = new TokenComparator() {
       @Override

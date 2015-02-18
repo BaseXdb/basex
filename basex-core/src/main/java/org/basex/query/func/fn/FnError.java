@@ -44,9 +44,9 @@ public final class FnError extends StandardFunc {
    * @return function
    */
   public static StandardFunc get(final QueryException ex, final SeqType tp) {
-    final StandardFunc e = ERROR.get(null, ex.info(), ex.qname(),
+    final StandardFunc sf = ERROR.get(null, ex.info(), ex.qname(),
         Str.get(ex.getLocalizedMessage()));
-    e.seqType(tp);
-    return e;
+    sf.seqType(tp);
+    return sf;
   }
 }

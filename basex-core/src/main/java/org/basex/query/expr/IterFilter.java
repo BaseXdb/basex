@@ -14,7 +14,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-final class IterFilter extends Filter {
+public final class IterFilter extends Filter {
   /**
    * Constructor.
    * @param info input info

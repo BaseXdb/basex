@@ -10,12 +10,12 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Axis step expression.
+ * Step expression, caching all results.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-final class AxisStep extends Step {
+final class CachedStep extends Step {
   /**
    * Constructor.
    * @param info input info
@@ -23,7 +23,7 @@ final class AxisStep extends Step {
    * @param test node test
    * @param preds predicates
    */
-  AxisStep(final InputInfo info, final Axis axis, final Test test, final Expr[] preds) {
+  CachedStep(final InputInfo info, final Axis axis, final Test test, final Expr[] preds) {
     super(info, axis, test, preds);
   }
 
@@ -38,18 +38,18 @@ final class AxisStep extends Step {
 
     // evaluate predicates
     final boolean scoring = qc.scoring;
-    for(final Expr p : preds) {
-      qc.size = nc.size();
+    for(final Expr pred : preds) {
+      final long nl = nc.size();
+      qc.size = nl;
       qc.pos = 1;
       int c = 0;
-      final long nl = nc.size();
       for(int n = 0; n < nl; ++n) {
-        qc.value = nc.get(n);
-        final Item i = p.test(qc, info);
-        if(i != null) {
+        final ANode node = nc.get(n);
+        qc.value = node;
+        final Item tst = pred.test(qc, info);
+        if(tst != null) {
           // assign score value
-          final ANode node = nc.get(n);
-          if(scoring) node.score(i.score());
+          if(scoring) node.score(tst.score());
           nc.nodes[c++] = node;
         }
         qc.pos++;
@@ -64,6 +64,6 @@ final class AxisStep extends Step {
     final int pl = preds.length;
     final Expr[] pred = new Expr[pl];
     for(int p = 0; p < pl; p++) pred[p] = preds[p].copy(qc, scp, vs);
-    return copyType(new AxisStep(info, axis, test.copy(), pred));
+    return copyType(new CachedStep(info, axis, test.copy(), pred));
   }
 }

@@ -17,7 +17,6 @@ import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
@@ -77,13 +76,9 @@ public abstract class StandardFunc extends Arr {
 
   @Override
   public final Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
-    try {
-      // skip context-based or non-deterministic functions, and non-values
-      return optPre(has(Flag.CTX) || has(Flag.NDT) || has(Flag.HOF) || has(Flag.UPD) ||
-          !allAreValues() ? opt(qc, scp) : sig.ret.zeroOrOne() ? item(qc, info) : value(qc), qc);
-    } catch(final QueryException ex) {
-      return FnError.get(ex, seqType);
-    }
+    // skip context-based or non-deterministic functions, and non-values
+    return optPre(has(Flag.CTX) || has(Flag.NDT) || has(Flag.HOF) || has(Flag.UPD) ||
+        !allAreValues() ? opt(qc, scp) : sig.ret.zeroOrOne() ? item(qc, info) : value(qc), qc);
   }
 
   /**
@@ -399,6 +394,21 @@ public abstract class StandardFunc extends Arr {
    */
   protected static boolean oneOf(final Function sig, final Function... sigs) {
     for(final Function s : sigs) if(sig == s) return true;
+    return false;
+  }
+
+  @Override
+  public final boolean sameAs(final Expr cmp) {
+    if(cmp instanceof StandardFunc) {
+      final StandardFunc sf = (StandardFunc) cmp;
+      final int el = exprs.length;
+      if(sig == sf.sig && el == sf.exprs.length) {
+        for(int e = 0; e < el; e++) {
+          if(!exprs[e].sameAs(sf.exprs[e])) return false;
+        }
+        return true;
+      }
+    }
     return false;
   }
 }
