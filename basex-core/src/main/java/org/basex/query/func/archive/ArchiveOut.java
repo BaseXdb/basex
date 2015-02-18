@@ -65,10 +65,12 @@ abstract class ArchiveOut implements Closeable {
   public abstract void close();
 
   /**
-   * Returns the output as byte array.
-   * @return byte array
+   * Returns the output as byte array and invalidates the internal array.
+   * Warning: the function must only be called if the list is discarded afterwards.
+   * @return array (internal representation!)
    */
-  final byte[] toArray() {
-    return ao.toArray();
+  final byte[] finish() {
+    close();
+    return ao.finish();
   }
 }

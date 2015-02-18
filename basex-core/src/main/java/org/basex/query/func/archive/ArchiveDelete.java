@@ -34,7 +34,7 @@ public final class ArchiveDelete extends ArchiveFn {
       if(in instanceof GZIPIn)
         throw ARCH_MODIFY_X.get(info, in.format().toUpperCase(Locale.ENGLISH));
       while(in.more()) if(!hm.contains(token(in.entry().getName()))) out.write(in);
-      return new B64(out.toArray());
+      return new B64(out.finish());
     } catch(final IOException ex) {
       throw ARCH_FAIL_X.get(info, ex);
     }
