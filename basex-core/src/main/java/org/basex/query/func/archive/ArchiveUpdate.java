@@ -56,7 +56,7 @@ public final class ArchiveUpdate extends ArchiveCreate {
         final Item[] it = hm.get(h);
         add(it[0], it[1], out, ZipEntry.DEFLATED, qc);
       }
-      return new B64(out.toArray());
+      return new B64(out.finish());
     } catch(final IOException ex) {
       throw ARCH_FAIL_X.get(info, ex);
     }
