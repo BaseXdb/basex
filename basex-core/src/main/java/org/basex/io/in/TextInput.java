@@ -98,12 +98,12 @@ public class TextInput extends BufferInput {
 
   /**
    * Sets a new encoding.
-   * @param enc encoding
+   * @param enc encoding (ignored if {@code null} or an empty string)
    * @return self reference
    * @throws IOException I/O Exception
    */
   public TextInput encoding(final String enc) throws IOException {
-    if(enc != null) {
+    if(enc != null && !enc.isEmpty()) {
       String e = normEncoding(enc);
       if(e == UTF16) e = decoder.encoding == UTF16LE ? UTF16LE : UTF16BE;
       decoder = TextDecoder.get(e);

@@ -132,7 +132,7 @@ public final class RestXqModules {
   private synchronized void cache(final HTTPContext http) throws Exception {
     // initialize RESTXQ directory (may be relative against WEBPATH)
     if(restxq == null) {
-      final StaticOptions sopts = HTTPContext.context().soptions;
+      final StaticOptions sopts = http.context(false).soptions;
       final String webpath = sopts.get(StaticOptions.WEBPATH);
       final String rxqpath = sopts.get(StaticOptions.RESTXQPATH);
       restxq = new IOFile(webpath).resolve(rxqpath);
@@ -169,7 +169,7 @@ public final class RestXqModules {
             module = new RestXqModule(file);
           }
           // add module if it has been parsed, and if it contains annotations
-          if(parsed || module.parse()) {
+          if(parsed || module.parse(http)) {
             module.touch();
             cache.put(path, module);
           }

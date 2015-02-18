@@ -16,7 +16,7 @@ import org.basex.query.func.http.*;
 public final class RESTServlet extends BaseXServlet {
   @Override
   protected void run(final HTTPContext http) throws IOException {
-    final RESTSession session = new RESTSession(http, http.authenticate());
+    final RESTSession session = new RESTSession(http, http.context(true));
     final RESTCmd cmd = code(session);
     try {
       cmd.execute(session.context);

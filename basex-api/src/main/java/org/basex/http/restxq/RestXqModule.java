@@ -36,21 +36,22 @@ final class RestXqModule {
 
   /**
    * Checks the module for RESTXQ annotations.
+   * @param http HTTP context
    * @return {@code true} if module contains relevant annotations
    * @throws Exception exception (including unexpected ones)
    */
-  boolean parse() throws Exception {
+  boolean parse(final HTTPContext http) throws Exception {
     functions.clear();
 
     // loop through all functions
-    try(final QueryContext qc = qc()) {
+    try(final QueryContext qc = qc(http)) {
       // loop through all functions
       final String name = file.name();
       for(final StaticFunc uf : qc.funcs.funcs()) {
         // only add functions that are defined in the same module (file)
         if(name.equals(new IOFile(uf.info.path()).name())) {
           final RestXqFunction rxf = new RestXqFunction(uf, qc, this);
-          if(rxf.parse()) functions.add(rxf);
+          if(rxf.parse(http)) functions.add(rxf);
         }
       }
     }
@@ -91,9 +92,9 @@ final class RestXqModule {
       throws Exception {
 
     // create new XQuery instance
-    try(final QueryContext qc = qc()) {
+    try(final QueryContext qc = qc(http)) {
       final RestXqFunction rxf = new RestXqFunction(find(qc, func.function), qc, this);
-      rxf.parse();
+      rxf.parse(http);
       RestXqResponse.create(rxf, qc, http, error);
     }
   }
@@ -102,11 +103,12 @@ final class RestXqModule {
 
   /**
    * Retrieves a query context for the given module.
+   * @param http HTTP context
    * @return query context
-   * @throws QueryException query exception
+   * @throws Exception exception
    */
-  private QueryContext qc() throws QueryException {
-    final QueryContext qc = new QueryContext(HTTPContext.context());
+  private QueryContext qc(final HTTPContext http) throws Exception {
+    final QueryContext qc = new QueryContext(http.context(false));
     try {
       qc.parse(string(file.read()), file.path(), null);
       return qc;

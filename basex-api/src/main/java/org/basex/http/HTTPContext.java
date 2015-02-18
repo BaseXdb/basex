@@ -16,8 +16,6 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 
 import org.basex.*;
-import org.basex.build.json.*;
-import org.basex.build.json.JsonOptions.*;
 import org.basex.core.*;
 import org.basex.core.StaticOptions.AuthMethod;
 import org.basex.core.users.*;
@@ -68,6 +66,8 @@ public final class HTTPContext {
   /** Path, starting with a slash. */
   private final String path;
 
+  /** Client database context. */
+  private Context ctx;
   /** Serialization parameters. */
   private SerializerOptions sopts;
 
@@ -94,7 +94,7 @@ public final class HTTPContext {
     res.setCharacterEncoding(Strings.UTF8);
     path = decode(normalize(req.getPathInfo()));
 
-    final StaticOptions mprop = context().soptions;
+    final StaticOptions mprop = context.soptions;
     if(servlet.username.isEmpty()) {
       // adopt existing servlet-specific credentials
       username = mprop.get(StaticOptions.USER);
@@ -139,21 +139,12 @@ public final class HTTPContext {
   }
 
   /**
-   * Returns the content type of a request (without an optional encoding).
+   * Returns the content type of a request, or an empty string.
    * @return content type
    */
   public String contentType() {
     final String ct = req.getContentType();
-    return ct != null ? ct.replaceFirst(";.*", "") : null;
-  }
-
-  /**
-   * Returns the content type extension of a request (without an optional encoding).
-   * @return content type
-   */
-  String contentTypeExt() {
-    final String ct = req.getContentType();
-    return ct != null ? ct.replaceFirst("^.*?;\\s*", "") : null;
+    return ct == null ? "" : ct;
   }
 
   /**
@@ -183,10 +174,7 @@ public final class HTTPContext {
     if(sm == SerialMethod.RAW) return APP_OCTET;
     if(sm == SerialMethod.ADAPTIVE || sm == SerialMethod.XML) return APP_XML;
     if(sm == SerialMethod.XHTML || sm == SerialMethod.HTML) return TEXT_HTML;
-    if(sm == SerialMethod.JSON) {
-      final JsonSerialOptions jprop = sopts.get(SerializerOptions.JSON);
-      return jprop.get(JsonOptions.FORMAT) == JsonFormat.JSONML ? APP_JSONML : APP_JSON;
-    }
+    if(sm == SerialMethod.JSON) return APP_JSON;
     return TEXT_PLAIN;
   }
 
@@ -290,19 +278,31 @@ public final class HTTPContext {
   }
 
   /**
-   * Authenticates the user and returns a new client {@link Context} instance.
-   * @return client context
+   * Returns the client database context. Authenticates the user if necessary.
+   * @param authenticate authenticate user
+   * @return client database context
    * @throws IOException I/O exception
    */
-  public Context authenticate() throws IOException {
+  public Context context(final boolean authenticate) throws IOException {
+    if(ctx == null) {
+      ctx = new Context(context);
+      ctx.user(authenticate ? authenticate() : context.users.get(UserText.ADMIN));
+    }
+    return ctx;
+  }
+
+  /**
+   * Authenticates the user and returns a new client {@link Context} instance.
+   * @return user
+   * @throws IOException I/O exception
+   */
+  private User authenticate() throws IOException {
     final byte[] address = token(req.getRemoteAddr());
     try {
       if(username == null || username.isEmpty()) throw new LoginException(NOUSERNAME);
 
-      final Context ctx = new Context(context(), null);
-      final User us = ctx.users.get(username);
+      final User us = context.users.get(username);
       if(us == null) throw new LoginException();
-      ctx.user(us);
 
       if(auth == AuthMethod.BASIC) {
         if(password == null || !us.matches(password)) throw new LoginException();
@@ -331,22 +331,14 @@ public final class HTTPContext {
 
         if(!Strings.md5(rsp.toString()).equals(password)) throw new LoginException();
       }
-
       context.blocker.remove(address);
-      return ctx;
+      return us;
+
     } catch(final LoginException ex) {
       // delay users with wrong passwords
       context.blocker.delay(address);
       throw ex;
     }
-  }
-
-  /**
-   * Returns the database context.
-   * @return context
-   */
-  public static Context context() {
-    return context;
   }
 
   /**

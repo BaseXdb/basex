@@ -62,6 +62,21 @@ public abstract class RestXqTest extends HTTPTest {
   }
 
   /**
+   * Executes the specified POST request and tests the result.
+   * @param function function to test
+   * @param query request
+   * @param request request
+   * @param type content type
+   * @param exp expected result
+   * @throws IOException I/O exception
+   */
+  protected static void post(final String function, final String query, final String request,
+      final String type, final String exp) throws IOException {
+    install(function);
+    assertEquals(exp, post(query, request, type));
+  }
+
+  /**
    * Installs a new module and removes all others.
    * @param function function to be tested
    * @throws IOException I/O exception

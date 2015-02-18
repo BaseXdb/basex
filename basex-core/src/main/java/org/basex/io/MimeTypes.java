@@ -27,8 +27,6 @@ public final class MimeTypes {
   public static final String APP_HTML_XML = "application/html+xml";
   /** Media type: application/json. */
   public static final String APP_JSON = "application/json";
-  /** Media type: application/jsonml+json. */
-  public static final String APP_JSONML = "application/jsonml+json";
   /** Media type: text/plain. */
   public static final String APP_OCTET = "application/octet-stream";
   /** Media type: application/xml. */
@@ -73,78 +71,97 @@ public final class MimeTypes {
 
   /**
    * Checks if the mime type is an XQuery mime type.
-   * @param type mime type
+   * @param mimeType mime type
    * @return result of check
    */
-  public static boolean isXQuery(final String type) {
-    return type.endsWith(XQUERY_SUFFIX);
+  public static boolean isXQuery(final String mimeType) {
+    return type(mimeType).endsWith(XQUERY_SUFFIX);
   }
 
   /**
    * Checks if the mime type is an XML mime type.
-   * @param type mime type
+   * @param mimeType mime type
    * @return result of check
    */
-  public static boolean isXML(final String type) {
+  public static boolean isXML(final String mimeType) {
+    final String type = type(mimeType);
     return Strings.eq(type, TEXT_XML, TEXT_XML_EXT, APP_XML, APP_XML_EXTERNAL) ||
         type.endsWith(XML_SUFFIX);
   }
 
   /**
-   * Checks if the mime type is a JSON mime type.
-   * @param type mime type
-   * @return result of check
-   */
-  public static boolean isJSON(final String type) {
-    return Strings.eq(type, APP_JSON, APP_JSONML);
-  }
-
-  /**
    * Checks if the main part of the mime type is {@code "text"}.
-   * @param type mime type
+   * @param mimeType mime type
    * @return result of check
    */
-  public static boolean isText(final String type) {
-    return type.startsWith(TEXT);
+  public static boolean isText(final String mimeType) {
+    return mimeType.startsWith(TEXT);
   }
 
   /**
    * Checks if the mime type is a multipart mime type.
-   * @param type mime type
+   * @param mimeType mime type
    * @return result of check
    */
-  public static boolean isMultipart(final String type) {
-    return type.startsWith(MULTIPART);
+  public static boolean isMultipart(final String mimeType) {
+    return mimeType.startsWith(MULTIPART);
+  }
+
+  /**
+   * Returns the main and sub type of the specified mime type (strips parameters).
+   * @param mimeType mime type
+   * @return main/sub type
+   */
+  public static String type(final String mimeType) {
+    final int p = mimeType.indexOf(';');
+    return p == -1 ? mimeType : mimeType.substring(0, p).trim();
+  }
+
+  /**
+   * Returns parameters of the specified mime type, separated by commas.
+   * @param mimeType mime type
+   * @return parameters
+   */
+  public static String parameters(final String mimeType) {
+    final int p = mimeType.indexOf(';');
+    if(p == -1) return "";
+    final StringBuilder sb = new StringBuilder();
+    for(final String param : Strings.split(mimeType.substring(p + 1), ';')) {
+      if(sb.length() != 0) sb.append(',');
+      sb.append(param.replace(",", ",,").trim());
+    }
+    return sb.toString();
   }
 
   /**
    * Checks if a mime type is accepted by the specified pattern.
-   * @param type mime type
+   * @param mimeType mime type
    * @param pattern pattern
    * @return result of check
    */
-  public static boolean matches(final String type, final String pattern) {
-    final String[] t = prepareType(type), p = prepareType(pattern);
+  public static boolean matches(final String mimeType, final String pattern) {
+    final String[] t = splitType(mimeType), p = splitType(pattern);
     return Strings.eq(p[0], t[0], "*") && Strings.eq(p[1], t[1], "*");
   }
 
   /**
-   * Prepares the specified mime type for comparison.
-   * @param type mime type
-   * @return mime type array
+   * Splits the specified mime type into main and sub type.
+   * @param mimeType mime type
+   * @return main and sub type
    */
-  private static String[] prepareType(final String type) {
-    final String[] t = { type, "" };
-    if(type.equals("*")) {
-      t[1] = type;
+  private static String[] splitType(final String mimeType) {
+    final String type = type(mimeType);
+    final String[] parts = { type, "" };
+    if(mimeType.equals("*")) {
+      parts[1] = "*";
     } else {
       final int i = type.indexOf('/');
       if(i != -1) {
-        t[0] = type.substring(i);
-        t[1] = type.substring(i + 1);
+        parts[0] = type.substring(0, i);
+        parts[1] = type.substring(i + 1);
       }
     }
-    return t;
+    return parts;
   }
 
   /** Hash map containing all assignments. */

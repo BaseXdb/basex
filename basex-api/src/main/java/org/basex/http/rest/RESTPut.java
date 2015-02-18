@@ -4,12 +4,15 @@ import static org.basex.io.MimeTypes.*;
 
 import java.io.*;
 
+import org.basex.build.csv.*;
+import org.basex.build.html.*;
 import org.basex.build.json.*;
-import org.basex.build.json.JsonOptions.*;
+import org.basex.build.text.*;
 import org.basex.core.*;
 import org.basex.core.MainOptions.MainParser;
 import org.basex.core.cmd.*;
 import org.basex.http.*;
+import org.basex.io.*;
 
 /**
  * REST-based evaluation of PUT operations.
@@ -35,28 +38,35 @@ final class RESTPut {
 
     RESTCmd.parseOptions(session);
 
-    boolean xml = true;
+    final MainOptions options = session.context.options;
     final InputStream is = http.req.getInputStream();
     final String ct = http.contentType();
+
     // choose correct importer
-    MainParser parser = null;
-    if(isJSON(ct)) {
-      parser = MainParser.JSON;
-      if(APP_JSONML.equals(ct)) {
-        final JsonParserOptions jopts = new JsonParserOptions();
-        jopts.set(JsonOptions.FORMAT, JsonFormat.JSONML);
-        session.context.options.set(MainOptions.JSONPARSER, jopts);
-      }
+    boolean xml = true;
+    if(APP_JSON.equals(ct)) {
+      final JsonParserOptions opts = new JsonParserOptions();
+      opts.parse(MimeTypes.parameters(ct));
+      options.set(MainOptions.JSONPARSER, opts);
+      options.set(MainOptions.PARSER, MainParser.JSON);
     } else if(TEXT_CSV.equals(ct)) {
-      parser = MainParser.CSV;
+      final CsvParserOptions opts = new CsvParserOptions();
+      opts.parse(MimeTypes.parameters(ct));
+      options.set(MainOptions.CSVPARSER, opts);
+      options.set(MainOptions.PARSER, MainParser.CSV);
     } else if(TEXT_HTML.equals(ct)) {
-      parser = MainParser.HTML;
-    } else if(ct != null && isText(ct)) {
-      parser = MainParser.TEXT;
-    } else if(ct != null && !isXML(ct)) {
+      final HtmlOptions opts = new HtmlOptions();
+      opts.parse(MimeTypes.parameters(ct));
+      options.set(MainOptions.HTMLPARSER, opts);
+      options.set(MainOptions.PARSER, MainParser.HTML);
+    } else if(isText(ct)) {
+      final TextOptions opts = new TextOptions();
+      opts.parse(MimeTypes.parameters(ct));
+      options.set(MainOptions.TEXTPARSER, opts);
+      options.set(MainOptions.PARSER, MainParser.TEXT);
+    } else if(!ct.isEmpty() && !isXML(ct)) {
       xml = false;
     }
-    if(parser != null) session.context.options.set(MainOptions.PARSER, parser);
 
     // store data as XML or raw file, depending on content type
     final String path = http.dbpath();

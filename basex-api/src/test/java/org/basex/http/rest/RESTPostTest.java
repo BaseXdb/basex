@@ -112,8 +112,7 @@ public final class RESTPostTest extends RESTTest {
   @Test
   public void postErr() {
     try {
-      assertEquals("", post("", "<query xmlns=\"" + URI + "\"><text>(</text></query>",
-          APP_XML));
+      assertEquals("", post("", "<query xmlns=\"" + URI + "\"><text>(</text></query>", APP_XML));
     } catch(final IOException ex) {
       assertContains(ex.getMessage(), "[XPST0003]");
     }

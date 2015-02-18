@@ -98,10 +98,10 @@ final class BXServletRequest extends AbstractRequest {
 
   @Override
   public Auth getAuthorization() {
-    if(auth != null) return auth;
-    final String enc = getRequestHeader(Header.AUTHORIZATION);
-    if(enc == null || enc.isEmpty()) return null;
-    auth = new Auth(enc);
+    if(auth == null) {
+      final String enc = getRequestHeader(Header.AUTHORIZATION);
+      if(enc != null && !enc.isEmpty()) auth = new Auth(enc);
+    }
     return auth;
   }
 

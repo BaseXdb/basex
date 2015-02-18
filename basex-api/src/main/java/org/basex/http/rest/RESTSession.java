@@ -17,13 +17,13 @@ final class RESTSession {
   final HTTPContext http;
   /** Commands to be executed. */
   final ArrayList<Command> cmds = new ArrayList<>();
-  /** Database context. */
+  /** Client context. */
   final Context context;
 
   /**
    * Constructor, specifying login data and an output stream.
    * @param http HTTP context
-   * @param context context
+   * @param context client context
    */
   RESTSession(final HTTPContext http, final Context context) {
     this.http = http;

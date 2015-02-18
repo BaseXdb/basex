@@ -14,7 +14,6 @@ import org.basex.core.*;
 import org.basex.core.StaticOptions.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
-import org.basex.io.out.*;
 import org.basex.query.func.http.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -143,14 +142,12 @@ public abstract class HTTPTest extends SandboxTest {
    * @return string result, or {@code null} for a failure.
    * @throws IOException I/O exception
    */
-  protected static String request(final String query, final String method)
-      throws IOException {
-
+  protected static String request(final String query, final String method) throws IOException {
     final URL url = new URL(root + query);
     final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
     try {
       conn.setRequestMethod(method);
-      return normNL(read(new BufferInput(conn.getInputStream())));
+      return read(new BufferInput(conn.getInputStream()));
     } catch(final IOException ex) {
       throw error(conn, ex);
     } finally {
@@ -184,7 +181,7 @@ public abstract class HTTPTest extends SandboxTest {
     }
 
     try {
-      return read(conn.getInputStream()).replaceAll("\r?\n *", "");
+      return read(conn.getInputStream());
     } catch(final IOException ex) {
       throw error(conn, ex);
     } finally {
@@ -201,7 +198,6 @@ public abstract class HTTPTest extends SandboxTest {
    */
   protected static IOException error(final HttpURLConnection conn, final IOException ex)
       throws IOException {
-
     final String msg = read(conn.getErrorStream());
     throw new BaseXException(msg.isEmpty() ? ex.getMessage() : msg);
   }
@@ -213,13 +209,7 @@ public abstract class HTTPTest extends SandboxTest {
    * @throws IOException I/O exception
    */
   protected static String read(final InputStream is) throws IOException {
-    final ArrayOutput ao = new ArrayOutput();
-    if(is != null) {
-      try(final BufferInput bi = new BufferInput(is)) {
-        for(int i; (i = bi.read()) != -1;) ao.write(i);
-      }
-    }
-    return ao.toString();
+    return is == null ? "" : normNL(string(new BufferInput(is).content()));
   }
 
   /**

@@ -2,8 +2,8 @@ package org.basex.http.restxq;
 
 import static org.basex.http.restxq.RestXqText.*;
 import static org.basex.query.QueryError.*;
-import static org.basex.util.Token.*;
 import static org.basex.query.ann.Annotation.*;
+import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
@@ -13,6 +13,10 @@ import java.util.regex.*;
 
 import javax.servlet.http.*;
 
+import org.basex.build.csv.*;
+import org.basex.build.html.*;
+import org.basex.build.json.*;
+import org.basex.build.text.*;
 import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.io.*;
@@ -32,6 +36,7 @@ import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
+import org.basex.util.options.*;
 
 /**
  * This class represents a single RESTXQ function.
@@ -110,19 +115,20 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
 
   /**
    * Checks a function for RESTFful annotations.
+   * @param http HTTP context
    * @return {@code true} if module contains relevant annotations
-   * @throws QueryException query exception
+   * @throws Exception exception
    */
-  boolean parse() throws QueryException {
+  boolean parse(final HTTPContext http) throws Exception {
     // parse all annotations
     final boolean[] declared = new boolean[function.args.length];
     boolean found = false;
+    final MainOptions options = http.context(false).options;
     for(final Ann ann : function.anns) {
       found |= eq(ann.sig.uri, QueryText.REST_URI);
-      final Item[] args = ann.args;
       if(ann.sig == _REST_PATH) {
         try {
-          path = new RestXqPath(toString(args[0]), ann.info);
+          path = new RestXqPath(toString(ann.args[0]), ann.info);
         } catch(final IllegalArgumentException ex) {
           throw error(ann.info, ex.getMessage());
         }
@@ -144,16 +150,28 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
       } else if(ann.sig == _REST_ERROR_PARAM) {
         errorParams.add(param(ann, declared));
       } else if(ann.sig == _REST_METHOD) {
-        final String mth = toString(args[0]).toUpperCase(Locale.ENGLISH);
-        final Item body = args.length > 1 ? args[1] : null;
+        final String mth = toString(ann.args[0]).toUpperCase(Locale.ENGLISH);
+        final Item body = ann.args.length > 1 ? ann.args[1] : null;
         addMethod(mth, body, declared, ann.info);
       } else if(eq(ann.sig.uri, QueryText.REST_URI)) {
-        final Item body = args.length == 0 ? null : args[0];
+        final Item body = ann.args.length == 0 ? null : ann.args[0];
         addMethod(string(ann.sig.local()), body, declared, ann.info);
+      } else if(ann.sig == _INPUT_CSV) {
+        final CsvParserOptions opts = new CsvParserOptions(options.get(MainOptions.CSVPARSER));
+        options.set(MainOptions.CSVPARSER, parse(opts, ann));
+      } else if(ann.sig == _INPUT_JSON) {
+        final JsonParserOptions opts = new JsonParserOptions(options.get(MainOptions.JSONPARSER));
+        options.set(MainOptions.JSONPARSER, parse(opts, ann));
+      } else if(ann.sig == _INPUT_HTML) {
+        final HtmlOptions opts = new HtmlOptions(options.get(MainOptions.HTMLPARSER));
+        options.set(MainOptions.HTMLPARSER, parse(opts, ann));
+      } else if(ann.sig == _INPUT_TEXT) {
+        final TextOptions opts = new TextOptions(options.get(MainOptions.TEXTPARSER));
+        options.set(MainOptions.TEXTPARSER, parse(opts, ann));
       } else if(eq(ann.sig.uri, QueryText.OUTPUT_URI)) {
         // serialization parameters
         try {
-          output.assign(string(ann.sig.local()), toString(args[0]));
+          output.assign(string(ann.sig.local()), toString(ann.args[0]));
         } catch(final BaseXException ex) {
           throw error(ann.info, UNKNOWN_SER, ann.sig.local());
         }
@@ -171,6 +189,19 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
       }
     }
     return found;
+  }
+
+  /**
+   * Assigns annotation values as options.
+   * @param <O> option type
+   * @param opts options instance
+   * @param ann annotation
+   * @return options instance
+   * @throws Exception any exception
+   */
+  private static <O extends Options> O parse(final O opts, final Ann ann) throws Exception {
+    for(final Item arg : ann.args) opts.parse(string(arg.string(ann.info)));
+    return opts;
   }
 
   /**
@@ -228,9 +259,10 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     }
 
     // bind request body in the correct format
+    final MainOptions options = http.context(false).options;
     if(requestBody != null) {
       try {
-        bind(requestBody, arg, http.params.content());
+        bind(requestBody, arg, HttpPayload.value(http.params.body(), options, http.contentType()));
       } catch(final IOException ex) {
         throw error(INPUT_CONV, ex);
       }
@@ -238,7 +270,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
 
     // bind query and form parameters
     for(final RestXqParam rxp : queryParams) bind(rxp, arg, http.params.query().get(rxp.key));
-    for(final RestXqParam rxp : formParams) bind(rxp, arg, http.params.form().get(rxp.key));
+    for(final RestXqParam rxp : formParams) bind(rxp, arg, http.params.form(options).get(rxp.key));
 
     // bind header parameters
     for(final RestXqParam rxp : headerParams) {
@@ -369,10 +401,11 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     if(consumes.isEmpty()) return true;
     // return true if no content type is specified by the user
     final String ct = http.contentType();
-    if(ct == null) return true;
+    if(ct.isEmpty()) return true;
+
     // check if any combination matches
-    for(final String c : consumes) {
-      if(MimeTypes.matches(c, ct)) return true;
+    for(final String consume : consumes) {
+      if(MimeTypes.matches(consume, ct)) return true;
     }
     return false;
   }
@@ -387,8 +420,8 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     if(produces.isEmpty()) return true;
     // check if any combination matches
     for(final HTTPAccept accept : http.accepts()) {
-      for(final String p : produces) {
-        if(MimeTypes.matches(p, accept.type)) return true;
+      for(final String produce : produces) {
+        if(MimeTypes.matches(produce, accept.type)) return true;
       }
     }
     return false;

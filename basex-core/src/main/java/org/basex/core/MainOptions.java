@@ -200,7 +200,7 @@ public final class MainOptions extends Options {
   }
 
   /**
-   * Constructor.
+   * Constructor, adopting XML parsing options from specified options.
    * @param options parent options
    */
   public MainOptions(final MainOptions options) {

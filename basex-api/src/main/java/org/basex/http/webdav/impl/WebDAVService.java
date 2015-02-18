@@ -66,7 +66,7 @@ public final class WebDAVService<T> {
    */
   public void authenticate(final String user, final String pass) throws IOException {
     http.credentials(user, pass);
-    http.authenticate();
+    session();
   }
 
   /**
@@ -571,7 +571,7 @@ public final class WebDAVService<T> {
    * @throws IOException I/O exception
    */
   private LocalSession session() throws IOException {
-    if(ls == null) ls = new LocalSession(http.authenticate(), http.username, http.password);
+    if(ls == null) ls = new LocalSession(http.context(true), http.username, http.password);
     return ls;
   }
 }

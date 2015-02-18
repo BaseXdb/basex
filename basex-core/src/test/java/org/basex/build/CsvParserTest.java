@@ -23,6 +23,9 @@ import org.junit.Test;
  * @author Christian Gruen
  */
 public final class CsvParserTest extends SandboxTest {
+  /** CSV options. */
+  private CsvParserOptions copts;
+
   /** Test CSV file. */
   private static final String FILE = "src/test/resources/input.csv";
   /** Temporary CSV file. */
@@ -47,11 +50,11 @@ public final class CsvParserTest extends SandboxTest {
 
   /**
    * Sets initial options.
-   * @throws BaseXException exception
    */
   @Before
-  public void init() throws BaseXException {
-    new Set(MainOptions.CSVPARSER, new CsvParserOptions()).execute(context);
+  public void init() {
+    copts = new CsvParserOptions();
+    context.options.set(MainOptions.CSVPARSER, copts);
   }
 
   /**
@@ -80,8 +83,6 @@ public final class CsvParserTest extends SandboxTest {
    */
   @Test
   public void one() throws Exception {
-    final CsvParserOptions copts = context.options.get(MainOptions.CSVPARSER);
-
     copts.set(CsvOptions.HEADER, true);
     new CreateDB(NAME, FILE).execute(context);
     assertEquals("3", new XQuery("count(//Name)").execute(context));
@@ -98,7 +99,6 @@ public final class CsvParserTest extends SandboxTest {
    */
   @Test
   public void separator() throws Exception {
-    final CsvParserOptions copts = context.options.get(MainOptions.CSVPARSER);
     copts.set(CsvOptions.HEADER, true);
 
     copts.set(CsvOptions.SEPARATOR, "tab");
@@ -116,7 +116,6 @@ public final class CsvParserTest extends SandboxTest {
    */
   @Test
   public void quotes() throws Exception {
-    final CsvParserOptions copts = context.options.get(MainOptions.CSVPARSER);
     copts.set(CsvOptions.HEADER, true);
 
     copts.set(CsvOptions.QUOTES, false);
@@ -134,7 +133,6 @@ public final class CsvParserTest extends SandboxTest {
    */
   @Test
   public void backslash() throws Exception {
-    final CsvParserOptions copts = context.options.get(MainOptions.CSVPARSER);
     copts.set(CsvOptions.HEADER, true);
 
     // "H \n""U\",a@b.c....
@@ -156,8 +154,6 @@ public final class CsvParserTest extends SandboxTest {
    */
   @Test
   public void atts() throws Exception {
-    final CsvParserOptions copts = context.options.get(MainOptions.CSVPARSER);
-
     copts.set(CsvOptions.HEADER, true);
     copts.set(CsvOptions.FORMAT, CsvFormat.ATTRIBUTES);
     new CreateDB(NAME, FILE).execute(context);

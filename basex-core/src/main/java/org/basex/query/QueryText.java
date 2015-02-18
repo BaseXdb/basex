@@ -487,15 +487,17 @@ public interface QueryText {
   byte[] QUERY_PREFIX = token("query");
   /** Index token. */
   byte[] INDEX_PREFIX = token("index");
+  /** Input token. */
+  byte[] INPUT_PREFIX = token("input");
   /** FETCH token. */
   byte[] FETCH_PREFIX = token("fetch");
   /** FT token. */
   byte[] FT_PREFIX = token("ft");
   /** XS token. */
   byte[] XS_PREFIX = token("xs");
-  /** XS token. */
+  /** XSI token. */
   byte[] XSI_PREFIX = token("xsi");
-  /** XS token. */
+  /** Local token. */
   byte[] LOCAL_PREFIX = token("local");
   /** Archive module token. */
   byte[] ARCHIVE_PREFIX = token("archive");
@@ -641,6 +643,8 @@ public interface QueryText {
   byte[] HTML_URI = token(BXMODULES_URI + "html");
   /** Index module URI. */
   byte[] INDEX_URI = token(BXMODULES_URI + "index");
+  /** Input URI. */
+  byte[] INPUT_URI = token(BXMODULES_URI + "input");
   /** Inspect module URI. */
   byte[] INSPECT_URI = token(BXMODULES_URI + "inspect");
   /** JSON module URI. */

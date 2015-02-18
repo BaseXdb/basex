@@ -191,7 +191,7 @@ public interface Text {
   /** Options error. */
   String OPT_OFFSET = "List counter for '%' is invalid.";
   /** Options error. */
-  String OPT_BOOLEAN = "Value of '%' must be a boolean.";
+  String OPT_BOOLEAN = "Value of '%' must be 'yes', 'no', or a boolean.";
   /** Options error. */
   String OPT_NUMBER = "Value of '%' must be a number.";
   /** Options error. */

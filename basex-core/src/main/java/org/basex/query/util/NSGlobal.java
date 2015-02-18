@@ -61,6 +61,7 @@ public final class NSGlobal {
     NS.add(HOF_PREFIX, HOF_URI);
     NS.add(HTML_PREFIX, HTML_URI);
     NS.add(INDEX_PREFIX, INDEX_URI);
+    NS.add(INPUT_PREFIX, INPUT_URI);
     NS.add(INSPECT_PREFIX, INSPECT_URI);
     NS.add(JSON_PREFIX, JSON_URI);
     NS.add(OUT_PREFIX, OUT_URI);

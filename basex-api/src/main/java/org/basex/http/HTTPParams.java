@@ -57,32 +57,22 @@ public final class HTTPParams {
   }
 
   /**
-   * Returns the request body as value.
-   * @return value
-   * @throws IOException I/O exception
-   * @throws QueryException query exception
-   */
-  public Value content() throws QueryException, IOException {
-    return HttpPayload.value(body(), HTTPContext.context().options, http.contentType(),
-        http.contentTypeExt());
-  }
-
-  /**
    * Binds form parameters.
-   * @return form parameters
+   * @param options main options
+   * @return parameters
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  public Map<String, Value> form() throws QueryException, IOException {
+  public Map<String, Value> form(final MainOptions options) throws QueryException, IOException {
     if(form == null) {
       form = new HashMap<>();
-      final String ct = http.contentType();
-      if(MimeTypes.MULTIPART_FORM_DATA.equals(ct)) {
+      final String type = MimeTypes.type(http.contentType());
+      if(MimeTypes.MULTIPART_FORM_DATA.equals(type)) {
         // convert multipart parameters encoded in a form
-        addMultipart(form, http.contentTypeExt());
-      } else if(MimeTypes.APP_FORM_URLENCODED.equals(ct)) {
+        addMultipart(MimeTypes.parameters(type), options);
+      } else if(MimeTypes.APP_FORM_URLENCODED.equals(type)) {
         // convert URL-encoded parameters
-        addURLEncoded(form);
+        addURLEncoded();
       }
     }
     return form;
@@ -112,7 +102,7 @@ public final class HTTPParams {
    * @return value
    * @throws IOException I/O exception
    */
-  IOContent body() throws IOException {
+  public IOContent body() throws IOException {
     if(content == null) {
       content = new IOContent(new BufferInput(http.req.getInputStream()).content());
       content.name(http.method + IO.XMLSUFFIX);
@@ -124,37 +114,35 @@ public final class HTTPParams {
 
   /**
    * Adds multipart form-data from the passed on request body.
-   * @param params map parameters
-   * @param ext content type extension (may be {@code null})
+   * @param params content type parameters
+   * @param options main options
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private void addMultipart(final Map<String, Value> params, final String ext)
+  private void addMultipart(final String params, final MainOptions options)
       throws QueryException, IOException {
 
-    final MainOptions opts = HTTPContext.context().options;
     try(final InputStream is = body().inputStream()) {
-      final HttpPayload hp = new HttpPayload(is, true, null, opts);
-      final HashMap<String, Value> mp = hp.multiForm(ext);
+      final HttpPayload hp = new HttpPayload(is, true, null, options);
+      final HashMap<String, Value> mp = hp.multiForm(params);
       for(final Entry<String, Value> entry : mp.entrySet()) {
-        params.put(entry.getKey(), entry.getValue());
+        form.put(entry.getKey(), entry.getValue());
       }
     }
   }
 
   /**
    * Adds URL-encoded parameters from the passed on request body.
-   * @param params map parameters
    * @throws IOException I/O exception
    */
-  private void addURLEncoded(final Map<String, Value> params) throws IOException {
+  private void addURLEncoded() throws IOException {
     for(final String nv : Strings.split(body().toString(), '&')) {
       final String[] parts = Strings.split(nv, '=', 2);
       if(parts.length == 2) {
         final Atm i = new Atm(URLDecoder.decode(parts[1], Strings.UTF8));
         final String k = parts[0];
-        final Value v = params.get(k);
-        params.put(k, v == null ? i : new ValueBuilder().add(v).add(i).value());
+        final Value v = form.get(k);
+        form.put(k, v == null ? i : new ValueBuilder().add(v).add(i).value());
       }
     }
   }

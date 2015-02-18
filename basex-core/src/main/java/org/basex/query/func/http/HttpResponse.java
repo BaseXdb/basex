@@ -1,5 +1,6 @@
 package org.basex.query.func.http;
 
+import static org.basex.io.MimeTypes.*;
 import static org.basex.query.func.http.HttpText.*;
 import static org.basex.util.Token.*;
 
@@ -49,7 +50,6 @@ public final class HttpResponse {
       throws IOException, QueryException {
 
     // check content type
-    final String type = conn.getContentType();
     InputStream is = conn.getErrorStream();
     final boolean error = is != null;
     try {
@@ -58,27 +58,32 @@ public final class HttpResponse {
       Util.debug(ex);
     }
 
-    // construct <http:response/>
+    // result
     final ValueBuilder vb = new ValueBuilder();
+
+    // construct <http:response/>
     final FElem response = new FElem(Q_RESPONSE).declareNS();
+    vb.add(response);
+
     final String msg = conn.getResponseMessage();
     response.add(STATUS, token(conn.getResponseCode()));
     response.add(MESSAGE, msg == null ? "" : msg);
+    // add <http:header/> elements
     for(final String header : conn.getHeaderFields().keySet()) {
       if(header != null) {
         final FElem hdr = new FElem(Q_HEADER);
-        hdr.add(NAME, token(header));
+        hdr.add(NAME, header);
         hdr.add(VALUE, conn.getHeaderField(header));
         response.add(hdr);
       }
     }
-    vb.add(response);
-
     // construct <http:body/>
     if(is != null) {
       try {
         final HttpPayload hp = new HttpPayload(is, body, info, options);
-        response.add(hp.parse(error, type, mtype));
+        final String ctype = conn.getContentType();
+        // error: adopt original type as content type
+        response.add(hp.parse(error || mtype == null ? ctype == null ? TEXT_PLAIN : ctype : mtype));
         if(body) vb.add(hp.payloads());
       } finally {
         is.close();

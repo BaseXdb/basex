@@ -172,7 +172,9 @@ public final class Compare {
                 n2 = a2.qname();
                 if(!n1.eq(n2)) continue;
                 if(flags.contains(Mode.NAMESPACES) && !eq(n1.prefix(), n2.prefix()) ||
-                    !eq(a1.string(), a2.string())) return false;
+                    !eq(a1.string(), a2.string())) {
+                  return false;
+                }
                 continue LOOP;
               }
               return false;

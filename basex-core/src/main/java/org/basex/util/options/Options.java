@@ -75,29 +75,6 @@ public class Options implements Iterable<Option<?>> {
    * @param opts options file
    */
   protected Options(final IOFile opts) {
-    init();
-    if(opts != null) read(opts);
-  }
-
-  /**
-   * Constructor with options file.
-   * @param opts options file
-   */
-  protected Options(final Options opts) {
-    for(final Entry<String, Option<?>> e : opts.options.entrySet())
-      options.put(e.getKey(), e.getValue());
-    for(final Entry<String, Object> e : opts.values.entrySet())
-      values.put(e.getKey(), e.getValue());
-    for(final Entry<String, String> e : opts.free.entrySet())
-      free.put(e.getKey(), e.getValue());
-    user.append(opts.user);
-    file = opts.file;
-  }
-
-  /**
-   * Initializes all options.
-   */
-  private void init() {
     try {
       for(final Option<?> opt : options(getClass())) {
         if(opt instanceof Comment) continue;
@@ -108,6 +85,22 @@ public class Options implements Iterable<Option<?>> {
     } catch(final Exception ex) {
       throw Util.notExpected(ex);
     }
+    if(opts != null) read(opts);
+  }
+
+  /**
+   * Constructor with options to be copied.
+   * @param opts options
+   */
+  protected Options(final Options opts) {
+    for(final Entry<String, Option<?>> e : opts.options.entrySet())
+      options.put(e.getKey(), e.getValue());
+    for(final Entry<String, Object> e : opts.values.entrySet())
+      values.put(e.getKey(), e.getValue());
+    for(final Entry<String, String> e : opts.free.entrySet())
+      free.put(e.getKey(), e.getValue());
+    user.append(opts.user);
+    file = opts.file;
   }
 
   /**
@@ -471,24 +464,6 @@ public class Options implements Iterable<Option<?>> {
   }
 
   /**
-   * Returns all options from the specified class.
-   * @param clz options class
-   * @return option instances
-   * @throws IllegalAccessException exception
-   */
-  public static Option<?>[] options(final Class<? extends Options> clz)
-      throws IllegalAccessException {
-
-    final ArrayList<Option<?>> opts = new ArrayList<>();
-    for(final Field f : clz.getFields()) {
-      if(!Modifier.isStatic(f.getModifiers())) continue;
-      final Object obj = f.get(null);
-      if(obj instanceof Option) opts.add((Option<?>) obj);
-    }
-    return opts.toArray(new Option[opts.size()]);
-  }
-
-  /**
    * Returns a list of allowed keys.
    * @param option option
    * @param all allowed values
@@ -501,6 +476,24 @@ public class Options implements Iterable<Option<?>> {
   }
 
   // PRIVATE METHODS ====================================================================
+
+  /**
+   * Returns all options from the specified class.
+   * @param clz options class
+   * @return option instances
+   * @throws IllegalAccessException exception
+   */
+  private static Option<?>[] options(final Class<? extends Options> clz)
+      throws IllegalAccessException {
+
+    final ArrayList<Option<?>> opts = new ArrayList<>();
+    for(final Field f : clz.getFields()) {
+      if(!Modifier.isStatic(f.getModifiers())) continue;
+      final Object obj = f.get(null);
+      if(obj instanceof Option) opts.add((Option<?>) obj);
+    }
+    return opts.toArray(new Option[opts.size()]);
+  }
 
   /**
    * Parses an option string and sets the options accordingly.

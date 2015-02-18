@@ -31,6 +31,15 @@ public enum Annotation {
   _BASEX_INLINE("inline([limit])", arg(ITR), BASEX_URI),
 
   /** XQuery annotation. */
+  _INPUT_CSV("csv(option[,...])", arg(STR), INPUT_URI),
+  /** XQuery annotation. */
+  _INPUT_HTML("html(option[,...])", arg(STR), INPUT_URI),
+  /** XQuery annotation. */
+  _INPUT_JSON("json(option[,...])", arg(STR), INPUT_URI),
+  /** XQuery annotation. */
+  _INPUT_TEXT("text(option[,...])", arg(STR), INPUT_URI),
+
+  /** XQuery annotation. */
   _OUTPUT_ALLOW_DUPLICATE_NAMES("allow-duplicate-names(value)", arg(STR), OUTPUT_URI),
   /** XQuery annotation. */
   _OUTPUT_BYTE_ORDER_MARK("byte-order-mark(value)", arg(STR), OUTPUT_URI),

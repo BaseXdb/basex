@@ -153,7 +153,7 @@ public final class Request extends QueryModule {
       final HTTPParams params = context().params;
       final TokenSet cache = new TokenSet();
       for(final String name : params.query().keySet()) cache.add(name);
-      for(final String name : params.form().keySet()) cache.add(name);
+      for(final String name : params.form(queryContext.context.options).keySet()) cache.add(name);
       final TokenList names = new TokenList(cache.size());
       for(final byte[] name : cache) names.add(name);
       return StrSeq.get(names);
@@ -186,7 +186,7 @@ public final class Request extends QueryModule {
       final String name = key.toJava();
       final HTTPParams params = context().params;
       final Value query = params.query().get(name);
-      final Value form = params.form().get(name);
+      final Value form = params.form(queryContext.context.options).get(name);
       if(query == null && form == null) return def;
       if(query == null) return form;
       if(form == null) return query;

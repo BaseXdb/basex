@@ -32,13 +32,13 @@ public class BufferInput extends InputStream {
 
   /**
    * Constructor.
-   * @param io input to be read
+   * @param input input to be read
    * @throws IOException I/O Exception
    */
-  public BufferInput(final IO io) throws IOException {
-    this(io.inputStream());
-    length = io.length();
-    input = io;
+  public BufferInput(final IO input) throws IOException {
+    this(input.inputStream());
+    this.input = input;
+    length = input.length();
   }
 
   /**
@@ -51,13 +51,13 @@ public class BufferInput extends InputStream {
 
   /**
    * Initializes the file reader.
-   * @param is input stream
+   * @param in input stream
    * @param bs buffer size
    */
-  public BufferInput(final InputStream is, final int bs) {
+  public BufferInput(final InputStream in, final int bs) {
+    this.in = in;
     array = new byte[bs];
     length = -1;
-    in = is;
   }
 
   /**

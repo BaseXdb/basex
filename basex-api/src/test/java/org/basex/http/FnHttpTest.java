@@ -651,17 +651,16 @@ public class FnHttpTest extends HTTPTest {
     conn.contentType = "multipart/alternative; boundary=\"boundary42\"";
     conn.content = token("--boundary42" + CRLF
         + "Content-Type: text/plain; charset=us-ascii" + CRLF + CRLF
-        + "...plain text version of message goes here...." + CRLF + CRLF
+        + "...plain text...." + CRLF + CRLF
         + "--boundary42" + CRLF + "Content-Type: text/richtext" + CRLF + CRLF
-        + ".... richtext version of same message goes here ..." + CRLF
+        + ".... richtext..." + CRLF
         + "--boundary42" + CRLF + "Content-Type: text/x-whatever" + CRLF + CRLF
-        + ".... fanciest formatted version of same  "
-        + "message  goes  here" + CRLF + "..."  + CRLF + "--boundary42--");
-    final ValueIter expIter = new HttpResponse(null, ctx.options).getResponse(conn, true, null);
+        + ".... fanciest formatted version  " + CRLF + "..."  + CRLF + "--boundary42--");
+    final ValueIter returned = new HttpResponse(null, ctx.options).getResponse(conn, true, null);
 
     // Construct expected result
-    final ValueBuilder resultIter = new ValueBuilder();
-    final String reqItem = "<http:response "
+    final ValueBuilder expected = new ValueBuilder();
+    final String response = "<http:response "
         + "xmlns:http='http://expath.org/ns/http-client' "
         + "status='200' message='OK'>"
         + "<http:header name='Subject' value='Formatted text mail'/>"
@@ -680,20 +679,18 @@ public class FnHttpTest extends HTTPTest {
         + "<http:header name='Content-Type' value='text/x-whatever'/>"
         + "<http:body media-type='text/x-whatever'/>"
         + "</http:multipart>" + "</http:response> ";
-
-    final DBNode dbNode = new DBNode(new IOContent(reqItem));
-    resultIter.add(dbNode.children().next());
-    resultIter.add(Str.get("...plain text version of message goes here....\n\n"));
-    resultIter.add(Str.get(".... richtext version of same message goes here ...\n"));
-    resultIter.add(Str.get(".... fanciest formatted version of same  message  goes  here\n...\n"));
+    expected.add(new DBNode(new IOContent(response)).children().next());
+    expected.add(Str.get("...plain text....\n\n"));
+    expected.add(Str.get(".... richtext...\n"));
+    expected.add(Str.get(".... fanciest formatted version  \n...\n"));
 
     // Compare response with expected result
-    if(!new Compare().equal(resultIter, expIter)) {
+    if(!new Compare().equal(expected, returned)) {
+      final TokenBuilder ret = new TokenBuilder();
+      for(final Item it : returned) ret.add("- " + it.type + ": " + it + '\n');
       final TokenBuilder exp = new TokenBuilder();
-      for(final Item it : expIter) exp.add("- ").add(it.toString()).add('\n');
-      final TokenBuilder res = new TokenBuilder();
-      for(final Item it : resultIter) exp.add("- ").add(it.toString()).add('\n');
-      fail("Expected:\n" + exp + "\nResult:\n" + res);
+      for(final Item it : expected) exp.add("- " + it.type + ": " + it + '\n');
+      fail("Expected:\n" + exp + "Returned:\n" + ret);
     }
   }
 
@@ -746,11 +743,11 @@ public class FnHttpTest extends HTTPTest {
         +  CRLF + "--simple boundary--" + CRLF
         + "This is the epilogue.  It is also to be ignored.");
     // Get response as sequence of XQuery items
-    final ValueIter expIter = new HttpResponse(null, ctx.options).getResponse(conn, true, null);
+    final ValueIter returned = new HttpResponse(null, ctx.options).getResponse(conn, true, null);
 
     // Construct expected result
-    final ValueBuilder resultIter = new ValueBuilder();
-    final String reqItem = "<http:response "
+    final ValueBuilder expected = new ValueBuilder();
+    final String response = "<http:response "
         + "xmlns:http='http://expath.org/ns/http-client' "
         + "status='200' message='OK'>"
         + "<http:header name='Subject' value='Formatted text mail'/>"
@@ -768,21 +765,19 @@ public class FnHttpTest extends HTTPTest {
         + "charset=us-ascii'/>"
         + "<http:body media-type='text/plain; charset=us-ascii'/>"
         + "</http:multipart>" + "</http:response>";
-
-    final DBNode dbNode = new DBNode(new IOContent(reqItem));
-    resultIter.add(dbNode.children().next());
-    resultIter.add(Str.get("This is implicitly typed plain ASCII text.\n"
+    expected.add(new DBNode(new IOContent(response)).children().next());
+    expected.add(Str.get("This is implicitly typed plain ASCII text.\n"
         + "It does NOT end with a linebreak.\n"));
-    resultIter.add(Str.get("This is explicitly typed plain ASCII text.\n"
+    expected.add(Str.get("This is explicitly typed plain ASCII text.\n"
         + "It DOES end with a linebreak.\n\n"));
 
     // Compare response with expected result
-    if(!new Compare().equal(resultIter, expIter)) {
+    if(!new Compare().equal(expected, returned)) {
+      final TokenBuilder ret = new TokenBuilder();
+      for(final Item it : returned) ret.add("- " + it.type + ": " + it + '\n');
       final TokenBuilder exp = new TokenBuilder();
-      for(final Item it : expIter) exp.add(it.toString()).add('\n');
-      final TokenBuilder res = new TokenBuilder();
-      for(final Item it : resultIter) exp.add(it.toString()).add('\n');
-      fail("Expected:\n" + exp + "\nResult:\n" + res);
+      for(final Item it : expected) exp.add("- " + it.type + ": " + it + '\n');
+      fail("Expected:\n" + exp + "Returned:\n" + ret);
     }
   }
 

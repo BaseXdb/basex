@@ -38,9 +38,9 @@ public final class TextParser extends SingleParser {
    */
   public TextParser(final IO source, final MainOptions opts) {
     super(source, opts);
-    final TextOptions tp = opts.get(MainOptions.TEXTPARSER);
-    lines = tp.get(TextOptions.LINES);
-    encoding = tp.get(TextOptions.ENCODING);
+    final TextOptions topts = opts.get(MainOptions.TEXTPARSER);
+    lines = topts.get(TextOptions.LINES);
+    encoding = topts.get(TextOptions.ENCODING);
   }
 
   @Override
