@@ -26,19 +26,18 @@ function _:redirect(
  : @return rest response and binary file
  :)
 declare
-  %rest:path("dba/files/{$file}")
+  %rest:path("dba/files/{$file=.+}")
 function _:file(
   $file as xs:string
 ) as item()+ {
-  let $path := file:parent(static-base-uri()) || 'files/' || $file
-  let $xq := some $x in ('.xq', '.xqm') satisfies ends-with($file, $x)
+  let $path := file:base-dir() || 'files/' || $file
   return (
     <rest:response>
       <http:response>
         <http:header name="Cache-Control" value="max-age=3600,public"/>
       </http:response>
       <output:serialization-parameters>
-        <output:media-type value='{ web:mime-type($file) }'/>
+        <output:media-type value='{ web:mime-type($path) }'/>
         <output:method value='raw'/>
       </output:serialization-parameters>
     </rest:response>,
