@@ -13,6 +13,7 @@ import org.basex.io.out.*;
 import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
+import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -86,6 +87,8 @@ public final class JsonNodeSerializer extends JsonSerializer {
       if(!custom) custom = elm;
       super.node(node);
       custom = c;
+    } else if(adaptive != null && node.type == NodeType.ATT || node.type == NodeType.NSP) {
+      adaptive.serialize((Value) node);
     } else {
       try(final Serializer ser = nodeSerializer()) {
         ser.serialize(node);
@@ -104,7 +107,9 @@ public final class JsonNodeSerializer extends JsonSerializer {
   }
 
   @Override
-  protected void attribute(final byte[] name, final byte[] value) throws IOException {
+  protected void attribute(final byte[] name, final byte[] value, final boolean standalone)
+      throws IOException {
+
     // parse merged types on root level
     if(level == 0) {
       final int tl = typeCache.length;

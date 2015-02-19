@@ -48,7 +48,9 @@ public final class JsonMLSerializer extends JsonSerializer {
   }
 
   @Override
-  protected void attribute(final byte[] name, final byte[] value) throws IOException {
+  protected void attribute(final byte[] name, final byte[] value, final boolean standalone)
+      throws IOException {
+
     out.print(",");
     out.print(' ');
     if(!att) {

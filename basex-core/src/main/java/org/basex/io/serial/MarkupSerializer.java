@@ -141,13 +141,16 @@ abstract class MarkupSerializer extends StandardSerializer {
   // PROTECTED METHODS ============================================================================
 
   @Override
-  protected void namespace(final byte[] prefix, final byte[] uri) throws IOException {
-    if(undecl || prefix.length == 0 || uri.length != 0) super.namespace(prefix, uri);
+  protected void namespace(final byte[] prefix, final byte[] uri, final boolean standalone)
+      throws IOException {
+    if(undecl || prefix.length == 0 || uri.length != 0) super.namespace(prefix, uri, standalone);
   }
 
   @Override
-  protected void attribute(final byte[] name, final byte[] value) throws IOException {
-    out.print(' ');
+  protected void attribute(final byte[] name, final byte[] value, final boolean standalone)
+      throws IOException {
+
+    if(!standalone) out.print(' ');
     out.print(name);
     out.print(ATT1);
     final byte[] val = norm(value);
@@ -339,9 +342,9 @@ abstract class MarkupSerializer extends StandardSerializer {
     if(empty) finishOpen();
     level++;
     startOpen(META);
-    attribute(HTTPEQUIV, token(HttpText.CONTENT_TYPE));
+    attribute(HTTPEQUIV, token(HttpText.CONTENT_TYPE), false);
     attribute(CONTENT, new TokenBuilder(media.isEmpty() ? MimeTypes.TEXT_HTML : media).
-        add(CHARSET).addExt(out.encoding()).finish());
+        add(CHARSET).addExt(out.encoding()).finish(), false);
     if(html) {
       out.print(ELEM_C);
     } else {

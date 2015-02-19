@@ -58,7 +58,7 @@ public final class DOTSerializer extends OutputSerializer {
   }
 
   @Override
-  protected void attribute(final byte[] name, final byte[] value) {
+  protected void attribute(final byte[] name, final byte[] value, final boolean standalone) {
     tb.addExt(DOTATTR, name, value);
   }
 

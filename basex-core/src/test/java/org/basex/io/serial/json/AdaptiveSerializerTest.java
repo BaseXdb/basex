@@ -28,8 +28,8 @@ public final class AdaptiveSerializerTest extends SandboxTest {
 
     // nodes
     serialize("<x/>", "<x/>");
-    serialize("<x y='z'/>/@y", " y='z'");
-    serialize("namespace x { 'y' }", " xmlns:x='y'");
+    serialize("<x y='z'/>/@y", "y='z'");
+    serialize("namespace x { 'y' }", "xmlns:x='y'");
 
     // function items
     serialize("exists#1", "function exists#1");

@@ -65,7 +65,7 @@ public class BuilderSerializer extends Serializer {
   }
 
   @Override
-  protected final void attribute(final byte[] name, final byte[] value) {
+  protected final void attribute(final byte[] name, final byte[] value, final boolean standalone) {
     if(startsWith(name, XMLNS)) {
       if(name.length == 5) {
         nsp.add(EMPTY, value);

@@ -87,7 +87,8 @@ public final class RepoManager {
     t.header.add(TYPE);
     t.header.add(PATH);
 
-    final Repo repo = context.repo;
+    final Repo repo = context.repo.reset();
+
     final TokenMap pkg = repo.pkgDict();
     // traverse EXPath packages
     for(final byte[] p : pkg) {
@@ -99,8 +100,7 @@ public final class RepoManager {
     for(final IOFile ch : repo.path().children()) {
       final String n = ch.name();
       if(!ch.isDir()) {
-        t.contents.add(entry(n.replaceAll("\\..*", "").
-            replace('/', '.'), "-", INTERNAL, n));
+        t.contents.add(entry(n.replaceAll("\\..*", "").replace('/', '.'), "-", INTERNAL, n));
       } else if(n.indexOf('-') == -1) {
         for(final String s : ch.descendants()) {
           t.contents.add(entry(n + '.' + s.replaceAll("\\..*", "").replace('/', '.'),

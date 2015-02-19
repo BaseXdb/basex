@@ -25,11 +25,13 @@ final class XHTMLSerializer extends MarkupSerializer {
   }
 
   @Override
-  protected void attribute(final byte[] name, final byte[] value) throws IOException {
+  protected void attribute(final byte[] name, final byte[] value, final boolean standalone)
+      throws IOException {
+
     // escape URI attributes
     final byte[] nm = concat(lc(elem), COLON, lc(name));
     final byte[] val = escuri && HTMLSerializer.URIS.contains(nm) ? escape(value) : value;
-    super.attribute(name, val);
+    super.attribute(name, val, standalone);
   }
 
   @Override

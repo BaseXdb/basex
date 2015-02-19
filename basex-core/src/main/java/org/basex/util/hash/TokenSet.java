@@ -174,7 +174,7 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
   }
 
   @Override
-  public final void clear() {
+  public void clear() {
     Arrays.fill(keys, null);
     super.clear();
   }

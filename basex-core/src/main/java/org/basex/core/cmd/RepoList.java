@@ -35,6 +35,6 @@ public final class RepoList extends ARepo {
 
   @Override
   public void build(final CmdBuilder cb) {
-    cb.init(Cmd.REPO + " " + CmdRepo.LIST).args();
+    cb.init(Cmd.REPO + " " + CmdRepo.LIST);
   }
 }

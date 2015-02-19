@@ -126,7 +126,7 @@ public abstract class JsonSerializer extends StandardSerializer {
 
       } else {
         if(adaptive != null) {
-          adaptive.serialize(item);
+          adaptive.serialize((Value) item);
         } else {
           throw SERJSONFUNC_X.getIO(item.type);
         }

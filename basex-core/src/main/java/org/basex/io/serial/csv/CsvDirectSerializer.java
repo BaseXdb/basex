@@ -95,7 +95,7 @@ public final class CsvDirectSerializer extends CsvSerializer {
   }
 
   @Override
-  protected void attribute(final byte[] name, final byte[] value) {
+  protected void attribute(final byte[] name, final byte[] value, final boolean standalone) {
     attv = value;
   }
 

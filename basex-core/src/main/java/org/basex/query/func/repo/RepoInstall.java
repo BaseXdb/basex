@@ -9,7 +9,7 @@ import org.basex.util.*;
  * Function implementation.
  *
  * @author BaseX Team 2005-15, BSD License
- * @author Rositsa Shadura
+ * @author Christian Gruen
  */
 public final class RepoInstall extends RepoFn {
   @Override

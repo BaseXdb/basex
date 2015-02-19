@@ -11,7 +11,7 @@ import org.basex.query.value.node.*;
  * Function implementation.
  *
  * @author BaseX Team 2005-15, BSD License
- * @author Rositsa Shadura
+ * @author Christian Gruen
  */
 public final class RepoList extends RepoFn {
   /** Element name. */
@@ -26,7 +26,8 @@ public final class RepoList extends RepoFn {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final NodeSeqBuilder cache = new NodeSeqBuilder();
-    for(final byte[] p : qc.context.repo.pkgDict()) {
+    final Repo repo = qc.context.repo.reset();
+    for(final byte[] p : repo.pkgDict()) {
       if(p == null) continue;
       final FElem elem = new FElem(PACKAGE);
       elem.add(NAME, Package.name(p));
@@ -35,7 +36,7 @@ public final class RepoList extends RepoFn {
       cache.add(elem);
     }
     // traverse all directories, ignore root entries with dashes
-    for(final IOFile dir : qc.context.repo.path().children()) {
+    for(final IOFile dir : repo.path().children()) {
       if(dir.name().indexOf('-') != -1) continue;
       for(final String s : dir.descendants()) {
         final FElem elem = new FElem(PACKAGE);

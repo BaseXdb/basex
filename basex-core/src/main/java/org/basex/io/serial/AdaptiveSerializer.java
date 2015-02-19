@@ -59,8 +59,8 @@ public final class AdaptiveSerializer extends OutputSerializer {
   @Override
   protected void node(final ANode item) throws IOException {
     final Type type = item.type;
-    if(type == NodeType.ATT) xml.attribute(item.name(), item.string());
-    else if(type == NodeType.NSP) xml.namespace(item.name(), item.string());
+    if(type == NodeType.ATT) xml.attribute(item.name(), item.string(), true);
+    else if(type == NodeType.NSP) xml.namespace(item.name(), item.string(), true);
     else xml.node(item);
     xml.reset();
   }
