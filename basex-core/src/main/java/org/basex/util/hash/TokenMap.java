@@ -1,5 +1,7 @@
 package org.basex.util.hash;
 
+import java.util.*;
+
 import org.basex.util.*;
 
 /**
@@ -56,6 +58,12 @@ public class TokenMap extends TokenSet {
    */
   public final Iterable<byte[]> values() {
     return new ArrayIterator<>(values, 1, size);
+  }
+
+  @Override
+  public final void clear() {
+    Arrays.fill(values, null);
+    super.clear();
   }
 
   @Override

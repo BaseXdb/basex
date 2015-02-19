@@ -28,7 +28,7 @@ public final class RepoModuleTest extends AdvancedQueryTest {
   @Before
   public void setupTest() {
     context.soptions.set(StaticOptions.REPOPATH, REPO);
-    new IOFile(REPO, PKG3ID).delete();
+    new IOFile(REPO, normalize(PKG3ID)).delete();
   }
 
   /** Test method. */

@@ -36,6 +36,17 @@ public final class Repo {
   }
 
   /**
+   * Resets the repository.
+   * @return self reference
+   */
+  public Repo reset() {
+    path = null;
+    nsDict.clear();
+    pkgDict.clear();
+    return this;
+  }
+
+  /**
    * Returns the path to the repository.
    * @return dictionary
    */

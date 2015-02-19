@@ -1,5 +1,7 @@
 package org.basex.util.hash;
 
+import java.util.*;
+
 import org.basex.util.*;
 
 /**
@@ -49,6 +51,12 @@ public final class TokenObjMap<E> extends TokenSet {
     final int i = super.delete(key);
     values[i] = null;
     return i;
+  }
+
+  @Override
+  public void clear() {
+    Arrays.fill(values, null);
+    super.clear();
   }
 
   @Override
