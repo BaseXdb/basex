@@ -146,7 +146,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   }
 
   @Override
-  protected void attribute(final byte[] name, final byte[] value) {
+  protected void attribute(final byte[] name, final byte[] value, final boolean standalone) {
     byte[] prefix = null;
     if(startsWith(name, XMLNS)) {
       if(name.length == 5) {

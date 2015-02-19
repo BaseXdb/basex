@@ -40,8 +40,10 @@ final class HTMLSerializer extends MarkupSerializer {
   }
 
   @Override
-  protected void attribute(final byte[] name, final byte[] value) throws IOException {
-    out.print(' ');
+  protected void attribute(final byte[] name, final byte[] value, final boolean standalone)
+      throws IOException {
+
+    if(!standalone) out.print(' ');
     out.print(name);
 
     // don't append value for boolean attributes

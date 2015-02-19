@@ -378,7 +378,7 @@ public final class QT3TS extends Main {
     final String exp = test(returned, expected);
     final TokenBuilder tmp = new TokenBuilder();
     tmp.add(name).add(NL);
-    tmp.add(noComments(string)).add(NL);
+    tmp.add(QueryProcessor.removeComments(string, maxout)).add(NL);
 
     boolean err = returned.value == null;
     String res;
@@ -388,7 +388,7 @@ public final class QT3TS extends Main {
       } else if(returned.xqerror != null) {
         res = returned.xqerror.getCode() + ": " + returned.xqerror.getLocalizedMessage();
       } else {
-        returned.sprop.set(SerializerOptions.OMIT_XML_DECLARATION, "yes");
+        returned.sprop.set(SerializerOptions.OMIT_XML_DECLARATION, YesNo.YES);
         res = serialize(returned.value, returned.sprop);
       }
     } catch(final XQueryException ex) {
@@ -398,24 +398,25 @@ public final class QT3TS extends Main {
       res = returned.value.toString();
     }
 
-    tmp.add(err ? "Error : " : "Result: ").add(noComments(res)).add(NL);
+    tmp.add(err ? "Error : " : "Result: ").add(normSpecial(res)).add(NL);
     if(exp == null) {
       tmp.add(NL);
       right.add(tmp.finish());
       correct++;
     } else {
-      wrong.add(tmp.add("Expect: ").add(noComments(exp)).add(NL).add(NL).finish());
+      wrong.add(tmp.add("Expect: ").add(normSpecial(exp)).add(NL).add(NL).finish());
     }
     if(report != null) report.addTest(name, exp == null);
   }
 
   /**
-   * Removes comments from the specified string.
+   * Normalizes special characters in the specified string.
    * @param in input string
    * @return result
    */
-  private String noComments(final String in) {
-    return QueryProcessor.removeComments(in, maxout);
+  private String normSpecial(final String in) {
+    // return QueryProcessor.removeComments(in, maxout);
+    return in.replace("\n", "%0A").replace("\r", "%0D").replace("\t", "%09");
   }
 
   /** Flags for dependencies that are not supported. */
@@ -707,6 +708,9 @@ public final class QT3TS extends Main {
     final int flgs = flags.contains("i") ? Pattern.CASE_INSENSITIVE : 0;
     final Pattern pat = Pattern.compile("^.*" + exp + ".*", flgs |
         Pattern.MULTILINE | Pattern.DOTALL);
+
+    if(sprop.get(SerializerOptions.METHOD) == SerialMethod.ADAPTIVE)
+      sprop.set(SerializerOptions.OMIT_XML_DECLARATION, YesNo.YES);
 
     try {
       return pat.matcher("^.*" + serialize(returned, sprop) + ".*").matches() ? null : exp;
