@@ -52,8 +52,10 @@ public interface HttpText {
   /** Body attribute: src. */
   String SRC = "src";
 
-  /** QOP. */
-  String MD5_SESS = "md5-sess";
+  /** MD5. */
+  String MD5 = "MD5";
+  /** MD5-sess. */
+  String MD5_SESS = MD5 + "-sess";
   /** Auth. */
   String AUTH = "auth";
   /** Auth-int. */

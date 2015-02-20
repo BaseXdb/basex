@@ -6,7 +6,7 @@ package org.basex.query.func.http;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public enum HTTPMethod {
+public enum HttpMethod {
   /** GET method. */
   GET,
   /** POST method. */
@@ -24,7 +24,7 @@ public enum HTTPMethod {
   public final boolean body;
 
   /** Default constructor. */
-  HTTPMethod() {
+  HttpMethod() {
     this(false);
   }
 
@@ -32,7 +32,7 @@ public enum HTTPMethod {
    * Constructor, specifying a body flag.
    * @param body body flag
    */
-  HTTPMethod(final boolean body) {
+  HttpMethod(final boolean body) {
     this.body = body;
   }
 
@@ -41,8 +41,8 @@ public enum HTTPMethod {
    * @param name method name
    * @return method
    */
-  public static HTTPMethod get(final String name) {
-    for(final HTTPMethod m : values()) if(m.name().equals(name)) return m;
+  public static HttpMethod get(final String name) {
+    for(final HttpMethod m : values()) if(m.name().equals(name)) return m;
     return null;
   }
 }

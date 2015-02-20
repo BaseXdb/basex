@@ -107,16 +107,26 @@ public final class HttpClient {
         conn.setRequestProperty(AUTHORIZATION, DIGEST);
 
         final EnumMap<Request, String> map = digestHeaders(conn.getHeaderField(WWW_AUTHENTICATE));
-        final String realm = map.get(REALM), nonce = map.get(NONCE),
-          qop = map.get(QOP), opaque = map.get(OPAQUE),
+        final String
+          realm = map.get(REALM),
+          nonce = map.get(NONCE),
+          uri = conn.getURL().getPath(),
+          qop = map.get(QOP),
+          nc = "00000001",
           cnonce = Strings.md5(Long.toString(System.nanoTime())),
-          nc = "00000001", uri = conn.getURL().getPath(),
           ha1 = Strings.md5(user + ':' + realm + ':' + pass),
           ha2 = Strings.md5(request.attribute(METHOD) + ':' + uri),
           rsp = Strings.md5(ha1 + ':' + nonce + ':' + nc + ':' + cnonce + ':' + qop + ':' + ha2),
-          creds = USERNAME + "=" + user + ',' + REALM + '=' + realm + ',' + NONCE + '=' + nonce
-            + ',' + URI + '=' + uri + ',' + QOP + '=' + qop + ',' + NC + '=' + nc + ',' + CNONCE
-            + '=' + cnonce + ',' + RESPONSE + '=' + rsp + ',' + OPAQUE + '=' + opaque;
+          creds = USERNAME + "=" + user + ','
+                + REALM + '=' + realm + ','
+                + NONCE + '=' + nonce + ','
+                + URI + '=' + uri + ','
+                + QOP + '=' + qop + ','
+                + NC + '=' + nc + ','
+                + CNONCE + '=' + cnonce + ','
+                + RESPONSE + '=' + rsp + ','
+                + ALGORITHM + '=' + MD5 + ','
+                + OPAQUE + '=' + map.get(OPAQUE);
 
         conn.disconnect();
         conn = connection(url, request);
