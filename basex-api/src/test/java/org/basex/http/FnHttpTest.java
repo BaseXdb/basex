@@ -351,7 +351,7 @@ public class FnHttpTest extends HTTPTest {
         "<http:request xmlns:http='http://expath.org/ns/http-client' "
         + "method='GET' href='" + REST_ROOT + "' send-authorization='true' "
         + "auth-method='Basic' username='unknown' password='wrong'/>"), ctx)) {
-      checkResponse(qp.execute(), 2, HttpURLConnection.HTTP_UNAUTHORIZED);
+      checkResponse(qp.execute(), 1, HttpURLConnection.HTTP_UNAUTHORIZED);
     }
   }
 
@@ -373,7 +373,7 @@ public class FnHttpTest extends HTTPTest {
         "<http:request xmlns:http='http://expath.org/ns/http-client' method='GET' " +
         "send-authorization='true' auth-method='Digest' username='unknown' password='wrong' " +
         "href='" + REST_ROOT + "?query=()'/>"), ctx)) {
-      checkResponse(qp.execute(), 2, HttpURLConnection.HTTP_UNAUTHORIZED);
+      checkResponse(qp.execute(), 1, HttpURLConnection.HTTP_UNAUTHORIZED);
     }
   }
 
