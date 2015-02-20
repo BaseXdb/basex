@@ -1,7 +1,7 @@
 package org.basex.http;
 
 import static org.basex.core.users.UserText.*;
-import static org.basex.query.func.http.HTTPMethod.*;
+import static org.basex.query.func.http.HttpMethod.*;
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 
@@ -130,7 +130,7 @@ public abstract class HTTPTest extends SandboxTest {
    * @return string result, or {@code null} for a failure.
    * @throws IOException I/O exception
    */
-  private static String request(final String query, final HTTPMethod method)
+  private static String request(final String query, final HttpMethod method)
       throws IOException {
     return request(query, method.name());
   }

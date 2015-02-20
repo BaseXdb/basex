@@ -72,7 +72,7 @@ public class FnHttpTest extends HTTPTest {
         "<http:request method='put' status-only='true'>"
         + "<http:body media-type='text/xml'>" + BOOKS + "</http:body>"
         + "</http:request>", RESTURL), ctx)) {
-      checkResponse(qp.execute(), HttpURLConnection.HTTP_CREATED, 1);
+      checkResponse(qp.execute(), 1, HttpURLConnection.HTTP_CREATED);
     }
   }
 
@@ -87,7 +87,7 @@ public class FnHttpTest extends HTTPTest {
         "<http:request method='put' status-only='true'>"
         + "<http:body media-type='text/xml'>" + BOOKS + "</http:body>"
         + "</http:request>", RESTURL), ctx)) {
-      checkResponse(qp.execute(), HttpURLConnection.HTTP_CREATED, 1);
+      checkResponse(qp.execute(), 1, HttpURLConnection.HTTP_CREATED);
     }
 
     // POST - query
@@ -99,7 +99,7 @@ public class FnHttpTest extends HTTPTest {
         + "</query>"
         + "</http:body>"
         + "</http:request>", RESTURL), ctx)) {
-        checkResponse(qp.execute(), HttpURLConnection.HTTP_OK, 2);
+        checkResponse(qp.execute(), 2, HttpURLConnection.HTTP_OK);
     }
 
     // Execute the same query but with content set from $bodies
@@ -111,7 +111,7 @@ public class FnHttpTest extends HTTPTest {
         "<query xmlns='" + Prop.URL + "/rest'>"
         + "<text><![CDATA[<x>1</x>]]></text>"
         + "</query>"), ctx)) {
-      checkResponse(qp.execute(), HttpURLConnection.HTTP_OK, 2);
+      checkResponse(qp.execute(), 2, HttpURLConnection.HTTP_OK);
     }
   }
 
@@ -125,7 +125,7 @@ public class FnHttpTest extends HTTPTest {
     try(final QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         "<http:request method='get' href='" + REST_ROOT + "'/>"), ctx)) {
       final Result r = qp.execute();
-      checkResponse(r, HttpURLConnection.HTTP_OK, 2);
+      checkResponse(r, 2, HttpURLConnection.HTTP_OK);
 
       assertEquals(NodeType.DOC, ((Iter) r).get(1).type);
     }
@@ -134,7 +134,7 @@ public class FnHttpTest extends HTTPTest {
     try(final QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         "<http:request method='get' override-media-type='text/plain'/>", REST_ROOT), ctx)) {
       final Result r = qp.execute();
-      checkResponse(r, HttpURLConnection.HTTP_OK, 2);
+      checkResponse(r, 2, HttpURLConnection.HTTP_OK);
 
       assertEquals(AtomType.STR, ((Iter) r).get(1).type);
     }
@@ -142,7 +142,7 @@ public class FnHttpTest extends HTTPTest {
     // Get3 - with status-only='true'
     try(final QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         "<http:request method='get' status-only='true'/>", REST_ROOT), ctx)) {
-      checkResponse(qp.execute(), HttpURLConnection.HTTP_OK, 1);
+      checkResponse(qp.execute(), 1, HttpURLConnection.HTTP_OK);
     }
   }
 
@@ -163,7 +163,7 @@ public class FnHttpTest extends HTTPTest {
     // DELETE
     try(final QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         "<http:request method='delete' status-only='true'/>", RESTURL), ctx)) {
-      checkResponse(qp.execute(), HttpURLConnection.HTTP_OK, 1);
+      checkResponse(qp.execute(), 1, HttpURLConnection.HTTP_OK);
     }
   }
 
@@ -215,7 +215,7 @@ public class FnHttpTest extends HTTPTest {
     // Simple HTTP request with no errors
     final String req = "<http:request "
         + "xmlns:http='http://expath.org/ns/http-client' "
-        + "method='POST' href='http://basex.org'>"
+        + "method='POST' href='" + REST_ROOT + "'>"
         + "<http:header name='hdr1' value='hdr1val'/>"
         + "<http:header name='hdr2' value='hdr2val'/>"
         + "<http:body media-type='text/xml'>" + "Test body content"
@@ -239,7 +239,7 @@ public class FnHttpTest extends HTTPTest {
   public void parseMultipartReq() throws IOException, QueryException {
     final String multiReq = "<http:request "
         + "xmlns:http='http://expath.org/ns/http-client' "
-        + "method='POST' href='http://basex.org'>"
+        + "method='POST' href='" + REST_ROOT + "'>"
         + "<http:header name='hdr1' value='hdr1val'/>"
         + "<http:header name='hdr2' value='hdr2val'/>"
         + "<http:multipart media-type='multipart/mixed' boundary='xxxx'>"
@@ -289,7 +289,7 @@ public class FnHttpTest extends HTTPTest {
   public void parseMultipartReqBodies() throws IOException, QueryException {
     final String multiReq = "<http:request "
         + "xmlns:http='http://expath.org/ns/http-client' "
-        + "method='POST' href='http://basex.org'>"
+        + "method='POST' href='" + REST_ROOT + "'>"
         + "<http:header name='hdr1' value='hdr1val'/>"
         + "<http:header name='hdr2' value='hdr2val'/>"
         + "<http:multipart media-type='multipart/mixed' boundary='xxxx'>"
@@ -334,20 +334,47 @@ public class FnHttpTest extends HTTPTest {
   }
 
   /**
-   * Tests the authorization.
+   * Tests basic authentication.
    * @throws Exception Exception
    */
   @Test
-  public void authorize() throws Exception {
-    // Test Basic authentication
-    final byte[] req = token("<http:request "
-        + "xmlns:http='http://expath.org/ns/http-client' "
-        + "method='GET' href='http://basex.org' "
-        + "send-authorization='true' auth-method='Basic' username='admin' password='admin'/>");
+  public void basic() throws Exception {
+    // correct credentials
+    try(final QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
+        "<http:request xmlns:http='http://expath.org/ns/http-client' "
+        + "method='GET' href='" + REST_ROOT + "' send-authorization='true' "
+        + "auth-method='Basic' username='admin' password='admin'/>"), ctx)) {
+      checkResponse(qp.execute(), 2, HttpURLConnection.HTTP_OK);
+    }
+    // wrong credentials
+    try(final QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
+        "<http:request xmlns:http='http://expath.org/ns/http-client' "
+        + "method='GET' href='" + REST_ROOT + "' send-authorization='true' "
+        + "auth-method='Basic' username='unknown' password='wrong'/>"), ctx)) {
+      checkResponse(qp.execute(), 2, HttpURLConnection.HTTP_UNAUTHORIZED);
+    }
+  }
 
-    final DBNode dbNode = new DBNode(new IOContent(req));
-    final HttpRequestParser rp = new HttpRequestParser(null);
-    rp.parse(dbNode.children().next(), null);
+  /**
+   * Test digest authentication.
+   * @throws Exception exception
+   */
+  @Test
+  public void digest() throws Exception {
+    // correct credentials
+    try(final QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
+        "<http:request xmlns:http='http://expath.org/ns/http-client' method='GET' " +
+        "send-authorization='true' auth-method='Digest' username='admin' password='admin' " +
+        "href='" + REST_ROOT + "'/>"), ctx)) {
+      checkResponse(qp.execute(), 2, HttpURLConnection.HTTP_OK);
+    }
+    // wrong credentials
+    try(final QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
+        "<http:request xmlns:http='http://expath.org/ns/http-client' method='GET' " +
+        "send-authorization='true' auth-method='Digest' username='unknown' password='wrong' " +
+        "href='" + REST_ROOT + "?query=()'/>"), ctx)) {
+      checkResponse(qp.execute(), 2, HttpURLConnection.HTTP_UNAUTHORIZED);
+    }
   }
 
   /**
@@ -364,41 +391,41 @@ public class FnHttpTest extends HTTPTest {
     // Request without method
     final byte[] falseReq1 = token("<http:request "
         + "xmlns:http='http://expath.org/ns/http-client' "
-        + "href='http://basex.org'/>");
+        + "href='" + REST_ROOT + "'/>");
     falseReqs.add(falseReq1);
 
     // Request with send-authorization and no credentials
     final byte[] falseReq2 = token("<http:request "
         + "xmlns:http='http://expath.org/ns/http-client' "
-        + "method='GET' href='http://basex.org' "
+        + "method='GET' href='" + REST_ROOT + "' "
         + "send-authorization='true'/>");
     falseReqs.add(falseReq2);
 
     // Request with send-authorization and only username
     final byte[] falseReq3 = token("<http:request "
         + "xmlns:http='http://expath.org/ns/http-client' "
-        + "method='GET' href='http://basex.org' "
+        + "method='GET' href='" + REST_ROOT + "' "
         + "send-authorization='true' username='test'/>");
     falseReqs.add(falseReq3);
 
     // Request with body that has no media-type
     final byte[] falseReq4 = token("<http:request "
         + "xmlns:http='http://expath.org/ns/http-client' "
-        + "method='POST' href='http://basex.org'>" + "<http:body>"
+        + "method='POST' href='" + REST_ROOT + "'>" + "<http:body>"
         + "</http:body>" + "</http:request>");
     falseReqs.add(falseReq4);
 
     // Request with multipart that has no media-type
     final byte[] falseReq5 = token("<http:request method='POST' "
         + "xmlns:http='http://expath.org/ns/http-client' "
-        + "href='http://basex.org'>" + "<http:multipart boundary='xxx'>"
+        + "href='" + REST_ROOT + "'>" + "<http:multipart boundary='xxx'>"
         + "</http:multipart>" + "</http:request>");
     falseReqs.add(falseReq5);
 
     // Request with multipart with part that has a body without media-type
     final byte[] falseReq6 = token("<http:request method='POST' "
         + "xmlns:http='http://expath.org/ns/http-client' "
-        + "href='http://basex.org'>" + "<http:multipart boundary='xxx'>"
+        + "href='" + REST_ROOT + "'>" + "<http:multipart boundary='xxx'>"
         + "<http:header name='hdr1' value-='val1'/>"
         + "<http:body media-type='text/plain'>" + "Part1" + "</http:body>"
         + "<http:header name='hdr1' value-='val1'/>"
@@ -415,7 +442,7 @@ public class FnHttpTest extends HTTPTest {
     // Request with content and method which must be empty
     final byte[] falseReq8 = token("<http:request "
         + "xmlns:http='http://expath.org/ns/http-client' "
-        + "method='DELETE' href='http://basex.org'>"
+        + "method='DELETE' href='" + REST_ROOT + "'>"
         + "<http:body media-type='text/plain'>" + "</http:body>"
         + "</http:request>");
     falseReqs.add(falseReq8);
@@ -784,11 +811,11 @@ public class FnHttpTest extends HTTPTest {
   /**
    * Checks the response to an HTTP request.
    * @param r query result
-   * @param expStatus expected status
    * @param itemsCount expected number of items
+   * @param expStatus expected status
    * @throws QueryException query exception
    */
-  private static void checkResponse(final Result r, final int expStatus, final int itemsCount)
+  private static void checkResponse(final Result r, final int itemsCount, final int expStatus)
       throws QueryException {
 
     assertTrue(r instanceof Iter);

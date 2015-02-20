@@ -312,19 +312,20 @@ public final class HTTPContext {
         final String am = map.get(Request.AUTH_METHOD);
         if(!AuthMethod.DIGEST.toString().equals(am)) throw new LoginException(DIGESTAUTH);
 
+        final String nonce = map.get(Request.NONCE), cnonce = map.get(Request.CNONCE);
         String ha1 = us.code(Algorithm.DIGEST, Code.HASH);
         if(Strings.eq(map.get(Request.ALGORITHM), MD5_SESS))
-          ha1 = Strings.md5(ha1 + ':' + map.get(Request.NONCE) + ':' + map.get(Request.CNONCE));
+          ha1 = Strings.md5(ha1 + ':' + nonce + ':' + cnonce);
 
         String h2 = method + ':' + map.get(Request.URI);
         final String qop = map.get(Request.QOP);
         if(Strings.eq(qop, AUTH_INT)) h2 += ':' + Strings.md5(params.body().toString());
         final String ha2 = Strings.md5(h2);
 
-        final StringBuilder rsp = new StringBuilder(ha1).append(':').append(map.get(Request.NONCE));
+        final StringBuilder rsp = new StringBuilder(ha1).append(':').append(nonce);
         if(Strings.eq(qop, AUTH, AUTH_INT)) {
           rsp.append(':').append(map.get(Request.NC));
-          rsp.append(':').append(map.get(Request.CNONCE));
+          rsp.append(':').append(cnonce);
           rsp.append(':').append(qop);
         }
         rsp.append(':').append(ha2);

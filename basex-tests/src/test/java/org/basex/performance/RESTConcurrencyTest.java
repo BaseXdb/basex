@@ -1,6 +1,6 @@
 package org.basex.performance;
 
-import static org.basex.query.func.http.HTTPMethod.*;
+import static org.basex.query.func.http.HttpMethod.*;
 import static org.junit.Assert.*;
 
 import java.io.*;
@@ -220,7 +220,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
     /** Content to send to the server. */
     private final byte[] data;
     /** HTTP method. */
-    protected HTTPMethod method;
+    protected HttpMethod method;
     /** Stop signal. */
     public volatile boolean stop;
 
@@ -239,7 +239,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
      * @param data data to send to the server
      * @param method HTTP method
      */
-    protected Put(final String request, final byte[] data, final HTTPMethod method) {
+    protected Put(final String request, final byte[] data, final HttpMethod method) {
       this.data = data;
       this.method = method;
       uri = URI.create(BASE_URL + request);

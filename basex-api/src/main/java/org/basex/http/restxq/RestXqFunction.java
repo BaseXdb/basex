@@ -216,7 +216,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
       final InputInfo info) throws QueryException {
 
     if(body != null && !body.isEmpty()) {
-      final HTTPMethod m = HTTPMethod.get(method);
+      final HttpMethod m = HttpMethod.get(method);
       if(m != null && !m.body) throw error(info, METHOD_VALUE, m);
       if(requestBody != null) throw error(info, ANN_BODYVAR);
       requestBody = checkVariable(toString(body), declared);
