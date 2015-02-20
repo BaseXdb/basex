@@ -174,24 +174,26 @@ public class BaseX extends CLI {
     verbose = true;
 
     // create console reader
-    final ConsoleReader cr = ConsoleReader.get();
-    // loop until console is set to false (may happen in server mode)
-    while(console) {
-      // get next line
-      final String in = cr.readLine(PROMPT);
-      // end of input: break loop
-      if(in == null) break;
-      // skip empty lines
-      if(in.isEmpty()) continue;
-      try {
-        if(!execute(new CommandParser(in, context).pwReader(cr.pwReader()))) {
-          // show goodbye message if method returns false
-          Util.outln(BYE[new Random().nextInt(4)]);
-          return;
+    try(final ConsoleReader cr = ConsoleReader.get()) {
+      // loop until console is set to false (may happen in server mode)
+      while(console) {
+        // get next line
+        final String in = cr.readLine(PROMPT);
+        // end of input: break loop
+        if(in == null) break;
+        // skip empty lines
+        if(in.isEmpty()) continue;
+
+        try {
+          if(!execute(new CommandParser(in, context).pwReader(cr.pwReader()))) {
+            // show goodbye message if method returns false
+            Util.outln(BYE[new Random().nextInt(4)]);
+            break;
+          }
+        } catch(final IOException ex) {
+          // output error messages
+          Util.errln(ex);
         }
-      } catch(final IOException ex) {
-        // output error messages
-        Util.errln(ex);
       }
     }
   }
