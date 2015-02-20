@@ -117,16 +117,16 @@ public final class HttpClient {
           ha1 = Strings.md5(user + ':' + realm + ':' + pass),
           ha2 = Strings.md5(request.attribute(METHOD) + ':' + uri),
           rsp = Strings.md5(ha1 + ':' + nonce + ':' + nc + ':' + cnonce + ':' + qop + ':' + ha2),
-          creds = USERNAME + "=" + user + ','
-                + REALM + '=' + realm + ','
-                + NONCE + '=' + nonce + ','
-                + URI + '=' + uri + ','
-                + QOP + '=' + qop + ','
+          creds = USERNAME + "=\"" + user + "\","
+                + REALM + "=\"" + realm + "\","
+                + NONCE + "=\"" + nonce + "\","
+                + URI + "=\"" + uri + "\","
+                + QOP + "=\"" + qop + "\","
                 + NC + '=' + nc + ','
-                + CNONCE + '=' + cnonce + ','
-                + RESPONSE + '=' + rsp + ','
-                + ALGORITHM + '=' + MD5 + ','
-                + OPAQUE + '=' + map.get(OPAQUE);
+                + CNONCE + "=\"" + cnonce + "\","
+                + RESPONSE + "=\"" + rsp + "\","
+                + ALGORITHM + "=\"" + MD5 + "\","
+                + OPAQUE + "\"," + map.get(OPAQUE) + "\"";
 
         conn.disconnect();
         conn = connection(url, request);
