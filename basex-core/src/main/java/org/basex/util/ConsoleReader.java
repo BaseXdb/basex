@@ -4,9 +4,11 @@ import static org.basex.core.Text.*;
 
 import java.io.*;
 import java.lang.reflect.*;
+import java.util.*;
 
 import org.basex.core.parse.*;
 import org.basex.io.*;
+import org.basex.util.list.*;
 
 /**
  * Console reader.
@@ -14,7 +16,7 @@ import org.basex.io.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Dimitar Popov
  */
-public abstract class ConsoleReader {
+public abstract class ConsoleReader implements AutoCloseable {
   /** Password prompt. */
   private static final String PW_PROMPT = PASSWORD + COLS;
 
@@ -38,6 +40,9 @@ public abstract class ConsoleReader {
    * @return password as plain text
    */
   protected abstract String readPassword();
+
+  @Override
+  public abstract void close();
 
   /**
    * Create a new password reader for this console.
@@ -88,6 +93,10 @@ public abstract class ConsoleReader {
       Util.out(PW_PROMPT);
       return Util.password();
     }
+
+    @Override
+    public void close() {
+    }
   }
 
   /** Implementation which provides advanced features, such as history. */
@@ -98,6 +107,10 @@ public abstract class ConsoleReader {
     private static final String JLINE_FILE_HISTORY = "jline.console.history.FileHistory";
     /** JLine history class name. */
     private static final String JLINE_HISTORY = "jline.console.history.History";
+    /** JLine history class name. */
+    private static final String JLINE_COMPLETER = "jline.console.completer.Completer";
+    /** JLine history class name. */
+    private static final String JLINE_STRING_COMPLETER = "jline.console.completer.StringsCompleter";
     /** Command history file. */
     private static final String HISTORY_FILE = IO.BASEXSUFFIX + "history";
     /** Password echo character. */
@@ -109,6 +122,11 @@ public abstract class ConsoleReader {
     private final Method readEcho;
     /** Implementation. */
     private final Object reader;
+
+    /** File history class. */
+    private final Class<?> fileHistoryC;
+    /** File history. */
+    private final Object fileHistory;
 
     /**
      * Checks if JLine implementation is available?
@@ -132,15 +150,24 @@ public abstract class ConsoleReader {
       reader = readerC.newInstance();
 
       final Class<?> history = Reflect.find(JLINE_HISTORY);
-      final Class<?> fileHistory = Reflect.find(JLINE_FILE_HISTORY);
-      final File file = new File(Prop.HOME, HISTORY_FILE);
+      fileHistoryC = Reflect.find(JLINE_FILE_HISTORY);
+      fileHistory = Reflect.get(Reflect.find(fileHistoryC, File.class),
+          new File(Prop.HOME, HISTORY_FILE));
 
-      Reflect.invoke(Reflect.method(readerC, "setHistoryEnabled", boolean.class),
-          reader, true);
-      Reflect.invoke(Reflect.method(readerC, "setBellEnabled", boolean.class),
-          reader, false);
-      Reflect.invoke(Reflect.method(readerC, "setHistory", history),
-          reader, Reflect.get(Reflect.find(fileHistory, File.class), file));
+      final Class<?> completer = Reflect.find(JLINE_COMPLETER);
+      final Class<?> stringCompleter = Reflect.find(JLINE_STRING_COMPLETER);
+
+      Reflect.invoke(Reflect.method(readerC, "setBellEnabled", boolean.class), reader, false);
+      Reflect.invoke(Reflect.method(readerC, "setHistory", history), reader, fileHistory);
+      Reflect.invoke(Reflect.method(readerC, "setHistoryEnabled", boolean.class), reader, true);
+
+      // command completions
+      final StringList sl = new StringList();
+      for(final Commands.Cmd cmd : Commands.Cmd.values()) {
+        sl.add(cmd.name().toLowerCase(Locale.ENGLISH));
+      }
+      Reflect.invoke(Reflect.method(readerC, "addCompleter", completer), reader,
+          Reflect.get(Reflect.find(stringCompleter, String[].class), (Object) sl.finish()));
     }
 
     @Override
@@ -151,6 +178,11 @@ public abstract class ConsoleReader {
     @Override
     public String readPassword() {
       return (String) Reflect.invoke(readEcho, reader, PW_PROMPT, PASSWORD_ECHO);
+    }
+
+    @Override
+    public void close() {
+      Reflect.invoke(Reflect.method(fileHistoryC, "flush"), fileHistory);
     }
   }
 }
