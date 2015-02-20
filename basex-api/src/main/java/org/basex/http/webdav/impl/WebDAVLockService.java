@@ -162,10 +162,8 @@ public final class WebDAVLockService {
         ao.reset();
       }
       return items;
-    } catch(final QueryException ex) {
-      throw new BaseXException(ex);
     } catch(final Exception ex) {
-      Util.debug(ex);
+      Util.errln(ex.getMessage());
       throw new BaseXException(ex);
     }
   }

@@ -206,6 +206,8 @@ declare %updating function w:create-lock(
   $owner    as xs:string,
   $timeout  as xs:integer
 ) {
+  (: limit timeout to one year (avoid overflow) :)
+  let $timeout := min((xs:integer($timeout), 31700000))
   let $expiry := w:expiry-dateTime($timeout),
       $requested-lock :=
         element w:lockinfo {
