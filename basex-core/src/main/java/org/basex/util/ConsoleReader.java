@@ -4,11 +4,9 @@ import static org.basex.core.Text.*;
 
 import java.io.*;
 import java.lang.reflect.*;
-import java.util.*;
 
 import org.basex.core.parse.*;
 import org.basex.io.*;
-import org.basex.util.list.*;
 
 /**
  * Console reader.
@@ -110,7 +108,10 @@ public abstract class ConsoleReader implements AutoCloseable {
     /** JLine history class name. */
     private static final String JLINE_COMPLETER = "jline.console.completer.Completer";
     /** JLine history class name. */
-    private static final String JLINE_STRING_COMPLETER = "jline.console.completer.StringsCompleter";
+    private static final String JLINE_ENUM_COMPLETER = "jline.console.completer.EnumCompleter";
+    /** JLine history class name. */
+    private static final String JLINE_FILE_NAME_COMPLETER =
+        "jline.console.completer.FileNameCompleter";
     /** Command history file. */
     private static final String HISTORY_FILE = IO.BASEXSUFFIX + "history";
     /** Password echo character. */
@@ -155,19 +156,18 @@ public abstract class ConsoleReader implements AutoCloseable {
           new File(Prop.HOME, HISTORY_FILE));
 
       final Class<?> completer = Reflect.find(JLINE_COMPLETER);
-      final Class<?> stringCompleter = Reflect.find(JLINE_STRING_COMPLETER);
+      final Class<?> enumCompleter = Reflect.find(JLINE_ENUM_COMPLETER);
+      final Class<?> fileNameCompleter = Reflect.find(JLINE_FILE_NAME_COMPLETER);
 
       Reflect.invoke(Reflect.method(readerC, "setBellEnabled", boolean.class), reader, false);
       Reflect.invoke(Reflect.method(readerC, "setHistory", history), reader, fileHistory);
       Reflect.invoke(Reflect.method(readerC, "setHistoryEnabled", boolean.class), reader, true);
 
       // command completions
-      final StringList sl = new StringList();
-      for(final Commands.Cmd cmd : Commands.Cmd.values()) {
-        sl.add(cmd.name().toLowerCase(Locale.ENGLISH));
-      }
       Reflect.invoke(Reflect.method(readerC, "addCompleter", completer), reader,
-          Reflect.get(Reflect.find(stringCompleter, String[].class), (Object) sl.finish()));
+          Reflect.get(Reflect.find(enumCompleter, Class.class), Commands.Cmd.class));
+      Reflect.invoke(Reflect.method(readerC, "addCompleter", completer), reader,
+          Reflect.get(Reflect.find(fileNameCompleter)));
     }
 
     @Override
