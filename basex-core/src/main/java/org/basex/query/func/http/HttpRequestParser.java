@@ -201,13 +201,12 @@ public final class HttpRequestParser {
       throw HC_REQ_X.get(info, "Invalid timeout: " + timeout);
 
     for(final Request r : new Request[] {
-        Request.FOLLOW_REDIRECT, Request.STATUS_ONLY, Request.SEND_AUTHORIZATION
+      Request.FOLLOW_REDIRECT, Request.STATUS_ONLY, Request.SEND_AUTHORIZATION
     }) {
       final String s = req.attribute(r);
       if(s != null && !Strings.eq(s, Text.TRUE, Text.FALSE))
         throw HC_REQ_X.get(info, "Value of '" + r + "' attribute is no boolean: " + s);
     }
-
   }
 
   /**

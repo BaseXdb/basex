@@ -253,12 +253,13 @@ public final class HTTPContext {
       log(code, info);
       res.resetBuffer();
       if(code == SC_UNAUTHORIZED) {
-        final StringBuilder header = new StringBuilder(auth.toString());
+        final TokenBuilder header = new TokenBuilder(auth.toString());
+        final String nonce = Strings.md5(Long.toString(System.nanoTime()));
         if(auth == AuthMethod.DIGEST) {
-          header.append(" " + Request.REALM + "=\"").append(Prop.NAME).append("\",");
-          header.append(Request.QOP).append("=\"").append(AUTH).append(',');
-          header.append(AUTH_INT).append("\",").append(Request.NONCE + "=\"");
-          header.append(Strings.md5(Long.toString(System.nanoTime()))).append('"');
+          header.add(" ");
+          header.addExt(Request.REALM).add("=\"").add(Prop.NAME).add("\",");
+          header.addExt(Request.QOP).add("=\"").add(AUTH).add(',').add(AUTH_INT).add("\",");
+          header.addExt(Request.NONCE).add("=\"").add(nonce).add('"');
         }
         res.setHeader(WWW_AUTHENTICATE, header.toString());
       }
