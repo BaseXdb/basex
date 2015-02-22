@@ -266,20 +266,22 @@ abstract class BXAbstractResource implements CopyableResource, DeletableResource
    * @param timeout lock timeout
    * @param lockInfo lock info
    * @return lock result
-   * @throws IOException I/O exception
    */
-  private LockResult lockResource(final LockTimeout timeout, final LockInfo lockInfo)
-      throws IOException {
-
-    final String tokenId = service.locking.lock(meta.db, meta.path,
-      lockInfo.scope.name().toLowerCase(Locale.ENGLISH),
-      lockInfo.type.name().toLowerCase(Locale.ENGLISH),
-      lockInfo.depth.name().toLowerCase(Locale.ENGLISH),
-      lockInfo.lockedByUser,
-      timeout.getSeconds());
-
-    // TODO failed(failureReason);
-    return success(new LockToken(tokenId, lockInfo, timeout));
+  private LockResult lockResource(final LockTimeout timeout, final LockInfo lockInfo) {
+    try {
+      final String tokenId = service.locking.lock(
+        meta.db,
+        meta.path,
+        lockInfo.scope.name().toLowerCase(Locale.ENGLISH),
+        lockInfo.type.name().toLowerCase(Locale.ENGLISH),
+        lockInfo.depth.name().toLowerCase(Locale.ENGLISH),
+        lockInfo.lockedByUser,
+        timeout.getSeconds()
+      );
+      return success(new LockToken(tokenId, lockInfo, timeout));
+    } catch(final IOException ex) {
+      return failed(FailureReason.ALREADY_LOCKED);
+    }
   }
 
   /**
@@ -302,8 +304,7 @@ abstract class BXAbstractResource implements CopyableResource, DeletableResource
     service.locking.refreshLock(token);
     final String lockInfoStr = service.locking.lock(token);
     final LockToken lockToken = lockInfoStr == null ? null : parseLockInfo(lockInfoStr);
-    // TODO failed(failureReason);
-    return success(lockToken);
+    return lockToken == null ? failed(FailureReason.ALREADY_LOCKED) : success(lockToken);
   }
 
   /**
@@ -320,8 +321,7 @@ abstract class BXAbstractResource implements CopyableResource, DeletableResource
       reader.parse(new InputSource(new StringReader(lockInfo)));
       return handler.lockToken;
     } catch(final SAXException ex) {
-      Util.errln("Error while parsing lock info.");
-      Util.debug(ex);
+      Util.errln("Error while parsing lock info: %", ex);
       return null;
     }
   }
