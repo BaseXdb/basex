@@ -49,7 +49,7 @@ final class RestXqResponse {
     query.context.register(query);
 
     String redirect = null, forward = null;
-    RestXqRespBuilder resp = null;
+    RestXqRespBuilder response = null;
     try {
       // evaluate query
       final Iter iter = query.iter();
@@ -73,8 +73,8 @@ final class RestXqResponse {
           return;
         }
         if(REST_RESPONSE.eq(node)) {
-          resp = new RestXqRespBuilder();
-          resp.build(node, function, iter, http);
+          response = new RestXqRespBuilder();
+          response.build(node, function, iter, http);
           return;
         }
       }
@@ -99,9 +99,10 @@ final class RestXqResponse {
         http.res.sendRedirect(redirect);
       } else if(forward != null) {
         http.req.getRequestDispatcher(forward).forward(http.req, http.res);
-      } else if(resp != null) {
-        if(resp.status != 0) http.status(resp.status, resp.message, resp.error);
-        http.res.getOutputStream().write(resp.cache.toArray());
+      } else if(response != null) {
+        if(response.status != 0) http.status(response.status, response.message, response.error);
+        final byte[] out = response.cache.finish();
+        if(out.length != 0) http.res.getOutputStream().write(out);
       }
     }
   }
