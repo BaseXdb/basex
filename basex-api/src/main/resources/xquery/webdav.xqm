@@ -59,7 +59,7 @@ declare function w:has-locked(
         count($ancestor-segments) + $depth eq count($descendant-segments)
         and
         w:is-prefix($ancestor-segments, $descendant-segments)
-    case 'infinite'
+    case 'infinity'
       return
         w:is-prefix($ancestor-segments, $descendant-segments)
    default
@@ -115,7 +115,7 @@ declare function w:locks-on(
   $path as xs:string
 ) as element(w:lockinfo)* {
   w:open-lock-db()/w:locks/w:lockinfo[
-    w:has-locked(w:path, $path, 'infinite')
+    w:has-locked(w:path, $path, 'infinity')
     and
     xs:dateTime(w:expiry) gt current-dateTime()
   ]
@@ -135,8 +135,6 @@ declare function w:in-conflict(
    w:has-locked($lock2/w:path, $lock1/w:path, $lock2/w:depth))
   and
   (w:is-exclusive($lock1) or w:is-exclusive($lock2))
-  and
-  $lock1/w:owner ne $lock2/w:owner
 };
 
 (:~
