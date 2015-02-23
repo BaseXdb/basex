@@ -121,12 +121,12 @@ public final class HttpClient {
                 + REALM + "=\"" + realm + "\","
                 + NONCE + "=\"" + nonce + "\","
                 + URI + "=\"" + uri + "\","
-                + QOP + "=\"" + qop + "\","
+                + QOP + '=' + qop + ','
                 + NC + '=' + nc + ','
                 + CNONCE + "=\"" + cnonce + "\","
                 + RESPONSE + "=\"" + rsp + "\","
                 + ALGORITHM + "=\"" + MD5 + "\","
-                + OPAQUE + "\"," + map.get(OPAQUE) + "\"";
+                + OPAQUE + "=\"" + map.get(OPAQUE) + "\"";
 
         conn.disconnect();
         conn = connection(url, request);
