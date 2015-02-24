@@ -193,14 +193,14 @@ public abstract class Serializer implements Closeable {
           final byte[] n = nd.name();
           final byte[] v = nd.string();
           attribute(n, v, false);
-          if(eq(n, XML_SPACE) && indent) indent = eq(v, DEFAULT);
+          if(eq(n, XML_SPACE) && indent) indent = !eq(v, PRESERVE);
         }
 
         // serialize children
         ai = node.children();
         for(ANode n; (n = ai.next()) != null;) node(n);
-        indent = i;
         closeElement();
+        indent = i;
       }
     }
   }
@@ -450,7 +450,7 @@ public abstract class Serializer implements Closeable {
             final byte[] n = data.name(p, Data.ATTR);
             final byte[] v = data.text(p, false);
             attribute(n, v, false);
-            if(eq(n, XML_SPACE) && indent) indent = eq(v, DEFAULT);
+            if(eq(n, XML_SPACE) && indent) indent = !eq(v, PRESERVE);
           }
           pars.push(r);
         }
