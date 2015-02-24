@@ -92,4 +92,22 @@ public final class SerializerTest extends AdvancedQueryTest {
     query(option + "'&#xa;'; <a/>,<b/>", "<a/>\n<b/>");
     query(option + "'&#xa;'; declare option output:method 'text'; 1,2", "1\n2");
   }
+
+  /** Test: xml:space='preserve'. */
+  @Test
+  public void preserve() {
+    query("<a xml:space='preserve'>T<b/></a>", "<a xml:space=\"preserve\">T<b/></a>");
+    query("<a xml:space='default'>T<b/></a>", "<a xml:space=\"default\">T<b/>\n</a>");
+    query("<a xml:space='x'>T<b/></a>", "<a xml:space=\"x\">T<b/>\n</a>");
+
+    String option = "declare option output:indent 'yes'; ";
+    query(option + "<a xml:space='preserve'>T<b/></a>", "<a xml:space=\"preserve\">T<b/></a>");
+    query(option + "<a xml:space='default'>T<b/></a>", "<a xml:space=\"default\">T<b/>\n</a>");
+    query(option + "<a xml:space='x'>T<b/></a>", "<a xml:space=\"x\">T<b/>\n</a>");
+
+    option = "declare option output:indent 'no'; ";
+    query(option + "<a xml:space='preserve'>T<b/></a>", "<a xml:space=\"preserve\">T<b/></a>");
+    query(option + "<a xml:space='default'>T<b/></a>", "<a xml:space=\"default\">T<b/></a>");
+    query(option + "<a xml:space='x'>T<b/></a>", "<a xml:space=\"x\">T<b/></a>");
+  }
 }
