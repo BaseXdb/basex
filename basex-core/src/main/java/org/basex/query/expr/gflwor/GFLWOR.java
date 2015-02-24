@@ -117,14 +117,14 @@ public final class GFLWOR extends ParseExpr {
       // rewrite singleton for clauses to let
       changed = forToLet(qc);
 
-      // remove unused variables
-      changed |= removeVars(qc);
-
       // slide let clauses out to avoid repeated evaluation
       changed |= slideLetsOut(qc);
 
       // inline let expressions if they are used only once (and not in a loop)
       changed |= inlineLets(qc, scp);
+
+      // remove unused variables
+      changed |= removeVars(qc);
 
       // clean unused variables from group-by and order-by expression
       changed |= cleanDeadVars();
@@ -276,23 +276,25 @@ public final class GFLWOR extends ParseExpr {
    */
   private boolean removeVars(final QueryContext qc) throws QueryException {
     boolean changed = false;
-    for(int c = 0; c < clauses.size(); c++) {
-      final Clause clause = clauses.get(c);
+    final ListIterator<Clause> iter = clauses.listIterator();
+    while(iter.hasNext()) {
+      final int pos = iter.nextIndex();
+      final Clause clause = iter.next();
       if(clause instanceof Let) {
         final Let lt = (Let) clause;
-        if(removingVar(lt.var, c + 1, qc) && !lt.has(Flag.NDT) && !lt.has(Flag.UPD)) {
+        if(removingVar(lt.var, pos + 1, qc) && !lt.has(Flag.NDT) && !lt.has(Flag.UPD)) {
           // check type before removing variable (see {@link FuncType#funcConv})
           lt.var.checkType(lt.expr, lt.info);
-          clauses.remove(c);
+          iter.remove();
           changed = true;
         }
       } else if(clause instanceof For) {
         final For f = (For) clause;
-        if(removingVar(f.score, c, qc)) {
+        if(removingVar(f.score, pos, qc)) {
           f.score = null;
           changed = true;
         }
-        if(removingVar(f.pos, c, qc)) {
+        if(removingVar(f.pos, pos, qc)) {
           f.pos = null;
           changed = true;
         }
