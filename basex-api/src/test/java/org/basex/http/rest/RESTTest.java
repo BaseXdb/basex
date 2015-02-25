@@ -6,6 +6,7 @@ import java.io.*;
 import java.net.*;
 
 import org.basex.http.*;
+import org.basex.io.*;
 import org.junit.*;
 
 /**
@@ -57,8 +58,8 @@ public abstract class RESTTest extends HTTPTest {
    * @throws IOException I/O exception
    */
   protected static String contentType(final String query) throws IOException {
-    final URL url = new URL(REST_ROOT + query);
-    final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+    final IOUrl url = new IOUrl(REST_ROOT + query);
+    final HttpURLConnection conn = (HttpURLConnection) url.connection();
     try {
       read(conn.getInputStream());
       return conn.getContentType();

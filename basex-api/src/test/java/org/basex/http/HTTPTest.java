@@ -11,7 +11,7 @@ import java.util.*;
 
 import org.basex.*;
 import org.basex.core.*;
-import org.basex.core.StaticOptions.*;
+import org.basex.core.StaticOptions.AuthMethod;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.func.http.*;
@@ -143,8 +143,8 @@ public abstract class HTTPTest extends SandboxTest {
    * @throws IOException I/O exception
    */
   protected static String request(final String query, final String method) throws IOException {
-    final URL url = new URL(root + query);
-    final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+    final IOUrl url = new IOUrl(root + query);
+    final HttpURLConnection conn = (HttpURLConnection) url.connection();
     try {
       conn.setRequestMethod(method);
       return read(new BufferInput(conn.getInputStream()));
@@ -167,8 +167,8 @@ public abstract class HTTPTest extends SandboxTest {
       throws IOException {
 
     // create connection
-    final URL url = new URL(root + query);
-    final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+    final IOUrl url = new IOUrl(root + query);
+    final HttpURLConnection conn = (HttpURLConnection) url.connection();
     conn.setDoOutput(true);
     conn.setRequestMethod(POST.name());
     conn.setRequestProperty(HttpText.CONTENT_TYPE, type);
@@ -232,8 +232,8 @@ public abstract class HTTPTest extends SandboxTest {
   protected static void put(final String u, final InputStream is, final String ctype)
       throws IOException {
 
-    final URL url = new URL(root + u);
-    final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+    final IOUrl url = new IOUrl(root + u);
+    final HttpURLConnection conn = (HttpURLConnection) url.connection();
     conn.setDoOutput(true);
     conn.setRequestMethod(PUT.name());
     if(ctype != null) conn.setRequestProperty(HttpText.CONTENT_TYPE, ctype);
