@@ -4,7 +4,10 @@ import static org.basex.core.Text.*;
 
 import java.io.*;
 import java.net.*;
+import java.security.*;
+import java.security.cert.*;
 
+import javax.net.ssl.*;
 import javax.xml.transform.stream.*;
 
 import org.basex.core.*;
@@ -161,5 +164,32 @@ public final class IOUrl extends IO {
       a = b;
     }
     return sb.toString();
+  }
+
+  /**
+   * Ignore certificates.
+   */
+  public static void ignoreCert() {
+    // http://www.rgagnon.com/javadetails/java-fix-certificate-problem-in-HTTPS.html
+    HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
+      @Override
+      public boolean verify(final String hostname, final SSLSession session) { return true; }
+    });
+
+    final TrustManager[] tm = { new X509TrustManager() {
+      @Override
+      public X509Certificate[] getAcceptedIssuers() { return null; }
+      @Override
+      public void checkClientTrusted(final X509Certificate[] certs, final String authType) { }
+      @Override
+      public void checkServerTrusted(final X509Certificate[] certs, final String authType) { }
+    }};
+    try {
+      final SSLContext sc = SSLContext.getInstance("SSL");
+      sc.init(null, tm, new SecureRandom());
+      HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+    } catch(final Exception ex) {
+      Util.errln(ex);
+    }
   }
 }

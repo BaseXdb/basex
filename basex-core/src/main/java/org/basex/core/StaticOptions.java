@@ -60,6 +60,8 @@ public final class StaticOptions extends Options {
   public static final NumberOption PROXYPORT = new NumberOption("PROXYPORT", 0);
   /** Server: non-proxy host. */
   public static final StringOption NONPROXYHOSTS = new StringOption("NONPROXYHOSTS", "");
+  /** Ignore missing certificates. */
+  public static final BooleanOption IGNORECERT = new BooleanOption("IGNORECERT", false);
 
   /** Timeout (seconds) for processing client requests; deactivated if set to 0. */
   public static final NumberOption TIMEOUT = new NumberOption("TIMEOUT", 30);
@@ -126,6 +128,7 @@ public final class StaticOptions extends Options {
     if(!nph.isEmpty()) {
       setSystem("http.nonProxyHosts", nph);
     }
+    if(get(IGNORECERT)) IOUrl.ignoreCert();
   }
 
   /**
