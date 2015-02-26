@@ -1,5 +1,5 @@
-BaseX
-=====
+BaseX ![Build Status](http://tc.dev.basex.org/httpAuth/app/rest/builds/buildType:%28id:Basex_Build%29/statusIcon?guest=1)
+=========================================================================================================================
 
 Welcome to the source code of BaseX.
 
