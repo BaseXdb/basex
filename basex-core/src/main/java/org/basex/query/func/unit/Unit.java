@@ -120,9 +120,9 @@ final class Unit {
         final int vs = args.length;
 
         // expected error code
-        byte[] code = null;
+        QNm code = null;
         if(vs == 2 && eq(EXPECTED, args[0].string(null))) {
-          code = args[1].string(null);
+          code = QNm.resolve(args[1].string(null), sf.name.uri(), sf.sc, sf.info);
         } else if(vs != 0) {
           throw BASX_ANNNUM_X_X_X.get(ann.info, ann, vs, vs == 1 ? "" : "s");
         }
@@ -151,7 +151,7 @@ final class Unit {
 
             if(code != null) {
               failures++;
-              testcase.add(new FElem(FAILURE).add(new FElem(EXPECTED).add(code)));
+              testcase.add(new FElem(FAILURE).add(new FElem(EXPECTED).add(code.prefixId())));
             }
           } catch(final QueryException ex) {
             addError(ex, testcase, code);
@@ -205,16 +205,15 @@ final class Unit {
     return null;
   }
 
-
   /**
    * Adds an error element to the specified test case.
    * @param ex exception
    * @param testcase testcase element
    * @param code error code (may be {@code null})
    */
-  private void addError(final QueryException ex, final FElem testcase, final byte[] code) {
+  private void addError(final QueryException ex, final FElem testcase, final QNm code) {
     final QNm name = ex.qname();
-    if(code == null || !eq(code, name.local())) {
+    if(code == null || !code.eq(name)) {
       final FElem error;
       final boolean fail = UNIT_ASSERT.eq(name);
       if(fail) {
