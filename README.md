@@ -63,7 +63,7 @@ The code base of BaseX can be accessed via [GitHub](https://www.github.com).
 Feedback
 --------
 
-Any kind of feedback is welcome; please check out the [documentation](https://docs.basex.org).
+Any kind of feedback is welcome. Please check out the [documentation](https://docs.basex.org).
 
 Tell us if you run into any troubles installing BaseX:
 
