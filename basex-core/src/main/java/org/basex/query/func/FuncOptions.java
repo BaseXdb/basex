@@ -37,11 +37,11 @@ public final class FuncOptions {
 
   /**
    * Constructor.
-   * @param root name of root node
+   * @param root name of root node (can be {@code null})
    * @param info input info
    */
   public FuncOptions(final QNm root, final InputInfo info) {
-    test = new NodeTest(root);
+    test = root == null ? null : new NodeTest(root);
     this.root = root;
     this.info = info;
   }
@@ -69,8 +69,12 @@ public final class FuncOptions {
     final TokenBuilder tb = new TokenBuilder();
     if(item != null) {
       try {
-        if(!(item instanceof Map || test.eq(item)))
+        final boolean map = item instanceof Map;
+        if(test == null) {
+          if(map) throw MAP_X_X.get(info, item.type, item);
+        } else if(!test.eq(item) && !(item instanceof Map)) {
           throw ELMMAP_X_X_X.get(info, root.prefixId(XML), item.type, item);
+        }
         options.parse(tb.add(optString(item)).toString());
       } catch(final BaseXException ex) {
         throw error.get(info, ex);

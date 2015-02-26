@@ -558,6 +558,8 @@ public enum QueryError {
   /** FORG0006. */
   STRNOD_X_X(FORG, 6, "String or node expected, % found: %."),
   /** FORG0006. */
+  MAP_X_X(FORG, 6, "Map expected, % found: %."),
+  /** FORG0006. */
   ELMMAP_X_X_X(FORG, 6, "element(%) or map expected, % found: %."),
   /** FORG0006. */
   ELMSTR_X_X_X(FORG, 6, "element(%) or string expected, % found: %."),
