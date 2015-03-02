@@ -44,6 +44,7 @@ public final class DbReplace extends DbNew {
       final NewInput input = checkInput(item, token(path));
       if(docs.isEmpty() || docs.get(0) == 0) {
         // no replacement of first document (because of TableDiskAccess#insert, used > 0, pre = 0)
+        // open issue: UPMULTDOC_X_X not raised when adding documents
         updates.add(new DBAdd(data, input, opts, qc, info), qc);
       } else {
         updates.add(new ReplaceDoc(docs.get(0), data, input, opts, qc, info), qc);
