@@ -8,7 +8,6 @@ import org.basex.core.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.path.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
@@ -66,59 +65,48 @@ public final class FuncOptions {
   private void parse(final Item item, final Options options, final QueryError error)
       throws QueryException {
 
+    if(item == null) return;
+
     final TokenBuilder tb = new TokenBuilder();
-    if(item != null) {
-      try {
-        final boolean map = item instanceof Map;
+    try {
+      if(item instanceof Map) {
+        options.parse((Map) item);
+      } else {
         if(test == null) {
-          if(map) throw MAP_X_X.get(info, item.type, item);
-        } else if(!test.eq(item) && !(item instanceof Map)) {
+          throw MAP_X_X.get(info, item.type, item);
+        } else if(!test.eq(item)) {
           throw ELMMAP_X_X_X.get(info, root.prefixId(XML), item.type, item);
         }
-        options.parse(tb.add(optString(item)).toString());
-      } catch(final BaseXException ex) {
-        throw error.get(info, ex);
+        options.parse(tb.add(optString((ANode) item)).toString());
       }
+    } catch(final BaseXException ex) {
+      throw error.get(info, ex);
     }
   }
 
   /**
-   * Builds a string representation of the specified value. The specified value may be
-   * another map or an atomic value that can be converted to a string.
-   * @param item item
+   * Builds a string representation of the specified node.
+   * @param node node
    * @return string
    * @throws QueryException query exception
    */
-  private String optString(final Item item) throws QueryException {
+  private String optString(final ANode node) throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
-    if(item instanceof Map) {
-      final Map map = (Map) item;
-      for(final Item it : map.keys()) {
-        if(!(it instanceof AStr)) throw EXPTYPE_X_X_X.get(info, AtomType.STR, it.type, it);
-        tb.add(it.string(info)).add('=');
-        final Value val = map.get(it, info);
-        if(!(val instanceof Item)) throw EXPTYPE_X_X_X.get(info, AtomType.ITEM, val.seqType(), val);
-        tb.add(optString((Item) val).replace(",", ",,")).add(',');
+    // interpret options
+    for(final ANode child : node.children()) {
+      if(child.type != NodeType.ELM) continue;
+      // ignore elements in other namespace
+      final QNm qn = child.qname();
+      if(!eq(qn.uri(), root.uri())) continue;
+      // retrieve key from element name and value from "value" attribute or text node
+      byte[] v;
+      if(hasElements(child)) {
+        v = token(optString(child));
+      } else {
+        v = child.attribute(VALUE);
+        if(v == null) v = child.string();
       }
-    } else if(item.type == NodeType.ELM) {
-      // interpret options
-      for(final ANode node : ((ANode) item).children()) {
-        if(node.type != NodeType.ELM) continue;
-        // ignore elements in other namespace
-        final QNm qn = node.qname();
-        if(!eq(qn.uri(), root.uri())) continue;
-        // retrieve key from element name and value from "value" attribute or text node
-        byte[] v;
-        if(hasElements(node)) {
-          v = token(optString(node));
-        } else {
-          v = node.attribute(VALUE);
-          if(v == null) v = node.string();
-        }
-        tb.add(string(qn.local())).add('=').add(optString(Str.get(v)).replace(",", ",,")).add(',');
-      }
-    } else {
-      tb.add(item.string(info));
+      tb.add(string(qn.local())).add('=').add(string(v).replace(",", ",,")).add(',');
     }
     return tb.toString();
   }

@@ -47,7 +47,7 @@ public final class FtModuleTest extends AdvancedQueryTest {
     query(_FT_CONTAINS.args("('A','B')", "('C','B')"), true);
 
     // check match options
-    query(_FT_CONTAINS.args("Assignments", "Azzignments", " map { 'fuzzy':'' }"), true);
+    query(_FT_CONTAINS.args("Assignments", "Azzignments", " map { 'fuzzy':'yes' }"), true);
     query(_FT_CONTAINS.args("Assignments", "Azzignments", " map { 'fuzzy':'no' }"), false);
     query(_FT_CONTAINS.args("Assignments", "assignment", " map { 'stemming':true() }"), true);
     query(_FT_CONTAINS.args("Assignment", "assignments", " map { 'stemming':true() }"), true);
@@ -97,7 +97,7 @@ public final class FtModuleTest extends AdvancedQueryTest {
 
     // check match options
     query(_FT_SEARCH.args(NAME, "Assignments", " map { }"), "Assignments");
-    query(_FT_SEARCH.args(NAME, "Azzignments", " map { 'fuzzy':'' }"), "Assignments");
+    query(_FT_SEARCH.args(NAME, "Azzignments", " map { 'fuzzy':'yes' }"), "Assignments");
     query(_FT_SEARCH.args(NAME, "Azzignments", " map { 'fuzzy':'no' }"), "");
     // check search modes
     query(_FT_SEARCH.args(NAME, "1 Exercise", " map { 'mode':'phrase' }"), "");

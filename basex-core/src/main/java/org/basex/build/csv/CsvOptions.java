@@ -3,6 +3,8 @@ package org.basex.build.csv;
 import java.util.*;
 
 import org.basex.core.*;
+import org.basex.query.*;
+import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
 
@@ -52,10 +54,10 @@ public class CsvOptions extends Options {
 
     /**
      * Constructor.
-     * @param sp separator character
+     * @param sep separator character
      */
-    CsvSep(final char sp) {
-      sep = sp;
+    CsvSep(final char sep) {
+      this.sep = sep;
     }
 
     @Override
@@ -67,9 +69,22 @@ public class CsvOptions extends Options {
   @Override
   public synchronized void assign(final String name, final String value) throws BaseXException {
     super.assign(name, value);
-    // check if separator contains only one character
-    if(options.get(name) == SEPARATOR && separator() == -1)
-      throw new BaseXException("Separator must be single character; '%' found", value);
+    check();
+  }
+
+  @Override
+  public synchronized void assign(final Item name, final Item value)
+      throws BaseXException, QueryException {
+    super.assign(name, value);
+    check();
+  }
+
+  /**
+   * Checks the separator character.
+   * @throws BaseXException database exception
+   */
+  private void check() throws BaseXException {
+    if(separator() == -1) throw new BaseXException("Invalid separator: '%'", get(SEPARATOR));
   }
 
   /**

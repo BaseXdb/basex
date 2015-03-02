@@ -12,6 +12,11 @@ import java.util.Map.Entry;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
+import org.basex.query.*;
+import org.basex.query.value.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.map.Map;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -197,6 +202,15 @@ public class Options implements Iterable<Option<?>> {
   }
 
   /**
+   * Returns the requested map.
+   * @param option option to be found
+   * @return value
+   */
+  public final synchronized org.basex.query.value.map.Map get(final MapOption option) {
+    return (org.basex.query.value.map.Map) get((Option<?>) option);
+  }
+
+  /**
    * Returns the requested boolean.
    * @param option option to be found
    * @return value
@@ -273,6 +287,16 @@ public class Options implements Iterable<Option<?>> {
   }
 
   /**
+   * Sets the map value of an option.
+   * @param option option to be set
+   * @param value value to be written
+   */
+  public final synchronized void set(final MapOption option,
+      final org.basex.query.value.map.Map value) {
+    put(option, value);
+  }
+
+  /**
    * Sets the string array value of an option.
    * @param option option to be set
    * @param value value to be written
@@ -339,6 +363,25 @@ public class Options implements Iterable<Option<?>> {
   }
 
   /**
+   * Assigns a value after casting it to the correct type. If the option is unknown,
+   * it will be added as free option.
+   * @param name name of option
+   * @param val value
+   * @throws BaseXException database exception
+   * @throws QueryException query exception
+   */
+  public synchronized void assign(final Item name, final Item val)
+      throws BaseXException, QueryException {
+
+    final String key = string(name.string(null));
+    if(options.isEmpty()) {
+      free.put(key, string(val.string(null)));
+    } else {
+      assign(key, val, true);
+    }
+  }
+
+  /**
    * Returns all name/value pairs without pre-defined option.
    * @return options
    */
@@ -387,6 +430,48 @@ public class Options implements Iterable<Option<?>> {
       } catch(final BaseXException ex) {
         Util.errln(ex);
       }
+    }
+  }
+
+  /**
+   * Parses an option string and sets the options accordingly.
+   * @param string options string
+   * @throws BaseXException database exception
+   */
+  public synchronized void parse(final String string) throws BaseXException {
+    final int sl = string.length();
+    int i = 0;
+    while(i < sl) {
+      int k = string.indexOf('=', i);
+      if(k == -1) k = sl;
+      final String key = string.substring(i, k).trim();
+      final StringBuilder val = new StringBuilder();
+      i = k;
+      while(++i < sl) {
+        final char ch = string.charAt(i);
+        if(ch == ',' && (++i == sl || string.charAt(i) != ',')) break;
+        val.append(ch);
+      }
+      assign(key, val.toString());
+    }
+  }
+
+  /**
+   * Parses options in the specified map.
+   * @param map map
+   * @throws BaseXException database exception
+   * @throws QueryException query exception
+   */
+  public synchronized void parse(final Map map) throws BaseXException, QueryException {
+    for(final Item name : map.keys()) {
+      if(!name.type.isStringOrUntyped())
+        throw new BaseXException(Text.OPT_EXPECT, AtomType.STR, name.type, name);
+
+      final Value value = map.get(name, null);
+      if(!(value instanceof Item))
+        throw new BaseXException(Text.OPT_EXPECT, AtomType.ITEM, value.seqType(), value);
+
+      assign(name, (Item) value);
     }
   }
 
@@ -495,28 +580,7 @@ public class Options implements Iterable<Option<?>> {
     return opts.toArray(new Option[opts.size()]);
   }
 
-  /**
-   * Parses an option string and sets the options accordingly.
-   * @param string options string
-   * @throws BaseXException database exception
-   */
-  public synchronized void parse(final String string) throws BaseXException {
-    final int sl = string.length();
-    int i = 0;
-    while(i < sl) {
-      int k = string.indexOf('=', i);
-      if(k == -1) k = sl;
-      final String key = string.substring(i, k).trim();
-      final StringBuilder val = new StringBuilder();
-      i = k;
-      while(++i < sl) {
-        final char ch = string.charAt(i);
-        if(ch == ',' && (++i == sl || string.charAt(i) != ',')) break;
-        val.append(ch);
-      }
-      assign(key, val.toString());
-    }
-  }
+  // PRIVATE METHODS ====================================================================
 
   /**
    * Reads the configuration file and initializes the options.
@@ -602,13 +666,78 @@ public class Options implements Iterable<Option<?>> {
   /**
    * Assigns the specified name and value.
    * @param name name of option
+   * @param item value of option
+   * @param error raise error if option is unknown
+   * @return success flag
+   * @throws BaseXException database exception
+   * @throws QueryException query exception
+   */
+  private synchronized boolean assign(final String name, final Item item,
+      final boolean error) throws BaseXException, QueryException {
+
+    final Option<?> option = options.get(name);
+    if(option == null) {
+      if(error) throw new BaseXException(error(name));
+      return false;
+    }
+
+    if(option instanceof BooleanOption) {
+      final boolean v;
+      if(item.type.isStringOrUntyped()) {
+        v = Strings.yes(string(item.string(null)));
+      } else if(item instanceof Bln) {
+        v = ((Bln) item).bool(null);
+      } else {
+        throw new BaseXException(Text.OPT_BOOLEAN, option.name());
+      }
+      put(option, v);
+    } else if(option instanceof NumberOption) {
+      if(item instanceof ANum) {
+        put(option, (int) ((ANum) item).itr(null));
+      } else {
+        throw new BaseXException(Text.OPT_NUMBER, option.name());
+      }
+    } else if(option instanceof StringOption) {
+      if(item.type.isStringOrUntyped()) {
+        put(option, string(item.string(null)));
+      } else {
+        throw new BaseXException(Text.OPT_STRING, option.name());
+      }
+    } else if(option instanceof EnumOption) {
+      if(item.type.isStringOrUntyped()) {
+        final EnumOption<?> eo = (EnumOption<?>) option;
+        final Object v = eo.get(string(item.string(null)));
+        if(v == null) throw new BaseXException(allowed(option, (Object[]) eo.values()));
+        put(option, v);
+      } else {
+        throw new BaseXException(Text.OPT_STRING, option.name());
+      }
+    } else if(option instanceof OptionsOption) {
+      final Options o = ((OptionsOption<?>) option).newInstance();
+      if(item instanceof Map) {
+        o.parse((Map) item);
+      } else {
+        throw new BaseXException(Text.OPT_MAP, option.name());
+      }
+      put(option, o);
+    } else if(option instanceof MapOption) {
+      put(option, item);
+    } else {
+      throw Util.notExpected("Unsupported option: " + option);
+    }
+    return true;
+  }
+
+  /**
+   * Assigns the specified name and value.
+   * @param name name of option
    * @param val value of option
-   * @param num number (optional)
+   * @param index index (optional, can be {@code -1})
    * @param error raise error if option is unknown
    * @return success flag
    * @throws BaseXException database exception
    */
-  private synchronized boolean assign(final String name, final String val, final int num,
+  private synchronized boolean assign(final String name, final String val, final int index,
       final boolean error) throws BaseXException {
 
     final Option<?> option = options.get(name);
@@ -647,30 +776,34 @@ public class Options implements Iterable<Option<?>> {
       final int v = Strings.toInt(val);
       if(v == MIN_VALUE) throw new BaseXException(Text.OPT_NUMBER, option.name());
       int[] ii = (int[]) get(option);
-      if(num == -1) {
+      if(index == -1) {
         if(ii == null) ii = new int[0];
         final IntList il = new IntList(ii.length + 1);
         for(final int i : ii) il.add(i);
         put(option, il.add(v).finish());
       } else {
-        if(num < 0 || num >= ii.length) throw new BaseXException(Text.OPT_OFFSET, option.name());
-        ii[num] = v;
+        if(index < 0 || index >= ii.length)
+          throw new BaseXException(Text.OPT_OFFSET, option.name());
+        ii[index] = v;
       }
     } else if(option instanceof StringsOption) {
       String[] ss = (String[]) get(option);
-      if(num == -1) {
+      if(index == -1) {
         if(ss == null) ss = new String[0];
         final StringList sl = new StringList(ss.length + 1);
         for(final String s : ss) sl.add(s);
         put(option, sl.add(val).finish());
-      } else if(num == 0) {
+      } else if(index == 0) {
         final int v = Strings.toInt(val);
         if(v == MIN_VALUE) throw new BaseXException(Text.OPT_NUMBER, option.name());
         values.put(name, new String[v]);
       } else {
-        if(num <= 0 || num > ss.length) throw new BaseXException(Text.OPT_OFFSET, option.name());
-        ss[num - 1] = val;
+        if(index <= 0 || index > ss.length)
+          throw new BaseXException(Text.OPT_OFFSET, option.name());
+        ss[index - 1] = val;
       }
+    } else {
+      throw Util.notExpected("Unsupported option: " + option);
     }
     return true;
   }
