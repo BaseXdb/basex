@@ -195,7 +195,13 @@ public interface Text {
   /** Options error. */
   String OPT_NUMBER = "Value of '%' must be a number.";
   /** Options error. */
+  String OPT_STRING = "Value of '%' must be a string.";
+  /** Options error. */
+  String OPT_MAP = "Value of '%' must be a map.";
+  /** Options error. */
   String OPT_ONEOF = "Value of '%' must be one of (%).";
+  /** Options error. */
+  String OPT_EXPECT = "% expected, % found: %.";
 
   /** "log". */
   String PLOTLOG = "log";
