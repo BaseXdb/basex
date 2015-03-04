@@ -24,11 +24,11 @@ public final class HofTopKWith extends HofFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Comparator<Item> cmp = getComp(1, qc);
-    final long k = toLong(exprs[2], qc);
-    if(k < 1 || k > Integer.MAX_VALUE / 2) return Empty.SEQ;
+    final long k = Math.min(toLong(exprs[2], qc), Integer.MAX_VALUE);
+    if(k < 1) return Empty.SEQ;
 
     final Iter iter = exprs[0].iter(qc);
-    final MinHeap<Item, Item> heap = new MinHeap<>((int) k, cmp);
+    final MinHeap<Item, Item> heap = new MinHeap<>(cmp);
 
     try {
       for(Item it; (it = iter.next()) != null;) {
