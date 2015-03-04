@@ -26,11 +26,11 @@ public final class HofTopKBy extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final FItem getKey = checkArity(exprs[1], 1, qc);
-    final long k = toLong(exprs[2], qc);
-    if(k < 1 || k > Integer.MAX_VALUE / 2) return Empty.SEQ;
+    final long k = Math.min(toLong(exprs[2], qc), Integer.MAX_VALUE);
+    if(k < 1) return Empty.SEQ;
 
     final Iter iter = exprs[0].iter(qc);
-    final MinHeap<Item, Item> heap = new MinHeap<>((int) k, new Comparator<Item>() {
+    final MinHeap<Item, Item> heap = new MinHeap<>(new Comparator<Item>() {
       @Override
       public int compare(final Item it1, final Item it2) {
         try {
