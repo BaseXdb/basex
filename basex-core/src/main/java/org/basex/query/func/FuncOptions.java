@@ -36,6 +36,13 @@ public final class FuncOptions {
 
   /**
    * Constructor.
+   */
+  public FuncOptions() {
+    this(null, null);
+  }
+
+  /**
+   * Constructor.
    * @param root name of root node (can be {@code null})
    * @param info input info
    */
@@ -49,10 +56,13 @@ public final class FuncOptions {
    * Extracts options from the specified item.
    * @param it item to be converted
    * @param options options
+   * @param <T> option type
+   * @return specified options
    * @throws QueryException query exception
    */
-  public void parse(final Item it, final Options options) throws QueryException {
+  public <T extends Options> T parse(final Item it, final T options) throws QueryException {
     parse(it, options, INVALIDOPT_X);
+    return options;
   }
 
   /**
