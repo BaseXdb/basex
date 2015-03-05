@@ -26,7 +26,7 @@ import org.basex.util.list.*;
 abstract class RESTCmd extends Command {
   /** REST session. */
   final RESTSession session;
-  /** Command. */
+  /** Commands. */
   final ArrayList<Command> cmds;
 
   /** Return code (may be {@code null}). */
@@ -46,7 +46,7 @@ abstract class RESTCmd extends Command {
   public void databases(final LockResult lr) {
     for(final Command c : cmds) c.databases(lr);
 
-    // lock globally if context-dependent is found (context will be changed by commands)
+    // lock globally if context-dependency is found (context will be changed by commands)
     final boolean wc = lr.write.contains(DBLocking.CTX) || lr.write.contains(DBLocking.COLL);
     final boolean rc = lr.read.contains(DBLocking.CTX) || lr.read.contains(DBLocking.COLL);
     if(wc || rc && !lr.write.isEmpty()) {
@@ -148,8 +148,8 @@ abstract class RESTCmd extends Command {
 
   /**
    * Parses and sets database options.
-   * @param session REST session
    * Throws an exception if an option is unknown.
+   * @param session REST session
    * @throws IOException I/O exception
    */
   static void parseOptions(final RESTSession session) throws IOException {
