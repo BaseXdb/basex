@@ -3,6 +3,7 @@ package org.basex.core;
 import java.util.*;
 
 import org.basex.data.*;
+import org.basex.util.*;
 
 /**
  * This class organizes all currently opened databases.
@@ -21,10 +22,10 @@ public final class Datas {
    * @return data reference
    */
   public synchronized Data pin(final String db) {
-    for(final Data d : list) {
-      if(d.meta.name.equals(db)) {
-        pin(d);
-        return d;
+    for(final Data data : list) {
+      if(eq(data, db)) {
+        pin(data);
+        return data;
       }
     }
     return null;
@@ -69,7 +70,9 @@ public final class Datas {
    * @return result of check
    */
   synchronized boolean pinned(final String db) {
-    for(final Data d : list) if(d.meta.name.equals(db)) return true;
+    for(final Data data : list) {
+      if(eq(data, db)) return true;
+    }
     return false;
   }
 
@@ -77,7 +80,7 @@ public final class Datas {
    * Closes all data references.
    */
   synchronized void close() {
-    for(final Data d : list) d.close();
+    for(final Data data : list) data.close();
     list.clear();
   }
 
@@ -88,9 +91,19 @@ public final class Datas {
    * @return number of references
    */
   public synchronized int pins(final String db) {
-    for(final Data d : list) {
-      if(d.meta.name.equals(db)) return d.pins;
+    for(final Data data : list) {
+      if(eq(data, db)) return data.pins;
     }
     return 0;
+  }
+
+  /**
+   * Compares the name of a database.
+   * @param data database
+   * @param name name of database
+   * @return result of check
+   */
+  private boolean eq(final Data data, final String name) {
+    return Prop.CASE ? data.meta.name.equals(name) : data.meta.name.equalsIgnoreCase(name);
   }
 }
