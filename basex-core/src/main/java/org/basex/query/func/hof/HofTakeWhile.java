@@ -10,7 +10,7 @@ import org.basex.query.value.seq.*;
 import org.basex.query.var.*;
 
 /**
- * Inplements the {@code hof:take-while($seq, $pred)} function.
+ * Implements the {@code hof:take-while($seq, $pred)} function.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler

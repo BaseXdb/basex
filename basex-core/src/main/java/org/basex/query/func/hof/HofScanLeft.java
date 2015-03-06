@@ -9,7 +9,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.var.*;
 
 /**
- * Inplements the {@code hof:scan-left($seq, $start, $f)} function.
+ * Implements the {@code hof:scan-left($seq, $start, $f)} function.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
