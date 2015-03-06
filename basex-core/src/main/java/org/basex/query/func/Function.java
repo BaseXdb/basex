@@ -970,7 +970,14 @@ public enum Function {
 
   /** XQuery function. */
   _HOF_SORT_WITH(HofSortWith.class, "sort-with(items,lt-fun)",
-      arg(ITEM_ZM, FuncType.get(BLN, ITEM, ITEM).seqType()), ITEM_ZM, HOF_URI),
+      arg(ITEM_ZM, FuncType.get(BLN, ITEM, ITEM).seqType()), ITEM_ZM, flag(HOF), HOF_URI),
+  /** XQuery function. */
+  _HOF_TAKE_WHILE(HofTakeWhile.class, "take-while(items,pred)",
+      arg(ITEM_ZM, FuncType.get(BLN, ITEM).seqType()), ITEM_ZM, flag(HOF), HOF_URI),
+  /** XQuery function. */
+  _HOF_SCAN_LEFT(HofScanLeft.class, "scan-left(items,start,function)",
+      arg(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM).seqType()), ITEM_ZM, flag(HOF),
+      HOF_URI),
   /** XQuery function. */
   _HOF_ID(HofId.class, "id(value)", arg(ITEM_ZM), ITEM_ZM, HOF_URI),
   /** XQuery function. */
