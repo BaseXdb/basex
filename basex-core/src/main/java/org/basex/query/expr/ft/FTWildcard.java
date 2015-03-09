@@ -16,6 +16,8 @@ public final class FTWildcard {
   private static final int DOT = -1;
   /** Original query. */
   private final byte[] query;
+  /** Simple flag: query contains no wildcard characters. */
+  private final boolean simple;
   /** Characters. */
   private int[] wc;
   /** Minimum number of occurrence. */
@@ -31,6 +33,7 @@ public final class FTWildcard {
    */
   public FTWildcard(final byte[] query) {
     this.query = query;
+    this.simple = !contains(query, '.') && !contains(query, '\\');
   }
 
   /**
@@ -129,6 +132,14 @@ public final class FTWildcard {
    */
   public boolean match(final byte[] t) {
     return match(cps(t), 0, 0);
+  }
+
+  /**
+   * Indicates if the input contains no wildcard characters.
+   * @return result of check
+   */
+  public boolean simple() {
+    return simple;
   }
 
   /**

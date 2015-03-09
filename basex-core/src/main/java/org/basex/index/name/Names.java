@@ -27,11 +27,11 @@ public final class Names extends TokenSet implements Index {
 
   /**
    * Default constructor.
-   * @param md meta data
+   * @param meta meta data
    */
-  public Names(final MetaData md) {
+  public Names(final MetaData meta) {
+    this.meta = meta;
     stats = new Stats[Array.CAPACITY];
-    meta = md;
   }
 
   /**
@@ -42,8 +42,8 @@ public final class Names extends TokenSet implements Index {
    */
   public Names(final DataInput in, final MetaData md) throws IOException {
     super(in);
+    this.meta = md;
     stats = new Stats[keys.length];
-    meta = md;
     for(int s = 1; s < size; ++s) stats[s] = new Stats(in);
   }
 
