@@ -11,14 +11,30 @@ import org.basex.util.list.*;
  * @see Proc#databases(LockResult)
  */
 public class LockResult {
-  /** List of databases to read lock. */
+  /** Read locks. */
   public final StringList read = new StringList(1);
-  /** List of databases to write lock. */
+  /** Write locks. */
   public final StringList write = new StringList(1);
   /** Flag if global read lock is required. */
   public boolean readAll;
   /** Flag if global write lock is required. */
   public boolean writeAll;
+
+  /**
+   * Merge lock instances.
+   * @param lr lock instance
+   */
+  public void union(final LockResult lr) {
+    // if command writes to currently opened database, it may affect any database that has been
+    // opened before. hence, assign write locks to all opened databases
+    if(lr.write.contains(DBLocking.CONTEXT)) write.add(read);
+    // merge local locks with global lock lists
+    read.add(lr.read);
+    write.add(lr.write);
+    readAll |= lr.readAll;
+    writeAll |= lr.writeAll;
+  }
+
 
   @Override
   public String toString() {

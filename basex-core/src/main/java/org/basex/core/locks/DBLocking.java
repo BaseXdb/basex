@@ -34,11 +34,9 @@ public final class DBLocking implements Locking {
   private static final boolean FAIR = true;
 
   /** Prefix for internal special locks. */
-  private static final String PREFIX = "%";
-  /** Special lock identifier for collection available via current context; will be substituted. */
-  public static final String COLL = PREFIX + "COLL";
+  public static final String PREFIX = "%";
   /** Special lock identifier for database opened in current context; will be substituted. */
-  public static final String CTX = PREFIX + "CTX";
+  public static final String CONTEXT = PREFIX + "CONTEXT";
   /** Special lock identifier for administrative commands. */
   public static final String ADMIN = PREFIX + "ADMIN";
   /** Special lock identifier for backup commands. */
@@ -47,6 +45,7 @@ public final class DBLocking implements Locking {
   public static final String EVENT = PREFIX + "EVENT";
   /** Special lock identifier for repository commands. */
   public static final String REPO = PREFIX + "REPO";
+
   /** Prefix for user defined locks. */
   public static final String USER_PREFIX = "+";
   /** Prefix for locks in Java modules. */

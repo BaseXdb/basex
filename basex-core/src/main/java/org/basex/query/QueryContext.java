@@ -22,6 +22,7 @@ import org.basex.io.serial.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.Expr.Flag;
 import org.basex.query.func.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.up.*;
 import org.basex.query.util.collation.*;
@@ -428,10 +429,12 @@ public final class QueryContext extends Proc implements Closeable {
     lr.write.add(writeLocks);
     if(root == null || !root.databases(lr, this) ||
        ctxItem != null && !ctxItem.databases(lr, this)) {
-
       if(updating) lr.writeAll = true;
       else lr.readAll = true;
     }
+    // replace collection lock with context lock
+    if(lr.read.delete(Docs.COLL)) lr.read.add(DBLocking.CONTEXT);
+    if(lr.write.delete(Docs.COLL)) lr.write.add(DBLocking.CONTEXT);
   }
 
   /**

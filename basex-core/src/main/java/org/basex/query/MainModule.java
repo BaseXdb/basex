@@ -165,7 +165,7 @@ public final class MainModule extends StaticScope {
   private static final class LockVisitor extends ASTVisitor {
     /** Already visited scopes. */
     private final IdentityHashMap<Scope, Object> funcs = new IdentityHashMap<>();
-    /** List of databases to be locked. */
+    /** Reference to process list of locked databases. */
     private final StringList sl;
     /** Focus level. */
     private int level;
@@ -182,8 +182,10 @@ public final class MainModule extends StaticScope {
 
     @Override
     public boolean lock(final String db) {
+      // name is unknown at compile time: return false
       if(db == null) return false;
-      if(level == 0 || db != DBLocking.CTX) sl.add(db);
+      // if context item is found on top level, it will refer to currently opened database
+      if(level == 0 || db != DBLocking.CONTEXT) sl.add(db);
       return true;
     }
 

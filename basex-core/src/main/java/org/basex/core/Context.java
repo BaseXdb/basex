@@ -292,15 +292,15 @@ public final class Context {
    * Prepares the string list for locking.
    * @param sl string list
    * @param all lock all databases
-   * @return string list or {@code null}
+   * @return string list, or {@code null} if all databases need to be locked
    */
   private StringList prepareLock(final StringList sl, final boolean all) {
     if(all) return null;
 
-    // replace empty string with currently opened database and return array
     for(int d = 0; d < sl.size(); d++) {
-      if(Strings.eq(sl.get(d), DBLocking.CTX, DBLocking.COLL)) {
-        if(data == null) sl.remove(d);
+      // replace context reference with real database name, or remove it if no database is open
+      if(sl.get(d).equals(DBLocking.CONTEXT)) {
+        if(data == null) sl.remove(d--);
         else sl.set(d, data.meta.name);
       }
     }

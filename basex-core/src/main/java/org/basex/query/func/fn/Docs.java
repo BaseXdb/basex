@@ -19,7 +19,10 @@ import org.basex.util.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-abstract class Docs extends StandardFunc {
+public abstract class Docs extends StandardFunc {
+  /** Special lock identifier for collection available via current context; will be substituted. */
+  public static final String COLL = DBLocking.PREFIX + "COLL";
+
   /**
    * Returns a collection.
    * @param qc query context
@@ -54,12 +57,11 @@ abstract class Docs extends StandardFunc {
   @Override
   public final boolean accept(final ASTVisitor visitor) {
     if(exprs.length == 0) {
-      if(oneOf(sig, COLLECTION, URI_COLLECTION) && !visitor.lock(DBLocking.COLL)) return false;
+      if(oneOf(sig, COLLECTION, URI_COLLECTION) && !visitor.lock(COLL)) return false;
     } else if(!(exprs[0] instanceof Str)) {
       if(!visitor.lock(null)) return false;
     } else {
       final QueryInput qi = new QueryInput(string(((Str) exprs[0]).string()));
-      if(qi.db == null && !visitor.lock(null)) return false;
       if(!visitor.lock(qi.db)) return false;
     }
     return super.accept(visitor);

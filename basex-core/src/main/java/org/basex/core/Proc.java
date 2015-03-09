@@ -132,6 +132,7 @@ public abstract class Proc {
    * @param lr container for lock result to pass around
    */
   public void databases(final LockResult lr) {
+    // default (worst case): lock all databases
     lr.writeAll = true;
   }
 
