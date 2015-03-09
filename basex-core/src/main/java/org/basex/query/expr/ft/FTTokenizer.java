@@ -64,6 +64,8 @@ final class FTTokenizer {
             if(!ftw.parse()) throw FTWILDCARD_X.get(words.info, qu);
             wcCache.put(qu, ftw);
           }
+          // simple characters
+          if(ftw.simple()) ftw = null;
         }
 
         return

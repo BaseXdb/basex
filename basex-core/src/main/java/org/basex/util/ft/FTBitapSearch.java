@@ -94,8 +94,9 @@ public final class FTBitapSearch {
         final TokenList n = tokens.get(id);
         final BitSet m = masks[id];
         // compare each element from the needle and set the corresponding bit:
-        for(int k = n.size(); k >= 1; k--)
+        for(int k = n.size(); k >= 1; k--) {
           m.set(k, m.get(k - 1) && cmp.equal(current, n.get(k - 1)));
+        }
         // if the last element of the needle's mask is true, then all elements
         // of the needle are matched:
         if(m.get(n.size()) && !matched) {

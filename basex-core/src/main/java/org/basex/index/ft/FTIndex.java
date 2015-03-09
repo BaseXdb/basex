@@ -72,17 +72,17 @@ public final class FTIndex implements Index {
 
   /**
    * Constructor, initializing the index structure.
-   * @param d data reference
+   * @param data data reference
    * @throws IOException I/O Exception
    */
-  public FTIndex(final Data d) throws IOException {
-    data = d;
+  public FTIndex(final Data data) throws IOException {
+    this.data = data;
 
     // cache token length index
-    inY = new DataAccess(d.meta.dbfile(DATAFTX + 'y'));
-    inZ = new DataAccess(d.meta.dbfile(DATAFTX + 'z'));
-    inX = new DataAccess(d.meta.dbfile(DATAFTX + 'x'));
-    tp = new int[d.meta.maxlen + 3];
+    inY = new DataAccess(data.meta.dbfile(DATAFTX + 'y'));
+    inZ = new DataAccess(data.meta.dbfile(DATAFTX + 'z'));
+    inX = new DataAccess(data.meta.dbfile(DATAFTX + 'x'));
+    tp = new int[data.meta.maxlen + 3];
     final int tl = tp.length;
     for(int i = 0; i < tl; ++i) tp[i] = -1;
     int is = inX.readNum();
