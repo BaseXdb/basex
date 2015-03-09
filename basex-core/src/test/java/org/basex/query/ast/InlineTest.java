@@ -125,5 +125,6 @@ public final class InlineTest extends QueryPlanTest {
   @Test public void funcTest() {
     check("let $a := function($a) { trace($a) }"
         + "let $b := $a(1) let $c := $a(1) let $d := $a(1) return $b", "1", "count(//Let) != 2");
+    check("let $a := 'foo' return 'bar' ! . ! $a", "foo", "empty(//Let)");
   }
 }
