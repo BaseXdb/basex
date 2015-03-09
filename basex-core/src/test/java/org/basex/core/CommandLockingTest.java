@@ -36,11 +36,9 @@ public final class CommandLockingTest extends SandboxTest {
   /** StringList containing name. */
   private static final StringList NAME_LIST = new StringList(NAME);
   /** StringList containing context. */
-  private static final StringList CTX_LIST = new StringList(DBLocking.CTX);
-  /** StringList containing collection. */
-  private static final StringList COLL_LIST = new StringList(DBLocking.COLL);
+  private static final StringList CTX_LIST = new StringList(DBLocking.CONTEXT);
   /** StringList containing name and context. */
-  private static final StringList NAME_CTX = new StringList(NAME, DBLocking.CTX);
+  private static final StringList NAME_CTX = new StringList(NAME, DBLocking.CONTEXT);
   /** StringList containing ADMIN lock string. */
   private static final StringList ADMIN_LIST = new StringList(DBLocking.ADMIN);
   /** StringList containing REPO lock string. */
@@ -122,9 +120,9 @@ public final class CommandLockingTest extends SandboxTest {
   public void xquery() throws BaseXException {
     // Basic document access
     ckDBs(new XQuery(COLLECTION.args(NAME)), false, NAME_LIST);
-    ckDBs(new XQuery(COLLECTION.args()), false, COLL_LIST);
+    ckDBs(new XQuery(COLLECTION.args()), false, CTX_LIST);
     // fn:collection() always accesses the global context, no matter what local context is
-    ckDBs(new XQuery("<a/>/" + COUNT.args(COLLECTION.args())), false, COLL_LIST);
+    ckDBs(new XQuery("<a/>/" + COUNT.args(COLLECTION.args())), false, CTX_LIST);
     ckDBs(new XQuery(DOC.args(NAME)), false, NAME_LIST);
     ckDBs(new XQuery(DOC_AVAILABLE.args(NAME + "/foo.xml")), false, NAME_LIST, null);
     ckDBs(new XQuery(PARSE_XML.args("<foo/>")), true, NONE);
@@ -139,7 +137,7 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new XQuery(UNPARSED_TEXT_AVAILABLE.args(FILE)), false, NONE);
     ckDBs(new XQuery(UNPARSED_TEXT_LINES.args(FILE)), false, NONE);
     ckDBs(new XQuery(URI_COLLECTION.args(NAME)), false, NAME_LIST);
-    ckDBs(new XQuery(URI_COLLECTION.args()), false, COLL_LIST);
+    ckDBs(new XQuery(URI_COLLECTION.args()), false, CTX_LIST);
 
     // Accessor and node functions
     for(final Function fn : new Function[] { DATA, STRING, NUMBER, STRING_LENGTH, NORMALIZE_SPACE,
@@ -168,7 +166,7 @@ public final class CommandLockingTest extends SandboxTest {
         "local:a(5)"), false, NONE);
     ckDBs(new XQuery("declare function local:a($a) {" +
         "if($a = 0) then " + COLLECTION.args() + " else local:a($a idiv 2) };" +
-        "local:a(5)"), false, COLL_LIST);
+        "local:a(5)"), false, CTX_LIST);
     ckDBs(new XQuery("declare function local:a($a) {" +
         "if($a = 0) then " + DOC.args(NAME) + " else local:a($a idiv 2) };" +
         "local:a(5)"), false, NAME_LIST);

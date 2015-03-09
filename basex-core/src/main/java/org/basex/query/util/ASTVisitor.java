@@ -84,9 +84,9 @@ public abstract class ASTVisitor {
   }
 
   /**
-   * Notifies the visitor of a database lock.
+   * Notifies the visitor of a database lock. Overwritten by {@link MainModule}.
    * @param db database to be locked
-   * @return if more expressions should be visited
+   * @return if database locks cannot be detected statically
    */
   @SuppressWarnings("unused")
   public boolean lock(final String db) {

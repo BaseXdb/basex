@@ -46,6 +46,6 @@ public final class Retrieve extends ACreate {
 
   @Override
   public void databases(final LockResult lr) {
-    lr.read.add(DBLocking.CTX);
+    lr.read.add(DBLocking.CONTEXT);
   }
 }

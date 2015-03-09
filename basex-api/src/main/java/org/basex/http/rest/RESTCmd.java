@@ -44,23 +44,18 @@ abstract class RESTCmd extends Command {
 
   @Override
   public void databases(final LockResult lr) {
-    for(final Command c : cmds) c.databases(lr);
-
-    // lock globally if context-dependency is found (context will be changed by commands)
-    final boolean wc = lr.write.contains(DBLocking.CTX) || lr.write.contains(DBLocking.COLL);
-    final boolean rc = lr.read.contains(DBLocking.CTX) || lr.read.contains(DBLocking.COLL);
-    if(wc || rc && !lr.write.isEmpty()) {
-      lr.writeAll = true;
-      lr.readAll = true;
-    } else if(rc) {
-      lr.readAll = true;
+    for(final Command cmd : cmds) {
+      // collect local locks and merge it with global lock list
+      final LockResult tmp = new LockResult();
+      cmd.databases(tmp);
+      lr.union(tmp);
     }
   }
 
   @Override
   public boolean updating(final Context ctx) {
     boolean up = false;
-    for(final Command c : cmds) up |= c.updating(ctx);
+    for(final Command cmd : cmds) up |= cmd.updating(ctx);
     return up;
   }
 
@@ -142,7 +137,7 @@ abstract class RESTCmd extends Command {
    */
   private static Perm max(final ArrayList<Command> cmds) {
     Perm p = Perm.NONE;
-    for(final Command c : cmds) p = p.max(c.perm);
+    for(final Command cmd : cmds) p = p.max(cmd.perm);
     return p;
   }
 

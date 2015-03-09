@@ -30,6 +30,6 @@ public final class Flush extends Command {
 
   @Override
   public void databases(final LockResult lr) {
-    lr.write.add(DBLocking.CTX);
+    lr.write.add(DBLocking.CONTEXT);
   }
 }
