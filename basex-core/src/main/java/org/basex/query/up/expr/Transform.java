@@ -84,11 +84,11 @@ public final class Transform extends Arr {
 
       updates.prepare(qc);
       updates.apply(qc);
-      return qc.value(exprs[1]);
     } finally {
       qc.resources.output.size(o);
       updates.mod = tmp;
     }
+    return qc.value(exprs[1]);
   }
 
   @Override
