@@ -75,7 +75,7 @@ public final class QueryInfo {
    * @param string evaluation info
    */
   void evalInfo(final String string) {
-    if(verbose) evaluate.add(token(string.replaceAll("\r?\n\\s*", " ")));
+    if(verbose) evaluate.add(token(string.replaceAll("\r?\n", "|")));
   }
 
   /**

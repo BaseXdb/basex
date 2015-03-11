@@ -1082,6 +1082,8 @@ public enum Function {
   _PROF_HUMAN(ProfHuman.class, "human(integer)", arg(ITR), STR, flag(NDT), PROF_URI),
   /** XQuery function. */
   _PROF_VOID(ProfVoid.class, "void(value)", arg(ITEM_ZM), EMP, flag(NDT), PROF_URI),
+  /** XQuery function. */
+  _PROF_VARIABLES(ProfVariables.class, "variables()", arg(), EMP, flag(NDT), PROF_URI),
 
   /* Random Module. */
 
