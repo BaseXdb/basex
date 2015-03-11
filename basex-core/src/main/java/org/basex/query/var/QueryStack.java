@@ -13,8 +13,10 @@ import org.basex.util.*;
 public final class QueryStack {
   /** Initial stack size. */
   private static final int INIT = 1 << 5;
-  /** The stack. */
+  /** The currently assigned values. */
   private Value[] stack = new Value[INIT];
+  /** The currently assigned variables. */
+  private Var[] vars = new Var[INIT];
   /** The frame pointer, marking the start of the current stack frame. */
   private int fp;
   /** The stack limit, marking the end of the current stack frame. */
@@ -105,7 +107,22 @@ public final class QueryStack {
    */
   public void set(final Var var, final Value val, final QueryContext qc, final InputInfo ii)
       throws QueryException {
-    stack[pos(var)] = var.checkType(val, qc, ii, false);
+    final int pos = pos(var);
+    stack[pos] = var.checkType(val, qc, ii, false);
+    vars[pos] = var;
+  }
+
+  /**
+   * Creates a dump of the current variable stack.
+   * @return string dump
+   */
+  public String dump() {
+    final StringBuilder sb = new StringBuilder(QueryText.DEBUGLOCAL + ':');
+    for(int i = sl - 1; i >= 0; i--) {
+      sb.append(Prop.NL).append("  $").append(vars[i].name).append(" := ").append(stack[i]);
+      if(i == fp && i > 0) sb.append(Prop.NL).append(QueryText.DEBUGGLOBAL + ':');
+    }
+    return sb.toString();
   }
 
   @Override

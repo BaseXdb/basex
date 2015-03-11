@@ -72,6 +72,17 @@ public final class ProfModuleTest extends AdvancedQueryTest {
 
   /** Test method. */
   @Test
+  public void variables() {
+    try {
+      System.setErr(NULL);
+      query("for $x in 1 to 2 return " + _PROF_VARIABLES.args(), "");
+    } finally {
+      System.setErr(ERR);
+    }
+  }
+
+  /** Test method. */
+  @Test
   public void voidd() {
     query(_PROF_VOID.args("()"), "");
     query(_PROF_VOID.args("1"), "");

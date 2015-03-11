@@ -191,7 +191,9 @@ public final class InfoView extends View implements LinkListener {
       } else if(line.equals(OPTIMIZED_QUERY + COL)) {
         while(++s < sl && !split[s].isEmpty()) optqu.add(split[s]);
       } else if(line.startsWith(EVALUATING)) {
-        while(++s < sl && split[s].startsWith(LI)) eval.add(split[s]);
+        while(++s < sl && split[s].startsWith(LI)) {
+          eval.add(split[s].substring(2).replaceAll("\\|", "\n"));
+        }
       } else if(line.equals(QUERY_PLAN + COL)) {
         while(++s < sl && !split[s].isEmpty()) plan.add(split[s]);
       } else if(line.equals(Text.ERROR + COL)) {

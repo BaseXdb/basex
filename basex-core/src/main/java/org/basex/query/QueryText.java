@@ -824,4 +824,12 @@ public interface QueryText {
   String OPTCHILD = "converting % to child steps";
   /** Optimization info. */
   String OPTUNROLL = "unrolling %";
+
+  // DEBUGGING INFO
+
+  /** Debugging info. */
+  String DEBUGLOCAL = "Local Variables";
+  /** Debugging info. */
+  String DEBUGGLOBAL = "Global Variables";
+
 }
