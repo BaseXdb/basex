@@ -97,6 +97,12 @@ public final class InlineTest extends QueryPlanTest {
         "empty(//Context)");
   }
 
+  /** Simple map operator. */
+  @Test public void gh1094() {
+    check("for $d in (true(), false()) where <a/>!<b/>!$d return $d", "true", "exists(//Where)");
+    check("let $a := <a/> return 'bar' ! . ! $a", "<a/>", "exists(//Let)");
+  }
+
   /**
    * Tests the annotation {@link Annotation#_BASEX_INLINE}.
    */
