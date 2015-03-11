@@ -197,7 +197,7 @@ public final class For extends ForLet {
    * @return success
    * @throws QueryException query exception
    */
-  boolean toPredicate(final QueryContext qc, final VarScope scp, final Expr ex)
+  public boolean toPredicate(final QueryContext qc, final VarScope scp, final Expr ex)
       throws QueryException {
 
     if(empty || !(vars.length == 1 && ex.uses(var) && ex.removable(var))) return false;

@@ -223,11 +223,10 @@ public abstract class Expr extends ExprInfo {
    * Checks if the specified variable is replaceable by a context value.
    * The following tests might return false:
    * <ul>
-   * <li>{@link Preds#removable} if one of the variables is used within a predicate.</li>
-   * <li>{@link MixedPath#removable} if the variable occurs within the path.</li>
+   *   <li>{@link Preds#removable} if one of the variables is used within a predicate.</li>
+   *   <li>{@link Path#removable} if the variable occurs within the path.</li>
    * </ul>
-   * This method is called by {@link GFLWOR#compile(QueryContext, VarScope)} to rewrite where
-   * clauses into predicates.
+   * This method is called by {@link For#toPredicate(QueryContext, VarScope, Expr)}.
    * @param var variable to be replaced
    * @return result of check
    */
