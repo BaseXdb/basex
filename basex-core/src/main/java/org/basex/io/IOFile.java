@@ -364,9 +364,12 @@ public final class IOFile extends IO {
    * @return result of check
    */
   public static boolean isValid(final String path) {
-    // accept short strings, string without colons and strings with Windows drive letters
-    return path.length() < 3 || path.indexOf(':') == -1 ||
-        Token.letter(path.charAt(0)) && path.charAt(1) == ':';
+    // no colon: treat as file path
+    final int c = path.indexOf(':');
+    if(c == -1) return true;
+    // Windows drive letter? Colon after first slash?
+    final int fs = path.indexOf('/'), bs = path.indexOf('\\');
+    return c == 1 && Token.letter(path.charAt(0)) || (fs != -1 && fs < c) || (bs != -1 && bs < c);
   }
 
   /**
