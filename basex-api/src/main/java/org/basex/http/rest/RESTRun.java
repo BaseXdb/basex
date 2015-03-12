@@ -54,7 +54,10 @@ final class RESTRun extends RESTQuery {
       final Map<String, String[]> vars, final String val) throws IOException {
 
     // get root directory for files
-    final IOFile root = new IOFile(session.context.soptions.get(StaticOptions.WEBPATH));
+    final Context context = session.context;
+    final String webpath = context.soptions.get(StaticOptions.WEBPATH);
+    final String rpath = context.soptions.get(StaticOptions.RESTPATH);
+    final IOFile root = new IOFile(webpath).resolve(rpath);
 
     // check if file is not found, is a folder or points to parent folder
     final IOFile file = new IOFile(root, path);
@@ -66,7 +69,7 @@ final class RESTRun extends RESTQuery {
     // interpret as commands if input ends with command script suffix
     if(file.hasSuffix(IO.BXSSUFFIX)) {
       try {
-        for(final Command cmd : new CommandParser(input, session.context).parse()) session.add(cmd);
+        for(final Command cmd : new CommandParser(input, context).parse()) session.add(cmd);
       } catch(final QueryException ex) {
         throw new IOException(ex);
       }

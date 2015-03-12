@@ -80,6 +80,8 @@ public final class StaticOptions extends Options {
   /** Web path. */
   public static final StringOption WEBPATH = new StringOption("WEBPATH",
     HOME + (USERHOME ? NAME + "Web" : "webapp"));
+  /** REST path (relative to web path). */
+  public static final StringOption RESTPATH = new StringOption("RESTPATH", "");
   /** RESTXQ path (relative to web path). */
   public static final StringOption RESTXQPATH = new StringOption("RESTXQPATH", "");
   /** Local (embedded) mode. */
