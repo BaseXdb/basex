@@ -45,7 +45,7 @@ public abstract class ACreate extends Command {
    * Converts the input (second argument of {@link #args}, or {@link #in} reference)
    * to an {@link IO} reference.
    * @param name name of source
-   * @return IO reference
+   * @return IO reference (can be {@code null})
    * @throws IOException I/O exception
    */
   final IO sourceToIO(final String name) throws IOException {
@@ -54,11 +54,11 @@ public abstract class ACreate extends Command {
       io = IO.get(args[1]);
     } else if(in != null) {
       if(in.getCharacterStream() != null) {
-        final TokenBuilder tb = new TokenBuilder();
+        final StringBuilder sb = new StringBuilder();
         try(final Reader r = in.getCharacterStream()) {
-          for(int c; (c = r.read()) != -1;) tb.add(c);
+          for(int c; (c = r.read()) != -1;) sb.append((char) c);
         }
-        io = new IOContent(tb.finish());
+        io = new IOContent(sb.toString());
       } else if(in.getByteStream() != null) {
         io = new IOStream(in.getByteStream());
       } else if(in.getSystemId() != null) {
@@ -66,10 +66,10 @@ public abstract class ACreate extends Command {
       }
     }
 
-    // assign name of source
+    // assign (intermediate) name to input reference
     if(io instanceof IOContent || io instanceof IOStream) {
       if(name.endsWith("/")) throw new BaseXException(NAME_INVALID_X, name);
-      io.name(name);
+      io.name(name.isEmpty() ? "" : name + '.' + options.get(MainOptions.PARSER));
     }
     return io;
   }
