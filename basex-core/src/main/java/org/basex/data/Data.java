@@ -437,7 +437,7 @@ public abstract class Data {
   }
 
   /**
-   * Returns the disk offset of a text (text, comment, pi) or attribute value.
+   * Returns the disk offset of a text (text, comment, pi, pi, document) or attribute value.
    * @param pre pre value
    * @return disk offset
    */
@@ -446,7 +446,7 @@ public abstract class Data {
   }
 
   /**
-   * Returns a text (text, comment, pi) or attribute value.
+   * Returns a text (text, comment, pi, document) or attribute value.
    * @param pre pre value
    * @param text text/attribute flag
    * @return atomized value
@@ -454,7 +454,7 @@ public abstract class Data {
   public abstract byte[] text(int pre, boolean text);
 
   /**
-   * Returns a text (text, comment, pi) or attribute value as integer value.
+   * Returns a text (text, comment, pi, document) or attribute value as integer value.
    * {@link Long#MIN_VALUE} is returned if the input is no valid integer.
    * @param pre pre value
    * @param text text/attribute flag
@@ -463,7 +463,7 @@ public abstract class Data {
   public abstract long textItr(int pre, boolean text);
 
   /**
-   * Returns a text (text, comment, pi) or attribute value as double value.
+   * Returns a text (text, comment, pi, document) or attribute value as double value.
    * {@link Double#NaN} is returned if the input is no valid double.
    * @param pre pre value
    * @param text text/attribute flag
@@ -472,7 +472,7 @@ public abstract class Data {
   public abstract double textDbl(int pre, boolean text);
 
   /**
-   * Returns the byte length of a (possibly compressed) text (text, comment, pi).
+   * Returns the byte length of a (possibly compressed) text (text, comment, pi, document).
    * @param pre pre value
    * @param text text/attribute flag
    * @return length
@@ -516,7 +516,7 @@ public abstract class Data {
    * attribute node.
    * @param pre pre value to be replaced
    * @param kind node kind
-   * @param value value to be updated (element name, text, comment, pi)
+   * @param value value to be updated (element name, text, comment, pi, document)
    */
   public final void update(final int pre, final int kind, final byte[] value) {
     final byte[] v = kind == PI ? trim(concat(name(pre, kind), SPACE, value)) : value;
