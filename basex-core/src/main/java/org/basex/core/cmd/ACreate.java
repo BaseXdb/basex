@@ -65,10 +65,11 @@ public abstract class ACreate extends Command {
         io = IO.get(in.getSystemId());
       }
     }
-    // update name if not given by the IO reference anyway
+
+    // assign name of source
     if(io instanceof IOContent || io instanceof IOStream) {
       if(name.endsWith("/")) throw new BaseXException(NAME_INVALID_X, name);
-      io.name(name.isEmpty() ? "" : name + '.' + options.get(MainOptions.PARSER));
+      io.name(name);
     }
     return io;
   }
