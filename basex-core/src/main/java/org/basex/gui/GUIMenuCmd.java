@@ -312,8 +312,7 @@ public enum GUIMenuCmd implements GUICommand {
 
     @Override
     public boolean enabled(final GUI gui) {
-      // disallow deletion of empty node set or root node
-      return updatable(gui.context.marked);
+      return updatable(gui.context.marked, Data.DOC);
     }
   },
 
