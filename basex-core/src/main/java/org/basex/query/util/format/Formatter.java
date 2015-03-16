@@ -545,58 +545,71 @@ public abstract class Formatter extends FormatUtil {
    * Creates a number character sequence.
    * @param num number to be formatted
    * @param fp format parser
-   * @param z zero digit
+   * @param zero zero digit
    * @return number character sequence
    */
-  private byte[] number(final long num, final FormatParser fp, final int z) {
+  private byte[] number(final long num, final FormatParser fp, final int zero) {
     // cache characters of presentation modifier
-    final IntList pr = new TokenParser(fp.primary).toList();
+    final IntList mod = new TokenParser(fp.primary).toList();
+    final int modSize = mod.size();
+    int modStart = 0;
+    while(modStart < modSize && mod.get(modStart) == '#') modStart++;
 
-    // check for a regular separator pattern
-    int rp = -1;
-    boolean reg = false;
-    for(int p = pr.size() - 1; p >= 0; --p) {
-      final int ch = pr.get(p);
-      if(ch == '#' || ch >= z && ch <= z + 9) continue;
-      if(rp == -1) rp = pr.size() - p;
-      reg = (pr.size() - p) % rp == 0;
+    // try to find regular separator pattern
+    int sepPos = -1, sepChar = -1, digitPos = 0;
+    boolean regSep = false;
+    for(int mp = modSize - 1; mp >= modStart; --mp) {
+      final int ch = mod.get(mp);
+      if(ch >= zero && ch <= zero + 9) {
+        digitPos = mp;
+        continue;
+      }
+      if(ch == '#') continue;
+      if(sepPos == -1) {
+        sepPos = modSize - mp;
+        sepChar = ch;
+        regSep = true;
+      } else if(regSep) {
+        regSep = (modSize - mp) % sepPos == 0 && ch == sepChar;
+      }
     }
-    final int rc = reg ? pr.get(pr.size() - rp) : 0;
-    if(!reg) rp = Integer.MAX_VALUE;
+    if(!regSep) sepPos = Integer.MAX_VALUE;
 
-    // build string representation in a reverse order
-    final IntList cache = new IntList();
-    final byte[] n = token(num);
-    int b = n.length - 1, p = pr.size() - 1;
+    // cache characters in reverse order
+    final IntList reverse = new IntList();
+    final byte[] in = token(num);
+    int inPos = in.length - 1, modPos = modSize - 1;
 
     // add numbers and separators
-    int mn = fp.min;
-    int mx = fp.max;
-    while((--mn >= 0 || b >= 0 || p >= 0) && --mx >= 0) {
-      final boolean sep = cache.size() % rp == rp - 1;
-      if(p >= 0) {
-        final int c = pr.get(p--);
-        if(b >= 0) {
-          if(c == '#' && sep) cache.add(rc);
-          cache.add(c == '#' || c >= z && c <= z + 9 ? n[b--] - '0' + z : c);
+    int min = fp.min, max = fp.max;
+    while((--min >= 0 || inPos >= 0 || modPos >= modStart) && --max >= 0) {
+      final boolean sep = reverse.size() % sepPos == sepPos - 1;
+      int ch;
+      if(modPos >= modStart) {
+        ch = mod.get(modPos--);
+        if(inPos >= 0) {
+          if(ch == '#' && sep) reverse.add(sepChar);
+          if(ch == '#' || ch >= zero && ch <= zero + 9) ch = in[inPos--] - '0' + zero;
         } else {
           // add remaining modifiers
-          if(c == '#') break;
-          cache.add(c >= z && c <= z + 9 ? z : c);
+          if(ch == '#') break;
+          if(ch >= zero && ch <= zero + 9) ch = zero;
+          if(regSep && modPos + 1 < digitPos) break;
         }
-      } else if(b >= 0) {
+      } else if(inPos >= 0) {
         // add remaining numbers
-        if(sep) cache.add(rc);
-        cache.add(n[b--] - '0' + z);
+        if(sep) reverse.add(sepChar);
+        ch = in[inPos--] - '0' + zero;
       } else {
-        // add minimum numbers
-        cache.add(z);
+        // add minimum number of digits
+        ch = zero;
       }
+      reverse.add(ch);
     }
 
     // reverse result and add ordinal suffix
-    final TokenBuilder tb = new TokenBuilder();
-    for(int c = cache.size() - 1; c >= 0; --c) tb.add(cache.get(c));
-    return tb.add(ordinal(num, fp.ordinal)).finish();
+    final TokenBuilder result = new TokenBuilder();
+    for(int rs = reverse.size() - 1; rs >= 0; --rs) result.add(reverse.get(rs));
+    return result.add(ordinal(num, fp.ordinal)).finish();
   }
 }

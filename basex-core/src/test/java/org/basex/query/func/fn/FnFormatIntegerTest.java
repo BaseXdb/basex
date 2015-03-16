@@ -23,10 +23,11 @@ public final class FnFormatIntegerTest extends QueryTest {
       { "080", strings("000"), "format-integer(0, '000')" },
       { "090", strings("00000"), "format-integer(0, '00000')" },
 
-      { "100", strings(",1"), "format-integer(1, '#,0')" },
-      { "102", strings(".1"), "format-integer(1, '#.0')" },
-      { "104", strings(",1"), "format-integer(1, '#,#,0')" },
+      { "100", strings("1"), "format-integer(1, '#,0')" },
+      { "102", strings("1"), "format-integer(1, '#.0')" },
+      { "104", strings("1"), "format-integer(1, '#,#,0')" },
       { "106", strings("1"), "format-integer(1, '#0')" },
+      { "107", strings("12"), "format-integer(12, '#,#1')" },
 
       { "110", strings("0.1"), "format-integer(1, '0.0')" },
       { "112", strings("0,1"), "format-integer(1, '0,0')" },
