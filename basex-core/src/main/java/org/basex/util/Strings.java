@@ -251,7 +251,7 @@ public final class Strings {
    * @return result of check
    */
   public static boolean yes(final String string) {
-    return eqic(string, Text.YES, Text.TRUE, Text.ON, "1");
+    return eqic(string, Text.TRUE, Text.YES, Text.ON, "1");
   }
 
   /**
@@ -260,6 +260,6 @@ public final class Strings {
    * @return result of check
    */
   public static boolean no(final String string) {
-    return eqic(string, Text.NO, Text.FALSE, Text.OFF, "0");
+    return eqic(string, Text.FALSE, Text.NO, Text.OFF, "0");
   }
 }

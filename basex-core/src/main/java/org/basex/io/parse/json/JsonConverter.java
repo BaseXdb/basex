@@ -18,6 +18,8 @@ import org.basex.util.*;
 public abstract class JsonConverter {
   /** JSON options. */
   final JsonParserOptions jopts;
+  /** Fallback function. */
+  JsonFallback fallback;
 
   /**
    * Constructor.
@@ -25,6 +27,16 @@ public abstract class JsonConverter {
    */
   JsonConverter(final JsonParserOptions jopts) {
     this.jopts = jopts;
+  }
+
+  /**
+   * Assigns a fallback function for invalid characters.
+   * @param func fallback function
+   * @return self reference
+   */
+  public JsonConverter fallback(final JsonFallback func) {
+    fallback = func;
+    return this;
   }
 
   /**

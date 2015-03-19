@@ -4,7 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import org.basex.build.json.*;
-import org.basex.build.json.JsonParserOptions.*;
+import org.basex.build.json.JsonParserOptions.JsonDuplicates;
 import org.basex.query.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -16,6 +16,8 @@ import org.basex.util.hash.*;
  * @author Leo Woerteler
  */
 final class JsonParser extends InputParser {
+  /** Invalid Unicode character. */
+  private static final int INVALID = '\uFFFD';
   /** Names of control characters not allowed in string literals. */
   private static final String[] CTRL = {
     // U+0000 -- U+001F
@@ -40,14 +42,14 @@ final class JsonParser extends InputParser {
    * Constructor taking the input string and the spec according to which it is parsed.
    * @param in input string
    * @param opts options
-   * @param cnv converter
+   * @param conv converter
    */
-  private JsonParser(final String in, final JsonParserOptions opts, final JsonConverter cnv) {
+  private JsonParser(final String in, final JsonParserOptions opts, final JsonConverter conv) {
     super(in);
     liberal = opts.get(JsonParserOptions.LIBERAL);
     unescape = opts.get(JsonParserOptions.UNESCAPE);
     duplicates = opts.get(JsonParserOptions.DUPLICATES);
-    conv = cnv;
+    this.conv = conv;
   }
 
   /**
@@ -197,7 +199,7 @@ final class JsonParser extends InputParser {
       throw error("Expected unquoted string, found %", rest());
     tb.reset();
     do {
-      add(cp);
+      tb.add(cp);
       cp = input.codePointAt(pos += cp < 0x10000 ? 1 : 2);
     } while(Character.isJavaIdentifierPart(cp));
     skipWs();
@@ -214,11 +216,11 @@ final class JsonParser extends InputParser {
 
     // integral part
     int ch = consume();
-    add(ch);
+    tb.add(ch);
     if(ch == '-') {
       ch = consume();
       if(ch < '0' || ch > '9') throw error("Number expected after '-'");
-      add(ch);
+      tb.add(ch);
     }
 
     final boolean zero = ch == '0';
@@ -236,7 +238,7 @@ final class JsonParser extends InputParser {
         case '7':
         case '8':
         case '9':
-          add(ch);
+          tb.add(ch);
           pos++;
           ch = curr();
           break;
@@ -251,11 +253,11 @@ final class JsonParser extends InputParser {
     }
 
     if(consume('.')) {
-      add('.');
+      tb.add('.');
       ch = curr();
       if(ch < '0' || ch > '9') throw error("Number expected after '.'");
       do {
-        add(ch);
+        tb.add(ch);
         pos++;
         ch = curr();
       } while(ch >= '0' && ch <= '9');
@@ -266,15 +268,15 @@ final class JsonParser extends InputParser {
     }
 
     // 'e' or 'E'
-    add(consume());
+    tb.add(consume());
     ch = curr();
     if(ch == '-' || ch == '+') {
-      add(consume());
+      tb.add(consume());
       ch = curr();
     }
 
     if(ch < '0' || ch > '9') throw error("Exponent expected");
-    do add(consume());
+    do tb.add(consume());
     while((ch = curr()) >= '0' && ch <= '9');
     skipWs();
     return tb.toArray();
@@ -288,22 +290,23 @@ final class JsonParser extends InputParser {
   private byte[] string() throws QueryIOException {
     if(!consume('"')) throw error("Expected string, found '%'", curr());
     tb.reset();
-    char hi = 0; // cached high surrogate
+    char high = 0; // cached high surrogate
     while(pos < length) {
+      final int p = pos;
       int ch = consume();
       if(ch == '"') {
-        if(hi != 0) add(hi);
+        if(high != 0) tb.add(INVALID);
         skipWs();
         return tb.toArray();
       }
 
       if(ch == '\\') {
         if(!unescape) {
-          if(hi != 0) {
-            add(hi);
-            hi = 0;
+          if(high != 0) {
+            tb.add(high);
+            high = 0;
           }
-          add('\\');
+          tb.add('\\');
         }
 
         final int n = consume();
@@ -340,14 +343,14 @@ final class JsonParser extends InputParser {
                 else throw error("Illegal hexadecimal digit: '%'", x);
               }
             } else {
-              add('u');
+              tb.add('u');
               for(int i = 0; i < 4; i++) {
                 final char x = consume();
                 if(x >= '0' && x <= '9' || x >= 'a' && x <= 'f' || x >= 'A' && x <= 'F') {
-                  if(i < 3) add(x);
-                  else ch = x;
+                  tb.add(x);
                 } else throw error("Illegal hexadecimal digit: '%'", x);
               }
+              continue;
             }
             break;
           default:
@@ -357,14 +360,17 @@ final class JsonParser extends InputParser {
         throw error("Non-escaped control character: '\\%'", CTRL[ch]);
       }
 
-      if(hi != 0) {
-        if(ch >= 0xDC00 && ch <= 0xDFFF) ch = (hi - 0xD800 << 10) + ch - 0xDC00 + 0x10000;
-        else add(hi);
-        hi = 0;
+      if(high != 0) {
+        if(ch >= 0xDC00 && ch <= 0xDFFF) ch = (high - 0xD800 << 10) + ch - 0xDC00 + 0x10000;
+        else tb.add(INVALID);
+        high = 0;
       }
 
-      if(ch >= 0xD800 && ch <= 0xDBFF) hi = (char) ch;
-      else add(ch);
+      if(ch >= 0xD800 && ch <= 0xDBFF) {
+        high = (char) ch;
+      } else {
+        add(ch, p);
+      }
     }
     throw eof(" in string literal");
   }
@@ -372,9 +378,16 @@ final class JsonParser extends InputParser {
   /**
    * Adds the specified character.
    * @param ch character
+   * @param p start position of unescape sequence
    */
-  private void add(final int ch) {
-    tb.add(XMLToken.valid(ch) ? ch : '\uFFFD');
+  private void add(final int ch, final int p) {
+    if(XMLToken.valid(ch)) {
+      tb.add(ch);
+    } else if(conv.fallback == null) {
+      tb.add(INVALID);
+    } else {
+      tb.add(conv.fallback.convert(new TokenBuilder().add(input.substring(p, pos)).finish()));
+    }
   }
 
   /** Consumes all whitespace characters from the remaining query. */

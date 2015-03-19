@@ -17,6 +17,8 @@ public final class JsonParserOptions extends JsonOptions {
   public static final BooleanOption UNESCAPE = new BooleanOption("unescape", true);
   /** Option: liberal parsing. */
   public static final BooleanOption LIBERAL = new BooleanOption("liberal", false);
+  /** Option: fallback function. */
+  public static final FuncOption FALLBACK = new FuncOption("fallback");
   /** Option: handle duplicates. */
   public static final EnumOption<JsonDuplicates> DUPLICATES =
       new EnumOption<>("duplicates", JsonDuplicates.USE_LAST);

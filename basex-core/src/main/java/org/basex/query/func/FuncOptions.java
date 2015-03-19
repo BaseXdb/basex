@@ -34,6 +34,9 @@ public final class FuncOptions {
   /** Input info. */
   private final InputInfo info;
 
+  /** Reject unknown options. */
+  private boolean acceptUnknown;
+
   /**
    * Constructor.
    */
@@ -53,6 +56,15 @@ public final class FuncOptions {
   }
 
   /**
+   * Accept unknown options.
+   * @return self reference
+   */
+  public FuncOptions acceptUnknown() {
+    acceptUnknown = true;
+    return this;
+  }
+
+  /**
    * Extracts options from the specified item.
    * @param it item to be converted
    * @param options options
@@ -61,37 +73,39 @@ public final class FuncOptions {
    * @throws QueryException query exception
    */
   public <T extends Options> T parse(final Item it, final T options) throws QueryException {
-    parse(it, options, INVALIDOPT_X);
-    return options;
+    return parse(it, options, INVALIDOPT_X);
   }
 
   /**
    * Extracts options from the specified item.
    * @param item item to be parsed
    * @param options options
-   * @param error raise error if parameter is unknown
+   * @param <T> option type
+   * @param error raise error code
+   * @return specified options
    * @throws QueryException query exception
    */
-  private void parse(final Item item, final Options options, final QueryError error)
+  public <T extends Options> T parse(final Item item, final T options, final QueryError error)
       throws QueryException {
 
-    if(item == null) return;
-
-    final TokenBuilder tb = new TokenBuilder();
-    try {
-      if(item instanceof Map) {
-        options.parse((Map) item);
-      } else {
-        if(test == null) {
-          throw MAP_X_X.get(info, item.type, item);
-        } else if(!test.eq(item)) {
-          throw ELMMAP_X_X_X.get(info, root.prefixId(XML), item.type, item);
+    if(item != null) {
+      final TokenBuilder tb = new TokenBuilder();
+      try {
+        if(item instanceof Map) {
+          options.parse((Map) item, !acceptUnknown);
+        } else {
+          if(test == null) {
+            throw MAP_X_X.get(info, item.type, item);
+          } else if(!test.eq(item)) {
+            throw ELMMAP_X_X_X.get(info, root.prefixId(XML), item.type, item);
+          }
+          options.parse(tb.add(optString((ANode) item)).toString());
         }
-        options.parse(tb.add(optString((ANode) item)).toString());
+      } catch(final BaseXException ex) {
+        throw error.get(info, ex);
       }
-    } catch(final BaseXException ex) {
-      throw error.get(info, ex);
     }
+    return options;
   }
 
   /**
@@ -157,7 +171,6 @@ public final class FuncOptions {
    */
   public static SerializerOptions serializer(final Item it, final SerializerOptions sopts,
       final InputInfo info) throws QueryException {
-    new FuncOptions(Q_SPARAM, info).parse(it, sopts, SEROPT_X);
-    return sopts;
+    return new FuncOptions(Q_SPARAM, info).parse(it, sopts, SEROPT_X);
   }
 }

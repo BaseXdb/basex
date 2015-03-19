@@ -511,8 +511,10 @@ public enum QueryError {
   JSON_PARSE_X(FOJS, 1, "%"),
   /** FOJS0003. */
   JSON_DUPLICATE_X(FOJS, 3, "%"),
-  /** FOJS0004. */
-  JSON_OPT_X(FOJS, 4, "%"),
+  /** FOJS0005. */
+  JSON_OPT_X(FOJS, 5, "%"),
+  /** FOJS0005. */
+  JSON_FUNC_OPT_X_X(FOJS, 5, "% expected, % found."),
 
   /** FOMP0001. */
   MAP_TZ(FOMP, 1, "Map cannot contain keys with and without timezone."),

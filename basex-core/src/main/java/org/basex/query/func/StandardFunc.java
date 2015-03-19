@@ -253,8 +253,9 @@ public abstract class StandardFunc extends Arr {
    */
   protected <E extends Options> E toOptions(final int i, final QNm qnm, final E opts,
       final QueryContext qc) throws QueryException {
-    if(i < exprs.length) new FuncOptions(qnm, info).parse(exprs[i].item(qc, info), opts);
-    return opts;
+
+    return i >= exprs.length ? opts :
+      new FuncOptions(qnm, info).parse(exprs[i].item(qc, info), opts);
   }
 
   /**

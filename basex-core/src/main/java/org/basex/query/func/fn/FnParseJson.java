@@ -1,13 +1,15 @@
 package org.basex.query.func.fn;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.query.QueryText.*;
 
 import org.basex.build.json.*;
 import org.basex.build.json.JsonOptions.JsonFormat;
 import org.basex.io.parse.json.*;
 import org.basex.query.*;
+import org.basex.query.func.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -17,9 +19,6 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public class FnParseJson extends Parse {
-  /** QName. */
-  private static final QNm Q_OPTIONS = QNm.get(FN_PREFIX, "options", FN_URI);
-
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item it = exprs[0].atomItem(qc, info);
@@ -38,12 +37,39 @@ public class FnParseJson extends Parse {
   final Item parse(final byte[] json, final QueryContext qc, final InputInfo ii)
       throws QueryException {
 
+    final JsonParserOptions opts = new JsonParserOptions();
+    if(exprs.length > 1) {
+      final Map options = toMap(exprs[1], qc);
+      try {
+        new FuncOptions(null, info).acceptUnknown().parse(options, opts);
+      } catch(final QueryException ex) {
+        throw JSON_OPT_X.get(ii, ex.getLocalizedMessage());
+      }
+    }
+
+    final boolean unesc = opts.get(JsonParserOptions.UNESCAPE);
+    final FuncItem fb = opts.get(JsonParserOptions.FALLBACK);
+    if(fb != null) {
+      final Type type = FuncType.get(SeqType.STR, SeqType.STR);
+      if(!fb.type.instanceOf(type)) throw JSON_FUNC_OPT_X_X.get(ii, type, fb.type);
+    }
+
     try {
-      final JsonParserOptions opts = toOptions(1, Q_OPTIONS, new JsonParserOptions(), qc);
       opts.set(JsonOptions.FORMAT, JsonFormat.MAP);
-      return JsonConverter.get(opts).convert(json, null);
-    } catch(final QueryException ex) {
-      throw ex.error() == INVALIDOPT_X ? JSON_OPT_X.get(ii, ex.getLocalizedMessage()) : ex;
+      final JsonConverter conv = JsonConverter.get(opts);
+      if(unesc && fb != null) conv.fallback(new JsonFallback() {
+        @Override
+        public byte[] convert(final byte[] string) {
+          try {
+            return fb.invokeItem(qc, ii, Str.get(string)).string(ii);
+          } catch(final QueryException ex) {
+            throw new QueryRTException(ex);
+          }
+        }
+      });
+      return conv.convert(json, null);
+    } catch(final QueryRTException ex) {
+      throw ex.getCause();
     } catch(final QueryIOException ex) {
       Util.debug(ex);
       final QueryException qe = ex.getCause(info);
