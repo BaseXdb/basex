@@ -950,7 +950,9 @@ public enum QueryError {
   /** XPTY0004. */
   INVCAST_X_X_X(XPTY, 4, "Cannot cast % to %: %."),
   /** XPTY0004. */
-  INVTREAT_X_X(XPTY, 4, "Cannot treat % as %."),
+  INVPROMOTE_X_X(XPTY, 4, "Cannot promote % to %."),
+  /** XPTY0004. */
+  INVPROMOTE_X_X_X(XPTY, 4, "Cannot promote % to %: %."),
   /** XPTY0004. */
   INVTREAT_X_X_X(XPTY, 4, "Cannot treat % as %: %."),
   /** XPTY0004. */
@@ -1449,18 +1451,6 @@ public enum QueryError {
   public static QueryException diffError(final InputInfo ii, final Item item1, final Item item2) {
     final Type t1 = item1.type, t2 = item2.type;
     return (item1 == item2 ? NOTCMP_X : t1 == t2 ? CMPTYPE_X : CMPTYPES_X_X).get(ii, t1, t2);
-  }
-
-  /**
-   * Throws a type promoting exception.
-   * @param ii input info
-   * @param value value
-   * @param seqType sequence type
-   * @return query exception (indicates that an error is raised)
-   */
-  public static QueryException treatError(final InputInfo ii, final Value value,
-      final SeqType seqType) {
-    return INVTREAT_X_X_X.get(ii, value.seqType(), seqType, value);
   }
 
   /**

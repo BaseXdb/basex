@@ -19,11 +19,10 @@ public final class FnFilter extends StandardFunc {
     return new Iter() {
       @Override
       public Item next() throws QueryException {
-        do {
-          final Item it = ir.next();
-          if(it == null) return null;
+        for(Item it; (it = ir.next()) != null;) {
           if(toBoolean(fun.invokeItem(qc, info, it))) return it;
-        } while(true);
+        }
+        return null;
       }
     };
   }

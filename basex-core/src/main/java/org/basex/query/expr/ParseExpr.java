@@ -300,9 +300,11 @@ public abstract class ParseExpr extends Expr {
    */
   protected final boolean toBoolean(final Item it) throws QueryException {
     final Type ip = checkNoEmpty(it, AtomType.BLN).type;
-    if(ip == AtomType.BLN || ip.isUntyped()) return it.bool(info);
+    if(ip == AtomType.BLN) return it.bool(info);
+    if(ip.isUntyped()) return Bln.parse(it.string(info), info);
     throw castError(info, it, AtomType.BLN);
   }
+
 
   /**
    * Checks if the specified expression yields a double.
