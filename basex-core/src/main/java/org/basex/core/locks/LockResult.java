@@ -1,6 +1,7 @@
 package org.basex.core.locks;
 
 import org.basex.core.*;
+import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -35,9 +36,12 @@ public class LockResult {
     writeAll |= lr.writeAll;
   }
 
-
   @Override
   public String toString() {
-    return "LockResult: " + "Read " + read + ", Write " + write;
+    final StringBuilder sb = new StringBuilder(Util.className(getClass())).append(": Read ");
+    if(readAll) sb.append(" readall");
+    sb.append(read).append(", Write ");
+    if(writeAll) sb.append(" writeall");
+    return sb.append(write).append(']').toString();
   }
 }
