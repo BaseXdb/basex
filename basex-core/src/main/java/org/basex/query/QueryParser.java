@@ -140,7 +140,10 @@ public class QueryParser extends InputParser {
 
     // bind external variables
     for(final Entry<String, String> entry : QueryProcessor.bindings(opts).entrySet()) {
-      qc.bind(entry.getKey(), new Atm(entry.getValue()), sc);
+      final String key = entry.getKey();
+      final Atm value = new Atm(entry.getValue());
+      if(key.isEmpty()) qc.context(value, sc);
+      else qc.bind(key, value, sc);
     }
   }
 

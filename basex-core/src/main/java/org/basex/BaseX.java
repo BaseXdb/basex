@@ -97,6 +97,12 @@ public class BaseX extends CLI {
           execute(new Set(MainOptions.MAINMEM, true), false);
           execute(new Check(val), verbose);
           execute(new Set(MainOptions.MAINMEM, false), false);
+        } else if(c == 'I') {
+          // set/add variable binding
+          if(bind.length() != 0) bind.append(',');
+          // commas are escaped by a second comma
+          val = bind.append("=").append(val.replaceAll(",", ",,")).toString();
+          execute(new Set(MainOptions.BINDINGS, val), false);
         } else if(c == 'o') {
           // change output stream
           if(out != System.out) out.close();
@@ -226,7 +232,7 @@ public class BaseX extends CLI {
       String v = null;
       if(arg.dash()) {
         c = arg.next();
-        if(c == 'b' || c == 'c' || c == 'C' || c == 'i' || c == 'o' || c == 'q' ||
+        if(c == 'b' || c == 'c' || c == 'C' || c == 'i' || c == 'I' || c == 'o' || c == 'q' ||
             c == 'r' || c == 's' || c == 't' && local()) {
           // options followed by a string
           v = arg.string();

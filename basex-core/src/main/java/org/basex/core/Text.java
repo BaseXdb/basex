@@ -60,7 +60,8 @@ public interface Text {
     "  -b<pars>    Bind external query variables" + NL +
     "  -c<input>   Execute commands from file or string" + NL +
     "  -d          Activate debugging mode" + NL +
-    "  -i<input>   Open initial file or database" + NL +
+    "  -i<input>   Assign file or database to context" + NL +
+    "  -I<input>   Assign input string to context" + NL +
     "  -o<output>  Write output to file" + NL +
     "  -q<expr>    Execute XQuery expression" + NL +
     "  -r<num>     Set number of query executions" + NL +
@@ -83,7 +84,8 @@ public interface Text {
     "  -b<pars>    Bind external query variables" + NL +
     "  -c<input>   Execute commands from file or string" + NL +
     "  -d          Activate debugging mode" + NL +
-    "  -i<input>   Open initial file or database" + NL +
+    "  -i<input>   Assign file or database to context" + NL +
+    "  -I<input>   Assign input string to context" + NL +
     "  -n<name>    Set server (host) name" + NL +
     "  -o<output>  Write output to file" + NL +
     "  -p<port>    Set server port" + NL +

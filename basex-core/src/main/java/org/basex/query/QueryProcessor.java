@@ -336,7 +336,7 @@ public final class QueryProcessor extends Proc implements Closeable {
         val.append(ch);
       }
     }
-    if(key.length() != 0) bindings.put(key.toString().trim(), val.toString());
+    if(!first) bindings.put(key.toString().trim(), val.toString());
     return bindings;
   }
 
