@@ -201,6 +201,8 @@ public interface Text {
   /** Options error. */
   String OPT_MAP = "Value of '%' must be a map.";
   /** Options error. */
+  String OPT_FUNC = "Value of '%' must be a function.";
+  /** Options error. */
   String OPT_ONEOF = "Value of '%' must be one of (%).";
   /** Options error. */
   String OPT_EXPECT = "% expected, % found: %.";

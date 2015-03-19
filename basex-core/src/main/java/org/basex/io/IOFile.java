@@ -369,7 +369,7 @@ public final class IOFile extends IO {
     if(c == -1) return true;
     // Windows drive letter? Colon after first slash?
     final int fs = path.indexOf('/'), bs = path.indexOf('\\');
-    return c == 1 && Token.letter(path.charAt(0)) || (fs != -1 && fs < c) || (bs != -1 && bs < c);
+    return c == 1 && Token.letter(path.charAt(0)) || fs != -1 && fs < c || bs != -1 && bs < c;
   }
 
   /**

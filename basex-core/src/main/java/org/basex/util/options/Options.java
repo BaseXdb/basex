@@ -202,21 +202,21 @@ public class Options implements Iterable<Option<?>> {
   }
 
   /**
-   * Returns the requested map.
-   * @param option option to be found
-   * @return value
-   */
-  public final synchronized org.basex.query.value.map.Map get(final MapOption option) {
-    return (org.basex.query.value.map.Map) get((Option<?>) option);
-  }
-
-  /**
    * Returns the requested boolean.
    * @param option option to be found
    * @return value
    */
   public final synchronized Boolean get(final BooleanOption option) {
     return (Boolean) get((Option<?>) option);
+  }
+
+  /**
+   * Returns the requested function.
+   * @param option option to be found
+   * @return value
+   */
+  public final synchronized FuncItem get(final FuncOption option) {
+    return (FuncItem) get((Option<?>) option);
   }
 
   /**
@@ -283,16 +283,6 @@ public class Options implements Iterable<Option<?>> {
    * @param value value to be written
    */
   public final synchronized void set(final BooleanOption option, final boolean value) {
-    put(option, value);
-  }
-
-  /**
-   * Sets the map value of an option.
-   * @param option option to be set
-   * @param value value to be written
-   */
-  public final synchronized void set(final MapOption option,
-      final org.basex.query.value.map.Map value) {
     put(option, value);
   }
 
@@ -367,17 +357,18 @@ public class Options implements Iterable<Option<?>> {
    * it will be added as free option.
    * @param name name of option
    * @param val value
+   * @param error error
    * @throws BaseXException database exception
    * @throws QueryException query exception
    */
-  public synchronized void assign(final Item name, final Item val)
+  public synchronized void assign(final Item name, final Item val, final boolean error)
       throws BaseXException, QueryException {
 
     final String key = string(name.string(null));
     if(options.isEmpty()) {
       free.put(key, string(val.string(null)));
     } else {
-      assign(key, val, true);
+      assign(key, val, error);
     }
   }
 
@@ -459,10 +450,13 @@ public class Options implements Iterable<Option<?>> {
   /**
    * Parses options in the specified map.
    * @param map map
+   * @param error raise error if option is unknown
    * @throws BaseXException database exception
    * @throws QueryException query exception
    */
-  public synchronized void parse(final Map map) throws BaseXException, QueryException {
+  public synchronized void parse(final Map map, final boolean error)
+      throws BaseXException, QueryException {
+
     for(final Item name : map.keys()) {
       if(!name.type.isStringOrUntyped())
         throw new BaseXException(Text.OPT_EXPECT, AtomType.STR, name.type, name);
@@ -471,7 +465,7 @@ public class Options implements Iterable<Option<?>> {
       if(!(value instanceof Item))
         throw new BaseXException(Text.OPT_EXPECT, AtomType.ITEM, value.seqType(), value);
 
-      assign(name, (Item) value);
+      assign(name, (Item) value, error);
     }
   }
 
@@ -685,6 +679,8 @@ public class Options implements Iterable<Option<?>> {
       final boolean v;
       if(item.type.isStringOrUntyped()) {
         v = Strings.yes(string(item.string(null)));
+        if(!v && !Strings.no(string(item.string(null))))
+          throw new BaseXException(Text.OPT_BOOLEAN, option.name());
       } else if(item instanceof Bln) {
         v = ((Bln) item).bool(null);
       } else {
@@ -715,12 +711,13 @@ public class Options implements Iterable<Option<?>> {
     } else if(option instanceof OptionsOption) {
       final Options o = ((OptionsOption<?>) option).newInstance();
       if(item instanceof Map) {
-        o.parse((Map) item);
+        o.parse((Map) item, error);
       } else {
         throw new BaseXException(Text.OPT_MAP, option.name());
       }
       put(option, o);
-    } else if(option instanceof MapOption) {
+    } else if(option instanceof FuncOption) {
+      if(!(item instanceof FuncItem)) throw new BaseXException(Text.OPT_FUNC, option.name());
       put(option, item);
     } else {
       throw Util.notExpected("Unsupported option: " + option);
