@@ -59,7 +59,7 @@ public final class TypeCheck extends Single {
 
     // function item coercion
     if(expr instanceof FuncItem && seqType.type instanceof FuncType) {
-      if(!seqType.occ.check(1)) throw INVTREAT_X_X.get(info, argType, seqType);
+      if(!seqType.occ.check(1)) throw INVPROMOTE_X_X.get(info, argType, seqType);
       final FuncItem fi = (FuncItem) expr;
       return optPre(fi.coerceTo((FuncType) seqType.type, qc, info, true), qc);
     }
@@ -113,7 +113,7 @@ public final class TypeCheck extends Single {
         vb.set(c++, null);
 
         if(it == null && i < st.occ.min || i > st.occ.max)
-          throw INVTREAT_X_X.get(info, expr.seqType(), st);
+          throw INVPROMOTE_X_X.get(info, expr.seqType(), st);
 
         i++;
         return it;

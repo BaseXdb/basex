@@ -410,7 +410,7 @@ public final class SeqType {
     if(val.seqType().instanceOf(this)) return;
 
     final int size = (int) val.size();
-    if(!occ.check(size)) throw treatError(ii, val, this);
+    if(!occ.check(size)) throw INVTREAT_X_X_X.get(ii, val.seqType(), this, val);
 
     // empty sequence has all types
     if(size == 0) return;
@@ -420,7 +420,7 @@ public final class SeqType {
     // check heterogeneous sequences
     if(!val.homogeneous())
       for(int i = 1; ins && i < size; i++) ins = instance(val.itemAt(i), true);
-    if(!ins) throw treatError(ii, val, this);
+    if(!ins) throw INVTREAT_X_X_X.get(ii, val.seqType(), this, val);
   }
 
   /**
@@ -437,7 +437,8 @@ public final class SeqType {
       final Value value, final boolean opt) throws QueryException {
 
     final int n = (int) value.size();
-    if(!occ.check(n)) throw treatError(ii, value, this);
+    if(!occ.check(n)) throw INVPROMOTE_X_X_X.get(ii, value.seqType(), withOcc(Occ.ONE), value);
+
     if(n == 0) return Empty.SEQ;
 
     ValueBuilder vb = null;
@@ -485,13 +486,13 @@ public final class SeqType {
         } else if(type == AtomType.STR && atom instanceof Uri) {
           vb.add(Str.get(atom.string(ii)));
         } else {
-          throw treatError(ii, item, withOcc(Occ.ONE));
+          throw INVPROMOTE_X_X_X.get(ii, item.seqType(), withOcc(Occ.ONE), item);
         }
       }
     } else if(item instanceof FItem && type instanceof FuncType) {
       vb.add(((FItem) item).coerceTo((FuncType) type, qc, ii, opt));
     } else {
-      throw treatError(ii, item, withOcc(Occ.ONE));
+      throw INVPROMOTE_X_X_X.get(ii, item.seqType(), withOcc(Occ.ONE), item);
     }
   }
 
