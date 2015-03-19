@@ -122,7 +122,7 @@ final class Unit {
         // expected error code
         QNm code = null;
         if(vs == 2 && eq(EXPECTED, args[0].string(null))) {
-          code = QNm.resolve(args[1].string(null), sf.name.uri(), sf.sc, sf.info);
+          code = QNm.resolve(args[1].string(null), QueryText.ERROR_URI, sf.sc, sf.info);
         } else if(vs != 0) {
           throw BASX_ANNNUM_X_X_X.get(ann.info, ann, vs, vs == 1 ? "" : "s");
         }
