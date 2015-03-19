@@ -264,8 +264,8 @@ public final class Context {
     // get touched databases
     final LockResult lr = new LockResult();
     pr.databases(lr);
-    final StringList read = prepareLock(lr.read, lr.readAll);
     final StringList write = prepareLock(lr.write, lr.writeAll);
+    final StringList read = write == null ? null : prepareLock(lr.read, lr.readAll);
     locks.acquire(pr, read, write);
   }
 
