@@ -42,71 +42,55 @@ abstract class Num extends StandardFunc {
     final Collation coll = toCollation(1, qc);
 
     final Iter iter = exprs[0].atomIter(qc, info);
-    Item rs = iter.next();
-    if(rs == null) return null;
+    Item curr = iter.next();
+    if(curr == null) return null;
 
     // check if first item is comparable
-    cmp.eval(rs, rs, coll, sc, info);
+    cmp.eval(curr, curr, coll, sc, info);
 
     // strings
-    if(rs instanceof AStr) {
+    if(curr instanceof AStr) {
       for(Item it; (it = iter.next()) != null;) {
-        if(!(it instanceof AStr)) throw EXPTYPE_X_X_X.get(info, rs.type, it.type, it);
-        final Type rt = rs.type, ri = it.type;
-        if(cmp.eval(rs, it, coll, sc, info)) rs = it;
-        if(rt != ri && rs.type == URI) rs = STR.cast(rs, qc, sc, info);
+        if(!(it instanceof AStr)) throw EXPTYPE_X_X_X.get(info, curr.type, it.type, it);
+        final Type rt = curr.type, ri = it.type;
+        if(cmp.eval(curr, it, coll, sc, info)) curr = it;
+        if(rt != ri && curr.type == URI) curr = STR.cast(curr, qc, sc, info);
       }
-      return rs;
+      return curr;
     }
     // dates, durations, booleans, binary values
-    if(rs instanceof ADate || rs instanceof Dur || rs instanceof Bin || rs.type == BLN) {
+    if(curr instanceof ADate || curr instanceof Dur || curr instanceof Bin || curr.type == BLN) {
       for(Item it; (it = iter.next()) != null;) {
-        if(rs.type != it.type) throw EXPTYPE_X_X_X.get(info, rs.type, it.type, it);
-        if(cmp.eval(rs, it, coll, sc, info)) rs = it;
+        if(curr.type != it.type) throw EXPTYPE_X_X_X.get(info, curr.type, it.type, it);
+        if(cmp.eval(curr, it, coll, sc, info)) curr = it;
       }
-      return rs;
+      return curr;
     }
     // numbers
-    if(rs.type.isUntyped()) rs = DBL.cast(rs, qc, sc, info);
+    if(curr.type.isUntyped()) curr = DBL.cast(curr, qc, sc, info);
     for(Item it; (it = iter.next()) != null;) {
-      final Type t = numType(rs, it);
-      if(cmp.eval(rs, it, coll, sc, info) || Double.isNaN(it.dbl(info))) rs = it;
-      if(rs.type != t) rs = (Item) t.cast(rs, qc, sc, info);
+      final Type type = numType(curr, it);
+      if(cmp.eval(curr, it, coll, sc, info) || Double.isNaN(it.dbl(info))) curr = it;
+      if(type != null) curr = (Item) type.cast(curr, qc, sc, info);
     }
-    return rs;
+    return curr;
   }
 
   /**
-   * Returns the numeric type with the highest precedence.
-   * @param res result item
+   * Returns the new target type, or {@code null} if conversion is not necessary.
+   * @param curr old item
    * @param it new item
-   * @return result
+   * @return result (or {@code null})
    * @throws QueryException query exception
    */
-  private Type numType(final Item res, final Item it) throws QueryException {
+  private AtomType numType(final Item curr, final Item it) throws QueryException {
     final Type ti = it.type;
     if(ti.isUntyped()) return DBL;
-    final Type tr = res.type;
-    if(!(it instanceof ANum)) throw EXPTYPE_X_X_X.get(info, tr, ti, it);
-    return tr == ti ? tr :
-           tr == DBL || ti == DBL ? DBL :
-           tr == FLT || ti == FLT ? FLT :
-           tr == DEC || ti == DEC ? DEC :
-           instanceOf(tr, ti, NNI) ? NNI :
-           instanceOf(tr, ti, SHR) ? SHR :
-           instanceOf(tr, ti, INT) ? INT :
-           instanceOf(tr, ti, LNG) ? LNG :
-           instanceOf(tr, ti, NPI) ? NPI : ITR;
-  }
-
-  /**
-   * Checks if the specified types are instances of the same type.
-   * @param tr result type
-   * @param ti new item type
-   * @param type to check
-   * @return result of check
-   */
-  private static boolean instanceOf(final Type tr, final Type ti, final Type type) {
-    return tr.instanceOf(type) && ti.instanceOf(type);
+    final Type tc = curr.type;
+    if(!(it instanceof ANum)) throw EXPTYPE_X_X_X.get(info, tc, ti, it);
+    return tc == ti ? null :
+           tc == DBL || ti == DBL ? DBL :
+           tc == FLT || ti == FLT ? FLT :
+           null;
   }
 }
