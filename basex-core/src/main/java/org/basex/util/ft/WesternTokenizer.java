@@ -156,7 +156,7 @@ public final class WesternTokenizer extends Tokenizer {
       } else if(!pa && ch == '\n') {
         pa = true;
         ++paragraph;
-      } else if(valid(ch)) {
+      } else if(lod(ch)) {
         // backslash (bs) followed by any character is the character itself:
         if(bs) {
           --cp;
@@ -187,7 +187,7 @@ public final class WesternTokenizer extends Tokenizer {
           continue;
         }
       }
-      if(!valid(ch)) {
+      if(!lod(ch)) {
         if(bs) --cp;
         break;
       }
@@ -215,7 +215,7 @@ public final class WesternTokenizer extends Tokenizer {
     for(; cp < txtl; cp += cl(txt, cp)) {
       final int ch = cp(txt, cp);
       if(ch == '\n') pa = true;
-      else if(valid(ch)) break;
+      else if(lod(ch)) break;
       sp = true;
     }
     para = pa;
@@ -227,7 +227,7 @@ public final class WesternTokenizer extends Tokenizer {
     // parse token
     for(; cp < txtl; cp += cl(txt, cp)) {
       final int ch = cp(txt, cp);
-      if(!valid(ch)) break;
+      if(!lod(ch)) break;
     }
     epos = cp;
     ++pos;

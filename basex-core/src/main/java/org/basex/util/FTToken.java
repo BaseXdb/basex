@@ -1,7 +1,5 @@
 package org.basex.util;
 
-import static org.basex.util.Token.*;
-
 import org.basex.util.hash.*;
 
 /**
@@ -19,24 +17,19 @@ public final class FTToken {
    * @param ch character to be tested
    * @return result of check
    */
-  public static boolean valid(final int ch) {
-    return ch >= '0' && (ch < 0x80 ? LOD[ch - '0'] :
-        Character.isLetterOrDigit(ch)) || combining(ch);
+  public static boolean ws(final int ch) {
+    return Character.isWhitespace(ch);
   }
 
-  /** Letter-or-digit table for ASCII codes larger than '0'. */
-  private static final boolean[] LOD = {
-    true,  true,  true,  true,  true,  true,  true,  true,
-    true,  true,  false, false, false, false, false, false,
-    false, true,  true,  true,  true,  true,  true,  true,
-    true,  true,  true,  true,  true,  true,  true,  true,
-    true,  true,  true,  true,  true,  true,  true,  true,
-    true,  true,  true,  false, false, false, false, false,
-    false, true,  true,  true,  true,  true,  true,  true,
-    true,  true,  true,  true,  true,  true,  true,  true,
-    true,  true,  true,  true,  true,  true,  true,  true,
-    true,  true,  true,  false, false, false, false, false
-  };
+  /**
+   * Returns true if the specified character is a valid full-text letter or digit.
+   * @param ch character to be tested
+   * @return result of check
+   */
+  public static boolean lod(final int ch) {
+    final int t = Character.getType(ch);
+    return isLOD(t) || isCombining(t);
+  }
 
   /**
    * Returns a token without diacritics.
@@ -46,10 +39,10 @@ public final class FTToken {
   public static byte[] noDiacritics(final byte[] token) {
     final int tl = token.length;
     final TokenBuilder tb = new TokenBuilder(tl);
-    for(int c = 0; c < tl; c += cl(token, c)) {
-      int cp = cp(token, c);
-      if(cp >= 0xC0) {
-        if(combining(cp)) continue;
+    for(int c = 0; c < tl; c += Token.cl(token, c)) {
+      int cp = Token.cp(token, c);
+      if(cp >= 0x80) {
+        if(isCombining(Character.getType(cp))) continue;
         cp = noDiacritics(cp);
       }
       tb.add(cp);
@@ -58,14 +51,31 @@ public final class FTToken {
   }
 
   /**
-   * Checks if the character is a combining mark.
-   * @param cp codepoint to be normalized
-   * @return resulting character
+   * Checks if a character is a letter or digit.
+   * @param type character type
+   * @return result of check
    */
-  private static boolean combining(final int cp) {
-    return cp >= 0x0300 && cp <= 0x036F || cp >= 0x1AB0 && cp <= 0x1AFF ||
-           cp >= 0x1DC0 && cp <= 0x1DFF || cp >= 0x20D0 && cp <= 0x20FF ||
-           cp >= 0xFE20 && cp <= 0xFE2F;
+  public static boolean isLOD(final int type) {
+    return ((1 << Character.UPPERCASE_LETTER |
+      1 << Character.LOWERCASE_LETTER |
+      1 << Character.TITLECASE_LETTER |
+      1 << Character.MODIFIER_LETTER |
+      1 << Character.OTHER_LETTER |
+      1 << Character.DECIMAL_DIGIT_NUMBER) >> type & 1)
+      != 0;
+  }
+
+  /**
+   * Checks if a character is a combining mark.
+   * @param type character type
+   * @return result of check
+   */
+  private static boolean isCombining(final int type) {
+    return (1 << type & (
+      1 << Character.NON_SPACING_MARK |
+      1 << Character.COMBINING_SPACING_MARK |
+      1 << Character.ENCLOSING_MARK
+    )) != 0;
   }
 
   /**
