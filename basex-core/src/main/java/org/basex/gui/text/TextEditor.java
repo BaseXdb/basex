@@ -1,6 +1,5 @@
 package org.basex.gui.text;
 
-import static org.basex.util.FTToken.*;
 import static org.basex.util.Token.*;
 
 import java.util.*;
@@ -158,15 +157,14 @@ public final class TextEditor {
     int ch = curr();
     forward(select);
     if(ch != '\n') {
-      if(Character.isLetterOrDigit(ch)) {
-        while(Character.isLetterOrDigit(ch)) ch = next();
-        while(ch != '\n' && Character.isWhitespace(ch)) ch = next();
-      } else if(Character.isWhitespace(ch)) {
-        while(ch != '\n' && Character.isWhitespace(ch)) ch = next();
+      if(FTToken.lod(ch)) {
+        while(FTToken.lod(ch)) ch = next();
+        while(ch != '\n' && FTToken.ws(ch)) ch = next();
+      } else if(FTToken.ws(ch)) {
+        while(ch != '\n' && FTToken.ws(ch)) ch = next();
       } else {
-        while(ch != '\n' && !Character.isLetterOrDigit(ch) &&
-            !Character.isWhitespace(ch)) ch = next();
-        while(ch != '\n' && Character.isWhitespace(ch)) ch = next();
+        while(ch != '\n' && !FTToken.lod(ch) && !FTToken.ws(ch)) ch = next();
+        while(ch != '\n' && FTToken.ws(ch)) ch = next();
       }
       if(pos != size()) prev();
     }
@@ -182,14 +180,13 @@ public final class TextEditor {
 
     int ch = back(select);
     if(ch != '\n') {
-      if(Character.isLetterOrDigit(ch)) {
-        while(Character.isLetterOrDigit(ch)) ch = prev();
-      } else if(Character.isWhitespace(ch)) {
-        while(ch != '\n' && Character.isWhitespace(ch)) ch = prev();
-        while(Character.isLetterOrDigit(ch)) ch = prev();
+      if(FTToken.lod(ch)) {
+        while(FTToken.lod(ch)) ch = prev();
+      } else if(FTToken.ws(ch)) {
+        while(ch != '\n' && FTToken.ws(ch)) ch = prev();
+        while(FTToken.lod(ch)) ch = prev();
       } else {
-        while(ch != '\n' && !Character.isLetterOrDigit(ch) &&
-            !Character.isWhitespace(ch)) ch = prev();
+        while(ch != '\n' && !FTToken.lod(ch) && !FTToken.ws(ch)) ch = prev();
       }
       if(pos != 0) next();
     }
@@ -286,11 +283,11 @@ public final class TextEditor {
     final int p = pos;
     boolean s = true;
     // find beginning of line
-    while(back(select) != '\n') s &= Character.isWhitespace(curr());
+    while(back(select) != '\n') s &= FTToken.ws(curr());
     if(pos != 0 || curr() == '\n') forward(select);
     // move to first non-whitespace character
     if(p == pos || !s) {
-      while(Character.isWhitespace(curr()) && curr() != '\n') forward(select);
+      while(FTToken.ws(curr()) && curr() != '\n') forward(select);
     }
 
     if(select) endSelection();
@@ -1048,10 +1045,10 @@ public final class TextEditor {
    * Selects the word at the cursor position.
    */
   void selectWord() {
-    final boolean ch = valid(curr());
+    final boolean ch = FTToken.lod(curr());
     while(pos() > 0) {
       final int cp = back(true);
-      if(cp == '\n' || ch != valid(cp)) {
+      if(cp == '\n' || ch != FTToken.lod(cp)) {
         forward(true);
         break;
       }
@@ -1059,7 +1056,7 @@ public final class TextEditor {
     startSelect();
     while(pos() < size()) {
       final int cp = curr();
-      if(cp == '\n' || ch != valid(cp)) break;
+      if(cp == '\n' || ch != FTToken.lod(cp)) break;
       forward(true);
     }
     endSelection();

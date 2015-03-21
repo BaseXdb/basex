@@ -63,10 +63,10 @@ final class TextIterator {
     // find next token boundary
     int ch = cp(text, p);
     p += cl(text, p);
-    if(valid(ch)) {
+    if(lod(ch)) {
       while(p < length) {
         ch = cp(text, p);
-        if(!valid(ch)) break;
+        if(!lod(ch)) break;
         p += cl(text, p);
       }
     }
