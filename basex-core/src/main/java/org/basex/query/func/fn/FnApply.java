@@ -2,6 +2,8 @@ package org.basex.query.func.fn;
 
 import static org.basex.query.QueryError.*;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
@@ -26,11 +28,12 @@ public final class FnApply extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     final FItem fun = toFunc(exprs[0], qc);
     final Array array = toArray(exprs[1], qc);
-    final int as = array.arraySize();
+    final long as = array.arraySize();
     if(fun.arity() != as) throw APPLY_X_X.get(info, fun.arity(), as);
 
-    final ValueList vl = new ValueList(as);
-    for(final Value v : array.members()) vl.add(v);
+    final ValueList vl = new ValueList((int) as);
+    final Iterator<Value> iter = array.members();
+    while(iter.hasNext()) vl.add(iter.next());
     return fun.invokeValue(qc, info, vl.finish());
   }
 }

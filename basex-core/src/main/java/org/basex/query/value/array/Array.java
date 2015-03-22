@@ -3,6 +3,8 @@ package org.basex.query.value.array;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.fn.*;
@@ -11,62 +13,275 @@ import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.*;
+import org.basex.query.value.map.Map;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
- * Array item.
+ * An array storing {@link Value}s.
  *
  * @author BaseX Team 2005-15, BSD License
- * @author Christian Gruen
+ * @author Leo Woerteler
  */
-public final class Array extends FItem {
-  /** Empty array. */
-  public static final Array EMPTY = new Array(new Value[0], 0, 0);
-  /** Members of the array. */
-  private final Value[] members;
-  /** Starting index. */
-  private final int start;
-  /** Length. */
-  private final int size;
+public abstract class Array extends FItem {
+  /** Minimum size of a leaf. */
+  static final int MIN_LEAF = 8;
+  /** Maximum size of a leaf. */
+  static final int MAX_LEAF = 2 * MIN_LEAF - 1;
+  /** Minimum number of elements in a digit. */
+  static final int MIN_DIGIT = MIN_LEAF / 2;
+  /** Maximum number of elements in a digit. */
+  static final int MAX_DIGIT = MAX_LEAF + MIN_DIGIT;
+  /** Maximum size of a small array. */
+  static final int MAX_SMALL = 2 * MIN_DIGIT - 1;
 
   /**
-   * Constructor.
-   * @param members array members
-   * @param start starting index
-   * @param size number of members
+   * Default constructor.
    */
-  private Array(final Value[] members, final int start, final int size) {
+  Array() {
     super(SeqType.ANY_ARRAY, new AnnList());
-    this.members = members;
-    this.start = start;
-    this.size = size;
   }
 
   /**
-   * Returns an instance of this class.
-   * @param members values
-   * @return instance
+   * The empty sequence.
+   * Running time: <i>O(1)</i> and no allocation
+   * @return (unique) instance of an empty sequence
    */
-  public static Array get(final Value... members) {
-    final int s = members.length;
-    return s == 0 ? EMPTY : new Array(members, 0, s);
+  public static Array empty() {
+    return EmptyArray.INSTANCE;
   }
 
   /**
-   * Factory method for subarrays.
-   * @param array input array
-   * @param start start index (starting from 0}
-   * @param size number of members
+   * Creates a singleton array containing the given element.
+   * @param elem the contained element
+   * @return the singleton array
+   */
+  public static Array singleton(final Value elem) {
+    return new SmallArray(new Value[] { elem });
+  }
+
+  /**
+   * Creates an array containing the given elements.
+   * @param elems elements
+   * @return the resulting array
+   */
+  @SafeVarargs
+  public static Array from(final Value... elems) {
+    final ArrayBuilder builder = new ArrayBuilder();
+    for(final Value val : elems) builder.append(val);
+    return builder.freeze();
+  }
+
+  /**
+   * Creates an array containing the elements from the given {@link Iterable}.
+   * @param iter the iterable
+   * @return the resulting array
+   */
+  public static Array from(final Iterable<Value> iter) {
+    final ArrayBuilder builder = new ArrayBuilder();
+    for(final Value val : iter) builder.append(val);
+    return builder.freeze();
+  }
+
+  /**
+   * Creates an array containing the elements from the given {@link Iterator}.
+   * @param iter the iterator
+   * @return the resulting array
+   */
+  public static Array from(final Iterator<Value> iter) {
+    final ArrayBuilder builder = new ArrayBuilder();
+    while(iter.hasNext()) builder.append(iter.next());
+    return builder.freeze();
+  }
+
+  /**
+   * Prepends an element to the front of this array.
+   * Running time: <i>O(1)*</i>
+   * @param elem element to prepend
    * @return resulting array
    */
-  public static Array get(final Array array, final int start, final int size) {
-    return size == 0 ? EMPTY : start == 0 && size == array.size ? array :
-      new Array(array.members, array.start + start, size);
+  public abstract Array cons(final Value elem);
+
+  /**
+   * Appends an element to the back of this array.
+   * Running time: <i>O(1)*</i>
+   * @param elem element to append
+   * @return resulting array
+   */
+  public abstract Array snoc(final Value elem);
+
+  /**
+   * Gets the element at the given position in this array.
+   * Running time: <i>O(log n)</i>
+   * @param index index of the element to get
+   * @return the corresponding element
+   * @throws IndexOutOfBoundsException if the index is smaller that {@code 0}
+   *             or {@code >=} the {@link #arraySize()} of this array
+   */
+  public abstract Value get(long index);
+
+  /**
+   * Returns the number of elements in this array.
+   * Running time: <i>O(1)</i>
+   * @return number of elements
+   */
+  public abstract long arraySize();
+
+  /**
+   * Concatenates this array with another one.
+   * Running time: <i>O(log (min { this.arraySize(), other.arraySize() }))</i>
+   * @param other array to append to the end of this array
+   * @return resulting array
+   */
+  public abstract Array concat(Array other);
+
+  /**
+   * First element of this array, equivalent to {@code array.get(0)}.
+   * Running time: <i>O(1)</i>
+   * @return the first element
+   */
+  public abstract Value head();
+
+  /**
+   * Last element of this array, equivalent to {@code array.get(array.arraySize() - 1)}.
+   * Running time: <i>O(1)</i>
+   * @return last element
+   */
+  public abstract Value last();
+
+  /**
+   * Initial segment of this array, i.e. an array containing all elements of this array (in the
+   * same order), except for the last one.
+   * Running time: <i>O(1)*</i>
+   * @return initial segment
+   * @throws IllegalStateException if the array is empty
+   */
+  public abstract Array init();
+
+  /**
+   * Tail segment of this array, i.e. an array containing all elements of this array (in the
+   * same order), except for the first one.
+   * Running time: <i>O(1)*</i>
+   * @return tail segment
+   * @throws IllegalStateException if the array is empty
+   */
+  public abstract Array tail();
+
+  /**
+   * Extracts a contiguous part of this array.
+   * @param pos position of first element
+   * @param len number of elements
+   * @return the sub-array
+   * @throws IndexOutOfBoundsException if {@code pos < 0} or {@code pos + len > this.arraySize()}
+   */
+  public abstract Array subArray(final long pos, final long len);
+
+  /**
+   * Returns an array with the same elements as this one, but their order reversed.
+   * Running time: <i>O(n)</i>
+   * @return reversed version of this array
+   */
+  public abstract Array reverse();
+
+  @Override
+  public final boolean isEmpty() {
+    return false;
   }
+
+  /**
+   * Checks if this array is empty.
+   * Running time: <i>O(1)</i>
+   * @return {@code true} if the array is empty, {@code false} otherwise
+   */
+  public abstract boolean isEmptyArray();
+
+  /**
+   * Inserts the given element at the given position into this array.
+   * Running time: <i>O(log n)</i>
+   * @param pos insertion position, must be between {@code 0} and {@code this.arraySize()}
+   * @param val element to insert
+   * @return resulting array
+   * @throws IndexOutOfBoundsException if {@code pos < 0 || pos > this.arraySize()} holds
+   */
+  public abstract Array insertBefore(final long pos, final Value val);
+
+  /**
+   * Removes the element at the given position in this array.
+   * Running time: <i>O(log n)</i>
+   * @param pos deletion position, must be between {@code 0} and {@code this.arraySize() - 1}
+   * @return resulting array
+   * @throws IndexOutOfBoundsException if {@code pos < 0 || pos >= this.arraySize()} holds
+   */
+  public abstract Array remove(final long pos);
+
+  /**
+   * Iterator over the members of this array.
+   * @param reverse flag for iterating from back to front
+   * @return array over the array members
+   */
+  public abstract ListIterator<Value> members(final boolean reverse);
+
+  /**
+   * Iterator over the members of this array.
+   * @return array over the array members
+   */
+  public final ListIterator<Value> members() {
+    return members(false);
+  }
+
+  /**
+   * Prepends the given elements to this array.
+   * @param vals values, with length at most {@link Array#MAX_SMALL}
+   * @return resulting array
+   */
+  abstract Array consSmall(final Value[] vals);
+
+  /**
+   * Returns an array containing the values at the indices {@code from} to {@code to - 1} in
+   * the given array. Its length is always {@code to - from}. If {@code from} is smaller than zero,
+   * the first {@code -from} entries in the resulting array are {@code null}.
+   * If {@code to > arr.length} then the last {@code to - arr.length} entries are {@code null}.
+   * If {@code from == 0 && to == arr.length}, the original array is returned.
+   * @param arr input array
+   * @param from first index, inclusive (may be negative)
+   * @param to last index, exclusive (may be greater than {@code arr.length})
+   * @return resulting array
+   */
+  static final Value[] slice(final Value[] arr, final int from, final int to) {
+    final Value[] out = new Value[to - from];
+    final int in0 = Math.max(0, from), in1 = Math.min(to, arr.length);
+    final int out0 = Math.max(-from, 0);
+    System.arraycopy(arr, in0, out, out0, in1 - in0);
+    return out;
+  }
+
+  /**
+   * Concatenates the two int arrays.
+   * @param as first array
+   * @param bs second array
+   * @return resulting array
+   */
+  static final Value[] concat(final Value[] as, final Value[] bs) {
+    final int l = as.length, r = bs.length, n = l + r;
+    final Value[] out = new Value[n];
+    System.arraycopy(as, 0, out, 0, l);
+    System.arraycopy(bs, 0, out, l, r);
+    return out;
+  }
+
+  /**
+   * Checks that this array's implementation does not violate any invariants.
+   * @throws AssertionError if an invariant was violated
+   */
+  abstract void checkInvariants();
+
+  /**
+   * Returns an array containing the number of elements stored at each level of the tree.
+   * @return array of sizes
+   */
+  abstract long[] sizes();
 
   @Override
   public Value invValue(final QueryContext qc, final InputInfo ii, final Value... args)
@@ -89,12 +304,12 @@ public final class Array extends FItem {
    * @return bound value if found, the empty sequence {@code ()} otherwise
    * @throws QueryException query exception
    */
-  public Value get(final Item key, final InputInfo ii) throws QueryException {
+  public final Value get(final Item key, final InputInfo ii) throws QueryException {
     if(!key.type.instanceOf(AtomType.ITR) && !key.type.isUntyped())
       throw castError(ii, key, AtomType.ITR);
 
-    final long pos = key.itr(ii);
-    if(pos > 0 && pos <= size) return get((int) pos - 1);
+    final long pos = key.itr(ii), size = arraySize();
+    if(pos > 0 && pos <= size) return get(pos - 1);
     throw (size == 0 ? ARRAYEMPTY : ARRAYBOUNDS_X_X).get(ii, pos, size);
   }
 
@@ -129,36 +344,12 @@ public final class Array extends FItem {
     return null;
   }
 
-  /**
-   * Returns a member iterator.
-   * @return iterator
-   */
-  public ArrayIterator<Value> members() {
-    return new ArrayIterator<>(members, start, start + size);
-  }
-
-  /**
-   * Returns the member at the specified index.
-   * @param index index
-   * @return value
-   */
-  public Value get(final int index) {
-    return members[start + index];
-  }
-
-  /**
-   * Number of members contained in this array.
-   * @return size
-   */
-  public int arraySize() {
-    return size;
-  }
-
   @Override
   public Array materialize(final InputInfo ii) throws QueryException {
-    final ValueList vl = new ValueList(size);
-    for(int a = 0; a < size; a++) vl.add(get(a).materialize(ii));
-    return vl.array();
+    final ArrayBuilder builder = new ArrayBuilder();
+    final Iterator<Value> iter = members();
+    while(iter.hasNext()) builder.append(iter.next().materialize(ii));
+    return builder.freeze();
   }
 
   @Override
@@ -175,8 +366,9 @@ public final class Array extends FItem {
   @Override
   public long atomSize() {
     long s = 0;
-    for(int a = 0; a < size; a++) {
-      final Value v = get(a);
+    final Iterator<Value> iter = members();
+    while(iter.hasNext()) {
+      final Value v = iter.next();
       final long vs = v.size();
       for(int i = 0; i < vs; i++) s += v.itemAt(i).atomSize();
     }
@@ -191,11 +383,11 @@ public final class Array extends FItem {
    * @throws QueryException query exception
    */
   private Value atm(final InputInfo ii, final boolean single) throws QueryException {
-    final long s = atomSize();
+    final long s = atomSize(), size = arraySize();
     if(single && s > 1) throw SEQFOUND_X.get(ii, this);
     if(size == 1) return get(0).atomValue(ii);
     final ValueBuilder vb = new ValueBuilder((int) s);
-    for(int a = 0; a < size; a++) vb.add(get(a).atomValue(ii));
+    for(long a = 0; a < size; a++) vb.add(get(a).atomValue(ii));
     return vb.value();
   }
 
@@ -220,9 +412,10 @@ public final class Array extends FItem {
   public void string(final TokenBuilder tb, final InputInfo ii) throws QueryException {
     tb.add('[');
     int c = 0;
-    for(int a = 0; a < size; a++) {
+    final Iterator<Value> iter = members();
+    while(iter.hasNext()) {
       if(c++ > 0) tb.add(", ");
-      final Value v = get(a);
+      final Value v = iter.next();
       final long vs = v.size();
       if(vs != 1) tb.add('(');
       int cc = 0;
@@ -245,7 +438,8 @@ public final class Array extends FItem {
    */
   public boolean hasType(final ArrayType t) {
     if(!t.retType.eq(SeqType.ITEM_ZM)) {
-      for(int a = 0; a < size; a++) if(!t.retType.instance(get(a))) return false;
+      final Iterator<Value> iter = members();
+      while(iter.hasNext()) if(!t.retType.instance(iter.next())) return false;
     }
     return true;
   }
@@ -263,9 +457,10 @@ public final class Array extends FItem {
 
     if(item instanceof Array) {
       final Array o = (Array) item;
-      if(size != o.size) return false;
-      for(int a = 0; a < size; a++) {
-        final Value v1 = get(a), v2 = o.get(a);
+      if(arraySize() != o.arraySize()) return false;
+      final Iterator<Value> it1 = members(), it2 = o.members();
+      while(it1.hasNext()) {
+        final Value v1 = it1.next(), v2 = it2.next();
         if(v1.size() != v2.size() || !new Compare(ii).collation(coll).equal(v1, v2))
           return false;
       }
@@ -281,25 +476,29 @@ public final class Array extends FItem {
 
   @Override
   public void plan(final FElem plan) {
+    final long size = arraySize();
     final FElem el = planElem(SIZE, size);
-    final int max = Math.min(size, 5);
+    final int max = (int) Math.min(size, 5);
     for(int i = 0; i < max; i++) get(i).plan(el);
     addPlan(plan, el);
   }
 
   @Override
-  public Object toJava() throws QueryException {
-    final Object[] tmp = new Object[size];
-    for(int a = 0; a < size; a++) tmp[a] = get(a).toJava();
+  public Object[] toJava() throws QueryException {
+    final long size = arraySize();
+    final Object[] tmp = new Object[(int) size];
+    final Iterator<Value> iter = members();
+    for(int i = 0; iter.hasNext(); i++) tmp[i] = iter.next().toJava();
     return tmp;
   }
 
   @Override
   public String toString() {
     final StringBuilder tb = new StringBuilder().append('[');
-    for(int a = 0; a < size; a++) {
-      if(a != 0) tb.append(", ");
-      final Value value = get(a);
+    final Iterator<Value> iter = members();
+    for(boolean fst = true; iter.hasNext(); fst = false) {
+      if(!fst) tb.append(", ");
+      final Value value = iter.next();
       final long vs = value.size();
       if(vs != 1) tb.append('(');
       for(int i = 0; i < vs; i++) {

@@ -1,6 +1,7 @@
 package org.basex.query.iter;
 
 import java.io.*;
+import java.util.*;
 
 import org.basex.data.*;
 import org.basex.io.out.*;
@@ -88,8 +89,9 @@ public final class ValueBuilder extends ValueIter implements Result {
    */
   public void addFlattened(final Item it) {
     if(it instanceof Array) {
-      for(final Value v : ((Array) it).members()) {
-        for(final Item i : v) addFlattened(i);
+      final Iterator<Value> iter = ((Array) it).members();
+      while(iter.hasNext()) {
+        for(final Item i : iter.next()) addFlattened(i);
       }
     } else {
       add(it);

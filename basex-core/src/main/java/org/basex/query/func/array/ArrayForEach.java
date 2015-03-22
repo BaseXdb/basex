@@ -1,8 +1,10 @@
 package org.basex.query.func.array;
 
+import java.util.*;
+
 import org.basex.query.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
+import org.basex.query.value.array.*;
 import org.basex.query.value.array.Array;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -18,8 +20,9 @@ public final class ArrayForEach extends ArrayFn {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Array array = toArray(exprs[0], qc);
     final FItem fun = checkArity(exprs[1], 1, qc);
-    final ValueList vl = new ValueList(array.arraySize());
-    for(final Value v : array.members()) vl.add(fun.invokeValue(qc, info, v));
-    return vl.array();
+    final ArrayBuilder builder = new ArrayBuilder();
+    final Iterator<Value> iter = array.members();
+    while(iter.hasNext()) builder.append(fun.invokeValue(qc, info, iter.next()));
+    return builder.freeze();
   }
 }

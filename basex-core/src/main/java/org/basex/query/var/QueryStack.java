@@ -131,9 +131,11 @@ public final class QueryStack {
    */
   public String dump() {
     final StringBuilder sb = new StringBuilder(QueryText.DEBUGLOCAL + ':');
-    for(int i = end - 1; i >= 0; i--) {
-      sb.append(Prop.NL).append("  $").append(vars[i].name).append(" := ").append(stack[i]);
-      if(i == start && i > 0) sb.append(Prop.NL).append(QueryText.DEBUGGLOBAL + ':');
+    for(int i = end; --i >= 0;) {
+      if(vars[i] != null) {
+        sb.append(Prop.NL).append("  $").append(vars[i].name).append(" := ").append(stack[i]);
+        if(i == start && i > 0) sb.append(Prop.NL).append(QueryText.DEBUGGLOBAL + ':');
+      }
     }
     return sb.toString();
   }

@@ -2,12 +2,14 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryError.*;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.Array;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.*;
+import org.basex.query.value.map.Map;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -49,7 +51,12 @@ public final class Lookup extends Arr {
 
       final FItem f = (FItem) ctx;
       if(exprs[0] == Str.WC) {
-        for(final Value v : map ? ((Map) f).values() : ((Array) f).members()) vb.add(v);
+        if(map) {
+          for(final Value v : ((Map) f).values()) vb.add(v);
+        } else {
+          final Iterator<Value> iter = ((Array) f).members();
+          while(iter.hasNext()) vb.add(iter.next());
+        }
       } else {
         final Iter ir = qc.iter(exprs[0]);
         for(Item it; (it = ir.next()) != null;) vb.add(f.invokeValue(qc, info, it));
