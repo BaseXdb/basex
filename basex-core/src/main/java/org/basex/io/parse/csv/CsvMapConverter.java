@@ -4,7 +4,7 @@ import java.util.*;
 
 import org.basex.build.csv.*;
 import org.basex.query.*;
-import org.basex.query.iter.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.Map;
 
@@ -16,9 +16,9 @@ import org.basex.query.value.map.Map;
  */
 final class CsvMapConverter extends CsvConverter {
   /** All records. */
-  private final ArrayList<ValueBuilder> records = new ArrayList<>(1);
+  private final ArrayList<ItemList> records = new ArrayList<>(1);
   /** Current record. */
-  private ValueBuilder record = new ValueBuilder();
+  private ItemList record = new ItemList();
 
   /**
    * Constructor.
@@ -35,7 +35,7 @@ final class CsvMapConverter extends CsvConverter {
 
   @Override
   protected void record() {
-    record = new ValueBuilder();
+    record = new ItemList();
     if(!headers.isEmpty()) record.add(Map.EMPTY);
     records.add(record);
     col = 0;
@@ -61,8 +61,8 @@ final class CsvMapConverter extends CsvConverter {
     try {
       Map map = Map.EMPTY;
       int row = 1;
-      for(final ValueBuilder vb : records) {
-        map = map.put(Int.get(row++), vb.value(), null);
+      for(final ItemList list : records) {
+        map = map.put(Int.get(row++), list.value(), null);
       }
       return map;
     } catch(final QueryException ex) {

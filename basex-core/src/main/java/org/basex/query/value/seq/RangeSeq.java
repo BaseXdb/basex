@@ -99,6 +99,16 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
+  public Value insert(final long pos, final Item item) {
+    return copyInsert(pos, item);
+  }
+
+  @Override
+  public Value remove(final long pos) {
+    return pos == 0 || pos == size - 1 ? subSeq(pos == 0 ? 0 : 1, size - 1) : copyRemove(pos);
+  }
+
+  @Override
   public Value reverse() {
     final long s = size();
     return asc ? get(start + s - 1, s, false) : get(start - s + 1, s, true);

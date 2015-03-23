@@ -12,6 +12,6 @@ import org.basex.query.iter.*;
 public final class XQueryUpdate extends XQueryEval {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    return eval(qc, toToken(exprs[0], qc), null, true);
+    return eval(qc, toToken(exprs[0], qc), null, true).iter();
   }
 }

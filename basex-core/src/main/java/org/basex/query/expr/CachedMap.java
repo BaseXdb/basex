@@ -2,6 +2,7 @@ package org.basex.query.expr;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;
@@ -26,15 +27,20 @@ final class CachedMap extends SimpleMap {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
+    return value(qc).iter();
+  }
+
+  @Override
+  public Value value(final QueryContext qc) throws QueryException {
     final Value cv = qc.value;
     final long cp = qc.pos, cs = qc.size;
     try {
-      ValueBuilder result = new ValueBuilder().add(qc.value(exprs[0]));
+      ItemList result = qc.value(exprs[0]).cache();
       final int el = exprs.length;
       for(int e = 1; e < el; e++) {
         qc.pos = 0;
         qc.size = result.size();
-        final ValueBuilder vb = new ValueBuilder((int) result.size());
+        final ItemList vb = new ItemList(result.size());
         for(final Item it : result) {
           qc.pos++;
           qc.value = it;
@@ -42,7 +48,7 @@ final class CachedMap extends SimpleMap {
         }
         result = vb;
       }
-      return result;
+      return result.value();
     } finally {
       qc.value = cv;
       qc.size = cs;

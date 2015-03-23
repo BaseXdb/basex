@@ -26,10 +26,12 @@ import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.up.*;
 import org.basex.query.util.collation.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.seq.tree.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -343,13 +345,13 @@ public final class QueryContext extends Proc implements Closeable {
       if(!updating) return root.iter(this);
 
       // cache results
-      ValueBuilder cache = root.cache(this);
+      ItemList cache = root.cache(this);
 
       final Updates updates = resources.updates;
       if(updates != null) {
         // if parent context exists, updates will be performed by main context
         if(qcParent == null) {
-          final ValueBuilder output = resources.output;
+          final ItemList output = resources.output;
 
           // copy nodes that will be affected by an update operation
           final HashSet<Data> datas = updates.prepare(this);
@@ -367,7 +369,7 @@ public final class QueryContext extends Proc implements Closeable {
           }
         }
       }
-      return cache;
+      return cache.iter();
 
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
@@ -381,7 +383,7 @@ public final class QueryContext extends Proc implements Closeable {
    * @param datas data references
    * @param dbs database names
    */
-  private void copy(final ValueBuilder cache, final HashSet<Data> datas, final StringList dbs) {
+  private void copy(final ItemList cache, final HashSet<Data> datas, final StringList dbs) {
     final long cs = cache.size();
     for(int c = 0; c < cs; c++) {
       final Item it = cache.get(c);
@@ -603,7 +605,7 @@ public final class QueryContext extends Proc implements Closeable {
 
     // evaluates the query
     final Iter ir = iter();
-    final ValueBuilder vb = new ValueBuilder();
+    final ItemList cache;
     Item it;
 
     // check if all results belong to the database of the input context
@@ -617,20 +619,25 @@ public final class QueryContext extends Proc implements Closeable {
       }
 
       final int ps = pres.size();
-      // all nodes have been processed: return compact node sequence
-      if(it == null || ps == max) return ps == 0 ? vb : new DBNodes(data, ftPosData, pres.finish());
+      if(it == null || ps == max) {
+        // all nodes have been processed: return compact node sequence
+        return ps == 0 ? new ItemList(0) : new DBNodes(data, ftPosData, pres.finish());
+      }
 
       // otherwise, add nodes to standard iterator
-      for(int p = 0; p < ps; ++p) vb.add(new DBNode(data, pres.get(p)));
-      vb.add(it);
+      cache = new ItemList();
+      for(int p = 0; p < ps; ++p) cache.add(new DBNode(data, pres.get(p)));
+      cache.add(it);
+    } else {
+      cache = new ItemList();
     }
 
     // use standard iterator
     while((it = ir.next()) != null) {
       checkStop();
-      if(vb.size() < max) vb.add(it.materialize(null));
+      if(cache.size() < max) cache.add(it.materialize(null));
     }
-    return vb;
+    return cache;
   }
 
   /**
@@ -679,7 +686,7 @@ public final class QueryContext extends Proc implements Closeable {
 
       // sub types overriding the global value (value \2 type)
       if(string.indexOf('\2') != -1) {
-        final ValueBuilder vb = new ValueBuilder(strings.size());
+        final ValueBuilder vb = new ValueBuilder();
         for(final String str : strings) {
           final int i = str.indexOf('\2');
           final String s = i == -1 ? str : str.substring(0, i);
@@ -732,7 +739,7 @@ public final class QueryContext extends Proc implements Closeable {
       if(vl instanceof Item) return tp.cast((Item) vl, this, sc, null);
       // cast sequence
       final Value v = (Value) vl;
-      final ValueBuilder seq = new ValueBuilder((int) v.size());
+      final ValueBuilder seq = new ValueBuilder();
       for(final Item i : v) seq.add(tp.cast(i, this, sc, null));
       return seq.value();
     }
@@ -740,7 +747,7 @@ public final class QueryContext extends Proc implements Closeable {
     if(vl instanceof String[]) {
       // cast string array
       final String[] strings = (String[]) vl;
-      final ValueBuilder seq = new ValueBuilder(strings.length);
+      final ValueBuilder seq = new ValueBuilder();
       for(final String s : strings) seq.add(tp.cast(s, this, sc, null));
       return seq.value();
     }

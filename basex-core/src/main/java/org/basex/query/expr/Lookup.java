@@ -10,6 +10,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.array.Array;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.Map;
+import org.basex.query.value.seq.tree.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -43,7 +44,12 @@ public final class Lookup extends Arr {
   }
 
   @Override
-  public ValueIter iter(final QueryContext qc) throws QueryException {
+  public Iter iter(final QueryContext qc) throws QueryException {
+    return value(qc).iter();
+  }
+
+  @Override
+  public Value value(final QueryContext qc) throws QueryException {
     final ValueBuilder vb = new ValueBuilder();
     for(final Item ctx : exprs.length == 1 ? ctxValue(qc) : qc.value(exprs[1])) {
       final boolean map = ctx instanceof Map, array = ctx instanceof Array;
@@ -62,7 +68,7 @@ public final class Lookup extends Arr {
         for(Item it; (it = ir.next()) != null;) vb.add(f.invokeValue(qc, info, it));
       }
     }
-    return vb;
+    return vb.value();
   }
 
   @Override

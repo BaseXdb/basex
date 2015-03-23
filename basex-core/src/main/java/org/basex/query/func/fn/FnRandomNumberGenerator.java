@@ -2,10 +2,10 @@ package org.basex.query.func.fn;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.Map;
-import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -74,11 +74,10 @@ public final class FnRandomNumberGenerator extends StandardFunc {
     return RuntimeExpr.funcItem(new RuntimeExpr(info) {
       @Override
       public Value value(final QueryContext qc) throws QueryException {
-        final Value value = qc.get(params[0]);
-        final int sz = (int) value.size();
-        final Item[] items = new Item[sz];
-        value.writeTo(items, 0);
+        final ItemList cache = qc.get(params[0]).cache();
+        final int sz = cache.size();
 
+        final Item[] items = cache.internal();
         long s = seed;
         for(int i = sz; --i >= 1;) {
           s = next(s);
@@ -89,7 +88,7 @@ public final class FnRandomNumberGenerator extends StandardFunc {
             items[j] = item;
           }
         }
-        return Seq.get(items);
+        return cache.value();
       }
     }, 1, sc, qctx);
   }

@@ -9,6 +9,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.seq.tree.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
 import org.basex.query.var.*;
@@ -59,7 +60,7 @@ public final class Treat extends Single {
     if(seqType.zeroOrOne()) {
       final Item n = iter.next();
       if(n != null) {
-        final ValueBuilder vb = new ValueBuilder(3).add(it).add(n);
+        final ValueBuilder vb = new ValueBuilder().add(it).add(n);
         if(iter.next() != null) vb.add(Str.get(DOTS));
         throw NOTREAT_X_X_X.get(info, expr.seqType(), seqType, vb.value());
       }

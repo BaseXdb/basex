@@ -55,6 +55,29 @@ public final class StrSeq extends NativeSeq {
     return get(tmp);
   }
 
+  @Override
+  public Value insert(final long pos, final Item item) {
+    if(!(item instanceof Str)) return copyInsert(pos, item);
+
+    final int p = (int) pos, n = values.length;
+    final byte[] val = ((Str) item).string();
+    final byte[][] out = new byte[n + 1][];
+    System.arraycopy(values, 0, out, 0, p);
+    out[p] = val;
+    System.arraycopy(values, p, out, p + 1, n - p);
+    return new StrSeq(out);
+  }
+
+  @Override
+  public Value remove(final long pos) {
+    final int p = (int) pos, n = values.length - 1;
+    if(n == 1) return Str.get(values[1 - p]);
+    final byte[][] out = new byte[n][];
+    System.arraycopy(values, 0, out, 0, p);
+    System.arraycopy(values, p + 1, out, p, n - p);
+    return new StrSeq(out);
+  }
+
   // STATIC METHODS =====================================================================
 
   /**

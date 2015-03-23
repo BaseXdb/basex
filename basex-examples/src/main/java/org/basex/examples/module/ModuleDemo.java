@@ -1,10 +1,10 @@
 package org.basex.examples.module;
 
 import org.basex.query.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.tree.*;
 
 /**
  * This is a simple XQuery demo module that demonstrates how XQuery items can be
@@ -80,7 +80,7 @@ public class ModuleDemo extends QueryModule {
     ValueBuilder vb = new ValueBuilder();
     for(final Item item : value) {
       if(item instanceof DBNode) {
-        DBNode node = (DBNode) item;
+        final DBNode node = (DBNode) item;
         int id = node.data.id(node.pre);
         vb.add(Int.get(id));
       }

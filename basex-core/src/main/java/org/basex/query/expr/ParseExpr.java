@@ -13,6 +13,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.seq.tree.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -51,7 +52,7 @@ public abstract class ParseExpr extends Expr {
     if(it == null || ir.size() == 1) return it;
     final Item n = ir.next();
     if(n != null) {
-      final ValueBuilder vb = new ValueBuilder(3).add(it).add(n);
+      final ValueBuilder vb = new ValueBuilder().add(it).add(n);
       if(ir.next() != null) vb.add(Str.get(DOTS));
       throw SEQFOUND_X.get(ii, vb.value());
     }
@@ -101,7 +102,7 @@ public abstract class ParseExpr extends Expr {
       if(it != null && !(it instanceof ANode)) {
         final Item n = ir.next();
         if(n != null) {
-          final ValueBuilder vb = new ValueBuilder(3).add(it).add(n);
+          final ValueBuilder vb = new ValueBuilder().add(it).add(n);
           if(ir.next() != null) vb.add(Str.get(DOTS));
           throw EBV_X.get(ii, vb.value());
         }

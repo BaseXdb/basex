@@ -42,6 +42,27 @@ public final class BytSeq extends NativeSeq {
   }
 
   @Override
+  public Value insert(final long pos, final Item item) {
+    if(!(item instanceof Int && item.type == AtomType.BYT)) return copyInsert(pos, item);
+    final int p = (int) pos, n = values.length;
+    final byte[] out = new byte[n + 1];
+    System.arraycopy(values, 0, out, 0, p);
+    out[p] = (byte) ((Int) item).itr();
+    System.arraycopy(values, p, out, p + 1, n - p);
+    return new BytSeq(out);
+  }
+
+  @Override
+  public Value remove(final long pos) {
+    final int p = (int) pos, n = values.length - 1;
+    if(n == 1) return itemAt(1 - pos);
+    final byte[] out = new byte[n];
+    System.arraycopy(values, 0, out, 0, p);
+    System.arraycopy(values, p + 1, out, p, n - p);
+    return new BytSeq(out);
+  }
+
+  @Override
   public Value reverse() {
     final int s = values.length;
     final byte[] tmp = new byte[s];

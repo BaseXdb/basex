@@ -8,13 +8,13 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.fn.*;
-import org.basex.query.iter.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.Map;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.tree.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -386,8 +386,9 @@ public abstract class Array extends FItem {
     final long s = atomSize(), size = arraySize();
     if(single && s > 1) throw SEQFOUND_X.get(ii, this);
     if(size == 1) return get(0).atomValue(ii);
-    final ValueBuilder vb = new ValueBuilder((int) s);
-    for(long a = 0; a < size; a++) vb.add(get(a).atomValue(ii));
+    final ValueBuilder vb = new ValueBuilder();
+    final Iterator<Value> iter = members();
+    while(iter.hasNext()) vb.add(iter.next().atomValue(ii));
     return vb.value();
   }
 

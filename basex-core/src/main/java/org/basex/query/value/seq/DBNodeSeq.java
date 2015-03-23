@@ -6,10 +6,10 @@ import static org.basex.query.func.Function.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.tree.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -70,6 +70,22 @@ public final class DBNodeSeq extends NativeSeq {
   }
 
   @Override
+  public Value insert(final long pos, final Item item) {
+    // TODO check data instance?
+    return copyInsert(pos, item);
+  }
+
+  @Override
+  public Value remove(final long pos) {
+    final int p = (int) pos, n = pres.length - 1;
+    if(n == 1) return itemAt(1 - pos);
+    final int[] out = new int[n];
+    System.arraycopy(pres, 0, out, 0, p);
+    System.arraycopy(pres, p + 1, out, p, n - p);
+    return new DBNodeSeq(out, data, type, false);
+  }
+
+  @Override
   public Value reverse() {
     final int s = pres.length;
     final int[] tmp = new int[s];
@@ -79,7 +95,7 @@ public final class DBNodeSeq extends NativeSeq {
 
   @Override
   public Value atomValue(final InputInfo ii) throws QueryException {
-    final ValueBuilder vb = new ValueBuilder((int) size);
+    final ValueBuilder vb = new ValueBuilder();
     for(int s = 0; s < size; s++) vb.add(itemAt(s).atomValue(ii));
     return vb.value();
   }

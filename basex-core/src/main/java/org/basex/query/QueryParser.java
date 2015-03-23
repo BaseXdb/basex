@@ -34,7 +34,6 @@ import org.basex.query.expr.path.*;
 import org.basex.query.expr.path.Test.Kind;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
-import org.basex.query.iter.*;
 import org.basex.query.up.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
@@ -412,12 +411,12 @@ public class QueryParser extends InputParser {
         final InputInfo info = info();
         final QNm name = eQName(QNAME_X, XQ_URI);
 
-        final ValueBuilder vb = new ValueBuilder();
+        final ItemList items = new ItemList();
         if(wsConsumeWs(PAREN1)) {
           do {
             final Expr ex = literal();
             if(!(ex instanceof Item)) throw error(ANNVALUE);
-            vb.add((Item) ex);
+            items.add((Item) ex);
           } while(wsConsumeWs(COMMA));
           wsCheck(PAREN2);
         }
@@ -434,19 +433,17 @@ public class QueryParser extends InputParser {
         // check if annotation is specified more than once
         if(sig.single && anns.contains(sig)) throw BASX_TWICE_X_X.get(info, '%', sig.id());
 
-        final long arity = vb.size();
+        final long arity = items.size();
         if(arity < sig.minMax[0] || arity > sig.minMax[1])
           throw BASX_ANNNUM_X_X_X.get(info, sig, arity, arity == 1 ? "" : "s");
         final int al = sig.args.length;
         for(int a = 0; a < arity; a++) {
           final SeqType st = sig.args[Math.min(al - 1, a)];
-          final Item it = vb.get(a);
+          final Item it = items.get(a);
           if(!st.instance(it)) throw BASX_ANNTYPE_X_X_X.get(info, sig, st, it.seqType());
         }
 
-        final Item[] args = new Item[(int) vb.size()];
-        vb.value().writeTo(args, 0);
-        anns.add(new Ann(info, sig, args));
+        anns.add(new Ann(info, sig, items.finish()));
       } else {
         break;
       }

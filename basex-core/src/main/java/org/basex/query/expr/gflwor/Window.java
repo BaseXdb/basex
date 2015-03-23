@@ -15,6 +15,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.seq.tree.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
 import org.basex.query.var.*;
@@ -117,8 +118,7 @@ public final class Window extends Clause {
 
           // find end item
           if(fst != null) {
-            final ValueBuilder window = new ValueBuilder(
-                new Item[] {fst, null, null, null}, 1);
+            final ValueBuilder window = new ValueBuilder().add(fst);
             final Item[] st = vals == null ? new Item[] { curr, prev, next } : vals;
             final long ps = vals == null ? p : spos;
             vals = null;

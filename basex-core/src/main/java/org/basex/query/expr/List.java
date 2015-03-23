@@ -7,6 +7,7 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.seq.tree.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
 import org.basex.query.var.*;
@@ -83,7 +84,7 @@ public final class List extends Arr {
         else if(all != null && all.instanceOf(AtomType.ITR)) {
           val = IntSeq.get(vs, s, all);
         } else {
-          final ValueBuilder vb = new ValueBuilder(s);
+          final ValueBuilder vb = new ValueBuilder();
           for(int i = 0; i < c; i++) vb.add(vs[i]);
           val = vb.value();
         }

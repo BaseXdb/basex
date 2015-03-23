@@ -24,6 +24,7 @@ import org.basex.query.util.pkg.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.seq.tree.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.Type;
 import org.basex.util.*;
@@ -155,7 +156,7 @@ public abstract class JavaMapping extends Arr {
     }
     // any other array (also nested ones)
     final Object[] objs = (Object[]) obj;
-    final ValueBuilder vb = new ValueBuilder(objs.length);
+    final ValueBuilder vb = new ValueBuilder();
     for(final Object o : objs) vb.add(toValue(o, qc, sc));
     return vb.value();
   }

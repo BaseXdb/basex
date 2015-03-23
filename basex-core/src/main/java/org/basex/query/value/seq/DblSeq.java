@@ -43,6 +43,27 @@ public final class DblSeq extends NativeSeq {
   }
 
   @Override
+  public Value insert(final long pos, final Item item) {
+    if(!(item instanceof Dbl)) return copyInsert(pos, item);
+    final int p = (int) pos, n = values.length;
+    final double[] out = new double[n + 1];
+    System.arraycopy(values, 0, out, 0, p);
+    out[p] = (byte) ((Dbl) item).dbl();
+    System.arraycopy(values, p, out, p + 1, n - p);
+    return new DblSeq(out);
+  }
+
+  @Override
+  public Value remove(final long pos) {
+    final int p = (int) pos, n = values.length - 1;
+    if(n == 1) return itemAt(1 - pos);
+    final double[] out = new double[n];
+    System.arraycopy(values, 0, out, 0, p);
+    System.arraycopy(values, p + 1, out, p, n - p);
+    return new DblSeq(out);
+  }
+
+  @Override
   public Value reverse() {
     final int s = values.length;
     final double[] tmp = new double[s];

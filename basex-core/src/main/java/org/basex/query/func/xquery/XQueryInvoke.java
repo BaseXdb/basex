@@ -20,7 +20,7 @@ public final class XQueryInvoke extends XQueryEval {
     checkCreate(qc);
     final IO io = checkPath(exprs[0], qc);
     try {
-      return eval(qc, io.read(), io.path(), false);
+      return eval(qc, io.read(), io.path(), false).iter();
     } catch(final IOException ex) {
       throw IOERR_X.get(info, ex);
     }

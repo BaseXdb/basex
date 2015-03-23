@@ -57,7 +57,7 @@ import org.basex.util.hash.*;
 /**
  * Definitions of all built-in XQuery functions.
  * New namespace mappings for function prefixes and URIs must be added to the static initializer of
- * the {@code NSGlobal} class.
+ * the {@link NSGlobal} class.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
