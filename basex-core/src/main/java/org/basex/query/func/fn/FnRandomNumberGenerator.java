@@ -1,7 +1,5 @@
 package org.basex.query.func.fn;
 
-import java.util.*;
-
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
@@ -17,12 +15,28 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class FnRandomNumberGenerator extends StandardFunc {
+  /** Multiplier for the RNG. */
+  private static final long MULT = 0x5DEECE66DL;
+  /** Additive component for the RNG. */
+  private static final long ADD = 0xBL;
+  /** Mask for the RNG. */
+  private static final long MASK = (1L << 48) - 1;
+
   /** Number key. */
   private static final Str NUMBER = Str.get("number");
   /** Next key. */
   private static final Str NEXT = Str.get("next");
   /** Permute key. */
   private static final Str PERMUTE = Str.get("permute");
+
+  /**
+   * Computes the next seed for the given one.
+   * @param oldSeed old seed
+   * @return new seed
+   */
+  private static long next(final long oldSeed) {
+    return (oldSeed * MULT + ADD) & MASK;
+  }
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
@@ -32,73 +46,71 @@ public final class FnRandomNumberGenerator extends StandardFunc {
     } else {
       seed = qc.initDateTime().nano;
     }
-    return result(new Random(seed), qc);
+    return result(seed, qc);
   }
 
   /**
    * Returns a new result.
-   * @param random random number generator
+   * @param s0 initial seed
    * @param qc query context
    * @return map
    * @throws QueryException query exception
    */
-  private Map result(final Random random, final QueryContext qc) throws QueryException {
-    final Dbl number = Dbl.get(random.nextDouble());
-    final FuncItem next = RuntimeExpr.funcItem(new Next(random, info), 0, sc, qc);
-    final FuncItem permute = RuntimeExpr.funcItem(new Permute(random, info), 1, sc, qc);
+  private Map result(final long s0, final QueryContext qc) throws QueryException {
+    final long s1 = next(s0), s2 = next(s1);
+    final double dbl = (((s1 >>> 22) << 27) + (s2 >>> 21)) / (double) (1L << 53);
+    final Dbl number = Dbl.get(dbl);
+    final FItem next = nextFunc(s2, qc), permute = permuteFunc(s1, qc);
     return Map.EMPTY.put(NUMBER, number, info).put(NEXT, next, info).put(PERMUTE, permute, info);
   }
 
+  /**
+   * Creates the permutation function initialized by the given seed.
+   * @param seed initial seed
+   * @param qctx query context
+   * @return permutation function
+   */
+  private FuncItem permuteFunc(final long seed, final QueryContext qctx) {
+    return RuntimeExpr.funcItem(new RuntimeExpr(info) {
+      @Override
+      public Value value(final QueryContext qc) throws QueryException {
+        final Value value = qc.get(params[0]);
+        final int sz = (int) value.size();
+        final Item[] items = new Item[sz];
+        value.writeTo(items, 0);
 
-  /** Returns a new number. */
-  private final class Next extends RuntimeExpr {
-    /** Random number generator. */
-    private final Random random;
-
-    /**
-     * Constructor.
-     * @param random random number generator
-     * @param info input info
-     */
-    private Next(final Random random, final InputInfo info) {
-      super(info);
-      this.random = random;
-    }
-
-    @Override
-    public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-      return result(random, qc);
-    }
+        long s = seed;
+        for(int i = sz; --i >= 1;) {
+          s = next(s);
+          final int j = (int) ((s >>> 16) % (i + 1));
+          if(i != j) {
+            final Item item = items[i];
+            items[i] = items[j];
+            items[j] = item;
+          }
+        }
+        return Seq.get(items);
+      }
+    }, 1, sc, qctx);
   }
 
-  /** Returns a random permutation of supplied values. */
-  private static final class Permute extends RuntimeExpr {
-    /** Random number generator. */
-    private final Random random;
-
-    /**
-     * Constructor.
-     * @param random random number generator
-     * @param info input info
-     */
-    private Permute(final Random random, final InputInfo info) {
-      super(info);
-      this.random = random;
-    }
-
-    @Override
-    public Value value(final QueryContext qc) throws QueryException {
-      final Value value = qc.get(params[0]).value(qc);
-      final int sz = (int) value.size();
-      final Item[] items = new Item[sz];
-      value.writeTo(items, 0);
-      for(int i = 0; i < sz; i++) {
-        final int r = i + random.nextInt(sz - i);
-        final Item item = items[i];
-        items[i] = items[r];
-        items[r] = item;
+  /**
+   * Creates the function returning the next random number generator.
+   * @param seed initial seed
+   * @param qctx query context
+   * @return function returning the next random number generator
+   */
+  private FuncItem nextFunc(final long seed, final QueryContext qctx) {
+    return RuntimeExpr.funcItem(new RuntimeExpr(info) {
+      @Override
+      public Map item(final QueryContext qc, final InputInfo ii) throws QueryException {
+        return result(seed, qc);
       }
-      return Seq.get(items);
-    }
+
+      @Override
+      public Value value(final QueryContext qc) throws QueryException {
+        return result(seed, qc);
+      }
+    }, 0, sc, qctx);
   }
 }
