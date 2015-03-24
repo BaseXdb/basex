@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -60,6 +61,34 @@ abstract class Logical extends Arr {
     final FElem el = planElem();
     plan.add(el);
     for(final ExprInfo e : exprs) if(e != null) e.plan(el);
+  }
+
+  @Override
+  public Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
+      throws QueryException {
+    final Expr[] arr = exprs;
+    boolean change = false;
+    for(int i = 0; i < arr.length; i++) {
+      try {
+        final Expr e = arr[i].inline(qc, scp, var, ex);
+        if(e != null) {
+          arr[i] = e;
+          change = true;
+        }
+      } catch(final QueryException qe) {
+        // first expression is evaluated eagerly
+        if(i == 0) throw qe;
+
+        // everything behind the error is dead anyway
+        final Expr[] nw = new Expr[i + 1];
+        System.arraycopy(arr, 0, nw, 0, i);
+        nw[i] = FnError.get(qe, seqType());
+        exprs = nw;
+        change = true;
+        break;
+      }
+    }
+    return change ? optimize(qc, scp) : null;
   }
 
   /**

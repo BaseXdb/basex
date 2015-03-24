@@ -121,6 +121,11 @@ public final class SimpleTest extends QueryTest {
       { "Cast 3", booleans(false), "string('/') castable as xs:QName" },
       { "Cast 4", strings("error"),
         "try { '1999-12-31'/. castable as xs:date } catch err:XPTY0019 { 'error' }" },
+      { "Cast 5", strings("bar"),
+          "declare function local:shortcircuit($a) {"
+          + "  if($a castable as xs:double and xs:double($a) gt 0) then $a else 'bar'"
+          + "};"
+          + "local:shortcircuit('foo')" },
 
       { "Div 1", "xs:dayTimeDuration('PT0S') div xs:dayTimeDuration('PT0S')" },
       { "Div 2", "xs:yearMonthDuration('P0M') div xs:yearMonthDuration('P0M')" },
