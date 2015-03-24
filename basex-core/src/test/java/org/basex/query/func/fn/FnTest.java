@@ -158,6 +158,11 @@ public final class FnTest extends AdvancedQueryTest {
         + "  $m2('next')()('number') = $m1('next')()('number'),"
         + "  deep-equal($m1('permute')($seq), $m2('permute')($seq))"
         + ") satisfies true()", "true");
+    // ensure that the generator has no mutable state
+    query("for $i in 1 to 100 "
+        + "let $rng := fn:random-number-generator() "
+        + "where $rng?next()?number ne $rng?next()?number "
+        + "return error()");
   }
 
   /** Tests for the {@code apply} function. */
