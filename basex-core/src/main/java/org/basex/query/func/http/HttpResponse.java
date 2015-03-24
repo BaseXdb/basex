@@ -78,7 +78,7 @@ public final class HttpResponse {
     if(is != null) {
       try {
         final HttpPayload hp = new HttpPayload(is, body, info, options);
-        response.add(hp.parse(error, type, mtype));
+        response.add(hp.parse(mtype == null || error ? type : mtype));
         if(body) vb.add(hp.payloads());
       } finally {
         is.close();

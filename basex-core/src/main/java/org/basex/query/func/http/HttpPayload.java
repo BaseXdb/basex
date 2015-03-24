@@ -61,38 +61,33 @@ public final class HttpPayload {
 
   /**
    * Parses the HTTP payload and returns a result body element.
-   * @param error error flag
-   * @param ctype content type defined in the connection
-   * @param mtype content type (can be {@code null})
+   * @param type content type (can be {@code null})
    * @return body element
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  FElem parse(final boolean error, final String ctype, final String mtype)
-      throws IOException, QueryException {
-
+  FElem parse(final String type) throws IOException, QueryException {
     // error: use text/plain as content type
-    final String ct = mtype == null || error ? contentType(ctype) : mtype;
-
+    final String ct = contentType(type);
     final FElem body;
     if(isMultipart(ct)) {
       // multipart response
-      final byte[] boundary = boundary(ctype);
+      final byte[] boundary = boundary(type);
       if(boundary == null) throw HC_REQ_X.get(info, "No separation boundary specified");
 
-      body = new FElem(Q_MULTIPART).add(SerializerOptions.MEDIA_TYPE.name(), ct);
-      body.add(BOUNDARY, boundary);
+      body = new FElem(Q_MULTIPART).add(BOUNDARY, boundary);
       final ANodeList parts = new ANodeList();
       extractParts(concat(DASHES, boundary), parts);
       for(final ANode node : parts) body.add(node);
     } else {
       // single part response
-      body = new FElem(Q_BODY).add(SerializerOptions.MEDIA_TYPE.name(), ct);
+      body = new FElem(Q_BODY);
       if(payloads != null) {
-        final byte[] pl = extract(ct, charset(ctype));
+        final byte[] pl = extract(ct, charset(type));
         payloads.add(parse(pl, ct));
       }
     }
+    body.add(SerializerOptions.MEDIA_TYPE.name(), ct);
     return body;
   }
 
@@ -363,8 +358,8 @@ public final class HttpPayload {
 
   /**
    * Extracts the content from a "Content-type" header.
-   * @param ctype value for "Content-type" header
-   * @return result
+   * @param ctype value for "Content-type" header, or ({@code null})
+   * @return result, or {@link MimeTypes#APP_OCTET} if specified content type was {@code null}
    */
   private static String contentType(final String ctype) {
     if(ctype == null) return APP_OCTET;
@@ -374,8 +369,8 @@ public final class HttpPayload {
 
   /**
    * Extracts the charset from the 'Content-Type' header if present.
-   * @param ctype Content-Type header
-   * @return charset charset
+   * @param ctype Content-Type header, or ({@code null})
+   * @return charset charset, or {@code null}
    */
   private static String charset(final String ctype) {
     // content type is unknown
