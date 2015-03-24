@@ -1,5 +1,6 @@
 package org.basex.query.func.http;
 
+import static org.basex.io.MimeTypes.*;
 import static org.basex.query.func.http.HttpText.*;
 import static org.basex.util.Token.*;
 
@@ -78,7 +79,7 @@ public final class HttpResponse {
     if(is != null) {
       try {
         final HttpPayload hp = new HttpPayload(is, body, info, options);
-        response.add(hp.parse(mtype == null || error ? type : mtype));
+        response.add(hp.parse(error || mtype == null ? type == null ? TEXT_PLAIN : type : mtype));
         if(body) vb.add(hp.payloads());
       } finally {
         is.close();
