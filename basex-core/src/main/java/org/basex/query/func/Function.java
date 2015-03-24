@@ -319,7 +319,7 @@ public enum Function {
   QNAME(FnQName.class, "QName(uri,name)", arg(STR_ZO, STR), QNM),
   /** XQuery function. */
   RANDOM_NUMBER_GENERATOR(FnRandomNumberGenerator.class, "random-number-generator([seed])",
-      arg(AAT), MAP_O),
+      arg(AAT), MAP_O, flag(NDT)),
   /** XQuery function. */
   REMOVE(FnRemove.class, "remove(items,pos)", arg(ITEM_ZM, ITR), ITEM_ZM),
   /** XQuery function. */
