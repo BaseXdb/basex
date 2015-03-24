@@ -35,6 +35,11 @@ public final class UserModuleTest extends AdvancedQueryTest {
   }
 
   /** Test method. */
+  @Test public void current() {
+    query(_USER_CURRENT.args(), UserText.ADMIN);
+  }
+
+  /** Test method. */
   @Test public void exists() {
     query(_USER_EXISTS.args(UserText.ADMIN), "true");
     query(_USER_EXISTS.args(NAME), "true");
