@@ -80,6 +80,7 @@ final class BXServletResponse extends AbstractResponse {
     try {
       res.flushBuffer();
       res.getOutputStream().flush();
+      RESPONSE.remove();
     } catch(final IOException ex) {
       throw new RuntimeException(ex);
     }
