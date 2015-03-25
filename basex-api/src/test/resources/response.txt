@@ -1,0 +1,29 @@
+--batchresponse_4c4c5223-efa7-4aba-9865-fb4cb102cfd2
+Content-Type: multipart/mixed; boundary=changesetresponse_48b5007b-b1a0-4515-b5b7-af2b20b3a9cd
+
+--changesetresponse_48b5007b-b1a0-4515-b5b7-af2b20b3a9cd
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+
+HTTP/1.1 201 Created
+DataServiceVersion: 1.0;
+Content-Type: application/atom+xml;type=entry;charset=utf-8
+X-Content-Type-Options: nosniff
+Cache-Control: no-cache
+Location: http://X
+
+<?xml version="1.0" encoding="utf-8"?><entry/>
+--changesetresponse_48b5007b-b1a0-4515-b5b7-af2b20b3a9cd
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+
+HTTP/1.1 201 Created
+DataServiceVersion: 1.0;
+Content-Type: application/atom+xml;type=entry;charset=utf-8
+X-Content-Type-Options: nosniff
+Cache-Control: no-cache
+Location: http://X')
+
+<?xml version="1.0" encoding="utf-8"?><entry/>
+--changesetresponse_48b5007b-b1a0-4515-b5b7-af2b20b3a9cd--
+--batchresponse_4c4c5223-efa7-4aba-9865-fb4cb102cfd2--
