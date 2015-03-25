@@ -158,6 +158,7 @@ public final class DiskData extends Data {
     } catch(final IOException ex) {
       Util.stack(ex);
     }
+    COMP.remove();
   }
 
   /**
