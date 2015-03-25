@@ -71,6 +71,13 @@ final class BXServletRequest extends AbstractRequest {
     REQUEST.set(req);
   }
 
+  /**
+   * Closes the request.
+   */
+  public void close() {
+    REQUEST.remove();
+  }
+
   @Override
   public String getFromAddress() {
     return req.getRemoteHost();

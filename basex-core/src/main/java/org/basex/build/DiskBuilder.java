@@ -137,6 +137,7 @@ public final class DiskBuilder extends Builder implements Closeable {
     xout = null;
     vout = null;
     sout = null;
+    COMP.remove();
   }
 
   @Override
