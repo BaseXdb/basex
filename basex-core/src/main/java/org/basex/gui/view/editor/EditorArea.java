@@ -56,8 +56,9 @@ public final class EditorArea extends TextPanel {
       @Override
       public void focusGained(final FocusEvent e) {
         // refresh query path and working directory
-        gui.context.options.set(MainOptions.QUERYPATH, file.path());
-        gui.gopts.set(GUIOptions.WORKPATH, file.dir());
+        final IOFile f = EditorArea.this.file;
+        gui.context.options.set(MainOptions.QUERYPATH, f.path());
+        gui.gopts.set(GUIOptions.WORKPATH, f.dir());
 
         // reload file if it has been changed
         SwingUtilities.invokeLater(new Runnable() {
