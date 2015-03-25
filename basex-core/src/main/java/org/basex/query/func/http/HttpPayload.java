@@ -129,7 +129,7 @@ public final class HttpPayload {
   private Value parse(final byte[] payload, final String ctype) throws QueryException {
     if(payload.length == 0) return Empty.SEQ;
     try {
-      return value(new IOContent(payload), options, contentType(ctype), contentTypeExt(ctype));
+      return value(new IOContent(payload), options, ctype, contentTypeExt(ctype));
     } catch(final IOException ex) {
       throw HC_PARSE_X.get(info, ex);
     }
@@ -152,7 +152,6 @@ public final class HttpPayload {
         if(l == null) throw HC_REQ_X.get(info, "No body specified for http:part");
         if(eq(sep, l)) break;
       }
-      // parse part
       while(extractPart(sep, concat(sep, DASHES), parts));
     } finally {
       in.close();
@@ -164,7 +163,7 @@ public final class HttpPayload {
    * @param sep separation boundary
    * @param end closing boundary
    * @param parts list with all parts (may be {@code null})
-   * @return success flag
+   * @return part
    * @throws IOException I/O Exception
    * @throws QueryException query exception
    */
@@ -203,7 +202,7 @@ public final class HttpPayload {
 
   /**
    * Reads the next line of an HTTP multipart content.
-   * @return line, or {@code null} if end of stream is reached
+   * @return line or {@code null} if end of stream is reached
    * @throws IOException I/O Exception
    */
   private byte[] readLine() throws IOException {
@@ -222,7 +221,7 @@ public final class HttpPayload {
   }
 
   /**
-   * Reads the next part of a payload.
+   * Reads the payload of a part.
    * @param sep separation boundary
    * @param end closing boundary
    * @param enc part content encoding
@@ -234,15 +233,14 @@ public final class HttpPayload {
 
     final ByteList bl = new ByteList();
     while(true) {
-      final byte[] line = readLine();
-      if(line == null || eq(line, sep)) break;
-
+      final byte[] next = readLine();
+      if(next == null || eq(next, sep)) break;
       // RFC 1341: Epilogue is to be ignored
-      if(eq(line, end)) {
+      if(eq(next, end)) {
         while(readLine() != null);
         break;
       }
-      bl.add(line).add(CRLF);
+      bl.add(next).add(CRLF);
     }
     return new TextInput(new IOContent(bl.finish())).encoding(enc).content();
   }
@@ -348,7 +346,7 @@ public final class HttpPayload {
         val = Str.get(new NewlineInput(in).content());
       } else if(isMultipart(ctype)) {
         try(final InputStream is = in.inputStream()) {
-          final HttpPayload hp = new HttpPayload(is, true, null, opts);
+          final HttpPayload hp = new HttpPayload(in.inputStream(), true, null, opts);
           hp.extractParts(concat(DASHES, hp.boundary(ext)), null);
           val = hp.payloads();
         }
@@ -358,8 +356,8 @@ public final class HttpPayload {
   }
 
   /**
-   * Extracts the main part from a "Content-type" header.
-   * @param ctype content-type string
+   * Extracts the content from a "Content-type" header.
+   * @param ctype value for "Content-type" header, or ({@code null})
    * @return result, or {@link MimeTypes#APP_OCTET} if specified content type was {@code null}
    */
   private static String contentType(final String ctype) {
@@ -370,13 +368,13 @@ public final class HttpPayload {
 
   /**
    * Extracts the extension from a "Content-type" header.
-   * @param ctype content-type string
-   * @return result, or empty string
+   * @param ctype value for "Content-type" header, or ({@code null})
+   * @return result
    */
   private static String contentTypeExt(final String ctype) {
     if(ctype == null) return "";
     final int end = ctype.indexOf(';');
-    return end == -1 ? ctype : ctype.substring(end + 1).trim();
+    return end == -1 ? "" : ctype.substring(end + 1);
   }
 
   /**
