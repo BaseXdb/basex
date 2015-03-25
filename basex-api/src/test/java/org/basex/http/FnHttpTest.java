@@ -809,6 +809,30 @@ public class FnHttpTest extends HTTPTest {
   }
 
   /**
+   * Tests nested multipart responses.
+   * @throws Exception exception
+   */
+  @Test
+  public void nestedMultipart() throws Exception {
+    // Create fake HTTP connection
+    final String boundary = "batchresponse_4c4c5223-efa7-4aba-9865-fb4cb102cfd2";
+
+    final FakeHttpConnection conn = new FakeHttpConnection(new URL("http://www.test.com"));
+    final Map<String, List<String>> hdrs = new HashMap<>();
+    final List<String> contTypeVal = new ArrayList<>();
+    contTypeVal.add("multipart/mixed");
+    contTypeVal.add("boundary=\"" + boundary + "\"");
+    hdrs.put("Content-Type", contTypeVal);
+
+    conn.headers = hdrs;
+    conn.contentType = "multipart/alternative; boundary=\"" + boundary + "\"";
+    conn.content = new IOFile("src/test/resources/response.txt").read();
+
+    new HttpResponse(null, ctx.options).getResponse(conn, true, null);
+  }
+
+
+  /**
    * Checks the response to an HTTP request.
    * @param r query result
    * @param itemsCount expected number of items

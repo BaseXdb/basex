@@ -74,19 +74,19 @@ public final class HttpPayload {
       final byte[] boundary = boundary(type);
       if(boundary == null) throw HC_REQ_X.get(info, "No separation boundary specified");
 
-      body = new FElem(Q_MULTIPART).add(SerializerOptions.MEDIA_TYPE.name(), main);
-      body.add(BOUNDARY, boundary);
+      body = new FElem(Q_MULTIPART).add(BOUNDARY, boundary);
       final ANodeList parts = new ANodeList();
       extractParts(concat(DASHES, boundary), parts);
       for(final ANode node : parts) body.add(node);
     } else {
       // single part response
-      body = new FElem(Q_BODY).add(SerializerOptions.MEDIA_TYPE.name(), main);
+      body = new FElem(Q_BODY);
       if(payloads != null) {
         final byte[] pl = extract(type);
         payloads.add(parse(pl, type));
       }
     }
+    body.add(SerializerOptions.MEDIA_TYPE.name(), main);
     return body;
   }
 
@@ -145,6 +145,7 @@ public final class HttpPayload {
         if(l == null) throw HC_REQ_X.get(info, "No body specified for http:part");
         if(eq(sep, l)) break;
       }
+      // parse part
       while(extractPart(sep, concat(sep, DASHES), parts));
     } finally {
       input.close();
@@ -156,7 +157,7 @@ public final class HttpPayload {
    * @param sep separation boundary
    * @param end closing boundary
    * @param parts list with all parts (may be {@code null})
-   * @return part
+   * @return success flag
    * @throws IOException I/O Exception
    * @throws QueryException query exception
    */
@@ -192,7 +193,7 @@ public final class HttpPayload {
 
   /**
    * Reads the next line of an HTTP multipart content.
-   * @return line or {@code null} if end of stream is reached
+   * @return line, or {@code null} if end of stream is reached
    * @throws IOException I/O Exception
    */
   private byte[] readLine() throws IOException {
@@ -211,7 +212,7 @@ public final class HttpPayload {
   }
 
   /**
-   * Reads the payload of a part.
+   * Reads the next part of a payload.
    * @param sep separation boundary
    * @param end closing boundary
    * @param enc part content encoding
@@ -223,14 +224,15 @@ public final class HttpPayload {
 
     final ByteList bl = new ByteList();
     while(true) {
-      final byte[] next = readLine();
-      if(next == null || eq(next, sep)) break;
+      final byte[] line = readLine();
+      if(line == null || eq(line, sep)) break;
+
       // RFC 1341: Epilogue is to be ignored
-      if(eq(next, end)) {
+      if(eq(line, end)) {
         while(readLine() != null);
         break;
       }
-      bl.add(next).add('\n');
+      bl.add(line).add(CRLF);
     }
     return new TextInput(new IOContent(bl.finish())).encoding(enc).content();
   }
@@ -338,7 +340,7 @@ public final class HttpPayload {
       } else if(isXML(ctype)) {
         val = new DBNode(input);
       } else if(isText(ctype)) {
-        val = Str.get(new TextInput(input).content());
+        val = Str.get(new NewlineInput(input).content());
       } else if(isMultipart(ctype)) {
         try(final InputStream is = input.inputStream()) {
           final HttpPayload hp = new HttpPayload(is, true, null, options);
@@ -352,8 +354,8 @@ public final class HttpPayload {
 
   /**
    * Extracts the charset from the 'Content-Type' header if present.
-   * @param ctype Content-Type header
-   * @return charset charset
+   * @param ctype Content-Type header, or ({@code null})
+   * @return charset charset, or {@code null}
    */
   private static String charset(final String ctype) {
     // content type is unknown
