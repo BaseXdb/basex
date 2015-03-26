@@ -1,6 +1,5 @@
 package org.basex.util.http;
 
-import static org.basex.io.MimeTypes.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.http.HttpText.*;
 
@@ -83,7 +82,9 @@ public final class HttpResponse {
         final HttpPayload hp = new HttpPayload(is, body, info, options);
         final String ctype = conn.getContentType();
         // error: adopt original type as content type
-        response.add(hp.parse(error || mtype == null ? ctype == null ? TEXT_PLAIN : ctype : mtype));
+        final MediaType type = error || mtype == null ? ctype == null ? MediaType.TEXT_PLAIN :
+          new MediaType(ctype) : new MediaType(mtype);
+        response.add(hp.parse(type));
         if(body) vb.add(hp.payloads());
       } finally {
         is.close();

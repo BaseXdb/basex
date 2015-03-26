@@ -50,7 +50,7 @@ final class BXFile extends BXAbstractResource implements FileResource {
 
   @Override
   public String getContentType(final String accepts) {
-    return meta.ctype;
+    return meta.type.toString();
   }
 
   @Override

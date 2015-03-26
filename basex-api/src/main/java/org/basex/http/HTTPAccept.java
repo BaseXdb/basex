@@ -1,5 +1,7 @@
 package org.basex.http;
 
+import org.basex.util.http.*;
+
 /**
  * Single HTTP Accept header.
  *
@@ -8,7 +10,7 @@ package org.basex.http;
  */
 public final class HTTPAccept {
   /** Media type. */
-  public String type;
+  public MediaType type;
   /** Quality factor (default: {@code 1}). */
   public double qf = 1;
 }

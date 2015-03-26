@@ -9,9 +9,10 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
+import org.basex.util.http.*;
 
 /**
- * Functions for fetching resources.
+ * Function implementation.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
@@ -23,19 +24,20 @@ public final class FetchContentType extends StandardFunc {
     final IO io = IO.get(Token.string(uri));
 
     final String path = io.path();
-    final String mt;
+    MediaType mt = null;
     if(io instanceof IOUrl) {
       try {
-        mt = ((IOUrl) io).connection().getContentType();
+        final String ct = ((IOUrl) io).connection().getContentType();
+        if(ct != null) mt = new MediaType(ct);
       } catch(final IOException ex) {
         throw BXFE_IO_X.get(info, ex);
       }
     } else if(io instanceof IOContent) {
-      mt = MimeTypes.APP_XML;
-    } else {
-      mt = io.exists() ? MimeTypes.get(path) : null;
+      mt = MediaType.APPLICATION_XML;
+    } else if(io.exists()) {
+      mt = MediaType.get(path);
     }
     if(mt == null) throw BXFE_IO_X.get(info, new FileNotFoundException(path));
-    return Str.get(mt);
+    return Str.get(mt.toString());
   }
 }

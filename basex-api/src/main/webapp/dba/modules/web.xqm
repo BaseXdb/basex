@@ -36,17 +36,6 @@ declare function web:create-url(
 };
 
 (:~
- : Returns the mime-type for the specified file.
- : @param  $name  file name
- : @return mime type
- :)
-declare function web:mime-type(
-  $name  as xs:string
-) as xs:string {
-  Q{java:org.basex.io.MimeTypes}get($name)
-};
-
-(:~
  : Creates a RESTXQ (HTTP) redirect header for the specified page.
  : @param  $page  page to forward to
  :)

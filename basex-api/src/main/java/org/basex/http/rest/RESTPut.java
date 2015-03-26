@@ -1,7 +1,5 @@
 package org.basex.http.rest;
 
-import static org.basex.io.MimeTypes.*;
-
 import java.io.*;
 
 import org.basex.build.csv.*;
@@ -45,27 +43,27 @@ final class RESTPut {
     // choose correct importer
     boolean xml = true;
     final String ct = mt.type();
-    if(APP_JSON.equals(ct)) {
+    if(mt.is(MediaType.APPLICATION_JSON)) {
       final JsonParserOptions opts = new JsonParserOptions();
       opts.parse(mt);
       options.set(MainOptions.JSONPARSER, opts);
       options.set(MainOptions.PARSER, MainParser.JSON);
-    } else if(TEXT_CSV.equals(ct)) {
+    } else if(mt.is(MediaType.TEXT_CSV)) {
       final CsvParserOptions opts = new CsvParserOptions();
       opts.parse(mt);
       options.set(MainOptions.CSVPARSER, opts);
       options.set(MainOptions.PARSER, MainParser.CSV);
-    } else if(TEXT_HTML.equals(ct)) {
+    } else if(mt.is(MediaType.TEXT_HTML)) {
       final HtmlOptions opts = new HtmlOptions();
       opts.parse(mt);
       options.set(MainOptions.HTMLPARSER, opts);
       options.set(MainOptions.PARSER, MainParser.HTML);
-    } else if(isText(ct)) {
+    } else if(mt.isText()) {
       final TextOptions opts = new TextOptions();
       opts.parse(mt);
       options.set(MainOptions.TEXTPARSER, opts);
       options.set(MainOptions.PARSER, MainParser.TEXT);
-    } else if(!ct.isEmpty() && !isXML(ct)) {
+    } else if(!ct.isEmpty() && !mt.isXML()) {
       xml = false;
     }
 

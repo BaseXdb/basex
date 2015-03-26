@@ -163,7 +163,7 @@ public abstract class HTTPTest extends SandboxTest {
    * @return string result, or {@code null} for a failure.
    * @throws IOException I/O exception
    */
-  protected static String post(final String query, final String request, final String type)
+  protected static String post(final String query, final String request, final MediaType type)
       throws IOException {
 
     // create connection
@@ -171,7 +171,7 @@ public abstract class HTTPTest extends SandboxTest {
     final HttpURLConnection conn = (HttpURLConnection) url.connection();
     conn.setDoOutput(true);
     conn.setRequestMethod(POST.name());
-    conn.setRequestProperty(HttpText.CONTENT_TYPE, type);
+    conn.setRequestProperty(HttpText.CONTENT_TYPE, type.toString());
     // basic authentication
     final String encoded = org.basex.util.Base64.encode(ADMIN + ':' + ADMIN);
     conn.setRequestProperty(HttpText.AUTHORIZATION, AuthMethod.BASIC + " " + encoded);
@@ -226,17 +226,17 @@ public abstract class HTTPTest extends SandboxTest {
    * Executes the specified PUT request.
    * @param u url
    * @param is input stream
-   * @param ctype content type (optional, may be {@code null})
+   * @param type content type (optional, may be {@code null})
    * @throws IOException I/O exception
    */
-  protected static void put(final String u, final InputStream is, final String ctype)
+  protected static void put(final String u, final InputStream is, final MediaType type)
       throws IOException {
 
     final IOUrl url = new IOUrl(root + u);
     final HttpURLConnection conn = (HttpURLConnection) url.connection();
     conn.setDoOutput(true);
     conn.setRequestMethod(PUT.name());
-    if(ctype != null) conn.setRequestProperty(HttpText.CONTENT_TYPE, ctype);
+    if(type != null) conn.setRequestProperty(HttpText.CONTENT_TYPE, type.toString());
     try(final OutputStream bos = new BufferedOutputStream(conn.getOutputStream())) {
       if(is != null) {
         // send input stream if it not empty

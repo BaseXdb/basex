@@ -19,7 +19,6 @@ import org.basex.build.json.*;
 import org.basex.build.text.*;
 import org.basex.core.*;
 import org.basex.http.*;
-import org.basex.io.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -78,9 +77,9 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
   /** Query context. */
   private final QueryContext qc;
   /** Consumed media types. */
-  private final StringList consumes = new StringList();
+  private final ArrayList<MediaType> consumes = new ArrayList<>();
   /** Returned media types. */
-  final StringList produces = new StringList();
+  final ArrayList<MediaType> produces = new ArrayList<>();
   /** Post/Put variable. */
   private QNm requestBody;
 
@@ -400,12 +399,12 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     // return true if no type is given
     if(consumes.isEmpty()) return true;
     // return true if no content type is specified by the user
-    final String type = http.contentType().type();
-    if(type.isEmpty()) return true;
+    final MediaType type = http.contentType();
+    if(type.type().isEmpty()) return true;
 
     // check if any combination matches
-    for(final String consume : consumes) {
-      if(MimeTypes.matches(consume, type)) return true;
+    for(final MediaType consume : consumes) {
+      if(consume.matches(type)) return true;
     }
     return false;
   }
@@ -419,9 +418,9 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     // return true if no type is given
     if(produces.isEmpty()) return true;
     // check if any combination matches
-    for(final HTTPAccept accept : http.accepts()) {
-      for(final String produce : produces) {
-        if(MimeTypes.matches(produce, accept.type)) return true;
+    for(final MediaType accept : http.accepts()) {
+      for(final MediaType produce : produces) {
+        if(produce.matches(accept)) return true;
       }
     }
     return false;
@@ -480,8 +479,8 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @param ann annotation
    * @param list list to add values to
    */
-  private static void strings(final Ann ann, final StringList list) {
-    for(final Item it : ann.args) list.add(toString(it));
+  private static void strings(final Ann ann, final ArrayList<MediaType> list) {
+    for(final Item it : ann.args) list.add(new MediaType(toString(it)));
   }
 
   /**

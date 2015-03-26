@@ -67,10 +67,10 @@ public final class HTTPParams {
     if(form == null) {
       form = new HashMap<>();
       final MediaType mt = http.contentType();
-      if(MimeTypes.MULTIPART_FORM_DATA.equals(mt.type())) {
+      if(mt.is(MediaType.MULTIPART_FORM_DATA)) {
         // convert multipart parameters encoded in a form
         addMultipart(mt, options);
-      } else if(MimeTypes.APP_FORM_URLENCODED.equals(mt.type())) {
+      } else if(mt.is(MediaType.APPLICATION_X_WWW_FORM_URLENCODED)) {
         // convert URL-encoded parameters
         addURLEncoded();
       }

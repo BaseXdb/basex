@@ -13,6 +13,7 @@ import javax.swing.filechooser.*;
 import org.basex.gui.*;
 import org.basex.io.*;
 import org.basex.util.*;
+import org.basex.util.http.*;
 
 /**
  * Organizes icons used all over the GUI.
@@ -155,9 +156,9 @@ public final class BaseXImages {
 
     // fallback code for displaying icons
     final String path = file.path();
-    final String mime = MimeTypes.get(path);
-    if(MimeTypes.isXML(mime)) return XML;
-    if(MimeTypes.isXQuery(mime)) return XQUERY;
+    final MediaType type = MediaType.get(path);
+    if(type.isXML()) return XML;
+    if(type.isXQuery()) return XQUERY;
     if(path.contains(IO.BASEXSUFFIX)) return BASEX;
 
     // only works with standard dpi (https://bugs.openjdk.java.net/browse/JDK-6817929)
@@ -174,6 +175,6 @@ public final class BaseXImages {
       return icon;
     }
     // default icon chooser
-    return MimeTypes.isText(mime) ? TEXT : UNKNOWN;
+    return type.isText() ? TEXT : UNKNOWN;
   }
 }

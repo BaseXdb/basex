@@ -7,7 +7,7 @@ module namespace _ = 'dba/util';
 
 import module namespace Request = 'http://exquery.org/ns/request';
 import module namespace tmpl = 'dba/tmpl' at 'modules/tmpl.xqm';
-import module namespace web = 'dba/web' at 'modules/web.xqm';
+import module namespace webb = 'dba/web' at 'modules/web.xqm';
 
 (:~
  : Redirects to the start page.
@@ -17,7 +17,7 @@ declare
   %rest:path("dba")
 function _:redirect(
 ) {
-  web:redirect('dba/databases')
+  webb:redirect('dba/databases')
 };
 
 (:~
@@ -37,7 +37,7 @@ function _:file(
         <http:header name="Cache-Control" value="max-age=3600,public"/>
       </http:response>
       <output:serialization-parameters>
-        <output:media-type value='{ web:mime-type($path) }'/>
+        <output:media-type value='{ web:content-type($path) }'/>
         <output:method value='raw'/>
       </output:serialization-parameters>
     </rest:response>,
@@ -56,7 +56,7 @@ declare
 function _:any(
   $unknown  as xs:string
 ) as element(html) {
-  web:check(),
+  webb:check(),
   tmpl:wrap(
     <tr>
       <td>
@@ -78,5 +78,5 @@ declare
   %rest:error("basex:login")
 function _:error-login(
 ) {
-  web:redirect("login")
+  webb:redirect("login")
 };

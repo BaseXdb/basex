@@ -1,6 +1,5 @@
 package org.basex.util.http;
 
-import static org.basex.io.MimeTypes.*;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.http.HttpText.*;
@@ -61,17 +60,16 @@ public final class HttpPayload {
 
   /**
    * Parses the HTTP payload and returns a result body element.
-   * @param type content type
+   * @param type media type
    * @return body element
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  FElem parse(final String type) throws IOException, QueryException {
-    final MediaType mt = new MediaType(type);
+  FElem parse(final MediaType type) throws IOException, QueryException {
     final FElem body;
-    if(isMultipart(type)) {
+    if(type.isMultipart()) {
       // multipart response
-      final byte[] boundary = boundary(mt);
+      final byte[] boundary = boundary(type);
       if(boundary == null) throw HC_REQ_X.get(info, "No separation boundary specified");
 
       body = new FElem(Q_MULTIPART).add(BOUNDARY, boundary);
@@ -82,14 +80,14 @@ public final class HttpPayload {
       // single part response
       body = new FElem(Q_BODY);
       if(payloads != null) {
-        final byte[] pl = (isXML(type) || isText(type)
-          ? new NewlineInput(input).encoding(mt.parameters().get(CHARSET))
+        final byte[] pl = (type.isXML() || type.isText()
+          ? new NewlineInput(input).encoding(type.parameters().get(CHARSET))
           : new BufferInput(input)
         ).content();
-        payloads.add(parse(pl, mt));
+        payloads.add(parse(pl, type));
       }
     }
-    return body.add(SerializerOptions.MEDIA_TYPE.name(), mt.type());
+    return body.add(SerializerOptions.MEDIA_TYPE.name(), type.type());
   }
 
   /**
@@ -303,27 +301,26 @@ public final class HttpPayload {
       throws IOException, QueryException {
 
     Value val = null;
-    final String ctype = type.type();
-    if(APP_JSON.equals(ctype)) {
+    if(type.is(MediaType.APPLICATION_JSON)) {
       final JsonParserOptions opts = new JsonParserOptions(options.get(MainOptions.JSONPARSER));
       opts.parse(type);
       val = new DBNode(new JsonParser(input, options, opts));
-    } else if(TEXT_CSV.equals(ctype)) {
+    } else if(type.is(MediaType.TEXT_CSV)) {
       final CsvParserOptions opts = new CsvParserOptions(options.get(MainOptions.CSVPARSER));
       opts.parse(type);
       val = new DBNode(new CsvParser(input, options, opts));
-    } else if(TEXT_HTML.equals(ctype)) {
+    } else if(type.is(MediaType.TEXT_HTML)) {
       final HtmlOptions opts = new HtmlOptions(options.get(MainOptions.HTMLPARSER));
       opts.parse(type);
       val = new DBNode(new HtmlParser(input, options, opts));
-    } else if(APP_FORM_URLENCODED.equals(ctype)) {
+    } else if(type.is(MediaType.APPLICATION_X_WWW_FORM_URLENCODED)) {
       final String enc = type.parameters().get(CHARSET);
       val = Str.get(URLDecoder.decode(string(input.read()), enc == null ? Strings.UTF8 : enc));
-    } else if(isXML(ctype)) {
+    } else if(type.isXML()) {
       val = new DBNode(input);
-    } else if(isText(ctype)) {
+    } else if(type.isText()) {
       val = Str.get(new NewlineInput(input).content());
-    } else if(isMultipart(ctype)) {
+    } else if(type.isMultipart()) {
       try(final InputStream is = input.inputStream()) {
         final HttpPayload hp = new HttpPayload(is, true, null, options);
         hp.extractParts(concat(DASHES, hp.boundary(type)), null);

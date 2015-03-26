@@ -1,6 +1,6 @@
 package org.basex.http.restxq;
 
-import org.basex.io.*;
+import org.basex.util.http.*;
 import org.junit.*;
 
 /**
@@ -18,19 +18,20 @@ public final class RestXqInputTest extends RestXqTest {
   public void json() throws Exception {
     // test input annotation
     post("declare %R:POST('{$x}') %R:path('') %input:json('lax=no') function m:f($x) {$x/*/*};",
-        "", "{ \"A_B\": \"\" }", "application/json", "<A__B/>");
+        "", "{ \"A_B\": \"\" }", MediaType.APPLICATION_JSON, "<A__B/>");
     post("declare %R:POST('{$x}') %R:path('') %input:json('lax=true') function m:f($x) {$x/*/*};",
-        "", "{ \"A_B\": \"\" }", MimeTypes.APP_JSON, "<A_B/>");
+        "", "{ \"A_B\": \"\" }", MediaType.APPLICATION_JSON, "<A_B/>");
 
     // test content-type parameters
     post("declare %R:POST('{$x}') %R:path('') function m:f($x) {$x/*/*};",
-        "", "{ \"A_B\": \"\" }", MimeTypes.APP_JSON + ";lax=false", "<A__B/>");
+        "", "{ \"A_B\": \"\" }", new MediaType(MediaType.APPLICATION_JSON + ";lax=false"),
+        "<A__B/>");
     post("declare %R:POST('{$x}') %R:path('') function m:f($x) {$x/*/*};",
-        "", "{ \"A_B\": \"\" }", MimeTypes.APP_JSON + ";lax=yes", "<A_B/>");
+        "", "{ \"A_B\": \"\" }", new MediaType(MediaType.APPLICATION_JSON + ";lax=yes"), "<A_B/>");
 
     // test default
     post("declare %R:POST('{$x}') %R:path('') function m:f($x) {$x/*/*};",
-        "", "{ \"A_B\": \"\" }", MimeTypes.APP_JSON, "<A__B/>");
+        "", "{ \"A_B\": \"\" }", MediaType.APPLICATION_JSON, "<A__B/>");
   }
 
   /**
@@ -41,18 +42,18 @@ public final class RestXqInputTest extends RestXqTest {
   public void csv() throws Exception {
     // test input annotation
     post("declare %R:POST('{$x}') %R:path('') %input:csv('header=no') function m:f($x) {$x//A};",
-        "", "A\n1", MimeTypes.TEXT_CSV, "");
+        "", "A\n1", MediaType.TEXT_CSV, "");
     post("declare %R:POST('{$x}') %R:path('') %input:csv('header=yes') function m:f($x) {$x//A};",
-        "", "A\n1", MimeTypes.TEXT_CSV, "<A>1</A>");
+        "", "A\n1", MediaType.TEXT_CSV, "<A>1</A>");
 
     // test content-type parameters
     post("declare %R:POST('{$x}') %R:path('') function m:f($x) {$x//A};",
-        "", "A\n1", MimeTypes.TEXT_CSV + ";header=no", "");
+        "", "A\n1", new MediaType(MediaType.TEXT_CSV + ";header=no"), "");
     post("declare %R:POST('{$x}') %R:path('') function m:f($x) {$x//A};",
-        "", "A\n1", MimeTypes.TEXT_CSV + ";header=yes", "<A>1</A>");
+        "", "A\n1", new MediaType(MediaType.TEXT_CSV + ";header=yes"), "<A>1</A>");
 
     // test default
     post("declare %R:POST('{$x}') %R:path('') function m:f($x) {$x//A};",
-        "", "A\n1", MimeTypes.TEXT_CSV, "");
+        "", "A\n1", MediaType.TEXT_CSV, "");
   }
 }

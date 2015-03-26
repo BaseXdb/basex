@@ -1036,7 +1036,7 @@ public class TextPanel extends BaseXPanel {
   static {
     try {
       final String file = "/completions.properties";
-      final InputStream is = MimeTypes.class.getResourceAsStream(file);
+      final InputStream is = TextPanel.class.getResourceAsStream(file);
       if(is == null) {
         Util.errln(file + " not found.");
       } else {

@@ -12,7 +12,6 @@ import org.basex.*;
 import org.basex.api.client.*;
 import org.basex.core.cmd.*;
 import org.basex.core.users.*;
-import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
 import org.basex.util.list.*;
@@ -251,7 +250,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
       try {
         hc.setDoOutput(true);
         hc.setRequestMethod(method.name());
-        hc.setRequestProperty(HttpText.CONTENT_TYPE, MimeTypes.APP_XML);
+        hc.setRequestProperty(HttpText.CONTENT_TYPE, MediaType.APPLICATION_XML.toString());
         hc.getOutputStream().write(data);
         hc.getOutputStream().close();
 

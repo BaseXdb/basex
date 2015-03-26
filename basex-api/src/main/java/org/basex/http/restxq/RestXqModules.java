@@ -10,6 +10,7 @@ import org.basex.io.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
+import org.basex.util.http.*;
 
 /**
  * This class caches RESTXQ modules found in the HTTP root directory.
@@ -88,8 +89,7 @@ public final class RestXqModules {
   }
 
   /**
-   * Returns the function that has a mime type the quality factor of which matches the HTTP request
-   * best.
+   * Returns the function that has a media type whose quality factor matches the HTTP request best.
    * @param list list of functions
    * @param http http context
    * @return best function, or {@code null} if more than one function exists
@@ -97,8 +97,8 @@ public final class RestXqModules {
   private static RestXqFunction bestQf(final ArrayList<RestXqFunction> list,
       final HTTPContext http) {
 
-    // mime types accepted by the client
-    final HTTPAccept[] accepts = http.accepts();
+    // media types accepted by the client
+    final MediaType[] accepts = http.accepts();
 
     double bestQf = 0;
     RestXqFunction best = list.get(0);
@@ -107,10 +107,11 @@ public final class RestXqModules {
       if(best.compareTo(rxf) != 0) break;
       if(rxf.produces.isEmpty()) return null;
 
-      for(final String p : rxf.produces) {
-        for(final HTTPAccept accept : accepts) {
-          final double qf = accept.qf;
-          if(MimeTypes.matches(p, accept.type)) {
+      for(final MediaType produce : rxf.produces) {
+        for(final MediaType accept : accepts) {
+          final String value = accept.parameters().get("q");
+          final double qf = value == null ? 1 : Double.parseDouble(value);
+          if(produce.matches(accept)) {
             // multiple functions with the same quality factor
             if(bestQf == qf) return null;
             if(bestQf < qf) {

@@ -1,11 +1,11 @@
 package org.basex.http.rest;
 
-import static org.basex.io.MimeTypes.*;
 import static org.junit.Assert.*;
 
 import java.io.*;
 
 import org.basex.core.*;
+import org.basex.util.http.*;
 import org.junit.*;
 
 /**
@@ -22,7 +22,7 @@ public final class RESTPostTest extends RESTTest {
   @Test
   public void post1() throws IOException {
     assertEquals("123",
-      post("", "<query xmlns=\"" + URI + "\"><text>123</text></query>", APP_XML));
+      post("", "<query xmlns=\"" + URI + "\"><text>123</text></query>", MediaType.APPLICATION_XML));
   }
 
   /**
@@ -32,7 +32,7 @@ public final class RESTPostTest extends RESTTest {
   @Test
   public void post2() throws IOException {
     assertEquals("",
-      post("", "<query xmlns=\"" + URI + "\"><text>()</text></query>", APP_XML));
+      post("", "<query xmlns=\"" + URI + "\"><text>()</text></query>", MediaType.APPLICATION_XML));
   }
 
   /**
@@ -44,7 +44,8 @@ public final class RESTPostTest extends RESTTest {
     assertEquals(
       "<?xml version=\"1.0\" encoding=\"UTF-8\"?>123",
       post("", "<query xmlns=\"" + URI + "\">" +
-        "<text>123</text><parameter name='omit-xml-declaration' value='no'/></query>", APP_XML));
+        "<text>123</text><parameter name='omit-xml-declaration' value='no'/></query>",
+        MediaType.APPLICATION_XML));
   }
 
   /**
@@ -58,7 +59,7 @@ public final class RESTPostTest extends RESTTest {
       "<text><![CDATA[<html/>]]></text>" +
       "<parameter name='omit-xml-declaration' value='no'/>" +
       "<parameter name='omit-xml-declaration' value='yes'/>" +
-      "<parameter name='method' value='xhtml'/>" + "</query>", APP_XML));
+      "<parameter name='method' value='xhtml'/>" + "</query>", MediaType.APPLICATION_XML));
   }
 
   /**
@@ -72,7 +73,7 @@ public final class RESTPostTest extends RESTTest {
       "<text>123</text>" +
       "<parameter name='omit-xml-declaration' value='no'/>" +
       "<parameter name='omit-xml-declaration' value='yes'/>" +
-      "</query>", APP_XML));
+      "</query>", MediaType.APPLICATION_XML));
   }
 
   /**
@@ -85,7 +86,7 @@ public final class RESTPostTest extends RESTTest {
       "<query xmlns=\"" + URI + "\">" +
       "<text>.</text>" +
       "<context><a/></context>" +
-      "</query>", APP_XML));
+      "</query>", MediaType.APPLICATION_XML));
   }
 
   /**
@@ -96,12 +97,14 @@ public final class RESTPostTest extends RESTTest {
   public void postOption() throws IOException {
     assertEquals("2", post("", "<query xmlns=\"" + URI + "\">" +
         "<text>2, delete node &lt;a/&gt;</text>" +
-        "<option name='" + MainOptions.MIXUPDATES.name() + "' value='true'/></query>", APP_XML));
+        "<option name='" + MainOptions.MIXUPDATES.name() + "' value='true'/></query>",
+        MediaType.APPLICATION_XML));
 
     try {
       post("", "<query xmlns=\"" + URI + "\">" +
           "<text>1, delete node &lt;a/&gt;</text>" +
-        "<option name='" + MainOptions.MIXUPDATES.name() + "' value='false'/></query>", APP_XML);
+        "<option name='" + MainOptions.MIXUPDATES.name() + "' value='false'/></query>",
+        MediaType.APPLICATION_XML);
       fail("Error expected.");
     } catch(final IOException ex) {
       assertContains(ex.getMessage(), "[XUST0001]");
@@ -112,7 +115,8 @@ public final class RESTPostTest extends RESTTest {
   @Test
   public void postErr() {
     try {
-      assertEquals("", post("", "<query xmlns=\"" + URI + "\"><text>(</text></query>", APP_XML));
+      assertEquals("", post("", "<query xmlns=\"" + URI + "\"><text>(</text></query>",
+          MediaType.APPLICATION_XML));
     } catch(final IOException ex) {
       assertContains(ex.getMessage(), "[XPST0003]");
     }

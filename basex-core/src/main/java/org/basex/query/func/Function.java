@@ -43,6 +43,7 @@ import org.basex.query.func.stream.*;
 import org.basex.query.func.unit.*;
 import org.basex.query.func.user.*;
 import org.basex.query.func.validate.*;
+import org.basex.query.func.web.*;
 import org.basex.query.func.xquery.*;
 import org.basex.query.func.xslt.*;
 import org.basex.query.func.zip.*;
@@ -1162,7 +1163,7 @@ public enum Function {
   /* User Module. */
 
   /** XQuery function. */
-  _USER_CURRENT(UserCurrent.class, "current()", arg(), STR, flag(), USER_URI),
+  _USER_CURRENT(UserCurrent.class, "current()", arg(), STR, USER_URI),
   /** XQuery function. */
   _USER_EXISTS(UserExists.class, "exists(name)", arg(STR), BLN, flag(NDT), USER_URI),
   /** XQuery function. */
@@ -1198,6 +1199,11 @@ public enum Function {
   /** XQuery function. */
   _VALIDATE_DTD_INFO(ValidateDtdInfo.class, "dtd-info(input[,schema])",
       arg(ITEM, ITEM), STR_ZM, flag(NDT), VALIDATE_URI),
+
+  /* Web Module. */
+
+  /** XQuery function. */
+  _WEB_CONTENT_TYPE(WebContentType.class, "content-type(path)", arg(STR), STR, WEB_URI),
 
   /* XQuery Module. */
 

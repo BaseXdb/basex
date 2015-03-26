@@ -4,6 +4,8 @@ import static org.basex.http.webdav.impl.Utils.*;
 
 import java.util.*;
 
+import org.basex.util.http.*;
+
 /**
  * Resource meta data.
  *
@@ -20,7 +22,7 @@ public final class ResourceMetaData {
   /** Raw binary file flag. */
   public final boolean raw;
   /** Resource content type. */
-  public final String ctype;
+  public final MediaType type;
   /** Resource size in bytes. */
   public final Long size;
 
@@ -54,15 +56,15 @@ public final class ResourceMetaData {
    * @param path resource path
    * @param ms resource last modification date in milliseconds
    * @param raw raw binary file flag
-   * @param ctype resource content type
+   * @param type resource media type
    * @param size resource size in bytes
    */
   ResourceMetaData(final String db, final String path, final long ms, final boolean raw,
-      final String ctype, final Long size) {
+      final MediaType type, final Long size) {
     this.db = db;
     this.path = stripLeadingSlash(path);
     this.raw = raw;
-    this.ctype = ctype;
+    this.type = type;
     this.size = size;
     mdate = ms == -1 ? null : new Date(ms);
   }

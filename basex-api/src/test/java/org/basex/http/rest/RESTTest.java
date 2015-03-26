@@ -7,6 +7,7 @@ import java.net.*;
 
 import org.basex.http.*;
 import org.basex.io.*;
+import org.basex.util.http.*;
 import org.junit.*;
 
 /**
@@ -33,13 +34,22 @@ public abstract class RESTTest extends HTTPTest {
   }
 
   /**
-   * Compares two byte arrays for equality.
+   * Checks if a string starts with another.
    * @param string full string
    * @param prefix prefix
    */
   protected static void assertStartsWith(final String string, final String prefix) {
     assertTrue('\'' + string + "' does not start with '" + prefix + '\'',
         string.startsWith(prefix));
+  }
+
+  /**
+   * Compares media types.
+   * @param ret returned media type
+   * @param exp expected media type
+   */
+  protected static void assertMediaType(final MediaType ret, final MediaType exp) {
+    if(!ret.is(exp)) fail("Wrong media type: " + ret + " returned, " + exp + " expected.");
   }
 
   /**
@@ -57,12 +67,12 @@ public abstract class RESTTest extends HTTPTest {
    * @return string result, or {@code null} for a failure.
    * @throws IOException I/O exception
    */
-  protected static String contentType(final String query) throws IOException {
+  protected static MediaType contentType(final String query) throws IOException {
     final IOUrl url = new IOUrl(REST_ROOT + query);
     final HttpURLConnection conn = (HttpURLConnection) url.connection();
     try {
       read(conn.getInputStream());
-      return conn.getContentType();
+      return new MediaType(conn.getContentType());
     } catch(final IOException ex) {
       throw error(conn, ex);
     } finally {

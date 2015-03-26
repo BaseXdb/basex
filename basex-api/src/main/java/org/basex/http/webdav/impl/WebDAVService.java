@@ -1,7 +1,6 @@
 package org.basex.http.webdav.impl;
 
 import static org.basex.http.webdav.impl.Utils.*;
-import static org.basex.io.MimeTypes.*;
 import static org.basex.query.func.Function.*;
 
 import java.io.*;
@@ -18,6 +17,7 @@ import org.basex.http.*;
 import org.basex.io.in.*;
 import org.basex.query.func.db.*;
 import org.basex.util.*;
+import org.basex.util.http.*;
 import org.basex.util.list.*;
 
 /**
@@ -144,12 +144,12 @@ public final class WebDAVService<T> {
     query.bind("path", path);
 
     final StringList result = execute(query);
-    final boolean raw  = Boolean.parseBoolean(result.get(0));
-    final String ctype = result.get(1);
-    final long mod     = DateTime.parse(result.get(2));
-    final Long size    = raw ? Long.valueOf(result.get(3)) : null;
-    final String pth   = stripLeadingSlash(result.get(4));
-    return new ResourceMetaData(db, pth, mod, raw, ctype, size);
+    final boolean raw = Boolean.parseBoolean(result.get(0));
+    final MediaType type = new MediaType(result.get(1));
+    final long mod = DateTime.parse(result.get(2));
+    final Long size = raw ? Long.valueOf(result.get(3)) : null;
+    final String pth = stripLeadingSlash(result.get(4));
+    return new ResourceMetaData(db, pth, mod, raw, type, size);
   }
 
   /**
@@ -318,12 +318,12 @@ public final class WebDAVService<T> {
     final HashSet<String> paths = new HashSet<>();
     final List<T> ch = new ArrayList<>(rs / 5);
     for(int r = 0; r < rs; r += 5) {
-      final boolean raw  = Boolean.parseBoolean(result.get(r));
-      final String ctype = result.get(r + 1);
-      final long mod     = DateTime.parse(result.get(r + 2));
-      final Long size    = raw ? Long.valueOf(result.get(r + 3)) : null;
-      final String pth   = stripLeadingSlash(result.get(r + 4));
-      final int ix       = pth.indexOf(SEP);
+      final boolean raw = Boolean.parseBoolean(result.get(r));
+      final MediaType ctype = new MediaType(result.get(r + 1));
+      final long mod = DateTime.parse(result.get(r + 2));
+      final Long size = raw ? Long.valueOf(result.get(r + 3)) : null;
+      final String pth = stripLeadingSlash(result.get(r + 4));
+      final int ix = pth.indexOf(SEP);
       // check if document or folder
       if(ix < 0) {
         if(!pth.equals(DUMMY)) ch.add(factory.file(this,
@@ -477,7 +477,8 @@ public final class WebDAVService<T> {
     session.execute(new Set(MainOptions.CHOP, false));
     session.execute(new Open(db));
     session.add(path, in);
-    return factory.file(this, new ResourceMetaData(db, path, timestamp(db), false, APP_XML, null));
+    return factory.file(this, new ResourceMetaData(db, path, timestamp(db), false,
+        MediaType.APPLICATION_XML, null));
   }
 
   /**

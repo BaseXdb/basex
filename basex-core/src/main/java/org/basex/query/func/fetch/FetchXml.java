@@ -17,7 +17,7 @@ import org.basex.util.*;
 import org.basex.util.options.*;
 
 /**
- * Functions for fetching XML resources.
+ * Function implementation.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen

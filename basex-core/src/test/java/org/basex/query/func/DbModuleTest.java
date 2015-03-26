@@ -14,6 +14,7 @@ import org.basex.core.parse.Commands.CmdIndex;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.util.*;
+import org.basex.util.http.*;
 import org.junit.*;
 import org.junit.Test;
 
@@ -186,14 +187,14 @@ public final class DbModuleTest extends AdvancedQueryTest {
 
     final String xmlCall = _DB_LIST_DETAILS.args(NAME, "xml");
     query(xmlCall + "/@raw/data()", "false");
-    query(xmlCall + "/@content-type/data()", MimeTypes.APP_XML);
+    query(xmlCall + "/@content-type/data()", MediaType.APPLICATION_XML.toString());
     query(xmlCall + "/@modified-date/xs:dateTime(.)");
     query(xmlCall + "/@size/data()", "");
     query(xmlCall + "/text()", "xml");
 
     final String rawCall = _DB_LIST_DETAILS.args(NAME, "raw");
     query(rawCall + "/@raw/data()", "true");
-    query(rawCall + "/@content-type/data()", MimeTypes.APP_OCTET);
+    query(rawCall + "/@content-type/data()", MediaType.APPLICATION_OCTET_STREAM.toString());
     query(rawCall + "/@modified-date/xs:dateTime(.) > " +
         "xs:dateTime('1971-01-01T00:00:01')", "true");
     query(rawCall + "/@size/data()", "3");
@@ -665,8 +666,8 @@ public final class DbModuleTest extends AdvancedQueryTest {
   public void contentType() {
     query(_DB_ADD.args(NAME, "\"<a/>\"", "xml"));
     query(_DB_STORE.args(NAME, "raw", "bla"));
-    query(_DB_CONTENT_TYPE.args(NAME, "xml"), MimeTypes.APP_XML);
-    query(_DB_CONTENT_TYPE.args(NAME, "raw"), MimeTypes.APP_OCTET);
+    query(_DB_CONTENT_TYPE.args(NAME, "xml"), MediaType.APPLICATION_XML.toString());
+    query(_DB_CONTENT_TYPE.args(NAME, "raw"), MediaType.APPLICATION_OCTET_STREAM.toString());
     error(_DB_CONTENT_TYPE.args(NAME, "test"), WHICHRES_X);
   }
 

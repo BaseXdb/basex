@@ -8,13 +8,13 @@ import static org.basex.util.Token.*;
 import java.io.*;
 
 import org.basex.data.*;
-import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.hash.*;
+import org.basex.util.http.*;
 import org.basex.util.options.*;
 import org.basex.util.options.Options.YesNoOmit;
 
@@ -343,7 +343,7 @@ abstract class MarkupSerializer extends StandardSerializer {
     level++;
     startOpen(META);
     attribute(HTTPEQUIV, CONTENT_TYPE, false);
-    attribute(CONTENT, new TokenBuilder(media.isEmpty() ? MimeTypes.TEXT_HTML : media).
+    attribute(CONTENT, new TokenBuilder(media.isEmpty() ? MediaType.TEXT_HTML.toString() : media).
         add("; ").add(CHARSET).add('=').addExt(out.encoding()).finish(), false);
     if(html) {
       out.print(ELEM_C);

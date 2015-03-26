@@ -1,6 +1,5 @@
 package org.basex.http.rest;
 
-import static org.basex.io.MimeTypes.*;
 import static org.junit.Assert.*;
 
 import java.io.*;
@@ -9,6 +8,7 @@ import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.util.*;
+import org.basex.util.http.*;
 import org.junit.*;
 
 /**
@@ -28,7 +28,7 @@ public final class RESTGetTest extends RESTTest {
     assertEquals("1\n2\n3", get("?query=1+to+3"));
 
     put(NAME, new ArrayInput("<a/>"));
-    put(NAME + "/raw", new ArrayInput("XXX"), APP_OCTET);
+    put(NAME + "/raw", new ArrayInput("XXX"), MediaType.APPLICATION_OCTET_STREAM);
     assertEquals("<a/>", get(NAME + '/' + NAME + ".xml"));
     assertEquals("XXX", get(NAME + "/raw"));
     delete(NAME);
@@ -94,19 +94,20 @@ public final class RESTGetTest extends RESTTest {
    */
   @Test
   public void contentType() throws Exception {
-    assertStartsWith(contentType("?query=1"), APP_XML);
-    assertStartsWith(contentType("?command=info"), TEXT_PLAIN);
+    assertMediaType(contentType("?query=1"), MediaType.APPLICATION_XML);
+    assertMediaType(contentType("?command=info"), MediaType.TEXT_PLAIN);
 
-    assertStartsWith(contentType("?query=1&method=xml"), APP_XML);
-    assertStartsWith(contentType("?query=1&method=xhtml"), TEXT_HTML);
-    assertStartsWith(contentType("?query=1&method=html"), TEXT_HTML);
-    assertStartsWith(contentType("?query=1&method=text"), TEXT_PLAIN);
-    assertStartsWith(contentType("?query=1&method=raw"), APP_OCTET);
-    assertStartsWith(contentType("?query=<json+type='object'/>&method=json"), APP_JSON);
+    assertMediaType(contentType("?query=1&method=xml"), MediaType.APPLICATION_XML);
+    assertMediaType(contentType("?query=1&method=xhtml"), MediaType.TEXT_HTML);
+    assertMediaType(contentType("?query=1&method=html"), MediaType.TEXT_HTML);
+    assertMediaType(contentType("?query=1&method=text"), MediaType.TEXT_PLAIN);
+    assertMediaType(contentType("?query=1&method=raw"), MediaType.APPLICATION_OCTET_STREAM);
+    assertMediaType(contentType("?query=<json+type='object'/>&method=json"),
+        MediaType.APPLICATION_JSON);
 
-    assertStartsWith(contentType("?query=1&media-type=application/xml"), APP_XML);
-    assertStartsWith(contentType("?query=1&media-type=text/html"), TEXT_HTML);
-    assertStartsWith(contentType("?query=1&media-type=xxx"), "xxx");
+    assertMediaType(contentType("?query=1&media-type=application/xml"), MediaType.APPLICATION_XML);
+    assertMediaType(contentType("?query=1&media-type=text/html"), MediaType.TEXT_HTML);
+    assertMediaType(contentType("?query=1&media-type=xxx"), new MediaType("xxx"));
   }
 
   /**

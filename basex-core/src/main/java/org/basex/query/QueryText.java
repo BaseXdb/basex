@@ -545,6 +545,8 @@ public interface QueryText {
   byte[] USER_PREFIX = token("user");
   /** Validate token. */
   byte[] VLDT_PREFIX = token("validate");
+  /** Web token. */
+  byte[] WEB_PREFIX = token("web");
   /** XQDoc token. */
   byte[] INSPECT_PREFIX = token("inspect");
   /** XQuery token. */
@@ -671,6 +673,8 @@ public interface QueryText {
   byte[] USER_URI = token(BXMODULES_URI + "user");
   /** Validate module URI. */
   byte[] VALIDATE_URI = token(BXMODULES_URI + "validate");
+  /** Web module URI. */
+  byte[] WEB_URI = token(BXMODULES_URI + "web");
   /** XQuery module URI. */
   byte[] XQUERY_URI = token(BXMODULES_URI + "xquery");
   /** XSLT module URI. */

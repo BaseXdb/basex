@@ -9,7 +9,7 @@ import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
- * Functions for fetching resources.
+ * Function implementation.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen

@@ -8,6 +8,7 @@ import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.io.*;
 import org.basex.util.*;
+import org.basex.util.http.*;
 import org.junit.*;
 
 /**
@@ -66,12 +67,12 @@ public abstract class RestXqTest extends HTTPTest {
    * @param function function to test
    * @param query request
    * @param request request
-   * @param type content type
+   * @param type media type
    * @param exp expected result
    * @throws IOException I/O exception
    */
   protected static void post(final String function, final String query, final String request,
-      final String type, final String exp) throws IOException {
+      final MediaType type, final String exp) throws IOException {
     install(function);
     assertEquals(exp, post(query, request, type));
   }

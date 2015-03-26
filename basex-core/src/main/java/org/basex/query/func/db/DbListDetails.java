@@ -14,6 +14,7 @@ import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
+import org.basex.util.http.*;
 import org.basex.util.list.*;
 
 /**
@@ -56,13 +57,12 @@ public final class DbListDetails extends DbList {
       public ANode get(final long i) {
         if(i < is) {
           final byte[] pt = data.text(il.get((int) i), true);
-          return resource(pt, false, 0, token(MimeTypes.APP_XML), data.meta.time);
+          return resource(pt, false, 0, MediaType.APPLICATION_XML, data.meta.time);
         }
         if(i < is + ts) {
           final byte[] pt = tl.get((int) i - is);
           final IOFile io = data.meta.binary(string(pt));
-          return resource(pt, true, io.length(), token(MimeTypes.get(io.path())),
-              io.timeStamp());
+          return resource(pt, true, io.length(), MediaType.get(io.path()), io.timeStamp());
         }
         return null;
       }
@@ -115,16 +115,16 @@ public final class DbListDetails extends DbList {
    * @param path path
    * @param raw is the resource a raw file
    * @param size size
-   * @param ctype content type
+   * @param type media type
    * @param mdate modified date
    * @return <code>&lt;resource/&gt;</code> node
    */
   private static FNode resource(final byte[] path, final boolean raw, final long size,
-      final byte[] ctype, final long mdate) {
+      final MediaType type, final long mdate) {
 
     final String tstamp = DateTime.format(new Date(mdate), DateTime.FULL);
     final FElem res = new FElem(RESOURCE).add(path).
-        add(RAW, token(raw)).add(CTYPE, ctype).add(MDATE, tstamp);
+        add(RAW, token(raw)).add(CTYPE, type.toString()).add(MDATE, tstamp);
     return raw ? res.add(SIZE, token(size)) : res;
   }
 }

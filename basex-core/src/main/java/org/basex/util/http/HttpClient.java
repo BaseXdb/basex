@@ -1,7 +1,6 @@
 package org.basex.util.http;
 
 import static java.net.HttpURLConnection.*;
-import static org.basex.io.MimeTypes.*;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.http.HttpText.*;
@@ -23,7 +22,8 @@ import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
-import org.basex.util.http.HttpRequest.*;
+import org.basex.util.http.HttpRequest.Part;
+import org.basex.util.http.HttpText.Request;
 
 /**
  * HTTP Client.
@@ -244,24 +244,24 @@ public final class HttpClient {
   /**
    * Writes the payload of a body or part in the output stream of the connection.
    * @param payload body/part payload
-   * @param payloadAtts payload attributes
+   * @param atts payload attributes
    * @param out output stream
    * @throws IOException I/O exception
    */
   private static void writePayload(final ValueBuilder payload,
-      final HashMap<String, String> payloadAtts, final OutputStream out) throws IOException {
+      final HashMap<String, String> atts, final OutputStream out) throws IOException {
 
     // detect method (specified by @method or derived from @media-type)
-    String method = payloadAtts.get(SerializerOptions.METHOD.name());
+    String method = atts.get(SerializerOptions.METHOD.name());
     if(method == null) {
-      final String type = payloadAtts.get(SerializerOptions.MEDIA_TYPE.name());
-      if(Strings.eq(type, APP_HTML_XML)) {
+      final MediaType type = new MediaType(atts.get(SerializerOptions.MEDIA_TYPE.name()));
+      if(type.is(MediaType.APPLICATION_HTML_XML)) {
         method = SerialMethod.XHTML.toString();
-      } else if(Strings.eq(type, TEXT_HTML)) {
+      } else if(type.is(MediaType.TEXT_HTML)) {
         method = SerialMethod.HTML.toString();
-      } else if(isXML(type)) {
+      } else if(type.isXML()) {
         method = SerialMethod.XML.toString();
-      } else if(isText(type)) {
+      } else if(type.isText()) {
         method = SerialMethod.TEXT.toString();
       } else {
         // default serialization method is XML
@@ -270,16 +270,16 @@ public final class HttpClient {
     }
 
     // write content depending on the method
-    final String src = payloadAtts.get(SRC);
+    final String src = atts.get(SRC);
     if(src == null) {
-      write(payload, payloadAtts, method, out);
+      write(payload, atts, method, out);
     } else {
       final IOUrl io = new IOUrl(src);
       if(Strings.eq(method, BINARY)) {
         out.write(io.read());
       } else {
         final ValueBuilder vb = new ValueBuilder().add(Str.get(new TextInput(io).content()));
-        write(vb, payloadAtts, method, out);
+        write(vb, atts, method, out);
       }
     }
   }

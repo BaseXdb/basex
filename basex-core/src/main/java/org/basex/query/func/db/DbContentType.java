@@ -8,6 +8,7 @@ import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
+import org.basex.util.http.*;
 
 /**
  * Function implementation.
@@ -21,15 +22,16 @@ public final class DbContentType extends DbAccess {
     final Data data = checkData(qc);
     final String path = path(1, qc);
     final int pre = data.resources.doc(path);
+    MediaType type = null;
     if(pre != -1) {
-      // check mime type; return application/xml if returned string is not of type xml
-      final String mt = MimeTypes.get(string(data.text(pre, true)));
-      return Str.get(MimeTypes.isXML(mt) ? mt : MimeTypes.APP_XML);
-    }
-    if(!data.inMemory()) {
+      // check media type; return application/xml if returned string is not of type xml
+      type = MediaType.get(string(data.text(pre, true)));
+      if(!type.isXML()) type = MediaType.APPLICATION_XML;
+    } else if(!data.inMemory()) {
       final IOFile io = data.meta.binary(path);
-      if(io.exists() && !io.isDir()) return Str.get(MimeTypes.get(path));
+      if(io.exists() && !io.isDir()) type = MediaType.get(path);
     }
-    throw WHICHRES_X.get(info, path);
+    if(type == null) throw WHICHRES_X.get(info, path);
+    return Str.get(type.toString());
   }
 }

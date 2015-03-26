@@ -2,14 +2,12 @@ package org.basex.http;
 
 import static javax.servlet.http.HttpServletResponse.*;
 import static org.basex.http.HTTPText.*;
-import static org.basex.io.MimeTypes.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.http.HttpText.*;
 
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import java.util.regex.*;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -25,6 +23,7 @@ import org.basex.server.Log.LogType;
 import org.basex.server.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
+import org.basex.util.http.HttpText.Request;
 import org.basex.util.options.*;
 
 /**
@@ -34,9 +33,6 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public final class HTTPContext {
-  /** Quality factor pattern. */
-  private static final Pattern QF = Pattern.compile("^(.*);\\s*q\\s*=(.*)$");
-
   /** Global static database context. */
   private static Context context;
   /** Initialization flag. */
@@ -154,8 +150,7 @@ public final class HTTPContext {
     final SerializerOptions opts = sopts();
     final String enc = opts.get(SerializerOptions.ENCODING);
     res.setCharacterEncoding(enc);
-    final String ct = mediaType(opts);
-    res.setContentType(new TokenBuilder(ct).add("; ").add(CHARSET).add('=').add(enc).toString());
+    res.setContentType(new MediaType(mediaType(opts) + "; " + CHARSET + '=' + enc).toString());
   }
 
   /**
@@ -163,18 +158,18 @@ public final class HTTPContext {
    * @param sopts serialization parameters
    * @return media type
    */
-  public static String mediaType(final SerializerOptions sopts) {
+  public static MediaType mediaType(final SerializerOptions sopts) {
     // set content type
     final String type = sopts.get(SerializerOptions.MEDIA_TYPE);
-    if(!type.isEmpty()) return type;
+    if(!type.isEmpty()) return new MediaType(type);
 
     // determine content type dependent on output method
     final SerialMethod sm = sopts.get(SerializerOptions.METHOD);
-    if(sm == SerialMethod.RAW) return APP_OCTET;
-    if(sm == SerialMethod.ADAPTIVE || sm == SerialMethod.XML) return APP_XML;
-    if(sm == SerialMethod.XHTML || sm == SerialMethod.HTML) return TEXT_HTML;
-    if(sm == SerialMethod.JSON) return APP_JSON;
-    return TEXT_PLAIN;
+    if(sm == SerialMethod.RAW) return MediaType.APPLICATION_OCTET_STREAM;
+    if(sm == SerialMethod.ADAPTIVE || sm == SerialMethod.XML) return MediaType.APPLICATION_XML;
+    if(sm == SerialMethod.XHTML || sm == SerialMethod.HTML) return MediaType.TEXT_HTML;
+    if(sm == SerialMethod.JSON) return MediaType.APPLICATION_JSON;
+    return MediaType.TEXT_PLAIN;
   }
 
   /**
@@ -207,29 +202,28 @@ public final class HTTPContext {
    * Returns all accepted media types.
    * @return accepted media types
    */
-  public HTTPAccept[] accepts() {
+  public MediaType[] accepts() {
     final String accept = req.getHeader(ACCEPT);
-    final ArrayList<HTTPAccept> list = new ArrayList<>();
+    final ArrayList<MediaType> list = new ArrayList<>();
     if(accept == null) {
-      final HTTPAccept acc = new HTTPAccept();
-      acc.type = "*/*";
-      list.add(acc);
+      list.add(MediaType.ALL_ALL);
     } else {
       for(final String produce : accept.split("\\s*,\\s*")) {
-        final HTTPAccept acc = new HTTPAccept();
         // check if quality factor was specified
-        final Matcher m = QF.matcher(produce);
-        if(m.find()) {
-          acc.type = m.group(1);
-          acc.qf = toDouble(token(m.group(2)));
-        } else {
-          acc.type = produce;
+        final MediaType type = new MediaType(produce);
+        final String qf = type.parameters().get("q");
+        final double d = qf != null ? toDouble(token(qf)) : 1;
+        // only accept media types with valid double values
+        if(d > 0 && d <= 1) {
+          final StringBuilder sb = new StringBuilder();
+          final String main = type.main(), sub = type.sub();
+          sb.append(main.isEmpty() ? "*" : main).append('/');
+          sb.append(sub.isEmpty() ? "*" : sub).append("; q=").append(d);
+          list.add(new MediaType(sb.toString()));
         }
-        // only accept valid double values
-        if(acc.qf > 0 && acc.qf <= 1) list.add(acc);
       }
     }
-    return list.toArray(new HTTPAccept[list.size()]);
+    return list.toArray(new MediaType[list.size()]);
   }
 
   /**
@@ -260,7 +254,7 @@ public final class HTTPContext {
       } else {
         res.setStatus(code);
         if(info != null) {
-          res.setContentType(TEXT_PLAIN);
+          res.setContentType(MediaType.TEXT_PLAIN.toString());
           final ArrayOutput ao = new ArrayOutput();
           ao.write(token(info));
           res.getOutputStream().write(ao.normalize().finish());
