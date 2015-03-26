@@ -76,6 +76,7 @@ public final class ProfModuleTest extends AdvancedQueryTest {
     try {
       System.setErr(NULL);
       query("for $x in 1 to 2 return " + _PROF_VARIABLES.args(), "");
+      query(_PROF_VARIABLES.args() + ", let $x := random:double() return floor($x * $x)", "0");
     } finally {
       System.setErr(ERR);
     }
