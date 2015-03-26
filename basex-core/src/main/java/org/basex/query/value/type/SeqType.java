@@ -218,9 +218,9 @@ public final class SeqType {
   /** Single map. */
   public static final SeqType MAP_O = new SeqType(ANY_MAP);
   /** Zero or more arrays. */
-  public static final SeqType ARRAY_ZM = new SeqType(ANY_ARRAY);
+  public static final SeqType ARRAY_ZM = new SeqType(ANY_ARRAY, Occ.ZERO_MORE);
   /** Single array. */
-  public static final SeqType ARRAY_O = new SeqType(ANY_ARRAY);
+  public static final SeqType ARRAY_O = ANY_ARRAY.seqType();
   /** One xs:hexBinary. */
   public static final SeqType HEX = AtomType.HEX.seqType();
   /** Single xs:base64Binary. */
