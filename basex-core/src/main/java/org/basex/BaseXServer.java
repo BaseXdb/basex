@@ -65,16 +65,19 @@ public final class BaseXServer extends CLI implements Runnable {
    * @throws IOException I/O exception
    */
   public BaseXServer(final String... args) throws IOException {
-    this(null, args);
+    this(null, false, args);
   }
 
   /**
    * Constructor.
    * @param ctx database context
+   * @param daemon start as daemon thread (stopped after last Java process has been finished)
    * @param args command-line arguments
    * @throws IOException I/O exception
    */
-  public BaseXServer(final Context ctx, final String... args) throws IOException {
+  public BaseXServer(final Context ctx, final boolean daemon, final String... args)
+      throws IOException {
+
     super(args, ctx);
 
     final StaticOptions sopts = context.soptions;
@@ -116,7 +119,9 @@ public final class BaseXServer extends CLI implements Runnable {
       throw ex;
     }
 
-    new Thread(this).start();
+    final Thread t = new Thread(this);
+    t.setDaemon(daemon);
+    t.start();
     do Thread.yield(); while(!running);
 
     // show info that server has been started
