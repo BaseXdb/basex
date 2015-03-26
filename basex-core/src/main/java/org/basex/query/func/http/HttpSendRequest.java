@@ -5,6 +5,7 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.util.http.*;
 
 /**
  * Function implementation.

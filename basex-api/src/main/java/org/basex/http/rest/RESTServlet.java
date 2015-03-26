@@ -5,7 +5,7 @@ import java.io.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.http.*;
-import org.basex.query.func.http.*;
+import org.basex.util.http.*;
 
 /**
  * <p>This servlet receives and processes REST requests.</p>

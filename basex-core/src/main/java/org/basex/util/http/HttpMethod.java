@@ -1,4 +1,4 @@
-package org.basex.query.func.http;
+package org.basex.util.http;
 
 /**
  * This enumeration contains basic HTTP methods.

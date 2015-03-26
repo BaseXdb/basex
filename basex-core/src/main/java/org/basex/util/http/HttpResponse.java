@@ -1,8 +1,8 @@
-package org.basex.query.func.http;
+package org.basex.util.http;
 
 import static org.basex.io.MimeTypes.*;
-import static org.basex.query.func.http.HttpText.*;
 import static org.basex.util.Token.*;
+import static org.basex.util.http.HttpText.*;
 
 import java.io.*;
 import java.net.*;

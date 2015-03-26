@@ -319,10 +319,6 @@ public final class TableDiskAccess extends TableAccess {
     } else if(pre > 0) {
       // find the offset within the block where the new records will be inserted
       split = cursor(pre - 1) + IO.NODESIZE;
-    } else {
-      // all insert operations will add data after first node.
-      // i.e., there is no "insert before first document" statement
-      throw Util.notExpected("Insertion at beginning of populated table.");
     }
 
     // number of bytes occupied by old records in the current block

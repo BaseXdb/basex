@@ -1,11 +1,10 @@
 package org.basex.http;
 
 import static javax.servlet.http.HttpServletResponse.*;
-import static org.basex.data.DataText.*;
-import static org.basex.query.func.http.HttpText.*;
 import static org.basex.http.HTTPText.*;
 import static org.basex.io.MimeTypes.*;
 import static org.basex.util.Token.*;
+import static org.basex.util.http.HttpText.*;
 
 import java.io.*;
 import java.net.*;
@@ -22,10 +21,10 @@ import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
-import org.basex.query.func.http.*;
 import org.basex.server.Log.LogType;
 import org.basex.server.*;
 import org.basex.util.*;
+import org.basex.util.http.*;
 import org.basex.util.options.*;
 
 /**
@@ -142,9 +141,9 @@ public final class HTTPContext {
    * Returns the content type of a request, or an empty string.
    * @return content type
    */
-  public String contentType() {
+  public MediaType contentType() {
     final String ct = req.getContentType();
-    return ct == null ? "" : ct;
+    return new MediaType(ct == null ? "" : ct);
   }
 
   /**
@@ -156,7 +155,7 @@ public final class HTTPContext {
     final String enc = opts.get(SerializerOptions.ENCODING);
     res.setCharacterEncoding(enc);
     final String ct = mediaType(opts);
-    res.setContentType(new TokenBuilder(ct).add(CHARSET).add(enc).toString());
+    res.setContentType(new TokenBuilder(ct).add("; ").add(CHARSET).add('=').add(enc).toString());
   }
 
   /**

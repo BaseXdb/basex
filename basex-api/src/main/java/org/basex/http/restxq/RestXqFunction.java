@@ -26,7 +26,6 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.expr.path.Test.Kind;
 import org.basex.query.func.*;
-import org.basex.query.func.http.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -35,6 +34,7 @@ import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.http.*;
 import org.basex.util.list.*;
 import org.basex.util.options.*;
 
@@ -400,12 +400,12 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     // return true if no type is given
     if(consumes.isEmpty()) return true;
     // return true if no content type is specified by the user
-    final String ct = http.contentType();
-    if(ct.isEmpty()) return true;
+    final String type = http.contentType().type();
+    if(type.isEmpty()) return true;
 
     // check if any combination matches
     for(final String consume : consumes) {
-      if(MimeTypes.matches(consume, ct)) return true;
+      if(MimeTypes.matches(consume, type)) return true;
     }
     return false;
   }

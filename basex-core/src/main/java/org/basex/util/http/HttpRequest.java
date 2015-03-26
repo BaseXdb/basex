@@ -1,10 +1,10 @@
-package org.basex.query.func.http;
+package org.basex.util.http;
 
 import java.util.*;
 
 import org.basex.core.StaticOptions.AuthMethod;
-import org.basex.query.func.http.HttpText.Request;
 import org.basex.query.iter.*;
+import org.basex.util.http.HttpText.*;
 
 /**
  * Container for parsed data from {@code <http:request/>}.

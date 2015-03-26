@@ -12,7 +12,7 @@ import org.basex.core.*;
 import org.basex.core.MainOptions.MainParser;
 import org.basex.core.cmd.*;
 import org.basex.http.*;
-import org.basex.io.*;
+import org.basex.util.http.*;
 
 /**
  * REST-based evaluation of PUT operations.
@@ -40,28 +40,29 @@ final class RESTPut {
 
     final MainOptions options = session.context.options;
     final InputStream is = http.req.getInputStream();
-    final String ct = http.contentType();
+    final MediaType mt = http.contentType();
 
     // choose correct importer
     boolean xml = true;
+    final String ct = mt.type();
     if(APP_JSON.equals(ct)) {
       final JsonParserOptions opts = new JsonParserOptions();
-      opts.parse(MimeTypes.parameters(ct));
+      opts.parse(mt);
       options.set(MainOptions.JSONPARSER, opts);
       options.set(MainOptions.PARSER, MainParser.JSON);
     } else if(TEXT_CSV.equals(ct)) {
       final CsvParserOptions opts = new CsvParserOptions();
-      opts.parse(MimeTypes.parameters(ct));
+      opts.parse(mt);
       options.set(MainOptions.CSVPARSER, opts);
       options.set(MainOptions.PARSER, MainParser.CSV);
     } else if(TEXT_HTML.equals(ct)) {
       final HtmlOptions opts = new HtmlOptions();
-      opts.parse(MimeTypes.parameters(ct));
+      opts.parse(mt);
       options.set(MainOptions.HTMLPARSER, opts);
       options.set(MainOptions.PARSER, MainParser.HTML);
     } else if(isText(ct)) {
       final TextOptions opts = new TextOptions();
-      opts.parse(MimeTypes.parameters(ct));
+      opts.parse(mt);
       options.set(MainOptions.TEXTPARSER, opts);
       options.set(MainOptions.PARSER, MainParser.TEXT);
     } else if(!ct.isEmpty() && !isXML(ct)) {

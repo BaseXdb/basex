@@ -9,11 +9,11 @@ import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
-import org.basex.query.func.http.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
+import org.basex.util.http.*;
 
 /**
  * Bundles parameters of an HTTP request.
@@ -66,11 +66,11 @@ public final class HTTPParams {
   public Map<String, Value> form(final MainOptions options) throws QueryException, IOException {
     if(form == null) {
       form = new HashMap<>();
-      final String type = MimeTypes.type(http.contentType());
-      if(MimeTypes.MULTIPART_FORM_DATA.equals(type)) {
+      final MediaType mt = http.contentType();
+      if(MimeTypes.MULTIPART_FORM_DATA.equals(mt.type())) {
         // convert multipart parameters encoded in a form
-        addMultipart(MimeTypes.parameters(type), options);
-      } else if(MimeTypes.APP_FORM_URLENCODED.equals(type)) {
+        addMultipart(mt, options);
+      } else if(MimeTypes.APP_FORM_URLENCODED.equals(mt.type())) {
         // convert URL-encoded parameters
         addURLEncoded();
       }
@@ -114,17 +114,17 @@ public final class HTTPParams {
 
   /**
    * Adds multipart form-data from the passed on request body.
-   * @param params content type parameters
+   * @param type media type
    * @param options main options
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private void addMultipart(final String params, final MainOptions options)
+  private void addMultipart(final MediaType type, final MainOptions options)
       throws QueryException, IOException {
 
     try(final InputStream is = body().inputStream()) {
       final HttpPayload hp = new HttpPayload(is, true, null, options);
-      final HashMap<String, Value> mp = hp.multiForm(params);
+      final HashMap<String, Value> mp = hp.multiForm(type);
       for(final Entry<String, Value> entry : mp.entrySet()) {
         form.put(entry.getKey(), entry.getValue());
       }

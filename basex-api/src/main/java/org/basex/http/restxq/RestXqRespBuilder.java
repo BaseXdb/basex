@@ -7,10 +7,10 @@ import org.basex.http.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.func.*;
-import org.basex.query.func.http.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.util.http.*;
 
 /**
  * This class holds information on a custom RESTXQ response.

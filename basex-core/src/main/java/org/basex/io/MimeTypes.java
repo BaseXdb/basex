@@ -7,9 +7,8 @@ import org.basex.io.in.*;
 import org.basex.util.*;
 
 /**
- * This class returns the mime types of a file, which is either dynamically
- * determined by Java, or statically resolved by requesting the mappings in
- * the {@code mime.txt} project file.
+ * This class contains Internet media types. Media types are either dynamically determined
+ * or statically resolved by requesting the mappings in the {@code mime.txt} project file.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
@@ -115,22 +114,6 @@ public final class MimeTypes {
   public static String type(final String mimeType) {
     final int p = mimeType.indexOf(';');
     return p == -1 ? mimeType : mimeType.substring(0, p).trim();
-  }
-
-  /**
-   * Returns parameters of the specified mime type, separated by commas.
-   * @param mimeType mime type
-   * @return parameters
-   */
-  public static String parameters(final String mimeType) {
-    final int p = mimeType.indexOf(';');
-    if(p == -1) return "";
-    final StringBuilder sb = new StringBuilder();
-    for(final String param : Strings.split(mimeType.substring(p + 1), ';')) {
-      if(sb.length() != 0) sb.append(',');
-      sb.append(param.replace(",", ",,").trim());
-    }
-    return sb.toString();
   }
 
   /**

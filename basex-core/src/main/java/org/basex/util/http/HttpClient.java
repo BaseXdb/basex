@@ -1,11 +1,11 @@
-package org.basex.query.func.http;
+package org.basex.util.http;
 
 import static java.net.HttpURLConnection.*;
 import static org.basex.io.MimeTypes.*;
 import static org.basex.query.QueryError.*;
-import static org.basex.query.func.http.HttpText.*;
-import static org.basex.query.func.http.HttpText.Request.*;
 import static org.basex.util.Token.*;
+import static org.basex.util.http.HttpText.*;
+import static org.basex.util.http.HttpText.Request.*;
 
 import java.io.*;
 import java.lang.reflect.*;
@@ -19,11 +19,11 @@ import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
-import org.basex.query.func.http.HttpRequest.Part;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
+import org.basex.util.http.HttpRequest.*;
 
 /**
  * HTTP Client.
@@ -55,7 +55,7 @@ public final class HttpClient {
    * @return HTTP response
    * @throws QueryException query exception
    */
-  ValueIter sendRequest(final byte[] href, final ANode request, final ValueBuilder bodies)
+  public ValueIter sendRequest(final byte[] href, final ANode request, final ValueBuilder bodies)
       throws QueryException {
 
     final HttpRequest req = new HttpRequestParser(info).parse(request, bodies);

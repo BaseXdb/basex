@@ -1,4 +1,4 @@
-package org.basex.query.func.http;
+package org.basex.util.http;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
@@ -32,14 +32,11 @@ public interface HttpText {
   byte[] CONTENT_DISPOSITION = token("Content-Disposition");
   /** Dashes. */
   byte[] DASHES = token("--");
+
   /** Character string. */
-  String CHARSET_IS = "charset=";
-  /** Boundary string. */
-  String BOUNDARY_IS = "boundary=";
-  /** Name string. */
-  String NAME_IS = "name=";
+  String CHARSET = "charset";
   /** Filename string. */
-  String FILENAME_IS = "filename=";
+  String FILENAME = "filename";
 
   /** Default multipart boundary. */
   String DEFAULT_BOUNDARY = "1BEF0A57BE110FD467A";
@@ -82,9 +79,9 @@ public interface HttpText {
   byte[] MESSAGE = token("message");
 
   /** Header attribute: name. */
-  byte[] NAME = token("name");
+  String NAME = "name";
   /** Header attribute: value. */
-  byte[] VALUE = token("value");
+  String VALUE = "value";
 
   /** Method binary. */
   String BINARY = "binary";

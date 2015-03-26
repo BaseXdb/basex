@@ -217,6 +217,8 @@ public interface DataText {
   /** XML spaces: preserve. */
   byte[] PRESERVE = token("preserve");
 
+  /** Content-Type. */
+  byte[] CONTENT_TYPE = token("Content-Type");
   /** HTML: head element. */
   byte[] HEAD = token("head");
   /** HTML: meta element. */
@@ -225,8 +227,8 @@ public interface DataText {
   byte[] HTTPEQUIV = token("http-equiv");
   /** HTML: content attribute. */
   byte[] CONTENT = token("content");
-  /** HTML: charset attribute value. */
-  byte[] CHARSET = token("; charset=");
+  /** HTML: charset. */
+  byte[] CHARSET = token("charset");
 
   // TABLE SERIALIZATION ==========================================================================
 

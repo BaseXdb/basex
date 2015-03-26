@@ -2,8 +2,8 @@ package org.basex.http;
 
 import static org.basex.core.Text.*;
 import static org.basex.query.func.Function.*;
-import static org.basex.query.func.http.HttpText.*;
 import static org.basex.util.Token.*;
+import static org.basex.util.http.HttpText.*;
 import static org.junit.Assert.*;
 
 import java.io.*;
@@ -20,13 +20,13 @@ import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.QueryError.*;
 import org.basex.query.func.fn.*;
-import org.basex.query.func.http.*;
-import org.basex.query.func.http.HttpRequest.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.http.*;
+import org.basex.util.http.HttpRequest.*;
 import org.junit.*;
 import org.junit.Test;
 
@@ -649,10 +649,10 @@ public class FnHttpTest extends HTTPTest {
   /**
    * Tests ResponseHandler.getResponse() with multipart response.
    * @throws IOException I/O Exception
-   * @throws QueryException query exception
+   * @throws Exception exception
    */
   @Test
-  public void multipartResponse() throws IOException, QueryException {
+  public void multipartResponse() throws Exception {
     // Create fake HTTP connection
     final FakeHttpConnection conn = new FakeHttpConnection(new URL("http://www.test.com"));
     final Map<String, List<String>> hdrs = new HashMap<>();
@@ -710,25 +710,16 @@ public class FnHttpTest extends HTTPTest {
     expected.add(Str.get("...plain text....\n\n"));
     expected.add(Str.get(".... richtext...\n"));
     expected.add(Str.get(".... fanciest formatted version  \n...\n"));
-
-    // Compare response with expected result
-    if(!new Compare().equal(expected, returned)) {
-      final TokenBuilder ret = new TokenBuilder();
-      for(final Item it : returned) ret.add("- " + it.type + ": " + it + '\n');
-      final TokenBuilder exp = new TokenBuilder();
-      for(final Item it : expected) exp.add("- " + it.type + ": " + it + '\n');
-      fail("Expected:\n" + exp + "Returned:\n" + ret);
-    }
+    compare(expected, returned);
   }
 
   /**
-   * Tests ResponseHandler.getResponse() with multipart response having preamble
-   * and epilogue.
+   * Tests ResponseHandler.getResponse() with multipart response having preamble and epilogue.
    * @throws IOException I/O Exception
-   * @throws QueryException query exception
+   * @throws Exception exception
    */
   @Test
-  public void multipartRespPreamble() throws IOException, QueryException {
+  public void multipartRespPreamble() throws Exception {
     // Create fake HTTP connection
     final FakeHttpConnection conn = new FakeHttpConnection(new URL("http://www.test.com"));
     final Map<String, List<String>> hdrs = new HashMap<>();
@@ -798,13 +789,29 @@ public class FnHttpTest extends HTTPTest {
     expected.add(Str.get("This is explicitly typed plain ASCII text.\n"
         + "It DOES end with a linebreak.\n\n"));
 
+    compare(expected, returned);
+  }
+
+  /**
+   * Compares results.
+   * @param expected expected result
+   * @param returned returned result
+   * @throws Exception exception
+   */
+  private static void compare(final ValueBuilder expected, final ValueIter returned)
+      throws Exception {
+
     // Compare response with expected result
-    if(!new Compare().equal(expected, returned)) {
-      final TokenBuilder ret = new TokenBuilder();
-      for(final Item it : returned) ret.add("- " + it.type + ": " + it + '\n');
-      final TokenBuilder exp = new TokenBuilder();
-      for(final Item it : expected) exp.add("- " + it.type + ": " + it + '\n');
-      fail("Expected:\n" + exp + "Returned:\n" + ret);
+    assertEquals("Different number of results", expected.size(), returned.size());
+
+    final long es = expected.size();
+    for(int e = 0; e < es; e++) {
+      final Item exp = expected.get(e), ret = returned.get(e);
+      if(!new Compare().equal(exp, ret)) {
+        final TokenBuilder tb = new TokenBuilder("Result ").addLong(e).add(" differs:\nReturned: ");
+        tb.addExt(ret.serialize()).add("\nExpected: ").addExt(exp.serialize());
+        fail(tb.toString());
+      }
     }
   }
 

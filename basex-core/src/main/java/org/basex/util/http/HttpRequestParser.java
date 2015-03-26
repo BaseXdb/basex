@@ -1,19 +1,19 @@
-package org.basex.query.func.http;
+package org.basex.util.http;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.query.func.http.HttpText.*;
 import static org.basex.util.Token.*;
+import static org.basex.util.http.HttpText.*;
 
 import java.util.*;
 
 import org.basex.core.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
-import org.basex.query.func.http.HttpRequest.Part;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
+import org.basex.util.http.HttpRequest.*;
 
 /**
  * Request parser.
@@ -100,14 +100,14 @@ public final class HttpRequestParser {
       if(nm == null) continue;
       if(!nm.eq(Q_HEADER)) return node;
 
-      byte[] name = null, value = null;
+      String name = null, value = null;
       for(final ANode attr : node.attributes()) {
-        final byte[] qn = attr.qname().local();
-        if(eq(qn, NAME)) name = attr.string();
-        else if(eq(qn, VALUE)) value = attr.string();
+        final String qn = string(attr.qname().local());
+        if(qn.equals(NAME)) name = string(attr.string());
+        else if(qn.equals(VALUE)) value = string(attr.string());
       }
-      if(name != null && name.length != 0 && value != null && value.length != 0) {
-        hdrs.put(string(name), string(value));
+      if(name != null && !name.isEmpty() && value != null && !value.isEmpty()) {
+        hdrs.put(name, value);
       }
     }
     return null;

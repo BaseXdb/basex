@@ -18,6 +18,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.map.Map;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.http.*;
 import org.basex.util.list.*;
 
 /**
@@ -420,6 +421,22 @@ public class Options implements Iterable<Option<?>> {
         if(assign(k, v, -1, false)) Util.debug(k + Text.COLS + v);
       } catch(final BaseXException ex) {
         Util.errln(ex);
+      }
+    }
+  }
+
+  /**
+   * Parses the specified options.
+   * @param type media type
+   * @throws BaseXException database exception
+   */
+  public synchronized void parse(final MediaType type) throws BaseXException {
+    for(final Entry<String, String> entry : type.parameters().entrySet()) {
+      if(options.isEmpty()) {
+        free.put(entry.getKey(), entry.getValue());
+      } else {
+        // ignore unknown options
+        assign(entry.getKey(), entry.getValue(), -1, false);
       }
     }
   }

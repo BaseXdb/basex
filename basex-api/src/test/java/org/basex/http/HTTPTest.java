@@ -1,8 +1,8 @@
 package org.basex.http;
 
 import static org.basex.core.users.UserText.*;
-import static org.basex.query.func.http.HttpMethod.*;
 import static org.basex.util.Token.*;
+import static org.basex.util.http.HttpMethod.*;
 import static org.junit.Assert.*;
 
 import java.io.*;
@@ -14,8 +14,8 @@ import org.basex.core.*;
 import org.basex.core.StaticOptions.AuthMethod;
 import org.basex.io.*;
 import org.basex.io.in.*;
-import org.basex.query.func.http.*;
 import org.basex.util.*;
+import org.basex.util.http.*;
 import org.basex.util.list.*;
 import org.junit.*;
 
