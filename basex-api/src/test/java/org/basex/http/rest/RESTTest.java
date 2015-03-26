@@ -62,12 +62,12 @@ public abstract class RESTTest extends HTTPTest {
   }
 
   /**
-   * Executes the specified GET request and returns the content type.
+   * Executes the specified GET request and returns the media type.
    * @param query request
    * @return string result, or {@code null} for a failure.
    * @throws IOException I/O exception
    */
-  protected static MediaType contentType(final String query) throws IOException {
+  protected static MediaType mediaType(final String query) throws IOException {
     final IOUrl url = new IOUrl(REST_ROOT + query);
     final HttpURLConnection conn = (HttpURLConnection) url.connection();
     try {

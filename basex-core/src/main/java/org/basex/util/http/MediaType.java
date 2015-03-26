@@ -185,7 +185,7 @@ public final class MediaType {
     final int s = path.lastIndexOf('/'), d = path.lastIndexOf('.');
     final String suffix = d <= s ? "" : path.substring(d + 1).toLowerCase(Locale.ENGLISH);
     final MediaType type = TYPES.get(suffix);
-    return type != null ? type : MediaType.APPLICATION_OCTET_STREAM;
+    return type != null ? type : APPLICATION_OCTET_STREAM;
   }
 
   /** Hash map containing all assignments. */

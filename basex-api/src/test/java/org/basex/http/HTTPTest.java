@@ -159,7 +159,7 @@ public abstract class HTTPTest extends SandboxTest {
    * Executes the specified PUT request.
    * @param query path
    * @param request request
-   * @param type content type
+   * @param type media type
    * @return string result, or {@code null} for a failure.
    * @throws IOException I/O exception
    */
@@ -226,7 +226,7 @@ public abstract class HTTPTest extends SandboxTest {
    * Executes the specified PUT request.
    * @param u url
    * @param is input stream
-   * @param type content type (optional, may be {@code null})
+   * @param type media type (optional, may be {@code null})
    * @throws IOException I/O exception
    */
   protected static void put(final String u, final InputStream is, final MediaType type)
