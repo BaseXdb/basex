@@ -92,8 +92,7 @@ public final class Replace extends ACreate {
         if(docs.isEmpty()) {
           auc.addInsert(data.meta.size, -1, add.clip);
         } else {
-          auc.addReplace(docs.get(0), add.clip);
-          d = 1;
+          auc.addReplace(docs.get(d++), add.clip);
         }
         context.invalidate();
       } finally {

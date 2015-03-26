@@ -45,8 +45,7 @@ public final class DbReplace extends DbNew {
       if(docs.isEmpty()) {
         updates.add(new DBAdd(data, input, opts, qc, info), qc);
       } else {
-        updates.add(new ReplaceDoc(docs.get(0), data, input, opts, qc, info), qc);
-        d = 1;
+        updates.add(new ReplaceDoc(docs.get(d++), data, input, opts, qc, info), qc);
       }
     }
 
