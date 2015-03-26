@@ -42,9 +42,8 @@ public final class WebDAVServlet extends BaseXServlet {
     try {
       manager.process(request, response);
     } finally {
-      response.close();
-      request.close();
       resources.close();
+      response.close();
     }
   }
 }

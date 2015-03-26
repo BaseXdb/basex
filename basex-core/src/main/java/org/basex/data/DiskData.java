@@ -31,8 +31,8 @@ import org.basex.util.list.*;
  * @author Tim Petrowsky
  */
 public final class DiskData extends Data {
-  /** Text compressor. */
-  private static final ThreadLocal<Compress> COMP = new ThreadLocal<Compress>() {
+  /** Text compressor. One instance per thread. */
+  private static final ThreadLocal<Compress> COMPRESS = new ThreadLocal<Compress>() {
     @Override
     protected Compress initialValue() {
       return new Compress();
@@ -158,7 +158,7 @@ public final class DiskData extends Data {
     } catch(final IOException ex) {
       Util.stack(ex);
     }
-    COMP.remove();
+    COMPRESS.remove();
   }
 
   /**
@@ -293,7 +293,7 @@ public final class DiskData extends Data {
    */
   private byte[] txt(final long off, final boolean text) {
     final byte[] txt = (text ? texts : values).readToken(off & IO.OFFCOMP - 1);
-    return compressed(off) ? COMP.get().unpack(txt) : txt;
+    return compressed(off) ? COMPRESS.get().unpack(txt) : txt;
   }
 
   /**
@@ -346,7 +346,7 @@ public final class DiskData extends Data {
     final long v = toSimpleInt(value);
     if(v == Integer.MIN_VALUE) {
       // text to be stored (possibly packed)
-      final byte[] val = COMP.get().pack(value);
+      final byte[] val = COMPRESS.get().pack(value);
       // old entry (offset or value)
       final long old = textOff(pre);
 
@@ -417,7 +417,7 @@ public final class DiskData extends Data {
 
     // store text
     final long off = store.length();
-    final byte[] val = COMP.get().pack(value);
+    final byte[] val = COMPRESS.get().pack(value);
     store.writeToken(off, val);
     return val == value ? off : off | IO.OFFCOMP;
   }

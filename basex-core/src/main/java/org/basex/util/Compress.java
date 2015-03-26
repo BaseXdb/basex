@@ -14,7 +14,7 @@ import org.basex.util.list.*;
  */
 public final class Compress {
   /** A ByteList instance serving as a buffer. */
-  private final MyByteList bl = new MyByteList();
+  private final LocalList bl = new LocalList();
   /** Temporary value. */
   private int pc;
   /** Pack offset. */
@@ -25,9 +25,9 @@ public final class Compress {
   private int uo;
 
   /**
-   * Compresses the specified text.
+   * Compresses the specified text. Returns the original text if the packed text is not shorter.
    * @param txt text to be packed
-   * @return packed text
+   * @return packed or original text
    */
   public byte[] pack(final byte[] txt) {
     // initialize compression
@@ -133,17 +133,17 @@ public final class Compress {
    * @return result
    */
   private int pull(final int s) {
-    int oo = uo, cc = uc, x = 0;
+    int oo = uo, oc = uc, x = 0;
     final byte[] l = bl.get();
     for(int i = 0; i < s; i++) {
-      if((l[cc] & 1 << oo) != 0) x |= 1 << i;
+      if((l[oc] & 1 << oo) != 0) x |= 1 << i;
       if(++oo == 8) {
         oo = 0;
-        ++cc;
+        ++oc;
       }
     }
     uo = oo;
-    uc = cc;
+    uc = oc;
     return x;
   }
 
@@ -204,20 +204,19 @@ public final class Compress {
   }
 
   /** Local ByteList implementation to make protected fields accessible. */
-  private static final class MyByteList extends ByteList {
+  private static final class LocalList extends ByteList {
     /**
      * Exchanges the actual byte array backing this list instance.
-     * @param newList the new value for ByteList.list, including
-     *   setting ByteList.size to list.size.
+     * @param list new value
      */
-    private void set(final byte[] newList) {
-      list = newList;
-      size = newList.length;
+    private void set(final byte[] list) {
+      this.list = list;
+      size = list.length;
     }
 
     /**
      * Direct access to the backing byte array.
-     * @return ByteList.list
+     * @return list
      */
     private byte[] get() {
       return list;

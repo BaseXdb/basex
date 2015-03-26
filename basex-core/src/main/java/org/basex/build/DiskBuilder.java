@@ -26,12 +26,7 @@ import org.basex.util.*;
  */
 public final class DiskBuilder extends Builder implements Closeable {
   /** Text compressor. */
-  private static final ThreadLocal<Compress> COMP = new ThreadLocal<Compress>() {
-    @Override
-    protected Compress initialValue() {
-      return new Compress();
-    }
-  };
+  private final Compress comp = new Compress();
 
   /** Database table. */
   private DataOutput tout;
@@ -137,7 +132,6 @@ public final class DiskBuilder extends Builder implements Closeable {
     xout = null;
     vout = null;
     sout = null;
-    COMP.remove();
   }
 
   @Override
@@ -205,7 +199,7 @@ public final class DiskBuilder extends Builder implements Closeable {
     // store text
     final DataOutput store = text ? xout : vout;
     final long off = store.size();
-    final byte[] val = COMP.get().pack(value);
+    final byte[] val = comp.pack(value);
     store.writeToken(val);
     return val == value ? off : off | IO.OFFCOMP;
   }

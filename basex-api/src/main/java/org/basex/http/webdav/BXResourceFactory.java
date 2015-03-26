@@ -1,7 +1,5 @@
 package org.basex.http.webdav;
 
-import static org.basex.http.webdav.BXServletRequest.*;
-
 import javax.servlet.http.*;
 
 import org.basex.http.*;
@@ -22,6 +20,9 @@ import com.bradmcevoy.http.*;
 final class BXResourceFactory implements ResourceFactory,
     ResourceMetaDataFactory<BXAbstractResource> {
 
+  /** Thread local variable to hold the current context. */
+  private static final ThreadLocal<HTTPContext> CONTEXTS = new ThreadLocal<>();
+
   /** WebDAV service. */
   private WebDAVService<BXAbstractResource> service;
 
@@ -31,6 +32,7 @@ final class BXResourceFactory implements ResourceFactory,
    */
   void init(final HTTPContext http) {
     service = new WebDAVService<>(this, http);
+    CONTEXTS.set(http);
   }
 
   /**
@@ -38,12 +40,13 @@ final class BXResourceFactory implements ResourceFactory,
    */
   void close() {
     service.close();
+    CONTEXTS.remove();
   }
 
   @Override
   public Resource getResource(final String host, final String dbpath) {
     try {
-      final HttpServletRequest r = getRequest();
+      final HttpServletRequest r = CONTEXTS.get().req;
       Path p = Path.path(dbpath);
       if(!r.getContextPath().isEmpty()) p = p.getStripFirst();
       if(!r.getServletPath().isEmpty()) p = p.getStripFirst();

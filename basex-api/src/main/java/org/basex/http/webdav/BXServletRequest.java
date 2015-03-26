@@ -49,17 +49,6 @@ final class BXServletRequest extends AbstractRequest {
       TYPE_CONTENTS.put(entry.getValue(), entry.getKey());
   }
 
-  /** Thread local variable to hold the current request. */
-  private static final ThreadLocal<HttpServletRequest> REQUEST = new ThreadLocal<>();
-
-  /**
-   * Get the current request.
-   * @return the current {@link HttpServletRequest}
-   */
-  public static HttpServletRequest getRequest() {
-    return REQUEST.get();
-  }
-
   /**
    * Constructor.
    * @param req HTTP servlet request
@@ -68,14 +57,6 @@ final class BXServletRequest extends AbstractRequest {
     this.req = req;
     method = Method.valueOf(req.getMethod());
     url = req.getRequestURL().toString(); // MiltonUtils.stripContext(r);
-    REQUEST.set(req);
-  }
-
-  /**
-   * Closes the request.
-   */
-  public void close() {
-    REQUEST.remove();
   }
 
   @Override

@@ -20,9 +20,6 @@ import com.bradmcevoy.http.Cookie;
  * @author Dimitar Popov
  */
 final class BXServletResponse extends AbstractResponse {
-  /** Thread local variable to hold the current response. */
-  private static final ThreadLocal<HttpServletResponse> RESPONSE = new ThreadLocal<>();
-
   /** HTTP servlet response. */
   private final HttpServletResponse res;
   /** Response headers. */
@@ -36,7 +33,6 @@ final class BXServletResponse extends AbstractResponse {
    */
   BXServletResponse(final HttpServletResponse res) {
     this.res = res;
-    RESPONSE.set(res);
   }
 
   @Override
@@ -80,7 +76,6 @@ final class BXServletResponse extends AbstractResponse {
     try {
       res.flushBuffer();
       res.getOutputStream().flush();
-      RESPONSE.remove();
     } catch(final IOException ex) {
       throw new RuntimeException(ex);
     }
