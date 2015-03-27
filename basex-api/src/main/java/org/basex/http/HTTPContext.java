@@ -427,7 +427,7 @@ public final class HTTPContext {
     // start server instance
     if(!context.soptions.get(StaticOptions.HTTPLOCAL)) {
       try {
-        new BaseXServer(context, true);
+        new BaseXServer(context);
       } catch(final IOException ex) {
         exception = ex;
         throw ex;
