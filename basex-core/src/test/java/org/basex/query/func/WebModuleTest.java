@@ -1,5 +1,6 @@
 package org.basex.query.func;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
@@ -19,5 +20,37 @@ public final class WebModuleTest extends AdvancedQueryTest {
     query(_WEB_CONTENT_TYPE.args("sample.mp3"), new MediaType("audio/mpeg").toString());
     query(_WEB_CONTENT_TYPE.args("a/b/input.xml"), MediaType.APPLICATION_XML.toString());
     query(_WEB_CONTENT_TYPE.args("a.xxxx"), MediaType.APPLICATION_OCTET_STREAM.toString());
+  }
+
+  /** Test method. */
+  @Test
+  public void createUrl() {
+    query(_WEB_CREATE_URL.args("http://x.com", " map {}"), "http://x.com");
+    query(_WEB_CREATE_URL.args("url", " map { 'a':'b' }"), "url?a=b");
+    query(_WEB_CREATE_URL.args("url", " map { 'a':('b','c') }"), "url?a=b&a=c");
+    query(_WEB_CREATE_URL.args("url", " map { 12:true() }"), "url?12=true");
+
+    error(_WEB_CREATE_URL.args("url", " map { ():'a' }"), SEQFOUND_X);
+    error(_WEB_CREATE_URL.args("url", " map { ('a','b'):() }"), SEQFOUND_X);
+    error(_WEB_CREATE_URL.args("url", " map { 'a':true#0 }"), FIATOM_X);
+  }
+
+  /** Test method. */
+  @Test
+  public void redirect() {
+    query(_WEB_REDIRECT.args("a/b") + "/*:response/*:header/@value = 'a/b'", "true");
+    query(_WEB_REDIRECT.args("a/b") + "/*:response/*:header/@name = 'location'", "true");
+    query(_WEB_REDIRECT.args("a/b") + "/*:response/@status = 302", "true");
+  }
+
+  /** Test method. */
+  @Test
+  public void responseHeader() {
+    query(_WEB_RESPONSE_HEADER.args("file.unknown") +
+        "/*:response/*:header/@name/string()", "Cache-Control");
+    query(_WEB_RESPONSE_HEADER.args("file.unknown") +
+        "/*:serialization-parameters/*:method/@value/string()", "raw");
+    query(_WEB_RESPONSE_HEADER.args("file.unknown") +
+        "/*:serialization-parameters/*:media-type/@value/string()", "application/octet-stream");
   }
 }

@@ -454,6 +454,9 @@ public interface QueryText {
   /** Error token. */
   byte[] E_ADDITIONAL = token("additional");
 
+  /** Serialization-parameters. */
+  byte[] SERIALIZATION_PARAMETERS = token("serialization-parameters");
+
   /** Array token. */
   byte[] ARRAY = token(ARRAYSTR);
   /** Map token. */

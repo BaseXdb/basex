@@ -1204,6 +1204,12 @@ public enum Function {
 
   /** XQuery function. */
   _WEB_CONTENT_TYPE(WebContentType.class, "content-type(path)", arg(STR), STR, WEB_URI),
+  /** XQuery function. */
+  _WEB_CREATE_URL(WebCreateUrl.class, "create-url(url,params)", arg(STR, MAP_O), STR, WEB_URI),
+  /** XQuery function. */
+  _WEB_REDIRECT(WebRedirect.class, "redirect(location)", arg(STR), ELM, WEB_URI),
+  /** XQuery function. */
+  _WEB_RESPONSE_HEADER(WebResponseHeader.class, "response-header(file)", arg(STR), ELM, WEB_URI),
 
   /* XQuery Module. */
 
