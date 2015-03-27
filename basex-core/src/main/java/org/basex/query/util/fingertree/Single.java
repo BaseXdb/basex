@@ -91,7 +91,7 @@ final class Single<N, E> extends FingerTree<N, E> {
 
   @Override
   public TreeSlice<N, E> remove(final long pos) {
-    NodeLike<N, E> removed = elem.remove(pos);
+    final NodeLike<N, E> removed = elem.remove(pos);
     return removed instanceof Node ? new TreeSlice<>(new Single<>((Node<N, E>) removed))
                                    : new TreeSlice<>((PartialNode<N, E>) removed);
   }

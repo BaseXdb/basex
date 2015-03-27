@@ -120,7 +120,7 @@ public final class FingerTreeBuilder<E> {
         for(int i = deep.left.length; --i >= 0;) prepend(deep.left[i]);
         final FingerTree<Node<N, E>, E> mid = deep.middle;
         if(!mid.isEmpty()) sub = new BufferNode<>(mid);
-        for(int i = 0; i < deep.right.length; i++) append(deep.right[i]);
+        for(final Node<N, E> node : deep.right) append(node);
       }
     }
 

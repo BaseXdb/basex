@@ -35,7 +35,7 @@ public final class FnRandomNumberGenerator extends StandardFunc {
    * @return new seed
    */
   private static long next(final long oldSeed) {
-    return (oldSeed * MULT + ADD) & MASK;
+    return oldSeed * MULT + ADD & MASK;
   }
 
   @Override
@@ -58,7 +58,7 @@ public final class FnRandomNumberGenerator extends StandardFunc {
    */
   private Map result(final long s0, final QueryContext qc) throws QueryException {
     final long s1 = next(s0), s2 = next(s1);
-    final double dbl = (((s1 >>> 22) << 27) + (s2 >>> 21)) / (double) (1L << 53);
+    final double dbl = ((s1 >>> 22 << 27) + (s2 >>> 21)) / (double) (1L << 53);
     final Dbl number = Dbl.get(dbl);
     final FItem next = nextFunc(s2, qc), permute = permuteFunc(s1, qc);
     return Map.EMPTY.put(NUMBER, number, info).put(NEXT, next, info).put(PERMUTE, permute, info);

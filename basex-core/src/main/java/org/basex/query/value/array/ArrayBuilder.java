@@ -139,7 +139,7 @@ public final class ArrayBuilder {
       tree.append(midTree);
       for(int i = ls.length; --i >= 0;) prepend(ls[i]);
       for(int i = k; --i >= 0;) prepend(temp[i]);
-      for(int i = 0; i < rs.length; i++) append(rs[i]);
+      for(final Value r : rs) append(r);
       return this;
     }
 

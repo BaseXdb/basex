@@ -25,7 +25,7 @@ public final class NodeIterator<E> implements ListIterator<E> {
   /** Current index. */
   private long index;
   /** Number of elements in the root node. */
-  private long rootSize;
+  private final long rootSize;
 
   /**
    * Constructor.
@@ -44,10 +44,10 @@ public final class NodeIterator<E> implements ListIterator<E> {
       final InnerNode<?, E> inner = (InnerNode<?, E>) curr;
       final int idx = reverse ? inner.arity() - 1 : 0;
       if(++top == nodes.length) {
-        InnerNode<?, E>[] newNodes = new InnerNode[2 * top];
+        final InnerNode<?, E>[] newNodes = new InnerNode[2 * top];
         System.arraycopy(nodes, 0, newNodes, 0, top);
         nodes = newNodes;
-        int[] newPoss = new int[2 * top];
+        final int[] newPoss = new int[2 * top];
         System.arraycopy(poss, 0, newPoss, 0, top);
         poss = newPoss;
       }

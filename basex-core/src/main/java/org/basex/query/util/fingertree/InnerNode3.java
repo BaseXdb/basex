@@ -180,7 +180,7 @@ final class InnerNode3<N, E> extends InnerNode<N, E> {
           return new InnerNode2<>((Node<N, E>) slice0, (Node<N, E>) slice1);
 
         // partial nodes have to be merged
-        NodeLike<N, E>[] merged = slice0.concat(slice1);
+        final NodeLike<N, E>[] merged = slice0.concat(slice1);
         return merged[1] == null ? new PartialInnerNode<>(merged[0]) :
           new InnerNode2<>((Node<N, E>) merged[0], (Node<N, E>) merged[1]);
       }
@@ -190,7 +190,7 @@ final class InnerNode3<N, E> extends InnerNode<N, E> {
       final NodeLike<N, E> slice2 = in2 == r - m ? child2 : child2.slice(0, in2);
       @SuppressWarnings("unchecked")
       final NodeLike<N, E>[] ns = new NodeLike[3];
-      int p0 = slice0.append(ns, 0), p1 = child1.append(ns, p0), p2 = slice2.append(ns, p1);
+      final int p0 = slice0.append(ns, 0), p1 = child1.append(ns, p0), p2 = slice2.append(ns, p1);
       return p2 == 1 ? new PartialInnerNode<>(ns[0])
            : p2 == 2 ? new InnerNode2<>((Node<N, E>) ns[0], (Node<N, E>) ns[1])
                      : new InnerNode3<>((Node<N, E>) ns[0], (Node<N, E>) ns[1], (Node<N, E>) ns[2]);
@@ -209,7 +209,7 @@ final class InnerNode3<N, E> extends InnerNode<N, E> {
         return new InnerNode2<>((Node<N, E>) slice1, (Node<N, E>) slice2);
 
       // partial nodes have to be merged
-      NodeLike<N, E>[] merged = slice1.concat(slice2);
+      final NodeLike<N, E>[] merged = slice1.concat(slice2);
       return merged[1] == null ? new PartialInnerNode<>(merged[0]) :
         new InnerNode2<>((Node<N, E>) merged[0], (Node<N, E>) merged[1]);
     }

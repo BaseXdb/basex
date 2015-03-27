@@ -211,7 +211,7 @@ final class Deep<N, E> extends FingerTree<N, E> {
     }
 
     final Deep<N, E> rght = (Deep<N, E>) other;
-    Node<N, E>[] as = lft.right, bs = rght.left;
+    final Node<N, E>[] as = lft.right, bs = rght.left;
     final int l = as.length, n = l + bs.length, k = (n + 2) / 3;
     @SuppressWarnings("unchecked")
     final Node<Node<N, E>, E>[] out = new Node[k];
@@ -416,7 +416,7 @@ final class Deep<N, E> extends FingerTree<N, E> {
 
       if(newFirst != first) {
         // nodes were balanced
-        FingerTree<Node<N, E>, E> newMid = middle.replaceHead(head.replaceFirst(newFirst));
+        final FingerTree<Node<N, E>, E> newMid = middle.replaceHead(head.replaceFirst(newFirst));
         return new Deep<>(newLeft, newNode.size(), newMid, right, size - 1);
       }
 

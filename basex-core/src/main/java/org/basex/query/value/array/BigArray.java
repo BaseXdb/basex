@@ -356,7 +356,7 @@ final class BigArray extends Array {
     }
 
     // delete in middle tree
-    TreeSlice<Value, Value> slice = middle.remove(pos - left.length);
+    final TreeSlice<Value, Value> slice = middle.remove(pos - left.length);
 
     if(slice.isTree()) {
       // middle tree did not underflow

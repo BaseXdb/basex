@@ -74,7 +74,7 @@ final class PartialInnerNode<N, E> extends PartialNode<Node<N, E>, E> {
       return 1;
     }
 
-    NodeLike<Node<N, E>, E>[] joined = nodes[pos - 1].concat(this);
+    final NodeLike<Node<N, E>, E>[] joined = nodes[pos - 1].concat(this);
     nodes[pos - 1] = joined[0];
 
     if(joined[1] != null) {
