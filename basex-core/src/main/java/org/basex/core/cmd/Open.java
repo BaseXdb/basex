@@ -96,7 +96,7 @@ public final class Open extends Command {
 
         // open database
         data = new DiskData(meta);
-        context.datas.add(data);
+        context.datas.pin(data);
       }
       return data;
     }

@@ -109,7 +109,6 @@ public final class QueryResources {
   void close() {
     for(final Data data : datas) Close.close(data, qc.context);
     datas.clear();
-
     // close dynamically loaded JAR files
     if(modules != null) modules.close();
     // close external resources

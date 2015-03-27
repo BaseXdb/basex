@@ -517,16 +517,6 @@ public final class DbModuleTest extends AdvancedQueryTest {
    * @throws BaseXException database exception
    */
   @Test
-  public void o() throws BaseXException {
-    new Close().execute(context);
-    query(_DB_OPTIMIZE.args(NAME, true));
-  }
-
-  /**
-   * Test method.
-   * @throws BaseXException database exception
-   */
-  @Test
   public void optimize() throws BaseXException {
     query(_DB_OPTIMIZE.args(NAME));
     query(_DB_OPTIMIZE.args(NAME));

@@ -79,6 +79,9 @@ public final class MemData extends Data {
   }
 
   @Override
+  public void unpin() { }
+
+  @Override
   public void close() { }
 
   @Override

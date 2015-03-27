@@ -86,7 +86,6 @@ public final class CreateDB extends ACreate {
         // create main memory instance
         final Data data = proc(new MemBuilder(name, parser)).build();
         context.openDB(data);
-        context.datas.add(data);
       } else {
         if(context.pinned(name)) return error(DB_PINNED_X, name);
 

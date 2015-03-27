@@ -42,6 +42,6 @@ public final class Close extends Command {
    * @param ctx database context
    */
   public static void close(final Data data, final Context ctx) {
-    synchronized(ctx.datas) { if(ctx.datas.unpin(data)) data.close(); }
+    synchronized(ctx.datas) { ctx.datas.unpin(data); }
   }
 }

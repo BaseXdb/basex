@@ -101,8 +101,6 @@ public abstract class Data {
   public Index attrIndex;
   /** Full-text index instance. */
   public Index ftxtIndex;
-  /** Number of current database users. */
-  public int pins = 1;
 
   /** Table access file. */
   TableAccess table;
@@ -118,6 +116,11 @@ public abstract class Data {
   protected Data(final MetaData meta) {
     this.meta = meta;
   }
+
+  /**
+   * Unpins the database.
+   */
+  public abstract void unpin();
 
   /**
    * Closes the database.
