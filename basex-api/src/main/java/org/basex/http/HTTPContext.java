@@ -39,6 +39,8 @@ public final class HTTPContext {
   private static boolean init;
   /** Initialized failed. */
   private static IOException exception;
+  /** Server instance. */
+  private static BaseXServer server;
 
   /** Servlet request. */
   public final HttpServletRequest req;
@@ -427,12 +429,25 @@ public final class HTTPContext {
     // start server instance
     if(!context.soptions.get(StaticOptions.HTTPLOCAL)) {
       try {
-        new BaseXServer(context);
+        server = new BaseXServer(context);
       } catch(final IOException ex) {
         exception = ex;
         throw ex;
       }
     }
+  }
+
+  /**
+   * Closes the database context.
+   */
+  public static synchronized void close() {
+    if(server == null) return;
+    try {
+      server.stop();
+    } catch(final IOException ex) {
+      Util.stack(ex);
+    }
+    server = null;
   }
 
   /**
