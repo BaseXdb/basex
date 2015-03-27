@@ -414,7 +414,7 @@ public enum QueryError {
   RANGE_X(FOAR, 2, "Value out of range: %."),
 
   /** FOAY0001. */
-  ARRAYBOUNDS_X_X(FOAY, 1, "Array index % out of bounds (1-%)."),
+  ARRAYBOUNDS_X_X(FOAY, 1, "Array index % out of bounds (1..%)."),
   /** FOAY0001. */
   ARRAYEMPTY(FOAY, 1, "Array has no entries."),
   /** FOAY0002. */

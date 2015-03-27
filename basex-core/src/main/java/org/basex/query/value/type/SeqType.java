@@ -343,9 +343,11 @@ public final class SeqType {
    */
   public boolean instance(final Item it, final boolean knd) {
     // maps and arrays don't have type information attached to them, you have to look...
-    return type instanceof MapType ? it instanceof Map && ((Map) it).hasType((MapType) type) :
-      type instanceof ArrayType ? it instanceof Array && ((Array) it).hasType((ArrayType) type) :
-      it.type.instanceOf(type) && (!knd || kind == null || kind.eq(it));
+    return type instanceof MapType
+        ? it instanceof Map && ((Map) it).hasType((MapType) type)
+        : type instanceof ArrayType
+            ? it instanceof Array && ((Array) it).hasType((ArrayType) type)
+            : it.type.instanceOf(type) && (!knd || kind == null || kind.eq(it));
   }
 
   /**

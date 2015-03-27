@@ -2,8 +2,8 @@ package org.basex.query.expr.constr;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.iter.*;
-import org.basex.query.util.list.*;
+import org.basex.query.value.*;
+import org.basex.query.value.array.*;
 import org.basex.query.value.array.Array;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -46,17 +46,16 @@ public final class CArray extends Arr {
 
   @Override
   public Array item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final ValueList vl;
+    final ArrayBuilder builder = new ArrayBuilder();
     if(create) {
-      final ValueBuilder vb = new ValueBuilder(exprs.length);
-      for(final Expr expr : exprs) vb.add(qc.value(expr));
-      vl = new ValueList((int) vb.size());
-      for(final Item it : vb) vl.add(it);
+      for(final Expr expr : exprs) {
+        final Value value = qc.value(expr);
+        for(final Item it : value) builder.append(it);
+      }
     } else {
-      vl = new ValueList(exprs.length);
-      for(final Expr expr : exprs) vl.add(qc.value(expr));
+      for(final Expr expr : exprs) builder.append(qc.value(expr));
     }
-    return vl.array();
+    return builder.freeze();
   }
 
   @Override

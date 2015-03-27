@@ -85,11 +85,12 @@ public final class ValueList extends ElementList {
   }
 
   /**
-   * Returns an XQuery array and invalidates the internal array.
-   * Warning: the function must only be called if the list is discarded afterwards.
-   * @return array (internal representation!)
+   * Creates an array from the contents of this list.
+   * @return the array
    */
-  public Array array() {
-    return Array.get(finish());
+  public Value array() {
+    final ArrayBuilder builder = new ArrayBuilder();
+    for(int i = 0; i < size; i++) builder.append(list[i]);
+    return builder.freeze();
   }
 }

@@ -17,10 +17,14 @@ public final class ArraySubarray extends ArrayFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Array array = toArray(exprs[0], qc);
-    final int p = checkPos(array, toLong(exprs[1], qc), true);
-    final int l = exprs.length > 2 ? (int) toLong(exprs[2], qc) : array.arraySize() - p;
-    if(l < 0) throw ARRAYNEG_X.get(info, l);
-    checkPos(array, p + 1 + l, true);
-    return Array.get(array, p, l);
+    final long n = array.arraySize();
+    final long from = toLong(exprs[1], qc) - 1;
+    if(from < 0 || from > n) throw ARRAYBOUNDS_X_X.get(info, from + 1, n + 1);
+    if(exprs.length == 2) return array.subArray(from, n - from);
+
+    final long len = toLong(exprs[2], qc);
+    if(len < 0) throw ARRAYNEG_X.get(info, len);
+    if(from + len > n) throw ARRAYBOUNDS_X_X.get(info, from + 1 + len, n + 1);
+    return array.subArray(from, len);
   }
 }

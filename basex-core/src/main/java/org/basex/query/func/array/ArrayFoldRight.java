@@ -1,5 +1,7 @@
 package org.basex.query.func.array;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
@@ -23,7 +25,8 @@ public final class ArrayFoldRight extends ArrayFn {
     final Array array = toArray(exprs[0], qc);
     Value res = qc.value(exprs[1]);
     final FItem fun = checkArity(exprs[2], 2, qc);
-    for(int a = array.arraySize(); --a >= 0;) res = fun.invokeValue(qc, info, array.get(a), res);
+    final ListIterator<Value> iter = array.members(true);
+    while(iter.hasPrevious()) res = fun.invokeValue(qc, info, iter.previous(), res);
     return res;
   }
 }
