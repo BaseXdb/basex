@@ -6,8 +6,7 @@
 module namespace html = 'dba/html';
 
 import module namespace Request = 'http://exquery.org/ns/request';
-import module namespace G = 'dba/global' at '../modules/global.xqm';
-import module namespace web = 'dba/web' at '../modules/web.xqm';
+import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 
 (: Number formats. :)
 declare variable $html:NUMBER := ('decimal','number', 'bytes');
@@ -251,7 +250,7 @@ declare function html:table(
         )
 
         for $entry at $c in $entries
-        return if($c <= $G:MAX-ROWS) then (
+        return if($c <= $cons:MAX-ROWS) then (
           <tr>{
             for $header at $pos in $headers
             let $name := $header/name()
@@ -283,7 +282,7 @@ declare function html:table(
               )
             }
           }</tr>
-        ) else if($c = $G:MAX-ROWS + 1) then (
+        ) else if($c = $cons:MAX-ROWS + 1) then (
           <tr>
             <td>{
               if($buttons) then <input type="checkbox" disabled=""/> else ()

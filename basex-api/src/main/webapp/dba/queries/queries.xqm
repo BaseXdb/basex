@@ -5,10 +5,10 @@
  :)
 module namespace _ = 'dba/queries';
 
-import module namespace G = 'dba/global' at '../modules/global.xqm';
+import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
 import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
-import module namespace web = 'dba/web' at '../modules/web.xqm';
+import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
 declare variable $_:CAT := 'queries';
@@ -32,7 +32,7 @@ function _:queries(
   $error  as xs:string?,
   $info   as xs:string?
 ) as element() {
-  web:check(),
+  cons:check(),
 
   let $f := function($b) { "xquery('Please wait…', 'Query was successful.', " || $b || ");" }
   return tmpl:wrap(map { 'top': $_:CAT, 'info': $info, 'error': $error },
@@ -82,8 +82,8 @@ declare
 function _:eval-query(
   $query  as xs:string?
 ) as xs:string {
-  web:check(),
-  web:query($query)
+  cons:check(),
+  util:query($query)
 };
 
 (:~
@@ -98,8 +98,8 @@ declare
 function _:update-query(
   $query  as xs:string?
 ) {
-  web:check(),
-  web:update-query($query)
+  cons:check(),
+  util:update-query($query)
 };
 
 (:~
@@ -107,7 +107,7 @@ function _:update-query(
  : @return options
  :)
 declare %private function _:query-options() {
-  "map { 'timeout':" || $G:TIMEOUT ||
-       ",'memory':" || $G:MEMORY ||
-       ",'permission':'" || $G:PERMISSION || "' }"
+  "map { 'timeout':" || $cons:TIMEOUT ||
+       ",'memory':" || $cons:MEMORY ||
+       ",'permission':'" || $cons:PERMISSION || "' }"
 };

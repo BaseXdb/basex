@@ -6,10 +6,10 @@
 module namespace _ = 'dba/settings';
 
 import module namespace Request = 'http://exquery.org/ns/request';
-import module namespace G = 'dba/global' at '../modules/global.xqm';
-import module namespace html = 'dba/html' at '../modules/html.xqm';
+import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
-import module namespace web = 'dba/web' at '../modules/web.xqm';
+
+declare option query:write-lock "settings";
 
 (:~ Top category :)
 declare variable $_:CAT := 'settings';
@@ -23,7 +23,7 @@ declare
   %output:method("html")
 function _:settings(
 ) as element() {
-  web:check(),
+  cons:check(),
 
   tmpl:wrap(map { 'top': $_:CAT },
     <tr>
@@ -36,7 +36,7 @@ function _:settings(
             </tr>
             <tr>
               <td><b>TIMEOUT:</b></td>
-              <td><input name="timeout" type="number" value="{ $G:TIMEOUT }"/>
+              <td><input name="timeout" type="number" value="{ $cons:TIMEOUT }"/>
                 <span class='note'> &#xa0;
                   …query timeout (seconds)
                 </span>
@@ -44,7 +44,7 @@ function _:settings(
             </tr>
             <tr>
               <td><b>MEMORY:</b></td>
-              <td><input name="memory" type="number" value="{ $G:MEMORY }"/>
+              <td><input name="memory" type="number" value="{ $cons:MEMORY }"/>
                 <span class='note'> &#xa0;
                   …memory limit (mb) during query execution
                 </span>
@@ -52,7 +52,7 @@ function _:settings(
             </tr>
             <tr>
               <td><b>MAXCHARS:</b></td>
-              <td><input name="maxchars" type="number" value="{ $G:MAX-CHARS }"/>
+              <td><input name="maxchars" type="number" value="{ $cons:MAX-CHARS }"/>
                 <span class='note'> &#xa0;
                   …maximum number of characters in query results
                 </span>
@@ -60,7 +60,7 @@ function _:settings(
             </tr>
             <tr>
               <td><b>MAXROWS:</b></td>
-              <td><input name="maxrows" type="number" value="{ $G:MAX-ROWS }"/>
+              <td><input name="maxrows" type="number" value="{ $cons:MAX-ROWS }"/>
                 <span class='note'> &#xa0;
                   …maximum number of displayed table rows
                 </span>
@@ -70,8 +70,8 @@ function _:settings(
               <td><b>PERMISSION:</b></td>
               <td>
                 <select name="permission">{
-                  for $p in $G:PERMISSIONS
-                  return element option { attribute selected { }[$p = $G:PERMISSION], $p }
+                  for $p in $cons:PERMISSIONS
+                  return element option { attribute selected { }[$p = $cons:PERMISSION], $p }
                 }</select>
                 <span class='note'> &#xa0;
                   …for running queries
@@ -89,22 +89,21 @@ function _:settings(
  : Saves the settings.
  :)
 declare
-  %updating
   %rest:POST
   %rest:path("dba/settings")
   %output:method("html")
 function _:settings-save(
 ) {
-  web:check(),
+  cons:check(),
 
-  let $config := doc($G:CONFIG-XML)/config update (
+  let $config := doc($cons:CONFIG-XML)/config update (
     for $key in Request:parameter-names()
     (: skip empty values :)
     for $value in Request:parameter($key)[.]
     return replace value of node *[name() = $key] with $value
   )
   return (
-    file:write($G:CONFIG-XML, $config),
+    file:write($cons:CONFIG-XML, $config),
     web:redirect("settings")
   )
 };

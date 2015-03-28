@@ -5,10 +5,10 @@
  :)
 module namespace _ = 'dba/users';
 
-import module namespace G = 'dba/global' at '../modules/global.xqm';
+import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
 import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
-import module namespace web = 'dba/web' at '../modules/web.xqm';
+import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
 declare variable $_:CAT := 'users';
@@ -34,7 +34,7 @@ function _:create(
   $perm   as xs:string,
   $error  as xs:string?
 ) as element() {
-  web:check(),
+  cons:check(),
   tmpl:wrap(map { 'top': $_:CAT, 'error': $error },
     <tr>
       <td>
@@ -68,7 +68,7 @@ function _:create(
               <td>Permission:</td>
               <td>
                 <select name="perm" size="5">{
-                  for $p in $G:PERMISSIONS
+                  for $p in $cons:PERMISSIONS
                   return element option { attribute selected { }[$p = $perm], $p }
                 }</select>
                 <div class='small'/>
@@ -100,9 +100,9 @@ function _:create(
   $pw    as xs:string,
   $perm  as xs:string
 ) {
-  web:check(),
+  cons:check(),
   try {
-    web:update("if(user:exists($name)) then (
+    util:update("if(user:exists($name)) then (
       error((), 'User already exists: ' || $name || '.')
     ) else (
       user:create($name, $pw, $perm)
@@ -111,16 +111,16 @@ function _:create(
       'pw':   $pw,
       'perm': $perm
     }),
-    web:redirect($_:CAT, map {
+    db:output(web:redirect($_:CAT, map {
       'info': 'Created User: ' || $name,
       'name': $name
-    })
+    }))
   } catch * {
-    web:redirect("create-user", map {
+    db:output(web:redirect("create-user", map {
       'error': $err:description,
       'name': $name,
       'pw':   $pw,
       'perm': $perm
-    })
+    }))
   }
 };

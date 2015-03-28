@@ -5,10 +5,10 @@
  :)
 module namespace _ = 'dba/databases';
 
-import module namespace G = 'dba/global' at '../modules/global.xqm';
+import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
 import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
-import module namespace web = 'dba/web' at '../modules/web.xqm';
+import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
 declare variable $_:CAT := 'databases';
@@ -32,17 +32,17 @@ function _:databases(
   $error  as xs:string?,
   $info   as xs:string?
 ) as element(html) {
-  web:check(),
+  cons:check(),
 
   (: request data in a single step :)
   let $data := try {
-    web:eval('element result {
+    util:eval('element result {
       element databases { db:list-details() },
       element backups { db:backups() },
       db:system()
     }')
   } catch * {
-    element error { $G:DATA-ERROR || ': ' || $err:description }
+    element error { $cons:DATA-ERROR || ': ' || $err:description }
   }
   let $error := ($data/self::error/string(), $error)[1]
 
@@ -109,7 +109,6 @@ function _:databases(
  : @param  $names   names of selected databases
  :)
 declare
-  %updating
   %rest:POST
   %rest:path("dba/databases")
   %rest:query-param("action", "{$action}")

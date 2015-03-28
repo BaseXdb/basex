@@ -6,7 +6,7 @@
 module namespace _ = 'dba/databases';
 
 import module namespace Sessions = 'http://basex.org/modules/sessions';
-import module namespace web = 'dba/web' at '../modules/web.xqm';
+import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 
 (:~
  : Kills DBA sessions.
@@ -20,11 +20,11 @@ declare
 function _:drop(
   $ids  as xs:string*
 ) {
-  web:check(),
+  cons:check(),
   try {
     Sessions:ids()[. = $ids] ! Sessions:close(.),
-    web:redirect-ro("users", map { 'info': 'Killed sessions: ' || count($ids) })
+    web:redirect("users", map { 'info': 'Killed sessions: ' || count($ids) })
   } catch * {
-    web:redirect-ro("users", map { 'error': $err:description })
+    web:redirect("users", map { 'error': $err:description })
   }
 };

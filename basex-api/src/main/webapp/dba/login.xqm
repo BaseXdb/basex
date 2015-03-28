@@ -6,10 +6,9 @@
 module namespace _ = 'dba/login';
 
 import module namespace Session = 'http://basex.org/modules/session';
-import module namespace G = 'dba/global' at 'modules/global.xqm';
+import module namespace cons = 'dba/cons' at 'modules/cons.xqm';
 import module namespace html = 'dba/html' at 'modules/html.xqm';
 import module namespace tmpl = 'dba/tmpl' at 'modules/tmpl.xqm';
-import module namespace web = 'dba/web' at 'modules/web.xqm';
 
 (:~
  : Login page.
@@ -91,7 +90,7 @@ function _:login(
   $name  as xs:string,
   $pass  as xs:string,
   $url   as xs:string
-) as element(rest:redirect) {
+) as element(rest:response) {
   if($url) then (
     if(matches($url, '^.+:\d+/?$')) then (
       let $host := replace($url, ':.*$', '')
@@ -137,14 +136,14 @@ function _:login(
  : @return redirect
  :)
 declare %rest:path("dba/logout") function _:logout(
-) as element(rest:redirect) {
-  let $name := $G:SESSION/name
-  let $url := string-join($G:SESSION/(host, port), ':')
+) as element(rest:response) {
+  let $name := $cons:SESSION/name
+  let $url := string-join($cons:SESSION/(host, port), ':')
   return (
     admin:write-log('User was logged out: ' || $name),
-    Session:delete($G:SESSION-KEY),
+    Session:delete($cons:SESSION-KEY),
     Session:close(),
-    web:redirect-ro('login', map { 'nane': $name, 'url': $url })
+    web:redirect('login', map { 'nane': $name, 'url': $url })
   )
 };
 
@@ -159,7 +158,7 @@ declare %private function _:accept(
   $host  as xs:string,
   $port  as xs:string
 ) {
-  Session:set($G:SESSION-KEY,
+  Session:set($cons:SESSION-KEY,
     element session {
       element name { $name },
       element pass { $pass },
@@ -168,7 +167,7 @@ declare %private function _:accept(
     }
   ),
   admin:write-log('User was logged in: ' || $name),
-  web:redirect-ro('databases')
+  web:redirect('databases')
 };
 
 (:~
@@ -182,7 +181,7 @@ declare %private function _:reject(
   $name     as xs:string,
   $url      as xs:string,
   $message  as xs:string
-) as element(rest:redirect) {
+) as element(rest:response) {
   admin:write-log('Login was denied: ' || $name),
-  web:redirect-ro('login', map { 'name': $name, 'url': $url, 'error': $message })
+  web:redirect('login', map { 'name': $name, 'url': $url, 'error': $message })
 };

@@ -5,7 +5,8 @@
  :)
 module namespace _ = 'dba/users';
 
-import module namespace web = 'dba/web' at '../modules/web.xqm';
+import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
+import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~
  : Drops users.
@@ -20,11 +21,11 @@ declare
 function _:drop(
   $names  as xs:string*
 ) {
-  web:check(),
+  cons:check(),
   try {
-    web:update("$n ! user:drop(.)", map { 'n': $names }),
-    web:redirect("users", map { 'info': 'Dropped users: ' || count($names) })
+    util:update("$n ! user:drop(.)", map { 'n': $names }),
+    db:output(web:redirect("users", map { 'info': 'Dropped users: ' || count($names) }))
   } catch * {
-    web:redirect("users", map { 'error': $err:description })
+    db:output(web:redirect("users", map { 'error': $err:description }))
   }
 };

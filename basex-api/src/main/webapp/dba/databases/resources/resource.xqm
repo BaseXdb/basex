@@ -5,7 +5,7 @@
  :)
 module namespace _ = 'dba/databases';
 
-import module namespace web = 'dba/web' at '../../modules/web.xqm';
+import module namespace cons = 'dba/cons' at '../../modules/cons.xqm';
 
 (:~ Top category :)
 declare variable $_:CAT := 'databases';
@@ -19,7 +19,6 @@ declare variable $_:SUB := 'database';
  : @param  $resource  resource
  :)
 declare
-  %updating
   %rest:POST
   %rest:path("dba/resource")
   %rest:form-param("action",   "{$action}")
@@ -30,7 +29,7 @@ function _:resource(
   $name      as xs:string,
   $resource  as xs:string*
 ) {
-  web:check(),
+  cons:check(),
   if($action = ('rename', 'replace')) then (
     web:redirect($action, map { 'name': $name, 'resource': $resource })
   ) else (

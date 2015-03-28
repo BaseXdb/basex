@@ -5,10 +5,10 @@
  :)
 module namespace _ = 'dba/databases';
 
-import module namespace G = 'dba/global' at '../modules/global.xqm';
+import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
 import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
-import module namespace web = 'dba/web' at '../modules/web.xqm';
+import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~
  : Form for optimizing a database.
@@ -35,12 +35,12 @@ function _:create(
   $lang   as xs:string?,
   $error  as xs:string?
 ) as element(html) {
-  web:check(),
+  cons:check(),
 
   let $data := try {
-    web:eval('db:info($n)', map { 'n': $name })
+    util:eval('db:info($n)', map { 'n': $name })
   } catch * {
-    element error { $G:DATA-ERROR || ': ' || $err:description }
+    element error { $cons:DATA-ERROR || ': ' || $err:description }
   }
   let $error := ($data/self::error/string(), $error)[1]
 
@@ -115,25 +115,25 @@ function _:optimize(
   $lang  as xs:string?
 ) {
   try {
-    web:check(),
-    web:update("db:optimize($name, boolean($all), map:merge((
+    cons:check(),
+    util:update("db:optimize($name, boolean($all), map:merge((
   (('textindex','attrindex','ftindex','stemming','casesens','diacritics') !
     map:entry(., $opts = .)),
     $lang ! map:entry('language', .)
   )
 ))", map { 'name': $name, 'all': $all, 'lang': $lang, 'opts': $opts }
     ),
-    web:redirect("database", map {
+    db:output(web:redirect("database", map {
       'name': $name,
       'info': 'Database was optimized.'
-    })
+    }))
   } catch * {
-    web:redirect("database", map {
+    db:output(web:redirect("database", map {
       'error': $err:description,
       'name': $name,
       'opts': $opts,
       'lang': $lang
-    })
+    }))
   }
 };
 
@@ -150,15 +150,15 @@ declare
 function _:drop(
   $names  as xs:string*
 ) {
-  web:check(),
+  cons:check(),
   try {
     $names ! db:optimize(.),
-    web:redirect("databases", map {
+    db:output(web:redirect("databases", map {
       'info': 'Optimized databases: ' || count($names)
-    })
+    }))
   } catch * {
-    web:redirect("databases", map {
+    db:output(web:redirect("databases", map {
       'error': $err:description
-    })
+    }))
   }
 };

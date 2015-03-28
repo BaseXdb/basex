@@ -5,7 +5,8 @@
  :)
 module namespace _ = 'dba/databases';
 
-import module namespace web = 'dba/web' at '../../modules/web.xqm';
+import module namespace cons = 'dba/cons' at '../../modules/cons.xqm';
+import module namespace util = 'dba/util' at '../../modules/util.xqm';
 
 (:~
  : Deletes resources.
@@ -23,12 +24,15 @@ function _:delete(
   $name       as xs:string,
   $resources  as xs:string*
 ) {
-  web:check(),
+  cons:check(),
   try {
-    web:update("$r ! db:delete($n, .)", map { 'n': $name, 'r': $resources }),
-    web:redirect("database",
+    util:update("$r ! db:delete($n, .)", map { 'n': $name, 'r': $resources }),
+    db:output(web:redirect("database",
       map { 'name': $name, 'info': 'Deleted resources: ' || count($resources) })
+    )
   } catch * {
-    web:redirect("database", map { 'name': $name, 'error': $err:description })
+    db:output(
+      web:redirect("database", map { 'name': $name, 'error': $err:description })
+    )
   }
 };

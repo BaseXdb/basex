@@ -5,9 +5,10 @@
  :)
 module namespace _ = 'dba/databases';
 
+import module namespace cons = 'dba/cons' at '../../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../../modules/html.xqm';
 import module namespace tmpl = 'dba/tmpl' at '../../modules/tmpl.xqm';
-import module namespace web = 'dba/web' at '../../modules/web.xqm';
+import module namespace util = 'dba/util' at '../../modules/util.xqm';
 
 (:~ Top category :)
 declare variable $_:CAT := 'databases';
@@ -36,7 +37,7 @@ function _:add(
   $binary    as xs:string?,
   $error     as xs:string?
 ) as element(html) {
-  web:check(),
+  cons:check(),
   tmpl:wrap(map { 'top': $_:CAT, 'error': $error },
     <tr>
       <td>
@@ -93,28 +94,28 @@ function _:add-post(
   $file      as map(*),
   $binary    as xs:string?
 ) {
-  web:check(),
+  cons:check(),
   try {
     let $key := map:keys($file)
     let $path := if($resource) then $resource else $key
     let $content := $file($key)
-    return if(web:eval('db:exists($n, $p)', map { 'n': $name, 'p': $path })) then (
+    return if(util:eval('db:exists($n, $p)', map { 'n': $name, 'p': $path })) then (
       error((), 'Resource already exists: ' || $path || '.')
     ) else (
       if($binary) then (
-        web:update('db:store($n, $p, $c)', map { 'n': $name, 'p': $path, 'c': $content })
+        util:update('db:store($n, $p, $c)', map { 'n': $name, 'p': $path, 'c': $content })
       ) else (
         let $xml := try {
           convert:binary-to-string($content)
         } catch * { error($err:code, replace($err:description, '^.*\): ', '')) }
-        return web:update('db:add($n, $x, $p)', map { 'n': $name, 'x': $xml, 'p': $path })
+        return util:update('db:add($n, $x, $p)', map { 'n': $name, 'x': $xml, 'p': $path })
       ),
-      web:redirect($_:SUB,
-        map { 'name': $name, 'resource': $path, 'info': 'Added resource: ' || $name })
+      db:output(web:redirect($_:SUB,
+        map { 'name': $name, 'resource': $path, 'info': 'Added resource: ' || $name }))
     )
   } catch * {
-    web:redirect("add", map { 'name': $name, 'resource': $resource,
-      'binary': $binary, 'error': $err:description }
+    db:output(web:redirect("add", map { 'name': $name, 'resource': $resource,
+      'binary': $binary, 'error': $err:description })
     )
   }
 };

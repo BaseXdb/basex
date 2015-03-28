@@ -5,10 +5,10 @@
  :)
 module namespace _ = 'dba/users';
 
-import module namespace G = 'dba/global' at '../modules/global.xqm';
+import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
 import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
-import module namespace web = 'dba/web' at '../modules/web.xqm';
+import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
 declare variable $_:CAT := 'users';
@@ -36,7 +36,7 @@ function _:create(
   $perm     as xs:string,
   $error    as xs:string?
 ) as element() {
-  web:check(),
+  cons:check(),
   tmpl:wrap(map { 'top': $_:CAT, 'error': $error },
     <tr>
       <td>
@@ -61,7 +61,7 @@ function _:create(
               <td>Permission:</td>
               <td>
                 <select name="perm" size="3">{
-                  for $p in $G:PERMISSIONS[position() = 1 to 3]
+                  for $p in $cons:PERMISSIONS[position() = 1 to 3]
                   return element option { attribute selected { }[$p = $perm], $p }
                 }</select>
                 <div class='small'/>
@@ -92,23 +92,23 @@ function _:create(
   $perm     as xs:string,
   $pattern  as xs:string
 ) {
-  web:check(),
+  cons:check(),
   try {
-    web:update("user:grant($name, $perm, $pattern)", map {
+    util:update("user:grant($name, $perm, $pattern)", map {
       'name':    $name,
       'perm':    $perm,
       'pattern': $pattern
     }),
-    web:redirect($_:SUB, map {
+    db:output(web:redirect($_:SUB, map {
       'info': 'Created Pattern: ' || $pattern,
       'name': $name
-    })
+    }))
   } catch * {
-    web:redirect("add-pattern", map {
+    db:output(web:redirect("add-pattern", map {
       'error': $err:description,
       'name': $name,
       'perm': $perm,
       'pattern': $pattern
-    })
+    }))
   }
 };

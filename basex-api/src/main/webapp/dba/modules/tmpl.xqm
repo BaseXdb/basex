@@ -5,8 +5,7 @@
  :)
 module namespace tmpl = 'dba/tmpl';
 
-import module namespace G = 'dba/global' at 'global.xqm';
-import module namespace web = 'dba/web' at 'web.xqm';
+import module namespace cons = 'dba/cons' at 'cons.xqm';
 
 (:~
  : Extends the specified table rows with the page template.
@@ -55,7 +54,7 @@ declare function tmpl:wrap(
           ' '
         })}</span>
         return try {
-          web:check(),
+          cons:check(),
           let $cats := 
             let $top := $options('top')
             for $cat in ('Databases', 'Queries', 'Logs', 'Users', 'Settings', 'Logout')
@@ -72,8 +71,8 @@ declare function tmpl:wrap(
           $emph
         },
         <span style='float:right'>User: <b>{
-          $G:SESSION/name/text()
-        }</b></span>[$G:SESSION]
+          $cons:SESSION/name/text()
+        }</b></span>[$cons:SESSION]
       }</div>
       <hr/>
       <div class='small'/>

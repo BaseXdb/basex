@@ -5,7 +5,8 @@
  :)
 module namespace _ = 'dba/databases';
 
-import module namespace web = 'dba/web' at '../modules/web.xqm';
+import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
+import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~
  : Creates a database backup.
@@ -73,14 +74,11 @@ declare %updating function _:action(
   $query  as xs:string,
   $args   as map(*)
 ) {
-  web:check(),
+  cons:check(),
   try {
-    web:update($query, $args),
-    web:redirect('database', map {
-      'name': $name,
-      'info': $info
-    })
+    util:update($query, $args),
+    db:output(web:redirect('database', map { 'name': $name, 'info': $info }))
   } catch * {
-    web:redirect('database', map { 'name': $name, 'error': $err:description })
+    db:output(web:redirect('database', map { 'name': $name, 'error': $err:description }))
   }
 };

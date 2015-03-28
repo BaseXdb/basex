@@ -5,7 +5,8 @@
  :)
 module namespace _ = 'dba/databases';
 
-import module namespace web = 'dba/web' at '../modules/web.xqm';
+import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
+import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~
  : Drops databases.
@@ -20,11 +21,11 @@ declare
 function _:drop(
   $names  as xs:string*
 ) {
-  web:check(),
+  cons:check(),
   try {
-    web:update("$n ! db:drop(.)", map { 'n': $names }),
-    web:redirect("databases", map { 'info': 'Dropped databases: ' || count($names) })
+    util:update("$n ! db:drop(.)", map { 'n': $names }),
+    db:output(web:redirect("databases", map { 'info': 'Dropped databases: ' || count($names) }))
   } catch * {
-    web:redirect("databases", map { 'error': $err:description })
+    db:output(web:redirect("databases", map { 'error': $err:description }))
   }
 };

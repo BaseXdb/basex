@@ -5,9 +5,10 @@
  :)
 module namespace _ = 'dba/databases';
 
+import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
 import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
-import module namespace web = 'dba/web' at '../modules/web.xqm';
+import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
 declare variable $_:CAT := 'databases';
@@ -36,7 +37,7 @@ function _:create(
   $lang   as xs:string?,
   $error  as xs:string?
 ) as element(html) {
-  web:check(),
+  cons:check(),
   tmpl:wrap(map { 'top': $_:CAT, 'error': $error },
     <tr>
       <td>
@@ -101,9 +102,9 @@ function _:create(
   $opts  as xs:string*,
   $lang  as xs:string?
 ) {
-  web:check(),
+  cons:check(),
   try {
-    web:update("if(db:exists($name)) then (
+    util:update("if(db:exists($name)) then (
       error((), 'Database already exists: ' || $name || '.')
     ) else (
       db:create($name, (), (), map:merge((
@@ -111,16 +112,16 @@ function _:create(
          map:entry(., $opts = .)), $lang ! map:entry('language', .))
       ))
     )", map { 'name': $name, 'lang': $lang, 'opts': $opts }),
-    web:redirect($_:SUB, map {
+    db:output(web:redirect($_:SUB, map {
       'info': 'Created Database: ' || $name,
       'name': $name
-    })
+    }))
   } catch * {
-    web:redirect("create-db", map {
+    db:output(web:redirect("create-db", map {
       'error': $err:description,
       'name': $name,
       'opts': $opts,
       'lang': $lang
-    })
+    }))
   }
 };

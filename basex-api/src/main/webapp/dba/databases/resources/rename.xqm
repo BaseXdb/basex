@@ -5,9 +5,10 @@
  :)
 module namespace _ = 'dba/databases';
 
+import module namespace cons = 'dba/cons' at '../../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../../modules/html.xqm';
 import module namespace tmpl = 'dba/tmpl' at '../../modules/tmpl.xqm';
-import module namespace web = 'dba/web' at '../../modules/web.xqm';
+import module namespace util = 'dba/util' at '../../modules/util.xqm';
 
 (:~ Top category :)
 declare variable $_:CAT := 'databases';
@@ -36,7 +37,7 @@ function _:rename(
   $newname   as xs:string?,
   $error     as xs:string?
 ) as element(html) {
-  web:check(),
+  cons:check(),
   tmpl:wrap(map { 'top': $_:SUB, 'error': $error },
     <tr>
       <td>
@@ -84,26 +85,26 @@ function _:rename(
   $resource  as xs:string,
   $newname   as xs:string
 ) {
-  web:check(),
+  cons:check(),
   try {
-    if(web:eval('db:exists($n, $m)', map { 'n' : $name, 'm': $newname })) then (
+    if(util:eval('db:exists($n, $m)', map { 'n' : $name, 'm': $newname })) then (
       error((), 'Resource already exists: ' || $newname || '.')
     ) else (
-      web:update("db:rename($n, $r, $m)",
+      util:update("db:rename($n, $r, $m)",
         map { 'n': $name, 'r': $resource, 'm': $newname }
       ),
-      web:redirect($_:SUB, map {
+      db:output(web:redirect($_:SUB, map {
         'info': 'Resource was renamed.',
         'name': $name,
         'resource': $newname
-      })
+      }))
     )
   } catch * {
-    web:redirect("rename", map {
+    db:output(web:redirect("rename", map {
       'error': $err:description,
       'name': $name,
       'resource': $resource,
       'newname': $newname
-    })
+    }))
   }
 };

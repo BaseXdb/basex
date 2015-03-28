@@ -5,9 +5,10 @@
  :)
 module namespace _ = 'dba/databases';
 
+import module namespace cons = 'dba/cons' at '../../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../../modules/html.xqm';
 import module namespace tmpl = 'dba/tmpl' at '../../modules/tmpl.xqm';
-import module namespace web = 'dba/web' at '../../modules/web.xqm';
+import module namespace util = 'dba/util' at '../../modules/util.xqm';
 
 (:~ Top category :)
 declare variable $_:CAT := 'databases';
@@ -33,7 +34,7 @@ function _:replace(
   $resource  as xs:string,
   $error     as xs:string?
 ) as element(html) {
-  web:check(),
+  cons:check(),
   tmpl:wrap(map { 'top': $_:SUB, 'error': $error },
     <tr>
       <td>
@@ -79,12 +80,12 @@ function _:replace-upload(
   $resource  as xs:string,
   $input     as map(*)?
 ) {
-  web:check(),
+  cons:check(),
   try {
     let $content := $input(map:keys($input))
     let $file := map:keys($input)
     let $content := $input($file)
-    let $raw := web:eval("db:is-raw($n, $r)", map { 'n': $name, 'r': $resource })
+    let $raw := util:eval("db:is-raw($n, $r)", map { 'n': $name, 'r': $resource })
     return if($file) then (
       try {
         let $i := if($raw) then (
@@ -92,31 +93,31 @@ function _:replace-upload(
         ) else (
           convert:binary-to-string($content)
         )
-        return web:update("db:replace($n, $r, $i)",
+        return util:update("db:replace($n, $r, $i)",
           map { 'n': $name, 'r': $resource, 'i': $i }
         ),
-        web:redirect($_:SUB, map {
+        db:output(web:redirect($_:SUB, map {
           'redirect': $_:SUB,
           'name': $name,
           'resource': $resource,
           'info': 'Replaced resource: ' || $resource
-        })
+        }))
       } catch * {
         error($err:code, replace($err:description, '^.*\): ', ''))
       }
     ) else (
-      web:redirect("replace", map {
+      db:output(web:redirect("replace", map {
         'redirect': $_:SUB,
         'name': $name,
         'resource': $resource,
         'error': 'Please select a file to upload.'
-      })
+      }))
     )
   } catch * {
-    web:redirect("replace", map {
+    db:output(web:redirect("replace", map {
       'error': $err:description,
       'name': $name,
       'resource': $resource
-    })
+    }))
   }
 };

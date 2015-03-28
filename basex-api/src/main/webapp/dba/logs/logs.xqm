@@ -5,10 +5,10 @@
  :)
 module namespace _ = 'dba/logs';
 
-import module namespace G = 'dba/global' at '../modules/global.xqm';
+import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
 import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
-import module namespace web = 'dba/web' at '../modules/web.xqm';
+import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~ Top category :)
 declare variable $_:CAT := 'logs';
@@ -41,10 +41,10 @@ function _:logs(
   $error    as xs:string?,
   $info     as xs:string?
 ) as element(html) {
-  web:check(),
+  cons:check(),
 
   let $loglists := _:loglist($sort, $loglist)
-  let $error := if($loglists) then $error else $G:DATA-ERROR
+  let $error := if($loglists) then $error else $cons:DATA-ERROR
   return tmpl:wrap(map { 'top': $_:CAT, 'info': $info, 'error': $error },
     <tr>
       <td width='230'>
@@ -97,10 +97,10 @@ function _:query(
   $query    as xs:string?,
   $loglist  as xs:string?
 ) as element()* {
-  web:check(),
+  cons:check(),
 
   let $logs := try {
-    web:eval("admin:logs($n, true())[matches(., $q, 'i')]",
+    util:eval("admin:logs($n, true())[matches(., $q, 'i')]",
       map { 'n': $name, 'q': $query }
     )
   } catch * { () }
@@ -136,10 +136,10 @@ function _:loglist(
   $sort   as xs:string?,
   $query  as xs:string?
 ) as element()* {
-  web:check(),
+  cons:check(),
 
   let $logs := try {
-    web:eval("for $a in admin:logs()
+    util:eval("for $a in admin:logs()
       let $n := $a/(@date,text())/string()
       where not($query) or (some $a in admin:logs($n) satisfies matches($a, $query, 'i'))
       order by $n descending

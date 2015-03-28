@@ -5,7 +5,8 @@
  :)
 module namespace _ = 'dba/databases';
 
-import module namespace web = 'dba/web' at '../../modules/web.xqm';
+import module namespace cons = 'dba/cons' at '../../modules/cons.xqm';
+import module namespace util = 'dba/util' at '../../modules/util.xqm';
 
 (:~
  : Downloads a resource.
@@ -23,18 +24,18 @@ function _:download(
   $resource  as xs:string,
   $file      as xs:string
 ) as item()+ {
-  web:check(),
+  cons:check(),
   try {
     let $options := map { 'n': $name, 'r': $resource }
-    let $raw := web:eval("db:is-raw($n, $r)", $options)
+    let $raw := util:eval("db:is-raw($n, $r)", $options)
     return (
       <rest:response>
         <output:serialization-parameters>
           <output:method value='{ if($raw) then "raw" else "xml" }'/>
-          <output:media-type value='{ web:eval("db:content-type($n, $r)", $options) }'/>
+          <output:media-type value='{ util:eval("db:content-type($n, $r)", $options) }'/>
         </output:serialization-parameters>
       </rest:response>,
-      web:eval(if($raw) then "db:retrieve($n, $r)" else "db:open($n, $r)", $options)
+      util:eval(if($raw) then "db:retrieve($n, $r)" else "db:open($n, $r)", $options)
     )
   } catch * {
     <rest:response>
@@ -55,8 +56,8 @@ declare
 function _:download(
   $backup  as xs:string
 ) {
-  web:check(),
-  web:eval("file:read-binary(db:system()/globaloptions/dbpath || '/' || $b)",
+  cons:check(),
+  util:eval("file:read-binary(db:system()/globaloptions/dbpath || '/' || $b)",
     map { 'b': $backup }
   )
 };

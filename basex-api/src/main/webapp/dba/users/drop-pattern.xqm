@@ -5,7 +5,8 @@
  :)
 module namespace _ = 'dba/users';
 
-import module namespace web = 'dba/web' at '../modules/web.xqm';
+import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
+import module namespace util = 'dba/util' at '../modules/util.xqm';
 
 (:~
  : Drops patterns.
@@ -23,11 +24,13 @@ function _:drop-pattern(
   $name     as xs:string,
   $pattern  as xs:string
 ) {
-  web:check(),
+  cons:check(),
   try {
-    web:update("user:drop($n, $p)", map { 'n': $name, 'p': $pattern }),
-    web:redirect("user", map { 'name': $name, 'info': 'Pattern dropped: ' || $pattern })
+    util:update("user:drop($n, $p)", map { 'n': $name, 'p': $pattern }),
+    db:output(web:redirect("user",
+      map { 'name': $name, 'info': 'Pattern dropped: ' || $pattern }))
   } catch * {
-    web:redirect("user", map { 'error': $err:description })
+    db:output(web:redirect("user",
+      map { 'error': $err:description }))
   }
 };

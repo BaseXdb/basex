@@ -1,23 +1,22 @@
 (:~
- : Utility services.
+ : Common RESTXQ access points.
  :
  : @author Christian Grün, BaseX GmbH, 2014-15
  :)
-module namespace _ = 'dba/util';
+module namespace _ = 'dba/common';
 
 import module namespace Request = 'http://exquery.org/ns/request';
+import module namespace cons = 'dba/cons' at 'modules/cons.xqm';
 import module namespace tmpl = 'dba/tmpl' at 'modules/tmpl.xqm';
-import module namespace webb = 'dba/web' at 'modules/web.xqm';
 
 (:~
  : Redirects to the start page.
  :)
 declare
-  %updating
   %rest:path("dba")
 function _:redirect(
 ) {
-  webb:redirect('dba/databases')
+  web:redirect('dba/databases')
 };
 
 (:~
@@ -32,15 +31,7 @@ function _:file(
 ) as item()+ {
   let $path := file:base-dir() || 'files/' || $file
   return (
-    <rest:response>
-      <http:response>
-        <http:header name="Cache-Control" value="max-age=3600,public"/>
-      </http:response>
-      <output:serialization-parameters>
-        <output:media-type value='{ web:content-type($path) }'/>
-        <output:method value='raw'/>
-      </output:serialization-parameters>
-    </rest:response>,
+    web:response-header(map { 'media-type': web:content-type($path) }),
     file:read-binary($path)
   )
 };
@@ -56,7 +47,7 @@ declare
 function _:any(
   $unknown  as xs:string
 ) as element(html) {
-  webb:check(),
+  cons:check(),
   tmpl:wrap(
     <tr>
       <td>
@@ -74,9 +65,8 @@ function _:any(
  : Login error: redirects to the login page.
  :)
 declare
-  %updating
   %rest:error("basex:login")
 function _:error-login(
 ) {
-  webb:redirect("login")
+  web:redirect("login")
 };

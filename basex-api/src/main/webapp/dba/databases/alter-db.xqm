@@ -5,9 +5,10 @@
  :)
 module namespace _ = 'dba/databases';
 
+import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace html = 'dba/html' at '../modules/html.xqm';
 import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
-import module namespace web = 'dba/web'  at '../modules/web.xqm';
+import module namespace util = 'dba/util'  at '../modules/util.xqm';
 
 (:~ Top category :)
 declare variable $_:CAT := 'databases';
@@ -33,7 +34,7 @@ function _:alter(
   $newname  as xs:string?,
   $error    as xs:string?
 ) as element(html) {
-  web:check(),
+  cons:check(),
   tmpl:wrap(map { 'top': $_:SUB, 'error': $error },
     <tr>
       <td>
@@ -76,22 +77,22 @@ function _:alter(
   $name     as xs:string,
   $newname  as xs:string
 ) {
-  web:check(),
+  cons:check(),
   try {
-    web:update("if(db:exists($newname)) then (
+    util:update("if(db:exists($newname)) then (
       error((), 'Database already exists: ' || $newname || '.')
     ) else (
       db:alter($name, $newname)
     )", map { 'name': $name, 'newname': $newname }),
-    web:redirect($_:SUB, map {
+    db:output(web:redirect($_:SUB, map {
       'info': 'Database was renamed.',
       'name': $newname
-    })
+    }))
   } catch * {
-    web:redirect("alter-db", map {
+    db:output(web:redirect("alter-db", map {
       'error': $err:description,
       'name': $name,
       'newname': $newname
-    })
+    }))
   }
 };

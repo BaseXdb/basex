@@ -5,8 +5,8 @@
  :)
 module namespace _ = 'dba/databases';
 
-import module namespace G = 'dba/global' at '../../modules/global.xqm';
-import module namespace web = 'dba/web' at '../../modules/web.xqm';
+import module namespace cons = 'dba/cons' at '../../modules/cons.xqm';
+import module namespace util = 'dba/util' at '../../modules/util.xqm';
 
 (:~
  : Runs a query on a document and returns the result as string.
@@ -27,10 +27,10 @@ function _:query-resource(
   $resource  as xs:string,
   $query     as xs:string
 ) as xs:string {
-  web:check(),
-  let $limit := $G:MAX-CHARS
+  cons:check(),
+  let $limit := $cons:MAX-CHARS
   let $query := if($query) then $query else '.'
-  return web:query($query, "'': db:open($name, $resource)", map {
+  return util:query($query, "'': db:open($name, $resource)", map {
     'name': $name, 'resource': $resource
   })
 };
