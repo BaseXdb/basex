@@ -1207,9 +1207,10 @@ public enum Function {
   /** XQuery function. */
   _WEB_CREATE_URL(WebCreateUrl.class, "create-url(url,params)", arg(STR, MAP_O), STR, WEB_URI),
   /** XQuery function. */
-  _WEB_REDIRECT(WebRedirect.class, "redirect(location)", arg(STR), ELM, WEB_URI),
+  _WEB_REDIRECT(WebRedirect.class, "redirect(location[,params])", arg(STR, MAP_O), ELM, WEB_URI),
   /** XQuery function. */
-  _WEB_RESPONSE_HEADER(WebResponseHeader.class, "response-header(file)", arg(STR), ELM, WEB_URI),
+  _WEB_RESPONSE_HEADER(WebResponseHeader.class, "response-header([headers[,output]])",
+      arg(MAP_O, MAP_O), ELM, WEB_URI),
 
   /* XQuery Module. */
 

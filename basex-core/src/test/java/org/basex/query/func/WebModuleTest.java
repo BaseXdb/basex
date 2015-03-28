@@ -41,16 +41,36 @@ public final class WebModuleTest extends AdvancedQueryTest {
     query(_WEB_REDIRECT.args("a/b") + "/*:response/*:header/@value = 'a/b'", "true");
     query(_WEB_REDIRECT.args("a/b") + "/*:response/*:header/@name = 'location'", "true");
     query(_WEB_REDIRECT.args("a/b") + "/*:response/@status = 302", "true");
+
+    query(_WEB_REDIRECT.args("a/b", " map { 'a':'b' }") +
+        "/*:response/*:header[@name = 'location']/@value/string()", "a/b?a=b");
   }
 
   /** Test method. */
   @Test
   public void responseHeader() {
-    query(_WEB_RESPONSE_HEADER.args("file.unknown") +
-        "/*:response/*:header/@name/string()", "Cache-Control");
-    query(_WEB_RESPONSE_HEADER.args("file.unknown") +
+    query(_WEB_RESPONSE_HEADER.args() +
+        "/*:response/*:header[@name = 'Cache-Control']/@value/string()", "max-age=3600,public");
+    query(_WEB_RESPONSE_HEADER.args() +
         "/*:serialization-parameters/*:method/@value/string()", "raw");
-    query(_WEB_RESPONSE_HEADER.args("file.unknown") +
+    query(_WEB_RESPONSE_HEADER.args() +
         "/*:serialization-parameters/*:media-type/@value/string()", "application/octet-stream");
+
+    // overwrite header
+    query(_WEB_RESPONSE_HEADER.args(" map { 'media-type': 'X' }") +
+        "/*:serialization-parameters/*:media-type/@value/string()", "X");
+    // header is not generated if value is empty
+    query(_WEB_RESPONSE_HEADER.args(" map { 'media-type': '' }") +
+        "/*:serialization-parameters/*:media-type", "");
+
+    // overwrite header
+    query(_WEB_RESPONSE_HEADER.args(" map { }", " map { 'Cache-Control': 'X' }") +
+        "/*:response/*:header[@name = 'Cache-Control']/@value/string()", "X");
+    // header is not generated if value is empty
+    query(_WEB_RESPONSE_HEADER.args(" map { }", " map { 'Cache-Control': '' }") +
+        "/*:response/*:header[@name = 'Cache-Control']", "");
+    // HTTP response is not generated if no value are specified
+    query(_WEB_RESPONSE_HEADER.args(" map { }", " map { 'Cache-Control': '' }") +
+        "/*:response/*:header", "");
   }
 }
