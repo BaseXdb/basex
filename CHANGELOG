@@ -1,3 +1,21 @@
+VERSION 8.1 (March 28, 2015) -------------------------------------------
+
+ XQUERY
+ - efficient Finger Tree algorithm for arrays
+ - prof:variables() outputs list of currently bound variables
+ - new higher-order functions: hof:scan-left, hof:take-while
+
+ WEB APPLICATIONS
+ - Web Module offers convenience functions for building web apps
+ - RESTXQ: %input annotation; input-specific content-type parameters
+
+ OPTIONS
+ - RESTPATH: specify server path for queries and command scripts
+ - IGNORECERT: ignore untrusted certificates when connecting to servers
+
+ COMMAND-LINE
+ - Bind input strings to the query context with -I
+
 VERSION 8.0.3 (March 19, 2015) -----------------------------------------
 
  Various bug fixes (all minor)
