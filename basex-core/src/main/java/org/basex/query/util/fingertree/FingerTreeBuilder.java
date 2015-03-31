@@ -10,9 +10,10 @@ import java.util.*;
  *
  * @param <E> element type
  */
+@SuppressWarnings("unchecked")
 public final class FingerTreeBuilder<E> {
   /** The root node, {@code null} if the tree is empty. */
-  private BufferNode<E, E> root;
+  private Object root;
 
   /**
    * Checks if this builder is empty, i.e. if no leaf nodes were added to it.
@@ -29,8 +30,12 @@ public final class FingerTreeBuilder<E> {
   public void prepend(final Node<E, E> leaf) {
     if(root == null) {
       root = new BufferNode<>(leaf);
+    } else if(root instanceof BufferNode) {
+      ((BufferNode<E, E>) root).prepend(leaf);
     } else {
-      root.prepend(leaf);
+      final BufferNode<E, E> newRoot = new BufferNode<>((FingerTree<E, E>) root);
+      newRoot.prepend(leaf);
+      root = newRoot;
     }
   }
 
@@ -41,8 +46,12 @@ public final class FingerTreeBuilder<E> {
   public void append(final Node<E, E> leaf) {
     if(root == null) {
       root = new BufferNode<>(leaf);
+    } else if(root instanceof BufferNode) {
+      ((BufferNode<E, E>) root).append(leaf);
     } else {
-      root.append(leaf);
+      final BufferNode<E, E> newRoot = new BufferNode<>((FingerTree<E, E>) root);
+      newRoot.append(leaf);
+      root = newRoot;
     }
   }
 
@@ -54,8 +63,12 @@ public final class FingerTreeBuilder<E> {
     if(!tree.isEmpty()) {
       if(root == null) {
         root = new BufferNode<>(tree);
+      } else if(root instanceof BufferNode) {
+        ((BufferNode<E, E>) root).append(tree);
       } else {
-        root.append(tree);
+        final BufferNode<E, E> newRoot = new BufferNode<>((FingerTree<E, E>) root);
+        newRoot.append(tree);
+        root = newRoot;
       }
     }
   }
@@ -65,7 +78,8 @@ public final class FingerTreeBuilder<E> {
    * @return the resulting finger tree
    */
   public FingerTree<E, E> freeze() {
-    return root == null ? FingerTree.<E>empty() : root.freeze();
+    return root == null ? FingerTree.<E>empty() :
+      root instanceof BufferNode ? ((BufferNode<E, E>) root).freeze() : (FingerTree<E, E>) root;
   }
 
   /**
@@ -73,7 +87,18 @@ public final class FingerTreeBuilder<E> {
    * @param sb string builder
    */
   public void toString(final StringBuilder sb) {
-    if(root != null) root.toString(sb);
+    if(root != null) {
+      if(root instanceof BufferNode) {
+        ((BufferNode<E, E>) root).toString(sb);
+      } else {
+        boolean first = true;
+        for(final E e : (FingerTree<E, E>) root) {
+          if(!first) sb.append(", ");
+          else first = false;
+          sb.append(e);
+        }
+      }
+    }
   }
 
   @Override
@@ -91,7 +116,6 @@ public final class FingerTreeBuilder<E> {
    */
   private static class BufferNode<N, E> {
     /** Ring buffer for nodes in the digits. */
-    @SuppressWarnings("unchecked")
     final Node<N, E>[] nodes = new Node[8];
     /** Number of elements in left digit. */
     int l;
@@ -199,7 +223,6 @@ public final class FingerTreeBuilder<E> {
         for(int i = 0; i < rl; i++) append(rs[i]);
       } else if(middle == null) {
         final int n = l + r;
-        @SuppressWarnings("unchecked")
         final Node<N, E>[] buff = new Node[n + ll];
         for(int i = 0; i < n; i++) buff[i] = nodes[(m - l + i + 8) & 7];
         System.arraycopy(ls, 0, buff, n, ll);
@@ -209,7 +232,6 @@ public final class FingerTreeBuilder<E> {
         for(int i = 0; i < rl; i++) append(rs[i]);
       } else {
         final int k = r + ll;
-        @SuppressWarnings("unchecked")
         final Node<N, E>[] buff = new Node[k];
         for(int i = 0; i < r; i++) {
           final int j = (m + i) & 7;
@@ -245,7 +267,6 @@ public final class FingerTreeBuilder<E> {
      * Returns the middle tree as a buffer node.
      * @return middle buffer node
      */
-    @SuppressWarnings("unchecked")
     private BufferNode<Node<N, E>, E> midBuffer() {
       if(middle == null) return null;
       if(middle instanceof BufferNode) return (BufferNode<Node<N, E>, E>) middle;
@@ -262,7 +283,6 @@ public final class FingerTreeBuilder<E> {
       final int n = l + r;
       if(n == 1) return new Single<>(nodes[(m + r + 7) & 7]);
       final int a = middle == null ? n / 2 : l, b = n - a;
-      @SuppressWarnings("unchecked")
       final Node<N, E>[] left = new Node[a], right = new Node[b];
       final int lOff = m - l + 8, rOff = lOff + a;
       for(int i = 0; i < a; i++) left[i] = nodes[(lOff + i) & 7];
@@ -271,12 +291,10 @@ public final class FingerTreeBuilder<E> {
       if(middle == null) return Deep.get(left, right);
 
       if(middle instanceof FingerTree) {
-        @SuppressWarnings("unchecked")
         final FingerTree<Node<N, E>, E> tree = (FingerTree<Node<N, E>, E>) middle;
         return Deep.get(left, tree, right);
       }
 
-      @SuppressWarnings("unchecked")
       final BufferNode<Node<N, E>, E> buffer = (BufferNode<Node<N, E>, E>) middle;
       return Deep.get(left, buffer.freeze(), right);
     }
