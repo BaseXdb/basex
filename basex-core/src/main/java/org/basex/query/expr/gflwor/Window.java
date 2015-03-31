@@ -542,7 +542,7 @@ public final class Window extends Clause {
    * @author BaseX Team 2005-15, BSD License
    * @author Leo Woerteler
    */
-  private abstract class WindowEval implements Eval {
+  private abstract class WindowEval extends Eval {
     /** Expression iterator. */
     private Iter iter;
     /** Previous item. */

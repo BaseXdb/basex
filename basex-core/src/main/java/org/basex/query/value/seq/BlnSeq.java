@@ -43,7 +43,7 @@ public final class BlnSeq extends NativeSeq {
   }
 
   @Override
-  public Value insert(final long pos, final Item item) {
+  public Seq insert(final long pos, final Item item) {
     if(!(item instanceof Bln)) return copyInsert(pos, item);
     final int p = (int) pos, n = values.length;
     final boolean[] out = new boolean[n + 1];

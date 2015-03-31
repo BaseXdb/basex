@@ -46,10 +46,7 @@ public abstract class Seq extends Value {
    * @return value that contains the items
    */
   public static final Value get(final Item... items) {
-    if(items.length < 2) return items.length == 0 ? Empty.SEQ : items[0];
-    final ValueBuilder vb = new ValueBuilder();
-    for(final Item it : items) vb.add(it);
-    return vb.value();
+    return ValueBuilder.value(items, items.length, null);
   }
 
   /**
@@ -60,10 +57,7 @@ public abstract class Seq extends Value {
    * @return the sequence
    */
   public static Value get(final Item[] items, final int n, final Type type) {
-    if(n < 2) return n == 0 ? Empty.SEQ : items[0];
-    final ValueBuilder vb = new ValueBuilder();
-    for(int i = 0; i < n; i++) vb.add(items[i]);
-    return vb.value(type);
+    return ValueBuilder.value(items, n, type);
   }
 
   @Override
@@ -133,7 +127,7 @@ public abstract class Seq extends Value {
    * @param val value to insert
    * @return resulting value
    */
-  public abstract Value insert(final long pos, final Item val);
+  public abstract Seq insert(final long pos, final Item val);
 
   /**
    * Helper for {@link #insertBefore(long, Value)} that copies all items into a {@link TreeSeq}.
@@ -141,13 +135,13 @@ public abstract class Seq extends Value {
    * @param val value to insert
    * @return resulting value
    */
-  protected final Value copyInsert(final long pos, final Value val) {
+  protected final Seq copyInsert(final long pos, final Value val) {
     if(val.isEmpty()) return this;
     final ValueBuilder vb = new ValueBuilder();
     for(long i = 0; i < pos; i++) vb.add(itemAt(i));
     vb.add(val);
     for(long i = pos; i < size; i++) vb.add(itemAt(i));
-    return vb.value(type);
+    return (Seq) vb.value(type);
   }
 
   /**

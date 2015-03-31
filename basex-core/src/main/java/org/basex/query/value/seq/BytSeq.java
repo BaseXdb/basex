@@ -42,7 +42,7 @@ public final class BytSeq extends NativeSeq {
   }
 
   @Override
-  public Value insert(final long pos, final Item item) {
+  public Seq insert(final long pos, final Item item) {
     if(!(item instanceof Int && item.type == AtomType.BYT)) return copyInsert(pos, item);
     final int p = (int) pos, n = values.length;
     final byte[] out = new byte[n + 1];

@@ -43,7 +43,7 @@ public final class DblSeq extends NativeSeq {
   }
 
   @Override
-  public Value insert(final long pos, final Item item) {
+  public Seq insert(final long pos, final Item item) {
     if(!(item instanceof Dbl)) return copyInsert(pos, item);
     final int p = (int) pos, n = values.length;
     final double[] out = new double[n + 1];

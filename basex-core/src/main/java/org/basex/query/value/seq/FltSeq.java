@@ -43,7 +43,7 @@ public final class FltSeq extends NativeSeq {
   }
 
   @Override
-  public Value insert(final long pos, final Item item) {
+  public Seq insert(final long pos, final Item item) {
     if(!(item instanceof Flt)) return copyInsert(pos, item);
     final int p = (int) pos, n = values.length;
     final float[] out = new float[n + 1];

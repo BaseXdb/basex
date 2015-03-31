@@ -31,6 +31,43 @@ public final class ValueBuilder {
   private final FingerTreeBuilder<Item> tree = new FingerTreeBuilder<>();
 
   /**
+   * Returns a {@link Value} representation of the given items.
+   * @param items array containing the items
+   * @param n number of items
+   * @param type item type of the resulting value (not checked), may be {@code null}
+   * @return the value
+   */
+  public static Value value(final Item[] items, final int n, final Type type) {
+    if(n < 2) return n == 1 ? items[0] : Empty.SEQ;
+    if(n <= TreeSeq.MAX_SMALL) {
+      final Item[] small = new Item[n];
+      System.arraycopy(items, 0, small, 0, n);
+      return new SmallSeq(small, type);
+    }
+
+    final ValueBuilder vb = new ValueBuilder();
+    for(int i = 0; i < n; i++) vb.add(items[i]);
+    return vb.value(type);
+  }
+
+  /**
+   * Concatenates two values.
+   * @param v1 first value to concatenate
+   * @param v2 second value to concatenate
+   * @return value which contains all items of {@code v1} followed by all items of {@code v2}
+   */
+  public static Value concat(final Value v1, final Value v2) {
+    final long l = v1.size();
+    if(l == 0) return v2;
+    final long r = v2.size();
+    if(r == 0) return v1;
+    if(l > 1) return ((Seq) v1).insertBefore(l, v2);
+    final Item i1 = (Item) v1;
+    if(r > 1) return ((Seq) v2).insert(0, i1);
+    return Seq.get(i1, (Item) v2);
+  }
+
+  /**
    * Adds an element to the start of the array.
    * @param elem element to add
    * @return reference to this builder for convenience

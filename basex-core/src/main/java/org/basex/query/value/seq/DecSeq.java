@@ -44,7 +44,7 @@ public final class DecSeq extends NativeSeq {
   }
 
   @Override
-  public Value insert(final long pos, final Item item) {
+  public Seq insert(final long pos, final Item item) {
     if(!(item instanceof Dec)) return copyInsert(pos, item);
     final int p = (int) pos, n = values.length;
     final BigDecimal[] out = new BigDecimal[n + 1];

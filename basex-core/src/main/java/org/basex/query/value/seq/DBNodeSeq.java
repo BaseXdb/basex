@@ -70,7 +70,7 @@ public final class DBNodeSeq extends NativeSeq {
   }
 
   @Override
-  public Value insert(final long pos, final Item item) {
+  public Seq insert(final long pos, final Item item) {
     // TODO check data instance?
     return copyInsert(pos, item);
   }

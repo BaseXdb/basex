@@ -43,7 +43,7 @@ final class SubSeq extends Seq {
   }
 
   @Override
-  public Value insert(final long pos, final Item item) {
+  public Seq insert(final long pos, final Item item) {
     return copyInsert(pos, item);
   }
 

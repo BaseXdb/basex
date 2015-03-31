@@ -130,6 +130,8 @@ public final class List extends Arr {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
+    // most common case
+    if(exprs.length == 2) return ValueBuilder.concat(qc.value(exprs[0]), qc.value(exprs[1]));
     final ValueBuilder vb = new ValueBuilder();
     for(final Expr e : exprs) vb.add(qc.value(e));
     return vb.value();

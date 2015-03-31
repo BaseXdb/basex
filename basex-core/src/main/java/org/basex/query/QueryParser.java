@@ -2057,7 +2057,7 @@ public class QueryParser extends InputParser {
             new PartFunc(sc, ii, e, args, holes);
         } else if(consume(QUESTION)) {
           // parses the "Lookup" rule
-          e = new Lookup(info(), keySpecifier(), e);
+          e = new Lookup(info(), sc, keySpecifier(), e);
         }
       } while(e != old);
     }
@@ -2110,7 +2110,7 @@ public class QueryParser extends InputParser {
     // unary lookup
     final int ip = pos;
     if(consume(QUESTION)) {
-      if(!wsConsume(COMMA) && !consume(PAREN2)) return new Lookup(info(), keySpecifier());
+      if(!wsConsume(COMMA) && !consume(PAREN2)) return new Lookup(info(), sc, keySpecifier());
       pos = ip;
     }
     // context value

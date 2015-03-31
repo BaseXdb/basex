@@ -56,7 +56,7 @@ public final class StrSeq extends NativeSeq {
   }
 
   @Override
-  public Value insert(final long pos, final Item item) {
+  public Seq insert(final long pos, final Item item) {
     if(!(item instanceof Str)) return copyInsert(pos, item);
 
     final int p = (int) pos, n = values.length;

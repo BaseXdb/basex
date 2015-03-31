@@ -71,7 +71,7 @@ public final class IntSeq extends NativeSeq {
   }
 
   @Override
-  public Value insert(final long pos, final Item item) {
+  public Seq insert(final long pos, final Item item) {
     if(!(item instanceof Int) || item.type != type) return copyInsert(pos, item);
 
     final Int val = (Int) item;
