@@ -411,17 +411,29 @@ final class BigSeq extends TreeSeq {
   }
 
   @Override
-  public ListIterator<Item> members(final boolean reverse) {
+  public ListIterator<Item> members(final long start) {
     final Item[] ls = left, rs = right;
-    final int l = ls.length, m = (int) middle.size(), r = rs.length;
-    final ListIterator<Item> sub = middle.listIterator(reverse);
+    final int l = ls.length , r = rs.length, startPos;
+    final long m = middle.size();
+    final ListIterator<Item> sub;
+    if(start < l) {
+      startPos = (int) start - l;
+      sub = middle.listIterator(0);
+    } else if(start - l < m) {
+      startPos = 0;
+      sub = middle.listIterator(start - l);
+    } else {
+      startPos = (int) (start - l - m) + 1;
+      sub = middle.listIterator(m);
+    }
+
     return new ListIterator<Item>() {
-      int pos = reverse ? r + 1 : -l;
+      int pos = startPos;
 
       @Override
       public int nextIndex() {
         return pos < 0 ? l + pos
-             : pos > 0 ? l + m + pos - 1
+             : pos > 0 ? (int) (l + m + pos - 1)
                        : l + sub.nextIndex();
       }
 
@@ -451,7 +463,7 @@ final class BigSeq extends TreeSeq {
       @Override
       public int previousIndex() {
         return pos < 0 ? l + pos - 1
-             : pos > 0 ? l + m + pos - 2
+             : pos > 0 ? (int) (l + m + pos - 2)
                        : l + sub.previousIndex();
       }
 

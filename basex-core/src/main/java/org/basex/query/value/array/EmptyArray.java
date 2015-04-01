@@ -96,7 +96,7 @@ final class EmptyArray extends Array {
   }
 
   @Override
-  public ListIterator<Value> members(final boolean reverse) {
+  public ListIterator<Value> members(final long size) {
     return Collections.emptyListIterator();
   }
 

@@ -24,7 +24,7 @@ public final class FnFoldRight extends StandardFunc {
     Value res = qc.value(exprs[1]);
     final FItem fun = checkArity(exprs[2], 2, qc);
     if(v instanceof TreeSeq) {
-      final ListIterator<Item> iter = ((TreeSeq) v).members(true);
+      final ListIterator<Item> iter = ((TreeSeq) v).members(v.size());
       while(iter.hasPrevious()) res = fun.invokeValue(qc, info, iter.previous(), res);
     } else {
       for(long i = v.size(); --i >= 0;) res = fun.invokeValue(qc, info, v.itemAt(i), res);
@@ -42,7 +42,7 @@ public final class FnFoldRight extends StandardFunc {
 
     Value res = qc.value(exprs[1]);
     if(v instanceof TreeSeq) {
-      final ListIterator<Item> iter = ((TreeSeq) v).members(true);
+      final ListIterator<Item> iter = ((TreeSeq) v).members(v.size());
       while(iter.hasPrevious()) res = fun.invokeValue(qc, info, iter.previous(), res);
     } else {
       for(long i = v.size(); --i >= 0;) res = fun.invokeValue(qc, info, v.itemAt(i), res);

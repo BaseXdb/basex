@@ -135,7 +135,7 @@ public abstract class Seq extends Value {
    * @param val value to insert
    * @return resulting value
    */
-  protected final Seq copyInsert(final long pos, final Value val) {
+  final Seq copyInsert(final long pos, final Value val) {
     if(val.isEmpty()) return this;
     final ValueBuilder vb = new ValueBuilder();
     for(long i = 0; i < pos; i++) vb.add(itemAt(i));

@@ -115,14 +115,18 @@ public final class FingerTreeBuilder<E> {
    * @param <E> element type
    */
   private static class BufferNode<N, E> {
+    /** Maximum number of nodes in the digits. */
+    private static final int CAP = 1 << 3;
+    /** Mask for calculating positions in the ring buffer. */
+    private static final int MASK = CAP - 1;
     /** Ring buffer for nodes in the digits. */
-    final Node<N, E>[] nodes = new Node[8];
+    final Node<N, E>[] nodes = new Node[CAP];
     /** Number of elements in left digit. */
-    int l;
+    int inLeft;
     /** Position of middle between left and right digit in buffer. */
-    int m = 4;
+    int midPos = 4;
     /** Number of elements in right digit. */
-    int r;
+    int inRight;
     /**
      * Root node of middle tree, either a {@code FingerTree<Node<N, E>, E>} or a
      * {@code BufferNode<Node<N, E>, E>}.
@@ -158,21 +162,22 @@ public final class FingerTreeBuilder<E> {
      * @param node the node to add
      */
     void prepend(final Node<N, E> node) {
-      if(l < 4) {
-        nodes[(m - l + 7) & 7] = node;
-        l++;
-      } else if(middle == null && r < 4) {
-        m = (m + 7) & 7;
-        nodes[(m - l + 8) & 7] = node;
-        r++;
+      if(inLeft < 4) {
+        nodes[(midPos - inLeft - 1 + CAP) & MASK] = node;
+        inLeft++;
+      } else if(middle == null && inRight < 4) {
+        midPos = (midPos - 1 + CAP) & MASK;
+        nodes[(midPos - inLeft + CAP) & MASK] = node;
+        inRight++;
       } else {
-        final int l3 = (m + 7) & 7, l2 = (l3 + 7) & 7, l1 = (l2 + 7) & 7, l0 = (l1 + 7) & 7;
+        final int l3 = (midPos - 1 + CAP) & MASK, l2 = (l3 - 1 + CAP) & MASK,
+            l1 = (l2 - 1 + CAP) & MASK, l0 = (l1 - 1 + CAP) & MASK;
         final Node<Node<N, E>, E> next = new InnerNode3<>(nodes[l1], nodes[l2], nodes[l3]);
         nodes[l3] = nodes[l0];
         nodes[l2] = node;
         nodes[l1] = null;
         nodes[l0] = null;
-        l = 2;
+        inLeft = 2;
         if(middle == null) middle = new BufferNode<>(next);
         else midBuffer().prepend(next);
       }
@@ -183,21 +188,21 @@ public final class FingerTreeBuilder<E> {
      * @param node the node to add
      */
     void append(final Node<N, E> node) {
-      if(r < 4) {
-        nodes[(m + r) & 7] = node;
-        r++;
-      } else if(middle == null && l < 4) {
-        m = (m + 1) & 7;
-        nodes[(m + r - 1) & 7] = node;
-        l++;
+      if(inRight < 4) {
+        nodes[(midPos + inRight) & MASK] = node;
+        inRight++;
+      } else if(middle == null && inLeft < 4) {
+        midPos = (midPos + 1) & MASK;
+        nodes[(midPos + inRight - 1) & MASK] = node;
+        inLeft++;
       } else {
-        final int r0 = m, r1 = (r0 + 1) & 7, r2 = (r1 + 1) & 7, r3 = (r2 + 1) & 7;
+        final int r0 = midPos, r1 = (r0 + 1) & MASK, r2 = (r1 + 1) & MASK, r3 = (r2 + 1) & MASK;
         final Node<Node<N, E>, E> next = new InnerNode3<>(nodes[r0], nodes[r1], nodes[r2]);
         nodes[r0] = nodes[r3];
         nodes[r1] = node;
         nodes[r2] = null;
         nodes[r3] = null;
-        r = 2;
+        inRight = 2;
         if(middle == null) middle = new BufferNode<>(next);
         else midBuffer().append(next);
       }
@@ -222,24 +227,24 @@ public final class FingerTreeBuilder<E> {
         for(int i = 0; i < ll; i++) append(ls[i]);
         for(int i = 0; i < rl; i++) append(rs[i]);
       } else if(middle == null) {
-        final int n = l + r;
+        final int n = inLeft + inRight;
         final Node<N, E>[] buff = new Node[n + ll];
-        for(int i = 0; i < n; i++) buff[i] = nodes[(m - l + i + 8) & 7];
+        for(int i = 0; i < n; i++) buff[i] = nodes[(midPos - inLeft + i + CAP) & MASK];
         System.arraycopy(ls, 0, buff, n, ll);
-        l = r = 0;
+        inLeft = inRight = 0;
         middle = mid;
         for(int i = buff.length; --i >= 0;) prepend(buff[i]);
         for(int i = 0; i < rl; i++) append(rs[i]);
       } else {
-        final int k = r + ll;
+        final int k = inRight + ll;
         final Node<N, E>[] buff = new Node[k];
-        for(int i = 0; i < r; i++) {
-          final int j = (m + i) & 7;
+        for(int i = 0; i < inRight; i++) {
+          final int j = (midPos + i) & MASK;
           buff[i] = nodes[j];
           nodes[j] = null;
         }
-        System.arraycopy(ls, 0, buff, r, ll);
-        r = 0;
+        System.arraycopy(ls, 0, buff, inRight, ll);
+        inRight = 0;
 
         for(int i = 0; i < k;) {
           final int rest = k - i;
@@ -280,13 +285,13 @@ public final class FingerTreeBuilder<E> {
      * @return the finger tree
      */
     FingerTree<N, E> freeze() {
-      final int n = l + r;
-      if(n == 1) return new Single<>(nodes[(m + r + 7) & 7]);
-      final int a = middle == null ? n / 2 : l, b = n - a;
+      final int n = inLeft + inRight;
+      if(n == 1) return new Single<>(nodes[(midPos + inRight - 1 + CAP) & MASK]);
+      final int a = middle == null ? n / 2 : inLeft, b = n - a;
       final Node<N, E>[] left = new Node[a], right = new Node[b];
-      final int lOff = m - l + 8, rOff = lOff + a;
-      for(int i = 0; i < a; i++) left[i] = nodes[(lOff + i) & 7];
-      for(int i = 0; i < b; i++) right[i] = nodes[(rOff + i) & 7];
+      final int lOff = midPos - inLeft + CAP, rOff = lOff + a;
+      for(int i = 0; i < a; i++) left[i]  = nodes[(lOff + i) & MASK];
+      for(int i = 0; i < b; i++) right[i] = nodes[(rOff + i) & MASK];
 
       if(middle == null) return Deep.get(left, right);
 
@@ -305,8 +310,8 @@ public final class FingerTreeBuilder<E> {
      */
     void toString(final StringBuilder sb) {
       boolean first = true;
-      for(int i = 0; i < l; i++) {
-        final Node<N, E> node = nodes[(m - l + i + 8) & 7];
+      for(int i = 0; i < inLeft; i++) {
+        final Node<N, E> node = nodes[(midPos - inLeft + i + CAP) & MASK];
         for(final E elem : node) {
           if(first) first = false;
           else sb.append(", ");
@@ -322,8 +327,8 @@ public final class FingerTreeBuilder<E> {
           while(iter.hasNext()) sb.append(", ").append(iter.next());
         }
       }
-      for(int i = 0; i < r; i++) {
-        final Node<N, E> node = nodes[(m + i) & 7];
+      for(int i = 0; i < inRight; i++) {
+        final Node<N, E> node = nodes[(midPos + i) & MASK];
         for(final E elem : node) {
           if(first) first = false;
           else sb.append(", ");

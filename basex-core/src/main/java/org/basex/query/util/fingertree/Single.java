@@ -1,7 +1,5 @@
 package org.basex.query.util.fingertree;
 
-import java.util.*;
-
 /**
  * A tree consisting of a single value.
  *
@@ -102,11 +100,6 @@ final class Single<N, E> extends FingerTree<N, E> {
     final NodeLike<N, E> sub = elem.slice(pos, len);
     if(sub instanceof Node) return new TreeSlice<>(new Single<>((Node<N, E>) sub));
     return new TreeSlice<>((PartialNode<N, E>) sub);
-  }
-
-  @Override
-  public ListIterator<E> listIterator(final boolean reverse) {
-    return elem.listIterator(reverse);
   }
 
   @Override

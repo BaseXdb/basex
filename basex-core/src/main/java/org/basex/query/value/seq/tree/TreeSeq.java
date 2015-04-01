@@ -93,17 +93,18 @@ public abstract class TreeSeq extends Seq {
 
   /**
    * Iterator over the members of this array.
-   * @param reverse flag for iterating from back to front
+   * @param start starting position
+   *   (i.e. the position initially returned by {@link ListIterator#nextIndex()})
    * @return array over the array members
    */
-  public abstract ListIterator<Item> members(final boolean reverse);
+  public abstract ListIterator<Item> members(final long start);
 
   /**
    * Iterator over the members of this array.
    * @return array over the array members
    */
   public final ListIterator<Item> members() {
-    return members(false);
+    return members(0);
   }
 
   @Override
@@ -183,9 +184,7 @@ public abstract class TreeSeq extends Seq {
   public Value atomValue(final InputInfo ii) throws QueryException {
     final ValueBuilder vb = new ValueBuilder();
     final Iterator<Item> iter = members();
-    while(iter.hasNext()) {
-      for(final Item it : iter.next().atomValue(ii)) vb.add(it);
-    }
+    while(iter.hasNext()) vb.add(iter.next().atomValue(ii));
     return vb.value();
   }
 

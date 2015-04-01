@@ -218,17 +218,18 @@ public abstract class Array extends FItem {
 
   /**
    * Iterator over the members of this array.
-   * @param reverse flag for iterating from back to front
+   * @param start starting position
+   *   (i.e. the position initially returned by {@link ListIterator#nextIndex()})
    * @return array over the array members
    */
-  public abstract ListIterator<Value> members(final boolean reverse);
+  public abstract ListIterator<Value> members(final long start);
 
   /**
    * Iterator over the members of this array.
    * @return array over the array members
    */
   public final ListIterator<Value> members() {
-    return members(false);
+    return members(0);
   }
 
   /**

@@ -4,6 +4,7 @@ import org.basex.query.util.fingertree.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.seq.Empty;
 import org.basex.query.value.type.*;
 
 /**
@@ -62,9 +63,8 @@ public final class ValueBuilder {
     final long r = v2.size();
     if(r == 0) return v1;
     if(l > 1) return ((Seq) v1).insertBefore(l, v2);
-    final Item i1 = (Item) v1;
-    if(r > 1) return ((Seq) v2).insert(0, i1);
-    return Seq.get(i1, (Item) v2);
+    if(r > 1) return ((Seq) v2).insert(0, (Item) v1);
+    return new SmallSeq(new Item[] { (Item) v1, (Item) v2 }, null);
   }
 
   /**
@@ -84,10 +84,7 @@ public final class ValueBuilder {
       inRight++;
     } else {
       // push leaf node into the tree
-      final Item[] leaf = new Item[NODE_SIZE];
-      final int start = (mid - NODE_SIZE + CAP) % CAP;
-      for(int i = 0; i < NODE_SIZE; i++) leaf[i] = vals[(start + i) % CAP];
-      tree.prepend(new LeafNode(leaf));
+      tree.prepend(new LeafNode(items(mid - NODE_SIZE, NODE_SIZE)));
 
       // move rest of the nodes to the right
       final int rest = inLeft - NODE_SIZE;
@@ -121,10 +118,7 @@ public final class ValueBuilder {
       inLeft++;
     } else {
       // push leaf node into the tree
-      final Item[] leaf = new Item[NODE_SIZE];
-      final int start = mid;
-      for(int i = 0; i < NODE_SIZE; i++) leaf[i] = vals[(start + i) % CAP];
-      tree.append(new LeafNode(leaf));
+      tree.append(new LeafNode(items(mid, NODE_SIZE)));
 
       // move rest of the nodes to the right
       final int rest = inRight - NODE_SIZE;
@@ -155,8 +149,8 @@ public final class ValueBuilder {
     final Item[] ls = big.left, rs = big.right;
     final FingerTree<Item, Item> midTree = big.middle;
     if(midTree.isEmpty()) {
-      for(final Item l : big.left) add(l);
-      for(final Item r : big.right) add(r);
+      for(final Item l : ls) add(l);
+      for(final Item r : rs) add(r);
       return this;
     }
 
@@ -180,22 +174,22 @@ public final class ValueBuilder {
       return this;
     }
 
-    final int inMiddle = inRight + big.left.length,
+    final int inMiddle = inRight + ls.length,
         leaves = (inMiddle + TreeSeq.MAX_LEAF - 1) / TreeSeq.MAX_LEAF,
         leafSize = (inMiddle + leaves - 1) / leaves;
     for(int i = 0, l = 0; l < leaves; l++) {
       final int inLeaf = Math.min(leafSize, inMiddle - i);
       final Item[] leaf = new Item[inLeaf];
       for(int p = 0; p < inLeaf; p++) {
-        leaf[p] = i < inRight ? vals[(mid + i) % CAP] : big.left[i - inRight];
+        leaf[p] = i < inRight ? vals[(mid + i) % CAP] : ls[i - inRight];
         i++;
       }
       tree.append(new LeafNode(leaf));
     }
 
-    tree.append(big.middle);
+    tree.append(midTree);
     inRight = 0;
-    for(final Item r : big.right) add(r);
+    for(final Item r : rs) add(r);
     return this;
   }
 
@@ -221,17 +215,12 @@ public final class ValueBuilder {
 
     if(n <= TreeSeq.MAX_SMALL) {
       // small int array, fill directly
-      final Item[] small = new Item[n];
-      for(int i = 0; i < n; i++) small[i] = vals[(start + i) % CAP];
-      return new SmallSeq(small, ret);
+      return new SmallSeq(items(start, n), ret);
     }
 
     // deep array
-    final int a = tree.isEmpty() ? n / 2 : inLeft, b = n - a;
-    final Item[] ls = new Item[a], rs = new Item[b];
-    for(int i = 0; i < a; i++) ls[i] = vals[(start + i) % CAP];
-    for(int i = a; i < n; i++) rs[i - a] = vals[(start + i) % CAP];
-    return new BigSeq(ls, tree.freeze(), rs, ret);
+    final int ll = tree.isEmpty() ? n / 2 : inLeft;
+    return new BigSeq(items(start, ll), tree.freeze(), items(start + ll, n - ll), ret);
   }
 
   @Override
@@ -256,5 +245,25 @@ public final class ValueBuilder {
     tree.toString(sb);
     for(int i = 0; i < inRight; i++) sb.append(", ").append(vals[(mid + i) % CAP]);
     return sb.append(']').toString();
+  }
+
+  /**
+   * Returns an array containing the given number of items starting at the given position in this
+   * builder's ring buffer.
+   * @param from position of the first item
+   * @param n number of items
+   * @return array containing the items
+   */
+  private Item[] items(final int from, final int n) {
+    final Item[] arr = new Item[n];
+    final int p = ((from % CAP) + CAP) % CAP;
+    final int m = CAP - p;
+    if(n <= m) {
+      System.arraycopy(vals, p, arr, 0, n);
+    } else {
+      System.arraycopy(vals, p, arr, 0, m);
+      System.arraycopy(vals, 0, arr, m, n - m);
+    }
+    return arr;
   }
 }

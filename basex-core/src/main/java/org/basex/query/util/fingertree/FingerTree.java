@@ -306,13 +306,16 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
 
   /**
    * Creates a {@link ListIterator} over the elements in this tree.
-   * @param reverse flag for starting at the back of the tree
+   * @param start starting position
+   *   (i.e. the position initially returned by {@link ListIterator#nextIndex()})
    * @return the list iterator
    */
-  public abstract ListIterator<E> listIterator(final boolean reverse);
+  public final ListIterator<E> listIterator(final long start) {
+    return FingerTreeIterator.get(this, start);
+  }
 
   @Override
   public final ListIterator<E> iterator() {
-    return listIterator(false);
+    return listIterator(0);
   }
 }

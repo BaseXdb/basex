@@ -95,9 +95,9 @@ final class SmallSeq extends TreeSeq {
   }
 
   @Override
-  public ListIterator<Item> members(final boolean reverse) {
+  public ListIterator<Item> members(final long start) {
     return new ListIterator<Item>() {
-      private int index = reverse ? elems.length : 0;
+      private int index = (int) start;
 
       @Override
       public int nextIndex() {

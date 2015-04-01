@@ -149,9 +149,9 @@ final class SmallArray extends Array {
   }
 
   @Override
-  public ListIterator<Value> members(final boolean reverse) {
+  public ListIterator<Value> members(final long start) {
     return new ListIterator<Value>() {
-      private int index = reverse ? elems.length : 0;
+      private int index = (int) Math.max(0, Math.min(start, elems.length));
 
       @Override
       public int nextIndex() {

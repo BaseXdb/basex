@@ -1,7 +1,5 @@
 package org.basex.query.util.fingertree;
 
-import java.util.*;
-
 /**
  * A <i>deep</i> node containing elements in the left and right digit and a sub-tree in
  * the middle.
@@ -704,11 +702,6 @@ final class Deep<N, E> extends FingerTree<N, E> {
     }
 
     return numMerged;
-  }
-
-  @Override
-  public ListIterator<E> listIterator(final boolean reverse) {
-    return new DeepTreeIterator<>(this, reverse);
   }
 
   /**

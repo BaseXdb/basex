@@ -92,11 +92,6 @@ final class Empty<N, E> extends FingerTree<N, E> {
   }
 
   @Override
-  public ListIterator<E> listIterator(final boolean reverse) {
-    return Collections.emptyListIterator();
-  }
-
-  @Override
   public FingerTree<N, E> replaceHead(final Node<N, E> head) {
     throw new AssertionError("Empty sub-tree.");
   }

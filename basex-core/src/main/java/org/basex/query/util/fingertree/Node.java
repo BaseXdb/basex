@@ -109,16 +109,17 @@ public abstract class Node<N, E> extends NodeLike<N, E> implements Iterable<E> {
   protected abstract long checkInvariants();
 
   @Override
-  public final NodeIterator<E> iterator() {
-    return new NodeIterator<>(this, false);
+  public final ListIterator<E> iterator() {
+    return listIterator(0);
   }
 
   /**
    * Creates a {@link ListIterator} over the elements in this node.
-   * @param reverse flag for starting at the back of this node
+   * @param start starting position
+   *   (i.e. the position initially returned by {@link ListIterator#nextIndex()})
    * @return the list iterator
    */
-  public final NodeIterator<E> listIterator(final boolean reverse) {
-    return new NodeIterator<>(this, reverse);
+  public final ListIterator<E> listIterator(final long start) {
+    return FingerTreeIterator.get(this, start);
   }
 }
