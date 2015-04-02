@@ -88,20 +88,6 @@ public abstract class Node<N, E> extends NodeLike<N, E> implements Iterable<E> {
   protected abstract NodeLike<N, E> slice(final long off, final long len);
 
   /**
-   * Returns a version of this node where the first sub-node is the given one.
-   * @param newFirst new first sub-node
-   * @return resulting node
-   */
-  protected abstract Node<N, E> replaceFirst(N newFirst);
-
-  /**
-   * Returns a version of this node where the last sub-node is the given one.
-   * @param newLast new last sub-node
-   * @return resulting node
-   */
-  protected abstract Node<N, E> replaceLast(N newLast);
-
-  /**
    * Checks that this node does not violate any invariants.
    * @return this node's size
    * @throws AssertionError if an invariant was violated

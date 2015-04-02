@@ -407,7 +407,7 @@ final class BigSeq extends TreeSeq {
       midNodes[i] = new LeafNode(arr);
     }
 
-    return new BigSeq(left, middle.concat(midNodes, bigOther.middle), bigOther.right, retType);
+    return new BigSeq(left, middle.concat(midNodes, n, bigOther.middle), bigOther.right, retType);
   }
 
   @Override

@@ -70,7 +70,7 @@ public abstract class Array extends FItem {
   @SafeVarargs
   public static Array from(final Value... elems) {
     final ArrayBuilder builder = new ArrayBuilder();
-    for(final Value val : elems) builder.append(val);
+    for(int i = 0; i < elems.length; i++) builder.append(elems[i]);
     return builder.freeze();
   }
 

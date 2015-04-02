@@ -103,11 +103,11 @@ public final class TreeSlice<N, E> {
     if(n == 1) {
       if(arr[0] instanceof PartialNode) return setPartial((PartialNode<M, E>) arr[0]);
       final Node<M, E> node = (Node<M, E>) arr[0];
-      return setTree(new Single<>(node));
+      return setTree(new SingletonTree<>(node));
     }
 
     final int mid = n / 2;
-    final Node<M, E>[] left = Deep.slice(arr, 0, mid), right = Deep.slice(arr, mid, n);
-    return setTree(Deep.get(left, right, size));
+    final Node<M, E>[] left = DeepTree.slice(arr, 0, mid), right = DeepTree.slice(arr, mid, n);
+    return setTree(DeepTree.get(left, right, size));
   }
 }

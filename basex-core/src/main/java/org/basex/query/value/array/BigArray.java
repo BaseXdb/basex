@@ -199,7 +199,7 @@ final class BigArray extends Array {
       midNodes[i] = new LeafNode(arr);
     }
 
-    return new BigArray(left, middle.concat(midNodes, other.middle), other.right);
+    return new BigArray(left, middle.concat(midNodes, n, other.middle), other.right);
   }
 
   @Override

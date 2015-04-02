@@ -33,37 +33,28 @@ final class PartialInnerNode<N, E> extends PartialNode<Node<N, E>, E> {
       if(b == null) {
         out[0] = new PartialInnerNode<>(a);
       } else {
-        out[0] = new InnerNode2<>((Node<N, E>) a, (Node<N, E>) b);
+        @SuppressWarnings("unchecked")
+        final Node<N, E>[] ch = new Node[] { (Node<N, E>) a, (Node<N, E>) b };
+        out[0] = new InnerNode<>(ch);
         out[1] = null;
       }
       return out;
     }
 
-    final InnerNode<N, E> deep0 = (InnerNode<N, E>) other;
-    final NodeLike<N, E>[] merged = sub.concat(deep0.getSub(0));
-
     // merging with a full node cannot result in under-full nodes
+    final InnerNode<N, E> inner = (InnerNode<N, E>) other;
+    final NodeLike<N, E>[] merged = sub.concat(inner.getSub(0));
     final Node<N, E> a = (Node<N, E>) merged[0], b = (Node<N, E>) merged[1];
+
     @SuppressWarnings("unchecked")
     final NodeLike<Node<N, E>, E>[] out = (NodeLike<Node<N, E>, E>[]) merged;
-
-    if(other instanceof InnerNode2) {
-      final InnerNode2<N, E> deep = (InnerNode2<N, E>) other;
-      if(b == null) {
-        out[0] = new InnerNode2<>(a, deep.child1);
-      } else {
-        out[0] = new InnerNode3<>(a, b, deep.child1);
-        out[1] = null;
-      }
-    } else {
-      final InnerNode3<N, E> deep = (InnerNode3<N, E>) other;
-      if(b == null) {
-        out[0] = new InnerNode3<>(a, deep.child1, deep.child2);
-      } else {
-        out[0] = new InnerNode2<>(a, b);
-        out[1] = new InnerNode2<>(deep.child1, deep.child2);
-      }
+    if(b == null) {
+      // partial node was absorbed
+      out[0] = inner.replaceFirst(a);
+      return out;
     }
+
+    inner.replaceFirst(out, a, b);
     return out;
   }
 

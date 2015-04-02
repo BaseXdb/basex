@@ -10,7 +10,9 @@ package org.basex.query.util.fingertree;
  * @param <N> node type
  * @param <E> element type
  */
-final class Deep<N, E> extends FingerTree<N, E> {
+final class DeepTree<N, E> extends FingerTree<N, E> {
+  /** Preferred size of an inner node. */
+  private static final int NODE_SIZE = MAX_ARITY;
   /** Left digit. */
   final Node<N, E>[] left;
   /** Size of the left digit, cached for speeding up indexing. */
@@ -31,7 +33,7 @@ final class Deep<N, E> extends FingerTree<N, E> {
    * @param right right digit
    * @param size size of this tree
    */
-  Deep(final Node<N, E>[] left, final long leftSize,
+  DeepTree(final Node<N, E>[] left, final long leftSize,
       final FingerTree<Node<N, E>, E> middle, final Node<N, E>[] right, final long size) {
     this.left = left;
     this.leftSize = leftSize;
@@ -50,9 +52,9 @@ final class Deep<N, E> extends FingerTree<N, E> {
    * @param size size of this tree
    * @return the deep node
    */
-  static <N, E> Deep<N, E> get(final Node<N, E>[] left, final FingerTree<Node<N, E>, E> middle,
+  static <N, E> DeepTree<N, E> get(final Node<N, E>[] left, final FingerTree<Node<N, E>, E> middle,
       final Node<N, E>[] right, final long size) {
-    return new Deep<>(left, size(left), middle, right, size);
+    return new DeepTree<>(left, size(left), middle, right, size);
   }
 
   /**
@@ -65,9 +67,9 @@ final class Deep<N, E> extends FingerTree<N, E> {
    * @param size size of this tree
    * @return the deep node
    */
-  static <N, E> Deep<N, E> get(final Node<N, E>[] left, final long leftSize,
+  static <N, E> DeepTree<N, E> get(final Node<N, E>[] left, final long leftSize,
       final Node<N, E>[] right, final long size) {
-    return new Deep<>(left, leftSize, Empty.<Node<N, E>, E>getInstance(), right, size);
+    return new DeepTree<>(left, leftSize, EmptyTree.<Node<N, E>, E>getInstance(), right, size);
   }
 
   /**
@@ -79,8 +81,9 @@ final class Deep<N, E> extends FingerTree<N, E> {
    * @param size size of this tree
    * @return the deep node
    */
-  static <N, E> Deep<N, E> get(final Node<N, E>[] left, final Node<N, E>[] right, final long size) {
-    return new Deep<>(left, size(left), Empty.<Node<N, E>, E>getInstance(), right, size);
+  static <N, E> DeepTree<N, E> get(final Node<N, E>[] left, final Node<N, E>[] right,
+      final long size) {
+    return new DeepTree<>(left, size(left), EmptyTree.<Node<N, E>, E>getInstance(), right, size);
   }
 
   /**
@@ -92,10 +95,10 @@ final class Deep<N, E> extends FingerTree<N, E> {
    * @param right right digit
    * @return the deep node
    */
-  static <N, E> Deep<N, E> get(final Node<N, E>[] left,
+  static <N, E> DeepTree<N, E> get(final Node<N, E>[] left,
       final FingerTree<Node<N, E>, E> middle, final Node<N, E>[] right) {
     final long l = size(left), m = middle.size(), r = size(right);
-    return new Deep<>(left, l, middle, right, l + m + r);
+    return new DeepTree<>(left, l, middle, right, l + m + r);
   }
 
   /**
@@ -106,38 +109,40 @@ final class Deep<N, E> extends FingerTree<N, E> {
    * @param right right digit
    * @return the deep node
    */
-  static <N, E> Deep<N, E> get(final Node<N, E>[] left, final Node<N, E>[] right) {
+  static <N, E> DeepTree<N, E> get(final Node<N, E>[] left, final Node<N, E>[] right) {
     final long l = size(left), r = size(right);
-    return new Deep<>(left, l, Empty.<Node<N, E>, E>getInstance(), right, l + r);
+    return new DeepTree<>(left, l, EmptyTree.<Node<N, E>, E>getInstance(), right, l + r);
   }
 
   @Override
-  public Deep<N, E> cons(final Node<N, E> fst) {
-    if(left.length < 4) {
+  public DeepTree<N, E> cons(final Node<N, E> fst) {
+    final long sz = fst.size();
+    if(left.length < MAX_DIGIT) {
       final Node<N, E>[] newLeft = slice(left, -1, left.length);
       newLeft[0] = fst;
-      return new Deep<>(newLeft, leftSize + fst.size(), middle, right, size + fst.size());
+      return new DeepTree<>(newLeft, leftSize + sz, middle, right, size + sz);
     }
 
-    final Node<N, E>[] newLeft = slice(left, -1, 1);
+    final int ll = left.length, m = ll - NODE_SIZE;
+    final Node<N, E>[] newLeft = slice(left, -1, m), sub = slice(left, m, ll);
     newLeft[0] = fst;
-    final FingerTree<Node<N, E>, E> mid = middle.cons(new InnerNode3<>(left[1], left[2], left[3]));
-    return Deep.get(newLeft, mid, right, size + fst.size());
+    final FingerTree<Node<N, E>, E> mid = middle.cons(new InnerNode<>(sub));
+    return DeepTree.get(newLeft, mid, right, size + sz);
   }
 
   @Override
-  public Deep<N, E> snoc(final Node<N, E> lst) {
-    if(right.length < 4) {
+  public DeepTree<N, E> snoc(final Node<N, E> lst) {
+    if(right.length < MAX_DIGIT) {
       final Node<N, E>[] newRight = slice(right, 0, right.length + 1);
       newRight[right.length] = lst;
-      return new Deep<>(left, leftSize, middle, newRight, size + lst.size());
+      return new DeepTree<>(left, leftSize, middle, newRight, size + lst.size());
     }
 
-    final FingerTree<Node<N, E>, E> mid =
-        middle.snoc(new InnerNode3<>(right[0], right[1], right[2]));
-    final Node<N, E>[] newRight = slice(right, 3, 5);
-    newRight[1] = lst;
-    return new Deep<>(left, leftSize, mid, newRight, size + lst.size());
+    final int rl = right.length, m = NODE_SIZE;
+    final Node<N, E>[] sub = slice(right, 0, m), newRight = slice(right, m, rl + 1);
+    newRight[rl - m] = lst;
+    final FingerTree<Node<N, E>, E> mid = middle.snoc(new InnerNode<>(sub));
+    return new DeepTree<>(left, leftSize, mid, newRight, size + lst.size());
   }
 
   @Override
@@ -156,44 +161,43 @@ final class Deep<N, E> extends FingerTree<N, E> {
 
     if(right.length > 1) {
       // right digit is safe, just shrink it
-      return new Deep<>(left, leftSize, middle, slice(right, 0, right.length - 1), newSize);
+      return new DeepTree<>(left, leftSize, middle, slice(right, 0, right.length - 1), newSize);
     }
 
     if(middle.isEmpty()) {
       // middle tree empty, make a tree from the left list
-      if(left.length == 1) return new Single<>(left[0]);
+      if(left.length == 1) return new SingletonTree<>(left[0]);
 
       final int mid = left.length / 2;
-      final Node<N, E>[] newLeft = slice(left, 0, mid);
-      return Deep.get(newLeft, slice(left, mid, left.length), newSize);
+      return DeepTree.get(slice(left, 0, mid), slice(left, mid, left.length), newSize);
     }
 
     // extract values for the right digit from the middle
     final InnerNode<N, E> last = (InnerNode<N, E>) middle.last();
-    return new Deep<>(left, leftSize, middle.init(), last.copyChildren(), newSize);
+    return new DeepTree<>(left, leftSize, middle.init(), last.children, newSize);
   }
 
   @Override
   public FingerTree<N, E> tail() {
-    final long fstSize = left[0].size();
-    final long newSize = size - fstSize;
+    final long fstSize = left[0].size(),  newSize = size - fstSize;
 
     if(left.length > 1) {
       // left digit is safe, just shrink it
-      return new Deep<>(slice(left, 1, left.length), leftSize - fstSize, middle, right, newSize);
+      final Node<N, E>[] newLeft = slice(left, 1, left.length);
+      return new DeepTree<>(newLeft, leftSize - fstSize, middle, right, newSize);
     }
 
     if(middle.isEmpty()) {
       // middle tree empty, make a tree from the right list
-      if(right.length == 1) return new Single<>(right[0]);
+      if(right.length == 1) return new SingletonTree<>(right[0]);
 
       final int mid = right.length / 2;
-      return Deep.get(slice(right, 0, mid), slice(right, mid, right.length), newSize);
+      return DeepTree.get(slice(right, 0, mid), slice(right, mid, right.length), newSize);
     }
 
     // extract values for the left digit from the middle
     final InnerNode<N, E> head = (InnerNode<N, E>) middle.head();
-    return new Deep<>(head.copyChildren(), head.size(), middle.tail(), right, newSize);
+    return new DeepTree<>(head.children, head.size(), middle.tail(), right, newSize);
   }
 
   @Override
@@ -202,36 +206,37 @@ final class Deep<N, E> extends FingerTree<N, E> {
   }
 
   @Override
-  public Deep<N, E> concat(final Node<N, E>[] nodes, final FingerTree<N, E> other) {
-    final Deep<N, E> lft = (Deep<N, E>) addAll(nodes, false);
-    if(!(other instanceof Deep)) {
-      return other instanceof Single ? lft.snoc(((Single<N, E>) other).elem) : lft;
-    }
+  public DeepTree<N, E> concat(final Node<N, E>[] nodes, final long sz,
+      final FingerTree<N, E> other) {
+    final DeepTree<N, E> lft = (DeepTree<N, E>) addAll(nodes, sz, false);
+    if(!(other instanceof DeepTree)) return other.isEmpty() ? lft : lft.snoc(other.head());
 
-    final Deep<N, E> rght = (Deep<N, E>) other;
+    final DeepTree<N, E> rght = (DeepTree<N, E>) other;
     final Node<N, E>[] as = lft.right, bs = rght.left;
-    final int l = as.length, n = l + bs.length, k = (n + 2) / 3;
+    final int l = as.length, n = l + bs.length, k = (n + MAX_ARITY - 1) / MAX_ARITY;
     @SuppressWarnings("unchecked")
     final Node<Node<N, E>, E>[] out = new Node[k];
-    int p = 0;
-    for(int i = 0; i < k; i++) {
-      final int rest = n - p;
-      final Node<N, E> x = p < l ? as[p] : bs[p - l];
-      p++;
-      final Node<N, E> y = p < l ? as[p] : bs[p - l];
-      p++;
-      if(rest > 4 || rest == 3) {
-        final Node<N, E> z = p < l ? as[p] : bs[p - l];
-        out[i] = new InnerNode3<>(x, y, z);
-        p++;
+    for(int i = 0, p = 0; i < k; i++) {
+      final int rem = k - i, curr = (n - p + rem - 1) / rem;
+      @SuppressWarnings("unchecked")
+      final Node<N, E>[] ch = new Node[curr];
+      final int inL = l - p;
+      if(curr <= inL) {
+        System.arraycopy(as, p, ch, 0, curr);
+      } else if(inL > 0) {
+        System.arraycopy(as, p, ch, 0, inL);
+        System.arraycopy(bs, 0, ch, inL, curr - inL);
       } else {
-        out[i] = new InnerNode2<>(x, y);
+        System.arraycopy(bs, -inL, ch, 0, curr);
       }
+      out[i] = new InnerNode<>(ch);
+      p += curr;
     }
 
-    final FingerTree<Node<N, E>, E> newMid = lft.middle.concat(out, rght.middle);
+    final long inMid = lft.rightSize() + rght.leftSize;
+    final FingerTree<Node<N, E>, E> newMid = lft.middle.concat(out, inMid, rght.middle);
     final long newSize = lft.leftSize + newMid.size() + rght.rightSize();
-    return new Deep<>(lft.left, lft.leftSize, newMid, rght.right, newSize);
+    return new DeepTree<>(lft.left, lft.leftSize, newMid, rght.right, newSize);
   }
 
   @Override
@@ -241,7 +246,7 @@ final class Deep<N, E> extends FingerTree<N, E> {
     final Node<N, E>[] newLeft = new Node[r], newRight = new Node[l];
     for(int i = 0; i < r; i++) newLeft[i] = right[r - 1 - i].reverse();
     for(int i = 0; i < l; i++) newRight[i] = left[l - 1 - i].reverse();
-    return new Deep<>(newLeft, rightSize(), middle.reverse(), newRight, size);
+    return new DeepTree<>(newLeft, rightSize(), middle.reverse(), newRight, size);
   }
 
   @Override
@@ -266,7 +271,7 @@ final class Deep<N, E> extends FingerTree<N, E> {
         if(i > 0) newLeft[i - 1] = siblings[0];
         newLeft[i] = siblings[1];
         if(i + 1 < ll) newLeft[i + 1] = siblings[2];
-        return new Deep<>(newLeft, leftSize + 1, middle, right, size + 1);
+        return new DeepTree<>(newLeft, leftSize + 1, middle, right, size + 1);
       }
 
       // node was split
@@ -282,19 +287,17 @@ final class Deep<N, E> extends FingerTree<N, E> {
         temp[i + 2] = siblings[3];
         System.arraycopy(left, i + 2, temp, i + 3, ll - i - 2);
       }
-      if(ll < 4) return new Deep<>(temp, leftSize + 1, middle, right, size + 1);
+      if(ll < MAX_DIGIT) return new DeepTree<>(temp, leftSize + 1, middle, right, size + 1);
 
       // digit has to be split
-      final Node<N, E> a = temp[0], b = temp[1];
-      @SuppressWarnings("unchecked")
-      final Node<N, E>[] newLeft = new Node[] { a, b };
-      final Node<Node<N, E>, E> sub = new InnerNode3<>(temp[2], temp[3], temp[4]);
-      return new Deep<>(newLeft, a.size() + b.size(), middle.cons(sub), right, size + 1);
+      final int m = temp.length - NODE_SIZE;
+      final Node<N, E>[] newLeft = slice(temp, 0, m), ch = slice(temp, m, temp.length);
+      return DeepTree.get(newLeft, middle.cons(new InnerNode<>(ch)), right, size + 1);
     }
 
     long p = pos - leftSize;
     final long midSize = middle.size();
-    if(p < midSize) return new Deep<>(left, leftSize, middle.insert(p, val), right, size + 1);
+    if(p < midSize) return new DeepTree<>(left, leftSize, middle.insert(p, val), right, size + 1);
 
     // insert into right digit
     p -= midSize;
@@ -315,7 +318,7 @@ final class Deep<N, E> extends FingerTree<N, E> {
       if(i > 0) newRight[i - 1] = siblings[0];
       newRight[i] = siblings[1];
       if(i + 1 < rl) newRight[i + 1] = siblings[2];
-      return new Deep<>(left, leftSize, middle, newRight, size + 1);
+      return new DeepTree<>(left, leftSize, middle, newRight, size + 1);
     }
 
     // node was split
@@ -331,14 +334,12 @@ final class Deep<N, E> extends FingerTree<N, E> {
       temp[i + 2] = siblings[3];
       System.arraycopy(right, i + 2, temp, i + 3, rl - i - 2);
     }
-    if(right.length < 4) return new Deep<>(left, leftSize, middle, temp, size + 1);
+    if(right.length < MAX_DIGIT) return new DeepTree<>(left, leftSize, middle, temp, size + 1);
 
     // digit has to be split
-    final Node<Node<N, E>, E> sub = new InnerNode3<>(temp[0], temp[1], temp[2]);
-    final Node<N, E> a = temp[3], b = temp[4];
-    @SuppressWarnings("unchecked")
-    final Node<N, E>[] newRight = new Node[] { a, b};
-    return new Deep<>(left, leftSize, middle.snoc(sub), newRight, size + 1);
+    final int m = NODE_SIZE;
+    final Node<N, E>[] ch = slice(temp, 0, m), newRight = slice(temp, m, temp.length);
+    return new DeepTree<>(left, leftSize, middle.snoc(new InnerNode<>(ch)), newRight, size + 1);
   }
 
   @Override
@@ -351,7 +352,7 @@ final class Deep<N, E> extends FingerTree<N, E> {
     if(slice.isTree()) {
       // no underflow
       final FingerTree<Node<N, E>, E> newMiddle = slice.getTree();
-      return slice.setTree(new Deep<>(left, leftSize, newMiddle, right, size - 1));
+      return slice.setTree(new DeepTree<>(left, leftSize, newMiddle, right, size - 1));
     }
 
     // middle tree had an underflow, one sub-node left
@@ -362,23 +363,27 @@ final class Deep<N, E> extends FingerTree<N, E> {
       // merge into left digit
       final Node<N, E>[] newLeft = slice(left, 0, left.length + 1);
       newLeft[left.length] = node;
-      return slice.setTree(Deep.get(newLeft, leftSize + node.size(), right, size - 1));
+      return slice.setTree(DeepTree.get(newLeft, leftSize + node.size(), right, size - 1));
     }
 
-    if(right.length < 4) {
+    if(right.length < MAX_DIGIT) {
       // merge into right digit
-      @SuppressWarnings("unchecked")
-      final Node<N, E>[] newRight = new Node[right.length + 1];
+      final Node<N, E>[] newRight = slice(right, -1, right.length);
       newRight[0] = node;
-      System.arraycopy(right, 0, newRight, 1, right.length);
-      return slice.setTree(Deep.get(left, leftSize, newRight, size - 1));
+      return slice.setTree(DeepTree.get(left, leftSize, newRight, size - 1));
     }
 
-    // redistribute the 9 nodes
-    final Node<N, E>[] newLeft = slice(left, 0, 3);
-    final Node<Node<N, E>, E> newMid = new InnerNode3<>(left[3], node, right[0]);
-    final Node<N, E>[] newRight = slice(right, 1, right.length);
-    return slice.setTree(Deep.get(newLeft, new Single<>(newMid), newRight, size - 1));
+    // redistribute the nodes
+    final int n = 2 * MAX_DIGIT + 1, ll = (n - NODE_SIZE) / 2;
+    @SuppressWarnings("unchecked")
+    final Node<N, E>[] newLeft = slice(left, 0, ll), ch = new Node[NODE_SIZE];
+    final int inL = left.length - ll, inR = NODE_SIZE - inL - 1;
+    System.arraycopy(left, ll, ch, 0, inL);
+    ch[inL] = node;
+    System.arraycopy(right, 0, ch, inL + 1, inR);
+    final Node<N, E>[] newRight = slice(right, inR, MAX_DIGIT);
+    final Node<Node<N, E>, E> newMid = new InnerNode<>(ch);
+    return slice.setTree(DeepTree.get(newLeft, new SingletonTree<>(newMid), newRight, size - 1));
   }
 
   /**
@@ -389,7 +394,7 @@ final class Deep<N, E> extends FingerTree<N, E> {
   private FingerTree<N, E> removeLeft(final long pos) {
     if(left.length > 1) {
       // left digit cannot underflow, just delete the element
-      return new Deep<>(remove(left, pos), leftSize - 1, middle, right, size - 1);
+      return new DeepTree<>(remove(left, pos), leftSize - 1, middle, right, size - 1);
     }
 
     // singleton digit might underflow
@@ -404,9 +409,9 @@ final class Deep<N, E> extends FingerTree<N, E> {
 
       if(newNode == null) {
         // nodes were merged
-        final Node<N, E>[] newLeft = head.copyChildren();
+        final Node<N, E>[] newLeft = head.children.clone();
         newLeft[0] = newFirst;
-        return Deep.get(newLeft, middle.tail(), right, size - 1);
+        return DeepTree.get(newLeft, middle.tail(), right, size - 1);
       }
 
       @SuppressWarnings("unchecked")
@@ -415,11 +420,11 @@ final class Deep<N, E> extends FingerTree<N, E> {
       if(newFirst != first) {
         // nodes were balanced
         final FingerTree<Node<N, E>, E> newMid = middle.replaceHead(head.replaceFirst(newFirst));
-        return new Deep<>(newLeft, newNode.size(), newMid, right, size - 1);
+        return new DeepTree<>(newLeft, newNode.size(), newMid, right, size - 1);
       }
 
       // no changes to this tree's structure
-      return new Deep<>(newLeft, newNode.size(), middle, right, size - 1);
+      return new DeepTree<>(newLeft, newNode.size(), middle, right, size - 1);
     }
 
     // potentially balance with right digit
@@ -428,11 +433,11 @@ final class Deep<N, E> extends FingerTree<N, E> {
 
     if(newNode == null) {
       // nodes were merged
-      if(right.length == 1) return new Single<>(newFirstRight);
+      if(right.length == 1) return new SingletonTree<>(newFirstRight);
       final int mid = right.length / 2;
       final Node<N, E>[] newLeft = slice(right, 0, mid);
       newLeft[0] = newFirstRight;
-      return Deep.get(newLeft, middle, slice(right, mid, right.length), size - 1);
+      return DeepTree.get(newLeft, middle, slice(right, mid, right.length), size - 1);
     }
 
     // structure does not change
@@ -441,13 +446,13 @@ final class Deep<N, E> extends FingerTree<N, E> {
 
     if(newFirstRight == right[0]) {
       // right digit stays the same
-      return new Deep<>(newLeft, newLeft[0].size(), middle, right, size - 1);
+      return new DeepTree<>(newLeft, newLeft[0].size(), middle, right, size - 1);
     }
 
     // adapt the right digit
     final Node<N, E>[] newRight = right.clone();
     newRight[0] = newFirstRight;
-    return new Deep<>(newLeft, newNode.size(), middle, newRight, size - 1);
+    return new DeepTree<>(newLeft, newNode.size(), middle, newRight, size - 1);
   }
 
   /**
@@ -458,7 +463,7 @@ final class Deep<N, E> extends FingerTree<N, E> {
   private FingerTree<N, E> removeRight(final long pos) {
     if(right.length > 1) {
       // right digit cannot underflow, just delete the element
-      return new Deep<>(left, leftSize, middle, remove(right, pos), size - 1);
+      return new DeepTree<>(left, leftSize, middle, remove(right, pos), size - 1);
     }
 
     // singleton digit might underflow
@@ -473,9 +478,9 @@ final class Deep<N, E> extends FingerTree<N, E> {
 
       if(newNode == null) {
         // nodes were merged
-        final Node<N, E>[] newRight = last.copyChildren();
+        final Node<N, E>[] newRight = last.children.clone();
         newRight[newRight.length - 1] = newLastSub;
-        return new Deep<>(left, leftSize, middle.init(), newRight, size - 1);
+        return new DeepTree<>(left, leftSize, middle.init(), newRight, size - 1);
       }
 
       @SuppressWarnings("unchecked")
@@ -483,7 +488,7 @@ final class Deep<N, E> extends FingerTree<N, E> {
 
       // replace last node in middle tree
       final Node<Node<N, E>, E> newLast = last.replaceLast(newLastSub);
-      return new Deep<>(left, leftSize, middle.replaceLast(newLast), newRight, size - 1);
+      return new DeepTree<>(left, leftSize, middle.replaceLast(newLast), newRight, size - 1);
     }
 
     // balance with left digit
@@ -494,12 +499,12 @@ final class Deep<N, E> extends FingerTree<N, E> {
       // nodes were merged
       if(left.length == 1) {
         // only one node left
-        return new Single<>(newLastLeft);
+        return new SingletonTree<>(newLastLeft);
       }
 
       @SuppressWarnings("unchecked")
       final Node<N, E>[] newRight = new Node[] { newLastLeft };
-      return Deep.get(slice(left, 0, left.length - 1), newRight, size - 1);
+      return DeepTree.get(slice(left, 0, left.length - 1), newRight, size - 1);
     }
 
     @SuppressWarnings("unchecked")
@@ -507,13 +512,13 @@ final class Deep<N, E> extends FingerTree<N, E> {
 
     if(newLastLeft == lastLeft) {
       // deletion could be absorbed
-      return Deep.get(left, leftSize, newRight, size - 1);
+      return DeepTree.get(left, leftSize, newRight, size - 1);
     }
 
     // adapt the left digit
     final Node<N, E>[] newLeft = left.clone();
     newLeft[newLeft.length - 1] = newLastLeft;
-    return Deep.get(newLeft, newRight, size - 1);
+    return DeepTree.get(newLeft, newRight, size - 1);
   }
 
   /**
@@ -575,26 +580,26 @@ final class Deep<N, E> extends FingerTree<N, E> {
     final long inRight = from >= rightOff ? len : from + len > rightOff ? from + len - rightOff : 0;
 
     @SuppressWarnings("unchecked")
-    final NodeLike<N, E>[] buffer = new NodeLike[9];
+    final NodeLike<N, E>[] buffer = new NodeLike[2 * MAX_DIGIT + 1];
     int inBuffer = splitDigit(left, from, inLeft, buffer, 0);
     if(inLeft == len) {
       final int n = inBuffer;
       if(n == 1) {
         if(buffer[0] instanceof PartialNode) return new TreeSlice<>((PartialNode<N, E>) buffer[0]);
         final Node<N, E> node = (Node<N, E>) buffer[0];
-        return new TreeSlice<>(new Single<>(node));
+        return new TreeSlice<>(new SingletonTree<>(node));
       }
 
       final int mid1 = n / 2;
-      final Node<N, E>[] ls = Deep.slice(buffer, 0, mid1), rs = Deep.slice(buffer, mid1, n);
-      return new TreeSlice<>(Deep.get(ls, rs, len));
+      final Node<N, E>[] ls = DeepTree.slice(buffer, 0, mid1), rs = DeepTree.slice(buffer, mid1, n);
+      return new TreeSlice<>(DeepTree.get(ls, rs, len));
     }
 
     final long inMiddle = len - inLeft - inRight;
     final FingerTree<Node<N, E>, E> mid;
     final TreeSlice<Node<N, E>, E> slice;
     if(inMiddle == 0) {
-      mid = Empty.getInstance();
+      mid = EmptyTree.getInstance();
       slice = new TreeSlice<>(mid);
     } else {
       final long midOff = from <= leftSize ? 0 : from - leftSize;
@@ -602,7 +607,7 @@ final class Deep<N, E> extends FingerTree<N, E> {
       if(!slice.isTree()) {
         final NodeLike<N, E> sub = ((PartialInnerNode<N, E>) slice.getPartial()).sub;
         inBuffer = sub.append(buffer, inBuffer);
-        mid = Empty.getInstance();
+        mid = EmptyTree.getInstance();
       } else {
         mid = slice.getTree();
       }
@@ -637,7 +642,7 @@ final class Deep<N, E> extends FingerTree<N, E> {
     final Node<N, E>[] newRight;
     if(inBuffer == 0) {
       mid3 = mid2.init();
-      newRight = ((InnerNode<N, E>) mid2.last()).copyChildren();
+      newRight = ((InnerNode<N, E>) mid2.last()).children;
     } else if(inBuffer > 1 || buffer[0] instanceof Node) {
       mid3 = mid2;
       newRight = slice(buffer, 0, inBuffer);
@@ -651,7 +656,7 @@ final class Deep<N, E> extends FingerTree<N, E> {
       newRight = slice(buffer, 0, inBuffer);
     }
 
-    return slice.setTree(Deep.get(newLeft, mid3, newRight, len));
+    return slice.setTree(DeepTree.get(newLeft, mid3, newRight, len));
   }
 
   /**
@@ -713,35 +718,40 @@ final class Deep<N, E> extends FingerTree<N, E> {
   }
 
   @Override
-  FingerTree<N, E> addAll(final Node<N, E>[] nodes, final boolean appendLeft) {
+  FingerTree<N, E> addAll(final Node<N, E>[] nodes, final long sz, final boolean appendLeft) {
     final int k = nodes.length;
-    if(k == 0) return this;
-    if(k == 1) return appendLeft ? cons(nodes[0]) : snoc(nodes[0]);
+    if(k < 2) return k == 0 ? this : appendLeft ? cons(nodes[0]) : snoc(nodes[0]);
 
     if(appendLeft) {
       int l = k + left.length;
       final Node<N, E>[] ls = slice(nodes, 0, l);
       System.arraycopy(left, 0, ls, k, left.length);
-      if(l <= 4) return Deep.get(ls, middle, right);
+      if(l <= MAX_DIGIT) return DeepTree.get(ls, middle, right);
+
       FingerTree<Node<N, E>, E> newMid = middle;
-      for(; l > 4; l -= 3) {
-        final InnerNode<N, E> sub = new InnerNode3<>(ls[l - 3], ls[l - 2], ls[l - 1]);
-        newMid = newMid.cons(sub);
+      for(int rem = (l + MAX_ARITY - 1) / MAX_ARITY; rem > 1; rem--) {
+        final int curr = (l + rem - 1) / rem;
+        newMid = newMid.cons(new InnerNode<>(slice(ls, l - curr, l)));
+        l -= curr;
       }
-      return Deep.get(slice(ls, 0, l), newMid, right);
+
+      return DeepTree.get(slice(ls, 0, l), newMid, right);
     }
 
     final int r = right.length + k;
     final Node<N, E>[] rs = slice(right, 0, r);
     System.arraycopy(nodes, 0, rs, right.length, k);
-    if(k + right.length <= 4) return Deep.get(left, middle, rs);
-    FingerTree<Node<N, E>, E> newMid = middle;
+    if(k + right.length <= MAX_DIGIT) return DeepTree.get(left, middle, rs);
+
     int i = 0;
-    for(; r - i > 4; i += 3) {
-      final InnerNode<N, E> sub = new InnerNode3<>(rs[i], rs[i + 1], rs[i + 2]);
-      newMid = newMid.snoc(sub);
+    FingerTree<Node<N, E>, E> newMid = middle;
+    for(int rem = (r + MAX_ARITY - 1) / MAX_ARITY; rem > 1; rem--) {
+      final int curr = (r - i + rem - 1) / rem;
+      newMid = newMid.snoc(new InnerNode<>(slice(rs, i, i + curr)));
+      i += curr;
     }
-    return Deep.get(left, newMid, slice(rs, i, r));
+
+    return DeepTree.get(left, newMid, slice(rs, i, r));
   }
 
   @Override
@@ -749,7 +759,7 @@ final class Deep<N, E> extends FingerTree<N, E> {
     final long sizeDiff = head.size() - left[0].size();
     final Node<N, E>[] newLeft = left.clone();
     newLeft[0] = head;
-    return new Deep<>(newLeft, leftSize + sizeDiff, middle, right, size + sizeDiff);
+    return new DeepTree<>(newLeft, leftSize + sizeDiff, middle, right, size + sizeDiff);
   }
 
   @Override
@@ -757,26 +767,23 @@ final class Deep<N, E> extends FingerTree<N, E> {
     final int lst = right.length - 1;
     final Node<N, E>[] newRight = right.clone();
     newRight[lst] = last;
-    return new Deep<>(left, leftSize, middle, newRight, size + last.size()
+    return new DeepTree<>(left, leftSize, middle, newRight, size + last.size()
         - right[lst].size());
   }
 
   @Override
   void toString(final StringBuilder sb, final int indent) {
-    for(int i = 0; i < indent; i++)
-      sb.append("  ");
-    sb.append("Deep[\n");
+    for(int i = 0; i < indent; i++) sb.append("  ");
+    sb.append("Deep(").append(size).append(")[\n");
 
     // left digit
-    for(int i = 0; i < indent + 1; i++)
-      sb.append("  ");
-    sb.append("Left[\n");
+    for(int i = 0; i < indent + 1; i++) sb.append("  ");
+    sb.append("Left(").append(leftSize).append(")[\n");
     for(final Node<N, E> e : left) {
       e.toString(sb, indent + 2);
       sb.append('\n');
     }
-    for(int i = 0; i < indent + 1; i++)
-      sb.append("  ");
+    for(int i = 0; i < indent + 1; i++) sb.append("  ");
     sb.append("]\n");
 
     // middle tree
@@ -784,25 +791,22 @@ final class Deep<N, E> extends FingerTree<N, E> {
     sb.append('\n');
 
     // right digit
-    for(int i = 0; i < indent + 1; i++)
-      sb.append("  ");
+    for(int i = 0; i < indent + 1; i++) sb.append("  ");
     sb.append("Right[\n");
     for(final Node<N, E> e : right) {
       e.toString(sb, indent + 2);
       sb.append("\n");
     }
-    for(int i = 0; i < indent + 1; i++)
-      sb.append("  ");
+    for(int i = 0; i < indent + 1; i++) sb.append("  ");
     sb.append("]\n");
 
-    for(int i = 0; i < indent; i++)
-      sb.append("  ");
+    for(int i = 0; i < indent; i++) sb.append("  ");
     sb.append("]");
   }
 
   @Override
   public long checkInvariants() {
-    if(left.length < 1 || left.length > 4) throw new AssertionError(
+    if(left.length < 1 || left.length > MAX_DIGIT) throw new AssertionError(
         "Wrong left digit length: " + left.length);
     long sz = 0;
     for(final Node<N, E> nd : left)
@@ -810,7 +814,7 @@ final class Deep<N, E> extends FingerTree<N, E> {
     if(sz != leftSize) throw new AssertionError("Wrong leftSize: " + leftSize + " vs. "
         + sz);
     sz += middle.checkInvariants();
-    if(right.length < 1 || right.length > 4) throw new AssertionError(
+    if(right.length < 1 || right.length > MAX_DIGIT) throw new AssertionError(
         "Wrong right digit length: " + right.length);
     for(final Node<N, E> nd : right)
       sz += nd.checkInvariants();

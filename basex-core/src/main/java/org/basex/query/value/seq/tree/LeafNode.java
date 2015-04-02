@@ -250,22 +250,6 @@ final class LeafNode extends Node<Item, Item> {
   }
 
   @Override
-  protected Node<Item, Item> replaceFirst(final Item newFirst) {
-    if(newFirst == values[0]) return this;
-    final Item[] vals = values.clone();
-    vals[0] = newFirst;
-    return new LeafNode(vals);
-  }
-
-  @Override
-  protected Node<Item, Item> replaceLast(final Item newLast) {
-    if(newLast == values[values.length - 1]) return this;
-    final Item[] vals = values.clone();
-    vals[vals.length - 1] = newLast;
-    return new LeafNode(vals);
-  }
-
-  @Override
   protected void toString(final StringBuilder sb, final int indent) {
     for(int i = 0; i < indent; i++) sb.append("  ");
     sb.append("Node(").append(size()).append(")").append(Arrays.toString(values));
