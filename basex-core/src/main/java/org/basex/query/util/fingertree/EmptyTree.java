@@ -114,11 +114,6 @@ final class EmptyTree<N, E> extends FingerTree<N, E> {
   }
 
   @Override
-  public long[] sizes(final int depth) {
-    return new long[depth];
-  }
-
-  @Override
   FingerTree<N, E> addAll(final Node<N, E>[] nodes, final long sz, final boolean left) {
     return buildTree(nodes, nodes.length, sz);
   }

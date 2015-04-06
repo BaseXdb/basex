@@ -9,7 +9,7 @@ package org.basex.query.util.fingertree;
  * @param <N> node type
  * @param <E> element type
  */
-final class InnerNode<N, E> extends Node<Node<N, E>, E> {
+final class InnerNode<N, E> implements Node<Node<N, E>, E> {
   /** Child nodes. */
   final Node<N, E>[] children;
   /** Right bound for the elements' index in each sub-node. */
@@ -32,22 +32,22 @@ final class InnerNode<N, E> extends Node<Node<N, E>, E> {
   }
 
   @Override
-  protected long size() {
+  public long size() {
     return bounds[bounds.length - 1];
   }
 
   @Override
-  protected int arity() {
+  public int arity() {
     return bounds.length;
   }
 
   @Override
-  protected Node<N, E> getSub(final int pos) {
+  public Node<N, E> getSub(final int pos) {
     return children[pos];
   }
 
   @Override
-  protected Node<Node<N, E>, E> reverse() {
+  public Node<Node<N, E>, E> reverse() {
     final int n = children.length;
     @SuppressWarnings("unchecked")
     final Node<N, E>[] newChildren = new Node[n];
@@ -56,7 +56,7 @@ final class InnerNode<N, E> extends Node<Node<N, E>, E> {
   }
 
   @Override
-  protected boolean insert(final Node<Node<N, E>, E>[] siblings, final long index, final E val) {
+  public boolean insert(final Node<Node<N, E>, E>[] siblings, final long index, final E val) {
     final Node<Node<N, E>, E> left = siblings[0], right = siblings[2];
 
     int i = 0;
@@ -184,58 +184,20 @@ final class InnerNode<N, E> extends Node<Node<N, E>, E> {
   }
 
   @Override
-  protected NodeLike<Node<N, E>, E> remove(final long pos) {
-    int i = 0;
-    final int n = bounds.length;
-    while(pos >= bounds[i]) i++;
-    final long off = i == 0 ? pos : pos - bounds[i - 1];
-
-    final Node<N, E> left = i == 0 ? null : children[i - 1],
-                     right = i == n - 1 ? null : children[i + 1];
-    final Node<N, E>[] res = children[i].remove(left, right, off);
-
-    if(res[1] != null) {
-      // no underflow
-      final Node<N, E>[] out = children.clone();
-      final int l = Math.max(0, i - 1), r = Math.min(i + 1, n - 1);
-      System.arraycopy(res, i == 0 ? 1 : 0, out, l, r - l + 1);
-      return new InnerNode<>(out);
-    }
-
-    if(n == 2) {
-      // this node underflowed
-      return new PartialInnerNode<>(res[i == 0 ? 2 : 0]);
-    }
-
-    // still big enough
-    @SuppressWarnings("unchecked")
-    final Node<N, E>[] out = new Node[n - 1];
-    if(i > 0) {
-      System.arraycopy(children, 0, out, 0, i - 1);
-      out[i - 1] = res[0];
-    }
-    if(i < n - 1) {
-      out[i] = res[2];
-      System.arraycopy(children, i + 2, out, i + 1, n - i - 2);
-    }
-    return new InnerNode<>(out);
-  }
-
-  @Override
-  protected Node<Node<N, E>, E>[] remove(final Node<Node<N, E>, E> left,
+  public NodeLike<Node<N, E>, E>[] remove(final Node<Node<N, E>, E> left,
       final Node<Node<N, E>, E> right, final long pos) {
     int i = 0;
     final int n = bounds.length;
     while(pos >= bounds[i]) i++;
     final long off = i == 0 ? pos : pos - bounds[i - 1];
 
-    final Node<N, E>[] res = children[i].remove(
+    final NodeLike<N, E>[] res = children[i].remove(
         i ==     0 ? null : children[i - 1],
         i == n - 1 ? null : children[i + 1], off);
 
     @SuppressWarnings("unchecked")
-    final Node<Node<N, E>, E>[] out = (Node<Node<N, E>, E>[]) res;
-    final Node<N, E> l = res[0], m = res[1], r = res[2];
+    final NodeLike<Node<N, E>, E>[] out = (NodeLike<Node<N, E>, E>[]) res;
+    final Node<N, E> l = (Node<N, E>) res[0], m = (Node<N, E>) res[1], r = (Node<N, E>) res[2];
 
     if(m != null) {
       // no underflow
@@ -310,7 +272,10 @@ final class InnerNode<N, E> extends Node<Node<N, E>, E> {
       ls[a] = single;
       out[0] = new InnerNode<>(ls);
       out[2] = right;
-    } else {
+      return out;
+    }
+
+    if(right != null) {
       // merge with right sibling
       final Node<N, E>[] ch = ((InnerNode<N, E>) right).children;
       final int a = ch.length;
@@ -320,13 +285,19 @@ final class InnerNode<N, E> extends Node<Node<N, E>, E> {
       System.arraycopy(ch, 0, rs, 1, a);
       out[0] = left;
       out[2] = new InnerNode<>(rs);
+      return out;
     }
+
+    // underflow
+    out[0] = null;
+    out[1] = new PartialInnerNode<>(single);
+    out[2] = null;
     return out;
   }
 
   @Override
   @SuppressWarnings("unchecked")
-  protected NodeLike<Node<N, E>, E> slice(final long start, final long len) {
+  public NodeLike<Node<N, E>, E> slice(final long start, final long len) {
     // find the range of affected sub-nodes
     int p = 0;
     while(start >= bounds[p]) p++;
@@ -363,7 +334,7 @@ final class InnerNode<N, E> extends Node<Node<N, E>, E> {
   }
 
   @Override
-  protected long checkInvariants() {
+  public long checkInvariants() {
     final int a = children.length;
     if(a < 2 || a > FingerTree.MAX_ARITY) throw new AssertionError("Wrong arity: " + a);
     long b = 0;
@@ -376,83 +347,76 @@ final class InnerNode<N, E> extends Node<Node<N, E>, E> {
   }
 
   @Override
-  protected NodeLike<Node<N, E>, E>[] concat(final NodeLike<Node<N, E>, E> other) {
-    if(other instanceof Node) {
-      // nothing to do
-      @SuppressWarnings("unchecked")
-      final NodeLike<Node<N, E>, E>[] out = new NodeLike[] { this, other };
-      return out;
-    }
-
-    final int n = children.length;
-    final NodeLike<N, E> single = ((PartialInnerNode<N, E>) other).sub;
-    final NodeLike<N, E>[] res = children[n - 1].concat(single);
-    @SuppressWarnings("unchecked")
-    final NodeLike<Node<N, E>, E>[] out = (NodeLike<Node<N, E>, E>[]) res;
-
-    if(res[1] == null) {
-      // partial node was absorbed
-      final Node<N, E>[] ch = children.clone();
-      ch[n - 1] = (Node<N, E>) res[0];
-      out[0] = new InnerNode<>(ch);
-      return out;
-    }
-
-    if(n < FingerTree.MAX_ARITY) {
-      // new sub-node can be absorbed
-      @SuppressWarnings("unchecked")
-      final Node<N, E>[] ch = new Node[n + 1];
-      System.arraycopy(children, 0, ch, 0, n - 1);
-      ch[n - 1] = (Node<N, E>) res[0];
-      ch[n] = (Node<N, E>) res[1];
-      out[0] = new InnerNode<>(ch);
-      out[1] = null;
-      return out;
-    }
-
-    // split this node
-    final int ll = (n + 1) / 2, rl = n + 1 - ll;
-    @SuppressWarnings("unchecked")
-    final Node<N, E>[] ls = new Node[ll], rs = new Node[rl];
-    System.arraycopy(children, 0, ls, 0, ll);
-    System.arraycopy(children, ll, rs, 0, rl - 2);
-    rs[rl - 2] = (Node<N, E>) res[0];
-    rs[rl - 1] = (Node<N, E>) res[1];
-    out[0] = new InnerNode<>(ls);
-    out[1] = new InnerNode<>(rs);
-    return out;
-  }
-
-  @Override
-  protected int append(final NodeLike<Node<N, E>, E>[] nodes, final int pos) {
-    if(pos == 0) {
-      nodes[0] = this;
-      return 1;
-    }
-
-    final NodeLike<Node<N, E>, E> left = nodes[pos - 1];
-    if(left instanceof Node) {
+  public int append(final NodeLike<Node<N, E>, E>[] nodes, final int pos) {
+    if(pos == 0 || nodes[pos - 1] instanceof InnerNode) {
       nodes[pos] = this;
       return pos + 1;
     }
 
-    final NodeLike<Node<N, E>, E>[] joined = left.concat(this);
-    nodes[pos - 1] = joined[0];
-    if(joined[1] == null) return pos;
-    nodes[pos] = joined[1];
+    final NodeLike<N, E> sub = ((PartialInnerNode<N, E>) nodes[pos - 1]).sub;
+    final int n = children.length;
+    final Node<N, E> a, b;
+    if(sub instanceof Node) {
+      a = (Node<N, E>) sub;
+      b = children[0];
+    } else {
+      @SuppressWarnings("unchecked")
+      final NodeLike<N, E>[] buffer = (NodeLike<N, E>[]) nodes;
+      buffer[pos - 1] = sub;
+      if(children[0].append(buffer, pos) == pos) {
+        nodes[pos - 1] = replaceFirst((Node<N, E>) buffer[pos - 1]);
+        return pos;
+      }
+      a = (Node<N, E>) buffer[pos - 1];
+      b = (Node<N, E>) buffer[pos];
+    }
+
+    if(n < FingerTree.MAX_ARITY) {
+      @SuppressWarnings("unchecked")
+      final Node<N, E>[] ch = new Node[n + 1];
+      System.arraycopy(children, 1, ch, 2, n - 1);
+      ch[0] = a;
+      ch[1] = b;
+      nodes[pos - 1] = new InnerNode<>(ch);
+      nodes[pos] = null;
+      return pos;
+    }
+
+    final int rl = (n + 1) / 2, ll = n + 1 - rl;
+    @SuppressWarnings("unchecked")
+    final Node<N, E>[] ls = new Node[ll], rs = new Node[rl];
+    System.arraycopy(children, 1, ls, 2, ll - 2);
+    ls[0] = a;
+    ls[1] = b;
+    System.arraycopy(children, ll - 1, rs, 0, rl);
+    nodes[pos - 1] = new InnerNode<>(ls);
+    nodes[pos] = new InnerNode<>(rs);
     return pos + 1;
   }
 
-  @Override
-  protected void toString(final StringBuilder sb, final int indent) {
+
+
+  /**
+   * Recursive helper method for {@link #toString()}.
+   * @param sb string builder
+   * @param indent indentation depth
+   */
+  public void toString(final StringBuilder sb, final int indent) {
     for(int i = 0; i < indent; i++) sb.append("  ");
     sb.append("Node(").append(size()).append(")[\n");
     for(final Node<N, E> sub : children) {
-      sub.toString(sb, indent + 1);
+      FingerTree.toString(sub, sb, indent + 1);
       sb.append("\n");
     }
     for(int i = 0; i < indent; i++) sb.append("  ");
     sb.append("]");
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder();
+    toString(sb, 0);
+    return sb.toString();
   }
 
   /**
@@ -464,32 +428,6 @@ final class InnerNode<N, E> extends Node<Node<N, E>, E> {
     final Node<N, E>[] copy = children.clone();
     copy[0] = newFirst;
     return new InnerNode<>(copy);
-  }
-
-  /**
-   * Replaces the first sub-node with the two given ones and writes the results to the given array.
-   * @param out output array
-   * @param a first node
-   * @param b second node
-   */
-  void replaceFirst(final NodeLike<Node<N, E>, E>[] out, final Node<N, E> a, final Node<N, E> b) {
-    final int n = children.length;
-    if(n == 2) {
-      @SuppressWarnings("unchecked")
-      final Node<N, E>[] subs = new Node[] { a, b, children[1] };
-      out[0] = new InnerNode<>(subs);
-      out[1] = null;
-    } else {
-      final int ll = (n + 1) / 2, rl = n + 1 - ll;
-      @SuppressWarnings("unchecked")
-      final Node<N, E>[] ls = new Node[ll], rs = new Node[rl];
-      ls[0] = a;
-      ls[1] = b;
-      System.arraycopy(children, 1, ls, 2, ll - 2);
-      System.arraycopy(children, ll - 1, rs, 0, rl);
-      out[0] = new InnerNode<>(ls);
-      out[1] = new InnerNode<>(rs);
-    }
   }
 
   /**

@@ -210,11 +210,6 @@ final class SmallArray extends Array {
   }
 
   @Override
-  long[] sizes() {
-    return new long[] { elems.length };
-  }
-
-  @Override
   Array consSmall(final Value[] left) {
     final int l = left.length, r = elems.length, n = l + r;
     if(Math.min(l, r) >= MIN_DIGIT) {

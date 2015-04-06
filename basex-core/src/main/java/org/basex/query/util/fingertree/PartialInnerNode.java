@@ -9,7 +9,7 @@ package org.basex.query.util.fingertree;
  * @param <N> node type
  * @param <E> element type
  */
-final class PartialInnerNode<N, E> extends PartialNode<Node<N, E>, E> {
+final class PartialInnerNode<N, E> implements NodeLike<Node<N, E>, E> {
   /** The sub-node. */
   final NodeLike<N, E> sub;
 
@@ -22,67 +22,97 @@ final class PartialInnerNode<N, E> extends PartialNode<Node<N, E>, E> {
   }
 
   @Override
-  protected NodeLike<Node<N, E>, E>[] concat(final NodeLike<Node<N, E>, E> other) {
-    if(other instanceof PartialInnerNode) {
-      final PartialInnerNode<N, E> single = (PartialInnerNode<N, E>) other;
-      final NodeLike<N, E>[] merged = sub.concat(single.sub);
-      final NodeLike<N, E> a = merged[0], b = merged[1];
-
-      @SuppressWarnings("unchecked")
-      final NodeLike<Node<N, E>, E>[] out = (NodeLike<Node<N, E>, E>[]) merged;
-      if(b == null) {
-        out[0] = new PartialInnerNode<>(a);
-      } else {
-        @SuppressWarnings("unchecked")
-        final Node<N, E>[] ch = new Node[] { (Node<N, E>) a, (Node<N, E>) b };
-        out[0] = new InnerNode<>(ch);
-        out[1] = null;
-      }
-      return out;
-    }
-
-    // merging with a full node cannot result in under-full nodes
-    final InnerNode<N, E> inner = (InnerNode<N, E>) other;
-    final NodeLike<N, E>[] merged = sub.concat(inner.getSub(0));
-    final Node<N, E> a = (Node<N, E>) merged[0], b = (Node<N, E>) merged[1];
-
-    @SuppressWarnings("unchecked")
-    final NodeLike<Node<N, E>, E>[] out = (NodeLike<Node<N, E>, E>[]) merged;
-    if(b == null) {
-      // partial node was absorbed
-      out[0] = inner.replaceFirst(a);
-      return out;
-    }
-
-    inner.replaceFirst(out, a, b);
-    return out;
-  }
-
-  @Override
-  protected int append(final NodeLike<Node<N, E>, E>[] nodes, final int pos) {
+  public int append(final NodeLike<Node<N, E>, E>[] out, final int pos) {
     if(pos == 0) {
-      nodes[pos] = this;
+      out[0] = this;
       return 1;
     }
 
-    final NodeLike<Node<N, E>, E>[] joined = nodes[pos - 1].concat(this);
-    nodes[pos - 1] = joined[0];
-
-    if(joined[1] != null) {
-      nodes[pos] = joined[1];
-      return pos + 1;
+    @SuppressWarnings("unchecked")
+    NodeLike<N, E>[] buffer = (NodeLike<N, E>[]) out;
+    final NodeLike<Node<N, E>, E> left = out[pos - 1];
+    if(left instanceof PartialInnerNode) {
+      buffer[pos - 1] = ((PartialInnerNode<N, E>) left).sub;
+      if(sub.append(buffer, pos) == pos) {
+        out[pos - 1] = new PartialInnerNode<>(buffer[pos - 1]);
+      } else {
+        @SuppressWarnings("unchecked")
+        final Node<N, E>[] ch = new Node[2];
+        ch[0] = (Node<N, E>) buffer[pos - 1];
+        ch[1] = (Node<N, E>) buffer[pos];
+        out[pos - 1] = new InnerNode<>(ch);
+        out[pos] = null;
+      }
+      return pos;
     }
 
-    return pos;
+    final Node<N, E>[] children = ((InnerNode<N, E>) left).children;
+    final int n = children.length;
+    final Node<N, E> a, b;
+    if(sub instanceof Node) {
+      a = children[n - 1];
+      b = (Node<N, E>) sub;
+    } else {
+      buffer[pos - 1] = children[n - 1];
+      if(sub.append(buffer, pos) == pos) {
+        final Node<N, E>[] ch = children.clone();
+        ch[n - 1] = (Node<N, E>) buffer[pos - 1];
+        out[pos - 1] = new InnerNode<>(ch);
+        return pos;
+      }
+      a = (Node<N, E>) buffer[pos - 1];
+      b = (Node<N, E>) buffer[pos];
+    }
+
+    if(n < FingerTree.MAX_ARITY) {
+      @SuppressWarnings("unchecked")
+      final Node<N, E>[] ch = new Node[n + 1];
+      System.arraycopy(children, 0, ch, 0, n - 1);
+      ch[n - 1] = a;
+      ch[n] = b;
+      out[pos - 1] = new InnerNode<>(ch);
+      out[pos] = null;
+      return pos;
+    }
+
+    final int ll = (n + 1) / 2, rl = n + 1 - ll;
+    @SuppressWarnings("unchecked")
+    final Node<N, E>[] ls = new Node[ll], rs = new Node[rl];
+    System.arraycopy(children, 0, ls, 0, ll);
+    System.arraycopy(children, ll, rs, 0, rl - 2);
+    rs[rl - 2] = a;
+    rs[rl - 1] = b;
+    out[pos - 1] = new InnerNode<>(ls);
+    out[pos] = new InnerNode<>(rs);
+    return pos + 1;
   }
 
   @Override
-  protected void toString(final StringBuilder sb, final int indent) {
-    for(int i = 0; i < indent; i++) sb.append("  ");
-    sb.append("OneSubnode[\n");
-    sub.toString(sb, indent + 1);
-    sb.append('\n');
-    for(int i = 0; i < indent; i++) sb.append("  ");
+  public String toString() {
+    final StringBuilder sb = new StringBuilder();
+    toString(sb, 0);
+    return sb.toString();
+  }
+
+  /**
+   * Recursive helper for {@link #toString()}.
+   * @param sb string builder
+   * @param indent indentation level
+   */
+  void toString(final StringBuilder sb, final int indent) {
+    for(int i = 0; i < indent; i++) sb.append(' ').append(' ');
+    sb.append(this.getClass().getSimpleName()).append('[').append('\n');
+    if(sub instanceof InnerNode) {
+      ((InnerNode<?, ?>) sub).toString(sb, indent + 1);
+    } else if(sub instanceof PartialInnerNode) {
+      ((PartialInnerNode<?, ?>) sub).toString(sb, indent + 1);
+    } else {
+      for(final String line : sub.toString().split("\r\n?|\n")) {
+        for(int i = 0; i <= indent; i++) sb.append(' ').append(' ');
+        sb.append(line).append('\n');
+      }
+    }
+    for(int i = 0; i < indent; i++) sb.append(' ').append(' ');
     sb.append(']');
   }
 }

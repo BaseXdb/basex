@@ -283,10 +283,11 @@ public final class FingerTreeBuilder<E> {
       boolean first = true;
       for(int i = 0; i < inLeft; i++) {
         final Node<N, E> node = nodes[(midPos - inLeft + i + CAP) % CAP];
-        for(final E elem : node) {
+        final Iterator<E> iter = FingerTreeIterator.get(node, 0);
+        while(iter.hasNext()) {
           if(first) first = false;
           else sb.append(", ");
-          sb.append(elem);
+          sb.append(iter.next());
         }
       }
       if(!(middle == null)) {
@@ -300,10 +301,11 @@ public final class FingerTreeBuilder<E> {
       }
       for(int i = 0; i < inRight; i++) {
         final Node<N, E> node = nodes[(midPos + i) % CAP];
-        for(final E elem : node) {
+        final Iterator<E> iter = FingerTreeIterator.get(node, 0);
+        while(iter.hasNext()) {
           if(first) first = false;
           else sb.append(", ");
-          sb.append(elem);
+          sb.append(iter.next());
         }
       }
     }

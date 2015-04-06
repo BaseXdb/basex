@@ -278,12 +278,6 @@ public abstract class Array extends FItem {
    */
   abstract void checkInvariants();
 
-  /**
-   * Returns an array containing the number of elements stored at each level of the tree.
-   * @return array of sizes
-   */
-  abstract long[] sizes();
-
   @Override
   public Value invValue(final QueryContext qc, final InputInfo ii, final Value... args)
       throws QueryException {

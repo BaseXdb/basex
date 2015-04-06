@@ -90,17 +90,14 @@ final class SingletonTree<N, E> extends FingerTree<N, E> {
 
   @Override
   public TreeSlice<N, E> remove(final long pos) {
-    final NodeLike<N, E> removed = elem.remove(pos);
-    return removed instanceof Node ? new TreeSlice<>(new SingletonTree<>((Node<N, E>) removed))
-                                   : new TreeSlice<>((PartialNode<N, E>) removed);
+    final NodeLike<N, E>[] removed = elem.remove(null, null, pos);
+    return new TreeSlice<>(removed[1]);
   }
 
   @Override
   public TreeSlice<N, E> slice(final long pos, final long len) {
     if(pos == 0 && len == elem.size()) return new TreeSlice<>(this);
-    final NodeLike<N, E> sub = elem.slice(pos, len);
-    if(sub instanceof Node) return new TreeSlice<>(new SingletonTree<>((Node<N, E>) sub));
-    return new TreeSlice<>((PartialNode<N, E>) sub);
+    return new TreeSlice<>(elem.slice(pos, len));
   }
 
   @Override
@@ -130,7 +127,7 @@ final class SingletonTree<N, E> extends FingerTree<N, E> {
   void toString(final StringBuilder sb, final int indent) {
     for(int i = 0; i < indent; i++) sb.append("  ");
     sb.append("Single[\n");
-    elem.toString(sb, indent + 1);
+    toString(elem, sb, indent + 1);
     sb.append("\n");
     for(int i = 0; i < indent; i++) sb.append("  ");
     sb.append("]");
@@ -139,12 +136,5 @@ final class SingletonTree<N, E> extends FingerTree<N, E> {
   @Override
   public long checkInvariants() {
     return elem.checkInvariants();
-  }
-
-  @Override
-  public long[] sizes(final int depth) {
-    final long[] sizes = new long[depth + 1];
-    sizes[depth] = elem.size();
-    return sizes;
   }
 }

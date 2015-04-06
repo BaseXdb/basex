@@ -106,11 +106,6 @@ final class EmptyArray extends Array {
   }
 
   @Override
-  long[] sizes() {
-    return new long[] { 0 };
-  }
-
-  @Override
   Array consSmall(final Value[] vals) {
     return new SmallArray(vals);
   }

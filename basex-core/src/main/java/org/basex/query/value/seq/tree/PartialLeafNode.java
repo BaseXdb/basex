@@ -11,7 +11,7 @@ import org.basex.query.value.item.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
-final class PartialLeafNode extends PartialNode<Item, Item> {
+final class PartialLeafNode implements NodeLike<Item, Item> {
   /** The single element. */
   final Item[] elems;
 
@@ -24,41 +24,7 @@ final class PartialLeafNode extends PartialNode<Item, Item> {
   }
 
   @Override
-  protected NodeLike<Item, Item>[] concat(final NodeLike<Item, Item> other) {
-    @SuppressWarnings("unchecked")
-    final NodeLike<Item, Item>[] out = new NodeLike[2];
-    if(other instanceof LeafNode) {
-      final Item[] ls = elems, rs = ((LeafNode) other).values;
-      final int l = ls.length, r = rs.length, n = l + r;
-      if(n <= TreeSeq.MAX_LEAF) {
-        // merge into one node
-        final Item[] vals = new Item[n];
-        System.arraycopy(ls, 0, vals, 0, l);
-        System.arraycopy(rs, 0, vals, l, r);
-        out[0] = new LeafNode(vals);
-      } else {
-        // split into two
-        final int ll = n / 2, rl = n - ll, move = r - rl;
-        final Item[] newLeft = new Item[ll], newRight = new Item[rl];
-        System.arraycopy(ls, 0, newLeft, 0, l);
-        System.arraycopy(rs, 0, newLeft, l, move);
-        System.arraycopy(rs, move, newRight, 0, rl);
-        out[0] = new LeafNode(newLeft);
-        out[1] = new LeafNode(newRight);
-      }
-    } else {
-      final Item[] elems2 = ((PartialLeafNode) other).elems;
-      final int l = elems.length, r = elems2.length, n = l + r;
-      final Item[] vals = new Item[n];
-      System.arraycopy(elems, 0, vals, 0, l);
-      System.arraycopy(elems2, 0, vals, l, r);
-      out[0] = n < TreeSeq.MIN_LEAF ? new PartialLeafNode(vals) : new LeafNode(vals);
-    }
-    return out;
-  }
-
-  @Override
-  protected int append(final NodeLike<Item, Item>[] nodes, final int pos) {
+  public int append(final NodeLike<Item, Item>[] nodes, final int pos) {
     if(pos == 0) {
       nodes[0] = this;
       return 1;
@@ -96,8 +62,7 @@ final class PartialLeafNode extends PartialNode<Item, Item> {
   }
 
   @Override
-  protected void toString(final StringBuilder sb, final int indent) {
-    for(int i = 0; i < indent; i++) sb.append("  ");
-    sb.append(getClass().getSimpleName()).append(Arrays.toString(elems));
+  public String toString() {
+    return getClass().getSimpleName() + "(" + elems.length + ")" + Arrays.toString(elems);
   }
 }

@@ -11,7 +11,7 @@ import org.basex.query.value.item.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
-final class LeafNode extends Node<Item, Item> {
+final class LeafNode implements Node<Item, Item> {
   /** Elements stored in this leaf node. */
   final Item[] values;
 
@@ -25,12 +25,12 @@ final class LeafNode extends Node<Item, Item> {
   }
 
   @Override
-  protected long size() {
+  public long size() {
     return values.length;
   }
 
   @Override
-  protected LeafNode reverse() {
+  public LeafNode reverse() {
     final int n = values.length;
     final Item[] out = new Item[n];
     for(int i = 0; i < n; i++) out[i] = values[n - 1 - i];
@@ -38,8 +38,7 @@ final class LeafNode extends Node<Item, Item> {
   }
 
   @Override
-  protected boolean insert(final Node<Item, Item>[] siblings,
-      final long pos, final Item val) {
+  public boolean insert(final Node<Item, Item>[] siblings, final long pos, final Item val) {
     final int p = (int) pos, n = values.length;
     final Item[] vals = new Item[n + 1];
     System.arraycopy(values, 0, vals, 0, p);
@@ -93,20 +92,11 @@ final class LeafNode extends Node<Item, Item> {
   }
 
   @Override
-  protected NodeLike<Item, Item> remove(final long pos) {
-    final int p = (int) pos, n = values.length;
-    final Item[] out = new Item[n - 1];
-    System.arraycopy(values, 0, out, 0, p);
-    System.arraycopy(values, p + 1, out, p, n - 1 - p);
-    return n == TreeSeq.MIN_LEAF ? new PartialLeafNode(out) : new LeafNode(out);
-  }
-
-  @Override
-  protected Node<Item, Item>[] remove(final Node<Item, Item> left,
+  public NodeLike<Item, Item>[] remove(final Node<Item, Item> left,
       final Node<Item, Item> right, final long pos) {
     final int p = (int) pos, n = values.length;
     @SuppressWarnings("unchecked")
-    final Node<Item, Item>[] out = new Node[] { left, null, right };
+    final NodeLike<Item, Item>[] out = new NodeLike[] { left, null, right };
     if(n > TreeSeq.MIN_LEAF) {
       // we do not have to split
       final Item[] vals = new Item[n - 1];
@@ -160,7 +150,10 @@ final class LeafNode extends Node<Item, Item> {
       System.arraycopy(values, p + 1, vals, l + p, r - 1 - p);
       out[0] = new LeafNode(vals);
       out[1] = null;
-    } else {
+      return out;
+    }
+
+    if(right != null) {
       // merge with right neighbor
       final Item[] rvals = ((LeafNode) right).values;
       final int l = values.length, r = rvals.length;
@@ -170,44 +163,19 @@ final class LeafNode extends Node<Item, Item> {
       System.arraycopy(rvals, 0, vals, l - 1, r);
       out[1] = null;
       out[2] = new LeafNode(vals);
+      return out;
     }
 
+    // underflow
+    final Item[] vals = new Item[n - 1];
+    System.arraycopy(values, 0, vals, 0, p);
+    System.arraycopy(values, p + 1, vals, p, n - 1 - p);
+    out[1] = new PartialLeafNode(vals);
     return out;
   }
 
   @Override
-  protected NodeLike<Item, Item>[] concat(final NodeLike<Item, Item> other) {
-    @SuppressWarnings("unchecked")
-    final NodeLike<Item, Item>[] arr = new NodeLike[2];
-
-    if(other instanceof PartialLeafNode) {
-      final Item[] left = values, right = ((PartialLeafNode) other).elems;
-      final int l = left.length, r = right.length, n = l + r;
-      if(n <= TreeSeq.MAX_LEAF) {
-        // merge into one node
-        final Item[] vals = new Item[n];
-        System.arraycopy(left, 0, vals, 0, l);
-        System.arraycopy(right, 0, vals, l, r);
-        arr[0] = new LeafNode(vals);
-      } else {
-        // split into two
-        final int ll = n / 2, rl = n - ll, move = l - ll;
-        final Item[] newLeft = new Item[ll], newRight = new Item[rl];
-        System.arraycopy(left, 0, newLeft, 0, ll);
-        System.arraycopy(left, ll, newRight, 0, move);
-        System.arraycopy(right, 0, newRight, move, r);
-        arr[0] = new LeafNode(newLeft);
-        arr[1] = new LeafNode(newRight);
-      }
-    } else {
-      arr[0] = this;
-      arr[1] = other;
-    }
-    return arr;
-  }
-
-  @Override
-  protected int append(final NodeLike<Item, Item>[] nodes, final int pos) {
+  public int append(final NodeLike<Item, Item>[] nodes, final int pos) {
     if(pos == 0) {
       nodes[pos] = this;
       return 1;
@@ -242,7 +210,7 @@ final class LeafNode extends Node<Item, Item> {
   }
 
   @Override
-  protected NodeLike<Item, Item> slice(final long off, final long size) {
+  public NodeLike<Item, Item> slice(final long off, final long size) {
     final int p = (int) off, n = (int) size;
     final Item[] out = new Item[n];
     System.arraycopy(values, p, out, 0, n);
@@ -250,25 +218,24 @@ final class LeafNode extends Node<Item, Item> {
   }
 
   @Override
-  protected void toString(final StringBuilder sb, final int indent) {
-    for(int i = 0; i < indent; i++) sb.append("  ");
-    sb.append("Node(").append(size()).append(")").append(Arrays.toString(values));
+  public String toString() {
+    return getClass().getSimpleName() + "(" + size() + ")" + Arrays.toString(values);
   }
 
   @Override
-  protected long checkInvariants() {
+  public long checkInvariants() {
     if(values.length < TreeSeq.MIN_LEAF || values.length > TreeSeq.MAX_LEAF)
       throw new AssertionError("Wrong " + getClass().getSimpleName() + " size: " + values.length);
     return values.length;
   }
 
   @Override
-  protected int arity() {
+  public int arity() {
     return values.length;
   }
 
   @Override
-  protected Item getSub(final int index) {
+  public Item getSub(final int index) {
     return values[index];
   }
 }

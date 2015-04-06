@@ -157,11 +157,6 @@ final class SmallSeq extends TreeSeq {
   }
 
   @Override
-  long[] sizes() {
-    return new long[] { elems.length };
-  }
-
-  @Override
   TreeSeq consSmall(final Item[] left) {
     final int l = left.length, r = elems.length, n = l + r;
     if(Math.min(l, r) >= MIN_DIGIT) {

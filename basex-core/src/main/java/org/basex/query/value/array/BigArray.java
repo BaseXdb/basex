@@ -640,13 +640,6 @@ final class BigArray extends Array {
   }
 
   @Override
-  long[] sizes() {
-    final long[] sizes = middle.sizes(1);
-    sizes[0] = left.length + right.length;
-    return sizes;
-  }
-
-  @Override
   Array consSmall(final Value[] vals) {
     final int a = vals.length, b = left.length, n = a + b;
     if(n <= MAX_DIGIT) {

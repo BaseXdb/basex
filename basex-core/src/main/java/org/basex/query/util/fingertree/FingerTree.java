@@ -290,13 +290,6 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
   public abstract long checkInvariants();
 
   /**
-   * Returns an array containing the number of elements stored at each level of the tree.
-   * @param depth current depth
-   * @return array of sizes
-   */
-  public abstract long[] sizes(int depth);
-
-  /**
    * Creates a {@link ListIterator} over the elements in this tree.
    * @param start starting position
    *   (i.e. the position initially returned by {@link ListIterator#nextIndex()})
@@ -309,5 +302,27 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
   @Override
   public final ListIterator<E> iterator() {
     return listIterator(0);
+  }
+
+  /**
+   * Writes a string representation of the given object to the given strun builder.
+   * @param obj object to write
+   * @param sb string builder
+   * @param indent indentation level
+   */
+  static void toString(final Object obj, final StringBuilder sb, final int indent) {
+    if(obj instanceof InnerNode) {
+      ((InnerNode<?, ?>) obj).toString(sb, indent);
+    } else if(obj instanceof PartialInnerNode) {
+      ((PartialInnerNode<?, ?>) obj).toString(sb, indent);
+    } else {
+      boolean fst = true;
+      for(final String line : obj.toString().split("\r\n?|\n")) {
+        for(int i = 0; i < indent; i++) sb.append(' ').append(' ');
+        sb.append(line);
+        if(fst) fst = false;
+        else sb.append('\n');
+      }
+    }
   }
 }
