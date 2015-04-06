@@ -95,7 +95,7 @@ public final class Quantifier extends Single {
 
   @Override
   public String toString() {
-    return every ? EVERY : SOME + '(' + expr + ')';
+    return (every ? EVERY : SOME) + '(' + expr + ')';
   }
 
   @Override
