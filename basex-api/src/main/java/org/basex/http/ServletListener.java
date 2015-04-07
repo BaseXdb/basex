@@ -10,7 +10,7 @@ import javax.servlet.annotation.*;
  * @author Christian Gruen
  */
 @WebListener
-public abstract class ServletListener implements ServletContextListener {
+public final class ServletListener implements ServletContextListener {
   @Override
   public void contextInitialized(final ServletContextEvent event) {
   }
