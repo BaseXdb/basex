@@ -73,9 +73,7 @@ public final class DialogMem extends BaseXDialog {
     timer.scheduleAtFixedRate(new TimerTask() {
       @Override
       public void run() {
-        while(isVisible()) {
-          if(!text.selected()) text.setText(info());
-        }
+        if(isVisible() && !text.selected()) text.setText(info());
       }
     }, 0, 500);
   }
