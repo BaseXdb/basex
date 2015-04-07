@@ -141,7 +141,7 @@ public enum Annotation {
   /** XQuery annotation. */
   _UNIT_BEFORE_MODULE("before-module()", arg(), UNIT_URI),
   /** XQuery annotation. */
-  _UNIT_IGNORE("ignore()", arg(), UNIT_URI),
+  _UNIT_IGNORE("ignore([message])", arg(STR), UNIT_URI),
   /** XQuery annotation. */
   _UNIT_TEST("test(['expected',error])", arg(STR, STR), UNIT_URI);
 
