@@ -1227,6 +1227,8 @@ public interface Text {
 
   /** Database path. */
   String DATABASE_PATH = lang("database_path");
+  /** Repository path. */
+  String REPOSITORY_PATH = lang("repository_path");
   /** Interactions. */
   String GUI_INTERACTIONS = lang("gui_interactions");
   /** Look and feel. */

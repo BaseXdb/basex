@@ -301,6 +301,7 @@ reopen               = Buka lagi
 reopen_file_%        = Buka lagi berkas % dan abaikan perubahan?
 replace_all          = Ganti semua
 replace_with         = Ganti dengan
+repository_path      = Rintis Tempat Penyimpanan
 requires_restart     = Membutuhkan start lagi
 res_added_%          = Sumber daya ditambahkan dalam %.
 res_deleted_%_%      = % sumber daya dihapus dalam %.

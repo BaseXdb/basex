@@ -301,6 +301,7 @@ reopen               = Riapri
 reopen_file_%        = Riapri % e scarta le modifiche?
 replace_all          = Rimpiazzare tutto
 replace_with         = Rimpiazzare con
+repository_path      = Percorso del repository
 requires_restart     = Richiede un riavvio
 res_added_%          = Risorsa/e aggiunto in %.
 res_deleted_%_%      = % risorsa/e cancellato in %.

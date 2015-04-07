@@ -301,6 +301,7 @@ reopen               = Neu öffnen
 reopen_file_%        = Datei % neu öffnen und Änderungen verwerfen?
 replace_all          = Alle ersetzen
 replace_with         = Ersetzen mit
+repository_path      = Repository-Pfad
 requires_restart     = nach Neustart
 res_added_%          = Ressource(n) hinzugefügt (%).
 res_deleted_%_%      = % Ressource(n) wurden gelöscht (%).

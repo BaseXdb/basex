@@ -301,6 +301,7 @@ reopen               = Opnieuw openen
 reopen_file_%        = % opnieuw openen en wijzigingen niet opslaan?
 replace_all          = Vervang alles
 replace_with         = Vervang door
+repository_path      = Repository pad
 requires_restart     = vereist een herstart
 res_added_%          = Resource(s) toegevoegd in %.
 res_deleted_%_%      = % resource(s) verwijderd in %.

@@ -301,6 +301,7 @@ reopen               = Reabrir
 reopen_file_%        = ¿Reabrir % y descartar los cambios?
 replace_all          = Reemplazar todo
 replace_with         = Reemplazar con
+repository_path      = Ruta al repositorio
 requires_restart     = requiere un reinicio
 res_added_%          = Recurso(s)  añadida en %.
 res_deleted_%_%      = % recurso(s) borrado(s) en %.

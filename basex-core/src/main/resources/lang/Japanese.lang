@@ -301,6 +301,7 @@ reopen               = 開き直す
 reopen_file_%        = 変更を破棄して % を開き直しますか？
 replace_all          = 全置換
 replace_with         = 置換
+repository_path      = Repository Path
 requires_restart     = 再起動が必要です
 res_added_%          = リソースがから削除されました。
 res_deleted_%_%      = % リソースが % から削除されました。

@@ -30,7 +30,9 @@ final class DialogGeneralPrefs extends BaseXBack {
   private static final String[][] LANGS = Lang.parse();
 
   /** Directory path. */
-  private final BaseXTextField path;
+  private final BaseXTextField dbPath;
+  /** Repository path. */
+  private final BaseXTextField repoPath;
   /** Number of hits. */
   private final BaseXSlider limit;
   /** Label for number of hits. */
@@ -45,26 +47,40 @@ final class DialogGeneralPrefs extends BaseXBack {
   /** Simple file dialog checkbox. */
   private final BaseXCheckBox simplefd;
   /** Browse button. */
-  private final BaseXButton button;
+  private final BaseXButton dbButton;
+  /** Browse button. */
+  private final BaseXButton repoButton;
 
   /**
    * Default constructor.
    * @param d dialog reference
    */
   DialogGeneralPrefs(final BaseXDialog d) {
-    border(8).setLayout(new TableLayout(8, 1));
+    border(8).setLayout(new TableLayout(10, 1));
     gui = d.gui;
 
     final StaticOptions opts = gui.context.soptions;
     final GUIOptions gopts = gui.gopts;
-    path = new BaseXTextField(opts.dbpath().path(), d);
+    dbPath = new BaseXTextField(opts.get(StaticOptions.DBPATH), d);
+    repoPath = new BaseXTextField(opts.get(StaticOptions.REPOPATH), d);
 
-    button = new BaseXButton(BROWSE_D, d);
-    button.addActionListener(new ActionListener() {
+    dbButton = new BaseXButton(BROWSE_D, d);
+    dbButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
-        final IOFile dir = new BaseXFileChooser(CHOOSE_DIR, path.getText(), gui).select(Mode.DOPEN);
-        if(dir != null) path.setText(dir.dir());
+        final String path = dbPath.getText();
+        final IOFile dir = new BaseXFileChooser(CHOOSE_DIR, path, gui).select(Mode.DOPEN);
+        if(dir != null) dbPath.setText(dir.dir());
+      }
+    });
+
+    repoButton = new BaseXButton(BROWSE_D, d);
+    repoButton.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(final ActionEvent e) {
+        final String path = repoPath.getText();
+        final IOFile dir = new BaseXFileChooser(CHOOSE_DIR, path, gui).select(Mode.DOPEN);
+        if(dir != null) repoPath.setText(dir.dir());
       }
     });
 
@@ -82,11 +98,17 @@ final class DialogGeneralPrefs extends BaseXBack {
     creds = new BaseXLabel(" ");
 
     add(new BaseXLabel(DATABASE_PATH + COL, true, true));
-
     BaseXBack p = new BaseXBack(new TableLayout(1, 2, 8, 0));
-    p.add(path);
-    p.add(button);
+    p.add(dbPath);
+    p.add(dbButton);
     add(p);
+
+    add(new BaseXLabel(REPOSITORY_PATH + COL, true, true));
+    p = new BaseXBack(new TableLayout(1, 2, 8, 0));
+    p.add(repoPath);
+    p.add(repoButton);
+    add(p);
+
     add(new BaseXLabel(GUI_INTERACTIONS + COL, true, true).border(8, 0, 8, 0));
 
     p = new BaseXBack(new TableLayout(2, 2, 40, 0));
@@ -143,13 +165,16 @@ final class DialogGeneralPrefs extends BaseXBack {
 
     // new database path: close opened database
     final StaticOptions opts = gui.context.soptions;
-    if(source == path || source == button) {
-      final String dbpath = path.getText();
+    if(source == dbPath || source == dbButton) {
+      final String dbpath = dbPath.getText();
       if(!opts.get(StaticOptions.DBPATH).equals(dbpath) && gui.context.data() != null) {
         new Close().run(gui.context);
         gui.notify.init();
       }
       opts.set(StaticOptions.DBPATH, dbpath);
+    } else if(source == repoPath || source == repoButton) {
+      gui.context.repo.reset();
+      opts.set(StaticOptions.REPOPATH, repoPath.getText());
     }
     opts.set(StaticOptions.LANG, lang.getSelectedItem());
 

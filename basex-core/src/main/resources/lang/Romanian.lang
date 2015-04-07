@@ -301,6 +301,7 @@ reopen               = Reopen
 reopen_file_%        = Reopen % and discard changes?
 replace_all          = Replace all
 replace_with         = Replace with
+repository_path      = Repository Path
 requires_restart     = Necesită o repornire
 res_added_%          = Resurse adăugata în %.
 res_deleted_%_%      = % resurse sterse in %

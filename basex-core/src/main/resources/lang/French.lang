@@ -301,6 +301,7 @@ reopen               = Rouvrir
 reopen_file_%        = Rouvrir % et annuler les changements ?
 replace_all          = Remplacer tout
 replace_with         = Remplacer avec
+repository_path      = Chemin de la dépôt
 requires_restart     = Redémarrage requis
 res_added_%          = Ressource(s) ajouté (%).
 res_deleted_%_%      = % ressource(s) supprimé dans %.
