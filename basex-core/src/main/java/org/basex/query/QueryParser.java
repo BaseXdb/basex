@@ -4055,15 +4055,26 @@ public class QueryParser extends InputParser {
       currDoc.setLength(0);
       ++pos;
     }
+    comment(false, doc);
+  }
+
+  /**
+   * Consumes a comment.
+   * @param nested nested flag
+   * @param doc xqdoc flag
+   * @throws QueryException query exception
+   */
+  private void comment(final boolean nested, final boolean doc) throws QueryException {
     while(++pos < length) {
       char curr = curr();
       if(curr == '(' && next() == ':') {
-        comment();
+        ++pos;
+        comment(true, doc);
         curr = curr();
       }
       if(curr == ':' && next() == ')') {
         pos += 2;
-        if(moduleDoc.isEmpty()) {
+        if(!nested && moduleDoc.isEmpty()) {
           moduleDoc = currDoc.toString().trim();
           currDoc.setLength(0);
         }
