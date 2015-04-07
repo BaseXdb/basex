@@ -162,7 +162,7 @@ public final class TextView extends View {
    * @param r result
    * @throws QueryException query exception
    */
-  public void cacheText(final ArrayOutput out, final Command c, final Result r)
+  public void cache(final ArrayOutput out, final Command c, final Result r)
       throws QueryException {
 
     // cache command or node set
@@ -220,8 +220,7 @@ public final class TextView extends View {
       } else if(ns != null) {
         ns.serialize(Serializer.get(out));
       } else {
-        final byte[] txt = text.getText();
-        for(final byte t : txt) if(t < 0 || t > ' ' || ws(t)) out.write(t);
+        for(final byte t : text.getText()) if(t < 0 || t > ' ' || ws(t)) out.write(t);
       }
     } catch(final IOException ex) {
       BaseXDialog.error(gui, Util.info(FILE_NOT_SAVED_X, file));

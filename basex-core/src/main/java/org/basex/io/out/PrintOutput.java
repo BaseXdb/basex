@@ -149,9 +149,8 @@ public class PrintOutput extends OutputStream {
   }
 
   /**
-   * Checks if stream can output more characters; can be overwritten to
-   * interrupt streaming at some point.
-   * @return result of check
+   * Checks if stream can output more characters.
+   * @return {@code true} if stream is exhausted
    */
   public final boolean finished() {
     return size == max;

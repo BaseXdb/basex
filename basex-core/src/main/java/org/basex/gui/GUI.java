@@ -494,10 +494,11 @@ public final class GUI extends JFrame {
         final Result result = cmd.finish();
         DBNodes nodes = result instanceof DBNodes && result.size() != 0 ? (DBNodes) result : null;
 
+        final boolean updated = cmd.updated(context);
         if(context.data() != data) {
           // database reference has changed - notify views
           notify.init();
-        } else if(cmd.updated(context)) {
+        } else if(updated) {
           // update visualizations
           notify.update();
           // adopt updated nodes as result set
@@ -536,7 +537,8 @@ public final class GUI extends JFrame {
             // assign textual output if no node result was created
             text.setText(ao);
           }
-          text.cacheText(ao, cmd, result);
+          // only cache output if data has not been updated (in which case notifyUpdate was called)
+          if(!updated) text.cache(ao, cmd, result);
         }
       }
     } catch(final Exception ex) {
