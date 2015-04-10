@@ -152,7 +152,7 @@ public abstract class Filter extends Preds {
       if(last) {
         if(e.isValue()) {
           // return sub-sequence
-          e = ((Value) e).subSeq(e.size() - 1, 1);
+          e = FnSubsequence.eval((Value) e, e.size(), 1);
         } else {
           // rewrite positional predicate to basex:last-from
           e = Function._BASEX_LAST_FROM.get(null, info, e);
