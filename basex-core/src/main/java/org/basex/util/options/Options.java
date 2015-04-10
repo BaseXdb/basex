@@ -212,6 +212,15 @@ public class Options implements Iterable<Option<?>> {
   }
 
   /**
+   * Returns the requested map.
+   * @param option option to be found
+   * @return value
+   */
+  public final synchronized Map get(final MapOption option) {
+    return (Map) get((Option<?>) option);
+  }
+
+  /**
    * Returns the requested function.
    * @param option option to be found
    * @return value
@@ -733,6 +742,9 @@ public class Options implements Iterable<Option<?>> {
         throw new BaseXException(Text.OPT_MAP, option.name());
       }
       put(option, o);
+    } else if(option instanceof MapOption) {
+      if(!(item instanceof Map)) throw new BaseXException(Text.OPT_FUNC, option.name());
+      put(option, item);
     } else if(option instanceof FuncOption) {
       if(!(item instanceof FuncItem)) throw new BaseXException(Text.OPT_FUNC, option.name());
       put(option, item);
