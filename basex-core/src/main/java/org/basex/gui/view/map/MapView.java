@@ -281,7 +281,7 @@ public final class MapView extends View implements Runnable {
 
     initLen();
     layout = new MapLayout(nodes.data, textLen, gui.gopts);
-    layout.makeMap(rect, new MapList(nodes.pres.clone()), 0, (int) nodes.size() - 1);
+    layout.makeMap(rect, new MapList(nodes.pres.clone()), 0, nodes.size() - 1);
     // rectangles are copied to avoid synchronization issues
     mainRects = layout.rectangles.copy();
 

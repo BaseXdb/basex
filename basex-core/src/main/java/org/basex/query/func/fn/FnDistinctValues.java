@@ -15,6 +15,7 @@ import org.basex.query.util.hash.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.seq.tree.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 
@@ -97,7 +98,7 @@ public final class FnDistinctValues extends StandardFunc {
       for(final byte[] c : pn.stats.cats) is.put(new Atm(c), info);
     }
     // return resulting sequence
-    final ValueBuilder vb = new ValueBuilder(is.size());
+    final ValueBuilder vb = new ValueBuilder();
     for(final Item i : is) vb.add(i);
     return vb.value();
   }

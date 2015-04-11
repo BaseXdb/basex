@@ -12,6 +12,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.seq.tree.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
 import org.basex.query.var.*;
@@ -42,24 +43,35 @@ public final class GFLWOR extends ParseExpr {
     this.ret = ret;
   }
 
+  /**
+   * Creates a new evaluator for this FLWOR expression.
+   * @return the evaluator
+   */
+  private Eval newEval() {
+    Eval e = new StartEval();
+    for(final Clause cls : clauses) e = cls.eval(e);
+    return e;
+  }
+
+  @Override
+  public Value value(final QueryContext qc) throws QueryException {
+    final Eval eval = newEval();
+    if(!eval.next(qc)) return Empty.SEQ;
+    final Value v1 = ret.value(qc);
+    if(!eval.next(qc)) return v1;
+
+    final ValueBuilder vb = new ValueBuilder().add(v1);
+    do {
+      vb.add(ret.value(qc));
+    } while(eval.next(qc));
+    return vb.value();
+  }
+
   @Override
   public Iter iter(final QueryContext qc) {
-    // Start evaluator, doing nothing, once.
-    Eval e = new Eval() {
-      /** First-evaluation flag. */
-      private boolean first = true;
-      @Override
-      public boolean next(final QueryContext q) {
-        if(!first) return false;
-        first = false;
-        return true;
-      }
-    };
-
-    for(final Clause cls : clauses) e = cls.eval(e);
-    final Eval ev = e;
-
     return new Iter() {
+      /** Clause evaluator. */
+      private final Eval ev = newEval();
       /** Return iterator. */
       private Iter sub = Empty.ITER;
       /** If the iterator has been emptied. */
@@ -67,7 +79,7 @@ public final class GFLWOR extends ParseExpr {
       @Override
       public Item next() throws QueryException {
         if(drained) return null;
-        while(true) {
+        for(;;) {
           final Item it = sub.next();
           qc.checkStop();
           if(it != null) return it;
@@ -811,7 +823,7 @@ public final class GFLWOR extends ParseExpr {
    * @author BaseX Team 2005-15, BSD License
    * @author Leo Woerteler
    */
-  interface Eval {
+  abstract static class Eval {
     /**
      * Makes the next evaluation step if available. This method is guaranteed
      * to not be called again if it has once returned {@code false}.
@@ -819,7 +831,19 @@ public final class GFLWOR extends ParseExpr {
      * @return {@code true} if step was made, {@code false} if no more results exist
      * @throws QueryException evaluation exception
      */
-    boolean next(final QueryContext qc) throws QueryException;
+    abstract boolean next(final QueryContext qc) throws QueryException;
+  }
+
+  /** Start evaluator, doing nothing, once. */
+  private static final class StartEval extends Eval {
+    /** First-evaluation flag. */
+    private boolean first = true;
+    @Override
+    public boolean next(final QueryContext q) {
+      if(!first) return false;
+      first = false;
+      return true;
+    }
   }
 
   /**

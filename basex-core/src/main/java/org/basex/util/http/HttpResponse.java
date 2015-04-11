@@ -8,7 +8,7 @@ import java.net.*;
 
 import org.basex.core.*;
 import org.basex.query.*;
-import org.basex.query.iter.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 
@@ -45,7 +45,7 @@ public final class HttpResponse {
    * @throws QueryException query exception
    */
   @SuppressWarnings("resource")
-  public ValueIter getResponse(final HttpURLConnection conn, final boolean body, final String mtype)
+  public ItemList getResponse(final HttpURLConnection conn, final boolean body, final String mtype)
       throws IOException, QueryException {
 
     // check content type
@@ -58,11 +58,11 @@ public final class HttpResponse {
     }
 
     // result
-    final ValueBuilder vb = new ValueBuilder();
+    final ItemList res = new ItemList();
 
     // construct <http:response/>
     final FElem response = new FElem(Q_RESPONSE).declareNS();
-    vb.add(response);
+    res.add(response);
 
     final String msg = conn.getResponseMessage();
     response.add(STATUS, token(conn.getResponseCode()));
@@ -85,11 +85,11 @@ public final class HttpResponse {
         final MediaType type = error || mtype == null ? ctype == null ? MediaType.TEXT_PLAIN :
           new MediaType(ctype) : new MediaType(mtype);
         response.add(hp.parse(type));
-        if(body) vb.add(hp.payloads());
+        if(body) res.add(hp.payloads());
       } finally {
         is.close();
       }
     }
-    return vb;
+    return res;
   }
 }

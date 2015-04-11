@@ -8,13 +8,13 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.fn.*;
-import org.basex.query.iter.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.Map;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.tree.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -70,7 +70,7 @@ public abstract class Array extends FItem {
   @SafeVarargs
   public static Array from(final Value... elems) {
     final ArrayBuilder builder = new ArrayBuilder();
-    for(final Value val : elems) builder.append(val);
+    for(int i = 0; i < elems.length; i++) builder.append(elems[i]);
     return builder.freeze();
   }
 
@@ -218,17 +218,18 @@ public abstract class Array extends FItem {
 
   /**
    * Iterator over the members of this array.
-   * @param reverse flag for iterating from back to front
+   * @param start starting position
+   *   (i.e. the position initially returned by {@link ListIterator#nextIndex()})
    * @return array over the array members
    */
-  public abstract ListIterator<Value> members(final boolean reverse);
+  public abstract ListIterator<Value> members(final long start);
 
   /**
    * Iterator over the members of this array.
    * @return array over the array members
    */
   public final ListIterator<Value> members() {
-    return members(false);
+    return members(0);
   }
 
   /**
@@ -276,12 +277,6 @@ public abstract class Array extends FItem {
    * @throws AssertionError if an invariant was violated
    */
   abstract void checkInvariants();
-
-  /**
-   * Returns an array containing the number of elements stored at each level of the tree.
-   * @return array of sizes
-   */
-  abstract long[] sizes();
 
   @Override
   public Value invValue(final QueryContext qc, final InputInfo ii, final Value... args)
@@ -386,8 +381,9 @@ public abstract class Array extends FItem {
     final long s = atomSize(), size = arraySize();
     if(single && s > 1) throw SEQFOUND_X.get(ii, this);
     if(size == 1) return get(0).atomValue(ii);
-    final ValueBuilder vb = new ValueBuilder((int) s);
-    for(long a = 0; a < size; a++) vb.add(get(a).atomValue(ii));
+    final ValueBuilder vb = new ValueBuilder();
+    final Iterator<Value> iter = members();
+    while(iter.hasNext()) vb.add(iter.next().atomValue(ii));
     return vb.value();
   }
 

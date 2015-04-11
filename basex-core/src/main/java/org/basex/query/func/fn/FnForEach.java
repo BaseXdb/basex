@@ -7,6 +7,7 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.seq.tree.*;
 import org.basex.query.var.*;
 
 /**
@@ -37,6 +38,23 @@ public final class FnForEach extends StandardFunc {
         } while(true);
       }
     };
+  }
+
+  @Override
+  public Value value(final QueryContext qc) throws QueryException {
+    final FItem f = checkArity(exprs[1], 1, qc);
+    final Iter iter = exprs[0].iter(qc);
+    Item it = iter.next();
+    if(it == null) return Empty.SEQ;
+    final Value v1 = f.invokeValue(qc, info, it);
+    it = iter.next();
+    if(it == null) return v1;
+
+    final ValueBuilder vb = new ValueBuilder().add(v1);
+    do {
+      vb.add(f.invokeValue(qc, info, it));
+    } while((it = iter.next()) != null);
+    return vb.value();
   }
 
   @Override

@@ -25,11 +25,11 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.expr.path.Test.Kind;
 import org.basex.query.func.*;
-import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.seq.tree.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -498,7 +498,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     final QNm qnm = checkVariable(toString(args[1]), declared);
     // default value
     final int al = args.length;
-    final ValueBuilder vb = new ValueBuilder(al);
+    final ValueBuilder vb = new ValueBuilder();
     for(int a = 2; a < al; a++) vb.add(args[a]);
     return new RestXqParam(qnm, key, vb.value());
   }

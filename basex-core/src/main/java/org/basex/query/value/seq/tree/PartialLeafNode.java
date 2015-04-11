@@ -1,9 +1,9 @@
-package org.basex.query.value.array;
+package org.basex.query.value.seq.tree;
 
 import java.util.*;
 
 import org.basex.query.util.fingertree.*;
-import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 
 /**
  * A partial leaf node containing fewer elements than required in a node.
@@ -11,40 +11,40 @@ import org.basex.query.value.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
-final class PartialLeafNode implements NodeLike<Value, Value> {
+final class PartialLeafNode implements NodeLike<Item, Item> {
   /** The single element. */
-  final Value[] elems;
+  final Item[] elems;
 
   /**
    * Constructor.
    * @param elems the elements
    */
-  PartialLeafNode(final Value[] elems) {
+  PartialLeafNode(final Item[] elems) {
     this.elems = elems;
   }
 
   @Override
-  public int append(final NodeLike<Value, Value>[] nodes, final int pos) {
+  public int append(final NodeLike<Item, Item>[] nodes, final int pos) {
     if(pos == 0) {
       nodes[0] = this;
       return 1;
     }
 
-    final NodeLike<Value, Value> left = nodes[pos - 1];
+    final NodeLike<Item, Item> left = nodes[pos - 1];
     if(left instanceof PartialLeafNode) {
-      final Value[] ls = ((PartialLeafNode) left).elems, rs = elems;
+      final Item[] ls = ((PartialLeafNode) left).elems, rs = elems;
       final int l = ls.length, r = rs.length, n = l + r;
-      final Value[] vals = new Value[n];
+      final Item[] vals = new Item[n];
       System.arraycopy(ls, 0, vals, 0, l);
       System.arraycopy(rs, 0, vals, l, r);
-      nodes[pos - 1] = n < Array.MIN_LEAF ? new PartialLeafNode(vals) : new LeafNode(vals);
+      nodes[pos - 1] = n < TreeSeq.MIN_LEAF ? new PartialLeafNode(vals) : new LeafNode(vals);
       return pos;
     }
 
-    final Value[] ls = ((LeafNode) left).values, rs = elems;
+    final Item[] ls = ((LeafNode) left).values, rs = elems;
     final int l = ls.length, r = rs.length, n = l + r;
-    if(n <= Array.MAX_LEAF) {
-      final Value[] vals = new Value[n];
+    if(n <= TreeSeq.MAX_LEAF) {
+      final Item[] vals = new Item[n];
       System.arraycopy(ls, 0, vals, 0, l);
       System.arraycopy(rs, 0, vals, l, r);
       nodes[pos - 1] = new LeafNode(vals);
@@ -52,7 +52,7 @@ final class PartialLeafNode implements NodeLike<Value, Value> {
     }
 
     final int ll = n / 2, rl = n - ll, move = l - ll;
-    final Value[] newLeft = new Value[ll], newRight = new Value[rl];
+    final Item[] newLeft = new Item[ll], newRight = new Item[rl];
     System.arraycopy(ls, 0, newLeft, 0, ll);
     System.arraycopy(ls, ll, newRight, 0, move);
     System.arraycopy(rs, 0, newRight, move, r);

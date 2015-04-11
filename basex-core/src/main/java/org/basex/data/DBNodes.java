@@ -52,7 +52,7 @@ public final class DBNodes implements Result {
   }
 
   @Override
-  public long size() {
+  public int size() {
     return pres.length;
   }
 

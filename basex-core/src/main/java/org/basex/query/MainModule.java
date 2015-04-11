@@ -8,6 +8,7 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -82,17 +83,12 @@ public final class MainModule extends StaticScope {
    * @return result
    * @throws QueryException evaluation exception
    */
-  ValueBuilder cache(final QueryContext qc) throws QueryException {
+  ItemList cache(final QueryContext qc) throws QueryException {
     final int fp = scope.enter(qc);
     try {
       final Iter iter = expr.iter(qc);
-      final ValueBuilder cache;
-      if(iter instanceof ValueBuilder) {
-        cache = (ValueBuilder) iter;
-      } else {
-        cache = new ValueBuilder(Math.max(1, (int) iter.size()));
-        for(Item it; (it = iter.next()) != null;) cache.add(it);
-      }
+      final ItemList cache = new ItemList(Math.max(1, (int) iter.size()));
+      for(Item it; (it = iter.next()) != null;) cache.add(it);
       if(declType != null) declType.treat(cache.value(), info);
       return cache;
 
@@ -108,7 +104,7 @@ public final class MainModule extends StaticScope {
    * @throws QueryException query exception
    */
   Iter iter(final QueryContext qc) throws QueryException {
-    if(declType != null) return cache(qc);
+    if(declType != null) return cache(qc).iter();
 
     final int fp = scope.enter(qc);
     final Iter iter = expr.iter(qc);

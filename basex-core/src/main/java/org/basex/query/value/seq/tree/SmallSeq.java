@@ -1,58 +1,36 @@
-package org.basex.query.value.array;
+package org.basex.query.value.seq.tree;
 
 import java.util.*;
 
+import org.basex.query.util.fingertree.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 
 /**
- * A small array that is represented in a single Java array.
+ * A small sequence that is represented as a single Java array.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
-final class SmallArray extends Array {
+final class SmallSeq extends TreeSeq {
   /** The elements. */
-  final Value[] elems;
+  final Item[] elems;
 
   /**
    * Constructor.
    * @param elems elements
+   * @param ret type of all elements in this sequence
    */
-  SmallArray(final Value[] elems) {
+  SmallSeq(final Item[] elems, final Type ret) {
+    super(elems.length, ret);
     this.elems = elems;
-    assert elems.length >= 1 && elems.length <= MAX_SMALL;
+    assert elems.length >= 2 && elems.length <= MAX_SMALL;
   }
 
   @Override
-  public Array cons(final Value head) {
-    if(elems.length < MAX_SMALL) {
-      final Value[] newElems = slice(elems, -1, elems.length);
-      newElems[0] = head;
-      return new SmallArray(newElems);
-    }
-
-    final int mid = MIN_DIGIT - 1;
-    final Value[] left = slice(elems, -1, mid), right = slice(elems, mid, elems.length);
-    left[0] = head;
-    return new BigArray(left, right);
-  }
-
-  @Override
-  public Array snoc(final Value last) {
-    if(elems.length < MAX_SMALL) {
-      final Value[] newElems = slice(elems, 0, elems.length + 1);
-      newElems[newElems.length - 1] = last;
-      return new SmallArray(newElems);
-    }
-
-    final Value[] left = slice(elems, 0, MIN_DIGIT),
-        right = slice(elems, MIN_DIGIT, elems.length + 1);
-    right[right.length - 1] = last;
-    return new BigArray(left, right);
-  }
-
-  @Override
-  public Value get(final long index) {
+  public Item itemAt(final long index) {
     // index to small?
     if(index < 0) throw new IndexOutOfBoundsException("Index < 0: " + index);
 
@@ -63,81 +41,44 @@ final class SmallArray extends Array {
   }
 
   @Override
-  public long arraySize() {
-    return elems.length;
-  }
-
-  @Override
-  public Array concat(final Array seq) {
-    return seq.isEmptyArray() ? this : seq.consSmall(elems);
-  }
-
-  @Override
-  public Value head() {
-    return elems[0];
-  }
-
-  @Override
-  public Value last() {
-    return elems[elems.length - 1];
-  }
-
-  @Override
-  public Array init() {
-    if(elems.length == 1) return empty();
-    return new SmallArray(slice(elems, 0, elems.length - 1));
-  }
-
-  @Override
-  public Array tail() {
-    if(elems.length == 1) return empty();
-    return new SmallArray(slice(elems, 1, elems.length));
-  }
-
-  @Override
-  public boolean isEmptyArray() {
-    return false;
-  }
-
-  @Override
-  public Array reverse() {
+  public TreeSeq reverse() {
     final int n = elems.length;
-    if(n == 1) return this;
-    final Value[] es = new Value[n];
+    final Item[] es = new Item[n];
     for(int i = 0; i < n; i++) es[i] = elems[n - 1 - i];
-    return new SmallArray(es);
+    return new SmallSeq(es, ret);
   }
 
   @Override
-  public Array insertBefore(final long pos, final Value val) {
+  public TreeSeq insert(final long pos, final Item val) {
     if(pos < 0) throw new IndexOutOfBoundsException("negative index: " + pos);
     if(pos > elems.length) throw new IndexOutOfBoundsException("position too big: " + pos);
 
     final int p = (int) pos, n = elems.length;
-    final Value[] out = new Value[n + 1];
+    final Item[] out = new Item[n + 1];
     System.arraycopy(elems, 0, out, 0, p);
     out[p] = val;
     System.arraycopy(elems, p, out, p + 1, n - p);
 
-    if(n < MAX_SMALL) return new SmallArray(out);
-    return new BigArray(slice(out, 0, MIN_DIGIT), slice(out, MIN_DIGIT, n + 1));
+    if(n < MAX_SMALL) return new SmallSeq(out, null);
+    return new BigSeq(slice(out, 0, MIN_DIGIT), FingerTree.<Item>empty(),
+        slice(out, MIN_DIGIT, n + 1), null);
   }
 
   @Override
-  public Array remove(final long pos) {
+  public Value remove(final long pos) {
     if(pos < 0) throw new IndexOutOfBoundsException("negative index: " + pos);
     if(pos >= elems.length) throw new IndexOutOfBoundsException("position too big: " + pos);
     final int p = (int) pos, n = elems.length;
-    if(n == 1) return empty();
+    if(n == 2) return elems[pos == 0 ? 1 : 0];
 
-    final Value[] out = new Value[n - 1];
+    final Item[] out = new Item[n - 1];
     System.arraycopy(elems, 0, out, 0, p);
     System.arraycopy(elems, p + 1, out, p, n - 1 - p);
-    return new SmallArray(out);
+    return new SmallSeq(out, ret);
   }
 
   @Override
-  public Array subArray(final long pos, final long len) {
+  public Value subSeq(final long pos, final long len) {
     if(pos < 0) throw new IndexOutOfBoundsException("first index < 0: " + pos);
     if(len < 0) throw new IndexOutOfBoundsException("length < 0: " + len);
     if(pos + len > elems.length)
@@ -145,13 +86,18 @@ final class SmallArray extends Array {
           + (pos + len) + " > " + elems.length);
 
     final int p = (int) pos, n = (int) len;
-    return n == 0 ? Array.empty() : new SmallArray(slice(elems, p, p + n));
+    return n == 0 ? Empty.SEQ : n == 1 ? elems[p] : new SmallSeq(slice(elems, p, p + n), ret);
   }
 
   @Override
-  public ListIterator<Value> members(final long start) {
-    return new ListIterator<Value>() {
-      private int index = (int) Math.max(0, Math.min(start, elems.length));
+  public TreeSeq concat(final TreeSeq other) {
+    return other.consSmall(elems);
+  }
+
+  @Override
+  public ListIterator<Item> members(final long start) {
+    return new ListIterator<Item>() {
+      private int index = (int) start;
 
       @Override
       public int nextIndex() {
@@ -164,7 +110,7 @@ final class SmallArray extends Array {
       }
 
       @Override
-      public Value next() {
+      public Item next() {
         if(index >= elems.length) throw new NoSuchElementException();
         return elems[index++];
       }
@@ -180,18 +126,18 @@ final class SmallArray extends Array {
       }
 
       @Override
-      public Value previous() {
+      public Item previous() {
         if(index <= 0) throw new NoSuchElementException();
         return elems[--index];
       }
 
       @Override
-      public void set(final Value e) {
+      public void set(final Item e) {
         throw new UnsupportedOperationException();
       }
 
       @Override
-      public void add(final Value e) {
+      public void add(final Item e) {
         throw new UnsupportedOperationException();
       }
 
@@ -206,23 +152,24 @@ final class SmallArray extends Array {
   void checkInvariants() {
     final int n = elems.length;
     if(n == 0) throw new AssertionError("Empty array in " + getClass().getSimpleName());
+    if(n == 1) throw new AssertionError("Singleton array in " + getClass().getSimpleName());
     if(n > MAX_SMALL) throw new AssertionError("Array too big: " + n);
   }
 
   @Override
-  Array consSmall(final Value[] left) {
+  TreeSeq consSmall(final Item[] left) {
     final int l = left.length, r = elems.length, n = l + r;
     if(Math.min(l, r) >= MIN_DIGIT) {
       // both arrays can be used as digits
-      return new BigArray(left, elems);
+      return new BigSeq(left, FingerTree.<Item>empty(), elems, null);
     }
 
-    final Value[] out = new Value[n];
+    final Item[] out = new Item[n];
     System.arraycopy(left, 0, out, 0, l);
     System.arraycopy(elems, 0, out, l, r);
-    if(n <= MAX_SMALL) return new SmallArray(out);
+    if(n <= MAX_SMALL) return new SmallSeq(out, null);
 
     final int mid = n / 2;
-    return new BigArray(slice(out, 0, mid), slice(out, mid, n));
+    return new BigSeq(slice(out, 0, mid), FingerTree.<Item>empty(), slice(out, mid, n), null);
   }
 }

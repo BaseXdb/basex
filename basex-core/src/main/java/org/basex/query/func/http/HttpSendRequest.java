@@ -3,6 +3,7 @@ package org.basex.query.func.http;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.http.*;
@@ -15,7 +16,7 @@ import org.basex.util.http.*;
  */
 public final class HttpSendRequest extends StandardFunc {
   @Override
-  public ValueIter iter(final QueryContext qc) throws QueryException {
+  public Iter iter(final QueryContext qc) throws QueryException {
     checkCreate(qc);
 
     // get request node
@@ -24,13 +25,14 @@ public final class HttpSendRequest extends StandardFunc {
     // get HTTP URI
     final byte[] href = exprs.length >= 2 ? toEmptyToken(exprs[1], qc) : null;
     // get parameter $bodies
-    ValueBuilder cache = null;
+    Iter iter = null;
     if(exprs.length == 3) {
       final Iter bodies = exprs[2].iter(qc);
-      cache = new ValueBuilder();
+      final ItemList cache = new ItemList();
       for(Item body; (body = bodies.next()) != null;) cache.add(body);
+      iter = cache.iter();
     }
     // send HTTP request
-    return new HttpClient(info, qc.context.options).sendRequest(href, request, cache);
+    return new HttpClient(info, qc.context.options).sendRequest(href, request, iter);
   }
 }

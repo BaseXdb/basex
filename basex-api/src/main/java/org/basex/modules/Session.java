@@ -7,11 +7,11 @@ import javax.servlet.http.*;
 import org.basex.data.*;
 import org.basex.http.*;
 import org.basex.query.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.seq.tree.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -99,7 +99,7 @@ public final class Session extends QueryModule {
    */
   @Requires(Permission.NONE)
   public void set(final Str key, final Value value) throws QueryException {
-    final ValueBuilder vb = new ValueBuilder(Math.max(1, (int) value.size()));
+    final ValueBuilder vb = new ValueBuilder();
     for(final Item item : value) {
       if(item instanceof FItem) throw SessionErrors.functionItem();
       final Data d = item.data();

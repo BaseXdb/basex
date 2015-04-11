@@ -15,6 +15,7 @@ import org.basex.query.value.array.Array;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.seq.tree.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -192,7 +193,7 @@ public final class Map extends FItem {
    */
   public Value keys() {
     if(keys == null) {
-      final ValueBuilder res = new ValueBuilder(root.size);
+      final ValueBuilder res = new ValueBuilder();
       root.keys(res);
       keys = res.value();
     }
@@ -203,10 +204,10 @@ public final class Map extends FItem {
    * All values defined in this map.
    * @return list of keys
    */
-  public ValueBuilder values() {
-    final ValueBuilder res = new ValueBuilder(root.size);
+  public Value values() {
+    final ValueBuilder res = new ValueBuilder();
     root.values(res);
-    return res;
+    return res.value();
   }
 
   /**
@@ -217,11 +218,11 @@ public final class Map extends FItem {
    * @return resulting value
    * @throws QueryException query exception
    */
-  public ValueBuilder apply(final FItem func, final QueryContext qc, final InputInfo ii)
+  public Value apply(final FItem func, final QueryContext qc, final InputInfo ii)
       throws QueryException {
-    final ValueBuilder vb = new ValueBuilder(root.size);
+    final ValueBuilder vb = new ValueBuilder();
     root.apply(vb, func, qc, ii);
-    return vb;
+    return vb.value();
   }
 
   @Override

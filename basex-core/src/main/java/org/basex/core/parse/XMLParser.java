@@ -12,8 +12,10 @@ import org.basex.core.cmd.Set;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.tree.*;
 import org.basex.util.*;
 
 /**
@@ -289,19 +291,20 @@ final class XMLParser extends CmdParser {
     }
 
     // run query
+    final Value mv = ma.value(), ov = oa.value();
     try(final QueryProcessor qp = new QueryProcessor(tb.toString(), ctx).context(root)) {
-      qp.bind("A", ma.value()).bind("O", oa.value());
+      qp.bind("A", mv).bind("O", ov);
       if(!qp.execute().toString().isEmpty()) return true;
     }
     // build error string
     final TokenBuilder syntax = new TokenBuilder();
     final byte[] nm = ((ANode) root).qname().string();
     syntax.reset().add('<').add(nm);
-    for(final Item i : ma) {
+    for(final Item i : mv) {
       final byte[] a = i.string(null);
       syntax.add(' ').add(a).add("=\"...\"");
     }
-    for(final Item i : oa) {
+    for(final Item i : ov) {
       final byte[] a = i.string(null);
       syntax.add(" (").add(a).add("=\"...\")");
     }

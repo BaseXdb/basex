@@ -57,7 +57,7 @@ public final class Modify extends Arr {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final int o = (int) qc.resources.output.size();
+    final int o = qc.resources.output.size();
     final Updates updates = qc.resources.updates();
     final ContextModifier tmp = updates.mod;
     final TransformModifier pu = new TransformModifier();

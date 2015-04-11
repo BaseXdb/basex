@@ -20,7 +20,7 @@ import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.QueryError.*;
 import org.basex.query.func.fn.*;
-import org.basex.query.iter.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -127,7 +127,7 @@ public class FnHttpTest extends HTTPTest {
       final Result r = qp.execute();
       checkResponse(r, 2, HttpURLConnection.HTTP_OK);
 
-      assertEquals(NodeType.DOC, ((Iter) r).get(1).type);
+      assertEquals(NodeType.DOC, ((ItemList) r).get(1).type);
     }
 
     // GET2 - with override-media-type='text/plain'
@@ -136,7 +136,7 @@ public class FnHttpTest extends HTTPTest {
       final Result r = qp.execute();
       checkResponse(r, 2, HttpURLConnection.HTTP_OK);
 
-      assertEquals(AtomType.STR, ((Iter) r).get(1).type);
+      assertEquals(AtomType.STR, ((ItemList) r).get(1).type);
     }
 
     // Get3 - with status-only='true'
@@ -302,13 +302,13 @@ public class FnHttpTest extends HTTPTest {
         + "</http:multipart>" + "</http:request>";
 
     final DBNode dbNode1 = new DBNode(new IOContent(multiReq));
-    final ValueBuilder bodies = new ValueBuilder();
+    final ItemList bodies = new ItemList();
     bodies.add(Str.get("Part1"));
     bodies.add(Str.get("Part2"));
     bodies.add(Str.get("Part3"));
 
     final HttpRequestParser rp = new HttpRequestParser(null);
-    final HttpRequest r = rp.parse(dbNode1.children().next(), bodies);
+    final HttpRequest r = rp.parse(dbNode1.children().next(), bodies.iter());
 
     assertEquals(2, r.attributes.size());
     assertEquals(2, r.headers.size());
@@ -641,9 +641,9 @@ public class FnHttpTest extends HTTPTest {
     // set content encoded in CP1251
     final String test = "\u0442\u0435\u0441\u0442";
     conn.content = Charset.forName("CP1251").encode(test).array();
-    final Iter i = new HttpResponse(null, ctx.options).getResponse(conn, true, null);
+    final ItemList res = new HttpResponse(null, ctx.options).getResponse(conn, true, null);
     // compare results
-    assertEquals(test, string(i.get(1).string(null)));
+    assertEquals(test, string(res.get(1).string(null)));
   }
 
   /**
@@ -683,10 +683,10 @@ public class FnHttpTest extends HTTPTest {
         + ".... richtext..." + CRLF
         + "--boundary42" + CRLF + "Content-Type: text/x-whatever" + CRLF + CRLF
         + ".... fanciest formatted version  " + CRLF + "..."  + CRLF + "--boundary42--");
-    final ValueIter returned = new HttpResponse(null, ctx.options).getResponse(conn, true, null);
+    final ItemList returned = new HttpResponse(null, ctx.options).getResponse(conn, true, null);
 
     // Construct expected result
-    final ValueBuilder expected = new ValueBuilder();
+    final ItemList expected = new ItemList();
     final String response = "<http:response "
         + "xmlns:http='http://expath.org/ns/http-client' "
         + "status='200' message='OK'>"
@@ -761,10 +761,10 @@ public class FnHttpTest extends HTTPTest {
         +  CRLF + "--simple boundary--" + CRLF
         + "This is the epilogue.  It is also to be ignored.");
     // Get response as sequence of XQuery items
-    final ValueIter returned = new HttpResponse(null, ctx.options).getResponse(conn, true, null);
+    final ItemList returned = new HttpResponse(null, ctx.options).getResponse(conn, true, null);
 
     // Construct expected result
-    final ValueBuilder expected = new ValueBuilder();
+    final ItemList expected = new ItemList();
     final String response = "<http:response "
         + "xmlns:http='http://expath.org/ns/http-client' "
         + "status='200' message='OK'>"
@@ -798,8 +798,7 @@ public class FnHttpTest extends HTTPTest {
    * @param returned returned result
    * @throws Exception exception
    */
-  private static void compare(final ValueBuilder expected, final ValueIter returned)
-      throws Exception {
+  private static void compare(final ItemList expected, final ItemList returned) throws Exception {
 
     // Compare response with expected result
     assertEquals("Different number of results", expected.size(), returned.size());
@@ -844,13 +843,10 @@ public class FnHttpTest extends HTTPTest {
    * @param r query result
    * @param itemsCount expected number of items
    * @param expStatus expected status
-   * @throws QueryException query exception
    */
-  private static void checkResponse(final Result r, final int itemsCount, final int expStatus)
-      throws QueryException {
-
-    assertTrue(r instanceof Iter);
-    final Iter res = (Iter) r;
+  private static void checkResponse(final Result r, final int itemsCount, final int expStatus) {
+    assertTrue(r instanceof ItemList);
+    final ItemList res = (ItemList) r;
     assertEquals(itemsCount, r.size());
     assertTrue(res.get(0) instanceof FElem);
     final FElem response = (FElem) res.get(0);
