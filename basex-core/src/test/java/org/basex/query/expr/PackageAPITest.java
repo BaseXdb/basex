@@ -230,15 +230,20 @@ public final class PackageAPITest extends AdvancedQueryTest {
     } catch(final QueryException ex) {
       check(null, ex, BXRE_WHICH_X);
     }
-    // try to install a package
+
+    // try to install a XAR package
     new RepoInstall(REPO + "pkg3.xar", null).execute(context);
     final String dir = normalize(PKG3ID);
-    assertTrue(dir(dir));
-    assertTrue(file(dir + "/expath-pkg.xml"));
-    assertTrue(dir(dir + "/pkg3"));
-    assertTrue(dir(dir + "/pkg3/mod"));
-    assertTrue(file(dir + "/pkg3/mod/pkg3mod1.xql"));
+    assertTrue(isDir(dir));
+    assertTrue(isFile(dir + "/expath-pkg.xml"));
+    assertTrue(isDir(dir + "/pkg3"));
+    assertTrue(isDir(dir + "/pkg3/mod"));
+    assertTrue(isFile(dir + "/pkg3/mod/pkg3mod1.xql"));
     assertTrue(new IOFile(REPO, dir).delete());
+
+    // try to install a URN package
+    new RepoInstall(REPO + "12345.xqm", null).execute(context);
+    assertTrue(isFile("urn/isbn/12345.xqm"));
   }
 
   /**
@@ -253,12 +258,12 @@ public final class PackageAPITest extends AdvancedQueryTest {
 
     // ensure package was properly installed
     final String dir = normalize("jarPkg-1.0.0");
-    assertTrue(dir(dir));
-    assertTrue(file(dir + "/expath-pkg.xml"));
-    assertTrue(file(dir + "/basex.xml"));
-    assertTrue(dir(dir + "/jar"));
-    assertTrue(file(dir + "/jar/test.jar"));
-    assertTrue(file(dir + "/jar/wrapper.xq"));
+    assertTrue(isDir(dir));
+    assertTrue(isFile(dir + "/expath-pkg.xml"));
+    assertTrue(isFile(dir + "/basex.xml"));
+    assertTrue(isDir(dir + "/jar"));
+    assertTrue(isFile(dir + "/jar/test.jar"));
+    assertTrue(isFile(dir + "/jar/wrapper.xq"));
 
     // use package
     try(final QueryProcessor qp = new QueryProcessor(
@@ -309,11 +314,11 @@ public final class PackageAPITest extends AdvancedQueryTest {
 
     // check if pkg3 was correctly unzipped
     final String pkg3Dir = normalize(PKG3ID);
-    assertTrue(dir(pkg3Dir));
-    assertTrue(file(pkg3Dir + "/expath-pkg.xml"));
-    assertTrue(dir(pkg3Dir + "/pkg3"));
-    assertTrue(dir(pkg3Dir + "/pkg3/mod"));
-    assertTrue(file(pkg3Dir + "/pkg3/mod/pkg3mod1.xql"));
+    assertTrue(isDir(pkg3Dir));
+    assertTrue(isFile(pkg3Dir + "/expath-pkg.xml"));
+    assertTrue(isDir(pkg3Dir + "/pkg3"));
+    assertTrue(isDir(pkg3Dir + "/pkg3/mod"));
+    assertTrue(isFile(pkg3Dir + "/pkg3/mod/pkg3mod1.xql"));
 
     // install another package (pkg4) with a dependency to pkg3
     new RepoInstall(REPO + "pkg4.xar", null).execute(context);
@@ -321,11 +326,11 @@ public final class PackageAPITest extends AdvancedQueryTest {
     assertTrue(context.repo.pkgDict().contains(token(PKG4ID)));
     // check if pkg4 was correctly unzipped
     final String pkg4Dir = normalize(PKG4ID);
-    assertTrue(dir(pkg4Dir));
-    assertTrue(file(pkg4Dir + "/expath-pkg.xml"));
-    assertTrue(dir(pkg4Dir + "/pkg4"));
-    assertTrue(dir(pkg4Dir + "/pkg4/mod"));
-    assertTrue(file(pkg4Dir + "/pkg4/mod/pkg4mod1.xql"));
+    assertTrue(isDir(pkg4Dir));
+    assertTrue(isFile(pkg4Dir + "/expath-pkg.xml"));
+    assertTrue(isDir(pkg4Dir + "/pkg4"));
+    assertTrue(isDir(pkg4Dir + "/pkg4/mod"));
+    assertTrue(isFile(pkg4Dir + "/pkg4/mod/pkg4mod1.xql"));
 
     // try to delete pkg3
     try {
@@ -340,13 +345,13 @@ public final class PackageAPITest extends AdvancedQueryTest {
     assertFalse(context.repo.pkgDict().contains(token(PKG4ID)));
 
     // check if pkg4 directory was deleted
-    assertFalse(dir(pkg4Dir));
+    assertFalse(isDir(pkg4Dir));
     // try to delete pkg3 (use package dir)
     new RepoDelete(PKG3ID, null).execute(context);
     // check if pkg3 is unregistered from the repo
     assertFalse(context.repo.pkgDict().contains(token(PKG3ID)));
     // check if pkg3 directory was deleted
-    assertFalse(dir(pkg3Dir));
+    assertFalse(isDir(pkg3Dir));
   }
 
   // PRIVATE METHODS ==========================================================
@@ -405,7 +410,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
    * @param path file path
    * @return result of check
    */
-  private static boolean file(final String path) {
+  private static boolean isFile(final String path) {
     final IOFile file = new IOFile(REPO, path);
     return file.exists() && !file.isDir();
   }
@@ -415,7 +420,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
    * @param path file path
    * @return result of check
    */
-  private static boolean dir(final String path) {
+  private static boolean isDir(final String path) {
     return new IOFile(REPO, path).isDir();
   }
 

@@ -186,25 +186,27 @@ public final class ModuleLoader {
     try {
       final URI u = new URI(uri);
       final TokenBuilder tb = new TokenBuilder();
-      final String auth = u.getAuthority();
-      if(auth != null) {
-        // reverse authority, replace dots by slashes
-        final String[] comp = auth.split("\\.");
-        for(int c = comp.length - 1; c >= 0; c--) tb.add('/').add(comp[c]);
+
+      if(u.isOpaque()) {
+        tb.add('/').add(u.getScheme()).add('/').add(u.getSchemeSpecificPart().replace(':', '/'));
       } else {
-        tb.add('/');
+        final String auth = u.getAuthority();
+        if(auth != null) {
+          // reverse authority, replace dots by slashes. example: basex.org -> org/basex
+          final String[] comp = auth.split("\\.");
+          for(int c = comp.length - 1; c >= 0; c--) tb.add('/').add(comp[c]);
+        } else {
+          tb.add('/');
+        }
+
+        // add remaining path
+        final String path = u.getPath();
+        tb.add(path == null || path.isEmpty() ? "/" : path.replace('.', '/'));
       }
 
-      // add remaining path
-      String path = u.getPath();
-      if(path == null) return null;
-
-      path = path.replace('.', '/');
-      // add slash or path
-      tb.add(path.isEmpty() ? "/" : path);
-      final String pth = tb.toString();
       // add "index" string
-      return pth.endsWith("/") ? pth + "index" : pth;
+      final String path = tb.toString().replaceAll("[^\\w.-/]+", "-");
+      return path.endsWith("/") ? path + "index" : path;
     } catch(final URISyntaxException ex) {
       Util.debug(ex);
       return null;
