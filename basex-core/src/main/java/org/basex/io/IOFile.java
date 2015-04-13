@@ -170,8 +170,7 @@ public final class IOFile extends IO {
   }
 
   /**
-   * Returns the children of the path that match the specified regular
-   * expression.
+   * Returns the children of the path that match the specified regular expression.
    * @param regex regular expression pattern
    * @return children
    */

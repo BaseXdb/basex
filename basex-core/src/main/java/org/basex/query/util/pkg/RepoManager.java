@@ -97,12 +97,14 @@ public final class RepoManager {
     }
 
     // traverse all directories, ignore root entries with dashes
-    for(final IOFile ch : repo.path().children()) {
+    // ignore files and directories starting with dot (#1122)
+    for(final IOFile ch : repo.path().children("^[^.].*")) {
       final String n = ch.name();
       if(!ch.isDir()) {
         t.contents.add(entry(n.replaceAll("\\..*", "").replace('/', '.'), "-", INTERNAL, n));
       } else if(n.indexOf('-') == -1) {
         for(final String s : ch.descendants()) {
+          if(new IOFile(s).name().startsWith(".")) continue;
           t.contents.add(entry(n + '.' + s.replaceAll("\\..*", "").replace('/', '.'),
               "-", INTERNAL, n + '/' + s));
         }

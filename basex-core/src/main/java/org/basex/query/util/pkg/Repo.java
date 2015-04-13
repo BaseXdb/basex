@@ -118,7 +118,8 @@ public final class Repo {
   private Repo init() {
     if(path == null) {
       path = new IOFile(sopts.get(StaticOptions.REPOPATH));
-      for(final IOFile dir : path.children()) {
+      // ignore directories starting with dot (#1122)
+      for(final IOFile dir : path.children("^[^.].*")) {
         if(dir.isDir()) readPkg(dir);
       }
     }
