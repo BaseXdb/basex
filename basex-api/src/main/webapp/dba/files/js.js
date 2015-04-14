@@ -17,7 +17,7 @@ function buttons() {
       if(s == "optimize" || s == "optimize-all" || s == "drop-backup" ||
          s == "drop-db" || s == "drop-pattern" || s == "drop-user" ||
          s == "kill-session" || s == "restore" || s == "backup" || s == "delete" ||
-         s == "delete-log" || s == "kill") {
+         s == "delete-logs" || s == "kill") {
         e = c > 0;
       }
       button.disabled = !e;
@@ -95,7 +95,7 @@ function logentries(wait, success) {
   var input = document.getElementById('logs').value.trim();
   if(_logs == input) return false;
   _logs = input;
-  query(wait, success, 'logs', input, false, function(text) {
+  query(wait, success, 'log', input, false, function(text) {
     document.getElementById("output").innerHTML = text;
   });
 };

@@ -8,6 +8,9 @@ module namespace _ = 'dba/databases';
 import module namespace cons = 'dba/cons' at '../../modules/cons.xqm';
 import module namespace util = 'dba/util' at '../../modules/util.xqm';
 
+(:~ Sub category :)
+declare variable $_:SUB := 'database';
+
 (:~
  : Deletes resources.
  : @param  $names     database
@@ -27,12 +30,12 @@ function _:delete(
   cons:check(),
   try {
     util:update("$r ! db:delete($n, .)", map { 'n': $name, 'r': $resources }),
-    db:output(web:redirect("database",
+    db:output(web:redirect($_:SUB,
       map { 'name': $name, 'info': 'Deleted resources: ' || count($resources) })
     )
   } catch * {
     db:output(
-      web:redirect("database", map { 'name': $name, 'error': $err:description })
+      web:redirect($_:SUB, map { 'name': $name, 'error': $err:description })
     )
   }
 };

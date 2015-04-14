@@ -268,16 +268,15 @@ declare function html:table(
               )
               else .
             )
+
             return element td {
               attribute align { if($header/@type = $html:NUMBER) then 'right' else 'left' },
               if($pos = 1 and $buttons) then (
-                <input type="checkbox" name="{ $name }" value="{ $col }" onClick="buttons()"/>,
-                if(exists($link)) then (
-                  html:link($value, $link($value), map:merge(($param, map { $name: $value })))
-                ) else if($header/@type = 'id') then () else (
-                  $value
-                )
-              ) else (
+                <input type="checkbox" name="{ $name }" value="{ $col }" onClick="buttons()"/>
+              ) else (),
+              if($pos = 1 and exists($link)) then (
+                html:link($value, $link($value), map:merge(($param, map { $name: $value })))
+              ) else if($header/@type = 'id') then () else (
                 $value
               )
             }

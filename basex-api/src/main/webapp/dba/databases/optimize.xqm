@@ -10,6 +10,11 @@ import module namespace html = 'dba/html' at '../modules/html.xqm';
 import module namespace tmpl = 'dba/tmpl' at '../modules/tmpl.xqm';
 import module namespace util = 'dba/util' at '../modules/util.xqm';
 
+(:~ Top category :)
+declare variable $_:CAT := 'databases';
+(:~ Sub category :)
+declare variable $_:SUB := 'database';
+
 (:~
  : Form for optimizing a database.
  : @param  $name   entered name
@@ -44,7 +49,7 @@ function _:create(
   }
   let $error := ($data/self::error/string(), $error)[1]
 
-  return tmpl:wrap(map { 'top': 'databases', 'error': $error },
+  return tmpl:wrap(map { 'top': $_:CAT, 'error': $error },
     let $first := not($opts = 'x')
     let $cb := function($option, $label) {
       let $c := if($first)
@@ -56,7 +61,7 @@ function _:create(
       <td>
         <form action="optimize" method="post">
           <h2>
-            <a href="databases">Databases</a> »
+            <a href="{ $_:CAT }">Databases</a> »
             { html:link($name, 'database', map { 'name': $name }) } »
             { html:button('optimize', 'Optimize') }
           </h2>
@@ -123,12 +128,12 @@ function _:optimize(
   )
 ))", map { 'name': $name, 'all': $all, 'lang': $lang, 'opts': $opts }
     ),
-    db:output(web:redirect("database", map {
+    db:output(web:redirect($_:SUB, map {
       'name': $name,
       'info': 'Database was optimized.'
     }))
   } catch * {
-    db:output(web:redirect("database", map {
+    db:output(web:redirect($_:SUB, map {
       'error': $err:description,
       'name': $name,
       'opts': $opts,
@@ -152,13 +157,9 @@ function _:drop(
 ) {
   cons:check(),
   try {
-    $names ! db:optimize(.),
-    db:output(web:redirect("databases", map {
-      'info': 'Optimized databases: ' || count($names)
-    }))
+    util:update("$names ! db:optimize(.)", map { 'n': $names }),
+    db:output(web:redirect($_:CAT, map { 'info': 'Optimized databases: ' || count($names) }))
   } catch * {
-    db:output(web:redirect("databases", map {
-      'error': $err:description
-    }))
+    db:output(web:redirect($_:CAT, map { 'error': $err:description }))
   }
 };
