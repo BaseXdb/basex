@@ -47,6 +47,13 @@ public enum QueryError {
   /** XUST0002. */
   BASEX_MOD(XUST, 2, "All transform expressions must be updating or return an empty sequence."),
 
+  // Admin module
+
+  /** FODC0001. */
+  BXCA_TODAY(FOAD, 1, "Today's log file cannot be deleted."),
+  /** FODC0002. */
+  BXCA_DELETE_X(FOAD, 2, "Log file could not be deleted: %."),
+
   // Client module
 
   /** BXCL0001. */
@@ -1354,6 +1361,7 @@ public enum QueryError {
 
     // W3 errors
 
+    /** FOAD Error type. */ FOAD,
     /** FOAP Error type. */ FOAP,
     /** FOAR Error type. */ FOAR,
     /** FOAY Error type. */ FOAY,

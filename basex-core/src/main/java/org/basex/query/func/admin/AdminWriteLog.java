@@ -1,9 +1,7 @@
 package org.basex.query.func.admin;
 
-import org.basex.core.locks.*;
 import org.basex.core.users.*;
 import org.basex.query.*;
-import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.server.*;
 import org.basex.server.Log.LogType;
@@ -26,10 +24,5 @@ public final class AdminWriteLog extends AdminFn {
     final User user = (cl == null ? qc.context : cl.context()).user();
     qc.context.log.write(addr, user, LogType.INFO, msg, null);
     return null;
-  }
-
-  @Override
-  public boolean accept(final ASTVisitor visitor) {
-    return visitor.lock(DBLocking.ADMIN) && super.accept(visitor);
   }
 }

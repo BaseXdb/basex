@@ -1,11 +1,10 @@
 package org.basex.query.func.admin;
 
 import static org.basex.core.users.UserText.*;
-import org.basex.core.locks.*;
+
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.value.node.*;
 import org.basex.server.*;
 
@@ -32,10 +31,5 @@ public final class AdminSessions extends AdminFn {
       }
     }
     return vb;
-  }
-
-  @Override
-  public boolean accept(final ASTVisitor visitor) {
-    return visitor.lock(DBLocking.ADMIN) && super.accept(visitor);
   }
 }
