@@ -189,7 +189,7 @@ public final class CommandLockingTest extends SandboxTest {
   @Test
   public void admin() {
     ckDBs(new XQuery(_ADMIN_SESSIONS.args()), false, ADMIN_LIST);
-    ckDBs(new XQuery(_ADMIN_LOGS.args()), false, NONE);
+    ckDBs(new XQuery(_ADMIN_LOGS.args()), false, ADMIN_LIST);
   }
 
   /** Test user module. */
