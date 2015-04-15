@@ -60,8 +60,7 @@ public final class ViewData {
     final TokenBuilder tb = new TokenBuilder();
     tb.add(Function._DB_OPEN.args(data.meta.name, Token.string(doc)));
     for(int i = il.size() - 1; i >= 0; i--) {
-      tb.add('/');
-      tb.add(content(data, il.get(i), true));
+      tb.add('/').add(content(data, il.get(i), true));
     }
     return tb.finish();
   }

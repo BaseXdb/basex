@@ -64,6 +64,15 @@ public final class TokenBuilder {
   }
 
   /**
+   * Constructor, specifying initial codepoints.
+   * @param cps initial codepoints
+   */
+  public TokenBuilder(final int[] cps) {
+    this(cps.length);
+    add(cps);
+  }
+
+  /**
    * Returns the number of bytes.
    * @return number of bytes
    */
@@ -139,6 +148,16 @@ public final class TokenBuilder {
    */
   public TokenBuilder hline() {
     return addByte(HLINE);
+  }
+
+  /**
+   * Adds the specified UTF8 codepoints.
+   * @param cps the codepoints to be added
+   * @return self reference
+   */
+  public TokenBuilder add(final int[] cps) {
+    for(final int cp : cps) add(cp);
+    return this;
   }
 
   /**
