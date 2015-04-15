@@ -550,16 +550,16 @@ public abstract class Formatter extends FormatUtil {
    */
   private byte[] number(final long num, final FormatParser fp, final int zero) {
     // cache characters of presentation modifier
-    final IntList mod = new TokenParser(fp.primary).toList();
-    final int modSize = mod.size();
+    final int[] mod = new TokenParser(fp.primary).toArray();
+    final int modSize = mod.length;
     int modStart = 0;
-    while(modStart < modSize && mod.get(modStart) == '#') modStart++;
+    while(modStart < modSize && mod[modStart] == '#') modStart++;
 
     // try to find regular separator pattern
     int sepPos = -1, sepChar = -1, digitPos = 0;
     boolean regSep = false;
     for(int mp = modSize - 1; mp >= modStart; --mp) {
-      final int ch = mod.get(mp);
+      final int ch = mod[mp];
       if(ch >= zero && ch <= zero + 9) {
         digitPos = mp;
         continue;
@@ -586,7 +586,7 @@ public abstract class Formatter extends FormatUtil {
       final boolean sep = reverse.size() % sepPos == sepPos - 1;
       int ch;
       if(modPos >= modStart) {
-        ch = mod.get(modPos--);
+        ch = mod[modPos--];
         if(inPos >= 0) {
           if(ch == '#' && sep) reverse.add(sepChar);
           if(ch == '#' || ch >= zero && ch <= zero + 9) ch = in[inPos--] - '0' + zero;
