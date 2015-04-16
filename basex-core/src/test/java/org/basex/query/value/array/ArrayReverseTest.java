@@ -23,8 +23,8 @@ public final class ArrayReverseTest {
       for(int i = 0; i < n; i++) arr = arr.insertBefore(rng.nextInt(i + 1), Int.get(i));
       assertEquals(n, arr.arraySize());
       final Array rev = arr.reverse();
-      final ListIterator<Value> af = arr.members(0), ab = arr.members(n);
-      final ListIterator<Value> rf = rev.members(0), rb = rev.members(n);
+      final ListIterator<Value> af = arr.iterator(0), ab = arr.iterator(n);
+      final ListIterator<Value> rf = rev.iterator(0), rb = rev.iterator(n);
       for(int i = 0; i < n; i++) {
         assertTrue(af.hasNext());
         assertTrue(ab.hasPrevious());

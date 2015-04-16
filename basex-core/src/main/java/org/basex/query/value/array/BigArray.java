@@ -534,7 +534,7 @@ final class BigArray extends Array {
   }
 
   @Override
-  public ListIterator<Value> members(final long start) {
+  public ListIterator<Value> iterator(final long start) {
     final Value[] ls = left, rs = right;
     final int l = ls.length , r = rs.length, startPos;
     final long m = middle.size();

@@ -25,7 +25,7 @@ public final class ArrayBuilderTest {
       final Array arr = builder.freeze();
       arr.checkInvariants();
       assertEquals(len, arr.arraySize());
-      final Iterator<Value> iter = arr.members();
+      final Iterator<Value> iter = arr.iterator(0);
       for(int i = 0; i < len; i++) {
         assertTrue(iter.hasNext());
         assertEquals(i, ((Int) iter.next()).itr());
@@ -43,7 +43,7 @@ public final class ArrayBuilderTest {
       final Array arr = builder.freeze();
       arr.checkInvariants();
       assertEquals(len, arr.arraySize());
-      final Iterator<Value> iter = arr.members();
+      final Iterator<Value> iter = arr.iterator(0);
       for(int i = 0; i < len; i++) {
         assertTrue(iter.hasNext());
         assertEquals(i, ((Int) iter.next()).itr());
@@ -77,7 +77,7 @@ public final class ArrayBuilderTest {
       final Array arr = builder.freeze();
       arr.checkInvariants();
       assertEquals(len, arr.arraySize());
-      final Iterator<Value> iter = arr.members();
+      final Iterator<Value> iter = arr.iterator(0);
       for(int i = 0; i < len; i++) {
         assertTrue(iter.hasNext());
         assertEquals(i, ((Int) iter.next()).itr());
@@ -113,7 +113,7 @@ public final class ArrayBuilderTest {
       arr.checkInvariants();
       assertEquals(len, arr.arraySize());
       final Iterator<Integer> iter1 = deque.iterator();
-      final Iterator<Value> iter2 = arr.members();
+      final Iterator<Value> iter2 = arr.iterator(0);
       while(iter1.hasNext()) {
         assertTrue(iter2.hasNext());
         assertEquals(iter1.next().intValue(), ((Int) iter2.next()).itr());

@@ -127,8 +127,7 @@ public final class Lookup extends Arr {
       if(ctx instanceof Map) {
         for(final Value v : ((Map) ctx).values()) vb.add(v);
       } else if(ctx instanceof Array) {
-        final Iterator<Value> iter = ((Array) ctx).members();
-        while(iter.hasNext()) vb.add(iter.next());
+        for(final Value val : ((Array) ctx).members()) vb.add(val);
       } else {
         throw LOOKUP_X.get(info, ctx);
       }

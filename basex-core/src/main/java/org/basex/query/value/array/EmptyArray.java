@@ -96,7 +96,7 @@ final class EmptyArray extends Array {
   }
 
   @Override
-  public ListIterator<Value> members(final long size) {
+  public ListIterator<Value> iterator(final long size) {
     return Collections.emptyListIterator();
   }
 

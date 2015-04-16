@@ -43,7 +43,7 @@ public final class ArrayConcatTest {
         assertEquals(n, a1.arraySize());
         assertEquals(n, a2.size());
 
-        final Iterator<Value> it1 = a1.members();
+        final Iterator<Value> it1 = a1.iterator(0);
         final Iterator<Integer> it2 = a2.iterator();
         while(it1.hasNext()) {
           assertTrue(it2.hasNext());

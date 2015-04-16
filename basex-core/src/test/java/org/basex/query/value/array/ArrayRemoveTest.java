@@ -66,7 +66,7 @@ public final class ArrayRemoveTest {
     for(int k = 0; k < n; k++) {
       for(int i = 0; i < k; i++) {
         final Array arr2 = arr.remove(i);
-        final Iterator<Value> iter = arr2.members();
+        final Iterator<Value> iter = arr2.iterator(0);
         for(int j = 0; j < k - 1; j++) {
           assertTrue(iter.hasNext());
           assertEquals(j < i ? j : j + 1, ((Int) iter.next()).itr());
@@ -279,7 +279,7 @@ public final class ArrayRemoveTest {
    * @throws AssertionError of the check fails
    */
   private static void assertContains(final Array arr, final int... vals) {
-    final Iterator<Value> iter = arr.members();
+    final Iterator<Value> iter = arr.iterator(0);
     for(final int v : vals) {
       assertTrue(iter.hasNext());
       assertEquals(v, ((Int) iter.next()).itr());

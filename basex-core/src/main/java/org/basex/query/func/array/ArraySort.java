@@ -1,7 +1,5 @@
 package org.basex.query.func.array;
 
-import java.util.*;
-
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
@@ -21,22 +19,21 @@ import org.basex.util.*;
 public final class ArraySort extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Array value = toArray(exprs[0], qc);
+    final Array array = toArray(exprs[0], qc);
 
-    final int sz = (int) value.arraySize();
+    final int sz = (int) array.arraySize();
     final ValueList vl = new ValueList(sz);
-    final Iterator<Value> iter = value.members();
     if(exprs.length > 1) {
       final FItem key = checkArity(exprs[1], 1, qc);
-      while(iter.hasNext()) vl.add(key.invokeValue(qc, info, iter.next()));
+      for(final Value val : array.members()) vl.add(key.invokeValue(qc, info, val));
     } else {
-      while(iter.hasNext()) vl.add(iter.next());
+      for(final Value val : array.members()) vl.add(val);
     }
 
     final Integer[] order = FnSort.sort(vl, this);
     final ArrayBuilder builder = new ArrayBuilder();
     if(exprs.length > 1) {
-      for(int r = 0; r < sz; r++) builder.append(value.get(order[r]));
+      for(int r = 0; r < sz; r++) builder.append(array.get(order[r]));
     } else {
       for(int r = 0; r < sz; r++) builder.append(vl.get(order[r]));
     }

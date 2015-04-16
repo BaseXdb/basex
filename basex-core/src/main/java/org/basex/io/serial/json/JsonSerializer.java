@@ -4,8 +4,6 @@ import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
-import java.util.*;
-
 import org.basex.build.json.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
@@ -114,11 +112,10 @@ public abstract class JsonSerializer extends StandardSerializer {
         out.print('[');
 
         boolean s = false;
-        final Iterator<Value> members = ((Array) item).members();
-        while(members.hasNext()) {
+        for(final Value val : ((Array) item).members()) {
           if(s) out.print(',');
           indent();
-          serialize(members.next());
+          serialize(val);
           s = true;
         }
 

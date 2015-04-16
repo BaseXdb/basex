@@ -2,8 +2,6 @@ package org.basex.query.expr.constr;
 
 import static org.basex.query.QueryError.*;
 
-import java.util.*;
-
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -88,9 +86,8 @@ public final class Constr {
    */
   private boolean add(final QueryContext qc, final Item it) throws QueryException {
     if(it instanceof Array) {
-      final Iterator<Value> members = ((Array) it).members();
-      while(members.hasNext()) {
-        for(final Item i : members.next()) {
+      for(final Value val : ((Array) it).members()) {
+        for(final Item i : val) {
           if(!add(qc, i)) return false;
         }
       }

@@ -148,7 +148,7 @@ public final class VariousArrayTest {
         final Array seq2 = seq.remove(i);
         assertEquals(k - 1, seq2.arraySize());
 
-        final Iterator<Value> iter = seq2.members();
+        final Iterator<Value> iter = seq2.iterator(0);
         for(int j = 0; j < k - 1; j++) {
           assertTrue(iter.hasNext());
           assertEquals(j < i ? j : j + 1, ((Int) iter.next()).itr());
@@ -166,13 +166,13 @@ public final class VariousArrayTest {
   public void iteratorTest() {
     final int n = 1_000;
     Array seq = Array.empty();
-    assertFalse(seq.members().hasNext());
+    assertFalse(seq.iterator(0).hasNext());
 
     for(int i = 0; i < n; i++) {
       final Int val = Int.get(i);
       seq = seq.cons(val).snoc(val);
       final int k = 2 * (i + 1);
-      final Iterator<Value> iter = seq.members();
+      final Iterator<Value> iter = seq.iterator(0);
       for(int j = 0; j < k; j++) {
         assertTrue(iter.hasNext());
         final Value next = iter.next();

@@ -1,7 +1,5 @@
 package org.basex.query.func.array;
 
-import java.util.*;
-
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
@@ -21,10 +19,8 @@ public final class ArrayFilter extends ArrayFn {
     final Array array = toArray(exprs[0], qc);
     final FItem fun = checkArity(exprs[1], 1, qc);
     final ArrayBuilder builder = new ArrayBuilder();
-    final Iterator<Value> iter = array.members();
-    while(iter.hasNext()) {
-      final Value v = iter.next();
-      if(toBoolean(fun.invokeItem(qc, info, v))) builder.append(v);
+    for(final Value val : array.members()) {
+      if(toBoolean(fun.invokeItem(qc, info, val))) builder.append(val);
     }
     return builder.freeze();
   }

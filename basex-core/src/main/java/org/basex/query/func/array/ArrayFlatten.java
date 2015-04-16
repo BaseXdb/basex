@@ -34,9 +34,8 @@ public final class ArrayFlatten extends ArrayFn {
    * @param arr current array
    */
   private static void addFlattened(final ValueBuilder vb, final Array arr) {
-    final Iterator<Value> members = arr.members();
-    while(members.hasNext()) {
-      for(final Item it : members.next()) {
+    for(final Value val : arr.members()) {
+      for(final Item it : val) {
         if(it instanceof Array) addFlattened(vb, (Array) it);
         else vb.add(it);
       }
@@ -65,7 +64,7 @@ public final class ArrayFlatten extends ArrayFn {
               System.arraycopy(iters, 0, temp, 0, p);
               iters = temp;
             }
-            iters[p] = arr.members();
+            iters[p] = arr.iterator(0);
           } else if(p < 0) {
             return null;
           }

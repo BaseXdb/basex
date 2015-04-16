@@ -9,7 +9,7 @@ import org.basex.query.value.item.*;
 import org.junit.*;
 
 /**
- * Tests for {@link Array#members(long)}.
+ * Tests for {@link Array#iterator(long)}.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
@@ -28,7 +28,7 @@ public final class ArrayMembersTest {
       }
 
       final int startPos = rng.nextInt(n + 1);
-      final ListIterator<Value> it1 = arr.members(startPos);
+      final ListIterator<Value> it1 = arr.iterator(startPos);
       final ListIterator<Integer> it2 = list.listIterator(startPos);
       int pos = startPos;
       for(int i = 0; i < 100; i++) {
