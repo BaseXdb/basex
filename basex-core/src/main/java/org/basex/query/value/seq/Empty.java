@@ -105,6 +105,11 @@ public final class Empty extends Value {
   }
 
   @Override
+  public Value subSeq(final long start, final long len) {
+    return this;
+  }
+
+  @Override
   public Value materialize(final InputInfo ii) {
     return this;
   }

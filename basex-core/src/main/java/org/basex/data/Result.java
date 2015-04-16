@@ -15,7 +15,7 @@ public interface Result {
    * Number of items, stored in the result instance.
    * @return number of items
    */
-  long size();
+  int size();
 
   /**
    * Serializes the result, using the standard serializer.

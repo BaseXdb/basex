@@ -14,6 +14,7 @@ import org.basex.core.cmd.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -442,7 +443,7 @@ public abstract class SessionTest extends SandboxTest {
     }
 
     try(Query query = session.query("declare variable $a external; $a")) {
-      query.bind("a", Seq.get(new Item[] { Int.get(1), Str.get("X") }));
+      query.bind("a", new ItemList().add(Int.get(1)).add(Str.get("X")).value());
       assertEqual("1", query.next());
       assertEqual("X", query.next());
     }

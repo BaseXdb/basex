@@ -13,6 +13,7 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -40,12 +41,12 @@ public class XQueryEval extends StandardFunc {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    return eval(qc, toToken(exprs[0], qc), null, false);
+    return value(qc).iter();
   }
 
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
-    return iter(qc).value();
+    return eval(qc, toToken(exprs[0], qc), null, false).value();
   }
 
   /**
@@ -57,7 +58,7 @@ public class XQueryEval extends StandardFunc {
    * @return resulting value
    * @throws QueryException query exception
    */
-  final ValueBuilder eval(final QueryContext qc, final byte[] qu, final String path,
+  final ItemList eval(final QueryContext qc, final byte[] qu, final String path,
       final boolean updating) throws QueryException {
 
     // bind variables and context value
@@ -118,9 +119,9 @@ public class XQueryEval extends StandardFunc {
           if(qctx.updating) throw BXXQ_UPDATING.get(info);
         }
 
-        final ValueBuilder vb = new ValueBuilder();
-        cache(qctx.iter(), vb, qctx);
-        return vb;
+        final ItemList cache = new ItemList();
+        cache(qctx.iter(), cache, qctx);
+        return cache;
       } catch(final ProcException ex) {
         throw BXXQ_STOPPED.get(info);
       } catch(final QueryException ex) {

@@ -25,7 +25,7 @@ public final class ArrayFoldRight extends ArrayFn {
     final Array array = toArray(exprs[0], qc);
     Value res = qc.value(exprs[1]);
     final FItem fun = checkArity(exprs[2], 2, qc);
-    final ListIterator<Value> iter = array.members(true);
+    final ListIterator<Value> iter = array.iterator(array.arraySize());
     while(iter.hasPrevious()) res = fun.invokeValue(qc, info, iter.previous(), res);
     return res;
   }

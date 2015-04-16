@@ -1,7 +1,5 @@
 package org.basex.query.value.array;
 
-import java.util.*;
-
 import org.basex.query.util.fingertree.*;
 import org.basex.query.value.*;
 
@@ -109,8 +107,7 @@ public final class ArrayBuilder {
    */
   public ArrayBuilder append(final Array arr) {
     if(!(arr instanceof BigArray)) {
-      final Iterator<Value> members = arr.members();
-      while(members.hasNext()) append(members.next());
+      for(final Value val : arr.members()) append(val);
       return this;
     }
 

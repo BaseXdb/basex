@@ -3,19 +3,21 @@ package org.basex.query.util.fingertree;
 import java.util.*;
 
 /**
- * Iterator over a finger tree with at least two sub-nodes.
+ * List iterator over the elements of a finger tree.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  *
  * @param <E> element type
  */
-final class DeepTreeIterator<E> implements ListIterator<E> {
+final class FingerTreeIterator<E> implements ListIterator<E> {
+  /** Size of the root. */
+  private final long n;
   /** Current index. */
   private long index;
 
   /** Stack of deep trees. */
-  private Deep<?, E>[] trees;
+  private DeepTree<?, E>[] trees;
   /** Position of the current node in the digits. */
   private int deepPos;
   /** Stack pointer for the deep trees. */
@@ -35,37 +37,138 @@ final class DeepTreeIterator<E> implements ListIterator<E> {
 
   /**
    * Constructor.
+   * @param n size of the root
+   * @param index initial index
+   * @param trees stack of deep finger tree nodes
+   * @param tTop top of the tree stack
+   * @param deepPos position inside the top tree
    * @param root root node
-   * @param reverse flag for starting at the end
+   * @param position position inside the root node
    */
   @SuppressWarnings("unchecked")
-  DeepTreeIterator(final Deep<?, E> root, final boolean reverse) {
-    index = reverse ? root.size : 0;
+  private FingerTreeIterator(final long n, final long index, final DeepTree<?, E>[] trees,
+      final int tTop, final int deepPos, final Node<?, E> root, final long position) {
 
-    trees = new Deep[8];
-    trees[0] = root;
-    tTop = 0;
+    this.n = n;
+    this.index = index;
+    this.trees = trees;
+    this.tTop = tTop;
+    this.deepPos = deepPos;
 
-    nodes = new InnerNode[8];
-    poss = new int[8];
-    nTop = -1;
+    this.nodes = new InnerNode[8];
+    this.poss = new int[8];
+    this.nTop = -1;
 
-    Node<?, E> curr = reverse ? root.right[root.right.length - 1] : root.left[0];
+    long pos = position;
+    Node<?, E> curr = root;
     while(curr instanceof InnerNode) {
       final InnerNode<?, E> inner = (InnerNode<?, E>) curr;
-      final int idx = reverse ? inner.arity() - 1 : 0;
+
+      int idx = 0;
+      Node<?, E> sub = inner.getSub(0);
+      for(;;) {
+        final long sz = sub.size();
+        if(pos < sz) break;
+        pos -= sz;
+        sub = inner.getSub(++idx);
+      }
+
       if(++nTop == nodes.length) {
-        nodes = Arrays.copyOf(nodes, 2 * nodes.length);
-        poss = Arrays.copyOf(poss, 2 * poss.length);
+        nodes = Arrays.copyOf(nodes, 2 * nTop);
+        poss = Arrays.copyOf(poss, 2 * nTop);
       }
       nodes[nTop] = inner;
       poss[nTop] = idx;
-      curr = inner.getSub(idx);
+      curr = sub;
     }
 
-    deepPos = reverse ? root.right.length : -root.left.length;
     leaf = (Node<E, E>) curr;
-    leafPos = reverse ? curr.arity() : 0;
+    leafPos = (int) (index < n ? pos : pos + 1);
+  }
+
+  /**
+   * Returns a list iterator for the given node starting at the given position.
+   * @param <E> element type
+   * @param root root node
+   * @param start starting position
+   * @return the iterator
+   */
+  static <E> ListIterator<E> get(final Node<?, E> root, final long start) {
+    final long n = root.size(), index = Math.max(0, Math.min(start, n));
+    return new FingerTreeIterator<>(n, index, null, -1, 0, root, Math.min(index, root.size() - 1));
+  }
+
+  /**
+   * Returns a list iterator for the given finger tree starting at the given position.
+   * @param <E> element type
+   * @param tree finger tree
+   * @param start starting position
+   * @return the iterator
+   */
+  static <E> ListIterator<E> get(final FingerTree<?, E> tree, final long start) {
+    if(tree.isEmpty()) return Collections.emptyListIterator();
+    if(tree instanceof SingletonTree) return get(tree.head(), start);
+
+    final DeepTree<?, E> root = (DeepTree<?, E>) tree;
+    final long n = root.size;
+    final long index = Math.max(0, Math.min(start, n));
+
+    @SuppressWarnings("unchecked")
+    DeepTree<?, E>[] trees = new DeepTree[8];
+    trees[0] = root;
+    int tTop = 0;
+
+    int deepPos;
+    Node<?, E> node;
+    long pos = Math.min(index, n - 1);
+    for(;;) {
+      final DeepTree<?, E> curr = trees[tTop];
+      if(pos < curr.leftSize) {
+        // left digit
+        final Node<?, E>[] left = curr.left;
+        int i = 0;
+        for(;; i++) {
+          node = left[i];
+          final long sz = node.size();
+          if(pos < sz) break;
+          pos -= sz;
+        }
+        deepPos = i - left.length;
+        break;
+      }
+      pos -= curr.leftSize;
+
+      final FingerTree<?, E> mid = curr.middle;
+      final long midSize = mid.size();
+      if(pos >= midSize) {
+        // right digit
+        pos -= midSize;
+        final Node<?, E>[] right = curr.right;
+        int i = 0;
+        for(;; i++) {
+          node = right[i];
+          final long sz = node.size();
+          if(pos < sz) break;
+          pos -= sz;
+        }
+        deepPos = i + 1;
+        break;
+      }
+
+
+      if(mid instanceof SingletonTree) {
+        // single middle node
+        node = mid.head();
+        deepPos = 0;
+        break;
+      }
+
+      // go one level deeper
+      if(++tTop == trees.length) trees = Arrays.copyOf(trees, 2 * tTop);
+      trees[tTop] = (DeepTree<?, E>) mid;
+    }
+
+    return new FingerTreeIterator<>(n, index, trees, tTop, deepPos, node, pos);
   }
 
   @Override
@@ -75,13 +178,13 @@ final class DeepTreeIterator<E> implements ListIterator<E> {
 
   @Override
   public boolean hasNext() {
-    return index < trees[0].size;
+    return index < n;
   }
 
   @Override
   @SuppressWarnings("unchecked")
   public E next() {
-    if(index >= trees[0].size) throw new NoSuchElementException();
+    if(index >= n) throw new NoSuchElementException();
 
     index++;
     if(leafPos < leaf.arity()) return leaf.getSub(leafPos++);
@@ -95,7 +198,7 @@ final class DeepTreeIterator<E> implements ListIterator<E> {
       start = nodes[nTop].getSub(++poss[nTop]);
     } else {
       // node drained, move to the next one
-      final Deep<?, E> curr = trees[tTop];
+      final DeepTree<?, E> curr = trees[tTop];
       if(deepPos < -1) {
         // go to next node in digit
         ++deepPos;
@@ -103,18 +206,18 @@ final class DeepTreeIterator<E> implements ListIterator<E> {
       } else if(deepPos == -1) {
         // left digit drained
         final FingerTree<?, E> mid = curr.middle;
-        if(mid instanceof Empty) {
+        if(mid instanceof EmptyTree) {
           // skip empty middle tree
           deepPos = 1;
           start = curr.right[0];
-        } else if(mid instanceof Single) {
+        } else if(mid instanceof SingletonTree) {
           // iterate through the one middle node
           deepPos = 0;
-          start = ((Single<?, E>) mid).elem;
+          start = ((SingletonTree<?, E>) mid).elem;
         } else {
-          final Deep<?, E> deep = (Deep<?, E>) mid;
+          final DeepTree<?, E> deep = (DeepTree<?, E>) mid;
           if(++tTop == trees.length) {
-            final Deep<?, E>[] newTrees = new Deep[2 * tTop];
+            final DeepTree<?, E>[] newTrees = new DeepTree[2 * tTop];
             System.arraycopy(trees, 0, newTrees, 0, tTop);
             trees = newTrees;
           }
@@ -189,7 +292,7 @@ final class DeepTreeIterator<E> implements ListIterator<E> {
       start = nodes[nTop].getSub(--poss[nTop]);
     } else {
       // node drained, move to the previous one
-      final Deep<?, E> curr = trees[tTop];
+      final DeepTree<?, E> curr = trees[tTop];
       if(deepPos > 1) {
         // go to next node in right digit
         --deepPos;
@@ -197,20 +300,20 @@ final class DeepTreeIterator<E> implements ListIterator<E> {
       } else if(deepPos == 1) {
         // right digit drained
         final FingerTree<?, E> mid = curr.middle;
-        if(mid instanceof Empty) {
+        if(mid instanceof EmptyTree) {
           // skip empty middle tree
           final int l = curr.left.length;
           start = curr.left[l - 1];
           deepPos = -1;
-        } else if(mid instanceof Single) {
+        } else if(mid instanceof SingletonTree) {
           // iterate through the one middle node
-          start = ((Single<?, E>) mid).elem;
+          start = ((SingletonTree<?, E>) mid).elem;
           deepPos = 0;
         } else {
           // go into the middle tree
-          final Deep<?, E> deep = (Deep<?, E>) mid;
+          final DeepTree<?, E> deep = (DeepTree<?, E>) mid;
           if(++tTop == trees.length) {
-            final Deep<?, E>[] newTrees = new Deep[2 * tTop];
+            final DeepTree<?, E>[] newTrees = new DeepTree[2 * tTop];
             System.arraycopy(trees, 0, newTrees, 0, tTop);
             trees = newTrees;
           }

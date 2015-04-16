@@ -17,9 +17,10 @@ import org.junit.*;
 public final class ArrayConcatTest {
   /** Generates and concatenates random arrays of a given size. */
   @Test public void fuzzyTest() {
-    final Random rng = new Random(42);
-    for(int n = 0; n < 1000; n++) {
+    final Random rng = new Random();
+    for(int n = 0; n < 1_000; n++) {
       for(int k = 0; k < 10; k++) {
+        rng.setSeed(10 * n + k);
         final int l = rng.nextInt(n + 1), r = n - l;
 
         Array a1 = Array.empty(), b1 = Array.empty();
@@ -42,7 +43,7 @@ public final class ArrayConcatTest {
         assertEquals(n, a1.arraySize());
         assertEquals(n, a2.size());
 
-        final Iterator<Value> it1 = a1.members();
+        final Iterator<Value> it1 = a1.iterator(0);
         final Iterator<Integer> it2 = a2.iterator();
         while(it1.hasNext()) {
           assertTrue(it2.hasNext());

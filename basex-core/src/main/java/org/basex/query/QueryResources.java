@@ -11,8 +11,8 @@ import org.basex.core.cmd.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.io.*;
-import org.basex.query.iter.*;
 import org.basex.query.up.*;
+import org.basex.query.util.list.*;
 import org.basex.query.util.pkg.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
@@ -50,7 +50,7 @@ public final class QueryResources {
   private final HashMap<Class<? extends QueryResource>, QueryResource> external = new HashMap<>();
 
   /** Pending output. */
-  public final ValueBuilder output = new ValueBuilder();
+  public final ItemList output = new ItemList();
   /** Pending updates. */
   Updates updates;
 

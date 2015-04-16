@@ -7,6 +7,7 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.seq.tree.*;
 import org.basex.util.*;
 
 /**
@@ -37,8 +38,8 @@ public final class HofTopKWith extends HofFn {
       }
     } catch(final QueryRTException ex) { throw ex.getCause(); }
 
-    final Item[] arr = new Item[heap.size()];
-    for(int i = arr.length; --i >= 0;) arr[i] = heap.removeMin();
-    return Seq.get(arr);
+    final ValueBuilder vb = new ValueBuilder();
+    while(!heap.isEmpty()) vb.addFront(heap.removeMin());
+    return vb.value();
   }
 }

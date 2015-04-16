@@ -10,6 +10,7 @@ import org.basex.core.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -40,7 +41,7 @@ public final class HttpRequestParser {
    * @return parsed request
    * @throws QueryException query exception
    */
-  public HttpRequest parse(final ANode request, final ValueBuilder bodies) throws QueryException {
+  public HttpRequest parse(final ANode request, final Iter bodies) throws QueryException {
     final HttpRequest req = new HttpRequest();
 
     if(request != null) {
@@ -122,7 +123,7 @@ public final class HttpRequestParser {
    * @throws QueryException query exception
    */
   private void parseBody(final ANode body, final Item contItem, final HashMap<String, String> attrs,
-      final ValueBuilder bodyContent) throws QueryException {
+      final ItemList bodyContent) throws QueryException {
 
     parseAttrs(body, attrs);
     checkBody(body, attrs);
@@ -147,7 +148,7 @@ public final class HttpRequestParser {
    * @param parts list for multipart parts
    * @throws QueryException query exception
    */
-  private void parseMultipart(final ANode multipart, final ValueBuilder contItems,
+  private void parseMultipart(final ANode multipart, final Iter contItems,
       final HashMap<String, String> attrs, final ArrayList<Part> parts) throws QueryException {
 
     parseAttrs(multipart, attrs);

@@ -2,8 +2,6 @@ package org.basex.query.func.fn;
 
 import static org.basex.query.QueryError.*;
 
-import java.util.*;
-
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
@@ -32,8 +30,7 @@ public final class FnApply extends StandardFunc {
     if(fun.arity() != as) throw APPLY_X_X.get(info, fun.arity(), as);
 
     final ValueList vl = new ValueList((int) as);
-    final Iterator<Value> iter = array.members();
-    while(iter.hasNext()) vl.add(iter.next());
+    for(final Value val : array.members()) vl.add(val);
     return fun.invokeValue(qc, info, vl.finish());
   }
 }

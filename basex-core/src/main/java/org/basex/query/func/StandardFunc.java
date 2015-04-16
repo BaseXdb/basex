@@ -20,6 +20,7 @@ import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.Map;
@@ -373,17 +374,17 @@ public abstract class StandardFunc extends Arr {
   /**
    * Caches and materializes all items of the specified iterator.
    * @param iter iterator
-   * @param vb value builder
+   * @param cache item list
    * @param qc query context
    * @throws QueryException query exception
    */
-  protected final void cache(final Iter iter, final ValueBuilder vb, final QueryContext qc)
+  protected final void cache(final Iter iter, final ItemList cache, final QueryContext qc)
       throws QueryException {
 
     for(Item it; (it = iter.next()) != null;) {
       qc.checkStop();
       if(it instanceof FItem) throw FISTRING_X.get(info, it.type);
-      vb.add(it.materialize(info));
+      cache.add(it.materialize(info));
     }
   }
 

@@ -10,6 +10,7 @@ import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.tree.*;
 
 /**
  * Function implementation.
@@ -42,7 +43,7 @@ public final class FnSort extends StandardFunc {
       public long size() { return sz; }
       @Override
       public Value value() {
-        final ValueBuilder vb = new ValueBuilder(sz);
+        final ValueBuilder vb = new ValueBuilder();
         for(int r = 0; r < sz; r++) vb.add(get(r));
         return vb.value();
       }

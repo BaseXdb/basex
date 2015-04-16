@@ -11,9 +11,9 @@ import java.util.*;
  * @param <N> node type
  * @param <E> element type
  */
-final class Empty<N, E> extends FingerTree<N, E> {
+final class EmptyTree<N, E> extends FingerTree<N, E> {
   /** The empty finger tree. */
-  static final Empty<?, ?> INSTANCE = new Empty<>();
+  static final EmptyTree<?, ?> INSTANCE = new EmptyTree<>();
 
   /**
    * Getter for the empty finger tree.
@@ -22,22 +22,22 @@ final class Empty<N, E> extends FingerTree<N, E> {
    * @return empty tree
    */
   @SuppressWarnings("unchecked")
-  static <N, E> Empty<N, E> getInstance() {
-    return (Empty<N, E>) INSTANCE;
+  static <N, E> EmptyTree<N, E> getInstance() {
+    return (EmptyTree<N, E>) INSTANCE;
   }
 
   /** Hidden constructor. */
-  private Empty() {
+  private EmptyTree() {
   }
 
   @Override
   public FingerTree<N, E> cons(final Node<N, E> fst) {
-    return new Single<>(fst);
+    return new SingletonTree<>(fst);
   }
 
   @Override
   public FingerTree<N, E> snoc(final Node<N, E> lst) {
-    return new Single<>(lst);
+    return new SingletonTree<>(lst);
   }
 
   @Override
@@ -66,8 +66,9 @@ final class Empty<N, E> extends FingerTree<N, E> {
   }
 
   @Override
-  public FingerTree<N, E> concat(final Node<N, E>[] nodes, final FingerTree<N, E> other) {
-    return other.addAll(nodes, true);
+  public FingerTree<N, E> concat(final Node<N, E>[] nodes, final long sz,
+      final FingerTree<N, E> other) {
+    return other.addAll(nodes, sz, true);
   }
 
   @Override
@@ -92,11 +93,6 @@ final class Empty<N, E> extends FingerTree<N, E> {
   }
 
   @Override
-  public ListIterator<E> listIterator(final boolean reverse) {
-    return Collections.emptyListIterator();
-  }
-
-  @Override
   public FingerTree<N, E> replaceHead(final Node<N, E> head) {
     throw new AssertionError("Empty sub-tree.");
   }
@@ -118,12 +114,7 @@ final class Empty<N, E> extends FingerTree<N, E> {
   }
 
   @Override
-  public long[] sizes(final int depth) {
-    return new long[depth];
-  }
-
-  @Override
-  FingerTree<N, E> addAll(final Node<N, E>[] nodes, final boolean left) {
-    return buildTree(nodes, nodes.length, Deep.size(nodes));
+  FingerTree<N, E> addAll(final Node<N, E>[] nodes, final long sz, final boolean left) {
+    return buildTree(nodes, nodes.length, sz);
   }
 }

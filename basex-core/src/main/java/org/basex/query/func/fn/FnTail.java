@@ -26,7 +26,7 @@ public final class FnTail extends StandardFunc {
     final Iter ir = e.iter(qc);
     if(ir instanceof ValueIter) {
       final Value val = ir.value();
-      return SubSeq.get(val, 1, val.size() - 1).iter();
+      return val.size() < 2 ? Empty.ITER : val.subSeq(1, val.size() - 1).iter();
     }
     if(ir.next() == null) return Empty.ITER;
 
@@ -41,7 +41,7 @@ public final class FnTail extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Value val = qc.value(exprs[0]);
-    return SubSeq.get(val, 1, val.size() - 1);
+    return val.size() < 2 ? Empty.SEQ : val.subSeq(1, val.size() - 1);
   }
 
   @Override

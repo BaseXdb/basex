@@ -3,7 +3,7 @@ package org.basex.util.http;
 import java.util.*;
 
 import org.basex.core.StaticOptions.AuthMethod;
-import org.basex.query.iter.*;
+import org.basex.query.util.list.*;
 import org.basex.util.http.HttpText.*;
 
 /**
@@ -20,7 +20,7 @@ public final class HttpRequest {
   /** Body or multipart attributes. */
   public final HashMap<String, String> payloadAttrs = new HashMap<>();
   /** Body content. */
-  public final ValueBuilder bodyContent = new ValueBuilder();
+  public final ItemList bodyContent = new ItemList();
   /** Parts in case of multipart request. */
   public final ArrayList<Part> parts = new ArrayList<>();
   /** Indicator for multipart request. */
@@ -49,6 +49,6 @@ public final class HttpRequest {
     /** Attributes of part body. */
     public final HashMap<String, String> bodyAttrs = new HashMap<>();
     /** Content of part body. */
-    public final ValueBuilder bodyContent = new ValueBuilder();
+    public final ItemList bodyContent = new ItemList();
   }
 }

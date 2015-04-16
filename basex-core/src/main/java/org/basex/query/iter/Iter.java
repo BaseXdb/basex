@@ -4,6 +4,7 @@ import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.seq.tree.*;
 import org.basex.util.*;
 
 /**
@@ -51,19 +52,17 @@ public abstract class Iter {
    */
   public Value value() throws QueryException {
     // check if sequence is empty
-    Item i = next();
-    if(i == null) return Empty.SEQ;
+    final Item i1 = next();
+    if(i1 == null) return Empty.SEQ;
 
-    // if possible, allocate array with final size, and add all single items
-    Item[] item = new Item[Math.max(1, (int) size())];
-    int s = 0;
-    do {
-      if(s == item.length) item = extend(item);
-      item[s++] = i;
-    } while((i = next()) != null);
+    final Item i2 = next();
+    if(i2 == null) return i1;
 
-    // create final value
-    return Seq.get(item, s);
+    final ValueBuilder vb = new ValueBuilder();
+    vb.add(i1);
+    vb.add(i2);
+    for(Item i; (i = next()) != null;) vb.add(i);
+    return vb.value();
   }
 
   /**
