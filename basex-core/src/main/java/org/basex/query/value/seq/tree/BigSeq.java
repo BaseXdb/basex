@@ -2,6 +2,7 @@ package org.basex.query.value.seq.tree;
 
 import java.util.*;
 
+import org.basex.query.iter.*;
 import org.basex.query.util.fingertree.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -41,15 +42,13 @@ final class BigSeq extends TreeSeq {
 
   @Override
   public Item itemAt(final long index) {
-    // index to small?
+    // index out of range?
     if(index < 0) throw new IndexOutOfBoundsException("Index < 0: " + index);
-
-    // index too big?
-    final long midSize = left.length + middle.size();
     if(index >= size) throw new IndexOutOfBoundsException(index + " >= " + size);
 
     // index in one of the digits?
     if(index < left.length) return left[(int) index];
+    final long midSize = size - right.length;
     if(index >= midSize) return right[(int) (index - midSize)];
 
     // the element is in the middle tree
@@ -504,6 +503,40 @@ final class BigSeq extends TreeSeq {
       @Override
       public void remove() {
         throw new UnsupportedOperationException();
+      }
+    };
+  }
+
+  @Override
+  public ValueIter iter() {
+    return new ValueIter() {
+      private long pos;
+      private Iterator<Item> sub;
+
+      @Override
+      public Item next() {
+        if(pos >= size) return null;
+        final long p = pos++;
+        if(p < left.length) return left[(int) p];
+        final long r = size - right.length;
+        if(p >= r) return right[(int) (p - r)];
+        if(sub == null) sub = middle.iterator();
+        return sub.next();
+      }
+
+      @Override
+      public Item get(final long i) {
+        return BigSeq.this.itemAt(i);
+      }
+
+      @Override
+      public long size() {
+        return size;
+      }
+
+      @Override
+      public Value value() {
+        return BigSeq.this;
       }
     };
   }

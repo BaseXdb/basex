@@ -146,31 +146,7 @@ public abstract class TreeSeq extends Seq {
   }
 
   @Override
-  public ValueIter iter() {
-    return new ValueIter() {
-      private final Iterator<Item> members = members();
-
-      @Override
-      public Item next() {
-        return members.hasNext() ? members.next() : null;
-      }
-
-      @Override
-      public Item get(final long i) {
-        return TreeSeq.this.itemAt(i);
-      }
-
-      @Override
-      public long size() {
-        return TreeSeq.this.size();
-      }
-
-      @Override
-      public Value value() {
-        return TreeSeq.this;
-      }
-    };
-  }
+  public abstract ValueIter iter();
 
   @Override
   public Value materialize(final InputInfo ii) throws QueryException {

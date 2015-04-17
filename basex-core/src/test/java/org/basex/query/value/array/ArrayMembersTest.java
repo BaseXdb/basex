@@ -17,8 +17,8 @@ import org.junit.*;
 public final class ArrayMembersTest {
   /** Random movements inside the array. */
   @Test public void randomTest() {
-    final Random rng = new Random(1337);
     for(int n = 0; n < 1_000; n++) {
+      final Random rng = new Random(1337 + n);
       Array arr = Array.empty();
       final ArrayList<Integer> list = new ArrayList<>(n);
       for(int i = 0; i < n; i++) {
