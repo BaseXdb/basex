@@ -79,9 +79,9 @@ public final class DialogColors extends BaseXDialog {
   public void action(final Object comp) {
     if(comp instanceof BaseXButton) {
       // reset default values
-      sliderRed.setValue(GUIOptions.COLORRED.value);
-      sliderGreen.setValue(GUIOptions.COLORGREEN.value);
-      sliderBlue.setValue(GUIOptions.COLORBLUE.value);
+      sliderRed.setValue(GUIOptions.COLORRED.value());
+      sliderGreen.setValue(GUIOptions.COLORGREEN.value());
+      sliderBlue.setValue(GUIOptions.COLORBLUE.value());
     }
     sliderRed.assign();
     sliderGreen.assign();
