@@ -3,6 +3,7 @@ package org.basex.performance;
 import static org.basex.core.Text.*;
 
 import java.io.*;
+import java.math.*;
 
 import org.basex.*;
 import org.basex.api.client.*;
@@ -11,6 +12,7 @@ import org.basex.core.cmd.*;
 import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 import org.junit.*;
 import org.junit.Test;
 
@@ -23,8 +25,14 @@ import org.junit.Test;
 public final class XMarkTest {
   /** Name of database. */
   private static final String DB = "111mb";
-  /** Number of runs. */
-  private static final int FACTOR = 1;
+
+  /** Test directory. */
+  private static final IOFile DIR = new IOFile(Prop.TMP, "XMark");
+  /** Output file. */
+  private static final IOFile FILE = new IOFile(DIR, "master- " + DB + ".graph");
+
+  /** Maximum time per query (ms). */
+  private static final int MAX = 2000;
 
   /** Queries. */
   private static final String[] QUERIES = {
@@ -101,11 +109,8 @@ public final class XMarkTest {
     + "count( for $p in $auction/site/people/person where empty($p/profile/@income) return $p ) } "
     + "</na> </result>"
   };
-  /** Queries to exclude. Negative value: do not consider global factor. */
-  private static final int[] RUNS = {
-    200, 70, 40, 60, 130, 22, 12, 0, 0, 0,
-    0, 0, 27, 6, 170, 200, 90, 70, 12, 50
-  };
+  /** Queries to exclude. */
+  private static final IntList EXCLUDE = new IntList().add(8, 9, 10, 11, 12);
 
   /** Server flag. */
   private static BaseXServer server;
@@ -143,40 +148,52 @@ public final class XMarkTest {
    */
   @Test
   public void test() throws Exception {
-    final TokenBuilder tb = new TokenBuilder();
-    tb.add(DB + " (" + FACTOR + "x)").add(Prop.NL);
+    final TokenBuilder tb = new TokenBuilder().add(DB).add(Prop.NL);
 
     try(final ClientSession cs = createClient()) {
       cs.execute(new Open(DB));
 
       // ignore first run
-      System.out.println("Test runs...");
+      System.out.println("Warming up...");
       for(int i = 1; i <= 20; i++) {
-        if(RUNS[i - 1] > 0) {
-          try(final ClientQuery cq = cs.query(QUERIES[i - 1])) { cq.execute(); }
+        if(!EXCLUDE.contains(i)) {
+          try(final ClientQuery cq = cs.query(QUERIES[i - 1])) {
+            final Performance p = new Performance();
+            cq.execute();
+            System.out.println(i + ": " + p);
+          }
         }
       }
 
-      System.out.println("Real runs...");
-      final Performance p = new Performance();
+      System.out.println(Prop.NL + "Testing...");
       for(int i = 1; i <= 20; i++) {
         tb.add(String.format("%02d", i)).add("  ");
+        final BigDecimal max = BigDecimal.valueOf(MAX);
         try(final ClientQuery cq = cs.query(QUERIES[i - 1])) {
-          final int run = RUNS[i - 1];
-          final int runs = run < 0 ? -run : FACTOR * RUNS[i - 1];
-          for(int r = 0; r < runs; r++) cq.execute();
-          final String time = p.getTime(runs).replaceAll(" .*", "");
-          System.out.println(i + ": " + runs * Double.parseDouble(time));
-          tb.add(time);
+          if(EXCLUDE.contains(i)) {
+            tb.add("1000000");
+          } else {
+            double min = Double.MAX_VALUE;
+            BigDecimal total = BigDecimal.valueOf(0);
+            int r = 0;
+            while(total.compareTo(max) < 0) {
+              final Performance p = new Performance();
+              cq.execute();
+              final double t = Double.parseDouble(p.getTime().replaceAll(" .*", ""));
+              total = total.add(BigDecimal.valueOf(t));
+              min = Math.min(min, t);
+              r++;
+            }
+            tb.add(Double.toString(min));
+            System.out.println(i + ": " + min + " (" + r + " runs, stopped at " + total + " ms)");
+          }
         }
         tb.add(Prop.NL);
       }
     }
 
-    System.out.println(tb);
-    final IOFile file = new IOFile(Prop.TMP, "XMark");
-    file.md();
-    new IOFile(file, DB + "-" + FACTOR + ".graph").write(tb.finish());
+    DIR.md();
+    FILE.write(tb.finish());
   }
 
   /**
