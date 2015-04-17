@@ -2,6 +2,7 @@ package org.basex.query.value.seq.tree;
 
 import java.util.*;
 
+import org.basex.query.iter.*;
 import org.basex.query.util.fingertree.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -144,6 +145,33 @@ final class SmallSeq extends TreeSeq {
       @Override
       public void remove() {
         throw new UnsupportedOperationException();
+      }
+    };
+  }
+
+  @Override
+  public ValueIter iter() {
+    return new ValueIter() {
+      private int pos;
+
+      @Override
+      public Item next() {
+        return pos < size ? elems[pos++] : null;
+      }
+
+      @Override
+      public Item get(final long i) {
+        return elems[(int) i];
+      }
+
+      @Override
+      public long size() {
+        return size;
+      }
+
+      @Override
+      public Value value() {
+        return SmallSeq.this;
       }
     };
   }
