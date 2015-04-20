@@ -1,6 +1,7 @@
 package org.basex.core;
 
 import org.basex.core.locks.*;
+import org.basex.core.uri.BaseXURIResolver;
 import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.io.random.*;
@@ -53,6 +54,9 @@ public final class Context {
   /** Data reference. */
   private Data data;
 
+  /** URI resolver */
+  private BaseXURIResolver baseXURIResolver = null;
+
   // GUI references
 
   /** Marked nodes. */
@@ -93,6 +97,7 @@ public final class Context {
     users = ctx.users;
     repo = ctx.repo;
     log = ctx.log;
+    baseXURIResolver = ctx.baseXURIResolver;
   }
 
   /**
@@ -305,5 +310,13 @@ public final class Context {
       }
     }
     return sl.sort().unique();
+  }
+
+  public BaseXURIResolver getBaseXURIResolver() {
+    return baseXURIResolver;
+  }
+
+  public void setBaseXURIResolver(BaseXURIResolver baseXURIResolver) {
+    this.baseXURIResolver = baseXURIResolver;
   }
 }

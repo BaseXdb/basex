@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import org.basex.core.*;
+import org.basex.core.uri.BaseXURIResolver;
 import org.basex.io.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
@@ -19,7 +20,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public final class StaticContext {
+public final class StaticContext implements BaseXURIResolver {
   /** Decimal formats. */
   public final TokenObjMap<DecFormatter> decFormats = new TokenObjMap<>();
   /** Static and dynamic namespaces. */
@@ -52,6 +53,13 @@ public final class StaticContext {
   /** Static Base URI. */
   private Uri baseURI = Uri.EMPTY;
 
+  private BaseXURIResolver baseXURIResolver = new BaseXURIResolver() {
+    @Override
+    public IO resolve(String path, String uri) {
+      return io(path);
+    }
+  };
+
   /**
    * Constructor setting the XQuery version.
    * @param ctx database context
@@ -59,6 +67,9 @@ public final class StaticContext {
   public StaticContext(final Context ctx) {
     final MainOptions opts = ctx.options;
     mixUpdates = opts.get(MainOptions.MIXUPDATES);
+    if (ctx.getBaseXURIResolver() != null) {
+      baseXURIResolver = ctx.getBaseXURIResolver();
+    }
   }
 
   /**
@@ -127,5 +138,10 @@ public final class StaticContext {
   @Override
   public String toString() {
     return Util.className(this) + '[' + baseIO() + ']';
+  }
+
+  @Override
+  public IO resolve(String path, String uri) {
+    return baseXURIResolver.resolve(path, uri);
   }
 }
