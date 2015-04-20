@@ -8,7 +8,7 @@ package org.basex.util.options;
  */
 public final class NumberOption extends Option<Integer> {
   /** Default value. */
-  public final Integer value;
+  private final Integer value;
 
   /**
    * Default constructor.
