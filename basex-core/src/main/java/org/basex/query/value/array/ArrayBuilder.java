@@ -192,18 +192,13 @@ public final class ArrayBuilder {
         sb.append(vals[first]);
         for(int i = 1; i < n; i++) sb.append(", ").append(vals[(first + i) % CAP]);
       }
-      return sb.append(']').toString();
-    }
-
-    if(inLeft > 0) {
+    } else {
       final int first = (mid - inLeft + CAP) % CAP;
       sb.append(vals[first]);
       for(int i = 1; i < inLeft; i++) sb.append(", ").append(vals[(first + i) % CAP]);
-      sb.append(", ");
+      for(final Value val : tree) sb.append(", ").append(val);
+      for(int i = 0; i < inRight; i++) sb.append(", ").append(vals[(mid + i) % CAP]);
     }
-
-    tree.toString(sb);
-    for(int i = 0; i < inRight; i++) sb.append(", ").append(vals[(mid + i) % CAP]);
     return sb.append(']').toString();
   }
 }

@@ -7,7 +7,6 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.tree.*;
 
 /**
  * Function implementation.

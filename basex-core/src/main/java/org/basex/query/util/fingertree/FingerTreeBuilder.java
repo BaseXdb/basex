@@ -11,7 +11,7 @@ import java.util.*;
  * @param <E> element type
  */
 @SuppressWarnings("unchecked")
-public final class FingerTreeBuilder<E> {
+public final class FingerTreeBuilder<E> implements Iterable<E> {
   /** The root node, {@code null} if the tree is empty. */
   private Object root;
 
@@ -82,30 +82,22 @@ public final class FingerTreeBuilder<E> {
       root instanceof BufferNode ? ((BufferNode<E, E>) root).freeze() : (FingerTree<E, E>) root;
   }
 
-  /**
-   * Writes the elements contained in this builder onto the given string builder.
-   * @param sb string builder
-   */
-  public void toString(final StringBuilder sb) {
-    if(root != null) {
-      if(root instanceof BufferNode) {
-        ((BufferNode<E, E>) root).toString(sb);
-      } else {
-        boolean first = true;
-        for(final E e : (FingerTree<E, E>) root) {
-          if(!first) sb.append(", ");
-          else first = false;
-          sb.append(e);
-        }
-      }
-    }
-  }
-
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
-    toString(sb);
+    final Iterator<E> iter = iterator();
+    if(iter.hasNext()) {
+      sb.append(iter.next());
+      while(iter.hasNext()) sb.append(", ").append(iter.next());
+    }
     return sb.append(']').toString();
+  }
+
+  @Override
+  public Iterator<E> iterator() {
+    if(root == null) return Collections.emptyIterator();
+    if(root instanceof FingerTree) return ((FingerTree<E, E>) root).iterator();
+    return new BufferNodeIterator<>((BufferNode<E, E>) root);
   }
 
   /**
@@ -276,38 +268,12 @@ public final class FingerTreeBuilder<E> {
     }
 
     /**
-     * Writes the elements contained in this node onto the given string builder.
-     * @param sb string builder
+     * Returns the node at the given position in this node's ring buffer.
+     * @param pos position
+     * @return node at that position
      */
-    void toString(final StringBuilder sb) {
-      boolean first = true;
-      for(int i = 0; i < inLeft; i++) {
-        final Node<N, E> node = nodes[(midPos - inLeft + i + CAP) % CAP];
-        final Iterator<E> iter = new FingerTreeIterator<>(node, 0);
-        while(iter.hasNext()) {
-          if(first) first = false;
-          else sb.append(", ");
-          sb.append(iter.next());
-        }
-      }
-      if(!(middle == null)) {
-        if(middle instanceof BufferNode) {
-          ((BufferNode<?, ?>) middle).toString(sb.append(", "));
-        } else {
-          final FingerTree<?, ?> tree = (FingerTree<?, ?>) middle;
-          final Iterator<?> iter = tree.iterator();
-          while(iter.hasNext()) sb.append(", ").append(iter.next());
-        }
-      }
-      for(int i = 0; i < inRight; i++) {
-        final Node<N, E> node = nodes[(midPos + i) % CAP];
-        final Iterator<E> iter = new FingerTreeIterator<>(node, 0);
-        while(iter.hasNext()) {
-          if(first) first = false;
-          else sb.append(", ");
-          sb.append(iter.next());
-        }
-      }
+    Node<N, E> get(final int pos) {
+      return nodes[(((midPos + pos) % CAP) + CAP) % CAP];
     }
 
     /**
@@ -349,6 +315,92 @@ public final class FingerTreeBuilder<E> {
         System.arraycopy(nodes, p, arr, pos, k);
         System.arraycopy(nodes, 0, arr, pos + k, len - k);
       }
+    }
+  }
+
+  /**
+   * Iterator over the elements in this builder.
+   * @param <E> element type
+   */
+  private static class BufferNodeIterator<E> implements Iterator<E> {
+    /** Stack of buffer nodes. */
+    private BufferNode<?, E>[] stack = new BufferNode[8];
+    /** Stack of position inside the buffer nodes. */
+    private int[] poss = new int[8];
+    /** Stack top. */
+    private int top;
+    /** Iterator over the current tree node. */
+    private Iterator<E> sub;
+
+    /**
+     * Constructor.
+     * @param root buffer node
+     */
+    BufferNodeIterator(final BufferNode<E, E> root) {
+      stack[0] = root;
+      final int pos = -root.inLeft;
+      poss[0] = pos;
+      sub = new FingerTreeIterator<>(root.get(pos), 0);
+    }
+
+    @Override
+    public boolean hasNext() {
+      return sub != null;
+    }
+
+    @Override
+    public E next() {
+      if(sub == null) throw new NoSuchElementException();
+      final E out = sub.next();
+      if(sub.hasNext()) return out;
+
+      // sub-iterator empty
+      sub = null;
+      final BufferNode<?, E> buffer = stack[top];
+      poss[top]++;
+
+      if(poss[top] < 0) {
+        sub = new FingerTreeIterator<>(buffer.get(poss[top]), 0);
+        return out;
+      }
+
+      if(poss[top] == 0) {
+        final Object mid = buffer.middle;
+        if(mid != null) {
+          if(mid instanceof FingerTree) {
+            sub = ((FingerTree<?, E>) mid).iterator();
+          } else {
+            final BufferNode<?, E> buff = (BufferNode<?, E>) mid;
+            if(++top == stack.length) {
+              stack = Arrays.copyOf(stack, 2 * top);
+              poss = Arrays.copyOf(poss, 2 * top);
+            }
+            stack[top] = buff;
+            poss[top] = -buff.inLeft;
+            sub = new FingerTreeIterator<>(buff.get(poss[top]), 0);
+          }
+          return out;
+        }
+        poss[top]++;
+      }
+
+      if(poss[top] <= buffer.inRight) {
+        sub = new FingerTreeIterator<>(buffer.get(poss[top] - 1), 0);
+        return out;
+      }
+
+      stack[top] = null;
+      if(--top >= 0) {
+        sub = new FingerTreeIterator<>(stack[top].get(0), 0);
+        poss[top]++;
+      }
+
+      return out;
+    }
+
+    @Override
+    public void remove() {
+      throw new UnsupportedOperationException();
     }
   }
 }
