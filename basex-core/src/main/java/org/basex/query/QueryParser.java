@@ -133,7 +133,7 @@ public class QueryParser extends InputParser {
     // set path to query file
     final MainOptions opts = qc.context.options;
     final String bi = path != null ? path : opts.get(MainOptions.QUERYPATH);
-    final StaticContext sctx = sc != null ? sc : new StaticContext(qc.context);
+    final StaticContext sctx = sc != null ? sc : new StaticContext(qc);
     if(!bi.isEmpty()) sctx.baseURI(bi);
     this.sc = sctx;
 
@@ -769,7 +769,7 @@ public class QueryParser extends InputParser {
    */
   public void module(final byte[] path, final byte[] uri) throws QueryException {
     // get absolute path
-    final IO io = sc.io(string(path));
+    final IO io = sc.resolve(string(path), string(uri));
     final byte[] p = token(io.path());
 
     // check if module has already been parsed
@@ -790,7 +790,7 @@ public class QueryParser extends InputParser {
     }
 
     qc.modStack.push(p);
-    final StaticContext sub = new StaticContext(qc.context);
+    final StaticContext sub = new StaticContext(qc);
     final LibraryModule lib = new QueryParser(qu, io.path(), qc, sub).parseLibrary(false);
     final byte[] muri = lib.name.uri();
 
@@ -3465,7 +3465,7 @@ public class QueryParser extends InputParser {
             } else if(wsConsumeWs(AT)) {
               final String fn = string(stringLiteral());
               // optional: resolve URI reference
-              final IO fl = qc.stop != null ? qc.stop.get(fn) : sc.io(fn);
+              final IO fl = qc.stop != null ? qc.stop.get(fn) : sc.resolve(fn, null);
               if(!opt.sw.read(fl, except)) throw error(NOSTOPFILE_X, fl);
             } else if(!union && !except) {
               throw error(FTSTOP);
@@ -3501,7 +3501,7 @@ public class QueryParser extends InputParser {
 
     final String fn = string(stringLiteral());
     // optional: resolve URI reference
-    final IO fl = qc.thes != null ? qc.thes.get(fn) : sc.io(fn);
+    final IO fl = qc.thes != null ? qc.thes.get(fn) : sc.resolve(fn, null);
     final byte[] rel = wsConsumeWs(RELATIONSHIP) ? stringLiteral() : EMPTY;
     final Expr[] range = ftRange(true);
     long min = 0;

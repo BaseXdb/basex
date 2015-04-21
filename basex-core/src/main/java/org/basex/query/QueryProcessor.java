@@ -13,6 +13,7 @@ import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -45,7 +46,7 @@ public final class QueryProcessor extends Proc implements Closeable {
   public QueryProcessor(final String query, final Context ctx) {
     this.query = query;
     qc = proc(new QueryContext(ctx));
-    sc = new StaticContext(ctx);
+    sc = new StaticContext(qc);
   }
 
   /**
@@ -197,6 +198,16 @@ public final class QueryProcessor extends Proc implements Closeable {
    */
   public QueryProcessor namespace(final String prefix, final String uri) throws QueryException {
     sc.namespace(prefix, uri);
+    return this;
+  }
+
+  /**
+   * Assigns a URI resolver.
+   * @param resolver resolver
+   * @return self reference
+   */
+  public QueryProcessor uriResolver(final UriResolver resolver) {
+    sc.resolver = resolver;
     return this;
   }
 

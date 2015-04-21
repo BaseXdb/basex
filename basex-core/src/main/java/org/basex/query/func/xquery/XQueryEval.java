@@ -103,7 +103,7 @@ public class XQueryEval extends StandardFunc {
 
       // evaluate query
       try {
-        final StaticContext sctx = new StaticContext(qctx.context);
+        final StaticContext sctx = new StaticContext(qctx);
         for(final Entry<String, Value> it : bindings.entrySet()) {
           final String key = it.getKey();
           final Value val = it.getValue();

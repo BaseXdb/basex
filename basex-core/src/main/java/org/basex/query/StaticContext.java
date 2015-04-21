@@ -51,14 +51,15 @@ public final class StaticContext {
 
   /** Static Base URI. */
   private Uri baseURI = Uri.EMPTY;
+  /** Sets a module URI resolver. */
+  UriResolver resolver;
 
   /**
    * Constructor setting the XQuery version.
-   * @param ctx database context
+   * @param qc query context
    */
-  public StaticContext(final Context ctx) {
-    final MainOptions opts = ctx.options;
-    mixUpdates = opts.get(MainOptions.MIXUPDATES);
+  public StaticContext(final QueryContext qc) {
+    mixUpdates = qc.context.options.get(MainOptions.MIXUPDATES);
   }
 
   /**
@@ -88,13 +89,14 @@ public final class StaticContext {
   }
 
   /**
-   * Returns an IO reference for the specified filename.
-   * If a base URI exists, it is merged with the specified filename.
-   * Otherwise, a plain reference is returned.
+   * Returns an IO reference for the specified path.
+   * If a base URI exists, it is merged with the path.
    * @param path file path
+   * @param uri module namespace (can be {@code null})
    * @return io reference
    */
-  IO io(final String path) {
+  IO resolve(final String path, final String uri) {
+    if(resolver != null) return resolver.resolve(path, uri, baseURI);
     final IO base = baseIO();
     return base != null ? base.merge(path) : IO.get(path);
   }

@@ -669,7 +669,7 @@ public final class QueryContext extends Proc implements Closeable {
    * @throws QueryException query exception
    */
   private Value cast(final Object val, final String type) throws QueryException {
-    final StaticContext sc = root != null ? root.sc : new StaticContext(context);
+    final StaticContext sc = root != null ? root.sc : new StaticContext(this);
 
     // String input
     Object vl = val;
