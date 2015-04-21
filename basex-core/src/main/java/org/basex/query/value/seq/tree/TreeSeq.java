@@ -57,7 +57,7 @@ public abstract class TreeSeq extends Seq {
       return l == 0 ? other.concat(this) : concat(other);
     }
 
-    final ValueBuilder vb = new ValueBuilder();
+    final TreeSeqBuilder vb = new TreeSeqBuilder();
     if(l < MAX_SMALL) {
       vb.add(val);
       for(long i = l; --i >= 0;) vb.addFront(itemAt(i));
@@ -139,14 +139,14 @@ public abstract class TreeSeq extends Seq {
 
   @Override
   public final Value materialize(final InputInfo ii) throws QueryException {
-    final ValueBuilder vb = new ValueBuilder();
+    final TreeSeqBuilder vb = new TreeSeqBuilder();
     for(final Item it : this) vb.add(it.materialize(ii));
     return vb.value();
   }
 
   @Override
   public final Value atomValue(final InputInfo ii) throws QueryException {
-    final ValueBuilder vb = new ValueBuilder();
+    final TreeSeqBuilder vb = new TreeSeqBuilder();
     for(final Item it : this) vb.add(it.atomValue(ii));
     return vb.value();
   }

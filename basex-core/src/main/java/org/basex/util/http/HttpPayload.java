@@ -22,7 +22,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.map.Map;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
-import org.basex.query.value.seq.tree.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 

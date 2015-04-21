@@ -11,7 +11,6 @@ import org.basex.query.value.array.Array;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
-import org.basex.query.value.seq.tree.*;
 import org.basex.util.*;
 
 /**

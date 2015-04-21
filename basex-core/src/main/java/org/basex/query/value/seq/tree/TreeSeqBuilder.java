@@ -1,5 +1,7 @@
 package org.basex.query.value.seq.tree;
 
+import java.util.*;
+
 import org.basex.query.util.fingertree.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -12,7 +14,7 @@ import org.basex.query.value.type.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
-public final class ValueBuilder {
+public final class TreeSeqBuilder implements Iterable<Item> {
   /** Capacity of the root. */
   private static final int CAP = 2 * TreeSeq.MAX_DIGIT;
   /** Size of inner nodes. */
@@ -47,25 +49,9 @@ public final class ValueBuilder {
       return new SmallSeq(small, type);
     }
 
-    final ValueBuilder vb = new ValueBuilder();
+    final TreeSeqBuilder vb = new TreeSeqBuilder();
     for(int i = 0; i < n; i++) vb.add(items[i]);
     return vb.value(type);
-  }
-
-  /**
-   * Concatenates two values.
-   * @param v1 first value to concatenate
-   * @param v2 second value to concatenate
-   * @return value which contains all items of {@code v1} followed by all items of {@code v2}
-   */
-  public static Value concat(final Value v1, final Value v2) {
-    final long l = v1.size();
-    if(l == 0) return v2;
-    final long r = v2.size();
-    if(r == 0) return v1;
-    if(l > 1) return ((Seq) v1).insertBefore(l, v2);
-    if(r > 1) return ((Seq) v2).insert(0, (Item) v1);
-    return new SmallSeq(new Item[] { (Item) v1, (Item) v2 }, null);
   }
 
   /**
@@ -73,7 +59,7 @@ public final class ValueBuilder {
    * @param elem element to add
    * @return reference to this builder for convenience
    */
-  public ValueBuilder addFront(final Item elem) {
+  public TreeSeqBuilder addFront(final Item elem) {
     if(inLeft < TreeSeq.MAX_DIGIT) {
       // just insert the element
       vals[(mid - inLeft + CAP - 1) % CAP] = elem;
@@ -107,7 +93,7 @@ public final class ValueBuilder {
    * @param elem element to add
    * @return reference to this builder for convenience
    */
-  public ValueBuilder add(final Item elem) {
+  public TreeSeqBuilder add(final Item elem) {
     if(inRight < TreeSeq.MAX_DIGIT) {
       // just insert the element
       vals[(mid + inRight) % CAP] = elem;
@@ -140,7 +126,7 @@ public final class ValueBuilder {
    * @param val value to append
    * @return this builder for convenience
    */
-  public ValueBuilder add(final Value val) {
+  public TreeSeqBuilder add(final Value val) {
     if(!(val instanceof BigSeq)) {
       for(final Item it : val) add(it);
       return this;
@@ -231,19 +217,56 @@ public final class ValueBuilder {
         sb.append(vals[first]);
         for(int i = 1; i < n; i++) sb.append(", ").append(vals[(first + i) % CAP]);
       }
-      return sb.append(']').toString();
-    }
-
-    if(inLeft > 0) {
+    } else {
       final int first = (mid - inLeft + CAP) % CAP;
       sb.append(vals[first]);
       for(int i = 1; i < inLeft; i++) sb.append(", ").append(vals[(first + i) % CAP]);
-      sb.append(", ");
+      for(final Item item : tree) sb.append(", ").append(item);
+      for(int i = 0; i < inRight; i++) sb.append(", ").append(vals[(mid + i) % CAP]);
     }
-
-    tree.toString(sb);
-    for(int i = 0; i < inRight; i++) sb.append(", ").append(vals[(mid + i) % CAP]);
     return sb.append(']').toString();
+  }
+
+  @Override
+  public Iterator<Item> iterator() {
+
+    return new Iterator<Item>() {
+      private int pos = -inLeft;
+      private Iterator<Item> sub;
+
+      @Override
+      public boolean hasNext() {
+        return pos <= inRight;
+      }
+
+      @Override
+      public Item next() {
+        if(pos > inRight) throw new NoSuchElementException();
+
+        if(pos < 0) {
+          final int p = pos++;
+          return vals[(mid + p + CAP) % CAP];
+        }
+
+        if(pos == 0) {
+          if(tree != null) {
+            if(sub == null) sub = tree.iterator();
+            if(sub.hasNext()) return sub.next();
+            sub = null;
+          }
+          pos++;
+        }
+
+        // pos > 0
+        final int p = pos++;
+        return vals[(mid + p - 1) % CAP];
+      }
+
+      @Override
+      public void remove() {
+        throw new UnsupportedOperationException();
+      }
+    };
   }
 
   /**

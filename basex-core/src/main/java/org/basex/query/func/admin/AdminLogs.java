@@ -13,7 +13,6 @@ import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.seq.tree.*;
 import org.basex.server.*;
 import org.basex.server.Log.LogEntry;
 import org.basex.server.Log.LogType;
