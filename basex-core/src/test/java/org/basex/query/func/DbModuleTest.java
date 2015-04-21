@@ -687,6 +687,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
   public void path() {
     query(_DB_PATH.args(_DB_OPEN.args(NAME)), FILE.replaceAll(".*/", ""));
     query(_DB_PATH.args(_DB_OPEN.args(NAME) + "/*"), FILE.replaceAll(".*/", ""));
+    query(_DB_PATH.args("<x/> update ()"), "");
   }
 
   /**
