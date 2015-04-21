@@ -22,7 +22,7 @@ public abstract class AdvancedQueryTest extends SandboxTest {
     try(final QueryProcessor qp = new QueryProcessor(query, context)) {
       final ArrayOutput ao = new ArrayOutput();
       try(final Serializer ser = qp.getSerializer(ao)) {
-        qp.execute().serialize(ser);
+        qp.value().serialize(ser);
       }
       return ao.toString().replaceAll("(\\r|\\n)\\s*", "");
     } catch(final Exception ex) {

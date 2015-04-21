@@ -1,6 +1,7 @@
 package org.basex.gui.view.folder;
 
 import org.basex.data.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.list.*;
 
 /**
@@ -94,7 +95,7 @@ final class FolderIterator {
   private boolean moreCS() {
     final DBNodes current = view.gui.context.current();
     if(current == null || ++cp >= current.size()) return false;
-    par = current.pres[cp];
+    par = current.pre(cp);
     pre = par;
     level = 0;
     ll = 0;

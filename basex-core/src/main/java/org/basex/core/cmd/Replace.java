@@ -6,8 +6,8 @@ import java.io.*;
 
 import org.basex.core.users.*;
 import org.basex.data.*;
-import org.basex.data.atomic.*;
 import org.basex.io.*;
+import org.basex.query.up.atomic.*;
 import org.basex.util.list.*;
 
 /**

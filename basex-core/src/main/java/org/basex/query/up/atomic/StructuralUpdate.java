@@ -1,4 +1,4 @@
-package org.basex.data.atomic;
+package org.basex.query.up.atomic;
 
 /**
  * Base class for structural updates that add to/remove from the table and introduce shifts.

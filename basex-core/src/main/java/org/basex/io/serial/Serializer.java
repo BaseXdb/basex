@@ -17,6 +17,7 @@ import org.basex.io.serial.csv.*;
 import org.basex.io.serial.json.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.ft.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -379,10 +380,10 @@ public abstract class Serializer implements Closeable {
    */
   private void node(final DBNode node) throws IOException {
     final FTPosData ft = node instanceof FTPosNode ? ((FTPosNode) node).ftpos : null;
-    final Data data = node.data;
-    int p = node.pre;
-    int k = data.kind(p);
-    if(k == Data.ATTR) throw SERATTR_X.getIO(node);
+    final Data data = node.data();
+    int pre = node.pre();
+    int kind = data.kind(pre);
+    if(kind == Data.ATTR) throw SERATTR_X.getIO(node);
 
     boolean doc = false;
     final TokenSet nsp = data.nspaces.size() == 0 ? null : new TokenSet();
@@ -390,10 +391,10 @@ public abstract class Serializer implements Closeable {
     final BoolList indt = new BoolList();
 
     // loop through all table entries
-    final int s = p + data.size(p, k);
-    while(p < s && !finished()) {
-      k = data.kind(p);
-      final int r = data.parent(p, k);
+    final int s = pre + data.size(pre, kind);
+    while(pre < s && !finished()) {
+      kind = data.kind(pre);
+      final int r = data.parent(pre, kind);
 
       // close opened elements...
       while(!pars.isEmpty() && pars.peek() >= r) {
@@ -402,31 +403,31 @@ public abstract class Serializer implements Closeable {
         pars.pop();
       }
 
-      if(k == Data.DOC) {
+      if(kind == Data.DOC) {
         if(doc) closeDoc();
-        openDoc(data.text(p++, true));
+        openDoc(data.text(pre++, true));
         doc = true;
-      } else if(k == Data.TEXT) {
-        prepareText(data.text(p, true), ft != null ? ft.get(data, p) : null);
-        p++;
-      } else if(k == Data.COMM) {
-        prepareComment(data.text(p++, true));
+      } else if(kind == Data.TEXT) {
+        prepareText(data.text(pre, true), ft != null ? ft.get(data, pre) : null);
+        pre++;
+      } else if(kind == Data.COMM) {
+        prepareComment(data.text(pre++, true));
       } else {
-        if(k == Data.PI) {
-          preparePi(data.name(p, Data.PI), data.atom(p++));
+        if(kind == Data.PI) {
+          preparePi(data.name(pre, Data.PI), data.atom(pre++));
         } else {
           // add element node
-          final byte[] name = data.name(p, k);
+          final byte[] name = data.name(pre, kind);
           openElement(name);
 
           // add namespace definitions
           if(nsp != null) {
             // add namespaces from database
             nsp.clear();
-            int pp = p;
+            int pp = pre;
 
             // check namespace of current element
-            final byte[] u = data.nspaces.uri(data.uri(p, k));
+            final byte[] u = data.nspaces.uri(data.uri(pre, kind));
             namespace(prefix(name), u == null ? EMPTY : u, false);
 
             do {
@@ -445,10 +446,10 @@ public abstract class Serializer implements Closeable {
 
           // serialize attributes
           indt.push(indent);
-          final int as = p + data.attSize(p, k);
-          while(++p != as) {
-            final byte[] n = data.name(p, Data.ATTR);
-            final byte[] v = data.text(p, false);
+          final int as = pre + data.attSize(pre, kind);
+          while(++pre != as) {
+            final byte[] n = data.name(pre, Data.ATTR);
+            final byte[] v = data.text(pre, false);
             attribute(n, v, false);
             if(eq(n, XML_SPACE) && indent) indent = !eq(v, PRESERVE);
           }

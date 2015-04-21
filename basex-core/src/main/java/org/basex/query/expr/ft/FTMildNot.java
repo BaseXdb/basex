@@ -3,10 +3,10 @@ package org.basex.query.expr.ft;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.util.ft.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -48,13 +48,13 @@ public final class FTMildNot extends FTExpr {
       @Override
       public FTNode next() throws QueryException {
         while(it1 != null && it2 != null) {
-          final int d = it1.pre - it2.pre;
+          final int d = it1.pre() - it2.pre();
           if(d < 0) break;
 
           if(d > 0) {
             it2 = i2.next();
           } else {
-            if(!mildnot(it1, it2).all.isEmpty()) break;
+            if(!mildnot(it1, it2).matches().isEmpty()) break;
             it1 = i1.next();
           }
         }
@@ -72,7 +72,7 @@ public final class FTMildNot extends FTExpr {
    * @return specified item
    */
   private static FTNode mildnot(final FTNode it1, final FTNode it2) {
-    it1.all = mildnot(it1.all, it2.all);
+    it1.matches(mildnot(it1.matches(), it2.matches()));
     return it1;
   }
 

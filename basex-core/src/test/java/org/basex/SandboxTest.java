@@ -137,8 +137,8 @@ public abstract class SandboxTest {
    * @param result input string
    * @return normalized string
    */
-  public static String normNL(final Object result) {
-    return result.toString().replaceAll("(\r?\n|\r) *", "\n");
+  public static String normNL(final String result) {
+    return result.replaceAll("(\r?\n|\r) *", "\n");
   }
 
   /** Client. */

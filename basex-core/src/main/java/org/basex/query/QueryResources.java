@@ -69,9 +69,9 @@ public final class QueryResources {
    */
   Value compile(final DBNodes nodes) {
     // assign initial context value
-    final Data data = nodes.data;
-    final boolean all = nodes.all;
-    final Value value = DBNodeSeq.get(new IntList(nodes.pres), data, all, all);
+    final Data data = nodes.data();
+    final boolean all = nodes.all();
+    final Value value = DBNodeSeq.get(new IntList(nodes.pres()), data, all, all);
 
     // create default collection: use initial node set if it contains all
     // documents of the database. otherwise, create new node set

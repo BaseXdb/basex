@@ -8,11 +8,11 @@ import java.io.*;
 
 import org.basex.build.json.*;
 import org.basex.build.json.JsonOptions.JsonFormat;
-import org.basex.data.*;
 import org.basex.io.out.*;
 import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
+import org.basex.query.util.ft.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;

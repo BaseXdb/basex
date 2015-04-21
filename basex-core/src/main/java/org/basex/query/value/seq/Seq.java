@@ -179,12 +179,6 @@ public abstract class Seq extends Value {
     throw SEQFOUND_X.get(ii, this);
   }
 
-  /**
-   * Returns a sequence in reverse order.
-   * @return sequence
-   */
-  public abstract Value reverse();
-
   @Override
   public void plan(final FElem plan) {
     final FElem el = planElem(SIZE, size);

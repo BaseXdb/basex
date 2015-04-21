@@ -1,11 +1,7 @@
 package org.basex.query.util.list;
 
-import java.io.*;
 import java.util.*;
 
-import org.basex.data.*;
-import org.basex.io.out.*;
-import org.basex.io.serial.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -20,7 +16,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
-public final class ItemList extends ElementList implements Iterable<Item>, Result {
+public final class ItemList extends ElementList implements Iterable<Item> {
   /** Element container. */
   private Item[] list;
 
@@ -144,11 +140,6 @@ public final class ItemList extends ElementList implements Iterable<Item>, Resul
     return this;
   }
 
-  @Override
-  public Iterator<Item> iterator() {
-    return new ArrayIterator<>(list, size);
-  }
-
   /**
    * Returns an iterator over the items in this list.
    * The list should not be changed after an iterator was created.
@@ -189,29 +180,7 @@ public final class ItemList extends ElementList implements Iterable<Item>, Resul
   }
 
   @Override
-  public String serialize() throws IOException {
-    final ArrayOutput ao = new ArrayOutput();
-    final Serializer ser = Serializer.get(ao);
-    for(int i = 0; i < size; i++) ser.serialize(list[i]);
-    return ao.toString();
-  }
-
-  @Override
-  public void serialize(final Serializer ser) throws IOException {
-    for(int c = 0; c < size && !ser.finished(); ++c) serialize(ser, c);
-  }
-
-  @Override
-  public void serialize(final Serializer ser, final int index) throws IOException {
-    ser.serialize(list[index]);
-  }
-
-  @Override
-  public String toString() {
-    try {
-      return serialize();
-    } catch(final IOException ex) {
-      throw Util.notExpected(ex);
-    }
+  public Iterator<Item> iterator() {
+    return new ArrayIterator<>(list, size);
   }
 }

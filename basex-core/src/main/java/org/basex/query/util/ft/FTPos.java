@@ -1,4 +1,4 @@
-package org.basex.data;
+package org.basex.query.util.ft;
 
 import org.basex.util.hash.*;
 import org.basex.util.list.*;

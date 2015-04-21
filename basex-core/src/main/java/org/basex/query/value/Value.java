@@ -191,7 +191,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
    * @throws QueryIOException query I/O exception
    */
   public final ArrayOutput serialize() throws QueryIOException {
-    return serialize(null);
+    return serialize((SerializerOptions) null);
   }
 
   /**
@@ -203,9 +203,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
   public final ArrayOutput serialize(final SerializerOptions options) throws QueryIOException {
     final ArrayOutput ao = new ArrayOutput();
     try {
-      try(final Serializer ser = Serializer.get(ao, options)) {
-        for(final Item it : this) ser.serialize(it);
-      }
+      serialize(Serializer.get(ao, options));
     } catch(final QueryIOException ex) {
       throw ex;
     } catch(final IOException ex) {
@@ -215,7 +213,20 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   /**
+   * Serializes the value with the specified serializer.
+   * @param ser serializer
+   * @throws IOException I/O exception
+   */
+  public final void serialize(final Serializer ser) throws IOException {
+    for(final Item it : this) {
+      if(ser.finished()) break;
+      ser.serialize(it);
+    }
+  }
+
+  /**
    * Gets the item at the given position in the value.
+   * The specified value must be lie within the valid bounds.
    * @param pos position
    * @return item
    */
@@ -226,6 +237,12 @@ public abstract class Value extends Expr implements Iterable<Item> {
    * @return result of check
    */
   public abstract boolean homogeneous();
+
+  /**
+   * Returns a sequence in reverse order.
+   * @return sequence
+   */
+  public abstract Value reverse();
 
   @Override
   public boolean accept(final ASTVisitor visitor) {

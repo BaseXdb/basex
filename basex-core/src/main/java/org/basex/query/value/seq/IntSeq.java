@@ -62,37 +62,6 @@ public final class IntSeq extends NativeSeq {
     }
   }
 
-  @Override
-  public Value reverse() {
-    final int s = values.length;
-    final long[] tmp = new long[s];
-    for(int l = 0, r = s - 1; l < s; l++, r--) tmp[l] = values[r];
-    return get(tmp, type);
-  }
-
-  @Override
-  public Seq insert(final long pos, final Item item) {
-    if(!(item instanceof Int) || item.type != type) return copyInsert(pos, item);
-
-    final Int val = (Int) item;
-    final int p = (int) pos, n = values.length;
-    final long[] out = new long[n + 1];
-    System.arraycopy(values, 0, out, 0, p);
-    out[p] = val.itr();
-    System.arraycopy(values, p, out, p + 1, n - p);
-    return new IntSeq(out, type);
-  }
-
-  @Override
-  public Value remove(final long pos) {
-    final int p = (int) pos, n = values.length - 1;
-    if(n == 1) return itemAt(1 - pos);
-    final long[] out = new long[n];
-    System.arraycopy(values, 0, out, 0, p);
-    System.arraycopy(values, p + 1, out, p, n - p);
-    return new IntSeq(out, type);
-  }
-
   // STATIC METHODS =====================================================================
 
   /**

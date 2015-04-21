@@ -1,8 +1,8 @@
 package org.basex.examples.module;
 
 import org.basex.core.*;
-import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.value.*;
 
 /**
  * This example demonstrates how Java classes can be imported as XQuery modules.
@@ -42,7 +42,7 @@ public final class FruitsExample {
     // Create a query processor
     try(QueryProcessor processor = new QueryProcessor(query, context)) {
       // Execute the query
-      Result result = processor.execute();
+      Value result = processor.value();
 
       System.out.println("\n* Result:");
 

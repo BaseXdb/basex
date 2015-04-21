@@ -4,7 +4,6 @@ import static org.junit.Assert.*;
 
 import java.io.*;
 
-import org.basex.data.atomic.*;
 import org.junit.*;
 
 /**

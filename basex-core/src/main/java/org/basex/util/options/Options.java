@@ -502,7 +502,7 @@ public class Options implements Iterable<Option<?>> {
 
   @Override
   public final synchronized String toString() {
-    // only those options are listed the value of which differs from default value
+    // only those options are listed whose value differs from default value
     final StringBuilder sb = new StringBuilder();
     for(final Entry<String, Object> e : values.entrySet()) {
       final String name = e.getKey();

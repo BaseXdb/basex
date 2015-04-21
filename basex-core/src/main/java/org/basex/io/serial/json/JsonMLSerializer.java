@@ -5,9 +5,9 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
-import org.basex.data.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
+import org.basex.query.util.ft.*;
 import org.basex.query.value.item.*;
 
 /**

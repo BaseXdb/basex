@@ -30,9 +30,9 @@ import org.basex.util.list.*;
  */
 public class DBNode extends ANode {
   /** Data reference. */
-  public final Data data;
+  private final Data data;
   /** Pre value. */
-  public int pre;
+  private int pre;
   /** Namespaces. */
   private Atts nsp;
 
@@ -111,6 +111,22 @@ public class DBNode extends ANode {
   @Override
   public final Data data() {
     return data;
+  }
+
+  /**
+   * Assigns a pre value.
+   * @param p pre value
+   */
+  public final void pre(final int p) {
+    pre = p;
+  }
+
+  /**
+   * Returns the pre value.
+   * @return pre value
+   */
+  public final int pre() {
+    return pre;
   }
 
   @Override

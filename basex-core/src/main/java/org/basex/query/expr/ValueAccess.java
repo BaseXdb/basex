@@ -84,9 +84,9 @@ public final class ValueAccess extends IndexAccess {
       public ANode next() {
         while(ii.more()) {
           if(test == null) {
-            tmp.pre = ii.pre();
+            tmp.pre(ii.pre());
           } else {
-            tmp.pre = data.parent(ii.pre(), kind);
+            tmp.pre(data.parent(ii.pre(), kind));
             if(!test.eq(tmp)) continue;
           }
           return tmp.finish();
@@ -143,7 +143,7 @@ public final class ValueAccess extends IndexAccess {
       public DBNode next() {
         while(++pre < sz) {
           if(data.kind(pre) == Data.ELEM && data.size(pre, Data.ELEM) == 1) {
-            tmp.pre = pre;
+            tmp.pre(pre);
             if(test == null || test.eq(tmp)) return tmp.finish();
           }
         }

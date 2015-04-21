@@ -3,9 +3,9 @@ package org.basex.query.up;
 import java.util.*;
 
 import org.basex.data.*;
-import org.basex.data.atomic.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.up.atomic.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.up.primitives.node.*;
 import org.basex.query.value.node.*;
@@ -103,7 +103,7 @@ public final class Updates {
     MemData data = fragmentIDs.get(ancID);
     // if data doesn't exist, create a new one
     if(data == null) {
-      data = (MemData) anc.dbCopy(qc.context.options).data;
+      data = (MemData) anc.dbCopy(qc.context.options).data();
       // create a mapping between the fragment id and the data reference
       fragmentIDs.put(ancID, data);
     }

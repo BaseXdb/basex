@@ -1,6 +1,7 @@
 package org.basex.query.value.node;
 
 import org.basex.data.*;
+import org.basex.query.util.ft.*;
 import org.basex.query.value.type.*;
 import org.basex.util.ft.*;
 
@@ -16,47 +17,63 @@ public final class FTNode extends DBNode {
   /** Total number of indexed results. */
   private final int is;
   /** Full-text matches. */
-  public FTMatches all;
+  private FTMatches matches;
 
   /**
    * Constructor, called by the sequential variant.
-   * @param all matches
+   * @param matches matches
    * @param score scoring
    */
-  public FTNode(final FTMatches all, final double score) {
-    this(all, null, 0, 0, 0, score);
+  public FTNode(final FTMatches matches, final double score) {
+    this(matches, null, 0, 0, 0, score);
   }
 
   /**
    * Constructor, called by the index variant.
-   * @param all full-text matches
+   * @param matches full-text matches
    * @param d data reference
    * @param p pre value
    * @param tl token length
    * @param is number of indexed results
    * @param score score value out of the index
    */
-  public FTNode(final FTMatches all, final Data d, final int p, final int tl, final int is,
+  public FTNode(final FTMatches matches, final Data d, final int p, final int tl, final int is,
       final double score) {
 
     super(d, p, null, NodeType.TXT);
-    this.all = all;
+    this.matches = matches;
     this.tl = tl;
     this.is = is;
     if(score != -1) this.score = score;
   }
 
+  /**
+   * Assigns full-text matches.
+   * @param match full-text matches
+   */
+  public void matches(final FTMatches match) {
+    matches = match;
+  }
+
+  /**
+   * Returns full-text matches.
+   * @return full-text matches
+   */
+  public FTMatches matches() {
+    return matches;
+  }
+
   @Override
   public double score() {
     if(score == null) {
-      if(all == null) return 0;
-      score = Scoring.textNode(all.size(), is, tl, data.textLen(pre, true));
+      if(matches == null) return 0;
+      score = Scoring.textNode(matches.size(), is, tl, data().textLen(pre(), true));
     }
     return score;
   }
 
   @Override
   public String toString() {
-    return super.toString() + (all != null ? " (" + all.size() + ')' : "");
+    return super.toString() + (matches != null ? " (" + matches.size() + ')' : "");
   }
 }

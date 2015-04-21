@@ -73,7 +73,7 @@ public final class FTWeight extends FTExpr {
     if(item == null) return null;
     final double d = toDouble(weight, qc);
     if(Math.abs(d) > 1000) throw FTWEIGHT_X.get(info, d);
-    if(d == 0) item.all.size(0);
+    if(d == 0) item.matches().reset();
     item.score(item.score() * d);
     return item;
   }

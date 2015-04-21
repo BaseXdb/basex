@@ -4,7 +4,6 @@ import org.basex.query.util.fingertree.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.query.value.seq.Empty;
 import org.basex.query.value.type.*;
 
 /**
@@ -213,10 +212,8 @@ public final class ValueBuilder {
     final int start = (mid - inLeft + CAP) % CAP;
     if(n == 1) return vals[start];
 
-    if(n <= TreeSeq.MAX_SMALL) {
-      // small int array, fill directly
-      return new SmallSeq(items(start, n), ret);
-    }
+    // small int array, fill directly
+    if(n <= TreeSeq.MAX_SMALL) return new SmallSeq(items(start, n), ret);
 
     // deep array
     final int ll = tree.isEmpty() ? n / 2 : inLeft;

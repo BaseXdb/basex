@@ -183,7 +183,7 @@ public abstract class Array extends FItem {
    * Running time: <i>O(n)</i>
    * @return reversed version of this array
    */
-  public abstract Array reverse();
+  public abstract Array reverseArray();
 
   @Override
   public final boolean isEmpty() {

@@ -43,35 +43,6 @@ public final class DecSeq extends NativeSeq {
     return values;
   }
 
-  @Override
-  public Seq insert(final long pos, final Item item) {
-    if(!(item instanceof Dec)) return copyInsert(pos, item);
-    final int p = (int) pos, n = values.length;
-    final BigDecimal[] out = new BigDecimal[n + 1];
-    System.arraycopy(values, 0, out, 0, p);
-    out[p] = ((Dec) item).dec(null);
-    System.arraycopy(values, p, out, p + 1, n - p);
-    return new DecSeq(out);
-  }
-
-  @Override
-  public Value remove(final long pos) {
-    final int p = (int) pos, n = values.length - 1;
-    if(n == 1) return itemAt(1 - pos);
-    final BigDecimal[] out = new BigDecimal[n];
-    System.arraycopy(values, 0, out, 0, p);
-    System.arraycopy(values, p + 1, out, p, n - p);
-    return new DecSeq(out);
-  }
-
-  @Override
-  public Value reverse() {
-    final int s = values.length;
-    final BigDecimal[] tmp = new BigDecimal[s];
-    for(int l = 0, r = s - 1; l < s; l++, r--) tmp[l] = values[r];
-    return get(tmp);
-  }
-
   // STATIC METHODS =====================================================================
 
   /**

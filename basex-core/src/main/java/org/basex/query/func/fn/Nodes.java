@@ -37,17 +37,18 @@ abstract class Nodes extends StandardFunc {
       // nodes are sorted, so ancestors always come before their descendants
       // the first/last node is thus always included in the output
       final DBNode fst = (DBNode) nc.get(outer ? 0 : len - 1);
-      final Data data = fst.data;
+      final Data data = fst.data();
       final ANode[] nodes = nc.nodes.clone();
 
       if(outer) {
         // skip the subtree of the last added node
         nc.size(0);
-        final DBNode dummy = new DBNode(fst.data);
+        final DBNode dummy = new DBNode(fst.data());
         final NodeSeqBuilder src = new NodeSeqBuilder(nodes, len);
         for(int next = 0, p; next < len; next = p < 0 ? -p - 1 : p) {
           final DBNode nd = (DBNode) nodes[next];
-          dummy.pre = nd.pre + data.size(nd.pre, data.kind(nd.pre));
+          final int pre = nd.pre();
+          dummy.pre(pre + data.size(pre, data.kind(pre)));
           p = src.binarySearch(dummy, next + 1, len - next - 1);
           nc.add(nd);
         }
@@ -55,12 +56,13 @@ abstract class Nodes extends StandardFunc {
         // skip ancestors of the last added node
         nc.nodes[0] = fst;
         nc.size(1);
-        int before = fst.pre;
+        int before = fst.pre();
         for(int i = len - 1; i-- != 0;) {
           final DBNode nd = (DBNode) nodes[i];
-          if(nd.pre + data.size(nd.pre, data.kind(nd.pre)) <= before) {
+          final int pre = nd.pre();
+          if(pre + data.size(pre, data.kind(pre)) <= before) {
             nc.add(nd);
-            before = nd.pre;
+            before = pre;
           }
         }
         // nodes were added in reverse order, correct that

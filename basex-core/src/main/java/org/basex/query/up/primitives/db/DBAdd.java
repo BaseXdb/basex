@@ -3,7 +3,6 @@ package org.basex.query.up.primitives.db;
 import java.util.*;
 
 import org.basex.data.*;
-import org.basex.data.atomic.*;
 import org.basex.query.*;
 import org.basex.query.up.primitives.*;
 import org.basex.util.*;

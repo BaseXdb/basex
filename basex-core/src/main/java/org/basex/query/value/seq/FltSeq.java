@@ -42,35 +42,6 @@ public final class FltSeq extends NativeSeq {
     return values;
   }
 
-  @Override
-  public Seq insert(final long pos, final Item item) {
-    if(!(item instanceof Flt)) return copyInsert(pos, item);
-    final int p = (int) pos, n = values.length;
-    final float[] out = new float[n + 1];
-    System.arraycopy(values, 0, out, 0, p);
-    out[p] = ((Flt) item).flt();
-    System.arraycopy(values, p, out, p + 1, n - p);
-    return new FltSeq(out);
-  }
-
-  @Override
-  public Value remove(final long pos) {
-    final int p = (int) pos, n = values.length - 1;
-    if(n == 1) return itemAt(1 - pos);
-    final float[] out = new float[n];
-    System.arraycopy(values, 0, out, 0, p);
-    System.arraycopy(values, p + 1, out, p, n - p);
-    return new FltSeq(out);
-  }
-
-  @Override
-  public Value reverse() {
-    final int s = values.length;
-    final float[] tmp = new float[s];
-    for(int l = 0, r = s - 1; l < s; l++, r--) tmp[l] = values[r];
-    return get(tmp);
-  }
-
   // STATIC METHODS =====================================================================
 
   /**

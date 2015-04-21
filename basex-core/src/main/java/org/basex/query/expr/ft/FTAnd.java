@@ -2,11 +2,11 @@ package org.basex.query.expr.ft;
 
 import static org.basex.query.QueryText.*;
 
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.util.ft.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -77,7 +77,7 @@ public final class FTAnd extends FTExpr {
             return null;
           }
 
-          final int d = it[0].pre - it[i].pre;
+          final int d = it[0].pre() - it[i].pre();
           if(negated[i]) {
             if(d >= 0) {
               if(d == 0) it[0] = ir[0].next();
@@ -113,14 +113,14 @@ public final class FTAnd extends FTExpr {
    * @param i2 second item
    */
   private static void and(final FTNode i1, final FTNode i2) {
-    final FTMatches all = new FTMatches((byte) Math.max(i1.all.pos, i2.all.pos));
-    for(final FTMatch s1 : i1.all) {
-      for(final FTMatch s2 : i2.all) {
+    final FTMatches all = new FTMatches((byte) Math.max(i1.matches().pos, i2.matches().pos));
+    for(final FTMatch s1 : i1.matches()) {
+      for(final FTMatch s2 : i2.matches()) {
         all.add(new FTMatch(s1.size() + s2.size()).add(s1).add(s2));
       }
     }
     i1.score(Scoring.avg(i1.score() + i2.score(), 2));
-    i1.all = all;
+    i1.matches(all);
   }
 
   @Override

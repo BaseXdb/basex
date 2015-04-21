@@ -3,7 +3,6 @@ package org.basex.build;
 import java.io.*;
 
 import org.basex.data.*;
-import org.basex.data.atomic.*;
 import org.basex.io.*;
 
 /**

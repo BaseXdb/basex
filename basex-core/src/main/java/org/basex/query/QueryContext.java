@@ -26,6 +26,7 @@ import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.up.*;
 import org.basex.query.util.collation.*;
+import org.basex.query.util.ft.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -300,7 +301,8 @@ public final class QueryContext extends Proc implements Closeable {
       // cache the initial context nodes
       final DBNodes nodes = context.current();
       if(nodes != null) {
-        if(!context.perm(Perm.READ, nodes.data.meta.name)) throw BASX_PERM_X.get(null, Perm.READ);
+        if(!context.perm(Perm.READ, nodes.data().meta.name))
+          throw BASX_PERM_X.get(null, Perm.READ);
         value = resources.compile(nodes);
       }
     }
@@ -528,7 +530,7 @@ public final class QueryContext extends Proc implements Closeable {
   }
 
   /**
-   * Returns the query-specific or global serialization parameters.
+   * Returns query-specific or global serialization parameters.
    * @return serialization parameters
    */
   public SerializerOptions serParams() {
@@ -546,11 +548,29 @@ public final class QueryContext extends Proc implements Closeable {
   }
 
   /**
-   * Sets full-text options.
+   * Assigns full-text options.
    * @param opt full-text options
    */
   public void ftOpt(final FTOpt opt) {
     ftOpt = opt;
+  }
+
+  /**
+   * Creates and returns an XML query plan (expression tree) for this query.
+   * @return query plan
+   */
+  public FElem plan() {
+    // only show root node if functions or variables exist
+    final FElem e = new FElem(QueryText.PLAN);
+    e.add(QueryText.COMPILED, token(compiled));
+    if(root != null) {
+      for(final StaticScope scp : QueryCompiler.usedDecls(root)) scp.plan(e);
+      root.plan(e);
+    } else {
+      funcs.plan(e);
+      vars.plan(e);
+    }
+    return e;
   }
 
   /**
@@ -594,14 +614,15 @@ public final class QueryContext extends Proc implements Closeable {
   // CLASS METHODS ======================================================================
 
   /**
-   * Evaluates the expression with the specified context set.
+   * This function is called by the GUI; use {@link #iter()} instead.
+   * Caches and returns the result of the specified query. If all nodes are of the same database
+   * instance, the returned value will be of type {@link DBNodes}.
+   * @param max maximum number of results to cache (negative: return all values)
    * @return resulting value
    * @throws QueryException query exception
    */
-  Result execute() throws QueryException {
-    // limit number of hits to be returned and displayed
-    int max = context.options.get(MainOptions.MAXHITS);
-    if(max < 0) max = Integer.MAX_VALUE;
+  Value cache(final int max) throws QueryException {
+    final int mx = max >= 0 ? max : Integer.MAX_VALUE;
 
     // evaluates the query
     final Iter ir = iter();
@@ -612,50 +633,29 @@ public final class QueryContext extends Proc implements Closeable {
     final Data data = resources.globalData();
     if(serialOpts == null && data != null) {
       final IntList pres = new IntList();
-      while((it = ir.next()) != null) {
+      while((it = ir.next()) != null && it.data() == data && pres.size() < mx) {
         checkStop();
-        if(it.data() != data) break;
-        if(pres.size() < max) pres.add(((DBNode) it).pre);
+        pres.add(((DBNode) it).pre());
       }
 
+      // all results processed: return compact node sequence
       final int ps = pres.size();
-      if(it == null || ps == max) {
-        // all nodes have been processed: return compact node sequence
-        return ps == 0 ? new ItemList(0) : new DBNodes(data, ftPosData, pres.finish());
-      }
+      if(it == null || ps == mx) return new DBNodes(data, pres.finish()).ftpos(ftPosData);
 
       // otherwise, add nodes to standard iterator
       cache = new ItemList();
-      for(int p = 0; p < ps; ++p) cache.add(new DBNode(data, pres.get(p)));
+      for(int p = 0; p < ps; p++) cache.add(new DBNode(data, pres.get(p)));
       cache.add(it);
     } else {
       cache = new ItemList();
     }
 
     // use standard iterator
-    while((it = ir.next()) != null) {
+    while((it = ir.next()) != null && cache.size() < mx) {
       checkStop();
-      if(cache.size() < max) cache.add(it.materialize(null));
+      cache.add(it.materialize(null));
     }
-    return cache;
-  }
-
-  /**
-   * Recursively builds a query plan.
-   * @return resulting node
-   */
-  public FElem plan() {
-    // only show root node if functions or variables exist
-    final FElem e = new FElem(QueryText.PLAN);
-    e.add(QueryText.COMPILED, token(compiled));
-    if(root != null) {
-      for(final StaticScope scp : QueryCompiler.usedDecls(root)) scp.plan(e);
-      root.plan(e);
-    } else {
-      funcs.plan(e);
-      vars.plan(e);
-    }
-    return e;
+    return cache.value();
   }
 
   // PRIVATE METHODS ====================================================================

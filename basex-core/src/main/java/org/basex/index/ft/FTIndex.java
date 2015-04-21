@@ -14,6 +14,7 @@ import org.basex.index.query.*;
 import org.basex.index.stats.*;
 import org.basex.io.random.*;
 import org.basex.query.expr.ft.*;
+import org.basex.query.util.ft.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.hash.*;

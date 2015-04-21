@@ -1,4 +1,4 @@
-package org.basex.data;
+package org.basex.query.util.ft;
 
 /**
  * Single full-text string match.

@@ -14,6 +14,7 @@ import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.view.*;
+import org.basex.query.value.seq.*;
 
 /**
  * This view offers a folder visualization of the database contents.
@@ -113,7 +114,7 @@ public final class FolderView extends View {
     scroll.pos(0);
 
     final DBNodes curr = gui.context.current();
-    if(more && curr.size() != 0) jumpTo(curr.pres[0], true);
+    if(more && curr.size() != 0) jumpTo(curr.pre(0), true);
     refreshHeight();
     repaint();
   }
@@ -141,7 +142,7 @@ public final class FolderView extends View {
     scroll.pos(0);
 
     final DBNodes marked = gui.context.marked;
-    if(marked.size() != 0) jumpTo(marked.pres[0], true);
+    if(marked.size() != 0) jumpTo(marked.pre(0), true);
     refreshHeight();
     repaint();
   }
@@ -461,11 +462,11 @@ public final class FolderView extends View {
     // calculate new tree position
     gui.context.focused = -1;
     final DBNodes curr = gui.context.current();
-    int pre = curr.pres[0];
+    int pre = curr.pre(0);
     final FolderIterator it = new FolderIterator(this);
     while(it.more() && focus-- != 0) pre = it.pre;
 
-    if(pre == curr.pres[0] && down) ++pre;
+    if(pre == curr.pre(0) && down) ++pre;
     gui.notify.focus(pre, this);
     jumpTo(pre, false);
     repaint();

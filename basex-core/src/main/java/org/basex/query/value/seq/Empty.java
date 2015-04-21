@@ -100,6 +100,11 @@ public final class Empty extends Value {
   }
 
   @Override
+  public Value reverse() {
+    return this;
+  }
+
+  @Override
   public boolean homogeneous() {
     return true;
   }

@@ -42,35 +42,6 @@ public final class BlnSeq extends NativeSeq {
     return values;
   }
 
-  @Override
-  public Seq insert(final long pos, final Item item) {
-    if(!(item instanceof Bln)) return copyInsert(pos, item);
-    final int p = (int) pos, n = values.length;
-    final boolean[] out = new boolean[n + 1];
-    System.arraycopy(values, 0, out, 0, p);
-    out[p] = ((Bln) item).bool(null);
-    System.arraycopy(values, p, out, p + 1, n - p);
-    return new BlnSeq(out);
-  }
-
-  @Override
-  public Value remove(final long pos) {
-    final int p = (int) pos, n = values.length - 1;
-    if(n == 1) return itemAt(1 - pos);
-    final boolean[] out = new boolean[n];
-    System.arraycopy(values, 0, out, 0, p);
-    System.arraycopy(values, p + 1, out, p, n - p);
-    return new BlnSeq(out);
-  }
-
-  @Override
-  public Value reverse() {
-    final int s = values.length;
-    final boolean[] tmp = new boolean[s];
-    for(int l = 0, r = s - 1; l < s; l++, r--) tmp[l] = values[r];
-    return get(tmp);
-  }
-
   // STATIC METHODS =====================================================================
 
   /**

@@ -100,7 +100,7 @@ final class SmallArray extends Array {
   }
 
   @Override
-  public Array reverse() {
+  public Array reverseArray() {
     final int n = elems.length;
     if(n == 1) return this;
     final Value[] es = new Value[n];

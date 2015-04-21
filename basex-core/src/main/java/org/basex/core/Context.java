@@ -5,6 +5,7 @@ import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.io.random.*;
 import org.basex.query.util.pkg.*;
+import org.basex.query.value.seq.*;
 import org.basex.server.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -176,9 +177,7 @@ public final class Context {
   public DBNodes current() {
     if(data == null) return null;
     if(current != null) return current;
-    final DBNodes nodes = new DBNodes(data, data.resources.docs().toArray());
-    nodes.all = true;
-    return nodes;
+    return new DBNodes(data, true, data.resources.docs().toArray());
   }
 
   /**

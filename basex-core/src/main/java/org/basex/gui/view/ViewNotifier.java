@@ -8,6 +8,7 @@ import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -169,10 +170,10 @@ public final class ViewNotifier {
 
     // add new entry if current node set has not been cached yet
     final DBNodes newn = nodes.discardDocs();
-    final DBNodes empty = new DBNodes(ctx.data(), ctx.marked.ftpos());
+    final DBNodes empty = new DBNodes(ctx.data()).ftpos(ctx.marked.ftpos());
     final DBNodes curr = quick ? ctx.current() : null;
     final DBNodes cmp = quick ? curr : ctx.marked;
-    if(cont[hist] == null ? cmp != null : cmp == null || !cont[hist].equals(cmp)) {
+    if(cont[hist] == null ? cmp != null : cmp == null || !cont[hist].sameAs(cmp)) {
       checkHist();
       if(quick) {
         // store history entry

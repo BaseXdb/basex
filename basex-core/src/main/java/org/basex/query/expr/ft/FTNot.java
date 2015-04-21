@@ -2,10 +2,10 @@ package org.basex.query.expr.ft;
 
 import static org.basex.query.QueryText.*;
 
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.util.ft.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -59,7 +59,7 @@ public final class FTNot extends FTExpr {
    */
   private static FTNode not(final FTNode item) {
     if(item != null) {
-      item.all = not(item.all);
+      item.matches(not(item.matches()));
       item.score(Scoring.not(item.score()));
     }
     return item;

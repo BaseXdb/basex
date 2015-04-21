@@ -150,13 +150,12 @@ public final class NodeSeqBuilder extends AxisIter {
    * @return position of the item or {@code -insertPosition - 1} if not found
    */
   public int binarySearch(final DBNode n, final int start, final int length) {
-    if(size == 0 || n.data != nodes[0].data()) return -start - 1;
+    if(size == 0 || n.data() != nodes[0].data()) return -start - 1;
     int l = start, r = start + length - 1;
     while(l <= r) {
-      final int m = l + r >>> 1;
-      final int npre = ((DBNode) nodes[m]).pre;
-      if(npre == n.pre) return m;
-      if(npre < n.pre) l = m + 1;
+      final int m = l + r >>> 1, mpre = ((DBNode) nodes[m]).pre(), npre = n.pre();
+      if(mpre == npre) return m;
+      if(mpre < npre) l = m + 1;
       else r = m - 1;
     }
     return -(l + 1);

@@ -46,13 +46,13 @@ final class InvDocTest extends Test {
     // adopt nodes from existing sequence
     if(rt instanceof DBNodeSeq) {
       final DBNodeSeq seq = (DBNodeSeq) rt;
-      return seq.all ? Test.DOC : new InvDocTest(new IntList(seq.pres), data);
+      return seq.all() ? Test.DOC : new InvDocTest(new IntList(seq.pres()), data);
     }
 
     // loop through all documents and add pre values of documents
     // not more than 2^31 documents supported
     final IntList il = new IntList((int) rt.size());
-    for(final Item it : rt) il.add(((DBNode) it).pre);
+    for(final Item it : rt) il.add(((DBNode) it).pre());
     return new InvDocTest(il, data);
   }
 
@@ -62,7 +62,7 @@ final class InvDocTest extends Test {
     if(!(node instanceof DBNode)) return false;
     // ensure that the pre value is contained in the target documents
     final DBNode db = (DBNode) node;
-    return data == db.data && pres.contains(db.pre);
+    return data == db.data() && pres.contains(db.pre());
   }
 
   @Override

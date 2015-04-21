@@ -4,7 +4,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
-import org.basex.data.*;
+import org.basex.query.util.ft.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.xml.sax.*;

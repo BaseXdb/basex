@@ -5,9 +5,9 @@ import static org.basex.query.QueryError.*;
 
 import java.io.*;
 
-import org.basex.data.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
+import org.basex.query.util.ft.*;
 import org.basex.query.value.item.*;
 
 /**

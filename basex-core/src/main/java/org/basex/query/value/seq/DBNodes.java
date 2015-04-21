@@ -1,34 +1,30 @@
-package org.basex.data;
+package org.basex.query.value.seq;
 
-import java.io.*;
 import java.util.*;
 
-import org.basex.core.*;
-import org.basex.io.out.*;
-import org.basex.io.serial.*;
+import org.basex.core.Context;
+import org.basex.data.*;
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.util.ft.*;
 import org.basex.query.value.node.*;
-import org.basex.util.*;
+import org.basex.query.value.type.*;
 import org.basex.util.list.*;
 
 /**
  * This class stores database nodes in an ascending order.
- * Instances of this class are used in the {@link Context} class to
- * reference the currently used, marked, and copied nodes.
+ * Instances of this class will be returned by the method {@link QueryProcessor#cache(int)} method.
+ * They are used in the GUI and in the {@link Context} class to reference currently opened,
+ * marked, and copied database nodes.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public final class DBNodes implements Result {
-  /** Pre values comprise all documents of the database. */
-  public boolean all;
-  /** Root node. */
-  public final Data data;
-  /** Pre values. */
-  public int[] pres;
-  /** Sorted pre values. */
-  public int[] sorted;
-  /** Full-text position data (for visualization). */
-  private final FTPosData ftpos;
+public final class DBNodes extends DBNodeSeq {
+  /** Full-text position data (can be {@code null}). */
+  private FTPosData ftpos;
+  /** Sorted pre values (can be {@code null}). */
+  private int[] sorted;
 
   /**
    * Constructor, specifying a database and pre values.
@@ -36,39 +32,50 @@ public final class DBNodes implements Result {
    * @param pres pre values
    */
   public DBNodes(final Data data, final int... pres) {
-    this(data, null, pres);
+    this(data, false, pres);
   }
 
   /**
    * Constructor, specifying a database, pre values and full-text positions.
+   * @param all pre values reference all documents of the database
    * @param data data reference
-   * @param ftpos ft position data
    * @param pres pre values
    */
-  public DBNodes(final Data data, final FTPosData ftpos, final int... pres) {
-    this.data = data;
-    this.ftpos = ftpos;
-    this.pres = pres;
-  }
-
-  @Override
-  public int size() {
-    return pres.length;
-  }
-
-  @Override
-  public boolean equals(final Object obj) {
-    if(!(obj instanceof DBNodes)) return false;
-    final DBNodes n = (DBNodes) obj;
-    final int[] ps = pres, ps2 = n.pres;
-    final int pl = ps.length;
-    if(pl != ps2.length || data != n.data) return false;
-    for(int c = 0; c < pl; ++c) if(ps2[c] != ps[c]) return false;
-    return ftpos == null ? n.ftpos == null : ftpos.equals(n.ftpos);
+  public DBNodes(final Data data, final boolean all, final int... pres) {
+    super(pres, data, all ? NodeType.DOC : NodeType.NOD, all);
   }
 
   /**
-   * Returns {@code null} if the pre values comprise all documents of the database.
+   * Assigns full-text position data.
+   * @param ft full-text positions
+   * @return self reference
+   */
+  public DBNodes ftpos(final FTPosData ft) {
+    ftpos = ft;
+    return this;
+  }
+
+  /**
+   * Returns full-text position data.
+   * @return position data
+   */
+  public FTPosData ftpos() {
+    return ftpos;
+  }
+
+  @Override
+  public boolean sameAs(final Expr cmp) {
+    if(!(cmp instanceof DBNodes)) return false;
+    final DBNodes n = (DBNodes) cmp;
+    final int[] ps = pres, ps2 = n.pres;
+    final int pl = ps.length;
+    if(pl != ps2.length || data != n.data) return false;
+    for(int p = 0; p < pl; ++p) if(ps2[p] != ps[p]) return false;
+    return ftpos == null ? n.ftpos == null : ftpos.sameAs(n.ftpos);
+  }
+
+  /**
+   * Returns {@code null} if the pre values reference all documents of the database.
    * @return self reference or {@code null}
    */
   public DBNodes discardDocs() {
@@ -97,7 +104,7 @@ public final class DBNodes implements Result {
    * Returns the position of the specified node or the negative value - 1 of
    * the position where it should have been found.
    * @param pre pre value
-   * @return true if the node was found
+   * @return position, or {@code -1}
    */
   public int find(final int pre) {
     sort();
@@ -110,7 +117,8 @@ public final class DBNodes implements Result {
    */
   public void toggle(final int pre) {
     final int[] n = { pre };
-    set(contains(pre) ? except(pres, n) : union(pres, n));
+    pres = contains(pre) ? except(pres, n) : union(pres, n);
+    sorted = null;
   }
 
   /**
@@ -118,15 +126,8 @@ public final class DBNodes implements Result {
    * @param pre pre value
    */
   public void union(final int[] pre) {
-    set(union(pres, pre));
-  }
-
-  /**
-   * Returns full-text position data.
-   * @return position data
-   */
-  public FTPosData ftpos() {
-    return ftpos;
+    pres = union(pres, pre);
+    sorted = null;
   }
 
   /**
@@ -172,56 +173,35 @@ public final class DBNodes implements Result {
   }
 
   /**
-   * Sets the specified nodes.
-   * @param nodes values
-   */
-  private void set(final int[] nodes) {
-    pres = nodes;
-    sorted = null;
-  }
-
-  /**
    * Creates a sorted node array. If the original array is already sorted,
    * the same reference is used.
    */
   private void sort() {
     if(sorted != null) return;
-    int i = Integer.MIN_VALUE;
-    for(final int n : pres) {
-      if(i > n) {
+    int min = Integer.MIN_VALUE;
+    for(final int pre : pres) {
+      if(pre < min) {
         sorted = Arrays.copyOf(pres, pres.length);
         Arrays.sort(sorted);
         return;
       }
-      i = n;
+      min = pre;
     }
     sorted = pres;
   }
 
-  @Override
-  public void serialize(final Serializer ser) throws IOException {
-    final int pl = pres.length;
-    for(int pre = 0; pre < pl && !ser.finished(); pre++) serialize(ser, pre);
+  /**
+   * Returns a sorted pre value.
+   * @param index index of pre value
+   * @return pre value
+   */
+  public int sorted(final int index) {
+    return sorted[index];
   }
 
   @Override
-  public void serialize(final Serializer ser, final int pre) throws IOException {
-    ser.serialize(new FTPosNode(data, pres[pre], ftpos));
-  }
-
-  @Override
-  public String serialize() throws IOException {
-    final ArrayOutput ao = new ArrayOutput();
-    serialize(Serializer.get(ao));
-    return ao.toString();
-  }
-
-  @Override
-  public String toString() {
-    try {
-      return serialize();
-    } catch(final IOException ex) {
-      throw Util.notExpected(ex);
-    }
+  public DBNode itemAt(final long pos) {
+    final int pre = pres[(int) pos];
+    return ftpos == null ? new DBNode(data, pre) : new FTPosNode(data, pre, ftpos);
   }
 }

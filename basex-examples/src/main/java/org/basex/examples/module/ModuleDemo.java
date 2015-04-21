@@ -81,7 +81,7 @@ public class ModuleDemo extends QueryModule {
     for(final Item item : value) {
       if(item instanceof DBNode) {
         final DBNode node = (DBNode) item;
-        int id = node.data.id(node.pre);
+        int id = node.data().id(node.pre());
         vb.add(Int.get(id));
       }
     }

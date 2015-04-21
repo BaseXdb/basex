@@ -157,6 +157,6 @@ public final class CreateTest extends SandboxTest {
    * @return first document name
    */
   private static String docName() {
-    return Token.string(context.data().text(context.current().pres[0], true));
+    return Token.string(context.data().text(context.current().pre(0), true));
   }
 }

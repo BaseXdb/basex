@@ -9,7 +9,6 @@ import java.util.*;
 import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.data.*;
-import org.basex.data.atomic.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.util.*;
@@ -92,7 +91,7 @@ public final class DBNew {
     // add document node
     final Context ctx = qc.context;
     if(ni.node != null) {
-      final MemData mdata = (MemData) ni.node.dbCopy(options).data;
+      final MemData mdata = (MemData) ni.node.dbCopy(options).data();
       mdata.update(0, Data.DOC, ni.path);
       return new DataClip(mdata);
     }

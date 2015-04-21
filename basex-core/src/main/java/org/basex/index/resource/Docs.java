@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 import java.io.*;
 
 import org.basex.data.*;
-import org.basex.data.atomic.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.util.*;

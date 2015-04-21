@@ -10,13 +10,13 @@ import org.basex.core.*;
 import org.basex.core.locks.*;
 import org.basex.core.parse.*;
 import org.basex.core.users.*;
-import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.io.serial.dot.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -37,7 +37,7 @@ public abstract class AQuery extends Command {
   private QueryInfo info;
 
   /** Query result. */
-  private Result result;
+  private Value result;
 
   /**
    * Protected constructor.
@@ -57,8 +57,8 @@ public abstract class AQuery extends Command {
   final boolean query(final String query) {
     final Performance p = new Performance();
     String error;
-    if(cause != null) {
-      error = Util.message(cause);
+    if(exception != null) {
+      error = Util.message(exception);
     } else {
       try {
         long hits = 0;
@@ -79,8 +79,8 @@ public abstract class AQuery extends Command {
 
           final PrintOutput po = r == 0 && serial ? out : new NullOutput();
           try(final Serializer ser = qp.getSerializer(po)) {
-            if(options.get(MainOptions.CACHEQUERY)) {
-              result = qp.execute();
+            if(maxResults >= 0) {
+              result = qp.cache(maxResults);
               info.evaluating += p.time();
               result.serialize(ser);
               hits = result.size();
@@ -108,7 +108,7 @@ public abstract class AQuery extends Command {
         return info(info.toString(qp, out.size(), hits, options.get(MainOptions.QUERYINFO)));
 
       } catch(final QueryException | IOException ex) {
-        cause = ex;
+        exception = ex;
         error = Util.message(ex);
       } catch(final ProcException ex) {
         error = INTERRUPTED;
@@ -157,29 +157,10 @@ public abstract class AQuery extends Command {
       return qp.updating;
     } catch(final QueryException ex) {
       Util.debug(ex);
-      cause = ex;
+      exception = ex;
       qp.close();
       return false;
     }
-  }
-
-  /**
-   * Evaluates the query and returns the result as {@link DBNodes} instance.
-   * @return result or {@code null} if result cannot be represented as {@link DBNodes} instance.
-   */
-  final DBNodes dbNodes() {
-    try {
-      final Result res = qp(args[0], context).execute();
-      if(res instanceof DBNodes) return (DBNodes) res;
-      // return empty result set
-      if(res.size() == 0) return new DBNodes(context.data());
-    } catch(final QueryException ex) {
-      error(Util.message(ex));
-    } finally {
-      qp.close();
-      qp = null;
-    }
-    return null;
   }
 
   /**
@@ -188,12 +169,22 @@ public abstract class AQuery extends Command {
    * @param ctx database context
    * @return query processor
    */
-  private QueryProcessor qp(final String query, final Context ctx) {
+  protected QueryProcessor qp(final String query, final Context ctx) {
     if(qp == null) {
       qp = proc(new QueryProcessor(query, ctx));
       if(info == null) info = qp.qc.info;
     }
     return qp;
+  }
+
+  /**
+   * Closes the query processor.
+   */
+  protected void closeQp() {
+    if(qp != null) {
+      qp.close();
+      qp = null;
+    }
   }
 
   /**
@@ -322,8 +313,8 @@ public abstract class AQuery extends Command {
   }
 
   @Override
-  public final Result finish() {
-    final Result r = result;
+  public final Value finish() {
+    final Value r = result;
     result = null;
     return r;
   }

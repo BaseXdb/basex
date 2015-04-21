@@ -16,6 +16,7 @@ import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.view.*;
 import org.basex.index.stats.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.list.*;
 
 /**
@@ -385,7 +386,8 @@ public final class PlotView extends View {
 
     final DBNodes marked = gui.context.marked;
     if(marked.size() == 0) return;
-    final int[] m = Arrays.copyOf(marked.pres, marked.pres.length);
+    final int[] pres = marked.pres();
+    final int[] m = Arrays.copyOf(pres, pres.length);
     int i = 0;
 
     // no child nodes of the marked context nodes are marked

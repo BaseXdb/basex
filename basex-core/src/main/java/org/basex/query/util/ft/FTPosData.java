@@ -1,7 +1,8 @@
-package org.basex.data;
+package org.basex.query.util.ft;
 
 import java.util.*;
 
+import org.basex.data.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
@@ -78,10 +79,12 @@ public final class FTPosData {
     return c;
   }
 
-  @Override
-  public boolean equals(final Object obj) {
-    if(!(obj instanceof FTPosData)) return false;
-    final FTPosData ft = (FTPosData) obj;
+  /**
+   * Compares full-text position data.
+   * @param ft data to be compared
+   * @return result of check
+   */
+  public boolean sameAs(final FTPosData ft) {
     if(size != ft.size) return false;
     for(int i = 0; i < size; ++i) {
       if(pos[i].pre != ft.pos[i].pre || !Arrays.equals(

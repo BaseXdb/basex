@@ -5,7 +5,7 @@ import static org.basex.util.Token.*;
 import java.util.*;
 
 import org.basex.core.*;
-import org.basex.data.*;
+import org.basex.query.util.ft.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
@@ -45,7 +45,7 @@ final class DataFTBuilder {
 
     // not all nodes have full-text positions
     final DBNode dbnode = (DBNode) node;
-    final FTPos ftp = pos.get(dbnode.data, dbnode.pre);
+    final FTPos ftp = pos.get(dbnode.data(), dbnode.pre());
     if(ftp == null) return null;
 
     final ArrayList<DataFTMarker> marks = new ArrayList<>();

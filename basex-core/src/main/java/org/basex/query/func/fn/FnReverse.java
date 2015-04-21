@@ -45,8 +45,7 @@ public final class FnReverse extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value v = exprs[0].value(qc);
-    return v.size() > 1 ? ((Seq) v).reverse() : v;
+    return exprs[0].value(qc).reverse();
   }
 
   @Override

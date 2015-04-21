@@ -1,4 +1,4 @@
-package org.basex.data.atomic;
+package org.basex.query.up.atomic;
 
 import org.basex.data.*;
 import org.basex.util.*;

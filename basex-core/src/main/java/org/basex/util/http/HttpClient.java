@@ -249,8 +249,8 @@ public final class HttpClient {
    * @param out output stream
    * @throws IOException I/O exception
    */
-  private static void writePayload(final ItemList payload,
-      final HashMap<String, String> atts, final OutputStream out) throws IOException {
+  private static void writePayload(final ItemList payload, final HashMap<String, String> atts,
+      final OutputStream out) throws IOException {
 
     // detect method (specified by @method or derived from @media-type)
     String method = atts.get(SerializerOptions.METHOD.name());

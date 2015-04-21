@@ -15,6 +15,7 @@ import org.basex.io.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -240,7 +241,7 @@ public enum GUIMenuCmd implements GUICommand {
   C_COPYPATH(COPY_PATH, "% shift C", true, false) {
     @Override
     public void execute(final GUI gui) {
-      final int pre = gui.context.marked.pres[0];
+      final int pre = gui.context.marked.pre(0);
       BaseXLayout.copy(Token.string(ViewData.path(gui.context.data(), pre)));
     }
 
@@ -258,7 +259,7 @@ public enum GUIMenuCmd implements GUICommand {
     public void execute(final GUI gui) {
       final Context ctx = gui.context;
       final DBNodes n = ctx.marked;
-      ctx.copied = new DBNodes(n.data, n.pres);
+      ctx.copied = new DBNodes(n.data(), n.pres());
     }
 
     @Override
@@ -304,7 +305,7 @@ public enum GUIMenuCmd implements GUICommand {
         if(i > 0) sb.append(',');
         sb.append(openPre(n, i));
       }
-      gui.context.marked = new DBNodes(n.data);
+      gui.context.marked = new DBNodes(n.data());
       gui.context.copied = null;
       gui.context.focused = -1;
       gui.execute(new XQuery("delete nodes (" + sb + ')'));
@@ -350,7 +351,7 @@ public enum GUIMenuCmd implements GUICommand {
     @Override
     public void execute(final GUI gui) {
       final DBNodes n = gui.context.marked;
-      final DialogEdit edit = new DialogEdit(gui, n.pres[0]);
+      final DialogEdit edit = new DialogEdit(gui, n.pre(0));
       if(!edit.ok()) return;
 
       String rename = null;
@@ -784,7 +785,7 @@ public enum GUIMenuCmd implements GUICommand {
       // check if all nodes are document nodes
       boolean doc = true;
       final Data data = ctx.data();
-      for(final int pre : ctx.current().pres) doc &= data.kind(pre) == Data.DOC;
+      for(final int pre : ctx.current().pres()) doc &= data.kind(pre) == Data.DOC;
       final DBNodes nodes;
       if(doc) {
         // if yes, jump to database root
@@ -793,7 +794,7 @@ public enum GUIMenuCmd implements GUICommand {
       } else {
         // otherwise, jump to parent nodes
         final IntList pres = new IntList();
-        for(final int pre : ctx.current().pres) {
+        for(final int pre : ctx.current().pres()) {
           final int k = data.kind(pre);
           pres.add(k == Data.DOC ? pre : data.parent(pre, k));
         }
@@ -894,7 +895,7 @@ public enum GUIMenuCmd implements GUICommand {
    */
   private static boolean updatable(final DBNodes n, final int... no) {
     if(n == null || (no.length == 0 ? n.size() < 1 : n.size() != 1)) return false;
-    final int k = n.data.kind(n.pres[0]);
+    final int k = n.data().kind(n.pre(0));
     for(final int i : no) if(k == i) return false;
     return true;
   }
@@ -915,7 +916,7 @@ public enum GUIMenuCmd implements GUICommand {
    * @return function string
    */
   private static String openPre(final DBNodes n, final int i) {
-    return Function._DB_OPEN_PRE.get(null, null, Str.get(n.data.meta.name),
-        Int.get(n.pres[i])).toString();
+    return Function._DB_OPEN_PRE.get(null, null, Str.get(n.data().meta.name),
+        Int.get(n.pre(i))).toString();
   }
 }

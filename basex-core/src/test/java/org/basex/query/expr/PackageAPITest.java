@@ -204,16 +204,16 @@ public final class PackageAPITest extends AdvancedQueryTest {
 
   /**
    * Tests ability to import two modules from the same package.
-   * @throws QueryException query exception
+   * @throws Exception exception
    */
   @Test
-  public void importTwoModulesFromPkg() throws QueryException {
+  public void importTwoModulesFromPkg() throws Exception {
     try(final QueryProcessor qp = new QueryProcessor(
       "import module namespace ns1='ns1';" +
       "import module namespace ns3='ns3';" +
       "(ns1:test2() eq 'pkg2mod1') and (ns3:test() eq 'pkg2mod2')",
       context)) {
-      assertEquals(qp.execute().toString(), "true");
+      assertEquals(qp.value().serialize().toString(), "true");
     }
   }
 
@@ -248,11 +248,10 @@ public final class PackageAPITest extends AdvancedQueryTest {
 
   /**
    * Tests installing of a package containing a jar file.
-   * @throws BaseXException database exception
-   * @throws QueryException query exception
+   * @throws Exception exception
    */
   @Test
-  public void installJar() throws BaseXException, QueryException {
+  public void installJar() throws Exception {
     // install package
     new RepoInstall(REPO + "testJar.xar", null).execute(context);
 
@@ -268,7 +267,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
     // use package
     try(final QueryProcessor qp = new QueryProcessor(
         "import module namespace j='jar'; j:print('test')", context)) {
-      assertEquals(qp.execute().toString(), "test");
+      assertEquals(qp.value().serialize().toString(), "test");
     }
 
     // delete package
@@ -277,19 +276,19 @@ public final class PackageAPITest extends AdvancedQueryTest {
 
   /**
    * Tests usage of installed packages.
-   * @throws QueryException query exception
+   * @throws Exception exception
    */
   @Test
-  public void importPkg() throws QueryException {
+  public void importPkg() throws Exception {
     // try with a package without dependencies
     try(final QueryProcessor qp = new QueryProcessor(
         "import module namespace ns3='ns3'; ns3:test()", context)) {
-      assertEquals(qp.execute().toString(), "pkg2mod2");
+      assertEquals(qp.value().serialize().toString(), "pkg2mod2");
     }
     // try with a package with dependencies
     try(final QueryProcessor qp = new QueryProcessor(
         "import module namespace ns2='ns2'; ns2:test()", context)) {
-      assertEquals(qp.execute().toString(), "pkg2mod2");
+      assertEquals(qp.value().serialize().toString(), "pkg2mod2");
     }
   }
 

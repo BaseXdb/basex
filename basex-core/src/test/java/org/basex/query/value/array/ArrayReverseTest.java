@@ -22,7 +22,7 @@ public final class ArrayReverseTest {
       Array arr = Array.empty();
       for(int i = 0; i < n; i++) arr = arr.insertBefore(rng.nextInt(i + 1), Int.get(i));
       assertEquals(n, arr.arraySize());
-      final Array rev = arr.reverse();
+      final Array rev = arr.reverseArray();
       final ListIterator<Value> af = arr.iterator(0), ab = arr.iterator(n);
       final ListIterator<Value> rf = rev.iterator(0), rb = rev.iterator(n);
       for(int i = 0; i < n; i++) {

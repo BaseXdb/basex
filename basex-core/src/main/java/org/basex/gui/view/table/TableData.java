@@ -164,19 +164,19 @@ final class TableData {
   private void createRows() {
     final Data data = ctx.data();
     rows = new IntList();
-    for(int p : ctx.current().pres) {
-      if(p >= data.meta.size) break;
-      final int s = p + data.size(p, data.kind(p));
+    for(int pre : ctx.current().pres()) {
+      if(pre >= data.meta.size) break;
+      final int s = pre + data.size(pre, data.kind(pre));
       // find first root element name
       do {
-        if(data.kind(p) == Data.ELEM && data.name(p) == root) break;
-      } while(++p < s);
+        if(data.kind(pre) == Data.ELEM && data.name(pre) == root) break;
+      } while(++pre < s);
 
       // parse whole document and collect root element names
-      while(p < s) {
-        final int k = data.kind(p);
-        if(k == Data.ELEM && data.name(p) == root) rows.add(p);
-        p += data.attSize(p, k);
+      while(pre < s) {
+        final int k = data.kind(pre);
+        if(k == Data.ELEM && data.name(pre) == root) rows.add(pre);
+        pre += data.attSize(pre, k);
       }
     }
     sort();

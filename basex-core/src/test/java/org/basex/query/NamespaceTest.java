@@ -747,7 +747,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
         "  $target := $input-context/works[1]/employee[1]" +
         "return insert nodes $source into $target";
     try(final QueryProcessor qp = new QueryProcessor(query, context)) {
-      qp.execute();
+      qp.value();
     } catch(final QueryException ex) {
       assertEquals("XUTY0004", string(ex.qname().local()));
     }

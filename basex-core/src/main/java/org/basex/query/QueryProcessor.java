@@ -9,13 +9,13 @@ import java.util.regex.*;
 import org.basex.core.*;
 import org.basex.core.Context;
 import org.basex.core.locks.*;
-import org.basex.data.*;
 import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 
 /**
  * This class is an entry point for evaluating XQuery strings.
@@ -69,7 +69,8 @@ public final class QueryProcessor extends Proc implements Closeable {
   }
 
   /**
-   * Returns a result iterator.
+   * Returns a memory-efficient result iterator. In most cases, the query will only be fully
+   * evaluated if all items of this iterator are requested.
    * @return result iterator
    * @throws QueryException query exception
    */
@@ -79,7 +80,7 @@ public final class QueryProcessor extends Proc implements Closeable {
   }
 
   /**
-   * Returns a result value.
+   * Evaluates the query and returns the resulting value.
    * @return result value
    * @throws QueryException query exception
    */
@@ -89,13 +90,16 @@ public final class QueryProcessor extends Proc implements Closeable {
   }
 
   /**
-   * Evaluates the specified query and returns the result.
+   * This function is called by the GUI; use {@link #iter()} or {@link #value()} instead.
+   * Caches and returns the result of the specified query. If all nodes are of the same database
+   * instance, the returned value will be of type {@link DBNodes}.
+   * @param max maximum number of results to cache (negative: return all values)
    * @return result of query
    * @throws QueryException query exception
    */
-  public Result execute() throws QueryException {
+  public Value cache(final int max) throws QueryException {
     parse();
-    return qc.execute();
+    return qc.cache(max);
   }
 
   /**

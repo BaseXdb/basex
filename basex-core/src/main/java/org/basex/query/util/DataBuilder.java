@@ -8,6 +8,7 @@ import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.DataFTBuilder.DataFTMarker;
+import org.basex.query.util.ft.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -257,8 +258,10 @@ public final class DataBuilder {
   private static int size(final ANode node, final boolean att) {
     if(node instanceof DBNode) {
       final DBNode dbn = (DBNode) node;
-      final int k = node.kind();
-      return att ? dbn.data.attSize(dbn.pre, k) : dbn.data.size(dbn.pre, k);
+      final Data data = dbn.data();
+      final int kind = node.kind();
+      final int pre = dbn.pre();
+      return att ? data.attSize(pre, kind) : data.size(pre, kind);
     }
 
     int s = 1;

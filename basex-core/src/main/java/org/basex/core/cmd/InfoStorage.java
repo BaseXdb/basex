@@ -12,6 +12,9 @@ import org.basex.core.parse.Commands.Cmd;
 import org.basex.core.parse.Commands.CmdInfo;
 import org.basex.core.users.*;
 import org.basex.data.*;
+import org.basex.query.*;
+import org.basex.query.value.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -38,12 +41,23 @@ public final class InfoStorage extends AQuery {
     final String start = args[0];
     final String end = args[1];
 
-    // evaluate input as number range or xquery
-    final DBNodes nodes = start != null && toInt(start) == Integer.MIN_VALUE ? dbNodes() : null;
+    DBNodes nodes = null;
+    if(start != null && toInt(start) == Integer.MIN_VALUE) {
+      try {
+        // evaluate input as query
+        final Value value = qp(args[0], context).value();
+        if(value instanceof DBNodes) nodes = (DBNodes) value;
+      } catch(final QueryException ex) {
+        error(Util.message(ex));
+      } finally {
+        closeQp();
+      }
+    }
+
     final Data data = context.data();
     if(nodes != null) {
       final Table table = th();
-      for(final int n : nodes.pres) table(table, data, n);
+      for(final int pre : nodes.pres()) table(table, data, pre);
       out.print(table.finish());
     } else {
       int ps = 0;

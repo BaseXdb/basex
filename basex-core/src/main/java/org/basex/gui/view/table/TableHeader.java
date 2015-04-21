@@ -14,6 +14,7 @@ import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.view.table.TableData.TableCol;
+import org.basex.query.value.seq.*;
 
 /**
  * This is the header of the table view.

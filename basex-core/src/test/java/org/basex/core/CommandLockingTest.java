@@ -205,7 +205,6 @@ public final class CommandLockingTest extends SandboxTest {
     // General Functions
     ckDBs(new XQuery(_DB_INFO.args(NAME)), false, NAME_LIST);
     ckDBs(new XQuery(_DB_LIST.args(NAME)), false, NAME_LIST);
-    ckDBs(new XQuery(_DB_INFO.args()), false, null);
     ckDBs(new XQuery(_DB_LIST_DETAILS.args(NAME)), false, NAME_LIST);
     ckDBs(new XQuery(_DB_LIST_DETAILS.args()), false, null);
     ckDBs(new XQuery(_DB_OPEN.args(NAME)), false, NAME_LIST);

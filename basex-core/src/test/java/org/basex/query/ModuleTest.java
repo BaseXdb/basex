@@ -23,7 +23,7 @@ public final class ModuleTest extends SandboxTest {
   public void builtIn() throws Exception {
     final String query = "import module namespace xquery = 'http://basex.org/modules/xquery'; 1";
     try(final QueryProcessor qp = new QueryProcessor(query, context)) {
-      qp.execute();
+      qp.value();
     }
   }
 

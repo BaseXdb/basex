@@ -8,7 +8,6 @@ import java.io.*;
 
 import org.basex.core.*;
 import org.basex.data.*;
-import org.basex.data.atomic.*;
 import org.basex.index.name.*;
 import org.basex.index.path.*;
 import org.basex.io.*;

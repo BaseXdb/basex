@@ -23,7 +23,7 @@ public final class DbNodeId extends StandardFunc {
         final Item it = ir.next();
         if(it == null) return null;
         final DBNode node = toDBNode(it);
-        return Int.get(node.data.id(node.pre));
+        return Int.get(node.data().id(node.pre()));
       }
     };
   }

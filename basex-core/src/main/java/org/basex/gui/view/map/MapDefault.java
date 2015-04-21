@@ -6,6 +6,7 @@ import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.view.*;
+import org.basex.query.util.ft.*;
 
 /**
  * Adds default paint operations to TreeMap.

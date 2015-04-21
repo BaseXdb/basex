@@ -4,7 +4,6 @@ import java.io.*;
 
 import org.basex.core.*;
 import org.basex.data.*;
-import org.basex.data.atomic.*;
 import org.basex.index.*;
 import org.basex.index.query.*;
 import org.basex.io.in.DataInput;

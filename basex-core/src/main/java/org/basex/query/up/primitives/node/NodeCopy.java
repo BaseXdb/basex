@@ -1,7 +1,6 @@
 package org.basex.query.up.primitives.node;
 
 import org.basex.data.*;
-import org.basex.data.atomic.*;
 import org.basex.query.up.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.util.*;

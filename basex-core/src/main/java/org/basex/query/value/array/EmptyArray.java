@@ -78,7 +78,7 @@ final class EmptyArray extends Array {
   }
 
   @Override
-  public Array reverse() {
+  public Array reverseArray() {
     return this;
   }
 

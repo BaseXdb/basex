@@ -1,6 +1,4 @@
-package org.basex.data.atomic;
-
-import org.basex.data.*;
+package org.basex.data;
 
 /**
  * Data container with start and end offset. Used mostly to save memory with insertion

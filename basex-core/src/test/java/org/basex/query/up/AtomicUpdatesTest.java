@@ -7,9 +7,9 @@ import java.io.*;
 
 import org.basex.build.*;
 import org.basex.data.*;
-import org.basex.data.atomic.*;
 import org.basex.io.*;
 import org.basex.query.*;
+import org.basex.query.up.atomic.*;
 import org.basex.util.*;
 import org.junit.*;
 import org.junit.rules.*;

@@ -62,6 +62,11 @@ public abstract class Item extends Value {
   }
 
   @Override
+  public final Item reverse() {
+    return this;
+  }
+
+  @Override
   public final Item ebv(final QueryContext qc, final InputInfo ii) {
     return this;
   }

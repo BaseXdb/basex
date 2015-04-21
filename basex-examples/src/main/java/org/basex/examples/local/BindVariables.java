@@ -1,8 +1,8 @@
 package org.basex.examples.local;
 
 import org.basex.core.*;
-import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.value.*;
 
 /**
  * This example demonstrates how items can be bound to variables with
@@ -44,7 +44,7 @@ public final class BindVariables {
       proc.bind("var2", number, "xs:integer");
 
       // Execute the query
-      Result result = proc.execute();
+      Value result = proc.value();
 
       System.out.println("\n* Result:");
 

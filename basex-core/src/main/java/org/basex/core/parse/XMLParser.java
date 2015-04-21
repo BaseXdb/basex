@@ -57,9 +57,10 @@ final class XMLParser extends CmdParser {
    * Returns a command.
    * @param root command node
    * @return command
+   * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  private Command command(final Item root) throws QueryException {
+  private Command command(final Item root) throws IOException, QueryException {
     final String e = ((ANode) root).qname().toJava().toString();
     if(e.equals(ADD) && check(root, PATH + '?', '<' + INPUT))
       return new Add(value(root, PATH), xml(root));
@@ -208,11 +209,12 @@ final class XMLParser extends CmdParser {
    * Returns an xml value (text node).
    * @param root root node
    * @return query exception
+   * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  private String xml(final Item root) throws QueryException {
+  private String xml(final Item root) throws IOException, QueryException {
     try(final QueryProcessor qp = new QueryProcessor("node()", ctx)) {
-      return qp.context(root).execute().toString().trim();
+      return qp.context(root).value().serialize().toString().trim();
     }
   }
 
@@ -294,7 +296,7 @@ final class XMLParser extends CmdParser {
     final Value mv = ma.value(), ov = oa.value();
     try(final QueryProcessor qp = new QueryProcessor(tb.toString(), ctx).context(root)) {
       qp.bind("A", mv).bind("O", ov);
-      if(!qp.execute().toString().isEmpty()) return true;
+      if(qp.value().size() != 0) return true;
     }
     // build error string
     final TokenBuilder syntax = new TokenBuilder();

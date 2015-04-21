@@ -28,7 +28,7 @@ public abstract class QueryPlanTest extends AdvancedQueryTest {
       // retrieve compiled query plan
       final FDoc plan = qp.plan();
       // compare results
-      if(res != null) assertEquals(res, normNL(qp.execute()));
+      if(res != null) assertEquals(res, normNL(qp.value().serialize().toString()));
 
       for(final String p : pr) {
         if(new QueryProcessor(p, context).context(plan).value() != Bln.TRUE) {
@@ -36,7 +36,7 @@ public abstract class QueryPlanTest extends AdvancedQueryTest {
               "- Plan: " + plan.serialize());
         }
       }
-    } catch(final QueryException | QueryIOException ex) {
+    } catch(final Exception ex) {
       final AssertionError err = new AssertionError(Util.message(ex));
       err.initCause(ex);
       throw err;

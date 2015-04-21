@@ -2,11 +2,11 @@ package org.basex.query.expr.ft;
 
 import static org.basex.query.QueryText.*;
 
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.util.ft.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -71,7 +71,7 @@ public final class FTOr extends FTExpr {
         // find item with smallest pre value
         int p = -1;
         for(int i = 0; i < es; ++i) {
-          if(it[i] != null && (p == -1 || it[p].pre > it[i].pre)) p = i;
+          if(it[i] != null && (p == -1 || it[p].pre() > it[i].pre())) p = i;
         }
         // no items left - leave
         if(p == -1) return null;
@@ -79,7 +79,7 @@ public final class FTOr extends FTExpr {
         // merge all matches
         final FTNode item = it[p];
         for(int i = 0; i < es; ++i) {
-          if(it[i] != null && p != i && item.pre == it[i].pre) {
+          if(it[i] != null && p != i && item.pre() == it[i].pre()) {
             or(item, it[i]);
             it[i] = ir[i].next();
           }
@@ -96,11 +96,12 @@ public final class FTOr extends FTExpr {
    * @param i2 second item
    */
   private static void or(final FTNode i1, final FTNode i2) {
-    final FTMatches all = new FTMatches((byte) Math.max(i1.all.pos, i2.all.pos));
-    for(final FTMatch m : i1.all) all.add(m);
-    for(final FTMatch m : i2.all) all.add(m);
+    final FTMatches all1 = i1.matches(), all2 = i2.matches();
+    final FTMatches all = new FTMatches((byte) Math.max(all1.pos, all2.pos));
+    for(final FTMatch m : all1) all.add(m);
+    for(final FTMatch m : all2) all.add(m);
     i1.score(Scoring.avg(i1.score() + i2.score(), 2));
-    i1.all = all;
+    i1.matches(all);
   }
 
   @Override

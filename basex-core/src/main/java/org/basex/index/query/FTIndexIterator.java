@@ -1,6 +1,6 @@
 package org.basex.index.query;
 
-import org.basex.data.*;
+import org.basex.query.util.ft.*;
 
 /**
  * This interface provides methods for returning index results.

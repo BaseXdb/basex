@@ -220,7 +220,7 @@ final class BigArray extends Array {
   }
 
   @Override
-  public Array reverse() {
+  public Array reverseArray() {
     final int l = left.length, r = right.length;
     final Value[] newLeft = new Value[r], newRight = new Value[l];
     for(int i = 0; i < r; i++) newLeft[i] = right[r - 1 - i];

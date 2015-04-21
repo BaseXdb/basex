@@ -10,7 +10,6 @@ import org.basex.build.xml.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
-import org.basex.data.atomic.*;
 import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.list.*;

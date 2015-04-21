@@ -58,7 +58,7 @@ public final class CollectionPathTest extends SandboxTest {
       "where $x//location contains text 'uzbekistan' " +
       "return $x";
     try(final QueryProcessor qp = new QueryProcessor(find, context)) {
-      assertEquals(1, qp.execute().size());
+      assertEquals(1, qp.value().size());
     }
   }
 
@@ -70,7 +70,7 @@ public final class CollectionPathTest extends SandboxTest {
   public void findDocs() throws Exception {
     final String find = "collection('" + NAME + "/test/zipped') ";
     try(final QueryProcessor qp = new QueryProcessor(find, context)) {
-      assertEquals(4, qp.execute().size());
+      assertEquals(4, qp.value().size());
     }
   }
 
@@ -82,7 +82,7 @@ public final class CollectionPathTest extends SandboxTest {
   public void baseUri() throws Exception {
     final String find = "base-uri(collection('" + NAME + '/' + DIR + "xmark.xml'))";
     try(final QueryProcessor qp = new QueryProcessor(find, context)) {
-      assertEquals(NAME + '/' + FILES[1], qp.execute().toString());
+      assertEquals(NAME + '/' + FILES[1], qp.value().serialize().toString());
     }
   }
 }

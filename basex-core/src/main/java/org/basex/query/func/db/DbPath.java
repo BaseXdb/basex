@@ -20,6 +20,6 @@ public final class DbPath extends DbAccess {
       par = node.parent();
     } while(par != null);
     final DBNode dbn = toDBNode(node);
-    return Str.get(dbn.data.text(dbn.pre, true));
+    return Str.get(dbn.data().text(dbn.pre(), true));
   }
 }
