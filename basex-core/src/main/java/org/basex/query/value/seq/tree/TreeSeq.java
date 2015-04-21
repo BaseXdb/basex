@@ -49,7 +49,8 @@ public abstract class TreeSeq extends Seq {
   @Override
   public final Value insertBefore(final long pos, final Value val) {
     final long n = val.size();
-    if(n < 2) return n == 0 ? this : insert(pos, (Item) val);
+    if(n == 0) return this;
+    if(n == 1) return insert(pos, (Item) val);
 
     final long l = pos, r = size - pos;
     if(val instanceof TreeSeq && (l == 0 || r == 0)) {
@@ -57,22 +58,22 @@ public abstract class TreeSeq extends Seq {
       return l == 0 ? other.concat(this) : concat(other);
     }
 
-    final TreeSeqBuilder vb = new TreeSeqBuilder();
+    final TreeSeqBuilder tsb = new TreeSeqBuilder();
     if(l < MAX_SMALL) {
-      vb.add(val);
-      for(long i = l; --i >= 0;) vb.addFront(itemAt(i));
+      tsb.add(val);
+      for(long i = l; --i >= 0;) tsb.addFront(itemAt(i));
     } else {
-      vb.add(subSeq(0, l));
-      vb.add(val);
+      tsb.add(subSeq(0, l));
+      tsb.add(val);
     }
 
     if(r < MAX_SMALL) {
-      for(long i = size - r; i < size; i++) vb.add(itemAt(i));
+      for(long i = size - r; i < size; i++) tsb.add(itemAt(i));
     } else {
-      vb.add(subSeq(pos, r));
+      tsb.add(subSeq(pos, r));
     }
 
-    return vb.value();
+    return tsb.seq();
   }
 
   /**
@@ -138,17 +139,17 @@ public abstract class TreeSeq extends Seq {
   public abstract ValueIter iter();
 
   @Override
-  public final Value materialize(final InputInfo ii) throws QueryException {
-    final TreeSeqBuilder vb = new TreeSeqBuilder();
-    for(final Item it : this) vb.add(it.materialize(ii));
-    return vb.value();
+  public final Seq materialize(final InputInfo ii) throws QueryException {
+    final TreeSeqBuilder tsb = new TreeSeqBuilder();
+    for(final Item it : this) tsb.add(it.materialize(ii));
+    return tsb.seq();
   }
 
   @Override
-  public final Value atomValue(final InputInfo ii) throws QueryException {
-    final TreeSeqBuilder vb = new TreeSeqBuilder();
-    for(final Item it : this) vb.add(it.atomValue(ii));
-    return vb.value();
+  public final Seq atomValue(final InputInfo ii) throws QueryException {
+    final TreeSeqBuilder tsb = new TreeSeqBuilder();
+    for(final Item it : this) tsb.add(it.atomValue(ii));
+    return tsb.seq();
   }
 
   @Override

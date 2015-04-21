@@ -718,7 +718,8 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
   @Override
   FingerTree<N, E> addAll(final Node<N, E>[] nodes, final long sz, final boolean appendLeft) {
     final int k = nodes.length;
-    if(k < 2) return k == 0 ? this : appendLeft ? cons(nodes[0]) : snoc(nodes[0]);
+    if(k == 0) return this;
+    if(k == 1) return appendLeft ? cons(nodes[0]) : snoc(nodes[0]);
 
     if(appendLeft) {
       int l = k + left.length;

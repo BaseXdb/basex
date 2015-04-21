@@ -226,7 +226,9 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
    */
   static <N, E> FingerTree<N, E> buildTree(final Node<N, E>[] nodes, final int n,
       final long size) {
-    if(n < 2) return n == 0 ? EmptyTree.<N, E>getInstance() : new SingletonTree<>(nodes[0]);
+
+    if(n == 0) return EmptyTree.<N, E>getInstance();
+    if(n == 1) return new SingletonTree<>(nodes[0]);
     if(n <= 2 * MAX_ARITY) {
       final int mid = n / 2;
       @SuppressWarnings("unchecked")

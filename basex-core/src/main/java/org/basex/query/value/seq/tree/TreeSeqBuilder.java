@@ -9,7 +9,8 @@ import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 
 /**
- * A builder for creating a {@link Value} by prepending and appending {@link Item}s.
+ * A builder for creating a {@link Seq}uence (with at least 2 items) by prepending and appending
+ * {@link Item}s.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
@@ -35,13 +36,12 @@ public final class TreeSeqBuilder implements Iterable<Item> {
   /**
    * Returns a {@link Value} representation of the given items.
    * @param items array containing the items
-   * @param n number of items
+   * @param n number of items (must be {@code 2} or more)
    * @param type item type of the resulting value (not checked), may be {@code null}
    * @return the value
    */
-  public static Value value(final Item[] items, final int n, final Type type) {
-    if(n == 0) return Empty.SEQ;
-    if(n == 1) return items[0];
+  public static Seq value(final Item[] items, final int n, final Type type) {
+    assert n > 1;
 
     if(n <= TreeSeq.MAX_SMALL) {
       final Item[] small = new Item[n];
@@ -49,9 +49,9 @@ public final class TreeSeqBuilder implements Iterable<Item> {
       return new SmallSeq(small, type);
     }
 
-    final TreeSeqBuilder vb = new TreeSeqBuilder();
-    for(int i = 0; i < n; i++) vb.add(items[i]);
-    return vb.value(type);
+    final TreeSeqBuilder tsb = new TreeSeqBuilder();
+    for(int i = 0; i < n; i++) tsb.add(items[i]);
+    return tsb.seq(type);
   }
 
   /**
@@ -127,6 +127,9 @@ public final class TreeSeqBuilder implements Iterable<Item> {
    * @return this builder for convenience
    */
   public TreeSeqBuilder add(final Value val) {
+    // shortcut for adding single items
+    if(val instanceof Item) return add((Item) val);
+
     if(!(val instanceof BigSeq)) {
       for(final Item it : val) add(it);
       return this;
@@ -184,8 +187,8 @@ public final class TreeSeqBuilder implements Iterable<Item> {
    * Creates a sequence containing the current elements of this builder.
    * @return resulting sequence
    */
-  public Value value() {
-    return value((Type) null);
+  Seq seq() {
+    return seq((Type) null);
   }
 
   /**
@@ -193,12 +196,10 @@ public final class TreeSeqBuilder implements Iterable<Item> {
    * @param ret type of all elements, may be {@code null}
    * @return resulting sequence
    */
-  public Value value(final Type ret) {
+  public Seq seq(final Type ret) {
     final int n = inLeft + inRight;
-    if(n == 0) return Empty.SEQ;
-
     final int start = (mid - inLeft + CAP) % CAP;
-    if(n == 1) return vals[start];
+    assert n > 1;
 
     // small int array, fill directly
     if(n <= TreeSeq.MAX_SMALL) return new SmallSeq(items(start, n), ret);
