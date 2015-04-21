@@ -29,7 +29,7 @@ final class PartialInnerNode<N, E> implements NodeLike<Node<N, E>, E> {
     }
 
     @SuppressWarnings("unchecked")
-    NodeLike<N, E>[] buffer = (NodeLike<N, E>[]) out;
+    final NodeLike<N, E>[] buffer = (NodeLike<N, E>[]) out;
     final NodeLike<Node<N, E>, E> left = out[pos - 1];
     if(left instanceof PartialInnerNode) {
       buffer[pos - 1] = ((PartialInnerNode<N, E>) left).sub;

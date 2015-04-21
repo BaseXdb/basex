@@ -4,7 +4,7 @@ import java.util.*;
 
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.seq.*;
+import org.basex.query.value.seq.tree.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -77,7 +77,7 @@ public final class ANodeList extends ElementList implements Iterable<ANode> {
    * @return array
    */
   public Value value() {
-    return Seq.get(list, size, NodeType.NOD);
+    return ValueBuilder.value(list, size, NodeType.NOD);
   }
 
   /**

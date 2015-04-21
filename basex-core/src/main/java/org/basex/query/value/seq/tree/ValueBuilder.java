@@ -38,7 +38,9 @@ public final class ValueBuilder {
    * @return the value
    */
   public static Value value(final Item[] items, final int n, final Type type) {
-    if(n < 2) return n == 1 ? items[0] : Empty.SEQ;
+    if(n == 0) return Empty.SEQ;
+    if(n == 1) return items[0];
+
     if(n <= TreeSeq.MAX_SMALL) {
       final Item[] small = new Item[n];
       System.arraycopy(items, 0, small, 0, n);
@@ -197,7 +199,7 @@ public final class ValueBuilder {
    * @return resulting sequence
    */
   public Value value() {
-    return value(null);
+    return value((Type) null);
   }
 
   /**

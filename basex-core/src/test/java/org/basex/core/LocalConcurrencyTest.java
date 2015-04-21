@@ -39,7 +39,7 @@ public final class LocalConcurrencyTest extends SandboxTest {
             try(Session session = new LocalSession(context, "user", "")) {
               session.execute(new Open("store"));
               counter.incrementAndGet();
-            } catch(Exception ex) {
+            } catch(final Exception ex) {
               error[0] = ex;
             }
           }

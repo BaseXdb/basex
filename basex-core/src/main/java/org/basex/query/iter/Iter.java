@@ -5,7 +5,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.seq.tree.*;
-import org.basex.util.*;
 
 /**
  * Iterator interface.
@@ -58,19 +57,8 @@ public abstract class Iter {
     final Item i2 = next();
     if(i2 == null) return i1;
 
-    final ValueBuilder vb = new ValueBuilder();
-    vb.add(i1);
-    vb.add(i2);
+    final ValueBuilder vb = new ValueBuilder().add(i1).add(i2);
     for(Item i; (i = next()) != null;) vb.add(i);
     return vb.value();
-  }
-
-  /**
-   * Doubles the size of an item array.
-   * @param it item array
-   * @return resulting array
-   */
-  static Item[] extend(final Item[] it) {
-    return Array.copy(it, new Item[Array.newSize(it.length)]);
   }
 }

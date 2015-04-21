@@ -57,7 +57,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   @Override
-  public final Iterator<Item> iterator() {
+  public Iterator<Item> iterator() {
     return iter().iterator();
   }
 

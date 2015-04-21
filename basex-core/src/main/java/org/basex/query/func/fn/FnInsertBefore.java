@@ -6,6 +6,7 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.seq.tree.*;
 
 /**
  * Function implementation.
@@ -43,17 +44,13 @@ public final class FnInsertBefore extends StandardFunc {
     final long pos = toLong(exprs[1], qc);
     final Value sub = exprs[2].value(qc);
 
-    final long n = val.size(), k = sub.size();
-    if(n == 0) return sub;
-    if(k == 0) return val;
+    final long vs = val.size();
+    final long p = Math.min(Math.max(0, pos - 1), vs);
 
-    final long p = Math.min(Math.max(0, pos - 1), n);
-    if(n > 1) return ((Seq) val).insertBefore(p, sub);
-
-    final Item v = (Item) val;
-    if(k > 1) return ((Seq) sub).insert(p == 0 ? k : 0, v);
-
-    final Item s = (Item) sub;
-    return p == 0 ? Seq.get(s, v) : Seq.get(v, s);
+    // prepend, append or insert new value
+    if(p == 0)  return ValueBuilder.concat(sub, val);
+    if(p == vs) return ValueBuilder.concat(val, sub);
+    return ((Seq) val).insertBefore(p, sub);
   }
 }
+

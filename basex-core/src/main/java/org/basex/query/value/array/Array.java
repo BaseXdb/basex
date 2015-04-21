@@ -64,35 +64,13 @@ public abstract class Array extends FItem {
 
   /**
    * Creates an array containing the given elements.
-   * @param elems elements
+   * @param values elements
    * @return the resulting array
    */
   @SafeVarargs
-  public static Array from(final Value... elems) {
+  public static Array from(final Value... values) {
     final ArrayBuilder builder = new ArrayBuilder();
-    for(int i = 0; i < elems.length; i++) builder.append(elems[i]);
-    return builder.freeze();
-  }
-
-  /**
-   * Creates an array containing the elements from the given {@link Iterable}.
-   * @param iter the iterable
-   * @return the resulting array
-   */
-  public static Array from(final Iterable<Value> iter) {
-    final ArrayBuilder builder = new ArrayBuilder();
-    for(final Value val : iter) builder.append(val);
-    return builder.freeze();
-  }
-
-  /**
-   * Creates an array containing the elements from the given {@link Iterator}.
-   * @param iter the iterator
-   * @return the resulting array
-   */
-  public static Array from(final Iterator<Value> iter) {
-    final ArrayBuilder builder = new ArrayBuilder();
-    while(iter.hasNext()) builder.append(iter.next());
+    for(final Value val : values) builder.append(val);
     return builder.freeze();
   }
 

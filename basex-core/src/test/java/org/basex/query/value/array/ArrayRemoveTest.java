@@ -240,7 +240,7 @@ public final class ArrayRemoveTest {
     final ArrayList<Value> list = new ArrayList<>(n);
     for(int i = 0; i < n; i++) list.add(Int.get(i));
 
-    Array arr = Array.from(list);
+    Array arr = Array.from(list.toArray(new Value[list.size()]));
 
     final Random rng = new Random(42);
     for(int i = 0; i < n; i++) {

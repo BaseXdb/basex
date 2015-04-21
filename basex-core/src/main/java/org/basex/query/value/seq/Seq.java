@@ -40,26 +40,6 @@ public abstract class Seq extends Value {
     this.size = size;
   }
 
-  /**
-   * Returns a value representation of the given items.
-   * @param items items to represent
-   * @return value that contains the items
-   */
-  public static final Value get(final Item... items) {
-    return ValueBuilder.value(items, items.length, null);
-  }
-
-  /**
-   * Creates a sequence from the given array of items.
-   * @param items item array
-   * @param n number of items in the array
-   * @param type type of the items
-   * @return the sequence
-   */
-  public static Value get(final Item[] items, final int n, final Type type) {
-    return ValueBuilder.value(items, n, type);
-  }
-
   @Override
   public Object toJava() throws QueryException {
     final Object[] obj = new Object[(int) size];
@@ -118,7 +98,7 @@ public abstract class Seq extends Value {
    */
   public Value insertBefore(final long pos, final Value val) {
     final long n = val.size();
-    return n == 0 ? this : n == 1 ? insert(pos, (Item) val) : copyInsert(pos, val);
+    return n == 1 ? insert(pos, (Item) val) : copyInsert(pos, val);
   }
 
   /**
@@ -127,7 +107,7 @@ public abstract class Seq extends Value {
    * @param val value to insert
    * @return resulting value
    */
-  public abstract Seq insert(final long pos, final Item val);
+  public abstract Value insert(final long pos, final Item val);
 
   /**
    * Helper for {@link #insertBefore(long, Value)} that copies all items into a {@link TreeSeq}.
@@ -135,13 +115,13 @@ public abstract class Seq extends Value {
    * @param val value to insert
    * @return resulting value
    */
-  final Seq copyInsert(final long pos, final Value val) {
+  final Value copyInsert(final long pos, final Value val) {
     if(val.isEmpty()) return this;
     final ValueBuilder vb = new ValueBuilder();
     for(long i = 0; i < pos; i++) vb.add(itemAt(i));
     vb.add(val);
     for(long i = pos; i < size; i++) vb.add(itemAt(i));
-    return (Seq) vb.value(type);
+    return vb.value(type);
   }
 
   /**

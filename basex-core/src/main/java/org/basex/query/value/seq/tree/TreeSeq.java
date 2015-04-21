@@ -16,7 +16,7 @@ import org.basex.query.value.type.SeqType.Occ;
 import org.basex.util.*;
 
 /**
- * An array storing {@link Item}s.
+ * A tree storing {@link Item}s.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
@@ -35,14 +35,6 @@ public abstract class TreeSeq extends Seq {
 
   /** Item Types. */
   Type ret;
-
-  /**
-   * Default constructor.
-   * @param size number of elements in this sequence
-   */
-  TreeSeq(final long size) {
-    super(size);
-  }
 
   /**
    * Default constructor.
@@ -92,37 +84,34 @@ public abstract class TreeSeq extends Seq {
   public abstract TreeSeq concat(final TreeSeq other);
 
   /**
-   * Iterator over the members of this array.
+   * Iterator over the members of this sequence.
    * @param start starting position
    *   (i.e. the position initially returned by {@link ListIterator#nextIndex()})
    * @return array over the array members
    */
-  public abstract ListIterator<Item> members(final long start);
+  public abstract ListIterator<Item> iterator(final long start);
 
-  /**
-   * Iterator over the members of this array.
-   * @return array over the array members
-   */
-  public final ListIterator<Item> members() {
-    return members(0);
+  @Override
+  public final Iterator<Item> iterator() {
+    return iterator(0);
   }
 
   @Override
-  public Object toJava() throws QueryException {
-    final Object[] obj = new Object[(int) size];
-    for(int s = 0; s < size; s++) obj[s] = itemAt(s).toJava();
-    return obj;
+  public final Object[] toJava() throws QueryException {
+    final ArrayList<Object> obj = new ArrayList<>((int) size);
+    for(final Item it : this) obj.add(it.toJava());
+    return obj.toArray();
   }
 
   @Override
-  public void plan(final FElem plan) {
+  public final void plan(final FElem plan) {
     final FElem el = planElem(SIZE, size);
     addPlan(plan, el);
     for(int v = 0; v != Math.min(size, 5); ++v) itemAt(v).plan(el);
   }
 
   @Override
-  public String toString() {
+  public final String toString() {
     return toString(false);
   }
 
@@ -149,58 +138,55 @@ public abstract class TreeSeq extends Seq {
   public abstract ValueIter iter();
 
   @Override
-  public Value materialize(final InputInfo ii) throws QueryException {
+  public final Value materialize(final InputInfo ii) throws QueryException {
     final ValueBuilder vb = new ValueBuilder();
-    final Iterator<Item> iter = members();
-    while(iter.hasNext()) vb.add(iter.next().materialize(ii));
+    for(final Item it : this) vb.add(it.materialize(ii));
     return vb.value();
   }
 
   @Override
-  public Value atomValue(final InputInfo ii) throws QueryException {
+  public final Value atomValue(final InputInfo ii) throws QueryException {
     final ValueBuilder vb = new ValueBuilder();
-    final Iterator<Item> iter = members();
-    while(iter.hasNext()) vb.add(iter.next().atomValue(ii));
+    for(final Item it : this) vb.add(it.atomValue(ii));
     return vb.value();
   }
 
   @Override
-  public long atomSize() {
+  public final long atomSize() {
     long s = 0;
-    final Iterator<Item> iter = members();
-    while(iter.hasNext()) s += iter.next().atomSize();
+    for(final Item it : this) s += it.atomSize();
     return s;
   }
 
   @Override
-  public int writeTo(final Item[] arr, final int off) {
+  public final int writeTo(final Item[] arr, final int off) {
     final int n = (int) Math.min(arr.length - off, size());
-    final Iterator<Item> iter = members();
+    final Iterator<Item> iter = iterator();
     for(int i = 0; i < n; i++) arr[off + i] = iter.next();
     return n;
   }
 
   @Override
-  public boolean homogeneous() {
+  public final boolean homogeneous() {
     return ret != null && ret != AtomType.ITEM;
   }
 
   @Override
-  public boolean iterable() {
+  public final boolean iterable() {
     return false;
   }
 
   @Override
-  public Item ebv(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public final Item ebv(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item head = itemAt(0);
     if(head instanceof ANode) return head;
     throw EBV_X.get(ii, this);
   }
 
   @Override
-  public SeqType seqType() {
+  public final SeqType seqType() {
     if(ret == null) {
-      final Iterator<Item> iter = members();
+      final Iterator<Item> iter = iterator();
       Type t = iter.next().type;
       while(iter.hasNext()) {
         if(t != iter.next().type) {
@@ -215,33 +201,33 @@ public abstract class TreeSeq extends Seq {
   }
 
   /**
-   * Prepends the given elements to this array.
+   * Prepends the given elements to this sequence.
    * @param vals values, with length at most {@link TreeSeq#MAX_SMALL}
-   * @return resulting array
+   * @return resulting sequence
    */
   abstract TreeSeq consSmall(final Item[] vals);
 
   /**
-   * Returns an array containing the values at the indices {@code from} to {@code to - 1} in
-   * the given array. Its length is always {@code to - from}. If {@code from} is smaller than zero,
-   * the first {@code -from} entries in the resulting array are {@code null}.
+   * Returns items containing the values at the indices {@code from} to {@code to - 1} in
+   * the given sequence. Its length is always {@code to - from}. If {@code from} is smaller than
+   * zero, the first {@code -from} entries in the resulting sequence are {@code null}.
    * If {@code to > arr.length} then the last {@code to - arr.length} entries are {@code null}.
-   * If {@code from == 0 && to == arr.length}, the original array is returned.
-   * @param arr input array
+   * If {@code from == 0 && to == arr.length}, the original items are returned.
+   * @param items input sequence
    * @param from first index, inclusive (may be negative)
    * @param to last index, exclusive (may be greater than {@code arr.length})
-   * @return resulting array
+   * @return resulting items
    */
-  static final Item[] slice(final Item[] arr, final int from, final int to) {
+  static final Item[] slice(final Item[] items, final int from, final int to) {
     final Item[] out = new Item[to - from];
-    final int in0 = Math.max(0, from), in1 = Math.min(to, arr.length);
+    final int in0 = Math.max(0, from), in1 = Math.min(to, items.length);
     final int out0 = Math.max(-from, 0);
-    System.arraycopy(arr, in0, out, out0, in1 - in0);
+    System.arraycopy(items, in0, out, out0, in1 - in0);
     return out;
   }
 
   /**
-   * Concatenates the two int arrays.
+   * Concatenates the two item arrays.
    * @param as first array
    * @param bs second array
    * @return resulting array

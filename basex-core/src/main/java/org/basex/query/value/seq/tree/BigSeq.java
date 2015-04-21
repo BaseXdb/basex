@@ -192,7 +192,7 @@ final class BigSeq extends TreeSeq {
     }
 
     // delete in middle tree
-    TreeSlice<Item, Item> slice = middle.remove(pos - left.length);
+    final TreeSlice<Item, Item> slice = middle.remove(pos - left.length);
 
     if(slice.isTree()) {
       // middle tree did not underflow
@@ -410,7 +410,7 @@ final class BigSeq extends TreeSeq {
   }
 
   @Override
-  public ListIterator<Item> members(final long start) {
+  public ListIterator<Item> iterator(final long start) {
     final Item[] ls = left, rs = right;
     final int l = ls.length , r = rs.length, startPos;
     final long m = middle.size();

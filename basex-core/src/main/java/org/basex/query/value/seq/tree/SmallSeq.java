@@ -96,7 +96,7 @@ final class SmallSeq extends TreeSeq {
   }
 
   @Override
-  public ListIterator<Item> members(final long start) {
+  public ListIterator<Item> iterator(final long start) {
     return new ListIterator<Item>() {
       private int index = (int) start;
 

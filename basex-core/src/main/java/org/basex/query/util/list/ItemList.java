@@ -5,7 +5,7 @@ import java.util.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
+import org.basex.query.value.seq.tree.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -125,7 +125,7 @@ public final class ItemList extends ElementList implements Iterable<Item> {
    * @return the value
    */
   public Value value(final Type type) {
-    return Seq.get(list, size, type);
+    return ValueBuilder.value(list, size, type);
   }
 
   /**

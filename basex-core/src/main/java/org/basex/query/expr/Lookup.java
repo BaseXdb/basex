@@ -152,7 +152,7 @@ public final class Lookup extends Arr {
     Item it = iter.next();
     if(it == null) return fstVal;
 
-    ValueBuilder vb = new ValueBuilder().add(fstVal);
+    final ValueBuilder vb = new ValueBuilder().add(fstVal);
     do {
       vb.add(mapOrArray(it).invokeValue(qc, info, key));
     } while((it = iter.next()) != null);

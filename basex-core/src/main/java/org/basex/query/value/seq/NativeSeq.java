@@ -64,7 +64,7 @@ abstract class NativeSeq extends Seq {
   }
 
   @Override
-  public final Seq insert(final long pos, final Item item) {
+  public final Value insert(final long pos, final Item item) {
     return copyInsert(pos, item);
   }
 

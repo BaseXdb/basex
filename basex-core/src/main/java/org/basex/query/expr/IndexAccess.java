@@ -13,7 +13,7 @@ import org.basex.util.*;
  */
 public abstract class IndexAccess extends Simple {
   /** Index context. */
-  public final IndexContext ictx;
+  final IndexContext ictx;
 
   /**
    * Constructor.
