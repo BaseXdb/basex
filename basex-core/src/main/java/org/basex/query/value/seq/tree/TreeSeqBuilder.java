@@ -41,7 +41,7 @@ public final class TreeSeqBuilder implements Iterable<Item> {
    * @return the value
    */
   public static Seq value(final Item[] items, final int n, final Type type) {
-    assert n > 1;
+    if(n < 2) throw new AssertionError("At least 2 items expected");
 
     if(n <= TreeSeq.MAX_SMALL) {
       final Item[] small = new Item[n];
@@ -199,7 +199,7 @@ public final class TreeSeqBuilder implements Iterable<Item> {
   public Seq seq(final Type ret) {
     final int n = inLeft + inRight;
     final int start = (mid - inLeft + CAP) % CAP;
-    assert n > 1;
+    if(n < 2) throw new AssertionError("At least 2 items expected");
 
     // small int array, fill directly
     if(n <= TreeSeq.MAX_SMALL) return new SmallSeq(items(start, n), ret);
