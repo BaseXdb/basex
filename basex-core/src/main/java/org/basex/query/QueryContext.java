@@ -429,8 +429,7 @@ public final class QueryContext extends Proc implements Closeable {
   @Override
   public void databases(final LockResult lr) {
     lr.read.add(readLocks);
-    // assign write locks as read locks if no updates are performed
-    (updating ? lr.write : lr.read).add(writeLocks);
+    lr.write.add(writeLocks);
     // use global locking if referenced databases cannot be statically determined
     if(root == null || !root.databases(lr, this) ||
        ctxItem != null && !ctxItem.databases(lr, this)) {
