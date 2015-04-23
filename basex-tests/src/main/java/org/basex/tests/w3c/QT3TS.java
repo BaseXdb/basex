@@ -478,6 +478,8 @@ public final class QT3TS extends Main {
         msg = assertSerializationError(returned, expected, returned.sprop);
       } else if(type.equals("all-of")) {
         msg = allOf(returned, expected);
+      } else if(type.equals("not")) {
+        msg = not(returned, expected);
       } else if(type.equals("any-of")) {
         msg = anyOf(returned, expected);
       } else if(value != null) {
@@ -539,6 +541,21 @@ public final class QT3TS extends Main {
     }
     final QNm expErr = new QNm(name, uri);
     return expErr.eq(resErr) ? null : exp;
+  }
+
+  /**
+   * Tests not.
+   * @param res resulting value
+   * @param exp expected result
+   * @return optional expected test suite result
+   */
+  private String not(final QT3Result res, final XdmValue exp) {
+    final TokenBuilder tb = new TokenBuilder();
+    for(final XdmItem it : new XQuery("*", ctx).context(exp)) {
+      final String msg = test(res, it);
+      if(msg != null) tb.add(tb.isEmpty() ? "" : ", ").add(msg);
+    }
+    return tb.isEmpty() ? "Error" : null;
   }
 
   /**
