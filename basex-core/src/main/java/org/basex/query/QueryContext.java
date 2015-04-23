@@ -109,9 +109,9 @@ public final class QueryContext extends Proc implements Closeable {
   /** Current nanoseconds. */
   public long nano;
 
-  /** Strings to lock defined by lock:read option. */
+  /** Strings to lock defined by read-lock option. */
   public final StringList readLocks = new StringList(0);
-  /** Strings to lock defined by lock:write option. */
+  /** Strings to lock defined by write-lock option. */
   public final StringList writeLocks = new StringList(0);
 
   /** Number of successive tail calls. */
@@ -429,7 +429,9 @@ public final class QueryContext extends Proc implements Closeable {
   @Override
   public void databases(final LockResult lr) {
     lr.read.add(readLocks);
-    lr.write.add(writeLocks);
+    // assign write locks as read locks if no updates are performed
+    (updating ? lr.write : lr.read).add(writeLocks);
+    // use global locking if referenced databases cannot be statically determined
     if(root == null || !root.databases(lr, this) ||
        ctxItem != null && !ctxItem.databases(lr, this)) {
       if(updating) lr.writeAll = true;
