@@ -317,13 +317,13 @@ public final class DecFormatter extends FormatUtil {
     // return infinite results
     final boolean neg = d < 0 || d == 0 && Double.doubleToLongBits(d) == Long.MIN_VALUE;
     final Picture pic = pics[neg && pics.length == 2 ? 1 : 0];
-    final TokenBuilder res = new TokenBuilder();
-    final TokenBuilder intgr = new TokenBuilder();
-    final TokenBuilder fract = new TokenBuilder();
+    final IntList res = new IntList();
+    final IntList intgr = new IntList();
+    final IntList fract = new IntList();
     int exp = 0;
 
     if(d == Double.POSITIVE_INFINITY || d == Double.NEGATIVE_INFINITY) {
-      intgr.add(inf);
+      intgr.add(new TokenParser(inf).toArray());
     } else {
       // convert and round number
       ANum num = it;
@@ -405,13 +405,13 @@ public final class DecFormatter extends FormatUtil {
       for(int i = sl; i < pic.minExp; i++) res.add(zero);
       for(int i = 0; i < sl; i++) res.add(zero + s.charAt(i) - '0');
     }
-    return res.finish();
+    return new TokenBuilder(res.finish()).finish();
   }
 
   /** Picture variables. */
   private static final class Picture {
     /** Prefix/suffix. */
-    private final TokenBuilder[] xyzfix = { new TokenBuilder(), new TokenBuilder() };
+    private final IntList[] xyzfix = { new IntList(), new IntList() };
     /** Integer/fractional-part-grouping-positions. */
     private final int[][] group = { {}, {} };
     /** Minimum-integer/fractional-part-size. */

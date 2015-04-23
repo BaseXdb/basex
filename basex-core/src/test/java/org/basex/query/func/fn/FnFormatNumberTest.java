@@ -76,6 +76,9 @@ public final class FnFormatNumberTest extends QueryTest {
       { "formnum 310", strings("\u0a66,i"),
           "declare default decimal-format zero-digit = '&#xA66;';"
         + "format-number(0, '#,i')" },
+      { "formnum 320", strings("\u0a67"),
+          "declare default decimal-format zero-digit = '&#xA66;';"
+        + "format-number(1, '#\u0a66')" },
 
         // http://www.w3schools.com/XSL/func_formatnumber.asp
       { "formnum w3-10", strings("500100"), "format-number(500100, '#')" },

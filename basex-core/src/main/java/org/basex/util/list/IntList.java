@@ -113,14 +113,14 @@ public class IntList extends ElementList {
   /**
    * Inserts elements at the specified index position.
    * @param index inserting position
-   * @param element elements to be inserted
+   * @param elements elements to be inserted
    */
-  public final void insert(final int index, final int[] element) {
-    final int l = element.length;
+  public final void insert(final int index, final int... elements) {
+    final int l = elements.length;
     if(l == 0) return;
     if(size + l > list.length) list = Arrays.copyOf(list, newSize(size + l));
     Array.move(list, index, l, size - index);
-    System.arraycopy(element, 0, list, index, l);
+    System.arraycopy(elements, 0, list, index, l);
     size += l;
   }
 
