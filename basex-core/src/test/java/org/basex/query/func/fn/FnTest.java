@@ -40,6 +40,12 @@ public final class FnTest extends AdvancedQueryTest {
     contains(SERIALIZE.args("<x>a</x>", serialParams("<method value='text'/>")), "a");
   }
 
+  /** Test method. */
+  @Test
+  public void parseSubstring() {
+    contains(SUBSTRING.args("'ab'", " [2]"), "b");
+  }
+
   /** Tests for the {@code replace} function. */
   @Test
   public void replace() {

@@ -12,6 +12,6 @@ import org.basex.query.iter.*;
 public final class UnitFail extends UnitFn {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    throw error(exprs.length < 1 ? null : toItem(exprs[0], qc));
+    throw error(exprs.length < 1 ? null : toNodeOrAtomItem(exprs[0], qc));
   }
 }

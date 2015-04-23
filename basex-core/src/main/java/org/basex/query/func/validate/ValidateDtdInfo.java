@@ -48,7 +48,7 @@ public class ValidateDtdInfo extends ValidateFn {
       void process(final ErrorHandler handler)
           throws IOException, ParserConfigurationException, SAXException, QueryException {
 
-        final Item it = toItem(exprs[0], qc);
+        final Item it = toNodeOrAtomItem(exprs[0], qc);
         SerializerOptions sp = null;
 
         // integrate doctype declaration via serialization parameters

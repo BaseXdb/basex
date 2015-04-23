@@ -72,7 +72,7 @@ public class XsltTransform extends XsltFn {
    * @throws QueryException query exception
    */
   private IO read(final Expr ex, final QueryContext qc) throws QueryException {
-    final Item it = toItem(ex, qc);
+    final Item it = toNodeOrAtomItem(ex, qc);
     if(it instanceof ANode) {
       try {
         final IO io = new IOContent(it.serialize(SerializerOptions.get(false)).finish());

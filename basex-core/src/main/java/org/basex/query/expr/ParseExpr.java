@@ -444,6 +444,22 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
+   * Checks if the evaluated expression yields a non-empty node or item.
+   * Returns the item or throws an exception.
+   * @param ex expression to be evaluated
+   * @param qc query context
+   * @return item
+   * @throws QueryException query exception
+   */
+  protected final Item toNodeOrAtomItem(final Expr ex, final QueryContext qc)
+      throws QueryException {
+
+    Item it = toItem(ex, qc);
+    if(!(it instanceof ANode)) it = it.atomItem(info);
+    return it;
+  }
+
+  /**
    * Checks if the evaluated expression yields a non-empty item.
    * Returns the item or throws an exception.
    * @param ex expression to be evaluated

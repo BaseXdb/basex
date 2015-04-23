@@ -24,7 +24,7 @@ abstract class DbNew extends DbAccess {
 
   /**
    * Creates a {@link Data} instance for the specified document.
-   * @param in input item
+   * @param in input item (node or string)
    * @param path optional path argument
    * @return database instance
    * @throws QueryException query exception

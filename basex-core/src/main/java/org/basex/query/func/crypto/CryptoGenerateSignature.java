@@ -6,7 +6,6 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -22,10 +21,13 @@ public final class CryptoGenerateSignature extends StandardFunc {
     Item arg6 = null;
     boolean arg6Str = false;
     if(exprs.length > 6) {
-      arg6 = toItem(exprs[6], qc);
-      if(arg6 instanceof AStr) arg6Str = true;
-      else if(!(arg6 instanceof ANode)) throw castError(info, arg6, AtomType.STR);
+      arg6 = toNodeOrAtomItem(exprs[6], qc);
+      if(!(arg6 instanceof ANode)) {
+        if(!arg6.type.isStringOrUntyped()) throw STRNOD_X_X.get(info, arg6.type, arg6);
+        arg6Str = true;
+      }
     }
+
     return new DigitalSignature(ii).generateSignature(
         toNode(exprs[0], qc), toToken(exprs[1], qc),
         toToken(exprs[2], qc), toToken(exprs[3], qc),
