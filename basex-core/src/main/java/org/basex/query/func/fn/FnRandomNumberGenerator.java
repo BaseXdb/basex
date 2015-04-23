@@ -42,7 +42,7 @@ public final class FnRandomNumberGenerator extends StandardFunc {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final long seed;
     if(exprs.length > 0) {
-      seed = exprs[0].atomItem(qc, info).hash(ii);
+      seed = toItem(exprs[0], qc).hash(ii);
     } else {
       seed = qc.initDateTime().nano;
     }
