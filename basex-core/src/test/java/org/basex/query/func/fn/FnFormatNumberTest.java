@@ -73,7 +73,11 @@ public final class FnFormatNumberTest extends QueryTest {
         "format-number(xs:decimal('11111111111111111111'), '#,#')" },
       { "formnum 300", strings("12.346e2"), "format-number(1234.5678, '00.000e0')" },
 
-      // http://www.w3schools.com/XSL/func_formatnumber.asp
+      { "formnum 310", strings("\u0a66,i"),
+          "declare default decimal-format zero-digit = '&#xA66;';"
+        + "format-number(0, '#,i')" },
+
+        // http://www.w3schools.com/XSL/func_formatnumber.asp
       { "formnum w3-10", strings("500100"), "format-number(500100, '#')" },
       { "formnum w3-20", strings("500100"), "format-number(500100, '0')" },
       { "formnum w3-30", strings("500100.00"), "format-number(500100, '#.00')" },

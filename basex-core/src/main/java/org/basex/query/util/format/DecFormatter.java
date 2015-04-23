@@ -361,11 +361,10 @@ public final class DecFormatter extends FormatUtil {
       for(int i = 0; i < il; i++) intgr.add(zero + s.charAt(i) - '0');
 
       // squeeze in grouping separators
-      if(pic.group[0].length == 1) {
+      if(pic.group[0].length == 1 && pic.group[0][0] > 0) {
         // regular pattern with repeating separators
-        final int pos = pic.group[0][0];
         for(int p = intgr.size() - (neg ? 2 : 1); p > 0; --p) {
-          if(p % pos == 0) intgr.insert(intgr.size() - p, grouping);
+          if(p % pic.group[0][0] == 0) intgr.insert(intgr.size() - p, grouping);
         }
       } else {
         // irregular pattern, or no separators at all
