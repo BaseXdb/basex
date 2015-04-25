@@ -5,7 +5,6 @@ import static org.basex.util.Prop.*;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.*;
 import java.util.concurrent.locks.*;
 
 import org.basex.core.*;
@@ -66,9 +65,9 @@ public final class DBLocking implements Locking {
    */
   private final ReentrantReadWriteLock writeAll = new ReentrantReadWriteLock();
   /** Stores one lock for each object used for locking. */
-  private final Map<String, ReentrantReadWriteLock> locks = new ConcurrentHashMap<>();
+  private final Map<String, ReentrantReadWriteLock> locks = new HashMap<>();
   /** Stores lock usage counters for each object used for locking. */
-  private final Map<String, AtomicInteger> lockUsage = new ConcurrentHashMap<>();
+  private final Map<String, Integer> lockUsage = new HashMap<>();
   /**
    * Currently running transactions.
    * Used as monitor for atomizing access to {@link #queue}.
@@ -249,12 +248,9 @@ public final class DBLocking implements Locking {
    */
   private void setLockUsed(final String lock) {
     synchronized(lockUsage) {
-      final AtomicInteger usage = lockUsage.get(lock);
-      if(usage == null) {
-        lockUsage.put(lock, new AtomicInteger(1));
-      } else {
-        usage.incrementAndGet();
-      }
+      Integer usage = lockUsage.get(lock);
+      if(usage == null) usage = 0;
+      lockUsage.put(lock, ++usage);
     }
   }
 
@@ -264,10 +260,13 @@ public final class DBLocking implements Locking {
    */
   private void unsetLockIfUnused(final String object) {
     synchronized(lockUsage) {
-      final AtomicInteger usage = lockUsage.get(object);
-      if(usage.decrementAndGet() == 0) {
+      Integer usage = lockUsage.get(object);
+      assert usage != null;
+      if(--usage == 0) {
         locks.remove(object);
         lockUsage.remove(object);
+      } else {
+        lockUsage.put(object, usage);
       }
     }
   }
