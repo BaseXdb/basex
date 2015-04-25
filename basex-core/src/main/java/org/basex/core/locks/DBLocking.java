@@ -247,7 +247,7 @@ public final class DBLocking implements Locking {
    * @param lock Lock to set used
    */
   private void setLockUsed(final String lock) {
-    synchronized(lockUsage) {
+    synchronized(locks) {
       Integer usage = lockUsage.get(lock);
       if(usage == null) usage = 0;
       lockUsage.put(lock, ++usage);
@@ -259,7 +259,7 @@ public final class DBLocking implements Locking {
    * @param object Object to test
    */
   private void unsetLockIfUnused(final String object) {
-    synchronized(lockUsage) {
+    synchronized(locks) {
       Integer usage = lockUsage.get(object);
       assert usage != null;
       if(--usage == 0) {
@@ -283,8 +283,10 @@ public final class DBLocking implements Locking {
     sb.append(ind + "Transactions running: " + transactions + NL);
     sb.append(ind + "Transaction queue: " + queue + NL);
     sb.append(ind + "Held locks by object:" + NL);
-    for(final Entry<String, ReentrantReadWriteLock> e : locks.entrySet())
-      sb.append(ind + ind + e.getKey() + " -> " + e.getValue() + NL);
+    synchronized(locks) {
+      for(final Entry<String, ReentrantReadWriteLock> e : locks.entrySet())
+        sb.append(ind + ind + e.getKey() + " -> " + e.getValue() + NL);
+    }
     sb.append(ind + "Held write locks by transaction:" + NL);
     for(final Long thread : writeLocked.keySet())
       sb.append(ind + ind + thread + " -> " + writeLocked.get(thread) + NL);
