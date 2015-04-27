@@ -1,7 +1,7 @@
 package org.basex.tests.w3c;
 
 import static org.basex.tests.w3c.QT3Constants.*;
-import static org.basex.util.Prop.NL;
+import static org.basex.util.Prop.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
@@ -24,7 +24,6 @@ import org.basex.tests.bxapi.*;
 import org.basex.tests.bxapi.xdm.*;
 import org.basex.util.*;
 import org.basex.util.options.Options.YesNo;
-import org.basex.util.options.Options.YesNoOmit;
 
 /**
  * Driver for the XQuery/XPath/XSLT 3.* Test Suite, located at
@@ -338,7 +337,8 @@ public final class QT3TS extends Main {
         }
         // bind resources
         for(final HashMap<String, String> src : env.resources) {
-          query.addResource(src.get(URI), file(base, src.get(FILE)), src.get(ENCODING));
+          query.addResource(src.get(URI), file(base, src.get(FILE)),
+              src.get(QT3Constants.ENCODING));
         }
         // bind collections
         query.addCollection(env.collURI, env.collSources.toArray());
@@ -360,7 +360,7 @@ public final class QT3TS extends Main {
 
       // run query
       returned.value = query.value();
-      returned.sprop = query.serializer();
+      returned.query = query;
     } catch(final XQueryException ex) {
       returned.xqerror = ex;
       returned.value = null;
@@ -389,8 +389,7 @@ public final class QT3TS extends Main {
       } else if(returned.xqerror != null) {
         res = returned.xqerror.getCode() + ": " + returned.xqerror.getLocalizedMessage();
       } else {
-        returned.sprop.set(SerializerOptions.OMIT_XML_DECLARATION, YesNo.YES);
-        res = serialize(returned.value, returned.sprop);
+        res = serialize(returned);
       }
     } catch(final XQueryException ex) {
       res = ex.getCode() + ": " + ex.getLocalizedMessage();
@@ -416,8 +415,8 @@ public final class QT3TS extends Main {
    * @return result
    */
   private String normSpecial(final String in) {
-    // return QueryProcessor.removeComments(in, maxout);
-    return in.replace("\n", "%0A").replace("\r", "%0D").replace("\t", "%09");
+    return in.replaceAll("<\\?xml.*?>", "").replace("\n", "%0A").replace("\r", "%0D").
+        replace("\t", "%09");
   }
 
   /** Flags for dependencies that are not supported. */
@@ -476,7 +475,7 @@ public final class QT3TS extends Main {
       if(type.equals("error")) {
         msg = assertError(returned, expected);
       } else if(type.equals("assert-serialization-error")) {
-        msg = assertSerializationError(returned, expected, returned.sprop);
+        msg = assertSerializationError(returned, expected);
       } else if(type.equals("all-of")) {
         msg = allOf(returned, expected);
       } else if(type.equals("not")) {
@@ -501,7 +500,7 @@ public final class QT3TS extends Main {
         } else if(type.equals("assert-xml")) {
           msg = assertXML(value, expected);
         } else if(type.equals("serialization-matches")) {
-          msg = serializationMatches(value, expected, returned.sprop);
+          msg = serializationMatches(returned, expected);
         } else if(type.equals("assert-string-value")) {
           msg = assertStringValue(value, expected);
         } else if(type.equals("assert-true")) {
@@ -713,24 +712,18 @@ public final class QT3TS extends Main {
 
   /**
    * Tests the serialized result.
-   * @param returned resulting value
+   * @param result query result
    * @param expected expected result
-   * @param sprop serialization properties
    * @return optional expected test suite result
    */
-  private String serializationMatches(final XdmValue returned, final XdmValue expected,
-      final SerializerOptions sprop) {
-
-    // won't work for K2-Serialization-18 and K2-Serialization-24
-    if(sprop.get(SerializerOptions.STANDALONE) == YesNoOmit.OMIT)
-      sprop.set(SerializerOptions.OMIT_XML_DECLARATION, YesNo.YES);
-
+  private String serializationMatches(final QT3Result result, final XdmValue expected) {
     try {
       final String flags = asString("@flags", expected);
-      final XdmValue ret = XdmValue.get(Str.get(serialize(returned, sprop)));
+      final XdmValue ret = XdmValue.get(Str.get(serialize(result)));
       final String qu = "declare variable $returned external;"
           + "declare variable $expected external;"
           + "matches($returned, string($expected), '" + flags + "')";
+
       return new XQuery(qu, ctx).bind("returned", ret).bind("expected", expected).
           value().getBoolean() ? null : expected.getString();
     } catch(final Exception err) {
@@ -742,12 +735,9 @@ public final class QT3TS extends Main {
    * Tests a serialization error.
    * @param returned result
    * @param expected expected result
-   * @param sprop serialization properties
    * @return optional expected test suite result
    */
-  private String assertSerializationError(final QT3Result returned, final XdmValue expected,
-      final SerializerOptions sprop) {
-
+  private String assertSerializationError(final QT3Result returned, final XdmValue expected) {
     final String expCode = asString('@' + CODE, expected);
     if(returned.xqerror != null) {
       if(!errors || expCode.equals("*")) return null;
@@ -756,11 +746,11 @@ public final class QT3TS extends Main {
     }
 
     try {
-      if(returned.value != null) serialize(returned.value, sprop);
+      if(returned.value != null) serialize(returned);
       return expCode;
-    } catch(final QueryIOException ex) {
+    } catch(final QueryException ex) {
       if(!errors || expCode.equals("*")) return null;
-      final String resCode = string(ex.getCause().qname().local());
+      final String resCode = string(ex.qname().local());
       if(resCode.equals(expCode)) return null;
       return Util.info("% (found: %)", expCode, ex);
     } catch(final IOException ex) {
@@ -770,19 +760,21 @@ public final class QT3TS extends Main {
 
   /**
    * Serializes values.
-   * @param returned resulting value
-   * @param sprop serialization properties
+   * @param result query result
    * @return optional expected test suite result
+   * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private static String serialize(final XdmValue returned, final SerializerOptions sprop)
-      throws IOException {
-
-    final ArrayOutput ao = new ArrayOutput();
-    try(final Serializer ser = Serializer.get(ao, sprop)) {
-      for(final Item it : returned.internal()) ser.serialize(it);
+  private static String serialize(final QT3Result result) throws QueryException, IOException {
+    try {
+      final ArrayOutput ao = new ArrayOutput();
+      try(final Serializer ser = result.query.qp().getSerializer(ao)) {
+        for(final Item it : result.value.internal()) ser.serialize(it);
+      }
+      return ao.toString();
+    } catch(final QueryIOException ex) {
+      throw ex.getCause();
     }
-    return ao.toString();
   }
 
   /**
@@ -971,8 +963,8 @@ public final class QT3TS extends Main {
    * Structure for storing XQuery results.
    */
   static class QT3Result {
-    /** Serialization parameters. */
-    SerializerOptions sprop;
+    /** Query instance. */
+    XQuery query;
     /** Query result. */
     XdmValue value;
     /** Query exception. */

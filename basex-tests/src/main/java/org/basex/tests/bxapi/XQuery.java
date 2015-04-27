@@ -6,7 +6,6 @@ import java.util.*;
 import javax.xml.namespace.*;
 
 import org.basex.core.Context;
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -242,11 +241,11 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
   }
 
   /**
-   * Returns serialization properties.
-   * @return serialization properties
+   * Returns the query processor.
+   * @return query processor
    */
-  public SerializerOptions serializer() {
-    return qp.qc.serParams();
+  public QueryProcessor qp() {
+    return qp;
   }
 
   @Override

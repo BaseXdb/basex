@@ -31,7 +31,7 @@ final class XMLSerializer extends MarkupSerializer {
   }
 
   @Override
-  protected void startOpen(final byte[] name) throws IOException {
+  protected void startOpen(final QNm name) throws IOException {
     if(elems.isEmpty()) {
       if(root) check();
       root = true;

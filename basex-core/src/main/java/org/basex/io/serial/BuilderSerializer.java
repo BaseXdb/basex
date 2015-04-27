@@ -42,14 +42,14 @@ public class BuilderSerializer extends Serializer {
 
   @Override
   protected final void finishOpen() throws IOException {
-    builder.openElem(elem, atts, nsp);
+    builder.openElem(elem.string(), atts, nsp);
     atts.clear();
     nsp.clear();
   }
 
   @Override
   protected void finishEmpty() throws IOException {
-    builder.emptyElem(elem, atts, nsp);
+    builder.emptyElem(elem.string(), atts, nsp);
     atts.clear();
     nsp.clear();
   }

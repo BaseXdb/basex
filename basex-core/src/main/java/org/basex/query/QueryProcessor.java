@@ -223,7 +223,7 @@ public final class QueryProcessor extends Proc implements Closeable {
   public Serializer getSerializer(final OutputStream os) throws IOException, QueryException {
     compile();
     try {
-      return Serializer.get(os, qc.serParams());
+      return Serializer.get(os, qc.serParams()).sc(sc);
     } catch(final QueryIOException ex) {
       throw ex.getCause();
     }

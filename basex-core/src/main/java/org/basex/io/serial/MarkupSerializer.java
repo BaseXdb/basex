@@ -6,14 +6,15 @@ import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
+import java.util.*;
 
 import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.util.ft.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
-import org.basex.util.hash.*;
 import org.basex.util.http.*;
 import org.basex.util.options.*;
 import org.basex.util.options.Options.YesNoOmit;
@@ -45,11 +46,6 @@ abstract class MarkupSerializer extends StandardSerializer {
   final boolean content;
   /** Undeclare prefixes. */
   final boolean undecl;
-
-  /** CData elements. */
-  private final TokenSet cdata = new TokenSet();
-  /** Suppress indentation elements. */
-  private final TokenSet suppress = new TokenSet();
 
   /** Media type. */
   private final String media;
@@ -97,25 +93,10 @@ abstract class MarkupSerializer extends StandardSerializer {
       }
     }
 
-    final String supp = sopts.get(SUPPRESS_INDENTATION);
-    if(!supp.isEmpty()) {
-      for(final byte[] c : split(normalize(token(supp)), ' ')) {
-        if(c.length != 0) suppress.add(c);
-      }
-    }
-
-    // collect CData elements
     final boolean html = this instanceof HTMLSerializer;
     final boolean xml = this instanceof XMLSerializer || this instanceof XHTMLSerializer;
-    if(xml || html) {
-      final String cdse = sopts.get(CDATA_SECTION_ELEMENTS);
-      if(!cdse.isEmpty()) {
-        for(final byte[] c :  split(normalize(token(cdse)), ' ')) {
-          if(c.length == 0) continue;
-          if(!html || contains(c, ':') && (!html5 || !string(c).contains("html:"))) cdata.add(c);
-        }
-      }
 
+    if(xml || html) {
       if(undecl && ver.equals(V10)) throw SERUNDECL.getIO();
       if(xml) {
         if(omitDecl) {
@@ -173,7 +154,8 @@ abstract class MarkupSerializer extends StandardSerializer {
     final byte[] val = norm(value);
     final int vl = val.length;
     if(ftp == null) {
-      if(cdata.isEmpty() || elems.isEmpty() || !cdata.contains(elems.peek())) {
+      final ArrayList<QNm> qnames = cdata();
+      if(qnames.isEmpty() || elems.isEmpty() || !qnames.contains(elems.peek())) {
         for(int k = 0; k < vl; k += cl(val, k)) encode(cp(val, k));
       } else {
         out.print(CDATA_O);
@@ -232,11 +214,11 @@ abstract class MarkupSerializer extends StandardSerializer {
   }
 
   @Override
-  protected void startOpen(final byte[] name) throws IOException {
+  protected void startOpen(final QNm name) throws IOException {
     doctype(name);
     if(sep) indent();
     out.print(ELEM_O);
-    out.print(name);
+    out.print(name.string());
     sep = true;
   }
 
@@ -254,7 +236,7 @@ abstract class MarkupSerializer extends StandardSerializer {
   protected void finishClose() throws IOException {
     if(sep) indent();
     out.print(ELEM_OS);
-    out.print(elem);
+    out.print(elem.string());
     out.print(ELEM_C);
     sep = true;
   }
@@ -291,12 +273,12 @@ abstract class MarkupSerializer extends StandardSerializer {
    * @return true if doctype was added
    * @throws IOException I/O exception
    */
-  boolean doctype(final byte[] type) throws IOException {
+  boolean doctype(final QNm type) throws IOException {
     if(level != 0 || docsys == null && docpub == null) return false;
     if(sep) indent();
     out.print(DOCTYPE);
     if(type == null) out.print(HTML);
-    else out.print(type);
+    else out.print(type.string());
     if(docpub != null) out.print(' ' + PUBLIC + " \"" + docpub + '"');
     else out.print(' ' + SYSTEM);
     if(docsys != null) out.print(" \"" + docsys + '"');
@@ -310,8 +292,11 @@ abstract class MarkupSerializer extends StandardSerializer {
     if(atomic) {
       atomic = false;
     } else if(indent) {
-      if(!suppress.isEmpty() && !elems.isEmpty()) {
-        for(final byte[] t : elems) if(suppress.contains(t)) return;
+      final ArrayList<QNm> qnames = suppress();
+      if(!qnames.isEmpty()) {
+        for(final QNm e : elems) {
+          if(qnames.contains(e)) return;
+        }
       }
       super.indent();
     }
@@ -341,7 +326,7 @@ abstract class MarkupSerializer extends StandardSerializer {
     ct++;
     if(empty) finishOpen();
     level++;
-    startOpen(META);
+    startOpen(new QNm(META));
     attribute(HTTPEQUIV, CONTENT_TYPE, false);
     attribute(CONTENT, new TokenBuilder(media.isEmpty() ? MediaType.TEXT_HTML.toString() : media).
         add("; ").add(CHARSET).add('=').addExt(out.encoding()).finish(), false);
@@ -378,5 +363,66 @@ abstract class MarkupSerializer extends StandardSerializer {
     if(val.isEmpty()) return allowed.length > 0 ? allowed[0] : val;
     for(final String a : allowed) if(a.equals(val)) return val;
     throw SERNOTSUPP_X.getIO(Options.allowed(option, (Object[]) allowed));
+  }
+
+  /** CData elements. */
+  private ArrayList<QNm> cdata;
+
+  /**
+   * Initializes the CData elements.
+   * @return list
+   * @throws QueryIOException query I/O exception
+   */
+  private ArrayList<QNm> cdata() throws QueryIOException {
+    ArrayList<QNm> list = cdata;
+    if(list == null) {
+      list = new ArrayList<>();
+      final boolean html = this instanceof HTMLSerializer;
+      final String cdse = sopts.get(CDATA_SECTION_ELEMENTS);
+      for(final byte[] name :  split(normalize(token(cdse)), ' ')) {
+        if(name.length == 0) continue;
+        final QNm qnm = resolve(name);
+        if(!html || contains(name, ':') && (!html5 || !string(name).contains("html:"))) {
+          list.add(qnm);
+        }
+      }
+      cdata = list;
+    }
+    return list;
+  }
+
+  /** Suppress indentation elements. */
+  private ArrayList<QNm> suppress;
+
+  /**
+   * Initializes and returns the elements whose contents must not be indented.
+   * @return list
+   * @throws QueryIOException query I/O exception
+   */
+  private ArrayList<QNm> suppress() throws QueryIOException {
+    ArrayList<QNm> list = suppress;
+    if(list == null) {
+      list = new ArrayList<>();
+      final String supp = sopts.get(SUPPRESS_INDENTATION);
+      for(final byte[] name : split(normalize(token(supp)), ' ')) {
+        if(name.length != 0) list.add(resolve(name));
+      }
+      suppress = list;
+    }
+    return list;
+  }
+
+  /**
+   * Resolves a QName.
+   * @param name name to be resolved
+   * @return list
+   * @throws QueryIOException query I/O exception
+   */
+  private QNm resolve(final byte[] name) throws QueryIOException {
+    try {
+      return QNm.resolve(name, null, sc, null);
+    } catch(final QueryException ex) {
+      throw new QueryIOException(ex);
+    }
   }
 }

@@ -7,6 +7,7 @@ import static org.basex.util.Token.*;
 import java.io.*;
 
 import org.basex.io.out.*;
+import org.basex.query.value.item.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
@@ -47,10 +48,13 @@ final class HTMLSerializer extends MarkupSerializer {
     out.print(name);
 
     // don't append value for boolean attributes
-    final byte[] nm = concat(lc(elem), COLON, lc(name));
-    if(BOOLEAN.contains(nm) && eq(name, value)) return;
-    // escape URI attributes
-    final byte[] val = escuri && URIS.contains(nm) ? escape(value) : value;
+    byte[] val = value;
+    if(!BOOLEAN.isEmpty() || !URIS.isEmpty()) {
+      final byte[] nm = concat(lc(elem.local()), ATT, lc(name));
+      if(BOOLEAN.contains(nm) && eq(name, val)) return;
+      // escape URI attributes
+      if(escuri && URIS.contains(nm)) val = escape(val);
+    }
 
     out.print(ATT1);
     final int vl = val.length;
@@ -97,14 +101,14 @@ final class HTMLSerializer extends MarkupSerializer {
   }
 
   @Override
-  protected void startOpen(final byte[] name) throws IOException {
+  protected void startOpen(final QNm name) throws IOException {
     doctype(null);
     if(sep) indent();
     out.print(ELEM_O);
-    out.print(name);
+    out.print(name.string());
     sep = indent;
-    script = SCRIPTS.contains(lc(name));
-    if(content && eq(lc(elem), HEAD)) ct++;
+    script = SCRIPTS.contains(lc(name.local()));
+    if(content && eq(lc(elem.local()), HEAD)) ct++;
   }
 
   @Override
@@ -117,10 +121,11 @@ final class HTMLSerializer extends MarkupSerializer {
   protected void finishEmpty() throws IOException {
     if(ct(true, true)) return;
     out.print(ELEM_C);
+    final byte[] lc = lc(elem.local());
     if(html5) {
-      if(EMPTIES5.contains(lc(elem))) return;
+      if(EMPTIES5.contains(lc)) return;
     } else {
-      if(EMPTIES.contains(lc(elem))) {
+      if(EMPTIES.contains(lc)) {
         final byte[] u = nsUri(EMPTY);
         if(u == null || u.length == 0) return;
       }
@@ -132,17 +137,17 @@ final class HTMLSerializer extends MarkupSerializer {
   @Override
   protected void finishClose() throws IOException {
     super.finishClose();
-    script = script && !SCRIPTS.contains(lc(elem));
+    script = script && !SCRIPTS.contains(lc(elem.local()));
   }
 
   @Override
-  boolean doctype(final byte[] type) throws IOException {
+  boolean doctype(final QNm type) throws IOException {
     if(level != 0) return false;
     if(!super.doctype(type) && html5) {
       if(sep) indent();
       out.print(DOCTYPE);
       if(type == null) out.print(HTML);
-      else out.print(type);
+      else out.print(type.local());
       out.print(ELEM_C);
       if(indent) newline();
     }
@@ -155,30 +160,30 @@ final class HTMLSerializer extends MarkupSerializer {
     SCRIPTS.add("script");
     SCRIPTS.add("style");
     // boolean attributes
-    BOOLEAN.add("area:nohref");
-    BOOLEAN.add("button:disabled");
-    BOOLEAN.add("dir:compact");
-    BOOLEAN.add("dl:compact");
-    BOOLEAN.add("frame:noresize");
-    BOOLEAN.add("hr:noshade");
-    BOOLEAN.add("img:ismap");
-    BOOLEAN.add("input:checked");
-    BOOLEAN.add("input:disabled");
-    BOOLEAN.add("input:readonly");
-    BOOLEAN.add("menu:compact");
-    BOOLEAN.add("object:declare");
-    BOOLEAN.add("ol:compact");
-    BOOLEAN.add("optgroup:disabled");
-    BOOLEAN.add("option:selected");
-    BOOLEAN.add("option:disabled");
-    BOOLEAN.add("script:defer");
-    BOOLEAN.add("select:multiple");
-    BOOLEAN.add("select:disabled");
-    BOOLEAN.add("td:nowrap");
-    BOOLEAN.add("textarea:disabled");
-    BOOLEAN.add("textarea:readonly");
-    BOOLEAN.add("th:nowrap");
-    BOOLEAN.add("ul:compact");
+    BOOLEAN.add("area@nohref");
+    BOOLEAN.add("button@disabled");
+    BOOLEAN.add("dir@compact");
+    BOOLEAN.add("dl@compact");
+    BOOLEAN.add("frame@noresize");
+    BOOLEAN.add("hr@noshade");
+    BOOLEAN.add("img@ismap");
+    BOOLEAN.add("input@checked");
+    BOOLEAN.add("input@disabled");
+    BOOLEAN.add("input@readonly");
+    BOOLEAN.add("menu@compact");
+    BOOLEAN.add("object@declare");
+    BOOLEAN.add("ol@compact");
+    BOOLEAN.add("optgroup@disabled");
+    BOOLEAN.add("option@selected");
+    BOOLEAN.add("option@disabled");
+    BOOLEAN.add("script@defer");
+    BOOLEAN.add("select@multiple");
+    BOOLEAN.add("select@disabled");
+    BOOLEAN.add("td@nowrap");
+    BOOLEAN.add("textarea@disabled");
+    BOOLEAN.add("textarea@readonly");
+    BOOLEAN.add("th@nowrap");
+    BOOLEAN.add("ul@compact");
     // elements with an empty content model
     EMPTIES.add("area");
     EMPTIES.add("base");
@@ -215,42 +220,42 @@ final class HTMLSerializer extends MarkupSerializer {
     EMPTIES5.add("track");
     EMPTIES5.add("wbr");
     // URI attributes
-    URIS.add("a:href");
-    URIS.add("a:name");
-    URIS.add("applet:codebase");
-    URIS.add("area:href");
-    URIS.add("base:href");
-    URIS.add("blockquote:cite");
-    URIS.add("body:background");
-    URIS.add("button:datasrc");
-    URIS.add("del:cite");
-    URIS.add("div:datasrc");
-    URIS.add("form:action");
-    URIS.add("frame:longdesc");
-    URIS.add("frame:src");
-    URIS.add("head:profile");
-    URIS.add("iframe:longdesc");
-    URIS.add("iframe:src");
-    URIS.add("img:longdesc");
-    URIS.add("img:src");
-    URIS.add("img:usemap");
-    URIS.add("input:datasrc");
-    URIS.add("input:src");
-    URIS.add("input:usemap");
-    URIS.add("ins:cite");
-    URIS.add("link:href");
-    URIS.add("object:archive");
-    URIS.add("object:classid");
-    URIS.add("object:codebase");
-    URIS.add("object:data");
-    URIS.add("object:datasrc");
-    URIS.add("object:usemap");
-    URIS.add("q:cite");
-    URIS.add("script:for");
-    URIS.add("script:src");
-    URIS.add("select:datasrc");
-    URIS.add("span:datasrc");
-    URIS.add("table:datasrc");
-    URIS.add("textarea:datasrc");
+    URIS.add("a@href");
+    URIS.add("a@name");
+    URIS.add("applet@codebase");
+    URIS.add("area@href");
+    URIS.add("base@href");
+    URIS.add("blockquote@cite");
+    URIS.add("body@background");
+    URIS.add("button@datasrc");
+    URIS.add("del@cite");
+    URIS.add("div@datasrc");
+    URIS.add("form@action");
+    URIS.add("frame@longdesc");
+    URIS.add("frame@src");
+    URIS.add("head@profile");
+    URIS.add("iframe@longdesc");
+    URIS.add("iframe@src");
+    URIS.add("img@longdesc");
+    URIS.add("img@src");
+    URIS.add("img@usemap");
+    URIS.add("input@datasrc");
+    URIS.add("input@src");
+    URIS.add("input@usemap");
+    URIS.add("ins@cite");
+    URIS.add("link@href");
+    URIS.add("object@archive");
+    URIS.add("object@classid");
+    URIS.add("object@codebase");
+    URIS.add("object@data");
+    URIS.add("object@datasrc");
+    URIS.add("object@usemap");
+    URIS.add("q@cite");
+    URIS.add("script@for");
+    URIS.add("script@src");
+    URIS.add("select@datasrc");
+    URIS.add("span@datasrc");
+    URIS.add("table@datasrc");
+    URIS.add("textarea@datasrc");
   }
 }

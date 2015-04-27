@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.nio.charset.*;
+import java.util.*;
 
 import org.basex.build.csv.*;
 import org.basex.build.csv.CsvOptions.CsvFormat;
@@ -33,11 +34,11 @@ import org.basex.util.list.*;
  */
 public abstract class Serializer implements Closeable {
   /** Stack with names of opened elements. */
-  protected final TokenList elems = new TokenList();
+  protected final Stack<QNm> elems = new Stack<>();
   /** Current level. */
   protected int level;
   /** Current element name. */
-  protected byte[] elem;
+  protected QNm elem;
   /** Indentation flag. */
   protected boolean indent;
 
@@ -46,6 +47,8 @@ public abstract class Serializer implements Closeable {
   /** Stack with namespace size pointers. */
   private final IntList nstack = new IntList();
 
+  /** Static context. */
+  protected StaticContext sc;
   /** Indicates if more than one item was serialized. */
   protected boolean more;
   /** Indicates if an element is currently being opened. */
@@ -148,6 +151,16 @@ public abstract class Serializer implements Closeable {
    */
   public void reset() { }
 
+  /**
+   * Assigns the static context.
+   * @param sctx static context
+   * @return serializer
+   */
+  public Serializer sc(final StaticContext sctx) {
+    sc = sctx;
+    return this;
+  }
+
   // PROTECTED METHODS ==================================================================
 
   /**
@@ -179,7 +192,7 @@ public abstract class Serializer implements Closeable {
       } else {
         // serialize elements (code will never be called for attributes)
         final QNm name = node.qname();
-        openElement(name.string());
+        openElement(name);
 
         // serialize declared namespaces
         final Atts nsp = node.namespaces();
@@ -211,7 +224,7 @@ public abstract class Serializer implements Closeable {
    * @param name element name
    * @throws IOException I/O exception
    */
-  protected final void openElement(final byte[] name) throws IOException {
+  protected final void openElement(final QNm name) throws IOException {
     prepare();
     opening = true;
     elem = name;
@@ -229,9 +242,10 @@ public abstract class Serializer implements Closeable {
       finishEmpty();
       opening = false;
     } else {
-      elem = elems.pop();
+      elem = elems.peek();
       level--;
       finishClose();
+      elems.pop();
     }
   }
 
@@ -306,7 +320,7 @@ public abstract class Serializer implements Closeable {
    * @throws IOException I/O exception
    */
   @SuppressWarnings("unused")
-  protected void startOpen(final byte[] name) throws IOException { }
+  protected void startOpen(final QNm name) throws IOException { }
 
   /**
    * Finishes an opening element node.
@@ -418,7 +432,8 @@ public abstract class Serializer implements Closeable {
         } else {
           // add element node
           final byte[] name = data.name(pre, kind);
-          openElement(name);
+          final byte[] uri = data.nspaces.uri(data.uri(pre, kind));
+          openElement(new QNm(name, uri));
 
           // add namespace definitions
           if(nsp != null) {
@@ -427,8 +442,7 @@ public abstract class Serializer implements Closeable {
             int pp = pre;
 
             // check namespace of current element
-            final byte[] u = data.nspaces.uri(data.uri(pre, kind));
-            namespace(prefix(name), u == null ? EMPTY : u, false);
+            namespace(prefix(name), uri == null ? EMPTY : uri, false);
 
             do {
               final Atts ns = data.ns(pp);

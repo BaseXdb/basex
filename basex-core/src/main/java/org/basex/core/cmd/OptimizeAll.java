@@ -14,6 +14,7 @@ import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -184,7 +185,7 @@ public final class OptimizeAll extends ACreate {
     public void parse(final Builder build) throws IOException {
       final Serializer ser = new BuilderSerializer(build) {
         @Override
-        protected void startOpen(final byte[] name) throws IOException {
+        protected void startOpen(final QNm name) throws IOException {
           super.startOpen(name);
           if(cmd != null) cmd.pre++;
         }

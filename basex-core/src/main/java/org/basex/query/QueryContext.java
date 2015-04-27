@@ -534,8 +534,9 @@ public final class QueryContext extends Proc implements Closeable {
    * @return serialization parameters
    */
   public SerializerOptions serParams() {
-    return serialOpts != null ? serialOpts :
-      new SerializerOptions(context.options.get(MainOptions.SERIALIZER));
+    if(serialOpts == null)
+      serialOpts = new SerializerOptions(context.options.get(MainOptions.SERIALIZER));
+    return serialOpts;
   }
 
   /**

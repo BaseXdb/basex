@@ -5,7 +5,6 @@ import static org.basex.util.Token.*;
 
 import java.math.*;
 import java.util.*;
-import java.util.regex.*;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
@@ -21,8 +20,6 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public abstract class Formatter extends FormatUtil {
-  /** Calendar pattern. */
-  private static final Pattern CALENDAR = Pattern.compile("(Q\\{([^}]*)\\})?([^}]+)");
   /** Military timezones. */
   private static final byte[] MIL = token("YXWVUTSRQPONZABCDEFGHIKLM");
   /** Token: Nn. */
@@ -132,10 +129,8 @@ public abstract class Formatter extends FormatUtil {
     if(lng.length != 0 && MAP.get(lng) == null) tb.add("[Language: en]");
     boolean iso = false;
     if(cal.length != 0) {
-      final Matcher m = CALENDAR.matcher(string(cal));
-      if(!m.matches()) throw CALQNAME_X.get(ii, cal);
-      final QNm qnm = new QNm(m.group(3), m.group(1) == null ||
-          m.group(2).isEmpty() ? null : m.group(2));
+      final QNm qnm = QNm.resolve(cal);
+      if(qnm == null) throw CALQNAME_X.get(ii, cal);
       if(!qnm.hasURI()) {
         int c = -1;
         final byte[] ln = qnm.local();
