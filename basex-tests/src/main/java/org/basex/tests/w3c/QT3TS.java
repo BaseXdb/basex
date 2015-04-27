@@ -24,6 +24,7 @@ import org.basex.tests.bxapi.*;
 import org.basex.tests.bxapi.xdm.*;
 import org.basex.util.*;
 import org.basex.util.options.Options.YesNo;
+import org.basex.util.options.Options.YesNoOmit;
 
 /**
  * Driver for the XQuery/XPath/XSLT 3.* Test Suite, located at
@@ -720,22 +721,22 @@ public final class QT3TS extends Main {
   private String serializationMatches(final XdmValue returned, final XdmValue expected,
       final SerializerOptions sprop) {
 
-    final String exp = expected.getString();
-    final String flags = asString("@flags", expected);
-    final int flgs = flags.contains("i") ? Pattern.CASE_INSENSITIVE : 0;
-    final Pattern pat = Pattern.compile("^.*" + exp + ".*", flgs |
-        Pattern.MULTILINE | Pattern.DOTALL);
-
-    if(sprop.get(SerializerOptions.METHOD) == SerialMethod.ADAPTIVE)
+    // won't work for K2-Serialization-18 and K2-Serialization-24
+    if(sprop.get(SerializerOptions.STANDALONE) == YesNoOmit.OMIT)
       sprop.set(SerializerOptions.OMIT_XML_DECLARATION, YesNo.YES);
 
     try {
-      return pat.matcher("^.*" + serialize(returned, sprop) + ".*").matches() ? null : exp;
-    } catch(final IOException ex) {
-      return Util.info("% (found: %)", exp, ex);
+      final String flags = asString("@flags", expected);
+      final XdmValue ret = XdmValue.get(Str.get(serialize(returned, sprop)));
+      final String qu = "declare variable $returned external;"
+          + "declare variable $expected external;"
+          + "matches($returned, string($expected), '" + flags + "')";
+      return new XQuery(qu, ctx).bind("returned", ret).bind("expected", expected).
+          value().getBoolean() ? null : expected.getString();
+    } catch(final Exception err) {
+      return Util.info("% (found: %)", expected.getString(), err);
     }
   }
-
 
   /**
    * Tests a serialization error.
