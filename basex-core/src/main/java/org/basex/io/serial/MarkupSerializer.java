@@ -141,7 +141,7 @@ abstract class MarkupSerializer extends StandardSerializer {
       if(cp == '"') {
         out.print(E_QUOT);
       } else if(cp == 0x9 || cp == 0xA) {
-        hex(cp);
+        printHex(cp);
       } else {
         encode(cp);
       }
@@ -253,7 +253,7 @@ abstract class MarkupSerializer extends StandardSerializer {
     }
 
     if(cp < ' ' && cp != '\n' && cp != '\t' || cp >= 0x7F && cp < 0xA0) {
-      hex(cp);
+      printHex(cp);
     } else if(cp == '&') {
       out.print(E_AMP);
     } else if(cp == '>') {
@@ -273,6 +273,11 @@ abstract class MarkupSerializer extends StandardSerializer {
    * @throws IOException I/O exception
    */
   protected abstract void doctype(final QNm type) throws IOException;
+
+  @Override
+  protected boolean ignore(final ANode node) {
+    return ct > 0 && eq(node.name(), META) && node.attribute(HTTPEQUIV) != null;
+  }
 
   /**
    * Prints the document type declaration.
@@ -317,7 +322,7 @@ abstract class MarkupSerializer extends StandardSerializer {
    * @param cp codepoint (00-FF)
    * @throws IOException I/O exception
    */
-  final void hex(final int cp) throws IOException {
+  protected final void printHex(final int cp) throws IOException {
     out.print("&#x");
     if(cp > 0xF) out.print(HEX[cp >> 4]);
     out.print(HEX[cp & 0xF]);
@@ -331,7 +336,7 @@ abstract class MarkupSerializer extends StandardSerializer {
    * @return {@code true} if declaration was printed
    * @throws IOException I/O exception
    */
-  boolean ct(final boolean empty, final boolean html) throws IOException {
+  protected final boolean printCT(final boolean empty, final boolean html) throws IOException {
     if(ct != 1) return false;
     ct++;
     if(empty) finishOpen();
@@ -349,11 +354,6 @@ abstract class MarkupSerializer extends StandardSerializer {
     level--;
     if(empty) finishClose();
     return true;
-  }
-
-  @Override
-  protected boolean ignore(final ANode node) {
-    return ct > 0 && eq(node.name(), META) && node.attribute(HTTPEQUIV) != null;
   }
 
   // PRIVATE METHODS ==============================================================================

@@ -50,7 +50,7 @@ final class HTMLSerializer extends MarkupSerializer {
     // don't append value for boolean attributes
     byte[] val = value;
     if(!BOOLEAN.isEmpty() || !URIS.isEmpty()) {
-      final byte[] nm = concat(lc(elem.local()), ATT, lc(name));
+      final byte[] nm = concat(lc(elem.string()), ATT, lc(name));
       if(BOOLEAN.contains(nm) && eq(name, val)) return;
       // escape URI attributes
       if(escuri && URIS.contains(nm)) val = escape(val);
@@ -65,7 +65,7 @@ final class HTMLSerializer extends MarkupSerializer {
       } else if(ch == '"') {
         out.print(E_QUOT);
       } else if(ch == 0x9 || ch == 0xA) {
-        hex(ch);
+        printHex(ch);
       } else {
         encode(ch);
       }
@@ -114,12 +114,12 @@ final class HTMLSerializer extends MarkupSerializer {
   @Override
   protected void finishOpen() throws IOException {
     super.finishOpen();
-    ct(false, true);
+    printCT(false, true);
   }
 
   @Override
   protected void finishEmpty() throws IOException {
-    if(ct(true, true)) return;
+    if(printCT(true, true)) return;
     out.print(ELEM_C);
     final byte[] lc = lc(elem.local());
     if(html5) {

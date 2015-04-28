@@ -44,12 +44,12 @@ final class XHTMLSerializer extends MarkupSerializer {
   @Override
   protected void finishOpen() throws IOException {
     super.finishOpen();
-    ct(false, false);
+    printCT(false, false);
   }
 
   @Override
   protected void finishEmpty() throws IOException {
-    if(ct(true, false)) return;
+    if(printCT(true, false)) return;
     final byte[] lc = lc(elem.local());
     if(html5 && HTMLSerializer.EMPTIES5.contains(lc)) {
       out.print(ELEM_SC);
