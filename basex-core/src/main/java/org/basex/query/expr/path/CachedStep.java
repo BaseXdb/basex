@@ -3,6 +3,7 @@ package org.basex.query.expr.path;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
@@ -28,35 +29,35 @@ final class CachedStep extends Step {
   }
 
   @Override
-  public NodeSeqBuilder iter(final QueryContext qc) throws QueryException {
+  public NodeIter iter(final QueryContext qc) throws QueryException {
     // evaluate step
-    final AxisIter ai = axis.iter(checkNode(qc));
-    final NodeSeqBuilder nc = new NodeSeqBuilder();
-    for(ANode n; (n = ai.next()) != null;) {
-      if(test.eq(n)) nc.add(n.finish());
+    final BasicNodeIter iter = axis.iter(checkNode(qc));
+    final ANodeList list = new ANodeList();
+    for(ANode n; (n = iter.next()) != null;) {
+      if(test.eq(n)) list.add(n.finish());
     }
 
     // evaluate predicates
     final boolean scoring = qc.scoring;
     for(final Expr pred : preds) {
-      final long nl = nc.size();
+      final long nl = list.size();
       qc.size = nl;
       qc.pos = 1;
       int c = 0;
       for(int n = 0; n < nl; ++n) {
-        final ANode node = nc.get(n);
+        final ANode node = list.get(n);
         qc.value = node;
         final Item tst = pred.test(qc, info);
         if(tst != null) {
           // assign score value
           if(scoring) node.score(tst.score());
-          nc.nodes[c++] = node;
+          list.set(c++, node);
         }
         qc.pos++;
       }
-      nc.size(c);
+      list.size(c);
     }
-    return nc;
+    return list.iter();
   }
 
   @Override

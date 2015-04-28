@@ -5,7 +5,7 @@ import org.basex.query.value.array.*;
 import org.basex.util.list.*;
 
 /**
- * This is a simple container for values.
+ * Resizable-array implementation for values.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen

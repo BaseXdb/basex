@@ -2,6 +2,7 @@ package org.basex.query.func.fn;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.list.*;
 
 /**
  * Function implementation.
@@ -11,9 +12,9 @@ import org.basex.query.iter.*;
  */
 public final class FnId extends Ids {
   @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
-    final NodeSeqBuilder nc = new NodeSeqBuilder().check();
-    add(ids(exprs[0].atomIter(qc, info)), nc, checkRoot(toNode(arg(1, qc), qc)), false);
-    return nc;
+  public BasicNodeIter iter(final QueryContext qc) throws QueryException {
+    final ANodeList list = new ANodeList().check();
+    add(ids(exprs[0].atomIter(qc, info)), list, checkRoot(toNode(arg(1, qc), qc)), false);
+    return list.iter();
   }
 }

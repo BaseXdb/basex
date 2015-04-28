@@ -95,7 +95,7 @@ public final class HttpRequestParser {
    * @param hdrs map for parsed headers
    * @return body or multipart
    */
-  private static ANode parseHdrs(final AxisIter iter, final HashMap<String, String> hdrs) {
+  private static ANode parseHdrs(final BasicNodeIter iter, final HashMap<String, String> hdrs) {
     for(final ANode node : iter) {
       final QNm nm = node.qname();
       if(nm == null) continue;
@@ -155,7 +155,7 @@ public final class HttpRequestParser {
     if(attrs.get(SerializerOptions.MEDIA_TYPE.name()) == null)
       throw HC_REQ_X.get(info, "Attribute media-type of http:multipart is mandatory");
 
-    final AxisIter prts = multipart.children();
+    final BasicNodeIter prts = multipart.children();
     while(true) {
       final Part p = new Part();
       final ANode partBody = parseHdrs(prts, p.headers);
@@ -225,7 +225,7 @@ public final class HttpRequestParser {
 
     // if src attribute is used to set the content of the body, no
     // other attributes must be specified and no content must be present
-    if(bodyAttrs.get(SRC) != null && (bodyAttrs.size() > 2 || body.children().more()))
+    if(bodyAttrs.get(SRC) != null && (bodyAttrs.size() > 2 || body.children().next() != null))
       throw HC_ATTR.get(info);
 
   }

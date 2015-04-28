@@ -37,7 +37,7 @@ final class IterLastStep extends Step {
         stop = true;
 
         // return last items
-        final AxisIter iter = axis.iter(checkNode(qc));
+        final BasicNodeIter iter = axis.iter(checkNode(qc));
         ANode litem = null;
         final Test tst = test;
         for(ANode item; (item = iter.next()) != null;) {

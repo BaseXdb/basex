@@ -98,9 +98,9 @@ public final class MixedPath extends Path {
 
         if(nodes == vs) {
           // remove potential duplicates from node sets
-          final NodeSeqBuilder nc = new NodeSeqBuilder().check();
-          for(final Item nd : cache) nc.add((ANode) nd);
-          iter = nc;
+          final ANodeList list = new ANodeList().check();
+          for(final Item nd : cache) list.add((ANode) nd);
+          iter = list.iter();
         } else {
           iter = cache.iter();
         }

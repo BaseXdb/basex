@@ -150,8 +150,8 @@ public final class Constr {
       } else if(ip == NodeType.DOC) {
         // type: document node
 
-        final AxisIter ai = node.children();
-        for(ANode ch; (ch = ai.next()) != null && add(qc, ch););
+        final BasicNodeIter iter = node.children();
+        for(ANode ch; (ch = iter.next()) != null && add(qc, ch););
 
       } else {
         // type: element/comment/processing instruction node

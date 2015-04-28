@@ -56,21 +56,21 @@ public final class Except extends Set {
   }
 
   @Override
-  protected NodeSeqBuilder eval(final Iter[] iter) throws QueryException {
-    final NodeSeqBuilder nc = new NodeSeqBuilder().check();
+  protected ANodeList eval(final Iter[] iter) throws QueryException {
+    final ANodeList list = new ANodeList().check();
 
-    for(Item it; (it = iter[0].next()) != null;) nc.add(toNode(it));
-    final boolean db = nc.dbnodes();
+    for(Item it; (it = iter[0].next()) != null;) list.add(toNode(it));
+    final boolean db = list.dbnodes();
 
     final int el = exprs.length;
-    for(int e = 1; e < el && nc.size() != 0; e++) {
+    for(int e = 1; e < el && !list.isEmpty(); e++) {
       final Iter ir = iter[e];
       for(Item it; (it = ir.next()) != null;) {
-        final int i = nc.indexOf(toNode(it), db);
-        if(i != -1) nc.delete(i);
+        final int i = list.indexOf(toNode(it), db);
+        if(i != -1) list.delete(i);
       }
     }
-    return nc;
+    return list;
   }
 
   @Override

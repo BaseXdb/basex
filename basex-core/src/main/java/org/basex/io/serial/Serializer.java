@@ -202,8 +202,8 @@ public abstract class Serializer implements Closeable {
 
         // serialize attributes
         final boolean i = indent;
-        AxisMoreIter ai = node.attributes();
-        for(ANode nd; (nd = ai.next()) != null;) {
+        BasicNodeIter iter = node.attributes();
+        for(ANode nd; (nd = iter.next()) != null;) {
           final byte[] n = nd.name();
           final byte[] v = nd.string();
           attribute(n, v, false);
@@ -211,8 +211,8 @@ public abstract class Serializer implements Closeable {
         }
 
         // serialize children
-        ai = node.children();
-        for(ANode n; (n = ai.next()) != null;) node(n);
+        iter = node.children();
+        for(ANode n; (n = iter.next()) != null;) node(n);
         closeElement();
         indent = i;
       }

@@ -30,12 +30,12 @@ final class IterStep extends Step {
   @Override
   public NodeIter iter(final QueryContext qc) {
     return new NodeIter() {
-      AxisIter ai;
+      BasicNodeIter iter;
 
       @Override
       public ANode next() throws QueryException {
-        if(ai == null) ai = axis.iter(checkNode(qc));
-        for(ANode node; (node = ai.next()) != null;) {
+        if(iter == null) iter = axis.iter(checkNode(qc));
+        for(ANode node; (node = iter.next()) != null;) {
           qc.checkStop();
           if(test.eq(node) && preds(node, qc)) return node.finish();
         }

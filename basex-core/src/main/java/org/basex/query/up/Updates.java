@@ -93,7 +93,7 @@ public final class Updates {
 
     // determine highest ancestor node
     ANode anc = target;
-    final AxisIter it = target.ancestor();
+    final BasicNodeIter it = target.ancestor();
     for(ANode p; (p = it.next()) != null;) anc = p;
 
     /* See if this ancestor has already been added to the pending update list.
@@ -163,7 +163,7 @@ public final class Updates {
     if(node.id == trgID) return 0;
 
     int s = 1;
-    AxisIter it = node.attributes();
+    BasicNodeIter it = node.attributes();
     for(ANode n; (n = it.next()) != null;) {
       final int st = preSteps(n, trgID);
       if(st == 0) return s;

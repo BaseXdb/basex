@@ -10,7 +10,7 @@ import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
- * This is a simple container for items.
+ * Resizable-array implementation for items.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
@@ -141,7 +141,7 @@ public final class ItemList extends ElementList implements Iterable<Item> {
 
   /**
    * Returns an iterator over the items in this list.
-   * The list should not be changed after an iterator was created.
+   * The list must not be modified after the iterator has been requested.
    * @return the iterator
    */
   public Iter iter() {

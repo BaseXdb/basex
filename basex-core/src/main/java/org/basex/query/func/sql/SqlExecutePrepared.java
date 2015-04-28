@@ -78,7 +78,7 @@ public final class SqlExecutePrepared extends SqlExecute {
    * @return number of parameters
    */
   private static long countParams(final ANode params) {
-    final AxisIter ch = params.children();
+    final BasicNodeIter ch = params.children();
     long n = ch.size();
     if(n == -1) do ++n;
     while(ch.next() != null);
@@ -91,14 +91,14 @@ public final class SqlExecutePrepared extends SqlExecute {
    * @param stmt prepared statement
    * @throws QueryException query exception
    */
-  private void setParameters(final AxisMoreIter params, final PreparedStatement stmt)
+  private void setParameters(final BasicNodeIter params, final PreparedStatement stmt)
       throws QueryException {
 
     int i = 0;
     for(ANode next; (next = params.next()) != null;) {
       // Check name
       if(!next.qname().eq(Q_PARAMETER)) throw INVALIDOPTION_X.get(info, next.qname().local());
-      final AxisIter attrs = next.attributes();
+      final BasicNodeIter attrs = next.attributes();
       byte[] paramType = null;
       boolean isNull = false;
       for(ANode attr; (attr = attrs.next()) != null;) {

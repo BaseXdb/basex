@@ -36,14 +36,14 @@ public final class StringRangeAccess extends IndexAccess {
   }
 
   @Override
-  public AxisIter iter(final QueryContext qc) {
+  public BasicNodeIter iter(final QueryContext qc) {
     final byte kind = index.text ? Data.TEXT : Data.ATTR;
     final Data data = ictx.data;
     final int ml = data.meta.maxlen;
     final IndexIterator ii = index.min.length <= ml && index.max.length <= ml &&
         (index.text ? data.meta.textindex : data.meta.attrindex) ? data.iter(index) : scan();
 
-    return new AxisIter() {
+    return new BasicNodeIter() {
       @Override
       public ANode next() {
         return ii.more() ? new DBNode(data, ii.pre(), kind) : null;

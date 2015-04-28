@@ -5,7 +5,7 @@ import static org.basex.query.QueryError.*;
 import org.junit.*;
 
 /**
- * This class tests serializer.
+ * This class tests the serializers.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
@@ -25,7 +25,10 @@ public final class SerializerTest extends AdvancedQueryTest {
     query(option + "<html/>", "<html></html>");
     final String[] empties = { "area", "base", "br", "col", "embed", "hr", "img", "input",
         "link", "meta", "basefont", "frame", "isindex", "param" };
-    for(final String e : empties) query(option + '<' + e + "/>", '<' + e + " />");
+    for(final String e : empties) {
+      query(option + "<html xmlns='http://www.w3.org/1999/xhtml'><" + e + "/></html>",
+          "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<" + e + " />\n</html>");
+    }
   }
 
   /** Test: method=html. */

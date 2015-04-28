@@ -5,7 +5,7 @@ import java.util.*;
 import org.basex.util.*;
 
 /**
- * This is a simple container for native booleans.
+ * Resizable-array implementation for native booleans.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen

@@ -7,6 +7,7 @@ import static org.basex.util.Token.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -37,24 +38,23 @@ abstract class Ids extends StandardFunc {
    * Adds nodes with the specified id.
    * @param ids ids to be found
    * @param idref idref flag
-   * @param nc node cache
+   * @param list node cache
    * @param node node
    */
-  static void add(final byte[][] ids, final NodeSeqBuilder nc, final ANode node,
-                  final boolean idref) {
-    AxisIter ai = node.attributes();
-    for(ANode at; (at = ai.next()) != null;) {
+  static void add(final byte[][] ids, final ANodeList list, final ANode node, final boolean idref) {
+    BasicNodeIter iter = node.attributes();
+    for(ANode at; (at = iter.next()) != null;) {
       final byte[][] val = split(at.string(), ' ');
       // [CG] XQuery: ID-IDREF Parsing
       for(final byte[] id : ids) {
         if(!eq(id, val)) continue;
         final byte[] nm = lc(at.qname().string());
         final boolean ii = contains(nm, ID), ir = contains(nm, IDREF);
-        if(idref ? ir : ii && !ir) nc.add(idref ? at.finish() : node);
+        if(idref ? ir : ii && !ir) list.add(idref ? at.finish() : node);
       }
     }
-    ai = node.children();
-    for(ANode att; (att = ai.next()) != null;) add(ids, nc, att.finish(), idref);
+    iter = node.children();
+    for(ANode att; (att = iter.next()) != null;) add(ids, list, att.finish(), idref);
   }
 
   /**

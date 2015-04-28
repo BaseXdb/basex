@@ -6,6 +6,7 @@ import org.basex.core.locks.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -36,15 +37,15 @@ public final class Root extends Simple {
   }
 
   @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
+  public BasicNodeIter iter(final QueryContext qc) throws QueryException {
     final Iter iter = ctxValue(qc).iter();
-    final NodeSeqBuilder nc = new NodeSeqBuilder().check();
+    final ANodeList list = new ANodeList().check();
     for(Item i; (i = iter.next()) != null;) {
       final ANode n = root(i);
       if(n == null || n.type != NodeType.DOC) throw CTXNODE.get(info);
-      nc.add(n);
+      list.add(n);
     }
-    return nc;
+    return list.iter();
   }
 
   @Override

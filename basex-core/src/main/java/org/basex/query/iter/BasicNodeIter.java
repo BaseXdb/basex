@@ -2,42 +2,52 @@ package org.basex.query.iter;
 
 import java.util.*;
 
+import org.basex.query.value.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
- * Interface for light-weight axis iterators, throwing no exceptions.
+ * Basic node iterator, throwing no exceptions.
  *
  * This class also implements the {@link Iterable} interface, which is why all of its
  * values can also be retrieved via enhanced for(for-each) loops. Note, however, that
- * using the {@link #next()} method will give you better performance.
- *
- * <b>Important</b>: to improve performance, this iterator may return the same node
- * instance with updated values. If resulting nodes are to be further processed,
- * they need to be finalized via {@link ANode#finish()}.
+ * the {@link #next()} method will give you better performance.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public abstract class AxisIter extends NodeIter implements Iterable<ANode> {
+public abstract class BasicNodeIter extends NodeIter implements Iterable<ANode> {
+  /** Empty iterator. */
+  public static final BasicNodeIter EMPTY = new BasicNodeIter() {
+    @Override public ANode next() { return null; }
+    @Override public long size() { return 0; }
+    @Override public Value value() { return Empty.SEQ; }
+  };
+
   @Override
   public abstract ANode next();
 
   @Override
+  public ANode get(final long i) {
+    return null;
+  }
+
+  @Override
   public final Iterator<ANode> iterator() {
     return new Iterator<ANode>() {
-      /** Current node. */
-      private ANode n;
+      private ANode node;
 
       @Override
       public boolean hasNext() {
-        n = AxisIter.this.next();
+        final ANode n = BasicNodeIter.this.next();
+        node = n;
         return n != null;
       }
 
       @Override
       public ANode next() {
-        return n;
+        return node;
       }
 
       @Override

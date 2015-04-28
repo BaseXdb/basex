@@ -101,8 +101,8 @@ public final class DataBuilder {
     data.doc(ds, s, node.baseURI());
     data.insert(ds);
     int p = pre + 1;
-    final AxisIter ai = node.children();
-    for(ANode ch; (ch = ai.next()) != null;) p = addNode(ch, p, pre, null);
+    final BasicNodeIter iter = node.children();
+    for(ANode ch; (ch = iter.next()) != null;) p = addNode(ch, p, pre, null);
     if(s != p - pre) data.size(ds, Data.DOC, p - pre);
     return p;
   }
@@ -238,10 +238,10 @@ public final class DataBuilder {
 
     // add attributes and children
     int p = pre + 1;
-    AxisIter ai = node.attributes();
-    for(ANode ch; (ch = ai.next()) != null;) p = addAttr(ch, p, pre);
-    ai = node.children();
-    for(ANode ch; (ch = ai.next()) != null;) p = addNode(ch, p, pre, node);
+    BasicNodeIter iter = node.attributes();
+    for(ANode ch; (ch = iter.next()) != null;) p = addAttr(ch, p, pre);
+    iter = node.children();
+    for(ANode ch; (ch = iter.next()) != null;) p = addNode(ch, p, pre, node);
     data.nspaces.close(ds);
 
     // update size if additional nodes have been added by the descendants
@@ -265,11 +265,11 @@ public final class DataBuilder {
     }
 
     int s = 1;
-    AxisIter ai = node.attributes();
-    while(ai.next() != null) ++s;
+    BasicNodeIter iter = node.attributes();
+    while(iter.next() != null) ++s;
     if(!att) {
-      ai = node.children();
-      for(ANode i; (i = ai.next()) != null;) s += size(i, false);
+      iter = node.children();
+      for(ANode i; (i = iter.next()) != null;) s += size(i, false);
     }
     return s;
   }
