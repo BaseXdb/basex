@@ -29,7 +29,7 @@ abstract class MarkupSerializer extends StandardSerializer {
   /** System document type. */
   String docsys;
   /** Public document type. */
-  private String docpub;
+  String docpub;
   /** Flag for printing content type. */
   int ct;
 
@@ -270,21 +270,31 @@ abstract class MarkupSerializer extends StandardSerializer {
   /**
    * Prints the document type declaration.
    * @param type document type or {@code null} for html type
-   * @return true if doctype was added
    * @throws IOException I/O exception
    */
-  boolean doctype(final QNm type) throws IOException {
-    if(level != 0 || docsys == null && docpub == null) return false;
+  protected abstract void doctype(final QNm type) throws IOException;
+
+  /**
+   * Prints the document type declaration.
+   * @param type document type or {@code null} for html type
+   * @param pub doctype-public parameter
+   * @param sys doctype-system parameter
+   * @throws IOException I/O exception
+   */
+  protected final void printDoctype(final QNm type, final String pub, final String sys)
+      throws IOException {
+
+    if(level != 0) return;
     if(sep) indent();
     out.print(DOCTYPE);
-    if(type == null) out.print(HTML);
-    else out.print(type.string());
-    if(docpub != null) out.print(' ' + PUBLIC + " \"" + docpub + '"');
-    else out.print(' ' + SYSTEM);
-    if(docsys != null) out.print(" \"" + docsys + '"');
+    out.print(type == null ? HTML : type.string());
+    if(sys != null || pub != null) {
+      if(pub != null) out.print(' ' + PUBLIC + " \"" + pub + '"');
+      else out.print(' ' + SYSTEM);
+      if(sys != null) out.print(" \"" + sys + '"');
+    }
     out.print(ELEM_C);
     sep = true;
-    return true;
   }
 
   @Override

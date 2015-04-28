@@ -141,17 +141,13 @@ final class HTMLSerializer extends MarkupSerializer {
   }
 
   @Override
-  boolean doctype(final QNm type) throws IOException {
-    if(level != 0) return false;
-    if(!super.doctype(type) && html5) {
-      if(sep) indent();
-      out.print(DOCTYPE);
-      if(type == null) out.print(HTML);
-      else out.print(type.local());
-      out.print(ELEM_C);
-      if(indent) newline();
+  protected void doctype(final QNm type) throws IOException {
+    final boolean doc = docpub != null || docsys != null;
+    if(doc) {
+      printDoctype(type, docpub, docsys);
+    } else if(html5) {
+      printDoctype(type, null, null);
     }
-    return true;
   }
 
   // HTML Serializer: cache elements
@@ -202,16 +198,13 @@ final class HTMLSerializer extends MarkupSerializer {
     // elements with an empty content model
     EMPTIES5.add("area");
     EMPTIES5.add("base");
-    EMPTIES5.add("basefont");
     EMPTIES5.add("br");
     EMPTIES5.add("col");
     EMPTIES5.add("command");
     EMPTIES5.add("embed");
-    EMPTIES5.add("frame");
     EMPTIES5.add("hr");
     EMPTIES5.add("img");
     EMPTIES5.add("input");
-    EMPTIES5.add("isindex");
     EMPTIES5.add("keygen");
     EMPTIES5.add("link");
     EMPTIES5.add("meta");

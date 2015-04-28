@@ -50,7 +50,10 @@ final class XHTMLSerializer extends MarkupSerializer {
   @Override
   protected void finishEmpty() throws IOException {
     if(ct(true, false)) return;
-    if((html5 ? HTMLSerializer.EMPTIES5 : HTMLSerializer.EMPTIES).contains(lc(elem.local()))) {
+    final byte[] lc = lc(elem.local());
+    if(html5 && HTMLSerializer.EMPTIES5.contains(lc)) {
+      out.print(ELEM_SC);
+    } else if(!html5 && HTMLSerializer.EMPTIES.contains(lc) && eq(elem.uri(), XHTML_URI)) {
       out.print(' ');
       out.print(ELEM_SC);
     } else {
@@ -61,16 +64,11 @@ final class XHTMLSerializer extends MarkupSerializer {
   }
 
   @Override
-  protected boolean doctype(final QNm type) throws IOException {
-    if(level != 0) return false;
-    if(!super.doctype(type) && html5) {
-      if(sep) indent();
-      out.print(DOCTYPE);
-      if(type == null) out.print(HTML);
-      else out.print(type.local());
-      out.print(ELEM_C);
-      newline();
+  protected void doctype(final QNm type) throws IOException {
+    if(html5 && docsys == null) {
+      printDoctype(type, null, null);
+    } else if(docsys != null) {
+      printDoctype(type, docpub, docsys);
     }
-    return true;
   }
 }

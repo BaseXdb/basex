@@ -51,6 +51,11 @@ final class XMLSerializer extends MarkupSerializer {
     super.atomic(it);
   }
 
+  @Override
+  protected void doctype(final QNm type) throws IOException {
+    if(docsys != null) printDoctype(type, docpub, docsys);
+  }
+
   /**
    * Checks if document serialization is valid.
    * @throws QueryIOException query I/O exception
