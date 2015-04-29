@@ -263,6 +263,13 @@ public final class DbModuleTest extends AdvancedQueryTest {
 
   /** Test method. */
   @Test
+  public void outputCache() {
+    query(_DB_OUTPUT_CACHE.args(), "");
+    query(_DB_OUTPUT.args("x") + ',' + _DB_OUTPUT.args(_DB_OUTPUT_CACHE.args()), "x\nx");
+  }
+
+  /** Test method. */
+  @Test
   public void add() {
     query(COUNT.args(COLLECTION.args(NAME)), "1");
     query(_DB_ADD.args(NAME, FILE));

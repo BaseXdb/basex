@@ -790,6 +790,8 @@ public enum Function {
   /** XQuery function. */
   _DB_OUTPUT(DbOutput.class, "output(result)", arg(ITEM_ZM), EMP, flag(UPD, NDT), DB_URI),
   /** XQuery function. */
+  _DB_OUTPUT_CACHE(DbOutputCache.class, "output-cache()", arg(), ITEM_ZO, flag(NDT), DB_URI),
+  /** XQuery function. */
   _DB_ADD(DbAdd.class, "add(database,input[,path[,options]])",
       arg(STR, NOD, STR, ITEM), EMP, flag(UPD, NDT), DB_URI),
   /** XQuery function. */
