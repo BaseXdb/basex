@@ -345,7 +345,7 @@ public final class Window extends Clause {
   void calcSize(final long[] minMax) {
     // number of results cannot be anticipated
     minMax[0] = 0;
-    minMax[1] = -1;
+    minMax[1] = expr.isEmpty() ? 0 : -1;
   }
 
   @Override
