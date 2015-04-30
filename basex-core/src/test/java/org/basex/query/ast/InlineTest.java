@@ -133,4 +133,14 @@ public final class InlineTest extends QueryPlanTest {
         + "let $b := $a(1) let $c := $a(1) let $d := $a(1) return $b", "1", "count(//Let) != 2");
     check("let $a := 'foo' return 'bar' ! . ! $a", "foo", "empty(//Let)");
   }
+
+  /** Checks that window clauses are recognized as loops. */
+  @Test public void gh1126() {
+    check("let $s := (1 to 2) ! . "
+        + "for tumbling window $w in 1 to 2 start when true() end when true() return $s",
+        "1\n2\n1\n2",
+        "count(//Let) eq 1",
+        "count(//Window) eq 1",
+        "//Let << //Window");
+  }
 }
