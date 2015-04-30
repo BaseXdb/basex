@@ -53,6 +53,19 @@ public final class GFLWOR extends ParseExpr {
   }
 
   @Override
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    Item out = null;
+    for(final Eval eval = newEval(); eval.next(qc);) {
+      final Item it = ret.item(qc, ii);
+      if(it != null) {
+        if(out != null) throw QueryError.SEQFOUND_X.get(ii, ValueBuilder.concat(out, it));
+        out = it;
+      }
+    }
+    return out;
+  }
+
+  @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Eval eval = newEval();
     if(!eval.next(qc)) return Empty.SEQ;
@@ -73,17 +86,14 @@ public final class GFLWOR extends ParseExpr {
       private final Eval ev = newEval();
       /** Return iterator. */
       private Iter sub = Empty.ITER;
-      /** If the iterator has been emptied. */
-      private boolean drained;
       @Override
       public Item next() throws QueryException {
-        if(drained) return null;
         for(;;) {
           final Item it = sub.next();
           qc.checkStop();
           if(it != null) return it;
           if(!ev.next(qc)) {
-            drained = true;
+            sub = null;
             return null;
           }
           sub = ret.iter(qc);
