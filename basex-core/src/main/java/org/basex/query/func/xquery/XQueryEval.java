@@ -84,10 +84,7 @@ public class XQueryEval extends StandardFunc {
             @Override
             public void run() {
               // limit reached: perform garbage collection and check again
-              if(Performance.memory() > limit) {
-                Performance.gc(1);
-                if(Performance.memory() > limit) qctx.stop();
-              }
+              if(Performance.memory() > limit) qctx.stop();
             }
           }, 500, 500);
         }
