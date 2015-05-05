@@ -65,7 +65,13 @@ function query(wait, success, key, query, enforce, target) {
           target(req.responseText);
           if(success) setInfo(success);
         } else {
-          setError(req.statusText.replace(/^.*?\] /, ''));
+          // Jetty and Tomcat support (both return error messages differently)
+          var msg = req.statusText.match(/\[\w+\]/g) ? req.statusText : req.responseText;
+          var s = msg.indexOf('['), e = msg.indexOf('<', s);
+          if(s > -1) msg = msg.substring(s, e > s ? e : msg.length);
+          var html = document.createElement('div');
+          html.innerHTML = msg;
+          setError(html.innerText || html.textContent);
         }
       }
     };
