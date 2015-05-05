@@ -22,7 +22,7 @@ declare variable $_:CAT := 'queries';
  :)
 declare
   %rest:GET
-  %rest:path("dba/queries")
+  %rest:path("/dba/queries")
   %rest:query-param("query",  "{$query}")
   %rest:query-param("error",  "{$error}")
   %rest:query-param("info",   "{$info}")
@@ -76,7 +76,7 @@ function _:queries(
  : @return result of query
  :)
 declare
-  %rest:path("dba/eval-query")
+  %rest:path("/dba/eval-query")
   %rest:query-param("query", "{$query}")
   %output:method("text")
 function _:eval-query(
@@ -92,7 +92,7 @@ function _:eval-query(
  :)
 declare
   %updating
-  %rest:path("dba/update-query")
+  %rest:path("/dba/update-query")
   %rest:query-param("query", "{$query}")
   %output:method("text")
 function _:update-query(

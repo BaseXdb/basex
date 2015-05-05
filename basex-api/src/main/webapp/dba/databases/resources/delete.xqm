@@ -19,7 +19,7 @@ declare variable $_:SUB := 'database';
 declare
   %updating
   %rest:GET
-  %rest:path("dba/delete")
+  %rest:path("/dba/delete")
   %rest:query-param("name",     "{$name}")
   %rest:query-param("resource", "{$resources}")
   %output:method("html")

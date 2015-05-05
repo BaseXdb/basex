@@ -25,7 +25,7 @@ declare variable $_:SUB := 'database';
  :)
 declare
   %rest:GET
-  %rest:path("dba/add")
+  %rest:path("/dba/add")
   %rest:query-param("name",     "{$name}")
   %rest:query-param("resource", "{$resource}")
   %rest:query-param("binary",   "{$binary}")
@@ -83,7 +83,7 @@ function _:add(
 declare
   %updating
   %rest:POST
-  %rest:path("dba/add")
+  %rest:path("/dba/add")
   %rest:form-param("name",     "{$name}")
   %rest:form-param("resource", "{$resource}")
   %rest:form-param("file",     "{$file}")

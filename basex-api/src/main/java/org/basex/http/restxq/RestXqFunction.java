@@ -18,6 +18,7 @@ import org.basex.build.html.*;
 import org.basex.build.json.*;
 import org.basex.build.text.*;
 import org.basex.core.*;
+import org.basex.core.Context;
 import org.basex.http.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
@@ -113,15 +114,15 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
 
   /**
    * Checks a function for RESTFful annotations.
-   * @param http HTTP context
+   * @param ctx database context
    * @return {@code true} if module contains relevant annotations
    * @throws Exception exception
    */
-  boolean parse(final HTTPContext http) throws Exception {
+  boolean parse(final Context ctx) throws Exception {
     // parse all annotations
     final boolean[] declared = new boolean[function.args.length];
     boolean found = false;
-    final MainOptions options = http.context(false).options;
+    final MainOptions options = ctx.options;
     for(final Ann ann : function.anns) {
       found |= eq(ann.sig.uri, QueryText.REST_URI);
       if(ann.sig == _REST_PATH) {

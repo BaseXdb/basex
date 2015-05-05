@@ -20,7 +20,7 @@ declare variable $_:SUB := 'database';
  :)
 declare
   %rest:POST
-  %rest:path("dba/resource")
+  %rest:path("/dba/resource")
   %rest:form-param("action",   "{$action}")
   %rest:form-param("name",     "{$name}")
   %rest:form-param("resource", "{$resource}")

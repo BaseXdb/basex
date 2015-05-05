@@ -13,10 +13,10 @@ import module namespace tmpl = 'dba/tmpl' at 'modules/tmpl.xqm';
  : Redirects to the start page.
  :)
 declare
-  %rest:path("dba")
+  %rest:path("/dba")
 function _:redirect(
 ) {
-  web:redirect('dba/databases')
+  web:redirect("/dba/databases")
 };
 
 (:~
@@ -25,7 +25,7 @@ function _:redirect(
  : @return rest response and binary file
  :)
 declare
-  %rest:path("dba/files/{$file=.+}")
+  %rest:path("/dba/files/{$file=.+}")
 function _:file(
   $file as xs:string
 ) as item()+ {
@@ -42,7 +42,7 @@ function _:file(
  : @return page
  :)
 declare
-  %rest:path("dba/{$unknown}")
+  %rest:path("/dba/{$unknown}")
   %output:method("html")
 function _:any(
   $unknown  as xs:string

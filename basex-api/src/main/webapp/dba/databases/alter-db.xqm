@@ -24,7 +24,7 @@ declare variable $_:SUB := 'database';
  :)
 declare
   %rest:GET
-  %rest:path("dba/alter-db")
+  %rest:path("/dba/alter-db")
   %rest:query-param("name",    "{$name}")
   %rest:query-param("newname", "{$newname}")
   %rest:query-param("error",   "{$error}")
@@ -70,7 +70,7 @@ function _:alter(
 declare
   %updating
   %rest:POST
-  %rest:path("dba/alter-db")
+  %rest:path("/dba/alter-db")
   %rest:query-param("name",    "{$name}")
   %rest:query-param("newname", "{$newname}")
 function _:alter(

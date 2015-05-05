@@ -24,7 +24,7 @@ declare variable $_:CAT := 'users';
  :)
 declare
   %rest:GET
-  %rest:path("dba/users")
+  %rest:path("/dba/users")
   %rest:query-param("sort", "{$sort}", "")
   %rest:query-param("error", "{$error}")
   %rest:query-param("info",  "{$info}")
@@ -114,7 +114,7 @@ function _:users(
  :)
 declare
   %rest:POST
-  %rest:path("dba/users")
+  %rest:path("/dba/users")
   %rest:query-param("action", "{$action}")
   %rest:query-param("name",   "{$names}")
   %rest:query-param("id",     "{$ids}")

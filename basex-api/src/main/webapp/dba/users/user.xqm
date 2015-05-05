@@ -27,7 +27,7 @@ declare variable $_:SUB := 'user';
  :)
 declare
   %rest:GET
-  %rest:path("dba/user")
+  %rest:path("/dba/user")
   %rest:query-param("name",     "{$name}")
   %rest:query-param("newname",  "{$newname}")
   %rest:query-param("pw",       "{$pw}")
@@ -149,7 +149,7 @@ function _:user(
  :)
 declare
   %rest:POST
-  %rest:path("dba/user")
+  %rest:path("/dba/user")
   %rest:form-param("action",  "{$action}")
   %rest:form-param("name",    "{$name}")
   %rest:form-param("pattern", "{$pattern}")
@@ -172,7 +172,7 @@ function _:action(
 declare
   %updating
   %rest:POST
-  %rest:path("dba/edit-user")
+  %rest:path("/dba/edit-user")
   %rest:query-param("name",    "{$name}")
   %rest:query-param("newname", "{$newname}")
   %rest:query-param("pw",      "{$pw}")

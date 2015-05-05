@@ -17,7 +17,7 @@ declare variable $_:CAT := 'settings';
  :)
 declare
   %rest:GET
-  %rest:path("dba/settings")
+  %rest:path("/dba/settings")
   %output:method("html")
 function _:settings(
 ) as element() {
@@ -88,7 +88,7 @@ function _:settings(
  :)
 declare
   %rest:POST
-  %rest:path("dba/settings")
+  %rest:path("/dba/settings")
   %output:method("html")
 function _:settings-save(
 ) {

@@ -25,7 +25,7 @@ declare variable $_:CAT := 'logs';
  :)
 declare
   %rest:GET
-  %rest:path("dba/logs")
+  %rest:path("/dba/logs")
   %rest:query-param("sort",    "{$sort}", "")
   %rest:query-param("name",    "{$name}")
   %rest:query-param("loglist", "{$loglist}")
@@ -87,7 +87,7 @@ function _:logs(
  :)
 declare
   %rest:POST
-  %rest:path("dba/log")
+  %rest:path("/dba/log")
   %rest:query-param("name",    "{$name}")
   %rest:query-param("sort",    "{$sort}")
   %rest:query-param("loglist", "{$loglist}")
@@ -130,7 +130,7 @@ function _:query(
  :)
 declare
   %rest:POST
-  %rest:path("dba/loglist")
+  %rest:path("/dba/loglist")
   %rest:query-param("sort",  "{$sort}")
   %rest:query-param("query", "{$query}")
   %output:method("html")
@@ -172,7 +172,7 @@ function _:loglist(
  :)
 declare
   %rest:POST
-  %rest:path("dba/logs")
+  %rest:path("/dba/logs")
   %rest:query-param("action", "{$action}")
   %rest:query-param("name",   "{$names}")
   %output:method("html")

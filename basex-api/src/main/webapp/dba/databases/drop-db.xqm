@@ -18,7 +18,7 @@ declare variable $_:CAT := 'databases';
 declare
   %updating
   %rest:GET
-  %rest:path("dba/drop-db")
+  %rest:path("/dba/drop-db")
   %rest:query-param("name", "{$names}")
   %output:method("html")
 function _:drop(

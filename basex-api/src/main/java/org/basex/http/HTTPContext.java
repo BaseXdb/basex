@@ -376,6 +376,47 @@ public final class HTTPContext {
     context.log.write(address(), context.user(), type, info, perf);
   }
 
+  /**
+   * Sends a redirect.
+   * @param location location
+   * @throws IOException I/O exception
+   */
+  public void redirect(final String location) throws IOException {
+    final boolean abs = location.startsWith("/");
+    System.out.println("? " + abs);
+    System.out.println(req.getRequestURI());
+    System.out.println(req.getRequestURL());
+    res.sendRedirect(resolve(location));
+  }
+
+  /**
+   * Normalizes a redirection location. Prefixes absolute locations with the request URI.
+   * @param location location
+   * @return normalized representation
+   */
+  public String resolve(final String location) {
+    String loc = location;
+    if(location.startsWith("/")) {
+      final String uri = req.getRequestURI(), info = req.getPathInfo();
+      if(info == null) {
+        loc = uri + location;
+      } else {
+        loc = uri.substring(0, uri.length() - info.length()) + location;
+      }
+    }
+    return loc;
+  }
+
+  /**
+   * Sends a forward.
+   * @param location location
+   * @throws IOException I/O exception
+   * @throws ServletException servlet exception
+   */
+  public void forward(final String location) throws IOException, ServletException {
+    req.getRequestDispatcher(resolve(location)).forward(req, res);
+  }
+
   // STATIC METHODS =====================================================================
 
   /**

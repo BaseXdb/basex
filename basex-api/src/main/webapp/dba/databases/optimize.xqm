@@ -26,7 +26,7 @@ declare variable $_:SUB := 'database';
  :)
 declare
   %rest:GET
-  %rest:path("dba/optimize")
+  %rest:path("/dba/optimize")
   %rest:query-param("name",  "{$name}")
   %rest:query-param("all",   "{$all}")
   %rest:query-param("opts",  "{$opts}")
@@ -108,7 +108,7 @@ function _:create(
 declare
   %updating
   %rest:POST
-  %rest:path("dba/optimize")
+  %rest:path("/dba/optimize")
   %rest:query-param("name", "{$name}")
   %rest:query-param("all",  "{$all}")
   %rest:query-param("opts", "{$opts}")
@@ -149,7 +149,7 @@ function _:optimize(
 declare
   %updating
   %rest:GET
-  %rest:path("dba/optimize-all")
+  %rest:path("/dba/optimize-all")
   %rest:query-param("name", "{$names}")
   %output:method("html")
 function _:drop(

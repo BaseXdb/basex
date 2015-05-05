@@ -17,7 +17,7 @@ declare variable $_:CAT := 'logs';
  :)
 declare
   %rest:GET
-  %rest:path("dba/delete-logs")
+  %rest:path("/dba/delete-logs")
   %rest:query-param("name", "{$names}")
   %output:method("html")
 function _:drop(
