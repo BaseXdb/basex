@@ -40,13 +40,23 @@ public class XQueryEval extends StandardFunc {
   }
 
   @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
-    return value(qc).iter();
+  public final Iter iter(final QueryContext qc) throws QueryException {
+    return eval(qc).iter();
   }
 
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
-    return eval(qc, toToken(exprs[0], qc), null, false).value();
+    return eval(qc).value();
+  }
+
+  /**
+   * Evaluates a query.
+   * @param qc query context
+   * @return resulting value
+   * @throws QueryException query exception
+   */
+  protected ItemList eval(final QueryContext qc) throws QueryException {
+    return eval(qc, toToken(exprs[0], qc), null, false);
   }
 
   /**
