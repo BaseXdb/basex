@@ -41,10 +41,10 @@ function _:queries(
         <table width='100%'>
           <tr>
             <td>
-              <button id='run' onClick="{ $f(true()) }">Run</button>
               <select id='mode' onChange='{ $f(false()) }'>{
                 ('Standard', 'Realtime', 'Updating') ! element option { . }
               }</select>
+              <button id='run' onClick="{ $f(true()) }">Run</button>
             </td>
             <td align='right'>
               <h2>Editor</h2>
