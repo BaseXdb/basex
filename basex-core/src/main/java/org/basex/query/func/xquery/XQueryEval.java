@@ -75,7 +75,6 @@ public class XQueryEval extends StandardFunc {
         user.perm(perm, null);
 
         // initial memory consumption: perform garbage collection and calculate usage
-        Performance.gc(2);
         final long mb = opts.get(XQueryOptions.MEMORY);
         if(mb != 0) {
           final long limit = Performance.memory() + (mb << 20);
@@ -84,10 +83,7 @@ public class XQueryEval extends StandardFunc {
             @Override
             public void run() {
               // limit reached: perform garbage collection and check again
-              if(Performance.memory() > limit) {
-                Performance.gc(1);
-                if(Performance.memory() > limit) qctx.stop();
-              }
+              if(Performance.memory() > limit) qctx.stop();
             }
           }, 500, 500);
         }
