@@ -71,7 +71,7 @@ public final class DbListDetails extends DbList {
         return ip < is ? get(ip++) : tp < ts ? get(ip + tp++) : null;
       }
       @Override
-      public long size() { return ip + is; }
+      public long size() { return is + ts; }
     };
   }
 
