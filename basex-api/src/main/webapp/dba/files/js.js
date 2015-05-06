@@ -50,40 +50,40 @@ function query(wait, success, key, query, enforce, target) {
   _d = d;
   setTimeout(function() {
     if(_d != d) return;
+    if(wait) setWarning(wait);
 
     var name = document.getElementById("name");
     var resource = document.getElementById("resource");
     var sort = document.getElementById("sort");
     var loglist = document.getElementById("loglist");
-  
-    if(wait) setWarning(wait);
-    var req = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
-    req.onreadystatechange = function() {
-      if(_d != d) return;
-      if(req.readyState == 4) {
-        if(req.status == 200) {
-          target(req.responseText);
-          if(success) setInfo(success);
-        } else {
-          // Jetty and Tomcat support (both return error messages differently)
-          var msg = req.statusText.match(/\[\w+\]/g) ? req.statusText : req.responseText;
-          var s = msg.indexOf('['), e = msg.indexOf('<', s);
-          if(s > -1) msg = msg.substring(s, e > s ? e : msg.length);
-          var html = document.createElement('div');
-          html.innerHTML = msg;
-          setError(html.innerText || html.textContent);
-        }
-      }
-    };
-    // synchronous querying: wait for server feedback
-    req.open("POST", key +
+    var url = key +
       "?name=" + encodeURIComponent(name ? name.value : "") +
       "&resource=" + encodeURIComponent(resource ? resource.value : "") +
       "&sort=" + encodeURIComponent(sort ? sort.value : "") +
       "&loglist=" + encodeURIComponent(loglist ? loglist.value : "") +
-      "&query=" + encodeURIComponent(query), true);
-    req.send(null);
+      "&query=" + encodeURIComponent(query);
+    request("POST", url, null,
+      function(req) {
+        if(_d != d) return;
+        target(req.responseText);
+        if(success) setInfo(success);
+      },
+      function(req) {
+        if(_d != d) return;
+        setErrorFromResponse(req);
+      }
+    )
   }, enforce ? 0 : searchDelay);
+};
+
+// Jetty and Tomcat support (both return error messages differently)
+function setErrorFromResponse(req) {
+  var msg = req.statusText.match(/\[\w+\]/g) ? req.statusText : req.responseText;
+  var s = msg.indexOf('['), e1 = msg.indexOf('\n', s), e2 = msg.indexOf('<', s);
+  if(s > -1) msg = msg.substring(s, e1 > e2 ? e2 : e1 > s ? e1 : msg.length);
+  var html = document.createElement('div');
+  html.innerHTML = msg;
+  setError(html.innerText || html.textContent);
 };
 
 var _list;
@@ -119,7 +119,7 @@ function queryResource(wait, success) {
 };
 
 var _editor;
-function xquery(wait, success, enforce) {
+function editor(wait, success, enforce) {
   var mode = document.getElementById("mode").selectedIndex;
   var update = mode == 2;
   var realtime = mode == 1;
@@ -133,4 +133,20 @@ function xquery(wait, success, enforce) {
       document.getElementById("output").value = text;
     });
   }
+};
+
+function request(method, url, data, success, failure) {
+  var req = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
+  req.onreadystatechange = function() {
+    if(req.readyState == 4) {
+      if(req.status == 200) {
+        success(req);
+      } else {
+        failure(req);
+      }
+    }
+  };
+  // synchronous querying: wait for server feedback
+  req.open(method, url, true);
+  req.send(data);
 };

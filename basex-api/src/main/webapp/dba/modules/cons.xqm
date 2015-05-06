@@ -17,6 +17,8 @@ declare variable $cons:SESSION := Session:get($cons:SESSION-KEY);
 
 (:~ Configuration file. :)
 declare variable $cons:CONFIG-XML := file:base-dir() || '../files/config.xml';
+(:~ Query directory. :)
+declare variable $cons:QUERY-DIR := file:base-dir() || '../files/editor/';
 (:~ Configuration. :)
 declare %private variable $cons:CONFIG := map:merge(
   doc($cons:CONFIG-XML)/config/* ! map { name(): string() }
