@@ -75,26 +75,25 @@ public final class List extends Command {
 
     for(final String name : context.filter(Perm.READ, context.databases.listDBs())) {
       String file = null;
-      long size = 0;
-      int docs = 0;
+      long dbsize = 0;
+      int count = 0;
 
-      final MetaData meta = new MetaData(name, options, soptions);
       try {
+        final MetaData meta = new MetaData(name, options, soptions);
         meta.read();
-        size = meta.dbsize();
-        docs = meta.ndocs;
+        dbsize = meta.dbsize();
         file = meta.original;
+        // add number of raw files
+        count = meta.ndocs + new IOFile(soptions.dbpath(name), IO.RAW).descendants().size();
       } catch(final IOException ex) {
         file = ERROR;
       }
-      // count number of raw files
-      final int bin = new IOFile(soptions.dbpath(name), IO.RAW).descendants().size();
 
       // create entry
       final TokenList tl = new TokenList(create ? 4 : 3);
       tl.add(name);
-      tl.add(docs + bin);
-      tl.add(size);
+      tl.add(count);
+      tl.add(dbsize);
       if(create) tl.add(file);
       table.contents.add(tl);
     }
