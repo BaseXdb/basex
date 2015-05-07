@@ -155,6 +155,8 @@ public enum QueryError {
   BXJS_PARSEML_X(BXJS, 1, "JsonML parser: %."),
   /** BXJS0002. */
   BXJS_SERIAL_X(BXJS, 2, "JSON serializer: %."),
+  /** BXJS0003. */
+  BXJS_INVALID_X(BXJS, 1, "'%':'%' is not supported by the target format."),
 
   // Process module
 

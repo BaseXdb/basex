@@ -10,9 +10,11 @@ import org.basex.util.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public final class FnJsonDoc extends FnParseJson {
+public class FnJsonToXml extends FnParseJson {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return parse(unparsedText(qc, false).string(ii), false, qc, ii);
+    final Item it = exprs[0].atomItem(qc, info);
+    if(it == null) return null;
+    return parse(toToken(it), true, qc, ii);
   }
 }

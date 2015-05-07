@@ -3061,7 +3061,7 @@ public class QueryParser extends InputParser {
       // parse optional question mark
       wsConsume(QUESTION);
     }
-    return new NodeTest(NodeType.ELM, name, type, sc.strip);
+    return new NodeTest(NodeType.ELM, name, type);
   }
 
   /**
@@ -3091,7 +3091,7 @@ public class QueryParser extends InputParser {
       if(type == null) type = AtomType.find(tn, true);
       if(type == null) throw error(TYPEUNDEF_X, tn);
     }
-    return new NodeTest(NodeType.ATT, name, type, sc.strip);
+    return new NodeTest(NodeType.ATT, name, type);
   }
 
   /**

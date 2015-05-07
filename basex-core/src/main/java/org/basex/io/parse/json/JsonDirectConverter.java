@@ -64,28 +64,13 @@ public final class JsonDirectConverter extends JsonXmlConverter {
     lax = jopts.get(JsonOptions.LAX);
   }
 
-  /**
-   * Adds a new element with the given type.
-   * @param type JSON type
-   * @return the element
-   */
-  private FElem addElem(final byte[] type) {
-    final FElem e = new FElem(name);
-    addType(e, e.name(), type);
-
-    if(curr != null) curr.add(e);
-    else curr = e;
-    name = null;
-    return e;
-  }
-
   @Override
   void openObject() {
     curr = addElem(OBJECT);
   }
 
   @Override
-  void openPair(final byte[] key) {
+  void openPair(final byte[] key, final boolean add) {
     name = XMLToken.encode(key, lax);
   }
 
@@ -117,31 +102,6 @@ public final class JsonDirectConverter extends JsonXmlConverter {
   }
 
   @Override
-  public void openConstr(final byte[] nm) {
-    // [LW] what can be done here?
-    openObject();
-    openPair(nm);
-    openArray();
-  }
-
-  @Override
-  public void openArg() {
-    openItem();
-  }
-
-  @Override
-  public void closeArg() {
-    closeItem();
-  }
-
-  @Override
-  public void closeConstr() {
-    closeArray();
-    closePair(true);
-    closeObject();
-  }
-
-  @Override
   public void numberLit(final byte[] value) {
     addElem(NUMBER).add(value);
   }
@@ -159,5 +119,20 @@ public final class JsonDirectConverter extends JsonXmlConverter {
   @Override
   public void booleanLit(final byte[] value) {
     addElem(BOOLEAN).add(value);
+  }
+
+  /**
+   * Adds a new element with the given type.
+   * @param type JSON type
+   * @return the element
+   */
+  private FElem addElem(final byte[] type) {
+    final FElem e = new FElem(name);
+    addType(e, e.name(), type);
+
+    if(curr != null) curr.add(e);
+    else curr = e;
+    name = null;
+    return e;
   }
 }

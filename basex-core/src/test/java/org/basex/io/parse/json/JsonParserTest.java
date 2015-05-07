@@ -146,19 +146,6 @@ public final class JsonParserTest {
   }
 
   /**
-   * Tests for parsing constructors.
-   * @throws QueryIOException query I/O exception
-   */
-  @Test public void constructorTest() throws QueryIOException {
-    parse("new foo()", true);
-    parse("new Test(1, { })", true);
-    parse("new Foo([ { \"a\": new Test(1, { }) } ])", true);
-
-    error("new" , true);
-    error("newt", true);
-  }
-
-  /**
    * Tests if the given JSON string is rejected by the parser using the given spec.
    * @param json JSON string
    * @param liberal liberal parsing

@@ -15,6 +15,12 @@ public interface JsonConstants {
   byte[] TYPE = token("type");
   /** Token: item. */
   byte[] ITEM = token("item");
+  /** Token: key. */
+  byte[] KEY = token("key");
+  /** Token: escaped. */
+  byte[] ESCAPED = token("escaped");
+  /** Token: escaped-key. */
+  byte[] ESCAPED_KEY = token("escaped-key");
 
   /** Token: string. */
   byte[] STRING = token("string");
@@ -26,6 +32,8 @@ public interface JsonConstants {
   byte[] ARRAY = token("array");
   /** Token: object. */
   byte[] OBJECT = token("object");
+  /** Token: map. */
+  byte[] MAP = token("map");
 
   /** Token: pair. */
   byte[] PAIR = token("pair");

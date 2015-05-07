@@ -67,7 +67,7 @@ final class JsonMLConverter extends JsonXmlConverter {
   }
 
   @Override
-  public void openPair(final byte[] key) throws QueryIOException {
+  public void openPair(final byte[] key, final boolean add) throws QueryIOException {
     attName = check(key);
   }
 
@@ -150,15 +150,4 @@ final class JsonMLConverter extends JsonXmlConverter {
   public void booleanLit(final byte[] b) throws QueryIOException {
     error("No booleans allowed");
   }
-
-  @Override
-  public void openConstr(final byte[] nm) throws QueryIOException {
-    error("No constructor functions allowed");
-  }
-
-  @Override public void openArg() { }
-
-  @Override public void closeArg() { }
-
-  @Override public void closeConstr() { }
 }

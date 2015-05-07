@@ -23,19 +23,20 @@ public class FnParseJson extends Parse {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item it = exprs[0].atomItem(qc, info);
     if(it == null) return null;
-    return parse(toToken(it), qc, ii);
+    return parse(toToken(it), false, qc, ii);
   }
 
   /**
    * Parses the specified JSON string.
    * @param json json string
+   * @param xml convert to xml
    * @param qc query context
    * @param ii input info
    * @return resulting item
    * @throws QueryException query exception
    */
-  final Item parse(final byte[] json, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
+  final Item parse(final byte[] json, final boolean xml, final QueryContext qc,
+      final InputInfo ii) throws QueryException {
 
     final JsonParserOptions opts = new JsonParserOptions();
     if(exprs.length > 1) {
@@ -55,13 +56,13 @@ public class FnParseJson extends Parse {
     }
 
     try {
-      opts.set(JsonOptions.FORMAT, JsonFormat.MAP);
+      opts.set(JsonOptions.FORMAT, xml ? JsonFormat.BASIC : JsonFormat.MAP);
       final JsonConverter conv = JsonConverter.get(opts);
       if(unesc && fb != null) conv.fallback(new JsonFallback() {
         @Override
-        public byte[] convert(final byte[] string) {
+        public String convert(final String string) {
           try {
-            return fb.invokeItem(qc, ii, Str.get(string)).string(ii);
+            return Token.string(fb.invokeItem(qc, ii, Str.get(string)).string(ii));
           } catch(final QueryException ex) {
             throw new QueryRTException(ex);
           }
@@ -77,6 +78,7 @@ public class FnParseJson extends Parse {
       final String message = ex.getLocalizedMessage();
       if(error == BXJS_PARSE_X_X_X) throw JSON_PARSE_X.get(ii, message);
       if(error == BXJS_DUPLICATE_X) throw JSON_DUPLICATE_X.get(ii, message);
+      if(error == BXJS_INVALID_X) throw JSON_OPT_X.get(ii, message);
       throw qe;
     }
   }

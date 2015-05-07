@@ -25,6 +25,7 @@ public class JsonOptions extends Options {
     /** Direct.        */ DIRECT,
     /** Attributes.    */ ATTRIBUTES,
     /** JsonML.        */ JSONML,
+    /** Basic.         */ BASIC,
     /** Map (non-XML). */ MAP;
 
     @Override
