@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -45,6 +46,16 @@ public final class List extends Arr {
 
   @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+    // remove empty sequences
+    final ExprList el = new ExprList(exprs.length);
+    for(final Expr e : exprs) {
+      if(!e.isEmpty()) el.add(e);
+    }
+    if(el.size() != exprs.length) {
+      qc.compInfo(OPTREMOVE, this, Empty.SEQ);
+      exprs = el.finish();
+    }
+
     // compute number of results
     size = 0;
     boolean ne = false;
