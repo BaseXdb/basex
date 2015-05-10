@@ -190,6 +190,13 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a/>[" + STRING_LENGTH.args() + " gt 1]", "", "exists(//" + stringLength + ")");
 
     check("<a/>[" + STRING_LENGTH.args() + " = <a>1</a>]", "", "exists(//" + stringLength + ")");
+  }
 
+  /**
+   * Checks that empty sequences are eliminated from lists and that singleton lists are flattened.
+   */
+  @Test
+  public void list() {
+    check("((), <x/>, ())", "<x/>", "empty(//List)", "empty(//Empty)", "exists(/*/CElem)");
   }
 }
