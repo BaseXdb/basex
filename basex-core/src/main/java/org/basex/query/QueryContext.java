@@ -133,15 +133,18 @@ public final class QueryContext extends Proc implements Closeable {
   /** Stack of module files that are currently parsed. */
   final TokenList modStack = new TokenList();
 
-  /** Serializer options. */
-  SerializerOptions serialOpts;
   /** Initial context value. */
   MainModule ctxItem;
 
   /** Root expression of the query. */
   public MainModule root;
 
-  /** Compilation flag. */
+  /** Serialization parameters. */
+  private SerializerOptions serParams;
+  /** Indicates if the default serialization parameters are used. */
+  public boolean defaultOutput;
+
+  /** Indicates if the query has been compiled. */
   private boolean compiled;
   /** Indicates if the query context has been closed. */
   private boolean closed;
@@ -530,13 +533,15 @@ public final class QueryContext extends Proc implements Closeable {
   }
 
   /**
-   * Returns query-specific or global serialization parameters.
+   * Returns query-specific or default serialization parameters.
    * @return serialization parameters
    */
   public SerializerOptions serParams() {
-    if(serialOpts == null)
-      serialOpts = new SerializerOptions(context.options.get(MainOptions.SERIALIZER));
-    return serialOpts;
+    if(serParams == null) {
+      serParams = new SerializerOptions(context.options.get(MainOptions.SERIALIZER));
+      defaultOutput = root != null;
+    }
+    return serParams;
   }
 
   /**
@@ -632,7 +637,7 @@ public final class QueryContext extends Proc implements Closeable {
 
     // check if all results belong to the database of the input context
     final Data data = resources.globalData();
-    if(serialOpts == null && data != null) {
+    if(defaultOutput && data != null) {
       final IntList pres = new IntList();
       while((it = ir.next()) != null && it.data() == data && pres.size() < mx) {
         checkStop();

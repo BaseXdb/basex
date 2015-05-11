@@ -523,11 +523,9 @@ public class QueryParser extends InputParser {
       // output declaration
       if(module != null) throw error(MODOUT);
 
-      if(qc.serialOpts == null) {
-        qc.serialOpts = new SerializerOptions(qc.context.options.get(MainOptions.SERIALIZER));
-      }
+      final SerializerOptions sopts = qc.serParams();
       if(!decl.add("S " + name)) throw error(OUTDUPL_X, name);
-      qc.serialOpts.parse(name, val, sc, info());
+      sopts.parse(name, val, sc, info());
 
     } else if(eq(qnm.uri(), XQ_URI)) {
       throw error(DECLOPTION_X, qnm);
