@@ -375,6 +375,8 @@ public enum QueryError {
   /** File error. */
   FILE_ID_DIR2_X(FILE, "is-dir", "Path '%' is a non-empty directory."),
   /** File error. */
+  FILE_IS_RELATIVE_X(FILE, "is-relative", "Base directory is relative: '%'."),
+  /** File error. */
   FILE_UNKNOWN_ENCODING_X(FILE, "unknown-encoding", "Unknown encoding '%'."),
   /** File error. */
   FILE_OUT_OF_RANGE_X_X(FILE, "out-of-range", "Requested file chunk [%,%] exceeds file bounds."),

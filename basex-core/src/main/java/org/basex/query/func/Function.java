@@ -868,6 +868,8 @@ public enum Function {
   /** XQuery function. */
   _FILE_IS_DIR(FileIsDir.class, "is-dir(path)", arg(STR), BLN, flag(NDT), FILE_URI),
   /** XQuery function. */
+  _FILE_IS_ABSOLUTE(FileIsAbsolute.class, "is-absolute(path)", arg(STR), BLN, flag(NDT), FILE_URI),
+  /** XQuery function. */
   _FILE_IS_FILE(FileIsFile.class, "is-file(path)", arg(STR), BLN, flag(NDT), FILE_URI),
   /** XQuery function. */
   _FILE_LAST_MODIFIED(FileLastModified.class, "last-modified(path)",
@@ -878,8 +880,8 @@ public enum Function {
   _FILE_PATH_TO_NATIVE(FilePathToNative.class, "path-to-native(path)",
       arg(STR), STR, flag(NDT), FILE_URI),
   /** XQuery function. */
-  _FILE_RESOLVE_PATH(FileResolvePath.class, "resolve-path(path)",
-      arg(STR), STR, flag(NDT), FILE_URI),
+  _FILE_RESOLVE_PATH(FileResolvePath.class, "resolve-path(path[,base])",
+      arg(STR, STR), STR, flag(NDT), FILE_URI),
   /** XQuery function. */
   _FILE_LIST(FileList.class, "list(path[,recursive[,pattern]])",
       arg(STR, BLN, STR), STR_ZM, flag(NDT), FILE_URI),
