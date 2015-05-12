@@ -382,10 +382,6 @@ public final class HTTPContext {
    * @throws IOException I/O exception
    */
   public void redirect(final String location) throws IOException {
-    final boolean abs = location.startsWith("/");
-    System.out.println("? " + abs);
-    System.out.println(req.getRequestURI());
-    System.out.println(req.getRequestURL());
     res.sendRedirect(resolve(location));
   }
 
