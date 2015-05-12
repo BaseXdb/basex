@@ -244,7 +244,7 @@ public abstract class Preds extends ParseExpr {
   }
 
   /**
-   * Checks if the specified expression returns a deterministic numeric value.
+   * Checks if the specified expression returns an empty sequence or a deterministic numeric value.
    * @param expr expression
    * @return result of check
    */

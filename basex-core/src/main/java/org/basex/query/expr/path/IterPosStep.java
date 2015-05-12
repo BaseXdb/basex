@@ -49,7 +49,9 @@ final class IterPosStep extends Step {
               posExpr[p] = (Pos) pred;
             } else if(num(pred)) {
               // pre-evaluate numeric position
-              final double dbl = toDouble(pred, qc);
+              final Item it = pred.atomItem(qc, info);
+              if(it == null) return null;
+              final double dbl = toDouble(it);
               final long lng = (long) dbl;
               if(dbl != lng) return null;
               final Expr e = Pos.get(lng, info);
