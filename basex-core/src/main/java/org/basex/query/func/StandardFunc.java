@@ -100,7 +100,7 @@ public abstract class StandardFunc extends Arr {
     final int es = exprs.length;
     final Expr[] arg = new Expr[es];
     for(int e = 0; e < es; e++) arg[e] = exprs[e].copy(qc, scp, vs);
-    return sig.get(sc, info, arg);
+    return copyType(sig.get(sc, info, arg));
   }
 
   /**
