@@ -199,4 +199,12 @@ public final class RewritingsTest extends QueryPlanTest {
   public void list() {
     check("((), <x/>, ())", "<x/>", "empty(//List)", "empty(//Empty)", "exists(/*/CElem)");
   }
+
+  /**
+   * Checks that expressions marked as non-deterministic will not be rewritten.
+   */
+  @Test
+  public void nonDeterministic() {
+    check("count((# basex:non-deterministic #) { <x/> })", "1", "exists(//FnCount)");
+  }
 }

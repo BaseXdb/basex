@@ -198,7 +198,7 @@ public abstract class Expr extends ExprInfo {
    * Indicates if an expression has the specified compiler property. This method must only be
    * called at compile time. It is invoked to test properties of sub-expressions.
    * It returns {@code true} if at least one test is successful.
-   * @param flag flag to be found
+   * @param flag flag to be checked
    * @return result of check
    */
   public abstract boolean has(final Flag flag);

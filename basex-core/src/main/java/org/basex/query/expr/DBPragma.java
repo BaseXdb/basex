@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 
 import org.basex.core.*;
 import org.basex.query.*;
+import org.basex.query.expr.Expr.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
@@ -23,13 +24,13 @@ public final class DBPragma extends Pragma {
 
   /**
    * Constructor.
-   * @param n name of pragma
-   * @param o option
-   * @param v optional value
+   * @param name name of pragma
+   * @param option option
+   * @param value optional value
    */
-  public DBPragma(final QNm n, final Option<?> o, final byte[] v) {
-    super(n, v);
-    option = o;
+  public DBPragma(final QNm name, final Option<?> option, final byte[] value) {
+    super(name, value);
+    this.option = option;
   }
 
   @Override
@@ -45,6 +46,11 @@ public final class DBPragma extends Pragma {
   @Override
   void finish(final QueryContext qc) {
     qc.context.options.put(option, old);
+  }
+
+  @Override
+  public boolean has(final Flag flag) {
+    return false;
   }
 
   @Override

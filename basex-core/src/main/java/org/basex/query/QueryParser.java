@@ -1770,13 +1770,16 @@ public class QueryParser extends InputParser {
         c = curr();
       }
 
-      final byte[] v = tok.trim().toArray();
+      final byte[] value = tok.trim().toArray();
       if(eq(name.prefix(), DB_PREFIX)) {
         // project-specific declaration
         final String key = string(uc(name.local()));
         final Option<?> opt = qc.context.options.option(key);
         if(opt == null) throw error(BASX_OPTIONS_X, key);
-        el.add(new DBPragma(name, opt, v));
+        el.add(new DBPragma(name, opt, value));
+      } else if(eq(name.prefix(), BASEX_PREFIX)) {
+        // project-specific declaration
+        el.add(new BaseXPragma(name, value));
       }
       pos += 2;
     } while(wsConsumeWs(PRAGMA));

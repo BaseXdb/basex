@@ -364,6 +364,8 @@ public interface QueryText {
   String READ_LOCK = "read-lock";
   /** Option: write-lock. */
   String WRITE_LOCK = "write-lock";
+  /** Pragma: write-lock. */
+  String NON_DETERMNISTIC = "non-deterministic";
 
   // ERROR INFORMATION ========================================================
 
