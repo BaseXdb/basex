@@ -253,8 +253,15 @@ public final class ModuleLoader {
     final Package pkg = new PkgParser(ii).parse(pkgDesc);
     // check if package contains a jar descriptor
     final IOFile jarDesc = new IOFile(pkgDir, PkgText.JARDESC);
+    // choose module directory (support for both 2010 and 2012 specs)
+    IOFile modDir = new IOFile(pkgDir, PkgText.CONTENT);
+    if(!modDir.exists()) modDir = new IOFile(pkgDir, string(pkg.abbrev));
+
     // add jars to classpath
-    if(jarDesc.exists()) addJar(jarDesc, pkgDir, string(pkg.abbrev), ii);
+    if(jarDesc.exists()) {
+      final JarDesc desc = new JarParser(ii).parse(jarDesc);
+      for(final byte[] u : desc.jars) addURL(new IOFile(modDir, string(u)));
+    }
 
     // package has dependencies -> they have to be loaded first => put package
     // in list with packages to be loaded
@@ -269,27 +276,11 @@ public final class ModuleLoader {
       }
     }
     for(final Component comp : pkg.comps) {
-      final String p = new IOFile(new IOFile(pkgDir, string(pkg.abbrev)), string(comp.file)).path();
+      final String p = new IOFile(modDir, string(comp.file)).path();
       qp.module(token(p), comp.uri);
     }
     if(toLoad.contains(name)) toLoad.delete(name);
     loaded.add(name);
-  }
-
-  /**
-   * Adds the jar files registered in jarDesc.
-   * @param jarDesc jar descriptor
-   * @param pkgDir package directory
-   * @param modDir module directory
-   * @param ii input info
-   * @throws QueryException query exception
-   */
-  private void addJar(final IOFile jarDesc, final IOFile pkgDir, final String modDir,
-      final InputInfo ii) throws QueryException {
-
-    // add new URLs
-    final JarDesc desc = new JarParser(ii).parse(jarDesc);
-    for(final byte[] u : desc.jars) addURL(new IOFile(new IOFile(pkgDir, modDir), string(u)));
   }
 
   /**
