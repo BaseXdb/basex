@@ -1220,6 +1220,10 @@ public enum Function {
   /** XQuery function. */
   _WEB_RESPONSE_HEADER(WebResponseHeader.class, "response-header([headers[,output]])",
       arg(MAP_O, MAP_O), ELM, WEB_URI),
+  /** XQuery function. */
+  _WEB_ENCODE_URL(WebEncodeUrl.class, "encode-url(string)", arg(STR), STR, WEB_URI),
+  /** XQuery function. */
+  _WEB_DECODE_URL(WebDecodeUrl.class, "decode-url(string)", arg(STR), STR, WEB_URI),
 
   /* XQuery Module. */
 
