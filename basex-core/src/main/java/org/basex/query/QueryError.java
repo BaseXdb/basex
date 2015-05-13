@@ -226,6 +226,13 @@ public enum QueryError {
   /** BXVA0002. */
   BXVA_START_X(BXVA, 2, "Validation could not be started. %"),
 
+  // Web module
+
+  /** BXWE0001. */
+  BXWE_INVALID_X(BXWE, 2, "%."),
+  /** BXWE0002. */
+  BXWE_CODES_X(BXWE, 2, "URL contains invalid characters: %"),
+
   // XQuery module
 
   /** BXXQ0001. */
@@ -1349,6 +1356,7 @@ public enum QueryError {
     /** BXSL Error type. */ BXSL(BXERR_PREFIX, BXERRORS_URI),
     /** BXSQ Error type. */ BXSQ(BXERR_PREFIX, BXERRORS_URI),
     /** BXVA Error type. */ BXVA(BXERR_PREFIX, BXERRORS_URI),
+    /** BXWE Error type. */ BXWE(BXERR_PREFIX, BXERRORS_URI),
     /** BXXQ Error type. */ BXXQ(BXERR_PREFIX, BXERRORS_URI),
     /** HASH Error type. */ HASH(BXERR_PREFIX, BXERRORS_URI),
     /** UNIT Error type. */ UNIT(UNIT_PREFIX,  UNIT_URI),
