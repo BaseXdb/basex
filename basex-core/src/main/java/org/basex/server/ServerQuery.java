@@ -30,8 +30,6 @@ public final class ServerQuery extends Proc {
 
   /** Query processor. */
   private QueryProcessor qp;
-  /** Serialization parameters. */
-  private SerializerOptions parameters;
   /** Parsing flag. */
   private boolean parsed;
   /** Query info. */
@@ -91,8 +89,7 @@ public final class ServerQuery extends Proc {
    * @throws IOException I/O Exception
    */
   public String parameters() throws IOException {
-    if(parameters == null) parameters = parse().qc.serParams();
-    return parameters.toString();
+    return parse().qc.serParams().toString();
   }
 
   /**
@@ -125,12 +122,11 @@ public final class ServerQuery extends Proc {
       qi.compiling = perf.time();
       final Iter ir = qp.iter();
       qi.evaluating = perf.time();
-      parameters();
 
       // iterate through results
       int c = 0;
       final PrintOutput po = PrintOutput.get(encode ? new EncodingOutput(out) : out);
-      try(final Serializer ser = Serializer.get(po, full ? null : parameters)) {
+      try(final Serializer ser = Serializer.get(po, full ? null : qp.qc.serParams())) {
         for(Item it; (it = ir.next()) != null;) {
           if(iter) {
             po.write(full ? it.xdmInfo() : it.typeId().bytes());
