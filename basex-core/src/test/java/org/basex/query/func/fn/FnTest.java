@@ -71,6 +71,14 @@ public final class FnTest extends AdvancedQueryTest {
     error("sum((), (1,2))", SEQFOUND_X);
   }
 
+  /** Tests for the {@code static-base-uri} function. */
+  @Test
+  public void staticBaseURI() {
+    query("declare base-uri 'a/'; " + ENDS_WITH.args(STATIC_BASE_URI.args(), "/"), "true");
+    query("declare base-uri '.'; " + ENDS_WITH.args(STATIC_BASE_URI.args(), "/"), "true");
+    query("declare base-uri '..'; " + ENDS_WITH.args(STATIC_BASE_URI.args(), "/"), "true");
+  }
+
   /** Tests for the {@code parse-ietf-date} function. */
   @Test
   public void parseIetfDate() {

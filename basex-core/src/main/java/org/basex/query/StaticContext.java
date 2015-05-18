@@ -115,15 +115,18 @@ public final class StaticContext {
    */
   public void baseURI(final String uri) {
     final IO base = IO.get(uri);
+    final String url;
     if(uri.isEmpty()) {
-      baseURI = Uri.EMPTY;
+      url = "";
     } else if(base instanceof IOContent) {
-      baseURI = Uri.uri(uri);
+      url = uri;
     } else if(baseURI == Uri.EMPTY) {
-      baseURI = Uri.uri(base.url());
+      url = base.url();
     } else {
-      baseURI = Uri.uri(baseIO().merge(uri).url());
+      url = baseIO().merge(uri).url();
     }
+    // #1062: check if specified URI points to a directory. if yes, add trailing slash
+    baseURI = Uri.uri(uri.endsWith(".") || uri.endsWith("/") ? url + '/' : url);
   }
 
   @Override
