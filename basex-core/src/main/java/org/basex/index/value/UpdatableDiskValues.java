@@ -54,8 +54,9 @@ public final class UpdatableDiskValues extends DiskValues {
           c += idxl.readNum();
           il.add(c);
         }
-        // write new ids
+        // mark old slot as empty
         free.add((int) (idxl.cursor() - off), off);
+        // write new ids
         writeIds(key, il.add(ids), index++);
       } else {
         index = -(index + 1);

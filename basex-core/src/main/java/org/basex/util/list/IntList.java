@@ -5,7 +5,7 @@ import java.util.*;
 import org.basex.util.*;
 
 /**
- * Resizable-array implementation for native integers.
+ * Resizable-array implementation for native int values.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
