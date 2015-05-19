@@ -14,6 +14,8 @@ import org.basex.util.list.*;
 public final class FreeSlots {
   /** Free slots: byte sizes referencing file offsets. */
   private final TreeMap<Integer, LongList> free = new TreeMap<>();
+  /** Number of slots. */
+  private int slots;
 
   /**
    * Adds a value for the specified slot size.
@@ -21,12 +23,7 @@ public final class FreeSlots {
    * @param offset file offset
    */
   public void add(final int size, final long offset) {
-    LongList ll = free.get(size);
-    if(ll == null) {
-      ll = new LongList();
-      free.put(size, ll);
-    }
-    ll.add(offset);
+    add(size, offset, true);
   }
 
   /**
@@ -44,6 +41,7 @@ public final class FreeSlots {
 
       final LongList offsets = entry.getValue();
       off = offsets.pop();
+      slots--;
       if(offsets.isEmpty()) free.remove(slotSize);
 
       if(slotSize > size) {
@@ -54,6 +52,69 @@ public final class FreeSlots {
       }
     }
     return off == -1 ? offset : off;
+  }
+
+  /**
+   * Adds a value for the specified slot size.
+   * @param size byte size
+   * @param offset file offset
+   * @param opt optimize
+   */
+  private void add(final int size, final long offset, final boolean opt) {
+    LongList ll = free.get(size);
+    if(ll == null) {
+      ll = new LongList();
+      free.put(size, ll);
+    }
+    ll.add(offset);
+    slots++;
+    if(opt) optimize();
+  }
+
+  /**
+   * Optimizes the free slot list structure by merging adjacent entries.
+   * Currently, this function is called after every addition of a new slot value.
+   */
+  private void optimize() {
+    if(free.isEmpty()) return;
+
+    // sort all entries by their offset (use native arrays; faster than TreeMap)
+    final int size = slots;
+    final LongList offList = new LongList(size);
+    final IntList sizeList = new IntList(size);
+    for(final Entry<Integer, LongList> entry : free.entrySet()) {
+      final int slotSize = entry.getKey();
+      final LongList list = entry.getValue();
+      final int ll = list.size();
+      for(int l = 0; l < ll; l++) {
+        offList.add(list.get(l));
+        sizeList.add(slotSize);
+      }
+    }
+    if(size != offList.size())
+      throw Util.notExpected("Wrong slot count: % vs. %", size, offList.size());
+
+    final long[] offsets = offList.finish();
+    final int[] slotSizes = sizeList.finish();
+    final int[] index = Array.createOrder(offsets, true);
+
+    // rebuild map with merged slots
+    free.clear();
+    slots = 0;
+    long offset = offsets[0];
+    int slotSize = slotSizes[index[0]];
+    for(int c = 1; c < size; c++) {
+      final long o = offsets[c];
+      final int s = slotSizes[index[c]];
+      if(o == offset + slotSize) {
+        slotSize += s;
+      } else {
+        add(slotSize, offset, false);
+        offset = o;
+        slotSize = s;
+      }
+    }
+    add(slotSize, offset, false);
   }
 
   @Override
