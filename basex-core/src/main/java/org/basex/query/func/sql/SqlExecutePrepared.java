@@ -46,6 +46,8 @@ public final class SqlExecutePrepared extends SqlExecute {
 
   /** Attribute "type" of <sql:parameter/>. */
   private static final byte[] TYPE = token("type");
+  /** Attribute "null" of <sql:parameter/>. */
+  private static final byte[] NULL = token("null");
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {

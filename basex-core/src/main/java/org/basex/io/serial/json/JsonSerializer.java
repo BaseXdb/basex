@@ -4,8 +4,10 @@ import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
+
 import org.basex.build.json.*;
 import org.basex.io.out.*;
+import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
@@ -50,7 +52,7 @@ public abstract class JsonSerializer extends StandardSerializer {
   public void serialize(final Item item) throws IOException {
     if(sep) throw SERJSON.getIO();
     if(item == null) {
-      out.print(NULL);
+      out.print(JsonConstants.NULL);
     } else {
       super.serialize(item);
     }
@@ -195,7 +197,7 @@ public abstract class JsonSerializer extends StandardSerializer {
 
   @Override
   public void close() throws IOException {
-    if(!sep) out.print(NULL);
+    if(!sep) out.print(JsonConstants.NULL);
     super.close();
   }
 }

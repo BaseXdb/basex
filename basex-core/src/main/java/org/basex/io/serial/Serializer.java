@@ -103,9 +103,10 @@ public abstract class Serializer implements Closeable {
                : new CsvDirectSerializer(po, so);
       case JSON:
         final JsonSerialOptions jopts = so.get(SerializerOptions.JSON);
-        return jopts.get(JsonOptions.FORMAT) == JsonFormat.JSONML
-               ? new JsonMLSerializer(po, so)
-               : new JsonNodeSerializer(po, so);
+        final JsonFormat jformat = jopts.get(JsonOptions.FORMAT);
+        return jformat == JsonFormat.JSONML ? new JsonMLSerializer(po, so) :
+               jformat == JsonFormat.BASIC  ? new JsonBasicSerializer(po, so) :
+               new JsonNodeSerializer(po, so);
       case XML:
         return new XMLSerializer(po, so);
       default:

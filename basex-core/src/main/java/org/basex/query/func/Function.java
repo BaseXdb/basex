@@ -303,9 +303,11 @@ public enum Function {
   /** XQuery function. */
   PARSE_IETF_DATE(FnParseIetfDate.class, "parse-ietf-date(string)", arg(STR_ZO), DTM_ZO),
   /** XQuery function. */
-  JSON_TO_XML(FnJsonToXml.class, "json-to-xml(string[,options])", arg(STR_ZO, MAP_O), DTM_ZO),
+  JSON_TO_XML(FnJsonToXml.class, "json-to-xml(string[,options])", arg(STR_ZO, MAP_O), NOD_ZO),
   /** XQuery function. */
-  PARSE_JSON(FnParseJson.class, "parse-json(string[,options])", arg(STR_ZO, ITEM), DTM_ZO),
+  XML_TO_JSON(FnXmlToJson.class, "xml-to-json(node[,options])", arg(NOD_ZO, MAP_O), STR_ZO),
+  /** XQuery function. */
+  PARSE_JSON(FnParseJson.class, "parse-json(string[,options])", arg(STR_ZO, ITEM), ITEM_ZO),
   /** XQuery function. */
   PARSE_XML(FnParseXml.class, "parse-xml(string)", arg(STR_ZO), DOC_O, flag(CNS)),
   /** XQuery function. */

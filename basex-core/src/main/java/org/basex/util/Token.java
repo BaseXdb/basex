@@ -36,8 +36,6 @@ public final class Token {
   public static final byte[] TRUE = token("true");
   /** Token 'false'. */
   public static final byte[] FALSE = token("false");
-  /** Token 'null'. */
-  public static final byte[] NULL = token("null");
   /** Token 'NaN'. */
   public static final byte[] NAN = token("NaN");
   /** Token 'INF'. */

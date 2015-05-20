@@ -139,7 +139,7 @@ final class JsonStringConverter extends JsonConverter {
 
   @Override
   public void nullLit() {
-    tb.add(Token.NULL);
+    tb.add(JsonConstants.NULL);
   }
 
   @Override
