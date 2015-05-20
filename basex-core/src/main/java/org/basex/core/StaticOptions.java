@@ -46,8 +46,6 @@ public final class StaticOptions extends Options {
   public static final NumberOption PORT = new NumberOption("PORT", 1984);
   /** Server: port, used for binding the server. */
   public static final NumberOption SERVERPORT = new NumberOption("SERVERPORT", 1984);
-  /** Server: port, used for sending events. */
-  public static final NumberOption EVENTPORT = new NumberOption("EVENTPORT", 1985);
   /** Default user. */
   public static final StringOption USER = new StringOption("USER", "");
   /** Default password. */

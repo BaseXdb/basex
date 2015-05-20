@@ -2,7 +2,6 @@ package org.basex.api.client;
 
 import java.io.*;
 import java.net.*;
-import java.util.*;
 
 import org.basex.core.*;
 import org.basex.core.parse.Commands.Cmd;
@@ -30,9 +29,6 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public class ClientSession extends Session {
-  /** Event notifications. */
-  private final Map<String, EventNotifier> notifiers =
-      Collections.synchronizedMap(new HashMap<String, EventNotifier>());
   /** Server output (buffered). */
   final PrintOutput sout;
   /** Server input. */
@@ -40,10 +36,6 @@ public class ClientSession extends Session {
 
   /** Socket reference. */
   private final Socket socket;
-  /** Socket event host. */
-  private final String ehost;
-  /** Socket event reference. */
-  private Socket esocket;
 
   /**
    * Constructor, specifying login data.
@@ -100,7 +92,6 @@ public class ClientSession extends Session {
       final String password, final OutputStream output) throws IOException {
 
     super(output);
-    ehost = host;
     socket = new Socket();
     try {
       // limit timeout to five seconds
@@ -161,7 +152,6 @@ public class ClientSession extends Session {
 
   @Override
   public synchronized void close() throws IOException {
-    if(esocket != null) esocket.close();
     socket.close();
   }
 
@@ -175,70 +165,6 @@ public class ClientSession extends Session {
   @Override
   protected void execute(final Command command, final OutputStream output) throws IOException {
     execute(command.toString(), output);
-  }
-
-  /**
-   * Watches an event.
-   * @param name event name
-   * @param notifier event notification
-   * @throws IOException I/O exception
-   */
-  public void watch(final String name, final EventNotifier notifier) throws IOException {
-    sout.write(ServerCmd.WATCH.code);
-    if(esocket == null) {
-      sout.flush();
-      final BufferInput bi = new BufferInput(sin);
-      final int eport = Integer.parseInt(bi.readString());
-      // initialize event socket
-      esocket = new Socket();
-      esocket.connect(new InetSocketAddress(ehost, eport), 5000);
-      final OutputStream so = esocket.getOutputStream();
-      so.write(bi.readBytes());
-      so.write(0);
-      so.flush();
-      final InputStream is = esocket.getInputStream();
-      is.read();
-      listen(is);
-    }
-    send(name);
-    sout.flush();
-    receive(null);
-    notifiers.put(name, notifier);
-  }
-
-  /**
-   * Unwatches an event.
-   * @param name event name
-   * @throws IOException I/O exception
-   */
-  public void unwatch(final String name) throws IOException {
-    sout.write(ServerCmd.UNWATCH.code);
-    send(name);
-    sout.flush();
-    receive(null);
-    notifiers.remove(name);
-  }
-
-  /**
-   * Starts the listener thread.
-   * @param input input stream
-   */
-  private void listen(final InputStream input) {
-    final BufferInput bi = new BufferInput(input);
-    new Thread() {
-      @Override
-      public void run() {
-        try {
-          while(true) {
-            final EventNotifier n = notifiers.get(bi.readString());
-            final String l = bi.readString();
-            if(n != null) n.notify(l);
-          }
-        } catch(final IOException ex) {
-          // listener did not receive any more input
-        }
-      }
-    }.start();
   }
 
   /**
@@ -333,10 +259,5 @@ public class ClientSession extends Session {
     receive(bi, o);
     if(!ok(bi)) throw new BaseXException(bi.readString());
     return o.toString();
-  }
-
-  @Override
-  public String toString() {
-     return ehost + ':' + socket.getPort();
   }
 }

@@ -25,8 +25,6 @@ import org.junit.*;
 public abstract class SandboxTest {
   /** Database port. */
   protected static final int DB_PORT = 9996;
-  /** Event port. */
-  protected static final int EVENT_PORT = 9997;
 
   /** Default output stream. */
   public static final PrintStream OUT = System.out;
@@ -88,7 +86,7 @@ public abstract class SandboxTest {
   public static BaseXServer createServer(final String... args) throws IOException {
     try {
       System.setOut(NULL);
-      final StringList sl = new StringList("-z", "-p" + DB_PORT, "-e" + EVENT_PORT, "-q");
+      final StringList sl = new StringList("-z", "-p" + DB_PORT, "-q");
       for(final String arg : args) sl.add(arg);
       final BaseXServer server = new BaseXServer(sl.finish());
       server.context.soptions.set(StaticOptions.DBPATH, sandbox().path());

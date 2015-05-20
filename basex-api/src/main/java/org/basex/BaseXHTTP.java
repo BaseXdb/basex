@@ -174,9 +174,7 @@ public final class BaseXHTTP extends Main {
 
     // server has been started in a separate process and needs to be stopped
     if(!bool(StaticOptions.HTTPLOCAL, mprop)) {
-      final int port = num(StaticOptions.SERVERPORT, mprop);
-      final int eport = num(StaticOptions.EVENTPORT, mprop);
-      BaseXServer.stop(port, eport);
+      BaseXServer.stop(num(StaticOptions.SERVERPORT, mprop));
     }
   }
 
@@ -273,9 +271,6 @@ public final class BaseXHTTP extends Main {
             break;
           case 'D': // hidden flag: daemon mode
             serve = false;
-            break;
-          case 'e': // parse event port
-            Options.setSystem(StaticOptions.EVENTPORT, arg.number());
             break;
           case 'h': // parse HTTP port
             httpPort = arg.number();

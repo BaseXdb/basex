@@ -29,8 +29,6 @@ public final class Context {
   public final StaticOptions soptions;
   /** Client sessions. */
   public final Sessions sessions;
-  /** Event pool. */
-  public final Events events;
   /** Opened databases. */
   public final Datas datas;
   /** Users. */
@@ -86,7 +84,6 @@ public final class Context {
   public Context(final Context ctx) {
     soptions = ctx.soptions;
     datas = ctx.datas;
-    events = ctx.events;
     sessions = ctx.sessions;
     databases = ctx.databases;
     blocker = ctx.blocker;
@@ -114,7 +111,6 @@ public final class Context {
   private Context(final StaticOptions soptions) {
     this.soptions = soptions;
     datas = new Datas();
-    events = new Events();
     sessions = new Sessions();
     blocker = new ClientBlocker();
     databases = new Databases(soptions);

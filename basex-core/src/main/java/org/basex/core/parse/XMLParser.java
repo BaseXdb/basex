@@ -79,8 +79,6 @@ final class XMLParser extends CmdParser {
       return new CreateBackup(value(root, NAME));
     if(e.equals(CREATE_DB) && check(root, NAME, '<' + INPUT + '?'))
       return new CreateDB(value(root, NAME), xml(root));
-    if(e.equals(CREATE_EVENT) && check(root, NAME + '?'))
-      return new CreateEvent(value(root, NAME));
     if(e.equals(CREATE_INDEX) && check(root, TYPE))
       return new CreateIndex(value(root, TYPE));
     if(e.equals(CREATE_USER) && check(root, NAME, '#' + PASSWORD + '?'))
@@ -91,8 +89,6 @@ final class XMLParser extends CmdParser {
       return new DropBackup(value(root, NAME));
     if(e.equals(DROP_DB) && check(root, NAME))
       return new DropDB(value(root, NAME));
-    if(e.equals(DROP_EVENT) && check(root, NAME))
-      return new DropEvent(value(root, NAME));
     if(e.equals(DROP_INDEX) && check(root, TYPE))
       return new DropIndex(value(root, TYPE));
     if(e.equals(DROP_USER) && check(root, NAME, PATTERN + '?'))
@@ -157,8 +153,6 @@ final class XMLParser extends CmdParser {
       return new Set(value(root, OPTION), value(root));
     if(e.equals(SHOW_BACKUPS) && check(root))
       return new ShowBackups();
-    if(e.equals(SHOW_EVENTS) && check(root))
-      return new ShowEvents();
     if(e.equals(SHOW_SESSIONS) && check(root))
       return new ShowSessions();
     if(e.equals(SHOW_USERS) && check(root, DATABASE + '?'))

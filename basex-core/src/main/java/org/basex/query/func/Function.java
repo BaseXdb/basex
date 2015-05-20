@@ -788,8 +788,6 @@ public enum Function {
   /** XQuery function. */
   _DB_NODE_PRE(DbNodePre.class, "node-pre(nodes)", arg(NOD_ZM), ITR_ZM, DB_URI),
   /** XQuery function. */
-  _DB_EVENT(DbEvent.class, "event(name,query)", arg(STR, ITEM_ZM), EMP, flag(NDT), DB_URI),
-  /** XQuery function. */
   _DB_OUTPUT(DbOutput.class, "output(result)", arg(ITEM_ZM), EMP, flag(UPD, NDT), DB_URI),
   /** XQuery function. */
   _DB_OUTPUT_CACHE(DbOutputCache.class, "output-cache()", arg(), ITEM_ZO, flag(NDT), DB_URI),

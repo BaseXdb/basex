@@ -109,8 +109,6 @@ public enum QueryError {
   BXDB_RENAME_X(BXDB, 8, "Invalid target path: %."),
   /** BXDB0009. */
   BXDB_RANGE_X_X_X(BXDB, 9, "Database '%' has no node with % value %."),
-  /** BXDB0010. */
-  BXDB_EVENT_X(BXDB, 10, "Event '%' is unknown."),
   /** BXDB0011. */
   BXDB_NAME_X(BXDB, 11, "Invalid database name '%'."),
   /** BXDB0012. */

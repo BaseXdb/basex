@@ -246,12 +246,6 @@ public final class DbModuleTest extends AdvancedQueryTest {
 
   /** Test method. */
   @Test
-  public void event() {
-    error(_DB_EVENT.args("X", "Y"), BXDB_EVENT_X);
-  }
-
-  /** Test method. */
-  @Test
   public void output() {
     query(_DB_OUTPUT.args("x"), "x");
     query(_DB_OUTPUT.args("('x','y')"), "x\ny");

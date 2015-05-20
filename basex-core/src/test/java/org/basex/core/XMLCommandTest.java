@@ -42,8 +42,6 @@ public final class XMLCommandTest extends SandboxTest {
     ok("<create-db name='X'>X</create-db>");
     ok("<create-db name='X'><X/></create-db>");
 
-    ok("<create-event name='X'/>");
-
     ok("<create-index type='X'/>");
 
     ok("<create-user name='X'/>");
@@ -54,8 +52,6 @@ public final class XMLCommandTest extends SandboxTest {
     ok("<drop-backup name='X'/>");
 
     ok("<drop-db name='X'/>");
-
-    ok("<drop-event name='X'/>");
 
     ok("<drop-index type='X'/>");
 
@@ -125,8 +121,6 @@ public final class XMLCommandTest extends SandboxTest {
     ok("<set option='X'>X</set>");
 
     ok("<show-backups/>");
-
-    ok("<show-events/>");
 
     ok("<show-sessions/>");
 

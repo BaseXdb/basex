@@ -42,8 +42,6 @@ public final class DBLocking implements Locking {
   public static final String ADMIN = PREFIX + "ADMIN";
   /** Special lock identifier for backup commands. */
   public static final String BACKUP = PREFIX + "BACKUP";
-  /** Special lock identifier for event commands. */
-  public static final String EVENT = PREFIX + "EVENT";
   /** Special lock identifier for repository commands. */
   public static final String REPO = PREFIX + "REPO";
 
