@@ -4,6 +4,10 @@ function openQuery() {
     null,
     function(req) {
       document.getElementById("editor").value = req.responseText;
+      //The next line sends a 'change' event to all listeners to the 'editor'
+      //This allows the syntax highlighter to hear that the text area value has changed
+      //Programatic changes to the value don't send events automatically
+      document.getElementById("editor").dispatchEvent(new Event("change",{ bubbles: false, cancelable: false }));
     },
     function(req) {
       setError('Query could not be opened.');
@@ -74,3 +78,18 @@ function queryExists() {
   }
   return false;
 };
+
+/**
+ * Replaces the 'editor' text area with a CodeMirror syntax-highlighted editor
+ * Adds event listeners to each to synchronise changes between the two
+ *
+ */
+function replaceEditor() {
+  if (CodeMirror) {
+    var editor = document.getElementById("editor")
+    var codeMirrorEditor = CodeMirror.fromTextArea(editor);
+    codeMirrorEditor.on("change",function(cm, cmo) { cm.save() });
+    codeMirrorEditor.display.wrapper.style.border = "solid 1pt black";
+    editor.addEventListener("change",function() {codeMirrorEditor.setValue(editor.value)});
+  }
+}
