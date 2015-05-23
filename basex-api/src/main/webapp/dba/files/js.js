@@ -148,5 +148,6 @@ function request(method, url, data, success, failure) {
   };
   // synchronous querying: wait for server feedback
   req.open(method, url, true);
+  req.setRequestHeader("Content-Type", "text/plain");
   req.send(data);
 };
