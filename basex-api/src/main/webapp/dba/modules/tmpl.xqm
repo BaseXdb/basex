@@ -41,6 +41,7 @@ declare function tmpl:wrap(
       <meta name="description" content="Database Administration"/>
       <meta name="author" content="BaseX Team, 2014-15"/>
       <link rel="stylesheet" type="text/css" href="files/style.css"/> 
+      <link rel="stylesheet" type="text/css" href="files/codemirror/lib/codemirror.css"/> 
       <script type="text/javascript" src="files/js.js"/>
     </head>
     <body>
