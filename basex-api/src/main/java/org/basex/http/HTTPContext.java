@@ -175,7 +175,7 @@ public final class HTTPContext {
   }
 
   /**
-   * Returns the URL path.
+   * Returns the URL path. The path always starts with a slash.
    * @return path path
    */
   public String path() {

@@ -27,6 +27,8 @@ public enum HTTPCode {
   NO_PATH(SC_NOT_FOUND, "No path specified."),
   /** Error: 404, "No function found to process the request.". */
   NO_XQUERY(SC_NOT_FOUND, "No function found that matches the request."),
+  /** Error: 404, "RESTXQ directory not found.". */
+  NO_RESTXQ(SC_NOT_FOUND, "RESTXQ directory not found."),
 
   /** Error 501, "Method not supported: %.". */
   NOT_IMPLEMENTED_X(SC_NOT_IMPLEMENTED, "Method not supported: %.");

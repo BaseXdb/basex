@@ -44,6 +44,10 @@ public interface RestXqText {
   String WADL_URI = "http://wadl.dev.java.net/2009/02";
   /** XHTML namespace. */
   String XHTML_URL = "http://www.w3.org/1999/xhtml";
+  /** Ignore directory. */
+  String IGNORE = ".ignore";
+  /** Init call. */
+  String INIT = ".init";
 
   /** Error message. */
   String ANN_MISSING = "Annotation %% or %% missing.";
