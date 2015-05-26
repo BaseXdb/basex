@@ -67,9 +67,6 @@ function _:queries(
                 <button type='delete' name='delete' id='delete' disabled='true'
                         onclick='deleteQuery()'>Delete</button>
                 <script type="text/javascript" src="files/editor.js"/>
-                <script type="text/javascript" src="files/codemirror/lib/codemirror.js"/>
-                <script type="text/javascript" src="files/codemirror/mode/xquery/xquery.js"/>
-                <script type="text/javascript">replaceEditor();</script>
               </div>
             </td>
           </tr>
