@@ -423,17 +423,9 @@ public class CommandTest extends SandboxTest {
     assertEquals(NAME + "/a/y.xml", ok(new XQuery("base-uri(.)")));
     ok(new Rename("a/", "/"));
     assertEquals(NAME + "/y.xml", ok(new XQuery("base-uri(.)")));
-    ok(new Rename("", "a"));
-    assertEquals(NAME + "/a/y.xml", ok(new XQuery("base-uri(.)")));
-    ok(new Rename("a", ""));
-    assertEquals(NAME + "/y.xml", ok(new XQuery("base-uri(.)")));
-    ok(new Rename("", "a/"));
-    assertEquals(NAME + "/a/y.xml", ok(new XQuery("base-uri(.)")));
-    ok(new Rename("a", "/"));
-    assertEquals(NAME + "/y.xml", ok(new XQuery("base-uri(.)")));
     ok(new Rename("/", "a"));
     assertEquals(NAME + "/a/y.xml", ok(new XQuery("base-uri(.)")));
-    ok(new Rename("a/", ""));
+    ok(new Rename("a", "/"));
     assertEquals(NAME + "/y.xml", ok(new XQuery("base-uri(.)")));
   }
 
