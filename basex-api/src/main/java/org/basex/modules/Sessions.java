@@ -26,7 +26,7 @@ public final class Sessions extends QueryModule {
    * @return session ids
    */
   public static Value ids() {
-    final HashMap<String, HttpSession> http = SessionListener.sessions();
+    final HashMap<String, HttpSession> http = ServletListener.sessions();
     final TokenList tl = new TokenList(http.size());
     for(final String s : http.keySet()) tl.add(s);
     return StrSeq.get(tl);
@@ -139,7 +139,7 @@ public final class Sessions extends QueryModule {
    */
   private HttpSession session(final Str id) throws QueryException {
     if(queryContext.http == null) throw SessionErrors.noContext();
-    final HashMap<String, HttpSession> http = SessionListener.sessions();
+    final HashMap<String, HttpSession> http = ServletListener.sessions();
     final HttpSession session = http.get(id.toJava());
     if(session == null) throw SessionErrors.whichSession(id);
     return session;
