@@ -119,7 +119,6 @@ public final class GFLWOR extends ParseExpr {
 
   @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
-    // split combined where clauses
     final ListIterator<Clause> iter = clauses.listIterator();
     while(iter.hasNext()) {
       final Clause clause = iter.next();
