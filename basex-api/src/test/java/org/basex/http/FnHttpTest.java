@@ -348,9 +348,10 @@ public class FnHttpTest extends HTTPTest {
     }
     // wrong credentials
     try(final QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
-        "<http:request xmlns:http='http://expath.org/ns/http-client' "
-        + "method='GET' href='" + REST_ROOT + "' send-authorization='true' "
-        + "auth-method='Basic' username='unknown' password='wrong'/>"), ctx)) {
+        "<http:request xmlns:http='http://expath.org/ns/http-client' " +
+        "method='GET' href='" + REST_ROOT + "' send-authorization='true' " +
+        "auth-method='Basic' username='unknown' password='wrong'/>") +
+        "[. instance of node()][@status = '401']", ctx)) {
       checkResponse(qp.value(), 1, HttpURLConnection.HTTP_UNAUTHORIZED);
     }
   }
@@ -372,7 +373,8 @@ public class FnHttpTest extends HTTPTest {
     try(final QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         "<http:request xmlns:http='http://expath.org/ns/http-client' method='GET' " +
         "send-authorization='true' auth-method='Digest' username='unknown' password='wrong' " +
-        "href='" + REST_ROOT + "?query=()'/>"), ctx)) {
+        "href='" + REST_ROOT + "?query=()'/>") +
+        "[. instance of node()][@status = '401']", ctx)) {
       checkResponse(qp.value(), 1, HttpURLConnection.HTTP_UNAUTHORIZED);
     }
   }

@@ -49,12 +49,14 @@ public final class HttpResponse {
       throws IOException, QueryException {
 
     // check content type
-    InputStream is = conn.getErrorStream();
-    final boolean error = is != null;
+    boolean error = false;
+    InputStream is = null;
     try {
-      if(!error) is = conn.getInputStream();
+      is = conn.getInputStream();
     } catch(final IOException ex) {
       Util.debug(ex);
+      is = conn.getErrorStream();
+      error = true;
     }
 
     // result
