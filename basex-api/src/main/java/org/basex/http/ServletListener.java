@@ -3,7 +3,7 @@ package org.basex.http;
 import javax.servlet.*;
 
 /**
- * This class creates and destroys HTTP sessions and servlet contexts.
+ * This class creates and destroys servlet contexts.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen

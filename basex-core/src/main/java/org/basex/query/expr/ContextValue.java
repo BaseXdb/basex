@@ -17,23 +17,23 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public final class Context extends Simple {
+public final class ContextValue extends Simple {
   /**
    * Constructor.
    * @param info input info
    */
-  public Context(final InputInfo info) {
+  public ContextValue(final InputInfo info) {
     super(info);
     seqType = SeqType.ITEM_ZM;
   }
 
   @Override
-  public Context compile(final QueryContext qc, final VarScope scp) {
+  public ContextValue compile(final QueryContext qc, final VarScope scp) {
     return optimize(qc, scp);
   }
 
   @Override
-  public Context optimize(final QueryContext qc, final VarScope scp) {
+  public ContextValue optimize(final QueryContext qc, final VarScope scp) {
     if(qc.value != null) seqType = qc.value.seqType();
     return this;
   }
@@ -65,7 +65,7 @@ public final class Context extends Simple {
 
   @Override
   public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return copyType(new Context(info));
+    return copyType(new ContextValue(info));
   }
 
   @Override
@@ -75,7 +75,7 @@ public final class Context extends Simple {
 
   @Override
   public boolean sameAs(final Expr cmp) {
-    return cmp instanceof Context;
+    return cmp instanceof ContextValue;
   }
 
   @Override

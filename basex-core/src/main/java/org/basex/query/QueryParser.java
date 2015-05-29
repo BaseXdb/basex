@@ -21,7 +21,7 @@ import org.basex.query.expr.CmpG.OpG;
 import org.basex.query.expr.CmpN.OpN;
 import org.basex.query.expr.CmpV.OpV;
 import org.basex.query.expr.Expr.Flag;
-import org.basex.query.expr.Context;
+import org.basex.query.expr.ContextValue;
 import org.basex.query.expr.List;
 import org.basex.query.expr.constr.*;
 import org.basex.query.expr.ft.*;
@@ -2123,7 +2123,7 @@ public class QueryParser extends InputParser {
     if(c == '.' && !digit(next())) {
       if(next() == '.') return null;
       consume('.');
-      return new Context(info());
+      return new ContextValue(info());
     }
     // literals
     return literal();

@@ -49,7 +49,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
     for(final IOFile f : new IOFile(REPO).children()) {
       if(f.isDir() && f.name().contains(".")) f.delete();
     }
-    context = newContext();
+    context = new Context();
     context.soptions.set(StaticOptions.REPOPATH, REPO);
   }
 

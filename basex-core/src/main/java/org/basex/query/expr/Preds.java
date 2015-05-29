@@ -205,7 +205,7 @@ public abstract class Preds extends ParseExpr {
 
     final Expr pred = preds[0];
     // a[.] -> a
-    if(pred instanceof Context) return root;
+    if(pred instanceof ContextValue) return root;
 
     if(!pred.seqType().mayBeNumber()) {
       // a[b] -> a/b
@@ -218,7 +218,7 @@ public abstract class Preds extends ParseExpr {
         if(!expr2.has(Flag.CTX)) {
           Expr path = null;
           // a[. = 'x'] -> a = 'x'
-          if(expr1 instanceof Context) path = root;
+          if(expr1 instanceof ContextValue) path = root;
           // a[text() = 'x'] -> a/text() = 'x'
           if(expr1 instanceof Path) path = Path.get(info, root, expr1).optimize(qc, scp);
           if(path != null) return new CmpG(path, expr2, cmp.op, cmp.coll, cmp.sc, cmp.info);
@@ -233,7 +233,7 @@ public abstract class Preds extends ParseExpr {
           final Expr expr = cmp.expr;
           Expr path = null;
           // a[. contains text 'x'] -> a contains text 'x'
-          if(expr instanceof Context) path = root;
+          if(expr instanceof ContextValue) path = root;
           // [text() contains text 'x'] -> a/text() contains text 'x'
           if(expr instanceof Path) path = Path.get(info, root, expr).optimize(qc, scp);
           if(path != null) return new FTContains(path, ftexpr, cmp.info);

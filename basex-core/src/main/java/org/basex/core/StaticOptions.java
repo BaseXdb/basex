@@ -118,17 +118,17 @@ public final class StaticOptions extends Options {
     debug = get(DEBUG);
     final String ph = get(PROXYHOST);
     if(!ph.isEmpty()) {
-      setSystem("http.proxyHost", ph);
-      setSystem("https.proxyHost", ph);
+      Prop.setSystem("http.proxyHost", ph);
+      Prop.setSystem("https.proxyHost", ph);
     }
     final String pp = Integer.toString(get(PROXYPORT));
     if(!pp.equals("0")) {
-      setSystem("http.proxyPort", pp);
-      setSystem("https.proxyPort", pp);
+      Prop.setSystem("http.proxyPort", pp);
+      Prop.setSystem("https.proxyPort", pp);
     }
     final String nph = get(NONPROXYHOSTS);
     if(!nph.isEmpty()) {
-      setSystem("http.nonProxyHosts", nph);
+      Prop.setSystem("http.nonProxyHosts", nph);
     }
     if(get(IGNORECERT)) IOUrl.ignoreCert();
   }

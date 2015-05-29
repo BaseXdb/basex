@@ -74,26 +74,26 @@ public abstract class Path extends ParseExpr {
       rt = path.root;
     }
     // remove redundant context reference
-    if(rt instanceof Context) rt = null;
+    if(rt instanceof ContextValue) rt = null;
 
     // add steps of input array
     for(final Expr expr : steps) {
       Expr step = expr;
-      if(step instanceof Context) {
+      if(step instanceof ContextValue) {
         // remove redundant context references
         if(sl > 1) continue;
         // single step: rewrite to axis step (required to sort results of path)
-        step = Step.get(((Context) step).info, SELF, Test.NOD);
+        step = Step.get(((ContextValue) step).info, SELF, Test.NOD);
       } else if(step instanceof Filter) {
         // rewrite filter to axis step
         final Filter f = (Filter) step;
-        if(f.root instanceof Context) {
+        if(f.root instanceof ContextValue) {
           step = Step.get(f.info, SELF, Test.NOD, f.preds);
         }
       } else if(step instanceof Path) {
         // rewrite path to axis steps
         final Path p = (Path) step;
-        if(p.root != null && !(p.root instanceof Context)) stps.add(p.root);
+        if(p.root != null && !(p.root instanceof ContextValue)) stps.add(p.root);
         final int pl = p.steps.length - 1;
         for(int i = 0; i < pl; i++) stps.add(p.steps[i]);
         step = p.steps[pl];
@@ -123,7 +123,7 @@ public abstract class Path extends ParseExpr {
   public final Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
     if(root != null) root = root.compile(qc, scp);
     // no steps
-    if(steps.length == 0) return root == null ? new Context(info) : root;
+    if(steps.length == 0) return root == null ? new ContextValue(info) : root;
 
     final Value init = qc.value, cv = initial(qc);
     qc.value = cv;
@@ -377,7 +377,7 @@ public abstract class Path extends ParseExpr {
     // current context value
     final Value v = qc != null ? qc.value : null;
     // no root or context expression: return context
-    if(root == null || root instanceof Context) return v;
+    if(root == null || root instanceof ContextValue) return v;
     // root reference
     if(root instanceof Root) return v instanceof Item ? Root.root(v) : v;
     // root is value: return root

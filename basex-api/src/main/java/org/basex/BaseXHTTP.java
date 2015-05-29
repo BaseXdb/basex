@@ -110,10 +110,10 @@ public final class BaseXHTTP extends Main {
     }
 
     // request password on command line if only the user was specified
-    if(!Options.getSystem(StaticOptions.USER).isEmpty()) {
-      while(Options.getSystem(StaticOptions.PASSWORD).isEmpty()) {
+    if(!Prop.get(StaticOptions.USER).isEmpty()) {
+      while(Prop.get(StaticOptions.PASSWORD).isEmpty()) {
         Util.out(PASSWORD + COLS);
-        Options.setSystem(StaticOptions.PASSWORD, Util.password());
+        Prop.put(StaticOptions.PASSWORD, Util.password());
       }
     }
 
@@ -185,7 +185,7 @@ public final class BaseXHTTP extends Main {
    * @return numeric value
    */
   private static int num(final NumberOption option, final StaticOptions sopts) {
-    final String val = Options.getSystem(option);
+    final String val = Prop.get(option);
     return val.isEmpty() ? sopts.get(option) : Strings.toInt(val);
   }
 
@@ -196,7 +196,7 @@ public final class BaseXHTTP extends Main {
    * @return boolean value
    */
   private static boolean bool(final BooleanOption option, final StaticOptions sopts) {
-    final String val = Options.getSystem(option);
+    final String val = Prop.get(option);
     return val.isEmpty() ? sopts.get(option) : Boolean.parseBoolean(val);
   }
 
@@ -266,7 +266,7 @@ public final class BaseXHTTP extends Main {
       if(arg.dash()) {
         switch(arg.next()) {
           case 'd': // activate debug mode
-            Options.setSystem(StaticOptions.DEBUG, true);
+            Prop.put(StaticOptions.DEBUG, true);
             Prop.debug = true;
             break;
           case 'D': // hidden flag: daemon mode
@@ -276,32 +276,32 @@ public final class BaseXHTTP extends Main {
             httpPort = arg.number();
             break;
           case 'l': // use local mode
-            Options.setSystem(StaticOptions.HTTPLOCAL, true);
+            Prop.put(StaticOptions.HTTPLOCAL, true);
             break;
           case 'n': // parse host name
             final String n = arg.string();
-            Options.setSystem(StaticOptions.HOST, n);
-            Options.setSystem(StaticOptions.SERVERHOST, n);
+            Prop.put(StaticOptions.HOST, n);
+            Prop.put(StaticOptions.SERVERHOST, n);
             break;
           case 'p': // parse server port
             final int p = arg.number();
-            Options.setSystem(StaticOptions.PORT, p);
-            Options.setSystem(StaticOptions.SERVERPORT, p);
+            Prop.put(StaticOptions.PORT, p);
+            Prop.put(StaticOptions.SERVERPORT, p);
             break;
           case 'P': // specify password
-            Options.setSystem(StaticOptions.PASSWORD, arg.string());
+            Prop.put(StaticOptions.PASSWORD, arg.string());
             break;
           case 's': // parse stop port
-            Options.setSystem(StaticOptions.STOPPORT, arg.number());
+            Prop.put(StaticOptions.STOPPORT, arg.number());
             break;
           case 'S': // set service flag
             service = serve;
             break;
           case 'U': // specify user name
-            Options.setSystem(StaticOptions.USER, arg.string());
+            Prop.put(StaticOptions.USER, arg.string());
             break;
           case 'z': // suppress logging
-            Options.setSystem(StaticOptions.LOG, false);
+            Prop.put(StaticOptions.LOG, false);
             break;
           default:
             throw arg.usage();

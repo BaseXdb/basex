@@ -5,7 +5,7 @@ import java.util.*;
 import javax.servlet.http.*;
 
 /**
- * This class creates and destroys HTTP sessions and servlet contexts.
+ * This class creates and destroys HTTP sessions.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen

@@ -416,18 +416,11 @@ public class Options implements Iterable<Option<?>> {
    * All properties starting with {@code org.basex.} will be assigned as options.
    */
   public final void setSystem() {
-    // collect parameters that start with "org.basex."
-    final StringList sl = new StringList();
-    for(final Object key : System.getProperties().keySet()) {
-      final String k = key.toString();
-      if(k.startsWith(DBPREFIX)) sl.add(k);
-    }
-    // assign properties
-    for(final String key : sl) {
-      final String v = System.getProperty(key);
+    // assign global options
+    for(final Entry<String, String> entry : Prop.entries()) {
+      final String n = entry.getKey(), v = entry.getValue().toString();
       try {
-        final String k = key.substring(DBPREFIX.length()).toUpperCase(Locale.ENGLISH);
-        if(assign(k, v, -1, false)) Util.debug(k + Text.COLS + v);
+        if(assign(n, v, -1, false)) Util.debug(n + Text.COLS + v);
       } catch(final BaseXException ex) {
         Util.errln(ex);
       }
@@ -532,43 +525,6 @@ public class Options implements Iterable<Option<?>> {
   // STATIC METHODS =====================================================================
 
   /**
-   * Returns a system property. If necessary, the key will be converted to lower-case
-   * and prefixed with the {@link Prop#DBPREFIX} string.
-   * @param option option
-   * @return value, or empty string
-   */
-  public static String getSystem(final Option<?> option) {
-    String name = option.name().toLowerCase(Locale.ENGLISH);
-    if(!name.startsWith(DBPREFIX)) name = DBPREFIX + name;
-    final String v = System.getProperty(name);
-    return v == null ? "" : v;
-  }
-
-  /**
-   * Sets a system property if it has not been set before.
-   * @param option option
-   * @param val value
-   */
-  public static void setSystem(final Option<?> option, final Object val) {
-    setSystem(option.name(), val);
-  }
-
-  /**
-   * Sets a system property if it has not been set before. If necessary, the key will
-   * be converted to lower-case and prefixed with the {@link Prop#DBPREFIX} string.
-   * @param key key
-   * @param val value
-   */
-  public static void setSystem(final String key, final Object val) {
-    final String name = key.indexOf('.') == -1 ? DBPREFIX + key.toLowerCase(Locale.ENGLISH) : key;
-    final String value = val.toString();
-    if(System.getProperty(name) == null) {
-      if(value.isEmpty()) System.clearProperty(name);
-      else System.setProperty(name, val.toString());
-    }
-  }
-
-  /**
    * Returns a list of allowed keys.
    * @param option option
    * @param all allowed values
@@ -648,7 +604,7 @@ public class Options implements Iterable<Option<?>> {
 
           if(local) {
             // cache local options as system properties
-            setSystem(name, val);
+            Prop.put(name, val);
           } else {
             try {
               assign(name, val, num, true);
