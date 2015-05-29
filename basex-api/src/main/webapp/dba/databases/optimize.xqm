@@ -157,7 +157,7 @@ function _:drop(
 ) {
   cons:check(),
   try {
-    util:update("$names ! db:optimize(.)", map { 'n': $names }),
+    util:update("$n ! db:optimize(.)", map { 'n': $names }),
     db:output(web:redirect($_:CAT, map { 'info': 'Optimized databases: ' || count($names) }))
   } catch * {
     db:output(web:redirect($_:CAT, map { 'error': $err:description }))
