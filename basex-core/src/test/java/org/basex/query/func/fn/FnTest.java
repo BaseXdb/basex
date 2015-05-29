@@ -34,6 +34,13 @@ public final class FnTest extends AdvancedQueryTest {
 
   /** Test method. */
   @Test
+  public void jsonToXml() {
+    contains(JSON_TO_XML.args("null"), "xmlns");
+    contains(JSON_TO_XML.args("null") + " update ()", "xmlns");
+  }
+
+  /** Test method. */
+  @Test
   public void serialize() {
     contains(SERIALIZE.args("<x/>"), "<x/>");
     contains(SERIALIZE.args("<x/>", serialParams("")), "<x/>");
