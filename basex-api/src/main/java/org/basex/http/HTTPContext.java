@@ -478,13 +478,15 @@ public final class HTTPContext {
    * Closes the database context.
    */
   public static synchronized void close() {
-    if(server == null) return;
-    try {
-      server.stop();
-    } catch(final IOException ex) {
-      Util.stack(ex);
+    if(server != null) {
+      try {
+        server.stop();
+      } catch(final IOException ex) {
+        Util.stack(ex);
+      }
+      server = null;
     }
-    server = null;
+    context.close();
   }
 
   /**
