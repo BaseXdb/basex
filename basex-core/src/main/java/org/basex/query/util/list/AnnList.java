@@ -79,20 +79,22 @@ public final class AnnList extends ElementList implements Iterable<Ann> {
     final AnnList tmp = new AnnList();
     boolean pub = false, priv = false, up = false;
     for(final Ann ann : this) {
-      if(ann.sig == Annotation.PUBLIC) pub = true;
-      else if(ann.sig == Annotation.PRIVATE) priv = true;
-      else if(ann.sig == Annotation.UPDATING) up = true;
+      final Annotation sig = ann.sig;
+      if(sig == Annotation.PUBLIC) pub = true;
+      else if(sig == Annotation.PRIVATE) priv = true;
+      else if(sig == Annotation.UPDATING) up = true;
       tmp.add(ann);
     }
 
     for(final Ann ann : al) {
-      if(ann.sig == Annotation.PUBLIC) {
+      final Annotation sig = ann.sig;
+      if(sig == Annotation.PUBLIC) {
         if(pub) continue;
         if(priv) return null;
-      } else if(ann.sig == Annotation.PRIVATE) {
+      } else if(sig == Annotation.PRIVATE) {
         if(pub) return null;
         if(priv) continue;
-      } else if(ann.sig == Annotation.UPDATING && up) {
+      } else if(sig == Annotation.UPDATING && up) {
         continue;
       }
       tmp.add(ann);

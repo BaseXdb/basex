@@ -24,7 +24,6 @@ import org.basex.server.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
 import org.basex.util.http.HttpText.Request;
-import org.basex.util.options.*;
 
 /**
  * Bundles context-based information on a single HTTP operation.
@@ -175,7 +174,7 @@ public final class HTTPContext {
   }
 
   /**
-   * Returns the URL path.
+   * Returns the URL path. The path always starts with a slash.
    * @return path path
    */
   public String path() {
@@ -437,8 +436,8 @@ public final class HTTPContext {
 
     // set web application path as home directory and HTTPPATH
     final String webapp = sc.getRealPath("/");
-    Options.setSystem(Prop.PATH, webapp);
-    Options.setSystem(StaticOptions.WEBPATH, webapp);
+    System.setProperty(Prop.PATH, webapp);
+    Prop.put(StaticOptions.WEBPATH, webapp);
 
     // bind all parameters that start with "org.basex." to system properties
     final Enumeration<String> en = sc.getInitParameterNames();
@@ -452,7 +451,7 @@ public final class HTTPContext {
         Util.debug(key.toUpperCase(Locale.ENGLISH) + ": " + val);
         val = new IOFile(webapp, val).path();
       }
-      Options.setSystem(key, val);
+      Prop.put(key, val);
     }
 
     // create context, update options
@@ -478,13 +477,15 @@ public final class HTTPContext {
    * Closes the database context.
    */
   public static synchronized void close() {
-    if(server == null) return;
-    try {
-      server.stop();
-    } catch(final IOException ex) {
-      Util.stack(ex);
+    if(server != null) {
+      try {
+        server.stop();
+      } catch(final IOException ex) {
+        Util.stack(ex);
+      }
+      server = null;
     }
-    server = null;
+    context.close();
   }
 
   /**

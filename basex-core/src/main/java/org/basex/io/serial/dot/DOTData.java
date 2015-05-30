@@ -78,7 +78,7 @@ final class DOTData {
     // green
     { "009900", GFLWOR.class },
     { "339933", VarStack.class },
-    { "33CC33", For.class, Let.class, List.class, Range.class, Context.class,
+    { "33CC33", For.class, Let.class, List.class, Range.class, ContextValue.class,
                 QueryText.RET },
     { "66CC66", Var.class, Cast.class },
     // cyan

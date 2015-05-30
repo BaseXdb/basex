@@ -105,6 +105,9 @@ public final class JsonBasicConverter extends JsonXmlConverter {
    */
   private FElem addElem(final byte[] type) {
     final FElem e = new FElem(type, QueryText.W3_JSON_URI);
+    // root node: declare namespace
+    if(curr == null) e.declareNS();
+
     if(name != null) {
       e.add(KEY, name);
       if(!unescape && contains(name, '\\')) e.add(ESCAPED_KEY, TRUE);

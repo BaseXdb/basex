@@ -28,6 +28,6 @@ declare %public function hello:world() as xs:string {
 };
 
 (:~ Private function returning a simple string. :)
-declare %private function hello:internal() as xs:string {
+declare %private %Q{ns}ignored function hello:internal() as xs:string {
   "hello world"
 };

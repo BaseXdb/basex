@@ -104,22 +104,25 @@ public final class GFLWOR extends ParseExpr {
 
   @Override
   public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    int i = 0;
+    final ListIterator<Clause> iter = clauses.listIterator();
     try {
-      for(final Clause clause : clauses) {
-        clause.compile(qc, scp);
-        i++;
-      }
+      while(iter.hasNext()) iter.next().compile(qc, scp);
+    } catch(final QueryException qe) {
+      iter.remove();
+      clauseError(qe, iter);
+    }
+
+    try {
       ret = ret.compile(qc, scp);
     } catch(final QueryException qe) {
-      clauseError(qe, i);
+      clauseError(qe, iter);
     }
+
     return optimize(qc, scp);
   }
 
   @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
-    // split combined where clauses
     final ListIterator<Clause> iter = clauses.listIterator();
     while(iter.hasNext()) {
       final Clause clause = iter.next();
@@ -373,8 +376,8 @@ public final class GFLWOR extends ParseExpr {
             || expr instanceof AxisPath && ((AxisPath) expr).cheap()) {
 
             qc.compInfo(QueryText.OPTINLINE, lt.var);
-            inline(qc, scp, lt.var, lt.inlineExpr(qc, scp), next);
-            iter.remove();
+            inline(qc, scp, lt.var, lt.inlineExpr(qc, scp), iter);
+            clauses.remove(lt);
             changing = changed = true;
             // continue from the beginning as clauses below could have been deleted
             break;
@@ -689,7 +692,7 @@ public final class GFLWOR extends ParseExpr {
   @Override
   public Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
       throws QueryException {
-    return inline(qc, scp, var, ex, 0) ? optimize(qc, scp) : null;
+    return inline(qc, scp, var, ex, clauses.listIterator()) ? optimize(qc, scp) : null;
   }
 
   /**
@@ -698,15 +701,14 @@ public final class GFLWOR extends ParseExpr {
    * @param scp variable scope
    * @param var variable
    * @param ex expression to inline
-   * @param pos clause position
+   * @param iter iterator at the position of the first clause to inline into
    * @return if changes occurred
    * @throws QueryException query exception
    */
   private boolean inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex,
-      final int pos) throws QueryException {
+      final ListIterator<Clause> iter) throws QueryException {
 
     boolean changed = false;
-    final ListIterator<Clause> iter = clauses.listIterator(pos);
     while(iter.hasNext()) {
       final Clause clause = iter.next();
       try {
@@ -716,7 +718,8 @@ public final class GFLWOR extends ParseExpr {
           iter.set(cl);
         }
       } catch(final QueryException qe) {
-        return clauseError(qe, iter.previousIndex() + 1);
+        iter.remove();
+        return clauseError(qe, iter);
       }
     }
 
@@ -727,7 +730,7 @@ public final class GFLWOR extends ParseExpr {
         ret = rt;
       }
     } catch(final QueryException qe) {
-      return clauseError(qe, clauses.size());
+      return clauseError(qe, iter);
     }
 
     return changed;
@@ -736,12 +739,13 @@ public final class GFLWOR extends ParseExpr {
   /**
    * Tries to recover from a compile-time exception inside a FLWOR clause.
    * @param qe thrown exception
-   * @param idx index of the throwing clause, size of {@link #clauses} for return clause
+   * @param iter iterator positioned where the failing clause was before
    * @return {@code true} if the GFLWOR expression has to stay
    * @throws QueryException query exception if the whole expression fails
    */
-  private boolean clauseError(final QueryException qe, final int idx) throws QueryException {
-    final ListIterator<Clause> iter = clauses.listIterator(idx);
+  private boolean clauseError(final QueryException qe, final ListIterator<Clause> iter)
+      throws QueryException {
+    // check if an outer clause can prevent the error
     while(iter.hasPrevious()) {
       final Clause b4 = iter.previous();
       if(b4 instanceof For || b4 instanceof Window || b4 instanceof Where) {
@@ -754,6 +758,8 @@ public final class GFLWOR extends ParseExpr {
         return true;
       }
     }
+
+    // error will always be thrown
     throw qe;
   }
 

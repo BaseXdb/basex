@@ -256,4 +256,14 @@ public final class GFLWOROptimizeTest extends QueryPlanTest {
         "exists(//Let)"
     );
   }
+
+  /** Checks that clauses can be removed during inlining. */
+  @Test public void gh1150() {
+    check("for $i in 1 to xs:integer(random:double()) let $x := 'does-not-exist.xml' "
+        + "for $x in doc($x) let $x := count($x) return $x",
+        "",
+        "count(//For) eq 1",
+        "count(//GFLWOR/*) eq 2",
+        "starts-with(//GFLWOR/*[last()]/@name, 'error(')");
+  }
 }

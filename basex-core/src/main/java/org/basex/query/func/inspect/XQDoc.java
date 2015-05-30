@@ -157,7 +157,8 @@ final class XQDoc extends Inspect {
     if(!anns.isEmpty()) annotation(anns, elem("annotations", parent), false);
     final int al = anns.size();
     for(int a = 0; a < al; a++) {
-      final byte[] uri = anns.get(a).sig.uri;
+      final Ann ann = anns.get(a);
+      final byte[] uri = ann.sig != null ? ann.sig.uri : ann.name.uri();
       if(uri.length > 0) nsCache.put(NSGlobal.prefix(uri), uri);
     }
   }

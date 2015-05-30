@@ -877,6 +877,7 @@ public final class GeoTest extends AdvancedQueryTest {
     final String q = "import module namespace geo='http://expath.org/ns/geo'; " +
         "declare namespace gml='http://www.opengis.net/gml';" + query;
 
+    System.setErr(NULL);
     try(final QueryProcessor qp = new QueryProcessor(q, context)) {
       final String res = qp.value().serialize().toString().replaceAll("(\\r|\\n) *", "");
       fail("Query did not fail:\n" + query + "\n[E] " +
@@ -886,6 +887,8 @@ public final class GeoTest extends AdvancedQueryTest {
         fail("Wrong error code:\n[E] " + error + "\n[F] " + ex.qname());
     } catch(final Exception ex) {
       fail(ex.toString());
+    } finally {
+      System.setErr(ERR);
     }
   }
 }

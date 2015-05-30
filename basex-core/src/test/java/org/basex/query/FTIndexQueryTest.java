@@ -23,9 +23,9 @@ public final class FTIndexQueryTest extends SandboxTest {
    * @throws BaseXException database exception
    */
   private static void init(final String input) throws BaseXException {
-    new CreateDB(NAME, input).execute(SandboxTest.context);
-    new Set(MainOptions.FTINDEX, true).execute(SandboxTest.context);
-    new CreateDB(NAME + "ix", input).execute(SandboxTest.context);
+    new CreateDB(NAME, input).execute(Sandbox.context);
+    new Set(MainOptions.FTINDEX, true).execute(Sandbox.context);
+    new CreateDB(NAME + "ix", input).execute(Sandbox.context);
   }
 
   /**

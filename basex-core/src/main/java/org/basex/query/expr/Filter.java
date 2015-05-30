@@ -131,7 +131,7 @@ public abstract class Filter extends Preds {
     if(ex != null) return ex.optimize(qc, scp);
 
     // try to rewrite filter to index access
-    if(root instanceof Context || root instanceof Value && root.data() != null) {
+    if(root instanceof ContextValue || root instanceof Value && root.data() != null) {
       final Path ip = Path.get(info, root, Step.get(info, SELF, Test.NOD, preds));
       final Expr ie = ip.index(qc, Path.initial(qc, root));
       if(ie != ip) return ie;

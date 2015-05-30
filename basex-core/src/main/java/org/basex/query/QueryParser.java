@@ -21,7 +21,7 @@ import org.basex.query.expr.CmpG.OpG;
 import org.basex.query.expr.CmpN.OpN;
 import org.basex.query.expr.CmpV.OpV;
 import org.basex.query.expr.Expr.Flag;
-import org.basex.query.expr.Context;
+import org.basex.query.expr.ContextValue;
 import org.basex.query.expr.List;
 import org.basex.query.expr.constr.*;
 import org.basex.query.expr.ft.*;
@@ -423,27 +423,32 @@ public class QueryParser extends InputParser {
         skipWs();
 
         final Annotation sig = Annotation.get(name);
+        // annotation is not statically known...
         if(sig == null) {
           // reject unknown annotations with pre-defined namespaces, ignore others
           final byte[] uri = name.uri();
-          if(NSGlobal.prefix(uri).length == 0 || eq(uri, LOCAL_URI, ERROR_URI)) continue;
-          throw (NSGlobal.reserved(uri) ? ANNWHICH_X_X : BASX_ANNOT_X_X).get(
-              info, '%', name.string());
-        }
-        // check if annotation is specified more than once
-        if(sig.single && anns.contains(sig)) throw BASX_TWICE_X_X.get(info, '%', sig.id());
+          if(NSGlobal.prefix(uri).length != 0 && !eq(uri, LOCAL_URI, ERROR_URI)) {
+            throw (NSGlobal.reserved(uri) ? ANNWHICH_X_X : BASX_ANNOT_X_X).get(
+                info, '%', name.string());
+          }
+          anns.add(new Ann(info, name, items.finish()));
 
-        final long arity = items.size();
-        if(arity < sig.minMax[0] || arity > sig.minMax[1])
-          throw BASX_ANNNUM_X_X_X.get(info, sig, arity, arity == 1 ? "" : "s");
-        final int al = sig.args.length;
-        for(int a = 0; a < arity; a++) {
-          final SeqType st = sig.args[Math.min(al - 1, a)];
-          final Item it = items.get(a);
-          if(!st.instance(it)) throw BASX_ANNTYPE_X_X_X.get(info, sig, st, it.seqType());
-        }
+        } else {
+          // check if annotation is specified more than once
+          if(sig.single && anns.contains(sig)) throw BASX_TWICE_X_X.get(info, '%', sig.id());
 
-        anns.add(new Ann(info, sig, items.finish()));
+          final long arity = items.size();
+          if(arity < sig.minMax[0] || arity > sig.minMax[1])
+            throw BASX_ANNNUM_X_X_X.get(info, sig, arity, arity == 1 ? "" : "s");
+          final int al = sig.args.length;
+          for(int a = 0; a < arity; a++) {
+            final SeqType st = sig.args[Math.min(al - 1, a)];
+            final Item it = items.get(a);
+            if(!st.instance(it)) throw BASX_ANNTYPE_X_X_X.get(info, sig, st, it.seqType());
+          }
+
+          anns.add(new Ann(info, sig, items.finish()));
+        }
       } else {
         break;
       }
@@ -2118,7 +2123,7 @@ public class QueryParser extends InputParser {
     if(c == '.' && !digit(next())) {
       if(next() == '.') return null;
       consume('.');
-      return new Context(info());
+      return new ContextValue(info());
     }
     // literals
     return literal();
