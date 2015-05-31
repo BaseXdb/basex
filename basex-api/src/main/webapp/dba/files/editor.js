@@ -4,6 +4,7 @@ function openQuery() {
     null,
     function(req) {
       document.getElementById("editor").value = req.responseText;
+      document.getElementById("editor").dispatchEvent(new Event("change",{ bubbles: false, cancelable: false }));
     },
     function(req) {
       setError('Query could not be opened.');
@@ -74,3 +75,56 @@ function queryExists() {
   }
   return false;
 };
+
+function loadCodeMirrorCSS() {
+    var link = document.createElement("link");
+    link.setAttribute("rel", "stylesheet");
+    link.setAttribute("type", "text/css");
+    link.setAttribute("href", "files/codemirror/lib/codemirror.css");
+    document.head.appendChild(link);
+}
+
+function loadCodeMirror() {
+  if (CodeMirror) {
+    //Now replace the editor and result areas
+    var editorArea = document.getElementById("editor");
+    var codeMirrorEditor = CodeMirror.fromTextArea(editorArea, {
+      mode: "xquery",
+      lineNumbers: true,
+      extraKeys: {
+        "Ctrl-Enter": function(cm) {
+           editor("Please wait…", "Query was successful.", true);
+        },
+        "Cmd-Enter": function(cm) {
+           editor("Please wait…", "Query was successful.", true);
+        }
+      }
+    });
+    codeMirrorEditor.on("change",function(cm, cmo) {
+        cm.save();
+        editor("Please wait…", "Query was successful.", false);
+      }
+    );
+    codeMirrorEditor.display.wrapper.style.border = "solid 1pt black";
+    editorArea.addEventListener("change",function() {
+      codeMirrorEditor.setValue(editorArea.value);
+    });
+    var outputArea = document.getElementById("output");
+    var codeMirrorResult = CodeMirror.fromTextArea(outputArea, {mode: "xml"});
+    codeMirrorResult.display.wrapper.style.border = "solid 1pt black";
+    outputArea.addEventListener("change",function() {codeMirrorResult.setValue(outputArea.value)});
+    window.addEventListener("load",setDisplayHeight);
+    window.addEventListener("resize",setDisplayHeight);
+  }
+}
+
+function setDisplayHeight() {
+    var elem = document.createElement("div");
+    document.body.appendChild(elem);
+    p = elem.offsetTop + 48 //To account for margin, it works but is not bullet proof.
+    var c = document.getElementsByClassName("CodeMirror")[0].offsetHeight;
+    var s = window.innerHeight;
+    Array.prototype.forEach.call(document.getElementsByClassName("CodeMirror"),function(cm) {
+        cm.CodeMirror.setSize("100%",Math.max(200,s-(p-c)));
+    });
+}
