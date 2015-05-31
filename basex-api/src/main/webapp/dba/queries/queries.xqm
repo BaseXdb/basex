@@ -67,6 +67,10 @@ function _:queries(
                 <button type='delete' name='delete' id='delete' disabled='true'
                         onclick='deleteQuery()'>Delete</button>
                 <script type="text/javascript" src="files/editor.js"/>
+                <script type="text/javascript" src="files/codemirror/lib/codemirror.js"/>
+                <script type="text/javascript" src="files/codemirror/mode/xquery/xquery.js"/>
+                <script type="text/javascript" src="files/codemirror/mode/xml/xml.js"/>
+                <script type="text/javascript">loadCodeMirrorCSS();</script>
               </div>
             </td>
           </tr>
@@ -82,6 +86,7 @@ function _:queries(
           </tr>
         </table>
         <textarea id='output' rows='20' readonly='' spellcheck='false'/>
+        <script type="text/javascript">loadCodeMirror();</script>
       </td>
     </tr>
   )
