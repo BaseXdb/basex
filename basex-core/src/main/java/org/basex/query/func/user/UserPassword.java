@@ -34,7 +34,7 @@ public final class UserPassword extends UserFn {
      */
     private Password(final User user, final String pw, final InputInfo info,
         final QueryContext qc) {
-      super(UpdateType.USERPASSWORD, user, null, qc, info);
+      super(UpdateType.USERPASSWORD, user, "", qc, info);
       this.pw = pw;
     }
 

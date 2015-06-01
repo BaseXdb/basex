@@ -201,10 +201,10 @@ public final class User {
   /**
    * Sets the permission.
    * @param prm permission
-   * @param pattern database pattern (can be {@code null})
+   * @param pattern database pattern (can be empty)
    */
   public synchronized void perm(final Perm prm, final String pattern) {
-    if(pattern == null) {
+    if(pattern.isEmpty()) {
       perm = prm;
     } else {
       locals.put(pattern, prm);

@@ -33,15 +33,15 @@ public final class Get extends AGet {
 
   /**
    * Default constructor.
-   * @param key key to be found
+   * @param key key to be found (can be {@code null})
    */
   public Get(final String key) {
-    super(key);
+    super(key == null ? "" : key);
   }
 
   @Override
   protected boolean run() throws IOException {
-    if(args[0] == null) {
+    if(args[0].isEmpty()) {
       // retrieve values of all options
       if(context.user().has(Perm.ADMIN)) {
         out.println(GLOBAL_OPTIONS + COL);

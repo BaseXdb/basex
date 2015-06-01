@@ -28,11 +28,11 @@ import org.basex.util.list.*;
 public final class InfoStorage extends AQuery {
   /**
    * Default constructor.
-   * @param arg optional arguments
+   * @param arg arguments (can be {@code null})
    */
   public InfoStorage(final String... arg) {
-    super(Perm.READ, true, arg.length > 0 && arg[0] != null && !arg[0].isEmpty() ?
-      arg[0] : null, arg.length >  1 ? arg[1] : null);
+    super(Perm.READ, true, arg.length > 0 && arg[0] != null ? arg[0] : "",
+                           arg.length > 1 && arg[1] != null ? arg[1] : "");
   }
 
   @Override
@@ -42,7 +42,7 @@ public final class InfoStorage extends AQuery {
     final String end = args[1];
 
     DBNodes nodes = null;
-    if(start != null && toInt(start) == Integer.MIN_VALUE) {
+    if(!start.isEmpty() && toInt(start) == Integer.MIN_VALUE) {
       try {
         // evaluate input as query
         final Value value = qp(args[0], context).value();
@@ -63,8 +63,8 @@ public final class InfoStorage extends AQuery {
       int ps = 0;
       int pe = 1000;
 
-      if(start != null) {
-        if(end != null) {
+      if(!start.isEmpty()) {
+        if(!end.isEmpty()) {
           ps = toInt(start);
           pe = toInt(end) + 1;
         } else {
@@ -155,7 +155,7 @@ public final class InfoStorage extends AQuery {
   @Override
   public void build(final CmdBuilder cb) {
     cb.init(Cmd.INFO + " " + CmdInfo.STORAGE);
-    if(args[0] != null && toInt(args[0]) == Integer.MIN_VALUE) {
+    if(!args[0].isEmpty() && toInt(args[0]) == Integer.MIN_VALUE) {
       cb.xquery(0);
     } else {
       cb.arg(0).arg(1);

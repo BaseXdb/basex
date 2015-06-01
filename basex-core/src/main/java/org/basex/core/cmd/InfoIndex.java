@@ -34,13 +34,13 @@ public final class InfoIndex extends AInfo {
    * @param type optional index type, defined in {@link CmdIndexInfo}
    */
   public InfoIndex(final Object type) {
-    super(true, type != null && type != CmdIndexInfo.NULL ? type.toString() : null);
+    super(true, type != null && type != CmdIndexInfo.NULL ? type.toString() : "");
   }
 
   @Override
   protected boolean run() throws IOException {
     final Data data = context.data();
-    if(args[0] != null) {
+    if(!args[0].isEmpty()) {
       final CmdIndexInfo ci = getOption(CmdIndexInfo.class);
       if(ci == null) return error(UNKNOWN_CMD_X, this);
       final byte[] inf = info(ci, data, options);

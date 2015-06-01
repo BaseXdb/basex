@@ -69,6 +69,7 @@ public final class XMLCommandTest extends SandboxTest {
 
     ok("<flush/>");
 
+    ok("<get>");
     ok("<get option='X'/>");
 
     ok("<grant name='X' permission='X' pattern='X'/>");

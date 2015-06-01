@@ -563,7 +563,7 @@ public interface Text {
   String DB_NOT_FOUND_X = lang("db_not_found_%");
   /** Name invalid. */
   String NAME_INVALID_X = lang("name_invalid_%");
-  /** Paht invalid. */
+  /** Path invalid. */
   String PATH_INVALID_X = lang("path_invalid_%");
   /** Database pinned. */
   String DB_PINNED_X = lang("db_pinned_%");

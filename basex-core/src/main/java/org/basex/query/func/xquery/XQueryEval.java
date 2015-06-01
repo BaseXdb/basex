@@ -74,7 +74,7 @@ public class XQueryEval extends StandardFunc {
     // bind variables and context value
     final HashMap<String, Value> bindings = toBindings(1, qc);
     final User user = qc.context.user();
-    final Perm tmp = user.perm(null);
+    final Perm tmp = user.perm("");
     Timer to = null;
 
     try(final QueryContext qctx = qc.proc(new QueryContext(qc))) {
@@ -82,7 +82,7 @@ public class XQueryEval extends StandardFunc {
         final Options opts = toOptions(2, Q_OPTIONS, new XQueryOptions(), qc);
         final Perm perm = Perm.get(opts.get(XQueryOptions.PERMISSION).toString());
         if(!user.has(perm)) throw BXXQ_PERM2_X.get(info, perm);
-        user.perm(perm, null);
+        user.perm(perm, "");
 
         // initial memory consumption: perform garbage collection and calculate usage
         final long mb = opts.get(XQueryOptions.MEMORY);
@@ -136,7 +136,7 @@ public class XQueryEval extends StandardFunc {
       }
 
     } finally {
-      user.perm(tmp, null);
+      user.perm(tmp, "");
       qc.proc(null);
       if(to != null) to.cancel();
     }

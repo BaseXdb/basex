@@ -19,7 +19,7 @@ public final class UserDrop extends UserFn {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     checkAdmin(qc);
     final User user = toSafeUser(0, qc);
-    final String db = exprs.length > 1 ? toDB(1, qc) : null;
+    final String db = exprs.length > 1 ? toDB(1, qc) : "";
     if(user.name().equals(UserText.ADMIN)) throw USER_ADMIN.get(info);
     qc.resources.updates().add(new Drop(user, db, qc, ii), qc);
     return null;
@@ -30,12 +30,13 @@ public final class UserDrop extends UserFn {
     /**
      * Constructor.
      * @param user user
-     * @param db database (optional)
+     * @param pattern database (optional)
      * @param qc query context
      * @param info input info
      */
-    private Drop(final User user, final String db, final QueryContext qc, final InputInfo info) {
-      super(UpdateType.USERDROP, user, db, qc, info);
+    private Drop(final User user, final String pattern, final QueryContext qc,
+        final InputInfo info) {
+      super(UpdateType.USERDROP, user, pattern, qc, info);
     }
 
     @Override
@@ -43,7 +44,7 @@ public final class UserDrop extends UserFn {
       boolean global = false;
       for(final String db : patterns) global |= db == null;
       if(global) {
-        users.drop(user, null);
+        users.drop(user, "");
       } else {
         for(final String db : patterns) users.drop(user, db);
       }

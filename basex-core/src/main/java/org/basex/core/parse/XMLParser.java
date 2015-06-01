@@ -115,7 +115,7 @@ final class XMLParser extends CmdParser {
       return new InfoIndex(value(root, TYPE));
     if(e.equals(INFO_STORAGE) && check(root, '#' + QUERY + '?'))
       return new InfoStorage(value(root));
-    if(e.equals(KILL) && check(root, TARGET + '?'))
+    if(e.equals(KILL) && check(root, TARGET))
       return new Kill(value(root, TARGET));
     if(e.equals(LIST) && check(root, NAME + '?', PATH + '?'))
       return new List(value(root, NAME), value(root, PATH));
@@ -170,7 +170,7 @@ final class XMLParser extends CmdParser {
    * Returns the value of the specified attribute.
    * @param root root node
    * @param att name of attribute
-   * @return query exception
+   * @return value
    * @throws QueryException query exception
    */
   private String value(final Item root, final String att) throws QueryException {
@@ -180,7 +180,7 @@ final class XMLParser extends CmdParser {
   /**
    * Returns a string value (text node).
    * @param root root node
-   * @return query exception
+   * @return string value
    * @throws QueryException query exception
    */
   private String value(final Item root) throws QueryException {
@@ -190,7 +190,7 @@ final class XMLParser extends CmdParser {
   /**
    * Returns a password (text node).
    * @param root root node
-   * @return query exception
+   * @return password string
    * @throws QueryException query exception
    */
   private String password(final Item root) throws QueryException {
@@ -201,7 +201,7 @@ final class XMLParser extends CmdParser {
   /**
    * Returns an xml value (text node).
    * @param root root node
-   * @return query exception
+   * @return xml value
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
@@ -215,7 +215,7 @@ final class XMLParser extends CmdParser {
    * Executes the specified query and returns a string representation.
    * @param query query
    * @param context context node
-   * @return query exception
+   * @return string representation
    * @throws QueryException query exception
    */
   private String execute(final String query, final Item context) throws QueryException {

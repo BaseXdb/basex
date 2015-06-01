@@ -47,7 +47,7 @@ public final class UserCreate extends UserFn {
      */
     private Create(final String name, final String pw, final Perm perm, final User user,
         final QueryContext qc, final InputInfo info) {
-      super(UpdateType.USERCREATE, user, null, qc, info);
+      super(UpdateType.USERCREATE, user, "", qc, info);
       this.name = name;
       this.pw = pw;
       this.perm = perm;
@@ -55,7 +55,7 @@ public final class UserCreate extends UserFn {
 
     @Override
     public void apply() {
-      if(user != null) users.drop(user, null);
+      if(user != null) users.drop(user, "");
       users.create(name, pw, perm);
     }
 
