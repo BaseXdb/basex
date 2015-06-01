@@ -195,7 +195,7 @@ final class XMLParser extends CmdParser {
    */
   private String password(final Item root) throws QueryException {
     final String pw = execute("string(.)", root);
-    return pw.isEmpty() && pwReader != null ? pwReader.password() : "";
+    return pw.isEmpty() && pwReader != null ? pwReader.password() : pw;
   }
 
   /**
