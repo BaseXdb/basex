@@ -4,7 +4,9 @@ function openQuery() {
     null,
     function(req) {
       document.getElementById("editor").value = req.responseText;
-      document.getElementById("editor").dispatchEvent(new Event("change",{ bubbles: false, cancelable: false }));
+      var evt = document.createEvent("HTMLEvents");
+      evt.initEvent("change",false,false);
+      document.getElementById("editor").dispatchEvent(evt);
     },
     function(req) {
       setError('Query could not be opened.');
@@ -76,16 +78,8 @@ function queryExists() {
   return false;
 };
 
-function loadCodeMirrorCSS() {
-    var link = document.createElement("link");
-    link.setAttribute("rel", "stylesheet");
-    link.setAttribute("type", "text/css");
-    link.setAttribute("href", "files/codemirror/lib/codemirror.css");
-    document.head.appendChild(link);
-}
-
 function loadCodeMirror() {
-  if (CodeMirror) {
+  if (CodeMirror && dispatchEvent) {
     //Now replace the editor and result areas
     var editorArea = document.getElementById("editor");
     var codeMirrorEditor = CodeMirror.fromTextArea(editorArea, {
