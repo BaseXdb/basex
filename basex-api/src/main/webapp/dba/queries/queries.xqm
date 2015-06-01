@@ -34,7 +34,7 @@ function _:queries(
   cons:check(),
 
   let $f := function($b) { "editor('Please wait…', 'Query was successful.', " || $b || ");" }
-  return tmpl:wrap(map { 'top': $_:CAT, 'info': $info, 'error': $error },
+  return tmpl:wrap(map { 'top': $_:CAT, 'info': $info, 'error': $error, 'css':'codemirror/lib/codemirror.css', 'scripts':('editor.js','codemirror/lib/codemirror.js','codemirror/mode/xquery/xquery.js','codemirror/mode/xml/xml.js') },
     <tr>
       <td width='50%'>
         <table width='100%'>
@@ -66,11 +66,6 @@ function _:queries(
                         onclick='saveQuery()'>Save</button>
                 <button type='delete' name='delete' id='delete' disabled='true'
                         onclick='deleteQuery()'>Delete</button>
-                <script type="text/javascript" src="files/editor.js"/>
-                <script type="text/javascript" src="files/codemirror/lib/codemirror.js"/>
-                <script type="text/javascript" src="files/codemirror/mode/xquery/xquery.js"/>
-                <script type="text/javascript" src="files/codemirror/mode/xml/xml.js"/>
-                <script type="text/javascript">loadCodeMirrorCSS();</script>
               </div>
             </td>
           </tr>
