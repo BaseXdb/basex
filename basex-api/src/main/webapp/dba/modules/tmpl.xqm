@@ -41,7 +41,9 @@ declare function tmpl:wrap(
       <meta name="description" content="Database Administration"/>
       <meta name="author" content="BaseX Team, 2014-15"/>
       <link rel="stylesheet" type="text/css" href="files/style.css"/> 
+      {$options('css')[.] ! <link rel="stylesheet" type="text/css" href="files/{.}"/>} 
       <script type="text/javascript" src="files/js.js"/>
+      {$options('scripts')[.] ! <script type="text/javascript" src="files/{.}"/>} 
     </head>
     <body>
       <div class="right"><img style='padding-left:10px;padding-bottom:10px;' src="files/basex.svg"/></div>
