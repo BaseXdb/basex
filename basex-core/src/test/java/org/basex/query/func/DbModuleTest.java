@@ -189,7 +189,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
     query(xmlCall + "/@raw/data()", "false");
     query(xmlCall + "/@content-type/data()", MediaType.APPLICATION_XML.toString());
     query(xmlCall + "/@modified-date/xs:dateTime(.)");
-    query(xmlCall + "/@size/data()", "");
+    query(xmlCall + "/@size/data()", "2");
     query(xmlCall + "/text()", "xml");
 
     final String rawCall = _DB_LIST_DETAILS.args(NAME, "raw");

@@ -56,8 +56,10 @@ public final class DbListDetails extends DbList {
       @Override
       public ANode get(final long i) {
         if(i < is) {
-          final byte[] pt = data.text(il.get((int) i), true);
-          return resource(pt, false, 0, MediaType.APPLICATION_XML, data.meta.time);
+          final int pre = il.get((int) i);
+          final byte[] pt = data.text(pre, true);
+          return resource(pt, false, data.size(pre, Data.DOC), MediaType.APPLICATION_XML,
+              data.meta.time);
         }
         if(i < is + ts) {
           final byte[] pt = tl.get((int) i - is);
@@ -124,8 +126,7 @@ public final class DbListDetails extends DbList {
       final MediaType type, final long mdate) {
 
     final String tstamp = DateTime.format(new Date(mdate), DateTime.FULL);
-    final FElem res = new FElem(RESOURCE).add(path).
-        add(RAW, token(raw)).add(CTYPE, type.toString()).add(MDATE, tstamp);
-    return raw ? res.add(SIZE, token(size)) : res;
+    return new FElem(RESOURCE).add(path).
+        add(RAW, token(raw)).add(CTYPE, type.toString()).add(MDATE, tstamp).add(SIZE, token(size));
   }
 }
