@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.lang.reflect.*;
+import java.nio.file.*;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -65,7 +66,7 @@ public class Options implements Iterable<Option<?>> {
   private final HashMap<String, String> free = new HashMap<>();
 
   /** Options, cached from an input file. */
-  private final StringBuilder user = new StringBuilder();
+  private final StringList user = new StringList();
   /** Options file. */
   private IOFile file;
 
@@ -105,7 +106,7 @@ public class Options implements Iterable<Option<?>> {
       values.put(e.getKey(), e.getValue());
     for(final Entry<String, String> e : opts.free.entrySet())
       free.put(e.getKey(), e.getValue());
-    user.append(opts.user);
+    user.add(opts.user);
     file = opts.file;
   }
 
@@ -113,34 +114,34 @@ public class Options implements Iterable<Option<?>> {
    * Writes the options to disk.
    */
   public final synchronized void write() {
-    final TokenBuilder tmp = new TokenBuilder();
+    final StringList lines = new StringList();
     try {
-      boolean first = true;
       for(final Option<?> opt : options(getClass())) {
         final String name = opt.name();
         if(opt instanceof Comment) {
-          if(!first) tmp.add(NL);
-          tmp.add("# " + name).add(NL);
+          if(!lines.isEmpty()) lines.add("");
+          lines.add("# " + name);
         } else if(opt instanceof NumbersOption) {
           final int[] ints = get((NumbersOption) opt);
           final int is = ints == null ? 0 : ints.length;
-          for(int i = 0; i < is; ++i) tmp.add(name + i + " = " + ints[i]).add(NL);
+          for(int i = 0; i < is; ++i) lines.add(name + i + " = " + ints[i]);
         } else if(opt instanceof StringsOption) {
           final String[] strings = get((StringsOption) opt);
           final int ss = strings == null ? 0 : strings.length;
-          tmp.add(name + " = " + ss).add(NL);
-          for(int i = 0; i < ss; ++i) tmp.add(name + (i + 1) + " = " + strings[i]).add(NL);
+          lines.add(name + " = " + ss);
+          for(int i = 0; i < ss; ++i) lines.add(name + (i + 1) + " = " + strings[i]);
         } else {
-          tmp.add(name + " = " + get(opt)).add(NL);
+          lines.add(name + " = " + get(opt));
         }
-        first = false;
       }
-      tmp.add(NL).add(PROPUSER).add(NL);
-      tmp.add(user.toString());
-      final byte[] content = tmp.finish();
+      lines.add("").add(PROPUSER).add(user);
 
       // only write file if contents have changed
-      if(!file.exists() || !eq(content, file.read())) file.write(content);
+      if(update(lines)) {
+        final TokenBuilder tb = new TokenBuilder();
+        for(final String line : lines) tb.add(line).add(NL);
+        file.write(tb.finish());
+      }
 
     } catch(final Exception ex) {
       Util.errln("% could not be written.", file);
@@ -556,8 +557,6 @@ public class Options implements Iterable<Option<?>> {
     return opts.toArray(new Option[opts.size()]);
   }
 
-  // PRIVATE METHODS ====================================================================
-
   /**
    * Reads the configuration file and initializes the options.
    * The file is located in the project home directory.
@@ -579,7 +578,7 @@ public class Options implements Iterable<Option<?>> {
             local = true;
             continue;
           }
-          if(local) user.append(line).append(NL);
+          if(local) user.add(line);
 
           if(line.isEmpty() || line.charAt(0) == '#') continue;
           final int d = line.indexOf('=');
@@ -637,6 +636,25 @@ public class Options implements Iterable<Option<?>> {
       errs.add("writing new configuration file.");
       for(final String s : errs) Util.errln(file + ": " + s);
     }
+  }
+
+  /**
+   * Checks if the options file needs to be updated.
+   * @param lines lines of new file
+   * @return result of check
+   * @throws IOException I/O exception
+   */
+  private boolean update(final StringList lines) throws IOException {
+    if(!file.exists()) return true;
+
+    int l = 0;
+    final int ls = lines.size();
+    try(final NewlineInput nli = new NewlineInput(file)) {
+      for(String line; (line = nli.readLine()) != null;) {
+        if(l == ls || !lines.get(l++).equals(line)) return true;
+      }
+    }
+    return l == ls;
   }
 
   /**
