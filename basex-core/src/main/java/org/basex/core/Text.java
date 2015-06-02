@@ -239,17 +239,23 @@ public interface Text {
   // SERVER ===================================================================
 
   /** Server was started. */
-  String SRV_STARTED_PORT_X = lang("srv_started_port_%");
+  String PORT_X = " (" + lang("port") + ": %).";
+  /** Server was started. */
+  String SRV_STARTED_PORT_X = lang("srv_started") + PORT_X;
   /** Server was stopped. */
-  String SRV_STOPPED_PORT_X = lang("srv_stopped_port_%");
+  String SRV_STOPPED_PORT_X = lang("srv_stopped") + PORT_X;
   /** Server is running or permission was denied. */
-  String SRV_RUNNING = lang("srv_running");
+  String SRV_RUNNING = lang("srv_running") + '.';
+  /** Server is running or permission was denied. */
+  String SRV_RUNNING_X = lang("srv_running") + PORT_X;
+  /** Connection error. */
+  String CONNECTION_ERROR = lang("connection_error") + '.';
+  /** Connection error. */
+  String CONNECTION_ERROR_X = lang("connection_error") + PORT_X;
   /** Unknown host. */
   String UNKNOWN_HOST_X = lang("unknown_host_x");
   /** Timeout exceeded. */
   String TIMEOUT_EXCEEDED = lang("timeout_exceeded");
-  /** Connection error. */
-  String CONNECTION_ERROR = lang("connection_error");
   /** Access denied. */
   String ACCESS_DENIED = lang("access_denied");
   /** User name. */

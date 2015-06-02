@@ -97,8 +97,8 @@ public final class BaseXHTTP extends Main {
     }
 
     // start web server in a new process
+    final Connector connector = jetty.getConnectors()[0];
     if(service) {
-      final Connector connector = jetty.getConnectors()[0];
       start(connector.getPort(), connector instanceof SslSelectChannelConnector, args);
 
       for(final Connector c : jetty.getConnectors()) {
@@ -121,7 +121,7 @@ public final class BaseXHTTP extends Main {
     try {
       jetty.start();
     } catch(final BindException ex) {
-      throw new IOException(HTTP + ' ' + SRV_RUNNING, ex);
+      throw new IOException(Util.info(HTTP + ' ' + SRV_RUNNING_X, connector.getPort()), ex);
     }
     // throw cached exception that did not break the servlet architecture
     final IOException ex = HTTPContext.exception();
@@ -331,7 +331,7 @@ public final class BaseXHTTP extends Main {
       if(ping(S_LOCALHOST, port, ssl)) return;
       Performance.sleep(c * 100L);
     }
-    throw new BaseXException(CONNECTION_ERROR);
+    throw new BaseXException(CONNECTION_ERROR_X, port);
   }
 
   /**
@@ -355,9 +355,10 @@ public final class BaseXHTTP extends Main {
       new Socket(S_LOCALHOST, port).close();
       // give the notified process some time to quit
       Performance.sleep(100);
-    } catch(final IOException ex) {
+    } catch(final ConnectException ex) {
+      throw new IOException(Util.info(CONNECTION_ERROR_X, port));
+    } finally {
       stop.delete();
-      throw ex;
     }
   }
 

@@ -102,7 +102,7 @@ public final class BaseXServer extends CLI implements Runnable {
       stopFile = stopFile(port);
     } catch(final IOException ex) {
       context.log.writeServer(LogType.ERROR, Util.message(ex));
-      throw ex;
+      throw ex instanceof BindException ? new IOException(Util.info(SRV_RUNNING_X, port)) : ex;
     }
 
     new Thread(this).start();
@@ -264,16 +264,17 @@ public final class BaseXServer extends CLI implements Runnable {
    */
   public static void start(final int port, final String... args) throws BaseXException {
     // check if server is already running (needs some time)
-    if(ping(S_LOCALHOST, port)) throw new BaseXException(SRV_RUNNING);
+    final String host = S_LOCALHOST;
+    if(ping(host, port)) throw new BaseXException(SRV_RUNNING_X, port);
 
     Util.start(BaseXServer.class, args);
 
     // try to connect to the new server instance
     for(int c = 1; c < 10; ++c) {
       Performance.sleep(c * 100L);
-      if(ping(S_LOCALHOST, port)) return;
+      if(ping(host, port)) return;
     }
-    throw new BaseXException(CONNECTION_ERROR);
+    throw new BaseXException(CONNECTION_ERROR_X, port);
   }
 
   /**
@@ -307,9 +308,10 @@ public final class BaseXServer extends CLI implements Runnable {
       new Socket(S_LOCALHOST, port).close();
       // wait and check if server was really stopped
       do Performance.sleep(100); while(ping(S_LOCALHOST, port));
-    } catch(final IOException ex) {
+    } catch(final ConnectException ex) {
+      throw new IOException(Util.info(CONNECTION_ERROR_X, port));
+    } finally {
       stop.delete();
-      throw ex;
     }
   }
 

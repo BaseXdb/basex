@@ -201,7 +201,7 @@ public final class Prop {
    * @param value value
    */
   public static void put(final String name, final Object value) {
-    OPTIONS.put(name, value.toString());
+    OPTIONS.put(normalizeKey(name), value.toString());
   }
 
   /**
@@ -233,11 +233,9 @@ public final class Prop {
     final HashMap<String, String> entries = new HashMap<>();
     entries.putAll(OPTIONS);
     // override with system properties
-    final int l = DBPREFIX.length();
     for(final Object key : System.getProperties().keySet()) {
       final String name = key.toString();
-      if(name.startsWith(DBPREFIX))
-        entries.put(name.substring(l).toUpperCase(Locale.ENGLISH), System.getProperty(name));
+      if(name.startsWith(DBPREFIX)) entries.put(normalizeKey(name), System.getProperty(name));
     }
     return entries.entrySet();
   }
@@ -249,5 +247,15 @@ public final class Prop {
    */
   public static void setSystem(final String key, final String value) {
     if(System.getProperty(key) == null) System.setProperty(key, value);
+  }
+
+  /**
+   * Normalizes the key of an option. Removes {@link #DBPREFIX} and converts the key to upper-case.
+   * @param name name of the option
+   * @return normalized string
+   */
+  private static String normalizeKey(final String name) {
+    final String n = name.startsWith(DBPREFIX) ? name.substring(DBPREFIX.length()) : name;
+    return n.toUpperCase(Locale.ENGLISH);
   }
 }
