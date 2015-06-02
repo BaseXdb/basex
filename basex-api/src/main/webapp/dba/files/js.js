@@ -131,6 +131,9 @@ function editor(wait, success, enforce) {
     var target = update ? 'update-query' : 'eval-query';
     query(wait, success, target, editor, enforce, function(text) {
       document.getElementById("output").value = text;
+      var evt = document.createEvent("HTMLEvents");
+      evt.initEvent("change",false,false);
+      document.getElementById("output").dispatchEvent(evt);
     });
   }
 };
