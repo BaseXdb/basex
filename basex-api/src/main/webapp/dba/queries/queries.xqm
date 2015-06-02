@@ -34,7 +34,13 @@ function _:queries(
   cons:check(),
 
   let $f := function($b) { "editor('Please wait…', 'Query was successful.', " || $b || ");" }
-  return tmpl:wrap(map { 'top': $_:CAT, 'info': $info, 'error': $error, 'css':'codemirror/lib/codemirror.css', 'scripts':('editor.js','codemirror/lib/codemirror.js','codemirror/mode/xquery/xquery.js','codemirror/mode/xml/xml.js') },
+  return tmpl:wrap(
+    map {
+      'top': $_:CAT, 'info': $info, 'error': $error,
+      'css': 'codemirror/lib/codemirror.css',
+      'scripts': ('editor.js', 'codemirror/lib/codemirror.js',
+                  'codemirror/mode/xquery/xquery.js','codemirror/mode/xml/xml.js')
+    },
     <tr>
       <td width='50%'>
         <table width='100%'>
@@ -55,8 +61,8 @@ function _:queries(
           <tr>
             <td>
               <div align='right'>
-                <input id='file' name='file' list='files' autocomplete='off' placeholder='Name of query'
-                       oninput='checkButtons()' onpropertychange='checkButtons()'/>
+                <input id='file' name='file' placeholder='Name of query' autocomplete='off'
+                       list='files' oninput='checkButtons()' onpropertychange='checkButtons()'/>
                 <datalist id='files'>{
                   file:list($cons:QUERY-DIR) ! element option { replace(., $_:SUFFIX || '$', '') }
                 }</datalist>

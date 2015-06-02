@@ -113,12 +113,12 @@ function loadCodeMirror() {
 }
 
 function setDisplayHeight() {
-    var elem = document.createElement("div");
-    document.body.appendChild(elem);
-    p = elem.offsetTop + 48 //To account for margin, it works but is not bullet proof.
-    var c = document.getElementsByClassName("CodeMirror")[0].offsetHeight;
-    var s = window.innerHeight;
-    Array.prototype.forEach.call(document.getElementsByClassName("CodeMirror"),function(cm) {
-        cm.CodeMirror.setSize("100%",Math.max(200,s-(p-c)));
-    });
+  var elem = document.createElement("div");
+  document.body.appendChild(elem);
+  p = elem.offsetTop + 48 //To account for margin, it works but is not bullet proof.
+  var c = document.getElementsByClassName("CodeMirror")[0].offsetHeight;
+  var s = window.innerHeight;
+  Array.prototype.forEach.call(document.getElementsByClassName("CodeMirror"),function(cm) {
+    cm.CodeMirror.setSize("100%",Math.max(200,s-(p-c)));
+  });
 }
