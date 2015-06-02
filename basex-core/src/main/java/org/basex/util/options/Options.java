@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.lang.reflect.*;
-import java.nio.file.*;
 import java.util.*;
 import java.util.Map.Entry;
 
