@@ -13,7 +13,7 @@ import org.xml.sax.helpers.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-final class ErrorHandler extends DefaultHandler {
+public final class ErrorHandler extends DefaultHandler {
   /** Will contain all raised validation exception messages. */
   private final TokenList exceptions = new TokenList();
 
@@ -59,7 +59,7 @@ final class ErrorHandler extends DefaultHandler {
    * Returns the exception messages.
    * @return exception messages
    */
-  TokenList getExceptions() {
+  public TokenList getExceptions() {
     return exceptions;
   }
 }

@@ -109,7 +109,7 @@ public final class IOFile extends IO {
 
   @Override
   public InputSource inputSource() {
-    return new InputSource(pth);
+    return new InputSource(url());
   }
 
   @Override

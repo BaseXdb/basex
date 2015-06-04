@@ -9,7 +9,6 @@ import javax.xml.validation.*;
 
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.xml.sax.*;
 
@@ -42,17 +41,18 @@ import org.xml.sax.*;
  */
 public class ValidateXsdInfo extends ValidateFn {
   @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
-    return value(qc).iter();
+  public Value value(final QueryContext qc) throws QueryException {
+    return info(qc);
   }
 
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
+  public Value info(final QueryContext qc) throws QueryException {
     checkCreate(qc);
     return process(new Validate() {
       @Override
       void process(final ErrorHandler handler) throws IOException, SAXException, QueryException {
         final IO in = read(toNodeOrAtomItem(exprs[0], qc), qc, null);
+
         final SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         final Schema schema;
         if(exprs.length < 2) {
