@@ -60,7 +60,7 @@ abstract class ValidateFn extends StandardFunc {
    * @return string sequence with warnings and errors
    * @throws QueryException query exception
    */
-  final Value process(final Validate v) throws QueryException {
+  final Value process(final Validation v) throws QueryException {
     final ErrorHandler handler = new ErrorHandler();
     try {
       v.process(handler);

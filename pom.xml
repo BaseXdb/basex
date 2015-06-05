@@ -65,6 +65,29 @@
         <optional>true</optional>
       </dependency>
       <dependency>
+        <groupId>com.thaiopensource</groupId>
+        <artifactId>jing</artifactId>
+        <version>20091111</version>
+        <exclusions>
+          <exclusion>
+            <groupId>xerces</groupId>
+            <artifactId>xercesImpl</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>net.sf.saxon</groupId>
+            <artifactId>saxon</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>isorelax</groupId>
+            <artifactId>isorelax</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
         <groupId>net.xqj</groupId>
         <artifactId>basex-xqj</artifactId>
         <version>1.4.0</version>

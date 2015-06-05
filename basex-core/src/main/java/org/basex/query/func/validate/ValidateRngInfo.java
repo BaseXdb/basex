@@ -26,7 +26,7 @@ public class ValidateRngInfo extends ValidateFn {
   @Override
   public Value info(final QueryContext qc) throws QueryException {
     checkCreate(qc);
-    return process(new Validate() {
+    return process(new Validation() {
       @Override
       void process(final ErrorHandler handler) throws IOException, SAXException, QueryException {
         final IO in = read(toNodeOrAtomItem(exprs[0], qc), qc, null);
@@ -36,34 +36,41 @@ public class ValidateRngInfo extends ValidateFn {
         tmp = createTmp(schema);
         if(tmp != null) schema = tmp;
 
+        final boolean compact = exprs.length > 2 && toBoolean(exprs[2], qc);
+
         try {
-          final Class<?> pmb = Class.forName("com.thaiopensource.util.PropertyMapBuilder");
-          final Class<?> vd = Class.forName("com.thaiopensource.validate.ValidationDriver");
-          final Class<?> vp = Class.forName("com.thaiopensource.validate.ValidateProperty");
-          final Class<?> pi = Class.forName("com.thaiopensource.util.PropertyId");
-          final Class<?> pm = Class.forName("com.thaiopensource.util.PropertyMap");
+          final Class<?>
+            pmb = Class.forName("com.thaiopensource.util.PropertyMapBuilder"),
+            vd = Class.forName("com.thaiopensource.validate.ValidationDriver"),
+            vp = Class.forName("com.thaiopensource.validate.ValidateProperty"),
+            pi = Class.forName("com.thaiopensource.util.PropertyId"),
+            pm = Class.forName("com.thaiopensource.util.PropertyMap"),
+            sr = Class.forName("com.thaiopensource.validate.SchemaReader"),
+            csr = Class.forName("com.thaiopensource.validate.rng.CompactSchemaReader");
 
           final Object ehInstance = vp.getField("ERROR_HANDLER").get(null);
           final Object pmbInstance = pmb.newInstance();
           pi.getMethod("put", pmb, Object.class).invoke(ehInstance, pmbInstance, handler);
 
+          final Object srInstance = compact ? csr.getMethod("getInstance").invoke(null) : null;
           final Object pmInstance = pmb.getMethod("toPropertyMap").invoke(pmbInstance);
-          final Object vdInstance = vd.getConstructor(pm).newInstance(pmInstance);
+          final Object vdInstance = vd.getConstructor(pm, sr).newInstance(pmInstance, srInstance);
 
           final Method vdLs = vd.getMethod("loadSchema", InputSource.class);
           final Object loaded = vdLs.invoke(vdInstance, schema.inputSource());
-          if(!Boolean.TRUE.equals(loaded)) return;
-
-          final Method vdV = vd.getMethod("validate", InputSource.class);
-          vdV.invoke(vdInstance, in.inputSource());
-
+          if(Boolean.TRUE.equals(loaded)) {
+            final Method vdV = vd.getMethod("validate", InputSource.class);
+            vdV.invoke(vdInstance, in.inputSource());
+          }
+        } catch(final ClassNotFoundException ex) {
+          throw BXVA_RELAXNG_X.get(info);
         } catch(final Exception ex) {
           Throwable e = ex;
           while(e.getCause() != null) {
             Util.debug(e);
             e = e.getCause();
           }
-          throw BXVA_RNG_X.get(info, e);
+          throw BXVA_FAIL_X.get(info, e);
         }
       }
     });

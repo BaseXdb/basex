@@ -220,11 +220,11 @@ public enum QueryError {
   // Validation module
 
   /** BXVA0001. */
-  BXVA_FAIL_X(BXVA, 1, "Validation failed. %"),
+  BXVA_FAIL_X(BXVA, 1, "Validation failed: %"),
   /** BXVA0002. */
-  BXVA_START_X(BXVA, 2, "Validation could not be started. %"),
+  BXVA_START_X(BXVA, 2, "Validation could not be started: %"),
   /** BXVA0003. */
-  BXVA_RNG_X(BXVA, 3, "RelaxNG: %."),
+  BXVA_RELAXNG_X(BXVA, 3, "RelaxNG validation is not available."),
 
   // Web module
 

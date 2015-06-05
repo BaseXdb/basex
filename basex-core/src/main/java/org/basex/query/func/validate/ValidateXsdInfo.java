@@ -48,7 +48,7 @@ public class ValidateXsdInfo extends ValidateFn {
   @Override
   public Value info(final QueryContext qc) throws QueryException {
     checkCreate(qc);
-    return process(new Validate() {
+    return process(new Validation() {
       @Override
       void process(final ErrorHandler handler) throws IOException, SAXException, QueryException {
         final IO in = read(toNodeOrAtomItem(exprs[0], qc), qc, null);

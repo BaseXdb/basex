@@ -9,7 +9,7 @@ import org.basex.query.*;
 import org.xml.sax.*;
 
 /** Abstract validator class. */
-abstract class Validate {
+abstract class Validation {
   /** Temporary file instance. */
   IOFile tmp;
 

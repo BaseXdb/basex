@@ -1209,11 +1209,11 @@ public enum Function {
   _VALIDATE_DTD_INFO(ValidateDtdInfo.class, "dtd-info(input[,schema])",
       arg(ITEM, ITEM), STR_ZM, flag(NDT), VALIDATE_URI),
   /** XQuery function. */
-  _VALIDATE_RNG(ValidateRng.class, "rng(input, schema)",
-      arg(ITEM, ITEM), STR_ZM, flag(NDT), VALIDATE_URI),
+  _VALIDATE_RNG(ValidateRng.class, "rng(input,schema[,compact])",
+      arg(ITEM, ITEM, BLN), STR_ZM, flag(NDT), VALIDATE_URI),
   /** XQuery function. */
-  _VALIDATE_RNG_INFO(ValidateRngInfo.class, "rng-info(input, schema)",
-      arg(ITEM, ITEM), STR_ZM, flag(NDT), VALIDATE_URI),
+  _VALIDATE_RNG_INFO(ValidateRngInfo.class, "rng-info(input,schema[,compact])",
+      arg(ITEM, ITEM, BLN), STR_ZM, flag(NDT), VALIDATE_URI),
 
   /* Web Module. */
 
