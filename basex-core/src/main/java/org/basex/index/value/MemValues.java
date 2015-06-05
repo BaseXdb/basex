@@ -12,6 +12,7 @@ import org.basex.index.query.*;
 import org.basex.index.stats.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * This class provides main memory access to attribute values and text contents.
@@ -19,7 +20,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public final class MemValues extends TokenSet implements Index {
+public final class MemValues extends TokenSet implements ValueIndex {
   /** Updating index. */
   private final boolean updindex;
   /** Indexing flag. */
@@ -40,9 +41,6 @@ public final class MemValues extends TokenSet implements Index {
     this.data = data;
     this.updindex = updindex;
   }
-
-  @Override
-  public void init() { }
 
   @Override
   public IndexIterator iter(final IndexToken token) {
@@ -135,6 +133,18 @@ public final class MemValues extends TokenSet implements Index {
     index = false;
     return true;
   }
+
+  @Override
+  public void add(final TokenObjMap<IntList> map) { }
+
+  @Override
+  public void delete(final TokenObjMap<IntList> map) { }
+
+  @Override
+  public void replace(final byte[] old, final byte[] key, final int id) { }
+
+  @Override
+  public void flush() { }
 
   @Override
   public void close() { }

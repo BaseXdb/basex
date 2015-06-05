@@ -75,7 +75,9 @@ public final class PathSummary implements Index {
     data = dt;
   }
 
-  @Override
+  /**
+   * Initializes the index.
+   */
   public void init() {
     root = new PathNode();
     stack.clear();

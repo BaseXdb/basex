@@ -278,6 +278,6 @@ public final class UpdatableDiskValues extends DiskValues {
 
   @Override
   public String toString() {
-    return super.toString() + "FREE BLOCKS: " + free;
+    return super.toString() + free;
   }
 }

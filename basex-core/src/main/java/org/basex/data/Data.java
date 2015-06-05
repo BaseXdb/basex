@@ -13,6 +13,7 @@ import org.basex.index.name.*;
 import org.basex.index.path.*;
 import org.basex.index.query.*;
 import org.basex.index.resource.*;
+import org.basex.index.value.*;
 import org.basex.io.*;
 import org.basex.io.random.*;
 import org.basex.util.*;
@@ -95,11 +96,11 @@ public abstract class Data {
   /** Path summary index. */
   public PathSummary paths;
   /** Text index. */
-  public Index textIndex;
+  public ValueIndex textIndex;
   /** Attribute value index. */
-  public Index attrIndex;
+  public ValueIndex attrIndex;
   /** Full-text index instance. */
-  public Index ftxtIndex;
+  public ValueIndex ftxtIndex;
 
   /** Table access file. */
   TableAccess table;
@@ -544,7 +545,7 @@ public abstract class Data {
     final int tsize = size(tpre, tkind);
     final int tpar = parent(tpre, tkind);
     final int diff = size - tsize;
-    buffer(size);
+    bufferSize(size);
     resources.replace(tpre, tsize, source);
 
     if(meta.updindex) {
@@ -600,28 +601,26 @@ public abstract class Data {
     }
 
     if(meta.updindex) {
-      indexAdd();
       // update ID -> PRE map:
       idmap.delete(tpre, id(tpre), -tsize);
       idmap.insert(tpre, meta.lastid - size + 1, size);
+      indexAdd();
     }
 
     // update table:
     table.replace(tpre, buffer(), tsize);
-    buffer(1);
-
-    // no distance/size update if the two subtrees are of equal size
-    if(diff == 0) return;
+    bufferSize(1);
 
     // increase/decrease size of ancestors, adjust distances of siblings
-    int p = tpar;
-    while(p >= 0) {
-      final int k = kind(p);
-      size(p, k, size(p, k) + diff);
-      p = parent(p, k);
+    if(diff != 0) {
+      int p = tpar;
+      while(p >= 0) {
+        final int k = kind(p);
+        size(p, k, size(p, k) + diff);
+        p = parent(p, k);
+      }
+      if(!cache) updateDist(tpre + size, diff);
     }
-
-    if(!cache) updateDist(tpre + size, diff);
 
     // adjust attribute size of parent if attributes inserted. attribute size
     // of parent cannot be reduced via a replace expression.
@@ -713,7 +712,7 @@ public abstract class Data {
     final int size = source.size();
     final int buf = Math.min(size, IO.BLOCKSIZE >> IO.NODEPOWER);
     // resize buffer to cache more entries
-    buffer(buf);
+    bufferSize(buf);
 
     // find all namespaces in scope to avoid duplicate declarations
     final TokenMap nsScope = nspaces.scope(tpar, this);
@@ -815,7 +814,7 @@ public abstract class Data {
 
     if(bp != 0) insert(tpre + c - 1 - (c - 1) % buf);
     // reset buffer to old size
-    buffer(1);
+    bufferSize(1);
 
     // set namespace flags
     final int fs = flagPres.size();
@@ -943,7 +942,7 @@ public abstract class Data {
    * Sets the update buffer to a new size.
    * @param size number of table entries
    */
-  private void buffer(final int size) {
+  private void bufferSize(final int size) {
     final int bs = size << IO.NODEPOWER;
     if(b.length != bs) b = new byte[bs];
   }
@@ -1079,7 +1078,7 @@ public abstract class Data {
   void indexDelete() { }
 
   /**
-   * Delete a node and its descendants from the corresponding indexes.
+   * Deletes a node and its descendants from the corresponding indexes.
    * @param pre pre value of the node to delete
    * @param size number of descendants
    */

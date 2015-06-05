@@ -8,6 +8,7 @@ import java.util.*;
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.query.*;
+import org.basex.index.value.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
@@ -42,7 +43,7 @@ public abstract class IndexFn extends StandardFunc {
   public static Iter entries(final Data data, final IndexEntries entries, final StandardFunc call)
       throws QueryException {
 
-    final Index index;
+    final ValueIndex index;
     final boolean avl;
     final IndexType it = entries.type();
     if(it == IndexType.TEXT) {

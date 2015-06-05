@@ -59,10 +59,6 @@ public final class Resources implements Index {
     return docs.docs();
   }
 
-  @Override
-  public synchronized void init() {
-  }
-
   /**
    * Adds entries to the index and updates subsequent nodes.
    * @param pre insertion position

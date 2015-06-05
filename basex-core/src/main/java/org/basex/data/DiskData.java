@@ -208,7 +208,7 @@ public final class DiskData extends Data {
    * @param type index to be opened
    * @param index index instance
    */
-  private void set(final IndexType type, final Index index) {
+  private void set(final IndexType type, final ValueIndex index) {
     meta.dirty = true;
     switch(type) {
       case TEXT:      textIndex = index; break;
@@ -253,8 +253,8 @@ public final class DiskData extends Data {
         write();
         texts.flush();
         values.flush();
-        if(textIndex != null) ((DiskValues) textIndex).flush();
-        if(attrIndex != null) ((DiskValues) attrIndex).flush();
+        if(textIndex != null) textIndex.flush();
+        if(attrIndex != null) attrIndex.flush();
       }
     } catch(final IOException ex) {
       Util.stack(ex);
@@ -332,14 +332,9 @@ public final class DiskData extends Data {
   protected void updateText(final int pre, final byte[] value, final int kind) {
     final boolean text = kind != ATTR;
 
-    if(meta.updindex) {
-      // update indexes
-      final int id = id(pre);
-      final byte[] oldval = text(pre, text);
-      final DiskValues index = (DiskValues) (text ? textIndex : attrIndex);
-      // don't index document names
-      if(index != null && kind != DOC) index.replace(oldval, value, id);
-    }
+    // update index; do not index document names
+    final ValueIndex index = text ? textIndex : attrIndex;
+    if(index != null && kind != DOC) index.replace(text(pre, text), value, id(pre));
 
     // reference to text store
     final DataAccess store = text ? texts : values;
@@ -381,14 +376,14 @@ public final class DiskData extends Data {
 
   @Override
   protected void indexAdd() {
-    if(!txtBuffer.isEmpty()) ((DiskValues) textIndex).add(txtBuffer);
-    if(!atvBuffer.isEmpty()) ((DiskValues) attrIndex).add(atvBuffer);
+    if(!txtBuffer.isEmpty()) textIndex.add(txtBuffer);
+    if(!atvBuffer.isEmpty()) attrIndex.add(atvBuffer);
   }
 
   @Override
   void indexDelete() {
-    if(!txtBuffer.isEmpty()) ((DiskValues) textIndex).delete(txtBuffer);
-    if(!atvBuffer.isEmpty()) ((DiskValues) attrIndex).delete(atvBuffer);
+    if(!txtBuffer.isEmpty()) textIndex.delete(txtBuffer);
+    if(!atvBuffer.isEmpty()) attrIndex.delete(atvBuffer);
   }
 
   @Override

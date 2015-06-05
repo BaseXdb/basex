@@ -21,6 +21,7 @@ public final class IndexTest extends AdvancedQueryTest {
    */
   @After
   public void after() throws BaseXException {
+    run(new Close());
     run(new Set(MainOptions.UPDINDEX, false));
     run(new Set(MainOptions.AUTOOPTIMIZE, false));
   }
@@ -141,7 +142,19 @@ public final class IndexTest extends AdvancedQueryTest {
     run(new Close());
     run(new Open(NAME));
     run(new Delete("A"));
-    run(new Close());
+  }
+
+  /**
+   * Test.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void updindex8() throws BaseXException {
+    run(new Set(MainOptions.UPDINDEX, true));
+    run(new CreateDB(NAME));
+    run(new Replace("A", "<X a='?' b='a' c='1'/>"));
+    run(new Replace("A", "<X a='?' b='b' c='2'/>"));
+    run(new Replace("A", "<X/>"));
   }
 
   /**
