@@ -24,7 +24,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public class DiskValues implements Index {
+public class DiskValues implements ValueIndex {
   /** ID references. */
   final DataAccess idxr;
   /** ID lists. */
@@ -67,9 +67,6 @@ public class DiskValues implements Index {
     idxr = new DataAccess(data.meta.dbfile(pref + 'r'));
     size.set(idxl.read4());
   }
-
-  @Override
-  public void init() { }
 
   @Override
   public byte[] info(final MainOptions options) {
@@ -120,27 +117,13 @@ public class DiskValues implements Index {
     }
   }
 
-  /**
-   * Add entries to the index.
-   * @param map a set of [key, id-list] pairs
-   */
-  @SuppressWarnings("unused")
+  @Override
   public void add(final TokenObjMap<IntList> map) { }
 
-  /**
-   * Deletes index entries from the index.
-   * @param map a set of [key, id-list] pairs
-   */
-  @SuppressWarnings("unused")
+  @Override
   public void delete(final TokenObjMap<IntList> map) { }
 
-  /**
-   * Replaces an index entry in the index.
-   * @param old old record key
-   * @param key new record key
-   * @param id record id
-   */
-  @SuppressWarnings("unused")
+  @Override
   public void replace(final byte[] old, final byte[] key, final int id) { }
 
   @Override
@@ -151,9 +134,7 @@ public class DiskValues implements Index {
     return keysFrom(key, input.descending);
   }
 
-  /**
-   * Flushes the buffered data.
-   */
+  @Override
   public final void flush() {
     idxl.flush();
     idxr.flush();
@@ -504,10 +485,9 @@ public class DiskValues implements Index {
       tb.add("- references:").add("\n");
       for(int m = 0; m < sz; m++) {
         final long pos = idxr.read5(m * 5L);
-        final int oc = idxl.readNum(pos);
-        int id = idxl.readNum();
-        tb.add("  ").addInt(m).add(". key: \"").add(data.text(pre(id), text)).add("\"; offset: ");
-        tb.addLong(pos).add("; id/dists: ").addInt(id).add('/').addInt(pre(id));
+        int oc = idxl.readNum(pos), id = idxl.readNum(), pre = pre(id);
+        tb.add("  ").addInt(m).add(". offset: ").addLong(pos).add(", key: \"");
+        tb.add(data.text(pre, text)).add("\", ids/pres: ").addInt(id).add('/').addInt(pre);
         for(int n = 1; n < oc; n++) {
           id += idxl.readNum();
           tb.add(",").addInt(id).add('/').addInt(pre(id));

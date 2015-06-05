@@ -38,7 +38,7 @@ public final class MemData extends Data {
    * @param options database options
    */
   private MemData(final Names elemNames, final Names attrNames, final PathSummary paths,
-      final Namespaces nspaces, final Index textIndex, final Index attrIndex,
+      final Namespaces nspaces, final ValueIndex textIndex, final ValueIndex attrIndex,
       final MainOptions options) {
 
     super(new MetaData(options));

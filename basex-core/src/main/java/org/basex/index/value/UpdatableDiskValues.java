@@ -122,7 +122,7 @@ public final class UpdatableDiskValues extends DiskValues {
       // create space for new entry
       final int sz = size() + 1;
       final byte[] tmp = idxr.readBytes(0, sz * 5);
-      for(int i = sz - 1; i > index; --i) copy(tmp, i, i - 1);
+      for(int i = sz - 1; i > index; --i) copy(tmp, i - 1, i);
       idxr.cursor(0);
       idxr.writeBytes(tmp, 0, sz * 5);
       size(sz);
@@ -278,6 +278,6 @@ public final class UpdatableDiskValues extends DiskValues {
 
   @Override
   public String toString() {
-    return super.toString() + "FREE BLOCKS: " + free;
+    return super.toString() + free;
   }
 }

@@ -119,9 +119,9 @@ public final class FreeSlots {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(free.size() + " entries:\n");
+    final StringBuilder sb = new StringBuilder("FREE SLOTS: " + free.size() + "\n");
     for(final Entry<Integer, LongList> entry : free.entrySet()) {
-      sb.append("- ").append(entry.getKey()).append(": ").append(entry.getValue()).append('\n');
+      sb.append("  ").append(entry.getKey()).append(": ").append(entry.getValue()).append('\n');
     }
     return sb.toString();
   }

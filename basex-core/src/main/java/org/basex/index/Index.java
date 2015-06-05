@@ -12,11 +12,6 @@ import org.basex.index.query.*;
  */
 public interface Index {
   /**
-   * Initializes the index.
-   */
-  void init();
-
-  /**
    * Returns information on the index structure.
    * @param options main options
    * @return info
@@ -46,13 +41,13 @@ public interface Index {
   int costs(final IndexToken token);
 
   /**
-   * Closes the index.
-   */
-  void close();
-
-  /**
    * Drops the index.
    * @return success flag
    */
   boolean drop();
+
+  /**
+   * Closes the index.
+   */
+  void close();
 }
