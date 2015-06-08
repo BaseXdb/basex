@@ -3043,7 +3043,7 @@ public class QueryParser extends InputParser {
 
     wsCheck(PAREN1);
     skipWs();
-    final Test t = elem ? elementTest() : schemaTest();
+    final NodeTest t = elem ? elementTest() : schemaTest();
     wsCheck(PAREN2);
     return new DocTest(t != null ? t : Test.ELM);
   }
@@ -3053,7 +3053,7 @@ public class QueryParser extends InputParser {
    * @return arguments
    * @throws QueryException query exception
    */
-  private Test elementTest() throws QueryException {
+  private NodeTest elementTest() throws QueryException {
     final QNm name = eQName(null, sc.elemNS);
     if(name == null && !consume(ASTERISK)) return null;
 
@@ -3075,7 +3075,7 @@ public class QueryParser extends InputParser {
    * @return arguments
    * @throws QueryException query exception
    */
-  private Test schemaTest() throws QueryException {
+  private NodeTest schemaTest() throws QueryException {
     final QNm name = eQName(QNAME_X, sc.elemNS);
     throw error(SCHEMAINV_X, name);
   }

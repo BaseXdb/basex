@@ -58,7 +58,7 @@ public final class NodeTest extends Test {
   }
 
   @Override
-  public Test intersect(final Test other) {
+  public NodeTest intersect(final Test other) {
     if(other instanceof NodeTest) {
       final NodeTest o = (NodeTest) other;
       if(type != null && o.type != null && type != o.type) return null;
