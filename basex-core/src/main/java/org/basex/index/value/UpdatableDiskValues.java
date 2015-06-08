@@ -130,24 +130,18 @@ public final class UpdatableDiskValues extends DiskValues {
     } else {
       // add id to the existing id list
       final long off = idxr.read5(index * 5L);
-      final int num = idxl.readNum(off);
-      final int newSize = num + 1;
-      newIds = new IntList(newSize);
+      final int count = idxl.readNum(off);
+      newIds = new IntList(count + 1);
 
       boolean notadded = true;
-      int prevId = 0;
-      for(int i = 0; i < num; ++i) {
-        int v = idxl.readNum();
-        if(notadded && id < prevId + v) {
+      for(int c = 0, currId = 0; c < count; ++c) {
+        currId += idxl.readNum();
+        if(notadded && id < currId) {
           // add the new id
           newIds.add(id);
           notadded = false;
-          // decrement the difference to the next id
-          v -= id - prevId;
-          prevId = id;
         }
-        newIds.add(id);
-        prevId += v;
+        newIds.add(currId);
       }
       if(notadded) newIds.add(id);
     }

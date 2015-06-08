@@ -71,10 +71,9 @@ public final class UpdIndexRandomTest extends SandboxTest {
         final String expected = "<a>" + word + "</a>";
         final String result = new XQuery(query).execute(context);
         if(!result.startsWith(expected)) {
-          final TokenBuilder tmp = new TokenBuilder("\nExpected: " + expected +
+          fail(new TokenBuilder("\nExpected: " + expected +
               "\nResult: " + result + "\nRun: " + r + "\nDoc: " + d +
-              "\nQuery: " + query + "\nDocument: " + doc);
-          fail(tmp.toString());
+              "\nQuery: " + query + "\nDocument: " + doc).toString());
         }
       }
     }

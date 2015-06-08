@@ -1099,7 +1099,7 @@ public abstract class Data {
    * @param end end pre value
    * @return table
    */
-  private String toString(final int start, final int end) {
+  public String toString(final int start, final int end) {
     return string(InfoStorage.table(this, start, end));
   }
 
