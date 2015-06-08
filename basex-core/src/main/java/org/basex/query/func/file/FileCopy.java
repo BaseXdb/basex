@@ -49,11 +49,7 @@ public class FileCopy extends FileFn {
     }
 
     // ignore operations on identical, canonical source and target path
-    if(copy) {
-      copy(src, trg);
-    } else {
-      Files.move(src, trg, StandardCopyOption.REPLACE_EXISTING);
-    }
+    relocate(src, trg, copy);
     return null;
   }
 
@@ -61,16 +57,22 @@ public class FileCopy extends FileFn {
    * Recursively copies files.
    * @param src source path
    * @param trg target path
+   * @param copy copy flag
    * @throws IOException I/O exception
    */
-  private synchronized void copy(final Path src, final Path trg) throws IOException {
+  private synchronized void relocate(final Path src, final Path trg, final boolean copy)
+      throws IOException {
+
     if(Files.isDirectory(src)) {
       Files.createDirectory(trg);
       try(DirectoryStream<Path> paths = Files.newDirectoryStream(src)) {
-        for(final Path p : paths) copy(p, trg.resolve(p.getFileName()));
+        for(final Path p : paths) relocate(p, trg.resolve(p.getFileName()), copy);
       }
-    } else {
+      if(!copy) Files.delete(src);
+    } else if(copy) {
       Files.copy(src, trg, StandardCopyOption.REPLACE_EXISTING);
+    } else {
+      Files.move(src, trg, StandardCopyOption.REPLACE_EXISTING);
     }
   }
 }
