@@ -1,7 +1,0 @@
-<config>
-  <maxchars>10000</maxchars>
-  <maxrows>500</maxrows>
-  <timeout>5</timeout>
-  <memory>100</memory>
-  <permission>admin</permission>
-</config>

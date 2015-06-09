@@ -249,8 +249,9 @@ declare function html:table(
                  return $entry
         )
 
+        let $max := $cons:OPTION($cons:K-MAX-ROWS)
         for $entry at $c in $entries
-        return if($c <= $cons:MAX-ROWS) then (
+        return if($c <= $max) then (
           <tr>{
             for $header at $pos in $headers
             let $name := $header/name()
@@ -281,7 +282,7 @@ declare function html:table(
               )
             }
           }</tr>
-        ) else if($c = $cons:MAX-ROWS + 1) then (
+        ) else if($c = $max + 1) then (
           <tr>
             <td>{
               if($buttons) then <input type="checkbox" disabled=""/> else ()

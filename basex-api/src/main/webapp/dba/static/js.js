@@ -17,7 +17,7 @@ function buttons() {
       if(s == "optimize" || s == "optimize-all" || s == "drop-backup" ||
          s == "drop-db" || s == "drop-pattern" || s == "drop-user" ||
          s == "kill-session" || s == "restore" || s == "backup" || s == "delete" ||
-         s == "delete-logs" || s == "kill") {
+         s == "delete-files" || s == "delete-logs" || s == "kill") {
         e = c > 0;
       }
       button.disabled = !e;

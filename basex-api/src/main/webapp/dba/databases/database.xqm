@@ -51,7 +51,7 @@ function _:database(
         ) else (),
         element backups { db:backups($name) }
       )
-    }', map { 'name': $name, 'max': $cons:MAX-ROWS + 1 })
+    }', map { 'name': $name, 'max': $cons:OPTION($cons:K-MAX-ROWS) + 1 })
   } catch * {
     element error { $cons:DATA-ERROR || ': ' || $err:description }
   }
@@ -71,11 +71,12 @@ function _:database(
               let $entries := $data/databases/* !
                 <e resource='{ . }' ct='{ @content-type }' raw='{
                   if(@raw = 'true') then '✓' else '–'
-                }'/>
+                }' size='{ @size }'/>
               let $headers := (
                 <resource>{ html:label($entries, ('Resource', 'Resources')) }</resource>,
                 <ct>Content type</ct>,
-                <raw>Raw</raw>
+                <raw>Raw</raw>,
+                <size type='number' order='desc'>Size (factor)</size>
               )
               let $buttons := (
                 html:button('add', 'Add…'),

@@ -13,7 +13,7 @@ import module namespace util = 'dba/util' at '../modules/util.xqm';
 (:~ Top category. :)
 declare variable $_:CAT := 'queries';
 (:~ Query file suffix. :)
-declare variable $_:SUFFIX := '.txt';
+declare variable $_:SUFFIX := '.xq';
 
 (:~
  : Queries page.
@@ -61,17 +61,17 @@ function _:queries(
           <tr>
             <td>
               <div align='right'>
-                <input id='file' name='file' placeholder='Name of query' autocomplete='off'
-                       list='files' oninput='checkButtons()' onpropertychange='checkButtons()'/>
-                <datalist id='files'>{
-                  file:list($cons:QUERY-DIR) ! element option { replace(., $_:SUFFIX || '$', '') }
-                }</datalist>
-                <button type='submit' name='open' id='open' disabled='true'
-                        onclick='openQuery()'>Open</button>
-                <button type='save' name='save' id='save' disabled='true'
-                        onclick='saveQuery()'>Save</button>
-                <button type='delete' name='delete' id='delete' disabled='true'
-                        onclick='deleteQuery()'>Delete</button>
+                <form autocomplete='off' action='javascript:void(0);'>
+                  <input id='file' name='file' placeholder='Name of query'
+                         list='files' oninput='checkButtons()' onpropertychange='checkButtons()'/>
+                  <datalist id='files'>{ _:files() ! element option { . } }</datalist>
+                  <button type='submit' name='open' id='open' disabled='true'
+                          onclick='openQuery()'>Open</button>
+                  <button type='save' name='save' id='save' disabled='true'
+                          onclick='saveQuery()'>Save</button>
+                  <button type='delete' name='delete' id='delete' disabled='true'
+                          onclick='deleteQuery()'>Delete</button>
+                </form>
               </div>
             </td>
           </tr>
@@ -139,7 +139,7 @@ function _:delete-query(
 ) as xs:string {
   cons:check(),
   file:delete(_:to-path($name)),
-  string-join(file:list($cons:QUERY-DIR) ! replace(., $_:SUFFIX || '$', ''), '/')
+  string-join(_:files(), '/')
 };
 
 (:~
@@ -159,7 +159,7 @@ function _:save-query(
 ) as xs:string {
   cons:check(),
   file:write-text(_:to-path($name), $query),
-  string-join(file:list($cons:QUERY-DIR) ! replace(., $_:SUFFIX || '$', ''), '/')
+  string-join(_:files(), '/')
 };
 
 (:~
@@ -183,9 +183,9 @@ function _:update-query(
  : @return options
  :)
 declare %private function _:query-options() as xs:string {
-  "map { 'timeout':" || $cons:TIMEOUT ||
-       ",'memory':" || $cons:MEMORY ||
-       ",'permission':'" || $cons:PERMISSION || "' }"
+  "map { 'timeout':" || $cons:OPTION($cons:K-TIMEOUT) ||
+       ",'memory':" || $cons:OPTION($cons:K-MEMORY) ||
+       ",'permission':'" || $cons:OPTION($cons:K-PERMISSION) || "' }"
 };
 
 (:~
@@ -196,5 +196,14 @@ declare %private function _:query-options() as xs:string {
 declare %private function _:to-path(
   $name  as xs:string
 ) as xs:string {
-  $cons:QUERY-DIR || translate($name, '\/:*?"<>|', '---------') || $_:SUFFIX
+  $cons:DBA-DIR || translate($name, '\/:*?"<>|', '---------') || $_:SUFFIX
+};
+
+(:~
+ : Returns the names of all files.
+ : @return list of files
+ :)
+declare %private function _:files() as xs:string* {
+  for $file in file:list($cons:DBA-DIR, false(), '*' || $_:SUFFIX)
+  return replace($file, $_:SUFFIX || '$', '')
 };

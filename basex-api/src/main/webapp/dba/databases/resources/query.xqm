@@ -28,7 +28,6 @@ function _:query-resource(
   $query     as xs:string
 ) as xs:string {
   cons:check(),
-  let $limit := $cons:MAX-CHARS
   let $query := if($query) then $query else '.'
   return util:query($query, "'': db:open($name, $resource)", map {
     'name': $name, 'resource': $resource

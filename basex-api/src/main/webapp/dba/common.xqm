@@ -25,11 +25,11 @@ function _:redirect(
  : @return rest response and binary file
  :)
 declare
-  %rest:path("/dba/files/{$file=.+}")
+  %rest:path("/dba/static/{$file=.+}")
 function _:file(
   $file as xs:string
 ) as item()+ {
-  let $path := file:base-dir() || 'files/' || $file
+  let $path := file:base-dir() || 'static/' || $file
   return (
     web:response-header(map { 'media-type': web:content-type($path) }),
     file:read-binary($path)
