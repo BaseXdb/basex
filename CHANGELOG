@@ -1,3 +1,13 @@
+VERSION 8.2.1 (June 9, 2015) -------------------------------------------
+
+ DBA
+ - code highlighting (thanks, James Ball!)
+ - new panel for up- and downloading files
+ - queries and files are now stored in a temporary directory
+
+ GENERAL
+ - various bug fixes
+
 VERSION 8.2 (May 21, 2015) ---------------------------------------------
 
  XQUERY
