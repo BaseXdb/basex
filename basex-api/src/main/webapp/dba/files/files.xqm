@@ -36,7 +36,7 @@ function _:files(
   cons:check(),
 
   (: request data in a single step :)
-  let $files := file:children($cons:DBA-DIR)
+  let $files := file:children($cons:DBA-DIR)[file:is-file(.)]
 
   return tmpl:wrap(map { 'top': $_:CAT, 'info': $info, 'error': $error },
     <tr>
