@@ -80,7 +80,9 @@ public final class TableView extends View implements Runnable {
     } else {
       if(!more) tdata.resetFilter();
       gui.updating = true;
-      new Thread(this).start();
+      final Thread t = new Thread(this);
+      t.setDaemon(true);
+      t.start();
     }
   }
 

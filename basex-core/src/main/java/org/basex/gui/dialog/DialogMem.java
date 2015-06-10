@@ -69,8 +69,7 @@ public final class DialogMem extends BaseXDialog {
     if(vis) return;
 
     // regularly refresh panel
-    final Timer timer = new Timer(true);
-    timer.scheduleAtFixedRate(new TimerTask() {
+    new Timer(true).scheduleAtFixedRate(new TimerTask() {
       @Override
       public void run() {
         if(isVisible() && !text.selected()) text.setText(info());

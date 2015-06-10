@@ -218,7 +218,9 @@ public final class MapView extends View implements Runnable {
       repaint();
     } else {
       zoomStep = ZOOMSIZE;
-      new Thread(this).start();
+      final Thread t = new Thread(this);
+      t.setDaemon(true);
+      t.start();
     }
   }
 
