@@ -42,13 +42,13 @@ function _:welcome(
               <td>
                 <input size="30" name="name" value="{ $name }" id="user"/>
                 { html:focus('user') }
-                { html:button('login', 'Login') }
               </td>
             </tr>
             <tr>
               <td><b>Password:</b></td>
               <td>
                 <input size="30" type="password" name="pass"/>
+                { html:button('login', 'Login') }
               </td>
             </tr>
             <tr>

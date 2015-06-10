@@ -5,11 +5,10 @@
  :)
 module namespace html = 'dba/html';
 
-import module namespace Request = 'http://exquery.org/ns/request';
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 
 (: Number formats. :)
-declare variable $html:NUMBER := ('decimal','number', 'bytes');
+declare variable $html:NUMBER := ('decimal', 'number', 'bytes');
 
 (:~
  : Creates a checkbox.
@@ -213,7 +212,7 @@ declare function html:table(
           if(empty($sort) or $name = $sort) then (
             $value
           ) else (
-            html:link($value, Request:path(), map:merge(($param, map { 'sort': $name })))
+            html:link($value, "", map:merge(($param, map { 'sort': $name })))
           )
         }
       }
