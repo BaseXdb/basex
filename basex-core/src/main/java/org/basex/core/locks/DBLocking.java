@@ -138,7 +138,9 @@ public final class DBLocking implements Locking {
       }
       // global read locking
       if(read == null) {
-        while(localWriters > 0) {
+        while(localWriters > 0 &&
+            // We're the only writer, allow global read lock anyway
+            !(1 == localWriters && !(null == write || write.isEmpty()))) {
           try {
             globalLock.wait();
           } catch(final InterruptedException ex) {
