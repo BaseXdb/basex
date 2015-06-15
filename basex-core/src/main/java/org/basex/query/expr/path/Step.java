@@ -53,7 +53,7 @@ public abstract class Step extends Preds {
     for(final Expr pred : preds) {
       if(pred instanceof Pos || num(pred)) {
         pos = true;
-      } else if(pred.seqType().mayBeNumber() || pred.has(Flag.FCS)) {
+      } else if(pred.seqType().mayBeNumber() || pred.has(Flag.POS)) {
         // positional checks may be nested or non-deterministic: choose full evaluation
         return new CachedStep(info, axis, test, preds);
       }

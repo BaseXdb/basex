@@ -89,7 +89,7 @@ public abstract class Preds extends ParseExpr {
           }
         }
       } else if(pred instanceof And) {
-        if(!pred.has(Flag.FCS)) {
+        if(!pred.has(Flag.POS)) {
           // replace AND expression with predicates (don't swap position tests)
           qc.compInfo(OPTPRED, pred);
           final Expr[] and = ((Arr) pred).exprs;
@@ -256,7 +256,7 @@ public abstract class Preds extends ParseExpr {
   @Override
   public boolean has(final Flag flag) {
     for(final Expr pred : preds) {
-      if(flag == Flag.FCS && pred.seqType().mayBeNumber() || pred.has(flag)) return true;
+      if(flag == Flag.POS && pred.seqType().mayBeNumber() || pred.has(flag)) return true;
     }
     return false;
   }

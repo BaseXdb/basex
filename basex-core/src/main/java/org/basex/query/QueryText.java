@@ -842,5 +842,4 @@ public interface QueryText {
   String DEBUGLOCAL = "Local Variables";
   /** Debugging info. */
   String DEBUGGLOBAL = "Global Variables";
-
 }

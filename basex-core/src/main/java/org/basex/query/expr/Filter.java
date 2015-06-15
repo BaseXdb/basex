@@ -55,11 +55,11 @@ public abstract class Filter extends Preds {
   private static Expr path(final Expr root, final Expr... preds) {
     // no predicates: return root
     if(preds.length == 0) return root;
-    // axis path
+    // axis path: attach predicates to last step
     if(root instanceof AxisPath) {
-      // predicate must not be numeric
+      // predicates must not be numeric: (//x)[1] != //x[1]
       for(final Expr pred : preds) {
-        if(pred.seqType().mayBeNumber() || pred.has(Flag.FCS)) return null;
+        if(pred.seqType().mayBeNumber() || pred.has(Flag.POS)) return null;
       }
       return ((AxisPath) root).addPreds(preds);
     }
@@ -138,7 +138,7 @@ public abstract class Filter extends Preds {
     }
 
     // no numeric predicates.. use simple iterator
-    if(!super.has(Flag.FCS)) return copyType(new IterFilter(info, root, preds));
+    if(!super.has(Flag.POS)) return copyType(new IterFilter(info, root, preds));
 
     // evaluate positional predicates
     Expr e = root;

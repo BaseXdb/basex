@@ -231,9 +231,12 @@ public abstract class Path extends ParseExpr {
 
   @Override
   public final boolean has(final Flag flag) {
-    // first step or root expression will be used as context
+    // context dependency. no root exists, or if it depends on context. Example: text(); ./abc
     if(flag == Flag.CTX) return root == null || root.has(flag);
-    for(final Expr s : steps) if(s.has(flag)) return true;
+    // positional test. may only occur in root node, not in first step. Example: position()/a
+    if(flag != Flag.POS) {
+      for(final Expr step : steps) if(step.has(flag)) return true;
+    }
     return root != null && root.has(flag);
   }
 
@@ -551,7 +554,7 @@ public abstract class Path extends ParseExpr {
 
       // ignore axes other than descendant, or numeric predicates
       final Step curr = axisStep(s);
-      if(curr == null || curr.axis != DESC || curr.has(Flag.FCS)) continue;
+      if(curr == null || curr.axis != DESC || curr.has(Flag.POS)) continue;
 
       // check if child steps can be retrieved for current step
       ArrayList<PathNode> nodes = pathNodes(data, s);
@@ -637,7 +640,7 @@ public abstract class Path extends ParseExpr {
       // only accept descendant steps without positional predicates
       // Example for position predicate: child:x[1] != parent::x[1]
       final Step step = axisStep(s);
-      if(step == null || !step.axis.down || step.has(Flag.FCS)) break;
+      if(step == null || !step.axis.down || step.has(Flag.POS)) break;
 
       // check if path is iterable (i.e., will be duplicate-free)
       final boolean iter = pathNodes(data, s) != null;
@@ -784,7 +787,7 @@ public abstract class Path extends ParseExpr {
             continue;
           }
           // //(X, Y)[text()] -> (/descendant::X | /descendant::Y)[text()]
-          if(next instanceof Filter && !next.has(Flag.FCS)) {
+          if(next instanceof Filter && !next.has(Flag.POS)) {
             final Filter f = (Filter) next;
             e = mergeList(f.root);
             if(e != null) {
@@ -843,8 +846,8 @@ public abstract class Path extends ParseExpr {
    */
   private static boolean simpleChild(final Expr expr) {
     if(expr instanceof Step) {
-      final Step n = (Step) expr;
-      if(n.axis == CHILD && !n.has(Flag.FCS)) return true;
+      final Step step = (Step) expr;
+      if(step.axis == CHILD && !step.has(Flag.POS)) return true;
     }
     return false;
   }

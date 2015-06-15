@@ -19,7 +19,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-final class CachedPath extends AxisPath {
+public final class CachedPath extends AxisPath {
   /** Flag for result caching. */
   private boolean cache;
 
@@ -29,7 +29,7 @@ final class CachedPath extends AxisPath {
    * @param root root expression; can be a {@code null} reference
    * @param steps axis steps
    */
-  CachedPath(final InputInfo info, final Expr root, final Expr... steps) {
+  public CachedPath(final InputInfo info, final Expr root, final Expr... steps) {
     super(info, root, steps);
     // analyze if result set can be cached: no root node, no variables...
     cache = root != null && !hasFreeVars();

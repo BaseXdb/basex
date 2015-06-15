@@ -143,7 +143,7 @@ public final class Pos extends Simple {
 
   @Override
   public boolean has(final Flag flag) {
-    return flag == Flag.FCS;
+    return flag == Flag.POS;
   }
 
   @Override

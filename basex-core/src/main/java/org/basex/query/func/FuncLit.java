@@ -105,7 +105,7 @@ public final class FuncLit extends Single implements Scope {
 
   @Override
   public boolean has(final Flag flag) {
-    return flag == Flag.CTX || flag == Flag.FCS;
+    return flag == Flag.CTX || flag == Flag.POS;
   }
 
   @Override

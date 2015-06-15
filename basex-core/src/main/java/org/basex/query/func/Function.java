@@ -204,7 +204,7 @@ public enum Function {
   FUNCTION_ARITY(FnFunctionArity.class, "function-arity(function)", arg(FUN_O), ITR),
   /** XQuery function. */
   FUNCTION_LOOKUP(FnFunctionLookup.class, "function-lookup(name,arity)",
-      arg(QNM, ITR), FUN_OZ, flag(CTX, FCS, NDT, HOF)),
+      arg(QNM, ITR), FUN_OZ, flag(CTX, Flag.POS, NDT, HOF)),
   /** XQuery function. */
   FUNCTION_NAME(FnFunctionName.class, "function-name(function)", arg(FUN_O), QNM_ZO),
   /** XQuery function. */
@@ -243,7 +243,7 @@ public enum Function {
   /** XQuery function. */
   LANG(FnLang.class, "lang(ids[,node])", arg(STR_ZO, NOD), BLN),
   /** XQuery function. */
-  LAST(FnLast.class, "last()", arg(), ITR, flag(FCS, CTX)),
+  LAST(FnLast.class, "last()", arg(), ITR, flag(Flag.POS, CTX)),
   /** XQuery function. */
   LOCAL_NAME(FnLocalName.class, "local-name([node])", arg(NOD_ZO), STR),
   /** XQuery function. */
@@ -315,7 +315,7 @@ public enum Function {
   /** XQuery function. */
   PATH(FnPath.class, "path([node])", arg(NOD_ZO), STR_ZO),
   /** XQuery function. */
-  POSITION(FnPosition.class, "position()", arg(), ITR, flag(FCS, CTX)),
+  POSITION(FnPosition.class, "position()", arg(), ITR, flag(Flag.POS, CTX)),
   /** XQuery function. */
   PREFIX_FROM_QNAME(FnPrefixFromQName.class, "prefix-from-QName(qname)", arg(QNM_ZO), NCN_ZO),
   /** XQuery function. */

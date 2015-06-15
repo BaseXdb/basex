@@ -1,7 +1,5 @@
 package org.basex.query.expr;
 
-import static org.basex.query.QueryText.*;
-
 import java.util.*;
 
 import org.basex.data.*;
@@ -34,7 +32,7 @@ public abstract class Expr extends ExprInfo {
     /** Creates new fragments. Example: node constructor. */ CNS,
     /** Depends on context. Example: context node. */        CTX,
     /** Non-deterministic. Example: random:double(). */      NDT,
-    /** Focus-dependent. Example: position(). */             FCS,
+    /** Positional access. Example: position(). */           POS,
     /** Performs updates. Example: insert expression. */     UPD,
     /** Invokes user-supplied functions. Example: fold. */   HOF,
   }
@@ -310,7 +308,7 @@ public abstract class Expr extends ExprInfo {
     // return true if a deterministic expression returns at least one node
     final SeqType st = seqType();
     if(st.type instanceof NodeType && st.occ.min >= 1 && !has(Flag.UPD) && !has(Flag.NDT)) {
-      qc.compInfo(OPTWRITE, this);
+      qc.compInfo(QueryText.OPTWRITE, this);
       return Bln.TRUE;
     }
     return this;

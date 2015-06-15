@@ -33,7 +33,7 @@ public abstract class SimpleMap extends Arr {
    */
   public static SimpleMap get(final InputInfo info, final Expr... exprs) {
     for(final Expr expr : exprs) {
-      if(expr.has(Flag.FCS)) return new CachedMap(info, exprs);
+      if(expr.has(Flag.POS)) return new CachedMap(info, exprs);
     }
     return new IterMap(info, exprs);
   }
