@@ -698,14 +698,14 @@ public final class TextEditor {
       } else if(ch == '~') {
         // closes XQuery comments
         if(prev == ':' && pprv == '(') {
-          sb.append("\n : \n ");
+          sb.append("  ");
           if(curr != ':') {
             sb.append(':');
             if(curr != ')') sb.append(')');
           } else if(next != ')') {
             sb.append(')');
           }
-          move = 5;
+          move = 2;
         }
       } else if(ch == '-') {
         // closes XML comments
