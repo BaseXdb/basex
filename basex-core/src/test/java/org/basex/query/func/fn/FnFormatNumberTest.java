@@ -42,7 +42,7 @@ public final class FnFormatNumberTest extends QueryTest {
       { "formnum  10", strings("0"), "format-number(0, '0')" },
       { "formnum  20", strings("00"), "format-number(0, '10')" },
       { "formnum  30", strings("1"), "format-number(1, '0')" },
-      { "formnum  35", strings("0.1"), "format-number(0.1, '.0')" },
+      { "formnum  35", strings(".1"), "format-number(0.1, '.0')" },
       { "formnum  40", strings("1.0"), "format-number(1, '1.0')" },
       { "formnum  50", strings("1"), "format-number(1.1, '1')" },
       { "formnum  60", strings("1.1"), "format-number(1.1, '1.0')" },
