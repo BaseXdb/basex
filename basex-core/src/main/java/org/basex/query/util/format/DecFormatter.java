@@ -153,8 +153,8 @@ public final class DecFormatter extends FormatUtil {
   private boolean check(final byte[][] patterns) {
     for(final byte[] pt : patterns) {
       boolean frac = false, pas = false, act = false, exp = false;
-      boolean dg = false, opt1 = false, opt2 = false;
-      int cl, pc = 0, pm = 0, ls = 0;
+      boolean dg = false, opt1 = false, opt2 = false, per = false;
+      int cl, ls = 0;
 
       // loop through all characters
       final int pl = pt.length;
@@ -176,15 +176,14 @@ public final class DecFormatter extends FormatUtil {
         } else if(ch == exponent) {
           if(contains(actives, ls) && contains(actives, ch(pt, i + cl))) {
             // more than one exponent sign
-            if(exp) return false;
+            if(exp || per) return false;
             exp = true;
           } else {
             active = false;
           }
-        } else if(ch == percent) {
-          ++pc;
-        } else if(ch == permille) {
-          ++pm;
+        } else if(ch == percent || ch == permille) {
+          if(per || exp) return false;
+          per = true;
         } else if(ch == optional) {
           if(frac) {
             opt2 = true;
@@ -207,12 +206,10 @@ public final class DecFormatter extends FormatUtil {
         // cache last character
         ls = ch;
       }
-
-      // percent and permille sign: more than 1, or exponent sign?
-      if(pc + pm > (exp ? 0 : 1)) return false;
       // no optional sign or digit?
       if(!opt1 && !opt2 && !dg) return false;
     }
+    // everything ok
     return true;
   }
 
@@ -347,7 +344,7 @@ public final class DecFormatter extends FormatUtil {
       }
       num = num.round(pic.maxFrac, true).abs();
 
-      // convert positive number to string, chop leading zero
+      // convert positive number to string
       final String s = (num instanceof Dbl || num instanceof Flt ?
           Dec.get(BigDecimal.valueOf(num.dbl(ii))) : num).toString();
 
@@ -358,7 +355,8 @@ public final class DecFormatter extends FormatUtil {
       final int sl = s.length();
       final int il = sep == -1 ? sl : sep;
       for(int i = il; i < pic.min[0]; ++i) intgr.add(zero);
-      for(int i = 0; i < il; i++) intgr.add(zero + s.charAt(i) - '0');
+      // fractional number: skip leading 0
+      if(!s.startsWith("0.")) for(int i = 0; i < il; i++) intgr.add(zero + s.charAt(i) - '0');
 
       // squeeze in grouping separators
       if(pic.group[0].length == 1 && pic.group[0][0] > 0) {
