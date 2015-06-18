@@ -153,7 +153,7 @@ public final class DecFormatter extends FormatUtil {
   private boolean check(final byte[][] patterns) {
     for(final byte[] pt : patterns) {
       boolean frac = false, pas = false, act = false, exp = false;
-      boolean dg = false, opt1 = false, opt2 = false, per = false;
+      boolean dig = false, opt1 = false, opt2 = false, per = false;
       int cl, ls = 0;
 
       // loop through all characters
@@ -170,9 +170,9 @@ public final class DecFormatter extends FormatUtil {
           if(frac) return false;
           frac = true;
         } else if(ch == grouping) {
-          // adjacent decimal sign?
-          if(i == 0 && frac || ls == decimal || i + cl < pl ? ch(pt, i + cl) == decimal : !frac)
-            return false;
+          // adjacent decimal sign, or at the end of the integer part?
+          if(i == 0 && frac || ls == decimal || ls == grouping ||
+              i + cl < pl ? ch(pt, i + cl) == decimal : !frac) return false;
         } else if(ch == exponent) {
           if(contains(actives, ls) && contains(actives, ch(pt, i + cl))) {
             // more than one exponent sign
@@ -189,13 +189,13 @@ public final class DecFormatter extends FormatUtil {
             opt2 = true;
           } else {
             // integer part, and optional sign after digit?
-            if(dg) return false;
+            if(dig) return false;
             opt1 = true;
           }
         } else if(digit) {
           // fractional part, and digit after optional sign?
           if(frac && opt2) return false;
-          dg = true;
+          dig = true;
         }
 
         // passive character with preceding and following active character?
@@ -206,8 +206,9 @@ public final class DecFormatter extends FormatUtil {
         // cache last character
         ls = ch;
       }
-      // no optional sign or digit?
-      if(!opt1 && !opt2 && !dg) return false;
+
+      // mantissa part: no optional digit or decimal digit
+      if(!opt1 && !opt2 && !dig) return false;
     }
     // everything ok
     return true;
@@ -330,14 +331,13 @@ public final class DecFormatter extends FormatUtil {
         final String s = (num instanceof Dbl || num instanceof Flt ?
           Dec.get(num.dbl(ii)) : num).abs().toString();
         final int sep = s.indexOf('.');
-        final int i = sep == -1 ? s.length() : sep;
-        final int m = pic.min[0];
-        double n = 1;
-        exp = i - m;
+        exp = (sep == -1 ? s.length() : sep) - pic.min[0];
         if(exp > 0) {
+          double n = 1;
           for(int a = exp; a-- > 0;) n *= 10;
           num = (ANum) Calc.DIV.ev(ii, num, Dec.get(n));
         } else {
+          double n = 1;
           for(int a = -exp; a-- > 0;) n *= 10;
           num = (ANum) Calc.MULT.ev(ii, num, Dec.get(n));
         }
