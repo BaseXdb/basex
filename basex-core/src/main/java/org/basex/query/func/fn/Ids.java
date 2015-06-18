@@ -4,9 +4,11 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
+import org.basex.core.locks.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -77,5 +79,10 @@ abstract class Ids extends StandardFunc {
   @Override
   public final boolean has(final Flag flag) {
     return flag == Flag.CTX && exprs.length == 1 || super.has(flag);
+  }
+
+  @Override
+  public final boolean accept(final ASTVisitor visitor) {
+    return (exprs.length != 1 || visitor.lock(DBLocking.CONTEXT)) && super.accept(visitor);
   }
 }
