@@ -22,6 +22,10 @@ import org.basex.util.hash.*;
 public final class CachedPath extends AxisPath {
   /** Flag for result caching. */
   private boolean cache;
+  /** Cached results. */
+  private ANodeList clist;
+  /** Cached context value. */
+  private Value cvalue;
 
   /**
    * Constructor.
@@ -31,45 +35,54 @@ public final class CachedPath extends AxisPath {
    */
   public CachedPath(final InputInfo info, final Expr root, final Expr... steps) {
     super(info, root, steps);
-    // analyze if result set can be cached: no root node, no variables...
-    cache = root != null && !hasFreeVars();
+    // cache values if expression has no free variables, is deterministic and performs no updates
+    cache = root instanceof Root && !hasFreeVars() &&
+        !has(Flag.NDT) && !has(Flag.UPD) && !has(Flag.HOF);
   }
 
   @Override
   public BasicNodeIter iter(final QueryContext qc) throws QueryException {
-    final long cp = qc.pos, cs = qc.size;
-    final Value cv = qc.value, r = root != null ? qc.value(root) : cv;
-    try {
-      final ANodeList list = new ANodeList().check();
-      if(r != null) {
-        final Iter ir = qc.iter(r);
-        for(Item it; (it = ir.next()) != null;) {
-          // ensure that root only returns nodes
-          if(root != null && !(it instanceof ANode))
-            throw PATHNODE_X_X_X.get(info, steps[0], it.type, it);
-          qc.value = it;
-          iter(0, list, qc);
+    final Value cv = qc.value;
+    ANodeList nl = clist;
+    if(nl == null || cv != cvalue) {
+      final long cp = qc.pos, cs = qc.size;
+      final Value r = root != null ? qc.value(root) : cv;
+      nl = new ANodeList().check();
+      try {
+        if(r != null) {
+          final Iter ir = qc.iter(r);
+          for(Item it; (it = ir.next()) != null;) {
+            // ensure that root only returns nodes
+            if(root != null && !(it instanceof ANode))
+              throw PATHNODE_X_X_X.get(info, steps[0], it.type, it);
+            qc.value = it;
+            iter(0, nl, qc);
+          }
+        } else {
+          qc.value = null;
+          iter(0, nl, qc);
         }
-      } else {
-        qc.value = null;
-        iter(0, list, qc);
+      } finally {
+        qc.value = cv;
+        qc.size = cs;
+        qc.pos = cp;
       }
-      return list.iter();
-    } finally {
-      qc.value = cv;
-      qc.size = cs;
-      qc.pos = cp;
+      if(cache) {
+        clist = nl;
+        cvalue = cv;
+      }
     }
+    return nl.iter();
   }
 
   /**
    * Recursive step iterator.
    * @param step current step
-   * @param list node cache
+   * @param nl node cache
    * @param qc query context
    * @throws QueryException query exception
    */
-  private void iter(final int step, final ANodeList list, final QueryContext qc)
+  private void iter(final int step, final ANodeList nl, final QueryContext qc)
       throws QueryException {
 
     // cast is safe (steps will always return a {@link NodeIter} instance)
@@ -78,10 +91,10 @@ public final class CachedPath extends AxisPath {
     for(ANode node; (node = ni.next()) != null;) {
       if(more) {
         qc.value = node;
-        iter(step + 1, list, qc);
+        iter(step + 1, nl, qc);
       } else {
         qc.checkStop();
-        list.add(node);
+        nl.add(node);
       }
     }
   }
