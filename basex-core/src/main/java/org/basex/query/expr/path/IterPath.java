@@ -32,7 +32,7 @@ final class IterPath extends AxisPath {
   }
 
   @Override
-  public NodeIter iter(final QueryContext qc) {
+  protected NodeIter nodeIter(final QueryContext qc) {
     return new NodeIter() {
       final boolean r = root != null;
       final int sz = steps.length + (r ? 1 : 0);

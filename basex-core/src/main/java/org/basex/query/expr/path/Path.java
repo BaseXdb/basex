@@ -382,7 +382,7 @@ public abstract class Path extends ParseExpr {
     // no root or context expression: return context
     if(root == null || root instanceof ContextValue) return v;
     // root reference
-    if(root instanceof Root) return v instanceof Item ? Root.root(v) : v;
+    if(root instanceof Root) return v instanceof ANode ? ((ANode) v).root() : v;
     // root is value: return root
     if(root.isValue()) return (Value) root;
     // data reference

@@ -1,7 +1,11 @@
 package org.basex.query.expr.path;
 
+import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
+import org.basex.query.value.*;
+import org.basex.query.value.node.*;
 import org.basex.util.*;
 
 /**
@@ -11,6 +15,21 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class AxisPath extends Path {
+  /** Caching states. */
+  private enum Caching {
+    /** Caching is disabled. */ DISABLED,
+    /** Caching is possible. */ ENABLED,
+    /** Ready to cache.      */ READY,
+    /** Results are cached.  */ CACHED;
+  };
+  /** Current state. */
+  private Caching state;
+
+  /** Cached result. */
+  private Value cached;
+  /** Cached context value. */
+  private Value cvalue;
+
   /**
    * Constructor.
    * @param info input info
@@ -19,7 +38,59 @@ public abstract class AxisPath extends Path {
    */
   AxisPath(final InputInfo info, final Expr root, final Expr... steps) {
     super(info, root, steps);
+    // cache values if expression has no free variables, is deterministic and performs no updates
+    state = !hasFreeVars() && !has(Flag.NDT) && !has(Flag.UPD) && !has(Flag.HOF) ?
+      Caching.ENABLED : Caching.DISABLED;
   }
+
+  @Override
+  public final Iter iter(final QueryContext qc) throws QueryException {
+    if(state == Caching.CACHED) {
+      // last result was cached
+      if(!sameContext(qc)) {
+        // disable caching if context has changed (expected to change frequently)
+        cached = null;
+        state = Caching.DISABLED;
+      }
+    } else if (state == Caching.READY) {
+      // values are ready to cache
+      if(sameContext(qc)) {
+        cached = nodeIter(qc).value();
+        state = Caching.CACHED;
+      } else {
+        // disable caching if context has changed (expected to change frequently)
+        state = Caching.DISABLED;
+      }
+    } else if(state == Caching.ENABLED) {
+      // caching is possible: remember context value
+      cvalue = qc.value instanceof DBNode ? ((DBNode) qc.value).copy() : qc.value;
+      state = Caching.READY;
+    }
+    // return new iterator or cached values
+    return cached == null ? nodeIter(qc) : cached.iter();
+  }
+
+  /**
+   * Checks if the specified context value is different to the cached one.
+   * @param qc query context
+   * @return result of check
+   */
+  private boolean sameContext(final QueryContext qc) {
+    final Value cv = qc.value;
+    // context value has not changed...
+    if(cv == cvalue && (cv == null || cv.sameAs(cvalue))) return true;
+    // otherwise, if path starts with root node, compare roots of cached and new context value
+    return root instanceof Root && cv instanceof ANode && cvalue instanceof ANode &&
+        ((ANode) cv).root().sameAs(((ANode) cv).root());
+  }
+
+  /**
+   * Returns a node iterator.
+   * @param qc query context
+   * @return iterator
+   * @throws QueryException query exception
+   */
+  protected abstract NodeIter nodeIter(final QueryContext qc) throws QueryException;
 
   /**
    * Inverts a location path.

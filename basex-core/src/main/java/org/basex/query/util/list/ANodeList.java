@@ -107,7 +107,7 @@ public final class ANodeList extends ElementList implements Iterable<ANode> {
   }
 
   /**
-   * Returns an array with all elements.
+   * Returns a {@link Value} representation of all items.
    * @return array
    */
   public Value value() {

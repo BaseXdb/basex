@@ -7,7 +7,6 @@ import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -40,8 +39,8 @@ public final class Root extends Simple {
   public BasicNodeIter iter(final QueryContext qc) throws QueryException {
     final Iter iter = ctxValue(qc).iter();
     final ANodeList list = new ANodeList().check();
-    for(Item i; (i = iter.next()) != null;) {
-      final ANode n = root(i);
+    for(Item it; (it = iter.next()) != null;) {
+      final ANode n = it instanceof ANode ? ((ANode) it).root() : null;
       if(n == null || n.type != NodeType.DOC) throw CTXNODE.get(info);
       list.add(n);
     }
@@ -51,21 +50,6 @@ public final class Root extends Simple {
   @Override
   public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
     return new Root(info);
-  }
-
-  /**
-   * Returns the root node of the specified item.
-   * @param v input node
-   * @return root node
-   */
-  public static ANode root(final Value v) {
-    if(!(v instanceof ANode)) return null;
-    ANode n = (ANode) v;
-    while(true) {
-      final ANode p = n.parent();
-      if(p == null) return n;
-      n = p;
-    }
   }
 
   @Override

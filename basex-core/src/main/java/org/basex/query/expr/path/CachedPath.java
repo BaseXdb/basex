@@ -31,7 +31,7 @@ final class CachedPath extends AxisPath {
   }
 
   @Override
-  public BasicNodeIter iter(final QueryContext qc) throws QueryException {
+  protected NodeIter nodeIter(final QueryContext qc) throws QueryException {
     final long cp = qc.pos, cs = qc.size;
     final Value cv = qc.value, r = root != null ? qc.value(root) : cv;
     final ANodeList list = new ANodeList().check();
