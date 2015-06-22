@@ -372,15 +372,15 @@ public enum QueryError {
   CX_SIGTYPINV(CX, 28, "Signature type is not supported."),
 
   /** File error. */
-  FILE_NOT_FOUND_X(FILE, "not-found", "File '%' does not exist."),
+  FILE_NOT_FOUND_X(FILE, "not-found", "'%' does not exist."),
   /** File error. */
-  FILE_EXISTS_X(FILE, "exists", "File '%' already exists."),
+  FILE_EXISTS_X(FILE, "exists", "'%' already exists."),
   /** File error. */
-  FILE_NO_DIR_X(FILE, "no-dir", "Path '%' is no directory."),
+  FILE_NO_DIR_X(FILE, "no-dir", "'%' is no directory."),
   /** File error. */
-  FILE_IS_DIR_X(FILE, "is-dir", "Path '%' is a directory."),
+  FILE_IS_DIR_X(FILE, "is-dir", "'%' is a directory."),
   /** File error. */
-  FILE_ID_DIR2_X(FILE, "is-dir", "Path '%' is a non-empty directory."),
+  FILE_ID_DIR2_X(FILE, "is-dir", "'%' is a non-empty directory."),
   /** File error. */
   FILE_IS_RELATIVE_X(FILE, "is-relative", "Base directory is relative: '%'."),
   /** File error. */
