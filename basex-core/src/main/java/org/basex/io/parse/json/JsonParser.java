@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import org.basex.build.json.*;
+import org.basex.build.json.JsonOptions.*;
 import org.basex.build.json.JsonParserOptions.JsonDuplicates;
 import org.basex.query.*;
 import org.basex.util.*;
@@ -48,7 +49,9 @@ final class JsonParser extends InputParser {
     super(in);
     liberal = opts.get(JsonParserOptions.LIBERAL);
     unescape = opts.get(JsonParserOptions.UNESCAPE);
-    duplicates = opts.get(JsonParserOptions.DUPLICATES);
+    final JsonDuplicates dupl = opts.get(JsonParserOptions.DUPLICATES);
+    duplicates = dupl != null ? dupl : opts.get(JsonOptions.FORMAT) == JsonFormat.BASIC ?
+      JsonDuplicates.RETAIN : JsonDuplicates.USE_FIRST;
     this.conv = conv;
   }
 
