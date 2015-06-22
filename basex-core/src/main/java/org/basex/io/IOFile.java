@@ -187,7 +187,7 @@ public final class IOFile extends IO {
   }
 
   /**
-   * Returns the relative paths of all descendant files.
+   * Returns the relative paths of all descendant files (excluding directories).
    * @return relative paths
    */
   public synchronized StringList descendants() {
