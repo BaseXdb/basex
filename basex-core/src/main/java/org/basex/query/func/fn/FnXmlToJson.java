@@ -21,7 +21,7 @@ public class FnXmlToJson extends FnParseJson {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ANode node = toEmptyNode(exprs[0], qc);
-    final JsonSerializeOptions opts = toOptions(1, null, new JsonSerializeOptions(), qc);
+    final JsonSerialOptions opts = toOptions(1, null, new JsonSerialOptions(), qc);
     if(node == null) return null;
 
     final JsonSerialOptions jopts = new JsonSerialOptions();
@@ -30,8 +30,7 @@ public class FnXmlToJson extends FnParseJson {
     final SerializerOptions sopts = new SerializerOptions();
     sopts.set(SerializerOptions.METHOD, SerialMethod.JSON);
     sopts.set(SerializerOptions.JSON, jopts);
-    sopts.set(SerializerOptions.INDENT,
-        opts.get(JsonSerializeOptions.INDENT) ? YesNo.YES : YesNo.NO);
+    sopts.set(SerializerOptions.INDENT, opts.get(JsonSerialOptions.INDENT) ? YesNo.YES : YesNo.NO);
     return Str.get(serialize(node.iter(), sopts, INVALIDOPT_X));
   }
 }
