@@ -560,6 +560,9 @@ public enum Function {
   _ARCHIVE_CREATE(ArchiveCreate.class, "create(entries,contents[,options])",
       arg(ITEM_ZM, ITEM_ZM, ITEM), B64, ARCHIVE_URI),
   /** XQuery function. */
+  _ARCHIVE_CREATE_FROM(ArchiveCreateFrom.class, "create-from(path[,options[,entries]])",
+      arg(STR, ITEM, ITEM_ZM), EMP, ARCHIVE_URI),
+  /** XQuery function. */
   _ARCHIVE_ENTRIES(ArchiveEntries.class, "entries(archive)", arg(B64), ELM_ZM, ARCHIVE_URI),
   /** XQuery function. */
   _ARCHIVE_EXTRACT_TEXT(ArchiveExtractText.class, "extract-text(archive[,entries[,encoding]])",
@@ -568,6 +571,9 @@ public enum Function {
   _ARCHIVE_EXTRACT_BINARY(ArchiveExtractBinary.class, "extract-binary(archive[,entries])",
       arg(B64, ITEM_ZM), B64_ZM, ARCHIVE_URI),
   /** XQuery function. */
+  _ARCHIVE_EXTRACT_TO(ArchiveExtractTo.class, "extract-to(path,archive[,entries])",
+      arg(STR, B64, ITEM_ZM), EMP, ARCHIVE_URI),
+  /** XQuery function. */
   _ARCHIVE_UPDATE(ArchiveUpdate.class, "update(archive,entries,contents)",
       arg(B64, ITEM_ZM, ITEM_ZM), B64, ARCHIVE_URI),
   /** XQuery function. */
@@ -575,8 +581,8 @@ public enum Function {
       arg(B64, ITEM_ZM), B64, ARCHIVE_URI),
   /** XQuery function. */
   _ARCHIVE_OPTIONS(ArchiveOptions.class, "options(archive)", arg(B64), ELM, ARCHIVE_URI),
-  /** XQuery function. */
-  _ARCHIVE_WRITE(ArchiveWrite.class, "write(path,archive[,entries])",
+  /** XQuery function (deprecated). */
+  @Deprecated _ARCHIVE_WRITE(ArchiveWrite.class, "write(path,archive[,entries])",
       arg(STR, B64, ITEM_ZM), EMP, ARCHIVE_URI),
 
   /* BaseX Module. */
