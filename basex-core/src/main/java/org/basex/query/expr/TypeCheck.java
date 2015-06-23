@@ -73,7 +73,7 @@ public final class TypeCheck extends Single {
     // check at each call
     if(argType.type.instanceOf(seqType.type) && !expr.has(Flag.NDT) && !expr.has(Flag.UPD)) {
       final Occ occ = argType.occ.intersect(seqType.occ);
-      if(occ == null) throw INVCAST_X_X.get(info, argType, seqType);
+      if(occ == null) throw INVPROMOTE_X_X.get(info, argType, seqType);
     }
 
     final Expr opt = expr.typeCheck(this, qc, scp);
