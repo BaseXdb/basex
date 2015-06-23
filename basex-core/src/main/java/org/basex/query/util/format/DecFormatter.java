@@ -109,7 +109,12 @@ public final class DecFormatter extends FormatUtil {
     final TokenBuilder tb = new TokenBuilder();
     for(int i = 0; i < 10; i++) tb.add(zero + i);
     digits = tb.toArray();
-    actives = tb.add(decimal).add(grouping).add(optional).add(exponent).finish();
+    // "decimal-separator-sign, exponent-separator-sign, grouping-sign, decimal-digit-family,
+    // optional-digit-sign and pattern-separator-sign are classified as active characters"
+    // -> decimal-digit-family: added above. pattern-separator-sign: will never occur at this stage
+    actives = tb.add(decimal).add(exponent).add(grouping).add(optional).finish();
+    // "all other characters (including the percent-sign and per-mille-sign) are classified
+    // as passive characters."
   }
 
   /**
@@ -126,19 +131,22 @@ public final class DecFormatter extends FormatUtil {
     // find pattern separator and sub-patterns
     final TokenList tl = new TokenList();
     byte[] pic = picture;
+    // "A picture-string consists either of a sub-picture, or of two sub-pictures separated by
+    // a pattern-separator-sign"
     final int i = indexOf(pic, pattern);
     if(i == -1) {
       tl.add(pic);
     } else {
       tl.add(substring(pic, 0, i));
       pic = substring(pic, i + cl(pic, i));
+      // "A picture-string must not contain more than one pattern-separator-sign"
       if(contains(pic, pattern)) throw PICNUM_X.get(info, picture);
       tl.add(pic);
     }
     final byte[][] patterns = tl.finish();
 
     // check and analyze patterns
-    if(!check(patterns)) throw PICNUM_X.get(info, picture);
+    if(!checkSyntax(patterns)) throw PICNUM_X.get(info, picture);
     final Picture[] pics = analyze(patterns);
 
     // return formatted string
@@ -150,68 +158,114 @@ public final class DecFormatter extends FormatUtil {
    * @param patterns patterns
    * @return result of check
    */
-  private boolean check(final byte[][] patterns) {
+  private boolean checkSyntax(final byte[][] patterns) {
     for(final byte[] pt : patterns) {
-      boolean frac = false, pas = false, act = false, exp = false;
-      boolean dig = false, opt1 = false, opt2 = false, per = false;
-      int cl, ls = 0;
+      boolean frac = false, act = false, expAct = false, exp = false, digMant = false;
+      boolean optInt = false, optFrac = false, per = false;
+      int cl, last = 0;
 
       // loop through all characters
       final int pl = pt.length;
       for(int i = 0; i < pl; i += cl) {
         final int ch = ch(pt, i);
         cl = cl(pt, i);
-        boolean active = contains(actives, ch);
         final boolean digit = contains(digits, ch);
-        if(exp && !digit) return false;
+        boolean active = contains(actives, ch), expon = false;
 
         if(ch == decimal) {
-          // more than 1 decimal sign?
+          // "A sub-picture must not contain more than one decimal-separator-sign."
           if(frac) return false;
           frac = true;
         } else if(ch == grouping) {
-          // adjacent decimal sign, or at the end of the integer part?
-          if(i == 0 && frac || ls == decimal || ls == grouping ||
-              i + cl < pl ? ch(pt, i + cl) == decimal : !frac) return false;
+          // "A sub-picture must not contain a grouping-separator-sign that appears adjacent to a
+          // decimal-separator-sign, or in the absence of a decimal-separator-sign, at the end of
+          // the integer part."
+          if(i == 0 && frac || last == decimal || i + cl < pl ? ch(pt, i + cl) == decimal : !frac)
+            return false;
+          // "A sub-picture must not contain two adjacent grouping-separator-signs."
+          if(last == grouping) return false;
         } else if(ch == exponent) {
-          if(contains(actives, ls) && contains(actives, ch(pt, i + cl))) {
-            // more than one exponent sign
-            if(exp || per) return false;
-            exp = true;
-          } else {
+          // "A character that matches the chosen exponent-separator-sign is treated as an
+          // exponent-separator-sign if it is both preceded and followed within the sub-picture by
+          // an active character."
+          if(act && containsActive(pt, i + cl)) {
+            // "A sub-picture must not contain more than one character that is treated as an
+            // exponent-separator-sign."
+            if(exp) return false;
+            expon = true;
+         } else {
+            // "Otherwise, it is treated as a passive character."
             active = false;
           }
         } else if(ch == percent || ch == permille) {
-          if(per || exp) return false;
+          // "A sub-picture must not contain more than one percent-sign or per-mille-sign,
+          // and it must not contain one of each."
+          if(per) return false;
           per = true;
         } else if(ch == optional) {
           if(frac) {
-            opt2 = true;
+            optFrac = true;
           } else {
-            // integer part, and optional sign after digit?
-            if(dig) return false;
-            opt1 = true;
+            // "The integer part of a sub-picture must not contain a member of the decimal-digit-
+            // family that is followed by an optional-digit-sign."
+            if(digMant) return false;
+            optInt = true;
           }
         } else if(digit) {
-          // fractional part, and digit after optional sign?
-          if(frac && opt2) return false;
-          dig = true;
+          // "The fractional part of a sub-picture must not contain an optional-digit-sign that
+          // is followed by a member of the decimal-digit-family."
+          if(!exp && optFrac) return false;
+          digMant = true;
         }
 
-        // passive character with preceding and following active character?
-        if(active && pas && act) return false;
-        // will be assigned if active characters were found
-        if(act) pas |= !active;
-        act |= active;
+        if(active) {
+          // "If a sub-picture contains a character treated as an exponent-separator-sign then
+          // this must be followed by one or more characters that are members of the
+          // decimal-digit-family, and it must not be followed by any active character that is not
+          // a member of the decimal-digit-family." (*)
+          if(exp) {
+            if(!digit) return false;
+            expAct = true;
+          }
+          act = true;
+        } else {
+          // "A sub-picture must not contain a passive character that is preceded by an active
+          // character and that is followed by another active character."
+          if(act && containsActive(pt, i + cl)) return false;
+        }
+
         // cache last character
-        ls = ch;
+        last = ch;
+        if(expon) exp = true;
       }
 
-      // mantissa part: no optional digit or decimal digit
-      if(!opt1 && !opt2 && !dig) return false;
+      // "The mantissa part of a sub-picture must contain at least one character that is an
+      // optional-digit-sign or a member of the decimal-digit-family."
+      if(!optInt && !optFrac && !digMant) return false;
+
+      // "A sub-picture that contains a percent-sign or per-mille-sign must not contain a character
+      // treated as an exponent-separator-sign."
+      if(per && exp) return false;
+
+      // (*) continued
+      if(exp && !expAct) return false;
     }
+
     // everything ok
     return true;
+  }
+
+  /**
+   * Checks if the specified pattern contains active characters after the specified index.
+   * @param pt pattern
+   * @param i index
+   * @return result of check
+   */
+  private boolean containsActive(final byte[] pt, final int i) {
+    for(int p = i; p < pt.length; p += cl(pt, p)) {
+      if(contains(actives, ch(pt, p))) return true;
+    }
+    return false;
   }
 
   /**
@@ -327,19 +381,23 @@ public final class DecFormatter extends FormatUtil {
       ANum num = it;
       if(pic.pc) num = (ANum) Calc.MULT.ev(ii, num, Int.get(100));
       if(pic.pm) num = (ANum) Calc.MULT.ev(ii, num, Int.get(1000));
-      if(pic.minExp != 0) {
-        final String s = (num instanceof Dbl || num instanceof Flt ?
-          Dec.get(num.dbl(ii)) : num).abs().toString();
-        final int sep = s.indexOf('.');
-        exp = (sep == -1 ? s.length() : sep) - pic.min[0];
-        if(exp > 0) {
-          double n = 1;
-          for(int a = exp; a-- > 0;) n *= 10;
-          num = (ANum) Calc.DIV.ev(ii, num, Dec.get(n));
+      if(pic.minExp != 0 && d != 0) {
+        BigDecimal dec = num.dec(ii).abs().stripTrailingZeros();
+        int scl = 0;
+        if(dec.compareTo(BigDecimal.ONE) >= 0) {
+          scl = dec.setScale(0, RoundingMode.HALF_DOWN).precision();
         } else {
-          double n = 1;
-          for(int a = -exp; a-- > 0;) n *= 10;
-          num = (ANum) Calc.MULT.ev(ii, num, Dec.get(n));
+          while(dec.compareTo(BigDecimal.ONE) < 0) {
+            dec = dec.multiply(BigDecimal.TEN);
+            scl--;
+          }
+          scl++;
+        }
+
+        exp = scl - Math.max(1, pic.min[0]);
+        if(exp != 0) {
+          final BigDecimal n = BigDecimal.TEN.pow(Math.abs(exp));
+          num = (ANum) Calc.MULT.ev(ii, num, Dec.get(exp > 0 ? BigDecimal.ONE.divide(n) : n));
         }
       }
       num = num.round(pic.maxFrac, true).abs();

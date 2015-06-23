@@ -82,6 +82,7 @@ public class FnParseJson extends Parse {
       final QueryException qe = ex.getCause();
       final QueryError err = qe.error();
       if(err != INVPROMOTE_X_X && err != INVPROMOTE_X_X_X) throw qe;
+      Util.debug(ex);
       throw JSON_OPT_X.get(ii, qe.getLocalizedMessage());
     } catch(final QueryIOException ex) {
       Util.debug(ex);
