@@ -69,7 +69,7 @@ public final class ValueBuilder {
   }
 
   /**
-   * Adds a value to the front of the built value.
+   * Appends a value to the end of the built value.
    * @param value value to append
    * @return reference to this builder for convenience
    */
