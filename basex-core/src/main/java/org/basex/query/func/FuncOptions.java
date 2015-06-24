@@ -25,7 +25,7 @@ public final class FuncOptions {
   /** QName. */
   public static final QNm Q_SPARAM = QNm.get(SERIALIZATION_PARAMETERS, OUTPUT_URI);
   /** Value. */
-  private static final String VALUE = "value";
+  private static final byte[] VALUE = token("value");
 
   /** Root element. */
   private final QNm root;
@@ -123,14 +123,14 @@ public final class FuncOptions {
       final QNm qn = child.qname();
       if(!eq(qn.uri(), root.uri())) continue;
       // retrieve key from element name and value from "value" attribute or text node
-      byte[] v;
+      byte[] v = null;
       if(hasElements(child)) {
         v = token(optString(child));
       } else {
         v = child.attribute(VALUE);
         if(v == null) v = child.string();
       }
-      tb.add(string(qn.local())).add('=').add(string(v).replace(",", ",,")).add(',');
+      tb.add(string(qn.local())).add('=').add(string(v).trim().replace(",", ",,")).add(',');
     }
     return tb.toString();
   }
