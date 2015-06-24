@@ -104,7 +104,7 @@ public final class JsonBasicConverter extends JsonXmlConverter {
    * @return new element
    */
   private FElem addElem(final byte[] type) {
-    final FElem e = new FElem(type, QueryText.W3_JSON_URI);
+    final FElem e = new FElem(type, QueryText.FN_URI);
     // root node: declare namespace
     if(curr == null) e.declareNS();
 

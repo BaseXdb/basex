@@ -53,7 +53,7 @@ public final class JsonBasicSerializer extends JsonSerializer {
     } else if(node.type == NodeType.ELM) {
       final QNm name = node.qname();
       final byte[] type = name.local();
-      if(!eq(name.uri(), QueryText.W3_JSON_URI))
+      if(!eq(name.uri(), QueryText.FN_URI))
         throw error("Element '%' has invalid namespace: '%'.", type, name.uri());
 
       byte[] key = node.attribute(KEY);

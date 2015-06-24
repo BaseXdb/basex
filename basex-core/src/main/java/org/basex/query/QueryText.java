@@ -578,8 +578,6 @@ public interface QueryText {
   byte[] FN_URI = token(W3_URI + "/2005/xpath-functions");
   /** Math URI. */
   byte[] MATH_URI = token(W3_URI + "/2005/xpath-functions/math");
-  /** JSON URI. */
-  byte[] W3_JSON_URI = token(W3_URI + "/2005/xpath-functions/json");
   /** XMLNS URI. */
   byte[] XMLNS_URI = token(W3_URI + "/2000/xmlns/");
   /** Local Functions URI. */
