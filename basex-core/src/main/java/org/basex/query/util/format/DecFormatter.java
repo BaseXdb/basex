@@ -180,7 +180,7 @@ public final class DecFormatter extends FormatUtil {
           // "A sub-picture must not contain a grouping-separator-sign that appears adjacent to a
           // decimal-separator-sign, or in the absence of a decimal-separator-sign, at the end of
           // the integer part."
-          if(i == 0 && frac || last == decimal || i + cl < pl ? ch(pt, i + cl) == decimal : !frac)
+          if(i == 0 && frac || last == decimal || (i + cl < pl ? ch(pt, i + cl) == decimal : !frac))
             return false;
           // "A sub-picture must not contain two adjacent grouping-separator-signs."
           if(last == grouping) return false;
@@ -193,7 +193,7 @@ public final class DecFormatter extends FormatUtil {
             // exponent-separator-sign."
             if(exp) return false;
             expon = true;
-         } else {
+          } else {
             // "Otherwise, it is treated as a passive character."
             active = false;
           }
@@ -212,10 +212,12 @@ public final class DecFormatter extends FormatUtil {
             optInt = true;
           }
         } else if(digit) {
-          // "The fractional part of a sub-picture must not contain an optional-digit-sign that
-          // is followed by a member of the decimal-digit-family."
-          if(!exp && optFrac) return false;
-          digMant = true;
+          if(!exp) {
+            // "The fractional part of a sub-picture must not contain an optional-digit-sign that
+            // is followed by a member of the decimal-digit-family."
+            if(optFrac) return false;
+            digMant = true;
+          }
         }
 
         if(active) {
@@ -256,30 +258,17 @@ public final class DecFormatter extends FormatUtil {
   }
 
   /**
-   * Checks if the specified pattern contains active characters after the specified index.
-   * @param pt pattern
-   * @param i index
-   * @return result of check
-   */
-  private boolean containsActive(final byte[] pt, final int i) {
-    for(int p = i; p < pt.length; p += cl(pt, p)) {
-      if(contains(actives, ch(pt, p))) return true;
-    }
-    return false;
-  }
-
-  /**
    * Analyzes the specified patterns.
    * @param patterns patterns
    * @return picture variables
    */
   private Picture[] analyze(final byte[][] patterns) {
     // pictures
-    final int pl = patterns.length;
-    final Picture[] pics = new Picture[pl];
+    final int picL = patterns.length;
+    final Picture[] pics = new Picture[picL];
 
     // analyze patterns
-    for(int p = 0; p < pl; p++) {
+    for(int p = 0; p < picL; p++) {
       final byte[] pt = patterns[p];
       final Picture pic = new Picture();
 
@@ -293,8 +282,8 @@ public final class DecFormatter extends FormatUtil {
       final int[] opt = new int[2];
 
       // loop through all characters
-      final int ptl = pt.length;
-      for(int i = 0, cl; i < ptl; i += cl) {
+      final int pl = pt.length;
+      for(int i = 0, cl; i < pl; i += cl) {
         final int ch = ch(pt, i);
         cl = cl(pt, i);
         boolean active = contains(actives, ch);
@@ -305,15 +294,9 @@ public final class DecFormatter extends FormatUtil {
         } else if(ch == optional) {
           opt[pos]++;
         } else if(ch == exponent) {
-          // check if following characters are all digits
-          boolean e = true;
-          for(int c = i + cl; c < ptl && e; c += cl(pt, c)) e = contains(digits, ch(pt, c));
-          if(e && i + cl < ptl) {
-            // test succeeds, exponent sign found
+          if(act && containsActive(pt, i + cl)) {
             exp = 0;
           } else {
-            // passive character: add to prefixes/suffixes
-            pic.xyzfix[pos == 0 && act ? pos + 1 : pos].add(ch);
             active = false;
           }
         } else if(ch == grouping) {
@@ -321,14 +304,17 @@ public final class DecFormatter extends FormatUtil {
         } else if(contains(digits, ch)) {
           if(exp == -1) pic.min[pos]++;
           else exp++;
+        }
+
+        if(active) {
+          act = true;
         } else {
           // passive characters
           pic.pc |= ch == percent;
           pic.pm |= ch == permille;
           // prefixes/suffixes
-          pic.xyzfix[pos == 0 && act ? pos + 1 : pos].add(ch);
+          pic.prefSuf[pos == 0 && act ? pos + 1 : pos].add(ch);
         }
-        act |= active;
       }
       // finalize integer-part-grouping-positions
       final int[] igp = pic.group[0];
@@ -352,6 +338,19 @@ public final class DecFormatter extends FormatUtil {
   }
 
   /**
+   * Checks if the specified pattern contains active characters after the specified index.
+   * @param pt pattern
+   * @param i index
+   * @return result of check
+   */
+  private boolean containsActive(final byte[] pt, final int i) {
+    for(int p = i; p < pt.length; p += cl(pt, p)) {
+      if(contains(actives, ch(pt, p))) return true;
+    }
+    return false;
+  }
+
+  /**
    * Formats the specified number and returns a string representation.
    * @param it item
    * @param pics pictures
@@ -362,25 +361,26 @@ public final class DecFormatter extends FormatUtil {
   private byte[] format(final ANum it, final Picture[] pics, final InputInfo ii)
       throws QueryException {
 
-    // return results for NaN
+    // Rule 1: return results for NaN
     final double d = it.dbl(ii);
     if(Double.isNaN(d)) return nan;
 
-    // return infinite results
+    // Rule 2: check if value if negative (smaller than zero or -0)
     final boolean neg = d < 0 || d == 0 && Double.doubleToLongBits(d) == Long.MIN_VALUE;
     final Picture pic = pics[neg && pics.length == 2 ? 1 : 0];
-    final IntList res = new IntList();
-    final IntList intgr = new IntList();
-    final IntList fract = new IntList();
+    final IntList res = new IntList(), intgr = new IntList(), fract = new IntList();
     int exp = 0;
 
-    if(d == Double.POSITIVE_INFINITY || d == Double.NEGATIVE_INFINITY) {
+    if(Double.isInfinite(d)) {
+      // Rule 3
       intgr.add(new TokenParser(inf).toArray());
     } else {
       // convert and round number
       ANum num = it;
+      // Rule 4
       if(pic.pc) num = (ANum) Calc.MULT.ev(ii, num, Int.get(100));
       if(pic.pm) num = (ANum) Calc.MULT.ev(ii, num, Int.get(1000));
+      // Rule 5
       if(pic.minExp != 0 && d != 0) {
         BigDecimal dec = num.dec(ii).abs().stripTrailingZeros();
         int scl = 0;
@@ -394,7 +394,7 @@ public final class DecFormatter extends FormatUtil {
           scl++;
         }
 
-        exp = scl - Math.max(1, pic.min[0]);
+        exp = scl - pic.min[0];
         if(exp != 0) {
           final BigDecimal n = BigDecimal.TEN.pow(Math.abs(exp));
           num = (ANum) Calc.MULT.ev(ii, num, Dec.get(exp > 0 ? BigDecimal.ONE.divide(n) : n));
@@ -447,11 +447,9 @@ public final class DecFormatter extends FormatUtil {
     // add minus sign
     if(neg && pics.length != 2) res.add(minus);
     // add prefix and integer part
-    res.add(pic.xyzfix[0].toArray()).add(intgr.finish());
+    res.add(pic.prefSuf[0].toArray()).add(intgr.finish());
     // add fractional part
     if(!fract.isEmpty()) res.add(decimal).add(fract.finish());
-    // add suffix
-    res.add(pic.xyzfix[1].toArray());
     // add exponent
     if(pic.minExp != 0) {
       res.add(exponent);
@@ -461,13 +459,15 @@ public final class DecFormatter extends FormatUtil {
       for(int i = sl; i < pic.minExp; i++) res.add(zero);
       for(int i = 0; i < sl; i++) res.add(zero + s.charAt(i) - '0');
     }
+    // add suffix
+    res.add(pic.prefSuf[1].toArray());
     return new TokenBuilder(res.finish()).finish();
   }
 
   /** Picture variables. */
   private static final class Picture {
     /** Prefix/suffix. */
-    private final IntList[] xyzfix = { new IntList(), new IntList() };
+    private final IntList[] prefSuf = { new IntList(), new IntList() };
     /** Integer/fractional-part-grouping-positions. */
     private final int[][] group = { {}, {} };
     /** Minimum-integer/fractional-part-size. */
