@@ -1148,7 +1148,7 @@ public enum QueryError {
   /** XQST0097. */
   INVDECZERO_X(XQST, 97, "Zero-digit property must be Unicode digit with value zero: '%'."),
   /** XQST0098. */
-  DUPLDECFORM_X(XQST, 98, "Duplicate use of decimal-format '%'."),
+  DUPLDECFORM_X(XQST, 98, "Clash of decimal format properties: '%'."),
   /** XQST0099. */
   DUPLITEM(XQST, 99, "Duplicate declaration of context value."),
   /** XQST0103. */

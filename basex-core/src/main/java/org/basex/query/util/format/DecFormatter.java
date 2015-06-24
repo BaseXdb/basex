@@ -102,7 +102,8 @@ public final class DecFormatter extends FormatUtil {
     // check for duplicate characters
     zero = z;
     final IntSet is = new IntSet();
-    final int[] ss = { decimal, grouping, exponent, percent, permille, zero, optional, pattern };
+    for(int i = 0; i < 10; i++) is.add(zero + i);
+    final int[] ss = { decimal, grouping, exponent, percent, permille, optional, pattern };
     for(final int s : ss) if(!is.add(s)) throw DUPLDECFORM_X.get(info, (char) s);
 
     // create auxiliary strings
