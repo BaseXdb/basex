@@ -13,7 +13,7 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
-import org.basex.util.list.*;
+import org.basex.util.hash.*;
 
 /**
  * Id functions.
@@ -23,57 +23,72 @@ import org.basex.util.list.*;
  */
 abstract class Ids extends StandardFunc {
   /**
-   * Extracts the ids from the specified iterator.
-   * @param iter iterator
-   * @return ids
+   * Returns referenced nodes.
+   * @param qc query context
+   * @param idref follow idref
+   * @return referenced nodes
    * @throws QueryException query exception
    */
-  final byte[][] ids(final Iter iter) throws QueryException {
-    final TokenList tl = new TokenList();
-    for(Item id; (id = iter.next()) != null;) {
-      for(final byte[] i : split(normalize(toToken(id)), ' ')) tl.add(i);
-    }
-    return tl.finish();
+  protected BasicNodeIter ids(final QueryContext qc, final boolean idref) throws QueryException {
+    // [CG] XQuery: ID-IDREF Parsing: take advantage of index structure; consider schema information
+    final ANodeList list = new ANodeList().check();
+    add(ids(exprs[0].atomIter(qc, info)), list, checkRoot(toNode(arg(1, qc), qc)), idref);
+    return list.iter();
   }
+
 
   /**
    * Adds nodes with the specified id.
    * @param ids ids to be found
    * @param idref idref flag
    * @param list node cache
-   * @param node node
+   * @param node current node
    */
-  static void add(final byte[][] ids, final ANodeList list, final ANode node, final boolean idref) {
-    BasicNodeIter iter = node.attributes();
-    for(ANode at; (at = iter.next()) != null;) {
-      final byte[][] val = split(at.string(), ' ');
-      // [CG] XQuery: ID-IDREF Parsing
-      for(final byte[] id : ids) {
-        if(!eq(id, val)) continue;
-        final byte[] nm = lc(at.qname().string());
-        final boolean ii = contains(nm, ID), ir = contains(nm, IDREF);
-        if(idref ? ir : ii && !ir) list.add(idref ? at.finish() : node);
+  private static void add(final TokenSet ids, final ANodeList list, final ANode node,
+      final boolean idref) {
+
+    for(final ANode item : node.attributes()) {
+      final byte[] name = lc(item.name());
+      if(idref ? contains(name, IDREF) : contains(name, ID) && !contains(name, IDREF)) {
+        // id/idref found
+        for(final byte[] val : split(normalize(item.string()), ' ')) {
+          // correct value: add to results
+          if(ids.contains(val)) {
+            list.add(idref ? item.finish() : node);
+            break;
+          }
+        }
       }
     }
-    iter = node.children();
-    for(ANode att; (att = iter.next()) != null;) add(ids, list, att.finish(), idref);
+    for(final ANode item : node.children()) {
+      add(ids, list, item.finish(), idref);
+    }
   }
 
   /**
    * Checks if the specified node has a document node as root.
    * @param node input node
-   * @return specified node
+   * @return root node
    * @throws QueryException query exception
    */
-  ANode checkRoot(final ANode node) throws QueryException {
-    if(node instanceof FNode) {
-      ANode n = node;
-      while(n.type != NodeType.DOC) {
-        n = n.parent();
-        if(n == null) throw IDDOC.get(info);
-      }
+  private ANode checkRoot(final ANode node) throws QueryException {
+    final ANode root = node.root();
+    if(root.type != NodeType.DOC) throw IDDOC.get(info);
+    return root;
+  }
+
+  /**
+   * Extracts and returns all ids from the iterated strings.
+   * @param iter iterator
+   * @return id set
+   * @throws QueryException query exception
+   */
+  private TokenSet ids(final Iter iter) throws QueryException {
+    final TokenSet ts = new TokenSet();
+    for(Item ids; (ids = iter.next()) != null;) {
+      for(final byte[] id : split(normalize(toToken(ids)), ' ')) ts.put(id);
     }
-    return node;
+    return ts;
   }
 
   @Override

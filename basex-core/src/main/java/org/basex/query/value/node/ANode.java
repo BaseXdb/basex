@@ -259,12 +259,12 @@ public abstract class ANode extends Item {
   }
 
   /**
-   * Returns the root node.
+   * Returns the root of a node (the topmost ancestor without parent node).
    * @return root node
    */
   public final ANode root() {
-    final ANode n = parent();
-    return n == null ? this : n.root();
+    final ANode p = parent();
+    return p == null ? this : p.root();
   }
 
   /**

@@ -439,7 +439,7 @@ public interface QueryText {
   /** ID token. */
   byte[] ID = token("id");
   /** IDRef token. */
-  byte[] IDREF = token("idref");
+  byte[] IDREF = token("ref");
 
   /** Error token. */
   byte[] E_CODE = token("code");

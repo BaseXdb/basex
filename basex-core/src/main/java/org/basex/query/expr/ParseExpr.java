@@ -32,7 +32,7 @@ public abstract class ParseExpr extends Expr {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null}
    */
   protected ParseExpr(final InputInfo info) {
     this.info = info;
