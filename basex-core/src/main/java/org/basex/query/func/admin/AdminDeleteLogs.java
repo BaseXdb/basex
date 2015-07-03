@@ -23,11 +23,11 @@ public final class AdminDeleteLogs extends AdminFn {
 
     final String date = Token.string(toToken(exprs[0], qc));
     final String cdate = Log.name(new Date());
-    if(date.equals(cdate)) throw BXCA_TODAY.get(info, date + IO.LOGSUFFIX);
+    if(date.equals(cdate)) throw BXAD_TODAY.get(info, date + IO.LOGSUFFIX);
 
     final IOFile file = new IOFile(qc.context.log.dir(), date + IO.LOGSUFFIX);
     if(!file.exists()) throw WHICHRES_X.get(info, file);
-    if(!file.delete()) throw BXCA_DELETE_X.get(info, date + IO.LOGSUFFIX);
+    if(!file.delete()) throw BXAD_DELETE_X.get(info, date + IO.LOGSUFFIX);
     return null;
   }
 }

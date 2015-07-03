@@ -97,7 +97,7 @@ public final class Log {
    * @param info info string (can be {@code null})
    * @param perf performance string
    */
-  private synchronized void write(final String address, final User user, final String type,
+  public synchronized void write(final String address, final User user, final String type,
       final String info, final Performance perf) {
 
     if(!sopts.get(StaticOptions.LOG)) {

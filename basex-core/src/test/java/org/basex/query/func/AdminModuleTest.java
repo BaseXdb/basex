@@ -56,7 +56,7 @@ public final class AdminModuleTest extends AdvancedQueryTest {
   @Test
   public void deleteLogs() {
     // no logging data exists in the sandbox
-    error(_ADMIN_DELETE_LOGS.args(Log.name(new Date())), BXCA_TODAY);
+    error(_ADMIN_DELETE_LOGS.args(Log.name(new Date())), BXAD_TODAY);
     error(_ADMIN_DELETE_LOGS.args("2001-01-01"), WHICHRES_X);
   }
 }

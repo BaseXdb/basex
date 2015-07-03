@@ -549,7 +549,8 @@ public enum Function {
   /** XQuery function. */
   _ADMIN_LOGS(AdminLogs.class, "logs([date[,merge]])", arg(STR, BLN), ELM_ZM, flag(NDT), ADMIN_URI),
   /** XQuery function. */
-  _ADMIN_WRITE_LOG(AdminWriteLog.class, "write-log(string)", arg(STR), EMP, flag(NDT), ADMIN_URI),
+  _ADMIN_WRITE_LOG(AdminWriteLog.class, "write-log(string)",
+      arg(STR, STR), EMP, flag(NDT), ADMIN_URI),
   /** XQuery function. */
   _ADMIN_DELETE_LOGS(AdminDeleteLogs.class, "delete-logs(date)",
       arg(STR), EMP, flag(NDT), ADMIN_URI),

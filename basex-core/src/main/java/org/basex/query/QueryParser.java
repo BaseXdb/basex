@@ -1335,6 +1335,7 @@ public class QueryParser extends InputParser {
    */
   private Expr switchh() throws QueryException {
     if(!wsConsumeWs(SWITCH, PAREN1, TYPEPAR)) return null;
+    final InputInfo ii = info();
     wsCheck(PAREN1);
     final Expr expr = check(expr(), NOSWITCH);
     SwitchCase[] exprs = { };
@@ -1355,7 +1356,7 @@ public class QueryParser extends InputParser {
       exprs = Array.add(exprs, new SwitchCase(info(), cases.finish()));
     } while(cases.size() != 1);
 
-    return new Switch(info(), expr, exprs);
+    return new Switch(ii, expr, exprs);
   }
 
   /**
@@ -1365,6 +1366,7 @@ public class QueryParser extends InputParser {
    */
   private Expr typeswitch() throws QueryException {
     if(!wsConsumeWs(TYPESWITCH, PAREN1, TYPEPAR)) return null;
+    final InputInfo ii = info();
     wsCheck(PAREN1);
     final Expr ts = check(expr(), NOTYPESWITCH);
     wsCheck(PAREN2);
@@ -1396,7 +1398,7 @@ public class QueryParser extends InputParser {
       closeSubScope(s);
     } while(cs);
     if(cases.length == 1) throw error(NOTYPESWITCH);
-    return new TypeSwitch(info(), ts, cases);
+    return new TypeSwitch(ii, ts, cases);
   }
 
   /**
@@ -1406,6 +1408,7 @@ public class QueryParser extends InputParser {
    */
   private Expr iff() throws QueryException {
     if(!wsConsumeWs(IF, PAREN1, IFPAR)) return null;
+    final InputInfo ii = info();
     wsCheck(PAREN1);
     final Expr iff = check(expr(), NOIF);
     wsCheck(PAREN2);
@@ -1413,7 +1416,7 @@ public class QueryParser extends InputParser {
     final Expr thn = check(single(), NOIF);
     if(!wsConsumeWs(ELSE)) throw error(NOIF);
     final Expr els = check(single(), NOIF);
-    return new If(info(), iff, thn, els);
+    return new If(ii, iff, thn, els);
   }
 
   /**
@@ -1425,9 +1428,10 @@ public class QueryParser extends InputParser {
     final Expr e = and();
     if(!wsConsumeWs(OR)) return e;
 
+    final InputInfo ii = info();
     final ExprList el = new ExprList(2).add(e);
     do add(el, and()); while(wsConsumeWs(OR));
-    return new Or(info(), el.finish());
+    return new Or(ii, el.finish());
   }
 
   /**
@@ -1439,9 +1443,10 @@ public class QueryParser extends InputParser {
     final Expr e = update();
     if(!wsConsumeWs(AND)) return e;
 
+    final InputInfo ii = info();
     final ExprList el = new ExprList(2).add(e);
     do add(el, update()); while(wsConsumeWs(AND));
-    return new And(info(), el.finish());
+    return new And(ii, el.finish());
   }
 
   /**

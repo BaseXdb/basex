@@ -50,9 +50,11 @@ public enum QueryError {
   // Admin module
 
   /** FODC0001. */
-  BXCA_TODAY(FOAD, 1, "Today's log file cannot be deleted."),
+  BXAD_TODAY(FOAD, 1, "Today's log file cannot be deleted."),
   /** FODC0002. */
-  BXCA_DELETE_X(FOAD, 2, "Log file could not be deleted: %."),
+  BXAD_DELETE_X(FOAD, 2, "Log file could not be deleted: %."),
+  /** FODC0003. */
+  BXAD_TYPE_X(FOAD, 3, "Log type must consist of uppercase letters: \"%\"."),
 
   // Client module
 
