@@ -50,8 +50,8 @@ public final class ValueAccess extends IndexAccess {
   }
 
   @Override
-  public NodeIter iter(final QueryContext qc) throws QueryException {
-    final ArrayList<NodeIter> iter = new ArrayList<>();
+  public BasicNodeIter iter(final QueryContext qc) throws QueryException {
+    final ArrayList<BasicNodeIter> iter = new ArrayList<>();
     final Iter ir = qc.iter(expr);
     for(Item it; (it = ir.next()) != null;) iter.add(index(it.string(info)));
     final int is = iter.size();
