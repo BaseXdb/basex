@@ -46,7 +46,7 @@ public abstract class QueryTest extends SandboxTest {
           if(correct) {
             final String cp = cmp.serialize().toString();
             sb.append('\'');
-            sb.append(cp.length() > 1000 ? cp.substring(0, 1000) + "..." : cp);
+            sb.append(cp.length() > 5000 ? cp.substring(0, 5000) + "..." : cp);
             sb.append('\'');
           } else {
             sb.append("error");

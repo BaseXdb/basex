@@ -19,12 +19,12 @@ import org.basex.query.var.*;
 public final class FnData extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    return arg(0, qc).atomIter(qc, info);
+    return ctxArg(0, qc).atomIter(qc, info);
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return arg(0, qc).atomValue(qc, info);
+    return ctxArg(0, qc).atomValue(qc, info);
   }
 
   @Override

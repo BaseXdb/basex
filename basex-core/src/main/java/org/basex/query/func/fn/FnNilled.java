@@ -18,7 +18,7 @@ import org.basex.util.*;
 public final class FnNilled extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final ANode node = toEmptyNode(arg(0, qc), qc);
+    final ANode node = toEmptyNode(ctxArg(0, qc), qc);
     // always false, as no schema information is given
     return node == null || node.type != NodeType.ELM ? null : Bln.FALSE;
   }

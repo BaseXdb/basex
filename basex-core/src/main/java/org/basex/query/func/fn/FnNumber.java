@@ -17,7 +17,7 @@ import org.basex.util.*;
 public final class FnNumber extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item it = arg(0, qc).atomItem(qc, info);
+    final Item it = ctxArg(0, qc).atomItem(qc, info);
     if(it == null) return Dbl.NAN;
     if(it.type == AtomType.DBL) return it;
     try {

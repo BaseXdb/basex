@@ -38,7 +38,7 @@ abstract class Ids extends StandardFunc {
     // [CG] XQuery: ID-IDREF Parsing: consider schema information
 
     final TokenSet idSet = ids(exprs[0].atomIter(qc, info));
-    final ANode root = checkRoot(toNode(arg(1, qc), qc));
+    final ANode root = checkRoot(toNode(ctxArg(1, qc), qc));
 
     final Data data = root.data();
     if(idref || data == null) {

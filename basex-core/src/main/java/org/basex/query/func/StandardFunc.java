@@ -164,7 +164,7 @@ public abstract class StandardFunc extends Arr {
    * @return expression
    * @throws QueryException query exception
    */
-  protected Expr arg(final int index, final QueryContext qc) throws QueryException {
+  protected Expr ctxArg(final int index, final QueryContext qc) throws QueryException {
     return exprs.length == index ? ctxValue(qc) : exprs[index];
   }
 

@@ -20,7 +20,7 @@ import org.basex.util.list.*;
 public final class FnPath extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    ANode node = toEmptyNode(arg(0, qc), qc);
+    ANode node = toEmptyNode(ctxArg(0, qc), qc);
     if(node == null) return null;
 
     final TokenList tl = new TokenList();
