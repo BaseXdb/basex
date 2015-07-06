@@ -29,13 +29,11 @@ public final class FnData extends StandardFunc {
 
   @Override
   protected Expr opt(final QueryContext qc, final VarScope scp) {
-    if(exprs.length == 1) {
-      final SeqType st = exprs[0].seqType();
-      if(st.type instanceof NodeType) {
-        seqType = SeqType.get(AtomType.ATM, st.occ);
-      } else if(!st.mayBeArray()) {
-        seqType = st;
-      }
+    final SeqType st = (exprs.length > 0 ? exprs[0] : qc.value != null ? qc.value : this).seqType();
+    if(st.type instanceof NodeType) {
+      seqType = SeqType.get(AtomType.ATM, st.occ);
+    } else if(!st.mayBeArray()) {
+      seqType = st;
     }
     return this;
   }
