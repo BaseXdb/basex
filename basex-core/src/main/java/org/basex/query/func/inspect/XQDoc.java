@@ -45,7 +45,7 @@ final class XQDoc extends Inspect {
     final QueryParser qp = parseQuery(io);
     final FElem xqdoc = new FElem(PREFIX, PREFIX, URI).declareNS();
     final FElem control = elem("control", xqdoc);
-    elem("date", control).add(qc.initDateTime().dtm.string(info));
+    elem("date", control).add(qc.initDateTime().datm.string(info));
     elem("version", control).add("1.1");
 
     final String type = module instanceof LibraryModule ? "library" : "main";

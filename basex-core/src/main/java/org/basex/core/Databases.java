@@ -14,6 +14,9 @@ import org.basex.util.list.*;
  * @author Jens Erat
  */
 public final class Databases {
+  /** Date pattern. */
+  public static final String DATE = "\\d{4}-\\d{2}-\\d{2}-\\d{2}-\\d{2}-\\d{2}";
+
   /** Allowed characters for database names (additional to letters and digits).
    * The following characters are invalid:
    * <ul>
@@ -27,8 +30,7 @@ public final class Databases {
   /** Regex representation of allowed database characters. */
   private static final String REGEXCHARS = DBCHARS.replaceAll("(.)", "\\\\$1");
   /** Pattern to extract the database name from a backup file name. */
-  private static final Pattern ZIPPATTERN =
-      Pattern.compile(DateTime.PATTERN + '\\' + IO.ZIPSUFFIX + '$');
+  private static final Pattern ZIPPATTERN = Pattern.compile('-' + DATE + '\\' + IO.ZIPSUFFIX + '$');
   /** Regex indicator. */
   private static final Pattern REGEX = Pattern.compile(".*[*?,].*");
 
@@ -145,7 +147,7 @@ public final class Databases {
     if(file.exists()) {
       backups.add(db);
     } else {
-      final Pattern regex = regex(db, DateTime.PATTERN + '\\' + IO.ZIPSUFFIX);
+      final Pattern regex = regex(db, '-' + DATE + '\\' + IO.ZIPSUFFIX);
       for(final IOFile f : soptions.dbpath().children()) {
         final String n = f.name();
         if(regex.matcher(n).matches()) backups.add(n.substring(0, n.lastIndexOf('.')));
@@ -162,7 +164,16 @@ public final class Databases {
    * @return name of the database ({@code [dbname]})
    */
   public static String name(final String backup) {
-    return Pattern.compile(DateTime.PATTERN + '$').split(backup)[0];
+    return Pattern.compile('-' + DATE + '$').split(backup)[0];
+  }
+
+  /**
+   * Extracts the date of a database from the name of a backup.
+   * @param backup name of the backup file, including the date
+   * @return date string
+   */
+  public static Date date(final String backup) {
+    return DateTime.parse(backup.replaceAll("^.+-(" + DATE + ")$", "$1"));
   }
 
   /**

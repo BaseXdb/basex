@@ -97,7 +97,7 @@ public final class DbListDetails extends DbList {
           final int bin = new IOFile(ctx.soptions.dbpath(name), IO.RAW).descendants().size();
           final FElem res = new FElem(DATABASE);
           res.add(RESOURCES, token(meta.ndocs + bin));
-          res.add(MDATE, DateTime.format(new Date(meta.dbtime()), DateTime.FULL));
+          res.add(MDATE, DateTime.format(new Date(meta.dbtime())));
           res.add(SIZE, token(meta.dbsize()));
           if(ctx.perm(Perm.CREATE, name)) res.add(PATH, meta.original);
           res.add(name);
@@ -125,7 +125,7 @@ public final class DbListDetails extends DbList {
   private static FNode resource(final byte[] path, final boolean raw, final long size,
       final MediaType type, final long mdate) {
 
-    final String tstamp = DateTime.format(new Date(mdate), DateTime.FULL);
+    final String tstamp = DateTime.format(new Date(mdate));
     return new FElem(RESOURCE).add(path).
         add(RAW, token(raw)).add(CTYPE, type.toString()).add(MDATE, tstamp).add(SIZE, token(size));
   }

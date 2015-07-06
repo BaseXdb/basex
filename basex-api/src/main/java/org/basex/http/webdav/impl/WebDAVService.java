@@ -4,7 +4,6 @@ import static org.basex.http.webdav.impl.Utils.*;
 import static org.basex.query.func.Function.*;
 
 import java.io.*;
-import java.text.*;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.List;
@@ -114,14 +113,7 @@ public final class WebDAVService<T> {
   public long timestamp(final String db) throws IOException {
     final WebDAVQuery query = new WebDAVQuery(DATA.args(_DB_INFO.args("$path") +
         "/descendant::" + DbFn.toName(Text.TIMESTAMP) + "[1]")).bind("path",  db);
-
-    try {
-      // retrieve and parse timestamp
-      return DateTime.parse(execute(query).get(0), DateTime.DATETIME).getTime();
-    } catch(final ParseException ex) {
-      Util.errln(ex);
-      return 0L;
-    }
+    return DateTime.parse(execute(query).get(0)).getTime();
   }
 
   /**
@@ -146,7 +138,7 @@ public final class WebDAVService<T> {
     final StringList result = execute(query);
     final boolean raw = Boolean.parseBoolean(result.get(0));
     final MediaType type = new MediaType(result.get(1));
-    final long mod = DateTime.parse(result.get(2));
+    final long mod = DateTime.parse(result.get(2)).getTime();
     final Long size = raw ? Long.valueOf(result.get(3)) : null;
     final String pth = stripLeadingSlash(result.get(4));
     return new ResourceMetaData(db, pth, mod, raw, type, size);
@@ -320,7 +312,7 @@ public final class WebDAVService<T> {
     for(int r = 0; r < rs; r += 5) {
       final boolean raw = Boolean.parseBoolean(result.get(r));
       final MediaType ctype = new MediaType(result.get(r + 1));
-      final long mod = DateTime.parse(result.get(r + 2));
+      final long mod = DateTime.parse(result.get(r + 2)).getTime();
       final Long size = raw ? Long.valueOf(result.get(r + 3)) : null;
       final String pth = stripLeadingSlash(result.get(r + 4));
       final int ix = pth.indexOf(SEP);
@@ -351,7 +343,7 @@ public final class WebDAVService<T> {
     final List<T> dbs = new ArrayList<>(rs >>> 1);
     for(int r = 0; r < rs; r += 2) {
       final String name = result.get(r);
-      final long mod = DateTime.parse(result.get(r + 1));
+      final long mod = DateTime.parse(result.get(r + 1)).getTime();
       dbs.add(factory.database(this, new ResourceMetaData(name, mod)));
     }
     return dbs;

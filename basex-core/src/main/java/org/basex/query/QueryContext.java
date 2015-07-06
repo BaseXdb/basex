@@ -101,7 +101,7 @@ public final class QueryContext extends Proc implements Closeable {
   /** Current Date. */
   public Item date;
   /** Current DateTime. */
-  public Item dtm;
+  public Item datm;
   /** Current Time. */
   public Item time;
   /** Current timezone. */
@@ -819,15 +819,15 @@ public final class QueryContext extends Proc implements Closeable {
    */
   public QueryContext initDateTime() throws QueryException {
     if(time == null) {
-      final Date d = Calendar.getInstance().getTime();
-      final String zon = DateTime.format(d, DateTime.ZONE);
-      final String ymd = DateTime.format(d, DateTime.DATE);
-      final String hms = DateTime.format(d, DateTime.TIME);
-      final String zn = zon.substring(0, 3) + ':' + zon.substring(3);
-      time = new Tim(token(hms + zn), null);
-      date = new Dat(token(ymd + zn), null);
-      dtm = new Dtm(token(ymd + 'T' + hms + zn), null);
-      zone = new DTDur(Strings.toInt(zon.substring(0, 3)), Strings.toInt(zon.substring(3)));
+      final Date dt = Calendar.getInstance().getTime();
+      final String ymd = DateTime.format(dt, DateTime.DATE);
+      final String hms = DateTime.format(dt, DateTime.TIME);
+      final String zon = DateTime.format(dt, DateTime.ZONE);
+      final String znm = zon.substring(0, 3), zns = zon.substring(3);
+      time = new Tim(token(hms + znm + ':' + zns), null);
+      date = new Dat(token(ymd + znm + ':' + zns), null);
+      datm = new Dtm(token(ymd + 'T' + hms + znm + ':' + zns), null);
+      zone = new DTDur(Strings.toInt(znm), Strings.toInt(zns));
       nano = System.nanoTime();
     }
     return this;

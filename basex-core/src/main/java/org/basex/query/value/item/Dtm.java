@@ -72,7 +72,7 @@ public final class Dtm extends ADate {
    * @throws QueryException query exception
    */
   public Dtm(final long ms, final InputInfo ii) throws QueryException {
-    this(Token.token(DateTime.format(new Date(ms), DateTime.FULL)), ii);
+    this(Token.token(DateTime.format(new Date(ms))), ii);
   }
 
   /**
