@@ -60,9 +60,8 @@ function query(wait, success, key, query, enforce, target) {
       "?name=" + encodeURIComponent(name ? name.value : "") +
       "&resource=" + encodeURIComponent(resource ? resource.value : "") +
       "&sort=" + encodeURIComponent(sort ? sort.value : "") +
-      "&loglist=" + encodeURIComponent(loglist ? loglist.value : "") +
-      "&query=" + encodeURIComponent(query);
-    request("POST", url, null,
+      "&loglist=" + encodeURIComponent(loglist ? loglist.value : "");
+    request("POST", url, query,
       function(req) {
         if(_d != d) return;
         target(req.responseText);
