@@ -82,7 +82,7 @@ public final class IndexInfo {
     final boolean elem = s.test.type == NodeType.ELM;
     if(elem) {
       // only do check if database is up-to-date if no namespaces occur and if name test is used
-      if(!data.meta.uptodate || data.nspaces.size() != 0 || s.test.kind != Kind.NAME) return false;
+      if(!data.meta.uptodate || !data.nspaces.isEmpty() || s.test.kind != Kind.NAME) return false;
       test = (NameTest) s.test;
       final Stats stats = data.elemNames.stat(data.elemNames.id(test.name.local()));
       if(stats == null || !stats.isLeaf()) return false;

@@ -191,7 +191,7 @@ public final class CmpR extends Single {
   private Stats key(final IndexInfo ii, final boolean text) {
     // statistics are not up-to-date
     final Data data = ii.ic.data;
-    if(!data.meta.uptodate || data.nspaces.size() != 0 || !(expr instanceof AxisPath)) return null;
+    if(!data.meta.uptodate || !data.nspaces.isEmpty() || !(expr instanceof AxisPath)) return null;
 
     NameTest test = ii.test;
     if(test == null) {

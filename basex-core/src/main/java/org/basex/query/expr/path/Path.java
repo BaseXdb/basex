@@ -543,7 +543,7 @@ public abstract class Path extends ParseExpr {
   private Expr children(final QueryContext qc, final Value rt) {
     // skip if index does not exist or is out-dated, or if several namespaces occur in the input
     final Data data = rt.data();
-    if(data == null || !data.meta.uptodate || data.nspaces.globalNS() == null) return this;
+    if(data == null || !data.meta.uptodate || data.nspaces.globalUri() == null) return this;
 
     Path path = this;
     final int sl = steps.length;

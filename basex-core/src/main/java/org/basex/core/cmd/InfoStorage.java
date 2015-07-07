@@ -134,9 +134,9 @@ public final class InfoStorage extends AQuery {
     tl.add(data.size(pre, k));
     tl.add(data.attSize(pre, k));
     tl.add(data.id(pre));
-    final int u = data.uri(pre, k);
-    if(data.nsFlag(pre)) tl.add("+" + u);
-    else tl.add(u);
+    final int uriId = data.uriId(pre, k);
+    if(data.nsFlag(pre)) tl.add("+" + uriId);
+    else tl.add(uriId);
     tl.add(TABLEKINDS[k]);
 
     final byte[] cont;

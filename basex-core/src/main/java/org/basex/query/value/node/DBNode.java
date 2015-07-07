@@ -178,22 +178,14 @@ public class DBNode extends ANode {
   @Override
   public final QNm qname(final QNm name) {
     // update the name and uri strings in the specified QName
-    final byte[] nm = name();
-    byte[] uri = Token.EMPTY;
-    final boolean pref = Token.indexOf(nm, ':') != -1;
-    if(pref || data.nspaces.size() != 0) {
-      final int n = pref ? data.nspaces.uri(nm, pre, data) :
-        data.uri(pre, data.kind(pre));
-      final byte[] u = n > 0 ? data.nspaces.uri(n) : pref ? NSGlobal.uri(Token.prefix(nm)) : null;
-      if(u != null) uri = u;
-    }
-    name.set(nm, uri);
+    final byte[][] qname = data.qname(pre, kind());
+    name.set(qname[0], qname[1]);
     return name;
   }
 
   @Override
   public final Atts namespaces() {
-    if(type == NodeType.ELM && nsp == null) nsp = data.ns(pre);
+    if(type == NodeType.ELM && nsp == null) nsp = data.namespaces(pre);
     return nsp;
   }
 

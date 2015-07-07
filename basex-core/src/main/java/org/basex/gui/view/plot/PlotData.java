@@ -109,7 +109,7 @@ final class PlotData {
       while(p < nl) {
         final int kind = data.kind(p);
         if(kind == Data.ELEM) {
-          if(data.name(p) == itmID) il.add(p);
+          if(data.nameId(p) == itmID) il.add(p);
           p += data.attSize(p, Data.ELEM);
         } else {
           ++p;

@@ -169,13 +169,13 @@ final class TableData {
       final int s = pre + data.size(pre, data.kind(pre));
       // find first root element name
       do {
-        if(data.kind(pre) == Data.ELEM && data.name(pre) == root) break;
+        if(data.kind(pre) == Data.ELEM && data.nameId(pre) == root) break;
       } while(++pre < s);
 
       // parse whole document and collect root element names
       while(pre < s) {
         final int k = data.kind(pre);
-        if(k == Data.ELEM && data.name(pre) == root) rows.add(pre);
+        if(k == Data.ELEM && data.nameId(pre) == root) rows.add(pre);
         pre += data.attSize(pre, k);
       }
     }
@@ -253,7 +253,7 @@ final class TableData {
       final int s = p + data.size(p, data.kind(p));
       while(p != s) {
         final int k = data.kind(p);
-        if((e && k == Data.ELEM || !e && k == Data.ATTR) && data.name(p) == c) {
+        if((e && k == Data.ELEM || !e && k == Data.ATTR) && data.nameId(p) == c) {
           tokens[r] = data.atom(p);
           break;
         }
@@ -276,7 +276,7 @@ final class TableData {
     if(pre == -1) return -1;
     int p = pre;
     int k = data.kind(p);
-    while(p != -1 && (k != Data.ELEM || data.name(p) != root)) {
+    while(p != -1 && (k != Data.ELEM || data.nameId(p) != root)) {
       p = data.parent(p, k);
       k = p == -1 ? 0 : data.kind(p);
     }

@@ -401,7 +401,7 @@ public abstract class Serializer implements Closeable {
     if(kind == Data.ATTR) throw SERATTR_X.getIO(node);
 
     boolean doc = false;
-    final TokenSet nsp = data.nspaces.size() == 0 ? null : new TokenSet();
+    final TokenSet nsp = data.nspaces.isEmpty() ? null : new TokenSet();
     final IntList pars = new IntList();
     final BoolList indt = new BoolList();
 
@@ -433,7 +433,7 @@ public abstract class Serializer implements Closeable {
         } else {
           // add element node
           final byte[] name = data.name(pre, kind);
-          final byte[] uri = data.nspaces.uri(data.uri(pre, kind));
+          final byte[] uri = data.nspaces.uri(data.uriId(pre, kind));
           openElement(new QNm(name, uri));
 
           // add namespace definitions
@@ -446,7 +446,7 @@ public abstract class Serializer implements Closeable {
             namespace(prefix(name), uri == null ? EMPTY : uri, false);
 
             do {
-              final Atts ns = data.ns(pp);
+              final Atts ns = data.namespaces(pp);
               final int nl = ns.size();
               for(int n = 0; n < nl; n++) {
                 final byte[] pref = ns.name(n);

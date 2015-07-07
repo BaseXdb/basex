@@ -482,7 +482,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
     context.data().startUpdate(context.options);
     context.data().delete(0);
     context.data().finishUpdate(context.options);
-    final byte[] ns = context.data().nspaces.globalNS();
+    final byte[] ns = context.data().nspaces.globalUri();
     assertTrue(ns != null && ns.length == 0);
   }
 
@@ -630,7 +630,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
     query(
       "let $b := <a xmlns:x='X' x:id='0'/> " +
       "return insert node $b//@*:id into /*:n");
-    assertEquals(1, context.data().ns(1).size());
+    assertEquals(1, context.data().namespaces(1).size());
   }
 
   /** Handles duplicate prefixes. */

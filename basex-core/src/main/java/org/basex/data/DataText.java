@@ -232,6 +232,8 @@ public interface DataText {
 
   /** XHTML namespace. */
   byte[] XHTML_URI = token("http://www.w3.org/1999/xhtml");
+  /** XML namespace. */
+  byte[] XML_URI = token("http://www.w3.org/XML/1998/namespace");
 
   // TABLE SERIALIZATION ==========================================================================
 

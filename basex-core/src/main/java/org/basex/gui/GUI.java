@@ -380,7 +380,7 @@ public final class GUI extends JFrame {
     final Data data = context.data();
     final Namespaces ns = data.nspaces;
     String in = qu.trim().isEmpty() ? "()" : qu;
-    final int u = ns.uri(Token.EMPTY, 0, data);
+    final int u = ns.uriId(Token.EMPTY, 0, data);
     if(u != 0) in = Util.info("declare default element namespace \"%\"; %", ns.uri(u), in);
     execute(edit, new XQuery(in));
   }

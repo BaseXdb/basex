@@ -126,7 +126,7 @@ public abstract class Step extends Preds {
    */
   final ArrayList<PathNode> nodes(final ArrayList<PathNode> nodes, final Data data) {
     // skip steps with predicates or different namespaces
-    if(preds.length != 0 || data.nspaces.globalNS() == null) return null;
+    if(preds.length != 0 || data.nspaces.globalUri() == null) return null;
 
     // check restrictions on node type
     int kind = -1, name = 0;

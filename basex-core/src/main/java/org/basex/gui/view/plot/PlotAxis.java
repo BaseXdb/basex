@@ -251,7 +251,7 @@ final class PlotAxis {
     for(int p = pre; p < limit; ++p) {
       final int kind = data.kind(p);
       if((kind == Data.ELEM && elem || kind == Data.ATTR && !elem) &&
-          attrID == data.name(p)) return data.atom(p);
+          attrID == data.nameId(p)) return data.atom(p);
     }
     return EMPTY;
   }

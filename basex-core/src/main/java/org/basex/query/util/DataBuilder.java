@@ -64,8 +64,8 @@ public final class DataBuilder {
    */
   public void build(final ANodeList nodes) {
     data.meta.update();
-    int ds = data.meta.size;
-    for(final ANode n : nodes) ds = addNode(n, ds, -1, null);
+    int tPre = data.meta.size;
+    for(final ANode n : nodes) tPre = addNode(n, tPre, -1, null);
   }
 
   /**
@@ -96,14 +96,14 @@ public final class DataBuilder {
    * @return pre value of next node
    */
   private int addDoc(final ANode node, final int pre) {
-    final int ds = data.meta.size;
+    final int tPre = data.meta.size;
     final int s = size(node, false);
-    data.doc(ds, s, node.baseURI());
-    data.insert(ds);
+    data.doc(tPre, s, node.baseURI());
+    data.insert(tPre);
     int p = pre + 1;
     final BasicNodeIter iter = node.children();
     for(ANode ch; (ch = iter.next()) != null;) p = addNode(ch, p, pre, null);
-    if(s != p - pre) data.size(ds, Data.DOC, p - pre);
+    if(s != p - pre) data.size(tPre, Data.DOC, p - pre);
     return p;
   }
 
@@ -115,19 +115,18 @@ public final class DataBuilder {
    * @return number of added nodes
    */
   private int addAttr(final ANode node, final int pre, final int par) {
-    final int ds = data.meta.size;
-    final QNm q = node.qname();
-    final byte[] uri = q.uri();
-    int u = 0;
-    if(uri.length != 0) {
-      if(par == -1) data.nspaces.add(ds, pre + 1, q.prefix(), uri, data);
-      u = data.nspaces.uri(uri);
-    }
-    final int n = data.attrNames.index(q.string(), null, false);
-    // usually, attributes don't have a namespace flag.
-    // this is different here, because a stand-alone attribute has no parent element.
-    data.attr(ds, pre - par, n, node.string(), u, par == -1 && u != 0);
-    data.insert(ds);
+    final int tPre = data.meta.size;
+    final QNm qname = node.qname();
+    final byte[] uri = qname.uri();
+    // standalone attribute (no parent): create new namespace entry
+    final int uriId = uri.length == 0 ? 0 : par != -1 ? data.nspaces.uriId(uri) :
+      data.nspaces.add(tPre, pre + 1, qname.prefix(), uri, data);
+
+    final int nameId = data.attrNames.index(qname.string(), null, false);
+    // usually, attributes cannot have namespace flags.
+    // this is different here, because a standalone attribute has no parent element.
+    data.attr(tPre, pre - par, nameId, node.string(), uriId, par == -1 && uriId != 0);
+    data.insert(tPre);
     return pre + 1;
   }
 
@@ -152,7 +151,7 @@ public final class DataBuilder {
       if(n != null && !n.hasPrefix()) break;
       p = p.parent();
     }
-    final int u = p == null ? 0 : data.nspaces.uri(p.name(), true);
+    final int u = p == null ? 0 : data.nspaces.uriId(p.name(), true);
 
     int ts = marks.size();
     for(final DataFTMarker marker : marks) {
@@ -175,9 +174,9 @@ public final class DataBuilder {
    * @return number of added nodes
    */
   private int addText(final byte[] text, final int dist) {
-    final int ds = data.meta.size;
-    data.text(ds, dist, text, Data.TEXT);
-    data.insert(ds);
+    final int tPre = data.meta.size;
+    data.text(tPre, dist, text, Data.TEXT);
+    data.insert(tPre);
     return 1;
   }
 
@@ -189,10 +188,10 @@ public final class DataBuilder {
    * @return number of added nodes
    */
   private int addPI(final ANode node, final int pre, final int par) {
-    final int ds = data.meta.size;
-    final byte[] v = trim(concat(node.name(), SPACE, node.string()));
-    data.text(ds, pre - par, v, Data.PI);
-    data.insert(ds);
+    final int tPre = data.meta.size;
+    final byte[] value = trim(concat(node.name(), SPACE, node.string()));
+    data.text(tPre, pre - par, value, Data.PI);
+    data.insert(tPre);
     return pre + 1;
   }
 
@@ -204,9 +203,9 @@ public final class DataBuilder {
    * @return number of added nodes
    */
   private int addComm(final ANode node, final int pre, final int par) {
-    final int ds = data.meta.size;
-    data.text(ds, pre - par, node.string(), Data.COMM);
-    data.insert(ds);
+    final int tPre = data.meta.size;
+    data.text(tPre, pre - par, node.string(), Data.COMM);
+    data.insert(tPre);
     return pre + 1;
   }
 
@@ -218,35 +217,35 @@ public final class DataBuilder {
    * @return pre value of next node
    */
   private int addElem(final ANode node, final int pre, final int par) {
-    final int ds = data.meta.size;
+    final int tPre = data.meta.size;
 
     // add new namespaces
-    data.nspaces.prepare();
     final Atts ns = par == -1 ? node.nsScope(null) : node.namespaces();
-    final int nl = ns.size();
-    for(int n = 0; n < nl; n++) data.nspaces.add(ns.name(n), ns.value(n), ds);
+    data.nspaces.open(tPre, ns);
 
-    // analyze node name
-    final QNm nm = node.qname();
-    final int tn = data.elemNames.index(nm.string(), null, false);
-    final int s = size(node, false);
-    final int u = data.nspaces.uri(nm.uri());
+    // collect node name properties
+    final QNm qname = node.qname();
+    final int size = size(node, false), asize = size(node, true);
+    final int nameId = data.elemNames.index(qname.string(), null, false);
+    final int uriId = data.nspaces.uriId(qname.uri());
 
     // add element node
-    data.elem(pre - par, tn, size(node, true), s, u, nl != 0);
-    data.insert(ds);
+    data.elem(pre - par, nameId, asize, size, uriId, !ns.isEmpty());
+    data.insert(tPre);
 
-    // add attributes and children
-    int p = pre + 1;
+    // add attributes and child nodes
+    int cPre = pre + 1;
     BasicNodeIter iter = node.attributes();
-    for(ANode ch; (ch = iter.next()) != null;) p = addAttr(ch, p, pre);
+    for(ANode ch; (ch = iter.next()) != null;) cPre = addAttr(ch, cPre, pre);
     iter = node.children();
-    for(ANode ch; (ch = iter.next()) != null;) p = addNode(ch, p, pre, node);
-    data.nspaces.close(ds);
+    for(ANode ch; (ch = iter.next()) != null;) cPre = addNode(ch, cPre, pre, node);
+
+    // finalize namespace structure
+    data.nspaces.close(tPre);
 
     // update size if additional nodes have been added by the descendants
-    if(s != p - pre) data.size(ds, Data.ELEM, p - pre);
-    return p;
+    if(size != cPre - pre) data.size(tPre, Data.ELEM, cPre - pre);
+    return cPre;
   }
 
   /**
@@ -257,21 +256,21 @@ public final class DataBuilder {
    */
   private static int size(final ANode node, final boolean att) {
     if(node instanceof DBNode) {
-      final DBNode dbn = (DBNode) node;
-      final Data data = dbn.data();
+      final DBNode dbnode = (DBNode) node;
+      final Data data = dbnode.data();
       final int kind = node.kind();
-      final int pre = dbn.pre();
+      final int pre = dbnode.pre();
       return att ? data.attSize(pre, kind) : data.size(pre, kind);
     }
 
-    int s = 1;
+    int size = 1;
     BasicNodeIter iter = node.attributes();
-    while(iter.next() != null) ++s;
+    while(iter.next() != null) ++size;
     if(!att) {
       iter = node.children();
-      for(ANode i; (i = iter.next()) != null;) s += size(i, false);
+      for(ANode i; (i = iter.next()) != null;) size += size(i, false);
     }
-    return s;
+    return size;
   }
 
   /**
@@ -284,34 +283,34 @@ public final class DataBuilder {
   public static ANode stripNS(final ANode node, final byte[] ns, final Context ctx) {
     if(node.type != NodeType.ELM) return node;
 
-    final MemData md = new MemData(ctx.options);
-    final DataBuilder db = new DataBuilder(md);
+    final MemData data = new MemData(ctx.options);
+    final DataBuilder db = new DataBuilder(data);
     db.build(node);
 
     // flag indicating if namespace should be completely removed
     boolean del = true;
     // loop through all nodes
-    for(int pre = 0; pre < md.meta.size; pre++) {
+    for(int pre = 0; pre < data.meta.size; pre++) {
       // only check elements and attributes
-      final int kind = md.kind(pre);
+      final int kind = data.kind(pre);
       if(kind != Data.ELEM && kind != Data.ATTR) continue;
       // check if namespace is referenced
-      final byte[] uri = md.nspaces.uri(md.uri(pre, kind));
+      final byte[] uri = data.nspaces.uri(data.uriId(pre, kind));
       if(uri == null || !eq(uri, ns)) continue;
 
-      final byte[] nm = md.name(pre, kind);
+      final byte[] nm = data.name(pre, kind);
       if(prefix(nm).length == 0) {
         // no prefix: remove namespace from element
         if(kind == Data.ELEM) {
-          md.update(pre, Data.ELEM, nm, EMPTY);
-          md.nsFlag(pre, false);
+          data.update(pre, Data.ELEM, nm, EMPTY);
+          data.nsFlag(pre, false);
         }
       } else {
         // prefix: retain namespace
         del = false;
       }
     }
-    if(del) md.nspaces.delete(ns);
-    return new DBNode(md);
+    if(del) data.nspaces.delete(ns);
+    return new DBNode(data);
   }
 }

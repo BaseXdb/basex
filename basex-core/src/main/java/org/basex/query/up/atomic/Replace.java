@@ -50,7 +50,7 @@ final class Replace extends StructuralUpdate {
   @Override
   void apply(final Data data) {
     // [LK] replace optimizations only work without namespaces..
-    if(data.nspaces.size() == 0 && clip.data.nspaces.size() == 0) {
+    if(data.nspaces.isEmpty() && clip.data.nspaces.isEmpty()) {
       // Lazy Replace: rewrite to value updates if structure has not changed
       if(lazyReplace(data)) return;
       // Rapid Replace: in-place update, overwrite existing table entries

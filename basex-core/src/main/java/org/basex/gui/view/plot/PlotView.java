@@ -301,12 +301,12 @@ public final class PlotView extends View {
     if(focused != -1) {
       final int itmID = data.elemNames.id(plotData.item);
       int k = data.kind(focused);
-      int name = data.name(focused);
+      int name = data.nameId(focused);
       while(focused > 0 && itmID != name) {
         focused = data.parent(focused, k);
         if(focused > -1) {
           k = data.kind(focused);
-          name = data.name(focused);
+          name = data.nameId(focused);
         }
       }
     }
