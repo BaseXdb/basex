@@ -691,7 +691,11 @@ public abstract class Data {
    * @param source clip with source data
    */
   public final void insertAttr(final int pre, final int par, final DataClip source) {
-    insert(pre, par, source);
+    // #1168/2: store one by one (otherwise, namespace declarations may be added more than once)
+    for(int s = 0; s < source.fragments; s++) {
+      final int start = source.start + s;
+      insert(pre + s, par, new DataClip(source.data, start, start + 1));
+    }
     attSize(par, ELEM, attSize(par, ELEM) + source.size());
   }
 
