@@ -4,7 +4,6 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
-import java.util.List;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
@@ -18,7 +17,6 @@ import org.basex.io.*;
 import org.basex.io.random.*;
 import org.basex.query.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -520,8 +518,8 @@ public abstract class Data {
       // write namespace uri reference
       table.write1(pre, kind == ELEM ? 3 : 11, uriId);
       // write name reference
-      table.write2(pre, 1, (nsFlag(pre) ? 1 << 15 : 0) |
-        (kind == ELEM ? elemNames : attrNames).index(name, null, false));
+      final int nameId = (kind == ELEM ? elemNames : attrNames).index(name, null, false);
+      table.write2(pre, 1, (nsFlag(pre) ? 1 << 15 : 0) | nameId);
       // write namespace flag
       table.write2(nsPre, 1, (nsFlag || nsFlag(nsPre) ? 1 << 15 : 0) | nameId(nsPre));
     }
@@ -727,19 +725,13 @@ public abstract class Data {
     if(meta.updindex) indexBegin();
     resources.insert(pre, source);
 
-    final int sCount = source.size();
     // resize buffer to cache more entries
+    final int sCount = source.size();
     final int bSize = Math.min(sCount, IO.BLOCKSIZE >> IO.NODEPOWER);
     bufferSize(bSize);
 
-    // find all namespaces in scope to avoid duplicate declarations
-    final TokenMap nsScope = nspaces.scope(par, this);
-
-    // loop through all entries
-    final IntList preStack = new IntList();
-    final NSNode nsCursor = nspaces.cursor();
-    // track existing NSNodes - their PRE values have to be shifted after each tuple insertion
-    final List<NSNode> nsNodeCache = nspaces.cache(pre);
+    // organize namespaces to avoid duplicate declarations
+    final NSScope nsScope = new NSScope(pre, par, this);
 
     // indicates if database only contains a dummy node
     final Data sdata = source.data;
@@ -752,81 +744,58 @@ public abstract class Data {
       final int sSize = sdata.size(sPre, sKind);
       final int sPar = sdata.parent(sPre, sKind);
 
-      // currently processed values
-      final int cPre = pre + c, cDist;
+      // pre and dist value of new node
+      final int nPre = pre + c, nDist;
       if(sPre == sTopPre) {
         // handle top level entry: calculate distance based on target database
-        cDist = cPre - par;
+        nDist = nPre - par;
         // calculate pre value of next top level entry
         sTopPre += sSize;
       } else {
         // handle descendant node: calculate distance based on source database
-        cDist = sPre - sPar;
+        nDist = sPre - sPar;
       }
-
       // documents: use -1 as namespace root
-      final int nsPre = sKind == DOC ? -1 : cPre - cDist;
-      if(c == 0) nspaces.root(nsPre, this);
-      while(!preStack.isEmpty() && preStack.peek() > nsPre) nspaces.close(preStack.pop());
+      final int nsPre = sKind == DOC ? -1 : nPre - nDist;
+      nsScope.loop(nsPre, c);
 
       switch(sKind) {
         case DOC:
           // add document
-          nspaces.open();
-          doc(cPre, sSize, sdata.text(sPre, true));
+          nsScope.open(nPre);
+          doc(nPre, sSize, sdata.text(sPre, true));
           ++meta.ndocs;
-          preStack.push(cPre);
           break;
         case ELEM:
-          // add element. collect and add namespaces that are not in the scope yet
-          final Atts nsp = new Atts();
-          if(sdata.nsFlag(sPre)) {
-            final Atts sNsp = sdata.namespaces(sPre);
-            final int as = sNsp.size();
-            for(int a = 0; a < as; a++) {
-              final byte[] prefix = sNsp.name(a), uri = sNsp.value(a), ancUri = nsScope.get(prefix);
-              if(ancUri == null || !eq(ancUri, uri)) nsp.add(prefix, uri);
-            }
-          }
-          nspaces.open(cPre, nsp);
-
+          // add element.
+          final boolean nsFlag = nsScope.open(nPre, sdata.namespaces(sPre));
           final byte[] en = sdata.name(sPre, sKind);
-          elem(cDist, elemNames.index(en, null, false), sdata.attSize(sPre, sKind), sSize,
-              nspaces.uriId(en, true), !nsp.isEmpty());
-          preStack.push(cPre);
+          elem(nDist, elemNames.index(en, null, false), sdata.attSize(sPre, sKind), sSize,
+              nspaces.uriId(en, true), nsFlag);
           break;
         case TEXT:
         case COMM:
         case PI:
           // add text, comment or processing instruction
-          text(cPre, cDist, sdata.text(sPre, true), sKind);
+          text(nPre, nDist, sdata.text(sPre, true), sKind);
           break;
         case ATTR:
-          // add attribute
-          final byte[] an = sdata.name(sPre, sKind), prefix = prefix(an);
-          // check for new namespace declaration (nsFlag can only be set in standalone attributes)
-          if(sdata.nsFlag(sPre) && nsScope.get(prefix) == null) {
-            final byte[] attUri = sdata.nspaces.uri(sdata.uriId(sPre, sKind));
-            nspaces.add(nsPre, -1, prefix, attUri, this);
-            //nspaces.prepare();
-            //nspaces.add(attPref, attUri, nsPre);
-            //preStack.push(nsPre);
-
-            // assign update flag
-            table.write2(nsPre, 1, nameId(nsPre) | 1 << 15);
+          // add attribute.
+          final byte[] an = sdata.name(sPre, sKind);
+          // extend namespace scope and write namespace flag if namespaces were added
+          if(sdata.nsFlag(sPre)) {
+            final byte[] uri = sdata.nspaces.uri(sdata.uriId(sPre, sKind));
+            if(nsScope.openAttr(nsPre, prefix(an), uri)) {
+              table.write2(nsPre, 1, 1 << 15 | nameId(nsPre));
+            }
           }
-
-          attr(cPre, cDist, attrNames.index(an, null, false), sdata.text(sPre, false),
+          attr(nPre, nDist, attrNames.index(an, null, false), sdata.text(sPre, false),
               nspaces.uriId(an, false), false);
-          break;
       }
-      // propagate pre value shifts to keep namespace structure valid
-      for(final NSNode node : nsNodeCache) node.incrementPre(1);
+      nsScope.shift(1);
     }
-
     // finalize and update namespace structure
-    while(!preStack.isEmpty()) nspaces.close(preStack.pop());
-    nspaces.current(nsCursor);
+    nsScope.close();
 
     // write final entries and reset buffer
     if(bp != 0) insert(pre + c - 1 - (c - 1) % bSize);

@@ -135,6 +135,15 @@ public final class Namespaces {
     return uri.length == 0 ? 0 : uris.id(uri);
   }
 
+  /**
+   * Returns the id of the specified prefix.
+   * @param prefix prefix
+   * @return id, or {@code 0} if no entry is found
+   */
+  public int prefixId(final byte[] prefix) {
+    return prefixes.id(prefix);
+  }
+
   // Requesting Namespaces Based on Context =======================================================
 
   /**
@@ -181,7 +190,7 @@ public final class Namespaces {
   }
 
   /**
-   * Returns all namespace prefixes and uris that are defined for the specified pre value.
+   * Returns all namespace prefixes and uris that are declared for the specified pre value.
    * Should only be called for element nodes.
    * @param pre pre value
    * @param data data reference
@@ -220,10 +229,9 @@ public final class Namespaces {
   }
 
   /**
-   * Finds the nearest namespace node on the ancestor axis of the insert
-   * location and sets it as new root. Possible candidates for this node are collected
-   * and the match with the highest pre value between ancestors and candidates
-   * is determined.
+   * Finds the nearest namespace node on the ancestor axis of the insert location and sets it as new
+   * root. Possible candidates for this node are collected and the match with the highest pre value
+   * between ancestors and candidates is determined.
    * @param pre pre value
    * @param data data reference
    */
@@ -245,28 +253,25 @@ public final class Namespaces {
       // take first candidate from stack
       NSNode curr = cand.remove(0);
       while(ancPre > -1 && node == root) {
-        // this is the new root
-        if(curr.pre() == ancPre) node = curr;
-        // if the current candidate's pre value is lower than the current
-        // ancestor of par or par itself, we have to look for a potential
-        // match for this candidate. therefore we iterate through ancestors
-        // until we find one with a lower than or the same pre value as the
+        // if the current candidate's pre value is lower than the current ancestor of par or par
+        // itself, we have to look for a potential match for this candidate. therefore we iterate
+        // through ancestors until we find one with a lower than or the same pre value as the
         // current candidate.
-        else if(curr.pre() < ancPre) {
-          while((ancPre = data.parent(ancPre, data.kind(ancPre))) > curr.pre());
-          if(curr.pre() == ancPre) node = curr;
+        while(ancPre > curr.pre()) {
+          ancPre = data.parent(ancPre, data.kind(ancPre));
         }
+        // this is the new root
+        if(ancPre == curr.pre()) node = curr;
         // no potential for infinite loop, because dummy root is always a match,
         // in this case ancPre ends iteration
         if(!cand.isEmpty()) curr = cand.remove(0);
       }
     }
 
-    final int uri = uriId(Token.EMPTY, pre, data);
-    defaults.set(level, uri);
-    // remind uri before insert of first node n to connect siblings of n to
-    // according namespace
-    defaults.set(level - 1, uri);
+    final int uriId = uriId(Token.EMPTY, pre, data);
+    defaults.set(level, uriId);
+    // remind uri before insert of first node n to connect siblings of n to according namespace
+    defaults.set(level - 1, uriId);
     cursor = node;
   }
 
@@ -275,8 +280,8 @@ public final class Namespaces {
    * @param pre minimum pre value of a namespace node.
    * @return list of namespace nodes
    */
-  List<NSNode> cache(final int pre) {
-    final List<NSNode> list = new ArrayList<>();
+  ArrayList<NSNode> cache(final int pre) {
+    final ArrayList<NSNode> list = new ArrayList<>();
     addNsNodes(root, list, pre);
     return list;
   }

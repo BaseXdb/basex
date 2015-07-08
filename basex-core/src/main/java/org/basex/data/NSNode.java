@@ -24,7 +24,7 @@ final class NSNode {
   private int size;
   /** Parent node. */
   private NSNode parent;
-  /** Ids of prefix/namespace uri pairs. */
+  /** Dense array with ids of prefix/namespace uri pairs. */
   private int[] values;
   /** Pre value. */
   private int pre;
