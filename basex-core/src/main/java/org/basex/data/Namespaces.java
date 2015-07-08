@@ -271,7 +271,7 @@ public final class Namespaces {
   }
 
   /**
-   * Returns all namespace nodes in the namespace structure with a minimum pre value.
+   * Caches and returns all namespace nodes in the namespace structure with a minimum pre value.
    * @param pre minimum pre value of a namespace node.
    * @return list of namespace nodes
    */
