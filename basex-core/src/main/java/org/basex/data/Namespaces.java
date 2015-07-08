@@ -406,18 +406,18 @@ public final class Namespaces {
    * Adds a namespace for the specified pre value.
    * @param pre pre value
    * @param par parent value
-   * @param pref prefix
+   * @param prefix prefix
    * @param uri namespace uri
    * @param data data reference
    * @return namespace uri id
    */
-  public int add(final int pre, final int par, final byte[] pref, final byte[] uri,
+  public int add(final int pre, final int par, final byte[] prefix, final byte[] uri,
       final Data data) {
 
     // don't store XML namespace
-    if(Token.eq(pref, Token.XML)) return 0;
+    if(Token.eq(prefix, Token.XML)) return 0;
 
-    final int prefId = prefixes.put(pref), uriId = uris.put(uri);
+    final int prefId = prefixes.put(prefix), uriId = uris.put(uri);
     NSNode nd = cursor.find(par, data);
     if(nd.pre() != pre) {
       final NSNode child = new NSNode(pre);
