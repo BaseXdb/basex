@@ -20,7 +20,7 @@ import org.basex.util.list.*;
  */
 public final class Namespaces {
   /** Namespace prefixes. */
-  private final TokenSet prefs;
+  private final TokenSet prefixes;
   /** Namespace URIs. */
   private final TokenSet uris;
   /** Root node. */
@@ -39,7 +39,7 @@ public final class Namespaces {
    * Empty constructor.
    */
   public Namespaces() {
-    prefs = new TokenSet();
+    prefixes = new TokenSet();
     uris = new TokenSet();
     root = new NSNode(-1);
     cursor = root;
@@ -51,7 +51,7 @@ public final class Namespaces {
    * @throws IOException I/O exception
    */
   Namespaces(final DataInput in) throws IOException {
-    prefs = new TokenSet(in);
+    prefixes = new TokenSet(in);
     uris = new TokenSet(in);
     root = new NSNode(in, null);
     cursor = root;
@@ -63,7 +63,7 @@ public final class Namespaces {
    * @throws IOException I/O exception
    */
   void write(final DataOutput out) throws IOException {
-    prefs.write(out);
+    prefixes.write(out);
     uris.write(out);
     root.write(out);
   }
@@ -94,7 +94,7 @@ public final class Namespaces {
    * @return prefix
    */
   public byte[] prefix(final int id) {
-    return prefs.key(id);
+    return prefixes.key(id);
   }
 
   /**
@@ -168,7 +168,7 @@ public final class Namespaces {
    * @return id of the namespace uri
    */
   private int uriId(final byte[] pref, final NSNode node) {
-    final int prefId = prefs.id(pref);
+    final int prefId = prefixes.id(pref);
     if(prefId == 0) return 0;
 
     NSNode nd = node;
@@ -357,7 +357,7 @@ public final class Namespaces {
       final int as = atts.size();
       for(int a = 0; a < as; a++) {
         final byte[] pref = atts.name(a), uri = atts.value(a);
-        final int prefId = prefs.put(pref), uriId = uris.put(uri);
+        final int prefId = prefixes.put(pref), uriId = uris.put(uri);
         node.add(prefId, uriId);
         if(pref.length == 0) defaults.set(level, uriId);
       }
@@ -417,7 +417,7 @@ public final class Namespaces {
     // don't store XML namespace
     if(Token.eq(pref, Token.XML)) return 0;
 
-    final int prefId = prefs.put(pref), uriId = uris.put(uri);
+    final int prefId = prefixes.put(pref), uriId = uris.put(uri);
     NSNode nd = cursor.find(par, data);
     if(nd.pre() != pre) {
       final NSNode child = new NSNode(pre);
