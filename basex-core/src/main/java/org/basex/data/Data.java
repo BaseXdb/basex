@@ -739,7 +739,7 @@ public abstract class Data {
     final IntList preStack = new IntList();
     final NSNode nsCursor = nspaces.cursor();
     // track existing NSNodes - their PRE values have to be shifted after each tuple insertion
-    final List<NSNode> nsNodesShift = nspaces.nsNodes(pre);
+    final List<NSNode> nsNodeCache = nspaces.cache(pre);
 
     // indicates if database only contains a dummy node
     final Data sdata = source.data;
@@ -821,7 +821,7 @@ public abstract class Data {
           break;
       }
       // propagate pre value shifts to keep namespace structure valid
-      for(final NSNode node : nsNodesShift) node.incrementPre(1);
+      for(final NSNode node : nsNodeCache) node.incrementPre(1);
     }
 
     // finalize and update namespace structure

@@ -275,7 +275,7 @@ public final class Namespaces {
    * @param pre minimum pre value of a namespace node.
    * @return list of namespace nodes
    */
-  List<NSNode> nsNodes(final int pre) {
+  List<NSNode> cache(final int pre) {
     final List<NSNode> list = new ArrayList<>();
     addNsNodes(root, list, pre);
     return list;
