@@ -107,6 +107,24 @@ public final class Namespaces {
   }
 
   /**
+   * Returns the id of the specified namespace uri.
+   * @param uri namespace URI
+   * @return id, or {@code 0} if the uri is empty or if no entry is found
+   */
+  public int uriId(final byte[] uri) {
+    return uri.length == 0 ? 0 : uris.id(uri);
+  }
+
+  /**
+   * Returns the id of the specified prefix.
+   * @param prefix prefix
+   * @return id, or {@code 0} if no entry is found
+   */
+  public int prefixId(final byte[] prefix) {
+    return prefixes.id(prefix);
+  }
+
+  /**
    * Returns the default namespace uri for all documents of the database.
    * @return global default namespace, or {@code null} if there is more than one such namespace
    */
@@ -127,21 +145,23 @@ public final class Namespaces {
   }
 
   /**
-   * Returns the id of the specified namespace uri.
-   * @param uri namespace URI
-   * @return id, or {@code 0} if the uri is empty or if no entry is found
-   */
-  public int uriId(final byte[] uri) {
-    return uri.length == 0 ? 0 : uris.id(uri);
-  }
-
-  /**
-   * Returns the id of the specified prefix.
+   * Returns the id of a namespace uri for the specified prefix and node,
+   * or {@code 0} if no namespace is found.
    * @param prefix prefix
-   * @return id, or {@code 0} if no entry is found
+   * @param node node to start with
+   * @return id of the namespace uri
    */
-  public int prefixId(final byte[] prefix) {
-    return prefixes.id(prefix);
+  private int uriId(final byte[] prefix, final NSNode node) {
+    final int prefId = prefixes.id(prefix);
+    if(prefId == 0) return 0;
+
+    NSNode nd = node;
+    while(nd != null) {
+      final int uriId = nd.uri(prefId);
+      if(uriId != 0) return uriId;
+      nd = nd.parent();
+    }
+    return 0;
   }
 
   // Requesting Namespaces Based on Context =======================================================
@@ -170,26 +190,6 @@ public final class Namespaces {
   }
 
   /**
-   * Returns the id of a namespace uri for the specified prefix and node,
-   * or {@code 0} if no namespace is found.
-   * @param pref prefix
-   * @param node node to start with
-   * @return id of the namespace uri
-   */
-  private int uriId(final byte[] pref, final NSNode node) {
-    final int prefId = prefixes.id(pref);
-    if(prefId == 0) return 0;
-
-    NSNode nd = node;
-    while(nd != null) {
-      final int uriId = nd.uri(prefId);
-      if(uriId != 0) return uriId;
-      nd = nd.parent();
-    }
-    return 0;
-  }
-
-  /**
    * Returns all namespace prefixes and uris that are declared for the specified pre value.
    * Should only be called for element nodes.
    * @param pre pre value
@@ -200,32 +200,8 @@ public final class Namespaces {
     final Atts as = new Atts();
     final int[] values = cursor.find(pre, data).values();
     final int nl = values.length;
-    for(int n = 0; n < nl; n += 2) {
-      as.add(prefix(values[n]), uri(values[n + 1]));
-    }
+    for(int n = 0; n < nl; n += 2) as.add(prefix(values[n]), uri(values[n + 1]));
     return as;
-  }
-
-  /**
-   * Returns a map with all namespaces that are valid for the specified pre value.
-   * @param pre pre value
-   * @param data data reference
-   * @return scope
-   */
-  TokenMap scope(final int pre, final Data data) {
-    final TokenMap nsScope = new TokenMap();
-    NSNode node = cursor;
-    do {
-      final int[] values = node.values();
-      final int vl = values.length;
-      for(int v = 0; v < vl; v += 2) {
-        nsScope.put(prefix(values[v]), uri(values[v + 1]));
-      }
-      final int pos = node.find(pre);
-      if(pos < 0) break;
-      node = node.child(pos);
-    } while(pre < node.pre() + data.size(node.pre(), Data.ELEM));
-    return nsScope;
   }
 
   /**
@@ -238,30 +214,28 @@ public final class Namespaces {
   void root(final int pre, final Data data) {
     // collect possible candidates for namespace root
     final List<NSNode> cand = new LinkedList<>();
-    NSNode node = root;
-    cand.add(node);
-    for(int p; (p = node.find(pre)) > -1;) {
+    NSNode nd = root;
+    cand.add(nd);
+    for(int p; (p = nd.find(pre)) > -1;) {
       // add candidate to stack
-      node = node.child(p);
-      cand.add(0, node);
+      nd = nd.child(p);
+      cand.add(0, nd);
     }
 
-    node = root;
+    nd = root;
     if(cand.size() > 1) {
       // compare candidates to ancestors of pre value
       int ancPre = pre;
       // take first candidate from stack
       NSNode curr = cand.remove(0);
-      while(ancPre > -1 && node == root) {
+      while(ancPre > -1 && nd == root) {
         // if the current candidate's pre value is lower than the current ancestor of par or par
         // itself, we have to look for a potential match for this candidate. therefore we iterate
         // through ancestors until we find one with a lower than or the same pre value as the
         // current candidate.
-        while(ancPre > curr.pre()) {
-          ancPre = data.parent(ancPre, data.kind(ancPre));
-        }
+        while(ancPre > curr.pre()) ancPre = data.parent(ancPre, data.kind(ancPre));
         // this is the new root
-        if(ancPre == curr.pre()) node = curr;
+        if(ancPre == curr.pre()) nd = curr;
         // no potential for infinite loop, because dummy root is always a match,
         // in this case ancPre ends iteration
         if(!cand.isEmpty()) curr = cand.remove(0);
@@ -270,9 +244,9 @@ public final class Namespaces {
 
     final int uriId = uriId(Token.EMPTY, pre, data);
     defaults.set(level, uriId);
-    // remind uri before insert of first node n to connect siblings of n to according namespace
+    // remember uri before insert of first node n to connect siblings of n to according namespace
     defaults.set(level - 1, uriId);
-    cursor = node;
+    cursor = nd;
   }
 
   /**
@@ -282,43 +256,25 @@ public final class Namespaces {
    */
   ArrayList<NSNode> cache(final int pre) {
     final ArrayList<NSNode> list = new ArrayList<>();
-    addNsNodes(root, list, pre);
+    addNodes(root, list, pre);
     return list;
   }
 
   /**
-   * Recursively adds namespace nodes to the given list, starting at the children of the given node.
-   * @param curr current namespace node
+   * Recursively adds namespace nodes to the a list, starting with the children of a node.
+   * @param node current namespace node
    * @param list list with namespace nodes
    * @param pre pre value
    */
-  private static void addNsNodes(final NSNode curr, final List<NSNode> list, final int pre) {
-    final int sz = curr.children();
-    int i = find(curr, pre);
-    while(i > 0 && (i == sz || curr.child(i).pre() >= pre)) i--;
+  private static void addNodes(final NSNode node, final List<NSNode> list, final int pre) {
+    final int sz = node.children();
+    int i = Math.max(0, node.find(pre));
+    while(i > 0 && (i == sz || node.child(i).pre() >= pre)) i--;
     for(; i < sz; i++) {
-      final NSNode ch = curr.child(i);
-      if(ch.pre() >= pre) list.add(ch);
-      addNsNodes(ch, list, pre);
+      final NSNode child = node.child(i);
+      if(child.pre() >= pre) list.add(child);
+      addNodes(child, list, pre);
     }
-  }
-
-  /**
-   * Returns the index of the specified pre value.
-   * @param curr current namespace node
-   * @param pre int pre value
-   * @return index, or possible insertion position
-   */
-  private static int find(final NSNode curr, final int pre) {
-    // binary search
-    int l = 0, h = curr.children() - 1;
-    while(l <= h) {
-      final int m = l + h >>> 1, c = curr.child(m).pre() - pre;
-      if(c == 0) return m;
-      if(c < 0) l = m + 1;
-      else h = m - 1;
-    }
-    return l;
   }
 
   // Updating Namespaces ==========================================================================
@@ -355,15 +311,15 @@ public final class Namespaces {
   public void open(final int pre, final Atts atts) {
     open();
     if(!atts.isEmpty()) {
-      final NSNode node = new NSNode(pre);
-      cursor.add(node);
-      cursor = node;
+      final NSNode nd = new NSNode(pre);
+      cursor.add(nd);
+      cursor = nd;
 
       final int as = atts.size();
       for(int a = 0; a < as; a++) {
         final byte[] pref = atts.name(a), uri = atts.value(a);
         final int prefId = prefixes.put(pref), uriId = uris.put(uri);
-        node.add(prefId, uriId);
+        nd.add(prefId, uriId);
         if(pref.length == 0) defaults.set(level, uriId);
       }
     }
@@ -375,9 +331,9 @@ public final class Namespaces {
    */
   public void close(final int pre) {
     while(cursor.pre() >= pre) {
-      final NSNode par = cursor.parent();
-      if(par == null) break;
-      cursor = par;
+      final NSNode nd = cursor.parent();
+      if(nd == null) break;
+      cursor = nd;
     }
     --level;
   }
@@ -414,7 +370,7 @@ public final class Namespaces {
    * @param prefix prefix
    * @param uri namespace uri
    * @param data data reference
-   * @return namespace uri id
+   * @return id of namespace uri
    */
   public int add(final int pre, final int par, final byte[] prefix, final byte[] uri,
       final Data data) {

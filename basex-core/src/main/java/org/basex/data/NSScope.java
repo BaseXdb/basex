@@ -49,13 +49,13 @@ final class NSScope {
 
   /**
    * Returns the id of a namespace uri.
-   * @param prefId prefix id
+   * @param prefixId prefix id
    * @return id of namespace uri, or {@code 0}
    */
-  int uriId(final int prefId) {
+  int uriId(final int prefixId) {
     for(int s = values.size() - 1; s > 0; s--) {
       final int uriId = values.get(s);
-      if(uriId != -1 && values.get(--s) == prefId) return uriId;
+      if(uriId != -1 && values.get(--s) == prefixId) return uriId;
     }
     return 0;
   }
@@ -102,11 +102,16 @@ final class NSScope {
     for(int a = 0; a < as; a++) {
       final byte[] prefix = nsp.name(a), uri = nsp.value(a);
       final int uriId = uriId(nspaces.prefixId(prefix));
-      if(uriId == 0 || uriId != nspaces.uriId(uri)) ns.add(prefix, uri);
+      if(uriId == 0 || uriId != nspaces.uriId(uri)) {
+        ns.add(prefix, uri);
+      }
     }
     nspaces.open(pre, ns);
     preStack.push(pre);
-
+    for(int a = 0; a < as; a++) {
+      values.add(nspaces.prefixId(nsp.name(a)));
+      values.add(nspaces.uriId(nsp.value(a)));
+    }
     return !ns.isEmpty();
   }
 

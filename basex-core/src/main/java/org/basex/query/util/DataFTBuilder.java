@@ -11,7 +11,7 @@ import org.basex.util.*;
 import org.basex.util.ft.*;
 
 /**
- * Class for constructing decorated full-text nodes.
+ * Constructor for marked full-text results.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
@@ -23,15 +23,28 @@ final class DataFTBuilder {
   private final FTPosData pos;
   /** Length of full-text extract. */
   private final int len;
+  /** Id of marker element name. */
+  private final int name;
 
   /**
    * Constructor.
    * @param pos full-text position data
    * @param len length of extract
+   * @param name id of marker element name
    */
-  DataFTBuilder(final FTPosData pos, final int len) {
+  DataFTBuilder(final FTPosData pos, final int len, final int name) {
     this.pos = pos;
     this.len = len;
+    this.name = name;
+  }
+
+
+  /**
+   * Returns the id of the marker element name.
+   * @return id
+   */
+  int name() {
+    return name;
   }
 
   /**

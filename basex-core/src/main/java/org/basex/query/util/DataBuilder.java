@@ -16,7 +16,7 @@ import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
- * Class for building memory-based database nodes.
+ * Data builder. Provides methods for copying XML nodes into a main-memory database instance.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
@@ -24,10 +24,8 @@ import org.basex.util.*;
 public final class DataBuilder {
   /** Target data instance. */
   private final MemData data;
-  /** Full-text position data. */
+  /** Full-text result builder. */
   private DataFTBuilder ftbuilder;
-  /** Index reference of marker element. */
-  private int name;
 
   /**
    * Constructor.
@@ -45,13 +43,12 @@ public final class DataBuilder {
    * @return self reference
    */
   public DataBuilder ftpos(final byte[] nm, final FTPosData pos, final int len) {
-    ftbuilder = new DataFTBuilder(pos, len);
-    name = data.elemNames.index(nm, null, false);
+    ftbuilder = new DataFTBuilder(pos, len, data.elemNames.index(nm, null, false));
     return this;
   }
 
   /**
-   * Fills the data instance with the specified node.
+   * Adds database entries for the specified node.
    * @param node node
    */
   public void build(final ANode node) {
@@ -59,18 +56,17 @@ public final class DataBuilder {
   }
 
   /**
-   * Fills the data instance with the specified nodes.
+   * Adds database entries for the specified nodes.
    * @param nodes node list
    */
   public void build(final ANodeList nodes) {
     data.meta.update();
-    int tPre = data.meta.size;
-    for(final ANode n : nodes) tPre = addNode(n, tPre, -1, null);
+    int next = data.meta.size;
+    for(final ANode n : nodes) next = addNode(n, next, -1, null);
   }
 
   /**
-   * Adds a fragment to a database instance.
-   * Document nodes are ignored.
+   * Adds a node.
    * @param node node to be added
    * @param pre node position
    * @param par node parent
@@ -96,15 +92,14 @@ public final class DataBuilder {
    * @return pre value of next node
    */
   private int addDoc(final ANode node, final int pre) {
-    final int tPre = data.meta.size;
-    final int s = size(node, false);
-    data.doc(tPre, s, node.baseURI());
-    data.insert(tPre);
-    int p = pre + 1;
-    final BasicNodeIter iter = node.children();
-    for(ANode ch; (ch = iter.next()) != null;) p = addNode(ch, p, pre, null);
-    if(s != p - pre) data.size(tPre, Data.DOC, p - pre);
-    return p;
+    final int last = data.meta.size;
+    final int size = size(node, false);
+    data.doc(last, size, node.baseURI());
+    data.insert(last);
+    int next = pre + 1;
+    for(final ANode child : node.children()) next = addNode(child, next, pre, null);
+    if(size != next - pre) data.size(last, Data.DOC, next - pre);
+    return next;
   }
 
   /**
@@ -112,21 +107,21 @@ public final class DataBuilder {
    * @param node node to be added
    * @param pre pre reference
    * @param par parent reference
-   * @return number of added nodes
+   * @return pre value of next node
    */
   private int addAttr(final ANode node, final int pre, final int par) {
-    final int tPre = data.meta.size;
+    final int last = data.meta.size;
     final QNm qname = node.qname();
     final byte[] uri = qname.uri();
-    // standalone attribute (no parent): create new namespace entry
+    // create new namespace entry if this is a standalone attribute
     final int uriId = uri.length == 0 ? 0 : par != -1 ? data.nspaces.uriId(uri) :
-      data.nspaces.add(tPre, pre + 1, qname.prefix(), uri, data);
+      data.nspaces.add(last, pre + 1, qname.prefix(), uri, data);
 
     final int nameId = data.attrNames.index(qname.string(), null, false);
     // usually, attributes cannot have namespace flags.
     // this is different here, because a standalone attribute has no parent element.
-    data.attr(tPre, pre - par, nameId, node.string(), uriId, par == -1 && uriId != 0);
-    data.insert(tPre);
+    data.attr(last, pre - par, nameId, node.string(), uriId, par == -1 && uriId != 0);
+    data.insert(last);
     return pre + 1;
   }
 
@@ -142,9 +137,12 @@ public final class DataBuilder {
     // check full-text mode
     int dist = pre - par;
     final ArrayList<DataFTMarker> marks = ftbuilder != null ? ftbuilder.build(node) : null;
-    if(marks == null) return pre + addText(node.string(), dist);
+    if(marks == null) {
+      addText(node.string(), dist);
+      return pre + 1;
+    }
 
-    // adopt namespace from parent
+    // adopt namespace from ancestor
     ANode p = pNode;
     while(p != null) {
       final QNm n = p.qname();
@@ -157,7 +155,7 @@ public final class DataBuilder {
     for(final DataFTMarker marker : marks) {
       if(marker.mark) {
         // open element
-        data.elem(dist++, name, 1, 2, u, false);
+        data.elem(dist++, ftbuilder.name(), 1, 2, u, false);
         data.insert(data.meta.size);
         ts++;
       }
@@ -171,13 +169,11 @@ public final class DataBuilder {
    * Adds a text.
    * @param text text node
    * @param dist distance
-   * @return number of added nodes
    */
-  private int addText(final byte[] text, final int dist) {
-    final int tPre = data.meta.size;
-    data.text(tPre, dist, text, Data.TEXT);
-    data.insert(tPre);
-    return 1;
+  private void addText(final byte[] text, final int dist) {
+    final int last = data.meta.size;
+    data.text(last, dist, text, Data.TEXT);
+    data.insert(last);
   }
 
   /**
@@ -185,13 +181,13 @@ public final class DataBuilder {
    * @param node node to be added
    * @param pre pre reference
    * @param par parent reference
-   * @return number of added nodes
+   * @return pre value of next node
    */
   private int addPI(final ANode node, final int pre, final int par) {
-    final int tPre = data.meta.size;
+    final int last = data.meta.size;
     final byte[] value = trim(concat(node.name(), SPACE, node.string()));
-    data.text(tPre, pre - par, value, Data.PI);
-    data.insert(tPre);
+    data.text(last, pre - par, value, Data.PI);
+    data.insert(last);
     return pre + 1;
   }
 
@@ -200,12 +196,12 @@ public final class DataBuilder {
    * @param node node to be added
    * @param pre pre reference
    * @param par parent reference
-   * @return number of added nodes
+   * @return pre value of next node
    */
   private int addComm(final ANode node, final int pre, final int par) {
-    final int tPre = data.meta.size;
-    data.text(tPre, pre - par, node.string(), Data.COMM);
-    data.insert(tPre);
+    final int last = data.meta.size;
+    data.text(last, pre - par, node.string(), Data.COMM);
+    data.insert(last);
     return pre + 1;
   }
 
@@ -217,11 +213,11 @@ public final class DataBuilder {
    * @return pre value of next node
    */
   private int addElem(final ANode node, final int pre, final int par) {
-    final int tPre = data.meta.size;
+    final int last = data.meta.size;
 
     // add new namespaces
     final Atts ns = par == -1 ? node.nsScope(null) : node.namespaces();
-    data.nspaces.open(tPre, ns);
+    data.nspaces.open(last, ns);
 
     // collect node name properties
     final QNm qname = node.qname();
@@ -231,25 +227,23 @@ public final class DataBuilder {
 
     // add element node
     data.elem(pre - par, nameId, asize, size, uriId, !ns.isEmpty());
-    data.insert(tPre);
+    data.insert(last);
 
     // add attributes and child nodes
     int cPre = pre + 1;
-    BasicNodeIter iter = node.attributes();
-    for(ANode ch; (ch = iter.next()) != null;) cPre = addAttr(ch, cPre, pre);
-    iter = node.children();
-    for(ANode ch; (ch = iter.next()) != null;) cPre = addNode(ch, cPre, pre, node);
+    for(final ANode attr : node.attributes()) cPre = addAttr(attr, cPre, pre);
+    for(final ANode child : node.children()) cPre = addNode(child, cPre, pre, node);
 
     // finalize namespace structure
-    data.nspaces.close(tPre);
+    data.nspaces.close(last);
 
     // update size if additional nodes have been added by the descendants
-    if(size != cPre - pre) data.size(tPre, Data.ELEM, cPre - pre);
+    if(size != cPre - pre) data.size(last, Data.ELEM, cPre - pre);
     return cPre;
   }
 
   /**
-   * Determines the number of descendants of a fragment.
+   * Returns the number of descendants of a fragment, including the node itself.
    * @param node fragment node
    * @param att count attributes instead of elements
    * @return number of descendants + 1 or attribute size + 1
@@ -267,8 +261,7 @@ public final class DataBuilder {
     BasicNodeIter iter = node.attributes();
     while(iter.next() != null) ++size;
     if(!att) {
-      iter = node.children();
-      for(ANode i; (i = iter.next()) != null;) size += size(i, false);
+      for(final ANode child : node.children()) size += size(child, false);
     }
     return size;
   }

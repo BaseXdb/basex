@@ -669,7 +669,7 @@ public abstract class Data {
       kind = kind(par);
     }
 
-    // delete namespace nodes and propagate PRE value shifts (before node sizes are touched!)
+    // delete namespace nodes and propagate pre value shifts (before node sizes are touched!)
     nspaces.delete(pre, size, this);
 
     // reduce size of ancestors
@@ -895,8 +895,7 @@ public abstract class Data {
   }
 
   /**
-   * Inserts the internal buffer to the storage
-   * without updating the table structure.
+   * Inserts the internal buffer to the storage without updating the table structure.
    * @param pre insert position
    */
   public final void insert(final int pre) {

@@ -143,13 +143,28 @@ final class NSNode {
   int find(final int p) {
     int l = 0, h = size - 1;
     while(l <= h) { // binary search
-      final int m = l + h >>> 1;
-      final int v = nodes[m].pre;
+      final int m = l + h >>> 1, v = nodes[m].pre;
       if(v == p) return m;
       if(v < p) l = m + 1;
       else h = m - 1;
     }
     return l - 1;
+  }
+
+  /**
+   * Returns the index of the specified pre value.
+   * @param p int pre value
+   * @return index, or possible insertion position
+   */
+  int find2(final int p) {
+    int l = 0, h = size - 1;
+    while(l <= h) { // binary search
+      final int m = l + h >>> 1, v = nodes[m].pre;
+      if(v == p) return m;
+      if(v < p) l = m + 1;
+      else h = m - 1;
+    }
+    return l;
   }
 
   /**
@@ -189,7 +204,6 @@ final class NSNode {
 
     // if all nodes are deleted, just create an empty array
     if(size == 0) nodes = new NSNode[0];
-
     // otherwise remove nodes from the child array
     else if(num > 0) System.arraycopy(nodes, d + num, nodes, d, size - d);
   }
@@ -248,7 +262,7 @@ final class NSNode {
    */
   void decrementPre(final int start, final int diff) {
     if(pre >= start + diff) pre -= diff;
-    for(int c = 0; c < size; c++) child(c).decrementPre(start, diff);
+    for(int c = 0; c < size; c++) nodes[c].decrementPre(start, diff);
   }
 
   /**
@@ -326,7 +340,7 @@ final class NSNode {
       }
       if(!prfs.contains(pref)) prfs.add(pref);
     }
-    for(final NSNode child : nodes) child.info(map, ns);
+    for(int c = 0; c < size; ++c) nodes[c].info(map, ns);
   }
 
   /**
