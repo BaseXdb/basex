@@ -653,7 +653,7 @@ public class Options implements Iterable<Option<?>> {
         if(l == ls || !lines.get(l++).equals(line)) return true;
       }
     }
-    return l == ls;
+    return l != ls;
   }
 
   /**
