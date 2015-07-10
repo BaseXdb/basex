@@ -158,7 +158,7 @@ public final class Namespaces {
   }
 
   /**
-   * Returns the id of a namespace uri for an element/attribute name and a specific pre value.
+   * Returns the id of a namespace uri for the specified prefix and pre value.
    * @param prefix prefix
    * @param pre pre value
    * @param data data reference
