@@ -123,7 +123,7 @@ public final class MemBuilder extends Builder {
 
   @Override
   protected void addAttr(final int nameId, final byte[] value, final int dist, final int uriId) {
-    data.attr(meta.size, dist, nameId, value, uriId, false);
+    data.attr(meta.size, dist, nameId, value, uriId);
     data.insert(meta.size);
   }
 

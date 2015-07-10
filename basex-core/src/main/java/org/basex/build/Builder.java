@@ -284,17 +284,19 @@ public abstract class Builder extends Proc {
     // get and store element references
     final int dis = level == 0 ? 1 : pre - parStack.get(level - 1);
     final int as = atts.size();
-    int uriId = nspaces.uriId(name, true);
-    if(uriId == 0 && indexOf(name, ':') != -1 && !eq(prefix(name), XML))
+    final byte[] pref = prefix(name);
+    int uriId = nspaces.uriIdForPrefix(pref, true);
+    if(uriId == 0 && pref.length != 0 && !eq(pref, XML))
       throw new BuildException(WHICHNS, parser.detail(), prefix(name));
     addElem(dis, nameId, Math.min(IO.MAXATTS, as + 1), uriId, !nsp.isEmpty());
 
     // get and store attribute references
     for(int a = 0; a < as; ++a) {
       final byte[] an = atts.name(a), av = atts.value(a);
+      final byte[] ap = prefix(an);
       nameId = attrNames.index(an, av, true);
-      uriId = nspaces.uriId(an, false);
-      if(uriId == 0 && indexOf(an, ':') != -1 && !eq(prefix(an), XML))
+      uriId = nspaces.uriIdForPrefix(ap, false);
+      if(uriId == 0 && ap.length != 0 && !eq(ap, XML))
         throw new BuildException(WHICHNS, parser.detail(), an);
 
       path.put(nameId, Data.ATTR, level + 1, av, meta);

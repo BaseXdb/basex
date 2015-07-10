@@ -116,7 +116,7 @@ final class NSNode {
    * @return node
    */
   NSNode find(final int p, final Data data) {
-    // return this node if the pre values of all children are bigger than the searched value
+    // return this node if the pre values of all children are greater than the searched value
     final int s = find(p);
     if(s == -1) return this;
 

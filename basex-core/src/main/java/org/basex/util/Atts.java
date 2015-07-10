@@ -10,9 +10,9 @@ import org.basex.util.list.*;
  */
 public final class Atts extends ElementList {
   /** Name array. */
-  private byte[][] nm = new byte[1][];
+  private byte[][] nm;
   /** Value array. */
-  private byte[][] vl = new byte[1][];
+  private byte[][] vl;
 
   /**
    * Default constructor.

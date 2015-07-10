@@ -665,8 +665,8 @@ public class Options implements Iterable<Option<?>> {
    * @throws BaseXException database exception
    * @throws QueryException query exception
    */
-  private synchronized boolean assign(final String name, final Item item,
-      final boolean error) throws BaseXException, QueryException {
+  private synchronized boolean assign(final String name, final Item item, final boolean error)
+      throws BaseXException, QueryException {
 
     final Option<?> option = options.get(name);
     if(option == null) {

@@ -279,8 +279,8 @@ final class DataUpdates {
       if(data.kind(pre) == Data.ATTR) {
         final byte[] nm = data.name(pre, Data.ATTR);
         final QNm name = new QNm(nm);
-        final byte[] uri = data.nspaces.uri(data.nspaces.uriId(nm, pre, data));
-        if(uri != null) name.uri(uri);
+        final int uriId = data.nspaces.uriIdForPrefix(Token.prefix(nm), pre, data);
+        if(uriId != 0) name.uri(data.nspaces.uri(uriId));
         pool.add(name, NodeType.ATT);
         il.add(pre);
       } else {
@@ -289,8 +289,8 @@ final class DataUpdates {
           final byte[] nm = data.name(p, Data.ATTR);
           if(!il.contains(p)) {
             final QNm name = new QNm(nm);
-            final byte[] uri = data.nspaces.uri(data.nspaces.uriId(nm, p, data));
-            if(uri != null) name.uri(uri);
+            final int uriId = data.nspaces.uriIdForPrefix(Token.prefix(nm), p, data);
+            if(uriId != 0) name.uri(data.nspaces.uri(uriId));
             pool.add(name, NodeType.ATT);
           }
         }
