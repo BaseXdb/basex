@@ -62,7 +62,7 @@ public final class DataBuilder {
   public void build(final ANodeList nodes) {
     data.meta.update();
     int next = data.meta.size;
-    for(final ANode n : nodes) next = addNode(n, next, -1, null);
+    for(final ANode n : nodes) next = addNode(n, next, -1);
   }
 
   /**
@@ -70,14 +70,13 @@ public final class DataBuilder {
    * @param node node to be added
    * @param pre node position
    * @param par node parent
-   * @param pNode parent of node to be added
    * @return pre value of next node
    */
-  private int addNode(final ANode node, final int pre, final int par, final ANode pNode) {
+  private int addNode(final ANode node, final int pre, final int par) {
     switch(node.nodeType()) {
       case DOC: return addDoc(node, pre);
       case ELM: return addElem(node, pre, par);
-      case TXT: return addText(node, pre, par, pNode);
+      case TXT: return addText(node, pre, par);
       case ATT: return addAttr(node, pre, par);
       case COM: return addComm(node, pre, par);
       // will always be processing instruction
@@ -97,7 +96,7 @@ public final class DataBuilder {
     data.doc(last, size, node.baseURI());
     data.insert(last);
     int next = pre + 1;
-    for(final ANode child : node.children()) next = addNode(child, next, pre, null);
+    for(final ANode child : node.children()) next = addNode(child, next, pre);
     if(size != next - pre) data.size(last, Data.DOC, next - pre);
     return next;
   }
@@ -118,9 +117,7 @@ public final class DataBuilder {
       data.nspaces.add(last, pre + 1, qname.prefix(), uri, data);
 
     final int nameId = data.attrNames.index(qname.string(), null, false);
-    // usually, attributes cannot have namespace flags.
-    // this is different here, because a standalone attribute has no parent element.
-    data.attr(last, pre - par, nameId, node.string(), uriId, par == -1 && uriId != 0);
+    data.attr(last, pre - par, nameId, node.string(), uriId);
     data.insert(last);
     return pre + 1;
   }
@@ -130,10 +127,9 @@ public final class DataBuilder {
    * @param node node to be added
    * @param pre pre reference
    * @param par parent reference
-   * @param pNode parent node
    * @return pre value of next node
    */
-  private int addText(final ANode node, final int pre, final int par, final ANode pNode) {
+  private int addText(final ANode node, final int pre, final int par) {
     // check full-text mode
     int dist = pre - par;
     final ArrayList<DataFTMarker> marks = ftbuilder != null ? ftbuilder.build(node) : null;
@@ -143,19 +139,12 @@ public final class DataBuilder {
     }
 
     // adopt namespace from ancestor
-    ANode p = pNode;
-    while(p != null) {
-      final QNm n = p.qname();
-      if(n != null && !n.hasPrefix()) break;
-      p = p.parent();
-    }
-    final int u = p == null ? 0 : data.nspaces.uriId(p.name(), true);
-
+    final int uriId = data.nspaces.uriIdForPrefix(EMPTY, true);
     int ts = marks.size();
     for(final DataFTMarker marker : marks) {
       if(marker.mark) {
         // open element
-        data.elem(dist++, ftbuilder.name(), 1, 2, u, false);
+        data.elem(dist++, ftbuilder.name(), 1, 2, uriId, false);
         data.insert(data.meta.size);
         ts++;
       }
@@ -232,7 +221,7 @@ public final class DataBuilder {
     // add attributes and child nodes
     int cPre = pre + 1;
     for(final ANode attr : node.attributes()) cPre = addAttr(attr, cPre, pre);
-    for(final ANode child : node.children()) cPre = addNode(child, cPre, pre, node);
+    for(final ANode child : node.children()) cPre = addNode(child, cPre, pre);
 
     // finalize namespace structure
     data.nspaces.close(last);

@@ -109,10 +109,10 @@ public final class Namespaces {
   /**
    * Returns the id of the specified namespace uri.
    * @param uri namespace URI
-   * @return id, or {@code 0} if the uri is empty or if no entry is found
+   * @return id, or {@code 0} if no entry is found
    */
   public int uriId(final byte[] uri) {
-    return uri.length == 0 ? 0 : uris.id(uri);
+    return uris.id(uri);
   }
 
   /**
@@ -144,6 +144,30 @@ public final class Namespaces {
     return uri(values[1]);
   }
 
+  // Requesting Namespaces Based on Context =======================================================
+
+  /**
+   * Returns the id of a namespace uri for the specified prefix.
+   * @param prefix prefix
+   * @param element indicates if this is an element or attribute name
+   * @return id of namespace uri, or {@code 0} if no entry is found
+   */
+  public int uriIdForPrefix(final byte[] prefix, final boolean element) {
+    if(isEmpty()) return 0;
+    return prefix.length != 0 ? uriId(prefix, cursor) : element ? defaults.get(level) : 0;
+  }
+
+  /**
+   * Returns the id of a namespace uri for the specified prefix and pre value.
+   * @param prefix prefix
+   * @param pre pre value
+   * @param data data reference
+   * @return id of namespace uri, or {@code 0} if no entry is found
+   */
+  public int uriIdForPrefix(final byte[] prefix, final int pre, final Data data) {
+    return uriId(prefix, cursor.find(pre, data));
+  }
+
   /**
    * Returns the id of a namespace uri for the specified prefix and node,
    * or {@code 0} if no namespace is found.
@@ -162,31 +186,6 @@ public final class Namespaces {
       nd = nd.parent();
     }
     return 0;
-  }
-
-  // Requesting Namespaces Based on Context =======================================================
-
-  /**
-   * Returns the id of a namespace uri for the specified element/attribute name.
-   * @param name element/attribute name
-   * @param element indicates if this is an element or attribute name
-   * @return id of namespace uri, or {@code 0} if no entry is found
-   */
-  public int uriId(final byte[] name, final boolean element) {
-    if(isEmpty()) return 0;
-    final byte[] pref = Token.prefix(name);
-    return pref.length != 0 ? uriId(pref, cursor) : element ? defaults.get(level) : 0;
-  }
-
-  /**
-   * Returns the id of a namespace uri for an element/attribute name and a specific pre value.
-   * @param name element/attribute name
-   * @param pre pre value
-   * @param data data reference
-   * @return id of namespace uri, or {@code 0} if no entry is found
-   */
-  public int uriId(final byte[] name, final int pre, final Data data) {
-    return uriId(Token.prefix(name), cursor.find(pre, data));
   }
 
   /**
@@ -242,7 +241,7 @@ public final class Namespaces {
       }
     }
 
-    final int uriId = uriId(Token.EMPTY, pre, data);
+    final int uriId = uriIdForPrefix(Token.EMPTY, pre, data);
     defaults.set(level, uriId);
     // remember uri before insert of first node n to connect siblings of n to according namespace
     defaults.set(level - 1, uriId);

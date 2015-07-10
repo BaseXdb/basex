@@ -527,7 +527,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
    */
   private static DataClip clipA(final Data d, final String name, final String value) {
     final int s = d.meta.size;
-    d.attr(s, s + 1, d.attrNames.index(token(name), null, false), token(value), -1, false);
+    d.attr(s, s + 1, d.attrNames.index(token(name), null, false), token(value), -1);
     d.insert(s);
     return new DataClip(d, s, d.meta.size);
   }

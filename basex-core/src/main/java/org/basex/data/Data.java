@@ -509,10 +509,11 @@ public abstract class Data {
       updateText(pre, trim(concat(name, SPACE, atom(pre))), PI);
     } else {
       // update/set namespace reference
-      final int oldUriId = nspaces.uriId(name, pre, this);
+      final byte[] prefix = prefix(name);
+      final int oldUriId = nspaces.uriIdForPrefix(prefix, pre, this);
       final boolean nsFlag = oldUriId == 0 && uri.length != 0;
       final int nsPre = kind == ATTR ? parent(pre, kind) : pre;
-      final int uriId = nsFlag ? nspaces.add(nsPre, nsPre, prefix(name), uri, this) :
+      final int uriId = nsFlag ? nspaces.add(nsPre, nsPre, prefix, uri, this) :
         oldUriId != 0 && eq(nspaces.uri(oldUriId), uri) ? oldUriId : 0;
 
       // write namespace uri reference
@@ -591,7 +592,7 @@ public abstract class Data {
           // add element
           final byte[] en = sData.name(sPre, sKind);
           elem(cDist, elemNames.index(en, null, false), sData.attSize(sPre, sKind), sSize,
-              nspaces.uriId(en, true), false);
+              nspaces.uriIdForPrefix(prefix(en), true), false);
           break;
         case TEXT:
         case COMM:
@@ -603,7 +604,7 @@ public abstract class Data {
           // add attribute
           final byte[] an = sData.name(sPre, sKind);
           attr(cPre, cDist, attrNames.index(an, null, false), sData.text(sPre, false),
-              nspaces.uriId(an, false), false);
+              nspaces.uriIdForPrefix(prefix(an), false));
           break;
       }
     }
@@ -731,7 +732,7 @@ public abstract class Data {
     bufferSize(bSize);
 
     // organize namespaces to avoid duplicate declarations
-    final NSScope nsScope = new NSScope(pre, par, this);
+    final NSScope nsScope = new NSScope(pre, this);
 
     // indicates if database only contains a dummy node
     final Data sdata = source.data;
@@ -771,7 +772,7 @@ public abstract class Data {
           final boolean nsFlag = nsScope.open(nPre, sdata.namespaces(sPre));
           final byte[] en = sdata.name(sPre, sKind);
           elem(nDist, elemNames.index(en, null, false), sdata.attSize(sPre, sKind), sSize,
-              nspaces.uriId(en, true), nsFlag);
+              nspaces.uriIdForPrefix(prefix(en), true), nsFlag);
           break;
         case TEXT:
         case COMM:
@@ -782,15 +783,13 @@ public abstract class Data {
         case ATTR:
           // add attribute.
           final byte[] an = sdata.name(sPre, sKind);
-          // extend namespace scope and write namespace flag if namespaces were added
-          if(sdata.nsFlag(sPre)) {
-            final byte[] uri = sdata.nspaces.uri(sdata.uriId(sPre, sKind));
-            if(nsScope.openAttr(nsPre, prefix(an), uri)) {
-              table.write2(nsPre, 1, 1 << 15 | nameId(nsPre));
-            }
+          final int uriId = sdata.uriId(sPre, sKind);
+          // extend namespace scope and write namespace flag if attribute has a new namespaces
+          if(uriId != 0 && nsScope.openAttr(nsPre, prefix(an), sdata.nspaces.uri(uriId))) {
+            table.write2(nsPre, 1, 1 << 15 | nameId(nsPre));
           }
           attr(nPre, nDist, attrNames.index(an, null, false), sdata.text(sPre, false),
-              nspaces.uriId(an, false), false);
+              nspaces.uriIdForPrefix(prefix(an), false));
       }
       nsScope.shift(1);
     }
@@ -986,17 +985,15 @@ public abstract class Data {
    * @param nameId id of attribute name
    * @param value attribute value
    * @param uriId id of namespace uri
-   * @param nsFlag namespace flag (only {@code true} if this is a stand-alone attribute)
    */
   public final void attr(final int pre, final int dist, final int nameId, final byte[] value,
-      final int uriId, final boolean nsFlag) {
+      final int uriId) {
 
     // add attribute to text storage
     final int i = newID();
     final long v = index(pre, i, value, ATTR);
-    final int n = nsFlag ? 1 << 7 : 0;
     s(Math.min(IO.MAXATTS, dist) << 3 | ATTR);
-    s(n | (byte) (nameId >> 8)); s(nameId); s(v >> 32);
+    s(nameId >> 8); s(nameId); s(v >> 32);
     s(v >> 24); s(v >> 16); s(v >> 8); s(v);
     s(0); s(0); s(0); s(uriId);
     s(i >> 24); s(i >> 16); s(i >> 8); s(i);

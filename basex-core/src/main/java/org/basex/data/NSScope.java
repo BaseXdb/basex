@@ -16,8 +16,6 @@ final class NSScope {
   private final Data data;
   /** Namespaces. */
   private final Namespaces nspaces;
-  /** Prefix and uri ids. */
-  private final IntList values = new IntList();
   /** Stack with pre values. */
   private final IntList preStack = new IntList();
   /** Root namespace. */
@@ -27,37 +25,14 @@ final class NSScope {
 
   /**
    * Default constructor.
-   * @param par pre value
    * @param pre pre value
    * @param data data reference
    */
-  NSScope(final int pre, final int par, final Data data) {
+  NSScope(final int pre, final Data data) {
     this.data = data;
     nspaces = data.nspaces;
     root = nspaces.cursor();
     cache = nspaces.cache(pre);
-
-    NSNode node = nspaces.cursor();
-    do {
-      values.add(node.values());
-      final int pos = node.find(par);
-      if(pos < 0) break;
-      node = node.child(pos);
-    } while(par < node.pre() + data.size(node.pre(), Data.ELEM));
-    values.add(-1);
-  }
-
-  /**
-   * Returns the id of a namespace uri.
-   * @param prefixId prefix id
-   * @return id of namespace uri, or {@code 0}
-   */
-  int uriId(final int prefixId) {
-    for(int s = values.size() - 1; s > 0; s--) {
-      final int uriId = values.get(s);
-      if(uriId != -1 && values.get(--s) == prefixId) return uriId;
-    }
-    return 0;
   }
 
   /**
@@ -67,15 +42,7 @@ final class NSScope {
    */
   void loop(final int nsPre, final int c) {
     if(c == 0) nspaces.root(nsPre, data);
-    while(!preStack.isEmpty() && preStack.peek() > nsPre) {
-      nspaces.close(preStack.pop());
-      for(int s = values.size() - 1; s >= 0; s--) {
-        if(values.get(s) == -1) {
-          values.size(s);
-          break;
-        }
-      }
-    }
+    while(!preStack.isEmpty() && preStack.peek() > nsPre) nspaces.close(preStack.pop());
   }
 
   /**
@@ -83,7 +50,6 @@ final class NSScope {
    * @param pre pre value
    */
   void open(final int pre) {
-    values.add(-1);
     nspaces.open();
     preStack.push(pre);
   }
@@ -95,23 +61,15 @@ final class NSScope {
    * @return {@code true} if new namespaces were added
    */
   boolean open(final int pre, final Atts nsp) {
-    values.add(-1);
-
     final Atts ns = new Atts();
     final int as = nsp.size();
     for(int a = 0; a < as; a++) {
       final byte[] prefix = nsp.name(a), uri = nsp.value(a);
-      final int uriId = uriId(nspaces.prefixId(prefix));
-      if(uriId == 0 || uriId != nspaces.uriId(uri)) {
-        ns.add(prefix, uri);
-      }
+      final int uriId = nspaces.uriIdForPrefix(prefix, true);
+      if(uriId == 0 || uriId != nspaces.uriId(uri)) ns.add(prefix, uri);
     }
     nspaces.open(pre, ns);
     preStack.push(pre);
-    for(int a = 0; a < as; a++) {
-      values.add(nspaces.prefixId(nsp.name(a)));
-      values.add(nspaces.uriId(nsp.value(a)));
-    }
     return !ns.isEmpty();
   }
 
@@ -123,7 +81,7 @@ final class NSScope {
    * @return {@code true} if new namespace was added
    */
   boolean openAttr(final int pre, final byte[] prefix, final byte[] uri) {
-    final int uriId = uriId(nspaces.prefixId(prefix));
+    final int uriId = nspaces.uriIdForPrefix(prefix, false);
     if(uriId != 0) return false;
 
     nspaces.add(pre, -1, prefix, uri, data);
