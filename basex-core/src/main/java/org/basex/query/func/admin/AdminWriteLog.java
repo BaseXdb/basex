@@ -22,7 +22,7 @@ public final class AdminWriteLog extends AdminFn {
     checkAdmin(qc);
 
     final String msg = string(toToken(exprs[0], qc));
-    final String type = exprs.length > 0 ? string(toToken(exprs[1], qc)) : LogType.INFO.toString();
+    final String type = exprs.length > 1 ? string(toToken(exprs[1], qc)) : LogType.INFO.toString();
     if(!type.matches("^[A-Z]+$")) throw BXAD_TYPE_X.get(info, type);
 
     final ClientListener cl = qc.context.listener;
