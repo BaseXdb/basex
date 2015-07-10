@@ -389,7 +389,7 @@ abstract class MarkupSerializer extends StandardSerializer {
       list = new ArrayList<>();
       final boolean html = this instanceof HTMLSerializer;
       final String cdse = sopts.get(CDATA_SECTION_ELEMENTS);
-      for(final byte[] name :  split(normalize(token(cdse)), ' ')) {
+      for(final byte[] name : split(normalize(token(cdse)), ' ')) {
         if(name.length == 0) continue;
         final QNm qnm = resolve(name);
         if(!html || contains(name, ':') && (!html5 || !string(name).contains("html:"))) {
@@ -430,7 +430,7 @@ abstract class MarkupSerializer extends StandardSerializer {
    */
   private QNm resolve(final byte[] name) throws QueryIOException {
     try {
-      return QNm.resolve(name, null, sc, null);
+      return QNm.resolve(name, sc == null ? null : sc.elemNS, sc, null);
     } catch(final QueryException ex) {
       throw new QueryIOException(ex);
     }
