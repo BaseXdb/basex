@@ -293,10 +293,11 @@ final class NSNode {
       final int[] vls = values;
       final int vl = vls.length;
       for(int i = 0; i < vl; i += 2) {
+        if(i != 0) tb.add(' ');
         tb.add("xmlns");
         final byte[] p = ns.prefix(vls[i]);
         if(p.length != 0) tb.add(':');
-        tb.add(p).add("=\"").add(ns.uri(vls[i + 1])).add("\" ");
+        tb.add(p).add("=\"").add(ns.uri(vls[i + 1])).add('"');
       }
     }
     for(int c = 0; c < size; ++c) nodes[c].print(tb, level + 1, ns, start, end);

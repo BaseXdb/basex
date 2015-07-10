@@ -33,8 +33,6 @@ public class DBNode extends ANode {
   private final Data data;
   /** Pre value. */
   private int pre;
-  /** Namespaces. */
-  private Atts nsp;
 
   /**
    * Constructor, creating a document node from the specified data reference.
@@ -104,7 +102,6 @@ public class DBNode extends ANode {
     type = type(k);
     parent = null;
     value = null;
-    nsp = null;
     pre = p;
   }
 
@@ -185,8 +182,7 @@ public class DBNode extends ANode {
 
   @Override
   public final Atts namespaces() {
-    if(type == NodeType.ELM && nsp == null) nsp = data.namespaces(pre);
-    return nsp;
+    return data.namespaces(pre);
   }
 
   @Override

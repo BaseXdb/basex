@@ -160,11 +160,11 @@ public abstract class ANode extends Item {
     final Atts ns = new Atts();
     ANode node = this;
     do {
-      final Atts n = node.namespaces();
-      if(n != null) {
-        for(int a = n.size() - 1; a >= 0; a--) {
-          final byte[] key = n.name(a);
-          if(!ns.contains(key)) ns.add(key, n.value(a));
+      final Atts nsp = node.namespaces();
+      if(nsp != null) {
+        for(int a = nsp.size() - 1; a >= 0; a--) {
+          final byte[] key = nsp.name(a);
+          if(!ns.contains(key)) ns.add(key, nsp.value(a));
         }
       }
       node = node.parent();

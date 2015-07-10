@@ -770,29 +770,35 @@ public abstract class Data {
           doc(nPre, sSize, sdata.text(sPre, true));
           ++meta.ndocs;
           break;
-        case ELEM:
+        case ELEM: {
           // add element.
           final boolean nsFlag = nsScope.open(nPre, sdata.namespaces(sPre));
-          final byte[] en = sdata.name(sPre, sKind);
-          elem(nDist, elemNames.index(en, null, false), sdata.attSize(sPre, sKind), sSize,
-              nspaces.uriIdForPrefix(prefix(en), true), nsFlag);
+          final byte[] name = sdata.name(sPre, sKind);
+          elem(nDist, elemNames.index(name, null, false), sdata.attSize(sPre, sKind), sSize,
+              nspaces.uriIdForPrefix(prefix(name), true), nsFlag);
           break;
+        }
         case TEXT:
         case COMM:
         case PI:
           // add text, comment or processing instruction
           text(nPre, nDist, sdata.text(sPre, true), sKind);
           break;
-        case ATTR:
+        case ATTR: {
           // add attribute
-          final byte[] an = sdata.name(sPre, sKind);
-          final int uriId = sdata.uriId(sPre, sKind);
+          final byte[] name = sdata.name(sPre, sKind);
+          int uriId = sdata.uriId(sPre, sKind);
           // extend namespace scope and write namespace flag if attribute has a new namespaces
-          if(uriId != 0 && nsScope.openAttr(nsPre, prefix(an), sdata.nspaces.uri(uriId))) {
-            table.write2(nsPre, 1, 1 << 15 | nameId(nsPre));
+          if(uriId != 0) {
+            final byte[] prefix = prefix(name), uri = sdata.nspaces.uri(uriId);
+            uriId = nspaces.uriIdForPrefix(prefix, false);
+            if(uriId == 0 && !Token.eq(prefix, Token.XML)) {
+              uriId = nspaces.add(nsPre, prefix, uri, this);
+              table.write2(nsPre, 1, 1 << 15 | nameId(nsPre));
+            }
           }
-          attr(nPre, nDist, attrNames.index(an, null, false), sdata.text(sPre, false),
-              nspaces.uriIdForPrefix(prefix(an), false));
+          attr(nPre, nDist, attrNames.index(name, null, false), sdata.text(sPre, false), uriId);
+        }
       }
       nsScope.shift(1);
     }

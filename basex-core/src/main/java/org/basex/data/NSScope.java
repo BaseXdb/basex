@@ -75,21 +75,6 @@ final class NSScope {
   }
 
   /**
-   * Parses the specified namespaces and returns all namespaces that have not been declared yet.
-   * @param pre pre value
-   * @param prefix prefix
-   * @param uri namespace uri
-   * @return {@code true} if new namespace was added
-   */
-  boolean openAttr(final int pre, final byte[] prefix, final byte[] uri) {
-    final int uriId = nspaces.uriIdForPrefix(prefix, false);
-    if(uriId != 0 || Token.eq(prefix, Token.XML)) return false;
-
-    nspaces.add(pre, prefix, uri, data);
-    return true;
-  }
-
-  /**
    * Shifts cached namespaces by the specified value.
    * @param diff shift
    */
