@@ -41,8 +41,11 @@ final class XMLParser extends CmdParser {
       if(!execute(COMMANDS, node).isEmpty()) {
         query = COMMANDS + query;
         // ensure that the root contains no text nodes as children
-        if(!execute(COMMANDS + "/text()/string()", node).trim().isEmpty())
-          throw error(Text.SYNTAX_X, '<' + COMMANDS + "><...></" + COMMANDS + '>');
+        final String ws = COMMANDS + "/text()[normalize-space()]";
+        try(final QueryProcessor qp = new QueryProcessor(ws, ctx).context(node)) {
+          if(!qp.value().isEmpty())
+            throw error(Text.SYNTAX_X, '<' + COMMANDS + "><...></" + COMMANDS + '>');
+        }
       }
       try(final QueryProcessor qp = new QueryProcessor(query, ctx).context(node)) {
         for(final Item ia : qp.value()) cmds.add(command(ia));
