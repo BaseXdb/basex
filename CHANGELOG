@@ -1,3 +1,7 @@
+VERSION 8.2.3 (July 14, 2015) ------------------------------------------
+
+ Bug fixes (DBA, admin:write-log; namespaces)
+
 VERSION 8.2.2 (July 6, 2015) -------------------------------------------
 
  Various bug fixes (all minor)
