@@ -160,7 +160,7 @@ public final class TreeSeqBuilder implements Iterable<Item> {
       tree.append(midTree);
       for(int i = ls.length; --i >= 0;) addFront(ls[i]);
       for(int i = k; --i >= 0;) addFront(temp[i]);
-      for(int i = 0; i < rs.length; i++) add(rs[i]);
+      for(final Item r : rs) add(r);
       return this;
     }
 

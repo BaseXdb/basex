@@ -155,7 +155,9 @@ final class CmpSR extends Single {
 
     // create range access
     final StringRange sr = new StringRange(ii.text, min, mni, max, mxi);
-    ii.costs = Math.max(2, data.meta.size / 10);
+    ii.costs = data.costs(sr);
+    if(ii.costs < 0) return false;
+
     final TokenBuilder tb = new TokenBuilder();
     tb.add(mni ? '[' : '(').addExt(min).add(',').addExt(max).add(mxi ? ']' : ')');
     ii.create(new StringRangeAccess(info, sr, ii.ic), info, Util.info(OPTSRNGINDEX, tb), true);

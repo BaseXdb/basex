@@ -10,7 +10,7 @@ import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
- * ID -> PRE mapping.
+ * Updatable ID -> PRE mapping.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Dimitar Popov
@@ -41,14 +41,14 @@ public class IdPreMap {
   public IdPreMap(final int id) {
     baseid = id;
     pres = new int[1];
-    fids = new int[pres.length];
-    nids = new int[pres.length];
-    incs = new int[pres.length];
-    oids = new int[pres.length];
+    fids = new int[1];
+    nids = new int[1];
+    incs = new int[1];
+    oids = new int[1];
   }
 
   /**
-   * Construct a map by reading it from a file.
+   * Constructs a map by reading it from a file.
    * @param f file to read from
    * @throws IOException I/O error while reading from the file
    */
@@ -82,7 +82,7 @@ public class IdPreMap {
   }
 
   /**
-   * Find the PRE value of a given ID.
+   * Finds the PRE value of a given ID.
    * @param id ID
    * @return PRE or -1 if the ID is already deleted
    */
@@ -105,20 +105,7 @@ public class IdPreMap {
   }
 
   /**
-   * Find the PRE values of a given list of IDs.
-   * @param ids IDs
-   * @param off start position in ids (inclusive)
-   * @param len number of ids
-   * @return a sorted array of PRE values
-   */
-  public int[] pre(final int[] ids, final int off, final int len) {
-    final IntList il = new IntList(len - off);
-    for(int i = off; i < len; ++i) il.add(pre(ids[i]));
-    return il.sort().finish();
-  }
-
-  /**
-   * Insert new record.
+   * Inserts a new record.
    * @param pre record PRE
    * @param id record ID
    * @param c number of inserted records
@@ -176,7 +163,7 @@ public class IdPreMap {
   }
 
   /**
-   * Delete records.
+   * Deletes records.
    * @param pre PRE of the first record
    * @param id ID of the first deleted record
    * @param c number of deleted records
@@ -250,7 +237,7 @@ public class IdPreMap {
   }
 
   /**
-   * Shrink the given tuple from the start.
+   * Shrinks the given tuple from the start.
    * @param i index of the tuple
    * @param pre pre-value
    * @param c number of deleted records (negative number)
@@ -262,7 +249,7 @@ public class IdPreMap {
   }
 
   /**
-   * Shrink the given tuple from the end.
+   * Shrinks the given tuple from the end.
    * @param i index of the tuple
    * @param pre pre-value
    * @param inc new inc-value
@@ -273,7 +260,7 @@ public class IdPreMap {
   }
 
   /**
-   * Increment the pre- and inc-values of all tuples starting from the given index.
+   * Increments the pre- and inc-values of all tuples starting from the given index.
    * @param from start index
    * @param with increment value
    */
@@ -285,7 +272,7 @@ public class IdPreMap {
   }
 
   /**
-   * Size of the map.
+   * Returns the size of the map.
    * @return number of stored tuples.
    */
   public int size() {
@@ -293,7 +280,7 @@ public class IdPreMap {
   }
 
   /**
-   * Search for a given pre value.
+   * Searches for a given pre value.
    * @param pre pre value
    * @return index of the record where the pre is found, or the insertion point if not found
    */
@@ -327,7 +314,7 @@ public class IdPreMap {
   }
 
   /**
-   * Add a record to the table and the ID index.
+   * Adds a record to the table and the ID index.
    * @param i index in the table where the record should be inserted
    * @param pre pre value
    * @param fid first ID value
@@ -363,7 +350,7 @@ public class IdPreMap {
   }
 
   /**
-   * Remove a records from the table and the ID index.
+   * Removes a records from the table and the ID index.
    * @param s start index of records in the table (inclusive)
    * @param e end index of records in the table (inclusive)
    */

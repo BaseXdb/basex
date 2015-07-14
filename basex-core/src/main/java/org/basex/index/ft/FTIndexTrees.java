@@ -32,7 +32,7 @@ final class FTIndexTrees {
   void index(final byte[] tok, final int pre, final int pos, final int cf) {
     final int tl = tok.length;
     if(trees[tl] == null) trees[tl] = new FTIndexTree();
-    trees[tl].index(tok, pre, pos, cf);
+    trees[tl].add(tok, pre, pos, cf);
   }
 
   /**

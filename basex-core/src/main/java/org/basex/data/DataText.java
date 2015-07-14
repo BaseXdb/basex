@@ -46,6 +46,12 @@ public interface DataText {
   String DBATVIDX = "ATVINDEX";
   /** Full-text indexing. */
   String DBFTXIDX = "FTXINDEX";
+  /** Text index: names. */
+  String DBTXTINC = "TXTINC";
+  /** Attribute index: names. */
+  String DBATVINC = "ATVINC";
+  /** Full-text index: names. */
+  String DBFTXINC = "FTXINC";
   /** Full-text stemming. */
   String DBFTST = "FTSTEM";
   /** Full-text language. */

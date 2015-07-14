@@ -24,7 +24,7 @@ public final class FTBuilder extends IndexBuilder {
   /** Value trees. */
   private final FTIndexTrees tree;
   /** Word parser. */
-  private final FTLexer lex;
+  private final FTLexer lexer;
   /** Number of indexed tokens. */
   private long ntok;
 
@@ -35,7 +35,7 @@ public final class FTBuilder extends IndexBuilder {
    * @throws IOException IOException
    */
   public FTBuilder(final Data data, final MainOptions options) throws IOException {
-    super(data, options.get(MainOptions.FTINDEXSPLITSIZE));
+    super(data, options, MainOptions.FTINDEXSPLITSIZE, MainOptions.FTINCLUDE, true);
     tree = new FTIndexTrees(data.meta.maxlen);
 
     final FTOpt fto = new FTOpt();
@@ -50,32 +50,23 @@ public final class FTBuilder extends IndexBuilder {
     if(options.get(MainOptions.STEMMING) && !Stemmer.supportFor(fto.ln))
       throw new BaseXException(NO_STEMMER_X, fto.ln);
 
-    lex = new FTLexer(fto);
+    lexer = new FTLexer(fto);
   }
 
-  /**
-   * Extracts and indexes words from the specified data reference.
-   * @throws IOException I/O Exception
-   */
-  private void index() throws IOException {
-    // delete old index
-    abort();
-
-    final Performance perf = Prop.debug ? new Performance() : null;
+  @Override
+  public FTIndex build() throws IOException {
     Util.debug(det());
 
     for(pre = 0; pre < size; ++pre) {
-      if((pre & 0xFFFF) == 0) check();
+      if((pre & 0x0FFF) == 0) check();
+      if(!indexEntry()) continue;
 
-      final int k = data.kind(pre);
-      if(k != Data.TEXT) continue;
-
-      /* Current lexer position. */
-      final StopWords sw = lex.ftOpt().sw;
-      lex.init(data.text(pre, true));
+      // current lexer position
+      final StopWords sw = lexer.ftOpt().sw;
+      lexer.init(data.text(pre, true));
       int pos = -1;
-      while(lex.hasNext()) {
-        final byte[] tok = lex.nextToken();
+      while(lexer.hasNext()) {
+        final byte[] tok = lexer.nextToken();
         ++pos;
         // skip too long and stopword tokens
         if(tok.length <= data.meta.maxlen && (sw.isEmpty() || !sw.contains(tok))) {
@@ -93,13 +84,7 @@ public final class FTBuilder extends IndexBuilder {
     // finalize partial or all index structures
     write(splits > 0);
 
-    data.meta.ftxtindex = true;
-    finishIndex(perf);
-  }
-
-  @Override
-  public FTIndex build() throws IOException {
-    index();
+    finishIndex();
     return new FTIndex(data);
   }
 
@@ -294,8 +279,8 @@ public final class FTBuilder extends IndexBuilder {
 
   @Override
   protected void abort() {
+    // drop index files
     data.meta.drop(DATAFTX + ".*");
-    data.meta.ftxtindex = false;
   }
 
   @Override

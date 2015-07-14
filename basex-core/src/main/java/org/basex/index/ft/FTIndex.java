@@ -48,7 +48,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public final class FTIndex implements ValueIndex {
+public final class FTIndex extends ValueIndex {
   /** Entry size. */
   private static final int ENTRY = 9;
 
@@ -56,8 +56,6 @@ public final class FTIndex implements ValueIndex {
   private final IntObjMap<byte[]> ctext = new IntObjMap<>();
   /** Levenshtein reference. */
   private final Levenshtein ls = new Levenshtein();
-  /** Data reference. */
-  private final Data data;
 
   /** Index storing each unique token length and pointer
    * on the first token with this length. */
@@ -78,7 +76,7 @@ public final class FTIndex implements ValueIndex {
    * @throws IOException I/O Exception
    */
   public FTIndex(final Data data) throws IOException {
-    this.data = data;
+    super(data, true);
 
     // cache token length index
     inY = new DataAccess(data.meta.dbfile(DATAFTX + 'y'));
@@ -222,6 +220,7 @@ public final class FTIndex implements ValueIndex {
   public synchronized byte[] info(final MainOptions options) {
     final TokenBuilder tb = new TokenBuilder();
     final long l = inX.length() + inY.length() + inZ.length();
+    tb.add(LI_NAMES).add(data.meta.ftinclude).add(NL);
     tb.add(LI_SIZE + Performance.format(l, true) + NL);
 
     final IndexStats stats = new IndexStats(options.get(MainOptions.MAXSTAT));
@@ -284,7 +283,8 @@ public final class FTIndex implements ValueIndex {
     while(j < tl && tp[j] == -1) ++j;
 
     while(p < tp[tl - 1]) {
-      if(stats.adding(size(p, i))) stats.add(inY.readBytes(p, i));
+      final int oc = size(p, i);
+      if(stats.adding(oc)) stats.add(inY.readBytes(p, i), oc);
       p += i + ENTRY;
       if(p == tp[j]) {
         i = j;
@@ -479,13 +479,14 @@ public final class FTIndex implements ValueIndex {
   }
 
   @Override
-  public void add(final TokenObjMap<IntList> map) { }
+  public void add(final TokenObjMap<IntList> map) {
+    throw Util.notExpected();
+  }
 
   @Override
-  public void delete(final TokenObjMap<IntList> map) { }
-
-  @Override
-  public void replace(final byte[] old, final byte[] key, final int id) { }
+  public void delete(final TokenObjMap<IntList> map) {
+    throw Util.notExpected();
+  }
 
   @Override
   public void flush() { }

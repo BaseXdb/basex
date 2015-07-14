@@ -29,7 +29,7 @@ import org.basex.util.hash.*;
  */
 public abstract class Step extends Preds {
   /** Axis. */
-  Axis axis;
+  public Axis axis;
   /** Kind test. */
   public final Test test;
 

@@ -23,6 +23,7 @@ public final class FTLexer extends FTIterator implements IndexToken {
   private final FTOpt ftopt;
   /** Text to be tokenized. */
   private byte[] text = Token.EMPTY;
+
   /** Levenshtein error. */
   private int lserror;
 

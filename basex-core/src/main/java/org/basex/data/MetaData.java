@@ -39,24 +39,32 @@ public final class MetaData {
   /** Number of stored documents. */
   public volatile int ndocs;
 
+  /** Indicates if a text index exists. */
+  public volatile boolean textindex;
+  /** Indicates if an attribute index exists. */
+  public volatile boolean attrindex;
+  /** Indicates if a full-text index exists. */
+  public volatile boolean ftindex;
+
   /** Flag for whitespace chopping. */
   public volatile boolean chop;
   /** Flag for activated automatic index update. */
   public volatile boolean updindex;
   /** Flag for automatic index updating. */
   public volatile boolean autoopt;
-  /** Indicates if a text index exists. */
-  public volatile boolean textindex;
-  /** Indicates if an attribute index exists. */
-  public volatile boolean attrindex;
-  /** Indicates if a full-text index exists. */
-  public volatile boolean ftxtindex;
+
   /** Indicates if text index is to be recreated. */
   public volatile boolean createtext;
   /** Indicates if attribute index is to be recreated. */
   public volatile boolean createattr;
   /** Indicates if full-text index is to be recreated. */
   public volatile boolean createftxt;
+  /** Text index: names to include. */
+  public volatile String textinclude = "";
+  /** Attribute index: names to include. */
+  public volatile String attrinclude = "";
+  /** Full-text index: names to include. */
+  public volatile String ftinclude = "";
 
   /** Flag for full-text stemming. */
   public volatile boolean stemming;
@@ -124,6 +132,9 @@ public final class MetaData {
     maxcats = options.get(MainOptions.MAXCATS);
     stopwords = options.get(MainOptions.STOPWORDS);
     language = Language.get(options);
+    textinclude = options.get(MainOptions.TEXTINCLUDE);
+    attrinclude = options.get(MainOptions.ATTRINCLUDE);
+    ftinclude = options.get(MainOptions.FTINCLUDE);
   }
 
   // STATIC METHODS ==========================================================
@@ -231,8 +242,8 @@ public final class MetaData {
   }
 
   /**
-   * Returns the specified binary file or {@code null} if the resource
-   * path cannot be resolved (e.g. if it points to a parent directory).
+   * Returns the specified binary file or {@code null} if the resource path cannot be resolved
+   * (e.g. if it points to a parent directory).
    * @param pth internal file path
    * @return binary directory
    */
@@ -278,34 +289,37 @@ public final class MetaData {
         for(int u = in.readNum(); u > 0; --u) { in.readToken(); in.readToken(); in.readNum(); }
       } else {
         final String v = Token.string(in.readToken());
-        if(k.equals(DBSTR))           storage    = v;
-        else if(k.equals(IDBSTR))     istorage   = v;
-        else if(k.equals(DBFNAME))    original   = v;
-        else if(k.equals(DBENC))      encoding   = v;
-        else if(k.equals(DBFTSW))     stopwords  = v;
-        else if(k.equals(DBFTLN))     language   = Language.get(v);
-        else if(k.equals(DBSIZE))     size       = toInt(v);
-        else if(k.equals(DBNDOCS))    ndocs      = toInt(v);
-        else if(k.equals(DBSCTYPE))   scoring    = toInt(v);
-        else if(k.equals(DBMAXLEN))   maxlen     = toInt(v);
-        else if(k.equals(DBMAXCATS))  maxcats    = toInt(v);
-        else if(k.equals(DBLASTID))   lastid     = toInt(v);
-        else if(k.equals(DBTIME))     time       = toLong(v);
-        else if(k.equals(DBFSIZE))    filesize   = toLong(v);
-        else if(k.equals(DBFTDC))     diacritics = toBool(v);
-        else if(k.equals(DBCHOP))     chop       = toBool(v);
-        else if(k.equals(DBUPDIDX))   updindex   = toBool(v);
-        else if(k.equals(DBAUTOOPT))  autoopt    = toBool(v);
-        else if(k.equals(DBTXTIDX))   textindex  = toBool(v);
-        else if(k.equals(DBATVIDX))   attrindex  = toBool(v);
-        else if(k.equals(DBFTXIDX))   ftxtindex  = toBool(v);
-        else if(k.equals(DBCRTTXT))   createtext = toBool(v);
-        else if(k.equals(DBCRTATV))   createattr = toBool(v);
-        else if(k.equals(DBCRTFTX))   createftxt = toBool(v);
-        else if(k.equals(DBWCIDX))    wcindex    = toBool(v);
-        else if(k.equals(DBFTST))     stemming   = toBool(v);
-        else if(k.equals(DBFTCS))     casesens   = toBool(v);
-        else if(k.equals(DBUPTODATE)) uptodate   = toBool(v);
+        if(k.equals(DBSTR))           storage     = v;
+        else if(k.equals(IDBSTR))     istorage    = v;
+        else if(k.equals(DBFNAME))    original    = v;
+        else if(k.equals(DBENC))      encoding    = v;
+        else if(k.equals(DBFTSW))     stopwords   = v;
+        else if(k.equals(DBFTLN))     language    = Language.get(v);
+        else if(k.equals(DBSIZE))     size        = toInt(v);
+        else if(k.equals(DBNDOCS))    ndocs       = toInt(v);
+        else if(k.equals(DBSCTYPE))   scoring     = toInt(v);
+        else if(k.equals(DBMAXLEN))   maxlen      = toInt(v);
+        else if(k.equals(DBMAXCATS))  maxcats     = toInt(v);
+        else if(k.equals(DBLASTID))   lastid      = toInt(v);
+        else if(k.equals(DBTIME))     time        = toLong(v);
+        else if(k.equals(DBFSIZE))    filesize    = toLong(v);
+        else if(k.equals(DBFTDC))     diacritics  = toBool(v);
+        else if(k.equals(DBCHOP))     chop        = toBool(v);
+        else if(k.equals(DBUPDIDX))   updindex    = toBool(v);
+        else if(k.equals(DBAUTOOPT))  autoopt     = toBool(v);
+        else if(k.equals(DBTXTIDX))   textindex   = toBool(v);
+        else if(k.equals(DBATVIDX))   attrindex   = toBool(v);
+        else if(k.equals(DBFTXIDX))   ftindex     = toBool(v);
+        else if(k.equals(DBTXTINC))   textinclude = v;
+        else if(k.equals(DBATVINC))   attrinclude = v;
+        else if(k.equals(DBFTXINC))   ftinclude   = v;
+        else if(k.equals(DBCRTTXT))   createtext  = toBool(v);
+        else if(k.equals(DBCRTATV))   createattr  = toBool(v);
+        else if(k.equals(DBCRTFTX))   createftxt  = toBool(v);
+        else if(k.equals(DBWCIDX))    wcindex     = toBool(v);
+        else if(k.equals(DBFTST))     stemming    = toBool(v);
+        else if(k.equals(DBFTCS))     casesens    = toBool(v);
+        else if(k.equals(DBUPTODATE)) uptodate    = toBool(v);
         // legacy: set up-to-date flag to false if path index does not exist
         else if(k.equals(DBPTHIDX) && !toBool(v)) uptodate = false;
       }
@@ -319,7 +333,7 @@ public final class MetaData {
         new Version(istorage).compareTo(new Version(ISTORAGE)) > 0;
     corrupt = dbfile(DATAUPD).exists();
     // deactivate full-text index if obsolete trie structure was used
-    if(wcindex) ftxtindex = false;
+    if(wcindex) ftindex = false;
   }
 
   /**
@@ -341,7 +355,10 @@ public final class MetaData {
     writeInfo(out, DBAUTOOPT,  autoopt);
     writeInfo(out, DBTXTIDX,   textindex);
     writeInfo(out, DBATVIDX,   attrindex);
-    writeInfo(out, DBFTXIDX,   ftxtindex);
+    writeInfo(out, DBFTXIDX,   ftindex);
+    writeInfo(out, DBTXTINC,   textinclude);
+    writeInfo(out, DBATVINC,   attrinclude);
+    writeInfo(out, DBFTXINC,   ftinclude);
     writeInfo(out, DBCRTTXT,   createtext);
     writeInfo(out, DBCRTATV,   createattr);
     writeInfo(out, DBCRTFTX,   createftxt);
@@ -369,7 +386,7 @@ public final class MetaData {
       textindex = false;
       attrindex = false;
     }
-    ftxtindex = false;
+    ftindex = false;
   }
 
   /**
@@ -430,5 +447,4 @@ public final class MetaData {
     out.writeToken(Token.token(name));
     out.writeToken(Token.token(value));
   }
-
 }

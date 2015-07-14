@@ -155,22 +155,21 @@ public final class CmpR extends Single {
     if(key == null) return false;
 
     // estimate costs for range access; all values out of range: no results
-    final NumericRange nr = new NumericRange(ii.text,
-        Math.max(min, key.min), Math.min(max, key.max));
-
+    final NumericRange nr = new NumericRange(ii, Math.max(min, key.min), Math.min(max, key.max));
     // skip queries with no results
     if(nr.min > nr.max || nr.max < key.min || nr.min > key.max) {
       ii.costs = 0;
       return true;
     }
 
+    // estimate costs
+    ii.costs = data.costs(nr);
+    if(ii.costs == -1) return false;
+
     // skip if numbers are negative, doubles, or of different string length
     final int mnl = min >= 0 && (long) min == min ? token(min).length : -1;
     final int mxl = max >= 0 && (long) max == max ? token(max).length : -1;
     if(mnl != mxl || mnl == -1) return false;
-
-    // estimate costs (conservative value)
-    ii.costs = Math.max(2, data.meta.size / 3);
 
     // don't use index if min/max values are infinite
     if(min == Double.NEGATIVE_INFINITY && max == Double.POSITIVE_INFINITY ||

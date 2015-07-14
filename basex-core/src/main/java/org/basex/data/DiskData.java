@@ -1,5 +1,6 @@
 package org.basex.data;
 
+import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 
@@ -18,8 +19,6 @@ import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.io.random.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * This class stores and organizes the database table and the index structures
@@ -43,10 +42,6 @@ public final class DiskData extends Data {
   private DataAccess texts;
   /** Values access file. */
   private DataAccess values;
-  /** Texts buffered for subsequent index updates. */
-  private TokenObjMap<IntList> txtBuffer;
-  /** Attribute values buffered for subsequent index updates. */
-  private TokenObjMap<IntList> atvBuffer;
   /** Closed flag. */
   private boolean closed;
 
@@ -83,7 +78,7 @@ public final class DiskData extends Data {
       if(meta.textindex) textIndex = new DiskValues(this, true);
       if(meta.attrindex) attrIndex = new DiskValues(this, false);
     }
-    if(meta.ftxtindex) ftxtIndex = new FTIndex(this);
+    if(meta.ftindex) ftxtIndex = new FTIndex(this);
   }
 
   /**
@@ -123,24 +118,24 @@ public final class DiskData extends Data {
    * @throws IOException I/O exception
    */
   private void write() throws IOException {
-    if(meta.dirty) {
-      try(final DataOutput out = new DataOutput(meta.dbfile(DATAINF))) {
-        meta.write(out);
-        out.writeToken(token(DBTAGS));
-        elemNames.write(out);
-        out.writeToken(token(DBATTS));
-        attrNames.write(out);
-        out.writeToken(token(DBPATH));
-        paths.write(out);
-        out.writeToken(token(DBNS));
-        nspaces.write(out);
-        out.writeToken(token(DBDOCS));
-        resources.write(out);
-        out.write(0);
-      }
-      if(idmap != null) idmap.write(meta.dbfile(DATAIDP));
-      meta.dirty = false;
+    if(!meta.dirty) return;
+
+    try(final DataOutput out = new DataOutput(meta.dbfile(DATAINF))) {
+      meta.write(out);
+      out.writeToken(token(DBTAGS));
+      elemNames.write(out);
+      out.writeToken(token(DBATTS));
+      attrNames.write(out);
+      out.writeToken(token(DBPATH));
+      paths.write(out);
+      out.writeToken(token(DBNS));
+      nspaces.write(out);
+      out.writeToken(token(DBDOCS));
+      resources.write(out);
+      out.write(0);
     }
+    if(meta.updindex) idmap.write(meta.dbfile(DATAIDP));
+    meta.dirty = false;
   }
 
   @Override
@@ -196,11 +191,10 @@ public final class DiskData extends Data {
   }
 
   @Override
-  public boolean dropIndex(final IndexType type) {
-    // close and drop index (return true if no index exists)
-    final Index index = index(type);
+  public void dropIndex(final IndexType type) throws BaseXException {
     close(type);
-    return index == null || index.drop();
+    final Index index = index(type);
+    if(index != null && !index.drop()) throw new BaseXException(INDEX_NOT_DROPPED_X, type);
   }
 
   /**
@@ -263,25 +257,25 @@ public final class DiskData extends Data {
 
   @Override
   public byte[] text(final int pre, final boolean text) {
-    final long o = textOff(pre);
+    final long o = textRef(pre);
     return number(o) ? token((int) o) : txt(o, text);
   }
 
   @Override
   public long textItr(final int pre, final boolean text) {
-    final long o = textOff(pre);
+    final long o = textRef(pre);
     return number(o) ? o & IO.OFFNUM - 1 : toLong(txt(o, text));
   }
 
   @Override
   public double textDbl(final int pre, final boolean text) {
-    final long o = textOff(pre);
+    final long o = textRef(pre);
     return number(o) ? o & IO.OFFNUM - 1 : toDouble(txt(o, text));
   }
 
   @Override
   public int textLen(final int pre, final boolean text) {
-    final long o = textOff(pre);
+    final long o = textRef(pre);
     if(number(o)) return numDigits((int) o);
     final DataAccess da = text ? texts : values;
     final int l = da.readNum(o & IO.OFFCOMP - 1);
@@ -318,139 +312,72 @@ public final class DiskData extends Data {
     return (offset & IO.OFFCOMP) != 0;
   }
 
+  @Override
+  public boolean inMemory() {
+    return false;
+  }
+
   // UPDATE OPERATIONS ========================================================
 
   @Override
   protected void delete(final int pre, final boolean text) {
     // old entry (offset or value)
-    final long old = textOff(pre);
+    final long old = textRef(pre);
     // fill unused space with zero-bytes
     if(!number(old)) (text ? texts : values).free(old & IO.OFFCOMP - 1, 0);
   }
 
   @Override
   protected void updateText(final int pre, final byte[] value, final int kind) {
-    final boolean text = kind != ATTR;
+    // delete existing index entry
+    indexDelete(pre, -1, 1);
 
-    // update index; do not index document names
-    final ValueIndex index = text ? textIndex : attrIndex;
-    if(index != null && kind != DOC) index.replace(text(pre, text), value, id(pre));
+    // reference to heap file
+    final DataAccess store = kind == ATTR ? values : texts;
+    // old entry (offset or value)
+    final long oldRef = textRef(pre);
 
-    // reference to text store
-    final DataAccess store = text ? texts : values;
-    // file length
-    final long len = store.length();
-
-    // new entry (offset or value)
+    // check if new entry is numeric and can be inlined
     final long v = toSimpleInt(value);
-    if(v == Integer.MIN_VALUE) {
-      // text to be stored (possibly packed)
+    if(v != Integer.MIN_VALUE) {
+      // invalidate old entry if it was not inlined
+      if(!number(oldRef)) store.free(oldRef & IO.OFFCOMP - 1, 0);
+      // inline integer value
+      textRef(pre, v | IO.OFFNUM);
+    } else {
+      // otherwise, try to compress new value
       final byte[] val = COMPRESS.get().pack(value);
-      // old entry (offset or value)
-      final long old = textOff(pre);
 
-      // find text store offset
+      // choose inserting position
       final long off;
-      if(number(old)) {
-        // numeric entry: append new entry at the end
-        off = len;
+      if(number(oldRef)) {
+        // old entry was numeric: append new entry to heap file
+        off = store.length();
       } else {
-        // text size (0 if value will be inlined)
+        // otherwise, compute inserting position and invalidate old entry
         final int vl = val.length;
-        off = store.free(old & IO.OFFCOMP - 1, vl + Num.length(vl));
+        off = store.free(oldRef & IO.OFFCOMP - 1, vl + Num.length(vl));
       }
 
       store.writeToken(off, val);
-      textOff(pre, val == value ? off : off | IO.OFFCOMP);
-    } else {
-      // inline integer value
-      textOff(pre, v | IO.OFFNUM);
-    }
-  }
-
-  @Override
-  void indexBegin() {
-    txtBuffer = new TokenObjMap<>();
-    atvBuffer = new TokenObjMap<>();
-  }
-
-  @Override
-  protected void indexAdd() {
-    if(!txtBuffer.isEmpty()) textIndex.add(txtBuffer);
-    if(!atvBuffer.isEmpty()) attrIndex.add(atvBuffer);
-  }
-
-  @Override
-  void indexDelete() {
-    if(!txtBuffer.isEmpty()) textIndex.delete(txtBuffer);
-    if(!atvBuffer.isEmpty()) attrIndex.delete(atvBuffer);
-  }
-
-  @Override
-  protected long index(final int pre, final int id, final byte[] value, final int kind) {
-    final DataAccess store;
-    final TokenObjMap<IntList> map;
-    if(kind == ATTR) {
-      store = values;
-      map = meta.attrindex ? atvBuffer : null;
-    } else {
-      store = texts;
-      // don't index document names
-      map = meta.textindex && kind != DOC ? txtBuffer : null;
+      textRef(pre, val == value ? off : off | IO.OFFCOMP);
     }
 
-    // add text to map to index later
-    if(meta.updindex && map != null && value.length <= meta.maxlen) {
-      IntList ids = map.get(value);
-      if(ids == null) {
-        ids = new IntList(1);
-        map.put(value, ids);
-      }
-      ids.add(id);
-    }
+    // insert new entries
+    indexAdd(pre, -1, 1, null);
+  }
 
-    // add text to text file
-    // inline integer value...
+  @Override
+  protected long textRef(final byte[] value, final boolean text) {
+    // inline integer value
     final long v = toSimpleInt(value);
     if(v != Integer.MIN_VALUE) return v | IO.OFFNUM;
 
-    // store text
+    // store text to heap file
+    final DataAccess store = text ? texts : values;
     final long off = store.length();
     final byte[] val = COMPRESS.get().pack(value);
     store.writeToken(off, val);
     return val == value ? off : off | IO.OFFCOMP;
-  }
-
-  @Override
-  protected void indexDelete(final int pre, final int size) {
-    final boolean textI = meta.textindex, attrI = meta.attrindex;
-    if(textI || attrI) {
-      // collect all keys and ids
-      indexBegin();
-      final int l = pre + size;
-      for(int p = pre; p < l; ++p) {
-        final int k = kind(p);
-        // consider nodes which are attribute, text, comment, or proc. instruction
-        final boolean text = k == TEXT || k == COMM || k == PI;
-        if(textI && text || attrI && k == ATTR) {
-          final byte[] key = text(p, text);
-          if(key.length <= meta.maxlen) {
-            final TokenObjMap<IntList> m = text ? txtBuffer : atvBuffer;
-            IntList ids = m.get(key);
-            if(ids == null) {
-              ids = new IntList(1);
-              m.put(key, ids);
-            }
-            ids.add(id(p));
-          }
-        }
-      }
-      indexDelete();
-    }
-  }
-
-  @Override
-  public boolean inMemory() {
-    return false;
   }
 }

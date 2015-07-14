@@ -380,6 +380,7 @@ public final class FTWords extends FTExpr {
         }
         // favor full-text index requests over exact queries
         final int costs = data.costs(ft);
+        if(costs < 0) return false;
         if(costs != 0) ii.costs += Math.max(2, costs / 100);
       }
     }

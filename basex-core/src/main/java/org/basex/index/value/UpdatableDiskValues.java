@@ -84,69 +84,18 @@ public final class UpdatableDiskValues extends DiskValues {
 
   @Override
   public synchronized void delete(final TokenObjMap<IntList> map) {
-    // delete ids and create a list of the key positions which should be deleted
-    final IntList il = new IntList(map.size());
-
-    // add sorted keys (allows faster binary search)
+    // create a list of the indexes of the keys which should be completely deleted
+    final IntList il = new IntList();
     int p = 0;
     final int sz = size();
+    // add keys in a sorted order (speeds up binary search)
     for(final byte[] key : new TokenList(map).sort(true)) {
       p = get(key, p, sz);
       if(p < 0) throw Util.notExpected("Key does not exist: '%'", key);
       if(deleteIds(p, key, map.get(key).sort().finish())) il.add(p);
       p++;
     }
-    // empty should contain sorted keys, since keys were sorted, too
-    if(!il.isEmpty()) deleteKeys(il.finish());
-  }
-
-  @Override
-  public synchronized void replace(final byte[] old, final byte[] key, final int id) {
-    // delete the id from the old key
-    final int p = get(old);
-    if(p >= 0) {
-      final int[] tmp = { id };
-      if(deleteIds(p, old, tmp)) {
-        tmp[0] = p;
-        deleteKeys(tmp);
-      }
-    }
-
-    final IntList newIds;
-    int index = get(key);
-    if(index < 0) {
-      newIds = new IntList(1).add(id);
-
-      // new id list
-      index = -(index + 1);
-      // create space for new entry
-      final int sz = size() + 1;
-      final byte[] tmp = idxr.readBytes(0, sz * 5);
-      for(int i = sz - 1; i > index; --i) copy(tmp, i - 1, i);
-      idxr.cursor(0);
-      idxr.writeBytes(tmp, 0, sz * 5);
-      size(sz);
-
-    } else {
-      // add id to the existing id list
-      final long off = idxr.read5(index * 5L);
-      final int count = idxl.readNum(off);
-      newIds = new IntList(count + 1);
-
-      boolean notadded = true;
-      for(int c = 0, currId = 0; c < count; ++c) {
-        currId += idxl.readNum();
-        if(notadded && id < currId) {
-          // add the new id
-          newIds.add(id);
-          notadded = false;
-        }
-        newIds.add(currId);
-      }
-      if(notadded) newIds.add(id);
-    }
-    // write new ids
-    writeIds(key, newIds, index);
+    deleteKeys(il);
   }
 
   /**
@@ -156,7 +105,7 @@ public final class UpdatableDiskValues extends DiskValues {
    * @param ids list of record ids to delete
    * @return {@code true} if list was completely deleted
    */
-  private boolean deleteIds(final int index, final byte[] key, final int[] ids) {
+  private boolean deleteIds(final int index, final byte[] key, final int... ids) {
     final long off = idxr.read5(index * 5L);
 
     // read each id from the list and skip the ones that should be deleted
@@ -186,12 +135,14 @@ public final class UpdatableDiskValues extends DiskValues {
    * Deletes keys from the index.
    * @param keys list of key positions to delete
    */
-  private void deleteKeys(final int[] keys) {
+  private void deleteKeys(final IntList keys) {
+    if(keys.isEmpty()) return;
+
     int sz = size();
-    final int kl = keys.length;
+    final int kl = keys.size();
     final byte[] tmp = idxr.readBytes(0, sz * 5);
-    for(int k = 0, newIndex = keys[k++], oldIndex = newIndex + 1; oldIndex < sz; oldIndex++) {
-      if(k < kl && oldIndex == keys[k]) {
+    for(int k = 0, newIndex = keys.get(k++), oldIndex = newIndex + 1; oldIndex < sz; oldIndex++) {
+      if(k < kl && oldIndex == keys.get(k)) {
         k++;
       } else {
         copy(tmp, oldIndex, newIndex++);

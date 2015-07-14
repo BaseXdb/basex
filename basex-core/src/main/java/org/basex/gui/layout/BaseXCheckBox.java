@@ -72,7 +72,7 @@ public final class BaseXCheckBox extends JCheckBox {
    */
   public BaseXCheckBox large() {
     final Font f = getFont();
-    setFont(new Font(f.getName(), Font.PLAIN, (int) (f.getSize2D() * 1.3)));
+    setFont(new Font(f.getName(), Font.BOLD, (int) (f.getSize2D() * 1.4)));
     return this;
   }
 

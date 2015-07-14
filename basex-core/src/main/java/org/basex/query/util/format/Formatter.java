@@ -119,18 +119,24 @@ public abstract class Formatter extends FormatUtil {
    * @param cal calendar
    * @param plc place
    * @param ii input info
+   * @param sc static context
    * @return formatted string
    * @throws QueryException query exception
    */
   public final byte[] formatDate(final ADate date, final byte[] lng, final byte[] pic,
-      final byte[] cal, final byte[] plc, final InputInfo ii) throws QueryException {
+      final byte[] cal, final byte[] plc, final InputInfo ii,
+      final StaticContext sc) throws QueryException {
 
     final TokenBuilder tb = new TokenBuilder();
     if(lng.length != 0 && MAP.get(lng) == null) tb.add("[Language: en]");
     boolean iso = false;
     if(cal.length != 0) {
-      final QNm qnm = QNm.resolve(cal);
-      if(qnm == null) throw CALQNAME_X.get(ii, cal);
+      final QNm qnm;
+      try {
+        qnm = QNm.resolve(cal, sc);
+      } catch(final QueryException ex) {
+        throw CALQNAME_X.get(ii, cal);
+      }
       if(!qnm.hasURI()) {
         int c = -1;
         final byte[] ln = qnm.local();

@@ -60,6 +60,7 @@ final class DialogAdd extends BaseXBack {
     add = new BaseXButton(ADD + DOTS, d);
     optimize = new BaseXButton(OPTIMIZE, d);
     optimizeAll = new BaseXButton(OPTIMIZE_ALL, d);
+    optimizeAll.setEnabled(!dialog.gui.context.data().inMemory());
 
     add(d.newButtons(add, optimize, optimizeAll), BorderLayout.SOUTH);
     action(general.parsers);

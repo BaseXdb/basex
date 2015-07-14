@@ -87,16 +87,6 @@ public final class Resources implements Index {
   }
 
   /**
-   * Replaces entries in the index.
-   * @param pre insertion position
-   * @param size number of deleted nodes
-   * @param clip data clip
-   */
-  public void replace(final int pre, final int size, final DataClip clip) {
-    docs.replace(pre, size, clip);
-  }
-
-  /**
    * Returns the pre values of all document nodes that start with the specified path.
    * @param path input path
    * @return pre values (internal representation!)

@@ -32,6 +32,6 @@ abstract class Format extends StandardFunc {
 
     final ADate date = (ADate) checkType(it, tp);
     final Formatter form = Formatter.get(lng);
-    return Str.get(form.formatDate(date, lng, pic, cal, plc, info));
+    return Str.get(form.formatDate(date, lng, pic, cal, plc, info, sc));
   }
 }

@@ -1,7 +1,7 @@
 package org.basex.index;
 
 /**
- * This class provides a single index entry.
+ * This class represents a single index entry.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Dimitar Popov

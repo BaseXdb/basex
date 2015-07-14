@@ -51,7 +51,7 @@ public final class DBAdd extends DBUpdate {
   @Override
   public void prepare(final MemData tmp) throws QueryException {
     size = add.inputs.size();
-    add.addDocs(tmp, data.meta.name, options);
+    add.addDocs(data.meta.name, options);
   }
 
   @Override

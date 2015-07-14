@@ -138,7 +138,7 @@ public class QueryParser extends InputParser {
     this.sc = sctx;
 
     // bind external variables
-    for(final Entry<String, String> entry : QueryProcessor.bindings(opts).entrySet()) {
+    for(final Entry<String, String> entry : opts.toMap(MainOptions.BINDINGS).entrySet()) {
       final String key = entry.getKey();
       final Atm value = new Atm(entry.getValue());
       if(key.isEmpty()) qc.context(value, sc);

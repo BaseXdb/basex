@@ -117,8 +117,8 @@ public final class GeoTest extends AdvancedQueryTest {
         "<gml:coordinates>11,11 18,11 18,18 11,18 11,11</gml:coordinates>" +
         "</gml:LinearRing></gml:outerBoundaryIs></gml:Polygon>)",
         "<gml:LineString xmlns:gml=\"http://www.opengis.net/gml\">" +
-        "<gml:coordinates>11.0,11.0 18.0,11.0 18.0,18.0 11.0,18.0 " +
-        "11.0,11.0</gml:coordinates></gml:LineString>");
+        "<gml:coordinates>11.0,11.0 18.0,11.0 18.0,18.0 11.0,18.0 11.0,11.0</gml:coordinates>" +
+        "</gml:LineString>");
 
     run("geo:boundary(" +
         "<gml:Point><gml:coordinates>2,3</gml:coordinates></gml:Point>)",

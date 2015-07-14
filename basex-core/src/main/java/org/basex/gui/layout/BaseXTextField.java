@@ -133,8 +133,9 @@ public class BaseXTextField extends JTextField {
    * Attaches a history.
    * @param so option
    * @param win windows reference
+   * @return self reference
    */
-  public void history(final StringsOption so, final Window win) {
+  public BaseXTextField history(final StringsOption so, final Window win) {
     final GUI gui;
     final BaseXDialog dialog;
     if(win instanceof BaseXDialog) {
@@ -161,6 +162,7 @@ public class BaseXTextField extends JTextField {
         }
       }
     });
+    return this;
   }
 
   /**
@@ -175,14 +177,16 @@ public class BaseXTextField extends JTextField {
   /**
    * Adds a hint to the text field.
    * @param label text of the hint
+   * @return self reference
    */
-  public void hint(final String label) {
+  public BaseXTextField hint(final String label) {
     if(hint == null) {
       hint = new BaseXTextHint(label, this);
     } else {
       hint.setText(label);
     }
     setToolTipText(label.replaceAll("\\.\\.\\.$", ""));
+    return this;
   }
 
   @Override

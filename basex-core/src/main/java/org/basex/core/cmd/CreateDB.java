@@ -12,7 +12,6 @@ import org.basex.core.parse.Commands.Cmd;
 import org.basex.core.parse.Commands.CmdCreate;
 import org.basex.core.users.*;
 import org.basex.data.*;
-import org.basex.index.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.util.*;
@@ -82,9 +81,10 @@ public final class CreateDB extends ACreate {
       // close open database
       new Close().run(context);
 
+      final Data data;
       if(options.get(MainOptions.MAINMEM)) {
         // create main memory instance
-        final Data data = proc(new MemBuilder(name, parser)).build();
+        data = proc(new MemBuilder(name, parser)).build();
         context.openDB(data);
       } else {
         if(context.pinned(name)) return error(DB_PINNED_X, name);
@@ -96,18 +96,16 @@ public final class CreateDB extends ACreate {
         final Open open = new Open(name);
         if(!open.run(context)) return error(open.info());
 
-        final Data data = context.data();
-        if(!startUpdate()) return false;
-        final boolean ok;
-        try {
-          if(data.meta.createtext) create(IndexType.TEXT,      data, options, this);
-          if(data.meta.createattr) create(IndexType.ATTRIBUTE, data, options, this);
-          if(data.meta.createftxt) create(IndexType.FULLTEXT,  data, options, this);
-        } finally {
-          ok = finishUpdate();
-        }
-        if(!ok) return false;
+        data = context.data();
       }
+
+      if(!startUpdate()) return false;
+      try {
+        CreateIndex.create(data, options, this);
+      } finally {
+        if(!finishUpdate()) return false;
+      }
+
       if(options.get(MainOptions.CREATEONLY)) new Close().run(context);
 
       return info(parser.info() + DB_CREATED_X_X, name, perf);
@@ -119,7 +117,7 @@ public final class CreateDB extends ACreate {
     } catch(final Exception ex) {
       // known exceptions:
       // - IllegalArgumentException (UTF8, zip files)
-      Util.debug(ex);
+      Util.stack(ex);
       abort();
       return error(NOT_PARSED_X, parser.source);
     }
@@ -161,19 +159,18 @@ public final class CreateDB extends ACreate {
     // check permissions
     if(!ctx.user().has(Perm.CREATE)) throw new BaseXException(PERM_REQUIRED_X, Perm.CREATE);
 
-    // create main memory database instance
-    if(mem) return MemBuilder.build(name, parser);
+    // create main-memory or disk-based database instance
+    final Data data;
+    if(mem) {
+      data = MemBuilder.build(name, parser);
+    } else {
+      // database is currently locked by another process
+      if(ctx.pinned(name)) throw new BaseXException(DB_PINNED_X, name);
+      new DiskBuilder(name, parser, ctx.soptions, options).build().close();
+      data = Open.open(name, ctx, options);
+    }
 
-    // database is currently locked by another process
-    if(ctx.pinned(name)) throw new BaseXException(DB_PINNED_X, name);
-
-    // create disk-based instance
-    new DiskBuilder(name, parser, ctx.soptions, options).build().close();
-
-    final Data data = Open.open(name, ctx, options);
-    if(data.meta.createtext) create(IndexType.TEXT,      data, options, null);
-    if(data.meta.createattr) create(IndexType.ATTRIBUTE, data, options, null);
-    if(data.meta.createftxt) create(IndexType.FULLTEXT,  data, options, null);
+    CreateIndex.create(data, options, null);
     return data;
   }
 

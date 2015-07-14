@@ -108,6 +108,8 @@ public final class QueryContext extends Proc implements Closeable {
   public Item zone;
   /** Current nanoseconds. */
   public long nano;
+  /** Current milliseconds. */
+  public long ms;
 
   /** Strings to lock defined by read-lock option. */
   public final StringList readLocks = new StringList(0);
@@ -504,7 +506,7 @@ public final class QueryContext extends Proc implements Closeable {
   public void bind(final String name, final Value val, final StaticContext sc)
       throws QueryException {
     final byte[] n = token(name);
-    bindings.put(QNm.resolve(indexOf(n, '$') == 0 ? substring(n, 1) : n, null, sc, null), val);
+    bindings.put(QNm.resolve(indexOf(n, '$') == 0 ? substring(n, 1) : n, sc), val);
   }
 
   /**
@@ -828,6 +830,7 @@ public final class QueryContext extends Proc implements Closeable {
       date = new Dat(token(ymd + znm + ':' + zns), null);
       datm = new Dtm(token(ymd + 'T' + hms + znm + ':' + zns), null);
       zone = new DTDur(Strings.toInt(znm), Strings.toInt(zns));
+      ms = dt.getTime();
       nano = System.nanoTime();
     }
     return this;

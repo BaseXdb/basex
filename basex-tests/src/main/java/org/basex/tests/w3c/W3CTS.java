@@ -7,7 +7,6 @@ import java.io.*;
 import java.util.*;
 import java.util.regex.*;
 
-import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
@@ -22,7 +21,7 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
-import org.basex.util.options.Options.*;
+import org.basex.util.options.Options.YesNo;
 
 /**
  * XQuery Test Suite wrapper.
@@ -154,7 +153,7 @@ public abstract class W3CTS extends Main {
     final Performance perf = new Performance();
     context.options.set(MainOptions.CHOP, false);
 
-    data = MemBuilder.build(new IOFile(path + input));
+    data = new DBNode(new IOFile(path + input)).data();
 
     final DBNode root = new DBNode(data, 0);
     Util.outln(NL + Util.className(this) + " Test Suite " + text("/*:test-suite/@version", root));
@@ -284,7 +283,7 @@ public abstract class W3CTS extends Main {
       Value curr = null;
       if(!cont.isEmpty()) {
         final String p = srcs.get(string(cont.itemAt(0).string(null)));
-        final Data d = MemBuilder.build(IO.get(p));
+        final Data d = new DBNode(IO.get(p)).data();
         curr = DBNodeSeq.get(d.resources.docs(), d, true, true);
       }
 
@@ -504,7 +503,7 @@ public abstract class W3CTS extends Main {
   private Value toValue(final String xml, final boolean frag) {
     try {
       final String str = frag ? "<X>" + xml + "</X>" : xml;
-      final Data d = MemBuilder.build(IO.get(str));
+      final Data d = new DBNode(IO.get(str)).data();
       final IntList il = new IntList();
       for(int p = frag ? 2 : 0; p < d.meta.size; p += d.size(p, d.kind(p))) il.add(p);
       return DBNodeSeq.get(il, d, false, false);

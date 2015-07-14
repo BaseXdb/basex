@@ -81,7 +81,10 @@ public final class InfoDB extends AInfo {
         info(tb, UP_TO_DATE, meta.uptodate);
         info(tb, MainOptions.TEXTINDEX.name(), meta.textindex);
         info(tb, MainOptions.ATTRINDEX.name(), meta.attrindex);
-        info(tb, MainOptions.FTINDEX.name(), meta.ftxtindex);
+        info(tb, MainOptions.FTINDEX.name(), meta.ftindex);
+        info(tb, MainOptions.TEXTINCLUDE.name(), meta.textinclude);
+        info(tb, MainOptions.ATTRINCLUDE.name(), meta.attrinclude);
+        info(tb, MainOptions.FTINCLUDE.name(), meta.ftinclude);
         info(tb, MainOptions.LANGUAGE.name(), meta.language);
         info(tb, MainOptions.STEMMING.name(), meta.stemming);
         info(tb, MainOptions.CASESENS.name(), meta.casesens);

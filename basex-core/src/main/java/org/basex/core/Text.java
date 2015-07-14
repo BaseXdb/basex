@@ -168,6 +168,8 @@ public interface Text {
   /** Index info. */
   String LI_STRUCTURE = LI + "Structure: ";
   /** Index info. */
+  String LI_NAMES = LI + "Names: ";
+  /** Index info. */
   String LI_SIZE = LI + "Size: ";
   /** Index info. */
   String LI_ENTRIES = LI + "Entries: ";

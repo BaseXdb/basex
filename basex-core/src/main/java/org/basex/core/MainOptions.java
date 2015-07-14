@@ -78,6 +78,13 @@ public final class MainOptions extends Options {
   /** Flag for creating a full-text index. */
   public static final BooleanOption FTINDEX = new BooleanOption("FTINDEX", false);
 
+  /** Text index: names to include. */
+  public static final StringOption TEXTINCLUDE = new StringOption("TEXTINCLUDE", "");
+  /** Attribute index: names to include. */
+  public static final StringOption ATTRINCLUDE = new StringOption("ATTRINCLUDE", "");
+  /** Full-text index: names to include. */
+  public static final StringOption FTINCLUDE = new StringOption("FTINCLUDE", "");
+
   /** Maximum number of text/attribute index entries to keep in memory during index creation. */
   public static final NumberOption INDEXSPLITSIZE = new NumberOption("INDEXSPLITSIZE", 0);
   /** Maximum number of fulltext index entries to keep in memory during index creation. */

@@ -39,13 +39,15 @@ public final class CreateIndex extends ACreate {
     final IndexType type;
     if(ci == CmdIndex.TEXT) {
       data.meta.createtext = true;
+      data.meta.textinclude = options.get(MainOptions.TEXTINCLUDE);
       type = IndexType.TEXT;
     } else if(ci == CmdIndex.ATTRIBUTE) {
       data.meta.createattr = true;
+      data.meta.attrinclude = options.get(MainOptions.ATTRINCLUDE);
       type = IndexType.ATTRIBUTE;
     } else if(ci == CmdIndex.FULLTEXT) {
-      if(data.inMemory()) return error(NO_MAINMEM);
       data.meta.createftxt = true;
+      data.meta.ftinclude = options.get(MainOptions.FTINCLUDE);
       data.meta.stemming = options.get(MainOptions.STEMMING);
       data.meta.casesens = options.get(MainOptions.CASESENS);
       data.meta.diacritics = options.get(MainOptions.DIACRITICS);
@@ -72,5 +74,37 @@ public final class CreateIndex extends ACreate {
   @Override
   public void build(final CmdBuilder cb) {
     cb.init(Cmd.CREATE + " " + CmdCreate.INDEX).args();
+  }
+
+  /**
+   * Builds the index structures.
+   * @param data data reference
+   * @param options main options
+   * @param cmd calling command
+   * @throws IOException I/O exception
+   */
+  static void create(final Data data, final MainOptions options, final ACreate cmd)
+      throws IOException {
+    if(data.meta.createtext) CreateIndex.create(IndexType.TEXT,      data, options, cmd);
+    if(data.meta.createattr) CreateIndex.create(IndexType.ATTRIBUTE, data, options, cmd);
+    if(data.meta.createftxt) CreateIndex.create(IndexType.FULLTEXT,  data, options, cmd);
+  }
+
+  /**
+   * Builds the specified index.
+   * @param type index to be built
+   * @param data data reference
+   * @param options main options
+   * @param cmd calling command
+   * @throws IOException I/O exception
+   */
+  static void create(final IndexType type, final Data data, final MainOptions options,
+      final ACreate cmd) throws IOException {
+
+    DropIndex.drop(type, data);
+    data.createIndex(type, options, cmd);
+    if(type == IndexType.TEXT) data.meta.textindex = true;
+    else if(type == IndexType.ATTRIBUTE) data.meta.attrindex = true;
+    else if(type == IndexType.FULLTEXT) data.meta.ftindex = true;
   }
 }

@@ -137,7 +137,7 @@ public final class DiskBuilder extends Builder implements Closeable {
   protected void addDoc(final byte[] value) throws IOException {
     tout.write1(Data.DOC);
     tout.write2(0);
-    tout.write5(textOff(value, true));
+    tout.write5(textRef(value, true));
     tout.write4(0);
     tout.write4(meta.size++);
   }
@@ -162,7 +162,7 @@ public final class DiskBuilder extends Builder implements Closeable {
 
     tout.write1(dist << 3 | Data.ATTR);
     tout.write2(nameId);
-    tout.write5(textOff(value, false));
+    tout.write5(textRef(value, false));
     tout.write4(uriId);
     tout.write4(meta.size++);
   }
@@ -171,7 +171,7 @@ public final class DiskBuilder extends Builder implements Closeable {
   protected void addText(final byte[] value, final int dist, final byte kind) throws IOException {
     tout.write1(kind);
     tout.write2(0);
-    tout.write5(textOff(value, true));
+    tout.write5(textRef(value, true));
     tout.write4(dist);
     tout.write4(meta.size++);
   }
@@ -190,12 +190,12 @@ public final class DiskBuilder extends Builder implements Closeable {
    * @return inline value or text position
    * @throws IOException I/O exception
    */
-  private long textOff(final byte[] value, final boolean text) throws IOException {
-    // inline integer values...
+  private long textRef(final byte[] value, final boolean text) throws IOException {
+    // inline integer value
     final long v = Token.toSimpleInt(value);
     if(v != Integer.MIN_VALUE) return v | IO.OFFNUM;
 
-    // store text
+    // store text to heap file
     final DataOutput store = text ? xout : vout;
     final long off = store.size();
     final byte[] val = comp.pack(value);

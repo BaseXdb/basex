@@ -11,7 +11,6 @@ import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.Cmd;
 import org.basex.core.users.*;
 import org.basex.data.*;
-import org.basex.index.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
 import org.basex.query.value.item.*;
@@ -130,15 +129,13 @@ public final class OptimizeAll extends ACreate {
     try(final DiskBuilder builder = new DiskBuilder(tname, parser, sopts, options)) {
       final DiskData dt = builder.build();
       try {
-        if(ometa.createtext) create(IndexType.TEXT, dt, options, cmd);
-        if(ometa.createattr) create(IndexType.ATTRIBUTE, dt, options, cmd);
-        if(ometa.createftxt) create(IndexType.FULLTEXT, dt, options, cmd);
         // adopt original meta data
         dt.meta.createtext = ometa.createtext;
         dt.meta.createattr = ometa.createattr;
         dt.meta.createftxt = ometa.createftxt;
         dt.meta.filesize   = ometa.filesize;
         dt.meta.dirty      = true;
+        CreateIndex.create(dt, options, cmd);
 
         // move binary files
         final IOFile bin = data.meta.binaries();

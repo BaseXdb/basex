@@ -74,8 +74,8 @@ public final class ValueAccess extends IndexAccess {
     // use index traversal if index exists and if term is not too long.
     // otherwise, scan data sequentially
     final Data data = ictx.data;
-    final IndexIterator ii = (text ? data.meta.textindex : data.meta.attrindex) &&
-        tl > 0 && tl <= data.meta.maxlen ? data.iter(new StringToken(text, term)) : scan(term);
+    final IndexIterator ii = (text ? data.meta.textindex : data.meta.attrindex) && tl > 0 &&
+        tl <= data.meta.maxlen ? data.iter(new StringToken(text, term)) : scan(term);
 
     final int kind = text ? Data.TEXT : Data.ATTR;
     final DBNode tmp = new DBNode(data, 0, test == null ? kind : Data.ELEM);

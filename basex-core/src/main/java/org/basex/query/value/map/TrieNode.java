@@ -187,7 +187,7 @@ abstract class TrieNode {
    * @param func function to apply on keys and values
    * @param qc query context
    * @param ii input info
-   * @throws QueryException TODO
+   * @throws QueryException query exception
    */
   abstract void apply(final ValueBuilder vb, final FItem func, QueryContext qc, InputInfo ii)
       throws QueryException;

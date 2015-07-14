@@ -205,17 +205,6 @@ final class Docs {
   }
 
   /**
-   * Replaces entries in the index.
-   * @param pre insertion position
-   * @param size number of deleted nodes
-   * @param clip data clip
-   */
-  void replace(final int pre, final int size, final DataClip clip) {
-    delete(pre, size);
-    insert(pre, clip);
-  }
-
-  /**
    * Notifies the meta structures of an update and invalidates the indexes.
    */
   private synchronized void update() {

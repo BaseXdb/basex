@@ -246,8 +246,8 @@ public final class UpdateTestText extends UpdateTest {
         data.kind(pre - 1)) == par && data.kind(pre - 1) == Data.TEXT))
       throw new IOException("May not insert TEXT before/after TEXT!");
 
-    final MemData md = new MemData(context.data(), context.options);
-    md.text(0, pre - par, val, kind);
+    final MemData md = new MemData(context.options);
+    md.text(pre - par, val, kind);
     md.insert(0);
     data.startUpdate(context.options);
     data.insert(pre, par, new DataClip(md));

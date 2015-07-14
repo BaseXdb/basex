@@ -3,7 +3,7 @@ package org.basex.io.random;
 import org.basex.io.*;
 
 /**
- * This class represents a simple buffer.
+ * Simple buffer for disk blocks.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen

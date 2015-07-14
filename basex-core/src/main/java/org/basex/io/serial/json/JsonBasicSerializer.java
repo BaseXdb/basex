@@ -56,7 +56,7 @@ public final class JsonBasicSerializer extends JsonSerializer {
       if(!eq(name.uri(), QueryText.FN_URI))
         throw error("Element '%' has invalid namespace: '%'.", type, name.uri());
 
-      byte[] key = node.attribute(KEY);
+      final byte[] key = node.attribute(KEY);
       if(printKey) {
         if(key == null) throw error("Element '%' has no key.", type);
         out.print('"');
@@ -70,17 +70,17 @@ public final class JsonBasicSerializer extends JsonSerializer {
         out.print(NULL);
         if(iter.next() != null) throw error("Element '%' must have no children.", type);
       } else if(eq(type, BOOLEAN)) {
-        byte[] value = value(iter, type);
+        final byte[] value = value(iter, type);
         if(value == null) throw error("Element '%' has no value.", type);
         if(!eq(value, TRUE, FALSE)) throw error("Element '%' has invalid value: '%'.", type, value);
         out.print(value);
       } else if(eq(type, STRING)) {
-        byte[] value = value(iter, type);
+        final byte[] value = value(iter, type);
         out.print('"');
         if(value != null) out.print(escape(value, node.attribute(ESCAPED)));
         out.print('"');
       } else if(eq(type, NUMBER)) {
-        byte[] value = value(iter, type);
+        final byte[] value = value(iter, type);
         if(value == null) throw error("Element '%' has no value.", type);
         final Double d = toDouble(value);
         if(d.isNaN() || d.isInfinite())
@@ -145,7 +145,7 @@ public final class JsonBasicSerializer extends JsonSerializer {
    * @throws IOException I/O exception
    */
   private void children(final BasicNodeIter iter, final boolean pk) throws IOException {
-    boolean tmp = printKey;
+    final boolean tmp = printKey;
     printKey = pk;
     level++;
     boolean comma = false;

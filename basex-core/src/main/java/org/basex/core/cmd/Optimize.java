@@ -75,20 +75,21 @@ public final class Optimize extends ACreate {
    */
   public static void optimize(final Data data, final MainOptions options, final Optimize cmd)
       throws IOException {
-    optimize(data, options, false, false, cmd);
+    optimize(data, options, false, false, false, cmd);
   }
 
   /**
    * Optimizes the structures of a database.
    * @param data data
    * @param options main options
-   * @param enforce enforce index operation
-   * @param enforceFT enforce full-text index operation
+   * @param enforceTxt enforce text index operation
+   * @param enforceAtr enforce attribute index operation
+   * @param enforceFtx enforce full-text index operation
    * @param cmd calling command instance (may be {@code null})
    * @throws IOException I/O Exception during index rebuild
    */
-  public static void optimize(final Data data, final MainOptions options, final boolean enforce,
-      final boolean enforceFT, final Optimize cmd) throws IOException {
+  public static void optimize(final Data data, final MainOptions options, final boolean enforceTxt,
+      final boolean enforceAtr, final boolean enforceFtx, final Optimize cmd) throws IOException {
 
     // initialize structural indexes
     final MetaData md = data.meta;
@@ -145,9 +146,9 @@ public final class Optimize extends ACreate {
     }
 
     // rebuild value indexes
-    optimize(IndexType.ATTRIBUTE, data, options, md.createattr, md.attrindex, enforce, cmd);
-    optimize(IndexType.TEXT,      data, options, md.createtext, md.textindex, enforce, cmd);
-    optimize(IndexType.FULLTEXT,  data, options, md.createftxt, md.ftxtindex, enforceFT, cmd);
+    optimize(IndexType.TEXT,      data, options, md.createtext, md.textindex, enforceTxt, cmd);
+    optimize(IndexType.ATTRIBUTE, data, options, md.createattr, md.attrindex, enforceAtr, cmd);
+    optimize(IndexType.FULLTEXT,  data, options, md.createftxt, md.ftindex, enforceFtx, cmd);
   }
 
   /**
@@ -157,19 +158,19 @@ public final class Optimize extends ACreate {
    * @param options main options
    * @param create new flag
    * @param old old flag
-   * @param force enforce operation
+   * @param enforce enforce operation
    * @param cmd calling command instance
    * @throws IOException I/O exception
    */
   private static void optimize(final IndexType type, final Data data, final MainOptions options,
-      final boolean create, final boolean old, final boolean force, final Optimize cmd)
+      final boolean create, final boolean old, final boolean enforce, final Optimize cmd)
       throws IOException {
 
     // check if flags have changed
-    if(create == old && !force) return;
+    if(create == old && !enforce) return;
 
     // create or drop index
-    if(create) create(type, data, options, cmd);
-    else drop(type, data);
+    if(create) CreateIndex.create(type, data, options, cmd);
+    else DropIndex.drop(type, data);
   }
 }
