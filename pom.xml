@@ -68,6 +68,8 @@
         <groupId>com.thaiopensource</groupId>
         <artifactId>jing</artifactId>
         <version>20091111</version>
+        <scope>runtime</scope>
+        <optional>true</optional>
         <exclusions>
           <exclusion>
             <groupId>xerces</groupId>
