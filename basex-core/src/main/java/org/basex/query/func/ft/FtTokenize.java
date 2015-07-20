@@ -17,7 +17,7 @@ import org.basex.util.list.*;
  */
 public class FtTokenize extends FtAccess {
   @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
+  public final Iter iter(final QueryContext qc) throws QueryException {
     return value(qc).iter();
   }
 
@@ -33,7 +33,7 @@ public class FtTokenize extends FtAccess {
    * @return resulting tokens
    * @throws QueryException query exception
    */
-  protected TokenList tokens(final QueryContext qc, final boolean all) throws QueryException {
+  protected final TokenList tokens(final QueryContext qc, final boolean all) throws QueryException {
     final byte[] token = toToken(exprs[0], qc);
     final FtTokenizeOptions opts = toOptions(1, Q_OPTIONS, new FtTokenizeOptions(), qc);
 
