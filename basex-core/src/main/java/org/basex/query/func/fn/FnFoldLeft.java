@@ -16,6 +16,15 @@ import org.basex.query.var.*;
  */
 public final class FnFoldLeft extends StandardFunc {
   @Override
+  public Value value(final QueryContext qc) throws QueryException {
+    final Iter ir = exprs[0].iter(qc);
+    final FItem fun = checkArity(exprs[2], 2, qc);
+    Value res = qc.value(exprs[1]);
+    for(Item it; (it = ir.next()) != null;) res = fun.invokeValue(qc, info, res, it);
+    return res;
+  }
+
+  @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Iter ir = exprs[0].iter(qc);
     final FItem fun = checkArity(exprs[2], 2, qc);

@@ -5,6 +5,7 @@ import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.io.random.*;
 import org.basex.query.util.pkg.*;
+import org.basex.query.value.seq.*;
 import org.basex.server.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -28,8 +29,6 @@ public final class Context {
   public final StaticOptions soptions;
   /** Client sessions. */
   public final Sessions sessions;
-  /** Event pool. */
-  public final Events events;
   /** Opened databases. */
   public final Datas datas;
   /** Users. */
@@ -85,7 +84,6 @@ public final class Context {
   public Context(final Context ctx) {
     soptions = ctx.soptions;
     datas = ctx.datas;
-    events = ctx.events;
     sessions = ctx.sessions;
     databases = ctx.databases;
     blocker = ctx.blocker;
@@ -113,7 +111,6 @@ public final class Context {
   private Context(final StaticOptions soptions) {
     this.soptions = soptions;
     datas = new Datas();
-    events = new Events();
     sessions = new Sessions();
     blocker = new ClientBlocker();
     databases = new Databases(soptions);
@@ -176,9 +173,7 @@ public final class Context {
   public DBNodes current() {
     if(data == null) return null;
     if(current != null) return current;
-    final DBNodes nodes = new DBNodes(data, data.resources.docs().toArray());
-    nodes.all = true;
-    return nodes;
+    return new DBNodes(data, true, data.resources.docs().toArray());
   }
 
   /**

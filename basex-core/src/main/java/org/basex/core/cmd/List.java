@@ -32,7 +32,7 @@ public final class List extends Command {
 
   /**
    * Default constructor.
-   * @param name database name
+   * @param name database name (can be {@code null})
    */
   public List(final String name) {
     this(name, null);
@@ -40,21 +40,21 @@ public final class List extends Command {
 
   /**
    * Default constructor.
-   * @param name database name
-   * @param path database path
+   * @param name database name (can be {@code null})
+   * @param path database path (can be {@code null})
    */
   public List(final String name, final String path) {
-    super(Perm.NONE, name, path);
+    super(Perm.NONE, name == null ? "" : name, path == null ? "" : path);
   }
 
   @Override
   protected boolean run() throws IOException {
-    return args[0] == null || args[0].isEmpty() ? list() : listDB();
+    return args[0].isEmpty() ? list() : listDB();
   }
 
   @Override
   public void databases(final LockResult lr) {
-    if(args[0] == null || args[0].isEmpty()) lr.readAll = true;
+    if(args[0].isEmpty()) lr.readAll = true;
     else lr.read.add(args[0]);
   }
 
@@ -75,26 +75,25 @@ public final class List extends Command {
 
     for(final String name : context.filter(Perm.READ, context.databases.listDBs())) {
       String file = null;
-      long size = 0;
-      int docs = 0;
+      long dbsize = 0;
+      int count = 0;
 
-      final MetaData meta = new MetaData(name, options, soptions);
       try {
+        final MetaData meta = new MetaData(name, options, soptions);
         meta.read();
-        size = meta.dbsize();
-        docs = meta.ndocs;
+        dbsize = meta.dbsize();
         file = meta.original;
+        // add number of raw files
+        count = meta.ndocs + new IOFile(soptions.dbpath(name), IO.RAW).descendants().size();
       } catch(final IOException ex) {
         file = ERROR;
       }
-      // count number of raw files
-      final int bin = new IOFile(soptions.dbpath(name), IO.RAW).descendants().size();
 
       // create entry
       final TokenList tl = new TokenList(create ? 4 : 3);
       tl.add(name);
-      tl.add(docs + bin);
-      tl.add(size);
+      tl.add(count);
+      tl.add(dbsize);
       if(create) tl.add(file);
       table.contents.add(tl);
     }
@@ -108,8 +107,7 @@ public final class List extends Command {
    * @throws IOException I/O exception
    */
   private boolean listDB() throws IOException {
-    final String db = args[0];
-    final String path = args[1] != null ? args[1] : "";
+    final String db = args[0], path = args[1];
     if(!Databases.validName(db)) return error(NAME_INVALID_X, db);
 
     final Table table = new Table();

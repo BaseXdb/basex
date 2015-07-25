@@ -11,7 +11,7 @@ import org.basex.query.value.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
-final class LeafNode extends Node<Value, Value> {
+final class LeafNode implements Node<Value, Value> {
   /** Elements stored in this leaf node. */
   final Value[] values;
 
@@ -25,12 +25,12 @@ final class LeafNode extends Node<Value, Value> {
   }
 
   @Override
-  protected long size() {
+  public long size() {
     return values.length;
   }
 
   @Override
-  protected LeafNode reverse() {
+  public LeafNode reverse() {
     final int n = values.length;
     final Value[] out = new Value[n];
     for(int i = 0; i < n; i++) out[i] = values[n - 1 - i];
@@ -38,7 +38,7 @@ final class LeafNode extends Node<Value, Value> {
   }
 
   @Override
-  protected boolean insert(final Node<Value, Value>[] siblings,
+  public boolean insert(final Node<Value, Value>[] siblings,
       final long pos, final Value val) {
     final int p = (int) pos, n = values.length;
     final Value[] vals = new Value[n + 1];
@@ -93,20 +93,11 @@ final class LeafNode extends Node<Value, Value> {
   }
 
   @Override
-  protected NodeLike<Value, Value> remove(final long pos) {
-    final int p = (int) pos, n = values.length;
-    final Value[] out = new Value[n - 1];
-    System.arraycopy(values, 0, out, 0, p);
-    System.arraycopy(values, p + 1, out, p, n - 1 - p);
-    return n == Array.MIN_LEAF ? new PartialLeafNode(out) : new LeafNode(out);
-  }
-
-  @Override
-  protected Node<Value, Value>[] remove(final Node<Value, Value> left,
+  public NodeLike<Value, Value>[] remove(final Node<Value, Value> left,
       final Node<Value, Value> right, final long pos) {
     final int p = (int) pos, n = values.length;
     @SuppressWarnings("unchecked")
-    final Node<Value, Value>[] out = new Node[] { left, null, right };
+    final NodeLike<Value, Value>[] out = new NodeLike[] { left, null, right };
     if(n > Array.MIN_LEAF) {
       // we do not have to split
       final Value[] vals = new Value[n - 1];
@@ -160,7 +151,10 @@ final class LeafNode extends Node<Value, Value> {
       System.arraycopy(values, p + 1, vals, l + p, r - 1 - p);
       out[0] = new LeafNode(vals);
       out[1] = null;
-    } else {
+      return out;
+    }
+
+    if(right != null) {
       // merge with right neighbor
       final Value[] rvals = ((LeafNode) right).values;
       final int l = values.length, r = rvals.length;
@@ -170,44 +164,19 @@ final class LeafNode extends Node<Value, Value> {
       System.arraycopy(rvals, 0, vals, l - 1, r);
       out[1] = null;
       out[2] = new LeafNode(vals);
+      return out;
     }
 
+    // underflow
+    final Value[] vals = new Value[n - 1];
+    System.arraycopy(values, 0, vals, 0, p);
+    System.arraycopy(values, p + 1, vals, p, n - 1 - p);
+    out[1] = new PartialLeafNode(vals);
     return out;
   }
 
   @Override
-  protected NodeLike<Value, Value>[] concat(final NodeLike<Value, Value> other) {
-    @SuppressWarnings("unchecked")
-    final NodeLike<Value, Value>[] arr = new NodeLike[2];
-
-    if(other instanceof PartialLeafNode) {
-      final Value[] left = values, right = ((PartialLeafNode) other).elems;
-      final int l = left.length, r = right.length, n = l + r;
-      if(n <= Array.MAX_LEAF) {
-        // merge into one node
-        final Value[] vals = new Value[n];
-        System.arraycopy(left, 0, vals, 0, l);
-        System.arraycopy(right, 0, vals, l, r);
-        arr[0] = new LeafNode(vals);
-      } else {
-        // split into two
-        final int ll = n / 2, rl = n - ll, move = l - ll;
-        final Value[] newLeft = new Value[ll], newRight = new Value[rl];
-        System.arraycopy(left, 0, newLeft, 0, ll);
-        System.arraycopy(left, ll, newRight, 0, move);
-        System.arraycopy(right, 0, newRight, move, r);
-        arr[0] = new LeafNode(newLeft);
-        arr[1] = new LeafNode(newRight);
-      }
-    } else {
-      arr[0] = this;
-      arr[1] = other;
-    }
-    return arr;
-  }
-
-  @Override
-  protected int append(final NodeLike<Value, Value>[] nodes, final int pos) {
+  public int append(final NodeLike<Value, Value>[] nodes, final int pos) {
     if(pos == 0) {
       nodes[pos] = this;
       return 1;
@@ -242,7 +211,7 @@ final class LeafNode extends Node<Value, Value> {
   }
 
   @Override
-  protected NodeLike<Value, Value> slice(final long off, final long size) {
+  public NodeLike<Value, Value> slice(final long off, final long size) {
     final int p = (int) off, n = (int) size;
     final Value[] out = new Value[n];
     System.arraycopy(values, p, out, 0, n);
@@ -250,41 +219,24 @@ final class LeafNode extends Node<Value, Value> {
   }
 
   @Override
-  protected Node<Value, Value> replaceFirst(final Value newFirst) {
-    if(newFirst == values[0]) return this;
-    final Value[] vals = values.clone();
-    vals[0] = newFirst;
-    return new LeafNode(vals);
-  }
-
-  @Override
-  protected Node<Value, Value> replaceLast(final Value newLast) {
-    if(newLast == values[values.length - 1]) return this;
-    final Value[] vals = values.clone();
-    vals[vals.length - 1] = newLast;
-    return new LeafNode(vals);
-  }
-
-  @Override
-  protected void toString(final StringBuilder sb, final int indent) {
-    for(int i = 0; i < indent; i++) sb.append("  ");
-    sb.append("Node(").append(size()).append(")").append(Arrays.toString(values));
-  }
-
-  @Override
-  protected long checkInvariants() {
+  public long checkInvariants() {
     if(values.length < Array.MIN_LEAF || values.length > Array.MAX_LEAF)
       throw new AssertionError("Wrong " + getClass().getSimpleName() + " size: " + values.length);
     return values.length;
   }
 
   @Override
-  protected int arity() {
+  public int arity() {
     return values.length;
   }
 
   @Override
-  protected Value getSub(final int index) {
+  public Value getSub(final int index) {
     return values[index];
+  }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "(" + size() + ")" + Arrays.toString(values);
   }
 }

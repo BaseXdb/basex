@@ -17,13 +17,8 @@ import org.basex.util.*;
 public final class FnRoot extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    ANode node = toEmptyNode(arg(0, qc), qc);
-    while(node != null) {
-      final ANode p = node.parent();
-      if(p == null) break;
-      node = p;
-    }
-    return node;
+    final ANode node = toEmptyNode(ctxArg(0, qc), qc);
+    return node != null ? node.root() : null;
   }
 
   @Override

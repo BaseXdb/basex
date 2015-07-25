@@ -37,8 +37,8 @@ public final class HofTopKWith extends HofFn {
       }
     } catch(final QueryRTException ex) { throw ex.getCause(); }
 
-    final Item[] arr = new Item[heap.size()];
-    for(int i = arr.length; --i >= 0;) arr[i] = heap.removeMin();
-    return Seq.get(arr);
+    final ValueBuilder vb = new ValueBuilder();
+    while(!heap.isEmpty()) vb.addFront(heap.removeMin());
+    return vb.value();
   }
 }

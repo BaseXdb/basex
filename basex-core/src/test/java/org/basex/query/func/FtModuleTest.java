@@ -223,5 +223,8 @@ public final class FtModuleTest extends AdvancedQueryTest {
     query("declare ft-option using stemming; " + _FT_NORMALIZE.args("Gifts"), "gift");
     query(_FT_NORMALIZE.args(""), "");
     query(_FT_NORMALIZE.args("a!b:c"), "a!b:c");
+
+    query("ft:normalize('&#778;', map { 'stemming': true(), 'language': 'de' })", "");
+    query("'/' ! " + _FT_NORMALIZE.args(" ."), "/");
   }
 }

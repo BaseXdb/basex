@@ -57,7 +57,7 @@ public final class IndexInfo {
 
   /**
    * Checks if the specified expression can be rewritten for index access.
-   * @param ex expression (must be {@link Context} or {@link AxisPath})
+   * @param ex expression (must be {@link ContextValue} or {@link AxisPath})
    * @param ft full-text flag
    * @return location step or {@code null}
    */
@@ -66,7 +66,7 @@ public final class IndexInfo {
 
     // context reference: work with index step
     Step s = step;
-    if(!(ex instanceof Context)) {
+    if(!(ex instanceof ContextValue)) {
       // check if index can be applied
       if(!(ex instanceof AxisPath)) return false;
       // accept only single axis steps as first expression
@@ -82,7 +82,7 @@ public final class IndexInfo {
     final boolean elem = s.test.type == NodeType.ELM;
     if(elem) {
       // only do check if database is up-to-date if no namespaces occur and if name test is used
-      if(!data.meta.uptodate || data.nspaces.size() != 0 || s.test.kind != Kind.NAME) return false;
+      if(!data.meta.uptodate || !data.nspaces.isEmpty() || s.test.kind != Kind.NAME) return false;
       test = (NameTest) s.test;
       final Stats stats = data.elemNames.stat(data.elemNames.id(test.name.local()));
       if(stats == null || !stats.isLeaf()) return false;
@@ -119,7 +119,7 @@ public final class IndexInfo {
    */
   private ParseExpr invert(final ParseExpr root) {
     // handle context node
-    if(orig instanceof Context) {
+    if(orig instanceof ContextValue) {
       // add attribute step
       if(!attr || step.test.name == null) return root;
       final Step as = Step.get(step.info, Axis.SELF, step.test);

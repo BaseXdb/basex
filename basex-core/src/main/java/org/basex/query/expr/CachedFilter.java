@@ -2,6 +2,7 @@ package org.basex.query.expr;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -28,6 +29,11 @@ final class CachedFilter extends Filter {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
+    return value(qc).iter();
+  }
+
+  @Override
+  public Value value(final QueryContext qc) throws QueryException {
     Value val = root.value(qc);
     final Value cv = qc.value;
     final long cs = qc.size;
@@ -35,7 +41,7 @@ final class CachedFilter extends Filter {
 
     try {
       // evaluate first predicate, based on incoming value
-      final ValueBuilder vb = new ValueBuilder();
+      final ItemList buffer = new ItemList();
       Expr pred = preds[0];
       long vs = val.size();
       qc.size = vs;
@@ -48,7 +54,7 @@ final class CachedFilter extends Filter {
         final Item test = pred.test(qc, info);
         if(test != null) {
           if(scoring) item.score(test.score());
-          vb.add(item);
+          buffer.add(item);
         }
         qc.pos++;
       }
@@ -58,26 +64,26 @@ final class CachedFilter extends Filter {
       // evaluate remaining predicates, based on value builder
       final int pl = preds.length;
       for(int i = 1; i < pl; i++) {
-        vs = vb.size();
+        vs = buffer.size();
         pred = preds[i];
         qc.size = vs;
         qc.pos = 1;
         int c = 0;
         for(int s = 0; s < vs; ++s) {
-          final Item item = vb.get(s);
+          final Item item = buffer.get(s);
           qc.value = item;
           final Item test = pred.test(qc, info);
           if(test != null) {
             if(scoring) item.score(test.score());
-            vb.set(c++, item);
+            buffer.set(c++, item);
           }
           qc.pos++;
         }
-        vb.size(c);
+        buffer.size(c);
       }
 
       // return resulting values
-      return vb;
+      return buffer.value();
     } finally {
       qc.value = cv;
       qc.size = cs;

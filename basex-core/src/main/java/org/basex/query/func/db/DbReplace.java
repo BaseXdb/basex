@@ -26,7 +26,7 @@ public final class DbReplace extends DbNew {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Data data = checkData(qc);
     final String path = path(1, qc);
-    final Item item = toItem(exprs[2], qc);
+    final Item item = toNodeOrAtomItem(exprs[2], qc);
     final Options opts = toOptions(3, Q_OPTIONS, new Options(), qc);
 
     final Updates updates = qc.resources.updates();

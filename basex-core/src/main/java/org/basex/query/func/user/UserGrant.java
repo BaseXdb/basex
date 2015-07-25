@@ -20,9 +20,9 @@ public final class UserGrant extends UserFn {
     checkAdmin(qc);
     final User user = toSafeUser(0, qc);
     final Perm perm = toPerm(1, qc);
-    final String db = exprs.length > 2 ? toDB(2, qc) : null;
+    final String db = exprs.length > 2 ? toDB(2, qc) : "";
     if(user.name().equals(UserText.ADMIN)) throw USER_ADMIN.get(info);
-    if(db != null && (perm == Perm.CREATE || perm == Perm.ADMIN))
+    if(!db.isEmpty() && (perm == Perm.CREATE || perm == Perm.ADMIN))
       throw USER_LOCAL.get(info);
 
     qc.resources.updates().add(new Grant(user, perm, db, qc, ii), qc);
@@ -38,13 +38,13 @@ public final class UserGrant extends UserFn {
      * Constructor.
      * @param user user
      * @param perm permission
-     * @param db database
+     * @param pattern pattern
      * @param qc query context
      * @param info input info
      */
-    private Grant(final User user, final Perm perm, final String db, final QueryContext qc,
+    private Grant(final User user, final Perm perm, final String pattern, final QueryContext qc,
         final InputInfo info) {
-      super(UpdateType.USERGRANT, user, db, qc, info);
+      super(UpdateType.USERGRANT, user, pattern, qc, info);
       this.perm = perm;
     }
 

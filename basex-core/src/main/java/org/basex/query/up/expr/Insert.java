@@ -88,18 +88,18 @@ public final class Insert extends Update {
       if(targ.type != NodeType.ELM) throw (before || after ? UPATTELM : UPATTELM2).get(info);
 
       dbn = updates.determineDataRef(targ, qc);
-      up = new InsertAttribute(dbn.pre, dbn.data, info, checkNS(aList, targ));
+      up = new InsertAttribute(dbn.pre(), dbn.data(), info, checkNS(aList, targ));
       updates.add(up, qc);
     }
 
     // no update primitive is created if node list is empty
     if(!cList.isEmpty()) {
       dbn = updates.determineDataRef(n, qc);
-      if(before) up = new InsertBefore(dbn.pre, dbn.data, info, cList);
-      else if(after) up = new InsertAfter(dbn.pre, dbn.data, info, cList);
-      else if(first) up = new InsertIntoAsFirst(dbn.pre, dbn.data, info, cList);
-      else if(last) up = new InsertIntoAsLast(dbn.pre, dbn.data, info, cList);
-      else up = new InsertInto(dbn.pre, dbn.data, info, cList);
+      if(before) up = new InsertBefore(dbn.pre(), dbn.data(), info, cList);
+      else if(after) up = new InsertAfter(dbn.pre(), dbn.data(), info, cList);
+      else if(first) up = new InsertIntoAsFirst(dbn.pre(), dbn.data(), info, cList);
+      else if(last) up = new InsertIntoAsLast(dbn.pre(), dbn.data(), info, cList);
+      else up = new InsertInto(dbn.pre(), dbn.data(), info, cList);
       updates.add(up, qc);
     }
     return null;

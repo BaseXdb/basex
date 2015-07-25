@@ -124,6 +124,13 @@ public final class FileModuleTest extends AdvancedQueryTest {
 
   /** Test method. */
   @Test
+  public void isAbsolute() {
+    query(_FILE_IS_ABSOLUTE.args(PATH), true);
+    query(_FILE_IS_ABSOLUTE.args("a"), false);
+  }
+
+  /** Test method. */
+  @Test
   public void isFile() {
     query(_FILE_IS_FILE.args(PATH), false);
     query(_FILE_WRITE.args(PATH1, "()"));
@@ -426,9 +433,15 @@ public final class FileModuleTest extends AdvancedQueryTest {
   @Test
   public void resolvePath() {
     final String path = query(_FILE_RESOLVE_PATH.args(PATH1));
-    final String can = Paths.get(PATH1).normalize().toAbsolutePath().toString();
-    assertEquals(path, can);
+    final String can1 = Paths.get(PATH1).normalize().toAbsolutePath().toString();
+    final String can2 = Paths.get(PATH2).normalize().toAbsolutePath().toString();
+    assertEquals(path, can1);
     query(ENDS_WITH.args(_FILE_RESOLVE_PATH.args("."), File.separator), "true");
+
+    query(CONTAINS.args(_FILE_RESOLVE_PATH.args(can1, can2), can1), "true");
+    query(CONTAINS.args(_FILE_RESOLVE_PATH.args("X", can1), can1 + File.separator + "X"), "true");
+    error(_FILE_RESOLVE_PATH.args(can1, "b"), FILE_IS_RELATIVE_X);
+    error(_FILE_RESOLVE_PATH.args("X", "b"), FILE_IS_RELATIVE_X);
   }
 
   /** Test method. */

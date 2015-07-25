@@ -8,6 +8,9 @@ module namespace _ = 'dba/databases';
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace util = 'dba/util' at '../modules/util.xqm';
 
+(:~ Top category :)
+declare variable $_:CAT := 'databases';
+
 (:~
  : Drops databases.
  : @param  $names  names of databases
@@ -15,7 +18,7 @@ import module namespace util = 'dba/util' at '../modules/util.xqm';
 declare
   %updating
   %rest:GET
-  %rest:path("dba/drop-db")
+  %rest:path("/dba/drop-db")
   %rest:query-param("name", "{$names}")
   %output:method("html")
 function _:drop(
@@ -24,8 +27,8 @@ function _:drop(
   cons:check(),
   try {
     util:update("$n ! db:drop(.)", map { 'n': $names }),
-    db:output(web:redirect("databases", map { 'info': 'Dropped databases: ' || count($names) }))
+    db:output(web:redirect($_:CAT, map { 'info': 'Dropped databases: ' || count($names) }))
   } catch * {
-    db:output(web:redirect("databases", map { 'error': $err:description }))
+    db:output(web:redirect($_:CAT, map { 'error': $err:description }))
   }
 };

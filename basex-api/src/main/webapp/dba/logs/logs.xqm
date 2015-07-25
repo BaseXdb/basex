@@ -25,7 +25,7 @@ declare variable $_:CAT := 'logs';
  :)
 declare
   %rest:GET
-  %rest:path("dba/logs")
+  %rest:path("/dba/logs")
   %rest:query-param("sort",    "{$sort}", "")
   %rest:query-param("name",    "{$name}")
   %rest:query-param("loglist", "{$loglist}")
@@ -48,13 +48,15 @@ function _:logs(
   return tmpl:wrap(map { 'top': $_:CAT, 'info': $info, 'error': $error },
     <tr>
       <td width='230'>
-        <input type='hidden' name='name' id='name' value='{ $name }'/>
-        <input type='hidden' name='sort' id='sort' value='{ $sort }'/>
-        <form action="{ $_:CAT }" method="post" class="update" autocomplete="off">
+        <form action="javascript:void(0);">
           <h2>{ if($name) then <a href="{ $_:CAT }">Logs</a> else 'Logs' }:
             <input size="14" name="loglist" id="loglist" value="{ $loglist }"
               onkeyup="logslist('Please wait…', 'Query was successful.');"/>
           </h2>
+        </form>
+        <form action="{ $_:CAT }" method="post" class="update" autocomplete="off">
+          <input type='hidden' name='name' id='name' value='{ $name }'/>
+          <input type='hidden' name='sort' id='sort' value='{ $sort }'/>
           <div id='list'>{ $loglists }</div>
         </form>
       </td>
@@ -76,8 +78,8 @@ function _:logs(
 };
 
 (:~
- : Returns log data.
- : @param  $name     name of log file
+ : Returns log entries of a specific log file.
+ : @param  $names    name of selected log files
  : @param  $sort     table sort key
  : @param  $loglist  loglist
  : @param  $query    query
@@ -85,7 +87,7 @@ function _:logs(
  :)
 declare
   %rest:POST
-  %rest:path("dba/logs")
+  %rest:path("/dba/log")
   %rest:query-param("name",    "{$name}")
   %rest:query-param("sort",    "{$sort}")
   %rest:query-param("loglist", "{$loglist}")
@@ -128,7 +130,7 @@ function _:query(
  :)
 declare
   %rest:POST
-  %rest:path("dba/loglist")
+  %rest:path("/dba/loglist")
   %rest:query-param("sort",  "{$sort}")
   %rest:query-param("query", "{$query}")
   %output:method("html")
@@ -157,8 +159,26 @@ function _:loglist(
     <name>{ html:label($entries, ('Log', 'Logs')) }</name>,
     <size type='bytes'>Size</size>
   )
-  let $buttons := html:button('delete-log', 'Delete', true())
+  let $buttons := html:button('delete-logs', 'Delete', true())
   let $link := function($value) { $_:CAT }
   return html:table($entries, $headers, $buttons,
     map { 'sort': $sort, 'loglist': $query }, (), $link)
+};
+
+(:~
+ : Redirects to the specified action.
+ : @param  $action  action to perform
+ : @param  $names   names of selected databases
+ :)
+declare
+  %rest:POST
+  %rest:path("/dba/logs")
+  %rest:query-param("action", "{$action}")
+  %rest:query-param("name",   "{$names}")
+  %output:method("html")
+function _:action(
+  $action  as xs:string,
+  $names   as xs:string*
+) {
+  web:redirect($action, map { 'name': $names[.], 'redirect': $_:CAT })
 };

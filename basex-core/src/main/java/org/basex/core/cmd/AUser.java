@@ -38,10 +38,10 @@ abstract class AUser extends Command {
    */
   boolean run(final int off, final boolean opt) {
     final String name = args[off];
-    final String pattern = off + 1 < args.length ? args[off + 1] : null;
+    final String pattern = off + 1 < args.length ? args[off + 1] : "";
 
     if(!Databases.validName(name, true)) return error(NAME_INVALID_X, name);
-    if(pattern != null && !Databases.validName(pattern, true))
+    if(!pattern.isEmpty() && !Databases.validName(pattern, true))
       return error(NAME_INVALID_X, pattern);
 
     // retrieve all users; stop if no user is found

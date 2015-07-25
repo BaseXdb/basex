@@ -41,7 +41,7 @@ public final class Delete extends Update {
       if(n.parent() == null) continue;
       final Updates updates = qc.resources.updates();
       final DBNode dbn = updates.determineDataRef(n, qc);
-      updates.add(new DeleteNode(dbn.pre, dbn.data, info), qc);
+      updates.add(new DeleteNode(dbn.pre(), dbn.data(), info), qc);
     }
     return null;
   }

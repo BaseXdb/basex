@@ -20,7 +20,7 @@ public final class DbStore extends DbAccess {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Data data = checkData(qc);
     final String path = path(1, qc);
-    final Item item = toItem(exprs[2], qc);
+    final Item item = toNodeOrAtomItem(exprs[2], qc);
     if(data.inMemory()) throw BXDB_MEM_X.get(info, data.meta.name);
 
     final IOFile file = data.meta.binary(path);

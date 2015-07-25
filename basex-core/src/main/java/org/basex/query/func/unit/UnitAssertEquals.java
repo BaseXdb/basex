@@ -17,7 +17,7 @@ import org.basex.util.*;
 public final class UnitAssertEquals extends UnitFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item it = exprs.length < 3 ? null : toItem(exprs[2], qc);
+    final Item it = exprs.length < 3 ? null : toNodeOrAtomItem(exprs[2], qc);
     final Iter iter1 = qc.iter(exprs[0]), iter2 = qc.iter(exprs[1]);
     final Compare comp = new Compare(info);
     Item it1, it2;

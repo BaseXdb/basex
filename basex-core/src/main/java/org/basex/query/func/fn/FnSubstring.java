@@ -21,7 +21,7 @@ public final class FnSubstring extends StandardFunc {
     // normalize positions
     final byte[] str = toEmptyToken(exprs[0], qc);
 
-    final Item is = toItem(exprs[1], qc);
+    final Item is = toAtomItem(exprs[1], qc);
     int s;
     if(is instanceof Int) {
       s = (int) is.itr(info) - 1;
@@ -35,7 +35,7 @@ public final class FnSubstring extends StandardFunc {
     int l = ascii ? str.length : length(str);
     int e = l;
     if(end) {
-      final Item ie = toItem(exprs[2], qc);
+      final Item ie = toAtomItem(exprs[2], qc);
       e = ie instanceof Int ? (int) ie.itr(info) : subPos(ie.dbl(info) + 1);
     }
     if(s < 0) {

@@ -19,6 +19,7 @@ import org.basex.io.in.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -55,7 +56,7 @@ public final class HttpClient {
    * @return HTTP response
    * @throws QueryException query exception
    */
-  public ValueIter sendRequest(final byte[] href, final ANode request, final ValueBuilder bodies)
+  public Iter sendRequest(final byte[] href, final ANode request, final Iter bodies)
       throws QueryException {
 
     final HttpRequest req = new HttpRequestParser(info).parse(request, bodies);
@@ -75,7 +76,7 @@ public final class HttpClient {
         setRequestContent(conn.getOutputStream(), req);
       }
 
-      return new HttpResponse(info, options).getResponse(conn, body, mediaType);
+      return new HttpResponse(info, options).getResponse(conn, body, mediaType).iter();
 
     } catch(final IOException ex) {
       throw HC_ERROR_X.get(info, ex);
@@ -248,8 +249,8 @@ public final class HttpClient {
    * @param out output stream
    * @throws IOException I/O exception
    */
-  private static void writePayload(final ValueBuilder payload,
-      final HashMap<String, String> atts, final OutputStream out) throws IOException {
+  private static void writePayload(final ItemList payload, final HashMap<String, String> atts,
+      final OutputStream out) throws IOException {
 
     // detect method (specified by @method or derived from @media-type)
     String method = atts.get(SerializerOptions.METHOD.name());
@@ -278,8 +279,8 @@ public final class HttpClient {
       if(Strings.eq(method, BINARY)) {
         out.write(io.read());
       } else {
-        final ValueBuilder vb = new ValueBuilder().add(Str.get(new TextInput(io).content()));
-        write(vb, atts, method, out);
+        final ItemList buffer = new ItemList().add(Str.get(new TextInput(io).content()));
+        write(buffer, atts, method, out);
       }
     }
   }
@@ -292,7 +293,7 @@ public final class HttpClient {
    * @param out connection output stream
    * @throws IOException I/O Exception
    */
-  private static void write(final ValueBuilder payload, final HashMap<String, String> attrs,
+  private static void write(final ItemList payload, final HashMap<String, String> attrs,
       final String method, final OutputStream out) throws IOException {
 
     // extract serialization parameters
@@ -305,7 +306,7 @@ public final class HttpClient {
 
     // serialize items according to the parameters
     try(final Serializer ser = Serializer.get(out, sopts)) {
-      payload.serialize(ser);
+      for(final Item it : payload) ser.serialize(it);
     }
   }
 

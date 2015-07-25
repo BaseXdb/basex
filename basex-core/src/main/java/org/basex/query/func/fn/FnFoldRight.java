@@ -1,11 +1,14 @@
 package org.basex.query.func.fn;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.tree.*;
 import org.basex.query.var.*;
 
 /**
@@ -16,6 +19,20 @@ import org.basex.query.var.*;
  */
 public final class FnFoldRight extends StandardFunc {
   @Override
+  public Value value(final QueryContext qc) throws QueryException {
+    final Value v = qc.value(exprs[0]);
+    Value res = qc.value(exprs[1]);
+    final FItem fun = checkArity(exprs[2], 2, qc);
+    if(v instanceof TreeSeq) {
+      final ListIterator<Item> iter = ((TreeSeq) v).iterator(v.size());
+      while(iter.hasPrevious()) res = fun.invokeValue(qc, info, iter.previous(), res);
+    } else {
+      for(long i = v.size(); --i >= 0;) res = fun.invokeValue(qc, info, v.itemAt(i), res);
+    }
+    return res;
+  }
+
+  @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Value v = qc.value(exprs[0]);
     final FItem fun = checkArity(exprs[2], 2, qc);
@@ -24,7 +41,12 @@ public final class FnFoldRight extends StandardFunc {
     if(v.isEmpty()) return exprs[1].iter(qc);
 
     Value res = qc.value(exprs[1]);
-    for(long i = v.size(); --i >= 0;) res = fun.invokeValue(qc, info, v.itemAt(i), res);
+    if(v instanceof TreeSeq) {
+      final ListIterator<Item> iter = ((TreeSeq) v).iterator(v.size());
+      while(iter.hasPrevious()) res = fun.invokeValue(qc, info, iter.previous(), res);
+    } else {
+      for(long i = v.size(); --i >= 0;) res = fun.invokeValue(qc, info, v.itemAt(i), res);
+    }
     return res.iter();
   }
 

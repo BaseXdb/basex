@@ -1,3 +1,51 @@
+VERSION 8.2.3 (July 14, 2015) ------------------------------------------
+
+ Bug fixes (DBA, admin:write-log; namespaces)
+
+VERSION 8.2.2 (July 6, 2015) -------------------------------------------
+
+ Various bug fixes (all minor)
+
+VERSION 8.2.1 (June 9, 2015) -------------------------------------------
+
+ DBA
+ - code highlighting (thanks, James Ball!)
+ - new panel for up- and downloading files
+ - queries and files are now stored in a temporary directory
+
+ GENERAL
+ - various bug fixes
+
+VERSION 8.2 (May 21, 2015) ---------------------------------------------
+
+ XQUERY
+ - much faster sequence modification via finger trees
+ - improved compliance with XQuery 3.1
+
+ DBA
+ - open, save and delete queries
+ - better Tomcat support
+
+ STORAGE
+ - updatable index structures: reduced disk space consumption
+
+ XQUERY FUNCTIONS
+ - Standard Module: fn:json-to-xml, fn:xml-to-json
+ - Web Module: web:encode-url, web:decode-url
+ - File Module: file:is-absolute, file:resolve-path
+ - Admin Module: admin:delete-logs
+ - Database Module: db:output-cache
+
+ BUG FIXES
+ - locking, full-text requests, stemming
+
+ REMOVED FEATURES
+ - event handling (will be replaced by database triggers)
+
+VERSION 8.1.1 (April 16, 2015) -----------------------------------------
+
+ Various bug fixes (all minor)
+
 VERSION 8.1 (March 28, 2015) -------------------------------------------
 
  XQUERY

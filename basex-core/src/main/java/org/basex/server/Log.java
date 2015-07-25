@@ -97,7 +97,7 @@ public final class Log {
    * @param info info string (can be {@code null})
    * @param perf performance string
    */
-  private synchronized void write(final String address, final User user, final String type,
+  public synchronized void write(final String address, final User user, final String type,
       final String info, final Performance perf) {
 
     if(!sopts.get(StaticOptions.LOG)) {
@@ -109,7 +109,7 @@ public final class Log {
     final Date date = new Date();
     try {
       // check if day has changed
-      final String nstart = DateTime.format(date, DateTime.DATE);
+      final String nstart = name(date);
       if(fos != null && !start.equals(nstart)) close();
 
       // create new log file
@@ -167,6 +167,15 @@ public final class Log {
    */
   public synchronized IOFile[] files() {
     return dir().children(".*\\" + IO.LOGSUFFIX);
+  }
+
+  /**
+   * Returns the name of a log file (excluding the suffix) for the specified date.
+   * @param date date
+   * @return name of log file
+   */
+  public static String name(final Date date) {
+    return DateTime.format(date, DateTime.DATE);
   }
 
   /**

@@ -7,7 +7,7 @@ import java.util.*;
 import org.basex.util.*;
 
 /**
- * This is a simple container for byte values.
+ * Resizable-array implementation for native bytes.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen

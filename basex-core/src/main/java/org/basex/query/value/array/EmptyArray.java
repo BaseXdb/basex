@@ -78,7 +78,7 @@ final class EmptyArray extends Array {
   }
 
   @Override
-  public Array reverse() {
+  public Array reverseArray() {
     return this;
   }
 
@@ -96,18 +96,13 @@ final class EmptyArray extends Array {
   }
 
   @Override
-  public ListIterator<Value> members(final boolean reverse) {
+  public ListIterator<Value> iterator(final long size) {
     return Collections.emptyListIterator();
   }
 
   @Override
   void checkInvariants() {
     // nothing can go wrong
-  }
-
-  @Override
-  long[] sizes() {
-    return new long[] { 0 };
   }
 
   @Override

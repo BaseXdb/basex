@@ -20,6 +20,8 @@ public interface HttpText {
   String AUTHORIZATION = "Authorization";
   /** HTTP header: Content-Type. */
   String CONTENT_TYPE = "Content-Type";
+  /** HTTP header: Location. */
+  String LOCATION = "Location";
   /** HTTP header: Accept. */
   String ACCEPT = "Accept";
 

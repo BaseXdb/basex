@@ -5,6 +5,7 @@ import static org.basex.util.Prop.*;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.*;
 import java.util.concurrent.locks.*;
 
 import org.basex.core.*;
@@ -41,8 +42,6 @@ public final class DBLocking implements Locking {
   public static final String ADMIN = PREFIX + "ADMIN";
   /** Special lock identifier for backup commands. */
   public static final String BACKUP = PREFIX + "BACKUP";
-  /** Special lock identifier for event commands. */
-  public static final String EVENT = PREFIX + "EVENT";
   /** Special lock identifier for repository commands. */
   public static final String REPO = PREFIX + "REPO";
 
@@ -67,7 +66,7 @@ public final class DBLocking implements Locking {
   /** Stores one lock for each object used for locking. */
   private final Map<String, ReentrantReadWriteLock> locks = new HashMap<>();
   /** Stores lock usage counters for each object used for locking. */
-  private final Map<String, Integer> lockUsage = new HashMap<>();
+  private final Map<String, AtomicInteger> lockUsage = new HashMap<>();
   /**
    * Currently running transactions.
    * Used as monitor for atomizing access to {@link #queue}.
@@ -139,7 +138,9 @@ public final class DBLocking implements Locking {
       }
       // global read locking
       if(read == null) {
-        while(localWriters > 0) {
+        while(localWriters > 0 &&
+            // We're the only writer, allow global read lock anyway
+            !(1 == localWriters && !(null == write || write.isEmpty()))) {
           try {
             globalLock.wait();
           } catch(final InterruptedException ex) {
@@ -247,10 +248,13 @@ public final class DBLocking implements Locking {
    * @param lock Lock to set used
    */
   private void setLockUsed(final String lock) {
-    synchronized(lockUsage) {
-      Integer usage = lockUsage.get(lock);
-      if(usage == null) usage = 0;
-      lockUsage.put(lock, ++usage);
+    synchronized(locks) {
+      final AtomicInteger usage = lockUsage.get(lock);
+      if(usage == null) {
+        lockUsage.put(lock, new AtomicInteger(1));
+      } else {
+        usage.incrementAndGet();
+      }
     }
   }
 
@@ -259,14 +263,11 @@ public final class DBLocking implements Locking {
    * @param object Object to test
    */
   private void unsetLockIfUnused(final String object) {
-    synchronized(lockUsage) {
-      Integer usage = lockUsage.get(object);
-      assert usage != null;
-      if(--usage == 0) {
+    synchronized(locks) {
+      final AtomicInteger usage = lockUsage.get(object);
+      if(usage.decrementAndGet() == 0) {
         locks.remove(object);
         lockUsage.remove(object);
-      } else {
-        lockUsage.put(object, usage);
       }
     }
   }
@@ -283,8 +284,10 @@ public final class DBLocking implements Locking {
     sb.append(ind + "Transactions running: " + transactions + NL);
     sb.append(ind + "Transaction queue: " + queue + NL);
     sb.append(ind + "Held locks by object:" + NL);
-    for(final Entry<String, ReentrantReadWriteLock> e : locks.entrySet())
-      sb.append(ind + ind + e.getKey() + " -> " + e.getValue() + NL);
+    synchronized(locks) {
+      for(final Entry<String, ReentrantReadWriteLock> e : locks.entrySet())
+        sb.append(ind + ind + e.getKey() + " -> " + e.getValue() + NL);
+    }
     sb.append(ind + "Held write locks by transaction:" + NL);
     for(final Long thread : writeLocked.keySet())
       sb.append(ind + ind + thread + " -> " + writeLocked.get(thread) + NL);

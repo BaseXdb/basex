@@ -54,7 +54,7 @@ final class JsonStringConverter extends JsonConverter {
   }
 
   @Override
-  public void openPair(final byte[] key) {
+  public void openPair(final byte[] key, final boolean add) {
     if(!first) tb.add(", ");
     stringLit(key);
     tb.add(": ");
@@ -89,27 +89,6 @@ final class JsonStringConverter extends JsonConverter {
   @Override
   public void closeArray() {
     tb.add(first ? "]" : " ]");
-  }
-
-  @Override
-  public void openConstr(final byte[] name) {
-    tb.add("new ").add(name).add('(');
-    first = true;
-  }
-
-  @Override
-  public void openArg() {
-    openItem();
-  }
-
-  @Override
-  public void closeArg() {
-    closeItem();
-  }
-
-  @Override
-  public void closeConstr() {
-    tb.add(')');
   }
 
   @Override
@@ -160,7 +139,7 @@ final class JsonStringConverter extends JsonConverter {
 
   @Override
   public void nullLit() {
-    tb.add(Token.NULL);
+    tb.add(JsonConstants.NULL);
   }
 
   @Override

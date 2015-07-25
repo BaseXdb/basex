@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import org.basex.build.json.*;
+import org.basex.build.json.JsonOptions.*;
 import org.basex.build.json.JsonParserOptions.JsonDuplicates;
 import org.basex.query.*;
 import org.basex.util.*;
@@ -48,7 +49,9 @@ final class JsonParser extends InputParser {
     super(in);
     liberal = opts.get(JsonParserOptions.LIBERAL);
     unescape = opts.get(JsonParserOptions.UNESCAPE);
-    duplicates = opts.get(JsonParserOptions.DUPLICATES);
+    final JsonDuplicates dupl = opts.get(JsonParserOptions.DUPLICATES);
+    duplicates = dupl != null ? dupl : opts.get(JsonOptions.FORMAT) == JsonFormat.BASIC ?
+      JsonDuplicates.RETAIN : JsonDuplicates.USE_FIRST;
     this.conv = conv;
   }
 
@@ -73,6 +76,7 @@ final class JsonParser extends InputParser {
    * @throws QueryIOException query I/O exception
    */
   private void parse() throws QueryIOException {
+    consume('\uFEFF');
     skipWs();
     value();
     if(more()) throw error("Unexpected trailing content: %", rest());
@@ -114,7 +118,6 @@ final class JsonParser extends InputParser {
         if(consume("true")) conv.booleanLit(TRUE);
         else if(consume("false")) conv.booleanLit(FALSE);
         else if(consume("null")) conv.nullLit();
-        else if(liberal && consume("new") && Character.isWhitespace(curr())) constr();
         else throw error("Unexpected JSON value: '%'", rest());
         skipWs();
     }
@@ -135,10 +138,11 @@ final class JsonParser extends InputParser {
         if(dupl && duplicates == JsonDuplicates.REJECT)
           throw error(BXJS_DUPLICATE_X, "Key '%' occurs more than once.", key);
 
-        conv.openPair(key);
+        final boolean add = !(dupl && duplicates == JsonDuplicates.USE_FIRST);
+        conv.openPair(key, add);
         consumeWs(':', true);
         value();
-        conv.closePair(!dupl || duplicates == JsonDuplicates.USE_LAST);
+        conv.closePair(add);
         set.put(key);
       } while(consumeWs(',', false) && !(liberal && curr() == '}'));
       consumeWs('}', true);
@@ -162,30 +166,6 @@ final class JsonParser extends InputParser {
       consumeWs(']', true);
     }
     conv.closeArray();
-  }
-
-  /**
-   * Parses a JSON constructor function.
-   * @throws QueryIOException query I/O exception
-   */
-  private void constr() throws QueryIOException {
-    skipWs();
-    if(!input.substring(pos).matches("^[a-zA-Z0-9_-]+\\(.*"))
-      throw error("Wrong constructor syntax: '%'", rest());
-
-    final int p = input.indexOf('(', pos);
-    conv.openConstr(token(input.substring(pos, p)));
-    pos = p + 1;
-    skipWs();
-    if(!consumeWs(')', false)) {
-      do {
-        conv.openArg();
-        value();
-        conv.closeArg();
-      } while(consumeWs(',', false));
-      consumeWs(')', true);
-    }
-    conv.closeConstr();
   }
 
   /**
@@ -295,7 +275,7 @@ final class JsonParser extends InputParser {
       final int p = pos;
       int ch = consume();
       if(ch == '"') {
-        if(high != 0) tb.add(INVALID);
+        if(high != 0) add(high, pos - 7, p);
         skipWs();
         return tb.toArray();
       }
@@ -362,14 +342,14 @@ final class JsonParser extends InputParser {
 
       if(high != 0) {
         if(ch >= 0xDC00 && ch <= 0xDFFF) ch = (high - 0xD800 << 10) + ch - 0xDC00 + 0x10000;
-        else tb.add(INVALID);
+        else add(high, p, pos);
         high = 0;
       }
 
       if(ch >= 0xD800 && ch <= 0xDBFF) {
         high = (char) ch;
       } else {
-        add(ch, p);
+        add(ch, p, pos);
       }
     }
     throw eof(" in string literal");
@@ -378,15 +358,16 @@ final class JsonParser extends InputParser {
   /**
    * Adds the specified character.
    * @param ch character
-   * @param p start position of unescape sequence
+   * @param s start position of invalid unicode sequence
+   * @param e end position
    */
-  private void add(final int ch, final int p) {
+  private void add(final int ch, final int s, final int e) {
     if(XMLToken.valid(ch)) {
       tb.add(ch);
     } else if(conv.fallback == null) {
       tb.add(INVALID);
     } else {
-      tb.add(conv.fallback.convert(new TokenBuilder().add(input.substring(p, pos)).finish()));
+      tb.add(conv.fallback.convert(input.substring(s, e)));
     }
   }
 

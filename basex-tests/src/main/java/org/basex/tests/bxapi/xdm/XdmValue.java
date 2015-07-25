@@ -9,7 +9,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.tests.bxapi.*;
-import org.basex.util.*;
 
 /**
  * Wrapper for representing XQuery values.
@@ -33,7 +32,7 @@ public abstract class XdmValue implements Iterable<XdmItem> {
    * @return node name
    */
   public String getBaseURI() {
-    throw Util.notExpected("Item must be a node: " + internal());
+    throw new XQueryException(new QueryException("Item must be a node: " + internal()));
   }
 
   /**
@@ -41,7 +40,7 @@ public abstract class XdmValue implements Iterable<XdmItem> {
    * @return node name
    */
   public QName getName() {
-    throw Util.notExpected("Item must be a node: " + internal());
+    throw new XQueryException(new QueryException("Item must be a node: " + internal()));
   }
 
   /**
@@ -49,7 +48,8 @@ public abstract class XdmValue implements Iterable<XdmItem> {
    * @return node name
    */
   public boolean getBoolean() {
-    throw Util.notExpected("Value has no boolean representation: " + internal());
+    throw new XQueryException(new QueryException(
+        "Value has no boolean representation: " + internal()));
   }
 
   /**
@@ -60,7 +60,8 @@ public abstract class XdmValue implements Iterable<XdmItem> {
     try {
       return Long.parseLong(getString());
     } catch(final NumberFormatException ex) {
-      throw Util.notExpected("Value has no integer representation: " + internal());
+      throw new XQueryException(new QueryException(
+          "Value has no integer representation: " + internal()));
     }
   }
 
@@ -69,7 +70,8 @@ public abstract class XdmValue implements Iterable<XdmItem> {
    * @return node name
    */
   public String getString() {
-    throw Util.notExpected("Value has no string representation: " + internal());
+    throw new XQueryException(new QueryException(
+        "Value has no string representation: " + internal()));
   }
 
   /**

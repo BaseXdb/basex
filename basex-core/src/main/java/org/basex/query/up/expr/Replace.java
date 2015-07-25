@@ -70,7 +70,7 @@ public final class Replace extends Update {
       if(tp == NodeType.COM) FComm.parse(txt, info);
       if(tp == NodeType.PI) FPI.parse(txt, info);
 
-      updates.add(new ReplaceValue(dbn.pre, dbn.data, info, txt), qc);
+      updates.add(new ReplaceValue(dbn.pre(), dbn.data(), info, txt), qc);
     } else {
       final ANode par = targ.parent();
       if(par == null) throw UPNOPAR_X.get(info, i);
@@ -83,7 +83,7 @@ public final class Replace extends Update {
         if(!aList.isEmpty()) throw UPWRELM.get(info);
       }
       // conforms to specification: insertion sequence may be empty
-      updates.add(new ReplaceNode(dbn.pre, dbn.data, info, list), qc);
+      updates.add(new ReplaceNode(dbn.pre(), dbn.data(), info, list), qc);
     }
     return null;
   }

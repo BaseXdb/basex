@@ -26,10 +26,10 @@ public final class DropUser extends AUser {
   /**
    * Constructor for dropping local database users.
    * @param name name of user
-   * @param db database (may be {@code null})
+   * @param pattern database pattern (may be {@code null})
    */
-  public DropUser(final String name, final String db) {
-    super(name, db);
+  public DropUser(final String name, final String pattern) {
+    super(name, pattern == null ? "" : pattern);
   }
 
   @Override
@@ -46,13 +46,13 @@ public final class DropUser extends AUser {
     final Users users = context.users;
     final User user = users.get(name);
     if(user != null) {
-      if(pattern == null) {
+      if(pattern.isEmpty()) {
         for(final ClientListener s : context.sessions) {
           if(s.context().user().name().equals(name)) return !info(USER_LOGGED_IN_X, name);
         }
       }
       users.drop(users.get(name), pattern);
-      return info(pattern == null ? USER_DROPPED_X : USER_DROPPED_X_X, name, pattern);
+      return info(pattern.isEmpty() ? USER_DROPPED_X : USER_DROPPED_X_X, name, pattern);
     }
     return true;
   }

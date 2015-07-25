@@ -18,7 +18,7 @@ import module namespace tmpl = 'dba/tmpl' at 'modules/tmpl.xqm';
  : @return page
  :)
 declare
-  %rest:path("dba/login")
+  %rest:path("/dba/login")
   %rest:query-param("name" , "{$name}")
   %rest:query-param("url",   "{$url}")
   %rest:query-param("error", "{$error}")
@@ -42,13 +42,13 @@ function _:welcome(
               <td>
                 <input size="30" name="name" value="{ $name }" id="user"/>
                 { html:focus('user') }
-                { html:button('login', 'Login') }
               </td>
             </tr>
             <tr>
               <td><b>Password:</b></td>
               <td>
                 <input size="30" type="password" name="pass"/>
+                { html:button('login', 'Login') }
               </td>
             </tr>
             <tr>
@@ -82,7 +82,7 @@ function _:welcome(
  : @return redirect
  :)
 declare
-  %rest:path("dba/login-check")
+  %rest:path("/dba/login-check")
   %rest:query-param("name", "{$name}")
   %rest:query-param("pass", "{$pass}")
   %rest:query-param("url",  "{$url}")
@@ -135,7 +135,7 @@ function _:login(
  : Ends a session and redirects to the login page.
  : @return redirect
  :)
-declare %rest:path("dba/logout") function _:logout(
+declare %rest:path("/dba/logout") function _:logout(
 ) as element(rest:response) {
   let $name := $cons:SESSION/name
   let $url := string-join($cons:SESSION/(host, port), ':')
@@ -143,7 +143,7 @@ declare %rest:path("dba/logout") function _:logout(
     admin:write-log('User was logged out: ' || $name),
     Session:delete($cons:SESSION-KEY),
     Session:close(),
-    web:redirect('login', map { 'nane': $name, 'url': $url })
+    web:redirect("/dba/login", map { 'nane': $name, 'url': $url })
   )
 };
 
@@ -167,7 +167,7 @@ declare %private function _:accept(
     }
   ),
   admin:write-log('User was logged in: ' || $name),
-  web:redirect('databases')
+  web:redirect("databases")
 };
 
 (:~
@@ -183,5 +183,5 @@ declare %private function _:reject(
   $message  as xs:string
 ) as element(rest:response) {
   admin:write-log('Login was denied: ' || $name),
-  web:redirect('login', map { 'name': $name, 'url': $url, 'error': $message })
+  web:redirect("login", map { 'name': $name, 'url': $url, 'error': $message })
 };

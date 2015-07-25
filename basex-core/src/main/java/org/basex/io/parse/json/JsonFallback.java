@@ -12,5 +12,5 @@ public abstract class JsonFallback {
    * @param string input string
    * @return converted token
    */
-  public abstract byte[] convert(final byte[] string);
+  public abstract String convert(final String string);
 }

@@ -12,6 +12,7 @@ import org.basex.query.expr.gflwor.GFLWOR.Clause;
 import org.basex.query.expr.gflwor.GFLWOR.Eval;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -117,8 +118,7 @@ public final class Window extends Clause {
 
           // find end item
           if(fst != null) {
-            final ValueBuilder window = new ValueBuilder(
-                new Item[] {fst, null, null, null}, 1);
+            final ValueBuilder window = new ValueBuilder().add(fst);
             final Item[] st = vals == null ? new Item[] { curr, prev, next } : vals;
             final long ps = vals == null ? p : spos;
             vals = null;
@@ -343,8 +343,9 @@ public final class Window extends Clause {
 
   @Override
   void calcSize(final long[] minMax) {
+    // number of results cannot be anticipated
     minMax[0] = 0;
-    if(expr.isEmpty()) minMax[1] = 0;
+    minMax[1] = expr.isEmpty() ? 0 : -1;
   }
 
   @Override
@@ -542,7 +543,7 @@ public final class Window extends Clause {
    * @author BaseX Team 2005-15, BSD License
    * @author Leo Woerteler
    */
-  private abstract class WindowEval implements Eval {
+  private abstract class WindowEval extends Eval {
     /** Expression iterator. */
     private Iter iter;
     /** Previous item. */

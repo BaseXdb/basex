@@ -8,7 +8,6 @@ import java.io.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
-import org.basex.data.atomic.*;
 import org.basex.index.name.*;
 import org.basex.io.*;
 import org.basex.io.in.DataInput;
@@ -101,7 +100,7 @@ public final class DiskBuilder extends Builder implements Closeable {
     meta.dbfile(DATATMP).delete();
 
     // return database instance
-    return new DiskData(meta, elemNames, attrNames, path, ns);
+    return new DiskData(meta, elemNames, attrNames, path, nspaces);
   }
 
   @Override
@@ -144,12 +143,12 @@ public final class DiskBuilder extends Builder implements Closeable {
   }
 
   @Override
-  protected void addElem(final int dist, final int name, final int asize, final int uri,
+  protected void addElem(final int dist, final int nameId, final int asize, final int uriId,
       final boolean ne) throws IOException {
 
     tout.write1(asize << 3 | Data.ELEM);
-    tout.write2((ne ? 1 << 15 : 0) | name);
-    tout.write1(uri);
+    tout.write2((ne ? 1 << 15 : 0) | nameId);
+    tout.write1(uriId);
     tout.write4(dist);
     tout.write4(asize);
     tout.write4(meta.size++);
@@ -158,13 +157,13 @@ public final class DiskBuilder extends Builder implements Closeable {
   }
 
   @Override
-  protected void addAttr(final int name, final byte[] value, final int dist, final int uri)
+  protected void addAttr(final int nameId, final byte[] value, final int dist, final int uriId)
       throws IOException {
 
     tout.write1(dist << 3 | Data.ATTR);
-    tout.write2(name);
+    tout.write2(nameId);
     tout.write5(textOff(value, false));
-    tout.write4(uri);
+    tout.write4(uriId);
     tout.write4(meta.size++);
   }
 

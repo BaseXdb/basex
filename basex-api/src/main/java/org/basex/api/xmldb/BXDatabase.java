@@ -76,8 +76,8 @@ final class BXDatabase implements Database, BXXMLDBText {
       final String main = uri.startsWith(XMLDBC) ? uri : XMLDBC + uri;
       if(main.startsWith(XMLDBURI)) {
         final String host = main.substring(XMLDBURI.length());
-        final String localhost = S_LOCALHOST + ':' +
-            ctx.soptions.get(StaticOptions.SERVERPORT) + '/';
+        final int port = ctx.soptions.get(StaticOptions.SERVERPORT);
+        final String localhost = S_LOCALHOST + ':' + port + '/';
         if(host.startsWith(localhost)) return host.substring(localhost.length());
       }
     }

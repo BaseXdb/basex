@@ -10,6 +10,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.util.ft.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -36,9 +37,9 @@ public final class FTWords extends FTExpr {
   Expr query;
   /** Minimum and maximum occurrences. */
   Expr[] occ;
-
   /** Full-text tokenizer. */
-  private FTTokenizer ftt;
+  FTTokenizer ftt;
+
   /** Data reference. */
   private Data data;
   /** Statically evaluated query tokens. */
@@ -349,14 +350,14 @@ public final class FTWords extends FTExpr {
        fto.isSet(ST) && md.stemming != fto.is(ST) ||
        fto.ln != null && !fto.ln.equals(md.language)) return false;
 
+    // adopt database options to tokenizer
+    fto.copy(md);
+
     // estimate costs if text is not known at compile time
     if(tokens == null) {
       ii.costs = Math.max(2, data.meta.size / 30);
       return true;
     }
-
-    // adopt database options to tokenizer
-    fto.copy(md);
 
     // summarize number of hits; break loop if no hits are expected
     final FTLexer ft = new FTLexer(fto);

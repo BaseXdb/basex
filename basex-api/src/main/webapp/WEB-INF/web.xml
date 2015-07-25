@@ -53,9 +53,10 @@
   </context-param>
   -->
 
-  <!-- Global session listener -->
+  <!-- Global session and servlet listener -->
   <listener>
     <listener-class>org.basex.http.SessionListener</listener-class>
+    <listener-class>org.basex.http.ServletListener</listener-class>
   </listener>
 
   <!-- RESTXQ Service (can be deactivated by removing this entry) -->

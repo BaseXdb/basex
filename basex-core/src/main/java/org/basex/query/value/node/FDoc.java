@@ -96,7 +96,7 @@ public final class FDoc extends FNode {
   }
 
   @Override
-  public AxisMoreIter children() {
+  public BasicNodeIter children() {
     return iter(children);
   }
 

@@ -6,7 +6,7 @@ import java.io.*;
 
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.iter.*;
+import org.basex.query.util.list.*;
 
 /**
  * Function implementation.
@@ -16,7 +16,7 @@ import org.basex.query.iter.*;
  */
 public final class XQueryInvoke extends XQueryEval {
   @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
+  protected ItemList eval(final QueryContext qc) throws QueryException {
     checkCreate(qc);
     final IO io = checkPath(exprs[0], qc);
     try {

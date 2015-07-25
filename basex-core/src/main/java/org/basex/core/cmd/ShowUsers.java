@@ -27,17 +27,17 @@ public final class ShowUsers extends Command {
 
   /**
    * Constructor, specifying a database.
-   * @param db database (for showing users)
+   * @param db database (can be {@code null})
    */
   public ShowUsers(final String db) {
-    super(Perm.ADMIN, db);
+    super(Perm.ADMIN, db == null ? "" : db);
   }
 
   @Override
   protected boolean run() throws IOException {
-    final String name = args[0] == null || args[0].isEmpty() ? null : args[0];
-    if(name != null && !Databases.validName(name)) return error(NAME_INVALID_X, name);
-    out.println(context.users.info(name).finish());
+    final String name = args[0];
+    if(!name.isEmpty() && !Databases.validName(name)) return error(NAME_INVALID_X, name);
+    out.println(context.users.info(name.isEmpty() ? null : name).finish());
     return true;
   }
 

@@ -1,5 +1,7 @@
 package org.basex.query.util.fingertree;
 
+import java.util.*;
+
 /**
  * A builder for {@link FingerTree}s from leaf nodes.
  *
@@ -8,9 +10,10 @@ package org.basex.query.util.fingertree;
  *
  * @param <E> element type
  */
-public final class FingerTreeBuilder<E> {
+@SuppressWarnings("unchecked")
+public final class FingerTreeBuilder<E> implements Iterable<E> {
   /** The root node, {@code null} if the tree is empty. */
-  private BufferNode<E, E> root;
+  private Object root;
 
   /**
    * Checks if this builder is empty, i.e. if no leaf nodes were added to it.
@@ -27,8 +30,12 @@ public final class FingerTreeBuilder<E> {
   public void prepend(final Node<E, E> leaf) {
     if(root == null) {
       root = new BufferNode<>(leaf);
+    } else if(root instanceof BufferNode) {
+      ((BufferNode<E, E>) root).prepend(leaf);
     } else {
-      root.prepend(leaf);
+      final BufferNode<E, E> newRoot = new BufferNode<>((FingerTree<E, E>) root);
+      newRoot.prepend(leaf);
+      root = newRoot;
     }
   }
 
@@ -39,8 +46,12 @@ public final class FingerTreeBuilder<E> {
   public void append(final Node<E, E> leaf) {
     if(root == null) {
       root = new BufferNode<>(leaf);
+    } else if(root instanceof BufferNode) {
+      ((BufferNode<E, E>) root).append(leaf);
     } else {
-      root.append(leaf);
+      final BufferNode<E, E> newRoot = new BufferNode<>((FingerTree<E, E>) root);
+      newRoot.append(leaf);
+      root = newRoot;
     }
   }
 
@@ -52,8 +63,12 @@ public final class FingerTreeBuilder<E> {
     if(!tree.isEmpty()) {
       if(root == null) {
         root = new BufferNode<>(tree);
+      } else if(root instanceof BufferNode) {
+        ((BufferNode<E, E>) root).append(tree);
       } else {
-        root.append(tree);
+        final BufferNode<E, E> newRoot = new BufferNode<>((FingerTree<E, E>) root);
+        newRoot.append(tree);
+        root = newRoot;
       }
     }
   }
@@ -63,22 +78,26 @@ public final class FingerTreeBuilder<E> {
    * @return the resulting finger tree
    */
   public FingerTree<E, E> freeze() {
-    return root == null ? FingerTree.<E>empty() : root.freeze();
-  }
-
-  /**
-   * Writes the elements contained in this builder onto the given string builder.
-   * @param sb string builder
-   */
-  public void toString(final StringBuilder sb) {
-    if(root != null) root.toString(sb);
+    return root == null ? FingerTree.<E>empty() :
+      root instanceof BufferNode ? ((BufferNode<E, E>) root).freeze() : (FingerTree<E, E>) root;
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
-    toString(sb);
+    final Iterator<E> iter = iterator();
+    if(iter.hasNext()) {
+      sb.append(iter.next());
+      while(iter.hasNext()) sb.append(", ").append(iter.next());
+    }
     return sb.append(']').toString();
+  }
+
+  @Override
+  public Iterator<E> iterator() {
+    if(root == null) return Collections.emptyIterator();
+    if(root instanceof FingerTree) return ((FingerTree<E, E>) root).iterator();
+    return new BufferNodeIterator<>((BufferNode<E, E>) root);
   }
 
   /**
@@ -88,17 +107,25 @@ public final class FingerTreeBuilder<E> {
    * @param <E> element type
    */
   private static class BufferNode<N, E> {
+    /** Size of inner nodes to create. */
+    private static final int NODE_SIZE = FingerTree.MAX_ARITY;
+    /** Maximum number of elements in a digit. */
+    private static final int MAX_DIGIT = NODE_SIZE + 1;
+    /** Maximum number of nodes in the digits. */
+    private static final int CAP = 2 * MAX_DIGIT;
     /** Ring buffer for nodes in the digits. */
-    @SuppressWarnings("unchecked")
-    final Node<N, E>[] nodes = new Node[8];
+    final Node<N, E>[] nodes = new Node[CAP];
     /** Number of elements in left digit. */
-    int l;
+    int inLeft;
     /** Position of middle between left and right digit in buffer. */
-    int m = 4;
+    int midPos = MAX_DIGIT;
     /** Number of elements in right digit. */
-    int r;
-    /** Root node of middle tree. */
-    BufferNode<Node<N, E>, E> sub;
+    int inRight;
+    /**
+     * Root node of middle tree, either a {@code FingerTree<Node<N, E>, E>} or a
+     * {@code BufferNode<Node<N, E>, E>}.
+     */
+    Object middle;
 
     /**
      * Constructs a buffered tree containing the given single node.
@@ -113,13 +140,13 @@ public final class FingerTreeBuilder<E> {
      * @param tree the tree to take the contents of
      */
     BufferNode(final FingerTree<N, E> tree) {
-      if(tree instanceof Single) {
-        prepend(((Single<N, E>) tree).elem);
+      if(tree instanceof SingletonTree) {
+        prepend(((SingletonTree<N, E>) tree).elem);
       } else {
-        final Deep<N, E> deep = (Deep<N, E>) tree;
+        final DeepTree<N, E> deep = (DeepTree<N, E>) tree;
         for(int i = deep.left.length; --i >= 0;) prepend(deep.left[i]);
         final FingerTree<Node<N, E>, E> mid = deep.middle;
-        if(!mid.isEmpty()) sub = new BufferNode<>(mid);
+        if(!mid.isEmpty()) middle = mid;
         for(final Node<N, E> node : deep.right) append(node);
       }
     }
@@ -129,26 +156,21 @@ public final class FingerTreeBuilder<E> {
      * @param node the node to add
      */
     void prepend(final Node<N, E> node) {
-      if(l < 4) {
-        nodes[(m - l + 7) & 7] = node;
-        l++;
-      } else if(sub == null && r < 4) {
-        m = (m + 7) & 7;
-        nodes[(m - l + 8) & 7] = node;
-        r++;
+      if(inLeft < MAX_DIGIT) {
+        nodes[(midPos - inLeft - 1 + CAP) % CAP] = node;
+        inLeft++;
+      } else if(middle == null && inRight < MAX_DIGIT) {
+        midPos = (midPos - 1 + CAP) % CAP;
+        nodes[(midPos - inLeft + CAP) % CAP] = node;
+        inRight++;
       } else {
-        final int l3 = (m + 7) & 7, l2 = (l3 + 7) & 7, l1 = (l2 + 7) & 7, l0 = (l1 + 7) & 7;
-        final Node<Node<N, E>, E> next = new InnerNode3<>(nodes[l1], nodes[l2], nodes[l3]);
-        nodes[l3] = nodes[l0];
-        nodes[l2] = node;
-        nodes[l1] = null;
-        nodes[l0] = null;
-        l = 2;
-        if(sub == null) {
-          sub = new BufferNode<>(next);
-        } else {
-          sub.prepend(next);
-        }
+        final int l = (midPos - inLeft + CAP) % CAP;
+        final Node<Node<N, E>, E> next = new InnerNode<>(copy(l + 1, inLeft - 1));
+        nodes[(midPos - 1 + CAP) % CAP] = nodes[l];
+        nodes[(midPos - 2 + CAP) % CAP] = node;
+        inLeft = 2;
+        if(middle == null) middle = new BufferNode<>(next);
+        else midBuffer().prepend(next);
       }
     }
 
@@ -157,26 +179,20 @@ public final class FingerTreeBuilder<E> {
      * @param node the node to add
      */
     void append(final Node<N, E> node) {
-      if(r < 4) {
-        nodes[(m + r) & 7] = node;
-        r++;
-      } else if(sub == null && l < 4) {
-        m = (m + 1) & 7;
-        nodes[(m + r - 1) & 7] = node;
-        l++;
+      if(inRight < MAX_DIGIT) {
+        nodes[(midPos + inRight) % CAP] = node;
+        inRight++;
+      } else if(middle == null && inLeft < MAX_DIGIT) {
+        midPos = (midPos + 1) % CAP;
+        nodes[(midPos + inRight - 1) % CAP] = node;
+        inLeft++;
       } else {
-        final int r0 = m, r1 = (r0 + 1) & 7, r2 = (r1 + 1) & 7, r3 = (r2 + 1) & 7;
-        final Node<Node<N, E>, E> next = new InnerNode3<>(nodes[r0], nodes[r1], nodes[r2]);
-        nodes[r0] = nodes[r3];
-        nodes[r1] = node;
-        nodes[r2] = null;
-        nodes[r3] = null;
-        r = 2;
-        if(sub == null) {
-          sub = new BufferNode<>(next);
-        } else {
-          sub.append(next);
-        }
+        final Node<Node<N, E>, E> next = new InnerNode<>(copy(midPos, inRight - 1));
+        nodes[midPos] = nodes[(midPos + inRight - 1) % CAP];
+        nodes[(midPos + 1) % CAP] = node;
+        inRight = 2;
+        if(middle == null) middle = new BufferNode<>(next);
+        else midBuffer().append(next);
       }
     }
 
@@ -185,53 +201,48 @@ public final class FingerTreeBuilder<E> {
      * @param tree finger tree to append
      */
     void append(final FingerTree<N, E> tree) {
-      if(!(tree instanceof Deep)) {
-        if(tree instanceof Single) append(((Single<N, E>) tree).elem);
+      if(!(tree instanceof DeepTree)) {
+        if(tree instanceof SingletonTree) append(((SingletonTree<N, E>) tree).elem);
         return;
       }
 
-      final Deep<N, E> deep = (Deep<N, E>) tree;
+      final DeepTree<N, E> deep = (DeepTree<N, E>) tree;
       final Node<N, E>[] ls = deep.left, rs = deep.right;
       final int ll = ls.length, rl = rs.length;
       final FingerTree<Node<N, E>, E> mid = deep.middle;
 
       if(mid.isEmpty()) {
+        // add digits
         for(int i = 0; i < ll; i++) append(ls[i]);
         for(int i = 0; i < rl; i++) append(rs[i]);
-      } else if(sub == null) {
-        final int n = l + r;
-        @SuppressWarnings("unchecked")
+      } else if(middle == null) {
+        // cache previous contents and re-add them afterwards
+        final int n = inLeft + inRight;
         final Node<N, E>[] buff = new Node[n + ll];
-        for(int i = 0; i < n; i++) buff[i] = nodes[(m - l + i + 8) & 7];
+        copyInto(midPos - inLeft, buff, 0, n);
         System.arraycopy(ls, 0, buff, n, ll);
-        l = r = 0;
-        sub = new BufferNode<>(mid);
+        inLeft = inRight = 0;
+        middle = mid;
         for(int i = buff.length; --i >= 0;) prepend(buff[i]);
         for(int i = 0; i < rl; i++) append(rs[i]);
       } else {
-        final int k = r + ll;
-        @SuppressWarnings("unchecked")
-        final Node<N, E>[] buff = new Node[k];
-        for(int i = 0; i < r; i++) {
-          final int j = (m + i) & 7;
-          buff[i] = nodes[j];
-          nodes[j] = null;
+        // inner digits have to be merged
+        final int n = inRight + ll;
+        final Node<N, E>[] buff = new Node[n];
+        copyInto(midPos, buff, 0, inRight);
+        System.arraycopy(ls, 0, buff, inRight, ll);
+        inRight = 0;
+        for(int k = (n + NODE_SIZE - 1) / NODE_SIZE, p = 0; k > 0; k--) {
+          final int inNode = (n - p + k - 1) / k;
+          final Node<N, E>[] out = new Node[inNode];
+          System.arraycopy(buff, p, out, 0, inNode);
+          final Node<Node<N, E>, E> sub = new InnerNode<>(out);
+          if(middle == null) middle = new BufferNode<>(sub);
+          else midBuffer().append(sub);
+          p += inNode;
         }
-        System.arraycopy(ls, 0, buff, r, ll);
-        r = 0;
-
-        for(int i = 0; i < k;) {
-          final int rest = k - i;
-          if(rest > 4 || rest == 3) {
-            sub.append(new InnerNode3<>(buff[i], buff[i + 1], buff[i + 2]));
-            i += 3;
-          } else {
-            sub.append(new InnerNode2<>(buff[i], buff[i + 1]));
-            i += 2;
-          }
-        }
-
-        sub.append(mid);
+        if(middle == null) middle = mid;
+        else midBuffer().append(mid);
         for(int i = 0; i < rl; i++) append(rs[i]);
       }
     }
@@ -241,44 +252,155 @@ public final class FingerTreeBuilder<E> {
      * @return the finger tree
      */
     FingerTree<N, E> freeze() {
-      final int n = l + r;
-      if(n == 1) return new Single<>(nodes[(m + r + 7) & 7]);
-      final int a = sub == null ? n / 2 : l, b = n - a;
-      @SuppressWarnings("unchecked")
-      final Node<N, E>[] left = new Node[a], right = new Node[b];
-      final int lOff = m - l + 8, rOff = lOff + a;
-      for(int i = 0; i < a; i++) left[i] = nodes[(lOff + i) & 7];
-      for(int i = 0; i < b; i++) right[i] = nodes[(rOff + i) & 7];
-      return sub == null ? Deep.get(left, right) : Deep.get(left, sub.freeze(), right);
+      final int n = inLeft + inRight;
+      if(n == 1) return new SingletonTree<>(nodes[(midPos + inRight - 1 + CAP) % CAP]);
+      final int a = middle == null ? n / 2 : inLeft, l = midPos - inLeft;
+      final Node<N, E>[] left = copy(l, a), right = copy(l + a, n - a);
+      if(middle == null) return DeepTree.get(left, right);
+
+      if(middle instanceof FingerTree) {
+        final FingerTree<Node<N, E>, E> tree = (FingerTree<Node<N, E>, E>) middle;
+        return DeepTree.get(left, tree, right);
+      }
+
+      final BufferNode<Node<N, E>, E> buffer = (BufferNode<Node<N, E>, E>) middle;
+      return DeepTree.get(left, buffer.freeze(), right);
     }
 
     /**
-     * Writes the elements contained in this node onto the given string builder.
-     * @param sb string builder
+     * Returns the node at the given position in this node's ring buffer.
+     * @param pos position
+     * @return node at that position
      */
-    void toString(final StringBuilder sb) {
-      boolean first = true;
-      for(int i = 0; i < l; i++) {
-        final Node<N, E> node = nodes[(m - l + i + 8) & 7];
-        for(final E elem : node) {
-          if(first) first = false;
-          else sb.append(", ");
-          sb.append(elem);
+    Node<N, E> get(final int pos) {
+      return nodes[(((midPos + pos) % CAP) + CAP) % CAP];
+    }
+
+    /**
+     * Returns the middle tree as a buffer node.
+     * @return middle buffer node
+     */
+    private BufferNode<Node<N, E>, E> midBuffer() {
+      if(middle == null) return null;
+      if(middle instanceof BufferNode) return (BufferNode<Node<N, E>, E>) middle;
+      final BufferNode<Node<N, E>, E> mid = new BufferNode<>((FingerTree<Node<N, E>, E>) middle);
+      middle = mid;
+      return mid;
+    }
+
+    /**
+     * Copies the elements in the given range from the ring buffer into an array.
+     * @param start start of the range
+     * @param len length of the range
+     * @return array containing all nodes in the range
+     */
+    private Node<N, E>[] copy(final int start, final int len) {
+      final Node<N, E>[] out = new Node[len];
+      copyInto(start, out, 0, len);
+      return out;
+    }
+
+    /**
+     * Copies the nodes in the given range of the ring buffer into the given array.
+     * @param start start position of the range in the ring buffer
+     * @param arr output array
+     * @param pos start position in the output array
+     * @param len length of the range
+     */
+    private void copyInto(final int start, final Node<N, E>[] arr, final int pos, final int len) {
+      final int p = ((start % CAP) + CAP) % CAP, k = CAP - p;
+      if(len <= k) {
+        System.arraycopy(nodes, p, arr, pos, len);
+      } else {
+        System.arraycopy(nodes, p, arr, pos, k);
+        System.arraycopy(nodes, 0, arr, pos + k, len - k);
+      }
+    }
+  }
+
+  /**
+   * Iterator over the elements in this builder.
+   * @param <E> element type
+   */
+  private static class BufferNodeIterator<E> implements Iterator<E> {
+    /** Stack of buffer nodes. */
+    private BufferNode<?, E>[] stack = new BufferNode[8];
+    /** Stack of position inside the buffer nodes. */
+    private int[] poss = new int[8];
+    /** Stack top. */
+    private int top;
+    /** Iterator over the current tree node. */
+    private Iterator<E> sub;
+
+    /**
+     * Constructor.
+     * @param root buffer node
+     */
+    BufferNodeIterator(final BufferNode<E, E> root) {
+      stack[0] = root;
+      final int pos = -root.inLeft;
+      poss[0] = pos;
+      sub = new FingerTreeIterator<>(root.get(pos), 0);
+    }
+
+    @Override
+    public boolean hasNext() {
+      return sub != null;
+    }
+
+    @Override
+    public E next() {
+      if(sub == null) throw new NoSuchElementException();
+      final E out = sub.next();
+      if(sub.hasNext()) return out;
+
+      // sub-iterator empty
+      sub = null;
+      final BufferNode<?, E> buffer = stack[top];
+      poss[top]++;
+
+      if(poss[top] < 0) {
+        sub = new FingerTreeIterator<>(buffer.get(poss[top]), 0);
+        return out;
+      }
+
+      if(poss[top] == 0) {
+        final Object mid = buffer.middle;
+        if(mid != null) {
+          if(mid instanceof FingerTree) {
+            sub = ((FingerTree<?, E>) mid).iterator();
+          } else {
+            final BufferNode<?, E> buff = (BufferNode<?, E>) mid;
+            if(++top == stack.length) {
+              stack = Arrays.copyOf(stack, 2 * top);
+              poss = Arrays.copyOf(poss, 2 * top);
+            }
+            stack[top] = buff;
+            poss[top] = -buff.inLeft;
+            sub = new FingerTreeIterator<>(buff.get(poss[top]), 0);
+          }
+          return out;
         }
+        poss[top]++;
       }
-      if(sub != null) {
-        if(first) first = false;
-        else sb.append(", ");
-        sub.toString(sb);
+
+      if(poss[top] <= buffer.inRight) {
+        sub = new FingerTreeIterator<>(buffer.get(poss[top] - 1), 0);
+        return out;
       }
-      for(int i = 0; i < r; i++) {
-        final Node<N, E> node = nodes[(m + i) & 7];
-        for(final E elem : node) {
-          if(first) first = false;
-          else sb.append(", ");
-          sb.append(elem);
-        }
+
+      stack[top] = null;
+      if(--top >= 0) {
+        sub = new FingerTreeIterator<>(stack[top].get(0), 0);
+        poss[top]++;
       }
+
+      return out;
+    }
+
+    @Override
+    public void remove() {
+      throw new UnsupportedOperationException();
     }
   }
 }

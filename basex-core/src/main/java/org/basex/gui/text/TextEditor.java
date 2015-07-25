@@ -418,16 +418,25 @@ public final class TextEditor {
     final byte[] ste = concat(st, SPACE), ene = concat(SPACE, en);
     final int sl = st.length, el = en.length, sle = ste.length, ele = ene.length;
 
-    // no selection: select line
     if(!selected()) {
+      // no selection: select line
       start = pos;
       end = pos;
       while(start > 0 && text[start - 1] != '\n') --start;
       while(end < size() && text[end] != '\n') ++end;
+    } else if(start > end) {
+      // selection -> start < end
+      final int s = start;
+      start = end;
+      end = s;
     }
 
-    final int min = Math.min(start, end);
-    int max = Math.max(start, end);
+    // ignore whitespaces
+    while(start < end && ws(text[start])) ++start;
+    while(end > start && ws(text[end - 1])) --end;
+
+    final int min = start;
+    int max = end;
     if(selected() && text[max - 1] == '\n') max--;
 
     // create new text with or without comment
@@ -689,14 +698,14 @@ public final class TextEditor {
       } else if(ch == '~') {
         // closes XQuery comments
         if(prev == ':' && pprv == '(') {
-          sb.append("\n : \n ");
+          sb.append("  ");
           if(curr != ':') {
             sb.append(':');
             if(curr != ')') sb.append(')');
           } else if(next != ')') {
             sb.append(')');
           }
-          move = 5;
+          move = 2;
         }
       } else if(ch == '-') {
         // closes XML comments
@@ -737,20 +746,19 @@ public final class TextEditor {
    * @param sb string builder
    */
   private void closeElem(final StringBuilder sb) {
-    int p = pos - 1;
-    for(; p >= 0; p--) {
-      final byte b = text[p];
-      if(!XMLToken.isNCChar(b) && b != ':') {
-        if(b == '<' && p < pos - 1) {
+    final int p = pos;
+    while(pos > 0) {
+      final int cp = prev();
+      if(!XMLToken.isNCChar(cp) && cp != ':') {
+        if(cp == '<' && pos < p - 1) {
           // add closing element
-          sb.append("</");
-          while(++p < pos) sb.append((char) text[p]);
-          sb.append('>');
-          break;
+          next();
+          sb.append("</").append(new TokenBuilder().add(text, pos, p).toString()).append('>');
         }
-        return;
+        break;
       }
     }
+    pos = p;
   }
 
   /**

@@ -64,6 +64,21 @@ public final class LockingTest extends SandboxTest {
   }
 
   /**
+   * Single thread acquires both global read lock and a single write lock.
+   * @throws InterruptedException Got interrupted.
+   */
+  @Test
+  public void singleThreadGlobalReadLocalWriteTest() throws InterruptedException {
+    final CountDownLatch test = new CountDownLatch(1);
+    final LockTester th1 = new LockTester(null, null, objects, test);
+
+    th1.start();
+    assertTrue("Thread should be able to acquire lock.",
+        test.await(WAIT, TimeUnit.MILLISECONDS));
+    th1.release();
+  }
+
+  /**
    * Test for concurrent writes.
    * @throws InterruptedException Got interrupted.
    */

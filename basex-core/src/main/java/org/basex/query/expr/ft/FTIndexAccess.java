@@ -50,9 +50,9 @@ public final class FTIndexAccess extends Simple {
           // assign scoring
           if(qc.scoring) it.score();
           // cache entry for visualizations or ft:mark/ft:extract
-          if(qc.ftPosData != null) qc.ftPosData.add(it.data, it.pre, it.all);
+          if(qc.ftPosData != null) qc.ftPosData.add(it.data(), it.pre(), it.matches());
           // remove matches reference to save memory
-          it.all = null;
+          it.matches(null);
         }
         return it;
       }
@@ -110,7 +110,7 @@ public final class FTIndexAccess extends Simple {
     Expr e = ftexpr;
     if(ftexpr instanceof FTWords) {
       final FTWords f = (FTWords) ftexpr;
-      if(f.mode == FTMode.ANY && f.occ == null) e = f.query;
+      if(f.mode == FTMode.ANY && f.occ == null && f.ftt == null) e = f.query;
     }
     return Function._FT_SEARCH.get(null, info, Str.get(ictx.data.meta.name), e).toString();
   }

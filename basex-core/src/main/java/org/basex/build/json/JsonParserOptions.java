@@ -11,23 +11,26 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public final class JsonParserOptions extends JsonOptions {
-  /** Option: encoding. */
-  public static final StringOption ENCODING = new StringOption("encoding");
-  /** Option: unescape special characters. */
+  /** Option: unescape special characters (parse-json, json-to-xml). */
   public static final BooleanOption UNESCAPE = new BooleanOption("unescape", true);
-  /** Option: liberal parsing. */
+  /** Option: liberal parsing (parse-json, json-to-xml). */
   public static final BooleanOption LIBERAL = new BooleanOption("liberal", false);
-  /** Option: fallback function. */
+  /** Option: fallback function (parse-json, json-to-xml). */
   public static final FuncOption FALLBACK = new FuncOption("fallback");
-  /** Option: handle duplicates. */
+  /** Option: handle duplicates (parse-json, json-to-xml). */
   public static final EnumOption<JsonDuplicates> DUPLICATES =
-      new EnumOption<>("duplicates", JsonDuplicates.USE_LAST);
+      new EnumOption<>("duplicates", JsonDuplicates.class);
+  /** Option: validation (json-to-xml). */
+  public static final BooleanOption VALIDATE = new BooleanOption("validate", false);
+  /** Option: encoding (custom). */
+  public static final StringOption ENCODING = new StringOption("encoding");
 
   /** Duplicate handling. */
   public enum JsonDuplicates {
     /** Reject.    */ REJECT,
     /** Use first. */ USE_FIRST,
-    /** Use last.  */ USE_LAST;
+    /** Use last.  */ USE_LAST,
+    /** Retain.    */ RETAIN;
 
     @Override
     public String toString() {

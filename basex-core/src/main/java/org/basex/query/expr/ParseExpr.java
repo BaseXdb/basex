@@ -32,7 +32,7 @@ public abstract class ParseExpr extends Expr {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null}
    */
   protected ParseExpr(final InputInfo info) {
     this.info = info;
@@ -51,7 +51,7 @@ public abstract class ParseExpr extends Expr {
     if(it == null || ir.size() == 1) return it;
     final Item n = ir.next();
     if(n != null) {
-      final ValueBuilder vb = new ValueBuilder(3).add(it).add(n);
+      final ValueBuilder vb = new ValueBuilder().add(it).add(n);
       if(ir.next() != null) vb.add(Str.get(DOTS));
       throw SEQFOUND_X.get(ii, vb.value());
     }
@@ -101,7 +101,7 @@ public abstract class ParseExpr extends Expr {
       if(it != null && !(it instanceof ANode)) {
         final Item n = ir.next();
         if(n != null) {
-          final ValueBuilder vb = new ValueBuilder(3).add(it).add(n);
+          final ValueBuilder vb = new ValueBuilder().add(it).add(n);
           if(ir.next() != null) vb.add(Str.get(DOTS));
           throw EBV_X.get(ii, vb.value());
         }
@@ -441,6 +441,22 @@ public abstract class ParseExpr extends Expr {
    */
   final ANode toEmptyNode(final Item it) throws QueryException {
     return it == null ? null : toNode(it);
+  }
+
+  /**
+   * Checks if the evaluated expression yields a non-empty node or item.
+   * Returns the item or throws an exception.
+   * @param ex expression to be evaluated
+   * @param qc query context
+   * @return item
+   * @throws QueryException query exception
+   */
+  protected final Item toNodeOrAtomItem(final Expr ex, final QueryContext qc)
+      throws QueryException {
+
+    Item it = toItem(ex, qc);
+    if(!(it instanceof ANode)) it = it.atomItem(info);
+    return it;
   }
 
   /**

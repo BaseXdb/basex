@@ -10,10 +10,9 @@ import javax.xml.xquery.*;
 import org.w3c.dom.*;
 
 /**
- * XQJ Example, derived from the XQJ Tutorial
- * <a href="http://www.xquery.com/tutorials/xqj_tutorial">
- * http://www.xquery.com/tutorials/xqj_tutorial</a>
- * from Marc van Cappellen.
+ * XQJ Examples, derived from an
+ * <a href="https://www.progress.com/products/data-integration-suite/data-integration-suite-developer-center/data-integration-suite-tutorials/learning-xquery/introduction-to-the-xquery-api-for-java-xqj-">
+ * XQJ online tutorial</a>.
  *
  * Part 8: Binding External Variables.
  *

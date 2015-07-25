@@ -9,6 +9,7 @@ import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -81,7 +82,7 @@ final class TableContent extends BaseXBack {
 
       final int pre = tdata.rows.get(l);
       final long ms = marked.size();
-      while(mpos < ms && marked.pres[mpos] < pre) ++mpos;
+      while(mpos < ms && marked.pre(mpos) < pre) ++mpos;
 
       // draw line
       g.setColor(GUIConstants.color2);
@@ -90,7 +91,7 @@ final class TableContent extends BaseXBack {
       g.drawLine(0, posY + rowH, w, posY + rowH);
 
       // verify if current node is marked or focused
-      final boolean rm = mpos < marked.size() && marked.pres[mpos] == pre;
+      final boolean rm = mpos < marked.size() && marked.pre(mpos) == pre;
       final boolean rf = pre == rfocus;
       final int col = rm ? rf ? 5 : 4 : 3;
       if(rm || rf) {

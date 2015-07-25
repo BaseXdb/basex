@@ -3,8 +3,8 @@ package org.basex.query.util.collation;
 import java.util.*;
 
 import org.basex.query.*;
-import org.basex.query.iter.*;
 import org.basex.query.util.hash.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -16,7 +16,7 @@ import org.basex.util.*;
  */
 public final class CollationItemSet implements ItemSet {
   /** Items. */
-  private final ValueBuilder items = new ValueBuilder();
+  private final ItemList items = new ItemList();
   /** Collation. */
   private final Collation coll;
 
@@ -30,7 +30,7 @@ public final class CollationItemSet implements ItemSet {
 
   @Override
   public boolean add(final Item item, final InputInfo ii) throws QueryException {
-    final int is = (int) items.size();
+    final int is = items.size();
     for(int id = 0; id < is; id++) {
       if(items.get(id).equiv(item, coll, ii)) return false;
     }

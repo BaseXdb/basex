@@ -24,8 +24,6 @@ public final class RestXqModules {
 
   /** Module cache. */
   private HashMap<String, RestXqModule> modules = new HashMap<>();
-  /** RESTXQ path. */
-  private IOFile restxq;
   /** Private constructor. */
   private RestXqModules() { }
 
@@ -35,6 +33,13 @@ public final class RestXqModules {
    */
   public static RestXqModules get() {
     return INSTANCE;
+  }
+
+  /**
+   * Initializes the module cache.
+   */
+  public void init() {
+    modules = new HashMap<>();
   }
 
   /**
@@ -55,11 +60,9 @@ public final class RestXqModules {
    * @throws Exception exception (including unexpected ones)
    */
   RestXqFunction find(final HTTPContext http, final QNm error) throws Exception {
-    cache(http);
-
     // collect all functions
     final ArrayList<RestXqFunction> list = new ArrayList<>();
-    for(final RestXqModule mod : modules.values()) {
+    for(final RestXqModule mod : cache(http).values()) {
       for(final RestXqFunction rxf : mod.functions()) {
         if(rxf.matches(http, error)) list.add(rxf);
       }
@@ -128,20 +131,27 @@ public final class RestXqModules {
   /**
    * Updates the module cache. Parses new modules and discards obsolete ones.
    * @param http http context
+   * @return module cache
    * @throws Exception exception (including unexpected ones)
    */
-  private synchronized void cache(final HTTPContext http) throws Exception {
-    // initialize RESTXQ directory (may be relative against WEBPATH)
-    if(restxq == null) {
-      final StaticOptions sopts = http.context(false).soptions;
+  private synchronized HashMap<String, RestXqModule> cache(final HTTPContext http)
+      throws Exception {
+
+    final StaticOptions sopts = http.context(false).soptions;
+    HashMap<String, RestXqModule> cache = modules;
+
+    // create new cache if it is empty, or if cache is to be recreated every time
+    if(cache.isEmpty() || !sopts.get(StaticOptions.CACHERESTXQ)) {
+      cache = new HashMap<>();
       final String webpath = sopts.get(StaticOptions.WEBPATH);
       final String rxqpath = sopts.get(StaticOptions.RESTXQPATH);
-      restxq = new IOFile(webpath).resolve(rxqpath);
+      final IOFile restxq = new IOFile(webpath).resolve(rxqpath);
+      if(!restxq.exists()) throw HTTPCode.NO_RESTXQ.get();
+
+      cache(http, restxq, cache, modules);
+      modules = cache;
     }
-    // create new cache
-    final HashMap<String, RestXqModule> cache = new HashMap<>();
-    cache(http, restxq, cache);
-    modules = cache;
+    return cache;
   }
 
   /**
@@ -149,18 +159,24 @@ public final class RestXqModules {
    * @param root root path
    * @param http http context
    * @param cache cached modules
+   * @param old old cache
    * @throws Exception exception (including unexpected ones)
    */
-  private synchronized void cache(final HTTPContext http, final IOFile root,
-      final HashMap<String, RestXqModule> cache) throws Exception {
+  private static synchronized void cache(final HTTPContext http, final IOFile root,
+      final HashMap<String, RestXqModule> cache, final HashMap<String, RestXqModule> old)
+      throws Exception {
 
-    for(final IOFile file : root.children()) {
+    // check if directory is to be skipped
+    final IOFile[] files = root.children();
+    for(final IOFile file : files) if(file.name().equals(IGNORE)) return;
+
+    for(final IOFile file : files) {
       if(file.isDir()) {
-        cache(http, file, cache);
+        cache(http, file, cache, old);
       } else {
         final String path = file.path();
         if(file.hasSuffix(IO.XQSUFFIXES)) {
-          RestXqModule module = modules.get(path);
+          RestXqModule module = old.get(path);
           boolean parsed = false;
           if(module != null) {
             // check if module has been modified

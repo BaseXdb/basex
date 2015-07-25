@@ -8,6 +8,9 @@ module namespace _ = 'dba/users';
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace util = 'dba/util' at '../modules/util.xqm';
 
+(:~ Top category :)
+declare variable $_:SUB := 'user';
+
 (:~
  : Drops patterns.
  : @param  $names    names of users
@@ -16,7 +19,7 @@ import module namespace util = 'dba/util' at '../modules/util.xqm';
 declare
   %updating
   %rest:GET
-  %rest:path("dba/drop-pattern")
+  %rest:path("/dba/drop-pattern")
   %rest:query-param("name",    "{$name}")
   %rest:query-param("pattern", "{$pattern}")
   %output:method("html")
@@ -27,10 +30,8 @@ function _:drop-pattern(
   cons:check(),
   try {
     util:update("user:drop($n, $p)", map { 'n': $name, 'p': $pattern }),
-    db:output(web:redirect("user",
-      map { 'name': $name, 'info': 'Pattern dropped: ' || $pattern }))
+    db:output(web:redirect($_:SUB, map { 'name': $name, 'info': 'Pattern dropped: ' || $pattern }))
   } catch * {
-    db:output(web:redirect("user",
-      map { 'error': $err:description }))
+    db:output(web:redirect($_:SUB, map { 'error': $err:description }))
   }
 };

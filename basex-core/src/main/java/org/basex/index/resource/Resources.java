@@ -4,7 +4,6 @@ import java.io.*;
 
 import org.basex.core.*;
 import org.basex.data.*;
-import org.basex.data.atomic.*;
 import org.basex.index.*;
 import org.basex.index.query.*;
 import org.basex.io.in.DataInput;
@@ -58,10 +57,6 @@ public final class Resources implements Index {
    */
   public synchronized IntList docs() {
     return docs.docs();
-  }
-
-  @Override
-  public synchronized void init() {
   }
 
   /**

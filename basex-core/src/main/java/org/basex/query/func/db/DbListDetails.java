@@ -56,8 +56,10 @@ public final class DbListDetails extends DbList {
       @Override
       public ANode get(final long i) {
         if(i < is) {
-          final byte[] pt = data.text(il.get((int) i), true);
-          return resource(pt, false, 0, MediaType.APPLICATION_XML, data.meta.time);
+          final int pre = il.get((int) i);
+          final byte[] pt = data.text(pre, true);
+          return resource(pt, false, data.size(pre, Data.DOC), MediaType.APPLICATION_XML,
+              data.meta.time);
         }
         if(i < is + ts) {
           final byte[] pt = tl.get((int) i - is);
@@ -71,7 +73,7 @@ public final class DbListDetails extends DbList {
         return ip < is ? get(ip++) : tp < ts ? get(ip + tp++) : null;
       }
       @Override
-      public long size() { return ip + is; }
+      public long size() { return is + ts; }
     };
   }
 
@@ -88,20 +90,21 @@ public final class DbListDetails extends DbList {
       @Override
       public ANode get(final long i) throws QueryException {
         final String name = dbs.get((int) i);
-        final MetaData meta = new MetaData(name, ctx.options, ctx.soptions);
         try {
+          final MetaData meta = new MetaData(name, ctx.options, ctx.soptions);
           meta.read();
+          // count number of raw files
+          final int bin = new IOFile(ctx.soptions.dbpath(name), IO.RAW).descendants().size();
+          final FElem res = new FElem(DATABASE);
+          res.add(RESOURCES, token(meta.ndocs + bin));
+          res.add(MDATE, DateTime.format(new Date(meta.dbtime())));
+          res.add(SIZE, token(meta.dbsize()));
+          if(ctx.perm(Perm.CREATE, name)) res.add(PATH, meta.original);
+          res.add(name);
+          return res;
         } catch(final IOException ex) {
           throw BXDB_OPEN_X.get(info, ex);
         }
-
-        final FElem res = new FElem(DATABASE);
-        res.add(RESOURCES, token(meta.ndocs));
-        res.add(MDATE, DateTime.format(new Date(meta.dbtime()), DateTime.FULL));
-        res.add(SIZE, token(meta.dbsize()));
-        if(ctx.perm(Perm.CREATE, name)) res.add(PATH, meta.original);
-        res.add(name);
-        return res;
       }
       @Override
       public ANode next() throws QueryException { return pos < size() ? get(pos++) : null; }
@@ -122,9 +125,8 @@ public final class DbListDetails extends DbList {
   private static FNode resource(final byte[] path, final boolean raw, final long size,
       final MediaType type, final long mdate) {
 
-    final String tstamp = DateTime.format(new Date(mdate), DateTime.FULL);
-    final FElem res = new FElem(RESOURCE).add(path).
-        add(RAW, token(raw)).add(CTYPE, type.toString()).add(MDATE, tstamp);
-    return raw ? res.add(SIZE, token(size)) : res;
+    final String tstamp = DateTime.format(new Date(mdate));
+    return new FElem(RESOURCE).add(path).
+        add(RAW, token(raw)).add(CTYPE, type.toString()).add(MDATE, tstamp).add(SIZE, token(size));
   }
 }

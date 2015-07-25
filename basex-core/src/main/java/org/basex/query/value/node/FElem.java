@@ -93,16 +93,7 @@ public final class FElem extends FNode {
    * @param name element name
    */
   public FElem(final QNm name) {
-    this(name, null);
-  }
-
-  /**
-   * Constructor for creating an element with namespace declarations.
-   * @param name element name
-   * @param ns namespaces
-   */
-  private FElem(final QNm name, final Atts ns) {
-    this(name, ns, null, null);
+    this(name, null, null, null);
   }
 
   /**
@@ -381,12 +372,12 @@ public final class FElem extends FNode {
   }
 
   @Override
-  public AxisMoreIter attributes() {
+  public BasicNodeIter attributes() {
     return atts != null ? iter(atts) : super.attributes();
   }
 
   @Override
-  public AxisMoreIter children() {
+  public BasicNodeIter children() {
     return children != null ? iter(children) : super.children();
   }
 

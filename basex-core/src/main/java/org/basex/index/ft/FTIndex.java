@@ -12,8 +12,10 @@ import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.query.*;
 import org.basex.index.stats.*;
+import org.basex.index.value.*;
 import org.basex.io.random.*;
 import org.basex.query.expr.ft.*;
+import org.basex.query.util.ft.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.hash.*;
@@ -46,7 +48,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public final class FTIndex implements Index {
+public final class FTIndex implements ValueIndex {
   /** Entry size. */
   private static final int ENTRY = 9;
 
@@ -101,9 +103,6 @@ public final class FTIndex implements Index {
     }
     tp[tl - 1] = (int) inY.length();
   }
-
-  @Override
-  public synchronized void init() { }
 
   @Override
   public synchronized int costs(final IndexToken it) {
@@ -478,4 +477,16 @@ public final class FTIndex implements Index {
       pos = ps;
     }
   }
+
+  @Override
+  public void add(final TokenObjMap<IntList> map) { }
+
+  @Override
+  public void delete(final TokenObjMap<IntList> map) { }
+
+  @Override
+  public void replace(final byte[] old, final byte[] key, final int id) { }
+
+  @Override
+  public void flush() { }
 }

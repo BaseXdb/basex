@@ -5,7 +5,6 @@ import static org.basex.util.Token.*;
 
 import java.math.*;
 import java.util.*;
-import java.util.regex.*;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
@@ -21,8 +20,6 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public abstract class Formatter extends FormatUtil {
-  /** Calendar pattern. */
-  private static final Pattern CALENDAR = Pattern.compile("(Q\\{([^}]*)\\})?([^}]+)");
   /** Military timezones. */
   private static final byte[] MIL = token("YXWVUTSRQPONZABCDEFGHIKLM");
   /** Token: Nn. */
@@ -132,10 +129,8 @@ public abstract class Formatter extends FormatUtil {
     if(lng.length != 0 && MAP.get(lng) == null) tb.add("[Language: en]");
     boolean iso = false;
     if(cal.length != 0) {
-      final Matcher m = CALENDAR.matcher(string(cal));
-      if(!m.matches()) throw CALQNAME_X.get(ii, cal);
-      final QNm qnm = new QNm(m.group(3), m.group(1) == null ||
-          m.group(2).isEmpty() ? null : m.group(2));
+      final QNm qnm = QNm.resolve(cal);
+      if(qnm == null) throw CALQNAME_X.get(ii, cal);
       if(!qnm.hasURI()) {
         int c = -1;
         final byte[] ln = qnm.local();
@@ -550,16 +545,16 @@ public abstract class Formatter extends FormatUtil {
    */
   private byte[] number(final long num, final FormatParser fp, final int zero) {
     // cache characters of presentation modifier
-    final IntList mod = new TokenParser(fp.primary).toList();
-    final int modSize = mod.size();
+    final int[] mod = new TokenParser(fp.primary).toArray();
+    final int modSize = mod.length;
     int modStart = 0;
-    while(modStart < modSize && mod.get(modStart) == '#') modStart++;
+    while(modStart < modSize && mod[modStart] == '#') modStart++;
 
     // try to find regular separator pattern
     int sepPos = -1, sepChar = -1, digitPos = 0;
     boolean regSep = false;
     for(int mp = modSize - 1; mp >= modStart; --mp) {
-      final int ch = mod.get(mp);
+      final int ch = mod[mp];
       if(ch >= zero && ch <= zero + 9) {
         digitPos = mp;
         continue;
@@ -586,7 +581,7 @@ public abstract class Formatter extends FormatUtil {
       final boolean sep = reverse.size() % sepPos == sepPos - 1;
       int ch;
       if(modPos >= modStart) {
-        ch = mod.get(modPos--);
+        ch = mod[modPos--];
         if(inPos >= 0) {
           if(ch == '#' && sep) reverse.add(sepChar);
           if(ch == '#' || ch >= zero && ch <= zero + 9) ch = in[inPos--] - '0' + zero;

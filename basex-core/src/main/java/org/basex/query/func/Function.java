@@ -57,7 +57,7 @@ import org.basex.util.hash.*;
 /**
  * Definitions of all built-in XQuery functions.
  * New namespace mappings for function prefixes and URIs must be added to the static initializer of
- * the {@code NSGlobal} class.
+ * the {@link NSGlobal} class.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
@@ -204,7 +204,7 @@ public enum Function {
   FUNCTION_ARITY(FnFunctionArity.class, "function-arity(function)", arg(FUN_O), ITR),
   /** XQuery function. */
   FUNCTION_LOOKUP(FnFunctionLookup.class, "function-lookup(name,arity)",
-      arg(QNM, ITR), FUN_OZ, flag(CTX, FCS, NDT, HOF)),
+      arg(QNM, ITR), FUN_OZ, flag(CTX, Flag.POS, NDT, HOF)),
   /** XQuery function. */
   FUNCTION_NAME(FnFunctionName.class, "function-name(function)", arg(FUN_O), QNM_ZO),
   /** XQuery function. */
@@ -243,7 +243,7 @@ public enum Function {
   /** XQuery function. */
   LANG(FnLang.class, "lang(ids[,node])", arg(STR_ZO, NOD), BLN),
   /** XQuery function. */
-  LAST(FnLast.class, "last()", arg(), ITR, flag(FCS, CTX)),
+  LAST(FnLast.class, "last()", arg(), ITR, flag(Flag.POS, CTX)),
   /** XQuery function. */
   LOCAL_NAME(FnLocalName.class, "local-name([node])", arg(NOD_ZO), STR),
   /** XQuery function. */
@@ -303,7 +303,11 @@ public enum Function {
   /** XQuery function. */
   PARSE_IETF_DATE(FnParseIetfDate.class, "parse-ietf-date(string)", arg(STR_ZO), DTM_ZO),
   /** XQuery function. */
-  PARSE_JSON(FnParseJson.class, "parse-json(string[,options])", arg(STR_ZO, ITEM), DTM_ZO),
+  JSON_TO_XML(FnJsonToXml.class, "json-to-xml(string[,options])", arg(STR_ZO, MAP_O), NOD_ZO),
+  /** XQuery function. */
+  XML_TO_JSON(FnXmlToJson.class, "xml-to-json(node[,options])", arg(NOD_ZO, MAP_O), STR_ZO),
+  /** XQuery function. */
+  PARSE_JSON(FnParseJson.class, "parse-json(string[,options])", arg(STR_ZO, ITEM), ITEM_ZO),
   /** XQuery function. */
   PARSE_XML(FnParseXml.class, "parse-xml(string)", arg(STR_ZO), DOC_O, flag(CNS)),
   /** XQuery function. */
@@ -311,7 +315,7 @@ public enum Function {
   /** XQuery function. */
   PATH(FnPath.class, "path([node])", arg(NOD_ZO), STR_ZO),
   /** XQuery function. */
-  POSITION(FnPosition.class, "position()", arg(), ITR, flag(FCS, CTX)),
+  POSITION(FnPosition.class, "position()", arg(), ITR, flag(Flag.POS, CTX)),
   /** XQuery function. */
   PREFIX_FROM_QNAME(FnPrefixFromQName.class, "prefix-from-QName(qname)", arg(QNM_ZO), NCN_ZO),
   /** XQuery function. */
@@ -464,11 +468,11 @@ public enum Function {
   /** XQuery function. */
   _ARRAY_HEAD(ArrayHead.class, "head(array)", arg(ARRAY_O), ITEM_ZM, ARRAY_URI),
   /** XQuery function. */
-  _ARRAY_TAIL(ArrayTail.class, "tail(array)", arg(ARRAY_O), ITEM_ZM, ARRAY_URI),
+  _ARRAY_TAIL(ArrayTail.class, "tail(array)", arg(ARRAY_O), ARRAY_O, ARRAY_URI),
   /** XQuery function. */
-  _ARRAY_REVERSE(ArrayReverse.class, "reverse(array)", arg(ARRAY_O), ITEM_ZM, ARRAY_URI),
+  _ARRAY_REVERSE(ArrayReverse.class, "reverse(array)", arg(ARRAY_O), ARRAY_O, ARRAY_URI),
   /** XQuery function. */
-  _ARRAY_JOIN(ArrayJoin.class, "join(array)", arg(ARRAY_ZM), ITEM_ZM, ARRAY_URI),
+  _ARRAY_JOIN(ArrayJoin.class, "join(array)", arg(ARRAY_ZM), ARRAY_O, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_FLATTEN(ArrayFlatten.class, "flatten(item()*)", arg(ITEM_ZM), ITEM_ZM, ARRAY_URI),
   /** XQuery function. */
@@ -545,13 +549,20 @@ public enum Function {
   /** XQuery function. */
   _ADMIN_LOGS(AdminLogs.class, "logs([date[,merge]])", arg(STR, BLN), ELM_ZM, flag(NDT), ADMIN_URI),
   /** XQuery function. */
-  _ADMIN_WRITE_LOG(AdminWriteLog.class, "write-log(string)", arg(STR), EMP, flag(NDT), ADMIN_URI),
+  _ADMIN_WRITE_LOG(AdminWriteLog.class, "write-log(message[,type])",
+      arg(STR, STR), EMP, flag(NDT), ADMIN_URI),
+  /** XQuery function. */
+  _ADMIN_DELETE_LOGS(AdminDeleteLogs.class, "delete-logs(date)",
+      arg(STR), EMP, flag(NDT), ADMIN_URI),
 
   /* Archive Module. */
 
   /** XQuery function. */
   _ARCHIVE_CREATE(ArchiveCreate.class, "create(entries,contents[,options])",
       arg(ITEM_ZM, ITEM_ZM, ITEM), B64, ARCHIVE_URI),
+  /** XQuery function. */
+  _ARCHIVE_CREATE_FROM(ArchiveCreateFrom.class, "create-from(path[,options[,entries]])",
+      arg(STR, ITEM, ITEM_ZM), EMP, ARCHIVE_URI),
   /** XQuery function. */
   _ARCHIVE_ENTRIES(ArchiveEntries.class, "entries(archive)", arg(B64), ELM_ZM, ARCHIVE_URI),
   /** XQuery function. */
@@ -561,6 +572,9 @@ public enum Function {
   _ARCHIVE_EXTRACT_BINARY(ArchiveExtractBinary.class, "extract-binary(archive[,entries])",
       arg(B64, ITEM_ZM), B64_ZM, ARCHIVE_URI),
   /** XQuery function. */
+  _ARCHIVE_EXTRACT_TO(ArchiveExtractTo.class, "extract-to(path,archive[,entries])",
+      arg(STR, B64, ITEM_ZM), EMP, ARCHIVE_URI),
+  /** XQuery function. */
   _ARCHIVE_UPDATE(ArchiveUpdate.class, "update(archive,entries,contents)",
       arg(B64, ITEM_ZM, ITEM_ZM), B64, ARCHIVE_URI),
   /** XQuery function. */
@@ -568,8 +582,8 @@ public enum Function {
       arg(B64, ITEM_ZM), B64, ARCHIVE_URI),
   /** XQuery function. */
   _ARCHIVE_OPTIONS(ArchiveOptions.class, "options(archive)", arg(B64), ELM, ARCHIVE_URI),
-  /** XQuery function. */
-  _ARCHIVE_WRITE(ArchiveWrite.class, "write(path,archive[,entries])",
+  /** XQuery function (deprecated). */
+  @Deprecated _ARCHIVE_WRITE(ArchiveWrite.class, "write(path,archive[,entries])",
       arg(STR, B64, ITEM_ZM), EMP, ARCHIVE_URI),
 
   /* BaseX Module. */
@@ -783,9 +797,9 @@ public enum Function {
   /** XQuery function. */
   _DB_NODE_PRE(DbNodePre.class, "node-pre(nodes)", arg(NOD_ZM), ITR_ZM, DB_URI),
   /** XQuery function. */
-  _DB_EVENT(DbEvent.class, "event(name,query)", arg(STR, ITEM_ZM), EMP, flag(NDT), DB_URI),
-  /** XQuery function. */
   _DB_OUTPUT(DbOutput.class, "output(result)", arg(ITEM_ZM), EMP, flag(UPD, NDT), DB_URI),
+  /** XQuery function. */
+  _DB_OUTPUT_CACHE(DbOutputCache.class, "output-cache()", arg(), ITEM_ZO, flag(NDT), DB_URI),
   /** XQuery function. */
   _DB_ADD(DbAdd.class, "add(database,input[,path[,options]])",
       arg(STR, NOD, STR, ITEM), EMP, flag(UPD, NDT), DB_URI),
@@ -861,6 +875,8 @@ public enum Function {
   /** XQuery function. */
   _FILE_IS_DIR(FileIsDir.class, "is-dir(path)", arg(STR), BLN, flag(NDT), FILE_URI),
   /** XQuery function. */
+  _FILE_IS_ABSOLUTE(FileIsAbsolute.class, "is-absolute(path)", arg(STR), BLN, flag(NDT), FILE_URI),
+  /** XQuery function. */
   _FILE_IS_FILE(FileIsFile.class, "is-file(path)", arg(STR), BLN, flag(NDT), FILE_URI),
   /** XQuery function. */
   _FILE_LAST_MODIFIED(FileLastModified.class, "last-modified(path)",
@@ -871,8 +887,8 @@ public enum Function {
   _FILE_PATH_TO_NATIVE(FilePathToNative.class, "path-to-native(path)",
       arg(STR), STR, flag(NDT), FILE_URI),
   /** XQuery function. */
-  _FILE_RESOLVE_PATH(FileResolvePath.class, "resolve-path(path)",
-      arg(STR), STR, flag(NDT), FILE_URI),
+  _FILE_RESOLVE_PATH(FileResolvePath.class, "resolve-path(path[,base])",
+      arg(STR, STR), STR, flag(NDT), FILE_URI),
   /** XQuery function. */
   _FILE_LIST(FileList.class, "list(path[,recursive[,pattern]])",
       arg(STR, BLN, STR), STR_ZM, flag(NDT), FILE_URI),
@@ -1199,6 +1215,12 @@ public enum Function {
   /** XQuery function. */
   _VALIDATE_DTD_INFO(ValidateDtdInfo.class, "dtd-info(input[,schema])",
       arg(ITEM, ITEM), STR_ZM, flag(NDT), VALIDATE_URI),
+  /** XQuery function. */
+  _VALIDATE_RNG(ValidateRng.class, "rng(input,schema[,compact])",
+      arg(ITEM, ITEM, BLN), STR_ZM, flag(NDT), VALIDATE_URI),
+  /** XQuery function. */
+  _VALIDATE_RNG_INFO(ValidateRngInfo.class, "rng-info(input,schema[,compact])",
+      arg(ITEM, ITEM, BLN), STR_ZM, flag(NDT), VALIDATE_URI),
 
   /* Web Module. */
 
@@ -1211,6 +1233,10 @@ public enum Function {
   /** XQuery function. */
   _WEB_RESPONSE_HEADER(WebResponseHeader.class, "response-header([headers[,output]])",
       arg(MAP_O, MAP_O), ELM, WEB_URI),
+  /** XQuery function. */
+  _WEB_ENCODE_URL(WebEncodeUrl.class, "encode-url(string)", arg(STR), STR, WEB_URI),
+  /** XQuery function. */
+  _WEB_DECODE_URL(WebDecodeUrl.class, "decode-url(string)", arg(STR), STR, WEB_URI),
 
   /* XQuery Module. */
 

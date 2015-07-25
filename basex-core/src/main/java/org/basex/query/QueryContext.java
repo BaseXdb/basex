@@ -26,6 +26,8 @@ import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.up.*;
 import org.basex.query.util.collation.*;
+import org.basex.query.util.ft.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -99,7 +101,7 @@ public final class QueryContext extends Proc implements Closeable {
   /** Current Date. */
   public Item date;
   /** Current DateTime. */
-  public Item dtm;
+  public Item datm;
   /** Current Time. */
   public Item time;
   /** Current timezone. */
@@ -107,9 +109,9 @@ public final class QueryContext extends Proc implements Closeable {
   /** Current nanoseconds. */
   public long nano;
 
-  /** Strings to lock defined by lock:read option. */
+  /** Strings to lock defined by read-lock option. */
   public final StringList readLocks = new StringList(0);
-  /** Strings to lock defined by lock:write option. */
+  /** Strings to lock defined by write-lock option. */
   public final StringList writeLocks = new StringList(0);
 
   /** Number of successive tail calls. */
@@ -131,15 +133,18 @@ public final class QueryContext extends Proc implements Closeable {
   /** Stack of module files that are currently parsed. */
   final TokenList modStack = new TokenList();
 
-  /** Serializer options. */
-  SerializerOptions serialOpts;
   /** Initial context value. */
   MainModule ctxItem;
 
   /** Root expression of the query. */
   public MainModule root;
 
-  /** Compilation flag. */
+  /** Serialization parameters. */
+  private SerializerOptions serParams;
+  /** Indicates if the default serialization parameters are used. */
+  public boolean defaultOutput;
+
+  /** Indicates if the query has been compiled. */
   private boolean compiled;
   /** Indicates if the query context has been closed. */
   private boolean closed;
@@ -298,7 +303,8 @@ public final class QueryContext extends Proc implements Closeable {
       // cache the initial context nodes
       final DBNodes nodes = context.current();
       if(nodes != null) {
-        if(!context.perm(Perm.READ, nodes.data.meta.name)) throw BASX_PERM_X.get(null, Perm.READ);
+        if(!context.perm(Perm.READ, nodes.data().meta.name))
+          throw BASX_PERM_X.get(null, Perm.READ);
         value = resources.compile(nodes);
       }
     }
@@ -343,13 +349,13 @@ public final class QueryContext extends Proc implements Closeable {
       if(!updating) return root.iter(this);
 
       // cache results
-      ValueBuilder cache = root.cache(this);
+      ItemList cache = root.cache(this);
 
       final Updates updates = resources.updates;
       if(updates != null) {
         // if parent context exists, updates will be performed by main context
         if(qcParent == null) {
-          final ValueBuilder output = resources.output;
+          final ItemList output = resources.output;
 
           // copy nodes that will be affected by an update operation
           final HashSet<Data> datas = updates.prepare(this);
@@ -367,7 +373,7 @@ public final class QueryContext extends Proc implements Closeable {
           }
         }
       }
-      return cache;
+      return cache.iter();
 
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
@@ -381,7 +387,7 @@ public final class QueryContext extends Proc implements Closeable {
    * @param datas data references
    * @param dbs database names
    */
-  private void copy(final ValueBuilder cache, final HashSet<Data> datas, final StringList dbs) {
+  private void copy(final ItemList cache, final HashSet<Data> datas, final StringList dbs) {
     final long cs = cache.size();
     for(int c = 0; c < cs; c++) {
       final Item it = cache.get(c);
@@ -427,6 +433,7 @@ public final class QueryContext extends Proc implements Closeable {
   public void databases(final LockResult lr) {
     lr.read.add(readLocks);
     lr.write.add(writeLocks);
+    // use global locking if referenced databases cannot be statically determined
     if(root == null || !root.databases(lr, this) ||
        ctxItem != null && !ctxItem.databases(lr, this)) {
       if(updating) lr.writeAll = true;
@@ -526,12 +533,15 @@ public final class QueryContext extends Proc implements Closeable {
   }
 
   /**
-   * Returns the query-specific or global serialization parameters.
+   * Returns query-specific or default serialization parameters.
    * @return serialization parameters
    */
   public SerializerOptions serParams() {
-    return serialOpts != null ? serialOpts :
-      new SerializerOptions(context.options.get(MainOptions.SERIALIZER));
+    if(serParams == null) {
+      serParams = new SerializerOptions(context.options.get(MainOptions.SERIALIZER));
+      defaultOutput = root != null;
+    }
+    return serParams;
   }
 
   /**
@@ -544,11 +554,29 @@ public final class QueryContext extends Proc implements Closeable {
   }
 
   /**
-   * Sets full-text options.
+   * Assigns full-text options.
    * @param opt full-text options
    */
   public void ftOpt(final FTOpt opt) {
     ftOpt = opt;
+  }
+
+  /**
+   * Creates and returns an XML query plan (expression tree) for this query.
+   * @return query plan
+   */
+  public FElem plan() {
+    // only show root node if functions or variables exist
+    final FElem e = new FElem(QueryText.PLAN);
+    e.add(QueryText.COMPILED, token(compiled));
+    if(root != null) {
+      for(final StaticScope scp : QueryCompiler.usedDecls(root)) scp.plan(e);
+      root.plan(e);
+    } else {
+      funcs.plan(e);
+      vars.plan(e);
+    }
+    return e;
   }
 
   /**
@@ -592,63 +620,48 @@ public final class QueryContext extends Proc implements Closeable {
   // CLASS METHODS ======================================================================
 
   /**
-   * Evaluates the expression with the specified context set.
+   * This function is called by the GUI; use {@link #iter()} instead.
+   * Caches and returns the result of the specified query. If all nodes are of the same database
+   * instance, the returned value will be of type {@link DBNodes}.
+   * @param max maximum number of results to cache (negative: return all values)
    * @return resulting value
    * @throws QueryException query exception
    */
-  Result execute() throws QueryException {
-    // limit number of hits to be returned and displayed
-    int max = context.options.get(MainOptions.MAXHITS);
-    if(max < 0) max = Integer.MAX_VALUE;
+  Value cache(final int max) throws QueryException {
+    final int mx = max >= 0 ? max : Integer.MAX_VALUE;
 
     // evaluates the query
     final Iter ir = iter();
-    final ValueBuilder vb = new ValueBuilder();
+    final ItemList cache;
     Item it;
 
     // check if all results belong to the database of the input context
     final Data data = resources.globalData();
-    if(serialOpts == null && data != null) {
+    if(defaultOutput && data != null) {
       final IntList pres = new IntList();
-      while((it = ir.next()) != null) {
+      while((it = ir.next()) != null && it.data() == data && pres.size() < mx) {
         checkStop();
-        if(it.data() != data) break;
-        if(pres.size() < max) pres.add(((DBNode) it).pre);
+        pres.add(((DBNode) it).pre());
       }
 
+      // all results processed: return compact node sequence
       final int ps = pres.size();
-      // all nodes have been processed: return compact node sequence
-      if(it == null || ps == max) return ps == 0 ? vb : new DBNodes(data, ftPosData, pres.finish());
+      if(it == null || ps == mx) return new DBNodes(data, pres.finish()).ftpos(ftPosData);
 
       // otherwise, add nodes to standard iterator
-      for(int p = 0; p < ps; ++p) vb.add(new DBNode(data, pres.get(p)));
-      vb.add(it);
+      cache = new ItemList();
+      for(int p = 0; p < ps; p++) cache.add(new DBNode(data, pres.get(p)));
+      cache.add(it);
+    } else {
+      cache = new ItemList();
     }
 
     // use standard iterator
-    while((it = ir.next()) != null) {
+    while((it = ir.next()) != null && cache.size() < mx) {
       checkStop();
-      if(vb.size() < max) vb.add(it.materialize(null));
+      cache.add(it.materialize(null));
     }
-    return vb;
-  }
-
-  /**
-   * Recursively builds a query plan.
-   * @return resulting node
-   */
-  public FElem plan() {
-    // only show root node if functions or variables exist
-    final FElem e = new FElem(QueryText.PLAN);
-    e.add(QueryText.COMPILED, token(compiled));
-    if(root != null) {
-      for(final StaticScope scp : QueryCompiler.usedDecls(root)) scp.plan(e);
-      root.plan(e);
-    } else {
-      funcs.plan(e);
-      vars.plan(e);
-    }
-    return e;
+    return cache.value();
   }
 
   // PRIVATE METHODS ====================================================================
@@ -662,7 +675,7 @@ public final class QueryContext extends Proc implements Closeable {
    * @throws QueryException query exception
    */
   private Value cast(final Object val, final String type) throws QueryException {
-    final StaticContext sc = root != null ? root.sc : new StaticContext(context);
+    final StaticContext sc = root != null ? root.sc : new StaticContext(this);
 
     // String input
     Object vl = val;
@@ -679,7 +692,7 @@ public final class QueryContext extends Proc implements Closeable {
 
       // sub types overriding the global value (value \2 type)
       if(string.indexOf('\2') != -1) {
-        final ValueBuilder vb = new ValueBuilder(strings.size());
+        final ValueBuilder vb = new ValueBuilder();
         for(final String str : strings) {
           final int i = str.indexOf('\2');
           final String s = i == -1 ? str : str.substring(0, i);
@@ -732,7 +745,7 @@ public final class QueryContext extends Proc implements Closeable {
       if(vl instanceof Item) return tp.cast((Item) vl, this, sc, null);
       // cast sequence
       final Value v = (Value) vl;
-      final ValueBuilder seq = new ValueBuilder((int) v.size());
+      final ValueBuilder seq = new ValueBuilder();
       for(final Item i : v) seq.add(tp.cast(i, this, sc, null));
       return seq.value();
     }
@@ -740,7 +753,7 @@ public final class QueryContext extends Proc implements Closeable {
     if(vl instanceof String[]) {
       // cast string array
       final String[] strings = (String[]) vl;
-      final ValueBuilder seq = new ValueBuilder(strings.length);
+      final ValueBuilder seq = new ValueBuilder();
       for(final String s : strings) seq.add(tp.cast(s, this, sc, null));
       return seq.value();
     }
@@ -806,15 +819,15 @@ public final class QueryContext extends Proc implements Closeable {
    */
   public QueryContext initDateTime() throws QueryException {
     if(time == null) {
-      final Date d = Calendar.getInstance().getTime();
-      final String zon = DateTime.format(d, DateTime.ZONE);
-      final String ymd = DateTime.format(d, DateTime.DATE);
-      final String hms = DateTime.format(d, DateTime.TIME);
-      final String zn = zon.substring(0, 3) + ':' + zon.substring(3);
-      time = new Tim(token(hms + zn), null);
-      date = new Dat(token(ymd + zn), null);
-      dtm = new Dtm(token(ymd + 'T' + hms + zn), null);
-      zone = new DTDur(Strings.toInt(zon.substring(0, 3)), Strings.toInt(zon.substring(3)));
+      final Date dt = Calendar.getInstance().getTime();
+      final String ymd = DateTime.format(dt, DateTime.DATE);
+      final String hms = DateTime.format(dt, DateTime.TIME);
+      final String zon = DateTime.format(dt, DateTime.ZONE);
+      final String znm = zon.substring(0, 3), zns = zon.substring(3);
+      time = new Tim(token(hms + znm + ':' + zns), null);
+      date = new Dat(token(ymd + znm + ':' + zns), null);
+      datm = new Dtm(token(ymd + 'T' + hms + znm + ':' + zns), null);
+      zone = new DTDur(Strings.toInt(znm), Strings.toInt(zns));
       nano = System.nanoTime();
     }
     return this;

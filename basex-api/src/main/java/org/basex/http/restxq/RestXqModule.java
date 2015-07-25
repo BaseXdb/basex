@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.util.*;
 
+import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.io.*;
 import org.basex.query.*;
@@ -44,14 +45,15 @@ final class RestXqModule {
     functions.clear();
 
     // loop through all functions
-    try(final QueryContext qc = qc(http)) {
+    final Context ctx = http.context(false);
+    try(final QueryContext qc = qc(ctx)) {
       // loop through all functions
       final String name = file.name();
       for(final StaticFunc uf : qc.funcs.funcs()) {
         // only add functions that are defined in the same module (file)
         if(name.equals(new IOFile(uf.info.path()).name())) {
           final RestXqFunction rxf = new RestXqFunction(uf, qc, this);
-          if(rxf.parse(http)) functions.add(rxf);
+          if(rxf.parse(ctx)) functions.add(rxf);
         }
       }
     }
@@ -92,9 +94,10 @@ final class RestXqModule {
       throws Exception {
 
     // create new XQuery instance
-    try(final QueryContext qc = qc(http)) {
+    final Context ctx = http.context(false);
+    try(final QueryContext qc = qc(ctx)) {
       final RestXqFunction rxf = new RestXqFunction(find(qc, func.function), qc, this);
-      rxf.parse(http);
+      rxf.parse(ctx);
       RestXqResponse.create(rxf, qc, http, error);
     }
   }
@@ -103,12 +106,12 @@ final class RestXqModule {
 
   /**
    * Retrieves a query context for the given module.
-   * @param http HTTP context
+   * @param ctx database context
    * @return query context
    * @throws Exception exception
    */
-  private QueryContext qc(final HTTPContext http) throws Exception {
-    final QueryContext qc = new QueryContext(http.context(false));
+  private QueryContext qc(final Context ctx) throws Exception {
+    final QueryContext qc = new QueryContext(ctx);
     try {
       qc.parse(string(file.read()), file.path(), null);
       return qc;

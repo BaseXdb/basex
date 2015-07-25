@@ -13,6 +13,6 @@ import org.basex.util.*;
 public final class FnUnparsedText extends Parse {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return unparsedText(qc, false);
+    return unparsedText(qc, false, true);
   }
 }

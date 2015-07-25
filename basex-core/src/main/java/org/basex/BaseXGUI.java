@@ -63,10 +63,6 @@ public final class BaseXGUI extends Main {
 
     // read options
     final GUIOptions gopts = new GUIOptions();
-    // cache results to pass them on to all visualizations
-    context.options.set(MainOptions.CACHEQUERY, true);
-    // reduce number of results to save memory
-    context.options.set(MainOptions.MAXHITS, gopts.get(GUIOptions.MAXHITS));
 
     // initialize look and feel
     init(gopts);

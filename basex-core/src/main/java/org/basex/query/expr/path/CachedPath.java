@@ -5,6 +5,7 @@ import static org.basex.query.QueryError.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -19,9 +20,6 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 final class CachedPath extends AxisPath {
-  /** Flag for result caching. */
-  private boolean cache;
-
   /**
    * Constructor.
    * @param info input info
@@ -30,16 +28,14 @@ final class CachedPath extends AxisPath {
    */
   CachedPath(final InputInfo info, final Expr root, final Expr... steps) {
     super(info, root, steps);
-    // analyze if result set can be cached: no root node, no variables...
-    cache = root != null && !hasFreeVars();
   }
 
   @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
+  protected NodeIter nodeIter(final QueryContext qc) throws QueryException {
     final long cp = qc.pos, cs = qc.size;
     final Value cv = qc.value, r = root != null ? qc.value(root) : cv;
+    final ANodeList list = new ANodeList().check();
     try {
-      final NodeSeqBuilder nb = new NodeSeqBuilder().check();
       if(r != null) {
         final Iter ir = qc.iter(r);
         for(Item it; (it = ir.next()) != null;) {
@@ -47,40 +43,40 @@ final class CachedPath extends AxisPath {
           if(root != null && !(it instanceof ANode))
             throw PATHNODE_X_X_X.get(info, steps[0], it.type, it);
           qc.value = it;
-          iter(0, nb, qc);
+          iter(0, list, qc);
         }
       } else {
         qc.value = null;
-        iter(0, nb, qc);
+        iter(0, list, qc);
       }
-      return nb.sort();
     } finally {
       qc.value = cv;
       qc.size = cs;
       qc.pos = cp;
     }
+    return list.iter();
   }
 
   /**
    * Recursive step iterator.
-   * @param l current step
-   * @param nc node cache
+   * @param step current step
+   * @param list node cache
    * @param qc query context
    * @throws QueryException query exception
    */
-  private void iter(final int l, final NodeSeqBuilder nc, final QueryContext qc)
+  private void iter(final int step, final ANodeList list, final QueryContext qc)
       throws QueryException {
 
     // cast is safe (steps will always return a {@link NodeIter} instance)
-    final NodeIter ni = (NodeIter) qc.iter(steps[l]);
-    final boolean more = l + 1 != steps.length;
+    final NodeIter ni = (NodeIter) qc.iter(steps[step]);
+    final boolean more = step + 1 != steps.length;
     for(ANode node; (node = ni.next()) != null;) {
       if(more) {
         qc.value = node;
-        iter(l + 1, nc, qc);
+        iter(step + 1, list, qc);
       } else {
         qc.checkStop();
-        nc.add(node);
+        list.add(node);
       }
     }
   }
@@ -88,8 +84,6 @@ final class CachedPath extends AxisPath {
   @Override
   public AxisPath copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
     final Expr rt = root == null ? null : root.copy(qc, scp, vs);
-    final CachedPath ap = copyType(new CachedPath(info, rt, Arr.copyAll(qc, scp, vs, steps)));
-    ap.cache = cache;
-    return ap;
+    return copyType(new CachedPath(info, rt, Arr.copyAll(qc, scp, vs, steps)));
   }
 }

@@ -1,8 +1,8 @@
 package org.basex.query.func.ft;
 
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.ft.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 

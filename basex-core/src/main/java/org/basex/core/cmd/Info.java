@@ -46,10 +46,8 @@ public final class Info extends AInfo {
     info(tb, VERSINFO, Prop.VERSION);
 
     final User user = context.user();
-    if(user.has(Perm.CREATE)) {
-      Performance.gc(1);
-      info(tb, USED_MEM, Performance.getMemory());
-    }
+    info(tb, USED_MEM, Performance.getMemory());
+
     if(user.has(Perm.ADMIN)) {
       final StaticOptions sopts = context.soptions;
       tb.add(NL + GLOBAL_OPTIONS + COL + NL);

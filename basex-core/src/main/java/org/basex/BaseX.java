@@ -86,9 +86,6 @@ public class BaseX extends CLI {
           execute(val);
           execute(new Set(MainOptions.QUERYPATH, ""), false);
           console = false;
-        } else if(c == 'd') {
-          // toggle debug mode
-          Prop.debug ^= true;
         } else if(c == 'D') {
           // hidden option: show/hide dot query graph
           execute(new Set(MainOptions.DOTPLAN, null), false);
@@ -232,8 +229,11 @@ public class BaseX extends CLI {
       String v = null;
       if(arg.dash()) {
         c = arg.next();
-        if(c == 'b' || c == 'c' || c == 'C' || c == 'i' || c == 'I' || c == 'o' || c == 'q' ||
-            c == 'r' || c == 's' || c == 't' && local()) {
+        if(c == 'd') {
+          // activate debug mode
+          Prop.debug = true;
+        } else if(c == 'b' || c == 'c' || c == 'C' || c == 'i' || c == 'I' || c == 'o' ||
+            c == 'q' || c == 'r' || c == 's' || c == 't' && local()) {
           // options followed by a string
           v = arg.string();
         } else if(c == 'd' || c == 'D' && local() || c == 'u' && local() || c == 'R' ||

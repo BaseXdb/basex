@@ -13,6 +13,7 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -39,13 +40,23 @@ public class XQueryEval extends StandardFunc {
   }
 
   @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
-    return eval(qc, toToken(exprs[0], qc), null, false);
+  public final Iter iter(final QueryContext qc) throws QueryException {
+    return eval(qc).iter();
   }
 
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
-    return iter(qc).value();
+    return eval(qc).value();
+  }
+
+  /**
+   * Evaluates a query.
+   * @param qc query context
+   * @return resulting value
+   * @throws QueryException query exception
+   */
+  protected ItemList eval(final QueryContext qc) throws QueryException {
+    return eval(qc, toToken(exprs[0], qc), null, false);
   }
 
   /**
@@ -57,13 +68,13 @@ public class XQueryEval extends StandardFunc {
    * @return resulting value
    * @throws QueryException query exception
    */
-  final ValueBuilder eval(final QueryContext qc, final byte[] qu, final String path,
+  final ItemList eval(final QueryContext qc, final byte[] qu, final String path,
       final boolean updating) throws QueryException {
 
     // bind variables and context value
     final HashMap<String, Value> bindings = toBindings(1, qc);
     final User user = qc.context.user();
-    final Perm tmp = user.perm(null);
+    final Perm tmp = user.perm("");
     Timer to = null;
 
     try(final QueryContext qctx = qc.proc(new QueryContext(qc))) {
@@ -71,10 +82,9 @@ public class XQueryEval extends StandardFunc {
         final Options opts = toOptions(2, Q_OPTIONS, new XQueryOptions(), qc);
         final Perm perm = Perm.get(opts.get(XQueryOptions.PERMISSION).toString());
         if(!user.has(perm)) throw BXXQ_PERM2_X.get(info, perm);
-        user.perm(perm, null);
+        user.perm(perm, "");
 
         // initial memory consumption: perform garbage collection and calculate usage
-        Performance.gc(2);
         final long mb = opts.get(XQueryOptions.MEMORY);
         if(mb != 0) {
           final long limit = Performance.memory() + (mb << 20);
@@ -83,10 +93,7 @@ public class XQueryEval extends StandardFunc {
             @Override
             public void run() {
               // limit reached: perform garbage collection and check again
-              if(Performance.memory() > limit) {
-                Performance.gc(1);
-                if(Performance.memory() > limit) qctx.stop();
-              }
+              if(Performance.memory() > limit) qctx.stop();
             }
           }, 500, 500);
         }
@@ -102,7 +109,7 @@ public class XQueryEval extends StandardFunc {
 
       // evaluate query
       try {
-        final StaticContext sctx = new StaticContext(qctx.context);
+        final StaticContext sctx = new StaticContext(qctx);
         for(final Entry<String, Value> it : bindings.entrySet()) {
           final String key = it.getKey();
           final Value val = it.getValue();
@@ -118,9 +125,9 @@ public class XQueryEval extends StandardFunc {
           if(qctx.updating) throw BXXQ_UPDATING.get(info);
         }
 
-        final ValueBuilder vb = new ValueBuilder();
-        cache(qctx.iter(), vb, qctx);
-        return vb;
+        final ItemList cache = new ItemList();
+        cache(qctx.iter(), cache, qctx);
+        return cache;
       } catch(final ProcException ex) {
         throw BXXQ_STOPPED.get(info);
       } catch(final QueryException ex) {
@@ -129,7 +136,7 @@ public class XQueryEval extends StandardFunc {
       }
 
     } finally {
-      user.perm(tmp, null);
+      user.perm(tmp, "");
       qc.proc(null);
       if(to != null) to.cancel();
     }

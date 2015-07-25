@@ -5,11 +5,10 @@
  :)
 module namespace html = 'dba/html';
 
-import module namespace Request = 'http://exquery.org/ns/request';
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 
 (: Number formats. :)
-declare variable $html:NUMBER := ('decimal','number', 'bytes');
+declare variable $html:NUMBER := ('decimal', 'number', 'bytes');
 
 (:~
  : Creates a checkbox.
@@ -213,7 +212,7 @@ declare function html:table(
           if(empty($sort) or $name = $sort) then (
             $value
           ) else (
-            html:link($value, Request:path(), map:merge(($param, map { 'sort': $name })))
+            html:link($value, "", map:merge(($param, map { 'sort': $name })))
           )
         }
       }
@@ -249,8 +248,9 @@ declare function html:table(
                  return $entry
         )
 
+        let $max := $cons:OPTION($cons:K-MAX-ROWS)
         for $entry at $c in $entries
-        return if($c <= $cons:MAX-ROWS) then (
+        return if($c <= $max) then (
           <tr>{
             for $header at $pos in $headers
             let $name := $header/name()
@@ -268,21 +268,20 @@ declare function html:table(
               )
               else .
             )
+
             return element td {
               attribute align { if($header/@type = $html:NUMBER) then 'right' else 'left' },
               if($pos = 1 and $buttons) then (
-                <input type="checkbox" name="{ $name }" value="{ $col }" onClick="buttons()"/>,
-                if(exists($link)) then (
-                  html:link($value, $link($value), map:merge(($param, map { $name: $value })))
-                ) else if($header/@type = 'id') then () else (
-                  $value
-                )
-              ) else (
+                <input type="checkbox" name="{ $name }" value="{ $col }" onClick="buttons()"/>
+              ) else (),
+              if($pos = 1 and exists($link)) then (
+                html:link($value, $link($value), map:merge(($param, map { $name: $value })))
+              ) else if($header/@type = 'id') then () else (
                 $value
               )
             }
           }</tr>
-        ) else if($c = $cons:MAX-ROWS + 1) then (
+        ) else if($c = $max + 1) then (
           <tr>
             <td>{
               if($buttons) then <input type="checkbox" disabled=""/> else ()

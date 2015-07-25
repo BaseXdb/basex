@@ -5,6 +5,8 @@ import static org.junit.Assert.*;
 import org.basex.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
+import org.basex.query.util.*;
+import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.junit.Test;
 
@@ -23,7 +25,7 @@ public final class ModuleTest extends SandboxTest {
   public void builtIn() throws Exception {
     final String query = "import module namespace xquery = 'http://basex.org/modules/xquery'; 1";
     try(final QueryProcessor qp = new QueryProcessor(query, context)) {
-      qp.execute();
+      qp.value();
     }
   }
 
@@ -79,6 +81,24 @@ public final class ModuleTest extends SandboxTest {
 
     try(final QueryContext qc = new QueryContext(context)) {
       qc.parseMain("import module namespace a='a'; ()", null, null);
+    }
+  }
+
+  /**
+   * Uses a URI resolver.
+   * @throws Exception exception
+   */
+  @Test
+  public void uriResolver() throws Exception {
+    final String query = "import module namespace m='uri' at 'x.xq'; m:f()";
+    try(final QueryProcessor qp = new QueryProcessor(query, context)) {
+      qp.uriResolver(new UriResolver() {
+        @Override
+        public IO resolve(final String path, final String uri, final Uri base) {
+          return new IOContent("module namespace m='uri'; declare function m:f() { 'OK' };");
+        }
+      });
+      assertEquals(qp.value().serialize().toString(), "OK");
     }
   }
 }

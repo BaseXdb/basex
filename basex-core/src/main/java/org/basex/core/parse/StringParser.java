@@ -79,8 +79,6 @@ final class StringParser extends CmdParser {
             return new CreateIndex(consume(CmdIndex.class, cmd));
           case USER:
             return new CreateUser(name(cmd), password());
-          case EVENT:
-            return new CreateEvent(name(cmd));
         }
         break;
       case COPY:
@@ -144,8 +142,6 @@ final class StringParser extends CmdParser {
             return new DropUser(glob(cmd), key(ON, null) ? glob(cmd) : null);
           case BACKUP:
             return new DropBackup(glob(cmd));
-          case EVENT:
-            return new DropEvent(name(cmd));
         }
         break;
       case OPTIMIZE:
@@ -193,8 +189,6 @@ final class StringParser extends CmdParser {
             return new ShowUsers(key(ON, null) ? name(cmd) : null);
           case BACKUPS:
             return new ShowBackups();
-          case EVENTS:
-            return new ShowEvents();
         }
         break;
       case GRANT:

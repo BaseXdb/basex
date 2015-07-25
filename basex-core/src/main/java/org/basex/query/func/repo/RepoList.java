@@ -3,6 +3,7 @@ package org.basex.query.func.repo;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.list.*;
 import org.basex.query.util.pkg.*;
 import org.basex.query.util.pkg.Package;
 import org.basex.query.value.node.*;
@@ -24,8 +25,8 @@ public final class RepoList extends RepoFn {
   private static final String VERSION = "version";
 
   @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
-    final NodeSeqBuilder cache = new NodeSeqBuilder();
+  public BasicNodeIter iter(final QueryContext qc) throws QueryException {
+    final ANodeList cache = new ANodeList();
     final Repo repo = qc.context.repo.reset();
     for(final byte[] p : repo.pkgDict()) {
       if(p == null) continue;
@@ -45,6 +46,6 @@ public final class RepoList extends RepoFn {
         cache.add(elem);
       }
     }
-    return cache;
+    return cache.iter();
   }
 }

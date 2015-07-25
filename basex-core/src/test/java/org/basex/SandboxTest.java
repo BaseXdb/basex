@@ -1,19 +1,6 @@
 package org.basex;
 
-import static org.basex.core.Text.*;
-import static org.junit.Assert.*;
-
-import java.io.*;
-import java.util.concurrent.*;
-
-import org.basex.api.client.*;
 import org.basex.core.*;
-import org.basex.core.users.*;
-import org.basex.io.*;
-import org.basex.io.out.*;
-import org.basex.util.*;
-import org.basex.util.list.*;
-import org.basex.util.options.*;
 import org.junit.*;
 
 /**
@@ -22,166 +9,20 @@ import org.junit.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public abstract class SandboxTest {
-  /** Database port. */
-  protected static final int DB_PORT = 9996;
-  /** Event port. */
-  protected static final int EVENT_PORT = 9997;
-
-  /** Default output stream. */
-  public static final PrintStream OUT = System.out;
-  /** Default error stream. */
-  public static final PrintStream ERR = System.err;
-  /** Null output stream. */
-  public static final PrintStream NULL = new PrintStream(new NullOutput());
-  /** Test name. */
-  protected static final String NAME = Util.className(SandboxTest.class);
-  /** Database context. */
-  protected static Context context;
-
+public abstract class SandboxTest extends Sandbox {
   /**
    * Creates the sandbox.
    */
   @BeforeClass
-  public static void initSandbox() {
-    final IOFile sb = sandbox();
-    sb.delete();
-    assertTrue("Sandbox could not be created.", sb.md());
-    context = newContext();
+  public static void initTests() {
+    initSandbox();
   }
 
   /**
    * Removes test databases and closes the database context.
    */
   @AfterClass
-  public static void closeContext() {
-    context.close();
-    assertTrue("Sandbox could not be deleted.", sandbox().delete());
-  }
-
-  /**
-   * Creates a new specified context.
-   * @return context
-   */
-  public static Context newContext() {
-    final IOFile sb = sandbox();
-    Options.setSystem(StaticOptions.DBPATH.name(), sb.path() + "/data");
-    Options.setSystem(StaticOptions.WEBPATH.name(), sb.path() + "/webapp");
-    Options.setSystem(StaticOptions.RESTXQPATH.name(), sb.path() + "/webapp");
-    Options.setSystem(StaticOptions.REPOPATH.name(), sb.path() + "/repo");
-    try {
-      return new Context();
-    } finally {
-      Options.setSystem(StaticOptions.DBPATH.name(), "");
-      Options.setSystem(StaticOptions.WEBPATH.name(), "");
-      Options.setSystem(StaticOptions.RESTXQPATH.name(), "");
-      Options.setSystem(StaticOptions.REPOPATH.name(), "");
-    }
-  }
-
-  /**
-   * Creates a new, sandboxed server instance.
-   * @param args additional arguments
-   * @return server instance
-   * @throws IOException I/O exception
-   */
-  public static BaseXServer createServer(final String... args) throws IOException {
-    try {
-      System.setOut(NULL);
-      final StringList sl = new StringList("-z", "-p" + DB_PORT, "-e" + EVENT_PORT, "-q");
-      for(final String arg : args) sl.add(arg);
-      final BaseXServer server = new BaseXServer(sl.finish());
-      server.context.soptions.set(StaticOptions.DBPATH, sandbox().path());
-      return server;
-    } finally {
-      System.setOut(OUT);
-    }
-  }
-
-  /**
-   * Stops a server instance.
-   * @param server server
-   * @throws IOException I/O exception
-   */
-  public static void stopServer(final BaseXServer server) throws IOException {
-    try {
-      System.setOut(NULL);
-      if(server != null) server.stop();
-    } finally {
-      System.setOut(OUT);
-    }
-  }
-
-  /**
-   * Creates a client instance.
-   * @param login optional login data
-   * @return client instance
-   * @throws IOException I/O exception
-   */
-  public static ClientSession createClient(final String... login) throws IOException {
-    final String user = login.length > 0 ? login[0] : UserText.ADMIN;
-    final String pass = login.length > 1 ? login[1] : UserText.ADMIN;
-    return new ClientSession(S_LOCALHOST, DB_PORT, user, pass);
-  }
-
-  /**
-   * Returns the sandbox database path.
-   * @return database path
-   */
-  public static IOFile sandbox() {
-    return new IOFile(Prop.TMP, NAME);
-  }
-
-  /**
-   * Normalizes newlines in a query result.
-   * @param result input string
-   * @return normalized string
-   */
-  public static String normNL(final Object result) {
-    return result.toString().replaceAll("(\r?\n|\r) *", "\n");
-  }
-
-  /** Client. */
-  public static final class Client extends Thread {
-    /** Start signal. */
-    private final CountDownLatch startSignal;
-    /** Stop signal. */
-    private final CountDownLatch stopSignal;
-    /** Client session. */
-    private final ClientSession session;
-    /** Command string. */
-    private final Command cmd;
-    /** Fail flag. */
-    public String error;
-
-    /**
-     * Client constructor.
-     * @param c command string to execute
-     * @param start start signal
-     * @param stop stop signal
-     * @throws IOException I/O exception while establishing the session
-     */
-    public Client(final Command c, final CountDownLatch start, final CountDownLatch stop)
-        throws IOException {
-
-      session = createClient();
-      cmd = c;
-      startSignal = start;
-      stopSignal = stop;
-      start();
-    }
-
-    @Override
-    public void run() {
-      try {
-        if(startSignal != null) startSignal.await();
-        session.execute(cmd);
-        session.close();
-      } catch(final Throwable ex) {
-        error = "\n" + cmd + '\n' + ex;
-      } finally {
-        if(stopSignal != null) stopSignal.countDown();
-      }
-    }
+  public static void finishTests() {
+    finishSandbox();
   }
 }

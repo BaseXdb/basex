@@ -9,6 +9,8 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public final class JsonSerialOptions extends JsonOptions {
-  /** Option: escape special characters. */
+  /** Option: merge type information (xml-to-json, custom). */
+  public static final BooleanOption INDENT = new BooleanOption("indent", false);
+  /** Option: escape special characters (custom). */
   public static final BooleanOption ESCAPE = new BooleanOption("escape", true);
 }

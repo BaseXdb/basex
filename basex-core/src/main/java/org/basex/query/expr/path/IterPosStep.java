@@ -35,13 +35,13 @@ final class IterPosStep extends Step {
       final Pos[] posExpr = new Pos[preds.length];
       final long[] cPos = new long[preds.length];
       boolean skip;
-      AxisIter ai;
+      BasicNodeIter iter;
 
       @Override
       public ANode next() throws QueryException {
         if(skip) return null;
-        if(ai == null) {
-          ai = axis.iter(checkNode(qc));
+        if(iter == null) {
+          iter = axis.iter(checkNode(qc));
           final int pl = preds.length;
           for(int p = 0; p < pl; p++) {
             final Expr pred = preds[p];
@@ -49,7 +49,9 @@ final class IterPosStep extends Step {
               posExpr[p] = (Pos) pred;
             } else if(num(pred)) {
               // pre-evaluate numeric position
-              final double dbl = toDouble(pred, qc);
+              final Item it = pred.atomItem(qc, info);
+              if(it == null) return null;
+              final double dbl = toDouble(it);
               final long lng = (long) dbl;
               if(dbl != lng) return null;
               final Expr e = Pos.get(lng, info);
@@ -59,7 +61,7 @@ final class IterPosStep extends Step {
           }
         }
 
-        for(ANode node; (node = ai.next()) != null;) {
+        for(ANode node; (node = iter.next()) != null;) {
           qc.checkStop();
           if(test.eq(node) && preds(node)) return node.finish();
         }

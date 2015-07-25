@@ -11,7 +11,7 @@ import org.basex.query.value.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
-final class PartialLeafNode extends PartialNode<Value, Value> {
+final class PartialLeafNode implements NodeLike<Value, Value> {
   /** The single element. */
   final Value[] elems;
 
@@ -24,41 +24,7 @@ final class PartialLeafNode extends PartialNode<Value, Value> {
   }
 
   @Override
-  protected NodeLike<Value, Value>[] concat(final NodeLike<Value, Value> other) {
-    @SuppressWarnings("unchecked")
-    final NodeLike<Value, Value>[] out = new NodeLike[2];
-    if(other instanceof LeafNode) {
-      final Value[] ls = elems, rs = ((LeafNode) other).values;
-      final int l = ls.length, r = rs.length, n = l + r;
-      if(n <= Array.MAX_LEAF) {
-        // merge into one node
-        final Value[] vals = new Value[n];
-        System.arraycopy(ls, 0, vals, 0, l);
-        System.arraycopy(rs, 0, vals, l, r);
-        out[0] = new LeafNode(vals);
-      } else {
-        // split into two
-        final int ll = n / 2, rl = n - ll, move = r - rl;
-        final Value[] newLeft = new Value[ll], newRight = new Value[rl];
-        System.arraycopy(ls, 0, newLeft, 0, l);
-        System.arraycopy(rs, 0, newLeft, l, move);
-        System.arraycopy(rs, move, newRight, 0, rl);
-        out[0] = new LeafNode(newLeft);
-        out[1] = new LeafNode(newRight);
-      }
-    } else {
-      final Value[] elems2 = ((PartialLeafNode) other).elems;
-      final int l = elems.length, r = elems2.length, n = l + r;
-      final Value[] vals = new Value[n];
-      System.arraycopy(elems, 0, vals, 0, l);
-      System.arraycopy(elems2, 0, vals, l, r);
-      out[0] = n < Array.MIN_LEAF ? new PartialLeafNode(vals) : new LeafNode(vals);
-    }
-    return out;
-  }
-
-  @Override
-  protected int append(final NodeLike<Value, Value>[] nodes, final int pos) {
+  public int append(final NodeLike<Value, Value>[] nodes, final int pos) {
     if(pos == 0) {
       nodes[0] = this;
       return 1;
@@ -96,8 +62,7 @@ final class PartialLeafNode extends PartialNode<Value, Value> {
   }
 
   @Override
-  protected void toString(final StringBuilder sb, final int indent) {
-    for(int i = 0; i < indent; i++) sb.append("  ");
-    sb.append(getClass().getSimpleName()).append(Arrays.toString(elems));
+  public String toString() {
+    return getClass().getSimpleName() + "(" + elems.length + ")" + Arrays.toString(elems);
   }
 }

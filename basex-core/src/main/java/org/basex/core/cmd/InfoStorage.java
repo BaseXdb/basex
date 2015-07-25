@@ -12,6 +12,9 @@ import org.basex.core.parse.Commands.Cmd;
 import org.basex.core.parse.Commands.CmdInfo;
 import org.basex.core.users.*;
 import org.basex.data.*;
+import org.basex.query.*;
+import org.basex.query.value.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -25,11 +28,11 @@ import org.basex.util.list.*;
 public final class InfoStorage extends AQuery {
   /**
    * Default constructor.
-   * @param arg optional arguments
+   * @param arg arguments (can be {@code null})
    */
   public InfoStorage(final String... arg) {
-    super(Perm.READ, true, arg.length > 0 && arg[0] != null && !arg[0].isEmpty() ?
-      arg[0] : null, arg.length >  1 ? arg[1] : null);
+    super(Perm.READ, true, arg.length > 0 && arg[0] != null ? arg[0] : "",
+                           arg.length > 1 && arg[1] != null ? arg[1] : "");
   }
 
   @Override
@@ -38,19 +41,30 @@ public final class InfoStorage extends AQuery {
     final String start = args[0];
     final String end = args[1];
 
-    // evaluate input as number range or xquery
-    final DBNodes nodes = start != null && toInt(start) == Integer.MIN_VALUE ? dbNodes() : null;
+    DBNodes nodes = null;
+    if(!start.isEmpty() && toInt(start) == Integer.MIN_VALUE) {
+      try {
+        // evaluate input as query
+        final Value value = qp(args[0], context).value();
+        if(value instanceof DBNodes) nodes = (DBNodes) value;
+      } catch(final QueryException ex) {
+        error(Util.message(ex));
+      } finally {
+        closeQp();
+      }
+    }
+
     final Data data = context.data();
     if(nodes != null) {
       final Table table = th();
-      for(final int n : nodes.pres) table(table, data, n);
+      for(final int pre : nodes.pres()) table(table, data, pre);
       out.print(table.finish());
     } else {
       int ps = 0;
       int pe = 1000;
 
-      if(start != null) {
-        if(end != null) {
+      if(!start.isEmpty()) {
+        if(!end.isEmpty()) {
           ps = toInt(start);
           pe = toInt(end) + 1;
         } else {
@@ -120,9 +134,9 @@ public final class InfoStorage extends AQuery {
     tl.add(data.size(pre, k));
     tl.add(data.attSize(pre, k));
     tl.add(data.id(pre));
-    final int u = data.uri(pre, k);
-    if(data.nsFlag(pre)) tl.add("+" + u);
-    else tl.add(u);
+    final int uriId = data.uriId(pre, k);
+    if(data.nsFlag(pre)) tl.add("+" + uriId);
+    else tl.add(uriId);
     tl.add(TABLEKINDS[k]);
 
     final byte[] cont;
@@ -141,7 +155,7 @@ public final class InfoStorage extends AQuery {
   @Override
   public void build(final CmdBuilder cb) {
     cb.init(Cmd.INFO + " " + CmdInfo.STORAGE);
-    if(args[0] != null && toInt(args[0]) == Integer.MIN_VALUE) {
+    if(!args[0].isEmpty() && toInt(args[0]) == Integer.MIN_VALUE) {
       cb.xquery(0);
     } else {
       cb.arg(0).arg(1);

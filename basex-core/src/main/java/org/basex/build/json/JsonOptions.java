@@ -11,13 +11,13 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public class JsonOptions extends Options {
-  /** Option: merge type information. */
+  /** Option: merge type information (custom). */
   public static final BooleanOption MERGE = new BooleanOption("merge", false);
-  /** Option: include string types. */
+  /** Option: include string types (custom). */
   public static final BooleanOption STRINGS = new BooleanOption("strings", false);
-  /** Option: lax conversion of names to QNames. */
+  /** Option: lax conversion of names to QNames (custom). */
   public static final BooleanOption LAX = new BooleanOption("lax", false);
-  /** Option: format. */
+  /** Option: format (custom). */
   public static final EnumOption<JsonFormat> FORMAT = new EnumOption<>("format", JsonFormat.DIRECT);
 
   /** JSON formats. */
@@ -25,6 +25,7 @@ public class JsonOptions extends Options {
     /** Direct.        */ DIRECT,
     /** Attributes.    */ ATTRIBUTES,
     /** JsonML.        */ JSONML,
+    /** Basic.         */ BASIC,
     /** Map (non-XML). */ MAP;
 
     @Override

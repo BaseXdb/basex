@@ -2,6 +2,7 @@ package org.basex.query.expr;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
@@ -31,24 +32,24 @@ public final class InterSect extends Set {
   }
 
   @Override
-  protected NodeSeqBuilder eval(final Iter[] iter) throws QueryException {
-    NodeSeqBuilder nc = new NodeSeqBuilder();
+  protected ANodeList eval(final Iter[] iter) throws QueryException {
+    ANodeList list = new ANodeList();
 
-    for(Item it; (it = iter[0].next()) != null;) nc.add(toNode(it));
-    final boolean db = nc.dbnodes();
+    for(Item it; (it = iter[0].next()) != null;) list.add(toNode(it));
+    final boolean db = list.dbnodes();
 
     final int el = exprs.length;
-    for(int e = 1; e < el && nc.size() != 0; ++e) {
-      final NodeSeqBuilder nt = new NodeSeqBuilder().check();
+    for(int e = 1; e < el && list.size() != 0; ++e) {
+      final ANodeList nt = new ANodeList().check();
       final Iter ir = iter[e];
       for(Item it; (it = ir.next()) != null;) {
         final ANode n = toNode(it);
-        final int i = nc.indexOf(n, db);
+        final int i = list.indexOf(n, db);
         if(i != -1) nt.add(n);
       }
-      nc = nt;
+      list = nt;
     }
-    return nc;
+    return list;
   }
 
   @Override

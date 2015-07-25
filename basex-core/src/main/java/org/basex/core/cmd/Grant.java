@@ -29,25 +29,26 @@ public final class Grant extends AUser {
    * Constructor, specifying a database.
    * @param permission permission
    * @param user user name
-   * @param pattern database pattern
+   * @param pattern database pattern (may be {@code null})
    */
   public Grant(final Object permission, final String user, final String pattern) {
-    super(permission.toString(), user, pattern);
+    super(permission.toString(), user, pattern == null ? "" : pattern);
   }
 
   @Override
   protected boolean run() {
     // find permission
     final CmdPerm cmd = getOption(CmdPerm.class);
+    final boolean local = args[2].isEmpty();
     if(cmd == CmdPerm.NONE) {
       prm = Perm.NONE;
     } else if(cmd == CmdPerm.READ) {
       prm = Perm.READ;
     } else if(cmd == CmdPerm.WRITE) {
       prm = Perm.WRITE;
-    } else if(cmd == CmdPerm.CREATE && args[2] == null) {
+    } else if(cmd == CmdPerm.CREATE && local) {
       prm = Perm.CREATE;
-    } else if(cmd == CmdPerm.ADMIN && args[2] == null) {
+    } else if(cmd == CmdPerm.ADMIN && local) {
       prm = Perm.ADMIN;
     }
     if(prm == null) return error(PERM_UNKNOWN_X, args[0]);
@@ -63,7 +64,7 @@ public final class Grant extends AUser {
     final Users users = context.users;
     final User user = users.get(name);
     Users.perm(user, prm, pattern);
-    return info(pattern == null ? GRANTED_X_X : GRANTED_ON_X_X_X, args[0], name, pattern);
+    return info(pattern.isEmpty() ? GRANTED_X_X : GRANTED_ON_X_X_X, args[0], name, pattern);
   }
 
   @Override

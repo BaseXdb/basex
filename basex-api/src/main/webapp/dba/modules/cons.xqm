@@ -15,48 +15,48 @@ declare variable $cons:SESSION-KEY := "session";
 (:~ Current session. :)
 declare variable $cons:SESSION := Session:get($cons:SESSION-KEY);
 
+(:~ Directory for DBA files. :)
+declare variable $cons:DBA-DIR := file:resolve-path(file:temp-dir() || 'dba/') !
+  (file:create-dir(.), .);
 (:~ Configuration file. :)
-declare variable $cons:CONFIG-XML := file:base-dir() || '../files/config.xml';
-(:~ Configuration. :)
-declare %private variable $cons:CONFIG := map:merge(
-  doc($cons:CONFIG-XML)/config/* ! map { name(): string() }
-);
-
-(:~ Language. :)
-declare variable $cons:LANGUAGE := cons:string('language');
-
-(:~ Maximum length of XML characters (currently: 1mb). :)
-declare variable $cons:MAX-CHARS := cons:integer('maxchars');
-(:~ Maximum number of table entries (currently: 1000 rows). :)
-declare variable $cons:MAX-ROWS := cons:integer('maxrows');
-(:~ Query timeout. :)
-declare variable $cons:TIMEOUT := cons:integer('timeout');
-(:~ Maximal memory consumption. :)
-declare variable $cons:MEMORY := cons:integer('memory');
-(:~ Permission when running queries. :)
-declare variable $cons:PERMISSION := cons:string('permission');
+declare variable $cons:DBA-SETTINGS-FILE := $cons:DBA-DIR || 'dba-settings.xml';
 
 (:~ Permissions. :)
 declare variable $cons:PERMISSIONS := ('none', 'read', 'write', 'create', 'admin');
 
-(:~
- : Returns a configuration string for the specified key.
- : @param  $key  key
- : @return text
- :)
-declare %private function cons:string($key as xs:string) as xs:string {
-  let $text := $cons:CONFIG($key)
-  return if($text) then $text else error((), 'Missing in config.xml: "' || $text || '"')
-};
+(:~ Maximum length of XML characters. :)
+declare variable $cons:K-MAX-CHARS := 'maxchars';
+(:~ Maximum number of table entries. :)
+declare variable $cons:K-MAX-ROWS := 'maxrows';
+(:~ Query timeout. :)
+declare variable $cons:K-TIMEOUT := 'timeout';
+(:~ Maximal memory consumption. :)
+declare variable $cons:K-MEMORY := 'memory';
+(:~ Permission when running queries. :)
+declare variable $cons:K-PERMISSION := 'permission';
 
-(:~
- : Returns a configuration number for the specified key.
- : @param  $key  key
- : @return text
- :)
-declare %private function cons:integer($key as xs:string) as xs:integer {
-  xs:integer(cons:string($key))
-};
+(:~ Configuration. :)
+declare variable $cons:OPTION :=
+  let $defaults := map {
+    'maxchars': 100000,
+    'maxrows': 500,
+    'timeout': 5,
+    'memory': 100,
+    'permission': 'admin'
+  }
+  return try {
+    (: merge defaults with options in settings file :)
+    map:merge((
+      $defaults,
+      for $opt in doc($cons:DBA-SETTINGS-FILE)/config/*
+      let $key := $opt/name()
+      let $val := if($defaults($key) instance of xs:integer) then xs:integer($opt) else string($opt)
+      return map { $key: $val }
+    ))
+  } catch * {
+    (: settings file does not exist or is not well-formed... use defaults :)
+    $defaults
+  };
 
 (:~
  : Checks if the current client is logged in. If not, raises an error.

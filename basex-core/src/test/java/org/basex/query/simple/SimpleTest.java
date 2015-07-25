@@ -158,6 +158,11 @@ public final class SimpleTest extends QueryTest {
       { "Catch 6", integers(1),
         "declare function local:f($x) { try { 1 idiv $x } catch * { 1 } }; local:f(0)" },
 
+      { "NodeTest 1", strings("a"),
+        "let $d as document-node(element()) := parse-xml('<!--a--><a/>') return name($d/*)" },
+      { "NodeTest 2", strings("a"),
+        "let $d as document-node(element(a)) := parse-xml('<!--a--><a/>') return name($d/*)" },
+
       { "FuncTest 1", integers(1), "xquery version '1.0';" +
         "declare function local:foo() { count(local:bar()) };" +
         "declare function local:bar() { 42 };" +
@@ -196,6 +201,11 @@ public final class SimpleTest extends QueryTest {
       { "Map 3", strings("a", "b"), "<a><b/></a>/b ! ancestor-or-self::node() ! name()" },
 
       { "Constructor 1", strings("1"), "<n xmlns='u'>{attribute{'a'}{1}}</n>/@a/string()" },
+
+      // #1140
+      { "Pred 1", empty(), "declare function local:test() {" +
+          "for $n in (1, 1) return <_><c/><w/></_>/*[$n[1]] }; local:test()/self::w" },
+      { "Pred 2", empty(), "for $n in (2,2) return (<c><c0/></c>, <d><d0/><d2/></d>)/*[$n[$n]]" }
     };
   }
 }

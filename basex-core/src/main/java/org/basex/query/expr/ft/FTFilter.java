@@ -1,9 +1,9 @@
 package org.basex.query.expr.ft;
 
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.util.ft.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
@@ -71,7 +71,7 @@ public abstract class FTFilter extends FTExpr {
   private boolean filter(final QueryContext qc, final FTNode item, final FTLexer lex)
       throws QueryException {
 
-    final FTMatches all = item.all;
+    final FTMatches all = item.matches();
     for(int a = 0; a < all.size(); a++) {
       if(!filter(qc, all.match[a], lex)) all.delete(a--);
     }

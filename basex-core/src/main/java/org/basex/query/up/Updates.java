@@ -3,9 +3,9 @@ package org.basex.query.up;
 import java.util.*;
 
 import org.basex.data.*;
-import org.basex.data.atomic.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.up.atomic.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.up.primitives.node.*;
 import org.basex.query.value.node.*;
@@ -93,7 +93,7 @@ public final class Updates {
 
     // determine highest ancestor node
     ANode anc = target;
-    final AxisIter it = target.ancestor();
+    final BasicNodeIter it = target.ancestor();
     for(ANode p; (p = it.next()) != null;) anc = p;
 
     /* See if this ancestor has already been added to the pending update list.
@@ -103,7 +103,7 @@ public final class Updates {
     MemData data = fragmentIDs.get(ancID);
     // if data doesn't exist, create a new one
     if(data == null) {
-      data = (MemData) anc.dbCopy(qc.context.options).data;
+      data = (MemData) anc.dbCopy(qc.context.options).data();
       // create a mapping between the fragment id and the data reference
       fragmentIDs.put(ancID, data);
     }
@@ -163,7 +163,7 @@ public final class Updates {
     if(node.id == trgID) return 0;
 
     int s = 1;
-    AxisIter it = node.attributes();
+    BasicNodeIter it = node.attributes();
     for(ANode n; (n = it.next()) != null;) {
       final int st = preSteps(n, trgID);
       if(st == 0) return s;

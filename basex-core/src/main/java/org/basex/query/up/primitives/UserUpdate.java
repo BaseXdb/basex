@@ -65,7 +65,7 @@ public abstract class UserUpdate extends Update {
   public final void merge(final Update update) throws QueryException {
     final String db = ((UserUpdate) update).patterns.get(0);
     if(patterns.contains(db)) {
-      if(db == null) throw USER_UPDATE_X_X.get(info, name(), operation());
+      if(db.isEmpty()) throw USER_UPDATE_X_X.get(info, name(), operation());
       throw USER_UPDATE_X_X_X.get(info, db, name(), operation());
     }
     patterns.add(db);

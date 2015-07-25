@@ -10,7 +10,7 @@ import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
- * Functions for parsing and serializing JSON objects.
+ * Function implementation.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen

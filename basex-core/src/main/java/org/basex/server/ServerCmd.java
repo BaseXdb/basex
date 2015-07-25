@@ -27,10 +27,6 @@ public enum ServerCmd {
   CREATE(8),
   /** Code for adding a document to a database: {path}0{input}0. */
   ADD(9),
-  /** Code for watching an event: {name}0. */
-  WATCH(10),
-  /** Code for unwatching an event: {name}0. */
-  UNWATCH(11),
   /** Code for replacing a document in a database: {path}0{input}0. */
   REPLACE(12),
   /** Code for storing raw data in a database: {path}0{input}0. */

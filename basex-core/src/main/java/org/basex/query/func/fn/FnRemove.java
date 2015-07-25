@@ -35,12 +35,10 @@ public final class FnRemove extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Value val = qc.value(exprs[0]);
-    final long p = toLong(exprs[1], qc) - 1, vs = val.size() - 1;
-    if(p < 0 || p > vs) return val;
-    if(p == 0 || p == vs) return SubSeq.get(val, p == 0 ? 1 : 0, vs);
-    final ValueBuilder vb = new ValueBuilder((int) vs);
-    for(int v = 0; v <= vs; v++) if(v != p) vb.add(val.itemAt(v));
-    return vb.value();
+    final long pos = toLong(exprs[1], qc) - 1, n = val.size();
+    if(pos < 0 || pos >= n) return val;
+    if(pos == 0 || pos + 1 == n) return val.subSeq(pos == 0 ? 1 : 0, n - 1);
+    return ((Seq) val).remove(pos);
   }
 
   @Override

@@ -60,18 +60,18 @@ public class ZipZipFile extends ZipFn {
    * Adds files to the specified zip output, or copies files from the
    * specified file.
    * @param zos output stream
-   * @param ai axis iterator
+   * @param iter axis iterator
    * @param root root path
    * @param qc query context
    * @param zf original zip file (or {@code null})
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  final void create(final ZipOutputStream zos, final AxisIter ai, final String root,
+  final void create(final ZipOutputStream zos, final BasicNodeIter iter, final String root,
       final ZipFile zf, final QueryContext qc) throws QueryException, IOException {
 
     final byte[] data = new byte[IO.BLOCKSIZE];
-    for(ANode node; (node = ai.next()) != null;) {
+    for(ANode node; (node = iter.next()) != null;) {
       // get entry type
       final QNm mode = node.qname();
       final boolean dir = mode.eq(Q_DIR);
@@ -106,7 +106,7 @@ public class ZipZipFile extends ZipFn {
           }
         } else {
           // no source reference: the child nodes are treated as file contents
-          final AxisIter ch = node.children();
+          final BasicNodeIter ch = node.children();
           final String m = attribute(node, METHOD, false);
           // retrieve first child (might be null)
           ANode n = ch.next();
@@ -171,7 +171,7 @@ public class ZipZipFile extends ZipFn {
   private static SerializerOptions so(final ANode node) throws BaseXException {
     // interpret query parameters
     final SerializerOptions sopts = new SerializerOptions();
-    final AxisIter ati = node.attributes();
+    final BasicNodeIter ati = node.attributes();
     for(ANode at; (at = ati.next()) != null;) {
       final byte[] name = at.qname().string();
       if(eq(name, NAME, SRC)) continue;

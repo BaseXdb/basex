@@ -41,14 +41,14 @@ public final class UserAlter extends UserFn {
      */
     private Alter(final User user, final String newname, final QueryContext qc,
         final InputInfo info) {
-      super(UpdateType.USERALTER, user, null, qc, info);
+      super(UpdateType.USERALTER, user, "", qc, info);
       this.newname = newname;
     }
 
     @Override
     public void apply() {
       final User old = users.get(newname);
-      if(old != null) users.drop(old, null);
+      if(old != null) users.drop(old, "");
       users.alter(user, newname);
     }
 

@@ -31,7 +31,7 @@ declare function util:query(
   $map    as xs:string,
   $vars   as map(*)
 ) as xs:string {
-  let $limit := $cons:MAX-CHARS
+  let $limit := $cons:OPTION($cons:K-MAX-CHARS)
   let $query := if($query) then $query else '()'
   let $q := "xquery:eval($query, map {" || $map || "}, " || util:query-options() || ")"
   let $s := "serialize(" || $q || ", map{ 'limit': $limit*2, 'method': 'adaptive' })"
@@ -59,9 +59,9 @@ declare %updating function util:update-query(
  : @return options
  :)
 declare %private function util:query-options() {
-  "map { 'timeout':" || $cons:TIMEOUT ||
-       ",'memory':" || $cons:MEMORY ||
-       ",'permission':'" || $cons:PERMISSION || "' }"
+  "map { 'timeout':" || $cons:OPTION($cons:K-TIMEOUT) ||
+       ",'memory':" || $cons:OPTION($cons:K-MEMORY) ||
+       ",'permission':'" || $cons:OPTION($cons:K-PERMISSION) || "' }"
 };
 
 (:~

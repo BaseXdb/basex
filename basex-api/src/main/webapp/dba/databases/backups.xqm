@@ -8,6 +8,9 @@ module namespace _ = 'dba/databases';
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 import module namespace util = 'dba/util' at '../modules/util.xqm';
 
+(:~ Sub category :)
+declare variable $_:SUB := 'database';
+
 (:~
  : Creates a database backup.
  : @param  $name  name of database
@@ -15,7 +18,7 @@ import module namespace util = 'dba/util' at '../modules/util.xqm';
 declare
   %updating
   %rest:GET
-  %rest:path("dba/create-backup")
+  %rest:path("/dba/create-backup")
   %rest:query-param("name", "{$name}")
 function _:create-backup(
   $name  as xs:string
@@ -31,7 +34,7 @@ function _:create-backup(
 declare
   %updating
   %rest:GET
-  %rest:path("dba/drop-backup")
+  %rest:path("/dba/drop-backup")
   %rest:query-param("name",   "{$name}")
   %rest:query-param("backup", "{$backups}")
 function _:drop-backup(
@@ -51,7 +54,7 @@ function _:drop-backup(
 declare
   %updating
   %rest:GET
-  %rest:path("dba/restore")
+  %rest:path("/dba/restore")
   %rest:query-param("name",   "{$name}")
   %rest:query-param("backup", "{$backup}")
 function _:restore(
@@ -77,8 +80,8 @@ declare %updating function _:action(
   cons:check(),
   try {
     util:update($query, $args),
-    db:output(web:redirect('database', map { 'name': $name, 'info': $info }))
+    db:output(web:redirect($_:SUB, map { 'name': $name, 'info': $info }))
   } catch * {
-    db:output(web:redirect('database', map { 'name': $name, 'error': $err:description }))
+    db:output(web:redirect($_:SUB, map { 'name': $name, 'error': $err:description }))
   }
 };

@@ -1,5 +1,7 @@
 package org.basex.query.func.file;
 
+import static org.basex.query.QueryError.*;
+
 import java.nio.file.*;
 
 import org.basex.query.*;
@@ -14,7 +16,15 @@ import org.basex.query.value.item.*;
 public final class FileResolvePath extends FileFn {
   @Override
   public Item item(final QueryContext qc) throws QueryException {
-    final Path abs = absolute(toPath(0, qc));
+    final Path path = toPath(0, qc);
+    final Path abs;
+    if(exprs.length < 2) {
+      abs = absolute(path);
+    } else {
+      final Path base = toPath(1, qc);
+      if(!base.isAbsolute()) throw FILE_IS_RELATIVE_X.get(info, base);
+      abs = base.resolve(path);
+    }
     return get(abs, Files.isDirectory(abs));
   }
 }

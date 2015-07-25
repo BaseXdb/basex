@@ -53,7 +53,7 @@ public abstract class Step extends Preds {
     for(final Expr pred : preds) {
       if(pred instanceof Pos || num(pred)) {
         pos = true;
-      } else if(pred.seqType().mayBeNumber() || pred.has(Flag.FCS)) {
+      } else if(pred.seqType().mayBeNumber() || pred.has(Flag.POS)) {
         // positional checks may be nested or non-deterministic: choose full evaluation
         return new CachedStep(info, axis, test, preds);
       }
@@ -126,7 +126,7 @@ public abstract class Step extends Preds {
    */
   final ArrayList<PathNode> nodes(final ArrayList<PathNode> nodes, final Data data) {
     // skip steps with predicates or different namespaces
-    if(preds.length != 0 || data.nspaces.globalNS() == null) return null;
+    if(preds.length != 0 || data.nspaces.globalUri() == null) return null;
 
     // check restrictions on node type
     int kind = -1, name = 0;

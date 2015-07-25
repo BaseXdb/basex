@@ -11,12 +11,12 @@ import org.basex.query.value.type.*;
  * @author Christian Gruen
  */
 public final class DocTest extends Test {
-  /** Optional child test. */
+  /** Child test. */
   private final Test test;
 
   /**
    * Constructor.
-   * @param test child test (may be {@code null})
+   * @param test child test
    */
   public DocTest(final Test test) {
     this.test = test;
@@ -31,8 +31,14 @@ public final class DocTest extends Test {
   @Override
   public boolean eq(final ANode node) {
     if(node.type != NodeType.DOC) return false;
-    final AxisMoreIter ai = node.children();
-    return ai.more() && test.eq(ai.next()) && !ai.more();
+    final BasicNodeIter iter = node.children();
+    boolean found = false;
+    for(ANode n; (n = iter.next()) != null;) {
+      if(n.type == NodeType.COM || n.type == NodeType.PI) continue;
+      if(found || !test.eq(n)) return false;
+      found = true;
+    }
+    return true;
   }
 
   @Override
@@ -55,8 +61,6 @@ public final class DocTest extends Test {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder().append(type).append('(');
-    if(test != null) sb.append(test);
-    return sb.append(')').toString();
+    return test.toString();
   }
 }

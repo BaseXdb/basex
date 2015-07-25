@@ -71,13 +71,15 @@ public final class CmpR extends Single {
    * @return new or original expression
    */
   static ParseExpr get(final CmpG cmp) {
-    final Expr e = cmp.exprs[1];
-    if(e instanceof RangeSeq) {
-      final RangeSeq rs = (RangeSeq) e;
+    final Expr e1 = cmp.exprs[0], e2 = cmp.exprs[1];
+    if(e1.has(Flag.NDT) || e1.has(Flag.UPD)) return cmp;
+
+    if(e2 instanceof RangeSeq) {
+      final RangeSeq rs = (RangeSeq) e2;
       return get(cmp, rs.start(), rs.end());
     }
-    if(e instanceof ANum) {
-      final double d = ((ANum) cmp.exprs[1]).dbl();
+    if(e2 instanceof ANum) {
+      final double d = ((ANum) e2).dbl();
       return get(cmp, d, d);
     }
     return cmp;
@@ -189,7 +191,7 @@ public final class CmpR extends Single {
   private Stats key(final IndexInfo ii, final boolean text) {
     // statistics are not up-to-date
     final Data data = ii.ic.data;
-    if(!data.meta.uptodate || data.nspaces.size() != 0 || !(expr instanceof AxisPath)) return null;
+    if(!data.meta.uptodate || !data.nspaces.isEmpty() || !(expr instanceof AxisPath)) return null;
 
     NameTest test = ii.test;
     if(test == null) {

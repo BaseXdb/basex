@@ -116,13 +116,13 @@ public final class Optimize extends ACreate {
           elms.push(0);
           ++n;
         } else if(kind == Data.ELEM) {
-          final int id = data.name(pre);
+          final int id = data.nameId(pre);
           data.elemNames.index(data.elemNames.key(id), null, true);
           data.paths.put(id, Data.ELEM, level);
           pars.push(pre);
           elms.push(id);
         } else if(kind == Data.ATTR) {
-          final int id = data.name(pre);
+          final int id = data.nameId(pre);
           final byte[] val = data.text(pre, false);
           data.attrNames.index(data.attrNames.key(id), val, true);
           data.paths.put(id, Data.ATTR, level, val, md);

@@ -34,10 +34,23 @@ public final class FnTest extends AdvancedQueryTest {
 
   /** Test method. */
   @Test
+  public void jsonToXml() {
+    contains(JSON_TO_XML.args("null"), "xmlns");
+    contains(JSON_TO_XML.args("null") + " update ()", "xmlns");
+  }
+
+  /** Test method. */
+  @Test
   public void serialize() {
     contains(SERIALIZE.args("<x/>"), "<x/>");
     contains(SERIALIZE.args("<x/>", serialParams("")), "<x/>");
     contains(SERIALIZE.args("<x>a</x>", serialParams("<method value='text'/>")), "a");
+  }
+
+  /** Test method. */
+  @Test
+  public void parseSubstring() {
+    contains(SUBSTRING.args("'ab'", " [2]"), "b");
   }
 
   /** Tests for the {@code replace} function. */
@@ -63,6 +76,14 @@ public final class FnTest extends AdvancedQueryTest {
     query("sum((), ())", "");
     error("sum(1, 'x')", SUM_X_X);
     error("sum((), (1,2))", SEQFOUND_X);
+  }
+
+  /** Tests for the {@code static-base-uri} function. */
+  @Test
+  public void staticBaseURI() {
+    query("declare base-uri 'a/'; " + ENDS_WITH.args(STATIC_BASE_URI.args(), "/"), "true");
+    query("declare base-uri '.'; " + ENDS_WITH.args(STATIC_BASE_URI.args(), "/"), "true");
+    query("declare base-uri '..'; " + ENDS_WITH.args(STATIC_BASE_URI.args(), "/"), "true");
   }
 
   /** Tests for the {@code parse-ietf-date} function. */

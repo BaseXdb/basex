@@ -5,7 +5,7 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.path.*;
-import org.basex.query.iter.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.Array;
 import org.basex.query.value.item.*;
@@ -397,8 +397,8 @@ public final class SeqType {
     if(val.isEmpty()) return Empty.SEQ;
     if(val instanceof Item) return cast((Item) val, qc, sc, ii, true);
 
-    final ValueBuilder vb = new ValueBuilder((int) vs);
-    for(int v = 0; v < vs; v++) vb.add(cast(val.itemAt(v), qc, sc, ii, true));
+    final ValueBuilder vb = new ValueBuilder();
+    for(final Item it : val) vb.add(cast(it, qc, sc, ii, true));
     return vb.value();
   }
 
@@ -443,21 +443,21 @@ public final class SeqType {
 
     if(n == 0) return Empty.SEQ;
 
-    ValueBuilder vb = null;
+    ItemList buffer = null;
     for(int i = 0; i < n; i++) {
       final Item it = value.itemAt(i);
       if(instance(it, true)) {
         if(i == 0 && value.homogeneous()) return value;
-        if(vb != null) vb.add(it);
+        if(buffer != null) buffer.add(it);
       } else {
-        if(vb == null) {
-          vb = new ValueBuilder(new Item[n], 0);
-          for(int j = 0; j < i; j++) vb.add(value.itemAt(j));
+        if(buffer == null) {
+          buffer = new ItemList(n);
+          for(int j = 0; j < i; j++) buffer.add(value.itemAt(j));
         }
-        promote(qc, sc, ii, it, opt, vb);
+        promote(qc, sc, ii, it, opt, buffer);
       }
     }
-    return vb != null ? Seq.get(vb.items(), (int) vb.size(), type) : value;
+    return buffer != null ? buffer.value(type) : value;
   }
 
   /**
@@ -467,32 +467,32 @@ public final class SeqType {
    * @param ii input info
    * @param item item to promote
    * @param opt if the result should be optimized
-   * @param vb value builder
+   * @param buffer value builder
    * @throws QueryException query exception
    */
   public void promote(final QueryContext qc, final StaticContext sc, final InputInfo ii,
-      final Item item, final boolean opt, final ValueBuilder vb) throws QueryException {
+      final Item item, final boolean opt, final ItemList buffer) throws QueryException {
 
     if(type instanceof AtomType) {
       for(final Item atom : item.atomValue(ii)) {
         final Type tp = atom.type;
         if(tp.instanceOf(type)) {
-          vb.add(atom);
+          buffer.add(atom);
         } else if(tp == AtomType.ATM) {
           if(type.nsSensitive()) throw NSSENS_X_X.get(ii, item.type, type);
-          vb.add(type.cast(atom, qc, sc, ii));
+          for(final Item it : type.cast(atom, qc, sc, ii)) buffer.add(it);
         } else if(type == AtomType.DBL && (tp == AtomType.FLT || tp.instanceOf(AtomType.DEC))) {
-          vb.add(Dbl.get(atom.dbl(ii)));
+          buffer.add(Dbl.get(atom.dbl(ii)));
         } else if(type == AtomType.FLT && tp.instanceOf(AtomType.DEC)) {
-          vb.add(Flt.get(atom.flt(ii)));
+          buffer.add(Flt.get(atom.flt(ii)));
         } else if(type == AtomType.STR && atom instanceof Uri) {
-          vb.add(Str.get(atom.string(ii)));
+          buffer.add(Str.get(atom.string(ii)));
         } else {
           throw INVPROMOTE_X_X_X.get(ii, item.seqType(), withOcc(Occ.ONE), item);
         }
       }
     } else if(item instanceof FItem && type instanceof FuncType) {
-      vb.add(((FItem) item).coerceTo((FuncType) type, qc, ii, opt));
+      buffer.add(((FItem) item).coerceTo((FuncType) type, qc, ii, opt));
     } else {
       throw INVPROMOTE_X_X_X.get(ii, item.seqType(), withOcc(Occ.ONE), item);
     }

@@ -9,7 +9,6 @@ import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -89,7 +88,7 @@ public final class HTTPParams {
       for(final Entry<String, String[]> entry : map().entrySet()) {
         final String key = entry.getKey();
         final String[] values = entry.getValue();
-        final ValueBuilder vb = new ValueBuilder(values.length);
+        final ValueBuilder vb = new ValueBuilder();
         for(final String v : values) vb.add(new Atm(v));
         query.put(key, vb.value());
       }

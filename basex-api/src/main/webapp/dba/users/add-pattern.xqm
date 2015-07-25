@@ -24,7 +24,7 @@ declare variable $_:SUB := 'user';
  :)
 declare
   %rest:GET
-  %rest:path("dba/add-pattern")
+  %rest:path("/dba/add-pattern")
   %rest:query-param("name",    "{$name}")
   %rest:query-param("pattern", "{$pattern}")
   %rest:query-param("perm",    "{$perm}", "write")
@@ -83,7 +83,7 @@ function _:create(
 declare
   %updating
   %rest:POST
-  %rest:path("dba/add-pattern")
+  %rest:path("/dba/add-pattern")
   %rest:query-param("name",    "{$name}")
   %rest:query-param("perm",    "{$perm}")
   %rest:query-param("pattern", "{$pattern}")

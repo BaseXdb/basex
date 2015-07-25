@@ -40,11 +40,13 @@ declare function tmpl:wrap(
       <title>Database Administration</title>
       <meta name="description" content="Database Administration"/>
       <meta name="author" content="BaseX Team, 2014-15"/>
-      <link rel="stylesheet" type="text/css" href="files/style.css"/> 
-      <script type="text/javascript" src="files/js.js"/>
+      <link rel="stylesheet" type="text/css" href="static/style.css"/> 
+      { $options('css') ! <link rel="stylesheet" type="text/css" href="static/{.}"/> }
+      <script type="text/javascript" src="static/js.js"/>
+      { $options('scripts') ! <script type="text/javascript" src="static/{.}"/> }
     </head>
     <body>
-      <div class="right"><img style='padding-left:10px;padding-bottom:10px;' src="files/basex.svg"/></div>
+      <div class="right"><img style='padding-left:10px;padding-bottom:10px;' src="static/basex.svg"/></div>
       <h1>Database Administration</h1>
       <div>{
         let $emph := <span>{(element b {
@@ -57,7 +59,7 @@ declare function tmpl:wrap(
           cons:check(),
           let $cats := 
             let $top := $options('top')
-            for $cat in ('Databases', 'Queries', 'Logs', 'Users', 'Settings', 'Logout')
+            for $cat in ('Databases', 'Queries', 'Logs', 'Users', 'Files', 'Settings', 'Logout')
             let $link := <a href="{ lower-case($cat) }">{ $cat }</a>
             return if($top = $link) then (
               <b>{ $link }</b>

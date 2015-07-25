@@ -73,4 +73,22 @@ public final class WebModuleTest extends AdvancedQueryTest {
     query(_WEB_RESPONSE_HEADER.args(" map { }", " map { 'Cache-Control': '' }") +
         "/*:response/*:header", "");
   }
+
+  /** Test method. */
+  @Test
+  public void encodeUrl() {
+    query(_WEB_ENCODE_URL.args("a&#xd; *-._"), "a%0D+*-._");
+  }
+
+  /** Test method. */
+  @Test
+  public void decodeUrl() {
+    query(_WEB_DECODE_URL.args("a+-._*"), "a -._*");
+    query("let $s := codepoints-to-string((9, 10, 13, 32 to 55295, 57344 to 65533, 65536)) " +
+        "return $s = web:decode-url(web:encode-url($s))", "true");
+
+    error(_WEB_DECODE_URL.args("%1"), BXWE_INVALID_X);
+    error(_WEB_DECODE_URL.args("%1F"), BXWE_CODES_X);
+    error(_WEB_DECODE_URL.args("%D8%00"), BXWE_CODES_X);
+  }
 }

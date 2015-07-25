@@ -47,8 +47,6 @@ public final class CommandLockingTest extends SandboxTest {
   private static final StringList BACKUP_LIST = new StringList(DBLocking.BACKUP);
   /** StringList containing BACKUP lock string and name. */
   private static final StringList BACKUP_NAME = new StringList(DBLocking.BACKUP, NAME);
-  /** StringList containing EVENT lock string. */
-  private static final StringList EVENT_LIST = new StringList(DBLocking.EVENT);
   /** StringList containing java module test lock strings. */
   private static final StringList MODULE_LIST = new StringList(DBLocking.MODULE_PREFIX
       + QueryModuleTest.LOCK1, DBLocking.MODULE_PREFIX + QueryModuleTest.LOCK2);
@@ -66,14 +64,12 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new Copy(NAME2, NAME), new StringList(NAME2), NAME_LIST);
     ckDBs(new CreateBackup(NAME), NAME_LIST, BACKUP_LIST);
     ckDBs(new CreateDB(NAME), CTX_LIST, NAME_LIST);
-    ckDBs(new CreateEvent(NAME), true, EVENT_LIST);
     ckDBs(new CreateIndex(IndexType.TEXT), true, CTX_LIST);
     ckDBs(new CreateUser(NAME, NAME), true, ADMIN_LIST);
     ckDBs(new Delete(FILE), true, CTX_LIST);
     ckDBs(new DropBackup(NAME), true, BACKUP_LIST);
     ckDBs(new DropDB(NAME + '*'), true, null); // Drop using globbing
     ckDBs(new DropDB(NAME), true, NAME_LIST);
-    ckDBs(new DropEvent(NAME), true, EVENT_LIST);
     ckDBs(new DropIndex(IndexType.TEXT), true, CTX_LIST);
     ckDBs(new DropUser(NAME), true, ADMIN_LIST);
     ckDBs(new Execute("RUN " + FILE), true, null);
@@ -107,7 +103,6 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new Run(FILE), true, null);
     ckDBs(new Set(NAME, NAME), false, NONE);
     ckDBs(new ShowBackups(), false, BACKUP_LIST);
-    ckDBs(new ShowEvents(), false, EVENT_LIST);
     ckDBs(new ShowSessions(), false, NONE);
     ckDBs(new ShowUsers(), false, ADMIN_LIST);
     ckDBs(new ShowUsers(NAME), false, ADMIN_LIST);
@@ -124,6 +119,14 @@ public final class CommandLockingTest extends SandboxTest {
     // fn:collection() always accesses the global context, no matter what local context is
     ckDBs(new XQuery("<a/>/" + COUNT.args(COLLECTION.args())), false, CTX_LIST);
     ckDBs(new XQuery(DOC.args(NAME)), false, NAME_LIST);
+    ckDBs(new XQuery(ID.args(NAME)), false, CTX_LIST);
+    ckDBs(new XQuery(IDREF.args(NAME)), false, CTX_LIST);
+    ckDBs(new XQuery(ELEMENT_WITH_ID.args(NAME)), false, CTX_LIST);
+    ckDBs(new XQuery(LANG.args(NAME)), false, CTX_LIST);
+    ckDBs(new XQuery(ID.args(NAME, DOC.args(NAME))), false, NAME_LIST);
+    ckDBs(new XQuery(IDREF.args(NAME, DOC.args(NAME))), false, NAME_LIST);
+    ckDBs(new XQuery(ELEMENT_WITH_ID.args(NAME, DOC.args(NAME))), false, NAME_LIST);
+    ckDBs(new XQuery(LANG.args(NAME, DOC.args(NAME))), false, NAME_LIST);
     ckDBs(new XQuery(DOC_AVAILABLE.args(NAME + "/foo.xml")), false, NAME_LIST, null);
     ckDBs(new XQuery(PARSE_XML.args("<foo/>")), true, NONE);
     ckDBs(new XQuery(PARSE_XML_FRAGMENT.args("<foo/>")), true, NONE);
@@ -189,7 +192,7 @@ public final class CommandLockingTest extends SandboxTest {
   @Test
   public void admin() {
     ckDBs(new XQuery(_ADMIN_SESSIONS.args()), false, ADMIN_LIST);
-    ckDBs(new XQuery(_ADMIN_LOGS.args()), false, NONE);
+    ckDBs(new XQuery(_ADMIN_LOGS.args()), false, ADMIN_LIST);
   }
 
   /** Test user module. */
@@ -205,7 +208,6 @@ public final class CommandLockingTest extends SandboxTest {
     // General Functions
     ckDBs(new XQuery(_DB_INFO.args(NAME)), false, NAME_LIST);
     ckDBs(new XQuery(_DB_LIST.args(NAME)), false, NAME_LIST);
-    ckDBs(new XQuery(_DB_INFO.args()), false, null);
     ckDBs(new XQuery(_DB_LIST_DETAILS.args(NAME)), false, NAME_LIST);
     ckDBs(new XQuery(_DB_LIST_DETAILS.args()), false, null);
     ckDBs(new XQuery(_DB_OPEN.args(NAME)), false, NAME_LIST);
@@ -245,8 +247,6 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new XQuery(_DB_IS_RAW.args(NAME, FILE)), false, NAME_LIST);
     ckDBs(new XQuery(_DB_IS_XML.args(NAME, FILE)), false, NAME_LIST);
     ckDBs(new XQuery(_DB_CONTENT_TYPE.args(NAME, FILE)), false, NAME_LIST);
-    ckDBs(new XQuery(_DB_EVENT.args("foo", "bar")), false, NONE);
-    ckDBs(new XQuery(_DB_EVENT.args("foo", DOC.args(NAME))), false, NAME_LIST);
   }
 
   /** Test ft module. */

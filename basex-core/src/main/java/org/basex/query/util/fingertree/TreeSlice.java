@@ -14,24 +14,22 @@ public final class TreeSlice<N, E> {
   /** A full sub-tree. */
   private FingerTree<N, E> tree;
   /** A partial node. */
-  private PartialNode<N, E> partial;
+  private NodeLike<N, E> partial;
 
   /**
    * Constructor for whole trees.
    * @param tree the tree
    */
   TreeSlice(final FingerTree<N, E> tree) {
-    this.tree = tree;
-    this.partial = null;
+    setTree(tree);
   }
 
   /**
-   * Constructor for partial nodes.
+   * Constructor for potentially partial nodes.
    * @param partial partial node
    */
-  TreeSlice(final PartialNode<N, E> partial) {
-    this.tree = null;
-    this.partial = partial;
+  TreeSlice(final NodeLike<N, E> partial) {
+    setNodeLike(partial);
   }
 
   /**
@@ -57,7 +55,7 @@ public final class TreeSlice<N, E> {
    * returns {@code false}.
    * @return the contained partial node
    */
-  public PartialNode<N, E> getPartial() {
+  public NodeLike<N, E> getPartial() {
     return partial;
   }
 
@@ -77,17 +75,22 @@ public final class TreeSlice<N, E> {
   }
 
   /**
-   * Sets the contents of this slice to the given partial node and returns it with the correct type.
+   * Sets the contents of this slice to the given node and returns it with the correct type.
    * The value with the current type is invalid afterwards and should <i>not</i> be used.
    * @param <M> new node type
-   * @param newPartial new contents
+   * @param newNode new contents
    * @return type-cast version of this slice
    */
-  <M> TreeSlice<M, E> setPartial(final PartialNode<M, E> newPartial) {
+  <M> TreeSlice<M, E> setNodeLike(final NodeLike<M, E> newNode) {
     @SuppressWarnings("unchecked")
     final TreeSlice<M, E> out = (TreeSlice<M, E>) this;
-    out.partial = newPartial;
-    out.tree = null;
+    if(newNode instanceof Node) {
+      out.partial = null;
+      out.tree = new SingletonTree<>((Node<M, E>) newNode);
+    } else {
+      out.partial = newNode;
+      out.tree = null;
+    }
     return out;
   }
 
@@ -100,14 +103,10 @@ public final class TreeSlice<N, E> {
    * @return type-cast version of this slice
    */
   <M> TreeSlice<M, E> setNodes(final NodeLike<M, E>[] arr, final int n, final long size) {
-    if(n == 1) {
-      if(arr[0] instanceof PartialNode) return setPartial((PartialNode<M, E>) arr[0]);
-      final Node<M, E> node = (Node<M, E>) arr[0];
-      return setTree(new Single<>(node));
-    }
-
+    if(n == 0) return setTree(EmptyTree.<M, E>getInstance());
+    if(n == 1) return setNodeLike(arr[0]);
     final int mid = n / 2;
-    final Node<M, E>[] left = Deep.slice(arr, 0, mid), right = Deep.slice(arr, mid, n);
-    return setTree(Deep.get(left, right, size));
+    final Node<M, E>[] left = DeepTree.slice(arr, 0, mid), right = DeepTree.slice(arr, mid, n);
+    return setTree(DeepTree.get(left, right, size));
   }
 }

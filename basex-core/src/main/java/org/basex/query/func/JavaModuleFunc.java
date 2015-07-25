@@ -73,8 +73,9 @@ final class JavaModuleFunc extends JavaMapping {
           Util.debug(e);
           e = e.getCause();
         }
-        throw e instanceof QueryException ? ((QueryException) e).info(info) :
-          JAVAERROR_X.get(info, e);
+        if(e instanceof QueryException) throw ((QueryException) e).info(info);
+        Util.stack(e);
+        throw JAVAERROR_X.get(info, Util.className(e) + ": " + e.getMessage());
       }
     }
 
@@ -119,7 +120,7 @@ final class JavaModuleFunc extends JavaMapping {
   @Override
   public boolean has(final Flag f) {
     return f == Flag.NDT && method.getAnnotation(Deterministic.class) == null ||
-      (f == Flag.CTX || f == Flag.FCS) &&
+      (f == Flag.CTX || f == Flag.POS) &&
       method.getAnnotation(FocusDependent.class) == null ||
       super.has(f);
   }

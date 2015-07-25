@@ -36,7 +36,7 @@ public final class FnPut extends StandardFunc {
     // check if all target paths are unique
     if(!updates.putPaths.add(uri)) throw UPURIDUP_X.get(info, uri);
 
-    updates.add(new Put(target.pre, target.data, uri, info), qc);
+    updates.add(new Put(target.pre(), target.data(), uri, info), qc);
     return null;
   }
 }

@@ -4,7 +4,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
-import org.basex.data.*;
+import org.basex.query.util.ft.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.xml.sax.*;
@@ -140,7 +140,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   private NSDecl namespaces;
 
   @Override
-  protected void startOpen(final byte[] name) {
+  protected void startOpen(final QNm name) {
     namespaces = new NSDecl(namespaces);
     attributes.clear();
   }
@@ -177,9 +177,9 @@ public final class SAXSerializer extends Serializer implements XMLReader {
         attrs.addAttribute(uri, lname, rname, null, value);
       }
 
-      final String uri = string(namespaces.get(prefix(elem)));
-      final String lname = string(local(elem));
-      final String rname = string(elem);
+      final String uri = string(namespaces.get(elem.prefix()));
+      final String lname = string(elem.local());
+      final String rname = string(elem.string());
       contentHandler.startElement(uri, lname, rname, attrs);
 
     } catch(final SAXException ex) {
@@ -196,7 +196,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   @Override
   protected void finishClose() throws IOException {
     try {
-      final String name = string(elem);
+      final String name = string(elem.string());
       contentHandler.endElement("", name, name);
       namespaces = namespaces.getParent();
     } catch(final SAXException ex) {

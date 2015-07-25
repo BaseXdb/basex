@@ -68,13 +68,13 @@ public class TokenParser {
   }
 
   /**
-   * Returns a list with all codepoints.
+   * Returns an array with all codepoints.
    * @return array
    */
-  public final IntList toList() {
-    final IntList il = new IntList();
+  public final int[] toArray() {
+    final IntList il = new IntList(size);
     while(more()) il.add(next());
-    return il;
+    return il.finish();
   }
 
   @Override

@@ -74,26 +74,26 @@ public abstract class Path extends ParseExpr {
       rt = path.root;
     }
     // remove redundant context reference
-    if(rt instanceof Context) rt = null;
+    if(rt instanceof ContextValue) rt = null;
 
     // add steps of input array
     for(final Expr expr : steps) {
       Expr step = expr;
-      if(step instanceof Context) {
+      if(step instanceof ContextValue) {
         // remove redundant context references
         if(sl > 1) continue;
         // single step: rewrite to axis step (required to sort results of path)
-        step = Step.get(((Context) step).info, SELF, Test.NOD);
+        step = Step.get(((ContextValue) step).info, SELF, Test.NOD);
       } else if(step instanceof Filter) {
         // rewrite filter to axis step
         final Filter f = (Filter) step;
-        if(f.root instanceof Context) {
+        if(f.root instanceof ContextValue) {
           step = Step.get(f.info, SELF, Test.NOD, f.preds);
         }
       } else if(step instanceof Path) {
         // rewrite path to axis steps
         final Path p = (Path) step;
-        if(p.root != null && !(p.root instanceof Context)) stps.add(p.root);
+        if(p.root != null && !(p.root instanceof ContextValue)) stps.add(p.root);
         final int pl = p.steps.length - 1;
         for(int i = 0; i < pl; i++) stps.add(p.steps[i]);
         step = p.steps[pl];
@@ -123,7 +123,7 @@ public abstract class Path extends ParseExpr {
   public final Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
     if(root != null) root = root.compile(qc, scp);
     // no steps
-    if(steps.length == 0) return root == null ? new Context(info) : root;
+    if(steps.length == 0) return root == null ? new ContextValue(info) : root;
 
     final Value init = qc.value, cv = initial(qc);
     qc.value = cv;
@@ -231,9 +231,12 @@ public abstract class Path extends ParseExpr {
 
   @Override
   public final boolean has(final Flag flag) {
-    // first step or root expression will be used as context
+    // context dependency. no root exists, or if it depends on context. Example: text(); ./abc
     if(flag == Flag.CTX) return root == null || root.has(flag);
-    for(final Expr s : steps) if(s.has(flag)) return true;
+    // positional test. may only occur in root node, not in first step. Example: position()/a
+    if(flag != Flag.POS) {
+      for(final Expr step : steps) if(step.has(flag)) return true;
+    }
     return root != null && root.has(flag);
   }
 
@@ -377,9 +380,9 @@ public abstract class Path extends ParseExpr {
     // current context value
     final Value v = qc != null ? qc.value : null;
     // no root or context expression: return context
-    if(root == null || root instanceof Context) return v;
+    if(root == null || root instanceof ContextValue) return v;
     // root reference
-    if(root instanceof Root) return v instanceof Item ? Root.root(v) : v;
+    if(root instanceof Root) return v instanceof ANode ? ((ANode) v).root() : v;
     // root is value: return root
     if(root.isValue()) return (Value) root;
     // data reference
@@ -540,7 +543,7 @@ public abstract class Path extends ParseExpr {
   private Expr children(final QueryContext qc, final Value rt) {
     // skip if index does not exist or is out-dated, or if several namespaces occur in the input
     final Data data = rt.data();
-    if(data == null || !data.meta.uptodate || data.nspaces.globalNS() == null) return this;
+    if(data == null || !data.meta.uptodate || data.nspaces.globalUri() == null) return this;
 
     Path path = this;
     final int sl = steps.length;
@@ -551,7 +554,7 @@ public abstract class Path extends ParseExpr {
 
       // ignore axes other than descendant, or numeric predicates
       final Step curr = axisStep(s);
-      if(curr == null || curr.axis != DESC || curr.has(Flag.FCS)) continue;
+      if(curr == null || curr.axis != DESC || curr.has(Flag.POS)) continue;
 
       // check if child steps can be retrieved for current step
       ArrayList<PathNode> nodes = pathNodes(data, s);
@@ -637,7 +640,7 @@ public abstract class Path extends ParseExpr {
       // only accept descendant steps without positional predicates
       // Example for position predicate: child:x[1] != parent::x[1]
       final Step step = axisStep(s);
-      if(step == null || !step.axis.down || step.has(Flag.FCS)) break;
+      if(step == null || !step.axis.down || step.has(Flag.POS)) break;
 
       // check if path is iterable (i.e., will be duplicate-free)
       final boolean iter = pathNodes(data, s) != null;
@@ -784,7 +787,7 @@ public abstract class Path extends ParseExpr {
             continue;
           }
           // //(X, Y)[text()] -> (/descendant::X | /descendant::Y)[text()]
-          if(next instanceof Filter && !next.has(Flag.FCS)) {
+          if(next instanceof Filter && !next.has(Flag.POS)) {
             final Filter f = (Filter) next;
             e = mergeList(f.root);
             if(e != null) {
@@ -843,8 +846,8 @@ public abstract class Path extends ParseExpr {
    */
   private static boolean simpleChild(final Expr expr) {
     if(expr instanceof Step) {
-      final Step n = (Step) expr;
-      if(n.axis == CHILD && !n.has(Flag.FCS)) return true;
+      final Step step = (Step) expr;
+      if(step.axis == CHILD && !step.has(Flag.POS)) return true;
     }
     return false;
   }

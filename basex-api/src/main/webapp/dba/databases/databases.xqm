@@ -22,7 +22,7 @@ declare variable $_:CAT := 'databases';
  :)
 declare
   %rest:GET
-  %rest:path("dba/databases")
+  %rest:path("/dba/databases")
   %rest:query-param("sort",  "{$sort}", "")
   %rest:query-param("error", "{$error}")
   %rest:query-param("info",  "{$info}")
@@ -110,7 +110,7 @@ function _:databases(
  :)
 declare
   %rest:POST
-  %rest:path("dba/databases")
+  %rest:path("/dba/databases")
   %rest:query-param("action", "{$action}")
   %rest:query-param("name",   "{$names}")
   %output:method("html")

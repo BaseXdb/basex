@@ -14,19 +14,19 @@ import java.util.List;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
+import org.basex.query.QueryError.ErrType;
 import org.basex.query.*;
-import org.basex.query.QueryError.*;
 import org.basex.query.func.fn.*;
-import org.basex.query.iter.*;
+import org.basex.query.util.list.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
-import org.basex.util.http.HttpRequest.*;
+import org.basex.util.http.HttpRequest.Part;
 import org.junit.*;
 import org.junit.Test;
 
@@ -72,7 +72,7 @@ public class FnHttpTest extends HTTPTest {
         "<http:request method='put' status-only='true'>"
         + "<http:body media-type='text/xml'>" + BOOKS + "</http:body>"
         + "</http:request>", RESTURL), ctx)) {
-      checkResponse(qp.execute(), 1, HttpURLConnection.HTTP_CREATED);
+      checkResponse(qp.value(), 1, HttpURLConnection.HTTP_CREATED);
     }
   }
 
@@ -87,7 +87,7 @@ public class FnHttpTest extends HTTPTest {
         "<http:request method='put' status-only='true'>"
         + "<http:body media-type='text/xml'>" + BOOKS + "</http:body>"
         + "</http:request>", RESTURL), ctx)) {
-      checkResponse(qp.execute(), 1, HttpURLConnection.HTTP_CREATED);
+      checkResponse(qp.value(), 1, HttpURLConnection.HTTP_CREATED);
     }
 
     // POST - query
@@ -99,7 +99,7 @@ public class FnHttpTest extends HTTPTest {
         + "</query>"
         + "</http:body>"
         + "</http:request>", RESTURL), ctx)) {
-        checkResponse(qp.execute(), 2, HttpURLConnection.HTTP_OK);
+        checkResponse(qp.value(), 2, HttpURLConnection.HTTP_OK);
     }
 
     // Execute the same query but with content set from $bodies
@@ -111,7 +111,7 @@ public class FnHttpTest extends HTTPTest {
         "<query xmlns='" + Prop.URL + "/rest'>"
         + "<text><![CDATA[<x>1</x>]]></text>"
         + "</query>"), ctx)) {
-      checkResponse(qp.execute(), 2, HttpURLConnection.HTTP_OK);
+      checkResponse(qp.value(), 2, HttpURLConnection.HTTP_OK);
     }
   }
 
@@ -124,25 +124,25 @@ public class FnHttpTest extends HTTPTest {
     // GET1 - just send a GET request
     try(final QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         "<http:request method='get' href='" + REST_ROOT + "'/>"), ctx)) {
-      final Result r = qp.execute();
-      checkResponse(r, 2, HttpURLConnection.HTTP_OK);
+      final Value v = qp.value();
+      checkResponse(v, 2, HttpURLConnection.HTTP_OK);
 
-      assertEquals(NodeType.DOC, ((Iter) r).get(1).type);
+      assertEquals(NodeType.DOC, v.itemAt(1).type);
     }
 
     // GET2 - with override-media-type='text/plain'
     try(final QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         "<http:request method='get' override-media-type='text/plain'/>", REST_ROOT), ctx)) {
-      final Result r = qp.execute();
-      checkResponse(r, 2, HttpURLConnection.HTTP_OK);
+      final Value v = qp.value();
+      checkResponse(v, 2, HttpURLConnection.HTTP_OK);
 
-      assertEquals(AtomType.STR, ((Iter) r).get(1).type);
+      assertEquals(AtomType.STR, v.itemAt(1).type);
     }
 
     // Get3 - with status-only='true'
     try(final QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         "<http:request method='get' status-only='true'/>", REST_ROOT), ctx)) {
-      checkResponse(qp.execute(), 1, HttpURLConnection.HTTP_OK);
+      checkResponse(qp.value(), 1, HttpURLConnection.HTTP_OK);
     }
   }
 
@@ -157,13 +157,13 @@ public class FnHttpTest extends HTTPTest {
         "<http:request method='put'>"
         + "<http:body media-type='text/xml'><ToBeDeleted/></http:body>"
         + "</http:request>", RESTURL), ctx)) {
-      qp.execute();
+      qp.value();
     }
 
     // DELETE
     try(final QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         "<http:request method='delete' status-only='true'/>", RESTURL), ctx)) {
-      checkResponse(qp.execute(), 1, HttpURLConnection.HTTP_OK);
+      checkResponse(qp.value(), 1, HttpURLConnection.HTTP_OK);
     }
   }
 
@@ -185,9 +185,9 @@ public class FnHttpTest extends HTTPTest {
    */
   @Test
   public void sendReqNoParams() {
-    final Command c = new XQuery(_HTTP_SEND_REQUEST.args("()"));
+    final Command cmd = new XQuery(_HTTP_SEND_REQUEST.args("()"));
     try {
-      c.execute(ctx);
+      cmd.execute(ctx);
     } catch(final BaseXException ex) {
       assertTrue(ex.getMessage().contains(ErrType.HC.toString()));
     }
@@ -195,13 +195,13 @@ public class FnHttpTest extends HTTPTest {
 
   /**
    * Tests an erroneous query.
-   * @throws QueryException query exception
+   * @throws Exception exception
    */
   @Test
-  public void error() throws QueryException {
+  public void error() throws Exception {
     try(final QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         "<http:request method='get'/>", RESTURL + "unknown") + "[1]/@status/data()", ctx)) {
-      assertEquals("404", qp.execute().toString());
+      assertEquals("404", qp.value().serialize().toString());
     }
   }
 
@@ -302,13 +302,13 @@ public class FnHttpTest extends HTTPTest {
         + "</http:multipart>" + "</http:request>";
 
     final DBNode dbNode1 = new DBNode(new IOContent(multiReq));
-    final ValueBuilder bodies = new ValueBuilder();
+    final ItemList bodies = new ItemList();
     bodies.add(Str.get("Part1"));
     bodies.add(Str.get("Part2"));
     bodies.add(Str.get("Part3"));
 
     final HttpRequestParser rp = new HttpRequestParser(null);
-    final HttpRequest r = rp.parse(dbNode1.children().next(), bodies);
+    final HttpRequest r = rp.parse(dbNode1.children().next(), bodies.iter());
 
     assertEquals(2, r.attributes.size());
     assertEquals(2, r.headers.size());
@@ -344,14 +344,15 @@ public class FnHttpTest extends HTTPTest {
         "<http:request xmlns:http='http://expath.org/ns/http-client' "
         + "method='GET' href='" + REST_ROOT + "' send-authorization='true' "
         + "auth-method='Basic' username='admin' password='admin'/>"), ctx)) {
-      checkResponse(qp.execute(), 2, HttpURLConnection.HTTP_OK);
+      checkResponse(qp.value(), 2, HttpURLConnection.HTTP_OK);
     }
     // wrong credentials
     try(final QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
-        "<http:request xmlns:http='http://expath.org/ns/http-client' "
-        + "method='GET' href='" + REST_ROOT + "' send-authorization='true' "
-        + "auth-method='Basic' username='unknown' password='wrong'/>"), ctx)) {
-      checkResponse(qp.execute(), 1, HttpURLConnection.HTTP_UNAUTHORIZED);
+        "<http:request xmlns:http='http://expath.org/ns/http-client' " +
+        "method='GET' href='" + REST_ROOT + "' send-authorization='true' " +
+        "auth-method='Basic' username='unknown' password='wrong'/>") +
+        "[. instance of node()][@status = '401']", ctx)) {
+      checkResponse(qp.value(), 1, HttpURLConnection.HTTP_UNAUTHORIZED);
     }
   }
 
@@ -366,14 +367,15 @@ public class FnHttpTest extends HTTPTest {
         "<http:request xmlns:http='http://expath.org/ns/http-client' method='GET' " +
         "send-authorization='true' auth-method='Digest' username='admin' password='admin' " +
         "href='" + REST_ROOT + "'/>"), ctx)) {
-      checkResponse(qp.execute(), 2, HttpURLConnection.HTTP_OK);
+      checkResponse(qp.value(), 2, HttpURLConnection.HTTP_OK);
     }
     // wrong credentials
     try(final QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         "<http:request xmlns:http='http://expath.org/ns/http-client' method='GET' " +
         "send-authorization='true' auth-method='Digest' username='unknown' password='wrong' " +
-        "href='" + REST_ROOT + "?query=()'/>"), ctx)) {
-      checkResponse(qp.execute(), 1, HttpURLConnection.HTTP_UNAUTHORIZED);
+        "href='" + REST_ROOT + "?query=()'/>") +
+        "[. instance of node()][@status = '401']", ctx)) {
+      checkResponse(qp.value(), 1, HttpURLConnection.HTTP_UNAUTHORIZED);
     }
   }
 
@@ -641,9 +643,9 @@ public class FnHttpTest extends HTTPTest {
     // set content encoded in CP1251
     final String test = "\u0442\u0435\u0441\u0442";
     conn.content = Charset.forName("CP1251").encode(test).array();
-    final Iter i = new HttpResponse(null, ctx.options).getResponse(conn, true, null);
+    final ItemList res = new HttpResponse(null, ctx.options).getResponse(conn, true, null);
     // compare results
-    assertEquals(test, string(i.get(1).string(null)));
+    assertEquals(test, string(res.get(1).string(null)));
   }
 
   /**
@@ -683,10 +685,10 @@ public class FnHttpTest extends HTTPTest {
         + ".... richtext..." + CRLF
         + "--boundary42" + CRLF + "Content-Type: text/x-whatever" + CRLF + CRLF
         + ".... fanciest formatted version  " + CRLF + "..."  + CRLF + "--boundary42--");
-    final ValueIter returned = new HttpResponse(null, ctx.options).getResponse(conn, true, null);
+    final ItemList returned = new HttpResponse(null, ctx.options).getResponse(conn, true, null);
 
     // Construct expected result
-    final ValueBuilder expected = new ValueBuilder();
+    final ItemList expected = new ItemList();
     final String response = "<http:response "
         + "xmlns:http='http://expath.org/ns/http-client' "
         + "status='200' message='OK'>"
@@ -761,10 +763,10 @@ public class FnHttpTest extends HTTPTest {
         +  CRLF + "--simple boundary--" + CRLF
         + "This is the epilogue.  It is also to be ignored.");
     // Get response as sequence of XQuery items
-    final ValueIter returned = new HttpResponse(null, ctx.options).getResponse(conn, true, null);
+    final ItemList returned = new HttpResponse(null, ctx.options).getResponse(conn, true, null);
 
     // Construct expected result
-    final ValueBuilder expected = new ValueBuilder();
+    final ItemList expected = new ItemList();
     final String response = "<http:response "
         + "xmlns:http='http://expath.org/ns/http-client' "
         + "status='200' message='OK'>"
@@ -798,8 +800,7 @@ public class FnHttpTest extends HTTPTest {
    * @param returned returned result
    * @throws Exception exception
    */
-  private static void compare(final ValueBuilder expected, final ValueIter returned)
-      throws Exception {
+  private static void compare(final ItemList expected, final ItemList returned) throws Exception {
 
     // Compare response with expected result
     assertEquals("Different number of results", expected.size(), returned.size());
@@ -841,19 +842,14 @@ public class FnHttpTest extends HTTPTest {
 
   /**
    * Checks the response to an HTTP request.
-   * @param r query result
+   * @param v query result
    * @param itemsCount expected number of items
    * @param expStatus expected status
-   * @throws QueryException query exception
    */
-  private static void checkResponse(final Result r, final int itemsCount, final int expStatus)
-      throws QueryException {
-
-    assertTrue(r instanceof Iter);
-    final Iter res = (Iter) r;
-    assertEquals(itemsCount, r.size());
-    assertTrue(res.get(0) instanceof FElem);
-    final FElem response = (FElem) res.get(0);
+  private static void checkResponse(final Value v, final int itemsCount, final int expStatus) {
+    assertEquals(itemsCount, v.size());
+    assertTrue(v.itemAt(0) instanceof FElem);
+    final FElem response = (FElem) v.itemAt(0);
     assertNotNull(response.attributes());
     if(!eq(response.attribute(STATUS), token(expStatus))) {
       fail("Expected: " + expStatus + "\nFound: " + response);

@@ -14,7 +14,7 @@ import org.basex.util.*;
 public final class StreamIsStreamable extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item it = toItem(exprs[0], qc);
+    final Item it = toAtomItem(exprs[0], qc);
     return Bln.get(it instanceof StrStream || it instanceof B64Stream);
   }
 }

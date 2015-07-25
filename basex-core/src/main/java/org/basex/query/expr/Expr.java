@@ -1,7 +1,5 @@
 package org.basex.query.expr;
 
-import static org.basex.query.QueryText.*;
-
 import java.util.*;
 
 import org.basex.data.*;
@@ -34,7 +32,7 @@ public abstract class Expr extends ExprInfo {
     /** Creates new fragments. Example: node constructor. */ CNS,
     /** Depends on context. Example: context node. */        CTX,
     /** Non-deterministic. Example: random:double(). */      NDT,
-    /** Focus-dependent. Example: position(). */             FCS,
+    /** Positional access. Example: position(). */           POS,
     /** Performs updates. Example: insert expression. */     UPD,
     /** Invokes user-supplied functions. Example: fold. */   HOF,
   }
@@ -180,8 +178,8 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Returns the data reference bound to this expression. This method is overwritten
-   * by the values {@link DBNode} and {@link DBNodeSeq} and some more expressions.
+   * Returns the data reference bound to this expression. This method is currently overwritten
+   * by {@link DBNode}, {@link DBNodeSeq}, {@link Path} and {@link VarRef}.
    * @return data reference
    */
   public Data data() {
@@ -198,7 +196,7 @@ public abstract class Expr extends ExprInfo {
    * Indicates if an expression has the specified compiler property. This method must only be
    * called at compile time. It is invoked to test properties of sub-expressions.
    * It returns {@code true} if at least one test is successful.
-   * @param flag flag to be found
+   * @param flag flag to be checked
    * @return result of check
    */
   public abstract boolean has(final Flag flag);
@@ -310,7 +308,7 @@ public abstract class Expr extends ExprInfo {
     // return true if a deterministic expression returns at least one node
     final SeqType st = seqType();
     if(st.type instanceof NodeType && st.occ.min >= 1 && !has(Flag.UPD) && !has(Flag.NDT)) {
-      qc.compInfo(OPTWRITE, this);
+      qc.compInfo(QueryText.OPTWRITE, this);
       return Bln.TRUE;
     }
     return this;

@@ -16,7 +16,7 @@ import module namespace util = 'dba/util' at '../../modules/util.xqm';
  : @return rest response and file content
  :)
 declare
-  %rest:path("dba/download/{$file}")
+  %rest:path("/dba/download/{$file}")
   %rest:query-param("name",     "{$name}")
   %rest:query-param("resource", "{$resource}")
 function _:download(
@@ -50,7 +50,7 @@ function _:download(
  : @return zip file
  :)
 declare
-  %rest:path("dba/backup/{$backup}")
+  %rest:path("/dba/backup/{$backup}")
   %output:method("raw")
   %output:media-type("application/octet-stream")
 function _:download(

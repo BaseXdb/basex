@@ -9,8 +9,8 @@ import org.basex.core.*;
 import org.basex.core.parse.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
-import org.basex.data.atomic.*;
 import org.basex.io.*;
+import org.basex.query.up.atomic.*;
 import org.basex.util.*;
 
 /**

@@ -25,7 +25,7 @@ public final class FuncOptions {
   /** QName. */
   public static final QNm Q_SPARAM = QNm.get(SERIALIZATION_PARAMETERS, OUTPUT_URI);
   /** Value. */
-  private static final String VALUE = "value";
+  private static final byte[] VALUE = token("value");
 
   /** Root element. */
   private final QNm root;
@@ -99,7 +99,8 @@ public final class FuncOptions {
           } else if(!test.eq(item)) {
             throw ELMMAP_X_X_X.get(info, root.prefixId(XML), item.type, item);
           }
-          options.parse(tb.add(optString((ANode) item)).toString());
+          final String opts = optString((ANode) item, error);
+          options.parse(tb.add(opts).toString());
         }
       } catch(final BaseXException ex) {
         throw error.get(info, ex);
@@ -111,26 +112,42 @@ public final class FuncOptions {
   /**
    * Builds a string representation of the specified node.
    * @param node node
+   * @param error raise error code
    * @return string
    * @throws QueryException query exception
    */
-  private String optString(final ANode node) throws QueryException {
+  private String optString(final ANode node, final QueryError error) throws QueryException {
+    final ANode n = node.attributes().next();
+    if(n != null) throw error.get(info, Util.info("Invalid attribute: '%'", n.name()));
+
     final TokenBuilder tb = new TokenBuilder();
     // interpret options
     for(final ANode child : node.children()) {
       if(child.type != NodeType.ELM) continue;
+
       // ignore elements in other namespace
       final QNm qn = child.qname();
-      if(!eq(qn.uri(), root.uri())) continue;
+      if(!eq(qn.uri(), root.uri())) {
+        if(qn.uri().length == 0)
+          throw error.get(info, Util.info("Element has no namespace: '%'", qn));
+        continue;
+      }
       // retrieve key from element name and value from "value" attribute or text node
-      byte[] v;
+      byte[] v = null;
       if(hasElements(child)) {
-        v = token(optString(child));
+        v = token(optString(child, error));
       } else {
-        v = child.attribute(VALUE);
+        for(final ANode attr : child.attributes()) {
+          if(eq(attr.name(), VALUE)) {
+            v = attr.string();
+          } else {
+            // Conflicts with QT3TS, Serialization-json-34 etc.
+            //throw error.get(info, Util.info("Invalid attribute: '%'", attr.name()));
+          }
+        }
         if(v == null) v = child.string();
       }
-      tb.add(string(qn.local())).add('=').add(string(v).replace(",", ",,")).add(',');
+      tb.add(string(qn.local())).add('=').add(string(v).trim().replace(",", ",,")).add(',');
     }
     return tb.toString();
   }

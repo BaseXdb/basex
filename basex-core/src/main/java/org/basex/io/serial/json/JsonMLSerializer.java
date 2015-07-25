@@ -1,13 +1,12 @@
 package org.basex.io.serial.json;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.util.Token.*;
 
 import java.io.*;
 
-import org.basex.data.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
+import org.basex.query.util.ft.*;
 import org.basex.query.value.item.*;
 
 /**
@@ -36,13 +35,13 @@ public final class JsonMLSerializer extends JsonSerializer {
   }
 
   @Override
-  protected void startOpen(final byte[] name) throws IOException {
+  protected void startOpen(final QNm name) throws IOException {
     if(level != 0) {
       out.print(',');
       indent();
     }
     out.print("[\"");
-    for(final byte ch : local(name)) encode(ch);
+    for(final byte ch : name.local()) encode(ch);
     out.print('"');
     att = false;
   }

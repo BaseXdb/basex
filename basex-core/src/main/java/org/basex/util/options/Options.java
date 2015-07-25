@@ -65,7 +65,7 @@ public class Options implements Iterable<Option<?>> {
   private final HashMap<String, String> free = new HashMap<>();
 
   /** Options, cached from an input file. */
-  private final StringBuilder user = new StringBuilder();
+  private final StringList user = new StringList();
   /** Options file. */
   private IOFile file;
 
@@ -105,7 +105,7 @@ public class Options implements Iterable<Option<?>> {
       values.put(e.getKey(), e.getValue());
     for(final Entry<String, String> e : opts.free.entrySet())
       free.put(e.getKey(), e.getValue());
-    user.append(opts.user);
+    user.add(opts.user);
     file = opts.file;
   }
 
@@ -113,34 +113,34 @@ public class Options implements Iterable<Option<?>> {
    * Writes the options to disk.
    */
   public final synchronized void write() {
-    final TokenBuilder tmp = new TokenBuilder();
+    final StringList lines = new StringList();
     try {
-      boolean first = true;
       for(final Option<?> opt : options(getClass())) {
         final String name = opt.name();
         if(opt instanceof Comment) {
-          if(!first) tmp.add(NL);
-          tmp.add("# " + name).add(NL);
+          if(!lines.isEmpty()) lines.add("");
+          lines.add("# " + name);
         } else if(opt instanceof NumbersOption) {
           final int[] ints = get((NumbersOption) opt);
           final int is = ints == null ? 0 : ints.length;
-          for(int i = 0; i < is; ++i) tmp.add(name + i + " = " + ints[i]).add(NL);
+          for(int i = 0; i < is; ++i) lines.add(name + i + " = " + ints[i]);
         } else if(opt instanceof StringsOption) {
           final String[] strings = get((StringsOption) opt);
           final int ss = strings == null ? 0 : strings.length;
-          tmp.add(name + " = " + ss).add(NL);
-          for(int i = 0; i < ss; ++i) tmp.add(name + (i + 1) + " = " + strings[i]).add(NL);
+          lines.add(name + " = " + ss);
+          for(int i = 0; i < ss; ++i) lines.add(name + (i + 1) + " = " + strings[i]);
         } else {
-          tmp.add(name + " = " + get(opt)).add(NL);
+          lines.add(name + " = " + get(opt));
         }
-        first = false;
       }
-      tmp.add(NL).add(PROPUSER).add(NL);
-      tmp.add(user.toString());
-      final byte[] content = tmp.finish();
+      lines.add("").add(PROPUSER).add(user);
 
       // only write file if contents have changed
-      if(!file.exists() || !eq(content, file.read())) file.write(content);
+      if(update(lines)) {
+        final TokenBuilder tb = new TokenBuilder();
+        for(final String line : lines) tb.add(line).add(NL);
+        file.write(tb.finish());
+      }
 
     } catch(final Exception ex) {
       Util.errln("% could not be written.", file);
@@ -416,18 +416,11 @@ public class Options implements Iterable<Option<?>> {
    * All properties starting with {@code org.basex.} will be assigned as options.
    */
   public final void setSystem() {
-    // collect parameters that start with "org.basex."
-    final StringList sl = new StringList();
-    for(final Object key : System.getProperties().keySet()) {
-      final String k = key.toString();
-      if(k.startsWith(DBPREFIX)) sl.add(k);
-    }
-    // assign properties
-    for(final String key : sl) {
-      final String v = System.getProperty(key);
+    // assign global options
+    for(final Entry<String, String> entry : Prop.entries()) {
+      final String n = entry.getKey(), v = entry.getValue().toString();
       try {
-        final String k = key.substring(DBPREFIX.length()).toUpperCase(Locale.ENGLISH);
-        if(assign(k, v, -1, false)) Util.debug(k + Text.COLS + v);
+        if(assign(n, v, -1, false)) Util.debug(n + Text.COLS + v);
       } catch(final BaseXException ex) {
         Util.errln(ex);
       }
@@ -502,7 +495,7 @@ public class Options implements Iterable<Option<?>> {
 
   @Override
   public final synchronized String toString() {
-    // only those options are listed the value of which differs from default value
+    // only those options are listed whose value differs from default value
     final StringBuilder sb = new StringBuilder();
     for(final Entry<String, Object> e : values.entrySet()) {
       final String name = e.getKey();
@@ -530,43 +523,6 @@ public class Options implements Iterable<Option<?>> {
   }
 
   // STATIC METHODS =====================================================================
-
-  /**
-   * Returns a system property. If necessary, the key will be converted to lower-case
-   * and prefixed with the {@link Prop#DBPREFIX} string.
-   * @param option option
-   * @return value, or empty string
-   */
-  public static String getSystem(final Option<?> option) {
-    String name = option.name().toLowerCase(Locale.ENGLISH);
-    if(!name.startsWith(DBPREFIX)) name = DBPREFIX + name;
-    final String v = System.getProperty(name);
-    return v == null ? "" : v;
-  }
-
-  /**
-   * Sets a system property if it has not been set before.
-   * @param option option
-   * @param val value
-   */
-  public static void setSystem(final Option<?> option, final Object val) {
-    setSystem(option.name(), val);
-  }
-
-  /**
-   * Sets a system property if it has not been set before. If necessary, the key will
-   * be converted to lower-case and prefixed with the {@link Prop#DBPREFIX} string.
-   * @param key key
-   * @param val value
-   */
-  public static void setSystem(final String key, final Object val) {
-    final String name = key.indexOf('.') == -1 ? DBPREFIX + key.toLowerCase(Locale.ENGLISH) : key;
-    final String value = val.toString();
-    if(System.getProperty(name) == null) {
-      if(value.isEmpty()) System.clearProperty(name);
-      else System.setProperty(name, val.toString());
-    }
-  }
 
   /**
    * Returns a list of allowed keys.
@@ -600,8 +556,6 @@ public class Options implements Iterable<Option<?>> {
     return opts.toArray(new Option[opts.size()]);
   }
 
-  // PRIVATE METHODS ====================================================================
-
   /**
    * Reads the configuration file and initializes the options.
    * The file is located in the project home directory.
@@ -623,7 +577,7 @@ public class Options implements Iterable<Option<?>> {
             local = true;
             continue;
           }
-          if(local) user.append(line).append(NL);
+          if(local) user.add(line);
 
           if(line.isEmpty() || line.charAt(0) == '#') continue;
           final int d = line.indexOf('=');
@@ -648,7 +602,7 @@ public class Options implements Iterable<Option<?>> {
 
           if(local) {
             // cache local options as system properties
-            setSystem(name, val);
+            Prop.put(name, val);
           } else {
             try {
               assign(name, val, num, true);
@@ -684,6 +638,25 @@ public class Options implements Iterable<Option<?>> {
   }
 
   /**
+   * Checks if the options file needs to be updated.
+   * @param lines lines of new file
+   * @return result of check
+   * @throws IOException I/O exception
+   */
+  private boolean update(final StringList lines) throws IOException {
+    if(!file.exists()) return true;
+
+    int l = 0;
+    final int ls = lines.size();
+    try(final NewlineInput nli = new NewlineInput(file)) {
+      for(String line; (line = nli.readLine()) != null;) {
+        if(l == ls || !lines.get(l++).equals(line)) return true;
+      }
+    }
+    return l != ls;
+  }
+
+  /**
    * Assigns the specified name and value.
    * @param name name of option
    * @param item value of option
@@ -692,8 +665,8 @@ public class Options implements Iterable<Option<?>> {
    * @throws BaseXException database exception
    * @throws QueryException query exception
    */
-  private synchronized boolean assign(final String name, final Item item,
-      final boolean error) throws BaseXException, QueryException {
+  private synchronized boolean assign(final String name, final Item item, final boolean error)
+      throws BaseXException, QueryException {
 
     final Option<?> option = options.get(name);
     if(option == null) {

@@ -42,7 +42,7 @@ public final class FnFormatNumberTest extends QueryTest {
       { "formnum  10", strings("0"), "format-number(0, '0')" },
       { "formnum  20", strings("00"), "format-number(0, '10')" },
       { "formnum  30", strings("1"), "format-number(1, '0')" },
-      { "formnum  35", strings("0.1"), "format-number(0.1, '.0')" },
+      { "formnum  35", strings(".1"), "format-number(0.1, '.0')" },
       { "formnum  40", strings("1.0"), "format-number(1, '1.0')" },
       { "formnum  50", strings("1"), "format-number(1.1, '1')" },
       { "formnum  60", strings("1.1"), "format-number(1.1, '1.0')" },
@@ -73,7 +73,14 @@ public final class FnFormatNumberTest extends QueryTest {
         "format-number(xs:decimal('11111111111111111111'), '#,#')" },
       { "formnum 300", strings("12.346e2"), "format-number(1234.5678, '00.000e0')" },
 
-      // http://www.w3schools.com/XSL/func_formatnumber.asp
+      { "formnum 310", strings("\u0a66,i"),
+          "declare default decimal-format zero-digit = '&#xA66;';"
+        + "format-number(0, '#,i')" },
+      { "formnum 320", strings("\u0a67"),
+          "declare default decimal-format zero-digit = '&#xA66;';"
+        + "format-number(1, '#\u0a66')" },
+
+        // http://www.w3schools.com/XSL/func_formatnumber.asp
       { "formnum w3-10", strings("500100"), "format-number(500100, '#')" },
       { "formnum w3-20", strings("500100"), "format-number(500100, '0')" },
       { "formnum w3-30", strings("500100.00"), "format-number(500100, '#.00')" },

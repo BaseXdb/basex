@@ -19,9 +19,9 @@ public final class FnLang extends Ids {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] lang = lc(toEmptyToken(exprs[0], qc));
-    final ANode node = toNode(arg(1, qc), qc);
+    final ANode node = toNode(ctxArg(1, qc), qc);
     for(ANode n = node; n != null; n = n.parent()) {
-      final AxisIter atts = n.attributes();
+      final BasicNodeIter atts = n.attributes();
       for(ANode at; (at = atts.next()) != null;) {
         if(eq(at.qname().string(), LANG)) {
           final byte[] ln = lc(normalize(at.string()));

@@ -12,6 +12,7 @@ import org.basex.core.cmd.Set;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -40,8 +41,11 @@ final class XMLParser extends CmdParser {
       if(!execute(COMMANDS, node).isEmpty()) {
         query = COMMANDS + query;
         // ensure that the root contains no text nodes as children
-        if(!execute(COMMANDS + "/text()/string()", node).trim().isEmpty())
-          throw error(Text.SYNTAX_X, '<' + COMMANDS + "><...></" + COMMANDS + '>');
+        final String ws = COMMANDS + "/text()[normalize-space()]";
+        try(final QueryProcessor qp = new QueryProcessor(ws, ctx).context(node)) {
+          if(!qp.value().isEmpty())
+            throw error(Text.SYNTAX_X, '<' + COMMANDS + "><...></" + COMMANDS + '>');
+        }
       }
       try(final QueryProcessor qp = new QueryProcessor(query, ctx).context(node)) {
         for(final Item ia : qp.value()) cmds.add(command(ia));
@@ -55,9 +59,10 @@ final class XMLParser extends CmdParser {
    * Returns a command.
    * @param root command node
    * @return command
+   * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  private Command command(final Item root) throws QueryException {
+  private Command command(final Item root) throws IOException, QueryException {
     final String e = ((ANode) root).qname().toJava().toString();
     if(e.equals(ADD) && check(root, PATH + '?', '<' + INPUT))
       return new Add(value(root, PATH), xml(root));
@@ -77,8 +82,6 @@ final class XMLParser extends CmdParser {
       return new CreateBackup(value(root, NAME));
     if(e.equals(CREATE_DB) && check(root, NAME, '<' + INPUT + '?'))
       return new CreateDB(value(root, NAME), xml(root));
-    if(e.equals(CREATE_EVENT) && check(root, NAME + '?'))
-      return new CreateEvent(value(root, NAME));
     if(e.equals(CREATE_INDEX) && check(root, TYPE))
       return new CreateIndex(value(root, TYPE));
     if(e.equals(CREATE_USER) && check(root, NAME, '#' + PASSWORD + '?'))
@@ -89,8 +92,6 @@ final class XMLParser extends CmdParser {
       return new DropBackup(value(root, NAME));
     if(e.equals(DROP_DB) && check(root, NAME))
       return new DropDB(value(root, NAME));
-    if(e.equals(DROP_EVENT) && check(root, NAME))
-      return new DropEvent(value(root, NAME));
     if(e.equals(DROP_INDEX) && check(root, TYPE))
       return new DropIndex(value(root, TYPE));
     if(e.equals(DROP_USER) && check(root, NAME, PATTERN + '?'))
@@ -117,7 +118,7 @@ final class XMLParser extends CmdParser {
       return new InfoIndex(value(root, TYPE));
     if(e.equals(INFO_STORAGE) && check(root, '#' + QUERY + '?'))
       return new InfoStorage(value(root));
-    if(e.equals(KILL) && check(root, TARGET + '?'))
+    if(e.equals(KILL) && check(root, TARGET))
       return new Kill(value(root, TARGET));
     if(e.equals(LIST) && check(root, NAME + '?', PATH + '?'))
       return new List(value(root, NAME), value(root, PATH));
@@ -155,8 +156,6 @@ final class XMLParser extends CmdParser {
       return new Set(value(root, OPTION), value(root));
     if(e.equals(SHOW_BACKUPS) && check(root))
       return new ShowBackups();
-    if(e.equals(SHOW_EVENTS) && check(root))
-      return new ShowEvents();
     if(e.equals(SHOW_SESSIONS) && check(root))
       return new ShowSessions();
     if(e.equals(SHOW_USERS) && check(root, DATABASE + '?'))
@@ -174,7 +173,7 @@ final class XMLParser extends CmdParser {
    * Returns the value of the specified attribute.
    * @param root root node
    * @param att name of attribute
-   * @return query exception
+   * @return value
    * @throws QueryException query exception
    */
   private String value(final Item root, final String att) throws QueryException {
@@ -184,7 +183,7 @@ final class XMLParser extends CmdParser {
   /**
    * Returns a string value (text node).
    * @param root root node
-   * @return query exception
+   * @return string value
    * @throws QueryException query exception
    */
   private String value(final Item root) throws QueryException {
@@ -194,23 +193,24 @@ final class XMLParser extends CmdParser {
   /**
    * Returns a password (text node).
    * @param root root node
-   * @return query exception
+   * @return password string
    * @throws QueryException query exception
    */
   private String password(final Item root) throws QueryException {
     final String pw = execute("string(.)", root);
-    return pw.isEmpty() && pwReader != null ? pwReader.password() : "";
+    return pw.isEmpty() && pwReader != null ? pwReader.password() : pw;
   }
 
   /**
    * Returns an xml value (text node).
    * @param root root node
-   * @return query exception
+   * @return xml value
+   * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  private String xml(final Item root) throws QueryException {
+  private String xml(final Item root) throws IOException, QueryException {
     try(final QueryProcessor qp = new QueryProcessor("node()", ctx)) {
-      return qp.context(root).execute().toString().trim();
+      return qp.context(root).value().serialize().toString().trim();
     }
   }
 
@@ -218,7 +218,7 @@ final class XMLParser extends CmdParser {
    * Executes the specified query and returns a string representation.
    * @param query query
    * @param context context node
-   * @return query exception
+   * @return string representation
    * @throws QueryException query exception
    */
   private String execute(final String query, final Item context) throws QueryException {
@@ -289,19 +289,20 @@ final class XMLParser extends CmdParser {
     }
 
     // run query
+    final Value mv = ma.value(), ov = oa.value();
     try(final QueryProcessor qp = new QueryProcessor(tb.toString(), ctx).context(root)) {
-      qp.bind("A", ma.value()).bind("O", oa.value());
-      if(!qp.execute().toString().isEmpty()) return true;
+      qp.bind("A", mv).bind("O", ov);
+      if(qp.value().size() != 0) return true;
     }
     // build error string
     final TokenBuilder syntax = new TokenBuilder();
     final byte[] nm = ((ANode) root).qname().string();
     syntax.reset().add('<').add(nm);
-    for(final Item i : ma) {
+    for(final Item i : mv) {
       final byte[] a = i.string(null);
       syntax.add(' ').add(a).add("=\"...\"");
     }
-    for(final Item i : oa) {
+    for(final Item i : ov) {
       final byte[] a = i.string(null);
       syntax.add(" (").add(a).add("=\"...\")");
     }

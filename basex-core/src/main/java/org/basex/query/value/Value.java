@@ -13,6 +13,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -56,7 +57,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   @Override
-  public final Iterator<Item> iterator() {
+  public Iterator<Item> iterator() {
     return iter().iterator();
   }
 
@@ -70,6 +71,20 @@ public abstract class Value extends Expr implements Iterable<Item> {
   public final Value value(final QueryContext qc) {
     return this;
   }
+
+  /**
+   * Returns a sub-sequence of this value with the given start and length.<br>
+   * The following properties must hold:
+   * <ul>
+   *   <li>{@code start >= 0},
+   *   <li>{@code len >= 0},
+   *   <li>{@code start + len <= size()}
+   * </ul>
+   * @param start starting position (zero-based)
+   * @param len number of items
+   * @return the sub-sequence
+   */
+  public abstract Value subSeq(final long start, final long len);
 
   /**
    * Materializes streamable values, or returns a self reference.
@@ -159,14 +174,14 @@ public abstract class Value extends Expr implements Iterable<Item> {
   public abstract int writeTo(final Item[] arr, final int index);
 
   /**
-   * Creates an {@link ValueBuilder}, containing all items of this value.
+   * Creates an array containing all items of this value.
    * Use with care, as compressed Values are expanded, creating many objects.
    * @return cached items
    */
-  public final ValueBuilder cache() {
-    final ValueBuilder vb = new ValueBuilder((int) size());
-    vb.size(writeTo(vb.items(), 0));
-    return vb;
+  public final ItemList cache() {
+    final long n = size();
+    if(n > Integer.MAX_VALUE) throw Util.notExpected(n);
+    return new ItemList((int) n).add(this);
   }
 
   /**
@@ -176,7 +191,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
    * @throws QueryIOException query I/O exception
    */
   public final ArrayOutput serialize() throws QueryIOException {
-    return serialize(null);
+    return serialize((SerializerOptions) null);
   }
 
   /**
@@ -188,9 +203,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
   public final ArrayOutput serialize(final SerializerOptions options) throws QueryIOException {
     final ArrayOutput ao = new ArrayOutput();
     try {
-      try(final Serializer ser = Serializer.get(ao, options)) {
-        for(final Item it : this) ser.serialize(it);
-      }
+      serialize(Serializer.get(ao, options));
     } catch(final QueryIOException ex) {
       throw ex;
     } catch(final IOException ex) {
@@ -200,7 +213,20 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   /**
+   * Serializes the value with the specified serializer.
+   * @param ser serializer
+   * @throws IOException I/O exception
+   */
+  public final void serialize(final Serializer ser) throws IOException {
+    for(final Item it : this) {
+      if(ser.finished()) break;
+      ser.serialize(it);
+    }
+  }
+
+  /**
    * Gets the item at the given position in the value.
+   * The specified value must be lie within the valid bounds.
    * @param pos position
    * @return item
    */
@@ -211,6 +237,12 @@ public abstract class Value extends Expr implements Iterable<Item> {
    * @return result of check
    */
   public abstract boolean homogeneous();
+
+  /**
+   * Returns a sequence in reverse order.
+   * @return sequence
+   */
+  public abstract Value reverse();
 
   @Override
   public boolean accept(final ASTVisitor visitor) {

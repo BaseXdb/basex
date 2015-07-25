@@ -24,6 +24,8 @@ import org.basex.util.list.*;
 public final class QNm extends Item {
   /** URL pattern (matching Clark and EQName notation). */
   private static final Pattern BIND = Pattern.compile("^((\"|')(.*?)\\2:|Q?(\\{(.*?)\\}))(.+)$");
+  /** Expanded QName pattern. */
+  private static final Pattern EQNAME = Pattern.compile("(Q\\{([^}]*)\\})?([^}]+)");
   /** Singleton instance. */
   private static final QNmMap CACHE = new QNmMap();
 
@@ -112,7 +114,7 @@ public final class QNm extends Item {
    * Resolves a QName string.
    * @param name name to resolve
    * @param def default namespace (can be {@code null})
-   * @param sc static context
+   * @param sc static context (can be {@code null})
    * @param info input info
    * @return string
    * @throws QueryException query exception
@@ -122,7 +124,7 @@ public final class QNm extends Item {
 
     // check for namespace declaration
     final Matcher m = BIND.matcher(Token.string(name));
-    final byte[] uri;
+    byte[] uri = null;
     byte[] nm = name;
     if(m.find()) {
       final String u = m.group(3);
@@ -133,12 +135,23 @@ public final class QNm extends Item {
       if(i == -1) {
         uri = def;
       } else {
-        uri = sc.ns.uri(substring(nm, 0, i));
+        if(sc != null) uri = sc.ns.uri(substring(nm, 0, i));
         if(uri == null) throw NOURI_X.get(info, name);
       }
     }
     if(!XMLToken.isQName(nm)) throw BINDNAME_X.get(info, name);
     return new QNm(nm, uri);
+  }
+
+  /**
+   * Resolves an expanded QName string.
+   * @param name string
+   * @return resulting QName, or {@code null}
+   */
+  public static QNm resolve(final byte[] name) {
+    final Matcher m = EQNAME.matcher(Token.string(name));
+    return m.matches() ? new QNm(m.group(3), m.group(1) == null ||
+        m.group(2).isEmpty() ? null : m.group(2)) : null;
   }
 
   /**
@@ -278,7 +291,7 @@ public final class QNm extends Item {
   public byte[] prefixId(final byte[] ns) {
     if(ns != null && Token.eq(uri(), ns)) return local();
     final byte[] p = NSGlobal.prefix(uri());
-    return p.length == 0 ? id() : concat(p, token(":"), local());
+    return p.length == 0 ? id() : Token.concat(p, token(":"), local());
   }
 
   @Override

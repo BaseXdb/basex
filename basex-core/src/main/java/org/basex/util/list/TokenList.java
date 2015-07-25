@@ -8,7 +8,7 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * This is a simple container for tokens (byte arrays).
+ * Resizable-array implementation for tokens (byte arrays).
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen

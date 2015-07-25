@@ -8,8 +8,8 @@ import java.awt.*;
 import java.util.*;
 
 import org.basex.core.*;
-import org.basex.data.*;
 import org.basex.gui.layout.*;
+import org.basex.query.util.ft.*;
 import org.basex.util.ft.*;
 import org.basex.util.list.*;
 

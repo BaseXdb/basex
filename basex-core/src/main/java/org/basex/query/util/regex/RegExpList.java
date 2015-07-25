@@ -3,7 +3,7 @@ package org.basex.query.util.regex;
 import org.basex.util.list.*;
 
 /**
- * This is a simple container for expressions.
+ * Resizable-array implementation for regular expressions.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen

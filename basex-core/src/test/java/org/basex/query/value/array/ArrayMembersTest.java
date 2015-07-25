@@ -9,7 +9,7 @@ import org.basex.query.value.item.*;
 import org.junit.*;
 
 /**
- * Tests for {@link Array#members(boolean)}.
+ * Tests for {@link Array#iterator(long)}.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
@@ -17,8 +17,8 @@ import org.junit.*;
 public final class ArrayMembersTest {
   /** Random movements inside the array. */
   @Test public void randomTest() {
-    final Random rng = new Random(1337);
     for(int n = 0; n < 1_000; n++) {
+      final Random rng = new Random(1337 + n);
       Array arr = Array.empty();
       final ArrayList<Integer> list = new ArrayList<>(n);
       for(int i = 0; i < n; i++) {
@@ -27,9 +27,10 @@ public final class ArrayMembersTest {
         list.add(insPos, i);
       }
 
-      final ListIterator<Value> it1 = arr.members();
-      final ListIterator<Integer> it2 = list.listIterator();
-      int pos = 0;
+      final int startPos = rng.nextInt(n + 1);
+      final ListIterator<Value> it1 = arr.iterator(startPos);
+      final ListIterator<Integer> it2 = list.listIterator(startPos);
+      int pos = startPos;
       for(int i = 0; i < 100; i++) {
         final int k = rng.nextInt(n + 1);
         if(rng.nextBoolean()) {

@@ -11,6 +11,7 @@ import org.basex.query.iter.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.Type.ID;
 import org.basex.util.*;
@@ -57,6 +58,11 @@ public abstract class Item extends Value {
 
   @Override
   public final Item itemAt(final long pos) {
+    return this;
+  }
+
+  @Override
+  public final Item reverse() {
     return this;
   }
 
@@ -187,6 +193,11 @@ public abstract class Item extends Value {
    */
   public BufferInput input(final InputInfo ii) throws QueryException {
     return new ArrayInput(string(ii));
+  }
+
+  @Override
+  public Value subSeq(final long start, final long len) {
+    return len == 0 ? Empty.SEQ : this;
   }
 
   // Overridden by B64Stream, StrStream, Jav and Array.

@@ -4,8 +4,8 @@ import static org.basex.core.Text.*;
 
 import org.basex.core.users.*;
 import org.basex.data.*;
-import org.basex.data.atomic.*;
 import org.basex.io.*;
+import org.basex.query.up.atomic.*;
 import org.basex.util.list.*;
 
 /**

@@ -25,7 +25,7 @@ declare variable $_:SUB := 'database';
  :)
 declare
   %rest:GET
-  %rest:path("dba/create-db")
+  %rest:path("/dba/create-db")
   %rest:query-param("name",  "{$name}")
   %rest:query-param("opts",  "{$opts}", "textindex", "attrindex")
   %rest:query-param("lang",  "{$lang}", "en")
@@ -93,7 +93,7 @@ function _:create(
 declare
   %updating
   %rest:POST
-  %rest:path("dba/create-db")
+  %rest:path("/dba/create-db")
   %rest:query-param("name", "{$name}")
   %rest:query-param("opts", "{$opts}")
   %rest:query-param("lang", "{$lang}")

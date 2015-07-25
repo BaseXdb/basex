@@ -2,8 +2,8 @@ package org.basex.io.serial;
 
 import java.io.*;
 
-import org.basex.data.*;
 import org.basex.io.out.*;
+import org.basex.query.util.ft.*;
 
 /**
  * This class serializes items as text.

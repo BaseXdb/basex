@@ -47,7 +47,7 @@ public final class Test extends Command {
       sb.append(suite.skipped).append(' ').append("skipped.");
       return suite.errors + suite.failures == 0 ? info(sb.toString()) : error(sb.toString());
     } catch(final IOException ex) {
-      cause = ex;
+      exception = ex;
       return error(Util.message(ex));
     }
   }

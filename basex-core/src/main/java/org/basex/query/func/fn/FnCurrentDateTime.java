@@ -14,6 +14,6 @@ import org.basex.util.*;
 public final class FnCurrentDateTime extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return qc.initDateTime().dtm;
+    return qc.initDateTime().datm;
   }
 }

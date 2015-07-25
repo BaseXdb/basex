@@ -22,7 +22,7 @@ declare variable $_:CAT := 'users';
  :)
 declare
   %rest:GET
-  %rest:path("dba/create-user")
+  %rest:path("/dba/create-user")
   %rest:query-param("name",  "{$name}")
   %rest:query-param("pw",    "{$pw}")
   %rest:query-param("perm",  "{$perm}", "none")
@@ -91,7 +91,7 @@ function _:create(
 declare
   %updating
   %rest:POST
-  %rest:path("dba/create-user")
+  %rest:path("/dba/create-user")
   %rest:query-param("name", "{$name}")
   %rest:query-param("pw",   "{$pw}")
   %rest:query-param("perm", "{$perm}")

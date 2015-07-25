@@ -6,6 +6,7 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -55,16 +56,16 @@ abstract class Set extends Arr {
     final int el = exprs.length;
     final Iter[] iter = new Iter[el];
     for(int e = 0; e < el; e++) iter[e] = qc.iter(exprs[e]);
-    return iterable ? iter(iter) : eval(iter).sort();
+    return iterable ? iter(iter) : eval(iter).iter();
   }
 
   /**
    * Evaluates the specified iterators.
    * @param iter iterators
-   * @return resulting iterator
+   * @return resulting node list
    * @throws QueryException query exception
    */
-  protected abstract NodeSeqBuilder eval(final Iter[] iter) throws QueryException;
+  protected abstract ANodeList eval(final Iter[] iter) throws QueryException;
 
   /**
    * Evaluates the specified iterators in an iterative manner.
@@ -94,10 +95,10 @@ abstract class Set extends Arr {
 
     /**
      * Constructor.
-     * @param ir iterator
+     * @param iter iterator
      */
-    SetIter(final Iter[] ir) {
-      iter = ir;
+    SetIter(final Iter[] iter) {
+      this.iter = iter;
     }
 
     @Override

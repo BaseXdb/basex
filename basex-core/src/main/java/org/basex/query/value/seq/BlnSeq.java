@@ -9,7 +9,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 
 /**
- * Sequence of items of type {@link Int xs:boolean}, containing at least two of them.
+ * Sequence of items of type {@link Bln xs:boolean}, containing at least two of them.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
@@ -40,14 +40,6 @@ public final class BlnSeq extends NativeSeq {
   @Override
   public boolean[] toJava() {
     return values;
-  }
-
-  @Override
-  public Value reverse() {
-    final int s = values.length;
-    final boolean[] tmp = new boolean[s];
-    for(int l = 0, r = s - 1; l < s; l++, r--) tmp[l] = values[r];
-    return get(tmp);
   }
 
   // STATIC METHODS =====================================================================

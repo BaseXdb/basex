@@ -40,11 +40,11 @@ public final class ParallelQueryTest extends SandboxTest {
   /**
    * Runs a single query.
    * @return result
-   * @throws QueryException exception
+   * @throws Exception exception
    */
-  private static String query() throws QueryException {
+  private static String query() throws Exception {
     try(final QueryProcessor qp = new QueryProcessor(QUERY, context)) {
-      return qp.value().toString();
+      return qp.value().serialize().toString();
     }
   }
 

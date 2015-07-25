@@ -109,7 +109,7 @@ public final class IOFile extends IO {
 
   @Override
   public InputSource inputSource() {
-    return new InputSource(pth);
+    return new InputSource(url());
   }
 
   @Override
@@ -170,8 +170,7 @@ public final class IOFile extends IO {
   }
 
   /**
-   * Returns the children of the path that match the specified regular
-   * expression.
+   * Returns the children of the path that match the specified regular expression.
    * @param regex regular expression pattern
    * @return children
    */
@@ -188,7 +187,7 @@ public final class IOFile extends IO {
   }
 
   /**
-   * Returns the relative paths of all descendant files.
+   * Returns the relative paths of all descendant files (excluding directories).
    * @return relative paths
    */
   public synchronized StringList descendants() {

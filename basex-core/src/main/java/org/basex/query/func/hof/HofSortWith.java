@@ -4,6 +4,7 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 
@@ -24,12 +25,12 @@ public final class HofSortWith extends HofFn {
     final Value v = exprs[0].value(qc);
     final Comparator<Item> cmp = getComp(1, qc);
     if(v.size() < 2) return v;
-    final ValueBuilder vb = v.cache();
+    final ItemList items = v.cache();
     try {
-      Arrays.sort(vb.items(), 0, (int) vb.size(), cmp);
+      Arrays.sort(items.internal(), 0, items.size(), cmp);
     } catch(final QueryRTException ex) {
       throw ex.getCause();
     }
-    return vb.value();
+    return items.value();
   }
 }

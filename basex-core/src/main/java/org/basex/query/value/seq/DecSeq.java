@@ -43,14 +43,6 @@ public final class DecSeq extends NativeSeq {
     return values;
   }
 
-  @Override
-  public Value reverse() {
-    final int s = values.length;
-    final BigDecimal[] tmp = new BigDecimal[s];
-    for(int l = 0, r = s - 1; l < s; l++, r--) tmp[l] = values[r];
-    return get(tmp);
-  }
-
   // STATIC METHODS =====================================================================
 
   /**

@@ -119,8 +119,8 @@ public final class StaticFuncCall extends FuncCall {
   public boolean has(final Flag flag) {
     // check arguments, which will be evaluated before running the function code
     if(super.has(flag)) return true;
-    // function code: position or context references will have no effect on calling code
-    if(flag == Flag.FCS || flag == Flag.CTX) return false;
+    // function code: position or context references of expression body have no effect
+    if(flag == Flag.POS || flag == Flag.CTX) return false;
     // pass on check to function code
     return func == null || (flag == Flag.UPD && !sc.mixUpdates ? func.updating : func.has(flag));
   }

@@ -35,8 +35,7 @@ public final class BaseXMem extends BaseXPanel {
     }
 
     // regularly refresh panel
-    final Timer timer = new Timer(true);
-    timer.scheduleAtFixedRate(new TimerTask() {
+    new Timer(true).scheduleAtFixedRate(new TimerTask() {
       @Override
       public void run() { repaint(); }
     }, 0, 5000);

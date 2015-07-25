@@ -42,12 +42,6 @@ public final class ClientListener extends Thread {
   /** Socket reference. */
   private final Socket socket;
 
-  /** Socket for events. */
-  private Socket esocket;
-  /** Output for events. */
-  private PrintOutput eout;
-  /** Flag for active events. */
-  private boolean events;
   /** Input stream. */
   private BufferInput in;
   /** Output stream. */
@@ -98,10 +92,6 @@ public final class ClientListener extends Thread {
             create();
           } else if(sc == ServerCmd.ADD) {
             add();
-          } else if(sc == ServerCmd.WATCH) {
-            watch();
-          } else if(sc == ServerCmd.UNWATCH) {
-            unwatch();
           } else if(sc == ServerCmd.REPLACE) {
             replace();
           } else if(sc == ServerCmd.STORE) {
@@ -247,11 +237,6 @@ public final class ClientListener extends Thread {
     try {
       new Close().run(context);
       socket.close();
-      if(events) {
-        esocket.close();
-        // remove this session from all events in pool
-        for(final Sessions s : context.events.values()) s.remove(this);
-      }
     } catch(final Throwable ex) {
       log(LogType.ERROR, Util.message(ex));
       Util.stack(ex);
@@ -264,33 +249,6 @@ public final class ClientListener extends Thread {
    */
   public Context context() {
     return context;
-  }
-
-  /**
-   * Registers the event socket.
-   * @param s socket
-   * @throws IOException I/O exception
-   */
-  public synchronized void register(final Socket s) throws IOException {
-    esocket = s;
-    eout = PrintOutput.get(s.getOutputStream());
-    eout.write(0);
-    eout.flush();
-  }
-
-  /**
-   * Sends a notification to the client.
-   * @param name event name
-   * @param msg event message
-   * @throws IOException I/O exception
-   */
-  public synchronized void notify(final byte[] name, final byte[] msg) throws IOException {
-    last = System.currentTimeMillis();
-    eout.print(name);
-    eout.write(0);
-    eout.print(msg);
-    eout.write(0);
-    eout.flush();
   }
 
   /**
@@ -391,59 +349,6 @@ public final class ClientListener extends Thread {
       di.flush();
       error(ex.getMessage());
     }
-  }
-
-  /**
-   * Watches an event.
-   * @throws IOException I/O exception
-   */
-  private void watch() throws IOException {
-    server.initEvents();
-
-    // initialize server-based event handling
-    if(!events) {
-      out.print(Integer.toString(context.soptions.get(StaticOptions.EVENTPORT)));
-      out.write(0);
-      out.print(Long.toString(getId()));
-      out.write(0);
-      out.flush();
-      events = true;
-    }
-    final String name = in.readString();
-    final Sessions session = context.events.get(name);
-    final boolean ok = session != null && !session.contains(this);
-    final String message;
-    if(ok) {
-      session.add(this);
-      message = WATCHING_EVENT_X;
-    } else if(session == null) {
-      message = EVENT_UNKNOWN_X;
-    } else {
-      message = EVENT_WATCHED_X;
-    }
-    info(Util.info(message, name), ok);
-  }
-
-  /**
-   * Unwatches an event.
-   * @throws IOException I/O exception
-   */
-  private void unwatch() throws IOException {
-    final String name = in.readString();
-
-    final Sessions session = context.events.get(name);
-    final boolean ok = session != null && session.contains(this);
-    final String message;
-    if(ok) {
-      session.remove(this);
-      message = UNWATCHING_EVENT_X;
-    } else if(session == null) {
-      message = EVENT_UNKNOWN_X;
-    } else {
-      message = EVENT_NOT_WATCHED_X;
-    }
-    info(Util.info(message, name), ok);
-    out.flush();
   }
 
   /**

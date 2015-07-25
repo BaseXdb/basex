@@ -15,6 +15,7 @@ import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.view.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -161,7 +162,7 @@ public final class TreeView extends View implements TreeConstants {
     gui.painting = true;
 
     final DBNodes nodes = gui.context.current();
-    roots = nodes.pres;
+    roots = nodes.pres();
     final int rl = roots.length;
     if(rl == 0) return;
 
@@ -547,15 +548,15 @@ public final class TreeView extends View implements TreeConstants {
     BaseXLayout.antiAlias(mg);
     mg.setFont(font);
 
-    final int[] mark = gui.context.marked.pres;
-    if(mark.length == 0) return;
+    final int[] marked = gui.context.marked.pres();
+    if(marked.length == 0) return;
 
     int rn = 0;
     final int rl = roots.length;
     while(rn < rl) {
-      final int ml = mark.length;
+      final int ml = marked.length;
       final LinkedList<Integer> marklink = new LinkedList<>();
-      for(int m = 0; m < ml; ++m) marklink.add(m, mark[m]);
+      for(int m = 0; m < ml; ++m) marklink.add(m, marked[m]);
 
       for(int lv = 0; lv < sub.subtreeHeight(rn); ++lv) {
         final int y = getYperLevel(lv);
@@ -570,8 +571,7 @@ public final class TreeView extends View implements TreeConstants {
 
             if(ix > -1) {
               li.remove();
-              final int x = (int) (rect.w * ix / (double) sub.levelSize(rn,
-                  lv));
+              final int x = (int) (rect.w * ix / (double) sub.levelSize(rn, lv));
               mg.setColor(colormark1);
               mg.fillRect(rect.x + x, y, 2, nodeHeight + 1);
             }
@@ -579,9 +579,7 @@ public final class TreeView extends View implements TreeConstants {
         } else {
           while(li.hasNext()) {
             final int pre = li.next();
-
             final TreeRect rect = tr.searchRect(sub, rn, lv, pre);
-
             if(rect != null) {
               li.remove();
               drawRectangle(mg, rn, lv, rect, pre, Draw.MARK);

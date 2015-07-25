@@ -12,7 +12,7 @@ import java.util.*;
  */
 public final class Reflect {
   /** Cached constructors. */
-  private static final HashMap<String, Constructor<?>> CONS = new HashMap<>();
+  private static final HashMap<String, Constructor<?>> CONSTRUCTORS = new HashMap<>();
   /** Cached classes. */
   private static final HashMap<String, Class<?>> CLASSES = new HashMap<>();
   /** Cached fields. */
@@ -122,7 +122,7 @@ public final class Reflect {
     final String key = sb.toString();
 
     @SuppressWarnings("unchecked")
-    Constructor<O> m = (Constructor<O>) CONS.get(key);
+    Constructor<O> m = (Constructor<O>) CONSTRUCTORS.get(key);
     if(m == null) {
       try {
         try {
@@ -131,7 +131,7 @@ public final class Reflect {
           m = clazz.getDeclaredConstructor(types);
           m.setAccessible(true);
         }
-        CONS.put(key, m);
+        CONSTRUCTORS.put(key, m);
       } catch(final Throwable ex) {
         Util.debug(ex);
       }

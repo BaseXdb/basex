@@ -17,7 +17,7 @@ import org.basex.util.*;
 public final class FnLocalName extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final ANode node = toEmptyNode(arg(0, qc), qc);
+    final ANode node = toEmptyNode(ctxArg(0, qc), qc);
     final QNm qname = node != null ? node.qname() : null;
     return qname != null ? Str.get(qname.local()) : Str.ZERO;
   }

@@ -4,7 +4,7 @@ import org.basex.query.expr.*;
 import org.basex.util.list.*;
 
 /**
- * This is a simple container for expressions.
+ * Resizable-array implementation for XQuery expressions.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen

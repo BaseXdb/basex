@@ -49,7 +49,7 @@ public final class Put extends DBUpdate {
       final DBNode node = new DBNode(data, pre);
       try(final PrintOutput po = new PrintOutput(u)) {
         // try to reproduce non-chopped documents correctly
-        final SerializerOptions so = SerializerOptions.get(node.data.meta.chop);
+        final SerializerOptions so = SerializerOptions.get(node.data().meta.chop);
         try(final Serializer ser = Serializer.get(po, so)) {
           ser.serialize(node);
         }

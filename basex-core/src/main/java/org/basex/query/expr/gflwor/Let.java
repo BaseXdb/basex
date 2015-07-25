@@ -152,7 +152,7 @@ public final class Let extends ForLet {
   }
 
   /** Evaluator for a block of {@code let} expressions. */
-  private static class LetEval implements Eval {
+  private static class LetEval extends Eval {
     /** Let expressions of the current block, in declaration order. */
     private final ArrayList<Let> lets;
     /** Sub-evaluator. */
@@ -170,7 +170,7 @@ public final class Let extends ForLet {
     }
 
     @Override
-    public boolean next(final QueryContext qc) throws QueryException {
+    boolean next(final QueryContext qc) throws QueryException {
       if(!sub.next(qc)) return false;
 
       for(final Let let : lets) {

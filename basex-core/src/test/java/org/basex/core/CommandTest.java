@@ -413,6 +413,20 @@ public class CommandTest extends SandboxTest {
     ok(new Rename(FILE, "xxx"));
     // source need not exist
     ok(new Rename(FILE, "xxx"));
+
+    // check leading and trailing slashes
+    ok(new CreateDB(NAME));
+    ok(new Add("x.xml", "<x/>"));
+    ok(new Rename("x.xml", "y.xml"));
+    assertEquals(NAME + "/y.xml", ok(new XQuery("base-uri(.)")));
+    ok(new Rename("/", "a/"));
+    assertEquals(NAME + "/a/y.xml", ok(new XQuery("base-uri(.)")));
+    ok(new Rename("a/", "/"));
+    assertEquals(NAME + "/y.xml", ok(new XQuery("base-uri(.)")));
+    ok(new Rename("/", "a"));
+    assertEquals(NAME + "/a/y.xml", ok(new XQuery("base-uri(.)")));
+    ok(new Rename("a", "/"));
+    assertEquals(NAME + "/y.xml", ok(new XQuery("base-uri(.)")));
   }
 
   /** Command test. */

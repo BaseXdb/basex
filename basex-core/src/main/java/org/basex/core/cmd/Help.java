@@ -18,16 +18,16 @@ import org.basex.core.users.*;
 public final class Help extends Command {
   /**
    * Default constructor.
-   * @param arg optional argument
+   * @param arg argument (can be {@code null})
    */
   public Help(final String arg) {
-    super(Perm.NONE, arg);
+    super(Perm.NONE, arg == null ? "" : arg);
   }
 
   @Override
   protected boolean run() throws IOException {
     final String key = args[0];
-    if(key != null && !key.isEmpty()) {
+    if(!key.isEmpty()) {
       final Cmd cmd = getOption(key, Cmd.class);
       if(cmd == null) return error(UNKNOWN_CMD_X, this);
       out.println(cmd.help(true));

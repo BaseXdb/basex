@@ -4,10 +4,10 @@ import java.io.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.data.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 
 /**
@@ -82,7 +82,7 @@ public final class RunQueries {
     // Create a query processor
     try(QueryProcessor proc = new QueryProcessor(query, context)) {
       // Execute the query
-      Result result = proc.execute();
+      Value result = proc.value();
 
       // Print result as string.
       System.out.println(result);

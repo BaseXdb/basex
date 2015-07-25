@@ -14,6 +14,7 @@ import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.view.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.list.*;
@@ -140,7 +141,7 @@ public final class MapView extends View implements Runnable {
     final int hist = gui.notify.hist;
     final boolean page = !more && rectHist[hist + 1] != null &&
       rectHist[hist + 1].pre == 0 || more && (context.size() != 1 ||
-      focused == null || context.pres[0] != focused.pre);
+      focused == null || context.pre(0) != focused.pre);
     if(page) focused = new MapRect(0, 0, getWidth(), 1);
 
     zoom(more, quick);
@@ -217,7 +218,9 @@ public final class MapView extends View implements Runnable {
       repaint();
     } else {
       zoomStep = ZOOMSIZE;
-      new Thread(this).start();
+      final Thread t = new Thread(this);
+      t.setDaemon(true);
+      t.start();
     }
   }
 
@@ -280,8 +283,8 @@ public final class MapView extends View implements Runnable {
     gui.cursor(CURSORWAIT);
 
     initLen();
-    layout = new MapLayout(nodes.data, textLen, gui.gopts);
-    layout.makeMap(rect, new MapList(nodes.pres.clone()), 0, (int) nodes.size() - 1);
+    layout = new MapLayout(nodes.data(), textLen, gui.gopts);
+    layout.makeMap(rect, new MapList(nodes.pres().clone()), 0, (int) nodes.size() - 1);
     // rectangles are copied to avoid synchronization issues
     mainRects = layout.rectangles.copy();
 

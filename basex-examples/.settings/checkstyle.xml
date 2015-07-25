@@ -26,7 +26,7 @@
     <module name="IllegalImport"/>
     <module name="RedundantImport"/>
     <module name="LineLength">
-      <property name="ignorePattern" value="^import"/>
+      <property name="ignorePattern" value="^(import| \*)"/>
       <property name="max" value="100"/>
       <property name="tabWidth" value="2"/>
     </module>
@@ -50,7 +50,6 @@
     </module>
     <module name="ModifierOrder"/>
     <module name="RedundantModifier"/>
-    <module name="AvoidNestedBlocks"/>
     <module name="EqualsHashCode">
       <property name="severity" value="ignore"/>
       <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>

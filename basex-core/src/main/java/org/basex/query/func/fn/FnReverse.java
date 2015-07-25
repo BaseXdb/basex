@@ -8,7 +8,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.var.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -26,11 +25,9 @@ public final class FnReverse extends StandardFunc {
     final Iter iter = qc.iter(exprs[0]);
     final long s = iter.size();
     if(s == -1) {
-      // estimate result size (could be known in the original expression)
-      final ValueBuilder vb = new ValueBuilder(Math.max((int) exprs[0].size(), 1));
-      for(Item it; (it = iter.next()) != null;) vb.add(it);
-      Array.reverse(vb.items(), 0, (int) vb.size());
-      return vb;
+      final ValueBuilder vb = new ValueBuilder();
+      for(Item it; (it = iter.next()) != null;) vb.addFront(it);
+      return vb.value().iter();
     }
 
     // return iterator if items can be directly accessed
@@ -47,8 +44,7 @@ public final class FnReverse extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value v = exprs[0].value(qc);
-    return v.size() > 1 ? ((Seq) v).reverse() : v;
+    return exprs[0].value(qc).reverse();
   }
 
   @Override

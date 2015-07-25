@@ -87,7 +87,7 @@ public final class User {
   }
 
   /**
-   * Writes permissions to the specified XML file.
+   * Writes permissions to the specified XML builder.
    * @param xml xml builder
    */
   synchronized void write(final XMLBuilder xml) {
@@ -121,7 +121,7 @@ public final class User {
    * Removes local permissions.
    * @param pattern database pattern
    */
-  void remove(final String pattern) {
+  synchronized void remove(final String pattern) {
     locals.remove(pattern);
   }
 
@@ -145,7 +145,7 @@ public final class User {
    * Computes new password hashes.
    * @param password password (plain text)
    */
-  void password(final String password) {
+  synchronized void password(final String password) {
     EnumMap<Code, String> codes = passwords.get(Algorithm.DIGEST);
     codes.put(Code.HASH, digest(name, password));
 
@@ -191,7 +191,7 @@ public final class User {
    * @param db database
    * @return entry, or {@code null}
    */
-  Entry<String, Perm> find(final String db) {
+  synchronized Entry<String, Perm> find(final String db) {
     for(final Entry<String, Perm> entry : locals.entrySet()) {
       if(Databases.regex(entry.getKey()).matcher(db).matches()) return entry;
     }
@@ -201,10 +201,10 @@ public final class User {
   /**
    * Sets the permission.
    * @param prm permission
-   * @param pattern database pattern (can be {@code null})
+   * @param pattern database pattern (can be empty)
    */
-  public void perm(final Perm prm, final String pattern) {
-    if(pattern == null) {
+  public synchronized void perm(final Perm prm, final String pattern) {
+    if(pattern.isEmpty()) {
       perm = prm;
     } else {
       locals.put(pattern, prm);

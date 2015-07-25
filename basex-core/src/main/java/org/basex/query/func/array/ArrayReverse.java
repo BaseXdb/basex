@@ -13,6 +13,6 @@ import org.basex.util.*;
 public final class ArrayReverse extends ArrayFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return toArray(exprs[0], qc).reverse();
+    return toArray(exprs[0], qc).reverseArray();
   }
 }

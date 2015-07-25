@@ -9,13 +9,14 @@ import java.util.regex.*;
 import org.basex.core.*;
 import org.basex.core.Context;
 import org.basex.core.locks.*;
-import org.basex.data.*;
 import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 
 /**
  * This class is an entry point for evaluating XQuery strings.
@@ -45,7 +46,7 @@ public final class QueryProcessor extends Proc implements Closeable {
   public QueryProcessor(final String query, final Context ctx) {
     this.query = query;
     qc = proc(new QueryContext(ctx));
-    sc = new StaticContext(ctx);
+    sc = new StaticContext(qc);
   }
 
   /**
@@ -69,7 +70,8 @@ public final class QueryProcessor extends Proc implements Closeable {
   }
 
   /**
-   * Returns a result iterator.
+   * Returns a memory-efficient result iterator. In most cases, the query will only be fully
+   * evaluated if all items of this iterator are requested.
    * @return result iterator
    * @throws QueryException query exception
    */
@@ -79,7 +81,7 @@ public final class QueryProcessor extends Proc implements Closeable {
   }
 
   /**
-   * Returns a result value.
+   * Evaluates the query and returns the resulting value.
    * @return result value
    * @throws QueryException query exception
    */
@@ -89,13 +91,16 @@ public final class QueryProcessor extends Proc implements Closeable {
   }
 
   /**
-   * Evaluates the specified query and returns the result.
+   * This function is called by the GUI; use {@link #iter()} or {@link #value()} instead.
+   * Caches and returns the result of the specified query. If all nodes are of the same database
+   * instance, the returned value will be of type {@link DBNodes}.
+   * @param max maximum number of results to cache (negative: return all values)
    * @return result of query
    * @throws QueryException query exception
    */
-  public Result execute() throws QueryException {
+  public Value cache(final int max) throws QueryException {
     parse();
-    return qc.execute();
+    return qc.cache(max);
   }
 
   /**
@@ -197,6 +202,16 @@ public final class QueryProcessor extends Proc implements Closeable {
   }
 
   /**
+   * Assigns a URI resolver.
+   * @param resolver resolver
+   * @return self reference
+   */
+  public QueryProcessor uriResolver(final UriResolver resolver) {
+    sc.resolver = resolver;
+    return this;
+  }
+
+  /**
    * Returns a serializer for the given output stream.
    * Optional output declarations within the query will be included in the
    * serializer instance.
@@ -208,7 +223,7 @@ public final class QueryProcessor extends Proc implements Closeable {
   public Serializer getSerializer(final OutputStream os) throws IOException, QueryException {
     compile();
     try {
-      return Serializer.get(os, qc.serParams());
+      return Serializer.get(os, qc.serParams()).sc(sc);
     } catch(final QueryIOException ex) {
       throw ex.getCause();
     }

@@ -1,7 +1,6 @@
 package org.basex.query.up.primitives.node;
 
 import org.basex.data.*;
-import org.basex.data.atomic.*;
 import org.basex.query.up.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.util.*;
@@ -46,8 +45,7 @@ abstract class NodeCopy extends NodeUpdate {
     // build main memory representation of nodes to be copied
     final int start = tmp.meta.size;
     new DataBuilder(tmp).build(list);
-    insseq = new DataClip(tmp, start, tmp.meta.size);
-    insseq.fragments = list.size();
+    insseq = new DataClip(tmp, start, tmp.meta.size, list.size());
   }
 
   /**
@@ -57,16 +55,15 @@ abstract class NodeCopy extends NodeUpdate {
    */
   final void add(final NamePool pool) {
     final Data d = insseq.data;
-    final int ps = insseq.start;
-    final int pe = insseq.end;
-    for(int p = ps; p < pe; ++p) {
-      final int k = d.kind(p);
-      if(k != Data.ATTR && k != Data.ELEM) continue;
-      if(p > ps && d.parent(p, k) >= ps) break;
-      final int u = d.uri(p, k);
-      final QNm qnm = new QNm(d.name(p, k));
-      if(u != 0) qnm.uri(d.nspaces.uri(u));
-      pool.add(qnm, ANode.type(k));
+    final int s = insseq.start, e = insseq.end;
+    for(int p = s; p < e; ++p) {
+      final int kind = d.kind(p);
+      if(kind != Data.ATTR && kind != Data.ELEM) continue;
+      if(p > s && d.parent(p, kind) >= s) break;
+      final int uriId = d.uriId(p, kind);
+      final QNm qnm = new QNm(d.name(p, kind));
+      if(uriId != 0) qnm.uri(d.nspaces.uri(uriId));
+      pool.add(qnm, ANode.type(kind));
     }
   }
 

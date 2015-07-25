@@ -63,7 +63,7 @@ public final class PathTest extends SandboxTest {
   public void documentTestInput() throws Exception {
     final String count = "count(collection('" + INPUT + "/input'))";
     try(final QueryProcessor qp = new QueryProcessor(count, context)) {
-      assertEquals(1, Integer.parseInt(qp.execute().toString()));
+      assertEquals(1, Integer.parseInt(qp.value().serialize().toString()));
     }
   }
 
@@ -75,7 +75,7 @@ public final class PathTest extends SandboxTest {
   public void documentTestWeek() throws Exception {
     final String count = "count(collection('" + WEEK1 + "/week/monday'))";
     try(final QueryProcessor qp = new QueryProcessor(count, context)) {
-      assertEquals(3, Integer.parseInt(qp.execute().toString()));
+      assertEquals(3, Integer.parseInt(qp.value().serialize().toString()));
     }
   }
 
@@ -100,7 +100,7 @@ public final class PathTest extends SandboxTest {
     path.write(Token.token("<a/>"));
     context.options.set(MainOptions.PARSER, MainParser.JSON);
     try(final QueryProcessor qp = new QueryProcessor("doc('" + path + "')", context)) {
-      assertEquals("<a/>", qp.execute().toString());
+      assertEquals("<a/>", qp.value().serialize().toString());
     }
   }
 
@@ -125,13 +125,13 @@ public final class PathTest extends SandboxTest {
     final String count = "count(collection('" + WEEK1 +
       "/week/monday')/root/monday/text[text() = 'text'])";
     try(final QueryProcessor qp = new QueryProcessor(count, context)) {
-      assertEquals(3, Integer.parseInt(qp.execute().toString()));
+      assertEquals(3, Integer.parseInt(qp.value().serialize().toString()));
     }
     // cross-check
     final String count2 = "count(collection('" + WEEK1 +
       "/week')/root/monday/text[text() = 'text'])";
     try(final QueryProcessor qp2 = new QueryProcessor(count2, context)) {
-      assertEquals(4, Integer.parseInt(qp2.execute().toString()));
+      assertEquals(4, Integer.parseInt(qp2.value().serialize().toString()));
     }
   }
 
@@ -144,7 +144,7 @@ public final class PathTest extends SandboxTest {
       " count(collection('" + WEEK2 +
       "/week/tuesday')/root/monday/text[text() = 'text']) ";
     try(final QueryProcessor qp = new QueryProcessor(count, context)) {
-      assertEquals("3\n1", normNL(qp.execute()));
+      assertEquals("3\n1", normNL(qp.value().serialize().toString()));
     }
   }
 }

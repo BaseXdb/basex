@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.nio.charset.*;
+import java.util.*;
 
 import org.basex.build.csv.*;
 import org.basex.build.csv.CsvOptions.CsvFormat;
@@ -17,6 +18,7 @@ import org.basex.io.serial.csv.*;
 import org.basex.io.serial.json.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.ft.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -32,11 +34,11 @@ import org.basex.util.list.*;
  */
 public abstract class Serializer implements Closeable {
   /** Stack with names of opened elements. */
-  protected final TokenList elems = new TokenList();
+  protected final Stack<QNm> elems = new Stack<>();
   /** Current level. */
   protected int level;
   /** Current element name. */
-  protected byte[] elem;
+  protected QNm elem;
   /** Indentation flag. */
   protected boolean indent;
 
@@ -45,6 +47,8 @@ public abstract class Serializer implements Closeable {
   /** Stack with namespace size pointers. */
   private final IntList nstack = new IntList();
 
+  /** Static context. */
+  protected StaticContext sc;
   /** Indicates if more than one item was serialized. */
   protected boolean more;
   /** Indicates if an element is currently being opened. */
@@ -99,9 +103,10 @@ public abstract class Serializer implements Closeable {
                : new CsvDirectSerializer(po, so);
       case JSON:
         final JsonSerialOptions jopts = so.get(SerializerOptions.JSON);
-        return jopts.get(JsonOptions.FORMAT) == JsonFormat.JSONML
-               ? new JsonMLSerializer(po, so)
-               : new JsonNodeSerializer(po, so);
+        final JsonFormat jformat = jopts.get(JsonOptions.FORMAT);
+        return jformat == JsonFormat.JSONML ? new JsonMLSerializer(po, so) :
+               jformat == JsonFormat.BASIC  ? new JsonBasicSerializer(po, so) :
+               new JsonNodeSerializer(po, so);
       case XML:
         return new XMLSerializer(po, so);
       default:
@@ -147,6 +152,16 @@ public abstract class Serializer implements Closeable {
    */
   public void reset() { }
 
+  /**
+   * Assigns the static context.
+   * @param sctx static context
+   * @return serializer
+   */
+  public Serializer sc(final StaticContext sctx) {
+    sc = sctx;
+    return this;
+  }
+
   // PROTECTED METHODS ==================================================================
 
   /**
@@ -178,7 +193,7 @@ public abstract class Serializer implements Closeable {
       } else {
         // serialize elements (code will never be called for attributes)
         final QNm name = node.qname();
-        openElement(name.string());
+        openElement(name);
 
         // serialize declared namespaces
         final Atts nsp = node.namespaces();
@@ -188,8 +203,8 @@ public abstract class Serializer implements Closeable {
 
         // serialize attributes
         final boolean i = indent;
-        AxisMoreIter ai = node.attributes();
-        for(ANode nd; (nd = ai.next()) != null;) {
+        BasicNodeIter iter = node.attributes();
+        for(ANode nd; (nd = iter.next()) != null;) {
           final byte[] n = nd.name();
           final byte[] v = nd.string();
           attribute(n, v, false);
@@ -197,8 +212,8 @@ public abstract class Serializer implements Closeable {
         }
 
         // serialize children
-        ai = node.children();
-        for(ANode n; (n = ai.next()) != null;) node(n);
+        iter = node.children();
+        for(ANode n; (n = iter.next()) != null;) node(n);
         closeElement();
         indent = i;
       }
@@ -210,7 +225,7 @@ public abstract class Serializer implements Closeable {
    * @param name element name
    * @throws IOException I/O exception
    */
-  protected final void openElement(final byte[] name) throws IOException {
+  protected final void openElement(final QNm name) throws IOException {
     prepare();
     opening = true;
     elem = name;
@@ -228,9 +243,10 @@ public abstract class Serializer implements Closeable {
       finishEmpty();
       opening = false;
     } else {
-      elem = elems.pop();
+      elem = elems.peek();
       level--;
       finishClose();
+      elems.pop();
     }
   }
 
@@ -305,7 +321,7 @@ public abstract class Serializer implements Closeable {
    * @throws IOException I/O exception
    */
   @SuppressWarnings("unused")
-  protected void startOpen(final byte[] name) throws IOException { }
+  protected void startOpen(final QNm name) throws IOException { }
 
   /**
    * Finishes an opening element node.
@@ -379,21 +395,21 @@ public abstract class Serializer implements Closeable {
    */
   private void node(final DBNode node) throws IOException {
     final FTPosData ft = node instanceof FTPosNode ? ((FTPosNode) node).ftpos : null;
-    final Data data = node.data;
-    int p = node.pre;
-    int k = data.kind(p);
-    if(k == Data.ATTR) throw SERATTR_X.getIO(node);
+    final Data data = node.data();
+    int pre = node.pre();
+    int kind = data.kind(pre);
+    if(kind == Data.ATTR) throw SERATTR_X.getIO(node);
 
     boolean doc = false;
-    final TokenSet nsp = data.nspaces.size() == 0 ? null : new TokenSet();
+    final TokenSet nsp = data.nspaces.isEmpty() ? null : new TokenSet();
     final IntList pars = new IntList();
     final BoolList indt = new BoolList();
 
     // loop through all table entries
-    final int s = p + data.size(p, k);
-    while(p < s && !finished()) {
-      k = data.kind(p);
-      final int r = data.parent(p, k);
+    final int s = pre + data.size(pre, kind);
+    while(pre < s && !finished()) {
+      kind = data.kind(pre);
+      final int r = data.parent(pre, kind);
 
       // close opened elements...
       while(!pars.isEmpty() && pars.peek() >= r) {
@@ -402,35 +418,35 @@ public abstract class Serializer implements Closeable {
         pars.pop();
       }
 
-      if(k == Data.DOC) {
+      if(kind == Data.DOC) {
         if(doc) closeDoc();
-        openDoc(data.text(p++, true));
+        openDoc(data.text(pre++, true));
         doc = true;
-      } else if(k == Data.TEXT) {
-        prepareText(data.text(p, true), ft != null ? ft.get(data, p) : null);
-        p++;
-      } else if(k == Data.COMM) {
-        prepareComment(data.text(p++, true));
+      } else if(kind == Data.TEXT) {
+        prepareText(data.text(pre, true), ft != null ? ft.get(data, pre) : null);
+        pre++;
+      } else if(kind == Data.COMM) {
+        prepareComment(data.text(pre++, true));
       } else {
-        if(k == Data.PI) {
-          preparePi(data.name(p, Data.PI), data.atom(p++));
+        if(kind == Data.PI) {
+          preparePi(data.name(pre, Data.PI), data.atom(pre++));
         } else {
           // add element node
-          final byte[] name = data.name(p, k);
-          openElement(name);
+          final byte[] name = data.name(pre, kind);
+          final byte[] uri = data.nspaces.uri(data.uriId(pre, kind));
+          openElement(new QNm(name, uri));
 
           // add namespace definitions
           if(nsp != null) {
             // add namespaces from database
             nsp.clear();
-            int pp = p;
+            int pp = pre;
 
             // check namespace of current element
-            final byte[] u = data.nspaces.uri(data.uri(p, k));
-            namespace(prefix(name), u == null ? EMPTY : u, false);
+            namespace(prefix(name), uri == null ? EMPTY : uri, false);
 
             do {
-              final Atts ns = data.ns(pp);
+              final Atts ns = data.namespaces(pp);
               final int nl = ns.size();
               for(int n = 0; n < nl; n++) {
                 final byte[] pref = ns.name(n);
@@ -445,10 +461,10 @@ public abstract class Serializer implements Closeable {
 
           // serialize attributes
           indt.push(indent);
-          final int as = p + data.attSize(p, k);
-          while(++p != as) {
-            final byte[] n = data.name(p, Data.ATTR);
-            final byte[] v = data.text(p, false);
+          final int as = pre + data.attSize(pre, kind);
+          while(++pre != as) {
+            final byte[] n = data.name(pre, Data.ATTR);
+            final byte[] v = data.text(pre, false);
             attribute(n, v, false);
             if(eq(n, XML_SPACE) && indent) indent = !eq(v, PRESERVE);
           }

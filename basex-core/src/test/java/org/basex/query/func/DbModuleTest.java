@@ -189,7 +189,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
     query(xmlCall + "/@raw/data()", "false");
     query(xmlCall + "/@content-type/data()", MediaType.APPLICATION_XML.toString());
     query(xmlCall + "/@modified-date/xs:dateTime(.)");
-    query(xmlCall + "/@size/data()", "");
+    query(xmlCall + "/@size/data()", "2");
     query(xmlCall + "/text()", "xml");
 
     final String rawCall = _DB_LIST_DETAILS.args(NAME, "raw");
@@ -212,6 +212,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
     new CreateBackup(NAME).execute(context);
     query(COUNT.args(_DB_BACKUPS.args()), "1");
     query(COUNT.args(_DB_BACKUPS.args(NAME)), "1");
+    query(COUNT.args(_DB_BACKUPS.args(NAME) + "/(@database, @date, @size)"), "3");
     query(COUNT.args(_DB_BACKUPS.args(NAME + 'X')), "0");
     new DropBackup(NAME).execute(context);
     query(COUNT.args(_DB_BACKUPS.args(NAME)), "0");
@@ -246,12 +247,6 @@ public final class DbModuleTest extends AdvancedQueryTest {
 
   /** Test method. */
   @Test
-  public void event() {
-    error(_DB_EVENT.args("X", "Y"), BXDB_EVENT_X);
-  }
-
-  /** Test method. */
-  @Test
   public void output() {
     query(_DB_OUTPUT.args("x"), "x");
     query(_DB_OUTPUT.args("('x','y')"), "x\ny");
@@ -259,6 +254,13 @@ public final class DbModuleTest extends AdvancedQueryTest {
     error(_DB_OUTPUT.args("x") + ",1", UPALL_X);
     error(_DB_OUTPUT.args(" count#1"), FISTRING_X);
     error("copy $c := <a/> modify " + _DB_OUTPUT.args("x") + " return $c", BASX_DBTRANSFORM);
+  }
+
+  /** Test method. */
+  @Test
+  public void outputCache() {
+    query(_DB_OUTPUT_CACHE.args(), "");
+    query(_DB_OUTPUT.args("x") + ',' + _DB_OUTPUT.args(_DB_OUTPUT_CACHE.args()), "x\nx");
   }
 
   /** Test method. */
@@ -687,6 +689,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
   public void path() {
     query(_DB_PATH.args(_DB_OPEN.args(NAME)), FILE.replaceAll(".*/", ""));
     query(_DB_PATH.args(_DB_OPEN.args(NAME) + "/*"), FILE.replaceAll(".*/", ""));
+    query(_DB_PATH.args("<x/> update ()"), "");
   }
 
   /**

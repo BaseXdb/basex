@@ -133,7 +133,7 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
    * The deletion of keys will lead to empty entries. If {@link #size} is called after
    * deletions, the original number of entries will be returned.
    * @param key key
-   * @return deleted key or 0
+   * @return id of the deleted key, or {@code 0} if the key did not exist
    */
   public int delete(final byte[] key) {
     final int b = Token.hash(key) & buckets.length - 1;

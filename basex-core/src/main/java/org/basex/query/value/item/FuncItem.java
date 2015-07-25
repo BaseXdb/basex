@@ -157,7 +157,7 @@ public final class FuncItem extends FItem implements Scope {
   public FItem coerceTo(final FuncType ft, final QueryContext qc, final InputInfo ii,
       final boolean opt) throws QueryException {
 
-    if(params.length != ft.argTypes.length) throw castError(ii, this, ft);
+    if(params.length != ft.argTypes.length) throw INVPROMOTE_X_X_X.get(ii, seqType(), ft, this);
     final FuncType tp = funcType();
     if(tp.instanceOf(ft)) return this;
 

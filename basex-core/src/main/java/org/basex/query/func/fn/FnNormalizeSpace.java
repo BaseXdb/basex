@@ -16,7 +16,7 @@ import org.basex.util.*;
 public final class FnNormalizeSpace extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Str.get(Token.normalize(toEmptyToken(arg(0, qc), qc)));
+    return Str.get(Token.normalize(toEmptyToken(ctxArg(0, qc), qc)));
   }
 
   @Override

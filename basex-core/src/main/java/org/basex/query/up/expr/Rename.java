@@ -72,7 +72,7 @@ public final class Rename extends Update {
 
     final Updates updates = qc.resources.updates();
     final DBNode dbn = updates.determineDataRef(targ, qc);
-    updates.add(new RenameNode(dbn.pre, dbn.data, info, rename), qc);
+    updates.add(new RenameNode(dbn.pre(), dbn.data(), info, rename), qc);
     return null;
   }
 

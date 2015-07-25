@@ -8,6 +8,7 @@ import org.basex.core.*;
 import org.basex.core.locks.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -28,10 +29,10 @@ public final class Open extends Command {
   /**
    * Default constructor.
    * @param name name of database
-   * @param path database path
+   * @param path database path (can be {@code null})
    */
   public Open(final String name, final String path) {
-    super(Perm.NONE, name, path);
+    super(Perm.NONE, name, path == null ? "" : path);
   }
 
   @Override
@@ -48,7 +49,7 @@ public final class Open extends Command {
         context.openDB(data);
 
         final String path = args[1];
-        if(path != null && !path.isEmpty()) {
+        if(!path.isEmpty()) {
           context.current(new DBNodes(data, data.resources.docs(path).toArray()));
         }
         if(data.meta.oldindex()) info(H_INDEX_FORMAT);

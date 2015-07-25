@@ -26,7 +26,7 @@ public final class ArraySliceTest {
           final Array sub = arr.subArray(pos, k);
           assertEquals(k, sub.arraySize());
           sub.checkInvariants();
-          final Iterator<Value> iter = sub.members();
+          final Iterator<Value> iter = sub.iterator(0);
           for(int i = 0; i < k; i++) {
             final long res = ((Int) iter.next()).itr();
             if(res != pos + i) {

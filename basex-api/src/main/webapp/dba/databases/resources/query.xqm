@@ -16,11 +16,10 @@ import module namespace util = 'dba/util' at '../../modules/util.xqm';
  : @return result string
  :)
 declare
-  %rest:POST
-  %rest:path("dba/query-resource")
+  %rest:POST("{$query}")
+  %rest:path("/dba/query-resource")
   %rest:query-param("name",     "{$name}")
   %rest:query-param("resource", "{$resource}")
-  %rest:query-param("query",    "{$query}")
   %output:method("text")
 function _:query-resource(
   $name      as xs:string,
@@ -28,7 +27,6 @@ function _:query-resource(
   $query     as xs:string
 ) as xs:string {
   cons:check(),
-  let $limit := $cons:MAX-CHARS
   let $query := if($query) then $query else '.'
   return util:query($query, "'': db:open($name, $resource)", map {
     'name': $name, 'resource': $resource

@@ -12,7 +12,6 @@ import javax.swing.*;
 
 import org.basex.core.*;
 import org.basex.core.parse.*;
-import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXFileChooser.Mode;
@@ -22,6 +21,8 @@ import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
+import org.basex.query.value.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -158,27 +159,27 @@ public final class TextView extends View {
   /**
    * Caches the output.
    * @param out cached output
-   * @param c command
-   * @param r result
+   * @param command command
+   * @param result result
    * @throws QueryException query exception
    */
-  public void cache(final ArrayOutput out, final Command c, final Result r)
+  public void cache(final ArrayOutput out, final Command command, final Value result)
       throws QueryException {
 
     // cache command or node set
     cmd = null;
     ns = null;
 
-    final int mh = gui.context.options.get(MainOptions.MAXHITS);
+    final int mh = gui.gopts.get(GUIOptions.MAXRESULTS);
     boolean parse = false;
-    if(mh >= 0 && r != null && r.size() >= mh) {
+    if(mh >= 0 && result != null && result.size() >= mh) {
       parse = true;
     } else if(out.finished()) {
-      if(r instanceof DBNodes) ns = (DBNodes) r;
+      if(result instanceof DBNodes) ns = (DBNodes) result;
       else parse = true;
     }
     // create new command instance
-    if(parse) cmd = new CommandParser(c.toString(), gui.context).parseSingle();
+    if(parse) cmd = new CommandParser(command.toString(), gui.context).parseSingle();
   }
 
   /**
@@ -209,11 +210,6 @@ public final class TextView extends View {
     gui.gopts.set(GUIOptions.WORKPATH, file.path());
 
     gui.cursor(CURSORWAIT, true);
-    final MainOptions opts = gui.context.options;
-    final int mh = opts.get(MainOptions.MAXHITS);
-    opts.set(MainOptions.MAXHITS, -1);
-    opts.set(MainOptions.CACHEQUERY, false);
-
     try(final PrintOutput out = new PrintOutput(file.toString())) {
       if(cmd != null) {
         cmd.execute(gui.context, out);
@@ -225,8 +221,6 @@ public final class TextView extends View {
     } catch(final IOException ex) {
       BaseXDialog.error(gui, Util.info(FILE_NOT_SAVED_X, file));
     } finally {
-      opts.set(MainOptions.MAXHITS, mh);
-      opts.set(MainOptions.CACHEQUERY, true);
       gui.cursor(CURSORARROW, true);
     }
   }

@@ -20,7 +20,7 @@ public final class DbNodePre extends StandardFunc {
       @Override
       public Int next() throws QueryException {
         final Item it = ir.next();
-        return it == null ? null : Int.get(toDBNode(it).pre);
+        return it == null ? null : Int.get(toDBNode(it).pre());
       }
     };
   }

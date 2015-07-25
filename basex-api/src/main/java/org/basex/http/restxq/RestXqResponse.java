@@ -96,9 +96,9 @@ final class RestXqResponse {
       query.context.unregister(query);
 
       if(redirect != null) {
-        http.res.sendRedirect(redirect);
+        http.redirect(redirect);
       } else if(forward != null) {
-        http.req.getRequestDispatcher(forward).forward(http.req, http.res);
+        http.forward(forward);
       } else if(response != null) {
         if(response.status != 0) http.status(response.status, response.message, response.error);
         final byte[] out = response.cache.finish();

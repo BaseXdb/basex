@@ -8,6 +8,7 @@ import java.util.zip.*;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
@@ -21,9 +22,14 @@ import org.basex.util.list.*;
 public class ArchiveExtractBinary extends ArchiveFn {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
+    return value(qc).iter();
+  }
+
+  @Override
+  public Value value(final QueryContext qc) throws QueryException {
     final ValueBuilder vb = new ValueBuilder();
     for(final byte[] b : extract(qc)) vb.add(new B64(b));
-    return vb;
+    return vb.value();
   }
 
   /**

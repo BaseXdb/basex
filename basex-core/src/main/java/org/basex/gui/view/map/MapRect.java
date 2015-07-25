@@ -1,7 +1,7 @@
 package org.basex.gui.view.map;
 
-import org.basex.data.*;
 import org.basex.gui.view.*;
+import org.basex.query.util.ft.*;
 
 /**
  * View rectangle.

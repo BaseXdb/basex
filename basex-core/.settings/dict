@@ -277,9 +277,6 @@ unzip
 payload
 credentials
 xslt
-unwatches
-unwatching
-unwatch
 username
 aaron
 donovan
@@ -349,3 +346,8 @@ ignorable
 javascript
 inlineable
 autoflush
+soundex
+resizable
+updatable
+uris
+dist

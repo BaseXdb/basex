@@ -3,6 +3,7 @@ package org.basex;
 import static org.basex.core.Text.*;
 
 import java.io.*;
+import java.net.*;
 
 import org.basex.api.client.*;
 import org.basex.core.*;
@@ -57,6 +58,13 @@ public final class BaseXClient extends BaseX {
       Util.out(PASSWORD + COLS);
       pass = Util.password();
     }
-    return new ClientSession(context, user, pass, out);
+
+    final String host = context.soptions.get(StaticOptions.HOST);
+    final int port = context.soptions.get(StaticOptions.PORT);
+    try {
+      return new ClientSession(host, port, user, pass, out);
+    } catch(final ConnectException ex) {
+      throw new BaseXException(CONNECTION_ERROR_X, port);
+    }
   }
 }

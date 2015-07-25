@@ -132,7 +132,7 @@ public final class Array {
   }
 
   /**
-   * Sorts the specified tokens and returns an integer array with offsets to the sorted tokens.
+   * Sorts the specified tokens and returns an array with offsets to the sorted array.
    * @param values values to sort by
    * @param numeric numeric sort
    * @param ascending ascending
@@ -146,7 +146,7 @@ public final class Array {
   }
 
   /**
-   * Sorts the specified doubles and returns an integer array with offsets to the sorted doubles.
+   * Sorts the specified double values and returns an array with offsets to the sorted array.
    * @param values values to sort by
    * @param ascending ascending
    * @return array containing the order
@@ -158,12 +158,24 @@ public final class Array {
   }
 
   /**
-   * Sorts the specified integers and returns an integer array with offsets to the sorted integers.
+   * Sorts the specified int values and returns an array with offsets to the sorted array.
    * @param values values to sort by
    * @param ascending ascending
    * @return array containing the order
    */
   public static int[] createOrder(final int[] values, final boolean ascending) {
+    final IntList il = number(values.length);
+    il.sort(values, ascending);
+    return il.finish();
+  }
+
+  /**
+   * Sorts the specified long values and returns an array with offsets to the sorted array.
+   * @param values values to sort by
+   * @param ascending ascending
+   * @return array containing the order
+   */
+  public static int[] createOrder(final long[] values, final boolean ascending) {
     final IntList il = number(values.length);
     il.sort(values, ascending);
     return il.finish();

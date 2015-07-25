@@ -6,10 +6,10 @@ import org.basex.query.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 
@@ -55,11 +55,11 @@ public abstract class Filter extends Preds {
   private static Expr path(final Expr root, final Expr... preds) {
     // no predicates: return root
     if(preds.length == 0) return root;
-    // axis path
+    // axis path: attach predicates to last step
     if(root instanceof AxisPath) {
-      // predicate must not be numeric
+      // predicates must not be numeric: (//x)[1] != //x[1]
       for(final Expr pred : preds) {
-        if(pred.seqType().mayBeNumber() || pred.has(Flag.FCS)) return null;
+        if(pred.seqType().mayBeNumber() || pred.has(Flag.POS)) return null;
       }
       return ((AxisPath) root).addPreds(preds);
     }
@@ -131,14 +131,14 @@ public abstract class Filter extends Preds {
     if(ex != null) return ex.optimize(qc, scp);
 
     // try to rewrite filter to index access
-    if(root instanceof Context || root instanceof Value && root.data() != null) {
+    if(root instanceof ContextValue || root instanceof Value && root.data() != null) {
       final Path ip = Path.get(info, root, Step.get(info, SELF, Test.NOD, preds));
       final Expr ie = ip.index(qc, Path.initial(qc, root));
       if(ie != ip) return ie;
     }
 
     // no numeric predicates.. use simple iterator
-    if(!super.has(Flag.FCS)) return copyType(new IterFilter(info, root, preds));
+    if(!super.has(Flag.POS)) return copyType(new IterFilter(info, root, preds));
 
     // evaluate positional predicates
     Expr e = root;
@@ -152,7 +152,7 @@ public abstract class Filter extends Preds {
       if(last) {
         if(e.isValue()) {
           // return sub-sequence
-          e = SubSeq.get((Value) e, e.size() - 1, 1);
+          e = FnSubsequence.eval((Value) e, e.size(), 1);
         } else {
           // rewrite positional predicate to basex:last-from
           e = Function._BASEX_LAST_FROM.get(null, info, e);
@@ -161,7 +161,7 @@ public abstract class Filter extends Preds {
       } else if(pos != null) {
         if(e.isValue()) {
           // return sub-sequence
-          e = SubSeq.get((Value) e, pos.min - 1, pos.max - pos.min + 1);
+          e = FnSubsequence.eval((Value) e, pos.min, pos.max - pos.min + 1);
         } else if(pos.min == pos.max) {
           // example: expr[pos] -> basex:item-at(expr, pos.min)
           e = Function._BASEX_ITEM_AT.get(null, info, e, Int.get(pos.min));

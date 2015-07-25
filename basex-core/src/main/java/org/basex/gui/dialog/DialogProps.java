@@ -125,7 +125,7 @@ public final class DialogProps extends BaseXDialog {
 
     final String db = InfoDB.db(data.meta, true, false, true);
     final TokenBuilder info = new TokenBuilder(db);
-    if(data.nspaces.size() != 0) {
+    if(!data.nspaces.isEmpty()) {
       info.bold().add(NL + NAMESPACES + NL).norm().add(data.nspaces.info());
     }
 

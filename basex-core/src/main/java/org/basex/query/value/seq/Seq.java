@@ -8,6 +8,7 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.tree.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -19,13 +20,13 @@ import org.basex.util.*;
  */
 public abstract class Seq extends Value {
   /** Length. */
-  final long size;
+  protected final long size;
 
   /**
    * Constructor.
    * @param size size
    */
-  Seq(final long size) {
+  protected Seq(final long size) {
     this(size, AtomType.ITEM);
   }
 
@@ -34,39 +35,9 @@ public abstract class Seq extends Value {
    * @param size size
    * @param type type
    */
-  Seq(final long size, final Type type) {
+  protected Seq(final long size, final Type type) {
     super(type);
     this.size = size;
-  }
-
-  /**
-   * Returns a value representation of the specified items.
-   * @param value value
-   * @return resulting item or sequence
-   */
-  public static Value get(final Item[] value) {
-    return get(value, value.length);
-  }
-
-  /**
-   * Returns a value representation of the specified items.
-   * @param value value
-   * @param size size
-   * @return resulting item or sequence
-   */
-  public static Value get(final Item[] value, final int size) {
-    return get(value, size, null);
-  }
-
-  /**
-   * Returns a value representation of the specified items.
-   * @param value value
-   * @param size size
-   * @param type sequence type
-   * @return resulting item or sequence
-   */
-  public static Value get(final Item[] value, final int size, final Type type) {
-    return size == 0 ? Empty.SEQ : size == 1 ? value[0] : new ItemSeq(value, size, type);
   }
 
   @Override
@@ -82,6 +53,11 @@ public abstract class Seq extends Value {
   }
 
   @Override
+  public final boolean isEmpty() {
+    return false;
+  }
+
+  @Override
   public final Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     throw SEQFOUND_X.get(ii, this);
   }
@@ -92,7 +68,7 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  public final ValueIter iter() {
+  public ValueIter iter() {
     return new ValueIter() {
       int c;
       @Override
@@ -104,6 +80,67 @@ public abstract class Seq extends Value {
       @Override
       public Value value() { return Seq.this; }
     };
+  }
+
+  @Override
+  public Value subSeq(final long start, final long len) {
+    return len == 0   ? Empty.SEQ
+         : len == 1   ? itemAt(start)
+         : len < size ? new SubSeq(this, start, len)
+                      : this;
+  }
+
+  /**
+   * Inserts a value at the given position into this sequence and returns the resulting sequence.
+   * @param pos position at which the value should be inserted, must be between 0 and {@link #size}
+   * @param val value to insert
+   * @return resulting value
+   */
+  public Value insertBefore(final long pos, final Value val) {
+    final long n = val.size();
+    return n == 1 ? insert(pos, (Item) val) : copyInsert(pos, val);
+  }
+
+  /**
+   * Inserts an item at the given position into this sequence and returns the resulting sequence.
+   * @param pos position at which the item should be inserted, must be between 0 and {@link #size}
+   * @param val value to insert
+   * @return resulting value
+   */
+  public abstract Value insert(final long pos, final Item val);
+
+  /**
+   * Helper for {@link #insertBefore(long, Value)} that copies all items into a {@link TreeSeq}.
+   * @param pos position at which the value should be inserted, must be between 0 and {@link #size}
+   * @param val value to insert
+   * @return resulting value
+   */
+  final Value copyInsert(final long pos, final Value val) {
+    if(val.isEmpty()) return this;
+    final ValueBuilder vb = new ValueBuilder();
+    for(long i = 0; i < pos; i++) vb.add(itemAt(i));
+    vb.add(val);
+    for(long i = pos; i < size; i++) vb.add(itemAt(i));
+    return vb.value(type);
+  }
+
+  /**
+   * Removes the item at the given position in this sequence and returns the resulting sequence.
+   * @param pos position of the item to remove, must be between 0 and {@link #size} - 1
+   * @return resulting sequence
+   */
+  public abstract Value remove(final long pos);
+
+  /**
+   * Helper for {@link #remove(long)} that copies all items into a {@link TreeSeq}.
+   * @param pos position of the item to remove, must be between 0 and {@link #size} - 1
+   * @return resulting sequence
+   */
+  final Value copyRemove(final long pos) {
+    final ValueBuilder vb = new ValueBuilder();
+    for(long i = 0; i < pos; i++) vb.add(itemAt(i));
+    for(long i = pos + 1; i < size; i++) vb.add(itemAt(i));
+    return vb.value(type);
   }
 
   @Override
@@ -121,12 +158,6 @@ public abstract class Seq extends Value {
   public final Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
     throw SEQFOUND_X.get(ii, this);
   }
-
-  /**
-   * Returns a sequence in reverse order.
-   * @return sequence
-   */
-  public abstract Value reverse();
 
   @Override
   public void plan(final FElem plan) {

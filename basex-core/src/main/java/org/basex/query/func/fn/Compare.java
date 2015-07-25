@@ -117,9 +117,9 @@ public final class Compare {
 
       ANode s1 = (ANode) it1, s2 = (ANode) it2;
       if(s1.is(s2)) continue;
-      AxisIter ch1 = s1.children(), ch2 = s2.children();
+      BasicNodeIter ch1 = s1.children(), ch2 = s2.children();
 
-      final Stack<AxisIter> stack = new Stack<>();
+      final Stack<BasicNodeIter> stack = new Stack<>();
       stack.push(ch1);
       stack.push(ch2);
 
@@ -163,12 +163,12 @@ public final class Compare {
             if(s1.attributes().value().size() != s2.attributes().value().size()) return false;
 
             // compare names, values and prefixes
-            final AxisIter ai1 = s1.attributes();
+            final BasicNodeIter ir1 = s1.attributes();
             LOOP:
-            for(ANode a1; (a1 = ai1.next()) != null;) {
+            for(ANode a1; (a1 = ir1.next()) != null;) {
               n1 = a1.qname();
-              final AxisIter ai2 = s2.attributes();
-              for(ANode a2; (a2 = ai2.next()) != null;) {
+              final BasicNodeIter ir2 = s2.attributes();
+              for(ANode a2; (a2 = ir2.next()) != null;) {
                 n2 = a2.qname();
                 if(!n1.eq(n2)) continue;
                 if(flags.contains(Mode.NAMESPACES) && !eq(n1.prefix(), n2.prefix()) ||

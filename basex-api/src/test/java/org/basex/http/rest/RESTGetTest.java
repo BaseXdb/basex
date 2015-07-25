@@ -116,9 +116,7 @@ public final class RESTGetTest extends RESTTest {
    */
   @Test
   public void queryOption() throws IOException {
-    assertEquals("2",
-        get("?query=2,delete+node+<a/>&" + MainOptions.MIXUPDATES.name() + "=true")
-    );
+    assertEquals("2", get("?query=2,delete+node+<a/>&" + MainOptions.MIXUPDATES.name() + "=true"));
     try {
       get("?query=1,delete+node+<a/>&" + MainOptions.MIXUPDATES.name() + "=false");
       fail("Error expected.");

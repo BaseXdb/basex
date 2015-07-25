@@ -134,7 +134,7 @@ final class DialogGeneralPrefs extends BaseXBack {
    * @return maximum number of hits
    */
   private int hitsForSlider() {
-    int mh = gui.gopts.get(MainOptions.MAXHITS);
+    int mh = gui.gopts.get(GUIOptions.MAXRESULTS);
     if(mh == -1) mh = Integer.MAX_VALUE;
     final int hl = HITS.length - 1;
     int h = -1;
@@ -178,7 +178,7 @@ final class DialogGeneralPrefs extends BaseXBack {
     }
     opts.set(StaticOptions.LANG, lang.getSelectedItem());
 
-    gui.gopts.set(GUIOptions.MAXHITS, HITS[limit.getValue()]);
+    gui.gopts.set(GUIOptions.MAXRESULTS, HITS[limit.getValue()]);
 
     creds.setText(TRANSLATION + COLS + creds(lang.getSelectedItem()));
     final int mh = HITS[limit.getValue()];

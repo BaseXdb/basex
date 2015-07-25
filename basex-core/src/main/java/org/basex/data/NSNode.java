@@ -8,6 +8,8 @@ import java.util.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.util.*;
+import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * This class stores a single namespace node.
@@ -16,25 +18,25 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 final class NSNode {
-  /** Children. */
-  NSNode[] children;
+  /** Child nodes. */
+  private NSNode[] nodes;
   /** Number of children. */
-  int sz;
+  private int size;
   /** Parent node. */
-  NSNode parent;
-  /** References to Prefix/URI pairs. */
-  int[] values;
+  private NSNode parent;
+  /** Dense array with ids of prefix/namespace uri pairs. */
+  private int[] values;
   /** Pre value. */
-  int pr;
+  private int pre;
 
   /**
    * Default constructor.
    * @param pre pre value
    */
   NSNode(final int pre) {
+    this.pre = pre;
     values = new int[0];
-    children = new NSNode[0];
-    pr = pre;
+    nodes = new NSNode[0];
   }
 
   /**
@@ -45,11 +47,11 @@ final class NSNode {
    */
   NSNode(final DataInput in, final NSNode parent) throws IOException {
     this.parent = parent;
-    pr = in.readNum();
+    pre = in.readNum();
     values = in.readNums();
-    sz = in.readNum();
-    children = new NSNode[sz];
-    for(int c = 0; c < sz; ++c) children[c] = new NSNode(in, this);
+    size = in.readNum();
+    nodes = new NSNode[size];
+    for(int n = 0; n < size; ++n) nodes[n] = new NSNode(in, this);
   }
 
   /**
@@ -58,10 +60,152 @@ final class NSNode {
    * @throws IOException I/O exception
    */
   void write(final DataOutput out) throws IOException {
-    out.writeNum(pr);
+    out.writeNum(pre);
     out.writeNums(values);
-    out.writeNum(sz);
-    for(int c = 0; c < sz; ++c) children[c].write(out);
+    out.writeNum(size);
+    for(int c = 0; c < size; ++c) nodes[c].write(out);
+  }
+
+  /**
+   * Returns the specified child.
+   * @param i index
+   * @return child
+   */
+  NSNode child(final int i) {
+    return nodes[i];
+  }
+
+  /**
+   * Returns the number of children.
+   * @return number of children
+   */
+  int children() {
+    return size;
+  }
+
+  /**
+   * Returns the pre value.
+   * @return pre value
+   */
+  int pre() {
+    return pre;
+  }
+
+  /**
+   * Returns the parent node.
+   * @return parent node
+   */
+  NSNode parent() {
+    return parent;
+  }
+
+  /**
+   * Returns the ids of prefix/namespace uri pairs.
+   * @return prefix/namespace uri pairs
+   */
+  int[] values() {
+    return values;
+  }
+
+  // Requesting Namespaces ========================================================================
+
+  /**
+   * Finds the namespace node that is located closest to the specified pre value.
+   * @param p pre value
+   * @param data data reference
+   * @return node
+   */
+  NSNode find(final int p, final Data data) {
+    // return this node if the pre values of all children are greater than the searched value
+    final int s = find(p);
+    if(s == -1) return this;
+
+    final NSNode ch = nodes[s];
+    final int cp = ch.pre;
+    // return exact hit
+    if(cp == p) return ch;
+    // found node is preceding sibling
+    if(cp + data.size(cp, Data.ELEM) <= p) return this;
+    // continue recursive search
+    return nodes[s].find(p, data);
+  }
+
+  /**
+   * Locates a child node with the specified pre value.
+   * <ul>
+   *   <li> If the value is found, the position of the child node is returned.</li>
+   *   <li> Otherwise, the position of the last child with a smaller pre value is returned.</li>
+   *   <li> -1 is returned if all children have greater pre values.</li>
+   * </ul>
+   * @param p pre value
+   * @return position of the child node
+   */
+  int find(final int p) {
+    int l = 0, h = size - 1;
+    while(l <= h) { // binary search
+      final int m = l + h >>> 1, v = nodes[m].pre;
+      if(v == p) return m;
+      if(v < p) l = m + 1;
+      else h = m - 1;
+    }
+    return l - 1;
+  }
+
+  /**
+   * Returns the index of the specified pre value.
+   * @param p int pre value
+   * @return index, or possible insertion position
+   */
+  int find2(final int p) {
+    int l = 0, h = size - 1;
+    while(l <= h) { // binary search
+      final int m = l + h >>> 1, v = nodes[m].pre;
+      if(v == p) return m;
+      if(v < p) l = m + 1;
+      else h = m - 1;
+    }
+    return l;
+  }
+
+  /**
+   * Returns the id of the namespace uri for the specified prefix.
+   * @param prefix prefix reference
+   * @return if of the namespace uri, or {@code 0} if none is found
+   */
+  int uri(final int prefix) {
+    final int[] vls = values;
+    final int vl = vls.length;
+    for(int v = 0; v < vl; v += 2) if(vls[v] == prefix) return vls[v + 1];
+    return 0;
+  }
+
+  // Updating Namespaces ==========================================================================
+
+  /**
+   * Deletes nodes in the specified range (p .. p + sz - 1) and updates the following pre values.
+   * @param p pre value
+   * @param s number of nodes to be deleted, or actually the size of the pre
+   * value which is to be deleted
+   */
+  void delete(final int p, final int s) {
+    // find the node to deleted
+    int d = find(p);
+    // if the node is not directly contained as a child, either start at array index 0 or
+    // proceed with the next node in the child array to search for descendants of pre
+    if(d == -1 || nodes[d].pre != p) ++d;
+    // first pre value which is not deleted
+    final int upper = p + s;
+    // number of nodes to be deleted
+    int num = 0;
+    // determine number of nodes to be deleted
+    for(int i = d; i < size && nodes[i].pre < upper; ++i, ++num);
+    // new size of child array
+    size -= num;
+
+    // if all nodes are deleted, just create an empty array
+    if(size == 0) nodes = new NSNode[0];
+    // otherwise remove nodes from the child array
+    else if(num > 0) System.arraycopy(nodes, d + num, nodes, d, size - d);
   }
 
   /**
@@ -69,15 +213,15 @@ final class NSNode {
    * @param node child node
    */
   void add(final NSNode node) {
-    if(sz == children.length)
-      children = Array.copy(children, new NSNode[Array.newSize(sz)]);
+    if(size == nodes.length)
+      nodes = Array.copy(nodes, new NSNode[Array.newSize(size)]);
 
     // find inserting position
-    int s = find(node.pr);
-    if(s < 0 || node.pr != children[s].pr) s++;
+    int s = find(node.pre);
+    if(s < 0 || node.pre != nodes[s].pre) s++;
 
-    System.arraycopy(children, s, children, s + 1, sz++ - s);
-    children[s] = node;
+    System.arraycopy(nodes, s, nodes, s + 1, size++ - s);
+    nodes[s] = node;
     node.parent = this;
   }
 
@@ -98,7 +242,7 @@ final class NSNode {
    * @param uri namespace URI reference
    */
   void delete(final int uri) {
-    for(int c = 0; c < sz; ++c) children[c].delete(uri);
+    for(int c = 0; c < size; ++c) nodes[c].delete(uri);
 
     final int vl = values.length;
     for(int v = 0; v < vl; v += 2) {
@@ -111,106 +255,25 @@ final class NSNode {
     }
   }
 
-  // Requesting Namespaces ====================================================
-
   /**
-   * Finds the closest namespace node for the specified pre value.
-   * @param pre pre value
-   * @param data data reference
-   * @return node
+   * Recursive shifting of pre values after delete operations.
+   * @param start update location
+   * @param diff value to subtract from pre value
    */
-  NSNode find(final int pre, final Data data) {
-    final int s = find(pre);
-    // no match found: return current node
-    if(s == -1) return this;
-    final NSNode ch = children[s];
-    final int cp = ch.pr;
-    // return exact hit
-    if(cp == pre) return ch;
-    // found node is preceding sibling
-    if(cp + data.size(cp, Data.ELEM) <= pre) return this;
-    // continue recursive search
-    return children[s].find(pre, data);
+  void decrementPre(final int start, final int diff) {
+    if(pre >= start + diff) pre -= diff;
+    for(int c = 0; c < size; c++) nodes[c].decrementPre(start, diff);
   }
 
   /**
-   * Finds a specific pre value in the child array utilizing binary search
-   * and returns its position if it is contained.
-   * If it is not contained, it returns the position of the biggest element in
-   * the array that is still smaller than p. If all elements in the array are
-   * bigger, it returns -1.
-   * @param pre pre value
-   * @return position of node in child array.
+   * Increments the pre value by the specified size.
+   * @param diff value to add to pre value
    */
-  int find(final int pre) {
-    int l = 0, h = sz - 1;
-    while(l <= h) { // binary search
-      final int m = l + h >>> 1;
-      final int v = children[m].pr;
-      if(v == pre) return m;
-      if(v < pre) l = m + 1;
-      else h = m - 1;
-    }
-    return l - 1;
+  void incrementPre(final int diff) {
+    pre += diff;
   }
 
-  /**
-   * Returns the namespace URI reference for the specified prefix.
-   * @param prefix prefix reference
-   * @return uri reference or {@code 0}
-   */
-  int uri(final int prefix) {
-    final int[] vls = values;
-    final int vl = vls.length;
-    for(int v = 0; v < vl; v += 2) if(vls[v] == prefix) return vls[v + 1];
-    return 0;
-  }
-
-  /**
-   * Deletes nodes in the specified range (p .. p + sz - 1) and updates the
-   * following pre values
-   * @param pre pre value
-   * @param size number of nodes to be deleted, or actually the size of the pre
-   * value which is to be deleted
-   */
-  void delete(final int pre, final int size) {
-    // find the pre value which must be deleted
-    int s = find(pre);
-    /* if the node is not directly contained as a child, either start at array
-     * index 0 or proceed with the next node in the child array to search for
-     * descendants of pre
-     */
-    if(s == -1 || children[s].pr != pre) ++s;
-    // first pre value which is not deleted
-    final int upper = pre + size;
-    // number of nodes to be deleted
-    int num = 0;
-    // determine number of nodes to be deleted
-    for(int i = s; i < sz && children[i].pr < upper; ++i, ++num);
-    // new size of child array
-    sz -= num;
-
-    // if all nodes are deleted, just create an empty array
-    if(sz == 0) children = new NSNode[0];
-
-    // otherwise remove nodes from the child array
-    else if(num > 0) System.arraycopy(children, s + num, children, s, sz - s);
-  }
-
-  // Printing Namespaces ======================================================
-
-  /**
-   * Prints the node structure for debugging purposes.
-   * @param ns namespace reference
-   * @param start start pre value
-   * @param end end pre value
-   * @return string
-   */
-  String print(final Namespaces ns, final int start, final int end) {
-    final TokenBuilder tb = new TokenBuilder();
-    print(tb, 0, ns, start, end);
-    return tb.toString();
-  }
+  // Printing Namespaces ==========================================================================
 
   /**
    * Prints the node structure for debugging purposes.
@@ -223,24 +286,79 @@ final class NSNode {
   private void print(final TokenBuilder tb, final int level, final Namespaces ns, final int start,
       final int end) {
 
-    if(pr >= start && pr <= end) {
+    if(pre >= start && pre <= end) {
       tb.add(NL);
       for(int i = 0; i < level; ++i) tb.add("  ");
       tb.add(toString() + ' ');
       final int[] vls = values;
       final int vl = vls.length;
       for(int i = 0; i < vl; i += 2) {
+        if(i != 0) tb.add(' ');
         tb.add("xmlns");
         final byte[] p = ns.prefix(vls[i]);
         if(p.length != 0) tb.add(':');
-        tb.add(p).add("=\"").add(ns.uri(vls[i + 1])).add("\" ");
+        tb.add(p).add("=\"").add(ns.uri(vls[i + 1])).add('"');
       }
     }
-    for(int c = 0; c < sz; ++c) children[c].print(tb, level + 1, ns, start, end);
+    for(int c = 0; c < size; ++c) nodes[c].print(tb, level + 1, ns, start, end);
+  }
+
+  /**
+   * Adds the namespace structure of a node to the specified table.
+   * @param table table
+   * @param start first pre value
+   * @param end last pre value
+   * @param ns namespace reference
+   */
+  void table(final Table table, final int start, final int end, final Namespaces ns) {
+    final int vl = values.length;
+    for(int i = 0; i < vl; i += 2) {
+      if(pre < start || pre > end) continue;
+      final TokenList tl = new TokenList();
+      tl.add(values[i + 1]);
+      tl.add(pre);
+      tl.add(pre - parent.pre);
+      tl.add(ns.prefix(values[i]));
+      tl.add(ns.uri(values[i + 1]));
+      table.contents.add(tl);
+    }
+    for(int i = 0; i < size; i++) nodes[i].table(table, start, end, ns);
+  }
+
+  /**
+   * Adds namespace information for the specified node to a map.
+   * @param map namespace map
+   * @param ns namespace reference
+   */
+  void info(final TokenObjMap<TokenList> map, final Namespaces ns) {
+    final int vl = values.length;
+    for(int v = 0; v < vl; v += 2) {
+      final byte[] pref = ns.prefix(values[v]), uri = ns.uri(values[v + 1]);
+      TokenList prfs = map.get(uri);
+      if(prfs == null) {
+        prfs = new TokenList(1);
+        map.put(uri, prfs);
+      }
+      if(!prfs.contains(pref)) prfs.add(pref);
+    }
+    for(int c = 0; c < size; ++c) nodes[c].info(map, ns);
+  }
+
+  /**
+   * Prints the node structure.
+   * @param ns namespace reference
+   * @param start start pre value
+   * @param end end pre value
+   * @return string
+   */
+  String toString(final Namespaces ns, final int start, final int end) {
+    final TokenBuilder tb = new TokenBuilder();
+    print(tb, 0, ns, start, end);
+    return tb.toString();
   }
 
   @Override
   public String toString() {
-    return "Pre[" + pr + ']';
+    return "Pre[" + pre + ']';
   }
 }

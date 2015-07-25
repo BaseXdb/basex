@@ -51,7 +51,7 @@ public final class NameTest extends Test {
     if(data == null) return true;
 
     // skip optimizations if more than one namespace is defined in the database
-    final byte[] dataNS = data.nspaces.globalNS();
+    final byte[] dataNS = data.nspaces.globalUri();
     if(dataNS == null) return true;
 
     // check if test may yield results

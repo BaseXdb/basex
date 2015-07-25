@@ -8,7 +8,6 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.fn.*;
-import org.basex.query.iter.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -64,35 +63,13 @@ public abstract class Array extends FItem {
 
   /**
    * Creates an array containing the given elements.
-   * @param elems elements
+   * @param values elements
    * @return the resulting array
    */
   @SafeVarargs
-  public static Array from(final Value... elems) {
+  public static Array from(final Value... values) {
     final ArrayBuilder builder = new ArrayBuilder();
-    for(final Value val : elems) builder.append(val);
-    return builder.freeze();
-  }
-
-  /**
-   * Creates an array containing the elements from the given {@link Iterable}.
-   * @param iter the iterable
-   * @return the resulting array
-   */
-  public static Array from(final Iterable<Value> iter) {
-    final ArrayBuilder builder = new ArrayBuilder();
-    for(final Value val : iter) builder.append(val);
-    return builder.freeze();
-  }
-
-  /**
-   * Creates an array containing the elements from the given {@link Iterator}.
-   * @param iter the iterator
-   * @return the resulting array
-   */
-  public static Array from(final Iterator<Value> iter) {
-    final ArrayBuilder builder = new ArrayBuilder();
-    while(iter.hasNext()) builder.append(iter.next());
+    for(final Value val : values) builder.append(val);
     return builder.freeze();
   }
 
@@ -183,7 +160,7 @@ public abstract class Array extends FItem {
    * Running time: <i>O(n)</i>
    * @return reversed version of this array
    */
-  public abstract Array reverse();
+  public abstract Array reverseArray();
 
   @Override
   public final boolean isEmpty() {
@@ -218,17 +195,29 @@ public abstract class Array extends FItem {
 
   /**
    * Iterator over the members of this array.
-   * @param reverse flag for iterating from back to front
+   * @param start starting position
+   *   (i.e. the position initially returned by {@link ListIterator#nextIndex()})
    * @return array over the array members
    */
-  public abstract ListIterator<Value> members(final boolean reverse);
+  public abstract ListIterator<Value> iterator(final long start);
+
+  /** Iterable over the elements of this array. */
+  private Iterable<Value> iterable;
 
   /**
    * Iterator over the members of this array.
    * @return array over the array members
    */
-  public final ListIterator<Value> members() {
-    return members(false);
+  public final Iterable<Value> members() {
+    if(iterable == null) {
+      iterable = new Iterable<Value>() {
+        @Override
+        public Iterator<Value> iterator() {
+          return Array.this.iterator(0);
+        }
+      };
+    }
+    return iterable;
   }
 
   /**
@@ -276,12 +265,6 @@ public abstract class Array extends FItem {
    * @throws AssertionError if an invariant was violated
    */
   abstract void checkInvariants();
-
-  /**
-   * Returns an array containing the number of elements stored at each level of the tree.
-   * @return array of sizes
-   */
-  abstract long[] sizes();
 
   @Override
   public Value invValue(final QueryContext qc, final InputInfo ii, final Value... args)
@@ -347,8 +330,7 @@ public abstract class Array extends FItem {
   @Override
   public Array materialize(final InputInfo ii) throws QueryException {
     final ArrayBuilder builder = new ArrayBuilder();
-    final Iterator<Value> iter = members();
-    while(iter.hasNext()) builder.append(iter.next().materialize(ii));
+    for(final Value val : members()) builder.append(val.materialize(ii));
     return builder.freeze();
   }
 
@@ -366,11 +348,8 @@ public abstract class Array extends FItem {
   @Override
   public long atomSize() {
     long s = 0;
-    final Iterator<Value> iter = members();
-    while(iter.hasNext()) {
-      final Value v = iter.next();
-      final long vs = v.size();
-      for(int i = 0; i < vs; i++) s += v.itemAt(i).atomSize();
+    for(final Value val : members()) {
+      for(final Item it : val) s += it.atomSize();
     }
     return s;
   }
@@ -386,8 +365,8 @@ public abstract class Array extends FItem {
     final long s = atomSize(), size = arraySize();
     if(single && s > 1) throw SEQFOUND_X.get(ii, this);
     if(size == 1) return get(0).atomValue(ii);
-    final ValueBuilder vb = new ValueBuilder((int) s);
-    for(long a = 0; a < size; a++) vb.add(get(a).atomValue(ii));
+    final ValueBuilder vb = new ValueBuilder();
+    for(final Value val : members()) vb.add(val.atomValue(ii));
     return vb.value();
   }
 
@@ -412,16 +391,14 @@ public abstract class Array extends FItem {
   public void string(final TokenBuilder tb, final InputInfo ii) throws QueryException {
     tb.add('[');
     int c = 0;
-    final Iterator<Value> iter = members();
-    while(iter.hasNext()) {
+    for(final Value val : members()) {
       if(c++ > 0) tb.add(", ");
-      final Value v = iter.next();
-      final long vs = v.size();
+      final long vs = val.size();
       if(vs != 1) tb.add('(');
       int cc = 0;
       for(int i = 0; i < vs; i++) {
         if(cc++ > 0) tb.add(", ");
-        final Item it = v.itemAt(i);
+        final Item it = val.itemAt(i);
         if(it instanceof Array) ((Array) it).string(tb, ii);
         else if(it instanceof Map) ((Map) it).string(tb, 0, ii);
         else tb.add(it.toString());
@@ -438,8 +415,7 @@ public abstract class Array extends FItem {
    */
   public boolean hasType(final ArrayType t) {
     if(!t.retType.eq(SeqType.ITEM_ZM)) {
-      final Iterator<Value> iter = members();
-      while(iter.hasNext()) if(!t.retType.instance(iter.next())) return false;
+      for(final Value val : members()) if(!t.retType.instance(val)) return false;
     }
     return true;
   }
@@ -458,7 +434,7 @@ public abstract class Array extends FItem {
     if(item instanceof Array) {
       final Array o = (Array) item;
       if(arraySize() != o.arraySize()) return false;
-      final Iterator<Value> it1 = members(), it2 = o.members();
+      final Iterator<Value> it1 = iterator(0), it2 = o.iterator(0);
       while(it1.hasNext()) {
         final Value v1 = it1.next(), v2 = it2.next();
         if(v1.size() != v2.size() || !new Compare(ii).collation(coll).equal(v1, v2))
@@ -487,7 +463,7 @@ public abstract class Array extends FItem {
   public Object[] toJava() throws QueryException {
     final long size = arraySize();
     final Object[] tmp = new Object[(int) size];
-    final Iterator<Value> iter = members();
+    final Iterator<Value> iter = iterator(0);
     for(int i = 0; iter.hasNext(); i++) tmp[i] = iter.next().toJava();
     return tmp;
   }
@@ -495,7 +471,7 @@ public abstract class Array extends FItem {
   @Override
   public String toString() {
     final StringBuilder tb = new StringBuilder().append('[');
-    final Iterator<Value> iter = members();
+    final Iterator<Value> iter = iterator(0);
     for(boolean fst = true; iter.hasNext(); fst = false) {
       if(!fst) tb.append(", ");
       final Value value = iter.next();

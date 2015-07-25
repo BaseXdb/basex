@@ -187,7 +187,7 @@ public final class Functions extends TokenSet {
         qc.updating();
         anns.add(new Ann(ii, Annotation.UPDATING));
       }
-      if(!sf.has(Flag.CTX) && !sf.has(Flag.FCS)) return closureOrFItem(
+      if(!sf.has(Flag.CTX) && !sf.has(Flag.POS)) return closureOrFItem(
           anns, name, args, fn.type(arity, anns), sf, scp, sc, ii, runtime, upd);
 
       return new FuncLit(anns, name, args, sf, ft, scp, sc, ii);

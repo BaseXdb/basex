@@ -2,8 +2,8 @@ package org.basex.query.expr.ft;
 
 import static org.basex.util.Token.*;
 
-import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.util.ft.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;

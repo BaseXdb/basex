@@ -44,7 +44,7 @@ final class TableIterator {
    */
   void init(final int p) {
     last = p + data.size(p, data.kind(p));
-    rootElem = data.name(p);
+    rootElem = data.nameId(p);
     pre = p;
     elem = -1;
   }
@@ -60,7 +60,7 @@ final class TableIterator {
 
       // content found...
       if(text || k == Data.ATTR) {
-        final int id = text ? elem : data.name(pre);
+        final int id = text ? elem : data.nameId(pre);
         // find correct column...
         final TableCol[] cols = tdata.cols;
         final int cl = cols.length;
@@ -69,7 +69,7 @@ final class TableIterator {
         }
       } else if(k == Data.ELEM) {
         // remember name of last element
-        elem = data.name(pre);
+        elem = data.nameId(pre);
         if(elem == rootElem) return false;
       }
     }

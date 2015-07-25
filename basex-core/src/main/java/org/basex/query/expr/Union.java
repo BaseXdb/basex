@@ -58,12 +58,12 @@ public final class Union extends Set {
   }
 
   @Override
-  protected NodeSeqBuilder eval(final Iter[] iter) throws QueryException {
-    final NodeSeqBuilder nc = new NodeSeqBuilder().check();
+  protected ANodeList eval(final Iter[] iter) throws QueryException {
+    final ANodeList list = new ANodeList().check();
     for(final Iter ir : iter) {
-      for(Item it; (it = ir.next()) != null;) nc.add(toNode(it));
+      for(Item it; (it = ir.next()) != null;) list.add(toNode(it));
     }
-    return nc;
+    return list;
   }
 
   @Override

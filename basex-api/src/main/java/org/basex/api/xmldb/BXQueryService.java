@@ -4,7 +4,6 @@ import static org.basex.util.Token.*;
 
 import java.util.*;
 
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
@@ -71,7 +70,8 @@ final class BXQueryService implements XPathQueryService, BXXMLDBText {
   @Override
   public BXResourceSet query(final String query) throws XMLDBException {
     final DBNodes nodes = coll.ctx.current();
-    return query(query, DBNodeSeq.get(new IntList(nodes.pres), nodes.data, nodes.all, nodes.all));
+    final boolean all = nodes.all();
+    return query(query, DBNodeSeq.get(new IntList(nodes.pres()), nodes.data(), all, all));
   }
 
   @Override

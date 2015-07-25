@@ -1,8 +1,8 @@
 package org.basex.examples.local;
 
 import org.basex.core.*;
-import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.value.*;
 
 /**
  * This example demonstrates how items can be bound as context item of
@@ -39,7 +39,7 @@ public final class BindContext {
       qp.context(item);
 
       // Execute the query
-      Result result = qp.execute();
+      Value result = qp.value();
 
       // Print result as string
       System.out.println("\n* Result:");

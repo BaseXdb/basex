@@ -11,8 +11,8 @@ import org.basex.core.cmd.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.io.*;
-import org.basex.query.iter.*;
 import org.basex.query.up.*;
+import org.basex.query.util.list.*;
 import org.basex.query.util.pkg.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
@@ -50,7 +50,7 @@ public final class QueryResources {
   private final HashMap<Class<? extends QueryResource>, QueryResource> external = new HashMap<>();
 
   /** Pending output. */
-  public final ValueBuilder output = new ValueBuilder();
+  public final ItemList output = new ItemList();
   /** Pending updates. */
   Updates updates;
 
@@ -69,9 +69,9 @@ public final class QueryResources {
    */
   Value compile(final DBNodes nodes) {
     // assign initial context value
-    final Data data = nodes.data;
-    final boolean all = nodes.all;
-    final Value value = DBNodeSeq.get(new IntList(nodes.pres), data, all, all);
+    final Data data = nodes.data();
+    final boolean all = nodes.all();
+    final Value value = DBNodeSeq.get(new IntList(nodes.pres()), data, all, all);
 
     // create default collection: use initial node set if it contains all
     // documents of the database. otherwise, create new node set
@@ -339,7 +339,7 @@ public final class QueryResources {
       final QueryInput qi = new QueryInput(paths[n]);
       nodes[n] = new DBNode(create(qi, true, baseIO, null), 0, Data.DOC);
     }
-    addCollection(Seq.get(nodes, ns, NodeType.DOC), name);
+    addCollection(ValueBuilder.value(nodes, ns, NodeType.DOC), name);
   }
 
   // PRIVATE METHODS ==============================================================================

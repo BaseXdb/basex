@@ -18,14 +18,15 @@ import org.basex.build.html.*;
 import org.basex.build.json.*;
 import org.basex.build.text.*;
 import org.basex.core.*;
+import org.basex.core.Context;
 import org.basex.http.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
+import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.expr.path.Test.Kind;
 import org.basex.query.func.*;
-import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -114,65 +115,68 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
 
   /**
    * Checks a function for RESTFful annotations.
-   * @param http HTTP context
+   * @param ctx database context
    * @return {@code true} if module contains relevant annotations
    * @throws Exception exception
    */
-  boolean parse(final HTTPContext http) throws Exception {
+  boolean parse(final Context ctx) throws Exception {
     // parse all annotations
     final boolean[] declared = new boolean[function.args.length];
     boolean found = false;
-    final MainOptions options = http.context(false).options;
+    final MainOptions options = ctx.options;
     for(final Ann ann : function.anns) {
-      found |= eq(ann.sig.uri, QueryText.REST_URI);
-      if(ann.sig == _REST_PATH) {
+      final Annotation sig = ann.sig;
+      if(sig == null) continue;
+
+      found |= eq(sig.uri, QueryText.REST_URI);
+      if(sig == _REST_PATH) {
         try {
           path = new RestXqPath(toString(ann.args[0]), ann.info);
         } catch(final IllegalArgumentException ex) {
           throw error(ann.info, ex.getMessage());
         }
         for(final QNm v : path.vars()) checkVariable(v, AtomType.AAT, declared);
-      } else if(ann.sig == _REST_ERROR) {
+      } else if(sig == _REST_ERROR) {
         error(ann);
-      } else if(ann.sig == _REST_CONSUMES) {
+      } else if(sig == _REST_CONSUMES) {
         strings(ann, consumes);
-      } else if(ann.sig == _REST_PRODUCES) {
+      } else if(sig == _REST_PRODUCES) {
         strings(ann, produces);
-      } else if(ann.sig == _REST_QUERY_PARAM) {
+      } else if(sig == _REST_QUERY_PARAM) {
         queryParams.add(param(ann, declared));
-      } else if(ann.sig == _REST_FORM_PARAM) {
+      } else if(sig == _REST_FORM_PARAM) {
         formParams.add(param(ann, declared));
-      } else if(ann.sig == _REST_HEADER_PARAM) {
+      } else if(sig == _REST_HEADER_PARAM) {
         headerParams.add(param(ann, declared));
-      } else if(ann.sig == _REST_COOKIE_PARAM) {
+      } else if(sig == _REST_COOKIE_PARAM) {
         cookieParams.add(param(ann, declared));
-      } else if(ann.sig == _REST_ERROR_PARAM) {
+      } else if(sig == _REST_ERROR_PARAM) {
         errorParams.add(param(ann, declared));
-      } else if(ann.sig == _REST_METHOD) {
+      } else if(sig == _REST_METHOD) {
         final String mth = toString(ann.args[0]).toUpperCase(Locale.ENGLISH);
         final Item body = ann.args.length > 1 ? ann.args[1] : null;
         addMethod(mth, body, declared, ann.info);
-      } else if(eq(ann.sig.uri, QueryText.REST_URI)) {
+      } else if(eq(sig.uri, QueryText.REST_URI)) {
         final Item body = ann.args.length == 0 ? null : ann.args[0];
-        addMethod(string(ann.sig.local()), body, declared, ann.info);
-      } else if(ann.sig == _INPUT_CSV) {
+        addMethod(string(sig.local()), body, declared, ann.info);
+      } else if(sig == _INPUT_CSV) {
         final CsvParserOptions opts = new CsvParserOptions(options.get(MainOptions.CSVPARSER));
         options.set(MainOptions.CSVPARSER, parse(opts, ann));
-      } else if(ann.sig == _INPUT_JSON) {
+      } else if(sig == _INPUT_JSON) {
         final JsonParserOptions opts = new JsonParserOptions(options.get(MainOptions.JSONPARSER));
         options.set(MainOptions.JSONPARSER, parse(opts, ann));
-      } else if(ann.sig == _INPUT_HTML) {
+      } else if(sig == _INPUT_HTML) {
         final HtmlOptions opts = new HtmlOptions(options.get(MainOptions.HTMLPARSER));
         options.set(MainOptions.HTMLPARSER, parse(opts, ann));
-      } else if(ann.sig == _INPUT_TEXT) {
+      } else if(sig == _INPUT_TEXT) {
         final TextOptions opts = new TextOptions(options.get(MainOptions.TEXTPARSER));
         options.set(MainOptions.TEXTPARSER, parse(opts, ann));
-      } else if(eq(ann.sig.uri, QueryText.OUTPUT_URI)) {
+      } else if(eq(sig.uri, QueryText.OUTPUT_URI)) {
         // serialization parameters
         try {
-          output.assign(string(ann.sig.local()), toString(ann.args[0]));
+          output.assign(string(sig.local()), toString(ann.args[0]));
         } catch(final BaseXException ex) {
-          throw error(ann.info, UNKNOWN_SER, ann.sig.local());
+          throw error(ann.info, UNKNOWN_SER, sig.local());
         }
       }
     }
@@ -498,7 +502,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     final QNm qnm = checkVariable(toString(args[1]), declared);
     // default value
     final int al = args.length;
-    final ValueBuilder vb = new ValueBuilder(al);
+    final ValueBuilder vb = new ValueBuilder();
     for(int a = 2; a < al; a++) vb.add(args[a]);
     return new RestXqParam(qnm, key, vb.value());
   }

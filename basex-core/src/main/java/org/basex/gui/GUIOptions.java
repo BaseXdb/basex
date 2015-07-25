@@ -189,7 +189,7 @@ public final class GUIOptions extends Options {
   /** Maximum text size to be displayed. */
   public static final NumberOption MAXTEXT = new NumberOption("MAXTEXT", 1 << 21);
   /** Maximum number of hits to be displayed (-1: return all hits; default: 250K). */
-  public static final NumberOption MAXHITS = new NumberOption("MAXHITS", 250000);
+  public static final NumberOption MAXRESULTS = new NumberOption("MAXHITS", 250000);
 
   /** Comment: written to options file. */
   public static final Comment C_SEARCH = new Comment("Search");

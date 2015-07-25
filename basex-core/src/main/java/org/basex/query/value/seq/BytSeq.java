@@ -41,14 +41,6 @@ public final class BytSeq extends NativeSeq {
     return values;
   }
 
-  @Override
-  public Value reverse() {
-    final int s = values.length;
-    final byte[] tmp = new byte[s];
-    for(int l = 0, r = s - 1; l < s; l++, r--) tmp[l] = values[r];
-    return get(tmp);
-  }
-
   // STATIC METHODS =====================================================================
 
   /**

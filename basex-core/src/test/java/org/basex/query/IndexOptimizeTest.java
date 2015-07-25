@@ -258,7 +258,7 @@ public final class IndexOptimizeTest extends AdvancedQueryTest {
     String plan = null;
     try {
       try(QueryProcessor qp = new QueryProcessor(query, context)) {
-        final String string = qp.execute().serialize();
+        final String string = qp.value().serialize().toString();
         if(result != null) assertEquals(result, normNL(string));
 
         // fetch query plan
@@ -269,7 +269,7 @@ public final class IndexOptimizeTest extends AdvancedQueryTest {
       try(QueryProcessor qp = new QueryProcessor(plan + "/descendant-or-self::*" +
             "[self::" + Util.className(ValueAccess.class) +
             "|self::" + Util.className(FTIndexAccess.class) + ']', context)) {
-        final String string = qp.execute().serialize();
+        final String string = qp.value().serialize().toString();
         assertFalse("No index used:\n- Query: " + query + "\n- Plan: " + plan + "\n- " +
             qp.info().trim(), string.isEmpty());
       }

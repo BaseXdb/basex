@@ -11,6 +11,7 @@ import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -24,6 +25,11 @@ import org.basex.util.*;
 public final class InspectFunctions extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
+    return value(qc).iter();
+  }
+
+  @Override
+  public Value value(final QueryContext qc) throws QueryException {
     checkCreate(qc);
     // about to be updated in a future version
     final ArrayList<StaticFunc> old = new ArrayList<>();
@@ -45,7 +51,7 @@ public final class InspectFunctions extends StandardFunc {
       final FuncItem fi = Functions.getUser(sf, qc, sf.sc, info);
       if(sc.mixUpdates || !fi.annotations().contains(Annotation.UPDATING)) vb.add(fi);
     }
-    return vb;
+    return vb.value();
   }
 
   @Override

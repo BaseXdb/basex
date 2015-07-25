@@ -117,7 +117,7 @@ public final class Users {
    * Sets the permission of a user.
    * @param user user
    * @param prm permission
-   * @param pattern database pattern (can be {@code null})
+   * @param pattern database pattern (can be empty)
    */
   public static void perm(final User user, final Perm prm, final String pattern) {
     user.perm(prm, pattern);
@@ -135,13 +135,13 @@ public final class Users {
   }
 
   /**
-   * Drops a user from the list.
+   * Drops a user from the list, or removes the specified pattern if non-empty.
    * @param user user reference
-   * @param pattern database pattern (can be {@code null})
+   * @param pattern database pattern (can be empty)
    * @return success flag
    */
   public synchronized boolean drop(final User user, final String pattern) {
-    if(pattern == null) {
+    if(pattern.isEmpty()) {
       if(users.remove(user.name()) == null) return false;
     } else {
       user.remove(pattern);

@@ -54,7 +54,7 @@ public class Execute extends Command {
         proc(null);
         sb.append(c.info());
         if(!ok) {
-          cause = c.cause;
+          exception = c.exception();
           return error(sb.toString());
         }
       }

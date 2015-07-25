@@ -19,23 +19,21 @@ import org.basex.query.var.*;
 public final class FnData extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    return arg(0, qc).atomIter(qc, info);
+    return ctxArg(0, qc).atomIter(qc, info);
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return arg(0, qc).atomValue(qc, info);
+    return ctxArg(0, qc).atomValue(qc, info);
   }
 
   @Override
   protected Expr opt(final QueryContext qc, final VarScope scp) {
-    if(exprs.length == 1) {
-      final SeqType st = exprs[0].seqType();
-      if(st.type instanceof NodeType) {
-        seqType = SeqType.get(AtomType.ATM, st.occ);
-      } else if(!st.mayBeArray()) {
-        seqType = st;
-      }
+    final SeqType st = (exprs.length > 0 ? exprs[0] : qc.value != null ? qc.value : this).seqType();
+    if(st.type instanceof NodeType) {
+      seqType = SeqType.get(AtomType.ATM, st.occ);
+    } else if(!st.mayBeArray()) {
+      seqType = st;
     }
     return this;
   }

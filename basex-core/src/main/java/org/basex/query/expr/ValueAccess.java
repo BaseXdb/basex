@@ -50,13 +50,13 @@ public final class ValueAccess extends IndexAccess {
   }
 
   @Override
-  public NodeIter iter(final QueryContext qc) throws QueryException {
-    final ArrayList<NodeIter> iter = new ArrayList<>();
+  public BasicNodeIter iter(final QueryContext qc) throws QueryException {
+    final ArrayList<BasicNodeIter> iter = new ArrayList<>();
     final Iter ir = qc.iter(expr);
     for(Item it; (it = ir.next()) != null;) iter.add(index(it.string(info)));
     final int is = iter.size();
-    return is == 0 ? AxisMoreIter.EMPTY : is == 1 ? iter.get(0) :
-      new Union(info, expr).eval(iter.toArray(new NodeIter[is]));
+    return is == 0 ? BasicNodeIter.EMPTY : is == 1 ? iter.get(0) :
+      new Union(info, expr).eval(iter.toArray(new NodeIter[is])).iter();
   }
 
   /**
@@ -64,12 +64,12 @@ public final class ValueAccess extends IndexAccess {
    * @param term term to be found
    * @return iterator
    */
-  private AxisIter index(final byte[] term) {
+  private BasicNodeIter index(final byte[] term) {
     // special case: empty text node
     // - no element name: return 0 results (empty text nodes are non-existent)
     // - otherwise, return scan-based element iterator
     final int tl = term.length;
-    if(tl == 0 && text) return test == null ? AxisMoreIter.EMPTY : scanEmpty();
+    if(tl == 0 && text) return test == null ? BasicNodeIter.EMPTY : scanEmpty();
 
     // use index traversal if index exists and if term is not too long.
     // otherwise, scan data sequentially
@@ -79,14 +79,14 @@ public final class ValueAccess extends IndexAccess {
 
     final int kind = text ? Data.TEXT : Data.ATTR;
     final DBNode tmp = new DBNode(data, 0, test == null ? kind : Data.ELEM);
-    return new AxisIter() {
+    return new BasicNodeIter() {
       @Override
       public ANode next() {
         while(ii.more()) {
           if(test == null) {
-            tmp.pre = ii.pre();
+            tmp.pre(ii.pre());
           } else {
-            tmp.pre = data.parent(ii.pre(), kind);
+            tmp.pre(data.parent(ii.pre(), kind));
             if(!test.eq(tmp)) continue;
           }
           return tmp.finish();
@@ -132,8 +132,8 @@ public final class ValueAccess extends IndexAccess {
    * b) having no descendants.
    * @return node iterator
    */
-  private AxisIter scanEmpty() {
-    return new AxisIter() {
+  private BasicNodeIter scanEmpty() {
+    return new BasicNodeIter() {
       final Data data = ictx.data;
       final DBNode tmp = new DBNode(data, 0, Data.ELEM);
       final int sz = data.meta.size;
@@ -143,7 +143,7 @@ public final class ValueAccess extends IndexAccess {
       public DBNode next() {
         while(++pre < sz) {
           if(data.kind(pre) == Data.ELEM && data.size(pre, Data.ELEM) == 1) {
-            tmp.pre = pre;
+            tmp.pre(pre);
             if(test == null || test.eq(tmp)) return tmp.finish();
           }
         }

@@ -3,7 +3,6 @@ package org.basex.build;
 import java.io.*;
 
 import org.basex.data.*;
-import org.basex.data.atomic.*;
 import org.basex.io.*;
 
 /**
@@ -82,7 +81,7 @@ public final class MemBuilder extends Builder {
    * Initializes the builder.
    */
   public void init() {
-    data = new MemData(path, ns, parser.options);
+    data = new MemData(path, nspaces, parser.options);
 
     meta = data.meta;
     meta.name = dbname;
@@ -116,15 +115,15 @@ public final class MemBuilder extends Builder {
   }
 
   @Override
-  protected void addElem(final int dist, final int name, final int asize, final int uri,
+  protected void addElem(final int dist, final int nameId, final int asize, final int uriId,
       final boolean ne) {
-    data.elem(dist, name, asize, asize, uri, ne);
+    data.elem(dist, nameId, asize, asize, uriId, ne);
     data.insert(meta.size);
   }
 
   @Override
-  protected void addAttr(final int name, final byte[] value, final int dist, final int uri) {
-    data.attr(meta.size, dist, name, value, uri, false);
+  protected void addAttr(final int nameId, final byte[] value, final int dist, final int uriId) {
+    data.attr(meta.size, dist, nameId, value, uriId);
     data.insert(meta.size);
   }
 

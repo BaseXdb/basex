@@ -121,8 +121,6 @@ public final class MainOptions extends Options {
   public static final NumberOption TAILCALLS = new NumberOption("TAILCALLS", 256);
   /** Favor global database when opening resources. */
   public static final BooleanOption DEFAULTDB = new BooleanOption("DEFAULTDB", false);
-  /** Caches the query results. */
-  public static final BooleanOption CACHEQUERY = new BooleanOption("CACHEQUERY", false);
   /** Forces database creation for unknown documents. */
   public static final BooleanOption FORCECREATE = new BooleanOption("FORCECREATE", false);
   /** Validate string inputs. */
@@ -162,9 +160,6 @@ public final class MainOptions extends Options {
   public static final NumberOption MAXSTAT = new NumberOption("MAXSTAT", 30);
 
   // Other
-
-  /** Hidden: maximum number of hits to be displayed in the GUI (will be overwritten). */
-  public static final NumberOption MAXHITS = new NumberOption("MAXHITS", -1);
 
   /** Options that are adopted from parent options. */
   private static final Option<?>[] PARENT = { CHOP, INTPARSE, STRIPNS, DTD, XINCLUDE, CATFILE };

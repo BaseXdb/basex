@@ -155,7 +155,7 @@ public abstract class JavaMapping extends Arr {
     }
     // any other array (also nested ones)
     final Object[] objs = (Object[]) obj;
-    final ValueBuilder vb = new ValueBuilder(objs.length);
+    final ValueBuilder vb = new ValueBuilder();
     for(final Object o : objs) vb.add(toValue(o, qc, sc));
     return vb.value();
   }

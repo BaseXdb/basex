@@ -24,7 +24,7 @@ public final class HofTakeWhile extends StandardFunc {
       @Override
       public Item next() throws QueryException {
         final Item it = in.next();
-        if(it != null && pred.invokeValue(qc, info, it).ebv(qc, info).bool(info)) return it;
+        if(it != null && toBoolean(pred.invokeValue(qc, info, it), qc)) return it;
         return null;
       }
     };

@@ -6,9 +6,9 @@ import static org.junit.Assert.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.data.atomic.*;
 import org.basex.io.*;
 import org.basex.query.*;
+import org.basex.query.up.atomic.*;
 import org.basex.query.up.primitives.node.*;
 import org.junit.*;
 import org.junit.Test;

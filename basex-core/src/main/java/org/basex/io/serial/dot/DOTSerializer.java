@@ -7,10 +7,10 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.util.*;
 
-import org.basex.data.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
+import org.basex.query.util.ft.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -53,7 +53,7 @@ public final class DOTSerializer extends OutputSerializer {
   }
 
   @Override
-  protected void startOpen(final byte[] name) {
+  protected void startOpen(final QNm name) {
     tb.reset();
   }
 
@@ -65,9 +65,9 @@ public final class DOTSerializer extends OutputSerializer {
   @Override
   protected void finishOpen() throws IOException {
     final byte[] attr = tb.toArray();
-    String color = color(elem);
+    String color = color(elem.string());
     if(color == null) color = attr.length == 0 ? ELEM1 : ELEM2;
-    print(concat(elem, attr), color);
+    print(concat(elem.string(), attr), color);
   }
 
   @Override

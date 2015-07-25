@@ -63,13 +63,13 @@ public final class InfoDB extends AInfo {
     // count number of raw files
     info(tb, DOCUMENTS, meta.ndocs);
     info(tb, BINARIES, meta.path != null ? meta.binaries().descendants().size() : 0);
-    info(tb, TIMESTAMP, DateTime.format(new Date(meta.dbtime()), DateTime.DATETIME));
+    info(tb, TIMESTAMP, DateTime.format(new Date(meta.dbtime())));
     if(meta.corrupt) tb.add(' ' + DB_CORRUPT + NL);
 
     tb.add(NL).addExt(header, RES_PROPS);
     if(create && !meta.original.isEmpty()) info(tb, INPUT_PATH, meta.original);
     if(meta.filesize != 0) info(tb, INPUT_SIZE, Performance.format(meta.filesize));
-    info(tb, TIMESTAMP, DateTime.format(new Date(meta.time), DateTime.DATETIME));
+    info(tb, TIMESTAMP, DateTime.format(new Date(meta.time)));
     info(tb, ENCODING, meta.encoding);
     info(tb, MainOptions.CHOP.name(), meta.chop);
 

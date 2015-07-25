@@ -8,6 +8,7 @@ import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.index.name.*;
 import org.basex.index.stats.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.list.*;
 
 /**
@@ -96,19 +97,19 @@ final class PlotData {
     final int itmID = data.elemNames.id(item);
 
     if(!sub) {
-      pres = nodes.pres;
+      pres = nodes.pres();
       Arrays.sort(pres);
       return;
     }
 
-    final int[] contextPres = nodes.pres;
+    final int[] contextPres = nodes.pres();
     for(int p : contextPres) {
       if(p >= data.meta.size) break;
       final int nl = p + data.size(p, Data.ELEM);
       while(p < nl) {
         final int kind = data.kind(p);
         if(kind == Data.ELEM) {
-          if(data.name(p) == itmID) il.add(p);
+          if(data.nameId(p) == itmID) il.add(p);
           p += data.attSize(p, Data.ELEM);
         } else {
           ++p;

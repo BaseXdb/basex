@@ -1,5 +1,7 @@
 package org.basex.http.restxq;
 
+import static org.basex.http.restxq.RestXqText.*;
+
 import org.basex.http.*;
 import org.basex.query.*;
 
@@ -18,17 +20,30 @@ import org.basex.query.*;
 public final class RestXqServlet extends BaseXServlet {
   @Override
   protected void run(final HTTPContext http) throws Exception {
+    // no trailing slash: send redirect
+    if(http.req.getPathInfo() == null) {
+      http.redirect("/");
+      return;
+    }
+
     // analyze input path
     final RestXqModules rxm = RestXqModules.get();
-    // select XQuery function
+
+    // initialize RESTXQ
+    if(http.path().equals("/" + INIT)) {
+      rxm.init();
+      return;
+    }
+
+    // select function that closest matches the request
     RestXqFunction func = rxm.find(http, null);
     if(func == null) throw HTTPCode.NO_XQUERY.get();
 
     try {
-      // process function that matches the current request
+      // process function
       func.process(http, null);
     } catch(final QueryException ex) {
-      // process optional error function
+      // run optional error function
       func = rxm.find(http, ex.qname());
       if(func == null) throw ex;
       func.process(http, ex);

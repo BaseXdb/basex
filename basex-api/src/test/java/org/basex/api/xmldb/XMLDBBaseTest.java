@@ -21,7 +21,7 @@ public abstract class XMLDBBaseTest extends SandboxTest {
   static final String DRIVER = BXDatabase.class.getName();
   /** Database/document path. */
   static final String URL =
-      "xmldb:" + Prop.PROJECT_NAME + "://" + S_LOCALHOST + ':' + StaticOptions.PORT.value + '/';
+      "xmldb:" + Prop.PROJECT_NAME + "://" + S_LOCALHOST + ':' + DB_PORT + '/';
   /** Name of the collection. */
   static final String COLL = "XMLDB";
   /** Database/document path. */
@@ -37,16 +37,13 @@ public abstract class XMLDBBaseTest extends SandboxTest {
   /** Test document. */
   static final String DOC3 = "third.xml";
 
-  /** Context. */
-  private static final Context CONTEXT = new Context();
-
   /**
    * Create XMLDB database.
    * @throws BaseXException exception during database create
    */
   static void createDB() throws BaseXException {
-    new CreateDB(COLL, DOCPATH + DOC1).execute(CONTEXT);
-    new Close().execute(CONTEXT);
+    new CreateDB(COLL, DOCPATH + DOC1).execute(context);
+    new Close().execute(context);
   }
 
   /**
@@ -54,6 +51,6 @@ public abstract class XMLDBBaseTest extends SandboxTest {
    * @throws BaseXException exception during database drop
    */
   static void dropDB() throws BaseXException {
-    new DropDB(COLL).execute(CONTEXT);
+    new DropDB(COLL).execute(context);
   }
 }

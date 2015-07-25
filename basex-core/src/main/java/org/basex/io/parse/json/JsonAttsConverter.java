@@ -1,7 +1,6 @@
 package org.basex.io.parse.json;
 
 import static org.basex.io.parse.json.JsonConstants.*;
-import static org.basex.util.Token.*;
 
 import org.basex.build.json.*;
 import org.basex.query.value.node.*;
@@ -31,16 +30,18 @@ public final class JsonAttsConverter extends JsonXmlConverter {
   }
 
   @Override
-  void openPair(final byte[] name) {
-    final FElem e = new FElem(PAIR).add(NAME, name);
-    curr.add(e);
-    curr = e;
-    nm = name;
+  void openPair(final byte[] name, final boolean add) {
+    if(add) {
+      final FElem e = new FElem(PAIR).add(NAME, name);
+      curr.add(e);
+      curr = e;
+      nm = name;
+    }
   }
 
   @Override
   void closePair(final boolean add) {
-    curr = (FElem) curr.parent();
+    if(add) curr = (FElem) curr.parent();
   }
 
   @Override
@@ -67,30 +68,6 @@ public final class JsonAttsConverter extends JsonXmlConverter {
 
   @Override
   void closeArray() {
-  }
-
-  @Override
-  public void openConstr(final byte[] name) {
-    openObject();
-    openPair(name);
-    openArray();
-  }
-
-  @Override
-  public void openArg() {
-    openItem();
-  }
-
-  @Override
-  public void closeArg() {
-    closeItem();
-  }
-
-  @Override
-  public void closeConstr() {
-    closeArray();
-    closePair(true);
-    closeObject();
   }
 
   @Override

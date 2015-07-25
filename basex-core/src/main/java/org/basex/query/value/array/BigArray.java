@@ -199,7 +199,7 @@ final class BigArray extends Array {
       midNodes[i] = new LeafNode(arr);
     }
 
-    return new BigArray(left, middle.concat(midNodes, other.middle), other.right);
+    return new BigArray(left, middle.concat(midNodes, n, other.middle), other.right);
   }
 
   @Override
@@ -220,7 +220,7 @@ final class BigArray extends Array {
   }
 
   @Override
-  public Array reverse() {
+  public Array reverseArray() {
     final int l = left.length, r = right.length;
     final Value[] newLeft = new Value[r], newRight = new Value[l];
     for(int i = 0; i < r; i++) newLeft[i] = right[r - 1 - i];
@@ -534,17 +534,29 @@ final class BigArray extends Array {
   }
 
   @Override
-  public ListIterator<Value> members(final boolean reverse) {
+  public ListIterator<Value> iterator(final long start) {
     final Value[] ls = left, rs = right;
-    final int l = ls.length, m = (int) middle.size(), r = rs.length;
-    final ListIterator<Value> sub = middle.listIterator(reverse);
+    final int l = ls.length , r = rs.length, startPos;
+    final long m = middle.size();
+    final ListIterator<Value> sub;
+    if(start < l) {
+      startPos = (int) start - l;
+      sub = middle.listIterator(0);
+    } else if(start - l < m) {
+      startPos = 0;
+      sub = middle.listIterator(start - l);
+    } else {
+      startPos = (int) (start - l - m) + 1;
+      sub = middle.listIterator(m);
+    }
+
     return new ListIterator<Value>() {
-      int pos = reverse ? r + 1 : -l;
+      int pos = startPos;
 
       @Override
       public int nextIndex() {
         return pos < 0 ? l + pos
-             : pos > 0 ? l + m + pos - 1
+             : pos > 0 ? (int) (l + m + pos - 1)
                        : l + sub.nextIndex();
       }
 
@@ -574,7 +586,7 @@ final class BigArray extends Array {
       @Override
       public int previousIndex() {
         return pos < 0 ? l + pos - 1
-             : pos > 0 ? l + m + pos - 2
+             : pos > 0 ? (int) (l + m + pos - 2)
                        : l + sub.previousIndex();
       }
 
@@ -625,13 +637,6 @@ final class BigArray extends Array {
     if(l < MIN_DIGIT || l > MAX_DIGIT) throw new AssertionError("Left digit: " + l);
     if(r < MIN_DIGIT || r > MAX_DIGIT) throw new AssertionError("Right digit: " + r);
     middle.checkInvariants();
-  }
-
-  @Override
-  long[] sizes() {
-    final long[] sizes = middle.sizes(1);
-    sizes[0] = left.length + right.length;
-    return sizes;
   }
 
   @Override

@@ -66,12 +66,14 @@ public abstract class JsonConverter {
    * Returns a JSON converter for the given configuration.
    * @param jopts options
    * @return JSON converter
+   * @throws QueryIOException query I/O exception
    */
-  public static JsonConverter get(final JsonParserOptions jopts) {
+  public static JsonConverter get(final JsonParserOptions jopts) throws QueryIOException {
     switch(jopts.get(JsonOptions.FORMAT)) {
       case JSONML:     return new JsonMLConverter(jopts);
       case ATTRIBUTES: return new JsonAttsConverter(jopts);
       case MAP:        return new JsonMapConverter(jopts);
+      case BASIC:      return new JsonBasicConverter(jopts);
       default:         return new JsonDirectConverter(jopts);
     }
   }
@@ -85,9 +87,10 @@ public abstract class JsonConverter {
   /**
    * Called when a pair of a JSON object is opened.
    * @param key the key of the entry
+   * @param add add pair
    * @throws QueryIOException query exception
    */
-  abstract void openPair(byte[] key) throws QueryIOException;
+  abstract void openPair(byte[] key, boolean add) throws QueryIOException;
 
   /**
    * Called when a pair of a JSON object is closed.
@@ -123,30 +126,6 @@ public abstract class JsonConverter {
    * @throws QueryIOException query exception
    */
   abstract void closeArray() throws QueryIOException;
-
-  /**
-   * Called when a constructor function is opened.
-   * @param name name of the constructor
-   * @throws QueryIOException query exception
-   */
-  abstract void openConstr(byte[] name) throws QueryIOException;
-
-  /**
-   * Called when an argument of a constructor function is opened.
-   */
-  abstract void openArg();
-
-  /**
-   * Called when an argument of a constructor function is closed.
-   * @throws QueryIOException query exception
-   */
-  abstract void closeArg() throws QueryIOException;
-
-  /**
-   * Called when a constructor function is closed.
-   * @throws QueryIOException query exception
-   */
-  abstract void closeConstr() throws QueryIOException;
 
   /**
    * Called when a number literal is encountered.

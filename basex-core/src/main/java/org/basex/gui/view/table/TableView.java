@@ -13,6 +13,7 @@ import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.view.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -79,7 +80,9 @@ public final class TableView extends View implements Runnable {
     } else {
       if(!more) tdata.resetFilter();
       gui.updating = true;
-      new Thread(this).start();
+      final Thread t = new Thread(this);
+      t.setDaemon(true);
+      t.start();
     }
   }
 
@@ -96,7 +99,7 @@ public final class TableView extends View implements Runnable {
     final Context context = gui.context;
     final DBNodes marked = context.marked;
     if(marked.size() != 0) {
-      final int p = tdata.getRoot(context.data(), marked.pres[0]);
+      final int p = tdata.getRoot(context.data(), marked.pre(0));
       if(p != -1) setPos(p);
     }
     repaint();
@@ -250,7 +253,7 @@ public final class TableView extends View implements Runnable {
       } else {
         DBNodes nodes = context.marked;
         if(getCursor() == CURSORARROW) {
-          nodes = new DBNodes(nodes.data, tdata.getRoot(nodes.data, pre));
+          nodes = new DBNodes(nodes.data(), tdata.getRoot(nodes.data(), pre));
         }
         gui.notify.context(nodes, false, null);
       }

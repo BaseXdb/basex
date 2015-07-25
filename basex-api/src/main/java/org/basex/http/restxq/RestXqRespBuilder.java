@@ -67,12 +67,12 @@ final class RestXqRespBuilder {
             final byte[] nam = c.attribute(Q_NAME);
             final byte[] val = c.attribute(Q_VALUE);
             if(nam != null && val != null) {
-              final String key = string(nam);
-              final String value = string(val);
-              if(key.equals(HttpText.CONTENT_TYPE)) {
+              final String key = string(nam), value = string(val);
+              if(key.equalsIgnoreCase(HttpText.CONTENT_TYPE)) {
                 cType = value;
               } else {
-                http.res.setHeader(key, value);
+                http.res.setHeader(key, key.equalsIgnoreCase(HttpText.LOCATION) ?
+                  http.resolve(value) : value);
               }
             }
           } else {

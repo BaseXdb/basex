@@ -87,7 +87,7 @@ final class Unit {
         // find Unit annotations
         final AnnList anns = sf.anns;
         boolean xq = false;
-        for(final Ann ann : anns) xq |= eq(ann.sig.uri, QueryText.UNIT_URI);
+        for(final Ann ann : anns) xq |= ann.sig != null && eq(ann.sig.uri, QueryText.UNIT_URI);
         if(!xq) continue;
 
         // Unit function:

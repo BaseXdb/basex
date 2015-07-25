@@ -7,7 +7,6 @@ import javax.xml.parsers.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.xml.sax.*;
@@ -36,19 +35,19 @@ import org.xml.sax.*;
  */
 public class ValidateDtdInfo extends ValidateFn {
   @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
-    return value(qc).iter();
+  public Value value(final QueryContext qc) throws QueryException {
+    return info(qc);
   }
 
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
+  public Value info(final QueryContext qc) throws QueryException {
     checkCreate(qc);
-    return process(new Validate() {
+    return process(new Validation() {
       @Override
       void process(final ErrorHandler handler)
           throws IOException, ParserConfigurationException, SAXException, QueryException {
 
-        final Item it = toItem(exprs[0], qc);
+        final Item it = toNodeOrAtomItem(exprs[0], qc);
         SerializerOptions sp = null;
 
         // integrate doctype declaration via serialization parameters

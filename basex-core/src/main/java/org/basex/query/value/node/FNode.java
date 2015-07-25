@@ -1,5 +1,7 @@
 package org.basex.query.value.node;
 
+import java.util.*;
+
 import org.basex.core.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
@@ -59,8 +61,8 @@ public abstract class FNode extends ANode {
   }
 
   @Override
-  public final AxisIter ancestor() {
-    return new AxisIter() {
+  public final BasicNodeIter ancestor() {
+    return new BasicNodeIter() {
       private ANode node = FNode.this;
 
       @Override
@@ -72,8 +74,8 @@ public abstract class FNode extends ANode {
   }
 
   @Override
-  public final AxisIter ancestorOrSelf() {
-    return new AxisIter() {
+  public final BasicNodeIter ancestorOrSelf() {
+    return new BasicNodeIter() {
       private ANode node = FNode.this;
 
       @Override
@@ -87,18 +89,18 @@ public abstract class FNode extends ANode {
   }
 
   @Override
-  public AxisMoreIter attributes() {
-    return AxisMoreIter.EMPTY;
+  public BasicNodeIter attributes() {
+    return BasicNodeIter.EMPTY;
   }
 
   @Override
-  public AxisMoreIter children() {
-    return AxisMoreIter.EMPTY;
+  public BasicNodeIter children() {
+    return BasicNodeIter.EMPTY;
   }
 
   @Override
-  public final FNode parent(final ANode p) {
-    parent = p;
+  public final FNode parent(final ANode par) {
+    parent = par;
     return this;
   }
 
@@ -108,12 +110,12 @@ public abstract class FNode extends ANode {
   }
 
   @Override
-  public final AxisIter descendant() {
+  public final BasicNodeIter descendant() {
     return desc(false);
   }
 
   @Override
-  public final AxisIter descendantOrSelf() {
+  public final BasicNodeIter descendantOrSelf() {
     return desc(true);
   }
 
@@ -122,13 +124,11 @@ public abstract class FNode extends ANode {
    * @param iter iterator
    * @return node iterator
    */
-  static AxisMoreIter iter(final ANodeList iter) {
-    return new AxisMoreIter() {
-      /** Child counter. */ int c;
+  static BasicNodeIter iter(final ANodeList iter) {
+    return new BasicNodeIter() {
+      int c;
       @Override
-      public boolean more() { return iter != null && c != iter.size(); }
-      @Override
-      public ANode next() { return more() ? iter.get(c++) : null; }
+      public ANode next() { return iter != null && c != iter.size() ? iter.get(c++) : null; }
       @Override
       public ANode get(final long i) { return iter.get((int) i); }
       @Override
@@ -159,90 +159,84 @@ public abstract class FNode extends ANode {
    * @param self include self node
    * @return node iterator
    */
-  private AxisIter desc(final boolean self) {
-    return new AxisIter() {
-      /** Iterator. */
-      private AxisMoreIter[] nm = new AxisMoreIter[1];
-      /** Iterator Level. */
-      private int l;
+  private BasicNodeIter desc(final boolean self) {
+    return new BasicNodeIter() {
+      private final Stack<BasicNodeIter> iters = new Stack<>();
+      private ANode last;
 
       @Override
       public ANode next() {
-        if(nm[0] == null) nm[0] = self ? self() : children();
-        if(l < 0) return null;
-
-        final ANode node = nm[l].next();
-        if(node != null) {
-          final AxisMoreIter ch = node.children();
-          if(ch.more()) {
-            if(l + 1 == nm.length) nm = Array.copy(nm, new AxisMoreIter[l + 1 << 1]);
-            nm[++l] = ch;
-          } else {
-            while(!nm[l].more()) if(l-- <= 0) break;
+        final BasicNodeIter iter = last != null ? last.children() : self ? self() : children();
+        last = iter.next();
+        if(last == null) {
+          while(!iters.isEmpty()) {
+            last = iters.peek().next();
+            if(last != null) break;
+            iters.pop();
           }
+        } else {
+          iters.add(iter);
         }
-        return node;
+        return last;
       }
     };
   }
 
   @Override
-  public final AxisIter parentIter() {
-    return new AxisIter() {
-      /** First call. */
-      private boolean more;
+  public final BasicNodeIter parentIter() {
+    return new BasicNodeIter() {
+      private boolean all;
 
       @Override
       public ANode next() {
-        return (more ^= true) ? parent : null;
+        if(all) return null;
+        all = true;
+        return parent;
       }
     };
   }
 
   @Override
-  public final AxisIter followingSibling() {
-    return new AxisIter() {
-      /** Iterator. */
-      private AxisIter ai;
+  public final BasicNodeIter followingSibling() {
+    return new BasicNodeIter() {
+      private BasicNodeIter iter;
 
       @Override
       public ANode next() {
-        if(ai == null) {
+        if(iter == null) {
           final ANode r = parent();
           if(r == null) return null;
-          ai = r.children();
-          for(ANode n; (n = ai.next()) != null && !n.is(FNode.this););
+          iter = r.children();
+          for(ANode n; (n = iter.next()) != null && !n.is(FNode.this););
         }
-        return ai.next();
+        return iter.next();
       }
     };
   }
 
   @Override
-  public final AxisIter following() {
-    return new AxisIter() {
-      /** Iterator. */
-      private NodeSeqBuilder nc;
+  public final BasicNodeIter following() {
+    return new BasicNodeIter() {
+      private BasicNodeIter iter;
 
       @Override
       public ANode next() {
-        if(nc == null) {
-          nc = new NodeSeqBuilder();
-          ANode n = FNode.this;
-          ANode p = n.parent();
-          while(p != null) {
-            final AxisIter i = p.children();
-            for(ANode c; n.type != NodeType.ATT &&
-              (c = i.next()) != null && !c.is(n););
-            for(ANode c; (c = i.next()) != null;) {
-              nc.add(c.finish());
-              addDesc(c.children(), nc);
+        if(iter == null) {
+          final ANodeList list = new ANodeList();
+          ANode node = FNode.this, par = node.parent();
+          while(par != null) {
+            final BasicNodeIter i = par.children();
+            for(ANode n; node.type != NodeType.ATT && (n = i.next()) != null && !n.is(node););
+            for(ANode n; (n = i.next()) != null;) {
+              list.add(n.finish());
+              addDesc(n.children(), list);
             }
-            n = p;
-            p = p.parent();
+            node = par;
+            par = par.parent();
           }
+          iter = list.iter();
         }
-        return nc.next();
+        return iter.next();
       }
     };
   }

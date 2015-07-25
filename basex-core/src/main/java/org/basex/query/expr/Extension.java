@@ -83,6 +83,12 @@ public final class Extension extends Single {
   }
 
   @Override
+  public boolean has(final Flag flag) {
+    for(final Pragma p : pragmas) if(p.has(flag)) return true;
+    return super.has(flag);
+  }
+
+  @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     for(final Pragma p : pragmas) sb.append(p).append(' ');

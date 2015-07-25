@@ -100,7 +100,7 @@ final class SmallArray extends Array {
   }
 
   @Override
-  public Array reverse() {
+  public Array reverseArray() {
     final int n = elems.length;
     if(n == 1) return this;
     final Value[] es = new Value[n];
@@ -149,9 +149,9 @@ final class SmallArray extends Array {
   }
 
   @Override
-  public ListIterator<Value> members(final boolean reverse) {
+  public ListIterator<Value> iterator(final long start) {
     return new ListIterator<Value>() {
-      private int index = reverse ? elems.length : 0;
+      private int index = (int) Math.max(0, Math.min(start, elems.length));
 
       @Override
       public int nextIndex() {
@@ -207,11 +207,6 @@ final class SmallArray extends Array {
     final int n = elems.length;
     if(n == 0) throw new AssertionError("Empty array in " + getClass().getSimpleName());
     if(n > MAX_SMALL) throw new AssertionError("Array too big: " + n);
-  }
-
-  @Override
-  long[] sizes() {
-    return new long[] { elems.length };
   }
 
   @Override

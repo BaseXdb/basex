@@ -20,6 +20,11 @@ import org.basex.query.value.node.*;
 public final class UserListDetails extends UserList {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
+    return value(qc).iter();
+  }
+
+  @Override
+  public Value value(final QueryContext qc) throws QueryException {
     checkAdmin(qc);
     final User u = exprs.length > 0 ? toUser(0, qc) : null;
 
@@ -42,11 +47,6 @@ public final class UserListDetails extends UserList {
       }
       vb.add(user);
     }
-    return vb;
-  }
-
-  @Override
-  public Value value(final QueryContext qc) throws QueryException {
-    return iter(qc).value();
+    return vb.value();
   }
 }

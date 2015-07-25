@@ -1,7 +1,5 @@
 package org.basex.query.value.array;
 
-import java.util.*;
-
 import org.basex.query.util.fingertree.*;
 import org.basex.query.value.*;
 
@@ -109,8 +107,7 @@ public final class ArrayBuilder {
    */
   public ArrayBuilder append(final Array arr) {
     if(!(arr instanceof BigArray)) {
-      final Iterator<Value> members = arr.members();
-      while(members.hasNext()) append(members.next());
+      for(final Value val : arr.members()) append(val);
       return this;
     }
 
@@ -195,18 +192,13 @@ public final class ArrayBuilder {
         sb.append(vals[first]);
         for(int i = 1; i < n; i++) sb.append(", ").append(vals[(first + i) % CAP]);
       }
-      return sb.append(']').toString();
-    }
-
-    if(inLeft > 0) {
+    } else {
       final int first = (mid - inLeft + CAP) % CAP;
       sb.append(vals[first]);
       for(int i = 1; i < inLeft; i++) sb.append(", ").append(vals[(first + i) % CAP]);
-      sb.append(", ");
+      for(final Value val : tree) sb.append(", ").append(val);
+      for(int i = 0; i < inRight; i++) sb.append(", ").append(vals[(mid + i) % CAP]);
     }
-
-    tree.toString(sb);
-    for(int i = 0; i < inRight; i++) sb.append(", ").append(vals[(mid + i) % CAP]);
     return sb.append(']').toString();
   }
 }

@@ -8,12 +8,13 @@ import java.io.*;
 
 import org.basex.build.json.*;
 import org.basex.build.json.JsonOptions.JsonFormat;
-import org.basex.data.*;
 import org.basex.io.out.*;
 import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
+import org.basex.query.util.ft.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -100,10 +101,10 @@ public final class JsonNodeSerializer extends JsonSerializer {
   }
 
   @Override
-  protected void startOpen(final byte[] name) throws IOException {
+  protected void startOpen(final QNm name) throws IOException {
     types.set(level, null);
     comma.set(level + 1, false);
-    key = atts ? null : name;
+    key = atts ? null : name.string();
   }
 
   @Override
@@ -127,7 +128,7 @@ public final class JsonNodeSerializer extends JsonSerializer {
       types.set(level, value);
     } else if(atts && eq(name, NAME)) {
       key = value;
-      if(!eq(elem, PAIR)) throw error("<%> found, <pair> expected", elem);
+      if(!eq(elem.string(), PAIR)) throw error("<%> found, <pair> expected", elem);
     } else if(!eq(name, XMLNS) && !startsWith(name, XMLNSC)) {
       throw error("<%> has invalid attribute \"%\"", elem, name);
     }
@@ -142,7 +143,7 @@ public final class JsonNodeSerializer extends JsonSerializer {
       indent();
       final byte[] ptype = types.get(level - 1);
       if(eq(ptype, OBJECT)) {
-        if(atts && !eq(elem, PAIR)) throw error("<%> found, <%> expected", elem, PAIR);
+        if(atts && !eq(elem.string(), PAIR)) throw error("<%> found, <%> expected", elem, PAIR);
         if(key == null) throw error("<%> has no name attribute", elem);
         out.print('"');
         final byte[] name = atts ? key : XMLToken.decode(key, lax);
@@ -151,10 +152,10 @@ public final class JsonNodeSerializer extends JsonSerializer {
         out.print("\":");
       } else if(eq(ptype, ARRAY)) {
         if(atts) {
-          if(!eq(elem, ITEM)) throw error("<%> found, <%> expected", elem, ITEM);
+          if(!eq(elem.string(), ITEM)) throw error("<%> found, <%> expected", elem, ITEM);
           if(key != null) throw error("<%> must have no name attribute", elem);
         } else {
-          if(!eq(elem, VALUE)) throw error("<%> found, <%> expected", elem, VALUE);
+          if(!eq(elem.string(), VALUE)) throw error("<%> found, <%> expected", elem, VALUE);
         }
       } else {
         throw error("<%> is typed as \"%\" and cannot be nested", elems.get(level - 1), ptype);

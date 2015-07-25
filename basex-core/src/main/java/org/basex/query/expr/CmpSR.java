@@ -73,14 +73,15 @@ final class CmpSR extends Single {
    * @throws QueryException query exception
    */
   static ParseExpr get(final CmpG cmp) throws QueryException {
-    if(!(cmp.exprs[1] instanceof AStr)) return cmp;
-    final byte[] d = ((Item) cmp.exprs[1]).string(cmp.info);
-    final Expr e = cmp.exprs[0];
+    final Expr e1 = cmp.exprs[0], e2 = cmp.exprs[1];
+    if(e1.has(Flag.NDT) || e1.has(Flag.UPD) || !(e2 instanceof AStr)) return cmp;
+
+    final byte[] d = ((AStr) e2).string(cmp.info);
     switch(cmp.op.op) {
-      case GE: return new CmpSR(e, d,    true,  null, true,  cmp.coll, cmp.info);
-      case GT: return new CmpSR(e, d,    false, null, true,  cmp.coll, cmp.info);
-      case LE: return new CmpSR(e, null, true,  d,    true,  cmp.coll, cmp.info);
-      case LT: return new CmpSR(e, null, true,  d,    false, cmp.coll, cmp.info);
+      case GE: return new CmpSR(e1, d,    true,  null, true,  cmp.coll, cmp.info);
+      case GT: return new CmpSR(e1, d,    false, null, true,  cmp.coll, cmp.info);
+      case LE: return new CmpSR(e1, null, true,  d,    true,  cmp.coll, cmp.info);
+      case LT: return new CmpSR(e1, null, true,  d,    false, cmp.coll, cmp.info);
       default: return cmp;
     }
   }

@@ -51,6 +51,13 @@ public final class AdaptiveSerializer extends OutputSerializer {
   }
 
   @Override
+  public Serializer sc(final StaticContext sctx) {
+    xml.sc(sctx);
+    json.sc(sctx);
+    return super.sc(sctx);
+  }
+
+  @Override
   public void serialize(final Item item) throws IOException {
     if(more) xml.printChars(itemsep);
     super.serialize(item);

@@ -6,7 +6,6 @@ import static org.basex.query.func.Function.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -20,22 +19,22 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public final class DBNodeSeq extends NativeSeq {
+public class DBNodeSeq extends NativeSeq {
   /** Data reference. */
-  private final Data data;
+  protected final Data data;
   /** Pre values. */
-  public final int[] pres;
-  /** Pre values comprise all documents of the database. */
-  public final boolean all;
+  protected int[] pres;
+  /** Pre values reference all documents of the database. */
+  protected boolean all;
 
   /**
    * Constructor.
    * @param pres pre values
    * @param data data reference
    * @param type node type
-   * @param all pre values comprise all documents of the database
+   * @param all pre values reference all documents of the database
    */
-  private DBNodeSeq(final int[] pres, final Data data, final Type type, final boolean all) {
+  protected DBNodeSeq(final int[] pres, final Data data, final Type type, final boolean all) {
     super(pres.length, type);
     this.pres = pres;
     this.data = data;
@@ -70,18 +69,35 @@ public final class DBNodeSeq extends NativeSeq {
   }
 
   @Override
-  public Value reverse() {
-    final int s = pres.length;
-    final int[] tmp = new int[s];
-    for(int l = 0, r = s - 1; l < s; l++, r--) tmp[l] = pres[r];
-    return get(tmp, data, type, false);
-  }
-
-  @Override
   public Value atomValue(final InputInfo ii) throws QueryException {
-    final ValueBuilder vb = new ValueBuilder((int) size);
+    final ValueBuilder vb = new ValueBuilder();
     for(int s = 0; s < size; s++) vb.add(itemAt(s).atomValue(ii));
     return vb.value();
+  }
+
+  /**
+   * Returns the internal pre value array.
+   * @return pre values
+   */
+  public int[] pres() {
+    return pres;
+  }
+
+  /**
+   * Returns the specified pre value.
+   * @param index index of pre value
+   * @return pre value
+   */
+  public int pre(final int index) {
+    return pres[index];
+  }
+
+  /**
+   * Indicates if pre values reference all documents of the database.
+   * @return flag
+   */
+  public boolean all() {
+    return all;
   }
 
   @Override
@@ -105,7 +121,7 @@ public final class DBNodeSeq extends NativeSeq {
    * @param pres pre values
    * @param data data reference
    * @param docs all values reference document nodes
-   * @param all pre values comprise all documents of the database
+   * @param all pre values reference all documents of the database
    * @return resulting item or sequence
    */
   public static Value get(final IntList pres, final Data data, final boolean docs,
@@ -118,7 +134,7 @@ public final class DBNodeSeq extends NativeSeq {
    * @param pres pre values
    * @param data data reference
    * @param type node type
-   * @param all pre values comprise all documents of the database
+   * @param all pre values reference all documents of the database
    * @return resulting item or sequence
    */
   private static Value get(final int[] pres, final Data data, final Type type, final boolean all) {

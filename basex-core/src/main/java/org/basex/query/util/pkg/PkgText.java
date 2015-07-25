@@ -24,6 +24,8 @@ public interface PkgText {
   String EXPATH = "EXPath";
   /** Internal type. */
   String INTERNAL = "Internal";
+  /** Content directory. */
+  String CONTENT = "content";
 
   /** <package/> root element. */
   /** Element package. */

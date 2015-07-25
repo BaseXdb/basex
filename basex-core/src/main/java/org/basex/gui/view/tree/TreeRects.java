@@ -2,9 +2,9 @@ package org.basex.gui.view.tree;
 
 import java.awt.*;
 
-import org.basex.data.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.view.*;
+import org.basex.query.value.seq.*;
 
 /**
  * This class stores the rectangles.
@@ -40,7 +40,7 @@ final class TreeRects implements TreeConstants {
   double generateRects(final TreeSubtree sub, final Graphics g, final int ds, final int dw,
       final boolean slim) {
 
-    final int[] roots = nodes.pres;
+    final int[] roots = nodes.pres();
     final int rl = roots.length;
     if(rl == 0) return 0;
     final double w = (dw - BORDER_PADDING - ds) / (double) rl;
@@ -155,7 +155,7 @@ final class TreeRects implements TreeConstants {
    * @return text
    */
   byte[] getText(final int pre) {
-    return ViewData.name(view.gui.gopts, nodes.data, pre);
+    return ViewData.name(view.gui.gopts, nodes.data(), pre);
   }
 
   /**

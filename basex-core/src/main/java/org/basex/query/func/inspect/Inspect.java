@@ -6,6 +6,9 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
+import org.basex.build.*;
+import org.basex.build.xml.*;
+import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
@@ -90,8 +93,14 @@ public abstract class Inspect {
 
     for(final Ann ann : anns) {
       final FElem annotation = elem("annotation", parent);
-      annotation.add("name", ann.sig.id());
-      if(uri) annotation.add("uri", ann.sig.uri);
+      if(ann.sig != null) {
+        annotation.add("name", ann.sig.id());
+        if(uri) annotation.add("uri", ann.sig.uri);
+      } else {
+        annotation.add("name", ann.name.string());
+        if(uri) annotation.add("uri", ann.name.uri());
+      }
+
       for(final Item it : ann.args) {
         final FElem literal = elem("literal", annotation);
         literal.add("type", it.type.toString()).add(it.string(null));
@@ -121,9 +130,10 @@ public abstract class Inspect {
    * @param elem element
    */
   public static void add(final byte[] value, final FElem elem) {
+
     try {
-      final ANode node = new DBNode(new IOContent(value));
-      for(final ANode n : node.children()) elem.add(n.copy());
+      final Parser parser = new XMLParser(new IOContent(value), MainOptions.get(), true);
+      for(final ANode node : new DBNode(parser).children()) elem.add(node.copy());
     } catch(final IOException ex) {
       // fallback: add string representation
       Util.debug(ex);

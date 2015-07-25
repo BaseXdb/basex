@@ -47,6 +47,15 @@ public enum QueryError {
   /** XUST0002. */
   BASEX_MOD(XUST, 2, "All transform expressions must be updating or return an empty sequence."),
 
+  // Admin module
+
+  /** FODC0001. */
+  BXAD_TODAY(FOAD, 1, "Today's log file cannot be deleted."),
+  /** FODC0002. */
+  BXAD_DELETE_X(FOAD, 2, "Log file could not be deleted: %."),
+  /** FODC0003. */
+  BXAD_TYPE_X(FOAD, 3, "Log type must consist of uppercase letters: \"%\"."),
+
   // Client module
 
   /** BXCL0001. */
@@ -102,8 +111,6 @@ public enum QueryError {
   BXDB_RENAME_X(BXDB, 8, "Invalid target path: %."),
   /** BXDB0009. */
   BXDB_RANGE_X_X_X(BXDB, 9, "Database '%' has no node with % value %."),
-  /** BXDB0010. */
-  BXDB_EVENT_X(BXDB, 10, "Event '%' is unknown."),
   /** BXDB0011. */
   BXDB_NAME_X(BXDB, 11, "Invalid database name '%'."),
   /** BXDB0012. */
@@ -148,6 +155,8 @@ public enum QueryError {
   BXJS_PARSEML_X(BXJS, 1, "JsonML parser: %."),
   /** BXJS0002. */
   BXJS_SERIAL_X(BXJS, 2, "JSON serializer: %."),
+  /** BXJS0003. */
+  BXJS_INVALID_X(BXJS, 1, "'%':'%' is not supported by the target format."),
 
   // Process module
 
@@ -213,9 +222,18 @@ public enum QueryError {
   // Validation module
 
   /** BXVA0001. */
-  BXVA_FAIL_X(BXVA, 1, "Validation failed. %"),
+  BXVA_FAIL_X(BXVA, 1, "Validation failed: %"),
   /** BXVA0002. */
-  BXVA_START_X(BXVA, 2, "Validation could not be started. %"),
+  BXVA_START_X(BXVA, 2, "Validation could not be started: %"),
+  /** BXVA0003. */
+  BXVA_RELAXNG_X(BXVA, 3, "RelaxNG validation is not available."),
+
+  // Web module
+
+  /** BXWE0001. */
+  BXWE_INVALID_X(BXWE, 2, "%."),
+  /** BXWE0002. */
+  BXWE_CODES_X(BXWE, 2, "URL contains invalid characters: %"),
 
   // XQuery module
 
@@ -356,15 +374,17 @@ public enum QueryError {
   CX_SIGTYPINV(CX, 28, "Signature type is not supported."),
 
   /** File error. */
-  FILE_NOT_FOUND_X(FILE, "not-found", "File '%' does not exist."),
+  FILE_NOT_FOUND_X(FILE, "not-found", "'%' does not exist."),
   /** File error. */
-  FILE_EXISTS_X(FILE, "exists", "File '%' already exists."),
+  FILE_EXISTS_X(FILE, "exists", "'%' already exists."),
   /** File error. */
-  FILE_NO_DIR_X(FILE, "no-dir", "Path '%' is no directory."),
+  FILE_NO_DIR_X(FILE, "no-dir", "'%' is no directory."),
   /** File error. */
-  FILE_IS_DIR_X(FILE, "is-dir", "Path '%' is a directory."),
+  FILE_IS_DIR_X(FILE, "is-dir", "'%' is a directory."),
   /** File error. */
-  FILE_ID_DIR2_X(FILE, "is-dir", "Path '%' is a non-empty directory."),
+  FILE_ID_DIR2_X(FILE, "is-dir", "'%' is a non-empty directory."),
+  /** File error. */
+  FILE_IS_RELATIVE_X(FILE, "is-relative", "Base directory is relative: '%'."),
   /** File error. */
   FILE_UNKNOWN_ENCODING_X(FILE, "unknown-encoding", "Unknown encoding '%'."),
   /** File error. */
@@ -515,6 +535,10 @@ public enum QueryError {
   JSON_OPT_X(FOJS, 5, "%"),
   /** FOJS0005. */
   JSON_FUNC_OPT_X_X(FOJS, 5, "% expected, % found."),
+  /** FOJS0006. */
+  JSON_INVALID_X(FOJS, 6, "%"),
+  /** FOJS0007. */
+  JSON_ESCAPE_X(FOJS, 7, "Invalid escape sequence: %."),
 
   /** FOMP0001. */
   MAP_TZ(FOMP, 1, "Map cannot contain keys with and without timezone."),
@@ -1126,7 +1150,7 @@ public enum QueryError {
   /** XQST0097. */
   INVDECZERO_X(XQST, 97, "Zero-digit property must be Unicode digit with value zero: '%'."),
   /** XQST0098. */
-  DUPLDECFORM_X(XQST, 98, "Duplicate use of decimal-format '%'."),
+  DUPLDECFORM_X(XQST, 98, "Clash of decimal format properties: '%'."),
   /** XQST0099. */
   DUPLITEM(XQST, 99, "Duplicate declaration of context value."),
   /** XQST0103. */
@@ -1338,6 +1362,7 @@ public enum QueryError {
     /** BXSL Error type. */ BXSL(BXERR_PREFIX, BXERRORS_URI),
     /** BXSQ Error type. */ BXSQ(BXERR_PREFIX, BXERRORS_URI),
     /** BXVA Error type. */ BXVA(BXERR_PREFIX, BXERRORS_URI),
+    /** BXWE Error type. */ BXWE(BXERR_PREFIX, BXERRORS_URI),
     /** BXXQ Error type. */ BXXQ(BXERR_PREFIX, BXERRORS_URI),
     /** HASH Error type. */ HASH(BXERR_PREFIX, BXERRORS_URI),
     /** UNIT Error type. */ UNIT(UNIT_PREFIX,  UNIT_URI),
@@ -1354,6 +1379,7 @@ public enum QueryError {
 
     // W3 errors
 
+    /** FOAD Error type. */ FOAD,
     /** FOAP Error type. */ FOAP,
     /** FOAR Error type. */ FOAR,
     /** FOAY Error type. */ FOAY,

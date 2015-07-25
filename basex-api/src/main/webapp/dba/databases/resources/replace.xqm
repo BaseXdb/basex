@@ -24,7 +24,7 @@ declare variable $_:SUB := 'database';
  :)
 declare
   %rest:GET
-  %rest:path("dba/replace")
+  %rest:path("/dba/replace")
   %rest:query-param("name",     "{$name}")
   %rest:query-param("resource", "{$resource}")
   %rest:query-param("error",    "{$error}")
@@ -71,7 +71,7 @@ function _:replace(
 declare
   %updating
   %rest:POST
-  %rest:path("dba/replace")
+  %rest:path("/dba/replace")
   %rest:form-param("name",     "{$name}")
   %rest:form-param("resource", "{$resource}")
   %rest:form-param("input",    "{$input}")

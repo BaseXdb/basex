@@ -7,9 +7,10 @@ import java.io.*;
 
 import org.basex.build.csv.*;
 import org.basex.build.csv.CsvOptions.CsvFormat;
-import org.basex.data.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
+import org.basex.query.util.ft.*;
+import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
@@ -52,7 +53,7 @@ public final class CsvDirectSerializer extends CsvSerializer {
   }
 
   @Override
-  protected void startOpen(final byte[] name) {
+  protected void startOpen(final QNm name) {
     if(level == 1) data = new TokenMap();
     attv = null;
   }
@@ -106,7 +107,7 @@ public final class CsvDirectSerializer extends CsvSerializer {
    */
   private void cache(final byte[] value) throws IOException {
     if(headers != null) {
-      final byte[] key = atts && attv != null ? attv : elem;
+      final byte[] key = atts && attv != null ? attv : elem.string();
       final byte[] name = XMLToken.decode(key, lax);
       if(name == null) error("Invalid element name <%>", key);
       if(!headers.contains(name)) headers.add(name);

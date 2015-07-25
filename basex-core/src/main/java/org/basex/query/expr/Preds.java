@@ -89,7 +89,7 @@ public abstract class Preds extends ParseExpr {
           }
         }
       } else if(pred instanceof And) {
-        if(!pred.has(Flag.FCS)) {
+        if(!pred.has(Flag.POS)) {
           // replace AND expression with predicates (don't swap position tests)
           qc.compInfo(OPTPRED, pred);
           final Expr[] and = ((Arr) pred).exprs;
@@ -205,7 +205,7 @@ public abstract class Preds extends ParseExpr {
 
     final Expr pred = preds[0];
     // a[.] -> a
-    if(pred instanceof Context) return root;
+    if(pred instanceof ContextValue) return root;
 
     if(!pred.seqType().mayBeNumber()) {
       // a[b] -> a/b
@@ -218,7 +218,7 @@ public abstract class Preds extends ParseExpr {
         if(!expr2.has(Flag.CTX)) {
           Expr path = null;
           // a[. = 'x'] -> a = 'x'
-          if(expr1 instanceof Context) path = root;
+          if(expr1 instanceof ContextValue) path = root;
           // a[text() = 'x'] -> a/text() = 'x'
           if(expr1 instanceof Path) path = Path.get(info, root, expr1).optimize(qc, scp);
           if(path != null) return new CmpG(path, expr2, cmp.op, cmp.coll, cmp.sc, cmp.info);
@@ -233,7 +233,7 @@ public abstract class Preds extends ParseExpr {
           final Expr expr = cmp.expr;
           Expr path = null;
           // a[. contains text 'x'] -> a contains text 'x'
-          if(expr instanceof Context) path = root;
+          if(expr instanceof ContextValue) path = root;
           // [text() contains text 'x'] -> a/text() contains text 'x'
           if(expr instanceof Path) path = Path.get(info, root, expr).optimize(qc, scp);
           if(path != null) return new FTContains(path, ftexpr, cmp.info);
@@ -244,7 +244,7 @@ public abstract class Preds extends ParseExpr {
   }
 
   /**
-   * Checks if the specified expression returns a deterministic numeric value.
+   * Checks if the specified expression returns an empty sequence or a deterministic numeric value.
    * @param expr expression
    * @return result of check
    */
@@ -256,7 +256,7 @@ public abstract class Preds extends ParseExpr {
   @Override
   public boolean has(final Flag flag) {
     for(final Expr pred : preds) {
-      if(flag == Flag.FCS && pred.seqType().mayBeNumber() || pred.has(flag)) return true;
+      if(flag == Flag.POS && pred.seqType().mayBeNumber() || pred.has(flag)) return true;
     }
     return false;
   }

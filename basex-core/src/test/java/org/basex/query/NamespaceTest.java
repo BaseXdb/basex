@@ -7,6 +7,7 @@ import static org.junit.Assert.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
 import org.basex.query.up.primitives.node.*;
@@ -60,8 +61,8 @@ public final class NamespaceTest extends AdvancedQueryTest {
     create(12);
     query("insert node <b xmlns:ns='A'/> into doc('d12')/*:a/*:b");
     assertEquals(NL +
-        "  Pre[3] xmlns:ns=\"A\" " + NL +
-        "  Pre[4] xmlns=\"B\" ",
+        "  Pre[3] xmlns:ns=\"A\"" + NL +
+        "  Pre[4] xmlns=\"B\"",
         context.data().nspaces.toString());
   }
 
@@ -75,7 +76,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
     create(13);
     query("insert node <c/> as first into doc('d13')/a");
     assertEquals(NL +
-        "  Pre[3] xmlns=\"A\" ",
+        "  Pre[3] xmlns=\"A\"",
         context.data().nspaces.toString());
   }
 
@@ -89,10 +90,10 @@ public final class NamespaceTest extends AdvancedQueryTest {
     create(14);
     query("insert node <n xmlns='D'/> into doc('d14')/*:a/*:b");
     assertEquals(NL +
-        "  Pre[1] xmlns=\"A\" " + NL +
-        "    Pre[2] xmlns=\"B\" " + NL +
-        "      Pre[3] xmlns=\"D\" " + NL +
-        "    Pre[4] xmlns=\"C\" ",
+        "  Pre[1] xmlns=\"A\"" + NL +
+        "    Pre[2] xmlns=\"B\"" + NL +
+        "      Pre[3] xmlns=\"D\"" + NL +
+        "    Pre[4] xmlns=\"C\"",
         context.data().nspaces.toString());
   }
 
@@ -106,7 +107,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
     create(12);
     query("delete node doc('d12')/a/b");
     assertEquals(NL +
-        "  Pre[2] xmlns=\"B\" ",
+        "  Pre[2] xmlns=\"B\"",
         context.data().nspaces.toString());
   }
 
@@ -120,8 +121,8 @@ public final class NamespaceTest extends AdvancedQueryTest {
     create(14);
     query("delete node doc('d14')/*:a/*:b");
     assertEquals(NL +
-        "  Pre[1] xmlns=\"A\" " + NL +
-        "    Pre[2] xmlns=\"C\" ",
+        "  Pre[1] xmlns=\"A\"" + NL +
+        "    Pre[2] xmlns=\"C\"",
         context.data().nspaces.toString());
   }
 
@@ -135,9 +136,9 @@ public final class NamespaceTest extends AdvancedQueryTest {
     create(15);
     query("delete node doc('d15')/*:a/*:c");
     assertEquals(NL +
-        "  Pre[1] xmlns=\"A\" " + NL +
-        "    Pre[2] xmlns=\"B\" " + NL +
-        "    Pre[3] xmlns=\"E\" ",
+        "  Pre[1] xmlns=\"A\"" + NL +
+        "    Pre[2] xmlns=\"B\"" + NL +
+        "    Pre[3] xmlns=\"E\"",
         context.data().nspaces.toString());
   }
 
@@ -151,6 +152,23 @@ public final class NamespaceTest extends AdvancedQueryTest {
     create(16);
     query("delete node doc('d16')/a/b");
     assertTrue(context.data().nspaces.toString().isEmpty());
+  }
+
+  /**
+   * Inserts an attribute with namespace.
+   * @throws Exception exception
+   */
+  @Test
+  public void insertAttributeWithNs() throws Exception {
+    create(1);
+    query("insert node attribute { QName('ns', 'pref:local') } { } into /*");
+    final Data data = context.data();
+    assertEquals(false, data.nsFlag(0));
+    assertEquals(true, data.nsFlag(1));
+    assertEquals(false, data.nsFlag(2));
+    assertEquals(0, data.uriId(1, data.kind(1)));
+    assertEquals(1, data.uriId(2, data.kind(2)));
+    assertEquals("ns", string(data.nspaces.uri(1)));
   }
 
   /**
@@ -176,7 +194,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
     create(21);
     query("delete node //b");
     assertEquals(NL +
-        "  Pre[2] xmlns:p1=\"u1\" ",
+        "  Pre[2] xmlns:p1=\"u1\"",
         context.data().nspaces.toString());
   }
 
@@ -264,9 +282,9 @@ public final class NamespaceTest extends AdvancedQueryTest {
     create(9);
     query("insert node <f xmlns='F'/> into doc('d9')//*:e");
     assertEquals(NL +
-        "  Pre[1] xmlns=\"A\" " + NL +
-        "    Pre[4] xmlns=\"D\" " + NL +
-        "    Pre[6] xmlns=\"F\" ",
+        "  Pre[1] xmlns=\"A\"" + NL +
+        "    Pre[4] xmlns=\"D\"" + NL +
+        "    Pre[6] xmlns=\"F\"",
         context.data().nspaces.toString());
   }
 
@@ -279,10 +297,10 @@ public final class NamespaceTest extends AdvancedQueryTest {
     create(10);
     query("insert node <f xmlns='F'/> into doc('d10')//*:e");
     assertEquals(NL +
-        "  Pre[1] xmlns=\"A\" " + NL +
-        "    Pre[4] xmlns=\"D\" " + NL +
-        "      Pre[5] xmlns=\"G\" " + NL +
-        "    Pre[7] xmlns=\"F\" ",
+        "  Pre[1] xmlns=\"A\"" + NL +
+        "    Pre[4] xmlns=\"D\"" + NL +
+        "      Pre[5] xmlns=\"G\"" + NL +
+        "    Pre[7] xmlns=\"F\"",
         context.data().nspaces.toString());
   }
 
@@ -301,8 +319,8 @@ public final class NamespaceTest extends AdvancedQueryTest {
     create(2);
     query("insert node <a xmlns='y'/> into doc('d2')//*:x");
     assertEquals(NL +
-        "  Pre[1] xmlns=\"xx\" " + NL +
-        "    Pre[2] xmlns=\"y\" ",
+        "  Pre[1] xmlns=\"xx\"" + NL +
+        "    Pre[2] xmlns=\"y\"",
         context.data().nspaces.toString());
   }
 
@@ -482,7 +500,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
     context.data().startUpdate(context.options);
     context.data().delete(0);
     context.data().finishUpdate(context.options);
-    final byte[] ns = context.data().nspaces.globalNS();
+    final byte[] ns = context.data().nspaces.globalUri();
     assertTrue(ns != null && ns.length == 0);
   }
 
@@ -630,7 +648,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
     query(
       "let $b := <a xmlns:x='X' x:id='0'/> " +
       "return insert node $b//@*:id into /*:n");
-    assertEquals(1, context.data().ns(1).size());
+    assertEquals(1, context.data().namespaces(1).size());
   }
 
   /** Handles duplicate prefixes. */
@@ -747,7 +765,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
         "  $target := $input-context/works[1]/employee[1]" +
         "return insert nodes $source into $target";
     try(final QueryProcessor qp = new QueryProcessor(query, context)) {
-      qp.execute();
+      qp.value();
     } catch(final QueryException ex) {
       assertEquals("XUTY0004", string(ex.qname().local()));
     }

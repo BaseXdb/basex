@@ -55,7 +55,7 @@ public interface Text {
   String S_STANDALONE = "Standalone";
   /** Start information. */
   String  S_LOCALINFO =
-    " [-bcdioqrRsuvVwxXz] [input]" + NL +
+    " [-bcdiIoqrRstuvVwxXz] [input]" + NL +
     "  [input]     XQuery or command file, or query string" + NL +
     "  -b<pars>    Bind external query variables" + NL +
     "  -c<input>   Execute commands from file or string" + NL +
@@ -79,7 +79,7 @@ public interface Text {
   String S_CLIENT = "Client";
   /** Client start information. */
   String S_CLIENTINFO =
-    " [-bcdinopPqrRsUvVwxz] [input]" + NL +
+    " [-bcdiInopPqrRsUvVwxXz] [input]" + NL +
     "  [input]     XQuery or command file, or query string" + NL +
     "  -b<pars>    Bind external query variables" + NL +
     "  -c<input>   Execute commands from file or string" + NL +
@@ -105,11 +105,10 @@ public interface Text {
   String S_SERVER = "Server";
   /** Server start information. */
   String S_SERVERINFO =
-    " [-cdeinpSz] [stop]" + NL +
+    " [-cdinpSz] [stop]" + NL +
     "  stop      Stop running server" + NL +
     "  -c<cmds>  Execute initial database commands" + NL +
     "  -d        Activate debugging mode" + NL +
-    "  -e<port>  Set event port" + NL +
     "  -n<name>  Set host the server is bound to" + NL +
     "  -p<port>  Set server port" + NL +
     "  -S        Start as service" + NL +
@@ -124,10 +123,9 @@ public interface Text {
 
   /** HTTP information. */
   String S_HTTPINFO =
-    " [-dehlnpPsSUz] [stop]" + NL +
+    " [-dhlnpPsSUz] [stop]" + NL +
     "  stop      Stop running server" + NL +
     "  -d        Activate debugging mode" + NL +
-    "  -e<port>  Set event port" + NL +
     "  -h<port>  Set port of HTTP server" + NL +
     "  -l        Start in local mode" + NL +
     "  -n<name>  Set host name of database server" + NL +
@@ -241,19 +239,23 @@ public interface Text {
   // SERVER ===================================================================
 
   /** Server was started. */
-  String SRV_STARTED_PORT_X = lang("srv_started_port_%");
+  String PORT_X = " (" + lang("port") + ": %).";
+  /** Server was started. */
+  String SRV_STARTED_PORT_X = lang("srv_started") + PORT_X;
   /** Server was stopped. */
-  String SRV_STOPPED_PORT_X = lang("srv_stopped_port_%");
+  String SRV_STOPPED_PORT_X = lang("srv_stopped") + PORT_X;
   /** Server is running or permission was denied. */
-  String SRV_RUNNING = lang("srv_running");
-  /** Ports was specified twice. */
-  String PORT_TWICE_X = lang("port_twice_%");
+  String SRV_RUNNING = lang("srv_running") + '.';
+  /** Server is running or permission was denied. */
+  String SRV_RUNNING_X = lang("srv_running") + PORT_X;
+  /** Connection error. */
+  String CONNECTION_ERROR = lang("connection_error") + '.';
+  /** Connection error. */
+  String CONNECTION_ERROR_X = lang("connection_error") + PORT_X;
   /** Unknown host. */
   String UNKNOWN_HOST_X = lang("unknown_host_x");
   /** Timeout exceeded. */
   String TIMEOUT_EXCEEDED = lang("timeout_exceeded");
-  /** Connection error. */
-  String CONNECTION_ERROR = lang("connection_error");
   /** Access denied. */
   String ACCESS_DENIED = lang("access_denied");
   /** User name. */
@@ -277,15 +279,13 @@ public interface Text {
   /** Command help. */
   String[] HELPCREATE = {
     "[" + CmdCreate.BACKUP + '|' + CmdCreate.DATABASE + '|' +
-    CmdCreate.EVENT + '|' + CmdCreate.INDEX + '|' + CmdCreate.USER + "] [...]",
+    CmdCreate.INDEX + '|' + CmdCreate.USER + "] [...]",
     lang("c_create1"),
     lang("c_create2") + NL +
     LI + CmdDrop.BACKUP + " [" + S_NAME + "]:" + NL +
     "  " + lang("c_create22", S_NAME) + NL +
     LI + CmdCreate.DATABASE + " [" + S_NAME + "] ([" + S_INPUT + "]):"  + NL +
     "  " + lang("c_create21", S_NAME, S_INPUT) + NL +
-    LI + CmdCreate.EVENT + " [" + S_NAME + "]: " + NL +
-    "  " + lang("c_create25") + NL +
     LI + CmdCreate.INDEX + " [" + CmdIndex.TEXT + '|' + CmdIndex.ATTRIBUTE +
     '|' + CmdIndex.FULLTEXT + "]:" + NL +
     "  " + lang("c_create23") + NL +
@@ -345,7 +345,7 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPDROP = {
-    "[" + CmdDrop.BACKUP + '|' + CmdDrop.DATABASE + '|' + CmdDrop.EVENT + '|' +
+    "[" + CmdDrop.BACKUP + '|' + CmdDrop.DATABASE + '|' +
       CmdDrop.INDEX + '|' + CmdDrop.USER + "] [...]",
     lang("c_drop1"),
     lang("c_drop2") + NL +
@@ -353,8 +353,6 @@ public interface Text {
       "  " + lang("c_drop24") + NL +
     LI + CmdDrop.DATABASE + " [" + S_NAME + "]:" + NL +
       "  " + lang("c_drop21") + NL +
-    LI + CmdDrop.EVENT + " [" + S_NAME + "]:" + NL +
-      "  " + lang("c_drop25") + NL +
     LI + CmdDrop.INDEX + " [" + CmdIndex.TEXT + '|' +
       CmdIndex.ATTRIBUTE + '|' + CmdIndex.FULLTEXT + "]:" + NL +
       "  " + lang("c_drop22") + NL +
@@ -413,11 +411,9 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPSHOW = {
-    "[" + CmdShow.BACKUPS + '|' + CmdShow.EVENTS +
-    '|' + CmdShow.SESSIONS + '|' + CmdShow.USERS + ']',
+    "[" + CmdShow.BACKUPS + '|' + CmdShow.SESSIONS + '|' + CmdShow.USERS + ']',
     lang("c_show1"),
     lang("c_show21") + NL +
-    LI + CmdShow.EVENTS + ": " + lang("c_show26") + NL +
     LI + CmdShow.SESSIONS + ": " + lang("c_show23") + NL +
     LI + CmdShow.USERS + " (" + ON + " [database]): " + lang("c_show24") + NL +
     LI + CmdShow.BACKUPS + ": " + lang("c_show25")
@@ -573,7 +569,7 @@ public interface Text {
   String DB_NOT_FOUND_X = lang("db_not_found_%");
   /** Name invalid. */
   String NAME_INVALID_X = lang("name_invalid_%");
-  /** Paht invalid. */
+  /** Path invalid. */
   String PATH_INVALID_X = lang("path_invalid_%");
   /** Database pinned. */
   String DB_PINNED_X = lang("db_pinned_%");
@@ -692,8 +688,6 @@ public interface Text {
 
   /** Show sessions. */
   String SESSIONS_X = lang("sessions_%");
-  /** Show events. */
-  String EVENTS_X = lang("events_%");
   /** Show packages. */
   String PACKAGES_X = lang("packages_%");
   /** Permission required. */
@@ -726,22 +720,6 @@ public interface Text {
   String SESSIONS_KILLED_X = lang("sessions_killed_%");
   /** User kills itself. */
   String KILL_SELF_X = lang("kill_self_%");
-  /** Event dropped. */
-  String EVENT_DROPPED_X = lang("event_dropped_%");
-  /** Event added. */
-  String EVENT_CREATED_X = lang("event_created_%");
-  /** Event not found. */
-  String EVENT_UNKNOWN_X = lang("event_unknown_%");
-  /** Already watching the event. */
-  String EVENT_WATCHED_X = lang("event_watched_%");
-  /** Nothing to unwatch. */
-  String EVENT_NOT_WATCHED_X = lang("event_not_watched_%");
-  /** Event already exists. */
-  String EVENT_EXISTS_X = lang("event_exists_%");
-  /** Watch Event. */
-  String WATCHING_EVENT_X = lang("watching_event_%");
-  /** Unwatch Event. */
-  String UNWATCHING_EVENT_X = lang("unwatching_event_%");
   /** Package deleted. */
   String PKG_DELETED_X = lang("pkg_deleted_%");
   /** Package installed. */

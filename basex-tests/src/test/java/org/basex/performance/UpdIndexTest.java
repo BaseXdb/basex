@@ -156,11 +156,11 @@ public final class UpdIndexTest extends SandboxTest {
    * Runs the specified query.
    * @param query query string
    * @return result
-   * @throws QueryException database exception
+   * @throws Exception exception
    */
-  protected static String query(final String query) throws QueryException {
+  protected static String query(final String query) throws Exception {
     try(final QueryProcessor qp = new QueryProcessor(query, context)) {
-      return qp.execute().toString().replaceAll("(\\r|\\n) *", "");
+      return normNL(qp.value().serialize().toString());
     }
   }
 
@@ -168,9 +168,9 @@ public final class UpdIndexTest extends SandboxTest {
    * Checks if a query yields the specified string.
    * @param query query to be run
    * @param result query result
-   * @throws QueryException database exception
+   * @throws Exception exception
    */
-  protected static void query(final String query, final Object result) throws QueryException {
+  protected static void query(final String query, final Object result) throws Exception {
     assertEquals(result.toString(), query(query));
   }
 }

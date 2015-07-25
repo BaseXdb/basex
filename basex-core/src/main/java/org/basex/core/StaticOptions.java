@@ -1,7 +1,5 @@
 package org.basex.core;
 
-import static org.basex.util.Prop.*;
-
 import java.util.*;
 
 import org.basex.io.*;
@@ -17,7 +15,7 @@ import org.basex.util.options.*;
  */
 public final class StaticOptions extends Options {
   /** Indicates if the user's home directory has been chosen as home directory. */
-  private static final boolean USERHOME = HOME.equals(Prop.USERHOME);
+  private static final boolean USERHOME = Prop.HOME.equals(Prop.USERHOME);
 
   /** Comment: written to options file. */
   public static final Comment C_GENERAL = new Comment("General Options");
@@ -26,12 +24,12 @@ public final class StaticOptions extends Options {
   public static final BooleanOption DEBUG = new BooleanOption("DEBUG", false);
   /** Database path. */
   public static final StringOption DBPATH = new StringOption("DBPATH",
-    HOME + (USERHOME ? NAME + "Data" : "data"));
+      Prop.HOME + (USERHOME ? Prop.NAME + "Data" : "data"));
   /** Package repository path. */
   public static final StringOption REPOPATH = new StringOption("REPOPATH",
-    HOME + (USERHOME ? NAME + "Repo" : "repo"));
+      Prop.HOME + (USERHOME ? Prop.NAME + "Repo" : "repo"));
   /** Language name. */
-  public static final StringOption LANG = new StringOption("LANG", language);
+  public static final StringOption LANG = new StringOption("LANG", Prop.language);
   /** Flag to include key names in the language strings. */
   public static final BooleanOption LANGKEYS = new BooleanOption("LANGKEYS", false);
   /** Applied locking algorithm: local (database) vs. global (process) locking. */
@@ -46,8 +44,6 @@ public final class StaticOptions extends Options {
   public static final NumberOption PORT = new NumberOption("PORT", 1984);
   /** Server: port, used for binding the server. */
   public static final NumberOption SERVERPORT = new NumberOption("SERVERPORT", 1984);
-  /** Server: port, used for sending events. */
-  public static final NumberOption EVENTPORT = new NumberOption("EVENTPORT", 1985);
   /** Default user. */
   public static final StringOption USER = new StringOption("USER", "");
   /** Default password. */
@@ -79,11 +75,13 @@ public final class StaticOptions extends Options {
 
   /** Web path. */
   public static final StringOption WEBPATH = new StringOption("WEBPATH",
-    HOME + (USERHOME ? NAME + "Web" : "webapp"));
+      Prop.HOME + (USERHOME ? Prop.NAME + "Web" : "webapp"));
   /** REST path (relative to web path). */
   public static final StringOption RESTPATH = new StringOption("RESTPATH", "");
   /** RESTXQ path (relative to web path). */
   public static final StringOption RESTXQPATH = new StringOption("RESTXQPATH", "");
+  /** Cache RESTXQ paths. */
+  public static final BooleanOption CACHERESTXQ = new BooleanOption("CACHERESTXQ", false);
   /** Local (embedded) mode. */
   public static final BooleanOption HTTPLOCAL = new BooleanOption("HTTPLOCAL", false);
   /** Port for stopping the web server. */
@@ -109,26 +107,26 @@ public final class StaticOptions extends Options {
    * @param file if {@code true}, options will be read from disk
    */
   StaticOptions(final boolean file) {
-    super(file ? new IOFile(HOME, IO.BASEXSUFFIX) : null);
+    super(file ? new IOFile(Prop.HOME, IO.BASEXSUFFIX) : null);
     setSystem();
 
     // set some static options
-    language = get(LANG);
-    langkeys = get(LANGKEYS);
-    debug = get(DEBUG);
+    Prop.language = get(LANG);
+    Prop.langkeys = get(LANGKEYS);
+    Prop.debug = get(DEBUG);
     final String ph = get(PROXYHOST);
     if(!ph.isEmpty()) {
-      setSystem("http.proxyHost", ph);
-      setSystem("https.proxyHost", ph);
+      Prop.setSystem("http.proxyHost", ph);
+      Prop.setSystem("https.proxyHost", ph);
     }
     final String pp = Integer.toString(get(PROXYPORT));
     if(!pp.equals("0")) {
-      setSystem("http.proxyPort", pp);
-      setSystem("https.proxyPort", pp);
+      Prop.setSystem("http.proxyPort", pp);
+      Prop.setSystem("https.proxyPort", pp);
     }
     final String nph = get(NONPROXYHOSTS);
     if(!nph.isEmpty()) {
-      setSystem("http.nonProxyHosts", nph);
+      Prop.setSystem("http.nonProxyHosts", nph);
     }
     if(get(IGNORECERT)) IOUrl.ignoreCert();
   }

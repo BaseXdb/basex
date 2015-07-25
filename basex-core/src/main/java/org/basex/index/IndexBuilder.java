@@ -6,6 +6,7 @@ import java.io.*;
 
 import org.basex.core.*;
 import org.basex.data.*;
+import org.basex.index.value.*;
 import org.basex.util.*;
 
 /**
@@ -52,7 +53,7 @@ public abstract class IndexBuilder extends Proc {
    * @return index instance
    * @throws IOException I/O Exception
    */
-  public abstract Index build() throws IOException;
+  public abstract ValueIndex build() throws IOException;
 
   /**
    * Checks if the command was interrupted, and prints some debug output.

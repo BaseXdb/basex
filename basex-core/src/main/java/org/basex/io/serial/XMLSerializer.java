@@ -5,9 +5,9 @@ import static org.basex.query.QueryError.*;
 
 import java.io.*;
 
-import org.basex.data.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
+import org.basex.query.util.ft.*;
 import org.basex.query.value.item.*;
 
 /**
@@ -31,7 +31,7 @@ final class XMLSerializer extends MarkupSerializer {
   }
 
   @Override
-  protected void startOpen(final byte[] name) throws IOException {
+  protected void startOpen(final QNm name) throws IOException {
     if(elems.isEmpty()) {
       if(root) check();
       root = true;
@@ -49,6 +49,11 @@ final class XMLSerializer extends MarkupSerializer {
   protected void atomic(final Item it) throws IOException {
     if(elems.isEmpty()) check();
     super.atomic(it);
+  }
+
+  @Override
+  protected void doctype(final QNm type) throws IOException {
+    if(docsys != null) printDoctype(type, docpub, docsys);
   }
 
   /**

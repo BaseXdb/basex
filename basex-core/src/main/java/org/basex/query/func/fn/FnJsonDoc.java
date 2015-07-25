@@ -13,6 +13,7 @@ import org.basex.util.*;
 public final class FnJsonDoc extends FnParseJson {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return parse(unparsedText(qc, false).string(ii), qc, ii);
+    final Item it = unparsedText(qc, false, false);
+    return it == null ? null : parse(it.string(ii), false, qc, ii);
   }
 }

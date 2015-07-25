@@ -1,6 +1,7 @@
 package org.basex.query.value.node;
 
 import org.basex.data.*;
+import org.basex.query.util.ft.*;
 
 /**
  * Database node with full-text positions.

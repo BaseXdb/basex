@@ -16,6 +16,7 @@ import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.view.*;
 import org.basex.index.stats.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.list.*;
 
 /**
@@ -300,12 +301,12 @@ public final class PlotView extends View {
     if(focused != -1) {
       final int itmID = data.elemNames.id(plotData.item);
       int k = data.kind(focused);
-      int name = data.name(focused);
+      int name = data.nameId(focused);
       while(focused > 0 && itmID != name) {
         focused = data.parent(focused, k);
         if(focused > -1) {
           k = data.kind(focused);
-          name = data.name(focused);
+          name = data.nameId(focused);
         }
       }
     }
@@ -385,7 +386,8 @@ public final class PlotView extends View {
 
     final DBNodes marked = gui.context.marked;
     if(marked.size() == 0) return;
-    final int[] m = Arrays.copyOf(marked.pres, marked.pres.length);
+    final int[] pres = marked.pres();
+    final int[] m = Arrays.copyOf(pres, pres.length);
     int i = 0;
 
     // no child nodes of the marked context nodes are marked

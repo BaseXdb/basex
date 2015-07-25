@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -72,7 +73,7 @@ public final class TypeCheck extends Single {
     // check at each call
     if(argType.type.instanceOf(seqType.type) && !expr.has(Flag.NDT) && !expr.has(Flag.UPD)) {
       final Occ occ = argType.occ.intersect(seqType.occ);
-      if(occ == null) throw INVCAST_X_X.get(info, argType, seqType);
+      if(occ == null) throw INVPROMOTE_X_X.get(info, argType, seqType);
     }
 
     final Expr opt = expr.typeCheck(this, qc, scp);
@@ -87,7 +88,7 @@ public final class TypeCheck extends Single {
 
     return new Iter() {
       /** Item cache. */
-      final ValueBuilder vb = new ValueBuilder();
+      final ItemList cache = new ItemList();
       /** Item cache index. */
       int c;
       /** Result index. */
@@ -96,21 +97,21 @@ public final class TypeCheck extends Single {
       @Override
       public Item next() throws QueryException {
         final SeqType st = seqType;
-        while(c == vb.size()) {
+        while(c == cache.size()) {
           qc.checkStop();
-          vb.size(0);
+          cache.size(0);
           c = 0;
 
           final Item it = iter.next();
           if(it == null || st.instance(it, true)) {
-            vb.add(it);
+            cache.add(it);
           } else {
-            st.promote(qc, sc, info, it, false, vb);
+            st.promote(qc, sc, info, it, false, cache);
           }
         }
 
-        final Item it = vb.get(c);
-        vb.set(c++, null);
+        final Item it = cache.get(c);
+        cache.set(c++, null);
 
         if(it == null && i < st.occ.min || i > st.occ.max)
           throw INVPROMOTE_X_X.get(info, expr.seqType(), st);

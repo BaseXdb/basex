@@ -15,6 +15,12 @@ public interface JsonConstants {
   byte[] TYPE = token("type");
   /** Token: item. */
   byte[] ITEM = token("item");
+  /** Token: key. */
+  byte[] KEY = token("key");
+  /** Token: escaped. */
+  byte[] ESCAPED = token("escaped");
+  /** Token: escaped-key. */
+  byte[] ESCAPED_KEY = token("escaped-key");
 
   /** Token: string. */
   byte[] STRING = token("string");
@@ -22,10 +28,16 @@ public interface JsonConstants {
   byte[] NUMBER = token("number");
   /** Token: boolean. */
   byte[] BOOLEAN = token("boolean");
+  /** Token: null. */
+  byte[] NULL = token("null");
   /** Token: array. */
   byte[] ARRAY = token("array");
   /** Token: object. */
   byte[] OBJECT = token("object");
+  /** Token: map. */
+  byte[] MAP = token("map");
+  /** Allowed elements. */
+  byte[][] ELEMENTS = { STRING, NUMBER, BOOLEAN, NULL, MAP };
 
   /** Token: pair. */
   byte[] PAIR = token("pair");
@@ -36,6 +48,8 @@ public interface JsonConstants {
 
   /** Supported data types. */
   byte[][] TYPES = { OBJECT, ARRAY, STRING, NUMBER, BOOLEAN, NULL };
+  /** Escape characters. */
+  byte[] ESCAPES = token("\"\\/bfnrtu");
   /** Plural. */
   byte[] S = { 's' };
   /** Global data type attributes. */

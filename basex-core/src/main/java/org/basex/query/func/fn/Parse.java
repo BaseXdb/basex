@@ -28,18 +28,24 @@ public abstract class Parse extends StandardFunc {
    * Performs the unparsed-text function.
    * @param qc query context
    * @param check only check if text is available
+   * @param encoding parse encoding
    * @return content string or boolean success flag
    * @throws QueryException query exception
    */
-  Item unparsedText(final QueryContext qc, final boolean check) throws QueryException {
+  Item unparsedText(final QueryContext qc, final boolean check, final boolean encoding)
+      throws QueryException {
+
     checkCreate(qc);
-    final byte[] path = toToken(exprs[0], qc);
+    final Item it = exprs[0].atomItem(qc, info);
+    if(it == null) return check ? Bln.FALSE : null;
+
+    final byte[] path = toToken(it);
     final IO base = sc.baseIO();
 
     String enc = null;
     try {
       if(base == null) throw STBASEURI.get(info);
-      enc = toEncoding(1, ENCODING_X, qc);
+      enc = encoding ? toEncoding(1, ENCODING_X, qc) : null;
 
       final String p = string(path);
       if(p.indexOf('#') != -1) throw FRAGID_X.get(info, p);

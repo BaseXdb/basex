@@ -21,7 +21,7 @@ import org.basex.util.*;
 public final class FnString extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item it = arg(0, qc).item(qc, info);
+    final Item it = ctxArg(0, qc).item(qc, info);
     if(it instanceof FItem) throw FISTRING_X.get(ii, it.type);
     return it == null ? Str.ZERO : it.type == AtomType.STR ? it : Str.get(it.string(ii));
   }

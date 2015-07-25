@@ -133,7 +133,7 @@ public interface DataText {
   String DOCDECL3 = "\" standalone=\"";
 
   /** HTML. */
-  String HTML = "html";
+  byte[] HTML = token("html");
   /** Doctype output. */
   String DOCTYPE = "<!DOCTYPE ";
   /** Doctype system keyword. */
@@ -229,6 +229,11 @@ public interface DataText {
   byte[] CONTENT = token("content");
   /** HTML: charset. */
   byte[] CHARSET = token("charset");
+
+  /** XHTML namespace. */
+  byte[] XHTML_URI = token("http://www.w3.org/1999/xhtml");
+  /** XML namespace. */
+  byte[] XML_URI = token("http://www.w3.org/XML/1998/namespace");
 
   // TABLE SERIALIZATION ==========================================================================
 

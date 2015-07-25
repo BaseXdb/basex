@@ -48,9 +48,11 @@ public final class InspectModuleTest extends AdvancedQueryTest {
     query(func + "/return/@type/data()", "xs:integer");
     query(func + "/return/@occurrence/data()", "");
 
-    // unknown annotations disappear
-    query("declare namespace x='x';" +
-      _INSPECT_FUNCTION.args(" %x:x function() {()}") + "/annotation", "");
+    // unknown annotation
+    query("declare namespace pref='uri';" +
+      _INSPECT_FUNCTION.args(" %pref:x function() {()}") + "/annotation/@name/data()", "pref:x");
+    query("declare namespace pref='uri';" +
+        _INSPECT_FUNCTION.args(" %pref:x function() {()}") + "/annotation/@uri/data()", "uri");
   }
 
   /** Test method. */
@@ -59,18 +61,26 @@ public final class InspectModuleTest extends AdvancedQueryTest {
     error(_INSPECT_MODULE.args("src/test/resources/non-existent.xqm"), WHICHRES_X);
 
     final String module = "src/test/resources/hello.xqm";
-    final String result = query(_INSPECT_MODULE.args(module));
+    final String result = query(_INSPECT_MODULE.args(module)).
+        replace("{", "{{").replace("}", "}}");
+
     final String var = query(result + "/variable[@name = 'hello:lazy']");
     query(var + "/@uri/data()", "world");
     query(var + "/annotation/@name/data()", "basex:lazy");
     query(var + "/annotation/@uri/data()", "http://basex.org");
 
-    final String func = query(result + "/function[@name = 'hello:world']");
-    query(func + "/@uri/data()", "world");
-    query(func + "/annotation/@name/data()", "public");
-    query(func + "/annotation/@uri/data()", "http://www.w3.org/2012/xquery");
-    query(func + "/return/@type/data()", "xs:string");
-    query(func + "/return/@occurrence/data()", "");
+    final String func1 = query(result + "/function[@name = 'hello:world']");
+    query(func1 + "/@uri/data()", "world");
+    query(func1 + "/annotation/@name/data()", "public");
+    query(func1 + "/annotation/@uri/data()", "http://www.w3.org/2012/xquery");
+    query(func1 + "/return/@type/data()", "xs:string");
+    query(func1 + "/return/@occurrence/data()", "");
+
+    final String func2 = query(result + "/function[@name = 'hello:internal']").
+        replace("{", "{{").replace("}", "}}");;
+    query(func2 + "/@uri/data()", "world");
+    query(func2 + "/annotation/@name/data()[ends-with(., 'ignored')]", "ignored");
+    query(func2 + "/annotation/@uri/data()[. = 'ns']", "ns");
   }
 
   /** Test method. */
@@ -79,7 +89,8 @@ public final class InspectModuleTest extends AdvancedQueryTest {
     error(_INSPECT_XQDOC.args("src/test/resources/non-existent.xqm"), WHICHRES_X);
 
     // validate against xqDoc schema
-    final String result = query(_INSPECT_XQDOC.args("src/test/resources/hello.xqm"));
+    final String result = query(_INSPECT_XQDOC.args("src/test/resources/hello.xqm")).
+        replace("{", "{{").replace("}", "}}");
     query(_VALIDATE_XSD.args(result, "src/test/resources/xqdoc.xsd"));
   }
 

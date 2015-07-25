@@ -31,7 +31,7 @@ public class FnSubsequence extends StandardFunc {
 
     // optimization: return subsequence
     final Iter iter = qc.iter(exprs[0]);
-    if(iter instanceof ValueIter) return sub((ValueIter) iter, start, len).iter();
+    if(iter instanceof ValueIter) return eval(((ValueIter) iter).value(), start, len).iter();
 
     // fast route if the size is known
     final long max = iter.size();
@@ -71,7 +71,7 @@ public class FnSubsequence extends StandardFunc {
 
     // optimization: return subsequence
     final Iter iter = qc.iter(exprs[0]);
-    if(iter instanceof ValueIter) return sub((ValueIter) iter, start, len);
+    if(iter instanceof ValueIter) return eval(((ValueIter) iter).value(), start, len);
 
     // fast route if the size is known
     final long max = iter.size();
@@ -79,7 +79,7 @@ public class FnSubsequence extends StandardFunc {
       final long s = Math.max(1, start) - 1;
       final long l = Math.min(max - s, len + Math.min(0, start - 1));
       if(s >= max || l <= 0) return Empty.SEQ;
-      final ValueBuilder vb = new ValueBuilder(Math.max((int) l, 1));
+      final ValueBuilder vb = new ValueBuilder();
       for(long i = 0; i < l; i++) vb.add(iter.get(s + i));
       return vb.value();
     }
@@ -124,16 +124,15 @@ public class FnSubsequence extends StandardFunc {
 
   /**
    * Returns a subsequence.
-   * @param iter iterator
+   * @param val value
    * @param start start position
    * @param len length
    * @return sub sequence
    */
-  private static Value sub(final ValueIter iter, final long start, final long len) {
-    final Value val = iter.value();
-    final long s = Math.max(1, start) - 1;
-    final long l = Math.min(val.size() - s, len + Math.min(0, start - 1));
-    return SubSeq.get(val, s, l);
+  public static Value eval(final Value val, final long start, final long len) {
+    final long p = Math.max(0, start - 1);
+    final long k = Math.min(val.size() - p, len + Math.min(0, start - 1));
+    return k <= 0 ? Empty.SEQ : val.subSeq(p, k);
   }
 
   @Override

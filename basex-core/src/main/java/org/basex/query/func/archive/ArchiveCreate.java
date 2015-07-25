@@ -14,7 +14,6 @@ import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
-import org.basex.util.options.*;
 
 /**
  * Function implementation.
@@ -25,46 +24,58 @@ import org.basex.util.options.*;
 public class ArchiveCreate extends ArchiveFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter entr = qc.iter(exprs[0]), cont = qc.iter(exprs[1]);
-    final Options opts = toOptions(2, Q_OPTIONS, new ArchOptions(), qc);
+    final Iter entries = qc.iter(exprs[0]), contents = qc.iter(exprs[1]);
+    final ArchOptions opts = toOptions(2, Q_OPTIONS, new ArchOptions(), qc);
 
+    // check options
     final String format = opts.get(ArchOptions.FORMAT);
-    try(final ArchiveOut out = ArchiveOut.get(format.toLowerCase(Locale.ENGLISH), info)) {
-      // check algorithm
-      final String alg = opts.get(ArchOptions.ALGORITHM);
-      int level = ZipEntry.DEFLATED;
-      if(alg != null) {
-        if(format.equals(ZIP)  && !Strings.eq(alg, STORED, DEFLATE) ||
-           format.equals(GZIP) && !Strings.eq(alg, DEFLATE)) {
-          throw ARCH_SUPP_X_X.get(info, ArchOptions.ALGORITHM.name(), alg);
-        }
-        if(Strings.eq(alg, STORED)) level = ZipEntry.STORED;
-        else if(Strings.eq(alg, DEFLATE)) level = ZipEntry.DEFLATED;
-      }
-      out.level(level);
+    final int level = level(opts);
 
+    try(final ArchiveOut out = ArchiveOut.get(format.toLowerCase(Locale.ENGLISH), info)) {
+      out.level(level);
       try {
-        Item en, cn;
         int e = 0, c = 0;
         while(true) {
-          en = entr.next();
-          cn = cont.next();
-          if(en == null || cn == null) break;
+          final Item en = entries.next(), cn = contents.next();
+          if(en == null || cn == null) {
+            // count remaining entries
+            if(cn != null) do c++; while(contents.next() != null);
+            if(en != null) do e++; while(entries.next() != null);
+            if(e != c) throw ARCH_DIFF_X_X.get(info, e, c);
+            break;
+          }
           if(out instanceof GZIPOut && c > 0)
             throw ARCH_ONE_X.get(info, format.toUpperCase(Locale.ENGLISH));
           add(checkElemToken(en), cn, out, level, qc);
           e++;
           c++;
         }
-        // count remaining entries
-        if(cn != null) do c++; while(cont.next() != null);
-        if(en != null) do e++; while(entr.next() != null);
-        if(e != c) throw ARCH_DIFF_X_X.get(info, e, c);
       } catch(final IOException ex) {
         throw ARCH_FAIL_X.get(info, ex);
       }
       return new B64(out.finish());
     }
+  }
+
+  /**
+   * Returns the compression level.
+   * @param options options
+   * @return level
+   * @throws QueryException query exception
+   */
+  protected int level(final ArchOptions options) throws QueryException {
+    int level = ZipEntry.DEFLATED;
+    final String format = options.get(ArchOptions.FORMAT);
+    final String alg = options.get(ArchOptions.ALGORITHM);
+    if(alg != null) {
+      if(format.equals(ZIP)  && !Strings.eq(alg, STORED, DEFLATE) ||
+         format.equals(GZIP) && !Strings.eq(alg, DEFLATE)) {
+        throw ARCH_SUPP_X_X.get(info, ArchOptions.ALGORITHM.name(), alg);
+      }
+      if(Strings.eq(alg, STORED)) level = ZipEntry.STORED;
+      else if(Strings.eq(alg, DEFLATE)) level = ZipEntry.DEFLATED;
+    }
+    return level;
   }
 
   /**
@@ -77,7 +88,7 @@ public class ArchiveCreate extends ArchiveFn {
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  final void add(final Item entry, final Item cont, final ArchiveOut out, final int level,
+  protected final void add(final Item entry, final Item cont, final ArchiveOut out, final int level,
       final QueryContext qc) throws QueryException, IOException {
 
     // create new zip entry

@@ -8,10 +8,10 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
-import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.view.*;
+import org.basex.query.value.seq.*;
 
 /**
  * This view allows the input of database queries.

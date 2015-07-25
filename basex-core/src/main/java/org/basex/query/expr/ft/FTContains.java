@@ -2,11 +2,11 @@ package org.basex.query.expr.ft;
 
 import static org.basex.query.QueryText.*;
 
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.util.ft.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -54,13 +54,14 @@ public final class FTContains extends Single {
     for(Item it; (it = iter.next()) != null;) {
       lex.init(it.string(info));
       final FTNode item = ftexpr.item(qc, info);
-      if(item.all.matches()) {
+      final FTMatches all = item.matches();
+      if(all.matches()) {
         f = true;
         if(scoring) s += item.score();
         // cache entry for visualizations or ft:mark/ft:extract
         if(ftPosData != null && it instanceof DBNode) {
           final DBNode node = (DBNode) it;
-          ftPosData.add(node.data, node.pre, item.all);
+          ftPosData.add(node.data(), node.pre(), all);
         }
       }
       c++;

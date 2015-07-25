@@ -12,6 +12,11 @@ import java.util.*;
  * @param <E> element type
  */
 public abstract class FingerTree<N, E> implements Iterable<E> {
+  /** Maximum number of children in an inner node, tested values are 3 and 4. */
+  static final int MAX_ARITY = 4;
+  /** Maximum length of a digit. */
+  static final int MAX_DIGIT = MAX_ARITY + 1;
+
   /**
    * Returns the empty finger tree.
    * @param <E> element type
@@ -19,7 +24,7 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
    */
   @SuppressWarnings("unchecked")
   public static final <E> FingerTree<E, E> empty() {
-    return (FingerTree<E, E>) Empty.INSTANCE;
+    return (FingerTree<E, E>) EmptyTree.INSTANCE;
   }
 
   /**
@@ -29,7 +34,7 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
    * @return the singleton finger tree
    */
   public static final <E> FingerTree<E, E> singleton(final Node<E, E> leaf) {
-    return new Single<>(leaf);
+    return new SingletonTree<>(leaf);
   }
 
   /**
@@ -37,7 +42,7 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
    * @return {@code true} if the node is empty, {@code false} otherwise
    */
   public final boolean isEmpty() {
-    return this == Empty.INSTANCE;
+    return this == EmptyTree.INSTANCE;
   }
 
   /**
@@ -52,13 +57,13 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
     int level = 0;
     final Node<?, E> digit;
     while(true) {
-      if(curr instanceof Single) {
+      if(curr instanceof SingletonTree) {
         // we unpack the contained node one level
-        digit = ((Single<?, E>) curr).elem;
+        digit = ((SingletonTree<?, E>) curr).elem;
         break;
       }
 
-      final Deep<?, E> deep = (Deep<?, E>) curr;
+      final DeepTree<?, E> deep = (DeepTree<?, E>) curr;
       // check if index is in left digit
       if(pos < deep.leftSize) {
         Node<?, E> nd = null;
@@ -96,26 +101,12 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
 
     Node<?, ?> nd = digit;
     for(; level > 0; level--) {
-      if(nd instanceof InnerNode2) {
-        final InnerNode2<?, ?> deep = (InnerNode2<?, ?>) nd;
-        if(pos < deep.l) {
-          nd = deep.child0;
-        } else {
-          nd = deep.child1;
-          pos -= deep.l;
-        }
-      } else {
-        final InnerNode3<?, ?> deep = (InnerNode3<?, ?>) nd;
-        if(pos < deep.l) {
-          nd = deep.child0;
-        } else if(pos < deep.m) {
-          nd = deep.child1;
-          pos -= deep.l;
-        } else {
-          nd = deep.child2;
-          pos -= deep.m;
-        }
-      }
+      final InnerNode<?, ?> deep = (InnerNode<?, ?>) nd;
+      final long[] bounds = deep.bounds;
+      int p = 0;
+      while(pos >= bounds[p]) p++;
+      if(p > 0) pos -= bounds[p - 1];
+      nd = deep.children[p];
     }
 
     @SuppressWarnings("unchecked")
@@ -172,10 +163,12 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
   /**
    * Concatenates this finger tree with the given one.
    * @param mid nodes between the two trees
+   * @param sz sum of the sizes of all nodes in the middle array
    * @param other the other tree
    * @return concatenation of both trees
    */
-  public abstract FingerTree<N, E> concat(final Node<N, E>[] mid, final FingerTree<N, E> other);
+  public abstract FingerTree<N, E> concat(final Node<N, E>[] mid, final long sz,
+      final FingerTree<N, E> other);
 
   /**
    * Creates a reversed version of this tree.
@@ -231,50 +224,51 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
    * @param size size of all nodes combined
    * @return constructed tree
    */
-  public static <N, E> FingerTree<N, E> buildTree(final Node<N, E>[] nodes, final int n,
+  static <N, E> FingerTree<N, E> buildTree(final Node<N, E>[] nodes, final int n,
       final long size) {
-    if(n == 1) return new Single<>(nodes[0]);
-    if(n < 7) {
+
+    if(n == 0) return EmptyTree.<N, E>getInstance();
+    if(n == 1) return new SingletonTree<>(nodes[0]);
+    if(n <= 2 * MAX_ARITY) {
       final int mid = n / 2;
       @SuppressWarnings("unchecked")
       final Node<N, E>[] left = new Node[mid], right = new Node[n - mid];
       System.arraycopy(nodes, 0, left, 0, mid);
       System.arraycopy(nodes, mid, right, 0, n - mid);
-      return Deep.get(left, right, size);
+      return DeepTree.get(left, right, size);
     }
 
-    final int k = n == 7 ? 2 : 3;
+    final int k = Math.min((n - MAX_ARITY) / 2, MAX_ARITY);
     @SuppressWarnings("unchecked")
     final Node<N, E>[] left = new Node[k], right = new Node[k];
     System.arraycopy(nodes, 0, left, 0, k);
     System.arraycopy(nodes, n - k, right, 0, k);
-    final long leftSize = Deep.size(left), rightSize = Deep.size(right);
+    final long leftSize = DeepTree.size(left), rightSize = DeepTree.size(right);
 
-    int remaining = n - 2 * k;
-    int i = k, j = 0;
     @SuppressWarnings("unchecked")
     final Node<Node<N, E>, E>[] outNodes = (Node<Node<N, E>, E>[]) nodes;
-    while(remaining > 4 || remaining == 3) {
-      outNodes[j++] = new InnerNode3<>(nodes[i++], nodes[i++], nodes[i++]);
-      remaining -= 3;
+    final int remaining = n - 2 * k, ns = (remaining + MAX_ARITY - 1) / MAX_ARITY;
+    for(int i = 0, j = 0; i < ns; i++) {
+      final int rem = ns - i, sz = (remaining - j + rem - 1) / rem;
+      @SuppressWarnings("unchecked")
+      final Node<N, E>[] ch = new Node[sz];
+      System.arraycopy(nodes, j, ch, 0, sz);
+      outNodes[i] = new InnerNode<>(ch);
+      j += sz;
     }
 
-    while(remaining > 0) {
-      outNodes[j++] = new InnerNode2<>(nodes[i++], nodes[i++]);
-      remaining -= 2;
-    }
-
-    final FingerTree<Node<N, E>, E> middle = buildTree(outNodes, j, size - leftSize - rightSize);
-    return new Deep<>(left, leftSize, middle, right, size);
+    final FingerTree<Node<N, E>, E> middle = buildTree(outNodes, ns, size - leftSize - rightSize);
+    return new DeepTree<>(left, leftSize, middle, right, size);
   }
 
   /**
    * Adds all nodes in the given array to the given side of this tree.
    * @param nodes the nodes
+   * @param sz sum of the sizes of all nodes in the array
    * @param left insertion direction, {@code true} adds to the left, {@code false} to the right
    * @return resulting tree
    */
-  abstract FingerTree<N, E> addAll(final Node<N, E>[] nodes, final boolean left);
+  abstract FingerTree<N, E> addAll(final Node<N, E>[] nodes, final long sz, final boolean left);
 
   @Override
   public final String toString() {
@@ -298,21 +292,39 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
   public abstract long checkInvariants();
 
   /**
-   * Returns an array containing the number of elements stored at each level of the tree.
-   * @param depth current depth
-   * @return array of sizes
-   */
-  public abstract long[] sizes(int depth);
-
-  /**
    * Creates a {@link ListIterator} over the elements in this tree.
-   * @param reverse flag for starting at the back of the tree
+   * @param start starting position
+   *   (i.e. the position initially returned by {@link ListIterator#nextIndex()})
    * @return the list iterator
    */
-  public abstract ListIterator<E> listIterator(final boolean reverse);
+  public final ListIterator<E> listIterator(final long start) {
+    return FingerTreeIterator.get(this, start);
+  }
 
   @Override
   public final ListIterator<E> iterator() {
-    return listIterator(false);
+    return listIterator(0);
+  }
+
+  /**
+   * Writes a string representation of the given object to the given strun builder.
+   * @param obj object to write
+   * @param sb string builder
+   * @param indent indentation level
+   */
+  static void toString(final Object obj, final StringBuilder sb, final int indent) {
+    if(obj instanceof InnerNode) {
+      ((InnerNode<?, ?>) obj).toString(sb, indent);
+    } else if(obj instanceof PartialInnerNode) {
+      ((PartialInnerNode<?, ?>) obj).toString(sb, indent);
+    } else {
+      boolean fst = true;
+      for(final String line : obj.toString().split("\r\n?|\n")) {
+        for(int i = 0; i < indent; i++) sb.append(' ').append(' ');
+        sb.append(line);
+        if(fst) fst = false;
+        else sb.append('\n');
+      }
+    }
   }
 }

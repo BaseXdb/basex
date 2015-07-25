@@ -20,7 +20,7 @@ import org.basex.util.list.*;
 public final class FnPath extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    ANode node = toEmptyNode(arg(0, qc), qc);
+    ANode node = toEmptyNode(ctxArg(0, qc), qc);
     if(node == null) return null;
 
     final TokenList tl = new TokenList();
@@ -35,21 +35,21 @@ public final class FnPath extends StandardFunc {
         tb.add(qnm.local());
       } else if(node.type == NodeType.ELM) {
         final QNm qnm = node.qname();
-        final AxisIter ai = node.precedingSibling();
-        for(ANode fs; (fs = ai.next()) != null;) {
+        final BasicNodeIter iter = node.precedingSibling();
+        for(ANode fs; (fs = iter.next()) != null;) {
           final QNm q = fs.qname();
           if(q != null && q.eq(qnm)) i++;
         }
         tb.add("Q{").add(qnm.uri()).add('}').add(qnm.local());
         tb.add('[').add(Integer.toString(i)).add(']');
       } else if(node.type == NodeType.COM || node.type == NodeType.TXT) {
-        final AxisIter ai = node.precedingSibling();
-        for(ANode fs; (fs = ai.next()) != null;) if(fs.type == node.type) i++;
+        final BasicNodeIter iter = node.precedingSibling();
+        for(ANode fs; (fs = iter.next()) != null;) if(fs.type == node.type) i++;
         tb.addExt(node.seqType() + "[%]", i);
       } else if(node.type == NodeType.PI) {
         final QNm qnm = node.qname();
-        final AxisIter ai = node.precedingSibling();
-        for(ANode fs; (fs = ai.next()) != null;) {
+        final BasicNodeIter iter = node.precedingSibling();
+        for(ANode fs; (fs = iter.next()) != null;) {
           if(fs.type == node.type && fs.qname().eq(qnm)) i++;
         }
         tb.add(node.type.string()).add('(').add(qnm.local());

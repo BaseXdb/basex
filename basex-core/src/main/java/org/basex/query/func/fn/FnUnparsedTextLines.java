@@ -13,7 +13,7 @@ import org.basex.query.value.*;
 public final class FnUnparsedTextLines extends Parse {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    return textIter(unparsedText(qc, false).string(info));
+    return textIter(unparsedText(qc, false, true).string(info));
   }
 
   @Override

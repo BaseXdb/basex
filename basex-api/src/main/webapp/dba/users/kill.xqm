@@ -8,13 +8,16 @@ module namespace _ = 'dba/databases';
 import module namespace Sessions = 'http://basex.org/modules/sessions';
 import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 
+(:~ Top category :)
+declare variable $_:CAT := 'users';
+
 (:~
  : Kills DBA sessions.
  : @param  $id  session ids
  :)
 declare
   %rest:GET
-  %rest:path("dba/kill-dba")
+  %rest:path("/dba/kill-dba")
   %rest:query-param("id", "{$ids}")
   %output:method("html")
 function _:drop(
@@ -23,8 +26,8 @@ function _:drop(
   cons:check(),
   try {
     Sessions:ids()[. = $ids] ! Sessions:close(.),
-    web:redirect("users", map { 'info': 'Killed sessions: ' || count($ids) })
+    web:redirect($_:CAT, map { 'info': 'Killed sessions: ' || count($ids) })
   } catch * {
-    web:redirect("users", map { 'error': $err:description })
+    web:redirect($_:CAT, map { 'error': $err:description })
   }
 };

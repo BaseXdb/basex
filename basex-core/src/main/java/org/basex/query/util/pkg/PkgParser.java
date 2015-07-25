@@ -66,7 +66,7 @@ public final class PkgParser {
   private void parseAttributes(final ANode node, final Package p, final byte[] root)
       throws QueryException {
 
-    final AxisIter atts = node.attributes();
+    final BasicNodeIter atts = node.attributes();
     for(ANode next; (next = atts.next()) != null;) {
       final byte[] name = next.name();
       if(eq(A_NAME, name))         p.name = next.string();
@@ -94,7 +94,7 @@ public final class PkgParser {
    * @throws QueryException query exception
    */
   private void parseChildren(final ANode node, final Package p) throws QueryException {
-    final AxisIter ch = childElements(node);
+    final BasicNodeIter ch = childElements(node);
     for(ANode next; (next = ch.next()) != null;) {
       final QNm name = next.qname();
       if(eqNS(DEPEND, name)) p.dep.add(parseDependency(next));
@@ -109,7 +109,7 @@ public final class PkgParser {
    * @throws QueryException query exception
    */
   private Dependency parseDependency(final ANode node) throws QueryException {
-    final AxisIter atts = node.attributes();
+    final BasicNodeIter atts = node.attributes();
     final Dependency d = new Dependency();
     for(ANode next; (next = atts.next()) != null;) {
       final byte[] name = next.name();
@@ -131,7 +131,7 @@ public final class PkgParser {
    * @throws QueryException query exception
    */
   private Component parseComp(final ANode node) throws QueryException {
-    final AxisIter ch = childElements(node);
+    final BasicNodeIter ch = childElements(node);
     final Component c = new Component();
     for(ANode next; (next = ch.next()) != null;) {
       final QNm name = next.qname();
@@ -152,10 +152,10 @@ public final class PkgParser {
    * @param node root node
    * @return child element iterator
    */
-  private static AxisIter childElements(final ANode node) {
-    return new AxisIter() {
+  private static BasicNodeIter childElements(final ANode node) {
+    return new BasicNodeIter() {
       /** Child iterator. */
-      final AxisIter ch = node.children();
+      final BasicNodeIter ch = node.children();
 
       @Override
       public ANode next() {

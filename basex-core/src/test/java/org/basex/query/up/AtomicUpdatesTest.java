@@ -7,9 +7,9 @@ import java.io.*;
 
 import org.basex.build.*;
 import org.basex.data.*;
-import org.basex.data.atomic.*;
 import org.basex.io.*;
 import org.basex.query.*;
+import org.basex.query.up.atomic.*;
 import org.basex.util.*;
 import org.junit.*;
 import org.junit.rules.*;
@@ -527,7 +527,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
    */
   private static DataClip clipA(final Data d, final String name, final String value) {
     final int s = d.meta.size;
-    d.attr(s, s + 1, d.attrNames.index(token(name), null, false), token(value), -1, false);
+    d.attr(s, s + 1, d.attrNames.index(token(name), null, false), token(value), -1);
     d.insert(s);
     return new DataClip(d, s, d.meta.size);
   }

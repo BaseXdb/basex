@@ -37,10 +37,10 @@ public final class RangeAccess extends IndexAccess {
   }
 
   @Override
-  public AxisIter iter(final QueryContext qc) {
+  public BasicNodeIter iter(final QueryContext qc) {
     final byte kind = index.type() == IndexType.TEXT ? Data.TEXT : Data.ATTR;
 
-    return new AxisIter() {
+    return new BasicNodeIter() {
       final IndexIterator it = ictx.data.iter(index);
       @Override
       public ANode next() {

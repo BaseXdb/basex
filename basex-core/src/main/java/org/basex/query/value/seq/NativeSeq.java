@@ -61,4 +61,22 @@ abstract class NativeSeq extends Seq {
   public final SeqType seqType() {
     return SeqType.get(type, Occ.ONE_MORE);
   }
+
+  @Override
+  public final Value insert(final long pos, final Item item) {
+    return copyInsert(pos, item);
+  }
+
+  @Override
+  public final Value remove(final long pos) {
+    return size == 1 ? itemAt(1 - pos) : copyRemove(pos);
+  }
+
+  @Override
+  public final Value reverse() {
+    final int n = (int) size;
+    final ValueBuilder vb = new ValueBuilder();
+    for(int i = 0; i < n; i++) vb.add(itemAt(n - i - 1));
+    return vb.value(type);
+  }
 }

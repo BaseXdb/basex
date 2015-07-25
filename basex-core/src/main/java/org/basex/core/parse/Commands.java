@@ -31,8 +31,6 @@ public interface Commands {
   String CREATE_BACKUP = "create-backup";
   /** Command string: "create-db". */
   String CREATE_DB = "create-db";
-  /** Command string: "create-event". */
-  String CREATE_EVENT = "create-event";
   /** Command string: "create-index". */
   String CREATE_INDEX = "create-index";
   /** Command string: "create-user". */
@@ -43,8 +41,6 @@ public interface Commands {
   String DROP_BACKUP = "drop-backup";
   /** Command string: "drop-db". */
   String DROP_DB = "drop-db";
-  /** Command string: "drop-event". */
-  String DROP_EVENT = "drop-event";
   /** Command string: "drop-index". */
   String DROP_INDEX = "drop-index";
   /** Command string: "drop-user". */
@@ -109,8 +105,6 @@ public interface Commands {
   String SET = "set";
   /** Command string: "show-backups". */
   String SHOW_BACKUPS = "show-backups";
-  /** Command string: "show-events". */
-  String SHOW_EVENTS = "show-events";
   /** Command string: "show-sessions". */
   String SHOW_SESSIONS = "show-sessions";
   /** Command string: "show-users". */
@@ -154,15 +148,15 @@ public interface Commands {
   String COMMAND = "command";
 
   /** Create commands. */
-  enum CmdCreate { DATABASE, DB, INDEX, USER, BACKUP, EVENT }
+  enum CmdCreate { DATABASE, DB, INDEX, USER, BACKUP }
   /** Info commands. */
   enum CmdInfo { NULL, DATABASE, DB, INDEX, STORAGE }
   /** Drop commands. */
-  enum CmdDrop { DATABASE, DB, INDEX, USER, BACKUP, EVENT }
+  enum CmdDrop { DATABASE, DB, INDEX, USER, BACKUP }
   /** Optimize commands. */
   enum CmdOptimize { NULL, ALL }
   /** Show commands. */
-  enum CmdShow { SESSIONS, USERS, BACKUPS, EVENTS }
+  enum CmdShow { SESSIONS, USERS, BACKUPS }
   /** Permission commands. */
   enum CmdPerm { NONE, READ, WRITE, CREATE, ADMIN }
   /** Index types. */

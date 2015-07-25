@@ -9,9 +9,9 @@ import java.util.List;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
-import org.basex.data.atomic.*;
 import org.basex.query.*;
 import org.basex.query.func.fn.*;
+import org.basex.query.up.atomic.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.up.primitives.db.*;
 import org.basex.query.up.primitives.node.*;
@@ -279,8 +279,8 @@ final class DataUpdates {
       if(data.kind(pre) == Data.ATTR) {
         final byte[] nm = data.name(pre, Data.ATTR);
         final QNm name = new QNm(nm);
-        final byte[] uri = data.nspaces.uri(data.nspaces.uri(nm, pre, data));
-        if(uri != null) name.uri(uri);
+        final int uriId = data.nspaces.uriIdForPrefix(Token.prefix(nm), pre, data);
+        if(uriId != 0) name.uri(data.nspaces.uri(uriId));
         pool.add(name, NodeType.ATT);
         il.add(pre);
       } else {
@@ -289,8 +289,8 @@ final class DataUpdates {
           final byte[] nm = data.name(p, Data.ATTR);
           if(!il.contains(p)) {
             final QNm name = new QNm(nm);
-            final byte[] uri = data.nspaces.uri(data.nspaces.uri(nm, p, data));
-            if(uri != null) name.uri(uri);
+            final int uriId = data.nspaces.uriIdForPrefix(Token.prefix(nm), p, data);
+            if(uriId != 0) name.uri(data.nspaces.uri(uriId));
             pool.add(name, NodeType.ATT);
           }
         }

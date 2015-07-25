@@ -13,6 +13,7 @@ import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
+import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -28,13 +29,38 @@ import org.xml.sax.*;
  * @author Marco Lettere (greedy/verbose validation)
  */
 abstract class ValidateFn extends StandardFunc {
+  @Override
+  public final Iter iter(final QueryContext qc) throws QueryException {
+    return value(qc).iter();
+  }
+
+  /**
+   * Runs the validation process.
+   * @param qc query context.
+   * @return resulting value
+   * @throws QueryException query exception
+   */
+  public final Value check(final QueryContext qc) throws QueryException {
+    final Value seq = info(qc);
+    if(seq.isEmpty()) return Empty.SEQ;
+    throw BXVA_FAIL_X.get(info, seq.iter().next());
+  }
+
+  /**
+   * Runs the validation process and returns a string sequence.
+   * @param qc query context.
+   * @return resulting value
+   * @throws QueryException query exception
+   */
+  public abstract Value info(final QueryContext qc) throws QueryException;
+
   /**
    * Runs the specified validator.
    * @param v validator code
    * @return string sequence with warnings and errors
    * @throws QueryException query exception
    */
-  final Value process(final Validate v) throws QueryException {
+  final Value process(final Validation v) throws QueryException {
     final ErrorHandler handler = new ErrorHandler();
     try {
       v.process(handler);

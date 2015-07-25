@@ -23,9 +23,9 @@ public final class XMLAccess {
    * @param name name
    * @return iterator
    */
-  public static AxisIter children(final ANode node, final byte[] name) {
-    final AxisIter children = node.children();
-    return new AxisIter() {
+  public static BasicNodeIter children(final ANode node, final byte[] name) {
+    final BasicNodeIter children = node.children();
+    return new BasicNodeIter() {
       @Override
       public ANode next() {
         for(ANode child; (child = children.next()) != null;) {

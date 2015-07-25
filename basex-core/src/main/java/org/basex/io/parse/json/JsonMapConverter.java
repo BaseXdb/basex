@@ -1,8 +1,11 @@
 package org.basex.io.parse.json;
 
+import static org.basex.query.QueryError.*;
+
 import java.util.*;
 
 import org.basex.build.json.*;
+import org.basex.build.json.JsonParserOptions.JsonDuplicates;
 import org.basex.query.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -43,9 +46,13 @@ public final class JsonMapConverter extends JsonConverter {
   /**
    * Constructor.
    * @param opts json options
+   * @throws QueryIOException query I/O exception
    */
-  JsonMapConverter(final JsonParserOptions opts) {
+  JsonMapConverter(final JsonParserOptions opts) throws QueryIOException {
     super(opts);
+    final JsonDuplicates dupl = jopts.get(JsonParserOptions.DUPLICATES);
+    if(dupl == JsonDuplicates.RETAIN) throw new QueryIOException(
+        BXJS_INVALID_X.get(null, JsonParserOptions.DUPLICATES.name(), dupl));
   }
 
   @Override
@@ -60,7 +67,7 @@ public final class JsonMapConverter extends JsonConverter {
   }
 
   @Override
-  void openPair(final byte[] key) {
+  void openPair(final byte[] key, final boolean add) {
     stack.push(Str.get(key));
   }
 
@@ -99,28 +106,6 @@ public final class JsonMapConverter extends JsonConverter {
   @Override
   void closeArray() {
     stack.push(arrays.pop().array());
-  }
-
-  @Override
-  public void openConstr(final byte[] name) {
-    openObject();
-    openPair(name);
-    openArray();
-  }
-
-  @Override public void openArg() {
-    openItem();
-  }
-
-  @Override public void closeArg() throws QueryIOException {
-    closeItem();
-  }
-
-  @Override
-  public void closeConstr() throws QueryIOException {
-    closeArray();
-    closePair(true);
-    closeObject();
   }
 
   @Override

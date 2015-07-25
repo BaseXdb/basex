@@ -54,8 +54,9 @@ public final class UpdatableDiskValues extends DiskValues {
           c += idxl.readNum();
           il.add(c);
         }
-        // write new ids
+        // mark old slot as empty
         free.add((int) (idxl.cursor() - off), off);
+        // write new ids
         writeIds(key, il.add(ids), index++);
       } else {
         index = -(index + 1);
@@ -121,7 +122,7 @@ public final class UpdatableDiskValues extends DiskValues {
       // create space for new entry
       final int sz = size() + 1;
       final byte[] tmp = idxr.readBytes(0, sz * 5);
-      for(int i = sz - 1; i > index; --i) copy(tmp, i, i - 1);
+      for(int i = sz - 1; i > index; --i) copy(tmp, i - 1, i);
       idxr.cursor(0);
       idxr.writeBytes(tmp, 0, sz * 5);
       size(sz);
@@ -129,24 +130,18 @@ public final class UpdatableDiskValues extends DiskValues {
     } else {
       // add id to the existing id list
       final long off = idxr.read5(index * 5L);
-      final int num = idxl.readNum(off);
-      final int newSize = num + 1;
-      newIds = new IntList(newSize);
+      final int count = idxl.readNum(off);
+      newIds = new IntList(count + 1);
 
       boolean notadded = true;
-      int prevId = 0;
-      for(int i = 0; i < num; ++i) {
-        int v = idxl.readNum();
-        if(notadded && id < prevId + v) {
+      for(int c = 0, currId = 0; c < count; ++c) {
+        currId += idxl.readNum();
+        if(notadded && id < currId) {
           // add the new id
           newIds.add(id);
           notadded = false;
-          // decrement the difference to the next id
-          v -= id - prevId;
-          prevId = id;
         }
-        newIds.add(id);
-        prevId += v;
+        newIds.add(currId);
       }
       if(notadded) newIds.add(id);
     }
@@ -277,6 +272,6 @@ public final class UpdatableDiskValues extends DiskValues {
 
   @Override
   public String toString() {
-    return super.toString() + "FREE BLOCKS: " + free;
+    return super.toString() + free;
   }
 }
