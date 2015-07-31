@@ -391,6 +391,45 @@ public class Options implements Iterable<Option<?>> {
   }
 
   /**
+   * Returns a map representation of the entries of the requested string (separated by commas).
+   * @param option option to be found
+   * @return map
+   */
+  public HashMap<String, String> toMap(final StringOption option) {
+    final String input = get(option).trim();
+    final HashMap<String, String> map = new HashMap<>();
+    final StringBuilder key = new StringBuilder();
+    final StringBuilder value = new StringBuilder();
+    boolean first = true;
+    final int sl = input.length();
+    for(int s = 0; s < sl; s++) {
+      final char ch = input.charAt(s);
+      if(first) {
+        if(ch == '=') {
+          first = false;
+        } else {
+          key.append(ch);
+        }
+      } else {
+        if(ch == ',') {
+          if(s + 1 == sl || input.charAt(s + 1) != ',') {
+            map.put(key.toString().trim(), value.toString());
+            key.setLength(0);
+            value.setLength(0);
+            first = true;
+            continue;
+          }
+          // literal commas are escaped by a second comma
+          s++;
+        }
+        value.append(ch);
+      }
+    }
+    if(!first) map.put(key.toString().trim(), value.toString());
+    return map;
+  }
+
+  /**
    * Returns an error string for an unknown option.
    * @param name name of option
    * @return error string

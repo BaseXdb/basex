@@ -337,9 +337,8 @@ public final class DataAccess implements Closeable {
   }
 
   /**
-   * Returns the offset to a free slot for writing an entry with the
-   * specified length. Fills the original space with 0xFF to facilitate
-   * future write operations.
+   * Returns the offset to a free slot for writing an entry with the specified length.
+   * Fills the original space with 0xFF to facilitate future write operations.
    * @param pos original offset
    * @param size size of new text entry
    * @return new offset to store text

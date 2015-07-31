@@ -1,6 +1,7 @@
 package org.basex.query.util;
 
 import org.basex.data.*;
+import org.basex.index.*;
 import org.basex.index.stats.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -26,11 +27,8 @@ public final class IndexInfo {
 
   /** Name test of parent element. */
   public NameTest test;
-
-  /** Flag for text index access. */
+  /** Indicates if the last step refers to a text step. */
   public boolean text;
-  /** Flag for attribute index access. */
-  private boolean attr;
 
   /** Optimization info. */
   public String info;
@@ -40,14 +38,14 @@ public final class IndexInfo {
    * all other values may be estimates (the smaller, the better). */
   public int costs;
 
-  /** Original expression. */
-  private Expr orig;
+  /** Predicate expression. */
+  private Expr pred;
 
   /**
    * Constructor.
    * @param ic index context
    * @param qc query context
-   * @param step index step
+   * @param step step containing the rewritable predicate
    */
   public IndexInfo(final IndexContext ic, final QueryContext qc, final Step step) {
     this.qc = qc;
@@ -57,44 +55,41 @@ public final class IndexInfo {
 
   /**
    * Checks if the specified expression can be rewritten for index access.
-   * @param ex expression (must be {@link ContextValue} or {@link AxisPath})
+   * @param pr predicate expression (must be {@link ContextValue} or {@link AxisPath})
    * @param ft full-text flag
-   * @return location step or {@code null}
+   * @return result of check
    */
-  public boolean check(final Expr ex, final boolean ft) {
-    orig = ex;
-
-    // context reference: work with index step
-    Step s = step;
-    if(!(ex instanceof ContextValue)) {
-      // check if index can be applied
-      if(!(ex instanceof AxisPath)) return false;
-      // accept only single axis steps as first expression
-      final AxisPath path = (AxisPath) ex;
-      // path must contain no root node
-      if(path.root != null) return false;
-      // return last step
-      s = path.step(path.steps.length - 1);
-    }
+  public boolean check(final Expr pr, final boolean ft) {
+    pred = pr;
 
     // check if step points to leaf element
+    final Step last = lastStep();
+    if(last == null) return false;
+
     final Data data = ic.data;
-    final boolean elem = s.test.type == NodeType.ELM;
+    final boolean elem = last.test.type == NodeType.ELM;
     if(elem) {
-      // only do check if database is up-to-date if no namespaces occur and if name test is used
-      if(!data.meta.uptodate || !data.nspaces.isEmpty() || s.test.kind != Kind.NAME) return false;
-      test = (NameTest) s.test;
+      // give up if database is out-dated, if namespaces occur, or if name test is not simple
+      if(!(data.meta.uptodate && data.nspaces.isEmpty() && last.test.kind == Kind.NAME))
+        return false;
+
+      test = (NameTest) last.test;
       final Stats stats = data.elemNames.stat(data.elemNames.id(test.name.local()));
       if(stats == null || !stats.isLeaf()) return false;
     }
+    text = elem || last.test.type == NodeType.TXT;
 
-    // check for full-text index access
-    if(ft) return (elem || s.test.type == NodeType.TXT) && data.meta.ftxtindex;
+    // check if the index contains result for the specified elements or attributes
+    final IndexNames in = new IndexNames(ft ? data.meta.ftinclude : text ? data.meta.textinclude :
+      data.meta.attrinclude);
+    if(!in.contains(qname())) return false;
 
-    // check for text or attribute index access
-    text = (elem || s.test.type == NodeType.TXT) && data.meta.textindex;
-    attr = !text && s.test.type == NodeType.ATT && data.meta.attrindex;
-    return text || attr;
+    // full-text index
+    if(ft) return text && data.meta.ftindex;
+    // text index
+    if(text) return data.meta.textindex;
+    // attribute index
+    return last.test.type == NodeType.ATT && data.meta.attrindex;
   }
 
   /**
@@ -113,23 +108,68 @@ public final class IndexInfo {
   }
 
   /**
+   * Returns the local name and namespace uri of the last name test.
+   * <ul>
+   *   <li> //*[x = 'TEXT']          -> x </li>
+   *   <li> //*[x / text() = 'TEXT'] -> x </li>
+   *   <li> //x[. = 'TEXT']          -> x </li>
+   *   <li> //x[text() = 'TEXT']     -> x </li>
+   *   <li> //*[* / @x = 'TEXT']     -> x </li>
+   *   <li> //*[@x = 'TEXT']         -> x </li>
+   *   <li> //@x[. = 'TEXT']         -> x </lI>
+   * </ul>
+   *
+   * @return local name and namespace uri
+   */
+  private byte[][] qname() {
+    Step s = step;
+    if(text) {
+      if(pred instanceof AxisPath) {
+        // predicate is context value: return global step
+        final AxisPath path = (AxisPath) pred;
+        final int pl = path.steps.length;
+        s = path.step(pl - 1);
+        if(s.axis == Axis.CHILD && s.test == Test.TXT) {
+          s = pl > 1 ? path.step(pl - 2) : step;
+        }
+      }
+    } else {
+      // expression in predicate is context value: return global step
+      if(pred instanceof AxisPath) {
+        final AxisPath path = (AxisPath) pred;
+        s = path.step(path.steps.length - 1);
+      }
+    }
+
+    // give up if test is not a name test
+    if(!(s.test instanceof NameTest)) return null;
+    final NameTest nt = (NameTest) s.test;
+
+    // give up if name test may refer to more than one element or attribute name
+    final Data data = ic.data;
+    if(nt.kind != Kind.URI_NAME && (!data.nspaces.isEmpty() || nt.kind != Kind.NAME)) return null;
+    // return local name and namespace uri
+    return new byte[][] { nt.local, nt.name.uri() };
+  }
+
+  /**
    * Rewrites the expression for index access.
    * @param root new root expression
    * @return index access
    */
   private ParseExpr invert(final ParseExpr root) {
     // handle context node
-    if(orig instanceof ContextValue) {
+    if(pred instanceof ContextValue) {
       // add attribute step
-      if(!attr || step.test.name == null) return root;
+      if(text || step.test.name == null) return root;
       final Step as = Step.get(step.info, Axis.SELF, step.test);
       return Path.get(root.info, root, as);
     }
 
-    final AxisPath origPath = (AxisPath) orig;
+    final AxisPath origPath = (AxisPath) pred;
     final Path invPath = origPath.invertPath(root, step);
 
-    if(attr) {
+    if(!text) {
       // add attribute test as first step
       final Step at = origPath.step(origPath.steps.length - 1);
       if(at.test.name != null) {
@@ -139,5 +179,28 @@ public final class IndexInfo {
       }
     }
     return invPath;
+  }
+
+  /**
+   * Returns the last step pointing to the requested nodes. Examples:
+   * <ul>
+   *   <li>{@code /xml/a[b = 'A']} -> {@code b}</li>
+   *   <li>{@code /xml/a[b/text() = 'A']} -> {@code text()}</li>
+   *   <li>{@code /xml/a[. = 'A']} -> {@code a}</li>
+   *   <li>{@code /xml/a[text() = 'A']} -> {@code text()}</li>
+   *   <li>{@code /xml/a/text()[. = 'A']} -> {@code text()}</li>
+   * </ul>
+   * @return step
+   */
+  private Step lastStep() {
+    // expression in predicate is context value: return global step
+    if(pred instanceof ContextValue) return step;
+    // give up if expression is not an axis path
+    if(!(pred instanceof AxisPath)) return null;
+    // give up if path contains is not relative
+    final AxisPath path = (AxisPath) pred;
+    if(path.root != null) return null;
+    // return last step
+    return path.step(path.steps.length - 1);
   }
 }

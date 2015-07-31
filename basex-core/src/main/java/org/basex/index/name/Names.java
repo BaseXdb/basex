@@ -57,7 +57,7 @@ public final class Names extends TokenSet implements Index {
   /**
    * Indexes a name and returns its unique id.
    * @param name name to be added
-   * @param value value, added to statistics
+   * @param value value, added to statistics (can be {@code null})
    * @param stat statistics flag
    * @return name id
    */

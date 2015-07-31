@@ -54,7 +54,7 @@ public abstract class IndexFn extends StandardFunc {
       avl = data.meta.attrindex;
     } else {
       index = data.ftxtIndex;
-      avl = data.meta.ftxtindex;
+      avl = data.meta.ftindex;
     }
     if(!avl) throw BXDB_INDEX_X.get(call.info, data.meta.name,
         it.toString().toLowerCase(Locale.ENGLISH));

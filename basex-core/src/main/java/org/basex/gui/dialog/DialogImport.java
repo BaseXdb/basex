@@ -68,8 +68,7 @@ final class DialogImport extends BaseXBack {
     add(new BaseXLabel(FILE_OR_DIR + COL, true, true).border(0, 0, 6, 0));
 
     final String path = gui.gopts.get(GUIOptions.INPUTPATH);
-    input = new BaseXTextField(path, dial);
-    input.history(GUIOptions.INPUTS, dial);
+    input = new BaseXTextField(path, dial).history(GUIOptions.INPUTS, dial);
 
     final IO io = IO.get(path);
     if(io instanceof IOFile && !path.isEmpty()) dbname = io.dbname();
@@ -113,7 +112,7 @@ final class DialogImport extends BaseXBack {
     add(archives);
 
     // add info label
-    info = new BaseXLabel(" ").border(32, 0, 6, 0);
+    info = new BaseXLabel(" ").border(20, 0, 6, 0);
     add(info);
 
     final DropHandler dh = new DropHandler() {

@@ -28,7 +28,7 @@ public final class FtSearch extends FtAccess {
     final FtIndexOptions opts = toOptions(2, Q_OPTIONS, new FtIndexOptions(), qc);
 
     final IndexContext ic = new IndexContext(data, false);
-    if(!data.meta.ftxtindex) throw BXDB_INDEX_X.get(info, data.meta.name,
+    if(!data.meta.ftindex) throw BXDB_INDEX_X.get(info, data.meta.name,
         IndexType.FULLTEXT.toString().toLowerCase(Locale.ENGLISH));
 
     final FTOpt opt = new FTOpt().copy(data.meta);

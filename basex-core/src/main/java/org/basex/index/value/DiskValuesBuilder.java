@@ -1,6 +1,5 @@
 package org.basex.index.value;
 
-import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 
@@ -34,11 +33,9 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public final class DiskValuesBuilder extends IndexBuilder {
+public final class DiskValuesBuilder extends ValuesBuilder {
   /** Temporary value tree. */
   private IndexTree index = new IndexTree();
-  /** Index type (attributes/texts). */
-  private final boolean text;
 
   /**
    * Constructor.
@@ -47,50 +44,41 @@ public final class DiskValuesBuilder extends IndexBuilder {
    * @param text value type (text/attribute)
    */
   public DiskValuesBuilder(final Data data, final MainOptions options, final boolean text) {
-    super(data, options.get(MainOptions.INDEXSPLITSIZE));
-    this.text = text;
+    super(data, options, text);
   }
 
   @Override
   public DiskValues build() throws IOException {
-    // delete old index
-    abort();
-
-    final Performance perf = Prop.debug ? new Performance() : null;
     Util.debug(det());
 
-    final int k = text ? Data.TEXT : Data.ATTR;
-
     for(pre = 0; pre < size; ++pre) {
-      if((pre & 0x0FFF) == 0) {
-        check();
-        // check if main memory is exhausted
-        if(split()) {
-          writeIndex(true);
-          index = new IndexTree();
-          finishSplit();
-        }
-      }
-      // skip too long values
-      if(data.kind(pre) == k && data.textLen(pre, text) <= data.meta.maxlen) {
-        index.index(data.text(pre, text), data.meta.updindex ? data.id(pre) : pre);
+      if((pre & 0x0FFF) == 0) check();
+      if(indexEntry() && data.textLen(pre, text) <= data.meta.maxlen) {
+        index.add(data.text(pre, text), data.meta.updindex ? data.id(pre) : pre);
         count++;
       }
     }
 
     writeIndex(splits > 0);
-    // merge partial index structures
     if(splits > 1) {
       index = null;
       Performance.gc(1);
       merge();
     }
 
-    if(text) data.meta.textindex = true;
-    else data.meta.attrindex = true;
-
-    finishIndex(perf);
+    finishIndex();
     return data.meta.updindex ? new UpdatableDiskValues(data, text) : new DiskValues(data, text);
+  }
+
+  @Override
+  protected void check() throws IOException {
+    super.check();
+    // check if main memory is exhausted
+    if(split()) {
+      writeIndex(true);
+      index = new IndexTree();
+      finishSplit();
+    }
   }
 
   /**
@@ -224,13 +212,7 @@ public final class DiskValuesBuilder extends IndexBuilder {
 
   @Override
   protected void abort() {
+    // drop index files
     data.meta.drop((text ? DATATXT : DATAATV) + ".+");
-    if(text) data.meta.textindex = false;
-    else data.meta.attrindex = false;
-  }
-
-  @Override
-  protected String det() {
-    return text ? INDEX_TEXT_D : INDEX_ATTRIBUTES_D;
   }
 }

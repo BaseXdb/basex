@@ -19,7 +19,7 @@ import org.basex.util.ft.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-final class DialogFT extends BaseXBack {
+final class DialogFT extends DialogIndex {
   /** Language flag. */
   private static final int F_LANG = 0;
   /** Stemming flag. */
@@ -33,28 +33,31 @@ final class DialogFT extends BaseXBack {
   /** Number of flags. */
   private static final int FLAGS = 5;
 
-  /** Dialog reference. */
-  private final BaseXDialog dialog;
   /** Full-text indexing. */
   private final BaseXCheckBox[] check = new BaseXCheckBox[FLAGS];
     /** Full-text language. */
   private final BaseXCombo language;
   /** Path for Full-text stopword list. */
   private final BaseXTextField swpath;
+  /** Element names to include. */
+  private final BaseXTextField ftinc;
   /** Path button for full-text stopword list path. */
   private final BaseXButton swbrowse;
 
   /**
    * Constructor.
-   * @param d dialog reference
+   * @param dialog dialog reference
    * @param create create dialog
    */
-  DialogFT(final BaseXDialog d, final boolean create) {
-    dialog = d;
-    layout(new TableLayout(create ? 9 : 15, 1));
+  DialogFT(final BaseXDialog dialog, final boolean create) {
+    super(dialog);
+    layout(new TableLayout(create ? 10 : 16, 1));
 
-    final MainOptions opts = d.gui.context.options;
+    final MainOptions opts = dialog.gui.context.options;
     add(new BaseXLabel(H_FULLTEXT_INDEX, true, false).border(0, 0, 6, 0));
+
+    ftinc = new BaseXTextField(opts.get(MainOptions.FTINCLUDE), dialog).hint(QNAME_INPUT);
+    add(ftinc);
 
     final String sw = opts.get(MainOptions.STOPWORDS);
     final String[] cb = { LANGUAGE, STEMMING, CASE_SENSITIVE, DIACRITICS, STOPWORD_LIST };
@@ -66,7 +69,7 @@ final class DialogFT extends BaseXBack {
     final BaseXLabel[] labels = new BaseXLabel[FLAGS];
     final int cl = check.length;
     for(int c = 0; c < cl; ++c) {
-      check[c] = new BaseXCheckBox(cb[c], val[c], d);
+      check[c] = new BaseXCheckBox(cb[c], val[c], dialog);
       if(create) {
         check[c].setToolTipText(desc[c]);
       } else {
@@ -75,10 +78,10 @@ final class DialogFT extends BaseXBack {
       }
     }
 
-    final BaseXBack b1 = new BaseXBack(new TableLayout(1, 2, 8, 0));
+    final BaseXBack b1 = new BaseXBack(new TableLayout(1, 2, 8, 0)).border(12, 0, 0, 0);
     b1.add(check[F_LANG]);
     final String[] langs = FTLexer.languages().finish();
-    language = new BaseXCombo(d, langs);
+    language = new BaseXCombo(dialog, langs);
     final Language ln = Language.get(opts);
     for(final String l : langs) {
       final String s = l.replaceFirst(" \\(.*", "");
@@ -97,10 +100,11 @@ final class DialogFT extends BaseXBack {
     add(check[F_STOP]);
     add(Box.createVerticalStrut(4));
     final BaseXBack b3 = new BaseXBack(new TableLayout(1, 2, 8, 0));
-    swpath = new BaseXTextField(sw.isEmpty() ? d.gui.gopts.get(GUIOptions.DATAPATH) : sw, d);
+    swpath = new BaseXTextField(
+        sw.isEmpty() ? dialog.gui.gopts.get(GUIOptions.DATAPATH) : sw, dialog);
     b3.add(swpath);
 
-    swbrowse = new BaseXButton(BROWSE_D, d);
+    swbrowse = new BaseXButton(BROWSE_D, dialog);
     swbrowse.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
@@ -126,13 +130,11 @@ final class DialogFT extends BaseXBack {
     }
   }
 
-  /**
-   * Reacts on user input.
-   * @param enabled enabled flag
-   */
+  @Override
   void action(final boolean enabled) {
     for(final BaseXCheckBox c : check) c.setEnabled(enabled);
 
+    ftinc.setEnabled(enabled);
     language.setEnabled(enabled && check[F_LANG].isSelected());
     swbrowse.setEnabled(enabled && check[F_STOP].isSelected());
     swpath.setEnabled(enabled && check[F_STOP].isSelected());
@@ -143,9 +145,7 @@ final class DialogFT extends BaseXBack {
     if(exists) dialog.gui.gopts.set(GUIOptions.DATAPATH, sw);
   }
 
-  /**
-   * Sets the chosen options.
-   */
+  @Override
   void setOptions() {
     final GUI gui = dialog.gui;
     final String lang = language.getSelectedItem();
@@ -155,5 +155,6 @@ final class DialogFT extends BaseXBack {
     gui.set(MainOptions.CASESENS, check[F_CASE].isSelected());
     gui.set(MainOptions.DIACRITICS, check[F_DIA].isSelected());
     gui.set(MainOptions.STOPWORDS, check[F_STOP].isSelected() ? swpath.getText() : "");
+    gui.set(MainOptions.FTINCLUDE, ftinc.getText());
   }
 }

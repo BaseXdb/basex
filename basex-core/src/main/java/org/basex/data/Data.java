@@ -15,8 +15,8 @@ import org.basex.index.resource.*;
 import org.basex.index.value.*;
 import org.basex.io.*;
 import org.basex.io.random.*;
-import org.basex.query.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -101,12 +101,13 @@ public abstract class Data {
   /** Full-text index instance. */
   public ValueIndex ftxtIndex;
 
+  /** Indicates if distances are to be updated. */
+  public boolean updateDists = true;
+
   /** Table access file. */
-  TableAccess table;
+  protected TableAccess table;
   /** ID->PRE mapping. */
-  IdPreMap idmap;
-  /** States if distance caching is active. */
-  public boolean cache;
+  protected IdPreMap idmap;
 
   /**
    * Default constructor.
@@ -139,9 +140,9 @@ public abstract class Data {
   /**
    * Drops the specified index.
    * @param type index to be dropped
-   * @return success flag
+   * @throws IOException I/O exceptions
    */
-  public abstract boolean dropIndex(IndexType type);
+  public abstract void dropIndex(IndexType type) throws IOException;
 
   /**
    * Starts an update operation: writes a file to disk to indicate that an update is
@@ -193,7 +194,7 @@ public abstract class Data {
   }
 
   /**
-   * Returns the index reference for the specified index type.
+   * Returns an index for the specified index type.
    * @param type index type
    * @return index
    */
@@ -256,32 +257,12 @@ public abstract class Data {
    * @return pre value or {@code -1} if id was not found
    */
   public final int pre(final int id) {
-    return meta.updindex ? idmap.pre(id) : findPre(id);
-  }
+    if(meta.updindex) return idmap.pre(id);
 
-  /**
-   * Returns a pre value for the specified id.
-   * @param ids unique node ids
-   * @param off start offset
-   * @param len number of ids
-   * @return sorted pre values
-   */
-  public final int[] pre(final int[] ids, final int off, final int len) {
-    if(meta.updindex) return idmap.pre(ids, off, len);
-    final IntList il = new IntList(len - off);
-    for(int i = off; i < len; ++i) il.add(findPre(ids[i]));
-    return il.sort().finish();
-  }
-
-  /**
-   * Returns a pre value for the specified id by scanning the table.
-   * @param id unique node id
-   * @return pre value or -1 if id was not found
-   */
-  private int findPre(final int id) {
-    // find pre value in table; start with specified id
+    // find pre value in the table; start with specified id
+    final int size = meta.size;
     for(int p = Math.max(0, id); p < meta.size; ++p) if(id == id(p)) return p;
-    final int ps = Math.min(meta.size, id);
+    final int ps = Math.min(size, id);
     for(int p = 0; p < ps; ++p) if(id == id(p)) return p;
     // id not found
     return -1;
@@ -389,7 +370,7 @@ public abstract class Data {
    * Returns the name of an element, attribute or processing instruction.
    * @param pre pre value
    * @param kind node kind
-   * @return name reference
+   * @return name
    */
   public final byte[] name(final int pre, final int kind) {
     if(kind == PI) {
@@ -411,10 +392,10 @@ public abstract class Data {
   }
 
   /**
-   * Returns the name and namespace uri of the addressed element or attribute.
+   * Returns the local name and namespace uri of the addressed element or attribute.
    * @param pre pre value
    * @param kind node kind
-   * @return array with name and namespace uri
+   * @return array with local name and namespace uri
    */
   public final byte[][] qname(final int pre, final int kind) {
     final byte[] name = name(pre, kind);
@@ -425,7 +406,7 @@ public abstract class Data {
       if(uriId > 0) {
         uri = nspaces.uri(uriId);
       } else if(hasPrefix && eq(prefix(name), XML)) {
-        uri = QueryText.XML_URI;
+        uri = DataText.XML_URI;
       }
     }
     return new byte[][] { name, uri == null ? EMPTY : uri };
@@ -451,11 +432,11 @@ public abstract class Data {
   }
 
   /**
-   * Returns the disk offset of a text (text, comment, pi, pi, document) or attribute value.
+   * Returns the reference to a text (text, comment, pi, pi, document) or attribute value.
    * @param pre pre value
    * @return disk offset
    */
-  public final long textOff(final int pre) {
+  public final long textRef(final int pre) {
     return table.read5(pre, 3);
   }
 
@@ -515,16 +496,33 @@ public abstract class Data {
       final int nsPre = kind == ATTR ? parent(pre, kind) : pre;
       final int uriId = nsFlag ? nspaces.add(nsPre, prefix, uri, this) :
         oldUriId != 0 && eq(nspaces.uri(oldUriId), uri) ? oldUriId : 0;
+      final int sz = size(pre, kind);
 
       // write ids of namespace uri and name, and namespace flag
+      final IntList pres = new IntList();
       if(kind == ATTR) {
+        // update attribute index
+        if(meta.updindex && meta.attrindex) {
+          pres.add(pre);
+          attrIndex.delete(cache(pres, false));
+        }
         table.write1(pre, 11, uriId);
         table.write2(pre, 1, attrNames.index(name, null, false));
         if(nsFlag) table.write2(nsPre, 1, 1 << 15 | nameId(nsPre));
+        if(!pres.isEmpty()) attrIndex.add(cache(pres, false));
       } else {
+        // update text index
+        if(meta.updindex && meta.textindex) {
+          final int last = pre + sz;
+          for(int curr = pre + attSize(pre, kind); curr != last; curr += size(curr, kind(curr))) {
+            if(kind(curr) == TEXT) pres.add(curr);
+          }
+          textIndex.delete(cache(pres, true));
+        }
         table.write1(pre, 3, uriId);
         final int nameId = elemNames.index(name, null, false);
         table.write2(nsPre, 1, (nsFlag || nsFlag(nsPre) ? 1 << 15 : 0) | nameId);
+        if(!pres.isEmpty()) textIndex.add(cache(pres, true));
       }
     }
   }
@@ -557,13 +555,9 @@ public abstract class Data {
     final int tSize = size(pre, tKind);
     final int tPar = parent(pre, tKind);
     bufferSize(sCount);
-    resources.replace(pre, tSize, source);
 
-    // initialize update of updatable index structures
-    if(meta.updindex) {
-      indexDelete(pre, tSize);
-      indexBegin();
-    }
+    // update index structures
+    indexDelete(pre, id(pre), tSize);
 
     final Data sData = source.data;
     int sTopPre = source.start;
@@ -588,7 +582,7 @@ public abstract class Data {
       switch(sKind) {
         case DOC:
           // add document
-          doc(cPre, sSize, sData.text(sPre, true));
+          doc(sSize, sData.text(sPre, true));
           ++meta.ndocs;
           break;
         case ELEM:
@@ -601,22 +595,15 @@ public abstract class Data {
         case COMM:
         case PI:
           // add text
-          text(cPre, cDist, sData.text(sPre, true), sKind);
+          text(cDist, sData.text(sPre, true), sKind);
           break;
         case ATTR:
           // add attribute
           final byte[] an = sData.name(sPre, sKind);
-          attr(cPre, cDist, attrNames.index(an, null, false), sData.text(sPre, false),
+          attr(cDist, attrNames.index(an, null, false), sData.text(sPre, false),
               nspaces.uriIdForPrefix(prefix(an), false));
           break;
       }
-    }
-
-    // update ID -> PRE map and index structures
-    if(meta.updindex) {
-      idmap.delete(pre, id(pre), -tSize);
-      idmap.insert(pre, meta.lastid - sCount + 1, sCount);
-      indexAdd();
     }
 
     // replace table entries, reset buffer size
@@ -632,7 +619,7 @@ public abstract class Data {
         size(p, k, size(p, k) + diff);
         p = parent(p, k);
       }
-      if(!cache) updateDist(pre + sCount, diff);
+      updateDist(pre + sCount, diff);
     }
 
     // adjust attribute size of parent if attributes inserted. attribute size
@@ -643,6 +630,9 @@ public abstract class Data {
       while(sPre < source.end && sData.kind(sPre++) == ATTR) d++;
       if(d > 1) attSize(tPar, kind(tPar), d + attSize(tPar, ELEM) - 1);
     }
+
+    // add entries to index structures
+    indexAdd(pre, meta.lastid - sCount + 1, sCount, source);
   }
 
   /**
@@ -655,12 +645,11 @@ public abstract class Data {
     // delete references in document index
     int kind = kind(pre);
     final int size = size(pre, kind);
-    resources.delete(pre, size);
 
     // delete entries in value indexes
-    if(meta.updindex) indexDelete(pre, size);
+    indexDelete(pre, id(pre), size);
 
-    /// delete text or attribute value in heap file
+    /// delete textual values
     if(kind != DOC && kind != ELEM) delete(pre, kind != ATTR);
 
     // reduce size of ancestors
@@ -686,15 +675,10 @@ public abstract class Data {
     // preserve empty root node
     if(kind(pre) == DOC) --meta.ndocs;
 
-    if(meta.updindex) {
-      // delete node and descendants from ID -> PRE map:
-      idmap.delete(pre, id(pre), -size);
-    }
-
     // delete node from table structure and reduce document size
     table.delete(pre, size);
 
-    if(!cache) updateDist(pre, -size);
+    updateDist(pre, -size);
   }
 
   /**
@@ -724,10 +708,6 @@ public abstract class Data {
    */
   public final void insert(final int pre, final int par, final DataClip source) {
     meta.update();
-
-    // update value and document indexes
-    if(meta.updindex) indexBegin();
-    resources.insert(pre, source);
 
     // resize buffer to cache more entries
     final int sCount = source.size();
@@ -767,7 +747,7 @@ public abstract class Data {
         case DOC:
           // add document
           nsScope.open(nPre);
-          doc(nPre, sSize, sdata.text(sPre, true));
+          doc(sSize, sdata.text(sPre, true));
           ++meta.ndocs;
           break;
         case ELEM: {
@@ -782,7 +762,7 @@ public abstract class Data {
         case COMM:
         case PI:
           // add text, comment or processing instruction
-          text(nPre, nDist, sdata.text(sPre, true), sKind);
+          text(nDist, sdata.text(sPre, true), sKind);
           break;
         case ATTR: {
           // add attribute
@@ -797,7 +777,7 @@ public abstract class Data {
               table.write2(nsPre, 1, 1 << 15 | nameId(nsPre));
             }
           }
-          attr(nPre, nDist, attrNames.index(name, null, false), sdata.text(sPre, false), uriId);
+          attr(nDist, attrNames.index(name, null, false), sdata.text(sPre, false), uriId);
         }
       }
       nsScope.shift(1);
@@ -817,14 +797,11 @@ public abstract class Data {
       cPre = parent(cPre, cKind);
     }
 
-    // add entries to the ID -> PRE mapping
-    if(meta.updindex) {
-      idmap.insert(pre, id(pre), sCount);
-      indexAdd();
-    }
+    // update index structures
+    indexAdd(pre, id(pre), sCount, source);
 
     // finally, update distances
-    if(!cache) updateDist(pre + sCount, sCount);
+    updateDist(pre + sCount, sCount);
   }
 
   /**
@@ -834,18 +811,20 @@ public abstract class Data {
    * @param size size to be added/removed
    */
   private void updateDist(final int pre, final int size) {
-    int p = pre;
-    while(p < meta.size) {
-      final int k = kind(p);
-      if(k == DOC) break;
-      dist(p, k, dist(p, k) + size);
-      p += size(p, k);
+    if(updateDists) {
+      int p = pre;
+      while(p < meta.size) {
+        final int k = kind(p);
+        if(k == DOC) break;
+        dist(p, k, dist(p, k) + size);
+        p += size(p, k);
+      }
     }
   }
 
   /**
    * Sets the size value.
-   * @param pre pre reference
+   * @param pre pre value
    * @param kind node kind
    * @param value value to be stored
    */
@@ -854,11 +833,11 @@ public abstract class Data {
   }
 
   /**
-   * Sets the disk offset of a text/attribute value.
+   * Sets the reference to a text/attribute value.
    * @param pre pre value
    * @param off offset
    */
-  final void textOff(final int pre, final long off) {
+  protected final void textRef(final int pre, final long off) {
     table.write5(pre, 3, off);
   }
 
@@ -934,22 +913,21 @@ public abstract class Data {
   }
 
   /**
-   * Adds a document entry to the internal update buffer.
-   * @param pre pre value
+   * Adds a document to the internal update buffer.
    * @param size node size
    * @param value document name
    */
-  public final void doc(final int pre, final int size, final byte[] value) {
-    final int i = newID();
-    final long v = index(pre, i, value, DOC);
+  public final void doc(final int size, final byte[] value) {
+    final int id = newID();
+    final long v = textRef(value, true);
     s(DOC); s(0); s(0); s(v >> 32);
     s(v >> 24); s(v >> 16); s(v >> 8); s(v);
     s(size >> 24); s(size >> 16); s(size >> 8); s(size);
-    s(i >> 24); s(i >> 16); s(i >> 8); s(i);
+    s(id >> 24); s(id >> 16); s(id >> 8); s(id);
   }
 
   /**
-   * Adds an element entry to the internal update buffer.
+   * Adds an element to the internal update buffer.
    * @param dist parent distance
    * @param nameId id of element name
    * @param asize number of attributes
@@ -961,51 +939,47 @@ public abstract class Data {
       final int uriId, final boolean nsFlag) {
 
     // build and insert new entry
-    final int i = newID();
+    final int id = newID();
     final int n = nsFlag ? 1 << 7 : 0;
     s(Math.min(IO.MAXATTS, asize) << 3 | ELEM);
     s(n | (byte) (nameId >> 8)); s(nameId); s(uriId);
     s(dist >> 24); s(dist >> 16); s(dist >> 8); s(dist);
     s(size >> 24); s(size >> 16); s(size >> 8); s(size);
-    s(i >> 24); s(i >> 16); s(i >> 8); s(i);
+    s(id >> 24); s(id >> 16); s(id >> 8); s(id);
   }
 
   /**
-   * Adds a text entry to the internal update buffer.
-   * @param pre pre value
+   * Adds a text, comment or processing instruction to the internal update buffer.
    * @param dist parent distance
    * @param value string value
    * @param kind node kind
    */
-  public final void text(final int pre, final int dist, final byte[] value, final int kind) {
+  public final void text(final int dist, final byte[] value, final int kind) {
     // build and insert new entry
-    final int i = newID();
-    final long v = index(pre, i, value, kind);
+    final int id = newID();
+    final long v = textRef(value, true);
     s(kind); s(0); s(0); s(v >> 32);
     s(v >> 24); s(v >> 16); s(v >> 8); s(v);
     s(dist >> 24); s(dist >> 16); s(dist >> 8); s(dist);
-    s(i >> 24); s(i >> 16); s(i >> 8); s(i);
+    s(id >> 24); s(id >> 16); s(id >> 8); s(id);
   }
 
   /**
-   * Adds an attribute entry to the internal update buffer.
-   * @param pre pre value
+   * Adds an attribute to the internal update buffer.
    * @param dist parent distance
    * @param nameId id of attribute name
    * @param value attribute value
    * @param uriId id of namespace uri
    */
-  public final void attr(final int pre, final int dist, final int nameId, final byte[] value,
-      final int uriId) {
-
+  public final void attr(final int dist, final int nameId, final byte[] value, final int uriId) {
     // add attribute to text storage
-    final int i = newID();
-    final long v = index(pre, i, value, ATTR);
+    final int id = newID();
+    final long v = textRef(value, false);
     s(Math.min(IO.MAXATTS, dist) << 3 | ATTR);
     s(nameId >> 8); s(nameId); s(v >> 32);
     s(v >> 24); s(v >> 16); s(v >> 8); s(v);
     s(0); s(0); s(0); s(uriId);
-    s(i >> 24); s(i >> 16); s(i >> 8); s(i);
+    s(id >> 24); s(id >> 16); s(id >> 8); s(id);
   }
 
   /**
@@ -1043,30 +1017,82 @@ public abstract class Data {
   }
 
   /**
-   * Indexes a text and returns the reference.
-   * @param pre pre value
-   * @param id id value
+   * Generates a reference for a text (text, comment, pi, pi, document) or attribute value.
    * @param value text to be indexed
-   * @param kind node kind
+   * @param text text/attribute flag
    * @return reference
    */
-  protected abstract long index(final int pre, final int id, final byte[] value, final int kind);
-
-  /** Notify the index structures that an update operation is started. */
-  void indexBegin() { }
-
-  /** Notify the index structures that an add operation is finished. */
-  void indexAdd() { }
-
-  /** Notify the index structures that a delete operation is finished. */
-  void indexDelete() { }
+  protected abstract long textRef(final byte[] value, final boolean text);
 
   /**
-   * Deletes a node and its descendants from the corresponding indexes.
-   * @param pre pre value of the node to delete
+   * Deletes entries from the index structures.
+   * @param pre first pre value of the nodes to delete
+   * @param id id (a simple value update is indicated by the value {@code -1})
    * @param size number of descendants
    */
-  protected abstract void indexDelete(final int pre, final int size);
+  protected final void indexDelete(final int pre, final int id, final int size) {
+    if(id != -1) resources.delete(pre, size);
+    if(meta.updindex) {
+      if(meta.textindex) textIndex.delete(cache(pre, size, true));
+      if(meta.attrindex) attrIndex.delete(cache(pre, size, false));
+      if(id != -1) idmap.delete(pre, id, -size);
+    }
+  }
+
+  /**
+   * Inserts new entries in the index structure.
+   * @param pre first pre value of the nodes to insert
+   * @param id id (a simple value update is indicated by the value {@code -1})
+   * @param size number of descendants
+   * @param clip data clip to be inserted
+   */
+  protected final void indexAdd(final int pre, final int id, final int size, final DataClip clip) {
+    if(id != -1) resources.insert(pre, clip);
+    if(meta.updindex) {
+      if(id != -1) idmap.insert(pre, id, size);
+      if(meta.textindex) textIndex.add(cache(pre, size, true));
+      if(meta.attrindex) attrIndex.add(cache(pre, size, false));
+    }
+  }
+
+  /**
+   * Caches all texts and ids in the specified database range.
+   * @param pre pre value
+   * @param size size value
+   * @param text text/attribute flag
+   * @return cached texts and ids
+   */
+  private TokenObjMap<IntList> cache(final int pre, final int size, final boolean text) {
+    final IntList pres = new IntList(size);
+    final int last = pre + size;
+    for(int curr = 0; curr < last; ++curr) pres.add(curr);
+    return cache(pres, text);
+  }
+
+  /**
+   * Caches texts of the specified pre values.
+   * @param pres pre values
+   * @param text text/attribute flag
+   * @return cached texts and ids
+   */
+  private TokenObjMap<IntList> cache(final IntList pres, final boolean text) {
+    final TokenObjMap<IntList> map = new TokenObjMap<>();
+    final IndexNames in = new IndexNames(text ? meta.textinclude : meta.attrinclude);
+    final int ps = pres.size(), kind = text ? TEXT : ATTR;
+    for(int p = 0; p < ps; p++) {
+      final int pre = pres.get(p);
+      if(kind(pre) == kind && textLen(pre, text) <= meta.maxlen && in.contains(this, pre, text)) {
+        final byte[] key = text(pre, text);
+        IntList ids = map.get(key);
+        if(ids == null) {
+          ids = new IntList(1);
+          map.put(key, ids);
+        }
+        ids.add(id(pre));
+      }
+    }
+    return map;
+  }
 
   // HELPER FUNCTIONS ===================================================================
 

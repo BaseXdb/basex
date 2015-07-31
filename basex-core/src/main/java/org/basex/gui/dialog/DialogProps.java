@@ -54,17 +54,17 @@ public final class DialogProps extends BaseXDialog {
   final DialogResources resources;
   /** Add panel. */
   final DialogAdd add;
-  /** Index information. */
+  /** Index information panel. */
   private final TextPanel[] infos = new TextPanel[LABELS.length];
 
   /** Index labels. */
   private final BaseXLabel[] labels = new BaseXLabel[LABELS.length];
   /** Index buttons. */
-  private final BaseXButton[] indxs = new BaseXButton[LABELS.length];
+  private final BaseXButton[] buttons = new BaseXButton[LABELS.length];
   /** Index panels. */
   private final BaseXBack[] panels = new BaseXBack[LABELS.length];
-  /** Editable full-text options. */
-  private final DialogFT ft;
+  /** Index creation panels. */
+  private final DialogIndex[] creations = new DialogIndex[LABELS.length];
 
   /**
    * Default constructor.
@@ -81,7 +81,6 @@ public final class DialogProps extends BaseXDialog {
 
     // tab: resources
     add = new DialogAdd(this);
-    ft = new DialogFT(this, false);
     final BaseXBack tabRes = add.border(8);
 
     final Data data = main.context.data();
@@ -92,29 +91,30 @@ public final class DialogProps extends BaseXDialog {
       infos[l] = new TextPanel(Token.token(PLEASE_WAIT_D), false, this);
       infos[l].setFont(dmfont);
       BaseXLayout.setHeight(infos[l], 200);
-      if(l != 1) {
-        indxs[l] = new BaseXButton(" ", this);
-        indxs[l].setEnabled(!data.inMemory());
-      }
+      // show no optimize button for attribute name panel
+      if(l != 1) buttons[l] = new BaseXButton(" ", this);
+      // disallow creation/removal of full-text index
+      if(l == 5) buttons[l].setEnabled(!data.inMemory());
     }
+    // alternative panels
+    creations[3] = new DialogValues(this, true);
+    creations[4] = new DialogValues(this, false);
+    creations[5] = new DialogFT(this, false);
 
     // tab: name indexes
     tabNames = new BaseXBack(new GridLayout(2, 1, 0, 8)).border(8);
-    add(0, tabNames, null);
-    add(1, tabNames, null);
-
+    tabNames.add(panels[0]);
+    tabNames.add(panels[1]);
     // tab: path index
     tabPath = new BaseXBack(new GridLayout(1, 1)).border(8);
-    add(2, tabPath, null);
-
+    tabPath.add(panels[2]);
     // tab: value indexes
     tabValues = new BaseXBack(new GridLayout(2, 1, 0, 8)).border(8);
-    add(3, tabValues, null);
-    add(4, tabValues, null);
-
+    tabValues.add(panels[3]);
+    tabValues.add(panels[4]);
     // tab: full-text index
     tabFT = new BaseXBack(new GridLayout(1, 1)).border(8);
-    add(5, tabFT, null);
+    tabFT.add(panels[5]);
 
     // tab: database info
     final BaseXBack tabGeneral = new BaseXBack(new BorderLayout(0, 8)).border(8);
@@ -179,7 +179,7 @@ public final class DialogProps extends BaseXDialog {
 
     final Data data = gui.context.data();
     final boolean[] val = {
-      true, true, true, data.meta.textindex, data.meta.attrindex, data.meta.ftxtindex
+      true, true, true, data.meta.textindex, data.meta.attrindex, data.meta.ftindex
     };
     final int is = il.size();
     for(int i = 0; i < is; i++) {
@@ -200,18 +200,17 @@ public final class DialogProps extends BaseXDialog {
   /**
    * Adds index information to the specified panel and tab.
    * @param i index offset
-   * @param tab panel tab
-   * @param info optional info to display
+   * @param alt alternative body component (if {@code null}, {@link #infos} will be displayed)
    */
-  private void add(final int i, final BaseXBack tab, final BaseXBack info) {
-    final BaseXBack idx = new BaseXBack(new BorderLayout(8, 0));
-    idx.add(labels[i], BorderLayout.WEST);
-    if(indxs[i] != null) idx.add(indxs[i], BorderLayout.EAST);
-    panels[i].add(idx, BorderLayout.NORTH);
-
-    final BaseXBack b = info != null ? info : new SearchEditor(gui, infos[i]);
-    panels[i].add(b, BorderLayout.CENTER);
-    tab.add(panels[i]);
+  private void add(final int i, final BaseXBack alt) {
+    final BaseXBack header = new BaseXBack(new BorderLayout(8, 0));
+    header.add(labels[i], BorderLayout.WEST);
+    if(buttons[i] != null) header.add(buttons[i], BorderLayout.EAST);
+    panels[i].removeAll();
+    panels[i].add(header, BorderLayout.NORTH);
+    panels[i].add(alt != null ? alt : new SearchEditor(gui, infos[i]), BorderLayout.CENTER);
+    panels[i].revalidate();
+    panels[i].repaint();
   }
 
   @Override
@@ -219,8 +218,8 @@ public final class DialogProps extends BaseXDialog {
     if(cmp != null) {
       final int ll = LABELS.length;
       for(int l = 0; l < ll; l++) {
-        if(cmp != indxs[l]) continue;
-        final String label = indxs[l].getText();
+        if(cmp != buttons[l]) continue;
+        final String label = buttons[l].getText();
         final Command cmd;
         if(label.equals(OPTIMIZE)) {
           cmd = new Optimize();
@@ -228,7 +227,7 @@ public final class DialogProps extends BaseXDialog {
           cmd = new DropIndex(TYPES[l]);
         } else {
           cmd = new CreateIndex(TYPES[l]);
-          ft.setOptions();
+          for(final DialogIndex di : creations) if(di != null) di.setOptions();
         }
         infos[l].setText(PLEASE_WAIT_D);
         DialogProgress.execute(this, cmd);
@@ -240,42 +239,38 @@ public final class DialogProps extends BaseXDialog {
     add.action(cmp);
 
     final Data data = gui.context.data();
-    final boolean[] val = {
-      true, true, true, data.meta.textindex, data.meta.attrindex, data.meta.ftxtindex
+    final boolean[] exists = {
+      true, true, true, data.meta.textindex, data.meta.attrindex, data.meta.ftindex
     };
 
     if(cmp == this) {
-      final boolean utd = data.meta.uptodate;
+      final boolean outdated = !data.meta.uptodate;
       final int ll = LABELS.length;
       for(int l = 0; l < ll; ++l) {
         // structural index/statistics?
-        final boolean struct = l < 3;
-        String lbl = LABELS[l];
-        if(struct && !utd) lbl += " (" + OUT_OF_DATE + ')';
+        final boolean stats = l < 3;
         // updates labels and infos
-        labels[l].setText(lbl);
+        labels[l].setText(stats && outdated ? LABELS[l] + " (" + OUT_OF_DATE + ')' : LABELS[l]);
         // update button (label, disable/enable)
-        if(indxs[l] != null) {
-          indxs[l].setText(struct ? OPTIMIZE : val[l] ? DROP : CREATE);
-          if(struct) indxs[l].setEnabled(!utd);
+        if(buttons[l] != null) {
+          buttons[l].setText(stats ? OPTIMIZE : exists[l] ? DROP : CREATE);
+          if(stats) buttons[l].setEnabled(outdated);
         }
+        add(l, creations[l] == null || exists[l] ? null : creations[l]);
       }
-      // full-text options
-      tabFT.removeAll();
-      final int f = 5;
-      panels[f].removeAll();
-      add(f, tabFT, val[f] ? null : ft);
-      panels[f].revalidate();
-      panels[f].repaint();
       updateInfo();
     }
 
-    ft.action(true);
+    for(final DialogIndex di : creations) {
+      if(di != null) di.action(true);
+    }
   }
 
   @Override
   public void close() {
     super.close();
-    ft.setOptions();
+    for(final DialogIndex di : creations) {
+      if(di != null) di.setOptions();
+    }
   }
 }

@@ -39,8 +39,8 @@ public class IndexTree {
    * @param key key to be indexed
    * @param value value to be indexes
    */
-  public final void index(final byte[] key, final int value) {
-    index(key, value, true);
+  public final void add(final byte[] key, final int value) {
+    add(key, value, true);
   }
 
   /**
@@ -52,7 +52,7 @@ public class IndexTree {
    * @param exist flag for using existing index
    * @return int node
    */
-  protected final int index(final byte[] key, final int value, final boolean exist) {
+  protected final int add(final byte[] key, final int value, final boolean exist) {
     // index is empty.. create root node
     if(root == -1) {
       root = n(key, value, -1, exist);

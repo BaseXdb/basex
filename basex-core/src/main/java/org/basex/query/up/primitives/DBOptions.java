@@ -27,8 +27,8 @@ public final class DBOptions {
   public static final Option<?>[] INDEXING = { MainOptions.MAXCATS, MainOptions.MAXLEN,
     MainOptions.INDEXSPLITSIZE, MainOptions.FTINDEXSPLITSIZE, MainOptions.LANGUAGE,
     MainOptions.STOPWORDS, MainOptions.TEXTINDEX, MainOptions.ATTRINDEX, MainOptions.FTINDEX,
-    MainOptions.STEMMING, MainOptions.CASESENS, MainOptions.DIACRITICS, MainOptions.UPDINDEX,
-    MainOptions.AUTOOPTIMIZE };
+    MainOptions.TEXTINCLUDE, MainOptions.ATTRINCLUDE, MainOptions.FTINCLUDE, MainOptions.STEMMING,
+    MainOptions.CASESENS, MainOptions.DIACRITICS, MainOptions.UPDINDEX, MainOptions.AUTOOPTIMIZE };
 
   /** Runtime options. */
   private final HashMap<Option<?>, Object> map = new HashMap<>();

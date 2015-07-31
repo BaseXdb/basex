@@ -5,10 +5,10 @@ import static org.junit.Assert.*;
 import java.io.*;
 
 import org.basex.*;
-import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
+import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.junit.*;
 import org.junit.Test;
@@ -33,7 +33,7 @@ public class MemDataTest extends SandboxTest {
    */
   @Before
   public void setUp() throws IOException {
-    data = MemBuilder.build(new IOContent(XML));
+    data = new DBNode(new IOContent(XML)).data();
     context.openDB(data);
   }
 

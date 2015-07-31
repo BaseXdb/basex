@@ -8,6 +8,7 @@ import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.index.value.*;
 import org.basex.util.*;
+import org.basex.util.options.*;
 
 /**
  * This interface defines the functions which are needed for building
@@ -17,15 +18,23 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class IndexBuilder extends Proc {
+  /** Performance. */
+  protected final Performance perf = new Performance();
+
   /** Data reference. */
   protected final Data data;
   /** Total parsing value. */
   protected final int size;
+  /** Node type to index (text/attributes). */
+  protected final boolean text;
+
   /** Number of index operations to perform before writing a partial index to disk. */
   private final int splitSize;
-
   /** Maximum memory to consume. */
   private final long maxMem = (long) (Runtime.getRuntime().maxMemory() * 0.8);
+
+  /** Names and namespace uri of element or attributes to include. */
+  private final IndexNames names;
 
   /** Current pre value. */
   protected int pre;
@@ -39,12 +48,21 @@ public abstract class IndexBuilder extends Proc {
   /**
    * Constructor.
    * @param data reference
-   * @param max maximum number of operations per partial index
+   * @param options main options
+   * @param splitSize index split size
+   * @param text index type (text/attributes)
+   * @param includes names of elements or attributes to include
    */
-  protected IndexBuilder(final Data data, final int max) {
+  protected IndexBuilder(final Data data, final MainOptions options, final NumberOption splitSize,
+      final StringOption includes, final boolean text) {
+
     this.data = data;
+    this.splitSize = options.get(splitSize);
+    this.text = text;
     size = data.meta.size;
-    splitSize = max;
+    names = new IndexNames(options.get(includes));
+
+    // run garbage collection if memory maximum is already reached
     if(Performance.memory() >= maxMem) Performance.gc(1);
   }
 
@@ -57,10 +75,20 @@ public abstract class IndexBuilder extends Proc {
 
   /**
    * Checks if the command was interrupted, and prints some debug output.
+   * @throws IOException I/O Exception
    */
-  protected final void check() {
+  @SuppressWarnings("unused")
+  protected void check() throws IOException {
     checkStop();
     if(Prop.debug && (pre & 0x1FFFFF) == 0) Util.err(".");
+  }
+
+  /**
+   * Checks if the current entry should be indexed.
+   * @return result of check
+   */
+  protected final boolean indexEntry() {
+    return data.kind(pre) == (text ? Data.TEXT : Data.ATTR) && names.contains(data, pre, text);
   }
 
   /**
@@ -100,9 +128,8 @@ public abstract class IndexBuilder extends Proc {
 
   /**
    * Prints some final debugging information.
-   * @param perf performance
    */
-  protected final void finishIndex(final Performance perf) {
+  protected final void finishIndex() {
     if(!Prop.debug) return;
 
     final StringBuilder sb = new StringBuilder();

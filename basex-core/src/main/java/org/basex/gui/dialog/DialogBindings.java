@@ -8,7 +8,6 @@ import java.util.Map.Entry;
 import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
-import org.basex.query.*;
 
 /**
  * Dialog window for defining variable and context bindings.
@@ -62,7 +61,7 @@ public final class DialogBindings extends BaseXDialog {
     final MainOptions opts = gui.context.options;
     final int cl = context.length;
     int c = 0;
-    for(final Entry<String, String> entry : QueryProcessor.bindings(opts).entrySet()) {
+    for(final Entry<String, String> entry : opts.toMap(MainOptions.BINDINGS).entrySet()) {
       context[c++].setText('$' + entry.getKey());
       context[c++].setText(entry.getValue());
       if(c == cl) break;

@@ -44,17 +44,14 @@ public final class DBNew {
 
   /**
    * Inserts all documents to be added to a temporary database.
-   * @param md temporary database
    * @param name name of database
    * @param options database options
    * @throws QueryException query exception
    */
-  public void addDocs(final MemData md, final String name, final DBOptions options)
-      throws QueryException {
-
+  public void addDocs(final String name, final DBOptions options) throws QueryException {
     final MainOptions opts = new MainOptions(qc.context.options);
     options.assignTo(opts);
-    addDocs(new MemData(md, opts), name, opts);
+    addDocs(new MemData(opts), name, opts);
   }
 
   /**

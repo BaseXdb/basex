@@ -44,7 +44,7 @@ public final class ReplaceDoc extends NodeUpdate {
 
   @Override
   public void prepare(final MemData tmp) throws QueryException {
-    replace.addDocs(tmp, data.meta.name, options);
+    replace.addDocs(data.meta.name, options);
   }
 
   @Override

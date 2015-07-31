@@ -126,8 +126,7 @@ public final class GUIInput extends BaseXTextField {
    * @param mode mode
    */
   void mode(final String mode) {
-    setText("");
-    hint(mode + Text.DOTS);
+    hint(mode + Text.DOTS).setText("");
   }
 
   /**

@@ -33,7 +33,12 @@ public interface Index {
   IndexIterator iter(final IndexToken token);
 
   /**
-   * Returns a cost estimation for searching the specified token.
+   * Computes costs for accessing the specified token. An integer is returned:
+   * <ul>
+   *   <li> A negative zero indicates that index access is not possible.</li>
+   *   <li> A value of zero indicates that no results will be returned.</li>
+   *   <li> A small value indicates that index access is fast.</li>
+   * </ul>
    * Smaller values are better, a value of zero indicates that no results will be returned.
    * @param token token to be found
    * @return cost estimation
@@ -41,7 +46,7 @@ public interface Index {
   int costs(final IndexToken token);
 
   /**
-   * Drops the index.
+   * Drops the index. Also returns true if the index does not exist.
    * @return success flag
    */
   boolean drop();
