@@ -5,8 +5,6 @@ import java.io.*;
 import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.io.*;
-import org.basex.io.parse.csv.*;
-import org.basex.query.value.item.*;
 
 /**
  * This class parses files in the CSV format and converts them to XML.
@@ -44,16 +42,5 @@ public final class CsvParser extends SingleParser {
   @Override
   protected void parse() throws IOException {
     proc(new CsvBuilder(copts, builder)).convert(source);
-  }
-
-  /**
-   * Converts a JSON document to XML.
-   * @param io input
-   * @param options parser options
-   * @return parser
-   * @throws IOException I/O exception
-   */
-  public static IOContent toXML(final IO io, final CsvParserOptions options) throws IOException {
-    return new IOContent(((Str) new CsvStringConverter(options).convert(io)).string());
   }
 }

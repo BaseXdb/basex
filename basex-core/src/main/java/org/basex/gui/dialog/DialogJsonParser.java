@@ -6,14 +6,14 @@ import java.awt.*;
 import java.io.*;
 
 import org.basex.build.json.*;
-import org.basex.build.json.JsonOptions.*;
+import org.basex.build.json.JsonOptions.JsonFormat;
 import org.basex.core.*;
 import org.basex.core.MainOptions.MainParser;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.text.*;
 import org.basex.io.*;
-import org.basex.query.value.node.*;
+import org.basex.io.parse.json.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -115,8 +115,8 @@ final class DialogJsonParser extends DialogParser {
         } else {
           json = EXAMPLE;
         }
-        final DBNode node = new DBNode(JsonParser.toXML(new IOContent(json), jopts));
-        example.setText(example(MainParser.JSON.name(), json, node.serialize().toString()));
+        example.setText(example(MainParser.JSON.name(), json,
+            JsonConverter.get(jopts).convert(new IOContent(json)).serialize().toString()));
       }
     } catch(final IOException ex) {
       example.setText(error(ex));

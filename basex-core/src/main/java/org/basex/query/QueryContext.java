@@ -715,8 +715,7 @@ public final class QueryContext extends Proc implements Closeable {
       try {
         final JsonParserOptions jp = new JsonParserOptions();
         jp.set(JsonOptions.FORMAT, JsonFormat.MAP);
-        final JsonConverter conv = JsonConverter.get(jp);
-        return conv.convert(token(vl.toString()), null);
+        return JsonConverter.get(jp).convert(token(vl.toString()), null);
       } catch(final QueryIOException ex) {
         throw ex.getCause();
       }
