@@ -210,6 +210,11 @@ public final class BaseXList extends BaseXBack {
     text.setEnabled(en);
   }
 
+  @Override
+  public boolean isEnabled() {
+    return list.isEnabled();
+  }
+
   /**
    * Sets the specified font.
    * @param font font name

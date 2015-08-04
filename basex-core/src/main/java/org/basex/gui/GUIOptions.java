@@ -47,6 +47,8 @@ public final class GUIOptions extends Options {
   public static final NumberOption FONTTYPE = new NumberOption("FONTTYPE", 0);
   /** Font size. */
   public static final NumberOption FONTSIZE = new NumberOption("FONTSIZE", GUIConstants.FONTSIZE);
+  /** Only display monospace fonts. */
+  public static final BooleanOption ONLYMONO = new BooleanOption("ONLYMONO", false);
 
   /** Red GUI color factor. */
   public static final NumberOption COLORRED = new NumberOption("COLORRED", 15);
