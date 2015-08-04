@@ -200,12 +200,20 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   protected Path toPath(final int i, final QueryContext qc) throws QueryException {
-    if(i >= exprs.length) return null;
-    final String file = string(toToken(exprs[i], qc));
+    return i < exprs.length ? toPath(string(toToken(exprs[i], qc))) : null;
+  }
+
+  /**
+   * Converts the specified string to a file path.
+   * @param path path string
+   * @return file instance
+   * @throws QueryException query exception
+   */
+  protected Path toPath(final String path) throws QueryException {
     try {
-      return Paths.get(IOUrl.isFileURL(file) ? IOUrl.toFile(file) : file);
+      return Paths.get(IOUrl.isFileURL(path) ? IOUrl.toFile(path) : path);
     } catch(final InvalidPathException ex) {
-      throw FILE_INVALID_PATH_X.get(info, file);
+      throw FILE_INVALID_PATH_X.get(info, path);
     }
   }
 

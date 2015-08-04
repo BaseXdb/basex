@@ -439,7 +439,8 @@ public final class FileModuleTest extends AdvancedQueryTest {
     query(ENDS_WITH.args(_FILE_RESOLVE_PATH.args("."), File.separator), "true");
 
     query(CONTAINS.args(_FILE_RESOLVE_PATH.args(can1, can2), can1), "true");
-    query(CONTAINS.args(_FILE_RESOLVE_PATH.args("X", can1), can1 + File.separator + "X"), "true");
+    query(CONTAINS.args(_FILE_RESOLVE_PATH.args("X", can1 + File.separator),
+        can1 + File.separator + "X"), "true");
     error(_FILE_RESOLVE_PATH.args(can1, "b"), FILE_IS_RELATIVE_X);
     error(_FILE_RESOLVE_PATH.args("X", "b"), FILE_IS_RELATIVE_X);
   }
