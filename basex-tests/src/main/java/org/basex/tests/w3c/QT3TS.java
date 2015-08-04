@@ -430,7 +430,7 @@ public final class QT3TS extends Main {
    * @return result
    */
   private String normSpecial(final String in) {
-    return in.replaceAll("<\\?xml.*?>", "").replace("\n", "%0A").replace("\r", "%0D").
+    return in.replaceAll("^<\\?xml.*?>\r?\n?", "").replace("\n", "%0A").replace("\r", "%0D").
         replace("\t", "%09");
   }
 

@@ -113,7 +113,7 @@ abstract class MarkupSerializer extends StandardSerializer {
           }
           out.print(ATT2);
           out.print(PI_C);
-          sep = true;
+          newline();
         }
       }
     }

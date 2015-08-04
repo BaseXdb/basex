@@ -42,9 +42,9 @@ public final class RESTPostTest extends RESTTest {
   @Test
   public void post3() throws IOException {
     assertEquals(
-      "<?xml version=\"1.0\" encoding=\"UTF-8\"?>123",
+      "1",
       post("", "<query xmlns=\"" + URI + "\">" +
-        "<text>123</text><parameter name='omit-xml-declaration' value='no'/></query>",
+        "<text><![CDATA[<a>1</a>]]></text><parameter name='method' value='text'/></query>",
         MediaType.APPLICATION_XML));
   }
 
