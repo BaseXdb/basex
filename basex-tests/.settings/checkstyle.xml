@@ -38,9 +38,7 @@
     <module name="NoWhitespaceBefore">
       <property name="tokens" value="SEMI,DOT,POST_DEC,POST_INC"/>
     </module>
-    <module name="ParenPad">
-      <property name="tokens" value="LPAREN,RPAREN,CTOR_CALL,METHOD_CALL,SUPER_CTOR_CALL"/>
-    </module>
+    <module name="ParenPad"/>
     <module name="TypecastParenPad">
       <property name="tokens" value="RPAREN,TYPECAST"/>
     </module>
@@ -50,15 +48,7 @@
     </module>
     <module name="ModifierOrder"/>
     <module name="RedundantModifier"/>
-    <module name="EqualsHashCode">
-      <property name="severity" value="ignore"/>
-      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
-    </module>
     <module name="IllegalInstantiation"/>
-    <module name="MagicNumber">
-      <property name="severity" value="ignore"/>
-      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
-    </module>
     <module name="SimplifyBooleanExpression"/>
     <module name="SimplifyBooleanReturn"/>
     <module name="DesignForExtension">
@@ -75,18 +65,8 @@
     <module name="DefaultComesLast"/>
     <module name="ExplicitInitialization"/>
     <module name="FallThrough"/>
-    <module name="FinalLocalVariable">
-      <property name="severity" value="ignore"/>
-      <property name="tokens" value="PARAMETER_DEF,VARIABLE_DEF"/>
-      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
-    </module>
     <module name="IllegalThrows">
       <property name="illegalClassNames" value="java.lang.Error, java.lang.RuntimeException"/>
-    </module>
-    <module name="MultipleStringLiterals">
-      <property name="severity" value="ignore"/>
-      <property name="allowedDuplicates" value="9"/>
-      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
     </module>
     <module name="ParameterAssignment"/>
     <module name="StringLiteralEquality"/>
@@ -110,11 +90,15 @@
       <property name="illegalPattern" value="true"/>
     </module>
     <module name="OuterTypeFilename"/>
-  </module>
-  <module name="StrictDuplicateCode">
-    <property name="severity" value="ignore"/>
-    <property name="min" value="20"/>
-    <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
+    <module name="StrictDuplicateCode">
+      <property name="severity" value="ignore"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
+    </module>
+    <module name="AnnotationUseStyle"/>
+    <module name="MissingOverride"/>
+    <module name="PackageAnnotation"/>
+    <module name="SuppressWarnings"/>
+    <module name="InterfaceTypeParameterName"/>
   </module>
   <module name="FileTabCharacter"/>
 </module>

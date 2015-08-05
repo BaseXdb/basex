@@ -29,9 +29,9 @@ public final class LockingTest extends SandboxTest {
   private static final int REPEAT = 1;
 
   /** Maximum sleep time in ms. */
-  private static final long SLEEP = 200L;
+  private static final long SLEEP = 500L;
   /** Additional allowed holding time for client creation overhead, ... in ms. */
-  private static final long SYNC = 100L;
+  private static final long SYNC = 200L;
 
   /** Test document. */
   private static final String DOC = "src/test/resources/test.xml";

@@ -92,6 +92,20 @@ public final class XQJConcurrencyTest extends XQJBaseTest {
   }
 
   /**
+   * Closes a connection.
+   * @param conn connection to be closed
+   */
+  private static void close(final XQConnection conn) {
+    if(conn != null) {
+      try {
+        conn.close();
+      } catch(final XQException ignored) {
+        /* ... superfluous ... */
+      }
+    }
+  }
+
+  /**
    * Query Thread.
    */
   private class SimpleQueryThread extends Thread {
@@ -161,19 +175,4 @@ public final class XQJConcurrencyTest extends XQJBaseTest {
       }
     }
   }
-
-  /**
-   * Closes a connection.
-   * @param conn connection to be closed
-   */
-  private static void close(final XQConnection conn) {
-    if(conn != null) {
-      try {
-        conn.close();
-      } catch(final XQException ignored) {
-        /* ... superfluous ... */
-      }
-    }
-  }
-
 }

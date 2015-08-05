@@ -23,7 +23,7 @@ public final class DialogFonts extends BaseXDialog implements Runnable {
       "22", "24", "26", "28", "30", "33", "36", "40" };
 
   /** Dialog. */
-  private static Dialog dialog;
+  private static DialogFonts dialog;
 
   /** Fonts. */
   private final String[] fonts;
@@ -69,7 +69,6 @@ public final class DialogFonts extends BaseXDialog implements Runnable {
     font2.setValue(gopts.get(GUIOptions.MONOFONT));
     font2.setEnabled(false);
     type.setValue(FONT_TYPES[gopts.get(GUIOptions.FONTTYPE)]);
-    size.setValue(Integer.toString(gui.gopts.get(GUIOptions.FONTSIZE)));
     font.setValue(gopts.get(GUIOptions.FONT));
 
     p.add(new BaseXBack());
@@ -78,6 +77,7 @@ public final class DialogFonts extends BaseXDialog implements Runnable {
 
     set(p, BorderLayout.CENTER);
     finish(gopts.get(GUIOptions.FONTSLOC));
+
     SwingUtilities.invokeLater(this);
     action(onlyMono);
   }
@@ -89,6 +89,7 @@ public final class DialogFonts extends BaseXDialog implements Runnable {
   public static void show(final GUI main) {
     if(dialog == null) dialog = new DialogFonts(main);
     dialog.setVisible(true);
+    dialog.size.setValue(Integer.toString(main.gopts.get(GUIOptions.FONTSIZE)));
   }
 
   @Override

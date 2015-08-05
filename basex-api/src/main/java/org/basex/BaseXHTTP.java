@@ -383,6 +383,16 @@ public final class BaseXHTTP extends Main {
     }
   }
 
+  @Override
+  public String header() {
+    return Util.info(S_CONSOLE, HTTP);
+  }
+
+  @Override
+  public String usage() {
+    return S_HTTPINFO;
+  }
+
   /** Monitor for stopping the Jetty server. */
   private final class StopServer extends Thread {
     /** Server socket. */
@@ -421,15 +431,5 @@ public final class BaseXHTTP extends Main {
         Util.errln(ex);
       }
     }
-  }
-
-  @Override
-  public String header() {
-    return Util.info(S_CONSOLE, HTTP);
-  }
-
-  @Override
-  public String usage() {
-    return S_HTTPINFO;
   }
 }

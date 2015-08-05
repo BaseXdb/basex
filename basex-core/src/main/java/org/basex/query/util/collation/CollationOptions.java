@@ -13,15 +13,6 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 abstract class CollationOptions extends Options {
-  /** Initialization of locales. */
-  protected static class Locales {
-    /** Available locales, indexed by language code. */
-    static final HashMap<String, Locale> MAP = new HashMap<>();
-    static {
-      for(final Locale l : Locale.getAvailableLocales()) MAP.put(l.toString().replace('_', '-'), l);
-    }
-  }
-
   /**
    * Parses the specified options and returns the faulty key.
    * @param args arguments
@@ -54,5 +45,14 @@ abstract class CollationOptions extends Options {
    */
   protected IllegalArgumentException error(final Option<?> option) {
     return new IllegalArgumentException("Invalid \"" + option + "\" value \"" + get(option) + "\"");
+  }
+
+  /** Initialization of locales. */
+  protected static class Locales {
+    /** Available locales, indexed by language code. */
+    static final HashMap<String, Locale> MAP = new HashMap<>();
+    static {
+      for(final Locale l : Locale.getAvailableLocales()) MAP.put(l.toString().replace('_', '-'), l);
+    }
   }
 }

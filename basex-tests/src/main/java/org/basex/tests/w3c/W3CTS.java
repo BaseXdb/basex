@@ -300,7 +300,8 @@ public abstract class W3CTS extends Main {
               nodes("*:input-file/@variable", state), qp, s == 0));
           files.add(file(nodes("*:defaultCollection", state), null, qp, s == 0));
           var(nodes("*:input-URI", state), nodes("*:input-URI/@variable", state), qp);
-          eval(nodes("*:input-query/@name", state), nodes("*:input-query/@variable", state), pth, qp);
+          eval(nodes("*:input-query/@name", state), nodes("*:input-query/@variable", state),
+              pth, qp);
 
           parse(qp, state);
 

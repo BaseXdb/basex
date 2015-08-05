@@ -410,7 +410,7 @@ public final class QT3TS extends Main {
    * @param env environment
    * @return query;
    */
-  private XQuery environment(XQuery query, QT3Env env) {
+  private XQuery environment(final XQuery query, final QT3Env env) {
     if(env != null) {
       // bind namespaces
       for(final HashMap<String, String> ns : env.namespaces) {
@@ -712,7 +712,8 @@ public final class QT3TS extends Main {
           asString("serialize(., map{ 'indent':'no','method':'xml' })", returned));
       if(exp.equals(res)) return null;
       final String r = normNL(asString(
-          "serialize(., map{ 'indent':'no','method':'xml','omit-xml-declaration':'no' })", returned));
+          "serialize(., map{ 'indent':'no','method':'xml','omit-xml-declaration':'no' })",
+          returned));
       if(exp.equals(r)) return null;
 
       // include check for comments, processing instructions and namespaces
