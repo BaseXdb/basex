@@ -1,10 +1,11 @@
-package org.basex.query.ast;
+package org.basex.query.index;
 
 import java.util.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.parse.Commands.CmdIndex;
+import org.basex.query.ast.*;
 import org.basex.query.expr.*;
 import org.basex.util.*;
 import org.junit.*;

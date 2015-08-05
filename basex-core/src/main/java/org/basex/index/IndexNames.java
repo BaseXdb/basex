@@ -65,24 +65,28 @@ public final class IndexNames {
    * @return result of check
    */
   public boolean contains(final Data data, final int pre, final boolean text) {
-    return contains(text ? data.qname(data.parent(pre, Data.TEXT), Data.ELEM) :
-      data.qname(pre, Data.ATTR));
+    final byte[][] qname = text ? data.qname(data.parent(pre, Data.TEXT), Data.ELEM) :
+      data.qname(pre, Data.ATTR);
+    qname[0] = local(qname[0]);
+    return contains(qname);
   }
 
   /**
-   * Checks if the specified name is to be indexed.
-   * @param qname local name and namespace uri
+   * Checks if the specified name is an index candidate.
+   * @param qname local name and namespace uri (reference or array entries can be {@code null})
    * @return result of check
    */
   public boolean contains(final byte[][] qname) {
     if(isEmpty()) return true;
 
-    final int ns = qnames.size();
     if(qname != null) {
+      final int ns = qnames.size();
+      final byte[] ln = qname[0], uri = qname[1];
       for(int n = 0; n < ns; n += 2) {
-        final byte[] ln = qnames.get(n), uri = qnames.get(n + 1);
-        if(ln != null && !eq(qname[0], ln)) continue;
-        if(uri != null && !eq(qname[1], uri)) continue;
+        final byte[] iln = qnames.get(n);
+        if(iln != null && (ln == null || !eq(ln, iln))) continue;
+        final byte[] iuri = qnames.get(n + 1);
+        if(iuri != null && (uri == null || !eq(uri, iuri))) continue;
         return true;
       }
     }
