@@ -657,6 +657,7 @@ public abstract class Path extends ParseExpr {
           qc.compInfo(OPTNOINDEX, this);
           return Empty.SEQ;
         }
+
         if(index == null || index.costs > ii.costs) {
           index = ii;
           iPred = p;

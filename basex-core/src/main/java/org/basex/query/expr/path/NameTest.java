@@ -16,9 +16,9 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class NameTest extends Test {
-  /** Local name. */
+  /** Local name (can be {@code null}). */
   public final byte[] local;
-  /** Default element namespace. */
+  /** Default element namespace (can be {@code null}). */
   private final byte[] defElemNS;
 
   /**

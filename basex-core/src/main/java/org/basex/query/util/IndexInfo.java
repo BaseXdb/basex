@@ -5,6 +5,7 @@ import org.basex.index.*;
 import org.basex.index.stats.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.Expr.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.expr.path.Test.Kind;
 import org.basex.query.util.list.*;
@@ -109,17 +110,17 @@ public final class IndexInfo {
 
   /**
    * Returns the local name and namespace uri of the last name test.
+   * If the returned name or uri is null, it represents a wildcard.
    * <ul>
-   *   <li> //*[x = 'TEXT']          -> x </li>
-   *   <li> //*[x / text() = 'TEXT'] -> x </li>
-   *   <li> //x[. = 'TEXT']          -> x </li>
-   *   <li> //x[text() = 'TEXT']     -> x </li>
-   *   <li> //*[* / @x = 'TEXT']     -> x </li>
-   *   <li> //*[@x = 'TEXT']         -> x </li>
-   *   <li> //@x[. = 'TEXT']         -> x </lI>
+   *   <li> //*[x = 'TEXT']         -> x </li>
+   *   <li> //*[x /text() = 'TEXT'] -> x </li>
+   *   <li> //x[. = 'TEXT']         -> x </li>
+   *   <li> //x[text() = 'TEXT']    -> x </li>
+   *   <li> //*[* /@x = 'TEXT']     -> x </li>
+   *   <li> //*[@x = 'TEXT']        -> x </li>
+   *   <li> //@x[. = 'TEXT']        -> x </lI>
    * </ul>
-   *
-   * @return local name and namespace uri
+   * @return local name and namespace uri (result, or name or uri, can be {@code null})
    */
   private byte[][] qname() {
     Step s = step;
@@ -140,16 +141,12 @@ public final class IndexInfo {
         s = path.step(path.steps.length - 1);
       }
     }
-
     // give up if test is not a name test
     if(!(s.test instanceof NameTest)) return null;
-    final NameTest nt = (NameTest) s.test;
 
-    // give up if name test may refer to more than one element or attribute name
-    final Data data = ic.data;
-    if(nt.kind != Kind.URI_NAME && (!data.nspaces.isEmpty() || nt.kind != Kind.NAME)) return null;
-    // return local name and namespace uri
-    return new byte[][] { nt.local, nt.name.uri() };
+    // return local name and namespace uri (null represents wildcards)
+    final NameTest nt = (NameTest) s.test;
+    return new byte[][] { nt.local, nt.name == null ? null : nt.name.uri() };
   }
 
   /**
@@ -201,6 +198,10 @@ public final class IndexInfo {
     final AxisPath path = (AxisPath) pred;
     if(path.root != null) return null;
     // return last step
-    return path.step(path.steps.length - 1);
+    final Step s = path.step(path.steps.length - 1);
+    // give up if step contains numeric predicate
+    if(s.has(Flag.POS)) return null;
+    // success: return step
+    return s;
   }
 }

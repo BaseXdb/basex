@@ -392,10 +392,10 @@ public abstract class Data {
   }
 
   /**
-   * Returns the local name and namespace uri of the addressed element or attribute.
+   * Returns the name and namespace uri of the addressed element or attribute.
    * @param pre pre value
    * @param kind node kind
-   * @return array with local name and namespace uri
+   * @return array with name and namespace uri
    */
   public final byte[][] qname(final int pre, final int kind) {
     final byte[] name = name(pre, kind);
@@ -409,7 +409,7 @@ public abstract class Data {
         uri = DataText.XML_URI;
       }
     }
-    return new byte[][] { hasPrefix ? local(name) : name, uri == null ? EMPTY : uri };
+    return new byte[][] { name, uri == null ? EMPTY : uri };
   }
 
   /**

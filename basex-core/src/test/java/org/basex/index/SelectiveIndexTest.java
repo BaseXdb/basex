@@ -19,34 +19,17 @@ public final class SelectiveIndexTest extends SandboxTest {
   /** Test file. */
   private static final String FILE = "src/test/resources/selective.xml";
 
-  /** Map with index filters. */
-  private static final LinkedHashMap<String, Integer> FILTERS = new LinkedHashMap<>();
-
-  static {
-    FILTERS.put("", 5);
-    FILTERS.put("*", 5);
-    FILTERS.put("*:*", 5);
-    FILTERS.put("a", 1);
-    FILTERS.put("*:c", 2);
-    FILTERS.put("Q{ns}*", 2);
-    FILTERS.put("Q{ns}c", 1);
-  }
-
   /**
    * Tests the text index.
    * @throws BaseXException database exception
    */
   @Test
   public void textIndex() throws BaseXException {
-    try {
-      for(final Map.Entry<String, Integer> entry : FILTERS.entrySet()) {
-        context.options.set(MainOptions.TEXTINCLUDE, entry.getKey());
-        new CreateDB(NAME, FILE).execute(context);
-        final int size = context.data().textIndex.size();
-        assertEquals("TextIndex: \"" + entry.getKey() + "\": ", entry.getValue().intValue(), size);
-      }
-    } finally {
-      context.options.set(MainOptions.TEXTINCLUDE, "");
+    for(final Map.Entry<String, Integer> entry : map().entrySet()) {
+      context.options.set(MainOptions.TEXTINCLUDE, entry.getKey());
+      new CreateDB(NAME, FILE).execute(context);
+      final int size = context.data().textIndex.size();
+      assertEquals("TextIndex: \"" + entry.getKey() + "\": ", entry.getValue().intValue(), size);
     }
   }
 
@@ -57,7 +40,7 @@ public final class SelectiveIndexTest extends SandboxTest {
   @Test
   public void attrIndex() throws BaseXException {
     try {
-      for(final Map.Entry<String, Integer> entry : FILTERS.entrySet()) {
+      for(final Map.Entry<String, Integer> entry : map().entrySet()) {
         context.options.set(MainOptions.ATTRINCLUDE, entry.getKey());
         new CreateDB(NAME, FILE).execute(context);
         final int size = context.data().attrIndex.size();
@@ -76,15 +59,32 @@ public final class SelectiveIndexTest extends SandboxTest {
   public void ftIndex() throws BaseXException {
     context.options.set(MainOptions.FTINDEX, true);
     try {
-      for(final Map.Entry<String, Integer> entry : FILTERS.entrySet()) {
-        context.options.set(MainOptions.FTINCLUDE, entry.getKey());
+      for(final Map.Entry<String, Integer> entry : map().entrySet()) {
+        final String key = entry.getKey();
+        final int value = entry.getValue();
+        context.options.set(MainOptions.FTINCLUDE, key);
         new CreateDB(NAME, FILE).execute(context);
-        final int size = context.data().ftxtIndex.size();
-        assertEquals("FTIndex: \"" + entry.getKey() + "\": ", entry.getValue().intValue(), size);
+        assertEquals("FTIndex: \"" + key + "\": ", value, context.data().ftxtIndex.size());
       }
     } finally {
-      context.options.set(MainOptions.FTINDEX, false);
       context.options.set(MainOptions.FTINCLUDE, "");
+      context.options.set(MainOptions.FTINDEX, false);
     }
+  }
+
+  /**
+   * Returns a map with name tests.
+   * @return map
+   */
+  private static HashMap<String, Integer> map() {
+    final LinkedHashMap<String, Integer> map = new LinkedHashMap<>();
+    map.put("", 5);
+    map.put("*", 5);
+    map.put("*:*", 5);
+    map.put("a", 1);
+    map.put("*:c", 2);
+    map.put("Q{ns}*", 2);
+    map.put("Q{ns}c", 1);
+    return map;
   }
 }

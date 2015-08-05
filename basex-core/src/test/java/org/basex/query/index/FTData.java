@@ -1,23 +1,16 @@
-package org.basex.query.simple;
+package org.basex.query.index;
 
-import org.basex.core.*;
-import org.basex.core.cmd.*;
 import org.basex.query.*;
-import org.basex.util.options.*;
-import org.junit.Test;
 
 /**
- * Full-text test queries.
+ * Full-text document and queries.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public final class FTTest extends QueryTest {
-  /** Test all flag. */
-  private static final boolean ALL = true;
-
+abstract class FTData extends QueryTest {
   /** Test document. */
-  public static final String DOC =
+  protected static final String DOC =
       "<fttest>\n" +
       "  <co>\n" +
       "     <w>xml in the first sentence. second sentence. " +
@@ -52,7 +45,7 @@ public final class FTTest extends QueryTest {
   static { create(DOC); }
 
   /** Test queries. */
-  public static final Object[][] QUERIES = {
+  protected static final Object[][] QUERIES = {
       { "Simple 1", booleans(true), "'a' contains text 'a'" },
       { "Simple 2", booleans(true), "'a b' contains text 'b'" },
       { "Simple 3", booleans(false), "'abc' contains text 'b'" },
@@ -538,100 +531,4 @@ public final class FTTest extends QueryTest {
         "//fti[text() contains text 'adf' ftor ftnot 'adf']" },
     };
 
-  static { queries = QUERIES; }
-
-  @Test
-  @Override
-  public void test() {
-    final MainOptions opts = context.options;
-    if(ALL) {
-      // testing all kinds of combinations
-      for(int a = 0; a < 2; ++a) {
-        opts.set(MainOptions.FTINDEX, a == 0);
-        super.test();
-      }
-    } else {
-      // single test
-      opts.set(MainOptions.FTINDEX, true);
-      opts.set(MainOptions.STEMMING, true);
-      opts.set(MainOptions.DIACRITICS, true);
-      opts.set(MainOptions.CASESENS, true);
-      super.test();
-    }
-  }
-
-  @Override
-  protected String details() {
-    final MainOptions opts = context.options;
-    final StringBuilder sb = new StringBuilder();
-    sb.append(set(opts, MainOptions.FTINDEX)).append(';');
-    sb.append(set(opts, MainOptions.STEMMING)).append(';');
-    sb.append(set(opts, MainOptions.DIACRITICS)).append(';');
-    sb.append(set(opts, MainOptions.CASESENS));
-    return sb.toString();
-  }
-
-  /**
-   * Returns a flag string.
-   * @param opts options
-   * @param option option
-   * @return string
-   */
-  private static String set(final Options opts, final BooleanOption option) {
-    return new Set(option, opts.get(option)).toString();
-  }
-
-  /* TABLE REPRESENTATION
-  PRE DIS SIZ ATS  NS  KIND  CONTENT
-    0   1  46   1   0  DOC   tmp
-    1   1  45   1   0  ELEM  fttest
-    2   1  11   1   0  ELEM  co
-    3   1   2   1   0  ELEM  w
-    4   1   1   1   0  TEXT  xml in the first sentence. second sentence.
-      third sentence. fourth sentence. fifth sentence.
-    5   3   2   1   0  ELEM  w
-    6   1   1   1   0  TEXT  XML xml XmL
-    7   5   2   1   0  ELEM  w
-    8   1   1   1   0  TEXT  we have xml databases
-    9   7   2   1   0  ELEM  w
-   10   1   1   1   0  TEXT  XML DATABASES
-   11   9   2   1   0  ELEM  w
-   12   1   1   1   0  TEXT  XML & Databases
-   13  12   3   1   0  ELEM  wc
-   14   1   2   1   0  ELEM  w
-   15   1   1   1   0  TEXT  hello
-   16  15   5   1   0  ELEM  sc
-   17   1   2   1   0  ELEM  s
-   18   1   1   1   0  TEXT  di\u00e4t-joghurt
-   19   3   2   1   0  ELEM  s
-   20   1   1   1   0  TEXT  diat-joghurt
-   21  20   4   1   0  ELEM  at
-   22   1   2   1   0  ELEM  b
-   23   1   1   1   0  TEXT  B
-   24   3   1   1   0  TEXT  ad one
-   25  24   2   1   0  ELEM  fti
-   26   1   1   1   0  TEXT  adfas wordt. ook wel eens
-   27  26   2   1   0  ELEM  fti
-   28   1   1   1   0  TEXT  wordt ook wel een s
-   29  28   2   1   0  ELEM  fti
-   30   1   1   1   0  TEXT  adfad. wordt
-  ook wel.eens a
-   31  30   2   1   0  ELEM  fti
-   32   1   1   1   0  TEXT  adfad wordt. ook
-  wel een s adf
-   33  32   2   1   0  ELEM  fti
-   34   1   1   1   0  TEXT  adfad wordt ook. wel een s
-   35  34   2   2   0  ELEM  atr
-   36   1   1   1   0  ATTR  key="value"
-   37  36   2   1   0  ELEM  w
-   38   1   1   1   0  TEXT  the fifth sentence. fourth sentence.
-     third sentence. second sentence. first sentence.
-   39   1   1   1   0  ELEM  wld
-   40   1   2   1   0  ELEM  wld
-   41   1   1   1   0  TEXT  yeah
-   42  41   4   1   0  ELEM  mix
-   43   1   1   1   0  TEXT  A
-   44   2   1   1   0  ELEM  sub
-   45   3   1   1   0  TEXT  B
-   */
 }

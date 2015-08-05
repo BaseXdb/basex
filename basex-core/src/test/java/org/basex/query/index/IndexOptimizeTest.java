@@ -1,4 +1,4 @@
-package org.basex.query;
+package org.basex.query.index;
 
 import static org.basex.query.func.Function.*;
 import static org.junit.Assert.*;
@@ -8,6 +8,7 @@ import java.io.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.cmd.Set;
+import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.ft.*;
 import org.basex.util.*;
@@ -28,17 +29,17 @@ public final class IndexOptimizeTest extends AdvancedQueryTest {
   @BeforeClass
   public static void start() throws Exception {
     new DropDB(NAME).execute(context);
-    new Set(MainOptions.FTINDEX, true).execute(context);
-    new Set(MainOptions.QUERYINFO, true).execute(context);
+    context.options.set(MainOptions.FTINDEX, true);
+    context.options.set(MainOptions.QUERYINFO, true);
   }
 
   /**
    * Drops the test database.
-   * @throws Exception exception
    */
   @AfterClass
-  public static void stop() throws Exception {
-    new DropDB(NAME).execute(context);
+  public static void stop() {
+    context.options.set(MainOptions.FTINDEX, false);
+    context.options.set(MainOptions.QUERYINFO, false);
   }
 
   /**

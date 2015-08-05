@@ -2,11 +2,17 @@ package org.basex.data;
 
 import static org.basex.query.func.Function.*;
 
+import java.util.*;
+import java.util.List;
+
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.query.*;
 import org.junit.*;
 import org.junit.Test;
+import org.junit.runner.*;
+import org.junit.runners.*;
+import org.junit.runners.Parameterized.*;
 
 /**
  * This class tests the {@link MainOptions#UPDINDEX} and {@link MainOptions#AUTOOPTIMIZE} options.
@@ -14,7 +20,34 @@ import org.junit.Test;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
+@RunWith(Parameterized.class)
 public final class IndexTest extends AdvancedQueryTest {
+  /** Main memory flag. */
+  @Parameter
+  public Object mainmem;
+
+  /**
+   * Mainmem parameters.
+   * @return parameters
+   */
+  @Parameters
+  public static Collection<Object[]> params() {
+    final List<Object[]> params = new ArrayList<>();
+    params.add(new Object[] { false });
+    // [CG] MAINMEM: fix bugs
+    //params.add(new Object[] { true });
+    return params;
+  }
+
+  /** Test file. */
+  public static final String FILE = "src/test/resources/selective.xml";
+
+  /** Initializes a test. */
+  @Before
+  public void before() {
+    context.options.set(MainOptions.MAINMEM, (Boolean) mainmem);
+  }
+
   /**
    * Finalize test.
    * @throws BaseXException database exception
@@ -22,8 +55,9 @@ public final class IndexTest extends AdvancedQueryTest {
   @After
   public void after() throws BaseXException {
     run(new Close());
-    run(new Set(MainOptions.UPDINDEX, false));
-    run(new Set(MainOptions.AUTOOPTIMIZE, false));
+    context.options.set(MainOptions.UPDINDEX, false);
+    context.options.set(MainOptions.AUTOOPTIMIZE, false);
+    context.options.set(MainOptions.MAINMEM, false);
   }
 
   /**
@@ -32,7 +66,7 @@ public final class IndexTest extends AdvancedQueryTest {
    */
   @Test
   public void updindex() throws BaseXException {
-    run(new Set(MainOptions.UPDINDEX, true));
+    context.options.set(MainOptions.UPDINDEX, true);
     run(new CreateDB(NAME));
     for(int i = 0; i < 5; i++) {
       run(new Replace("x.xml", "<x><a>A</a><a>B</a></x>"));
@@ -48,7 +82,7 @@ public final class IndexTest extends AdvancedQueryTest {
    */
   @Test
   public void updindex2() throws BaseXException {
-    run(new Set(MainOptions.UPDINDEX, true));
+    context.options.set(MainOptions.UPDINDEX, true);
     run(new CreateDB(NAME));
     for(int i = 0; i < 5; i++) {
       run(new Replace("x.xml", "<x><a>A</a><a>B</a></x>"));
@@ -66,7 +100,7 @@ public final class IndexTest extends AdvancedQueryTest {
    */
   @Test
   public void updindex3() throws BaseXException {
-    run(new Set(MainOptions.UPDINDEX, true));
+    context.options.set(MainOptions.UPDINDEX, true);
     run(new CreateDB(NAME));
     for(int i = 0; i < 5; i++) {
       run(new Replace("x.xml", "<x><a>A</a><a>BC</a><a>DEF</a></x>"));
@@ -83,7 +117,7 @@ public final class IndexTest extends AdvancedQueryTest {
    */
   @Test
   public void updindex4() throws BaseXException {
-    run(new Set(MainOptions.UPDINDEX, true));
+    context.options.set(MainOptions.UPDINDEX, true);
     run(new CreateDB(NAME));
     for(int i = 0; i < 5; i++) {
       run(new Open(NAME));
@@ -101,7 +135,7 @@ public final class IndexTest extends AdvancedQueryTest {
    */
   @Test
   public void updindex5() throws BaseXException {
-    run(new Set(MainOptions.UPDINDEX, true));
+    context.options.set(MainOptions.UPDINDEX, true);
     run(new CreateDB(NAME));
     for(int i = 0; i < 5; i++) {
       run(new Add("a", "<x c='c'/>"));
@@ -120,7 +154,7 @@ public final class IndexTest extends AdvancedQueryTest {
    */
   @Test
   public void updindex6() throws BaseXException {
-    run(new Set(MainOptions.UPDINDEX, true));
+    context.options.set(MainOptions.UPDINDEX, true);
     run(new CreateDB(NAME, "<X><A>q</A><B>q</B></X>"));
     query("replace node /X/A with 'x', replace node /X/B with 'y'", "");
     query(_DB_INFO.args(NAME) + "//textindex/text()", "true");
@@ -132,7 +166,7 @@ public final class IndexTest extends AdvancedQueryTest {
    */
   @Test
   public void updindex7() throws BaseXException {
-    run(new Set(MainOptions.UPDINDEX, true));
+    context.options.set(MainOptions.UPDINDEX, true);
     run(new CreateDB(NAME));
     run(new Replace("A", "<a/>"));
     run(new Replace("B", "<a a='1'/>"));
@@ -150,7 +184,7 @@ public final class IndexTest extends AdvancedQueryTest {
    */
   @Test
   public void updindex8() throws BaseXException {
-    run(new Set(MainOptions.UPDINDEX, true));
+    context.options.set(MainOptions.UPDINDEX, true);
     run(new CreateDB(NAME));
     run(new Replace("A", "<X a='?' b='a' c='1'/>"));
     run(new Replace("A", "<X a='?' b='b' c='2'/>"));
@@ -163,7 +197,7 @@ public final class IndexTest extends AdvancedQueryTest {
    */
   @Test
   public void autooptimize() throws BaseXException {
-    run(new Set(MainOptions.AUTOOPTIMIZE, true));
+    context.options.set(MainOptions.AUTOOPTIMIZE, true);
     run(new CreateDB(NAME));
     query(_DB_INFO.args(NAME) + "//textindex/text()", "true");
     run(new Replace("x.xml", "<a>A</a>"));
@@ -171,7 +205,7 @@ public final class IndexTest extends AdvancedQueryTest {
     query(_DB_REPLACE.args(NAME, "x.xml", "<a>B</a>"));
     query(_DB_INFO.args(NAME) + "//textindex/text()", "true");
 
-    run(new Set(MainOptions.AUTOOPTIMIZE, false));
+    context.options.set(MainOptions.AUTOOPTIMIZE, false);
     run(new Optimize());
     run(new Replace("x.xml", "<a>C</a>"));
     query(_DB_INFO.args(NAME) + "//textindex/text()", "false");
