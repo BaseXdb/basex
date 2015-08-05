@@ -35,7 +35,7 @@ public final class MemValues extends ValueIndex {
   public MemValues(final Data data, final boolean text) {
     super(data, text);
     values = ((MemData) data).values(text);
-    final int s = values.size() + 1;
+    final int s = size() + 1;
     ids = new ArrayList<>(s);
     len = new IntList(s);
   }
@@ -72,7 +72,7 @@ public final class MemValues extends ValueIndex {
   public EntryIterator entries(final IndexEntries entries) {
     final byte[] prefix = entries.get();
     return new EntryIterator() {
-      final int s = values.size();
+      final int s = size();
       int c;
       @Override
       public byte[] next() {
@@ -96,13 +96,18 @@ public final class MemValues extends ValueIndex {
     tb.add(LI_NAMES).add(text ? data.meta.textinclude : data.meta.attrinclude).add(NL);
 
     final IndexStats stats = new IndexStats(options.get(MainOptions.MAXSTAT));
-    final int s = values.size();
+    final int s = size();
     for(int c = 1; c < s; c++) {
       final int oc = len.get(c);
       if(stats.adding(oc)) stats.add(values.key(c), oc);
     }
     stats.print(tb);
     return tb.finish();
+  }
+
+  @Override
+  public int size() {
+    return values.size();
   }
 
   @Override

@@ -409,7 +409,7 @@ public abstract class Data {
         uri = DataText.XML_URI;
       }
     }
-    return new byte[][] { name, uri == null ? EMPTY : uri };
+    return new byte[][] { hasPrefix ? local(name) : name, uri == null ? EMPTY : uri };
   }
 
   /**

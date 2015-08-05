@@ -85,6 +85,11 @@ public class DiskValues extends ValueIndex {
   }
 
   @Override
+  public final int size() {
+    return size.get();
+  }
+
+  @Override
   public final int costs(final IndexToken it) {
     if(it instanceof StringRange) return Math.max(1, data.meta.size / 10);
     if(it instanceof NumericRange) return Math.max(1, data.meta.size / 3);
@@ -176,14 +181,6 @@ public class DiskValues extends ValueIndex {
       }
     }
     return -(l + 1);
-  }
-
-  /**
-   * Returns the number of index entries.
-   * @return number of index entries
-   */
-  protected final int size() {
-    return size.get();
   }
 
   // PRIVATE METHODS ==============================================================================

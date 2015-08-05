@@ -27,7 +27,7 @@ public final class IndexNames {
     final HashSet<String> inc = toSet(names.trim());
     for(final String entry : inc) {
       // global wildcard: ignore all assignments
-      if(entry.equals("*")) {
+      if(entry.equals("*") || entry.equals("*:*")) {
         qnames.reset();
         return;
       }

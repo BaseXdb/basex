@@ -28,6 +28,12 @@ public abstract class ValueIndex implements Index {
   }
 
   /**
+   * Returns the number of index entries.
+   * @return number of index entries
+   */
+  public abstract int size();
+
+  /**
    * Deletes entries from the index.
    * @param map a set of [key, id-list] pairs
    */

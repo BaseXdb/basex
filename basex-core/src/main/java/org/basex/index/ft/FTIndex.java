@@ -241,6 +241,19 @@ public final class FTIndex extends ValueIndex {
     inZ.close();
   }
 
+  @Override
+  public int size() {
+    final int tl = tp.length;
+    int size = 0, t = tl - 1;
+    while(true) {
+      final int e = t;
+      while(tp[--t] == -1) {
+        if(t == 0) return size;
+      }
+      size += (tp[e] - tp[t]) / (t + ENTRY);
+    }
+  }
+
   /**
    * Determines the pointer on a token.
    * @param token token looking for
@@ -282,7 +295,8 @@ public final class FTIndex extends ValueIndex {
     int p = tp[i], j = i + 1;
     while(j < tl && tp[j] == -1) ++j;
 
-    while(p < tp[tl - 1]) {
+    final int max = tp[tl - 1];
+    while(p < max) {
       final int oc = size(p, i);
       if(stats.adding(oc)) stats.add(inY.readBytes(p, i), oc);
       p += i + ENTRY;
