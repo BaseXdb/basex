@@ -18,9 +18,9 @@ import org.basex.util.list.*;
  */
 public final class DialogFonts extends BaseXDialog implements Runnable {
   /** Predefined font sizes. */
-  private static final String[] FTSZ =
+  private static final String[] SIZES =
     { "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20",
-      "22", "24", "26", "28", "30", "33", "36", "40" };
+      "22", "24", "26", "28", "30", "33", "36", "40", "48", "64", "96" };
 
   /** Dialog. */
   private static DialogFonts dialog;
@@ -61,7 +61,7 @@ public final class DialogFonts extends BaseXDialog implements Runnable {
     type = new BaseXList(FONT_TYPES, this);
     type.setWidth(90);
     p.add(type);
-    size = new BaseXList(FTSZ, this);
+    size = new BaseXList(SIZES, this);
     size.setWidth(50);
     p.add(size);
 
@@ -95,14 +95,10 @@ public final class DialogFonts extends BaseXDialog implements Runnable {
   @Override
   public void action(final Object cmp) {
     final GUIOptions gopts = gui.gopts;
-    gopts.set(GUIOptions.FONT, font.getValue());
-    if(font2.isEnabled()) gopts.set(GUIOptions.MONOFONT, font2.getValue());
-    gopts.set(GUIOptions.FONTTYPE, type.getIndex());
-    gopts.set(GUIOptions.FONTSIZE, size.getNum());
-    gopts.set(GUIOptions.ONLYMONO, onlyMono.isSelected());
-
     if(cmp == onlyMono) {
-      if(onlyMono.isSelected()) {
+      final boolean selected = onlyMono.isSelected();
+      gopts.set(GUIOptions.ONLYMONO, selected);
+      if(selected) {
         final boolean ready = monoFonts != null;
         font2.setEnabled(ready);
         font2.setData(ready ? monoFonts : new String[] { PLEASE_WAIT_D });
@@ -112,9 +108,39 @@ public final class DialogFonts extends BaseXDialog implements Runnable {
       }
       font2.setValue(gopts.get(GUIOptions.MONOFONT));
     } else {
-      font.setFont(font.getValue(), type.getIndex());
-      font2.setFont(font2.getValue(), type.getIndex());
-      gui.updateLayout();
+      boolean changed = false;
+      if(cmp == font) {
+        final String name = font.getValue();
+        if(!name.isEmpty()) {
+          gopts.set(GUIOptions.FONT, name);
+          changed = true;
+        }
+      } else if(cmp == font2) {
+        final String name = font2.getValue();
+        if(!name.isEmpty()) {
+          gopts.set(GUIOptions.MONOFONT, name);
+          changed = true;
+        }
+      } else if(cmp == size) {
+        final int num = size.getNum();
+        if(num > 0) {
+          gopts.set(GUIOptions.FONTSIZE, num);
+          changed = true;
+        }
+      } else if(cmp == type) {
+        final int num = type.getIndex();
+        if(num >= 0) {
+          gopts.set(GUIOptions.FONTTYPE, num);
+          changed = true;
+        }
+      }
+
+      if(changed) {
+        final int t = gopts.get(GUIOptions.FONTTYPE);
+        font.setFont(gopts.get(GUIOptions.FONT), t);
+        font2.setFont(gopts.get(GUIOptions.MONOFONT), t);
+        gui.updateLayout();
+      }
     }
   }
 
