@@ -30,7 +30,16 @@ abstract class Logical extends Arr {
 
   @Override
   public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    super.compile(qc, scp);
+    for(int i = 0; i < exprs.length; i++) {
+      try {
+        exprs[i] = exprs[i].compile(qc, scp);
+      } catch(final QueryException qe) {
+        // first expression is evaluated eagerly
+        if(i == 0) throw qe;
+        exprs[i] = FnError.get(qe, exprs[i].seqType());
+      }
+    }
+
     final boolean and = this instanceof And;
     final int es = exprs.length;
     final ExprList el = new ExprList(es);
