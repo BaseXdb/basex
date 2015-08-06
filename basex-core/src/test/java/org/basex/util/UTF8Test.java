@@ -6,8 +6,6 @@ import static org.junit.Assert.*;
 import java.nio.charset.*;
 
 import org.basex.*;
-import org.basex.core.*;
-import org.basex.core.cmd.*;
 import org.junit.Test;
 
 /**
@@ -45,12 +43,11 @@ public final class UTF8Test extends SandboxTest {
 
   /**
    * Tests entity parsing with codepoints.
-   * @throws BaseXException database exception
    */
   @Test
-  public void entities() throws BaseXException {
+  public void entities() {
     for(int i = 0xA0; i <= Character.MAX_CODE_POINT; i++) {
-      final String qu = new XQuery("'&#" + i + ";'").execute(context);
+      final String qu = query("'&#" + i + ";'");
       assertEquals(new String(Character.toChars(i)), qu);
       if(i == 0x400) i = 0xFFF;
       else if(i == 0x1400) i = 0xFFFF;

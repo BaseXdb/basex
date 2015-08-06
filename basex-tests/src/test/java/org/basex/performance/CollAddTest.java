@@ -15,73 +15,65 @@ import org.junit.Test;
 public final class CollAddTest extends SandboxTest {
   /**
    * Initializes the tests.
-   * @throws Exception exception
    */
   @BeforeClass
-  public static void init() throws Exception {
-    new Set(MainOptions.INTPARSE, true).execute(context);
+  public static void init() {
+    set(MainOptions.INTPARSE, true);
   }
 
   /**
    * Adds 100 documents.
-   * @throws Exception exception
    */
   @Test
-  public void add100() throws Exception {
+  public void add100() {
     add(100, false);
   }
 
   /**
    * Adds 1000 documents.
-   * @throws Exception exception
    */
   @Test
-  public void add1000() throws Exception {
+  public void add1000() {
     add(1000, false);
   }
 
   /**
    * Adds 10000 documents.
-   * @throws Exception exception
    */
   @Test
-  public void add10000() throws Exception {
+  public void add10000() {
     add(10000, false);
   }
 
   /**
    * Adds 100000 documents.
-   * @throws Exception exception
    */
   @Test
-  public void add100000() throws Exception {
+  public void add100000() {
     add(100000, false);
   }
 
   /**
    * Adds 1000 documents.
-   * @throws Exception exception
    */
   @Test
-  public void add100Force() throws Exception {
+  public void add100Force() {
     add(100, true);
   }
 
   /**
    * Adds 1000 documents.
-   * @throws Exception exception
    */
   @Test
-  public void add1000Force() throws Exception {
+  public void add1000Force() {
     add(1000, true);
   }
 
   /**
    * Adds 1000 documents.
-   * @throws Exception exception
    */
   @Test
-  public void add10000Force() throws Exception {
+  public void add10000Force() {
     add(10000, true);
   }
 
@@ -89,19 +81,14 @@ public final class CollAddTest extends SandboxTest {
    * Creates a database.
    * @param n number of documents to be added
    * @param flush force flush of updates
-   * @throws Exception exception
    */
-  private static void add(final int n, final boolean flush) throws Exception {
-    new Set(MainOptions.AUTOFLUSH, flush).execute(context);
-
+  private static void add(final int n, final boolean flush) {
+    set(MainOptions.AUTOFLUSH, flush);
     // Create test database
-    final Command cmd = new CreateDB(NAME);
-    cmd.execute(context);
+    execute(new CreateDB(NAME));
     // Add documents
-    for(int i = 0; i < n; i++) {
-      new Add(Integer.toString(i), "<xml/>").execute(context);
-    }
+    for(int i = 0; i < n; i++) execute(new Add(Integer.toString(i), "<xml/>"));
     // Close database
-    new DropDB(NAME).execute(context);
+    execute(new DropDB(NAME));
   }
 }

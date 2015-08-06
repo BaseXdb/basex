@@ -4,7 +4,6 @@ import java.io.*;
 import java.util.*;
 
 import org.basex.*;
-import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
@@ -56,7 +55,7 @@ public final class ScanTest extends SandboxTest {
     }
 
     // create database
-    new CreateDB(NAME, dbfile.path()).execute(context);
+    execute(new CreateDB(NAME, dbfile.path()));
     // print file contents
     //Util.outln(dbfile.string());
     // print database info
@@ -68,55 +67,50 @@ public final class ScanTest extends SandboxTest {
 
   /**
    * Initializes the benchmark.
-   * @throws BaseXException database exception
    */
   @AfterClass
-  public static void finishDB() throws BaseXException {
-    new DropDB(NAME).execute(context);
+  public static void finishDB() {
+    execute(new DropDB(NAME));
   }
 
   /**
    * Counts the number of elements with text node as child.
-   * @throws BaseXException database exception
    */
   @Test
-  public void elementsWithText() throws BaseXException {
-    query("count( //*[text()] )");
+  public void elementsWithText() {
+    run("count( //*[text()] )");
   }
 
   /**
    * Counts the number of elements with text node or attribute as child.
-   * @throws BaseXException database exception
    */
   @Test
-  public void elementsWithTextOrAttribute() throws BaseXException {
-    query("count( descendant::*//(*|@*) )");
+  public void elementsWithTextOrAttribute() {
+    run("count( descendant::*//(*|@*) )");
   }
 
   /**
    * Counts the number of elements the text of which does not equal a given string.
-   * @throws BaseXException database exception
    */
   @Test
-  public void textNotEquals() throws BaseXException {
-    query("count( //*[text() != ' '] )");
+  public void textNotEquals() {
+    run("count( //*[text() != ' '] )");
   }
 
   /**
    * Performs the specified query; some performance measurements are output and
    * the result is ignored.
    * @param query query to be evaluated
-   * @throws BaseXException database exception
    */
-  private void query(final String query) throws BaseXException {
+  private void run(final String query) {
     Util.outln("Query: " + query);
     // warm up
-    new XQuery(query).execute(context);
+    query(query);
     final Performance p = new Performance();
     // run query and dump required time
     final Performance pl = new Performance();
     for(int l = 0; l < LOOPS; l++) {
-      new XQuery(query).execute(context);
+      query(query);
       Util.outln(pl);
     }
     // print average runtime

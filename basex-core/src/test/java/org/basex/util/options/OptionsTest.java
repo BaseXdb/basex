@@ -8,7 +8,6 @@ import org.basex.build.html.*;
 import org.basex.build.json.*;
 import org.basex.build.text.*;
 import org.basex.core.*;
-import org.basex.core.cmd.*;
 import org.basex.io.*;
 import org.basex.query.func.archive.*;
 import org.basex.query.func.ft.*;
@@ -74,17 +73,17 @@ public final class OptionsTest extends SandboxTest {
     file.write(Token.token(input));
 
     // check if original file will be updated
-    context.options.set(name, true);
+    set(name, true);
     try {
-      new XQuery("delete node doc('" + file + "')/a").execute(context);
+      query("delete node doc('" + file + "')/a");
       assertEquals("", Token.string(file.read()));
     } finally {
-      context.options.set(name, false);
+      set(name, false);
     }
 
     // original file will stay untouched
     file.write(Token.token(input));
-    new XQuery("delete node doc('" + file + "')/a").execute(context);
+    query("delete node doc('" + file + "')/a");
     assertEquals(input, Token.string(file.read()));
   }
 

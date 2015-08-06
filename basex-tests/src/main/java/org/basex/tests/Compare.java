@@ -71,7 +71,7 @@ public abstract class Compare extends SandboxTest {
       while(true) {
         final String line = br.readLine();
         if(line == null) break;
-        if(!line.isEmpty() && line.charAt(0) != '#') query(line);
+        if(!line.isEmpty() && line.charAt(0) != '#') run(line);
       }
     }
 
@@ -85,7 +85,7 @@ public abstract class Compare extends SandboxTest {
    * @param query query input
    * @throws Exception exception
    */
-  private static void query(final String query) throws Exception {
+  private static void run(final String query) throws Exception {
     final StringList sl = new StringList();
     String result = "";
     try {

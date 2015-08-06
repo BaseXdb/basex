@@ -3,7 +3,6 @@ package org.basex.api.xmldb;
 import static org.basex.core.Text.*;
 
 import org.basex.*;
-import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.users.*;
 import org.basex.util.*;
@@ -39,18 +38,16 @@ public abstract class XMLDBBaseTest extends SandboxTest {
 
   /**
    * Create XMLDB database.
-   * @throws BaseXException exception during database create
    */
-  static void createDB() throws BaseXException {
-    new CreateDB(COLL, DOCPATH + DOC1).execute(context);
-    new Close().execute(context);
+  static void createDB() {
+    execute(new CreateDB(COLL, DOCPATH + DOC1));
+    execute(new Close());
   }
 
   /**
    * Drop XMLDB database.
-   * @throws BaseXException exception during database drop
    */
-  static void dropDB() throws BaseXException {
-    new DropDB(COLL).execute(context);
+  static void dropDB() {
+    execute(new DropDB(COLL));
   }
 }

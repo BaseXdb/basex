@@ -20,11 +20,10 @@ public final class FastReplaceTest extends AdvancedQueryTest {
 
   /**
    * Creates the db based on xmark.xml.
-   * @throws Exception exception
    */
   @Before
-  public void setUp() throws Exception {
-    new CreateDB(NAME, DOC).execute(context);
+  public void setUp() {
+    execute(new CreateDB(NAME, DOC));
     query("let $items := /site/regions//item " +
       "for $i in 1 to 10 " +
       "return (insert node $items into /site/regions, " +

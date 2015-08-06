@@ -26,17 +26,6 @@ import org.junit.*;
  * @author Christian Gruen
  */
 public abstract class HTTPTest extends SandboxTest {
-  /** HTTP stop port. */
-  protected static final int STOP_PORT = 9999;
-  /** HTTP port. */
-  protected static final int HTTP_PORT = 9998;
-  /** REST identifier. */
-  protected static final String REST = "rest";
-  /** Root path. */
-  protected static final String RESTXQ_ROOT = "http://" + Text.S_LOCALHOST + ':' + HTTP_PORT + '/';
-  /** Root path. */
-  protected static final String REST_ROOT = RESTXQ_ROOT + REST + '/';
-
   /** Database context. */
   private static final Context CONTEXT = HTTPContext.init();
   /** HTTP server. */
@@ -209,7 +198,7 @@ public abstract class HTTPTest extends SandboxTest {
    * @throws IOException I/O exception
    */
   protected static String read(final InputStream is) throws IOException {
-    return is == null ? "" : normNL(string(new BufferInput(is).content()));
+    return is == null ? "" : string(new BufferInput(is).content());
   }
 
   /**

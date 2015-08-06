@@ -6,11 +6,9 @@ import java.io.*;
 import java.security.*;
 
 import org.basex.core.*;
-import org.basex.core.cmd.*;
 import org.basex.io.serial.*;
 import org.basex.util.*;
 import org.junit.*;
-import org.junit.Test;
 
 /**
  * This class tests the functions of the EXPath Cryptographic module. The tests
@@ -20,6 +18,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-15, BSD License
  * @author Lukas Kircher
  */
+@SuppressWarnings("unused")
 public final class FNCryptoTest extends SandboxTest{
   /** User home directory. */
   private static final String KEYSTORE_DIR = System.getProperty("user.home");
@@ -117,7 +116,7 @@ public final class FNCryptoTest extends SandboxTest{
     if(proc.exitValue() != 0) throw new RuntimeException("Cannot initialize keystore.");
 
     // turn off pretty printing
-    new Set(MainOptions.SERIALIZER, SerializerOptions.get(false)).execute(context);
+    set(MainOptions.SERIALIZER, SerializerOptions.get(false));
   }
 
   /**
@@ -147,14 +146,9 @@ public final class FNCryptoTest extends SandboxTest{
   private static void query(final String first, final String second,
       final String expected) {
 
-    try {
-      if(first != null) new XQuery(first).execute(context);
-      final String result = new XQuery(second).execute(context);
-      // quotes are replaced by apostrophes to simplify comparison
-      assertEquals(expected.replaceAll("\"", "'"),
-              result.replaceAll("\"", "'"));
-    } catch(final BaseXException ex) {
-      fail(Util.message(ex));
-    }
+    if(first != null) query(first);
+    final String result = query(second);
+    // quotes are replaced by apostrophes to simplify comparison
+    assertEquals(expected.replaceAll("\"", "'"), result.replaceAll("\"", "'"));
   }
 }

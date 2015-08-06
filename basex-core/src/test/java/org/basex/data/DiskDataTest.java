@@ -1,6 +1,5 @@
 package org.basex.data;
 
-import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.util.*;
 import org.junit.*;
@@ -17,16 +16,15 @@ public final class DiskDataTest extends MemDataTest {
 
   @Override
   @Before
-  public void setUp() throws BaseXException {
-    new CreateDB(dbname, XMLSTR).execute(context);
+  public void setUp() {
+    execute(new CreateDB(dbname, XMLSTR));
   }
 
   /**
    * Clean up method; executed after each test; drops the database.
-   * @throws BaseXException the database cannot be dropped
    */
   @After
-  public void cleanUp() throws BaseXException {
-    new DropDB(dbname).execute(context);
+  public void cleanUp() {
+    execute(new DropDB(dbname));
   }
 }

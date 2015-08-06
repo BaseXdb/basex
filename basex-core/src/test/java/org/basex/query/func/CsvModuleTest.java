@@ -112,7 +112,8 @@ public final class CsvModuleTest extends AdvancedQueryTest {
    * @param function function
    */
   private static void query(final String input, final String options, final String expected,
-                            final Function function) {
+      final Function function) {
+
     final String query = options.isEmpty() ? function.args(input) :
       function.args(input, " map {" + options + '}');
     if(expected.startsWith("...")) {

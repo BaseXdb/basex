@@ -26,19 +26,17 @@ public final class UpdateTest extends AdvancedQueryTest {
   /**
    * Creates a database.
    * @param input input database string; use default if {@code null}
-   * @throws BaseXException database exception
    */
-  private static void createDB(final String input) throws BaseXException {
-    new CreateDB(NAME, input == null ? DOC : input).execute(context);
+  private static void createDB(final String input) {
+    execute(new CreateDB(NAME, input == null ? DOC : input));
   }
 
   /**
    * Closes the currently opened database.
-   * @throws BaseXException database exception
    */
   @After
-  public void finish() throws BaseXException {
-    new Close().execute(context);
+  public void finish() {
+    execute(new Close());
   }
 
   // BASIC XQUF TESTS *********************************************
@@ -91,28 +89,29 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Checks whether existing indexes etc. are NOT recycled for the copy of a transform expression.
-   * @throws BaseXException BaseX exception.
    */
   @Test
-  public void transform2() throws BaseXException {
-    new Set("mainmem", "on").execute(context);
-    new CreateDB(
-        "DBtransform", "<instance><data><vocable hits='1'/></data></instance>").execute(context);
-    query(
-        "for $voc in 1 to 2 " +
-        "let $xml := doc('DBtransform') " +
-        "return (" +
-        "$xml update (" +
-        "for $i in 1 to 2 return " +
-        "insert node $xml/instance/data/vocable[@hits = '1'] into ./instance))",
-        "<instance>\n<data>\n" +
-        "<vocable hits=\"1\"/>\n</data>\n" +
-        "<vocable hits=\"1\"/>\n" +
-        "<vocable hits=\"1\"/>\n</instance>\n<instance>\n<data>\n" +
-        "<vocable hits=\"1\"/>\n</data>\n" +
-        "<vocable hits=\"1\"/>\n" +
-        "<vocable hits=\"1\"/>\n</instance>");
-    new Set("mainmem", "off").execute(context);
+  public void transform2() {
+    set(MainOptions.MAINMEM, true);
+    try {
+      execute(new CreateDB("DBtransform", "<instance><data><vocable hits='1'/></data></instance>"));
+      query(
+          "for $voc in 1 to 2 " +
+          "let $xml := doc('DBtransform') " +
+          "return (" +
+          "$xml update (" +
+          "for $i in 1 to 2 return " +
+          "insert node $xml/instance/data/vocable[@hits = '1'] into ./instance))",
+          "<instance>\n<data>\n" +
+          "<vocable hits=\"1\"/>\n</data>\n" +
+          "<vocable hits=\"1\"/>\n" +
+          "<vocable hits=\"1\"/>\n</instance>\n<instance>\n<data>\n" +
+          "<vocable hits=\"1\"/>\n</data>\n" +
+          "<vocable hits=\"1\"/>\n" +
+          "<vocable hits=\"1\"/>\n</instance>");
+    } finally {
+      set(MainOptions.MAINMEM, false);
+    }
   }
 
   /**
@@ -458,10 +457,9 @@ public final class UpdateTest extends AdvancedQueryTest {
   /**
    * Replaces the value of the documents root node. Related to
    * github issue #141.
-   * @throws BaseXException database exception
    */
   @Test
-  public void replaceValueOfEmptyRoot() throws BaseXException {
+  public void replaceValueOfEmptyRoot() {
     createDB("<a/>");
     query("replace value of node /a with 'a'");
     query("/", "<a>a</a>");
@@ -489,10 +487,9 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Insertion into an empty document.
-   * @throws BaseXException database exception
    */
   @Test
-  public void emptyInsert3() throws BaseXException {
+  public void emptyInsert3() {
     createDB("<a/>");
     query("delete node /a");
     query("insert nodes <X/> into doc('" + NAME + "')");
@@ -501,10 +498,9 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Tests a simple call of the optimize command.
-   * @throws BaseXException database exception
    */
   @Test
-  public void optimize() throws BaseXException {
+  public void optimize() {
     createDB(null);
     query("let $w := //item[@id = 'item0'] " +
       "return (if($w/@id) " +
@@ -565,10 +561,9 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Text merging for a simple insert into statement.
-   * @throws Exception exception
    */
   @Test
-  public void textMerging01() throws Exception {
+  public void textMerging01() {
     createDB(null);
     query("insert node 'foo' into //item[@id='item0']/location");
     query("(//item[@id='item0']/location/text())[1]", "United Statesfoo");
@@ -576,12 +571,10 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Text merging for a simple insert into statement in combination with an
-   * insert before statement. Checks if pre value shifts are taken into
-   * account.
-   * @throws Exception exception
+   * insert before statement. Checks if pre value shifts are taken into account.
    */
   @Test
-  public void textMerging02() throws Exception {
+  public void textMerging02() {
     createDB(null);
     query("insert node 'foo' into //item[@id='item0']/location," +
       "insert node <a/> before //item[@id='item0']");
@@ -591,10 +584,9 @@ public final class UpdateTest extends AdvancedQueryTest {
   /**
    * Text merging test. Test 'insert into as first' and whether pre value
    * shifts are taken into account correctly.
-   * @throws Exception exception
    */
   @Test
-  public void textMerging03() throws Exception {
+  public void textMerging03() {
     createDB(null);
     query("let $i := //item[@id='item0'] return (insert node 'foo' as " +
       "first into $i/location, insert node 'foo' before $i/location, " +
@@ -607,10 +599,9 @@ public final class UpdateTest extends AdvancedQueryTest {
   /**
    * Text merging for a simple insert into statement. Checks if pre value shifts
    * are taken into account.
-   * @throws Exception exception
    */
   @Test
-  public void textMerging04() throws Exception {
+  public void textMerging04() {
     createDB(null);
     query("let $i := //item[@id='item0'] return insert node 'foo' before $i/location/text()");
     query("let $i := //item[@id='item0'] return ($i/location/text())[1]", "fooUnited States");
@@ -619,10 +610,9 @@ public final class UpdateTest extends AdvancedQueryTest {
   /**
    * Text merging for a simple insert into statement. Checks if pre value shifts
    * are taken into account.
-   * @throws Exception exception
    */
   @Test
-  public void textMerging05() throws Exception {
+  public void textMerging05() {
     createDB(null);
     query("let $i := //item[@id='item0']/location return " +
       "(insert node 'foo' into $i, delete node $i/text())");
@@ -631,10 +621,9 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Text merging test.
-   * @throws Exception exception
    */
   @Test
-  public void textMerging06() throws Exception {
+  public void textMerging06() {
     createDB(null);
     query("let $i := //item[@id='item0']/location return " +
       "(insert node <n/> into $i, insert node 'foo' as last into $i)");
@@ -644,10 +633,9 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Text merging test.
-   * @throws Exception exception
    */
   @Test
-  public void textMerging07() throws Exception {
+  public void textMerging07() {
     createDB(null);
     query("let $i := //item[@id='item0']/location return insert node 'foo' after $i/text()");
     query("(//item[@id='item0']/location/text())[1]", "United Statesfoo");
@@ -655,10 +643,9 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Text merging test.
-   * @throws Exception exception
    */
   @Test
-  public void textMerging08() throws Exception {
+  public void textMerging08() {
     createDB(null);
     query("let $i := //item[@id='item0'] return (insert node 'foo' after $i/location)");
     query("let $i := //item[@id='item0']/location return " +
@@ -782,10 +769,9 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Distance caching tested for inserts at different levels.
-   * @throws BaseXException exception
    */
   @Test
-  public void delayedDistanceAdjustment1() throws BaseXException {
+  public void delayedDistanceAdjustment1() {
     createDB("<A><B><C/></B><D/></A>");
     query("insert node <XB/> before //B, insert node <XC/> before //C, " +
         "insert node <XD/> before //D");
@@ -794,10 +780,9 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Distance caching tested for inserts at different levels.
-   * @throws BaseXException exception
    */
   @Test
-  public void delayedDistanceAdjustment2() throws BaseXException {
+  public void delayedDistanceAdjustment2() {
     createDB("<A><B><C/></B><D><E/></D></A>");
     query("insert node <XB/> before //B, insert node <XC/> before //C, " +
         "insert node <XD/> before //D, insert node <XE/> before //E");
@@ -806,10 +791,9 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Distance caching tested for inserts at different levels.
-   * @throws BaseXException exception
    */
   @Test
-  public void delayedDistanceAdjustment3() throws BaseXException {
+  public void delayedDistanceAdjustment3() {
     createDB("<A><B><C/><D/></B></A>");
     query("insert node <XB/> before //B, insert node <XC/> before //C, " +
         "insert node <XXC/> into //C");
@@ -818,10 +802,9 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Distance caching tested for inserts at different levels.
-   * @throws BaseXException exception
    */
   @Test
-  public void delayedDistanceAdjustment4() throws BaseXException {
+  public void delayedDistanceAdjustment4() {
     createDB("<A><B><C/><D/></B><E/></A>");
     query("insert node <XB/> before //B, insert node <XC/> before //C, " +
         "insert node <XXC/> into //C");
@@ -830,10 +813,9 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Distance caching tested for inserts at different levels.
-   * @throws BaseXException exception
    */
   @Test
-  public void delayedDistanceAdjustment5() throws BaseXException {
+  public void delayedDistanceAdjustment5() {
     createDB("<A><B><C/></B></A>");
     query("insert node <XB/> before //B, insert node <XC/> before //C");
     query("/", "<A>\n<XB/>\n<B>\n<XC/>\n<C/>\n</B>\n</A>");
@@ -841,10 +823,9 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Distance caching tested for simple deletes.
-   * @throws BaseXException exception
    */
   @Test
-  public void delayedDistanceAdjustment6() throws BaseXException {
+  public void delayedDistanceAdjustment6() {
     createDB("<A><B/><C/></A>");
     query("delete node //B");
     query("/", "<A>\n<C/>\n</A>");
@@ -852,10 +833,9 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Distance caching tested for simple deletes.
-   * @throws BaseXException exception
    */
   @Test
-  public void delayedDistanceAdjustment7() throws BaseXException {
+  public void delayedDistanceAdjustment7() {
     createDB("<A><B/><C/><D/><E/></A>");
     query("delete node (//B,//D)");
     query("/", "<A>\n<C/>\n<E/>\n</A>");
@@ -863,10 +843,9 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Distance caching tested for deletes at different levels.
-   * @throws BaseXException exception
    */
   @Test
-  public void delayedDistanceAdjustment8() throws BaseXException {
+  public void delayedDistanceAdjustment8() {
     createDB("<A><B/><C><D/><E/></C></A>");
     query("delete node (//B,//D)");
     query("/", "<A>\n<C>\n<E/>\n</C>\n</A>");
@@ -874,10 +853,9 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Distance caching tested for deletes at different levels.
-   * @throws BaseXException exception
    */
   @Test
-  public void delayedDistanceAdjustment9() throws BaseXException {
+  public void delayedDistanceAdjustment9() {
     createDB("<A><B/><C><D/><E/><F/></C></A>");
     query("delete node (//B,//D)");
     query("/", "<A>\n<C>\n<E/>\n<F/>\n</C>\n</A>");
@@ -885,10 +863,9 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Distance caching tested for deletes at different levels.
-   * @throws BaseXException exception
    */
   @Test
-  public void delayedDistanceAdjustment10() throws BaseXException {
+  public void delayedDistanceAdjustment10() {
     createDB("<A><B/><C><D/><E/></C><F/></A>");
     query("delete node (//B,//D)");
     query("/", "<A>\n<C>\n<E/>\n</C>\n<F/>\n</A>");
@@ -896,10 +873,9 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Distance caching tested for deletes at different levels.
-   * @throws BaseXException exception
    */
   @Test
-  public void delayedDistanceAdjustment11() throws BaseXException {
+  public void delayedDistanceAdjustment11() {
     createDB("<A><B/><C/><D/><E/></A>");
     query("delete node (//C,//D)");
     query("/", "<A>\n<B/>\n<E/>\n</A>");
@@ -907,10 +883,9 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Distance caching tested for deletes at different levels.
-   * @throws BaseXException exception
    */
   @Test
-  public void delayedDistanceAdjustment12() throws BaseXException {
+  public void delayedDistanceAdjustment12() {
     createDB("<A><B/><C/><D/><E/></A>");
     query("delete node (//B, //C), insert node <CNEW><X/></CNEW> before //D");
     query("/", "<A>\n<CNEW>\n<X/>\n</CNEW>\n<D/>\n<E/>\n</A>");
@@ -918,10 +893,9 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Distance caching tested for deletes at different levels.
-   * @throws BaseXException exception
    */
   @Test
-  public void delayedDistanceAdjustment13() throws BaseXException {
+  public void delayedDistanceAdjustment13() {
     createDB("<A><B><C/><D/></B></A>");
     query("insert node <X/> into //C," +
         "insert node <X><Y/></X> before //C," +
@@ -931,10 +905,9 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Distance caching tested for neighboring inserts.
-   * @throws BaseXException exception
    */
   @Test
-  public void delayedDistanceAdjustment14() throws BaseXException {
+  public void delayedDistanceAdjustment14() {
     createDB("<A><B><C/><D/></B></A>");
     query("insert node <X><Y/></X> into //C," +
         "insert node <X><Y/></X> before //C," +
@@ -945,10 +918,9 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Distance caching tested for neighboring inserts.
-   * @throws BaseXException exception
    */
   @Test
-  public void delayedDistanceAdjustment15() throws BaseXException {
+  public void delayedDistanceAdjustment15() {
     createDB("<A><B/><C/></A>");
     query("insert node <X2/> before //C," +
         "insert node <X1/> after //B");
@@ -957,10 +929,9 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Distance caching tested for neighboring inserts.
-   * @throws BaseXException exception
    */
   @Test
-  public void delayedDistanceAdjustment16() throws BaseXException {
+  public void delayedDistanceAdjustment16() {
     createDB("<A><B/><C><D/></C><E/></A>");
     query("insert node <X1/> into //C," +
         "insert node <X2/> as last into //C");
@@ -969,10 +940,9 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Tests if pre cache is clear / free of ambiguous entries.
-   * @throws BaseXException exception
    */
   @Test
-  public void delayedDistanceAdjustment17() throws BaseXException {
+  public void delayedDistanceAdjustment17() {
     createDB("<A><B/><C/><D/></A>");
     query("insert node <X/> after //B, delete node //C");
     query("/", "<A>\n<B/>\n<X/>\n<D/>\n</A>");
@@ -980,10 +950,9 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Tests if pre cache is clear / free of ambiguous entries.
-   * @throws BaseXException exception
    */
   @Test
-  public void delayedDistanceAdjustment18() throws BaseXException {
+  public void delayedDistanceAdjustment18() {
     createDB("<A><B/><C/><D/></A>");
     query("insert node <X/> before //D, delete node //C");
     query("/", "<A>\n<B/>\n<X/>\n<D/>\n</A>");
@@ -991,10 +960,9 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Tests if pre cache is clear / free of ambiguous entries.
-   * @throws BaseXException exception
    */
   @Test
-  public void delayedDistanceAdjustment19() throws BaseXException {
+  public void delayedDistanceAdjustment19() {
     createDB("<A><B/><C/><D/></A>");
     query("replace node //C with <X/>");
     query("/", "<A>\n<B/>\n<X/>\n<D/>\n</A>");
@@ -1032,10 +1000,9 @@ public final class UpdateTest extends AdvancedQueryTest {
   /**
    * Testing distance caching when a node is deleted and there have been updates on the
    * descendant axis. Tests effect on following nodes.
-   * @throws BaseXException exception
    */
   @Test
-  public void delayedDistanceAdjustment22() throws BaseXException {
+  public void delayedDistanceAdjustment22() {
     createDB("<A><B><C/><D/></B><E/></A>");
     query("insert node <X/> into //D, delete node //B");
     query("/", "<A>\n<E/>\n</A>");
@@ -1044,10 +1011,9 @@ public final class UpdateTest extends AdvancedQueryTest {
   /**
    * Tests if updates are executed in the correct order and if the sorting of updates
    * is stable.
-   * @throws BaseXException exception
    */
   @Test
-  public void delayedDistanceAdjustment23() throws BaseXException {
+  public void delayedDistanceAdjustment23() {
     createDB("<A><B/></A>");
     query("insert node <P2/> into //B, insert node <P3/> into //A");
     query("/", "<A>\n<B>\n<P2/>\n</B>\n<P3/>\n</A>");
@@ -1055,10 +1021,9 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Tests if reordering of updates works correctly.
-   * @throws BaseXException exception
    */
   @Test
-  public void delayedDistanceAdjustment24() throws BaseXException {
+  public void delayedDistanceAdjustment24() {
     createDB("<A><B/><C/><D/><E/></A>");
     query("insert node <X/> into //B, delete node //C");
     query("/", "<A>\n<B>\n<X/>\n</B>\n<D/>\n<E/>\n</A>");
@@ -1066,10 +1031,9 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /**
    * Tests if reordering of updates works correctly.
-   * @throws BaseXException exception
    */
   @Test
-  public void delayedDistanceAdjustment25() throws BaseXException {
+  public void delayedDistanceAdjustment25() {
     createDB("<A><B><C/></B><D/><E/></A>");
     query("insert node <X/> into //B, delete node //C");
     query("/", "<A>\n<B>\n<X/>\n</B>\n<D/>\n<E/>\n</A>");

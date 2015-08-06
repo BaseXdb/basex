@@ -3,7 +3,6 @@ package org.basex.query;
 import static org.junit.Assert.*;
 
 import org.basex.*;
-import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.value.*;
@@ -84,11 +83,7 @@ public abstract class QueryTest extends SandboxTest {
    * @param doc document
    */
   protected static void create(final String doc) {
-    try {
-      new CreateDB(Util.className(SandboxTest.class), doc).execute(context);
-    } catch(final BaseXException ex) {
-      Util.notExpected(ex);
-    }
+    execute(new CreateDB(Util.className(SandboxTest.class), doc));
   }
 
   /**

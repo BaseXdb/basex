@@ -219,10 +219,9 @@ public final class PackageAPITest extends AdvancedQueryTest {
 
   /**
    * Tests package installation.
-   * @throws BaseXException database exception
    */
   @Test
-  public void repoInstall() throws BaseXException {
+  public void repoInstall() {
     // try to install non-existing package
     try {
       new RepoManager(context).install("src/test/resources/pkg");
@@ -232,7 +231,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
     }
 
     // try to install a XAR package
-    new RepoInstall(REPO + "pkg3.xar", null).execute(context);
+    execute(new RepoInstall(REPO + "pkg3.xar", null));
     final String dir = normalize(PKG3ID);
     assertTrue(isDir(dir));
     assertTrue(isFile(dir + "/expath-pkg.xml"));
@@ -242,7 +241,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
     assertTrue(new IOFile(REPO, dir).delete());
 
     // try to install a URN package
-    new RepoInstall(REPO + "12345.xqm", null).execute(context);
+    execute(new RepoInstall(REPO + "12345.xqm", null));
     assertTrue(isFile("urn/isbn/12345.xqm"));
   }
 
@@ -253,7 +252,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
   @Test
   public void installJar() throws Exception {
     // install package
-    new RepoInstall(REPO + "testJar.xar", null).execute(context);
+    execute(new RepoInstall(REPO + "testJar.xar", null));
 
     // ensure package was properly installed
     final String dir = normalize("jarPkg-1.0.0");
@@ -294,10 +293,9 @@ public final class PackageAPITest extends AdvancedQueryTest {
 
   /**
    * Tests package delete.
-   * @throws BaseXException database exception
    */
   @Test
-  public void delete() throws BaseXException {
+  public void delete() {
     // try to delete a package which is not installed
     try {
       new RepoManager(context).delete("xyz");
@@ -306,7 +304,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
       check(null, ex, BXRE_WHICH_X);
     }
     // install a package without dependencies (pkg3)
-    new RepoInstall(REPO + "pkg3.xar", null).execute(context);
+    execute(new RepoInstall(REPO + "pkg3.xar", null));
 
     // check if pkg3 is registered in the repo
     assertTrue(context.repo.pkgDict().contains(token(PKG3ID)));
@@ -320,7 +318,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
     assertTrue(isFile(pkg3Dir + "/pkg3/mod/pkg3mod1.xql"));
 
     // install another package (pkg4) with a dependency to pkg3
-    new RepoInstall(REPO + "pkg4.xar", null).execute(context);
+    execute(new RepoInstall(REPO + "pkg4.xar", null));
     // check if pkg4 is registered in the repo
     assertTrue(context.repo.pkgDict().contains(token(PKG4ID)));
     // check if pkg4 was correctly unzipped
@@ -339,14 +337,14 @@ public final class PackageAPITest extends AdvancedQueryTest {
       check(null, ex, BXRE_DEP_X_X);
     }
     // try to delete pkg4 (use package name)
-    new RepoDelete(PKG4, null).execute(context);
+    execute(new RepoDelete(PKG4, null));
     // check if pkg4 is unregistered from the repo
     assertFalse(context.repo.pkgDict().contains(token(PKG4ID)));
 
     // check if pkg4 directory was deleted
     assertFalse(isDir(pkg4Dir));
     // try to delete pkg3 (use package dir)
-    new RepoDelete(PKG3ID, null).execute(context);
+    execute(new RepoDelete(PKG3ID, null));
     // check if pkg3 is unregistered from the repo
     assertFalse(context.repo.pkgDict().contains(token(PKG3ID)));
     // check if pkg3 directory was deleted

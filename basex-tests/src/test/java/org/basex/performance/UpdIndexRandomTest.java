@@ -4,15 +4,18 @@ import static org.basex.query.func.Function.*;
 import static org.junit.Assert.*;
 
 import java.util.*;
+import java.util.List;
 
 import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.core.cmd.Set;
 import org.basex.util.*;
 import org.basex.util.list.*;
 import org.junit.*;
 import org.junit.Test;
+import org.junit.runner.*;
+import org.junit.runners.*;
+import org.junit.runners.Parameterized.*;
 
 /**
  * This test class performs random incremental updates with random documents.
@@ -20,6 +23,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
+@RunWith(Parameterized.class)
 public final class UpdIndexRandomTest extends SandboxTest {
   /** Number of different documents. */
   private static final int DOCS = 20;
@@ -27,22 +31,41 @@ public final class UpdIndexRandomTest extends SandboxTest {
   private static final int RUNS = 500;
 
   /**
+   * Test parameters.
+   * @return parameters
+   */
+  @Parameters
+  public static List<Object[]> params() {
+    return Arrays.asList(new Object[][] { { false }, { true } });
+  }
+
+  /** Main memory flag. */
+  private final boolean mainmem;
+
+  /**
+   * Constructor.
+   * @param mainmem main memory flag
+   */
+  public UpdIndexRandomTest(final boolean mainmem) {
+    this.mainmem = mainmem;
+  }
+
+  /**
    * Initializes the test.
-   * @throws Exception exception
    */
   @Before
-  public void init() throws Exception {
-    new Set(MainOptions.UPDINDEX, true).execute(context);
-    new Set(MainOptions.ATTRINDEX, false).execute(context);
-    new CreateDB(NAME).execute(context);
+  public void init() {
+    set(MainOptions.MAINMEM, mainmem);
+    set(MainOptions.UPDINDEX, true);
+    set(MainOptions.ATTRINDEX, false);
+    execute(new CreateDB(NAME));
   }
 
   /**
    * Incremental test.
-   * @throws Exception exception
    */
   @Test
-  public void insertInto() throws Exception {
+  public void insertInto() {
     final Random rnd = new Random(0);
 
     // create random words
@@ -63,13 +86,13 @@ public final class UpdIndexRandomTest extends SandboxTest {
       final int offset = rnd.nextInt(cap - DOCS);
       for(int i = 0; i < DOCS; i++) doc.add("<a>").add(words.get(offset + i)).add("</a>");
       doc.add("</xml>");
-      new Replace(path, doc.toString()).execute(context);
+      execute(new Replace(path, doc.toString()));
 
       for(int d = 0; d < DOCS; d++) {
         final String word = words.get(offset + d);
         final String query = _DB_OPEN.args(NAME, path) + "//a[text() = '" + word + "']";
         final String expected = "<a>" + word + "</a>";
-        final String result = new XQuery(query).execute(context);
+        final String result = query(query);
         if(!result.startsWith(expected)) {
           fail(new TokenBuilder("\nExpected: " + expected +
               "\nResult: " + result + "\nRun: " + r + "\nDoc: " + d +

@@ -3,7 +3,6 @@ package org.basex.data;
 import static org.junit.Assert.*;
 
 import org.basex.*;
-import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
 import org.junit.*;
@@ -31,36 +30,33 @@ public final class TableTest extends SandboxTest {
 
   /**
    * Set up method.
-   * @throws BaseXException exception during creation of database
    */
   @Before
-  public void setUp() throws BaseXException {
-    new CreateDB(NAME, DBFILE).execute(context);
+  public void setUp() {
+    execute(new CreateDB(NAME, DBFILE));
     tbl = context.data().meta.dbfile(DataText.DATATBL);
   }
 
   /**
    * Drops the JUnitTest database.
-   * @throws BaseXException exception during drop of database
    */
   @After
-  public void tearDown() throws BaseXException {
-    new DropDB(NAME).execute(context);
+  public void tearDown() {
+    execute(new DropDB(NAME));
   }
 
   /**
    * Test if the size of the table remains constant after insertion, deletion,
    * and re-insertion of the same record.
-   * @throws BaseXException exception during query execution
    */
   @Test
-  public void tableSize() throws BaseXException {
+  public void tableSize() {
     final long s = tbl.length();
 
-    final String n = new XQuery(SELECT).execute(context);
-    new XQuery(DELETE).execute(context);
-    new XQuery(String.format(INSERT, n)).execute(context);
-    new Close().execute(context);
+    final String n = query(SELECT);
+    query(DELETE);
+    query(String.format(INSERT, n));
+    execute(new Close());
 
     assertEquals("Database size changed: ", s, tbl.length());
   }

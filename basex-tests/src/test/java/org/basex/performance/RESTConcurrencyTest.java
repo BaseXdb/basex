@@ -1,5 +1,6 @@
 package org.basex.performance;
 
+import static org.basex.core.users.UserText.*;
 import static org.basex.util.http.HttpMethod.*;
 import static org.junit.Assert.*;
 
@@ -11,7 +12,6 @@ import java.util.concurrent.*;
 import org.basex.*;
 import org.basex.api.client.*;
 import org.basex.core.cmd.*;
-import org.basex.core.users.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
 import org.basex.util.list.*;
@@ -33,7 +33,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
   /** Socket time-out in (ms). */
   private static final int SOCKET_TIMEOUT = 3000;
   /** BaseX HTTP base URL. */
-  static final String BASE_URL = "http://localhost:8984/rest/" + NAME;
+  private static final String BASE_URL = REST_ROOT + NAME;
 
   /**
    * Create a test database and start BaseXHTTP.
@@ -41,8 +41,12 @@ public final class RESTConcurrencyTest extends SandboxTest {
    */
   @BeforeClass
   public static void setUp() throws Exception {
-    http = new BaseXHTTP("-U" + UserText.ADMIN, "-P" + UserText.ADMIN);
-    try(final ClientSession cs = new ClientSession(context, UserText.ADMIN, UserText.ADMIN)) {
+    final StringList sl = new StringList();
+    sl.add("-p" + DB_PORT, "-h" + HTTP_PORT, "-s" + STOP_PORT, "-z");
+    sl.add("-U" + ADMIN, "-P" + ADMIN);
+
+    http = new BaseXHTTP(sl.toArray());
+    try(final ClientSession cs = createClient()) {
       cs.execute(new CreateDB(NAME));
     }
   }
@@ -53,7 +57,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
    */
   @AfterClass
   public static void tearDown() throws Exception {
-    try(final ClientSession cs = new ClientSession(context, UserText.ADMIN, UserText.ADMIN)) {
+    try(final ClientSession cs = createClient()) {
       cs.execute(new DropDB(NAME));
     }
     http.stop();

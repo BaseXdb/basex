@@ -25,7 +25,7 @@ public final class RESTGetTest extends RESTTest {
   @Test
   public void basic() throws Exception {
     assertEquals("1", get("?query=1"));
-    assertEquals("1\n2\n3", get("?query=1+to+3"));
+    assertEquals("a,b", get("?query=string-join(('a','b'),',')"));
 
     put(NAME, new ArrayInput("<a/>"));
     put(NAME + "/raw", new ArrayInput("XXX"), MediaType.APPLICATION_OCTET_STREAM);

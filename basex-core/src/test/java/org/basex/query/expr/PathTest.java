@@ -1,6 +1,5 @@
 package org.basex.query.expr;
 
-import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.query.*;
 import org.junit.*;
@@ -22,20 +21,18 @@ public final class PathTest extends AdvancedQueryTest {
 
   /**
    * Creates a database.
-   * @throws BaseXException exception
    */
   @Before
-  public void setUp() throws BaseXException {
-    new CreateDB(NAME, FILE).execute(context);
+  public void setUp() {
+    execute(new CreateDB(NAME, FILE));
   }
 
   /**
    * Drops the database.
-   * @throws BaseXException exception
    */
   @After
-  public void tearDown() throws BaseXException {
-    new DropDB(NAME).execute(context);
+  public void tearDown() {
+    execute(new DropDB(NAME));
   }
 
   /**

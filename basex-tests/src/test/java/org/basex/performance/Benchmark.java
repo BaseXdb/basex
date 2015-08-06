@@ -78,7 +78,7 @@ public abstract class Benchmark extends SandboxTest {
    * @return result
    * @throws IOException I/O exception
    */
-  protected static String query(final String query) throws IOException {
+  protected static String eval(final String query) throws IOException {
     check();
     return session.execute(new XQuery(query));
   }

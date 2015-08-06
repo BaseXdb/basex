@@ -18,30 +18,25 @@ public final class DocReplaceTest extends SandboxTest {
 
   /**
    * Runs the test.
-   * @throws Exception exception
    */
   @Test
-  public void run() throws Exception {
-    context.options.set(MainOptions.TEXTINDEX, false);
-    context.options.set(MainOptions.ATTRINDEX, false);
-    context.options.set(MainOptions.AUTOFLUSH, false);
-    context.options.set(MainOptions.INTPARSE, true);
+  public void run() {
+    set(MainOptions.TEXTINDEX, false);
+    set(MainOptions.ATTRINDEX, false);
+    set(MainOptions.AUTOFLUSH, false);
+    set(MainOptions.INTPARSE, true);
 
     // create test database
-    new CreateDB(NAME).execute(context);
+    execute(new CreateDB(NAME));
 
     // add documents
-    for(int i = 0; i < NQUERIES; i++) {
-      new Add(i + IO.XMLSUFFIX, "<a/>").execute(context);
-    }
-    new Flush().execute(context);
+    for(int i = 0; i < NQUERIES; i++) execute(new Add(i + IO.XMLSUFFIX, "<a/>"));
+    execute(new Flush());
 
     // replace documents with same content
-    for(int i = 0; i < NQUERIES; i++) {
-      new Replace(i + IO.XMLSUFFIX, "<a/>").execute(context);
-    }
+    for(int i = 0; i < NQUERIES; i++) execute(new Replace(i + IO.XMLSUFFIX, "<a/>"));
 
     // Drop database
-    new DropDB(NAME).execute(context);
+    execute(new DropDB(NAME));
   }
 }

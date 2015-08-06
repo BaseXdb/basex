@@ -3,7 +3,6 @@ package org.basex.performance;
 import java.util.*;
 
 import org.basex.*;
-import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.util.*;
 import org.junit.Test;
@@ -71,8 +70,7 @@ public final class LocalStressTest extends SandboxTest {
    */
   private static void run(final int clients, final int runs) throws Exception {
     // Create test database
-    Command cmd = new CreateDB(NAME, INPUT);
-    cmd.execute(context);
+    execute(new CreateDB(NAME, INPUT));
 
     // Start clients
     final Client[] cl = new Client[clients];
@@ -80,8 +78,7 @@ public final class LocalStressTest extends SandboxTest {
     for(final Client c : cl) c.start();
     for(final Client c : cl) c.join();
     // Drop database
-    cmd = new DropDB(NAME);
-    cmd.execute(context);
+    execute(new DropDB(NAME));
   }
 
   /** Single client. */
@@ -99,16 +96,10 @@ public final class LocalStressTest extends SandboxTest {
 
     @Override
     public void run() {
-      try {
-        for(int i = 0; i < runs; ++i) {
-          Performance.sleep((long) (50 * RND.nextDouble()));
-          // Return nth text of the database
-          final int n = RND.nextInt() % MAX + 1;
-          final String qu = Util.info(QUERY, n);
-          new XQuery(qu).execute(context);
-        }
-      } catch(final BaseXException ex) {
-        ex.printStackTrace();
+      for(int i = 0; i < runs; ++i) {
+        Performance.sleep((long) (50 * RND.nextDouble()));
+        // Return nth text of the database
+        query(Util.info(QUERY, RND.nextInt() % MAX + 1));
       }
     }
   }

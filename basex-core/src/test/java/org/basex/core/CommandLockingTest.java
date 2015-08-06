@@ -109,10 +109,9 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new Store(FILE), true, CTX_LIST);
   }
 
-  /** Tests locked databases in XQuery queries.
-   * @throws BaseXException database exception */
+  /** Tests locked databases in XQuery queries. */
   @Test
-  public void xquery() throws BaseXException {
+  public void xquery() {
     // Basic document access
     ckDBs(new XQuery(COLLECTION.args(NAME)), false, NAME_LIST);
     ckDBs(new XQuery(COLLECTION.args()), false, CTX_LIST);
@@ -179,12 +178,12 @@ public final class CommandLockingTest extends SandboxTest {
     XQuery query = new XQuery(
         "import module namespace qm='java:org.basex.query.func.QueryModuleTest';" +
         "qm:readLock()");
-    query.execute(context);
+    execute(query);
     ckDBs(query, false, MODULE_LIST);
     query = new XQuery(
         "import module namespace qm='java:org.basex.query.func.QueryModuleTest';" +
         "qm:writeLock()");
-    query.execute(context);
+    execute(query);
     ckDBs(query, true, MODULE_LIST);
   }
 

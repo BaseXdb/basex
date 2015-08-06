@@ -31,7 +31,7 @@ public abstract class RestXqTest extends HTTPTest {
    */
   @BeforeClass
   public static void start() throws Exception {
-    init(RESTXQ_ROOT, true);
+    init(HTTP_ROOT, true);
   }
 
   /**

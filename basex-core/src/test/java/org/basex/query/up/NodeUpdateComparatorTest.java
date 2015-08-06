@@ -5,13 +5,11 @@ import static org.junit.Assert.*;
 import java.util.*;
 import java.util.List;
 
-import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.up.primitives.node.*;
-import org.basex.util.*;
 import org.junit.*;
 import org.junit.Test;
 import org.junit.rules.*;
@@ -490,11 +488,7 @@ public final class NodeUpdateComparatorTest extends AdvancedQueryTest {
    * @return database instance
    */
   private static Data data(final String s) {
-    try {
-      new CreateDB(NAME, s).execute(context);
-    } catch(final BaseXException ex) {
-      fail(Util.message(ex));
-    }
+    execute(new CreateDB(NAME, s));
     return context.data();
   }
 

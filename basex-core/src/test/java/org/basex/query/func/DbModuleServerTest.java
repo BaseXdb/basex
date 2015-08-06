@@ -29,11 +29,10 @@ public final class DbModuleServerTest extends AdvancedQueryTest {
 
   /**
    * Initializes a test.
-   * @throws BaseXException database exception
    */
   @Before
-  public void finishTest() throws BaseXException {
-    new DropDB(NAME).execute(context);
+  public void finishTest() {
+    execute(new DropDB(NAME));
   }
 
   /**

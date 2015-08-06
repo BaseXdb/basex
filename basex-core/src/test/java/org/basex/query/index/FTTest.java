@@ -21,19 +21,18 @@ public final class FTTest extends FTData {
   @Test
   @Override
   public void test() {
-    final MainOptions opts = context.options;
     if(ALL) {
       // test with and without index
       for(int a = 0; a < 2; ++a) {
-        opts.set(MainOptions.FTINDEX, a == 0);
+        set(MainOptions.FTINDEX, a == 0);
         super.test();
       }
     } else {
       // single test
-      opts.set(MainOptions.FTINDEX, true);
-      opts.set(MainOptions.STEMMING, true);
-      opts.set(MainOptions.DIACRITICS, true);
-      opts.set(MainOptions.CASESENS, true);
+      set(MainOptions.FTINDEX, true);
+      set(MainOptions.STEMMING, true);
+      set(MainOptions.DIACRITICS, true);
+      set(MainOptions.CASESENS, true);
       super.test();
     }
   }
@@ -42,10 +41,10 @@ public final class FTTest extends FTData {
   protected String details() {
     final MainOptions opts = context.options;
     final StringBuilder sb = new StringBuilder();
-    sb.append(set(opts, MainOptions.FTINDEX)).append(';');
-    sb.append(set(opts, MainOptions.STEMMING)).append(';');
-    sb.append(set(opts, MainOptions.DIACRITICS)).append(';');
-    sb.append(set(opts, MainOptions.CASESENS));
+    sb.append(toString(opts, MainOptions.FTINDEX)).append(';');
+    sb.append(toString(opts, MainOptions.STEMMING)).append(';');
+    sb.append(toString(opts, MainOptions.DIACRITICS)).append(';');
+    sb.append(toString(opts, MainOptions.CASESENS));
     return sb.toString();
   }
 
@@ -55,7 +54,7 @@ public final class FTTest extends FTData {
    * @param option option
    * @return string
    */
-  private static String set(final Options opts, final BooleanOption option) {
+  private static String toString(final Options opts, final BooleanOption option) {
     return new Set(option, opts.get(option)).toString();
   }
 }

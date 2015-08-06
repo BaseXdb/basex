@@ -21,13 +21,12 @@ public final class SelectiveIndexTest extends SandboxTest {
 
   /**
    * Tests the text index.
-   * @throws BaseXException database exception
    */
   @Test
-  public void textIndex() throws BaseXException {
+  public void textIndex() {
     for(final Map.Entry<String, Integer> entry : map().entrySet()) {
-      context.options.set(MainOptions.TEXTINCLUDE, entry.getKey());
-      new CreateDB(NAME, FILE).execute(context);
+      set(MainOptions.TEXTINCLUDE, entry.getKey());
+      execute(new CreateDB(NAME, FILE));
       final int size = context.data().textIndex.size();
       assertEquals("TextIndex: \"" + entry.getKey() + "\": ", entry.getValue().intValue(), size);
     }
@@ -35,40 +34,38 @@ public final class SelectiveIndexTest extends SandboxTest {
 
   /**
    * Tests the attribute index.
-   * @throws BaseXException database exception
    */
   @Test
-  public void attrIndex() throws BaseXException {
+  public void attrIndex() {
     try {
       for(final Map.Entry<String, Integer> entry : map().entrySet()) {
-        context.options.set(MainOptions.ATTRINCLUDE, entry.getKey());
-        new CreateDB(NAME, FILE).execute(context);
+        set(MainOptions.ATTRINCLUDE, entry.getKey());
+        execute(new CreateDB(NAME, FILE));
         final int size = context.data().attrIndex.size();
         assertEquals("AttrIndex: \"" + entry.getKey() + "\": ", entry.getValue().intValue(), size);
       }
     } finally {
-      context.options.set(MainOptions.ATTRINCLUDE, "");
+      set(MainOptions.ATTRINCLUDE, "");
     }
   }
 
   /**
    * Tests the full-text index.
-   * @throws BaseXException database exception
    */
   @Test
-  public void ftIndex() throws BaseXException {
-    context.options.set(MainOptions.FTINDEX, true);
+  public void ftIndex() {
+    set(MainOptions.FTINDEX, true);
     try {
       for(final Map.Entry<String, Integer> entry : map().entrySet()) {
         final String key = entry.getKey();
         final int value = entry.getValue();
-        context.options.set(MainOptions.FTINCLUDE, key);
-        new CreateDB(NAME, FILE).execute(context);
+        set(MainOptions.FTINCLUDE, key);
+        execute(new CreateDB(NAME, FILE));
         assertEquals("FTIndex: \"" + key + "\": ", value, context.data().ftxtIndex.size());
       }
     } finally {
-      context.options.set(MainOptions.FTINCLUDE, "");
-      context.options.set(MainOptions.FTINDEX, false);
+      set(MainOptions.FTINCLUDE, "");
+      set(MainOptions.FTINDEX, false);
     }
   }
 

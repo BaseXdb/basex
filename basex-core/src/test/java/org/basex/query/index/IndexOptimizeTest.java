@@ -7,7 +7,6 @@ import java.io.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.core.cmd.Set;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.ft.*;
@@ -24,33 +23,22 @@ import org.junit.Test;
 public final class IndexOptimizeTest extends AdvancedQueryTest {
   /**
    * Creates a test database.
-   * @throws Exception exception
    */
   @BeforeClass
-  public static void start() throws Exception {
-    new DropDB(NAME).execute(context);
-    context.options.set(MainOptions.FTINDEX, true);
-    context.options.set(MainOptions.QUERYINFO, true);
-  }
-
-  /**
-   * Drops the test database.
-   */
-  @AfterClass
-  public static void stop() {
-    context.options.set(MainOptions.FTINDEX, false);
-    context.options.set(MainOptions.QUERYINFO, false);
+  public static void start() {
+    execute(new DropDB(NAME));
+    set(MainOptions.FTINDEX, true);
+    set(MainOptions.QUERYINFO, true);
   }
 
   /**
    * Checks the open command.
    * Test method.
-   * @throws Exception unexpected exception
    */
   @Test
-  public void openDocTest() throws Exception {
+  public void openDocTest() {
     createDoc();
-    new Open(NAME).execute(context);
+    execute(new Open(NAME));
     check("//*[text() = '1']");
     check("data(//*[@* = 'y'])", "1");
     check("data(//@*[. = 'y'])", "y");
@@ -64,12 +52,11 @@ public final class IndexOptimizeTest extends AdvancedQueryTest {
   /**
    * Checks the open command.
    * Test method.
-   * @throws Exception unexpected exception
    */
   @Test
-  public void openCollTest() throws Exception {
+  public void openCollTest() {
     createColl();
-    new Open(NAME).execute(context);
+    execute(new Open(NAME));
     check("//*[text() = '1']");
     check("//*[text() contains text '1']");
     check("//a[. = '1']");
@@ -80,10 +67,9 @@ public final class IndexOptimizeTest extends AdvancedQueryTest {
 
   /**
    * Checks the XQuery doc() function.
-   * @throws Exception unexpected exception
    */
   @Test
-  public void docTest() throws Exception {
+  public void docTest() {
     createDoc();
     final String func = DOC.args(NAME);
     check(func + "//*[text() = '1']");
@@ -97,10 +83,9 @@ public final class IndexOptimizeTest extends AdvancedQueryTest {
 
   /**
    * Checks the XQuery collection() function.
-   * @throws Exception unexpected exception
    */
   @Test
-  public void collTest() throws Exception {
+  public void collTest() {
     createColl();
     final String func = COLLECTION.args(NAME);
     check(func + "//*[text() = '1']");
@@ -115,10 +100,9 @@ public final class IndexOptimizeTest extends AdvancedQueryTest {
 
   /**
    * Checks the XQuery db:open() function.
-   * @throws Exception unexpected exception
    */
   @Test
-  public void dbOpenTest() throws Exception {
+  public void dbOpenTest() {
     createColl();
     final String func = _DB_OPEN.args(NAME);
     check(func + "//*[text() = '1']");
@@ -131,10 +115,9 @@ public final class IndexOptimizeTest extends AdvancedQueryTest {
 
   /**
    * Checks the XQuery db:open() function, using a specific path.
-   * @throws Exception unexpected exception
    */
   @Test
-  public void dbOpenExtTest() throws Exception {
+  public void dbOpenExtTest() {
     createColl();
     final String func = _DB_OPEN.args(NAME, "two");
     check(func + "//*[text() = '1']", "");
@@ -148,12 +131,11 @@ public final class IndexOptimizeTest extends AdvancedQueryTest {
 
   /**
    * Checks full-text requests.
-   * @throws Exception unexpected exception
    */
   @Test
-  public void ftTest() throws Exception {
+  public void ftTest() {
     createDoc();
-    new Open(NAME).execute(context);
+    execute(new Open(NAME));
     check("data(//*[text() contains text '1'])", "1");
     check("data(//*[text() contains text '1 2' any word])", "1\n2 3");
     check("//*[text() contains text {'2','4'} all]", "");
@@ -163,13 +145,12 @@ public final class IndexOptimizeTest extends AdvancedQueryTest {
 
   /**
    * Checks if a full-text index with language option is used.
-   * @throws Exception unexpected exception
    */
   @Test
-  public void ftTestLang() throws Exception {
-    new Set(MainOptions.LANGUAGE, "de").execute(context);
+  public void ftTestLang() {
+    set(MainOptions.LANGUAGE, "de");
     createDoc();
-    new Open(NAME).execute(context);
+    execute(new Open(NAME));
     check("//text()[. contains text '1']");
     check("//text()[. contains text '1' using language 'de']");
     check("//text()[. contains text '1' using language 'German']");
@@ -177,10 +158,9 @@ public final class IndexOptimizeTest extends AdvancedQueryTest {
 
   /**
    * Checks index optimizations inside functions.
-   * @throws Exception unexpected exception
    */
   @Test
-  public void functionTest() throws Exception {
+  public void functionTest() {
     createColl();
     // document access after inlining
     check("declare function local:x($d) { collection($d)//text()[. = '1'] };"
@@ -203,12 +183,11 @@ public final class IndexOptimizeTest extends AdvancedQueryTest {
 
   /**
    * Checks predicate tests for empty strings.
-   * @throws Exception unexpected exception
    */
   @Test
-  public void empty() throws Exception {
+  public void empty() {
     createDoc();
-    new Open(NAME).execute(context);
+    execute(new Open(NAME));
     query("//*[text() = '']", "");
     query("//text()[. = '']", "");
     query("//*[. = '']", "<a/>");
@@ -222,23 +201,21 @@ public final class IndexOptimizeTest extends AdvancedQueryTest {
 
   /**
    * Creates a test database.
-   * @throws Exception exception
    */
-  private static void createDoc() throws Exception {
-    new CreateDB(NAME, "<xml><a x='y'>1</a><a>2 3</a><a/></xml>").execute(context);
-    new Close().execute(context);
+  private static void createDoc() {
+    execute(new CreateDB(NAME, "<xml><a x='y'>1</a><a>2 3</a><a/></xml>"));
+    execute(new Close());
   }
 
   /**
    * Creates a test collection.
-   * @throws Exception exception
    */
-  private static void createColl() throws Exception {
-    new CreateDB(NAME).execute(context);
-    new Add("one", "<xml><a>1</a><a>2 3</a></xml>").execute(context);
-    new Add("two", "<xml><a>4</a><a>5 6</a></xml>").execute(context);
-    new Optimize().execute(context);
-    new Close().execute(context);
+  private static void createColl() {
+    execute(new CreateDB(NAME));
+    execute(new Add("one", "<xml><a>1</a><a>2 3</a></xml>"));
+    execute(new Add("two", "<xml><a>4</a><a>5 6</a></xml>"));
+    execute(new Optimize());
+    execute(new Close());
   }
 
   /**

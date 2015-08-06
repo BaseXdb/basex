@@ -216,13 +216,12 @@ public final class LockingTest extends SandboxTest {
 
   /**
    * Test for concurrent writes.
-   * @throws BaseXException database exception
    */
   @Test
-  public void downgradeTest() throws BaseXException {
+  public void downgradeTest() {
     // hangs if QueryContext.downgrade call is activated..
-    new CreateDB(NAME, "<x/>").execute(context);
-    new XQuery("delete node /y").execute(context);
-    new XQuery("let $d := '" + NAME + "' return doc($d)").execute(context);
+    execute(new CreateDB(NAME, "<x/>"));
+    query("delete node /y");
+    query("let $d := '" + NAME + "' return doc($d)");
   }
 }

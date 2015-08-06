@@ -4,7 +4,6 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
 import org.basex.core.*;
-import org.basex.core.cmd.*;
 import org.basex.query.*;
 import org.junit.*;
 import org.junit.Test;
@@ -18,20 +17,10 @@ import org.junit.Test;
 public final class MixUpdatesTest extends AdvancedQueryTest {
   /**
    * Prepare tests.
-   * @throws BaseXException database exception
    */
   @BeforeClass
-  public static void beforeClass() throws BaseXException {
-    new Set(MainOptions.MIXUPDATES, true).execute(context);
-  }
-
-  /**
-   * Finalize tests.
-   * @throws BaseXException database exception
-   */
-  @AfterClass
-  public static void afterClass() throws BaseXException {
-    new Set(MainOptions.MIXUPDATES, false).execute(context);
+  public static void beforeClass() {
+    set(MainOptions.MIXUPDATES, true);
   }
 
   /** Transform expression containing a simple expression. */

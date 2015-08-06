@@ -4,6 +4,7 @@ import java.awt.*;
 import java.util.*;
 
 import org.basex.gui.layout.*;
+import org.basex.util.options.*;
 
 /**
  * This class contains a view reference and adds a {@link ViewMover}
@@ -47,7 +48,7 @@ final class ViewPanel extends BaseXBack implements ViewLayout {
    */
   public void delete() {
     final String name = "SHOW" + view.getName().toUpperCase(Locale.ENGLISH);
-    view.gui.gopts.put(view.gui.gopts.option(name), false);
+    view.gui.gopts.set((BooleanOption) view.gui.gopts.option(name), false);
     view.gui.layoutViews();
   }
 

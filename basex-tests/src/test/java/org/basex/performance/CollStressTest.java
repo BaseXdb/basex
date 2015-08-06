@@ -18,73 +18,50 @@ public final class CollStressTest extends SandboxTest {
 
   /**
    * Initializes the tests.
-   * @throws Exception exception
    */
   @BeforeClass
-  public static void init() throws Exception {
-    final CreateDB cmd = new CreateDB(NAME);
-    cmd.execute(context);
+  public static void init() {
+    execute(new CreateDB(NAME));
     // Speed up updates and add documents
-    new Set(MainOptions.AUTOFLUSH, false).execute(context);
-    new Set(MainOptions.INTPARSE, true).execute(context);
-    for(int i = 0; i < SIZE; i++) {
-      new Add(Integer.toString(i), "<xml/>").execute(context);
-    }
-    new Set(MainOptions.AUTOFLUSH, true).execute(context);
-  }
-
-  /**
-   * Finishes the tests.
-   * @throws Exception exception
-   */
-  @AfterClass
-  public static void finish() throws Exception {
-    new DropDB(NAME).execute(context);
+    set(MainOptions.AUTOFLUSH, false);
+    set(MainOptions.INTPARSE, true);
+    for(int i = 0; i < SIZE; i++) execute(new Add(Integer.toString(i), "<xml/>"));
+    set(MainOptions.AUTOFLUSH, true);
   }
 
   /**
    * Requests specific documents.
-   * @throws Exception exception
    */
   @Test
-  public void specificOpened() throws Exception {
-    new Open(NAME).execute(context);
-    for(int i = 0; i < SIZE; i++) {
-      new XQuery("collection('" + NAME + '/' + i + "')").execute(context);
-    }
+  public void specificOpened() {
+    execute(new Open(NAME));
+    for(int i = 0; i < SIZE; i++) query("collection('" + NAME + '/' + i + "')");
   }
 
   /**
    * Requests specific documents from closed database.
-   * @throws Exception exception
    */
   @Test
-  public void specificClosed() throws Exception {
-    new Close().execute(context);
-    for(int i = 0; i < SIZE; i++) {
-      new XQuery("collection('" + NAME + '/' + i + "')").execute(context);
-    }
+  public void specificClosed() {
+    execute(new Close());
+    for(int i = 0; i < SIZE; i++) query("collection('" + NAME + '/' + i + "')");
   }
 
   /**
    * Requests all documents.
-   * @throws Exception exception
    */
   @Test
-  public void allOpened() throws Exception {
-    new Open(NAME).execute(context);
-    new XQuery("for $i in 0 to " + (SIZE - 1) + ' ' +
-      "return collection(concat('" + NAME + "/', $i))").execute(context);
+  public void allOpened() {
+    execute(new Open(NAME));
+    query("for $i in 0 to " + (SIZE - 1) + " return collection(concat('" + NAME + "/', $i))");
   }
 
   /**
    * Requests all documents from closed database.
-   * @throws Exception exception
    */
   @Test
-  public void allClosed() throws Exception {
-    new Close().execute(context);
-    new XQuery("for $i in 0 to " + (SIZE - 1) + ' ' +
-      "return collection(concat('" + NAME + "/', $i))").execute(context);
+  public void allClosed() {
+    execute(new Close());
+    query("for $i in 0 to " + (SIZE - 1) + " return collection(concat('" + NAME + "/', $i))");
   }
 }

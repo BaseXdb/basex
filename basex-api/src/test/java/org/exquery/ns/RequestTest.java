@@ -58,7 +58,7 @@ public final class RequestTest extends HTTPTest {
   @Test
   public void path() throws Exception {
     put(NAME, null);
-    assertEquals("/rest/", get("?query=" + request("R:path()")));
+    assertEquals("/rest/",        get("?query=" + request("R:path()")));
     assertEquals("/rest/" + NAME, get(NAME + "?query=" + request("R:path()")));
     delete(NAME);
   }
@@ -108,10 +108,10 @@ public final class RequestTest extends HTTPTest {
    */
   @Test
   public void parameter() throws Exception {
-    assertEquals("b", get("?query=" + request("R:parameter('a')") + "&a=b"));
-    assertEquals("b\nc", get("?query=" + request("R:parameter('a')") + "&a=b&a=c"));
-    assertEquals("b", get("?query=" + request("R:parameter('a','c')") + "&a=b"));
-    assertEquals("c", get("?query=" + request("R:parameter('x','c')") + "&a=b"));
+    assertEquals("b",   get("?query=" + request("R:parameter('a')") + "&a=b"));
+    assertEquals("b,c", get("?query=" + request("string-join(R:parameter('a'),',')") + "&a=b&a=c"));
+    assertEquals("b",   get("?query=" + request("R:parameter('a','c')") + "&a=b"));
+    assertEquals("c",   get("?query=" + request("R:parameter('x','c')") + "&a=b"));
   }
 
   /**
@@ -120,8 +120,8 @@ public final class RequestTest extends HTTPTest {
    */
   @Test
   public void headerNames() throws Exception {
-    final String query = "R:header-names()";
-    assertEquals("Host\nAccept\nConnection\nUser-Agent", get("?query=" + request(query)));
+    assertEquals("Host,Accept,Connection,User-Agent",
+        get("?query=" + request("string-join(R:header-names(), ',')")));
   }
 
   /**
@@ -131,7 +131,7 @@ public final class RequestTest extends HTTPTest {
   @Test
   public void header() throws Exception {
     assertEquals("localhost:" + HTTP_PORT, get("?query=" + request("R:header('Host')")));
-    assertEquals("def", get("?query=" + request("R:header('ABC', 'def')")));
+    assertEquals("def",                     get("?query=" + request("R:header('ABC', 'def')")));
   }
 
   /**
@@ -140,8 +140,7 @@ public final class RequestTest extends HTTPTest {
    */
   @Test
   public void cookieNames() throws Exception {
-    final String query = "count(R:cookie-names())";
-    assertEquals("0", get("?query=" + request(query)));
+    assertEquals("0", get("?query=" + request("count(R:cookie-names())")));
   }
 
   /**
@@ -150,8 +149,7 @@ public final class RequestTest extends HTTPTest {
    */
   @Test
   public void cookie() throws Exception {
-    final String query = "count(R:cookie('x'))";
-    assertEquals("0", get("?query=" + request(query)));
+    assertEquals("0", get("?query=" + request("count(R:cookie('x'))")));
   }
 
   // PRIVATE METHODS ====================================================================

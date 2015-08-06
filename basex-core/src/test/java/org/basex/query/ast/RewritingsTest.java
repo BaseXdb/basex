@@ -2,7 +2,6 @@ package org.basex.query.ast;
 
 import static org.basex.query.func.Function.*;
 
-import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.basex.*;
@@ -20,13 +19,12 @@ import org.junit.Test;
 public final class RewritingsTest extends QueryPlanTest {
   /**
    * Checks if the count function is pre-compiled.
-   * @throws Exception exception
    */
   @Test
-  public void preEval() throws Exception {
+  public void preEval() {
     check("count(1)", "1", "exists(//" + Util.className(Int.class) + ')');
 
-    new CreateDB(NAME, "<xml><a x='y'>1</a><a>2 3</a><a/></xml>").execute(context);
+    execute(new CreateDB(NAME, "<xml><a x='y'>1</a><a>2 3</a><a/></xml>"));
     check("count(//a)", "3", "exists(//" + Util.className(Int.class) + ')');
     check("count(/xml/a)", "3", "exists(//" + Util.className(Int.class) + ')');
     check("count(//text())", "2", "exists(//" + Util.className(Int.class) + ')');
@@ -34,16 +32,15 @@ public final class RewritingsTest extends QueryPlanTest {
     check("count(//node())", "6", "exists(//" + Util.className(Int.class) + ')');
     check("count(//comment())", "0", "exists(//" + Util.className(Int.class) + ')');
     check("count(/self::document-node())", "1", "exists(//" + Util.className(Int.class) + ')');
-    new DropDB(NAME).execute(context);
+    execute(new DropDB(NAME));
   }
 
   /**
    * Checks if descendant-or-self::node() steps are rewritten.
-   * @throws Exception exception
    */
   @Test
-  public void mergeDesc() throws Exception {
-    new CreateDB(NAME, "<a><b>B</b><b><c>C</c></b></a>").execute(context);
+  public void mergeDesc() {
+    execute(new CreateDB(NAME, "<a><b>B</b><b><c>C</c></b></a>"));
 
     check("//*", null, "//@axis = 'descendant'");
     check("//(b,*)", null, "exists(//Union) and //@axis = 'descendant'");
@@ -54,11 +51,10 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /**
    * Checks if descendant steps are rewritten to child steps.
-   * @throws Exception exception
    */
   @Test
-  public void descToChild() throws Exception {
-    new CreateDB(NAME, "<a><b>B</b><b><c>C</c></b></a>").execute(context);
+  public void descToChild() {
+    execute(new CreateDB(NAME, "<a><b>B</b><b><c>C</c></b></a>"));
 
     check("descendant::a", null, "//@axis = 'child'");
     check("descendant::b", null, "//@axis = 'child'");
@@ -95,12 +91,11 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /**
    * Checks if iterative evaluation of XPaths is used iff no duplicated occur (see GH-1001).
-   * @throws BaseXException if creating or dropping the database fails
    */
   @Test
-  public void iterPath() throws BaseXException {
-    new CreateDB(NAME, "<a id='0' x:id='' x='' xmlns:x='x'><b id='1'/><c id='2'/>"
-        + "<d id='3'/><e id='4'/></a>").execute(context);
+  public void iterPath() {
+    execute(new CreateDB(NAME, "<a id='0' x:id='' x='' xmlns:x='x'><b id='1'/><c id='2'/>"
+        + "<d id='3'/><e id='4'/></a>"));
     check("(/a/*/../*) ! name()", "b\nc\nd\ne", "empty(//IterPath)");
     check("(exactly-one(/a/b)/../*) ! name()", "b\nc\nd\ne", "exists(//IterPath)");
     check("(/a/*/following::*) ! name()", "c\nd\ne", "empty(//IterPath)");
@@ -109,7 +104,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("(exactly-one(/a/b)/following-sibling::*) ! name()", "c\nd\ne", "exists(//IterPath)");
     check("(/*/@id/../*) ! name()", "b\nc\nd\ne", "empty(//IterPath)");
     check("(exactly-one(/a)/@id/../*) ! name()", "b\nc\nd\ne", "exists(//IterPath)");
-    new DropDB(NAME).execute(context);
+    execute(new DropDB(NAME));
   }
 
   /**

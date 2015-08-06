@@ -2,7 +2,6 @@ package org.basex.query.index;
 
 import java.util.*;
 
-import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.parse.Commands.CmdIndex;
 import org.basex.query.ast.*;
@@ -20,10 +19,9 @@ import org.junit.Test;
 public final class StringRangeTest extends QueryPlanTest {
   /**
    * Initializes the tests.
-   * @throws BaseXException database exception
    */
   @BeforeClass
-  public static void start() throws BaseXException {
+  public static void start() {
     final Random rnd = new Random();
 
     // create initial document
@@ -39,24 +37,22 @@ public final class StringRangeTest extends QueryPlanTest {
       tb.add("<x>").add(r.next()).add("</x>");
     }
     tb.add("</xml>");
-    new CreateDB(NAME, tb.toString()).execute(context);
+    execute(new CreateDB(NAME, tb.toString()));
   }
 
   /**
    * Finishes the tests.
-   * @throws BaseXException database exception
    */
   @AfterClass
-  public static void finish() throws BaseXException {
-    new DropDB(NAME).execute(context);
+  public static void finish() {
+    execute(new DropDB(NAME));
   }
 
   /**
    * Testing greater-equal and less-equal.
-   * @throws BaseXException database exception
    */
   @Test
-  public void geLe() throws BaseXException {
+  public void geLe() {
     test("exists(//*[text() >= '999' and text() <= '999'])", "true", ValueAccess.class);
     final Class<? extends Expr> clz = StringRangeAccess.class;
     test("count(//*[text() >= '990' and text() <= '999'])", "10", clz);
@@ -69,10 +65,9 @@ public final class StringRangeTest extends QueryPlanTest {
 
   /**
    * Testing less-equal and greater-equal.
-   * @throws BaseXException database exception
    */
   @Test
-  public void leGe() throws BaseXException {
+  public void leGe() {
     test("exists(//*[text() <= '999' and text() >= '999'])", "true", ValueAccess.class);
     final Class<? extends Expr> clz = StringRangeAccess.class;
     test("count(//*[text() <= '999' and text() >= '990'])", "10", clz);
@@ -84,10 +79,9 @@ public final class StringRangeTest extends QueryPlanTest {
 
   /**
    * Testing greater-than and less-than.
-   * @throws BaseXException database exception
    */
   @Test
-  public void gtLt() throws BaseXException {
+  public void gtLt() {
     test("exists(//*[text() > '999' and text() < '999'])", "false");
     final Class<? extends Expr> clz = StringRangeAccess.class;
     test("count(//*[text() > '990' and text() < '999'])", "8", clz);
@@ -103,14 +97,13 @@ public final class StringRangeTest extends QueryPlanTest {
    * @param query query
    * @param result expected result
    * @param expr class expected in query plan
-   * @throws BaseXException database exception
    */
   private static void test(final String query, final String result,
-      final Class<? extends Expr> expr) throws BaseXException {
+      final Class<? extends Expr> expr) {
 
-    new CreateIndex(CmdIndex.TEXT).execute(context);
+    execute(new CreateIndex(CmdIndex.TEXT));
     check(query, result, "exists(//" + Util.className(expr) + ')');
-    new DropIndex(CmdIndex.TEXT).execute(context);
+    execute(new DropIndex(CmdIndex.TEXT));
     check(query, result, "not(//" + Util.className(expr) + ')');
   }
 
@@ -118,12 +111,11 @@ public final class StringRangeTest extends QueryPlanTest {
    * Tests a query with and without index.
    * @param query query
    * @param result expected result
-   * @throws BaseXException database exception
    */
-  private static void test(final String query, final String result) throws BaseXException {
-    new CreateIndex(CmdIndex.TEXT).execute(context);
+  private static void test(final String query, final String result) {
+    execute(new CreateIndex(CmdIndex.TEXT));
     check(query, result);
-    new DropIndex(CmdIndex.TEXT).execute(context);
+    execute(new DropIndex(CmdIndex.TEXT));
     check(query, result);
   }
 }

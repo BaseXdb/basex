@@ -5,7 +5,6 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 import static org.junit.Assert.*;
 
-import java.io.*;
 import java.util.*;
 
 import org.basex.core.*;
@@ -42,34 +41,31 @@ public final class DbModuleTest extends AdvancedQueryTest {
 
   /**
    * Initializes a test.
-   * @throws BaseXException database exception
    */
   @Before
-  public void initTest() throws BaseXException {
-    new CreateDB(NAME, FILE).execute(context);
+  public void initTest() {
+    execute(new CreateDB(NAME, FILE));
   }
 
   /**
    * Finalizes tests.
-   * @throws IOException I/O exception
    */
   @AfterClass
-  public static void finish() throws IOException {
-    new DropDB(NAME).execute(context);
+  public static void finish() {
+    execute(new DropDB(NAME));
   }
 
   /**
    * Test method.
-   * @throws BaseXException database exception
    */
   @Test
-  public void open() throws BaseXException {
+  public void open() {
     query(COUNT.args(_DB_OPEN.args(NAME)), "1");
     query(COUNT.args(_DB_OPEN.args(NAME, "")), "1");
     query(COUNT.args(_DB_OPEN.args(NAME, "unknown")), "0");
 
     // close database instance
-    new Close().execute(context);
+    execute(new Close());
     query(COUNT.args(_DB_OPEN.args(NAME, "unknown")), "0");
     query(_DB_OPEN.args(NAME) + "//title/text()", "XML");
 
@@ -77,7 +73,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
     if(Prop.WIN) error(_DB_OPEN.args(NAME, "*"), RESINV_X);
 
     // run function on non-existing database
-    new DropDB(NAME).execute(context);
+    execute(new DropDB(NAME));
     error(_DB_OPEN.args(NAME), BXDB_OPEN_X);
   }
 
@@ -97,72 +93,57 @@ public final class DbModuleTest extends AdvancedQueryTest {
     error(_DB_OPEN_ID.args(NAME, Integer.MAX_VALUE), BXDB_RANGE_X_X_X);
   }
 
-  /**
-   * Test method.
-   * @throws BaseXException database exception
-   */
+  /** Test method. */
   @Test
-  public void text() throws BaseXException {
+  public void text() {
     // run function without and with index
-    new DropIndex(CmdIndex.TEXT).execute(context);
+    execute(new DropIndex(CmdIndex.TEXT));
     query(_DB_TEXT.args(NAME, "XML"), "XML");
-    new CreateIndex(CmdIndex.TEXT).execute(context);
+    execute(new CreateIndex(CmdIndex.TEXT));
     query(_DB_TEXT.args(NAME, "XML"), "XML");
     query(_DB_TEXT.args(NAME, "XXX"), "");
   }
 
-  /**
-   * Test method.
-   * @throws BaseXException database exception
-   */
+  /** Test method. */
   @Test
-  public void textRange() throws BaseXException {
+  public void textRange() {
     // run function without and with index
-    new DropIndex(CmdIndex.TEXT).execute(context);
+    execute(new DropIndex(CmdIndex.TEXT));
     query(_DB_TEXT_RANGE.args(NAME, "Exercise", "Fun"), "Exercise 1\nExercise 2");
-    new CreateIndex(CmdIndex.TEXT).execute(context);
+    execute(new CreateIndex(CmdIndex.TEXT));
     query(_DB_TEXT_RANGE.args(NAME, "Exercise", "Fun"), "Exercise 1\nExercise 2");
     query(_DB_TEXT_RANGE.args(NAME, "XXX", "XXX"), "");
   }
 
-  /**
-   * Test method.
-   * @throws BaseXException database exception
-   */
+  /** Test method. */
   @Test
-  public void attribute() throws BaseXException {
+  public void attribute() {
     // run function without and with index
-    new DropIndex(CmdIndex.ATTRIBUTE).execute(context);
+    execute(new DropIndex(CmdIndex.ATTRIBUTE));
     query(DATA.args(_DB_ATTRIBUTE.args(NAME, "0")), "0");
-    new CreateIndex(CmdIndex.ATTRIBUTE).execute(context);
+    execute(new CreateIndex(CmdIndex.ATTRIBUTE));
     query(DATA.args(_DB_ATTRIBUTE.args(NAME, "0")), "0");
     query(DATA.args(_DB_ATTRIBUTE.args(NAME, "0", "id")), "0");
     query(DATA.args(_DB_ATTRIBUTE.args(NAME, "0", "XXX")), "");
     query(DATA.args(_DB_ATTRIBUTE.args(NAME, "XXX")), "");
   }
 
-  /**
-   * Test method.
-   * @throws BaseXException database exception
-   */
+  /** Test method. */
   @Test
-  public void attributeRange() throws BaseXException {
+  public void attributeRange() {
     // run function without and with index
-    new CreateIndex(CmdIndex.ATTRIBUTE).execute(context);
+    execute(new CreateIndex(CmdIndex.ATTRIBUTE));
     query(_DB_ATTRIBUTE_RANGE.args(NAME, "0", "9") + "/data()", "0\n1");
-    new CreateIndex(CmdIndex.ATTRIBUTE).execute(context);
+    execute(new CreateIndex(CmdIndex.ATTRIBUTE));
     query(_DB_ATTRIBUTE_RANGE.args(NAME, "0", "9") + "/data()", "0\n1");
     query(_DB_ATTRIBUTE_RANGE.args(NAME, "XXX", "XXX"), "");
   }
 
-  /**
-   * Test method.
-   * @throws BaseXException database exception
-   */
+  /** Test method. */
   @Test
-  public void list() throws BaseXException {
+  public void list() {
     // add documents
-    new Add("test/docs", FLDR).execute(context);
+    execute(new Add("test/docs", FLDR));
     contains(_DB_LIST.args(NAME), "test/docs");
     contains(_DB_LIST.args(NAME, "test/"), "test/docs");
     contains(_DB_LIST.args(NAME, "test/docs/input.xml"), "input.xml");
@@ -170,11 +151,11 @@ public final class DbModuleTest extends AdvancedQueryTest {
     query(_DB_LIST.args(NAME, "bin/"), "bin/b");
     query(_DB_LIST.args(NAME, "bin/b"), "bin/b");
     // create two other database and compare substring
-    new CreateDB(NAME + 1).execute(context);
-    new CreateDB(NAME + 2).execute(context);
+    execute(new CreateDB(NAME + 1));
+    execute(new CreateDB(NAME + 2));
     contains(_DB_LIST.args(), NAME + 1 + '\n' + NAME + 2);
-    new DropDB(NAME + 1).execute(context);
-    new DropDB(NAME + 2).execute(context);
+    execute(new DropDB(NAME + 1));
+    execute(new DropDB(NAME + 2));
   }
 
   /** Test method. */
@@ -204,17 +185,16 @@ public final class DbModuleTest extends AdvancedQueryTest {
     error(_DB_LIST_DETAILS.args("mostProbablyNotAvailable"), BXDB_OPEN_X);
   }
 
-  /** Test method.
-   * @throws BaseXException database exception */
+  /** Test method. */
   @Test
-  public void backups() throws BaseXException {
+  public void backups() {
     query(COUNT.args(_DB_BACKUPS.args(NAME)), "0");
-    new CreateBackup(NAME).execute(context);
+    execute(new CreateBackup(NAME));
     query(COUNT.args(_DB_BACKUPS.args()), "1");
     query(COUNT.args(_DB_BACKUPS.args(NAME)), "1");
     query(COUNT.args(_DB_BACKUPS.args(NAME) + "/(@database, @date, @size)"), "3");
     query(COUNT.args(_DB_BACKUPS.args(NAME + 'X')), "0");
-    new DropBackup(NAME).execute(context);
+    execute(new DropBackup(NAME));
     query(COUNT.args(_DB_BACKUPS.args(NAME)), "0");
   }
 
@@ -310,24 +290,18 @@ public final class DbModuleTest extends AdvancedQueryTest {
     query(_DB_ADD.args(NAME, " document { <x xmlns:a='a' a:y='' /> }", "x"));
   }
 
-  /**
-   * Test method.
-   * @throws BaseXException database exception
-   */
+  /** Test method. */
   @Test
-  public void delete() throws BaseXException {
-    new Add("test/docs", FLDR).execute(context);
+  public void delete() {
+    execute(new Add("test/docs", FLDR));
     query(_DB_DELETE.args(NAME, "test"));
     query(COUNT.args(COLLECTION.args(NAME + "/test")), 0);
   }
 
-  /**
-   * Test method.
-   * @throws BaseXException database exception
-   */
+  /** Test method. */
   @Test
-  public void create() throws BaseXException {
-    new Close().execute(context);
+  public void create() {
+    execute(new Close());
 
     // create DB without initial content
     query(_DB_CREATE.args(NAME));
@@ -426,9 +400,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
     error(_DB_CREATE.args(NAME, "()", "()", " map { 'textindex':'nope' }"), BASX_VALUE_X_X);
   }
 
-  /**
-   * Test method.
-   */
+  /** Test method. */
   @Test
   public void drop() {
     // non-existing DB name
@@ -445,30 +417,24 @@ public final class DbModuleTest extends AdvancedQueryTest {
     error(_DB_DROP.args(dbname), BXDB_WHICH_X);
   }
 
-  /**
-   * Test method, using a mix of command and XQuery calls.
-   * @throws BaseXException database exception
-   */
+  /** Test method. */
   @Test
-  public void createCommand() throws BaseXException {
+  public void createCommand() {
     final String dbname = NAME + "DBCreate";
     query(_DB_CREATE.args(dbname));
-    new Open(dbname).execute(context);
+    execute(new Open(dbname));
     error(_DB_CREATE.args(dbname), BXDB_OPENED_X);
     // close and try again
-    new Close().execute(context);
+    execute(new Close());
     query(_DB_CREATE.args(dbname));
     // eventually drop database
     query(_DB_DROP.args(dbname));
   }
 
-  /**
-   * Test method.
-   * @throws BaseXException database exception
-   */
+  /** Test method. */
   @Test
-  public void rename() throws BaseXException {
-    new Add("test/docs", FLDR).execute(context);
+  public void rename() {
+    execute(new Add("test/docs", FLDR));
     query(COUNT.args(COLLECTION.args(NAME + "/test")), NFLDR);
 
     // rename document
@@ -492,13 +458,10 @@ public final class DbModuleTest extends AdvancedQueryTest {
     error(_DB_RENAME.args(NAME, "x/input.xml", " '.'"), BXDB_RENAME_X);
   }
 
-  /**
-   * Test method.
-   * @throws BaseXException database exception
-   */
+  /** Test method. */
   @Test
-  public void replace() throws BaseXException {
-    new Add("test", FILE).execute(context);
+  public void replace() {
+    execute(new Add("test", FILE));
 
     query(_DB_REPLACE.args(NAME, FILE, "\"<R1/>\""));
     query(COUNT.args(COLLECTION.args(NAME + '/' + FILE) + "/R1"), 1);
@@ -514,16 +477,13 @@ public final class DbModuleTest extends AdvancedQueryTest {
     query(COUNT.args(COLLECTION.args(NAME + '/' + FILE) + "/html"), 1);
   }
 
-  /**
-   * Test method.
-   * @throws BaseXException database exception
-   */
+  /** Test method. */
   @Test
-  public void optimize() throws BaseXException {
+  public void optimize() {
     query(_DB_OPTIMIZE.args(NAME));
     query(_DB_OPTIMIZE.args(NAME));
     error(_DB_OPTIMIZE.args(NAME, true), UPDBOPTERR_X);
-    new Close().execute(context);
+    execute(new Close());
     query(_DB_OPTIMIZE.args(NAME, true));
 
     // specify additional index options
@@ -556,22 +516,22 @@ public final class DbModuleTest extends AdvancedQueryTest {
     query(_DB_INFO.args(NAME) + "//attrindex/text()", "false");
     query(_DB_INFO.args(NAME) + "//ftindex/text()", "false");
 
-    new Open(NAME).execute(context);
-    new CreateIndex(CmdIndex.TEXT).execute(context);
-    new CreateIndex(CmdIndex.ATTRIBUTE).execute(context);
-    new CreateIndex(CmdIndex.FULLTEXT).execute(context);
-    new Close().execute(context);
+    execute(new Open(NAME));
+    execute(new CreateIndex(CmdIndex.TEXT));
+    execute(new CreateIndex(CmdIndex.ATTRIBUTE));
+    execute(new CreateIndex(CmdIndex.FULLTEXT));
+    execute(new Close());
 
     query(_DB_OPTIMIZE.args(NAME));
     query(_DB_INFO.args(NAME) + "//textindex/text()", "true");
     query(_DB_INFO.args(NAME) + "//attrindex/text()", "true");
     query(_DB_INFO.args(NAME) + "//ftindex/text()", "true");
 
-    new Open(NAME).execute(context);
-    new DropIndex(CmdIndex.TEXT).execute(context);
-    new DropIndex(CmdIndex.ATTRIBUTE).execute(context);
-    new DropIndex(CmdIndex.FULLTEXT).execute(context);
-    new Close().execute(context);
+    execute(new Open(NAME));
+    execute(new DropIndex(CmdIndex.TEXT));
+    execute(new DropIndex(CmdIndex.ATTRIBUTE));
+    execute(new DropIndex(CmdIndex.FULLTEXT));
+    execute(new Close());
 
     query(_DB_OPTIMIZE.args(NAME));
     query(_DB_INFO.args(NAME) + "//textindex/text()", "false");
@@ -623,12 +583,9 @@ public final class DbModuleTest extends AdvancedQueryTest {
     query(_DB_IS_RAW.args(NAME, "xxx"), "false");
   }
 
-  /**
-   * Test method.
-   * @throws BaseXException database exception
-   */
+  /** Test method. */
   @Test
-  public void exists() throws BaseXException {
+  public void exists() {
     query(_DB_ADD.args(NAME, "\"<a/>\"", "x/xml"));
     query(_DB_STORE.args(NAME, "x/raw", "bla"));
     // checks if the specified resources exist (false expected for directories)
@@ -639,7 +596,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
     query(_DB_EXISTS.args(NAME, "x"), "false");
     query(_DB_EXISTS.args(NAME, ""), "false");
     // false expected for missing database
-    new DropDB(NAME).execute(context);
+    execute(new DropDB(NAME));
     query(_DB_EXISTS.args(NAME), "false");
   }
 
@@ -692,9 +649,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
     query(_DB_PATH.args("<x/> update ()"), "");
   }
 
-  /**
-   * db:create-backup test method.
-   */
+  /** Test method. */
   @Test
   public void createBackup() {
     query(COUNT.args(_DB_BACKUPS.args(NAME)), "0");
@@ -707,9 +662,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
     error(_DB_CREATE_BACKUP.args(NAME + "backup"), BXDB_WHICH_X);
   }
 
-  /**
-   * db:drop-backup test method.
-   */
+  /** Test method. */
   @Test
   public void dropBackup() {
     // create and drop backup
@@ -729,14 +682,11 @@ public final class DbModuleTest extends AdvancedQueryTest {
     error(_DB_CREATE_BACKUP.args(NAME) + ',' + _DB_DROP_BACKUP.args(NAME), BXDB_WHICHBACK_X);
   }
 
-  /**
-   * db:copy test method.
-   * @throws BaseXException database exception
-   */
+  /** Test method. */
   @Test
-  public void copy() throws BaseXException {
+  public void copy() {
     // close database in global context
-    new Close().execute(context);
+    execute(new Close());
 
     // copy database to new name and vice versa
     query(_DB_COPY.args(NAME, NAME + 'c'));
@@ -756,14 +706,11 @@ public final class DbModuleTest extends AdvancedQueryTest {
     error(_DB_COPY.args(NAME + "copy", NAME), BXDB_WHICH_X);
   }
 
-  /**
-   * db:alter test method.
-   * @throws BaseXException database exception
-   */
+  /** Test method. */
   @Test
-  public void alter() throws BaseXException {
+  public void alter() {
     // close database in global context
-    new Close().execute(context);
+    execute(new Close());
 
     // rename database to new name and vice versa
     query(_DB_ALTER.args(NAME, NAME + 'a'));
@@ -779,13 +726,10 @@ public final class DbModuleTest extends AdvancedQueryTest {
     error(_DB_ALTER.args(NAME + "alter", NAME), BXDB_WHICH_X);
   }
 
-  /**
-   * db:restore test method.
-   * @throws BaseXException database exception
-   */
+  /** Test method. */
   @Test
-  public void restore() throws BaseXException {
-    new Close().execute(context);
+  public void restore() {
+    execute(new Close());
 
     // backup and restore file
     query(_DB_CREATE_BACKUP.args(NAME));

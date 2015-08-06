@@ -20,62 +20,58 @@ public final class StoreTest extends SandboxTest {
 
   /**
    * Initializes the tests.
-   * @throws Exception exception
    */
   @BeforeClass
-  public static void init() throws Exception {
+  public static void init() {
     // speed up updates and create initial database
-    run(new Set(MainOptions.TEXTINDEX, false));
-    run(new Set(MainOptions.ATTRINDEX, false));
-    run(new Set(MainOptions.AUTOFLUSH, false));
+    set(MainOptions.TEXTINDEX, false);
+    set(MainOptions.ATTRINDEX, false);
+    set(MainOptions.AUTOFLUSH, false);
   }
 
   /**
    * Replaces text nodes with random double values.
-   * @throws BaseXException database exception
    */
   @Test
-  public void replace() throws BaseXException {
-    run(new CreateDB(NAME, "<X><A>q</A><A>q</A></X>"));
+  public void replace() {
+    execute(new CreateDB(NAME, "<X><A>q</A><A>q</A></X>"));
     final long size = context.data().meta.dbfile(DataText.DATATXT).length();
     for(int n = 0; n < NQUERIES; n++) {
-      run(new XQuery("for $a in //text() return replace node $a with random:double()"));
+      query("for $a in //text() return replace node $a with random:double()");
     }
     check(size);
   }
 
   /**
    * Replaces two text nodes with random integer values.
-   * @throws BaseXException database exception
    */
   @Test
-  public void deleteInsertTwo() throws BaseXException {
-    run(new CreateDB(NAME, "<X><A>q</A><A>q</A></X>"));
+  public void deleteInsertTwo() {
+    execute(new CreateDB(NAME, "<X><A>q</A><A>q</A></X>"));
     final long size = context.data().meta.dbfile(DataText.DATATXT).length();
 
     for(int n = 0; n < NQUERIES; n++) {
       String qu = "for $a in //text() return delete node $a";
-      run(new XQuery(qu));
+      query(qu);
       qu = "for $a in //text() " +
           "let $d := random:integer(" + Integer.MAX_VALUE + ") " +
           "return insert node $a into $d";
-      run(new XQuery(qu));
+      query(qu);
     }
     check(size);
   }
 
   /**
    * Deletes and inserts a text multiple times.
-   * @throws BaseXException database exception
    */
   @Test
-  public void deleteInsert() throws BaseXException {
-    run(new CreateDB(NAME, "<X>abc</X>"));
+  public void deleteInsert() {
+    execute(new CreateDB(NAME, "<X>abc</X>"));
     final long size = context.data().meta.dbfile(DataText.DATATXT).length();
 
     for(int i = 0; i < NQUERIES; i++) {
-      run(new XQuery("delete node //text()"));
-      run(new XQuery("insert node 'abc' into /X"));
+      query("delete node //text()");
+      query("insert node 'abc' into /X");
     }
     check(size);
   }
@@ -83,27 +79,26 @@ public final class StoreTest extends SandboxTest {
   /**
    * Tests the {@link MainOptions#UPDINDEX} and {@link MainOptions#AUTOFLUSH} flags in combination.
    * Reaction on a bug (incremental value index was not correctly closed)
-   * @throws BaseXException database exception
    */
   @Test
-  public void updIndexFlush() throws BaseXException {
+  public void updIndexFlush() {
     try {
       for(int a = 0; a < 1; a++) {
         for(int b = 0; b < 1; b++) {
-          run(new Set(MainOptions.TEXTINDEX, a == 0));
-          run(new Set(MainOptions.UPDINDEX, b == 0));
-          run(new CreateDB(NAME));
+          set(MainOptions.TEXTINDEX, a == 0);
+          set(MainOptions.UPDINDEX, b == 0);
+          execute(new CreateDB(NAME));
           final String input = "<a>0</a>";
-          run(new Add("a.xml", input));
+          execute(new Add("a.xml", input));
           final String query = "doc('" + NAME + "')//*[text()='0']";
-          assertEquals(input, run(new XQuery(query)));
-          run(new Close());
-          assertEquals(input, run(new XQuery(query)));
+          assertEquals(input, query(query));
+          execute(new Close());
+          assertEquals(input, query(query));
         }
       }
     } finally {
-      run(new Set(MainOptions.TEXTINDEX, false));
-      run(new Set(MainOptions.UPDINDEX, false));
+      set(MainOptions.TEXTINDEX, false);
+      set(MainOptions.UPDINDEX, false);
     }
   }
 
@@ -113,15 +108,5 @@ public final class StoreTest extends SandboxTest {
    */
   private static void check(final long old) {
     assertEquals(old, context.data().meta.dbfile(DataText.DATATXT).length());
-  }
-
-  /**
-   * Runs the specified command.
-   * @param cmd command to be run
-   * @return string result
-   * @throws BaseXException database exception
-   */
-  private static String run(final Command cmd) throws BaseXException {
-    return cmd.execute(context);
   }
 }

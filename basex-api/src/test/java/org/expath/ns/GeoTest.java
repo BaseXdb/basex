@@ -3,9 +3,10 @@ package org.expath.ns;
 import static org.basex.query.QueryError.*;
 import static org.junit.Assert.*;
 
-import org.basex.AdvancedQueryTest;
+import org.basex.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
+import org.basex.util.*;
 import org.junit.*;
 
 /**
@@ -14,7 +15,7 @@ import org.junit.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Masoumeh Seydi
  */
-public final class GeoTest extends AdvancedQueryTest {
+public final class GeoTest extends SandboxTest {
   /** Test method. */
   @Test
   public void dimension() {
@@ -864,8 +865,9 @@ public final class GeoTest extends AdvancedQueryTest {
    * @param result result
    */
   private static void run(final String query, final String result) {
-    query("import module namespace geo='http://expath.org/ns/geo'; " +
-          "declare namespace gml='http://www.opengis.net/gml';" + query, result);
+    final String qu = "import module namespace geo='http://expath.org/ns/geo'; " +
+        "declare namespace gml='http://www.opengis.net/gml';" + query;
+    assertEquals(result, query(qu).replaceAll(Prop.NL + "\\s*", ""));
   }
 
   /**

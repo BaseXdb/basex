@@ -41,42 +41,44 @@ public final class ValueIndexTest extends QueryPlanTest {
     return params;
   }
 
-  /** Initializes a test. */
+  /**
+   * Initializes a test.
+   */
   @Before
   public void before() {
-    context.options.set(MainOptions.MAINMEM, (Boolean) mainmem);
+    set(MainOptions.MAINMEM, mainmem);
   }
 
-  /** Finalizes a test. */
+  /**
+   * Finalizes a test.
+   */
   @After
   public void after() {
-    context.options.set(MainOptions.MAINMEM, false);
-    context.options.set(MainOptions.UPDINDEX, false);
-    context.options.set(MainOptions.FTINDEX, false);
-    context.options.set(MainOptions.TEXTINCLUDE, "");
-    context.options.set(MainOptions.ATTRINCLUDE, "");
-    context.options.set(MainOptions.FTINCLUDE, "");
+    set(MainOptions.MAINMEM, false);
+    set(MainOptions.UPDINDEX, false);
+    set(MainOptions.FTINDEX, false);
+    set(MainOptions.TEXTINCLUDE, "");
+    set(MainOptions.ATTRINCLUDE, "");
+    set(MainOptions.FTINCLUDE, "");
   }
 
   /**
    * Initializes the tests.
-   * @throws BaseXException database exception
    */
   @BeforeClass
-  public static void start() throws BaseXException {
-    new CreateDB(NAME, FILE).execute(context);
+  public static void start() {
+    execute(new CreateDB(NAME, FILE));
   }
 
   /**
    * Tests the text index.
-   * @throws BaseXException database exception
    */
   @Test
-  public void textIndex() throws BaseXException {
+  public void textIndex() {
     for(final Map.Entry<String, String> entry : map().entrySet()) {
       final String key = entry.getKey(), value = entry.getValue();
-      context.options.set(MainOptions.TEXTINCLUDE, key);
-      new CreateDB(NAME, FILE).execute(context);
+      set(MainOptions.TEXTINCLUDE, key);
+      execute(new CreateDB(NAME, FILE));
       check("count(//" + key + "[text() = " + value + "])",
           Integer.toString(value.split(",").length), "exists(//ValueAccess)");
       if(!key.equals("*")) check("//X[text() = 'unknown']", "", "exists(//DBNode)");
@@ -85,14 +87,13 @@ public final class ValueIndexTest extends QueryPlanTest {
 
   /**
    * Tests the attribute index.
-   * @throws BaseXException database exception
    */
   @Test
-  public void attrIndex() throws BaseXException {
+  public void attrIndex() {
     for(final Map.Entry<String, String> entry : map().entrySet()) {
       final String key = entry.getKey(), value = entry.getValue();
-      context.options.set(MainOptions.ATTRINCLUDE, key);
-      new CreateDB(NAME, FILE).execute(context);
+      set(MainOptions.ATTRINCLUDE, key);
+      execute(new CreateDB(NAME, FILE));
       check("count(//*[@" + key + " = " + value + "])",
           Integer.toString(value.split(",").length), "exists(//ValueAccess)");
       if(!key.equals("*")) check("//*[@x = 'unknown']", "", "exists(//DBNode)");
@@ -101,18 +102,17 @@ public final class ValueIndexTest extends QueryPlanTest {
 
   /**
    * Tests the full-text index.
-   * @throws BaseXException database exception
    */
   @Test
-  public void fulltextIndex() throws BaseXException {
+  public void fulltextIndex() {
     // not applicable in main-memory mode
     if(((Boolean) mainmem).booleanValue()) return;
 
-    context.options.set(MainOptions.FTINDEX, true);
+    set(MainOptions.FTINDEX, true);
     for(final Map.Entry<String, String> entry : map().entrySet()) {
       final String key = entry.getKey(), value = entry.getValue();
-      context.options.set(MainOptions.FTINCLUDE, key);
-      new CreateDB(NAME, FILE).execute(context);
+      set(MainOptions.FTINCLUDE, key);
+      execute(new CreateDB(NAME, FILE));
       check("count(//" + key + "[text() contains text { " + value + " }])",
           Integer.toString(value.split(",").length),
           "exists(//" + Util.className(FTIndexAccess.class) + ")");
@@ -122,38 +122,37 @@ public final class ValueIndexTest extends QueryPlanTest {
 
   /**
    * Tests the text index and update operations.
-   * @throws BaseXException database exception
    */
   @Test
-  public void textUpdates() throws BaseXException {
+  public void textUpdates() {
     // [CG] MAINMEM: needs to be fixed
     if(((Boolean) mainmem).booleanValue()) return;
 
-    context.options.set(MainOptions.UPDINDEX, true);
+    set(MainOptions.UPDINDEX, true);
 
-    context.options.set(MainOptions.TEXTINCLUDE, "a");
-    new CreateDB(NAME, "<x><a>text</a><b>TEXT</b></x>").execute(context);
+    set(MainOptions.TEXTINCLUDE, "a");
+    execute(new CreateDB(NAME, "<x><a>text</a><b>TEXT</b></x>"));
     check("count(//a[text() = 'text'])", "1", "exists(//ValueAccess)");
     check("count(//b[text() = 'TEXT'])", "1", "empty(//ValueAccess)");
 
-    new XQuery("replace value of node x/a with 'TEXT'").execute(context);
+    query("replace value of node x/a with 'TEXT'");
     check("count(//a[text() = 'TEXT'])", "1", "exists(//ValueAccess)");
 
-    new XQuery("rename node x/a as 'b'").execute(context);
+    query("rename node x/a as 'b'");
     check("//a[text() = 'TEXT']", "", "exists(//Empty)");
     check("count(//b[text() = 'TEXT'])", "2", "empty(ValueAccess)");
 
-    new XQuery("x/b/(rename node . as 'a')").execute(context);
+    query("x/b/(rename node . as 'a')");
     check("count(//a[text() = 'TEXT'])", "2", "exists(//ValueAccess)");
     check("count(//b[text() = 'TEXT'])", "0", "empty(//ValueAccess)");
 
-    new XQuery("x/a/(replace value of node . with 'text')").execute(context);
+    query("x/a/(replace value of node . with 'text')");
     check("count(//a[text() = 'text'])", "2", "exists(//ValueAccess)");
 
-    new XQuery("delete node x/a[1]").execute(context);
+    query("delete node x/a[1]");
     check("count(//a[text() = 'text'])", "1", "exists(//ValueAccess)");
 
-    new XQuery("delete node x/a[1]").execute(context);
+    query("delete node x/a[1]");
     check("//a[text() = 'text']", "", "exists(//Empty)");
   }
 

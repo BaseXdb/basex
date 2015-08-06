@@ -51,7 +51,7 @@ public final class Delete extends Benchmark {
    */
   @Test
   public void texts1000() throws Exception {
-    final String qu = query("count(//text())");
+    final String qu = eval("count(//text())");
     final int n = Math.min(1000, Integer.parseInt(qu.trim()));
     update(n, "delete node (//text())[1]");
   }

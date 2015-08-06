@@ -5,7 +5,6 @@ import static org.basex.query.func.Function.*;
 
 import java.util.*;
 
-import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.query.*;
 import org.basex.server.*;
@@ -21,20 +20,18 @@ import org.junit.Test;
 public final class AdminModuleTest extends AdvancedQueryTest {
   /**
    * Init method.
-   * @throws BaseXException database exception
    */
   @BeforeClass
-  public static void init() throws BaseXException {
-    new CreateDB(NAME).execute(context);
+  public static void init() {
+    execute(new CreateDB(NAME));
   }
 
   /**
    * Init method.
-   * @throws BaseXException database exception
    */
   @AfterClass
-  public static void finish() throws BaseXException {
-    new DropDB(NAME).execute(context);
+  public static void finish() {
+    execute(new DropDB(NAME));
   }
 
   /** Test method. */

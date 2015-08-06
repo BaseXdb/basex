@@ -18,21 +18,20 @@ import org.junit.Test;
 public final class LocalConcurrencyTest extends SandboxTest {
   /**
    * Test for concurrently accessing and modifying users.
-   * @throws Exception exception
    */
   @Test
-  public void userTest() throws Exception {
+  public void userTest() {
     final AtomicInteger counter = new AtomicInteger();
     final Exception[] error = new Exception[1];
     final int runs = 250;
 
     try {
-      new CreateDB("store").execute(context);
-      new CreateUser("user", "").execute(context);
-      new Grant("write", "user").execute(context);
+      execute(new CreateDB("store"));
+      execute(new CreateUser("user", ""));
+      execute(new Grant("write", "user"));
 
       for(int d = 0; d < runs; d++) {
-        new Grant("write", "user", "doc" + d).execute(context);
+        execute(new Grant("write", "user", "doc" + d));
         new Thread() {
           @Override
           public void run() {
@@ -47,8 +46,8 @@ public final class LocalConcurrencyTest extends SandboxTest {
       }
     } finally {
       while(counter.get() < runs && error[0] == null) Thread.yield();
-      new DropDB("store").execute(context);
-      new DropUser("user").execute(context);
+      execute(new DropDB("store"));
+      execute(new DropUser("user"));
 
       if(error[0] != null) {
         error[0].printStackTrace();

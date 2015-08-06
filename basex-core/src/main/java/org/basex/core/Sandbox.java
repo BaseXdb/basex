@@ -1,17 +1,22 @@
 package org.basex.core;
 
 import static org.basex.core.Text.*;
+import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.concurrent.*;
 
 import org.basex.*;
 import org.basex.api.client.*;
+import org.basex.core.cmd.*;
 import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
+import org.basex.io.serial.*;
+import org.basex.query.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
+import org.basex.util.options.*;
 
 /**
  * If this class is extended, tests will be run in a sandbox.
@@ -20,8 +25,22 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public abstract class Sandbox {
+  /** Base uri. */
+  private static final String BASEURI = new File(".").getAbsolutePath();
+
   /** Database port. */
   protected static final int DB_PORT = 9996;
+  /** HTTP stop port. */
+  protected static final int STOP_PORT = 9999;
+  /** HTTP port. */
+  protected static final int HTTP_PORT = 9998;
+
+  /** REST identifier. */
+  protected static final String REST = "rest";
+  /** Root path. */
+  protected static final String HTTP_ROOT = "http://" + Text.S_LOCALHOST + ':' + HTTP_PORT + '/';
+  /** Root path. */
+  protected static final String REST_ROOT = HTTP_ROOT + REST + '/';
 
   /** Default output stream. */
   public static final PrintStream OUT = System.out;
@@ -33,6 +52,81 @@ public abstract class Sandbox {
   protected static final String NAME = Util.className(Sandbox.class);
   /** Database context. */
   protected static Context context;
+
+  /**
+   * Executes a command and returns exceptions into assertion errors.
+   * @param cmd command to be run
+   * @return string result
+   */
+  protected static String execute(final Command cmd) {
+    try {
+      return cmd.execute(context);
+    } catch(final BaseXException ex) {
+      Util.stack(ex);
+      final AssertionError err = new AssertionError(ex.getMessage());
+      err.initCause(ex);
+      throw err;
+    }
+  }
+
+  /**
+   * Sets an option and returns exceptions into assertion errors.
+   * @param option option to be set
+   * @param value value to be assigned
+   */
+  protected static void set(final Option<?> option, final Object value) {
+    execute(new Set(option.name(), value));
+  }
+
+  /**
+   * Runs a query and returns exceptions into assertion errors.
+   * @param query query to be evaluated
+   * @return string result
+   */
+  protected static String query(final String query) {
+    try {
+      return eval(query);
+    } catch(final QueryException | IOException ex) {
+      Util.stack(ex);
+      final AssertionError err = new AssertionError("Query failed:\n" + query);
+      err.initCause(ex);
+      throw err;
+    }
+  }
+
+  /**
+   * Runs a query.
+   * @param query query string
+   * @return result
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
+   */
+  protected static String eval(final String query) throws QueryException, IOException {
+    final ArrayOutput ao = new ArrayOutput();
+    try(final QueryProcessor qp = new QueryProcessor(query, context)) {
+      qp.sc.baseURI(BASEURI);
+      try(final Serializer ser = qp.getSerializer(ao)) {
+        qp.value().serialize(ser);
+      }
+    }
+    return ao.toString();
+  }
+
+  /**
+   * Writes a test file.
+   * @param file file
+   * @param data data to write
+   */
+  protected static void write(final IOFile file, final String data) {
+    try {
+      file.write(token(data));
+    } catch(final IOException ex) {
+      Util.stack(ex);
+      final AssertionError err = new AssertionError(ex.getMessage());
+      err.initCause(ex);
+      throw err;
+    }
+  }
 
   /**
    * Creates the sandbox.

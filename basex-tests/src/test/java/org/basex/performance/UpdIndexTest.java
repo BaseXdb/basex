@@ -8,8 +8,6 @@ import java.util.List;
 import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.core.cmd.Set;
-import org.basex.query.*;
 import org.junit.*;
 import org.junit.Test;
 import org.junit.runner.*;
@@ -30,7 +28,9 @@ public final class UpdIndexTest extends SandboxTest {
    */
   @Parameters
   public static List<Object[]> params() {
-    return Arrays.asList(new Object[][] { { false }, { true } });
+    return Arrays.asList(new Object[][] {
+        { false, false }, { true, false }, { false, true }, { true, true }
+    });
   }
 
   /** Number of steps. */
@@ -40,46 +40,46 @@ public final class UpdIndexTest extends SandboxTest {
 
   /** Incremental index update flag. */
   private final boolean updindex;
+  /** Main memory flag. */
+  private final boolean mainmem;
 
   /**
    * Constructor.
    * @param updindex incremental index update flag.
+   * @param mainmem main memory flag
    */
-  public UpdIndexTest(final boolean updindex) {
+  public UpdIndexTest(final boolean updindex, final boolean mainmem) {
     this.updindex = updindex;
+    this.mainmem = mainmem;
   }
 
   /**
    * Initializes the test.
-   * @throws Exception exception
    */
   @Before
-  public void init() throws Exception {
-    new Set(MainOptions.UPDINDEX, updindex).execute(context);
-    new CreateDB(NAME, "<xml/>").execute(context);
-    new Set(MainOptions.AUTOFLUSH, false).execute(context);
+  public void init() {
+    set(MainOptions.UPDINDEX, updindex);
+    set(MainOptions.MAINMEM, mainmem);
+    execute(new CreateDB(NAME, "<xml/>"));
+    set(MainOptions.AUTOFLUSH, false);
   }
 
   /**
    * Finishes the test.
-   * @throws Exception exception
    */
   @After
-  public void finish() throws Exception {
-    new DropDB(NAME).execute(context);
+  public void finish() {
+    execute(new DropDB(NAME));
   }
 
   /**
    * Incremental test.
-   * @throws Exception exception
    */
   @Test
-  public void insertInto() throws Exception {
+  public void insertInto() {
     for(int a = 0; a < STEPS; a++) {
       final int n = MAX * a;
-      for(int i = 0; i < n; i++) {
-        query("insert node <x/> into /*");
-      }
+      for(int i = 0; i < n; i++) query("insert node <x/> into /*");
       query("count(//x)", n);
       query("delete node //x");
       query("count(//x)", 0);
@@ -88,10 +88,9 @@ public final class UpdIndexTest extends SandboxTest {
 
   /**
    * Incremental test.
-   * @throws Exception exception
    */
   @Test
-  public void insertBefore() throws Exception {
+  public void insertBefore() {
     for(int a = 0; a < STEPS; a++) {
       final int n = MAX * a;
       for(int i = 0; i < n; i++) {
@@ -105,10 +104,9 @@ public final class UpdIndexTest extends SandboxTest {
 
   /**
    * Incremental test.
-   * @throws Exception exception
    */
   @Test
-  public void insertAfter() throws Exception {
+  public void insertAfter() {
     for(int a = 0; a < STEPS; a++) {
       final int n = MAX * a;
       for(int i = 0; i < n; i++) {
@@ -122,10 +120,9 @@ public final class UpdIndexTest extends SandboxTest {
 
   /**
    * Incremental test.
-   * @throws Exception exception
    */
   @Test
-  public void insertDeep() throws Exception {
+  public void insertDeep() {
     for(int a = 0; a < STEPS; a++) {
       final int n = MAX * a;
       for(int i = 0; i < n; i++) {
@@ -139,10 +136,9 @@ public final class UpdIndexTest extends SandboxTest {
 
   /**
    * Incremental test.
-   * @throws Exception exception
    */
   @Test
-  public void replaceValue() throws Exception {
+  public void replaceValue()  {
     final Random rnd = new Random();
     final StringBuilder sb = new StringBuilder();
     for(int i = 0; i < MAX * STEPS; i++) {
@@ -153,24 +149,11 @@ public final class UpdIndexTest extends SandboxTest {
   }
 
   /**
-   * Runs the specified query.
-   * @param query query string
-   * @return result
-   * @throws Exception exception
-   */
-  protected static String query(final String query) throws Exception {
-    try(final QueryProcessor qp = new QueryProcessor(query, context)) {
-      return normNL(qp.value().serialize().toString());
-    }
-  }
-
-  /**
    * Checks if a query yields the specified string.
    * @param query query to be run
    * @param result query result
-   * @throws Exception exception
    */
-  protected static void query(final String query, final Object result) throws Exception {
+  protected static void query(final String query, final Object result) {
     assertEquals(result.toString(), query(query));
   }
 }
