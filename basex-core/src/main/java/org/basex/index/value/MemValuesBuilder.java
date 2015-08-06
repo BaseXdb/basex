@@ -36,6 +36,7 @@ public class MemValuesBuilder extends ValuesBuilder {
         count++;
       }
     }
+    index.finish();
     finishIndex();
     return index;
   }

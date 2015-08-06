@@ -238,8 +238,7 @@ public final class Array {
   }
 
   /**
-   * Returns a value for a new array size, which will always be larger than
-   * the specified value.
+   * Returns a value for a new array size, which will always be larger than the specified value.
    * @param old old size
    * @param factor resize factor; must be larger than or equal to 1
    * @return resulting size

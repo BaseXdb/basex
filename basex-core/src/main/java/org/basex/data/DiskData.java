@@ -37,7 +37,6 @@ public final class DiskData extends Data {
       return new Compress();
     }
   };
-
   /** Texts access file. */
   private DataAccess texts;
   /** Values access file. */

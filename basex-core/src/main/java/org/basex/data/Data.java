@@ -103,11 +103,11 @@ public abstract class Data {
 
   /** Indicates if distances are to be updated. */
   public boolean updateDists = true;
+  /** ID->PRE mapping. */
+  public IdPreMap idmap;
 
   /** Table access file. */
   protected TableAccess table;
-  /** ID->PRE mapping. */
-  protected IdPreMap idmap;
 
   /**
    * Default constructor.

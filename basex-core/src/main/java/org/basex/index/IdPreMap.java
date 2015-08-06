@@ -82,6 +82,14 @@ public class IdPreMap {
   }
 
   /**
+   * Finishes database creation.
+   * @param base last id
+   */
+  public void finish(final int base) {
+    baseid = base;
+  }
+
+  /**
    * Finds the PRE value of a given ID.
    * @param id ID
    * @return PRE or -1 if the ID is already deleted
@@ -166,7 +174,7 @@ public class IdPreMap {
    * Deletes records.
    * @param pre PRE of the first record
    * @param id ID of the first deleted record
-   * @param c number of deleted records
+   * @param c number of deleted records (negative)
    */
   public void delete(final int pre, final int id, final int c) {
     if(rows == 0 && pre == id && id - c == baseid + 1) {
@@ -370,22 +378,13 @@ public class IdPreMap {
   @Override
   public String toString() {
     final Table t = new Table();
-    t.header.add("pres");
-    t.header.add("fids");
-    t.header.add("nids");
-    t.header.add("incs");
-    t.header.add("oids");
+    t.header.add("PRE").add("FID").add("NID").add("INC").add("OID");
     for(int i = 0; i < 5; ++i) t.align.add(true);
-
     for(int i = 0; i < rows; i++) {
       final TokenList tl = new TokenList();
-      tl.add(Token.token(pres[i]));
-      tl.add(Token.token(fids[i]));
-      tl.add(Token.token(nids[i]));
-      tl.add(Token.token(incs[i]));
-      tl.add(Token.token(oids[i]));
+      tl.add(pres[i]).add(fids[i]).add(nids[i]).add(incs[i]).add(oids[i]);
       t.contents.add(tl);
     }
-    return t.toString();
+    return t + "\n- BaseID: " + baseid + '\n';
   }
 }

@@ -467,24 +467,26 @@ public class DiskValues extends ValueIndex {
    * @return string
    */
   public final String toString(final boolean all) {
-    // should not be called during an update, because it may return an invalid state
     final int sz = size();
     final TokenBuilder tb = new TokenBuilder();
     tb.add(text ? "TEXT" : "ATTRIBUTE").add(" INDEX, '").add(data.meta.name).add("':\n");
     if(sz != 0) {
-      tb.add("- entries: ").addInt(sz).add("\n");
-      tb.add("- references:").add("\n");
       for(int m = 0; m < sz; m++) {
         final long pos = idxr.read5(m * 5L);
         final int oc = idxl.readNum(pos);
         int id = idxl.readNum();
-        final int pre = pre(id);
+        final int pre = all ? pre(id) : 0;
         tb.add("  ").addInt(m).add(". offset: ").addLong(pos);
-        if(all) tb.add(", key: \"").add(data.text(pre, text));
-        tb.add("\", ids/pres: ").addInt(id).add('/').addInt(pre);
+        if(all) tb.add(", key: \"").add(data.text(pre, text)).add('"');
+        tb.add(", ids");
+        if(all) tb.add("/pres");
+        tb.add(": ");
+        tb.addInt(id);
+        if(all) tb.add('/').addInt(pre);
         for(int n = 1; n < oc; n++) {
           id += idxl.readNum();
-          tb.add(",").addInt(id).add('/').addInt(pre(id));
+          tb.add(",").addInt(id);
+          if(all) tb.add('/').addInt(pre(id));
         }
         tb.add("\n");
       }

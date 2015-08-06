@@ -125,9 +125,6 @@ public final class ValueIndexTest extends QueryPlanTest {
    */
   @Test
   public void textUpdates() {
-    // [CG] MAINMEM: needs to be fixed
-    if(((Boolean) mainmem).booleanValue()) return;
-
     set(MainOptions.UPDINDEX, true);
 
     set(MainOptions.TEXTINCLUDE, "a");

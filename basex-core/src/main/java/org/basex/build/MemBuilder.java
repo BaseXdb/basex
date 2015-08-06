@@ -108,6 +108,7 @@ public final class MemBuilder extends Builder {
   @Override
   public void close() throws IOException {
     parser.close();
+    if(data.meta.updindex) data.idmap.finish(data.meta.lastid);
   }
 
   @Override

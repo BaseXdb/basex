@@ -38,7 +38,7 @@ public final class MemData extends Data {
   }
 
   /**
-   * Constructor, creating a new, empty database.
+   * Constructor for creating a new, empty database.
    * @param opts database options
    */
   public MemData(final MainOptions opts) {
@@ -46,7 +46,7 @@ public final class MemData extends Data {
   }
 
   /**
-   * Constructor.
+   * Constructor for building a new database.
    * @param elemNames element name index
    * @param attrNames attribute name index
    * @param paths path summary

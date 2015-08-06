@@ -51,7 +51,7 @@ public abstract class IdPreMapBulkTestBase {
   /**
    * Delete a &lt;pre, id&gt; pair from {@link #basemap} and {@link #testedmap}.
    * @param pre pre value
-   * @param c number of deleted records
+   * @param c number of deleted records (negative)
    */
   final void delete(final int pre, final int c) {
     ops.add(new int[] { pre, basemap.id(pre), c});
