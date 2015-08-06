@@ -35,12 +35,13 @@ public final class DbReplace extends DbNew {
 
     // delete binary resources
     final IOFile bin = data.meta.binary(path);
-    if(bin == null || bin.isDir()) throw BXDB_REPLACE_X.get(info, path);
+    final boolean disk = !data.inMemory();
+    if(disk && (bin == null || bin.isDir())) throw BXDB_REPLACE_X.get(info, path);
 
-    if(item instanceof Bin) {
+    if(disk && item instanceof Bin) {
       updates.add(new DBStore(data, path, item, info), qc);
     } else {
-      if(bin.exists()) updates.add(new DBDelete(data, path, info), qc);
+      if(disk && bin.exists()) updates.add(new DBDelete(data, path, info), qc);
       final NewInput input = checkInput(item, token(path));
       if(docs.isEmpty()) {
         updates.add(new DBAdd(data, input, opts, qc, info), qc);

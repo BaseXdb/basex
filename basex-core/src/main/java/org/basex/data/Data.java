@@ -708,6 +708,7 @@ public abstract class Data {
    */
   public final void insert(final int pre, final int par, final DataClip source) {
     meta.update();
+    resources.docs();
 
     // resize buffer to cache more entries
     final int sCount = source.size();

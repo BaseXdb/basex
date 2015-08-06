@@ -34,8 +34,7 @@ public final class IndexTest extends AdvancedQueryTest {
   public static Collection<Object[]> params() {
     final List<Object[]> params = new ArrayList<>();
     params.add(new Object[] { false });
-    // [CG] MAINMEM: fix bugs
-    //params.add(new Object[] { true });
+    params.add(new Object[] { true });
     return params;
   }
 

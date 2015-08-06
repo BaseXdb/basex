@@ -38,6 +38,14 @@ public final class MemData extends Data {
   }
 
   /**
+   * Constructor, creating a new, empty database.
+   * @param opts database options
+   */
+  public MemData(final MainOptions opts) {
+    this(null, null, opts);
+  }
+
+  /**
    * Constructor.
    * @param elemNames element name index
    * @param attrNames attribute name index
@@ -60,14 +68,6 @@ public final class MemData extends Data {
     this.attrNames = attrNames == null ? new Names(meta) : attrNames;
     this.paths = paths == null ? new PathSummary(this) : paths;
     this.nspaces = nspaces == null ? new Namespaces() : nspaces;
-  }
-
-  /**
-   * Constructor, creating a new, empty database.
-   * @param opts database options
-   */
-  public MemData(final MainOptions opts) {
-    this(null, null, opts);
   }
 
   @Override

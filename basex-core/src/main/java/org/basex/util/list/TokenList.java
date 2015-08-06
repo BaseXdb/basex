@@ -94,17 +94,21 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
   /**
    * Adds a long value.
    * @param element element to be added
+   * @return self reference
    */
-  public void add(final long element) {
+  public TokenList add(final long element) {
     add(token(element));
+    return this;
   }
 
   /**
    * Adds a string.
    * @param element element to be added
+   * @return self reference
    */
-  public void add(final String element) {
+  public TokenList add(final String element) {
     add(token(element));
+    return this;
   }
 
   /**

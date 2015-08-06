@@ -327,4 +327,18 @@ final class Docs {
   private static byte[] normalize(final byte[] path) {
     return concat(SLASH, Prop.CASE ? path : lc(path));
   }
+
+  @Override
+  public String toString() {
+    final Table table = new Table();
+    table.header.add(TABLEPRE);
+    table.header.add(TABLECON);
+
+    final TokenList tl = new TokenList();
+    final int ds = paths().size();
+    for(int d = 0; d < ds; d++) {
+      table.contents.add(tl.add(docList.get(d)).add(pathList.get(d)));
+    }
+    return table.toString();
+  }
 }

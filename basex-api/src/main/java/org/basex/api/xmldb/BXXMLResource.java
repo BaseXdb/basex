@@ -186,7 +186,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
   /** SAX parser. */
   private static final class BXSAXContentHandler extends SAXHandler {
     /** XMLResource. */
-    private final BXXMLResource res;
+    private final BXXMLResource resource;
 
     /**
      * Default constructor.
@@ -195,13 +195,13 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
      */
     BXSAXContentHandler(final BXXMLResource resource, final MemBuilder builder) {
       super(builder, false, false);
-      res = resource;
+      this.resource = resource;
     }
 
     @Override
     public void endDocument() throws SAXException {
       try {
-        res.content = new DBNode(((MemBuilder) builder).data()).serialize().toArray();
+        resource.content = new DBNode(((MemBuilder) builder).data()).serialize().toArray();
       } catch(final QueryIOException ex) {
         error(new BaseXException(ex));
       }
