@@ -228,7 +228,8 @@ public final class StaticFuncs extends ExprInfo {
     for(final FuncCache fc : funcs.values()) {
       final StaticFunc sf = fc.func;
       if(sf != null && sf.expr != null && ls.similar(nm, lc(sf.name.local()))) {
-        qe = FUNCSIMILAR_X_X.get(ii, name.string(), sf.name.string());
+        final boolean eq = eq(name.prefix(), sf.name.prefix());
+        qe = FUNCSIMILAR_X_X.get(ii, name.string(), eq ? sf.name.id() : sf.name.string());
         break;
       }
     }
