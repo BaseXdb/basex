@@ -1066,7 +1066,7 @@ public abstract class Data {
   private TokenObjMap<IntList> cache(final int pre, final int size, final boolean text) {
     final IntList pres = new IntList(size);
     final int last = pre + size;
-    for(int curr = 0; curr < last; ++curr) pres.add(curr);
+    for(int curr = pre; curr < last; ++curr) pres.add(curr);
     return cache(pres, text);
   }
 

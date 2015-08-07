@@ -23,12 +23,11 @@ public final class MemValues extends ValueIndex {
   /** Values. */
   private final TokenSet values;
   /** IDs lists. */
-  private ArrayList<int[]> ids;
+  private ArrayList<int[]> idsList;
   /** ID array lengths. */
-  private IntList len;
-
+  private IntList lenList;
   /** Order flags. */
-  private BoolList orders;
+  private BoolList reorder;
 
   /**
    * Constructor.
@@ -39,37 +38,40 @@ public final class MemValues extends ValueIndex {
     super(data, text);
     values = ((MemData) data).values(text);
     final int s = values.size() + 1;
-    ids = new ArrayList<>(s);
-    len = new IntList(s);
-    orders = new BoolList(s);
+    idsList = new ArrayList<>(s);
+    lenList = new IntList(s);
+    reorder = new BoolList(s);
   }
 
   @Override
   public IndexIterator iter(final IndexToken token) {
     final int id = values.id(token.get());
-    if(id > 0) {
-      final int s = len.get(id);
-      final int[] tmp = ids.get(id);
-      final IntList pres = new IntList(s);
-      for(int i = 0; i < s; ++i) pres.add(data.pre(tmp[i]));
-      pres.sort();
+    if(id == 0) return IndexIterator.EMPTY;
 
-      return new IndexIterator() {
-        int p = -1;
-        @Override
-        public boolean more() { return ++p < s; }
-        @Override
-        public int pre() { return pres.get(p); }
-        @Override
-        public int size() { return s; }
-      };
+    final int len = lenList.get(id);
+    final int[] ids = idsList.get(id), pres;
+    if(data.meta.updindex) {
+      final IntList tmp = new IntList();
+      for(int i = 0; i < len; ++i) tmp.add(data.pre(ids[i]));
+      pres = tmp.sort().finish();
+    } else {
+      pres = ids;
     }
-    return IndexIterator.EMPTY;
+
+    return new IndexIterator() {
+      int p;
+      @Override
+      public boolean more() { return p < len; }
+      @Override
+      public int pre() { return pres[p++]; }
+      @Override
+      public int size() { return len; }
+    };
   }
 
   @Override
   public int costs(final IndexToken it) {
-    return len.get(values.id(it.get()));
+    return lenList.get(values.id(it.get()));
   }
 
   @Override
@@ -77,18 +79,19 @@ public final class MemValues extends ValueIndex {
     final byte[] prefix = entries.get();
     return new EntryIterator() {
       final int s = values.size();
-      int c;
+      int p;
       @Override
       public byte[] next() {
-        while(++c < s) {
-          final byte[] key = values.key(c);
-          if(startsWith(key, prefix) && ids.get(c).length > 0) return key;
+        while(++p <= s) {
+          if(lenList.get(p) == 0) continue;
+          final byte[] key = values.key(p);
+          if(startsWith(key, prefix)) return key;
         }
         return null;
       }
       @Override
       public int count() {
-        return len.get(c);
+        return lenList.get(p);
       }
     };
   }
@@ -101,9 +104,9 @@ public final class MemValues extends ValueIndex {
 
     final IndexStats stats = new IndexStats(options.get(MainOptions.MAXSTAT));
     final int s = values.size();
-    for(int c = 1; c < s; c++) {
-      final int oc = len.get(c);
-      if(stats.adding(oc)) stats.add(values.key(c), oc);
+    for(int p = 1; p <= s; p++) {
+      final int oc = lenList.get(p);
+      if(oc > 0 && stats.adding(oc)) stats.add(values.key(p), oc);
     }
     stats.print(tb);
     return tb.finish();
@@ -113,16 +116,14 @@ public final class MemValues extends ValueIndex {
   public int size() {
     // returns the actual number of indexed entries
     int s = 0;
-    for(int c = 1; c < s; c++) {
-      if(len.get(c) > 0) s++;
-    }
+    for(int c = 1; c < s; c++) if(lenList.get(c) > 0) s++;
     return s;
   }
 
   @Override
   public boolean drop() {
-    ids = null;
-    len = null;
+    idsList = null;
+    lenList = null;
     return true;
   }
 
@@ -153,34 +154,34 @@ public final class MemValues extends ValueIndex {
 
     // if required, resize existing arrays
     final int id = values.id(key), vl = vals.length;
-    while(ids.size() < id + 1) ids.add(null);
-    if(len.size() < id + 1) len.set(id, 0);
+    while(idsList.size() < id + 1) idsList.add(null);
+    if(lenList.size() < id + 1) lenList.set(id, 0);
 
-    final int l = len.get(id), s = l + vl;
-    int[] tmp = ids.get(id);
-    if(tmp == null) {
-      tmp = vals;
+    final int len = lenList.get(id), size = len + vl;
+    int[] ids = idsList.get(id);
+    if(ids == null) {
+      ids = vals;
     } else {
-      if(tmp.length < s) tmp = Arrays.copyOf(tmp, Array.newSize(s));
-      System.arraycopy(vals, 0, tmp, l, vl);
-      if(tmp[l - 1] > vals[0]) {
-        if(orders == null) orders = new BoolList(values.size());
-        orders.set(id, true);
+      if(ids.length < size) ids = Arrays.copyOf(ids, Array.newSize(size));
+      System.arraycopy(vals, 0, ids, len, vl);
+      if(ids[len - 1] > vals[0]) {
+        if(reorder == null) reorder = new BoolList(values.size());
+        reorder.set(id, true);
       }
     }
-    ids.set(id, tmp);
-    len.set(id, s);
+    idsList.set(id, ids);
+    lenList.set(id, size);
   }
 
   /**
    * Finishes the index creation.
    */
   void finish() {
-    if(orders == null) return;
-    for(int i = 1; i < orders.size(); i++) {
-      if(orders.get(i)) Arrays.sort(ids.get(i), 0, len.get(i));
+    if(reorder == null) return;
+    for(int i = 1; i < reorder.size(); i++) {
+      if(reorder.get(i)) Arrays.sort(idsList.get(i), 0, lenList.get(i));
     }
-    orders = null;
+    reorder = null;
   }
 
   /**
@@ -189,14 +190,35 @@ public final class MemValues extends ValueIndex {
    * @param vals sorted values
    */
   void delete(final byte[] key, final int... vals) {
-    final int id = values.id(key), vl = vals.length, l = len.get(id), s = l - vl;
-    final int[] tmp = ids.get(id);
-    int o = -1, n = 0, v = 0;
-    while(++o < l) {
-      if(v == vl || tmp[o] != vals[v++]) tmp[n++] = tmp[o];
+    final int id = values.id(key), vl = vals.length, l = lenList.get(id), s = l - vl;
+    final int[] ids = idsList.get(id);
+    for(int i = 0, n = 0, v = 0; i < l; i++) {
+      if(v == vl || ids[i] != vals[v]) ids[n++] = ids[i];
+      else v++;
     }
-    len.set(id, s);
-    if(s == 0) ids.set(id, null);
+    lenList.set(id, s);
+    if(s == 0) idsList.set(id, null);
+  }
+
+  /**
+   * Checks the consistency of the index structure.
+   */
+  public void check() {
+    final IntMap set = new IntMap();
+    final int s = lenList.size();
+    for(int m = 1; m < s; m++) {
+      final int len = lenList.get(m);
+      final int[] ids = idsList.get(m);
+      for(int i = 0; i < len; i++) {
+        if(set.contains(ids[i])) {
+          int old = set.get(ids[i]);
+          throw Util.notExpected(
+            "Duplicate id: " + ids[i] + ", pos: " + old + "/" + m + ", text: " +
+            string(values.key(m)) + "/" + string(values.key(old)));
+        }
+        set.put(ids[i], m);
+      }
+    }
   }
 
   /**
@@ -205,23 +227,23 @@ public final class MemValues extends ValueIndex {
    * @return string
    */
   public String toString(final boolean all) {
-    final int sz = values.size();
+    final int s = lenList.size();
     final TokenBuilder tb = new TokenBuilder();
     tb.add(text ? "TEXT" : "ATTRIBUTE").add(" INDEX, '").add(data.meta.name).add("':\n");
-    if(sz != 0) {
-      for(int m = 1; m <= sz; m++) {
-        final int oc = len.get(m);
-        if(oc == 0) continue;
-        final int[] pos = ids.get(m);
+    if(s != 0) {
+      for(int m = 1; m < s; m++) {
+        final int len = lenList.get(m);
+        if(len == 0) continue;
+        final int[] ids = idsList.get(m);
         tb.add("  ").addInt(m);
-        if(all) tb.add(", key: \"").add(data.text(data.pre(pos[0]), text)).add('"');
+        if(all) tb.add(", key: \"").add(data.text(data.pre(ids[0]), text)).add('"');
         tb.add(", ids");
         if(all) tb.add("/pres");
         tb.add(": ");
-        for(int n = 0; n < oc; n++) {
+        for(int n = 0; n < len; n++) {
           if(n != 0) tb.add(",");
-          tb.addInt(pos[n]);
-          if(all) tb.add('/').addInt(data.pre(pos[n]));
+          tb.addInt(ids[n]);
+          if(all) tb.add('/').addInt(data.pre(ids[n]));
         }
         tb.add("\n");
       }
@@ -231,6 +253,6 @@ public final class MemValues extends ValueIndex {
 
   @Override
   public String toString() {
-    return toString(false);
+    return toString(true);
   }
 }
