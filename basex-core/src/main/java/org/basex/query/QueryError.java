@@ -991,9 +991,9 @@ public enum QueryError {
   /** XPTY0004. */
   CMPTYPES_X_X(XPTY, 4, "Items of type % and % cannot be compared."),
   /** XPTY0004. */
-  DOCATTS(XPTY, 4, "Cannot add attributes to a document node."),
+  DOCATTS_X(XPTY, 4, "Cannot add attributes to a document node: %."),
   /** XPTY0004. */
-  DOCNS(XPTY, 4, "Cannot add namespaces to a document node."),
+  DOCNS_X(XPTY, 4, "Cannot add namespaces to a document node: %."),
   /** XPTY0004. */
   INVARITY_X_X_X_X(XPTY, 4, "%: % argument% supplied (% expected)."),
   /** XPTY0004. */
@@ -1187,9 +1187,9 @@ public enum QueryError {
   NSAXIS(XQST, 134, "Namespace axis is not supported."),
 
   /** XQTY0024. */
-  NOATTALL(XQTY, 24, "Attribute must follow the root element."),
+  NOATTALL_X(XQTY, 24, "Attribute does not follow root element: %."),
   /** XQTY0024. */
-  NONSALL(XQTY, 24, "Namespaces must follow the root element."),
+  NONSALL_X(XQTY, 24, "Namespaces does not follow root element: %."),
   /** XQTY0105. */
   CONSFUNC_X(XQTY, 105, "Invalid content: %."),
 
@@ -1198,27 +1198,27 @@ public enum QueryError {
   /** XUDY0014. */
   UPNOTCOPIED_X(XUDY, 14, "% was not created by copy clause."),
   /** XUDY0015. */
-  UPMULTREN_X(XUDY, 15, "Node can only be renamed once: %."),
+  UPMULTREN_X(XUDY, 15, "% can only be renamed once."),
   /** XUDY0015. */
   UPPATHREN_X(XUDY, 15, "Path can only be renamed once: '%'."),
   /** XUDY0016. */
-  UPMULTREPL_X(XUDY, 16, "Node can only be replaced once: %."),
+  UPMULTREPL_X(XUDY, 16, "% can only be replaced once."),
   /** XUDY0016. */
   UPMULTDOC_X_X(XUDY, 16, "Document can only be replaced once: %/%."),
   /** XUDY0017. */
-  UPMULTREPV_X(XUDY, 17, "Node can only be replaced once: %"),
+  UPMULTREPV_X(XUDY, 17, "% can only be replaced once."),
   /** XUDY0021. */
-  UPATTDUPL_X(XUDY, 21, "Duplicate attribute %."),
+  UPATTDUPL_X(XUDY, 21, "Duplicate attribute: %."),
   /** XUDY0023. */
-  UPNSCONFL(XUDY, 23, "Conflicts with existing namespaces."),
+  UPNSCONFL_X_X(XUDY, 23, "Namespace conflicts: % vs. %."),
   /** XUDY0024. */
-  UPNSCONFL2(XUDY, 24, "New namespaces conflict with each other."),
+  UPNSCONFL2_X_X(XUDY, 24, "Namespaces conflicts: % vs. %."),
   /** XUDY0027. */
-  UPSEQEMP_X(XUDY, 27, "% target must not be empty."),
+  UPSEQEMP_X(XUDY, 27, "% target is an empty sequence."),
   /** XUDY0029. */
-  UPPAREMPTY(XUDY, 29, "Target has no parent node."),
+  UPPAREMPTY_X(XUDY, 29, "Target % has no parent."),
   /** XUDY0030. */
-  UPATTELM(XUDY, 30, "Attributes cannot be inserted as child of a document."),
+  UPATTELM_X(XUDY, 30, "Attribute cannot be added to %."),
   /** XUDY0031. */
   UPURIDUP_X(XUDY, 31, "URI '%' is addressed multiple times."),
 
@@ -1245,27 +1245,35 @@ public enum QueryError {
   UUPFUNCTYPE(XUST, 28, "No return type allowed in updating functions."),
 
   /** XUTY0004. */
-  UPNOATTRPER(XUTY, 4, "Attribute must follow the root element."),
+  UPNOATTRPER_X(XUTY, 4, "Attribute does not follow root element: %."),
   /** XUTY0005. */
-  UPTRGTYP(XUTY, 5, "Single element or document expected as insert target."),
+  UPTRGTYP_X(XUTY, 5, "Target must be element or document: %."),
+  /** XUTY0005. */
+  UPTRGSNGL_X(XUTY, 5, "Target must be single node: %."),
   /** XUTY0006. */
-  UPTRGTYP2(XUTY, 6, "Single element, text, comment or pi expected as insert target."),
+  UPTRGTYP2_X(XUTY, 6, "Target must be element, text, comment or pi: %."),
+  /** XUTY0006. */
+  UPTRGSNGL2_X(XUTY, 6, "Target must be single node: %."),
   /** XUTY0007. */
-  UPTRGDELEMPT(XUTY, 7, "Only nodes can be deleted."),
+  UPTRGDELEMPT_X(XUTY, 7, "Target must be node: %."),
   /** XUTY0008. */
-  UPTRGMULT(XUTY, 8, "Single element, text, attribute, comment or pi expected as replace target."),
+  UPTRGNODE_X(XUTY, 8, "Target must be element, text, attribute, comment or pi: %."),
+  /** XUTY0008. */
+  UPTRGSINGLE_X(XUTY, 8, "Target must single node: %."),
   /** XUTY0010. */
-  UPWRELM(XUTY, 10, "Replacing nodes must be no attribute nodes."),
+  UPWRELM_X_X(XUTY, 10, "% cannot be replaced with attribute: %."),
   /** XUTY0011. */
-  UPWRATTR(XUTY, 11, "Replacing nodes must be attribute nodes."),
+  UPWRATTR_X(XUTY, 11, "Attribute cannot be replaced with other type: %."),
   /** XUTY0012. */
-  UPWRTRGTYP(XUTY, 12, "Single element, attribute or pi expected as rename target."),
+  UPWRTRGTYP_X(XUTY, 12, "Target must be element, attribute or pi: %."),
+  /** XUTY0012. */
+  UPWRTRGSINGLE_X(XUTY, 12, "Target must be single node: %."),
   /** XUTY0013. */
-  UPCOPYMULT_X(XUTY, 13, "Value assigned to $% must be a single node."),
+  UPCOPYMULT_X(XUTY, 13, "Value of $% must be single node: %."),
   /** XUTY0013. */
-  UPSOURCE(XUTY, 13, "Source of transform expression must be a single node."),
+  UPSOURCE_X(XUTY, 13, "Transformed expression must be single node: %."),
   /** XUTY0022. */
-  UPATTELM2(XUTY, 22, "Insert target must be an element.");
+  UPATTELM2_X(XUTY, 22, "Attribute cannot be added to %.");
 
   /** Cached enums (faster). */
   private static final QueryError[] VALUES = values();

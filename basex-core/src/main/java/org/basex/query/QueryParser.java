@@ -1462,7 +1462,7 @@ public class QueryParser extends InputParser {
         qc.updating();
         final Expr m = check(single(), COPYEXPR);
         closeSubScope(s);
-        return new Modify(info(), e, m);
+        return new TransformWith(info(), e, m);
       }
     }
     return e;

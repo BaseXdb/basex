@@ -567,7 +567,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
       "copy $a := <a xmlns:p='A' a='v'/> " +
       "modify rename node $a/@a as QName('uri', 'p:a') " +
       "return $a",
-      UPNSCONFL);
+      UPNSCONFL_X_X);
   }
 
   /**
@@ -594,7 +594,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
       "modify for $el in $a/descendant-or-self::element() return " +
       "rename node $el as QName('',local-name($el)) " +
       "return $a",
-      UPNSCONFL);
+      UPNSCONFL_X_X);
   }
 
   /**
@@ -813,7 +813,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
     error("copy $c := <a xmlns='X'/> modify (" +
         "  rename node $c as QName('Y','b')," +
         "  insert node attribute c{'a'} into $c" +
-        ") return $c", UPNSCONFL);
+        ") return $c", UPNSCONFL_X_X);
     query("copy $c := <a/> modify (" +
         "  rename node $c as QName('X','b')," +
         "  insert node attribute c{'a'} into $c" +

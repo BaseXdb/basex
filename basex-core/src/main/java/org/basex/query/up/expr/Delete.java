@@ -35,7 +35,7 @@ public final class Delete extends Update {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter t = qc.iter(exprs[0]);
     for(Item i; (i = t.next()) != null;) {
-      if(!(i instanceof ANode)) throw UPTRGDELEMPT.get(info);
+      if(!(i instanceof ANode)) throw UPTRGDELEMPT_X.get(info, i);
       final ANode n = (ANode) i;
       // nodes without parents are ignored
       if(n.parent() == null) continue;

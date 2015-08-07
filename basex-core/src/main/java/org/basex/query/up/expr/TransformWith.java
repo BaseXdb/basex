@@ -14,19 +14,19 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Modify expression.
+ * Transform expression.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public final class Modify extends Arr {
+public final class TransformWith extends Arr {
   /**
    * Constructor.
    * @param info input info
    * @param src source expression
    * @param mod modify expression
    */
-  public Modify(final InputInfo info, final Expr src, final Expr mod) {
+  public TransformWith(final InputInfo info, final Expr src, final Expr mod) {
     super(info, src, mod);
   }
 
@@ -67,7 +67,9 @@ public final class Modify extends Arr {
     try {
       final Iter ir = qc.iter(exprs[0]);
       Item i = ir.next();
-      if(!(i instanceof ANode) || ir.next() != null) throw UPSOURCE.get(info);
+      if(!(i instanceof ANode)) throw UPSOURCE_X.get(info, i);
+      final Item i2 = ir.next();
+      if(i2 != null) throw UPSOURCE_X.get(info, ValueBuilder.concat(i, i2));
 
       // copy node to main memory data instance
       i = ((ANode) i).dbCopy(qc.context.options);
@@ -95,7 +97,7 @@ public final class Modify extends Arr {
 
   @Override
   public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Modify(info, exprs[0].copy(qc, scp, vs), exprs[1].copy(qc, scp, vs));
+    return new TransformWith(info, exprs[0].copy(qc, scp, vs), exprs[1].copy(qc, scp, vs));
   }
 
   @Override

@@ -27,11 +27,11 @@ public final class Constr {
   /** Namespace array. */
   final Atts nspaces = new Atts();
   /** Error: attribute position. */
-  public boolean errAtt;
+  public QNm errAtt;
   /** Error: namespace position. */
-  boolean errNS;
+  public QNm errNS;
   /** Error: duplicate attribute. */
-  public byte[] duplAtt;
+  public QNm duplAtt;
   /** Error: duplicate namespace. */
   byte[] duplNS;
 
@@ -110,14 +110,14 @@ public final class Constr {
 
         // no attribute allowed after texts or child nodes
         if(!text.isEmpty() || !children.isEmpty()) {
-          errAtt = true;
+          errAtt = node.qname();
           return false;
         }
         // check for duplicate attribute names
         final QNm name = node.qname();
         for(final ANode att : atts) {
           if(name.eq(att.qname())) {
-            duplAtt = name.string();
+            duplAtt = name;
             return false;
           }
         }
@@ -131,7 +131,7 @@ public final class Constr {
 
         // no attribute allowed after texts or child nodes
         if(!text.isEmpty() || !children.isEmpty()) {
-          errNS = true;
+          errNS = node.qname();
           return false;
         }
 

@@ -37,8 +37,10 @@ public final class CDoc extends CNode {
 
     // add child nodes
     c.add(qc, exprs);
-    if(c.errAtt || !c.atts.isEmpty()) throw DOCATTS.get(ii);
-    if(c.errNS || !c.nspaces.isEmpty()) throw DOCNS.get(ii);
+    if(c.errAtt != null) throw DOCATTS_X.get(ii, c.errAtt);
+    if(!c.atts.isEmpty()) throw DOCATTS_X.get(ii, c.atts.get(0).name());
+    if(c.errNS != null) throw DOCNS_X.get(ii, c.errNS);
+    if(!c.nspaces.isEmpty()) throw DOCNS_X.get(ii, c.nspaces.name(0));
     return doc.optimize();
   }
 

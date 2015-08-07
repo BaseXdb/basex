@@ -54,9 +54,9 @@ public final class NamePool {
 
   /**
    * Checks if no namespace conflicts occur.
-   * @return success flag
+   * @return {@code null} or conflicting namespaces
    */
-  boolean nsOK() {
+  byte[][] nsOK() {
     final Atts at = new Atts();
     for(int i = 0; i < size; ++i) {
       if(cache[i].add <= (cache[i].del ? 1 : 0)) continue;
@@ -68,9 +68,9 @@ public final class NamePool {
       final byte[] u = at.value(pref);
       if(u == null) at.add(pref, uri);
       // check if only one uri is assigned to a prefix
-      else if(!eq(uri, u)) return false;
+      else if(!eq(uri, u)) return new byte[][] { uri, u };
     }
-    return true;
+    return null;
   }
 
   /**

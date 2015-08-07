@@ -71,7 +71,9 @@ public final class Transform extends Arr {
       for(final Let fo : copies) {
         final Iter ir = qc.iter(fo.expr);
         Item i = ir.next();
-        if(!(i instanceof ANode) || ir.next() != null) throw UPCOPYMULT_X.get(fo.info, fo.var.name);
+        if(!(i instanceof ANode)) throw UPCOPYMULT_X.get(fo.info, fo.var.name, i);
+        final Item i2 = ir.next();
+        if(i2 != null) throw UPCOPYMULT_X.get(fo.info, fo.var.name, ValueBuilder.concat(i, i2));
 
         // copy node to main memory data instance
         i = ((ANode) i).dbCopy(qc.context.options);

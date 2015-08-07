@@ -270,7 +270,8 @@ final class DataUpdates {
       if(ups != null) for(final NodeUpdate up : ups.updates) up.update(pool);
     }
     // check namespaces
-    if(!pool.nsOK()) throw UPNSCONFL2.get(null);
+    final byte[][] ns = pool.nsOK();
+    if(ns != null) throw UPNSCONFL2_X_X.get(null, ns[0], ns[1]);
 
     // add the already existing attributes to the name pool
     final IntSet il = new IntSet();
