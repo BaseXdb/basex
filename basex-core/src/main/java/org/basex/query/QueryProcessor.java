@@ -53,9 +53,9 @@ public final class QueryProcessor extends Proc implements Closeable {
    */
   public void parse() throws QueryException {
     if(parsed) return;
-    parsed = true;
     qc.parseMain(query, null, sc);
     updating = qc.updating;
+    parsed = true;
   }
 
   /**

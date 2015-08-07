@@ -274,7 +274,6 @@ public final class QueryContext extends Proc implements Closeable {
    */
   public void compile() throws QueryException {
     if(compiled) return;
-    compiled = true;
 
     // set database options
     final StringList opts = tempOpts;
@@ -320,6 +319,7 @@ public final class QueryContext extends Proc implements Closeable {
     // dynamic compilation
     analyze();
     info.runtime = true;
+    compiled = true;
   }
 
   /**
