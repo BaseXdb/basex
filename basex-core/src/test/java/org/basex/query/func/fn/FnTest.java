@@ -28,6 +28,12 @@ public final class FnTest extends AdvancedQueryTest {
 
   /** Test method. */
   @Test
+  public void unparsedTextLines() {
+    query(UNPARSED_TEXT_LINES.args("()"), "");
+  }
+
+  /** Test method. */
+  @Test
   public void parseXML() {
     contains(PARSE_XML.args("\"<x>a</x>\"") + "//text()", "a");
   }
