@@ -1,5 +1,11 @@
 package org.basex.query.func.db;
 
+import static org.basex.query.QueryError.*;
+
+import java.util.*;
+
+import org.basex.data.*;
+import org.basex.index.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -25,6 +31,11 @@ public class DbText extends DbAccess {
    * @throws QueryException query exception
    */
   final ValueAccess valueAccess(final boolean text, final QueryContext qc) throws QueryException {
-    return new ValueAccess(info, exprs[1], text, null, new IndexContext(checkData(qc), false));
+    final Data data = checkData(qc);
+    final MetaData meta = data.meta;
+    if(!(text ? meta.textindex : meta.attrindex)) throw BXDB_INDEX_X.get(info, meta.name,
+        (text ? IndexType.TEXT : IndexType.ATTRIBUTE).toString().toLowerCase(Locale.ENGLISH));
+
+    return new ValueAccess(info, exprs[1], text, null, new IndexContext(data, false));
   }
 }

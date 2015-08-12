@@ -98,7 +98,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
   public void text() {
     // run function without and with index
     execute(new DropIndex(CmdIndex.TEXT));
-    query(_DB_TEXT.args(NAME, "XML"), "XML");
+    error(_DB_TEXT.args(NAME, "XML"), BXDB_INDEX_X);
     execute(new CreateIndex(CmdIndex.TEXT));
     query(_DB_TEXT.args(NAME, "XML"), "XML");
     query(_DB_TEXT.args(NAME, "XXX"), "");
@@ -109,7 +109,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
   public void textRange() {
     // run function without and with index
     execute(new DropIndex(CmdIndex.TEXT));
-    query(_DB_TEXT_RANGE.args(NAME, "Exercise", "Fun"), "Exercise 1\nExercise 2");
+    error(_DB_TEXT_RANGE.args(NAME, "Exercise", "Fun"), BXDB_INDEX_X);
     execute(new CreateIndex(CmdIndex.TEXT));
     query(_DB_TEXT_RANGE.args(NAME, "Exercise", "Fun"), "Exercise 1\nExercise 2");
     query(_DB_TEXT_RANGE.args(NAME, "XXX", "XXX"), "");
@@ -120,7 +120,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
   public void attribute() {
     // run function without and with index
     execute(new DropIndex(CmdIndex.ATTRIBUTE));
-    query(DATA.args(_DB_ATTRIBUTE.args(NAME, "0")), "0");
+    error(DATA.args(_DB_ATTRIBUTE.args(NAME, "0")), BXDB_INDEX_X);
     execute(new CreateIndex(CmdIndex.ATTRIBUTE));
     query(DATA.args(_DB_ATTRIBUTE.args(NAME, "0")), "0");
     query(DATA.args(_DB_ATTRIBUTE.args(NAME, "0", "id")), "0");
@@ -132,8 +132,8 @@ public final class DbModuleTest extends AdvancedQueryTest {
   @Test
   public void attributeRange() {
     // run function without and with index
-    execute(new CreateIndex(CmdIndex.ATTRIBUTE));
-    query(_DB_ATTRIBUTE_RANGE.args(NAME, "0", "9") + "/data()", "0\n1");
+    execute(new DropIndex(CmdIndex.ATTRIBUTE));
+    error(_DB_ATTRIBUTE_RANGE.args(NAME, "0", "9") + "/data()", BXDB_INDEX_X);
     execute(new CreateIndex(CmdIndex.ATTRIBUTE));
     query(_DB_ATTRIBUTE_RANGE.args(NAME, "0", "9") + "/data()", "0\n1");
     query(_DB_ATTRIBUTE_RANGE.args(NAME, "XXX", "XXX"), "");
