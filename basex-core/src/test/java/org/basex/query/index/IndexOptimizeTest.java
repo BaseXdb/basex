@@ -1,13 +1,10 @@
 package org.basex.query.index;
 
 import static org.basex.query.func.Function.*;
-import static org.junit.Assert.*;
-
-import java.io.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.query.*;
+import org.basex.query.ast.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.ft.*;
 import org.basex.util.*;
@@ -20,7 +17,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public final class IndexOptimizeTest extends AdvancedQueryTest {
+public final class IndexOptimizeTest extends QueryPlanTest {
   /**
    * Creates a test database.
    */
@@ -197,7 +194,35 @@ public final class IndexOptimizeTest extends AdvancedQueryTest {
     query("//a[not(text() = '')]/text()", "1\n2 3");
     query("//text()[not(. = '')]", "1\n2 3");
     query("//a[not(. = '')]/text()", "1\n2 3");
-}
+  }
+
+  /**
+   * Checks the selective index feature.
+   * Test method.
+   */
+  @Test
+  public void selectiveIndexTest() {
+    try {
+      // first run: use index; second run: no index
+      for(final String include : new String[] { "a", "b" }) {
+        set(MainOptions.TEXTINCLUDE, include);
+        set(MainOptions.ATTRINCLUDE, include);
+        execute(new CreateDB(NAME, "<xml><a a='1'>1</a></xml>"));
+
+        final String test = "exists(//ValueAccess) = " + (include.equals("a") + "()");
+        check("data(//*[a = '1'])", "1", test);
+        check("data(//*[a/text() = '1'])", "1", test);
+        check("data(//a[. = '1'])", "1", test);
+        check("data(//a[text() = '1'])", "1", test);
+        check("data(//*[*/@a = '1'])", "1", test);
+        check("data(//*[@a = '1'])", "1", test);
+        check("data(//@a[. = '1'])", "1", test);
+      }
+    } finally {
+      set(MainOptions.TEXTINCLUDE, "");
+      set(MainOptions.ATTRINCLUDE, "");
+    }
+  }
 
   /**
    * Creates a test database.
@@ -229,32 +254,11 @@ public final class IndexOptimizeTest extends AdvancedQueryTest {
   /**
    * Checks if specified query was rewritten for index access, and checks the query result.
    * @param query query to be tested
-   * @param result expected query result
+   * @param result result or {@code null} for no comparison
    */
   private static void check(final String query, final String result) {
-    // compile query
-    String plan = null;
-    try {
-      try(QueryProcessor qp = new QueryProcessor(query, context)) {
-        final String string = qp.value().serialize().toString();
-        if(result != null) assertEquals(result, normNL(string));
-
-        // fetch query plan
-        plan = qp.plan().serialize().toString();
-      }
-
-      // check if index is used
-      try(QueryProcessor qp = new QueryProcessor(plan + "/descendant-or-self::*" +
-            "[self::" + Util.className(ValueAccess.class) +
-            "|self::" + Util.className(FTIndexAccess.class) + ']', context)) {
-        final String string = qp.value().serialize().toString();
-        assertFalse("No index used:\n- Query: " + query + "\n- Plan: " + plan + "\n- " +
-            qp.info().trim(), string.isEmpty());
-      }
-    } catch(final QueryException ex) {
-      fail(Util.message(ex) + "\n- Query: " + query + "\n- Plan: " + plan);
-    } catch(final IOException ex) {
-      fail(Util.message(ex));
-    }
+    check(query, result, "exists(/descendant-or-self::*" +
+        "[self::" + Util.className(ValueAccess.class) +
+        "|self::" + Util.className(FTIndexAccess.class) + "])");
   }
 }

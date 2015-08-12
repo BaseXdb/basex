@@ -9,6 +9,7 @@ import java.util.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.core.cmd.Set;
 import org.basex.core.parse.Commands.CmdIndex;
 import org.basex.io.*;
 import org.basex.query.*;
@@ -482,6 +483,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
   public void optimize() {
     query(_DB_OPTIMIZE.args(NAME));
     query(_DB_OPTIMIZE.args(NAME));
+    // opened database cannot be fully optimized
     error(_DB_OPTIMIZE.args(NAME, true), UPDBOPTERR_X);
     execute(new Close());
     query(_DB_OPTIMIZE.args(NAME, true));
@@ -512,37 +514,36 @@ public final class DbModuleTest extends AdvancedQueryTest {
 
     // check if optimize call preserves original options
     query(_DB_OPTIMIZE.args(NAME));
-    query(_DB_INFO.args(NAME) + "//textindex/text()", "false");
-    query(_DB_INFO.args(NAME) + "//attrindex/text()", "false");
-    query(_DB_INFO.args(NAME) + "//ftindex/text()", "false");
+    final String[] indexes = { "textindex", "attrindex", "ftindex" };
+    final String[] includes = { "textinclude", "attrinclude", "ftinclude" };
+    for(final String i : indexes) query(_DB_INFO.args(NAME) + "//" + i + "/text()", "false");
+    for(final String i : includes) query(_DB_INFO.args(NAME) + "//" + i + "/text()", "");
 
     execute(new Open(NAME));
-    execute(new CreateIndex(CmdIndex.TEXT));
-    execute(new CreateIndex(CmdIndex.ATTRIBUTE));
-    execute(new CreateIndex(CmdIndex.FULLTEXT));
+    final CmdIndex[] cmds = { CmdIndex.TEXT, CmdIndex.ATTRIBUTE, CmdIndex.FULLTEXT };
+    for(final String i : includes) execute(new Set(i, "a"));
+    for(final CmdIndex cmd : cmds) execute(new CreateIndex(cmd));
     execute(new Close());
 
     query(_DB_OPTIMIZE.args(NAME));
-    query(_DB_INFO.args(NAME) + "//textindex/text()", "true");
-    query(_DB_INFO.args(NAME) + "//attrindex/text()", "true");
-    query(_DB_INFO.args(NAME) + "//ftindex/text()", "true");
+    for(final String i : indexes) query(_DB_INFO.args(NAME) + "//" + i + "/text()", "true");
+    for(final String i : includes) query(_DB_INFO.args(NAME) + "//" + i + "/text()", "a");
 
     execute(new Open(NAME));
-    execute(new DropIndex(CmdIndex.TEXT));
-    execute(new DropIndex(CmdIndex.ATTRIBUTE));
-    execute(new DropIndex(CmdIndex.FULLTEXT));
+    for(final String i : includes) execute(new Set(i, ""));
+    for(final CmdIndex cmd : cmds) execute(new DropIndex(cmd));
     execute(new Close());
 
     query(_DB_OPTIMIZE.args(NAME));
-    query(_DB_INFO.args(NAME) + "//textindex/text()", "false");
-    query(_DB_INFO.args(NAME) + "//attrindex/text()", "false");
-    query(_DB_INFO.args(NAME) + "//ftindex/text()", "false");
+    for(final String i : indexes) query(_DB_INFO.args(NAME) + "//" + i + "/text()", "false");
+    for(final String i : includes) query(_DB_INFO.args(NAME) + "//" + i + "/text()", "");
 
-    query(_DB_OPTIMIZE.args(NAME, true,
-        " map { 'textindex':true(),'attrindex':true(),'ftindex':true(),'updindex':true() }"));
-    query(_DB_INFO.args(NAME) + "//textindex/text()", "true");
-    query(_DB_INFO.args(NAME) + "//attrindex/text()", "true");
-    query(_DB_INFO.args(NAME) + "//ftindex/text()", "true");
+    query(_DB_OPTIMIZE.args(NAME, true, " map {"
+        + "'textindex':true(),'attrindex':true(),'ftindex':true(),'updindex':true(),"
+        + "'textinclude':'a','attrinclude':'a','ftinclude':'a'"
+        + " }"));
+    for(final String i : indexes) query(_DB_INFO.args(NAME) + "//" + i + "/text()", "true");
+    for(final String i : includes) query(_DB_INFO.args(NAME) + "//" + i + "/text()", "a");
     query(_DB_INFO.args(NAME) + "//updindex/text()", "true");
   }
 

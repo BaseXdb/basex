@@ -107,7 +107,8 @@ public abstract class AdvancedQueryTest extends SandboxTest {
         int c = 0;
         for(final QueryError er : errors) tb.add(c++ == 0 ? "" : "/").add(er.name());
         ex.printStackTrace();
-        fail(tb.add("\nResult: ").add(err.name() + " (" + err.qname() + ')').toString());
+        fail(tb.add("\nResult: ").add(err.name() + " (" + ex.getLocalizedMessage() + ')').
+            toString());
       } else {
         int c = 0;
         for(final QueryError er : errors) tb.add(c++ == 0 ? "" : "/").add(er.qname().local());

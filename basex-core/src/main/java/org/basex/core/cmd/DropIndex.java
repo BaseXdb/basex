@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 
 import java.io.*;
 
+import org.basex.core.*;
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.Cmd;
 import org.basex.core.parse.Commands.CmdDrop;
@@ -36,12 +37,15 @@ public final class DropIndex extends ACreate {
     final IndexType type;
     if(ci == CmdIndex.TEXT) {
       data.meta.createtext = false;
+      data.meta.textinclude = options.get(MainOptions.TEXTINCLUDE);
       type = IndexType.TEXT;
     } else if(ci == CmdIndex.ATTRIBUTE) {
       data.meta.createattr = false;
+      data.meta.attrinclude = options.get(MainOptions.ATTRINCLUDE);
       type = IndexType.ATTRIBUTE;
     } else if(ci == CmdIndex.FULLTEXT) {
       data.meta.createftxt = false;
+      data.meta.ftinclude = options.get(MainOptions.FTINCLUDE);
       type = IndexType.FULLTEXT;
     } else {
       return error(UNKNOWN_CMD_X, this);
