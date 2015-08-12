@@ -99,8 +99,8 @@ function _:queries(
  : @return result of query
  :)
 declare
+  %rest:POST("{$query}")
   %rest:path("/dba/eval-query")
-  %rest:query-param("query", "{$query}")
   %output:method("text")
 function _:eval-query(
   $query  as xs:string?
@@ -168,8 +168,8 @@ function _:save-query(
  :)
 declare
   %updating
+  %rest:POST("{$query}")
   %rest:path("/dba/update-query")
-  %rest:query-param("query", "{$query}")
   %output:method("text")
 function _:update-query(
   $query  as xs:string?

@@ -79,19 +79,18 @@ function _:logs(
 
 (:~
  : Returns log entries of a specific log file.
+ : @param  $query    query
  : @param  $names    name of selected log files
  : @param  $sort     table sort key
  : @param  $loglist  loglist
- : @param  $query    query
  : @return html elements
  :)
 declare
-  %rest:POST
+  %rest:POST("{$query}")
   %rest:path("/dba/log")
   %rest:query-param("name",    "{$name}")
   %rest:query-param("sort",    "{$sort}")
   %rest:query-param("loglist", "{$loglist}")
-  %rest:query-param("query",   "{$query}")
   %output:method("html")
 function _:query(
   $name     as xs:string,
@@ -129,10 +128,9 @@ function _:query(
  : @return html elements
  :)
 declare
-  %rest:POST
+  %rest:POST("{$query}")
   %rest:path("/dba/loglist")
   %rest:query-param("sort",  "{$sort}")
-  %rest:query-param("query", "{$query}")
   %output:method("html")
 function _:loglist(
   $sort   as xs:string?,
