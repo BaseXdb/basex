@@ -22,7 +22,7 @@ public abstract class Session implements Closeable {
   /** Client output stream. */
   protected OutputStream out;
   /** Command info. */
-  protected String info;
+  protected String info = "";
 
   /**
    * Executes a {@link Command} and returns the result as string or serializes
