@@ -51,6 +51,7 @@ function _:logs(
         <form action="javascript:void(0);">
           <h2>{ if($name) then <a href="{ $_:CAT }">Logs</a> else 'Logs' }:
             <input size="14" name="loglist" id="loglist" value="{ $loglist }"
+              placeholder="regular expression"
               onkeyup="logslist('Please wait…', 'Query was successful.');"/>
           </h2>
         </form>
@@ -66,6 +67,7 @@ function _:logs(
           <h3>
             { $name }:
             <input size="40" id="logs" value="{ ($loglist, $logs)[1] }"
+              placeholder="regular expression"
               onkeyup="logentries('Please wait…', 'Query was successful.');"/>
           </h3>,
           <div id='output'/>,
