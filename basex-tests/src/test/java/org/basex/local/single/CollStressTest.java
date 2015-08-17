@@ -1,4 +1,4 @@
-package org.basex.performance;
+package org.basex.local.single;
 
 import org.basex.*;
 import org.basex.core.*;

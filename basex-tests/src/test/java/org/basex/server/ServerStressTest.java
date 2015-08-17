@@ -1,4 +1,4 @@
-package org.basex.performance;
+package org.basex.server;
 
 import java.util.*;
 

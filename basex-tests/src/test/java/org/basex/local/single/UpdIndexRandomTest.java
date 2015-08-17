@@ -1,4 +1,4 @@
-package org.basex.performance;
+package org.basex.local.single;
 
 import static org.basex.query.func.Function.*;
 import static org.junit.Assert.*;

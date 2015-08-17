@@ -1,4 +1,4 @@
-package org.basex.performance;
+package org.basex.rest;
 
 import static org.basex.core.users.UserText.*;
 import static org.basex.util.http.HttpMethod.*;

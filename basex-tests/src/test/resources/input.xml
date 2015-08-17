@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<html>
+  <!-- Header -->
+  <head id="0">
+    <title>XML</title>
+  </head>
+  <!-- Body -->
+  <body id="1" bgcolor="#FFFFFF" text="#000000" link="#0000CC">
+    <h1>Databases and XML</h1>
+    <div align="right">
+      <b>Assignments</b>
+      <ul>
+        <li>Exercise 1</li>
+        <li>Exercise 2</li>
+      </ul>
+    </div>
+  </body>
+  <?pi bogus?>
+</html>

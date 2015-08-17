@@ -1,4 +1,4 @@
-package org.basex.performance;
+package org.basex.server;
 
 import org.basex.*;
 import org.basex.api.client.*;

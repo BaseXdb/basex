@@ -1,4 +1,4 @@
-package org.basex.performance;
+package org.basex.local.single;
 
 import org.junit.*;
 
@@ -15,7 +15,7 @@ public final class Delete extends Benchmark {
    */
   @Test
   public void root() throws Exception {
-    update("delete node /*");
+    eval("delete node /*");
   }
 
   /**
@@ -24,7 +24,7 @@ public final class Delete extends Benchmark {
    */
   @Test
   public void nodes() throws Exception {
-    update("delete node //node()");
+    eval("delete node //node()");
   }
 
   /**
@@ -33,7 +33,7 @@ public final class Delete extends Benchmark {
    */
   @Test
   public void elements() throws Exception {
-    update("delete node //*");
+    eval("delete node //*");
   }
 
   /**
@@ -42,7 +42,7 @@ public final class Delete extends Benchmark {
    */
   @Test
   public void texts() throws Exception {
-    update("delete node //text()");
+    eval("delete node //text()");
   }
 
   /**
@@ -53,7 +53,7 @@ public final class Delete extends Benchmark {
   public void texts1000() throws Exception {
     final String qu = eval("count(//text())");
     final int n = Math.min(1000, Integer.parseInt(qu.trim()));
-    update(n, "delete node (//text())[1]");
+    eval(n, "delete node (//text())[1]");
   }
 
   /**
@@ -62,7 +62,7 @@ public final class Delete extends Benchmark {
    */
   @Test
   public void textsSingle1000() throws Exception {
-    update("for $i in 1 to min((1000, count(//text()))) " +
+    eval("for $i in 1 to min((1000, count(//text()))) " +
         "return delete node /descendant::text()[$i]");
   }
 }

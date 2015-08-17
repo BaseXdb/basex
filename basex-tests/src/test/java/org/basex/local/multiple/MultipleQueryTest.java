@@ -1,4 +1,4 @@
-package org.basex.performance;
+package org.basex.local.multiple;
 
 import java.util.*;
 
@@ -13,7 +13,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public final class LocalStressTest extends SandboxTest {
+public final class MultipleQueryTest extends SandboxTest {
   /** Input document. */
   private static final String INPUT = "src/test/resources/factbook.zip";
   /** Query to be run ("%" may be used as placeholder for dynamic content). */
@@ -96,7 +96,7 @@ public final class LocalStressTest extends SandboxTest {
 
     @Override
     public void run() {
-      for(int i = 0; i < runs; ++i) {
+      for(int r = 0; r < runs; ++r) {
         Performance.sleep((long) (50 * RND.nextDouble()));
         // Return nth text of the database
         query(Util.info(QUERY, RND.nextInt() % MAX + 1));

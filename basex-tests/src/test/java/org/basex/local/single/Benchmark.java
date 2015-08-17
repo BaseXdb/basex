@@ -1,4 +1,4 @@
-package org.basex.performance;
+package org.basex.local.single;
 
 import static org.basex.core.Text.*;
 
@@ -52,35 +52,27 @@ public abstract class Benchmark extends SandboxTest {
 
   /**
    * Creates a new database instance and performs a query.
-   * @param queries queries to be evaluated
-   * @throws Exception exception
-   */
-  protected static void update(final String queries) throws Exception {
-    update(1, queries);
-  }
-
-  /**
-   * Creates a new database instance and performs a query for the
-   * specified number of runs.
-   * @param query queries to be evaluated
-   * @param r runs the number for the specified number of time
-   * @throws IOException I/O exception
-   */
-  protected static void update(final int r, final String query) throws IOException {
-    // loop through number of runs for a single query
-    check();
-    for(int rn = 0; rn < r; ++rn) session.execute(new XQuery(query));
-  }
-
-  /**
-   * Performs the specified query and returns the result.
    * @param query query to be evaluated
-   * @return result
+   * @return resulting string
    * @throws IOException I/O exception
    */
   protected static String eval(final String query) throws IOException {
+    return eval(1, query);
+  }
+
+  /**
+   * Performs the specified query n times and and returns the result.
+   * @param query query to be evaluated
+   * @param n number of runs
+   * @return resulting string
+   * @throws IOException I/O exception
+   */
+  protected static String eval(final int n, final String query) throws IOException {
+    // loop through number of runs for a single query
     check();
-    return session.execute(new XQuery(query));
+    String result = "";
+    for(int rn = 0; rn < n; ++rn) result = session.execute(new XQuery(query));
+    return result;
   }
 
   /**
