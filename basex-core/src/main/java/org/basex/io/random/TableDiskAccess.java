@@ -132,8 +132,10 @@ public final class TableDiskAccess extends TableAccess {
   @Override
   public boolean lock(final boolean write) {
     try {
-      if(fl != null && write != fl.isShared()) return true;
-      if(fl != null) fl.release();
+      if(fl != null) {
+        if(write != fl.isShared()) return true;
+        fl.release();
+      }
       fl = file.getChannel().tryLock(0, Long.MAX_VALUE, !write);
       return fl != null;
     } catch(final IOException ex) {

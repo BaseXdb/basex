@@ -94,8 +94,11 @@ public final class DiskBuilder extends Builder implements Closeable {
     // copy temporary values into database table
     try(final DataInput in = new DataInput(meta.dbfile(DATATMP))) {
       final TableAccess ta = new TableDiskAccess(meta, true);
-      for(; spos < ssize; ++spos) ta.write4(in.readNum(), 8, in.readNum());
-      ta.close();
+      try {
+        for(; spos < ssize; ++spos) ta.write4(in.readNum(), 8, in.readNum());
+      } finally {
+        ta.close();
+      }
     }
     meta.dbfile(DATATMP).delete();
 
