@@ -1,10 +1,7 @@
 package org.basex.server;
 
-import java.util.*;
-
 import org.basex.*;
 import org.basex.api.client.*;
-import org.basex.util.*;
 import org.junit.*;
 
 /**
@@ -14,16 +11,10 @@ import org.junit.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public final class ServerStressTest extends SandboxTest {
+public final class ServerAddTest extends SandboxTest {
   /** Input document. */
-  private static final String INPUT = "src/test/resources/factbook.zip";
-  /** Query to be run ("%" may be used as placeholder for dynamic content). */
-  private static final String QUERY = "(doc('test')//text())[position() = %]";
-  /** Maximum position to retrieve. */
-  private static final int MAX = 1000;
+  private static final String INPUT = "src/test/resources/input.xml";
 
-  /** Random number generator. */
-  static final Random RND = new Random();
   /** Server reference. */
   BaseXServer server;
   /** Result counter. */
@@ -34,8 +25,8 @@ public final class ServerStressTest extends SandboxTest {
    * @throws Exception exception
    */
   @Test
-  public void clients20runs20() throws Exception {
-    run(20, 20);
+  public void clients10runs10() throws Exception {
+    run(10, 10);
   }
 
   /**
@@ -43,8 +34,8 @@ public final class ServerStressTest extends SandboxTest {
    * @throws Exception exception
    */
   @Test
-  public void clients20runs200() throws Exception {
-    run(20, 200);
+  public void clients10runs100() throws Exception {
+    run(10, 100);
   }
 
   /**
@@ -52,8 +43,8 @@ public final class ServerStressTest extends SandboxTest {
    * @throws Exception exception
    */
   @Test
-  public void clients200runs20() throws Exception {
-    run(200, 20);
+  public void clients100runs10() throws Exception {
+    run(100, 10);
   }
 
   /**
@@ -61,8 +52,8 @@ public final class ServerStressTest extends SandboxTest {
    * @throws Exception exception
    */
   @Test
-  public void clients200runs200() throws Exception {
-    run(200, 200);
+  public void clients100runs100() throws Exception {
+    run(100, 100);
   }
 
   /**
@@ -76,7 +67,7 @@ public final class ServerStressTest extends SandboxTest {
     server = createServer();
     // create test database
     try(final ClientSession cs = createClient()) {
-      cs.execute("create db test " + INPUT);
+      cs.execute("create db " + NAME + " " + INPUT);
       // run clients
       final Client[] cl = new Client[clients];
       for(int i = 0; i < clients; ++i) cl[i] = new Client(runs);
@@ -108,14 +99,9 @@ public final class ServerStressTest extends SandboxTest {
     @Override
     public void run() {
       try {
-        // Perform some queries
+        session.execute("open " + NAME);
         for(int i = 0; i < runs; ++i) {
-          Performance.sleep((long) (50 * RND.nextDouble()));
-
-          // Return nth text of the database
-          final int n = RND.nextInt() % MAX + 1;
-          final String qu = Util.info(QUERY, n);
-          session.execute("xquery " + qu);
+          session.execute("add " + INPUT);
         }
         session.close();
       } catch(final Exception ex) {

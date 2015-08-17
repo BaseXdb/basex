@@ -25,7 +25,34 @@ public final class MultipleAddTest extends SandboxTest {
    */
   @Test
   public void clients10runs10() throws Exception {
-    run(1, 1);
+    run(10, 10);
+  }
+
+  /**
+   * Runs the test.
+   * @throws Exception exception
+   */
+  @Test
+  public void clients10runs100() throws Exception {
+    run(10, 100);
+  }
+
+  /**
+   * Runs the test.
+   * @throws Exception exception
+   */
+  @Test
+  public void clients100runs10() throws Exception {
+    run(100, 10);
+  }
+
+  /**
+   * Runs the test.
+   * @throws Exception exception
+   */
+  @Test
+  public void clients100runs100() throws Exception {
+    run(100, 100);
   }
 
   /**
@@ -67,14 +94,18 @@ public final class MultipleAddTest extends SandboxTest {
     @Override
     public void run() {
       try {
+        new Set(MainOptions.AUTOFLUSH, false).execute(ctx);
+        new Set(MainOptions.INTPARSE, true).execute(ctx);
         new Open(NAME).execute(ctx);
-        for(int i = 0; i < runs; ++i) {
-          new Add("", INPUT).execute(ctx);
+        try {
+          for(int r = 0; r < runs; ++r) {
+            new Add("", INPUT).execute(ctx);
+          }
+        } finally {
+          new Close().execute(ctx);
         }
       } catch(BaseXException ex) {
         ex.printStackTrace();
-      } finally {
-        ctx.close();
       }
     }
   }
