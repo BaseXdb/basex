@@ -47,6 +47,14 @@ public final class FnTest extends AdvancedQueryTest {
 
   /** Test method. */
   @Test
+  public void xmlToJson() {
+    query(XML_TO_JSON.args("<map xmlns='http://www.w3.org/2005/xpath-functions'>"
+        + "<string key=''>í</string></map>"), "{\"\":\"\u00ed\"}");
+  }
+
+
+  /** Test method. */
+  @Test
   public void serialize() {
     contains(SERIALIZE.args("<x/>"), "<x/>");
     contains(SERIALIZE.args("<x/>", serialParams("")), "<x/>");

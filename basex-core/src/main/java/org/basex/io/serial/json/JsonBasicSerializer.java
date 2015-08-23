@@ -219,7 +219,7 @@ public final class JsonBasicSerializer extends JsonSerializer {
 
     final ByteList bl = new ByteList();
     for(final byte c : value) {
-      if(c < 32 || c >= 128 && c <= 160) {
+      if(c >= 0 && c < 32 || c >= 128 && c <= 160) {
         bl.add('\\');
         if(c == '\b') bl.add('b');
         else if(c == '\f') bl.add('f');
