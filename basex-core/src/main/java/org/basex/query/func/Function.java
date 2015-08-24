@@ -1210,17 +1210,26 @@ public enum Function {
   _VALIDATE_XSD_INFO(ValidateXsdInfo.class, "xsd-info(input[,schema])",
       arg(ITEM, ITEM), STR_ZM, flag(NDT), VALIDATE_URI),
   /** XQuery function. */
+  _VALIDATE_XSD_REPORT(ValidateXsdReport.class, "xsd-report(input[,schema])",
+      arg(ITEM, ITEM), ELM, flag(NDT), VALIDATE_URI),
+  /** XQuery function. */
   _VALIDATE_DTD(ValidateDtd.class, "dtd(input[,schema])", arg(ITEM, ITEM), EMP, flag(NDT),
       VALIDATE_URI),
   /** XQuery function. */
   _VALIDATE_DTD_INFO(ValidateDtdInfo.class, "dtd-info(input[,schema])",
       arg(ITEM, ITEM), STR_ZM, flag(NDT), VALIDATE_URI),
   /** XQuery function. */
+  _VALIDATE_DTD_REPORT(ValidateDtdReport.class, "dtd-report(input[,schema])",
+      arg(ITEM, ITEM), ELM, flag(NDT), VALIDATE_URI),
+  /** XQuery function. */
   _VALIDATE_RNG(ValidateRng.class, "rng(input,schema[,compact])",
       arg(ITEM, ITEM, BLN), STR_ZM, flag(NDT), VALIDATE_URI),
   /** XQuery function. */
   _VALIDATE_RNG_INFO(ValidateRngInfo.class, "rng-info(input,schema[,compact])",
       arg(ITEM, ITEM, BLN), STR_ZM, flag(NDT), VALIDATE_URI),
+  /** XQuery function. */
+  _VALIDATE_RNG_REPORT(ValidateRngReport.class, "rng-report(input,schema[,compact])",
+      arg(ITEM, ITEM, BLN), ELM, flag(NDT), VALIDATE_URI),
 
   /* Web Module. */
 

@@ -4,14 +4,14 @@ import org.basex.query.*;
 import org.basex.query.value.*;
 
 /**
- * Validates a document against a RelaxNG document.
+ * Function implementation.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public class ValidateRngInfo extends ValidateRng {
+public final class ValidateDtdReport extends ValidateDtd {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return info(qc);
+    return report(qc);
   }
 }

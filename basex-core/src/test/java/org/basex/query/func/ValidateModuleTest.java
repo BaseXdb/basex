@@ -21,6 +21,8 @@ public final class ValidateModuleTest extends AdvancedQueryTest {
   private static final String XSD = DIR + "validate.xsd";
   /** Test file. */
   private static final String DTD = DIR + "validate.dtd";
+  /** Test file. */
+  private static final String INPUT = DIR + "input.xml";
 
   /** Test method. */
   @Test
@@ -44,11 +46,11 @@ public final class ValidateModuleTest extends AdvancedQueryTest {
     error(_VALIDATE_XSD.args(FILE, "unknown.xsd"), WHICHRES_X);
     error(_VALIDATE_XSD.args(FILE), BXVA_FAIL_X);
     error(
-        "let $doc := <root/> " +
-        "let $schema := <xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'> " +
-        "<xs:element name='unknown'/> " +
-        "</xs:schema> " +
-        "return validate:xsd($doc, $schema)", BXVA_FAIL_X);
+      "let $doc := <root/> " +
+      "let $schema := <xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'> " +
+      "<xs:element name='unknown'/> " +
+      "</xs:schema> " +
+      "return validate:xsd($doc, $schema)", BXVA_FAIL_X);
   }
 
   /** Test method. */
@@ -67,20 +69,71 @@ public final class ValidateModuleTest extends AdvancedQueryTest {
       "let $schema := <xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'> " +
       "<xs:element name='root'/> " +
       "</xs:schema> " +
-      "return validate:xsd-info($doc, $schema)", "");
+      "return " + _VALIDATE_XSD_INFO.args("$doc", "$schema"), "");
 
     // returned error
     query(EXISTS.args(_VALIDATE_XSD_INFO.args(FILE)), "true");
     query(EXISTS.args(
-        "let $doc := <root/> " +
-        "let $schema := <xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'> " +
-        "<xs:element name='unknown'/> " +
-        "</xs:schema> " +
-        "return validate:xsd-info($doc, $schema)"), "true");
+      "let $doc := <root/> " +
+      "let $schema := <xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'> " +
+      "<xs:element name='unknown'/> " +
+      "</xs:schema> " +
+      "return " + _VALIDATE_XSD_INFO.args("$doc", "$schema")), "true");
 
     // invalid arguments
     error(_VALIDATE_XSD_INFO.args("unknown"), WHICHRES_X);
     error(_VALIDATE_XSD_INFO.args(FILE, "unknown.xsd"), WHICHRES_X);
+  }
+
+  /** Test method. */
+  @Test
+  public void xsdReport() {
+    // check XML result
+    query(_VALIDATE_XSD_REPORT.args(FILE, XSD), "<report>\n<status>valid</status>\n</report>");
+    // specify arguments as file paths
+    query(_VALIDATE_XSD_REPORT.args(FILE, XSD) + "//status/string()", "valid");
+    // specify arguments as document nodes
+    query(_VALIDATE_XSD_REPORT.args(DOC.args(FILE), DOC.args(XSD)) + "//status/string()", "valid");
+    // specify arguments as file contents
+    query(_VALIDATE_XSD_REPORT.args(_FILE_READ_TEXT.args(FILE), _FILE_READ_TEXT.args(XSD)) +
+        "//status/string()", "valid");
+    // specify main-memory fragments as arguments
+    query(
+      "let $doc := <root/> " +
+      "let $schema := <xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'> " +
+      "                 <xs:element name='root'/> " +
+      "               </xs:schema> " +
+      "return " + _VALIDATE_XSD_REPORT.args("$doc", "$schema") + "//status/string()", "valid");
+
+    // returned error
+    query(_VALIDATE_XSD_REPORT.args(FILE) + "//status/string()", "invalid");
+    query(
+      "let $doc := <root/> " +
+      "let $schema := <xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'> " +
+      "                 <xs:element name='unknown'/> " +
+      "               </xs:schema> " +
+      "return " + _VALIDATE_XSD_REPORT.args("$doc", "$schema") + "//status/string()", "invalid");
+
+    // check XML result
+    query(
+      "let $doc := <root/> " +
+      "let $schema := <xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'> " +
+      "                 <xs:element name='unknown'/> " +
+      "               </xs:schema> " +
+      "let $report := " + _VALIDATE_XSD_REPORT.args("$doc", "$schema") +
+      "return $report update (" +
+      "  delete node .//message/text()," +
+      "  for $a in .//@* return replace value of node $a with ''" +
+      ")",
+      "<report>\n<status>invalid</status>\n" +
+      "<message level=\"\" line=\"\" column=\"\"/>\n" +
+      "</report>");
+    // check URL attribute
+    query(EXISTS.args(_VALIDATE_XSD_REPORT.args(INPUT, XSD) + "//@url"), "true");
+
+    // invalid arguments
+    error(_VALIDATE_XSD_REPORT.args("unknown"), WHICHRES_X);
+    error(_VALIDATE_XSD_REPORT.args(FILE, "unknown.xsd"), WHICHRES_X);
   }
 
   /** Test method. */
@@ -104,9 +157,9 @@ public final class ValidateModuleTest extends AdvancedQueryTest {
     error(_VALIDATE_DTD.args(FILE, "unknown.dtd"), WHICHRES_X);
     error(_VALIDATE_DTD.args(FILE), BXVA_FAIL_X);
     error(
-        "let $doc := <root/> " +
-        "let $dtd := '<!ELEMENT unknown (#PCDATA)>' " +
-        "return validate:dtd($doc, $dtd) ", BXVA_FAIL_X);
+      "let $doc := <root/> " +
+      "let $dtd := '<!ELEMENT unknown (#PCDATA)>' " +
+      "return validate:dtd($doc, $dtd) ", BXVA_FAIL_X);
   }
 
   /** Test method. */
@@ -123,17 +176,62 @@ public final class ValidateModuleTest extends AdvancedQueryTest {
     query(
       "let $doc := <root/> " +
       "let $dtd := '<!ELEMENT root (#PCDATA)>' " +
-      "return validate:dtd($doc, $dtd) ", "");
+      "return " + _VALIDATE_DTD_INFO.args("$doc", "$dtd"), "");
 
     // returned error
     query(EXISTS.args(_VALIDATE_DTD_INFO.args(FILE)), "true");
     query(EXISTS.args(
-        "let $doc := <root/> " +
-        "let $dtd := '<!ELEMENT unknown (#PCDATA)>' " +
-        "return validate:dtd($doc, $dtd) "), "true");
+      "let $doc := <root/> " +
+      "let $dtd := '<!ELEMENT unknown (#PCDATA)>' " +
+      "return " + _VALIDATE_DTD_INFO.args("$doc", "$dtd")), "true");
 
     // invalid arguments
     error(_VALIDATE_DTD_INFO.args("unknown"), WHICHRES_X);
     error(_VALIDATE_DTD_INFO.args(FILE, "unknown.dtd"), WHICHRES_X);
+  }
+
+  /** Test method. */
+  @Test
+  public void dtdReport() {
+    // check XML result
+    query(_VALIDATE_DTD_REPORT.args(FILE, DTD), "<report>\n<status>valid</status>\n</report>");
+    // specify arguments as file paths
+    query(_VALIDATE_DTD_REPORT.args(FILE, DTD) + "//status/string()", "valid");
+    // specify document as document nodes
+    query(_VALIDATE_DTD_REPORT.args(DOC.args(FILE), DTD) + "//status/string()", "valid");
+    // specify arguments as file contents
+    query(_VALIDATE_DTD_REPORT.args(_FILE_READ_TEXT.args(FILE), _FILE_READ_TEXT.args(DTD)) +
+        "//status/string()", "valid");
+    // specify main-memory fragments as arguments
+    query(
+      "let $doc := <root/> " +
+      "let $dtd := '<!ELEMENT root (#PCDATA)>' " +
+      "return " + _VALIDATE_DTD_REPORT.args("$doc", "$dtd") + "//status/string()", "valid");
+
+    // returned error
+    query(_VALIDATE_DTD_REPORT.args(FILE) + "//status/string()", "invalid");
+    query(
+      "let $doc := <root/> " +
+      "let $dtd := '<!ELEMENT unknown (#PCDATA)>' " +
+      "return " + _VALIDATE_DTD_REPORT.args("$doc", "$dtd") + "//status/string()", "invalid");
+
+    // check XML result
+    query(
+      "let $doc := <root/> " +
+      "let $schema := '<!ELEMENT unknown (#PCDATA)>' " +
+      "let $report := " + _VALIDATE_DTD_REPORT.args("$doc", "$schema") +
+      "return $report update (" +
+      "  delete node .//message/text()," +
+      "  for $a in .//@* return replace value of node $a with ''" +
+      ")",
+      "<report>\n<status>invalid</status>\n" +
+      "<message level=\"\" line=\"\" column=\"\"/>\n" +
+      "</report>");
+    // check URL attribute
+    query(EXISTS.args(_VALIDATE_DTD_REPORT.args(INPUT, DTD) + "//@url"), "true");
+
+    // invalid arguments
+    error(_VALIDATE_DTD_REPORT.args("unknown"), WHICHRES_X);
+    error(_VALIDATE_DTD_REPORT.args(FILE, "unknown.dtd"), WHICHRES_X);
   }
 }
