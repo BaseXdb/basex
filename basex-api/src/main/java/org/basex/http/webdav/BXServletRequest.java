@@ -56,7 +56,19 @@ final class BXServletRequest extends AbstractRequest {
   BXServletRequest(final HttpServletRequest req) {
     this.req = req;
     method = Method.valueOf(req.getMethod());
-    url = req.getRequestURL().toString(); // MiltonUtils.stripContext(r);
+    String u = req.getRequestURL().toString();
+    // encoded characters: try to guess character set
+    if(u.indexOf("%") != -1) {
+      try {
+        final String enc = req.getCharacterEncoding();
+        final String ud = URLDecoder.decode(u, enc == null ? Strings.UTF8 : enc);
+        u = ud.contains("\uFFFD") ? URLDecoder.decode(u, "ISO-8859-1") : ud;
+      } catch(final Exception ignore) {
+        Util.debug(ignore);
+      }
+    }
+    url = u;
+    System.out.println("=> " + url);
   }
 
   @Override
