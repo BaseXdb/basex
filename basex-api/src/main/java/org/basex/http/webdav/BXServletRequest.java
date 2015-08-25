@@ -68,7 +68,6 @@ final class BXServletRequest extends AbstractRequest {
       }
     }
     url = u;
-    System.out.println("=> " + url);
   }
 
   @Override
