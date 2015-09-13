@@ -167,7 +167,7 @@ public final class HttpClient {
       conn.setDoOutput(true);
 
       final String timeout = request.attribute(TIMEOUT);
-      if(timeout != null) conn.setConnectTimeout(Strings.toInt(timeout));
+      if(timeout != null) conn.setConnectTimeout(Strings.toInt(timeout) * 1000);
       final String redirect = request.attribute(FOLLOW_REDIRECT);
       if(redirect != null) setFollowRedirects(Strings.yes(redirect));
 
