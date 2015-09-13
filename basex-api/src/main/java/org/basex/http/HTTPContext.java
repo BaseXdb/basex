@@ -489,16 +489,16 @@ public final class HTTPContext {
   }
 
   /**
-   * Decodes the specified path segments.
-   * @param segments strings to be decoded
+   * Decodes the specified path.
+   * @param path strings to be decoded
    * @return argument
    * @throws IllegalArgumentException invalid path segments
    */
-  public static String decode(final String segments) {
+  public static String decode(final String path) {
     try {
-      return URLDecoder.decode(segments, Prop.ENCODING);
-    } catch(final UnsupportedEncodingException ex) {
-      throw new IllegalArgumentException(ex);
+      return URLDecoder.decode(path, Prop.ENCODING);
+    } catch(final UnsupportedEncodingException | IllegalArgumentException ex) {
+      return path;
     }
   }
 

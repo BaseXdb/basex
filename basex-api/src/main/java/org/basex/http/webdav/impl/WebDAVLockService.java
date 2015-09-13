@@ -1,6 +1,6 @@
 package org.basex.http.webdav.impl;
 
-import static org.basex.http.webdav.impl.Utils.*;
+import static org.basex.http.webdav.impl.WebDAVUtils.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;

@@ -24,6 +24,8 @@ public final class Strings {
   public static final String UTF16LE = "UTF-16LE";
   /** UTF16 encoding string. */
   public static final String UTF32 = "UTF-32";
+  /** ISO-8859-1 encoding string. */
+  public static final String ISO88591 = "ISO-8859-1";
 
   /** UTF8 encoding strings. */
   private static final String[] ALL_UTF8 = { UTF8, "UTF8" };

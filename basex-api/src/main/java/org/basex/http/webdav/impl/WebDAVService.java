@@ -1,6 +1,6 @@
 package org.basex.http.webdav.impl;
 
-import static org.basex.http.webdav.impl.Utils.*;
+import static org.basex.http.webdav.impl.WebDAVUtils.*;
 import static org.basex.query.func.Function.*;
 
 import java.io.*;
@@ -272,22 +272,22 @@ public final class WebDAVService<T> {
 
   /**
    * Renames the database with the given name.
-   * @param db database name
-   * @param n new name
+   * @param old database name
+   * @param db new name
    * @throws IOException I/O exception
    */
-  public void renameDb(final String db, final String n) throws IOException {
-    session().execute(new AlterDB(db, n));
+  public void renameDb(final String old, final String db) throws IOException {
+    session().execute(new AlterDB(old, dbname(db)));
   }
 
   /**
    * Copies the database with the given name.
-   * @param db database name
-   * @param n new database name
+   * @param old database name
+   * @param db new database name
    * @throws IOException I/O exception
    */
-  public void copyDb(final String db, final String n) throws IOException {
-    session().execute(new Copy(db, n));
+  public void copyDb(final String old, final String db) throws IOException {
+    session().execute(new Copy(old, dbname(db)));
   }
 
   /**

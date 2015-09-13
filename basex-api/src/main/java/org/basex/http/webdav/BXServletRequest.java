@@ -1,5 +1,7 @@
 package org.basex.http.webdav;
 
+import static org.basex.http.webdav.impl.WebDAVUtils.*;
+
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -28,6 +30,9 @@ import com.bradmcevoy.http.Cookie;
  * @author Dimitar Popov
  */
 final class BXServletRequest extends AbstractRequest {
+  /** Destination string. */
+  private static final String DESTINATION = "Destination";
+
   /** HTTP servlet request. */
   private final HttpServletRequest req;
   /** Request method. */
@@ -56,18 +61,7 @@ final class BXServletRequest extends AbstractRequest {
   BXServletRequest(final HttpServletRequest req) {
     this.req = req;
     method = Method.valueOf(req.getMethod());
-    String u = req.getRequestURL().toString();
-    // encoded characters: try to guess character set
-    if(u.indexOf("%") != -1) {
-      try {
-        final String enc = req.getCharacterEncoding();
-        final String ud = URLDecoder.decode(u, enc == null ? Strings.UTF8 : enc);
-        u = ud.contains("\uFFFD") ? URLDecoder.decode(u, "ISO-8859-1") : ud;
-      } catch(final Exception ignore) {
-        Util.debug(ignore);
-      }
-    }
-    url = u;
+    url = decode(req.getRequestURL().toString());
   }
 
   @Override
@@ -77,7 +71,8 @@ final class BXServletRequest extends AbstractRequest {
 
   @Override
   public String getRequestHeader(final Header header) {
-    return req.getHeader(header.code);
+    final String value = req.getHeader(header.code);
+    return header.code.equals(DESTINATION) ? decode(value) : value;
   }
 
   @Override

@@ -97,7 +97,7 @@ public interface HttpText {
     /** Nonce. */ NONCE,
     /** Realm. */ REALM,
     /** Opaque. */ OPAQUE,
-    /** Cnonce .*/ CNONCE,
+    /** Cnonce. */ CNONCE,
     /** Method. */ METHOD,
     /** Timeout. */ TIMEOUT,
     /** Response. */ RESPONSE,

@@ -1,9 +1,11 @@
 package org.basex.http.webdav.impl;
 
 import java.io.*;
+import java.net.*;
 
 import org.basex.io.*;
 import org.basex.io.in.*;
+import org.basex.util.*;
 
 /**
  * WebDAV utility methods.
@@ -11,14 +13,14 @@ import org.basex.io.in.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Dimitar Popov
  */
-public final class Utils {
+public final class WebDAVUtils {
   /** File path separator. */
   public static final char SEP = '/';
-  /** Dummy file for empty folder.*/
-  static final String DUMMY = ".empty";
+  /** Dummy file for empty folder. */
+  public static final String DUMMY = ".empty";
 
   /** Private constructor. */
-  private Utils() { }
+  private WebDAVUtils() { }
 
   /**
    * Strips leading slash if available.
@@ -45,6 +47,23 @@ public final class Utils {
    */
   public static String dbname(final String db) {
     return IO.get(db).dbname();
+  }
+
+  /**
+   * Decodes a url. Character set must be guessed, because it cannot be derived from the request.
+   * @param url url to be decoded
+   * @return decoded url
+   */
+  public static String decode(final String url) {
+    if(url.indexOf('%') != -1) {
+      try {
+        final String ud = URLDecoder.decode(url, Strings.UTF8);
+        return ud.contains("\uFFFD") ? URLDecoder.decode(url, Strings.ISO88591) : ud;
+      } catch(final Exception ignore) {
+        Util.errln(ignore);
+      }
+    }
+    return url;
   }
 
   /**

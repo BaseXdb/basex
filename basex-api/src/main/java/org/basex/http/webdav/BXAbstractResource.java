@@ -1,7 +1,7 @@
 package org.basex.http.webdav;
 
 import static com.bradmcevoy.http.LockResult.*;
-import static org.basex.http.webdav.impl.Utils.*;
+import static org.basex.http.webdav.impl.WebDAVUtils.*;
 
 import java.io.*;
 import java.util.*;

@@ -614,7 +614,7 @@ public interface QueryText {
   byte[] HTTP_URI = token(EXPATH + "http-client");
   /** URI of Package API. */
   byte[] PKG_URI = token(EXPATH + "pkg");
-  /** URI of ZIP Module.*/
+  /** URI of ZIP Module. */
   byte[] ZIP_URI = token(EXPATH + "zip");
   /** URI of EXPath errors. */
   byte[] EXPERROR_URI = token(EXPATH + "error");
@@ -628,7 +628,7 @@ public interface QueryText {
 
   /** Database module URI. */
   byte[] ADMIN_URI = token(BXMODULES_URI + "admin");
-  /** Archive module URI.*/
+  /** Archive module URI. */
   byte[] ARCHIVE_URI = token(BXMODULES_URI + "archive");
   /** Client module URI. */
   byte[] CLIENT_URI = token(BXMODULES_URI + "client");
