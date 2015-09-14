@@ -244,7 +244,7 @@ public final class GFLWOR extends ParseExpr {
 
     size = calcSize();
     if(size == 0 && !has(Flag.NDT) && !has(Flag.UPD)) {
-      qc.compInfo(QueryText.OPTWRITE, this);
+      qc.compInfo(QueryText.OPTREWRITE, this);
       return Empty.SEQ;
     }
 

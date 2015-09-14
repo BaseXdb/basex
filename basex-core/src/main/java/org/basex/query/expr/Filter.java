@@ -90,7 +90,7 @@ public abstract class Filter extends Preds {
   public final Expr optimizeEbv(final QueryContext qc, final VarScope scp) throws QueryException {
     final Expr e = merge(root, qc, scp);
     if(e != this) {
-      qc.compInfo(QueryText.OPTWRITE, this);
+      qc.compInfo(QueryText.OPTREWRITE, this);
       return e;
     }
     return super.optimizeEbv(qc, scp);
@@ -184,7 +184,7 @@ public abstract class Filter extends Preds {
     }
 
     if(opt) {
-      qc.compInfo(QueryText.OPTWRITE, this);
+      qc.compInfo(QueryText.OPTREWRITE, this);
       return e.optimize(qc, scp);
     }
 

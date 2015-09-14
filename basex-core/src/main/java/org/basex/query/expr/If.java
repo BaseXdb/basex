@@ -72,7 +72,7 @@ public final class If extends Arr {
 
     // if not(A) then B else C -> if A then C else B
     if(cond.isFunction(Function.NOT)) {
-      qc.compInfo(OPTWRITE, this);
+      qc.compInfo(OPTREWRITE, this);
       cond = ((Arr) cond).exprs[0];
       final Expr tmp = exprs[0];
       exprs[0] = exprs[1];
@@ -89,7 +89,7 @@ public final class If extends Arr {
           return compBln(a, info);
         }
         // if(A) then true() else C -> A or C
-        qc.compInfo(OPTWRITE, this);
+        qc.compInfo(OPTREWRITE, this);
         return new Or(info, a, c).optimize(qc, scp);
       }
 
@@ -100,21 +100,21 @@ public final class If extends Arr {
           return Function.NOT.get(null, info, a).optimize(qc, scp);
         }
         // if(A) then B else true() -> not(A) or B
-        qc.compInfo(OPTWRITE, this);
+        qc.compInfo(OPTREWRITE, this);
         final Expr notA = Function.NOT.get(null, info, a).optimize(qc, scp);
         return new Or(info, notA, b).optimize(qc, scp);
       }
 
       if(b == Bln.FALSE) {
         // if(A) then false() else C -> not(A) and C
-        qc.compInfo(OPTWRITE, this);
+        qc.compInfo(OPTREWRITE, this);
         final Expr notA = Function.NOT.get(null, info, a).optimize(qc, scp);
         return new And(info, notA, c).optimize(qc, scp);
       }
 
       if(c == Bln.FALSE) {
         // if(A) then B else false() -> A and B
-        qc.compInfo(OPTWRITE, this);
+        qc.compInfo(OPTREWRITE, this);
         return new And(info, a, b).optimize(qc, scp);
       }
     }

@@ -204,7 +204,7 @@ public abstract class Path extends ParseExpr {
         // merge nested predicates. example: if(a[b]) ->  if(a/b)
         final Expr s = step.merge(this, qc, scp);
         if(s != step) {
-          qc.compInfo(OPTWRITE, this);
+          qc.compInfo(OPTREWRITE, this);
           step.preds = new Expr[0];
           return s;
         }

@@ -114,7 +114,7 @@ public final class Switch extends ParseExpr {
 
     if(tmp.size() != cases.length) {
       // branches have changed
-      qc.compInfo(OPTWRITE, this);
+      qc.compInfo(OPTREWRITE, this);
       cases = tmp.toArray(new SwitchCase[tmp.size()]);
     }
     return this;

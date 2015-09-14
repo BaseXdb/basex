@@ -24,13 +24,13 @@ public final class FnNot extends StandardFunc {
     final Expr e = exprs[0];
     // simplify: not(empty(A)) -> exists(A)
     if(e.isFunction(Function.EMPTY)) {
-      qc.compInfo(QueryText.OPTWRITE, this);
+      qc.compInfo(QueryText.OPTREWRITE, this);
       exprs = ((Arr) e).exprs;
       return Function.EXISTS.get(sc, info, exprs);
     }
     // simplify: not(exists(A)) -> empty(A)
     if(e.isFunction(Function.EXISTS)) {
-      qc.compInfo(QueryText.OPTWRITE, this);
+      qc.compInfo(QueryText.OPTREWRITE, this);
       exprs = ((Arr) e).exprs;
       return Function.EMPTY.get(sc, info, exprs);
     }

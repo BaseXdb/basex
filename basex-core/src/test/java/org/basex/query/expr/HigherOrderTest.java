@@ -2,6 +2,7 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryError.*;
 
+import org.basex.io.*;
 import org.basex.query.*;
 import org.junit.*;
 
@@ -119,5 +120,21 @@ public final class HigherOrderTest extends AdvancedQueryTest {
   public void funcLitForward() {
     query("declare function local:a($a) { local:b#1($a) };" +
           "declare function local:b($b) { $b }; local:a(1)", "1");
+  }
+
+  /** Do not pre-evaluate function items with non-deterministic expressions (see GH-1191). */
+  @Test
+  public void nonDeterministic() {
+    final IOFile sandbox = sandbox();
+    query(
+      "let $files := ('a','b') ! (\"" + sandbox + "/\" || . || '.txt')" +
+      "return (\n" +
+      "  for $file in $files return (file:write-text($file, ?))(''),\n" +
+      "  $files ! file:exists(.),\n" +
+      "  $files ! file:delete(?)(.),\n" +
+      "  $files ! file:exists(.)\n" +
+      ")",
+      "true\ntrue\nfalse\nfalse"
+    );
   }
 }

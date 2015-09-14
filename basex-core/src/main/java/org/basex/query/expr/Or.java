@@ -63,7 +63,7 @@ public final class Or extends Logical {
     if(list.isEmpty()) return optPre(Bln.FALSE, qc);
 
     if(es != list.size()) {
-      qc.compInfo(OPTWRITE, this);
+      qc.compInfo(OPTREWRITE, this);
       exprs = list.finish();
     }
     compFlatten(qc);
@@ -77,7 +77,7 @@ public final class Or extends Logical {
     }
 
     if(not) {
-      qc.compInfo(OPTWRITE, this);
+      qc.compInfo(OPTREWRITE, this);
       final int el = exprs.length;
       final Expr[] inner = new Expr[el];
       for(int e = 0; e < el; e++) inner[e] = ((Arr) exprs[e]).exprs[0];

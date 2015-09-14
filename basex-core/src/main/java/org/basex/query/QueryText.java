@@ -788,7 +788,7 @@ public interface QueryText {
   /** Optimization info. */
   String OPTPRE = "pre-evaluating %";
   /** Optimization info. */
-  String OPTWRITE = "rewriting %";
+  String OPTREWRITE = "rewriting %";
   /** Optimization info. */
   String OPTFLAT = "flattening %";
   /** Optimization info. */

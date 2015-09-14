@@ -308,7 +308,7 @@ public abstract class Expr extends ExprInfo {
     // return true if a deterministic expression returns at least one node
     final SeqType st = seqType();
     if(st.type instanceof NodeType && st.occ.min >= 1 && !has(Flag.UPD) && !has(Flag.NDT)) {
-      qc.compInfo(QueryText.OPTWRITE, this);
+      qc.compInfo(QueryText.OPTREWRITE, this);
       return Bln.TRUE;
     }
     return this;

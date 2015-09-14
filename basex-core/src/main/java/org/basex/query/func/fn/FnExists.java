@@ -33,7 +33,7 @@ public final class FnExists extends StandardFunc {
     // if(exists(node*)) -> if(node*)
     final Expr e = exprs[0];
     if(e.seqType().type instanceof NodeType) {
-      qc.compInfo(QueryText.OPTWRITE, this);
+      qc.compInfo(QueryText.OPTREWRITE, this);
       return e;
     }
     return this;

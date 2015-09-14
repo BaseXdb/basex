@@ -83,7 +83,7 @@ public abstract class Preds extends ParseExpr {
           if(e2.isFunction(Function.LAST) || st2.one() && st2.type.isNumber()) {
             if(cmp instanceof CmpG && ((CmpG) cmp).op == OpG.EQ ||
                cmp instanceof CmpV && ((CmpV) cmp).op == OpV.EQ) {
-              qc.compInfo(OPTWRITE, pred);
+              qc.compInfo(OPTREWRITE, pred);
               preds[p] = e2;
             }
           }

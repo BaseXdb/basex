@@ -194,14 +194,14 @@ public final class CmpV extends Cmp {
       e = preEval(qc);
     } else if(e1.isFunction(Function.COUNT)) {
       e = compCount(op);
-      if(e != this) qc.compInfo(e instanceof Bln ? OPTPRE : OPTWRITE, this);
+      if(e != this) qc.compInfo(e instanceof Bln ? OPTPRE : OPTREWRITE, this);
     } else if(e1.isFunction(Function.STRING_LENGTH)) {
       e = compStringLength(op);
-      if(e != this) qc.compInfo(e instanceof Bln ? OPTPRE : OPTWRITE, this);
+      if(e != this) qc.compInfo(e instanceof Bln ? OPTPRE : OPTREWRITE, this);
     } else if(e1.isFunction(Function.POSITION)) {
       // position() CMP number
       e = Pos.get(op, e2, e, info);
-      if(e != this) qc.compInfo(OPTWRITE, this);
+      if(e != this) qc.compInfo(OPTREWRITE, this);
     } else if(st1.eq(SeqType.BLN) && (op == OpV.EQ && e2 == Bln.FALSE ||
         op == OpV.NE && e2 == Bln.TRUE)) {
       // (A eq false()) -> not(A)

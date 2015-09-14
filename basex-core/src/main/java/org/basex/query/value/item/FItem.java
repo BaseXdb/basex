@@ -77,7 +77,7 @@ public abstract class FItem extends Item implements XQFunction {
 
   @Override
   public boolean has(final Flag flag) {
-    return flag == Flag.UPD && annotations().contains(Annotation.UPDATING) || super.has(flag);
+    return flag == Flag.UPD && annotations().contains(Annotation.UPDATING);
   }
 
   @Override

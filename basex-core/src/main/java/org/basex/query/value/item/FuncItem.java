@@ -209,6 +209,13 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
+  public boolean has(final Flag flag) {
+    // function item itself has no particular properties unless it is evaluated; the associated
+    // expression is checked instead in order to suppress unwanted optimizations (see e.g. GH-1191)
+    return flag == Flag.UPD && sc.mixUpdates || expr.has(flag) || super.has(flag);
+  }
+
+  @Override
   public Expr inlineExpr(final Expr[] exprs, final QueryContext qc, final VarScope scp,
       final InputInfo ii) throws QueryException {
 
@@ -216,8 +223,7 @@ public final class FuncItem extends FItem implements Scope {
     qc.compInfo(OPTINLINE, this);
 
     // create let bindings for all variables
-    final LinkedList<Clause> cls =
-        exprs.length == 0 ? null : new LinkedList<Clause>();
+    final LinkedList<Clause> cls = exprs.length == 0 ? null : new LinkedList<Clause>();
     final IntObjMap<Var> vs = new IntObjMap<>();
     final int pl = params.length;
     for(int p = 0; p < pl; p++) {

@@ -160,7 +160,7 @@ public final class CmpG extends Cmp {
     if(e1.isFunction(Function.COUNT)) {
       final Expr e = compCount(op.op);
       if(e != this) {
-        qc.compInfo(e instanceof Bln ? OPTPRE : OPTWRITE, this);
+        qc.compInfo(e instanceof Bln ? OPTPRE : OPTREWRITE, this);
         return e;
       }
     }
@@ -169,7 +169,7 @@ public final class CmpG extends Cmp {
     if(e1.isFunction(Function.STRING_LENGTH)) {
       final Expr e = compStringLength(op.op);
       if(e != this) {
-        qc.compInfo(e instanceof Bln ? OPTPRE : OPTWRITE, this);
+        qc.compInfo(e instanceof Bln ? OPTPRE : OPTREWRITE, this);
         return e;
       }
     }
@@ -178,14 +178,14 @@ public final class CmpG extends Cmp {
     if(e1.isFunction(Function.POSITION)) {
       final Expr e = Pos.get(op.op, e2, this, info);
       if(e != this) {
-        qc.compInfo(OPTWRITE, this);
+        qc.compInfo(OPTREWRITE, this);
         return e;
       }
     }
 
     // (A = false()) -> not(A)
     if(st1.eq(SeqType.BLN) && (op == OpG.EQ && e2 == Bln.FALSE || op == OpG.NE && e2 == Bln.TRUE)) {
-      qc.compInfo(OPTWRITE, this);
+      qc.compInfo(OPTREWRITE, this);
       return Function.NOT.get(null, info, e1);
     }
 
@@ -195,7 +195,7 @@ public final class CmpG extends Cmp {
     if(e == this) e = CmpSR.get(this);
     if(e != this) {
       // pre-evaluate optimized expression
-      qc.compInfo(OPTWRITE, this);
+      qc.compInfo(OPTREWRITE, this);
       return allAreValues() ? e.preEval(qc) : e;
     }
 
