@@ -707,11 +707,13 @@ public abstract class Data {
    * @param source clip with source data
    */
   public final void insert(final int pre, final int par, final DataClip source) {
+    final int sCount = source.size();
+    if(sCount == 0) return;
+
     meta.update();
     resources.docs();
 
     // resize buffer to cache more entries
-    final int sCount = source.size();
     final int bSize = Math.min(sCount, IO.BLOCKSIZE >> IO.NODEPOWER);
     bufferSize(bSize);
 
