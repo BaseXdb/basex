@@ -74,11 +74,6 @@ final class Leaf extends TrieNode {
   }
 
   @Override
-  StringBuilder toString(final StringBuilder sb, final String ind) {
-    return sb.append(ind).append("`-- ").append(key).append(" => ").append(value).append('\n');
-  }
-
-  @Override
   TrieNode addAll(final TrieNode o, final int l, final InputInfo ii) throws QueryException {
     return o.add(this, l, ii);
   }
@@ -183,6 +178,11 @@ final class Leaf extends TrieNode {
   @Override
   int hash(final InputInfo ii) throws QueryException {
     return 31 * hash + value.hash(ii);
+  }
+
+  @Override
+  StringBuilder toString(final StringBuilder sb, final String ind) {
+    return sb.append(ind).append("`-- ").append(key).append(" => ").append(value).append('\n');
   }
 
   @Override

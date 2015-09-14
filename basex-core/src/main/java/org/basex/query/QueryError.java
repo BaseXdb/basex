@@ -29,6 +29,8 @@ public enum QueryError {
   BASX_OPTIONS_X(BASX, 2, "Unknown database option '%'."),
   /** BASX0002. */
   BASX_VALUE_X_X(BASX, 2, "Database option '%' cannot be set to '%'."),
+  /** BASX0002. */
+  BASX_WHICH_X(BASX, 2, "%"),
   /** BASX0003. */
   BASX_RESTXQ_X(BASX, 3, "%"),
   /** BASX0004. */

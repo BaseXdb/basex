@@ -92,7 +92,7 @@ public final class FuncOptions {
       final TokenBuilder tb = new TokenBuilder();
       try {
         if(item instanceof Map) {
-          options.parse((Map) item, !acceptUnknown);
+          options.parse((Map) item, !acceptUnknown, info);
         } else {
           if(test == null) {
             throw MAP_X_X.get(info, item.type, item);

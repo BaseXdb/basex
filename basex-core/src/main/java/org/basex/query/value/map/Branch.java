@@ -108,19 +108,6 @@ final class Branch extends TrieNode {
   private static final String[] ENDS = { "|-- ", "|   ", "`-- ", "    " };
 
   @Override
-  StringBuilder toString(final StringBuilder sb, final String ind) {
-    final int s = Integer.bitCount(used);
-    for(int i = 0, j = 0; i < s; i++, j++) {
-      while((used & 1 << j) == 0) j++;
-      final int e = i == s - 1 ? 2 : 0;
-      sb.append(ind).append(ENDS[e]).append(
-          String.format("%x", j)).append('\n');
-      kids[j].toString(sb, ind + ENDS[e + 1]);
-    }
-    return sb;
-  }
-
-  @Override
   TrieNode addAll(final TrieNode o, final int l, final InputInfo ii) throws QueryException {
     return o.add(this, l, ii);
   }
@@ -236,6 +223,18 @@ final class Branch extends TrieNode {
 
     // everything OK
     return true;
+  }
+
+  @Override
+  StringBuilder toString(final StringBuilder sb, final String ind) {
+    final int s = Integer.bitCount(used);
+    for(int i = 0, j = 0; i < s; i++, j++) {
+      while((used & 1 << j) == 0) j++;
+      final int e = i == s - 1 ? 2 : 0;
+      sb.append(ind).append(ENDS[e]).append(String.format("%x", j)).append('\n');
+      kids[j].toString(sb, ind + ENDS[e + 1]);
+    }
+    return sb;
   }
 
   @Override

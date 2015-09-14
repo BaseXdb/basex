@@ -23,8 +23,6 @@ abstract class TrieNode {
   /** The empty node. */
   static final TrieNode EMPTY = new TrieNode(0) {
     @Override
-    StringBuilder toString(final StringBuilder sb, final String ind) { return sb.append("{ }"); }
-    @Override
     TrieNode delete(final int h, final Item k, final int l, final InputInfo i) { return this; }
     @Override
     Value get(final int h, final Item k, final int l, final InputInfo i) { return null; }
@@ -54,10 +52,12 @@ abstract class TrieNode {
     public TrieNode put(final int h, final Item k, final Value v, final int l,
         final InputInfo i) { return new Leaf(h, k, v); }
     @Override
-    StringBuilder toString(final StringBuilder sb) { return sb; }
-    @Override
     void apply(final ValueBuilder vb, final FItem func, final QueryContext qc,
         final InputInfo ii) { }
+    @Override
+    StringBuilder toString(final StringBuilder sb, final String ind) { return sb.append("{ }"); }
+    @Override
+    StringBuilder toString(final StringBuilder sb) { return sb; }
   };
 
   /** Size of this node. */
@@ -202,20 +202,6 @@ abstract class TrieNode {
     return hash >>> lvl * Map.BITS & MASK;
   }
 
-  @Override
-  public String toString() {
-    return toString(new StringBuilder(), "").toString();
-  }
-
-  /**
-   * Recursive {@link #toString()} helper.
-   *
-   * @param sb string builder
-   * @param ind indentation string
-   * @return string builder for convenience
-   */
-  abstract StringBuilder toString(final StringBuilder sb, final String ind);
-
   /**
    * Checks if the map has the specified key and value type.
    * @param kt key type
@@ -270,9 +256,23 @@ abstract class TrieNode {
       throws QueryException;
 
   /**
+   * Recursive {@link #toString()} helper.
+   *
+   * @param sb string builder
+   * @param ind indentation string
+   * @return string builder for convenience
+   */
+  abstract StringBuilder toString(final StringBuilder sb, final String ind);
+
+  /**
    * Recursive helper for {@link Map#toString()}.
    * @param sb string builder
    * @return reference to {@code sb}
    */
   abstract StringBuilder toString(final StringBuilder sb);
+
+  @Override
+  public String toString() {
+    return toString(new StringBuilder(), "").toString();
+  }
 }

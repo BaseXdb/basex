@@ -169,7 +169,7 @@ public final class MainOptions extends Options {
   // Other
 
   /** Options that are adopted from parent options. */
-  private static final Option<?>[] PARENT = { CHOP, INTPARSE, STRIPNS, DTD, XINCLUDE, CATFILE };
+  private static final Option<?>[] INHERIT = { CHOP, INTPARSE, STRIPNS, DTD, XINCLUDE, CATFILE };
 
   /** Parser. */
   public enum MainParser {
@@ -202,17 +202,16 @@ public final class MainOptions extends Options {
   }
 
   /**
-   * Constructor, adopting XML parsing options from specified options.
+   * Constructor, adopting XML parsing options from the specified options.
    * @param options parent options
    */
   public MainOptions(final MainOptions options) {
     this(false);
-    for(final Option<?> o : PARENT) put(o, options.get(o));
+    for(final Option<?> option : INHERIT) put(option, options.get(option));
   }
 
   /**
-   * Creates an options instance with whitespace chopping turned off.
-   * The returned instance should not be modified.
+   * Creates a new options instance with whitespace chopping turned off.
    * @return main options
    */
   public static MainOptions get() {

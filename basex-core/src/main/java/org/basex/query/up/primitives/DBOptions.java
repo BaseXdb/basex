@@ -74,13 +74,23 @@ public final class DBOptions {
         final boolean yes = Strings.yes(value);
         if(!yes && !Strings.no(value)) throw BASX_VALUE_X_X.get(info, key, value);
         map.put(option, yes);
+      } else if(option instanceof StringOption) {
+        map.put(option, value);
       } else if(option instanceof EnumOption) {
         final EnumOption<?> eo = (EnumOption<?>) option;
         final Object ev = eo.get(value);
         if(ev == null) throw BASX_VALUE_X_X.get(info, key, value);
         map.put(option, ev);
+      } else if(option instanceof OptionsOption) {
+        try {
+          final Options o = ((OptionsOption<?>) option).newInstance();
+          o.parse(value);
+          map.put(option, o);
+        } catch(final BaseXException ex) {
+          throw BASX_WHICH_X.get(info, ex);
+        }
       } else {
-        map.put(option, value);
+        throw Util.notExpected();
       }
     }
   }

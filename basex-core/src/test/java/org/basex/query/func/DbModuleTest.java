@@ -26,7 +26,9 @@ import org.junit.Test;
  */
 public final class DbModuleTest extends AdvancedQueryTest {
   /** Test file. */
-  private static final String FILE = "src/test/resources/input.xml";
+  private static final String XML = "src/test/resources/input.xml";
+  /** Test file. */
+  private static final String CSV = "src/test/resources/input.csv";
   /** Test folder. */
   private static final String FLDR = "src/test/resources/dir/";
   /** Number of XML files for folder. */
@@ -45,7 +47,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
    */
   @Before
   public void initTest() {
-    execute(new CreateDB(NAME, FILE));
+    execute(new CreateDB(NAME, XML));
   }
 
   /**
@@ -248,7 +250,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
   @Test
   public void add() {
     query(COUNT.args(COLLECTION.args(NAME)), "1");
-    query(_DB_ADD.args(NAME, FILE));
+    query(_DB_ADD.args(NAME, XML));
     query(COUNT.args(COLLECTION.args(NAME)), "2");
 
     query(_DB_ADD.args(NAME, "\"<root/>\"", "t1.xml"));
@@ -260,10 +262,10 @@ public final class DbModuleTest extends AdvancedQueryTest {
     query(_DB_ADD.args(NAME, " <root/>", "test/t3.xml"));
     query(COUNT.args(COLLECTION.args(NAME + "/test/t3.xml") + "/root"), "1");
 
-    query(_DB_ADD.args(NAME, FILE, "in/"));
+    query(_DB_ADD.args(NAME, XML, "in/"));
     query(COUNT.args(COLLECTION.args(NAME + "/in/input.xml") + "/html"), "1");
 
-    query(_DB_ADD.args(NAME, FILE, "test/t4.xml"));
+    query(_DB_ADD.args(NAME, XML, "test/t4.xml"));
     query(COUNT.args(COLLECTION.args(NAME + "/test/t4.xml") + "/html"), "1");
 
     query(_DB_ADD.args(NAME, FLDR, "test/dir"));
@@ -283,6 +285,26 @@ public final class DbModuleTest extends AdvancedQueryTest {
     query(_DB_OPEN.args(NAME, "chop.xml"), "<a/>");
     query(_DB_ADD.args(NAME, " '<a> </a>'", "nochop.xml", " map { 'chop':false() }"));
     query(_DB_OPEN.args(NAME, "nochop.xml"), "<a> </a>");
+
+    // specify parsing options
+    query(_DB_ADD.args(NAME, CSV, "csv.xml",
+        " map { 'parser':'csv','csvparser': 'header=true' }"));
+    query(EXISTS.args(_DB_OPEN.args(NAME, "csv.xml") + "//City"), "true");
+    query(_DB_ADD.args(NAME, CSV, "csv.xml",
+        " map { 'parser':'csv','csvparser': map { 'header': 'true' } }"));
+    query(EXISTS.args(_DB_OPEN.args(NAME, "csv.xml") + "//City"), "true");
+    query(_DB_ADD.args(NAME, CSV, "csv.xml",
+        " map { 'parser':'csv','csvparser': map { 'header': true() } }"));
+    query(EXISTS.args(_DB_OPEN.args(NAME, "csv.xml") + "//City"), "true");
+
+    error(_DB_ADD.args(NAME, CSV, "csv.xml",
+        " map { 'parser':('csv','html') }"), INVALIDOPT_X);
+    error(_DB_ADD.args(NAME, CSV, "csv.xml",
+        " map { 'parser':'csv','csvparser': map { 'header': ('true','false') } }"), INVALIDOPT_X);
+    error(_DB_ADD.args(NAME, CSV, "csv.xml",
+        " map { 'parser':'csv','csvparser': map { 'headr': 'true' } }"), BASX_WHICH_X);
+    error(_DB_ADD.args(NAME, CSV, "csv.xml",
+        " map { 'parser':'csv','csvparser': 'headr=true' }"), BASX_WHICH_X);
   }
 
   /** Test method. */
@@ -329,7 +351,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
     error(_DB_CREATE.args(NAME) + ',' + _DB_CREATE.args(NAME), BXDB_ONCE_X_X);
 
     // create DB from file
-    query(_DB_CREATE.args(NAME, FILE, "in/"));
+    query(_DB_CREATE.args(NAME, XML, "in/"));
     query(COUNT.args(COLLECTION.args(NAME + "/in/input.xml") + "/html"), "1");
 
     // create DB from folder
@@ -338,7 +360,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
 
     // create DB w/ more than one input
     query(_DB_CREATE.args(NAME, "(<a/>,<b/>)", "('1.xml','2.xml')"));
-    query(_DB_CREATE.args(NAME, "(<a/>,'" + FILE + "')", "('1.xml','2.xml')"));
+    query(_DB_CREATE.args(NAME, "(<a/>,'" + XML + "')", "('1.xml','2.xml')"));
 
     error(_DB_CREATE.args(NAME, "()", "1.xml"), BXDB_CREATEARGS_X_X);
     error(_DB_CREATE.args(NAME, "(<a/>,<b/>)", "1.xml"), BXDB_CREATEARGS_X_X);
@@ -462,20 +484,20 @@ public final class DbModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void replace() {
-    execute(new Add("test", FILE));
+    execute(new Add("test", XML));
 
-    query(_DB_REPLACE.args(NAME, FILE, "\"<R1/>\""));
-    query(COUNT.args(COLLECTION.args(NAME + '/' + FILE) + "/R1"), 1);
-    query(COUNT.args(COLLECTION.args(NAME + '/' + FILE) + "/R2"), 0);
+    query(_DB_REPLACE.args(NAME, XML, "\"<R1/>\""));
+    query(COUNT.args(COLLECTION.args(NAME + '/' + XML) + "/R1"), 1);
+    query(COUNT.args(COLLECTION.args(NAME + '/' + XML) + "/R2"), 0);
 
-    query(_DB_REPLACE.args(NAME, FILE, " document { <R2/> }"));
-    query(COUNT.args(COLLECTION.args(NAME + '/' + FILE) + "/R1"), 0);
-    query(COUNT.args(COLLECTION.args(NAME + '/' + FILE) + "/R2"), 1);
+    query(_DB_REPLACE.args(NAME, XML, " document { <R2/> }"));
+    query(COUNT.args(COLLECTION.args(NAME + '/' + XML) + "/R1"), 0);
+    query(COUNT.args(COLLECTION.args(NAME + '/' + XML) + "/R2"), 1);
 
-    query(_DB_REPLACE.args(NAME, FILE, FILE));
-    query(COUNT.args(COLLECTION.args(NAME + '/' + FILE) + "/R1"), 0);
-    query(COUNT.args(COLLECTION.args(NAME + '/' + FILE) + "/R2"), 0);
-    query(COUNT.args(COLLECTION.args(NAME + '/' + FILE) + "/html"), 1);
+    query(_DB_REPLACE.args(NAME, XML, XML));
+    query(COUNT.args(COLLECTION.args(NAME + '/' + XML) + "/R1"), 0);
+    query(COUNT.args(COLLECTION.args(NAME + '/' + XML) + "/R2"), 0);
+    query(COUNT.args(COLLECTION.args(NAME + '/' + XML) + "/html"), 1);
   }
 
   /** Test method. */
@@ -626,7 +648,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
   public void export() {
     // exports the database
     query(_DB_EXPORT.args(NAME, new IOFile(Prop.TMP, NAME)));
-    final IOFile f = new IOFile(new IOFile(Prop.TMP, NAME), FILE.replaceAll(".*/", ""));
+    final IOFile f = new IOFile(new IOFile(Prop.TMP, NAME), XML.replaceAll(".*/", ""));
     query(_FILE_EXISTS.args(f));
     // serializes as text; ensures that the output contains no angle bracket
     query(_DB_EXPORT.args(NAME, new IOFile(Prop.TMP, NAME), " map {'method':'text'}"));
@@ -645,8 +667,8 @@ public final class DbModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void path() {
-    query(_DB_PATH.args(_DB_OPEN.args(NAME)), FILE.replaceAll(".*/", ""));
-    query(_DB_PATH.args(_DB_OPEN.args(NAME) + "/*"), FILE.replaceAll(".*/", ""));
+    query(_DB_PATH.args(_DB_OPEN.args(NAME)), XML.replaceAll(".*/", ""));
+    query(_DB_PATH.args(_DB_OPEN.args(NAME) + "/*"), XML.replaceAll(".*/", ""));
     query(_DB_PATH.args("<x/> update ()"), "");
   }
 
