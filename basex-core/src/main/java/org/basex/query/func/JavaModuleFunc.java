@@ -63,10 +63,10 @@ final class JavaModuleFunc extends JavaMapping {
       mod.queryContext = qc;
     }
 
-    final Object[] args = JavaFunc.args(params, vTypes, vals, true);
-    if(args != null) {
+    final Object[] jargs = JavaFunc.javaArgs(params, vTypes, vals, true);
+    if(jargs != null) {
       try {
-        return method.invoke(module, args);
+        return method.invoke(module, jargs);
       } catch(final Exception ex) {
         Throwable e = ex;
         if(e.getCause() != null) {

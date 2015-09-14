@@ -69,9 +69,9 @@ final class JavaFunc extends JavaMapping {
    * @throws Exception exception
    */
   private Object constructor(final Value[] ar) throws Exception {
-    for(final Constructor<?> con : clazz.getConstructors()) {
-      final Object[] arg = args(con.getParameterTypes(), null, ar, true);
-      if(arg != null) return con.newInstance(arg);
+    for(final Constructor<?> cons : clazz.getConstructors()) {
+      final Object[] jargs = javaArgs(cons.getParameterTypes(), null, ar, true);
+      if(jargs != null) return cons.newInstance(jargs);
     }
     throw JAVACONSTR_X_X.get(info, name(), foundArgs(ar));
   }
@@ -88,17 +88,23 @@ final class JavaFunc extends JavaMapping {
     try {
       final Field f = clazz.getField(method);
       final boolean st = Modifier.isStatic(f.getModifiers());
-      if(ar.length == (st ? 0 : 1)) {
-        return f.get(st ? null : instObj(ar[0]));
-      }
+      if(ar.length == (st ? 0 : 1)) return f.get(st ? null : instObj(ar[0]));
     } catch(final NoSuchFieldException ex) { /* ignored */ }
 
-    for(final Method meth : clazz.getMethods()) {
-      if(!meth.getName().equals(method)) continue;
-      final boolean st = Modifier.isStatic(meth.getModifiers());
-      final Object[] arg = args(meth.getParameterTypes(), null, ar, st);
-      if(arg != null) {
-        Object inst = null;
+    Method meth = null;
+    Object inst = null;
+    Object[] args = null;
+    for(final Method m : clazz.getMethods()) {
+      if(!m.getName().equals(method)) continue;
+      final boolean st = Modifier.isStatic(m.getModifiers());
+      final Class<?>[] pTypes = m.getParameterTypes();
+      final Object[] jargs = javaArgs(pTypes, null, ar, st);
+      if(jargs != null) {
+        if(meth != null) throw JAVAAMBIG_X.get(info, Util.className(clazz) + '.' +
+            method + '#' + pTypes.length);
+        meth = m;
+        args = jargs;
+
         if(!st) {
           inst = instObj(ar[0]);
           if(inst instanceof QueryModule) {
@@ -107,9 +113,10 @@ final class JavaFunc extends JavaMapping {
             mod.queryContext = qc;
           }
         }
-        return meth.invoke(inst, arg);
       }
     }
+    if(meth != null) return meth.invoke(inst, args);
+
     throw JAVAMETHOD_X_X.get(info, name(), foundArgs(ar));
   }
 
@@ -134,17 +141,16 @@ final class JavaFunc extends JavaMapping {
    * @return argument array or {@code null}
    * @throws QueryException query exception
    */
-  static Object[] args(final Class<?>[] params, final boolean[] vTypes, final Value[] args,
+  static Object[] javaArgs(final Class<?>[] params, final boolean[] vTypes, final Value[] args,
       final boolean stat) throws QueryException {
 
-    final int s = stat ? 0 : 1;
-    final int l = args.length - s;
-    if(l != params.length) return null;
+    final int s = stat ? 0 : 1, al = args.length - s;
+    if(al != params.length) return null;
 
     // function arguments
     final boolean[] vType = vTypes == null ? values(params) : vTypes;
-    final Object[] vals = new Object[l];
-    for(int a = 0; a < l; a++) {
+    final Object[] vals = new Object[al];
+    for(int a = 0; a < al; a++) {
       final Class<?> param = params[a];
       final Value arg = args[s + a];
 

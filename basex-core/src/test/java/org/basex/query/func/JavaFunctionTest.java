@@ -43,7 +43,7 @@ public final class JavaFunctionTest extends AdvancedQueryTest {
   @Test
   public void method() {
     query("declare namespace rect = 'java.awt.Rectangle';" +
-        "rect:contains(rect:new(xs:int(2), xs:int(2)), xs:int(1), xs:int(1))", true);
+        "rect:new(xs:int(2), xs:int(2)) => rect:contains(xs:int(1), xs:int(1))", true);
     query("declare namespace p = 'java.util.Properties'; p:new()", "{}");
   }
 
@@ -93,6 +93,8 @@ public final class JavaFunctionTest extends AdvancedQueryTest {
   @Test
   public void ambiguousSignature() {
     error("import module namespace n='java:java.lang.StringBuilder'; n:append('x')",
+        JAVAAMBIG_X);
+    error("declare namespace n='java:java.lang.StringBuilder'; n:append(n:new(), 'x')",
         JAVAAMBIG_X);
   }
 
