@@ -13,13 +13,12 @@ import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
- * <p>This data structure contains references to all document nodes in a
- * database. The document nodes are incrementally updated.</p>
+ * <p>This data structure contains references to all document nodes in a database.
+ * The document nodes are incrementally updated.</p>
  *
- * <p>If updates are performed, the path order is discarded, as its continuous
- * update would be more expensive in some cases (e.g. when bulk insertions of
- * new documents are performed). A tree structure could be introduced to
- * offer better general performance.</p>
+ * <p>If updates are performed, the path order is discarded, as the update would be more expensive
+ * in some cases (e.g. when bulk insertions of new documents are performed). A tree structure could
+ * be introduced to offer better general performance.</p>
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
@@ -31,10 +30,10 @@ final class Docs {
   /** Pre values of document nodes (may be {@code null}).
    * This variable should always be requested via {@link #docs()}. */
   private IntList docList;
-  /** Sorted document paths (may be {@code null}).
+  /** Document paths (may be {@code null}).
    * This variable should always be requested via {@link #paths()}. */
   private TokenList pathList;
-  /** Ordered path indexes (may be {@code null}).
+  /** Mapping for path order (may be {@code null}).
    * This variable should always be requested via {@link #order()}. */
   private int[] pathOrder;
   /** Dirty flag. */
@@ -217,7 +216,7 @@ final class Docs {
    * Returns the pre values of all document nodes matching the specified path.
    * @param path input path
    * @param exact exact (no prefix) matches
-   * @return pre values (internal representation!)
+   * @return pre values (can be internal representation!)
    */
   synchronized IntList docs(final String path, final boolean exact) {
     // invalid path, or no documents: return empty list
@@ -265,8 +264,8 @@ final class Docs {
    * @return path to a directory or not
    */
   synchronized boolean isDir(final byte[] path) {
-    final byte[] pa = concat(path, SLASH);
-    for(final byte[] b : paths()) if(startsWith(b, pa)) return true;
+    final byte[] pref = concat(path, SLASH);
+    for(final byte[] pth : paths()) if(startsWith(pth, pref)) return true;
     return false;
   }
 
