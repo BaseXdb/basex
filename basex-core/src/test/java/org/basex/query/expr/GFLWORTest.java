@@ -24,4 +24,10 @@ public final class GFLWORTest extends AdvancedQueryTest {
   public void groupShadowTest() {
     assertEquals("1", query("let $i := 1 group by $i, $i return $i"));
   }
+
+  /** Positional optimization. */
+  @Test
+  public void posOptimizationTest() {
+    assertEquals("<a/>", query("for $a at $p in (<a/>,<b/>)/. where $p < 2 return $a"));
+  }
 }

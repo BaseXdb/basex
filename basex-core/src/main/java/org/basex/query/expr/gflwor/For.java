@@ -175,16 +175,18 @@ public final class For extends ForLet {
   }
 
   /**
-   * Adds a predicate to the loop expression.
+   * Adds a predicate to the looped expression.
    * @param pred predicate
    */
   void addPredicate(final Expr pred) {
-    // add to clause expression
-    if(expr instanceof AxisPath) {
+    if(expr instanceof AxisPath && !(pred.has(Flag.POS))) {
+      // add to axis path, provided that predicate is not positional
       expr = ((AxisPath) expr).addPreds(pred);
     } else if(expr instanceof Filter) {
+      // add to existing filter expression
       expr = ((Filter) expr).addPred(pred);
     } else {
+      // create new filter expression
       expr = Filter.get(info, expr, pred);
     }
   }
