@@ -154,18 +154,20 @@ public final class FTWords extends FTExpr {
               }
             } while(lexer.hasNext());
 
-            // create or combine iterator
-            if(ftiter == null) {
-              len = t;
-              ftiter = ii;
-            } else if(mode == FTMode.ALL || mode == FTMode.ALL_WORDS) {
-              if(ii.size() == 0) return null;
-              len += t;
-              ftiter = FTIndexIterator.intersect(ftiter, ii, 0);
-            } else {
-              if(ii.size() == 0) continue;
-              len = Math.max(t, len);
-              ftiter = FTIndexIterator.union(ftiter, ii);
+            if(ii != null) {
+              // create or combine iterator
+              if(ftiter == null) {
+                len = t;
+                ftiter = ii;
+              } else if(mode == FTMode.ALL || mode == FTMode.ALL_WORDS) {
+                if(ii.size() == 0) return null;
+                len += t;
+                ftiter = FTIndexIterator.intersect(ftiter, ii, 0);
+              } else {
+                if(ii.size() == 0) continue;
+                len = Math.max(t, len);
+                ftiter = FTIndexIterator.union(ftiter, ii);
+              }
             }
           }
         }
