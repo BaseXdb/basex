@@ -19,7 +19,7 @@ import com.bradmcevoy.http.Cookie;
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
-final class BXServletResponse extends AbstractResponse {
+final class WebDAVResponse extends AbstractResponse {
   /** HTTP servlet response. */
   private final HttpServletResponse res;
   /** Response headers. */
@@ -31,7 +31,7 @@ final class BXServletResponse extends AbstractResponse {
    * Constructor.
    * @param res HTTP servlet response
    */
-  BXServletResponse(final HttpServletResponse res) {
+  WebDAVResponse(final HttpServletResponse res) {
     this.res = res;
   }
 
@@ -104,8 +104,8 @@ final class BXServletResponse extends AbstractResponse {
 
   @Override
   public Cookie setCookie(final Cookie cookie) {
-    if(cookie instanceof BXServletCookie) {
-      res.addCookie(((BXServletCookie) cookie).cookie);
+    if(cookie instanceof WebDAVCookie) {
+      res.addCookie(((WebDAVCookie) cookie).cookie);
       return cookie;
     }
 
@@ -118,7 +118,7 @@ final class BXServletResponse extends AbstractResponse {
     c.setVersion(cookie.getVersion());
 
     res.addCookie(c);
-    return new BXServletCookie(c);
+    return new WebDAVCookie(c);
   }
 
   @Override
@@ -126,6 +126,6 @@ final class BXServletResponse extends AbstractResponse {
     final javax.servlet.http.Cookie c =
         new javax.servlet.http.Cookie(name, value);
     res.addCookie(c);
-    return new BXServletCookie(c);
+    return new WebDAVCookie(c);
   }
 }

@@ -2,8 +2,6 @@ package org.basex.http.webdav;
 
 import java.io.*;
 
-import org.basex.http.webdav.impl.*;
-
 /**
  * WebDAV resource representing a collection database.
  *
@@ -11,13 +9,13 @@ import org.basex.http.webdav.impl.*;
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
-final class BXDatabase extends BXFolder {
+final class WebDAVDatabase extends WebDAVFolder {
   /**
    * Constructor.
    * @param meta resource meta data
    * @param service service
    */
-  BXDatabase(final ResourceMetaData meta, final WebDAVService<BXAbstractResource> service) {
+  WebDAVDatabase(final WebDAVMetaData meta, final WebDAVService service) {
     super(meta, service);
   }
 

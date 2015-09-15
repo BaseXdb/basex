@@ -1,11 +1,10 @@
 package org.basex.http.webdav;
 
-import static org.basex.http.webdav.impl.WebDAVUtils.*;
+import static org.basex.http.webdav.WebDAVUtils.*;
 
 import java.io.*;
 import java.util.*;
 
-import org.basex.http.webdav.impl.*;
 import org.basex.io.in.*;
 import org.basex.util.*;
 
@@ -19,7 +18,7 @@ import com.bradmcevoy.http.exceptions.*;
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
-class BXFolder extends BXAbstractResource implements FolderResource, DeletableCollectionResource,
+class WebDAVFolder extends WebDAVResource implements FolderResource, DeletableCollectionResource,
   LockingCollectionResource {
 
   /**
@@ -27,7 +26,7 @@ class BXFolder extends BXAbstractResource implements FolderResource, DeletableCo
    * @param meta resource meta data
    * @param service service implementation
    */
-  BXFolder(final ResourceMetaData meta, final WebDAVService<BXAbstractResource> service) {
+  WebDAVFolder(final WebDAVMetaData meta, final WebDAVService service) {
     super(meta, service);
   }
 
@@ -58,7 +57,7 @@ class BXFolder extends BXAbstractResource implements FolderResource, DeletableCo
 
   @Override
   public final boolean isLockedOutRecursive(final Request request) {
-    return new BXCode<Boolean>(this) {
+    return new WebDAVCode<Boolean>(this) {
       @Override
       public Boolean get() throws IOException {
         return service.locking.conflictingLocks(meta.db, meta.path);
@@ -67,45 +66,45 @@ class BXFolder extends BXAbstractResource implements FolderResource, DeletableCo
   }
 
   @Override
-  public BXFolder createCollection(final String folder) throws BadRequestException,
+  public WebDAVFolder createCollection(final String folder) throws BadRequestException,
     NotAuthorizedException {
-    return new BXCode<BXFolder>(this) {
+    return new WebDAVCode<WebDAVFolder>(this) {
       @Override
-      public BXFolder get() throws IOException {
-        return (BXFolder) service.createFolder(meta.db, meta.path,  folder);
+      public WebDAVFolder get() throws IOException {
+        return (WebDAVFolder) service.createFolder(meta.db, meta.path,  folder);
       }
     }.eval();
   }
 
   @Override
-  public BXAbstractResource child(final String childName)
+  public WebDAVResource child(final String childName)
       throws BadRequestException, NotAuthorizedException {
 
-    return new BXCode<BXAbstractResource>(this) {
+    return new WebDAVCode<WebDAVResource>(this) {
       @Override
-      public BXAbstractResource get() throws IOException {
+      public WebDAVResource get() throws IOException {
         return service.resource(meta.db, meta.path + SEP + childName);
       }
     }.eval();
   }
 
   @Override
-  public List<BXAbstractResource> getChildren() throws BadRequestException, NotAuthorizedException {
-    return new BXCode<List<BXAbstractResource>>(this) {
+  public List<WebDAVResource> getChildren() throws BadRequestException, NotAuthorizedException {
+    return new WebDAVCode<List<WebDAVResource>>(this) {
       @Override
-      public List<BXAbstractResource> get() throws IOException {
+      public List<WebDAVResource> get() throws IOException {
         return service.list(meta.db, meta.path);
       }
     }.eval();
   }
 
   @Override
-  public BXAbstractResource createNew(final String newName, final InputStream input,
+  public WebDAVResource createNew(final String newName, final InputStream input,
       final Long length, final String contentType)
       throws BadRequestException, NotAuthorizedException {
-    return new BXCode<BXAbstractResource>(this) {
+    return new WebDAVCode<WebDAVResource>(this) {
       @Override
-      public BXAbstractResource get() throws IOException {
+      public WebDAVResource get() throws IOException {
         return service.createFile(meta.db, meta.path, newName, input);
       }
     }.eval();
@@ -115,7 +114,7 @@ class BXFolder extends BXAbstractResource implements FolderResource, DeletableCo
   public final LockToken createAndLock(final String name, final LockTimeout timeout,
       final LockInfo lockInfo) {
     try {
-      final BXAbstractResource r = createNew(name, new ArrayInput(Token.EMPTY), 0L, null);
+      final WebDAVResource r = createNew(name, new ArrayInput(Token.EMPTY), 0L, null);
       final LockResult lockResult = r.lock(timeout, lockInfo);
       if(lockResult.isSuccessful()) return lockResult.getLockToken();
     } catch(final Exception ex) {
@@ -133,7 +132,7 @@ class BXFolder extends BXAbstractResource implements FolderResource, DeletableCo
   }
 
   @Override
-  protected final void copyTo(final BXFolder folder, final String name) throws IOException {
+  protected final void copyTo(final WebDAVFolder folder, final String name) throws IOException {
     // folder is copied to a folder in a database
     service.copyAll(meta.db, meta.path, folder.meta.db, folder.meta.path + SEP + name);
     service.deleteDummy(folder.meta.db, folder.meta.path);

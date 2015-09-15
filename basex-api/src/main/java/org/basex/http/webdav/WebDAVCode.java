@@ -10,19 +10,19 @@ import com.bradmcevoy.http.exceptions.*;
 /**
  * Code container.
  *
- * @param <E> return type
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
+ * @param <E> return type
  */
-abstract class BXCode<E> {
+abstract class WebDAVCode<E> {
   /** Resource. */
-  private final BXAbstractResource resource;
+  private final WebDAVResource resource;
 
   /**
    * Constructor.
    * @param resource resource
    */
-  BXCode(final BXAbstractResource resource) {
+  WebDAVCode(final WebDAVResource resource) {
     this.resource = resource;
   }
 

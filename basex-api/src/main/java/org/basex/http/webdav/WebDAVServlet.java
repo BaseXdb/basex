@@ -16,21 +16,21 @@ import com.bradmcevoy.http.*;
  */
 public final class WebDAVServlet extends BaseXServlet {
   /** Resource factory. */
-  private BXResourceFactory resources;
+  private WebDAVFactory resources;
   /** Http Manager (must be a singleton). */
   private HttpManager manager;
 
   @Override
   public void init(final ServletConfig config) throws ServletException {
     super.init(config);
-    resources = new BXResourceFactory();
+    resources = new WebDAVFactory();
     manager = new HttpManager(resources);
   }
 
   @Override
   protected void run(final HTTPContext http) throws IOException {
     // authorize request
-    final BXServletRequest request = new BXServletRequest(http.req);
+    final WebDAVRequest request = new WebDAVRequest(http.req);
     final Auth a = request.getAuthorization();
     if(a != null) http.credentials(a.getUser(), a.getPassword());
 
@@ -38,7 +38,7 @@ public final class WebDAVServlet extends BaseXServlet {
     resources.init(http);
 
     // create response
-    final BXServletResponse response = new BXServletResponse(http.res);
+    final WebDAVResponse response = new WebDAVResponse(http.res);
     try {
       manager.process(request, response);
     } finally {

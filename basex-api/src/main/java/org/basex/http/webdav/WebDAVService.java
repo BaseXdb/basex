@@ -1,6 +1,6 @@
-package org.basex.http.webdav.impl;
+package org.basex.http.webdav;
 
-import static org.basex.http.webdav.impl.WebDAVUtils.*;
+import static org.basex.http.webdav.WebDAVUtils.*;
 import static org.basex.query.func.Function.*;
 
 import java.io.*;
@@ -24,18 +24,18 @@ import org.basex.util.list.*;
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Dimitar Popov
- * @param <T> the type of resource
  */
-public final class WebDAVService<T> {
+final class WebDAVService {
   /** Name of the database with the WebDAV locks. */
   private static final String WEBDAV_DB = "~webdav";
 
   /** HTTP context. */
-  public final HTTPContext http;
-  /** Resource factory. */
-  private final ResourceMetaDataFactory<T> factory;
+  final HTTPContext http;
   /** Locking service. */
-  public final WebDAVLockService locking;
+  final WebDAVLockService locking;
+
+  /** Resource factory. */
+  private final WebDAVFactory factory;
   /** Session. */
   private LocalSession ls;
 
@@ -44,7 +44,7 @@ public final class WebDAVService<T> {
    * @param factory resource factory
    * @param http http context
    */
-  public WebDAVService(final ResourceMetaDataFactory<T> factory, final HTTPContext http) {
+  public WebDAVService(final WebDAVFactory factory, final HTTPContext http) {
     this.factory = factory;
     this.http = http;
     locking = new WebDAVLockService(http);
@@ -111,8 +111,8 @@ public final class WebDAVService<T> {
    * @throws IOException I/O exception
    */
   public long timestamp(final String db) throws IOException {
-    final WebDAVQuery query = new WebDAVQuery(DATA.args(_DB_INFO.args("$path") +
-        "/descendant::" + DbFn.toName(Text.TIMESTAMP) + "[1]")).bind("path",  db);
+    final WebDAVQuery query = new WebDAVQuery(DATA.args(_DB_INFO.args("$db") +
+        "/descendant::" + DbFn.toName(Text.TIMESTAMP) + "[1]")).bind("db",  db);
     return DateTime.parse(execute(query).get(0)).getTime();
   }
 
@@ -123,9 +123,9 @@ public final class WebDAVService<T> {
    * @return resource meta data
    * @throws IOException I/O exception
    */
-  private ResourceMetaData metaData(final String db, final String path) throws IOException {
+  private WebDAVMetaData metaData(final String db, final String path) throws IOException {
     final WebDAVQuery query = new WebDAVQuery(
-      "let $a := " + _DB_LIST_DETAILS.args("$db", "$path") +
+      "let $a := " + _DB_LIST_DETAILS.args("$db", "$path") + "[1] " +
       "return (" +
       "string($a/@raw)," +
       "string($a/@content-type)," +
@@ -141,7 +141,7 @@ public final class WebDAVService<T> {
     final long mod = DateTime.parse(result.get(2)).getTime();
     final Long size = raw ? Long.valueOf(result.get(3)) : null;
     final String pth = stripLeadingSlash(result.get(4));
-    return new ResourceMetaData(db, pth, mod, raw, type, size);
+    return new WebDAVMetaData(db, pth, mod, raw, type, size);
   }
 
   /**
@@ -243,8 +243,8 @@ public final class WebDAVService<T> {
     session().setOutputStream(out);
     final WebDAVQuery query = new WebDAVQuery(
       "declare option output:" + (raw ?
-      "method 'raw'; " + _DB_RETRIEVE.args("$db", "$path") :
-      "use-character-maps '&#xA0;=&amp;#xA0;'; " + _DB_OPEN.args("$db", "$path")));
+      "method 'raw'; " + _DB_RETRIEVE.args("$db", "$path") + "[1]" :
+      "use-character-maps '&#xA0;=&amp;#xA0;'; " + _DB_OPEN.args("$db", "$path")) + "[1]");
     query.bind("db", db);
     query.bind("path", path);
     execute(query);
@@ -256,9 +256,9 @@ public final class WebDAVService<T> {
    * @return object representing the newly created database
    * @throws IOException I/O exception
    */
-  public T createDb(final String db) throws IOException {
+  public WebDAVResource createDb(final String db) throws IOException {
     session().execute(new CreateDB(db));
-    return factory.database(this, new ResourceMetaData(db, timestamp(db)));
+    return factory.database(this, new WebDAVMetaData(db, timestamp(db)));
   }
 
   /**
@@ -297,7 +297,7 @@ public final class WebDAVService<T> {
    * @return children
    * @throws IOException I/O exception
    */
-  public List<T> list(final String db, final String path) throws IOException {
+  public List<WebDAVResource> list(final String db, final String path) throws IOException {
     final WebDAVQuery query = new WebDAVQuery(
       _DB_LIST_DETAILS.args("$db", "$path") + " ! (" +
       "string(@raw), string(@content-type), string(@modified-date), string(@size)," +
@@ -308,7 +308,7 @@ public final class WebDAVService<T> {
     final int rs = result.size();
 
     final HashSet<String> paths = new HashSet<>();
-    final List<T> ch = new ArrayList<>(rs / 5);
+    final List<WebDAVResource> ch = new ArrayList<>(rs / 5);
     for(int r = 0; r < rs; r += 5) {
       final boolean raw = Boolean.parseBoolean(result.get(r));
       final MediaType ctype = new MediaType(result.get(r + 1));
@@ -319,10 +319,10 @@ public final class WebDAVService<T> {
       // check if document or folder
       if(ix < 0) {
         if(!pth.equals(DUMMY)) ch.add(factory.file(this,
-            new ResourceMetaData(db, path + SEP + pth, mod, raw, ctype, size)));
+            new WebDAVMetaData(db, path + SEP + pth, mod, raw, ctype, size)));
       } else {
         final String dir = path + SEP + pth.substring(0, ix);
-        if(paths.add(dir)) ch.add(factory.folder(this, new ResourceMetaData(db, dir, mod)));
+        if(paths.add(dir)) ch.add(factory.folder(this, new WebDAVMetaData(db, dir, mod)));
       }
     }
     return ch;
@@ -333,18 +333,18 @@ public final class WebDAVService<T> {
    * @return a list of database resources.
    * @throws IOException I/O exception
    */
-  public List<T> listDbs() throws IOException {
+  public List<WebDAVResource> listDbs() throws IOException {
     final WebDAVQuery query = new WebDAVQuery(
         _DB_LIST_DETAILS.args() + "[. != $db] ! (text(), @modified-date/data())");
     query.bind("db", WEBDAV_DB);
 
     final StringList result = execute(query);
     final int rs = result.size();
-    final List<T> dbs = new ArrayList<>(rs >>> 1);
+    final List<WebDAVResource> dbs = new ArrayList<>(rs >>> 1);
     for(int r = 0; r < rs; r += 2) {
       final String name = result.get(r);
       final long mod = DateTime.parse(result.get(r + 1)).getTime();
-      dbs.add(factory.database(this, new ResourceMetaData(name, mod)));
+      dbs.add(factory.database(this, new WebDAVMetaData(name, mod)));
     }
     return dbs;
   }
@@ -357,11 +357,13 @@ public final class WebDAVService<T> {
    * @return new folder resource
    * @throws IOException I/O exception
    */
-  public T createFolder(final String db, final String path, final String name) throws IOException {
+  public WebDAVResource createFolder(final String db, final String path, final String name)
+      throws IOException {
+
     deleteDummy(db, path);
     final String newFolder = path + SEP + name;
     createDummy(db, newFolder);
-    return factory.folder(this, new ResourceMetaData(db, newFolder, timestamp(db)));
+    return factory.folder(this, new WebDAVMetaData(db, newFolder, timestamp(db)));
   }
 
   /**
@@ -371,11 +373,11 @@ public final class WebDAVService<T> {
    * @return resource
    * @throws IOException I/O exception
    */
-  public T resource(final String db, final String path) throws IOException {
+  public WebDAVResource resource(final String db, final String path) throws IOException {
     return exists(db, path) ?
       factory.file(this, metaData(db, path)) :
       pathExists(db, path) ?
-        factory.folder(this, new ResourceMetaData(db, path, timestamp(db))) :
+        factory.folder(this, new WebDAVMetaData(db, path, timestamp(db))) :
         null;
   }
 
@@ -388,7 +390,7 @@ public final class WebDAVService<T> {
    * @return object representing the newly added file
    * @throws IOException I/O exception
    */
-  public T createFile(final String db, final String path, final String name,
+  public WebDAVResource createFile(final String db, final String path, final String name,
     final InputStream in) throws IOException {
 
     final LocalSession session = session();
@@ -412,7 +414,7 @@ public final class WebDAVService<T> {
    * @return object representing the newly created database
    * @throws IOException I/O exception
    */
-  public T createFile(final String n, final InputStream in) throws IOException {
+  public WebDAVResource createFile(final String n, final InputStream in) throws IOException {
     return addFile(null, n, in);
   }
 
@@ -451,9 +453,9 @@ public final class WebDAVService<T> {
    * @return object representing the newly created database
    * @throws IOException I/O exception
    */
-  private T createDb(final String db, final InputStream in) throws IOException {
+  private WebDAVResource createDb(final String db, final InputStream in) throws IOException {
     session().create(db, in);
-    return factory.database(this, new ResourceMetaData(db, timestamp(db)));
+    return factory.database(this, new WebDAVMetaData(db, timestamp(db)));
   }
 
   /**
@@ -464,12 +466,14 @@ public final class WebDAVService<T> {
    * @return object representing the newly added XML
    * @throws IOException I/O exception
    */
-  private T addXML(final String db, final String path, final InputStream in) throws IOException {
+  private WebDAVResource addXML(final String db, final String path, final InputStream in)
+      throws IOException {
+
     final LocalSession session = session();
     session.execute(new Set(MainOptions.CHOP, false));
     session.execute(new Open(db));
     session.add(path, in);
-    return factory.file(this, new ResourceMetaData(db, path, timestamp(db), false,
+    return factory.file(this, new WebDAVMetaData(db, path, timestamp(db), false,
         MediaType.APPLICATION_XML, null));
   }
 
@@ -481,7 +485,9 @@ public final class WebDAVService<T> {
    * @return object representing the newly added file
    * @throws IOException I/O exception
    */
-  private T store(final String db, final String path, final InputStream in) throws IOException {
+  private WebDAVResource store(final String db, final String path, final InputStream in)
+      throws IOException {
+
     final LocalSession session = session();
     session.execute(new Open(db));
     session.store(path, in);
@@ -496,7 +502,9 @@ public final class WebDAVService<T> {
    * @return object representing the newly added file
    * @throws IOException I/O exception
    */
-  private T addFile(final String db, final String path, final InputStream in) throws IOException {
+  private WebDAVResource addFile(final String db, final String path, final InputStream in)
+      throws IOException {
+
     // use 4MB as buffer input
     try(final BufferInput bi = new BufferInput(in, 1 << 22)) {
       // guess the content type from the first character

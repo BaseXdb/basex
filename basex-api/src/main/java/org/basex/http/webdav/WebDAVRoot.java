@@ -1,11 +1,9 @@
 package org.basex.http.webdav;
 
-import static org.basex.http.webdav.impl.WebDAVUtils.*;
+import static org.basex.http.webdav.WebDAVUtils.*;
 
 import java.io.*;
 import java.util.*;
-
-import org.basex.http.webdav.impl.*;
 
 import com.bradmcevoy.http.*;
 import com.bradmcevoy.http.exceptions.*;
@@ -17,13 +15,13 @@ import com.bradmcevoy.http.exceptions.*;
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
-final class BXRoot extends BXFolder {
+final class WebDAVRoot extends WebDAVFolder {
   /**
    * Constructor.
    * @param service service
    */
-  BXRoot(final WebDAVService<BXAbstractResource> service) {
-    super(new ResourceMetaData(), service);
+  WebDAVRoot(final WebDAVService service) {
+    super(new WebDAVMetaData(), service);
   }
 
   @Override
@@ -47,44 +45,45 @@ final class BXRoot extends BXFolder {
   }
 
   @Override
-  public BXAbstractResource child(final String name) {
-    return new BXCode<BXAbstractResource>(this) {
+  public WebDAVResource child(final String name) {
+    return new WebDAVCode<WebDAVResource>(this) {
       @Override
-      public BXAbstractResource get() throws IOException {
+      public WebDAVResource get() throws IOException {
         return service.dbExists(name) ?
-          new BXDatabase(new ResourceMetaData(name, service.timestamp(name)), service) : null;
+          new WebDAVDatabase(new WebDAVMetaData(name, service.timestamp(name)), service) : null;
       }
     }.evalNoEx();
   }
 
   @Override
-  public List<BXAbstractResource> getChildren() {
-    return new BXCode<List<BXAbstractResource>>(this) {
+  public List<WebDAVResource> getChildren() {
+    return new WebDAVCode<List<WebDAVResource>>(this) {
       @Override
-      public List<BXAbstractResource> get() throws IOException {
+      public List<WebDAVResource> get() throws IOException {
         return service.listDbs();
       }
     }.evalNoEx();
   }
 
   @Override
-  public BXDatabase createCollection(final String name)
+  public WebDAVDatabase createCollection(final String name)
       throws BadRequestException, NotAuthorizedException {
 
-    return new BXCode<BXDatabase>(this) {
+    return new WebDAVCode<WebDAVDatabase>(this) {
       @Override
-      public BXDatabase get() throws IOException {
-        return (BXDatabase) service.createDb(dbname(name));
+      public WebDAVDatabase get() throws IOException {
+        return (WebDAVDatabase) service.createDb(dbname(name));
       }
     }.eval();
   }
 
   @Override
-  public BXAbstractResource createNew(final String name, final InputStream input, final Long length,
+  public WebDAVResource createNew(final String name, final InputStream input, final Long length,
       final String contentType) throws BadRequestException, NotAuthorizedException {
-    return new BXCode<BXAbstractResource>(this) {
+
+    return new WebDAVCode<WebDAVResource>(this) {
       @Override
-      public BXAbstractResource get() throws IOException {
+      public WebDAVResource get() throws IOException {
         return service.createFile(name, input);
       }
     }.eval();

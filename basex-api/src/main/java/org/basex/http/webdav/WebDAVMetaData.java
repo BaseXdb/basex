@@ -1,6 +1,6 @@
-package org.basex.http.webdav.impl;
+package org.basex.http.webdav;
 
-import static org.basex.http.webdav.impl.WebDAVUtils.*;
+import static org.basex.http.webdav.WebDAVUtils.*;
 
 import java.util.*;
 
@@ -12,22 +12,22 @@ import org.basex.util.http.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Dimitar Popov
  */
-public final class ResourceMetaData {
+final class WebDAVMetaData {
   /** Database owning the resource. */
-  public final String db;
+  final String db;
   /** Resource path. */
-  public final String path;
+  final String path;
   /** Resource last modification date. */
-  public final Date mdate;
+  final Date mdate;
   /** Raw binary file flag. */
-  public final boolean raw;
+  final boolean raw;
   /** Resource content type. */
-  public final MediaType type;
+  final MediaType type;
   /** Resource size in bytes. */
-  public final Long size;
+  final Long size;
 
   /** Default constructor. */
-  public ResourceMetaData() {
+  WebDAVMetaData() {
     this(null, 0L);
   }
 
@@ -36,7 +36,7 @@ public final class ResourceMetaData {
    * @param db database owning the resource
    * @param ms resource last modification date in milliseconds
    */
-  public ResourceMetaData(final String db, final long ms) {
+  WebDAVMetaData(final String db, final long ms) {
     this(db, "", ms);
   }
 
@@ -46,7 +46,7 @@ public final class ResourceMetaData {
    * @param path resource path
    * @param ms resource last modification date in milliseconds
    */
-  ResourceMetaData(final String db, final String path, final long ms) {
+  WebDAVMetaData(final String db, final String path, final long ms) {
     this(db, path, ms, false, null,  null);
   }
 
@@ -59,8 +59,9 @@ public final class ResourceMetaData {
    * @param type resource media type
    * @param size resource size in bytes
    */
-  ResourceMetaData(final String db, final String path, final long ms, final boolean raw,
+  WebDAVMetaData(final String db, final String path, final long ms, final boolean raw,
       final MediaType type, final Long size) {
+
     this.db = db;
     this.path = stripLeadingSlash(path);
     this.raw = raw;

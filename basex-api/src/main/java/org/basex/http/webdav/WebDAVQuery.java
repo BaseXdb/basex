@@ -1,4 +1,4 @@
-package org.basex.http.webdav.impl;
+package org.basex.http.webdav;
 
 import java.util.*;
 import java.util.Map.Entry;

@@ -15,12 +15,12 @@ import com.bradmcevoy.http.Request.Method;
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
-final class BXNotAuthorizedResource implements FolderResource, LockableResource {
+final class WebDAVNotAuthorized implements FolderResource, LockableResource {
   /** The only instance of this class. */
-  public static final Resource NOAUTH = new BXNotAuthorizedResource();
+  static final Resource NOAUTH = new WebDAVNotAuthorized();
 
   /** Constructor. */
-  private BXNotAuthorizedResource() { }
+  private WebDAVNotAuthorized() { }
 
   @Override
   public String getRealm() {

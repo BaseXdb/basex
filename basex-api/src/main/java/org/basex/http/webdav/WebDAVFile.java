@@ -1,11 +1,9 @@
 package org.basex.http.webdav;
 
-import static org.basex.http.webdav.impl.WebDAVUtils.*;
+import static org.basex.http.webdav.WebDAVUtils.*;
 
 import java.io.*;
 import java.util.*;
-
-import org.basex.http.webdav.impl.*;
 
 import com.bradmcevoy.http.*;
 import com.bradmcevoy.http.exceptions.*;
@@ -17,13 +15,13 @@ import com.bradmcevoy.http.exceptions.*;
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
-final class BXFile extends BXAbstractResource implements FileResource {
+final class WebDAVFile extends WebDAVResource implements FileResource {
   /**
    * Constructor.
    * @param meta resource meta data
    * @param service service implementation
    */
-  BXFile(final ResourceMetaData meta, final WebDAVService<BXAbstractResource> service) {
+  WebDAVFile(final WebDAVMetaData meta, final WebDAVService service) {
     super(meta, service);
   }
 
@@ -55,9 +53,10 @@ final class BXFile extends BXAbstractResource implements FileResource {
 
   @Override
   public void sendContent(final OutputStream out, final Range range,
-      final Map<String, String> params, final String contentType) throws BadRequestException,
-      NotAuthorizedException {
-    new BXCode<Object>(this) {
+      final Map<String, String> params, final String contentType)
+      throws BadRequestException, NotAuthorizedException {
+
+    new WebDAVCode<Object>(this) {
       @Override
       public void run() throws IOException {
         service.retrieve(meta.db, meta.path, meta.raw, out);
@@ -74,7 +73,7 @@ final class BXFile extends BXAbstractResource implements FileResource {
   }
 
   @Override
-  protected void copyTo(final BXFolder folder, final String name) throws IOException {
+  protected void copyTo(final WebDAVFolder folder, final String name) throws IOException {
     // folder is copied to a folder in a database
     service.copyDoc(meta.db, meta.path, folder.meta.db, folder.meta.path + SEP + name);
     service.deleteDummy(folder.meta.db, folder.meta.path);

@@ -1,7 +1,7 @@
 package org.basex.http.webdav;
 
 import static com.bradmcevoy.http.LockResult.*;
-import static org.basex.http.webdav.impl.WebDAVUtils.*;
+import static org.basex.http.webdav.WebDAVUtils.*;
 
 import java.io.*;
 import java.util.*;
@@ -13,7 +13,6 @@ import com.bradmcevoy.http.Request.Method;
 
 import org.basex.core.StaticOptions.AuthMethod;
 import org.basex.http.*;
-import org.basex.http.webdav.impl.*;
 import org.basex.util.*;
 import org.xml.sax.*;
 import org.xml.sax.helpers.*;
@@ -28,20 +27,20 @@ import com.bradmcevoy.http.exceptions.*;
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
-abstract class BXAbstractResource implements CopyableResource, DeletableResource, MoveableResource,
-  LockableResource {
+abstract class WebDAVResource implements CopyableResource, DeletableResource, MoveableResource,
+    LockableResource {
 
   /** Resource meta data. */
-  final ResourceMetaData meta;
+  final WebDAVMetaData meta;
   /** WebDAV service implementation. */
-  final WebDAVService<BXAbstractResource> service;
+  final WebDAVService service;
 
   /**
    * Constructor.
    * @param meta resource meta data
    * @param service service
    */
-  BXAbstractResource(final ResourceMetaData meta, final WebDAVService<BXAbstractResource> service) {
+  WebDAVResource(final WebDAVMetaData meta, final WebDAVService service) {
     this.meta = meta;
     this.service = service;
   }
@@ -49,7 +48,7 @@ abstract class BXAbstractResource implements CopyableResource, DeletableResource
   @Override
   public Object authenticate(final String user, final String pass) {
     if(user == null) return null;
-    return new BXCode<Object>(this) {
+    return new WebDAVCode<Object>(this) {
       @Override
       public String get() throws IOException {
         service.authenticate(user, pass);
@@ -95,7 +94,7 @@ abstract class BXAbstractResource implements CopyableResource, DeletableResource
 
   @Override
   public void delete() throws BadRequestException, NotAuthorizedException {
-    new BXCode<Object>(this) {
+    new WebDAVCode<Object>(this) {
       @Override
       public void run() throws IOException {
         del();
@@ -107,13 +106,13 @@ abstract class BXAbstractResource implements CopyableResource, DeletableResource
   public void copyTo(final CollectionResource target, final String name) throws BadRequestException,
       NotAuthorizedException {
 
-    new BXCode<Object>(this) {
+    new WebDAVCode<Object>(this) {
       @Override
       public void run() throws IOException {
-        if(target instanceof BXRoot)
+        if(target instanceof WebDAVRoot)
           copyToRoot(name);
-        else if(target instanceof BXFolder)
-          copyTo((BXFolder) target, name);
+        else if(target instanceof WebDAVFolder)
+          copyTo((WebDAVFolder) target, name);
       }
     }.eval();
   }
@@ -122,13 +121,13 @@ abstract class BXAbstractResource implements CopyableResource, DeletableResource
   public void moveTo(final CollectionResource target, final String name) throws BadRequestException,
       NotAuthorizedException {
 
-    new BXCode<Object>(this) {
+    new WebDAVCode<Object>(this) {
       @Override
       public void run() throws IOException {
-        if(target instanceof BXRoot)
+        if(target instanceof WebDAVRoot)
           moveToRoot(name);
-        else if(target instanceof BXFolder)
-          moveTo((BXFolder) target, name);
+        else if(target instanceof WebDAVFolder)
+          moveTo((WebDAVFolder) target, name);
       }
     }.eval();
   }
@@ -145,7 +144,7 @@ abstract class BXAbstractResource implements CopyableResource, DeletableResource
   public LockResult lock(final LockTimeout timeout, final LockInfo lockInfo)
       throws NotAuthorizedException, PreConditionFailedException, LockedException {
 
-    return new BXCode<LockResult>(this) {
+    return new WebDAVCode<LockResult>(this) {
       @Override
       public LockResult get() throws IOException {
         return lockResource(timeout, lockInfo);
@@ -162,7 +161,7 @@ abstract class BXAbstractResource implements CopyableResource, DeletableResource
   @Override
   public LockResult refreshLock(final String token) throws NotAuthorizedException,
       PreConditionFailedException {
-    return new BXCode<LockResult>(this) {
+    return new WebDAVCode<LockResult>(this) {
       @Override
       public LockResult get() throws IOException {
         return refresh(token);
@@ -179,7 +178,7 @@ abstract class BXAbstractResource implements CopyableResource, DeletableResource
   @Override
   public void unlock(final String tokenId) throws NotAuthorizedException,
       PreConditionFailedException {
-    new BXCode<Object>(this) {
+    new WebDAVCode<Object>(this) {
       @Override
       public void run() throws IOException {
         service.locking.unlock(tokenId);
@@ -193,7 +192,7 @@ abstract class BXAbstractResource implements CopyableResource, DeletableResource
    */
   @Override
   public LockToken getCurrentLock() {
-    return new BXCode<LockToken>(this) {
+    return new WebDAVCode<LockToken>(this) {
       @Override
       public LockToken get() throws IOException {
         return getCurrentActiveLock();
@@ -231,7 +230,7 @@ abstract class BXAbstractResource implements CopyableResource, DeletableResource
    * @param n new name of the folder
    * @throws IOException I/O exception
    */
-  protected abstract void copyTo(final BXFolder f, final String n) throws IOException;
+  protected abstract void copyTo(final WebDAVFolder f, final String n) throws IOException;
 
   /**
    * Move folder to the root, creating a new database.
@@ -250,7 +249,7 @@ abstract class BXAbstractResource implements CopyableResource, DeletableResource
    * @param n new name of the folder
    * @throws IOException I/O exception
    */
-  private void moveTo(final BXFolder f, final String n) throws IOException {
+  private void moveTo(final WebDAVFolder f, final String n) throws IOException {
     if(f.meta.db.equals(meta.db)) {
       // folder is moved to a folder in the same database
       rename(f.meta.path + SEP + n);

@@ -1,4 +1,4 @@
-package org.basex.http.webdav.impl;
+package org.basex.http.webdav;
 
 import java.io.*;
 import java.net.*;
@@ -13,11 +13,11 @@ import org.basex.util.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Dimitar Popov
  */
-public final class WebDAVUtils {
+final class WebDAVUtils {
   /** File path separator. */
-  public static final char SEP = '/';
+  static final char SEP = '/';
   /** Dummy file for empty folder. */
-  public static final String DUMMY = ".empty";
+  static final String DUMMY = ".empty";
 
   /** Private constructor. */
   private WebDAVUtils() { }

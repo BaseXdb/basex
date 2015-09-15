@@ -1,6 +1,6 @@
-package org.basex.http.webdav.impl;
+package org.basex.http.webdav;
 
-import static org.basex.http.webdav.impl.WebDAVUtils.*;
+import static org.basex.http.webdav.WebDAVUtils.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
@@ -23,9 +23,11 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Dimitar Popov
  */
-public final class WebDAVLockService {
+final class WebDAVLockService {
   /** Path to WebDAV module. */
   private static final String FILE = "xquery/webdav.xqm";
+  /** Module contents. */
+  private static String module;
   /** HTTP context. */
   private final HTTPContext http;
 
@@ -142,16 +144,18 @@ public final class WebDAVLockService {
    * @throws IOException error during query execution
    */
   private StringList execute(final WebDAVQuery query) throws IOException {
-    final ClassLoader cl = getClass().getClassLoader();
-    final InputStream s = cl.getResourceAsStream(FILE);
-    if(s == null) throw new IOException("WebDAV module not found");
-    final byte[] module = new IOStream(s).read();
+    if(module == null) {
+      final ClassLoader cl = getClass().getClassLoader();
+      final InputStream is = cl.getResourceAsStream(FILE);
+      if(is == null) throw new IOException("WebDAV module not found: " + FILE);
+      module = string(new IOStream(is).read());
+    }
 
     try(final QueryProcessor qp = new QueryProcessor(query.toString(), http.context(true))) {
       for(final Entry<String, Object> entry : query.entries()) {
         qp.bind(entry.getKey(), entry.getValue());
       }
-      qp.qc.parseLibrary(string(module), FILE, qp.sc);
+      qp.qc.parseLibrary(module, FILE, qp.sc);
 
       final StringList items = new StringList();
       final ArrayOutput ao = new ArrayOutput();

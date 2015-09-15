@@ -15,14 +15,15 @@ import com.bradmcevoy.http.*;
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
-final class BXServletCookie implements Cookie {
+final class WebDAVCookie implements Cookie {
   /** Wrapped instance. */
-  public final javax.servlet.http.Cookie cookie;
+  final javax.servlet.http.Cookie cookie;
+
   /**
    * Constructor.
    * @param cookie servlet cookie
    */
-  BXServletCookie(final javax.servlet.http.Cookie cookie) {
+  WebDAVCookie(final javax.servlet.http.Cookie cookie) {
     this.cookie = cookie;
   }
 

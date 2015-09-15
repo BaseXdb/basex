@@ -1,6 +1,6 @@
 package org.basex.http.webdav;
 
-import static org.basex.http.webdav.impl.WebDAVUtils.*;
+import static org.basex.http.webdav.WebDAVUtils.*;
 
 import java.io.*;
 import java.net.*;
@@ -29,7 +29,7 @@ import com.bradmcevoy.http.Cookie;
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
-final class BXServletRequest extends AbstractRequest {
+final class WebDAVRequest extends AbstractRequest {
   /** Destination string. */
   private static final String DESTINATION = "Destination";
 
@@ -58,7 +58,7 @@ final class BXServletRequest extends AbstractRequest {
    * Constructor.
    * @param req HTTP servlet request
    */
-  BXServletRequest(final HttpServletRequest req) {
+  WebDAVRequest(final HttpServletRequest req) {
     this.req = req;
     method = Method.valueOf(req.getMethod());
     url = decode(req.getRequestURL().toString());
@@ -124,7 +124,7 @@ final class BXServletRequest extends AbstractRequest {
   @Override
   public Cookie getCookie(final String name) {
     for(final javax.servlet.http.Cookie c : req.getCookies()) {
-      if(c.getName().equals(name)) return new BXServletCookie(c);
+      if(c.getName().equals(name)) return new WebDAVCookie(c);
     }
     return null;
   }
@@ -133,7 +133,7 @@ final class BXServletRequest extends AbstractRequest {
   public List<Cookie> getCookies() {
     final List<Cookie> list = new ArrayList<>();
     for(final javax.servlet.http.Cookie c : req.getCookies()) {
-      list.add(new BXServletCookie(c));
+      list.add(new WebDAVCookie(c));
     }
     return list;
   }
