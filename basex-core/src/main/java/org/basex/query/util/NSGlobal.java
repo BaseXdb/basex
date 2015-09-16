@@ -72,6 +72,7 @@ public final class NSGlobal {
     NS.add(REPO_PREFIX, REPO_URI);
     NS.add(SQL_PREFIX, SQL_URI);
     NS.add(STREAM_PREFIX, STREAM_URI);
+    NS.add(STRINGS_PREFIX, STRINGS_URI);
     NS.add(UNIT_PREFIX, UNIT_URI);
     NS.add(USER_PREFIX, USER_URI);
     NS.add(VLDT_PREFIX, VALIDATE_URI);

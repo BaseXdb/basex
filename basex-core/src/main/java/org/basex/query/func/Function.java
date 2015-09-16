@@ -40,6 +40,7 @@ import org.basex.query.func.random.*;
 import org.basex.query.func.repo.*;
 import org.basex.query.func.sql.*;
 import org.basex.query.func.stream.*;
+import org.basex.query.func.strings.*;
 import org.basex.query.func.unit.*;
 import org.basex.query.func.user.*;
 import org.basex.query.func.validate.*;
@@ -1164,6 +1165,17 @@ public enum Function {
   /** XQuery function. */
   _STREAM_IS_STREAMABLE(StreamIsStreamable.class, "is-streamable(item)", arg(ITEM), BLN,
       STREAM_URI),
+
+  /* Strings Module. */
+
+  /** XQuery function. */
+  _STRINGS_LEVENSHTEIN(StringsLevenshtein.class, "levenshtein(string1,string2)",
+      arg(STR, STR), DBL, STRINGS_URI),
+  /** XQuery function. */
+  _STRINGS_SOUNDEX(StringsSoundex.class, "soundex(string)", arg(STR), STR, STRINGS_URI),
+  /** XQuery function. */
+  _STRINGS_COLOGNE_PHONETIC(StringsColognePhonetic.class, "cologne-phonetic(string)",
+      arg(STR), STR, STRINGS_URI),
 
   /* Unit Module. */
 

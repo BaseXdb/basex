@@ -20,6 +20,7 @@ import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
 import org.basex.util.list.*;
+import org.basex.util.similarity.*;
 
 /**
  * This class provides methods for accessing, reading and storing options.

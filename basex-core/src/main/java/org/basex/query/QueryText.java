@@ -538,6 +538,8 @@ public interface QueryText {
   byte[] SQL_PREFIX = token("sql");
   /** SQL token. */
   byte[] STREAM_PREFIX = token("stream");
+  /** Strings token. */
+  byte[] STRINGS_PREFIX = token("strings");
   /** Binary token. */
   byte[] BIN_PREFIX = token("bin");
   /** Cryptography token. */
@@ -672,6 +674,8 @@ public interface QueryText {
   byte[] SQL_URI = token(BXMODULES_URI + "sql");
   /** Streaming module URI. */
   byte[] STREAM_URI = token(BXMODULES_URI + "stream");
+  /** Strings module URI. */
+  byte[] STRINGS_URI = token(BXMODULES_URI + "strings");
   /** Unit module URI. */
   byte[] UNIT_URI = token(BXMODULES_URI + "unit");
   /** User module URI. */

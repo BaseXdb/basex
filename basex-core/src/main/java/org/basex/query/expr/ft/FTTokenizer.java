@@ -6,11 +6,11 @@ import static org.basex.util.ft.FTFlag.*;
 
 import org.basex.core.*;
 import org.basex.query.*;
-import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.ft.FTBitapSearch.TokenComparator;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
+import org.basex.util.similarity.*;
 
 /**
  * This class performs the full-text tokenization.

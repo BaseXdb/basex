@@ -16,6 +16,7 @@ import org.basex.query.value.type.SeqType.Occ;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
+import org.basex.util.similarity.*;
 
 /**
  * This class provides access to built-in and user-defined functions.

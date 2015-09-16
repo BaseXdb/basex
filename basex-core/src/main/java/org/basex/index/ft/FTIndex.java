@@ -20,6 +20,7 @@ import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
+import org.basex.util.similarity.*;
 
 /**
  * <p>This class provides access to a fuzzy full-text index structure

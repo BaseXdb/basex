@@ -1,13 +1,12 @@
-package org.basex.util;
+package org.basex.util.similarity;
 
 import static org.basex.util.Token.*;
 import static org.basex.util.FTToken.*;
 
 /**
- * Damerau-Levenshtein implementation. Based on the publications from
- * Levenshtein (1965): Binary codes capable of correcting spurious insertions
- * and deletions of ones, and Damerau (1964): A technique for computer
- * detection and correction of spelling errors.
+ * <p>Damerau-Levenshtein algorithm. Based on the publications from Levenshtein (1965):
+ * "Binary codes capable of correcting spurious insertions and deletions of ones", and
+ * Damerau (1964): "A technique for computer detection and correction of spelling errors.".</p>
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
@@ -106,6 +105,39 @@ public final class Levenshtein {
     }
     return mx[tl][sl] <= k;
   }
+
+  /**
+   * <p>Computes the full Damerau-Levenshtein distance for two codepoint arrays and returns a
+   * double value (0.0 - 1.0), which represents the distance. The value is computed as follows:</p>
+   *
+   * <pre>  1.0 - distance / max(length of strings)</pre>
+   *
+   * <p>1.0 is returned if the strings are equal; 0.0 is returned if all strings are
+   * completely different.</p>
+   *
+   * @param cps1 first array
+   * @param cps2 second array
+   * @return distance (0.0 - 1.0)
+   */
+  public static double distance(final int[] cps1, final int[] cps2) {
+    final int l1 = cps1.length, l2 = cps2.length, lMax = Math.max(l1, l2);
+    if(lMax == 0) return 1;
+
+    final int[][] m = new int[lMax + 1][lMax + 1];
+    for(int f2 = -1, f1 = -1, p1 = 0; p1 < lMax; p1++) {
+      final int c1 = p1 < l1 ? cps1[p1] : 0;
+      for(int p2 = 0; p2 < lMax; p2++) {
+        final int c2 = p2 < l2 ? cps2[p2] : 0;
+        int c = m(m[p1][p2 + 1] + 1, m[p1 + 1][p2] + 1, m[p1][p2] + (c1 == c2 ? 0 : 1));
+        if(c1 == f1 && c2 == f2) c = m[p1][p2];
+        m[p1 + 1][p2 + 1] = c;
+        f1 = c2;
+      }
+      f2 = c1;
+    }
+    return 1 - (double) m[lMax][lMax] / lMax;
+  }
+
 
   /**
    * Gets the minimum of three values.

@@ -24,6 +24,7 @@ import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
+import org.basex.util.similarity.*;
 
 /**
  * This is a parser for command strings, creating {@link Command} instances.
