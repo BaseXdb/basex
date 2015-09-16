@@ -282,7 +282,7 @@ public abstract class ParseExpr extends Expr {
   /**
    * Checks if the specified expression yields a boolean.
    * Returns the boolean or throws an exception.
-   * @param ex expression to be checked
+   * @param ex expression to be evaluated
    * @param qc query context
    * @return boolean
    * @throws QueryException query exception
@@ -309,7 +309,7 @@ public abstract class ParseExpr extends Expr {
   /**
    * Checks if the specified expression yields a double.
    * Returns the double or throws an exception.
-   * @param ex expression to be checked
+   * @param ex expression to be evaluated
    * @param qc query context
    * @return double
    * @throws QueryException query exception
@@ -333,7 +333,7 @@ public abstract class ParseExpr extends Expr {
   /**
    * Checks if the specified expression yields a number or {@code null}.
    * Returns the number, {@code null}, or throws an exception.
-   * @param ex expression to be checked
+   * @param ex expression to be evaluated
    * @param qc query context
    * @return double
    * @throws QueryException query exception
@@ -346,8 +346,8 @@ public abstract class ParseExpr extends Expr {
   /**
    * Checks if the specified, non-empty item is a double.
    * Returns the double or throws an exception.
-   * @param it item
-   * @return double
+   * @param it item to be checked
+   * @return number
    * @throws QueryException query exception
    */
   private ANum toNumber(final Item it) throws QueryException {
@@ -359,7 +359,7 @@ public abstract class ParseExpr extends Expr {
   /**
    * Checks if the specified expression yields a float.
    * Returns the float or throws an exception.
-   * @param ex expression to be checked
+   * @param ex expression to be evaluated
    * @param qc query context
    * @return float
    * @throws QueryException query exception
@@ -373,7 +373,7 @@ public abstract class ParseExpr extends Expr {
   /**
    * Checks if the specified expression yields an integer.
    * Returns a token representation or throws an exception.
-   * @param ex expression to be checked
+   * @param ex expression to be evaluated
    * @param qc query context
    * @return integer value
    * @throws QueryException query exception
@@ -398,7 +398,7 @@ public abstract class ParseExpr extends Expr {
   /**
    * Checks if the specified expression yields a node.
    * Returns the boolean or throws an exception.
-   * @param ex expression to be checked
+   * @param ex expression to be evaluated
    * @param qc query context
    * @return node
    * @throws QueryException query exception
@@ -410,7 +410,7 @@ public abstract class ParseExpr extends Expr {
   /**
    * Checks if the specified expression yields a node or {@code null}.
    * Returns the node, {@code null}, or throws an exception.
-   * @param ex expression to be checked
+   * @param ex expression to be evaluated
    * @param qc query context
    * @return node or {@code null}
    * @throws QueryException query exception
@@ -421,7 +421,7 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the specified non-item is a node.
+   * Checks if the specified non-empty item is a node.
    * Returns the node or throws an exception.
    * @param it item to be checked
    * @return node
@@ -444,19 +444,27 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the evaluated expression yields a non-empty node or item.
+   * Checks if the evaluated expression yields a node or item.
    * Returns the item or throws an exception.
    * @param ex expression to be evaluated
    * @param qc query context
-   * @return item
+   * @return node or atomized item
    * @throws QueryException query exception
    */
   protected final Item toNodeOrAtomItem(final Expr ex, final QueryContext qc)
       throws QueryException {
+    return toNodeOrAtomItem(toItem(ex, qc));
+  }
 
-    Item it = toItem(ex, qc);
-    if(!(it instanceof ANode)) it = it.atomItem(info);
-    return it;
+  /**
+   * Checks if the specified item yields a node or item.
+   * Returns the item or throws an exception.
+   * @param it item to be checked (can be {@code null})
+   * @return node or atomized item
+   * @throws QueryException query exception
+   */
+  protected final Item toNodeOrAtomItem(final Item it) throws QueryException {
+    return it == null || it instanceof ANode ? it : it.atomItem(info);
   }
 
   /**
@@ -586,7 +594,7 @@ public abstract class ParseExpr extends Expr {
   /**
    * Checks if the specified expression yields a QName.
    * Returns the item or throws an exception.
-   * @param ex expression to be checked
+   * @param ex expression to be evaluated
    * @param qc query context
    * @param empty allow empty result
    * @return QNm item

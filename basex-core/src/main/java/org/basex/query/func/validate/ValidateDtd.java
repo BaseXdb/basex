@@ -33,13 +33,13 @@ public class ValidateDtd extends ValidateFn {
           throws IOException, ParserConfigurationException, SAXException, QueryException {
 
         final Item it = toNodeOrAtomItem(exprs[0], qc);
-        SerializerOptions sp = null;
+        final IO path = exprs.length < 2 ? null : checkPath(toEmptyToken(exprs[1], qc));
 
         // integrate doctype declaration via serialization parameters
-        if(exprs.length > 1) {
+        SerializerOptions sp = null;
+        if(path != null) {
           sp = new SerializerOptions();
-          final IO schema = prepare(checkPath(exprs[1], qc), handler);
-          sp.set(SerializerOptions.DOCTYPE_SYSTEM, schema.url());
+          sp.set(SerializerOptions.DOCTYPE_SYSTEM, prepare(path, handler).url());
         }
 
         final IO in = read(it, qc, sp);

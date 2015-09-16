@@ -218,7 +218,7 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Returns a valid reference if a file is found in the specified path or the static base uri.
+   * Returns a valid reference if a file is found at the specified path or the static base uri.
    * Otherwise, returns an error.
    * @param path file path
    * @param qc query context
@@ -226,7 +226,19 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   protected IO checkPath(final Expr path, final QueryContext qc) throws QueryException {
-    return QueryResources.checkPath(new QueryInput(string(toToken(path, qc))), sc.baseIO(), info);
+    return checkPath(toToken(path, qc));
+  }
+
+  /**
+   * Returns a valid reference if a file is found at the specified path or the static base uri.
+   * Otherwise, returns an error.
+   * @param path file path
+   * @return input source, or exception
+   * @throws QueryException query exception
+   */
+  protected IO checkPath(final byte[] path) throws QueryException {
+    return path == null ? null :
+      QueryResources.checkPath(new QueryInput(string(path)), sc.baseIO(), info);
   }
 
   /**
