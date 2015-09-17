@@ -1216,17 +1216,17 @@ public enum Function {
   /* Validate Module. */
 
   /** XQuery function. */
-  _VALIDATE_XSD(ValidateXsd.class, "xsd(input[,schema])", arg(ITEM, ITEM), EMP, flag(NDT),
-      VALIDATE_URI),
+  _VALIDATE_XSD(ValidateXsd.class, "xsd(input[,schema[,version]])",
+      arg(ITEM, ITEM, STR), EMP, flag(NDT), VALIDATE_URI),
   /** XQuery function. */
-  _VALIDATE_XSD_INFO(ValidateXsdInfo.class, "xsd-info(input[,schema])",
-      arg(ITEM, ITEM), STR_ZM, flag(NDT), VALIDATE_URI),
+  _VALIDATE_XSD_INFO(ValidateXsdInfo.class, "xsd-info(input[,schema[,version]])",
+      arg(ITEM, ITEM, STR), STR_ZM, flag(NDT), VALIDATE_URI),
   /** XQuery function. */
-  _VALIDATE_XSD_REPORT(ValidateXsdReport.class, "xsd-report(input[,schema])",
-      arg(ITEM, ITEM), ELM, flag(NDT), VALIDATE_URI),
+  _VALIDATE_XSD_REPORT(ValidateXsdReport.class, "xsd-report(input[,schema[,version]])",
+      arg(ITEM, ITEM, STR), ELM, flag(NDT), VALIDATE_URI),
   /** XQuery function. */
-  _VALIDATE_DTD(ValidateDtd.class, "dtd(input[,schema])", arg(ITEM, ITEM), EMP, flag(NDT),
-      VALIDATE_URI),
+  _VALIDATE_DTD(ValidateDtd.class, "dtd(input[,schema])",
+      arg(ITEM, ITEM), EMP, flag(NDT), VALIDATE_URI),
   /** XQuery function. */
   _VALIDATE_DTD_INFO(ValidateDtdInfo.class, "dtd-info(input[,schema])",
       arg(ITEM, ITEM), STR_ZM, flag(NDT), VALIDATE_URI),

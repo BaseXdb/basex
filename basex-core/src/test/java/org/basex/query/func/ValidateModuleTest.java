@@ -33,6 +33,8 @@ public final class ValidateModuleTest extends AdvancedQueryTest {
     query(_VALIDATE_XSD.args(DOC.args(FILE), DOC.args(XSD)), "");
     // specify arguments as file contents
     query(_VALIDATE_XSD.args(_FILE_READ_TEXT.args(FILE), _FILE_READ_TEXT.args(XSD)), "");
+    // specify version
+    query(_VALIDATE_XSD.args(FILE, XSD, "1.0"), "");
     // specify main-memory fragments as arguments
     query(
       "let $doc := <root/> " +
@@ -44,6 +46,7 @@ public final class ValidateModuleTest extends AdvancedQueryTest {
     // invalid arguments
     error(_VALIDATE_XSD.args("unknown"), WHICHRES_X);
     error(_VALIDATE_XSD.args(FILE, "unknown.xsd"), WHICHRES_X);
+    error(_VALIDATE_XSD.args(FILE, XSD, "0.99"), BXVA_XSDVERSION_X);
     error(_VALIDATE_XSD.args(FILE), BXVA_FAIL_X);
     error(
       "let $doc := <root/> " +
@@ -63,6 +66,8 @@ public final class ValidateModuleTest extends AdvancedQueryTest {
     // specify arguments as file contents
     query(_VALIDATE_XSD_INFO.args(_FILE_READ_TEXT.args(FILE),
         _FILE_READ_TEXT.args(XSD)), "");
+    // specify version
+    query(_VALIDATE_XSD_INFO.args(FILE, XSD, "1.0"), "");
     // specify main-memory fragments as arguments
     query(
       "let $doc := <root/> " +
@@ -83,6 +88,7 @@ public final class ValidateModuleTest extends AdvancedQueryTest {
     // invalid arguments
     error(_VALIDATE_XSD_INFO.args("unknown"), WHICHRES_X);
     error(_VALIDATE_XSD_INFO.args(FILE, "unknown.xsd"), WHICHRES_X);
+    error(_VALIDATE_XSD_INFO.args(FILE, XSD, "0.99"), BXVA_XSDVERSION_X);
   }
 
   /** Test method. */
@@ -97,6 +103,9 @@ public final class ValidateModuleTest extends AdvancedQueryTest {
     // specify arguments as file contents
     query(_VALIDATE_XSD_REPORT.args(_FILE_READ_TEXT.args(FILE), _FILE_READ_TEXT.args(XSD)) +
         "//status/string()", "valid");
+    // check XML result
+    query(_VALIDATE_XSD_REPORT.args(FILE, XSD, "1.0"),
+        "<report>\n<status>valid</status>\n</report>");
     // specify main-memory fragments as arguments
     query(
       "let $doc := <root/> " +
@@ -134,6 +143,7 @@ public final class ValidateModuleTest extends AdvancedQueryTest {
     // invalid arguments
     error(_VALIDATE_XSD_REPORT.args("unknown"), WHICHRES_X);
     error(_VALIDATE_XSD_REPORT.args(FILE, "unknown.xsd"), WHICHRES_X);
+    error(_VALIDATE_XSD_REPORT.args(FILE, XSD, "0.99"), BXVA_XSDVERSION_X);
   }
 
   /** Test method. */

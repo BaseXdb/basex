@@ -31,8 +31,6 @@ public class ValidateRng extends ValidateFn {
       @Override
       void process(final ErrorHandler handler) throws IOException, SAXException, QueryException {
         final IO in = read(toNodeOrAtomItem(exprs[0], qc), qc, null);
-
-        // schema specified as string
         final IO schema = prepare(read(toNodeOrAtomItem(exprs[1], qc), qc, null), handler);
         final boolean compact = exprs.length > 2 && toBoolean(exprs[2], qc);
 
