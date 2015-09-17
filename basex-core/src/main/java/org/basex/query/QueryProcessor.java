@@ -79,6 +79,16 @@ public final class QueryProcessor extends Proc implements Closeable {
   }
 
   /**
+   * Deprecated; use {@link #value} instead.
+   * @return result value
+   * @throws QueryException query exception
+   */
+  @Deprecated
+  public Value execute() throws QueryException {
+    return value();
+  }
+
+  /**
    * Evaluates the query and returns the resulting value.
    * @return result value
    * @throws QueryException query exception
