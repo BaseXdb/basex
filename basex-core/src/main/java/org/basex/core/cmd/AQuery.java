@@ -134,8 +134,9 @@ public abstract class AQuery extends Command {
    */
   private void parse(final Performance p) throws QueryException {
     qp.http(http);
-    for(final String name : vars.keySet()) {
-      final String[] value = vars.get(name);
+    for(final Map.Entry<String, String[]> entry : vars.entrySet()) {
+      final String name = entry.getKey();
+      final String[] value = entry.getValue();
       if(name == null) qp.context(value[0], value[1]);
       else qp.bind(name, value[0], value[1]);
     }

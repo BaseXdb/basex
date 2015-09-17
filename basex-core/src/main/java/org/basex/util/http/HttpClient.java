@@ -185,9 +185,9 @@ public final class HttpClient {
    */
   private static void setContentType(final HttpURLConnection conn, final HttpRequest request) {
     String ct;
-    final String contType = request.headers.get(lc(token(CONTENT_TYPE)));
+    final String contType = request.headers.get(CONTENT_TYPE.toLowerCase(Locale.ENGLISH));
     if(contType != null) {
-      // if content type is set explicitly in the header, its value is used
+      // if content type is set in the header, its value is used
       ct = contType;
     } else {
       // otherwise @media-type of <http:body/> is considered

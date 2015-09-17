@@ -48,8 +48,8 @@ final class JarManifest {
    */
   public static Object get(final String key) {
     if(MAP != null) {
-      for(final Object o : MAP.keySet()) {
-        if(key.equals(o.toString())) return MAP.get(o);
+      for(final Map.Entry<Object, Object> entry : MAP.entrySet()) {
+        if(key.equals(entry.getKey().toString())) return entry.getValue();
       }
     }
     return null;

@@ -36,8 +36,6 @@ public interface JsonConstants {
   byte[] OBJECT = token("object");
   /** Token: map. */
   byte[] MAP = token("map");
-  /** Allowed elements. */
-  byte[][] ELEMENTS = { STRING, NUMBER, BOOLEAN, NULL, MAP };
 
   /** Token: pair. */
   byte[] PAIR = token("pair");

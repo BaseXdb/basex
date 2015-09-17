@@ -86,7 +86,7 @@ public final class DiskBuilder extends Builder implements Closeable {
       if(Prop.debug) Util.errln(" " + perf + " (" + Performance.getMemory() + ')');
 
     } catch(final IOException ex) {
-      try { close(); } catch(final IOException ignored) { }
+      try { close(); } catch(final IOException ignore) { }
       throw ex;
     }
     close();

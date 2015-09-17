@@ -5,6 +5,7 @@ import static org.basex.data.DataText.*;
 import static org.basex.util.Strings.*;
 
 import java.io.*;
+import java.util.concurrent.atomic.*;
 
 import org.basex.build.*;
 import org.basex.core.*;
@@ -37,7 +38,7 @@ public final class MetaData {
   /** Timestamp of original document. */
   public volatile long time;
   /** Number of stored documents. */
-  public volatile int ndocs;
+  public volatile AtomicInteger ndocs = new AtomicInteger();
 
   /** Indicates if a text index exists. */
   public volatile boolean textindex;
@@ -296,7 +297,7 @@ public final class MetaData {
         else if(k.equals(DBFTSW))     stopwords   = v;
         else if(k.equals(DBFTLN))     language    = Language.get(v);
         else if(k.equals(DBSIZE))     size        = toInt(v);
-        else if(k.equals(DBNDOCS))    ndocs       = toInt(v);
+        else if(k.equals(DBNDOCS))    ndocs.set(toInt(v));
         else if(k.equals(DBSCTYPE))   scoring     = toInt(v);
         else if(k.equals(DBMAXLEN))   maxlen      = toInt(v);
         else if(k.equals(DBMAXCATS))  maxcats     = toInt(v);
@@ -347,7 +348,7 @@ public final class MetaData {
     writeInfo(out, DBTIME,     time);
     writeInfo(out, IDBSTR,     ISTORAGE);
     writeInfo(out, DBFSIZE,    filesize);
-    writeInfo(out, DBNDOCS,    ndocs);
+    writeInfo(out, DBNDOCS,    ndocs.get());
     writeInfo(out, DBENC,      encoding);
     writeInfo(out, DBSIZE,     size);
     writeInfo(out, DBCHOP,     chop);

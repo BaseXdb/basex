@@ -84,7 +84,7 @@ public final class List extends Command {
         dbsize = meta.dbsize();
         file = meta.original;
         // add number of raw files
-        count = meta.ndocs + new IOFile(soptions.dbpath(name), IO.RAW).descendants().size();
+        count = meta.ndocs.get() + new IOFile(soptions.dbpath(name), IO.RAW).descendants().size();
       } catch(final IOException ex) {
         file = ERROR;
       }

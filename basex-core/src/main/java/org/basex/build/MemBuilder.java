@@ -78,7 +78,7 @@ public final class MemBuilder extends Builder {
       if(Prop.debug) Util.errln(" " + perf + " (" + Performance.getMemory() + ')');
 
     } catch(final IOException ex) {
-      try { close(); } catch(final IOException ignored) { }
+      try { close(); } catch(final IOException ignore) { }
       throw ex;
     }
     close();

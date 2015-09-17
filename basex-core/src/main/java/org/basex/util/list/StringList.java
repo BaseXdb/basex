@@ -115,7 +115,6 @@ public class StringList extends ElementList implements Iterable<String> {
    * @return result of check
    */
   public final boolean containsAll(final StringList elements) {
-    if(isEmpty()) return elements.isEmpty();
     int i = 0;
     final int s = size;
     for(final String e : elements) {
@@ -159,16 +158,6 @@ public class StringList extends ElementList implements Iterable<String> {
    */
   public final String[] toArray() {
     return Array.copyOf(list, size);
-  }
-
-  /**
-   * Returns an array with all elements and resets the array size.
-   * @return array
-   */
-  public final String[] next() {
-    final String[] lst = Array.copyOf(list, size);
-    reset();
-    return lst;
   }
 
   /**

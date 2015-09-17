@@ -404,7 +404,7 @@ public abstract class Path extends ParseExpr {
     final Data data = rt.data();
     // skip computation if no database instance is available, is out-of-date or
     // if context does not contain all database nodes
-    if(data == null || !data.meta.uptodate || data.meta.ndocs != rt.size()) return -1;
+    if(data == null || !data.meta.uptodate || data.meta.ndocs.get() != rt.size()) return -1;
 
     ArrayList<PathNode> nodes = data.paths.root();
     long m = 1;

@@ -34,7 +34,7 @@ abstract class ArchiveIn implements Closeable {
       if(li.lookup() == 0x50) return new ZIPIn(li);
       if(li.lookup() == 0x1f) return new GZIPIn(li);
     } catch(final IOException ex) {
-      try { bi.close(); } catch(final IOException ignored) { }
+      try { bi.close(); } catch(final IOException ignore) { }
       throw ARCH_FAIL_X.get(info, ex);
     }
     throw ARCH_UNKNOWN.get(info);

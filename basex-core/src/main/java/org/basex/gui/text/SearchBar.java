@@ -208,7 +208,7 @@ public final class SearchBar extends BaseXBack {
    */
   public void refreshLayout() {
     if(editor == null) return;
-    final Font ef = editor.getFont().deriveFont(7f + (GUIConstants.fontSize >> 1));
+    final Font ef = editor.getFont().deriveFont((float) (7 + (GUIConstants.fontSize >> 1)));
     search.setFont(ef);
     replace.setFont(ef);
   }

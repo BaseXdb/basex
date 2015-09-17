@@ -51,7 +51,7 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Constructor.
+   * Constructor. Invoked by {@link Function#get(StaticContext, InputInfo, Expr...)}.
    * @param ii input info
    * @param sctx static context
    * @param f function definition

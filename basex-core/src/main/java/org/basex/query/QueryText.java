@@ -218,12 +218,8 @@ public interface QueryText {
   String PRESERVE = "preserve";
   /** Parser token. */
   String PREVIOUS = "previous";
-  /** Public token. */
-  String PRIVATE = "private";
   /** Parser token. */
   String PI = "processing-instruction";
-  /** Public token. */
-  String PUBLIC = "public";
   /** Parser token. */
   String RELATIONSHIP = "relationship";
   /** Parser token. */

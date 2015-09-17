@@ -256,9 +256,10 @@ public final class HTTPContext {
         res.setStatus(code);
         if(info != null) {
           res.setContentType(MediaType.TEXT_PLAIN.toString());
-          final ArrayOutput ao = new ArrayOutput();
-          ao.write(token(info));
-          res.getOutputStream().write(ao.normalize().finish());
+          try(final ArrayOutput ao = new ArrayOutput()) {
+            ao.write(token(info));
+            res.getOutputStream().write(ao.normalize().finish());
+          }
         }
       }
     } catch(final IllegalStateException ex) {
@@ -476,7 +477,7 @@ public final class HTTPContext {
   /**
    * Closes the database context.
    */
-  public static synchronized void close() {
+  static synchronized void close() {
     if(server != null) {
       try {
         server.stop();

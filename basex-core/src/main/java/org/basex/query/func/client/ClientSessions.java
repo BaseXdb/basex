@@ -51,10 +51,8 @@ final class ClientSessions implements QueryResource {
   @Override
   public void close() {
     for(final byte[] c : conns) {
-      final ClientSession cs = conns.get(c);
-      if(cs == null) continue;
-      try {
-        cs.close();
+      try(final ClientSession cs = conns.get(c)) {
+        /* close */
       } catch(final IOException ex) {
         Util.debug(ex);
       }

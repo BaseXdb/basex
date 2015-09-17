@@ -59,7 +59,7 @@ public class Options implements Iterable<Option<?>> {
   private static final String PROPUSER = "# Local Options";
 
   /** Map with option names and definition. */
-  protected final TreeMap<String, Option<?>> options = new TreeMap<>();
+  private final TreeMap<String, Option<?>> options = new TreeMap<>();
   /** Map with option names and values. */
   private final TreeMap<String, Object> values = new TreeMap<>();
   /** Free option definitions. */
@@ -474,7 +474,7 @@ public class Options implements Iterable<Option<?>> {
   public final void setSystem() {
     // assign global options
     for(final Entry<String, String> entry : Prop.entries()) {
-      final String n = entry.getKey(), v = entry.getValue().toString();
+      final String n = entry.getKey(), v = entry.getValue();
       try {
         if(assign(n, v, -1, false)) Util.debug(n + Text.COLS + v);
       } catch(final BaseXException ex) {

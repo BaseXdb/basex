@@ -448,7 +448,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
    * parsing.
    * @param ft function type
    */
-  public void adoptSignature(final FuncType ft) {
+  void adoptSignature(final FuncType ft) {
     anns = ft.anns;
     final int al = args.length;
     for(int a = 0; a < al; a++) args[a].declType = ft.argTypes[a];

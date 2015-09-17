@@ -236,7 +236,7 @@ public class BaseX extends CLI {
             c == 'q' || c == 'r' || c == 's' || c == 't' && local()) {
           // options followed by a string
           v = arg.string();
-        } else if(c == 'd' || c == 'D' && local() || c == 'u' && local() || c == 'R' ||
+        } else if(c == 'D' && local() || c == 'u' && local() || c == 'R' ||
             c == 'v' || c == 'V' || c == 'w' || c == 'x' || c == 'X' || c == 'z') {
           // options to be toggled
           v = "";

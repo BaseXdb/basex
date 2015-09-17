@@ -114,7 +114,7 @@ public final class XPathQueryServiceTest extends XMLDBBaseTest {
     try {
       serv.queryResource("UnknownDoc", "/");
       fail("Query was executed on unknown document.");
-    } catch(final XMLDBException ex) { /* ignored. */ }
+    } catch(final XMLDBException ignored) { }
   }
 
   @Test

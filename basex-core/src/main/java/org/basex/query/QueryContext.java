@@ -108,8 +108,6 @@ public final class QueryContext extends Proc implements Closeable {
   public Item zone;
   /** Current nanoseconds. */
   public long nano;
-  /** Current milliseconds. */
-  public long ms;
 
   /** Strings to lock defined by read-lock option. */
   public final StringList readLocks = new StringList(0);
@@ -829,7 +827,6 @@ public final class QueryContext extends Proc implements Closeable {
       date = new Dat(token(ymd + znm + ':' + zns), null);
       datm = new Dtm(token(ymd + 'T' + hms + znm + ':' + zns), null);
       zone = new DTDur(Strings.toInt(znm), Strings.toInt(zns));
-      ms = dt.getTime();
       nano = System.nanoTime();
     }
     return this;

@@ -209,7 +209,7 @@ public final class Prop {
    * @param option option
    */
   public static void remove(final Option<?> option) {
-    OPTIONS.remove(option);
+    OPTIONS.remove(option.name());
   }
 
   /**
@@ -219,7 +219,7 @@ public final class Prop {
    */
   public static String get(final Option<?> option) {
     String v = System.getProperty(DBPREFIX + option.name().toLowerCase(Locale.ENGLISH));
-    if(v == null) v = OPTIONS.get(option);
+    if(v == null) v = OPTIONS.get(option.name());
     return v == null ? "" : v;
   }
 

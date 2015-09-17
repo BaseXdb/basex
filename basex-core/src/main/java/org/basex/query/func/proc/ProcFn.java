@@ -55,7 +55,7 @@ abstract class ProcFn extends StandardFunc {
     } catch(final IOException ex) {
       try {
         result.error.write(token(Util.message(ex)));
-      } catch(final IOException ignored) { }
+      } catch(final IOException ignore) { }
       result.code = 9999;
       return result;
     }

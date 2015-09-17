@@ -414,7 +414,7 @@ public abstract class Command extends Proc {
       // flushes the output
       try {
         if(out != null) out.flush();
-      } catch(final IOException ignored) { }
+      } catch(final IOException ignore) { }
     }
   }
 }

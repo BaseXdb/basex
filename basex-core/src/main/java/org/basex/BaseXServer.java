@@ -305,7 +305,7 @@ public final class BaseXServer extends CLI implements Runnable {
     final IOFile stop = stopFile(port);
     try {
       stop.touch();
-      new Socket(S_LOCALHOST, port).close();
+      try(final Socket s = new Socket(S_LOCALHOST, port)) { }
       // wait and check if server was really stopped
       do Performance.sleep(100); while(ping(S_LOCALHOST, port));
     } catch(final ConnectException ex) {

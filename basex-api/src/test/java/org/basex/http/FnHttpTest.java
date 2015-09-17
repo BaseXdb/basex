@@ -527,7 +527,7 @@ public class FnHttpTest extends HTTPTest {
     // String item child
     req1.bodyContent.add(Str.get("<b>b</b>"));
     HttpClient.setRequestContent(fakeConn1.getOutputStream(), req1);
-    assertEquals("<a>a</a>&lt;b&gt;b&lt;/b&gt;", fakeConn1.out.toString());
+    assertEquals("<a>a</a>&lt;b&gt;b&lt;/b&gt;", fakeConn1.out.toString(Strings.UTF8));
 
     // Case 2: No method, media-type='text/plain'
     final HttpRequest req2 = new HttpRequest();
@@ -568,7 +568,7 @@ public class FnHttpTest extends HTTPTest {
     req1.bodyContent.add(new B64(token("dGVzdA==")));
     final FakeHttpConnection fakeConn1 = new FakeHttpConnection(new URL("http://www.test.com"));
     HttpClient.setRequestContent(fakeConn1.getOutputStream(), req1);
-    assertEquals(fakeConn1.out.toString(), "dGVzdA==");
+    assertEquals(fakeConn1.out.toString(Strings.UTF8), "dGVzdA==");
 
     // Case 2: content is a node
     final HttpRequest req2 = new HttpRequest();
@@ -592,7 +592,7 @@ public class FnHttpTest extends HTTPTest {
     req1.bodyContent.add(new Hex(token("74657374")));
     final FakeHttpConnection fakeConn1 = new FakeHttpConnection(new URL("http://www.test.com"));
     HttpClient.setRequestContent(fakeConn1.getOutputStream(), req1);
-    assertEquals(fakeConn1.out.toString(), "74657374");
+    assertEquals(fakeConn1.out.toString(Strings.UTF8), "74657374");
 
     // Case 2: content is a node
     final HttpRequest req2 = new HttpRequest();
@@ -625,7 +625,7 @@ public class FnHttpTest extends HTTPTest {
     // Delete file
     file.delete();
 
-    assertEquals(fakeConn.out.toString(), "test");
+    assertEquals(fakeConn.out.toString(Strings.UTF8), "test");
   }
 
   /**

@@ -338,7 +338,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
      * @param code code
      * @param message message
      */
-    private HTTPCode(final int code, final String message) {
+    HTTPCode(final int code, final String message) {
       this.code = code;
       this.message = message;
     }

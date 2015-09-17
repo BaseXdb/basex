@@ -43,7 +43,7 @@ final class ErrorInfo {
       final String id = se.getSystemId();
       if(id != null) {
         final IO io = IO.get(id);
-        if(schema == null || !io.isDir() && !schema.equals(id)) url = id;
+        if(schema == null || !io.isDir() && !schema.equals(io)) url = id;
       }
       line = se.getLineNumber();
       column = se.getColumnNumber();

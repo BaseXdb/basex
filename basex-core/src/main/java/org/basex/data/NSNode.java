@@ -152,22 +152,6 @@ final class NSNode {
   }
 
   /**
-   * Returns the index of the specified pre value.
-   * @param p int pre value
-   * @return index, or possible insertion position
-   */
-  int find2(final int p) {
-    int l = 0, h = size - 1;
-    while(l <= h) { // binary search
-      final int m = l + h >>> 1, v = nodes[m].pre;
-      if(v == p) return m;
-      if(v < p) l = m + 1;
-      else h = m - 1;
-    }
-    return l;
-  }
-
-  /**
    * Returns the id of the namespace uri for the specified prefix.
    * @param prefix prefix reference
    * @return if of the namespace uri, or {@code 0} if none is found

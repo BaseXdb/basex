@@ -23,14 +23,6 @@ public abstract class Seq extends Value {
   protected final long size;
 
   /**
-   * Constructor.
-   * @param size size
-   */
-  protected Seq(final long size) {
-    this(size, AtomType.ITEM);
-  }
-
-  /**
    * Constructor, specifying a type.
    * @param size size
    * @param type type

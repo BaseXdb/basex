@@ -206,7 +206,7 @@ public final class GUIMacOSX {
       final Class<?>[] params = { Window.class, Boolean.TYPE };
       final Method method = util.getMethod("setWindowCanFullScreen", params);
       method.invoke(util, window, true);
-    } catch(final Exception ignored) { }
+    } catch(final Exception ignore) { }
   }
 
   /**

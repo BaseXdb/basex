@@ -352,7 +352,7 @@ public final class BaseXHTTP extends Main {
     final IOFile stop = stopFile(port);
     try {
       stop.touch();
-      new Socket(S_LOCALHOST, port).close();
+      try(final Socket s = new Socket(S_LOCALHOST, port)) { }
       // give the notified process some time to quit
       Performance.sleep(100);
     } catch(final ConnectException ex) {

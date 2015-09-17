@@ -67,14 +67,6 @@ public final class Bln extends Item {
     return Token.token(value);
   }
 
-  /**
-   * Returns the string value.
-   * @return string value
-   */
-  public byte[] string() {
-    return Token.token(value);
-  }
-
   @Override
   public boolean bool(final InputInfo ii) {
     return value;

@@ -220,8 +220,7 @@ final class IndonesianStemmer extends InternalStemmer {
         flags |= REMOVED_MENG;
         numSyllables--;
         tb.delete(0, 4);
-      } else if(c1 == 'm' && c2 == 'e' && c3 == 'n' && c4 == 'y'
-          && tl > 4 && isVowel(tb.get(4))) {
+      } else if(c1 == 'm' && c2 == 'e' && c3 == 'n' && c4 == 'y' && isVowel(tb.get(4))) {
         flags |= REMOVED_MENG;
         final byte setS = 's';
         tb.set(3, setS);
@@ -231,8 +230,7 @@ final class IndonesianStemmer extends InternalStemmer {
         flags |= REMOVED_MENG;
         numSyllables--;
         tb.delete(0, 3);
-      } else if(c1 == 'm' && c2 == 'e' && c3 == 'm' && tl > 3
-          && isVowel(tb.get(3))) {
+      } else if(c1 == 'm' && c2 == 'e' && c3 == 'm' && isVowel(tb.get(3))) {
         flags |= REMOVED_MENG;
         final byte setP = 'p';
         tb.set(2, setP);
@@ -318,7 +316,7 @@ final class IndonesianStemmer extends InternalStemmer {
           numSyllables--;
           tb.delete(0, 3);
         }
-      } else if(c1 == 'b' && c2 == 'e' && !isVowel(tb.get(2)) && c4 == 'e' && tl > 4) {
+      } else if(c1 == 'b' && c2 == 'e' && !isVowel(tb.get(2)) && c4 == 'e') {
         if(tb.get(4) == 'r') {
           flags |= REMOVED_BER;
           numSyllables--;

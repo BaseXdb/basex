@@ -89,7 +89,7 @@ public interface HttpText {
   String BINARY = "binary";
 
   /** Request attributes. */
-  public enum Request {
+  enum Request {
     /** NC. */ NC,
     /** QOP. */ QOP,
     /** URI. */ URI,
