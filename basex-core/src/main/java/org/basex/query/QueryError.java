@@ -230,7 +230,7 @@ public enum QueryError {
   /** BXVA0003. */
   BXVA_RELAXNG_X(BXVA, 3, "RelaxNG validation is not available."),
   /** BXVA0004. */
-  BXVA_XSDVERSION_X(BXVA, 4, "No implementation found for XML Schema %."),
+  BXVA_XSDVERSION_X(BXVA, 4, "No XML Schema implementation found for version '%'."),
 
   // Web module
 

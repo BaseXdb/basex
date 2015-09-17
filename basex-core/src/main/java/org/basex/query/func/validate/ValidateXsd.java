@@ -24,15 +24,20 @@ import org.xml.sax.*;
  * @author Christian Gruen
  */
 public class ValidateXsd extends ValidateFn {
-  /** Classpath for XML Schema 1.1. */
-  private static final String XSD11_PATH = "javax.xml.validation.SchemaFactory";
-  /** URI for XML Schema 1.1. */
+  /** XML Schema 1.1 Classpath. */
+  private static final String SCHEMA_FACTORY_CP = "javax.xml.validation.SchemaFactory";
+  /** XML Schema 1.0 URI. */
+  private static final String XSD10_URI = "http://www.w3.org/XML/XMLSchema/v1.0";
+  /** XML Schema 1.1 URI. */
   private static final String XSD11_URI = "http://www.w3.org/XML/XMLSchema/v1.1";
-  /** XML Schema 1.1 implementations. */
-  private static final String[] XSD11_FACTORIES = {
-    "com.saxonica.ee.jaxp.SchemaFactoryImpl",
-    "org.apache.xerces.jaxp.validation.XMLSchema11Factory"
-  };
+  /** Saxon schema factory. */
+  private static final String SAXON_CP = "com.saxonica.ee.jaxp.SchemaFactoryImpl";
+  /** Xerces schema factory. */
+  private static final String XERCES_CP = "org.apache.xerces.jaxp.validation.XMLSchemaFactory";
+  /** Xerces schema factory. */
+  private static final String XERCES11_CP = "org.apache.xerces.jaxp.validation.XMLSchema11Factory";
+  /** Saxon version URI. */
+  private static final String SAXON_VERSION_URI = "http://saxon.sf.net/feature/xsd-version";
   /** Version 1.0. */
   private static final String VERSION_10 = "1.0";
   /** Version 1.1. */
@@ -51,33 +56,40 @@ public class ValidateXsd extends ValidateFn {
       @Override
       void process(final ErrorHandler handler) throws IOException, SAXException, QueryException {
         final IO in = read(toNodeOrAtomItem(exprs[0], qc), qc, null);
-        final Item sch = exprs.length < 2 ? null : toNodeOrAtomItem(exprs[1].item(qc, info));
-        String ns = XMLConstants.W3C_XML_SCHEMA_NS_URI;
-        String version = VERSION_10;
-        if(exprs.length > 2) {
-          version = Token.string(toToken(exprs[2], qc));
-          if(version.equals(VERSION_11)) {
-            ns = XSD11_URI;
-            String factory = null;
-            for(final String f : XSD11_FACTORIES) if(Reflect.find(f) != null) factory = f;
-            if(factory == null) throw BXVA_XSDVERSION_X.get(info, VERSION_11);
-            System.setProperty(XSD11_PATH + ':' + ns, factory);
-          } else if(!version.equals(VERSION_10)) {
-            throw BXVA_XSDVERSION_X.get(info, VERSION_11);
-          }
+        final Item schema = exprs.length > 1 ? toNodeOrAtomItem(exprs[1].item(qc, info)) : null;
+        final String version = exprs.length > 2 ? Token.string(toToken(exprs[2], qc)) : null;
+        final boolean xsd11 = VERSION_11.equals(version);
+
+        // find alternative validator (null: use default validator)
+        String cp = null;
+        if(Reflect.find(XERCES11_CP) != null) {
+          cp = xsd11 ? XERCES11_CP : XERCES_CP;
+        } else if(Reflect.find(SAXON_CP) != null) {
+          cp = SAXON_CP;
         }
 
-        final SchemaFactory sf = SchemaFactory.newInstance(ns);
-        //sf.setProperty("http://saxon.sf.net/feature/xsd-version", version);
+        // find implementation URI
+        String uri = null;
+        if(version == null || version.equals(VERSION_10)) {
+          uri = cp == null ? XMLConstants.W3C_XML_SCHEMA_NS_URI : XSD10_URI;
+        } else if(xsd11 && cp != null) {
+          uri = XSD11_URI;
+        } else {
+          throw BXVA_XSDVERSION_X.get(info, version);
+        }
+
+        // create schema factory and set version
+        if(cp != null) System.setProperty(SCHEMA_FACTORY_CP + ':' + uri, cp);
+        final SchemaFactory sf = SchemaFactory.newInstance(uri);
+        if(SAXON_CP.equals(cp)) sf.setProperty(SAXON_VERSION_URI, xsd11 ? VERSION_11 : VERSION_10);
 
         final Schema s;
-        if(sch == null) {
+        if(schema == null) {
           // schema declaration is included in document
           s = sf.newSchema();
         } else {
           // schema is specified as string
-          final IO schema = prepare(read(sch, qc, null), handler);
-          s = sf.newSchema(new URL(schema.url()));
+          s = sf.newSchema(new URL(prepare(read(schema, qc, null), handler).url()));
         }
 
         final Validator v = s.newValidator();
