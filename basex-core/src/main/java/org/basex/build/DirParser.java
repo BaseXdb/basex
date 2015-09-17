@@ -128,7 +128,7 @@ public final class DirParser extends Parser {
           for(ZipEntry ze; (ze = is.getNextEntry()) != null;) {
             if(ze.isDirectory()) continue;
             final String path = ze.getName();
-            source = new IOStream(is, archiveName ? (name + '/' + path) : path);
+            source = new IOStream(is, archiveName ? (input.name() + '/' + path) : path);
             source.length(ze.getSize());
             parseResource(builder);
           }
