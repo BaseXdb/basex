@@ -42,6 +42,8 @@ public final class DirParser extends Parser {
   private final boolean dtd;
   /** Raw parsing. */
   private final boolean rawParser;
+  /** Archive name. */
+  private final boolean archiveName;
   /** Database path for storing binary files. */
   private IOFile rawPath;
 
@@ -64,6 +66,7 @@ public final class DirParser extends Parser {
     root = dir.endsWith("/") ? dir : dir + '/';
     skipCorrupt = options.get(MainOptions.SKIPCORRUPT);
     archives = options.get(MainOptions.ADDARCHIVES);
+    archiveName = options.get(MainOptions.ARCHIVENAME);
     addRaw = options.get(MainOptions.ADDRAW);
     dtd = options.get(MainOptions.DTD);
     rawParser = options.get(MainOptions.PARSER) == MainParser.RAW;
@@ -124,7 +127,8 @@ public final class DirParser extends Parser {
         try(final ZipInputStream is = new ZipInputStream(in)) {
           for(ZipEntry ze; (ze = is.getNextEntry()) != null;) {
             if(ze.isDirectory()) continue;
-            source = new IOStream(is, ze.getName());
+            final String path = ze.getName();
+            source = new IOStream(is, archiveName ? (name + '/' + path) : path);
             source.length(ze.getSize());
             parseResource(builder);
           }

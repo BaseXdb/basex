@@ -93,11 +93,24 @@ public final class AddDeleteTest extends SandboxTest {
   public void addZip() {
     execute(new Add("target", ZIPFILE));
     assertEquals(4, docs());
+
     // do not add archives
-    set(MainOptions.ADDARCHIVES, false);
-    execute(new Add("", ZIPFILE));
-    assertEquals(4, docs());
-    set(MainOptions.ADDARCHIVES, true);
+    try {
+      set(MainOptions.ADDARCHIVES, false);
+      execute(new Add("", ZIPFILE));
+      assertEquals(4, docs());
+    } finally {
+      set(MainOptions.ADDARCHIVES, true);
+    }
+
+    // prefix database path with name of archive
+    try {
+      set(MainOptions.ARCHIVENAME, true);
+      execute(new Add("", ZIPFILE));
+      assertEquals(4, context.data().resources.docs("xml.zip/").size());
+    } finally {
+      set(MainOptions.ARCHIVENAME, false);
+    }
   }
 
   /**
@@ -216,12 +229,15 @@ public final class AddDeleteTest extends SandboxTest {
     final IOFile io = new IOFile(TEMP);
     write(io, "<x");
 
-    set(MainOptions.SKIPCORRUPT, true);
-    assertEquals(0, context.data().resources.docs("").size());
-    execute(new Add("x", "<x"));
-    execute(new Add("x", CORRUPT));
-    assertEquals(0, context.data().resources.docs("").size());
-    set(MainOptions.SKIPCORRUPT, false);
+    try {
+      set(MainOptions.SKIPCORRUPT, true);
+      assertEquals(0, docs());
+      execute(new Add("x", "<x"));
+      execute(new Add("x", CORRUPT));
+      assertEquals(0, docs());
+    } finally {
+      set(MainOptions.SKIPCORRUPT, false);
+    }
 
     try {
       new Add("", "<x").execute(context);

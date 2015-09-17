@@ -29,6 +29,8 @@ public final class MainOptions extends Options {
   public static final StringOption CREATEFILTER = new StringOption("CREATEFILTER", "*.xml");
   /** Flag for adding archives to a database. */
   public static final BooleanOption ADDARCHIVES = new BooleanOption("ADDARCHIVES", true);
+  /** Flag for prefixing database paths with name of archive. */
+  public static final BooleanOption ARCHIVENAME = new BooleanOption("ARCHIVENAME", false);
   /** Flag for skipping corrupt files. */
   public static final BooleanOption SKIPCORRUPT = new BooleanOption("SKIPCORRUPT", false);
   /** Flag for adding remaining files as raw files. */

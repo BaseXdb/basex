@@ -5,6 +5,7 @@ about_%              = A propos de %
 access_denied        = Accès refusé.
 add                  = Ajouter
 add_as_import        = Ajouter comme import
+add_archive_name     = Include name of archive in document path
 add_raw_files        = Ajouter les fichiers restants comme fichiers bruts
 add_resources        = Ajouter des ressources
 adjust_nodes         = Ajuster les nœuds au texte
