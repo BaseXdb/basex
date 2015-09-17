@@ -135,7 +135,7 @@ public final class Levenshtein {
       }
       f2 = c1;
     }
-    return 1 - (double) m[lMax][lMax] / lMax;
+    return (double) (lMax - m[lMax][lMax]) / lMax;
   }
 
 
