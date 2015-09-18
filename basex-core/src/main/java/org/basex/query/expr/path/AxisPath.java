@@ -81,7 +81,7 @@ public abstract class AxisPath extends Path {
     if(cv == cvalue && (cv == null || cv.sameAs(cvalue))) return true;
     // otherwise, if path starts with root node, compare roots of cached and new context value
     return root instanceof Root && cv instanceof ANode && cvalue instanceof ANode &&
-        ((ANode) cv).root().sameAs(((ANode) cv).root());
+        ((ANode) cvalue).root().sameAs(((ANode) cv).root());
   }
 
   /**

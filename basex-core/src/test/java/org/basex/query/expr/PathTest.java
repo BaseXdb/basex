@@ -195,4 +195,14 @@ public final class PathTest extends AdvancedQueryTest {
     query("for $i in (1,'a') return //ul/li[$i][2]");
     query("for $i in (1,'a') return //ul/li[$i][last()]", LI1 + '\n' + LI2);
   }
+
+  /**
+   * Caching of path expression results (GH-1197).
+   */
+  @Test public void pathCaching() {
+    execute(new CreateDB(NAME));
+    execute(new Add("a.xml", "<a><b/><b/></a>"));
+    execute(new Add("a.xml", "<c><b/></c>"));
+    query("//b[/a]", "<b/>\n<b/>");
+  }
 }
