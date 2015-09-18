@@ -135,7 +135,7 @@ public final class OptimizeAll extends ACreate {
         dt.meta.createftxt = ometa.createftxt;
         dt.meta.filesize   = ometa.filesize;
         dt.meta.dirty      = true;
-        CreateIndex.create(dt, options, cmd);
+        CreateIndex.create(dt, cmd);
 
         // move binary files
         final IOFile bin = data.meta.binaries();

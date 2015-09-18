@@ -6,7 +6,6 @@ import java.io.*;
 import java.util.*;
 
 import org.basex.core.*;
-import org.basex.core.cmd.*;
 import org.basex.index.*;
 import org.basex.index.name.*;
 import org.basex.index.path.*;
@@ -130,12 +129,10 @@ public abstract class Data {
   /**
    * Drops the specified index.
    * @param type index to be dropped
-   * @param options main options
    * @param cmd calling command
    * @throws IOException I/O exception
    */
-  public abstract void createIndex(IndexType type, MainOptions options, Command cmd)
-      throws IOException;
+  public abstract void createIndex(IndexType type, Command cmd) throws IOException;
 
   /**
    * Drops the specified index.
@@ -826,6 +823,15 @@ public abstract class Data {
   }
 
   /**
+   * Sets the node id.
+   * @param pre pre value
+   * @param value value to be stored
+   */
+  public final void id(final int pre, final int value) {
+    table.write4(pre, 12, value);
+  }
+
+  /**
    * Sets the size value.
    * @param pre pre value
    * @param kind node kind
@@ -1105,20 +1111,11 @@ public abstract class Data {
    */
   public abstract boolean inMemory();
 
-  /**
-   * Returns a string representation of the specified table range. Can be called
-   * for debugging.
-   * @param start start pre value
-   * @param end end pre value
-   * @return table
-   */
-  public String toString(final int start, final int end) {
-    return string(InfoStorage.table(this, start, end));
-  }
-
   @Override
   public final String toString() {
     final int max = 20;
-    return meta.size > max ? toString(0, max) + "..." : toString(0, meta.size);
+    final DataPrinter dp = new DataPrinter(this);
+    dp.add(0, max);
+    return meta.size > max ? dp + "..." : dp.toString();
   }
 }

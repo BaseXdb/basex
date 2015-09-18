@@ -64,14 +64,16 @@ public final class DBOptimize extends DBUpdate {
     // create new options, based on global defaults, and overwrite with database options
     final MainOptions opts = new MainOptions(qc.context.options);
     final MetaData meta = data.meta;
-    options.assign(MainOptions.TEXTINDEX,    meta.createtext);
-    options.assign(MainOptions.ATTRINDEX,    meta.createattr);
-    options.assign(MainOptions.FTINDEX,      meta.createftxt);
-    options.assign(MainOptions.TEXTINCLUDE,  meta.textinclude);
-    options.assign(MainOptions.ATTRINCLUDE,  meta.attrinclude);
-    options.assign(MainOptions.FTINCLUDE,    meta.ftinclude);
-    options.assign(MainOptions.UPDINDEX,     meta.updindex);
-    options.assign(MainOptions.AUTOOPTIMIZE, meta.autoopt);
+    options.assignIfEmpty(MainOptions.TEXTINDEX, meta.createtext);
+    options.assignIfEmpty(MainOptions.ATTRINDEX, meta.createattr);
+    options.assignIfEmpty(MainOptions.FTINDEX, meta.createftxt);
+    options.assignIfEmpty(MainOptions.TEXTINCLUDE, meta.textinclude);
+    options.assignIfEmpty(MainOptions.ATTRINCLUDE, meta.attrinclude);
+    options.assignIfEmpty(MainOptions.FTINCLUDE, meta.ftinclude);
+    options.assignIfEmpty(MainOptions.INDEXSPLITSIZE, meta.splitsize);
+    options.assignIfEmpty(MainOptions.FTINDEXSPLITSIZE, meta.ftsplitsize);
+    options.assignIfEmpty(MainOptions.UPDINDEX, meta.updindex);
+    options.assignIfEmpty(MainOptions.AUTOOPTIMIZE, meta.autoopt);
     options.assignTo(opts);
 
     // adopt options to database meta data
@@ -86,12 +88,14 @@ public final class DBOptimize extends DBUpdate {
     final String ti = opts.get(MainOptions.TEXTINCLUDE);
     final String ai = opts.get(MainOptions.ATTRINCLUDE);
     final boolean rebuild = mc != meta.maxcats || ml != meta.maxlen;
-    final boolean rebuildText = !meta.textinclude.equals(ti);
-    final boolean rebuildAttr = !meta.attrinclude.equals(ai);
+    final boolean rebuildText = rebuild || !meta.textinclude.equals(ti);
+    final boolean rebuildAttr = rebuild || !meta.attrinclude.equals(ai);
     meta.textinclude = ti;
     meta.attrinclude = ai;
     meta.maxcats = mc;
     meta.maxlen = ml;
+    meta.splitsize = opts.get(MainOptions.INDEXSPLITSIZE);
+    meta.ftsplitsize = opts.get(MainOptions.FTINDEXSPLITSIZE);
 
     // check if fulltext indexing options have changed
     final boolean st = opts.get(MainOptions.STEMMING);
@@ -109,10 +113,11 @@ public final class DBOptimize extends DBUpdate {
     meta.diacritics = dc;
     meta.stopwords  = sw;
     meta.ftinclude = fi;
+    meta.autoopt = opts.get(MainOptions.AUTOOPTIMIZE);
 
     try {
       if(all) OptimizeAll.optimizeAll(data, qc.context, opts, null);
-      else Optimize.optimize(data, opts, rebuildText, rebuildAttr, rebuildFtx, null);
+      else Optimize.optimize(data, rebuildText, rebuildAttr, rebuildFtx, null);
     } catch(final IOException ex) {
       throw UPDBOPTERR_X.get(info, ex);
     }

@@ -178,14 +178,10 @@ final class DataUpdates {
     // execute fn:put operations
     for(final Put put : puts.values()) put.apply();
 
-    // Feature #1035: auto-optimize database
-    final MainOptions opts = qc.context.options;
-    if(data.meta.autoopt) {
-      try {
-        Optimize.optimize(data, opts, null);
-      } catch(final IOException ex) {
-        throw UPDBOPTERR_X.get(null, ex);
-      }
+    try {
+      Optimize.finish(data);
+    } catch(final IOException ex) {
+      throw UPDBOPTERR_X.get(null, ex);
     }
 
     /* optional: export file if...

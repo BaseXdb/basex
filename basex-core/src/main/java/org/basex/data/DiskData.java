@@ -173,16 +173,14 @@ public final class DiskData extends Data {
   }
 
   @Override
-  public void createIndex(final IndexType type, final MainOptions options, final Command cmd)
-      throws IOException {
-
+  public void createIndex(final IndexType type, final Command cmd) throws IOException {
     // close existing index
     close(type);
     final IndexBuilder ib;
     switch(type) {
-      case TEXT:      ib = new DiskValuesBuilder(this, options, true); break;
-      case ATTRIBUTE: ib = new DiskValuesBuilder(this, options, false); break;
-      case FULLTEXT:  ib = new FTBuilder(this, options); break;
+      case TEXT:      ib = new DiskValuesBuilder(this, true); break;
+      case ATTRIBUTE: ib = new DiskValuesBuilder(this, false); break;
+      case FULLTEXT:  ib = new FTBuilder(this); break;
       default:        throw Util.notExpected();
     }
     if(cmd != null) cmd.proc(ib);

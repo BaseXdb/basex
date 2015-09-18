@@ -77,13 +77,11 @@ public final class MemData extends Data {
   public void close() { }
 
   @Override
-  public void createIndex(final IndexType type, final MainOptions options, final Command cmd)
-      throws IOException {
-
+  public void createIndex(final IndexType type, final Command cmd) throws IOException {
     final IndexBuilder ib;
     switch(type) {
-      case TEXT:      ib = new MemValuesBuilder(this, options, true); break;
-      case ATTRIBUTE: ib = new MemValuesBuilder(this, options, false); break;
+      case TEXT:      ib = new MemValuesBuilder(this, true); break;
+      case ATTRIBUTE: ib = new MemValuesBuilder(this, false); break;
       case FULLTEXT:  throw new BaseXException(NO_MAINMEM);
       default:        throw Util.notExpected();
     }

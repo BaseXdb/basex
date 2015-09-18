@@ -40,10 +40,12 @@ public final class CreateIndex extends ACreate {
     if(ci == CmdIndex.TEXT) {
       data.meta.createtext = true;
       data.meta.textinclude = options.get(MainOptions.TEXTINCLUDE);
+      data.meta.splitsize = options.get(MainOptions.INDEXSPLITSIZE);
       type = IndexType.TEXT;
     } else if(ci == CmdIndex.ATTRIBUTE) {
       data.meta.createattr = true;
       data.meta.attrinclude = options.get(MainOptions.ATTRINCLUDE);
+      data.meta.splitsize = options.get(MainOptions.INDEXSPLITSIZE);
       type = IndexType.ATTRIBUTE;
     } else if(ci == CmdIndex.FULLTEXT) {
       data.meta.createftxt = true;
@@ -53,6 +55,7 @@ public final class CreateIndex extends ACreate {
       data.meta.diacritics = options.get(MainOptions.DIACRITICS);
       data.meta.language = Language.get(options);
       data.meta.stopwords = options.get(MainOptions.STOPWORDS);
+      data.meta.ftsplitsize = options.get(MainOptions.FTINDEXSPLITSIZE);
       type = IndexType.FULLTEXT;
     } else {
       return error(UNKNOWN_CMD_X, this);
@@ -61,7 +64,7 @@ public final class CreateIndex extends ACreate {
     if(!startUpdate()) return false;
     boolean ok = true;
     try {
-      create(type, data, options, this);
+      create(type, data, this);
       ok = info(INDEX_CREATED_X_X, type, perf);
     } catch(final IOException ex) {
       ok = error(Util.message(ex));
@@ -79,30 +82,25 @@ public final class CreateIndex extends ACreate {
   /**
    * Builds the index structures.
    * @param data data reference
-   * @param options main options
    * @param cmd calling command
    * @throws IOException I/O exception
    */
-  static void create(final Data data, final MainOptions options, final ACreate cmd)
-      throws IOException {
-    if(data.meta.createtext) CreateIndex.create(IndexType.TEXT,      data, options, cmd);
-    if(data.meta.createattr) CreateIndex.create(IndexType.ATTRIBUTE, data, options, cmd);
-    if(data.meta.createftxt) CreateIndex.create(IndexType.FULLTEXT,  data, options, cmd);
+  static void create(final Data data, final ACreate cmd) throws IOException {
+    if(data.meta.createtext) CreateIndex.create(IndexType.TEXT,      data, cmd);
+    if(data.meta.createattr) CreateIndex.create(IndexType.ATTRIBUTE, data, cmd);
+    if(data.meta.createftxt) CreateIndex.create(IndexType.FULLTEXT,  data, cmd);
   }
 
   /**
    * Builds the specified index.
    * @param type index to be built
    * @param data data reference
-   * @param options main options
    * @param cmd calling command
    * @throws IOException I/O exception
    */
-  static void create(final IndexType type, final Data data, final MainOptions options,
-      final ACreate cmd) throws IOException {
-
+  static void create(final IndexType type, final Data data, final ACreate cmd) throws IOException {
     DropIndex.drop(type, data);
-    data.createIndex(type, options, cmd);
+    data.createIndex(type, cmd);
     if(type == IndexType.TEXT) data.meta.textindex = true;
     else if(type == IndexType.ATTRIBUTE) data.meta.attrindex = true;
     else if(type == IndexType.FULLTEXT) data.meta.ftindex = true;

@@ -54,11 +54,11 @@ public final class MetaData {
   /** Flag for automatic index updating. */
   public volatile boolean autoopt;
 
-  /** Indicates if text index is to be recreated. */
+  /** Indicates if the text index is to be recreated. */
   public volatile boolean createtext;
-  /** Indicates if attribute index is to be recreated. */
+  /** Indicates if the attribute index is to be recreated. */
   public volatile boolean createattr;
-  /** Indicates if full-text index is to be recreated. */
+  /** Indicates if the full-text index is to be recreated. */
   public volatile boolean createftxt;
   /** Text index: names to include. */
   public volatile String textinclude = "";
@@ -81,6 +81,11 @@ public final class MetaData {
   /** Maximum token length. */
   public volatile int maxlen;
 
+  /** Split size for creating new index. */
+  public volatile int splitsize;
+  /** Split size for creating new full-text index. */
+  public volatile int ftsplitsize;
+
   /** Language of full-text search index. */
   public volatile Language language;
 
@@ -93,7 +98,7 @@ public final class MetaData {
 
   /** Number of nodes. */
   public volatile int size;
-  /** Last (highest) id assigned to a node. */
+  /** Last (highest) id assigned to a node. Can be {@code -1} if database is empty. */
   public volatile int lastid = -1;
 
   /** Flag for out-of-date indexes. */
@@ -136,6 +141,8 @@ public final class MetaData {
     textinclude = options.get(MainOptions.TEXTINCLUDE);
     attrinclude = options.get(MainOptions.ATTRINCLUDE);
     ftinclude = options.get(MainOptions.FTINCLUDE);
+    splitsize = options.get(MainOptions.INDEXSPLITSIZE);
+    ftsplitsize = options.get(MainOptions.FTINDEXSPLITSIZE);
   }
 
   // STATIC METHODS ==========================================================
@@ -314,6 +321,8 @@ public final class MetaData {
         else if(k.equals(DBTXTINC))   textinclude = v;
         else if(k.equals(DBATVINC))   attrinclude = v;
         else if(k.equals(DBFTXINC))   ftinclude   = v;
+        else if(k.equals(DBSPLIT))    splitsize   = toInt(v);
+        else if(k.equals(DBFTSPLIT))  ftsplitsize = toInt(v);
         else if(k.equals(DBCRTTXT))   createtext  = toBool(v);
         else if(k.equals(DBCRTATV))   createattr  = toBool(v);
         else if(k.equals(DBCRTFTX))   createftxt  = toBool(v);
@@ -360,6 +369,8 @@ public final class MetaData {
     writeInfo(out, DBTXTINC,   textinclude);
     writeInfo(out, DBATVINC,   attrinclude);
     writeInfo(out, DBFTXINC,   ftinclude);
+    writeInfo(out, DBSPLIT,    splitsize);
+    writeInfo(out, DBFTSPLIT,  ftsplitsize);
     writeInfo(out, DBCRTTXT,   createtext);
     writeInfo(out, DBCRTATV,   createattr);
     writeInfo(out, DBCRTFTX,   createftxt);

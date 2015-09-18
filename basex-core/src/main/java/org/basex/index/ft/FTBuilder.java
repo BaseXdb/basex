@@ -31,23 +31,23 @@ public final class FTBuilder extends IndexBuilder {
   /**
    * Constructor.
    * @param data data reference
-   * @param options options
    * @throws IOException IOException
    */
-  public FTBuilder(final Data data, final MainOptions options) throws IOException {
-    super(data, options, MainOptions.FTINDEXSPLITSIZE, MainOptions.FTINCLUDE, true);
+  public FTBuilder(final Data data) throws IOException {
+    super(data, data.meta.ftsplitsize, data.meta.ftinclude, true);
+    final MetaData meta = data.meta;
     tree = new FTIndexTrees(data.meta.maxlen);
 
     final FTOpt fto = new FTOpt();
-    fto.set(FTFlag.DC, options.get(MainOptions.DIACRITICS));
-    fto.set(FTFlag.ST, options.get(MainOptions.STEMMING));
-    fto.cs = options.get(MainOptions.CASESENS) ? FTCase.SENSITIVE : FTCase.INSENSITIVE;
-    fto.sw = new StopWords(data, options);
-    fto.ln = Language.get(options);
+    fto.set(FTFlag.DC, meta.diacritics);
+    fto.set(FTFlag.ST, meta.stemming);
+    fto.cs = meta.casesens ? FTCase.SENSITIVE : FTCase.INSENSITIVE;
+    fto.sw = new StopWords(data, meta.stopwords);
+    fto.ln = data.meta.language;
 
     if(!Tokenizer.supportFor(fto.ln))
       throw new BaseXException(NO_TOKENIZER_X, fto.ln);
-    if(options.get(MainOptions.STEMMING) && !Stemmer.supportFor(fto.ln))
+    if(meta.stemming && !Stemmer.supportFor(fto.ln))
       throw new BaseXException(NO_STEMMER_X, fto.ln);
 
     lexer = new FTLexer(fto);

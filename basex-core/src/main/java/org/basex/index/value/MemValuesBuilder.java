@@ -2,7 +2,6 @@ package org.basex.index.value;
 
 import java.io.*;
 
-import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.util.*;
@@ -17,11 +16,10 @@ public class MemValuesBuilder extends ValuesBuilder {
   /**
    * Constructor.
    * @param data data reference
-   * @param options main options
    * @param text value type (text/attribute)
    */
-  public MemValuesBuilder(final Data data, final MainOptions options, final boolean text) {
-    super(data, options, text);
+  public MemValuesBuilder(final Data data, final boolean text) {
+    super(data, text);
   }
 
   @Override

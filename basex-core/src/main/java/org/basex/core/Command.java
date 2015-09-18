@@ -337,7 +337,7 @@ public abstract class Command extends Proc {
    */
   protected final boolean finishUpdate(final Data data) {
     try {
-      if(data.meta.autoopt) Optimize.optimize(data, options, null);
+      Optimize.finish(data);
       data.finishUpdate(options);
       return true;
     } catch(final IOException ex) {

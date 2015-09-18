@@ -8,7 +8,6 @@ import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.index.value.*;
 import org.basex.util.*;
-import org.basex.util.options.*;
 
 /**
  * This interface defines the functions which are needed for building
@@ -48,19 +47,18 @@ public abstract class IndexBuilder extends Proc {
   /**
    * Constructor.
    * @param data reference
-   * @param options main options
    * @param splitSize index split size
    * @param text index type (text/attributes)
    * @param includes names of elements or attributes to include
    */
-  protected IndexBuilder(final Data data, final MainOptions options, final NumberOption splitSize,
-      final StringOption includes, final boolean text) {
+  protected IndexBuilder(final Data data, final int splitSize, final String includes,
+      final boolean text) {
 
     this.data = data;
-    this.splitSize = options.get(splitSize);
+    this.splitSize = splitSize;
     this.text = text;
     size = data.meta.size;
-    names = new IndexNames(options.get(includes));
+    names = new IndexNames(includes);
 
     // run garbage collection if memory maximum is already reached
     if(Performance.memory() >= maxMem) Performance.gc(1);

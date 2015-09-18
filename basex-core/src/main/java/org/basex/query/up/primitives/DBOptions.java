@@ -100,7 +100,7 @@ public final class DBOptions {
    * @param option option
    * @param value value
    */
-  public void assign(final Option<?> option, final Object value) {
+  public void assignIfEmpty(final Option<?> option, final Object value) {
     if(!map.containsKey(option)) map.put(option, value);
   }
 

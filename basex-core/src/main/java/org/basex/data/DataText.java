@@ -66,6 +66,10 @@ public interface DataText {
   String DBMAXLEN = "MAXLEN";
   /** Maximum number of categories. */
   String DBMAXCATS = "MAXCATS";
+  /** Index split size. */
+  String DBSPLIT = "SPLIT";
+  /** Fulltext index split size. */
+  String DBFTSPLIT = "FTSPLIT";
   /** Up-to-date flag. */
   String DBUPTODATE = "UPTODATE";
   /** Last (highest) id. */

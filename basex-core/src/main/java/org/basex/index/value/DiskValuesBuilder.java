@@ -5,7 +5,6 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
-import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.io.out.DataOutput;
@@ -40,11 +39,10 @@ public final class DiskValuesBuilder extends ValuesBuilder {
   /**
    * Constructor.
    * @param data data reference
-   * @param options main options
    * @param text value type (text/attribute)
    */
-  public DiskValuesBuilder(final Data data, final MainOptions options, final boolean text) {
-    super(data, options, text);
+  public DiskValuesBuilder(final Data data, final boolean text) {
+    super(data, text);
   }
 
   @Override

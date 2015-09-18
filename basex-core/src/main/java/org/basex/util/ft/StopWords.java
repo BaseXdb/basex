@@ -5,7 +5,6 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
-import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.in.DataInput;
@@ -29,11 +28,10 @@ public final class StopWords extends TokenSet {
    * Constructor, reading stopword list from disk.
    * And creating database stopword file.
    * @param data data reference
-   * @param options main options
+   * @param file stopwords file
    * @throws IOException I/O exception
    */
-  public StopWords(final Data data, final MainOptions options) throws IOException {
-    final String file = options.get(MainOptions.STOPWORDS);
+  public StopWords(final Data data, final String file) throws IOException {
     if(!file.isEmpty()) read(IO.get(file), false);
     try(final DataOutput out = new DataOutput(data.meta.dbfile(DATASWL))) {
       write(out);

@@ -71,7 +71,7 @@ public final class DBCreate extends NameUpdate {
         data.startUpdate(opts);
         try {
           data.insert(data.meta.size, -1, new DataClip(add.data));
-          Optimize.optimize(data, opts, null);
+          Optimize.optimize(data, null);
         } finally {
           data.finishUpdate(opts);
         }

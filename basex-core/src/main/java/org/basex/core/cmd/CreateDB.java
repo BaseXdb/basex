@@ -101,7 +101,7 @@ public final class CreateDB extends ACreate {
 
       if(!startUpdate()) return false;
       try {
-        CreateIndex.create(data, options, this);
+        CreateIndex.create(data, this);
       } finally {
         if(!finishUpdate()) return false;
       }
@@ -170,7 +170,7 @@ public final class CreateDB extends ACreate {
       data = Open.open(name, ctx, options);
     }
 
-    CreateIndex.create(data, options, null);
+    CreateIndex.create(data, null);
     return data;
   }
 
