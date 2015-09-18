@@ -79,9 +79,9 @@ public final class Optimize extends ACreate {
    */
   public static void finish(final Data data) throws IOException {
     // GH-676: optimize database and rebuild index structures if ID has turned negative
-    if(data.meta.lastid < data.meta.size - 1) Optimize.ids(data);
+    if(data.meta.lastid < data.meta.size - 1) ids(data);
     // GH-1035: auto-optimize database
-    if(data.meta.autoopt) Optimize.optimize(data, null);
+    if(data.meta.autoopt) optimize(data, null);
   }
 
   /**
@@ -97,6 +97,7 @@ public final class Optimize extends ACreate {
     md.dirty = true;
 
     if(data.meta.updindex) {
+      data.idmap = new IdPreMap(md.lastid);
       if(data.meta.textindex) optimize(IndexType.TEXT, data, true, true, true, null);
       if(data.meta.attrindex) optimize(IndexType.ATTRIBUTE, data, true, true, true, null);
     }
