@@ -54,6 +54,11 @@ public final class AdaptiveSerializerTest extends SandboxTest {
     serialize("[ (true#0, false#0) ]", "[function true#0\nfunction false#0]");
     serialize("[ (1,2) ]", "[1\n2]");
     serialize("[ () ]", "[null]");
+
+    serialize("[ <a/> ]", "['<a/>']");
+    serialize("[ <a/> update () ]", "['<a/>']");
+    serialize("[ document { <a/> } ]", "['<a/>']");
+    serialize("[ document { <a/> } update () ]", "['<a/>']");
   }
 
   /**

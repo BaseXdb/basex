@@ -7,7 +7,7 @@ import static org.basex.util.Token.*;
 import java.io.*;
 
 import org.basex.build.json.*;
-import org.basex.build.json.JsonOptions.JsonFormat;
+import org.basex.build.json.JsonOptions.*;
 import org.basex.io.out.*;
 import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
@@ -20,7 +20,7 @@ import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
-import org.basex.util.options.Options.YesNo;
+import org.basex.util.options.Options.*;
 
 /**
  * This class serializes items as JSON. The input must conform to the rules
@@ -45,7 +45,7 @@ public final class JsonNodeSerializer extends JsonSerializer {
 
   /** Current name of a pair. */
   private byte[] key;
-  /** Custom serialization. */
+  /** BaseX JSON serialization. */
   private boolean custom;
   /** Node serializer. */
   private Serializer nodeSerializer;
@@ -81,11 +81,11 @@ public final class JsonNodeSerializer extends JsonSerializer {
 
   @Override
   protected void node(final ANode node) throws IOException {
-    final boolean doc = node.type == NodeType.DOC;
-    final boolean elm = node.type == NodeType.ELM && eq(JSON, node.name());
-    if(custom || doc || elm) {
+    if(node.type == NodeType.DOC || custom) {
+      super.node(node);
+    } else if(node.type == NodeType.ELM && eq(JSON, node.name())) {
       final boolean c = custom;
-      if(!custom) custom = elm;
+      custom = true;
       super.node(node);
       custom = c;
     } else if(adaptive != null && node.type == NodeType.ATT || node.type == NodeType.NSP) {

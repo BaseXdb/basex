@@ -171,52 +171,10 @@ public abstract class Serializer implements Closeable {
    */
   protected void node(final ANode node) throws IOException {
     if(ignore(node)) return;
-
     if(node instanceof DBNode) {
       node((DBNode) node);
     } else {
-      final Type type = node.type;
-      if(type == NodeType.COM) {
-        prepareComment(node.string());
-      } else if(type == NodeType.TXT) {
-        prepareText(node.string(), null);
-      } else if(type == NodeType.PI) {
-        preparePi(node.name(), node.string());
-      } else if(type == NodeType.ATT) {
-        attribute(node.name(), node.string(), true);
-      } else if(type == NodeType.NSP) {
-        namespace(node.name(), node.string(), true);
-      } else if(type == NodeType.DOC) {
-        openDoc(node.baseURI());
-        for(final ANode n : node.children()) node(n);
-        closeDoc();
-      } else {
-        // serialize elements (code will never be called for attributes)
-        final QNm name = node.qname();
-        openElement(name);
-
-        // serialize declared namespaces
-        final Atts nsp = node.namespaces();
-        for(int p = nsp.size() - 1; p >= 0; p--) namespace(nsp.name(p), nsp.value(p), false);
-        // add new or updated namespace
-        namespace(name.prefix(), name.uri(), false);
-
-        // serialize attributes
-        final boolean i = indent;
-        BasicNodeIter iter = node.attributes();
-        for(ANode nd; (nd = iter.next()) != null;) {
-          final byte[] n = nd.name();
-          final byte[] v = nd.string();
-          attribute(n, v, false);
-          if(eq(n, XML_SPACE) && indent) indent = !eq(v, PRESERVE);
-        }
-
-        // serialize children
-        iter = node.children();
-        for(ANode n; (n = iter.next()) != null;) node(n);
-        closeElement();
-        indent = i;
-      }
+      node((FNode) node);
     }
   }
 
@@ -396,18 +354,26 @@ public abstract class Serializer implements Closeable {
   private void node(final DBNode node) throws IOException {
     final FTPosData ft = node instanceof FTPosNode ? ((FTPosNode) node).ftpos : null;
     final Data data = node.data();
-    int pre = node.pre();
-    int kind = data.kind(pre);
-    if(kind == Data.ATTR) throw SERATTR_X.getIO(node);
+    int pre = node.pre(), kind = data.kind(pre);
 
-    boolean doc = false;
+    // document node: output all children
+    int size = pre + data.size(pre, kind);
+    if(kind == Data.DOC) {
+      openDoc(data.text(pre++, true));
+      while(pre < size && !finished()) {
+        node((ANode) new DBNode(data, pre));
+        pre += data.size(pre, data.kind(pre));
+      }
+      closeDoc();
+      return;
+    }
+
     final TokenSet nsp = data.nspaces.isEmpty() ? null : new TokenSet();
     final IntList pars = new IntList();
     final BoolList indt = new BoolList();
 
     // loop through all table entries
-    final int s = pre + data.size(pre, kind);
-    while(pre < s && !finished()) {
+    while(pre < size && !finished()) {
       kind = data.kind(pre);
       final int r = data.parent(pre, kind);
 
@@ -418,58 +384,52 @@ public abstract class Serializer implements Closeable {
         pars.pop();
       }
 
-      if(kind == Data.DOC) {
-        if(doc) closeDoc();
-        openDoc(data.text(pre++, true));
-        doc = true;
-      } else if(kind == Data.TEXT) {
+      if(kind == Data.TEXT) {
         prepareText(data.text(pre, true), ft != null ? ft.get(data, pre) : null);
         pre++;
       } else if(kind == Data.COMM) {
         prepareComment(data.text(pre++, true));
+      } else if(kind == Data.PI) {
+        preparePi(data.name(pre, Data.PI), data.atom(pre++));
       } else {
-        if(kind == Data.PI) {
-          preparePi(data.name(pre, Data.PI), data.atom(pre++));
-        } else {
-          // add element node
-          final byte[] name = data.name(pre, kind);
-          final byte[] uri = data.nspaces.uri(data.uriId(pre, kind));
-          openElement(new QNm(name, uri));
+        // add element node
+        final byte[] name = data.name(pre, kind);
+        final byte[] uri = data.nspaces.uri(data.uriId(pre, kind));
+        openElement(new QNm(name, uri));
 
-          // add namespace definitions
-          if(nsp != null) {
-            // add namespaces from database
-            nsp.clear();
-            int pp = pre;
+        // add namespace definitions
+        if(nsp != null) {
+          // add namespaces from database
+          nsp.clear();
+          int pp = pre;
 
-            // check namespace of current element
-            namespace(prefix(name), uri == null ? EMPTY : uri, false);
+          // check namespace of current element
+          namespace(prefix(name), uri == null ? EMPTY : uri, false);
 
-            do {
-              final Atts ns = data.namespaces(pp);
-              final int nl = ns.size();
-              for(int n = 0; n < nl; n++) {
-                final byte[] pref = ns.name(n);
-                if(nsp.add(pref)) namespace(pref, ns.value(n), false);
-              }
-              // check ancestors only on top level
-              if(level != 0) break;
+          do {
+            final Atts ns = data.namespaces(pp);
+            final int nl = ns.size();
+            for(int n = 0; n < nl; n++) {
+              final byte[] pref = ns.name(n);
+              if(nsp.add(pref)) namespace(pref, ns.value(n), false);
+            }
+            // check ancestors only on top level
+            if(level != 0) break;
 
-              pp = data.parent(pp, data.kind(pp));
-            } while(pp >= 0 && data.kind(pp) == Data.ELEM);
-          }
-
-          // serialize attributes
-          indt.push(indent);
-          final int as = pre + data.attSize(pre, kind);
-          while(++pre != as) {
-            final byte[] n = data.name(pre, Data.ATTR);
-            final byte[] v = data.text(pre, false);
-            attribute(n, v, false);
-            if(eq(n, XML_SPACE) && indent) indent = !eq(v, PRESERVE);
-          }
-          pars.push(r);
+            pp = data.parent(pp, data.kind(pp));
+          } while(pp >= 0 && data.kind(pp) == Data.ELEM);
         }
+
+        // serialize attributes
+        indt.push(indent);
+        final int as = pre + data.attSize(pre, kind);
+        while(++pre != as) {
+          final byte[] n = data.name(pre, Data.ATTR);
+          final byte[] v = data.text(pre, false);
+          attribute(n, v, false);
+          if(eq(n, XML_SPACE) && indent) indent = !eq(v, PRESERVE);
+        }
+        pars.push(r);
       }
     }
 
@@ -479,7 +439,56 @@ public abstract class Serializer implements Closeable {
       indent = indt.pop();
       pars.pop();
     }
-    if(doc) closeDoc();
+  }
+
+  /**
+   * Serializes a node fragment.
+   * @param node database node
+   * @throws IOException I/O exception
+   */
+  private void node(final FNode node) throws IOException {
+    final Type type = node.type;
+    if(type == NodeType.COM) {
+      prepareComment(node.string());
+    } else if(type == NodeType.TXT) {
+      prepareText(node.string(), null);
+    } else if(type == NodeType.PI) {
+      preparePi(node.name(), node.string());
+    } else if(type == NodeType.ATT) {
+      attribute(node.name(), node.string(), true);
+    } else if(type == NodeType.NSP) {
+      namespace(node.name(), node.string(), true);
+    } else if(type == NodeType.DOC) {
+      openDoc(node.baseURI());
+      for(final ANode n : node.children()) node(n);
+      closeDoc();
+    } else {
+      // serialize elements (code will never be called for attributes)
+      final QNm name = node.qname();
+      openElement(name);
+
+      // serialize declared namespaces
+      final Atts nsp = node.namespaces();
+      for(int p = nsp.size() - 1; p >= 0; p--) namespace(nsp.name(p), nsp.value(p), false);
+      // add new or updated namespace
+      namespace(name.prefix(), name.uri(), false);
+
+      // serialize attributes
+      final boolean i = indent;
+      BasicNodeIter iter = node.attributes();
+      for(ANode nd; (nd = iter.next()) != null;) {
+        final byte[] n = nd.name();
+        final byte[] v = nd.string();
+        attribute(n, v, false);
+        if(eq(n, XML_SPACE) && indent) indent = !eq(v, PRESERVE);
+      }
+
+      // serialize children
+      iter = node.children();
+      for(ANode n; (n = iter.next()) != null;) node(n);
+      closeElement();
+      indent = i;
+    }
   }
 
   /**
