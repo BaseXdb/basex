@@ -235,6 +235,14 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
 
   /**
    * Sorts the elements.
+   * @return self reference
+   */
+  public TokenList sort() {
+    return sort(true);
+  }
+
+  /**
+   * Sorts the elements.
    * @param cs respect case sensitivity
    * @return self reference
    */

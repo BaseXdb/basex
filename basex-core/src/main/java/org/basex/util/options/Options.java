@@ -468,17 +468,20 @@ public class Options implements Iterable<Option<?>> {
   }
 
   /**
-   * Overwrites the options with system properties.
+   * Overwrites the options with global options and system properties.
    * All properties starting with {@code org.basex.} will be assigned as options.
    */
   public final void setSystem() {
     // assign global options
     for(final Entry<String, String> entry : Prop.entries()) {
-      final String n = entry.getKey(), v = entry.getValue();
-      try {
-        if(assign(n, v, -1, false)) Util.debug(n + Text.COLS + v);
-      } catch(final BaseXException ex) {
-        Util.errln(ex);
+      String name = entry.getKey(), value = entry.getValue();
+      if(name.startsWith(Prop.DBPREFIX)) {
+        name = name.substring(Prop.DBPREFIX.length()).toUpperCase(Locale.ENGLISH);
+        try {
+          if(assign(name, value, -1, false)) Util.debug(name + Text.COLS + value);
+        } catch(final BaseXException ex) {
+          Util.errln(ex);
+        }
       }
     }
   }
@@ -658,8 +661,8 @@ public class Options implements Iterable<Option<?>> {
           }
 
           if(local) {
-            // cache local options as system properties
-            Prop.put(name, val);
+            // cache local options as global options
+            Prop.put(Prop.DBPREFIX + name.toLowerCase(Locale.ENGLISH), val);
           } else {
             try {
               assign(name, val, num, true);

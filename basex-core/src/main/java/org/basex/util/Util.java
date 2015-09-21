@@ -89,7 +89,7 @@ public final class Util {
 
   /**
    * Returns a password from standard input.
-   * @return password
+   * @return password or empty string
    */
   public static String password() {
     // use standard input if no console if defined (such as in Eclipse)

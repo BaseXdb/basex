@@ -440,14 +440,12 @@ public final class HTTPContext {
     System.setProperty(Prop.PATH, webapp);
     Prop.put(StaticOptions.WEBPATH, webapp);
 
-    // bind all parameters that start with "org.basex." to system properties
+    // set all parameters that start with "org.basex." as global options
     final Enumeration<String> en = sc.getInitParameterNames();
     while(en.hasMoreElements()) {
       final String key = en.nextElement();
-      if(!key.startsWith(Prop.DBPREFIX)) continue;
-
       String val = sc.getInitParameter(key);
-      if(key.endsWith("path") && !new File(val).isAbsolute()) {
+      if(key.startsWith(Prop.DBPREFIX) && key.endsWith("path") && !new File(val).isAbsolute()) {
         // prefix relative path with absolute servlet path
         Util.debug(key.toUpperCase(Locale.ENGLISH) + ": " + val);
         val = new IOFile(webapp, val).path();

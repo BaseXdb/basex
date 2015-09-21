@@ -43,7 +43,7 @@ public final class UpdatableDiskValues extends DiskValues {
     // update id lists of existing keys (use sorted map to allow for binary search)
     int index = 0;
     final int sz = size();
-    for(final byte[] key : new TokenList(map).sort(true)) {
+    for(final byte[] key : new TokenList(map).sort()) {
       index = get(key, index, sz);
       if(index >= 0) {
         final int[] ids = map.get(key).finish();
@@ -89,7 +89,7 @@ public final class UpdatableDiskValues extends DiskValues {
     int p = 0;
     final int sz = size();
     // add keys in a sorted order (speeds up binary search)
-    for(final byte[] key : new TokenList(map).sort(true)) {
+    for(final byte[] key : new TokenList(map).sort()) {
       p = get(key, p, sz);
       if(p < 0) throw Util.notExpected("Key does not exist: '%'", key);
       if(deleteIds(p, key, map.get(key).sort().finish())) il.add(p);

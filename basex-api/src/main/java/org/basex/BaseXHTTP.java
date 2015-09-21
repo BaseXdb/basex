@@ -110,10 +110,12 @@ public final class BaseXHTTP extends Main {
     }
 
     // request password on command line if only the user was specified
-    if(!Prop.get(StaticOptions.USER).isEmpty()) {
-      while(Prop.get(StaticOptions.PASSWORD).isEmpty()) {
+    String user = Prop.get(StaticOptions.USER), pw = Prop.get(StaticOptions.PASSWORD);
+    if(user != null && !user.isEmpty()) {
+      while(pw == null || pw.isEmpty()) {
         Util.out(PASSWORD + COLS);
-        Prop.put(StaticOptions.PASSWORD, Util.password());
+        pw = Util.password();
+        Prop.put(StaticOptions.PASSWORD, pw);
       }
     }
 
@@ -186,7 +188,7 @@ public final class BaseXHTTP extends Main {
    */
   private static int num(final NumberOption option, final StaticOptions sopts) {
     final String val = Prop.get(option);
-    return val.isEmpty() ? sopts.get(option) : Strings.toInt(val);
+    return val == null || val.isEmpty() ? sopts.get(option) : Strings.toInt(val);
   }
 
   /**
@@ -197,7 +199,7 @@ public final class BaseXHTTP extends Main {
    */
   private static boolean bool(final BooleanOption option, final StaticOptions sopts) {
     final String val = Prop.get(option);
-    return val.isEmpty() ? sopts.get(option) : Boolean.parseBoolean(val);
+    return val == null || val.isEmpty() ? sopts.get(option) : Boolean.parseBoolean(val);
   }
 
   /**
@@ -266,7 +268,7 @@ public final class BaseXHTTP extends Main {
       if(arg.dash()) {
         switch(arg.next()) {
           case 'd': // activate debug mode
-            Prop.put(StaticOptions.DEBUG, true);
+            Prop.put(StaticOptions.DEBUG, Boolean.toString(true));
             Prop.debug = true;
             break;
           case 'D': // hidden flag: daemon mode
@@ -276,7 +278,7 @@ public final class BaseXHTTP extends Main {
             httpPort = arg.number();
             break;
           case 'l': // use local mode
-            Prop.put(StaticOptions.HTTPLOCAL, true);
+            Prop.put(StaticOptions.HTTPLOCAL, Boolean.toString(true));
             break;
           case 'n': // parse host name
             final String n = arg.string();
@@ -285,14 +287,14 @@ public final class BaseXHTTP extends Main {
             break;
           case 'p': // parse server port
             final int p = arg.number();
-            Prop.put(StaticOptions.PORT, p);
-            Prop.put(StaticOptions.SERVERPORT, p);
+            Prop.put(StaticOptions.PORT, Integer.toString(p));
+            Prop.put(StaticOptions.SERVERPORT, Integer.toString(p));
             break;
           case 'P': // specify password
             Prop.put(StaticOptions.PASSWORD, arg.string());
             break;
           case 's': // parse stop port
-            Prop.put(StaticOptions.STOPPORT, arg.number());
+            Prop.put(StaticOptions.STOPPORT, Integer.toString(arg.number()));
             break;
           case 'S': // set service flag
             service = serve;
@@ -301,7 +303,7 @@ public final class BaseXHTTP extends Main {
             Prop.put(StaticOptions.USER, arg.string());
             break;
           case 'z': // suppress logging
-            Prop.put(StaticOptions.LOG, false);
+            Prop.put(StaticOptions.LOG, Boolean.toString(false));
             break;
           default:
             throw arg.usage();

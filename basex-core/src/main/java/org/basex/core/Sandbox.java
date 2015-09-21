@@ -141,7 +141,7 @@ public abstract class Sandbox {
     Prop.put(StaticOptions.WEBPATH, path + "/webapp");
     Prop.put(StaticOptions.RESTXQPATH, path + "/webapp");
     Prop.put(StaticOptions.REPOPATH, path + "/repo");
-    Prop.put(StaticOptions.SERVERPORT, DB_PORT);
+    Prop.put(StaticOptions.SERVERPORT, Integer.toString(DB_PORT));
     context = new Context();
   }
 

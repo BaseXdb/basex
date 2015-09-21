@@ -159,11 +159,7 @@ public interface Text {
   /** Command keyword. */
   String S_PW = "password";
   /** Command keyword. */
-  String S_PKGPATH = "path";
-  /** Command keyword. */
-  String S_PKGNAME = "name";
-  /** Command keyword. */
-  String S_PKGDIR = "dir";
+  String S_DIR = "dir";
 
   /** Index info. */
   String LI_STRUCTURE = LI + "Structure: ";
@@ -461,10 +457,10 @@ public interface Text {
     "[" + CmdRepo.DELETE + '|' + CmdRepo.INSTALL + '|' + CmdRepo.LIST + ']',
     lang("c_repo1"),
     lang("c_repo2") + NL +
-    LI + CmdRepo.DELETE + " [" + S_PKGNAME + '|' + S_PKGDIR + "]:" +  NL +
-    "  " + lang("c_repo3", S_PKGNAME, S_PKGDIR) + NL +
-    LI + CmdRepo.INSTALL + " [" + S_PKGPATH + "]:" + NL +
-    "  " + lang("c_repo4", S_PKGPATH) + NL +
+    LI + CmdRepo.DELETE + " [" + S_NAME + '|' + S_DIR + "]:" +  NL +
+    "  " + lang("c_repo3", S_NAME, S_DIR) + NL +
+    LI + CmdRepo.INSTALL + " [" + S_PATH + "]:" + NL +
+    "  " + lang("c_repo4", S_PATH) + NL +
     LI + CmdRepo.LIST + ':' + NL +
     "  " + lang("c_repo5")
   };

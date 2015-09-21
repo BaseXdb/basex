@@ -6,6 +6,7 @@ import static org.basex.query.func.Function.*;
 import java.io.*;
 
 import org.basex.query.*;
+import org.basex.util.*;
 import org.junit.*;
 
 /**
@@ -32,6 +33,11 @@ public final class ProcModuleTest extends AdvancedQueryTest {
   @Test
   public void property() {
     query(_PROC_PROPERTY.args("path.separator"), File.pathSeparator);
+
+    Prop.put("A", "B");
+    query(_PROC_PROPERTY.args("A"), "B");
+    query(_PROC_PROPERTY.args("XYZ"), "");
+    Prop.remove("A");
   }
 
   /** Test method. */
@@ -39,5 +45,10 @@ public final class ProcModuleTest extends AdvancedQueryTest {
   public void propertyNames() {
     // checks if all system properties exist (i.e., have a value)
     query(_PROC_PROPERTY_NAMES.args() + '[' + EMPTY.args(_PROC_PROPERTY.args(" .")) + ']', "");
+
+    Prop.put("A", "B");
+    query(_PROC_PROPERTY_NAMES.args() + "[. = 'A']", "A");
+    query(_PROC_PROPERTY_NAMES.args() + "[. = 'XYZ']", "");
+    Prop.remove("A");
   }
 }
