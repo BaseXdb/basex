@@ -547,10 +547,10 @@ public interface QueryText {
   /** User token. */
   byte[] USER_PREFIX = token("user");
   /** Validate token. */
-  byte[] VLDT_PREFIX = token("validate");
+  byte[] VALIDATE_PREFIX = token("validate");
   /** Web token. */
   byte[] WEB_PREFIX = token("web");
-  /** XQDoc token. */
+  /** Inspect token. */
   byte[] INSPECT_PREFIX = token("inspect");
   /** XQuery token. */
   byte[] XQUERY_PREFIX = token(XQUERY);

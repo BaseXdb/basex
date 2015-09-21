@@ -22,7 +22,7 @@ import org.junit.Test;
  */
 public final class PermissionTest extends SandboxTest {
   /** Name of the database to be renamed. */
-  private static final String RENAMED = Util.className(PermissionTest.class) + 'r';
+  private static final String NAME2 = NAME + '2';
   /** Test folder. */
   private static final String FOLDER = "src/test/resources/";
   /** Test repository. **/
@@ -63,7 +63,7 @@ public final class PermissionTest extends SandboxTest {
       }
 
       ok(new CreateUser(NAME, NAME), adminSession);
-      ok(new CreateDB(RENAMED), adminSession);
+      ok(new CreateDB(NAME2), adminSession);
       server.context.soptions.set(StaticOptions.REPOPATH, REPO);
       testSession = createClient(NAME, NAME);
 
@@ -79,7 +79,7 @@ public final class PermissionTest extends SandboxTest {
   public void cleanUp() {
     try {
       testSession.close();
-      adminSession.execute(new DropDB(RENAMED));
+      adminSession.execute(new DropDB(NAME2));
       adminSession.execute(new DropDB(NAME));
       adminSession.close();
       // give the server some time to clean up the sessions before next test
@@ -120,7 +120,7 @@ public final class PermissionTest extends SandboxTest {
     no(new XQuery("for $item in doc('" + NAME + "')//xml " +
       "return rename node $item as 'null'"), testSession);
     no(new CreateDB(NAME, "<xml/>"), testSession);
-    no(new Rename(RENAMED, RENAMED + '2'), testSession);
+    no(new Rename(NAME2, NAME2 + '2'), testSession);
     no(new CreateIndex("SUMMARY"), testSession);
     no(new DropDB(NAME), testSession);
     no(new DropIndex("SUMMARY"), testSession);
@@ -161,8 +161,8 @@ public final class PermissionTest extends SandboxTest {
     no(new XQuery(_DB_CREATE.args(NAME)), testSession);
     no(new Optimize(), testSession);
     no(new CreateDB(NAME, "<xml/>"), testSession);
-    no(new Replace(RENAMED, "<xml />"), testSession);
-    no(new Rename(RENAMED, RENAMED + '2'), testSession);
+    no(new Replace(NAME2, "<xml />"), testSession);
+    no(new Rename(NAME2, NAME2 + '2'), testSession);
     no(new CreateIndex("SUMMARY"), testSession);
     no(new DropDB(NAME), testSession);
     no(new DropIndex("SUMMARY"), testSession);
@@ -183,13 +183,13 @@ public final class PermissionTest extends SandboxTest {
   @Test
   public void writePermsNeeded() {
     ok(new Grant("write", NAME), adminSession);
-    ok(new Open(RENAMED), testSession);
-    ok(new Rename(RENAMED, RENAMED + '2'), testSession);
-    ok(new Rename(RENAMED + '2', RENAMED), testSession);
+    ok(new Open(NAME2), testSession);
+    ok(new Rename(NAME2, NAME2 + '2'), testSession);
+    ok(new Rename(NAME2 + '2', NAME2), testSession);
 
     // replace Test
     ok(new Close(), testSession);
-    ok(new Open(RENAMED), testSession);
+    ok(new Open(NAME2), testSession);
     ok(new Add(NAME + ".xml", "<xml>1</xml>"), testSession);
     ok(new Optimize(), testSession);
     ok(new Replace(NAME + ".xml", "<xmlr>2</xmlr>"), testSession);
