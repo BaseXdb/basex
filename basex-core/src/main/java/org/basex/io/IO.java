@@ -23,6 +23,8 @@ import org.xml.sax.*;
  * @author Christian Gruen
  */
 public abstract class IO {
+  /** Temporary file suffix. */
+  public static final String TMPSUFFIX = ".tmp";
   /** Database file suffix. */
   public static final String BASEXSUFFIX = ".basex";
   /** Command script suffix. */

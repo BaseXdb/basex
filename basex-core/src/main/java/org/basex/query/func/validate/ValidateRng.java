@@ -9,6 +9,7 @@ import java.util.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.xml.sax.*;
 
@@ -31,8 +32,19 @@ public class ValidateRng extends ValidateFn {
       @Override
       void process(final ErrorHandler handler) throws IOException, SAXException, QueryException {
         final IO in = read(toNodeOrAtomItem(exprs[0], qc), qc, null);
-        final IO schema = prepare(read(toNodeOrAtomItem(exprs[1], qc), qc, null), handler);
+        final Item sch = toNodeOrAtomItem(exprs[1], qc);
         final boolean compact = exprs.length > 2 && toBoolean(exprs[2], qc);
+
+        // detect format of schema input
+        IO schema;
+        try {
+          schema = read(sch, qc, null);
+        } catch(final QueryException ex) {
+          // compact schema: treat string as input
+          if(!compact || ex.error() != QueryError.WHICHRES_X) throw ex;
+          schema = new IOContent(sch.string(info));
+        }
+        schema = prepare(schema, handler);
 
         try {
           final Class<?>

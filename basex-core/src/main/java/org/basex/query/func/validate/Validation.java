@@ -6,6 +6,7 @@ import javax.xml.parsers.*;
 
 import org.basex.io.*;
 import org.basex.query.*;
+import org.basex.util.*;
 import org.xml.sax.*;
 
 /** Abstract validator class. */
@@ -34,12 +35,11 @@ abstract class Validation {
    */
   protected IO prepare(final IO in, final ErrorHandler handler) throws IOException {
     if(in instanceof IOContent || in instanceof IOStream) {
-      // main-memory content, stream: cache contents to file
-      final IOFile io = new IOFile(File.createTempFile("validate", IO.BASEXSUFFIX));
-      io.write(in.read());
-      schema = io;
-      handler.schema(io);
-      return io;
+      // cache main-memory content or stream to file
+      schema = new IOFile(File.createTempFile(Prop.NAME + '-', IO.TMPSUFFIX));
+      schema.write(in.read());
+      handler.schema(schema);
+      return schema;
     }
     return in;
   }
