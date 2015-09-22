@@ -86,9 +86,9 @@ public final class CreateIndex extends ACreate {
    * @throws IOException I/O exception
    */
   static void create(final Data data, final ACreate cmd) throws IOException {
-    if(data.meta.createtext) CreateIndex.create(IndexType.TEXT,      data, cmd);
-    if(data.meta.createattr) CreateIndex.create(IndexType.ATTRIBUTE, data, cmd);
-    if(data.meta.createftxt) CreateIndex.create(IndexType.FULLTEXT,  data, cmd);
+    if(data.meta.createtext) create(IndexType.TEXT, data, cmd);
+    if(data.meta.createattr) create(IndexType.ATTRIBUTE, data, cmd);
+    if(data.meta.createftxt) create(IndexType.FULLTEXT, data, cmd);
   }
 
   /**

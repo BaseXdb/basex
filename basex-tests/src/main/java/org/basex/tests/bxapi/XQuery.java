@@ -2,6 +2,7 @@ package org.basex.tests.bxapi;
 
 import java.io.*;
 import java.util.*;
+import java.util.Map.Entry;
 
 import javax.xml.namespace.*;
 
@@ -92,7 +93,7 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
   public XQuery decimalFormat(final QName name, final HashMap<String, String> map) {
     try {
       final TokenMap tm = new TokenMap();
-      for(final Map.Entry<String, String> e : map.entrySet()) {
+      for(final Entry<String, String> e : map.entrySet()) {
         tm.put(Token.token(e.getKey()), Token.token(e.getValue()));
       }
       qp.sc.decFormats.put(new QNm(name).id(), new DecFormatter(null, tm));
@@ -202,7 +203,7 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
     qName.uri(qName.hasPrefix() ? NSGlobal.uri(qName.prefix()) : qp.sc.funcNS);
     try {
       return Functions.get().get(qName, args, qp.sc, null);
-    } catch(QueryException ex) {
+    } catch(final QueryException ex) {
       throw new XQueryException(ex);
     }
   }

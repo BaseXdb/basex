@@ -77,7 +77,7 @@ public final class InspectModuleTest extends AdvancedQueryTest {
     query(func1 + "/return/@occurrence/data()", "");
 
     final String func2 = query(result + "/function[@name = 'hello:internal']").
-        replace("{", "{{").replace("}", "}}");;
+        replace("{", "{{").replace("}", "}}");
     query(func2 + "/@uri/data()", "world");
     query(func2 + "/annotation/@name/data()[ends-with(., 'ignored')]", "ignored");
     query(func2 + "/annotation/@uri/data()[. = 'ns']", "ns");

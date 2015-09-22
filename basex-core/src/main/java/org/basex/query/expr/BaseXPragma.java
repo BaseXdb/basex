@@ -22,7 +22,7 @@ public final class BaseXPragma extends Pragma {
   }
 
   @Override
-  void init(final QueryContext qc, final InputInfo info) throws QueryException {
+  void init(final QueryContext qc, final InputInfo info) {
   }
 
   @Override

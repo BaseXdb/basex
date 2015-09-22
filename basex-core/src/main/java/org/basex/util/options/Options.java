@@ -473,10 +473,11 @@ public class Options implements Iterable<Option<?>> {
    */
   public final void setSystem() {
     // assign global options
-    for(final Entry<String, String> entry : Prop.entries()) {
-      String name = entry.getKey(), value = entry.getValue();
-      if(name.startsWith(Prop.DBPREFIX)) {
-        name = name.substring(Prop.DBPREFIX.length()).toUpperCase(Locale.ENGLISH);
+    for(final Entry<String, String> entry : entries()) {
+      String name = entry.getKey();
+      final String value = entry.getValue();
+      if(name.startsWith(DBPREFIX)) {
+        name = name.substring(DBPREFIX.length()).toUpperCase(Locale.ENGLISH);
         try {
           if(assign(name, value, -1, false)) Util.debug(name + Text.COLS + value);
         } catch(final BaseXException ex) {
@@ -662,7 +663,7 @@ public class Options implements Iterable<Option<?>> {
 
           if(local) {
             // cache local options as global options
-            Prop.put(Prop.DBPREFIX + name.toLowerCase(Locale.ENGLISH), val);
+            Prop.put(DBPREFIX + name.toLowerCase(Locale.ENGLISH), val);
           } else {
             try {
               assign(name, val, num, true);

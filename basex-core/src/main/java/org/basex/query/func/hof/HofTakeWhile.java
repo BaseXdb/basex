@@ -43,7 +43,7 @@ public final class HofTakeWhile extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext qc, final VarScope scp) throws QueryException {
+  protected Expr opt(final QueryContext qc, final VarScope scp) {
     return exprs[0].isEmpty() ? Empty.SEQ : this;
   }
 }

@@ -96,7 +96,7 @@ public final class DbListDetails extends DbList {
           // count number of raw files
           final int bin = new IOFile(ctx.soptions.dbpath(name), IO.RAW).descendants().size();
           final FElem res = new FElem(DATABASE);
-          res.add(RESOURCES, token(meta.ndocs.addAndGet(bin)));
+          res.add(RESOURCES, token(meta.ndocs + bin));
           res.add(MDATE, DateTime.format(new Date(meta.dbtime())));
           res.add(SIZE, token(meta.dbsize()));
           if(ctx.perm(Perm.CREATE, name)) res.add(PATH, meta.original);

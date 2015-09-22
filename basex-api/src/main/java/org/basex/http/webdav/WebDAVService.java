@@ -34,18 +34,14 @@ final class WebDAVService {
   /** Locking service. */
   final WebDAVLockService locking;
 
-  /** Resource factory. */
-  private final WebDAVFactory factory;
   /** Session. */
   private LocalSession ls;
 
   /**
    * Constructor.
-   * @param factory resource factory
    * @param http http context
    */
-  public WebDAVService(final WebDAVFactory factory, final HTTPContext http) {
-    this.factory = factory;
+  WebDAVService(final HTTPContext http) {
     this.http = http;
     locking = new WebDAVLockService(http);
   }
@@ -53,7 +49,7 @@ final class WebDAVService {
   /**
    * Closes an open session.
    */
-  public void close() {
+  void close() {
     if(ls != null) ls.close();
   }
 
@@ -63,7 +59,7 @@ final class WebDAVService {
    * @param pass password
    * @throws IOException I/O exception
    */
-  public void authenticate(final String user, final String pass) throws IOException {
+  void authenticate(final String user, final String pass) throws IOException {
     http.credentials(user, pass);
     session();
   }
@@ -73,7 +69,7 @@ final class WebDAVService {
    * @param db database (can be {@code null})
    * @return {@code true} if the user is authorized
    */
-  public static boolean authorize(final String db) {
+  static boolean authorize(final String db) {
     return !WEBDAV_DB.equals(db);
   }
 
@@ -83,7 +79,7 @@ final class WebDAVService {
    * @param path path
    * @throws IOException I/O exception
    */
-  public void deleteDummy(final String db, final String path) throws IOException {
+  void deleteDummy(final String db, final String path) throws IOException {
     final String dummy = path + SEP + DUMMY;
     if(!pathExists(db, dummy)) return;
 
@@ -99,7 +95,7 @@ final class WebDAVService {
    * @return result of check
    * @throws IOException I/O exception
    */
-  public boolean dbExists(final String db) throws IOException {
+  boolean dbExists(final String db) throws IOException {
     final WebDAVQuery query = new WebDAVQuery(_DB_LIST.args() + "[. = $db]").bind("db", db);
     return !execute(query).isEmpty();
   }
@@ -110,7 +106,7 @@ final class WebDAVService {
    * @return timestamp in milliseconds.
    * @throws IOException I/O exception
    */
-  public long timestamp(final String db) throws IOException {
+  long timestamp(final String db) throws IOException {
     final WebDAVQuery query = new WebDAVQuery(DATA.args(_DB_INFO.args("$db") +
         "/descendant::" + DbFn.toName(Text.TIMESTAMP) + "[1]")).bind("db",  db);
     return DateTime.parse(execute(query).get(0)).getTime();
@@ -150,7 +146,7 @@ final class WebDAVService {
    * @param path path
    * @throws IOException I/O exception
    */
-  public void delete(final String db, final String path) throws IOException {
+  void delete(final String db, final String path) throws IOException {
     final LocalSession session = session();
     session.execute(new Open(db));
     session.execute(new Delete(path));
@@ -167,7 +163,7 @@ final class WebDAVService {
    * @param npath new path
    * @throws IOException I/O exception
    */
-  public void rename(final String db, final String path, final String npath) throws IOException {
+  void rename(final String db, final String path, final String npath) throws IOException {
     final LocalSession session = session();
     session.execute(new Open(db));
     session.execute(new Rename(path, npath));
@@ -189,7 +185,7 @@ final class WebDAVService {
    * @param tpath target path
    * @throws IOException I/O exception
    */
-  public void copyDoc(final String db, final String path, final String tdb, final String tpath)
+  void copyDoc(final String db, final String path, final String tdb, final String tpath)
       throws IOException {
 
     final WebDAVQuery query = new WebDAVQuery(
@@ -212,7 +208,7 @@ final class WebDAVService {
    * @param tpath target folder
    * @throws IOException I/O exception
    */
-  public void copyAll(final String db, final String path, final String tdb, final String tpath)
+  void copyAll(final String db, final String path, final String tdb, final String tpath)
       throws IOException {
 
     final WebDAVQuery query = new WebDAVQuery(
@@ -237,8 +233,8 @@ final class WebDAVService {
    * @param out output stream
    * @throws IOException I/O exception
    */
-  public void retrieve(final String db, final String path, final boolean raw,
-      final OutputStream out) throws IOException {
+  void retrieve(final String db, final String path, final boolean raw, final OutputStream out)
+      throws IOException {
 
     session().setOutputStream(out);
     final WebDAVQuery query = new WebDAVQuery(
@@ -256,9 +252,9 @@ final class WebDAVService {
    * @return object representing the newly created database
    * @throws IOException I/O exception
    */
-  public WebDAVResource createDb(final String db) throws IOException {
+  WebDAVResource createDb(final String db) throws IOException {
     session().execute(new CreateDB(db));
-    return factory.database(this, new WebDAVMetaData(db, timestamp(db)));
+    return WebDAVFactory.database(this, new WebDAVMetaData(db, timestamp(db)));
   }
 
   /**
@@ -266,7 +262,7 @@ final class WebDAVService {
    * @param db database name
    * @throws IOException I/O exception
    */
-  public void dropDb(final String db) throws IOException {
+  void dropDb(final String db) throws IOException {
     session().execute(new DropDB(db));
   }
 
@@ -276,7 +272,7 @@ final class WebDAVService {
    * @param db new name
    * @throws IOException I/O exception
    */
-  public void renameDb(final String old, final String db) throws IOException {
+  void renameDb(final String old, final String db) throws IOException {
     session().execute(new AlterDB(old, dbname(db)));
   }
 
@@ -286,7 +282,7 @@ final class WebDAVService {
    * @param db new database name
    * @throws IOException I/O exception
    */
-  public void copyDb(final String old, final String db) throws IOException {
+  void copyDb(final String old, final String db) throws IOException {
     session().execute(new Copy(old, dbname(db)));
   }
 
@@ -297,7 +293,7 @@ final class WebDAVService {
    * @return children
    * @throws IOException I/O exception
    */
-  public List<WebDAVResource> list(final String db, final String path) throws IOException {
+  List<WebDAVResource> list(final String db, final String path) throws IOException {
     final WebDAVQuery query = new WebDAVQuery(
       _DB_LIST_DETAILS.args("$db", "$path") + " ! (" +
       "string(@raw), string(@content-type), string(@modified-date), string(@size)," +
@@ -318,11 +314,11 @@ final class WebDAVService {
       final int ix = pth.indexOf(SEP);
       // check if document or folder
       if(ix < 0) {
-        if(!pth.equals(DUMMY)) ch.add(factory.file(this,
-            new WebDAVMetaData(db, path + SEP + pth, mod, raw, ctype, size)));
+        if(!pth.equals(DUMMY)) ch.add(WebDAVFactory.file(this,
+          new WebDAVMetaData(db, path + SEP + pth, mod, raw, ctype, size)));
       } else {
         final String dir = path + SEP + pth.substring(0, ix);
-        if(paths.add(dir)) ch.add(factory.folder(this, new WebDAVMetaData(db, dir, mod)));
+        if(paths.add(dir)) ch.add(WebDAVFactory.folder(this, new WebDAVMetaData(db, dir, mod)));
       }
     }
     return ch;
@@ -333,7 +329,7 @@ final class WebDAVService {
    * @return a list of database resources.
    * @throws IOException I/O exception
    */
-  public List<WebDAVResource> listDbs() throws IOException {
+  List<WebDAVResource> listDbs() throws IOException {
     final WebDAVQuery query = new WebDAVQuery(
         _DB_LIST_DETAILS.args() + "[. != $db] ! (text(), @modified-date/data())");
     query.bind("db", WEBDAV_DB);
@@ -344,7 +340,7 @@ final class WebDAVService {
     for(int r = 0; r < rs; r += 2) {
       final String name = result.get(r);
       final long mod = DateTime.parse(result.get(r + 1)).getTime();
-      dbs.add(factory.database(this, new WebDAVMetaData(name, mod)));
+      dbs.add(WebDAVFactory.database(this, new WebDAVMetaData(name, mod)));
     }
     return dbs;
   }
@@ -357,13 +353,13 @@ final class WebDAVService {
    * @return new folder resource
    * @throws IOException I/O exception
    */
-  public WebDAVResource createFolder(final String db, final String path, final String name)
+  WebDAVResource createFolder(final String db, final String path, final String name)
       throws IOException {
 
     deleteDummy(db, path);
     final String newFolder = path + SEP + name;
     createDummy(db, newFolder);
-    return factory.folder(this, new WebDAVMetaData(db, newFolder, timestamp(db)));
+    return WebDAVFactory.folder(this, new WebDAVMetaData(db, newFolder, timestamp(db)));
   }
 
   /**
@@ -373,11 +369,11 @@ final class WebDAVService {
    * @return resource
    * @throws IOException I/O exception
    */
-  public WebDAVResource resource(final String db, final String path) throws IOException {
+  WebDAVResource resource(final String db, final String path) throws IOException {
     return exists(db, path) ?
-      factory.file(this, metaData(db, path)) :
+      WebDAVFactory.file(this, metaData(db, path)) :
       pathExists(db, path) ?
-        factory.folder(this, new WebDAVMetaData(db, path, timestamp(db))) :
+        WebDAVFactory.folder(this, new WebDAVMetaData(db, path, timestamp(db))) :
         null;
   }
 
@@ -390,7 +386,7 @@ final class WebDAVService {
    * @return object representing the newly added file
    * @throws IOException I/O exception
    */
-  public WebDAVResource createFile(final String db, final String path, final String name,
+  WebDAVResource createFile(final String db, final String path, final String name,
     final InputStream in) throws IOException {
 
     final LocalSession session = session();
@@ -414,7 +410,7 @@ final class WebDAVService {
    * @return object representing the newly created database
    * @throws IOException I/O exception
    */
-  public WebDAVResource createFile(final String n, final InputStream in) throws IOException {
+  WebDAVResource createFile(final String n, final InputStream in) throws IOException {
     return addFile(null, n, in);
   }
 
@@ -455,7 +451,7 @@ final class WebDAVService {
    */
   private WebDAVResource createDb(final String db, final InputStream in) throws IOException {
     session().create(db, in);
-    return factory.database(this, new WebDAVMetaData(db, timestamp(db)));
+    return WebDAVFactory.database(this, new WebDAVMetaData(db, timestamp(db)));
   }
 
   /**
@@ -473,8 +469,8 @@ final class WebDAVService {
     session.execute(new Set(MainOptions.CHOP, false));
     session.execute(new Open(db));
     session.add(path, in);
-    return factory.file(this, new WebDAVMetaData(db, path, timestamp(db), false,
-        MediaType.APPLICATION_XML, null));
+    return WebDAVFactory.file(this, new WebDAVMetaData(db, path, timestamp(db), false,
+      MediaType.APPLICATION_XML, null));
   }
 
   /**
@@ -491,7 +487,7 @@ final class WebDAVService {
     final LocalSession session = session();
     session.execute(new Open(db));
     session.store(path, in);
-    return factory.file(this, metaData(db, path));
+    return WebDAVFactory.file(this, metaData(db, path));
   }
 
   /**

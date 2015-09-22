@@ -15,7 +15,7 @@ import org.basex.util.*;
  */
 public final class MathE extends StandardFunc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Item item(final QueryContext qc, final InputInfo ii) {
     return Dbl.get(E);
   }
 }

@@ -19,7 +19,7 @@ final class ProjectCellEditor extends DefaultTreeCellEditor {
    * @param tr tree
    * @param rend renderer
    */
-  public ProjectCellEditor(final JTree tr, final DefaultTreeCellRenderer rend) {
+  ProjectCellEditor(final JTree tr, final DefaultTreeCellRenderer rend) {
     super(tr, rend);
   }
 

@@ -17,7 +17,7 @@ final class SingletonTree<N, E> extends FingerTree<N, E> {
    * Constructor.
    * @param elem element
    */
-  public SingletonTree(final Node<N, E> elem) {
+  SingletonTree(final Node<N, E> elem) {
     this.elem = elem;
   }
 

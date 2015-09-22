@@ -20,7 +20,7 @@ import org.basex.util.options.*;
  */
 public final class Prop {
   /** Global options, assigned by the starter classes and the web.xml context parameters. */
-  private static final java.util.Map<String, String> OPTIONS = new ConcurrentHashMap<>();
+  private static final Map<String, String> OPTIONS = new ConcurrentHashMap<>();
 
   /** User's home directory. */
   public static final String USERHOME;

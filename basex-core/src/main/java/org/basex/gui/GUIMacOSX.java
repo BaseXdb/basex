@@ -163,10 +163,8 @@ public final class GUIMacOSX {
      * Unlike other handles, quit mustn't set {@code setHandled} or OS X will quit the
      * application.
      *
-     * @see com.apple.eawt.ApplicationListener#handleQuit
      * @return always false
      */
-    @SuppressWarnings("all") // ApplicationListener is deprecated
     public boolean handleQuit() {
       // explicit cast to circumvent Java compiler bug
       ((GUICommand) GUIMenuCmd.C_EXIT).execute(main);

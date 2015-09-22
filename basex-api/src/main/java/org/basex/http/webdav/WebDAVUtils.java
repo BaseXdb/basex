@@ -36,7 +36,7 @@ final class WebDAVUtils {
    * @param path path
    * @return name of the resource identified by the path
    */
-  public static String name(final String path) {
+  static String name(final String path) {
     return IO.get(path).name();
   }
 
@@ -45,7 +45,7 @@ final class WebDAVUtils {
    * @param db name of database
    * @return valid database name
    */
-  public static String dbname(final String db) {
+  static String dbname(final String db) {
     return IO.get(db).dbname();
   }
 
@@ -54,7 +54,7 @@ final class WebDAVUtils {
    * @param url url to be decoded
    * @return decoded url
    */
-  public static String decode(final String url) {
+  static String decode(final String url) {
     if(url.indexOf('%') != -1) {
       try {
         final String ud = URLDecoder.decode(url, Strings.UTF8);

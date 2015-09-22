@@ -22,7 +22,7 @@ final class InnerNode<N, E> implements Node<Node<N, E>, E> {
   InnerNode(final Node<N, E>[] children) {
     final int n = children.length;
     this.children = children;
-    this.bounds = new long[n];
+    bounds = new long[n];
     long off = 0;
     for(int i = 0; i < n; i++) {
       off += children[i].size();

@@ -4195,7 +4195,7 @@ public class QueryParser extends InputParser {
   }
 
   /** Variable context for resolving local variables. */
-  private class VarContext {
+  private final class VarContext {
     /** Stack of local variables. */
     final VarStack stack = new VarStack();
     /** Current scope containing all variables and the closure. */
@@ -4207,7 +4207,7 @@ public class QueryParser extends InputParser {
      * Constructor.
      * @param bindings non-local variable bindings for closures
      */
-    public VarContext(final HashMap<Var, Expr> bindings) {
+    private VarContext(final HashMap<Var, Expr> bindings) {
       nonLocal = bindings;
     }
 

@@ -68,7 +68,7 @@ public final class ColognePhonetic {
       } else if(cp == 'h' || cp < 'a' || cp > 'z') {
         if(lastCode == '/') continue;
         code = '-';
-      } else if(cp == 'b' || (cp == 'p' && nextCp != 'h')) {
+      } else if(cp == 'b' || cp == 'p' && nextCp != 'h') {
         code = '1';
       } else if((cp == 'd' || cp == 't') && !contains(SCZ, nextCp)) {
         code = '2';

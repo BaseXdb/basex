@@ -24,11 +24,11 @@ public final class HofScanLeft extends StandardFunc {
       private Iter inner = acc.iter();
       @Override
       public Item next() throws QueryException {
-        for(;;) {
+        while (true) {
           final Item i = inner.next();
-          if(i != null) return i;
+          if (i != null) return i;
           final Item o = outer.next();
-          if(o == null) return null;
+          if (o == null) return null;
           acc = f.invokeValue(qc, info, acc, o);
           inner = acc.iter();
         }
@@ -37,7 +37,7 @@ public final class HofScanLeft extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext qc, final VarScope scp) throws QueryException {
+  protected Expr opt(final QueryContext qc, final VarScope scp) {
     return exprs[0].isEmpty() ? exprs[1] : this;
   }
 }

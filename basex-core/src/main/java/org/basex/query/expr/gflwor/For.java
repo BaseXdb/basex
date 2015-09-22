@@ -179,7 +179,7 @@ public final class For extends ForLet {
    * @param pred predicate
    */
   void addPredicate(final Expr pred) {
-    if(expr instanceof AxisPath && !(pred.has(Flag.POS))) {
+    if(expr instanceof AxisPath && !pred.has(Flag.POS)) {
       // add to axis path, provided that predicate is not positional
       expr = ((AxisPath) expr).addPreds(pred);
     } else if(expr instanceof Filter) {

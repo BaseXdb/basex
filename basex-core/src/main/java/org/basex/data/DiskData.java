@@ -155,7 +155,7 @@ public final class DiskData extends Data {
   }
 
   @Override
-  public synchronized void unpin() {
+  public void unpin() {
     COMPRESS.remove();
   }
 
@@ -211,10 +211,10 @@ public final class DiskData extends Data {
 
   @Override
   public void startUpdate(final MainOptions opts) throws IOException {
-    if(!table.lock(true)) throw new BaseXException(Text.DB_PINNED_X, meta.name);
+    if(!table.lock(true)) throw new BaseXException(DB_PINNED_X, meta.name);
     if(opts.get(MainOptions.AUTOFLUSH)) {
       final IOFile uf = meta.updateFile();
-      if(uf.exists()) throw new BaseXException(Text.DB_UPDATED_X, meta.name);
+      if(uf.exists()) throw new BaseXException(DB_UPDATED_X, meta.name);
       if(!uf.touch()) throw Util.notExpected("%: could not create lock file.", meta.name);
     }
   }

@@ -19,7 +19,7 @@ final class GZIPOut extends ArchiveOut {
    * Writing constructor.
    * @throws IOException I/O exception
    */
-  public GZIPOut() throws IOException {
+  GZIPOut() throws IOException {
     zos = new GZIPOutputStream(ao);
   }
 

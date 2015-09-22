@@ -51,26 +51,26 @@ public final class ArrayFlatten extends ArrayFn {
 
       @Override
       public Item next() throws QueryException {
-        for(;;) {
+        while(true) {
           final Item it = curr.next();
 
-          if(it != null) {
-            if(!(it instanceof Array)) return it;
+          if (it != null) {
+            if (!(it instanceof Array)) return it;
             final Array arr = (Array) it;
-            if(++p == iters.length) {
+            if (++p == iters.length) {
               @SuppressWarnings("unchecked")
               final Iterator<Value>[] temp = new Iterator[2 * p];
               System.arraycopy(iters, 0, temp, 0, p);
               iters = temp;
             }
             iters[p] = arr.iterator(0);
-          } else if(p < 0) {
+          } else if (p < 0) {
             return null;
           }
 
           while(!iters[p].hasNext()) {
             iters[p] = null;
-            if(--p < 0) return null;
+            if (--p < 0) return null;
           }
 
           curr = iters[p].next().iter();

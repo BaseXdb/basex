@@ -27,13 +27,13 @@ public final class Help extends Command {
   @Override
   protected boolean run() throws IOException {
     final String key = args[0];
-    if(!key.isEmpty()) {
+    if(key.isEmpty()) {
+      out.println(TRY_SPECIFIC_X);
+      for (final Cmd c : Cmd.values()) out.print(c.help(false));
+    } else {
       final Cmd cmd = getOption(key, Cmd.class);
       if(cmd == null) return error(UNKNOWN_CMD_X, this);
       out.println(cmd.help(true));
-    } else {
-      out.println(TRY_SPECIFIC_X);
-      for(final Cmd c : Cmd.values()) out.print(c.help(false));
     }
     return true;
   }

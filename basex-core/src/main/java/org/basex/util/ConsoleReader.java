@@ -6,6 +6,7 @@ import java.io.*;
 import java.lang.reflect.*;
 
 import org.basex.core.parse.*;
+import org.basex.core.parse.Commands.Cmd;
 import org.basex.io.*;
 
 /**
@@ -165,7 +166,7 @@ public abstract class ConsoleReader implements AutoCloseable {
 
       // command completions
       Reflect.invoke(Reflect.method(readerC, "addCompleter", completer), reader,
-          Reflect.get(Reflect.find(enumCompleter, Class.class), Commands.Cmd.class));
+          Reflect.get(Reflect.find(enumCompleter, Class.class), Cmd.class));
       Reflect.invoke(Reflect.method(readerC, "addCompleter", completer), reader,
           Reflect.get(Reflect.find(fileNameCompleter)));
     }

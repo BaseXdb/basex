@@ -73,7 +73,7 @@ public final class FnRandomNumberGenerator extends StandardFunc {
   private FuncItem permuteFunc(final long seed, final QueryContext qctx) {
     return RuntimeExpr.funcItem(new RuntimeExpr(info) {
       @Override
-      public Value value(final QueryContext qc) throws QueryException {
+      public Value value(final QueryContext qc) {
         final ItemList cache = qc.get(params[0]).cache();
         final int sz = cache.size();
 

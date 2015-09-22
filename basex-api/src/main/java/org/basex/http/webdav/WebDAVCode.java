@@ -32,7 +32,7 @@ abstract class WebDAVCode<E> {
    * @throws BadRequestException bad request exception
    * @throws NotAuthorizedException not authorized exception
    */
-  public final E eval() throws BadRequestException, NotAuthorizedException {
+  final E eval() throws BadRequestException, NotAuthorizedException {
     try {
       final E ret = get();
       if(ret == null) run();
@@ -48,7 +48,7 @@ abstract class WebDAVCode<E> {
    * Runs the contained code, throwing no exception.
    * @return result
    */
-  public final E evalNoEx() {
+  final E evalNoEx() {
     try {
       return eval();
     } catch(final Exception ex) {
@@ -63,7 +63,7 @@ abstract class WebDAVCode<E> {
    * @throws IOException I/O exception
    */
   @SuppressWarnings("unused")
-  public E get() throws IOException {
+  E get() throws IOException {
     return null;
   }
 
@@ -72,6 +72,6 @@ abstract class WebDAVCode<E> {
    * @throws IOException I/O exception
    */
   @SuppressWarnings("unused")
-  public void run() throws IOException {
+  void run() throws IOException {
   }
 }

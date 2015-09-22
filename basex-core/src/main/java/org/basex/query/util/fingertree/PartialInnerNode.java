@@ -101,7 +101,7 @@ final class PartialInnerNode<N, E> implements NodeLike<Node<N, E>, E> {
    */
   void toString(final StringBuilder sb, final int indent) {
     for(int i = 0; i < indent; i++) sb.append(' ').append(' ');
-    sb.append(this.getClass().getSimpleName()).append('[').append('\n');
+    sb.append(getClass().getSimpleName()).append('[').append('\n');
     if(sub instanceof InnerNode) {
       ((InnerNode<?, ?>) sub).toString(sb, indent + 1);
     } else if(sub instanceof PartialInnerNode) {

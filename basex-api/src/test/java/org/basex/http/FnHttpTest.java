@@ -506,8 +506,7 @@ public class FnHttpTest extends HTTPTest {
         + "--boundary42--" + CRLF;
 
     // Compare results
-    final String fake = fakeConn.getOutputStream().toString();
-    assertEquals(expResult, fake);
+    assertEquals(expResult, fakeConn.getOutputStream().toString());
   }
 
   /**

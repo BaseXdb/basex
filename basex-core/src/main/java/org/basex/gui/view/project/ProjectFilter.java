@@ -50,7 +50,7 @@ final class ProjectFilter extends BaseXBack {
    * Constructor.
    * @param project project view
    */
-  public ProjectFilter(final ProjectView project) {
+  ProjectFilter(final ProjectView project) {
     this.project = project;
 
     layout(new BorderLayout(0, 2));
@@ -135,6 +135,14 @@ final class ProjectFilter extends BaseXBack {
   }
 
   /**
+   * Returns the running flag.
+   * @return flag
+   */
+  private boolean running() {
+    return running;
+  }
+
+  /**
    * Filters the entries.
    * @param file file search string
    * @param content content search string
@@ -142,7 +150,7 @@ final class ProjectFilter extends BaseXBack {
    */
   private void filter(final String file, final String content, final int thread) {
     // wait when command is still running
-    while(running) {
+    while(running()) {
       Thread.yield();
       // newer thread has arrived
       if(threadID != thread) return;

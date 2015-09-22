@@ -99,7 +99,7 @@ public final class JsonMapConverter extends JsonConverter {
   }
 
   @Override
-  void closeItem() throws QueryIOException {
+  void closeItem() {
     arrays.peek().add(stack.pop());
   }
 

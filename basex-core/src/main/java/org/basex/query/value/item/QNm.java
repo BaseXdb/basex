@@ -288,7 +288,7 @@ public final class QNm extends Item {
   public byte[] prefixId(final byte[] ns) {
     if(ns != null && Token.eq(uri(), ns)) return local();
     final byte[] p = NSGlobal.prefix(uri());
-    return p.length == 0 ? id() : Token.concat(p, token(":"), local());
+    return p.length == 0 ? id() : concat(p, token(":"), local());
   }
 
   @Override

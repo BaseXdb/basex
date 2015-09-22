@@ -3,6 +3,7 @@ package org.basex.index;
 import static org.junit.Assert.*;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 import org.basex.*;
 import org.basex.core.*;
@@ -24,7 +25,7 @@ public final class SelectiveIndexTest extends SandboxTest {
    */
   @Test
   public void textIndex() {
-    for(final Map.Entry<String, Integer> entry : map().entrySet()) {
+    for(final Entry<String, Integer> entry : map().entrySet()) {
       set(MainOptions.TEXTINCLUDE, entry.getKey());
       execute(new CreateDB(NAME, FILE));
       final int size = context.data().textIndex.size();
@@ -38,7 +39,7 @@ public final class SelectiveIndexTest extends SandboxTest {
   @Test
   public void attrIndex() {
     try {
-      for(final Map.Entry<String, Integer> entry : map().entrySet()) {
+      for(final Entry<String, Integer> entry : map().entrySet()) {
         set(MainOptions.ATTRINCLUDE, entry.getKey());
         execute(new CreateDB(NAME, FILE));
         final int size = context.data().attrIndex.size();
@@ -56,7 +57,7 @@ public final class SelectiveIndexTest extends SandboxTest {
   public void ftIndex() {
     set(MainOptions.FTINDEX, true);
     try {
-      for(final Map.Entry<String, Integer> entry : map().entrySet()) {
+      for(final Entry<String, Integer> entry : map().entrySet()) {
         final String key = entry.getKey();
         final int value = entry.getValue();
         set(MainOptions.FTINCLUDE, key);

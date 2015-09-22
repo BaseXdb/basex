@@ -211,7 +211,7 @@ public final class MemValues extends ValueIndex {
       final int[] ids = idsList.get(m);
       for(int i = 0; i < len; i++) {
         if(set.contains(ids[i])) {
-          int old = set.get(ids[i]);
+          final int old = set.get(ids[i]);
           throw Util.notExpected(
             "Duplicate id: " + ids[i] + ", pos: " + old + "/" + m + ", text: " +
             string(values.key(m)) + "/" + string(values.key(old)));

@@ -69,7 +69,7 @@ public class ValidateXsd extends ValidateFn {
         }
 
         // find implementation URI
-        String uri = null;
+        final String uri;
         if(version == null || version.equals(VERSION_10)) {
           uri = cp == null ? XMLConstants.W3C_XML_SCHEMA_NS_URI : XSD10_URI;
         } else if(xsd11 && cp != null) {

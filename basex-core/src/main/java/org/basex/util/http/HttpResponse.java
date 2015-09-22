@@ -50,7 +50,7 @@ public final class HttpResponse {
 
     // check content type
     boolean error = false;
-    InputStream is = null;
+    InputStream is;
     try {
       is = conn.getInputStream();
     } catch(final IOException ex) {

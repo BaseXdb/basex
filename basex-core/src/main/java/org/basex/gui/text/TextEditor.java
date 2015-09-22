@@ -747,13 +747,13 @@ public final class TextEditor {
    */
   private void closeElem(final StringBuilder sb) {
     final int p = pos;
-    while(pos > 0) {
+    while(pos() > 0) {
       final int cp = prev();
       if(!XMLToken.isNCChar(cp) && cp != ':') {
         if(cp == '<' && pos < p - 1) {
           // add closing element
           next();
-          sb.append("</").append(new TokenBuilder().add(text, pos, p).toString()).append('>');
+          sb.append("</").append(new TokenBuilder().add(text, pos, p)).append('>');
         }
         break;
       }

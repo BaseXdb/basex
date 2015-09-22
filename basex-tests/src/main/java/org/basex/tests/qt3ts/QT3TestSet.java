@@ -370,8 +370,8 @@ public abstract class QT3TestSet {
    */
   protected String queryFile(final String uri) {
     try {
-      return Token.string(IO.get(uri).read());
-    } catch(IOException e) {
+      return string(IO.get(uri).read());
+    } catch(final IOException e) {
       throw new AssertionError(e);
     }
   }
@@ -403,7 +403,7 @@ public abstract class QT3TestSet {
         }
       }
       return f.getPath();
-    } catch(IOException e) {
+    } catch(final IOException e) {
       e.printStackTrace();
       return null;
     }
@@ -449,8 +449,7 @@ public abstract class QT3TestSet {
     @Override
     public String toString() {
       return value != null ? value.toString() : exc != null
-          ? '[' + exc.getCode() + "] " + exc.toString()
-          : error.toString();
+          ? '[' + exc.getCode() + "] " + exc : error.toString();
     }
   }
 }

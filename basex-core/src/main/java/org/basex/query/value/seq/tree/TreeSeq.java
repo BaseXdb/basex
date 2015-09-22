@@ -52,18 +52,18 @@ public abstract class TreeSeq extends Seq {
     if(n == 0) return this;
     if(n == 1) return insert(pos, (Item) val);
 
-    final long l = pos, r = size - pos;
-    if(val instanceof TreeSeq && (l == 0 || r == 0)) {
+    final long r = size - pos;
+    if(val instanceof TreeSeq && (pos == 0 || r == 0)) {
       final TreeSeq other = (TreeSeq) val;
-      return l == 0 ? other.concat(this) : concat(other);
+      return pos == 0 ? other.concat(this) : concat(other);
     }
 
     final TreeSeqBuilder tsb = new TreeSeqBuilder();
-    if(l < MAX_SMALL) {
+    if(pos < MAX_SMALL) {
       tsb.add(val);
-      for(long i = l; --i >= 0;) tsb.addFront(itemAt(i));
+      for(long i = pos; --i >= 0;) tsb.addFront(itemAt(i));
     } else {
-      tsb.add(subSeq(0, l));
+      tsb.add(subSeq(0, pos));
       tsb.add(val);
     }
 
@@ -219,7 +219,7 @@ public abstract class TreeSeq extends Seq {
    * @param to last index, exclusive (may be greater than {@code arr.length})
    * @return resulting items
    */
-  static final Item[] slice(final Item[] items, final int from, final int to) {
+  static Item[] slice(final Item[] items, final int from, final int to) {
     final Item[] out = new Item[to - from];
     final int in0 = Math.max(0, from), in1 = Math.min(to, items.length);
     final int out0 = Math.max(-from, 0);
@@ -233,7 +233,7 @@ public abstract class TreeSeq extends Seq {
    * @param bs second array
    * @return resulting array
    */
-  static final Item[] concat(final Item[] as, final Item[] bs) {
+  static Item[] concat(final Item[] as, final Item[] bs) {
     final int l = as.length, r = bs.length, n = l + r;
     final Item[] out = new Item[n];
     System.arraycopy(as, 0, out, 0, l);

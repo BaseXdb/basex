@@ -98,7 +98,7 @@ public final class IndexNames {
    * @param names names
    * @return map
    */
-  private HashSet<String> toSet(final String names) {
+  private static HashSet<String> toSet(final String names) {
     final HashSet<String> set = new HashSet<>();
     final StringBuilder value = new StringBuilder();
     final int sl = names.length();

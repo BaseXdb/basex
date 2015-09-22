@@ -152,7 +152,7 @@ public final class StringsModuleTest extends AdvancedQueryTest {
    * @param code expected code
    * @param variations variations
    */
-  private void soundexVariations(final String code, final String... variations) {
+  private static void soundexVariations(final String code, final String... variations) {
     for(final String string : variations) query(_STRINGS_SOUNDEX.args(string), code);
   }
 
@@ -162,7 +162,9 @@ public final class StringsModuleTest extends AdvancedQueryTest {
    * @param string2 second string
    * @param diff difference
    */
-  private void soundexDifference(final String string1, final String string2, final int diff) {
+  private static void soundexDifference(final String string1, final String string2,
+      final int diff) {
+
     query(SUM.args(FOR_EACH_PAIR.args(
       STRING_TO_CODEPOINTS.args(_STRINGS_SOUNDEX.args(string1)) + "," +
       STRING_TO_CODEPOINTS.args(_STRINGS_SOUNDEX.args(string2)) + "," +
@@ -273,7 +275,7 @@ public final class StringsModuleTest extends AdvancedQueryTest {
    * @param arg argument
    * @param result result
    */
-  private void colognePhonetic(final String arg, final String result) {
+  private static void colognePhonetic(final String arg, final String result) {
     query(_STRINGS_COLOGNE_PHONETIC.args(arg), result);
   }
 
@@ -282,7 +284,7 @@ public final class StringsModuleTest extends AdvancedQueryTest {
    * @param string1 first string
    * @param string2 second string
    */
-  private void cologneEquals(final String string1, final String string2) {
+  private static void cologneEquals(final String string1, final String string2) {
     query(_STRINGS_COLOGNE_PHONETIC.args(string1) + " = " +
           _STRINGS_COLOGNE_PHONETIC.args(string2), true);
   }
@@ -292,7 +294,7 @@ public final class StringsModuleTest extends AdvancedQueryTest {
    * @param code expected code
    * @param variations variations
    */
-  private void cologneVariations(final String code, final String... variations) {
+  private static void cologneVariations(final String code, final String... variations) {
     for(final String string : variations) query(_STRINGS_COLOGNE_PHONETIC.args(string), code);
   }
 }

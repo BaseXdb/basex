@@ -48,5 +48,5 @@ public final class DBDelete extends DBUpdate {
   }
 
   @Override
-  public void prepare(final MemData tmp) { }
+  public void prepare() { }
 }

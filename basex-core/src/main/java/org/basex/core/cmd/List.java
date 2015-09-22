@@ -74,7 +74,7 @@ public final class List extends Command {
     if(create) table.header.add(INPUT_PATH);
 
     for(final String name : context.filter(Perm.READ, context.databases.listDBs())) {
-      String file = null;
+      String file;
       long dbsize = 0;
       int count = 0;
 
@@ -84,7 +84,7 @@ public final class List extends Command {
         dbsize = meta.dbsize();
         file = meta.original;
         // add number of raw files
-        count = meta.ndocs.get() + new IOFile(soptions.dbpath(name), IO.RAW).descendants().size();
+        count = meta.ndocs + new IOFile(soptions.dbpath(name), IO.RAW).descendants().size();
       } catch(final IOException ex) {
         file = ERROR;
       }

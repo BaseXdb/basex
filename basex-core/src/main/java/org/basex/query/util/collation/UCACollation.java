@@ -6,7 +6,6 @@ import java.lang.reflect.*;
 import java.text.*;
 import java.util.*;
 
-import org.basex.query.*;
 import org.basex.util.*;
 
 /**
@@ -47,7 +46,7 @@ final class UCACollation extends Collation {
 
   @Override
   protected int indexOf(final String string, final String contains, final Mode mode,
-      final InputInfo info) throws QueryException {
+      final InputInfo info) {
 
     final RuleBasedCollator rbc = (RuleBasedCollator) collator;
     final Object iterS = Reflect.invoke(RBC_GCEI, rbc, string);

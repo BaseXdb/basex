@@ -20,8 +20,9 @@ public abstract class AxisPath extends Path {
     /** Caching is disabled. */ DISABLED,
     /** Caching is possible. */ ENABLED,
     /** Ready to cache.      */ READY,
-    /** Results are cached.  */ CACHED;
-  };
+    /** Results are cached.  */ CACHED
+  }
+
   /** Current state. */
   private Caching state;
 

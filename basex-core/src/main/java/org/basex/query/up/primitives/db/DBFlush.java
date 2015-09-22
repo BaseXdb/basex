@@ -42,5 +42,5 @@ public final class DBFlush extends DBUpdate {
   }
 
   @Override
-  public void prepare(final MemData tmp) { }
+  public void prepare() { }
 }

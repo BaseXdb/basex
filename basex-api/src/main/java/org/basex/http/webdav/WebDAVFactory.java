@@ -24,14 +24,14 @@ final class WebDAVFactory implements ResourceFactory {
    * Creates a new service.
    * @param http http context
    */
-  void init(final HTTPContext http) {
-    SERVICES.set(new WebDAVService(this, http));
+  static void init(final HTTPContext http) {
+    SERVICES.set(new WebDAVService(http));
   }
 
   /**
    * Closes the database session.
    */
-  void close() {
+  static void close() {
     SERVICES.get().close();
     SERVICES.remove();
   }
@@ -66,7 +66,7 @@ final class WebDAVFactory implements ResourceFactory {
    * @param d file meta data
    * @return object representing the file
    */
-  public WebDAVFile file(final WebDAVService s, final WebDAVMetaData d) {
+  static WebDAVFile file(final WebDAVService s, final WebDAVMetaData d) {
     return new WebDAVFile(d, s);
   }
 
@@ -76,7 +76,7 @@ final class WebDAVFactory implements ResourceFactory {
    * @param d folder meta data
    * @return object representing the folder
    */
-  public WebDAVFolder folder(final WebDAVService s, final WebDAVMetaData d) {
+  static WebDAVFolder folder(final WebDAVService s, final WebDAVMetaData d) {
     return new WebDAVFolder(d, s);
   }
 
@@ -86,7 +86,7 @@ final class WebDAVFactory implements ResourceFactory {
    * @param d database meta data
    * @return object representing the database
    */
-  public WebDAVDatabase database(final WebDAVService s, final WebDAVMetaData d) {
+  static WebDAVDatabase database(final WebDAVService s, final WebDAVMetaData d) {
     return new WebDAVDatabase(d, s);
   }
 }

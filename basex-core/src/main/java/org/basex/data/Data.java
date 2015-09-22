@@ -580,7 +580,7 @@ public abstract class Data {
         case DOC:
           // add document
           doc(sSize, sData.text(sPre, true));
-          meta.ndocs.incrementAndGet();
+          ++meta.ndocs;
           break;
         case ELEM:
           // add element
@@ -670,7 +670,7 @@ public abstract class Data {
     }
 
     // preserve empty root node
-    if(kind(pre) == DOC) meta.ndocs.decrementAndGet();
+    if(kind(pre) == DOC) --meta.ndocs;
 
     // delete node from table structure and reduce document size
     table.delete(pre, size);
@@ -748,7 +748,7 @@ public abstract class Data {
           // add document
           nsScope.open(nPre);
           doc(sSize, sdata.text(sPre, true));
-          meta.ndocs.incrementAndGet();
+          ++meta.ndocs;
           break;
         case ELEM: {
           // add element.
@@ -772,7 +772,7 @@ public abstract class Data {
           if(uriId != 0) {
             final byte[] prefix = prefix(name), uri = sdata.nspaces.uri(uriId);
             uriId = nspaces.uriIdForPrefix(prefix, false);
-            if(uriId == 0 && !Token.eq(prefix, Token.XML)) {
+            if(uriId == 0 && !eq(prefix, XML)) {
               uriId = nspaces.add(nsPre, prefix, uri, this);
               table.write2(nsPre, 1, 1 << 15 | nameId(nsPre));
             }

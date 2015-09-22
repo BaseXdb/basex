@@ -110,12 +110,12 @@ public final class XdmInfoTest extends SandboxTest {
      * @return string
      * @throws IOException I/O exception
      */
-    @SuppressWarnings("resource")
     byte[] exec(final ServerCmd cmd, final String arg) throws IOException {
       final ArrayOutput ao = new ArrayOutput();
       sout.write(cmd.code);
       send(arg);
       sout.flush();
+      @SuppressWarnings("resource")
       final BufferInput bi = new BufferInput(sin);
       ClientSession.receive(bi, ao);
       if(!ClientSession.ok(bi)) throw new BaseXException(bi.readString());

@@ -101,7 +101,7 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
   }
 
   @Override
-  public void treeWillExpand(final TreeExpansionEvent event) throws ExpandVetoException {
+  public void treeWillExpand(final TreeExpansionEvent event) {
     final Object obj = event.getPath().getLastPathComponent();
     if(obj instanceof ProjectNode) {
       final ProjectNode node = (ProjectNode) obj;
@@ -111,7 +111,7 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
   }
 
   @Override
-  public void treeWillCollapse(final TreeExpansionEvent event) throws ExpandVetoException {
+  public void treeWillCollapse(final TreeExpansionEvent event) {
     final Object obj = event.getPath().getLastPathComponent();
     if(obj instanceof ProjectNode) {
       final ProjectNode node = (ProjectNode) obj;

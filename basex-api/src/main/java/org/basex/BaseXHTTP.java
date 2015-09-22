@@ -110,7 +110,8 @@ public final class BaseXHTTP extends Main {
     }
 
     // request password on command line if only the user was specified
-    String user = Prop.get(StaticOptions.USER), pw = Prop.get(StaticOptions.PASSWORD);
+    final String user = Prop.get(StaticOptions.USER);
+    String pw = Prop.get(StaticOptions.PASSWORD);
     if(user != null && !user.isEmpty()) {
       while(pw == null || pw.isEmpty()) {
         Util.out(PASSWORD + COLS);
@@ -127,7 +128,7 @@ public final class BaseXHTTP extends Main {
     }
     // throw cached exception that did not break the servlet architecture
     final IOException ex = HTTPContext.exception();
-    if(ex != null) throw HTTPContext.exception();
+    if(ex != null) throw ex;
 
     // show start message
     for(final Connector c : jetty.getConnectors()) Util.outln(startX, c.getPort());
@@ -221,16 +222,16 @@ public final class BaseXHTTP extends Main {
    * @throws IOException I/O exception
    */
   private static IOFile locate(final String file, final String root) throws IOException {
-    final IOFile trg = new IOFile(root + '/' + file);
+    final IOFile trg = new IOFile(root, file);
     final boolean create = !trg.exists();
 
     // try to locate file from development branch
-    final IO in = new IOFile("src/main/webapp/" + file);
+    final IO in = new IOFile("src/main/webapp", file);
     final byte[] data;
     if(in.exists()) {
       data = in.read();
       // check if resource path exists
-      IOFile res = new IOFile("src/main/resources/");
+      IOFile res = new IOFile("src/main/resources");
       if(res.exists()) {
         res = new IOFile(res, file);
         // update file in resource path if it has changed
@@ -242,9 +243,10 @@ public final class BaseXHTTP extends Main {
       }
     } else if(create) {
       // try to locate file from resource path
-      final InputStream is = BaseXHTTP.class.getResourceAsStream('/' + file);
-      if(is == null) throw new BaseXException(in + " not found.");
-      data = new IOStream(is).read();
+      try(final InputStream is = BaseXHTTP.class.getResourceAsStream('/' + file)) {
+        if(is == null) throw new BaseXException(in + " not found.");
+        data = new IOStream(is).read();
+      }
     } else {
       return trg;
     }
@@ -421,7 +423,7 @@ public final class BaseXHTTP extends Main {
     public void run() {
       try {
         while(true) {
-          ss.accept().close();
+          try(final Socket s = ss.accept()) { }
           if(stop.exists()) {
             ss.close();
             stop.delete();

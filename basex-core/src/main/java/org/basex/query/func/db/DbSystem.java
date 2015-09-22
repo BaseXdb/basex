@@ -16,7 +16,7 @@ public final class DbSystem extends DbFn {
   private static final String SYSTEM = "system";
 
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Item item(final QueryContext qc, final InputInfo ii) {
     return toNode(Info.info(qc.context), SYSTEM);
   }
 }

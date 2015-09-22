@@ -12,7 +12,7 @@ import org.basex.util.*;
  */
 public final class UserCurrent extends UserList {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Item item(final QueryContext qc, final InputInfo ii) {
     return Str.get(qc.context.user().name());
   }
 }

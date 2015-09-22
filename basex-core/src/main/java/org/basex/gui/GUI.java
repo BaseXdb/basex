@@ -775,17 +775,17 @@ public final class GUI extends JFrame {
           }
         }
       }
+
+      /**
+       * Writes a version to the options.
+       * @param version version
+       */
+      private void writeVersion(final Version version) {
+        gopts.set(GUIOptions.UPDATEVERSION, version.toString());
+        gopts.write();
+      }
     };
     t.setDaemon(true);
     SwingUtilities.invokeLater(t);
-  }
-
-  /**
-   * Writes a version to the options.
-   * @param version version
-   */
-  private void writeVersion(final Version version) {
-    gopts.set(GUIOptions.UPDATEVERSION, version.toString());
-    gopts.write();
   }
 }

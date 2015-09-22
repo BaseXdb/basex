@@ -146,7 +146,7 @@ abstract class WebDAVResource implements CopyableResource, DeletableResource, Mo
 
     return new WebDAVCode<LockResult>(this) {
       @Override
-      public LockResult get() throws IOException {
+      public LockResult get() {
         return lockResource(timeout, lockInfo);
       }
     }.evalNoEx();
@@ -328,7 +328,7 @@ abstract class WebDAVResource implements CopyableResource, DeletableResource, Mo
   /** SAX handler for lock token. */
   private static final class LockTokenSaxHandler extends DefaultHandler {
     /** Parsed lock token. */
-    public final LockToken lockToken = new LockToken(null, new LockInfo(), null);
+    private final LockToken lockToken = new LockToken(null, new LockInfo(), null);
     /** Current element name. */
     private String elementName;
 

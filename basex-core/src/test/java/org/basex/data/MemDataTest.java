@@ -5,7 +5,6 @@ import static org.junit.Assert.*;
 import java.io.*;
 
 import org.basex.*;
-import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -17,7 +16,6 @@ import org.junit.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Dimitar Popov
  */
-@SuppressWarnings("unused")
 public class MemDataTest extends SandboxTest {
   /** XML document. */
   static final String XMLSTR = "<a><b>test</b><c/><f>test1</f><f>test3</f></a>";

@@ -103,7 +103,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
   @Override
   public int getResourceCount() throws XMLDBException {
     check();
-    return ctx.data().meta.ndocs.get();
+    return ctx.data().meta.ndocs;
   }
 
   @Override

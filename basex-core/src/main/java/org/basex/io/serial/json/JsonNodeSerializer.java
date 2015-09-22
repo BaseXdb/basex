@@ -101,7 +101,7 @@ public final class JsonNodeSerializer extends JsonSerializer {
   }
 
   @Override
-  protected void startOpen(final QNm name) throws IOException {
+  protected void startOpen(final QNm name) {
     types.set(level, null);
     comma.set(level + 1, false);
     key = atts ? null : name.string();

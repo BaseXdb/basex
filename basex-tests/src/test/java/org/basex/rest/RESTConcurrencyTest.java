@@ -312,7 +312,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
   }
 
   /** HTTP response codes. */
-  private static enum HTTPCode {
+  private enum HTTPCode {
     /** 100: Continue. */
     CONTINUE(100, "Continue"),
     /** 200: OK. */

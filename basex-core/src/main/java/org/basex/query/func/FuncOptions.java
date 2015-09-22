@@ -94,11 +94,8 @@ public final class FuncOptions {
         if(item instanceof Map) {
           options.parse((Map) item, !acceptUnknown, info);
         } else {
-          if(test == null) {
-            throw MAP_X_X.get(info, item.type, item);
-          } else if(!test.eq(item)) {
-            throw ELMMAP_X_X_X.get(info, root.prefixId(XML), item.type, item);
-          }
+          if(test == null) throw MAP_X_X.get(info, item.type, item);
+          if(!test.eq(item)) throw ELMMAP_X_X_X.get(info, root.prefixId(XML), item.type, item);
           final String opts = optString((ANode) item, error);
           options.parse(tb.add(opts).toString());
         }

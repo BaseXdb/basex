@@ -32,7 +32,7 @@ public class HofId extends StandardFunc {
   }
 
   @Override
-  protected final Expr opt(final QueryContext qc, final VarScope scp) throws QueryException {
+  protected final Expr opt(final QueryContext qc, final VarScope scp) {
     return exprs[0];
   }
 }

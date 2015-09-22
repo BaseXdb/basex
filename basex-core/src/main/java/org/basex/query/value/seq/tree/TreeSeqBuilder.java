@@ -188,7 +188,7 @@ public final class TreeSeqBuilder implements Iterable<Item> {
    * @return resulting sequence
    */
   Seq seq() {
-    return seq((Type) null);
+    return seq(null);
   }
 
   /**

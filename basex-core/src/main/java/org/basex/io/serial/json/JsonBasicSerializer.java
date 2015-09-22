@@ -103,33 +103,32 @@ public final class JsonBasicSerializer extends JsonSerializer {
   }
 
   @Override
-  protected void startOpen(final QNm name) throws IOException {
+  protected void startOpen(final QNm name) {
     throw Util.notExpected();
   }
 
   @Override
-  protected void attribute(final byte[] name, final byte[] value, final boolean standalone)
-      throws IOException {
+  protected void attribute(final byte[] name, final byte[] value, final boolean standalone) {
     throw Util.notExpected();
   }
 
   @Override
-  protected void finishOpen() throws IOException {
+  protected void finishOpen() {
     throw Util.notExpected();
   }
 
   @Override
-  protected void text(final byte[] value, final FTPos ftp) throws IOException {
+  protected void text(final byte[] value, final FTPos ftp) {
     throw Util.notExpected();
   }
 
   @Override
-  protected void finishEmpty() throws IOException {
+  protected void finishEmpty() {
     throw Util.notExpected();
   }
 
   @Override
-  protected void finishClose() throws IOException {
+  protected void finishClose() {
     throw Util.notExpected();
   }
 
@@ -170,7 +169,7 @@ public final class JsonBasicSerializer extends JsonSerializer {
    * @return value
    * @throws QueryIOException query exception
    */
-  private byte[] value(final BasicNodeIter iter, final byte[] type) throws QueryIOException {
+  private static byte[] value(final BasicNodeIter iter, final byte[] type) throws QueryIOException {
     byte[] value = null;
     for(ANode child; (child = iter.next()) != null;) {
       if(child.type == NodeType.TXT) {
@@ -190,7 +189,7 @@ public final class JsonBasicSerializer extends JsonSerializer {
    * @return escaped value
    * @throws QueryIOException I/O exception
    */
-  private byte[] escape(final byte[] value, final byte[] flag) throws QueryIOException {
+  private static byte[] escape(final byte[] value, final byte[] flag) throws QueryIOException {
     if(flag != null && !eq(flag, FALSE, TRUE))
       throw error("Value of escape attribute is invalid: '%'.", flag);
 

@@ -37,12 +37,12 @@ public final class Names extends TokenSet implements Index {
   /**
    * Constructor, specifying an input file.
    * @param in input stream
-   * @param md meta data
+   * @param meta meta data
    * @throws IOException I/O exception
    */
-  public Names(final DataInput in, final MetaData md) throws IOException {
+  public Names(final DataInput in, final MetaData meta) throws IOException {
     super(in);
-    this.meta = md;
+    this.meta = meta;
     stats = new Stats[keys.length];
     for(int s = 1; s < size; ++s) stats[s] = new Stats(in);
   }

@@ -66,5 +66,5 @@ public final class DBStore extends DBUpdate {
   }
 
   @Override
-  public void prepare(final MemData tmp) { }
+  public void prepare() { }
 }

@@ -686,7 +686,7 @@ public final class Geo extends QueryModule {
    * @throws QueryException exception
    */
   private DBNode gmlWriter(final Geometry geometry) throws QueryException {
-    String geo = "";
+    final String geo;
     try {
       // write geometry and add namespace declaration
       geo = new GMLWriter().write(geometry).replaceAll(

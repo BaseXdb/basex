@@ -5,6 +5,7 @@ import static org.basex.query.QueryError.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.Map.Entry;
 
 import org.basex.core.*;
 import org.basex.core.locks.*;
@@ -134,7 +135,7 @@ public abstract class AQuery extends Command {
    */
   private void parse(final Performance p) throws QueryException {
     qp.http(http);
-    for(final Map.Entry<String, String[]> entry : vars.entrySet()) {
+    for(final Entry<String, String[]> entry : vars.entrySet()) {
       final String name = entry.getKey();
       final String[] value = entry.getValue();
       if(name == null) qp.context(value[0], value[1]);

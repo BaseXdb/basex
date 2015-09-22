@@ -117,9 +117,8 @@ public abstract class JsonConverter {
 
   /**
    * Called when an item of a JSON array is closed.
-   * @throws QueryIOException query exception
    */
-  abstract void closeItem() throws QueryIOException;
+  abstract void closeItem();
 
   /**
    * Called when a JSON array is closed.

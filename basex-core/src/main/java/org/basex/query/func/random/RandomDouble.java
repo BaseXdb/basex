@@ -18,7 +18,7 @@ public final class RandomDouble extends StandardFunc {
   private static final Random RND = new Random();
 
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Item item(final QueryContext qc, final InputInfo ii) {
     return Dbl.get(RND.nextDouble());
   }
 }

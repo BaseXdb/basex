@@ -35,15 +35,6 @@ public final class ItemList extends ElementList implements Iterable<Item> {
   }
 
   /**
-   * Constructor, specifying an initial entry.
-   * @param element array capacity
-   */
-  public ItemList(final Item element) {
-    list = new Item[] { element };
-    size = 1;
-  }
-
-  /**
    * Returns the specified element.
    * @param p position
    * @return value

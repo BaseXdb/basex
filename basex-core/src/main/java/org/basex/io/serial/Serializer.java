@@ -357,7 +357,7 @@ public abstract class Serializer implements Closeable {
     int pre = node.pre(), kind = data.kind(pre);
 
     // document node: output all children
-    int size = pre + data.size(pre, kind);
+    final int size = pre + data.size(pre, kind);
     if(kind == Data.DOC) {
       openDoc(data.text(pre++, true));
       while(pre < size && !finished()) {

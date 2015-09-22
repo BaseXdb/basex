@@ -13,7 +13,7 @@ import org.basex.query.value.*;
  */
 public final class DbOutputCache extends StandardFunc {
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) {
     return qc.resources.output.value();
   }
 

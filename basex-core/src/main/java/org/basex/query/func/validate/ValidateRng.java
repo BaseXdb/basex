@@ -30,7 +30,7 @@ public class ValidateRng extends ValidateFn {
     checkCreate(qc);
     return process(new Validation() {
       @Override
-      void process(final ErrorHandler handler) throws IOException, SAXException, QueryException {
+      void process(final ErrorHandler handler) throws IOException, QueryException {
         final IO in = read(toNodeOrAtomItem(exprs[0], qc), qc, null);
         final Item sch = toNodeOrAtomItem(exprs[1], qc);
         final boolean compact = exprs.length > 2 && toBoolean(exprs[2], qc);
@@ -41,7 +41,7 @@ public class ValidateRng extends ValidateFn {
           schema = read(sch, qc, null);
         } catch(final QueryException ex) {
           // compact schema: treat string as input
-          if(!compact || ex.error() != QueryError.WHICHRES_X) throw ex;
+          if(!compact || ex.error() != WHICHRES_X) throw ex;
           schema = new IOContent(sch.string(info));
         }
         schema = prepare(schema, handler);

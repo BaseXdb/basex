@@ -2,7 +2,6 @@ package org.basex.query.util.collation;
 
 import static org.basex.util.Token.*;
 
-import org.basex.query.*;
 import org.basex.util.*;
 
 /**
@@ -25,7 +24,7 @@ final class NoCaseCollation extends Collation {
 
   @Override
   protected int indexOf(final String string, final String sub, final Mode mode,
-      final InputInfo info) throws QueryException {
+      final InputInfo info) {
 
     final int tl = string.length(), sl = sub.length();
     if(sl == 0) return 0;

@@ -160,7 +160,7 @@ public final class QueryResources {
     // check currently opened databases
     for(final Data data : datas) {
       // check if database has a single document with an identical input path
-      if(data.meta.ndocs.get() == 1 && IO.get(data.meta.original).eq(qi.input))
+      if(data.meta.ndocs == 1 && IO.get(data.meta.original).eq(qi.input))
         return new DBNode(data, 0, Data.DOC);
 
       // check if database and input have identical name
@@ -381,7 +381,7 @@ public final class QueryResources {
 
     // check if input is an existing file
     final IO source = checkPath(input, baseIO, info);
-    if(single && source.isDir()) WHICHRES_X.get(info, baseIO);
+    if(single && source.isDir()) throw WHICHRES_X.get(info, baseIO);
 
     // overwrite parsing options with default values
     try {

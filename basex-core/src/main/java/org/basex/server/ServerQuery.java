@@ -1,6 +1,5 @@
 package org.basex.server;
 
-import static org.basex.core.Text.*;
 import static org.basex.query.QueryError.*;
 
 import java.io.*;
@@ -145,13 +144,11 @@ public final class ServerQuery extends Proc {
       // generate query info
       info = qi.toString(qp, po.size(), c, ctx.options.get(MainOptions.QUERYINFO));
 
-    } catch(final QueryException ex) {
+    } catch(final QueryException | ProcException ex) {
       throw new BaseXException(ex);
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
       throw new BaseXException(BASX_STACKOVERFLOW.desc);
-    } catch(final ProcException ex) {
-      throw new BaseXException(TIMEOUT_EXCEEDED);
     } finally {
       // close processor and unregisters the process
       if(qp != null) {

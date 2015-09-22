@@ -40,8 +40,7 @@ public abstract class DBUpdate extends DataUpdate implements Comparable<DBUpdate
 
   /**
    * Prepares this operation.
-   * @param tmp temporary mem data
    * @throws QueryException exception
    */
-  public abstract void prepare(final MemData tmp) throws QueryException;
+  public abstract void prepare() throws QueryException;
 }

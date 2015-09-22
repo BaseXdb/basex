@@ -38,7 +38,7 @@ public final class MixedPath extends Path {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     Iter iter;
-    long sz;
+    final long sz;
     if(root != null) {
       final Iter rt = qc.iter(root);
       final long s = rt.size();

@@ -32,7 +32,7 @@ public final class Ann {
     this.info = info;
     this.args = args;
     this.sig = sig;
-    this.name = null;
+    name = null;
   }
 
   /**
@@ -45,7 +45,7 @@ public final class Ann {
     this.info = info;
     this.args = args;
     this.name = name;
-    this.sig = null;
+    sig = null;
   }
 
   /**

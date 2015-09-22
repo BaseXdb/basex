@@ -16,7 +16,7 @@ public final class OutTab extends StandardFunc {
   private static final Str TAB = Str.get("\t");
 
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Item item(final QueryContext qc, final InputInfo ii) {
     return TAB;
   }
 }

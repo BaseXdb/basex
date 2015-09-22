@@ -47,7 +47,6 @@ public final class ArrayMembersTest {
               pos++;
             } else {
               assertFalse(it1.hasNext());
-              continue;
             }
           }
         } else {
@@ -64,7 +63,6 @@ public final class ArrayMembersTest {
               assertEquals(exp, got);
             } else {
               assertFalse(it1.hasPrevious());
-              continue;
             }
           }
         }

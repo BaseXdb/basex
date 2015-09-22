@@ -75,5 +75,5 @@ public final class Put extends DBUpdate {
   }
 
   @Override
-  public void prepare(final MemData tmp) { }
+  public void prepare() { }
 }

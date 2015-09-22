@@ -143,9 +143,7 @@ public abstract class Filter extends Preds {
     // evaluate positional predicates
     Expr e = root;
     boolean opt = false;
-    final int pl = preds.length;
-    for(int p = 0; p < pl; p++) {
-      final Expr pred = preds[p];
+    for(final Expr pred : preds) {
       final Pos pos = pred instanceof Pos ? (Pos) pred : null;
       final boolean last = pred.isFunction(Function.LAST);
 

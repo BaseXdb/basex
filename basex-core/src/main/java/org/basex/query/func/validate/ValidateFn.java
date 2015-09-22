@@ -92,8 +92,8 @@ abstract class ValidateFn extends StandardFunc {
     for(final ErrorInfo ei : errors) {
       final FElem error = new FElem(MESSAGE);
       error.add(LEVEL, ei.level);
-      if(ei.line != Integer.MIN_VALUE) error.add(LINE, Token.token(ei.line));
-      if(ei.column != Integer.MIN_VALUE) error.add(COLUMN, Token.token(ei.column));
+      if(ei.line != Integer.MIN_VALUE) error.add(LINE, token(ei.line));
+      if(ei.column != Integer.MIN_VALUE) error.add(COLUMN, token(ei.column));
       if(ei.url != null) error.add(URL, ei.url);
       error.add(ei.message);
       report.add(error);

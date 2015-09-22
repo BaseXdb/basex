@@ -6,6 +6,7 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.gflwor.*;
+import org.basex.query.expr.gflwor.GFLWOR.Clause;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
@@ -68,7 +69,7 @@ public final class Lookup extends Arr {
 
       if(ks.isValue()) {
         // keys are constant, so we do not duplicate work in the inner loop
-        final LinkedList<GFLWOR.Clause> clauses = new LinkedList<>();
+        final LinkedList<Clause> clauses = new LinkedList<>();
         final Var f = scp.newLocal(qc, QNm.get("f"), null, false);
         clauses.add(new For(f, null, null, fs, false, info));
         final Var k = scp.newLocal(qc, QNm.get("k"), null, false);

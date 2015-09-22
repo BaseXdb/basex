@@ -25,7 +25,7 @@ public final class RepoList extends RepoFn {
   private static final String VERSION = "version";
 
   @Override
-  public BasicNodeIter iter(final QueryContext qc) throws QueryException {
+  public BasicNodeIter iter(final QueryContext qc) {
     final ANodeList cache = new ANodeList();
     final Repo repo = qc.context.repo.reset();
     for(final byte[] p : repo.pkgDict()) {

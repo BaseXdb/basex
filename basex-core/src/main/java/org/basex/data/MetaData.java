@@ -5,7 +5,6 @@ import static org.basex.data.DataText.*;
 import static org.basex.util.Strings.*;
 
 import java.io.*;
-import java.util.concurrent.atomic.*;
 
 import org.basex.build.*;
 import org.basex.core.*;
@@ -27,86 +26,86 @@ public final class MetaData {
   public final IOFile path;
 
   /** Database name. */
-  public volatile String name;
+  public String name;
 
   /** Encoding of original document. */
-  public volatile String encoding = UTF8;
+  public String encoding = UTF8;
   /** Path to original document. */
-  public volatile String original = "";
+  public String original = "";
   /** Size of original document. */
-  public volatile long filesize;
+  public long filesize;
   /** Timestamp of original document. */
-  public volatile long time;
+  public long time;
   /** Number of stored documents. */
-  public volatile AtomicInteger ndocs = new AtomicInteger();
+  public int ndocs;
 
   /** Indicates if a text index exists. */
-  public volatile boolean textindex;
+  public boolean textindex;
   /** Indicates if an attribute index exists. */
-  public volatile boolean attrindex;
+  public boolean attrindex;
   /** Indicates if a full-text index exists. */
-  public volatile boolean ftindex;
+  public boolean ftindex;
 
   /** Flag for whitespace chopping. */
-  public volatile boolean chop;
+  public boolean chop;
   /** Flag for activated automatic index update. */
-  public volatile boolean updindex;
+  public boolean updindex;
   /** Flag for automatic index updating. */
-  public volatile boolean autoopt;
+  public boolean autoopt;
 
   /** Indicates if the text index is to be recreated. */
-  public volatile boolean createtext;
+  public boolean createtext;
   /** Indicates if the attribute index is to be recreated. */
-  public volatile boolean createattr;
+  public boolean createattr;
   /** Indicates if the full-text index is to be recreated. */
-  public volatile boolean createftxt;
+  public boolean createftxt;
   /** Text index: names to include. */
-  public volatile String textinclude = "";
+  public String textinclude = "";
   /** Attribute index: names to include. */
-  public volatile String attrinclude = "";
+  public String attrinclude = "";
   /** Full-text index: names to include. */
-  public volatile String ftinclude = "";
+  public String ftinclude = "";
 
   /** Flag for full-text stemming. */
-  public volatile boolean stemming;
+  public boolean stemming;
   /** Flag for full-text case sensitivity. */
-  public volatile boolean casesens;
+  public boolean casesens;
   /** Flag for full-text diacritics removal. */
-  public volatile boolean diacritics;
+  public boolean diacritics;
   /** Full-text stopword file. */
-  public volatile String stopwords = "";
+  public String stopwords = "";
 
   /** Maximum number of categories. */
-  public volatile int maxcats;
+  public int maxcats;
   /** Maximum token length. */
-  public volatile int maxlen;
+  public int maxlen;
 
   /** Split size for creating new index. */
-  public volatile int splitsize;
+  public int splitsize;
   /** Split size for creating new full-text index. */
-  public volatile int ftsplitsize;
+  public int ftsplitsize;
 
   /** Language of full-text search index. */
-  public volatile Language language;
+  public Language language;
 
   /** Indicates if index structures are out-dated. */
-  public volatile boolean uptodate = true;
+  public boolean uptodate = true;
   /** Indicate if the database may be corrupt. */
-  public volatile boolean corrupt;
+  public boolean corrupt;
   /** Dirty flag. */
-  public volatile boolean dirty;
+  public boolean dirty;
 
   /** Number of nodes. */
-  public volatile int size;
+  public int size;
   /** Last (highest) id assigned to a node. Can be {@code -1} if database is empty. */
-  public volatile int lastid = -1;
+  public int lastid = -1;
 
   /** Flag for out-of-date indexes. */
-  private volatile boolean oldindex;
+  private boolean oldindex;
   /** Flag for out-of-date wildcard index (legacy, deprecated). */
-  private volatile boolean wcindex;
+  private boolean wcindex;
   /** Scoring mode (legacy, deprecated). */
-  private volatile int scoring;
+  private int scoring;
 
   /**
    * Constructor for a main-memory database instance.
@@ -304,7 +303,7 @@ public final class MetaData {
         else if(k.equals(DBFTSW))     stopwords   = v;
         else if(k.equals(DBFTLN))     language    = Language.get(v);
         else if(k.equals(DBSIZE))     size        = toInt(v);
-        else if(k.equals(DBNDOCS))    ndocs.set(toInt(v));
+        else if(k.equals(DBNDOCS))    ndocs       = toInt(v);
         else if(k.equals(DBSCTYPE))   scoring     = toInt(v);
         else if(k.equals(DBMAXLEN))   maxlen      = toInt(v);
         else if(k.equals(DBMAXCATS))  maxcats     = toInt(v);
@@ -357,7 +356,7 @@ public final class MetaData {
     writeInfo(out, DBTIME,     time);
     writeInfo(out, IDBSTR,     ISTORAGE);
     writeInfo(out, DBFSIZE,    filesize);
-    writeInfo(out, DBNDOCS,    ndocs.get());
+    writeInfo(out, DBNDOCS,    ndocs);
     writeInfo(out, DBENC,      encoding);
     writeInfo(out, DBSIZE,     size);
     writeInfo(out, DBCHOP,     chop);

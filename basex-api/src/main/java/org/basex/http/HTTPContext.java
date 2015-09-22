@@ -49,9 +49,9 @@ public final class HTTPContext {
   public final String method;
   /** Request method. */
   public final HTTPParams params;
-
   /** Authentication method. */
-  public AuthMethod auth;
+  public final AuthMethod auth;
+
   /** User name. */
   public String username;
   /** Password (plain text). */

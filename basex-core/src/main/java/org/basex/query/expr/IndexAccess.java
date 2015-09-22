@@ -30,7 +30,7 @@ public abstract class IndexAccess extends Simple {
    * @param s number of results
    */
   public void size(final long s) {
-    this.size = s;
+    size = s;
     seqType = seqType().withSize(s);
   }
 

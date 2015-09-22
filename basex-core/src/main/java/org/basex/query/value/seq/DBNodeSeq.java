@@ -22,10 +22,10 @@ import org.basex.util.list.*;
 public class DBNodeSeq extends NativeSeq {
   /** Data reference. */
   protected final Data data;
+  /** Pre values reference all documents of the database. */
+  protected final boolean all;
   /** Pre values. */
   protected int[] pres;
-  /** Pre values reference all documents of the database. */
-  protected boolean all;
 
   /**
    * Constructor.

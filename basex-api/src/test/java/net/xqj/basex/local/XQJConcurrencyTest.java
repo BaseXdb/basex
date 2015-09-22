@@ -148,7 +148,7 @@ public final class XQJConcurrencyTest extends XQJBaseTest {
   }
 
   /** Insertion thread. */
-  private class InsertItemThread extends Thread {
+  private final class InsertItemThread extends Thread {
     /** URI of document being inserted. */
     private final String uri;
     /** Content of document being inserted. */
@@ -159,7 +159,7 @@ public final class XQJConcurrencyTest extends XQJBaseTest {
      * @param u uri
      * @param it item
      */
-    public InsertItemThread(final String u, final XQItem it) {
+    private InsertItemThread(final String u, final XQItem it) {
       uri = u;
       item = it;
     }

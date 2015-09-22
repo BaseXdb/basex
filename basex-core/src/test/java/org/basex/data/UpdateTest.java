@@ -80,7 +80,7 @@ public abstract class UpdateTest extends SandboxTest {
    */
   @After
   public final void tearDown() {
-    if(((Boolean) mainmem).booleanValue()) return;
+    if((Boolean) mainmem) return;
     execute(new Close());
     execute(new DropDB(NAME));
   }
@@ -89,7 +89,7 @@ public abstract class UpdateTest extends SandboxTest {
    * Reloads the database.
    */
   void reload() {
-    if(((Boolean) mainmem).booleanValue()) return;
+    if((Boolean) mainmem) return;
     execute(new Close());
     execute(new Open(NAME));
   }

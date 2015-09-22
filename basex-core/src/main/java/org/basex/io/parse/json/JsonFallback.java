@@ -6,11 +6,11 @@ package org.basex.io.parse.json;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public abstract class JsonFallback {
+public interface JsonFallback {
   /**
    * Converts the specified token.
    * @param string input string
    * @return converted token
    */
-  public abstract String convert(final String string);
+  String convert(final String string);
 }

@@ -369,7 +369,7 @@ final class BigSeq extends TreeSeq {
    * @param rt element type
    * @return the array
    */
-  private TreeSeq fromMerged(final Item[] merged, final Type rt) {
+  private static TreeSeq fromMerged(final Item[] merged, final Type rt) {
     if(merged.length <= MAX_SMALL) return new SmallSeq(merged, rt);
     final int mid = merged.length / 2;
     return new BigSeq(slice(merged, 0, mid), FingerTree.<Item>empty(),
@@ -526,7 +526,7 @@ final class BigSeq extends TreeSeq {
 
       @Override
       public Item get(final long i) {
-        return BigSeq.this.itemAt(i);
+        return itemAt(i);
       }
 
       @Override

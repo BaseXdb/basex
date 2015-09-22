@@ -289,10 +289,10 @@ public final class DBLocking implements Locking {
         sb.append(ind + ind + e.getKey() + " -> " + e.getValue() + NL);
     }
     sb.append(ind + "Held write locks by transaction:" + NL);
-    for(final Map.Entry<Long, StringList> entry : writeLocked.entrySet())
+    for(final Entry<Long, StringList> entry : writeLocked.entrySet())
       sb.append(ind + ind + entry.getKey() + " -> " + entry.getValue() + NL);
     sb.append(ind + "Held read locks by transaction:" + NL);
-    for(final Map.Entry<Long, StringList> entry : readLocked.entrySet())
+    for(final Entry<Long, StringList> entry : readLocked.entrySet())
       sb.append(ind + ind + entry.getKey() + " -> " + entry.getValue() + NL);
     return sb.toString();
   }

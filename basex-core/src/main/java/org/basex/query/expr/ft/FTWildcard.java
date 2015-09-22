@@ -33,7 +33,7 @@ public final class FTWildcard {
    */
   public FTWildcard(final byte[] query) {
     this.query = query;
-    this.simple = !contains(query, '.') && !contains(query, '\\');
+    simple = !contains(query, '.') && !contains(query, '\\');
   }
 
   /**

@@ -2,6 +2,7 @@ package org.basex.query.index;
 
 import java.util.*;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
@@ -75,7 +76,7 @@ public final class ValueIndexTest extends QueryPlanTest {
    */
   @Test
   public void textIndex() {
-    for(final Map.Entry<String, String> entry : map().entrySet()) {
+    for(final Entry<String, String> entry : map().entrySet()) {
       final String key = entry.getKey(), value = entry.getValue();
       set(MainOptions.TEXTINCLUDE, key);
       execute(new CreateDB(NAME, FILE));
@@ -90,7 +91,7 @@ public final class ValueIndexTest extends QueryPlanTest {
    */
   @Test
   public void attrIndex() {
-    for(final Map.Entry<String, String> entry : map().entrySet()) {
+    for(final Entry<String, String> entry : map().entrySet()) {
       final String key = entry.getKey(), value = entry.getValue();
       set(MainOptions.ATTRINCLUDE, key);
       execute(new CreateDB(NAME, FILE));
@@ -106,10 +107,10 @@ public final class ValueIndexTest extends QueryPlanTest {
   @Test
   public void fulltextIndex() {
     // not applicable in main-memory mode
-    if(((Boolean) mainmem).booleanValue()) return;
+    if((Boolean) mainmem) return;
 
     set(MainOptions.FTINDEX, true);
-    for(final Map.Entry<String, String> entry : map().entrySet()) {
+    for(final Entry<String, String> entry : map().entrySet()) {
       final String key = entry.getKey(), value = entry.getValue();
       set(MainOptions.FTINCLUDE, key);
       execute(new CreateDB(NAME, FILE));

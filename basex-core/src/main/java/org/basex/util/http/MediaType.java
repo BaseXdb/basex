@@ -104,7 +104,7 @@ public final class MediaType {
    * @return type
    */
   public String type() {
-    return sub.isEmpty() ? main : new StringBuilder(main).append('/').append(sub).toString();
+    return sub.isEmpty() ? main : (main + '/' + sub);
   }
 
   /**

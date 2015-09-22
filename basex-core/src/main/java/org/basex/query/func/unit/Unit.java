@@ -56,7 +56,7 @@ final class Unit {
    * @param ctx database context
    * @param proc process
    */
-  public Unit(final IOFile file, final Context ctx, final Proc proc) {
+  Unit(final IOFile file, final Context ctx, final Proc proc) {
     this.file = file;
     this.ctx = ctx;
     this.proc = proc;

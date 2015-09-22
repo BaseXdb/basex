@@ -26,7 +26,7 @@ final class DatabaseModifier extends ContextModifier {
       if(!qc.context.perm(Perm.WRITE, ((DataUpdate) update).data().meta.name))
         throw BASX_PERM_X.get(update.info(), Perm.WRITE);
     } else if(update instanceof UserUpdate) {
-      if(!qc.context.perm(Perm.ADMIN, (String) null))
+      if(!qc.context.perm(Perm.ADMIN, null))
         throw BASX_PERM_X.get(update.info(), Perm.ADMIN);
     } else {
       throw Util.notExpected("Unknown update type: " + update);

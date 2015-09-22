@@ -38,7 +38,7 @@ public abstract class Sandbox {
   /** REST identifier. */
   protected static final String REST = "rest";
   /** Root path. */
-  protected static final String HTTP_ROOT = "http://" + Text.S_LOCALHOST + ':' + HTTP_PORT + '/';
+  protected static final String HTTP_ROOT = "http://" + S_LOCALHOST + ':' + HTTP_PORT + '/';
   /** Root path. */
   protected static final String REST_ROOT = HTTP_ROOT + REST + '/';
 

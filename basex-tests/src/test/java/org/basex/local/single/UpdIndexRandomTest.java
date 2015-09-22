@@ -69,7 +69,7 @@ public final class UpdIndexRandomTest extends SandboxTest {
     final Random rnd = new Random(0);
 
     // create random words
-    int cap = 1000;
+    final int cap = 1000;
     final StringList words = new StringList(cap);
     for(int w = 0; w < cap; w++) {
       final int r = 1 + rnd.nextInt(10);

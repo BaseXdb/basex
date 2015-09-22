@@ -23,7 +23,7 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
    * @return empty finger tree
    */
   @SuppressWarnings("unchecked")
-  public static final <E> FingerTree<E, E> empty() {
+  public static <E> FingerTree<E, E> empty() {
     return (FingerTree<E, E>) EmptyTree.INSTANCE;
   }
 
@@ -33,7 +33,7 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
    * @param leaf the contained leaf
    * @return the singleton finger tree
    */
-  public static final <E> FingerTree<E, E> singleton(final Node<E, E> leaf) {
+  public static <E> FingerTree<E, E> singleton(final Node<E, E> leaf) {
     return new SingletonTree<>(leaf);
   }
 
@@ -227,7 +227,7 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
   static <N, E> FingerTree<N, E> buildTree(final Node<N, E>[] nodes, final int n,
       final long size) {
 
-    if(n == 0) return EmptyTree.<N, E>getInstance();
+    if(n == 0) return EmptyTree.getInstance();
     if(n == 1) return new SingletonTree<>(nodes[0]);
     if(n <= 2 * MAX_ARITY) {
       final int mid = n / 2;

@@ -7,6 +7,7 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.regex.*;
 
 import javax.xml.namespace.*;
@@ -166,7 +167,7 @@ public final class QT3TS extends Main {
     // save report
     if(report != null) {
       final String file = "ReportingResults/results_" +
-          Prop.NAME + "_" + Prop.VERSION + IO.XMLSUFFIX;
+          NAME + "_" + VERSION + IO.XMLSUFFIX;
       new IOFile(file).write(report.create(ctx).toArray());
       Util.outln("Creating report '" + file + "'...");
     }
@@ -176,7 +177,7 @@ public final class QT3TS extends Main {
 
     if(slow != null && !slow.isEmpty()) {
       Util.outln(NL + "Slow queries:");
-      for(final Map.Entry<Long, String> l : slow.entrySet()) {
+      for(final Entry<Long, String> l : slow.entrySet()) {
         Util.outln("- " + -(l.getKey() / 1000000) + " ms: " + l.getValue());
       }
     }
@@ -347,7 +348,7 @@ public final class QT3TS extends Main {
         // set base uri
         if(env.baseURI != null) query.baseURI(env.baseURI);
         // bind decimal formats
-        for(final Map.Entry<QName, HashMap<String, String>> df :
+        for(final Entry<QName, HashMap<String, String>> df :
           env.decFormats.entrySet()) {
           query.decimalFormat(df.getKey(), df.getValue());
         }
@@ -484,7 +485,7 @@ public final class QT3TS extends Main {
   private String test(final QT3Result result, final XdmValue expected) {
     final String type = expected.getName().getLocalPart();
     try {
-      String msg;
+      final String msg;
       if(type.equals("error")) {
         msg = assertError(result, expected);
       } else if(type.equals("assert-serialization-error")) {
@@ -921,7 +922,7 @@ public final class QT3TS extends Main {
         } else if(c == 'a') {
           all = true;
         } else if(c == 'd') {
-          Prop.debug = true;
+          debug = true;
         } else if(c == 'i') {
           ignoring = true;
         } else if(c == 'e') {
@@ -1000,7 +1001,7 @@ public final class QT3TS extends Main {
    * @return database path
    */
   private IOFile sandbox() {
-    return new IOFile(Prop.TMP, testid);
+    return new IOFile(TMP, testid);
   }
 
   @Override

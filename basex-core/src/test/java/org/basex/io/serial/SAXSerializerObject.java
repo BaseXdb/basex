@@ -10,7 +10,7 @@ import javax.xml.bind.annotation.*;
  */
 @XmlRootElement(name = "domain-object")
 @XmlAccessorType(XmlAccessType.FIELD)
-class SAXSerializerObject {
+public class SAXSerializerObject {
   /** Name of the object. */
   @XmlAttribute
   private String name;
@@ -28,7 +28,7 @@ class SAXSerializerObject {
    * @param name name
    * @param value value
    */
-  public SAXSerializerObject(final String name, final long value) {
+  SAXSerializerObject(final String name, final long value) {
     this.name = name;
     this.value = value;
   }

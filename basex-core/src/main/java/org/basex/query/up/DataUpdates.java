@@ -105,7 +105,7 @@ final class DataUpdates {
    */
   void prepare(final MemData tmp) throws QueryException {
     // Prepare/check database operations
-    for(final DBUpdate d : dbUpdates) d.prepare(tmp);
+    for(final DBUpdate d : dbUpdates) d.prepare();
 
     // Prepare/check XQUP primitives:
     final int s = nodeUpdates.size();

@@ -18,7 +18,7 @@ final class ZIPOut extends ArchiveOut {
   /**
    * Writing constructor.
    */
-  public ZIPOut() {
+  ZIPOut() {
     zos = new ZipOutputStream(ao);
   }
 

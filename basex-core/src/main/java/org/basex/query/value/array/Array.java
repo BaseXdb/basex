@@ -238,7 +238,7 @@ public abstract class Array extends FItem {
    * @param to last index, exclusive (may be greater than {@code arr.length})
    * @return resulting array
    */
-  static final Value[] slice(final Value[] arr, final int from, final int to) {
+  static Value[] slice(final Value[] arr, final int from, final int to) {
     final Value[] out = new Value[to - from];
     final int in0 = Math.max(0, from), in1 = Math.min(to, arr.length);
     final int out0 = Math.max(-from, 0);
@@ -252,7 +252,7 @@ public abstract class Array extends FItem {
    * @param bs second array
    * @return resulting array
    */
-  static final Value[] concat(final Value[] as, final Value[] bs) {
+  static Value[] concat(final Value[] as, final Value[] bs) {
     final int l = as.length, r = bs.length, n = l + r;
     final Value[] out = new Value[n];
     System.arraycopy(as, 0, out, 0, l);

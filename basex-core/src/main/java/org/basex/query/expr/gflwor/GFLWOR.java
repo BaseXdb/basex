@@ -88,11 +88,11 @@ public final class GFLWOR extends ParseExpr {
       private Iter sub = Empty.ITER;
       @Override
       public Item next() throws QueryException {
-        for(;;) {
+        while(true) {
           final Item it = sub.next();
           qc.checkStop();
-          if(it != null) return it;
-          if(!ev.next(qc)) {
+          if (it != null) return it;
+          if (!ev.next(qc)) {
             sub = null;
             return null;
           }

@@ -64,8 +64,7 @@ public final class ExploreView extends View {
   @Override
   public void refreshMark() {
     final DBNodes marked = gui.context.marked;
-    filter.setEnabled(!gui.gopts.get(GUIOptions.FILTERRT) &&
-        marked != null && marked.size() != 0);
+    filter.setEnabled(!gui.gopts.get(GUIOptions.FILTERRT) && marked != null && !marked.isEmpty());
   }
 
   @Override

@@ -68,7 +68,7 @@ final class XdmSequence extends XdmValue {
     final StringBuilder sb = new StringBuilder("(");
     for(final XdmItem it : this) {
       if(sb.length() != 1) sb.append(',');
-      sb.append(it.toString());
+      sb.append(it);
     }
     return sb.append(')').toString();
   }

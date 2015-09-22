@@ -23,7 +23,7 @@ public final class ProcPropertyNames extends StandardFunc {
   }
 
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) {
     final TokenList tl = new TokenList();
     for(final Entry<String, String> entry : Prop.entries()) tl.add(entry.getKey());
     return StrSeq.get(tl.sort());

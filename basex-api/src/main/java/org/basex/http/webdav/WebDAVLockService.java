@@ -44,7 +44,7 @@ final class WebDAVLockService {
    * @param token lock token
    * @throws IOException I/O exception
    */
-  public void unlock(final String token) throws IOException {
+  void unlock(final String token) throws IOException {
     execute(new WebDAVQuery("w:delete-lock($token)").bind("token", token));
   }
 
@@ -53,7 +53,7 @@ final class WebDAVLockService {
    * @param token lock token
    * @throws IOException I/O exception
    */
-  public void refreshLock(final String token) throws IOException {
+  void refreshLock(final String token) throws IOException {
     execute(new WebDAVQuery("w:refresh-lock($token)").bind("token", token));
   }
 
@@ -69,7 +69,7 @@ final class WebDAVLockService {
    * @return lock token
    * @throws IOException I/O exception
    */
-  public String lock(final String db, final String p, final String scope, final String type,
+  String lock(final String db, final String p, final String scope, final String type,
       final String depth, final String user, final Long to) throws IOException {
 
     initLockDb();
@@ -94,7 +94,7 @@ final class WebDAVLockService {
    * @return lock
    * @throws IOException I/O exception
    */
-  public String lock(final String token) throws IOException {
+  String lock(final String token) throws IOException {
     final StringList locks = execute(new WebDAVQuery("w:lock($token)").bind("token", token));
     return locks.isEmpty() ? null : locks.get(0);
   }
@@ -106,7 +106,7 @@ final class WebDAVLockService {
    * @return locks
    * @throws IOException I/O exception
    */
-  public String lock(final String db, final String path) throws IOException {
+  String lock(final String db, final String path) throws IOException {
     final WebDAVQuery query = new WebDAVQuery("w:locks-on($path)").bind("path", db + SEP + path);
     final StringList sl = execute(query);
     return sl.isEmpty() ? null : sl.get(0);
@@ -119,7 +119,7 @@ final class WebDAVLockService {
    * @return {@code true} if there active conflicting locks
    * @throws IOException I/O exception
    */
-  public boolean conflictingLocks(final String db, final String p) throws IOException {
+  boolean conflictingLocks(final String db, final String p) throws IOException {
     return !execute(new WebDAVQuery("w:conflicting-locks(" +
         "<w:lockinfo>" +
         "<w:path>{ $path }</w:path>" +

@@ -252,8 +252,7 @@ public final class ArrayRemoveTest {
       assertEquals(size, list.size());
 
       if(i % 1000 == 999) {
-        final Array arr1 = arr;
-        arr1.checkInvariants();
+        arr.checkInvariants();
         for(int j = 0; j < size; j++) {
           assertEquals(((Int) list.get(j)).itr(), ((Int) arr.get(j)).itr());
         }

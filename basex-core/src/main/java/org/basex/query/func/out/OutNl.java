@@ -16,7 +16,7 @@ public final class OutNl extends StandardFunc {
   private static final Str NL = Str.get("\n");
 
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Item item(final QueryContext qc, final InputInfo ii) {
     return NL;
   }
 }

@@ -42,7 +42,7 @@ public final class DBAlter extends NameUpdate {
   }
 
   @Override
-  public void prepare() throws QueryException { }
+  public void prepare() { }
 
   @Override
   protected String operation() { return "renamed"; }

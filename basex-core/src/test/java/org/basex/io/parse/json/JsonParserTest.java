@@ -13,7 +13,7 @@ import org.junit.*;
  */
 public final class JsonParserTest {
   /** Tests if the empty JSON string is rejected. */
-  public void emptyQuery() {
+  @Test public void emptyQuery() {
     error("", false);
     error(" \t\r\n", false);
   }
@@ -150,7 +150,7 @@ public final class JsonParserTest {
    * @param json JSON string
    * @param liberal liberal parsing
    */
-  private void error(final String json, final boolean liberal) {
+  private static void error(final String json, final boolean liberal) {
     try {
       parse(json, liberal);
       fail("Should have failed: '" + json + '\'');

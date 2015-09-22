@@ -104,7 +104,7 @@ public final class MultipleAddTest extends SandboxTest {
         } finally {
           new Close().execute(ctx);
         }
-      } catch(BaseXException ex) {
+      } catch(final BaseXException ex) {
         ex.printStackTrace();
       }
     }

@@ -58,5 +58,5 @@ public final class DBRename extends DBUpdate {
   }
 
   @Override
-  public void prepare(final MemData tmp) { }
+  public void prepare() { }
 }
