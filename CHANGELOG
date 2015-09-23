@@ -1,3 +1,25 @@
+VERSION 8.3 (September 23, 2015) ---------------------------------------
+
+ SELECTIVE INDEXING
+ - restrict value indexing to given elements and attributes
+ - support extended to updatable and main-memory databases
+
+ VALIDATION
+ - support for RelaxNG validation (XML and compact syntax)
+ - optional XML Schema 1.1 support
+ - new function for creating validation reports
+
+ XQUERY MODULES
+ - Strings Module: Levenshtein, Soundex, Cologne Phonetic
+ - updates in the Archive, Database, Admin and Process modules
+
+ DBA
+ - File panel: upload and download files
+
+ BUG FIXES
+ - automatic database optimization if node id turns negative
+ - XQuery optimizations, performance tweaks, WebDAV issues
+
 VERSION 8.2.3 (July 14, 2015) ------------------------------------------
 
  Bug fixes (DBA, admin:write-log; namespaces)
