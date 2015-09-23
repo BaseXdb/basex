@@ -73,11 +73,14 @@ public final class BaseXHTTP extends Main {
     jetty = (Server) new XmlConfiguration(initJetty(webapp).inputStream()).configure();
     jetty.setHandler(wac);
 
-    // set the first http port (can also be https) to the port provided on command line
+    final Connector[] conns = jetty.getConnectors();
+    if(conns == null || conns.length == 0)
+      throw new BaseXException("No Jetty connector defined in " + JETTYCONF + ".");
+
     if(httpPort != 0) {
-      for(final Connector c : jetty.getConnectors()) {
-        if(c instanceof SelectChannelConnector) {
-          c.setPort(httpPort);
+      for(final Connector conn : conns) {
+        if(conn instanceof SelectChannelConnector) {
+          conn.setPort(httpPort);
           break;
         }
       }
@@ -89,20 +92,20 @@ public final class BaseXHTTP extends Main {
 
     if(stopped) {
       stop();
-      for(final Connector c : jetty.getConnectors())
-        Util.outln(stopX, c.getPort());
+      for(final Connector conn : conns)
+        Util.outln(stopX, conn.getPort());
       // temporary console windows: keep the message visible for a while
       Performance.sleep(1000);
       return;
     }
 
     // start web server in a new process
-    final Connector connector = jetty.getConnectors()[0];
+    final Connector conn1 = conns[0];
     if(service) {
-      start(connector.getPort(), connector instanceof SslSelectChannelConnector, args);
+      start(conn1.getPort(), conn1 instanceof SslSelectChannelConnector, args);
 
-      for(final Connector c : jetty.getConnectors()) {
-        Util.outln(startX, c.getPort());
+      for(final Connector conn : conns) {
+        Util.outln(startX, conn.getPort());
       }
       // temporary console windows: keep the message visible for a while
       Performance.sleep(1000);
@@ -124,14 +127,15 @@ public final class BaseXHTTP extends Main {
     try {
       jetty.start();
     } catch(final BindException ex) {
-      throw new IOException(Util.info(HTTP + ' ' + SRV_RUNNING_X, connector.getPort()), ex);
+      Util.debug(ex);
+      throw new BaseXException(HTTP + ' ' + SRV_RUNNING_X, conn1.getPort());
     }
     // throw cached exception that did not break the servlet architecture
     final IOException ex = HTTPContext.exception();
     if(ex != null) throw ex;
 
     // show start message
-    for(final Connector c : jetty.getConnectors()) Util.outln(startX, c.getPort());
+    for(final Connector conn : conns) Util.outln(startX, conn.getPort());
 
     // initialize web.xml settings, assign system properties and run database server.
     // the call of this function may already have been triggered during the start of jetty
@@ -146,13 +150,13 @@ public final class BaseXHTTP extends Main {
     Runtime.getRuntime().addShutdownHook(new Thread() {
       @Override
       public void run() {
-        for(final Connector c : jetty.getConnectors()) {
-          Util.outln(stopX, c.getPort());
+        for(final Connector conn : conns) {
+          Util.outln(stopX, conn.getPort());
         }
         final Log l = context.log;
         if(l != null) {
-          for(final Connector c : jetty.getConnectors()) {
-            l.writeServer(LogType.OK, Util.info(stopX, c.getPort()));
+          for(final Connector conn : conns) {
+            l.writeServer(LogType.OK, Util.info(stopX, conn.getPort()));
           }
         }
         context.close();
@@ -160,8 +164,8 @@ public final class BaseXHTTP extends Main {
     });
 
     // log server start at very end (logging flag could have been updated by web.xml)
-    for(final Connector c : jetty.getConnectors()) {
-      context.log.writeServer(LogType.OK, Util.info(startX, c.getPort()));
+    for(final Connector conn : conns) {
+      context.log.writeServer(LogType.OK, Util.info(startX, conn.getPort()));
     }
   }
 
