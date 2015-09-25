@@ -77,7 +77,8 @@ public final class UCAOptions extends CollationOptions {
         if(vi == null || vic == null || ((Comparable<Object>) vi).compareTo(vic) > 0)
           throw error(VERSION);
       } catch(final IllegalArgumentException ex) {
-        throw error(VERSION);
+        if(get(FALLBACK) == YesNo.NO)
+          throw new IllegalArgumentException("Version not supported: \"" + v + "\"");
       }
     }
 
