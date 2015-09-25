@@ -151,7 +151,7 @@ public abstract class AQuery extends Command {
    * @param query query string
    * @return result of check
    */
-  final boolean updating(final Context ctx, final String query) {
+  final boolean updates(final Context ctx, final String query) {
     try {
       final Performance p = new Performance();
       qp(query, ctx);
@@ -285,11 +285,11 @@ public abstract class AQuery extends Command {
 
   @Override
   public boolean updating(final Context ctx) {
-    return args[0] != null && updating(ctx, args[0]);
+    return updates(ctx, args[0]);
   }
 
   @Override
-  public boolean updated(final Context ctx) {
+  public final boolean updated(final Context ctx) {
     return qp != null && qp.updates() != 0;
   }
 

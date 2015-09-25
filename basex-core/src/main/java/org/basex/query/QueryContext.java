@@ -272,52 +272,54 @@ public final class QueryContext extends Proc implements Closeable {
    */
   public void compile() throws QueryException {
     if(compiled) return;
-
-    // set database options
-    final StringList opts = tempOpts;
-    final int os = opts.size();
-    for(int o = 0; o < os; o += 2) {
-      try {
-        context.options.assign(opts.get(o).toUpperCase(Locale.ENGLISH), opts.get(o + 1));
-      } catch(final BaseXException ex) {
-        throw BASX_VALUE_X_X.get(null, opts.get(o), opts.get(o + 1));
+    try {
+      // set database options
+      final StringList opts = tempOpts;
+      final int os = opts.size();
+      for(int o = 0; o < os; o += 2) {
+        try {
+          context.options.assign(opts.get(o).toUpperCase(Locale.ENGLISH), opts.get(o + 1));
+        } catch(final BaseXException ex) {
+          throw BASX_VALUE_X_X.get(null, opts.get(o), opts.get(o + 1));
+        }
       }
-    }
-    // set tail call option after assignment database option
-    maxCalls = context.options.get(MainOptions.TAILCALLS);
+      // set tail call option after assignment database option
+      maxCalls = context.options.get(MainOptions.TAILCALLS);
 
-    // bind external variables
-    vars.bindExternal(this, bindings);
+      // bind external variables
+      vars.bindExternal(this, bindings);
 
-    if(ctxItem != null) {
-      // evaluate initial expression
-      try {
-        ctxItem.compile(this);
-        value = ctxItem.cache(this).value();
-      } catch(final QueryException ex) {
-        // only {@link ParseExpr} instances may lead to a missing context
-        throw ex.error() == NOCTX_X ? CIRCCTX.get(ctxItem.info) : ex;
+      if(ctxItem != null) {
+        // evaluate initial expression
+        try {
+          ctxItem.compile(this);
+          value = ctxItem.cache(this).value();
+        } catch(final QueryException ex) {
+          // only {@link ParseExpr} instances may lead to a missing context
+          throw ex.error() == NOCTX_X ? CIRCCTX.get(ctxItem.info) : ex;
+        }
+      } else {
+        // cache the initial context nodes
+        final DBNodes nodes = context.current();
+        if(nodes != null) {
+          if(!context.perm(Perm.READ, nodes.data().meta.name))
+            throw BASX_PERM_X.get(null, Perm.READ);
+          value = resources.compile(nodes);
+        }
       }
-    } else {
-      // cache the initial context nodes
-      final DBNodes nodes = context.current();
-      if(nodes != null) {
-        if(!context.perm(Perm.READ, nodes.data().meta.name))
-          throw BASX_PERM_X.get(null, Perm.READ);
-        value = resources.compile(nodes);
+
+      // if specified, convert context value to specified type
+      // [LW] should not be necessary
+      if(value != null && root.sc.contextType != null) {
+        value = root.sc.contextType.promote(this, root.sc, null, value, true);
       }
-    }
 
-    // if specified, convert context value to specified type
-    // [LW] should not be necessary
-    if(value != null && root.sc.contextType != null) {
-      value = root.sc.contextType.promote(this, root.sc, null, value, true);
+      // dynamic compilation
+      analyze();
+      info.runtime = true;
+    } finally {
+      compiled = true;
     }
-
-    // dynamic compilation
-    analyze();
-    info.runtime = true;
-    compiled = true;
   }
 
   /**
@@ -583,7 +585,7 @@ public final class QueryContext extends Proc implements Closeable {
    * Indicates that the query contains any updating expressions.
    */
   public void updating() {
-    updating = true;
+    updating = Boolean.TRUE;
   }
 
   @Override

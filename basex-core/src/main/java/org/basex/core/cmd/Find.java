@@ -53,7 +53,7 @@ public final class Find extends AQuery {
 
   @Override
   public boolean updating(final Context ctx) {
-    return updating(ctx, find(args[0], ctx, root));
+    return updates(ctx, find(args[0], ctx, root));
   }
 
   @Override

@@ -21,7 +21,8 @@ public abstract class Proc {
   public boolean updating;
 
   /** Indicates if a process is currently registered. */
-  boolean registered;
+  protected boolean registered;
+
   /** Stopped flag. */
   private boolean stopped;
   /** Timer. */

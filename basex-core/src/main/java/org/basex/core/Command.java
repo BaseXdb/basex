@@ -90,7 +90,7 @@ public abstract class Command extends Proc {
     if(!ctx.perm(perm, data != null && !data.inMemory() ? data.meta.name : null))
       throw new BaseXException(PERM_REQUIRED_X, perm);
 
-    // set updating flag
+    // checks if the command performs updates
     updating = updating(ctx);
 
     try {

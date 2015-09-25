@@ -4,6 +4,7 @@ import static org.basex.util.Strings.*;
 
 import java.io.*;
 
+import org.basex.core.*;
 import org.basex.core.locks.*;
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.Cmd;
@@ -34,15 +35,12 @@ public final class InfoStorage extends AQuery {
 
   @Override
   protected boolean run() throws IOException {
-    // get arguments
-    final String start = args[0];
-    final String end = args[1];
-
+    final String first = args[0], second = args[1];
     DBNodes nodes = null;
-    if(!start.isEmpty() && toInt(start) == Integer.MIN_VALUE) {
+    if(isQuery()) {
       try {
         // evaluate input as query
-        final Value value = qp(args[0], context).value();
+        final Value value = qp(first, context).value();
         if(value instanceof DBNodes) nodes = (DBNodes) value;
       } catch(final QueryException ex) {
         error(Util.message(ex));
@@ -56,20 +54,25 @@ public final class InfoStorage extends AQuery {
     if(nodes != null) {
       for(final int pre : nodes.pres()) dp.add(pre);
     } else {
-      int ps = 0, pe = 1000;
-      if(!start.isEmpty()) {
-        if(!end.isEmpty()) {
-          ps = toInt(start);
-          pe = toInt(end) + 1;
+      int start = 0, end = 1000;
+      if(!first.isEmpty()) {
+        if(!second.isEmpty()) {
+          start = toInt(first);
+          end = toInt(second) + 1;
         } else {
-          ps = toInt(start);
-          pe = ps + 1;
+          start = toInt(first);
+          end = start + 1;
         }
       }
-      dp.add(ps, pe);
+      dp.add(start, end);
     }
     out.print(dp.finish());
     return true;
+  }
+
+  @Override
+  public boolean updating(final Context ctx) {
+    return isQuery() && updates(ctx, args[0]);
   }
 
   @Override
@@ -80,10 +83,16 @@ public final class InfoStorage extends AQuery {
   @Override
   public void build(final CmdBuilder cb) {
     cb.init(Cmd.INFO + " " + CmdInfo.STORAGE);
-    if(!args[0].isEmpty() && toInt(args[0]) == Integer.MIN_VALUE) {
-      cb.xquery(0);
-    } else {
-      cb.arg(0).arg(1);
-    }
+    if(isQuery()) cb.xquery(0);
+    else cb.arg(0).arg(1);
+  }
+
+  /**
+   * Checks if the first argument is a query.
+   * @return result of check
+   */
+  private boolean isQuery() {
+    final String first = args[0];
+    return !first.isEmpty() && toInt(first) == Integer.MIN_VALUE;
   }
 }
