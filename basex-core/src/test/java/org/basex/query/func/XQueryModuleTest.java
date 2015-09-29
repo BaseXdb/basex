@@ -90,6 +90,14 @@ public final class XQueryModuleTest extends AdvancedQueryTest {
 
   /** Test method. */
   @Test
+  public void parseUri() {
+    query(_XQUERY_PARSE_URI.args("src/test/resources/input.xq") + "/name()", "MainModule");
+    query(_XQUERY_PARSE_URI.args("src/test/resources/input.xq") + "/@updating/string()", "false");
+    error(_XQUERY_PARSE_URI.args("src/test/resources/xxx.xq"), WHICHRES_X);
+  }
+
+  /** Test method. */
+  @Test
   public void type() {
     try {
       System.setErr(NULL);

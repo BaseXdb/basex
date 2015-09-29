@@ -15,7 +15,7 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public final class XQueryParse extends StandardFunc {
+public class XQueryParse extends StandardFunc {
   /** Token. */
   private static final byte[] LIBRARY_MODULE = token("LibraryModule");
   /** Token. */
@@ -41,7 +41,19 @@ public final class XQueryParse extends StandardFunc {
 
   @Override
   public FElem item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] query = toToken(exprs[0], qc);
+    return parse(qc, toToken(exprs[0], qc), null);
+  }
+
+  /**
+   * Parses the specified query and returns the resulting query plan.
+   * @param qc query context
+   * @param query query
+   * @param path file path (may be {@code null})
+   * @return query plan
+   * @throws QueryException query exception
+   */
+  protected final FElem parse(final QueryContext qc, final byte[] query, final String path)
+      throws QueryException {
 
     boolean compile = false, plan = true;
     if(exprs.length > 1) {
@@ -51,7 +63,7 @@ public final class XQueryParse extends StandardFunc {
     }
 
     try(final QueryContext qctx = new QueryContext(qc.context)) {
-      final StaticScope ss = qctx.parse(string(query), null, null);
+      final StaticScope ss = qctx.parse(string(query), path, null);
       final boolean library = ss instanceof LibraryModule;
 
       final FElem root;

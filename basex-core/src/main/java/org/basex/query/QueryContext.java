@@ -183,7 +183,7 @@ public final class QueryContext extends Proc implements Closeable {
    * Parses the specified query.
    * @param query query string
    * @param path file path (may be {@code null})
-   * @param sc static context
+   * @param sc static context (may be {@code null})
    * @return main module
    * @throws QueryException query exception
    */

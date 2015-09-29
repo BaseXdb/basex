@@ -1279,6 +1279,9 @@ public enum Function {
   _XQUERY_PARSE(XQueryParse.class, "parse(string[,options])",
       arg(STR, ITEM), NOD, flag(NDT), XQUERY_URI),
   /** XQuery function. */
+  _XQUERY_PARSE_URI(XQueryParseUri.class, "parse-uri(uri[,options])",
+      arg(STR, ITEM), NOD, flag(NDT), XQUERY_URI),
+  /** XQuery function. */
   _XQUERY_TYPE(XQueryType.class, "type(value)", arg(ITEM_ZM), ITEM_ZM, XQUERY_URI),
 
   /* XSLT Module. */
