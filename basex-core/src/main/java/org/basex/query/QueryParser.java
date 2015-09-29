@@ -1023,7 +1023,6 @@ public class QueryParser extends InputParser {
       if(wsConsumeWs(WHERE)) {
         alterPos = pos;
         clauses.add(new Where(check(single(), NOWHERE), info()));
-        alter = NOWHERE;
       }
 
       if(wsConsumeWs(GROUP)) {
@@ -1058,7 +1057,6 @@ public class QueryParser extends InputParser {
 
         final VarRef[] pre = new VarRef[ng.size()];
         clauses.add(new GroupBy(specs, ng.toArray(pre), ngrp, specs[0].info));
-        alter = GRPBY;
       }
 
       final boolean stable = wsConsumeWs(STABLE);
@@ -1076,7 +1074,6 @@ public class QueryParser extends InputParser {
         int i = 0;
         for(final Var v : curr.values()) vs[i++] = new VarRef(ob[0].info, v);
         clauses.add(new OrderBy(vs, ob, ob[0].info));
-        alter = ORDERBY;
       }
 
       if(wsConsumeWs(COUNT, DOLLAR, NOCOUNT)) {
