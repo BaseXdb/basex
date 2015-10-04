@@ -318,6 +318,7 @@
           <executions>
             <execution>
               <id>javacc</id>
+              <phase>generate-sources</phase>
               <goals>
                 <goal>javacc</goal>
               </goals>
