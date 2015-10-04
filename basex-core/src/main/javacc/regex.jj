@@ -3,7 +3,7 @@ options {
   STATIC = false;
   USER_TOKEN_MANAGER = true;
   GRAMMAR_ENCODING = "UTF-8";
-  JDK_VERSION = "1.6";
+  JDK_VERSION = "1.7";
 }
 
 PARSER_BEGIN(RegExParser)
