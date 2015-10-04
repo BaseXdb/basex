@@ -317,7 +317,7 @@
           <inherited>true</inherited>
           <executions>
             <execution>
-              <id>javacc</id>
+              <id>generate-all-parsers</id>
               <phase>generate-sources</phase>
               <goals>
                 <goal>javacc</goal>
