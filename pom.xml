@@ -324,9 +324,6 @@
               </goals>
             </execution>
           </executions>
-          <configuration>
-            <outputDirectory>src/main/java</outputDirectory>
-          </configuration>
         </plugin>
 
         <plugin>
