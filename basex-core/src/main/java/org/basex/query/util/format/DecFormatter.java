@@ -353,17 +353,17 @@ public final class DecFormatter extends FormatUtil {
 
   /**
    * Formats the specified number and returns a string representation.
-   * @param it item
+   * @param item item
    * @param pics pictures
    * @param ii input info
    * @return picture variables
    * @throws QueryException query exception
    */
-  private byte[] format(final ANum it, final Picture[] pics, final InputInfo ii)
+  private byte[] format(final ANum item, final Picture[] pics, final InputInfo ii)
       throws QueryException {
 
     // Rule 1: return results for NaN
-    final double d = it.dbl(ii);
+    final double d = item.dbl(ii);
     if(Double.isNaN(d)) return nan;
 
     // Rule 2: check if value if negative (smaller than zero or -0)
@@ -372,16 +372,16 @@ public final class DecFormatter extends FormatUtil {
     final IntList res = new IntList(), intgr = new IntList(), fract = new IntList();
     int exp = 0;
 
-    if(Double.isInfinite(d)) {
-      // Rule 3
+    // Rule 3: percent/permille
+    ANum num = item;
+    if(pic.pc) num = (ANum) Calc.MULT.ev(ii, num, Int.get(100));
+    if(pic.pm) num = (ANum) Calc.MULT.ev(ii, num, Int.get(1000));
+
+    if(Double.isInfinite(num.dbl(ii))) {
+      // Rule 4: infinity
       intgr.add(new TokenParser(inf).toArray());
     } else {
-      // convert and round number
-      ANum num = it;
-      // Rule 4
-      if(pic.pc) num = (ANum) Calc.MULT.ev(ii, num, Int.get(100));
-      if(pic.pm) num = (ANum) Calc.MULT.ev(ii, num, Int.get(1000));
-      // Rule 5
+      // Rule 5: exponent
       if(pic.minExp != 0 && d != 0) {
         BigDecimal dec = num.dec(ii).abs().stripTrailingZeros();
         int scl = 0;
@@ -394,7 +394,6 @@ public final class DecFormatter extends FormatUtil {
           }
           scl++;
         }
-
         exp = scl - pic.min[0];
         if(exp != 0) {
           final BigDecimal n = BigDecimal.TEN.pow(Math.abs(exp));

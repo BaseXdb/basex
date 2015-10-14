@@ -233,7 +233,8 @@ abstract class TrieNode {
    * @throws QueryException query exception
    */
   static boolean eq(final Item a, final Item b, final InputInfo ii) throws QueryException {
-    return a.equiv(b, null, ii);
+    return a.equiv(b, null, ii) && (!(a instanceof ADate && b instanceof ADate) ||
+        ((ADate) a).tzDefined() == ((ADate) b).tzDefined());
   }
 
   /**

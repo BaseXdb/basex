@@ -27,8 +27,7 @@ public final class MapModuleTest extends AdvancedQueryTest {
     query(EXISTS.args(_MAP_MERGE.args(" map{ 'a':'b','b':'c' }")), true);
     count(_MAP_MERGE.args(" map{ 'a':'b','b':'c' }"), 2);
 
-    error(_MAP_MERGE.args("(map{ xs:time('01:01:01'):''}, map{ xs:time('01:01:01+01:00'):''})"),
-        MAP_TZ);
+    query(_MAP_MERGE.args("(map{ xs:time('01:01:01'):''}, map{ xs:time('01:01:01+01:00'):''})"));
   }
 
   /** Test method. */
@@ -50,8 +49,7 @@ public final class MapModuleTest extends AdvancedQueryTest {
     count(_MAP_PUT.args(" map{ 'a': 'b' }", "c", "d"), 2);
     count(_MAP_PUT.args(" map{ 'a': 'b' }", "c", "d"), 2);
 
-    error(_MAP_PUT.args(" map{ xs:time('01:01:01'):'b' }", "xs:time('01:01:02+01:00')", "1"),
-        MAP_TZ);
+    query(_MAP_PUT.args(" map{ xs:time('01:01:01'):'b' }", "xs:time('01:01:02+01:00')", "1"));
   }
 
   /** Test method. */

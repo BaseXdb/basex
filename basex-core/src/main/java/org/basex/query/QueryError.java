@@ -544,9 +544,6 @@ public enum QueryError {
   /** FOJS0007. */
   JSON_ESCAPE_X(FOJS, 7, "Invalid escape sequence: %."),
 
-  /** FOMP0001. */
-  MAP_TZ(FOMP, 1, "Map cannot contain keys with and without timezone."),
-
   /** FONS0004. */
   NSDECL_X(FONS, 4, "No namespace declared for prefix '%'."),
 
@@ -1054,8 +1051,6 @@ public enum QueryError {
   DUPLNSCONS_X(XQDY, 102, "Duplicate namespace declaration: '%'."),
   /** XQDY0137. */
   MAPDUPLKEY_X_X_X(XQDY, 137, "Key % already exists in map (values: % vs. %)."),
-  /** XPDY0139. */
-  MAPTZ(XPDY, 139, "Map cannot contains keys with and without timezone."),
 
   /** XQST0009. */
   IMPLSCHEMA(XQST, 9, "Schema import not supported."),

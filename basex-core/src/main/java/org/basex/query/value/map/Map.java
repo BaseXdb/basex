@@ -27,7 +27,7 @@ import org.basex.util.*;
  */
 public final class Map extends FItem {
   /** The empty map. */
-  public static final Map EMPTY = new Map(TrieNode.EMPTY, 0);
+  public static final Map EMPTY = new Map(TrieNode.EMPTY);
   /** Number of bits per level, maximum is 5 because {@code 1 << 5 == 32}. */
   static final int BITS = 5;
 
@@ -35,18 +35,14 @@ public final class Map extends FItem {
   private final TrieNode root;
   /** Key sequence. */
   private Value keys;
-  /** Date/time entries (negative: without timezone). */
-  private final int dt;
 
   /**
    * Constructor.
    * @param root map
-   * @param dt number of date/time entries (negative: without timezone)
    */
-  private Map(final TrieNode root, final int dt) {
+  private Map(final TrieNode root) {
     super(SeqType.ANY_MAP, new AnnList());
     this.root = root;
-    this.dt = dt;
   }
 
   @Override
@@ -97,8 +93,7 @@ public final class Map extends FItem {
    */
   public Map delete(final Item key, final InputInfo ii) throws QueryException {
     final TrieNode del = root.delete(key.hash(ii), key, 0, ii);
-    return del == root ? this : del == null ? EMPTY :
-      new Map(del, dt + (key instanceof ADate ? ((ADate) key).tzDefined() ? -1 : 1 : 0));
+    return del == root ? this : del == null ? EMPTY : new Map(del);
   }
 
   /**
@@ -133,9 +128,8 @@ public final class Map extends FItem {
    */
   public Map addAll(final Map map, final InputInfo ii) throws QueryException {
     if(map == EMPTY) return this;
-    if(map.dt != 0 && dt != 0 && (map.dt > 0 ? dt < 0 : dt > 0)) throw MAP_TZ.get(ii);
     final TrieNode upd = root.addAll(map.root, 0, ii);
-    return upd == map.root ? map : new Map(upd, map.dt + dt);
+    return upd == map.root ? map : new Map(upd);
   }
 
   /**
@@ -165,17 +159,7 @@ public final class Map extends FItem {
    */
   public Map put(final Item key, final Value value, final InputInfo ii) throws QueryException {
     final TrieNode ins = root.put(key.hash(ii), key, value, 0, ii);
-    return ins == root ? this :
-      new Map(ins, dt + (key instanceof ADate ? ((ADate) key).tzDefined() ? 1 : -1 : 0));
-  }
-
-  /**
-   * Checks if the specified key has a different timezone than the stored keys.
-   * @param key key to check
-   * @return result of check
-   */
-  public boolean checkTz(final Item key) {
-    return !(key instanceof ADate) || (((ADate) key).tzDefined() ? dt >= 0 : dt <= 0);
+    return ins == root ? this : new Map(ins);
   }
 
   /**
