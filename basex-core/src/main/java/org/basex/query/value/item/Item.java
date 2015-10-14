@@ -141,8 +141,10 @@ public abstract class Item extends Value {
    */
   public final boolean comparable(final Item it) {
     final Type t1 = type, t2 = it.type;
-    return t1 == t2 || this instanceof ANum && it instanceof ANum ||
-      t1.isStringOrUntyped() && t2.isStringOrUntyped() || this instanceof Dur && it instanceof Dur;
+    return t1 == t2
+        || this instanceof ANum && it instanceof ANum
+        || t1.isStringOrUntyped() && t2.isStringOrUntyped()
+        || this instanceof Dur && it instanceof Dur;
   }
 
   /**
@@ -168,8 +170,19 @@ public abstract class Item extends Value {
   public final boolean equiv(final Item it, final Collation coll, final InputInfo ii)
       throws QueryException {
     // check if both values are NaN, or if values are equal..
-    return (this == Dbl.NAN || this == Flt.NAN) && it instanceof ANum && Double.isNaN(it.dbl(ii)) ||
+    return it instanceof ANum && (this == Dbl.NAN || this == Flt.NAN) && Double.isNaN(it.dbl(ii)) ||
         comparable(it) && eq(it, coll, null, ii);
+  }
+
+  /**
+   * Checks the items as keys.
+   * @param it item to be compared
+   * @param ii input info
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  public boolean sameKey(final Item it, final InputInfo ii) throws QueryException {
+    return comparable(it) && eq(it, null, null, ii);
   }
 
   /**

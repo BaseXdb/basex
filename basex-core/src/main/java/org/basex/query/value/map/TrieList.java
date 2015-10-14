@@ -15,7 +15,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
-final class List extends TrieNode {
+final class TrieList extends TrieNode {
   /** Common hash value of all contained values. */
   final int hash;
 
@@ -31,7 +31,7 @@ final class List extends TrieNode {
    * @param keys key array
    * @param values value array
    */
-  List(final int hash, final Item[] keys, final Value[] values) {
+  TrieList(final int hash, final Item[] keys, final Value[] values) {
     super(keys.length);
     this.keys = keys;
     this.values = values;
@@ -47,7 +47,8 @@ final class List extends TrieNode {
    * @param key2 second key
    * @param value2 second value
    */
-  List(final int hash, final Item key1, final Value value1, final Item key2, final Value value2) {
+  TrieList(final int hash, final Item key1, final Value value1, final Item key2,
+      final Value value2) {
     this(hash, new Item[]{ key1, key2 }, new Value[]{ value1, value2 });
   }
 
@@ -57,15 +58,15 @@ final class List extends TrieNode {
 
     if(h == hash) {
       for(int i = size; i-- > 0;) {
-        if(eq(k, keys[i], ii)) {
+        if(k.sameKey(keys[i], ii)) {
           // found entry
           if(size == 2) {
             // single leaf remains
             final int o = i ^ 1;
-            return new Leaf(h, keys[o], values[o]);
+            return new TrieLeaf(h, keys[o], values[o]);
           }
           // still collisions
-          return new List(h, Array.delete(keys, i), Array.delete(values, i));
+          return new TrieList(h, Array.delete(keys, i), Array.delete(values, i));
         }
       }
     }
@@ -79,14 +80,14 @@ final class List extends TrieNode {
     // same hash, replace or merge
     if(h == hash) {
       for(int i = keys.length; i-- > 0;) {
-        if(eq(k, keys[i], ii)) {
+        if(k.sameKey(keys[i], ii)) {
           // replace value
           final Value[] vs = values.clone();
           vs[i] = v;
-          return new List(h, keys.clone(), vs);
+          return new TrieList(h, keys.clone(), vs);
         }
       }
-      return new List(hash, Array.add(keys, k), Array.add(values, v));
+      return new TrieList(hash, Array.add(keys, k), Array.add(values, v));
     }
 
     // different hash, branch
@@ -97,18 +98,18 @@ final class List extends TrieNode {
       ch[a] = put(h, k, v, l + 1, ii);
       used = 1 << a;
     } else {
-      ch[a] = new Leaf(h, k, v);
+      ch[a] = new TrieLeaf(h, k, v);
       ch[b] = this;
       used = 1 << a | 1 << b;
     }
     // we definitely inserted one value
-    return new Branch(ch, used, size + 1);
+    return new TrieBranch(ch, used, size + 1);
   }
 
   @Override
   Value get(final int h, final Item k, final int l, final InputInfo ii) throws QueryException {
     if(h == hash) for(int i = keys.length; i-- != 0;)
-      if(eq(k, keys[i], ii)) return values[i];
+      if(k.sameKey(keys[i], ii)) return values[i];
     return null;
   }
 
@@ -116,7 +117,7 @@ final class List extends TrieNode {
   boolean contains(final int h, final Item k, final int u, final InputInfo ii)
       throws QueryException {
     if(h == hash) for(int i = keys.length; i-- != 0;)
-      if(eq(k, keys[i], ii)) return true;
+      if(k.sameKey(keys[i], ii)) return true;
     return false;
   }
 
@@ -126,10 +127,10 @@ final class List extends TrieNode {
   }
 
   @Override
-  TrieNode add(final Leaf o, final int l, final InputInfo ii) throws QueryException {
+  TrieNode add(final TrieLeaf o, final int l, final InputInfo ii) throws QueryException {
     if(hash == o.hash) {
-      for(final Item k : keys) if(eq(k, o.key, ii)) return this;
-      return new List(hash, Array.add(keys, o.key), Array.add(values, o.value));
+      for(final Item k : keys) if(k.sameKey(o.key, ii)) return this;
+      return new TrieList(hash, Array.add(keys, o.key), Array.add(values, o.value));
     }
 
     final TrieNode[] ch = new TrieNode[KIDS];
@@ -146,11 +147,11 @@ final class List extends TrieNode {
       nu = 1 << k | 1 << ok;
     }
 
-    return new Branch(ch, nu, size + 1);
+    return new TrieBranch(ch, nu, size + 1);
   }
 
   @Override
-  TrieNode add(final List o, final int l, final InputInfo ii) throws QueryException {
+  TrieNode add(final TrieList o, final int l, final InputInfo ii) throws QueryException {
     if(hash == o.hash) {
       Item[] ks = keys;
       Value[] vs = values;
@@ -158,12 +159,12 @@ final class List extends TrieNode {
       outer: for(int i = 0; i < size; i++) {
         final Item ok = o.keys[i];
         // skip all entries that are overridden
-        for(final Item k : keys) if(eq(k, ok, ii)) continue outer;
+        for(final Item k : keys) if(k.sameKey(ok, ii)) continue outer;
         // key is not in this list, add it
         ks = Array.add(ks, ok);
         vs = Array.add(vs, o.values[i]);
       }
-      return ks == keys ? this : new List(hash, ks, vs);
+      return ks == keys ? this : new TrieList(hash, ks, vs);
     }
 
     final TrieNode[] ch = new TrieNode[KIDS];
@@ -180,16 +181,16 @@ final class List extends TrieNode {
       nu = 1 << k | 1 << ok;
     }
 
-    return new Branch(ch, nu, size + o.size);
+    return new TrieBranch(ch, nu, size + o.size);
   }
 
   @Override
-  TrieNode add(final Branch o, final int l, final InputInfo ii) throws QueryException {
+  TrieNode add(final TrieBranch o, final int l, final InputInfo ii) throws QueryException {
     final int k = key(hash, l);
     final TrieNode[] ch = o.copyKids();
     final TrieNode old = ch[k];
     ch[k] = old == null ? this : old.addAll(this, l + 1, ii);
-    return new Branch(ch, o.used | 1 << k, o.size + size - (old != null ? old.size : 0));
+    return new TrieBranch(ch, o.used | 1 << k, o.size + size - (old != null ? old.size : 0));
   }
 
   @Override
@@ -197,7 +198,7 @@ final class List extends TrieNode {
     try {
       for(int i = 1; i < size; i++) {
         for(int j = i; j-- > 0;) {
-          if(eq(keys[i], keys[j], null)) return false;
+          if(keys[i].sameKey(keys[j], null)) return false;
         }
       }
     } catch(final QueryException ex) {
@@ -244,14 +245,14 @@ final class List extends TrieNode {
 
   @Override
   boolean deep(final InputInfo ii, final TrieNode o, final Collation coll) throws QueryException {
-    if(!(o instanceof List) || size != o.size) return false;
-    final List ol = (List) o;
+    if(!(o instanceof TrieList) || size != o.size) return false;
+    final TrieList ol = (TrieList) o;
 
     // do the evil nested-loop thing
     outer: for(int i = 0; i < size; i++) {
       final Item k = keys[i];
       for(int j = 0; j < size; j++) {
-        if(eq(k, ol.keys[i], ii)) {
+        if(k.sameKey(ol.keys[i], ii)) {
           // check bound value, too
           if(!deep(values[i], ol.values[j], coll, ii)) return false;
           // value matched, continue with next key

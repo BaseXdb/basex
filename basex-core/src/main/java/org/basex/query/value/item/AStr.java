@@ -43,6 +43,11 @@ public abstract class AStr extends Item {
   }
 
   @Override
+  public boolean sameKey(final Item it, final InputInfo ii) throws QueryException {
+    return it.type.isStringOrUntyped() && eq(it, null, null, ii);
+  }
+
+  @Override
   public final int diff(final Item it, final Collation coll, final InputInfo ii)
       throws QueryException {
     return coll == null ? Token.diff(string(ii), it.string(ii)) :

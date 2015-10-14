@@ -54,6 +54,11 @@ public final class Atm extends Item {
   }
 
   @Override
+  public boolean sameKey(final Item it, final InputInfo ii) throws QueryException {
+    return it.type.isStringOrUntyped() && eq(it, null, null, ii);
+  }
+
+  @Override
   public int diff(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
     return it.type.isUntyped() ? coll == null ? Token.diff(value, it.string(ii)) :
       coll.compare(value, it.string(ii)) : -it.diff(this, coll, ii);

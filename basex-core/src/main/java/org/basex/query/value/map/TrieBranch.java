@@ -13,7 +13,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Leo Woerteler
  */
-final class Branch extends TrieNode {
+final class TrieBranch extends TrieNode {
   /** Child array. */
   private final TrieNode[] kids;
   /** Bit array with a bit set for every used slot. */
@@ -25,7 +25,7 @@ final class Branch extends TrieNode {
    * @param used bit array
    * @param size size of this node
    */
-  Branch(final TrieNode[] kids, final int used, final int size) {
+  TrieBranch(final TrieNode[] kids, final int used, final int size) {
     super(size);
     this.kids = kids;
     this.used = used;
@@ -56,13 +56,13 @@ final class Branch extends TrieNode {
       bs = used;
       rem = sub.size;
     } else {
-      nsub = new Leaf(h, k, v);
+      nsub = new TrieLeaf(h, k, v);
       bs = used | 1 << key;
       rem = 0;
     }
     final TrieNode[] ks = copyKids();
     ks[key] = nsub;
-    return new Branch(ks, bs, size - rem + nsub.size);
+    return new TrieBranch(ks, bs, size - rem + nsub.size);
   }
 
   @Override
@@ -80,13 +80,13 @@ final class Branch extends TrieNode {
       if(Integer.bitCount(nu) == 1) {
         final TrieNode single = kids[Integer.numberOfTrailingZeros(nu)];
         // check whether the child depends on the right offset
-        if(!(single instanceof Branch)) return single;
+        if(!(single instanceof TrieBranch)) return single;
       }
     } else nu = used;
 
     final TrieNode[] ks = copyKids();
     ks[key] = nsub;
-    return new Branch(ks, nu, size - 1);
+    return new TrieBranch(ks, nu, size - 1);
   }
 
   @Override
@@ -113,7 +113,7 @@ final class Branch extends TrieNode {
   }
 
   @Override
-  TrieNode add(final Leaf o, final int l, final InputInfo ii) throws QueryException {
+  TrieNode add(final TrieLeaf o, final int l, final InputInfo ii) throws QueryException {
     final int k = key(o.hash, l);
     final TrieNode ch = kids[k], nw;
     if(ch != null) {
@@ -126,11 +126,11 @@ final class Branch extends TrieNode {
     ks[k] = nw;
 
     // we don't replace here, so the size must increase
-    return new Branch(ks, used | 1 << k, size + 1);
+    return new TrieBranch(ks, used | 1 << k, size + 1);
   }
 
   @Override
-  TrieNode add(final List o, final int l, final InputInfo ii) throws QueryException {
+  TrieNode add(final TrieList o, final int l, final InputInfo ii) throws QueryException {
     final int k = key(o.hash, l);
     final TrieNode ch = kids[k], nw;
     int n = o.size;
@@ -145,11 +145,11 @@ final class Branch extends TrieNode {
     ks[k] = nw;
 
     // we don't replace here, so the size must increase
-    return new Branch(ks, used | 1 << k, size + n);
+    return new TrieBranch(ks, used | 1 << k, size + n);
   }
 
   @Override
-  TrieNode add(final Branch o, final int l, final InputInfo ii) throws QueryException {
+  TrieNode add(final TrieBranch o, final int l, final InputInfo ii) throws QueryException {
     TrieNode[] ch = null;
     int nu = used, ns = size;
     final int kl = kids.length;
@@ -165,7 +165,7 @@ final class Branch extends TrieNode {
         }
       }
     }
-    return ch == null ? this : new Branch(ch, nu, ns);
+    return ch == null ? this : new TrieBranch(ch, nu, ns);
   }
 
   @Override
@@ -211,8 +211,8 @@ final class Branch extends TrieNode {
 
   @Override
   boolean deep(final InputInfo ii, final TrieNode o, final Collation coll) throws QueryException {
-    if(!(o instanceof Branch)) return false;
-    final Branch ob = (Branch) o;
+    if(!(o instanceof TrieBranch)) return false;
+    final TrieBranch ob = (TrieBranch) o;
 
     // check bin usage first
     if(used != ob.used) return false;

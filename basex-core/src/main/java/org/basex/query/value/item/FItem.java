@@ -76,6 +76,11 @@ public abstract class FItem extends Item implements XQFunction {
   }
 
   @Override
+  public boolean sameKey(final Item it, final InputInfo ii) throws QueryException {
+    return false;
+  }
+
+  @Override
   public boolean has(final Flag flag) {
     return flag == Flag.UPD && annotations().contains(Annotation.UPDATING);
   }

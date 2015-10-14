@@ -48,7 +48,7 @@ abstract class DateTime extends StandardFunc {
    * @return timezone
    */
   static DTDur zon(final ADate it) {
-    return it.tzDefined() ? new DTDur(0, it.tz()) : null;
+    return it.hasTz() ? new DTDur(0, it.tz()) : null;
   }
 
   /**

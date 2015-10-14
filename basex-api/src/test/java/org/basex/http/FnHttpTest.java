@@ -807,7 +807,7 @@ public class FnHttpTest extends HTTPTest {
     final long es = expected.size();
     for(int e = 0; e < es; e++) {
       final Item exp = expected.get(e), ret = returned.get(e);
-      if(!new Compare().equal(exp, ret)) {
+      if(!new DeepEqual().equal(exp, ret)) {
         final TokenBuilder tb = new TokenBuilder("Result ").addLong(e).add(" differs:\nReturned: ");
         tb.addExt(ret.serialize()).add("\nExpected: ").addExt(exp.serialize());
         fail(tb.toString());

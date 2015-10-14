@@ -44,6 +44,18 @@ public abstract class ANum extends Item {
     return flt();
   }
 
+  @Override
+  public boolean sameKey(final Item it, final InputInfo ii) throws QueryException {
+    if(it instanceof ANum) {
+      final double d1 = dbl(ii), d2 = it.dbl(ii);
+      if(Double.isNaN(d1)) return Double.isNaN(d2);
+      if(Double.isNaN(d2)) return Double.isNaN(d1);
+      if(Double.isInfinite(d1) || Double.isInfinite(d2)) return d1 == d2;
+      return dec(ii).compareTo(it.dec(ii)) == 0;
+    }
+    return false;
+  }
+
   /**
    * Returns a string representation of the value.
    * @return string value

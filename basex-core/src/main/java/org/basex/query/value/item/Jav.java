@@ -50,6 +50,11 @@ public final class Jav extends Item {
   }
 
   @Override
+  public boolean sameKey(final Item it, final InputInfo ii) throws QueryException {
+    return false;
+  }
+
+  @Override
   public int diff(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
     return Token.diff(string(ii), it.string(ii));
   }

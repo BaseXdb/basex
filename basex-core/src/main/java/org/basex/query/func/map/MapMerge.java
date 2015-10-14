@@ -16,15 +16,12 @@ import org.basex.util.*;
 public final class MapMerge extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    // legacy code (obsolete, as only required by map:new)...
-    if(exprs.length == 0) return Map.EMPTY;
-
-    Map map = null;
+    Map map = Map.EMPTY;
     final Iter maps = exprs[0].iter(qc);
     for(Item it; (it = maps.next()) != null;) {
       final Map m = toMap(it);
-      map = map == null ? m : map.addAll(m, ii);
+      map = map == Map.EMPTY ? m : map.addAll(m, ii);
     }
-    return map == null ? Map.EMPTY : map;
+    return map;
   }
 }

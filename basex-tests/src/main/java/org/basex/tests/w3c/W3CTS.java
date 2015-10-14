@@ -405,8 +405,8 @@ public abstract class W3CTS extends Main {
             if(xml || frag) {
               try {
                 final Value v = toValue(expect.replaceAll("^<\\?xml.*?\\?>", "").trim(), frag);
-                if(new Compare().equal(value.iter(), v.iter())) break;
-                if(new Compare().equal(toValue(actual, frag).iter(), v.iter())) break;
+                if(new DeepEqual().equal(value.iter(), v.iter())) break;
+                if(new DeepEqual().equal(toValue(actual, frag).iter(), v.iter())) break;
               } catch(final Throwable ex) {
                 Util.errln('\n' + outname + ':');
                 Util.stack(ex);

@@ -437,7 +437,7 @@ public abstract class Array extends FItem {
       final Iterator<Value> it1 = iterator(0), it2 = o.iterator(0);
       while(it1.hasNext()) {
         final Value v1 = it1.next(), v2 = it2.next();
-        if(v1.size() != v2.size() || !new Compare(ii).collation(coll).equal(v1, v2))
+        if(v1.size() != v2.size() || !new DeepEqual(ii).collation(coll).equal(v1, v2))
           return false;
       }
       return true;

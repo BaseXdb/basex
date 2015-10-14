@@ -31,11 +31,11 @@ abstract class TrieNode {
     @Override
     TrieNode addAll(final TrieNode o, final int l, final InputInfo ii) { return o; }
     @Override
-    TrieNode add(final Leaf o, final int l, final InputInfo ii) { return o; }
+    TrieNode add(final TrieLeaf o, final int l, final InputInfo ii) { return o; }
     @Override
-    TrieNode add(final List o, final int l, final InputInfo ii) { return o; }
+    TrieNode add(final TrieList o, final int l, final InputInfo ii) { return o; }
     @Override
-    TrieNode add(final Branch o, final int l, final InputInfo ii) { return o; }
+    TrieNode add(final TrieBranch o, final int l, final InputInfo ii) { return o; }
     @Override
     boolean verify() { return true; }
     @Override
@@ -50,7 +50,7 @@ abstract class TrieNode {
     boolean deep(final InputInfo ii, final TrieNode o, final Collation coll) { return this == o; }
     @Override
     public TrieNode put(final int h, final Item k, final Value v, final int l,
-        final InputInfo i) { return new Leaf(h, k, v); }
+        final InputInfo i) { return new TrieLeaf(h, k, v); }
     @Override
     void apply(final ValueBuilder vb, final FItem func, final QueryContext qc,
         final InputInfo ii) { }
@@ -139,7 +139,7 @@ abstract class TrieNode {
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  abstract TrieNode add(final Leaf o, final int lvl, final InputInfo ii) throws QueryException;
+  abstract TrieNode add(final TrieLeaf o, final int lvl, final InputInfo ii) throws QueryException;
 
   /**
    * Add an overflow list to this node if the key isn't already used.
@@ -149,7 +149,7 @@ abstract class TrieNode {
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  abstract TrieNode add(final List o, final int lvl, final InputInfo ii) throws QueryException;
+  abstract TrieNode add(final TrieList o, final int lvl, final InputInfo ii) throws QueryException;
 
   /**
    * Add all bindings of the given branch to this node for which the key isn't
@@ -160,7 +160,7 @@ abstract class TrieNode {
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  abstract TrieNode add(final Branch o, final int lvl, final InputInfo ii)
+  abstract TrieNode add(final TrieBranch o, final int lvl, final InputInfo ii)
       throws QueryException;
 
   /**
@@ -221,20 +221,7 @@ abstract class TrieNode {
    */
   static boolean deep(final Value a, final Value b, final Collation coll, final InputInfo ii)
       throws QueryException {
-    return a.size() == b.size() && new Compare(ii).collation(coll).equal(a, b);
-  }
-
-  /**
-   * Compares two items.
-   * @param a first item
-   * @param b second item
-   * @param ii input info
-   * @return {@code true} if both items are equal, {@code false} otherwise
-   * @throws QueryException query exception
-   */
-  static boolean eq(final Item a, final Item b, final InputInfo ii) throws QueryException {
-    return a.equiv(b, null, ii) && (!(a instanceof ADate && b instanceof ADate) ||
-        ((ADate) a).tzDefined() == ((ADate) b).tzDefined());
+    return a.size() == b.size() && new DeepEqual(ii).collation(coll).equal(a, b);
   }
 
   /**

@@ -19,7 +19,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public final class Compare {
+public final class DeepEqual {
   /** Flags. */
   public enum Mode {
     /** Compare all node types. */ ALLNODES,
@@ -36,7 +36,7 @@ public final class Compare {
   /**
    * Constructor.
    */
-  public Compare() {
+  public DeepEqual() {
     this(null);
   }
 
@@ -44,7 +44,7 @@ public final class Compare {
    * Constructor.
    * @param info input info
    */
-  public Compare(final InputInfo info) {
+  public DeepEqual(final InputInfo info) {
     this.info = info;
   }
 
@@ -53,7 +53,7 @@ public final class Compare {
    * @param flag flag
    * @return self reference
    */
-  public Compare flag(final Mode flag) {
+  public DeepEqual flag(final Mode flag) {
     flags.add(flag);
     return this;
   }
@@ -63,7 +63,7 @@ public final class Compare {
    * @param cl collation
    * @return self reference
    */
-  public Compare collation(final Collation cl) {
+  public DeepEqual collation(final Collation cl) {
     coll = cl;
     return this;
   }
