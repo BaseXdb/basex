@@ -23,20 +23,14 @@ public final class ArraySort extends StandardFunc {
 
     final int sz = (int) array.arraySize();
     final ValueList vl = new ValueList(sz);
-    if(exprs.length > 1) {
-      final FItem key = checkArity(exprs[1], 1, qc);
-      for(final Value val : array.members()) vl.add(key.invokeValue(qc, info, val));
-    } else {
-      for(final Value val : array.members()) vl.add(val);
-    }
-
-    final Integer[] order = FnSort.sort(vl, this);
     final ArrayBuilder builder = new ArrayBuilder();
     if(exprs.length > 1) {
-      for(int r = 0; r < sz; r++) builder.append(array.get(order[r]));
+      final FItem key = checkArity(exprs[1], 1, qc);
+      for(final Value value : array.members()) vl.add(key.invokeValue(qc, info, value));
     } else {
-      for(int r = 0; r < sz; r++) builder.append(vl.get(order[r]));
+      for(final Value value : array.members()) vl.add(value.atomValue(qc, info));
     }
+    for(final int order : FnSort.sort(vl, this)) builder.append(array.get(order));
     return builder.freeze();
   }
 }
