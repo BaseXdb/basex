@@ -437,8 +437,7 @@ public final class QT3TS extends Main {
 
   /** Flags for dependencies that are not supported. */
   private static final String NOSUPPORT =
-    "('schema-location-hint','schemaAware','schemaImport'," +
-    "'schemaValidation','staticTyping')";
+    "('schema-location-hint','schemaAware','schemaImport','schemaValidation','staticTyping')";
 
   /**
    * Checks if the current test case is supported.
@@ -460,6 +459,8 @@ public final class QT3TS extends Main {
       "@type = ('xml-version', 'xsd-version') and @value = ('1.1', '1.0:4-') or " +
       // skip limits
       "@type = 'limits' and @value = ('big_integer') or " +
+      // skip default-language
+      "@type = 'default-language' or " +
       // skip non-XQuery tests
       "@type = 'spec' and not(matches(@value, 'XQ\\d\\d\\+'))" +
       "]", ctx).context(test).value().size() == 0;

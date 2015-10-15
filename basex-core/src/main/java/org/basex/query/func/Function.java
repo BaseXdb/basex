@@ -134,6 +134,8 @@ public enum Function {
   /** XQuery function. */
   DEFAULT_COLLATION(FnDefaultCollation.class, "default-collation()", arg(), STR),
   /** XQuery function. */
+  DEFAULT_LANGUAGE(FnDefaultLanguage.class, "default-language()", arg(), LAN),
+  /** XQuery function. */
   DISTINCT_VALUES(FnDistinctValues.class, "distinct-values(items[,collation])",
       arg(AAT_ZM, STR), AAT_ZM),
   /** XQuery function. */

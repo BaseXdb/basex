@@ -2,8 +2,9 @@ package org.basex.query.func.fn;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.util.collation.*;
+import org.basex.query.util.format.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -12,10 +13,9 @@ import org.basex.util.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public final class FnDefaultCollation extends StandardFunc {
+public final class FnDefaultLanguage extends StandardFunc {
   @Override
-  public Uri item(final QueryContext qc, final InputInfo ii) {
-    final Collation coll = sc.collation;
-    return Uri.uri(coll == null ? QueryText.COLLATION_URI : coll.uri());
+  public Str item(final QueryContext qc, final InputInfo ii) {
+    return new Str(Formatter.EN, AtomType.LAN);
   }
 }

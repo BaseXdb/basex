@@ -92,7 +92,7 @@ public final class NameTest extends Test {
       // name wildcard: only check namespace
       case URI: return Token.eq(name.uri(), node.qname(tmpq).uri());
       // check attributes, or check everything
-      default: return type == NodeType.ATT && !name.hasURI() ?
+      default: return type == NodeType.ATT && name.uri().length == 0 ?
         Token.eq(local, node.name()) : name.eq(node.qname(tmpq));
     }
   }

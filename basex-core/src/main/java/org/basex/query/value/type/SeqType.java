@@ -154,6 +154,8 @@ public final class SeqType {
   public static final SeqType URI_ZO = new SeqType(AtomType.URI, Occ.ZERO_ONE);
   /** Zero or more URIs. */
   public static final SeqType URI_ZM = new SeqType(AtomType.URI, Occ.ZERO_MORE);
+  /** Single language. */
+  public static final SeqType LAN = AtomType.LAN.seqType();
   /** Single string. */
   public static final SeqType STR = AtomType.STR.seqType();
   /** Zero or one strings. */

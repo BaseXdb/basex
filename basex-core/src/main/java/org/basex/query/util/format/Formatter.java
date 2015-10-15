@@ -30,7 +30,7 @@ public abstract class Formatter extends FormatUtil {
     "JE", "KE", "KY", "ME", "MS", "NS", "OS", "RS", "SE", "SH", "SS", "TE", "VE", "VS");
 
   /** Default language: English. */
-  private static final byte[] EN = token("en");
+  public static final byte[] EN = token("en");
   /** Formatter instances. */
   private static final TokenObjMap<Formatter> MAP = new TokenObjMap<>();
 
@@ -137,7 +137,7 @@ public abstract class Formatter extends FormatUtil {
       } catch(final QueryException ex) {
         throw CALQNAME_X.get(ii, cal);
       }
-      if(!qnm.hasURI()) {
+      if(qnm.uri().length == 0) {
         int c = -1;
         final byte[] ln = qnm.local();
         final int cl = CALENDARS.length;
