@@ -37,6 +37,8 @@ public class XQueryParse extends StandardFunc {
     public static final BooleanOption PLAN = new BooleanOption("plan", true);
     /** Compile query. */
     public static final BooleanOption COMPILE = new BooleanOption("compile", false);
+    /** Pass on error info. */
+    public static final BooleanOption PASS = new BooleanOption("pass", false);
   }
 
   @Override
@@ -55,11 +57,12 @@ public class XQueryParse extends StandardFunc {
   protected final FElem parse(final QueryContext qc, final byte[] query, final String path)
       throws QueryException {
 
-    boolean compile = false, plan = true;
+    boolean compile = false, plan = true, pass = false;
     if(exprs.length > 1) {
       final Options opts = toOptions(1, Q_OPTIONS, new XQueryOptions(), qc);
       compile = opts.get(XQueryOptions.COMPILE);
       plan = opts.get(XQueryOptions.PLAN);
+      pass = opts.get(XQueryOptions.PASS);
     }
 
     try(final QueryContext qctx = new QueryContext(qc.context)) {
@@ -81,7 +84,8 @@ public class XQueryParse extends StandardFunc {
       if(plan) root.add(qctx.plan());
       return root;
     } catch(final QueryException ex) {
-      throw ex.info(info);
+      if(!pass) ex.info(info);
+      throw ex;
     }
   }
 }
