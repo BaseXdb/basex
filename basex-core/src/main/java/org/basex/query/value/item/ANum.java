@@ -48,8 +48,8 @@ public abstract class ANum extends Item {
   public boolean sameKey(final Item it, final InputInfo ii) throws QueryException {
     if(it instanceof ANum) {
       final double d1 = dbl(ii), d2 = it.dbl(ii);
-      if(Double.isNaN(d1)) return Double.isNaN(d2);
-      if(Double.isNaN(d2)) return Double.isNaN(d1);
+      final boolean n1 = Double.isNaN(d1), n2 = Double.isNaN(d2);
+      if(n1 || n2) return n1 == n2;
       if(Double.isInfinite(d1) || Double.isInfinite(d2)) return d1 == d2;
       return dec(ii).compareTo(it.dec(ii)) == 0;
     }
