@@ -48,7 +48,7 @@ public final class SAXWrapper extends SingleParser {
   @Override
   public void parse() throws IOException {
     final InputSource is = wrap(saxs.getInputSource());
-    final String in = saxs.getSystemId() == null ? DOTS : saxs.getSystemId();
+    //final String in = saxs.getSystemId() == null ? DOTS : saxs.getSystemId();
 
     try {
       XMLReader r = saxs.getXMLReader();
@@ -78,7 +78,7 @@ public final class SAXWrapper extends SingleParser {
       if(is != null) r.parse(is);
       else r.parse(saxs.getSystemId());
     } catch(final SAXParseException ex) {
-      final String msg = Util.info(SCANPOS_X_X, in, ex.getLineNumber(),
+      final String msg = Util.info(SCANPOS_X_X, source, ex.getLineNumber(),
           ex.getColumnNumber()) + COLS + Util.message(ex);
       throw new IOException(msg, ex);
     } catch(final ProcException ex) {
@@ -86,7 +86,7 @@ public final class SAXWrapper extends SingleParser {
     } catch(final Exception ex) {
       // occurs, e.g. if document encoding is invalid:
       // prefix message with source id
-      final String msg = '"' + in + '"' + COLS + Util.message(ex);
+      final String msg = "\"" + source + '"' + COLS + Util.message(ex);
       // wrap and return original message
       throw new IOException(msg, ex);
     } finally {
