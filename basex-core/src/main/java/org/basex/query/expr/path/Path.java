@@ -869,7 +869,16 @@ public abstract class Path extends ParseExpr {
   public final Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
       throws QueryException {
 
-    boolean changed = inlineAll(qc, scp, steps, var, ex);
+    // #1202: during inlining, expressions will be optimized, which are based on the context value
+    boolean changed = false;
+    final Value init = qc.value;
+    qc.value = null;
+    try {
+      changed = inlineAll(qc, scp, steps, var, ex);
+    } finally {
+      qc.value = init;
+    }
+
     if(root != null) {
       final Expr rt = root.inline(qc, scp, var, ex);
       if(rt != null) {

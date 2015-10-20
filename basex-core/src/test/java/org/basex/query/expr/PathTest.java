@@ -205,4 +205,12 @@ public final class PathTest extends AdvancedQueryTest {
     execute(new Add("a.xml", "<c><b/></c>"));
     query("//b[/a]", "<b/>\n<b/>");
   }
+
+  /**
+   * Utilization of database statistics (GH-1202).
+   */
+  @Test public void nameIndex() {
+    execute(new CreateDB(NAME, "<x/>"));
+    query("let $x := 'e' return element e {}/self::e[name() = $x]", "<e/>");
+  }
 }
