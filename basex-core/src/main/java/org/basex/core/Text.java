@@ -1120,8 +1120,8 @@ public interface Text {
   String MERGE_TYPES = lang("merge_types");
   /** Merge type information. */
   String INCLUDE_STRINGS = lang("include_strings");
-  /** Unescape characters. */
-  String UNESCAPE_CHARS = lang("unescape_chars");
+  /** Escape characters. */
+  String ESCAPE_CHARS = lang("escape_chars");
   /** Liberal parsing. */
   String LIBERAL_PARSING = lang("liberal_parsing");
   /** Backslash. */

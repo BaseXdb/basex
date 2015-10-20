@@ -121,10 +121,10 @@ public final class JsonModuleTest extends AdvancedQueryTest {
         "<foo test=\"asdf\"/>");
     query("array:size(json:parse('[\"foo\",{\"test\":\"asdf\"}]', map {'format':'map'}))",
         "2");
-    query("json:parse('\"\\t\\u000A\"', map {'format':'map','unescape':false(),'liberal':true()})",
+    query("json:parse('\"\\t\\u000A\"', map {'format':'map','escape':true(),'liberal':true()})",
         "\\t\\u000A");
     query("string-to-codepoints(json:parse('\"\\t\\u000A\"'," +
-        "  map {'format':'map','unescape':true(),'liberal':true()}))", "9\n10");
+        "  map {'format':'map','escape':false(),'liberal':true()}))", "9\n10");
     error("json:parse('42', map {'spec':'garbage'})", INVALIDOPT_X);
   }
 

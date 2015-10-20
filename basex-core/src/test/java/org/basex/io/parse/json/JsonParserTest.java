@@ -79,14 +79,14 @@ public final class JsonParserTest {
     parse("\"\\b\\f\\t\\r\\n\"", "\"\uFFFD\uFFFD\\t\\r\\n\"", false);
     parse("\"\\u0000\\u001F\"", "\"\uFFFD\uFFFD\"", false);
 
-    unescape("\"\\b\\f\\t\\r\\n\"", "\"\\\\b\\\\f\\\\t\\\\r\\\\n\"");
+    escape("\"\\b\\f\\t\\r\\n\"", "\"\\\\b\\\\f\\\\t\\\\r\\\\n\"");
     // Unicode in JSON notation
-    unescape("\"\\uD853\\uDF5C\"", "\"\\\\uD853\\\\uDF5C\"");
-    unescape("\"\\uD853asdf\"", "\"\\\\uD853asdf\"");
-    unescape("\"\\uD853\"", "\"\\\\uD853\"");
+    escape("\"\\uD853\\uDF5C\"", "\"\\\\uD853\\\\uDF5C\"");
+    escape("\"\\uD853asdf\"", "\"\\\\uD853asdf\"");
+    escape("\"\\uD853\"", "\"\\\\uD853\"");
     // Unicode in Java notation
-    unescape("\"\u00E4\\t\"", "\"\u00E4\\\\t\"");
-    unescape("\"\u00E4\\u00E4\\t\"", "\"\u00E4\\\\u00E4\\\\t\"");
+    escape("\"\u00E4\\t\"", "\"\u00E4\\\\t\"");
+    escape("\"\u00E4\\u00E4\\t\"", "\"\u00E4\\\\u00E4\\\\t\"");
 
     error("\"\\u0A", false);
     error("\"\\uXX0A\"", false);
@@ -178,17 +178,17 @@ public final class JsonParserTest {
    */
   private static void parse(final String json, final String exp, final boolean liberal)
       throws QueryIOException {
-    assertEquals(exp, JsonStringConverter.toString(json, liberal, true));
+    assertEquals(exp, JsonStringConverter.toString(json, liberal, false));
   }
 
   /**
-   * Checks if the given JSON string is correct and produces the given output with unescaping
-   * deactivated.
+   * Checks if the given JSON string is correct and produces the given output with escaping
+   * activated.
    * @param json JSON string
    * @param exp expected output
    * @throws QueryIOException parse error
    */
-  private static void unescape(final String json, final String exp) throws QueryIOException {
-    assertEquals(exp, JsonStringConverter.toString(json, false, false));
+  private static void escape(final String json, final String exp) throws QueryIOException {
+    assertEquals(exp, JsonStringConverter.toString(json, false, true));
   }
 }

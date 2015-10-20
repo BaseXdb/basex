@@ -12,7 +12,7 @@ import org.basex.util.options.*;
  */
 public final class JsonParserOptions extends JsonOptions {
   /** Option: unescape special characters (parse-json, json-to-xml). */
-  public static final BooleanOption UNESCAPE = new BooleanOption("unescape", true);
+  public static final BooleanOption ESCAPE = new BooleanOption("escape", false);
   /** Option: liberal parsing (parse-json, json-to-xml). */
   public static final BooleanOption LIBERAL = new BooleanOption("liberal", false);
   /** Option: fallback function (parse-json, json-to-xml). */

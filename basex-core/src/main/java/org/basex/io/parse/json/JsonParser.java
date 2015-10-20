@@ -32,8 +32,8 @@ final class JsonParser extends InputParser {
   private final JsonConverter conv;
   /** Spec. */
   private final boolean liberal;
-  /** Unescape flag. */
-  private final boolean unescape;
+  /** Escape flag. */
+  private final boolean escape;
   /** Duplicates. */
   private final JsonDuplicates duplicates;
   /** Token builder for string literals. */
@@ -48,7 +48,7 @@ final class JsonParser extends InputParser {
   private JsonParser(final String in, final JsonParserOptions opts, final JsonConverter conv) {
     super(in);
     liberal = opts.get(JsonParserOptions.LIBERAL);
-    unescape = opts.get(JsonParserOptions.UNESCAPE);
+    escape = opts.get(JsonParserOptions.ESCAPE);
     final JsonDuplicates dupl = opts.get(JsonParserOptions.DUPLICATES);
     duplicates = dupl != null ? dupl : opts.get(JsonOptions.FORMAT) == JsonFormat.BASIC ?
       JsonDuplicates.RETAIN : JsonDuplicates.USE_FIRST;
@@ -281,7 +281,7 @@ final class JsonParser extends InputParser {
       }
 
       if(ch == '\\') {
-        if(!unescape) {
+        if(escape) {
           if(high != 0) {
             tb.add(high);
             high = 0;
@@ -297,32 +297,23 @@ final class JsonParser extends InputParser {
             ch = n;
             break;
           case 'b':
-            ch = unescape ? '\b' : 'b';
+            ch = escape ? 'b' : '\b';
             break;
           case 'f':
-            ch = unescape ? '\f' : 'f';
+            ch = escape ? 'f' : '\f';
             break;
           case 't':
-            ch = unescape ? '\t' : 't';
+            ch = escape ? 't' : '\t';
             break;
           case 'r':
-            ch = unescape ? '\r' : 'r';
+            ch = escape ? 'r' : '\r';
             break;
           case 'n':
-            ch = unescape ? '\n' : 'n';
+            ch = escape ? 'n' : '\n';
             break;
           case 'u':
             if(pos + 4 >= length) throw eof(", expected four-digit hex value");
-            if(unescape) {
-              ch = 0;
-              for(int i = 0; i < 4; i++) {
-                final char x = consume();
-                if(x >= '0' && x <= '9')      ch = 16 * ch + x      - '0';
-                else if(x >= 'a' && x <= 'f') ch = 16 * ch + x + 10 - 'a';
-                else if(x >= 'A' && x <= 'F') ch = 16 * ch + x + 10 - 'A';
-                else throw error("Illegal hexadecimal digit: '%'", x);
-              }
-            } else {
+            if(escape) {
               tb.add('u');
               for(int i = 0; i < 4; i++) {
                 final char x = consume();
@@ -331,6 +322,14 @@ final class JsonParser extends InputParser {
                 } else throw error("Illegal hexadecimal digit: '%'", x);
               }
               continue;
+            }
+            ch = 0;
+            for(int i = 0; i < 4; i++) {
+              final char x = consume();
+              if(x >= '0' && x <= '9')      ch = 16 * ch + x      - '0';
+              else if(x >= 'a' && x <= 'f') ch = 16 * ch + x + 10 - 'a';
+              else if(x >= 'A' && x <= 'F') ch = 16 * ch + x + 10 - 'A';
+              else throw error("Illegal hexadecimal digit: '%'", x);
             }
             break;
           default:

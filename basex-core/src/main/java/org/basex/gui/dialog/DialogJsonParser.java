@@ -41,8 +41,8 @@ final class DialogJsonParser extends DialogParser {
   private final BaseXCombo format;
   /** JSON: liberal. */
   private final BaseXCheckBox liberal;
-  /** JSON: unescape. */
-  private final BaseXCheckBox unescape;
+  /** JSON: escape. */
+  private final BaseXCheckBox escape;
   /** JSON: lax name conversion. */
   private final BaseXCheckBox lax;
   /** JSON: merge type information. */
@@ -69,7 +69,7 @@ final class DialogJsonParser extends DialogParser {
     format.setSelectedItem(jopts.get(JsonOptions.FORMAT));
 
     liberal = new BaseXCheckBox(LIBERAL_PARSING, JsonParserOptions.LIBERAL, jopts, d);
-    unescape = new BaseXCheckBox(UNESCAPE_CHARS, JsonParserOptions.UNESCAPE, jopts, d);
+    escape = new BaseXCheckBox(ESCAPE_CHARS, JsonParserOptions.ESCAPE, jopts, d);
     merge = new BaseXCheckBox(MERGE_TYPES, JsonOptions.MERGE, jopts, d);
     strings = new BaseXCheckBox(INCLUDE_STRINGS, JsonOptions.STRINGS, jopts, d);
     lax = new BaseXCheckBox(LAX_NAME_CONVERSION, JsonOptions.LAX, jopts, d);
@@ -84,7 +84,7 @@ final class DialogJsonParser extends DialogParser {
 
     p = new BaseXBack(new TableLayout(5, 1));
     p.add(liberal);
-    p.add(unescape);
+    p.add(escape);
     p.add(merge);
     p.add(strings);
     p.add(lax);
@@ -129,7 +129,7 @@ final class DialogJsonParser extends DialogParser {
     final String enc = encoding.getSelectedItem();
     jopts.set(JsonParserOptions.ENCODING, enc.equals(Strings.UTF8) ? null : enc);
     jopts.set(JsonParserOptions.LIBERAL, liberal.isSelected());
-    jopts.set(JsonParserOptions.UNESCAPE, unescape.isSelected());
+    jopts.set(JsonParserOptions.ESCAPE, escape.isSelected());
     jopts.set(JsonOptions.MERGE, merge.isSelected());
     jopts.set(JsonOptions.STRINGS, strings.isSelected());
     jopts.set(JsonOptions.FORMAT, format.getSelectedItem());

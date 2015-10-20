@@ -51,7 +51,7 @@ public class FnParseJson extends Parse {
       }
     }
 
-    final boolean unesc = opts.get(JsonParserOptions.UNESCAPE);
+    final boolean esc = opts.get(JsonParserOptions.ESCAPE);
     final FuncItem fb = opts.get(JsonParserOptions.FALLBACK);
     final FItem fallback;
     if(fb == null) {
@@ -67,7 +67,7 @@ public class FnParseJson extends Parse {
     try {
       opts.set(JsonOptions.FORMAT, xml ? JsonFormat.BASIC : JsonFormat.MAP);
       final JsonConverter conv = JsonConverter.get(opts);
-      if(unesc && fallback != null) conv.fallback(new JsonFallback() {
+      if(!esc && fallback != null) conv.fallback(new JsonFallback() {
         @Override
         public String convert(final String string) {
           try {
