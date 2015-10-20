@@ -286,43 +286,31 @@ final class JsonParser extends InputParser {
             tb.add(high);
             high = 0;
           }
-          tb.add('\\');
         }
 
-        final int n = consume();
-        switch(n) {
-          case '/':
+        ch = consume();
+        switch(ch) {
           case '\\':
+          case '/':
           case '"':
-            ch = n;
             break;
           case 'b':
-            ch = escape ? 'b' : '\b';
+            ch = '\b';
             break;
           case 'f':
-            ch = escape ? 'f' : '\f';
-            break;
-          case 't':
-            ch = escape ? 't' : '\t';
-            break;
-          case 'r':
-            ch = escape ? 'r' : '\r';
+            ch = '\f';
             break;
           case 'n':
-            ch = escape ? 'n' : '\n';
+            ch = '\n';
+            break;
+          case 'r':
+            ch = '\r';
+            break;
+          case 't':
+            ch = '\t';
             break;
           case 'u':
             if(pos + 4 >= length) throw eof(", expected four-digit hex value");
-            if(escape) {
-              tb.add('u');
-              for(int i = 0; i < 4; i++) {
-                final char x = consume();
-                if(x >= '0' && x <= '9' || x >= 'a' && x <= 'f' || x >= 'A' && x <= 'F') {
-                  tb.add(x);
-                } else throw error("Illegal hexadecimal digit: '%'", x);
-              }
-              continue;
-            }
             ch = 0;
             for(int i = 0; i < 4; i++) {
               final char x = consume();
@@ -332,8 +320,9 @@ final class JsonParser extends InputParser {
               else throw error("Illegal hexadecimal digit: '%'", x);
             }
             break;
+
           default:
-            throw error("Unknown character escape: '\\%'", n);
+            throw error("Unknown character escape: '\\%'", ch);
         }
       } else if(!liberal && ch <= 0x1F) {
         throw error("Non-escaped control character: '\\%'", CTRL[ch]);
@@ -361,7 +350,26 @@ final class JsonParser extends InputParser {
    * @param e end position
    */
   private void add(final int ch, final int s, final int e) {
-    if(XMLToken.valid(ch)) {
+    if(escape) {
+      if(ch == '\\') {
+        tb.add("\\\\");
+      } else if(ch == '\b') {
+        tb.add("\\b");
+      } else if(ch == '\f') {
+        tb.add("\\f");
+      } else if(ch == '\n') {
+        tb.add("\\n");
+      } else if(ch == '\r') {
+        tb.add("\\r");
+      } else if(ch == '\t') {
+        tb.add("\\t");
+      } else if(XMLToken.valid(ch)) {
+        tb.add(ch);
+      } else {
+        tb.add('\\').add('u').add(HEX[ch >> 12 & 0xF]).add(HEX[ch >> 8 & 0xF]);
+        tb.add(HEX[ch >> 4 & 0xF]).add(HEX[ch & 0xF]);
+      }
+    } else if(XMLToken.valid(ch)) {
       tb.add(ch);
     } else if(conv.fallback == null) {
       tb.add(INVALID);
