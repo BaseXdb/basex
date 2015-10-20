@@ -79,14 +79,16 @@ public final class JsonParserTest {
     parse("\"\\b\\f\\t\\r\\n\"", "\"\uFFFD\uFFFD\\t\\r\\n\"", false);
     parse("\"\\u0000\\u001F\"", "\"\uFFFD\uFFFD\"", false);
 
+    escape("\"\\u0008\\u000c\\u0009\\u000d\\u000a\"", "\"\\\\b\\\\f\\\\t\\\\r\\\\n\"");
     escape("\"\\b\\f\\t\\r\\n\"", "\"\\\\b\\\\f\\\\t\\\\r\\\\n\"");
     // Unicode in JSON notation
-    escape("\"\\uD853\\uDF5C\"", "\"\\\\uD853\\\\uDF5C\"");
+    //escape("\"\\uD853\\uDF5C\"", "\"\\\\uD853\\\\uDF5C\"");
     escape("\"\\uD853asdf\"", "\"\\\\uD853asdf\"");
     escape("\"\\uD853\"", "\"\\\\uD853\"");
+
     // Unicode in Java notation
     escape("\"\u00E4\\t\"", "\"\u00E4\\\\t\"");
-    escape("\"\u00E4\\u00E4\\t\"", "\"\u00E4\\\\u00E4\\\\t\"");
+    escape("\"\u00E4\\u00E4\\t\"", "\"\u00E4\u00E4\\\\t\"");
 
     error("\"\\u0A", false);
     error("\"\\uXX0A\"", false);
