@@ -213,4 +213,12 @@ public final class PathTest extends AdvancedQueryTest {
     execute(new CreateDB(NAME, "<x/>"));
     query("let $x := 'e' return element e {}/self::e[name() = $x]", "<e/>");
   }
+
+  /**
+   * Retrieve double values from disk (GH-1206).
+   */
+  @Test public void diskDoubles() {
+    execute(new CreateDB(NAME, "<x>a</x>"));
+    query("/* castable as xs:double", "false");
+  }
 }

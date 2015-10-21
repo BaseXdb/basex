@@ -149,15 +149,18 @@ public class DBNode extends ANode {
 
   @Override
   public final double dbl(final InputInfo ii) throws QueryException {
+    // try to directly retrieve inlined numeric value from XML storage
+    double d = Double.NaN;
     if(type == NodeType.ELM) {
       final int as = data.attSize(pre, Data.ELEM);
       if(data.size(pre, Data.ELEM) - as == 1 && data.kind(pre + as) == Data.TEXT) {
-        return data.textDbl(pre + as, true);
+        d = data.textDbl(pre + as, true);
       }
     } else if(type == NodeType.TXT || type == NodeType.ATT) {
-      return data.textDbl(pre, type == NodeType.TXT);
+      d = data.textDbl(pre, type == NodeType.TXT);
     }
-    return Dbl.parse(data.atom(pre), ii);
+    // GH-1206: parse invalid values again
+    return Double.isNaN(d) ? Dbl.parse(data.atom(pre), ii) : d;
   }
 
   @Override
