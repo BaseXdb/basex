@@ -408,14 +408,19 @@ public abstract class Array extends FItem {
     tb.add(']');
   }
 
-  /**
-   * Checks if the array has the given type.
-   * @param t type
-   * @return {@code true} if the type fits, {@code false} otherwise
-   */
-  public boolean hasType(final ArrayType t) {
-    if(!t.retType.eq(SeqType.ITEM_ZM)) {
-      for(final Value val : members()) if(!t.retType.instance(val)) return false;
+  @Override
+  public boolean instanceOf(final Type tp) {
+    if(tp.eq(AtomType.ITEM)) return true;
+    if(!(tp instanceof FuncType) || tp instanceof MapType) return false;
+
+    final FuncType ft = (FuncType) tp;
+    final SeqType[] at = ft.argTypes;
+    if(at != null && (at.length != 1 || !at[0].instanceOf(SeqType.ITR))) return false;
+    final SeqType ret = ft.retType;
+    if(ret != null && !ret.eq(SeqType.ITEM_ZM)) {
+      for(final Value val : members()) {
+        if(!ret.instance(val)) return false;
+      }
     }
     return true;
   }
@@ -423,8 +428,9 @@ public abstract class Array extends FItem {
   @Override
   public FItem coerceTo(final FuncType ft, final QueryContext qc, final InputInfo ii,
       final boolean opt) throws QueryException {
-    if(!(ft instanceof ArrayType) || !hasType((ArrayType) ft)) throw castError(ii, this, ft);
-    return this;
+
+    if(instanceOf(ft)) return this;
+    throw castError(ii, this, ft);
   }
 
   @Override

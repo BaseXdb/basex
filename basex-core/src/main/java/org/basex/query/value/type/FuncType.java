@@ -36,8 +36,8 @@ public class FuncType implements Type {
   /**
    * Constructor.
    * @param anns annotations (can be {@code null})
-   * @param argTypes argument types
-   * @param retType return type
+   * @param argTypes argument types (can be {@code null})
+   * @param retType return type (can be {@code null})
    */
   FuncType(final AnnList anns, final SeqType[] argTypes, final SeqType retType) {
     this.anns = anns;

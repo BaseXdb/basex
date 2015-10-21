@@ -103,7 +103,7 @@ public final class TypeCheck extends Single {
           c = 0;
 
           final Item it = iter.next();
-          if(it == null || st.instance(it, true)) {
+          if(it == null || st.instance(it)) {
             cache.add(it);
           } else {
             st.promote(qc, sc, info, it, false, cache);

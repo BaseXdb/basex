@@ -117,7 +117,7 @@ public final class StaticVar extends StaticDecl {
   }
 
   /**
-   * Binds an expression to this variable from outside the query.
+   * Binds an external value.
    * @param value value to bind
    * @param qc query context
    * @throws QueryException query exception

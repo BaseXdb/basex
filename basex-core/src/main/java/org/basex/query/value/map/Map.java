@@ -132,21 +132,24 @@ public final class Map extends FItem {
     return upd == map.root ? map : new Map(upd);
   }
 
-  /**
-   * Checks if the map has the given type.
-   * @param mt type
-   * @return {@code true} if the type fits, {@code false} otherwise
-   */
-  public boolean hasType(final MapType mt) {
-    return root.hasType(mt.keyType == AtomType.AAT ? null : mt.keyType,
-        mt.retType.eq(SeqType.ITEM_ZM) ? null : mt.retType);
+  @Override
+  public boolean instanceOf(final Type tp) {
+    if(tp.eq(AtomType.ITEM)) return true;
+    if(!(tp instanceof FuncType) || tp instanceof ArrayType) return false;
+
+    final FuncType ft = (FuncType) tp;
+    final SeqType[] at = ft.argTypes;
+    if(at != null && (at.length != 1 || !at[0].one())) return false;
+    final SeqType ret = ft.retType;
+    return ret == null || ret.eq(SeqType.ITEM_ZM) || root.instanceOf(ret);
   }
 
   @Override
   public Map coerceTo(final FuncType ft, final QueryContext qc, final InputInfo ii,
       final boolean opt) throws QueryException {
-    if(!(ft instanceof MapType) || !hasType((MapType) ft)) throw castError(ii, this, ft);
-    return this;
+
+    if(instanceOf(ft)) return this;
+    throw castError(ii, this, ft);
   }
 
   /**

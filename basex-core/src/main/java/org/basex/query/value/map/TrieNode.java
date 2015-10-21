@@ -43,7 +43,7 @@ abstract class TrieNode {
     @Override
     void values(final ValueBuilder vs) { }
     @Override
-    boolean hasType(final AtomType kt, final SeqType vt) { return true; }
+    boolean instanceOf(final SeqType vt) { return true; }
     @Override
     int hash(final InputInfo ii) { return 0; }
     @Override
@@ -203,12 +203,11 @@ abstract class TrieNode {
   }
 
   /**
-   * Checks if the map has the specified key and value type.
-   * @param kt key type
+   * Checks if the map has the specified value type.
    * @param vt value type
    * @return {@code true} if the type fits, {@code false} otherwise
    */
-  abstract boolean hasType(final AtomType kt, final SeqType vt);
+  abstract boolean instanceOf(final SeqType vt);
 
   /**
    * Compares two values.

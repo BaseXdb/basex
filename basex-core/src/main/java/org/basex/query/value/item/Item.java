@@ -13,7 +13,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.Type.ID;
+import org.basex.query.value.type.Type.*;
 import org.basex.util.*;
 
 /**
@@ -132,6 +132,15 @@ public abstract class Item extends Value {
    */
   public double dbl(final InputInfo ii) throws QueryException {
     return Dbl.parse(string(ii), ii);
+  }
+
+  /**
+   * Checks if this item is instance of the specified type.
+   * @param tp type
+   * @return result of check
+   */
+  public boolean instanceOf(final Type tp) {
+    return type.instanceOf(tp);
   }
 
   /**

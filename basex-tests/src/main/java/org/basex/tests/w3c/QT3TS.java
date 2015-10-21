@@ -570,7 +570,7 @@ public final class QT3TS extends Main {
       final String msg = test(result, it);
       if(msg != null) tb.add(tb.isEmpty() ? "" : ", ").add(msg);
     }
-    return tb.isEmpty() ? "Error" : null;
+    return tb.isEmpty() ? "not(...)" : null;
   }
 
   /**

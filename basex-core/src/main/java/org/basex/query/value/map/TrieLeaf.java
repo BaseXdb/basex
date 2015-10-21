@@ -167,8 +167,8 @@ final class TrieLeaf extends TrieNode {
   }
 
   @Override
-  boolean hasType(final AtomType kt, final SeqType vt) {
-    return (kt == null || key.type.instanceOf(kt)) && (vt == null || vt.instance(value));
+  boolean instanceOf(final SeqType vt) {
+    return vt == null || vt.instance(value);
   }
 
   @Override
