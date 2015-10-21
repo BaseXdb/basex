@@ -166,6 +166,11 @@ public final class MainOptions extends Options {
   /** Maximum number of index occurrences to print. */
   public static final NumberOption MAXSTAT = new NumberOption("MAXSTAT", 30);
 
+  // Authorization
+  
+  /** Allow for custom Authorization header */
+  public static final BooleanOption CUSTOMAUTH = new BooleanOption("CUSTOMAUTH", false);
+
   // Other
 
   /** Options that are adopted from parent options. */
