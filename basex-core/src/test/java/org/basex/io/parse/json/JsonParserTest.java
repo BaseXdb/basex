@@ -73,11 +73,11 @@ public final class JsonParserTest {
     parse("\"\\u000A\"", "\"\\n\"", false);
     parse("\"\n\"", "\"\\n\"", true);
     parse("\"\uD834\"", "\"\uFFFD\"", false);
-    parse("\"\uD853\uFFFF\"", "\"\uFFFD\uFFFD\"", false);
     parse("\"\uFFFF\"", "\"\uFFFD\"", false);
-    parse("\"\uD853a\"", "\"\uFFFDa\"", false);
     parse("\"\\b\\f\\t\\r\\n\"", "\"\uFFFD\uFFFD\\t\\r\\n\"", false);
     parse("\"\\u0000\\u001F\"", "\"\uFFFD\uFFFD\"", false);
+    parse("\"\uD853\uFFFF\"", "\"\uFFFD\uFFFD\"", false);
+    parse("\"\uD853a\"", "\"\uFFFDa\"", false);
 
     escape("\"\\u0008\\u000c\\u0009\\u000d\\u000a\"", "\"\\\\b\\\\f\\\\t\\\\r\\\\n\"");
     escape("\"\\b\\f\\t\\r\\n\"", "\"\\\\b\\\\f\\\\t\\\\r\\\\n\"");

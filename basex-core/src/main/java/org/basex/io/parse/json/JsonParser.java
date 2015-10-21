@@ -274,6 +274,7 @@ final class JsonParser extends InputParser {
     while(pos < length) {
       final int p = pos;
       int ch = consume();
+
       // string is closed..
       if(ch == '"') {
         // unpaired surrogate?
@@ -328,8 +329,8 @@ final class JsonParser extends InputParser {
         if(ch >= 0xDC00 && ch <= 0xDFFF) {
           // compute resulting codepoint
           ch = (high - 0xD800 << 10) + ch - 0xDC00 + 0x10000;
-        } else if(escape) {
-          // add invalid high surrogate, treat low surrogate as next character
+        } else {
+          // add invalid high surrogate, treat expected low surrogate as new character
           add(high, p, pos);
         }
         high = 0;
