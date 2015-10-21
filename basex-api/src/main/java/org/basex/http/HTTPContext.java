@@ -118,7 +118,11 @@ public final class HTTPContext {
 
     final String[] ams = Strings.split(value, ' ', 2);
     final AuthMethod am = StaticOptions.AUTHMETHOD.get(ams[0]);
-    if(am == null) throw new BaseXException(WHICHAUTH, value);
+    if(am == null){
+      if(StaticOptions.CUSTOMAUTH.value()) return;
+      else throw new BaseXException(WHICHAUTH, value);
+    } 
+    
 
     // overwrite credentials with client data (basic or digest)
     if(am == AuthMethod.BASIC) {
