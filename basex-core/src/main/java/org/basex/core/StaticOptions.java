@@ -101,6 +101,9 @@ public final class StaticOptions extends Options {
       return name.substring(0, 1) + name.substring(1).toLowerCase(Locale.ENGLISH);
     }
   }
+  
+  /** Allow for custom Authorization header */
+  public static final BooleanOption CUSTOMAUTH = new BooleanOption("CUSTOMAUTH", false);
 
   /**
    * Constructor, adopting system properties starting with "org.basex.".
