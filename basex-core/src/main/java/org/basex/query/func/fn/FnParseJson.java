@@ -44,11 +44,7 @@ public class FnParseJson extends Parse {
     final JsonParserOptions opts = new JsonParserOptions();
     if(exprs.length > 1) {
       final Map options = toMap(exprs[1], qc);
-      try {
-        new FuncOptions(null, info).acceptUnknown().parse(options, opts);
-      } catch(final QueryException ex) {
-        throw JSON_OPT_X.get(ii, ex.getLocalizedMessage());
-      }
+      new FuncOptions(null, info).acceptUnknown().parse(options, opts);
     }
 
     final boolean esc = opts.get(JsonParserOptions.ESCAPE);
@@ -57,12 +53,10 @@ public class FnParseJson extends Parse {
     if(fb == null) {
       fallback = null;
     } else {
-      try {
-        fallback = STRFUNC.cast(fb, qc, sc, ii);
-      } catch(final QueryException ex) {
-        throw JSON_OPT_X.get(ii, ex.getLocalizedMessage());
-      }
+      fallback = STRFUNC.cast(fb, qc, sc, ii);
     }
+    if(esc && fallback != null) throw JSON_OPT_X.get(ii,
+        "Escaping cannot be combined with a fallback function.");
 
     try {
       opts.set(JsonOptions.FORMAT, xml ? JsonFormat.BASIC : JsonFormat.MAP);
@@ -79,11 +73,7 @@ public class FnParseJson extends Parse {
       });
       return conv.convert(json, null);
     } catch(final QueryRTException ex) {
-      final QueryException qe = ex.getCause();
-      final QueryError err = qe.error();
-      if(err != INVPROMOTE_X_X && err != INVPROMOTE_X_X_X) throw qe;
-      Util.debug(ex);
-      throw JSON_OPT_X.get(ii, qe.getLocalizedMessage());
+      throw ex.getCause();
     } catch(final QueryIOException ex) {
       Util.debug(ex);
       final QueryException qe = ex.getCause(info);

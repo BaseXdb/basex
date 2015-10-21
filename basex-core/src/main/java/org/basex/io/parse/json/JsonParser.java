@@ -274,20 +274,16 @@ final class JsonParser extends InputParser {
     while(pos < length) {
       final int p = pos;
       int ch = consume();
+      // string is closed..
       if(ch == '"') {
+        // unpaired surrogate?
         if(high != 0) add(high, pos - 7, p);
         skipWs();
         return tb.toArray();
       }
 
+      // escape sequence
       if(ch == '\\') {
-        if(escape) {
-          if(high != 0) {
-            tb.add(high);
-            high = 0;
-          }
-        }
-
         ch = consume();
         switch(ch) {
           case '\\':
@@ -329,12 +325,18 @@ final class JsonParser extends InputParser {
       }
 
       if(high != 0) {
-        if(ch >= 0xDC00 && ch <= 0xDFFF) ch = (high - 0xD800 << 10) + ch - 0xDC00 + 0x10000;
-        else add(high, p, pos);
+        if(ch >= 0xDC00 && ch <= 0xDFFF) {
+          // compute resulting codepoint
+          ch = (high - 0xD800 << 10) + ch - 0xDC00 + 0x10000;
+        } else if(escape) {
+          // add invalid high surrogate, treat low surrogate as next character
+          add(high, p, pos);
+        }
         high = 0;
       }
 
       if(ch >= 0xD800 && ch <= 0xDBFF) {
+        // remember high surrogate
         high = (char) ch;
       } else {
         add(ch, p, pos);

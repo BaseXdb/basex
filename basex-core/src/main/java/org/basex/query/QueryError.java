@@ -566,6 +566,7 @@ public enum QueryError {
   ONEORMORE(FORG, 4, "One or more values expected."),
   /** FORG0005. */
   EXACTLYONE(FORG, 5, "Exactly one value expected."),
+
   /** FORG0006. */
   EXPTYPE_X_X_X(FORG, 6, "% expected, % found: %."),
   /** FORG0006. */
@@ -608,8 +609,6 @@ public enum QueryError {
   INVBASEDIG_X_X(FORG, 6, "Invalid digit for base %: %."),
   /** FORG0006. */
   ERRFORMAT_X_X(FORG, 6, "%: %."),
-  /** FORG0006. */
-  INVALIDOPT_X(FORG, 6, "%"),
   /** FORG0006. */
   INVALIDOPTION_X(FORG, 6, "Unknown option '%'."),
 
@@ -971,7 +970,6 @@ public enum QueryError {
   STRQNM_X_X(XPTY, 4, "String or QName expected, % found: %."),
   /** XPTY0004. */
   CPIWRONG_X_X(XPTY, 4, "String or NCName expected, % found: %."),
-
   /** XPTY0004. */
   INVCAST_X_X(XPTY, 4, "Cannot cast % to %."),
   /** XPTY0004. */
@@ -986,7 +984,6 @@ public enum QueryError {
   CALCTYPE_X_X_X(XPTY, 4, "% not defined for % and %."),
   /** XPTY0004. */
   INVFUNCITEM_X(XPTY, 4, "Function expected, % found: %."),
-
   /** XPTY0004. */
   CMPTYPE_X(XPTY, 4, "Items of type % cannot be compared."),
   /** XPTY0004. */
@@ -1003,6 +1000,8 @@ public enum QueryError {
   CITYPES_X_X(XPTY, 4, "Incompatible types in context value declarations: % vs. %."),
   /** XPTY0004. */
   LOOKUP_X(XPTY, 4, "Input of lookup operator is not a map or array: %."),
+  /** XPTY0004. */
+  INVALIDOPT_X(XPTY, 4, "%"),
 
   /** XPTY0018. */
   EVALNODESVALS(XPTY, 18, "Path yields both nodes and atomic values."),
