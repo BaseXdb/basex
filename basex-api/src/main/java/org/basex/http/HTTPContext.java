@@ -119,7 +119,7 @@ public final class HTTPContext {
     final String[] ams = Strings.split(value, ' ', 2);
     final AuthMethod am = StaticOptions.AUTHMETHOD.get(ams[0]);
     if(am == null){
-      if(StaticOptions.CUSTOMAUTH.value()) return;
+      if(context.soptions.get(StaticOptions.CUSTOMAUTH)) return;
       else throw new BaseXException(WHICHAUTH, value);
     } 
     
