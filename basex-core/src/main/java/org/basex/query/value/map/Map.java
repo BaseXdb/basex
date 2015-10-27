@@ -41,7 +41,7 @@ public final class Map extends FItem {
    * @param root map
    */
   private Map(final TrieNode root) {
-    super(MapType.ANY_MAP, new AnnList());
+    super(SeqType.ANY_MAP, new AnnList());
     this.root = root;
   }
 
@@ -157,15 +157,18 @@ public final class Map extends FItem {
     final SeqType[] at = tp.argTypes;
     if(at != null && (at.length != 1 || !at[0].one())) return false;
 
+    // only check key for map types:
+    // map { 'a': ... } instance of function(xs:integer, ...) -> true
+    // map { 'a': ... } instance of map(xs:integer, ...) -> false
     final boolean map = tp instanceof MapType;
-    AtomType arg = map ? ((MapType) tp).keyType : null;
+    AtomType arg = map ? ((MapType) tp).keyType() : null;
     if(arg == AtomType.AAT) arg = null;
     SeqType ret = tp.retType;
     if(ret == null || ret.eq(SeqType.ITEM_ZM)) ret = null;
 
-    // no argument and return type: no check required.
+    // no argument and return type: no check required
     if(arg == null && ret == null) return true;
-    // map { ... } instance of function(...) as item() is false (map may return empty sequence)
+    // map { ... } instance of function(...) as item() -> false (result may be empty sequence)
     return root.instanceOf(arg, ret) && (one || map || ret == null || ret.mayBeZero());
   }
 

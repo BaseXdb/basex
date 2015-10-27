@@ -4,7 +4,6 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.util.*;
@@ -16,20 +15,13 @@ import org.basex.util.*;
  * @author Leo Woerteler
  */
 public final class MapType extends FuncType {
-  /** The general map type. */
-  public static final MapType ANY_MAP = new MapType(AtomType.AAT, SeqType.ITEM_ZM);
-
-  /** Key type of the map. */
-  public final AtomType keyType;
-
   /**
    * Constructor.
    * @param type argument type
    * @param rt return type
    */
   MapType(final AtomType type, final SeqType rt) {
-    super(new AnnList(), new SeqType[] { type.seqType() }, rt);
-    keyType = type;
+    super(rt, type.seqType());
   }
 
   @Override
@@ -53,19 +45,19 @@ public final class MapType extends FuncType {
     if(this == t) return true;
     if(!(t instanceof MapType)) return false;
     final MapType mt = (MapType) t;
-    return keyType.eq(mt.keyType) && retType.eq(mt.retType);
+    return keyType().eq(mt.keyType()) && retType.eq(mt.retType);
   }
 
   @Override
   public boolean instanceOf(final Type t) {
     // the only non-function super-type of function is item()
-    if(t == AtomType.ITEM || t == ANY_MAP || t == ANY_FUN) return true;
+    if(t == AtomType.ITEM || t == SeqType.ANY_MAP || t == SeqType.ANY_FUN) return true;
     if(!(t instanceof FuncType) || t instanceof ArrayType) return false;
 
     final FuncType ft = (FuncType) t;
     final int al = argTypes.length;
     if(al != ft.argTypes.length || !retType.instanceOf(ft.retType)) return false;
-    if(t instanceof MapType) return keyType.instanceOf(((MapType) t).keyType);
+    if(t instanceof MapType) return keyType().instanceOf(((MapType) t).keyType());
 
     // test function arguments of function type
     for(int a = 0; a < al; a++) {
@@ -80,10 +72,11 @@ public final class MapType extends FuncType {
     if(t instanceof MapType) {
       final MapType mt = (MapType) t;
       if(mt.instanceOf(this)) return this;
-      final AtomType a = (AtomType) keyType.intersect(mt.keyType);
-      return a != null ? get(a, retType.union(mt.retType)) : ANY_FUN;
+      final AtomType a = (AtomType) keyType().intersect(mt.keyType());
+      return a != null ? get(a, retType.union(mt.retType)) : SeqType.ANY_FUN;
     }
-    return t instanceof ArrayType ? ANY_FUN : t instanceof FuncType ? t.union(this) : AtomType.ITEM;
+    return t instanceof ArrayType ? SeqType.ANY_FUN : t instanceof FuncType ? t.union(this) :
+      AtomType.ITEM;
   }
 
   @Override
@@ -95,13 +88,13 @@ public final class MapType extends FuncType {
       final MapType mt = (MapType) t;
       if(mt.instanceOf(this)) return mt;
       final SeqType rt = retType.intersect(mt.retType);
-      return rt == null ? null : get((AtomType) keyType.union(mt.keyType), rt);
+      return rt == null ? null : get((AtomType) keyType().union(mt.keyType()), rt);
     }
     if(t instanceof FuncType) {
       final FuncType ft = (FuncType) t;
       if(ft.argTypes.length == 1 && ft.argTypes[0].instanceOf(SeqType.AAT)) {
         final SeqType rt = retType.intersect(ft.retType);
-        return rt == null ? null : get((AtomType) keyType.union(ft.argTypes[0].type), rt);
+        return rt == null ? null : get((AtomType) keyType().union(ft.argTypes[0].type), rt);
       }
     }
     return null;
@@ -114,11 +107,20 @@ public final class MapType extends FuncType {
    * @return map type
    */
   public static MapType get(final AtomType key, final SeqType val) {
-    return key == AtomType.AAT && val.eq(SeqType.ITEM_ZM) ? ANY_MAP : new MapType(key, val);
+    return key == AtomType.AAT && val.eq(SeqType.ITEM_ZM) ? SeqType.ANY_MAP : new MapType(key, val);
+  }
+
+  /**
+   * Returns the key type.
+   * @return key type
+   */
+  public AtomType keyType() {
+    return (AtomType) argTypes[0].type;
   }
 
   @Override
   public String toString() {
+    final AtomType keyType = keyType();
     return keyType == AtomType.AAT && retType.eq(SeqType.ITEM_ZM) ? "map(*)"
         : "map(" + keyType + ", " + retType + ')';
   }

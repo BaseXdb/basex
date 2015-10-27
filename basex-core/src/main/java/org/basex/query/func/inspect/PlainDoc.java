@@ -37,34 +37,27 @@ final class PlainDoc extends Inspect {
    * @throws QueryException query exception
    */
   FElem context() throws QueryException {
-    final FElem context = elem("context", null);
-
-    for(final StaticVar sv : qc.vars) {
-      variable(sv, context);
-    }
-    for(final StaticFunc sf : qc.funcs.funcs()) {
-      function(sf.name, sf, sf.funcType(), sf.anns, context);
-    }
-
-    return context;
+    final FElem root = elem("context", null);
+    for(final StaticVar sv : qc.vars) variable(sv, root);
+    for(final StaticFunc sf : qc.funcs.funcs()) function(sf.name, sf, sf.funcType(), sf.anns, root);
+    return root;
   }
 
   @Override
   public FElem parse(final IO io) throws QueryException {
     final QueryParser qp = parseQuery(io);
-    final FElem mod = elem("module", null);
+    final FElem root = elem("module", null);
     if(module instanceof LibraryModule) {
       final QNm name = ((LibraryModule) module).name;
-      mod.add("prefix", name.string());
-      mod.add("uri", name.uri());
+      root.add("prefix", name.string());
+      root.add("uri", name.uri());
     }
 
     final TokenObjMap<TokenList> doc = module.doc();
-    if(doc != null) comment(doc, mod);
-
-    for(final StaticVar sv : qp.vars) variable(sv, mod);
-    for(final StaticFunc sf : qp.funcs) function(sf.name, sf, sf.funcType(), sf.anns, mod);
-    return mod;
+    if(doc != null) comment(doc, root);
+    for(final StaticVar sv : qp.vars) variable(sv, root);
+    for(final StaticFunc sf : qp.funcs) function(sf.name, sf, sf.funcType(), sf.anns, root);
+    return root;
   }
 
   /**

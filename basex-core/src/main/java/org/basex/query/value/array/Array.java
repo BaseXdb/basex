@@ -40,7 +40,7 @@ public abstract class Array extends FItem {
    * Default constructor.
    */
   Array() {
-    super(ArrayType.ANY_ARRAY, new AnnList());
+    super(SeqType.ANY_ARRAY, new AnnList());
   }
 
   /**
@@ -436,12 +436,13 @@ public abstract class Array extends FItem {
     final boolean array = tp instanceof ArrayType;
     SeqType ret = tp.retType;
 
-    // no argument and return type: no check required.
+    // no argument and return type: no check required
     if(ret == null || ret.eq(SeqType.ITEM_ZM)) return true;
+    // check types of members
     for(final Value val : members()) {
       if(!ret.instance(val)) return false;
     }
-    // array { ... } instance of function(...) as item() is false (array may return empty sequence)
+    // array { ... } instance of function(...) as item() -> false (result may be empty sequence)
     return (one || array || ret.mayBeZero());
   }
 

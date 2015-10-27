@@ -66,7 +66,7 @@ public class QueryParser extends InputParser {
 
   static {
     final byte[][] keys = {
-      FuncType.ANY_FUN.string(), ARRAY, NodeType.ATT.string(), NodeType.COM.string(),
+      SeqType.ANY_FUN.string(), ARRAY, NodeType.ATT.string(), NodeType.COM.string(),
       NodeType.DOC.string(), NodeType.ELM.string(), token(EMPTY_SEQUENCE), token(IF),
       AtomType.ITEM.string(), MAP, NodeType.NSP.string(), NodeType.NOD.string(),
       NodeType.PI.string(), token(SCHEMA_ATTRIBUTE), token(SCHEMA_ELEMENT), token(SWITCH),

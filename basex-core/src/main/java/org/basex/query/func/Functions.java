@@ -163,7 +163,7 @@ public final class Functions extends TokenSet {
       final Var[] args = { scp.newLocal(qc, new QNm(ITEMM, ""), SeqType.AAT_ZO, true) };
       final Expr e = new Cast(sc, ii, new VarRef(ii, args[0]), type.seqType());
       final AnnList anns = new AnnList();
-      final FuncType ft = FuncType.get(anns, args, e.seqType());
+      final FuncType ft = FuncType.get(anns, e.seqType(), args);
       return closureOrFItem(anns, name, args, ft, e, scp, sc, ii, runtime, false);
     }
 

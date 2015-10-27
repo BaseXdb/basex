@@ -135,7 +135,7 @@ public interface Type {
     public static Type getType(final byte b) {
       final ID id = get(b);
       if(id == null) return null;
-      if(id == FUN) return FuncType.ANY_FUN;
+      if(id == FUN) return SeqType.ANY_FUN;
       final Type t = AtomType.getType(id);
       return t != null ? t : NodeType.getType(id);
     }

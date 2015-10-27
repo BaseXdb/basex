@@ -150,7 +150,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
   @Override
   public FuncType funcType() {
-    return FuncType.get(anns, args, declType);
+    return FuncType.get(anns, declType, args);
   }
 
   @Override

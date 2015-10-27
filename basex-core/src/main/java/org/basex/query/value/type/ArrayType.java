@@ -4,7 +4,6 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.array.Array;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -16,15 +15,12 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class ArrayType extends FuncType {
-  /** The general array type. */
-  public static final ArrayType ANY_ARRAY = new ArrayType(SeqType.ITEM_ZM);
-
   /**
    * Constructor.
    * @param rt return type
    */
   ArrayType(final SeqType rt) {
-    super(new AnnList(), new SeqType[] { SeqType.ITR }, rt);
+    super(rt, SeqType.ITR);
   }
 
   @Override
@@ -51,7 +47,7 @@ public final class ArrayType extends FuncType {
   @Override
   public boolean instanceOf(final Type t) {
     // the only non-function super-type of function is item()
-    if(t == AtomType.ITEM || t == ANY_ARRAY || t == ANY_FUN) return true;
+    if(t == AtomType.ITEM || t == SeqType.ANY_ARRAY || t == SeqType.ANY_FUN) return true;
     if(!(t instanceof FuncType) || t instanceof MapType) return false;
 
     final FuncType ft = (FuncType) t;
@@ -73,7 +69,8 @@ public final class ArrayType extends FuncType {
       final ArrayType mt = (ArrayType) t;
       return mt.instanceOf(this) ? this : get(retType.union(mt.retType));
     }
-    return t instanceof MapType ? ANY_FUN : t instanceof FuncType ? t.union(this) : AtomType.ITEM;
+    return t instanceof MapType ? SeqType.ANY_FUN : t instanceof FuncType ? t.union(this) :
+      AtomType.ITEM;
   }
 
   @Override
@@ -103,7 +100,7 @@ public final class ArrayType extends FuncType {
    * @return array type
    */
   public static ArrayType get(final SeqType val) {
-    return val.eq(SeqType.ITEM_ZM) ? ANY_ARRAY : new ArrayType(val);
+    return val.eq(SeqType.ITEM_ZM) ? SeqType.ANY_ARRAY : new ArrayType(val);
   }
 
   @Override

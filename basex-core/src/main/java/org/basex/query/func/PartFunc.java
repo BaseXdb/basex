@@ -57,7 +57,7 @@ public final class PartFunc extends Arr {
     if(allAreValues()) return preEval(qc);
 
     final SeqType t = f.seqType();
-    if(t.instanceOf(SeqType.FUN_O) && t.type != FuncType.ANY_FUN) {
+    if(t.instanceOf(SeqType.FUN_O) && t.type != SeqType.ANY_FUN) {
       final FuncType ft = (FuncType) t.type;
       final int ar = exprs.length + holes.length - 1;
       if(ft.argTypes.length != ar)
@@ -94,7 +94,7 @@ public final class PartFunc extends Arr {
     while(++a < al) args[a] = exprs[a - hl].value(qc);
 
     final AnnList anns = f.annotations();
-    final FuncType tp = FuncType.get(anns, vars, ft.retType);
+    final FuncType tp = FuncType.get(anns, ft.retType, vars);
     final DynFuncCall fc = new DynFuncCall(info, sc, anns.contains(Annotation.UPDATING), f, args);
     return new FuncItem(sc, anns, null, vars, tp, fc, qc.value, qc.pos, qc.size, scp.stackSize());
   }

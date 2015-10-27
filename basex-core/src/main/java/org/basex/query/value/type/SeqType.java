@@ -180,12 +180,6 @@ public final class SeqType {
   public static final SeqType TIM_ZO = new SeqType(AtomType.TIM, Occ.ZERO_ONE);
   /** Zero or one duration. */
   public static final SeqType DUR_ZO = new SeqType(AtomType.DUR, Occ.ZERO_ONE);
-  /** Zero of single function. */
-  public static final SeqType FUN_OZ = new SeqType(FuncType.ANY_FUN, Occ.ZERO_ONE);
-  /** Single function. */
-  public static final SeqType FUN_O = FuncType.ANY_FUN.seqType();
-  /** Zero of more functions. */
-  public static final SeqType FUN_ZM = new SeqType(FuncType.ANY_FUN, Occ.ZERO_MORE);
   /** Zero or more bytes. */
   public static final SeqType BYT_ZM = new SeqType(AtomType.BYT, Occ.ZERO_MORE);
   /** One attribute node. */
@@ -208,15 +202,6 @@ public final class SeqType {
   public static final SeqType PI = NodeType.PI.seqType();
   /** Namespace node. */
   public static final SeqType TXT_ZO = new SeqType(NodeType.TXT, Occ.ZERO_ONE);
-
-  /** Zero or more maps. */
-  public static final SeqType MAP_ZM = new SeqType(MapType.ANY_MAP, Occ.ZERO_MORE);
-  /** Single map. */
-  public static final SeqType MAP_O = new SeqType(MapType.ANY_MAP);
-  /** Zero or more arrays. */
-  public static final SeqType ARRAY_ZM = new SeqType(ArrayType.ANY_ARRAY, Occ.ZERO_MORE);
-  /** Single array. */
-  public static final SeqType ARRAY_O = ArrayType.ANY_ARRAY.seqType();
   /** One xs:hexBinary. */
   public static final SeqType HEX = AtomType.HEX.seqType();
   /** Single xs:base64Binary. */
@@ -225,9 +210,30 @@ public final class SeqType {
   public static final SeqType B64_ZO = new SeqType(AtomType.B64, Occ.ZERO_ONE);
   /** Zero or more xs:base64Binary. */
   public static final SeqType B64_ZM = new SeqType(AtomType.B64, Occ.ZERO_MORE);
-
   /** Single binary. */
   public static final SeqType BIN = AtomType.BIN.seqType();
+
+  /** Any function type. */
+  public static final FuncType ANY_FUN = new FuncType(null, (SeqType[]) null);
+  /** The general array type. */
+  public static final ArrayType ANY_ARRAY = new ArrayType(ITEM_ZM);
+  /** The general map type. */
+  public static final MapType ANY_MAP = new MapType(AtomType.AAT, ITEM_ZM);
+
+  /** Zero of single function. */
+  public static final SeqType FUN_OZ = new SeqType(ANY_FUN, Occ.ZERO_ONE);
+  /** Single function. */
+  public static final SeqType FUN_O = ANY_FUN.seqType();
+  /** Zero of more functions. */
+  public static final SeqType FUN_ZM = new SeqType(ANY_FUN, Occ.ZERO_MORE);
+  /** Zero or more maps. */
+  public static final SeqType MAP_ZM = new SeqType(ANY_MAP, Occ.ZERO_MORE);
+  /** Single map. */
+  public static final SeqType MAP_O = new SeqType(ANY_MAP);
+  /** Zero or more arrays. */
+  public static final SeqType ARRAY_ZM = new SeqType(ANY_ARRAY, Occ.ZERO_MORE);
+  /** Single array. */
+  public static final SeqType ARRAY_O = ANY_ARRAY.seqType();
 
   /** Item type. */
   public final Type type;

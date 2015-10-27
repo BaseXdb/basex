@@ -115,7 +115,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public FuncType funcType() {
-    return FuncType.get(anns, args, ret);
+    return FuncType.get(anns, ret, args);
   }
 
   @Override
@@ -158,7 +158,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     final SeqType r = expr.seqType();
     final SeqType rt = updating ? SeqType.EMP : ret == null || r.instanceOf(ret) ? r : ret;
-    seqType = FuncType.get(anns, args, rt).seqType();
+    seqType = FuncType.get(anns, rt, args).seqType();
     size = 1;
 
     try {
