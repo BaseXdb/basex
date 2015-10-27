@@ -16,6 +16,9 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class ArrayType extends FuncType {
+  /** The general array type. */
+  public static final ArrayType ANY_ARRAY = new ArrayType(SeqType.ITEM_ZM);
+
   /**
    * Constructor.
    * @param rt return type
@@ -47,8 +50,20 @@ public final class ArrayType extends FuncType {
 
   @Override
   public boolean instanceOf(final Type t) {
-    return t instanceof ArrayType ? retType.instanceOf(((ArrayType) t).retType) :
-      super.instanceOf(t);
+    // the only non-function super-type of function is item()
+    if(t == AtomType.ITEM || t == ANY_ARRAY || t == ANY_FUN) return true;
+    if(!(t instanceof FuncType) || t instanceof MapType) return false;
+
+    final FuncType ft = (FuncType) t;
+    final int al = argTypes.length;
+    if(al != ft.argTypes.length || !retType.instanceOf(ft.retType)) return false;
+    if(t instanceof ArrayType) return true;
+
+    // test function arguments of function type
+    for(int a = 0; a < al; a++) {
+      if(!argTypes[a].instanceOf(ft.argTypes[a])) return false;
+    }
+    return true;
   }
 
   @Override
@@ -88,7 +103,7 @@ public final class ArrayType extends FuncType {
    * @return array type
    */
   public static ArrayType get(final SeqType val) {
-    return val.eq(SeqType.ITEM_ZM) ? SeqType.ANY_ARRAY : new ArrayType(val);
+    return val.eq(SeqType.ITEM_ZM) ? ANY_ARRAY : new ArrayType(val);
   }
 
   @Override

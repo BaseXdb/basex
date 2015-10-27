@@ -209,18 +209,14 @@ public final class SeqType {
   /** Namespace node. */
   public static final SeqType TXT_ZO = new SeqType(NodeType.TXT, Occ.ZERO_ONE);
 
-  /** The general array type. */
-  public static final ArrayType ANY_ARRAY = new ArrayType(ITEM_ZM);
-  /** The general map type. */
-  public static final MapType ANY_MAP = new MapType(AtomType.AAT, ITEM_ZM);
   /** Zero or more maps. */
-  public static final SeqType MAP_ZM = new SeqType(ANY_MAP, Occ.ZERO_MORE);
+  public static final SeqType MAP_ZM = new SeqType(MapType.ANY_MAP, Occ.ZERO_MORE);
   /** Single map. */
-  public static final SeqType MAP_O = new SeqType(ANY_MAP);
+  public static final SeqType MAP_O = new SeqType(MapType.ANY_MAP);
   /** Zero or more arrays. */
-  public static final SeqType ARRAY_ZM = new SeqType(ANY_ARRAY, Occ.ZERO_MORE);
+  public static final SeqType ARRAY_ZM = new SeqType(ArrayType.ANY_ARRAY, Occ.ZERO_MORE);
   /** Single array. */
-  public static final SeqType ARRAY_O = ANY_ARRAY.seqType();
+  public static final SeqType ARRAY_O = ArrayType.ANY_ARRAY.seqType();
   /** One xs:hexBinary. */
   public static final SeqType HEX = AtomType.HEX.seqType();
   /** Single xs:base64Binary. */

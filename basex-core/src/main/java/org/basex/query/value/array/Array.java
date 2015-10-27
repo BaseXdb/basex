@@ -40,7 +40,7 @@ public abstract class Array extends FItem {
    * Default constructor.
    */
   Array() {
-    super(SeqType.ANY_ARRAY, new AnnList());
+    super(ArrayType.ANY_ARRAY, new AnnList());
   }
 
   /**
@@ -410,27 +410,39 @@ public abstract class Array extends FItem {
 
   @Override
   public boolean instanceOf(final Type tp) {
-    if(tp.eq(AtomType.ITEM)) return true;
-    if(!(tp instanceof FuncType) || tp instanceof MapType) return false;
-
-    final FuncType ft = (FuncType) tp;
-    final SeqType[] at = ft.argTypes;
-    if(at != null && (at.length != 1 || !at[0].instanceOf(SeqType.ITR))) return false;
-    final SeqType ret = ft.retType;
-    if(ret != null && !ret.eq(SeqType.ITEM_ZM)) {
-      for(final Value val : members()) {
-        if(!ret.instance(val)) return false;
-      }
-    }
-    return true;
+    return tp == AtomType.ITEM || tp instanceof FuncType && instOf((FuncType) tp, false);
   }
 
   @Override
   public FItem coerceTo(final FuncType ft, final QueryContext qc, final InputInfo ii,
       final boolean opt) throws QueryException {
 
-    if(instanceOf(ft)) return this;
+    if(instOf(ft, true)) return this;
     throw castError(ii, this, ft);
+  }
+
+  /**
+   * Checks if this is an instance of the specified type.
+   * @param tp type
+   * @param one tolerate one-or-more results
+   * @return result of check
+   */
+  private boolean instOf(final FuncType tp, final boolean one) {
+    if(tp instanceof MapType) return false;
+
+    final SeqType[] at = tp.argTypes;
+    if(at != null && (at.length != 1 || !at[0].instanceOf(SeqType.ITR))) return false;
+
+    final boolean array = tp instanceof ArrayType;
+    SeqType ret = tp.retType;
+
+    // no argument and return type: no check required.
+    if(ret == null || ret.eq(SeqType.ITEM_ZM)) return true;
+    for(final Value val : members()) {
+      if(!ret.instance(val)) return false;
+    }
+    // array { ... } instance of function(...) as item() is false (array may return empty sequence)
+    return (one || array || ret.mayBeZero());
   }
 
   @Override

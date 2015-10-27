@@ -642,7 +642,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected Map toMap(final Expr ex, final QueryContext qc) throws QueryException {
-    return toMap(toItem(ex, qc, SeqType.ANY_MAP));
+    return toMap(toItem(ex, qc, MapType.ANY_MAP));
   }
 
   /**
@@ -654,7 +654,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected Map toMap(final Item it) throws QueryException {
     if(it instanceof Map) return (Map) it;
-    throw castError(info, it, SeqType.ANY_MAP);
+    throw castError(info, it, MapType.ANY_MAP);
   }
 
   /**
@@ -665,7 +665,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected Array toArray(final Expr e, final QueryContext qc) throws QueryException {
-    return toArray(toItem(e, qc, SeqType.ANY_ARRAY));
+    return toArray(toItem(e, qc, ArrayType.ANY_ARRAY));
   }
 
   /**
@@ -676,7 +676,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected Array toArray(final Item it) throws QueryException {
     if(it instanceof Array) return (Array) it;
-    throw castError(info, it, SeqType.ANY_ARRAY);
+    throw castError(info, it, ArrayType.ANY_ARRAY);
   }
 
   /**

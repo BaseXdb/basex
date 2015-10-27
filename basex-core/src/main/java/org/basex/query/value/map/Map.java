@@ -41,7 +41,7 @@ public final class Map extends FItem {
    * @param root map
    */
   private Map(final TrieNode root) {
-    super(SeqType.ANY_MAP, new AnnList());
+    super(MapType.ANY_MAP, new AnnList());
     this.root = root;
   }
 
@@ -134,22 +134,39 @@ public final class Map extends FItem {
 
   @Override
   public boolean instanceOf(final Type tp) {
-    if(tp.eq(AtomType.ITEM)) return true;
-    if(!(tp instanceof FuncType) || tp instanceof ArrayType) return false;
-
-    final FuncType ft = (FuncType) tp;
-    final SeqType[] at = ft.argTypes;
-    if(at != null && (at.length != 1 || !at[0].one())) return false;
-    final SeqType ret = ft.retType;
-    return ret == null || ret.eq(SeqType.ITEM_ZM) || root.instanceOf(ret);
+    return tp == AtomType.ITEM || tp instanceof FuncType && instOf((FuncType) tp, false);
   }
 
   @Override
   public Map coerceTo(final FuncType ft, final QueryContext qc, final InputInfo ii,
       final boolean opt) throws QueryException {
 
-    if(instanceOf(ft)) return this;
+    if(instOf(ft, true)) return this;
     throw castError(ii, this, ft);
+  }
+
+  /**
+   * Checks if this is an instance of the specified type.
+   * @param tp type
+   * @param one tolerate one-or-more results
+   * @return result of check
+   */
+  private boolean instOf(final FuncType tp, final boolean one) {
+    if(tp instanceof ArrayType) return false;
+
+    final SeqType[] at = tp.argTypes;
+    if(at != null && (at.length != 1 || !at[0].one())) return false;
+
+    final boolean map = tp instanceof MapType;
+    AtomType arg = map ? ((MapType) tp).keyType : null;
+    if(arg == AtomType.AAT) arg = null;
+    SeqType ret = tp.retType;
+    if(ret == null || ret.eq(SeqType.ITEM_ZM)) ret = null;
+
+    // no argument and return type: no check required.
+    if(arg == null && ret == null) return true;
+    // map { ... } instance of function(...) as item() is false (map may return empty sequence)
+    return root.instanceOf(arg, ret) && (one || map || ret == null || ret.mayBeZero());
   }
 
   /**

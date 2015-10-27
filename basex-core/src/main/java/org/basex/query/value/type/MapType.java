@@ -16,6 +16,9 @@ import org.basex.util.*;
  * @author Leo Woerteler
  */
 public final class MapType extends FuncType {
+  /** The general map type. */
+  public static final MapType ANY_MAP = new MapType(AtomType.AAT, SeqType.ITEM_ZM);
+
   /** Key type of the map. */
   public final AtomType keyType;
 
@@ -55,9 +58,20 @@ public final class MapType extends FuncType {
 
   @Override
   public boolean instanceOf(final Type t) {
-    if(!(t instanceof MapType)) return super.instanceOf(t);
-    final MapType mt = (MapType) t;
-    return retType.instanceOf(mt.retType) && mt.keyType.instanceOf(keyType);
+    // the only non-function super-type of function is item()
+    if(t == AtomType.ITEM || t == ANY_MAP || t == ANY_FUN) return true;
+    if(!(t instanceof FuncType) || t instanceof ArrayType) return false;
+
+    final FuncType ft = (FuncType) t;
+    final int al = argTypes.length;
+    if(al != ft.argTypes.length || !retType.instanceOf(ft.retType)) return false;
+    if(t instanceof MapType) return keyType.instanceOf(((MapType) t).keyType);
+
+    // test function arguments of function type
+    for(int a = 0; a < al; a++) {
+      if(!argTypes[a].instanceOf(ft.argTypes[a])) return false;
+    }
+    return true;
   }
 
   @Override
@@ -100,7 +114,7 @@ public final class MapType extends FuncType {
    * @return map type
    */
   public static MapType get(final AtomType key, final SeqType val) {
-    return key == AtomType.AAT && val.eq(SeqType.ITEM_ZM) ? SeqType.ANY_MAP : new MapType(key, val);
+    return key == AtomType.AAT && val.eq(SeqType.ITEM_ZM) ? ANY_MAP : new MapType(key, val);
   }
 
   @Override

@@ -104,8 +104,7 @@ public class FuncType implements Type {
     final FuncType ft = (FuncType) t;
 
     // check annotations
-    final int as = anns.size();
-    if(as != ft.anns.size()) return false;
+    if(anns.size() != ft.anns.size()) return false;
     for(final Ann ann : ft.anns) if(!anns.contains(ann)) return false;
 
     if(this == ANY_FUN || ft == ANY_FUN || argTypes.length != ft.argTypes.length) return false;
@@ -119,15 +118,14 @@ public class FuncType implements Type {
   @Override
   public boolean instanceOf(final Type t) {
     // the only non-function super-type of function is item()
-    if(!(t instanceof FuncType)) return t == AtomType.ITEM;
-    if(t instanceof MapType || t instanceof ArrayType) return false;
+    if(t == AtomType.ITEM || t == ANY_FUN) return true;
+    if(!(t instanceof FuncType) || t instanceof MapType || t instanceof ArrayType) return false;
 
     // check annotations
     final FuncType ft = (FuncType) t;
     for(final Ann ann : ft.anns) if(!anns.contains(ann)) return false;
 
     // takes care of FunType.ANY
-    if(this == ft || ft == ANY_FUN) return true;
     if(this == ANY_FUN || argTypes.length != ft.argTypes.length || !retType.instanceOf(ft.retType))
       return false;
 
@@ -210,8 +208,8 @@ public class FuncType implements Type {
     if(type.uri().length == 0) {
       final byte[] ln = type.local();
       if(Token.eq(ln, token(FUNCTION))) return ANY_FUN;
-      if(Token.eq(ln, MAP)) return SeqType.ANY_MAP;
-      if(Token.eq(ln, ARRAY)) return SeqType.ANY_ARRAY;
+      if(Token.eq(ln, MAP)) return MapType.ANY_MAP;
+      if(Token.eq(ln, ARRAY)) return ArrayType.ANY_ARRAY;
     }
     return null;
   }
