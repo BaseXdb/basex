@@ -437,7 +437,8 @@ public final class QT3TS extends Main {
 
   /** Flags for dependencies that are not supported. */
   private static final String NOSUPPORT =
-    "('schema-location-hint','schemaAware','schemaImport','schemaValidation','staticTyping')";
+    "('schema-location-hint','schemaAware','schemaImport','schemaValidation',"
+    + "'staticTyping','typedData')";
 
   /**
    * Checks if the current test case is supported.
