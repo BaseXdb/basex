@@ -205,9 +205,9 @@ public abstract class JavaMapping extends Arr {
    * @param uri module URI
    * @return module path
    */
-  private static String toPath(final byte[] uri) {
-    final String path = string(uri), p = ModuleLoader.uri2path(path);
-    return p == null ? path : ModuleLoader.capitalize(p).replace("/", ".").substring(1);
+  private static String toPath(final String uri) {
+    final String p = ModuleLoader.uri2path(uri);
+    return p == null ? uri : ModuleLoader.capitalize(p).replace("/", ".").substring(1);
   }
 
   /**
@@ -223,15 +223,15 @@ public abstract class JavaMapping extends Arr {
   static JavaMapping get(final QNm name, final Expr[] args, final QueryContext qc,
       final StaticContext sc, final InputInfo ii) throws QueryException {
 
-    final byte[] uri = name.uri();
+    final String uri = string(name.uri());
     // check if URI starts with "java:" prefix (if yes, module must be Java code)
-    final boolean java = startsWith(uri, JAVAPREF);
+    final boolean java = uri.startsWith(JAVAPREF);
 
     // rewrite function name: convert dashes to upper-case initials
     final String local = Strings.camelCase(string(name.local()));
 
     // check imported Java modules
-    final String path = Strings.camelCase(toPath(java ? substring(uri, JAVAPREF.length) : uri));
+    final String path = Strings.camelCase(toPath(java ? uri.substring(JAVAPREF.length()) : uri));
 
     final ModuleLoader modules = qc.resources.modules();
     final Object jm  = modules.findImport(path);

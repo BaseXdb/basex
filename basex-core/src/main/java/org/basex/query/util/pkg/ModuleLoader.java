@@ -10,10 +10,7 @@ import java.util.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.util.pkg.Package.Component;
-import org.basex.query.util.pkg.Package.Dependency;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 
 /**
  * Module loader.
@@ -67,30 +64,30 @@ public final class ModuleLoader {
    * @return if the package has been found
    * @throws QueryException query exception
    */
-  public boolean addImport(final byte[] uri, final InputInfo ii, final QueryParser qp)
+  public boolean addImport(final String uri, final InputInfo ii, final QueryParser qp)
       throws QueryException {
 
     // add EXPath package
-    final TokenSet pkgs = context.repo.nsDict().get(uri);
+    final HashSet<String> pkgs = context.repo.nsDict().get(uri);
     if(pkgs != null) {
       Version ver = null;
-      byte[] nm = null;
-      for(final byte[] name : pkgs) {
-        final Version v = new Version(Package.version(name));
+      String nm = null;
+      for(final String name : pkgs) {
+        final Version v = new Version(Pkg.version(name));
         if(ver == null || v.compareTo(ver) > 0) {
           ver = v;
           nm = name;
         }
       }
       if(nm != null) {
-        addRepo(nm, new TokenSet(), new TokenSet(), ii, qp);
+        addRepo(nm, new HashSet<String>(), new HashSet<String>(), ii, qp);
         return true;
       }
     }
 
     // search module in repository: rewrite URI to file path
-    final boolean java = startsWith(uri, JAVAPREF);
-    String uriPath = uri2path(string(java ? substring(uri, JAVAPREF.length) : uri));
+    final boolean java = uri.startsWith(JAVAPREF);
+    String uriPath = uri2path(java ? uri.substring(JAVAPREF.length()) : uri);
     if(uriPath == null) return false;
 
     if(!java) {
@@ -100,7 +97,7 @@ public final class ModuleLoader {
       for(final String suf : IO.XQSUFFIXES) {
         final IOFile file = new IOFile(path + suf);
         if(file.exists()) {
-          qp.module(token(file.path()), uri);
+          qp.module(file.path(), uri);
           return true;
         }
       }
@@ -228,34 +225,35 @@ public final class ModuleLoader {
 
   /**
    * Adds a package from the package repository.
-   * @param name package name
+   * @param id package id
    * @param toLoad list with packages to be loaded
    * @param loaded already loaded packages
    * @param ii input info
    * @param qp query parser
    * @throws QueryException query exception
    */
-  private void addRepo(final byte[] name, final TokenSet toLoad, final TokenSet loaded,
-      final InputInfo ii, final QueryParser qp) throws QueryException {
+  private void addRepo(final String id, final HashSet<String> toLoad,
+      final HashSet<String> loaded, final InputInfo ii, final QueryParser qp)
+      throws QueryException {
 
     // return if package is already loaded
-    if(loaded.contains(name)) return;
+    if(loaded.contains(id)) return;
 
     // find package in package dictionary
-    final byte[] pDir = context.repo.pkgDict().get(name);
-    if(pDir == null) throw BXRE_NOTINST_X.get(ii, name);
-    final IOFile pkgDir = context.repo.path(string(pDir));
+    Pkg pkg = context.repo.pkgDict().get(id);
+    if(pkg == null) throw BXRE_NOTINST_X.get(ii, id);
+    final IOFile pkgDir = context.repo.path(pkg.dir());
 
     // parse package descriptor
     final IO pkgDesc = new IOFile(pkgDir, PkgText.DESCRIPTOR);
-    if(!pkgDesc.exists()) Util.debug(PkgText.MISSDESC, string(name));
+    if(!pkgDesc.exists()) Util.debug(PkgText.MISSDESC, id);
 
-    final Package pkg = new PkgParser(ii).parse(pkgDesc);
+    pkg = new PkgParser(ii).parse(pkgDesc);
     // check if package contains a jar descriptor
     final IOFile jarDesc = new IOFile(pkgDir, PkgText.JARDESC);
     // choose module directory (support for both 2010 and 2012 specs)
     IOFile modDir = new IOFile(pkgDir, PkgText.CONTENT);
-    if(!modDir.exists()) modDir = new IOFile(pkgDir, string(pkg.abbrev));
+    if(!modDir.exists()) modDir = new IOFile(pkgDir, pkg.abbrev());
 
     // add jars to classpath
     if(jarDesc.exists()) {
@@ -265,22 +263,21 @@ public final class ModuleLoader {
 
     // package has dependencies -> they have to be loaded first => put package
     // in list with packages to be loaded
-    if(!pkg.dep.isEmpty()) toLoad.add(name);
-    for(final Dependency d : pkg.dep) {
-      if(d.pkg != null) {
+    if(!pkg.dep.isEmpty()) toLoad.add(id);
+    for(final PkgDep d : pkg.dep) {
+      if(d.name != null) {
         // we consider only package dependencies here
-        final byte[] depPkg = new PkgValidator(context.repo, ii).depPkg(d);
-        if(depPkg == null) throw BXRE_NOTINST_X.get(ii, string(d.pkg));
-        if(toLoad.contains(depPkg)) throw CIRCMODULE.get(ii);
-        addRepo(depPkg, toLoad, loaded, ii, qp);
+        final String depId = new PkgValidator(context.repo, ii).depPkg(d);
+        if(depId == null) throw BXRE_NOTINST_X.get(ii, d.name);
+        if(toLoad.contains(depId)) throw CIRCMODULE.get(ii);
+        addRepo(depId, toLoad, loaded, ii, qp);
       }
     }
-    for(final Component comp : pkg.comps) {
-      final String p = new IOFile(modDir, string(comp.file)).path();
-      qp.module(token(p), comp.uri);
+    for(final PkgComponent comp : pkg.comps) {
+      qp.module(new IOFile(modDir, comp.file).path(), comp.uri);
     }
-    if(toLoad.contains(name)) toLoad.delete(name);
-    loaded.add(name);
+    if(toLoad.contains(id)) toLoad.remove(id);
+    loaded.add(id);
   }
 
   /**

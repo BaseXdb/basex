@@ -138,7 +138,7 @@ public final class UCAOptions extends CollationOptions {
       final IntList list = new IntList();
       final Method uscript = method(find("com.ibm.icu.lang.UScript"), "getCode", String.class);
       for(final String code : split(v, ',')) {
-        switch (code) {
+        switch(code) {
           case "space":    list.add(0x1000); break;
           case "punct":    list.add(0x1001); break;
           case "symbol":   list.add(0x1002); break;

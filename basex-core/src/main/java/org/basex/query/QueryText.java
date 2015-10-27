@@ -428,6 +428,9 @@ public interface QueryText {
   /** Parser token. */
   String ARROW = "=>";
 
+  /** Java prefix. */
+  String JAVAPREF = "java:";
+
   // TOKENS ===================================================================
 
   /** Base token. */
@@ -685,8 +688,6 @@ public interface QueryText {
   /** XSLT module URI. */
   byte[] XSLT_URI = token(BXMODULES_URI + "xslt");
 
-  /** Java prefix. */
-  byte[] JAVAPREF = token("java:");
   /** URI of default collation. */
   byte[] COLLATION_URI = concat(FN_URI, token("/collation/codepoint"));
 

@@ -9,8 +9,6 @@ import java.io.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.pkg.Package.Component;
-import org.basex.query.util.pkg.Package.Dependency;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -40,8 +38,8 @@ public final class PkgParser {
    * @return package container
    * @throws QueryException query exception
    */
-  public Package parse(final IO io) throws QueryException {
-    final Package pkg = new Package();
+  public Pkg parse(final IO io) throws QueryException {
+    final Pkg pkg = new Pkg();
     try {
       // checks root node
       final ANode node = childElements(new DBNode(new IOContent(io.read()))).next();
@@ -63,27 +61,27 @@ public final class PkgParser {
    * @param root root node
    * @throws QueryException query exception
    */
-  private void parseAttributes(final ANode node, final Package p, final byte[] root)
+  private void parseAttributes(final ANode node, final Pkg p, final byte[] root)
       throws QueryException {
 
     final BasicNodeIter atts = node.attributes();
     for(ANode next; (next = atts.next()) != null;) {
       final byte[] name = next.name();
-      if(eq(A_NAME, name))         p.name = next.string();
-      else if(eq(A_ABBREV, name))  p.abbrev = next.string();
-      else if(eq(A_VERSION, name)) p.version = next.string();
-      else if(eq(A_SPEC, name))    p.spec = next.string();
+      if(eq(A_NAME, name))         p.name = string(next.string());
+      else if(eq(A_ABBREV, name))  p.abbrev = string(next.string());
+      else if(eq(A_VERSION, name)) p.version = string(next.string());
+      else if(eq(A_SPEC, name))    p.spec = string(next.string());
       else throw BXRE_DESC_X.get(info, Util.info(WHICHATTR, name));
     }
 
     // check mandatory attributes
-    if(p.name == null)
+    if(p.name() == null)
       throw BXRE_DESC_X.get(info, Util.info(MISSATTR, A_NAME, root));
-    if(p.version == null)
+    if(p.version() == null)
       throw BXRE_DESC_X.get(info, Util.info(MISSATTR, A_VERSION, root));
-    if(p.abbrev == null)
+    if(p.abbrev() == null)
       throw BXRE_DESC_X.get(info, Util.info(MISSATTR, A_ABBREV, root));
-    if(p.spec == null)
+    if(p.spec() == null)
       throw BXRE_DESC_X.get(info, Util.info(MISSATTR, A_SPEC, root));
   }
 
@@ -93,7 +91,7 @@ public final class PkgParser {
    * @param p package container
    * @throws QueryException query exception
    */
-  private void parseChildren(final ANode node, final Package p) throws QueryException {
+  private void parseChildren(final ANode node, final Pkg p) throws QueryException {
     final BasicNodeIter ch = childElements(node);
     for(ANode next; (next = ch.next()) != null;) {
       final QNm name = next.qname();
@@ -108,17 +106,17 @@ public final class PkgParser {
    * @return dependency container
    * @throws QueryException query exception
    */
-  private Dependency parseDependency(final ANode node) throws QueryException {
+  private PkgDep parseDependency(final ANode node) throws QueryException {
     final BasicNodeIter atts = node.attributes();
-    final Dependency d = new Dependency();
+    final PkgDep d = new PkgDep();
     for(ANode next; (next = atts.next()) != null;) {
       final byte[] name = next.name();
-      if(eq(A_PACKAGE, name))            d.pkg = next.string();
-      else if(eq(A_PROCESSOR, name))      d.processor = next.string();
-      else if(eq(A_VERSIONS, name))      d.versions = next.string();
-      else if(eq(A_SEMVER, name))    d.semver = next.string();
-      else if(eq(A_SEMVER_MIN, name)) d.semverMin = next.string();
-      else if(eq(A_SEMVER_MAX, name)) d.semverMax = next.string();
+      if(eq(A_PACKAGE, name)) d.name = string(next.string());
+      else if(eq(A_PROCESSOR, name)) d.processor = string(next.string());
+      else if(eq(A_VERSIONS, name)) d.versions = string(next.string());
+      else if(eq(A_SEMVER, name)) d.semver = string(next.string());
+      else if(eq(A_SEMVER_MIN, name)) d.semverMin = string(next.string());
+      else if(eq(A_SEMVER_MAX, name)) d.semverMax = string(next.string());
       else throw BXRE_DESC_X.get(info, Util.info(WHICHATTR, name));
     }
     return d;
@@ -130,13 +128,13 @@ public final class PkgParser {
    * @return component container
    * @throws QueryException query exception
    */
-  private Component parseComp(final ANode node) throws QueryException {
+  private PkgComponent parseComp(final ANode node) throws QueryException {
     final BasicNodeIter ch = childElements(node);
-    final Component c = new Component();
+    final PkgComponent c = new PkgComponent();
     for(ANode next; (next = ch.next()) != null;) {
       final QNm name = next.qname();
-      if(eqNS(A_NAMESPACE, name)) c.uri = next.string();
-      else if(eqNS(A_FILE, name)) c.file = next.string();
+      if(eqNS(A_NAMESPACE, name)) c.uri = string(next.string());
+      else if(eqNS(A_FILE, name)) c.file = string(next.string());
       else throw BXRE_DESC_X.get(info, Util.info(WHICHELEM, name));
     }
 

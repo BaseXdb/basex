@@ -9,12 +9,11 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
-import org.basex.gui.layout.BaseXFileChooser.Mode;
+import org.basex.gui.layout.BaseXFileChooser.*;
 import org.basex.io.*;
 import org.basex.query.util.pkg.*;
-import org.basex.query.util.pkg.Package;
+import org.basex.query.util.pkg.Pkg;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -137,22 +136,21 @@ public final class DialogPackages extends BaseXDialog {
       for(final String p : pkgs) cmds.add(new RepoDelete(p, null));
 
     } else {
-      final byte[] key = Token.token(packages.getValue());
-      final TokenMap pkg = ctx.repo.pkgDict();
-      if(pkg.get(key) != null) {
-        title.setText(key.length == 0 ? DOTS : Token.string(key));
-        name.setText(Token.string(Package.name(key)));
-        version.setText(Token.string(Package.version(key)));
+      final String key = packages.getValue();
+      final Pkg pkg = ctx.repo.pkgDict().get(key);
+      if(pkg != null) {
+        title.setText(key.isEmpty() ? DOTS : key);
+        name.setText(pkg.name());
+        version.setText(pkg.version());
         type.setText(PkgText.EXPATH);
-        path.setText(Token.string(pkg.get(key)));
+        path.setText(pkg.dir());
       } else {
-        final String pp = Token.string(key);
-        final IOFile file = RepoManager.file(pp, ctx.repo);
-        title.setText(key.length == 0 ? DOTS : pp);
+        final IOFile file = new RepoManager(ctx).find(key);
+        title.setText(key.isEmpty() ? DOTS : key);
         name.setText(file != null ? file.name() : "-");
         version.setText("-");
         type.setText(PkgText.INTERNAL);
-        path.setText(pp.replace('.', '/'));
+        path.setText(key.replace('.', '/'));
       }
       // enable or disable buttons
       delete.setEnabled(!pkgs.isEmpty());

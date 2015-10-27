@@ -33,8 +33,8 @@ public final class Context {
   public final Datas datas;
   /** Users. */
   public final Users users;
-  /** Package repository. */
-  public final Repo repo;
+  /** EXPath package repository. */
+  public final EXPathRepo repo;
   /** Databases list. */
   public final Databases databases;
   /** Log. */
@@ -117,7 +117,7 @@ public final class Context {
     locks = soptions.get(StaticOptions.GLOBALLOCK) ? new ProcLocking(soptions) :
       new DBLocking(soptions);
     users = new Users(soptions);
-    repo = new Repo(soptions);
+    repo = new EXPathRepo(soptions);
     log = new Log(soptions);
     user = users.get(UserText.ADMIN);
   }

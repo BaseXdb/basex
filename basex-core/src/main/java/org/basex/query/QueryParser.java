@@ -39,6 +39,7 @@ import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.format.*;
 import org.basex.query.util.list.*;
+import org.basex.query.util.parse.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -47,7 +48,6 @@ import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 import org.basex.util.options.*;
 
 /**
@@ -61,8 +61,8 @@ public class QueryParser extends InputParser {
   private static final byte[] URICHECK = {};
   /** QName check: skip namespace check. */
   private static final byte[] SKIPCHECK = {};
-  /** Reserved function names (XQuery 3.0). */
-  private static final TokenSet KEYWORDS30 = new TokenSet();
+  /** Reserved function names. */
+  private static final TokenSet KEYWORDS = new TokenSet();
 
   static {
     final byte[][] keys = {
@@ -72,13 +72,15 @@ public class QueryParser extends InputParser {
       NodeType.PI.string(), token(SCHEMA_ATTRIBUTE), token(SCHEMA_ELEMENT), token(SWITCH),
       NodeType.TXT.string(), token(TYPESWITCH)
     };
-    for(final byte[] key : keys) KEYWORDS30.add(key);
+    for(final byte[] key : keys) KEYWORDS.add(key);
   }
 
   /** Modules loaded by the current file. */
   public final TokenSet modules = new TokenSet();
   /** List of modules to be parsed. */
   public final ArrayList<ModInfo> mods = new ArrayList<>();
+  /** Name of current module. */
+  public QNm module;
 
   /** Parsed variables. */
   public final ArrayList<StaticVar> vars = new ArrayList<>();
@@ -88,9 +90,9 @@ public class QueryParser extends InputParser {
   public final TokenMap namespaces = new TokenMap();
 
   /** Query context. */
-  private final QueryContext qc;
+  public final QueryContext qc;
   /** Static context. */
-  private final StaticContext sc;
+  public final StaticContext sc;
 
   /** Temporary token cache. */
   private final TokenBuilder tok = new TokenBuilder();
@@ -98,9 +100,6 @@ public class QueryParser extends InputParser {
   private final StringBuilder currDoc = new StringBuilder();
   /** Current XQDoc string. */
   private String moduleDoc = "";
-
-  /** Name of current module. */
-  private QNm module;
 
   /** Alternative error code. */
   private QueryError alter;
@@ -111,10 +110,10 @@ public class QueryParser extends InputParser {
 
   /** Declared flags. */
   private final HashSet<String> decl = new HashSet<>();
-  /** Cached QNames. */
-  private final ArrayList<QNmCheck> names = new ArrayList<>();
-  /** Stack of variable contexts. */
-  private final ArrayList<VarContext> localVars = new ArrayList<>();
+  /** QName cache. */
+  private final QNmCache qnames = new QNmCache();
+  /** Local variable. */
+  private final LocalVars localVars = new LocalVars(this);
 
   /**
    * Constructor.
@@ -167,10 +166,10 @@ public class QueryParser extends InputParser {
       importModules();
       prolog2();
 
-      pushVarContext(null);
+      localVars.pushContext(null);
       final Expr expr = expr();
       if(expr == null) throw alter == null ? error(EXPREMPTY) : error();
-      final VarScope scope = popVarContext();
+      final VarScope scope = localVars.popContext();
 
       final MainModule mm = new MainModule(expr, scope, moduleDoc, sc);
       finish(mm, true);
@@ -267,7 +266,7 @@ public class QueryParser extends InputParser {
     }
 
     // completes the parsing step
-    assignURI(0);
+    qnames.assignURI(this, 0);
     if(sc.elemNS != null) sc.ns.add(EMPTY, sc.elemNS, null);
 
     // set default decimal format
@@ -546,7 +545,7 @@ public class QueryParser extends InputParser {
 
     } else if(eq(qnm.uri(), QUERY_URI)) {
       // query-specific options
-      switch (name) {
+      switch(name) {
         case READ_LOCK:
           for(final byte[] lock : split(val, ','))
             qc.readLocks.add(DBLocking.USER_PREFIX + string(lock).trim());
@@ -727,16 +726,6 @@ public class QueryParser extends InputParser {
     }
   }
 
-  /** Information required for parsing a module. */
-  private static final class ModInfo {
-    /** Paths. */
-    private final TokenList paths = new TokenList(1);
-    /** URI. */
-    private byte[] uri;
-    /** Input info. */
-    private InputInfo info;
-  }
-
   /**
    * Imports all modules parsed in the prolog.
    * @throws QueryException query exception
@@ -753,15 +742,15 @@ public class QueryParser extends InputParser {
   private void importModule(final ModInfo mi) throws QueryException {
     final byte[] uri = mi.uri;
     if(mi.paths.isEmpty()) {
-      // skip statically available modules
+      // no paths specified: skip statically available modules
       for(final byte[] u : Function.URIS) if(eq(uri, u)) return;
       // try to resolve module uri
-      if(qc.resources.modules().addImport(uri, mi.info, this)) return;
+      if(qc.resources.modules().addImport(string(uri), mi.info, this)) return;
       // module not found
       throw error(WHICHMODULE_X, uri);
     }
     // parse supplied paths
-    for(final byte[] path : mi.paths) module(path, uri);
+    for(final byte[] path : mi.paths) module(string(path), string(uri));
   }
 
   /**
@@ -770,19 +759,19 @@ public class QueryParser extends InputParser {
    * @param uri module uri
    * @throws QueryException query exception
    */
-  public void module(final byte[] path, final byte[] uri) throws QueryException {
+  public void module(final String path, final String uri) throws QueryException {
     // get absolute path
-    final IO io = sc.resolve(string(path), string(uri));
+    final IO io = sc.resolve(path, uri);
     final byte[] p = token(io.path());
 
     // check if module has already been parsed
     final byte[] u = qc.modParsed.get(p);
     if(u != null) {
-      if(!eq(uri, u)) throw error(WRONGMODULE_X_X, uri,
+      if(!uri.equals(string(u))) throw error(WRONGMODULE_X_X, uri,
           qc.context.user().has(Perm.ADMIN) ? io.path() : io.name());
       return;
     }
-    qc.modParsed.put(p, uri);
+    qc.modParsed.put(p, token(uri));
 
     // read module
     final String qu;
@@ -798,7 +787,7 @@ public class QueryParser extends InputParser {
     final byte[] muri = lib.name.uri();
 
     // check if import and declaration uri match
-    if(!eq(uri, muri)) throw error(WRONGMODULE_X_X, muri, file);
+    if(!uri.equals(string(muri))) throw error(WRONGMODULE_X_X, muri, file);
 
     // check if context value declaration types are compatible to each other
     if(sub.contextType != null) {
@@ -831,10 +820,10 @@ public class QueryParser extends InputParser {
     if(!wsConsumeWs(EXTERNAL)) wsCheck(ASSIGN);
     else if(!wsConsumeWs(ASSIGN)) return;
 
-    pushVarContext(null);
+    localVars.pushContext(null);
     final Expr e = check(single(), NOVARDECL);
     final SeqType declType = sc.contextType == null ? SeqType.ITEM : sc.contextType;
-    final VarScope scope = popVarContext();
+    final VarScope scope = localVars.popContext();
     qc.ctxItem = new MainModule(e, scope, declType, currDoc.toString(), sc, info());
 
     if(module != null) throw error(DECITEM);
@@ -851,7 +840,7 @@ public class QueryParser extends InputParser {
     final SeqType tp = optAsType();
     if(module != null && !eq(vn.uri(), module.uri())) throw error(MODULENS_X, vn);
 
-    pushVarContext(null);
+    localVars.pushContext(null);
     final boolean external = wsConsumeWs(EXTERNAL);
     final Expr bind;
     if(external) {
@@ -861,7 +850,7 @@ public class QueryParser extends InputParser {
       bind = check(single(), NOVARDECL);
     }
 
-    final VarScope scope = popVarContext();
+    final VarScope scope = localVars.popContext();
     vars.add(qc.vars.declare(vn, tp, anns, bind, external, sc, scope, currDoc.toString(), info()));
   }
 
@@ -896,13 +885,13 @@ public class QueryParser extends InputParser {
     wsCheck(PAREN1);
     if(module != null && !eq(name.uri(), module.uri())) throw error(MODULENS_X, name);
 
-    pushVarContext(null);
+    localVars.pushContext(null);
     final Var[] args = paramList();
     wsCheck(PAREN2);
     final SeqType type = optAsType();
     if(anns.contains(Annotation.UPDATING)) qc.updating();
     final Expr expr = wsConsumeWs(EXTERNAL) ? null : enclosed(NOFUNBODY);
-    final VarScope scope = popVarContext();
+    final VarScope scope = localVars.popContext();
     funcs.add(qc.funcs.declare(anns, name, args, type, expr, sc, scope, currDoc.toString(), ii));
   }
 
@@ -912,7 +901,7 @@ public class QueryParser extends InputParser {
    * @return result of check
    */
   private static boolean keyword(final QNm name) {
-    return !name.hasPrefix() && KEYWORDS30.contains(name.string());
+    return !name.hasPrefix() && KEYWORDS.contains(name.string());
   }
 
   /**
@@ -928,7 +917,7 @@ public class QueryParser extends InputParser {
         if(args.length == 0) break;
         check('$');
       }
-      final Var var = addVar(varName(), optAsType(), true);
+      final Var var = localVars.add(varName(), optAsType(), true);
       for(final Var v : args)
         if(v.name.eq(var.name)) throw error(FUNCDUPL_X, var);
 
@@ -1002,7 +991,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr flwor() throws QueryException {
-    final int s = openSubScope();
+    final int s = localVars.openScope();
     final LinkedList<Clause> clauses = initialClause(null);
     if(clauses == null) return null;
 
@@ -1047,7 +1036,7 @@ public class QueryParser extends InputParser {
 
           // if one groups variables such as $x as xs:integer, then the resulting
           // sequence isn't compatible with the type and can't be assigned
-          final Var nv = addVar(v.var.name, null, false);
+          final Var nv = localVars.add(v.var.name, null, false);
           // [LW] should be done everywhere
           if(v.seqType().one())
             nv.refineType(SeqType.get(v.seqType().type, Occ.ONE_MORE), qc, info());
@@ -1077,7 +1066,7 @@ public class QueryParser extends InputParser {
       }
 
       if(wsConsumeWs(COUNT, DOLLAR, NOCOUNT)) {
-        final Var v = addVar(varName(), SeqType.ITR, false);
+        final Var v = localVars.add(varName(), SeqType.ITR, false);
         curr.put(v.name.id(), v);
         clauses.add(new Count(v, info()));
       }
@@ -1086,7 +1075,7 @@ public class QueryParser extends InputParser {
     if(!wsConsumeWs(RETURN)) throw alter == null ? error(FLWORRETURN) : error();
 
     final Expr ret = check(single(), NORETURN);
-    closeSubScope(s);
+    localVars.closeScope(s);
     return new GFLWOR(clauses.get(0).info, clauses, ret);
   }
 
@@ -1136,9 +1125,9 @@ public class QueryParser extends InputParser {
       final Expr e = check(single(), NOVARDECL);
 
       // declare late because otherwise it would shadow the wrong variables
-      final Var var = addVar(nm, tp, false);
-      final Var ps = p != null ? addVar(p, SeqType.ITR, false) : null;
-      final Var scr = s != null ? addVar(s, SeqType.DBL, false) : null;
+      final Var var = localVars.add(nm, tp, false);
+      final Var ps = p != null ? localVars.add(p, SeqType.ITR, false) : null;
+      final Var scr = s != null ? localVars.add(s, SeqType.DBL, false) : null;
       if(p != null) {
         if(nm.eq(p)) throw error(DUPLVAR_X, var);
         if(s != null && p.eq(s)) throw error(DUPLVAR_X, ps);
@@ -1162,7 +1151,7 @@ public class QueryParser extends InputParser {
       final SeqType tp = score ? SeqType.DBL : optAsType();
       wsCheck(ASSIGN);
       final Expr e = check(single(), NOVARDECL);
-      cls.add(new Let(addVar(nm, tp, false), e, score, info()));
+      cls.add(new Let(localVars.add(nm, tp, false), e, score, info()));
     } while(wsConsume(COMMA));
   }
 
@@ -1195,7 +1184,7 @@ public class QueryParser extends InputParser {
       if(check) wsCheck(END);
       end = windowCond(false);
     }
-    return new Window(info(), slide, addVar(nm, tp, false), e, start, only, end);
+    return new Window(info(), slide, localVars.add(nm, tp, false), e, start, only, end);
   }
 
   /**
@@ -1207,10 +1196,10 @@ public class QueryParser extends InputParser {
   private Condition windowCond(final boolean start) throws QueryException {
     skipWs();
     final InputInfo ii = info();
-    final Var var = curr('$')             ? addVar(varName(), null, false) : null,
-              at  = wsConsumeWs(AT)       ? addVar(varName(), null, false) : null,
-              prv = wsConsumeWs(PREVIOUS) ? addVar(varName(), null, false) : null,
-              nxt = wsConsumeWs(NEXT)     ? addVar(varName(), null, false) : null;
+    final Var var = curr('$')             ? localVars.add(varName(), null, false) : null,
+              at  = wsConsumeWs(AT)       ? localVars.add(varName(), null, false) : null,
+              prv = wsConsumeWs(PREVIOUS) ? localVars.add(varName(), null, false) : null,
+              nxt = wsConsumeWs(NEXT)     ? localVars.add(varName(), null, false) : null;
     wsCheck(WHEN);
     return new Condition(start, var, at, prv, nxt, check(single(), NOEXPR), ii);
   }
@@ -1256,7 +1245,7 @@ public class QueryParser extends InputParser {
         if(declType != null) wsCheck(ASSIGN);
         by = check(single(), NOVARDECL);
       } else {
-        final VarRef vr = resolveLocalVar(name, ii);
+        final VarRef vr = localVars.resolveLocal(name, ii);
         // the grouping variable has to be declared by the same FLWOR expression
         boolean dec = false;
         if(vr != null) {
@@ -1284,7 +1273,7 @@ public class QueryParser extends InputParser {
 
       final Collation coll = wsConsumeWs(COLLATION) ? Collation.get(stringLiteral(),
           qc, sc, info(), FLWORCOLL_X) : sc.collation;
-      final Spec spec = new Spec(ii, addVar(name, declType, false), by, coll);
+      final Spec spec = new Spec(ii, localVars.add(name, declType, false), by, coll);
       if(specs == null) {
         specs = new Spec[] { spec };
       } else {
@@ -1309,19 +1298,19 @@ public class QueryParser extends InputParser {
     final boolean some = wsConsumeWs(SOME, DOLLAR, NOSOME);
     if(!some && !wsConsumeWs(EVERY, DOLLAR, NOSOME)) return null;
 
-    final int s = openSubScope();
+    final int s = localVars.openScope();
     For[] fl = { };
     do {
       final QNm nm = varName();
       final SeqType tp = optAsType();
       wsCheck(IN);
       final Expr e = check(single(), NOSOME);
-      fl = Array.add(fl, new For(addVar(nm, tp, false), null, null, e, false, info()));
+      fl = Array.add(fl, new For(localVars.add(nm, tp, false), null, null, e, false, info()));
     } while(wsConsumeWs(COMMA));
 
     wsCheck(SATISFIES);
     final Expr e = check(single(), NOSOME);
-    closeSubScope(s);
+    localVars.closeScope(s);
     return new Quantifier(info(), fl, e, !some);
   }
 
@@ -1370,7 +1359,7 @@ public class QueryParser extends InputParser {
 
     TypeCase[] cases = { };
     final ArrayList<SeqType> types = new ArrayList<>();
-    final int s = openSubScope();
+    final int s = localVars.openScope();
     boolean cs;
     do {
       types.clear();
@@ -1381,7 +1370,7 @@ public class QueryParser extends InputParser {
       }
       Var var = null;
       if(curr('$')) {
-        var = addVar(varName(), null, false);
+        var = localVars.add(varName(), null, false);
         if(cs) wsCheck(AS);
       }
       if(cs) {
@@ -1392,7 +1381,7 @@ public class QueryParser extends InputParser {
       final Expr ret = check(single(), NOTYPESWITCH);
       cases = Array.add(cases, new TypeCase(info(), var,
           types.toArray(new SeqType[types.size()]), ret));
-      closeSubScope(s);
+      localVars.closeScope(s);
     } while(cs);
     if(cases.length == 1) throw error(NOTYPESWITCH);
     return new TypeSwitch(ii, ts, cases);
@@ -1455,10 +1444,10 @@ public class QueryParser extends InputParser {
     final Expr e = comparison();
     if(e != null) {
       if(wsConsumeWs(UPDATE)) {
-        final int s = openSubScope();
+        final int s = localVars.openScope();
         qc.updating();
         final Expr m = check(single(), COPYEXPR);
-        closeSubScope(s);
+        localVars.closeScope(s);
         return new TransformWith(info(), e, m);
       }
     }
@@ -1667,7 +1656,7 @@ public class QueryParser extends InputParser {
     if(e != null) {
       while(wsConsume(ARROW)) {
         final Expr ex = wsConsume(PAREN1) ? parenthesized() : curr() == '$'
-            ? resolveVar(varName(), info()) : eQName(ARROWSPEC, sc.funcNS);
+            ? localVars.resolve(varName(), info()) : eQName(ARROWSPEC, sc.funcNS);
         wsCheck(PAREN1);
 
         if(ex instanceof QNm) {
@@ -1732,8 +1721,7 @@ public class QueryParser extends InputParser {
     if(consume(CURLY1)) {
       brace = false;
     } else if(consume(TYPE)) {
-      final QNm qnm = eQName(QNAME_X, SKIPCHECK);
-      names.add(new QNmCheck(qnm));
+      qnames.add(eQName(QNAME_X, SKIPCHECK));
     } else if(!consume(STRICT) && !consume(LAX)) {
       pos = i;
       return;
@@ -2014,13 +2002,13 @@ public class QueryParser extends InputParser {
         // name test: prefix:name, name, Q{uri}name
         if(name.hasPrefix() || !consume(':')) {
           skipWs();
-          names.add(new QNmCheck(name, !att));
+          qnames.add(name, !att);
           return new NameTest(name, Kind.URI_NAME, att, sc.elemNS);
         }
         // name test: prefix:*
         if(consume('*')) {
           final QNm nm = new QNm(concat(name.string(), COLON));
-          names.add(new QNmCheck(nm, !att));
+          qnames.add(nm, !att);
           return new NameTest(nm, Kind.URI, att, sc.elemNS);
         }
       }
@@ -2086,7 +2074,7 @@ public class QueryParser extends InputParser {
     // variables
     if(c == '$') {
       final InputInfo ii = info();
-      return resolveVar(varName(), ii);
+      return localVars.resolve(varName(), ii);
     }
     // parentheses
     if(next() != '#' && consume('(')) return parenthesized();
@@ -2197,12 +2185,12 @@ public class QueryParser extends InputParser {
       if(anns.contains(Annotation.PRIVATE) || anns.contains(Annotation.PUBLIC))
         throw error(INVISIBLE);
       final HashMap<Var, Expr> nonLocal = new HashMap<>();
-      pushVarContext(nonLocal);
+      localVars.pushContext(nonLocal);
       final Var[] args = paramList();
       wsCheck(PAREN2);
       final SeqType type = optAsType();
       final Expr body = enclosed(NOFUNBODY);
-      final VarScope scope = popVarContext();
+      final VarScope scope = localVars.popContext();
       return new Closure(info(), type, args, body, anns, nonLocal, sc, scope);
     }
     // annotations not allowed here
@@ -2464,10 +2452,10 @@ public class QueryParser extends InputParser {
     // cache namespace information
     final int s = sc.ns.size();
     final byte[] nse = sc.elemNS;
-    final int npos = names.size();
+    final int npos = qnames.size();
 
     final QNm name = new QNm(qName(ELEMNAME_X));
-    names.add(new QNmCheck(name));
+    qnames.add(name);
     consumeWS();
 
     final Atts ns = new Atts();
@@ -2555,7 +2543,7 @@ public class QueryParser extends InputParser {
         final QNm attn = new QNm(atn);
         if(atts == null) atts = new ArrayList<>(1);
         atts.add(attn);
-        names.add(new QNmCheck(attn, false));
+        qnames.add(attn, false);
         add(cont, new CAttr(sc, info(), false, attn, attv.finish()));
       }
       if(!consumeWS()) break;
@@ -2577,7 +2565,7 @@ public class QueryParser extends InputParser {
       if(!eq(name.string(), close)) throw error(TAGWRONG_X_X, name.string(), close);
     }
 
-    assignURI(npos);
+    qnames.assignURI(this, npos);
 
     // check for duplicate attribute names
     if(atts != null) {
@@ -2755,7 +2743,7 @@ public class QueryParser extends InputParser {
     final QNm qn = eQName(null, SKIPCHECK);
     if(qn != null) {
       name = qn;
-      names.add(new QNmCheck(qn));
+      qnames.add(qn);
     } else {
       if(!wsConsume(CURLY1)) return null;
       name = check(expr(), NOELEMNAME);
@@ -2780,7 +2768,7 @@ public class QueryParser extends InputParser {
     final QNm qn = eQName(null, SKIPCHECK);
     if(qn != null) {
       name = qn;
-      names.add(new QNmCheck(qn, false));
+      qnames.add(qn, false);
     } else {
       if(!wsConsume(CURLY1)) return null;
       name = check(expr(), NOATTNAME);
@@ -3142,13 +3130,13 @@ public class QueryParser extends InputParser {
         codes = Array.add(codes, test);
       } while(wsConsumeWs(PIPE));
 
-      final int s = openSubScope();
+      final int s = localVars.openScope();
       final int cl = Catch.NAMES.length;
       final Var[] vs = new Var[cl];
-      for(int i = 0; i < cl; i++) vs[i] = addVar(Catch.NAMES[i], Catch.TYPES[i], false);
+      for(int i = 0; i < cl; i++) vs[i] = localVars.add(Catch.NAMES[i], Catch.TYPES[i], false);
       final Catch c = new Catch(info(), codes, vs);
       c.expr = enclosed(NOENCLEXPR);
-      closeSubScope(s);
+      localVars.closeScope(s);
 
       ct = Array.add(ct, c);
     } while(wsConsumeWs(CATCH));
@@ -3623,14 +3611,14 @@ public class QueryParser extends InputParser {
    */
   private Expr transform() throws QueryException {
     if(!wsConsumeWs(COPY, DOLLAR, INCOMPLETE)) return null;
-    final int s = openSubScope();
+    final int s = localVars.openScope();
 
     Let[] fl = { };
     do {
       final QNm name = varName();
       wsCheck(ASSIGN);
       final Expr e = check(single(), INCOMPLETE);
-      fl = Array.add(fl, new Let(addVar(name, SeqType.NOD, false), e, false, info()));
+      fl = Array.add(fl, new Let(localVars.add(name, SeqType.NOD, false), e, false, info()));
     } while(wsConsumeWs(COMMA));
     wsCheck(MODIFY);
 
@@ -3638,7 +3626,7 @@ public class QueryParser extends InputParser {
     wsCheck(RETURN);
     final Expr r = check(single(), INCOMPLETE);
 
-    closeSubScope(s);
+    localVars.closeScope(s);
     qc.updating();
     return new Transform(info(), fl, m, r);
   }
@@ -3867,108 +3855,6 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Creates and registers a new local variable in the current scope.
-   * @param name variable name
-   * @param tp variable type
-   * @param prm if the variable is a function parameter
-   * @return registered variable
-   */
-  private Var addVar(final QNm name, final SeqType tp, final boolean prm) {
-    return localVars.get(localVars.size() - 1).addVar(name, tp, prm);
-  }
-
-  /**
-   * Tries to resolve a local variable reference.
-   * @param name variable name
-   * @param ii input info
-   * @return variable reference (may be {@code null})
-   */
-  private VarRef resolveLocalVar(final QNm name, final InputInfo ii) {
-    int l = localVars.size();
-    Var var = null;
-
-    // look up through the scopes until we find the declaring scope
-    while(--l >= 0) {
-      var = localVars.get(l).stack.get(name);
-      if(var != null) break;
-    }
-
-    // looked through all scopes, must be a static variable
-    if(var == null) return null;
-
-    // go down through the scopes and add bindings to their closures
-    final int ls = localVars.size();
-    while(++l < ls) {
-      final VarContext vctx = localVars.get(l);
-      final Var local = vctx.addVar(var.name, var.seqType(), false);
-      vctx.nonLocal.put(local, new VarRef(ii, var));
-      var = local;
-    }
-
-    // return the properly propagated variable reference
-    return new VarRef(ii, var);
-  }
-
-  /**
-   * Resolves the referenced variable as a local or static variable and returns a reference to it.
-   * IF the variable is not declared, the specified error is thrown.
-   * @param name variable name
-   * @param ii input info
-   * @return referenced variable
-   * @throws QueryException if the variable isn't defined
-   */
-  private Expr resolveVar(final QNm name, final InputInfo ii) throws QueryException {
-    // local variable
-    final VarRef local = resolveLocalVar(name, ii);
-    if(local != null) return local;
-
-    // static variable
-    final byte[] uri = name.uri();
-
-    // accept variable reference...
-    // - if a variable uses the module or an imported URI, or
-    // - if it is specified in the main module
-    if(module == null || eq(module.uri(), uri) || modules.contains(uri))
-      return qc.vars.newRef(name, sc, ii);
-
-    throw error(VARUNDEF_X, '$' + string(name.string()));
-  }
-
-  /**
-   * Pushes a new variable context onto the stack.
-   * @param nonLocal mapping for non-local variables
-   */
-  private void pushVarContext(final HashMap<Var, Expr> nonLocal) {
-    localVars.add(new VarContext(nonLocal));
-  }
-
-  /**
-   * Pops one variable context from the stack.
-   * @return the removed context's variable scope
-   */
-  private VarScope popVarContext() {
-    return localVars.remove(localVars.size() - 1).scope;
-  }
-
-  /**
-   * Opens a new sub-scope inside the current one. The returned marker has to be supplied to the
-   * corresponding call to {@link #closeSubScope(int)} in order to mark the variables as
-   * inaccessible.
-   * @return marker for the current bindings
-   */
-  private int openSubScope() {
-    return localVars.get(localVars.size() - 1).stack.size();
-  }
-
-  /**
-   * Closes the sub-scope and marks all contained variables as inaccessible.
-   * @param marker marker for the start of the sub-scope
-   */
-  private void closeSubScope(final int marker) {
-    localVars.get(localVars.size() - 1).stack.size(marker);
-  }
-
-  /**
    * Consumes the next character and normalizes new line characters.
    * @return next character
    * @throws QueryException query exception
@@ -4132,93 +4018,7 @@ public class QueryParser extends InputParser {
    * @param arg error arguments
    * @return error
    */
-  QueryException error(final QueryError err, final Object... arg) {
+  public QueryException error(final QueryError err, final Object... arg) {
     return err.get(info(), arg);
-  }
-
-  /**
-   * Finalizes the QNames by assigning namespace URIs.
-   * @param npos first entry to be checked
-   * @throws QueryException query exception
-   */
-  private void assignURI(final int npos) throws QueryException {
-    for(int i = npos; i < names.size(); i++) {
-      if(names.get(i).assign(npos == 0)) names.remove(i--);
-    }
-  }
-
-  /** Cache for checking QNames after their construction. */
-  private class QNmCheck {
-    /** QName to be checked. */
-    final QNm name;
-    /** Flag for assigning default element namespace. */
-    final boolean nsElem;
-
-    /**
-     * Constructor.
-     * @param nm qname
-     */
-    QNmCheck(final QNm nm) {
-      this(nm, true);
-    }
-
-    /**
-     * Constructor.
-     * @param nm qname
-     * @param nse default check
-     */
-    QNmCheck(final QNm nm, final boolean nse) {
-      name = nm;
-      nsElem = nse;
-    }
-
-    /**
-     * Assigns the namespace URI that is currently in scope.
-     * @param check check if prefix URI was assigned
-     * @return true if URI has a URI
-     * @throws QueryException query exception
-     */
-    boolean assign(final boolean check) throws QueryException {
-      if(name.hasURI()) return true;
-
-      if(name.hasPrefix()) {
-        name.uri(sc.ns.uri(name.prefix()));
-        if(check && !name.hasURI()) throw error(NOURI_X, name.string());
-      } else if(nsElem) {
-        name.uri(sc.elemNS);
-      }
-      return name.hasURI();
-    }
-  }
-
-  /** Variable context for resolving local variables. */
-  private final class VarContext {
-    /** Stack of local variables. */
-    final VarStack stack = new VarStack();
-    /** Current scope containing all variables and the closure. */
-    final VarScope scope = new VarScope(sc);
-    /** Non-local variable bindings for closures. */
-    final HashMap<Var, Expr> nonLocal;
-
-    /**
-     * Constructor.
-     * @param bindings non-local variable bindings for closures
-     */
-    private VarContext(final HashMap<Var, Expr> bindings) {
-      nonLocal = bindings;
-    }
-
-    /**
-     * Adds a new variable to this context.
-     * @param name variable name
-     * @param tp variable type
-     * @param prm promotion flag
-     * @return the variable
-     */
-    public Var addVar(final QNm name, final SeqType tp, final boolean prm) {
-      final Var var = scope.newLocal(qc, name, tp, prm);
-      stack.push(var);
-      return var;
-    }
   }
 }

@@ -1,37 +1,35 @@
 package org.basex.query.util.pkg;
 
 import static org.basex.query.util.pkg.PkgText.*;
-import static org.basex.util.Token.*;
+
+import java.util.*;
 
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.util.pkg.Package.Component;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 
 /**
- * EXPath repository context.
+ * EXPath repositories.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Rositsa Shadura
  */
-public final class Repo {
-  /** Namespace-dictionary with all namespaces (unique names) available
-   * in the repository, and the packages in which they are found. */
-  private final TokenObjMap<TokenSet> nsDict = new TokenObjMap<>();
-  /** Package dictionary with installed packages and their directories. */
-  private final TokenMap pkgDict = new TokenMap();
-  /** Repository path; will be initialized after first call. */
-  private IOFile path;
+public final class EXPathRepo {
+  /** Namespace dictionary with namespace URIs and package IDs. */
+  private final HashMap<String, HashSet<String>> nsDict = new HashMap<>();
+  /** Package dictionary with package IDs and instances. */
+  private final HashMap<String, Pkg> pkgDict = new HashMap<>();
   /** Static options. */
   private final StaticOptions sopts;
+  /** Repository path; will be initialized when needed. */
+  private IOFile path;
 
   /**
    * Constructor.
    * @param sopts static options
    */
-  public Repo(final StaticOptions sopts) {
+  public EXPathRepo(final StaticOptions sopts) {
     this.sopts = sopts;
   }
 
@@ -39,7 +37,7 @@ public final class Repo {
    * Resets the repository.
    * @return self reference
    */
-  public Repo reset() {
+  public EXPathRepo reset() {
     path = null;
     nsDict.clear();
     pkgDict.clear();
@@ -58,7 +56,7 @@ public final class Repo {
    * Returns the namespace dictionary.
    * @return dictionary
    */
-  public TokenObjMap<TokenSet> nsDict() {
+  public HashMap<String, HashSet<String>> nsDict() {
     return init().nsDict;
   }
 
@@ -66,7 +64,7 @@ public final class Repo {
    * Returns the package dictionary.
    * @return dictionary
    */
-  public TokenMap pkgDict() {
+  public HashMap<String, Pkg> pkgDict() {
     return init().pkgDict;
   }
 
@@ -76,46 +74,45 @@ public final class Repo {
    * @return file reference
    */
   IOFile path(final String pkg) {
-    return new IOFile(init().path, pkg);
+    return new IOFile(path(), pkg);
   }
 
   /**
    * Adds a newly installed package to the namespace and package dictionaries.
    * @param pkg new package
-   * @param dir new package directory
    */
-  synchronized void add(final Package pkg, final String dir) {
+  void add(final Pkg pkg) {
     init();
-    addPkg(pkg, dir);
+    addPkg(pkg);
   }
 
   /**
    * Deletes a package from the namespace and package dictionaries when it is deleted.
    * @param pkg deleted package
    */
-  synchronized void delete(final Package pkg) {
+  void delete(final Pkg pkg) {
     init();
 
-    final byte[] name = pkg.uniqueName();
+    final String id = pkg.id();
     // delete package from namespace dictionary
-    for(final Component comp : pkg.comps) {
-      final byte[] uri = comp.uri;
-      final TokenSet pkgs = nsDict.get(uri);
+    for(final PkgComponent comp : pkg.comps) {
+      final String uri = comp.uri;
+      final HashSet<String> pkgs = nsDict.get(uri);
       if(pkgs.size() > 1) {
-        pkgs.delete(name);
+        pkgs.remove(id);
       } else {
-        nsDict.delete(uri);
+        nsDict.remove(uri);
       }
     }
     // delete package from package dictionary
-    pkgDict.delete(name);
+    pkgDict.remove(id);
   }
 
   /**
    * Initializes the package repository.
    * @return self reference
    */
-  private Repo init() {
+  private synchronized EXPathRepo init() {
     if(path == null) {
       path = new IOFile(sopts.get(StaticOptions.REPOPATH));
       // ignore directories starting with dot (#1122)
@@ -136,7 +133,7 @@ public final class Repo {
     if(!desc.exists()) return;
 
     try {
-      addPkg(new PkgParser(null).parse(desc), dir.name());
+      addPkg(new PkgParser(null).parse(desc).dir(dir.name()));
     } catch(final QueryException ex) {
       Util.errln(ex);
     }
@@ -145,24 +142,21 @@ public final class Repo {
   /**
    * Adds a package to the package dictionary.
    * @param pkg package
-   * @param dir name of package directory
    */
-  private void addPkg(final Package pkg, final String dir) {
-    final byte[] name = pkg.uniqueName();
+  private void addPkg(final Pkg pkg) {
     // read package components
-    for(final Component comp : pkg.comps) {
+    final String id = pkg.id();
+    for(final PkgComponent comp : pkg.comps) {
       // add component's namespace to namespace dictionary
       if(comp.uri != null) {
-        TokenSet dict = nsDict.get(comp.uri);
-        if(dict == null) {
-          dict = new TokenSet();
-          nsDict.put(comp.uri, dict);
+        HashSet<String> ids = nsDict.get(comp.uri);
+        if(ids == null) {
+          ids = new HashSet<>();
+          nsDict.put(comp.uri, ids);
         }
-        dict.add(name);
+        ids.add(id);
       }
     }
-    // add package to package dictionary
-    pkgDict.put(name, token(dir));
+    pkgDict.put(id, pkg);
   }
-
 }

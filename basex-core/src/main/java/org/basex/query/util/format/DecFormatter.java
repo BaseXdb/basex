@@ -77,7 +77,7 @@ public final class DecFormatter extends FormatUtil {
           nan = v;
         } else if(v.length != 0 && cl(v, 0) == v.length) {
           final int cp = cp(v, 0);
-          switch (k) {
+          switch(k) {
             case DF_DEC: decimal  = cp; break;
             case DF_GRP: grouping = cp; break;
             case DF_EXP: exponent = cp; break;
