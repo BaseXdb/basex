@@ -109,10 +109,6 @@ public class FuncType implements Type {
     if(t.getClass() != FuncType.class) return false;
     final FuncType ft = (FuncType) t;
 
-    // check annotations
-    if(anns.size() != ft.anns.size()) return false;
-    for(final Ann ann : ft.anns) if(!anns.contains(ann)) return false;
-
     if(this == SeqType.ANY_FUN || ft == SeqType.ANY_FUN || argTypes.length != ft.argTypes.length)
       return false;
 
