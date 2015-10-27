@@ -856,7 +856,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses an optional SeqType declaration.
-   * @return type if preceded by {@code as} (may be {@code null})
+   * @return type if preceded by {@code as} or {@code null}
    * @throws QueryException query exception
    */
   private SeqType optAsType() throws QueryException {
@@ -942,7 +942,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "Expr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr expr() throws QueryException {
@@ -960,7 +960,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "ExprSingle" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr single() throws QueryException {
@@ -987,7 +987,7 @@ public class QueryParser extends InputParser {
    * Parses the "OrderByClause" rule.
    * Parses the "OrderSpecList" rule.
    * Parses the "GroupByClause" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr flwor() throws QueryException {
@@ -1291,7 +1291,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "QuantifiedExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr quantified() throws QueryException {
@@ -1316,7 +1316,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "SwitchExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr switchh() throws QueryException {
@@ -1347,7 +1347,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "TypeswitchExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr typeswitch() throws QueryException {
@@ -1389,7 +1389,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "IfExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr iff() throws QueryException {
@@ -1407,7 +1407,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "OrExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr or() throws QueryException {
@@ -1437,7 +1437,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "UpdateExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr update() throws QueryException {
@@ -1456,7 +1456,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "ComparisonExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr comparison() throws QueryException {
@@ -1474,7 +1474,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "FTContainsExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr ftContains() throws QueryException {
@@ -1497,7 +1497,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "StringConcatExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr stringConcat() throws QueryException {
@@ -1511,7 +1511,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "RangeExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr range() throws QueryException {
@@ -1522,7 +1522,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "AdditiveExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr additive() throws QueryException {
@@ -1537,7 +1537,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "MultiplicativeExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr multiplicative() throws QueryException {
@@ -1553,7 +1553,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "UnionExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr union() throws QueryException {
@@ -1579,7 +1579,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "IntersectExceptExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr intersect() throws QueryException {
@@ -1600,7 +1600,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "InstanceofExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr instanceoff() throws QueryException {
@@ -1612,7 +1612,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "TreatExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr treat() throws QueryException {
@@ -1624,7 +1624,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "CastableExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr castable() throws QueryException {
@@ -1636,7 +1636,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "CastExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr cast() throws QueryException {
@@ -1648,14 +1648,15 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "ArrowExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr arrow() throws QueryException {
     Expr e = unary();
     if(e != null) {
       while(wsConsume(ARROW)) {
-        final Expr ex = wsConsume(PAREN1) ? parenthesized() : curr() == '$'
+        skipWs();
+        final Expr ex = curr('(') ? parenthesized() : curr('$')
             ? localVars.resolve(varName(), info()) : eQName(ARROWSPEC, sc.funcNS);
         wsCheck(PAREN1);
 
@@ -1678,7 +1679,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "UnaryExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr unary() throws QueryException {
@@ -1700,7 +1701,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "ValueExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr value() throws QueryException {
@@ -1735,7 +1736,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "ExtensionExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr extension() throws QueryException {
@@ -1747,7 +1748,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "Pragma" rule.
-   * @return array of pragmas (may be {@code null})
+   * @return array of pragmas or {@code null}
    * @throws QueryException query exception
    */
   private Pragma[] pragma() throws QueryException {
@@ -1783,7 +1784,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "MapExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr map() throws QueryException {
@@ -1798,7 +1799,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "PathExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr path() throws QueryException {
@@ -1895,7 +1896,7 @@ public class QueryParser extends InputParser {
   /**
    * Parses the "StepExpr" rule.
    * @param error show error if nothing is found
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr step(final boolean error) throws QueryException {
@@ -1906,7 +1907,7 @@ public class QueryParser extends InputParser {
   /**
    * Parses the "AxisStep" rule.
    * @param error show error if nothing is found
-   * @return step (may be {@code null})
+   * @return step or {@code null}
    * @throws QueryException query exception
    */
   private Step axisStep(final boolean error) throws QueryException {
@@ -1969,7 +1970,7 @@ public class QueryParser extends InputParser {
    * Parses the "KindTest" rule.
    * @param att attribute flag
    * @param all check all tests, or only names
-   * @return test (may be {@code null})
+   * @return test or {@code null}
    * @throws QueryException query exception
    */
   private Test nodeTest(final boolean att, final boolean all) throws QueryException {
@@ -2019,7 +2020,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "PostfixExpr" rule.
-   * @return postfix expression (may be {@code null})
+   * @return postfix expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr postfix() throws QueryException {
@@ -2065,7 +2066,7 @@ public class QueryParser extends InputParser {
    * Parses the "VarRef" rule.
    * Parses the "ContextItem" rule.
    * Parses the "Literal" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr primary() throws QueryException {
@@ -2077,9 +2078,11 @@ public class QueryParser extends InputParser {
       return localVars.resolve(varName(), ii);
     }
     // parentheses
-    if(next() != '#' && consume('(')) return parenthesized();
+    if(c == '(' && next() != '#') return parenthesized();
     // direct constructor
-    if(c == '<') return constructor();
+    if(c == '<') return dirConstructor();
+    // string constructor
+    if(c == '`') return stringConstructor();
     // function item
     Expr e = functionItem();
     if(e != null) return e;
@@ -2092,7 +2095,7 @@ public class QueryParser extends InputParser {
     // ordered expression
     if(wsConsumeWs(ORDERED, CURLY1, INCOMPLETE) || wsConsumeWs(UNORDERED, CURLY1, INCOMPLETE))
       return enclosed(NOENCLEXPR);
-    // map
+    // map constructor
     if(wsConsumeWs(MAPSTR, CURLY1, INCOMPLETE)) return new CMap(info(), keyValues());
     // square array constructor
     if(wsConsumeWs(SQUARE1)) return new CArray(info(), false, values());
@@ -2110,10 +2113,12 @@ public class QueryParser extends InputParser {
       pos = ip;
     }
     // context value
-    if(c == '.' && !digit(next())) {
+    if(c == '.') {
       if(next() == '.') return null;
-      consume('.');
-      return new ContextValue(info());
+      if(!digit(next())) {
+        consume();
+        return new ContextValue(info());
+      }
     }
     // literals
     return literal();
@@ -2125,9 +2130,14 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr keySpecifier() throws QueryException {
-    return wsConsume(ASTERISK) ? Str.WC :
-      consume(PAREN1) ? parenthesized() :
-      digit(curr()) ? numericLiteral(true) :
+    skipWs();
+    final int c = curr();
+    if(c == '*') {
+      consume();
+      return Str.WC;
+    }
+    return c == '(' ? parenthesized() :
+      digit(c) ? numericLiteral(true) :
       Str.get(ncName(KEYSPEC));
   }
 
@@ -2171,7 +2181,7 @@ public class QueryParser extends InputParser {
    * Parses the "NamedFunctionRef" rule.
    * Parses the "LiteralFunctionItem" rule.
    * Parses the "InlineFunction" rule.
-   * @return function item (may be {@code null})
+   * @return function item or {@code null}
    * @throws QueryException query exception
    */
   private Expr functionItem() throws QueryException {
@@ -2229,7 +2239,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "Literal" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr literal() throws QueryException {
@@ -2328,7 +2338,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "VarName" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private QNm varName() throws QueryException {
@@ -2338,11 +2348,12 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "ParenthesizedExpr" rule without the opening parenthesis.
+   * Parses the "ParenthesizedExpr" rule.
    * @return query expression
    * @throws QueryException query exception
    */
   private Expr parenthesized() throws QueryException {
+    check('(');
     final Expr e = expr();
     wsCheck(PAREN2);
     return e == null ? Empty.SEQ : e;
@@ -2350,7 +2361,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "FunctionCall" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr functionCall() throws QueryException {
@@ -2370,7 +2381,7 @@ public class QueryParser extends InputParser {
    * Returns a function.
    * @param name function name
    * @param exprs initial expressions
-   * @return function (may be {@code null})
+   * @return function or {@code null}
    * @throws QueryException query exception
    */
   private Expr function(final QNm name, final Expr... exprs) throws QueryException {
@@ -2432,12 +2443,45 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "Constructor" rule.
+   * Parses the "StringConstructor" rule.
+   * @return query expression
+   * @throws QueryException query exception
+   */
+  private Expr stringConstructor() throws QueryException {
+    check('`');
+    check('`');
+    check('[');
+
+    final ExprList el = new ExprList();
+    final TokenBuilder tb = new TokenBuilder();
+    while(more()) {
+      int p = pos;
+      if(consume(']') && consume('`') && consume('`')) {
+        if(!tb.isEmpty()) el.add(Str.get(tb.next()));
+        return Function.CONCAT.get(sc, info(), el.finish());
+      }
+      pos = p;
+      if(consume('`') && consume('{')) {
+        if(!tb.isEmpty()) el.add(Str.get(tb.next()));
+        final Expr e = expr();
+        if(e != null) el.add(Function.STRING_JOIN.get(sc, info(), e, Str.get(" ")));
+        skipWs();
+        check('}');
+        check('`');
+      } else {
+        pos = p;
+        tb.add(consume());
+      }
+    }
+    throw error(INCOMPLETE);
+  }
+
+  /**
    * Parses the "DirectConstructor" rule.
    * @return query expression
    * @throws QueryException query exception
    */
-  private Expr constructor() throws QueryException {
+  private Expr dirConstructor() throws QueryException {
     check('<');
     return consume('!') ? dirComment() : consume('?') ? dirPI() : dirElement();
   }
@@ -2599,7 +2643,7 @@ public class QueryParser extends InputParser {
           strip = false;
         } else {
           final Str txt = text(tb, strip);
-          return txt != null ? txt : next() == '/' ? null : constructor();
+          return txt != null ? txt : next() == '/' ? null : dirConstructor();
         }
       } else if(c == '{') {
         if(next() == '{') {
@@ -2625,7 +2669,7 @@ public class QueryParser extends InputParser {
    * Returns a string item.
    * @param tb token builder
    * @param strip strip flag
-   * @return string item (may be {@code null})
+   * @return string item or {@code null}
    */
   private Str text(final TokenBuilder tb, final boolean strip) {
     final byte[] t = tb.toArray();
@@ -2692,7 +2736,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "ComputedConstructor" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr compConstructor() throws QueryException {
@@ -2711,7 +2755,7 @@ public class QueryParser extends InputParser {
    * Consumes the specified expression or resets the query position.
    * @param expr expression
    * @param p query position
-   * @return expression (may be {@code null})
+   * @return expression or {@code null}
    */
   private Expr consume(final Expr expr, final int p) {
     if(expr == null) pos = p;
@@ -3111,7 +3155,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "TryCatch" rules.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr tryCatch() throws QueryException {
@@ -3513,7 +3557,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "InsertExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr insert() throws QueryException {
@@ -3547,7 +3591,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "DeleteExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr deletee() throws QueryException {
@@ -3562,7 +3606,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "RenameExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr rename() throws QueryException {
@@ -3581,7 +3625,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "ReplaceExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr replace() throws QueryException {
@@ -3606,7 +3650,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "TransformExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr transform() throws QueryException {
@@ -3633,7 +3677,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "UpdatingFunctionCall" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr updatingFunctionCall() throws QueryException {
@@ -3678,7 +3722,7 @@ public class QueryParser extends InputParser {
    * @param err optional error message. Will be thrown if no EQName is found, or ignored if set to
    * {@code null}
    * @param def default namespace, or operation mode ({@link #URICHECK}, {@link #SKIPCHECK})
-   * @return QName (may be {@code null})
+   * @return QName or {@code null}
    * @throws QueryException query exception
    */
   private QNm eQName(final QueryError err, final byte[] def) throws QueryException {

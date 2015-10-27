@@ -83,7 +83,7 @@ public abstract class Expr extends ExprInfo {
    * expression, as it may be called by this method.
    * @param qc query context
    * @param ii input info
-   * @return iterator or {@code null}
+   * @return item or {@code null}
    * @throws QueryException query exception
    */
   public abstract Item item(final QueryContext qc, final InputInfo ii) throws QueryException;
@@ -98,7 +98,7 @@ public abstract class Expr extends ExprInfo {
   public abstract Value value(final QueryContext qc) throws QueryException;
 
   /**
-   * Evaluates the expression and returns zero or one atomized item, or an error.
+   * Evaluates the expression and returns an iterator on the resulting, atomized items.
    * @param qc query context
    * @param ii input info
    * @return iterator
@@ -109,10 +109,11 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Evaluates the expression and returns zero or one atomized item, or an error.
+   * Evaluates the expression and returns the resulting, atomized item,
+   * or a {@code null} reference if the expression yields an empty sequence.
    * @param qc query context
    * @param ii input info
-   * @return iterator
+   * @return item or {@code null}
    * @throws QueryException query exception
    */
   public abstract Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException;

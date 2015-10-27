@@ -367,7 +367,7 @@ public enum Function {
   /** XQuery function. */
   STRING(FnString.class, "string([item])", arg(ITEM_ZO), STR),
   /** XQuery function. */
-  STRING_JOIN(FnStringJoin.class, "string-join(strings[,sep])", arg(STR_ZM, STR), STR),
+  STRING_JOIN(FnStringJoin.class, "string-join(items[,sep])", arg(ITEM_ZM, STR), STR),
   /** XQuery function. */
   STRING_LENGTH(FnStringLength.class, "string-length([string])", arg(STR_ZO), ITR),
   /** XQuery function. */
