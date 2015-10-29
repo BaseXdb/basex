@@ -221,4 +221,12 @@ public final class PathTest extends AdvancedQueryTest {
     execute(new CreateDB(NAME, "<x>a</x>"));
     query("/* castable as xs:double", "false");
   }
+
+  /**
+   * Index rewritings in nested XPath expressions (GH-1210).
+   */
+  @Test public void indexContext() {
+    execute(new CreateDB(NAME, "<a><b>x</b></a>"));
+    query("/a[b = .[b = 'x']/b]/b/text()", "x");
+  }
 }

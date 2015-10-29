@@ -164,7 +164,7 @@ public abstract class Path extends ParseExpr {
     Expr e = mergeSteps(qc);
     if(e != this) return e.optimize(qc, scp);
 
-    if(v != null && v.type == NodeType.DOC) {
+    if(v != null) {
       // check index access
       e = index(qc, v);
       // recompile path
@@ -541,6 +541,9 @@ public abstract class Path extends ParseExpr {
    * @return original or new expression
    */
   private Expr children(final QueryContext qc, final Value rt) {
+    // only rewrite on document level
+    if(rt.type != NodeType.DOC) return this;
+
     // skip if index does not exist or is out-dated, or if several namespaces occur in the input
     final Data data = rt.data();
     if(data == null || !data.meta.uptodate || data.nspaces.globalUri() == null) return this;
@@ -624,8 +627,9 @@ public abstract class Path extends ParseExpr {
    * @throws QueryException query exception
    */
   public Expr index(final QueryContext qc, final Value rt) throws QueryException {
+    // only rewrite on document level
+    if(rt == null || rt.type != NodeType.DOC) return this;
     // only rewrite paths with data reference
-    if(rt == null) return this;
     final Data data = rt.data();
     if(data == null) return this;
 
