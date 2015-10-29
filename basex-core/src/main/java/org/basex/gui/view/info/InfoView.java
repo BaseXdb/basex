@@ -27,8 +27,6 @@ public final class InfoView extends View implements LinkListener {
   /** Searchable editor. */
   private final SearchEditor editor;
 
-  /** Current text. */
-  private final TokenBuilder text = new TokenBuilder();
   /** Header label. */
   private final BaseXHeader header;
   /** Timer label. */
@@ -40,8 +38,10 @@ public final class InfoView extends View implements LinkListener {
   private IntList stat = new IntList(4);
   /** Query statistics strings. */
   private StringList strings = new StringList(4);
-  /** Indicates if text has changed. */
-  private boolean changed;
+  /** Current text. */
+  private byte[] text = Token.EMPTY;
+  /** Old text. */
+  private byte[] old;
   /** Clear text before adding new text. */
   private boolean clear;
   /** Focused bar. */
@@ -152,6 +152,7 @@ public final class InfoView extends View implements LinkListener {
   public void setInfo(final String info, final Command cmd, final String time, final boolean ok,
       final boolean reset) {
 
+    final TokenBuilder tb = new TokenBuilder(text);
     final StringList eval = new StringList(1);
     final StringList comp = new StringList(1);
     final StringList plan = new StringList(1);
@@ -201,23 +202,23 @@ public final class InfoView extends View implements LinkListener {
           final Pattern p = Pattern.compile(STOPPED_AT + "(.*)" + COL);
           final Matcher m = p.matcher(split[s]);
           if(m.find()) {
-            final TokenBuilder tb = new TokenBuilder();
-            tb.add(STOPPED_AT).uline().add(m.group(1)).uline().add(COL);
-            split[s] = tb.toString();
+            final TokenBuilder tmp = new TokenBuilder();
+            tmp.add(STOPPED_AT).uline().add(m.group(1)).uline().add(COL);
+            split[s] = tmp.toString();
           }
           error.add(split[s]);
         }
       } else if(line.equals(STACK_TRACE + COL)) {
         while(++s < sl && !split[s].isEmpty()) {
-          final TokenBuilder tb = new TokenBuilder();
+          final TokenBuilder tmp = new TokenBuilder();
           final String sp = split[s].replaceAll("<.*", "");
           final boolean last = !sp.equals(split[s]);
           if(sp.startsWith(LI)) {
-            tb.add(LI).uline().add(sp.substring(2)).uline();
+            tmp.add(LI).uline().add(sp.substring(2)).uline();
           } else {
-            tb.add(sp);
+            tmp.add(sp);
           }
-          stack.add(tb.toString());
+          stack.add(tmp.toString());
           if(last) break;
         }
       } else if(!ok && !line.isEmpty()) {
@@ -228,10 +229,21 @@ public final class InfoView extends View implements LinkListener {
     stat = times;
     strings = timings;
 
-    if(clear || !times.isEmpty() || !ok) text.reset();
+    final boolean test = cmd instanceof Test, query = cmd instanceof AQuery;
+    /* reset old text if:
+       a) deletion was requested by the last function call
+       b) the result contains execution times
+       c) result is not ok and no XQUnit tests are run */
+    if(clear || !times.isEmpty() || !(ok || test)) {
+      tb.reset();
+    } else if(test) {
+      // XQUnit tests: adopt trace output
+      eval.add(tb.toString().trim());
+      tb.reset();
+    }
 
     String inf = null;
-    if(!(cmd instanceof AQuery)) {
+    if(!query) {
       if(cmd != null) command.add(cmd.toString());
       if(ok && !info.isEmpty()) {
         if(reset) result.add(info.trim());
@@ -239,18 +251,17 @@ public final class InfoView extends View implements LinkListener {
       }
     }
 
-    add(COMMAND + COL, command);
-    add(Text.ERROR + COL, error);
-    add(STACK_TRACE + COL, stack);
-    add(EVALUATING + COL, eval);
-    add(COMPILING + COL, comp);
-    add(QUERY + COL, origqu);
-    add(OPTIMIZED_QUERY + COL, optqu);
-    add(RESULT + COL, result);
-    add(TIMING + COL, timings);
-    add(QUERY_PLAN + COL, plan);
-    if(inf != null) text.add(inf).nline();
-    changed = true;
+    add(STACK_TRACE + COL, stack, tb);
+    add(EVALUATING + COL, eval, tb);
+    add(COMMAND + COL, command, tb);
+    add(Text.ERROR + COL, error, tb);
+    add(COMPILING + COL, comp, tb);
+    add(QUERY + COL, origqu, tb);
+    add(OPTIMIZED_QUERY + COL, optqu, tb);
+    add(RESULT + COL, result, tb);
+    add(TIMING + COL, timings, tb);
+    add(QUERY_PLAN + COL, plan, tb);
+    if(inf != null) tb.add(inf).nline();
     clear = reset;
 
     // show total time required for running the process
@@ -259,6 +270,7 @@ public final class InfoView extends View implements LinkListener {
       total = Performance.getTime(times.get(times.size() - 1) * 10000L * runs, runs);
     }
     if(total != null) timer.setText(TOTAL_TIME_CC + total);
+    text = tb.finish();
     repaint();
   }
 
@@ -266,12 +278,13 @@ public final class InfoView extends View implements LinkListener {
    * Adds the specified strings.
    * @param head string header
    * @param list list reference
+   * @param tb token builder
    */
-  private void add(final String head, final StringList list) {
+  private void add(final String head, final StringList list, final TokenBuilder tb) {
     if(list.isEmpty()) return;
-    text.bold().add(head).norm().nline();
-    for(final String s : list) text.add(s).nline();
-    text.hline();
+    tb.bold().add(head).norm().nline();
+    for(final String s : list) tb.add(s).nline();
+    tb.hline();
   }
 
   @Override
@@ -299,9 +312,9 @@ public final class InfoView extends View implements LinkListener {
 
   @Override
   public void paintComponent(final Graphics g) {
-    if(changed) {
-      area.setText(text.toArray());
-      changed = false;
+    if(old != text) {
+      old = text;
+      area.setText(text);
     }
 
     super.paintComponent(g);
