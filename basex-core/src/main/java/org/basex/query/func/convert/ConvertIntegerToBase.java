@@ -30,7 +30,7 @@ public final class ConvertIntegerToBase extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final long num = toLong(exprs[0], qc), base = toLong(exprs[1], qc);
-    if(base < 2 || base > 36) throw INVBASE_X.get(ii, base);
+    if(base < 2 || base > 36) throw BXCO_INVBASE_X.get(ii, base);
 
     // use fast variant for powers of two
     for(int i = 1, p = 2; i < 6; i++, p <<= 1)

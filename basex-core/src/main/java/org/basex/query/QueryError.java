@@ -51,12 +51,12 @@ public enum QueryError {
 
   // Admin module
 
-  /** FODC0001. */
-  BXAD_TODAY(FOAD, 1, "Today's log file cannot be deleted."),
-  /** FODC0002. */
-  BXAD_DELETE_X(FOAD, 2, "Log file could not be deleted: %."),
-  /** FODC0003. */
-  BXAD_TYPE_X(FOAD, 3, "Log type must consist of uppercase letters: \"%\"."),
+  /** BXAD0001. */
+  BXAD_TODAY(BXAD, 1, "Today's log file cannot be deleted."),
+  /** BXAD0002. */
+  BXAD_DELETE_X(BXAD, 2, "Log file could not be deleted: %."),
+  /** BXAD0003. */
+  BXAD_TYPE_X(BXAD, 3, "Log type must consist of uppercase letters: \"%\"."),
 
   // Client module
 
@@ -79,6 +79,10 @@ public enum QueryError {
   BXCO_BASE64_X_X(BXCO, 1, "Conversion of '%' to encoding '%' failed."),
   /** BXCO0002. */
   BXCO_ENCODING_X(BXCO, 2, "Unknown encoding '%'."),
+  /** BXCO0003. */
+  BXCO_INVBASE_X(BXCO, 3, "Unsupported base: %."),
+  /** BXCO0004. */
+  BXCO_INVBASEDIG_X_X(BXCO, 4, "Invalid digit for base %: %."),
 
   // CSV module
 
@@ -159,6 +163,11 @@ public enum QueryError {
   BXJS_SERIAL_X(BXJS, 2, "JSON serializer: %."),
   /** BXJS0003. */
   BXJS_INVALID_X(BXJS, 1, "'%':'%' is not supported by the target format."),
+
+  // Output module
+
+  /** BXOU0001. */
+  ERRFORMAT_X_X(BXOU, 1, "%: %."),
 
   // Process module
 
@@ -582,18 +591,6 @@ public enum QueryError {
   /** FORG0006. */
   SUMDUR_X_X(FORG, 6, "Duration expected, % found: %."),
   /** FORG0006. */
-  BINARY_X(FORG, 6, "Binary expected, % found."),
-  /** FORG0006. */
-  STRNOD_X_X(FORG, 6, "String or node expected, % found: %."),
-  /** FORG0006. */
-  MAP_X_X(FORG, 6, "Map expected, % found: %."),
-  /** FORG0006. */
-  ELMMAP_X_X_X(FORG, 6, "element(%) or map expected, % found: %."),
-  /** FORG0006. */
-  ELMSTR_X_X_X(FORG, 6, "element(%) or string expected, % found: %."),
-  /** FORG0006. */
-  STRBIN_X_X(FORG, 6, "String or binary expected, % found: %."),
-  /** FORG0006. */
   JAVACONSTR_X_X(FORG, 6, "Unknown constructor: %(%)."),
   /** FORG0006. */
   JAVAMETHOD_X_X(FORG, 6, "Unknown method: %(%)."),
@@ -603,14 +600,6 @@ public enum QueryError {
   JAVAARGS_X_X(FORG, 6, "Invalid arguments: % expected, % found."),
   /** FORG0006. */
   JAVAERROR_X(FORG, 6, "Java function call failed: %."),
-  /** FORG0006. */
-  INVBASE_X(FORG, 6, "Unsupported base: %."),
-  /** FORG0006. */
-  INVBASEDIG_X_X(FORG, 6, "Invalid digit for base %: %."),
-  /** FORG0006. */
-  ERRFORMAT_X_X(FORG, 6, "%: %."),
-  /** FORG0006. */
-  INVALIDOPTION_X(FORG, 6, "Unknown option '%'."),
 
   /** FORG0008. */
   FUNZONE_X_X(FORG, 8, "% and % have different timezones."),
@@ -1002,6 +991,20 @@ public enum QueryError {
   LOOKUP_X(XPTY, 4, "Input of lookup operator is not a map or array: %."),
   /** XPTY0004. */
   INVALIDOPT_X(XPTY, 4, "%"),
+  /** XPTY0004. */
+  BINARY_X(XPTY, 4, "Binary expected, % found."),
+  /** FORG0006. */
+  STRNOD_X_X(XPTY, 4, "String or node expected, % found: %."),
+  /** XPTY0004. */
+  MAP_X_X(XPTY, 4, "Map expected, % found: %."),
+  /** XPTY0004. */
+  ELMMAP_X_X_X(XPTY, 4, "element(%) or map expected, % found: %."),
+  /** XPTY0004. */
+  ELMSTR_X_X_X(XPTY, 4, "element(%) or string expected, % found: %."),
+  /** XPTY0004. */
+  STRBIN_X_X(XPTY, 4, "String or binary expected, % found: %."),
+  /** XPTY0004. */
+  INVALIDOPTION_X(XPTY, 4, "Unknown option '%'."),
 
   /** XPTY0018. */
   EVALNODESVALS(XPTY, 18, "Path yields both nodes and atomic values."),
@@ -1354,6 +1357,7 @@ public enum QueryError {
 
     /** BASX Error type. */ BASX(BXERR_PREFIX, BXERRORS_URI),
 
+    /** BXAD Error type. */ BXAD(BXERR_PREFIX, BXERRORS_URI),
     /** BXCL Error type. */ BXCL(BXERR_PREFIX, BXERRORS_URI),
     /** BXCO Error type. */ BXCO(BXERR_PREFIX, BXERRORS_URI),
     /** BXCS Error type. */ BXCS(BXERR_PREFIX, BXERRORS_URI),
@@ -1362,6 +1366,7 @@ public enum QueryError {
     /** BXFT Error type. */ BXFT(BXERR_PREFIX, BXERRORS_URI),
     /** BXHL Error type. */ BXHL(BXERR_PREFIX, BXERRORS_URI),
     /** BXJS Error type. */ BXJS(BXERR_PREFIX, BXERRORS_URI),
+    /** BXOU Error type. */ BXOU(BXERR_PREFIX, BXERRORS_URI),
     /** BXPR Error type. */ BXPR(BXERR_PREFIX, BXERRORS_URI),
     /** BXRA Error type. */ BXRA(BXERR_PREFIX, BXERRORS_URI),
     /** BXRE Error type. */ BXRE(BXERR_PREFIX, BXERRORS_URI),
@@ -1385,7 +1390,6 @@ public enum QueryError {
 
     // W3 errors
 
-    /** FOAD Error type. */ FOAD,
     /** FOAP Error type. */ FOAP,
     /** FOAR Error type. */ FOAR,
     /** FOAY Error type. */ FOAY,

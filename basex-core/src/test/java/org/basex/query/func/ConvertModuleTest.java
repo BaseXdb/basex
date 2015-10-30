@@ -25,9 +25,9 @@ public final class ConvertModuleTest extends AdvancedQueryTest {
     query(_CONVERT_INTEGER_TO_BASE.args(4, 10), 4);
     query(_CONVERT_INTEGER_TO_BASE.args(65535, 10), 65535);
     query(_CONVERT_INTEGER_TO_BASE.args(65536, 10), 65536);
-    error(_CONVERT_INTEGER_TO_BASE.args(1, 1), INVBASE_X);
-    error(_CONVERT_INTEGER_TO_BASE.args(1, 100), INVBASE_X);
-    error(_CONVERT_INTEGER_TO_BASE.args(1, 100), INVBASE_X);
+    error(_CONVERT_INTEGER_TO_BASE.args(1, 1), BXCO_INVBASE_X);
+    error(_CONVERT_INTEGER_TO_BASE.args(1, 100), BXCO_INVBASE_X);
+    error(_CONVERT_INTEGER_TO_BASE.args(1, 100), BXCO_INVBASE_X);
   }
 
   /** Test method. */
@@ -43,10 +43,10 @@ public final class ConvertModuleTest extends AdvancedQueryTest {
     query(_CONVERT_INTEGER_FROM_BASE.args("4", 10), 4);
     query(_CONVERT_INTEGER_FROM_BASE.args("65535", 10), 65535);
     query(_CONVERT_INTEGER_FROM_BASE.args("65536", 10), 65536);
-    error(_CONVERT_INTEGER_FROM_BASE.args("1", 1), INVBASE_X);
-    error(_CONVERT_INTEGER_FROM_BASE.args("1", 100), INVBASE_X);
-    error(_CONVERT_INTEGER_FROM_BASE.args("abc", 10), INVBASEDIG_X_X);
-    error(_CONVERT_INTEGER_FROM_BASE.args("012", 2), INVBASEDIG_X_X);
+    error(_CONVERT_INTEGER_FROM_BASE.args("1", 1), BXCO_INVBASE_X);
+    error(_CONVERT_INTEGER_FROM_BASE.args("1", 100), BXCO_INVBASE_X);
+    error(_CONVERT_INTEGER_FROM_BASE.args("abc", 10), BXCO_INVBASEDIG_X_X);
+    error(_CONVERT_INTEGER_FROM_BASE.args("012", 2), BXCO_INVBASEDIG_X_X);
   }
 
   /** Test method. */
