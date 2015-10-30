@@ -251,13 +251,13 @@ public final class InfoView extends View implements LinkListener {
       }
     }
 
-    add(STACK_TRACE + COL, stack, tb);
-    add(EVALUATING + COL, eval, tb);
     add(COMMAND + COL, command, tb);
     add(Text.ERROR + COL, error, tb);
+    add(STACK_TRACE + COL, stack, tb);
+    add(EVALUATING + COL, eval, tb);
     add(COMPILING + COL, comp, tb);
-    add(QUERY + COL, origqu, tb);
     add(OPTIMIZED_QUERY + COL, optqu, tb);
+    add(QUERY + COL, origqu, tb);
     add(RESULT + COL, result, tb);
     add(TIMING + COL, timings, tb);
     add(QUERY_PLAN + COL, plan, tb);
