@@ -117,7 +117,7 @@ public class FnSubsequence extends StandardFunc {
     if(min) return len == Long.MAX_VALUE ? ALL : null;
 
     // end flag: compute length
-    if(this instanceof BaseXItemRange) len = len - start + 1;
+    if(this instanceof BaseXItemRange && len != Long.MAX_VALUE) len -= start - 1;
     return new long[] { start, len };
   }
 

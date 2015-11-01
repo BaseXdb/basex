@@ -283,4 +283,13 @@ public final class FilterTest extends AdvancedQueryTest {
         + "return <a b='{$i}'/>[<a b='{random:integer()}'/>][<b c='{random:integer()}'/>][$i]",
         "<a b=\"1\"/>\n<a b=\"a\"/>");
   }
+
+  /**
+   * Start position.
+   */
+  @Test public void startPos() {
+    query("(<a/>,<b/>)[position() > 1]", "<b/>");
+    query("(<a/>,<b/>,<c/>)[position() > 2]", "<c/>");
+    query("(<a/>,<b/>,<c/>)[position() = 2 to 3]", "<b/>\n<c/>");
+  }
 }
