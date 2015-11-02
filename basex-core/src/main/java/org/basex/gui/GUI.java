@@ -479,27 +479,32 @@ public final class GUI extends JFrame {
       } finally {
         updating = false;
       }
-      final String time = perf.getTime();
 
       // show query info
+      final String time = perf.getTime();
       info.setInfo(inf, cmd, time, ok, true);
 
       // sends feedback to the query editor
       final boolean stopped = inf.endsWith(INTERRUPTED);
       if(edit) editor.info(cause, stopped, true);
 
+      // get query result and node references to currently opened database
+      final Value result = cmd.finish();
+      DBNodes nodes = result instanceof DBNodes && !result.isEmpty() ? (DBNodes) result : null;
+
+      // show text view if a non-empty result does not reference the currently opened database
+      if(!text.visible() && ao.size() != 0 && nodes == null) {
+        GUIMenuCmd.C_SHOWRESULT.execute(this);
+      }
+
       // check if query feedback was evaluated in the query view
       if(!ok && !stopped) {
         // display error in info view
         text.setText(ao);
-        if((!edit || inf.startsWith(S_BUGINFO)) && !info.visible()) {
+        if(!info.visible() && (!edit || inf.startsWith(S_BUGINFO))) {
           GUIMenuCmd.C_SHOWINFO.execute(this);
         }
       } else {
-        // get query result
-        final Value result = cmd.finish();
-        DBNodes nodes = result instanceof DBNodes && result.size() != 0 ? (DBNodes) result : null;
-
         final boolean updated = cmd.updated(context);
         if(context.data() != data) {
           // database reference has changed - notify views
@@ -523,7 +528,7 @@ public final class GUI extends JFrame {
               // use query result
               m = nodes;
             } else if(m.size() != 0) {
-              // remove old highlight
+              // remove old highlighting
               m = new DBNodes(data);
             }
             // refresh views
@@ -536,13 +541,8 @@ public final class GUI extends JFrame {
           status.setText(Util.info(TIME_NEEDED_X, time));
           // show number of hits
           if(result != null) setResults(result.size());
-
-          if(nodes == null) {
-            // make text view visible
-            if(!text.visible() && ao.size() != 0) GUIMenuCmd.C_SHOWRESULT.execute(this);
-            // assign textual output if no node result was created
-            text.setText(ao);
-          }
+          // assign textual output if no node result was created
+          if(nodes == null) text.setText(ao);
           // only cache output if data has not been updated (in which case notifyUpdate was called)
           if(!updated) text.cache(ao, cmd, result);
         }
