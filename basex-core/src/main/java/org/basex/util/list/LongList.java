@@ -124,6 +124,6 @@ public class LongList extends ElementList {
 
   @Override
   public String toString() {
-    return Arrays.toString(toArray());
+    return list == null ? "" : Arrays.toString(toArray());
   }
 }

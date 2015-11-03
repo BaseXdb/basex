@@ -422,6 +422,6 @@ public final class TokenBuilder {
 
   @Override
   public String toString() {
-    return string(chars, 0, size);
+    return chars == null ? "" : string(chars, 0, size);
   }
 }

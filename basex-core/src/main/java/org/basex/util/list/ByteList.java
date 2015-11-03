@@ -113,6 +113,6 @@ public class ByteList extends ElementList {
 
   @Override
   public String toString() {
-    return string(list, 0, size);
+    return list == null ? "" : string(list, 0, size);
   }
 }
