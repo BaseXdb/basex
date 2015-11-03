@@ -890,7 +890,7 @@ public class QueryParser extends InputParser {
     wsCheck(PAREN2);
     final SeqType type = optAsType();
     if(anns.contains(Annotation.UPDATING)) qc.updating();
-    final Expr expr = wsConsumeWs(EXTERNAL) ? null : enclosed(NOFUNBODY);
+    final Expr expr = wsConsumeWs(EXTERNAL) ? null : enclosedExpr();
     final VarScope scope = localVars.popContext();
     funcs.add(qc.funcs.declare(anns, name, args, type, expr, sc, scope, currDoc.toString(), ii));
   }
@@ -925,6 +925,18 @@ public class QueryParser extends InputParser {
       if(!consume(',')) break;
     }
     return args;
+  }
+
+  /**
+   * Parses the "EnclosedExpr" rule.
+   * @return query expression
+   * @throws QueryException query exception
+   */
+  private Expr enclosedExpr() throws QueryException {
+    wsCheck(CURLY1);
+    final Expr e = expr();
+    wsCheck(CURLY2);
+    return e == null ? Empty.SEQ : e;
   }
 
   /**
@@ -1718,20 +1730,17 @@ public class QueryParser extends InputParser {
     final int i = pos;
     if(!wsConsumeWs(VALIDATE)) return;
 
-    boolean brace = true;
-    if(consume(CURLY1)) {
-      brace = false;
-    } else if(consume(TYPE)) {
-      qnames.add(eQName(QNAME_X, SKIPCHECK));
-    } else if(!consume(STRICT) && !consume(LAX)) {
-      pos = i;
-      return;
+    if(consume(TYPE)) qnames.add(eQName(QNAME_X, SKIPCHECK));
+    consume(STRICT);
+    consume(LAX);
+    skipWs();
+    if(curr('{')) {
+      enclosedExpr();
+      throw error(IMPLVAL);
     }
 
-    if(brace) wsCheck(CURLY1);
-    check(single(), NOVALIDATE);
-    wsCheck(CURLY2);
-    throw error(IMPLVAL);
+    pos = i;
+    return;
   }
 
   /**
@@ -2093,8 +2102,11 @@ public class QueryParser extends InputParser {
     e = compConstructor();
     if(e != null) return e;
     // ordered expression
-    if(wsConsumeWs(ORDERED, CURLY1, INCOMPLETE) || wsConsumeWs(UNORDERED, CURLY1, INCOMPLETE))
-      return enclosed(NOENCLEXPR);
+    final int p = pos;
+    if(wsConsumeWs(ORDERED) || wsConsumeWs(UNORDERED)) {
+      if(curr('{')) return enclosedExpr();
+      pos = p;
+    }
     // map constructor
     if(wsConsumeWs(MAPSTR, CURLY1, INCOMPLETE)) return new CMap(info(), keyValues());
     // square array constructor
@@ -2199,7 +2211,7 @@ public class QueryParser extends InputParser {
       final Var[] args = paramList();
       wsCheck(PAREN2);
       final SeqType type = optAsType();
-      final Expr body = enclosed(NOFUNBODY);
+      final Expr body = enclosedExpr();
       final VarScope scope = localVars.popContext();
       return new Closure(info(), type, args, body, anns, nonLocal, sc, scope);
     }
@@ -2531,7 +2543,7 @@ public class QueryParser extends InputParser {
             } else {
               final byte[] text = tb.next();
               if(text.length == 0) {
-                add(attv, enclosed(NOENCLEXPR));
+                add(attv, enclosedExpr());
                 simple = false;
               } else {
                 add(attv, Str.get(text));
@@ -2651,7 +2663,7 @@ public class QueryParser extends InputParser {
           consume();
         } else {
           final Str txt = text(tb, strip);
-          return txt != null ? txt : enclosed(NOENCLEXPR);
+          return txt != null ? txt : enclosedExpr();
         }
       } else if(c == '}') {
         consume();
@@ -2768,10 +2780,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr compDoc() throws QueryException {
-    if(!wsConsume(CURLY1)) return null;
-    final Expr e = check(expr(), NODOCCONS);
-    wsCheck(CURLY2);
-    return new CDoc(sc, info(), e);
+    return curr('{') ? new CDoc(sc, info(), enclosedExpr()) : null;
   }
 
   /**
@@ -2794,10 +2803,8 @@ public class QueryParser extends InputParser {
       wsCheck(CURLY2);
     }
 
-    if(!wsConsume(CURLY1)) return null;
-    final Expr e = expr();
-    wsCheck(CURLY2);
-    return new CElem(sc, info(), name, null, e == null ? new Expr[0] : new Expr[] { e });
+    skipWs();
+    return curr('{') ? new CElem(sc, info(), name, null, enclosedExpr()) : null;
   }
 
   /**
@@ -2819,10 +2826,8 @@ public class QueryParser extends InputParser {
       wsCheck(CURLY2);
     }
 
-    if(!wsConsume(CURLY1)) return null;
-    final Expr e = expr();
-    wsCheck(CURLY2);
-    return new CAttr(sc, info(), true, name, e == null ? Empty.SEQ : e);
+    skipWs();
+    return curr('{') ? new CAttr(sc, info(), true, name, enclosedExpr()) : null;
   }
 
   /**
@@ -2836,17 +2841,13 @@ public class QueryParser extends InputParser {
     final Expr name;
     final byte[] str = ncName(null);
     if(str.length == 0) {
-      if(!wsConsume(CURLY1)) return null;
-      name = check(expr(), NSWRONG);
-      wsCheck(CURLY2);
+      if(!curr('{')) return null;
+      name = enclosedExpr();
     } else {
       name = Str.get(str);
     }
-
-    if(!wsConsume(CURLY1)) return null;
-    final Expr e = expr();
-    wsCheck(CURLY2);
-    return new CNSpace(sc, info(), name, e == null ? Empty.SEQ : e);
+    skipWs();
+    return curr('{') ? new CNSpace(sc, info(), name, enclosedExpr()) : null;
   }
 
   /**
@@ -2855,10 +2856,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr compText() throws QueryException {
-    if(!wsConsume(CURLY1)) return null;
-    final Expr e = check(expr(), NOTXTCONS);
-    wsCheck(CURLY2);
-    return new CTxt(sc, info(), e);
+    return curr('{') ? new CTxt(sc, info(), enclosedExpr()) : null;
   }
 
   /**
@@ -2867,10 +2865,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr compComment() throws QueryException {
-    if(!wsConsume(CURLY1)) return null;
-    final Expr e = check(expr(), NOCOMCONS);
-    wsCheck(CURLY2);
-    return new CComm(sc, info(), e);
+    return curr('{') ? new CComm(sc, info(), enclosedExpr()) : null;
   }
 
   /**
@@ -2891,10 +2886,8 @@ public class QueryParser extends InputParser {
       name = Str.get(str);
     }
 
-    if(!wsConsume(CURLY1)) return null;
-    final Expr e = expr();
-    wsCheck(CURLY2);
-    return new CPI(sc, info(), name, e == null ? Empty.SEQ : e);
+    skipWs();
+    return curr('{') ? new CPI(sc, info(), name, enclosedExpr()) : null;
   }
 
   /**
@@ -3161,7 +3154,7 @@ public class QueryParser extends InputParser {
   private Expr tryCatch() throws QueryException {
     if(!wsConsumeWs(TRY)) return null;
 
-    final Expr tr = enclosed(NOENCLEXPR);
+    final Expr tr = enclosedExpr();
     wsCheck(CATCH);
 
     Catch[] ct = { };
@@ -3179,7 +3172,7 @@ public class QueryParser extends InputParser {
       final Var[] vs = new Var[cl];
       for(int i = 0; i < cl; i++) vs[i] = localVars.add(Catch.NAMES[i], Catch.TYPES[i], false);
       final Catch c = new Catch(info(), codes, vs);
-      c.expr = enclosed(NOENCLEXPR);
+      c.expr = enclosedExpr();
       localVars.closeScope(s);
 
       ct = Array.add(ct, c);

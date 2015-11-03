@@ -30,11 +30,11 @@ abstract class CName extends CNode {
    * @param sc static context
    * @param info input info
    * @param name name
-   * @param v attribute values
+   * @param cont contents
    */
   CName(final String desc, final StaticContext sc, final InputInfo info, final Expr name,
-      final Expr... v) {
-    super(sc, info, v);
+      final Expr... cont) {
+    super(sc, info, cont);
     this.name = name;
     this.desc = desc;
   }

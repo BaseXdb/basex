@@ -746,8 +746,6 @@ public enum QueryError {
   /** XPST0003. */
   NOQUOTE_X(XPST, 3, "Expecting quote%."),
   /** XPST0003. */
-  NOVALIDATE(XPST, 3, "Invalid validation expression."),
-  /** XPST0003. */
   NUMBERWS(XPST, 3, "Expecting separator after number."),
   /** XPST0003. */
   NUMBERDBL_X(XPST, 3, "Incomplete double value: '%'."),
@@ -800,19 +798,9 @@ public enum QueryError {
   /** XPST0003. */
   PIWRONG(XPST, 3, "Expecting name of processing-instruction."),
   /** XPST0003. */
-  NSWRONG(XPST, 3, "Expecting namespace prefix."),
-  /** XPST0003. */
   NOENCLEXPR(XPST, 3, "Expecting valid expression after curly brace."),
   /** XPST0003. */
   NOFTSELECT_X(XPST, 3, "Expecting quote or opening curly brace%."),
-  /** XPST0003. */
-  NODOCCONS(XPST, 3, "Expecting expression in document constructor."),
-  /** XPST0003. */
-  NOTXTCONS(XPST, 3, "Expecting expression in text constructor."),
-  /** XPST0003. */
-  NOCOMCONS(XPST, 3, "Expecting expression in comment constructor."),
-  /** XPST0003. */
-  NOFUNBODY(XPST, 3, "Expecting function body."),
   /** XPST0003. */
   FUNCMISS_X(XPST, 3, "Expecting closing bracket for function '%'."),
   /** XPST0003. */

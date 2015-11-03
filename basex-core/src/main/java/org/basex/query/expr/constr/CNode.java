@@ -20,10 +20,10 @@ public abstract class CNode extends Arr {
    * Constructor.
    * @param sc static context
    * @param info input info
-   * @param name name
+   * @param exprs expressions
    */
-  CNode(final StaticContext sc, final InputInfo info, final Expr... name) {
-    super(info, name);
+  CNode(final StaticContext sc, final InputInfo info, final Expr... exprs) {
+    super(info, exprs);
     this.sc = sc;
     size = 1;
   }
