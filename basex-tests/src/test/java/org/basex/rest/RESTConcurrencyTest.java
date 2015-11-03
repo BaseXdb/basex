@@ -189,7 +189,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
      * Construct a new GET request.
      * @param request request string without the base URI
      */
-    public Get(final String request) {
+    Get(final String request) {
       uri = URI.create(BASE_URL + request);
     }
 
@@ -232,7 +232,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
      * @param request request string without the base URI
      * @param data data to send to the server
      */
-    public Put(final String request, final byte[] data) {
+    Put(final String request, final byte[] data) {
       this(request, data, PUT);
     }
 
@@ -278,7 +278,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
      * @param request request string without the base URI
      * @param data data to send to the server
      */
-    public Post(final String request, final byte[] data) {
+    Post(final String request, final byte[] data) {
       super(request, data, POST);
     }
   }
@@ -296,7 +296,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
      * Constructor.
      * @param code HTTP response status code
      */
-    public HTTPResponse(final int code) {
+    HTTPResponse(final int code) {
       this(code, null);
     }
 
@@ -305,7 +305,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
      * @param code HTTP response status code
      * @param data data
      */
-    public HTTPResponse(final int code, final String data) {
+    HTTPResponse(final int code, final String data) {
       this.data = data;
       status = HTTPCode.valueOf(code);
     }

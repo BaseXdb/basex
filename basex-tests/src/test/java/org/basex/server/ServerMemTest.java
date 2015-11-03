@@ -61,7 +61,7 @@ public final class ServerMemTest extends SandboxTest {
      * Default constructor.
      * @throws Exception exception
      */
-    public Client() throws Exception {
+    Client() throws Exception {
       session = createClient();
     }
 

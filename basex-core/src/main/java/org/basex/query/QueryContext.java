@@ -171,7 +171,7 @@ public final class QueryContext extends Proc implements Closeable {
   /**
    * Constructor.
    * @param context database context
-   * @param qcParent parent context (optional)
+   * @param qcParent parent context (can be {@code null})
    */
   private QueryContext(final Context context, final QueryContext qcParent) {
     this.context = context;

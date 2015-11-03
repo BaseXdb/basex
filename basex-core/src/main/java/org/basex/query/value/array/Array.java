@@ -44,9 +44,9 @@ public abstract class Array extends FItem {
   }
 
   /**
-   * The empty sequence.
+   * The empty array.
    * Running time: <i>O(1)</i> and no allocation
-   * @return (unique) instance of an empty sequence
+   * @return (unique) instance of an empty array
    */
   public static Array empty() {
     return EmptyArray.INSTANCE;
@@ -443,7 +443,7 @@ public abstract class Array extends FItem {
       if(!ret.instance(val)) return false;
     }
     // array { ... } instance of function(...) as item() -> false (result may be empty sequence)
-    return (one || array || ret.mayBeZero());
+    return one || array || ret.mayBeZero();
   }
 
   @Override

@@ -92,7 +92,7 @@ public final class ServerAddTest extends SandboxTest {
      * @param runs number of runs
      * @throws Exception exception
      */
-    public Client(final int runs) throws Exception {
+    Client(final int runs) throws Exception {
       this.runs = runs;
       session = createClient();
     }

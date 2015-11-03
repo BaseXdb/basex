@@ -106,7 +106,7 @@ public final class Part10 extends Main {
      * Constructor.
      * @param xqp prepared expression
      */
-    public XQJFilter(final XQPreparedExpression xqp) {
+    XQJFilter(final XQPreparedExpression xqp) {
       expression = xqp;
     }
 

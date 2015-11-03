@@ -88,7 +88,7 @@ public final class ValueList extends ElementList {
    * Creates an array from the contents of this list.
    * @return the array
    */
-  public Value array() {
+  public Array array() {
     final ArrayBuilder builder = new ArrayBuilder();
     for(int i = 0; i < size; i++) builder.append(list[i]);
     return builder.freeze();
