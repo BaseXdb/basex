@@ -193,26 +193,26 @@ public final class SerializerOptions extends Options {
   /**
    * Parses options.
    * @param name name of option
-   * @param val value
+   * @param value value
    * @param sc static context
    * @param info input info
    * @throws QueryException query exception
    */
-  public void parse(final String name, final byte[] val, final StaticContext sc,
+  public void parse(final String name, final byte[] value, final StaticContext sc,
       final InputInfo info) throws QueryException {
 
     try {
-      if(name.equals(USE_CHARACTER_MAPS.name()) && !eq(val, token(WEBDAV)))
-        throw OUTMAP_X.get(info, val);
-      assign(name, string(val));
+      if(name.equals(USE_CHARACTER_MAPS.name()) && !eq(value, token(WEBDAV)))
+        throw OUTMAP_X.get(info, value);
+      assign(name, string(value));
     } catch(final BaseXException ex) {
       for(final Option<?> o : this) if(o.name().equals(name)) throw SER_X.get(info, ex);
       throw OUTINVALID_X.get(info, ex);
     }
 
     if(name.equals(PARAMETER_DOCUMENT.name())) {
-      Uri uri = Uri.uri(val);
-      if(!uri.isValid()) throw INVURI_X.get(info, val);
+      Uri uri = Uri.uri(value);
+      if(!uri.isValid()) throw INVURI_X.get(info, value);
       if(!uri.isAbsolute()) uri = sc.baseURI().resolve(uri, info);
       final IO io = IO.get(string(uri.string()));
       try {
@@ -223,23 +223,22 @@ public final class SerializerOptions extends Options {
         final HashMap<String, String> free = free();
         if(!free.isEmpty()) throw SEROPTION_X.get(info, free.keySet().iterator().next());
 
-        final StringOption ucm = USE_CHARACTER_MAPS;
-        final byte[] mapsId = QNm.get(ucm.name(), QueryText.OUTPUT_URI).id();
+        final byte[] mapsId = QNm.get(USE_CHARACTER_MAPS.name(), QueryText.OUTPUT_URI).id();
         final byte[] mapId = QNm.get("character-map", QueryText.OUTPUT_URI).id();
-        if(!get(ucm).isEmpty()) {
-          final TokenBuilder value = new TokenBuilder();
+        if(!get(USE_CHARACTER_MAPS).isEmpty()) {
+          final TokenBuilder tb = new TokenBuilder();
           for(final ANode option : XMLAccess.children(root, mapsId)) {
             for(final ANode child : XMLAccess.children(option, mapId)) {
-              if(!value.isEmpty()) value.add(',');
-              value.add(child.attribute("character")).add('=').add(child.attribute("map-string"));
+              if(!tb.isEmpty()) tb.add(',');
+              tb.add(child.attribute("character")).add('=').add(child.attribute("map-string"));
             }
           }
-          set(ucm, value.toString());
+          set(USE_CHARACTER_MAPS, tb.toString());
         }
 
       } catch(final IOException ex) {
         Util.debug(ex);
-        throw OUTDOC_X.get(info, val);
+        throw OUTDOC_X.get(info, value);
       }
     }
   }
