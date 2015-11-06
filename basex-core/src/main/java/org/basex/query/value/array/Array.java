@@ -424,26 +424,27 @@ public abstract class Array extends FItem {
   /**
    * Checks if this is an instance of the specified type.
    * @param tp type
-   * @param one tolerate one-or-more results
+   * @param coerce coerce value
    * @return result of check
    */
-  private boolean instOf(final FuncType tp, final boolean one) {
+  private boolean instOf(final FuncType tp, final boolean coerce) {
     if(tp instanceof MapType) return false;
 
     final SeqType[] at = tp.argTypes;
     if(at != null && (at.length != 1 || !at[0].instanceOf(SeqType.ITR))) return false;
 
-    final boolean array = tp instanceof ArrayType;
     SeqType ret = tp.retType;
-
-    // no argument and return type: no check required
-    if(ret == null || ret.eq(SeqType.ITEM_ZM)) return true;
-    // check types of members
-    for(final Value val : members()) {
-      if(!ret.instance(val)) return false;
+    if(tp instanceof ArrayType) {
+      // no argument and return type: no check required
+      if(ret == null || ret.eq(SeqType.ITEM_ZM)) return true;
+      // check types of members
+      for(final Value val : members()) {
+        if(!ret.instance(val)) return false;
+      }
+      return true;
     }
-    // array { ... } instance of function(...) as item() -> false (result may be empty sequence)
-    return one || array || ret.mayBeZero();
+    // allow coercion
+    return coerce || ret == null || ret.eq(SeqType.ITEM_ZM);
   }
 
   @Override

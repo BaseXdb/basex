@@ -158,7 +158,7 @@ public abstract class ANode extends Item {
 
   /**
    * Returns a copy of the namespace hierarchy.
-   * @param sc static context
+   * @param sc static context (can be {@code null})
    * @return namespaces
    */
   public final Atts nsScope(final StaticContext sc) {

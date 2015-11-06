@@ -17,8 +17,6 @@ import org.basex.util.hash.*;
  * @author Leo Woerteler
  */
 final class JsonParser extends InputParser {
-  /** Invalid Unicode character. */
-  private static final int INVALID = '\uFFFD';
   /** Names of control characters not allowed in string literals. */
   private static final String[] CTRL = {
     // U+0000 -- U+001F

@@ -1389,7 +1389,6 @@ public enum QueryError {
     /** FOFD Error type. */ FOFD,
     /** FOER Error type. */ FOER,
     /** FOJS Error type. */ FOJS,
-    /** FOMP Error type. */ FOMP,
     /** FONS Error type. */ FONS,
     /** FORG Error type. */ FORG,
     /** FORX Error type. */ FORX,

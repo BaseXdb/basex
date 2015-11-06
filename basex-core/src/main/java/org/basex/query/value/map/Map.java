@@ -148,28 +148,25 @@ public final class Map extends FItem {
   /**
    * Checks if this is an instance of the specified type.
    * @param tp type
-   * @param one tolerate one-or-more results
+   * @param coerce coerce value
    * @return result of check
    */
-  private boolean instOf(final FuncType tp, final boolean one) {
+  private boolean instOf(final FuncType tp, final boolean coerce) {
     if(tp instanceof ArrayType) return false;
 
     final SeqType[] at = tp.argTypes;
     if(at != null && (at.length != 1 || !at[0].one())) return false;
 
-    // only check key for map types:
-    // map { 'a': ... } instance of function(xs:integer, ...) -> true
-    // map { 'a': ... } instance of map(xs:integer, ...) -> false
-    final boolean map = tp instanceof MapType;
-    AtomType arg = map ? ((MapType) tp).keyType() : null;
-    if(arg == AtomType.AAT) arg = null;
     SeqType ret = tp.retType;
-    if(ret == null || ret.eq(SeqType.ITEM_ZM)) ret = null;
-
-    // no argument and return type: no check required
-    if(arg == null && ret == null) return true;
-    // map { ... } instance of function(...) as item() -> false (result may be empty sequence)
-    return root.instanceOf(arg, ret) && (one || map || ret == null || ret.mayBeZero());
+    if(tp instanceof MapType) {
+      AtomType arg = ((MapType) tp).keyType();
+      if(arg == AtomType.AAT) arg = null;
+      if(ret == null || ret.eq(SeqType.ITEM_ZM)) ret = null;
+      // map { ... } instance of function(...) as item() -> false (result may be empty sequence)
+      return (arg == null && ret == null) || root.instanceOf(arg, ret);
+    }
+    // allow coercion
+    return coerce || ret == null || ret.eq(SeqType.ITEM_ZM);
   }
 
   /**

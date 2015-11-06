@@ -55,7 +55,7 @@ public final class TextParser extends SingleParser {
           builder.text(tb.next());
           builder.closeElem();
         } else {
-          tb.add(XMLToken.valid(ch) ? ch : '?');
+          tb.add(XMLToken.valid(ch) ? ch : Token.INVALID);
         }
       }
     }

@@ -131,12 +131,16 @@ public final class FuncOptions {
       }
       // retrieve key from element name and value from "value" attribute or text node
       byte[] v = null;
+      final String name = string(qn.local());
       if(hasElements(child)) {
         v = token(optString(child, error));
       } else {
         for(final ANode attr : child.attributes()) {
           if(eq(attr.name(), VALUE)) {
             v = attr.string();
+            if(name.equals(SerializerOptions.CDATA_SECTION_ELEMENTS.name())) {
+              v = resolve(child, v);
+            }
           } else {
             // Conflicts with QT3TS, Serialization-json-34 etc.
             //throw error.get(info, Util.info("Invalid attribute: '%'", attr.name()));
@@ -144,9 +148,38 @@ public final class FuncOptions {
         }
         if(v == null) v = child.string();
       }
-      tb.add(string(qn.local())).add('=').add(string(v).trim().replace(",", ",,")).add(',');
+      tb.add(name).add('=').add(string(v).trim().replace(",", ",,")).add(',');
     }
     return tb.toString();
+  }
+
+  /**
+   * Resolve QName in options.
+   * @param elem root element
+   * @param v value
+   * @return name with resolved QNames
+   */
+  private static byte[] resolve(final ANode elem, final byte[] v) {
+    if(!Token.contains(v, ':')) return v;
+
+    final TokenBuilder tmp = new TokenBuilder();
+    for(final byte[] t : split(normalize(v), ' ')) {
+      if(t.length == 0) continue;
+
+      final int i = indexOf(t, ':');
+      if(i == -1) {
+        tmp.add(t);
+      } else {
+        final byte[] vl = elem.nsScope(null).value(substring(t, 0, i));
+        if(vl != null) {
+          tmp.add("Q{").add(vl).add('}').add(substring(t, i + 1));
+        } else {
+          tmp.add(t);
+        }
+      }
+      tmp.add(' ');
+    }
+    return tmp.finish();
   }
 
   /**

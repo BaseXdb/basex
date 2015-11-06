@@ -14,14 +14,6 @@ import java.util.*;
  * @author Christian Gruen
  */
 public final class Token {
-  /** Maximum length for hash calculation. */
-  private static final byte MAXLENGTH = 96;
-
-  /** Maximum values for converting tokens to integer values. */
-  private static final int MAXINT = Integer.MAX_VALUE / 10;
-  /** Maximum values for converting tokens to long values. */
-  private static final long MAXLONG = Long.MAX_VALUE / 10;
-
   /** Empty token. */
   public static final byte[] EMPTY = {};
   /** XML token. */
@@ -56,6 +48,16 @@ public final class Token {
   public static final byte[] SLASH = { '/' };
   /** Colon. */
   public static final byte[] COLON = { ':' };
+
+  /** Invalid Unicode character. */
+  public static final char INVALID = '\uFFFD';
+
+  /** Maximum length for hash calculation. */
+  private static final byte MAXLENGTH = 96;
+  /** Maximum values for converting tokens to integer values. */
+  private static final int MAXINT = Integer.MAX_VALUE / 10;
+  /** Maximum values for converting tokens to long values. */
+  private static final long MAXLONG = Long.MAX_VALUE / 10;
 
   /** Hex codes. */
   public static final byte[] HEX = token("0123456789ABCDEF");
@@ -215,8 +217,7 @@ public final class Token {
 
   /**
    * Returns the codepoint (unicode value) of the specified token, starting at
-   * the specified position. Returns a unicode replacement character for invalid
-   * values.
+   * the specified position. Returns a unicode replacement character for invalid values.
    * @param token token
    * @param pos character position
    * @return current character
@@ -227,7 +228,7 @@ public final class Token {
     if((v & 0xFF) < 192) return v & 0xFF;
     // number of bytes to be read
     final int vl = cl(v);
-    if(pos + vl > token.length) return 0xFFFD;
+    if(pos + vl > token.length) return INVALID;
     // 110xxxxx 10xxxxxx
     if(vl == 2) return (v & 0x1F) << 6 | token[pos + 1] & 0x3F;
     // 1110xxxx 10xxxxxx 10xxxxxx

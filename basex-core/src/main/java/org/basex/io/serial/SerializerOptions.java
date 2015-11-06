@@ -198,8 +198,8 @@ public final class SerializerOptions extends Options {
    * @param info input info
    * @throws QueryException query exception
    */
-  public void parse(final String name,
-      final byte[] val, final StaticContext sc, final InputInfo info) throws QueryException {
+  public void parse(final String name, final byte[] val, final StaticContext sc,
+      final InputInfo info) throws QueryException {
 
     try {
       if(name.equals(USE_CHARACTER_MAPS.name()) && !eq(val, token(WEBDAV)))
