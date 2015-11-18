@@ -837,7 +837,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
   @BeforeClass
   public static void start() {
     // turn off pretty printing
-    set(MainOptions.SERIALIZER, SerializerOptions.get(false));
+    set(MainOptions.SERIALIZER, SerializerMode.NOINDENT.get());
   }
 
   /**

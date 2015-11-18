@@ -1,5 +1,7 @@
 package org.basex.io.out;
 
+import static org.basex.util.Token.*;
+
 import java.io.*;
 
 import org.basex.util.*;
@@ -12,7 +14,7 @@ import org.basex.util.*;
  */
 public class PrintOutput extends OutputStream {
   /** Output stream reference. */
-  private final OutputStream os;
+  protected final OutputStream os;
   /** Maximum numbers of bytes to write. */
   long max = Long.MAX_VALUE;
   /** Number of bytes written. */
@@ -54,7 +56,7 @@ public class PrintOutput extends OutputStream {
 
   /**
    * Sets the maximum number of bytes to be written.
-   * Note that the limit might break unicode characters.
+   * Note that a specified limit might break unicode characters.
    * @param limit maximum
    */
   public final void setLimit(final int limit) {
@@ -64,6 +66,11 @@ public class PrintOutput extends OutputStream {
   @Override
   public void write(final int b) throws IOException {
     if(size++ < max) os.write(b);
+  }
+
+  @Override
+  public void write(final byte[] b) throws IOException {
+    super.write(b);
   }
 
   /**
@@ -95,7 +102,8 @@ public class PrintOutput extends OutputStream {
    * @throws IOException I/O exception
    */
   public void print(final byte[] token) throws IOException {
-    for(final byte cp : token) write(cp);
+    final int tl = token.length;
+    for(int t = 0; t < tl; t += cl(token, t)) print(cp(token, t));
   }
 
   /**
@@ -114,7 +122,7 @@ public class PrintOutput extends OutputStream {
    */
   public final void println(final String string) throws IOException {
     print(string);
-    print(Prop.NL);
+    print('\n');
   }
 
   /**
@@ -124,7 +132,7 @@ public class PrintOutput extends OutputStream {
    */
   public final void println(final byte[] token) throws IOException {
     print(token);
-    print(Prop.NL);
+    print('\n');
   }
 
   /**
@@ -154,13 +162,5 @@ public class PrintOutput extends OutputStream {
    */
   public final boolean finished() {
     return size == max;
-  }
-
-  /**
-   * Returns the encoding.
-   * @return encoding
-   */
-  public String encoding() {
-    return Strings.UTF8;
   }
 }

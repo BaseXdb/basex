@@ -31,12 +31,10 @@ public final class BaseXStandaloneTest extends BaseXTest {
     try {
       final ArrayOutput ao = new ArrayOutput();
       System.setOut(new PrintStream(ao));
-      System.setErr(NULL);
       new BaseX(args);
       return ao.toString();
     } finally {
       System.setOut(OUT);
-      System.setErr(ERR);
     }
   }
 }

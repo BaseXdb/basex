@@ -51,10 +51,8 @@ public final class WebResponseHeader extends StandardFunc {
     // Serialization parameters
     if(!output.containsKey(SerializerOptions.MEDIA_TYPE.name())) output.put(
         SerializerOptions.MEDIA_TYPE.name(), MediaType.APPLICATION_OCTET_STREAM.toString());
-    if(!output.containsKey(SerializerOptions.METHOD.name())) output.put(
-        SerializerOptions.METHOD.name(), SerialMethod.RAW.toString());
 
-    final SerializerOptions so = SerializerOptions.get(true);
+    final SerializerOptions so = SerializerMode.DEFAULT.get();
     final FElem oseri = new FElem(QNm.get(OUTPUT_PREFIX, SERIALIZATION_PARAMETERS, OUTPUT_URI));
     for(final Entry<String, String> entry : output.entrySet()) {
       final String name = entry.getKey(), value = entry.getValue();

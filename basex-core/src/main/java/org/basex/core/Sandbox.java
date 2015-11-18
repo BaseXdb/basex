@@ -165,16 +165,11 @@ public abstract class Sandbox {
    * @throws IOException I/O exception
    */
   public static BaseXServer createServer(final String... args) throws IOException {
-    try {
-      System.setOut(NULL);
-      final StringList sl = new StringList("-z", "-p" + DB_PORT, "-q");
-      for(final String arg : args) sl.add(arg);
-      final BaseXServer server = new BaseXServer(sl.finish());
-      server.context.soptions.set(StaticOptions.DBPATH, sandbox().path());
-      return server;
-    } finally {
-      System.setOut(OUT);
-    }
+    final StringList sl = new StringList("-z", "-p" + DB_PORT, "-q");
+    for(final String arg : args) sl.add(arg);
+    final BaseXServer server = new BaseXServer(sl.finish());
+    server.context.soptions.set(StaticOptions.DBPATH, sandbox().path());
+    return server;
   }
 
   /**
@@ -183,12 +178,7 @@ public abstract class Sandbox {
    * @throws IOException I/O exception
    */
   public static void stopServer(final BaseXServer server) throws IOException {
-    try {
-      System.setOut(NULL);
-      if(server != null) server.stop();
-    } finally {
-      System.setOut(OUT);
-    }
+    if(server != null) server.stop();
   }
 
   /**

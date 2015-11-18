@@ -1,11 +1,11 @@
 package org.basex.query.value.node;
 
+import static org.basex.data.DataText.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 import org.basex.util.list.*;
 import org.w3c.dom.*;
 
@@ -81,12 +81,18 @@ public final class FAttr extends FNode {
 
   @Override
   public byte[] xdmInfo() {
-    return new ByteList().add(typeId().bytes()).add(name.uri()).add(0).finish();
+    return new ByteList().add(typeId().asByte()).add(name.uri()).add(0).finish();
   }
 
   @Override
   public String toString() {
-    return Util.info(" %=\"%\"", name.string(),
-        Token.string(value).replaceAll("\"", "&quot;"));
+    final ByteList tb = new ByteList().add(name.string()).add('=').add('"');
+    for(final byte v : value) {
+      if(v == '&') tb.add(E_AMP);
+      else if(v == '\r') tb.add(E_CR);
+      else if(v == '\n') tb.add(E_NL);
+      else if(v == '"') tb.add(E_QUOT);
+    }
+    return tb.add('"').toString();
   }
 }

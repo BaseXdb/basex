@@ -52,13 +52,13 @@ public final class XdmInfoTest extends SandboxTest {
    */
   @Test
   public void testIter() throws IOException {
-    for(final Object[] t : TYPES) {
-      if(t.length < 2) continue;
-      try(final TestQuery tq = session.query(t[1].toString())) {
-        final TestItem ti = tq.iter();
-        assertSame("Types are different.\nExpected: " + t[0] +
-            "\nFound: " + TYPES[ti.type][0], t, TYPES[ti.type]);
-        assertEquals(Token.string(ti.result), TYPES[ti.type][2]);
+    for(final Object[] exp : TYPES) {
+      if(exp.length < 2) continue;
+      try(final TestQuery tq = session.query(exp[1].toString())) {
+        final TestResult tr = tq.iter();
+        final Object[] type = TYPES[tr.type];
+        assertSame("Types are different.\nExpected: " + exp[0] + "\nFound: " + type[0], exp, type);
+        assertEquals(Token.string(tr.result), type[2]);
       }
     }
   }
@@ -69,14 +69,14 @@ public final class XdmInfoTest extends SandboxTest {
    */
   @Test
   public void testFull() throws IOException {
-    for(final Object[] t : TYPES) {
-      if(t.length < 2) continue;
-      try(final TestQuery tq = session.query(t[1].toString())) {
-        final TestItem ti = tq.full();
-        assertSame("Types are different.\nExpected: " + t[0] +
-            "\nFound: " + TYPES[ti.type][0], t, TYPES[ti.type]);
-        assertEquals(Token.string(ti.result), TYPES[ti.type][2]);
-        if(t.length > 3) assertEquals(Token.string(ti.uri), TYPES[ti.type][3]);
+    for(final Object[] exp : TYPES) {
+      if(exp.length < 2) continue;
+      try(final TestQuery tq = session.query(exp[1].toString())) {
+        final TestResult tr = tq.full();
+        final Object[] type = TYPES[tr.type];
+        assertSame("Types are different.\nExpected: " + exp[0] + "\nFound: " + type[0], exp, type);
+        assertEquals(Token.string(tr.result), type[2]);
+        if(exp.length > 3) assertEquals(Token.string(tr.uri), type[3]);
       }
     }
   }
@@ -142,24 +142,23 @@ public final class XdmInfoTest extends SandboxTest {
      * @return full string
      * @throws IOException I/O exception
      */
-    TestItem full() throws IOException {
-      final byte[] f = ((TestSession) cs).exec(ServerCmd.FULL, id);
-      final TestItem ti = new TestItem();
-      ti.type = f[0];
-      final int fl = f.length;
-      if(TYPES[ti.type].length > 3) {
-        for(int b = 1; b < fl; b++) {
-          if(f[b] == 0) {
-            ti.uri = Arrays.copyOfRange(f, 1, b);
-            ti.result = Arrays.copyOfRange(f, b + 1, fl);
-            break;
-          }
-        }
-        assertNotNull("No extended info: " + TYPES[ti.type][0], ti.uri);
+    TestResult full() throws IOException {
+      final byte[] result = ((TestSession) cs).exec(ServerCmd.FULL, id);
+      final TestResult tr = new TestResult();
+      tr.type = result[0];
+      final int rl = result.length, b = Token.indexOf(result, 0);
+      if(b != -1) {
+        // result includes URI
+        tr.uri = Arrays.copyOfRange(result, 1, b);
+        tr.result = Arrays.copyOfRange(result, b + 1, rl);
       } else {
-        ti.result = Arrays.copyOfRange(f, 1, fl);
+        tr.result = Arrays.copyOfRange(result, 1, rl);
       }
-      return ti;
+
+      final boolean uriResult = tr.uri != null, uriExpected = tr.uri != null;
+      if(uriResult && !uriExpected) fail("No URI expected for " + TYPES[tr.type][0]);
+      if(!uriResult && uriExpected) fail("URI expected for " + TYPES[tr.type][0]);
+      return tr;
     }
 
     /**
@@ -167,19 +166,19 @@ public final class XdmInfoTest extends SandboxTest {
      * @return full string
      * @throws IOException I/O exception
      */
-    TestItem iter() throws IOException {
-      final byte[] f = ((TestSession) cs).exec(ServerCmd.RESULTS, id);
-      final TestItem ti = new TestItem();
-      ti.type = f[0];
-      ti.result = Arrays.copyOfRange(f, 1, f.length);
-      return ti;
+    TestResult iter() throws IOException {
+      final byte[] result = ((TestSession) cs).exec(ServerCmd.RESULTS, id);
+      final TestResult tr = new TestResult();
+      tr.type = result[0];
+      tr.result = Arrays.copyOfRange(result, 1, result.length);
+      return tr;
     }
   }
 
   /**
    * Resulting item.
    */
-  static class TestItem {
+  static class TestResult {
     /** Item kind/type. */
     int type;
     /** Optional URI. */
@@ -193,8 +192,9 @@ public final class XdmInfoTest extends SandboxTest {
    * <ul>
    * <li>Array position: type id</li>
    * <li>Entry 1: node type</li>
-   * <li>Entry 2: example</li>
+   * <li>Entry 2: query</li>
    * <li>Entry 3: textual result</li>
+   * <li>Entry 4: URI</li>
    * </ul>
    */
   public static final Object[][] TYPES = {
@@ -260,8 +260,8 @@ public final class XdmInfoTest extends SandboxTest {
     { "xs:gMonth", "xs:gMonth('--01')", "--01" },
     { "xs:boolean", "true()", "true" },
     { "basex:binary" },
-    { "xs:base64Binary", "xs:base64Binary('aaaa')", "aaaa" },
-    { "xs:hexBinary", "xs:hexBinary('aa')", "AA" },
+    { "xs:base64Binary" },
+    { "xs:hexBinary" },
     { "xs:anyURI", "xs:anyURI('a')", "a" },
     { "xs:QName", "xs:QName('xml:a')", "xml:a", "http://www.w3.org/XML/1998/namespace" },
     { "xs:NOTATION" }

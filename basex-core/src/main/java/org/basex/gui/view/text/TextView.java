@@ -216,7 +216,7 @@ public final class TextView extends View {
       } else if(ns != null) {
         ns.serialize(Serializer.get(out));
       } else {
-        for(final byte t : text.getText()) if(t < 0 || t > ' ' || ws(t)) out.write(t);
+        out.write(text.getText());
       }
     } catch(final IOException ex) {
       BaseXDialog.error(gui, Util.info(FILE_NOT_SAVED_X, file));

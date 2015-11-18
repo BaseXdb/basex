@@ -48,7 +48,7 @@ public final class OptionsOption<O extends Options> extends Option<O> {
     if(value == null) return null;
     final O o = newInstance();
     try {
-      o.parse(value.toString());
+      o.assign(value.toString());
     } catch(final Exception ex) {
       throw Util.notExpected(ex);
     }

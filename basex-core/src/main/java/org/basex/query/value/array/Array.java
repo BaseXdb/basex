@@ -372,35 +372,46 @@ public abstract class Array extends FItem {
 
   /**
    * Returns a string representation of the array.
+   * @param indent indent output
    * @param ii input info
    * @return string
    * @throws QueryException query exception
    */
-  public byte[] serialize(final InputInfo ii) throws QueryException {
+  public byte[] serialize(final boolean indent, final InputInfo ii) throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
-    string(tb, ii);
+    string(indent, tb, 0, ii);
     return tb.finish();
   }
 
   /**
    * Returns a string representation of the array.
+   * @param indent indent output
    * @param tb token builder
+   * @param level current level
    * @param ii input info
    * @throws QueryException query exception
    */
-  public void string(final TokenBuilder tb, final InputInfo ii) throws QueryException {
+  public void string(final boolean indent, final TokenBuilder tb, final int level,
+      final InputInfo ii) throws QueryException {
+
     tb.add('[');
     int c = 0;
     for(final Value val : members()) {
-      if(c++ > 0) tb.add(", ");
+      if(c++ > 0) {
+        tb.add(',');
+        if(indent) tb.add(' ');
+      }
       final long vs = val.size();
       if(vs != 1) tb.add('(');
       int cc = 0;
       for(int i = 0; i < vs; i++) {
-        if(cc++ > 0) tb.add(", ");
+        if(cc++ > 0) {
+          tb.add(',');
+          if(indent) tb.add(' ');
+        }
         final Item it = val.itemAt(i);
-        if(it instanceof Array) ((Array) it).string(tb, ii);
-        else if(it instanceof Map) ((Map) it).string(tb, 0, ii);
+        if(it instanceof Array) ((Array) it).string(indent, tb, level, ii);
+        else if(it instanceof Map) ((Map) it).string(indent, tb, level + 1, ii);
         else tb.add(it.toString());
       }
       if(vs != 1) tb.add(')');

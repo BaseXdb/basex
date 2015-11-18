@@ -112,30 +112,6 @@ public abstract class TreeSeq extends Seq {
   }
 
   @Override
-  public final String toString() {
-    return toString(false);
-  }
-
-  /**
-   * Returns a string representation of the sequence.
-   * @param error error flag
-   * @return string
-   */
-  private String toString(final boolean error) {
-    final StringBuilder sb = new StringBuilder(PAREN1);
-    for(int i = 0; i < size; ++i) {
-      sb.append(i == 0 ? "" : SEP);
-      final Item it = itemAt(i);
-      sb.append(error ? it.toErrorString() : it.toString());
-      if(sb.length() <= 16 || i + 1 == size) continue;
-      // output is chopped to prevent too long error strings
-      sb.append(SEP).append(DOTS);
-      break;
-    }
-    return sb.append(PAREN2).toString();
-  }
-
-  @Override
   public abstract ValueIter iter();
 
   @Override

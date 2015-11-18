@@ -84,7 +84,6 @@ public final class BaseXClientTest extends BaseXTest {
     final BaseXServer server = createServer(sargs);
     final ArrayOutput ao = new ArrayOutput();
     System.setOut(new PrintStream(ao));
-    System.setErr(NULL);
 
     final StringList sl = new StringList(
         "-p" + DB_PORT, "-U" + UserText.ADMIN, "-P" + UserText.ADMIN).add(args);
@@ -92,7 +91,6 @@ public final class BaseXClientTest extends BaseXTest {
       new BaseXClient(sl.finish());
       return ao.toString();
     } finally {
-      System.setErr(ERR);
       stopServer(server);
     }
   }

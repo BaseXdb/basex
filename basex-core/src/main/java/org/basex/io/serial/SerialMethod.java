@@ -15,8 +15,8 @@ public enum SerialMethod {
   /** JSON.     */ JSON,
   /** CSV.      */ CSV,
   /** Text.     */ TEXT,
-  /** Raw.      */ RAW,
-  /** Adaptive. */ ADAPTIVE;
+  /** Adaptive. */ ADAPTIVE,
+  /** BaseX.    */ BASEX;
 
   @Override
   public String toString() {

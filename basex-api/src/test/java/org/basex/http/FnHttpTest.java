@@ -562,21 +562,20 @@ public class FnHttpTest extends HTTPTest {
   public void writeBase64() throws IOException {
     // Case 1: content is xs:base64Binary
     final HttpRequest req1 = new HttpRequest();
-    req1.payloadAttrs.put("method", "raw");
-
-    req1.bodyContent.add(new B64(token("dGVzdA==")));
+    req1.payloadAttrs.put("method", SerialMethod.BASEX.toString());
+    req1.bodyContent.add(new B64(token("test")));
     final FakeHttpConnection fakeConn1 = new FakeHttpConnection(new URL("http://www.test.com"));
     HttpClient.setRequestContent(fakeConn1.getOutputStream(), req1);
-    assertEquals(fakeConn1.out.toString(Strings.UTF8), "dGVzdA==");
+    assertEquals(fakeConn1.out.toString(Strings.UTF8), "test");
 
     // Case 2: content is a node
     final HttpRequest req2 = new HttpRequest();
-    req2.payloadAttrs.put("method", "raw");
-    final FElem e3 = new FElem("a").add("dGVzdA==");
+    req2.payloadAttrs.put("method", SerialMethod.BASEX.toString());
+    final FElem e3 = new FElem("a").add("test");
     req2.bodyContent.add(e3);
     final FakeHttpConnection fakeConn2 = new FakeHttpConnection(new URL("http://www.test.com"));
     HttpClient.setRequestContent(fakeConn2.getOutputStream(), req2);
-    assertEquals(fakeConn2.out.toString(), "dGVzdA==");
+    assertEquals(fakeConn2.out.toString(), "<a>test</a>");
   }
 
   /**
@@ -587,20 +586,20 @@ public class FnHttpTest extends HTTPTest {
   public void writeHex() throws IOException {
     // Case 1: content is xs:hexBinary
     final HttpRequest req1 = new HttpRequest();
-    req1.payloadAttrs.put("method", "raw");
-    req1.bodyContent.add(new Hex(token("74657374")));
+    req1.payloadAttrs.put("method", SerialMethod.BASEX.toString());
+    req1.bodyContent.add(new Hex(token("test")));
     final FakeHttpConnection fakeConn1 = new FakeHttpConnection(new URL("http://www.test.com"));
     HttpClient.setRequestContent(fakeConn1.getOutputStream(), req1);
-    assertEquals(fakeConn1.out.toString(Strings.UTF8), "74657374");
+    assertEquals(fakeConn1.out.toString(Strings.UTF8), "test");
 
     // Case 2: content is a node
     final HttpRequest req2 = new HttpRequest();
-    req2.payloadAttrs.put("method", "raw");
-    final FElem e3 = new FElem("a").add("74657374");
+    req2.payloadAttrs.put("method", SerialMethod.BASEX.toString());
+    final FElem e3 = new FElem("a").add("test");
     req2.bodyContent.add(e3);
     final FakeHttpConnection fakeConn2 = new FakeHttpConnection(new URL("http://www.test.com"));
     HttpClient.setRequestContent(fakeConn2.getOutputStream(), req2);
-    assertEquals(fakeConn2.out.toString(), "74657374");
+    assertEquals(fakeConn2.out.toString(), "<a>test</a>");
   }
 
   /**

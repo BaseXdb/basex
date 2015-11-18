@@ -13,7 +13,6 @@ import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.util.ft.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -52,27 +51,14 @@ public final class JsonNodeSerializer extends JsonSerializer {
 
   /**
    * Constructor.
-   * @param out print output
-   * @param opts serialization parameters
-   * @param adaptive adaptive serializer (can be {@code null})
-   * @throws IOException I/O exception
-   */
-  public JsonNodeSerializer(final PrintOutput out, final SerializerOptions opts,
-      final AdaptiveSerializer adaptive) throws IOException {
-    this(out, opts);
-    this.adaptive = adaptive;
-  }
-
-  /**
-   * Constructor.
-   * @param out print output
+   * @param os output stream
    * @param opts serialization parameters
    * @throws IOException I/O exception
    */
-  public JsonNodeSerializer(final PrintOutput out, final SerializerOptions opts)
+  public JsonNodeSerializer(final OutputStream os, final SerializerOptions opts)
       throws IOException {
 
-    super(out, opts);
+    super(os, opts);
     final int tl = typeCache.length;
     for(int t = 0; t < tl; t++) typeCache[t] = new TokenMap();
     atts = jopts.get(JsonOptions.FORMAT) == JsonFormat.ATTRIBUTES;
@@ -88,8 +74,6 @@ public final class JsonNodeSerializer extends JsonSerializer {
       custom = true;
       super.node(node);
       custom = c;
-    } else if(adaptive != null && node.type == NodeType.ATT || node.type == NodeType.NSP) {
-      adaptive.serialize((Value) node);
     } else {
       try(final Serializer ser = nodeSerializer()) {
         ser.serialize(node);
@@ -148,7 +132,7 @@ public final class JsonNodeSerializer extends JsonSerializer {
         out.print('"');
         final byte[] name = atts ? key : XMLToken.decode(key, lax);
         if(name == null) throw error("Name of element <%> is invalid", key);
-        out.print(name);
+        out.print(norm(name));
         out.print("\":");
       } else if(eq(ptype, ARRAY)) {
         if(atts) {
@@ -186,7 +170,7 @@ public final class JsonNodeSerializer extends JsonSerializer {
     final byte[] type = types.get(level - 1);
     if(eq(type, STRING)) {
       out.print('"');
-      for(final byte ch : norm(value)) encode(ch);
+      for(final byte ch : norm(value)) printChar(ch);
       out.print('"');
     } else if(eq(type, BOOLEAN)) {
       if(!eq(value, TRUE, FALSE))

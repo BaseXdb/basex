@@ -29,14 +29,20 @@ public final class FnTrace extends StandardFunc {
       public Item next() throws QueryException {
         final Item it = ir.next();
         if(it != null) {
-          dump(it, label, info, qc);
+          trace(it, label, info, qc);
           empty = false;
         } else if(empty) {
-          dump(null, label, info, qc);
+          trace(null, label, info, qc);
         }
         return it;
       }
     };
+  }
+
+  @Override
+  protected Expr opt(final QueryContext qc, final VarScope scp) {
+    seqType = exprs[0].seqType();
+    return this;
   }
 
   /**
@@ -47,27 +53,14 @@ public final class FnTrace extends StandardFunc {
    * @param qc query context
    * @throws QueryException query exception
    */
-  public static void dump(final Item it, final byte[] label, final InputInfo info,
+  public static void trace(final Item it, final byte[] label, final InputInfo info,
       final QueryContext qc) throws QueryException {
     try {
-      final byte[] value;
-      if(it == null) {
-        value = token(SeqType.EMP.toString());
-      } else if(it instanceof FItem || it.type == NodeType.ATT || it.type == NodeType.NSP) {
-        value = token(it.toString());
-      } else {
-        value = it.serialize(SerializerOptions.get(false)).finish();
-      }
-      dump(value, label, qc);
+      trace(it == null ? token(SeqType.EMP.toString()) :
+        it.serialize(SerializerMode.DEBUG.get()).finish(), label, qc);
     } catch(final QueryIOException ex) {
       throw ex.getCause(info);
     }
-  }
-
-  @Override
-  protected Expr opt(final QueryContext qc, final VarScope scp) {
-    seqType = exprs[0].seqType();
-    return this;
   }
 
   /**
@@ -76,11 +69,10 @@ public final class FnTrace extends StandardFunc {
    * @param label additional label to display (may be {@code null})
    * @param qc query context
    */
-  public static void dump(final byte[] value, final byte[] label, final QueryContext qc) {
+  public static void trace(final byte[] value, final byte[] label, final QueryContext qc) {
     final TokenBuilder tb = new TokenBuilder();
     if(label != null) tb.add(label);
-    tb.add(value);
-    final String info = tb.toString();
+    final String info = tb.add(value).toString();
 
     // if GUI is used or client is calling, cache trace info
     if(qc.listen != null || qc.context.listener != null) {

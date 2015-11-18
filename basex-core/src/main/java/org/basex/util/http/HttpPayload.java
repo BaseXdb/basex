@@ -304,15 +304,15 @@ public final class HttpPayload {
     Value val = null;
     if(type.is(MediaType.APPLICATION_JSON)) {
       final JsonParserOptions opts = new JsonParserOptions(options.get(MainOptions.JSONPARSER));
-      opts.parse(type);
+      opts.assign(type);
       val = JsonConverter.get(opts).convert(input);
     } else if(type.is(MediaType.TEXT_CSV)) {
       final CsvParserOptions opts = new CsvParserOptions(options.get(MainOptions.CSVPARSER));
-      opts.parse(type);
+      opts.assign(type);
       val = CsvConverter.get(opts).convert(input);
     } else if(type.is(MediaType.TEXT_HTML)) {
       final HtmlOptions opts = new HtmlOptions(options.get(MainOptions.HTMLPARSER));
-      opts.parse(type);
+      opts.assign(type);
       val = new DBNode(new HtmlParser(input, options, opts));
     } else if(type.is(MediaType.APPLICATION_X_WWW_FORM_URLENCODED)) {
       final String enc = type.parameters().get(CHARSET);

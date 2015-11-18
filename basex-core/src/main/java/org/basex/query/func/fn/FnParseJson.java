@@ -44,7 +44,7 @@ public class FnParseJson extends Parse {
     final JsonParserOptions opts = new JsonParserOptions();
     if(exprs.length > 1) {
       final Map options = toMap(exprs[1], qc);
-      new FuncOptions(null, info).acceptUnknown().parse(options, opts);
+      new FuncOptions(null, info).acceptUnknown().assign(options, opts);
     }
 
     final boolean esc = opts.get(JsonParserOptions.ESCAPE);

@@ -9,7 +9,6 @@ import java.text.*;
 import java.text.Normalizer.Form;
 
 import org.basex.core.*;
-import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -36,15 +35,14 @@ public abstract class StandardSerializer extends OutputSerializer {
 
   /**
    * Constructor.
-   * @param out print output
+   * @param os output stream
    * @param sopts serialization parameters
    * @throws IOException I/O exception
    */
-  protected StandardSerializer(final PrintOutput out, final SerializerOptions sopts)
+  protected StandardSerializer(final OutputStream os, final SerializerOptions sopts)
       throws IOException {
 
-    super(out, sopts);
-    indent = sopts.yes(INDENT);
+    super(os, sopts);
     itemsep(null);
 
     // normalization form
@@ -74,12 +72,9 @@ public abstract class StandardSerializer extends OutputSerializer {
 
   @Override
   public void serialize(final Item item) throws IOException {
-    final byte[] sp = itemsep;
-    if(sp != null) {
-      if(more) {
-        printChars(sp);
-        sep = false;
-      }
+    if(more && itemsep != null) {
+      out.print(itemsep);
+      sep = false;
     }
     super.serialize(item);
   }
@@ -104,20 +99,16 @@ public abstract class StandardSerializer extends OutputSerializer {
     throw SERFUNC_X.getIO(item.seqType());
   }
 
-  // PROTECTED METHODS ============================================================================
-
   @Override
   protected void atomic(final Item item) throws IOException {
     if(sep && atomic) out.print(' ');
     try {
       if(item instanceof StrStream && form == null) {
         try(final InputStream ni = ((StrStream) item).input(null)) {
-          for(int cp; (cp = ni.read()) != -1;) encode(cp);
+          for(int cp; (cp = ni.read()) != -1;) printChar(cp);
         }
       } else {
-        final byte[] str = norm(item.string(null));
-        final int al = str.length;
-        for(int a = 0; a < al; a += cl(str, a)) encode(cp(str, a));
+        printChars(norm(item.string(null)));
       }
     } catch(final QueryException ex) {
       throw new QueryIOException(ex);
@@ -131,41 +122,7 @@ public abstract class StandardSerializer extends OutputSerializer {
    * @param text text to be normalized
    * @return normalized text
    */
-  protected byte[] norm(final byte[] text) {
+  protected final byte[] norm(final byte[] text) {
     return form == null || ascii(text) ? text : token(Normalizer.normalize(string(text), form));
-  }
-
-  /**
-   * Prints the characters of the specified token.
-   * @param token token
-   * @throws IOException I/O exception
-   */
-  protected void printChars(final byte[] token) throws IOException {
-    if(contains(token, '\n')) {
-      final int sl = token.length;
-      for(int s = 0; s < sl; s += cl(token, s)) printChar(cp(token, s));
-    } else {
-      out.print(token);
-    }
-  }
-
-  /**
-   * Writes a codepoint in the current encoding and
-   * converts newlines to the operating system's default.
-   * @param cp codepoint to be printed
-   * @throws IOException I/O exception
-   */
-  protected final void printChar(final int cp) throws IOException {
-    if(cp == '\n') newline();
-    else out.print(cp);
-  }
-
-  /**
-   * Encodes the specified codepoint before printing it.
-   * @param cp codepoint to be encoded and printed
-   * @throws IOException I/O exception
-   */
-  protected void encode(final int cp) throws IOException {
-    printChar(cp);
   }
 }

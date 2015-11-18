@@ -198,7 +198,7 @@ final class DataUpdates {
           throw UPDBOPTERR_X.get(null, ex);
         }
       } else {
-        FnTrace.dump(Token.token(original + ": Updates are not written back."), null, qc);
+        FnTrace.trace(Token.token(original + ": Updates are not written back."), null, qc);
       }
     }
   }

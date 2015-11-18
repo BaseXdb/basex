@@ -5,7 +5,6 @@ import static org.basex.query.QueryError.*;
 
 import java.io.*;
 
-import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.util.ft.*;
 import org.basex.query.value.item.*;
@@ -16,18 +15,18 @@ import org.basex.query.value.item.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-final class XMLSerializer extends MarkupSerializer {
+public class XMLSerializer extends MarkupSerializer {
   /** Indicates if root element has been serialized. */
   private boolean root;
 
   /**
    * Constructor, specifying serialization options.
-   * @param out print output
+   * @param os output stream
    * @param sopts serialization parameters
    * @throws IOException I/O exception
    */
-  XMLSerializer(final PrintOutput out, final SerializerOptions sopts) throws IOException {
-    super(out, sopts, V10, V11);
+  XMLSerializer(final OutputStream os, final SerializerOptions sopts) throws IOException {
+    super(os, sopts, V10, V11);
   }
 
   @Override

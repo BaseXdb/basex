@@ -86,7 +86,7 @@ public final class XMLParserTest extends SandboxTest {
   @Test
   public void parse() {
     set(MainOptions.STRIPNS, true);
-    set(MainOptions.SERIALIZER, SerializerOptions.get(false));
+    set(MainOptions.SERIALIZER, SerializerMode.NOINDENT.get());
 
     final String doc = "<e xmlns='A'><b:f xmlns:b='B'/></e>";
     for(final boolean b : new boolean[] { false, true }) {
@@ -102,7 +102,7 @@ public final class XMLParserTest extends SandboxTest {
    */
   @Test
   public void xmlSpace() {
-    set(MainOptions.SERIALIZER, SerializerOptions.get(false));
+    set(MainOptions.SERIALIZER, SerializerMode.NOINDENT.get());
 
     final String in = "<x><a xml:space='default'> </a><a> </a>" +
         "<a xml:space='preserve'> </a></x>";

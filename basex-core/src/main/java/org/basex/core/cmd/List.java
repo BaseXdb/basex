@@ -11,7 +11,6 @@ import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.index.resource.*;
 import org.basex.io.*;
-import org.basex.io.serial.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
 import org.basex.util.list.*;
@@ -128,7 +127,7 @@ public final class List extends Command {
         final TokenList tl = new TokenList(3);
         final byte[] file = data.text(pre, true);
         tl.add(file);
-        tl.add(SerialMethod.XML.toString());
+        tl.add(XML);
         tl.add(MediaType.APPLICATION_XML.toString());
         tl.add(data.size(pre, Data.DOC));
         table.contents.add(tl);
@@ -138,7 +137,7 @@ public final class List extends Command {
         final String f = string(file);
         final TokenList tl = new TokenList(3);
         tl.add(file);
-        tl.add(SerialMethod.RAW.toString());
+        tl.add(IO.RAW);
         tl.add(MediaType.get(f).toString());
         tl.add(data.meta.binary(f).length());
         table.contents.add(tl);

@@ -76,10 +76,20 @@ public final class Atm extends Item {
 
   @Override
   public String toString() {
-    final ByteList tb = new ByteList();
-    tb.add('"');
+    return toString(value);
+  }
+
+  /**
+   * Returns a string representation of the specified value.
+   * @param value value
+   * @return string
+   */
+  public static String toString(final byte[] value) {
+    final ByteList tb = new ByteList().add('"');
     for(final byte v : value) {
       if(v == '&') tb.add(E_AMP);
+      else if(v == '\r') tb.add(E_CR);
+      else if(v == '\n') tb.add(E_NL);
       else tb.add(v);
       if(v == '"') tb.add('"');
     }

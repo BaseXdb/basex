@@ -574,7 +574,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
   public void retrieve() {
     error(_DB_RETRIEVE.args(NAME, "raw"), WHICHRES_X);
     query(_DB_STORE.args(NAME, "raw", "xs:hexBinary('41')"));
-    query("xs:hexBinary(" + _DB_RETRIEVE.args(NAME, "raw") + ')', "41");
+    query("xs:hexBinary(" + _DB_RETRIEVE.args(NAME, "raw") + ')', "A");
     query(_DB_DELETE.args(NAME, "raw"));
     error(_DB_RETRIEVE.args(NAME, "raw"), WHICHRES_X);
   }
@@ -584,9 +584,9 @@ public final class DbModuleTest extends AdvancedQueryTest {
   public void store() {
     query(_DB_STORE.args(NAME, "raw1", "xs:hexBinary('41')"));
     query(_DB_STORE.args(NAME, "raw2", "b"));
-    query("xs:hexBinary(" + _DB_RETRIEVE.args(NAME, "raw2") + ')', "62");
+    query(_DB_RETRIEVE.args(NAME, "raw2"), "b");
     query(_DB_STORE.args(NAME, "raw3", 123));
-    query("xs:hexBinary(" + _DB_RETRIEVE.args(NAME, "raw3") + ')', "313233");
+    query(_DB_RETRIEVE.args(NAME, "raw3"), "123");
   }
 
   /** Test method. */

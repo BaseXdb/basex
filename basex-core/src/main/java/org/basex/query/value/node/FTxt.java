@@ -1,9 +1,11 @@
 package org.basex.query.value.node;
 
+import static org.basex.data.DataText.*;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 import org.w3c.dom.*;
 
 /**
@@ -51,6 +53,11 @@ public final class FTxt extends FNode {
 
   @Override
   public String toString() {
-    return Token.string(value);
+    final ByteList tb = new ByteList();
+    for(final byte v : value) {
+      if(v == '&') tb.add(E_AMP);
+      else if(v == '\r') tb.add(E_CR);
+    }
+    return tb.add('"').toString();
   }
 }

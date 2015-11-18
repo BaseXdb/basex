@@ -3,7 +3,7 @@ package org.basex.query.func.client;
 import static org.basex.query.QueryError.*;
 
 import java.io.*;
-import java.util.Map.Entry;
+import java.util.Map.*;
 import java.util.regex.*;
 
 import org.basex.api.client.*;
@@ -12,6 +12,7 @@ import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -38,15 +39,17 @@ public final class ClientQuery extends ClientFn {
     try(org.basex.api.client.ClientQuery cq = cs.query(query)) {
       // bind variables and context value
       for(final Entry<String, Value> binding : toBindings(2, qc).entrySet()) {
-        final String k = binding.getKey();
+        final String key = binding.getKey();
         final Value value = binding.getValue();
-        if(k.isEmpty()) cq.context(value);
-        else cq.bind(k, value);
+        if(key.isEmpty()) cq.context(value);
+        else cq.bind(key, value);
       }
-
       // evaluate query
+      cq.cache(true);
       while(cq.more()) {
         final String result = cq.next();
+        final Type tp = cq.type();
+        if(tp instanceof FuncType) throw BXCL_FITEM_X.get(info, result);
         vb.add(cq.type().castString(result, qc, sc, info));
       }
       return vb.value();

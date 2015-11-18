@@ -300,8 +300,8 @@ public abstract class W3CTS extends Main {
               nodes("*:input-file/@variable", state), qp, s == 0));
           files.add(file(nodes("*:defaultCollection", state), null, qp, s == 0));
           var(nodes("*:input-URI", state), nodes("*:input-URI/@variable", state), qp);
-          eval(nodes("*:input-query/@name", state), nodes("*:input-query/@variable", state),
-              pth, qp);
+          eval(nodes("*:input-query/@name", state),
+              nodes("*:input-query/@variable", state), pth, qp);
 
           parse(qp, state);
 
@@ -315,8 +315,8 @@ public abstract class W3CTS extends Main {
           value = qp.value();
 
           // serialize query
-          final SerializerOptions options = context.options.get(MainOptions.SERIALIZER);
-          try(final Serializer ser = Serializer.get(ao, options)) {
+          final SerializerOptions sopts = context.options.get(MainOptions.SERIALIZER);
+          try(final Serializer ser = Serializer.get(ao, sopts)) {
             for(final Item it : value) ser.serialize(it);
           }
 

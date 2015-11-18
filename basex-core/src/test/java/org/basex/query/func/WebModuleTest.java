@@ -52,8 +52,6 @@ public final class WebModuleTest extends AdvancedQueryTest {
     query(_WEB_RESPONSE_HEADER.args() +
         "/*:response/*:header[@name = 'Cache-Control']/@value/string()", "max-age=3600,public");
     query(_WEB_RESPONSE_HEADER.args() +
-        "/*:serialization-parameters/*:method/@value/string()", "raw");
-    query(_WEB_RESPONSE_HEADER.args() +
         "/*:serialization-parameters/*:media-type/@value/string()", "application/octet-stream");
 
     // overwrite header

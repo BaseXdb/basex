@@ -14,7 +14,7 @@ import org.junit.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public final class SessionTest extends HTTPTest {
+public final class SessionModuleTest extends HTTPTest {
   /**
    * Start server.
    * @throws Exception exception

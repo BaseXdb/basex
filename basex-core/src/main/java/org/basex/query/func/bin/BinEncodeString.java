@@ -17,7 +17,7 @@ import org.basex.util.*;
  */
 public final class BinEncodeString extends BinFn {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public B64 item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] str = str(0, qc);
     final String enc = toEncoding(1, BIN_UE_X, qc);
     if(str == null) return null;

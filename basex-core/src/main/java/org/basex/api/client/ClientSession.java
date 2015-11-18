@@ -173,8 +173,8 @@ public class ClientSession extends Session {
    * @throws IOException I/O exception
    */
   private void send(final InputStream input) throws IOException {
-    final EncodingOutput eo = new EncodingOutput(sout);
-    for(int b; (b = input.read()) != -1;) eo.write(b);
+    final ServerOutput so = new ServerOutput(sout);
+    for(int b; (b = input.read()) != -1;) so.write(b);
     sout.write(0);
     sout.flush();
     receive(null);
@@ -225,8 +225,8 @@ public class ClientSession extends Session {
    * @throws IOException I/O exception
    */
   static void receive(final BufferInput input, final OutputStream output) throws IOException {
-    final DecodingInput di = new DecodingInput(input);
-    for(int b; (b = di.read()) != -1;) output.write(b);
+    final ServerInput si = new ServerInput(input);
+    for(int b; (b = si.read()) != -1;) output.write(b);
   }
 
   /**

@@ -3,8 +3,8 @@ package org.basex.io.in;
 import java.io.*;
 
 /**
- * This server-side class wraps an {@link InputStream} filled by a database
- * client. The incoming bytes are decoded:
+ * This server-side class wraps an {@link InputStream} reference by a database client.
+ * The incoming bytes are decoded:
  * <ul>
  * <li> {@code 0x00} is treated as end of stream, and -1 is returned</li>
  * <li> {@code 0xFF} is treated as encoding flag and skipped</li>
@@ -13,7 +13,7 @@ import java.io.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public final class DecodingInput extends InputStream {
+public final class ServerInput extends InputStream {
   /** Input stream. */
   private final InputStream input;
   /** All bytes have been read. */
@@ -23,7 +23,7 @@ public final class DecodingInput extends InputStream {
    * Constructor.
    * @param input buffer input to be wrapped
    */
-  public DecodingInput(final InputStream input) {
+  public ServerInput(final InputStream input) {
     this.input = input;
   }
 

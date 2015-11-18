@@ -20,13 +20,13 @@ public final class ArrayOutput extends PrintOutput {
   private byte[] buffer = new byte[8];
 
   @Override
-  public void write(final int value) {
+  public void write(final int b) throws IOException {
     final int s = (int) size;
     if(s == max) return;
 
     byte[] bffr = buffer;
     if(s == bffr.length) bffr = Arrays.copyOf(bffr, Array.newSize(s));
-    bffr[s] = (byte) value;
+    bffr[s] = (byte) b;
     buffer = bffr;
     size = s + 1;
   }

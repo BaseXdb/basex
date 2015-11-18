@@ -29,14 +29,14 @@ import org.basex.util.*;
  */
 public abstract class AQuery extends Command {
   /** Variables. */
-  private final HashMap<String, String[]> vars = new HashMap<>();
+  protected final HashMap<String, String[]> vars = new HashMap<>();
+
   /** HTTP context. */
   private Object http;
   /** Query processor. */
   private QueryProcessor qp;
   /** Query info. */
   private QueryInfo info;
-
   /** Query result. */
   private Value result;
 
@@ -100,7 +100,8 @@ public abstract class AQuery extends Command {
           info.serializing += p.time();
         }
         // dump some query info
-        out.flush();
+        //out.flush();
+
         // remove string list if global locking is used and if query is updating
         if(soptions.get(StaticOptions.GLOBALLOCK) && qp.updating) {
           info.readLocked = null;
@@ -204,29 +205,7 @@ public abstract class AQuery extends Command {
     } finally {
       qp = null;
     }
-    return SerializerOptions.get(true).toString();
-  }
-
-  /**
-   * Binds a variable.
-   * @param name name of variable (if {@code null}, value will be bound as context value)
-   * @param value value to be bound
-   * @return reference
-   */
-  public AQuery bind(final String name, final String value) {
-    return bind(name, value, null);
-  }
-
-  /**
-   * Binds a variable.
-   * @param name name of variable (if {@code null}, value will be bound as context value)
-   * @param value value to be bound
-   * @param type type
-   * @return reference
-   */
-  public AQuery bind(final String name, final String value, final String type) {
-    vars.put(name, new String[] { value, type });
-    return this;
+    return SerializerMode.DEFAULT.get().toString();
   }
 
   /**

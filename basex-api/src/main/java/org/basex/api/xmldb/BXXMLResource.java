@@ -95,16 +95,18 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
   @Override
   public Object getContent() throws XMLDBException {
     if(content == null) {
+      System.out.println("!");
       try {
         // serialize and cache content
         final ArrayOutput ao = new ArrayOutput();
-        final Serializer ser = Serializer.get(ao);
-        if(data != null) {
-          ser.serialize(new DBNode(data, pre));
-        } else if(item != null) {
-          ser.serialize(item);
-        } else {
-          return null;
+        try(final Serializer ser = Serializer.get(ao, SerializerMode.NOINDENT.get())) {
+          if(data != null) {
+            ser.serialize(new DBNode(data, pre));
+          } else if(item != null) {
+            ser.serialize(item);
+          } else {
+            return null;
+          }
         }
         content = ao.toArray();
       } catch(final IOException ex) {
@@ -201,7 +203,8 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
     @Override
     public void endDocument() throws SAXException {
       try {
-        resource.content = new DBNode(((MemBuilder) builder).data()).serialize().toArray();
+        resource.content = new DBNode(((MemBuilder) builder).data()).serialize(
+            SerializerMode.NOINDENT.get()).toArray();
       } catch(final QueryIOException ex) {
         error(new BaseXException(ex));
       }

@@ -80,7 +80,7 @@ public abstract class Item extends Value {
    * Returns a string representation of the value.
    * @param ii input info, use {@code null} if none is available
    * @return string value
-   * @throws QueryException if the item can't be atomized
+   * @throws QueryException if the item cannot be atomized (caused by function or streaming items)
    */
   public abstract byte[] string(final InputInfo ii) throws QueryException;
 
@@ -322,14 +322,16 @@ public abstract class Item extends Value {
 
   /**
    * Returns data model info.
+   * Overwritten by xs:QName, attribute() and document-node().
    * @return type string
    */
   public byte[] xdmInfo() {
-    return typeId().bytes();
+    return new byte[] { typeId().asByte() };
   }
 
   /**
    * Returns a type id.
+   * Overwritten by document-node() to check if document has an element as child.
    * @return type string
    */
   public ID typeId() {

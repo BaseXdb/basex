@@ -1,19 +1,16 @@
 package org.basex.io.serial;
 
 import static org.basex.data.DataText.*;
-import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
-import java.nio.charset.*;
 import java.util.*;
 
 import org.basex.build.csv.*;
-import org.basex.build.csv.CsvOptions.CsvFormat;
+import org.basex.build.csv.CsvOptions.*;
 import org.basex.build.json.*;
-import org.basex.build.json.JsonOptions.JsonFormat;
+import org.basex.build.json.JsonOptions.*;
 import org.basex.data.*;
-import org.basex.io.out.*;
 import org.basex.io.serial.csv.*;
 import org.basex.io.serial.json.*;
 import org.basex.query.*;
@@ -49,13 +46,13 @@ public abstract class Serializer implements Closeable {
 
   /** Static context. */
   protected StaticContext sc;
-  /** Indicates if more than one item was serialized. */
+  /** Indicates if at least one item was already serialized. */
   protected boolean more;
   /** Indicates if an element is currently being opened. */
   private boolean opening;
 
   /**
-   * Returns an adaptive serializer.
+   * Returns a default serializer.
    * @param os output stream reference
    * @return serializer
    * @throws IOException I/O exception
@@ -74,43 +71,29 @@ public abstract class Serializer implements Closeable {
   public static Serializer get(final OutputStream os, final SerializerOptions sopts)
       throws IOException {
 
-    // create print output
-    final SerializerOptions so = sopts == null ? SerializerOptions.get(true) : sopts;
-    final String enc = Strings.normEncoding(so.get(SerializerOptions.ENCODING), true);
-    final PrintOutput po;
-    if(enc == Strings.UTF8) {
-      po = PrintOutput.get(os);
-    } else {
-      try {
-        po = new EncoderOutput(os, Charset.forName(enc));
-      } catch(final Exception ex) {
-        throw SERENCODING_X.getIO(enc);
-      }
-    }
-    final int limit = so.get(SerializerOptions.LIMIT);
-    if(limit != -1) po.setLimit(so.get(SerializerOptions.LIMIT));
-
-    // no parameters given: serialize adaptively
+    // choose serializer
+    final SerializerOptions so = sopts == null ? SerializerMode.DEFAULT.get() : sopts;
     switch(so.get(SerializerOptions.METHOD)) {
-      case XHTML: return new XHTMLSerializer(po, so);
-      case HTML:  return new HTMLSerializer(po, so);
-      case TEXT:  return new TextSerializer(po, so);
-      case RAW:   return new RawSerializer(po, so);
+      case XHTML: return new XHTMLSerializer(os, so);
+      case HTML:  return new HTMLSerializer(os, so);
+      case TEXT:  return new TextSerializer(os, so);
       case CSV:
         final CsvOptions copts = so.get(SerializerOptions.CSV);
         return copts.get(CsvOptions.FORMAT) == CsvFormat.MAP
-               ? new CsvMapSerializer(po, so)
-               : new CsvDirectSerializer(po, so);
+               ? new CsvMapSerializer(os, so)
+               : new CsvDirectSerializer(os, so);
       case JSON:
         final JsonSerialOptions jopts = so.get(SerializerOptions.JSON);
         final JsonFormat jformat = jopts.get(JsonOptions.FORMAT);
-        return jformat == JsonFormat.JSONML ? new JsonMLSerializer(po, so) :
-               jformat == JsonFormat.BASIC  ? new JsonBasicSerializer(po, so) :
-               new JsonNodeSerializer(po, so);
+        return jformat == JsonFormat.JSONML ? new JsonMLSerializer(os, so) :
+               jformat == JsonFormat.BASIC  ? new JsonBasicSerializer(os, so) :
+               new JsonNodeSerializer(os, so);
       case XML:
-        return new XMLSerializer(po, so);
+        return new XMLSerializer(os, so);
+      case ADAPTIVE:
+        return new AdaptiveSerializer(os, so);
       default:
-        return new AdaptiveSerializer(po, so);
+        return new BaseXSerializer(os, so);
     }
   }
 
@@ -155,7 +138,7 @@ public abstract class Serializer implements Closeable {
   /**
    * Assigns the static context.
    * @param sctx static context
-   * @return serializer
+   * @return self-reference
    */
   public Serializer sc(final StaticContext sctx) {
     sc = sctx;
@@ -344,14 +327,12 @@ public abstract class Serializer implements Closeable {
   @SuppressWarnings("unused")
   protected void function(final FItem item) throws IOException { }
 
-  // PRIVATE METHODS ==========================================================
-
   /**
    * Serializes a node of the specified data reference.
    * @param node database node
    * @throws IOException I/O exception
    */
-  private void node(final DBNode node) throws IOException {
+  protected final void node(final DBNode node) throws IOException {
     final FTPosData ft = node instanceof FTPosNode ? ((FTPosNode) node).ftpos : null;
     final Data data = node.data();
     int pre = node.pre(), kind = data.kind(pre);
@@ -446,7 +427,7 @@ public abstract class Serializer implements Closeable {
    * @param node database node
    * @throws IOException I/O exception
    */
-  private void node(final FNode node) throws IOException {
+  protected final void node(final FNode node) throws IOException {
     final Type type = node.type;
     if(type == NodeType.COM) {
       prepareComment(node.string());
@@ -490,6 +471,8 @@ public abstract class Serializer implements Closeable {
       indent = i;
     }
   }
+
+  // PRIVATE METHODS ==========================================================
 
   /**
    * Serializes a comment.

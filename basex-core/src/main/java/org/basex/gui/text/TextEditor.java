@@ -1044,7 +1044,8 @@ public final class TextEditor {
     final int e = start < end ? end : start;
     for(int s = start < end ? start : end; s < e; s += cl(text, s)) {
       final int cp = cp(text, s);
-      if(cp >= ' ' || cp == 0x0A || cp == 0x09) tb.add(cp);
+      if(cp >= ' ' && cp < TokenBuilder.PRIVATE_START || cp == 0x0A || cp == 0x09 ||
+          cp > TokenBuilder.PRIVATE_END) tb.add(cp);
     }
     return tb.toString();
   }

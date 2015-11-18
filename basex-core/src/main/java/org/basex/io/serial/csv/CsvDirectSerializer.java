@@ -7,7 +7,6 @@ import java.io.*;
 
 import org.basex.build.csv.*;
 import org.basex.build.csv.CsvOptions.CsvFormat;
-import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.util.ft.*;
 import org.basex.query.value.item.*;
@@ -38,14 +37,14 @@ public final class CsvDirectSerializer extends CsvSerializer {
 
   /**
    * Constructor.
-   * @param out print output
+   * @param os output stream
    * @param opts serialization parameters
    * @throws IOException I/O exception
    */
-  public CsvDirectSerializer(final PrintOutput out, final SerializerOptions opts)
+  public CsvDirectSerializer(final OutputStream os, final SerializerOptions opts)
       throws IOException {
 
-    super(out, opts);
+    super(os, opts);
     header = copts.get(CsvOptions.HEADER);
     headers = header ? new TokenList() : null;
     atts = copts.get(CsvOptions.FORMAT) == CsvFormat.ATTRIBUTES;

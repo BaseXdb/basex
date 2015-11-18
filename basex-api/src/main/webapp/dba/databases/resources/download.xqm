@@ -31,7 +31,6 @@ function _:download(
     return (
       <rest:response>
         <output:serialization-parameters>
-          <output:method value='{ if($raw) then "raw" else "xml" }'/>
           <output:media-type value='{ util:eval("db:content-type($n, $r)", $options) }'/>
         </output:serialization-parameters>
       </rest:response>,
@@ -51,7 +50,6 @@ function _:download(
  :)
 declare
   %rest:path("/dba/backup/{$backup}")
-  %output:method("raw")
   %output:media-type("application/octet-stream")
 function _:download(
   $backup  as xs:string

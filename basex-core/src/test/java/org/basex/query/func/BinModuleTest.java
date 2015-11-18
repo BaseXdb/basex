@@ -27,8 +27,8 @@ public final class BinModuleTest extends AdvancedQueryTest {
     hexQuery(_BIN_HEX.args("FFFFFFFFFFFFF"),  "0FFFFFFFFFFFFF");
     hexQuery(_BIN_HEX.args("10000000000000"), "10000000000000");
     hexQuery(_BIN_HEX.args("10000000000000"), "10000000000000");
-    query(_BIN_HEX.args("11223F4E"), "ESI/Tg==");
-    query(_BIN_HEX.args("1223F4E"),  "ASI/Tg==");
+    hexQuery(_BIN_HEX.args("11223F4E"),       "11223F4E");
+    hexQuery(_BIN_HEX.args("1223F4E"),        "01223F4E");
     // errors
     error(_BIN_HEX.args("X"), BIN_NNC);
   }
@@ -36,17 +36,17 @@ public final class BinModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void bin() {
-    hexQuery(_BIN_BIN.args("()"),        "");
-    hexQuery(_BIN_BIN.args(""),          "");
-    hexQuery(_BIN_BIN.args("0"),         "00");
-    hexQuery(_BIN_BIN.args("00"),        "00");
-    hexQuery(_BIN_BIN.args("000000000"), "0000");
-    hexQuery(_BIN_BIN.args("1"),         "01");
-    hexQuery(_BIN_BIN.args("10"),        "02");
-    hexQuery(_BIN_BIN.args("11111111"),  "FF");
-    hexQuery(_BIN_BIN.args("111111111"), "01FF");
-    query(_BIN_BIN.args("1101000111010101"), "0dU=");
-    query(_BIN_BIN.args("1000111010101"),    "EdU=");
+    hexQuery(_BIN_BIN.args("()"),               "");
+    hexQuery(_BIN_BIN.args(""),                 "");
+    hexQuery(_BIN_BIN.args("0"),                "00");
+    hexQuery(_BIN_BIN.args("00"),               "00");
+    hexQuery(_BIN_BIN.args("000000000"),        "0000");
+    hexQuery(_BIN_BIN.args("1"),                "01");
+    hexQuery(_BIN_BIN.args("10"),               "02");
+    hexQuery(_BIN_BIN.args("11111111"),         "FF");
+    hexQuery(_BIN_BIN.args("111111111"),        "01FF");
+    hexQuery(_BIN_BIN.args("1101000111010101"), "D1D5");
+    hexQuery(_BIN_BIN.args("1000111010101"),    "11D5");
     // errors
     error(_BIN_BIN.args("X"), BIN_NNC);
   }
@@ -54,16 +54,16 @@ public final class BinModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void octal() {
-    hexQuery(_BIN_OCTAL.args("()"),  "");
-    hexQuery(_BIN_OCTAL.args(""),    "");
-    hexQuery(_BIN_OCTAL.args("0"),   "00");
-    hexQuery(_BIN_OCTAL.args("00"),  "00");
-    hexQuery(_BIN_OCTAL.args("000"), "0000");
-    hexQuery(_BIN_OCTAL.args("007"), "0007");
-    hexQuery(_BIN_OCTAL.args("1"),   "01");
-    hexQuery(_BIN_OCTAL.args("10"),  "08");
-    hexQuery(_BIN_OCTAL.args("77"),  "3F");
-    query(_BIN_OCTAL.args("11223047"), "JSYn");
+    hexQuery(_BIN_OCTAL.args("()"),       "");
+    hexQuery(_BIN_OCTAL.args(""),         "");
+    hexQuery(_BIN_OCTAL.args("0"),        "00");
+    hexQuery(_BIN_OCTAL.args("00"),       "00");
+    hexQuery(_BIN_OCTAL.args("000"),      "0000");
+    hexQuery(_BIN_OCTAL.args("007"),      "0007");
+    hexQuery(_BIN_OCTAL.args("1"),        "01");
+    hexQuery(_BIN_OCTAL.args("10"),       "08");
+    hexQuery(_BIN_OCTAL.args("77"),       "3F");
+    hexQuery(_BIN_OCTAL.args("11223047"), "252627");
     // errors
     error(_BIN_OCTAL.args("X"), BIN_NNC);
   }
@@ -420,7 +420,7 @@ public final class BinModuleTest extends AdvancedQueryTest {
    * @param result expected query result
    */
   private static void hexQuery(final String query, final String result) {
-    query("xs:hexBinary(" + query + ')', result);
+    query(STRING.args("xs:hexBinary(" + query + ')'), result);
   }
 
   /**

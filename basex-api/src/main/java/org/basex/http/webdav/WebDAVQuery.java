@@ -13,7 +13,7 @@ final class WebDAVQuery {
   /** String query. */
   private final String query;
   /** Bindings. */
-  private final HashMap<String, Object> bindings = new HashMap<>();
+  private final HashMap<String, String> bindings = new HashMap<>();
 
   /**
    * Constructor.
@@ -29,7 +29,7 @@ final class WebDAVQuery {
    * @param value value of variable
    * @return self reference
    */
-  WebDAVQuery bind(final String name, final Object value) {
+  WebDAVQuery bind(final String name, final String value) {
     bindings.put(name, value);
     return this;
   }
@@ -38,7 +38,7 @@ final class WebDAVQuery {
    * Returns the hash map entries.
    * @return self reference
    */
-  Set<Entry<String, Object>> entries() {
+  Set<Entry<String, String>> entries() {
     return bindings.entrySet();
   }
 

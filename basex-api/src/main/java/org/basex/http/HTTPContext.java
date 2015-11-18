@@ -166,8 +166,8 @@ public final class HTTPContext {
 
     // determine content type dependent on output method
     final SerialMethod sm = sopts.get(SerializerOptions.METHOD);
-    if(sm == SerialMethod.RAW) return MediaType.APPLICATION_OCTET_STREAM;
-    if(sm == SerialMethod.ADAPTIVE || sm == SerialMethod.XML) return MediaType.APPLICATION_XML;
+    if(sm == SerialMethod.BASEX || sm == SerialMethod.ADAPTIVE || sm == SerialMethod.XML)
+      return MediaType.APPLICATION_XML;
     if(sm == SerialMethod.XHTML || sm == SerialMethod.HTML) return MediaType.TEXT_HTML;
     if(sm == SerialMethod.JSON) return MediaType.APPLICATION_JSON;
     return MediaType.TEXT_PLAIN;

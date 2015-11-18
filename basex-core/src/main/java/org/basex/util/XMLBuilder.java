@@ -155,12 +155,12 @@ public final class XMLBuilder {
 
   /**
    * Returns a hex entity for the specified codepoint.
-   * @param cp codepoint
+   * @param ch character (00-FF)
    */
-  private void addHex(final int cp) {
+  private void addHex(final int ch) {
     cache.add("&#x");
-    if(cp > 0xF) cache.add(HEX[cp >> 4]);
-    cache.add(HEX[cp & 0xF]).add(';');
+    if(ch > 0xF) cache.add(HEX[ch >> 4]);
+    cache.add(HEX[ch & 0xF]).add(';');
   }
 
   /**

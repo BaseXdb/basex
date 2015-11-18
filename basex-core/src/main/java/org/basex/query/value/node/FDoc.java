@@ -122,14 +122,14 @@ public final class FDoc extends FNode {
 
   @Override
   public byte[] xdmInfo() {
-    return new ByteList().add(typeId().bytes()).add(uri).add(0).finish();
+    return new ByteList().add(typeId().asByte()).add(uri).add(0).finish();
   }
 
   @Override
   public ID typeId() {
     // check if a document has a single element as child
-    return children.size() == 1 && children.get(0).type == NodeType.ELM ?
-      NodeType.DEL.id() : type.id();
+    return (children.size() == 1 && children.get(0).type == NodeType.ELM
+        ? NodeType.DEL : type).id();
   }
 
   @Override

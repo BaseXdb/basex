@@ -1,7 +1,6 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
 import org.basex.query.value.array.*;
@@ -237,7 +236,7 @@ public final class ArrayTest extends AdvancedQueryTest {
    * @param exp expected result
    */
   private static void array(final String query, final String exp) {
-    query(_ARRAY_SERIALIZE.args(' ' + query), exp);
+    query(query, exp);
   }
 
   /** Atomize key. */

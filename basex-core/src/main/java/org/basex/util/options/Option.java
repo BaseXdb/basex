@@ -48,4 +48,13 @@ public abstract class Option<O> {
     if(v != null && !v.toString().isEmpty()) sb.append('=').append(v);
     return sb.toString();
   }
+
+  /**
+   * Returns a string representation of the option with the specified argument.
+   * @param arg argument
+   * @return string representation
+   */
+  public final String arg(final String arg) {
+    return "declare option output:" + name() + "'" + arg.replace("'", "''") + "';";
+  }
 }

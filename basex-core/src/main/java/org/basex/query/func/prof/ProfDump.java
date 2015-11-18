@@ -20,10 +20,10 @@ public final class ProfDump extends StandardFunc {
     final byte[] label = exprs.length > 1 ? toToken(exprs[1], qc) : null;
     boolean empty = true;
     for(Item it; (it = ir.next()) != null;) {
-      FnTrace.dump(it, label, info, qc);
+      FnTrace.trace(it, label, info, qc);
       empty = false;
     }
-    if(empty) FnTrace.dump(null, label, info, qc);
+    if(empty) FnTrace.trace(null, label, info, qc);
     return null;
   }
 }

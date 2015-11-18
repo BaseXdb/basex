@@ -41,7 +41,7 @@ public final class DOTSerializer extends OutputSerializer {
    * @throws IOException I/O exception
    */
   public DOTSerializer(final OutputStream os, final boolean compact) throws IOException {
-    super(PrintOutput.get(os), SerializerOptions.get(true));
+    super(PrintOutput.get(os), SerializerMode.DEFAULT.get());
     this.compact = compact;
     out.print(HEADER);
   }

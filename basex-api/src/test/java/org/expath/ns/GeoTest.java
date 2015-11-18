@@ -89,8 +89,8 @@ public final class GeoTest extends SandboxTest {
   /** Test method. */
   @Test
   public void asBinary() {
-    run("geo:asBinary(<gml:LineString><gml:coordinates>1,1 55,99 2,1" +
-            "</gml:coordinates></gml:LineString>)",
+    run("string(geo:asBinary(<gml:LineString><gml:coordinates>1,1 55,99 2,1" +
+            "</gml:coordinates></gml:LineString>))",
           "AAAAAAIAAAADP/AAAAAAAAA/8AAAAAAAAEBLgAAAAAAAQFjAAAAAAABAAAAAAAAAAD/wAAAAAAAA");
 
     error("geo:asBinary(text {'a'})", EXPTYPE_X_X_X.qname());

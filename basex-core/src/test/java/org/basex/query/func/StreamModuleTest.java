@@ -19,7 +19,7 @@ public final class StreamModuleTest extends AdvancedQueryTest {
   @Test
   public void materialize() {
     query(_FILE_READ_TEXT.args(FILE), "<");
-    query(_STREAM_MATERIALIZE.args(_FILE_READ_BINARY.args(FILE)), "PA==");
+    query(_STREAM_MATERIALIZE.args(_FILE_READ_BINARY.args(FILE)), "<");
     query(_STREAM_MATERIALIZE.args(_FILE_READ_TEXT.args(FILE)), "<");
   }
 
@@ -27,7 +27,6 @@ public final class StreamModuleTest extends AdvancedQueryTest {
   @Test
   public void isStreamable() {
     query(_STREAM_IS_STREAMABLE.args(_FILE_READ_BINARY.args(FILE)), "true");
-
     query(_STREAM_IS_STREAMABLE.args("A"), "false");
     query(_STREAM_IS_STREAMABLE.args(_STREAM_MATERIALIZE.args(
         _FILE_READ_TEXT.args(FILE))), "false");

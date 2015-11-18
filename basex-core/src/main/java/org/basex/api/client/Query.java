@@ -73,7 +73,7 @@ public abstract class Query implements Closeable {
    * @throws IOException I/O exception
    */
   public boolean more() throws IOException {
-    if(cache == null) cache();
+    if(cache == null) cache(false);
     if(pos < cache.size()) return true;
     cache = null;
     types = null;
@@ -82,9 +82,10 @@ public abstract class Query implements Closeable {
 
   /**
    * Caches the query result.
+   * @param full retrieve full type information
    * @throws IOException I/O exception
    */
-  protected abstract void cache() throws IOException;
+  public abstract void cache(final boolean full) throws IOException;
 
   /**
    * Returns the next item of the query.
@@ -111,15 +112,21 @@ public abstract class Query implements Closeable {
   /**
    * Caches the incoming input.
    * @param input input stream
+   * @param full retrieve full type information
    * @throws IOException I/O exception
    */
-  void cache(final InputStream input) throws IOException {
+  void cache(final InputStream input, final boolean full) throws IOException {
     cache = new TokenList();
     types = new ByteList();
     final ByteList bl = new ByteList();
     for(int t; (t = input.read()) > 0;) {
-      final DecodingInput di = new DecodingInput(input);
-      for(int b; (b = di.read()) != -1;) bl.add(b);
+      // skip type information
+      if(full && ID.get(t).isExtended()) {
+        while(input.read() > 0);
+      }
+      // read and decode result
+      final ServerInput si = new ServerInput(input);
+      for(int b; (b = si.read()) != -1;) bl.add(b);
       cache.add(bl.next());
       types.add(t);
     }

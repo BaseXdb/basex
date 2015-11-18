@@ -65,19 +65,19 @@ public final class FuncOptions {
   }
 
   /**
-   * Extracts options from the specified item.
+   * Assign options to the specified options.
    * @param item item to be converted
    * @param options options
    * @param <T> option type
    * @return specified options
    * @throws QueryException query exception
    */
-  public <T extends Options> T parse(final Item item, final T options) throws QueryException {
-    return parse(item, options, INVALIDOPT_X);
+  public <T extends Options> T assign(final Item item, final T options) throws QueryException {
+    return assign(item, options, INVALIDOPT_X);
   }
 
   /**
-   * Extracts options from the specified item.
+   * Assigns options to the specified options.
    * @param item item to be parsed
    * @param options options
    * @param <T> option type
@@ -85,19 +85,19 @@ public final class FuncOptions {
    * @return specified options
    * @throws QueryException query exception
    */
-  public <T extends Options> T parse(final Item item, final T options, final QueryError error)
+  public <T extends Options> T assign(final Item item, final T options, final QueryError error)
       throws QueryException {
 
     if(item != null) {
       final TokenBuilder tb = new TokenBuilder();
       try {
         if(item instanceof Map) {
-          options.parse((Map) item, !acceptUnknown, info);
+          options.assign((Map) item, !acceptUnknown, info);
         } else {
           if(test == null) throw MAP_X_X.get(info, item.type, item);
           if(!test.eq(item)) throw ELMMAP_X_X_X.get(info, root.prefixId(XML), item.type, item);
           final String opts = optString((ANode) item, error);
-          options.parse(tb.add(opts).toString());
+          options.assign(tb.add(opts).toString());
         }
       } catch(final BaseXException ex) {
         throw error.get(info, ex);
@@ -216,6 +216,6 @@ public final class FuncOptions {
    */
   public static SerializerOptions serializer(final Item item, final SerializerOptions sopts,
       final InputInfo info) throws QueryException {
-    return new FuncOptions(Q_SPARAM, info).parse(item, sopts, SEROPT_X);
+    return new FuncOptions(Q_SPARAM, info).assign(item, sopts, SEROPT_X);
   }
 }

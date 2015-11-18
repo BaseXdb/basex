@@ -4,7 +4,6 @@ import static org.basex.query.QueryError.*;
 
 import java.io.*;
 
-import org.basex.io.out.*;
 import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
@@ -24,12 +23,12 @@ import org.basex.util.list.*;
 public final class CsvMapSerializer extends CsvSerializer {
   /**
    * Constructor.
-   * @param out print output
+   * @param os output stream
    * @param opts serialization parameters
    * @throws IOException I/O exception
    */
-  public CsvMapSerializer(final PrintOutput out, final SerializerOptions opts) throws IOException {
-    super(out, opts);
+  public CsvMapSerializer(final OutputStream os, final SerializerOptions opts) throws IOException {
+    super(os, opts);
   }
 
   @Override

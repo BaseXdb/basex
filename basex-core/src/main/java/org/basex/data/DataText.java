@@ -160,9 +160,9 @@ public interface DataText {
   /** LessThan entity. */
   byte[] E_LT = token("&lt;");
   /** Carriage return. */
-  byte[] E_0D = token("&#x0D;");
-  /** Line feed. */
-  byte[] E_0A = token("&#x0A;");
+  byte[] E_CR = token("&#xD;");
+  /** Newline. */
+  byte[] E_NL = token("&#xA;");
   /** Line separator. */
   byte[] E_2028 = token("&#x2028;");
   /** HTML: Non-breaking space entity. */

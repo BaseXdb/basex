@@ -448,8 +448,6 @@ public enum Function {
   /** XQuery function. */
   _MAP_FOR_EACH(MapForEach.class, "for-each(map,function)",
       arg(MAP_O, FuncType.get(ITEM_ZM, AAT, ITEM_ZM).seqType()), ITEM_ZM, flag(HOF), MAP_URI),
-  /** XQuery function. */
-  _MAP_SERIALIZE(MapSerialize.class, "serialize(map)", arg(MAP_O), STR, MAP_URI),
 
   /* Array Module. */
 
@@ -500,8 +498,6 @@ public enum Function {
   /** XQuery function. */
   _ARRAY_SORT(ArraySort.class, "sort(array[,key-func])",
       arg(ARRAY_O, FuncType.arity(1).seqType()), ARRAY_O, flag(HOF), ARRAY_URI),
-  /** XQuery function. */
-  _ARRAY_SERIALIZE(ArraySerialize.class, "serialize(array)", arg(ARRAY_O), STR, ARRAY_URI),
 
   /* Math Module. */
 

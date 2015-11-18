@@ -2,7 +2,6 @@ package org.basex.io.serial;
 
 import java.io.*;
 
-import org.basex.io.out.*;
 import org.basex.query.util.ft.*;
 
 /**
@@ -14,17 +13,17 @@ import org.basex.query.util.ft.*;
 final class TextSerializer extends StandardSerializer {
   /**
    * Constructor, specifying serialization options.
-   * @param out print output
+   * @param os output stream
    * @param sopts serialization parameters
    * @throws IOException I/O exception
    */
-  TextSerializer(final PrintOutput out, final SerializerOptions sopts) throws IOException {
-    super(out, sopts);
+  TextSerializer(final OutputStream os, final SerializerOptions sopts) throws IOException {
+    super(os, sopts);
   }
 
   @Override
   protected void text(final byte[] value, final FTPos ftp) throws IOException {
-    printChars(norm(value));
+    out.print(norm(value));
     sep = false;
   }
 }

@@ -108,16 +108,20 @@ final class TrieList extends TrieNode {
 
   @Override
   Value get(final int h, final Item k, final int l, final InputInfo ii) throws QueryException {
-    if(h == hash) for(int i = keys.length; i-- != 0;)
+    if(h == hash) {
+      for(int i = keys.length; i-- != 0;)
       if(k.sameKey(keys[i], ii)) return values[i];
+    }
     return null;
   }
 
   @Override
   boolean contains(final int h, final Item k, final int u, final InputInfo ii)
       throws QueryException {
-    if(h == hash) for(int i = keys.length; i-- != 0;)
-      if(k.sameKey(keys[i], ii)) return true;
+    if(h == hash) {
+      for(int i = keys.length; i-- != 0;)
+        if(k.sameKey(keys[i], ii)) return true;
+    }
     return false;
   }
 
@@ -129,7 +133,9 @@ final class TrieList extends TrieNode {
   @Override
   TrieNode add(final TrieLeaf o, final int l, final InputInfo ii) throws QueryException {
     if(hash == o.hash) {
-      for(final Item k : keys) if(k.sameKey(o.key, ii)) return this;
+      for(final Item k : keys) {
+        if(k.sameKey(o.key, ii)) return this;
+      }
       return new TrieList(hash, Array.add(keys, o.key), Array.add(values, o.value));
     }
 

@@ -145,16 +145,16 @@ public final class XMLResourceTest extends XMLDBBaseTest {
   /**
    * Compares an XML resource with a file on disk.
    * @param file file name
-   * @param r resource
+   * @param resource resource
    * @throws XMLDBException exception
    * @throws IOException I/O exception
    */
-  private static void compare(final String file, final Resource r)
+  private static void compare(final String file, final Resource resource)
       throws XMLDBException, IOException {
 
     // compare serialized node with input file
-    final String cont = r.getContent().toString().replaceAll("\\r?\\n *", "");
-    final String buffer = Token.string(new IOFile(file).read()).trim();
-    assertEquals("File content differs.", buffer, cont.trim());
+    final String result = resource.getContent().toString().replaceAll("\\r?\\n *", "");
+    final String expected = Token.string(new IOFile(file).read()).trim();
+    assertEquals("File content differs.", expected, result.trim());
   }
 }

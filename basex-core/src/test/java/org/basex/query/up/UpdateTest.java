@@ -669,6 +669,14 @@ public final class UpdateTest extends AdvancedQueryTest {
    * Text merging test for delete operation.
    */
   @Test
+  public void x() {
+    query("1,2", "1\n2");
+  }
+
+  /**
+   * Text merging test for delete operation.
+   */
+  @Test
   public void textMerging10() {
     query("copy $c := <n>aa<d/><d/>cc</n> " +
       "modify (delete node $c//d, insert node 'bb' before ($c//d)[2]) " +
@@ -1145,12 +1153,11 @@ public final class UpdateTest extends AdvancedQueryTest {
    */
   @Test
   public void updatingFuncItems() {
-    query("db:output(?)", "function (anonymous)#1");
-    query("db:output#1", "function db:output#1");
-    query("declare updating function local:a() { () }; local:a#0", "function local:a#0");
+    query("db:output(?)", "(anonymous-function)#1");
+    query("db:output#1", "db:output#1");
+    query("declare updating function local:a() { () }; local:a#0", "local:a#0");
     query("declare function local:a() { local:a#0 };"
-        + "declare updating function local:b() { db:output('1') }; local:a()",
-        "function local:a#0");
+        + "declare updating function local:b() { db:output('1') }; local:a()", "local:a#0");
     query("declare function local:not-used() { local:b#0 };"
         + "declare updating function local:b() { db:output('1') }; local:b()", "1");
 

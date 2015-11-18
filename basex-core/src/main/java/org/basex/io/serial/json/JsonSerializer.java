@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 import java.io.*;
 
 import org.basex.build.json.*;
-import org.basex.io.out.*;
 import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
@@ -27,8 +26,6 @@ import org.basex.util.options.Options.YesNo;
 public abstract class JsonSerializer extends StandardSerializer {
   /** JSON options. */
   final JsonSerialOptions jopts;
-  /** Adaptive serializer. */
-  AdaptiveSerializer adaptive;
 
   /** Escape special characters. */
   private final boolean escape;
@@ -37,12 +34,12 @@ public abstract class JsonSerializer extends StandardSerializer {
 
   /**
    * Constructor.
-   * @param out print output
+   * @param os output stream
    * @param opts serialization parameters
    * @throws IOException I/O exception
    */
-  JsonSerializer(final PrintOutput out, final SerializerOptions opts) throws IOException {
-    super(out, opts);
+  JsonSerializer(final OutputStream os, final SerializerOptions opts) throws IOException {
+    super(os, opts);
     jopts = opts.get(SerializerOptions.JSON);
     escape = jopts.get(JsonSerialOptions.ESCAPE);
     nodups = opts.get(SerializerOptions.ALLOW_DUPLICATE_NAMES) == YesNo.NO;
@@ -65,16 +62,9 @@ public abstract class JsonSerializer extends StandardSerializer {
    * @throws IOException I/O exception
    */
   private void serialize(final Value value) throws IOException {
-    if(value.size() > 1) {
-      if(adaptive != null) {
-        adaptive.serialize(value);
-      } else {
-        throw SERJSONSEQ.getIO();
-      }
-    } else {
-      sep = false;
-      serialize(value.isEmpty() ? null : (Item) value);
-    }
+    if(value.size() > 1) throw SERJSONSEQ.getIO();
+    sep = false;
+    serialize(value.isEmpty() ? null : (Item) value);
   }
 
   @Override
@@ -90,11 +80,8 @@ public abstract class JsonSerializer extends StandardSerializer {
         for(final Item key : m.keys()) {
           final byte[] name = key.string(null);
           if(nodups) {
-            if(set.contains(name)) {
-              if(adaptive == null) throw SERDUPL_X.getIO(name);
-            } else {
-              set.put(name);
-            }
+            if(set.contains(name)) throw SERDUPL_X.getIO(name);
+            set.put(name);
           }
           if(s) out.print(',');
           indent();
@@ -126,11 +113,7 @@ public abstract class JsonSerializer extends StandardSerializer {
         out.print(']');
 
       } else {
-        if(adaptive != null) {
-          adaptive.serialize((Value) item);
-        } else {
-          throw SERJSONFUNC_X.getIO(item.type);
-        }
+        throw SERJSONFUNC_X.getIO(item.type);
       }
     } catch(final QueryException ex) {
       throw new QueryIOException(ex);
@@ -143,7 +126,7 @@ public abstract class JsonSerializer extends StandardSerializer {
     try {
       if(item.type.isNumber()) {
         final byte[] str = item.string(null);
-        if(eq(str, NAN, INF, NINF) && adaptive == null) throw SERNUMBER_X.getIO(str);
+        if(eq(str, NAN, INF, NINF)) throw SERNUMBER_X.getIO(str);
         out.print(str);
       } else if(item.type == AtomType.BLN) {
         out.print(item.string(null));
@@ -164,12 +147,12 @@ public abstract class JsonSerializer extends StandardSerializer {
     out.print('"');
     final byte[] str = norm(string);
     final int sl = str.length;
-    for(int s = 0; s < sl; s += cl(str, s)) encode(cp(str, s));
+    for(int s = 0; s < sl; s += cl(str, s)) printChar(cp(str, s));
     out.print('"');
   }
 
   @Override
-  protected final void encode(final int cp) throws IOException {
+  protected final void printChar(final int cp) throws IOException {
     if(map != null) {
       // character map
       final byte[] value = map.get(cp);

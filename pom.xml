@@ -5,7 +5,7 @@
   <!-- Artifact information -->
   <groupId>org.basex</groupId>
   <artifactId>basex-parent</artifactId>
-  <version>8.3.2-SNAPSHOT</version>
+  <version>8.4-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <modules>
@@ -92,7 +92,7 @@
       <dependency>
         <groupId>net.xqj</groupId>
         <artifactId>basex-xqj</artifactId>
-        <version>1.5.0</version>
+        <version>1.6.0</version>
       </dependency>
       <dependency>
         <groupId>org.xmldb</groupId>

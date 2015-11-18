@@ -303,12 +303,7 @@ public final class QNm extends Item {
 
   @Override
   public byte[] xdmInfo() {
-    return new ByteList().add(typeId().bytes()).add(uri()).add(0).finish();
-  }
-
-  @Override
-  public String toString() {
-    return Token.string(id());
+    return new ByteList().add(typeId().asByte()).add(uri()).add(0).finish();
   }
 
   @Override
@@ -395,8 +390,8 @@ public final class QNm extends Item {
   /**
    * Constructs an internal string representation for the components of a QName.
    * @param prefix prefix
-   * @param local name
-   * @param uri uri
+   * @param local name (can be {@code null})
+   * @param uri uri (can be {@code null})
    * @return EQName representation
    */
   public static byte[] internal(final byte[] prefix, final byte[] local, final byte[] uri) {
@@ -423,5 +418,10 @@ public final class QNm extends Item {
     }
     System.arraycopy(local, 0, key, i, local.length);
     return key;
+  }
+
+  @Override
+  public String toString() {
+    return new TokenBuilder().add("Q{").add(uri()).add('}').add(local()).toString();
   }
 }

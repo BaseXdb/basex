@@ -73,7 +73,7 @@ public class ClientQuery extends Query {
         for(final Item it : val) {
           if(!tb.isEmpty()) tb.add(1);
           if(it.type instanceof NodeType) {
-            tb.add(it.serialize(SerializerOptions.get(false)).finish());
+            tb.add(it.serialize(SerializerMode.NOINDENT.get()).finish());
           } else {
             tb.add(it.string(null));
           }
@@ -108,13 +108,14 @@ public class ClientQuery extends Query {
   }
 
   @Override
-  @SuppressWarnings("resource")
-  protected void cache() throws IOException {
-    cs.sout.write(ServerCmd.RESULTS.code);
+  public void cache(final boolean full) throws IOException {
+    cs.sout.write((full ? ServerCmd.FULL : ServerCmd.RESULTS).code);
     cs.send(id);
     cs.sout.flush();
+
+    @SuppressWarnings("resource")
     final BufferInput bi = new BufferInput(cs.sin);
-    cache(bi);
+    cache(bi, full);
     if(!ClientSession.ok(bi)) throw new BaseXException(bi.readString());
   }
 }

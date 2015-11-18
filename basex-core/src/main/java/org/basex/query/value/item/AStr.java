@@ -1,12 +1,9 @@
 package org.basex.query.value.item;
 
-import static org.basex.data.DataText.*;
-
 import org.basex.query.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Abstract string item.
@@ -57,16 +54,7 @@ public abstract class AStr extends Item {
   @Override
   public String toString() {
     try {
-      final ByteList tb = new ByteList();
-      tb.add('"');
-      for(final byte v : string(null)) {
-        if(v == '&') tb.add(E_AMP);
-        else if(v == '\r') tb.add(E_0D);
-        else if(v == '\n') tb.add(E_0A);
-        else tb.add(v);
-        if(v == '"') tb.add('"');
-      }
-      return tb.add('"').toString();
+      return Atm.toString(string(null));
     } catch(final QueryException ex) {
       Util.debug(ex);
       return "";

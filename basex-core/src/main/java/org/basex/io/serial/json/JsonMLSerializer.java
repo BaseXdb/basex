@@ -4,7 +4,6 @@ import static org.basex.query.QueryError.*;
 
 import java.io.*;
 
-import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.util.ft.*;
 import org.basex.query.value.item.*;
@@ -26,12 +25,12 @@ public final class JsonMLSerializer extends JsonSerializer {
 
   /**
    * Constructor.
-   * @param out print output
+   * @param os output stream
    * @param opts serialization parameters
    * @throws IOException I/O exception
    */
-  public JsonMLSerializer(final PrintOutput out, final SerializerOptions opts) throws IOException {
-    super(out, opts);
+  public JsonMLSerializer(final OutputStream os, final SerializerOptions opts) throws IOException {
+    super(os, opts);
   }
 
   @Override
@@ -41,7 +40,7 @@ public final class JsonMLSerializer extends JsonSerializer {
       indent();
     }
     out.print("[\"");
-    for(final byte ch : name.local()) encode(ch);
+    for(final byte ch : name.local()) printChar(ch);
     out.print('"');
     att = false;
   }
@@ -57,9 +56,9 @@ public final class JsonMLSerializer extends JsonSerializer {
       att = true;
     }
     out.print('"');
-    for(final byte ch : name) encode(ch);
+    for(final byte ch : name) printChar(ch);
     out.print("\":\"");
-    for(final byte ch : norm(value)) encode(ch);
+    for(final byte ch : norm(value)) printChar(ch);
     out.print("\"");
   }
 
@@ -73,7 +72,7 @@ public final class JsonMLSerializer extends JsonSerializer {
     out.print(',');
     indent();
     out.print('"');
-    for(final byte ch : value) encode(ch);
+    for(final byte ch : value) printChar(ch);
     out.print('"');
   }
 

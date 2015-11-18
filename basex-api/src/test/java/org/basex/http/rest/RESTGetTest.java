@@ -101,10 +101,11 @@ public final class RESTGetTest extends RESTTest {
     assertMediaType(mediaType("?query=1&method=xhtml"), MediaType.TEXT_HTML);
     assertMediaType(mediaType("?query=1&method=html"), MediaType.TEXT_HTML);
     assertMediaType(mediaType("?query=1&method=text"), MediaType.TEXT_PLAIN);
-    assertMediaType(mediaType("?query=1&method=raw"), MediaType.APPLICATION_OCTET_STREAM);
     assertMediaType(mediaType("?query=<json+type='object'/>&method=json"),
         MediaType.APPLICATION_JSON);
 
+    assertMediaType(mediaType("?query=1&media-type=application/octet-stream"),
+        MediaType.APPLICATION_OCTET_STREAM);
     assertMediaType(mediaType("?query=1&media-type=application/xml"), MediaType.APPLICATION_XML);
     assertMediaType(mediaType("?query=1&media-type=text/html"), MediaType.TEXT_HTML);
     assertMediaType(mediaType("?query=1&media-type=xxx"), new MediaType("xxx"));

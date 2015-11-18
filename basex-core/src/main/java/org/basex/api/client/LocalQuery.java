@@ -43,16 +43,16 @@ public class LocalQuery extends Query {
   }
 
   @Override
-  protected void cache() throws IOException {
+  public void cache(final boolean full) throws IOException {
     final ArrayOutput ao = new ArrayOutput();
-    ql.execute(true, ao, true, false);
-    cache(new ArrayInput(ao.finish()));
+    ql.execute(ao, true, true, full);
+    cache(new ArrayInput(ao.finish()), full);
   }
 
   @Override
   public String execute() throws IOException {
     final OutputStream os = out == null ? new ArrayOutput() : out;
-    ql.execute(false, os, false, false);
+    ql.execute(os, false, false, false);
     return out == null ? os.toString() : null;
   }
 

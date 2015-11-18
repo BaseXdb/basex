@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
-import org.basex.io.out.*;
 import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
@@ -31,13 +30,13 @@ public final class JsonBasicSerializer extends JsonSerializer {
 
   /**
    * Constructor.
-   * @param out print output
+   * @param os output stream
    * @param opts serialization parameters
    * @throws IOException I/O exception
    */
-  public JsonBasicSerializer(final PrintOutput out, final SerializerOptions opts)
+  public JsonBasicSerializer(final OutputStream os, final SerializerOptions opts)
       throws IOException {
-    super(out, opts);
+    super(os, opts);
   }
 
   @Override
@@ -60,7 +59,7 @@ public final class JsonBasicSerializer extends JsonSerializer {
       if(printKey) {
         if(key == null) throw error("Element '%' has no key.", type);
         out.print('"');
-        out.print(escape(key, node.attribute(ESCAPED_KEY)));
+        out.print(norm(escape(key, node.attribute(ESCAPED_KEY))));
         out.print("\":");
       } else {
         if(key != null) throw error("Element '%' must have no key.", type);
@@ -73,11 +72,11 @@ public final class JsonBasicSerializer extends JsonSerializer {
         final byte[] value = value(iter, type);
         if(value == null) throw error("Element '%' has no value.", type);
         if(!eq(value, TRUE, FALSE)) throw error("Element '%' has invalid value: '%'.", type, value);
-        out.print(value);
+        out.print(norm(value));
       } else if(eq(type, STRING)) {
         final byte[] value = value(iter, type);
         out.print('"');
-        if(value != null) out.print(escape(value, node.attribute(ESCAPED)));
+        if(value != null) out.print(norm(escape(value, node.attribute(ESCAPED))));
         out.print('"');
       } else if(eq(type, NUMBER)) {
         final byte[] value = value(iter, type);
@@ -144,7 +143,7 @@ public final class JsonBasicSerializer extends JsonSerializer {
    * @throws IOException I/O exception
    */
   private void children(final BasicNodeIter iter, final boolean pk) throws IOException {
-    final boolean tmp = printKey;
+    final boolean p = printKey;
     printKey = pk;
     level++;
     boolean comma = false;
@@ -159,7 +158,7 @@ public final class JsonBasicSerializer extends JsonSerializer {
     }
     level--;
     indent();
-    printKey = tmp;
+    printKey = p;
   }
 
   /**

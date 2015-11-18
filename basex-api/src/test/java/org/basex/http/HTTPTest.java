@@ -49,12 +49,7 @@ public abstract class HTTPTest extends SandboxTest {
     if(local) sl.add("-l");
     sl.add("-p" + DB_PORT, "-h" + HTTP_PORT, "-s" + STOP_PORT, "-z");
     sl.add("-U" + ADMIN, "-P" + ADMIN);
-    System.setOut(NULL);
-    try {
-      http = new BaseXHTTP(sl.toArray());
-    } finally {
-      System.setOut(OUT);
-    }
+    http = new BaseXHTTP(sl.toArray());
   }
 
   /**
@@ -63,12 +58,7 @@ public abstract class HTTPTest extends SandboxTest {
    */
   @AfterClass
   public static void stop() throws Exception {
-    System.setOut(NULL);
-    try {
-      http.stop();
-    } finally {
-      System.setOut(OUT);
-    }
+    http.stop();
 
     // cleanup: remove project specific system properties
     final StringList sl = new StringList();

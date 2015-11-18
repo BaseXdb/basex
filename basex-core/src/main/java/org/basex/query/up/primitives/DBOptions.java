@@ -84,7 +84,7 @@ public final class DBOptions {
       } else if(option instanceof OptionsOption) {
         try {
           final Options o = ((OptionsOption<?>) option).newInstance();
-          o.parse(value);
+          o.assign(value);
           map.put(option, o);
         } catch(final BaseXException ex) {
           throw BASX_WHICH_X.get(info, ex);

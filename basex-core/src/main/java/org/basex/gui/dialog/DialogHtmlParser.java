@@ -58,7 +58,7 @@ final class DialogHtmlParser extends DialogParser {
   @Override
   boolean action(final boolean active) {
     try {
-      hopts.parse(options.getText());
+      hopts.assign(options.getText());
       info.setText(null, null);
       return true;
     } catch(final IOException ex) {

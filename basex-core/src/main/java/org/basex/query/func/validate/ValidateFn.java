@@ -9,7 +9,6 @@ import java.util.*;
 import javax.xml.parsers.*;
 
 import org.basex.io.*;
-import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
@@ -149,9 +148,7 @@ abstract class ValidateFn extends StandardFunc {
 
     if(it instanceof ANode) {
       // return node as main-memory string
-      final ArrayOutput ao = new ArrayOutput();
-      Serializer.get(ao, sopts).serialize(it);
-      final IOContent io = new IOContent(ao.finish());
+      final IOContent io = new IOContent(it.serialize(sopts).finish());
       io.name(string(((ANode) it).baseURI()));
       return io;
     }
@@ -160,9 +157,7 @@ abstract class ValidateFn extends StandardFunc {
       IO io = checkPath(it, qc);
       if(sopts != null) {
         // add doctype declaration if specified
-        final ArrayOutput ao = new ArrayOutput();
-        Serializer.get(ao, sopts).serialize(new DBNode(io));
-        io = new IOContent(ao.finish());
+        io = new IOContent(new DBNode(io).serialize(sopts).finish());
         io.name(io.path());
       }
       return io;

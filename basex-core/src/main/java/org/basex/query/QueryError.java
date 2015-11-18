@@ -70,6 +70,8 @@ public enum QueryError {
   BXCL_COMMAND_X(BXCL, 4, "Command could not be executed: %"),
   /** BXCL0005. */
   BXCL_QUERY_X(BXCL, 5, "Query could not be executed: %"),
+  /** BXCL0006. */
+  BXCL_FITEM_X(BXCL, 6, "Result is a function item: %."),
 
   // Conversion module
 
@@ -697,8 +699,8 @@ public enum QueryError {
   SERDT(SEPM, 4, "If 'doctype-system' is specified, the root must be a single element."),
   /** SESU0007. */
   SERENCODING_X(SESU, 7, "Unknown encoding '%'."),
-  /** SESU0007. */
-  SERMAP_X_X(SESU, 7, "Character '#x%;' cannot be mapped to '%'."),
+  /** SERE0008. */
+  SERENC_X_X(SERE, 8, "Character '#x%;' cannot be mapped to '%'."),
   /** SEPM0009. */
   SERSTAND(SEPM, 9, "Invalid combination of 'omit-xml-declaration'."),
   /** SEPM0010. */

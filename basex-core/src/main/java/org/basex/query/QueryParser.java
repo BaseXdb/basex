@@ -3747,7 +3747,7 @@ public class QueryParser extends InputParser {
       }
       if(name.hasPrefix()) {
         pos = i;
-        throw error(NOURI_X, name);
+        throw error(NOURI_X, name.string());
       }
       name.uri(def);
     }

@@ -54,9 +54,9 @@ public final class SerializerOptions extends Options {
   /** Serialization parameter. */
   public static final StringOption MEDIA_TYPE =
       new StringOption("media-type", "");
-  /** Serialization parameter: xml/xhtml/html/text/json/csv/adaptive. */
+  /** Serialization parameter: xml/xhtml/html/text/json/csv/raw/adaptive. */
   public static final EnumOption<SerialMethod> METHOD =
-      new EnumOption<>("method", SerialMethod.ADAPTIVE);
+      new EnumOption<>("method", SerialMethod.BASEX);
   /** Serialization parameter: NFC/NFD/NFKC/NKFD/fully-normalized/none. */
   public static final StringOption NORMALIZATION_FORM =
       new StringOption("normalization-form", Text.NONE);
@@ -110,6 +110,9 @@ public final class SerializerOptions extends Options {
   /** Specific serialization parameter: maximum number of bytes to serialize. */
   public static final NumberOption LIMIT =
       new NumberOption("limit", -1);
+  /** Specific serialization parameter: binary serialization. */
+  public static final EnumOption<YesNo> BINARY =
+      new EnumOption<>("binary", YesNo.YES);
 
   /** Static WebDAV character map. */
   public static final String WEBDAV = "\u00a0=&#xA0;";
@@ -149,9 +152,6 @@ public final class SerializerOptions extends Options {
     }
   }
 
-  /** Serialization parameters (with and without indentation). */
-  private static final SerializerOptions[] OPTIONS = new SerializerOptions[2];
-
   /**
    * Checks if the specified option is true.
    * @param option option
@@ -159,21 +159,6 @@ public final class SerializerOptions extends Options {
    */
   public boolean yes(final EnumOption<YesNo> option) {
     return get(option) == YesNo.YES;
-  }
-
-  /**
-   * Returns serialization parameters.
-   * @param indent indent XML
-   * @return parameters
-   */
-  public static SerializerOptions get(final boolean indent) {
-    SerializerOptions o = OPTIONS[indent ? 1 : 0];
-    if(o == null) {
-      o = new SerializerOptions();
-      if(!indent) o.set(INDENT, YesNo.NO);
-      OPTIONS[indent ? 1 : 0] = o;
-    }
-    return o;
   }
 
   /**

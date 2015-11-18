@@ -30,15 +30,13 @@ public final class Test extends Command {
   @Override
   protected boolean run() {
     final IOFile root = new IOFile(args[0]);
-    if(!root.exists()) return error(RES_NOT_FOUND_X,
-        context.user().has(Perm.CREATE) ? root : args[0]);
+    if(!root.exists())
+      return error(RES_NOT_FOUND_X, context.user().has(Perm.CREATE) ? root : args[0]);
 
     try {
-      final Serializer ser = Serializer.get(out);
       final Suite suite = new Suite();
-      ser.serialize(suite.test(root, context, this));
+      suite.test(root, context, this).serialize(Serializer.get(out));
       out.print(NL);
-      out.flush();
 
       final StringBuilder sb = new StringBuilder(RESULT).append(COLS);
       add(sb, "test", suite.tests);

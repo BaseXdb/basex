@@ -15,8 +15,8 @@ public final class MathModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void crc32() {
-    query(_MATH_CRC32.args(""), "00000000");
-    query(_MATH_CRC32.args("BaseX"), "4C06FC7F");
+    query(STRING.args(_MATH_CRC32.args("")), "00000000");
+    query(STRING.args(_MATH_CRC32.args("BaseX")), "4C06FC7F");
   }
 
   /** Test method. */

@@ -33,8 +33,8 @@ public final class RestXqMethodTest extends RestXqTest {
     post(f, "<entry>A</entry>", "A", MediaType.TEXT_CSV);
     // binary
     f = "declare %R:POST('{$x}') %R:path('') function m:f($x) {$x};";
-    post(f, "QUFB", "AAA", MediaType.APPLICATION_OCTET_STREAM);
-    post(f, "QUFB", "AAA", new MediaType("whatever/type"));
+    post(f, "AAA", "AAA", MediaType.APPLICATION_OCTET_STREAM);
+    post(f, "AAA", "AAA", new MediaType("whatever/type"));
   }
 
   /**

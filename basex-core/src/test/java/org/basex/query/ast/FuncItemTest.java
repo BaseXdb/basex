@@ -294,7 +294,7 @@ public final class FuncItemTest extends QueryPlanTest {
   @Test
   public void gh1113() {
     check("let $join := array:join#1 return $join(([], []))",
-        "[\n]",
+        "[]",
         "empty(//" + Util.className(DynFuncCall.class) + ')',
         "empty(//" + Util.className(StaticFuncCall.class) + ')');
   }

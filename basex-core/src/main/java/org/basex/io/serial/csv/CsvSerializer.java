@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 import java.io.*;
 
 import org.basex.build.csv.*;
-import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -30,12 +29,12 @@ abstract class CsvSerializer extends StandardSerializer {
 
   /**
    * Constructor.
-   * @param out print output
+   * @param os output stream
    * @param opts serialization parameters
    * @throws IOException I/O exception
    */
-  CsvSerializer(final PrintOutput out, final SerializerOptions opts) throws IOException {
-    super(out, opts);
+  CsvSerializer(final OutputStream os, final SerializerOptions opts) throws IOException {
+    super(os, opts);
     copts = opts.get(SerializerOptions.CSV);
     quotes = copts.get(CsvOptions.QUOTES);
     backslashes = copts.get(CsvOptions.BACKSLASHES);
@@ -70,7 +69,7 @@ abstract class CsvSerializer extends StandardSerializer {
       }
       out.print(txt);
     }
-    newline();
+    out.print('\n');
   }
 
   @Override

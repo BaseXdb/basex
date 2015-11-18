@@ -492,7 +492,7 @@ public class Options implements Iterable<Option<?>> {
    * @param type media type
    * @throws BaseXException database exception
    */
-  public synchronized void parse(final MediaType type) throws BaseXException {
+  public synchronized void assign(final MediaType type) throws BaseXException {
     for(final Entry<String, String> entry : type.parameters().entrySet()) {
       if(options.isEmpty()) {
         free.put(entry.getKey(), entry.getValue());
@@ -504,11 +504,11 @@ public class Options implements Iterable<Option<?>> {
   }
 
   /**
-   * Parses an option string and sets the options accordingly.
+   * Parses and assigns options string from the specified string.
    * @param string options string
    * @throws BaseXException database exception
    */
-  public synchronized void parse(final String string) throws BaseXException {
+  public synchronized void assign(final String string) throws BaseXException {
     final int sl = string.length();
     int i = 0;
     while(i < sl) {
@@ -527,14 +527,14 @@ public class Options implements Iterable<Option<?>> {
   }
 
   /**
-   * Parses options in the specified map.
+   * Parses and assigns options from the specified map.
    * @param map map
    * @param error raise error if option is unknown
    * @param info input info
    * @throws BaseXException database exception
    * @throws QueryException query exception
    */
-  public synchronized void parse(final Map map, final boolean error, final InputInfo info)
+  public synchronized void assign(final Map map, final boolean error, final InputInfo info)
       throws BaseXException, QueryException {
 
     for(final Item name : map.keys()) {
@@ -772,7 +772,7 @@ public class Options implements Iterable<Option<?>> {
     } else if(option instanceof OptionsOption) {
       final Options o = ((OptionsOption<?>) option).newInstance();
       if(item instanceof Map) {
-        o.parse((Map) item, error, info);
+        o.assign((Map) item, error, info);
       } else {
         throw new BaseXException(Text.OPT_MAP, option.name());
       }
@@ -831,7 +831,7 @@ public class Options implements Iterable<Option<?>> {
       put(option, v);
     } else if(option instanceof OptionsOption) {
       final Options o = ((OptionsOption<?>) option).newInstance();
-      o.parse(val);
+      o.assign(val);
       put(option, o);
     } else if(option instanceof NumbersOption) {
       final int v = Strings.toInt(val);

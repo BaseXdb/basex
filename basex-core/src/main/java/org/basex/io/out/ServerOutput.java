@@ -3,8 +3,8 @@ package org.basex.io.out;
 import java.io.*;
 
 /**
- * This server-side class wraps an {@link InputStream} filled by a database
- * client. The incoming bytes are encoded:
+ * This server-side class wraps an {@link InputStream} referenced by a database client.
+ * The incoming bytes are encoded:
  * <ul>
  * <li>{@code 0x00} and {@code 0xFF} are prefixed with {@code 0xFF}</li>
  * <li>{@code 0x00} is sent to indicate the end of a stream</li>
@@ -13,7 +13,7 @@ import java.io.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public final class EncodingOutput extends OutputStream {
+public final class ServerOutput extends OutputStream {
   /** Output stream. */
   private final OutputStream os;
 
@@ -21,7 +21,7 @@ public final class EncodingOutput extends OutputStream {
    * Constructor.
    * @param os output stream to be wrapped
    */
-  public EncodingOutput(final OutputStream os) {
+  public ServerOutput(final OutputStream os) {
     this.os = os;
   }
 

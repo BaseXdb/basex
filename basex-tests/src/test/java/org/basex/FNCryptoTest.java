@@ -116,7 +116,7 @@ public final class FNCryptoTest extends SandboxTest{
     if(proc.exitValue() != 0) throw new RuntimeException("Cannot initialize keystore.");
 
     // turn off pretty printing
-    set(MainOptions.SERIALIZER, SerializerOptions.get(false));
+    set(MainOptions.SERIALIZER, SerializerMode.NOINDENT.get());
   }
 
   /**
