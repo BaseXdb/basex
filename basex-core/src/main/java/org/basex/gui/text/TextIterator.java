@@ -222,15 +222,15 @@ final class TextIterator {
 
   /**
    * Retrieves the current hyperlink.
-   * @return link string
+   * @return link string, or {@code null}
    */
   String link() {
     if(!link) return null;
-
     // find beginning and end of link
     int ls = pos, le = ls;
-    while(ls > 0 && text[ls - 1] != TokenBuilder.ULINE) ls--;
-    while(le < length && text[le] != TokenBuilder.ULINE) le++;
+    while(--ls > 0 && (text[ls] < -64 || cp(text, ls) != TokenBuilder.ULINE));
+    while(++le < length && (text[le] < -64 || cp(text, le) != TokenBuilder.ULINE));
+    ls += cl(text, ls);
     return string(text, ls, le - ls);
   }
 }

@@ -317,12 +317,11 @@ public final class TextEditor {
   /**
    * Moves one character back and returns the found character. A newline character is
    * returned if the cursor is placed at the beginning of the text.
-   * @return character
+   * @return previous character, or newline
    */
   private int prev() {
     if(pos == 0) return '\n';
-    // UTF-8 encoded bytes: move to first byte
-    while(--pos > 0 && text[pos] < -64 && text[pos] >= -128);
+    while(--pos > 0 && text[pos] < -64);
     return curr();
   }
 
@@ -1084,7 +1083,7 @@ public final class TextEditor {
 
   /**
    * Returns the current character, or the newline character if the position is out of bounds.
-   * @return current character
+   * @return current character, or newline
    */
   private int curr() {
     return pos < 0 || pos >= size() ? '\n' : cp(text, pos);
