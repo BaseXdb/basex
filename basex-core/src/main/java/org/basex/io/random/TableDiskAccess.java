@@ -439,7 +439,7 @@ public final class TableDiskAccess extends TableAccess {
    * @param pre pre of the entry to search for
    * @return offset of the entry in the page
    */
-  private int cursor(final int pre) {
+  private synchronized int cursor(final int pre) {
     int fp = firstPre, np = nextPre;
     if(pre < fp || pre >= np) {
       final int last = used - 1;
@@ -468,7 +468,7 @@ public final class TableDiskAccess extends TableAccess {
    * Updates the page pointers.
    * @param p page index
    */
-  private void setPage(final int p) {
+  private synchronized void setPage(final int p) {
     page = p;
     firstPre = fpre(p);
     nextPre = p + 1 >= used ? meta.size : fpre(p + 1);
@@ -478,7 +478,7 @@ public final class TableDiskAccess extends TableAccess {
    * Updates the index pointers and fetches the requested page.
    * @param p page index
    */
-  private void readPage(final int p) {
+  private synchronized void readPage(final int p) {
     setPage(p);
     read(page(p));
   }
@@ -488,7 +488,7 @@ public final class TableDiskAccess extends TableAccess {
    * @param p index of the page to fetch
    * @return pre value
    */
-  private int page(final int p) {
+  private synchronized int page(final int p) {
     return pages == null ? p : pages[p];
   }
 
@@ -497,7 +497,7 @@ public final class TableDiskAccess extends TableAccess {
    * @param p index of the page to fetch
    * @return pre value
    */
-  private int fpre(final int p) {
+  private synchronized int fpre(final int p) {
     return fpres == null ? p * IO.ENTRIES : fpres[p];
   }
 
@@ -505,7 +505,7 @@ public final class TableDiskAccess extends TableAccess {
    * Reads a page from disk.
    * @param p page to fetch
    */
-  private void read(final int p) {
+  private synchronized void read(final int p) {
     if(!bm.cursor(p)) return;
 
     final Buffer bf = bm.current();
