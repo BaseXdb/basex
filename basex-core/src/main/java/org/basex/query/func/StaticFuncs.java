@@ -20,7 +20,7 @@ import org.basex.util.list.*;
 import org.basex.util.similarity.*;
 
 /**
- * Container for a user-defined function.
+ * Container for user-defined functions.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
@@ -61,12 +61,12 @@ public final class StaticFuncs extends ExprInfo {
     if(uri.length == 0) throw FUNNONS_X.get(ii, nm.string());
     if(NSGlobal.reserved(uri)) throw NAMERES_X.get(ii, nm.string());
 
-    final StaticFunc fn = new StaticFunc(anns, nm, args, type, expr, sc, scope, doc, ii);
-    final byte[] sig = fn.id();
+    final StaticFunc sf = new StaticFunc(anns, nm, args, type, expr, sc, scope, doc, ii);
+    final byte[] sig = sf.id();
     final FuncCache fc = funcs.get(sig);
-    if(fc != null) fc.setFunc(fn);
-    else funcs.put(sig, new FuncCache(fn));
-    return fn;
+    if(fc != null) fc.setFunc(sf);
+    else funcs.put(sig, new FuncCache(sf));
+    return sf;
   }
 
   /**
@@ -284,22 +284,22 @@ public final class StaticFuncs extends ExprInfo {
 
     /**
      * Constructor.
-     * @param sf function
+     * @param func function
      */
-    FuncCache(final StaticFunc sf) {
-      func = sf;
+    FuncCache(final StaticFunc func) {
+      this.func = func;
     }
 
     /**
      * Assigns the given function to all of its references and checks their visibility.
-     * @param fn function to assign
+     * @param sf function to assign
      * @throws QueryException query exception
      */
-    public void setFunc(final StaticFunc fn) throws QueryException {
-      if(func != null) throw FUNCDEFINED_X.get(fn.info, fn.name.string());
-      func = fn;
-      for(final StaticFuncCall call : calls) call.init(fn);
-      final FuncType ft = fn.funcType();
+    public void setFunc(final StaticFunc sf) throws QueryException {
+      if(func != null) throw FUNCDEFINED_X.get(sf.info, sf.name.string());
+      func = sf;
+      for(final StaticFuncCall call : calls) call.init(sf);
+      final FuncType ft = sf.funcType();
       for(final Closure lit : lits) lit.adoptSignature(ft);
     }
 

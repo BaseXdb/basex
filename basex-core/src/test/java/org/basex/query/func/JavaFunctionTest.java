@@ -107,6 +107,14 @@ public final class JavaFunctionTest extends AdvancedQueryTest {
     error("'x' cast as java", TYPE30_X);
   }
 
+  /** Static check for Java method/variable names. */
+  @Test
+  public void javaNameTest() {
+    error("rest:XYZ()", FUNCUNKNOWN_X);
+    error("Q{java.lang.String}XYZ()", FUNCUNKNOWN_X);
+    error("Q{java:java.lang.String}XYZ()", FUNCJAVA_X);
+  }
+
   /** Pass on Java items to functions. */
   @Test
   public void funcItem() {

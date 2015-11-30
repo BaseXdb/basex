@@ -171,7 +171,7 @@ public abstract class JavaMapping extends Arr {
    * @return method if found, {@code null} otherwise
    * @throws QueryException query exception
    */
-  private static Method getModMethod(final Object mod, final String path, final String name,
+  private static Method moduleMethod(final Object mod, final String path, final String name,
       final long arity, final QueryContext qc, final InputInfo ii) throws QueryException {
 
     // find method with identical name and arity
@@ -201,18 +201,8 @@ public abstract class JavaMapping extends Arr {
   }
 
   /**
-   * Converts a module URI to a Java path.
-   * @param uri module URI
-   * @return module path
-   */
-  private static String toPath(final String uri) {
-    final String p = ModuleLoader.uri2path(uri);
-    return p == null ? uri : ModuleLoader.capitalize(p).replace("/", ".").substring(1);
-  }
-
-  /**
    * Returns a new Java function instance.
-   * @param name function name
+   * @param qname function name
    * @param args arguments
    * @param qc query context
    * @param sc static context
@@ -220,41 +210,59 @@ public abstract class JavaMapping extends Arr {
    * @return Java function or {@code null}
    * @throws QueryException query exception
    */
-  static JavaMapping get(final QNm name, final Expr[] args, final QueryContext qc,
+  static JavaMapping get(final QNm qname, final Expr[] args, final QueryContext qc,
       final StaticContext sc, final InputInfo ii) throws QueryException {
 
-    final String uri = string(name.uri());
+    // rewrite function name
+    final String name = Strings.camelCase(string(qname.local()));
+    final String uri = string(qname.uri());
     // check if URI starts with "java:" prefix (if yes, module must be Java code)
-    final boolean java = uri.startsWith(JAVAPREF);
-
-    // rewrite function name: convert dashes to upper-case initials
-    final String local = Strings.camelCase(string(name.local()));
+    final boolean prefix = uri.startsWith(JAVAPREF);
+    // rewrite function path
+    final String pth = prefix ? uri.substring(JAVAPREF.length()) : uri;
+    final String dirp = ModuleLoader.uri2path(pth);
+    final String path = dirp == null ? pth :
+      ModuleLoader.capitalize(dirp).replace('/', '.').substring(1);
 
     // check imported Java modules
-    final String path = Strings.camelCase(toPath(java ? uri.substring(JAVAPREF.length()) : uri));
-
     final ModuleLoader modules = qc.resources.modules();
     final Object jm  = modules.findImport(path);
     if(jm != null) {
-      final Method meth = getModMethod(jm, path, local, args.length, qc, ii);
-      if(meth != null) return new JavaModuleFunc(sc, ii, jm, meth, args);
+      final Method mth = moduleMethod(jm, path, name, args.length, qc, ii);
+      if(mth != null) return new JavaModuleFunc(sc, ii, jm, mth, args);
     }
 
-    // only allowed with administrator permissions
+    // arbitrary Java code can only be called with administrator permissions
     if(!qc.context.user().has(Perm.ADMIN)) return null;
 
-    // check addressed class
+    // try to find matching Java variable or method
     try {
-      return new JavaFunc(sc, ii, modules.findClass(path), local, args);
+      final Class<?> clazz = modules.findClass(path);
+      if(name.equals(NEW) || exists(clazz, name)) return new JavaFunc(sc, ii, clazz, name, args);
     } catch(final ClassNotFoundException ex) {
-      // only throw exception if "java:" prefix was explicitly specified
-      if(java) throw FUNCJAVA_X.get(ii, path);
     } catch(final Throwable th) {
       throw JAVAINIT_X.get(ii, th);
     }
 
-    // no function found
+    // no function found: raise error only if "java:" prefix was specified
+    if(prefix) throw FUNCJAVA_X.get(ii, path);
     return null;
+  }
+
+  /**
+   * Checks if a method or variable with the specified name exists.
+   * @param clazz clazz
+   * @param name method/variable name
+   * @return result of check
+   */
+  private static boolean exists(final Class<?> clazz, final String name) {
+    for(final Field f : clazz.getFields()) {
+      if(f.getName().equals(name)) return true;
+    }
+    for(final Method m : clazz.getMethods()) {
+      if(m.getName().equals(name)) return true;
+    }
+    return false;
   }
 
   /**
