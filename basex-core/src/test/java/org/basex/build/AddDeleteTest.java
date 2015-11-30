@@ -108,6 +108,8 @@ public final class AddDeleteTest extends SandboxTest {
       set(MainOptions.ARCHIVENAME, true);
       execute(new Add("", ZIPFILE));
       assertEquals(4, context.data().resources.docs("xml.zip/").size());
+      execute(new Add("", GZIPFILE));
+      assertEquals(1, context.data().resources.docs("xml.gz/").size());
     } finally {
       set(MainOptions.ARCHIVENAME, false);
     }
