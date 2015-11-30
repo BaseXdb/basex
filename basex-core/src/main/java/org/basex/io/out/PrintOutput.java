@@ -160,7 +160,7 @@ public class PrintOutput extends OutputStream {
    * Checks if stream can output more characters.
    * @return {@code true} if stream is exhausted
    */
-  public final boolean finished() {
+  public boolean finished() {
     return size == max;
   }
 }

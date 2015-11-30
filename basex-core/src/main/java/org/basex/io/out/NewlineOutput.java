@@ -33,4 +33,9 @@ public final class NewlineOutput extends PrintOutput {
       po.print(cp);
     }
   }
+
+  @Override
+  public boolean finished() {
+    return po.finished();
+  }
 }
