@@ -253,11 +253,11 @@ public final class GUIConstants {
   public static final int FONTSIZE = 13;
 
   /** Standard line height. */
-  public static final int HEIGHT;
+  private static int height = -1;
   /** Standard scale factor (>= 1). */
-  public static final double SCALE;
+  public static double scale;
   /** Adapted scale factor. */
-  public static final double ASCALE;
+  public static double ascale;
 
   /** Large font. */
   public static Font lfont;
@@ -272,16 +272,16 @@ public final class GUIConstants {
   /** Current font size. */
   public static int fontSize;
 
-  /** Default monospace font widths. */
-  private static int[] dwidth;
-  /** Character large character widths. */
-  private static int[] lwidth;
   /** Character widths. */
   private static int[] fwidth;
-  /** Bold character widths. */
-  private static int[] bwidth;
   /** Monospace character widths. */
   private static int[] mfwidth;
+  /** Bold character widths. */
+  private static int[] bwidth;
+  /** Character large character widths. */
+  private static int[] lwidth;
+  /** Default monospace font widths. */
+  private static int[] dmwidth;
 
   // KEYS =====================================================================
 
@@ -296,20 +296,22 @@ public final class GUIConstants {
   /** Shortcut key (CTRL/META). */
   public static final int META = Prop.MAC ? Event.META_MASK : Event.CTRL_MASK;
 
-  static {
-    HEIGHT = LABEL.getFontMetrics(LABEL.getFont()).getHeight();
-    SCALE = Math.max(1, (HEIGHT - 16) / 10d + 1);
-    ASCALE = 1 + (SCALE - 1) / 2;
-  }
-
   /** Private constructor, preventing class instantiation. */
   private GUIConstants() { }
 
   /**
-   * Initializes colors.
+   * Initializes UI settings.
    * @param opts gui options
    */
-  public static void init(final GUIOptions opts) {
+  public static synchronized void init(final GUIOptions opts) {
+    if(height < 0) {
+      // initialize scaling only once
+      final int h = FONTSIZE + 3;
+      height = opts.get(GUIOptions.SCALE) ? LABEL.getFontMetrics(LABEL.getFont()).getHeight() : h;
+      scale = Math.max(1, (height - h) / 10d + 1);
+      ascale = 1 + (scale - 1) / 2;
+    }
+
     lgray = color(224, 224, 224);
     gray = color(160, 160, 160);
     dgray = color(64, 64, 64);
@@ -343,18 +345,26 @@ public final class GUIConstants {
     final String name = opts.get(GUIOptions.FONT);
     final int type = opts.get(GUIOptions.FONTTYPE);
 
-    fontSize = (int) (opts.get(GUIOptions.FONTSIZE) * SCALE);
+    fontSize = (int) (opts.get(GUIOptions.FONTSIZE) * scale);
     font  = new Font(name, type, fontSize);
     mfont = new Font(opts.get(GUIOptions.MONOFONT), type, fontSize);
     bfont = new Font(name, Font.BOLD, fontSize);
-    lfont = new Font(name, type, (int) (FONTSIZE * ASCALE * 1.5 + fontSize / 2.0));
-    dmfont = new Font(opts.get(GUIOptions.MONOFONT), 0, (int) (HEIGHT * 0.8));
+    lfont = new Font(name, type, (int) (FONTSIZE * ascale * 1.5 + fontSize / 2.0));
+    dmfont = new Font(opts.get(GUIOptions.MONOFONT), 0, (int) (height * 0.8));
 
-    dwidth  = LABEL.getFontMetrics(dmfont).getWidths();
+    dmwidth  = LABEL.getFontMetrics(dmfont).getWidths();
     fwidth  = LABEL.getFontMetrics(font).getWidths();
     lwidth  = LABEL.getFontMetrics(lfont).getWidths();
     mfwidth = LABEL.getFontMetrics(mfont).getWidths();
     bwidth  = LABEL.getFontMetrics(bfont).getWidths();
+  }
+
+  /**
+   * Indicates if images are to be scaled.
+   * @return result of check
+   */
+  public static boolean large() {
+    return height > FONTSIZE + 3;
   }
 
   /**
@@ -376,7 +386,7 @@ public final class GUIConstants {
     if(f == mfont) return mfwidth;
     if(f == bfont) return bwidth;
     if(f == lfont) return lwidth;
-    if(f == dmfont) return dwidth;
+    if(f == dmfont) return dmwidth;
     return LABEL.getFontMetrics(f).getWidths();
   }
 

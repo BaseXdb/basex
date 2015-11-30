@@ -94,7 +94,7 @@ public final class BaseXLayout {
    * @param w width
    */
   public static void setWidth(final Component comp, final int w) {
-    comp.setPreferredSize(new Dimension((int) (w * SCALE), comp.getPreferredSize().height));
+    comp.setPreferredSize(new Dimension((int) (w * scale), comp.getPreferredSize().height));
   }
 
   /**
@@ -103,7 +103,7 @@ public final class BaseXLayout {
    * @param h height
    */
   public static void setHeight(final Component comp, final int h) {
-    comp.setPreferredSize(new Dimension(comp.getPreferredSize().width, (int) (h * SCALE)));
+    comp.setPreferredSize(new Dimension(comp.getPreferredSize().width, (int) (h * scale)));
   }
 
   /**
@@ -115,8 +115,8 @@ public final class BaseXLayout {
    * @return border
    */
   public static EmptyBorder border(final int t, final int l, final int b, final int r) {
-    return new EmptyBorder((int) (t * ASCALE), (int) (l * ASCALE),
-        (int) (b * ASCALE), (int) (r * ASCALE));
+    return new EmptyBorder((int) (t * ascale), (int) (l * ascale),
+        (int) (b * ascale), (int) (r * ascale));
   }
 
   /**

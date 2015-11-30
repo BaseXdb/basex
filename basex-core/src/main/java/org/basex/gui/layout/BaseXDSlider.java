@@ -18,7 +18,7 @@ public final class BaseXDSlider extends BaseXPanel {
   /** Slider width. */
   private static final int ARROW = 17;
   /** Label space (scaled). */
-  private static final int SLABELW = (int) (LABELW * SCALE);
+  private static final int SLABELW = (int) (LABELW * scale);
 
   /** Minimum slider value. */
   public final double totMin;
@@ -203,7 +203,7 @@ public final class BaseXDSlider extends BaseXPanel {
     final int w = getWidth() - SLABELW;
     final int h = getHeight();
     final int hc = h / 2;
-    final int s = (int) (4 * ASCALE);
+    final int s = (int) (4 * ascale);
 
     final boolean focus = hasFocus();
     g.setColor(BACK);

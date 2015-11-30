@@ -319,6 +319,7 @@ run_tests            = Run tests
 save                 = Salvare
 save_as              = Salvează ca
 save_before_execute  = Save before executing file
+scale_gui            = Scale GUI
 select_all           = Selectare totală
 separator            = Separator
 sessions_%           = % sesiuni

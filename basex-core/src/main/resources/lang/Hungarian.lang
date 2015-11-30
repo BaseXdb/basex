@@ -319,6 +319,7 @@ run_tests            = Tesztek futtatása
 save                 = Mentés
 save_as              = Mentés másként
 save_before_execute  = Mentés a futtatás előtt
+scale_gui            = Scale GUI
 select_all           = Mind kijelölése
 separator            = Elválasztó
 sessions_%           = % munkamenet

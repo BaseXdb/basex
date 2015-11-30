@@ -658,7 +658,7 @@ public final class TreeView extends View implements TreeConstants {
 
     final boolean br = tr.bigRect(sub, rn, lv);
     final boolean root = roots[rn] == pre;
-    final int height = sub.subtreeHeight(rn);
+    final int h = sub.subtreeHeight(rn);
 
     final Data d = gui.context.data();
     final int k = d.kind(pre);
@@ -687,7 +687,7 @@ public final class TreeView extends View implements TreeConstants {
     }
 
     // if there are descendants draw them
-    if((t == Draw.CONNECTION || t == Draw.HIGHLIGHT) && size > 1 && lv + 1 < height)
+    if((t == Draw.CONNECTION || t == Draw.HIGHLIGHT) && size > 1 && lv + 1 < h)
       highlightDescendants(g, rn, lv, r, pre, rc, t);
 
     // draws node text

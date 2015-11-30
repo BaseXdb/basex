@@ -319,6 +319,7 @@ run_tests            = Tests ausführen
 save                 = Speichern
 save_as              = Speichern unter
 save_before_execute  = Speichere vor Ausführung
+scale_gui            = GUI skalieren
 select_all           = Alles markieren
 separator            = Trennzeichen
 sessions_%           = % Verbindung(en)

@@ -319,6 +319,7 @@ run_tests            = Ejecutar tests
 save                 = Guardar
 save_as              = Guardar como
 save_before_execute  = Guardar antes de ejecutar el fichero
+scale_gui            = Scale GUI
 select_all           = Seleccionar Todo
 separator            = Separador
 sessions_%           = % sesión(es)

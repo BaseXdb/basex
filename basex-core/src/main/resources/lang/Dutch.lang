@@ -319,6 +319,7 @@ run_tests            = Tests uitvoeren
 save                 = Opslaan
 save_as              = Opslaan als
 save_before_execute  = Opslaan voor uitvoeren van bestand
+scale_gui            = Scale GUI
 select_all           = Selecteer alles
 separator            = Scheidingsteken
 sessions_%           = % sessie(s)

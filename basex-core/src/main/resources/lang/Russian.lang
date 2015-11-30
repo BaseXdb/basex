@@ -319,6 +319,7 @@ run_tests            = Выполнить тесты
 save                 = Сохранить
 save_as              = Сохранить как
 save_before_execute  = Сохранять перед выполнением
+scale_gui            = Scale GUI
 select_all           = Найти все
 separator            = Разделитель
 sessions_%           = Сессий: %

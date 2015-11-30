@@ -113,6 +113,8 @@ public final class GUIOptions extends Options {
   public static final NumberOption PREFTAB = new NumberOption("PREFTAB", 0);
   /** Flag for Java look and feel. */
   public static final StringOption LOOKANDFEEL = new StringOption("LOOKANDFEEL", "");
+  /** Scale UI components. */
+  public static final BooleanOption SCALE = new BooleanOption("SCALE", true);
   /** Flag for dissolving name attributes. */
   public static final BooleanOption SHOWNAME = new BooleanOption("SHOWNAME", true);
   /** Focus follows mouse. */

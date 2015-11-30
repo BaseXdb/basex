@@ -183,9 +183,12 @@ final class ProjectList extends JList<String> {
           x += fm.stringWidth(s);
 
           final String[] names = file.file().getParent().split("/|\\\\");
-          final StringBuilder sb = new StringBuilder(" ");
-          for(int n = names.length - 1; n >= 0; n--) sb.append('/').append(names[n]);
-          g.setColor(GUIConstants.gray);
+          final StringBuilder sb = new StringBuilder(" \u00b7 ");
+          for(int n = names.length - 1; n >= 0; n--) {
+            sb.append(names[n]);
+            if(n > 0) sb.append("/");
+          }
+          g.setColor(GUIConstants.dgray);
           g.drawString(sb.toString(), x, y);
         }
       };

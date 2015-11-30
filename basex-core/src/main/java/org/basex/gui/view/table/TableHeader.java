@@ -150,7 +150,7 @@ final class TableHeader extends BaseXPanel {
     BaseXLayout.antiAlias(g);
 
     int o = header && clicked ? 1 : 0;
-    final int xo = (int) (4 * SCALE), yo = (int) (6 * SCALE);
+    final int xo = (int) (4 * scale), yo = (int) (6 * scale);
     g.setColor(TEXT);
     g.fillPolygon(
         new int[] { (int) x + o + xo, (int) x + o + bs - xo, (int) x + o + bs / 2 },

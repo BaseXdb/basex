@@ -37,6 +37,8 @@ final class DialogVisualPrefs extends BaseXBack {
   private final BaseXCombo mapOffsets;
   /** Simple file dialog checkbox. */
   private final BaseXCombo lookfeel;
+  /** Scale UI components. */
+  private final BaseXCheckBox scale;
 
   /** Look and feels. */
   private final StringList classes = new StringList();
@@ -57,7 +59,7 @@ final class DialogVisualPrefs extends BaseXBack {
     mapOffsets = new BaseXCombo(d, GUIOptions.MAPOFFSETS, gopts, MAP_CHOICES);
     mapWeight = new BaseXSlider(0, 100, GUIOptions.MAPWEIGHT, gopts, d);
     mapAtts = new BaseXCheckBox(SHOW_ATTS, GUIOptions.MAPATTS, gopts, d);
-    mapAlgo.setSize((int) (GUIConstants.SCALE * 200), (int) (GUIConstants.SCALE * 100));
+    mapAlgo.setSize((int) (GUIConstants.scale * 200), (int) (GUIConstants.scale * 100));
     BaseXLayout.setWidth(mapWeight, 150);
 
     final StringList lafs = new StringList("(default)");
@@ -73,6 +75,8 @@ final class DialogVisualPrefs extends BaseXBack {
     lookfeel = new BaseXCombo(d, lafs.finish());
     lookfeel.setSelectedIndex(i);
 
+    scale = new BaseXCheckBox(SCALE_GUI, GUIOptions.SCALE, gopts, d);
+
     BaseXBack pp = new BaseXBack().layout(new TableLayout(3, 1, 0, 8));
     BaseXBack p = new BaseXBack(new TableLayout(2, 1));
     p.add(new BaseXLabel(GENERAL + COL, true, true));
@@ -85,9 +89,10 @@ final class DialogVisualPrefs extends BaseXBack {
     p.add(treeAtts);
     pp.add(p);
 
-    p = new BaseXBack(new TableLayout(2, 1));
+    p = new BaseXBack(new TableLayout(3, 1));
     p.add(new BaseXLabel(JAVA_LF + COL, true, true));
     p.add(lookfeel);
+    p.add(scale);
     pp.add(p);
 
     add(pp);
@@ -122,6 +127,7 @@ final class DialogVisualPrefs extends BaseXBack {
     mapWeight.assign();
     mapAlgo.assign();
     mapOffsets.assign();
+    scale.assign();
     gui.gopts.set(GUIOptions.LOOKANDFEEL, classes.get(lookfeel.getSelectedIndex()));
   }
 
