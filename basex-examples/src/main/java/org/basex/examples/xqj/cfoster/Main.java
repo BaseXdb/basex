@@ -24,9 +24,8 @@ abstract class Main {
   /**
    * Creates and returns a default connection.
    * @return connection instance
-   * @throws XQException connection exception
    */
-  static XQConnection connect() throws XQException {
+  static XQConnection connect() {
     return new BaseXXQDataSource().getConnection("admin", "admin");
   }
 
