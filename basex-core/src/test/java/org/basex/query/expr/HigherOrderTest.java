@@ -137,4 +137,28 @@ public final class HigherOrderTest extends AdvancedQueryTest {
       "true\ntrue\nfalse\nfalse"
     );
   }
+
+  /** Tests the %non-deterministic annotation (see GH-1212). */
+  @Test
+  public void ndtAnnotation() {
+    // FLWOR will be optimized away (empty result)
+    query("for $f in (prof:void#1(?), error#0) let $ignore := $f() return ()", "");
+    // FLWOR expression will be evaluated (due to non-deterministic keyword)
+    query("try {"
+        + "  let $f := error#0 let $err := non-deterministic $f() return ()"
+        + "} catch * { 'ERR' }", "ERR");
+    query("try {"
+        + "  for $f in (prof:void#1(?), error#0)"
+        + "  let $err := non-deterministic $f() return ()"
+        + "} catch * { 'ERR' }", "ERR");
+    // FLWOR expression will be evaluated (due to internal optimizations)
+    query("try {"
+        + "  let $f := error#0 let $err := $f() return ()"
+        + "} catch * { 'ERR' }", "ERR");
+    query("try {"
+        + "  let $f := function() { fn:error(()) }"
+        + "  let $e := $f()"
+        + "  return ()"
+        + "} catch * { 'ERR' }", "ERR");
+  }
 }

@@ -3,7 +3,6 @@ package org.basex.query.value.item;
 import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
-import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.collation.*;
@@ -78,11 +77,6 @@ public abstract class FItem extends Item implements XQFunction {
   @Override
   public boolean sameKey(final Item it, final InputInfo ii) throws QueryException {
     return false;
-  }
-
-  @Override
-  public boolean has(final Flag flag) {
-    return flag == Flag.UPD && annotations().contains(Annotation.UPDATING);
   }
 
   @Override

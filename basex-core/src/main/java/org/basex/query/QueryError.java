@@ -804,7 +804,7 @@ public enum QueryError {
   /** XPST0003. */
   NOFTSELECT_X(XPST, 3, "Expecting quote or opening curly brace%."),
   /** XPST0003. */
-  FUNCMISS_X(XPST, 3, "Expecting closing bracket for function '%'."),
+  FUNCMISS_X(XPST, 3, "Expecting closing bracket: %."),
   /** XPST0003. */
   MAPTAAT_X(XPST, 3, "Expecting atomic key type for map, found '%'."),
   /** XPST0003. */
@@ -1173,7 +1173,7 @@ public enum QueryError {
   /** XQST0123. */
   DECLOPTION_X(XQST, 123, "Unknown option: %."),
   /** XQST0125. */
-  INVISIBLE(XQST, 125, "No visibility annotation allowed in inline function."),
+  NOVISALLOWED(XQST, 125, "No visibility annotation allowed in inline function."),
   /** XQST034. */
   NSAXIS(XQST, 134, "Namespace axis is not supported."),
 
@@ -1214,9 +1214,9 @@ public enum QueryError {
   UPURIDUP_X(XUDY, 31, "URI '%' is addressed multiple times."),
 
   /** XUDY0032 (WIP). */
-  UPFUNCNOTUP(XUDY, 32, "Function has no %updating annotation."),
-  /** XUDY0032 (WIP). */
-  UPFUNCUP(XUDY, 32, "No 'updating' keyword specified before function call."),
+  UPFUNCNOTUP(XUDY, 32, "Function is not updating."),
+  /** XUST0043. */
+  UPFUNCUP(XUDY, 32, "Function is updating; use 'updating' keyword."),
 
   /** XUST0001. */
   UPNOT_X(XUST, 1, "%: no updating expression allowed."),
@@ -1224,6 +1224,7 @@ public enum QueryError {
   UPALL_X(XUST, 1, "%: all expressions must be updating or return an empty sequence."),
   /** XUST0001. */
   UPCTX(XUST, 1, "Context value may not declare an updating expression."),
+
   /** XUST0002. */
   UPMODIFY(XUST, 2, "Modify clause: all expressions must be updating or return an empty sequence."),
   /** XUST0002. */

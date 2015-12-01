@@ -47,7 +47,7 @@ public final class FnFoldLeft extends StandardFunc {
       final Value seq = (Value) exprs[0];
       Expr e = exprs[1];
       for(final Item it : seq) {
-        e = new DynFuncCall(info, sc, false, exprs[2], e, it).optimize(qc, scp);
+        e = new DynFuncCall(info, sc, exprs[2], e, it).optimize(qc, scp);
       }
       return e;
     }

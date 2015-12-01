@@ -43,7 +43,7 @@ public final class HofFoldLeft1 extends StandardFunc {
       Expr e = seq.itemAt(0);
       final long is = seq.size();
       for(int i = 1; i < is; i++)
-        e = new DynFuncCall(info, sc, false, f, e, seq.itemAt(i)).optimize(qc, scp);
+        e = new DynFuncCall(info, sc, f, e, seq.itemAt(i)).optimize(qc, scp);
       return e;
     }
     return this;

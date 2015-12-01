@@ -585,7 +585,7 @@ public final class QueryContext extends Proc implements Closeable {
    * Indicates that the query contains any updating expressions.
    */
   public void updating() {
-    updating = Boolean.TRUE;
+    updating = true;
   }
 
   @Override

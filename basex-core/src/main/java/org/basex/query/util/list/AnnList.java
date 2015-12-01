@@ -52,6 +52,20 @@ public final class AnnList extends ElementList implements Iterable<Ann> {
   }
 
   /**
+   * Removes an annotation.
+   * @param sig signature to be found
+   */
+  public void delete(final Annotation sig) {
+    final Ann[] lst = anns;
+    final int sz = size;
+    int s = 0;
+    for(int i = 0; i < sz; ++i) {
+      if(lst[i].sig != sig) lst[s++] = lst[i];
+    }
+    size = s;
+  }
+
+  /**
    * Checks if the specified signature is found in the list.
    * @param sig signature to be found
    * @return result of check
@@ -119,7 +133,7 @@ public final class AnnList extends ElementList implements Iterable<Ann> {
 
   /**
    * Checks all annotations for parsing errors.
-   * @param var variable flag
+   * @param var variable flag (triggers different error codes)
    * @return self reference
    * @throws QueryException query exception
    */

@@ -339,7 +339,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     Boolean b = map.get(flag);
     if(b == null) {
       map.put(flag, false);
-      b = expr == null || flag != Flag.UPD && super.has(flag);
+      // closure itself does not perform any updates
+      b = flag != Flag.UPD && (expr == null || super.has(flag));
       map.put(flag, b);
     }
     return b;
@@ -404,15 +405,12 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       // updating function
       if(ret != null) throw UUPFUNCTYPE.get(info);
       if(!u && !expr.isVacuous()) throw UPEXPECTF.get(ii);
-    } else if(u) {
-      // uses updates, but is not declared as such
-      throw UPNOT_X.get(ii, description());
     }
   }
 
   @Override
   public boolean isVacuous() {
-    return !has(Flag.UPD) && ret != null && ret.eq(SeqType.EMP);
+    return ret != null && ret.eq(SeqType.EMP) && !has(Flag.UPD);
   }
 
   @Override

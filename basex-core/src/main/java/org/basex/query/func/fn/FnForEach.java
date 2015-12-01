@@ -67,7 +67,7 @@ public final class FnForEach extends StandardFunc {
       // fn:for-each(...)
       final Expr[] results = new Expr[len];
       for(int i = 0; i < len; i++) {
-        results[i] = new DynFuncCall(info, sc, false, exprs[1], seq.itemAt(i)).optimize(qc, scp);
+        results[i] = new DynFuncCall(info, sc, exprs[1], seq.itemAt(i)).optimize(qc, scp);
       }
       return new List(info, results).optimize(qc, scp);
     }

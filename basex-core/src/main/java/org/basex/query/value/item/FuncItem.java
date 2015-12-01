@@ -163,14 +163,14 @@ public final class FuncItem extends FItem implements Scope {
 
     final VarScope vsc = new VarScope(sc);
     final int pl = params.length;
-    final Var[] vs = new Var[pl];
+    final Var[] vars = new Var[pl];
     final Expr[] refs = new Expr[pl];
     for(int p = pl; p-- > 0;) {
-      vs[p] = vsc.newLocal(qc, params[p].name, ft.argTypes[p], true);
-      refs[p] = new VarRef(ii, vs[p]);
+      vars[p] = vsc.newLocal(qc, params[p].name, ft.argTypes[p], true);
+      refs[p] = new VarRef(ii, vars[p]);
     }
 
-    final Expr e = new DynFuncCall(ii, sc, false, this, refs);
+    final Expr e = new DynFuncCall(ii, sc, this, refs);
     final Expr optimized = opt ? e.optimize(qc, vsc) : e, checked;
     if(ft.retType == null || tp.retType != null && tp.retType.instanceOf(ft.retType)) {
       checked = optimized;
@@ -179,7 +179,7 @@ public final class FuncItem extends FItem implements Scope {
       checked = opt ? tc.optimize(qc, vsc) : tc;
     }
     checked.markTailCalls(null);
-    return new FuncItem(sc, anns, name, vs, ft, checked, vsc.stackSize());
+    return new FuncItem(sc, anns, name, vars, ft, checked, vsc.stackSize());
   }
 
   @Override
@@ -206,13 +206,6 @@ public final class FuncItem extends FItem implements Scope {
   @Override
   public Object toJava() {
     throw Util.notExpected();
-  }
-
-  @Override
-  public boolean has(final Flag flag) {
-    // function item itself has no particular properties unless it is evaluated; the associated
-    // expression is checked instead in order to suppress unwanted optimizations (see e.g. GH-1191)
-    return flag == Flag.UPD && sc.mixUpdates || expr.has(flag) || super.has(flag);
   }
 
   @Override

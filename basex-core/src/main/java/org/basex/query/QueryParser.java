@@ -1681,8 +1681,13 @@ public class QueryParser extends InputParser {
           final ExprList argList = new ExprList(e);
           final int[] holes = argumentList(argList, e);
           final Expr[] args = argList.finish();
-          e = holes == null ? new DynFuncCall(ii, sc, false, ex, args) :
-            new PartFunc(sc, ii, ex, args, holes);
+          // MIXUPDATES: function may be updating
+          if(holes == null) {
+            if(sc.mixUpdates) qc.updating();
+            e = new DynFuncCall(ii, sc, ex, args);
+          } else {
+            e = new PartFunc(sc, ii, ex, args, holes);
+          }
         }
       }
     }
@@ -2052,15 +2057,13 @@ public class QueryParser extends InputParser {
           final ExprList argList = new ExprList();
           final int[] holes = argumentList(argList, e);
           final Expr[] args = argList.finish();
-          // only set updating flag if updating and non-updating expressions are mixed
-          AnnList anns = null;
-          if(e instanceof FuncItem) anns = ((FuncItem) e).annotations();
-          else if(e instanceof FuncLit) anns = ((FuncLit) e).annotations();
-          else if(e instanceof PartFunc) anns = ((PartFunc) e).annotations();
-          final boolean up = sc.mixUpdates && anns != null && anns.contains(Annotation.UPDATING);
-          if(up) qc.updating();
-          e = holes == null ? new DynFuncCall(ii, sc, up, e, args) :
-            new PartFunc(sc, ii, e, args, holes);
+          // MIXUPDATES: function may be updating
+          if(holes == null) {
+            if(sc.mixUpdates) qc.updating();
+            e = new DynFuncCall(ii, sc, e, args);
+          } else {
+            e = new PartFunc(sc, ii, e, args, holes);
+          }
         } else if(consume(QUESTION)) {
           // parses the "Lookup" rule
           e = new Lookup(info(), sc, keySpecifier(), e);
@@ -2205,7 +2208,8 @@ public class QueryParser extends InputParser {
     // inline function
     if(wsConsume(FUNCTION) && wsConsume(PAREN1)) {
       if(anns.contains(Annotation.PRIVATE) || anns.contains(Annotation.PUBLIC))
-        throw error(INVISIBLE);
+        throw error(NOVISALLOWED);
+
       final HashMap<Var, Expr> nonLocal = new HashMap<>();
       localVars.pushContext(nonLocal);
       final Var[] args = paramList();
@@ -2213,6 +2217,10 @@ public class QueryParser extends InputParser {
       final SeqType type = optAsType();
       final Expr body = enclosedExpr();
       final VarScope scope = localVars.popContext();
+      // derive updating flag from function body
+      final boolean upd = body.has(Flag.UPD), updAnn = anns.contains(Annotation.UPDATING);
+      if(upd && !updAnn) anns.add(new Ann(info(), Annotation.UPDATING));
+      if(!upd && updAnn) anns.delete(Annotation.UPDATING);
       return new Closure(info(), type, args, body, anns, nonLocal, sc, scope);
     }
     // annotations not allowed here
@@ -2411,8 +2419,6 @@ public class QueryParser extends InputParser {
       final Expr lit = Functions.getLiteral(name, card, qc, sc, ii, false);
       final Expr f = lit != null ? lit : unknownLit(name, card, ii);
       ret = new PartFunc(sc, ii, f, args, holes);
-      if(lit != null && (lit instanceof XQFunctionExpr ? ((XQFunctionExpr) f).annotations() :
-        ((FuncLit) lit).annotations()).contains(Annotation.UPDATING)) qc.updating();
     } else {
       final TypedFunc f = Functions.get(name, args, qc, sc, ii);
       if(f == null) {
@@ -2445,11 +2451,11 @@ public class QueryParser extends InputParser {
         } else if(wsConsume(QUESTION)) {
           holes = holes == null ? new int[] { i } : Array.add(holes, i);
         } else {
-          throw error(FUNCMISS_X, name);
+          throw funcMiss(name);
         }
         i++;
       } while(wsConsume(COMMA));
-      if(!wsConsume(PAREN2)) throw error(FUNCMISS_X, name);
+      if(!wsConsume(PAREN2)) throw funcMiss(name);
     }
     return holes;
   }
@@ -3675,7 +3681,8 @@ public class QueryParser extends InputParser {
    */
   private Expr updatingFunctionCall() throws QueryException {
     final int p = pos;
-    if(wsConsumeWs(UPDATING)) {
+    final boolean upd = wsConsumeWs(UPDATING), ndt = wsConsumeWs(NON_DETERMINISTIC);
+    if(upd || ndt) {
       final Expr func = primary();
       if(wsConsume(PAREN1)) {
         final InputInfo ii = info();
@@ -3684,13 +3691,16 @@ public class QueryParser extends InputParser {
         if(!wsConsume(PAREN2)) {
           do {
             final Expr e = single();
-            if(e == null) throw error(FUNCMISS_X, func);
+            if(e == null) throw funcMiss(func);
             argList.add(e);
           } while(wsConsume(COMMA));
-          if(!wsConsume(PAREN2)) throw error(FUNCMISS_X, func);
+          if(!wsConsume(PAREN2)) throw funcMiss(func);
         }
-        qc.updating();
-        return new DynFuncCall(ii, sc, true, func, argList.finish());
+        // skip if primary expression cannot be a function
+        if(!(func instanceof Item) || func instanceof FItem) {
+          if(upd || sc.mixUpdates) qc.updating();
+          return new DynFuncCall(ii, sc, upd, ndt, func, argList.finish());
+        }
       }
     }
     pos = p;
@@ -4047,6 +4057,20 @@ public class QueryParser extends InputParser {
   private void add(final ExprList ar, final Expr ex) throws QueryException {
     if(ex == null) throw error(INCOMPLETE);
     ar.add(ex);
+  }
+
+  /**
+   * Creates a function parsing error.
+   * @param func function
+   * @return error
+   */
+  private QueryException funcMiss(final Object func) {
+    Object name = func;
+    if(func instanceof XQFunctionExpr) {
+      final QNm qnm = ((XQFunctionExpr) func).funcName();
+      if(qnm != null) name = qnm.prefixId();
+    }
+    return error(FUNCMISS_X, name);
   }
 
   /**

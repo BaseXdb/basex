@@ -669,14 +669,6 @@ public final class UpdateTest extends AdvancedQueryTest {
    * Text merging test for delete operation.
    */
   @Test
-  public void x() {
-    query("1,2", "1\n2");
-  }
-
-  /**
-   * Text merging test for delete operation.
-   */
-  @Test
   public void textMerging10() {
     query("copy $c := <n>aa<d/><d/>cc</n> " +
       "modify (delete node $c//d, insert node 'bb' before ($c//d)[2]) " +
@@ -1155,21 +1147,25 @@ public final class UpdateTest extends AdvancedQueryTest {
   public void updatingFuncItems() {
     query("db:output(?)", "(anonymous-function)#1");
     query("db:output#1", "db:output#1");
+    query("db:output#1, db:output#1", "db:output#1\ndb:output#1");
+
     query("declare updating function local:a() { () }; local:a#0", "local:a#0");
     query("declare function local:a() { local:a#0 };"
         + "declare updating function local:b() { db:output('1') }; local:a()", "local:a#0");
-    query("declare function local:not-used() { local:b#0 };"
-        + "declare updating function local:b() { db:output('1') }; local:b()", "1");
+    query("updating function() { delete node <a/> }()");
+    // updating annotation is ignored
+    query("%updating function() { 1 }()", "1");
 
-    error("function() { delete node <a/> }()", UPNOT_X);
-    error("updating function() { delete node <a/> }()", UPNOT_X);
-    error("updating %updating function() { 1 }()", UPEXPECTF);
+    error("function() { delete node <a/> }()", UPFUNCUP);
+    error("updating %updating function() { 1 }()", UPFUNCNOTUP);
 
     error("db:output(?)(<a/>)", UPFUNCUP);
     error("db:output#1(<a/>)", UPFUNCUP);
     error("%updating function($a) { db:output($a) }(1)", UPFUNCUP);
-    error("%updating function() { 1 }()", UPFUNCUP);
     error("declare updating function local:a() { () }; local:a#0()", UPFUNCUP);
+
+    query("declare function local:a() { local:b#0 };"
+        + "declare updating function local:b() { db:output('1') }; updating local:a()()", "1");
     error("declare function local:a() { local:b#0 };"
         + "declare updating function local:b() { db:output('1') }; local:a()()", UPFUNCUP);
 

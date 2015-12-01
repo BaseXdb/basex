@@ -12,7 +12,6 @@ import org.basex.util.*;
  * @author Leo Woerteler
  */
 public interface XQFunction extends XQFunctionExpr {
-
   /**
    * Internally invokes this function with the given arguments.
    * This method does not deal with tail calls, so it is unsafe to call.

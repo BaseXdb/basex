@@ -184,10 +184,8 @@ public final class Functions extends TokenSet {
 
       final StandardFunc sf = fn.get(sc, ii, calls);
       final boolean upd = sf.has(Flag.UPD);
-      if(upd) {
-        qc.updating();
-        anns.add(new Ann(ii, Annotation.UPDATING));
-      }
+      if(upd) anns.add(new Ann(ii, Annotation.UPDATING));
+
       if(!sf.has(Flag.CTX) && !sf.has(Flag.POS)) return closureOrFItem(
           anns, name, args, fn.type(arity, anns), sf, scp, sc, ii, runtime, upd);
 
@@ -254,14 +252,13 @@ public final class Functions extends TokenSet {
   }
 
   /**
-   * Returns a function with the specified name and number of arguments,
-   * or {@code null}.
+   * Returns a function with the specified name and number of arguments.
    * @param name name of the function
    * @param args optional arguments
    * @param qc query context
    * @param sc static context
    * @param ii input info
-   * @return function instance
+   * @return function instance, or {@code null}
    * @throws QueryException query exception
    */
   public static TypedFunc get(final QNm name, final Expr[] args, final QueryContext qc,
@@ -279,10 +276,7 @@ public final class Functions extends TokenSet {
     final StandardFunc fun = get().get(name, args, sc, ii);
     if(fun != null) {
       final AnnList anns = new AnnList();
-      if(fun.sig.has(Flag.UPD)) {
-        qc.updating();
-        anns.add(new Ann(ii, Annotation.UPDATING));
-      }
+      if(fun.sig.has(Flag.UPD)) anns.add(new Ann(ii, Annotation.UPDATING));
       return new TypedFunc(fun, anns);
     }
 

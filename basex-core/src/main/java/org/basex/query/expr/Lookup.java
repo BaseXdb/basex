@@ -63,7 +63,7 @@ public final class Lookup extends Arr {
       if(fs.size() == 1 || fs.seqType().one()) {
         // one function, rewrite to for-each or function call
         final Expr opt = ks.size() == 1 || ks.seqType().one()
-            ? new DynFuncCall(info, sc, false, fs, ks) : Function.FOR_EACH.get(sc, info, exprs);
+            ? new DynFuncCall(info, sc, fs, ks) : Function.FOR_EACH.get(sc, info, exprs);
         return optPre(opt, qc).optimize(qc, scp);
       }
 
@@ -75,7 +75,7 @@ public final class Lookup extends Arr {
         final Var k = scp.newLocal(qc, QNm.get("k"), null, false);
         clauses.add(new For(k, null, null, ks, false, info));
         final VarRef rf = new VarRef(info, f), rk = new VarRef(info, k);
-        final DynFuncCall ret = new DynFuncCall(info, sc, false, rf, rk);
+        final DynFuncCall ret = new DynFuncCall(info, sc, rf, rk);
         return optPre(new GFLWOR(info, clauses, ret), qc).optimize(qc, scp);
       }
     }

@@ -95,7 +95,8 @@ public final class PartFunc extends Arr {
 
     final AnnList anns = f.annotations();
     final FuncType tp = FuncType.get(anns, ft.retType, vars);
-    final DynFuncCall fc = new DynFuncCall(info, sc, anns.contains(Annotation.UPDATING), f, args);
+    final DynFuncCall fc = new DynFuncCall(info, sc, anns.contains(Annotation.UPDATING),
+        false, f, args);
     return new FuncItem(sc, anns, null, vars, tp, fc, qc.value, qc.pos, qc.size, scp.stackSize());
   }
 
@@ -130,6 +131,16 @@ public final class PartFunc extends Arr {
     plan.add(e);
   }
 
+  /**
+   * Returns the function annotations.
+   * @return annotations
+   */
+  public AnnList annotations() {
+    final Expr fn = exprs[exprs.length - 1];
+    if(!(fn instanceof FItem)) return null;
+    return ((FItem) fn).annotations();
+  }
+
   @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder(exprs[exprs.length - 1].toString()).add('(');
@@ -142,15 +153,5 @@ public final class PartFunc extends Arr {
     }
     while(++p < es + hs - 1) tb.add(QueryText.SEP).add(exprs[p - hs].toString());
     return tb.add(')').toString();
-  }
-
-  /**
-   * Returns the function annotations.
-   * @return annotations
-   */
-  public AnnList annotations() {
-    final Expr fn = exprs[exprs.length - 1];
-    if(!(fn instanceof FItem)) return null;
-    return ((FItem) fn).annotations();
   }
 }

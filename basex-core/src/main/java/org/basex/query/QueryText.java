@@ -185,6 +185,8 @@ public interface QueryText {
   /** Parser token. */
   String NO_PRESERVE = "no-preserve";
   /** Parser token. */
+  String NON_DETERMINISTIC = "non-deterministic";
+  /** Parser token. */
   String NODE = "node";
   /** Parser token. */
   String NODES = "nodes";

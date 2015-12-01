@@ -32,22 +32,38 @@ public final class DynFuncCall extends FuncCall {
   /** Hash values of all function items that this call was copied from, possibly {@code null}. */
   private int[] inlinedFrom;
   /** Updating flag. */
-  private final boolean updating;
+  private final boolean upd;
+  /** Non-deterministic flag. */
+  private final boolean ndt;
 
   /**
    * Function constructor.
    * @param info input info
    * @param sc static context
-   * @param updating updating flag
    * @param expr function expression
    * @param arg arguments
    */
-  public DynFuncCall(final InputInfo info, final StaticContext sc, final boolean updating,
-      final Expr expr, final Expr... arg) {
+  public DynFuncCall(final InputInfo info, final StaticContext sc, final Expr expr,
+      final Expr... arg) {
+    this(info, sc, false, false, expr, arg);
+  }
+
+  /**
+   * Function constructor.
+   * @param info input info
+   * @param sc static context
+   * @param upd updating flag
+   * @param ndt non-deterministic flag
+   * @param expr function expression
+   * @param arg arguments
+   */
+  public DynFuncCall(final InputInfo info, final StaticContext sc, final boolean upd,
+      final boolean ndt, final Expr expr, final Expr... arg) {
 
     super(info, add(arg, expr));
     this.sc = sc;
-    this.updating = updating;
+    this.upd = upd;
+    this.ndt = ndt || expr.has(Flag.NDT);
   }
 
   @Override
@@ -77,8 +93,8 @@ public final class DynFuncCall extends FuncCall {
       // try to inline the function
       final XQFunctionExpr fe = (XQFunctionExpr) f;
       if(!(f instanceof FuncItem && comesFrom((FuncItem) f))) {
-        if(!sc.mixUpdates && updating != fe.annotations().contains(Annotation.UPDATING))
-          throw (updating ? UPFUNCNOTUP : UPFUNCUP).get(info);
+        if(!sc.mixUpdates && upd != fe.annotations().contains(Annotation.UPDATING))
+          throw (upd ? UPFUNCNOTUP : UPFUNCUP).get(info);
 
         final Expr[] args = Arrays.copyOf(exprs, ar);
         final Expr in = fe.inlineExpr(args, qc, scp, info);
@@ -126,7 +142,7 @@ public final class DynFuncCall extends FuncCall {
     final Expr[] copy = copyAll(qc, scp, vs, exprs);
     final int last = copy.length - 1;
     final Expr[] args = Arrays.copyOf(copy, last);
-    final DynFuncCall call = new DynFuncCall(info, sc, updating, copy[last], args);
+    final DynFuncCall call = new DynFuncCall(info, sc, upd, ndt, copy[last], args);
     if(inlinedFrom != null) call.inlinedFrom = inlinedFrom.clone();
     return copyType(call);
   }
@@ -150,17 +166,6 @@ public final class DynFuncCall extends FuncCall {
   }
 
   @Override
-  public String toString() {
-    final int es = exprs.length;
-    final TokenBuilder tb = new TokenBuilder(exprs[es - 1].toString()).add('(');
-    for(int e = 0; e < es - 1; e++) {
-      tb.add(exprs[e].toString());
-      if(e < es - 2) tb.add(", ");
-    }
-    return tb.add(')').toString();
-  }
-
-  @Override
   FItem evalFunc(final QueryContext qc) throws QueryException {
     final int ar = exprs.length - 1;
     final Item it = toItem(exprs[ar], qc);
@@ -171,8 +176,8 @@ public final class DynFuncCall extends FuncCall {
       final Expr e = f instanceof FuncItem ? ((FuncItem) f).expr : f;
       throw INVARITY_X_X_X_X.get(info, e, ar, ar == 1 ? "" : "s", f.arity());
     }
-    if(!sc.mixUpdates && updating != f.annotations().contains(Annotation.UPDATING))
-      throw (updating ? UPFUNCNOTUP : UPFUNCUP).get(info);
+    if(!sc.mixUpdates && upd != f.annotations().contains(Annotation.UPDATING))
+      throw (upd ? UPFUNCNOTUP : UPFUNCUP).get(info);
 
     return f;
   }
@@ -188,6 +193,18 @@ public final class DynFuncCall extends FuncCall {
   @Override
   public boolean has(final Flag flag) {
     // MIXUPDATES: all function calls may be updating
-    return flag == Flag.UPD ? sc.mixUpdates || updating : super.has(flag);
+    return flag == Flag.UPD ? sc.mixUpdates || upd :
+           flag == Flag.NDT ? ndt : super.has(flag);
+  }
+
+  @Override
+  public String toString() {
+    final int es = exprs.length;
+    final TokenBuilder tb = new TokenBuilder(exprs[es - 1].toString()).add('(');
+    for(int e = 0; e < es - 1; e++) {
+      tb.add(exprs[e].toString());
+      if(e < es - 2) tb.add(", ");
+    }
+    return tb.add(')').toString();
   }
 }
