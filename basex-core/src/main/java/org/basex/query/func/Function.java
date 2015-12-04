@@ -1581,7 +1581,7 @@ public enum Function {
    * All function names are listed in reverse order to give precedence to longer names.
    * @param args ignored
   public static void main(final String... args) {
-    final StringList sl = new StringList();
+    final org.basex.util.list.StringList sl = new org.basex.util.list.StringList();
     for(Function f : VALUES) {
       sl.add(f.toString().replaceAll("^fn:|\\(.*", ""));
     }
