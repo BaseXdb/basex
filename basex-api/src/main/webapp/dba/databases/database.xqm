@@ -58,7 +58,12 @@ function _:database(
   let $found := $data/found = 'true'
   let $error := ($data/self::error/string(), $error)[1]
 
-  return tmpl:wrap(map { 'top': $_:CAT, 'info': $info, 'error': $error },
+  return tmpl:wrap(
+    map {
+      'top': $_:CAT, 'info': $info, 'error': $error,
+      'css': 'codemirror/lib/codemirror.css',
+      'scripts': ('codemirror/lib/codemirror.js', 'codemirror/mode/xml/xml.js')
+    },
     <tr>
       <td width='49%'>
         <form action="{ $_:SUB }" method="post" id="{ $_:SUB }" class="update">
@@ -128,11 +133,13 @@ function _:database(
             { html:button('replace', 'Replace…') }
           </form>
           <b>XQuery:</b>
-          <input style="width:100%" name="input" id="input"
-            onkeyup='queryResource("Please wait…", "Query was successful.")'/>
+          <input style="width:100%" name="input" id="input" onkeyup='queryResource(false)'/>
           { html:focus('input') }
           <textarea name='output' id='output' rows='20' readonly='' spellcheck='false'/>
-          <script type="text/javascript">queryResource('', '');</script>
+          <script type="text/javascript">
+            loadCodeMirror();
+            queryResource(true);
+          </script>
         </_>/node() else (
           $data/info/*/html:properties(.)
         )
