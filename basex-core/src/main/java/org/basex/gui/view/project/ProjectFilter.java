@@ -38,9 +38,9 @@ final class ProjectFilter extends BaseXBack {
   private final TokenList cache = new TokenList();
 
   /** Last file search. */
-  private String lastFiles = "";
+  private String fileFilter = "";
   /** Last content search. */
-  private String lastContents = "";
+  private String contentFilter = "";
   /** Running flag. */
   private boolean running;
   /** Current filter id. */
@@ -183,13 +183,13 @@ final class ProjectFilter extends BaseXBack {
   void refresh(final boolean force) {
     final String file = files.getText();
     final String content = contents.getText();
-    if(!force && lastFiles.equals(file) && lastContents.equals(content)) return;
-    lastFiles = file;
-    lastContents = content;
+    if(!force && fileFilter.equals(file) && contentFilter.equals(content)) return;
+    fileFilter = file;
+    contentFilter = content;
     ++threadID;
 
-    final boolean list = !file.isEmpty() || !content.isEmpty();
-    if(list) {
+    final boolean filter = !file.isEmpty() || !content.isEmpty();
+    if(filter) {
       final Thread t = new Thread() {
         @Override
         public void run() {
@@ -199,7 +199,7 @@ final class ProjectFilter extends BaseXBack {
       t.setDaemon(true);
       t.start();
     }
-    project.showList(list);
+    project.showList(filter);
   }
 
   /**
