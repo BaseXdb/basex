@@ -4,7 +4,6 @@
 about_%              = Über %
 access_denied        = Der Zugriff wurde verweigert.
 add                  = Hinzufügen
-add_as_import        = Als Import hinzufügen
 add_archive_name     = Archivname dem Dokumentpfad hinzufügen
 add_raw_files        = Speichere andere Dateien im Binärformat
 add_resources        = Neue Ressourcen

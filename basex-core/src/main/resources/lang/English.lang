@@ -4,7 +4,6 @@
 about_%              = About %
 access_denied        = Access denied.
 add                  = Add
-add_as_import        = Add as import
 add_archive_name     = Include name of archive in document path
 add_raw_files        = Add other files as raw files
 add_resources        = Add Resources

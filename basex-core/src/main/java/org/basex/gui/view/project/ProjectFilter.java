@@ -186,10 +186,10 @@ final class ProjectFilter extends BaseXBack {
     if(!force && fileFilter.equals(file) && contentFilter.equals(content)) return;
     fileFilter = file;
     contentFilter = content;
-    ++threadID;
 
     final boolean filter = !file.isEmpty() || !content.isEmpty();
     if(filter) {
+      ++threadID;
       final Thread t = new Thread() {
         @Override
         public void run() {

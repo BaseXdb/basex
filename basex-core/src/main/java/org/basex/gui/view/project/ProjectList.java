@@ -48,12 +48,6 @@ final class ProjectList extends JList<String> {
         BaseXLayout.copy(selectedValue());
       }
       @Override public boolean enabled(final GUI main) { return selectedValue() != null; }
-    },
-    new GUIPopupCmd(ADD_AS_IMPORT, BaseXKeys.ADDIMPORT) {
-      @Override public void execute() {
-        project.addImport(selectedValues()[0]);
-      }
-      @Override public boolean enabled(final GUI main) { return selectedValue() != null; }
     }
   };
 
