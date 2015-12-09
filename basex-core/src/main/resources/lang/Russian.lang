@@ -257,6 +257,7 @@ parse_archives       = Обрабатывать файлы в архивах
 parse_dtds           = Разбирать DTD и сущности
 parse_quotes         = Parse quotes
 parser_%             = Парсер % 
+parse_project_files  = Parse project files
 parsing              = Парсинг
 password             = Пароль
 paste                = Вставить

@@ -257,6 +257,7 @@ parse_archives       = Архиваар дамжуулан файлыг Parsing 
 parse_dtds           = DTD-үүд болон объектуудыг Parsing хийх
 parse_quotes         = Parse quotes
 parser_%             = % Parser
+parse_project_files  = Parse project files
 parsing              = Parsing хийх
 password             = Нууц үг
 paste                = Хуулж тавих

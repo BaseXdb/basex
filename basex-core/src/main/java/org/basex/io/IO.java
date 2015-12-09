@@ -57,6 +57,8 @@ public abstract class IO {
   public static final String XARSUFFIX = ".xar";
   /** XQuery log suffix. */
   public static final String LOGSUFFIX = ".log";
+  /** Ignore suffix. */
+  public static final String IGNORESUFFIX = ".ignore";
   /** Directory for raw files. */
   public static final String RAW = "raw";
   /** File prefix. */

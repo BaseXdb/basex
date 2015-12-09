@@ -126,10 +126,10 @@ public final class QueryContext extends Proc implements Closeable {
   /** Counter for variable IDs. */
   public int varIDs;
 
+  /** Parsed modules, containing the file path and module uri. */
+  public final TokenMap modParsed = new TokenMap();
   /** Pre-declared modules, containing module uri and their file paths (required for test APIs). */
   final TokenMap modDeclared = new TokenMap();
-  /** Parsed modules, containing the file path and module uri. */
-  final TokenMap modParsed = new TokenMap();
   /** Stack of module files that are currently parsed. */
   final TokenList modStack = new TokenList();
 

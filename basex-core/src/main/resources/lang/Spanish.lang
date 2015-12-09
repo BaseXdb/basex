@@ -257,6 +257,7 @@ parse_archives       = Analizar ficheros en archivos
 parse_dtds           = Analizar DTDs y entidades
 parse_quotes         = Analizar citas
 parser_%             = % Analizador Sintáctico
+parse_project_files  = Analizar ficheros del proyecto
 parsing              = Analizando
 password             = Clave
 paste                = Pegar

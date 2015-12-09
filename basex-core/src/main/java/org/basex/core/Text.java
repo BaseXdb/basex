@@ -1236,6 +1236,8 @@ public interface Text {
   String MARK_EDITED_LINE = lang("mark_edited_line");
   /** Save before executing file. */
   String SAVE_BEFORE_EXECUTE = lang("save_before_execute");
+  /** Parse project files. */
+  String PARSE_PROJECT_FILES = lang("parse_project_files");
   /** Automatically add characters. */
   String AUTO_ADD_CHARS = lang("auto_add_chars");
   /** Default file filter. */

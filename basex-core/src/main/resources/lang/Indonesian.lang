@@ -257,6 +257,7 @@ parse_archives       = Uraikan berkas yang didalam arsip
 parse_dtds           = Uraikan DTD dan entitas
 parse_quotes         = Uraikan tanda kutip
 parser_%             = Pengurai %
+parse_project_files  = Parse project files
 parsing              = Menguarikan
 password             = Kata kunci
 paste                = Tempel

@@ -45,12 +45,14 @@ final class ProjectDir extends ProjectNode {
     // create child nodes
     for(final IOFile f : dirs) add(new ProjectDir(f, project));
     for(final IOFile f : files) add(new ProjectFile(f, project));
+    project.refreshTree();
   }
 
   @Override
   void collapse() {
     removeAllChildren();
     addDummy();
+    project.refreshTree();
   }
 
   /**

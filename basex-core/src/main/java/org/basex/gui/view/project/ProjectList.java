@@ -15,7 +15,6 @@ import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.io.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -75,25 +74,22 @@ final class ProjectList extends JList<String> {
 
   /**
    * Assigns the specified list entries and selects the first entry.
-   * @param elements result elements
+   * @param list result elements
    * @param srch content search string
    */
-  void setElements(final TokenSet elements, final String srch) {
+  void setElements(final String[] list, final String srch) {
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
         // set new values and selections
-        final int is = elements.size();
-        final String[] list = new String[is];
-        for(int i = 0; i < is; i++) list[i] = Token.string(elements.key(i + 1));
         if(changed(list)) {
           // check which old values had been selected
           final List<String> values = getSelectedValuesList();
           final IntList il = new IntList();
           for(final String value : values) {
-            final byte[] val = Token.token(value);
+            final int is = list.length;
             for(int i = 0; i < is; i++) {
-              if(Token.eq(val, elements.key(i + 1))) {
+              if(value.equals(list[i])) {
                 il.add(i);
                 break;
               }

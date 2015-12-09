@@ -257,6 +257,7 @@ parse_archives       = Parsare fisiere in arhiva
 parse_dtds           = Parsare DTD-uri si entitati
 parse_quotes         = Parse quotes
 parser_%             = % Parser
+parse_project_files  = Parse project files
 parsing              = Parsare
 password             = Parolă
 paste                = Lipește

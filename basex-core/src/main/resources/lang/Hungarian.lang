@@ -257,6 +257,7 @@ parse_archives       = Archívumokban lévő fájlok elemzése
 parse_dtds           = DTD-k és bejegyzések elemzése
 parse_quotes         = Idézőjelek elemzése
 parser_%             = % elemző
+parse_project_files  = Parse project files
 parsing              = Elemzés
 password             = Jelszó
 paste                = Beillesztés

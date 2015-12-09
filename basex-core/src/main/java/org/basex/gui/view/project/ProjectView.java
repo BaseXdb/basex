@@ -15,6 +15,7 @@ import org.basex.gui.layout.BaseXFileChooser.*;
 import org.basex.gui.view.editor.*;
 import org.basex.io.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Project file tree.
@@ -23,22 +24,26 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class ProjectView extends BaseXPanel {
+  /** Cached file paths. */
+  final ProjectFiles files = new ProjectFiles();
   /** Root directory. */
   final ProjectDir root;
   /** Tree. */
   final ProjectTree tree;
-  /** Editor view. */
-  final EditorView editor;
-  /** Filter field. */
-  private final ProjectFilter filter;
   /** Filter list. */
   final ProjectList list;
+
+  /** Filter field. */
+  private final ProjectFilter filter;
   /** Root path. */
-  private final BaseXTextField path;
+  private final BaseXTextField rootPath;
   /** Splitter. */
   private final BaseXSplit split;
+
   /** Last focused component. */
   private Component last;
+  /** Parsed flag. */
+  private boolean parsed;
 
   /** Remembers the last focused component. */
   final FocusAdapter lastfocus = new FocusAdapter() {
@@ -54,7 +59,6 @@ public final class ProjectView extends BaseXPanel {
    */
   public ProjectView(final EditorView ev) {
     super(ev.gui);
-    editor = ev;
     setLayout(new BorderLayout());
 
     tree = new ProjectTree(this);
@@ -70,9 +74,9 @@ public final class ProjectView extends BaseXPanel {
     back.setBorder(new CompoundBorder(new MatteBorder(0, 0, 1, 0, GUIConstants.gray),
         BaseXLayout.border(3, 1, 3, 2)));
 
-    path = new BaseXTextField(gui);
-    path.setText(root.file.path());
-    path.setEnabled(false);
+    rootPath = new BaseXTextField(gui);
+    rootPath.setText(root.file.path());
+    rootPath.setEnabled(false);
 
     final BaseXButton browse = new BaseXButton(DOTS, gui);
     browse.setMargin(new Insets(0, 2, 0, 2));
@@ -80,11 +84,11 @@ public final class ProjectView extends BaseXPanel {
     browse.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
-        change();
+        changeRoot();
       }
     });
 
-    back.add(path, BorderLayout.CENTER);
+    back.add(rootPath, BorderLayout.CENTER);
     back.add(browse, BorderLayout.EAST);
     back.add(filter, BorderLayout.SOUTH);
 
@@ -108,6 +112,14 @@ public final class ProjectView extends BaseXPanel {
     last = tree;
     tree.addFocusListener(lastfocus);
     list.addFocusListener(lastfocus);
+
+    addComponentListener(new ComponentAdapter() {
+      @Override
+      public void componentResized(final ComponentEvent e) {
+        // trigger parsing of project files
+        refresh(false, false);
+      }
+    });
   }
 
   /**
@@ -119,67 +131,121 @@ public final class ProjectView extends BaseXPanel {
   }
 
   /**
-   * Refreshes the specified file node.
+   * Refreshes the view after a file has been saved.
    * @param file file to be opened
    * @param rename file has been renamed
    */
   public void save(final IOFile file, final boolean rename) {
-    refresh(file);
-    if(rename) reset();
-    refresh();
+    final Thread t = new Thread() {
+      @Override
+      public void run() {
+        final IOFile path = file.normalize();
+        if(path.path().startsWith(root.file.path())) refreshTree(path);
+        refresh(rename, true);
+      }
+    };
+    t.setDaemon(true);
+    t.start();
   }
 
   /**
-   * Refreshes the filter view.
+   * Refreshes the tree component.
+   */
+  void refreshTree() {
+    final StringList sl = files.errors;
+    final Enumeration<?> en = root.depthFirstEnumeration();
+    while(en.hasMoreElements()) {
+      final ProjectNode node = (ProjectNode) en.nextElement();
+      if(node.file == null) continue;
+
+      final String path = node.file.path();
+      boolean found = false;
+      for(int s = 0; s < sl.size() && !found; s++) {
+        if(sl.get(s).startsWith(path)) {
+          found = true;
+        }
+      }
+      node.error = found;
+    }
+    repaint();
+  }
+
+  /**
+   * Refreshes the project view.
    */
   void refresh() {
-    filter.refresh(true);
+    refresh(true, true);
   }
 
   /**
-   * Resets the filter cache.
+   * Refreshes the project view.
+   * @param reset invalidate the file cache
+   * @param parse parse
    */
-  void reset() {
-    filter.reset();
+  void refresh(final boolean reset, final boolean parse) {
+    if(reset) files.reset();
+    filter.refresh(true);
+
+    System.out.println("[1] " + parsed + "/" + parse);
+    if(gui.gopts.get(GUIOptions.PARSEPROJ) && (!parsed || parse)) {
+      parsed = false;
+      // do not parse if project view is hidden
+      System.out.println("[2] " + parse);
+      if(getWidth() == 0) return;
+      System.out.println("[3]");
+
+      final Thread t = new Thread() {
+        @Override
+        public void run() {
+          try {
+            Performance p = new Performance();
+            files.parse(root.file, gui.context);
+            parsed = true;
+            System.out.println(p);
+            refreshTree();
+          } catch(final InterruptedException ignore) { }
+        }
+      };
+      t.setDaemon(true);
+      t.start();
+    }
   }
 
   /**
    * Jumps to the specified file.
    * @param file file to be focused
    */
-  public void jump(final IOFile file) {
+  public void jumpTo(final IOFile file) {
     final IOFile fl = file.normalize();
     if(fl.path().startsWith(root.file.path())) tree.expand(root, fl.path());
     tree.requestFocusInWindow();
   }
 
   /**
-   * Refreshes the visualization of the specified file, or its parent, in the tree.
+   * Refreshes the rendering of the specified file, or its parent, in the tree.
+   * It may possibly be hidden in the current tree.
    * @param file file to be refreshed
    */
-  private void refresh(final IOFile file) {
-    final ProjectNode node = find(file);
+  private void refreshTree(final IOFile file) {
+    final ProjectNode node = find(file.path());
     if(node != null) {
       node.refresh();
     } else {
       final IOFile parent = file.parent();
-      if(parent != null) refresh(parent);
+      if(parent != null) refreshTree(parent);
     }
   }
 
   /**
    * Returns the node for the specified file.
-   * @param file file to be found
+   * @param path path of file to be found
    * @return node or {@code null}
    */
-  private ProjectNode find(final IOFile file) {
-    final IOFile fl = file.normalize();
-    if(fl.path().startsWith(root.file.path())) {
-      final Enumeration<?> en = root.depthFirstEnumeration();
-      while(en.hasMoreElements()) {
-        final ProjectNode node = (ProjectNode) en.nextElement();
-        if(node.file != null && node.file.path().equals(fl.path())) return node;
-      }
+  private ProjectNode find(final String path) {
+    final Enumeration<?> en = root.depthFirstEnumeration();
+    while(en.hasMoreElements()) {
+      final ProjectNode node = (ProjectNode) en.nextElement();
+      if(node.file != null && node.file.path().equals(path)) return node;
     }
     return null;
   }
@@ -189,7 +255,7 @@ public final class ProjectView extends BaseXPanel {
    */
   public void refreshLayout() {
     filter.refreshLayout();
-    root.refresh();
+    //root.refresh();
   }
 
   /**
@@ -239,7 +305,7 @@ public final class ProjectView extends BaseXPanel {
    * @param search search string
    */
   void open(final IOFile file, final String search) {
-    final EditorArea ea = editor.open(file);
+    final EditorArea ea = gui.editor.open(file);
     if(ea == null) return;
 
     // delay search and focus request (avoid keyTyped event to be handled in editor)
@@ -252,9 +318,9 @@ public final class ProjectView extends BaseXPanel {
   }
 
   /**
-   * Changes the root directory.
+   * Shows a dialog for changing the root directory.
    */
-  private void change() {
+  private void changeRoot() {
     final ProjectNode child = tree.selectedNode();
     final IOFile file = (child != null ? child : root).file;
     final BaseXFileChooser fc = new BaseXFileChooser(CHOOSE_DIR, file.path(), gui);
@@ -272,8 +338,8 @@ public final class ProjectView extends BaseXPanel {
     if(!force && !project.isEmpty()) return;
     root.file = io;
     root.refresh();
-    filter.reset();
-    path.setText(io.path());
+    refresh();
+    rootPath.setText(io.path());
     if(force) {
       gui.gopts.set(GUIOptions.PROJECTPATH, io.path());
       gui.gopts.write();

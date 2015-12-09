@@ -257,6 +257,7 @@ parse_archives       = Parse Dateien in Archiven
 parse_dtds           = Parsen von DTDs und Entities
 parse_quotes         = Parse Anführungszeichen
 parser_%             = %-Parser
+parse_project_files  = Parse Projekt-Dateien
 parsing              = Parsing
 password             = Passwort
 paste                = Einfügen

@@ -257,6 +257,7 @@ parse_archives       = Analyser les fichiers dans les archives
 parse_dtds           = Analyser les DTD et les entités
 parse_quotes         = Parser les guillemets
 parser_%             = % Parser
+parse_project_files  = Parser les fichiers du projet
 parsing              = Analyse
 password             = Mot de passe
 paste                = Coller

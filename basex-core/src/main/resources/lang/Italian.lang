@@ -257,6 +257,7 @@ parse_archives       = Leggi i documenti negli archivi
 parse_dtds           = Leggi le DTD e le entità
 parse_quotes         = Parse quotes
 parser_%             = % Parser
+parse_project_files  = Parse i risorse del progetto
 parsing              = Parsing
 password             = Parola chiave
 paste                = Incolla

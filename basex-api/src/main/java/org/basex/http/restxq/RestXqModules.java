@@ -168,7 +168,7 @@ public final class RestXqModules {
 
     // check if directory is to be skipped
     final IOFile[] files = root.children();
-    for(final IOFile file : files) if(file.name().equals(IGNORE)) return;
+    for(final IOFile file : files) if(file.name().equals(IO.IGNORESUFFIX)) return;
 
     for(final IOFile file : files) {
       if(file.isDir()) {

@@ -354,7 +354,7 @@ public final class EditorView extends View {
    */
   public void jumpToFile() {
     final EditorArea editor = getEditor();
-    if(editor.opened()) project.jump(editor.file());
+    if(editor.opened()) project.jumpTo(editor.file());
   }
 
   /**

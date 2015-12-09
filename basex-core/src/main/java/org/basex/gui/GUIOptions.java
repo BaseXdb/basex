@@ -147,6 +147,8 @@ public final class GUIOptions extends Options {
   public static final BooleanOption MARKLINE = new BooleanOption("MARKLINE", true);
   /** Save before executing file. */
   public static final BooleanOption SAVERUN = new BooleanOption("SAVERUN", false);
+  /** Parse project files. */
+  public static final BooleanOption PARSEPROJ = new BooleanOption("PARSEPROJ", true);
   /** Automatically add characters. */
   public static final BooleanOption AUTO = new BooleanOption("AUTO", true);
   /** Default file filter. */

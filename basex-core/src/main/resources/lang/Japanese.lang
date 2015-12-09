@@ -257,6 +257,7 @@ parse_archives       = アーカイブ内のファイルを解析する
 parse_dtds           = DTDとエントリーを解析する
 parse_quotes         = 引用符をパース
 parser_%             = % パーサ
+parse_project_files  = Parse project files
 parsing              = パース
 password             = パスワード
 paste                = 貼り付け

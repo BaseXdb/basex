@@ -54,8 +54,8 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
 
     // add popup
     new BaseXPopup(this, pv.gui,
-      new OpenCmd(), new OpenExternalCmd(), new TestCmd(),
-      null, new DeleteCmd(), new RenameCmd(), new NewDirCmd(), null,
+      new OpenCmd(), new OpenExternalCmd(), new TestCmd(), null,
+      new DeleteCmd(), new RenameCmd(), new NewDirCmd(), null,
       new RefreshCmd(), null, new CopyPathCmd()
     );
   }
@@ -168,7 +168,7 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
     RefreshCmd() { super(REFRESH, BaseXKeys.REFRESH); }
 
     @Override public void execute() {
-      view.reset();
+      view.refresh();
       selectedNode().refresh();
     }
 
@@ -209,7 +209,9 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
         }
       }
     }
-    @Override public boolean enabled(final GUI main) { return selectedNode() != null; }
+    @Override public boolean enabled(final GUI main) {
+      return selectedNode() != null;
+    }
   }
 
   /** Delete command. */
@@ -219,15 +221,16 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
 
     @Override public void execute() {
       final ProjectNode node = selectedNode();
-      if(BaseXDialog.confirm(view.gui, Util.info(DELETE_FILE_X, node.file))) {
+      final GUI gui = view.gui;
+      if(BaseXDialog.confirm(gui, Util.info(DELETE_FILE_X, node.file))) {
         final ProjectNode parent = (ProjectNode) node.getParent();
         // delete file or show error dialog
-        if(view.editor.delete(node.file)) {
+        if(gui.editor.delete(node.file)) {
           parent.refresh();
           setSelectionPath(parent.path());
-          view.reset();
+          view.refresh();
         } else {
-          BaseXDialog.error(view.gui, Util.info(FILE_NOT_DELETED_X, node.file));
+          BaseXDialog.error(gui, Util.info(FILE_NOT_DELETED_X, node.file));
         }
       }
     }
@@ -245,7 +248,7 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
 
     @Override public void execute() {
       startEditingAtPath(selectedNode().path());
-      view.reset();
+      view.refresh();
     }
 
     @Override public boolean enabled(final GUI main) {

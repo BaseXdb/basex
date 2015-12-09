@@ -15,6 +15,8 @@ abstract class ProjectNode extends DefaultMutableTreeNode {
   final ProjectView project;
   /** Path. */
   IOFile file;
+  /** Error flag. */
+  boolean error;
 
   /**
    * Constructor.
