@@ -186,22 +186,17 @@ public final class ProjectView extends BaseXPanel {
     if(reset) files.reset();
     filter.refresh(true);
 
-    System.out.println("[1] " + parsed + "/" + parse);
     if(gui.gopts.get(GUIOptions.PARSEPROJ) && (!parsed || parse)) {
       parsed = false;
       // do not parse if project view is hidden
-      System.out.println("[2] " + parse);
       if(getWidth() == 0) return;
-      System.out.println("[3]");
 
       final Thread t = new Thread() {
         @Override
         public void run() {
           try {
-            Performance p = new Performance();
             files.parse(root.file, gui.context);
             parsed = true;
-            System.out.println(p);
             refreshTree();
           } catch(final InterruptedException ignore) { }
         }

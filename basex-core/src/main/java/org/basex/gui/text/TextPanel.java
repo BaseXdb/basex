@@ -1003,17 +1003,22 @@ public class TextPanel extends BaseXPanel {
         }
       };
 
-      JMenuItem mi = new JMenuItem(Text.INPUT + Text.COLS + prefix);
-      mi.setEnabled(false);
-      pm.add(mi);
-      pm.addSeparator();
       for(final Entry<String, String> entry : tmp.entrySet()) {
-        mi = new JMenuItem("[" + entry.getKey() + "] " + entry.getValue());
+        final JMenuItem mi = new JMenuItem("[" + entry.getKey() + "] " + entry.getValue());
         pm.add(mi);
         mi.addActionListener(al);
       }
+      pm.addSeparator();
+      final JMenuItem mi = new JMenuItem(Text.INPUT + Text.COLS + prefix);
+      mi.setEnabled(false);
+      pm.add(mi);
+
       final int[] cursor = rend.cursor();
       pm.show(this, cursor[0], cursor[1]);
+
+      // highlight first entry
+      final MenuElement[] me = { pm, (JMenuItem) pm.getComponent(0) };
+      MenuSelectionManager.defaultManager().setSelectedPath(me);
     }
   }
 
