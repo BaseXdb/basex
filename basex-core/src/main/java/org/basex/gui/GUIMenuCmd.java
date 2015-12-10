@@ -179,7 +179,7 @@ public enum GUIMenuCmd implements GUICommand {
   C_NEXTERROR(NEXT_ERROR, "% PERIOD", false, false) {
     @Override
     public void execute(final GUI gui) {
-      gui.editor.jumpToError();
+      gui.editor.markError(true);
     }
 
     @Override

@@ -20,15 +20,14 @@ import org.basex.util.list.*;
 final class ProjectFiles {
   /** Maximum number of filtered hits (speeds up search). */
   private static final int MAXHITS = 256;
+  /** Files with errors. */
+  private StringList errors = new StringList();
   /** Current file cache (can be {@code null}). */
   private ProjectCache cache;
   /** Filter id. */
   private long filterId;
   /** Parse id. */
   private long parseId;
-
-  /** Files with errors. */
-  StringList errors = new StringList();
 
   /**
    * Returns the current file cache.
@@ -89,11 +88,11 @@ final class ProjectFiles {
   }
 
   /**
-   * Indicates is the cache is empty.
-   * @return result of check
+   * Returns paths to files with errors.
+   * @return file list
    */
-  boolean invalid() {
-    return cache == null;
+  StringList errors() {
+    return errors;
   }
 
   /**

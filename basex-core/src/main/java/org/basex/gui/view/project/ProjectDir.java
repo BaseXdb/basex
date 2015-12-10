@@ -34,11 +34,10 @@ final class ProjectDir extends ProjectNode {
   void expand() {
     removeAllChildren();
     // cache and sort directories and files
-    final ArrayList<IOFile> dirs = new ArrayList<>();
-    final ArrayList<IOFile> files = new ArrayList<>();
+    final ArrayList<IOFile> dirs = new ArrayList<>(), files = new ArrayList<>();
     final boolean hidden = project.gui.gopts.get(GUIOptions.HIDDENFILES);
-    for(final IOFile f : file.children()) {
-      if(hidden || !f.file().isHidden()) (f.isDir() ? dirs : files).add(f);
+    for(final IOFile child : file.children()) {
+      if(hidden || !child.file().isHidden()) (child.isDir() ? dirs : files).add(child);
     }
     Collections.sort(dirs, COMP);
     Collections.sort(files, COMP);

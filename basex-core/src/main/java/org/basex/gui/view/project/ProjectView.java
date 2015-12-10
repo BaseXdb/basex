@@ -149,10 +149,18 @@ public final class ProjectView extends BaseXPanel {
   }
 
   /**
+   * Returns the list of erroneous files.
+   * @return files
+   */
+  public StringList errors() {
+    return files.errors();
+  }
+
+  /**
    * Refreshes the tree component.
    */
   void refreshTree() {
-    final StringList sl = files.errors;
+    final StringList sl = files.errors();
     final Enumeration<?> en = root.depthFirstEnumeration();
     while(en.hasMoreElements()) {
       final ProjectNode node = (ProjectNode) en.nextElement();
@@ -161,9 +169,7 @@ public final class ProjectView extends BaseXPanel {
       final String path = node.file.path();
       boolean found = false;
       for(int s = 0; s < sl.size() && !found; s++) {
-        if(sl.get(s).startsWith(path)) {
-          found = true;
-        }
+        if(sl.get(s).startsWith(path)) found = true;
       }
       node.error = found;
     }

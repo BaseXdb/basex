@@ -419,7 +419,7 @@ public final class GUI extends JFrame {
   /**
    * Executes the specified command.
    * @param cmd command to be executed
-   * @param edit call from editor panel
+   * @param edit called from editor panel
    * @return success flag
    */
   private boolean exec(final Command cmd, final boolean edit) {
