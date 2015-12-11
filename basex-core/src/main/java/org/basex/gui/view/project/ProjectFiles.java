@@ -82,7 +82,6 @@ final class ProjectFiles {
    */
   void reset() {
     cache = null;
-    errors.clear();
     filterId = 0;
     parseId = 0;
   }
@@ -100,10 +99,10 @@ final class ProjectFiles {
    * @param file file filter
    * @param content content filter
    * @param root root directory
-   * @return ordered result set
+   * @return sorted file paths
    * @throws InterruptedException interruption
    */
-  TreeSet<String> filter(final String file, final String content, final IOFile root)
+  String[] filter(final String file, final String content, final IOFile root)
       throws InterruptedException {
 
     final long id = ++filterId;
@@ -131,7 +130,7 @@ final class ProjectFiles {
         filter(pttrn, search, i, results, exclude, pathSearch, pc, id);
       }
     }
-    return results;
+    return results.toArray(new String[results.size()]);
   }
 
   /**

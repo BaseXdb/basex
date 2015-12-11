@@ -263,7 +263,7 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
     OpenCmd() { super(OPEN, BaseXKeys.ENTER); }
 
     @Override public void execute() {
-      for(final ProjectNode node : selectedNodes()) view.open(node.file, null);
+      for(final ProjectNode node : selectedNodes()) view.open(node.file, "");
     }
 
     @Override public boolean enabled(final GUI main) {

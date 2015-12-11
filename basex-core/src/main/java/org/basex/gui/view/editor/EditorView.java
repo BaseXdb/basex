@@ -43,6 +43,8 @@ import org.xml.sax.*;
  * @author Christian Gruen
  */
 public final class EditorView extends View {
+  /** Delay for highlighting an error. */
+  private static final int SEARCH_DELAY = 200;
   /** Link pattern. */
   private static final Pattern LINK = Pattern.compile("(.*?), ([0-9]+)/([0-9]+)");
   /** Number of files in the history. */
@@ -677,17 +679,17 @@ public final class EditorView extends View {
       search.deactivate(true);
       // reopen single tab and focus project listener
       addTab();
-      new GUIThread() {
+      SwingUtilities.invokeLater(new Runnable() {
         @Override
         public void run() { project(); }
-      }.invoke();
+      });
     } else if(i + 1 == t) {
       // if necessary, activate last editor tab
       tabs.setSelectedIndex(i - 1);
-      new GUIThread() {
+      SwingUtilities.invokeLater(new Runnable() {
         @Override
         public void run() { getEditor().requestFocusInWindow(); }
-      }.invoke();
+      });
     }
     return true;
   }
@@ -705,7 +707,7 @@ public final class EditorView extends View {
           stop.setEnabled(true);
         }
       }
-    }, 200);
+    }, SEARCH_DELAY);
   }
 
   /**

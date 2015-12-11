@@ -6,6 +6,8 @@ import static org.basex.gui.layout.BaseXKeys.*;
 import java.awt.event.*;
 import java.io.*;
 
+import javax.swing.*;
+
 import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
@@ -59,12 +61,12 @@ public final class EditorArea extends TextPanel {
         gui.gopts.set(GUIOptions.WORKPATH, f.dir());
 
         // reload file if it has been changed
-        new GUIThread() {
+        SwingUtilities.invokeLater(new Runnable() {
           @Override
           public void run() {
             reopen(false);
           }
-        }.invoke();
+        });
       }
     });
   }
@@ -213,12 +215,12 @@ public final class EditorArea extends TextPanel {
    * @param string search string
    */
   public void jump(final String string) {
-    if(string != null) {
+    if(string.isEmpty()) {
+      search.deactivate(true);
+    } else {
       search.reset();
       search.activate(string, false);
       jump(SearchDir.CURRENT, true);
-    } else {
-      search.deactivate(true);
     }
     requestFocusInWindow();
   }

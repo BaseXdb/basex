@@ -111,7 +111,7 @@ final class DialogResources extends BaseXBack {
     add(sp, BorderLayout.CENTER);
     add(panel, BorderLayout.SOUTH);
 
-    new GUIThread() {
+    new Thread() {
       @Override
       public void run() {
         tree.setCursor(CURSORWAIT);
@@ -254,7 +254,7 @@ final class DialogResources extends BaseXBack {
       final TreeNode n = selection();
       if(n == null || !BaseXDialog.confirm(dialog.gui, DELETE_NODES)) return;
 
-      final GUIThread run = new GUIThread() {
+      final Runnable run = new Runnable() {
         @Override
         public void run() {
           refreshNewFolder(n.path());
@@ -284,7 +284,7 @@ final class DialogResources extends BaseXBack {
       if(!d.ok()) return;
 
       final String p = string(TreeNode.preparePath(token(d.input())));
-      final GUIThread run = new GUIThread() {
+      final Runnable run = new Runnable() {
         @Override
         public void run() {
           refreshNewFolder(p);

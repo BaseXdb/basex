@@ -9,8 +9,7 @@ import java.awt.datatransfer.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
-import java.util.Map.Entry;
-import java.util.Timer;
+import java.util.Map.*;
 
 import javax.swing.*;
 
@@ -18,7 +17,7 @@ import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.dialog.*;
 import org.basex.gui.layout.*;
-import org.basex.gui.text.SearchBar.SearchDir;
+import org.basex.gui.text.SearchBar.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.util.*;
@@ -30,9 +29,6 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public class TextPanel extends BaseXPanel {
-  /** Delay for highlighting an error. */
-  private static final int ERROR_DELAY = 500;
-
   /** Editor action. */
   public enum Action {
     /** Check for changes; do nothing if input has not changed. */
@@ -147,11 +143,11 @@ public class TextPanel extends BaseXPanel {
 
   /**
    * Returns a currently marked string if it does not extend over more than one line.
-   * @return search string or {@code null}
+   * @return search string
    */
   public String searchString() {
     final String string = editor.copy();
-    return string.isEmpty() || string.contains("\n") ? null : string;
+    return string.indexOf('\n') != -1 ? "" : string;
   }
 
   /**
@@ -258,14 +254,10 @@ public class TextPanel extends BaseXPanel {
     }
   }
 
-  /** Thread counter. */
-  private int errorID;
-
   /**
    * Removes the error marker.
    */
   public final void resetError() {
-    ++errorID;
     editor.error(-1);
     rend.repaint();
   }
@@ -275,13 +267,8 @@ public class TextPanel extends BaseXPanel {
    * @param pos start of optional error mark
    */
   public final void error(final int pos) {
-    final int eid = ++errorID;
     editor.error(pos);
-
-    new Timer(true).schedule(new TimerTask() {
-      @Override
-      public void run() { if(eid == errorID) rend.repaint(); }
-    }, ERROR_DELAY);
+    rend.repaint();
   }
 
   /**

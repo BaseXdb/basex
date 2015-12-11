@@ -5,6 +5,7 @@ import static org.basex.gui.GUIConstants.*;
 
 import java.awt.*;
 
+import javax.swing.*;
 import javax.swing.event.*;
 
 import org.basex.core.*;
@@ -186,14 +187,14 @@ public final class DialogProps extends BaseXDialog {
       final int idx = il.get(i);
       if(updated.contains(idx)) continue;
       updated.add(idx);
-      new GUIThread() {
+      SwingUtilities.invokeLater(new Runnable() {
         @Override
         public void run() {
           infos[idx].setText(val[idx] ? data.info(TYPES[idx], gui.context.options) :
             Token.token(HELP[idx]));
           updated.delete(idx);
         }
-      }.start();
+      });
     }
   }
 

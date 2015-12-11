@@ -146,9 +146,9 @@ public final class DialogFonts extends BaseXDialog {
    * Creates a list of mono-spaced fonts in a separate thread.
    */
   private void monoFonts() {
-    new GUIThread() {
+    new GUIWorker<Boolean>() {
       @Override
-      public void run() {
+      protected Boolean doInBackground() throws Exception {
         final Graphics g = getGraphics();
         final StringList monos = new StringList();
         for(final String name : fonts) {
@@ -156,8 +156,12 @@ public final class DialogFonts extends BaseXDialog {
           if(fm.charWidth(' ') == fm.charWidth('M')) monos.add(name);
         }
         monoFonts = monos.finish();
-        if(gui.gopts.get(GUIOptions.ONLYMONO)) action(onlyMono);
+        return gui.gopts.get(GUIOptions.ONLYMONO);
       }
-    }.start();
+      @Override
+      protected void done(final Boolean mono) {
+        if(mono) action(onlyMono);
+      }
+    }.execute();
   }
 }

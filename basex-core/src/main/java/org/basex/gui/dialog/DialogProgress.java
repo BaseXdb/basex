@@ -141,7 +141,7 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
    * @param post post-processing step
    * @param cmds commands to be run
    */
-  static void execute(final BaseXDialog dialog, final GUIThread post, final Command... cmds) {
+  static void execute(final BaseXDialog dialog, final Runnable post, final Command... cmds) {
     execute(dialog.gui, dialog, post, cmds);
   }
 
@@ -153,7 +153,7 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
    * @param post post-processing step
    * @param cmds commands to be run
    */
-  private static void execute(final GUI gui, final BaseXDialog dialog, final GUIThread post,
+  private static void execute(final GUI gui, final BaseXDialog dialog, final Runnable post,
       final Command... cmds) {
 
     for(final Command cmd : cmds) {
@@ -166,7 +166,7 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
         new DialogProgress(gui, cmd);
 
       // start command thread
-      new GUIThread() {
+      new Thread() {
         @Override
         public void run() {
           // execute command
@@ -203,6 +203,6 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
       else if(cmd.updating(gui.context)) gui.notify.update();
     }
     if(dialog != null) dialog.action(dialog);
-    if(post != null) post.start();
+    if(post != null) SwingUtilities.invokeLater(post);
   }
 }

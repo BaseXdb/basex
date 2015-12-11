@@ -4,7 +4,6 @@ import static org.basex.gui.GUIConstants.*;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.util.*;
 import java.util.regex.*;
 
 import org.basex.core.*;
@@ -91,14 +90,7 @@ final class ProjectFilter extends BaseXBack {
     contentFilter = content;
 
     final boolean filter = !file.isEmpty() || !content.isEmpty();
-    if(filter) {
-      new GUIThread() {
-        @Override
-        public void run() {
-          filter(file, content);
-        }
-      }.start();
-    }
+    if(filter) filter(file, content);
     project.showList(filter);
   }
 
@@ -151,21 +143,23 @@ final class ProjectFilter extends BaseXBack {
    * @param content content search string
    */
   private void filter(final String file, final String content) {
-    try {
-      filesFilter.setCursor(CURSORWAIT);
-      contentsFilter.setCursor(CURSORWAIT);
-      project.list.setCursor(CURSORWAIT);
+    filesFilter.setCursor(CURSORWAIT);
+    contentsFilter.setCursor(CURSORWAIT);
+    project.list.setCursor(CURSORWAIT);
 
-      final String pattern = file.isEmpty() ? project.gui.gopts.get(GUIOptions.FILES) : file;
-      final TreeSet<String> files = project.files.filter(pattern, content, project.root.file);
-      project.list.setElements(files.toArray(new String[files.size()]),
-          content.isEmpty() ? null : content);
-
-      filesFilter.setCursor(CURSORTEXT);
-      contentsFilter.setCursor(CURSORTEXT);
-      project.list.setCursor(CURSORARROW);
-    } catch(final InterruptedException ignore) {
-      // original icons will be restored by another thread
-    }
+    new GUIWorker<String[]>() {
+      @Override
+      protected String[] doInBackground() throws Exception {
+        final String pattern = file.isEmpty() ? project.gui.gopts.get(GUIOptions.FILES) : file;
+        return project.files.filter(pattern, content, project.root.file);
+      }
+      @Override
+      protected void done(final String[] files) {
+        project.list.setElements(files, content);
+        filesFilter.setCursor(CURSORTEXT);
+        contentsFilter.setCursor(CURSORTEXT);
+        project.list.setCursor(CURSORARROW);
+      }
+    }.execute();
   }
 }

@@ -197,7 +197,7 @@ public final class SearchBar extends BaseXBack {
       @Override
       public void actionPerformed(final ActionEvent e) {
         if(isVisible()) deactivate(true);
-        else activate(null, true);
+        else activate("", true);
       }
     });
     return button;
@@ -226,7 +226,6 @@ public final class SearchBar extends BaseXBack {
   /**
    * Activates the search bar.
    * @param string search string; triggers a new search if it differs from old string.
-   * Will be ignored if set to {@code null}
    * @param focus indicates if the search field should be focused
    */
   public void activate(final String string, final boolean focus) {
@@ -238,7 +237,7 @@ public final class SearchBar extends BaseXBack {
     if(focus) search.requestFocusInWindow();
 
     // set new, different search string
-    if(string != null && !new SearchContext(this, search.getText()).matches(string)) {
+    if(!string.isEmpty() && !new SearchContext(this, search.getText()).matches(string)) {
       search.setText(string);
       search.store();
       regex.setSelected(false);

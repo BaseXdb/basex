@@ -53,7 +53,7 @@ final class ProjectList extends JList<String> {
   /** Project view. */
   private final ProjectView project;
   /** Content search string. */
-  private String search;
+  private String search = "";
 
   /**
    * Constructor.
@@ -78,29 +78,24 @@ final class ProjectList extends JList<String> {
    * @param srch content search string
    */
   void setElements(final String[] list, final String srch) {
-    new GUIThread() {
-      @Override
-      public void run() {
-        // set new values and selections
-        if(changed(list)) {
-          // check which old values had been selected
-          final List<String> values = getSelectedValuesList();
-          final IntList il = new IntList();
-          for(final String value : values) {
-            final int is = list.length;
-            for(int i = 0; i < is; i++) {
-              if(value.equals(list[i])) {
-                il.add(i);
-                break;
-              }
-            }
+    // set new values and selections
+    if(changed(list)) {
+      // check which old values had been selected
+      final List<String> values = getSelectedValuesList();
+      final IntList il = new IntList();
+      for(final String value : values) {
+        final int is = list.length;
+        for(int i = 0; i < is; i++) {
+          if(value.equals(list[i])) {
+            il.add(i);
+            break;
           }
-          setListData(list);
-          setSelectedIndices(il.finish());
         }
-        search = srch;
       }
-    }.invoke();
+      setListData(list);
+      setSelectedIndices(il.finish());
+    }
+    search = srch;
   }
 
   /**

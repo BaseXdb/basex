@@ -135,14 +135,14 @@ public final class ProjectView extends BaseXPanel {
    * @param rename file has been renamed
    */
   public void save(final IOFile file, final boolean rename) {
-    new GUIThread() {
+    SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
         final IOFile path = file.normalize();
         if(path.path().startsWith(root.file.path())) refreshTree(path);
         refresh(rename, true);
       }
-    }.invoke();
+    });
   }
 
   /**
@@ -198,16 +198,18 @@ public final class ProjectView extends BaseXPanel {
       // do not parse if project view is hidden
       if(getWidth() == 0) return;
 
-      new GUIThread() {
+      new GUIWorker<Boolean>() {
         @Override
-        public void run() {
-          try {
-            files.parse(root.file, gui.context);
-            parsed = true;
-            refreshTree();
-          } catch(final InterruptedException ignore) { }
+        protected Boolean doInBackground() throws InterruptedException {
+          files.parse(root.file, gui.context);
+          parsed = true;
+          return parsed;
         }
-      }.start();
+        @Override
+        protected void done(final Boolean refresh) {
+          if(refresh) refreshTree();
+        }
+      }.execute();
     }
   }
 
@@ -307,12 +309,12 @@ public final class ProjectView extends BaseXPanel {
   void open(final IOFile file, final String search) {
     final EditorArea ea = gui.editor.open(file);
     if(ea == null) return;
-    new GUIThread() {
+    SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
         ea.jump(search);
       }
-    }.invoke();
+    });
   }
 
   /**

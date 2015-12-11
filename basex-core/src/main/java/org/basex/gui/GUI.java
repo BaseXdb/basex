@@ -403,7 +403,7 @@ public final class GUI extends JFrame {
   public void execute(final boolean edit, final Command... cmd) {
     // ignore command if updates take place
     if(updating) return;
-    new GUIThread() {
+    new Thread() {
       @Override
       public void run() {
         if(cmd.length == 0) info.setInfo("", null, true, true);
@@ -741,9 +741,9 @@ public final class GUI extends JFrame {
     // ignore snapshots and beta versions
     if(Strings.contains(Prop.VERSION, ' ')) return;
 
-    new GUIThread() {
+    new GUIWorker<Version>() {
       @Override
-      public void run() {
+      protected Version doInBackground() throws Exception {
         final Version disk = new Version(gopts.get(GUIOptions.UPDATEVERSION));
         final Version used = new Version(Prop.VERSION);
 
@@ -751,31 +751,32 @@ public final class GUI extends JFrame {
           // update version option to latest used version
           writeVersion(used);
         } else {
-          try {
-            final String page = Token.string(new IOUrl(Prop.VERSION_URL).read());
-            final Matcher m = Pattern.compile("^(Version )?([\\w\\d.]*?)( .*|$)",
-                Pattern.DOTALL).matcher(page);
-            if(m.matches()) {
-              final Version latest = new Version(m.group(2));
-              if(disk.compareTo(latest) < 0) {
-                if(BaseXDialog.confirm(GUI.this, Util.info(H_NEW_VERSION, Prop.NAME, latest))) {
-                  // jump to browser
-                  BaseXDialog.browse(GUI.this, Prop.UPDATE_URL);
-                } else {
-                  // don't show update dialog anymore if it has been rejected once
-                  writeVersion(latest);
-                }
-              }
-            }
-          } catch(final Exception ex) {
-            // ignore connection failure
+          final String page = Token.string(new IOUrl(Prop.VERSION_URL).read());
+          final Matcher m = Pattern.compile("^(Version )?([\\w\\d.]*?)( .*|$)",
+              Pattern.DOTALL).matcher(page);
+          if(m.matches()) {
+            final Version latest = new Version(m.group(2));
+            if(disk.compareTo(latest) < 0) return latest;
           }
         }
+        return null;
       }
+
+      @Override
+      protected void done(final Version latest) {
+        if(BaseXDialog.confirm(GUI.this, Util.info(H_NEW_VERSION, Prop.NAME, latest))) {
+          // jump to browser
+          BaseXDialog.browse(GUI.this, Prop.UPDATE_URL);
+        } else {
+          // don't show update dialog anymore if it has been rejected once
+          writeVersion(latest);
+        }
+      }
+
       private void writeVersion(final Version version) {
         gopts.set(GUIOptions.UPDATEVERSION, version.toString());
         gopts.write();
       }
-    }.start();
+    }.execute();
   }
 }

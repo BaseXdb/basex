@@ -4,6 +4,9 @@ import static org.basex.core.Text.*;
 
 import java.awt.*;
 import java.util.*;
+import java.util.Timer;
+
+import javax.swing.*;
 
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
@@ -56,13 +59,13 @@ public final class DialogMem extends BaseXDialog {
   @Override
   public void setVisible(final boolean v) {
     super.setVisible(v);
-    new GUIThread() {
+    SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
         // focus GC button
         gc.requestFocusInWindow();
       }
-    }.invoke();
+    });
   }
 
   @Override

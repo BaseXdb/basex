@@ -80,7 +80,7 @@ public final class TableView extends View {
     } else {
       if(!more) tdata.resetFilter();
       gui.updating = true;
-      new GUIThread() {
+      new Thread() {
         @Override
         public void run() {
           // current zoom step

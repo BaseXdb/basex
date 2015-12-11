@@ -76,7 +76,7 @@ final class DialogAdd extends BaseXBack {
 
     if(comp == add) {
       general.setOptions();
-      final GUIThread run = new GUIThread() {
+      final Runnable run = new Runnable() {
         @Override
         public void run() {
           dialog.resources.refreshNewFolder(trg);

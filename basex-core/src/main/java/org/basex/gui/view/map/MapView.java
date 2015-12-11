@@ -218,7 +218,7 @@ public final class MapView extends View {
       repaint();
     } else {
       zoomStep = ZOOMSIZE;
-      new GUIThread() {
+      new Thread() {
         @Override
         public void run() {
           focused = null;
