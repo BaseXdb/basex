@@ -3,11 +3,9 @@ package org.basex.gui.dialog;
 import java.awt.*;
 import java.util.*;
 
-import javax.swing.*;
-
 import org.basex.core.*;
 import org.basex.gui.*;
-import org.basex.gui.GUIConstants.Msg;
+import org.basex.gui.GUIConstants.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.text.*;
 import org.basex.util.*;
@@ -50,7 +48,7 @@ public final class DialogMessage extends BaseXDialog {
       list.add(Text.B_YES);
       list.add(Text.B_NO);
       Collections.addAll(list, buttons);
-      if(ic == Msg.YESNOCANCEL) list.add(Text.CANCEL);
+      if(ic == Msg.YESNOCANCEL) list.add(Text.B_CANCEL);
     } else {
       Collections.addAll(list, buttons);
       list.add(Text.B_OK);
@@ -58,13 +56,12 @@ public final class DialogMessage extends BaseXDialog {
     final BaseXBack bttns = newButtons(list.toArray(new Object[list.size()]));
     set(bttns, BorderLayout.SOUTH);
 
-    SwingUtilities.invokeLater(new Runnable() {
+    new GUIThread() {
       @Override
       public void run() {
         ((Container) bttns.getComponent(0)).getComponent(0).requestFocusInWindow();
       }
-    });
-
+    }.invoke();
     finish(null);
   }
 
@@ -72,7 +69,7 @@ public final class DialogMessage extends BaseXDialog {
   public void action(final Object cmp) {
     final BaseXButton button = (BaseXButton) cmp;
     final String text = button.getText();
-    if(text.equals(Text.CANCEL)) cancel();
+    if(text.equals(Text.B_CANCEL)) cancel();
 
     action = text;
     if(text.equals(Text.NO)) {

@@ -183,7 +183,7 @@ public final class BaseXScrollBar extends BaseXPanel {
     // start dragging
     if(sliding || animated) return;
 
-    final Thread t = new Thread() {
+    new GUIThread() {
       @Override
       public void run() {
         // scroll up/down/move slider
@@ -207,9 +207,7 @@ public final class BaseXScrollBar extends BaseXPanel {
           }
         }
       }
-    };
-    t.setDaemon(true);
-    t.start();
+    }.start();
   }
 
   @Override

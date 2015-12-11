@@ -1,7 +1,5 @@
 package org.basex.gui.layout;
 
-import javax.swing.*;
-
 /**
  * This class can be overwritten to define code snippets that are to be evaluated
  * after all pending events.
@@ -32,11 +30,11 @@ public abstract class GUICode {
    */
   public final void invokeLater(final Object arg) {
     final int c = ++counter;
-    SwingUtilities.invokeLater(new Runnable() {
+    new GUIThread() {
       @Override
       public void run() {
         if(c == counter) execute(arg);
       }
-    });
+    }.invoke();
   }
 }

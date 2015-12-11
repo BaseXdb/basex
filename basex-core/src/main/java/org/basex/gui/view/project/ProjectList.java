@@ -78,7 +78,7 @@ final class ProjectList extends JList<String> {
    * @param srch content search string
    */
   void setElements(final String[] list, final String srch) {
-    SwingUtilities.invokeLater(new Runnable() {
+    new GUIThread() {
       @Override
       public void run() {
         // set new values and selections
@@ -100,7 +100,7 @@ final class ProjectList extends JList<String> {
         }
         search = srch;
       }
-    });
+    }.invoke();
   }
 
   /**

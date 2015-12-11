@@ -6,13 +6,11 @@ import static org.basex.gui.layout.BaseXKeys.*;
 import java.awt.event.*;
 import java.io.*;
 
-import javax.swing.*;
-
 import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.text.*;
-import org.basex.gui.text.SearchBar.SearchDir;
+import org.basex.gui.text.SearchBar.*;
 import org.basex.io.*;
 import org.basex.util.*;
 
@@ -61,12 +59,12 @@ public final class EditorArea extends TextPanel {
         gui.gopts.set(GUIOptions.WORKPATH, f.dir());
 
         // reload file if it has been changed
-        SwingUtilities.invokeLater(new Runnable() {
+        new GUIThread() {
           @Override
           public void run() {
             reopen(false);
           }
-        });
+        }.invoke();
       }
     });
   }

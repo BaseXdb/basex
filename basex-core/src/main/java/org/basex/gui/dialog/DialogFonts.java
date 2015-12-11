@@ -4,8 +4,6 @@ import static org.basex.core.Text.*;
 
 import java.awt.*;
 
-import javax.swing.*;
-
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.util.list.*;
@@ -16,7 +14,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public final class DialogFonts extends BaseXDialog implements Runnable {
+public final class DialogFonts extends BaseXDialog {
   /** Predefined font sizes. */
   private static final String[] SIZES =
     { "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20",
@@ -78,7 +76,7 @@ public final class DialogFonts extends BaseXDialog implements Runnable {
     set(p, BorderLayout.CENTER);
     finish(gopts.get(GUIOptions.FONTSLOC));
 
-    SwingUtilities.invokeLater(this);
+    monoFonts();
     action(onlyMono);
   }
 
@@ -144,9 +142,11 @@ public final class DialogFonts extends BaseXDialog implements Runnable {
     }
   }
 
-  @Override
-  public void run() {
-    final Thread t = new Thread() {
+  /**
+   * Creates a list of mono-spaced fonts in a separate thread.
+   */
+  private void monoFonts() {
+    new GUIThread() {
       @Override
       public void run() {
         final Graphics g = getGraphics();
@@ -158,8 +158,6 @@ public final class DialogFonts extends BaseXDialog implements Runnable {
         monoFonts = monos.finish();
         if(gui.gopts.get(GUIOptions.ONLYMONO)) action(onlyMono);
       }
-    };
-    t.setDaemon(true);
-    t.start();
+    }.start();
   }
 }

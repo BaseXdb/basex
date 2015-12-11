@@ -968,10 +968,10 @@ public interface Text {
   /** Button: " no ". */
   String B_NO = "  " + lang("no") + "  ";
   /** Button: "cancel". */
-  String CANCEL = lang("cancel");
-  /** Button for refreshing. */
-  String REFRESH = lang("refresh");
+  String B_CANCEL = lang("cancel");
 
+  /** "Refresh". */
+  String REFRESH = lang("refresh");
   /** "Find". */
   String FIND = lang("find");
   /** "Find files". */

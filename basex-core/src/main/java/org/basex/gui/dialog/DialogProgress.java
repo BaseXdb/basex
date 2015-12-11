@@ -77,7 +77,7 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
     s.add(m, BorderLayout.WEST);
 
     if(cmd.stoppable()) {
-      final BaseXButton cancel = new BaseXButton(CANCEL, this);
+      final BaseXButton cancel = new BaseXButton(B_CANCEL, this);
       s.add(cancel, BorderLayout.EAST);
     }
     set(s, BorderLayout.SOUTH);
@@ -141,19 +141,19 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
    * @param post post-processing step
    * @param cmds commands to be run
    */
-  static void execute(final BaseXDialog dialog, final Runnable post, final Command... cmds) {
+  static void execute(final BaseXDialog dialog, final GUIThread post, final Command... cmds) {
     execute(dialog.gui, dialog, post, cmds);
   }
 
   /**
-   * Runs the specified commands, decorated by a progress dialog, and
-   * calls {@link BaseXDialog#action} if the dialog is closed.
+   * Runs the specified commands, decorated by a progress dialog, and calls
+   * {@link BaseXDialog#action} if the dialog is closed.
    * @param gui reference to the main window
    * @param dialog reference to the dialog window (may be {@code null})
    * @param post post-processing step
    * @param cmds commands to be run
    */
-  private static void execute(final GUI gui, final BaseXDialog dialog, final Runnable post,
+  private static void execute(final GUI gui, final BaseXDialog dialog, final GUIThread post,
       final Command... cmds) {
 
     for(final Command cmd : cmds) {
@@ -166,7 +166,7 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
         new DialogProgress(gui, cmd);
 
       // start command thread
-      new Thread() {
+      new GUIThread() {
         @Override
         public void run() {
           // execute command
@@ -203,6 +203,6 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
       else if(cmd.updating(gui.context)) gui.notify.update();
     }
     if(dialog != null) dialog.action(dialog);
-    if(post != null) post.run();
+    if(post != null) post.start();
   }
 }

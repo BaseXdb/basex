@@ -21,7 +21,7 @@ final class ProjectFiles {
   /** Maximum number of filtered hits (speeds up search). */
   private static final int MAXHITS = 256;
   /** Files with errors. */
-  private StringList errors = new StringList();
+  private TreeMap<String, InputInfo> errors = new TreeMap<>();
   /** Current file cache (can be {@code null}). */
   private ProjectCache cache;
   /** Filter id. */
@@ -82,7 +82,7 @@ final class ProjectFiles {
    */
   void reset() {
     cache = null;
-    errors.reset();
+    errors.clear();
     filterId = 0;
     parseId = 0;
   }
@@ -91,7 +91,7 @@ final class ProjectFiles {
    * Returns paths to files with errors.
    * @return file list
    */
-  StringList errors() {
+  TreeMap<String, InputInfo> errors() {
     return errors;
   }
 
@@ -143,7 +143,7 @@ final class ProjectFiles {
   void parse(final IOFile root, final Context ctx) throws InterruptedException {
     final long id = ++parseId;
     final HashSet<String> parsed = new HashSet<>();
-    final StringList errs = new StringList();
+    final TreeMap<String, InputInfo> errs = new TreeMap<>();
 
     // collect files to be parsed
     final ProjectCache pc = cache(root);
@@ -170,7 +170,9 @@ final class ProjectFiles {
           for(final byte[] mod : qc.modParsed) parsed.add(Token.string(mod));
         } catch(final QueryException ex) {
           // parsing failed: remember path
-          errs.add(path);
+          final InputInfo ii = ex.info();
+          errs.put(path, ii);
+          parsed.add(ii.path());
         }
       } catch(final IOException ex) {
         // file may not be accessible

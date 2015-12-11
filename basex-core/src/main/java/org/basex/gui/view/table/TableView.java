@@ -23,7 +23,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public final class TableView extends View implements Runnable {
+public final class TableView extends View {
   /** Zoom table. */
   private static final double[] ZOOM = {
     1, .99, .98, .97, 1, 1.03, 1.05, .9, .8, .6, .35, .18, .13, .09, .05, .03
@@ -80,9 +80,20 @@ public final class TableView extends View implements Runnable {
     } else {
       if(!more) tdata.resetFilter();
       gui.updating = true;
-      final Thread t = new Thread(this);
-      t.setDaemon(true);
-      t.start();
+      new GUIThread() {
+        @Override
+        public void run() {
+          // current zoom step
+          int zoomstep = ZOOM.length;
+          while(--zoomstep >= 0) {
+            scroll.height(tdata.rows.size() * tdata.rowH(ZOOM[zoomstep]));
+            repaint();
+            Performance.sleep(25);
+          }
+          gui.updating = false;
+          focus();
+        }
+      }.start();
     }
   }
 
@@ -141,19 +152,6 @@ public final class TableView extends View implements Runnable {
   public void paintComponent(final Graphics g) {
     super.paintComponent(g);
     if(tdata.rows == null && visible()) refreshInit();
-  }
-
-  @Override
-  public void run() {
-    // current zoom step
-    int zoomstep = ZOOM.length;
-    while(--zoomstep >= 0) {
-      scroll.height(tdata.rows.size() * tdata.rowH(ZOOM[zoomstep]));
-      repaint();
-      Performance.sleep(25);
-    }
-    gui.updating = false;
-    focus();
   }
 
   /**

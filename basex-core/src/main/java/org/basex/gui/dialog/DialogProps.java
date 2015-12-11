@@ -186,7 +186,7 @@ public final class DialogProps extends BaseXDialog {
       final int idx = il.get(i);
       if(updated.contains(idx)) continue;
       updated.add(idx);
-      new Thread() {
+      new GUIThread() {
         @Override
         public void run() {
           infos[idx].setText(val[idx] ? data.info(TYPES[idx], gui.context.options) :

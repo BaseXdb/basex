@@ -403,17 +403,14 @@ public final class GUI extends JFrame {
   public void execute(final boolean edit, final Command... cmd) {
     // ignore command if updates take place
     if(updating) return;
-
-    final Thread t = new Thread() {
+    new GUIThread() {
       @Override
       public void run() {
         if(cmd.length == 0) info.setInfo("", null, true, true);
         for(final Command c : cmd)
           if(!exec(c, edit)) break;
       }
-    };
-    t.setDaemon(true);
-    t.start();
+    }.start();
   }
 
   /**
@@ -744,7 +741,7 @@ public final class GUI extends JFrame {
     // ignore snapshots and beta versions
     if(Strings.contains(Prop.VERSION, ' ')) return;
 
-    final Thread t = new Thread() {
+    new GUIThread() {
       @Override
       public void run() {
         final Version disk = new Version(gopts.get(GUIOptions.UPDATEVERSION));
@@ -775,17 +772,10 @@ public final class GUI extends JFrame {
           }
         }
       }
-
-      /**
-       * Writes a version to the options.
-       * @param version version
-       */
       private void writeVersion(final Version version) {
         gopts.set(GUIOptions.UPDATEVERSION, version.toString());
         gopts.write();
       }
-    };
-    t.setDaemon(true);
-    SwingUtilities.invokeLater(t);
+    }.start();
   }
 }

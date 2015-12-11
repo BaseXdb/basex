@@ -21,8 +21,8 @@ import org.basex.core.parse.*;
 import org.basex.gui.*;
 import org.basex.gui.dialog.*;
 import org.basex.gui.layout.*;
-import org.basex.gui.layout.BaseXFileChooser.Mode;
-import org.basex.gui.layout.BaseXLayout.DropHandler;
+import org.basex.gui.layout.BaseXFileChooser.*;
+import org.basex.gui.layout.BaseXLayout.*;
 import org.basex.gui.text.*;
 import org.basex.gui.text.TextPanel.Action;
 import org.basex.gui.view.*;
@@ -619,9 +619,9 @@ public final class EditorView extends View {
         } catch(final InputException ex) {
           if(valid) {
             valid = false;
-            final String action = BaseXDialog.yesNoCancel(gui, H_FILE_BINARY);
-            if(action == null) return null;
-            if(action == YES) {
+            final String button = BaseXDialog.yesNoCancel(gui, H_FILE_BINARY);
+            if(button == null) return null;
+            if(button == B_YES) {
               try {
                 file.open();
               } catch(final IOException ioex) {
@@ -677,17 +677,17 @@ public final class EditorView extends View {
       search.deactivate(true);
       // reopen single tab and focus project listener
       addTab();
-      SwingUtilities.invokeLater(new Runnable() {
+      new GUIThread() {
         @Override
         public void run() { project(); }
-      });
+      }.invoke();
     } else if(i + 1 == t) {
       // if necessary, activate last editor tab
       tabs.setSelectedIndex(i - 1);
-      SwingUtilities.invokeLater(new Runnable() {
+      new GUIThread() {
         @Override
         public void run() { getEditor().requestFocusInWindow(); }
-      });
+      }.invoke();
     }
     return true;
   }
@@ -776,9 +776,9 @@ public final class EditorView extends View {
     final String path;
     final boolean error = ii == null;
     if(error) {
-      final StringList errors = project.errors();
+      final TreeMap<String, InputInfo> errors = project.errors();
       if(errors.isEmpty()) return;
-      path = errors.get(0);
+      path = errors.get(errors.keySet().iterator().next()).path();
     } else {
       path = ii.path();
     }

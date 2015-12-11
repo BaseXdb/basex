@@ -166,7 +166,7 @@ public abstract class BaseXDialog extends JDialog {
    * @return button list
    */
   protected BaseXBack okCancel() {
-    return newButtons(B_OK, CANCEL);
+    return newButtons(B_OK, B_CANCEL);
   }
 
   /**
@@ -218,7 +218,7 @@ public abstract class BaseXDialog extends JDialog {
    * @param gui parent reference
    * @param text text
    * @param buttons additional buttons
-   * @return true if dialog was confirmed
+   * @return chosen action (button text): {@link #B_YES}, {@link #B_NO}, {@link #B_CANCEL}
    */
   public static String yesNoCancel(final GUI gui, final String text, final String... buttons) {
     return new DialogMessage(gui, text.trim(), Msg.YESNOCANCEL, buttons).action();
@@ -228,7 +228,7 @@ public abstract class BaseXDialog extends JDialog {
    * Static yes/no dialog.
    * @param gui parent reference
    * @param text text
-   * @return true if dialog was confirmed
+   * @return {@code true} if dialog was confirmed
    */
   public static boolean confirm(final GUI gui, final String text) {
     return B_YES.equals(new DialogMessage(gui, text.trim(), Msg.QUESTION).action());

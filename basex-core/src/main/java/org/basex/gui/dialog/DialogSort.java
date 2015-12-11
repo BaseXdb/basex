@@ -39,7 +39,7 @@ public final class DialogSort extends BaseXDialog {
     p.add(merge);
     set(p, BorderLayout.CENTER);
 
-    set(newButtons(B_OK, CANCEL), BorderLayout.SOUTH);
+    set(newButtons(B_OK, B_CANCEL), BorderLayout.SOUTH);
     action(null);
     finish(null);
   }

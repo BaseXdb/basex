@@ -15,7 +15,6 @@ import org.basex.gui.layout.BaseXFileChooser.*;
 import org.basex.gui.view.editor.*;
 import org.basex.io.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Project file tree.
@@ -136,23 +135,21 @@ public final class ProjectView extends BaseXPanel {
    * @param rename file has been renamed
    */
   public void save(final IOFile file, final boolean rename) {
-    final Thread t = new Thread() {
+    new GUIThread() {
       @Override
       public void run() {
         final IOFile path = file.normalize();
         if(path.path().startsWith(root.file.path())) refreshTree(path);
         refresh(rename, true);
       }
-    };
-    t.setDaemon(true);
-    t.start();
+    }.invoke();
   }
 
   /**
    * Returns the list of erroneous files.
    * @return files
    */
-  public StringList errors() {
+  public TreeMap<String, InputInfo> errors() {
     return files.errors();
   }
 
@@ -160,7 +157,8 @@ public final class ProjectView extends BaseXPanel {
    * Refreshes the tree component.
    */
   void refreshTree() {
-    final StringList sl = files.errors();
+    final TreeMap<String, InputInfo> errs = files.errors();
+    final String[] paths = errs.keySet().toArray(new String[errs.size()]);
     final Enumeration<?> en = root.depthFirstEnumeration();
     while(en.hasMoreElements()) {
       final ProjectNode node = (ProjectNode) en.nextElement();
@@ -168,8 +166,11 @@ public final class ProjectView extends BaseXPanel {
 
       final String path = node.file.path();
       boolean found = false;
-      for(int s = 0; s < sl.size() && !found; s++) {
-        if(sl.get(s).startsWith(path)) found = true;
+      for(final String p : paths) {
+        if(p.startsWith(path)) {
+          found = true;
+          break;
+        }
       }
       node.error = found;
     }
@@ -197,7 +198,7 @@ public final class ProjectView extends BaseXPanel {
       // do not parse if project view is hidden
       if(getWidth() == 0) return;
 
-      final Thread t = new Thread() {
+      new GUIThread() {
         @Override
         public void run() {
           try {
@@ -206,9 +207,7 @@ public final class ProjectView extends BaseXPanel {
             refreshTree();
           } catch(final InterruptedException ignore) { }
         }
-      };
-      t.setDaemon(true);
-      t.start();
+      }.start();
     }
   }
 
@@ -308,14 +307,12 @@ public final class ProjectView extends BaseXPanel {
   void open(final IOFile file, final String search) {
     final EditorArea ea = gui.editor.open(file);
     if(ea == null) return;
-
-    // delay search and focus request (avoid keyTyped event to be handled in editor)
-    SwingUtilities.invokeLater(new Runnable() {
+    new GUIThread() {
       @Override
       public void run() {
         ea.jump(search);
       }
-    });
+    }.invoke();
   }
 
   /**

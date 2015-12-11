@@ -51,7 +51,7 @@ final class DialogInstallURL extends BaseXDialog {
 
     p = new BaseXBack(new BorderLayout());
     p.add(link, BorderLayout.WEST);
-    buttons = newButtons(B_OK, CANCEL);
+    buttons = newButtons(B_OK, B_CANCEL);
     p.add(buttons, BorderLayout.EAST);
 
     set(p, BorderLayout.SOUTH);

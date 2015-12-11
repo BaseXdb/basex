@@ -92,14 +92,12 @@ final class ProjectFilter extends BaseXBack {
 
     final boolean filter = !file.isEmpty() || !content.isEmpty();
     if(filter) {
-      final Thread t = new Thread() {
+      new GUIThread() {
         @Override
         public void run() {
           filter(file, content);
         }
-      };
-      t.setDaemon(true);
-      t.start();
+      }.start();
     }
     project.showList(filter);
   }

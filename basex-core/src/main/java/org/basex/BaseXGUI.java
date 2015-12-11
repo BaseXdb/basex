@@ -63,13 +63,12 @@ public final class BaseXGUI extends Main {
 
     // read options
     final GUIOptions gopts = new GUIOptions();
-
     // initialize look and feel
     init(gopts);
     // initialize fonts and colors
     GUIConstants.init(gopts);
 
-    SwingUtilities.invokeLater(new Runnable() {
+    new GUIThread() {
       @Override
       public void run() {
         // open main window
@@ -93,7 +92,7 @@ public final class BaseXGUI extends Main {
         }
         gui.editor.init(xqfiles);
       }
-    });
+    }.invoke();
 
     // guarantee correct shutdown of database context
     Runtime.getRuntime().addShutdownHook(new Thread() {

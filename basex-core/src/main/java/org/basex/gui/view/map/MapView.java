@@ -27,7 +27,7 @@ import org.basex.util.list.*;
  * @author Joerg Hauser
  * @author Bastian Lemke
  */
-public final class MapView extends View implements Runnable {
+public final class MapView extends View {
   /** Dynamic zooming steps. */
   private static final int[] ZS = { 0, 0, 0, 0, 20, 80, 180, 320, 540, 840,
       1240, 1740, 2380, 3120, 4000, 4980, 5980, 6860, 7600, 8240, 8740, 9140,
@@ -218,30 +218,28 @@ public final class MapView extends View implements Runnable {
       repaint();
     } else {
       zoomStep = ZOOMSIZE;
-      final Thread t = new Thread(this);
-      t.setDaemon(true);
-      t.start();
+      new GUIThread() {
+        @Override
+        public void run() {
+          focused = null;
+
+          // run zooming
+          while(zoomStep > 1) {
+            Performance.sleep(zoomSpeed);
+            --zoomStep;
+            repaint();
+          }
+          // wait until current painting is finished
+          while(gui.painting) Performance.sleep(zoomSpeed);
+
+          // remove old rectangle and repaint map
+          zoomStep = 0;
+          gui.updating = false;
+          focus();
+          repaint();
+        }
+      }.start();
     }
-  }
-
-  @Override
-  public void run() {
-    focused = null;
-
-    // run zooming
-    while(zoomStep > 1) {
-      Performance.sleep(zoomSpeed);
-      --zoomStep;
-      repaint();
-    }
-    // wait until current painting is finished
-    while(gui.painting) Performance.sleep(zoomSpeed);
-
-    // remove old rectangle and repaint map
-    zoomStep = 0;
-    gui.updating = false;
-    focus();
-    repaint();
   }
 
   /**
