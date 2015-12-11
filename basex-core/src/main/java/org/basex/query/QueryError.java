@@ -995,6 +995,12 @@ public enum QueryError {
   STRBIN_X_X(XPTY, 4, "String or binary expected, % found: %."),
   /** XPTY0004. */
   INVALIDOPTION_X(XPTY, 4, "Unknown option '%'."),
+  /** XPTY0004. */
+  FUNCUP_X(XPTY, 4, "Function must not be updating: %."),
+  /** XPTY0004. */
+  FUNCUP(XPTY, 4, "Function must not be updating."),
+  /** XPTY0004. */
+  FUNCNOTUP(XPTY, 4, "Function is not updating."),
 
   /** XPTY0018. */
   EVALNODESVALS(XPTY, 18, "Path yields both nodes and atomic values."),
@@ -1212,11 +1218,6 @@ public enum QueryError {
   UPATTELM_X(XUDY, 30, "Attribute cannot be added to %."),
   /** XUDY0031. */
   UPURIDUP_X(XUDY, 31, "URI '%' is addressed multiple times."),
-
-  /** XUDY0032 (WIP). */
-  UPFUNCNOTUP(XUDY, 32, "Function is not updating."),
-  /** XUST0043. */
-  UPFUNCUP(XUDY, 32, "Function is updating; use 'updating' keyword."),
 
   /** XUST0001. */
   UPNOT_X(XUST, 1, "%: no updating expression allowed."),

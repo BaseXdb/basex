@@ -94,7 +94,7 @@ public final class DynFuncCall extends FuncCall {
       final XQFunctionExpr fe = (XQFunctionExpr) f;
       if(!(f instanceof FuncItem && comesFrom((FuncItem) f))) {
         if(!sc.mixUpdates && upd != fe.annotations().contains(Annotation.UPDATING))
-          throw (upd ? UPFUNCNOTUP : UPFUNCUP).get(info);
+          throw (upd ? FUNCNOTUP : FUNCUP).get(info);
 
         final Expr[] args = Arrays.copyOf(exprs, ar);
         final Expr in = fe.inlineExpr(args, qc, scp, info);
@@ -177,7 +177,7 @@ public final class DynFuncCall extends FuncCall {
       throw INVARITY_X_X_X_X.get(info, e, ar, ar == 1 ? "" : "s", f.arity());
     }
     if(!sc.mixUpdates && upd != f.annotations().contains(Annotation.UPDATING))
-      throw (upd ? UPFUNCNOTUP : UPFUNCUP).get(info);
+      throw (upd ? FUNCNOTUP : FUNCUP).get(info);
 
     return f;
   }

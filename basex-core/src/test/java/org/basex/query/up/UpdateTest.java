@@ -1066,6 +1066,16 @@ public final class UpdateTest extends AdvancedQueryTest {
   }
 
   /**
+   * Reject updating functions in built-in higher-order function.
+   */
+  @Test
+  public void updatingHof() {
+    error(FOR_EACH.args("<a/>", " db:output#1"), FUNCUP_X);
+    error(FOR_EACH_PAIR.args("<a/>", "<b/>", " db:output#1"), FUNCUP_X);
+    error(APPLY.args(" db:output#1", " <b/>"), FUNCUP_X);
+  }
+
+  /**
    * Replaces a node with two others.
    */
   @Test
@@ -1156,25 +1166,25 @@ public final class UpdateTest extends AdvancedQueryTest {
     // updating annotation is ignored
     query("%updating function() { 1 }()", "1");
 
-    error("function() { delete node <a/> }()", UPFUNCUP);
-    error("updating %updating function() { 1 }()", UPFUNCNOTUP);
+    error("function() { delete node <a/> }()", FUNCUP);
+    error("updating %updating function() { 1 }()", FUNCNOTUP);
 
-    error("db:output(?)(<a/>)", UPFUNCUP);
-    error("db:output#1(<a/>)", UPFUNCUP);
-    error("%updating function($a) { db:output($a) }(1)", UPFUNCUP);
-    error("declare updating function local:a() { () }; local:a#0()", UPFUNCUP);
+    error("db:output(?)(<a/>)", FUNCUP);
+    error("db:output#1(<a/>)", FUNCUP);
+    error("%updating function($a) { db:output($a) }(1)", FUNCUP);
+    error("declare updating function local:a() { () }; local:a#0()", FUNCUP);
 
     query("declare function local:a() { local:b#0 };"
         + "declare updating function local:b() { db:output('1') }; updating local:a()()", "1");
     error("declare function local:a() { local:b#0 };"
-        + "declare updating function local:b() { db:output('1') }; local:a()()", UPFUNCUP);
+        + "declare updating function local:b() { db:output('1') }; local:a()()", FUNCUP);
 
-    error("updating count(?)(1)", UPFUNCNOTUP);
-    error("updating count#1(1)", UPFUNCNOTUP);
-    error("updating function($a) { count($a) }(1)", UPFUNCNOTUP);
-    error("declare function local:a() { () }; updating local:a#0()", UPFUNCNOTUP);
+    error("updating count(?)(1)", FUNCNOTUP);
+    error("updating count#1(1)", FUNCNOTUP);
+    error("updating function($a) { count($a) }(1)", FUNCNOTUP);
+    error("declare function local:a() { () }; updating local:a#0()", FUNCNOTUP);
     error("declare function local:a() { local:b#0 };"
-        + "declare function local:b() { count('1') }; updating local:a()()", UPFUNCNOTUP);
+        + "declare function local:b() { count('1') }; updating local:a()()", FUNCNOTUP);
   }
 
   /** Test method. */

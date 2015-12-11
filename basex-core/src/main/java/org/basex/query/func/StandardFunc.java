@@ -16,6 +16,7 @@ import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
+import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -363,9 +364,10 @@ public abstract class StandardFunc extends Arr {
   protected FItem checkArity(final Expr e, final int a, final QueryContext qc)
       throws QueryException {
 
-    final FItem it = toFunc(e, qc);
-    if(it.arity() == a) return it;
-    throw castError(info, it, FuncType.arity(a));
+    final FItem fun = toFunc(e, qc);
+    if(fun.annotations().contains(Annotation.UPDATING)) throw FUNCUP_X.get(info, fun);
+    if(fun.arity() == a) return fun;
+    throw castError(info, fun, FuncType.arity(a));
   }
 
   /**
