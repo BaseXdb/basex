@@ -1,6 +1,5 @@
 package org.basex.index.value;
 
-import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
@@ -33,13 +32,15 @@ final class DiskValuesMerger {
    * Constructor.
    * @param data data reference
    * @param text text flag
+   * @param tokenize tokenizing index
    * @param i merge id
    * @throws IOException I/O exception
    */
-  DiskValuesMerger(final Data data, final boolean text, final int i) throws IOException {
-    pref = (text ? DATATXT : DATAATV) + i;
+  DiskValuesMerger(final Data data, final boolean text, final boolean tokenize, final int i)
+      throws IOException {
+    pref = DiskValues.getFileSuffix(text, tokenize) + i;
     dk = new DataInput(data.meta.dbfile(pref + 't'));
-    dv = new DiskValues(data, text, pref);
+    dv = new DiskValues(data, text, tokenize, pref);
     this.data = data;
     next();
   }

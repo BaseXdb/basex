@@ -26,6 +26,8 @@ public abstract class IndexBuilder extends Proc {
   protected final int size;
   /** Node type to index (text/attributes). */
   protected final boolean text;
+  /** Tokenize index values. */
+  protected final boolean tokenize;
 
   /** Number of index operations to perform before writing a partial index to disk. */
   private final int splitSize;
@@ -33,7 +35,7 @@ public abstract class IndexBuilder extends Proc {
   private final long maxMem = (long) (Runtime.getRuntime().maxMemory() * 0.8);
 
   /** Names and namespace uri of element or attributes to include. */
-  private final IndexNames names;
+  private final IndexNames includeNames;
 
   /** Current pre value. */
   protected int pre;
@@ -48,17 +50,21 @@ public abstract class IndexBuilder extends Proc {
    * Constructor.
    * @param data reference
    * @param splitSize index split size
-   * @param text index type (text/attributes)
    * @param includes names of elements or attributes to include
+   * @param text index type (text/attributes)
+   * @param tokenize tokenize index values
    */
   protected IndexBuilder(final Data data, final int splitSize, final String includes,
-      final boolean text) {
+      final boolean text, final boolean tokenize) {
 
     this.data = data;
     this.splitSize = splitSize;
     this.text = text;
+    this.tokenize = tokenize;
     size = data.meta.size;
-    names = new IndexNames(includes);
+    includeNames = new IndexNames(includes);
+
+    assert !text || !tokenize; // Token index only allowed for attribute index
 
     // run garbage collection if memory maximum is already reached
     if(Performance.memory() >= maxMem) Performance.gc(1);
@@ -86,7 +92,8 @@ public abstract class IndexBuilder extends Proc {
    * @return result of check
    */
   protected final boolean indexEntry() {
-    return data.kind(pre) == (text ? Data.TEXT : Data.ATTR) && names.contains(data, pre, text);
+    return data.kind(pre) == (text ? Data.TEXT : Data.ATTR)
+        && includeNames.contains(data, pre, text);
   }
 
   /**

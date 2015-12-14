@@ -15,6 +15,8 @@ public enum IndexType {
   TEXT,
   /** Attribute index. */
   ATTRIBUTE,
+  /** Attribute token index. */
+  ATTTOKEN,
   /** Full-text index. */
   FULLTEXT,
   /** Path index. */

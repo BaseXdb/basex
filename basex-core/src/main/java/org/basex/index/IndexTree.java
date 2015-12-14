@@ -15,6 +15,8 @@ import org.basex.util.list.*;
 public class IndexTree {
   /** Factor for resize. */
   protected static final double FACTOR = 1.2;
+  /** Tokenize keys. */
+  final boolean tokenize;
 
   /** Keys saved in the tree. */
   public final TokenList keys = new TokenList(FACTOR);
@@ -34,13 +36,29 @@ public class IndexTree {
   private int root = -1;
 
   /**
+   * Non-tokenizing IndexTree constructor.
+   */
+  public IndexTree() {
+    this(false);
+  }
+
+  /**
+   * Non-tokenizing or tokenizing IndexTree constructor.
+   * @param tokenize create tokenizing index
+   */
+  public IndexTree(final boolean tokenize) {
+    this.tokenize = tokenize;
+  }
+
+  /**
    * Indexes the specified key and value.
    *
    * @param key key to be indexed
    * @param value value to be indexes
+   * @param pos token position, unsed for non-tokenizing indexes
    */
-  public final void add(final byte[] key, final int value) {
-    add(key, value, true);
+  public final void add(final byte[] key, final int value, final int pos) {
+    add(key, value, true, pos);
   }
 
   /**
@@ -50,12 +68,13 @@ public class IndexTree {
    * @param key key to be indexed
    * @param value value to be indexed
    * @param exist flag for using existing index
+   * @param pos token position, unsed for non-tokenizing indexes
    * @return int node
    */
-  protected final int add(final byte[] key, final int value, final boolean exist) {
+  protected final int add(final byte[] key, final int value, final boolean exist, final int pos) {
     // index is empty.. create root node
     if(root == -1) {
-      root = newNode(key, value, -1, exist);
+      root = newNode(key, value, pos, -1, exist);
       return root;
     }
 
@@ -64,21 +83,21 @@ public class IndexTree {
       final int c = Token.diff(key, keys.get(n));
       if(c == 0) {
         if(exist) {
-          values.set(n, Num.add(values.get(n), value));
+          valuesAdd(value, pos, n);
         } else {
           final int i = maps.get(Num.num(n));
           if(i < 0) {
             maps.put(Num.num(n), values.size());
-            values.add(Num.newNum(value));
+            valuesNewAdd(value, pos);
           } else {
-            values.set(i, Num.add(values.get(i), value));
+            valuesAdd(value, pos, i);
           }
         }
         return n;
       }
       int ch = c < 0 ? left(n) : right(n);
       if(ch == -1) {
-        ch = newNode(key, value, n, exist);
+        ch = newNode(key, value, pos, n, exist);
         if(c < 0) {
           setLeft(n, ch);
           adjust(left(n));
@@ -90,6 +109,30 @@ public class IndexTree {
       }
       n = ch;
     }
+  }
+
+  /**
+   * Creates a new values list and add a value.
+   * @param value value to store
+   * @param pos token position, unsed for non-tokenizing indexes
+   */
+  private void valuesNewAdd(final int value, final int pos) {
+    byte[] vs = Num.newNum(value);
+    if(tokenize) vs = Num.add(vs, pos);
+    values.add(vs);
+  }
+
+  /**
+   * Appends a value to value list n.
+   * @param value Value to store
+   * @param pos token position, unsed for non-tokenizing indexes
+   * @param n values list to append to
+   */
+  private void valuesAdd(final int value, final int pos, final int n) {
+    byte[] vs = values.get(n);
+    vs = Num.add(vs, value);
+    if(tokenize) vs = Num.add(vs, pos);
+    values.set(n, vs);
   }
 
   /**
@@ -144,18 +187,19 @@ public class IndexTree {
    * Creates a new node.
    * @param key node key
    * @param value node value
+   * @param pos token position, unsed for non-tokenizing indexes
    * @param par pointer on parent node
    * @param exist flag for reusing existing tree
    * @return pointer of the new node
    */
-  private int newNode(final byte[] key, final int value, final int par,
+  private int newNode(final byte[] key, final int value, final int pos, final int par,
       final boolean exist) {
     tree.add(-1); // left node
     tree.add(-1); // right node
     tree.add(par); // parent node
     mod.add(false);
     keys.add(key);
-    values.add(Num.newNum(value));
+    valuesNewAdd(value, pos);
     if(!exist) maps.put(Num.num(keys.size() - 1), values.size() - 1);
     return mod.size() - 1;
   }

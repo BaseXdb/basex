@@ -34,7 +34,7 @@ public final class FTBuilder extends IndexBuilder {
    * @throws IOException IOException
    */
   public FTBuilder(final Data data) throws IOException {
-    super(data, data.meta.ftsplitsize, data.meta.ftinclude, true);
+    super(data, data.meta.ftsplitsize, data.meta.ftinclude, true, false);
     final MetaData meta = data.meta;
     tree = new FTIndexTrees(data.meta.maxlen);
 

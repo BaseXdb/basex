@@ -87,6 +87,9 @@ public final class MainOptions extends Options {
   /** Full-text index: names to include. */
   public static final StringOption FTINCLUDE = new StringOption("FTINCLUDE", "");
 
+  /** Attribute index: names to include. */
+  public static final StringOption ATTRTOKENIZE = new StringOption("ATTRTOKENIZE", "");
+
   /** Maximum number of text/attribute index entries to keep in memory during index creation. */
   public static final NumberOption INDEXSPLITSIZE = new NumberOption("INDEXSPLITSIZE", 0);
   /** Maximum number of fulltext index entries to keep in memory during index creation. */

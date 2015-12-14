@@ -1,7 +1,5 @@
 package org.basex.index.value;
 
-import static org.basex.data.DataText.*;
-
 import java.io.*;
 
 import org.basex.data.*;
@@ -24,10 +22,12 @@ public final class UpdatableDiskValues extends DiskValues {
    * Constructor, initializing the index structure.
    * @param data data reference
    * @param text value type (texts/attributes)
+   * @param tokenize tokenizing index
    * @throws IOException I/O Exception
    */
-  public UpdatableDiskValues(final Data data, final boolean text) throws IOException {
-    super(data, text, text ? DATATXT : DATAATV);
+  public UpdatableDiskValues(final Data data, final boolean text, final boolean tokenize)
+      throws IOException {
+    super(data, text, tokenize, getFileSuffix(text, tokenize));
   }
 
   @Override
@@ -36,7 +36,7 @@ public final class UpdatableDiskValues extends DiskValues {
   }
 
   @Override
-  public synchronized void add(final TokenObjMap<IntList> map) {
+  public synchronized void add(final TokenObjMap<IntList> map) { // [JE] tokenized index support
     // create a sorted list of the new keys and update the old keys
     final TokenList newKeys = new TokenList();
 

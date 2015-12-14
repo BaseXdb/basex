@@ -111,6 +111,8 @@ public interface DataText {
   String DATATXT = "txt";
   /** Database - Attribute value index. */
   String DATAATV = "atv";
+  /** Database - Attribute token value index. */
+  String DATAATT = "att";
   /** Database - Full-text index. */
   String DATAFTX = "ftx";
   /** Database - Stopword list. */
