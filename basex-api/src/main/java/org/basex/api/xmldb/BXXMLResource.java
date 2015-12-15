@@ -95,7 +95,6 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
   @Override
   public Object getContent() throws XMLDBException {
     if(content == null) {
-      System.out.println("!");
       try {
         // serialize and cache content
         final ArrayOutput ao = new ArrayOutput();
