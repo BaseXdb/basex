@@ -2473,7 +2473,7 @@ public class QueryParser extends InputParser {
     final ExprList el = new ExprList();
     final TokenBuilder tb = new TokenBuilder();
     while(more()) {
-      int p = pos;
+      final int p = pos;
       if(consume(']') && consume('`') && consume('`')) {
         if(!tb.isEmpty()) el.add(Str.get(tb.next()));
         return Function.CONCAT.get(sc, info(), el.finish());

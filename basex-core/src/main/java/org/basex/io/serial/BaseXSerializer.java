@@ -16,7 +16,7 @@ import org.basex.query.value.map.*;
  */
 public final class BaseXSerializer extends AdaptiveSerializer {
   /** Binary. */
-  private boolean binary;
+  private final boolean binary;
   /** Level counter. */
   private int count;
 
