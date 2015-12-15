@@ -21,7 +21,7 @@ import org.basex.util.list.*;
 public final class ANodeList extends ElementList implements Iterable<ANode> {
   /** Element container. */
   private ANode[] list;
-  /** Sort flag. */
+  /** Sort flags: nodes need to be sorted before they can be returned. */
   private boolean sort;
   /** Check incoming nodes for potential duplicates and unsorted entries. */
   private boolean check;
@@ -66,8 +66,12 @@ public final class ANodeList extends ElementList implements Iterable<ANode> {
   public void add(final ANode element) {
     ANode[] lst = list;
     final int s = size;
+    if(s != 0 && check && !sort) {
+      final int d = element.diff(lst[s - 1]);
+      if(d == 0) return;
+      if(d < 0) sort = true;
+    }
     if(s == lst.length) lst = copyOf(newSize());
-    if(s != 0 && check && !sort) sort = lst[s - 1].diff(element) > 0;
     lst[s] = element;
     list = lst;
     size = s + 1;
