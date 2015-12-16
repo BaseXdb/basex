@@ -64,7 +64,10 @@ public final class DialogManage extends BaseXDialog {
     choice = new BaseXList(dbs, this, false);
     choice.setSize(200, 500);
     final Data data = main.context.data();
-    if(data != null) choice.setValue(data.meta.name);
+    if(data != null) {
+      data.flush(true);
+      choice.setValue(data.meta.name);
+    }
 
     doc1 = new BaseXLabel(" ").large();
     doc1.setSize(420, doc1.getHeight());
