@@ -22,7 +22,7 @@ import org.junit.runners.Parameterized.*;
  * @author Tim Petrowsky
  */
 @RunWith(Parameterized.class)
-public abstract class UpdateTest extends SandboxTest {
+public abstract class DataUpdateTest extends SandboxTest {
   /** Test file we do updates with. */
   private static final String TESTFILE = "src/test/resources/test.xml";
 
