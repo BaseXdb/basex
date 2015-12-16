@@ -546,7 +546,7 @@ public final class GUI extends JFrame {
       }
     } catch(final Exception ex) {
       // unexpected error
-      BaseXDialog.error(this, Util.info(EXEC_ERROR, cmd, Util.bug(ex)));
+      BaseXDialog.error(this, Util.info(EXEC_ERROR_X_X, cmd, Util.bug(ex)));
       updating = false;
     }
     stop();

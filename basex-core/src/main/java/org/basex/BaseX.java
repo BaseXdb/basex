@@ -173,7 +173,7 @@ public class BaseX extends CLI {
    * Launches the console mode, which reads and executes user input.
    */
   private void console() {
-    Util.outln(S_CONSOLE + TRY_MORE_X, local() ? S_STANDALONE : S_CLIENT);
+    Util.outln(header() + NL + TRY_MORE_X);
     verbose = true;
 
     // create console reader
@@ -274,7 +274,7 @@ public class BaseX extends CLI {
 
   @Override
   public String header() {
-    return Util.info(S_CONSOLE, local() ? S_STANDALONE : S_CLIENT);
+    return Util.info(S_CONSOLE_X, local() ? S_STANDALONE : S_CLIENT);
   }
 
   @Override

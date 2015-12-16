@@ -129,6 +129,6 @@ public final class MainParser {
    */
   public BaseXException usage() {
     final String name = Util.className(main).toLowerCase(Locale.ENGLISH);
-    return new BaseXException(main.header() + "Usage: " + name + main.usage());
+    return new BaseXException(main.header() + Prop.NL + "Usage: " + name + main.usage());
   }
 }

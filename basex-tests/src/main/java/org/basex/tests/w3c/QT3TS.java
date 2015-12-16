@@ -1008,7 +1008,7 @@ public final class QT3TS extends Main {
 
   @Override
   public String header() {
-    return Util.info(Text.S_CONSOLE, Util.className(this));
+    return Util.info(Text.S_CONSOLE_X, Util.className(this));
   }
 
   @Override

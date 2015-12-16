@@ -33,8 +33,10 @@ public final class BaseXServer extends CLI implements Runnable {
   private StringList commands;
   /** Server socket. */
   private ServerSocket socket;
-  /** Start as daemon. */
+  /** Start as service. */
   private boolean service;
+  /** Daemon flag. */
+  private boolean daemon;
   /** Quiet flag. */
   private boolean quiet;
   /** Stop file. */
@@ -74,7 +76,6 @@ public final class BaseXServer extends CLI implements Runnable {
 
     final StaticOptions sopts = context.soptions;
     final int port = sopts.get(StaticOptions.SERVERPORT);
-
     final String host = sopts.get(StaticOptions.SERVERHOST);
     final InetAddress addr = host.isEmpty() ? null : InetAddress.getByName(host);
 
@@ -109,15 +110,20 @@ public final class BaseXServer extends CLI implements Runnable {
     do Thread.yield(); while(!running);
 
     // show info that server has been started
-    if(!quiet) Util.outln(S_CONSOLE + Util.info(SRV_STARTED_PORT_X, port), S_SERVER);
-    context.log.writeServer(LogType.OK, Util.info(SRV_STARTED_PORT_X, port));
+    final String startX = Util.info(SRV_STARTED_PORT_X, port);
+    if(!quiet) {
+      if(!daemon) Util.outln(header());
+      Util.outln(startX);
+    }
+    context.log.writeServer(LogType.OK, startX);
 
     // show info when server is aborted
     Runtime.getRuntime().addShutdownHook(new Thread() {
       @Override
       public void run() {
-        context.log.writeServer(LogType.OK, Util.info(SRV_STOPPED_PORT_X, port));
-        Util.outln(SRV_STOPPED_PORT_X, port);
+        final String stopX = Util.info(SRV_STOPPED_PORT_X, port);
+        if(!quiet) Util.outln(stopX);
+        context.log.writeServer(LogType.OK, stopX);
       }
     });
   }
@@ -204,7 +210,6 @@ public final class BaseXServer extends CLI implements Runnable {
   protected void parseArgs() throws IOException {
     final MainParser arg = new MainParser(this);
     commands = new StringList();
-    boolean daemon = false;
 
     while(arg.more()) {
       if(arg.dash()) {
@@ -328,7 +333,7 @@ public final class BaseXServer extends CLI implements Runnable {
 
   @Override
   public String header() {
-    return Util.info(S_CONSOLE, S_SERVER);
+    return Util.info(S_CONSOLE_X, S_SERVER);
   }
 
   @Override

@@ -778,7 +778,7 @@ public abstract class W3CTS extends Main {
 
   @Override
   public String header() {
-    return Util.info(S_CONSOLE, Util.className(this));
+    return Util.info(S_CONSOLE_X, Util.className(this));
   }
 
   @Override

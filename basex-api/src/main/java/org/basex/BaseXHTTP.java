@@ -37,6 +37,8 @@ public final class BaseXHTTP extends Main {
   private int httpPort;
   /** Start as daemon. */
   private boolean service;
+  /** Quiet flag. */
+  private boolean quiet;
   /** Stopped flag. */
   private boolean stopped;
 
@@ -92,8 +94,9 @@ public final class BaseXHTTP extends Main {
 
     if(stopped) {
       stop();
-      for(final Connector conn : conns)
-        Util.outln(stopX, conn.getPort());
+      if(!quiet) {
+        for(final Connector conn : conns) Util.outln(stopX, conn.getPort());
+      }
       // temporary console windows: keep the message visible for a while
       Performance.sleep(1000);
       return;
@@ -104,8 +107,8 @@ public final class BaseXHTTP extends Main {
     if(service) {
       start(conn1.getPort(), conn1 instanceof SslSelectChannelConnector, args);
 
-      for(final Connector conn : conns) {
-        Util.outln(startX, conn.getPort());
+      if(!quiet) {
+        for(final Connector conn : conns) Util.outln(startX, conn.getPort());
       }
       // temporary console windows: keep the message visible for a while
       Performance.sleep(1000);
@@ -124,6 +127,7 @@ public final class BaseXHTTP extends Main {
     }
 
     // start web server
+    if(!quiet) Util.outln(header());
     try {
       jetty.start();
     } catch(final BindException ex) {
@@ -135,7 +139,9 @@ public final class BaseXHTTP extends Main {
     if(ex != null) throw ex;
 
     // show start message
-    for(final Connector conn : conns) Util.outln(startX, conn.getPort());
+    if(!quiet) {
+      for(final Connector conn : conns) Util.outln(startX, conn.getPort());
+    }
 
     // initialize web.xml settings, assign system properties and run database server.
     // the call of this function may already have been triggered during the start of jetty
@@ -150,8 +156,8 @@ public final class BaseXHTTP extends Main {
     Runtime.getRuntime().addShutdownHook(new Thread() {
       @Override
       public void run() {
-        for(final Connector conn : conns) {
-          Util.outln(stopX, conn.getPort());
+        if(!quiet) {
+          for(final Connector conn : conns) Util.outln(stopX, conn.getPort());
         }
         final Log l = context.log;
         if(l != null) {
@@ -273,6 +279,9 @@ public final class BaseXHTTP extends Main {
     while(arg.more()) {
       if(arg.dash()) {
         switch(arg.next()) {
+          case 'c': // use client mode
+            Prop.put(StaticOptions.HTTPLOCAL, Boolean.toString(false));
+            break;
           case 'd': // activate debug mode
             Prop.put(StaticOptions.DEBUG, Boolean.toString(true));
             Prop.debug = true;
@@ -298,6 +307,9 @@ public final class BaseXHTTP extends Main {
             break;
           case 'P': // specify password
             Prop.put(StaticOptions.PASSWORD, arg.string());
+            break;
+          case 'q': // quiet flag (hidden)
+            quiet = true;
             break;
           case 's': // parse stop port
             Prop.put(StaticOptions.STOPPORT, Integer.toString(arg.number()));
@@ -393,7 +405,7 @@ public final class BaseXHTTP extends Main {
 
   @Override
   public String header() {
-    return Util.info(S_CONSOLE, HTTP);
+    return Util.info(S_CONSOLE_X, S_HTTP_SERVER);
   }
 
   @Override
@@ -404,7 +416,7 @@ public final class BaseXHTTP extends Main {
   /** Monitor for stopping the Jetty server. */
   private final class StopServer extends Thread {
     /** Server socket. */
-    private final ServerSocket ss;
+    private final ServerSocket socket;
     /** Stop file. */
     private final IOFile stop;
 
@@ -416,9 +428,9 @@ public final class BaseXHTTP extends Main {
      */
     StopServer(final String host, final int port) throws IOException {
       final InetAddress addr = host.isEmpty() ? null : InetAddress.getByName(host);
-      ss = new ServerSocket();
-      ss.setReuseAddress(true);
-      ss.bind(new InetSocketAddress(addr, port));
+      socket = new ServerSocket();
+      socket.setReuseAddress(true);
+      socket.bind(new InetSocketAddress(addr, port));
       stop = stopFile(port);
       setDaemon(true);
     }
@@ -427,9 +439,9 @@ public final class BaseXHTTP extends Main {
     public void run() {
       try {
         while(true) {
-          try(final Socket s = ss.accept()) { }
+          try(final Socket s = socket.accept()) { }
           if(stop.exists()) {
-            ss.close();
+            socket.close();
             stop.delete();
             jetty.stop();
             break;

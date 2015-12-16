@@ -435,9 +435,10 @@ public final class HTTPContext {
     if(init) return;
     init = true;
 
-    // set web application path as home directory and HTTPPATH
     final String webapp = sc.getRealPath("/");
+    // system property (requested in Prop#homePath)
     System.setProperty(Prop.PATH, webapp);
+    // global option (will later be assigned to StaticOptions#WEBPATH)
     Prop.put(StaticOptions.WEBPATH, webapp);
 
     // set all parameters that start with "org.basex." as global options
@@ -464,7 +465,7 @@ public final class HTTPContext {
     // start server instance
     if(!context.soptions.get(StaticOptions.HTTPLOCAL)) {
       try {
-        server = new BaseXServer(context);
+        server = new BaseXServer(context, "-D");
       } catch(final IOException ex) {
         exception = ex;
         throw ex;
@@ -491,7 +492,6 @@ public final class HTTPContext {
    * Decodes the specified path.
    * @param path strings to be decoded
    * @return argument
-   * @throws IllegalArgumentException invalid path segments
    */
   public static String decode(final String path) {
     try {
@@ -504,7 +504,7 @@ public final class HTTPContext {
   // PRIVATE METHODS ====================================================================
 
   /**
-   * Normalizes the path information.
+   * Normalizes the specified path.
    * @param path path, or {@code null}
    * @return normalized path
    */

@@ -96,7 +96,7 @@ public final class Prop {
   public static final String PATH = DBPREFIX + "path";
 
   /** Directory for storing the property files, database directory, etc. */
-  public static final String HOME = dir(homePath());
+  public static final String HOME = dir(homeDir());
 
   // STATIC OPTIONS =====================================================================
 
@@ -130,9 +130,9 @@ public final class Prop {
    *   <li> Otherwise, the <b>user's home directory</b> (defined in
    *        {@code "user.home"}) is chosen.</li>
    * </ol>
-   * @return home directory
+   * @return path to home directory
    */
-  private static String homePath() {
+  private static String homeDir() {
     // check for system property
     String dir = System.getProperty(PATH);
     if(dir != null) return dir;
@@ -245,7 +245,7 @@ public final class Prop {
    * @return entry set
    */
   public static Set<Entry<String, String>> entries() {
-    // override with system properties
+    // properties from starter classes and web.xml context parameters
     final HashMap<String, String> entries = new HashMap<>();
     entries.putAll(OPTIONS);
     // override with system properties

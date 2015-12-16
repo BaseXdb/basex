@@ -130,7 +130,7 @@ public final class BaseXGUI extends Main {
 
   @Override
   public String header() {
-    return Util.info(S_CONSOLE, S_GUI);
+    return Util.info(S_CONSOLE_X, S_GUI);
   }
 
   @Override

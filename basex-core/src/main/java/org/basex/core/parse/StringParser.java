@@ -432,7 +432,7 @@ final class StringParser extends CmdParser {
     for(final Enum<?> s : startWith(cmp, null)) {
       final byte[] sm = uc(token(s.name()));
       if(ls.similar(name, sm) && Cmd.class.isInstance(s)) {
-        throw error(alt, UNKNOWN_SIMILAR_X, name, sm);
+        throw error(alt, UNKNOWN_SIMILAR_X_X, name, sm);
       }
     }
 

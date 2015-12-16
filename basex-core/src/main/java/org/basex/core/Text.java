@@ -121,10 +121,13 @@ public interface Text {
     " [file]" + NL +
     "  [file]  Open specified XML or XQuery file";
 
+  /** HTTP server mode. */
+  String S_HTTP_SERVER = "HTTP Server";
   /** HTTP information. */
   String S_HTTPINFO =
     " [-dhlnpPsSUz] [stop]" + NL +
     "  stop      Stop running server" + NL +
+    "  -c        Start in client mode" + NL +
     "  -d        Activate debugging mode" + NL +
     "  -h<port>  Set port of HTTP server" + NL +
     "  -l        Start in local mode" + NL +
@@ -139,7 +142,7 @@ public interface Text {
   /** Bug info. */
   String S_BUGINFO = "Improper use? Potential bug? Your feedback is welcome:";
   /** Console text. */
-  String S_CONSOLE = Prop.TITLE + " [%]" + NL;
+  String S_CONSOLE_X = Prop.TITLE + " [%]";
 
   /** Localhost. */
   String S_LOCALHOST = "localhost";
@@ -187,21 +190,21 @@ public interface Text {
   String NONE = "none";
 
   /** Options error. */
-  String OPT_OFFSET = "List counter for '%' is invalid.";
+  String OPT_OFFSET_X = "List counter for '%' is invalid.";
   /** Options error. */
-  String OPT_BOOLEAN = "Value of '%' must be 'yes', 'no', or a boolean.";
+  String OPT_BOOLEAN_X = "Value of '%' must be 'yes', 'no', or a boolean.";
   /** Options error. */
-  String OPT_NUMBER = "Value of '%' must be a number.";
+  String OPT_NUMBER_X = "Value of '%' must be a number.";
   /** Options error. */
-  String OPT_STRING = "Value of '%' must be a string.";
+  String OPT_STRING_X = "Value of '%' must be a string.";
   /** Options error. */
-  String OPT_MAP = "Value of '%' must be a map.";
+  String OPT_MAP_X = "Value of '%' must be a map.";
   /** Options error. */
-  String OPT_FUNC = "Value of '%' must be a function.";
+  String OPT_FUNC_X = "Value of '%' must be a function.";
   /** Options error. */
-  String OPT_ONEOF = "Value of '%' must be one of (%).";
+  String OPT_ONEOF_X_X = "Value of '%' must be one of (%).";
   /** Options error. */
-  String OPT_EXPECT = "% expected, % found: %.";
+  String OPT_EXPECT_X_X_X = "% expected, % found: %.";
 
   /** "log". */
   String PLOTLOG = "log";
@@ -264,7 +267,7 @@ public interface Text {
   // COMMANDS =================================================================
 
   /** Console text. */
-  String TRY_MORE_X = lang("try_more_%", "help") + NL;
+  String TRY_MORE_X = lang("try_more_%", "'help'");
   /** Version information. */
   String VERSINFO = lang("version");
 
@@ -480,7 +483,7 @@ public interface Text {
   /** Command syntax information. */
   String SYNTAX_X = lang("syntax") + ": %";
   /** Command execution error. */
-  String EXEC_ERROR = lang("exec_error_%") + COL + NL + '%';
+  String EXEC_ERROR_X_X = lang("exec_error_%") + COL + NL + '%';
 
   /** No database error. */
   String NO_DB_OPENED = lang("no_db_opened");
@@ -498,11 +501,11 @@ public interface Text {
   /** Command syntax information. */
   String SINGLE_CMD = lang("single_cmd");
   /** Unknown command error. */
-  String UNKNOWN_TRY_X = UNKNOWN_CMD_X + ' ' + lang("try_%", "HELP");
+  String UNKNOWN_TRY_X = UNKNOWN_CMD_X + ' ' + lang("try_%", "'help'");
   /** Try "help [...]" to get.. */
   String TRY_SPECIFIC_X = lang("try_specific_%", "HELP [...]") + NL;
   /** Unknown command error. */
-  String UNKNOWN_SIMILAR_X = UNKNOWN_CMD_X + ' ' + lang("similar_cmd_%");
+  String UNKNOWN_SIMILAR_X_X = UNKNOWN_CMD_X + ' ' + lang("similar_cmd_%");
 
   // CREATE COMMAND ===========================================================
 
@@ -517,7 +520,7 @@ public interface Text {
   /** "Command was canceled". */
   String COMMAND_CANCELED = lang("command_canceled");
   /** Create database information. */
-  String NODES_PARSED_X = " \"%\" (" + lang("nodes_parsed_%") + ')';
+  String NODES_PARSED_X_X = " \"%\" (" + lang("nodes_parsed_%") + ')';
   /** Scanner position. */
   String SCANPOS_X_X = "\"%\" (" + lang("line") + " %)";
 
@@ -537,7 +540,7 @@ public interface Text {
 
   /** Resource not found. */
   String RES_NOT_FOUND_X = lang("res_not_found_%");
-  /** Resource "%" not found. */
+  /** Resource not found. */
   String RES_NOT_FOUND = lang("res_not_found");
   /** Resource deleted. */
   String RES_DELETED_X_X = lang("res_deleted_%_%");
@@ -836,7 +839,7 @@ public interface Text {
   /** "(chopped)". */
   String CHOPPED = '(' + lang("chopped") + ") ";
   /** "(% entries)". */
-  String ENTRIES = '(' + lang("entries_%") + ')';
+  String ENTRIES_X = '(' + lang("entries_%") + ')';
   /** "Error". */
   String ERROR = lang("error");
 

@@ -387,7 +387,7 @@ public class Options implements Iterable<Option<?>> {
           tb.add(it.string(info)).add('=');
           final Value v = map.get(it, info);
           if(v instanceof Item) tb.add(string(((Item) v).string(info)).replace(",", ",,"));
-          else throw new BaseXException(Text.OPT_EXPECT, AtomType.ITEM, v.seqType(), v);
+          else throw new BaseXException(Text.OPT_EXPECT_X_X_X, AtomType.ITEM, v.seqType(), v);
         }
         val = tb.finish();
       } else {
@@ -539,11 +539,11 @@ public class Options implements Iterable<Option<?>> {
 
     for(final Item name : map.keys()) {
       if(!name.type.isStringOrUntyped())
-        throw new BaseXException(Text.OPT_EXPECT, AtomType.STR, name.type, name);
+        throw new BaseXException(Text.OPT_EXPECT_X_X_X, AtomType.STR, name.type, name);
 
       final Value value = map.get(name, info);
       if(!(value instanceof Item))
-        throw new BaseXException(Text.OPT_EXPECT, AtomType.ITEM, value.seqType(), value);
+        throw new BaseXException(Text.OPT_EXPECT_X_X_X, AtomType.ITEM, value.seqType(), value);
 
       assign(name, (Item) value, error, info);
     }
@@ -594,7 +594,7 @@ public class Options implements Iterable<Option<?>> {
   public static String allowed(final Option<?> option, final Object... all) {
     final TokenBuilder vals = new TokenBuilder();
     for(final Object a : all) vals.add(vals.isEmpty() ? "" : ",").add(a.toString());
-    return Util.info(Text.OPT_ONEOF, option.name(), vals);
+    return Util.info(Text.OPT_ONEOF_X_X, option.name(), vals);
   }
 
   // PRIVATE METHODS ====================================================================
@@ -741,24 +741,24 @@ public class Options implements Iterable<Option<?>> {
       if(item.type.isStringOrUntyped()) {
         v = Strings.yes(string(item.string(null)));
         if(!v && !Strings.no(string(item.string(null))))
-          throw new BaseXException(Text.OPT_BOOLEAN, option.name());
+          throw new BaseXException(Text.OPT_BOOLEAN_X, option.name());
       } else if(item instanceof Bln) {
         v = ((Bln) item).bool(null);
       } else {
-        throw new BaseXException(Text.OPT_BOOLEAN, option.name());
+        throw new BaseXException(Text.OPT_BOOLEAN_X, option.name());
       }
       put(option, v);
     } else if(option instanceof NumberOption) {
       if(item instanceof ANum) {
         put(option, (int) ((ANum) item).itr(null));
       } else {
-        throw new BaseXException(Text.OPT_NUMBER, option.name());
+        throw new BaseXException(Text.OPT_NUMBER_X, option.name());
       }
     } else if(option instanceof StringOption) {
       if(item.type.isStringOrUntyped()) {
         put(option, string(item.string(null)));
       } else {
-        throw new BaseXException(Text.OPT_STRING, option.name());
+        throw new BaseXException(Text.OPT_STRING_X, option.name());
       }
     } else if(option instanceof EnumOption) {
       if(item.type.isStringOrUntyped()) {
@@ -767,21 +767,21 @@ public class Options implements Iterable<Option<?>> {
         if(v == null) throw new BaseXException(allowed(option, (Object[]) eo.values()));
         put(option, v);
       } else {
-        throw new BaseXException(Text.OPT_STRING, option.name());
+        throw new BaseXException(Text.OPT_STRING_X, option.name());
       }
     } else if(option instanceof OptionsOption) {
       final Options o = ((OptionsOption<?>) option).newInstance();
       if(item instanceof Map) {
         o.assign((Map) item, error, info);
       } else {
-        throw new BaseXException(Text.OPT_MAP, option.name());
+        throw new BaseXException(Text.OPT_MAP_X, option.name());
       }
       put(option, o);
     } else if(option instanceof MapOption) {
-      if(!(item instanceof Map)) throw new BaseXException(Text.OPT_FUNC, option.name());
+      if(!(item instanceof Map)) throw new BaseXException(Text.OPT_FUNC_X, option.name());
       put(option, item);
     } else if(option instanceof FuncOption) {
-      if(!(item instanceof FuncItem)) throw new BaseXException(Text.OPT_FUNC, option.name());
+      if(!(item instanceof FuncItem)) throw new BaseXException(Text.OPT_FUNC_X, option.name());
       put(option, item);
     } else {
       throw Util.notExpected("Unsupported option: " + option);
@@ -811,16 +811,16 @@ public class Options implements Iterable<Option<?>> {
       final boolean v;
       if(val == null || val.isEmpty()) {
         final Boolean b = get((BooleanOption) option);
-        if(b == null) throw new BaseXException(Text.OPT_BOOLEAN, option.name());
+        if(b == null) throw new BaseXException(Text.OPT_BOOLEAN_X, option.name());
         v = !b;
       } else {
         v = Strings.yes(val);
-        if(!v && !Strings.no(val)) throw new BaseXException(Text.OPT_BOOLEAN, option.name());
+        if(!v && !Strings.no(val)) throw new BaseXException(Text.OPT_BOOLEAN_X, option.name());
       }
       put(option, v);
     } else if(option instanceof NumberOption) {
       final int v = Strings.toInt(val);
-      if(v == MIN_VALUE) throw new BaseXException(Text.OPT_NUMBER, option.name());
+      if(v == MIN_VALUE) throw new BaseXException(Text.OPT_NUMBER_X, option.name());
       put(option, v);
     } else if(option instanceof StringOption) {
       put(option, val);
@@ -835,7 +835,7 @@ public class Options implements Iterable<Option<?>> {
       put(option, o);
     } else if(option instanceof NumbersOption) {
       final int v = Strings.toInt(val);
-      if(v == MIN_VALUE) throw new BaseXException(Text.OPT_NUMBER, option.name());
+      if(v == MIN_VALUE) throw new BaseXException(Text.OPT_NUMBER_X, option.name());
       int[] ii = (int[]) get(option);
       if(index == -1) {
         if(ii == null) ii = new int[0];
@@ -844,7 +844,7 @@ public class Options implements Iterable<Option<?>> {
         put(option, il.add(v).finish());
       } else {
         if(index < 0 || index >= ii.length)
-          throw new BaseXException(Text.OPT_OFFSET, option.name());
+          throw new BaseXException(Text.OPT_OFFSET_X, option.name());
         ii[index] = v;
       }
     } else if(option instanceof StringsOption) {
@@ -856,11 +856,11 @@ public class Options implements Iterable<Option<?>> {
         put(option, sl.add(val).finish());
       } else if(index == 0) {
         final int v = Strings.toInt(val);
-        if(v == MIN_VALUE) throw new BaseXException(Text.OPT_NUMBER, option.name());
+        if(v == MIN_VALUE) throw new BaseXException(Text.OPT_NUMBER_X, option.name());
         values.put(name, new String[v]);
       } else {
         if(index <= 0 || index > ss.length)
-          throw new BaseXException(Text.OPT_OFFSET, option.name());
+          throw new BaseXException(Text.OPT_OFFSET_X, option.name());
         ss[index - 1] = val;
       }
     } else {
