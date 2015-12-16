@@ -161,4 +161,13 @@ public final class HigherOrderTest extends AdvancedQueryTest {
         + "  return ()"
         + "} catch * { 'ERR' }", "ERR");
   }
+
+  /** Ensures that updating flag is not assigned before function body is known (see GH-1222). */
+  @Test
+  public void gh1222() {
+    query("declare function local:f($i) {"
+        + "  for-each($i, function($k) { if($k) then local:f('') else () })"
+        + "};"
+        + "local:f('a')", "");
+  }
 }

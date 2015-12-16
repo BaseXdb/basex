@@ -4,14 +4,14 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import java.util.*;
-import java.util.Map.Entry;
+import java.util.Map.*;
 
 import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.gflwor.*;
-import org.basex.query.expr.gflwor.GFLWOR.Clause;
+import org.basex.query.expr.gflwor.GFLWOR.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -20,7 +20,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.Occ;
+import org.basex.query.value.type.SeqType.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -41,7 +41,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   /** Annotations. */
   private AnnList anns;
   /** Updating flag. */
-  private final boolean updating;
+  private boolean updating;
 
   /** Map with requested function properties. */
   private final EnumMap<Flag, Boolean> map = new EnumMap<>(Flag.class);
@@ -95,7 +95,6 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     this.nonLocal = nonLocal == null ? Collections.<Var, Expr>emptyMap() : nonLocal;
     this.scope = scope;
     this.sc = sc;
-    updating = anns.contains(Annotation.UPDATING);
   }
 
   @Override
@@ -132,6 +131,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
     if(compiled) return this;
     compiled = true;
+
+    checkUpdating();
 
     // compile closure
     for(final Entry<Var, Expr> e : nonLocal.entrySet()) {
@@ -398,6 +399,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public void checkUp() throws QueryException {
+    checkUpdating();
+
     final boolean u = expr.has(Flag.UPD);
     if(u) expr.checkUp();
     final InputInfo ii = (expr instanceof ParseExpr ? (ParseExpr) expr : this).info;
@@ -451,6 +454,16 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     final int al = args.length;
     for(int a = 0; a < al; a++) args[a].declType = ft.argTypes[a];
     if(ft.retType != null && !ft.retType.eq(SeqType.ITEM_ZM)) ret = ft.retType;
+  }
+
+  /**
+   * Assigns the updating flag.
+   */
+  private void checkUpdating() {
+    // derive updating flag from function body
+    updating = expr.has(Flag.UPD);
+    if(!updating) anns.delete(Annotation.UPDATING);
+    else if(!anns.contains(Annotation.UPDATING)) anns.add(new Ann(info, Annotation.UPDATING));
   }
 
   /**

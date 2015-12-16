@@ -2217,10 +2217,6 @@ public class QueryParser extends InputParser {
       final SeqType type = optAsType();
       final Expr body = enclosedExpr();
       final VarScope scope = localVars.popContext();
-      // derive updating flag from function body
-      final boolean upd = body.has(Flag.UPD), updAnn = anns.contains(Annotation.UPDATING);
-      if(upd && !updAnn) anns.add(new Ann(info(), Annotation.UPDATING));
-      if(!upd && updAnn) anns.delete(Annotation.UPDATING);
       return new Closure(info(), type, args, body, anns, nonLocal, sc, scope);
     }
     // annotations not allowed here

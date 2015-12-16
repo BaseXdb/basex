@@ -29,12 +29,13 @@ import org.basex.util.hash.*;
 public final class DynFuncCall extends FuncCall {
   /** Static context. */
   private final StaticContext sc;
-  /** Hash values of all function items that this call was copied from, possibly {@code null}. */
-  private int[] inlinedFrom;
   /** Updating flag. */
   private final boolean upd;
+
   /** Non-deterministic flag. */
-  private final boolean ndt;
+  private boolean ndt;
+  /** Hash values of all function items that this call was copied from, possibly {@code null}. */
+  private int[] inlinedFrom;
 
   /**
    * Function constructor.
@@ -63,25 +64,27 @@ public final class DynFuncCall extends FuncCall {
     super(info, add(arg, expr));
     this.sc = sc;
     this.upd = upd;
-    this.ndt = ndt || expr.has(Flag.NDT);
+    this.ndt = ndt;
   }
 
   @Override
   public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    if(body().has(Flag.NDT)) ndt = true;
     super.compile(qc, scp);
     return optimize(qc, scp);
   }
 
   @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
-    final int ar = exprs.length - 1;
-    final Expr f = exprs[ar];
+    final Expr f = body();
     final Type t = f.seqType().type;
+
+    final int last = exprs.length - 1;
     if(t instanceof FuncType) {
       final FuncType ft = (FuncType) t;
-      if(ft.argTypes != null && ft.argTypes.length != ar) {
+      if(ft.argTypes != null && ft.argTypes.length != last) {
         final Expr e = f instanceof FuncItem ? ((FuncItem) f).expr : f;
-        throw INVARITY_X_X_X_X.get(info, e, ar, ar == 1 ? "" : "s", ft.argTypes.length);
+        throw INVARITY_X_X_X_X.get(info, e, last, last == 1 ? "" : "s", ft.argTypes.length);
       }
       if(ft.retType != null) seqType = ft.retType;
     }
@@ -96,7 +99,7 @@ public final class DynFuncCall extends FuncCall {
         if(!sc.mixUpdates && upd != fe.annotations().contains(Annotation.UPDATING))
           throw (upd ? FUNCNOTUP : FUNCUP).get(info);
 
-        final Expr[] args = Arrays.copyOf(exprs, ar);
+        final Expr[] args = Arrays.copyOf(exprs, last);
         final Expr in = fe.inlineExpr(args, qc, scp, info);
         if(in != null) return in;
       }
@@ -108,9 +111,8 @@ public final class DynFuncCall extends FuncCall {
 
   @Override
   public void checkUp() throws QueryException {
-    final int ar = exprs.length - 1;
-    checkNoneUp(Arrays.copyOf(exprs, ar));
-    exprs[ar].checkUp();
+    checkNoneUp(Arrays.copyOf(exprs, exprs.length - 1));
+    body().checkUp();
   }
 
   /**
@@ -137,6 +139,14 @@ public final class DynFuncCall extends FuncCall {
     return false;
   }
 
+  /**
+   * Returns the function body expression.
+   * @return body
+   */
+  private Expr body() {
+    return exprs[exprs.length - 1];
+  }
+
   @Override
   public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
     final Expr[] copy = copyAll(qc, scp, vs, exprs);
@@ -155,26 +165,26 @@ public final class DynFuncCall extends FuncCall {
   @Override
   public void plan(final FElem plan) {
     final FElem el = planElem(TCL, tailCall);
-    final int es = exprs.length;
-    addPlan(plan, el, exprs[es - 1]);
-    for(int e = 0; e < es - 1; e++) exprs[e].plan(el);
+    addPlan(plan, el, body());
+    final int last = exprs.length - 1;
+    for(int e = 0; e < last; e++) exprs[e].plan(el);
   }
 
   @Override
   public String description() {
-    return exprs[exprs.length - 1].description() + "(...)";
+    return body().description() + "(...)";
   }
 
   @Override
   FItem evalFunc(final QueryContext qc) throws QueryException {
-    final int ar = exprs.length - 1;
-    final Item it = toItem(exprs[ar], qc);
+    final Item it = toItem(body(), qc);
     if(!(it instanceof FItem)) throw INVFUNCITEM_X.get(info, it.type, it);
 
     final FItem f = (FItem) it;
-    if(f.arity() != ar) {
+    final int last = exprs.length - 1;
+    if(f.arity() != last) {
       final Expr e = f instanceof FuncItem ? ((FuncItem) f).expr : f;
-      throw INVARITY_X_X_X_X.get(info, e, ar, ar == 1 ? "" : "s", f.arity());
+      throw INVARITY_X_X_X_X.get(info, e, last, last == 1 ? "" : "s", f.arity());
     }
     if(!sc.mixUpdates && upd != f.annotations().contains(Annotation.UPDATING))
       throw (upd ? FUNCNOTUP : FUNCUP).get(info);
@@ -184,9 +194,9 @@ public final class DynFuncCall extends FuncCall {
 
   @Override
   Value[] evalArgs(final QueryContext qc) throws QueryException {
-    final int al = exprs.length - 1;
-    final Value[] args = new Value[al];
-    for(int a = 0; a < al; ++a) args[a] = qc.value(exprs[a]);
+    final int last = exprs.length - 1;
+    final Value[] args = new Value[last];
+    for(int a = 0; a < last; a++) args[a] = qc.value(exprs[a]);
     return args;
   }
 
@@ -199,11 +209,11 @@ public final class DynFuncCall extends FuncCall {
 
   @Override
   public String toString() {
-    final int es = exprs.length;
-    final TokenBuilder tb = new TokenBuilder(exprs[es - 1].toString()).add('(');
-    for(int e = 0; e < es - 1; e++) {
+    final TokenBuilder tb = new TokenBuilder(body().toString()).add('(');
+    final int last = exprs.length - 1;
+    for(int e = 0; e < last; e++) {
       tb.add(exprs[e].toString());
-      if(e < es - 2) tb.add(", ");
+      if(e < last - 1) tb.add(", ");
     }
     return tb.add(')').toString();
   }
