@@ -157,7 +157,7 @@ public final class Map extends FItem {
     final SeqType[] at = tp.argTypes;
     if(at != null && (at.length != 1 || !at[0].one())) return false;
 
-    SeqType ret = tp.retType;
+    SeqType ret = tp.type;
     if(tp instanceof MapType) {
       AtomType arg = ((MapType) tp).keyType();
       if(arg == AtomType.AAT) arg = null;

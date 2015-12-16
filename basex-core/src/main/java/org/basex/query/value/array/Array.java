@@ -444,7 +444,7 @@ public abstract class Array extends FItem {
     final SeqType[] at = tp.argTypes;
     if(at != null && (at.length != 1 || !at[0].instanceOf(SeqType.ITR))) return false;
 
-    final SeqType ret = tp.retType;
+    final SeqType ret = tp.type;
     if(tp instanceof ArrayType) {
       // no argument and return type: no check required
       if(ret == null || ret.eq(SeqType.ITEM_ZM)) return true;

@@ -15,10 +15,10 @@ import org.basex.util.*;
 public abstract class StaticDecl extends StaticScope {
   /** Annotations. */
   public final AnnList anns;
-  /** This declaration's name. */
+  /** Name of the declaration. */
   public final QNm name;
   /** Declared type, {@code null} if not specified. */
-  protected final SeqType declType;
+  protected final SeqType type;
 
   /** Flag that is set during compilation and execution and prevents infinite loops. */
   protected boolean dontEnter;
@@ -39,7 +39,7 @@ public abstract class StaticDecl extends StaticScope {
     super(scope, doc, sc, info);
     this.anns = anns;
     this.name = name;
-    declType = type;
+    this.type = type;
   }
 
   /**
@@ -54,6 +54,6 @@ public abstract class StaticDecl extends StaticScope {
    * @return return type
    */
   public SeqType seqType() {
-    return declType != null ? declType : expr.seqType();
+    return type != null ? type : expr.seqType();
   }
 }

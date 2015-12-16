@@ -41,7 +41,7 @@ public final class ArrayType extends FuncType {
 
   @Override
   public boolean eq(final Type t) {
-    return this == t || t instanceof ArrayType && retType.eq(((ArrayType) t).retType);
+    return this == t || t instanceof ArrayType && type.eq(((ArrayType) t).type);
   }
 
   @Override
@@ -52,7 +52,7 @@ public final class ArrayType extends FuncType {
 
     final FuncType ft = (FuncType) t;
     final int al = argTypes.length;
-    if(al != ft.argTypes.length || !retType.instanceOf(ft.retType)) return false;
+    if(al != ft.argTypes.length || !type.instanceOf(ft.type)) return false;
     if(t instanceof ArrayType) return true;
 
     // test function arguments of function type
@@ -67,7 +67,7 @@ public final class ArrayType extends FuncType {
     if(instanceOf(t)) return t;
     if(t instanceof ArrayType) {
       final ArrayType mt = (ArrayType) t;
-      return mt.instanceOf(this) ? this : get(retType.union(mt.retType));
+      return mt.instanceOf(this) ? this : get(type.union(mt.type));
     }
     return t instanceof MapType ? SeqType.ANY_FUN : t instanceof FuncType ? t.union(this) :
       AtomType.ITEM;
@@ -81,13 +81,13 @@ public final class ArrayType extends FuncType {
     if(t instanceof ArrayType) {
       final ArrayType mt = (ArrayType) t;
       if(mt.instanceOf(this)) return mt;
-      final SeqType rt = retType.intersect(mt.retType);
+      final SeqType rt = type.intersect(mt.type);
       return rt == null ? null : get(rt);
     }
     if(t instanceof FuncType) {
       final FuncType ft = (FuncType) t;
       if(ft.argTypes.length == 1 && ft.argTypes[0].instanceOf(SeqType.ITR)) {
-        final SeqType rt = retType.intersect(ft.retType);
+        final SeqType rt = type.intersect(ft.type);
         return rt == null ? null : get(rt);
       }
     }
@@ -105,6 +105,6 @@ public final class ArrayType extends FuncType {
 
   @Override
   public String toString() {
-    return retType.eq(SeqType.ITEM_ZM) ? "array(*)" : "array(" + retType + ')';
+    return type.eq(SeqType.ITEM_ZM) ? "array(*)" : "array(" + type + ')';
   }
 }

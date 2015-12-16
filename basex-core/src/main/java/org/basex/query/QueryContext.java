@@ -219,7 +219,7 @@ public final class QueryContext extends Proc implements Closeable {
 
     info.query = query;
     root = new QueryParser(query, path, this, sc).parseMain();
-    updating = updating && root.expr.has(Flag.UPD);
+    if(updating) updating = root.expr.has(Flag.UPD);
     return root;
   }
 

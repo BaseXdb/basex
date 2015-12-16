@@ -1200,4 +1200,13 @@ public final class UpdateTest extends AdvancedQueryTest {
     final String output = sandbox().merge("test.xml").url();
     query(PUT.args("<a/>", output));
   }
+
+  /**
+   * Allows empty-sequence() as return type for updating functions.
+   */
+  @Test
+  public void returnType() {
+    query("declare %updating function local:f() as empty-sequence() {delete node <a/>};local:f()");
+    query("updating function() as empty-sequence() {delete node <a/>}()");
+  }
 }

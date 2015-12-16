@@ -86,19 +86,18 @@ public final class DynFuncCall extends FuncCall {
         final Expr e = f instanceof FuncItem ? ((FuncItem) f).expr : f;
         throw INVARITY_X_X_X_X.get(info, e, last, last == 1 ? "" : "s", ft.argTypes.length);
       }
-      if(ft.retType != null) seqType = ft.retType;
+      if(ft.type != null) seqType = ft.type;
     }
 
     // maps and arrays can only contain fully evaluated values, so this is safe
-    if((f instanceof Map || f instanceof Array) && allAreValues()) return optPre(value(qc), qc);
+    if((f instanceof Map || f instanceof Array) && allAreValues())
+      return optPre(value(qc), qc);
 
     if(f instanceof XQFunctionExpr) {
       // try to inline the function
       final XQFunctionExpr fe = (XQFunctionExpr) f;
       if(!(f instanceof FuncItem && comesFrom((FuncItem) f))) {
-        if(!sc.mixUpdates && upd != fe.annotations().contains(Annotation.UPDATING))
-          throw (upd ? FUNCNOTUP : FUNCUP).get(info);
-
+        checkUpdating(fe);
         final Expr[] args = Arrays.copyOf(exprs, last);
         final Expr in = fe.inlineExpr(args, qc, scp, info);
         if(in != null) return in;
@@ -186,10 +185,18 @@ public final class DynFuncCall extends FuncCall {
       final Expr e = f instanceof FuncItem ? ((FuncItem) f).expr : f;
       throw INVARITY_X_X_X_X.get(info, e, last, last == 1 ? "" : "s", f.arity());
     }
-    if(!sc.mixUpdates && upd != f.annotations().contains(Annotation.UPDATING))
-      throw (upd ? FUNCNOTUP : FUNCUP).get(info);
-
+    checkUpdating(f);
     return f;
+  }
+
+  /**
+   * Checks if the function is updating or not.
+   * @param item function expression
+   * @throws QueryException query exception
+   */
+  private void checkUpdating(final XQFunctionExpr item) throws QueryException {
+    if(!sc.mixUpdates && upd != item.annotations().contains(Annotation.UPDATING))
+      throw (upd ? FUNCNOTUP : FUNCUP).get(info);
   }
 
   @Override

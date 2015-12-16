@@ -1341,7 +1341,7 @@ public enum Function {
   /** Descriptions. */
   final String desc;
   /** Return type. */
-  final SeqType ret;
+  final SeqType type;
 
   /** Compiler flags. */
   private final EnumSet<Flag> flags;
@@ -1356,11 +1356,11 @@ public enum Function {
    * @param func reference to the class containing the function implementation
    * @param desc descriptive function string
    * @param args types of the function arguments
-   * @param ret return type
+   * @param type return type
    */
   Function(final Class<? extends StandardFunc> func, final String desc, final SeqType[] args,
-      final SeqType ret) {
-    this(func, desc, args, ret, EnumSet.noneOf(Flag.class));
+      final SeqType type) {
+    this(func, desc, args, type, EnumSet.noneOf(Flag.class));
   }
 
   /**
@@ -1369,12 +1369,12 @@ public enum Function {
    * @param func reference to the class containing the function implementation
    * @param desc descriptive function string
    * @param args types of the function arguments
-   * @param ret return type
+   * @param type return type
    * @param uri uri
    */
   Function(final Class<? extends StandardFunc> func, final String desc, final SeqType[] args,
-      final SeqType ret, final byte[] uri) {
-    this(func, desc, args, ret, EnumSet.noneOf(Flag.class), uri);
+      final SeqType type, final byte[] uri) {
+    this(func, desc, args, type, EnumSet.noneOf(Flag.class), uri);
   }
 
   /**
@@ -1383,12 +1383,12 @@ public enum Function {
    * @param func reference to the class containing the function implementation
    * @param desc descriptive function string
    * @param args types of the function arguments
-   * @param ret return type
+   * @param type return type
    * @param flag static function properties
    */
   Function(final Class<? extends StandardFunc> func, final String desc, final SeqType[] args,
-      final SeqType ret, final EnumSet<Flag> flag) {
-    this(func, desc, args, ret, flag, FN_URI);
+      final SeqType type, final EnumSet<Flag> flag) {
+    this(func, desc, args, type, flag, FN_URI);
   }
 
   /**
@@ -1399,16 +1399,16 @@ public enum Function {
    *             square brackets; three dots indicate that the number of arguments of a
    *             function is not limited
    * @param args types of the function arguments
-   * @param ret return type
+   * @param type return type
    * @param flags static function properties
    * @param uri uri
    */
   Function(final Class<? extends StandardFunc> func, final String desc, final SeqType[] args,
-      final SeqType ret, final EnumSet<Flag> flags, final byte[] uri) {
+      final SeqType type, final EnumSet<Flag> flags, final byte[] uri) {
 
     this.func = func;
     this.desc = desc;
-    this.ret = ret;
+    this.type = type;
     this.args = args;
     this.flags = flags;
     this.uri = uri;
@@ -1476,7 +1476,7 @@ public enum Function {
     } else {
       System.arraycopy(args, 0, st, 0, arity);
     }
-    return FuncType.get(anns, ret, st);
+    return FuncType.get(anns, type, st);
   }
 
   /**

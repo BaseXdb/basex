@@ -172,10 +172,10 @@ public final class FuncItem extends FItem implements Scope {
 
     final Expr e = new DynFuncCall(ii, sc, this, refs);
     final Expr optimized = opt ? e.optimize(qc, vsc) : e, checked;
-    if(ft.retType == null || tp.retType != null && tp.retType.instanceOf(ft.retType)) {
+    if(ft.type == null || tp.type != null && tp.type.instanceOf(ft.type)) {
       checked = optimized;
     } else {
-      final TypeCheck tc = new TypeCheck(sc, ii, optimized, ft.retType, true);
+      final TypeCheck tc = new TypeCheck(sc, ii, optimized, ft.type, true);
       checked = opt ? tc.optimize(qc, vsc) : tc;
     }
     checked.markTailCalls(null);
@@ -256,7 +256,7 @@ public final class FuncItem extends FItem implements Scope {
     tb.addExt(anns).add(FUNCTION).add('(');
     final int pl = params.length;
     for(final Var v : params) tb.addExt(v).add(v == params[pl - 1] ? "" : ", ");
-    tb.add(')').add(ft.retType != null ? " as " + ft.retType : "");
+    tb.add(')').add(ft.type != null ? " as " + ft.type : "");
     return tb.add(" { ").addExt(expr).add(" }").toString();
   }
 }

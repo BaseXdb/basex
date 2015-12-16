@@ -193,20 +193,20 @@ public final class TreeSeqBuilder implements Iterable<Item> {
 
   /**
    * Creates a sequence containing the current elements of this builder.
-   * @param ret type of all elements, may be {@code null}
+   * @param type type of all elements, may be {@code null}
    * @return resulting sequence
    */
-  public Seq seq(final Type ret) {
+  public Seq seq(final Type type) {
     final int n = inLeft + inRight;
     final int start = (mid - inLeft + CAP) % CAP;
     if(n < 2) throw new AssertionError("At least 2 items expected");
 
     // small int array, fill directly
-    if(n <= TreeSeq.MAX_SMALL) return new SmallSeq(items(start, n), ret);
+    if(n <= TreeSeq.MAX_SMALL) return new SmallSeq(items(start, n), type);
 
     // deep array
     final int ll = tree.isEmpty() ? n / 2 : inLeft;
-    return new BigSeq(items(start, ll), tree.freeze(), items(start + ll, n - ll), ret);
+    return new BigSeq(items(start, ll), tree.freeze(), items(start + ll, n - ll), type);
   }
 
   @Override

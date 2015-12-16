@@ -58,8 +58,10 @@ public final class MixUpdatesTest extends AdvancedQueryTest {
   /** Updating functions. */
   @Test
   public void updatingFunctions() {
+    query("declare %updating function local:b() { db:output('1') }; local:b()", "1");
+
     query("declare function local:not-used() { local:b#0 };"
-        + "declare updating function local:b() { db:output('1') }; local:b()", "1");
+        + "declare %updating function local:b() { db:output('1') }; local:b()", "1");
 
     query("function($a) { db:output($a) }(1)", "1");
     query("db:output(?)(1)", "1");

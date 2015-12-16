@@ -73,14 +73,14 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     try {
       expr = expr.compile(qc, scope);
 
-      if(declType != null) {
+      if(type != null) {
         // remove redundant casts
-        if((declType.type == AtomType.BLN || declType.type == AtomType.FLT ||
-            declType.type == AtomType.DBL || declType.type == AtomType.QNM ||
-            declType.type == AtomType.URI) && declType.eq(expr.seqType())) {
-          qc.compInfo(OPTCAST, declType);
+        if((type.type == AtomType.BLN || type.type == AtomType.FLT ||
+            type.type == AtomType.DBL || type.type == AtomType.QNM ||
+            type.type == AtomType.URI) && type.eq(expr.seqType())) {
+          qc.compInfo(OPTCAST, type);
         } else {
-          expr = new TypeCheck(sc, info, expr, declType, true).optimize(qc, scope);
+          expr = new TypeCheck(sc, info, expr, type, true).optimize(qc, scope);
         }
       }
     } catch(final QueryException qe) {
@@ -102,17 +102,6 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     addPlan(plan, el, expr);
     final int al = args.length;
     for(int a = 0; a < al; ++a) el.add(planAttr(ARG + a, args[a].name.string()));
-  }
-
-  @Override
-  public String toString() {
-    final TokenBuilder tb = new TokenBuilder(DECLARE).add(' ').addExt(anns);
-    tb.add(FUNCTION).add(' ').add(name.string());
-    tb.add(PAREN1).addSep(args, SEP).add(PAREN2);
-    if(declType != null) tb.add(' ' + AS + ' ' + declType);
-    if(expr != null) tb.add(" { ").addExt(expr).add(" }; ");
-    else tb.add(" external; ");
-    return tb.toString();
   }
 
   /**
@@ -150,7 +139,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
   @Override
   public FuncType funcType() {
-    return FuncType.get(anns, declType, args);
+    return FuncType.get(anns, type, args);
   }
 
   @Override
@@ -217,7 +206,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     final InputInfo ii = expr instanceof ParseExpr ? ((ParseExpr) expr).info : info;
     if(updating) {
       // updating function
-      if(declType != null) throw UUPFUNCTYPE.get(info);
+      if(type != null && !type.eq(SeqType.EMP)) throw UUPFUNCTYPE.get(info);
       if(!u && !expr.isVacuous()) throw UPEXPECTF.get(ii);
     } else if(u) {
       // uses updates, but is not declared as such
@@ -230,7 +219,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    * @return result of check
    */
   public boolean isVacuous() {
-    return !has(Flag.UPD) && declType != null && declType.eq(SeqType.EMP);
+    return type != null && type.eq(SeqType.EMP) && !has(Flag.UPD);
   }
 
   /**
@@ -244,7 +233,8 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     Boolean b = map.get(flag);
     if(b == null) {
       map.put(flag, false);
-      b = expr == null || expr.has(flag);
+      // function itself does not perform any updates
+      b = flag != Flag.UPD && expr.has(flag);
       map.put(flag, b);
     }
     return b;
@@ -296,5 +286,16 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
         ? ann.args.length > 0 ? ((ANum) ann.args[0]).itr() : Long.MAX_VALUE
         : qc.context.options.get(MainOptions.INLINELIMIT);
     return expr.isValue() || expr.exprSize() < limit;
+  }
+
+  @Override
+  public String toString() {
+    final TokenBuilder tb = new TokenBuilder(DECLARE).add(' ').addExt(anns);
+    tb.add(FUNCTION).add(' ').add(name.string());
+    tb.add(PAREN1).addSep(args, SEP).add(PAREN2);
+    if(type != null) tb.add(' ' + AS + ' ' + type);
+    if(expr != null) tb.add(" { ").addExt(expr).add(" }; ");
+    else tb.add(" external; ");
+    return tb.toString();
   }
 }

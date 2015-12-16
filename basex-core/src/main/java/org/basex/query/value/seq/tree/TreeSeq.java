@@ -33,17 +33,13 @@ public abstract class TreeSeq extends Seq {
   /** Maximum size of a small array. */
   static final int MAX_SMALL = 2 * MIN_DIGIT - 1;
 
-  /** Item Types. */
-  Type ret;
-
   /**
    * Default constructor.
    * @param size number of elements in this sequence
-   * @param ret type of all items in this sequence
+   * @param type type of all items in this sequence
    */
-  TreeSeq(final long size, final Type ret) {
-    super(size, ret == null ? AtomType.ITEM : ret);
-    this.ret = ret;
+  TreeSeq(final long size, final Type type) {
+    super(size, type == null ? AtomType.ITEM : type);
   }
 
   @Override
@@ -145,7 +141,7 @@ public abstract class TreeSeq extends Seq {
 
   @Override
   public final boolean homogeneous() {
-    return ret != null && ret != AtomType.ITEM;
+    return type != AtomType.ITEM;
   }
 
   @Override
@@ -162,19 +158,7 @@ public abstract class TreeSeq extends Seq {
 
   @Override
   public final SeqType seqType() {
-    if(ret == null) {
-      final Iterator<Item> iter = iterator();
-      Type t = iter.next().type;
-      while(iter.hasNext()) {
-        if(t != iter.next().type) {
-          t = AtomType.ITEM;
-          break;
-        }
-      }
-      ret = t;
-      type = t;
-    }
-    return SeqType.get(ret, Occ.ONE_MORE);
+    return SeqType.get(type, Occ.ONE_MORE);
   }
 
   /**

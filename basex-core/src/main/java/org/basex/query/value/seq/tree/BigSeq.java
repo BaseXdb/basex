@@ -28,11 +28,11 @@ final class BigSeq extends TreeSeq {
    * @param left left digit
    * @param middle middle tree
    * @param right right digit
-   * @param ret type of all items in this sequence, can be {@code null}
+   * @param type type of all items in this sequence, can be {@code null}
    */
   BigSeq(final Item[] left, final FingerTree<Item, Item> middle, final Item[] right,
-      final Type ret) {
-    super(left.length + middle.size() + right.length, ret);
+      final Type type) {
+    super(left.length + middle.size() + right.length, type);
     this.left = left;
     this.middle = middle;
     this.right = right;
@@ -61,7 +61,7 @@ final class BigSeq extends TreeSeq {
     final Item[] newLeft = new Item[r], newRight = new Item[l];
     for(int i = 0; i < r; i++) newLeft[i] = right[r - 1 - i];
     for(int i = 0; i < l; i++) newRight[i] = left[l - 1 - i];
-    return new BigSeq(newLeft, middle.reverse(), newRight, ret);
+    return new BigSeq(newLeft, middle.reverse(), newRight, type);
   }
 
   @Override
@@ -110,7 +110,7 @@ final class BigSeq extends TreeSeq {
         final Item[] newLeft = new Item[l - 1];
         System.arraycopy(left, 0, newLeft, 0, p);
         System.arraycopy(left, p + 1, newLeft, p, newLeft.length - p);
-        return new BigSeq(newLeft, middle, right, ret);
+        return new BigSeq(newLeft, middle, right, type);
       }
 
       if(middle.isEmpty()) {
@@ -120,7 +120,7 @@ final class BigSeq extends TreeSeq {
         System.arraycopy(left, 0, vals, 0, p);
         System.arraycopy(left, p + 1, vals, p, l - 1 - p);
         System.arraycopy(right, 0, vals, l - 1, r);
-        return fromMerged(vals, ret);
+        return fromMerged(vals, type);
       }
 
       // extract a new left digit from the middle
@@ -135,7 +135,7 @@ final class BigSeq extends TreeSeq {
         System.arraycopy(left, p + 1, newLeft, p, l - 1 - p);
         System.arraycopy(head, 0, newLeft, l - 1, move);
         final Item[] newHead = slice(head, move, r);
-        return new BigSeq(newLeft, middle.replaceHead(new LeafNode(newHead)), right, ret);
+        return new BigSeq(newLeft, middle.replaceHead(new LeafNode(newHead)), right, type);
       }
 
       // merge digit and head node
@@ -143,7 +143,7 @@ final class BigSeq extends TreeSeq {
       System.arraycopy(left, 0, newLeft, 0, p);
       System.arraycopy(left, p + 1, newLeft, p, l - 1 - p);
       System.arraycopy(head, 0, newLeft, l - 1, r);
-      return new BigSeq(newLeft, middle.tail(), right, ret);
+      return new BigSeq(newLeft, middle.tail(), right, type);
     }
 
     final long midSize = middle.size(), rightOffset = left.length + midSize;
@@ -155,7 +155,7 @@ final class BigSeq extends TreeSeq {
         final Item[] newRight = new Item[r - 1];
         System.arraycopy(right, 0, newRight, 0, p);
         System.arraycopy(right, p + 1, newRight, p, r - 1 - p);
-        return new BigSeq(left, middle, newRight, ret);
+        return new BigSeq(left, middle, newRight, type);
       }
 
       if(middle.isEmpty()) {
@@ -165,7 +165,7 @@ final class BigSeq extends TreeSeq {
         System.arraycopy(left, 0, vals, 0, l);
         System.arraycopy(right, 0, vals, l, p);
         System.arraycopy(right, p + 1, vals, l + p, r - 1 - p);
-        return fromMerged(vals, ret);
+        return fromMerged(vals, type);
       }
 
       // extract a new right digit from the middle
@@ -180,7 +180,7 @@ final class BigSeq extends TreeSeq {
         System.arraycopy(last, l - move, newRight, 0, move);
         System.arraycopy(right, 0, newRight, move, p);
         System.arraycopy(right, p + 1, newRight, move + p, r - 1 - p);
-        return new BigSeq(left, middle.replaceLast(new LeafNode(newLast)), newRight, ret);
+        return new BigSeq(left, middle.replaceLast(new LeafNode(newLast)), newRight, type);
       }
 
       // merge last node and digit
@@ -188,7 +188,7 @@ final class BigSeq extends TreeSeq {
       System.arraycopy(last, 0, newRight, 0, l);
       System.arraycopy(right, 0, newRight, l, p);
       System.arraycopy(right, p + 1, newRight, l + p, r - 1 - p);
-      return new BigSeq(left, middle.init(), newRight, ret);
+      return new BigSeq(left, middle.init(), newRight, type);
     }
 
     // delete in middle tree
@@ -196,7 +196,7 @@ final class BigSeq extends TreeSeq {
 
     if(slice.isTree()) {
       // middle tree did not underflow
-      return new BigSeq(left, slice.getTree(), right, ret);
+      return new BigSeq(left, slice.getTree(), right, type);
     }
 
     // tree height might change
@@ -209,7 +209,7 @@ final class BigSeq extends TreeSeq {
       final Item[] newLeft = slice(left, 0, l - move);
       final Item[] newMid = slice(left, l - move, l + m);
       System.arraycopy(mid, 0, newMid, move, m);
-      return new BigSeq(newLeft, FingerTree.singleton(new LeafNode(newMid)), right, ret);
+      return new BigSeq(newLeft, FingerTree.singleton(new LeafNode(newMid)), right, type);
     }
 
     if(r > MIN_DIGIT) {
@@ -218,7 +218,7 @@ final class BigSeq extends TreeSeq {
       final Item[] newMid = slice(mid, 0, m + move);
       System.arraycopy(right, 0, newMid, m, move);
       final Item[] newRight = slice(right, move, r);
-      return new BigSeq(left, FingerTree.singleton(new LeafNode(newMid)), newRight, ret);
+      return new BigSeq(left, FingerTree.singleton(new LeafNode(newMid)), newRight, type);
     }
 
     // divide onto left and right digit
@@ -227,7 +227,7 @@ final class BigSeq extends TreeSeq {
     System.arraycopy(mid, 0, newLeft, l, ml);
     final Item[] newRight = slice(right, -mr, r);
     System.arraycopy(mid, ml, newRight, 0, mr);
-    final Type rt = ret;
+    final Type rt = type;
     return new BigSeq(newLeft, FingerTree.<Item>empty(), newRight, rt);
   }
 
@@ -248,9 +248,9 @@ final class BigSeq extends TreeSeq {
     if(end <= left.length) {
       // completely in left digit
       final int p = (int) pos, n = (int) len;
-      if(len <= MAX_SMALL) return new SmallSeq(slice(left, p, p + n), ret);
+      if(len <= MAX_SMALL) return new SmallSeq(slice(left, p, p + n), type);
       final int mid = p + n / 2;
-      final Type rt = ret;
+      final Type rt = type;
       return new BigSeq(slice(left, p, mid), FingerTree.<Item>empty(), slice(left, mid, p + n), rt);
     }
 
@@ -258,9 +258,9 @@ final class BigSeq extends TreeSeq {
     if(pos >= rightOffset) {
       // completely in right digit
       final int p = (int) (pos - rightOffset), n = (int) len;
-      if(len <= MAX_SMALL) return new SmallSeq(slice(right, p, p + n), ret);
+      if(len <= MAX_SMALL) return new SmallSeq(slice(right, p, p + n), type);
       final int mid = p + n / 2;
-      final Type rt = ret;
+      final Type rt = type;
       return new BigSeq(slice(right, p, mid), FingerTree.<Item>empty(),
           slice(right, mid, p + n), rt);
     }
@@ -271,7 +271,7 @@ final class BigSeq extends TreeSeq {
       // digits are still long enough
       final Item[] newLeft = inLeft == left.length ? left : slice(left, (int) pos, left.length);
       final Item[] newRight = inRight == right.length ? right : slice(right, 0, inRight);
-      return new BigSeq(newLeft, middle, newRight, ret);
+      return new BigSeq(newLeft, middle, newRight, type);
     }
 
     if(middle.isEmpty()) {
@@ -285,7 +285,7 @@ final class BigSeq extends TreeSeq {
         out = slice(left, left.length - inLeft, left.length + inRight);
         System.arraycopy(right, 0, out, inLeft, inRight);
       }
-      return fromMerged(out, ret);
+      return fromMerged(out, type);
     }
 
     final long inMiddle = len - inLeft - inRight;
@@ -302,14 +302,14 @@ final class BigSeq extends TreeSeq {
         if(inLeft > 0) {
           final Item[] out = slice(left, (int) pos, left.length + single.length);
           System.arraycopy(single, 0, out, inLeft, single.length);
-          return fromMerged(out, ret);
+          return fromMerged(out, type);
         }
         if(inRight > 0) {
           final Item[] out = slice(single, 0, single.length + inRight);
           System.arraycopy(right, 0, out, single.length, inRight);
-          return fromMerged(out, ret);
+          return fromMerged(out, type);
         }
-        return new SmallSeq(single, ret);
+        return new SmallSeq(single, type);
       }
 
       mid = slice.getTree();
@@ -352,14 +352,14 @@ final class BigSeq extends TreeSeq {
       }
     } else {
       // not enough elements for a right digit
-      if(inRight == 0) return fromMerged(newLeft, ret);
+      if(inRight == 0) return fromMerged(newLeft, type);
       final int n = newLeft.length + inRight;
       final Item[] out = slice(newLeft, 0, n);
       System.arraycopy(right, 0, out, newLeft.length, inRight);
-      return fromMerged(out, ret);
+      return fromMerged(out, type);
     }
 
-    return new BigSeq(newLeft, newMiddle, newRight, ret);
+    return new BigSeq(newLeft, newMiddle, newRight, type);
   }
 
   /**
@@ -378,16 +378,16 @@ final class BigSeq extends TreeSeq {
 
   @Override
   public TreeSeq concat(final TreeSeq seq) {
-    final Type retType = type == seq.type ? type : null;
+    final Type tp = type == seq.type ? type : null;
     if(seq instanceof SmallSeq) {
       // merge with right digit
       final Item[] newRight = concat(right, ((SmallSeq) seq).elems);
       final int r = newRight.length;
-      if(r <= MAX_DIGIT) return new BigSeq(left, middle, newRight, retType);
+      if(r <= MAX_DIGIT) return new BigSeq(left, middle, newRight, tp);
       final int mid = r / 2;
       final Item[] leaf = slice(newRight, 0, mid);
       final FingerTree<Item, Item> newMid = middle.snoc(new LeafNode(leaf));
-      return new BigSeq(left, newMid, slice(newRight, mid, r), retType);
+      return new BigSeq(left, newMid, slice(newRight, mid, r), tp);
     }
 
     final BigSeq bigOther = (BigSeq) seq;
@@ -406,7 +406,7 @@ final class BigSeq extends TreeSeq {
       midNodes[i] = new LeafNode(arr);
     }
 
-    return new BigSeq(left, middle.concat(midNodes, n, bigOther.middle), bigOther.right, retType);
+    return new BigSeq(left, middle.concat(midNodes, n, bigOther.middle), bigOther.right, tp);
   }
 
   @Override

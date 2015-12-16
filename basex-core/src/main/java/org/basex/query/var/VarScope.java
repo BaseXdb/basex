@@ -119,7 +119,7 @@ public final class VarScope {
 
     // remove unused entries from the closure
     if(expr instanceof Closure) {
-      final Iterator<Entry<Var, Expr>> cls = ((Closure) expr).nonLocalBindings();
+      final Iterator<Entry<Var, Expr>> cls = ((Closure) expr).globalBindings();
       while(cls.hasNext()) {
         final Entry<Var, Expr> e = cls.next();
         final Var v = e.getKey();

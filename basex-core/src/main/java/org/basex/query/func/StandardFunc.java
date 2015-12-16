@@ -65,7 +65,7 @@ public abstract class StandardFunc extends Arr {
     sig = f;
     info = ii;
     exprs = args;
-    seqType = f.ret;
+    seqType = f.type;
     return this;
   }
 
@@ -80,7 +80,7 @@ public abstract class StandardFunc extends Arr {
   public final Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     // skip context-based or non-deterministic functions, and non-values
     return optPre(has(Flag.CTX) || has(Flag.NDT) || has(Flag.HOF) || has(Flag.UPD) ||
-        !allAreValues() ? opt(qc, scp) : sig.ret.zeroOrOne() ? item(qc, info) : value(qc), qc);
+        !allAreValues() ? opt(qc, scp) : sig.type.zeroOrOne() ? item(qc, info) : value(qc), qc);
   }
 
   /**

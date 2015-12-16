@@ -139,7 +139,7 @@ public final class Functions extends TokenSet {
       final FuncType ft, final Expr expr, final VarScope scp, final StaticContext sc,
       final InputInfo ii, final boolean runtime, final boolean updating) {
     return runtime ? new FuncItem(sc, anns, name, params, ft, expr, scp.stackSize()) :
-      new Closure(ii, name, updating ? null : ft.retType, params, expr, anns, null, sc, scp);
+      new Closure(ii, name, updating ? null : ft.type, params, expr, anns, null, sc, scp);
   }
 
   /**

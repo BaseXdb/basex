@@ -2210,14 +2210,14 @@ public class QueryParser extends InputParser {
       if(anns.contains(Annotation.PRIVATE) || anns.contains(Annotation.PUBLIC))
         throw error(NOVISALLOWED);
 
-      final HashMap<Var, Expr> nonLocal = new HashMap<>();
-      localVars.pushContext(nonLocal);
+      final HashMap<Var, Expr> global = new HashMap<>();
+      localVars.pushContext(global);
       final Var[] args = paramList();
       wsCheck(PAREN2);
       final SeqType type = optAsType();
       final Expr body = enclosedExpr();
       final VarScope scope = localVars.popContext();
-      return new Closure(info(), type, args, body, anns, nonLocal, sc, scope);
+      return new Closure(info(), type, args, body, anns, global, sc, scope);
     }
     // annotations not allowed here
     if(!anns.isEmpty()) throw error(NOANN);
@@ -2950,9 +2950,9 @@ public class QueryParser extends InputParser {
 
     // parenthesized item type
     if(consume(PAREN1)) {
-      final SeqType ret = itemType();
+      final SeqType type = itemType();
       wsCheck(PAREN2);
-      return ret;
+      return type;
     }
 
     // parse optional annotation and type name

@@ -105,8 +105,8 @@ final class RestXqWadl {
     param.add("name", name).add("style", style);
     final QNm qn = new QNm(name);
     for(final Var var : func.function.args) {
-      if(var.name.eq(qn) && var.declType != null) {
-        param.add("type", var.declType.toString());
+      if(var.name.eq(qn) && var.type != null) {
+        param.add("type", var.type.toString());
       }
     }
     addDoc(Inspect.doc(xqdoc, token(name)), param);

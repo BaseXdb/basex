@@ -109,8 +109,8 @@ public final class BaseXServer extends CLI implements Runnable {
     do Thread.yield(); while(!running);
 
     // show info that server has been started
-    context.log.writeServer(LogType.OK, Util.info(SRV_STARTED_PORT_X, port));
     if(!quiet) Util.outln(S_CONSOLE + Util.info(SRV_STARTED_PORT_X, port), S_SERVER);
+    context.log.writeServer(LogType.OK, Util.info(SRV_STARTED_PORT_X, port));
 
     // show info when server is aborted
     Runtime.getRuntime().addShutdownHook(new Thread() {

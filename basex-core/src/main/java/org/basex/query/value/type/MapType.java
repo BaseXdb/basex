@@ -45,7 +45,7 @@ public final class MapType extends FuncType {
     if(this == t) return true;
     if(!(t instanceof MapType)) return false;
     final MapType mt = (MapType) t;
-    return keyType().eq(mt.keyType()) && retType.eq(mt.retType);
+    return keyType().eq(mt.keyType()) && type.eq(mt.type);
   }
 
   @Override
@@ -56,7 +56,7 @@ public final class MapType extends FuncType {
 
     final FuncType ft = (FuncType) t;
     final int al = argTypes.length;
-    if(al != ft.argTypes.length || !retType.instanceOf(ft.retType)) return false;
+    if(al != ft.argTypes.length || !type.instanceOf(ft.type)) return false;
     if(t instanceof MapType) return keyType().instanceOf(((MapType) t).keyType());
 
     // test function arguments of function type
@@ -73,7 +73,7 @@ public final class MapType extends FuncType {
       final MapType mt = (MapType) t;
       if(mt.instanceOf(this)) return this;
       final AtomType a = (AtomType) keyType().intersect(mt.keyType());
-      return a != null ? get(a, retType.union(mt.retType)) : SeqType.ANY_FUN;
+      return a != null ? get(a, type.union(mt.type)) : SeqType.ANY_FUN;
     }
     return t instanceof ArrayType ? SeqType.ANY_FUN : t instanceof FuncType ? t.union(this) :
       AtomType.ITEM;
@@ -87,13 +87,13 @@ public final class MapType extends FuncType {
     if(t instanceof MapType) {
       final MapType mt = (MapType) t;
       if(mt.instanceOf(this)) return mt;
-      final SeqType rt = retType.intersect(mt.retType);
+      final SeqType rt = type.intersect(mt.type);
       return rt == null ? null : get((AtomType) keyType().union(mt.keyType()), rt);
     }
     if(t instanceof FuncType) {
       final FuncType ft = (FuncType) t;
       if(ft.argTypes.length == 1 && ft.argTypes[0].instanceOf(SeqType.AAT)) {
-        final SeqType rt = retType.intersect(ft.retType);
+        final SeqType rt = type.intersect(ft.type);
         return rt == null ? null : get((AtomType) keyType().union(ft.argTypes[0].type), rt);
       }
     }
@@ -121,7 +121,7 @@ public final class MapType extends FuncType {
   @Override
   public String toString() {
     final AtomType keyType = keyType();
-    return keyType == AtomType.AAT && retType.eq(SeqType.ITEM_ZM) ? "map(*)"
-        : "map(" + keyType + ", " + retType + ')';
+    return keyType == AtomType.AAT && type.eq(SeqType.ITEM_ZM) ? "map(*)"
+        : "map(" + keyType + ", " + type + ')';
   }
 }

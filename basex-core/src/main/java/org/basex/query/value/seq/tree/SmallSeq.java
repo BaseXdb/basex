@@ -22,10 +22,10 @@ final class SmallSeq extends TreeSeq {
   /**
    * Constructor.
    * @param elems elements
-   * @param ret type of all elements in this sequence
+   * @param type type of all elements in this sequence
    */
-  SmallSeq(final Item[] elems, final Type ret) {
-    super(elems.length, ret);
+  SmallSeq(final Item[] elems, final Type type) {
+    super(elems.length, type);
     this.elems = elems;
     assert elems.length >= 2 && elems.length <= MAX_SMALL;
   }
@@ -46,7 +46,7 @@ final class SmallSeq extends TreeSeq {
     final int n = elems.length;
     final Item[] es = new Item[n];
     for(int i = 0; i < n; i++) es[i] = elems[n - 1 - i];
-    return new SmallSeq(es, ret);
+    return new SmallSeq(es, type);
   }
 
   @Override
@@ -75,7 +75,7 @@ final class SmallSeq extends TreeSeq {
     final Item[] out = new Item[n - 1];
     System.arraycopy(elems, 0, out, 0, p);
     System.arraycopy(elems, p + 1, out, p, n - 1 - p);
-    return new SmallSeq(out, ret);
+    return new SmallSeq(out, type);
   }
 
   @Override
@@ -87,7 +87,7 @@ final class SmallSeq extends TreeSeq {
           + (pos + len) + " > " + elems.length);
 
     final int p = (int) pos, n = (int) len;
-    return n == 0 ? Empty.SEQ : n == 1 ? elems[p] : new SmallSeq(slice(elems, p, p + n), ret);
+    return n == 0 ? Empty.SEQ : n == 1 ? elems[p] : new SmallSeq(slice(elems, p, p + n), type);
   }
 
   @Override
