@@ -196,8 +196,10 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   @Override
   protected void finishClose() throws IOException {
     try {
-      final String name = string(elem.string());
-      contentHandler.endElement("", name, name);
+      final String uri = string(namespaces.get(elem.prefix()));
+      final String lname = string(elem.local());
+      final String rname = string(elem.string());
+      contentHandler.endElement(uri, lname, rname);
       namespaces = namespaces.getParent();
     } catch(final SAXException ex) {
       throw new IOException(ex);
