@@ -21,7 +21,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-final class JavaModuleFunc extends JavaMapping {
+final class JavaModuleFunc extends JavaFunction {
   /** Java module. */
   private final Object module;
   /** Method to be called. */

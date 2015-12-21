@@ -36,7 +36,7 @@ import org.w3c.dom.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public abstract class JavaMapping extends Arr {
+public abstract class JavaFunction extends Arr {
   /** New keyword. */
   static final String NEW = "new";
   /** Input Java types. */
@@ -65,7 +65,7 @@ public abstract class JavaMapping extends Arr {
    * @param info input info
    * @param args arguments
    */
-  JavaMapping(final StaticContext sc, final InputInfo info, final Expr[] args) {
+  JavaFunction(final StaticContext sc, final InputInfo info, final Expr[] args) {
     super(info, args);
     this.sc = sc;
   }
@@ -210,19 +210,23 @@ public abstract class JavaMapping extends Arr {
    * @return Java function or {@code null}
    * @throws QueryException query exception
    */
-  static JavaMapping get(final QNm qname, final Expr[] args, final QueryContext qc,
+  static JavaFunction get(final QNm qname, final Expr[] args, final QueryContext qc,
       final StaticContext sc, final InputInfo ii) throws QueryException {
 
     // rewrite function name
     final String name = Strings.camelCase(string(qname.local()));
     final String uri = string(qname.uri());
+
     // check if URI starts with "java:" prefix (if yes, module must be Java code)
-    final boolean prefix = uri.startsWith(JAVAPREF);
-    // rewrite function path
-    final String pth = prefix ? uri.substring(JAVAPREF.length()) : uri;
-    final String dirp = ModuleLoader.uri2path(pth);
-    final String path = dirp == null ? pth :
-      ModuleLoader.capitalize(dirp).replace('/', '.').substring(1);
+    final boolean java = uri.startsWith(JAVAPREF);
+    String path = uri;
+    if(java) {
+      path = uri.substring(JAVAPREF.length());
+    } else {
+      // otherwise, rewrite function path
+      final String uriPath = ModuleLoader.uri2path(path);
+      if(uriPath != null) path = ModuleLoader.capitalize(uriPath).replace('/', '.').substring(1);
+    }
 
     // check imported Java modules
     final ModuleLoader modules = qc.resources.modules();
@@ -245,7 +249,7 @@ public abstract class JavaMapping extends Arr {
     }
 
     // no function found: raise error only if "java:" prefix was specified
-    if(prefix) throw FUNCJAVA_X.get(ii, path);
+    if(java) throw FUNCJAVA_X.get(ii, path);
     return null;
   }
 

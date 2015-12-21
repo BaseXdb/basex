@@ -707,7 +707,7 @@ public final class QueryContext extends Proc implements Closeable {
 
     // no type specified: return original value or convert Java object
     if(type == null || type.isEmpty()) {
-      return vl instanceof Value ? (Value) vl : JavaMapping.toValue(vl, this, sc);
+      return vl instanceof Value ? (Value) vl : JavaFunction.toValue(vl, this, sc);
     }
 
     // convert to json

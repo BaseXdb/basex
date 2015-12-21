@@ -193,7 +193,7 @@ public final class Functions extends TokenSet {
     }
 
     // user-defined function
-    final StaticFunc sf = qc.funcs.get(name, arity, ii, true);
+    final StaticFunc sf = qc.funcs.get(name, arity, ii, false);
     if(sf != null) {
       final FuncType ft = sf.funcType();
       final VarScope scp = new VarScope(sc);
@@ -221,8 +221,8 @@ public final class Functions extends TokenSet {
       vs[v] = scp.newLocal(qc, new QNm(ARG + (v + 1), ""), SeqType.ITEM_ZM, true);
       refs[v] = new VarRef(ii, vs[v]);
     }
-    final Expr jm = JavaMapping.get(name, refs, qc, sc, ii);
-    return jm == null ? null : new FuncLit(new AnnList(), name, vs, jm, jt, scp, sc, ii);
+    final Expr jf = JavaFunction.get(name, refs, qc, sc, ii);
+    return jf == null ? null : new FuncLit(new AnnList(), name, vs, jf, jt, scp, sc, ii);
   }
 
   /**
@@ -285,7 +285,7 @@ public final class Functions extends TokenSet {
     if(tf != null) return tf;
 
     // Java function (only allowed with administrator permissions)
-    final JavaMapping jf = JavaMapping.get(name, args, qc, sc, ii);
+    final JavaFunction jf = JavaFunction.get(name, args, qc, sc, ii);
     if(jf != null) return TypedFunc.java(jf);
 
     // add user-defined function that has not been declared yet

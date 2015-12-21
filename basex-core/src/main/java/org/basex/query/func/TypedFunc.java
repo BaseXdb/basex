@@ -39,7 +39,7 @@ public final class TypedFunc {
    * @param f java function
    * @return typed function
    */
-  static TypedFunc java(final JavaMapping f) {
+  static TypedFunc java(final JavaFunction f) {
     return new TypedFunc(f, new AnnList());
   }
 }

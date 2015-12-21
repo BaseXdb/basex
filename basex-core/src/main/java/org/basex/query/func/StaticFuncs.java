@@ -198,7 +198,7 @@ public final class StaticFuncs extends ExprInfo {
    * @param name function name
    * @param arity function arity
    * @param ii input info
-   * @param error raise error if function is not found
+   * @param error raise error if function in reserved namespace is not found
    * @return function if found, {@code null} otherwise
    * @throws QueryException query exception
    */
@@ -210,7 +210,7 @@ public final class StaticFuncs extends ExprInfo {
 
     if(error && NSGlobal.reserved(name.uri())) {
       final QueryException qe = similarError(name, ii);
-      if(qe != null) throw qe;
+      throw qe == null ? FUNCUNKNOWN_X.get(ii, name.string()) : qe;
     }
     return null;
   }
