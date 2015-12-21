@@ -153,7 +153,7 @@ public abstract class Path extends ParseExpr {
   }
 
   @Override
-  public final Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     final Value v = initial(qc);
     if(v != null && v.isEmpty() || emptyPath(v)) return optPre(qc);
 

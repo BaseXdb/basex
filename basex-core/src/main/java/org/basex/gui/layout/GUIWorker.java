@@ -1,6 +1,10 @@
 package org.basex.gui.layout;
 
+import java.util.concurrent.*;
+
 import javax.swing.*;
+
+import org.basex.util.*;
 
 /**
  * Simplified version of the {@link SwingWorker} class.
@@ -37,7 +41,10 @@ public abstract class GUIWorker<T> {
         try {
           final T t = get();
           if(t != null) GUIWorker.this.done(t);
-        } catch(final Exception ignore) { }
+        } catch(final InterruptedException ignore) {
+        } catch(final ExecutionException ex) {
+          Util.stack(ex);
+        }
       }
     }.execute();
   }

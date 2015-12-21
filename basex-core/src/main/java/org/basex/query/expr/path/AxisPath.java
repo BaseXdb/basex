@@ -6,6 +6,7 @@ import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -25,7 +26,6 @@ public abstract class AxisPath extends Path {
 
   /** Current state. */
   private Caching state;
-
   /** Cached result. */
   private Value cached;
   /** Cached context value. */
@@ -39,9 +39,14 @@ public abstract class AxisPath extends Path {
    */
   AxisPath(final InputInfo info, final Expr root, final Expr... steps) {
     super(info, root, steps);
+  }
+
+  @Override
+  public final Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     // cache values if expression has no free variables, is deterministic and performs no updates
     state = !hasFreeVars() && !has(Flag.NDT) && !has(Flag.UPD) && !has(Flag.HOF) ?
       Caching.ENABLED : Caching.DISABLED;
+    return super.optimize(qc, scp);
   }
 
   @Override
