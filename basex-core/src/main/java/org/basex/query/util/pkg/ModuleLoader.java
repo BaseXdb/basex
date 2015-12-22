@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
+import java.lang.reflect.*;
 import java.net.*;
 import java.util.*;
 
@@ -21,16 +22,17 @@ import org.basex.util.*;
 public final class ModuleLoader {
   /** Default class loader. */
   private static final ClassLoader LOADER = Thread.currentThread().getContextClassLoader();
+  /** Close method. */
+  private static final Method CLOSE = Reflect.method(QueryResource.class, "close");
 
   /** Database context. */
   private final Context context;
   /** Cached URLs to be added to the class loader. */
   private final ArrayList<URL> urls = new ArrayList<>(0);
+  /** Java modules. */
+  private final HashSet<Object> javaModules = new HashSet<>();
   /** Current class loader. */
   private ClassLoader loader = LOADER;
-
-  /** Java modules. */
-  private HashSet<Object> javaModules;
 
   /**
    * Constructor.
@@ -46,12 +48,9 @@ public final class ModuleLoader {
    */
   public void close() {
     if(loader instanceof JarLoader) ((JarLoader) loader).close();
-    if(javaModules != null) {
-      for(final Object jm : javaModules) {
-        for(final Class<?> c : jm.getClass().getInterfaces()) {
-          if(c != QueryResource.class) continue;
-          Reflect.invoke(Reflect.method(QueryResource.class, "close"), jm);
-        }
+    for(final Object jm : javaModules) {
+      for(final Class<?> c : jm.getClass().getInterfaces()) {
+        if(c == QueryResource.class) Reflect.invoke(CLOSE, jm);
       }
     }
   }
@@ -67,67 +66,65 @@ public final class ModuleLoader {
   public boolean addImport(final String uri, final InputInfo ii, final QueryParser qp)
       throws QueryException {
 
-    // add EXPath package
-    final HashSet<String> pkgs = context.repo.nsDict().get(uri);
-    if(pkgs != null) {
-      Version ver = null;
-      String nm = null;
-      for(final String name : pkgs) {
-        final Version v = new Version(Pkg.version(name));
-        if(ver == null || v.compareTo(ver) > 0) {
-          ver = v;
-          nm = name;
-        }
-      }
-      if(nm != null) {
-        addRepo(nm, new HashSet<String>(), new HashSet<String>(), ii, qp);
-        return true;
-      }
-    }
-
-    // search module in repository: rewrite URI to file path
+    // add Java repository package
+    final String repoPath = context.soptions.get(StaticOptions.REPOPATH);
     final boolean java = uri.startsWith(JAVAPREF);
-    String uriPath = uri2path(java ? uri.substring(JAVAPREF.length()) : uri);
-    if(uriPath == null) return false;
-
-    if(!java) {
-      // no "java:" prefix: first try to import module as XQuery
-      final String path = context.soptions.get(StaticOptions.REPOPATH) + uriPath;
-      // check for any file with XQuery suffix
-      for(final String suf : IO.XQSUFFIXES) {
-        final IOFile file = new IOFile(path + suf);
-        if(file.exists()) {
-          qp.module(file.path(), uri);
+    String className;
+    if(java) {
+      className = uri.substring(JAVAPREF.length());
+    } else {
+      // no "java:" prefix: check EXPath repositories
+      final HashSet<String> pkgs = context.repo.nsDict().get(uri);
+      if(pkgs != null) {
+        Version ver = null;
+        String id = null;
+        for(final String pkg : pkgs) {
+          final Version v = new Version(Pkg.version(pkg));
+          if(ver == null || v.compareTo(ver) > 0) {
+            ver = v;
+            id = pkg;
+          }
+        }
+        if(id != null) {
+          addRepo(id, new HashSet<String>(), new HashSet<String>(), ii, qp);
           return true;
         }
       }
+      // check XQuery modules
+      String path = Strings.uri2path(uri);
+      for(final String suffix : IO.XQSUFFIXES) {
+        final IOFile file = new IOFile(repoPath, path + suffix);
+        if(file.exists()) {
+          qp.module(file.path(), uri, ii);
+          return true;
+        }
+      }
+      // convert to Java notation
+      className = Strings.className(path);
     }
 
-    // try to load Java module
-    uriPath = capitalize(uriPath);
-    final String path = context.soptions.get(StaticOptions.REPOPATH) + uriPath;
-    final IOFile file = new IOFile(path + IO.JARSUFFIX);
-    if(file.exists()) addURL(file);
+    // load Java module
+    final IOFile jar = new IOFile(repoPath, Strings.uri2path(className) + IO.JARSUFFIX);
+    if(jar.exists()) addURL(jar);
 
-    // try to create Java class instance
-    final String cp = Strings.camelCase(uriPath.replace('/', '.').substring(1));
+    // create Java class instance
     final Class<?> clz;
     try {
-      clz = findClass(cp);
+      clz = findClass(className);
     } catch(final ClassNotFoundException ex) {
       if(java) throw WHICHCLASS_X.get(ii, ex.getMessage());
       return false;
     } catch(final Throwable th) {
-      throw MODINITERR_X.get(ii, th);
+      throw MODINIT_X_X.get(ii, className, th);
     }
 
-    // add new instance to module cache
-    final Object jm = Reflect.get(clz);
-    if(jm == null) throw INSTERR_X.get(ii, cp);
-
-    if(javaModules == null) javaModules = new HashSet<>();
-    javaModules.add(jm);
-    return true;
+    // instantiate class
+    try {
+      javaModules.add(clz.newInstance());
+      return true;
+    } catch(final Throwable ex) {
+      throw MODINST_X_X.get(ii, className, ex);
+    }
   }
 
   /**
@@ -153,72 +150,11 @@ public final class ModuleLoader {
    * @param clz class to be found
    * @return instance or {@code null}
    */
-  public Object findImport(final String clz) {
-    // check if class was imported as Java module
-    if(javaModules != null) {
-      for(final Object jm : javaModules) {
-        if(jm.getClass().getName().equals(clz)) return jm;
-      }
+  public Object findModule(final String clz) {
+    for(final Object mod : javaModules) {
+      if(mod.getClass().getName().equals(clz)) return mod;
     }
     return null;
-  }
-
-  // STATIC METHODS =====================================================================
-
-  /**
-   * <p>Converts a URI to a directory path. The conversion is inspired by Zorba's
-   * URI transformation
-   * (http://www.zorba-xquery.com/html/documentation/2.2.0/zorba/uriresolvers):</p>
-   * <ul>
-   * <li>In the URI authority, the order of all substrings separated by dots is reversed.</li>
-   * <li>Dots in the authority and the path are replaced by slashes.
-   *     If no path exists, a single slash is appended.</li>
-   * <li>If the resulting string ends with a slash, "index" is appended.</li>
-   * <li>{@code null} is returned if the URI has an invalid syntax.</li>
-   * </ul>
-   * @param uri namespace uri
-   * @return path or {@code null}
-   */
-  public static String uri2path(final String uri) {
-    try {
-      final URI u = new URI(uri);
-      final TokenBuilder tb = new TokenBuilder();
-
-      if(u.isOpaque()) {
-        tb.add('/').add(u.getScheme()).add('/').add(u.getSchemeSpecificPart().replace(':', '/'));
-      } else {
-        final String auth = u.getAuthority();
-        if(auth != null) {
-          // reverse authority, replace dots by slashes. example: basex.org -> org/basex
-          final String[] comp = auth.split("\\.");
-          for(int c = comp.length - 1; c >= 0; c--) tb.add('/').add(comp[c]);
-        } else {
-          tb.add('/');
-        }
-
-        // add remaining path
-        final String path = u.getPath();
-        tb.add(path == null || path.isEmpty() ? "/" : path.replace('.', '/'));
-      }
-
-      // add "index" string
-      final String path = tb.toString().replaceAll("[^\\w.-/]+", "-");
-      return path.endsWith("/") ? path + "index" : path;
-    } catch(final URISyntaxException ex) {
-      Util.debug(ex);
-      return null;
-    }
-  }
-
-  /**
-   * Capitalizes the last path segment.
-   * @param path input path
-   * @return capitalized path
-   */
-  public static String capitalize(final String path) {
-    final int i = path.lastIndexOf('/');
-    return i == -1 || i + 1 >= path.length() ? path : path.substring(0, i + 1) +
-      Character.toUpperCase(path.charAt(i + 1)) + path.substring(i + 2);
   }
 
   // PRIVATE METHODS ====================================================================
@@ -232,9 +168,8 @@ public final class ModuleLoader {
    * @param qp query parser
    * @throws QueryException query exception
    */
-  private void addRepo(final String id, final HashSet<String> toLoad,
-      final HashSet<String> loaded, final InputInfo ii, final QueryParser qp)
-      throws QueryException {
+  private void addRepo(final String id, final HashSet<String> toLoad, final HashSet<String> loaded,
+      final InputInfo ii, final QueryParser qp) throws QueryException {
 
     // return if package is already loaded
     if(loaded.contains(id)) return;
@@ -274,7 +209,7 @@ public final class ModuleLoader {
       }
     }
     for(final PkgComponent comp : pkg.comps) {
-      qp.module(new IOFile(modDir, comp.file).path(), comp.uri);
+      qp.module(new IOFile(modDir, comp.file).path(), comp.uri, ii);
     }
     if(toLoad.contains(id)) toLoad.remove(id);
     loaded.add(id);

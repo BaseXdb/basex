@@ -52,6 +52,22 @@ public final class ModuleTest extends SandboxTest {
   }
 
   /**
+   * Tests a repository import.
+   * @throws Exception exception
+   */
+  @Test
+  public void repoFile() throws Exception {
+    // repository files
+    final IOFile repo = new IOFile(sandbox(), "repo");
+    repo.md();
+    write(new IOFile(repo, "a.xqm"), "module namespace a='a'; declare function a:a(){()};");
+
+    try(final QueryContext qc = new QueryContext(context)) {
+      qc.parseMain("import module namespace a='a'; a:a()", null, null);
+    }
+  }
+
+  /**
    * Tests circular dependencies.
    * @throws Exception exception
    */

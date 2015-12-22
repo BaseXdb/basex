@@ -117,6 +117,7 @@ public final class PermissionTest extends SandboxTest {
     no(new Find(NAME), testSession);
     no(new Optimize(), testSession);
     // XQuery update
+    no(new XQuery("Q{java.lang.String}new('x')"), testSession);
     no(new XQuery("for $item in doc('" + NAME + "')//xml " +
       "return rename node $item as 'null'"), testSession);
     no(new CreateDB(NAME, "<xml/>"), testSession);
@@ -157,6 +158,7 @@ public final class PermissionTest extends SandboxTest {
     no(new RepoDelete("http://www.pkg3.com", null), testSession);
 
     // XQuery update
+    no(new XQuery("Q{java.lang.String}new('x')"), testSession);
     no(new XQuery("for $n in " + DOC.args(NAME) + "//xml return delete node $n"), testSession);
     no(new XQuery(_DB_CREATE.args(NAME)), testSession);
     no(new Optimize(), testSession);
@@ -200,6 +202,7 @@ public final class PermissionTest extends SandboxTest {
     no(new RepoDelete("http://www.pkg3.com", null), testSession);
 
     // XQuery Update
+    no(new XQuery("Q{java.lang.String}new('x')"), testSession);
     ok(new XQuery("for $item in doc('" + NAME + "')//xml " +
         "return rename node $item as 'null'"), testSession);
     no(new XQuery(_DB_CREATE.args(NAME)), testSession);
@@ -279,6 +282,8 @@ public final class PermissionTest extends SandboxTest {
     ok(new RepoList(), testSession);
     ok(new RepoDelete("http://www.pkg3.com", null), testSession);
     ok(new org.basex.core.cmd.Test(FOLDER + "tests-ok.xqm"), testSession);
+
+    ok(new XQuery("Q{java.lang.String}new('x')"), testSession);
   }
 
   /** Drops users. */

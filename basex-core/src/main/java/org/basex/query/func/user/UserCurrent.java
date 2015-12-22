@@ -10,7 +10,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public final class UserCurrent extends UserList {
+public final class UserCurrent extends UserFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) {
     return Str.get(qc.context.user().name());

@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 
 import java.lang.reflect.*;
 
+import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
@@ -36,7 +37,7 @@ final class JavaFunc extends JavaFunction {
    */
   JavaFunc(final StaticContext sc, final InputInfo info, final Class<?> clazz, final String method,
       final Expr[] args) {
-    super(sc, info, args);
+    super(sc, info, args, Perm.ADMIN);
     this.clazz = clazz;
     this.method = method;
   }

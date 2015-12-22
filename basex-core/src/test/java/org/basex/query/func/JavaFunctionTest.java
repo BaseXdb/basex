@@ -15,9 +15,20 @@ public final class JavaFunctionTest extends AdvancedQueryTest {
   /** Tests calling some Java constructors from XQuery. */
   @Test
   public void constr() {
+    // check java: prefix
     query("Q{java:java.lang.Integer}new('123')", 123);
-    query("declare namespace rand='java:java.util.Random'; rand:nextInt(rand:new())");
-    query("declare namespace ctx='java:org.basex.core.Context'; ctx:new()");
+    query("declare namespace f='java:java.util.Random'; f:nextInt(f:new())");
+    query("declare namespace f='java:org.basex.util.list.StringList'; f:new()");
+    error("declare namespace rand='java:java.util.random'; rand:new()", FUNCJAVA_X);
+    error("Q{java:java.util.random}new()", FUNCJAVA_X);
+  }
+
+  /** Tests namespace rewritings. */
+  @Test
+  public void rewriteURI() {
+    query("Q{java.lang.integer}new('123')", 123);
+    query("declare namespace j='java.util.random'; j:nextInt(j:new())");
+    query("declare namespace j='http://basex.org/util/list/string-list'; j:new()");
   }
 
   /** Tests calling some Java static fields from XQuery. */
@@ -82,6 +93,8 @@ public final class JavaFunctionTest extends AdvancedQueryTest {
     // handle {@link Jav} type
     error("declare namespace string = 'java.lang.String';" +
         "string:concat(string:new(), Q{java.awt.Point}new())", JAVAMETHOD_X_X);
+    error("import module namespace qm='java:org.basex.query.func.QueryModuleTest';" +
+        "qm:fast()", FUNCJAVA_X);
 
     query("declare namespace qm='java:org.basex.query.func.QueryModuleTest';" +
         "try{qm:error(qm:new())} catch * {local-name-from-QName($err:code)}", "BASX0000");
@@ -92,10 +105,8 @@ public final class JavaFunctionTest extends AdvancedQueryTest {
   /** Tests ambiguous function signatures. */
   @Test
   public void ambiguousSignature() {
-    error("import module namespace n='java:java.lang.StringBuilder'; n:append('x')",
-        JAVAAMBIG_X);
-    error("declare namespace n='java:java.lang.StringBuilder'; n:append(n:new(), 'x')",
-        JAVAAMBIG_X);
+    error("import module namespace n='java:java.lang.StringBuilder'; n:append('x')", JAVAAMBIG_X);
+    error("declare namespace n='java:java.lang.StringBuilder';n:append(n:new(), 'x')", JAVAAMBIG_X);
   }
 
   /** Ensure that items cannot be cast to Java. */

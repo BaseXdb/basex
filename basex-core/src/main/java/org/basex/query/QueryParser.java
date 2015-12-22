@@ -12,7 +12,6 @@ import java.util.Map.Entry;
 
 import org.basex.core.*;
 import org.basex.core.locks.*;
-import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
 import org.basex.query.ann.*;
@@ -232,8 +231,7 @@ public class QueryParser extends InputParser {
    */
   private void init() throws QueryException {
     final IO baseIO = sc.baseIO();
-    file = baseIO == null ? null : qc.context.user().has(Perm.ADMIN) ? baseIO.path() :
-      baseIO.name();
+    file = baseIO == null ? null : baseIO.path();
     if(!more()) throw error(QUERYEMPTY);
 
     // checks if the query string contains invalid characters
@@ -750,16 +748,19 @@ public class QueryParser extends InputParser {
       throw error(WHICHMODULE_X, uri);
     }
     // parse supplied paths
-    for(final byte[] path : mi.paths) module(string(path), string(uri));
+    for(final byte[] path : mi.paths) module(string(path), string(uri), mi.info);
   }
 
   /**
    * Parses the specified module, checking function and variable references at the end.
    * @param path file path
    * @param uri module uri
+   * @param info input info
    * @throws QueryException query exception
    */
-  public void module(final String path, final String uri) throws QueryException {
+  public void module(final String path, final String uri, final InputInfo info)
+      throws QueryException {
+
     // get absolute path
     final IO io = sc.resolve(path, uri);
     final byte[] p = token(io.path());
@@ -767,8 +768,7 @@ public class QueryParser extends InputParser {
     // check if module has already been parsed
     final byte[] u = qc.modParsed.get(p);
     if(u != null) {
-      if(!uri.equals(string(u))) throw error(WRONGMODULE_X_X, uri,
-          qc.context.user().has(Perm.ADMIN) ? io.path() : io.name());
+      if(!uri.equals(string(u))) throw WRONGMODULE_X_X_X.get(info, io.name(), uri, u);
       return;
     }
     qc.modParsed.put(p, token(uri));
@@ -778,7 +778,7 @@ public class QueryParser extends InputParser {
     try {
       qu = string(io.read());
     } catch(final IOException ex) {
-      throw error(WHICHMODFILE_X, qc.context.user().has(Perm.ADMIN) ? io.path() : io.name());
+      throw error(WHICHMODFILE_X, io);
     }
 
     qc.modStack.push(p);
@@ -787,7 +787,7 @@ public class QueryParser extends InputParser {
     final byte[] muri = lib.name.uri();
 
     // check if import and declaration uri match
-    if(!uri.equals(string(muri))) throw error(WRONGMODULE_X_X, muri, file);
+    if(!uri.equals(string(muri))) throw WRONGMODULE_X_X_X.get(info, io.name(), uri, muri);
 
     // check if context value declaration types are compatible to each other
     if(sub.contextType != null) {

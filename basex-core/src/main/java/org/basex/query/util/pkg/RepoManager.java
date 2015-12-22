@@ -221,9 +221,7 @@ public final class RepoManager {
     try(final QueryContext qc = new QueryContext(context)) {
       final byte[] uri = qc.parseLibrary(string(content), path, null).name.uri();
       // copy file to rewritten URI file path
-      final String uriPath = ModuleLoader.uri2path(string(uri));
-      if(uriPath == null) throw BXRE_URI_X.get(info, uri);
-      return write(uriPath + IO.XQMSUFFIX, content);
+      return write(Strings.uri2path(string(uri)) + IO.XQMSUFFIX, content);
     }
   }
 

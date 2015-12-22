@@ -47,7 +47,7 @@ public final class MixedTest extends AdvancedQueryTest {
   public void duplLocation() {
     error("import module namespace a='world' at '" + XQMFILE + "';" +
       "import module namespace b='galaxy' at '" + XQMFILE + "'; 1",
-      WRONGMODULE_X_X);
+      WRONGMODULE_X_X_X);
   }
 
   /** Checks static context scoping in variables. */

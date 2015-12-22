@@ -188,7 +188,7 @@ public enum QueryError {
   /** BXRE0001. */
   BXRE_WHICH_X(BXRE, 1, "Package '%' does not exist."),
   /** BXRE0002. */
-  BXRE_URI_X(BXRE, 2, "URI is invalid or has no path component: '%'."),
+  BXRE_URI_X(BXRE, 2, "URI is invalid: '%'."),
   /** BXRE0003. */
   BXRE_NOTINST_X(BXRE, 3, "Required package '%' is not installed."),
   /** BXRE0004. */
@@ -916,7 +916,7 @@ public enum QueryError {
   /** XPST0017. */
   FUNCNOIMPL_X(XPST, 17, "Function '%' not implemented."),
   /** XPST0017. */
-  FUNCJAVA_X(XPST, 17, "Java function '%' not found."),
+  FUNCJAVA_X(XPST, 17, "Java function not found: %."),
   /** XPST0017. */
   JAVAAMBIG_X(XPST, 17, "%: Several functions with same number of arguments."),
   /** XPST0017. */
@@ -1089,17 +1089,17 @@ public enum QueryError {
   /** XQST0057. */
   NSEMPTY(XQST, 57, "Namespace URI cannot be empty."),
   /** XQST0059. */
-  INSTERR_X(XQST, 59, "Could not instantiate module '%'."),
+  WHICHMODULE_X(XQST, 59, "Module not found: %."),
   /** XQST0059. */
-  WHICHMODULE_X(XQST, 59, "Module '%' not found."),
+  WHICHCLASS_X(XQST, 59, "Java class not found: %."),
   /** XQST0059. */
-  WHICHCLASS_X(XQST, 59, "Class not found: '%'."),
+  MODINIT_X_X(XQST, 59, "Could not initialize %: %."),
   /** XQST0059. */
-  MODINITERR_X(XQST, 59, "Module not initialized: %."),
+  MODINST_X_X(XQST, 59, "Could not instantiate %: %."),
   /** XQST0059. */
-  WHICHMODFILE_X(XQST, 59, "Could not retrieve module '%'."),
+  WHICHMODFILE_X(XQST, 59, "Could not retrieve module: %."),
   /** XQST0059. */
-  WRONGMODULE_X_X(XQST, 59, "Wrong URI '%' in imported module '%'."),
+  WRONGMODULE_X_X_X(XQST, 59, "Imported module '%' has unexpected namespace: '%' vs '%'."),
   /** XQST0060. */
   FUNNONS_X(XQST, 60, "Namespace needed for function '%'."),
   /** XQST0065. */

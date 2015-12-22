@@ -1,5 +1,6 @@
 package org.basex.util;
 
+import java.net.*;
 import java.nio.charset.*;
 import java.security.*;
 import java.util.*;
@@ -131,7 +132,6 @@ public final class Strings {
    * @return resulting token
    */
   public static String delete(final String string, final char ch) {
-    // check if character occurs in string
     if(!contains(string, ch)) return string;
 
     final int tl = string.length();
@@ -187,28 +187,6 @@ public final class Strings {
   }
 
   /**
-   * Converts the given string to camel case.
-   * @param string string to convert
-   * @return resulting string
-   */
-  public static String camelCase(final String string) {
-    final StringBuilder sb = new StringBuilder(string.length());
-    boolean dash = false;
-    final int sl = string.length();
-    for(int s = 0; s < sl; s++) {
-      final char ch = string.charAt(s);
-      if(dash) {
-        sb.append(Character.toUpperCase(ch));
-        dash = false;
-      } else {
-        dash = ch == '-';
-        if(!dash) sb.append(ch);
-      }
-    }
-    return sb.toString();
-  }
-
-  /**
    * Returns a unified representation of the specified encoding.
    * @param encoding input encoding (UTF-8 is returned for a {@code null} reference)
    * @return encoding
@@ -257,11 +235,94 @@ public final class Strings {
   }
 
   /**
+   * Capitalizes a string.
+   * @param string input string
+   * @return capitalized string
+   */
+  public static String capitalize(final String string) {
+    final StringBuilder sb = new StringBuilder();
+    if(!string.isEmpty())
+      sb.append(Character.toUpperCase(string.charAt(0))).append(string.substring(1));
+    return sb.toString();
+  }
+
+  /**
+   * Converts the given string to a Java class name. Slashes will be replaced with dots, and
+   * the last package segment will be capitalized and camel-cased.
+   * @param string string to convert
+   * @return class name
+   */
+  public static String className(final String string) {
+    final String s = string.replace('/', '.');
+    final int c = s.lastIndexOf('.') + 1;
+    return s.substring(0, c) + capitalize(camelCase(s.substring(c)));
+  }
+
+  /**
+   * Converts the given string to camel case.
+   * @param string string to convert
+   * @return resulting string
+   */
+  public static String camelCase(final String string) {
+    final StringBuilder sb = new StringBuilder();
+    boolean upper = false;
+    final int sl = string.length();
+    for(int s = 0; s < sl; s++) {
+      final char ch = string.charAt(s);
+      if(ch == '-') {
+        upper = true;
+      } else if(upper) {
+        sb.append(Character.toUpperCase(ch));
+        upper = false;
+      } else {
+        sb.append(ch);
+      }
+    }
+    return sb.toString();
+  }
+
+  /**
    * Checks if the specified string is "no", "false", "off" or "0".
    * @param string string to be checked
    * @return result of check
    */
   public static boolean no(final String string) {
     return eqic(string, Text.FALSE, Text.NO, Text.OFF, "0");
+  }
+
+  /**
+   * Converts a URI to a directory path.
+   * See http://docs.basex.org/wiki/Repository#URI_Rewriting for details.
+   * @param uri namespace uri
+   * @return converted path
+   */
+  public static String uri2path(final String uri) {
+    String path = uri;
+    try {
+      final URI u = new URI(uri);
+      final TokenBuilder tb = new TokenBuilder();
+      if(u.isOpaque()) {
+        tb.add(u.getScheme()).add('/').add(u.getSchemeSpecificPart().replace(':', '/'));
+      } else {
+        final String auth = u.getAuthority();
+        if(auth != null) {
+          // reverse authority, replace dots by slashes. example: basex.org -> org/basex
+          final String[] comp = split(auth, '.');
+          for(int c = comp.length - 1; c >= 0; c--) tb.add('/').add(comp[c]);
+        }
+        // add remaining path
+        final String p = u.getPath();
+        tb.add(p == null || p.isEmpty() ? "/" : p.replace('.', '/'));
+      }
+      path = tb.toString();
+    } catch(final URISyntaxException ignore) { }
+
+    // replace special characters with dashes; remove multiple slashes
+    path = path.replaceAll("[^\\w.-/]+", "-").replaceAll("//+", "/");
+    // add "index" string
+    if(path.endsWith("/")) path += "index";
+    // remove heading slash
+    if(path.startsWith("/")) path = path.substring(1);
+    return path;
   }
 }

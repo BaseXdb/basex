@@ -58,16 +58,20 @@ public abstract class JavaFunction extends Arr {
 
   /** Static context. */
   final StaticContext sc;
+  /** Permission. */
+  final Perm perm;
 
   /**
    * Constructor.
    * @param sc static context
    * @param info input info
    * @param args arguments
+   * @param perm required permission to run the function
    */
-  JavaFunction(final StaticContext sc, final InputInfo info, final Expr[] args) {
+  JavaFunction(final StaticContext sc, final InputInfo info, final Expr[] args, final Perm perm) {
     super(info, args);
     this.sc = sc;
+    this.perm = perm;
   }
 
   @Override
@@ -77,6 +81,9 @@ public abstract class JavaFunction extends Arr {
 
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
+    // check permission
+    if(!qc.context.user().has(perm)) throw BASX_PERM_X.get(info, perm);
+
     final int es = exprs.length;
     final Value[] args = new Value[es];
     for(int e = 0; e < es; ++e) args[e] = qc.value(exprs[e]);
@@ -162,8 +169,7 @@ public abstract class JavaFunction extends Arr {
 
   /**
    * Gets the specified method from a query module.
-   * @param mod query module object
-   * @param path path of the module
+   * @param module query module object
    * @param name method name
    * @param arity number of arguments
    * @param qc query context
@@ -171,24 +177,19 @@ public abstract class JavaFunction extends Arr {
    * @return method if found, {@code null} otherwise
    * @throws QueryException query exception
    */
-  private static Method moduleMethod(final Object mod, final String path, final String name,
-      final long arity, final QueryContext qc, final InputInfo ii) throws QueryException {
+  private static Method moduleMethod(final Object module, final String name, final long arity,
+      final QueryContext qc, final InputInfo ii) throws QueryException {
 
     // find method with identical name and arity
     Method meth = null;
-    for(final Method m : mod.getClass().getMethods()) {
+    final Class<?> clz = module.getClass();
+    for(final Method m : clz.getMethods()) {
       if(m.getName().equals(name) && m.getParameterTypes().length == arity) {
-        if(meth != null) throw JAVAAMBIG_X.get(ii, "Q{" + path + '}' + name + '#' + arity);
+        if(meth != null) throw JAVAAMBIG_X.get(ii, "Q{" + clz.getName() + '}' + name + '#' + arity);
         meth = m;
       }
     }
-    if(meth == null) throw FUNCJAVA_X.get(ii, path + ':' + name);
-
-    // check if user has sufficient permissions to call the function
-    Perm perm = Perm.ADMIN;
-    final Requires req = meth.getAnnotation(Requires.class);
-    if(req != null) perm = Perm.get(req.value().name().toLowerCase(Locale.ENGLISH));
-    if(!qc.context.user().has(perm)) return null;
+    if(meth == null) throw FUNCJAVA_X.get(ii, clz.getName() + ':' + name);
 
     // Add module locks to QueryContext.
     final Lock lock = meth.getAnnotation(Lock.class);
@@ -196,7 +197,6 @@ public abstract class JavaFunction extends Arr {
       for(final String read : lock.read()) qc.readLocks.add(DBLocking.MODULE_PREFIX + read);
       for(final String write : lock.write()) qc.writeLocks.add(DBLocking.MODULE_PREFIX + write);
     }
-
     return meth;
   }
 
@@ -219,29 +219,30 @@ public abstract class JavaFunction extends Arr {
 
     // check if URI starts with "java:" prefix (if yes, module must be Java code)
     final boolean java = uri.startsWith(JAVAPREF);
-    String path = uri;
+    String className = uri;
     if(java) {
-      path = uri.substring(JAVAPREF.length());
+      className = uri.substring(JAVAPREF.length());
     } else {
       // otherwise, rewrite function path
-      final String uriPath = ModuleLoader.uri2path(path);
-      if(uriPath != null) path = ModuleLoader.capitalize(uriPath).replace('/', '.').substring(1);
+      className = Strings.className(Strings.uri2path(uri));
     }
 
-    // check imported Java modules
+    // try to find function in imported Java modules
     final ModuleLoader modules = qc.resources.modules();
-    final Object jm  = modules.findImport(path);
-    if(jm != null) {
-      final Method mth = moduleMethod(jm, path, name, args.length, qc, ii);
-      if(mth != null) return new JavaModuleFunc(sc, ii, jm, mth, args);
+    final Object module  = modules.findModule(className);
+    if(module != null) {
+      final Method meth = moduleMethod(module, name, args.length, qc, ii);
+      if(meth != null) {
+        final Requires req = meth.getAnnotation(Requires.class);
+        final Perm perm = req == null ? Perm.ADMIN :
+          Perm.get(req.value().name().toLowerCase(Locale.ENGLISH));
+        return new JavaModuleFunc(sc, ii, module, meth, args, perm);
+      }
     }
-
-    // arbitrary Java code can only be called with administrator permissions
-    if(!qc.context.user().has(Perm.ADMIN)) return null;
 
     // try to find matching Java variable or method
     try {
-      final Class<?> clazz = modules.findClass(path);
+      final Class<?> clazz = modules.findClass(className);
       if(name.equals(NEW) || exists(clazz, name)) return new JavaFunc(sc, ii, clazz, name, args);
     } catch(final ClassNotFoundException ex) {
     } catch(final Throwable th) {
@@ -249,7 +250,7 @@ public abstract class JavaFunction extends Arr {
     }
 
     // no function found: raise error only if "java:" prefix was specified
-    if(java) throw FUNCJAVA_X.get(ii, path);
+    if(java) throw FUNCJAVA_X.get(ii, className);
     return null;
   }
 

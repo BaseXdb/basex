@@ -5,9 +5,9 @@ import static org.basex.query.QueryText.*;
 
 import java.lang.reflect.*;
 
+import org.basex.core.users.*;
 import org.basex.query.*;
-import org.basex.query.QueryModule.Deterministic;
-import org.basex.query.QueryModule.FocusDependent;
+import org.basex.query.QueryModule.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
@@ -38,11 +38,12 @@ final class JavaModuleFunc extends JavaFunction {
    * @param module Java module
    * @param method Java method/field
    * @param args arguments
+   * @param perm required permission
    */
   JavaModuleFunc(final StaticContext sc, final InputInfo info, final Object module,
-      final Method method, final Expr[] args) {
+      final Method method, final Expr[] args, final Perm perm) {
 
-    super(sc, info, args);
+    super(sc, info, args, perm);
     this.module = module;
     this.method = method;
     params = method.getParameterTypes();
@@ -91,7 +92,7 @@ final class JavaModuleFunc extends JavaFunction {
 
   @Override
   public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new JavaModuleFunc(sc, info, module, method, copyAll(qc, scp, vs, exprs));
+    return new JavaModuleFunc(sc, info, module, method, copyAll(qc, scp, vs, exprs), perm);
   }
 
   @Override
