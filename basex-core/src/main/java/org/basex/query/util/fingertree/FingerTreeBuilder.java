@@ -2,6 +2,8 @@ package org.basex.query.util.fingertree;
 
 import java.util.*;
 
+import org.basex.util.*;
+
 /**
  * A builder for {@link FingerTree}s from leaf nodes.
  *
@@ -71,7 +73,7 @@ public final class FingerTreeBuilder<E> implements Iterable<E> {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    final StringBuilder sb = new StringBuilder(Util.className(this)).append('[');
     final Iterator<E> iter = iterator();
     if(iter.hasNext()) {
       sb.append(iter.next());

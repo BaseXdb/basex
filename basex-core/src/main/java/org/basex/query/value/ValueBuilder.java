@@ -6,6 +6,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.seq.tree.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 
 /**
  * A builder for efficiently creating a {@link Value} by prepending and appending
@@ -114,7 +115,7 @@ public final class ValueBuilder {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    final StringBuilder sb = new StringBuilder(Util.className(this)).append('[');
     final Iterator<Item> iter = firstValue != null ? firstValue.iterator() :
       builder != null ? builder.iterator() : Collections.<Item>emptyIterator();
     if(iter.hasNext()) {

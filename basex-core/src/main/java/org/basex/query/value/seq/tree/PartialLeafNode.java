@@ -4,6 +4,7 @@ import java.util.*;
 
 import org.basex.query.util.fingertree.*;
 import org.basex.query.value.item.*;
+import org.basex.util.*;
 
 /**
  * A partial leaf node containing fewer elements than required in a node.
@@ -63,6 +64,6 @@ final class PartialLeafNode implements NodeLike<Item, Item> {
 
   @Override
   public String toString() {
-    return getClass().getSimpleName() + "(" + elems.length + ")" + Arrays.toString(elems);
+    return Util.className(this) + "(" + elems.length + ")" + Arrays.toString(elems);
   }
 }

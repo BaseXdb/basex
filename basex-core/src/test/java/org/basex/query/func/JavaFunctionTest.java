@@ -102,9 +102,9 @@ public final class JavaFunctionTest extends AdvancedQueryTest {
         "try { qm:error() } catch * { local-name-from-QName($err:code) }", "BASX0000");
   }
 
-  /** Tests ambiguous function signatures. */
+  /** Tests ambiguous signatures. */
   @Test
-  public void ambiguousSignature() {
+  public void ambiguous() {
     error("import module namespace n='java:java.lang.StringBuilder'; n:append('x')", JAVAAMBIG_X);
     error("declare namespace n='java:java.lang.StringBuilder';n:append(n:new(), 'x')", JAVAAMBIG_X);
   }

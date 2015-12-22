@@ -100,6 +100,13 @@ public abstract class JavaFunction extends Arr {
   protected abstract Object eval(final Value[] args, final QueryContext qc)
       throws QueryException;
 
+  @Override
+  public boolean has(final Flag flag) {
+    return flag == Flag.NDT || super.has(flag);
+  }
+
+  // STATIC METHODS ===============================================================================
+
   /**
    * Converts the specified result to an XQuery value.
    * @param obj result object
@@ -168,6 +175,55 @@ public abstract class JavaFunction extends Arr {
   }
 
   /**
+   * Returns a new Java function instance.
+   * @param qname function name
+   * @param args arguments
+   * @param qc query context
+   * @param sc static context
+   * @param ii input info
+   * @return Java function or {@code null}
+   * @throws QueryException query exception
+   */
+  static JavaFunction get(final QNm qname, final Expr[] args, final QueryContext qc,
+      final StaticContext sc, final InputInfo ii) throws QueryException {
+
+    // rewrite function name
+    final String name = Strings.camelCase(string(qname.local()));
+    final String uri = string(qname.uri());
+
+    // check if URI starts with "java:" prefix. if yes, skip rewritings
+    final boolean java = uri.startsWith(JAVAPREF);
+    final String className = java ? uri.substring(JAVAPREF.length()) :
+      Strings.className(Strings.uri2path(uri));
+
+    // try to find function in imported Java modules
+    final ModuleLoader modules = qc.resources.modules();
+    final Object module  = modules.findModule(className);
+    if(module != null) {
+      final Method meth = moduleMethod(module, name, args.length, qc, ii);
+      if(meth != null) {
+        final Requires req = meth.getAnnotation(Requires.class);
+        final Perm perm = req == null ? Perm.ADMIN :
+          Perm.get(req.value().name().toLowerCase(Locale.ENGLISH));
+        return new JavaModuleFunc(sc, ii, module, meth, args, perm);
+      }
+    }
+
+    // try to find matching Java variable or method
+    try {
+      final Class<?> clazz = modules.findClass(className);
+      if(name.equals(NEW) || exists(clazz, name)) return new JavaFunc(sc, ii, clazz, name, args);
+    } catch(final ClassNotFoundException ex) {
+    } catch(final Throwable th) {
+      throw JAVAINIT_X.get(ii, th);
+    }
+
+    // no function found: raise error only if "java:" prefix was specified
+    if(java) throw FUNCJAVA_X.get(ii, className);
+    return null;
+  }
+
+  /**
    * Gets the specified method from a query module.
    * @param module query module object
    * @param name method name
@@ -198,60 +254,6 @@ public abstract class JavaFunction extends Arr {
       for(final String write : lock.write()) qc.writeLocks.add(DBLocking.MODULE_PREFIX + write);
     }
     return meth;
-  }
-
-  /**
-   * Returns a new Java function instance.
-   * @param qname function name
-   * @param args arguments
-   * @param qc query context
-   * @param sc static context
-   * @param ii input info
-   * @return Java function or {@code null}
-   * @throws QueryException query exception
-   */
-  static JavaFunction get(final QNm qname, final Expr[] args, final QueryContext qc,
-      final StaticContext sc, final InputInfo ii) throws QueryException {
-
-    // rewrite function name
-    final String name = Strings.camelCase(string(qname.local()));
-    final String uri = string(qname.uri());
-
-    // check if URI starts with "java:" prefix (if yes, module must be Java code)
-    final boolean java = uri.startsWith(JAVAPREF);
-    String className = uri;
-    if(java) {
-      className = uri.substring(JAVAPREF.length());
-    } else {
-      // otherwise, rewrite function path
-      className = Strings.className(Strings.uri2path(uri));
-    }
-
-    // try to find function in imported Java modules
-    final ModuleLoader modules = qc.resources.modules();
-    final Object module  = modules.findModule(className);
-    if(module != null) {
-      final Method meth = moduleMethod(module, name, args.length, qc, ii);
-      if(meth != null) {
-        final Requires req = meth.getAnnotation(Requires.class);
-        final Perm perm = req == null ? Perm.ADMIN :
-          Perm.get(req.value().name().toLowerCase(Locale.ENGLISH));
-        return new JavaModuleFunc(sc, ii, module, meth, args, perm);
-      }
-    }
-
-    // try to find matching Java variable or method
-    try {
-      final Class<?> clazz = modules.findClass(className);
-      if(name.equals(NEW) || exists(clazz, name)) return new JavaFunc(sc, ii, clazz, name, args);
-    } catch(final ClassNotFoundException ex) {
-    } catch(final Throwable th) {
-      throw JAVAINIT_X.get(ii, th);
-    }
-
-    // no function found: raise error only if "java:" prefix was specified
-    if(java) throw FUNCJAVA_X.get(ii, className);
-    return null;
   }
 
   /**
@@ -314,7 +316,7 @@ public abstract class JavaFunction extends Arr {
    * @param type Java type
    * @return item type or {@code null} if no appropriate type was found
    */
-  static Type type(final Class<?> type) {
+  private static Type type(final Class<?> type) {
     final int jl = JAVA.length;
     for(int j = 0; j < jl; ++j) if(JAVA[j] == type) return XQUERY[j];
     return null;
@@ -325,7 +327,7 @@ public abstract class JavaFunction extends Arr {
    * @param args array with arguments
    * @return string representation
    */
-  static String foundArgs(final Value[] args) {
+  protected static String foundArgs(final Value[] args) {
     // compose found arguments
     final StringBuilder sb = new StringBuilder();
     for(final Value v : args) {
@@ -335,8 +337,54 @@ public abstract class JavaFunction extends Arr {
     return sb.toString();
   }
 
-  @Override
-  public boolean has(final Flag flag) {
-    return flag == Flag.NDT || super.has(flag);
+  /**
+   * Converts the arguments to objects that match the specified function parameters.
+   * {@code null} is returned if conversion is not possible.
+   * @param params parameters
+   * @param vTypes value types
+   * @param args arguments
+   * @param stat static flag
+   * @return argument array or {@code null}
+   * @throws QueryException query exception
+   */
+  protected static Object[] javaArgs(final Class<?>[] params, final boolean[] vTypes,
+      final Value[] args, final boolean stat) throws QueryException {
+
+    final int s = stat ? 0 : 1, al = args.length - s;
+    if(al != params.length) return null;
+
+    // function arguments
+    final boolean[] vType = vTypes == null ? values(params) : vTypes;
+    final Object[] vals = new Object[al];
+    for(int a = 0; a < al; a++) {
+      final Class<?> param = params[a];
+      final Value arg = args[s + a];
+
+      if(arg.type.instanceOf(type(param))) {
+        // convert to Java object if an XQuery type exists for the function parameter
+        vals[a] = arg.toJava();
+      } else {
+        // convert to Java object if
+        // - argument is of type {@link Jav}, wrapping a Java object, or
+        // - function parameter is not of type {@link Value}, or a sub-class of it
+        vals[a] = arg instanceof Jav || !vType[a] ? arg.toJava() : arg;
+        // abort conversion if argument is not an instance of function parameter
+        if(!param.isInstance(vals[a])) return null;
+      }
+    }
+    return vals;
+  }
+
+  /**
+   * Returns a boolean array that indicated which of the specified function parameters are of
+   * (sub)class {@link Value}.
+   * @param params parameters
+   * @return array
+   */
+  protected static boolean[] values(final Class<?>[] params) {
+    final int l = params.length;
+    final boolean[] vals = new boolean[l];
+    for(int a = 0; a < l; a++) vals[a] = Value.class.isAssignableFrom(params[a]);
+    return vals;
   }
 }

@@ -920,6 +920,8 @@ public enum QueryError {
   /** XPST0017. */
   JAVAAMBIG_X(XPST, 17, "%: Several functions with same number of arguments."),
   /** XPST0017. */
+  JAVACONSAMBIG_X(XPST, 17, "%: Several constructors with same number of arguments."),
+  /** XPST0017. */
   JAVAINIT_X(XPST, 17, "Class cannot be initialized: %."),
 
   /** XPST0051. */

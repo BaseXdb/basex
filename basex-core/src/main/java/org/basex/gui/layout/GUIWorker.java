@@ -1,7 +1,5 @@
 package org.basex.gui.layout;
 
-import java.util.concurrent.*;
-
 import javax.swing.*;
 
 import org.basex.util.*;
@@ -41,9 +39,8 @@ public abstract class GUIWorker<T> {
         try {
           final T t = get();
           if(t != null) GUIWorker.this.done(t);
-        } catch(final InterruptedException ignore) {
-        } catch(final ExecutionException ex) {
-          Util.stack(ex);
+        } catch(final Exception ex) {
+          if(!(ex.getCause() instanceof InterruptedException)) Util.stack(ex);
         }
       }
     }.execute();

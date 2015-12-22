@@ -7,6 +7,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 
 /**
  * A builder for creating a {@link Seq}uence (with at least 2 items) by prepending and appending
@@ -211,7 +212,7 @@ public final class TreeSeqBuilder implements Iterable<Item> {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    final StringBuilder sb = new StringBuilder(Util.className(this)).append('[');
     if(tree.isEmpty()) {
       final int n = inLeft + inRight, first = (mid - inLeft + CAP) % CAP;
       if(n > 0) {

@@ -9,7 +9,6 @@ import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -79,35 +78,35 @@ final class JavaFunc extends JavaFunction {
 
   /**
    * Calls a method.
-   * @param ar arguments
+   * @param args arguments
    * @param qc query context
    * @return resulting object
    * @throws Exception exception
    */
-  private Object method(final Value[] ar, final QueryContext qc) throws Exception {
+  private Object method(final Value[] args, final QueryContext qc) throws Exception {
     // check if a field with the specified name exists
     try {
       final Field f = clazz.getField(method);
       final boolean st = Modifier.isStatic(f.getModifiers());
-      if(ar.length == (st ? 0 : 1)) return f.get(st ? null : instObj(ar[0]));
+      if(args.length == (st ? 0 : 1)) return f.get(st ? null : instObj(args[0]));
     } catch(final NoSuchFieldException ex) { /* ignored */ }
 
     Method meth = null;
     Object inst = null;
-    Object[] args = null;
+    Object[] margs = null;
     for(final Method m : clazz.getMethods()) {
       if(!m.getName().equals(method)) continue;
       final boolean st = Modifier.isStatic(m.getModifiers());
       final Class<?>[] pTypes = m.getParameterTypes();
-      final Object[] jargs = javaArgs(pTypes, null, ar, st);
-      if(jargs != null) {
+      final Object[] jArgs = javaArgs(pTypes, null, args, st);
+      if(jArgs != null) {
         if(meth != null) throw JAVAAMBIG_X.get(info, Util.className(clazz) + '.' +
             method + '#' + pTypes.length);
         meth = m;
-        args = jargs;
+        margs = jArgs;
 
         if(!st) {
-          inst = instObj(ar[0]);
+          inst = instObj(args[0]);
           if(inst instanceof QueryModule) {
             final QueryModule mod = (QueryModule) inst;
             mod.staticContext = sc;
@@ -116,9 +115,9 @@ final class JavaFunc extends JavaFunction {
         }
       }
     }
-    if(meth != null) return meth.invoke(inst, args);
+    if(meth != null) return meth.invoke(inst, margs);
 
-    throw JAVAMETHOD_X_X.get(info, name(), foundArgs(ar));
+    throw JAVAMETHOD_X_X.get(info, name(), foundArgs(args));
   }
 
   /**
@@ -133,54 +132,11 @@ final class JavaFunc extends JavaFunction {
   }
 
   /**
-   * Converts the arguments to objects that match the specified function parameters.
-   * {@code null} is returned if conversion is not possible.
-   * @param params parameters
-   * @param vTypes value types
-   * @param args arguments
-   * @param stat static flag
-   * @return argument array or {@code null}
-   * @throws QueryException query exception
+   * Returns the function descriptor.
+   * @return string
    */
-  static Object[] javaArgs(final Class<?>[] params, final boolean[] vTypes, final Value[] args,
-      final boolean stat) throws QueryException {
-
-    final int s = stat ? 0 : 1, al = args.length - s;
-    if(al != params.length) return null;
-
-    // function arguments
-    final boolean[] vType = vTypes == null ? values(params) : vTypes;
-    final Object[] vals = new Object[al];
-    for(int a = 0; a < al; a++) {
-      final Class<?> param = params[a];
-      final Value arg = args[s + a];
-
-      if(arg.type.instanceOf(type(param))) {
-        // convert to Java object if an XQuery type exists for the function parameter
-        vals[a] = arg.toJava();
-      } else {
-        // convert to Java object if
-        // - argument is of type {@link Jav}, wrapping a Java object, or
-        // - function parameter is not of type {@link Value}, or a sub-class of it
-        vals[a] = arg instanceof Jav || !vType[a] ? arg.toJava() : arg;
-        // abort conversion if argument is not an instance of function parameter
-        if(!param.isInstance(vals[a])) return null;
-      }
-    }
-    return vals;
-  }
-
-  /**
-   * Returns a boolean array that indicated which of the specified function parameters are of
-   * (sub)class {@link Value}.
-   * @param params parameters
-   * @return array
-   */
-  static boolean[] values(final Class<?>[] params) {
-    final int l = params.length;
-    final boolean[] vals = new boolean[l];
-    for(int a = 0; a < l; a++) vals[a] = Value.class.isAssignableFrom(params[a]);
-    return vals;
+  private String name() {
+    return Util.className(clazz) + '.' + method;
   }
 
   @Override
@@ -194,14 +150,6 @@ final class JavaFunc extends JavaFunction {
     if(method.equals(NEW)) sb.append(NEW).append(' ').append(Util.className(clazz));
     else sb.append(name());
     return sb.append("(...)").toString();
-  }
-
-  /**
-   * Returns the function descriptor.
-   * @return string
-   */
-  private String name() {
-    return Util.className(clazz) + '.' + method;
   }
 
   @Override

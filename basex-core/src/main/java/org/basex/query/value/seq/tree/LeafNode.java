@@ -4,6 +4,7 @@ import java.util.*;
 
 import org.basex.query.util.fingertree.*;
 import org.basex.query.value.item.*;
+import org.basex.util.*;
 
 /**
  * A leaf node containing {@link Item}s.
@@ -219,13 +220,13 @@ final class LeafNode implements Node<Item, Item> {
 
   @Override
   public String toString() {
-    return getClass().getSimpleName() + "(" + size() + ")" + Arrays.toString(values);
+    return Util.className(this) + "(" + size() + ")" + Arrays.toString(values);
   }
 
   @Override
   public long checkInvariants() {
     if(values.length < TreeSeq.MIN_LEAF || values.length > TreeSeq.MAX_LEAF)
-      throw new AssertionError("Wrong " + getClass().getSimpleName() + " size: " + values.length);
+      throw new AssertionError("Wrong " + Util.className(this) + " size: " + values.length);
     return values.length;
   }
 
