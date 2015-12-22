@@ -64,16 +64,26 @@ final class JavaFunc extends JavaFunction {
 
   /**
    * Calls a constructor.
-   * @param ar arguments
+   * @param args arguments
    * @return resulting object
    * @throws Exception exception
    */
-  private Object constructor(final Value[] ar) throws Exception {
-    for(final Constructor<?> cons : clazz.getConstructors()) {
-      final Object[] jargs = javaArgs(cons.getParameterTypes(), null, ar, true);
-      if(jargs != null) return cons.newInstance(jargs);
+  private Object constructor(final Value[] args) throws Exception {
+    Constructor<?> cons = null;
+    Object[] cargs = null;
+    for(final Constructor<?> c : clazz.getConstructors()) {
+      final Class<?>[] pTypes = c.getParameterTypes();
+      final Object[] jArgs = javaArgs(pTypes, null, args, true);
+      if(jArgs != null) {
+        if(cons != null) throw JAVACONSAMBIG_X.get(info,
+            Util.className(clazz) + '#' + pTypes.length);
+        cons = c;
+        cargs = jArgs;
+      }
     }
-    throw JAVACONSTR_X_X.get(info, name(), foundArgs(ar));
+    if(cons != null) return cons.newInstance(cargs);
+
+    throw JAVACONSTR_X_X.get(info, name(), foundArgs(args));
   }
 
   /**

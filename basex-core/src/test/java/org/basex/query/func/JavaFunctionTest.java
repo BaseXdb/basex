@@ -105,6 +105,7 @@ public final class JavaFunctionTest extends AdvancedQueryTest {
   /** Tests ambiguous signatures. */
   @Test
   public void ambiguous() {
+    error("Q{java:org.basex.query.func.JavaFunctionExample}new(true())", JAVACONSAMBIG_X);
     error("import module namespace n='java:java.lang.StringBuilder'; n:append('x')", JAVAAMBIG_X);
     error("declare namespace n='java:java.lang.StringBuilder';n:append(n:new(), 'x')", JAVAAMBIG_X);
   }
