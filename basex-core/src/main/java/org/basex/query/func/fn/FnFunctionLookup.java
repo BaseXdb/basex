@@ -1,7 +1,5 @@
 package org.basex.query.func.fn;
 
-import static org.basex.query.QueryError.*;
-
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -20,15 +18,14 @@ public final class FnFunctionLookup extends StandardFunc {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final QNm name = toQNm(exprs[0], qc, false);
     final long arity = toLong(exprs[1], qc);
-    if(arity < 0 || arity > Integer.MAX_VALUE) throw WHICHFUNC_X.get(ii, name);
-
-    try {
-      final Expr lit = Functions.getLiteral(name, (int) arity, qc, sc, ii, true);
-      return lit == null ? null : lit.item(qc, ii);
-    } catch(final QueryException e) {
-      // function not found (in most cases: XPST0017)
-      return null;
+    if(arity >= 0 && arity <= Long.MAX_VALUE) {
+      try {
+        final Expr lit = Functions.getLiteral(name, (int) arity, qc, sc, ii, true);
+        if(lit != null) return lit.item(qc, ii);
+      } catch(final QueryException ignore) { }
     }
+    // function not found
+    return null;
   }
 
   @Override

@@ -50,9 +50,9 @@ final class JavaFunc extends JavaFunction {
     } catch(final InvocationTargetException ex) {
       final Throwable cause = ex.getCause();
       throw cause instanceof QueryException ? ((QueryException) cause).info(info) :
-        JAVAERROR_X.get(info, name(), foundArgs(args), cause);
+        JAVAERROR_X_X_X.get(info, name(), foundArgs(args), cause);
     } catch(final Throwable ex) {
-      throw JAVAERROR_X.get(info, name(), foundArgs(args), ex);
+      throw JAVAERROR_X_X_X.get(info, name(), foundArgs(args), ex);
     }
   }
 
@@ -109,8 +109,7 @@ final class JavaFunc extends JavaFunction {
       final Class<?>[] pTypes = m.getParameterTypes();
       final Object[] jArgs = javaArgs(pTypes, null, args, st);
       if(jArgs != null) {
-        if(meth != null) throw JAVAAMBIG_X.get(info, Util.className(clazz) + '.' +
-            method + '#' + pTypes.length);
+        if(meth != null) throw JAVAAMBIG_X_X_X.get(info, clazz.getName(), method, pTypes.length);
         meth = m;
         margs = jArgs;
 

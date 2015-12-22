@@ -56,7 +56,7 @@ final class JavaModuleFunc extends JavaFunction {
   }
 
   @Override
-  protected Object eval(final Value[] vals, final QueryContext qc) throws QueryException {
+  protected Object eval(final Value[] args, final QueryContext qc) throws QueryException {
     // assign context if module is inheriting {@link QueryModule}
     if(module instanceof QueryModule) {
       final QueryModule mod = (QueryModule) module;
@@ -64,7 +64,7 @@ final class JavaModuleFunc extends JavaFunction {
       mod.queryContext = qc;
     }
 
-    final Object[] jargs = javaArgs(params, vTypes, vals, true);
+    final Object[] jargs = javaArgs(params, vTypes, args, true);
     if(jargs != null) {
       try {
         return method.invoke(module, jargs);
@@ -75,8 +75,7 @@ final class JavaModuleFunc extends JavaFunction {
           e = e.getCause();
         }
         if(e instanceof QueryException) throw ((QueryException) e).info(info);
-        Util.stack(e);
-        throw JAVAERROR_X.get(info, Util.className(e) + ": " + e.getMessage());
+        throw JAVAERROR_X_X_X.get(info, name(), foundArgs(args), e);
       }
     }
 
@@ -87,7 +86,7 @@ final class JavaModuleFunc extends JavaFunction {
       expect.add(Util.className(param));
     }
     throw JAVAARGS_X_X.get(info, method.getName() + '(' + expect + ')',
-        method.getName() + '(' + foundArgs(vals) + ')');
+        method.getName() + '(' + foundArgs(args) + ')');
   }
 
   @Override

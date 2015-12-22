@@ -214,12 +214,13 @@ public abstract class JavaFunction extends Arr {
       final Class<?> clazz = modules.findClass(className);
       if(name.equals(NEW) || exists(clazz, name)) return new JavaFunc(sc, ii, clazz, name, args);
     } catch(final ClassNotFoundException ex) {
+      if(java) Util.debug(ex);
     } catch(final Throwable th) {
-      throw JAVAINIT_X.get(ii, th);
+      throw JAVAINIT_X_X.get(ii, Util.className(th), th);
     }
 
     // no function found: raise error only if "java:" prefix was specified
-    if(java) throw JAVAWHICH_X.get(ii, className);
+    if(java) throw JAVAWHICH_X_X_X.get(ii, className, name, args.length);
     return null;
   }
 
@@ -238,14 +239,14 @@ public abstract class JavaFunction extends Arr {
 
     // find method with identical name and arity
     Method meth = null;
-    final Class<?> clz = module.getClass();
-    for(final Method m : clz.getMethods()) {
+    final Class<?> clazz = module.getClass();
+    for(final Method m : clazz.getMethods()) {
       if(m.getName().equals(name) && m.getParameterTypes().length == arity) {
-        if(meth != null) throw JAVAAMBIG_X.get(ii, "Q{" + clz.getName() + '}' + name + '#' + arity);
+        if(meth != null) throw JAVAAMBIG_X_X_X.get(ii, clazz.getName(), name, arity);
         meth = m;
       }
     }
-    if(meth == null) throw JAVAWHICH_X.get(ii, clz.getName() + ':' + name);
+    if(meth == null) throw JAVAWHICH_X_X_X.get(ii, clazz.getName(), name, arity);
 
     // Add module locks to QueryContext.
     final Lock lock = meth.getAnnotation(Lock.class);

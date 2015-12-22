@@ -599,7 +599,7 @@ public enum QueryError {
   /** FORG0006. */
   JAVAARGS_X_X(FORG, 6, "Invalid Java arguments: % expected, % found."),
   /** FORG0006. */
-  JAVAERROR_X(FORG, 6, "%(%): %."),
+  JAVAERROR_X_X_X(FORG, 6, "%(%): %."),
 
   /** FORG0008. */
   FUNZONE_X_X(FORG, 8, "% and % have different timezones."),
@@ -908,15 +908,15 @@ public enum QueryError {
   /** XPST0017. */
   WHICHFUNC_X(XPST, 17, "Unknown function: %."),
   /** XPST0017. */
-  JAVAWHICH_X(XPST, 17, "Unknown Java function: %."),
+  JAVAWHICH_X_X_X(XPST, 17, "Unknown Java function: %:%#%."),
   /** XPST0017. */
-  JAVAAMBIG_X(XPST, 17, "Ambiguous Java function: %."),
+  JAVAAMBIG_X_X_X(XPST, 17, "Ambiguous Java function: %:%#%."),
   /** XPST0017. */
   JAVACONSAMBIG_X(XPST, 17, "Ambiguous Java constructor: %."),
   /** XPST0017. */
-  JAVAINIT_X(XPST, 17, "Class cannot be initialized: %."),
-  /** XPST0017. */
   FUNCNOIMPL_X(XPST, 17, "Function not implemented: %."),
+  /** XPST0017. */
+  JAVAINIT_X_X(XPST, 17, "%: %."),
 
   /** XPST0051. */
   TYPEUNKNOWN_X(XPST, 51, "Unknown type: %."),

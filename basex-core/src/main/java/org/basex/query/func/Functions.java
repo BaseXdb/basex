@@ -78,10 +78,10 @@ public final class Functions extends TokenSet {
       if(t.parent == null) continue;
       final byte[] u = t.name.uri();
       if(eq(u, XS_URI) && t != AtomType.NOT && t != AtomType.AAT && ls.similar(
-          lc(ln), lc(t.string()))) throw FUNCSIMILAR_X_X.get(ii, name.string(), t.string());
+          lc(ln), lc(t.string()))) throw FUNCSIMILAR_X_X.get(ii, name.prefixId(), t.string());
     }
     // no similar name: constructor function found, or abstract type specified
-    throw WHICHFUNC_X.get(ii, name.string());
+    throw WHICHFUNC_X.get(ii, name.prefixId());
   }
 
   /**
@@ -211,7 +211,7 @@ public final class Functions extends TokenSet {
       return f;
     }
 
-    // Java function (only allowed with administrator permissions)
+    // Java function
     final VarScope scp = new VarScope(sc);
     final FuncType jt = FuncType.arity(arity);
     final Var[] vs = new Var[arity];
@@ -284,7 +284,7 @@ public final class Functions extends TokenSet {
     final TypedFunc tf = qc.funcs.getRef(name, args, sc, ii);
     if(tf != null) return tf;
 
-    // Java function (only allowed with administrator permissions)
+    // Java function
     final JavaFunction jf = JavaFunction.get(name, args, qc, sc, ii);
     if(jf != null) return TypedFunc.java(jf);
 
@@ -302,39 +302,26 @@ public final class Functions extends TokenSet {
    * @return query exception or {@code null}
    */
   QueryException similarError(final QNm name, final InputInfo ii) {
-    // find functions with identical URIs and similar local names
+    // find similar function in three runs
     final byte[] local = name.local(), uri = name.uri();
     final Levenshtein ls = new Levenshtein();
-    for(final byte[] key : this) {
-      final int i = indexOf(key, '}');
-      if(eq(uri, substring(key, 2, i)) && ls.similar(local, substring(key, i + 1)))
-        return similarError(name, ii, key);
-    }
-    // find functions with identical local names
-    for(final byte[] key : this) {
-      final int i = indexOf(key, '}');
-      if(eq(local, substring(key, i + 1))) return similarError(name, ii, key);
-    }
-    // find functions with identical URIs and local names that start with the specified name
-    for(final byte[] key : this) {
-      final int i = indexOf(key, '}');
-      if(eq(uri, substring(key, 2, i)) && startsWith(substring(key, i + 1), local))
-        return similarError(name, ii, key);
+    for(int mode = 0; mode < 3; mode++) {
+      for(final byte[] key : this) {
+        final int i = indexOf(key, '}');
+        final byte[] slocal = substring(key, i + 1), suri = substring(key, 2, i);
+        if(mode == 0 ?
+          // find functions with identical URIs and similar local names
+          eq(uri, suri) && ls.similar(local, slocal) : mode == 1 ?
+          // find functions with identical local names
+          eq(local, substring(key, i + 1)) :
+          // find functions with identical URIs and local names that start with the specified name
+          eq(uri, substring(key, 2, i)) && startsWith(substring(key, i + 1), local)) {
+          final QNm sim = new QNm(slocal, suri);
+          return FUNCSIMILAR_X_X.get(ii, name.prefixId(), sim.prefixId());
+        }
+      }
     }
     return null;
-  }
-
-  /**
-   * Returns an exception for the specified function.
-   * @param name name of input function
-   * @param ii input info
-   * @param key key of built-in function
-   * @return query exception
-   */
-  private static QueryException similarError(final QNm name, final InputInfo ii, final byte[] key) {
-    final int i = indexOf(key, '}');
-    return FUNCSIMILAR_X_X.get(ii, name.prefixId(FN_URI), new TokenBuilder(
-        NSGlobal.prefix(substring(key, 2, i))).add(':').add(substring(key, i + 1)).finish());
   }
 
   @Override

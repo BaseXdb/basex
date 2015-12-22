@@ -162,7 +162,7 @@ public final class StaticFuncs extends ExprInfo {
 
         // if not, indicate that function is unknown
         final QueryException qe = similarError(call.name, call.info);
-        throw qe == null ? WHICHFUNC_X.get(call.info, call.name.string()) : qe;
+        throw qe == null ? WHICHFUNC_X.get(call.info, call.name.prefixId()) : qe;
       }
 
       if(call != null) {
@@ -210,7 +210,7 @@ public final class StaticFuncs extends ExprInfo {
 
     if(error && NSGlobal.reserved(name.uri())) {
       final QueryException qe = similarError(name, ii);
-      throw qe == null ? WHICHFUNC_X.get(ii, name.string()) : qe;
+      throw qe == null ? WHICHFUNC_X.get(ii, name.prefixId()) : qe;
     }
     return null;
   }
@@ -229,8 +229,7 @@ public final class StaticFuncs extends ExprInfo {
     for(final FuncCache fc : funcs.values()) {
       final StaticFunc sf = fc.func;
       if(sf != null && sf.expr != null && ls.similar(nm, lc(sf.name.local()))) {
-        final boolean eq = eq(name.prefix(), sf.name.prefix());
-        qe = FUNCSIMILAR_X_X.get(ii, name.string(), eq ? sf.name.id() : sf.name.string());
+        qe = FUNCSIMILAR_X_X.get(ii, name.prefixId(), sf.name.prefixId());
         break;
       }
     }
