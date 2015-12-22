@@ -162,7 +162,7 @@ public final class StaticFuncs extends ExprInfo {
 
         // if not, indicate that function is unknown
         final QueryException qe = similarError(call.name, call.info);
-        throw qe == null ? FUNCUNKNOWN_X.get(call.info, call.name.string()) : qe;
+        throw qe == null ? WHICHFUNC_X.get(call.info, call.name.string()) : qe;
       }
 
       if(call != null) {
@@ -210,7 +210,7 @@ public final class StaticFuncs extends ExprInfo {
 
     if(error && NSGlobal.reserved(name.uri())) {
       final QueryException qe = similarError(name, ii);
-      throw qe == null ? FUNCUNKNOWN_X.get(ii, name.string()) : qe;
+      throw qe == null ? WHICHFUNC_X.get(ii, name.string()) : qe;
     }
     return null;
   }

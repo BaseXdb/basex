@@ -281,4 +281,11 @@ public class BaseX extends CLI {
   public String usage() {
     return local() ? S_LOCALINFO : S_CLIENTINFO;
   }
+
+  /**
+   * Throws an exception.
+   */
+  public static void error() {
+    throw new RuntimeException("ERROR");
+  }
 }

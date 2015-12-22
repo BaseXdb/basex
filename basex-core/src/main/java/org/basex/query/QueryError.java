@@ -593,15 +593,13 @@ public enum QueryError {
   /** FORG0006. */
   SUMDUR_X_X(FORG, 6, "Duration expected, % found: %."),
   /** FORG0006. */
-  JAVACONSTR_X_X(FORG, 6, "Unknown constructor: %(%)."),
+  WHICHCONSTR_X_X(FORG, 6, "Unknown Java constructor: %(%)."),
   /** FORG0006. */
-  JAVAMETHOD_X_X(FORG, 6, "Unknown method: %(%)."),
+  WHICHMETHOD_X_X(FORG, 6, "Unknown Java method: %(%)."),
   /** FORG0006. */
-  JAVACALL_X_X(FORG, 6, "Invalid call of Java function: %(%)."),
+  JAVAARGS_X_X(FORG, 6, "Invalid Java arguments: % expected, % found."),
   /** FORG0006. */
-  JAVAARGS_X_X(FORG, 6, "Invalid arguments: % expected, % found."),
-  /** FORG0006. */
-  JAVAERROR_X(FORG, 6, "Java function call failed: %."),
+  JAVAERROR_X(FORG, 6, "%(%): %."),
 
   /** FORG0008. */
   FUNZONE_X_X(FORG, 8, "% and % have different timezones."),
@@ -904,25 +902,25 @@ public enum QueryError {
   SCHEMAINV_X(XPST, 8, "Undefined schema name '%'."),
 
   /** XPST0017. */
-  FUNCPRIVATE_X(XPST, 17, "Function '%' is not visible from this module."),
+  FUNCPRIVATE_X(XPST, 17, "Function not visible: %."),
   /** XPST0017. */
-  FUNCSIMILAR_X_X(XPST, 17, "Unknown function '%'; similar: '%'."),
+  FUNCSIMILAR_X_X(XPST, 17, "Unknown function: % (similar: %)."),
   /** XPST0017. */
   FUNCARGNUM_X_X_X(XPST, 17, "%: % argument% supplied."),
   /** XPST0017. */
   FUNCTYPES_X_X_X_X(XPST, 17, "%: % argument% supplied (% expected)."),
   /** XPST0017. */
-  FUNCUNKNOWN_X(XPST, 17, "Unknown function '%'."),
+  WHICHFUNC_X(XPST, 17, "Unknown function: %."),
   /** XPST0017. */
-  FUNCNOIMPL_X(XPST, 17, "Function '%' not implemented."),
+  JAVAWHICH_X(XPST, 17, "Unknown Java function: %."),
   /** XPST0017. */
-  FUNCJAVA_X(XPST, 17, "Java function not found: %."),
+  JAVAAMBIG_X(XPST, 17, "Ambiguous Java function: %."),
   /** XPST0017. */
-  JAVAAMBIG_X(XPST, 17, "%: Several functions with same number of arguments."),
-  /** XPST0017. */
-  JAVACONSAMBIG_X(XPST, 17, "%: Several constructors with same number of arguments."),
+  JAVACONSAMBIG_X(XPST, 17, "Ambiguous Java constructor: %."),
   /** XPST0017. */
   JAVAINIT_X(XPST, 17, "Class cannot be initialized: %."),
+  /** XPST0017. */
+  FUNCNOIMPL_X(XPST, 17, "Function not implemented: %."),
 
   /** XPST0051. */
   TYPEUNKNOWN_X(XPST, 51, "Unknown type: %."),

@@ -35,7 +35,7 @@ public final class ModuleTest extends SandboxTest {
       qc.parseLibrary("module namespace m='foo'; declare function m:foo() { m:bar() }; ", "", null);
       fail("Unknown function 'm:bar()' was not detected.");
     } catch(final QueryException e) {
-      assertSame(QueryError.FUNCUNKNOWN_X, e.error());
+      assertSame(QueryError.WHICHFUNC_X, e.error());
     }
   }
 

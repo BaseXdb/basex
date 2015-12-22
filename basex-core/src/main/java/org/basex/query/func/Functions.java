@@ -81,7 +81,7 @@ public final class Functions extends TokenSet {
           lc(ln), lc(t.string()))) throw FUNCSIMILAR_X_X.get(ii, name.string(), t.string());
     }
     // no similar name: constructor function found, or abstract type specified
-    throw FUNCUNKNOWN_X.get(ii, name.string());
+    throw WHICHFUNC_X.get(ii, name.string());
   }
 
   /**

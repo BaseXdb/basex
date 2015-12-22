@@ -219,7 +219,7 @@ public abstract class JavaFunction extends Arr {
     }
 
     // no function found: raise error only if "java:" prefix was specified
-    if(java) throw FUNCJAVA_X.get(ii, className);
+    if(java) throw JAVAWHICH_X.get(ii, className);
     return null;
   }
 
@@ -245,7 +245,7 @@ public abstract class JavaFunction extends Arr {
         meth = m;
       }
     }
-    if(meth == null) throw FUNCJAVA_X.get(ii, clz.getName() + ':' + name);
+    if(meth == null) throw JAVAWHICH_X.get(ii, clz.getName() + ':' + name);
 
     // Add module locks to QueryContext.
     final Lock lock = meth.getAnnotation(Lock.class);
@@ -340,26 +340,25 @@ public abstract class JavaFunction extends Arr {
   /**
    * Converts the arguments to objects that match the specified function parameters.
    * {@code null} is returned if conversion is not possible.
-   * @param params parameters
-   * @param vTypes value types
+   * @param pTypes parameter types
+   * @param vTypes indicates which parameter types are values
    * @param args arguments
    * @param stat static flag
    * @return argument array or {@code null}
    * @throws QueryException query exception
    */
-  protected static Object[] javaArgs(final Class<?>[] params, final boolean[] vTypes,
+  protected static Object[] javaArgs(final Class<?>[] pTypes, final boolean[] vTypes,
       final Value[] args, final boolean stat) throws QueryException {
 
     final int s = stat ? 0 : 1, al = args.length - s;
-    if(al != params.length) return null;
+    if(al != pTypes.length) return null;
 
     // function arguments
-    final boolean[] vType = vTypes == null ? values(params) : vTypes;
+    final boolean[] vType = vTypes == null ? values(pTypes) : vTypes;
     final Object[] vals = new Object[al];
     for(int a = 0; a < al; a++) {
-      final Class<?> param = params[a];
+      final Class<?> param = pTypes[a];
       final Value arg = args[s + a];
-
       if(arg.type.instanceOf(type(param))) {
         // convert to Java object if an XQuery type exists for the function parameter
         vals[a] = arg.toJava();
@@ -369,7 +368,13 @@ public abstract class JavaFunction extends Arr {
         // - function parameter is not of type {@link Value}, or a sub-class of it
         vals[a] = arg instanceof Jav || !vType[a] ? arg.toJava() : arg;
         // abort conversion if argument is not an instance of function parameter
-        if(!param.isInstance(vals[a])) return null;
+        if(!param.isInstance(vals[a])) {
+          if(arg.isEmpty() && !param.isPrimitive()) {
+            vals[a] = null;
+          } else {
+            return null;
+          }
+        }
       }
     }
     return vals;

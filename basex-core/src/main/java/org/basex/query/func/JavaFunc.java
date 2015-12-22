@@ -45,15 +45,14 @@ final class JavaFunc extends JavaFunction {
   protected Object eval(final Value[] args, final QueryContext qc) throws QueryException {
     try {
       return method.equals(NEW) ? constructor(args) : method(args, qc);
+    } catch(final QueryException ex) {
+      throw ex;
     } catch(final InvocationTargetException ex) {
       final Throwable cause = ex.getCause();
       throw cause instanceof QueryException ? ((QueryException) cause).info(info) :
-        JAVAERROR_X.get(info, cause);
-    } catch(final QueryException ex) {
-      throw ex;
+        JAVAERROR_X.get(info, name(), foundArgs(args), cause);
     } catch(final Throwable ex) {
-      Util.debug(ex);
-      throw JAVACALL_X_X.get(info, name(), foundArgs(args));
+      throw JAVAERROR_X.get(info, name(), foundArgs(args), ex);
     }
   }
 
@@ -83,7 +82,7 @@ final class JavaFunc extends JavaFunction {
     }
     if(cons != null) return cons.newInstance(cargs);
 
-    throw JAVACONSTR_X_X.get(info, name(), foundArgs(args));
+    throw WHICHCONSTR_X_X.get(info, name(), foundArgs(args));
   }
 
   /**
@@ -127,7 +126,7 @@ final class JavaFunc extends JavaFunction {
     }
     if(meth != null) return meth.invoke(inst, margs);
 
-    throw JAVAMETHOD_X_X.get(info, name(), foundArgs(args));
+    throw WHICHMETHOD_X_X.get(info, name(), foundArgs(args));
   }
 
   /**

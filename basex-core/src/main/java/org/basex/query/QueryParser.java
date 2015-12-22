@@ -2405,7 +2405,7 @@ public class QueryParser extends InputParser {
     final ExprList argList = new ExprList().add(exprs);
     final int[] holes = argumentList(argList, name.string());
     final Expr[] args = argList.finish();
-    alter = FUNCUNKNOWN_X;
+    alter = WHICHFUNC_X;
     alterFunc = name;
     alterPos = pos;
 
@@ -4039,7 +4039,7 @@ public class QueryParser extends InputParser {
    */
   private QueryException error() {
     pos = alterPos;
-    if(alter != FUNCUNKNOWN_X) return error(alter);
+    if(alter != WHICHFUNC_X) return error(alter);
     final QueryException qe = qc.funcs.similarError(alterFunc, info());
     return qe == null ? error(alter, alterFunc.string()) : qe;
   }
