@@ -118,8 +118,9 @@ public interface Text {
   String S_GUI = "GUI";
   /** GUI start information. */
   String S_GUIINFO =
-    " [file]" + NL +
-    "  [file]  Open specified XML or XQuery file";
+    " [-d] [file]" + NL +
+    "  [file]  Open specified XML or XQuery file" + NL +
+    "  -d  Activate debugging mode";
 
   /** HTTP server mode. */
   String S_HTTP_SERVER = "HTTP Server";

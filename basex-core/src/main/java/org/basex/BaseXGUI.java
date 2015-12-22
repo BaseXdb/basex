@@ -123,8 +123,17 @@ public final class BaseXGUI extends Main {
   protected void parseArgs() throws BaseXException {
     final MainParser arg = new MainParser(this);
     while(arg.more()) {
-      if(arg.dash()) throw arg.usage();
-      files.add(arg.string());
+      if(arg.dash()) {
+        final char c = arg.next();
+        if(c == 'd') {
+          // activate debug mode
+          Prop.debug = true;
+        } else {
+          throw arg.usage();
+        }
+      } else {
+        files.add(arg.string());
+      }
     }
   }
 
