@@ -116,7 +116,7 @@ public enum QueryError {
   /** BXDB0007. */
   BXDB_LOCK_X(BXDB, 7, "%"),
   /** BXDB0008. */
-  BXDB_RENAME_X(BXDB, 8, "Invalid target path: %."),
+  BXDB_PATH_X(BXDB, 8, "Invalid path: %."),
   /** BXDB0009. */
   BXDB_RANGE_X_X_X(BXDB, 9, "Database '%' has no node with % value %."),
   /** BXDB0011. */
@@ -638,15 +638,11 @@ public enum QueryError {
   /** FOUP0002. */
   UPPUTERR_X(FOUP, 2, "File '%' could not be written."),
   /** FOUP0002. */
+  UPDBPUT_X(FOUP, 2, "Resource '%' could not be written."),
+  /** FOUP0002. */
   UPDROPBACK_X_X(FOUP, 2, "Backup '%' could not be %."),
   /** FOUP0002. */
   UPDBERROR_X_X(FOUP, 2, "Database '%' could not be %."),
-  /** FOUP0002. */
-  UPDBPUT_X(FOUP, 2, "Resource '%' could not be written."),
-  /** FOUP0002. */
-  UPDBDELETE_X(FOUP, 2, "Resource '%' could not be deleted."),
-  /** FOUP0002. */
-  UPDBRENAME_X(FOUP, 2, "Resource '%' could not be renamed."),
   /** FOUP0002. */
   UPDBOPTERR_X(FOUP, 2, "%"),
 

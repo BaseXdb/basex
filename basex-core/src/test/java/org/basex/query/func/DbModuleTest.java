@@ -10,7 +10,7 @@ import java.util.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.cmd.Set;
-import org.basex.core.parse.Commands.CmdIndex;
+import org.basex.core.parse.Commands.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.util.*;
@@ -465,20 +465,37 @@ public final class DbModuleTest extends AdvancedQueryTest {
     query(COUNT.args(COLLECTION.args(NAME + "/test")), 0);
     query(COUNT.args(COLLECTION.args(NAME + "/newtest")), NFLDR);
 
+    // invalid target
+    error(_DB_RENAME.args(NAME, "input.xml", " ''"), BXDB_PATH_X);
+    error(_DB_RENAME.args(NAME, "input.xml", " '/'"), BXDB_PATH_X);
+    error(_DB_RENAME.args(NAME, "input.xml", " '.'"), BXDB_PATH_X);
+
     // rename paths
     query(_DB_RENAME.args(NAME, "", "x"));
     query(COUNT.args(COLLECTION.args(NAME + "/x/newtest")), NFLDR);
 
     // rename binary file
-    query(_DB_STORE.args(NAME, "one", ""));
-    query(_DB_RENAME.args(NAME, "one", "two"));
-    query(_DB_RETRIEVE.args(NAME, "two"));
-    error(_DB_RETRIEVE.args(NAME, "one"), WHICHRES_X);
+    query(_DB_STORE.args(NAME, "file1", ""));
+    query(_DB_RENAME.args(NAME, "file1", "file2"));
+    query(_DB_RETRIEVE.args(NAME, "file2"));
+    error(_DB_RETRIEVE.args(NAME, "file1"), WHICHRES_X);
 
-    // invalid target
-    error(_DB_RENAME.args(NAME, "x/input.xml", " ''"), BXDB_RENAME_X);
-    error(_DB_RENAME.args(NAME, "x/input.xml", " '/'"), BXDB_RENAME_X);
-    error(_DB_RENAME.args(NAME, "x/input.xml", " '.'"), BXDB_RENAME_X);
+    query(_DB_RENAME.args(NAME, "file2", "dir1/file3"));
+    query(_DB_RETRIEVE.args(NAME, "dir1/file3"));
+    query(_DB_RENAME.args(NAME, "dir1", "dir2"));
+    query(_DB_RETRIEVE.args(NAME, "dir2/file3"));
+    error(_DB_RETRIEVE.args(NAME, "dir1"), WHICHRES_X);
+
+    query(_DB_STORE.args(NAME, "file4", ""));
+    query(_DB_STORE.args(NAME, "dir3/file5", ""));
+
+    error(_DB_RENAME.args(NAME, "dir2", "file4"), BXDB_PATH_X);
+    error(_DB_RENAME.args(NAME, "file4", "dir2"), BXDB_PATH_X);
+
+    // move files in directories
+    query(_DB_RENAME.args(NAME, "dir2", "dir3"));
+    query(_DB_RETRIEVE.args(NAME, "dir3/file3"));
+    query(_DB_RETRIEVE.args(NAME, "dir3/file5"));
   }
 
   /** Test method. */

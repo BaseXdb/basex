@@ -48,7 +48,14 @@ public final class DBRename extends DBUpdate {
     for(final Entry<String, String> op : map.entrySet()) {
       final IOFile src = new IOFile(op.getKey());
       final IOFile trg = new IOFile(op.getValue());
-      if(src.exists()) src.rename(trg);
+      if(src.exists()) {
+        if(trg.exists()) {
+          trg.delete();
+        } else {
+          trg.parent().md();
+        }
+        src.rename(trg);
+      }
     }
   }
 

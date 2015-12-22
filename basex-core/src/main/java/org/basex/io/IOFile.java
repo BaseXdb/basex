@@ -239,7 +239,9 @@ public final class IOFile extends IO {
   public boolean delete() {
     boolean ok = true;
     if(file.exists()) {
-      if(isDir()) for(final IOFile ch : children()) ok &= ch.delete();
+      if(isDir()) {
+        for(final IOFile ch : children()) ok &= ch.delete();
+      }
       try {
         Files.delete(toPath());
       } catch(final IOException ex) {
