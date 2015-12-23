@@ -229,4 +229,14 @@ public final class PathTest extends AdvancedQueryTest {
     execute(new CreateDB(NAME, "<a><b>x</b></a>"));
     query("/a[b = .[b = 'x']/b]/b/text()", "x");
   }
+
+  /**
+   * Single root expressions (GH-1231).
+   */
+  @Test public void singleRoot() {
+    execute(new CreateDB(NAME));
+    execute(new Add("a.xml", "<a/>"));
+    execute(new Add("b.xml", "<b/>"));
+    query(".[/a]", "<a/>");
+  }
 }
