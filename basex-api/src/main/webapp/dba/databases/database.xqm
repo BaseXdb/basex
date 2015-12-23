@@ -133,12 +133,12 @@ function _:database(
             { html:button('replace', 'Replace…') }
           </form>
           <b>XQuery:</b>
-          <input style="width:100%" name="input" id="input" onkeyup='queryResource(false)'/>
+          <input style="width:100%" name="input" id="input" onkeyup='queryResource()'/>
           { html:focus('input') }
           <textarea name='output' id='output' rows='20' readonly='' spellcheck='false'/>
           <script type="text/javascript">
             loadCodeMirror();
-            queryResource(true);
+            queryResource();
           </script>
         </_>/node() else (
           $data/info/*/html:properties(.)

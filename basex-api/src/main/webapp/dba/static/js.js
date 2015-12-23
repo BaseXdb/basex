@@ -1,3 +1,6 @@
+var WAIT = "Please wait…";
+var SUCCESS = "Query was successful.";
+
 function buttons() {
   var forms = document.getElementsByTagName("form");
   for(var f = 0; f < forms.length; f++) {
@@ -49,7 +52,6 @@ function query(wait, success, key, query, enforce, target) {
   var d = new Date();
   _d = d;
   setTimeout(function() {
-    if(_d != d) return;
     if(wait) setWarning(wait);
 
     var name = document.getElementById("name");
@@ -65,7 +67,7 @@ function query(wait, success, key, query, enforce, target) {
       function(req) {
         if(_d != d) return;
         target(req.responseText);
-        if(success) setInfo(success);
+        setInfo(success);
       },
       function(req) {
         if(_d != d) return;
@@ -86,33 +88,31 @@ function setErrorFromResponse(req) {
 };
 
 var _list;
-function logslist(wait, success) {
+function logslist() {
   var list = document.getElementById('loglist').value.trim();
   if(_list == list) return false;
   _list = list;
-  query(wait, success, 'loglist', list, false, function(text) {
+  query(WAIT, SUCCESS, 'loglist', list, false, function(text) {
     document.getElementById("list").innerHTML = text;
   })
 };
 
 var _logs;
-function logentries(wait, success) {
+function logentries() {
   var logs = document.getElementById('logs').value.trim();
   if(_logs == logs) return false;
   _logs = logs;
-  query(wait, success, 'log', logs, false, function(text) {
+  query(WAIT, SUCCESS, 'log', logs, false, function(text) {
     document.getElementById("output").innerHTML = text;
   });
 };
 
 var _input;
-function queryResource(init) {
+function queryResource() {
   var input = document.getElementById('input').value.trim();
   if(_input == input) return false;
   _input = input;
-  var wait = "Please wait…";
-  var success = init ? "" : "Query was successful.";
-  query(wait, success, 'query-resource', input, false, function(text) {
+  query(WAIT, SUCCESS, 'query-resource', input, false, function(text) {
     _outputMirror.setValue(text);
   });
 };
@@ -122,9 +122,7 @@ function evaluate(reverse) {
   var editor = document.getElementById('editor').value;
   var update = (mode == 1) ^ reverse;
   var target = update ? 'update-query' : 'eval-query';
-  var wait = "Please wait…";
-  var success = "Query was successful.";
-  query(wait, success, target, editor, true, function(text) {
+  query(WAIT, SUCCESS, target, editor, true, function(text) {
     _outputMirror.setValue(text);
   });
 };

@@ -11,6 +11,21 @@ import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 declare variable $html:NUMBER := ('decimal', 'number', 'bytes');
 
 (:~
+ : Creates an option checkbox.
+ : @param  $value  value
+ : @param  $label  label
+ : @param  $opts   checked options
+ : @return checkbox
+ :)
+declare function html:option(
+  $value    as xs:string,
+  $label    as xs:string,
+  $opts     as xs:string*
+) as node()+ {
+  html:checkbox("opts", $value, $opts = $value, $label)
+};
+
+(:~
  : Creates a checkbox.
  : @param  $name     name of checkbox
  : @param  $value    value
@@ -45,7 +60,8 @@ declare function html:checkbox(
     attribute type { "checkbox" },
     map:for-each($map, function($key, $value) { attribute { $key } { $value } })
   },
-  text { $label }
+  text { $label },
+  element br { }
 };
 
 (:~
