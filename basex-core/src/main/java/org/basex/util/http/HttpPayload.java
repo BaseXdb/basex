@@ -268,7 +268,10 @@ public final class HttpPayload {
           } else {
             val = Str.get(cont.next());
           }
-          if(!name.isEmpty()) map.put(name, val);
+          if(!name.isEmpty()) {
+            final Value v = map.get(name);
+            map.put(name, v == null ? val : new ValueBuilder().add(val).add(v).value());
+          }
           lines = -1;
           if(eq(line, last)) break;
         } else {
