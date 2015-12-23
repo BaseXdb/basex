@@ -257,19 +257,14 @@ public final class ProjectView extends BaseXPanel {
    */
   public void refreshLayout() {
     filter.refreshLayout();
-    //root.refresh();
   }
 
   /**
-   * Focuses the project filter.
+   * Finds files with the text selected in the specified editor area.
    * @param ea calling editor
    */
   public void findFiles(final EditorArea ea) {
-    if(isFocusOwner()) {
-      filter.find(tree.selectedNode());
-    } else {
-      filter.find(ea);
-    }
+    filter.find(ea);
   }
 
   /**

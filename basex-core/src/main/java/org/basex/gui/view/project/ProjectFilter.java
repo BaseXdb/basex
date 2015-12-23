@@ -95,13 +95,12 @@ final class ProjectFilter extends BaseXBack {
   }
 
   /**
-   * Filters the file search field.
+   * Finds files with the text selected in the specified editor area.
    * @param ea calling editor
    */
   void find(final EditorArea ea) {
     final String string = ea.searchString();
-    if(string != null) {
-      contentsFilter.requestFocusInWindow();
+    if(!string.isEmpty()) {
       contentsFilter.setText(string);
       if(ea.opened()) {
         final String name = ea.file().name();
@@ -114,19 +113,8 @@ final class ProjectFilter extends BaseXBack {
         }
       }
       refresh(false);
-    } else {
-      filesFilter.requestFocusInWindow();
     }
-  }
-
-  /**
-   * Filters the file search field.
-   * @param node node
-   */
-  void find(final ProjectNode node) {
-    if(node != null) filesFilter.setText(node.file.path());
-    refresh(false);
-    filesFilter.requestFocusInWindow();
+    contentsFilter.requestFocusInWindow();
   }
 
   /**
