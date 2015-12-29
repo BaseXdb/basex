@@ -1,6 +1,5 @@
 package org.basex.query.value.item;
 
-
 import static org.junit.Assert.*;
 
 import org.junit.*;
@@ -16,7 +15,10 @@ import org.junit.runners.Parameterized.*;
  */
 @RunWith(Parameterized.class)
 public class UriTest {
-
+  /**
+   * Sample URIs.
+   * @return object parameters
+   */
   @Parameters(name = "{index}: \"{0}\": valid = {1}, absolute = {2}")
   public static Object[][] sampleUris() {
     return new Object[][] {
@@ -69,8 +71,11 @@ public class UriTest {
     };
   }
 
+  /** Current test URI. */
   @Parameter(0) public String uri;
+  /** Current valid flag. */
   @Parameter(1) public boolean valid;
+  /** Current absolute flag. */
   @Parameter(2) public boolean absolute;
 
   /**
