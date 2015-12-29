@@ -283,7 +283,7 @@
         <plugins>
           <plugin>
             <artifactId>maven-assembly-plugin</artifactId>
-            <version>2.5.3</version>
+            <version>2.5.5</version>
             <inherited>true</inherited>
             <executions>
               <execution>
@@ -317,15 +317,13 @@
           <inherited>true</inherited>
           <executions>
             <execution>
-              <id>javacc</id>
+              <id>generate-all-parsers</id>
+              <phase>generate-sources</phase>
               <goals>
                 <goal>javacc</goal>
               </goals>
             </execution>
           </executions>
-          <configuration>
-            <outputDirectory>src/main/java</outputDirectory>
-          </configuration>
         </plugin>
 
         <plugin>
