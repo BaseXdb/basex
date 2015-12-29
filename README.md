@@ -8,7 +8,7 @@ To get the project running as smooth as possible, please consider the following 
 Compiling BaseX
 ---------------
 
-JDK 1.6 and JUnit is currently required to compile the complete sources
+JDK 1.7 and JUnit is currently required to compile the complete sources
 of the main project. If you are using another environment than Eclipse
 or don't have JUnit installed, just delete the `test` packages inside
 the project and rebuild the project.
