@@ -56,7 +56,7 @@ public final class Geo extends QueryModule {
    * @return dimension
    * @throws QueryException query exception
    */
-  @Deterministic
+  @Deterministic @Requires(Permission.NONE)
   public Int dimension(final ANode node) throws QueryException {
     return Int.get(checkGeo(node).getDimension());
   }
@@ -67,7 +67,7 @@ public final class Geo extends QueryModule {
    * @return geometry type
    * @throws QueryException query exception
    */
-  @Deterministic
+  @Deterministic @Requires(Permission.NONE)
   public QNm geometryType(final ANode node) throws QueryException {
     return QNm.get(GML, checkGeo(node).getGeometryType(), URI);
   }
@@ -78,7 +78,7 @@ public final class Geo extends QueryModule {
    * @return integer value of CRS of the geometry
    * @throws QueryException query exception
    */
-  @Deterministic
+  @Deterministic @Requires(Permission.NONE)
   public Uri srid(final ANode node) throws QueryException {
     return Uri.uri(token(checkGeo(node).getSRID()));
   }
@@ -90,7 +90,7 @@ public final class Geo extends QueryModule {
    * @return envelop element
    * @throws QueryException query exception
    */
-  @Deterministic
+  @Deterministic @Requires(Permission.NONE)
   public ANode envelope(final ANode node) throws QueryException {
     return gmlWriter(checkGeo(node).getEnvelope());
   }
@@ -101,7 +101,7 @@ public final class Geo extends QueryModule {
    * @return Well-Known Text geometry representation
    * @throws QueryException query exception
    */
-  @Deterministic
+  @Deterministic @Requires(Permission.NONE)
   public Str asText(final ANode node) throws QueryException {
     return Str.get(new WKTWriter().write(checkGeo(node)));
   }
@@ -112,7 +112,7 @@ public final class Geo extends QueryModule {
    * @return Well-Known Binary geometry representation
    * @throws QueryException query exception
    */
-  @Deterministic
+  @Deterministic @Requires(Permission.NONE)
   public B64 asBinary(final ANode node) throws QueryException {
     return new B64(new WKBWriter().write(checkGeo(node)));
   }
@@ -123,7 +123,7 @@ public final class Geo extends QueryModule {
    * @return boolean value
    * @throws QueryException query exception
    */
-  @Deterministic
+  @Deterministic @Requires(Permission.NONE)
   public Bln isEmpty(final ANode node) throws QueryException {
     if(node == null) return Bln.FALSE;
     checkGeo(node);
@@ -137,7 +137,7 @@ public final class Geo extends QueryModule {
    * @return boolean value
    * @throws QueryException query exception
    */
-  @Deterministic
+  @Deterministic @Requires(Permission.NONE)
   public Bln isSimple(final ANode node) throws QueryException {
     return Bln.get(checkGeo(node).isSimple());
   }
@@ -149,7 +149,7 @@ public final class Geo extends QueryModule {
    * @return boundary element (geometry)
    * @throws QueryException query exception
    */
-  @Deterministic
+  @Deterministic @Requires(Permission.NONE)
   public ANode boundary(final ANode node) throws QueryException {
     return gmlWriter(checkGeo(node).getBoundary());
   }
@@ -161,7 +161,7 @@ public final class Geo extends QueryModule {
    * @return boolean value
    * @throws QueryException query exception
    */
-  @Deterministic
+  @Deterministic @Requires(Permission.NONE)
   public Bln equals(final ANode node1, final ANode node2) throws QueryException {
     final Geometry geo1 = checkGeo(node1);
     final Geometry geo2 = checkGeo(node2);
@@ -175,7 +175,7 @@ public final class Geo extends QueryModule {
    * @return boolean value
    * @throws QueryException query exception
    */
-  @Deterministic
+  @Deterministic @Requires(Permission.NONE)
   public Bln disjoint(final ANode node1, final ANode node2) throws QueryException {
     final Geometry geo1 = checkGeo(node1);
     final Geometry geo2 = checkGeo(node2);
@@ -189,7 +189,7 @@ public final class Geo extends QueryModule {
    * @return boolean value
    * @throws QueryException query exception
    */
-  @Deterministic
+  @Deterministic @Requires(Permission.NONE)
   public Bln intersects(final ANode node1, final ANode node2) throws QueryException {
     final Geometry geo1 = checkGeo(node1);
     final Geometry geo2 = checkGeo(node2);
@@ -203,7 +203,7 @@ public final class Geo extends QueryModule {
    * @return boolean value
    * @throws QueryException query exception
    */
-  @Deterministic
+  @Deterministic @Requires(Permission.NONE)
   public Bln touches(final ANode node1, final ANode node2) throws QueryException {
     final Geometry geo1 = checkGeo(node1);
     final Geometry geo2 = checkGeo(node2);
@@ -217,7 +217,7 @@ public final class Geo extends QueryModule {
    * @return boolean value
    * @throws QueryException query exception
    */
-  @Deterministic
+  @Deterministic @Requires(Permission.NONE)
   public Bln crosses(final ANode node1, final ANode node2) throws QueryException {
     final Geometry geo1 = checkGeo(node1);
     final Geometry geo2 = checkGeo(node2);
@@ -231,7 +231,7 @@ public final class Geo extends QueryModule {
    * @return boolean value
    * @throws QueryException query exception
    */
-  @Deterministic
+  @Deterministic @Requires(Permission.NONE)
   public Bln within(final ANode node1, final ANode node2) throws QueryException {
     final Geometry geo1 = checkGeo(node1);
     final Geometry geo2 = checkGeo(node2);
@@ -245,7 +245,7 @@ public final class Geo extends QueryModule {
    * @return boolean value
    * @throws QueryException query exception
    */
-  @Deterministic
+  @Deterministic @Requires(Permission.NONE)
   public Bln contains(final ANode node1, final ANode node2) throws QueryException {
     final Geometry geo1 = checkGeo(node1);
     final Geometry geo2 = checkGeo(node2);
@@ -259,7 +259,7 @@ public final class Geo extends QueryModule {
    * @return boolean value
    * @throws QueryException query exception
    */
-  @Deterministic
+  @Deterministic @Requires(Permission.NONE)
   public Bln overlaps(final ANode node1, final ANode node2) throws QueryException {
     final Geometry geo1 = checkGeo(node1);
     final Geometry geo2 = checkGeo(node2);
@@ -276,7 +276,7 @@ public final class Geo extends QueryModule {
    * @return boolean value
    * @throws QueryException query exception
    */
-  @Deterministic
+  @Deterministic @Requires(Permission.NONE)
   public Bln relate(final ANode node1, final ANode node2, final Str intersectionMatrix)
       throws QueryException {
     final Geometry geo1 = checkGeo(node1);
@@ -293,7 +293,7 @@ public final class Geo extends QueryModule {
    * @return distance double value
    * @throws QueryException query exception
    */
-  @Deterministic
+  @Deterministic @Requires(Permission.NONE)
   public Dbl distance(final ANode node1, final ANode node2) throws QueryException {
     final Geometry geo1 = checkGeo(node1);
     final Geometry geo2 = checkGeo(node2);
@@ -309,7 +309,7 @@ public final class Geo extends QueryModule {
    * @return buffer geometry as gml element
    * @throws QueryException query exception
    */
-  @Deterministic
+  @Deterministic @Requires(Permission.NONE)
   public ANode buffer(final ANode node, final Dbl distance) throws QueryException {
     return gmlWriter(checkGeo(node).buffer(distance.dbl()));
   }
@@ -321,7 +321,7 @@ public final class Geo extends QueryModule {
    * @return convex hull geometry as a gml element
    * @throws QueryException query exception
    */
-  @Deterministic
+  @Deterministic @Requires(Permission.NONE)
   public ANode convexHull(final ANode node) throws QueryException {
     return gmlWriter(checkGeo(node).convexHull());
   }
@@ -333,7 +333,7 @@ public final class Geo extends QueryModule {
    * @return intersection geometry as a gml element
    * @throws QueryException query exception
    */
-  @Deterministic
+  @Deterministic @Requires(Permission.NONE)
   public ANode intersection(final ANode node1, final ANode node2) throws QueryException {
     final Geometry geo1 = checkGeo(node1);
     final Geometry geo2 = checkGeo(node2);
@@ -347,7 +347,7 @@ public final class Geo extends QueryModule {
    * @return union geometry as a gml element
    * @throws QueryException query exception
    */
-  @Deterministic
+  @Deterministic @Requires(Permission.NONE)
   public ANode union(final ANode node1, final ANode node2) throws QueryException {
     final Geometry geo1 = checkGeo(node1);
     final Geometry geo2 = checkGeo(node2);
@@ -362,7 +362,7 @@ public final class Geo extends QueryModule {
    * @return difference geometry as a gml element
    * @throws QueryException query exception
    */
-  @Deterministic
+  @Deterministic @Requires(Permission.NONE)
   public ANode difference(final ANode node1, final ANode node2) throws QueryException {
     final Geometry geo1 = checkGeo(node1);
     final Geometry geo2 = checkGeo(node2);
@@ -377,7 +377,7 @@ public final class Geo extends QueryModule {
    * @return symmetric difference geometry as a gml element
    * @throws QueryException query exception
    */
-  @Deterministic
+  @Deterministic @Requires(Permission.NONE)
   public ANode symDifference(final ANode node1, final ANode node2) throws QueryException {
     final Geometry geo1 = checkGeo(node1);
     final Geometry geo2 = checkGeo(node2);
@@ -391,7 +391,7 @@ public final class Geo extends QueryModule {
    * @return integer value of number of geometries
    * @throws QueryException query exception
    */
-  @Deterministic
+  @Deterministic @Requires(Permission.NONE)
   public Int numGeometries(final ANode node) throws QueryException {
     return Int.get(checkGeo(node).getNumGeometries());
   }
@@ -404,7 +404,7 @@ public final class Geo extends QueryModule {
    * @return geometry as a gml element
    * @throws QueryException query exception
    */
-  @Deterministic
+  @Deterministic @Requires(Permission.NONE)
   public ANode geometryN(final ANode node, final Int number) throws QueryException {
     final Geometry geo = checkGeo(node);
     final long n = number.itr();
@@ -418,7 +418,7 @@ public final class Geo extends QueryModule {
    * @return x double value
    * @throws QueryException query exception
    */
-  @Deterministic
+  @Deterministic @Requires(Permission.NONE)
   public Dbl x(final ANode node) throws QueryException {
     final Geometry geo = geo(node, "Point", Q_GML_POINT);
     return Dbl.get(geo.getCoordinate().x);
@@ -430,7 +430,7 @@ public final class Geo extends QueryModule {
    * @return y double value
    * @throws QueryException query exception
    */
-  @Deterministic
+  @Deterministic @Requires(Permission.NONE)
   public Dbl y(final ANode node) throws QueryException {
     final Geometry geo = geo(node, "Point", Q_GML_POINT);
     return Dbl.get(geo.getCoordinate().y);
@@ -442,7 +442,7 @@ public final class Geo extends QueryModule {
    * @return z double value
    * @throws QueryException query exception
    */
-  @Deterministic
+  @Deterministic @Requires(Permission.NONE)
   public Dbl z(final ANode node) throws QueryException {
     final Geometry geo = geo(node, "Point", Q_GML_POINT);
     return Dbl.get(geo.getCoordinate().z);
@@ -455,7 +455,7 @@ public final class Geo extends QueryModule {
    * @return length double value
    * @throws QueryException query exception
    */
-  @Deterministic
+  @Deterministic @Requires(Permission.NONE)
   public Dbl length(final ANode node) throws QueryException {
     return Dbl.get(checkGeo(node).getLength());
   }
@@ -466,7 +466,7 @@ public final class Geo extends QueryModule {
    * @return start point geometry as a gml element
    * @throws QueryException query exception
    */
-  @Deterministic
+  @Deterministic @Requires(Permission.NONE)
   public ANode startPoint(final ANode node) throws QueryException {
     final Geometry geo = geo(node, "Line", Q_GML_LINEARRING, Q_GML_LINESTRING);
     return gmlWriter(((LineString) geo).getStartPoint());
@@ -478,7 +478,7 @@ public final class Geo extends QueryModule {
    * @return end point geometry as a gml element
    * @throws QueryException query exception
    */
-  @Deterministic
+  @Deterministic @Requires(Permission.NONE)
   public ANode endPoint(final ANode node) throws QueryException {
     final Geometry geo = geo(node, "Line", Q_GML_LINEARRING, Q_GML_LINESTRING);
     return gmlWriter(((LineString) geo).getEndPoint());
@@ -491,7 +491,7 @@ public final class Geo extends QueryModule {
    * @return boolean value
    * @throws QueryException query exception
    */
-  @Deterministic
+  @Deterministic @Requires(Permission.NONE)
   public Bln isClosed(final ANode node) throws QueryException {
     final Geometry geo = geo(node, "Line",
         Q_GML_LINEARRING, Q_GML_LINESTRING, Q_GML_MULTILINESTRING);
@@ -506,7 +506,7 @@ public final class Geo extends QueryModule {
    * @return boolean value
    * @throws QueryException query exception
    */
-  @Deterministic
+  @Deterministic @Requires(Permission.NONE)
   public Bln isRing(final ANode node) throws QueryException {
     final Geometry geo = geo(node, "Line", Q_GML_LINEARRING, Q_GML_LINESTRING);
     return Bln.get(((LineString) geo).isRing());
@@ -518,7 +518,7 @@ public final class Geo extends QueryModule {
    * @return number of points int value
    * @throws QueryException query exception
    */
-  @Deterministic
+  @Deterministic @Requires(Permission.NONE)
   public Int numPoints(final ANode node) throws QueryException {
     return Int.get(checkGeo(node).getNumPoints());
   }
@@ -530,7 +530,7 @@ public final class Geo extends QueryModule {
    * @return n-th point as a gml element
    * @throws QueryException query exception
    */
-  @Deterministic
+  @Deterministic @Requires(Permission.NONE)
   public ANode pointN(final ANode node, final Int number) throws QueryException {
     final Geometry geo = geo(node, "Line", Q_GML_LINEARRING, Q_GML_LINESTRING);
     final int max = geo.getNumPoints();
@@ -547,7 +547,7 @@ public final class Geo extends QueryModule {
    * @return geometry area as a double vaue
    * @throws QueryException query exception
    */
-  @Deterministic
+  @Deterministic @Requires(Permission.NONE)
   public Dbl area(final ANode node) throws QueryException {
     return Dbl.get(checkGeo(node).getArea());
   }
@@ -559,7 +559,7 @@ public final class Geo extends QueryModule {
    * @return centroid geometry as a gml element
    * @throws QueryException query exception
    */
-  @Deterministic
+  @Deterministic @Requires(Permission.NONE)
   public ANode centroid(final ANode node) throws QueryException {
     return gmlWriter(checkGeo(node).getCentroid());
   }
@@ -571,7 +571,7 @@ public final class Geo extends QueryModule {
    * @return a point as a gml element
    * @throws QueryException query exception
    */
-  @Deterministic
+  @Deterministic @Requires(Permission.NONE)
   public ANode pointOnSurface(final ANode node) throws QueryException {
     return gmlWriter(checkGeo(node).getInteriorPoint());
   }
@@ -582,7 +582,7 @@ public final class Geo extends QueryModule {
    * @return exterior ring geometry (LineString) as a gml element
    * @throws QueryException query exception
    */
-  @Deterministic
+  @Deterministic @Requires(Permission.NONE)
   public ANode exteriorRing(final ANode node) throws QueryException {
     final Geometry geo = geo(node, "Polygon", Q_GML_POLYGON);
     return gmlWriter(((Polygon) geo).getExteriorRing());
@@ -594,7 +594,7 @@ public final class Geo extends QueryModule {
    * @return integer number of interior rings
    * @throws QueryException query exception
    */
-  @Deterministic
+  @Deterministic @Requires(Permission.NONE)
   public Int numInteriorRing(final ANode node) throws QueryException {
     final Geometry geo = geo(node, "Polygon", Q_GML_POLYGON);
     return Int.get(((Polygon) geo).getNumInteriorRing());
@@ -607,7 +607,7 @@ public final class Geo extends QueryModule {
    * @return n-th interior ring geometry (LineString) as a gml element
    * @throws QueryException query exception
    */
-  @Deterministic
+  @Deterministic @Requires(Permission.NONE)
   public ANode interiorRingN(final ANode node, final Int number) throws QueryException {
     final Geometry geo = geo(node, "Polygon", Q_GML_POLYGON);
     final long n = number.itr();
