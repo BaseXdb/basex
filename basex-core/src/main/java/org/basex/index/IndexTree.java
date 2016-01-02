@@ -55,7 +55,7 @@ public class IndexTree {
   protected final int add(final byte[] key, final int value, final boolean exist) {
     // index is empty.. create root node
     if(root == -1) {
-      root = n(key, value, -1, exist);
+      root = newNode(key, value, -1, exist);
       return root;
     }
 
@@ -76,15 +76,15 @@ public class IndexTree {
         }
         return n;
       }
-      int ch = c < 0 ? l(n) : r(n);
+      int ch = c < 0 ? left(n) : right(n);
       if(ch == -1) {
-        ch = n(key, value, n, exist);
+        ch = newNode(key, value, n, exist);
         if(c < 0) {
-          l(n, ch);
-          a(l(n));
+          setLeft(n, ch);
+          adjust(left(n));
         } else {
-          r(n, ch);
-          a(r(n));
+          setRight(n, ch);
+          adjust(right(n));
         }
         return ch;
       }
@@ -106,7 +106,7 @@ public class IndexTree {
    */
   public final void init() {
     cn = root;
-    if(cn != -1) while(l(cn) != -1) cn = l(cn);
+    if(cn != -1) while(left(cn) != -1) cn = left(cn);
   }
 
   /**
@@ -124,16 +124,16 @@ public class IndexTree {
   public final int next() {
     /* Last iterator node. */
     final int ln = cn;
-    if(r(cn) == -1) {
+    if(right(cn) == -1) {
       int t = cn;
-      cn = p(cn);
-      while(cn != -1 && t == r(cn)) {
+      cn = parent(cn);
+      while(cn != -1 && t == right(cn)) {
         t = cn;
-        cn = p(cn);
+        cn = parent(cn);
       }
     } else {
-      cn = r(cn);
-      while(l(cn) != -1) cn = l(cn);
+      cn = right(cn);
+      while(left(cn) != -1) cn = left(cn);
     }
     return ln;
   }
@@ -148,7 +148,7 @@ public class IndexTree {
    * @param exist flag for reusing existing tree
    * @return pointer of the new node
    */
-  private int n(final byte[] key, final int value, final int par,
+  private int newNode(final byte[] key, final int value, final int par,
       final boolean exist) {
     tree.add(-1); // left node
     tree.add(-1); // right node
@@ -165,7 +165,7 @@ public class IndexTree {
    * @param nd current node
    * @return left node
    */
-  private int l(final int nd) {
+  private int left(final int nd) {
     return tree.get((nd << 1) + nd);
   }
 
@@ -174,7 +174,7 @@ public class IndexTree {
    * @param nd current node
    * @return right node
    */
-  private int r(final int nd) {
+  private int right(final int nd) {
     return tree.get((nd << 1) + nd + 1);
   }
 
@@ -183,7 +183,7 @@ public class IndexTree {
    * @param nd current node
    * @return parent node
    */
-  private int p(final int nd) {
+  private int parent(final int nd) {
     return tree.get((nd << 1) + nd + 2);
   }
 
@@ -192,7 +192,7 @@ public class IndexTree {
    * @param nd current node
    * @param val left node
    */
-  private void l(final int nd, final int val) {
+  private void setLeft(final int nd, final int val) {
     tree.set((nd << 1) + nd, val);
   }
 
@@ -201,7 +201,7 @@ public class IndexTree {
    * @param nd current node
    * @param val right node
    */
-  private void r(final int nd, final int val) {
+  private void setRight(final int nd, final int val) {
     tree.set((nd << 1) + nd + 1, val);
   }
 
@@ -210,7 +210,7 @@ public class IndexTree {
    * @param nd current node
    * @param val parent node
    */
-  private void p(final int nd, final int val) {
+  private void setParent(final int nd, final int val) {
     tree.set((nd << 1) + nd + 2, val);
   }
 
@@ -218,42 +218,42 @@ public class IndexTree {
    * Adjusts the tree balance.
    * @param nd node to be adjusted
    */
-  private void a(final int nd) {
+  private void adjust(final int nd) {
     int n = nd;
     mod.set(n, true);
 
-    while(n != -1 && n != root && mod.get(p(n))) {
-      if(p(n) == l(p(p(n)))) {
-        final int y = r(p(p(n)));
+    while(n != -1 && n != root && mod.get(parent(n))) {
+      if(parent(n) == left(parent(parent(n)))) {
+        final int y = right(parent(parent(n)));
         if(y != -1 && mod.get(y)) {
-          mod.set(p(n), false);
+          mod.set(parent(n), false);
           mod.set(y, false);
-          mod.set(p(p(n)), true);
-          n = p(p(n));
+          mod.set(parent(parent(n)), true);
+          n = parent(parent(n));
         } else {
-          if(n == r(p(n))) {
-            n = p(n);
-            rl(n);
+          if(n == right(parent(n))) {
+            n = parent(n);
+            rotateLeft(n);
           }
-          mod.set(p(n), false);
-          mod.set(p(p(n)), true);
-          if(p(p(n)) != -1) rr(p(p(n)));
+          mod.set(parent(n), false);
+          mod.set(parent(parent(n)), true);
+          if(parent(parent(n)) != -1) rotateRight(parent(parent(n)));
         }
       } else {
-        final int y = l(p(p(n)));
+        final int y = left(parent(parent(n)));
         if(y != -1 && mod.get(y)) {
-          mod.set(p(n), false);
+          mod.set(parent(n), false);
           mod.set(y, false);
-          mod.set(p(p(n)), true);
-          n = p(p(n));
+          mod.set(parent(parent(n)), true);
+          n = parent(parent(n));
         } else {
-          if(n == l(p(n))) {
-            n = p(n);
-            rr(n);
+          if(n == left(parent(n))) {
+            n = parent(n);
+            rotateRight(n);
           }
-          mod.set(p(n), false);
-          mod.set(p(p(n)), true);
-          if(p(p(n)) != -1) rl(p(p(n)));
+          mod.set(parent(n), false);
+          mod.set(parent(parent(n)), true);
+          if(parent(parent(n)) != -1) rotateLeft(parent(parent(n)));
         }
       }
     }
@@ -264,31 +264,31 @@ public class IndexTree {
    * Left rotation.
    * @param n node to be rotated
    */
-  private void rl(final int n) {
-    final int r = r(n);
-    r(n, l(r));
-    if(l(r) != -1) p(l(r), n);
-    p(r, p(n));
-    if(p(n) == -1) root = r;
-    else if(l(p(n)) == n) l(p(n), r);
-    else r(p(n), r);
-    l(r, n);
-    p(n, r);
+  private void rotateLeft(final int n) {
+    final int r = right(n);
+    setRight(n, left(r));
+    if(left(r) != -1) setParent(left(r), n);
+    setParent(r, parent(n));
+    if(parent(n) == -1) root = r;
+    else if(left(parent(n)) == n) setLeft(parent(n), r);
+    else setRight(parent(n), r);
+    setLeft(r, n);
+    setParent(n, r);
   }
 
   /**
    * Right rotation.
    * @param n node to be rotated
    */
-  private void rr(final int n) {
-    final int l = l(n);
-    l(n, r(l));
-    if(r(l) != -1) p(r(l), n);
-    p(l, p(n));
-    if(p(n) == -1) root = l;
-    else if(r(p(n)) == n) r(p(n), l);
-    else l(p(n), l);
-    r(l, n);
-    p(n, l);
+  private void rotateRight(final int n) {
+    final int l = left(n);
+    setLeft(n, right(l));
+    if(right(l) != -1) setParent(right(l), n);
+    setParent(l, parent(n));
+    if(parent(n) == -1) root = l;
+    else if(right(parent(n)) == n) setRight(parent(n), l);
+    else setLeft(parent(n), l);
+    setRight(l, n);
+    setParent(n, l);
   }
 }
