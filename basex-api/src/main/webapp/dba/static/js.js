@@ -88,7 +88,7 @@ function setErrorFromResponse(req) {
 };
 
 var _list;
-function logslist() {
+function logList() {
   var list = document.getElementById('loglist').value.trim();
   if(_list == list) return false;
   _list = list;
@@ -98,7 +98,7 @@ function logslist() {
 };
 
 var _logs;
-function logentries() {
+function logEntries() {
   var logs = document.getElementById('logs').value.trim();
   if(_logs == logs) return false;
   _logs = logs;
@@ -117,7 +117,7 @@ function queryResource() {
   });
 };
 
-function evaluate(reverse) {
+function evalQuery(reverse) {
   var mode = document.getElementById("mode").selectedIndex;
   var editor = document.getElementById('editor').value;
   var update = (mode == 1) ^ reverse;
@@ -154,10 +154,10 @@ function loadCodeMirror() {
         mode: "xquery",
         lineNumbers: true,
         extraKeys: {
-          "Ctrl-Enter": function(cm) { evaluate(); },
-          "Cmd-Enter": function(cm) { evaluate(); },
-          "Shift-Ctrl-Enter": function(cm) { evaluate(true); },
-          "Shift-Cmd-Enter": function(cm) { evaluate(true); }
+          "Ctrl-Enter": function(cm) { evalQuery(); },
+          "Cmd-Enter": function(cm) { evalQuery(); },
+          "Shift-Ctrl-Enter": function(cm) { evalQuery(true); },
+          "Shift-Cmd-Enter": function(cm) { evalQuery(true); }
         }
       });
       _editorMirror.on("change",function(cm, cmo) { cm.save(); });

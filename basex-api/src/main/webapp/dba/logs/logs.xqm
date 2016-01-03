@@ -52,7 +52,7 @@ function _:logs(
           <h2>{ if($name) then <a href="{ $_:CAT }">Logs</a> else 'Logs' }:
             <input size="14" name="loglist" id="loglist" value="{ $loglist }"
               placeholder="regular expression"
-              onkeyup="logslist();"/>
+              onkeyup="logList();"/>
           </h2>
         </form>
         <form action="{ $_:CAT }" method="post" class="update" autocomplete="off">
@@ -68,10 +68,10 @@ function _:logs(
             { $name }:
             <input size="40" id="logs" value="{ ($loglist, $logs)[1] }"
               placeholder="regular expression"
-              onkeyup="logentries();"/>
+              onkeyup="logEntries();"/>
           </h3>,
           <div id='output'/>,
-          <script type="text/javascript">(function(){{ logentries('', ''); }})();</script>
+          <script type="text/javascript">(function(){{ logEntries(); }})();</script>
         ) else (),
         html:focus(if($name) then 'logs' else 'loglist')
       }</td>

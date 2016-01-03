@@ -48,7 +48,7 @@ function _:queries(
               <select id='mode'>{
                 ('Read-Only', 'Updating') ! element option { . }
               }</select>
-              <button id='run' onclick="evaluate()"
+              <button id='run' onclick="evalQuery()"
                 title='Ctrl-Enter'>Run</button>
             </td>
             <td width='20%' align='right'>
