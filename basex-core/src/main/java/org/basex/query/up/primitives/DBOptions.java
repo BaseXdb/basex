@@ -22,7 +22,7 @@ public final class DBOptions {
     MainOptions.ARCHIVENAME, MainOptions.SKIPCORRUPT, MainOptions.ADDRAW, MainOptions.ADDCACHE,
     MainOptions.CSVPARSER, MainOptions.TEXTPARSER, MainOptions.JSONPARSER, MainOptions.HTMLPARSER,
     MainOptions.PARSER, MainOptions.CHOP, MainOptions.INTPARSE, MainOptions.STRIPNS,
-    MainOptions.DTD, MainOptions.CATFILE };
+    MainOptions.DTD, MainOptions.CATFILE, MainOptions.XINCLUDE };
   /** Indexing options. */
   public static final Option<?>[] INDEXING = { MainOptions.MAXCATS, MainOptions.MAXLEN,
     MainOptions.INDEXSPLITSIZE, MainOptions.FTINDEXSPLITSIZE, MainOptions.LANGUAGE,
