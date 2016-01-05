@@ -102,7 +102,8 @@ public final class Where extends Clause {
 
   @Override
   boolean skippable(final Clause cl) {
-    return true;
+    // do not slide LET clauses over WHERE (WHERE may filter out many items)
+    return !(cl instanceof Let);
   }
 
   @Override

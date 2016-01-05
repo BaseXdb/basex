@@ -60,6 +60,18 @@ public final class GFLWOROptimizeTest extends QueryPlanTest {
     );
   }
 
+  /** Tests the relocation of a let clause (GH-1236). */
+  @Test public void dontMove3() {
+    check("for $x in 1 to 2 " +
+        "for $y in 1 to 2 " +
+        "where $x + $y > 4 " +
+        "let $z := $x + 1 " +
+        "return $z",
+        "",
+        "empty((//Let, //Where))"
+    );
+  }
+
   /** Tests the relocation of a static let clause. */
   @Test public void moveFor() {
     check("let $x := <x/> " +
