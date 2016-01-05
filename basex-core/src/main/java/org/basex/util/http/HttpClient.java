@@ -25,6 +25,7 @@ import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.http.HttpRequest.Part;
 import org.basex.util.http.HttpText.Request;
+import org.basex.util.options.Options.*;
 
 /**
  * HTTP Client.
@@ -299,6 +300,7 @@ public final class HttpClient {
     // extract serialization parameters
     final SerializerOptions sopts = new SerializerOptions();
     sopts.set(SerializerOptions.METHOD, method);
+    sopts.set(SerializerOptions.INDENT, YesNo.NO);
     for(final Entry<String, String> attr : attrs.entrySet()) {
       final String key = attr.getKey();
       if(!key.equals(SRC)) sopts.assign(key, attr.getValue());
