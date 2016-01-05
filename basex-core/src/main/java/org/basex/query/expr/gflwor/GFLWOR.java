@@ -140,25 +140,18 @@ public final class GFLWOR extends ParseExpr {
     do {
       // rewrite singleton for clauses to let
       changed = forToLet(qc);
-
       // slide let clauses out to avoid repeated evaluation
       changed |= slideLetsOut(qc);
-
       // inline let expressions if they are used only once (and not in a loop)
       changed |= inlineLets(qc, scp);
-
       // remove unused variables
       changed |= removeVars(qc);
-
       // clean unused variables from group-by and order-by expression
       changed |= cleanDeadVars();
-
       // include the clauses of nested FLWR expressions into this one
       changed |= unnestFLWR(qc, scp);
-
       // float where expressions upwards to filter earlier
       changed |= optimizeWhere(qc, scp);
-
       // rewrite positional variables to predicates
       changed |= optimizePos(qc, scp);
 
@@ -485,9 +478,10 @@ public final class GFLWOR extends ParseExpr {
   private boolean slideLetsOut(final QueryContext qc) {
     boolean changed = false;
     for(int i = 1; i < clauses.size(); i++) {
-      final Clause l = clauses.get(i);
-      if(!(l instanceof Let) || l.has(Flag.NDT) || l.has(Flag.CNS) || l.has(Flag.UPD)) continue;
-      final Let let = (Let) l;
+      final Clause clause = clauses.get(i);
+      if(!(clause instanceof Let) || clause.has(Flag.NDT) || clause.has(Flag.CNS) ||
+          clause.has(Flag.UPD)) continue;
+      final Let let = (Let) clause;
 
       // find insertion position
       int insert = -1;
@@ -522,14 +516,14 @@ public final class GFLWOR extends ParseExpr {
     for(int i = 0; i < clauses.size(); i++) {
       final Clause clause = clauses.get(i);
       if(!(clause instanceof Where) || clause.has(Flag.NDT) || clause.has(Flag.UPD)) continue;
-      final Where wh = (Where) clause;
+      final Where where = (Where) clause;
 
-      if(wh.expr.isValue()) {
-        if(!(wh.expr instanceof Bln))
-          wh.expr = Bln.get(wh.expr.ebv(qc, wh.info).bool(wh.info));
+      if(where.expr.isValue()) {
+        if(!(where.expr instanceof Bln))
+          where.expr = Bln.get(where.expr.ebv(qc, where.info).bool(where.info));
 
         // predicate is always false: no results possible
-        if(!((Item) wh.expr).bool(null)) break;
+        if(!((Item) where.expr).bool(null)) break;
 
         // condition is always true
         clauses.remove(i--);
@@ -539,7 +533,7 @@ public final class GFLWOR extends ParseExpr {
         int insert = -1;
         for(int j = i; --j >= 0;) {
           final Clause curr = clauses.get(j);
-          if(curr.has(Flag.NDT) || curr.has(Flag.UPD) || !curr.skippable(wh)) break;
+          if(curr.has(Flag.NDT) || curr.has(Flag.UPD) || !curr.skippable(where)) break;
           // where clauses are always moved to avoid unnecessary computations,
           // but skipping only other where clauses can cause infinite loops
           if(!(curr instanceof Where)) insert = j;
@@ -556,7 +550,7 @@ public final class GFLWOR extends ParseExpr {
           final Clause before = clauses.get(b4);
           if(before instanceof For) {
             final For f = (For) before;
-            if(f.toPredicate(qc, scp, wh.expr)) {
+            if(f.toPredicate(qc, scp, where.expr)) {
               fors.add((For) before);
               clauses.remove(newPos);
               i--;
@@ -931,7 +925,7 @@ public final class GFLWOR extends ParseExpr {
     public abstract Clause copy(QueryContext qc, VarScope scp, IntObjMap<Var> vs);
 
     /**
-     * Checks if the given clause can be slid over this clause.
+     * Checks if the given clause (currently: let or where) can be slid over this clause.
      * @param cl clause
      * @return result of check
      */
