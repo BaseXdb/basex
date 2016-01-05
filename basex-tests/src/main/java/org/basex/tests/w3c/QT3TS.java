@@ -166,8 +166,8 @@ public final class QT3TS extends Main {
 
     // save report
     if(report != null) {
-      final String file = "ReportingResults/results_" +
-          NAME + "_" + VERSION + IO.XMLSUFFIX;
+      sopts.set(SerializerOptions.OMIT_XML_DECLARATION, YesNo.YES);
+      final String file = "ReportingResults/results_" + NAME + "_" + VERSION + IO.XMLSUFFIX;
       new IOFile(file).write(report.create(ctx).toArray());
       Util.outln("Creating report '" + file + "'...");
     }
@@ -437,8 +437,7 @@ public final class QT3TS extends Main {
 
   /** Flags for dependencies that are not supported. */
   private static final String NOSUPPORT =
-    "('schema-location-hint','schemaAware','schemaImport','schemaValidation',"
-    + "'staticTyping','typedData')";
+    "('schema-location-hint','schemaImport','schemaValidation','staticTyping','typedData')";
 
   /**
    * Checks if the current test case is supported.
@@ -458,10 +457,8 @@ public final class QT3TS extends Main {
       "@type = 'unicode-normalization-form' and @value = 'FULLY-NORMALIZED' or " +
       // skip xml/xsd 1.1 tests
       "@type = ('xml-version', 'xsd-version') and @value = ('1.1', '1.0:4-') or " +
-      // skip limits
-      "@type = 'limits' and @value = ('big_integer') or " +
       // skip default-language
-      "@type = 'default-language' or " +
+      "@type = 'default-language' and @value != 'en' or " +
       // skip non-XQuery tests
       "@type = 'spec' and not(matches(@value, 'XQ\\d\\d\\+'))" +
       "]", ctx).context(test).value().size() == 0;
