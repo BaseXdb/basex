@@ -29,14 +29,10 @@ public final class And extends Logical {
   }
 
   @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    // remove atomic values
-    final Expr c = super.compile(qc, scp);
-    return c == this ? optimize(qc, scp) : c;
-  }
-
-  @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+    final Expr c = super.optimize(qc, scp);
+    if(c != this) return c;
+
     final int es = exprs.length;
     final ExprList list = new ExprList(es);
     for(int i = 0; i < es; i++) {

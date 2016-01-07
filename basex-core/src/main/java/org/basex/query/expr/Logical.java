@@ -29,7 +29,7 @@ abstract class Logical extends Arr {
   }
 
   @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+  public final Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
     for(int i = 0; i < exprs.length; i++) {
       try {
         exprs[i] = exprs[i].compile(qc, scp);
@@ -39,7 +39,11 @@ abstract class Logical extends Arr {
         exprs[i] = FnError.get(qe, exprs[i].seqType());
       }
     }
+    return optimize(qc, scp);
+  }
 
+  @Override
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     final boolean and = this instanceof And;
     final int es = exprs.length;
     final ExprList el = new ExprList(es);

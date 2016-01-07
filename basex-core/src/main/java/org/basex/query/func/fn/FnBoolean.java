@@ -24,13 +24,13 @@ public final class FnBoolean extends StandardFunc {
   protected Expr opt(final QueryContext qc, final VarScope scp) throws QueryException {
     final Expr e = exprs[0].optimizeEbv(qc, scp);
     exprs[0] = e;
-    // simplify, e.g.: if(boolean(A)) -> if(A)
+    // simplify, e.g.: boolean(true())) -> true()
     return e.seqType().eq(SeqType.BLN) ? e : this;
   }
 
   @Override
   public Expr optimizeEbv(final QueryContext qc, final VarScope scp) {
-    // expr[boolean(A)] -> expr[A]
+    // if A is not numeric: expr[boolean(A)] -> expr[A]
     final Expr e = exprs[0];
     if(!e.seqType().mayBeNumber()) {
       qc.compInfo(QueryText.OPTREWRITE, this);

@@ -56,7 +56,7 @@ public abstract class Preds extends ParseExpr {
       final int pl = preds.length;
       for(int p = 0; p < pl; ++p) {
         try {
-          preds[p] = preds[p].compile(qc, scp).optimizeEbv(qc, scp);
+          preds[p] = preds[p].compile(qc, scp);
         } catch(final QueryException ex) {
           // replace original expression with error
           preds[p] = FnError.get(ex, seqType);
@@ -72,7 +72,9 @@ public abstract class Preds extends ParseExpr {
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     // number of predicates may change in loop
     for(int p = 0; p < preds.length; p++) {
-      Expr pred = preds[p];
+      Expr pred = preds[p].optimizeEbv(qc, scp);
+      preds[p] = pred;
+
       if(pred instanceof CmpG || pred instanceof CmpV) {
         final Cmp cmp = (Cmp) pred;
         final Expr e1 = cmp.exprs[0], e2 = cmp.exprs[1];

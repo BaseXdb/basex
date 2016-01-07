@@ -214,7 +214,7 @@ public final class CmpG extends Cmp {
         (!e1.has(Flag.CTX) || qc.value != null)) {
       // currently limited to strings (function items are invalid, numbers may be NaN)
       final SeqType st = e1.seqType();
-      if(st.occ.min > 0 && st.type.isStringOrUntyped()) return optPre(Bln.TRUE, qc);
+      if(st.oneOrMore() && st.type.isStringOrUntyped()) return optPre(Bln.TRUE, qc);
     }
     return this;
   }

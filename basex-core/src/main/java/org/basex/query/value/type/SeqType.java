@@ -573,6 +573,14 @@ public final class SeqType {
   }
 
   /**
+   * Tests if the type exactly one or more items.
+   * @return result of check
+   */
+  public boolean oneOrMore() {
+    return occ.min >= 1;
+  }
+
+  /**
    * Tests if the type may yield zero items.
    * @return result of check
    */

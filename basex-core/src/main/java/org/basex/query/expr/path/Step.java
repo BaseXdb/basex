@@ -10,7 +10,7 @@ import org.basex.index.name.*;
 import org.basex.index.path.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.path.Test.Kind;
+import org.basex.query.expr.path.Test.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;

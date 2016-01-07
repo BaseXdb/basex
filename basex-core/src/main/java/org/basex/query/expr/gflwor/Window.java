@@ -393,12 +393,13 @@ public final class Window extends Clause {
 
     @Override
     public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-      expr = expr.compile(qc, scp).optimizeEbv(qc, scp);
-      return this;
+      expr = expr.compile(qc, scp);
+      return optimize(qc, scp);
     }
 
     @Override
-    public Condition optimize(final QueryContext qc, final VarScope scp) {
+    public Condition optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+      expr = expr.optimizeEbv(qc, scp);
       return this;
     }
 

@@ -61,12 +61,13 @@ public final class Where extends Clause {
 
   @Override
   public Where compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    expr = expr.compile(qc, scp).optimizeEbv(qc, scp);
+    expr = expr.compile(qc, scp);
     return optimize(qc, scp);
   }
 
   @Override
   public Where optimize(final QueryContext qc, final VarScope sc) throws QueryException {
+    expr = expr.optimizeEbv(qc, sc);
     if(expr.isValue()) expr = expr.ebv(qc, info);
     return this;
   }

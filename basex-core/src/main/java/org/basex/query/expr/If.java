@@ -45,13 +45,12 @@ public final class If extends Arr {
 
   @Override
   public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    cond = cond.compile(qc, scp).optimizeEbv(qc, scp);
-    // static condition: return branch in question
-    if(cond.isValue()) return optPre(eval(qc).compile(qc, scp), qc);
-
-    // compile and simplify branches
-    final int es = exprs.length;
-    for(int e = 0; e < es; e++) {
+    cond = cond.compile(qc, scp);
+    // choose branches to compile
+    final int[] branches = cond.isValue() ? new int[] { branch(qc) } : new int[] { 0, 1 };
+    final int bl = branches.length;
+    for(int b = 0; b < bl; b++) {
+      final int e = branches[b];
       try {
         exprs[e] = exprs[e].compile(qc, scp);
       } catch(final QueryException ex) {
@@ -65,7 +64,8 @@ public final class If extends Arr {
   @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     // static condition: return branch in question
-    if(cond.isValue()) return optPre(eval(qc), qc);
+    cond = cond.optimizeEbv(qc, scp);
+    if(cond.isValue()) return optPre(exprs[branch(qc)], qc);
 
     // if A then B else B -> B (errors in A will be ignored)
     if(exprs[0].sameAs(exprs[1])) return optPre(exprs[0], qc);
@@ -125,27 +125,27 @@ public final class If extends Arr {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    return qc.iter(eval(qc));
+    return qc.iter(exprs[branch(qc)]);
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return qc.value(eval(qc));
+    return qc.value(exprs[branch(qc)]);
   }
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return eval(qc).item(qc, info);
+    return exprs[branch(qc)].item(qc, info);
   }
 
   /**
-   * Evaluates the condition and returns the matching expression.
+   * Evaluates the condition and returns the offset of the resulting branch.
    * @param qc query context
-   * @return resulting expression
+   * @return branch offset
    * @throws QueryException query exception
    */
-  private Expr eval(final QueryContext qc) throws QueryException {
-    return exprs[cond.ebv(qc, info).bool(info) ? 0 : 1];
+  private int branch(final QueryContext qc) throws QueryException {
+    return cond.ebv(qc, info).bool(info) ? 0 : 1;
   }
 
   @Override
