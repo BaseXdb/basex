@@ -79,16 +79,17 @@ public final class BaseXServer extends CLI implements Runnable {
     final String host = sopts.get(StaticOptions.SERVERHOST);
     final InetAddress addr = host.isEmpty() ? null : InetAddress.getByName(host);
 
-    if(service) {
-      start(port, args);
-      if(!quiet) Util.outln(SRV_STARTED_PORT_X, port);
+    if(stop) {
+      stop();
+      if(!quiet) Util.outln(SRV_STOPPED_PORT_X, port);
+      // keep message visible for a while
       Performance.sleep(1000);
       return;
     }
 
-    if(stop) {
-      stop(port);
-      if(!quiet) Util.outln(SRV_STOPPED_PORT_X, port);
+    if(service) {
+      start(port, args);
+      if(!quiet) Util.outln(SRV_STARTED_PORT_X, port);
       Performance.sleep(1000);
       return;
     }
@@ -256,7 +257,10 @@ public final class BaseXServer extends CLI implements Runnable {
    * @throws IOException I/O exception
    */
   public void stop() throws IOException {
-    stop(context.soptions.get(StaticOptions.SERVERPORT));
+    final StaticOptions sopts = context.soptions;
+    final int port = sopts.get(StaticOptions.SERVERPORT);
+    final String host = sopts.get(StaticOptions.SERVERHOST);
+    stop(host.isEmpty() ? S_LOCALHOST : host, port);
   }
 
   // STATIC METHODS ===========================================================
@@ -303,20 +307,21 @@ public final class BaseXServer extends CLI implements Runnable {
 
   /**
    * Stops the server.
+   * @param host server host
    * @param port server port
    * @throws IOException I/O exception
    */
-  public static void stop(final int port) throws IOException {
-    final IOFile stop = stopFile(port);
+  public static void stop(final String host, final int port) throws IOException {
+    final IOFile stopFile = stopFile(port);
     try {
-      stop.touch();
-      try(final Socket s = new Socket(S_LOCALHOST, port)) { }
+      stopFile.touch();
+      try(final Socket s = new Socket(host, port)) { }
       // wait and check if server was really stopped
       do Performance.sleep(100); while(ping(S_LOCALHOST, port));
     } catch(final ConnectException ex) {
       throw new IOException(Util.info(CONNECTION_ERROR_X, port));
     } finally {
-      stop.delete();
+      stopFile.delete();
     }
   }
 
