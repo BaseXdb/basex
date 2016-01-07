@@ -181,13 +181,14 @@ public final class BaseXHTTP extends Main {
    */
   public void stop() throws Exception {
     // notify the jetty monitor to stop
-    final StaticOptions mprop = context.soptions;
-    final int stop = num(StaticOptions.STOPPORT, mprop);
-    if(stop >= 0) stop(stop);
+    final StaticOptions sopts = context.soptions;
+    final int stop = num(StaticOptions.STOPPORT, sopts);
+    final String host = sopts.get(StaticOptions.SERVERHOST);
+    if(stop >= 0) stop(host.isEmpty() ? S_LOCALHOST : host, stop);
 
     // server has been started in a separate process and needs to be stopped
-    if(!bool(StaticOptions.HTTPLOCAL, mprop)) {
-      BaseXServer.stop(num(StaticOptions.SERVERPORT, mprop));
+    if(!bool(StaticOptions.HTTPLOCAL, sopts)) {
+      BaseXServer.stop(num(StaticOptions.SERVERPORT, sopts));
     }
   }
 
@@ -365,14 +366,15 @@ public final class BaseXHTTP extends Main {
 
   /**
    * Stops the server.
+   * @param host server host
    * @param port server port
    * @throws IOException I/O exception
    */
-  private static void stop(final int port) throws IOException {
+  private static void stop(final String host, final int port) throws IOException {
     final IOFile stop = stopFile(port);
     try {
       stop.touch();
-      try(final Socket s = new Socket(S_LOCALHOST, port)) { }
+      try(final Socket s = new Socket(host, port)) { }
       // give the notified process some time to quit
       Performance.sleep(100);
     } catch(final ConnectException ex) {
