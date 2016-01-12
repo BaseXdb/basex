@@ -940,19 +940,6 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "EnclosedExpr" rule.
-   * @param err error message
-   * @return query expression
-   * @throws QueryException query exception
-   */
-  private Expr enclosed(final QueryError err) throws QueryException {
-    wsCheck(CURLY1);
-    final Expr e = check(expr(), err);
-    wsCheck(CURLY2);
-    return e;
-  }
-
-  /**
    * Parses the "Expr" rule.
    * @return query expression or {@code null}
    * @throws QueryException query exception
@@ -1756,7 +1743,7 @@ public class QueryParser extends InputParser {
   private Expr extension() throws QueryException {
     final Pragma[] pragmas = pragma();
     if(pragmas == null) return null;
-    final Expr expr = enclosed(NOPRAGMA);
+    final Expr expr = enclosedExpr();
     return pragmas.length == 0 ? expr : new Extension(info(), pragmas, expr);
   }
 
@@ -3315,7 +3302,7 @@ public class QueryParser extends InputParser {
     if(fto.is(ST) && fto.sd == null && !Stemmer.supportFor(fto.ln)) throw error(FTNOSTEM_X, fto.ln);
 
     // consume weight option
-    if(wsConsumeWs(WEIGHT)) expr = new FTWeight(info(), expr, enclosed(NOENCLEXPR));
+    if(wsConsumeWs(WEIGHT)) expr = new FTWeight(info(), expr, enclosedExpr());
 
     // skip options if none were specified...
     return found ? new FTOpts(info(), expr, fto) : expr;
@@ -3347,7 +3334,7 @@ public class QueryParser extends InputParser {
     if(quote(curr())) {
       e = Str.get(stringLiteral());
     } else if(curr('{')) {
-      e = enclosed(NOENCLEXPR);
+      e = enclosedExpr();
     } else {
       throw error(prg ? NOPRAGMA : NOFTSELECT_X, found());
     }

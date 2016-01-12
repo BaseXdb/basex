@@ -712,7 +712,7 @@ public enum QueryError {
   /** SEPM0017. */
   SERMAP_X(SEPM, 17, "Character map '%' is not defined."),
   /** SEPM0017. */
-  SEROPT_X(SEPM, 17, "%."),
+  SEROPT_X(SEPM, 17, "%"),
   /** SEPM0017. */
   SEROPTION_X(SEPM, 17, "Serialization parameter '%' is invalid."),
   /** SERE0020. */
@@ -793,8 +793,6 @@ public enum QueryError {
   NOVARDECL(XPST, 3, "Expecting variable declaration."),
   /** XPST0003. */
   PIWRONG(XPST, 3, "Expecting name of processing-instruction."),
-  /** XPST0003. */
-  NOENCLEXPR(XPST, 3, "Expecting valid expression after curly brace."),
   /** XPST0003. */
   NOFTSELECT_X(XPST, 3, "Expecting quote or opening curly brace%."),
   /** XPST0003. */

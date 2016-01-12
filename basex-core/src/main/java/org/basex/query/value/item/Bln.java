@@ -123,13 +123,24 @@ public final class Bln extends Item {
    * Converts the specified string to a boolean.
    * @param value string to be checked
    * @param ii input info
-   * @return result of check
+   * @return resulting boolean value, or {@code null}
    * @throws QueryException query exception
    */
   public static boolean parse(final byte[] value, final InputInfo ii) throws QueryException {
+    final Boolean b = parse(value);
+    if(b != null) return b;
+    throw funCastError(ii, AtomType.BLN, value);
+  }
+
+  /**
+   * Converts the specified string to a boolean.
+   * @param value string to be checked
+   * @return resulting boolean value, or {@code null}
+   */
+  public static Boolean parse(final byte[] value) {
     final byte[] v = Token.trim(value);
-    if(Token.eq(v, Token.TRUE) || Token.eq(v, Token.ONE)) return true;
-    if(Token.eq(v, Token.FALSE) || Token.eq(v, Token.ZERO)) return false;
-    throw funCastError(ii, AtomType.BLN, v);
+    if(Token.eq(v, Token.TRUE) || Token.eq(v, Token.ONE)) return Boolean.TRUE;
+    if(Token.eq(v, Token.FALSE) || Token.eq(v, Token.ZERO)) return Boolean.FALSE;
+    return null;
   }
 }
