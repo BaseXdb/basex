@@ -91,7 +91,7 @@ public final class ModuleLoader {
         }
       }
       // check XQuery modules
-      String path = Strings.uri2path(uri);
+      final String path = Strings.uri2path(uri);
       for(final String suffix : IO.XQSUFFIXES) {
         final IOFile file = new IOFile(repoPath, path + suffix);
         if(file.exists()) {
