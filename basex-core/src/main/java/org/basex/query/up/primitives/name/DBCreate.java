@@ -52,7 +52,7 @@ public final class DBCreate extends NameUpdate {
   public void prepare() throws QueryException {
     if(add.inputs == null || add.inputs.isEmpty()) return;
 
-    final MainOptions opts = new MainOptions(qc.context.options);
+    final MainOptions opts = new MainOptions(qc.context.options, true);
     options.assignTo(opts);
     add.addDocs(new MemData(opts), name, opts);
   }
@@ -61,7 +61,7 @@ public final class DBCreate extends NameUpdate {
   public void apply() throws QueryException {
     close();
 
-    final MainOptions opts = new MainOptions(qc.context.options);
+    final MainOptions opts = new MainOptions(qc.context.options, true);
     options.assignTo(opts);
     try {
       final Data data = CreateDB.create(name, Parser.emptyParser(opts), qc.context, opts);

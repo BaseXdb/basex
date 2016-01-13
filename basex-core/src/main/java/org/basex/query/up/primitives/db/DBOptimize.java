@@ -62,7 +62,7 @@ public final class DBOptimize extends DBUpdate {
   @Override
   public void apply() throws QueryException {
     // create new options, based on global defaults, and overwrite with database options
-    final MainOptions opts = new MainOptions(qc.context.options);
+    final MainOptions opts = new MainOptions(qc.context.options, true);
     final MetaData meta = data.meta;
     options.assignIfEmpty(MainOptions.TEXTINDEX, meta.createtext);
     options.assignIfEmpty(MainOptions.ATTRINDEX, meta.createattr);

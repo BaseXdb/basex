@@ -21,10 +21,12 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class Context {
+  /** Client listener. Set to {@code null} in standalone/server mode. */
+  public final ClientListener listener;
   /** Blocked clients. */
   public final ClientBlocker blocker;
   /** Options. */
-  public final MainOptions options = new MainOptions();
+  public final MainOptions options;
   /** Static options. */
   public final StaticOptions soptions;
   /** Client sessions. */
@@ -39,9 +41,6 @@ public final class Context {
   public final Databases databases;
   /** Log. */
   public final Log log;
-
-  /** Client listener. Set to {@code null} in standalone/server mode. */
-  public ClientListener listener;
 
   /** Current node context. Set if it does not contain all documents of the current database. */
   private DBNodes current;
@@ -77,12 +76,24 @@ public final class Context {
   }
 
   /**
-   * Constructor, called by clients, and adopting the variables of the main process.
+   * Constructor, called by clients, and adopting the variables of the specified context.
    * The {@link #user} reference must be set after calling this method.
    * @param ctx context of the main process
    */
   public Context(final Context ctx) {
+    this(ctx, null);
+  }
+
+  /**
+   * Constructor, called by clients, and adopting the variables of the main process.
+   * The {@link #user} reference must be set after calling this method.
+   * @param ctx context of the main process
+   * @param listener client listener
+   */
+  public Context(final Context ctx, final ClientListener listener) {
+    this.listener = listener;
     soptions = ctx.soptions;
+    options = new MainOptions(ctx.options);
     datas = ctx.datas;
     sessions = ctx.sessions;
     databases = ctx.databases;
@@ -94,22 +105,12 @@ public final class Context {
   }
 
   /**
-   * Constructor, called by clients, and adopting the variables of the main process.
-   * The {@link #user} reference must be set after calling this method.
-   * @param ctx context of the main process
-   * @param listener client listener
-   */
-  public Context(final Context ctx, final ClientListener listener) {
-    this(ctx);
-    this.listener = listener;
-  }
-
-  /**
    * Private constructor.
    * @param soptions static options
    */
   private Context(final StaticOptions soptions) {
     this.soptions = soptions;
+    options = new MainOptions();
     datas = new Datas();
     sessions = new Sessions();
     blocker = new ClientBlocker();
@@ -120,6 +121,7 @@ public final class Context {
     repo = new EXPathRepo(soptions);
     log = new Log(soptions);
     user = users.get(UserText.ADMIN);
+    listener = null;
   }
 
   /**

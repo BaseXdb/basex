@@ -386,7 +386,7 @@ public final class QueryResources {
     // overwrite parsing options with default values
     try {
       final boolean mem = !context.options.get(MainOptions.FORCECREATE);
-      final MainOptions opts = new MainOptions(context.options);
+      final MainOptions opts = new MainOptions(context.options, true);
       return addData(CreateDB.create(source.dbname(),
           new DirParser(source, opts), context, opts, mem));
     } catch(final IOException ex) {

@@ -204,12 +204,23 @@ public final class MainOptions extends Options {
   }
 
   /**
-   * Constructor, adopting XML parsing options from the specified options.
+   * Constructor, adopting the specified options.
    * @param options parent options
    */
   public MainOptions(final MainOptions options) {
+    super(options);
+  }
+
+  /**
+   * Constructor, adopting XML parsing options from the specified options.
+   * @param options parent options
+   * @param xml adopt xml options
+   */
+  public MainOptions(final MainOptions options, final boolean xml) {
     this(false);
-    for(final Option<?> option : INHERIT) put(option, options.get(option));
+    if(xml) {
+      for(final Option<?> option : INHERIT) put(option, options.get(option));
+    }
   }
 
   /**

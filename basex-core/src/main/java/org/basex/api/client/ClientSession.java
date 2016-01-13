@@ -54,8 +54,7 @@ public class ClientSession extends Session {
    * @param context database context
    * @param username user name
    * @param password password (plain text)
-   * @param output client output; if set to {@code null}, results will
-   * be returned as strings.
+   * @param output client output; if set to {@code null}, results will be returned as strings
    * @throws IOException I/O exception
    */
   public ClientSession(final Context context, final String username, final String password,
@@ -83,8 +82,7 @@ public class ClientSession extends Session {
    * @param port server port
    * @param username user name
    * @param password password (plain text)
-   * @param output client output; if set to {@code null}, results will
-   * be returned as strings.
+   * @param output client output; if set to {@code null}, results will be returned as strings
    * @throws IOException I/O exception
    */
   @SuppressWarnings("resource")

@@ -152,7 +152,7 @@ public final class Users {
   /**
    * Returns user with the specified name.
    * @param name user name
-   * @return success of operation
+   * @return user name, or {@code null}
    */
   public synchronized User get(final String name) {
     return users.get(name);

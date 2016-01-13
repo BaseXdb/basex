@@ -49,7 +49,7 @@ public final class DBNew {
    * @throws QueryException query exception
    */
   public void addDocs(final String name, final DBOptions options) throws QueryException {
-    final MainOptions opts = new MainOptions(qc.context.options);
+    final MainOptions opts = new MainOptions(qc.context.options, true);
     options.assignTo(opts);
     addDocs(new MemData(opts), name, opts);
   }
