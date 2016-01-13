@@ -46,6 +46,14 @@ public final class CollationTest extends AdvancedQueryTest {
     query(prolog + "'a'='A'", true);
     query(prolog + "'\u00c4'='A\u00e4'", false);
     query(prolog + "compare('a', 'A')", "0");
+
+    query(prolog + "contains('aaa', 'ab')", "false");
+    query(prolog + "ends-with('aaa', 'ab')", "false");
+    query(prolog + "starts-with('aaa', 'ab')", "false");
+
+    query(prolog + "contains('baa', 'aa')", "true");
+    query(prolog + "ends-with('baa', 'aa')", "true");
+    query(prolog + "starts-with('aaa', 'aa')", "true");
   }
 
   /** Tests errors. */
