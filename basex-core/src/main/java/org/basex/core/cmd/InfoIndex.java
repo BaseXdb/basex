@@ -84,7 +84,7 @@ public final class InfoIndex extends AInfo {
         return info(TEXT_INDEX, IndexType.TEXT, data, options, data.meta.textindex);
       case ATTRIBUTE:
         return info(ATTRIBUTE_INDEX, IndexType.ATTRIBUTE, data, options, data.meta.attrindex);
-      // [JE] TODO Token Index information
+      // [JE] Token Index information
       case FULLTEXT:
         return info(FULLTEXT_INDEX, IndexType.FULLTEXT, data, options, data.meta.ftindex);
       default:

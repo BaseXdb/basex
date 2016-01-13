@@ -107,7 +107,7 @@ public final class DiskValuesBuilder extends ValuesBuilder {
 
       // initialize cached index iterators
       final IntList ml = new IntList();
-      final LongList il = new LongList(); // [JE] mangle token positions?
+      final LongList il = new LongList();
       final DiskValuesMerger[] vm = new DiskValuesMerger[splits];
       for(int i = 0; i < splits; ++i) vm[i] = new DiskValuesMerger(data, text, tokenize, i);
 
@@ -220,7 +220,7 @@ public final class DiskValuesBuilder extends ValuesBuilder {
   private static void write(final DataOutput outL, final DataOutput outR, final LongList il,
       final boolean tokenize) throws IOException {
     // sort values before writing
-    il.sort(); // [JE] how to sort together with keys (token position)?
+    il.sort();
     final int is = il.size();
     outR.write5(outL.size());
     outL.writeNum(is);

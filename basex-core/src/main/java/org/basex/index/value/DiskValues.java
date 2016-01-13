@@ -256,7 +256,7 @@ public class DiskValues extends ValueIndex {
         if(++ix < s) {
           synchronized(monitor) {
             final IndexEntry entry = indexEntry(ix);
-            if(startsWith(entry.key, prefix)) { // [JE] token semantics valid?
+            if(startsWith(entry.key, prefix)) { // [JE] token semantics valid? -> tokenize
               count = entry.size;
               return entry.key;
             }
@@ -374,7 +374,7 @@ public class DiskValues extends ValueIndex {
     synchronized(monitor) {
       idxl.cursor(offset);
       for(int i = 0, id = 0; i < sz; i++) {
-        id += idxl.readNum(); // [JE] Read next num, tokenize
+        id += idxl.readNum();
         // Pass over token position
         if(tokenize) idxl.readNum();
         pres.add(pre(id));
@@ -397,7 +397,7 @@ public class DiskValues extends ValueIndex {
       final int s = size();
       for(int l = i < 0 ? -i - 1 : tok.mni ? i : i + 1; l < s; l++) {
         final int ps = idxl.readNum(idxr.read5(l * 5L));
-        int id = idxl.readNum(); // [JE] Read next num, tokenize
+        int id = idxl.readNum(); // [JE] Read next num, tokenize -> NotImplemented
         final int pre = pre(id);
 
         // value is too large: skip traversal
@@ -406,7 +406,7 @@ public class DiskValues extends ValueIndex {
         // add pre values
         for(int p = 0; p < ps; ++p) {
           pres.add(pre(id));
-          id += idxl.readNum(); //[JE] Read next num, tokenize
+          id += idxl.readNum(); //[JE] Read next num, tokenize -> NotImplemented
         }
       }
     }
@@ -438,7 +438,7 @@ public class DiskValues extends ValueIndex {
           // value is in range
           for(int d = 0; d < ds; ++d) {
             pres.add(pre(id));
-            id += idxl.readNum(); //[JE] Read next num, tokenize
+            id += idxl.readNum(); //[JE] Read next num, tokenize -> NotImplemented
           }
         } else if(simple && v > max && data.textLen(pre, text) == len) {
           // if limits are integers, if min, max and current value have the same

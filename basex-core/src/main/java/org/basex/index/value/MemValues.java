@@ -147,7 +147,7 @@ public final class MemValues extends ValueIndex {
   public void close() { }
 
   /**
-   * Adds values to the index. // [JE] tokenized index support
+   * Adds values to the index.
    * @param key key to be indexed
    * @param vals sorted values
    */
