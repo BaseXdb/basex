@@ -287,21 +287,22 @@ final class TextRenderer extends BaseXBack {
    * @return iterator, or {@code null} if graphics reference is invalid
    */
   private TextIterator init(final Graphics g, final boolean start) {
-    font = defaultFont;
     syntax.init(GUIConstants.TEXT);
+    font = defaultFont;
 
-    final TextIterator iter = new TextIterator(text);
-    link = false;
     offset = OFFSET;
-    x = offset;
-    y = fontHeight - (start ? 0 : scroll.pos()) - 2;
-    lineY = y - fontHeight * 4 / 5;
-    line = 1;
-    lineC = edit && iter.caretLine(true);
     if(g != null) {
       g.setFont(font);
       if(edit && showLines) offset += fontWidth(g, Integer.toString(text.lines())) + OFFSET * 2;
     }
+    x = offset;
+    y = fontHeight - (start ? 0 : scroll.pos()) - 2;
+    lineY = y - fontHeight * 4 / 5;
+    line = 1;
+    link = false;
+
+    final TextIterator iter = new TextIterator(text);
+    lineC = edit && iter.caretLine(true);
     return iter;
   }
 
