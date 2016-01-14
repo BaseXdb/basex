@@ -1087,7 +1087,7 @@ public enum QueryError {
   /** XQST0059. */
   WHICHCLASS_X(XQST, 59, "Java class not found: %."),
   /** XQST0059. */
-  MODINIT_X_X(XQST, 59, "Could not initialize %: %."),
+  MODINIT_X_X_X(XQST, 59, "Could not initialize %: % (%)."),
   /** XQST0059. */
   MODINST_X_X(XQST, 59, "Could not instantiate %: %."),
   /** XQST0059. */
