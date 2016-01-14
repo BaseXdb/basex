@@ -159,8 +159,7 @@ final class TextIterator {
    */
   boolean selectStart() {
     return start != end && (inSelect() ||
-        (start < end ? start >= pos && start < posEnd :
-          end >= pos && end < posEnd));
+        (start < end ? start >= pos && start < posEnd : end >= pos && end < posEnd));
   }
 
   /**
@@ -168,8 +167,7 @@ final class TextIterator {
    * @return result of check
    */
   boolean inSelect() {
-    return start < end ? pos >= start && pos < end :
-      pos >= end && pos < start;
+    return start < end ? pos >= start && pos < end : pos >= end && pos < start;
   }
 
   /**

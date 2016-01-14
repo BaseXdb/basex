@@ -178,7 +178,7 @@ public class TextPanel extends BaseXPanel {
     if(editor.text(txt)) {
       if(hist != null) hist.store(txt, editor.pos(), 0);
     }
-    componentResized(null);
+    if(isShowing()) resizeCode.invokeLater();
   }
 
   /**

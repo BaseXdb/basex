@@ -282,9 +282,9 @@ final class TextRenderer extends BaseXBack {
 
   /**
    * Initializes the renderer.
-   * @param g graphics reference
+   * @param g graphics reference, or {@code null}
    * @param start start at beginning of text or at current scroll position
-   * @return iterator
+   * @return iterator, or {@code null} if graphics reference is invalid
    */
   private TextIterator init(final Graphics g, final boolean start) {
     font = defaultFont;
@@ -293,13 +293,15 @@ final class TextRenderer extends BaseXBack {
     final TextIterator iter = new TextIterator(text);
     link = false;
     offset = OFFSET;
-    if(edit && showLines) offset += fontWidth(g, Integer.toString(text.lines())) + OFFSET * 2;
     x = offset;
     y = fontHeight - (start ? 0 : scroll.pos()) - 2;
     lineY = y - fontHeight * 4 / 5;
     line = 1;
     lineC = edit && iter.caretLine(true);
-    if(g != null) g.setFont(font);
+    if(g != null) {
+      g.setFont(font);
+      if(edit && showLines) offset += fontWidth(g, Integer.toString(text.lines())) + OFFSET * 2;
+    }
     return iter;
   }
 
@@ -333,12 +335,12 @@ final class TextRenderer extends BaseXBack {
   /**
    * Checks if the text has more words to print.
    * @param iter iterator
-   * @param g graphics reference
+   * @param g graphics reference (can be {@code null})
    * @return true if the text has more words
    */
   private boolean more(final TextIterator iter, final Graphics g) {
-    // no more words found; quit
-    if(!iter.moreTokens()) return false;
+    // no valid graphics reference, no more words found: quit
+    if(g == null || !iter.moreTokens()) return false;
 
     // calculate word width
     int ww = 0;
@@ -557,8 +559,8 @@ final class TextRenderer extends BaseXBack {
    * @return width
    */
   private int fontWidth(final Graphics g, final int cp) {
-    return cp < ' ' || g == null ? cp == '\t' ?
-      charWidths[' '] * indent : 0 : cp < 256 ? charWidths[cp] :
+    return cp == '\t' ? charWidths[' '] * indent : cp < 256 ? charWidths[cp] :
+      cp >= TokenBuilder.PRIVATE_START && cp <= TokenBuilder.PRIVATE_END ||
       cp >= 0xD800 && cp <= 0xDC00 ? 0 : g.getFontMetrics().charWidth(cp);
   }
 
