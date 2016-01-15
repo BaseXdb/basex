@@ -38,7 +38,7 @@ public abstract class Arr extends ParseExpr {
   public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
     final int el = exprs.length;
     for(int e = 0; e < el; e++) exprs[e] = exprs[e].compile(qc, scp);
-    return this;
+    return optimize(qc, scp);
   }
 
   @Override

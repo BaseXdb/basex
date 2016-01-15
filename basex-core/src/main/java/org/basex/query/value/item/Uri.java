@@ -18,8 +18,6 @@ import org.basex.util.*;
 public final class Uri extends AStr {
   /** Empty URI. */
   public static final Uri EMPTY = new Uri(Token.EMPTY);
-  /** String data. */
-  private final byte[] value;
   /** Parsed URI (lazy instantiation). */
   private UriParser.ParsedUri pUri;
 
@@ -28,8 +26,7 @@ public final class Uri extends AStr {
    * @param value value
    */
   private Uri(final byte[] value) {
-    super(AtomType.URI);
-    this.value = value;
+    super(AtomType.URI, value);
   }
 
   /**

@@ -31,11 +31,9 @@ public final class CDoc extends CNode {
 
   @Override
   public FDoc item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    // create node
+    // create document node and add children
     final Constr c = new Constr(ii, sc);
     final FDoc doc = new FDoc(c.children, Token.EMPTY);
-
-    // add child nodes
     c.add(qc, exprs);
     if(c.errAtt != null) throw DOCATTS_X.get(ii, c.errAtt);
     if(!c.atts.isEmpty()) throw DOCATTS_X.get(ii, c.atts.get(0).name());

@@ -351,31 +351,31 @@ public final class QueryContext extends Proc implements Closeable {
       if(!updating) return root.iter(this);
 
       // cache results
-      ItemList cache = root.cache(this);
+      ItemList results = root.cache(this);
 
       final Updates updates = resources.updates;
       if(updates != null) {
-        // if parent context exists, updates will be performed by main context
+        // only perform updates if no parent context exists
         if(qcParent == null) {
-          final ItemList output = resources.output;
-
-          // copy nodes that will be affected by an update operation
+          // create copies of results that will be modified by an update operation
+          final ItemList cache = resources.cache;
           final HashSet<Data> datas = updates.prepare(this);
           final StringList dbs = updates.databases();
-          copy(cache, datas, dbs);
-          copy(output, datas, dbs);
+          check(results, datas, dbs);
+          check(cache, datas, dbs);
 
+          // invalidate current node set in context, apply updates
           if(context.data() != null) context.invalidate();
           updates.apply(this);
 
           // append cached outputs
-          if(output.size() != 0) {
-            if(cache.size() == 0) cache = output;
-            else cache.add(output.value());
+          if(!cache.isEmpty()) {
+            if(results.isEmpty()) results = cache;
+            else results.add(cache.value());
           }
         }
       }
-      return cache.iter();
+      return results.iter();
 
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
@@ -384,19 +384,26 @@ public final class QueryContext extends Proc implements Closeable {
   }
 
   /**
-   * Creates copies of nodes that will be affected by an update operation.
-   * @param cache node cache
+   * Checks the specified results, and replaces nodes with their copies if they will be
+   * affected by update operations.
+   * @param results node cache
    * @param datas data references
    * @param dbs database names
+   * @throws QueryException query exception
    */
-  private void copy(final ItemList cache, final HashSet<Data> datas, final StringList dbs) {
-    final long cs = cache.size();
+  private void check(final ItemList results, final HashSet<Data> datas, final StringList dbs)
+      throws QueryException {
+
+    final long cs = results.size();
     for(int c = 0; c < cs; c++) {
-      final Item it = cache.get(c);
-      if(!(it instanceof DBNode)) continue;
-      final Data data = it.data();
-      if(datas.contains(data) || !data.inMemory() && dbs.contains(data.meta.name)) {
-        cache.set(c, ((DBNode) it).dbCopy(context.options));
+      final Item it = results.get(c);
+      // all updates are performed on database nodes
+      if(it instanceof FItem) throw BASX_FITEM_X.get(null, it);
+      if(it instanceof DBNode) {
+        final Data data = it.data();
+        if(datas.contains(data) || !data.inMemory() && dbs.contains(data.meta.name)) {
+          results.set(c, ((DBNode) it).dbNodeCopy(context.options));
+        }
       }
     }
   }
@@ -661,7 +668,8 @@ public final class QueryContext extends Proc implements Closeable {
     // use standard iterator
     while((it = ir.next()) != null && cache.size() < mx) {
       checkStop();
-      cache.add(it.materialize(null));
+      it.materialize(null);
+      cache.add(it);
     }
     return cache.value();
   }

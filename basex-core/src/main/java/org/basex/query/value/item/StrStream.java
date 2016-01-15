@@ -43,11 +43,8 @@ public final class StrStream extends AStr implements Streamable {
 
   @Override
   public byte[] string(final InputInfo ii) throws QueryException {
-    try {
-      return input(ii).content();
-    } catch(final IOException ex) {
-      throw error.get(ii, ex);
-    }
+    materialize(ii);
+    return value;
   }
 
   @Override
@@ -56,7 +53,9 @@ public final class StrStream extends AStr implements Streamable {
   }
 
   @Override
-  public TextInput input(final InputInfo ii) throws QueryException {
+  public BufferInput input(final InputInfo ii) throws QueryException {
+    if(value != null) return super.input(ii);
+
     TextInput ti = null;
     try {
       ti = new TextInput(input);
@@ -69,12 +68,20 @@ public final class StrStream extends AStr implements Streamable {
   }
 
   @Override
-  public Str materialize(final InputInfo ii) throws QueryException {
-    return Str.get(string(ii));
+  public void materialize(final InputInfo ii) throws QueryException {
+    try {
+      if(value == null) value = input(ii).content();
+    } catch(final IOException ex) {
+      throw error.get(ii, ex);
+    }
   }
 
   @Override
   public String toString() {
-    return Util.info(Function._FILE_READ_TEXT.args(input));
+    try {
+      return toJava();
+    } catch(final QueryException ex) {
+      return Util.info(Function._FILE_READ_TEXT.args(input));
+    }
   }
 }

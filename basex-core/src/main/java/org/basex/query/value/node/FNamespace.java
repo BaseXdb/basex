@@ -3,6 +3,7 @@ package org.basex.query.value.node;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
+import org.basex.core.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -13,7 +14,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public final class FNames extends FNode {
+public final class FNamespace extends FNode {
   /** Namespace name. */
   private final byte[] name;
 
@@ -22,7 +23,7 @@ public final class FNames extends FNode {
    * @param n name
    * @param v value
    */
-  public FNames(final byte[] n, final byte[] v) {
+  public FNamespace(final byte[] n, final byte[] v) {
     super(NodeType.NSP);
     name = n;
     value = v;
@@ -39,8 +40,8 @@ public final class FNames extends FNode {
   }
 
   @Override
-  public FNode copy() {
-    return new FNames(name, value);
+  public FNode deepCopy(final MainOptions options) {
+    return new FNamespace(name, value);
   }
 
   @Override

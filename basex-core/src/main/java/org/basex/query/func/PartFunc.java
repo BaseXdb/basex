@@ -46,12 +46,6 @@ public final class PartFunc extends Arr {
   }
 
   @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    super.compile(qc, scp);
-    return optimize(qc, scp);
-  }
-
-  @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     final Expr f = exprs[exprs.length - 1];
     if(allAreValues()) return preEval(qc);

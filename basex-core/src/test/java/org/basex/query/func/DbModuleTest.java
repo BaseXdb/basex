@@ -234,8 +234,8 @@ public final class DbModuleTest extends AdvancedQueryTest {
     query(_DB_OUTPUT.args("x"), "x");
     query(_DB_OUTPUT.args("('x','y')"), "x\ny");
     query(_DB_OUTPUT.args("<a/>"), "<a/>");
-    error(_DB_OUTPUT.args("x") + ",1", UPALL_X);
-    error(_DB_OUTPUT.args(" count#1"), FISTRING_X);
+    error(_DB_OUTPUT.args("x") + ",1", UPALL);
+    error(_DB_OUTPUT.args(" count#1"), BASX_FITEM_X);
     error("copy $c := <a/> modify " + _DB_OUTPUT.args("x") + " return $c", BASX_DBTRANSFORM);
   }
 

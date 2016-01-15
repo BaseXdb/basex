@@ -2,7 +2,6 @@ package org.basex.io.serial;
 
 import java.io.*;
 
-import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
@@ -33,22 +32,21 @@ public final class BaseXSerializer extends AdaptiveSerializer {
   }
 
   @Override
-  protected void atomic(final Item it) throws IOException {
+  protected void atomic(final Item item) throws IOException {
     if(count == 0) {
       try {
-        if(binary && it instanceof Bin) {
-          try(final InputStream is = it.input(null)) {
-            final PrintOutput po = out;
-            for(int b; (b = is.read()) != -1;) po.write(b);
+        if(binary && item instanceof Bin) {
+          try(final InputStream is = item.input(null)) {
+            for(int b; (b = is.read()) != -1;) out.write(b);
           }
         } else {
-          printChars(it.string(null));
+          printChars(item.string(null));
         }
       } catch(final QueryException ex) {
         throw new QueryIOException(ex);
       }
     } else {
-      super.atomic(it);
+      super.atomic(item);
     }
   }
 

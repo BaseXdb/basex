@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
+import org.basex.query.iter.*;
 import org.basex.query.up.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -18,7 +19,11 @@ public final class DbOutput extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     if(qc.resources.updates().mod instanceof TransformModifier) throw BASX_DBTRANSFORM.get(info);
-    cache(qc.iter(exprs[0]), qc.resources.output, qc);
+    final Iter iter = qc.iter(exprs[0]);
+    for(Item it; (it = iter.next()) != null;) {
+      qc.checkStop();
+      qc.resources.cache.add(it);
+    }
     return null;
   }
 }

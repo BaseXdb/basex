@@ -5,6 +5,7 @@ import static org.basex.query.func.Function.*;
 
 import java.io.*;
 
+import org.basex.api.dom.*;
 import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.data.*;
@@ -224,19 +225,12 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final DBNode copy() {
-    final DBNode n = new DBNode(data, pre, parent, nodeType());
-    n.score = score;
-    return n;
-  }
-
-  @Override
   public final Value copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return copy();
+    return finish();
   }
 
   @Override
-  public final DBNode dbCopy(final MainOptions opts) {
+  public final DBNode dbNodeCopy(final MainOptions opts) {
     final MemData md = new MemData(opts);
     new DataBuilder(md).build(this);
     return new DBNode(md).parent(parent);
@@ -244,12 +238,14 @@ public class DBNode extends ANode {
 
   @Override
   public final DBNode deepCopy(final MainOptions options) {
-    return dbCopy(options);
+    return dbNodeCopy(options);
   }
 
   @Override
   public final DBNode finish() {
-    return copy();
+    final DBNode n = new DBNode(data, pre, parent, nodeType());
+    n.score = score;
+    return n;
   }
 
   @Override
@@ -258,7 +254,7 @@ public class DBNode extends ANode {
     final int p = data.parent(pre, data.kind(pre));
     if(p == -1) return null;
 
-    final DBNode node = copy();
+    final DBNode node = finish();
     node.set(p, data.kind(p));
     return node;
   }
@@ -278,7 +274,7 @@ public class DBNode extends ANode {
   @Override
   public final BasicNodeIter ancestor() {
     return new BasicNodeIter() {
-      private final DBNode node = copy();
+      private final DBNode node = finish();
       int curr = pre, kind = data.kind(curr);
 
       @Override
@@ -295,7 +291,7 @@ public class DBNode extends ANode {
   @Override
   public final BasicNodeIter ancestorOrSelf() {
     return new BasicNodeIter() {
-      private final DBNode node = copy();
+      private final DBNode node = finish();
       int curr = pre, kind = data.kind(curr);
 
       @Override
@@ -312,7 +308,7 @@ public class DBNode extends ANode {
   @Override
   public final BasicNodeIter attributes() {
     return new BasicNodeIter() {
-      final DBNode node = copy();
+      final DBNode node = finish();
       final int last = pre + data.attSize(pre, data.kind(pre));
       int curr = pre + 1;
 
@@ -331,7 +327,7 @@ public class DBNode extends ANode {
     return new BasicNodeIter() {
       int kind = data.kind(pre), curr = pre + data.attSize(pre, kind);
       final int last = pre + data.size(pre, kind);
-      final DBNode node = copy();
+      final DBNode node = finish();
 
       @Override
       public ANode next() {
@@ -350,7 +346,7 @@ public class DBNode extends ANode {
     return new BasicNodeIter() {
       int kind = data.kind(pre), curr = pre + data.attSize(pre, kind);
       final int last = pre + data.size(pre, kind);
-      final DBNode node = copy();
+      final DBNode node = finish();
 
       @Override
       public DBNode next() {
@@ -366,7 +362,7 @@ public class DBNode extends ANode {
   @Override
   public final BasicNodeIter descendantOrSelf() {
     return new BasicNodeIter() {
-      final DBNode node = copy();
+      final DBNode node = finish();
       final int last = pre + data.size(pre, data.kind(pre));
       int curr = pre;
 
@@ -384,7 +380,7 @@ public class DBNode extends ANode {
   @Override
   public final BasicNodeIter following() {
     return new BasicNodeIter() {
-      private final DBNode node = copy();
+      private final DBNode node = finish();
       final int sz = data.meta.size;
       int kind = data.kind(pre);
       int curr = pre + data.size(pre, kind);
@@ -403,7 +399,7 @@ public class DBNode extends ANode {
   @Override
   public final BasicNodeIter followingSibling() {
     return new BasicNodeIter() {
-      private final DBNode node = copy();
+      private final DBNode node = finish();
       int kind = data.kind(pre);
       private final int pp = data.parent(pre, kind);
       final int sz = pp == -1 ? 0 : pp + data.size(pp, data.kind(pp));
@@ -499,5 +495,10 @@ public class DBNode extends ANode {
         break;
     }
     return tb.toString();
+  }
+
+  @Override
+  public final BXNode toJava() {
+    return BXNode.get(deepCopy(new MainOptions()));
   }
 }

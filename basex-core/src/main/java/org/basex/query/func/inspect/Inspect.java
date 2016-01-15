@@ -130,10 +130,9 @@ public abstract class Inspect {
    * @param elem element
    */
   public static void add(final byte[] value, final FElem elem) {
-
     try {
       final Parser parser = new XMLParser(new IOContent(value), MainOptions.get(), true);
-      for(final ANode node : new DBNode(parser).children()) elem.add(node.copy());
+      for(final ANode node : new DBNode(parser).children()) elem.add(node.finish());
     } catch(final IOException ex) {
       // fallback: add string representation
       Util.debug(ex);

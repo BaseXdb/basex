@@ -79,11 +79,10 @@ public abstract class Filter extends Preds {
     final Value init = qc.value;
     qc.value = Path.initial(qc, root);
     try {
-      super.compile(qc, scp);
+      return super.compile(qc, scp);
     } finally {
       qc.value = init;
     }
-    return optimize(qc, scp);
   }
 
   @Override

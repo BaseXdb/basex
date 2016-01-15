@@ -43,16 +43,16 @@ public final class StopWords extends TokenSet {
    * @param data data reference
    */
   public void comp(final Data data) {
-    // no data reference, or stop words have already been defined..
-    if(data == null || size() != 0 || data.inMemory()) return;
-
-    // try to parse the stop words file of the current database
-    final IOFile file = data.meta.dbfile(DATASWL);
-    if(!file.exists()) return;
-    try(final DataInput in = new DataInput(data.meta.dbfile(DATASWL))) {
-      read(in);
-    } catch(final Exception ex) {
-      Util.debug(ex);
+    // stop words have not been initialized, database is on disk...
+    if(isEmpty() && data != null && !data.inMemory()) {
+      // try to parse the stop words file of the current database
+      final IOFile file = data.meta.dbfile(DATASWL);
+      if(!file.exists()) return;
+      try(final DataInput in = new DataInput(data.meta.dbfile(DATASWL))) {
+        read(in);
+      } catch(final Exception ex) {
+        Util.debug(ex);
+      }
     }
   }
 

@@ -3,6 +3,7 @@ package org.basex.query.value.node;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
+import org.basex.core.MainOptions;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
@@ -387,7 +388,7 @@ public final class FElem extends FNode {
   }
 
   @Override
-  public FElem copy() {
+  public FNode deepCopy(final MainOptions options) {
     // nodes must be added after root constructor in order to ensure ascending node ids
     final ANodeList ch = children != null ? new ANodeList(children.size()) : null;
     final ANodeList at = atts != null ? new ANodeList(atts.size()) : null;
@@ -398,10 +399,10 @@ public final class FElem extends FNode {
       for(int n = 0; n < nl; ++n) as.add(ns.name(n), ns.value(n));
     }
     if(at != null) {
-      for(final ANode n : atts) at.add(n.copy());
+      for(final ANode n : atts) at.add(n.deepCopy(options));
     }
     if(ch != null) {
-      for(final ANode n : children) ch.add(n.copy());
+      for(final ANode n : children) ch.add(n.deepCopy(options));
     }
     node.parent(parent);
     return node.optimize();
@@ -418,7 +419,7 @@ public final class FElem extends FNode {
     if(ns != null) {
       final int nl = ns.size();
       for(int n = 0; n < nl; n++) {
-        tb.add(new FNames(ns.name(n), ns.value(n)).toString());
+        tb.add(new FNamespace(ns.name(n), ns.value(n)).toString());
       }
     }
     if(atts != null) {

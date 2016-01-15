@@ -103,7 +103,7 @@ public final class Updates {
     MemData data = fragmentIDs.get(ancID);
     // if data doesn't exist, create a new one
     if(data == null) {
-      data = (MemData) anc.dbCopy(qc.context.options).data();
+      data = (MemData) anc.dbNodeCopy(qc.context.options).data();
       // create a mapping between the fragment id and the data reference
       fragmentIDs.put(ancID, data);
     }
@@ -163,16 +163,14 @@ public final class Updates {
     if(node.id == trgID) return 0;
 
     int s = 1;
-    BasicNodeIter it = node.attributes();
-    for(ANode n; (n = it.next()) != null;) {
+    for(final ANode n : node.attributes()) {
       final int st = preSteps(n, trgID);
       if(st == 0) return s;
       s += st;
     }
-
-    it = node.children();
-    // n.id <= trgID: rewritten to catch ID overflow
-    for(ANode n; (n = it.next()) != null && trgID - n.id >= 0;) {
+    for(final ANode n : node.children()) {
+      // n.id <= trgID: rewritten to catch ID overflow
+      if(trgID - n.id < 0) break;
       s += preSteps(n, trgID);
     }
     return s;

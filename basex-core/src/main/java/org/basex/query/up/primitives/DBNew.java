@@ -88,7 +88,7 @@ public final class DBNew {
     // add document node
     final Context ctx = qc.context;
     if(ni.node != null) {
-      final MemData mdata = (MemData) ni.node.dbCopy(options).data();
+      final MemData mdata = (MemData) ni.node.dbNodeCopy(options).data();
       mdata.update(0, Data.DOC, ni.path);
       return new DataClip(mdata);
     }

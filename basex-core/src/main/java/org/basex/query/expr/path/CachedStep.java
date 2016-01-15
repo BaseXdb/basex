@@ -31,9 +31,8 @@ final class CachedStep extends Step {
   @Override
   public NodeIter iter(final QueryContext qc) throws QueryException {
     // evaluate step
-    final BasicNodeIter iter = axis.iter(checkNode(qc));
     final ANodeList list = new ANodeList();
-    for(ANode n; (n = iter.next()) != null;) {
+    for(final ANode n : axis.iter(checkNode(qc))) {
       if(test.eq(n)) list.add(n.finish());
     }
 

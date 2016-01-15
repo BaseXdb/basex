@@ -70,8 +70,7 @@ public final class DynFuncCall extends FuncCall {
   @Override
   public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
     if(body().has(Flag.NDT)) ndt = true;
-    super.compile(qc, scp);
-    return optimize(qc, scp);
+    return super.compile(qc, scp);
   }
 
   @Override

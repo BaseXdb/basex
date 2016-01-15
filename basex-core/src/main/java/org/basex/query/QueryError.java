@@ -45,9 +45,12 @@ public enum QueryError {
   BASX_ANNTYPE_X_X_X(BASX, 6, "%: % expected, % found."),
   /** BASX0007. */
   BASX_TWICE_X_X(BASX, 6, "Annotation %% was declared twice."),
-
-  /** XUST0002. */
-  BASEX_MOD(XUST, 2, "All transform expressions must be updating or return an empty sequence."),
+  /** BASX0008. */
+  BASX_FITEM_X(BASX, 8, "Function items cannot be cached: %."),
+  /** BASX0009. */
+  BASX_UPMODIFY(BASX, 9, "Transform expressions must all be updating or return an empty sequence."),
+  /** XQST0010. */
+  BASX_OPTDECL_X(BASX, 10, "Database option not allowed in library module: %."),
 
   // Admin module
 
@@ -1151,7 +1154,7 @@ public enum QueryError {
   /** XQST0106. */
   DUPLFUNVIS(XQST, 106, "More than one visibility annotation declared."),
   /** XQST0108. */
-  MODOUT(XQST, 108, "No output declarations allowed in library modules."),
+  OPTDECL_X(XQST, 108, "Output declaration not allowed library module: %."),
   /** XQST0109. */
   OUTMAP_X(XQST, 109, "Character map '%' is not defined."),
   /** XQST0109. */
@@ -1170,8 +1173,6 @@ public enum QueryError {
   TAGWRONG_X_X(XQST, 118, "Different start and end tag: <%>...</%>."),
   /** XQST0119. */
   OUTDOC_X(XQST, 119, "Serialization document '%' cannot be parsed."),
-  /** XQST0123. */
-  DECLOPTION_X(XQST, 123, "Unknown option: %."),
   /** XQST0125. */
   NOVISALLOWED(XQST, 125, "No visibility annotation allowed in inline function."),
   /** XQST034. */
@@ -1216,12 +1217,12 @@ public enum QueryError {
   /** XUST0001. */
   UPNOT_X(XUST, 1, "%: no updating expression allowed."),
   /** XUST0001. */
-  UPALL_X(XUST, 1, "%: all expressions must be updating or return an empty sequence."),
+  UPALL(XUST, 1, "Expressions must all be updating or return an empty sequence."),
   /** XUST0001. */
   UPCTX(XUST, 1, "Context value may not declare an updating expression."),
 
   /** XUST0002. */
-  UPMODIFY(XUST, 2, "Modify clause: all expressions must be updating or return an empty sequence."),
+  UPMODIFY(XUST, 2, "Expressions must all be updating or return an empty sequence."),
   /** XUST0002. */
   UPEXPECTF(XUST, 2, "Function body must be an updating expression."),
   /** XUST0003. */
@@ -1256,7 +1257,7 @@ public enum QueryError {
   /** XUTY0012. */
   UPWRTRGSINGLE_X(XUTY, 12, "Target must be single node: %."),
   /** XUTY0013. */
-  UPCOPYMULT_X(XUTY, 13, "Value of $% must be single node: %."),
+  UPCOPYMULT_X_X(XUTY, 13, "Value of $% must be single node: %."),
   /** XUTY0013. */
   UPSOURCE_X(XUTY, 13, "Transformed expression must be single node: %."),
   /** XUTY0022. */

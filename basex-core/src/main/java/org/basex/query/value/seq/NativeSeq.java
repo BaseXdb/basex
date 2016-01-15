@@ -43,9 +43,7 @@ abstract class NativeSeq extends Seq {
   }
 
   @Override
-  public final Value materialize(final InputInfo ii) {
-    return this;
-  }
+  public final void materialize(final InputInfo ii) { }
 
   @Override
   public Value atomValue(final InputInfo ii) throws QueryException {

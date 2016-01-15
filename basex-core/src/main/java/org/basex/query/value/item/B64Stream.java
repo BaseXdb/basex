@@ -32,15 +32,13 @@ public final class B64Stream extends B64 implements Streamable {
 
   @Override
   public byte[] binary(final InputInfo ii) throws QueryException {
-    try {
-      return input.read();
-    } catch(final IOException ex) {
-      throw error.get(ii, ex);
-    }
+    materialize(ii);
+    return data;
   }
 
   @Override
   public BufferInput input(final InputInfo ii) throws QueryException {
+    if(data != null) return super.input(ii);
     try {
       return new BufferInput(input);
     } catch(final IOException ex) {
@@ -49,12 +47,21 @@ public final class B64Stream extends B64 implements Streamable {
   }
 
   @Override
-  public B64 materialize(final InputInfo ii) throws QueryException {
-    return new B64(binary(ii));
+  public void materialize(final InputInfo ii) throws QueryException {
+    try {
+      if(data == null) data = input.read();
+    } catch(final IOException ex) {
+      throw error.get(ii, ex);
+    }
   }
 
   @Override
   public String toString() {
-    return Util.info(Function._FILE_READ_BINARY.args(input));
+    try {
+      materialize(null);
+      return super.toString();
+    } catch(final QueryException ex) {
+      return Util.info(Function._FILE_READ_BINARY.args(input));
+    }
   }
 }

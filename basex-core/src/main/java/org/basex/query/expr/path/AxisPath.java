@@ -69,7 +69,7 @@ public abstract class AxisPath extends Path {
       }
     } else if(state == Caching.ENABLED) {
       // caching is possible: remember context value
-      cvalue = qc.value instanceof DBNode ? ((DBNode) qc.value).copy() : qc.value;
+      cvalue = qc.value instanceof DBNode ? ((DBNode) qc.value).finish() : qc.value;
       state = Caching.READY;
     }
     // return new iterator or cached values

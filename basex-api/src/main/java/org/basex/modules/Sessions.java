@@ -4,14 +4,11 @@ import java.util.*;
 
 import javax.servlet.http.*;
 
-import org.basex.data.*;
 import org.basex.http.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -40,7 +37,7 @@ public final class Sessions extends QueryModule {
    */
   @Requires(Permission.NONE)
   public Dtm created(final Str id) throws QueryException {
-    return new Dtm(session(id).getCreationTime(), null);
+    return session(id).created();
   }
 
   /**
@@ -51,20 +48,17 @@ public final class Sessions extends QueryModule {
    */
   @Requires(Permission.NONE)
   public Dtm accessed(final Str id) throws QueryException {
-    return new Dtm(session(id).getLastAccessedTime(), null);
+    return session(id).accessed();
   }
 
   /**
-   * Returns all attributes of the specified session.
+   * Returns all attributes of a session.
    * @param id session id
    * @return session attributes
    * @throws QueryException query exception
    */
   public Value names(final Str id) throws QueryException {
-    final TokenList tl = new TokenList();
-    final Enumeration<String> en = session(id).getAttributeNames();
-    while(en.hasMoreElements()) tl.add(en.nextElement());
-    return StrSeq.get(tl);
+    return session(id).names();
   }
 
   /**
@@ -74,8 +68,8 @@ public final class Sessions extends QueryModule {
    * @return session attribute
    * @throws QueryException query exception
    */
-  public Item get(final Str id, final Str key) throws QueryException {
-    return get(id, key, null);
+  public Value get(final Str id, final Str key) throws QueryException {
+    return session(id).get(key);
   }
 
   /**
@@ -86,11 +80,8 @@ public final class Sessions extends QueryModule {
    * @return session attribute
    * @throws QueryException query exception
    */
-  public Item get(final Str id, final Str key, final Item def) throws QueryException {
-    final Object o = session(id).getAttribute(key.toJava());
-    if(o == null) return def;
-    if(o instanceof Item) return (Item) o;
-    throw SessionErrors.noAttribute(Util.className(o));
+  public Value get(final Str id, final Str key, final Item def) throws QueryException {
+    return session(id).get(key, def);
   }
 
   /**
@@ -101,15 +92,7 @@ public final class Sessions extends QueryModule {
    * @throws QueryException query exception
    */
   public void set(final Str id, final Str key, final Item item) throws QueryException {
-    Item it = item;
-    final Data d = it.data();
-    if(d != null && !d.inMemory()) {
-      // convert database node to main memory data instance
-      it = ((ANode) it).dbCopy(queryContext.context.options);
-    } else if(it instanceof FItem) {
-      throw SessionErrors.functionItem();
-    }
-    session(id).setAttribute(key.toJava(), it);
+    session(id).set(key, item);
   }
 
   /**
@@ -119,29 +102,29 @@ public final class Sessions extends QueryModule {
    * @throws QueryException query exception
    */
   public void delete(final Str id, final Str key) throws QueryException {
-    session(id).removeAttribute(key.toJava());
+    session(id).delete(key);
   }
 
   /**
-   * Invalidates a session.
+   * Closes a session.
    * @param id session id
    * @throws QueryException query exception
    */
   public void close(final Str id) throws QueryException {
-    session(id).invalidate();
+    session(id).close();
   }
 
   /**
-   * Returns the specified session.
-   * @param id ids
+   * Returns a session instance.
+   * @param id session id
    * @return request
    * @throws QueryException query exception
    */
-  private HttpSession session(final Str id) throws QueryException {
+  private ASession session(final Str id) throws QueryException {
     if(queryContext.http == null) throw SessionErrors.noContext();
     final HashMap<String, HttpSession> http = SessionListener.sessions();
-    final HttpSession session = http.get(id.toJava());
+    final HttpSession session = id != null ? http.get(id.toJava()) : null;
     if(session == null) throw SessionErrors.whichSession(id);
-    return session;
+    return new ASession(session, queryContext);
   }
 }

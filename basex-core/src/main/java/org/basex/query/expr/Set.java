@@ -33,12 +33,6 @@ abstract class Set extends Arr {
   }
 
   @Override
-  public final Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    super.compile(qc, scp);
-    return optimize(qc, scp);
-  }
-
-  @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     boolean i = true;
     for(final Expr e : exprs) {

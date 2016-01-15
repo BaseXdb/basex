@@ -181,24 +181,38 @@ final class TrieBranch extends TrieNode {
 
   @Override
   void keys(final ValueBuilder ks) {
-    for(final TrieNode nd : kids) if(nd != null) nd.keys(ks);
+    for(final TrieNode nd : kids) {
+      if(nd != null) nd.keys(ks);
+    }
   }
 
   @Override
   void values(final ValueBuilder vs) {
-    for(final TrieNode nd : kids) if(nd != null) nd.values(vs);
+    for(final TrieNode nd : kids) {
+      if(nd != null) nd.values(vs);
+    }
   }
 
   @Override
-  void apply(final ValueBuilder vb, final FItem func, final QueryContext qc, final InputInfo ii)
+  void materialize(final InputInfo ii) throws QueryException {
+    for(final TrieNode nd : kids) {
+      if(nd != null) nd.materialize(ii);
+    }
+  }
+
+  @Override
+  void forEach(final ValueBuilder vb, final FItem func, final QueryContext qc, final InputInfo ii)
       throws QueryException {
-    for(final TrieNode nd : kids) if(nd != null) nd.apply(vb, func, qc, ii);
+    for(final TrieNode nd : kids) {
+      if(nd != null) nd.forEach(vb, func, qc, ii);
+    }
   }
 
   @Override
   boolean instanceOf(final AtomType kt, final SeqType vt) {
-    for(final TrieNode k : kids)
+    for(final TrieNode k : kids) {
       if(!(k == null || k.instanceOf(kt, vt))) return false;
+    }
     return true;
   }
 

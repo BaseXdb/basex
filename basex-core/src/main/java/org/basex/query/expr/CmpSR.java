@@ -150,7 +150,7 @@ final class CmpSR extends Single {
 
     // accept only location path, string and equality expressions
     final Data data = ii.ic.data;
-    // no range index support in main-memory index structures
+    // no support for main-memory databases
     if(data.inMemory() || !ii.check(expr, false)) return false;
 
     // create range access

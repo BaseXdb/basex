@@ -126,7 +126,11 @@ public class XQueryEval extends StandardFunc {
         }
 
         final ItemList cache = new ItemList();
-        cache(qctx.iter(), cache, qctx);
+        final Iter iter = qctx.iter();
+        for(Item it; (it = iter.next()) != null;) {
+          qc.checkStop();
+          cache.add(it);
+        }
         return cache;
       } catch(final ProcException ex) {
         throw BXXQ_STOPPED.get(info);
@@ -136,9 +140,9 @@ public class XQueryEval extends StandardFunc {
       }
 
     } finally {
+      if(to != null) to.cancel();
       user.perm(tmp, "");
       qc.proc(null);
-      if(to != null) to.cancel();
     }
   }
 

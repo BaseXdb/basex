@@ -43,11 +43,13 @@ public final class CElem extends CName {
   }
 
   @Override
-  public CElem compile(final QueryContext qc, final VarScope scp) throws QueryException {
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
     final int s = addNS();
-    super.compile(qc, scp);
-    sc.ns.size(s);
-    return this;
+    try {
+      return super.compile(qc, scp);
+    } finally {
+      sc.ns.size(s);
+    }
   }
 
   @Override

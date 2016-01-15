@@ -43,6 +43,8 @@ abstract class TrieNode {
     @Override
     void values(final ValueBuilder vs) { }
     @Override
+    void materialize(final InputInfo ii) { }
+    @Override
     boolean instanceOf(final AtomType kt, final SeqType vt) { return true; }
     @Override
     int hash(final InputInfo ii) { return 0; }
@@ -52,7 +54,7 @@ abstract class TrieNode {
     public TrieNode put(final int h, final Item k, final Value v, final int l,
         final InputInfo i) { return new TrieLeaf(h, k, v); }
     @Override
-    void apply(final ValueBuilder vb, final FItem func, final QueryContext qc,
+    void forEach(final ValueBuilder vb, final FItem func, final QueryContext qc,
         final InputInfo ii) { }
     @Override
     StringBuilder toString(final StringBuilder sb, final String ind) { return sb.append("{ }"); }
@@ -182,6 +184,13 @@ abstract class TrieNode {
   abstract void values(final ValueBuilder vs);
 
   /**
+   * Materializes all keys and values.
+   * @param ii input info
+   * @throws QueryException query exception
+   */
+  abstract void materialize(final InputInfo ii) throws QueryException;
+
+  /**
    * Applies a function on all entries.
    * @param vb value builder
    * @param func function to apply on keys and values
@@ -189,7 +198,7 @@ abstract class TrieNode {
    * @param ii input info
    * @throws QueryException query exception
    */
-  abstract void apply(final ValueBuilder vb, final FItem func, QueryContext qc, InputInfo ii)
+  abstract void forEach(final ValueBuilder vb, final FItem func, QueryContext qc, InputInfo ii)
       throws QueryException;
 
   /**

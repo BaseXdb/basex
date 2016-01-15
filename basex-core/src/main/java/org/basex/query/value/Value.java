@@ -87,12 +87,11 @@ public abstract class Value extends Expr implements Iterable<Item> {
   public abstract Value subSeq(final long start, final long len);
 
   /**
-   * Materializes streamable values, or returns a self reference.
+   * Materializes streamable values.
    * @param ii input info
-   * @return materialized item
    * @throws QueryException query exception
    */
-  public abstract Value materialize(final InputInfo ii) throws QueryException;
+  public abstract void materialize(final InputInfo ii) throws QueryException;
 
   /**
    * Evaluates the expression and returns the atomized items.

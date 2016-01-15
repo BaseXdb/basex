@@ -49,8 +49,8 @@ public final class QueryResources {
   /** External resources. */
   private final HashMap<Class<? extends QueryResource>, QueryResource> external = new HashMap<>();
 
-  /** Pending output. */
-  public final ItemList output = new ItemList();
+  /** Cached outputs. */
+  public final ItemList cache = new ItemList();
   /** Pending updates. */
   Updates updates;
 

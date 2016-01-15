@@ -115,9 +115,7 @@ public final class Empty extends Value {
   }
 
   @Override
-  public Value materialize(final InputInfo ii) {
-    return this;
-  }
+  public void materialize(final InputInfo ii) { }
 
   @Override
   public Value atomValue(final InputInfo ii) {

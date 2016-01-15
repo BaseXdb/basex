@@ -66,6 +66,11 @@ public final class Map extends FItem {
   }
 
   @Override
+  public void materialize(final InputInfo ii) throws QueryException {
+    root.materialize(ii);
+  }
+
+  @Override
   public int stackFrameSize() {
     return 0;
   }
@@ -221,10 +226,10 @@ public final class Map extends FItem {
    * @return resulting value
    * @throws QueryException query exception
    */
-  public Value apply(final FItem func, final QueryContext qc, final InputInfo ii)
+  public Value forEach(final FItem func, final QueryContext qc, final InputInfo ii)
       throws QueryException {
     final ValueBuilder vb = new ValueBuilder();
-    root.apply(vb, func, qc, ii);
+    root.forEach(vb, func, qc, ii);
     return vb.value();
   }
 

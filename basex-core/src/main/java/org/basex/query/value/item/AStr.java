@@ -12,6 +12,9 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class AStr extends Item {
+  /** String data. */
+  byte[] value;
+
   /**
    * Constructor.
    */
@@ -20,11 +23,13 @@ public abstract class AStr extends Item {
   }
 
   /**
-   * Constructor, specifying a type.
+   * Constructor, specifying a type and value.
    * @param type atomic type
+   * @param value value
    */
-  AStr(final AtomType type) {
+  AStr(final AtomType type, final byte[] value) {
     super(type);
+    this.value = value;
   }
 
   @Override

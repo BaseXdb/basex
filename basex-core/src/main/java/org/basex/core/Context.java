@@ -218,7 +218,7 @@ public final class Context {
   }
 
   /**
-   * Invalidates the current node set.
+   * Invalidates the current node set. Will be recreated once it is requested.
    */
   public void invalidate() {
     current = null;

@@ -19,8 +19,6 @@ public final class Str extends AStr {
   public static final Str WC = new Str(new byte[] { '*' });
   /** Zero-length string. */
   public static final Str ZERO = new Str(Token.EMPTY);
-  /** String data. */
-  final byte[] value;
 
   /**
    * Constructor.
@@ -36,8 +34,7 @@ public final class Str extends AStr {
    * @param type item type
    */
   public Str(final byte[] value, final AtomType type) {
-    super(type);
-    this.value = value;
+    super(type, value);
   }
 
   /**
@@ -59,7 +56,7 @@ public final class Str extends AStr {
   }
 
   /**
-   * Returns an instance of this class.
+   * Returns a string representation of the specified value.
    * @param value object (will be converted to token)
    * @param qc query context
    * @param ii input info

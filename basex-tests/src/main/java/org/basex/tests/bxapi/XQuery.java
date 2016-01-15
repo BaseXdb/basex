@@ -13,6 +13,7 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.format.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.tests.bxapi.xdm.*;
 import org.basex.util.*;
@@ -233,7 +234,9 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
    */
   public XdmValue value() {
     try {
-      return XdmValue.get(qp.value().materialize(null));
+      final Value v = qp.value();
+      v.materialize(null);
+      return XdmValue.get(v);
     } catch(final QueryException ex) {
       throw new XQueryException(ex);
     } finally {

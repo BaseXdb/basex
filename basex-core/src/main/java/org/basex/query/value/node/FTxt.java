@@ -3,6 +3,7 @@ package org.basex.query.value.node;
 import static org.basex.data.DataText.*;
 import static org.basex.query.QueryText.*;
 
+import org.basex.core.MainOptions;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -42,7 +43,7 @@ public final class FTxt extends FNode {
   }
 
   @Override
-  public FNode copy() {
+  public FNode deepCopy(final MainOptions options) {
     return new FTxt(value).parent(parent);
   }
 
@@ -58,6 +59,6 @@ public final class FTxt extends FNode {
       if(v == '&') tb.add(E_AMP);
       else if(v == '\r') tb.add(E_CR);
     }
-    return tb.add('"').toString();
+    return tb.toString();
   }
 }

@@ -88,10 +88,8 @@ final class SubSeq extends Seq {
   }
 
   @Override
-  public Value materialize(final InputInfo ii) throws QueryException {
-    final ValueBuilder vb = new ValueBuilder();
-    for(long i = 0; i < size; i++) vb.add(itemAt(i).materialize(ii));
-    return vb.value();
+  public void materialize(final InputInfo ii) throws QueryException {
+    for(long i = 0; i < size; i++) itemAt(i).materialize(ii);
   }
 
   @Override

@@ -47,6 +47,6 @@ public abstract class CNode extends Arr {
 
   @Override
   protected String toString(final String pref) {
-    return pref + " { " + (exprs.length == 0 ? "()" : super.toString(SEP)) + " }";
+    return pref + " { " + super.toString(SEP) + " }";
   }
 }

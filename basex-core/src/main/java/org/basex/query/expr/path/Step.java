@@ -77,12 +77,6 @@ public abstract class Step extends Preds {
   }
 
   @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    super.compile(qc, scp);
-    return optimize(qc, scp);
-  }
-
-  @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     // check if test will never yield results
     if(!test.optimize(qc)) return Empty.SEQ;

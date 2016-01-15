@@ -16,6 +16,7 @@ public final class ProfVoid extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter ir = exprs[0].iter(qc);
+    // materialize values to ensure that streams are consumed
     for(Item it; (it = ir.next()) != null;) it.materialize(info);
     return null;
   }

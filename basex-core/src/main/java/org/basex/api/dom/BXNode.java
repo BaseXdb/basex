@@ -268,9 +268,8 @@ public abstract class BXNode implements Node {
    */
   final BXNList getElements(final String name) {
     final ANodeList nb = new ANodeList();
-    final BasicNodeIter iter = nd.descendant();
     final byte[] nm = "*".equals(name) ? null : token(name);
-    for(ANode n; (n = iter.next()) != null;) {
+    for(final ANode n : nd.descendant()) {
       if(n.type == NodeType.ELM && (nm == null || eq(nm, n.name()))) nb.add(n.finish());
     }
     return new BXNList(nb);
@@ -283,7 +282,7 @@ public abstract class BXNode implements Node {
    */
   static ANodeList finish(final BasicNodeIter iter) {
     final ANodeList nl = new ANodeList();
-    for(ANode n; (n = iter.next()) != null;) nl.add(n.finish());
+    for(final ANode n : iter) nl.add(n.finish());
     return nl;
   }
 

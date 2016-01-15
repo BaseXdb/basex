@@ -50,8 +50,7 @@ public final class Transform extends Arr {
   @Override
   public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
     for(final Let c : copies) c.expr = c.expr.compile(qc, scp);
-    super.compile(qc, scp);
-    return this;
+    return super.compile(qc, scp);
   }
 
   @Override
@@ -61,33 +60,33 @@ public final class Transform extends Arr {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final int o = qc.resources.output.size();
+    final int o = qc.resources.cache.size();
     final Updates updates = qc.resources.updates();
     final ContextModifier tmp = updates.mod;
     final TransformModifier pu = new TransformModifier();
     updates.mod = pu;
 
     try {
-      for(final Let fo : copies) {
-        final Iter ir = qc.iter(fo.expr);
+      for(final Let c : copies) {
+        final Iter ir = qc.iter(c.expr);
         Item i = ir.next();
-        if(!(i instanceof ANode)) throw UPCOPYMULT_X.get(fo.info, fo.var.name, i);
+        if(!(i instanceof ANode)) throw UPCOPYMULT_X_X.get(c.info, c.var.name, i);
         final Item i2 = ir.next();
-        if(i2 != null) throw UPCOPYMULT_X.get(fo.info, fo.var.name, ValueBuilder.concat(i, i2));
+        if(i2 != null) throw UPCOPYMULT_X_X.get(c.info, c.var.name, ValueBuilder.concat(i, i2));
 
         // copy node to main memory data instance
-        i = ((ANode) i).dbCopy(qc.context.options);
+        i = ((ANode) i).dbNodeCopy(qc.context.options);
         // add resulting node to variable
-        qc.set(fo.var, i, info);
+        qc.set(c.var, i, info);
         pu.addData(i.data());
       }
       final Value v = qc.value(exprs[0]);
-      if(!v.isEmpty()) throw BASEX_MOD.get(info);
+      if(!v.isEmpty()) throw BASX_UPMODIFY.get(info);
 
       updates.prepare(qc);
       updates.apply(qc);
     } finally {
-      qc.resources.output.size(o);
+      qc.resources.cache.size(o);
       updates.mod = tmp;
     }
     return qc.value(exprs[1]);

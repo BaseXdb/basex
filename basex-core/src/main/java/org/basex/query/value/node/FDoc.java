@@ -2,6 +2,7 @@ package org.basex.query.value.node;
 
 import static org.basex.query.QueryText.*;
 
+import org.basex.core.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.type.*;
@@ -111,7 +112,7 @@ public final class FDoc extends FNode {
   }
 
   @Override
-  public FDoc copy() {
+  public FNode deepCopy(final MainOptions options) {
     return new FDoc(children, uri).optimize();
   }
 
@@ -134,6 +135,6 @@ public final class FDoc extends FNode {
 
   @Override
   public String toString() {
-    return Util.info("%(%)", type, uri);
+    return Util.info("%(%)", DOCUMENT, uri);
   }
 }

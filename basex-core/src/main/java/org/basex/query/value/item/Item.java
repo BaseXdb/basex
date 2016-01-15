@@ -222,11 +222,9 @@ public abstract class Item extends Value {
     return len == 0 ? Empty.SEQ : this;
   }
 
-  // Overridden by B64Stream, StrStream, Jav and Array.
+  // Overridden by B64Stream, StrStream, Map and Array.
   @Override
-  public Item materialize(final InputInfo ii) throws QueryException {
-    return this;
-  }
+  public void materialize(final InputInfo ii) throws QueryException { }
 
   // Overridden by Array.
   @Override

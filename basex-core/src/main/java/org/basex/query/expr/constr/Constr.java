@@ -77,8 +77,7 @@ public final class Constr {
   }
 
   /**
-   * Recursively adds nodes to the element arrays. Recursion is necessary
-   * as documents are resolved to their child nodes.
+   * Recursively adds nodes to the element arrays.
    * @param qc query context
    * @param it current item
    * @return true if item was added
@@ -108,13 +107,13 @@ public final class Constr {
       } else if(ip == NodeType.ATT) {
         // type: attribute node
 
-        // no attribute allowed after texts or child nodes
+        // check if attribute is specified after texts or child nodes
+        final QNm name = node.qname();
         if(!text.isEmpty() || !children.isEmpty()) {
-          errAtt = node.qname();
+          errAtt = name;
           return false;
         }
         // check for duplicate attribute names
-        final QNm name = node.qname();
         for(final ANode att : atts) {
           if(name.eq(att.qname())) {
             duplAtt = name;
@@ -136,12 +135,10 @@ public final class Constr {
         }
 
         // add namespace
-        final byte[] name = node.name();
-        final byte[] uri = node.string();
-        final byte[] u = nspaces.value(name);
-        if(u == null) {
+        final byte[] name = node.name(), uri = node.string(), knownUri = nspaces.value(name);
+        if(knownUri == null) {
           nspaces.add(name, uri);
-        } else if(!Token.eq(uri, u)) {
+        } else if(!Token.eq(uri, knownUri)) {
           // duplicate namespace (ignore duplicates with same uri)
           duplNS = name;
           return false;
@@ -158,8 +155,6 @@ public final class Constr {
 
         // add text node
         if(!text.isEmpty()) children.add(new FTxt(text.next()));
-
-        // [CG] XQuery, element construction: avoid full copy of sub tree if not needed
         node = node.deepCopy(qc.context.options);
         children.add(node);
       }

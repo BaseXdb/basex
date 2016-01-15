@@ -62,10 +62,10 @@ public abstract class Preds extends ParseExpr {
           preds[p] = FnError.get(ex, seqType);
         }
       }
-      return this;
     } finally {
       qc.value = init;
     }
+    return optimize(qc, scp);
   }
 
   @Override

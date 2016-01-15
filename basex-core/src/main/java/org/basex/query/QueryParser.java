@@ -523,17 +523,16 @@ public class QueryParser extends InputParser {
 
     if(eq(qnm.uri(), OUTPUT_URI)) {
       // output declaration
-      if(module != null) throw error(MODOUT);
+      if(module != null) throw error(OPTDECL_X, qnm.string());
 
       final SerializerOptions sopts = qc.serParams();
       if(!decl.add("S " + name)) throw error(OUTDUPL_X, name);
       sopts.parse(name, val, sc, info());
 
-    } else if(eq(qnm.uri(), XQ_URI)) {
-      throw error(DECLOPTION_X, qnm);
-
     } else if(eq(qnm.uri(), DB_URI)) {
       // project-specific declaration
+      if(module != null) throw error(BASX_OPTDECL_X, qnm.local());
+
       final String ukey = name.toUpperCase(Locale.ENGLISH);
       final Option<?> opt = qc.context.options.option(ukey);
       if(opt == null) throw error(BASX_OPTIONS_X, ukey);
@@ -1443,11 +1442,12 @@ public class QueryParser extends InputParser {
     final Expr e = comparison();
     if(e != null) {
       if(wsConsumeWs(UPDATE)) {
+        final InputInfo ii = info();
         final int s = localVars.openScope();
         qc.updating();
         final Expr m = check(single(), COPYEXPR);
         localVars.closeScope(s);
-        return new TransformWith(info(), e, m);
+        return new TransformWith(ii, e, m);
       }
     }
     return e;
@@ -3648,13 +3648,14 @@ public class QueryParser extends InputParser {
     } while(wsConsumeWs(COMMA));
     wsCheck(MODIFY);
 
+    final InputInfo ii = info();
     final Expr m = check(single(), INCOMPLETE);
     wsCheck(RETURN);
     final Expr r = check(single(), INCOMPLETE);
 
     localVars.closeScope(s);
     qc.updating();
-    return new Transform(info(), fl, m, r);
+    return new Transform(ii, fl, m, r);
   }
 
   /**

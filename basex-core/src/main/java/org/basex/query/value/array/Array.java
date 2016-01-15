@@ -193,6 +193,11 @@ public abstract class Array extends FItem {
    */
   public abstract Array remove(final long pos);
 
+  @Override
+  public final void materialize(final InputInfo ii) throws QueryException {
+    for(final Value v : members()) v.materialize(ii);
+  }
+
   /**
    * Iterator over the members of this array.
    * @param start starting position
@@ -325,13 +330,6 @@ public abstract class Array extends FItem {
   public Expr inlineExpr(final Expr[] exprs, final QueryContext qc, final VarScope scp,
       final InputInfo ii) {
     return null;
-  }
-
-  @Override
-  public Array materialize(final InputInfo ii) throws QueryException {
-    final ArrayBuilder builder = new ArrayBuilder();
-    for(final Value val : members()) builder.append(val.materialize(ii));
-    return builder.freeze();
   }
 
   @Override

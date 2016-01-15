@@ -111,10 +111,8 @@ public abstract class TreeSeq extends Seq {
   public abstract ValueIter iter();
 
   @Override
-  public final Seq materialize(final InputInfo ii) throws QueryException {
-    final TreeSeqBuilder tsb = new TreeSeqBuilder();
-    for(final Item it : this) tsb.add(it.materialize(ii));
-    return tsb.seq();
+  public final void materialize(final InputInfo ii) throws QueryException {
+    for(final Item it : this) it.materialize(ii);
   }
 
   @Override

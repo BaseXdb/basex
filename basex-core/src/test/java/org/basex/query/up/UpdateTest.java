@@ -1143,11 +1143,11 @@ public final class UpdateTest extends AdvancedQueryTest {
   @Test
   public void modifyCheck() {
     error("copy $c:= <a>X</a> modify 'a' return $c", UPMODIFY);
-    error("copy $c:= <a>X</a> modify(delete node $c/text(),'a') return $c", UPALL_X);
+    error("copy $c:= <a>X</a> modify(delete node $c/text(),'a') return $c", UPALL);
 
-    error("text { <a/> update (delete node <a/>,<b/>) }", UPALL_X);
-    error("1[<a/> update (delete node <a/>,<b/>)]", UPALL_X);
-    error("for $i in 1 order by (<a/> update (delete node <a/>,<b/>)) return $i", UPALL_X);
+    error("text { <a/> update (delete node <a/>,<b/>) }", UPALL);
+    error("1[<a/> update (delete node <a/>,<b/>)]", UPALL);
+    error("for $i in 1 order by (<a/> update (delete node <a/>,<b/>)) return $i", UPALL);
   }
 
   /**

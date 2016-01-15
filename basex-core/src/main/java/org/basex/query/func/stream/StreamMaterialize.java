@@ -21,7 +21,9 @@ public final class StreamMaterialize extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return qc.value(exprs[0]).materialize(info);
+    final Value v = qc.value(exprs[0]);
+    v.materialize(info);
+    return v;
   }
 
   @Override
