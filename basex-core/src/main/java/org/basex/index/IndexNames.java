@@ -7,6 +7,7 @@ import java.util.regex.*;
 
 import org.basex.data.*;
 import org.basex.query.value.item.*;
+import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -21,9 +22,19 @@ public final class IndexNames {
 
   /**
    * Constructor.
-   * @param names names and namespace uris
+   * @param type index type
+   * @param data data reference
    */
-  public IndexNames(final String names) {
+  public IndexNames(final IndexType type, final Data data) {
+    final String names;
+    switch(type) {
+      case TEXT: names = data.meta.textinclude; break;
+      case ATTRIBUTE: names = data.meta.attrinclude; break;
+      case TOKEN: names = data.meta.tokeninclude; break;
+      case FULLTEXT: names = data.meta.ftinclude; break;
+      default: throw Util.notExpected();
+    }
+
     final HashSet<String> inc = toSet(names.trim());
     for(final String entry : inc) {
       // global wildcard: ignore all assignments

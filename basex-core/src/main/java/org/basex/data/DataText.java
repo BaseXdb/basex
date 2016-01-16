@@ -64,7 +64,7 @@ public interface DataText {
   String DBFTCS = "FTCS";
   /** Full-text diacritics removal. */
   String DBFTDC = "FTDC";
-  /** Maximum token length. */
+  /** Maximum length of index entries. */
   String DBMAXLEN = "MAXLEN";
   /** Maximum number of categories. */
   String DBMAXCATS = "MAXCATS";
@@ -116,7 +116,7 @@ public interface DataText {
   /** Database - Attribute value index. */
   String DATAATV = "atv";
   /** Database - Token index. */
-  String DATAATT = "tok";
+  String DATATOK = "tok";
   /** Database - Full-text index. */
   String DATAFTX = "ftx";
   /** Database - Stopword list. */

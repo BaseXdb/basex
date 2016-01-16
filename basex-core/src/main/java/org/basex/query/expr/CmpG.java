@@ -6,6 +6,7 @@ import static org.basex.query.QueryText.*;
 import java.util.*;
 
 import org.basex.data.*;
+import org.basex.index.*;
 import org.basex.index.query.*;
 import org.basex.query.*;
 import org.basex.query.expr.CmpV.OpV;
@@ -330,6 +331,7 @@ public final class CmpG extends Cmp {
     // check if index rewriting is possible
     if(!ii.check(exprs[0], false)) return false;
 
+    final IndexType type = ii.text ? IndexType.TEXT : IndexType.ATTRIBUTE;
     final Data data = ii.ic.data;
     final Expr arg = exprs[1];
     final ParseExpr root;
@@ -350,10 +352,10 @@ public final class CmpG extends Cmp {
         // add only expressions that yield results and have not been requested before
         if(!strings.contains(string)) {
           strings.put(string);
-          final int costs = data.costs(new StringToken(ii.text, string));
+          final int costs = data.costs(new StringToken(type, string));
           if(costs < 0) return false;
           if(costs > 0) {
-            final ValueAccess va = new ValueAccess(info, it, ii.text, false, ii.test, ii.ic);
+            final ValueAccess va = new ValueAccess(info, it, type, ii.test, ii.ic);
             tmp.add(va);
             if(costs == 1) va.seqType(va.seqType().withOcc(Occ.ZERO_ONE));
             ii.costs += costs;
@@ -375,7 +377,7 @@ public final class CmpG extends Cmp {
 
       // estimate costs (tend to worst case)
       ii.costs = Math.max(1, data.meta.size / 10);
-      root = new ValueAccess(info, arg, ii.text, false, ii.test, ii.ic);
+      root = new ValueAccess(info, arg, type, ii.test, ii.ic);
     }
 
     ii.create(root, info, Util.info(ii.text ? OPTTXTINDEX : OPTATVINDEX, arg), false);

@@ -25,17 +25,24 @@ final class FTIndexTree extends IndexTree {
   private int pft;
 
   /**
+   * Constructor.
+   */
+  FTIndexTree() {
+    super(IndexType.FULLTEXT);
+  }
+
+  /**
    * Checks if the specified token was already indexed. If yes, its pre
    * value is added to the existing values. Otherwise a new index entry
    * is created.
    * @param tok token to be indexed
-   * @param pre pre value for the token
+   * @param id id value of the token
    * @param pos pos value of the token
    * @param cf current file id
    */
-  void add(final byte[] tok, final int pre, final int pos, final int cf) {
+  void add(final byte[] tok, final int id, final int pos, final int cf) {
     final int os = keys.size();
-    final int n = add(tok, pre, 0, cf == 0);
+    final int n = add(tok, id, 0, cf == 0);
     if(os == keys.size()) {
       final int i = cf > 0 ? maps.get(Num.num(n)) : n;
       if(poss.size() > i && poss.get(i) != null) {
@@ -53,7 +60,7 @@ final class FTIndexTree extends IndexTree {
    */
   void initFT() {
     poss = new TokenList(FACTOR);
-    values = new TokenList(FACTOR);
+    ids = new TokenList(FACTOR);
     numpre = new IntList(FACTOR);
     maps = new TokenIntMap();
   }
@@ -87,7 +94,7 @@ final class FTIndexTree extends IndexTree {
    * @return byte[] compressed pre values
    */
   byte[] nextPres() {
-    return values.get(pft);
+    return ids.get(pft);
   }
 
   /**

@@ -81,8 +81,8 @@ public final class IndexInfo {
     text = elem || last.test.type == NodeType.TXT;
 
     // check if the index contains result for the specified elements or attributes
-    final IndexNames in = new IndexNames(ft ? data.meta.ftinclude : text ? data.meta.textinclude :
-      data.meta.attrinclude);
+    final IndexNames in = new IndexNames(ft ? IndexType.FULLTEXT : text ? IndexType.TEXT :
+      IndexType.ATTRIBUTE, data);
     if(!in.contains(qname())) return false;
 
     // full-text index

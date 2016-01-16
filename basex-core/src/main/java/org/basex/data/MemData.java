@@ -80,11 +80,12 @@ public final class MemData extends Data {
   public void createIndex(final IndexType type, final Command cmd) throws IOException {
     final IndexBuilder ib;
     switch(type) {
-      case TEXT:      ib = new MemValuesBuilder(this, true, false); break;
-      case ATTRIBUTE: ib = new MemValuesBuilder(this, false, false); break;
-      case TOKEN:     ib = new MemValuesBuilder(this, false, true); break;
-      case FULLTEXT:  throw new BaseXException(NO_MAINMEM);
-      default:        throw Util.notExpected();
+      case TEXT: case ATTRIBUTE: case TOKEN:
+        ib = new MemValuesBuilder(this, type); break;
+      case FULLTEXT:
+        throw new BaseXException(NO_MAINMEM);
+      default:
+        throw Util.notExpected();
     }
     if(cmd != null) cmd.proc(ib);
     set(type, ib.build());

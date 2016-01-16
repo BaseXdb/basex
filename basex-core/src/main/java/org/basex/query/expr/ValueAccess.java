@@ -28,10 +28,8 @@ import org.basex.util.hash.*;
 public final class ValueAccess extends IndexAccess {
   /** Expression. */
   private Expr expr;
-  /** Text index. */
-  private final boolean text;
-  /** Token index. */
-  private final boolean tokenize;
+  /** Index type. */
+  private final IndexType type;
   /** Parent name test. */
   private final NameTest test;
 
@@ -39,17 +37,15 @@ public final class ValueAccess extends IndexAccess {
    * Constructor.
    * @param info input info
    * @param expr index expression
-   * @param text text index
-   * @param tokenize token index
+   * @param type index type
    * @param test test test
    * @param ictx index context
    */
-  public ValueAccess(final InputInfo info, final Expr expr, final boolean text,
-      final boolean tokenize, final NameTest test, final IndexContext ictx) {
+  public ValueAccess(final InputInfo info, final Expr expr, final IndexType type,
+      final NameTest test, final IndexContext ictx) {
     super(ictx, info);
     this.expr = expr;
-    this.text = text;
-    this.tokenize = tokenize;
+    this.type = type;
     this.test = test;
   }
 
@@ -73,17 +69,24 @@ public final class ValueAccess extends IndexAccess {
     // - no element name: return 0 results (empty text nodes are non-existent)
     // - otherwise, return scan-based element iterator
     final int tl = term.length;
-    if(tl == 0 && text) return test == null ? BasicNodeIter.EMPTY : scanEmpty();
+    if(tl == 0 && type == IndexType.TEXT)
+      return test == null ? BasicNodeIter.EMPTY : scanEmpty();
 
-    // use index traversal if index exists and if term is not too long.
-    // otherwise, scan data sequentially
+    // check if index is available and if it may contain the requested term
+    // otherwise, use sequential scan
     final Data data = ictx.data;
-    final IndexIterator ii = (text ? data.meta.textindex : tokenize
-                                   ? data.meta.tokenindex : data.meta.attrindex)
-        && tl > 0
-        && tl <= data.meta.maxlen ? data.iter(new StringToken(text, term)) : scan(term);
+    final boolean index;
+    if(type == IndexType.TEXT) {
+      index = data.meta.textindex && tl > 0 && tl <= data.meta.maxlen;
+    } else if(type == IndexType.ATTRIBUTE) {
+      index = data.meta.attrindex && tl > 0 && tl <= data.meta.maxlen;
+    } else {
+      index = data.meta.tokenindex;
+    }
 
-    final int kind = text ? Data.TEXT : Data.ATTR;
+    final IndexIterator ii = index ? data.iter(new StringToken(type, term)) : scan(term);
+
+    final int kind = type == IndexType.TEXT ? Data.TEXT : Data.ATTR;
     final DBNode tmp = new DBNode(data, 0, test == null ? kind : Data.ELEM);
     return new BasicNodeIter() {
       @Override
@@ -109,6 +112,7 @@ public final class ValueAccess extends IndexAccess {
    */
   private IndexIterator scan(final byte[] value) {
     return new IndexIterator() {
+      final boolean text = type == IndexType.TEXT;
       final Data data = ictx.data;
       final byte kind = text ? Data.TEXT : Data.ATTR;
       final int sz = data.meta.size;
@@ -121,7 +125,9 @@ public final class ValueAccess extends IndexAccess {
       @Override
       public boolean more() {
         while(++pre < sz) {
-          if(data.kind(pre) == kind && eq(data.text(pre, text), value)) return true;
+          if(data.kind(pre) == kind) {
+            if(eq(data.text(pre, text), value)) return true;
+          }
         }
         return false;
       }
@@ -184,7 +190,7 @@ public final class ValueAccess extends IndexAccess {
 
   @Override
   public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return copyType(new ValueAccess(info, expr.copy(qc, scp, vs), text, tokenize, test, ictx));
+    return copyType(new ValueAccess(info, expr.copy(qc, scp, vs), type, test, ictx));
   }
 
   @Override
@@ -199,15 +205,15 @@ public final class ValueAccess extends IndexAccess {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(DATA, ictx.data.meta.name, TYP, text ? IndexType.TEXT :
-      tokenize ? IndexType.TOKEN : IndexType.ATTRIBUTE, NAM, test), expr);
+    addPlan(plan, planElem(DATA, ictx.data.meta.name, TYP, type, NAM, test), expr);
   }
 
   @Override
   public String toString() {
     final TokenBuilder string = new TokenBuilder();
-    string.add((text ? Function._DB_TEXT : tokenize ? Function._DB_TOKEN : Function._DB_ATTRIBUTE).
-        get(null, info, Str.get(ictx.data.meta.name), expr).toString());
+    final Function func = type == IndexType.TEXT ? Function._DB_TEXT : type == IndexType.ATTRIBUTE
+        ? Function._DB_ATTRIBUTE : Function._DB_TOKEN;
+    string.add(func.get(null, info, Str.get(ictx.data.meta.name), expr).toString());
     if(test != null) string.add("/parent::").addExt(test);
     return string.toString();
   }

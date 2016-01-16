@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 
 import org.basex.core.locks.*;
 import org.basex.data.*;
+import org.basex.index.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -41,19 +42,21 @@ abstract class Ids extends StandardFunc {
     final ANode root = checkRoot(toNode(ctxArg(1, qc), qc));
 
     final Data data = root.data();
-    // [JE] Verify against indexNames, whether id/idref included at all
-    if(data == null || !idref && null == data.attrIndex || idref && null == data.tokenIndex) {
+    if(data == null || (idref ? data.tokenIndex : data.attrIndex) == null) {
+      // no index support: parse node and its descendants
       final ANodeList list = new ANodeList().check();
       add(idSet, list, root, idref);
       return list.iter();
     }
 
-    // database value index can be utilized. create index iterator
+    // [JE] Verify against indexNames, whether id/idref included at all
+
+    // index support: create index iterator
     final TokenList idList = new TokenList(idSet.size());
     for(final byte[] id : idSet) idList.add(id);
     final Value ids = StrSeq.get(idList);
-    final ValueAccess va = new ValueAccess(info, ids, false, idref, null, new IndexContext(data,
-        false));
+    final ValueAccess va = new ValueAccess(info, ids, idref ? IndexType.TOKEN : IndexType.ATTRIBUTE,
+        null, new IndexContext(data, false));
 
     // collect and return index results, filtered by id/idref attributes
     final ANodeList results = new ANodeList();

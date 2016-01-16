@@ -100,7 +100,6 @@ public abstract class CLI extends Main {
    */
   protected final void execute(final Command cmd, final boolean info) throws IOException {
     final Session ss = session();
-    if(cmd instanceof Set) cmd.execute(context);
     ss.execute(cmd);
     if(info) Util.out(ss.info());
   }

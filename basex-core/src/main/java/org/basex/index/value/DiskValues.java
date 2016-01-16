@@ -42,26 +42,23 @@ public class DiskValues extends ValueIndex {
   /**
    * Constructor, initializing the index structure.
    * @param data data reference
-   * @param text value type (texts/attributes)
-   * @param tokenize token index
+   * @param type index type
    * @throws IOException I/O Exception
    */
-  public DiskValues(final Data data, final boolean text, final boolean tokenize)
+  public DiskValues(final Data data, final IndexType type)
       throws IOException {
-    this(data, text, tokenize, fileSuffix(text, tokenize));
+    this(data, type, fileSuffix(type));
   }
 
   /**
    * Constructor, initializing the index structure.
    * @param data data reference
-   * @param text value type (texts/attributes)
-   * @param tokenize token index
+   * @param type index type
    * @param pref file prefix
    * @throws IOException I/O Exception
    */
-  DiskValues(final Data data, final boolean text, final boolean tokenize, final String pref)
-      throws IOException {
-    super(data, text, tokenize);
+  DiskValues(final Data data, final IndexType type, final String pref) throws IOException {
+    super(data, type);
     idxl = new DataAccess(data.meta.dbfile(pref + 'l'));
     idxr = new DataAccess(data.meta.dbfile(pref + 'r'));
     size.set(idxl.read4());
@@ -71,17 +68,18 @@ public class DiskValues extends ValueIndex {
   public final byte[] info(final MainOptions options) {
     final TokenBuilder tb = new TokenBuilder();
     tb.add(LI_STRUCTURE).add(SORTED_LIST).add(NL);
-    tb.add(LI_NAMES).add(text ? data.meta.textinclude : data.meta.attrinclude).add(NL);
+    tb.add(LI_NAMES).add(type == IndexType.TOKEN ? data.meta.tokeninclude :
+      type == IndexType.TEXT ? data.meta.textinclude : data.meta.attrinclude).add(NL);
 
     final IndexStats stats = new IndexStats(options.get(MainOptions.MAXSTAT));
     synchronized(monitor) {
       final long l = idxl.length() + idxr.length();
       tb.add(LI_SIZE).add(Performance.format(l, true)).add(NL);
-      final int s = size();
-      for(int m = 0; m < s; ++m) {
-        final long pos = idxr.read5(m * 5L);
-        final int oc = idxl.readNum(pos);
-        if(stats.adding(oc)) stats.add(key(idxl.readNum()), oc);
+      final int entries = size();
+      for(int index = 0; index < entries; index++) {
+        final long pos = idxr.read5(index * 5L);
+        final int count = idxl.readNum(pos);
+        if(stats.adding(count)) stats.add(key(idxl.readNum()), count);
       }
     }
     stats.print(tb);
@@ -110,7 +108,7 @@ public class DiskValues extends ValueIndex {
 
   @Override
   public final boolean drop() {
-    return data.meta.drop(fileSuffix(text, tokenize) + '.');
+    return data.meta.drop(fileSuffix(type) + '.');
   }
 
   @Override
@@ -196,19 +194,18 @@ public class DiskValues extends ValueIndex {
    * @return cache entry
    */
   private IndexEntry entry(final byte[] token) {
-    final IndexEntry e = cache.get(token);
-    if(e != null) return e;
+    final IndexEntry ie = cache.get(token);
+    if(ie != null) return ie;
 
-    final long p = get(token);
-    if(p < 0) return new IndexEntry(token, 0, 0);
+    final long index = get(token);
+    if(index < 0) return new IndexEntry(token, 0, 0);
 
     final int count;
     final long offset;
 
     synchronized(monitor) {
       // get position in heap file
-      final long pos = idxr.read5(p * 5L);
-      // the first heap entry represents the number of hits
+      final long pos = idxr.read5(index * 5L);
       count = idxl.readNum(pos);
       offset = idxl.cursor();
     }
@@ -351,13 +348,12 @@ public class DiskValues extends ValueIndex {
 
     // read text and cache result
     final long pos = idxr.read5(index * 5L);
-    final int sz = idxl.readNum(pos);
-    final long off = pos + Num.length(sz);
+    final int count = idxl.readNum(pos);
     if(key == null) {
       key = key(idxl.readNum());
       ctext.put(index, key);
     }
-    return cache.add(key, sz, off);
+    return cache.add(key, count, pos + Num.length(count));
   }
 
   /**
@@ -374,7 +370,7 @@ public class DiskValues extends ValueIndex {
       for(int i = 0, id = 0; i < sz; i++) {
         id += idxl.readNum();
         // pass over token position
-        if(tokenize) idxl.readNum();
+        if(type == IndexType.TOKEN) idxl.readNum();
         pres.add(pre(id));
       }
     }
@@ -392,15 +388,15 @@ public class DiskValues extends ValueIndex {
     final IntList pres = new IntList();
     synchronized(monitor) {
       final int i = get(tok.min);
-      final int s = size();
-      for(int l = i < 0 ? -i - 1 : tok.mni ? i : i + 1; l < s; l++) {
-        final int ps = idxl.readNum(idxr.read5(l * 5L));
+      final int entries = size();
+      for(int index = i < 0 ? -i - 1 : tok.mni ? i : i + 1; index < entries; index++) {
+        final int count = idxl.readNum(idxr.read5(index * 5L));
         int id = idxl.readNum();
         // skip traversal if value is too large
-        final int d = diff(key(id), tok.max);
-        if(d > 0 || !tok.mxi && d == 0) break;
+        final int diff = diff(key(id), tok.max);
+        if(diff > 0 || !tok.mxi && diff == 0) break;
         // add pre values
-        for(int p = 0; p < ps; ++p) {
+        for(int c = 0; c < count; c++) {
           pres.add(pre(id));
           id += idxl.readNum();
         }
@@ -423,16 +419,17 @@ public class DiskValues extends ValueIndex {
 
     final IntList pres = new IntList();
     synchronized(monitor) {
-      final int s = size();
-      for(int l = 0; l < s; ++l) {
-        final int ds = idxl.readNum(idxr.read5(l * 5L));
+      final int entries = size();
+      final boolean text = type == IndexType.TEXT;
+      for(int index = 0; index < entries; ++index) {
+        final int count = idxl.readNum(idxr.read5(index * 5L));
         int id = idxl.readNum();
         final int pre = pre(id);
 
         final double v = data.textDbl(pre, text);
         if(v >= min && v <= max) {
           // value is in range
-          for(int d = 0; d < ds; ++d) {
+          for(int c = 0; c < count; c++) {
             pres.add(pre(id));
             id += idxl.readNum();
           }
@@ -471,8 +468,8 @@ public class DiskValues extends ValueIndex {
    * @return key token
    */
   private byte[] key(final int id) {
-    final byte[] txt = data.text(pre(id), text);
-    return tokenize ? distinctTokens(txt)[idxl.readNum()] : txt;
+    final byte[] text = data.text(pre(id), type == IndexType.TEXT);
+    return type == IndexType.TOKEN ? distinctTokens(text)[idxl.readNum()] : text;
   }
 
   /**
@@ -483,20 +480,20 @@ public class DiskValues extends ValueIndex {
    */
   public final String toString(final boolean all) {
     final TokenBuilder tb = new TokenBuilder();
-    tb.add(text ? "TEXT" : "ATTRIBUTE").add(" INDEX, '").add(data.meta.name).add("':\n");
-    final int s = size();
-    for(int m = 0; m < s; m++) {
-      final long pos = idxr.read5(m * 5L);
-      final int oc = idxl.readNum(pos);
+    tb.addExt(type).add(" INDEX, '").add(data.meta.name).add("':\n");
+    final int entries = size();
+    for(int index = 0; index < entries; index++) {
+      final long pos = idxr.read5(index * 5L);
+      final int count = idxl.readNum(pos);
       int id = idxl.readNum();
-      tb.add("  ").addInt(m).add(". offset: ").addLong(pos);
+      tb.add("  ").addInt(index).add(". offset: ").addLong(pos);
       if(all) {
         tb.add(", key: \"").add(key(id)).add('"');
         tb.add(", ids").add("/pres").add(": ").addInt(id).add('/').addInt(pre(id));
       } else {
         tb.add(", ids").add(": ").addInt(id);
       }
-      for(int n = 1; n < oc; n++) {
+      for(int c = 1; c < count; c++) {
         id += idxl.readNum();
         tb.add(",").addInt(id);
         if(all) tb.add('/').addInt(pre(id));
@@ -512,12 +509,11 @@ public class DiskValues extends ValueIndex {
   }
 
   /**
-   * Get file suffix for index.
-   * @param text text index
-   * @param tokenize token index
+   * Gets the file suffix for the specified index type.
+   * @param type index type
    * @return file suffix
    */
-  static String fileSuffix(final boolean text, final boolean tokenize) {
-    return text ? DATATXT : tokenize ? DATAATT : DATAATV;
+  static String fileSuffix(final IndexType type) {
+    return type == IndexType.TOKEN ? DATATOK : type == IndexType.TEXT ? DATATXT : DATAATV;
   }
 }

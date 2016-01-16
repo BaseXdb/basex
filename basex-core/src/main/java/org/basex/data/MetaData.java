@@ -83,7 +83,7 @@ public final class MetaData {
 
   /** Maximum number of categories. */
   public int maxcats;
-  /** Maximum token length. */
+  /** Maximum length of index entries. */
   public int maxlen;
 
   /** Split size for creating new index. */

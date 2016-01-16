@@ -528,9 +528,11 @@ public interface Text {
   /** Finish database creation. */
   String FINISHING_D = lang("finishing") + DOTS;
   /** Create text index. */
-  String INDEX_TEXT_D = lang("index_text") + DOTS;
+  String INDEX_TEXTS_D = lang("index_texts") + DOTS;
   /** Create attribute index. */
   String INDEX_ATTRIBUTES_D = lang("index_attributes") + DOTS;
+  /** Create token index. */
+  String INDEX_TOKENS_D = lang("index_tokens") + DOTS;
   /** Create full-text index. */
   String INDEX_FULLTEXT_D = lang("index_fulltext") + DOTS;
 

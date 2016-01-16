@@ -71,13 +71,13 @@ public final class DiskData extends Data {
     init();
     if(meta.updindex) {
       idmap = new IdPreMap(meta.dbfile(DATAIDP));
-      if(meta.textindex) textIndex = new UpdatableDiskValues(this, true);
-      if(meta.attrindex) attrIndex = new UpdatableDiskValues(this, false);
+      if(meta.textindex) textIndex = new UpdatableDiskValues(this, IndexType.TEXT);
+      if(meta.attrindex) attrIndex = new UpdatableDiskValues(this, IndexType.ATTRIBUTE);
     } else {
-      if(meta.textindex) textIndex = new DiskValues(this, true, false);
-      if(meta.attrindex) attrIndex = new DiskValues(this, false, false);
+      if(meta.textindex) textIndex = new DiskValues(this, IndexType.TEXT);
+      if(meta.attrindex) attrIndex = new DiskValues(this, IndexType.ATTRIBUTE);
     }
-    if(meta.tokenindex) tokenIndex = new DiskValues(this, false, true);
+    if(meta.tokenindex) tokenIndex = new DiskValues(this, IndexType.TOKEN);
     if(meta.ftindex) ftIndex = new FTIndex(this);
   }
 
@@ -180,11 +180,9 @@ public final class DiskData extends Data {
     close(type);
     final IndexBuilder ib;
     switch(type) {
-      case TEXT:      ib = new DiskValuesBuilder(this, true, false); break;
-      case ATTRIBUTE: ib = new DiskValuesBuilder(this, false, false); break;
-      case TOKEN:     ib = new DiskValuesBuilder(this, false, true); break;
-      case FULLTEXT:  ib = new FTBuilder(this); break;
-      default:        throw Util.notExpected();
+      case TEXT: case ATTRIBUTE: case TOKEN: ib = new DiskValuesBuilder(this, type); break;
+      case FULLTEXT: ib = new FTBuilder(this); break;
+      default: throw Util.notExpected();
     }
     if(cmd != null) cmd.proc(ib);
     set(type, ib.build());

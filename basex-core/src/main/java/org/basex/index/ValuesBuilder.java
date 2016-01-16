@@ -1,7 +1,5 @@
 package org.basex.index;
 
-import static org.basex.core.Text.*;
-
 import org.basex.data.*;
 
 /**
@@ -11,19 +9,16 @@ import org.basex.data.*;
  * @author Christian Gruen
  */
 public abstract class ValuesBuilder extends IndexBuilder {
+  /** Tokenize flag. */
+  protected final boolean tokenize;
+
   /**
    * Constructor.
    * @param data reference
-   * @param text index type (text/attributes)
-   * @param tokenize token index
+   * @param type index type
    */
-  protected ValuesBuilder(final Data data, final boolean text, final boolean tokenize) {
-    super(data, data.meta.splitsize, text ? data.meta.textinclude :
-      tokenize ? data.meta.tokeninclude : data.meta.attrinclude, text, tokenize);
-  }
-
-  @Override
-  protected final String det() {
-    return text ? INDEX_TEXT_D : INDEX_ATTRIBUTES_D;
+  protected ValuesBuilder(final Data data, final IndexType type) {
+    super(data, type);
+    tokenize = type == IndexType.TOKEN;
   }
 }

@@ -20,27 +20,22 @@ import org.basex.query.util.*;
 public class DbText extends DbAccess {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    return valueAccess(true, false, qc).iter(qc);
+    return valueAccess(IndexType.TEXT, qc).iter(qc);
   }
 
   /**
    * Returns an index accessor.
-   * @param text text/attribute flag
-   * @param tokenize token index
+   * @param type index type
    * @param qc query context
    * @return index accessor
    * @throws QueryException query exception
    */
-  final ValueAccess valueAccess(final boolean text, final boolean tokenize,
-      final QueryContext qc) throws QueryException {
-
+  final ValueAccess valueAccess(final IndexType type, final QueryContext qc) throws QueryException {
     final Data data = checkData(qc);
     final MetaData meta = data.meta;
-    if(!(text ? meta.textindex : tokenize ? meta.tokenindex : meta.attrindex)) {
-      throw BXDB_INDEX_X.get(info, meta.name,
-          (text ? IndexType.TEXT : IndexType.ATTRIBUTE).toString().toLowerCase(Locale.ENGLISH));
-    }
-
-    return new ValueAccess(info, exprs[1], text, tokenize, null, new IndexContext(data, false));
+    final boolean index = type == IndexType.TOKEN ? meta.tokenindex : type == IndexType.TEXT
+        ? meta.textindex : meta.attrindex;
+    if(!index) throw BXDB_INDEX_X.get(info, meta.name, type.toString().toLowerCase(Locale.ENGLISH));
+    return new ValueAccess(info, exprs[1], type, null, new IndexContext(data, false));
   }
 }

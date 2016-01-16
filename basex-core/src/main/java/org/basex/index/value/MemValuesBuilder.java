@@ -1,5 +1,7 @@
 package org.basex.index.value;
 
+import static org.basex.util.Token.*;
+
 import java.io.*;
 
 import org.basex.data.*;
@@ -16,23 +18,30 @@ public class MemValuesBuilder extends ValuesBuilder {
   /**
    * Constructor.
    * @param data data reference
-   * @param text value type (text/attribute)
-   * @param tokenize token index
+   * @param type index type
    */
-  public MemValuesBuilder(final Data data, final boolean text, final boolean tokenize) {
-    super(data, text, tokenize);
+  public MemValuesBuilder(final Data data, final IndexType type) {
+    super(data, type);
   }
 
   @Override
   public MemValues build() throws IOException {
     Util.debug(det());
 
-    final MemValues index = new MemValues(data, text, tokenize);
+    final MemValues index = new MemValues(data, type);
+    final boolean updindex = data.meta.updindex && !tokenize;
     for(pre = 0; pre < size; pre++) {
       if((pre & 0x0FFF) == 0) check();
-      if(indexEntry() && data.textLen(pre, text) <= data.meta.maxlen) {
-        index.add(data.text(pre, text), data.meta.updindex ? data.id(pre) : pre);
-        count++;
+      if(indexEntry()) {
+        if(tokenize) {
+          for(final byte[] token : distinctTokens(data.text(pre, text))) {
+            index.add(token, updindex ? data.id(pre) : pre);
+            count++;
+          }
+        } else if(data.textLen(pre, text) <= data.meta.maxlen) {
+          index.add(data.text(pre, text), updindex ? data.id(pre) : pre);
+          count++;
+        }
       }
     }
     index.finish();

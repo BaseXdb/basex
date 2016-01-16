@@ -504,12 +504,12 @@ public abstract class Data {
         // update attribute index
         if(meta.updindex && meta.attrindex) {
           pres.add(pre);
-          attrIndex.delete(cache(pres, false));
+          attrIndex.delete(cache(pres, IndexType.ATTRIBUTE));
         }
         table.write1(pre, 11, uriId);
         table.write2(pre, 1, attrNames.index(name, null, false));
         if(nsFlag) table.write2(nsPre, 1, 1 << 15 | nameId(nsPre));
-        if(!pres.isEmpty()) attrIndex.add(cache(pres, false));
+        if(!pres.isEmpty()) attrIndex.add(cache(pres, IndexType.ATTRIBUTE));
       } else {
         // update text index
         if(meta.updindex && meta.textindex) {
@@ -517,12 +517,12 @@ public abstract class Data {
           for(int curr = pre + attSize(pre, kind); curr != last; curr += size(curr, kind(curr))) {
             if(kind(curr) == TEXT) pres.add(curr);
           }
-          textIndex.delete(cache(pres, true));
+          textIndex.delete(cache(pres, IndexType.TEXT));
         }
         table.write1(pre, 3, uriId);
         final int nameId = elemNames.index(name, null, false);
         table.write2(nsPre, 1, (nsFlag || nsFlag(nsPre) ? 1 << 15 : 0) | nameId);
-        if(!pres.isEmpty()) textIndex.add(cache(pres, true));
+        if(!pres.isEmpty()) textIndex.add(cache(pres, IndexType.TEXT));
       }
     }
   }
@@ -1045,8 +1045,8 @@ public abstract class Data {
   protected final void indexDelete(final int pre, final int id, final int size) {
     if(id != -1) resources.delete(pre, size);
     if(meta.updindex) {
-      if(meta.textindex) textIndex.delete(cache(pre, size, true));
-      if(meta.attrindex) attrIndex.delete(cache(pre, size, false));
+      if(meta.textindex) textIndex.delete(cache(pre, size, IndexType.TEXT));
+      if(meta.attrindex) attrIndex.delete(cache(pre, size, IndexType.ATTRIBUTE));
       if(id != -1) idmap.delete(pre, id, -size);
     }
   }
@@ -1062,8 +1062,8 @@ public abstract class Data {
     if(id != -1) resources.insert(pre, clip);
     if(meta.updindex) {
       if(id != -1) idmap.insert(pre, id, size);
-      if(meta.textindex) textIndex.add(cache(pre, size, true));
-      if(meta.attrindex) attrIndex.add(cache(pre, size, false));
+      if(meta.textindex) textIndex.add(cache(pre, size, IndexType.TEXT));
+      if(meta.attrindex) attrIndex.add(cache(pre, size, IndexType.ATTRIBUTE));
     }
   }
 
@@ -1071,25 +1071,26 @@ public abstract class Data {
    * Caches all texts and ids in the specified database range.
    * @param pre pre value
    * @param size size value
-   * @param text text/attribute flag
+   * @param type index type
    * @return cached texts and ids
    */
-  private TokenObjMap<IntList> cache(final int pre, final int size, final boolean text) {
+  private TokenObjMap<IntList> cache(final int pre, final int size, final IndexType type) {
     final IntList pres = new IntList(size);
     final int last = pre + size;
     for(int curr = pre; curr < last; ++curr) pres.add(curr);
-    return cache(pres, text);
+    return cache(pres, type);
   }
 
   /**
    * Caches texts of the specified pre values.
    * @param pres pre values
-   * @param text text/attribute flag
+   * @param type index type
    * @return cached texts and ids
    */
-  private TokenObjMap<IntList> cache(final IntList pres, final boolean text) {
+  private TokenObjMap<IntList> cache(final IntList pres, final IndexType type) {
     final TokenObjMap<IntList> map = new TokenObjMap<>();
-    final IndexNames in = new IndexNames(text ? meta.textinclude : meta.attrinclude);
+    final IndexNames in = new IndexNames(type, this);
+    final boolean text = type == IndexType.TEXT;
     final int ps = pres.size(), kind = text ? TEXT : ATTR;
     for(int p = 0; p < ps; p++) {
       final int pre = pres.get(p);

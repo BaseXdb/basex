@@ -34,7 +34,7 @@ public final class FTBuilder extends IndexBuilder {
    * @throws IOException IOException
    */
   public FTBuilder(final Data data) throws IOException {
-    super(data, data.meta.ftsplitsize, data.meta.ftinclude, true, false);
+    super(data, IndexType.FULLTEXT);
     final MetaData meta = data.meta;
     tree = new FTIndexTrees(data.meta.maxlen);
 
@@ -281,10 +281,5 @@ public final class FTBuilder extends IndexBuilder {
   protected void abort() {
     // drop index files
     data.meta.drop(DATAFTX + ".*");
-  }
-
-  @Override
-  protected String det() {
-    return INDEX_FULLTEXT_D;
   }
 }

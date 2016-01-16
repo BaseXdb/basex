@@ -76,8 +76,7 @@ public abstract class IndexFn extends StandardFunc {
       @Override
       public ANode next() {
         final byte[] token = ei.next();
-        return token == null ? null :
-          new FElem(ENTRY).add(COUNT, token(ei.count())).add(token);
+        return token == null ? null : new FElem(ENTRY).add(COUNT, token(ei.count())).add(token);
       }
     };
   }

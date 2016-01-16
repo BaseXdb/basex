@@ -1,4 +1,4 @@
-package org.basex.query.func.db;
+package org.basex.query.func.index;
 
 import org.basex.index.*;
 import org.basex.query.*;
@@ -10,9 +10,9 @@ import org.basex.query.iter.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public final class DbAttribute extends DbText {
+public final class IndexTokens extends IndexTexts {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    return attribute(valueAccess(IndexType.ATTRIBUTE, qc), qc, 2);
+    return values(qc, IndexType.TOKEN);
   }
 }

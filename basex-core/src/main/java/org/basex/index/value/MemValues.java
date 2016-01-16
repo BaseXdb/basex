@@ -7,6 +7,7 @@ import java.util.*;
 
 import org.basex.core.*;
 import org.basex.data.*;
+import org.basex.index.*;
 import org.basex.index.query.*;
 import org.basex.index.stats.*;
 import org.basex.util.*;
@@ -32,12 +33,13 @@ public final class MemValues extends ValueIndex {
   /**
    * Constructor.
    * @param data data instance
-   * @param text value type (texts/attributes)
-   * @param tokenize token index
+   * @param type index type
    */
-  public MemValues(final Data data, final boolean text, final boolean tokenize) {
-    super(data, text, tokenize);
-    values = tokenize ? new TokenSet() : ((MemData) data).values(text);
+  public MemValues(final Data data, final IndexType type) {
+    super(data, type);
+    // token index: work extra token set instance
+    values = type == IndexType.TOKEN ? new TokenSet() :
+      ((MemData) data).values(type == IndexType.TEXT);
     final int s = values.size() + 1;
     idsList = new ArrayList<>(s);
     lenList = new IntList(s);
@@ -77,7 +79,6 @@ public final class MemValues extends ValueIndex {
 
   @Override
   public EntryIterator entries(final IndexEntries entries) {
-    if(tokenize) throw new UnsupportedOperationException();
     final byte[] prefix = entries.get();
     return new EntryIterator() {
       final int s = values.size();
@@ -102,7 +103,8 @@ public final class MemValues extends ValueIndex {
   public byte[] info(final MainOptions options) {
     final TokenBuilder tb = new TokenBuilder();
     tb.add(LI_STRUCTURE).add(HASH).add(NL);
-    tb.add(LI_NAMES).add(text ? data.meta.textinclude : data.meta.attrinclude).add(NL);
+    tb.add(LI_NAMES).add(type == IndexType.TOKEN ? data.meta.tokeninclude :
+      type == IndexType.TEXT ? data.meta.textinclude : data.meta.attrinclude).add(NL);
 
     final IndexStats stats = new IndexStats(options.get(MainOptions.MAXSTAT));
     final int s = values.size();
@@ -131,13 +133,19 @@ public final class MemValues extends ValueIndex {
 
   @Override
   public void add(final TokenObjMap<IntList> map) {
-    for(final byte[] key : new TokenList(map)) add(key, map.get(key).sort().finish());
+    for(final byte[] key : new TokenList(map)) {
+      final IntList vals = map.get(key);
+      // [JE] tokenize:  for(final byte[] tok : distinctTokens(key)) { ... } ...
+      if(!vals.isEmpty()) add(key, vals.sort().finish());
+    }
     finish();
   }
 
   @Override
   public void delete(final TokenObjMap<IntList> map) {
-    for(final byte[] key : new TokenList(map)) delete(key, map.get(key).sort().finish());
+    for(final byte[] key : new TokenList(map)) {
+      delete(key, map.get(key).sort().finish());
+    }
   }
 
   @Override
@@ -152,30 +160,26 @@ public final class MemValues extends ValueIndex {
    * @param vals sorted values
    */
   void add(final byte[] key, final int... vals) {
-    if(vals.length == 0) return;
+    // token index: add values. otherwise, reference existing values
+    final int id = type == IndexType.TOKEN ? values.put(key) : values.id(key), vl = vals.length;
+    // updatable index: if required, resize existing arrays
+    while(idsList.size() < id + 1) idsList.add(null);
+    if(lenList.size() < id + 1) lenList.set(id, 0);
 
-    final byte[][] tokens = tokenize ? distinctTokens(key) : new byte[][] { key };
-    for(final byte[] token : tokens) {
-      // if required, resize existing arrays
-      final int id = tokenize ? values.put(token) : values.id(token), vl = vals.length;
-      while(idsList.size() < id + 1) idsList.add(null);
-      if(lenList.size() < id + 1) lenList.set(id, 0);
-
-      final int len = lenList.get(id), size = len + vl;
-      int[] ids = idsList.get(id);
-      if(ids == null) {
-        ids = vals;
-      } else {
-        if(ids.length < size) ids = Arrays.copyOf(ids, Array.newSize(size));
-        System.arraycopy(vals, 0, ids, len, vl);
-        if(ids[len - 1] > vals[0]) {
-          if(reorder == null) reorder = new BoolList(values.size());
-          reorder.set(id, true);
-        }
+    final int len = lenList.get(id), size = len + vl;
+    int[] ids = idsList.get(id);
+    if(ids == null) {
+      ids = vals;
+    } else {
+      if(ids.length < size) ids = Arrays.copyOf(ids, Array.newSize(size));
+      System.arraycopy(vals, 0, ids, len, vl);
+      if(ids[len - 1] > vals[0]) {
+        if(reorder == null) reorder = new BoolList(values.size());
+        reorder.set(id, true);
       }
-      idsList.set(id, ids);
-      lenList.set(id, size);
     }
+    idsList.set(id, ids);
+    lenList.set(id, size);
   }
 
   /**
@@ -234,14 +238,14 @@ public final class MemValues extends ValueIndex {
    */
   public String toString(final boolean all) {
     final TokenBuilder tb = new TokenBuilder();
-    tb.add(text ? "TEXT" : "ATTRIBUTE").add(" INDEX, '").add(data.meta.name).add("':\n");
+    tb.addExt(type).add(" INDEX, '").add(data.meta.name).add("':\n");
     final int s = lenList.size();
     for(int m = 1; m < s; m++) {
       final int len = lenList.get(m);
       if(len == 0) continue;
       final int[] ids = idsList.get(m);
       tb.add("  ").addInt(m);
-      if(all) tb.add(", key: \"").add(data.text(data.pre(ids[0]), text)).add('"');
+      if(all) tb.add(", key: \"").add(data.text(data.pre(ids[0]), type == IndexType.TEXT)).add('"');
       tb.add(", ids");
       if(all) tb.add("/pres");
       tb.add(": ");

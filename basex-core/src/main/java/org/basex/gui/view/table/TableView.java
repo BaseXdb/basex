@@ -216,8 +216,7 @@ public final class TableView extends View {
     content.repaint();
 
     final String str = content.focusedString;
-    gui.cursor(valid && str != null && str.length() <= data.meta.maxlen ?
-      CURSORHAND : CURSORARROW);
+    gui.cursor(valid && str != null && str.length() <= data.meta.maxlen ? CURSORHAND : CURSORARROW);
   }
 
   @Override

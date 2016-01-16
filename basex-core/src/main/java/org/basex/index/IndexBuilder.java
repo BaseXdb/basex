@@ -24,10 +24,10 @@ public abstract class IndexBuilder extends Proc {
   protected final Data data;
   /** Total parsing value. */
   protected final int size;
-  /** Node type to index (text/attributes). */
+  /** Index type. */
+  protected final IndexType type;
+  /** Text node flag. */
   protected final boolean text;
-  /** Tokenize index values. */
-  protected final boolean tokenize;
 
   /** Number of index operations to perform before writing a partial index to disk. */
   private final int splitSize;
@@ -49,22 +49,15 @@ public abstract class IndexBuilder extends Proc {
   /**
    * Constructor.
    * @param data reference
-   * @param splitSize index split size
-   * @param includes names of elements or attributes to include
-   * @param text index type (text/attributes)
-   * @param tokenize tokenize index values
+   * @param type index type
    */
-  protected IndexBuilder(final Data data, final int splitSize, final String includes,
-      final boolean text, final boolean tokenize) {
-
+  protected IndexBuilder(final Data data, final IndexType type) {
     this.data = data;
-    this.splitSize = splitSize;
-    this.text = text;
-    this.tokenize = tokenize;
+    this.splitSize = type == IndexType.FULLTEXT ? data.meta.ftsplitsize : data.meta.splitsize;
+    this.type = type;
     size = data.meta.size;
-    includeNames = new IndexNames(includes);
-
-    assert !text || !tokenize; // Token index only allowed for attribute index
+    includeNames = new IndexNames(type, data);
+    text = type == IndexType.TEXT || type == IndexType.FULLTEXT;
 
     // run garbage collection if memory maximum is already reached
     if(Performance.memory() >= maxMem) Performance.gc(1);
@@ -92,8 +85,8 @@ public abstract class IndexBuilder extends Proc {
    * @return result of check
    */
   protected final boolean indexEntry() {
-    return data.kind(pre) == (text ? Data.TEXT : Data.ATTR)
-        && includeNames.contains(data, pre, text);
+    return data.kind(pre) == (text ? Data.TEXT : Data.ATTR) &&
+        includeNames.contains(data, pre, text);
   }
 
   /**
@@ -152,5 +145,16 @@ public abstract class IndexBuilder extends Proc {
   @Override
   public final double prog() {
     return pre / (size + (splits > 0 ? size / 50d : 0d));
+  }
+
+  @Override
+  protected final String det() {
+    switch(type) {
+      case TEXT: return INDEX_TEXTS_D;
+      case ATTRIBUTE: return INDEX_ATTRIBUTES_D;
+      case TOKEN: return INDEX_TOKENS_D;
+      case FULLTEXT: return INDEX_FULLTEXT_D;
+      default: throw Util.notExpected();
+    }
   }
 }

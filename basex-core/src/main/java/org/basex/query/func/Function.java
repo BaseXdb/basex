@@ -1043,6 +1043,8 @@ public enum Function {
   _INDEX_ATTRIBUTES(IndexAttributes.class, "attributes(database[,prefix[,ascending]])",
       arg(STR, STR, BLN), NOD_ZM, flag(NDT), INDEX_URI),
   /** XQuery function. */
+  _INDEX_TOKENS(IndexTokens.class, "tokens(database)", arg(STR), NOD_ZM, flag(NDT), INDEX_URI),
+  /** XQuery function. */
   _INDEX_ELEMENT_NAMES(IndexElementNames.class, "element-names(database)", arg(STR), NOD_ZM,
       INDEX_URI),
   /** XQuery function. */

@@ -142,6 +142,21 @@ public final class Num {
     return v < 0 || v > 0x3FFFFFFF ? 5 : v > 0x3FFF ? 4 : v > 0x3F ? 2 : 1;
   }
 
+  /**
+   * Returns a string representation of the specified number array.
+   * @param num numbers
+   * @return string
+   */
+  public static String toString(final byte[] num) {
+    final StringBuilder sb = new StringBuilder();
+    final int pos = size(num);
+    for(int ip = 4; ip < pos; ip += Num.length(num, ip)) {
+      if(ip > 4) sb.append(',');
+      sb.append(Num.get(num, ip));
+    }
+    return sb.toString();
+  }
+
   // PRIVATE STATIC METHODS ===================================================
 
   /**

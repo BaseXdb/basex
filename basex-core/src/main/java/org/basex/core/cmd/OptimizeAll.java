@@ -112,14 +112,14 @@ public final class OptimizeAll extends ACreate {
     // adopt original index options
     options.set(MainOptions.UPDINDEX, ometa.updindex);
     options.set(MainOptions.AUTOOPTIMIZE, ometa.autoopt);
-    options.set(MainOptions.MAXCATS,  ometa.maxcats);
-    options.set(MainOptions.MAXLEN,   ometa.maxlen);
+    options.set(MainOptions.MAXCATS, ometa.maxcats);
+    options.set(MainOptions.MAXLEN, ometa.maxlen);
     // adopt original full-text index options
-    options.set(MainOptions.STEMMING,   ometa.stemming);
-    options.set(MainOptions.CASESENS,   ometa.casesens);
+    options.set(MainOptions.STEMMING, ometa.stemming);
+    options.set(MainOptions.CASESENS, ometa.casesens);
     options.set(MainOptions.DIACRITICS, ometa.diacritics);
-    options.set(MainOptions.LANGUAGE,   ometa.language.toString());
-    options.set(MainOptions.STOPWORDS,  ometa.stopwords);
+    options.set(MainOptions.LANGUAGE, ometa.language.toString());
+    options.set(MainOptions.STOPWORDS, ometa.stopwords);
 
     // build database and index structures
     if(cmd != null) cmd.size = ometa.size;
@@ -134,8 +134,8 @@ public final class OptimizeAll extends ACreate {
         dt.meta.createattr = ometa.createattr;
         dt.meta.createtoken = ometa.createtoken;
         dt.meta.createft = ometa.createft;
-        dt.meta.filesize   = ometa.filesize;
-        dt.meta.dirty      = true;
+        dt.meta.filesize = ometa.filesize;
+        dt.meta.dirty = true;
         CreateIndex.create(dt, cmd);
 
         // move binary files

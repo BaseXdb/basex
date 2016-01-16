@@ -1,5 +1,6 @@
 package org.basex.query.func.db;
 
+import org.basex.index.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 
@@ -12,6 +13,6 @@ import org.basex.query.iter.*;
 public final class DbToken extends DbText {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    return attribute(valueAccess(false, true, qc), qc, 2);
+    return attribute(valueAccess(IndexType.TOKEN, qc), qc, 2);
   }
 }

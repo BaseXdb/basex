@@ -12,23 +12,19 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public abstract class ValueIndex implements Index {
-  /** Value type (texts/attributes). */
-  protected final boolean text;
+  /** Index type. */
+  protected final IndexType type;
   /** Data instance. */
   protected final Data data;
-  /** Tokenize values. */
-  protected final boolean tokenize;
 
   /**
    * Constructor, initializing the index structure.
    * @param data data reference
-   * @param text value type (texts/attributes)
-   * @param tokenize token index
+   * @param type index type
    */
-  protected ValueIndex(final Data data, final boolean text, final boolean tokenize) {
+  protected ValueIndex(final Data data, final IndexType type) {
     this.data = data;
-    this.text = text;
-    this.tokenize = tokenize;
+    this.type = type;
   }
 
   /**

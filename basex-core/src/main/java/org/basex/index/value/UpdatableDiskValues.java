@@ -3,6 +3,7 @@ package org.basex.index.value;
 import java.io.*;
 
 import org.basex.data.*;
+import org.basex.index.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
@@ -21,11 +22,11 @@ public final class UpdatableDiskValues extends DiskValues {
   /**
    * Constructor, initializing the index structure.
    * @param data data reference
-   * @param text value type (texts/attributes)
+   * @param type index type
    * @throws IOException I/O Exception
    */
-  public UpdatableDiskValues(final Data data, final boolean text) throws IOException {
-    super(data, text, false, fileSuffix(text, false));
+  public UpdatableDiskValues(final Data data, final IndexType type) throws IOException {
+    super(data, type, fileSuffix(type));
   }
 
   @Override

@@ -90,10 +90,10 @@ public final class DBOptimize extends DBUpdate {
     final String textinclude = opts.get(MainOptions.TEXTINCLUDE);
     final String attrinclude = opts.get(MainOptions.ATTRINCLUDE);
     final String tokeninclude = opts.get(MainOptions.TOKENINCLUDE);
-    final boolean rebuild = maxcats != meta.maxcats || maxlen != meta.maxlen;
+    final boolean rebuild = maxlen != meta.maxlen;
     final boolean rebuildText = rebuild || !meta.textinclude.equals(textinclude);
     final boolean rebuildAttr = rebuild || !meta.attrinclude.equals(attrinclude);
-    final boolean rebuildToken = rebuild || !meta.tokeninclude.equals(tokeninclude);
+    final boolean rebuildToken = !meta.tokeninclude.equals(tokeninclude);
     meta.textinclude = textinclude;
     meta.attrinclude = attrinclude;
     meta.tokeninclude = tokeninclude;
