@@ -288,8 +288,8 @@ public interface Text {
     "  " + lang("c_create22", S_NAME) + NL +
     LI + CmdCreate.DATABASE + " [" + S_NAME + "] ([" + S_INPUT + "]):"  + NL +
     "  " + lang("c_create21", S_NAME, S_INPUT) + NL +
-    LI + CmdCreate.INDEX + " [" + CmdIndex.TEXT + '|' + CmdIndex.ATTRIBUTE +
-    '|' + CmdIndex.FULLTEXT + "]:" + NL +
+    LI + CmdCreate.INDEX + " [" + CmdIndex.TEXT + '|' + CmdIndex.ATTRIBUTE + '|' +
+      CmdIndex.TOKEN + '|' + CmdIndex.FULLTEXT + "]:" + NL +
     "  " + lang("c_create23") + NL +
     LI + CmdCreate.USER + " [" + S_NAME + "] ([" + S_PW + "]):" + NL +
     "  " + lang("c_create24")
@@ -352,12 +352,12 @@ public interface Text {
     lang("c_drop1"),
     lang("c_drop2") + NL +
     LI + CmdDrop.BACKUP + " [" + S_NAME + "]:" + NL +
-      "  " + lang("c_drop24") + NL +
+    "  " + lang("c_drop24") + NL +
     LI + CmdDrop.DATABASE + " [" + S_NAME + "]:" + NL +
-      "  " + lang("c_drop21") + NL +
-    LI + CmdDrop.INDEX + " [" + CmdIndex.TEXT + '|' +
-      CmdIndex.ATTRIBUTE + '|' + CmdIndex.FULLTEXT + "]:" + NL +
-      "  " + lang("c_drop22") + NL +
+    "  " + lang("c_drop21") + NL +
+    LI + CmdDrop.INDEX + " [" + CmdIndex.TEXT + '|' + CmdIndex.ATTRIBUTE + '|' +
+      CmdIndex.TOKEN + '|' + CmdIndex.FULLTEXT + "]:" + NL +
+    "  " + lang("c_drop22") + NL +
     LI + CmdDrop.USER + " [" + S_NAME + "] (" + ON + " [pattern]): " + NL +
       "  " + lang("c_drop23")
   };
