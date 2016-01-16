@@ -41,7 +41,8 @@ abstract class Ids extends StandardFunc {
     final ANode root = checkRoot(toNode(ctxArg(1, qc), qc));
 
     final Data data = root.data();
-    if(idref || data == null) {
+    // [JE] Verify against indexNames, whether id/idref included at all
+    if(data == null || !idref && null == data.attrIndex || idref && null == data.attrTokenIndex) {
       final ANodeList list = new ANodeList().check();
       add(idSet, list, root, idref);
       return list.iter();
@@ -51,7 +52,8 @@ abstract class Ids extends StandardFunc {
     final TokenList idList = new TokenList(idSet.size());
     for(final byte[] id : idSet) idList.add(id);
     final Value ids = StrSeq.get(idList);
-    final ValueAccess va = new ValueAccess(info, ids, false, null, new IndexContext(data, false));
+    final ValueAccess va = new ValueAccess(info, ids, false, idref, null, new IndexContext(data,
+        false));
 
     // collect and return index results, filtered by id/idref attributes
     final ANodeList results = new ANodeList();

@@ -53,6 +53,7 @@ public final class InfoIndex extends AInfo {
     tb.add(info(CmdIndexInfo.ATTNAME, data, options));
     tb.add(info(CmdIndexInfo.TEXT, data, options));
     tb.add(info(CmdIndexInfo.ATTRIBUTE, data, options));
+    // [JE] Token Index information
     tb.add(info(CmdIndexInfo.FULLTEXT, data, options));
     tb.add(info(CmdIndexInfo.PATH, data, options));
     out.print(tb.finish());
@@ -83,6 +84,7 @@ public final class InfoIndex extends AInfo {
         return info(TEXT_INDEX, IndexType.TEXT, data, options, data.meta.textindex);
       case ATTRIBUTE:
         return info(ATTRIBUTE_INDEX, IndexType.ATTRIBUTE, data, options, data.meta.attrindex);
+      // [JE] Token Index information
       case FULLTEXT:
         return info(FULLTEXT_INDEX, IndexType.FULLTEXT, data, options, data.meta.ftindex);
       default:

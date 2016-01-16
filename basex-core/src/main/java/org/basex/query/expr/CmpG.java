@@ -353,7 +353,7 @@ public final class CmpG extends Cmp {
           final int costs = data.costs(new StringToken(ii.text, string));
           if(costs < 0) return false;
           if(costs > 0) {
-            final ValueAccess va = new ValueAccess(info, it, ii.text, ii.test, ii.ic);
+            final ValueAccess va = new ValueAccess(info, it, ii.text, false, ii.test, ii.ic);
             tmp.add(va);
             if(costs == 1) va.seqType(va.seqType().withOcc(Occ.ZERO_ONE));
             ii.costs += costs;
@@ -375,7 +375,7 @@ public final class CmpG extends Cmp {
 
       // estimate costs (tend to worst case)
       ii.costs = Math.max(1, data.meta.size / 10);
-      root = new ValueAccess(info, arg, ii.text, ii.test, ii.ic);
+      root = new ValueAccess(info, arg, ii.text, false, ii.test, ii.ic);
     }
 
     ii.create(root, info, Util.info(ii.text ? OPTTXTINDEX : OPTATVINDEX, arg), false);

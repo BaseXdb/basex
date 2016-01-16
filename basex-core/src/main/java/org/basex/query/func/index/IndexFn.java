@@ -52,6 +52,9 @@ public abstract class IndexFn extends StandardFunc {
     } else if(it == IndexType.ATTRIBUTE) {
       index = data.attrIndex;
       avl = data.meta.attrindex;
+    } else if(it == IndexType.ATTTOKEN) {
+      index = data.attrTokenIndex;
+      avl = data.meta.attrtokenindex;
     } else {
       index = data.ftxtIndex;
       avl = data.meta.ftindex;

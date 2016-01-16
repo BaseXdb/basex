@@ -47,6 +47,11 @@ public final class CreateIndex extends ACreate {
       data.meta.attrinclude = options.get(MainOptions.ATTRINCLUDE);
       data.meta.splitsize = options.get(MainOptions.INDEXSPLITSIZE);
       type = IndexType.ATTRIBUTE;
+    } else if(ci == CmdIndex.ATTTOKEN) {
+      data.meta.createattrtoken = true;
+      data.meta.attrtokeninclude = options.get(MainOptions.ATTRTOKENIZE);
+      data.meta.splitsize = options.get(MainOptions.INDEXSPLITSIZE);
+      type = IndexType.ATTTOKEN;
     } else if(ci == CmdIndex.FULLTEXT) {
       data.meta.createftxt = true;
       data.meta.ftinclude = options.get(MainOptions.FTINCLUDE);
@@ -88,6 +93,7 @@ public final class CreateIndex extends ACreate {
   static void create(final Data data, final ACreate cmd) throws IOException {
     if(data.meta.createtext) create(IndexType.TEXT, data, cmd);
     if(data.meta.createattr) create(IndexType.ATTRIBUTE, data, cmd);
+    if(data.meta.createattrtoken) create(IndexType.ATTTOKEN, data, cmd);
     if(data.meta.createftxt) create(IndexType.FULLTEXT, data, cmd);
   }
 
@@ -103,6 +109,7 @@ public final class CreateIndex extends ACreate {
     data.createIndex(type, cmd);
     if(type == IndexType.TEXT) data.meta.textindex = true;
     else if(type == IndexType.ATTRIBUTE) data.meta.attrindex = true;
+    else if(type == IndexType.ATTTOKEN) data.meta.attrtokenindex = true;
     else if(type == IndexType.FULLTEXT) data.meta.ftindex = true;
   }
 }

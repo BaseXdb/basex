@@ -110,7 +110,7 @@ public final class Optimize extends ACreate {
    * @throws IOException I/O Exception during index rebuild
    */
   public static void optimize(final Data data, final Optimize cmd) throws IOException {
-    optimize(data, false, false, false, cmd);
+    optimize(data, false, false, false, false, cmd);
   }
 
   /**
@@ -118,12 +118,14 @@ public final class Optimize extends ACreate {
    * @param data data
    * @param enforceTxt enforce text index operation
    * @param enforceAtr enforce attribute index operation
+   * @param enforceAtrToken enforce attribute token index operation
    * @param enforceFtx enforce full-text index operation
    * @param cmd calling command instance (may be {@code null})
    * @throws IOException I/O Exception during index rebuild
    */
   public static void optimize(final Data data, final boolean enforceTxt, final boolean enforceAtr,
-      final boolean enforceFtx, final Optimize cmd) throws IOException {
+      final boolean enforceAtrToken, final boolean enforceFtx, final Optimize cmd)
+      throws IOException {
 
     // initialize structural indexes
     final MetaData md = data.meta;
@@ -173,9 +175,10 @@ public final class Optimize extends ACreate {
     }
 
     // rebuild value indexes
-    optimize(IndexType.TEXT,      data, md.createtext, md.textindex, enforceTxt, cmd);
+    optimize(IndexType.TEXT, data, md.createtext, md.textindex, enforceTxt, cmd);
     optimize(IndexType.ATTRIBUTE, data, md.createattr, md.attrindex, enforceAtr, cmd);
-    optimize(IndexType.FULLTEXT,  data, md.createftxt, md.ftindex, enforceFtx, cmd);
+    optimize(IndexType.ATTTOKEN, data, md.createattrtoken, md.attrtokenindex, enforceAtrToken, cmd);
+    optimize(IndexType.FULLTEXT, data, md.createftxt, md.ftindex, enforceFtx, cmd);
   }
 
   /**

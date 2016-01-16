@@ -69,6 +69,7 @@ public final class DBOptimize extends DBUpdate {
     options.assignIfEmpty(MainOptions.FTINDEX, meta.createftxt);
     options.assignIfEmpty(MainOptions.TEXTINCLUDE, meta.textinclude);
     options.assignIfEmpty(MainOptions.ATTRINCLUDE, meta.attrinclude);
+    options.assignIfEmpty(MainOptions.ATTRTOKENIZE, meta.attrtokeninclude);
     options.assignIfEmpty(MainOptions.FTINCLUDE, meta.ftinclude);
     options.assignIfEmpty(MainOptions.INDEXSPLITSIZE, meta.splitsize);
     options.assignIfEmpty(MainOptions.FTINDEXSPLITSIZE, meta.ftsplitsize);
@@ -79,6 +80,8 @@ public final class DBOptimize extends DBUpdate {
     // adopt options to database meta data
     meta.createtext = opts.get(MainOptions.TEXTINDEX);
     meta.createattr = opts.get(MainOptions.ATTRINDEX);
+    meta.createattrtoken = opts.contains(MainOptions.ATTRTOKENIZE)
+        && !opts.get(MainOptions.ATTRTOKENIZE).isEmpty();
     meta.createftxt = opts.get(MainOptions.FTINDEX);
     meta.updindex = opts.get(MainOptions.UPDINDEX);
 
@@ -87,11 +90,14 @@ public final class DBOptimize extends DBUpdate {
     final int ml = opts.get(MainOptions.MAXLEN);
     final String ti = opts.get(MainOptions.TEXTINCLUDE);
     final String ai = opts.get(MainOptions.ATTRINCLUDE);
+    final String ait = opts.get(MainOptions.ATTRTOKENIZE);
     final boolean rebuild = mc != meta.maxcats || ml != meta.maxlen;
     final boolean rebuildText = rebuild || !meta.textinclude.equals(ti);
     final boolean rebuildAttr = rebuild || !meta.attrinclude.equals(ai);
+    final boolean rebuildAttrToken = rebuild || !meta.attrtokeninclude.equals(ai);
     meta.textinclude = ti;
     meta.attrinclude = ai;
+    meta.attrtokeninclude = ait;
     meta.maxcats = mc;
     meta.maxlen = ml;
     meta.splitsize = opts.get(MainOptions.INDEXSPLITSIZE);
@@ -117,7 +123,7 @@ public final class DBOptimize extends DBUpdate {
 
     try {
       if(all) OptimizeAll.optimizeAll(data, qc.context, opts, null);
-      else Optimize.optimize(data, rebuildText, rebuildAttr, rebuildFtx, null);
+      else Optimize.optimize(data, rebuildText, rebuildAttr, rebuildAttrToken, rebuildFtx, null);
     } catch(final IOException ex) {
       throw UPDBOPTERR_X.get(info, ex);
     }

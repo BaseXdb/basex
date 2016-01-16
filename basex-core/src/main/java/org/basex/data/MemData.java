@@ -80,8 +80,9 @@ public final class MemData extends Data {
   public void createIndex(final IndexType type, final Command cmd) throws IOException {
     final IndexBuilder ib;
     switch(type) {
-      case TEXT:      ib = new MemValuesBuilder(this, true); break;
-      case ATTRIBUTE: ib = new MemValuesBuilder(this, false); break;
+      case TEXT:      ib = new MemValuesBuilder(this, true, false); break;
+      case ATTRIBUTE: ib = new MemValuesBuilder(this, false, false); break;
+      case ATTTOKEN:  ib = new MemValuesBuilder(this, false, true); break;
       case FULLTEXT:  throw new BaseXException(NO_MAINMEM);
       default:        throw Util.notExpected();
     }
@@ -94,6 +95,7 @@ public final class MemData extends Data {
     switch(type) {
       case TEXT:      break;
       case ATTRIBUTE: break;
+      case ATTTOKEN:  break;
       case FULLTEXT:  throw new BaseXException(NO_MAINMEM);
       default:        throw Util.notExpected();
     }
@@ -110,6 +112,7 @@ public final class MemData extends Data {
     switch(type) {
       case TEXT:      textIndex = index; break;
       case ATTRIBUTE: attrIndex = index; break;
+      case ATTTOKEN:  attrTokenIndex = index; break;
       case FULLTEXT:  ftxtIndex = index; break;
       default:        break;
     }

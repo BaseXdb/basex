@@ -160,7 +160,7 @@ public interface Commands {
   /** Permission commands. */
   enum CmdPerm { NONE, READ, WRITE, CREATE, ADMIN }
   /** Index types. */
-  enum CmdIndex { TEXT, ATTRIBUTE, FULLTEXT }
+  enum CmdIndex { TEXT, ATTRIBUTE, FULLTEXT, ATTTOKEN }
   /** Index types. */
   enum CmdIndexInfo { NULL, TEXT, ATTRIBUTE, FULLTEXT, PATH, TAG, ATTNAME }
   /** Alter types. */

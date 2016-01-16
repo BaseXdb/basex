@@ -77,7 +77,7 @@ public final class FTIndex extends ValueIndex {
    * @throws IOException I/O Exception
    */
   public FTIndex(final Data data) throws IOException {
-    super(data, true);
+    super(data, true, false);
 
     // cache token length index
     inY = new DataAccess(data.meta.dbfile(DATAFTX + 'y'));

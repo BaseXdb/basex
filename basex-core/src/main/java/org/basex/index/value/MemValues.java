@@ -33,10 +33,11 @@ public final class MemValues extends ValueIndex {
    * Constructor.
    * @param data data instance
    * @param text value type (texts/attributes)
+   * @param tokenize tokenizing index
    */
-  public MemValues(final Data data, final boolean text) {
-    super(data, text);
-    values = ((MemData) data).values(text);
+  public MemValues(final Data data, final boolean text, final boolean tokenize) {
+    super(data, text, tokenize);
+    values = tokenize ? new TokenSet() : ((MemData) data).values(text);
     final int s = values.size() + 1;
     idsList = new ArrayList<>(s);
     lenList = new IntList(s);
@@ -52,7 +53,7 @@ public final class MemValues extends ValueIndex {
     final int[] ids = idsList.get(id), pres;
     if(data.meta.updindex) {
       final IntList tmp = new IntList();
-      for(int i = 0; i < len; ++i) tmp.add(data.pre(ids[i]));
+      for(int i = 0; i < len; ++i) tmp.add(data.pre(ids[i])); //[JE]  support update token index
       pres = tmp.sort().finish();
     } else {
       pres = ids;
@@ -76,6 +77,7 @@ public final class MemValues extends ValueIndex {
 
   @Override
   public EntryIterator entries(final IndexEntries entries) {
+    if(tokenize) throw new UnsupportedOperationException();
     final byte[] prefix = entries.get();
     return new EntryIterator() {
       final int s = values.size();
@@ -152,25 +154,31 @@ public final class MemValues extends ValueIndex {
   void add(final byte[] key, final int... vals) {
     if(vals.length == 0) return;
 
-    // if required, resize existing arrays
-    final int id = values.id(key), vl = vals.length;
-    while(idsList.size() < id + 1) idsList.add(null);
-    if(lenList.size() < id + 1) lenList.set(id, 0);
+    byte[][] tokens = tokenize ? Token.split(normalize(key), ' ') : new byte[][] { key};
+    for(byte[] token : tokens) {
+      if(token.length <= data.meta.maxlen) {
+        // if required, resize existing arrays
+        final int id = tokenize ? values.put(token) : values.id(token), vl = vals.length;
+        while(idsList.size() < id + 1)
+          idsList.add(null);
+        if(lenList.size() < id + 1) lenList.set(id, 0);
 
-    final int len = lenList.get(id), size = len + vl;
-    int[] ids = idsList.get(id);
-    if(ids == null) {
-      ids = vals;
-    } else {
-      if(ids.length < size) ids = Arrays.copyOf(ids, Array.newSize(size));
-      System.arraycopy(vals, 0, ids, len, vl);
-      if(ids[len - 1] > vals[0]) {
-        if(reorder == null) reorder = new BoolList(values.size());
-        reorder.set(id, true);
+        final int len = lenList.get(id), size = len + vl;
+        int[] ids = idsList.get(id);
+        if(ids == null) {
+          ids = vals;
+        } else {
+          if(ids.length < size) ids = Arrays.copyOf(ids, Array.newSize(size));
+          System.arraycopy(vals, 0, ids, len, vl);
+          if(ids[len - 1] > vals[0]) {
+            if(reorder == null) reorder = new BoolList(values.size());
+            reorder.set(id, true);
+          }
+        }
+        idsList.set(id, ids);
+        lenList.set(id, size);
       }
     }
-    idsList.set(id, ids);
-    lenList.set(id, size);
   }
 
   /**

@@ -36,6 +36,6 @@ public class DbText extends DbAccess {
     if(!(text ? meta.textindex : meta.attrindex)) throw BXDB_INDEX_X.get(info, meta.name,
         (text ? IndexType.TEXT : IndexType.ATTRIBUTE).toString().toLowerCase(Locale.ENGLISH));
 
-    return new ValueAccess(info, exprs[1], text, null, new IndexContext(data, false));
+    return new ValueAccess(info, exprs[1], text, false, null, new IndexContext(data, false));
   }
 }

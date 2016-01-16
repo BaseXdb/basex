@@ -43,21 +43,25 @@ public class DiskValues extends ValueIndex {
    * Constructor, initializing the index structure.
    * @param data data reference
    * @param text value type (texts/attributes)
+   * @param tokenize tokenizing index
    * @throws IOException I/O Exception
    */
-  public DiskValues(final Data data, final boolean text) throws IOException {
-    this(data, text, text ? DATATXT : DATAATV);
+  public DiskValues(final Data data, final boolean text, final boolean tokenize)
+      throws IOException {
+    this(data, text, tokenize, getFileSuffix(text, tokenize));
   }
 
   /**
    * Constructor, initializing the index structure.
    * @param data data reference
    * @param text value type (texts/attributes)
+   * @param tokenize tokenizing index
    * @param pref file prefix
    * @throws IOException I/O Exception
    */
-  DiskValues(final Data data, final boolean text, final String pref) throws IOException {
-    super(data, text);
+  DiskValues(final Data data, final boolean text, final boolean tokenize, final String pref)
+      throws IOException {
+    super(data, text, tokenize);
     idxl = new DataAccess(data.meta.dbfile(pref + 'l'));
     idxr = new DataAccess(data.meta.dbfile(pref + 'r'));
     size.set(idxl.read4());
@@ -106,7 +110,7 @@ public class DiskValues extends ValueIndex {
 
   @Override
   public final boolean drop() {
-    return data.meta.drop((text ? DATATXT : DATAATV) + '.');
+    return data.meta.drop(getFileSuffix(text, tokenize) + '.');
   }
 
   @Override
@@ -252,7 +256,7 @@ public class DiskValues extends ValueIndex {
         if(++ix < s) {
           synchronized(monitor) {
             final IndexEntry entry = indexEntry(ix);
-            if(startsWith(entry.key, prefix)) {
+            if(startsWith(entry.key, prefix)) { // [JE] token semantics valid? -> tokenize
               count = entry.size;
               return entry.key;
             }
@@ -350,7 +354,9 @@ public class DiskValues extends ValueIndex {
     final int sz = idxl.readNum(pos);
     final long off = pos + Num.length(sz);
     if(key == null) {
-      key = data.text(pre(idxl.readNum()), text);
+      int id = idxl.readNum();
+      if(tokenize) key = Token.split(normalize(data.text(pre(id), text)), ' ')[idxl.readNum()];
+      else key = data.text(pre(id), text);
       ctext.put(index, key);
     }
     return cache.add(key, sz, off);
@@ -369,6 +375,8 @@ public class DiskValues extends ValueIndex {
       idxl.cursor(offset);
       for(int i = 0, id = 0; i < sz; i++) {
         id += idxl.readNum();
+        // Pass over token position
+        if(tokenize) idxl.readNum();
         pres.add(pre(id));
       }
     }
@@ -389,7 +397,7 @@ public class DiskValues extends ValueIndex {
       final int s = size();
       for(int l = i < 0 ? -i - 1 : tok.mni ? i : i + 1; l < s; l++) {
         final int ps = idxl.readNum(idxr.read5(l * 5L));
-        int id = idxl.readNum();
+        int id = idxl.readNum(); // [JE] Read next num, tokenize -> NotImplemented
         final int pre = pre(id);
 
         // value is too large: skip traversal
@@ -398,7 +406,7 @@ public class DiskValues extends ValueIndex {
         // add pre values
         for(int p = 0; p < ps; ++p) {
           pres.add(pre(id));
-          id += idxl.readNum();
+          id += idxl.readNum(); //[JE] Read next num, tokenize -> NotImplemented
         }
       }
     }
@@ -430,7 +438,7 @@ public class DiskValues extends ValueIndex {
           // value is in range
           for(int d = 0; d < ds; ++d) {
             pres.add(pre(id));
-            id += idxl.readNum();
+            id += idxl.readNum(); //[JE] Read next num, tokenize -> NotImplemented
           }
         } else if(simple && v > max && data.textLen(pre, text) == len) {
           // if limits are integers, if min, max and current value have the same
@@ -497,5 +505,15 @@ public class DiskValues extends ValueIndex {
   @Override
   public String toString() {
     return toString(false);
+  }
+
+  /**
+   * Get file suffix for index.
+   * @param text text index
+   * @param tokenize tokenizing index
+   * @return file suffix
+   */
+  static String getFileSuffix(final boolean text, final boolean tokenize) {
+    return text ? DATATXT : tokenize ? DATAATT : DATAATV;
   }
 }

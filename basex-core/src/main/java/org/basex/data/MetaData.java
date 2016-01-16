@@ -43,6 +43,8 @@ public final class MetaData {
   public boolean textindex;
   /** Indicates if an attribute index exists. */
   public boolean attrindex;
+  /** Indicates if an attribute token index exists. */
+  public boolean attrtokenindex;
   /** Indicates if a full-text index exists. */
   public boolean ftindex;
 
@@ -57,6 +59,8 @@ public final class MetaData {
   public boolean createtext;
   /** Indicates if the attribute index is to be recreated. */
   public boolean createattr;
+  /** Indicates if the attribute token index is to be recreated. */
+  public boolean createattrtoken;
   /** Indicates if the full-text index is to be recreated. */
   public boolean createftxt;
   /** Text index: names to include. */
@@ -65,6 +69,8 @@ public final class MetaData {
   public String attrinclude = "";
   /** Full-text index: names to include. */
   public String ftinclude = "";
+  /** Attribute index: names to tokenize. */
+  public String attrtokeninclude = "";
 
   /** Flag for full-text stemming. */
   public boolean stemming;
@@ -127,6 +133,8 @@ public final class MetaData {
     chop = options.get(MainOptions.CHOP);
     createtext = options.get(MainOptions.TEXTINDEX);
     createattr = options.get(MainOptions.ATTRINDEX);
+    String createattrtokenstr = options.get(MainOptions.ATTRTOKENIZE);
+    createattrtoken = null != createattrtokenstr && !createattrtokenstr.isEmpty();
     createftxt = options.get(MainOptions.FTINDEX);
     diacritics = options.get(MainOptions.DIACRITICS);
     stemming = options.get(MainOptions.STEMMING);
@@ -140,6 +148,7 @@ public final class MetaData {
     textinclude = options.get(MainOptions.TEXTINCLUDE);
     attrinclude = options.get(MainOptions.ATTRINCLUDE);
     ftinclude = options.get(MainOptions.FTINCLUDE);
+    attrtokeninclude = options.get(MainOptions.ATTRTOKENIZE);
     splitsize = options.get(MainOptions.INDEXSPLITSIZE);
     ftsplitsize = options.get(MainOptions.FTINDEXSPLITSIZE);
   }
