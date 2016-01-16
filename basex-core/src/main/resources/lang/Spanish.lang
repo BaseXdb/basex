@@ -420,6 +420,7 @@ h_path_index         = Un resumen de ruta acelera las resoluciones de ruta.
 h_stemming           = Los términos son reducidos a la raiz antes de ser indizados.
 h_stopwords          = Escoja una lista de "palabras vacías" para ignorar términos frecuentes.
 h_text_index         = Este índice acelera las comparaciones de texto en los predicados.
+h_token_index        = Faster lookup of tokens in attribute values.
 h_used_mem           = Si hay poca memoria, por favor lance\nBaseX con el modificador Java -Xmx<tamaño>.
 
 # Commands

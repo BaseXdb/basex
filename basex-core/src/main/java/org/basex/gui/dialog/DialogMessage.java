@@ -10,7 +10,6 @@ import org.basex.gui.*;
 import org.basex.gui.GUIConstants.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.text.*;
-import org.basex.util.*;
 
 /**
  * Dialog window for messages.
@@ -39,7 +38,7 @@ public final class DialogMessage extends BaseXDialog {
     label.setIcon(ic.large);
     back.add(label);
 
-    final TextPanel text = new TextPanel(Token.token(txt), false, this);
+    final TextPanel text = new TextPanel(txt, false, this);
     text.setFont(label.getFont());
     back.add(text);
 

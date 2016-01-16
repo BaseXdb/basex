@@ -9,6 +9,7 @@ import org.basex.core.cmd.List;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.layout.*;
+import org.basex.index.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -27,11 +28,13 @@ public final class DialogNew extends BaseXDialog {
   private final BaseXBack buttons;
 
   /** Text index flag. */
-  private final BaseXCheckBox txtindex;
+  private final BaseXCheckBox textindex;
   /** Attribute value index flag. */
-  private final BaseXCheckBox atvindex;
+  private final BaseXCheckBox attrindex;
   /** Full-text index flag. */
-  private final BaseXCheckBox ftxindex;
+  private final BaseXCheckBox ftindex;
+  /** Token index flag. */
+  private final BaseXCheckBox tokenindex;
   /** Index creation options. */
   private final DialogIndex[] index;
   /** Available databases. */
@@ -59,33 +62,39 @@ public final class DialogNew extends BaseXDialog {
 
     // option panels
     final BaseXTabs tabs = new BaseXTabs(this);
-    final DialogParsing parsing = new DialogParsing(this, tabs);
-    general = new DialogImport(this, pnl, parsing);
+    final DialogParsing parsePanel = new DialogParsing(this, tabs);
+    general = new DialogImport(this, pnl, parsePanel);
 
     index = new DialogIndex[] {
-      new DialogValues(this, true), new DialogValues(this, false), new DialogFT(this, true)
+      new DialogValues(this, IndexType.TEXT), new DialogValues(this, IndexType.ATTRIBUTE),
+      new DialogValues(this, IndexType.TOKEN), new DialogFT(this, true)
     };
-    txtindex = new BaseXCheckBox(TEXT_INDEX, MainOptions.TEXTINDEX, opts, this).bold().large();
-    atvindex = new BaseXCheckBox(ATTRIBUTE_INDEX, MainOptions.ATTRINDEX, opts, this).bold().large();
-    ftxindex = new BaseXCheckBox(FULLTEXT_INDEX, MainOptions.FTINDEX, opts, this).bold().large();
+    textindex = new BaseXCheckBox(TEXT_INDEX, MainOptions.TEXTINDEX, opts, this).bold().large();
+    attrindex = new BaseXCheckBox(ATTRIBUTE_INDEX, MainOptions.ATTRINDEX, opts, this).bold().
+        large();
+    tokenindex = new BaseXCheckBox(TOKEN_INDEX, MainOptions.TOKENINDEX, opts, this).bold().large();
+    ftindex = new BaseXCheckBox(FULLTEXT_INDEX, MainOptions.FTINDEX, opts, this).bold().large();
 
     // index panel
-    final BaseXBack indexes = new BaseXBack(new TableLayout(5, 1)).border(8);
-    indexes.add(txtindex);
-    indexes.add(index[0]);
-    indexes.add(new BaseXBack());
-    indexes.add(atvindex);
-    indexes.add(index[1]);
+    final BaseXBack indexPanel = new BaseXBack(new TableLayout(8, 1)).border(8);
+    indexPanel.add(textindex);
+    indexPanel.add(index[0]);
+    indexPanel.add(new BaseXBack());
+    indexPanel.add(attrindex);
+    indexPanel.add(index[1]);
+    indexPanel.add(new BaseXBack());
+    indexPanel.add(tokenindex);
+    indexPanel.add(index[2]);
 
-    // full-text panel
-    final BaseXBack ftindex = new BaseXBack(new TableLayout(2, 1)).border(8);
-    ftindex.add(ftxindex);
-    ftindex.add(index[2]);
+    // full-text index panel
+    final BaseXBack ftPanel = new BaseXBack(new TableLayout(2, 1)).border(8);
+    ftPanel.add(ftindex);
+    ftPanel.add(index[3]);
 
     tabs.addTab(GENERAL, general);
-    tabs.addTab(PARSING, parsing);
-    tabs.addTab(INDEXES, indexes);
-    tabs.addTab(FULLTEXT_INDEX, ftindex);
+    tabs.addTab(PARSING, parsePanel);
+    tabs.addTab(INDEXES, indexPanel);
+    tabs.addTab(FULLTEXT_INDEX, ftPanel);
     set(tabs, BorderLayout.CENTER);
 
     set(buttons, BorderLayout.SOUTH);
@@ -100,9 +109,10 @@ public final class DialogNew extends BaseXDialog {
   @Override
   public void action(final Object comp) {
     final boolean valid = general.action(comp, true);
-    index[0].action(txtindex.isSelected());
-    index[1].action(atvindex.isSelected());
-    index[2].action(ftxindex.isSelected());
+    index[0].action(textindex.isSelected());
+    index[1].action(attrindex.isSelected());
+    index[2].action(tokenindex.isSelected());
+    index[3].action(ftindex.isSelected());
 
     // ...must be located before remaining checks
     if(comp == general.browse || comp == general.input) dbname.setText(general.dbname);
@@ -139,10 +149,10 @@ public final class DialogNew extends BaseXDialog {
     if(!ok) return;
 
     super.close();
-    gui.set(MainOptions.TEXTINDEX, txtindex.isSelected());
-    gui.set(MainOptions.ATTRINDEX, atvindex.isSelected());
-    gui.set(MainOptions.FTINDEX,   ftxindex.isSelected());
-    gui.set(MainOptions.FTINDEX,   ftxindex.isSelected());
+    gui.set(MainOptions.TEXTINDEX, textindex.isSelected());
+    gui.set(MainOptions.ATTRINDEX, attrindex.isSelected());
+    gui.set(MainOptions.TOKENINDEX, tokenindex.isSelected());
+    gui.set(MainOptions.FTINDEX, ftindex.isSelected());
     general.setOptions();
     for(final DialogIndex di : index) di.setOptions();
   }

@@ -420,6 +420,7 @@ h_path_index         = Un rezumat a caii accelerează rezoluţiile de cale.
 h_stemming           = Termenii sunt stemmed înainte de a fi indexati.
 h_stopwords          = Alege o listă stopword pentru a sări peste termeni frecventi.
 h_text_index         = Acest indice accelereaza comparaţia de predicate.
+h_token_index        = Faster lookup of tokens in attribute values.
 h_used_mem           = Dacă memoria este redusa, vă rugăm să lanseti\nBaseX cu Java flag -Xmx<size>.
 
 # Commands

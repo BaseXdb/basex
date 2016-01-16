@@ -64,7 +64,7 @@ public class TextPanel extends BaseXPanel {
    * @param win parent window
    */
   public TextPanel(final boolean edit, final Window win) {
-    this(EMPTY, edit, win);
+    this("", edit, win);
   }
 
   /**
@@ -73,7 +73,7 @@ public class TextPanel extends BaseXPanel {
    * @param editable editable flag
    * @param win parent window
    */
-  public TextPanel(final byte[] txt, final boolean editable, final Window win) {
+  public TextPanel(final String txt, final boolean editable, final Window win) {
     super(win);
     this.editable = editable;
     editor = new TextEditor(gui);

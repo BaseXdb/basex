@@ -1343,6 +1343,8 @@ public interface Text {
   String H_TEXT_INDEX = lang("h_text_index");
   /** Attribute value index information. */
   String H_ATTR_INDEX = lang("h_attr_index");
+  /** Token index information. */
+  String H_TOKEN_INDEX = lang("h_token_index");
   /** Full-text index information. */
   String H_FULLTEXT_INDEX = lang("h_fulltext_index");
   /** Full-text index information. */

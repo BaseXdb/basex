@@ -420,6 +420,7 @@ h_path_index         = Suat ringkasan rintis mempercepat penemuan rintis.
 h_stemming           = Istilah dipotong sebelum diindeks.
 h_stopwords          = Pilih suatu daftar kata henti untuk melewatkan istilah yang sering muncul.
 h_text_index         = Indeks ini mempercepat pembandingan teks dalam predikat.
+h_token_index        = Faster lookup of tokens in attribute values.
 h_used_mem           = Jika memori kurang, mohon jalankan\nBaseX dengan penanda Java -Xmx<size>.
 
 # Commands

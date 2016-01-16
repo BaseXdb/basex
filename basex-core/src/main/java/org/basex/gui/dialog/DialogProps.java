@@ -27,26 +27,26 @@ import org.basex.util.list.*;
 public final class DialogProps extends BaseXDialog {
   /** Index types. */
   private static final String[] HELP = {
-    "", "", H_PATH_INDEX, H_TEXT_INDEX, H_ATTR_INDEX, ""
+    "", "", H_PATH_INDEX, H_TEXT_INDEX, H_ATTR_INDEX, H_TOKEN_INDEX, ""
   };
   /** Index types. */
   private static final IndexType[] TYPES = {
-    IndexType.TAG, IndexType.ATTNAME, IndexType.PATH,
-    IndexType.TEXT, IndexType.ATTRIBUTE, IndexType.FULLTEXT
+    IndexType.TAG, IndexType.ATTNAME, IndexType.PATH, IndexType.TEXT, IndexType.ATTRIBUTE,
+    IndexType.TOKEN, IndexType.FULLTEXT
   };
   /** Label strings. */
   private static final String[] LABELS = {
-    ELEMENTS, ATTRIBUTES, PATH_INDEX, TEXT_INDEX, ATTRIBUTE_INDEX, FULLTEXT_INDEX
+    ELEMENTS, ATTRIBUTES, PATH_INDEX, TEXT_INDEX, ATTRIBUTE_INDEX, TOKEN_INDEX, FULLTEXT_INDEX
   };
 
   /** Full-text tab. */
-  private final BaseXBack tabFT;
+  private final BaseXBack ftPanel;
   /** Name tab. */
-  private final BaseXBack tabNames;
+  private final BaseXBack namePanel;
   /** Name tab. */
-  private final BaseXBack tabPath;
+  private final BaseXBack pathPanel;
   /** Name tab. */
-  private final BaseXBack tabValues;
+  private final BaseXBack indexPanel;
   /** Contains the panels that are currently being updated. */
   private final IntList updated = new IntList();
   /** Tabbed pane. */
@@ -86,43 +86,44 @@ public final class DialogProps extends BaseXDialog {
 
     final Data data = main.context.data();
     final int ll = LABELS.length;
-    for(int l = 0; l < ll; ++l) {
+    for(int l = 0; l < ll; l++) {
       labels[l] = new BaseXLabel(LABELS[l]).large();
       panels[l] = new BaseXBack(new BorderLayout(0, 4));
-      infos[l] = new TextPanel(Token.token(PLEASE_WAIT_D), false, this);
+      infos[l] = new TextPanel(PLEASE_WAIT_D, false, this);
       infos[l].setFont(dmfont);
-      BaseXLayout.setHeight(infos[l], 200);
-      // show no optimize button for attribute name panel
+      BaseXLayout.setHeight(infos[l], 150);
+      // show no optimize button for attribute name panel (on lower area of panel)
       if(l != 1) buttons[l] = new BaseXButton(" ", this);
-      // disallow creation/removal of full-text index
-      if(l == 5) buttons[l].setEnabled(!data.inMemory());
+      // disallow creation/removal of full-text index in main-memory mode
+      if(l == 6) buttons[l].setEnabled(!data.inMemory());
     }
     // alternative panels
-    creations[3] = new DialogValues(this, true);
-    creations[4] = new DialogValues(this, false);
-    creations[5] = new DialogFT(this, false);
+    creations[3] = new DialogValues(this, IndexType.TEXT);
+    creations[4] = new DialogValues(this, IndexType.ATTRIBUTE);
+    creations[5] = new DialogValues(this, IndexType.TOKEN);
+    creations[6] = new DialogFT(this, false);
 
-    // tab: name indexes
-    tabNames = new BaseXBack(new GridLayout(2, 1, 0, 8)).border(8);
-    tabNames.add(panels[0]);
-    tabNames.add(panels[1]);
-    // tab: path index
-    tabPath = new BaseXBack(new GridLayout(1, 1)).border(8);
-    tabPath.add(panels[2]);
-    // tab: value indexes
-    tabValues = new BaseXBack(new GridLayout(2, 1, 0, 8)).border(8);
-    tabValues.add(panels[3]);
-    tabValues.add(panels[4]);
-    // tab: full-text index
-    tabFT = new BaseXBack(new GridLayout(1, 1)).border(8);
-    tabFT.add(panels[5]);
+    // name indexes
+    namePanel = new BaseXBack(new GridLayout(2, 1, 0, 8)).border(8);
+    namePanel.add(panels[0]);
+    namePanel.add(panels[1]);
+    // path index
+    pathPanel = new BaseXBack(new GridLayout(1, 1)).border(8);
+    pathPanel.add(panels[2]);
+    // indexes
+    indexPanel = new BaseXBack(new GridLayout(3, 1, 0, 8)).border(8);
+    indexPanel.add(panels[3]);
+    indexPanel.add(panels[4]);
+    indexPanel.add(panels[5]);
+    // full-text index
+    ftPanel = new BaseXBack(new GridLayout(1, 1)).border(8);
+    ftPanel.add(panels[6]);
 
-    // tab: database info
-    final BaseXBack tabGeneral = new BaseXBack(new BorderLayout(0, 8)).border(8);
-    final Font f = tabGeneral.getFont();
+    // database properties
+    final BaseXBack propPanel = new BaseXBack(new BorderLayout(0, 8)).border(8);
+    final Font f = propPanel.getFont();
     final BaseXLabel doc = new BaseXLabel(data.meta.name).border(0, 0, 6, 0).large();
-    BaseXLayout.setWidth(doc, 400);
-    tabGeneral.add(doc, BorderLayout.NORTH);
+    propPanel.add(doc, BorderLayout.NORTH);
 
     final String db = InfoDB.db(data.meta, true, false, true);
     final TokenBuilder info = new TokenBuilder(db);
@@ -130,18 +131,18 @@ public final class DialogProps extends BaseXDialog {
       info.bold().add(NL + NAMESPACES + NL).norm().add(data.nspaces.info());
     }
 
-    final TextPanel text = new TextPanel(info.finish(), false, this);
+    final TextPanel text = new TextPanel(info.toString(), false, this);
     text.setFont(f);
     BaseXLayout.setHeight(text, 200);
-    tabGeneral.add(new SearchEditor(main, text), BorderLayout.CENTER);
+    propPanel.add(new SearchEditor(main, text), BorderLayout.CENTER);
 
     tabs = new BaseXTabs(this);
     tabs.addTab(RESOURCES, tabRes);
-    tabs.addTab(NAMES, tabNames);
-    tabs.addTab(PATH_INDEX, tabPath);
-    tabs.addTab(INDEXES, tabValues);
-    tabs.addTab(FULLTEXT, tabFT);
-    tabs.addTab(GENERAL, tabGeneral);
+    tabs.addTab(NAMES, namePanel);
+    tabs.addTab(PATH_INDEX, pathPanel);
+    tabs.addTab(INDEXES, indexPanel);
+    tabs.addTab(FULLTEXT, ftPanel);
+    tabs.addTab(Text.PROPERTIES, propPanel);
 
     tabs.addChangeListener(new ChangeListener() {
       @Override
@@ -166,27 +167,30 @@ public final class DialogProps extends BaseXDialog {
   private synchronized void updateInfo() {
     final Object o = tabs.getSelectedComponent();
     final IntList il = new IntList();
-    if(o == tabNames) {
+    if(o == namePanel) {
       il.add(0);
       il.add(1);
-    } else if(o == tabPath) {
+    } else if(o == pathPanel) {
       il.add(2);
-    } else if(o == tabValues) {
+    } else if(o == indexPanel) {
       il.add(3);
       il.add(4);
-    } else if(o == tabFT) {
       il.add(5);
+    } else if(o == ftPanel) {
+      il.add(6);
     }
 
     final Data data = gui.context.data();
     final boolean[] val = {
-      true, true, true, data.meta.textindex, data.meta.attrindex, data.meta.ftindex
+      true, true, true, data.meta.textindex, data.meta.attrindex, data.meta.tokenindex,
+      data.meta.ftindex
     };
     final int is = il.size();
     for(int i = 0; i < is; i++) {
       final int idx = il.get(i);
       if(updated.contains(idx)) continue;
       updated.add(idx);
+
       SwingUtilities.invokeLater(new Runnable() {
         @Override
         public void run() {
@@ -241,7 +245,8 @@ public final class DialogProps extends BaseXDialog {
 
     final Data data = gui.context.data();
     final boolean[] exists = {
-      true, true, true, data.meta.textindex, data.meta.attrindex, data.meta.ftindex
+      true, true, true, data.meta.textindex, data.meta.attrindex, data.meta.tokenindex,
+      data.meta.ftindex
     };
 
     if(cmp == this) {

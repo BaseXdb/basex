@@ -41,7 +41,7 @@ public final class DialogEdit extends BaseXDialog {
   /** Old content. */
   private String old2;
   /** Old content. */
-  private byte[] old3;
+  private String old3;
 
   /**
    * Default constructor.
@@ -67,13 +67,13 @@ public final class DialogEdit extends BaseXDialog {
     } else if(kind == Data.DOC) {
       old1 = string(data.text(p, true));
     } else if(kind == Data.TEXT || kind == Data.COMM) {
-      old3 = data.atom(p);
+      old3 = string(data.atom(p));
     } else if(kind == Data.ATTR) {
       old1 = string(data.name(p, kind));
       old2 = string(data.atom(p));
     } else {
       old1 = string(data.name(p, kind));
-      old3 = data.atom(p);
+      old3 = string(data.atom(p));
     }
     final BaseXBack b = new BaseXBack(new BorderLayout(0, 4));
     if(old1 != null) {
@@ -133,8 +133,9 @@ public final class DialogEdit extends BaseXDialog {
       ok |= !input2.getText().equals(old2);
     }
     if(old3 != null) {
-      result.add(string(input3.getText()));
-      ok |= !eq(input3.getText(), old3);
+      final String text = string(input3.getText());
+      result.add(text);
+      ok |= !text.equals(old3);
     }
   }
 }

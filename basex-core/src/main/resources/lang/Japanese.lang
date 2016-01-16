@@ -420,6 +420,7 @@ h_path_index         = パスサマリーはパスレゾリューションを高
 h_stemming           = インデックスが作成される前に、単語の語幹が抽出されます。
 h_stopwords          = 頻出する語をスキップするストップワードリストを選択してください。
 h_text_index         = このインデックスはテキスト比較を高速化します。
+h_token_index        = Faster lookup of tokens in attribute values.
 h_used_mem           = メモリが少ない場合はBaseXを起動する際に、\nJavaのコマンドライン引数 -Xmx <サイズ> を付けて下さい。
 
 # Commands

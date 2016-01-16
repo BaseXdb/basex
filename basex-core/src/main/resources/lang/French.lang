@@ -420,6 +420,7 @@ h_path_index         = Définir un index des chemins accélère les résolutions
 h_stemming           = Les termes sont stemmés avant d'être indexés.
 h_stopwords          = Choisir une liste de mots vides pour ignorer les termes fréquents.
 h_text_index         = Cet index accélère les comparaisons de texte dans les prédicats.
+h_token_index        = Faster lookup of tokens in attribute values.
 h_used_mem           = Si la mémoire est insuffisante, lancez\nBaseX avec le paramètre Java -Xmx<size>.
 
 # Commands

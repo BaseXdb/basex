@@ -420,6 +420,7 @@ h_path_index         = Egy útvonalösszegzés gyorsítja az útvonal felbontás
 h_stemming           = Kifejezés csupaszítása (stemming) az indexelés előtt.
 h_stopwords          = Válasszon egy megállító-kulcsszavakat (stopwords) tartalmazó fájlt a gyakran figyelmen kívül hagyott kifejezésekhez.
 h_text_index         = Ez az index a szövegek feltételekben lévő összehasonlítását gyorsítja meg.
+h_token_index        = Faster lookup of tokens in attribute values.
 h_used_mem           = Amikor kevés a memória, kérem futtassa\na BaseX-et a -Xmx<size> Java paraméterrel.
 
 # Commands

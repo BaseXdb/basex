@@ -420,6 +420,7 @@ h_path_index         = Хаягын байршлын үр дүнг илүү ху
 h_stemming           = Индексд тодорхойлогдохоосоо өмнө бий болгоно.
 h_stopwords          = Байнгын үйл ажиллагааг алгасаж үгийн жагсаалтыг сонгох.
 h_text_index         = Уг индекс нь текст харьцуулалтыг баталгаатай хурдан ажиллагаатай болгоно.
+h_token_index        = Faster lookup of tokens in attribute values.
 h_used_mem           = Хэрвээ санах ой багасвал, \nBaseX-г Java шинж тэмдэг -Xmx<size> тусламжтай ажиллуулна уу.
 
 # Commands

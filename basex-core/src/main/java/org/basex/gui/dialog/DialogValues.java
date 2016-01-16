@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 
 import org.basex.core.*;
 import org.basex.gui.layout.*;
+import org.basex.index.*;
 import org.basex.util.options.*;
 
 /**
@@ -21,17 +22,20 @@ final class DialogValues extends DialogIndex {
   /**
    * Constructor.
    * @param dialog dialog reference
-   * @param text text/attribute flag
+   * @param type index type
    */
-  DialogValues(final BaseXDialog dialog, final boolean text) {
+  DialogValues(final BaseXDialog dialog, final IndexType type) {
     super(dialog);
 
     layout(new TableLayout(2, 1));
 
     final MainOptions opts = dialog.gui.context.options;
-    add(new BaseXLabel(text ? H_TEXT_INDEX : H_ATTR_INDEX, true, false).border(0, 0, 6, 0));
+    final String text = type == IndexType.TOKEN ? H_TOKEN_INDEX : type == IndexType.TEXT
+        ? H_TEXT_INDEX : H_ATTR_INDEX;
+    add(new BaseXLabel(text, true, false).border(0, 0, 8, 0));
 
-    inc = text ? MainOptions.TEXTINCLUDE : MainOptions.ATTRINCLUDE;
+    inc = type == IndexType.TOKEN ? MainOptions.TOKENINCLUDE : type == IndexType.TEXT
+        ? MainOptions.TEXTINCLUDE : MainOptions.ATTRINCLUDE;
     include = new BaseXTextField(opts.get(inc), dialog).hint(QNAME_INPUT);
     add(include);
   }

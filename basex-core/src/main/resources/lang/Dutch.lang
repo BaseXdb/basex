@@ -420,6 +420,7 @@ h_path_index         = Een 'path summary' (pad-index) versnelt het vergelijken v
 h_stemming           = Van termen wordt de stam bepaald voor ze geïndexeerd worden.
 h_stopwords          = Kies een stopword lijst om veelvoorkomende termen over te slaan.
 h_text_index         = Deze index versnelt tekst vergelijkingen in predicaten.
+h_token_index        = Faster lookup of tokens in attribute values.
 h_used_mem           = Als er weinig geheugen beschikbaar is, start\nBaseX dan met de Java vlag -Xmx<size>.
 
 # Commands

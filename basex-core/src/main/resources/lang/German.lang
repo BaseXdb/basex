@@ -420,6 +420,7 @@ h_path_index         = Ein Path Summary beschleunigt Pfadauflösungen.
 h_stemming           = Begriffe werden vor der Indexierung auf die Stammform reduziert.
 h_stopwords          = Auswahl einer Stoppwort-Liste, um häufige Begriffe zu ignorieren.
 h_text_index         = Dieser Index beschleunigt Textvergleiche in Prädikaten.
+h_token_index        = Schnellere Suche nach Tokens in Attributwerten.
 h_used_mem           = Der verfügbare Speicher kann mit dem Java-Flag -Xmx<size> erhöht werden.
 
 # Commands

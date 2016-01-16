@@ -420,6 +420,7 @@ h_path_index         = A path summary speeds up path resolutions.
 h_stemming           = Terms are stemmed before they are indexed.
 h_stopwords          = Choose a stopword list to skip frequent terms.
 h_text_index         = This index speeds up text comparisons in predicates.
+h_token_index        = Faster lookup of tokens in attribute values.
 h_used_mem           = If memory is low, please launch\nBaseX with the Java flag -Xmx<size>.
 
 # Commands
