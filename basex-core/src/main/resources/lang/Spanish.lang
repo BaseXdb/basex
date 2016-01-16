@@ -362,6 +362,7 @@ time_needed          = Tiempo necesario
 timeout_exceeded     = Excedido el tiempo máximo de espera.
 timestamp            = Marca de tiempo
 timing               = Horario
+token_index          = Índice del Token
 total_mem            = Memoria Total
 total_time           = Tiempo Total
 translation          = Traducción

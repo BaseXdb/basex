@@ -362,6 +362,7 @@ time_needed          = Time needed
 timeout_exceeded     = Timeout exceeded.
 timestamp            = Timestamp
 timing               = Timing
+token_index          = Token Index
 total_mem            = Total Memory
 total_time           = Total Time
 translation          = Translation

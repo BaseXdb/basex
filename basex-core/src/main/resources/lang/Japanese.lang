@@ -362,6 +362,7 @@ time_needed          = 所要時間
 timeout_exceeded     = タイムアウトになりました。
 timestamp            = タイムスタンプ
 timing               = タイミング
+token_index          = トークナイインデックス
 total_mem            = メモリ合計
 total_time           = 合計時間
 translation          = 翻訳

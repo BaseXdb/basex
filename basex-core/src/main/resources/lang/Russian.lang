@@ -362,6 +362,7 @@ time_needed          = Понадобилось времени
 timeout_exceeded     = Время ожидания вышло
 timestamp            = Метка времени
 timing               = Тайминги
+token_index          = Токен индекс
 total_mem            = Всего памяти
 total_time           = Итоговое время
 translation          = Перевод

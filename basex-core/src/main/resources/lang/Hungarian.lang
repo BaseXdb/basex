@@ -362,6 +362,7 @@ time_needed          = Idő szükséges
 timeout_exceeded     = Időtúllépés.
 timestamp            = Időbélyegző
 timing               = Időmérés
+token_index          = Token index
 total_mem            = Összes memória
 total_time           = Összes idő
 translation          = Fordítás

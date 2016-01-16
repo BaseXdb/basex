@@ -362,6 +362,7 @@ time_needed          = Timpul necesar
 timeout_exceeded     = Timeout depăşit.
 timestamp            = Timestamp
 timing               = Sincronizare
+token_index          = Token Index
 total_mem            = Memorie totală
 total_time           = Timp total
 translation          = Traducere

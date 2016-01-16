@@ -362,6 +362,7 @@ time_needed          = Tempo necessario
 timeout_exceeded     = Il processo ha raggiunto il timeout.
 timestamp            = Data
 timing               = Cronometraggio
+token_index          = Indice sul token
 total_mem            = Memoria totale
 total_time           = Tempo totale
 translation          = Traduzione

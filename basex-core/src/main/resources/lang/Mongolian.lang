@@ -362,6 +362,7 @@ time_needed          = Хугацаа шаардагдсан
 timeout_exceeded     = Ажиллуулахад их хугацаа шаардагдаж байна.
 timestamp            = Цаг тооцогч
 timing               = Хугацаа тооцоолж байна
+token_index          = Токен индекс
 total_mem            = Ерөнхий санах ой
 total_time           = Ерөнхий хугацаа
 translation          = Хэлний орчуулга

@@ -362,6 +362,7 @@ time_needed          = Temps d'exécution
 timeout_exceeded     = Délai expiré.
 timestamp            = Horodateur
 timing               = Timing
+token_index          = Index token
 total_mem            = Mémoire totale
 total_time           = Temps total
 translation          = Traduction
