@@ -43,19 +43,19 @@ public class DiskValues extends ValueIndex {
    * Constructor, initializing the index structure.
    * @param data data reference
    * @param text value type (texts/attributes)
-   * @param tokenize tokenizing index
+   * @param tokenize token index
    * @throws IOException I/O Exception
    */
   public DiskValues(final Data data, final boolean text, final boolean tokenize)
       throws IOException {
-    this(data, text, tokenize, getFileSuffix(text, tokenize));
+    this(data, text, tokenize, fileSuffix(text, tokenize));
   }
 
   /**
    * Constructor, initializing the index structure.
    * @param data data reference
    * @param text value type (texts/attributes)
-   * @param tokenize tokenizing index
+   * @param tokenize token index
    * @param pref file prefix
    * @throws IOException I/O Exception
    */
@@ -81,7 +81,7 @@ public class DiskValues extends ValueIndex {
       for(int m = 0; m < s; ++m) {
         final long pos = idxr.read5(m * 5L);
         final int oc = idxl.readNum(pos);
-        if(stats.adding(oc)) stats.add(data.text(pre(idxl.readNum()), text), oc);
+        if(stats.adding(oc)) stats.add(key(idxl.readNum()), oc);
       }
     }
     stats.print(tb);
@@ -110,7 +110,7 @@ public class DiskValues extends ValueIndex {
 
   @Override
   public final boolean drop() {
-    return data.meta.drop(getFileSuffix(text, tokenize) + '.');
+    return data.meta.drop(fileSuffix(text, tokenize) + '.');
   }
 
   @Override
@@ -192,15 +192,15 @@ public class DiskValues extends ValueIndex {
   /**
    * Returns a cache entry.
    * <p><em>Important:</em> This method is thread-safe.</p>
-   * @param tok token to be found or cached
+   * @param token token to be found or cached
    * @return cache entry
    */
-  private IndexEntry entry(final byte[] tok) {
-    final IndexEntry e = cache.get(tok);
+  private IndexEntry entry(final byte[] token) {
+    final IndexEntry e = cache.get(token);
     if(e != null) return e;
 
-    final long p = get(tok);
-    if(p < 0) return new IndexEntry(tok, 0, 0);
+    final long p = get(token);
+    if(p < 0) return new IndexEntry(token, 0, 0);
 
     final int count;
     final long offset;
@@ -213,7 +213,7 @@ public class DiskValues extends ValueIndex {
       offset = idxl.cursor();
     }
 
-    return cache.add(tok, count, offset);
+    return cache.add(token, count, offset);
   }
 
   /**
@@ -256,7 +256,7 @@ public class DiskValues extends ValueIndex {
         if(++ix < s) {
           synchronized(monitor) {
             final IndexEntry entry = indexEntry(ix);
-            if(startsWith(entry.key, prefix)) { // [JE] token semantics valid? -> tokenize
+            if(startsWith(entry.key, prefix)) {
               count = entry.size;
               return entry.key;
             }
@@ -354,9 +354,7 @@ public class DiskValues extends ValueIndex {
     final int sz = idxl.readNum(pos);
     final long off = pos + Num.length(sz);
     if(key == null) {
-      int id = idxl.readNum();
-      if(tokenize) key = Token.split(normalize(data.text(pre(id), text)), ' ')[idxl.readNum()];
-      else key = data.text(pre(id), text);
+      key = key(idxl.readNum());
       ctext.put(index, key);
     }
     return cache.add(key, sz, off);
@@ -375,7 +373,7 @@ public class DiskValues extends ValueIndex {
       idxl.cursor(offset);
       for(int i = 0, id = 0; i < sz; i++) {
         id += idxl.readNum();
-        // Pass over token position
+        // pass over token position
         if(tokenize) idxl.readNum();
         pres.add(pre(id));
       }
@@ -397,16 +395,14 @@ public class DiskValues extends ValueIndex {
       final int s = size();
       for(int l = i < 0 ? -i - 1 : tok.mni ? i : i + 1; l < s; l++) {
         final int ps = idxl.readNum(idxr.read5(l * 5L));
-        int id = idxl.readNum(); // [JE] Read next num, tokenize -> NotImplemented
-        final int pre = pre(id);
-
-        // value is too large: skip traversal
-        final int d = diff(data.text(pre, text), tok.max);
+        int id = idxl.readNum();
+        // skip traversal if value is too large
+        final int d = diff(key(id), tok.max);
         if(d > 0 || !tok.mxi && d == 0) break;
         // add pre values
         for(int p = 0; p < ps; ++p) {
           pres.add(pre(id));
-          id += idxl.readNum(); //[JE] Read next num, tokenize -> NotImplemented
+          id += idxl.readNum();
         }
       }
     }
@@ -438,7 +434,7 @@ public class DiskValues extends ValueIndex {
           // value is in range
           for(int d = 0; d < ds; ++d) {
             pres.add(pre(id));
-            id += idxl.readNum(); //[JE] Read next num, tokenize -> NotImplemented
+            id += idxl.readNum();
           }
         } else if(simple && v > max && data.textLen(pre, text) == len) {
           // if limits are integers, if min, max and current value have the same
@@ -470,34 +466,42 @@ public class DiskValues extends ValueIndex {
   }
 
   /**
+   * Returns the specified key, considering tokenization.
+   * @param id id of key
+   * @return key token
+   */
+  private byte[] key(final int id) {
+    final byte[] txt = data.text(pre(id), text);
+    return tokenize ? distinctTokens(txt)[idxl.readNum()] : txt;
+  }
+
+  /**
    * Returns a string representation of the index structure.
-   * @param all include database contents in the representation
+   * @param all include database contents in the representation. During updates, database lookups
+   *        must be avoided, as the data structures will be inconsistent.
    * @return string
    */
   public final String toString(final boolean all) {
-    final int sz = size();
     final TokenBuilder tb = new TokenBuilder();
     tb.add(text ? "TEXT" : "ATTRIBUTE").add(" INDEX, '").add(data.meta.name).add("':\n");
-    if(sz != 0) {
-      for(int m = 0; m < sz; m++) {
-        final long pos = idxr.read5(m * 5L);
-        final int oc = idxl.readNum(pos);
-        int id = idxl.readNum();
-        final int pre = all ? pre(id) : 0;
-        tb.add("  ").addInt(m).add(". offset: ").addLong(pos);
-        if(all) tb.add(", key: \"").add(data.text(pre, text)).add('"');
-        tb.add(", ids");
-        if(all) tb.add("/pres");
-        tb.add(": ");
-        tb.addInt(id);
-        if(all) tb.add('/').addInt(pre);
-        for(int n = 1; n < oc; n++) {
-          id += idxl.readNum();
-          tb.add(",").addInt(id);
-          if(all) tb.add('/').addInt(pre(id));
-        }
-        tb.add("\n");
+    final int s = size();
+    for(int m = 0; m < s; m++) {
+      final long pos = idxr.read5(m * 5L);
+      final int oc = idxl.readNum(pos);
+      int id = idxl.readNum();
+      tb.add("  ").addInt(m).add(". offset: ").addLong(pos);
+      if(all) {
+        tb.add(", key: \"").add(key(id)).add('"');
+        tb.add(", ids").add("/pres").add(": ").addInt(id).add('/').addInt(pre(id));
+      } else {
+        tb.add(", ids").add(": ").addInt(id);
       }
+      for(int n = 1; n < oc; n++) {
+        id += idxl.readNum();
+        tb.add(",").addInt(id);
+        if(all) tb.add('/').addInt(pre(id));
+      }
+      tb.add("\n");
     }
     return tb.toString();
   }
@@ -510,10 +514,10 @@ public class DiskValues extends ValueIndex {
   /**
    * Get file suffix for index.
    * @param text text index
-   * @param tokenize tokenizing index
+   * @param tokenize token index
    * @return file suffix
    */
-  static String getFileSuffix(final boolean text, final boolean tokenize) {
+  static String fileSuffix(final boolean text, final boolean tokenize) {
     return text ? DATATXT : tokenize ? DATAATT : DATAATV;
   }
 }

@@ -23,7 +23,7 @@ public abstract class ValueIndex implements Index {
    * Constructor, initializing the index structure.
    * @param data data reference
    * @param text value type (texts/attributes)
-   * @param tokenize tokenizing index
+   * @param tokenize token index
    */
   protected ValueIndex(final Data data, final boolean text, final boolean tokenize) {
     this.data = data;

@@ -42,7 +42,7 @@ abstract class Ids extends StandardFunc {
 
     final Data data = root.data();
     // [JE] Verify against indexNames, whether id/idref included at all
-    if(data == null || !idref && null == data.attrIndex || idref && null == data.attrTokenIndex) {
+    if(data == null || !idref && null == data.attrIndex || idref && null == data.tokenIndex) {
       final ANodeList list = new ANodeList().check();
       add(idSet, list, root, idref);
       return list.iter();
@@ -76,7 +76,7 @@ abstract class Ids extends StandardFunc {
     for(final ANode attr : node.attributes()) {
       if(isId(attr, idref)) {
         // id/idref found
-        for(final byte[] val : split(normalize(attr.string()), ' ')) {
+        for(final byte[] val : distinctTokens(attr.string())) {
           // correct value: add to results
           if(idSet.contains(val)) {
             results.add(idref ? attr.finish() : node);
@@ -120,7 +120,7 @@ abstract class Ids extends StandardFunc {
   private TokenSet ids(final Iter iter) throws QueryException {
     final TokenSet ts = new TokenSet();
     for(Item ids; (ids = iter.next()) != null;) {
-      for(final byte[] id : split(normalize(toToken(ids)), ' ')) ts.put(id);
+      for(final byte[] id : distinctTokens(toToken(ids))) ts.put(id);
     }
     return ts;
   }

@@ -15,12 +15,11 @@ public abstract class ValuesBuilder extends IndexBuilder {
    * Constructor.
    * @param data reference
    * @param text index type (text/attributes)
-   * @param tokenize tokenizing index
+   * @param tokenize token index
    */
   protected ValuesBuilder(final Data data, final boolean text, final boolean tokenize) {
-    super(data, data.meta.splitsize, text ? data.meta.textinclude
-                                         : tokenize ? data.meta.attrtokeninclude
-                                                   : data.meta.attrinclude, text, tokenize);
+    super(data, data.meta.splitsize, text ? data.meta.textinclude :
+      tokenize ? data.meta.tokeninclude : data.meta.attrinclude, text, tokenize);
   }
 
   @Override

@@ -52,11 +52,11 @@ public abstract class IndexFn extends StandardFunc {
     } else if(it == IndexType.ATTRIBUTE) {
       index = data.attrIndex;
       avl = data.meta.attrindex;
-    } else if(it == IndexType.ATTTOKEN) {
-      index = data.attrTokenIndex;
-      avl = data.meta.attrtokenindex;
+    } else if(it == IndexType.TOKEN) {
+      index = data.tokenIndex;
+      avl = data.meta.tokenindex;
     } else {
-      index = data.ftxtIndex;
+      index = data.ftIndex;
       avl = data.meta.ftindex;
     }
     if(!avl) throw BXDB_INDEX_X.get(call.info, data.meta.name,

@@ -40,11 +40,13 @@ public interface DataText {
   String DBUPDIDX = "UPDINDEX";
   /** Automatic optimization. */
   String DBAUTOOPT = "AUTOOPT";
-  /** Text indexing. */
+  /** Text index. */
   String DBTXTIDX = "TXTINDEX";
-  /** Attribute indexing. */
+  /** Attribute index. */
   String DBATVIDX = "ATVINDEX";
-  /** Full-text indexing. */
+  /** Token index. */
+  String DBTOKIDX = "TOKINDEX";
+  /** Full-text index. */
   String DBFTXIDX = "FTXINDEX";
   /** Text index: names. */
   String DBTXTINC = "TXTINC";
@@ -78,11 +80,13 @@ public interface DataText {
   String DBPERM = "PERM";
   /** Documents. */
   String DBDOCS = "DOCS";
-  /** Text indexing. */
+  /** Recreate text index. */
   String DBCRTTXT = "CRTTXT";
-  /** Attribute indexing. */
+  /** Recreate attribute index. */
   String DBCRTATV = "CRTATV";
-  /** Full-text indexing. */
+  /** Recreate token index. */
+  String DBCRTTOK = "CRTTOK";
+  /** Recreate full-text index. */
   String DBCRTFTX = "CRTFTX";
 
   /** Full-text wildcards indexing (legacy, obsolete). */
@@ -111,8 +115,8 @@ public interface DataText {
   String DATATXT = "txt";
   /** Database - Attribute value index. */
   String DATAATV = "atv";
-  /** Database - Attribute token value index. */
-  String DATAATT = "att";
+  /** Database - Token index. */
+  String DATAATT = "tok";
   /** Database - Full-text index. */
   String DATAFTX = "ftx";
   /** Database - Stopword list. */

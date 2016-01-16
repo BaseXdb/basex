@@ -808,14 +808,16 @@ public interface Text {
   /** "Strings were replaced.". */
   String STRINGS_REPLACED = lang("strings_replaced");
 
-  /** Info on text indexing. */
+  /** Info on text index. */
   String TEXT_INDEX = lang("text_index");
-  /** Info on attribute indexing. */
+  /** Info on attribute index. */
   String ATTRIBUTE_INDEX = lang("attribute_index");
-  /** Info on full-text indexing. */
+  /** Info on full-text index. */
   String FULLTEXT_INDEX = lang("fulltext_index");
   /** Info on path summary. */
   String PATH_INDEX = lang("path_index");
+  /** Info on token index. */
+  String TOKEN_INDEX = lang("token_index");
   /** Info on up-to-date. */
   String UP_TO_DATE = lang("up_to_date");
 

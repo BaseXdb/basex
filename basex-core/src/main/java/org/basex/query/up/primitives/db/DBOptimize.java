@@ -66,10 +66,10 @@ public final class DBOptimize extends DBUpdate {
     final MetaData meta = data.meta;
     options.assignIfEmpty(MainOptions.TEXTINDEX, meta.createtext);
     options.assignIfEmpty(MainOptions.ATTRINDEX, meta.createattr);
-    options.assignIfEmpty(MainOptions.FTINDEX, meta.createftxt);
+    options.assignIfEmpty(MainOptions.FTINDEX, meta.createft);
     options.assignIfEmpty(MainOptions.TEXTINCLUDE, meta.textinclude);
     options.assignIfEmpty(MainOptions.ATTRINCLUDE, meta.attrinclude);
-    options.assignIfEmpty(MainOptions.ATTRTOKENIZE, meta.attrtokeninclude);
+    options.assignIfEmpty(MainOptions.TOKENINCLUDE, meta.tokeninclude);
     options.assignIfEmpty(MainOptions.FTINCLUDE, meta.ftinclude);
     options.assignIfEmpty(MainOptions.INDEXSPLITSIZE, meta.splitsize);
     options.assignIfEmpty(MainOptions.FTINDEXSPLITSIZE, meta.ftsplitsize);
@@ -80,50 +80,49 @@ public final class DBOptimize extends DBUpdate {
     // adopt options to database meta data
     meta.createtext = opts.get(MainOptions.TEXTINDEX);
     meta.createattr = opts.get(MainOptions.ATTRINDEX);
-    meta.createattrtoken = opts.contains(MainOptions.ATTRTOKENIZE)
-        && !opts.get(MainOptions.ATTRTOKENIZE).isEmpty();
-    meta.createftxt = opts.get(MainOptions.FTINDEX);
+    meta.createtoken = opts.get(MainOptions.TOKENINDEX);
+    meta.createft = opts.get(MainOptions.FTINDEX);
     meta.updindex = opts.get(MainOptions.UPDINDEX);
 
     // check if other indexing options have changed
-    final int mc = opts.get(MainOptions.MAXCATS);
-    final int ml = opts.get(MainOptions.MAXLEN);
-    final String ti = opts.get(MainOptions.TEXTINCLUDE);
-    final String ai = opts.get(MainOptions.ATTRINCLUDE);
-    final String ait = opts.get(MainOptions.ATTRTOKENIZE);
-    final boolean rebuild = mc != meta.maxcats || ml != meta.maxlen;
-    final boolean rebuildText = rebuild || !meta.textinclude.equals(ti);
-    final boolean rebuildAttr = rebuild || !meta.attrinclude.equals(ai);
-    final boolean rebuildAttrToken = rebuild || !meta.attrtokeninclude.equals(ai);
-    meta.textinclude = ti;
-    meta.attrinclude = ai;
-    meta.attrtokeninclude = ait;
-    meta.maxcats = mc;
-    meta.maxlen = ml;
+    final int maxcats = opts.get(MainOptions.MAXCATS);
+    final int maxlen = opts.get(MainOptions.MAXLEN);
+    final String textinclude = opts.get(MainOptions.TEXTINCLUDE);
+    final String attrinclude = opts.get(MainOptions.ATTRINCLUDE);
+    final String tokeninclude = opts.get(MainOptions.TOKENINCLUDE);
+    final boolean rebuild = maxcats != meta.maxcats || maxlen != meta.maxlen;
+    final boolean rebuildText = rebuild || !meta.textinclude.equals(textinclude);
+    final boolean rebuildAttr = rebuild || !meta.attrinclude.equals(attrinclude);
+    final boolean rebuildToken = rebuild || !meta.tokeninclude.equals(tokeninclude);
+    meta.textinclude = textinclude;
+    meta.attrinclude = attrinclude;
+    meta.tokeninclude = tokeninclude;
+    meta.maxcats = maxcats;
+    meta.maxlen = maxlen;
     meta.splitsize = opts.get(MainOptions.INDEXSPLITSIZE);
     meta.ftsplitsize = opts.get(MainOptions.FTINDEXSPLITSIZE);
 
     // check if fulltext indexing options have changed
-    final boolean st = opts.get(MainOptions.STEMMING);
-    final boolean cs = opts.get(MainOptions.CASESENS);
-    final boolean dc = opts.get(MainOptions.DIACRITICS);
-    final String sw = opts.get(MainOptions.STOPWORDS);
-    final Language ln = Language.get(opts);
-    final String fi = opts.get(MainOptions.FTINCLUDE);
-    final boolean rebuildFtx = rebuild || !ln.equals(meta.language) || st != meta.stemming ||
-        cs != meta.casesens || dc != meta.diacritics || !sw.equals(meta.stopwords) ||
-        !meta.ftinclude.equals(fi);
-    meta.language   = ln;
-    meta.stemming   = st;
-    meta.casesens   = cs;
-    meta.diacritics = dc;
-    meta.stopwords  = sw;
-    meta.ftinclude = fi;
+    final boolean stemming = opts.get(MainOptions.STEMMING);
+    final boolean casesens = opts.get(MainOptions.CASESENS);
+    final boolean diacritics = opts.get(MainOptions.DIACRITICS);
+    final String stopwords = opts.get(MainOptions.STOPWORDS);
+    final Language language = Language.get(opts);
+    final String ftinclude = opts.get(MainOptions.FTINCLUDE);
+    final boolean rebuildFt = rebuild || !language.equals(meta.language) ||
+        stemming != meta.stemming || casesens != meta.casesens || diacritics != meta.diacritics ||
+        !stopwords.equals(meta.stopwords) || !meta.ftinclude.equals(ftinclude);
+    meta.language   = language;
+    meta.stemming   = stemming;
+    meta.casesens   = casesens;
+    meta.diacritics = diacritics;
+    meta.stopwords  = stopwords;
+    meta.ftinclude = ftinclude;
     meta.autoopt = opts.get(MainOptions.AUTOOPTIMIZE);
 
     try {
       if(all) OptimizeAll.optimizeAll(data, qc.context, opts, null);
-      else Optimize.optimize(data, rebuildText, rebuildAttr, rebuildAttrToken, rebuildFtx, null);
+      else Optimize.optimize(data, rebuildText, rebuildAttr, rebuildToken, rebuildFt, null);
     } catch(final IOException ex) {
       throw UPDBOPTERR_X.get(info, ex);
     }

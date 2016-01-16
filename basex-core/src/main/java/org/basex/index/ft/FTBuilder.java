@@ -71,7 +71,7 @@ public final class FTBuilder extends IndexBuilder {
         // skip too long and stopword tokens
         if(tok.length <= data.meta.maxlen && (sw.isEmpty() || !sw.contains(tok))) {
           // check if main memory is exhausted
-          if((ntok++ & 0x0FFF) == 0 && split()) {
+          if((ntok++ & 0x0FFF) == 0 && splitRequired()) {
             writeIndex(true);
             finishSplit();
           }

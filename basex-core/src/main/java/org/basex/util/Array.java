@@ -133,7 +133,7 @@ public final class Array {
 
   /**
    * Sorts the specified tokens and returns an array with offsets to the sorted array.
-   * @param values values to sort by
+   * @param values values to sort by (will be sorted as well)
    * @param numeric numeric sort
    * @param ascending ascending
    * @return array containing the order
@@ -147,7 +147,7 @@ public final class Array {
 
   /**
    * Sorts the specified double values and returns an array with offsets to the sorted array.
-   * @param values values to sort by
+   * @param values values to sort by (will be sorted as well)
    * @param ascending ascending
    * @return array containing the order
    */
@@ -159,7 +159,7 @@ public final class Array {
 
   /**
    * Sorts the specified int values and returns an array with offsets to the sorted array.
-   * @param values values to sort by
+   * @param values values to sort by (will be sorted as well)
    * @param ascending ascending
    * @return array containing the order
    */
@@ -171,7 +171,7 @@ public final class Array {
 
   /**
    * Sorts the specified long values and returns an array with offsets to the sorted array.
-   * @param values values to sort by
+   * @param values values to sort by (will be sorted as well)
    * @param ascending ascending
    * @return array containing the order
    */
@@ -186,7 +186,7 @@ public final class Array {
    * @param size array size
    * @return number list
    */
-  private static IntList number(final int size) {
+  public static IntList number(final int size) {
     final int[] tmp = new int[size];
     for(int i = 0; i < size; ++i) tmp[i] = i;
     return new IntList(tmp);

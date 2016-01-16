@@ -51,6 +51,25 @@ public final class SelectiveIndexTest extends SandboxTest {
   }
 
   /**
+   * Tests the token index.
+   */
+  @Test
+  public void tokenIndex() {
+    set(MainOptions.TOKENINDEX, true);
+    try {
+      for(final Entry<String, Integer> entry : map().entrySet()) {
+        set(MainOptions.TOKENINCLUDE, entry.getKey());
+        execute(new CreateDB(NAME, FILE));
+        final int size = context.data().tokenIndex.size();
+        assertEquals("TokenIndex: \"" + entry.getKey() + "\": ", entry.getValue().intValue(), size);
+      }
+    } finally {
+      set(MainOptions.TOKENINCLUDE, "");
+      set(MainOptions.TOKENINDEX, false);
+    }
+  }
+
+  /**
    * Tests the full-text index.
    */
   @Test
@@ -62,7 +81,7 @@ public final class SelectiveIndexTest extends SandboxTest {
         final int value = entry.getValue();
         set(MainOptions.FTINCLUDE, key);
         execute(new CreateDB(NAME, FILE));
-        assertEquals("FTIndex: \"" + key + "\": ", value, context.data().ftxtIndex.size());
+        assertEquals("FTIndex: \"" + key + "\": ", value, context.data().ftIndex.size());
       }
     } finally {
       set(MainOptions.FTINCLUDE, "");

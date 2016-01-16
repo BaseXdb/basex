@@ -38,7 +38,7 @@ final class DiskValuesMerger {
    */
   DiskValuesMerger(final Data data, final boolean text, final boolean tokenize, final int i)
       throws IOException {
-    pref = DiskValues.getFileSuffix(text, tokenize) + i;
+    pref = DiskValues.fileSuffix(text, tokenize) + i;
     dk = new DataInput(data.meta.dbfile(pref + 't'));
     dv = new DiskValues(data, text, tokenize, pref);
     this.data = data;

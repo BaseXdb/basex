@@ -9,9 +9,9 @@ import org.basex.query.iter.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public final class DbAttribute extends DbText {
+public final class DbToken extends DbText {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    return attribute(valueAccess(false, false, qc), qc, 2);
+    return attribute(valueAccess(false, true, qc), qc, 2);
   }
 }

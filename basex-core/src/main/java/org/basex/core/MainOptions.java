@@ -79,6 +79,8 @@ public final class MainOptions extends Options {
   public static final BooleanOption ATTRINDEX = new BooleanOption("ATTRINDEX", true);
   /** Flag for creating a full-text index. */
   public static final BooleanOption FTINDEX = new BooleanOption("FTINDEX", false);
+  /** Flag for creating a token index. */
+  public static final BooleanOption TOKENINDEX = new BooleanOption("TOKENINDEX", false);
 
   /** Text index: names to include. */
   public static final StringOption TEXTINCLUDE = new StringOption("TEXTINCLUDE", "");
@@ -86,9 +88,8 @@ public final class MainOptions extends Options {
   public static final StringOption ATTRINCLUDE = new StringOption("ATTRINCLUDE", "");
   /** Full-text index: names to include. */
   public static final StringOption FTINCLUDE = new StringOption("FTINCLUDE", "");
-
-  /** Attribute index: names to include. */
-  public static final StringOption ATTRTOKENIZE = new StringOption("ATTRTOKENIZE", "");
+  /** Token index: names to include. */
+  public static final StringOption TOKENINCLUDE = new StringOption("TOKENINCLUDE", "");
 
   /** Maximum number of text/attribute index entries to keep in memory during index creation. */
   public static final NumberOption INDEXSPLITSIZE = new NumberOption("INDEXSPLITSIZE", 0);

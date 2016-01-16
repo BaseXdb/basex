@@ -71,15 +71,14 @@ public final class DiskData extends Data {
     init();
     if(meta.updindex) {
       idmap = new IdPreMap(meta.dbfile(DATAIDP));
-      if(meta.textindex) textIndex = new UpdatableDiskValues(this, true, false);
-      if(meta.attrindex) attrIndex = new UpdatableDiskValues(this, false, false);
-      if(meta.attrtokenindex) attrTokenIndex = new UpdatableDiskValues(this, false, true);
+      if(meta.textindex) textIndex = new UpdatableDiskValues(this, true);
+      if(meta.attrindex) attrIndex = new UpdatableDiskValues(this, false);
     } else {
       if(meta.textindex) textIndex = new DiskValues(this, true, false);
       if(meta.attrindex) attrIndex = new DiskValues(this, false, false);
-      if(meta.attrtokenindex) attrTokenIndex = new DiskValues(this, false, true);
     }
-    if(meta.ftindex) ftxtIndex = new FTIndex(this);
+    if(meta.tokenindex) tokenIndex = new DiskValues(this, false, true);
+    if(meta.ftindex) ftIndex = new FTIndex(this);
   }
 
   /**
@@ -150,7 +149,7 @@ public final class DiskData extends Data {
       values.close();
       close(IndexType.TEXT);
       close(IndexType.ATTRIBUTE);
-      close(IndexType.ATTTOKEN);
+      close(IndexType.TOKEN);
       close(IndexType.FULLTEXT);
     } catch(final IOException ex) {
       Util.stack(ex);
@@ -183,7 +182,7 @@ public final class DiskData extends Data {
     switch(type) {
       case TEXT:      ib = new DiskValuesBuilder(this, true, false); break;
       case ATTRIBUTE: ib = new DiskValuesBuilder(this, false, false); break;
-      case ATTTOKEN:  ib = new DiskValuesBuilder(this, false, true); break;
+      case TOKEN:     ib = new DiskValuesBuilder(this, false, true); break;
       case FULLTEXT:  ib = new FTBuilder(this); break;
       default:        throw Util.notExpected();
     }
@@ -208,8 +207,8 @@ public final class DiskData extends Data {
     switch(type) {
       case TEXT:      textIndex = index; break;
       case ATTRIBUTE: attrIndex = index; break;
-      case ATTTOKEN:  attrTokenIndex = index; break;
-      case FULLTEXT:  ftxtIndex = index; break;
+      case TOKEN:     tokenIndex = index; break;
+      case FULLTEXT:  ftIndex = index; break;
       default:        break;
     }
   }
@@ -251,7 +250,6 @@ public final class DiskData extends Data {
         values.flush();
         if(textIndex != null) textIndex.flush();
         if(attrIndex != null) attrIndex.flush();
-        if(attrTokenIndex != null) attrTokenIndex.flush();
       }
     } catch(final IOException ex) {
       Util.stack(ex);

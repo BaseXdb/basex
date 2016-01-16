@@ -240,6 +240,18 @@ public class IntList extends ElementList {
   }
 
   /**
+   * Sorts the data and returns an array with offsets to the sorted array.
+   * See {@link Array#createOrder(int[], boolean)} for more details.
+   * @return array with new order
+   */
+  public int[] createOrder() {
+    final IntList il = Array.number(size);
+    il.sort(list, true);
+    return il.finish();
+  }
+
+
+  /**
    * Sorts the data.
    * @return self reference
    */

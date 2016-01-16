@@ -78,8 +78,8 @@ public final class ValueAccess extends IndexAccess {
     // use index traversal if index exists and if term is not too long.
     // otherwise, scan data sequentially
     final Data data = ictx.data;
-    final IndexIterator ii = (text ? data.meta.textindex : tokenize ? data.meta.attrtokenindex
-                                                                   : data.meta.attrindex)
+    final IndexIterator ii = (text ? data.meta.textindex : tokenize
+                                   ? data.meta.tokenindex : data.meta.attrindex)
         && tl > 0
         && tl <= data.meta.maxlen ? data.iter(new StringToken(text, term)) : scan(term);
 
@@ -199,20 +199,15 @@ public final class ValueAccess extends IndexAccess {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(
-        plan,
-        planElem(DATA, ictx.data.meta.name, TYP, text ? IndexType.TEXT
-                                                     : tokenize ? IndexType.ATTTOKEN
-                                                               : IndexType.ATTRIBUTE, NAM, test),
-        expr);
+    addPlan(plan, planElem(DATA, ictx.data.meta.name, TYP, text ? IndexType.TEXT :
+      tokenize ? IndexType.TOKEN : IndexType.ATTRIBUTE, NAM, test), expr);
   }
 
   @Override
   public String toString() {
     final TokenBuilder string = new TokenBuilder();
-    // [JE]  Token Index information
-    string.add((text ? Function._DB_TEXT : Function._DB_ATTRIBUTE).get(
-        null, info, Str.get(ictx.data.meta.name), expr).toString());
+    string.add((text ? Function._DB_TEXT : tokenize ? Function._DB_TOKEN : Function._DB_ATTRIBUTE).
+        get(null, info, Str.get(ictx.data.meta.name), expr).toString());
     if(test != null) string.add("/parent::").addExt(test);
     return string.toString();
   }

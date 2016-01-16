@@ -222,6 +222,8 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new XQuery(_DB_RETRIEVE.args(NAME, "foo")), false, NAME_LIST);
     ckDBs(new XQuery(_DB_TEXT.args(NAME, "foo")), false, NAME_LIST);
     ckDBs(new XQuery(_DB_TEXT_RANGE.args(NAME, 23, 42)), false, NAME_LIST);
+    ckDBs(new XQuery(_DB_TOKEN.args(NAME, "foo")), false, NAME_LIST);
+    ckDBs(new XQuery(_DB_TOKEN.args(NAME, 23, 42)), false, NAME_LIST);
 
     // Updates
     ckDBs(new XQuery(_DB_CREATE.args(NAME)), true, NAME_LIST);

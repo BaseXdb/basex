@@ -132,8 +132,8 @@ public final class OptimizeAll extends ACreate {
         // adopt original meta data
         dt.meta.createtext = ometa.createtext;
         dt.meta.createattr = ometa.createattr;
-        dt.meta.createattrtoken = ometa.createattrtoken;
-        dt.meta.createftxt = ometa.createftxt;
+        dt.meta.createtoken = ometa.createtoken;
+        dt.meta.createft = ometa.createft;
         dt.meta.filesize   = ometa.filesize;
         dt.meta.dirty      = true;
         CreateIndex.create(dt, cmd);

@@ -23,7 +23,7 @@ public final class StemDir extends TokenMap {
     try {
       for(final byte[] sl : split(fl.read(), '\n')) {
         byte[] val = null;
-        for(final byte[] st : split(normalize(sl), ' ')) {
+        for(final byte[] st : distinctTokens(sl)) {
           if(val == null) val = st;
           else put(st, val);
         }

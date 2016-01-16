@@ -50,22 +50,22 @@ public final class DiskValuesBuilder extends ValuesBuilder {
   public DiskValues build() throws IOException {
     Util.debug(det());
 
-    // TODO factor out (duplicate code DiskValuesBuilder/MemValuesBuilder)
+    // [JE] factor out (duplicate code DiskValuesBuilder/MemValuesBuilder)
+    final boolean updindex = data.meta.updindex && !tokenize;
     for(pre = 0; pre < size; ++pre) {
       if((pre & 0x0FFF) == 0) check();
       if(indexEntry() && data.textLen(pre, text) <= data.meta.maxlen) {
         if(tokenize) {
           byte[] token = data.text(pre, text);
           int pos = 0;
-          // [JE] filter duplicates if (hashSet.add...)?
-          for(final byte[] tok : Token.split(normalize(token), ' ')) {
+          for(final byte[] tok : distinctTokens(token)) {
             if(tok.length <= data.meta.maxlen) {
-              index.add(tok, data.meta.updindex ? data.id(pre) : pre, pos++);
+              index.add(tok, updindex ? data.id(pre) : pre, pos++);
               count++;
             }
           }
         } else {
-          index.add(data.text(pre, text), data.meta.updindex ? data.id(pre) : pre, 0);
+          index.add(data.text(pre, text), updindex ? data.id(pre) : pre, 0);
           count++;
         }
       }
@@ -79,15 +79,14 @@ public final class DiskValuesBuilder extends ValuesBuilder {
     }
 
     finishIndex();
-    return data.meta.updindex ? new UpdatableDiskValues(data, text, tokenize)
-                              : new DiskValues(data, text, tokenize);
+    return updindex ? new UpdatableDiskValues(data, text) : new DiskValues(data, text, tokenize);
   }
 
   @Override
   protected void check() throws IOException {
     super.check();
     // check if main memory is exhausted
-    if(split()) {
+    if(splitRequired()) {
       writeIndex(true);
       index = new IndexTree(tokenize);
       finishSplit();
@@ -99,7 +98,7 @@ public final class DiskValuesBuilder extends ValuesBuilder {
    * @throws IOException I/O exception
    */
   private void merge() throws IOException {
-    final String f = DiskValues.getFileSuffix(text, tokenize);
+    final String f = DiskValues.fileSuffix(text, tokenize);
     int sz = 0;
     try(final DataOutput outL = new DataOutput(data.meta.dbfile(f + 'l'));
         final DataOutput outR = new DataOutput(data.meta.dbfile(f + 'r'))) {
@@ -107,7 +106,7 @@ public final class DiskValuesBuilder extends ValuesBuilder {
 
       // initialize cached index iterators
       final IntList ml = new IntList();
-      final LongList il = new LongList();
+      final IntList id = new IntList(), pos = tokenize ? new IntList() : null;
       final DiskValuesMerger[] vm = new DiskValuesMerger[splits];
       for(int i = 0; i < splits; ++i) vm[i] = new DiskValuesMerger(data, text, tokenize, i);
 
@@ -137,19 +136,19 @@ public final class DiskValuesBuilder extends ValuesBuilder {
         final int ms = ml.size();
         for(int m = 0; m < ms; ++m) {
           final DiskValuesMerger t = vm[ml.get(m)];
-          final int vl = t.values.length;
-          for(int l = 4; l < vl; l += Num.length(t.values, l)) {
-            long value = Num.get(t.values, l);
+          final byte[] values = t.values;
+          final int vl = values.length;
+          for(int l = 4; l < vl; l += Num.length(values, l)) {
+            id.add(Num.get(values, l));
             if(tokenize) {
-              l += Num.length(t.values, l);
-              value = value << 32 | Num.get(t.values, l);
+              l += Num.length(values, l);
+              pos.add(Num.get(values, l));
             }
-            il.add(value);
           }
           t.next();
         }
         // write final structure to disk
-        write(outL, outR, il, tokenize);
+        write(outL, outR, id, pos);
         ++sz;
       }
     }
@@ -167,12 +166,12 @@ public final class DiskValuesBuilder extends ValuesBuilder {
    */
   private void writeIndex(final boolean partial) throws IOException {
     // write id arrays and references
-    final String name = DiskValues.getFileSuffix(text, tokenize) + (partial ? splits : "");
+    final String name = DiskValues.fileSuffix(text, tokenize) + (partial ? splits : "");
     try(final DataOutput outL = new DataOutput(data.meta.dbfile(name + 'l'));
         final DataOutput outR = new DataOutput(data.meta.dbfile(name + 'r'))) {
       outL.write4(index.size());
 
-      final LongList il = new LongList();
+      final IntList id = new IntList(), pos = tokenize ? new IntList() : null;
       index.init();
       while(index.more()) {
         final byte[] values = index.values.get(index.next());
@@ -185,15 +184,14 @@ public final class DiskValuesBuilder extends ValuesBuilder {
         } else {
           // cache and sort all values
           for(int ip = 4; ip < vs; ip += Num.length(values, ip)) {
-            long value = Num.get(values, ip);
+            id.add(Num.get(values, ip));
             if(tokenize) {
               ip += Num.length(values, ip);
-              value = value << 32 | Num.get(values, ip);
+              pos.add(Num.get(values, ip));
             }
-            il.add(value);
           }
           // write final structure to disk
-          write(outL, outR, il, tokenize);
+          write(outL, outR, id, pos);
         }
       }
     }
@@ -213,36 +211,38 @@ public final class DiskValuesBuilder extends ValuesBuilder {
    * Writes the final value structure to disk.
    * @param outL index values
    * @param outR references
-   * @param il values
-   * @param tokenize tokenizing index
+   * @param id ids
+   * @param pos positions (can be {@code null})
    * @throws IOException I/O exception
    */
-  private static void write(final DataOutput outL, final DataOutput outR, final LongList il,
-      final boolean tokenize) throws IOException {
+  private void write(final DataOutput outL, final DataOutput outR, final IntList id,
+      final IntList pos) throws IOException {
+
     // sort values before writing
-    il.sort();
-    final int is = il.size();
+    int[] order = null;
+    if(tokenize) {
+      // tokenization: create array with offsets to ordered values
+      order = id.createOrder();
+    } else {
+      // no token index: simple sort
+      id.sort();
+    }
+
+    final int is = id.size();
     outR.write5(outL.size());
     outL.writeNum(is);
     for(int i = 0, old = 0; i < is; i++) {
-      final long value = il.get(i);
-      // Also write out position
-      if(tokenize) {
-        int v = (int) (value >> 32);
-        outL.writeNum(v - old);
-        old = v;
-        outL.writeNum((int) value);
-      } else {
-        outL.writeNum((int) value - old);
-        old = (int) value;
-      }
+      final int value = id.get(i);
+      outL.writeNum(value - old);
+      if(tokenize) outL.writeNum(pos.get(order[i]));
+      old = value;
     }
-    il.reset();
+    id.reset();
   }
 
   @Override
   protected void abort() {
     // drop index files
-    data.meta.drop(DiskValues.getFileSuffix(text, tokenize) + ".+");
+    data.meta.drop(DiskValues.fileSuffix(text, tokenize) + ".+");
   }
 }

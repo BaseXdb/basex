@@ -57,9 +57,11 @@ public final class ValueIndexTest extends QueryPlanTest {
   public void after() {
     set(MainOptions.MAINMEM, false);
     set(MainOptions.UPDINDEX, false);
+    set(MainOptions.TOKENINDEX, false);
     set(MainOptions.FTINDEX, false);
     set(MainOptions.TEXTINCLUDE, "");
     set(MainOptions.ATTRINCLUDE, "");
+    set(MainOptions.TOKENINCLUDE, "");
     set(MainOptions.FTINCLUDE, "");
   }
 

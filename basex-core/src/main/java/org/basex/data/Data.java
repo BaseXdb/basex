@@ -97,10 +97,10 @@ public abstract class Data {
   public ValueIndex textIndex;
   /** Attribute value index. */
   public ValueIndex attrIndex;
-  /** Attribute token value index. */
-  public ValueIndex attrTokenIndex;
-  /** Full-text index instance. */
-  public ValueIndex ftxtIndex;
+  /** Token index. */
+  public ValueIndex tokenIndex;
+  /** Full-text index. */
+  public ValueIndex ftIndex;
 
   /** Indicates if distances are to be updated. */
   public boolean updateDists = true;
@@ -203,8 +203,8 @@ public abstract class Data {
       case ATTNAME:   return attrNames;
       case TEXT:      return textIndex;
       case ATTRIBUTE: return attrIndex;
-      case ATTTOKEN:  return attrTokenIndex;
-      case FULLTEXT:  return ftxtIndex;
+      case TOKEN:     return tokenIndex;
+      case FULLTEXT:  return ftIndex;
       case PATH:      return paths;
       default:        throw Util.notExpected();
     }
@@ -506,17 +506,10 @@ public abstract class Data {
           pres.add(pre);
           attrIndex.delete(cache(pres, false));
         }
-        if(meta.updindex && meta.attrtokenindex) {
-          pres.add(pre);
-          attrTokenIndex.delete(cache(pres, false));
-        }
         table.write1(pre, 11, uriId);
         table.write2(pre, 1, attrNames.index(name, null, false));
         if(nsFlag) table.write2(nsPre, 1, 1 << 15 | nameId(nsPre));
-        if(!pres.isEmpty()) {
-          attrIndex.add(cache(pres, false));
-          attrTokenIndex.add(cache(pres, false));
-        }
+        if(!pres.isEmpty()) attrIndex.add(cache(pres, false));
       } else {
         // update text index
         if(meta.updindex && meta.textindex) {
@@ -1054,7 +1047,6 @@ public abstract class Data {
     if(meta.updindex) {
       if(meta.textindex) textIndex.delete(cache(pre, size, true));
       if(meta.attrindex) attrIndex.delete(cache(pre, size, false));
-      if(meta.attrtokenindex) attrTokenIndex.delete(cache(pre, size, false));
       if(id != -1) idmap.delete(pre, id, -size);
     }
   }
@@ -1072,7 +1064,6 @@ public abstract class Data {
       if(id != -1) idmap.insert(pre, id, size);
       if(meta.textindex) textIndex.add(cache(pre, size, true));
       if(meta.attrindex) attrIndex.add(cache(pre, size, false));
-      if(meta.attrtokenindex) attrTokenIndex.add(cache(pre, size, false));
     }
   }
 

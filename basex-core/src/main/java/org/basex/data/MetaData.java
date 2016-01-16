@@ -43,8 +43,8 @@ public final class MetaData {
   public boolean textindex;
   /** Indicates if an attribute index exists. */
   public boolean attrindex;
-  /** Indicates if an attribute token index exists. */
-  public boolean attrtokenindex;
+  /** Indicates if a token index exists. */
+  public boolean tokenindex;
   /** Indicates if a full-text index exists. */
   public boolean ftindex;
 
@@ -59,18 +59,18 @@ public final class MetaData {
   public boolean createtext;
   /** Indicates if the attribute index is to be recreated. */
   public boolean createattr;
-  /** Indicates if the attribute token index is to be recreated. */
-  public boolean createattrtoken;
+  /** Indicates if the token index is to be recreated. */
+  public boolean createtoken;
   /** Indicates if the full-text index is to be recreated. */
-  public boolean createftxt;
+  public boolean createft;
   /** Text index: names to include. */
   public String textinclude = "";
   /** Attribute index: names to include. */
   public String attrinclude = "";
+  /** Token index: names to tokenize. */
+  public String tokeninclude = "";
   /** Full-text index: names to include. */
   public String ftinclude = "";
-  /** Attribute index: names to tokenize. */
-  public String attrtokeninclude = "";
 
   /** Flag for full-text stemming. */
   public boolean stemming;
@@ -133,9 +133,8 @@ public final class MetaData {
     chop = options.get(MainOptions.CHOP);
     createtext = options.get(MainOptions.TEXTINDEX);
     createattr = options.get(MainOptions.ATTRINDEX);
-    String createattrtokenstr = options.get(MainOptions.ATTRTOKENIZE);
-    createattrtoken = null != createattrtokenstr && !createattrtokenstr.isEmpty();
-    createftxt = options.get(MainOptions.FTINDEX);
+    createtoken = options.get(MainOptions.TOKENINDEX);
+    createft = options.get(MainOptions.FTINDEX);
     diacritics = options.get(MainOptions.DIACRITICS);
     stemming = options.get(MainOptions.STEMMING);
     casesens = options.get(MainOptions.CASESENS);
@@ -147,8 +146,8 @@ public final class MetaData {
     language = Language.get(options);
     textinclude = options.get(MainOptions.TEXTINCLUDE);
     attrinclude = options.get(MainOptions.ATTRINCLUDE);
+    tokeninclude = options.get(MainOptions.TOKENINCLUDE);
     ftinclude = options.get(MainOptions.FTINCLUDE);
-    attrtokeninclude = options.get(MainOptions.ATTRTOKENIZE);
     splitsize = options.get(MainOptions.INDEXSPLITSIZE);
     ftsplitsize = options.get(MainOptions.FTINDEXSPLITSIZE);
   }
@@ -325,6 +324,7 @@ public final class MetaData {
         else if(k.equals(DBAUTOOPT))  autoopt     = toBool(v);
         else if(k.equals(DBTXTIDX))   textindex   = toBool(v);
         else if(k.equals(DBATVIDX))   attrindex   = toBool(v);
+        else if(k.equals(DBTOKIDX))   tokenindex  = toBool(v);
         else if(k.equals(DBFTXIDX))   ftindex     = toBool(v);
         else if(k.equals(DBTXTINC))   textinclude = v;
         else if(k.equals(DBATVINC))   attrinclude = v;
@@ -333,7 +333,8 @@ public final class MetaData {
         else if(k.equals(DBFTSPLIT))  ftsplitsize = toInt(v);
         else if(k.equals(DBCRTTXT))   createtext  = toBool(v);
         else if(k.equals(DBCRTATV))   createattr  = toBool(v);
-        else if(k.equals(DBCRTFTX))   createftxt  = toBool(v);
+        else if(k.equals(DBCRTTOK))   createtoken = toBool(v);
+        else if(k.equals(DBCRTFTX))   createft    = toBool(v);
         else if(k.equals(DBWCIDX))    wcindex     = toBool(v);
         else if(k.equals(DBFTST))     stemming    = toBool(v);
         else if(k.equals(DBFTCS))     casesens    = toBool(v);
@@ -373,6 +374,7 @@ public final class MetaData {
     writeInfo(out, DBAUTOOPT,  autoopt);
     writeInfo(out, DBTXTIDX,   textindex);
     writeInfo(out, DBATVIDX,   attrindex);
+    writeInfo(out, DBTOKIDX,   tokenindex);
     writeInfo(out, DBFTXIDX,   ftindex);
     writeInfo(out, DBTXTINC,   textinclude);
     writeInfo(out, DBATVINC,   attrinclude);
@@ -381,7 +383,8 @@ public final class MetaData {
     writeInfo(out, DBFTSPLIT,  ftsplitsize);
     writeInfo(out, DBCRTTXT,   createtext);
     writeInfo(out, DBCRTATV,   createattr);
-    writeInfo(out, DBCRTFTX,   createftxt);
+    writeInfo(out, DBCRTTOK,   createtoken);
+    writeInfo(out, DBCRTFTX,   createft);
     writeInfo(out, DBFTST,     stemming);
     writeInfo(out, DBFTCS,     casesens);
     writeInfo(out, DBFTDC,     diacritics);
@@ -406,6 +409,7 @@ public final class MetaData {
       textindex = false;
       attrindex = false;
     }
+    tokenindex = false;
     ftindex = false;
   }
 

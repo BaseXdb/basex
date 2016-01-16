@@ -17,7 +17,7 @@ public class MemValuesBuilder extends ValuesBuilder {
    * Constructor.
    * @param data data reference
    * @param text value type (text/attribute)
-   * @param tokenize tokenizing index
+   * @param tokenize token index
    */
   public MemValuesBuilder(final Data data, final boolean text, final boolean tokenize) {
     super(data, text, tokenize);

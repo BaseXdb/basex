@@ -116,15 +116,15 @@ public final class Optimize extends ACreate {
   /**
    * Optimizes the structures of a database.
    * @param data data
-   * @param enforceTxt enforce text index operation
-   * @param enforceAtr enforce attribute index operation
-   * @param enforceAtrToken enforce attribute token index operation
-   * @param enforceFtx enforce full-text index operation
+   * @param enforceText enforce creation or deletion of text index
+   * @param enforceAttr enforce creation or deletion of attribute index
+   * @param enforceToken enforce creation or deletion of token index
+   * @param enforceFt enforce creation or deletion of full-text index
    * @param cmd calling command instance (may be {@code null})
    * @throws IOException I/O Exception during index rebuild
    */
-  public static void optimize(final Data data, final boolean enforceTxt, final boolean enforceAtr,
-      final boolean enforceAtrToken, final boolean enforceFtx, final Optimize cmd)
+  public static void optimize(final Data data, final boolean enforceText, final boolean enforceAttr,
+      final boolean enforceToken, final boolean enforceFt, final Optimize cmd)
       throws IOException {
 
     // initialize structural indexes
@@ -175,14 +175,14 @@ public final class Optimize extends ACreate {
     }
 
     // rebuild value indexes
-    optimize(IndexType.TEXT, data, md.createtext, md.textindex, enforceTxt, cmd);
-    optimize(IndexType.ATTRIBUTE, data, md.createattr, md.attrindex, enforceAtr, cmd);
-    optimize(IndexType.ATTTOKEN, data, md.createattrtoken, md.attrtokenindex, enforceAtrToken, cmd);
-    optimize(IndexType.FULLTEXT, data, md.createftxt, md.ftindex, enforceFtx, cmd);
+    optimize(IndexType.TEXT, data, md.createtext, md.textindex, enforceText, cmd);
+    optimize(IndexType.ATTRIBUTE, data, md.createattr, md.attrindex, enforceAttr, cmd);
+    optimize(IndexType.TOKEN, data, md.createtoken, md.tokenindex, enforceToken, cmd);
+    optimize(IndexType.FULLTEXT, data, md.createft, md.ftindex, enforceFt, cmd);
   }
 
   /**
-   * Optimizes the specified index if the old and new state is different.
+   * Creates or deletes the specified index if the old and new state is different.
    * @param type index type
    * @param data data reference
    * @param create new flag

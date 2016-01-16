@@ -102,7 +102,7 @@ public abstract class IndexBuilder extends Proc {
    * @return true if structures shall be flushed to disk
    * @throws IOException I/O Exception
    */
-  protected final boolean split() throws IOException {
+  protected final boolean splitRequired() throws IOException {
     // checks if a fixed split size has been specified
     final boolean split;
     if(splitSize > 0) {

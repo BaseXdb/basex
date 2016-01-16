@@ -13,7 +13,6 @@ import org.basex.core.cmd.*;
 import org.basex.core.cmd.Set;
 import org.basex.index.query.*;
 import org.basex.index.value.*;
-import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.junit.*;
 import org.junit.Test;
@@ -78,7 +77,7 @@ public final class ValueIndexTest extends SandboxTest {
   /** Set-up database. */
   @After
   public void setDown() {
-    execute(new Set(MainOptions.ATTRTOKENIZE, ""));
+    execute(new Set(MainOptions.TOKENINCLUDE, ""));
     execute(new DropDB(NAME));
   }
 
@@ -130,7 +129,7 @@ public final class ValueIndexTest extends SandboxTest {
     // Fetch index reference to be tested
     boolean text = IndexType.TEXT == indexType;
     ValueIndex index = text ? context.data().textIndex
-                            : IndexType.ATTTOKEN == indexType ? context.data().attrTokenIndex
+                            : IndexType.TOKEN == indexType ? context.data().tokenIndex
                                                               : context.data().attrIndex;
 
     // Receive, verify and count results for passed tokens
@@ -141,9 +140,9 @@ public final class ValueIndexTest extends SandboxTest {
       while(it.more()) {
         int pre = it.pre();
         final byte[] result = context.data().text(pre, text);
-        if(IndexType.ATTTOKEN == indexType)
+        if(IndexType.TOKEN == indexType)
           assertTrue("Token '" + entry.getKey() + "' not found in match '" + string(result) + "'!",
-              new TokenSet(Token.split(normalize(result), ' ')).contains(token(entry.getKey())));
+              new TokenSet(distinctTokens(result)).contains(token(entry.getKey())));
         else
           assertEquals("Wrong result returned!", entry.getKey(), string(result));
         count++;

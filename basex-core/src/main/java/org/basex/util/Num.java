@@ -149,7 +149,7 @@ public final class Num {
    * @param a array to be resized
    * @param p current array position
    * @param l length of new entry
-   * @return new array
+   * @return original or new array
    */
   private static byte[] check(final byte[] a, final int p, final int l) {
     final int s = a.length;

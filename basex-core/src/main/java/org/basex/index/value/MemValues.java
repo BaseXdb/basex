@@ -33,7 +33,7 @@ public final class MemValues extends ValueIndex {
    * Constructor.
    * @param data data instance
    * @param text value type (texts/attributes)
-   * @param tokenize tokenizing index
+   * @param tokenize token index
    */
   public MemValues(final Data data, final boolean text, final boolean tokenize) {
     super(data, text, tokenize);
@@ -154,30 +154,27 @@ public final class MemValues extends ValueIndex {
   void add(final byte[] key, final int... vals) {
     if(vals.length == 0) return;
 
-    byte[][] tokens = tokenize ? Token.split(normalize(key), ' ') : new byte[][] { key};
-    for(byte[] token : tokens) {
-      if(token.length <= data.meta.maxlen) {
-        // if required, resize existing arrays
-        final int id = tokenize ? values.put(token) : values.id(token), vl = vals.length;
-        while(idsList.size() < id + 1)
-          idsList.add(null);
-        if(lenList.size() < id + 1) lenList.set(id, 0);
+    final byte[][] tokens = tokenize ? distinctTokens(key) : new byte[][] { key };
+    for(final byte[] token : tokens) {
+      // if required, resize existing arrays
+      final int id = tokenize ? values.put(token) : values.id(token), vl = vals.length;
+      while(idsList.size() < id + 1) idsList.add(null);
+      if(lenList.size() < id + 1) lenList.set(id, 0);
 
-        final int len = lenList.get(id), size = len + vl;
-        int[] ids = idsList.get(id);
-        if(ids == null) {
-          ids = vals;
-        } else {
-          if(ids.length < size) ids = Arrays.copyOf(ids, Array.newSize(size));
-          System.arraycopy(vals, 0, ids, len, vl);
-          if(ids[len - 1] > vals[0]) {
-            if(reorder == null) reorder = new BoolList(values.size());
-            reorder.set(id, true);
-          }
+      final int len = lenList.get(id), size = len + vl;
+      int[] ids = idsList.get(id);
+      if(ids == null) {
+        ids = vals;
+      } else {
+        if(ids.length < size) ids = Arrays.copyOf(ids, Array.newSize(size));
+        System.arraycopy(vals, 0, ids, len, vl);
+        if(ids[len - 1] > vals[0]) {
+          if(reorder == null) reorder = new BoolList(values.size());
+          reorder.set(id, true);
         }
-        idsList.set(id, ids);
-        lenList.set(id, size);
       }
+      idsList.set(id, ids);
+      lenList.set(id, size);
     }
   }
 
@@ -231,36 +228,35 @@ public final class MemValues extends ValueIndex {
 
   /**
    * Returns a string representation of the index structure.
-   * @param all include database contents in the representation
+   * @param all include database contents in the representation. During updates, database lookups
+   *        must be avoided, as the data structures will be inconsistent.
    * @return string
    */
   public String toString(final boolean all) {
-    final int s = lenList.size();
     final TokenBuilder tb = new TokenBuilder();
     tb.add(text ? "TEXT" : "ATTRIBUTE").add(" INDEX, '").add(data.meta.name).add("':\n");
-    if(s != 0) {
-      for(int m = 1; m < s; m++) {
-        final int len = lenList.get(m);
-        if(len == 0) continue;
-        final int[] ids = idsList.get(m);
-        tb.add("  ").addInt(m);
-        if(all) tb.add(", key: \"").add(data.text(data.pre(ids[0]), text)).add('"');
-        tb.add(", ids");
-        if(all) tb.add("/pres");
-        tb.add(": ");
-        for(int n = 0; n < len; n++) {
-          if(n != 0) tb.add(",");
-          tb.addInt(ids[n]);
-          if(all) tb.add('/').addInt(data.pre(ids[n]));
-        }
-        tb.add("\n");
+    final int s = lenList.size();
+    for(int m = 1; m < s; m++) {
+      final int len = lenList.get(m);
+      if(len == 0) continue;
+      final int[] ids = idsList.get(m);
+      tb.add("  ").addInt(m);
+      if(all) tb.add(", key: \"").add(data.text(data.pre(ids[0]), text)).add('"');
+      tb.add(", ids");
+      if(all) tb.add("/pres");
+      tb.add(": ");
+      for(int n = 0; n < len; n++) {
+        if(n != 0) tb.add(",");
+        tb.addInt(ids[n]);
+        if(all) tb.add('/').addInt(data.pre(ids[n]));
       }
+      tb.add("\n");
     }
     return tb.toString();
   }
 
   @Override
   public String toString() {
-    return toString(true);
+    return toString(false);
   }
 }

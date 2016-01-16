@@ -770,6 +770,9 @@ public enum Function {
   _DB_ATTRIBUTE_RANGE(DbAttributeRange.class, "attribute-range(database,from,to[,name])",
       arg(STR, ITEM, ITEM, STR), NOD_ZM, flag(NDT), DB_URI),
   /** XQuery function. */
+  _DB_TOKEN(DbToken.class, "token(database,string[,name])",
+      arg(STR, ITEM, STR), NOD_ZM, flag(NDT), DB_URI),
+  /** XQuery function. */
   _DB_LIST(DbList.class, "list([database[,path]])", arg(STR, STR), STR_ZM, flag(NDT), DB_URI),
   /** XQuery function. */
   _DB_LIST_DETAILS(DbListDetails.class, "list-details([database[,path]])", arg(STR, STR), ELM_ZM,

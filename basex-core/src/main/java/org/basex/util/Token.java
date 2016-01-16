@@ -3,6 +3,8 @@ package org.basex.util;
 import java.text.*;
 import java.util.*;
 
+import org.basex.util.list.*;
+
 /**
  * <p>This class provides convenience operations for handling 'Tokens'.
  * A token is a UTF-8 encoded string. It is represented as a byte array.</p>
@@ -914,6 +916,20 @@ public final class Token {
     }
     if(!tb.isEmpty()) split[s++] = tb.finish();
     return Array.copyOf(split, s);
+  }
+
+  /**
+   * Tokenizes the specified input and returns distinct tokens.
+   * @param token token to be split
+   * @return array
+   */
+  public static byte[][] distinctTokens(final byte[] token) {
+    final byte[][] tokens = split(normalize(token), ' ');
+    final TokenList tl = new TokenList(tokens.length);
+    for(final byte[] t : tokens) {
+      if(!tl.contains(t)) tl.add(t);
+    }
+    return tl.finish();
   }
 
   /**

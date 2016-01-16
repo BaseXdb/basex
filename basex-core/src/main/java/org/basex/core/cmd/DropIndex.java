@@ -43,12 +43,12 @@ public final class DropIndex extends ACreate {
       data.meta.createattr = false;
       data.meta.attrinclude = options.get(MainOptions.ATTRINCLUDE);
       type = IndexType.ATTRIBUTE;
-    } else if(ci == CmdIndex.ATTTOKEN) {
-      data.meta.createattr = false;
-      data.meta.attrinclude = options.get(MainOptions.ATTRTOKENIZE);
-      type = IndexType.ATTTOKEN;
+    } else if(ci == CmdIndex.TOKEN) {
+      data.meta.createtoken = false;
+      data.meta.tokeninclude = options.get(MainOptions.TOKENINCLUDE);
+      type = IndexType.TOKEN;
     } else if(ci == CmdIndex.FULLTEXT) {
-      data.meta.createftxt = false;
+      data.meta.createft = false;
       data.meta.ftinclude = options.get(MainOptions.FTINCLUDE);
       type = IndexType.FULLTEXT;
     } else {
@@ -85,8 +85,8 @@ public final class DropIndex extends ACreate {
       data.meta.textindex = false;
     } else if(type == IndexType.ATTRIBUTE) {
       data.meta.attrindex = false;
-    } else if(type == IndexType.ATTTOKEN) {
-      data.meta.attrtokenindex = false;
+    } else if(type == IndexType.TOKEN) {
+      data.meta.tokenindex = false;
     } else if(type == IndexType.FULLTEXT) {
       data.meta.ftindex = false;
     } else {

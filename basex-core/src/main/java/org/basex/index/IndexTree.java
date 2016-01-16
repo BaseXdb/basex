@@ -15,8 +15,6 @@ import org.basex.util.list.*;
 public class IndexTree {
   /** Factor for resize. */
   protected static final double FACTOR = 1.2;
-  /** Tokenize keys. */
-  final boolean tokenize;
 
   /** Keys saved in the tree. */
   public final TokenList keys = new TokenList(FACTOR);
@@ -30,21 +28,23 @@ public class IndexTree {
 
   /** Tree structure [left, right, parent]. */
   private final IntList tree = new IntList(FACTOR);
-  /** Flag if a node has been modified. */
+  /** Indicates which nodes have been modified. */
   private final BoolList mod = new BoolList();
+  /** Tokenize keys. */
+  private final boolean tokenize;
   /** Tree root node. */
   private int root = -1;
 
   /**
-   * Non-tokenizing IndexTree constructor.
+   * Constructor.
    */
-  public IndexTree() {
+  protected IndexTree() {
     this(false);
   }
 
   /**
-   * Non-tokenizing or tokenizing IndexTree constructor.
-   * @param tokenize create tokenizing index
+   * Constructor.
+   * @param tokenize create token index
    */
   public IndexTree(final boolean tokenize) {
     this.tokenize = tokenize;
@@ -52,13 +52,12 @@ public class IndexTree {
 
   /**
    * Indexes the specified key and value.
-   *
    * @param key key to be indexed
    * @param value value to be indexes
-   * @param pos token position, unsed for non-tokenizing indexes
+   * @param pos token position, used for token index
    */
   public final void add(final byte[] key, final int value, final int pos) {
-    add(key, value, true, pos);
+    add(key, value, pos, true);
   }
 
   /**
@@ -67,11 +66,11 @@ public class IndexTree {
    * Otherwise, a new index entry is created.
    * @param key key to be indexed
    * @param value value to be indexed
+   * @param pos token position, used for token index
    * @param exist flag for using existing index
-   * @param pos token position, unsed for non-tokenizing indexes
    * @return int node
    */
-  protected final int add(final byte[] key, final int value, final boolean exist, final int pos) {
+  protected final int add(final byte[] key, final int value, final int pos, final boolean exist) {
     // index is empty.. create root node
     if(root == -1) {
       root = newNode(key, value, pos, -1, exist);
@@ -83,14 +82,14 @@ public class IndexTree {
       final int c = Token.diff(key, keys.get(n));
       if(c == 0) {
         if(exist) {
-          valuesAdd(value, pos, n);
+          addValues(value, pos, n);
         } else {
           final int i = maps.get(Num.num(n));
           if(i < 0) {
             maps.put(Num.num(n), values.size());
-            valuesNewAdd(value, pos);
+            addNewValues(value, pos);
           } else {
-            valuesAdd(value, pos, i);
+            addValues(value, pos, i);
           }
         }
         return n;
@@ -109,30 +108,6 @@ public class IndexTree {
       }
       n = ch;
     }
-  }
-
-  /**
-   * Creates a new values list and add a value.
-   * @param value value to store
-   * @param pos token position, unsed for non-tokenizing indexes
-   */
-  private void valuesNewAdd(final int value, final int pos) {
-    byte[] vs = Num.newNum(value);
-    if(tokenize) vs = Num.add(vs, pos);
-    values.add(vs);
-  }
-
-  /**
-   * Appends a value to value list n.
-   * @param value Value to store
-   * @param pos token position, unsed for non-tokenizing indexes
-   * @param n values list to append to
-   */
-  private void valuesAdd(final int value, final int pos, final int n) {
-    byte[] vs = values.get(n);
-    vs = Num.add(vs, value);
-    if(tokenize) vs = Num.add(vs, pos);
-    values.set(n, vs);
   }
 
   /**
@@ -184,11 +159,35 @@ public class IndexTree {
   // PRIVATE METHODS ==========================================================
 
   /**
+   * Creates a new value list and adds a value.
+   * @param value value to store
+   * @param pos token position, used for token index
+   */
+  private void addNewValues(final int value, final int pos) {
+    byte[] vs = Num.newNum(value);
+    if(tokenize) vs = Num.add(vs, pos);
+    values.add(vs);
+  }
+
+  /**
+   * Appends a value to value list n.
+   * @param value value to store
+   * @param pos token position, used for token index
+   * @param n values list to append to
+   */
+  private void addValues(final int value, final int pos, final int n) {
+    byte[] vs = values.get(n);
+    vs = Num.add(vs, value);
+    if(tokenize) vs = Num.add(vs, pos);
+    values.set(n, vs);
+  }
+
+  /**
    * Creates a new node.
    * @param key node key
    * @param value node value
-   * @param pos token position, unsed for non-tokenizing indexes
-   * @param par pointer on parent node
+   * @param pos token position, used for token index
+   * @param par pointer to parent node
    * @param exist flag for reusing existing tree
    * @return pointer of the new node
    */
@@ -199,7 +198,7 @@ public class IndexTree {
     tree.add(par); // parent node
     mod.add(false);
     keys.add(key);
-    valuesNewAdd(value, pos);
+    addNewValues(value, pos);
     if(!exist) maps.put(Num.num(keys.size() - 1), values.size() - 1);
     return mod.size() - 1;
   }

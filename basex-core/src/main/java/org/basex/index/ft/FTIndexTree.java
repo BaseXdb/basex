@@ -35,7 +35,7 @@ final class FTIndexTree extends IndexTree {
    */
   void add(final byte[] tok, final int pre, final int pos, final int cf) {
     final int os = keys.size();
-    final int n = add(tok, pre, cf == 0, 0);
+    final int n = add(tok, pre, 0, cf == 0);
     if(os == keys.size()) {
       final int i = cf > 0 ? maps.get(Num.num(n)) : n;
       if(poss.size() > i && poss.get(i) != null) {
