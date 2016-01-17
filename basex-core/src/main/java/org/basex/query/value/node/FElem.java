@@ -419,7 +419,7 @@ public final class FElem extends FNode {
     if(ns != null) {
       final int nl = ns.size();
       for(int n = 0; n < nl; n++) {
-        tb.add(new FNamespace(ns.name(n), ns.value(n)).toString());
+        tb.add(new FNSpace(ns.name(n), ns.value(n)).toString());
       }
     }
     if(atts != null) {

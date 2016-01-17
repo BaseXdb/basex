@@ -14,7 +14,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
  */
-public final class FNamespace extends FNode {
+public final class FNSpace extends FNode {
   /** Namespace name. */
   private final byte[] name;
 
@@ -23,7 +23,7 @@ public final class FNamespace extends FNode {
    * @param n name
    * @param v value
    */
-  public FNamespace(final byte[] n, final byte[] v) {
+  public FNSpace(final byte[] n, final byte[] v) {
     super(NodeType.NSP);
     name = n;
     value = v;
@@ -41,7 +41,7 @@ public final class FNamespace extends FNode {
 
   @Override
   public FNode deepCopy(final MainOptions options) {
-    return new FNamespace(name, value);
+    return new FNSpace(name, value);
   }
 
   @Override

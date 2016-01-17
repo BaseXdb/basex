@@ -3,8 +3,7 @@ package org.basex.util.list;
 import org.basex.util.*;
 
 /**
- * This is an abstract class for storing elements of any kind in an array-based
- * list.
+ * This is an abstract class for storing elements of any kind in an array-based list.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen

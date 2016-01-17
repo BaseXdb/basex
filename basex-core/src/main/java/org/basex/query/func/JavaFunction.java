@@ -5,9 +5,6 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import java.lang.reflect.*;
-import java.lang.reflect.Array;
-import java.math.*;
-import java.net.*;
 import java.util.*;
 
 import javax.xml.datatype.*;
@@ -16,8 +13,7 @@ import javax.xml.namespace.*;
 import org.basex.core.locks.*;
 import org.basex.core.users.*;
 import org.basex.query.*;
-import org.basex.query.QueryModule.Lock;
-import org.basex.query.QueryModule.Requires;
+import org.basex.query.QueryModule.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.pkg.*;
@@ -39,22 +35,6 @@ import org.w3c.dom.*;
 public abstract class JavaFunction extends Arr {
   /** New keyword. */
   static final String NEW = "new";
-  /** Input Java types. */
-  private static final Class<?>[] JAVA = {
-    String.class,     boolean.class,    Boolean.class, byte.class,     Byte.class,
-    short.class,      Short.class,      int.class,     Integer.class,  long.class,
-    Long.class,       float.class,      Float.class,   double.class,   Double.class,
-    BigDecimal.class, BigInteger.class, QName.class,   char.class,     Character.class,
-    URI.class,        URL.class
-  };
-  /** Resulting XQuery types. */
-  private static final Type[] XQUERY = {
-    AtomType.STR, AtomType.BLN, AtomType.BLN, AtomType.BYT, AtomType.BYT,
-    AtomType.SHR, AtomType.SHR, AtomType.INT, AtomType.INT, AtomType.LNG,
-    AtomType.LNG, AtomType.FLT, AtomType.FLT, AtomType.DBL, AtomType.DBL,
-    AtomType.DEC, AtomType.ITR, AtomType.QNM, AtomType.STR, AtomType.STR,
-    AtomType.URI, AtomType.URI
-  };
 
   /** Static context. */
   final StaticContext sc;
@@ -137,7 +117,7 @@ public abstract class JavaFunction extends Arr {
     if(!obj.getClass().isArray()) return new Jav(obj, qc);
 
     // empty array
-    final int s = Array.getLength(obj);
+    final int s = java.lang.reflect.Array.getLength(obj);
     if(s == 0) return Empty.SEQ;
     // string array
     if(obj instanceof String[]) {
@@ -279,7 +259,7 @@ public abstract class JavaFunction extends Arr {
    * @return item type or {@code null} if no appropriate type was found
    */
   private static Type type(final Object o) {
-    final Type t = type(o.getClass());
+    final Type t = JavaMapping.type(o.getClass(), true);
     if(t != null) return t;
 
     if(o instanceof Element) return NodeType.ELM;
@@ -313,17 +293,6 @@ public abstract class JavaFunction extends Arr {
   }
 
   /**
-   * Returns an appropriate XQuery type for the specified Java class.
-   * @param type Java type
-   * @return item type or {@code null} if no appropriate type was found
-   */
-  private static Type type(final Class<?> type) {
-    final int jl = JAVA.length;
-    for(int j = 0; j < jl; ++j) if(JAVA[j] == type) return XQUERY[j];
-    return null;
-  }
-
-  /**
    * Returns a string representation of all found arguments.
    * @param args array with arguments
    * @return string representation
@@ -339,39 +308,42 @@ public abstract class JavaFunction extends Arr {
   }
 
   /**
-   * Converts the arguments to objects that match the specified function parameters.
+   * Converts the arguments to values that match the specified function parameters.
    * {@code null} is returned if conversion is not possible.
    * @param pTypes parameter types
    * @param vTypes indicates which parameter types are values
    * @param args arguments
    * @param stat static flag
-   * @return argument array or {@code null}
+   * @return converted arguments, or {@code null}
    * @throws QueryException query exception
    */
   protected static Object[] javaArgs(final Class<?>[] pTypes, final boolean[] vTypes,
       final Value[] args, final boolean stat) throws QueryException {
 
-    final int s = stat ? 0 : 1, al = args.length - s;
-    if(al != pTypes.length) return null;
+    // start with second argument if function is not static
+    final int s = stat ? 0 : 1, pl = pTypes.length;
+    if(pl != args.length - s) return null;
 
     // function arguments
     final boolean[] vType = vTypes == null ? values(pTypes) : vTypes;
-    final Object[] vals = new Object[al];
-    for(int a = 0; a < al; a++) {
-      final Class<?> param = pTypes[a];
-      final Value arg = args[s + a];
-      if(arg.type.instanceOf(type(param))) {
+    final Object[] vals = new Object[pl];
+    for(int p = 0; p < pl; p++) {
+      final Class<?> param = pTypes[p];
+      final Value arg = args[s + p];
+
+      if(arg.type.instanceOf(JavaMapping.type(param, true))) {
         // convert to Java object if an XQuery type exists for the function parameter
-        vals[a] = arg.toJava();
+        vals[p] = arg.toJava();
       } else {
         // convert to Java object if
         // - argument is of type {@link Jav}, wrapping a Java object, or
         // - function parameter is not of type {@link Value}, or a sub-class of it
-        vals[a] = arg instanceof Jav || !vType[a] ? arg.toJava() : arg;
-        // abort conversion if argument is not an instance of function parameter
-        if(!param.isInstance(vals[a])) {
+        vals[p] = arg instanceof Jav || !vType[p] ? arg.toJava() : arg;
+        // check if argument is an instance of the function parameter
+        if(!param.isInstance(vals[p])) {
+          // if no, check if argument is an empty sequence; otherwise, give up
           if(arg.isEmpty() && !param.isPrimitive()) {
-            vals[a] = null;
+            vals[p] = null;
           } else {
             return null;
           }

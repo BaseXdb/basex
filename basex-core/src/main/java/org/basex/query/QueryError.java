@@ -600,7 +600,7 @@ public enum QueryError {
   /** FORG0006. */
   WHICHMETHOD_X_X(FORG, 6, "Unknown Java method: %(%)."),
   /** FORG0006. */
-  JAVAARGS_X_X(FORG, 6, "Invalid Java arguments: % expected, % found."),
+  JAVAARGS_X_X_X_X(FORG, 6, "Invalid Java arguments: %(%) expected, %(%) found."),
   /** FORG0006. */
   JAVAERROR_X_X_X(FORG, 6, "%(%): %."),
 

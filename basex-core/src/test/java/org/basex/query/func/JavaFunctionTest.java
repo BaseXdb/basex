@@ -127,7 +127,7 @@ public final class JavaFunctionTest extends AdvancedQueryTest {
     error("import module namespace n='org.basex.query.func.JavaFunctionExample';"
         + "n:a(())", JAVAAMBIG_X_X_X);
     error("import module namespace n='org.basex.query.func.JavaFunctionExample';"
-        + "n:b(())", JAVAARGS_X_X);
+        + "n:b(())", JAVAARGS_X_X_X_X);
     error("import module namespace n='org.basex.query.func.JavaFunctionExample';"
         + "n:g(())", JAVAAMBIG_X_X_X);
   }

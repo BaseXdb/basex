@@ -32,7 +32,7 @@ public final class CNSpace extends CName {
   }
 
   @Override
-  public FNamespace item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public FNSpace item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] cp = toEmptyToken(name, qc);
     if(cp.length != 0 && !XMLToken.isNCName(cp)) throw INVNSNAME_X.get(info, cp);
 
@@ -41,7 +41,7 @@ public final class CNSpace extends CName {
     if(eq(cp, XMLNS)) throw CNINV_X.get(info, cp);
     if(eq(cu, XMLNS_URI) || cu.length == 0) throw CNINVNS_X.get(info, cu);
 
-    return new FNamespace(cp, cu);
+    return new FNSpace(cp, cu);
   }
 
   @Override

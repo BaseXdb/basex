@@ -10,6 +10,7 @@ import org.basex.query.*;
 import org.basex.query.QueryModule.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
+import org.basex.query.value.type.Type;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -83,10 +84,11 @@ final class JavaModuleFunc extends JavaFunction {
     final TokenBuilder expect = new TokenBuilder();
     for(final Class<?> param : method.getParameterTypes()) {
       if(!expect.isEmpty()) expect.add(", ");
-      expect.add(Util.className(param));
+      final Type t = JavaMapping.type(param, false);
+      expect.add(t != null ? t.toString() : Util.className(t));
     }
-    throw JAVAARGS_X_X.get(info, method.getName() + '(' + expect + ')',
-        method.getName() + '(' + foundArgs(args) + ')');
+    final String name = method.getName();
+    throw JAVAARGS_X_X_X_X.get(info, name, expect, name, foundArgs(args));
   }
 
   @Override

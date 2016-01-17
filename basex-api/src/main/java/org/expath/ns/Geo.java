@@ -310,7 +310,7 @@ public final class Geo extends QueryModule {
    * @throws QueryException query exception
    */
   @Deterministic @Requires(Permission.NONE)
-  public ANode buffer(final ANode node, final ANum distance) throws QueryException {
+  public ANode buffer(final ANode node, final Dbl distance) throws QueryException {
     return gmlWriter(checkGeo(node).buffer(distance.dbl()));
   }
 
