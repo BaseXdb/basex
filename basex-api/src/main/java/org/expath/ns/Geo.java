@@ -92,7 +92,7 @@ public final class Geo extends QueryModule {
    */
   @Deterministic @Requires(Permission.NONE)
   public ANode envelope(final ANode node) throws QueryException {
-    return gmlWriter(checkGeo(node).getEnvelope());
+    return toElement(checkGeo(node).getEnvelope());
   }
 
   /**
@@ -151,7 +151,7 @@ public final class Geo extends QueryModule {
    */
   @Deterministic @Requires(Permission.NONE)
   public ANode boundary(final ANode node) throws QueryException {
-    return gmlWriter(checkGeo(node).getBoundary());
+    return toElement(checkGeo(node).getBoundary());
   }
 
   /**
@@ -311,7 +311,7 @@ public final class Geo extends QueryModule {
    */
   @Deterministic @Requires(Permission.NONE)
   public ANode buffer(final ANode node, final ANum distance) throws QueryException {
-    return gmlWriter(checkGeo(node).buffer(distance.dbl()));
+    return toElement(checkGeo(node).buffer(distance.dbl()));
   }
 
   /**
@@ -323,7 +323,7 @@ public final class Geo extends QueryModule {
    */
   @Deterministic @Requires(Permission.NONE)
   public ANode convexHull(final ANode node) throws QueryException {
-    return gmlWriter(checkGeo(node).convexHull());
+    return toElement(checkGeo(node).convexHull());
   }
 
   /**
@@ -337,7 +337,7 @@ public final class Geo extends QueryModule {
   public ANode intersection(final ANode node1, final ANode node2) throws QueryException {
     final Geometry geo1 = checkGeo(node1);
     final Geometry geo2 = checkGeo(node2);
-    return gmlWriter(geo1.intersection(geo2));
+    return toElement(geo1.intersection(geo2));
   }
 
   /**
@@ -351,7 +351,7 @@ public final class Geo extends QueryModule {
   public ANode union(final ANode node1, final ANode node2) throws QueryException {
     final Geometry geo1 = checkGeo(node1);
     final Geometry geo2 = checkGeo(node2);
-    return gmlWriter(geo1.union(geo2));
+    return toElement(geo1.union(geo2));
   }
 
   /**
@@ -366,7 +366,7 @@ public final class Geo extends QueryModule {
   public ANode difference(final ANode node1, final ANode node2) throws QueryException {
     final Geometry geo1 = checkGeo(node1);
     final Geometry geo2 = checkGeo(node2);
-    return gmlWriter(geo1.difference(geo2));
+    return toElement(geo1.difference(geo2));
   }
 
   /**
@@ -381,7 +381,7 @@ public final class Geo extends QueryModule {
   public ANode symDifference(final ANode node1, final ANode node2) throws QueryException {
     final Geometry geo1 = checkGeo(node1);
     final Geometry geo2 = checkGeo(node2);
-    return gmlWriter(geo1.symDifference(geo2));
+    return toElement(geo1.symDifference(geo2));
   }
 
   /**
@@ -409,7 +409,7 @@ public final class Geo extends QueryModule {
     final Geometry geo = checkGeo(node);
     final long n = number.itr();
     if(n < 1 || n > geo.getNumGeometries()) throw GeoErrors.outOfRangeIdx(number);
-    return gmlWriter(geo.getGeometryN((int) n - 1));
+    return toElement(geo.getGeometryN((int) n - 1));
   }
 
   /**
@@ -469,7 +469,7 @@ public final class Geo extends QueryModule {
   @Deterministic @Requires(Permission.NONE)
   public ANode startPoint(final ANode node) throws QueryException {
     final Geometry geo = geo(node, "Line", Q_GML_LINEARRING, Q_GML_LINESTRING);
-    return gmlWriter(((LineString) geo).getStartPoint());
+    return toElement(((LineString) geo).getStartPoint());
   }
 
   /**
@@ -481,7 +481,7 @@ public final class Geo extends QueryModule {
   @Deterministic @Requires(Permission.NONE)
   public ANode endPoint(final ANode node) throws QueryException {
     final Geometry geo = geo(node, "Line", Q_GML_LINEARRING, Q_GML_LINESTRING);
-    return gmlWriter(((LineString) geo).getEndPoint());
+    return toElement(((LineString) geo).getEndPoint());
   }
 
   /**
@@ -536,8 +536,7 @@ public final class Geo extends QueryModule {
     final int max = geo.getNumPoints();
     final long n = number.itr();
     if(n < 1 || n > max) throw GeoErrors.outOfRangeIdx(number);
-
-    return gmlWriter(((LineString) geo).getPointN((int) n - 1));
+    return toElement(((LineString) geo).getPointN((int) n - 1));
   }
 
   /**
@@ -561,7 +560,7 @@ public final class Geo extends QueryModule {
    */
   @Deterministic @Requires(Permission.NONE)
   public ANode centroid(final ANode node) throws QueryException {
-    return gmlWriter(checkGeo(node).getCentroid());
+    return toElement(checkGeo(node).getCentroid());
   }
 
   /**
@@ -573,7 +572,7 @@ public final class Geo extends QueryModule {
    */
   @Deterministic @Requires(Permission.NONE)
   public ANode pointOnSurface(final ANode node) throws QueryException {
-    return gmlWriter(checkGeo(node).getInteriorPoint());
+    return toElement(checkGeo(node).getInteriorPoint());
   }
 
   /**
@@ -585,7 +584,7 @@ public final class Geo extends QueryModule {
   @Deterministic @Requires(Permission.NONE)
   public ANode exteriorRing(final ANode node) throws QueryException {
     final Geometry geo = geo(node, "Polygon", Q_GML_POLYGON);
-    return gmlWriter(((Polygon) geo).getExteriorRing());
+    return toElement(((Polygon) geo).getExteriorRing());
   }
 
   /**
@@ -613,7 +612,7 @@ public final class Geo extends QueryModule {
     final long n = number.itr();
     final int max = ((Polygon) geo).getNumInteriorRing();
     if(n < 1 || n > max) throw GeoErrors.outOfRangeIdx(number);
-    return gmlWriter(((Polygon) geo).getInteriorRingN((int) n - 1));
+    return toElement(((Polygon) geo).getInteriorRingN((int) n - 1));
   }
 
   // PRIVATE METHODS (hidden from user of module) ========================================
@@ -680,12 +679,12 @@ public final class Geo extends QueryModule {
   }
 
   /**
-   * Writes an geometry and returns a string representation of the geometry.
+   * Writes an geometry and returns a new element.
    * @param geometry geometry
    * @return DBNode database node
    * @throws QueryException exception
    */
-  private DBNode gmlWriter(final Geometry geometry) throws QueryException {
+  private ANode toElement(final Geometry geometry) throws QueryException {
     final String geo;
     try {
       // write geometry and add namespace declaration
@@ -697,7 +696,7 @@ public final class Geo extends QueryModule {
 
     try {
       final XMLParser parser = new XMLParser(new IOContent(geo), queryContext.context.options);
-      return new DBNode(MemBuilder.build(parser));
+      return new DBNode(MemBuilder.build(parser)).children().next();
     } catch(final IOException ex) {
       throw IOERR_X.get(null, ex);
     }

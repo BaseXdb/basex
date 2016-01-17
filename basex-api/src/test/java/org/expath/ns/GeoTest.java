@@ -337,7 +337,7 @@ public final class GeoTest extends SandboxTest {
             "<gml:LinearRing><gml:coordinates>1,1 55,99 2,1</gml:coordinates>" +
             "</gml:LinearRing>, xs:double(1))", GeoErrors.qname(2));
     error("geo:buffer(<gml:LinearRing><gml:coordinates>1,1 55,99 1,1" +
-            "</gml:coordinates></gml:LinearRing>, 1)", EXPTYPE_X_X_X.qname());
+            "</gml:coordinates></gml:LinearRing>, 's')", EXPTYPE_X_X_X.qname());
     error("geo:buffer(xs:double(1))", FUNCARGNUM_X_X_X.qname());
   }
 
