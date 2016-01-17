@@ -78,6 +78,7 @@ public final class Catch extends Single {
         Str.get(ex.getMessage().replaceAll("\r\n?", "\n")) }) {
       qc.set(vars[i++], v, info);
     }
+    Util.debug(ex);
     return qc.value(expr);
   }
 

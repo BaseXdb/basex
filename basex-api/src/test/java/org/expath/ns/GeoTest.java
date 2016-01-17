@@ -22,7 +22,7 @@ public final class GeoTest extends SandboxTest {
     run("geo:dimension(" +
             "<gml:Point><gml:coordinates>1,2</gml:coordinates></gml:Point>)", "0");
 
-    error("geo:dimension(text {'a'})", EXPTYPE_X_X_X.qname());
+    error("geo:dimension(text {'a'})", INVCAST_X_X_X.qname());
     error("geo:dimension(<gml:unknown/>)", GeoErrors.qname(1));
     error("geo:dimension(<gml:Point>" +
             "<gml:coordinates>1 2</gml:coordinates></gml:Point>)",
@@ -37,7 +37,7 @@ public final class GeoTest extends SandboxTest {
             "<gml:Point><gml:coordinates>1,2</gml:coordinates></gml:Point>" +
             "</gml:MultiPoint>)", "gml:MultiPoint");
 
-    error("geo:geometryType(text {'srsName'})", EXPTYPE_X_X_X.qname());
+    error("geo:geometryType(text {'srsName'})", INVCAST_X_X_X.qname());
     error("geo:geometryType(<gml:unknown/>)", GeoErrors.qname(1));
     error("geo:geometryType(<gml:Point><gml:coordinates>1 2</gml:coordinates>" +
             "</gml:Point>)", GeoErrors.qname(2));
@@ -52,7 +52,7 @@ public final class GeoTest extends SandboxTest {
             "-150,50 -150,60 -125,60 -125,50 -150,50" +
             "</coordinates></gml:LinearRing></outerboundaryIs></gml:Polygon>)", "0");
 
-    error("geo:srid(text {'a'})", EXPTYPE_X_X_X.qname());
+    error("geo:srid(text {'a'})", INVCAST_X_X_X.qname());
     error("geo:srid(<gml:unknown/>)", GeoErrors.qname(1));
     error("geo:srid(<gml:LinearRing><gml:pos>1,1 20,1 50,30 1,1</gml:pos>" +
             "</gml:LinearRing>)", GeoErrors.qname(2));
@@ -68,7 +68,7 @@ public final class GeoTest extends SandboxTest {
             "<gml:coordinates>1.0,1.0 1.0,30.0 50.0,30.0 50.0,1.0 1.0,1.0" +
             "</gml:coordinates></gml:LinearRing></gml:outerBoundaryIs></gml:Polygon>");
 
-    error("geo:envelope(text {'a'})", EXPTYPE_X_X_X.qname());
+    error("geo:envelope(text {'a'})", INVCAST_X_X_X.qname());
     error("geo:envelope(<gml:unknown/>)", GeoErrors.qname(1));
     error("geo:envelope(<gml:LinearRing><gml:pos>1,1 20,1 50,30 1,1</gml:pos>" +
             "</gml:LinearRing>)", GeoErrors.qname(2));
@@ -80,7 +80,7 @@ public final class GeoTest extends SandboxTest {
     run("geo:asText(<gml:LineString><gml:coordinates>1,1 55,99 2,1" +
             "</gml:coordinates></gml:LineString>)", "LINESTRING (1 1, 55 99, 2 1)");
 
-    error("geo:asText(text {'a'})", EXPTYPE_X_X_X.qname());
+    error("geo:asText(text {'a'})", INVCAST_X_X_X.qname());
     error("geo:asText(<gml:unknown/>)", GeoErrors.qname(1));
     error("geo:asText(<gml:LineString><gml:coordinates>1,1</gml:coordinates>" +
             "</gml:LineString>)", GeoErrors.qname(2));
@@ -93,7 +93,7 @@ public final class GeoTest extends SandboxTest {
             "</gml:coordinates></gml:LineString>))",
           "AAAAAAIAAAADP/AAAAAAAAA/8AAAAAAAAEBLgAAAAAAAQFjAAAAAAABAAAAAAAAAAD/wAAAAAAAA");
 
-    error("geo:asBinary(text {'a'})", EXPTYPE_X_X_X.qname());
+    error("geo:asBinary(text {'a'})", INVCAST_X_X_X.qname());
     error("geo:asBinary(<gml:unknown/>)", GeoErrors.qname(1));
     error("geo:asBinary(<gml:LinearRing><gml:coordinates>1,1 55,99 2,1" +
             "</gml:coordinates></gml:LinearRing>)", GeoErrors.qname(2));
@@ -105,7 +105,7 @@ public final class GeoTest extends SandboxTest {
     run("geo:isSimple(<gml:LineString><gml:coordinates>1,1 20,1 10,4 20,-10" +
             "</gml:coordinates></gml:LineString>)", "false");
 
-    error("geo:isSimple(text {'a'})", EXPTYPE_X_X_X.qname());
+    error("geo:isSimple(text {'a'})", INVCAST_X_X_X.qname());
     error("geo:isSimple(<gml:unknown/>)", GeoErrors.qname(1));
     error("geo:isSimple(<gml:LinearRing><gml:coordinates>1,1 55,99 2,1" +
             "</gml:coordinates></gml:LinearRing>)", GeoErrors.qname(2));
@@ -124,7 +124,7 @@ public final class GeoTest extends SandboxTest {
     run("geo:boundary(" +
         "<gml:Point><gml:coordinates>2,3</gml:coordinates></gml:Point>)",
         "<gml:MultiGeometry xmlns:gml=\"http://www.opengis.net/gml\"/>");
-    error("geo:boundary(text {'a'})", EXPTYPE_X_X_X.qname());
+    error("geo:boundary(text {'a'})", INVCAST_X_X_X.qname());
     error("geo:boundary(a)", NOCTX_X.qname());
     error("geo:boundary(<gml:geo/>)", GeoErrors.qname(1));
     error("geo:boundary(<gml:Point><gml:pos>1 2</gml:pos></gml:Point>)",
@@ -259,62 +259,62 @@ public final class GeoTest extends SandboxTest {
   @Test
   public void overlaps() {
     run("geo:overlaps(" +
-            "<gml:LineString><gml:coordinates>1,1 55,99 2,1</gml:coordinates>" +
-            "</gml:LineString>, <gml:LineString><gml:coordinates>1,1 55,0" +
-            "</gml:coordinates></gml:LineString>)", "false");
+        "<gml:LineString><gml:coordinates>1,1 55,99 2,1</gml:coordinates>" +
+        "</gml:LineString>, <gml:LineString><gml:coordinates>1,1 55,0" +
+        "</gml:coordinates></gml:LineString>)", "false");
 
     error("geo:overlaps()", FUNCARGNUM_X_X_X.qname());
     error("geo:overlaps(<gml:LineString><gml:coordinates>1,1 55,99 2,1" +
-            "</gml:coordinates></gml:LineString>," +
-            "<gml:LineString></gml:LineString>)", GeoErrors.qname(2));
+        "</gml:coordinates></gml:LineString>," +
+        "<gml:LineString></gml:LineString>)", GeoErrors.qname(2));
     error("geo:overlaps(" +
-            "<gml:unknown><gml:coordinates>1,1</gml:coordinates></gml:unknown>)",
-            FUNCARGNUM_X_X_X.qname());
+        "<gml:unknown><gml:coordinates>1,1</gml:coordinates></gml:unknown>)",
+        FUNCARGNUM_X_X_X.qname());
   }
 
   /** Test method. */
   @Test
   public void relate() {
     run("geo:relate(" +
-            "<gml:Point><gml:coordinates>18,11</gml:coordinates></gml:Point>, " +
-            "<gml:Polygon><gml:outerBoundaryIs><gml:LinearRing><gml:coordinates>" +
-            "10,10 20,10 30,40 20,40 10,10</gml:coordinates></gml:LinearRing>" +
-            "</gml:outerBoundaryIs></gml:Polygon>, \"0********\")", "true");
+        "<gml:Point><gml:coordinates>18,11</gml:coordinates></gml:Point>, " +
+        "<gml:Polygon><gml:outerBoundaryIs><gml:LinearRing><gml:coordinates>" +
+        "10,10 20,10 30,40 20,40 10,10</gml:coordinates></gml:LinearRing>" +
+        "</gml:outerBoundaryIs></gml:Polygon>, \"0********\")", "true");
 
     error("geo:relate(<gml:Point><gml:coordinates>18,11</gml:coordinates></gml:Point>,"
-          + "<gml:LineString><gml:coordinates>11,10 20,1 20,20</gml:coordinates>" +
-            "</gml:LineString>, \"0******\")", EXPTYPE_X_X_X.qname());
+        + "<gml:LineString><gml:coordinates>11,10 20,1 20,20</gml:coordinates>" +
+          "</gml:LineString>, \"0******\")", INVCAST_X_X_X.qname());
 
     error("geo:relate(" +
-            "<gml:Point><gml:coordinates>18,11</gml:coordinates></gml:Point>," +
-            "<gml:LineString><gml:coordinates>11,10 20,1 20,20</gml:coordinates>" +
-            "</gml:LineString>, \"0*******12*F\")", EXPTYPE_X_X_X.qname());
+        "<gml:Point><gml:coordinates>18,11</gml:coordinates></gml:Point>," +
+        "<gml:LineString><gml:coordinates>11,10 20,1 20,20</gml:coordinates>" +
+        "</gml:LineString>, \"0*******12*F\")", INVCAST_X_X_X.qname());
 
     error("geo:relate()", FUNCARGNUM_X_X_X.qname());
     error("geo:relate(" +
-            "<gml:Line><gml:coordinates>1,1 55,99 2,1</gml:coordinates></gml:Line>," +
-            "<gml:LineString></gml:LineString>, \"0********\")", GeoErrors.qname(1));
+        "<gml:Line><gml:coordinates>1,1 55,99 2,1</gml:coordinates></gml:Line>," +
+        "<gml:LineString></gml:LineString>, \"0********\")", GeoErrors.qname(1));
     error("geo:relate(" +
-            "<gml:Point><gml:coordinates>1,1</gml:coordinates></gml:Point>," +
-            " \"0********\")", FUNCARGNUM_X_X_X.qname());
+        "<gml:Point><gml:coordinates>1,1</gml:coordinates></gml:Point>," +
+        " \"0********\")", FUNCARGNUM_X_X_X.qname());
   }
 
   /** Test method. */
   @Test
   public void distance() {
     run("geo:distance(<gml:LinearRing><gml:coordinates>10,400 20,200 30,100 " +
-            "20,100 10,400</gml:coordinates></gml:LinearRing>, " +
-            "<gml:Polygon><gml:outerBoundaryIs><gml:LinearRing><gml:coordinates>" +
-            "10,10 20,10 30,40 20,40 10,10</gml:coordinates></gml:LinearRing>" +
-            "</gml:outerBoundaryIs></gml:Polygon>)", "60");
+        "20,100 10,400</gml:coordinates></gml:LinearRing>, " +
+        "<gml:Polygon><gml:outerBoundaryIs><gml:LinearRing><gml:coordinates>" +
+        "10,10 20,10 30,40 20,40 10,10</gml:coordinates></gml:LinearRing>" +
+        "</gml:outerBoundaryIs></gml:Polygon>)", "60");
 
     error("geo:distance()", FUNCARGNUM_X_X_X.qname());
     error("geo:distance(" +
-            "<gml:LinearRing><gml:coordinates>1,1 55,99 2,1</gml:coordinates>" +
-            "</gml:LinearRing>, <gml:LineString></gml:LineString>)", GeoErrors.qname(2));
+        "<gml:LinearRing><gml:coordinates>1,1 55,99 2,1</gml:coordinates>" +
+        "</gml:LinearRing>, <gml:LineString></gml:LineString>)", GeoErrors.qname(2));
     error("geo:distance(" +
-            "<gml:Point><gml:coordinates>1,1</gml:coordinates></gml:Point>)",
-            FUNCARGNUM_X_X_X.qname());
+        "<gml:Point><gml:coordinates>1,1</gml:coordinates></gml:Point>)",
+        FUNCARGNUM_X_X_X.qname());
   }
 
   /** Test method. */
@@ -337,7 +337,7 @@ public final class GeoTest extends SandboxTest {
             "<gml:LinearRing><gml:coordinates>1,1 55,99 2,1</gml:coordinates>" +
             "</gml:LinearRing>, xs:double(1))", GeoErrors.qname(2));
     error("geo:buffer(<gml:LinearRing><gml:coordinates>1,1 55,99 1,1" +
-            "</gml:coordinates></gml:LinearRing>, 's')", EXPTYPE_X_X_X.qname());
+            "</gml:coordinates></gml:LinearRing>, 's')", INVCAST_X_X_X.qname());
     error("geo:buffer(xs:double(1))", FUNCARGNUM_X_X_X.qname());
   }
 
@@ -405,7 +405,7 @@ public final class GeoTest extends SandboxTest {
             "<gml:Point><gml:coordinates>2,3</gml:coordinates></gml:Point>)",
             GeoErrors.qname(2));
     error("geo:union(text {'a'}, <gml:Point><gml:coordinates>2,3" +
-            "</gml:coordinates></gml:Point>)", EXPTYPE_X_X_X.qname());
+            "</gml:coordinates></gml:Point>)", INVCAST_X_X_X.qname());
   }
 
   /** Test method. */
@@ -423,7 +423,7 @@ public final class GeoTest extends SandboxTest {
         "<gml:Point><gml:coordinates>2,3</gml:coordinates></gml:Point>)",
         GeoErrors.qname(2));
     error("geo:difference(text {'a'}, <gml:Point><gml:coordinates>2,3" +
-        "</gml:coordinates></gml:Point>)", EXPTYPE_X_X_X.qname());
+        "</gml:coordinates></gml:Point>)", INVCAST_X_X_X.qname());
   }
 
   /** Test method. */
@@ -446,7 +446,7 @@ public final class GeoTest extends SandboxTest {
             GeoErrors.qname(1));
 
     error("geo:symDifference(text {'a'}, <gml:Point><gml:coordinates>2,3" +
-            "</gml:coordinates></gml:Point>)", EXPTYPE_X_X_X.qname());
+            "</gml:coordinates></gml:Point>)", INVCAST_X_X_X.qname());
   }
 
   /** Test method. */
@@ -467,7 +467,7 @@ public final class GeoTest extends SandboxTest {
             "<gml:Point><gml:coordinates>2,1</gml:coordinates></gml:Point>, 2)",
             GeoErrors.qname(4));
     error("geo:geometryN(text {'a'}, <gml:Point><gml:coordinates>2,3" +
-            "</gml:coordinates></gml:Point>)", EXPTYPE_X_X_X.qname());
+            "</gml:coordinates></gml:Point>)", INVCAST_X_X_X.qname());
   }
 
   /** Test method. */
@@ -487,7 +487,7 @@ public final class GeoTest extends SandboxTest {
         GeoErrors.qname(2));
     error("geo:x(<gml:geo><gml:coordinates>2,1</gml:coordinates></gml:geo>)",
         GeoErrors.qname(1));
-    error("geo:x(text {'a'})", EXPTYPE_X_X_X.qname());
+    error("geo:x(text {'a'})", INVCAST_X_X_X.qname());
   }
 
   /** Test method. */
@@ -575,7 +575,7 @@ public final class GeoTest extends SandboxTest {
             "<gml:LineString><gml:coordinates>1,1</gml:coordinates></gml:LineString>)",
             GeoErrors.qname(2));
     error("geo:startPoint()", FUNCARGNUM_X_X_X.qname());
-    error("geo:startPoint(text {'gml:Point'})", EXPTYPE_X_X_X.qname());
+    error("geo:startPoint(text {'gml:Point'})", INVCAST_X_X_X.qname());
     error("geo:startPoint(<gml:geo><gml:coordinates>2,1</gml:coordinates></gml:geo>)",
             GeoErrors.qname(1));
   }
@@ -601,7 +601,7 @@ public final class GeoTest extends SandboxTest {
             "<gml:LineString><gml:coordinates>1,1</gml:coordinates></gml:LineString>)",
             GeoErrors.qname(2));
     error("geo:endPoint()", FUNCARGNUM_X_X_X.qname());
-    error("geo:endPoint(text {'gml:Point'})", EXPTYPE_X_X_X.qname());
+    error("geo:endPoint(text {'gml:Point'})", INVCAST_X_X_X.qname());
     error("geo:endPoint(<gml:geo><gml:coordinates>2,1</gml:coordinates></gml:geo>)",
             GeoErrors.qname(1));
   }
@@ -626,7 +626,7 @@ public final class GeoTest extends SandboxTest {
             "<gml:LineString><gml:coordinates>1,1</gml:coordinates></gml:LineString>)",
             GeoErrors.qname(2));
     error("geo:isClosed()", FUNCARGNUM_X_X_X.qname());
-    error("geo:isClosed(text {'gml:Point'})", EXPTYPE_X_X_X.qname());
+    error("geo:isClosed(text {'gml:Point'})", INVCAST_X_X_X.qname());
     error("geo:isClosed(" +
             "<gml:Point><gml:coordinates>2,1</gml:coordinates></gml:Point>)",
             GeoErrors.qname(3));
@@ -652,7 +652,7 @@ public final class GeoTest extends SandboxTest {
             "<gml:LineString><gml:coordinates>1,1</gml:coordinates></gml:LineString>)",
             GeoErrors.qname(2));
     error("geo:isRing()", FUNCARGNUM_X_X_X.qname());
-    error("geo:isRing(text {'gml:Point'})", EXPTYPE_X_X_X.qname());
+    error("geo:isRing(text {'gml:Point'})", INVCAST_X_X_X.qname());
     error("geo:isRing(<Point><gml:coordinates>2,1</gml:coordinates></Point>)",
             GeoErrors.qname(1));
   }
@@ -674,7 +674,7 @@ public final class GeoTest extends SandboxTest {
     error("geo:numPoints(<gml:LineString><gml:coordinates>1,1</gml:coordinates>" +
             "</gml:LineString>)", GeoErrors.qname(2));
     error("geo:numPoints()", FUNCARGNUM_X_X_X.qname());
-    error("geo:numPoints(text {'gml:Point'})", EXPTYPE_X_X_X.qname());
+    error("geo:numPoints(text {'gml:Point'})", INVCAST_X_X_X.qname());
     error("geo:numPoints(<Point><gml:coordinates>2,1</gml:coordinates></Point>)",
             GeoErrors.qname(1));
   }
@@ -704,7 +704,7 @@ public final class GeoTest extends SandboxTest {
             "</gml:coordinates></gml:LineString>, 5)", GeoErrors.qname(4));
     error("geo:pointN(<gml:LineString><gml:coordinates>11,10 20,1 20,20 12,13" +
             "</gml:coordinates></gml:LineString>, 0)", GeoErrors.qname(4));
-    error("geo:pointN(text {'a'},3)", EXPTYPE_X_X_X.qname());
+    error("geo:pointN(text {'a'},3)", INVCAST_X_X_X.qname());
   }
 
   /** Test method. */
@@ -754,7 +754,7 @@ public final class GeoTest extends SandboxTest {
             "<gml:unknown><gml:coordinates>1,1</gml:coordinates></gml:unknown>)",
             GeoErrors.qname(1));
     error("geo:centroid()", FUNCARGNUM_X_X_X.qname());
-    error("geo:centroid(text {'a'})", EXPTYPE_X_X_X.qname());
+    error("geo:centroid(text {'a'})", INVCAST_X_X_X.qname());
   }
 
   /** Test method. */
@@ -783,7 +783,7 @@ public final class GeoTest extends SandboxTest {
             GeoErrors.qname(1));
 
     error("geo:pointOnSurface()", FUNCARGNUM_X_X_X.qname());
-    error("geo:pointOnSurface(text {'a'})", EXPTYPE_X_X_X.qname());
+    error("geo:pointOnSurface(text {'a'})", INVCAST_X_X_X.qname());
   }
 
   /** Test method. */
@@ -803,7 +803,7 @@ public final class GeoTest extends SandboxTest {
             "<gml:unknown><gml:coordinates>1,1</gml:coordinates></gml:unknown>)",
             GeoErrors.qname(1));
     error("geo:exteriorRing()", FUNCARGNUM_X_X_X.qname());
-    error("geo:exteriorRing(text {'a'})", EXPTYPE_X_X_X.qname());
+    error("geo:exteriorRing(text {'a'})", INVCAST_X_X_X.qname());
   }
 
   /** Test method. */
@@ -823,7 +823,7 @@ public final class GeoTest extends SandboxTest {
             GeoErrors.qname(1));
 
     error("geo:numInteriorRing()", FUNCARGNUM_X_X_X.qname());
-    error("geo:numInteriorRing(text {'a'})", EXPTYPE_X_X_X.qname());
+    error("geo:numInteriorRing(text {'a'})", INVCAST_X_X_X.qname());
   }
 
   /** Test method. */
@@ -855,7 +855,7 @@ public final class GeoTest extends SandboxTest {
             "<gml:Point><gml:coordinates>2.0,3.0</gml:coordinates></gml:Point>, 1)",
             GeoErrors.qname(3));
 
-    error("geo:interiorRingN(text {'<gml:Polygon/'}, 1)", EXPTYPE_X_X_X.qname());
+    error("geo:interiorRingN(text {'<gml:Polygon/'}, 1)", INVCAST_X_X_X.qname());
     error("geo:interiorRingN()", FUNCARGNUM_X_X_X.qname());
   }
 
@@ -879,18 +879,20 @@ public final class GeoTest extends SandboxTest {
     final String q = "import module namespace geo='http://expath.org/ns/geo'; " +
         "declare namespace gml='http://www.opengis.net/gml';" + query;
 
-    System.setErr(NULL);
+    //System.setErr(NULL);
     try(final QueryProcessor qp = new QueryProcessor(q, context)) {
       final String res = qp.value().serialize().toString().replaceAll("(\\r|\\n) *", "");
-      fail("Query did not fail:\n" + query + "\n[E] " +
-          error + "...\n[F] " + res);
+      fail("Query did not fail:\n" + query + "\n[E] " + error + "...\n[F] " + res);
     } catch(final QueryException ex) {
-      if(!ex.qname().eq(error))
+      if(!ex.qname().eq(error)) {
+        Util.stack(ex);
         fail("Wrong error code:\n[E] " + error + "\n[F] " + ex.qname());
+      }
     } catch(final Exception ex) {
+      Util.stack(ex);
       fail(ex.toString());
     } finally {
-      System.setErr(ERR);
+      //System.setErr(ERR);
     }
   }
 }

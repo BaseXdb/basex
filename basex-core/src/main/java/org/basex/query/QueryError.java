@@ -582,7 +582,7 @@ public enum QueryError {
   EXACTLYONE(FORG, 5, "Exactly one value expected."),
 
   /** FORG0006. */
-  EXPTYPE_X_X_X(FORG, 6, "% expected, % found: %."),
+  MINMAX_X_X_X(FORG, 6, "% expected, % found: %."),
   /** FORG0006. */
   NOTCMP_X(FORG, 6, "Items of type % cannot be compared."),
   /** FORG0006. */
@@ -595,14 +595,6 @@ public enum QueryError {
   SUMNUM_X_X(FORG, 6, "Number expected, % found: %."),
   /** FORG0006. */
   SUMDUR_X_X(FORG, 6, "Duration expected, % found: %."),
-  /** FORG0006. */
-  WHICHCONSTR_X_X(FORG, 6, "Unknown Java constructor: %(%)."),
-  /** FORG0006. */
-  WHICHMETHOD_X_X(FORG, 6, "Unknown Java method: %(%)."),
-  /** FORG0006. */
-  JAVAARGS_X_X_X_X(FORG, 6, "Invalid Java arguments: %(%) expected, %(%) found."),
-  /** FORG0006. */
-  JAVAERROR_X_X_X(FORG, 6, "%(%): %."),
 
   /** FORG0008. */
   FUNZONE_X_X(FORG, 8, "% and % have different timezones."),
@@ -927,6 +919,15 @@ public enum QueryError {
   NOURI_X(XPST, 81, "No namespace declared for '%'."),
   /** XPST0081. */
   NSMISS_X(XPST, 81, "QName '%' has no namespace."),
+
+  /** XPTY0004. */
+  WHICHCONSTR_X_X(XPTY, 4, "Unknown Java constructor: %(%)."),
+  /** XPTY0004. */
+  WHICHMETHOD_X_X(XPTY, 4, "Unknown Java method: %(%)."),
+  /** XPTY0004. */
+  JAVAARGS_X_X_X(XPTY, 4, "Function %(%) cannot be called with (%)."),
+  /** XPTY0004. */
+  JAVAERROR_X_X_X(XPTY, 4, "%(%): %."),
 
   /** XPTY0004. */
   NONAME_X(XPTY, 4, "Name expected, '%' found."),

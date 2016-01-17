@@ -58,7 +58,6 @@ final class GeoErrors {
     return thrw(4, "Out of range input index: %", geoNumber);
   }
 
-
   /**
    * GEO0005: GML writer error massage (JTS).
    * @param th throwable

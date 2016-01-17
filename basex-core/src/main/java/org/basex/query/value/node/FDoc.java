@@ -135,6 +135,6 @@ public final class FDoc extends FNode {
 
   @Override
   public String toString() {
-    return Util.info("%(%)", DOCUMENT, uri);
+    return Util.info("% { % }", DOCUMENT, uri);
   }
 }

@@ -88,7 +88,7 @@ final class JavaModuleFunc extends JavaFunction {
       expect.add(t != null ? t.toString() : Util.className(t));
     }
     final String name = method.getName();
-    throw JAVAARGS_X_X_X_X.get(info, name, expect, name, foundArgs(args));
+    throw JAVAARGS_X_X_X.get(info, name, expect, foundArgs(args));
   }
 
   @Override
