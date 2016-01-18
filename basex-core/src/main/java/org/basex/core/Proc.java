@@ -11,7 +11,7 @@ import org.basex.core.locks.*;
  * It gives feedback on the current process. Moreover, it allows to
  * interrupt the process by calling the {@link #stop()} method.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class Proc {

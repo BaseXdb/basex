@@ -13,7 +13,7 @@ import org.junit.Test;
 /**
  * Tests for the selective index feature (#59).
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class SelectiveIndexTest extends SandboxTest {

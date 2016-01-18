@@ -10,7 +10,7 @@ import org.junit.*;
  * Many of the Soundex and ColognePhonetic tests have been adopted from the
  * Apache Commons project (SoundexTest.java, ColognePhoneticTest.java).
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class StringsModuleTest extends AdvancedQueryTest {

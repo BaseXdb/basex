@@ -22,7 +22,7 @@ import org.basex.util.hash.*;
 /**
  * Replace expression.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Lukas Kircher
  */
 public final class Replace extends Update {

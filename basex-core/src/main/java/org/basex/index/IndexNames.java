@@ -13,7 +13,7 @@ import org.basex.util.list.*;
 /**
  * Names and namespace uris of elements/attribute to index.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class IndexNames {

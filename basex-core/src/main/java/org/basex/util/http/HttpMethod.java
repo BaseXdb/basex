@@ -3,7 +3,7 @@ package org.basex.util.http;
 /**
  * This enumeration contains basic HTTP methods.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public enum HttpMethod {

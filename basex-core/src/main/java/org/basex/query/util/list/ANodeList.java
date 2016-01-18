@@ -15,7 +15,7 @@ import org.basex.util.list.*;
  * nodes will be sorted and duplicates will before removed before they are returned as value or
  * via an iterator.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class ANodeList extends ElementList implements Iterable<ANode> {

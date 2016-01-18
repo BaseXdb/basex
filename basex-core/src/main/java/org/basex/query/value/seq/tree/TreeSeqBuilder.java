@@ -13,7 +13,7 @@ import org.basex.util.*;
  * A builder for creating a {@link Seq}uence (with at least 2 items) by prepending and appending
  * {@link Item}s.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public final class TreeSeqBuilder implements Iterable<Item> {

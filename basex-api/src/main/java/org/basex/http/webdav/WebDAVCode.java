@@ -10,7 +10,7 @@ import com.bradmcevoy.http.exceptions.*;
 /**
  * Code container.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  * @param <E> return type
  */

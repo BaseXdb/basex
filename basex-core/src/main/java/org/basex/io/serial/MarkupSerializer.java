@@ -21,7 +21,7 @@ import org.basex.util.options.Options.YesNoOmit;
 /**
  * This class serializes items to in a markup language.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 abstract class MarkupSerializer extends StandardSerializer {

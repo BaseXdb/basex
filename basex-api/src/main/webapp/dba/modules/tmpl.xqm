@@ -1,7 +1,7 @@
 (:~
  : Template functions.
  :
- : @author Christian Grün, BaseX GmbH, 2014-15
+ : @author Christian Grün, BaseX Team, 2014-16
  :)
 module namespace tmpl = 'dba/tmpl';
 
@@ -39,7 +39,7 @@ declare function tmpl:wrap(
       <meta charset="utf-8"/>
       <title>Database Administration</title>
       <meta name="description" content="Database Administration"/>
-      <meta name="author" content="BaseX Team, 2014-15"/>
+      <meta name="author" content="BaseX Team, 2014-16"/>
       <link rel="stylesheet" type="text/css" href="static/style.css"/> 
       { $options('css') ! <link rel="stylesheet" type="text/css" href="static/{.}"/> }
       <script type="text/javascript" src="static/js.js"/>
@@ -80,7 +80,7 @@ declare function tmpl:wrap(
       <div class='small'/>
       <table width='100%'>{ $tr }</table>
       <hr/>
-      <div class='right'><sup>BaseX Team, 2014-15</sup></div>
+      <div class='right'><sup>BaseX Team, 2014-16</sup></div>
       <div class='small'/>
       <script type="text/javascript">(function(){{ buttons(); }})();</script>
     </body>

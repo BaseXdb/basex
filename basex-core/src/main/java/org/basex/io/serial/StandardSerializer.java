@@ -19,7 +19,7 @@ import org.basex.util.hash.*;
 /**
  * This class serializes items to an output stream.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class StandardSerializer extends OutputSerializer {

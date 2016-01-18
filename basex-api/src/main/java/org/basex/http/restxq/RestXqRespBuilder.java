@@ -15,7 +15,7 @@ import org.basex.util.http.*;
 /**
  * This class holds information on a custom RESTXQ response.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class RestXqRespBuilder {

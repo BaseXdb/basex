@@ -18,7 +18,7 @@ import org.basex.util.*;
 /**
  * Data builder. Provides methods for copying XML nodes into a main-memory database instance.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class DataBuilder {

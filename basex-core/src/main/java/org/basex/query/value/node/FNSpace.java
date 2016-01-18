@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * Namespace node.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class FNSpace extends FNode {

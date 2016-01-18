@@ -15,7 +15,7 @@ import org.junit.*;
  * in basex-test package are only executable after a java keystore has been
  * created.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Lukas Kircher
  */
 @SuppressWarnings("unused")

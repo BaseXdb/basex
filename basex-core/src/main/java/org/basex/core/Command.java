@@ -20,7 +20,7 @@ import org.xml.sax.*;
  * implementations. It evaluates queries that are sent by the GUI, the client or
  * the standalone version.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class Command extends Proc {

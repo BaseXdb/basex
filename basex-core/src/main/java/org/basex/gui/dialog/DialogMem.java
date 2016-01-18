@@ -16,7 +16,7 @@ import org.basex.util.*;
 /**
  * Dialog with a single text field.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class DialogMem extends BaseXDialog {

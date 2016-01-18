@@ -16,7 +16,7 @@ import org.basex.util.list.*;
 /**
  * This module contains functions for processing global sessions.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class ASession {

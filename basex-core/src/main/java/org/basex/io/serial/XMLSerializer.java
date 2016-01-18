@@ -12,7 +12,7 @@ import org.basex.query.value.item.*;
 /**
  * This class serializes items as XML.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public class XMLSerializer extends MarkupSerializer {

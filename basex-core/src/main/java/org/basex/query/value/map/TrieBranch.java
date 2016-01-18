@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * Inner node of a {@link Map}.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 final class TrieBranch extends TrieNode {

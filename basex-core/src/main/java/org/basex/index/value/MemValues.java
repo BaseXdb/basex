@@ -17,7 +17,7 @@ import org.basex.util.list.*;
 /**
  * This class provides main memory access to attribute values and text contents.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class MemValues extends ValueIndex {

@@ -7,7 +7,7 @@ import org.basex.util.*;
 /**
  * Resizable-array implementation for native int values.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public class IntList extends ElementList {

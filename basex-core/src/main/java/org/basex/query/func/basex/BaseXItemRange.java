@@ -5,7 +5,7 @@ import org.basex.query.func.fn.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class BaseXItemRange extends FnSubsequence {

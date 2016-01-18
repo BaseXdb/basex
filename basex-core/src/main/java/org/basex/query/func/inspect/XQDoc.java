@@ -19,7 +19,7 @@ import org.basex.util.list.*;
 /**
  * This class contains functions for generating a xqDoc documentation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class XQDoc extends Inspect {

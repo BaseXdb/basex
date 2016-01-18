@@ -14,7 +14,7 @@ import org.basex.util.hash.*;
 /**
  * Runtime expression, created by non-deterministic functions.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 abstract class RuntimeExpr extends ParseExpr {

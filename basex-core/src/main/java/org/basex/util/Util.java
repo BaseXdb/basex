@@ -14,7 +14,7 @@ import org.basex.util.list.*;
  * The methods are used for dumping error output, debugging information,
  * getting the application path, etc.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Util {

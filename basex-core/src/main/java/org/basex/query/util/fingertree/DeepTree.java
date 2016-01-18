@@ -4,7 +4,7 @@ package org.basex.query.util.fingertree;
  * A <i>deep</i> node containing elements in the left and right digit and a sub-tree in
  * the middle.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  *
  * @param <N> node type

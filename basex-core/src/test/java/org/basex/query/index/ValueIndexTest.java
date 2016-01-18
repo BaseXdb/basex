@@ -18,7 +18,7 @@ import org.junit.runners.Parameterized.*;
 /**
  * This class tests if value indexes will be used.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 @RunWith(Parameterized.class)

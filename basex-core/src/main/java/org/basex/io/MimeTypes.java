@@ -6,7 +6,7 @@ import org.basex.util.http.*;
  * Obsolete class for retrieving mime types (new: {@link MediaType}).
  * Will be removed in Version 8.2 or later.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class MimeTypes {

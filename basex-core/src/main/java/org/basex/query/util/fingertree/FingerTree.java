@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * A node of a FingerTree.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  *
  * @param <N> node type

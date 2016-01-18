@@ -11,7 +11,7 @@ import org.basex.util.http.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Rositsa Shadura
  */
 public final class HttpSendRequest extends StandardFunc {

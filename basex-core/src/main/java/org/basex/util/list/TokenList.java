@@ -10,7 +10,7 @@ import org.basex.util.hash.*;
 /**
  * Resizable-array implementation for tokens (byte arrays).
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class TokenList extends ElementList implements Iterable<byte[]> {

@@ -23,7 +23,7 @@ import org.basex.util.list.*;
 /**
  * This enumeration encapsulates all commands that are triggered by GUI operations.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public enum GUIMenuCmd implements GUICommand {

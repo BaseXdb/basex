@@ -16,7 +16,7 @@ import org.basex.util.ft.*;
 /**
  * Evaluates the 'create db' command and creates a new index.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class CreateIndex extends ACreate {

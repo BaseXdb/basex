@@ -16,7 +16,7 @@ import org.basex.util.*;
  * HTTP response handler. Reads HTTP response and constructs the
  * {@code <http:response/>} element.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Rositsa Shadura
  */
 public final class HttpResponse {

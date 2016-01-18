@@ -28,7 +28,7 @@ import org.basex.util.http.HttpText.Request;
 /**
  * Bundles context-based information on a single HTTP operation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class HTTPContext {

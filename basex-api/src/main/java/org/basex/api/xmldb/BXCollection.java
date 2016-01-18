@@ -20,7 +20,7 @@ import org.xmldb.api.modules.*;
 /**
  * Implementation of the Collection Interface for the XMLDB:API.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class BXCollection implements Collection, BXXMLDBText {

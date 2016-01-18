@@ -11,7 +11,7 @@ import org.basex.query.value.node.*;
 /**
  * Node functions.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 abstract class Nodes extends StandardFunc {

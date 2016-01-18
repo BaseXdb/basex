@@ -18,7 +18,7 @@ import org.junit.runners.Parameterized.*;
 /**
  * This class tests the update features of the {@link Data} class.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Tim Petrowsky
  */
 @RunWith(Parameterized.class)

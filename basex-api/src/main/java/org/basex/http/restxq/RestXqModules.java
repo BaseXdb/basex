@@ -15,7 +15,7 @@ import org.basex.util.http.*;
 /**
  * This class caches RESTXQ modules found in the HTTP root directory.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class RestXqModules {

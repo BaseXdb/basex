@@ -12,7 +12,7 @@ import org.junit.Test;
 /**
  * Local concurrency tests.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class LocalConcurrencyTest extends SandboxTest {

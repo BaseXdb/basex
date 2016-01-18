@@ -18,7 +18,7 @@ import org.basex.util.*;
 /**
  * A tree storing {@link Item}s.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public abstract class TreeSeq extends Seq {
