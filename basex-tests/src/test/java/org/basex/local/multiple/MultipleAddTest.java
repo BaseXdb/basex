@@ -7,7 +7,7 @@ import org.basex.core.users.*;
 import org.junit.Test;
 
 /**
- * This class performs a local stress tests with a specified number of threads and queries.
+ * This class performs local stress tests with a specified number of threads and queries.
  *
  * @author BaseX Team 2005-15, BSD License
  * @author Christian Gruen
