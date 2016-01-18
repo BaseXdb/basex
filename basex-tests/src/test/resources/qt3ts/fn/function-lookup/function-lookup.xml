@@ -1,5 +1,0 @@
-<?xml version="1.0"?>
-<root>
-  <child>1</child>
-  <ns:element xmlns:ns="http://www.example.org/" />
-</root>
