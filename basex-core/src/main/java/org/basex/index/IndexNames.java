@@ -8,7 +8,6 @@ import java.util.regex.*;
 import org.basex.data.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Names and namespace uris of elements/attribute to index.
@@ -17,8 +16,8 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class IndexNames {
-  /** Names and namespace uris. */
-  private final TokenList qnames = new TokenList();
+  /** Local names and namespace uris. All names are accepted if the list is empty. */
+  private final Atts qnames = new Atts();
 
   /**
    * Constructor.
@@ -51,12 +50,14 @@ public final class IndexNames {
       } else if(entry.startsWith("*:")) { // *:name
         uri = null;
         ln = entry.substring(2);
-      } else { // name
+      } else if(XMLToken.isNCName(token(entry))) { // name
         uri = "";
         ln = entry;
+      } else { // invalid
+        Util.debug("Included name is invalid: %", entry);
+        continue;
       }
-      qnames.add(ln == null ? null : token(ln));
-      qnames.add(uri == null ? null : token(uri));
+      qnames.add(ln == null ? null : token(ln), uri == null ? null : token(uri));
     }
   }
 
@@ -93,10 +94,10 @@ public final class IndexNames {
     if(qname != null) {
       final int ns = qnames.size();
       final byte[] ln = qname[0], uri = qname[1];
-      for(int n = 0; n < ns; n += 2) {
-        final byte[] iln = qnames.get(n);
+      for(int n = 0; n < ns; n++) {
+        final byte[] iln = qnames.name(n);
         if(iln != null && (ln == null || !eq(ln, iln))) continue;
-        final byte[] iuri = qnames.get(n + 1);
+        final byte[] iuri = qnames.value(n);
         if(iuri != null && (uri == null || !eq(uri, iuri))) continue;
         return true;
       }
@@ -130,5 +131,21 @@ public final class IndexNames {
     }
     if(value.length() != 0) set.add(value.toString().trim());
     return set;
+  }
+
+  /**
+   * Checks if the name index contains id or idref names, or if it is empty.
+   * @param idref idref flag
+   * @return result of check
+   */
+  public boolean containsIds(final boolean idref) {
+    // flawed... the correct solution would be to store all id/idref attributes as DB meta data
+    final int ns = qnames.size();
+    for(int n = 0; n < ns; n++) {
+      final byte[] name = qnames.name(n);
+      if(name == null || (idref ? Token.contains(name, IDREF) :
+        Token.contains(name, ID) && !Token.contains(name, IDREF))) return true;
+    }
+    return isEmpty();
   }
 }

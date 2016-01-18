@@ -3,8 +3,6 @@ package org.basex.util;
 import java.text.*;
 import java.util.*;
 
-import org.basex.util.list.*;
-
 /**
  * <p>This class provides convenience operations for handling 'Tokens'.
  * A token is a UTF-8 encoded string. It is represented as a byte array.</p>
@@ -26,6 +24,10 @@ public final class Token {
   public static final byte[] XMLNS = token("xmlns");
   /** XMLNS token with colon. */
   public static final byte[] XMLNSC = token("xmlns:");
+  /** ID token. */
+  public static final byte[] ID = token("id");
+  /** IDRef token. */
+  public static final byte[] IDREF = token("ref");
   /** Token 'true'. */
   public static final byte[] TRUE = token("true");
   /** Token 'false'. */
@@ -901,35 +903,41 @@ public final class Token {
    * @return array
    */
   public static byte[][] split(final byte[] token, final int sep) {
-    final int l = token.length;
-    final byte[][] split = new byte[l][];
+    final int tl = token.length;
+    final byte[][] split = new byte[tl][];
 
-    int s = 0;
+    int sl = 0;
     final TokenBuilder tb = new TokenBuilder();
-    for(int i = 0; i < l; i += cl(token, i)) {
-      final int c = cp(token, i);
+    for(int t = 0; t < tl; t += cl(token, t)) {
+      final int c = cp(token, t);
       if(c == sep) {
-        if(!tb.isEmpty()) split[s++] = tb.next();
+        if(!tb.isEmpty()) split[sl++] = tb.next();
       } else {
         tb.add(c);
       }
     }
-    if(!tb.isEmpty()) split[s++] = tb.finish();
-    return Array.copyOf(split, s);
+    if(!tb.isEmpty()) split[sl++] = tb.finish();
+    return Array.copyOf(split, sl);
   }
 
   /**
-   * Tokenizes the specified input and returns distinct tokens.
-   * @param token token to be split
-   * @return array
+   * Normalizes the specified input and returns its distinct tokens.
+   * Optimized for small number of tokens.
+   * @param token token
+   * @return distinct tokens
    */
   public static byte[][] distinctTokens(final byte[] token) {
     final byte[][] tokens = split(normalize(token), ' ');
-    final TokenList tl = new TokenList(tokens.length);
-    for(final byte[] t : tokens) {
-      if(!tl.contains(t)) tl.add(t);
+    int tl = tokens.length;
+    for(int i = 0; i < tl - 1; i++) {
+      for(int j = i + 1; j < tl; j++) {
+        if(eq(tokens[i], tokens[j])) {
+          Array.move(tokens, j + 1, -1, tl - j  - 1);
+          j--; tl--;
+        }
+      }
     }
-    return tl.finish();
+    return Array.copyOf(tokens, tl);
   }
 
   /**

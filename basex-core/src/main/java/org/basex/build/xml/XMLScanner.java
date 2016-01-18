@@ -1,6 +1,7 @@
 package org.basex.build.xml;
 
 import static org.basex.build.BuildText.*;
+import static org.basex.build.BuildText.ID;
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.XMLToken.*;

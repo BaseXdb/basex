@@ -234,7 +234,7 @@ public final class Var extends ExprInfo {
   @Override
   public void plan(final FElem plan) {
     final FElem e = planElem(QueryText.NAM, '$' + Token.string(name.string()),
-        QueryText.ID, Token.token(id));
+        Token.ID, Token.token(id));
     if(type != null) e.add(planAttr(QueryText.AS, type.toString()));
     addPlan(plan, e);
   }

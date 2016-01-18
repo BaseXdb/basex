@@ -102,8 +102,8 @@ public class DiskValues extends ValueIndex {
   public final IndexIterator iter(final IndexToken it) {
     if(it instanceof StringRange) return idRange((StringRange) it);
     if(it instanceof NumericRange) return idRange((NumericRange) it);
-    final IndexEntry e = entry(it.get());
-    return iter(e.size, e.offset);
+    final IndexEntry ie = entry(it.get());
+    return iter(ie.size, ie.offset);
   }
 
   @Override
@@ -188,7 +188,7 @@ public class DiskValues extends ValueIndex {
   // PRIVATE METHODS ==============================================================================
 
   /**
-   * Returns a cache entry.
+   * Returns an index entry.
    * <p><em>Important:</em> This method is thread-safe.</p>
    * @param token token to be found or cached
    * @return cache entry

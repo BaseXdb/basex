@@ -1,7 +1,6 @@
 package org.basex.query.func.fn;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import org.basex.core.locks.*;
@@ -28,6 +27,9 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 abstract class Ids extends StandardFunc {
+  /** Index names (lazy instantiation). */
+  IndexNames names;
+
   /**
    * Returns referenced nodes.
    * @param qc query context
@@ -36,34 +38,42 @@ abstract class Ids extends StandardFunc {
    * @throws QueryException query exception
    */
   protected BasicNodeIter ids(final QueryContext qc, final boolean idref) throws QueryException {
-    // [CG] XQuery: ID-IDREF Parsing: consider schema information
-
     final TokenSet idSet = ids(exprs[0].atomIter(qc, info));
     final ANode root = checkRoot(toNode(ctxArg(1, qc), qc));
 
-    final Data data = root.data();
-    if(data == null || (idref ? data.tokenIndex : data.attrIndex) == null) {
-      // no index support: parse node and its descendants
+    if(scan(root, idref)) {
+      // sequential scan: parse node and its descendants
       final ANodeList list = new ANodeList().check();
       add(idSet, list, root, idref);
       return list.iter();
     }
 
-    // [JE] Verify against indexNames, whether id/idref included at all
-
-    // index support: create index iterator
+    // create index iterator
     final TokenList idList = new TokenList(idSet.size());
     for(final byte[] id : idSet) idList.add(id);
     final Value ids = StrSeq.get(idList);
     final ValueAccess va = new ValueAccess(info, ids, idref ? IndexType.TOKEN : IndexType.ATTRIBUTE,
-        null, new IndexContext(data, false));
+        null, new IndexContext(root.data(), false));
 
     // collect and return index results, filtered by id/idref attributes
     final ANodeList results = new ANodeList();
     for(final ANode attr : va.iter(qc)) {
-      if(isId(attr, idref)) results.add(attr.parent());
+      if(isId(attr, idref)) results.add(idref ? attr : attr.parent());
     }
     return results.iter();
+  }
+
+  /**
+   * Checks if the ids need to be found via sequential scanning.
+   * @param root root node
+   * @param idref follow idref
+   * @return result of check
+   */
+  private boolean scan(final ANode root, final boolean idref) {
+    final Data data = root.data();
+    if(data == null || (idref ? data.tokenIndex : data.attrIndex) == null) return true;
+    if(names == null) names = new IndexNames(IndexType.ATTRIBUTE, data);
+    return !names.containsIds(idref);
   }
 
   /**
@@ -92,13 +102,15 @@ abstract class Ids extends StandardFunc {
   }
 
   /**
-   * Checks if an attribute is an id/idref attribute.
+   * Checks if an attribute is an id/idref attribute ({@code idref}: local name must contain
+   * 'idref'; {@code id}: local name must contain 'if', but not 'idref').
+   * The correct approach would be to gather all id/idref attributes and store them as meta data.
    * @param attr attribute
    * @param idref id/idref flag
    * @return result of check
    */
   private static boolean isId(final ANode attr, final boolean idref) {
-    final byte[] name = lc(attr.name());
+    final byte[] name = lc(local(attr.name()));
     return idref ? contains(name, IDREF) : contains(name, ID) && !contains(name, IDREF);
   }
 

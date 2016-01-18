@@ -3,11 +3,11 @@ package org.basex.index;
 import static org.junit.Assert.*;
 
 import java.util.*;
-import java.util.Map.Entry;
+import java.util.Map.*;
 
-import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.query.*;
 import org.junit.Test;
 
 /**
@@ -16,7 +16,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public final class SelectiveIndexTest extends SandboxTest {
+public final class SelectiveIndexTest extends AdvancedQueryTest {
   /** Test file. */
   private static final String FILE = "src/test/resources/selective.xml";
 
@@ -86,6 +86,40 @@ public final class SelectiveIndexTest extends SandboxTest {
     } finally {
       set(MainOptions.FTINCLUDE, "");
       set(MainOptions.FTINDEX, false);
+    }
+  }
+
+  /**
+   * Tests the id functions.
+   */
+  @Test
+  public void id() {
+    set(MainOptions.TOKENINDEX, true);
+    try {
+      final String idref = "idref=\"B C\"";
+      final String file = "<xml id=\"A\" " + idref + "/>";
+      final String[] includes = {
+        "", "*", "Q{}*", "Q{id}",
+        "Q{}id", "id", "*:id", "Q{}idref", "idref", "*:idref",
+        "Q{}x", "Q{}x", "x", "*:x", "Q{}x",
+        // does not work, as it would currently indicate that idref is included in the index
+        // "Q{}ref", "ref", "*:ref",
+      };
+      for(final String include : includes) {
+        try {
+          set(MainOptions.ATTRINCLUDE, include);
+          set(MainOptions.TOKENINCLUDE, include);
+          execute(new CreateDB(NAME, file));
+          query("id('A', .)", file);
+          query("idref('B', .)", idref);
+        } catch(final AssertionError ae) {
+          throw new AssertionError(ae.getMessage() + "\nInclude: '" + include + "'");
+        }
+      }
+    } finally {
+      set(MainOptions.ATTRINCLUDE, "");
+      set(MainOptions.TOKENINCLUDE, "");
+      set(MainOptions.TOKENINDEX, false);
     }
   }
 

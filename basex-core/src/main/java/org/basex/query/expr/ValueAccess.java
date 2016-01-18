@@ -85,7 +85,6 @@ public final class ValueAccess extends IndexAccess {
     }
 
     final IndexIterator ii = index ? data.iter(new StringToken(type, term)) : scan(term);
-
     final int kind = type == IndexType.TEXT ? Data.TEXT : Data.ATTR;
     final DBNode tmp = new DBNode(data, 0, test == null ? kind : Data.ELEM);
     return new BasicNodeIter() {

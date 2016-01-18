@@ -19,7 +19,7 @@ public final class FnGenerateId extends StandardFunc {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ANode node = toEmptyNode(ctxArg(0, qc), qc);
     return node == null ? Str.ZERO :
-      Str.get(new TokenBuilder(QueryText.ID).addInt(node.id).finish());
+      Str.get(new TokenBuilder(Token.ID).addInt(node.id).finish());
   }
 
   @Override

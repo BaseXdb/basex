@@ -437,10 +437,6 @@ public interface QueryText {
 
   /** Base token. */
   byte[] BASE = token("base");
-  /** ID token. */
-  byte[] ID = token("id");
-  /** IDRef token. */
-  byte[] IDREF = token("ref");
 
   /** Error token. */
   byte[] E_CODE = token("code");
