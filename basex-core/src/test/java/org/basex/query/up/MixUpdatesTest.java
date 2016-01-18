@@ -90,4 +90,10 @@ public final class MixUpdatesTest extends AdvancedQueryTest {
   public void functionItem() {
     error("let $x := <a>a</a> update () return (delete node $x/text(), [$x])", BASX_FITEM_X);
   }
+
+  /** Test method. */
+  @Test
+  public void xqueryEval() {
+    query(_XQUERY_EVAL.args(" \"function($x) { function() { $x }  }(4)\"") + "()", "4");
+  }
 }

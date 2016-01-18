@@ -38,7 +38,7 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Checks if all updating expressions are correctly placed.
+   * Checks if the updating semantics are satisfied.
    * This function is only called if any updating expression was found in the query.
    * @throws QueryException query exception
    */

@@ -33,6 +33,8 @@ public final class StaticContext {
   public byte[] elemNS;
   /** Default function namespace. */
   public byte[] funcNS = FN_URI;
+  /** Expression contains dynamic function call. */
+  public boolean dynFuncCall;
   /** Static type of context value. */
   SeqType contextType;
 
@@ -55,7 +57,7 @@ public final class StaticContext {
   UriResolver resolver;
 
   /**
-   * Constructor setting the XQuery version.
+   * Constructor.
    * @param qc query context
    */
   public StaticContext(final QueryContext qc) {

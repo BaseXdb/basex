@@ -117,30 +117,39 @@ public class QueryParser extends InputParser {
   /**
    * Constructor.
    * @param query query string
-   * @param path file path (if {@code null}, {@link MainOptions#QUERYPATH} will be assigned)
-   * @param qc query context
-   * @param sc static context
+   * @param qctx query context
    * @throws QueryException query exception
    */
-  public QueryParser(final String query, final String path, final QueryContext qc,
-      final StaticContext sc) throws QueryException {
+  public QueryParser(final String query, final QueryContext qctx) throws QueryException {
+    this(query, null, qctx, null);
+  }
+
+  /**
+   * Constructor.
+   * @param query query string
+   * @param path file path (if {@code null}, {@link MainOptions#QUERYPATH} will be assigned)
+   * @param qctx query context
+   * @param sctx static context (can be {@code null})
+   * @throws QueryException query exception
+   */
+  public QueryParser(final String query, final String path, final QueryContext qctx,
+      final StaticContext sctx) throws QueryException {
 
     super(query);
-    this.qc = qc;
+    qc = qctx;
+    sc = sctx != null ? sctx : new StaticContext(qctx);
 
     // set path to query file
-    final MainOptions opts = qc.context.options;
-    final String bi = path != null ? path : opts.get(MainOptions.QUERYPATH);
-    final StaticContext sctx = sc != null ? sc : new StaticContext(qc);
-    if(!bi.isEmpty()) sctx.baseURI(bi);
-    this.sc = sctx;
+    final MainOptions opts = qctx.context.options;
+    final String uri = path != null ? path : opts.get(MainOptions.QUERYPATH);
+    if(!uri.isEmpty()) sc.baseURI(uri);
 
     // bind external variables
     for(final Entry<String, String> entry : opts.toMap(MainOptions.BINDINGS).entrySet()) {
       final String key = entry.getKey();
       final Atm value = new Atm(entry.getValue());
-      if(key.isEmpty()) qc.context(value, sc);
-      else qc.bind(key, value, sc);
+      if(key.isEmpty()) qctx.context(value, sc);
+      else qctx.bind(key, value, sc);
     }
   }
 
@@ -171,7 +180,8 @@ public class QueryParser extends InputParser {
       final VarScope scope = localVars.popContext();
 
       final MainModule mm = new MainModule(expr, scope, moduleDoc, sc);
-      finish(mm, true);
+      finish(mm);
+      check(mm);
       return mm;
     } catch(final QueryException ex) {
       mark();
@@ -214,7 +224,8 @@ public class QueryParser extends InputParser {
       prolog1();
       importModules();
       prolog2();
-      finish(null, check);
+      finish(null);
+      if(check) check(null);
 
       qc.modStack.pop();
       return new LibraryModule(module, moduleDoc, sc);
@@ -251,10 +262,9 @@ public class QueryParser extends InputParser {
   /**
    * Finishes the parsing step.
    * @param mm main module; {@code null} for library modules
-   * @param check check function calls and variable references and update constraints
    * @throws QueryException query exception
    */
-  private void finish(final MainModule mm, final boolean check) throws QueryException {
+  private void finish(final MainModule mm) throws QueryException {
     if(more()) {
       if(alter != null) throw error();
       final String rest = rest();
@@ -272,8 +282,23 @@ public class QueryParser extends InputParser {
     if(sc.decFormats.get(empty) == null) {
       sc.decFormats.put(empty, new DecFormatter());
     }
+  }
 
-    if(check) qc.check(mm, sc);
+  /**
+   * Checks function calls, variable references and updating semantics.
+   * @param mm main module; {@code null} for library modules
+   * @throws QueryException query exception
+   */
+  private void check(final MainModule mm) throws QueryException {
+    // check function calls and variable references
+    qc.funcs.check(qc);
+    qc.vars.check();
+    // check updating semantics (skip if updates and values can be mixed)
+    if(qc.updating && !sc.mixUpdates) {
+      qc.funcs.checkUp();
+      qc.vars.checkUp();
+      if(mm != null) mm.expr.checkUp();
+    }
   }
 
   /**
@@ -394,15 +419,16 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "Annotation" rule.
-   * @param updating updating flag
+   * @param updating also check for updating keyword
    * @return annotations
    * @throws QueryException query exception
    */
   private AnnList annotations(final boolean updating) throws QueryException {
     final AnnList anns = new AnnList();
     while(true) {
+      final Ann ann;
       if(updating && wsConsumeWs(UPDATING)) {
-        anns.add(new Ann(info(), Annotation.UPDATING));
+        ann = new Ann(info(), Annotation.UPDATING);
       } else if(consume('%')) {
         skipWs();
         final InputInfo info = info();
@@ -420,7 +446,7 @@ public class QueryParser extends InputParser {
         skipWs();
 
         final Annotation sig = Annotation.get(name);
-        // annotation is not statically known...
+        // check if annotation is a pre-defined one
         if(sig == null) {
           // reject unknown annotations with pre-defined namespaces, ignore others
           final byte[] uri = name.uri();
@@ -428,7 +454,7 @@ public class QueryParser extends InputParser {
             throw (NSGlobal.reserved(uri) ? ANNWHICH_X_X : BASX_ANNOT_X_X).get(
                 info, '%', name.string());
           }
-          anns.add(new Ann(info, name, items.finish()));
+          ann = new Ann(info, name, items.finish());
 
         } else {
           // check if annotation is specified more than once
@@ -443,12 +469,14 @@ public class QueryParser extends InputParser {
             final Item it = items.get(a);
             if(!st.instance(it)) throw BASX_ANNTYPE_X_X_X.get(info, sig, st, it.seqType());
           }
-
-          anns.add(new Ann(info, sig, items.finish()));
+          ann = new Ann(info, sig, items.finish());
         }
       } else {
         break;
       }
+
+      anns.add(ann);
+      if(ann.sig == Annotation.UPDATING) qc.updating();
     }
     skipWs();
     return anns;
@@ -888,7 +916,6 @@ public class QueryParser extends InputParser {
     final Var[] args = paramList();
     wsCheck(PAREN2);
     final SeqType type = optAsType();
-    if(anns.contains(Annotation.UPDATING)) qc.updating();
     final Expr expr = wsConsumeWs(EXTERNAL) ? null : enclosedExpr();
     final VarScope scope = localVars.popContext();
     funcs.add(qc.funcs.declare(anns, name, args, type, expr, sc, scope, currDoc.toString(), ii));
@@ -1668,9 +1695,7 @@ public class QueryParser extends InputParser {
           final ExprList argList = new ExprList(e);
           final int[] holes = argumentList(argList, e);
           final Expr[] args = argList.finish();
-          // MIXUPDATES: function may be updating
           if(holes == null) {
-            if(sc.mixUpdates) qc.updating();
             e = new DynFuncCall(ii, sc, ex, args);
           } else {
             e = new PartFunc(sc, ii, ex, args, holes);
@@ -2044,9 +2069,7 @@ public class QueryParser extends InputParser {
           final ExprList argList = new ExprList();
           final int[] holes = argumentList(argList, e);
           final Expr[] args = argList.finish();
-          // MIXUPDATES: function may be updating
           if(holes == null) {
-            if(sc.mixUpdates) qc.updating();
             e = new DynFuncCall(ii, sc, e, args);
           } else {
             e = new PartFunc(sc, ii, e, args, holes);
@@ -2404,12 +2427,7 @@ public class QueryParser extends InputParser {
       ret = new PartFunc(sc, ii, f, args, holes);
     } else {
       final TypedFunc f = Functions.get(name, args, qc, sc, ii);
-      if(f == null) {
-        ret = null;
-      } else {
-        if(f.anns.contains(Annotation.UPDATING)) qc.updating();
-        ret = f.fun;
-      }
+      ret = f != null ? f.fun : null;
     }
 
     if(ret != null) alter = null;
@@ -3474,8 +3492,7 @@ public class QueryParser extends InputParser {
         if(wsConsumeWs(DEFAULT)) {
           if(!using) throw error(FTSTOP);
         } else {
-          boolean union = false;
-          boolean except = false;
+          boolean union = false, except = false;
           while(using) {
             if(wsConsume(PAREN1)) {
               do {
@@ -3682,7 +3699,7 @@ public class QueryParser extends InputParser {
         }
         // skip if primary expression cannot be a function
         if(!(func instanceof Item) || func instanceof FItem) {
-          if(upd || sc.mixUpdates) qc.updating();
+          if(upd) qc.updating();
           return new DynFuncCall(ii, sc, upd, ndt, func, argList.finish());
         }
       }

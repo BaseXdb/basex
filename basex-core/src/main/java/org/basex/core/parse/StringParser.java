@@ -279,11 +279,11 @@ final class StringParser extends CmdParser {
     final StringBuilder sb = new StringBuilder();
     if(!eoc()) {
       try(final QueryContext qc = new QueryContext(ctx)) {
-        final QueryParser p = new QueryParser(parser.input, null, qc, null);
-        p.pos = parser.pos;
-        p.parseMain();
-        sb.append(parser.input.substring(parser.pos, p.pos));
-        parser.pos = p.pos;
+        final QueryParser qp = new QueryParser(parser.input, qc);
+        qp.pos = parser.pos;
+        qp.parseMain();
+        sb.append(parser.input.substring(parser.pos, qp.pos));
+        parser.pos = qp.pos;
       }
     }
     return finish(sb, cmd);

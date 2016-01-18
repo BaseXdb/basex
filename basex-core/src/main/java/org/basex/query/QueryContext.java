@@ -58,7 +58,7 @@ public final class QueryContext extends Proc implements Closeable {
   private final HashMap<QNm, Value> bindings = new HashMap<>();
 
   /** Parent query context. */
-  private final QueryContext qcParent;
+  private final QueryContext parent;
   /** Query info. */
   public final QueryInfo info;
   /** Database context. */
@@ -171,11 +171,11 @@ public final class QueryContext extends Proc implements Closeable {
   /**
    * Constructor.
    * @param context database context
-   * @param qcParent parent context (can be {@code null})
+   * @param parent parent context (can be {@code null})
    */
-  private QueryContext(final Context context, final QueryContext qcParent) {
+  private QueryContext(final Context context, final QueryContext parent) {
     this.context = context;
-    this.qcParent = qcParent;
+    this.parent = parent;
     info = new QueryInfo(this);
   }
 
@@ -197,7 +197,7 @@ public final class QueryContext extends Proc implements Closeable {
    * @param query query string
    * @param library library/main module
    * @param path file path (may be {@code null})
-   * @param sc static context
+   * @param sc static context (may be {@code null})
    * @return main module
    * @throws QueryException query exception
    */
@@ -210,7 +210,7 @@ public final class QueryContext extends Proc implements Closeable {
    * Parses the specified query.
    * @param query query string
    * @param path file path (may be {@code null})
-   * @param sc static context
+   * @param sc static context (may be {@code null})
    * @return main module
    * @throws QueryException query exception
    */
@@ -218,8 +218,11 @@ public final class QueryContext extends Proc implements Closeable {
       throws QueryException {
 
     info.query = query;
-    root = new QueryParser(query, path, this, sc).parseMain();
-    if(updating) updating = root.expr.has(Flag.UPD);
+    final QueryParser qp = new QueryParser(query, path, this, sc);
+    root = qp.parseMain();
+    if(updating) {
+      updating = (qp.sc.mixUpdates && qp.sc.dynFuncCall) || root.expr.has(Flag.UPD);
+    }
     return root;
   }
 
@@ -227,7 +230,7 @@ public final class QueryContext extends Proc implements Closeable {
    * Parses the specified module.
    * @param query query string
    * @param path file path (may be {@code null})
-   * @param sc static context
+   * @param sc static context (may be {@code null})
    * @return name of module
    * @throws QueryException query exception
    */
@@ -235,7 +238,12 @@ public final class QueryContext extends Proc implements Closeable {
       throws QueryException {
 
     info.query = query;
-    return new QueryParser(query, path, this, sc).parseLibrary(true);
+    try {
+      return new QueryParser(query, path, this, sc).parseLibrary(true);
+    } finally {
+      // library module itself is not updating
+      updating = false;
+    }
   }
 
   /**
@@ -248,30 +256,12 @@ public final class QueryContext extends Proc implements Closeable {
   }
 
   /**
-   * Checks function calls and variable references.
-   * @param main main module
-   * @param sc static context
-   * @throws QueryException query exception
-   */
-  void check(final MainModule main, final StaticContext sc) throws QueryException {
-    // check function calls and variable references
-    funcs.check(this);
-    vars.check();
-
-    // check placement of updating expressions if any have been found
-    if(!sc.mixUpdates && updating) {
-      funcs.checkUp();
-      vars.checkUp();
-      if(main != null) main.expr.checkUp();
-    }
-  }
-
-  /**
    * Compiles and optimizes the expression.
    * @throws QueryException query exception
    */
   public void compile() throws QueryException {
     if(compiled) return;
+
     try {
       // set database options
       final StringList opts = tempOpts;
@@ -356,7 +346,7 @@ public final class QueryContext extends Proc implements Closeable {
       final Updates updates = resources.updates;
       if(updates != null) {
         // only perform updates if no parent context exists
-        if(qcParent == null) {
+        if(parent == null) {
           // create copies of results that will be modified by an update operation
           final ItemList cache = resources.cache;
           final HashSet<Data> datas = updates.prepare(this);
@@ -530,7 +520,7 @@ public final class QueryContext extends Proc implements Closeable {
    * @param string evaluation info
    */
   public void evalInfo(final String string) {
-    (qcParent != null ? qcParent.info : info).evalInfo(string);
+    (parent != null ? parent.info : info).evalInfo(string);
   }
 
   /**
@@ -600,7 +590,7 @@ public final class QueryContext extends Proc implements Closeable {
     // close only once
     if(closed) return;
 
-    if(qcParent == null) {
+    if(parent == null) {
       closed = true;
       resources.close();
     }
@@ -629,7 +619,6 @@ public final class QueryContext extends Proc implements Closeable {
   // CLASS METHODS ======================================================================
 
   /**
-   * This function is called by the GUI; use {@link #iter()} instead.
    * Caches and returns the result of the specified query. If all nodes are of the same database
    * instance, the returned value will be of type {@link DBNodes}.
    * @param max maximum number of results to cache (negative: return all values)

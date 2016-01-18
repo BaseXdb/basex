@@ -184,12 +184,14 @@ public final class Functions extends TokenSet {
 
       final StandardFunc sf = fn.get(sc, ii, calls);
       final boolean upd = sf.has(Flag.UPD);
-      if(upd) anns.add(new Ann(ii, Annotation.UPDATING));
+      if(upd) {
+        anns.add(new Ann(ii, Annotation.UPDATING));
+        qc.updating();
+      }
 
-      if(!sf.has(Flag.CTX) && !sf.has(Flag.POS)) return closureOrFItem(
-          anns, name, args, fn.type(arity, anns), sf, scp, sc, ii, runtime, upd);
-
-      return new FuncLit(anns, name, args, sf, ft, scp, sc, ii);
+      return sf.has(Flag.CTX) || sf.has(Flag.POS)
+          ? new FuncLit(anns, name, args, sf, ft, scp, sc, ii)
+          : closureOrFItem(anns, name, args, fn.type(arity, anns), sf, scp, sc, ii, runtime, upd);
     }
 
     // user-defined function
@@ -276,13 +278,19 @@ public final class Functions extends TokenSet {
     final StandardFunc fun = get().get(name, args, sc, ii);
     if(fun != null) {
       final AnnList anns = new AnnList();
-      if(fun.sig.has(Flag.UPD)) anns.add(new Ann(ii, Annotation.UPDATING));
+      if(fun.sig.has(Flag.UPD)) {
+        anns.add(new Ann(ii, Annotation.UPDATING));
+        qc.updating();
+      }
       return new TypedFunc(fun, anns);
     }
 
     // user-defined function
     final TypedFunc tf = qc.funcs.getRef(name, args, sc, ii);
-    if(tf != null) return tf;
+    if(tf != null) {
+      if(tf.anns.contains(Annotation.UPDATING)) qc.updating();
+      return tf;
+    }
 
     // Java function
     final JavaFunction jf = JavaFunction.get(name, args, qc, sc, ii);

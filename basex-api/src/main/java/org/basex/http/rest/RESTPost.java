@@ -55,7 +55,7 @@ final class RESTPost {
     try {
       // handle serialization parameters
       final SerializerOptions sopts = http.sopts();
-      try(QueryProcessor qp = new QueryProcessor("*/*:parameter", ctx).context(doc)) {
+      try(final QueryProcessor qp = new QueryProcessor("*/*:parameter", ctx).context(doc)) {
         for(final Item param : qp.value()) {
           final String name = value("@name", param, ctx);
           final String value = value("@value", param, ctx);

@@ -40,7 +40,7 @@ public final class QuerySuggest extends QueryParser {
    */
   public QuerySuggest(final String query, final QueryContext qc, final Data data)
       throws QueryException {
-    super(query, null, qc, null);
+    super(query, qc);
     this.data = data;
     checkInit();
   }

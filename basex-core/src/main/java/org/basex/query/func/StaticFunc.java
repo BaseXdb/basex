@@ -197,7 +197,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   }
 
   /**
-   * Checks if all updating expressions in the function are correctly declared and placed.
+   * Checks if the updating semantics are satisfied.
    * @throws QueryException query exception
    */
   void checkUp() throws QueryException {
