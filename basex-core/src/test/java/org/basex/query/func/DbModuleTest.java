@@ -9,11 +9,13 @@ import java.util.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.core.cmd.Set;
 import org.basex.core.parse.Commands.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
+import org.basex.util.list.*;
 import org.basex.util.options.*;
 import org.junit.*;
 import org.junit.Test;
@@ -32,14 +34,14 @@ public final class DbModuleTest extends AdvancedQueryTest {
   /** Test folder. */
   private static final String FLDR = "src/test/resources/dir/";
   /** Number of XML files for folder. */
-  private static final int NFLDR;
+  private static final int XMLFILES;
 
   static {
-    int fc = 0;
-    for(final IOFile c : new IOFile(FLDR).children()) {
-      if(c.name().endsWith(IO.XMLSUFFIX)) ++fc;
+    int files = 0;
+    for(final IOFile file : new IOFile(FLDR).children()) {
+      if(file.name().endsWith(IO.XMLSUFFIX)) ++files;
     }
-    NFLDR = fc;
+    XMLFILES = files;
   }
 
   /**
@@ -286,11 +288,11 @@ public final class DbModuleTest extends AdvancedQueryTest {
     query(COUNT.args(COLLECTION.args(NAME + "/test/t4.xml") + "/html"), "1");
 
     query(_DB_ADD.args(NAME, FLDR, "test/dir"));
-    query(COUNT.args(COLLECTION.args(NAME + "/test/dir")), NFLDR);
+    query(COUNT.args(COLLECTION.args(NAME + "/test/dir")), XMLFILES);
 
     query("for $f in " + _FILE_LIST.args(FLDR, true, "*.xml") +
         " return " + _DB_ADD.args(NAME, " '" + FLDR + "' || $f", "dir"));
-    query(COUNT.args(COLLECTION.args(NAME + "/dir")), NFLDR);
+    query(COUNT.args(COLLECTION.args(NAME + "/dir")), XMLFILES);
 
     query("for $i in 1 to 3 return " +
         _DB_ADD.args(NAME, "\"<root/>\"", "\"doc\" || $i"));
@@ -373,7 +375,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
 
     // create DB from folder
     query(_DB_CREATE.args(NAME, FLDR, "test/dir"));
-    query(COUNT.args(COLLECTION.args(NAME + "/test/dir")), NFLDR);
+    query(COUNT.args(COLLECTION.args(NAME + "/test/dir")), XMLFILES);
 
     // create DB w/ more than one input
     query(_DB_CREATE.args(NAME, "(<a/>,<b/>)", "('1.xml','2.xml')"));
@@ -475,12 +477,12 @@ public final class DbModuleTest extends AdvancedQueryTest {
   @Test
   public void rename() {
     execute(new Add("test/docs", FLDR));
-    query(COUNT.args(COLLECTION.args(NAME + "/test")), NFLDR);
+    query(COUNT.args(COLLECTION.args(NAME + "/test")), XMLFILES);
 
     // rename document
     query(_DB_RENAME.args(NAME, "test", "newtest"));
     query(COUNT.args(COLLECTION.args(NAME + "/test")), 0);
-    query(COUNT.args(COLLECTION.args(NAME + "/newtest")), NFLDR);
+    query(COUNT.args(COLLECTION.args(NAME + "/newtest")), XMLFILES);
 
     // invalid target
     error(_DB_RENAME.args(NAME, "input.xml", " ''"), BXDB_PATH_X);
@@ -489,7 +491,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
 
     // rename paths
     query(_DB_RENAME.args(NAME, "", "x"));
-    query(COUNT.args(COLLECTION.args(NAME + "/x/newtest")), NFLDR);
+    query(COUNT.args(COLLECTION.args(NAME + "/x/newtest")), XMLFILES);
 
     // rename binary file
     query(_DB_STORE.args(NAME, "file1", ""));
@@ -537,6 +539,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void optimize() {
+    // simple optimize call
     query(_DB_OPTIMIZE.args(NAME));
     query(_DB_OPTIMIZE.args(NAME));
     // opened database cannot be fully optimized
@@ -544,72 +547,71 @@ public final class DbModuleTest extends AdvancedQueryTest {
     execute(new Close());
     query(_DB_OPTIMIZE.args(NAME, true));
 
-    // specify additional index options
-    final String[] nopt = { "maxcats", "maxlen", "indexsplitsize", "ftindexsplitsize" };
-    for(final String k : nopt) {
-      query(_DB_OPTIMIZE.args(NAME, false, " map { '" + k + "': 1 }"));
+    // commands
+    final CmdIndex[] cis = { CmdIndex.TEXT, CmdIndex.ATTRIBUTE, CmdIndex.TOKEN, CmdIndex.FULLTEXT };
+    // options
+    final String[] numberOptions = lc(MainOptions.MAXCATS, MainOptions.MAXLEN,
+        MainOptions.INDEXSPLITSIZE, MainOptions.FTINDEXSPLITSIZE);
+    final String[] boolOptions = lc(MainOptions.TEXTINDEX, MainOptions.ATTRINDEX,
+        MainOptions.TOKENINDEX, MainOptions.FTINDEX, MainOptions.STEMMING,
+        MainOptions.CASESENS, MainOptions.DIACRITICS);
+    final String[] stringOptions = lc(MainOptions.LANGUAGE, MainOptions.STOPWORDS);
+    final String[] indexes = lc(MainOptions.TEXTINDEX, MainOptions.ATTRINDEX,
+        MainOptions.TOKENINDEX, MainOptions.FTINDEX);
+    final String[] includes = lc(MainOptions.TEXTINCLUDE, MainOptions.ATTRINCLUDE,
+        MainOptions.TOKENINCLUDE, MainOptions.FTINCLUDE);
+
+    // check single options
+    for(final String option : numberOptions)
+      query(_DB_OPTIMIZE.args(NAME, false, " map { '" + option + "': 1 }"));
+    for(final String option : boolOptions) {
+      for(final boolean bool : new boolean[] { true, false })
+        query(_DB_OPTIMIZE.args(NAME, false, " map { '" + option + "':" + bool + "() }"));
     }
-    final String[] bopt = { "textindex", "attrindex", "tokenindex", "ftindex", "stemming",
-        "casesens", "diacritics" };
-    for(final String k : bopt) {
-      for(final boolean v : new boolean[] { true, false }) {
-        query(_DB_OPTIMIZE.args(NAME, false, " map { '" + k + "':" + v + "() }"));
-      }
-    }
-    final String[] sopt = { "language", "stopwords" };
-    for(final String k : sopt) {
-      query(_DB_OPTIMIZE.args(NAME, false, " map { '" + k + "':'' }"));
-    }
+    for(final String option : stringOptions)
+      query(_DB_OPTIMIZE.args(NAME, false, " map { '" + option + "':'' }"));
+    // ensure that option in context was not changed
     assertEquals(context.options.get(MainOptions.TEXTINDEX), true);
 
+    // check invalid options
     error(_DB_OPTIMIZE.args(NAME, false, " map { 'xyz': 'abc' }"), BASX_OPTIONS_X);
     error(_DB_OPTIMIZE.args(NAME, false, " map { 'updindex': 1 }"), BASX_OPTIONS_X);
     error(_DB_OPTIMIZE.args(NAME, false, " map { 'maxlen': -1 }"), BASX_VALUE_X_X);
     error(_DB_OPTIMIZE.args(NAME, false, " map { 'maxlen': 'a' }"), BASX_VALUE_X_X);
     error(_DB_OPTIMIZE.args(NAME, false, " map { 'textindex':'nope' }"), BASX_VALUE_X_X);
 
-    // check if optimize call preserves original options
+    // check if optimize call adopts original options
     query(_DB_OPTIMIZE.args(NAME));
-    final BooleanOption[] indexes = { MainOptions.TEXTINDEX, MainOptions.ATTRINDEX,
-        MainOptions.TOKENINDEX, MainOptions.FTINDEX };
-    final StringOption[] includes = { MainOptions.TEXTINCLUDE, MainOptions.ATTRINCLUDE,
-        MainOptions.TOKENINCLUDE, MainOptions.FTINCLUDE };
-    for(final BooleanOption bo : indexes) query(_DB_INFO.args(NAME) +
-        "//" + bo.name().toLowerCase(Locale.ENGLISH) + "/text()", "false");
-    for(final StringOption so : includes) query(_DB_INFO.args(NAME) +
-        "//" + so.name().toLowerCase(Locale.ENGLISH) + "/text()", "");
+    for(final String ind : indexes) query(_DB_INFO.args(NAME) + "//" + ind + "/text()", "false");
+    for(final String inc : includes) query(_DB_INFO.args(NAME) + "//" + inc + "/text()", "");
 
+    // check if options in context are adopted
     execute(new Open(NAME));
-    final CmdIndex[] cis = { CmdIndex.TEXT, CmdIndex.ATTRIBUTE, CmdIndex.TOKEN, CmdIndex.FULLTEXT };
-    for(final StringOption so : includes) set(so, "a");
+    for(final String inc : includes) execute(new Set(inc, "a"));
     for(final CmdIndex ci : cis) execute(new CreateIndex(ci));
     execute(new Close());
-
     query(_DB_OPTIMIZE.args(NAME));
-    for(final BooleanOption bo : indexes) query(_DB_INFO.args(NAME) +
-        "//" + bo.name().toLowerCase(Locale.ENGLISH) + "/text()", "true");
-    for(final StringOption so : includes) query(_DB_INFO.args(NAME) +
-        "//" + so.name().toLowerCase(Locale.ENGLISH) + "/text()", "a");
+    for(final String ind : indexes) query(_DB_INFO.args(NAME) + "//" + ind + "/text()", "true");
+    for(final String inc : includes) query(_DB_INFO.args(NAME) + "//" + inc + "/text()", "a");
 
+    // check if options in context are adopted, even if database is closed (reset options)
     execute(new Open(NAME));
-    for(final StringOption so : includes) set(so, "");
+    for(final String inc : includes) execute(new Set(inc, ""));
     for(final CmdIndex cmd : cis) execute(new DropIndex(cmd));
+    for(final String ind : indexes) query(_DB_INFO.args(NAME) + "//" + ind + "/text()", "false");
+    for(final String inc : includes) query(_DB_INFO.args(NAME) + "//" + inc + "/text()", "");
     execute(new Close());
-
     query(_DB_OPTIMIZE.args(NAME));
-    for(final BooleanOption bo : indexes) query(_DB_INFO.args(NAME) +
-        "//" + bo.name().toLowerCase(Locale.ENGLISH) + "/text()", "false");
-    for(final StringOption so : includes) query(_DB_INFO.args(NAME) +
-        "//" + so.name().toLowerCase(Locale.ENGLISH) + "/text()", "");
+    for(final String ind : indexes) query(_DB_INFO.args(NAME) + "//" + ind + "/text()", "false");
+    for(final String inc : includes) query(_DB_INFO.args(NAME) + "//" + inc + "/text()", "");
 
+    // check if options specified in map are adopted
     query(_DB_OPTIMIZE.args(NAME, true, " map {"
         + "'textindex':true(),'attrindex':true(),'ftindex':true(),'tokenindex':true(),"
         + "'updindex':true(),'textinclude':'a','attrinclude':'a','tokeninclude':'a','ftinclude':'a'"
         + " }"));
-    for(final BooleanOption bo : indexes) query(_DB_INFO.args(NAME) +
-        "//" + bo.name().toLowerCase(Locale.ENGLISH) + "/text()", "true");
-    for(final StringOption so : includes) query(_DB_INFO.args(NAME) +
-        "//" + so.name().toLowerCase(Locale.ENGLISH) + "/text()", "a");
+    for(final String ind : indexes) query(_DB_INFO.args(NAME) + "//" + ind + "/text()", "true");
+    for(final String inc : includes) query(_DB_INFO.args(NAME) + "//" + inc + "/text()", "a");
     query(_DB_INFO.args(NAME) + "//updindex/text()", "true");
   }
 
@@ -809,5 +811,16 @@ public final class DbModuleTest extends AdvancedQueryTest {
 
     // invalid names
     error(_DB_RESTORE.args(" ''"), BXDB_NAME_X);
+  }
+
+  /**
+   * Returns lower-case representations of the specified options.
+   * @param options options
+   * @return string
+   */
+  private String[] lc(final Option<?>... options) {
+    final StringList sl = new StringList();
+    for(final Option<?> option : options) sl.add(option.name().toLowerCase(Locale.ENGLISH));
+    return sl.finish();
   }
 }
