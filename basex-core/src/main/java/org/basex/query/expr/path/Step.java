@@ -17,6 +17,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.query.value.type.SeqType.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -73,7 +74,7 @@ public abstract class Step extends Preds {
     super(info, preds);
     this.axis = axis;
     this.test = test;
-    seqType = SeqType.NOD_ZM;
+    seqType = SeqType.get(test.type, Occ.ZERO_MORE);
   }
 
   @Override

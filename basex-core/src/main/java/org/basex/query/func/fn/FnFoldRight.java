@@ -54,7 +54,7 @@ public final class FnFoldRight extends StandardFunc {
   protected Expr opt(final QueryContext qc, final VarScope scp) throws QueryException {
     if(allAreValues() && exprs[0].size() < FnForEach.UNROLL_LIMIT) {
       // unroll the loop
-      qc.compInfo(QueryText.OPTUNROLL, this);
+      qc.compInfo(QueryText.OPTUNROLL_X, this);
       final Value seq = (Value) exprs[0];
       Expr e = exprs[1];
       for(int i = (int) seq.size(); --i >= 0;) {

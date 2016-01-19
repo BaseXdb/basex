@@ -7,6 +7,7 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.constr.*;
 import org.basex.query.expr.ft.*;
 import org.basex.query.expr.gflwor.*;
+import org.basex.query.expr.index.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;

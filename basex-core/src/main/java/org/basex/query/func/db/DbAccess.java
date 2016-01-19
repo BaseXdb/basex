@@ -5,7 +5,7 @@ import static org.basex.util.Token.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
-import org.basex.query.expr.*;
+import org.basex.query.expr.index.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.expr.path.Test.Kind;
 import org.basex.query.iter.*;

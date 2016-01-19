@@ -33,7 +33,7 @@ public final class FnBoolean extends StandardFunc {
     // if A is not numeric: expr[boolean(A)] -> expr[A]
     final Expr e = exprs[0];
     if(!e.seqType().mayBeNumber()) {
-      qc.compInfo(QueryText.OPTREWRITE, this);
+      qc.compInfo(QueryText.OPTREWRITE_X, this);
       return e;
     }
     return this;

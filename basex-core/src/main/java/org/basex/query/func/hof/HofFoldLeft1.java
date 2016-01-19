@@ -36,7 +36,7 @@ public final class HofFoldLeft1 extends StandardFunc {
   @Override
   protected Expr opt(final QueryContext qc, final VarScope scp) throws QueryException {
     if(allAreValues() && exprs[0].size() <= FnForEach.UNROLL_LIMIT) {
-      qc.compInfo(QueryText.OPTUNROLL, this);
+      qc.compInfo(QueryText.OPTUNROLL_X, this);
       final Value seq = (Value) exprs[0];
       if(seq.isEmpty()) throw EMPTYFOUND.get(info);
       final FItem f = checkArity(exprs[1], 2, qc);

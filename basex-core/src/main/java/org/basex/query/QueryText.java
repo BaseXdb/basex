@@ -783,55 +783,47 @@ public interface QueryText {
   /** Optimization info. */
   String OPTDESC = "rewriting descendant-or-self step(s)";
   /** Optimization info. */
-  String OPTATOMIC = "atomic evaluation of %";
+  String OPTATOMIC_X = "atomic evaluation of %";
   /** Optimization info. */
-  String OPTPRE = "pre-evaluating %";
+  String OPTPRE_X = "pre-evaluating %";
   /** Optimization info. */
-  String OPTREWRITE = "rewriting %";
+  String OPTREWRITE_X = "rewriting %";
   /** Optimization info. */
-  String OPTFLAT = "flattening %";
+  String OPTFLAT_X = "flattening %";
   /** Optimization info. */
-  String OPTREMOVE = "%: removing %";
+  String OPTREMOVE_X_X = "%: removing %";
   /** Optimization info. */
-  String OPTTCE = "marking as tail call: %";
+  String OPTTCE_X = "marking as tail call: %";
   /** Optimization info. */
   String OPTFORLET = "moving for/let clauses";
   /** Optimization info. */
   String OPTFORTOLET = "rewriting singleton for to let";
   /** Optimization info. */
-  String OPTSWAP = "swapping operands: %";
+  String OPTSWAP_X = "swapping operands: %";
   /** Optimization info. */
   String OPTFLWOR = "simplifying flwor expression";
   /** Optimization info. */
-  String OPTINLINE = "inlining %";
+  String OPTINLINE_X = "inlining %";
   /** Optimization info. */
-  String OPTWHERE2 = "rewriting where clause(s)";
+  String OPTWHERE = "rewriting where clause(s)";
   /** Optimization info. */
-  String OPTPRED = "rewriting % to predicate(s)";
+  String OPTPRED_X = "rewriting % to predicate(s)";
   /** Optimization info. */
-  String OPTCAST = "removing redundant % cast.";
+  String OPTCAST_X = "removing redundant % cast.";
   /** Optimization info. */
-  String OPTVAR = "removing variable %";
+  String OPTVAR_X = "removing variable %";
   /** Optimization info. */
-  String OPTNAME = "removing unknown element/attribute %";
+  String OPTNAME_X = "removing unknown element/attribute %";
   /** Optimization info. */
-  String OPTPATH = "removing non-existing path %";
+  String OPTPATH_X = "removing non-existing path %";
   /** Optimization info. */
-  String OPTTXTINDEX = "applying text index for %";
-  /** Optimization info. */
-  String OPTATVINDEX = "applying attribute index for %";
-  /** Optimization info. */
-  String OPTFTXINDEX = "applying full-text index for %";
-  /** Optimization info. */
-  String OPTRNGINDEX = "applying range index for %";
-  /** Optimization info. */
-  String OPTSRNGINDEX = "applying string range index for %";
+  String OPTINDEX_X_X = "applying % index for %";
   /** Optimization info. */
   String OPTNOINDEX = "removing path with no index results";
   /** Optimization info. */
-  String OPTCHILD = "converting % to child steps";
+  String OPTCHILD_X = "converting % to child steps";
   /** Optimization info. */
-  String OPTUNROLL = "unrolling %";
+  String OPTUNROLL_X = "unrolling %";
 
   // DEBUGGING INFO
 

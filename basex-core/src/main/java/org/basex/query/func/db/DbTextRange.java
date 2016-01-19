@@ -2,13 +2,11 @@ package org.basex.query.func.db;
 
 import static org.basex.query.QueryError.*;
 
-import java.util.*;
-
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.query.*;
 import org.basex.query.*;
-import org.basex.query.expr.*;
+import org.basex.query.expr.index.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 
@@ -21,28 +19,27 @@ import org.basex.query.util.*;
 public class DbTextRange extends DbAccess {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    return rangeAccess(true, qc).iter(qc);
+    return rangeAccess(IndexType.TEXT, qc).iter(qc);
   }
 
   /**
    * Returns a range index accessor.
-   * @param text text/attribute flag
+   * @param type index type ({@link IndexType#TEXT} or {@link IndexType#ATTRIBUTE})
    * @param qc query context
    * @return iterator
    * @throws QueryException query exception
    */
-  final StringRangeAccess rangeAccess(final boolean text, final QueryContext qc)
+  final StringRangeAccess rangeAccess(final IndexType type, final QueryContext qc)
       throws QueryException {
 
     final Data data = checkData(qc);
     final byte[] min = toToken(exprs[1], qc);
     final byte[] max = toToken(exprs[2], qc);
 
-    final MetaData meta = data.meta;
-    if(!(text ? meta.textindex : meta.attrindex)) throw BXDB_INDEX_X.get(info, meta.name,
-        (text ? IndexType.TEXT : IndexType.ATTRIBUTE).toString().toLowerCase(Locale.ENGLISH));
+    if(!(type == IndexType.TEXT ? data.meta.textindex : data.meta.attrindex))
+      throw BXDB_INDEX_X.get(info, data.meta.name, type);
 
-    final StringRange sr = new StringRange(text, min, true, max, true);
+    final StringRange sr = new StringRange(type, min, true, max, true);
     return new StringRangeAccess(info, sr, new IndexContext(data, false));
   }
 }

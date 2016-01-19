@@ -5,8 +5,8 @@ import static org.basex.query.func.Function.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.query.ast.*;
-import org.basex.query.expr.*;
 import org.basex.query.expr.ft.*;
+import org.basex.query.expr.index.*;
 import org.basex.util.*;
 import org.junit.*;
 import org.junit.Test;
@@ -25,6 +25,7 @@ public final class IndexOptimizeTest extends QueryPlanTest {
   public static void start() {
     execute(new DropDB(NAME));
     set(MainOptions.FTINDEX, true);
+    set(MainOptions.TOKENINDEX, true);
     set(MainOptions.QUERYINFO, true);
   }
 
@@ -124,6 +125,25 @@ public final class IndexOptimizeTest extends QueryPlanTest {
     check(func + "//*[text() = '4']", "<a>4</a>");
     check("for $s in ('x', '', string-join((1 to 513) ! 'a'))"
         + "return " + func + "//*[text() = $s]", "");
+  }
+
+  /**
+   * Checks token requests.
+   */
+  @Test
+  public void tokenTest() {
+    createDoc();
+    execute(new Open(NAME));
+    check("data(//*[tokenize(@idref) = 'id1'])", "1");
+    check("data(//@*[tokenize(.) = 'id1'])", "id1 id2");
+    check("for $s in ('id2', 'id3') return data(//*[tokenize(@idref) = $s])", "1");
+    check("for $s in ('id2', 'id3') return data(//@*[tokenize(.) = $s])", "id1 id2");
+
+    check("data(//*[contains-token(@idref, 'id1')])", "1");
+    check("data(//*[contains-token(@idref, '   id1  ')])", "1");
+    check("data(//@*[contains-token(., 'id1')])", "id1 id2");
+    check("for $s in ('id2', 'id3') return data(//*[contains-token(@idref, $s)])", "1");
+    check("for $s in ('id2', 'id3') return data(//@*[contains-token(., $s)])", "id1 id2");
   }
 
   /**
@@ -228,7 +248,7 @@ public final class IndexOptimizeTest extends QueryPlanTest {
    * Creates a test database.
    */
   private static void createDoc() {
-    execute(new CreateDB(NAME, "<xml><a x='y'>1</a><a>2 3</a><a/></xml>"));
+    execute(new CreateDB(NAME, "<xml><a x='y' idref='id1 id2'>1</a><a>2 3</a><a/></xml>"));
     execute(new Close());
   }
 

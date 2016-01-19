@@ -166,7 +166,7 @@ public interface Commands {
   /** Index types. */
   enum CmdIndex { TEXT, ATTRIBUTE, TOKEN, FULLTEXT }
   /** Index types. */
-  enum CmdIndexInfo { NULL, TEXT, ATTRIBUTE, TOKEN, FULLTEXT, PATH, TAG, ATTNAME }
+  enum CmdIndexInfo { NULL, TEXT, ATTRIBUTE, TOKEN, FULLTEXT, PATH, ELEMNAME, ATTRNAME }
   /** Alter types. */
   enum CmdAlter { DATABASE, DB, PASSWORD, USER }
   /** Repo types. */

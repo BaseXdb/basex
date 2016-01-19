@@ -100,7 +100,7 @@ public enum Function {
   /** XQuery function. */
   CODEPOINTS_TO_STRING(FnCodepointsToString.class, "codepoints-to-string(nums)", arg(ITR_ZM), STR),
   /** XQuery function. */
-  COLLECTION(FnCollection.class, "collection([uri])", arg(STR_ZO), NOD_ZM),
+  COLLECTION(FnCollection.class, "collection([uri])", arg(STR_ZO), DOC_ZM),
   /** XQuery function. */
   COMPARE(FnCompare.class, "compare(first,second[,collation])", arg(STR_ZO, STR_ZO, STR), ITR_ZO),
   /** XQuery function. */

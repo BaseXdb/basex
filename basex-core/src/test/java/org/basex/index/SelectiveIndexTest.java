@@ -11,7 +11,7 @@ import org.basex.query.*;
 import org.junit.Test;
 
 /**
- * Tests for the selective index feature (#59).
+ * Storage tests for the selective index feature (#59).
  *
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen

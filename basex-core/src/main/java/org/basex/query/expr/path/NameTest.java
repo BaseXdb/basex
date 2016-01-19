@@ -37,11 +37,12 @@ public final class NameTest extends Test {
    * @param elemNS default element namespace (may be {@code null})
    */
   public NameTest(final QNm name, final Kind kind, final boolean attr, final byte[] elemNS) {
+    super(attr ? NodeType.ATT : NodeType.ELM);
     this.name = name;
     this.kind = kind;
-    type = attr ? NodeType.ATT : NodeType.ELM;
     local = name != null ? name.local() : null;
     defElemNS = elemNS != null ? elemNS : Token.EMPTY;
+    unique = kind == Kind.URI_NAME;
   }
 
   @Override
@@ -70,7 +71,7 @@ public final class NameTest extends Test {
     if(results) results = kind != Kind.NAME ||
         (type == NodeType.ELM ? data.elemNames : data.attrNames).contains(local);
 
-    if(!results) qc.compInfo(OPTNAME, name);
+    if(!results) qc.compInfo(OPTNAME_X, name);
     return results;
   }
 

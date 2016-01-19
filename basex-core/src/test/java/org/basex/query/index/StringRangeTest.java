@@ -6,6 +6,7 @@ import org.basex.core.cmd.*;
 import org.basex.core.parse.Commands.CmdIndex;
 import org.basex.query.ast.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.index.*;
 import org.basex.util.*;
 import org.junit.*;
 import org.junit.Test;

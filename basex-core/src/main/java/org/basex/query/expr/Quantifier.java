@@ -66,7 +66,7 @@ public final class Quantifier extends Single {
       final GFLWOR gflwor = (GFLWOR) expr;
       if(gflwor.size() > 0 && gflwor.ret.isValue()) {
         final Value value = (Value) gflwor.ret;
-        qc.compInfo(OPTPRE, value);
+        qc.compInfo(OPTPRE_X, value);
         return Bln.get(value.ebv(qc, info).bool(info));
       }
     }

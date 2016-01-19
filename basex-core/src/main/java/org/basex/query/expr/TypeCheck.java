@@ -54,7 +54,7 @@ public final class TypeCheck extends Single {
 
     // return type is already correct
     if(argType.instanceOf(seqType)) {
-      qc.compInfo(QueryText.OPTCAST, seqType);
+      qc.compInfo(QueryText.OPTCAST_X, seqType);
       return expr;
     }
 

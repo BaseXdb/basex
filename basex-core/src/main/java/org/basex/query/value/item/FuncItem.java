@@ -213,7 +213,7 @@ public final class FuncItem extends FItem implements Scope {
       final InputInfo ii) throws QueryException {
 
     if(!StaticFunc.inline(qc, anns, expr) || expr.has(Flag.CTX)) return null;
-    qc.compInfo(OPTINLINE, this);
+    qc.compInfo(OPTINLINE_X, this);
 
     // create let bindings for all variables
     final LinkedList<Clause> cls = exprs.length == 0 ? null : new LinkedList<Clause>();

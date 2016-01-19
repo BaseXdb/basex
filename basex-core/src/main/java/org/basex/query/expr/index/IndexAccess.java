@@ -1,6 +1,7 @@
-package org.basex.query.expr;
+package org.basex.query.expr.index;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.util.*;

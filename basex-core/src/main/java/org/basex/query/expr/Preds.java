@@ -85,7 +85,7 @@ public abstract class Preds extends ParseExpr {
           if(e2.isFunction(Function.LAST) || st2.one() && st2.type.isNumber()) {
             if(cmp instanceof CmpG && ((CmpG) cmp).op == OpG.EQ ||
                cmp instanceof CmpV && ((CmpV) cmp).op == OpV.EQ) {
-              qc.compInfo(OPTREWRITE, pred);
+              qc.compInfo(OPTREWRITE_X, pred);
               preds[p] = e2;
             }
           }
@@ -93,7 +93,7 @@ public abstract class Preds extends ParseExpr {
       } else if(pred instanceof And) {
         if(!pred.has(Flag.POS)) {
           // replace AND expression with predicates (don't swap position tests)
-          qc.compInfo(OPTPRED, pred);
+          qc.compInfo(OPTPRED_X, pred);
           final Expr[] and = ((Arr) pred).exprs;
           final int m = and.length - 1;
           final ExprList el = new ExprList(preds.length + m);
@@ -117,7 +117,7 @@ public abstract class Preds extends ParseExpr {
       } else if(pred.isValue()) {
         if(pred.ebv(qc, info).bool(info)) {
           // example: ....[true()]
-          qc.compInfo(OPTREMOVE, this, pred);
+          qc.compInfo(OPTREMOVE_X_X, this, pred);
           preds = Array.delete(preds, p--);
         } else {
           // example: ....[false()]

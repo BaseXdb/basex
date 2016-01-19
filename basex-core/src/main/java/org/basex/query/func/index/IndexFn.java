@@ -3,8 +3,6 @@ package org.basex.query.func.index;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
-import java.util.*;
-
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.query.*;
@@ -45,22 +43,21 @@ public abstract class IndexFn extends StandardFunc {
 
     final ValueIndex index;
     final boolean avl;
-    final IndexType it = entries.type();
-    if(it == IndexType.TEXT) {
+    final IndexType type = entries.type();
+    if(type == IndexType.TEXT) {
       index = data.textIndex;
       avl = data.meta.textindex;
-    } else if(it == IndexType.ATTRIBUTE) {
+    } else if(type == IndexType.ATTRIBUTE) {
       index = data.attrIndex;
       avl = data.meta.attrindex;
-    } else if(it == IndexType.TOKEN) {
+    } else if(type == IndexType.TOKEN) {
       index = data.tokenIndex;
       avl = data.meta.tokenindex;
     } else {
       index = data.ftIndex;
       avl = data.meta.ftindex;
     }
-    if(!avl) throw BXDB_INDEX_X.get(call.info, data.meta.name,
-        it.toString().toLowerCase(Locale.ENGLISH));
+    if(!avl) throw BXDB_INDEX_X.get(call.info, data.meta.name, type);
     return entries(index, entries);
   }
 

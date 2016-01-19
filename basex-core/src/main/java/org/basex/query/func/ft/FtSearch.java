@@ -3,8 +3,6 @@ package org.basex.query.func.ft;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.ft.FTFlag.*;
 
-import java.util.*;
-
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.query.*;
@@ -28,8 +26,7 @@ public final class FtSearch extends FtAccess {
     final FtIndexOptions opts = toOptions(2, Q_OPTIONS, new FtIndexOptions(), qc);
 
     final IndexContext ic = new IndexContext(data, false);
-    if(!data.meta.ftindex) throw BXDB_INDEX_X.get(info, data.meta.name,
-        IndexType.FULLTEXT.toString().toLowerCase(Locale.ENGLISH));
+    if(!data.meta.ftindex) throw BXDB_INDEX_X.get(info, data.meta.name, IndexType.FULLTEXT);
 
     final FTOpt opt = new FTOpt().copy(data.meta);
     final FTMode mode = opts.get(FtIndexOptions.MODE);

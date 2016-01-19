@@ -12,7 +12,7 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class NodeTest extends Test {
-  /** Extended type. */
+  /** Extended type (can be {@code null}). */
   private final Type ext;
 
   /**
@@ -20,7 +20,7 @@ public final class NodeTest extends Test {
    * @param nm node name
    */
   public NodeTest(final QNm nm) {
-    this(NodeType.ELM, nm, null);
+    this(NodeType.ELM, nm);
   }
 
   /**
@@ -36,10 +36,10 @@ public final class NodeTest extends Test {
    * Constructor.
    * @param type node type
    * @param name optional node name
-   * @param ext extended node type
+   * @param ext extended node type (can be {@code null})
    */
   public NodeTest(final NodeType type, final QNm name, final Type ext) {
-    this.type = type;
+    super(type);
     this.name = name;
     this.ext = ext;
   }

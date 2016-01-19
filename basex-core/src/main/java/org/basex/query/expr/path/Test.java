@@ -42,11 +42,13 @@ public abstract class Test {
   }
 
   /** Node kind. */
-  public NodeType type;
+  public final NodeType type;
   /** Kind of name test (can be {@code null}). */
   public Kind kind;
   /** Name test (can be {@code null}). */
   public QNm name;
+  /** Indicates if test will match exactly one node (e.g.: @id). */
+  public boolean unique;
 
   /** Mutable QName instance. */
   final QNm tmpq = new QNm();
@@ -68,6 +70,14 @@ public abstract class Test {
       case NSP: return NSP;
       default: throw Util.notExpected();
     }
+  }
+
+  /**
+   * Constructor.
+   * @param type node type
+   */
+  Test(final NodeType type) {
+    this.type = type;
   }
 
   /**

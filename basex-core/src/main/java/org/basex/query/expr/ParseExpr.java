@@ -26,8 +26,9 @@ public abstract class ParseExpr extends Expr {
   /** Input information. */
   public InputInfo info;
   /** Static type. */
-  protected SeqType seqType;
-  /** Cardinality of result; {@code -1} if unknown. */
+  public SeqType seqType;
+  /** Cardinality of result; {@code -1} if unknown
+   * ({@link #seqType} will then be requested to estimate result size). */
   protected long size = -1;
 
   /**
@@ -129,14 +130,6 @@ public abstract class ParseExpr extends Expr {
   // OPTIMIZATIONS ================================================================================
 
   /**
-   * Assigns a sequence type.
-   * @param type sequence type
-   */
-  public void seqType(final SeqType type) {
-    seqType = type;
-  }
-
-  /**
    * Pre-evaluates the specified expression.
    * @param qc query context
    * @return optimized expression
@@ -162,7 +155,7 @@ public abstract class ParseExpr extends Expr {
    * @return optimized expression
    */
   protected final Expr optPre(final Expr ex, final QueryContext qc) {
-    if(ex != this) qc.compInfo(OPTPRE, this);
+    if(ex != this) qc.compInfo(OPTPRE_X, this);
     return ex == null ? Empty.SEQ : ex;
   }
 

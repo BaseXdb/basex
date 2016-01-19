@@ -1,5 +1,7 @@
 package org.basex.index.stats;
 
+import java.util.*;
+
 /**
  * Content types, used for index statistics.
  *
@@ -18,5 +20,10 @@ public enum StatsType {
   /** Numeric.  */
   DOUBLE,
   /** No values. */
-  NONE
+  NONE;
+
+  @Override
+  public String toString() {
+    return name().toLowerCase(Locale.ENGLISH);
+  }
 }

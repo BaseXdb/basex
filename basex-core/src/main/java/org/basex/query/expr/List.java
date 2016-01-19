@@ -52,7 +52,7 @@ public final class List extends Arr {
     }
 
     if(p != exprs.length) {
-      qc.compInfo(OPTREMOVE, this, Empty.SEQ);
+      qc.compInfo(OPTREMOVE_X_X, this, Empty.SEQ);
       if(p < 2) return p == 0 ? Empty.SEQ : exprs[0];
       final Expr[] es = new Expr[p];
       System.arraycopy(exprs, 0, es, 0, p);

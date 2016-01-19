@@ -10,6 +10,7 @@ import org.basex.data.*;
 import org.basex.index.path.*;
 import org.basex.query.*;
 import org.basex.query.expr.constr.*;
+import org.basex.query.expr.index.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.List;
 import org.basex.query.expr.path.Test.*;
@@ -54,8 +55,8 @@ public abstract class Path extends ParseExpr {
   }
 
   /**
-   * Returns a new path instance. A path implementation is chosen that works fastest for the
-   * given steps.
+   * Returns a new path instance.
+   * A path implementation is chosen that works fastest for the given steps.
    * @param info input info
    * @param root root expression, may be {@code null}
    * @param steps steps
@@ -179,18 +180,23 @@ public abstract class Path extends ParseExpr {
       if(e != this) return e.optimize(qc, scp);
     }
 
-    // set atomic type for single attribute steps to speed up predicate tests
-    if(root == null && steps.length == 1 && steps[0] instanceof Step) {
-      final Step step = (Step) steps[0];
-      if(step.axis == ATTR && step.test.kind == Kind.URI_NAME) {
-        step.seqType(SeqType.NOD_ZO);
-      }
-    }
-
     // choose best path implementation and set type information
     final Path path = get(info, root, steps);
+    final int sl = path.steps.length;
+    final Expr lastExpr = path.steps[sl - 1];
+
+    // try to compute result size and derive result type from last step
     path.size = path.size(qc);
-    path.seqType = SeqType.get(steps[steps.length - 1].seqType().type, path.size);
+    path.seqType = SeqType.get(lastExpr.seqType().type, path.size);
+
+    // single attribute with exact name test will return at most one result
+    if(path.root == null && sl == 1 && lastExpr instanceof Step) {
+      final Step lastStep = (Step) lastExpr;
+      if(lastStep.axis == ATTR && lastStep.test.unique) {
+        lastStep.seqType = lastStep.seqType.withOcc(Occ.ZERO_ONE);
+        path.seqType = lastStep.seqType;
+      }
+    }
     return path;
   }
 
@@ -204,7 +210,7 @@ public abstract class Path extends ParseExpr {
         // merge nested predicates. example: if(a[b]) ->  if(a/b)
         final Expr s = step.merge(this, qc, scp);
         if(s != step) {
-          qc.compInfo(OPTREWRITE, this);
+          qc.compInfo(OPTREWRITE_X, this);
           step.preds = new Expr[0];
           return s;
         }
@@ -575,7 +581,7 @@ public abstract class Path extends ParseExpr {
         qnm.add(nm);
         nodes = PathSummary.parent(nodes);
       }
-      qc.compInfo(OPTCHILD, steps[s]);
+      qc.compInfo(OPTCHILD_X, steps[s]);
 
       // build new steps
       int ts = qnm.size();
@@ -595,7 +601,7 @@ public abstract class Path extends ParseExpr {
     // check if all steps yield results; if not, return empty sequence
     final ArrayList<PathNode> nodes = pathNodes(qc);
     if(nodes != null && nodes.isEmpty()) {
-      qc.compInfo(OPTPATH, path);
+      qc.compInfo(OPTPATH_X, path);
       return Empty.SEQ;
     }
 
@@ -674,7 +680,7 @@ public abstract class Path extends ParseExpr {
     if(index == null || index.costs > data.meta.size) return this;
 
     // rewrite for index access
-    qc.compInfo(index.info);
+    qc.compInfo(index.optInfo);
 
     // invert steps that occur before index step and add them as predicate
     final ExprList newPreds = new ExprList();
@@ -717,7 +723,7 @@ public abstract class Path extends ParseExpr {
     if(index.costs == 1) {
       // set sequence type
       if(resultRoot instanceof IndexAccess) ((IndexAccess) resultRoot).size(1);
-      else ((ParseExpr) resultRoot).seqType(resultRoot.seqType().withOcc(Occ.ZERO_ONE));
+      else ((ParseExpr) resultRoot).seqType = resultRoot.seqType().withOcc(Occ.ZERO_ONE);
     }
 
     if(!newPreds.isEmpty()) {

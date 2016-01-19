@@ -39,7 +39,7 @@ public class Options implements Iterable<Option<?>> {
 
     @Override
     public String toString() {
-      return super.toString().toLowerCase(Locale.ENGLISH);
+      return name().toLowerCase(Locale.ENGLISH);
     }
   }
 
@@ -51,7 +51,7 @@ public class Options implements Iterable<Option<?>> {
 
     @Override
     public String toString() {
-      return super.toString().toLowerCase(Locale.ENGLISH);
+      return name().toLowerCase(Locale.ENGLISH);
     }
   }
 

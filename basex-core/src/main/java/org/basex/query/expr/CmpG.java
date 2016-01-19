@@ -3,21 +3,17 @@ package org.basex.query.expr;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
-import java.util.*;
-
-import org.basex.data.*;
 import org.basex.index.*;
-import org.basex.index.query.*;
 import org.basex.query.*;
-import org.basex.query.expr.CmpV.OpV;
+import org.basex.query.expr.CmpV.*;
 import org.basex.query.func.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.Occ;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -140,7 +136,7 @@ public final class CmpG extends Cmp {
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     // swap expressions; add text() to location paths to simplify optimizations
     if(swap()) {
-      qc.compInfo(OPTSWAP, this);
+      qc.compInfo(OPTSWAP_X, this);
       op = op.swap();
     }
 
@@ -155,7 +151,7 @@ public final class CmpG extends Cmp {
     if(e1.isFunction(Function.COUNT)) {
       final Expr e = compCount(op.op);
       if(e != this) {
-        qc.compInfo(e instanceof Bln ? OPTPRE : OPTREWRITE, this);
+        qc.compInfo(e instanceof Bln ? OPTPRE_X : OPTREWRITE_X, this);
         return e;
       }
     }
@@ -164,7 +160,7 @@ public final class CmpG extends Cmp {
     if(e1.isFunction(Function.STRING_LENGTH)) {
       final Expr e = compStringLength(op.op);
       if(e != this) {
-        qc.compInfo(e instanceof Bln ? OPTPRE : OPTREWRITE, this);
+        qc.compInfo(e instanceof Bln ? OPTPRE_X : OPTREWRITE_X, this);
         return e;
       }
     }
@@ -173,14 +169,14 @@ public final class CmpG extends Cmp {
     if(e1.isFunction(Function.POSITION)) {
       final Expr e = Pos.get(op.op, e2, this, info);
       if(e != this) {
-        qc.compInfo(OPTREWRITE, this);
+        qc.compInfo(OPTREWRITE_X, this);
         return e;
       }
     }
 
     // (A = false()) -> not(A)
     if(st1.eq(SeqType.BLN) && (op == OpG.EQ && e2 == Bln.FALSE || op == OpG.NE && e2 == Bln.TRUE)) {
-      qc.compInfo(OPTREWRITE, this);
+      qc.compInfo(OPTREWRITE_X, this);
       return Function.NOT.get(null, info, e1);
     }
 
@@ -190,7 +186,7 @@ public final class CmpG extends Cmp {
     if(e == this) e = CmpSR.get(this);
     if(e != this) {
       // pre-evaluate optimized expression
-      qc.compInfo(OPTREWRITE, this);
+      qc.compInfo(OPTREWRITE_X, this);
       return allAreValues() ? e.preEval(qc) : e;
     }
 
@@ -198,7 +194,7 @@ public final class CmpG extends Cmp {
     final SeqType st2 = e2.seqType();
     if(st1.zeroOrOne() && !st1.mayBeArray() && st2.zeroOrOne() && !st2.mayBeArray()) {
       atomic = true;
-      qc.compInfo(OPTATOMIC, this);
+      qc.compInfo(OPTATOMIC_X, this);
     }
 
     // pre-evaluate values
@@ -277,7 +273,6 @@ public final class CmpG extends Cmp {
       }
       ir2 = null;
     }
-
     // give up
     return Bln.FALSE;
   }
@@ -328,60 +323,10 @@ public final class CmpG extends Cmp {
     // only equality expressions on default collation can be rewritten
     if(op != OpG.EQ || coll != null) return false;
 
-    // check if index rewriting is possible
-    if(!ii.check(exprs[0], false)) return false;
-
-    final IndexType type = ii.text ? IndexType.TEXT : IndexType.ATTRIBUTE;
-    final Data data = ii.ic.data;
-    final Expr arg = exprs[1];
-    final ParseExpr root;
-    if(arg.isValue()) {
-      // loop through all items
-      ii.costs = 0;
-      final Iter ir = arg.iter(ii.qc);
-      final ArrayList<ValueAccess> tmp = new ArrayList<>();
-      final TokenSet strings = new TokenSet();
-      for(Item it; (it = ir.next()) != null;) {
-        // only strings and untyped items are supported
-        if(!it.type.isStringOrUntyped()) return false;
-        // do not use index if string is empty
-        final byte[] string = it.string(info);
-        final int sl = string.length;
-        if(sl == 0 || sl > data.meta.maxlen) return false;
-
-        // add only expressions that yield results and have not been requested before
-        if(!strings.contains(string)) {
-          strings.put(string);
-          final int costs = data.costs(new StringToken(type, string));
-          if(costs < 0) return false;
-          if(costs > 0) {
-            final ValueAccess va = new ValueAccess(info, it, type, ii.test, ii.ic);
-            tmp.add(va);
-            if(costs == 1) va.seqType(va.seqType().withOcc(Occ.ZERO_ONE));
-            ii.costs += costs;
-          }
-        }
-      }
-      // more than one string - merge index results
-      final int vs = tmp.size();
-      root = vs == 1 ? tmp.get(0) : new Union(info, tmp.toArray(new ValueAccess[vs]));
-    } else {
-      /* index access is not possible if returned type is not a string or untyped; if
-         expression depends on context; or if it is non-deterministic. examples:
-         for $x in ('a', 1) return //*[text() = $x]
-         //*[text() = .]
-         //*[text() = (if(random:double() < .5) then 'X' else 'Y')]
-       */
-      if(!arg.seqType().type.isStringOrUntyped() || arg.has(Flag.CTX) || arg.has(Flag.NDT) ||
-        arg.has(Flag.UPD)) return false;
-
-      // estimate costs (tend to worst case)
-      ii.costs = Math.max(1, data.meta.size / 10);
-      root = new ValueAccess(info, arg, type, ii.test, ii.ic);
-    }
-
-    ii.create(root, info, Util.info(ii.text ? OPTTXTINDEX : OPTATVINDEX, arg), false);
-    return true;
+    Expr expr1 = exprs[0];
+    final boolean tokenize = expr1 instanceof FnTokenize;
+    if(tokenize) expr1 = ((FnTokenize) expr1).input();
+    return ii.create(exprs[1], ii.type(expr1, tokenize ? IndexType.TOKEN : null), info, false);
   }
 
   @Override

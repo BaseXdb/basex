@@ -16,7 +16,7 @@ class KindTest extends Test {
    * @param type node type
    */
   KindTest(final NodeType type) {
-    this.type = type;
+    super(type);
   }
 
   @Override

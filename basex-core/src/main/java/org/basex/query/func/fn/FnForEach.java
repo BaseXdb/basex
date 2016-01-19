@@ -60,7 +60,7 @@ public final class FnForEach extends StandardFunc {
   protected Expr opt(final QueryContext qc, final VarScope scp) throws QueryException {
     if(allAreValues() && exprs[0].size() < UNROLL_LIMIT) {
       // unroll the loop
-      qc.compInfo(QueryText.OPTUNROLL, this);
+      qc.compInfo(QueryText.OPTUNROLL_X, this);
       final Value seq = (Value) exprs[0];
       final int len = (int) seq.size();
 

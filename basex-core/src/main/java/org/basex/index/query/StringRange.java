@@ -10,8 +10,8 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class StringRange implements IndexToken {
-  /** Text/attribute index. */
-  public final boolean text;
+  /** Index type. */
+  private final IndexType type;
   /** Minimum value. */
   public final byte[] min;
   /** Include minimum value. */
@@ -23,15 +23,15 @@ public final class StringRange implements IndexToken {
 
   /**
    * Constructor.
-   * @param text text/attribute index
+   * @param type index type
    * @param min minimum value
    * @param mni include minimum value
    * @param max maximum value
    * @param mxi include maximum value
    */
-  public StringRange(final boolean text, final byte[] min, final boolean mni, final byte[] max,
+  public StringRange(final IndexType type, final byte[] min, final boolean mni, final byte[] max,
       final boolean mxi) {
-    this.text = text;
+    this.type = type;
     this.min = min;
     this.mni = mni;
     this.max = max;
@@ -40,7 +40,7 @@ public final class StringRange implements IndexToken {
 
   @Override
   public IndexType type() {
-    return text ? IndexType.TEXT : IndexType.ATTRIBUTE;
+    return type;
   }
 
   @Override

@@ -27,9 +27,9 @@ final class InvDocTest extends Test {
    * @param data data reference
    */
   private InvDocTest(final IntList pres, final Data data) {
+    super(NodeType.DOC);
     this.pres = pres;
     this.data = data;
-    type = NodeType.DOC;
   }
 
   /**

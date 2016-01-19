@@ -1,5 +1,7 @@
 package org.basex.index;
 
+import java.util.*;
+
 /**
  * This enumeration lists available index types.
  *
@@ -8,9 +10,9 @@ package org.basex.index;
  */
 public enum IndexType {
   /** Attribute names. */
-  ATTNAME,
+  ATTRNAME,
   /** Element names. */
-  TAG,
+  ELEMNAME,
   /** Text index. */
   TEXT,
   /** Attribute index. */
@@ -20,5 +22,10 @@ public enum IndexType {
   /** Full-text index. */
   FULLTEXT,
   /** Path index. */
-  PATH
+  PATH;
+
+  @Override
+  public String toString() {
+    return name().toLowerCase(Locale.ENGLISH);
+  }
 }

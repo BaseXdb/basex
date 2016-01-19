@@ -123,14 +123,13 @@ public final class ValueIndexTest extends SandboxTest {
   private void valueIndexTest(final IndexType indexType, final LinkedHashMap<String,
       Integer> tokens, final Collection<Set> options) {
     // Set up environment
-    for (final Set option : options) execute(option);
+    for(final Set option : options) execute(option);
     execute(new CreateDB(NAME, FILE));
 
     // Fetch index reference to be tested
     final boolean text = IndexType.TEXT == indexType;
-    final ValueIndex index = text ? context.data().textIndex
-                            : IndexType.TOKEN == indexType ? context.data().tokenIndex
-                                                              : context.data().attrIndex;
+    final ValueIndex index = text ? context.data().textIndex : IndexType.TOKEN == indexType
+        ? context.data().tokenIndex : context.data().attrIndex;
 
     // Receive, verify and count results for passed tokens
     for(final Entry<String, Integer> entry : tokens.entrySet()) {

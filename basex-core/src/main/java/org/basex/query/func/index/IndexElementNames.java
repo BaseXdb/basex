@@ -17,7 +17,7 @@ import org.basex.query.iter.*;
 public class IndexElementNames extends IndexFn {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    return names(qc, IndexType.TAG);
+    return names(qc, IndexType.ELEMNAME);
   }
 
   /**
@@ -29,7 +29,7 @@ public class IndexElementNames extends IndexFn {
    */
   Iter names(final QueryContext qc, final IndexType it) throws QueryException {
     final Data data = checkData(qc);
-    return entries(it == IndexType.TAG ? data.elemNames : data.attrNames,
+    return entries(it == IndexType.ELEMNAME ? data.elemNames : data.attrNames,
       new IndexEntries(EMPTY, it));
   }
 }

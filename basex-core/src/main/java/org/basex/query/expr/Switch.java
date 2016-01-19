@@ -94,10 +94,10 @@ public final class Switch extends ParseExpr {
           // includes check for empty sequence (null reference)
           final Item cs = ex.item(qc, info);
           if(it == cs || cs != null && it != null && it.equiv(cs, null, info)) return ret;
-          qc.compInfo(OPTREMOVE, description(), ex);
+          qc.compInfo(OPTREMOVE_X_X, description(), ex);
         } else if(cache.contains(ex)) {
           // case has already been checked before
-          qc.compInfo(OPTREMOVE, description(), ex);
+          qc.compInfo(OPTREMOVE_X_X, description(), ex);
         } else {
           cache.add(ex);
           el.add(ex);
@@ -114,7 +114,7 @@ public final class Switch extends ParseExpr {
 
     if(tmp.size() != cases.length) {
       // branches have changed
-      qc.compInfo(OPTREWRITE, this);
+      qc.compInfo(OPTREWRITE_X, this);
       cases = tmp.toArray(new SwitchCase[tmp.size()]);
     }
     return this;

@@ -1,16 +1,26 @@
 package org.basex.query.util;
 
+import static org.basex.query.QueryText.*;
+
+import java.util.*;
+
 import org.basex.data.*;
 import org.basex.index.*;
+import org.basex.index.query.*;
 import org.basex.index.stats.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.Expr.*;
+import org.basex.query.expr.index.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.expr.path.Test.Kind;
+import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
+import org.basex.query.value.type.SeqType.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * This class contains methods for storing information on new index expressions.
@@ -26,13 +36,12 @@ public final class IndexInfo {
   /** Step with predicate that can be rewritten for index access. */
   public final Step step;
 
-  /** Name test of parent element. */
-  public NameTest test;
-  /** Indicates if the last step refers to a text step. */
-  public boolean text;
+  // The following variables will be overwritten for each index candidate
 
   /** Optimization info. */
-  public String info;
+  public String optInfo;
+  /** Name test of parent element. */
+  public NameTest test;
   /** Index expression. */
   public Expr expr;
   /** Costs of index access. 0 = no results; 1 = exactly one results;
@@ -41,6 +50,8 @@ public final class IndexInfo {
 
   /** Predicate expression. */
   private Expr pred;
+  /** Indicates if the last step refers to a text step. */
+  private boolean text;
 
   /**
    * Constructor.
@@ -55,42 +66,103 @@ public final class IndexInfo {
   }
 
   /**
-   * Checks if the specified expression can be rewritten for index access.
-   * @param pr predicate expression (must be {@link ContextValue} or {@link AxisPath})
-   * @param ft full-text flag
-   * @return result of check
+   * Checks if the specified expression can be rewritten for index access, and returns
+   * the applicable index type.
+   * @param input input (if {@code null}, no optimization will be possible)
+   * @param type proposed index type ({@link IndexType#TOKEN}, {@link IndexType#FULLTEXT},
+   * or {@code null})
+   * @return type of applicable index, or {@code null}
    */
-  public boolean check(final Expr pr, final boolean ft) {
-    pred = pr;
+  public IndexType type(final Expr input, final IndexType type) {
+    pred = input;
 
-    // check if step points to leaf element
+    // find last step that will be evaluated before doing a comparison
     final Step last = lastStep();
-    if(last == null) return false;
+    if(last == null) return null;
 
     final Data data = ic.data;
     final boolean elem = last.test.type == NodeType.ELM;
     if(elem) {
       // give up if database is out-dated, if namespaces occur, or if name test is not simple
       if(!(data.meta.uptodate && data.nspaces.isEmpty() && last.test.kind == Kind.NAME))
-        return false;
+        return null;
 
       test = (NameTest) last.test;
       final Stats stats = data.elemNames.stat(data.elemNames.id(test.name.local()));
-      if(stats == null || !stats.isLeaf()) return false;
+      if(stats == null || !stats.isLeaf()) return null;
     }
     text = elem || last.test.type == NodeType.TXT;
 
     // check if the index contains result for the specified elements or attributes
-    final IndexNames in = new IndexNames(ft ? IndexType.FULLTEXT : text ? IndexType.TEXT :
-      IndexType.ATTRIBUTE, data);
-    if(!in.contains(qname())) return false;
+    final IndexType it = type != null ? type : text ? IndexType.TEXT : IndexType.ATTRIBUTE;
+    return new IndexNames(it, data).contains(qname()) && check(type, last) ? it : null;
+  }
 
-    // full-text index
-    if(ft) return text && data.meta.ftindex;
-    // text index
-    if(text) return data.meta.textindex;
-    // attribute index
-    return last.test.type == NodeType.ATT && data.meta.attrindex;
+  /**
+   * Tries to rewrite the specified input for index access.
+   * @param type index type (can be {@code null})
+   * @param value value to find (can be {@code null})
+   * @return success flag
+   * @param info input info
+   * @param trim normalize second string
+   * @throws QueryException query exception
+   */
+  public boolean create(final Expr value, final IndexType type, final InputInfo info,
+      final boolean trim) throws QueryException {
+
+    // no index or no search value: no optimization
+    if(type == null || value == null) return false;
+
+    final Data data = ic.data;
+    final ParseExpr root;
+    if(value.isValue()) {
+      // loop through all items
+      costs = 0;
+      final Iter ir = value.iter(qc);
+      final ArrayList<ValueAccess> tmp = new ArrayList<>();
+      final TokenSet strings = new TokenSet();
+      for(Item it; (it = ir.next()) != null;) {
+        // only strings and untyped items are supported
+        if(!it.type.isStringOrUntyped()) return false;
+        // do not use text/attribute index if string is empty or too long
+        byte[] string = it.string(info);
+        if(trim) string = Token.trim(string);
+        final int sl = string.length;
+        if(type != IndexType.TOKEN && (sl == 0 || sl > data.meta.maxlen)) return false;
+
+        // add only expressions that yield results and that have not been requested before
+        if(!strings.contains(string)) {
+          strings.put(string);
+          final int c = data.costs(new StringToken(type, string));
+          if(c < 0) return false;
+          if(c > 0) {
+            final ValueAccess va = new ValueAccess(info, it, type, test, ic).trim(trim);
+            tmp.add(va);
+            if(c == 1) va.seqType = va.seqType().withOcc(Occ.ZERO_ONE);
+            costs += c;
+          }
+        }
+      }
+      // more than one string: merge index results
+      final int vs = tmp.size();
+      root = vs == 1 ? tmp.get(0) : new Union(info, tmp.toArray(new ValueAccess[vs]));
+    } else {
+      /* index access is not possible if returned type is not a string or untyped; if
+         expression depends on context; or if it is non-deterministic. examples:
+         for $x in ('a', 1) return //*[text() = $x]
+         //*[text() = .]
+         //*[text() = (if(random:double() < .5) then 'X' else 'Y')]
+       */
+      if(!value.seqType().type.isStringOrUntyped() || value.has(Flag.CTX) || value.has(Flag.NDT) ||
+        value.has(Flag.UPD)) return false;
+
+      // estimate costs (tend to worst case)
+      costs = Math.max(1, data.meta.size / 10);
+      root = new ValueAccess(info, value, type, test, ic);
+    }
+
+    create(root, false, info, Util.info(OPTINDEX_X_X, type, value));
+    return true;
   }
 
   /**
@@ -100,12 +172,31 @@ public final class IndexInfo {
    * @param ii input info
    * @param opt optimization info
    */
-  public void create(final ParseExpr root, final InputInfo ii, final String opt,
-      final boolean parent) {
+  public void create(final ParseExpr root, final boolean parent, final InputInfo ii,
+      final String opt) {
 
     expr = invert(test == null || !parent ? root :
       Path.get(ii, root, Step.get(ii, Axis.PARENT, test)));
-    info = opt;
+    optInfo = opt;
+  }
+
+  // PRIVATE METHODS ==============================================================================
+
+  /**
+   * Checks if the specified expression can be rewritten for index access.
+   * @param type index type
+   * @param last last step
+   * @return type of index that can be used; {@code null} otherwise
+   */
+  private boolean check(final IndexType type, final Step last) {
+    // full-text index
+    if(type == IndexType.FULLTEXT) return text && ic.data.meta.ftindex;
+    // token index
+    if(type == IndexType.TOKEN) return !text && ic.data.meta.tokenindex;
+    // text index
+    if(text) return ic.data.meta.textindex;
+    // attribute index
+    return last.test.type == NodeType.ATT && ic.data.meta.attrindex;
   }
 
   /**

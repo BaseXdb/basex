@@ -181,7 +181,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
           if(!cl.has(Flag.NDT) && cl.global.size() < 5
               && expr.count(v) != VarUsage.MORE_THAN_ONCE
               && cl.exprSize() < qc.context.options.get(MainOptions.INLINELIMIT)) {
-            qc.compInfo(OPTINLINE, e);
+            qc.compInfo(OPTINLINE_X, e);
             for(final Entry<Var, Expr> e2 : cl.global.entrySet()) {
               final Var v2 = e2.getKey(), v2c = scope.newCopyOf(qc, v2);
               if(add == null) add = new HashMap<>();
@@ -255,7 +255,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
     if(expr.has(Flag.CTX)) return null;
 
-    qc.compInfo(OPTINLINE, this);
+    qc.compInfo(OPTINLINE_X, this);
     // create let bindings for all variables
     final LinkedList<Clause> cls =
         exprs.length == 0 && global.isEmpty() ? null : new LinkedList<Clause>();

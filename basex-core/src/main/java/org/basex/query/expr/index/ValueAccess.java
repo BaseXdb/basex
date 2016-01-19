@@ -1,4 +1,4 @@
-package org.basex.query.expr;
+package org.basex.query.expr.index;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
@@ -9,6 +9,7 @@ import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.query.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
@@ -26,17 +27,19 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class ValueAccess extends IndexAccess {
-  /** Expression. */
+  /** Search expression. */
   private Expr expr;
   /** Index type. */
   private final IndexType type;
   /** Parent name test. */
   private final NameTest test;
+  /** Trim search terms. */
+  private boolean trim;
 
   /**
    * Constructor.
    * @param info input info
-   * @param expr index expression
+   * @param expr search expression
    * @param type index type
    * @param test test test
    * @param ictx index context
@@ -49,11 +52,24 @@ public final class ValueAccess extends IndexAccess {
     this.test = test;
   }
 
+  /**
+   * Sets the trim flag.
+   * @param tr trim flag
+   * @return self reference
+   */
+  public ValueAccess trim(final boolean tr) {
+    trim = tr;
+    return this;
+  }
+
   @Override
   public BasicNodeIter iter(final QueryContext qc) throws QueryException {
     final ArrayList<BasicNodeIter> iter = new ArrayList<>();
     final Iter ir = qc.iter(expr);
-    for(Item it; (it = ir.next()) != null;) iter.add(index(it.string(info)));
+    for(Item it; (it = ir.next()) != null;) {
+      final byte[] term = it.string(info);
+      iter.add(iter(trim ? Token.trim(term) : term));
+    }
     final int is = iter.size();
     return is == 0 ? BasicNodeIter.EMPTY : is == 1 ? iter.get(0) :
       new Union(info, expr).eval(iter.toArray(new NodeIter[is])).iter();
@@ -64,7 +80,7 @@ public final class ValueAccess extends IndexAccess {
    * @param term term to be found
    * @return iterator
    */
-  private BasicNodeIter index(final byte[] term) {
+  private BasicNodeIter iter(final byte[] term) {
     // special case: empty text node
     // - no element name: return 0 results (empty text nodes are non-existent)
     // - otherwise, return scan-based element iterator
@@ -209,11 +225,11 @@ public final class ValueAccess extends IndexAccess {
 
   @Override
   public String toString() {
-    final TokenBuilder string = new TokenBuilder();
+    final TokenBuilder tb = new TokenBuilder();
     final Function func = type == IndexType.TEXT ? Function._DB_TEXT : type == IndexType.ATTRIBUTE
         ? Function._DB_ATTRIBUTE : Function._DB_TOKEN;
-    string.add(func.get(null, info, Str.get(ictx.data.meta.name), expr).toString());
-    if(test != null) string.add("/parent::").addExt(test);
-    return string.toString();
+    tb.addExt(func.get(null, info, Str.get(ictx.data.meta.name), expr));
+    if(test != null) tb.add("/parent::").addExt(test);
+    return tb.toString();
   }
 }

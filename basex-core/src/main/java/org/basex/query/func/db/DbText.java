@@ -2,12 +2,10 @@ package org.basex.query.func.db;
 
 import static org.basex.query.QueryError.*;
 
-import java.util.*;
-
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.query.*;
-import org.basex.query.expr.*;
+import org.basex.query.expr.index.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 
@@ -35,7 +33,7 @@ public class DbText extends DbAccess {
     final MetaData meta = data.meta;
     final boolean index = type == IndexType.TOKEN ? meta.tokenindex : type == IndexType.TEXT
         ? meta.textindex : meta.attrindex;
-    if(!index) throw BXDB_INDEX_X.get(info, meta.name, type.toString().toLowerCase(Locale.ENGLISH));
+    if(!index) throw BXDB_INDEX_X.get(info, meta.name, type);
     return new ValueAccess(info, exprs[1], type, null, new IndexContext(data, false));
   }
 }

@@ -175,7 +175,7 @@ public final class GFLWOR extends ParseExpr {
         final For fst = (For) clauses.getFirst();
         if(!fst.empty) {
           if(fst.expr instanceof GFLWOR) {
-            qc.compInfo(QueryText.OPTFLAT, fst);
+            qc.compInfo(QueryText.OPTFLAT_X, fst);
             final GFLWOR sub = (GFLWOR) fst.expr;
             clauses.set(0, new For(fst.var, null, fst.score, sub.ret, false, fst.info));
             if(fst.pos != null) clauses.add(1, new Count(fst.pos, fst.info));
@@ -202,7 +202,7 @@ public final class GFLWOR extends ParseExpr {
           final GFLWOR sub = (GFLWOR) ret;
           if(sub.isFLWR()) {
             // flatten nested FLWOR expressions
-            qc.compInfo(QueryText.OPTFLAT, this);
+            qc.compInfo(QueryText.OPTFLAT_X, this);
             clauses.addAll(sub.clauses);
             ret = sub.ret;
             changed = true;
@@ -213,7 +213,7 @@ public final class GFLWOR extends ParseExpr {
         if(ret instanceof GFLWOR || tc != null && tc.expr instanceof GFLWOR) {
           final GFLWOR sub = (GFLWOR) (tc == null ? ret : tc.expr);
           if(sub.clauses.getFirst() instanceof Let) {
-            qc.compInfo(QueryText.OPTFLAT, this);
+            qc.compInfo(QueryText.OPTFLAT_X, this);
             final LinkedList<Clause> cls = sub.clauses;
             // propagate all leading let bindings into outer clauses
             do {
@@ -237,7 +237,7 @@ public final class GFLWOR extends ParseExpr {
 
     size = calcSize();
     if(size == 0 && !has(Flag.NDT) && !has(Flag.UPD)) {
-      qc.compInfo(QueryText.OPTREWRITE, this);
+      qc.compInfo(QueryText.OPTREWRITE_X, this);
       return Empty.SEQ;
     }
 
@@ -330,7 +330,7 @@ public final class GFLWOR extends ParseExpr {
    */
   private boolean removingVar(final Var var, final int index, final QueryContext qc) {
     if(var != null && count(var, index) == VarUsage.NEVER) {
-      qc.compInfo(QueryText.OPTVAR, var);
+      qc.compInfo(QueryText.OPTVAR_X, var);
       return true;
     }
     return false;
@@ -368,7 +368,7 @@ public final class GFLWOR extends ParseExpr {
             // inline only cheap axis paths
             || expr instanceof AxisPath && ((AxisPath) expr).cheap()) {
 
-            qc.compInfo(QueryText.OPTINLINE, lt.var);
+            qc.compInfo(QueryText.OPTINLINE_X, lt.var);
             inline(qc, scp, lt.var, lt.inlineExpr(qc, scp), iter);
             clauses.remove(lt);
             changing = changed = true;
@@ -402,7 +402,7 @@ public final class GFLWOR extends ParseExpr {
           if(!fr.empty && fr.pos == null && fr.expr instanceof GFLWOR) {
             final GFLWOR fl = (GFLWOR) fr.expr;
             if(fl.isFLWR()) {
-              qc.compInfo(QueryText.OPTFLAT, this);
+              qc.compInfo(QueryText.OPTFLAT_X, this);
               iter.remove();
               for(final Clause cls : fl.clauses) iter.add(cls);
               fr.expr = fl.ret;
@@ -565,7 +565,7 @@ public final class GFLWOR extends ParseExpr {
     }
     // trigger optimizations on rewritten expressions
     for(final For f : fors) f.expr = f.expr.optimize(qc, scp);
-    if(changed) qc.compInfo(QueryText.OPTWHERE2);
+    if(changed) qc.compInfo(QueryText.OPTWHERE);
     return changed;
   }
 
@@ -604,7 +604,7 @@ public final class GFLWOR extends ParseExpr {
         if(count(pos.pos, c) == VarUsage.NEVER) {
           pos.addPredicate(Pos.get(cmp));
           pos.expr = pos.expr.optimize(qc, scp);
-          qc.compInfo(QueryText.OPTPRED, cmp);
+          qc.compInfo(QueryText.OPTPRED_X, cmp);
           changed = true;
         } else {
           // re-add variable, give up

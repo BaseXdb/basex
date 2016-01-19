@@ -78,7 +78,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
         if((type.type == AtomType.BLN || type.type == AtomType.FLT ||
             type.type == AtomType.DBL || type.type == AtomType.QNM ||
             type.type == AtomType.URI) && type.eq(expr.seqType())) {
-          qc.compInfo(OPTCAST, type);
+          qc.compInfo(OPTCAST_X, type);
         } else {
           expr = new TypeCheck(sc, info, expr, type, true).optimize(qc, scope);
         }
@@ -256,7 +256,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
       final InputInfo ii) throws QueryException {
 
     if(!inline(qc, anns, expr) || has(Flag.CTX) || compiling || selfRecursive()) return null;
-    qc.compInfo(OPTINLINE, id());
+    qc.compInfo(OPTINLINE_X, id());
 
     // create let bindings for all variables
     final LinkedList<Clause> cls = exprs.length == 0 ? null : new LinkedList<Clause>();

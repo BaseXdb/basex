@@ -2,8 +2,6 @@ package org.basex.query.func.index;
 
 import static org.basex.util.Token.*;
 
-import java.util.*;
-
 import org.basex.data.*;
 import org.basex.index.name.*;
 import org.basex.index.path.*;
@@ -92,8 +90,7 @@ public final class IndexFacets extends IndexFn {
    * @param elem element
    */
   private static void stats(final Stats stats, final FElem elem) {
-    final String k = stats.type.toString().toLowerCase(Locale.ENGLISH);
-    elem.add(TYPE, k);
+    elem.add(TYPE, stats.type.toString());
     elem.add(COUNT, token(stats.count));
     switch(stats.type) {
       case CATEGORY:

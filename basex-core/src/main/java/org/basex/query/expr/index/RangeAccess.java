@@ -1,15 +1,16 @@
-package org.basex.query.expr;
+package org.basex.query.expr.index;
 
 import static org.basex.query.QueryText.*;
-
-import java.util.*;
 
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.query.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -31,7 +32,7 @@ public final class RangeAccess extends IndexAccess {
    * @param index index reference
    * @param ictx index context
    */
-  RangeAccess(final InputInfo info, final NumericRange index, final IndexContext ictx) {
+  public RangeAccess(final InputInfo info, final NumericRange index, final IndexContext ictx) {
     super(ictx, info);
     this.index = index;
   }
@@ -62,8 +63,9 @@ public final class RangeAccess extends IndexAccess {
 
   @Override
   public String toString() {
-    return new TokenBuilder(DB_PREFIX).add(':').
-      add(index.type().toString().toLowerCase(Locale.ENGLISH)).add("-range(").
-      addExt(index.min).add(SEP).addExt(index.max).add(')').toString();
+    final TokenBuilder tb = new TokenBuilder();
+    return tb.addExt((index.type() == IndexType.TEXT ? Function._DB_TEXT_RANGE :
+      Function._DB_ATTRIBUTE_RANGE).get(null, info, Str.get(ictx.data.meta.name),
+        Dbl.get(index.min), Dbl.get(index.max))).toString();
   }
 }

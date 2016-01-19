@@ -36,7 +36,7 @@ public final class Union extends Set {
     for(final Expr ex : exprs) {
       if(ex.isEmpty()) {
         // remove empty operands
-        qc.compInfo(OPTREMOVE, this, ex);
+        qc.compInfo(OPTREMOVE_X_X, this, ex);
       } else {
         el.add(ex);
       }
@@ -58,7 +58,7 @@ public final class Union extends Set {
   }
 
   @Override
-  protected ANodeList eval(final Iter[] iter) throws QueryException {
+  public ANodeList eval(final Iter[] iter) throws QueryException {
     final ANodeList list = new ANodeList().check();
     for(final Iter ir : iter) {
       for(Item it; (it = ir.next()) != null;) list.add(toNode(it));

@@ -13,6 +13,6 @@ import org.basex.query.iter.*;
 public final class IndexAttributeNames extends IndexElementNames {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    return names(qc, IndexType.ATTNAME);
+    return names(qc, IndexType.ATTRNAME);
   }
 }

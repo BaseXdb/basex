@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 import java.util.regex.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.seq.*;
@@ -43,5 +44,14 @@ public final class FnTokenize extends RegEx {
       tl.add(str.substring(s, str.length()));
     }
     return StrSeq.get(tl);
+  }
+
+  /**
+   * Returns the input argument if no others are specified, and if it returns at most one item.
+   * @return first argument
+   */
+  public Expr input() {
+    // X must yield single result (otherwise, it may result in an error)
+    return exprs.length == 1 && exprs[0].seqType().zeroOrOne() ? exprs[0] : null;
   }
 }

@@ -1,10 +1,12 @@
-package org.basex.query.expr;
+package org.basex.query.expr.index;
 
 import static org.basex.query.QueryText.*;
 
 import org.basex.data.*;
+import org.basex.index.*;
 import org.basex.index.query.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -37,11 +39,12 @@ public final class StringRangeAccess extends IndexAccess {
 
   @Override
   public BasicNodeIter iter(final QueryContext qc) {
-    final byte kind = index.text ? Data.TEXT : Data.ATTR;
+    final boolean text = index.type() == IndexType.TEXT;
+    final byte kind = text ? Data.TEXT : Data.ATTR;
     final Data data = ictx.data;
     final int ml = data.meta.maxlen;
     final IndexIterator ii = index.min.length <= ml && index.max.length <= ml &&
-        (index.text ? data.meta.textindex : data.meta.attrindex) ? data.iter(index) : scan();
+        (text ? data.meta.textindex : data.meta.attrindex) ? data.iter(index) : scan();
 
     return new BasicNodeIter() {
       @Override
@@ -57,7 +60,8 @@ public final class StringRangeAccess extends IndexAccess {
    */
   private IndexIterator scan() {
     return new IndexIterator() {
-      final byte kind = index.text ? Data.TEXT : Data.ATTR;
+      final boolean text = index.type() == IndexType.TEXT;
+      final byte kind = text ? Data.TEXT : Data.ATTR;
       final Data data = ictx.data;
       final int sz = data.meta.size;
       int pre = -1;
@@ -70,7 +74,7 @@ public final class StringRangeAccess extends IndexAccess {
       public boolean more() {
         while(++pre < sz) {
           if(data.kind(pre) != kind) continue;
-          final byte[] t = data.text(pre, index.text);
+          final byte[] t = data.text(pre, text);
           final int mn = Token.diff(t, index.min);
           final int mx = Token.diff(t, index.max);
           if(mn >= (index.mni ? 0 : 1) && mx <= (index.mxi ? 0 : 1)) return true;
@@ -97,7 +101,8 @@ public final class StringRangeAccess extends IndexAccess {
 
   @Override
   public String toString() {
-    return (index.text ? Function._DB_TEXT_RANGE : Function._DB_ATTRIBUTE_RANGE).get(null, info,
+    final boolean text = index.type() == IndexType.TEXT;
+    return (text ? Function._DB_TEXT_RANGE : Function._DB_ATTRIBUTE_RANGE).get(null, info,
         Str.get(ictx.data.meta.name), Str.get(index.min), Str.get(index.max)).toString();
   }
 }

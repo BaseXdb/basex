@@ -495,17 +495,17 @@ public interface Text {
   /** Progress exception. */
   String INTERRUPTED = lang("interrupted");
 
-  /** Unknown command error. */
+  /** Expecting command. */
   String EXPECTING_CMD = lang("expecting_cmd");
-  /** Unknown command error. */
+  /** Unknown command: %. */
   String UNKNOWN_CMD_X = lang("unknown_cmd_%");
-  /** Command syntax information. */
+  /** Single command expected. */
   String SINGLE_CMD = lang("single_cmd");
-  /** Unknown command error. */
+  /** Unknown command: % (try help). */
   String UNKNOWN_TRY_X = UNKNOWN_CMD_X + ' ' + lang("try_%", "'help'");
   /** Try "help [...]" to get.. */
   String TRY_SPECIFIC_X = lang("try_specific_%", "HELP [...]") + NL;
-  /** Unknown command error. */
+  /** Unknown command: % (similar: %). */
   String UNKNOWN_SIMILAR_X_X = UNKNOWN_CMD_X + ' ' + lang("similar_cmd_%");
 
   // CREATE COMMAND ===========================================================

@@ -109,7 +109,7 @@ public final class Var extends ExprInfo {
     if(type != null) {
       if(type.occ.intersect(st.occ) == null) throw INVCAST_X_X.get(ii, st, type);
       if(st.instanceOf(type)) {
-        qc.compInfo(QueryText.OPTCAST, this);
+        qc.compInfo(QueryText.OPTCAST_X, this);
         type = null;
       } else if(!st.promotable(type)) {
         return;

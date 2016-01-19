@@ -31,7 +31,7 @@ public final class DialogProps extends BaseXDialog {
   };
   /** Index types. */
   private static final IndexType[] TYPES = {
-    IndexType.TAG, IndexType.ATTNAME, IndexType.PATH, IndexType.TEXT, IndexType.ATTRIBUTE,
+    IndexType.ELEMNAME, IndexType.ATTRNAME, IndexType.PATH, IndexType.TEXT, IndexType.ATTRIBUTE,
     IndexType.TOKEN, IndexType.FULLTEXT
   };
   /** Label strings. */

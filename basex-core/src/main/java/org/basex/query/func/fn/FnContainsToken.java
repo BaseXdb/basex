@@ -2,9 +2,12 @@ package org.basex.query.func.fn;
 
 import static org.basex.util.Token.*;
 
+import org.basex.index.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -29,5 +32,20 @@ public final class FnContainsToken extends StandardFunc {
       }
     }
     return Bln.FALSE;
+  }
+
+  @Override
+  public boolean indexAccessible(final IndexInfo ii) throws QueryException {
+    // support limited to default collation
+    return exprs.length == 2 &&
+           ii.create(input(), ii.type(exprs[0], IndexType.TOKEN), info, true);
+  }
+
+  /**
+   * Returns the input argument if no others are specified, and if it returns at most one item.
+   * @return first argument
+   */
+  private Expr input() {
+    return exprs.length == 2 && exprs[1].seqType().zeroOrOne() ? exprs[1] : null;
   }
 }

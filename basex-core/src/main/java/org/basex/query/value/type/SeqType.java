@@ -136,12 +136,6 @@ public final class SeqType {
   public static final SeqType ITR_ZM = new SeqType(AtomType.ITR, Occ.ZERO_MORE);
   /** One or more integers. */
   public static final SeqType ITR_OM = new SeqType(AtomType.ITR, Occ.ONE_MORE);
-  /** Single node. */
-  public static final SeqType NOD = NodeType.NOD.seqType();
-  /** Zero or one nodes. */
-  public static final SeqType NOD_ZO = new SeqType(NodeType.NOD, Occ.ZERO_ONE);
-  /** Zero or more nodes. */
-  public static final SeqType NOD_ZM = new SeqType(NodeType.NOD, Occ.ZERO_MORE);
   /** Single QName. */
   public static final SeqType QNM = AtomType.QNM.seqType();
   /** Zero or one QNames. */
@@ -182,8 +176,27 @@ public final class SeqType {
   public static final SeqType DUR_ZO = new SeqType(AtomType.DUR, Occ.ZERO_ONE);
   /** Zero or more bytes. */
   public static final SeqType BYT_ZM = new SeqType(AtomType.BYT, Occ.ZERO_MORE);
+  /** One xs:hexBinary. */
+  public static final SeqType HEX = AtomType.HEX.seqType();
+  /** Single xs:base64Binary. */
+  public static final SeqType B64 = AtomType.B64.seqType();
+  /** Zero or one xs:base64Binary. */
+  public static final SeqType B64_ZO = new SeqType(AtomType.B64, Occ.ZERO_ONE);
+  /** Zero or more xs:base64Binary. */
+  public static final SeqType B64_ZM = new SeqType(AtomType.B64, Occ.ZERO_MORE);
+  /** Single binary. */
+  public static final SeqType BIN = AtomType.BIN.seqType();
+
+  /** Single node. */
+  public static final SeqType NOD = NodeType.NOD.seqType();
+  /** Zero or one nodes. */
+  public static final SeqType NOD_ZO = new SeqType(NodeType.NOD, Occ.ZERO_ONE);
+  /** Zero or more nodes. */
+  public static final SeqType NOD_ZM = new SeqType(NodeType.NOD, Occ.ZERO_MORE);
   /** One attribute node. */
   public static final SeqType ATT = NodeType.ATT.seqType();
+  /** Zero or one attribute. */
+  public static final SeqType ATT_ZO = new SeqType(NodeType.ATT, Occ.ZERO_ONE);
   /** One comment node. */
   public static final SeqType COM = NodeType.COM.seqType();
   /** One document node. */
@@ -202,16 +215,6 @@ public final class SeqType {
   public static final SeqType PI = NodeType.PI.seqType();
   /** Namespace node. */
   public static final SeqType TXT_ZO = new SeqType(NodeType.TXT, Occ.ZERO_ONE);
-  /** One xs:hexBinary. */
-  public static final SeqType HEX = AtomType.HEX.seqType();
-  /** Single xs:base64Binary. */
-  public static final SeqType B64 = AtomType.B64.seqType();
-  /** Zero or one xs:base64Binary. */
-  public static final SeqType B64_ZO = new SeqType(AtomType.B64, Occ.ZERO_ONE);
-  /** Zero or more xs:base64Binary. */
-  public static final SeqType B64_ZM = new SeqType(AtomType.B64, Occ.ZERO_MORE);
-  /** Single binary. */
-  public static final SeqType BIN = AtomType.BIN.seqType();
 
   /** Any function type. */
   public static final FuncType ANY_FUN = new FuncType(null, (SeqType[]) null);

@@ -4,9 +4,11 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import org.basex.data.*;
+import org.basex.index.*;
 import org.basex.index.query.*;
 import org.basex.query.*;
-import org.basex.query.expr.CmpG.OpG;
+import org.basex.query.expr.CmpG.*;
+import org.basex.query.expr.index.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
@@ -151,16 +153,19 @@ final class CmpSR extends Single {
     // accept only location path, string and equality expressions
     final Data data = ii.ic.data;
     // no support for main-memory databases
-    if(data.inMemory() || !ii.check(expr, false)) return false;
+    if(data.inMemory()) return false;
+    final IndexType type = ii.type(expr, null);
+    if(type == null) return false;
 
     // create range access
-    final StringRange sr = new StringRange(ii.text, min, mni, max, mxi);
+    final StringRange sr = new StringRange(type, min, mni, max, mxi);
     ii.costs = data.costs(sr);
     if(ii.costs < 0) return false;
 
     final TokenBuilder tb = new TokenBuilder();
     tb.add(mni ? '[' : '(').addExt(min).add(',').addExt(max).add(mxi ? ']' : ')');
-    ii.create(new StringRangeAccess(info, sr, ii.ic), info, Util.info(OPTSRNGINDEX, tb), true);
+    ii.create(new StringRangeAccess(info, sr, ii.ic), true, info,
+        Util.info(OPTINDEX_X_X, type + " string range", tb));
     return true;
   }
 

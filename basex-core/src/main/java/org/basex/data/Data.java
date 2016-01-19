@@ -199,8 +199,8 @@ public abstract class Data {
    */
   final Index index(final IndexType type) {
     switch(type) {
-      case TAG:       return elemNames;
-      case ATTNAME:   return attrNames;
+      case ELEMNAME:  return elemNames;
+      case ATTRNAME:  return attrNames;
       case TEXT:      return textIndex;
       case ATTRIBUTE: return attrIndex;
       case TOKEN:     return tokenIndex;

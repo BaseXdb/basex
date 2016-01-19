@@ -19,8 +19,8 @@ public final class DocTest extends Test {
    * @param test child test
    */
   public DocTest(final Test test) {
+    super(NodeType.DOC);
     this.test = test;
-    type = NodeType.DOC;
   }
 
   @Override

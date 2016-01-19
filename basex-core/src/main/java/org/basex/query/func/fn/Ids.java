@@ -9,7 +9,7 @@ import org.basex.core.locks.*;
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.query.*;
-import org.basex.query.expr.*;
+import org.basex.query.expr.index.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
