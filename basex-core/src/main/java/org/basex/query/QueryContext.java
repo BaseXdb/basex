@@ -169,6 +169,20 @@ public final class QueryContext extends Proc implements Closeable {
   }
 
   /**
+   * Construct for use in a fork-join query
+   * @param qcParent
+   * @param async
+   */
+  public QueryContext(final QueryContext qcParent, boolean async ) {
+    this(qcParent.context, qcParent);
+    listen = qcParent.listen;
+    if(async) {
+      resources = new QueryResources(this, qcParent.resources);
+    } else {
+      resources = qcParent.resources;
+    }
+  }
+  /**
    * Constructor.
    * @param context database context
    * @param parent parent context (can be {@code null})

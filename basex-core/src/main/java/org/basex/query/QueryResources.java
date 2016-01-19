@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.Map.*;
 
 import org.basex.build.*;
 import org.basex.core.*;
@@ -60,6 +61,24 @@ public final class QueryResources {
    */
   QueryResources(final QueryContext qc) {
     this.qc = qc;
+  }
+
+  @SuppressWarnings("unchecked")
+  QueryResources(QueryContext qc, QueryResources qr) {
+    this.qc = qc;
+    // Shallow clone the resources 
+    for(Data d : qr.datas) { this.datas.add(d); }
+    for(String s : qr.collNames) { this.collNames.add(s); }
+    for(Value v : qr.colls) { this.colls.add(v); }
+    for(Entry<Class<? extends QueryResource>, QueryResource> e : external.entrySet()) {
+       this.external.put(e.getKey(), e.getValue());
+    }
+
+    for(Value v : qr.cache) {
+      cache.add(v);
+    }
+
+    this.modules = qr.modules;
   }
 
   /**
@@ -433,4 +452,5 @@ public final class QueryResources {
     colls.add(coll);
     collNames.add(name);
   }
+
 }
