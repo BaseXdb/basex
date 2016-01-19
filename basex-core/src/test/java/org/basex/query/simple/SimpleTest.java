@@ -117,6 +117,7 @@ public final class SimpleTest extends QueryTest {
 
       { "Path 1", empty(), "<a/>[./(@*)]" },
       { "Path 2", strings("A", "B"), "<_><x><x>A</x>B</x></_>//x/node()[last()] ! string()" },
+      { "Path 3", integers(2, 2), "<a><b/><b/></a>/b/last()" },
 
       { "Cast 1", integers(1), "xs:integer('+1')" },
       { "Cast 2", "xs:integer('++1')" },

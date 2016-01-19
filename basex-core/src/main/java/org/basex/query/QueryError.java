@@ -1001,7 +1001,7 @@ public enum QueryError {
   FUNCNOTUP(XPTY, 4, "Function is not updating."),
 
   /** XPTY0018. */
-  EVALNODESVALS(XPTY, 18, "Path yields both nodes and atomic values."),
+  MIXEDRESULTS(XPTY, 18, "Path returns both nodes and non-nodes."),
   /** XPTY0019. */
   PATHNODE_X_X_X(XPTY, 19, "%: node expected as input, % found: %."),
   /** XPTY0020. */
