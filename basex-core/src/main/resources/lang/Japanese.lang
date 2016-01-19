@@ -48,6 +48,7 @@ close_all            = 全て閉じる
 close_file_%         = % への変更を保存しますか？
 color_schema         = カラースキーマ
 colors               = 色
+column               = Column
 command              = コマンド
 command_canceled     = コマンドはキャンセルされました。
 comment              = コメント

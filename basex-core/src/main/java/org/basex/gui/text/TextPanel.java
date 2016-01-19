@@ -284,12 +284,13 @@ public class TextPanel extends BaseXPanel {
    * Sorts text.
    */
   public void sort() {
-    final DialogSort ds = new DialogSort(gui);
-    if(!ds.ok()) return;
-
     final int caret = editor.pos();
-    if(editor.sort()) hist.store(editor.text(), caret, editor.pos());
+    final DialogSort ds = new DialogSort(gui);
+    if(!ds.ok() || !editor.sort()) return;
+
+    hist.store(editor.text(), caret, editor.pos());
     scrollCode.invokeLater(true);
+    repaint();
   }
 
   /**

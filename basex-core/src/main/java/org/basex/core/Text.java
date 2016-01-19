@@ -1107,6 +1107,8 @@ public interface Text {
   String ASCENDING_ORDER = lang("ascending_order");
   /** Merge duplicate lines. */
   String MERGE_DUPLICATES = lang("merge_duplicates");
+  /** Column. */
+  String COLUMN = lang("column");
 
   /** Format. */
   String FORMAT = lang("format");

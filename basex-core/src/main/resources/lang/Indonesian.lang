@@ -48,6 +48,7 @@ close_all            = Tutup semua
 close_file_%         = Simpan perubahan ke %?
 color_schema         = Skema Warna
 colors               = Warna
+column               = Kolom
 command              = Perintah
 command_canceled     = Perintah telah dibatalkan.
 comment              = Komentar

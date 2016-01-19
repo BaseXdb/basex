@@ -253,12 +253,21 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
   /**
    * Sorts the elements.
    * @param cs respect case sensitivity
-   * @param asc ascending (true)/descending (false) flag
+   * @param ascending ascending/descending order
    * @return self reference
    */
-  public TokenList sort(final boolean cs, final boolean asc) {
-    final Comparator<byte[]> comp = cs ? COMP : LC_COMP;
-    Arrays.sort(list, 0, size, asc ? comp : Collections.reverseOrder(comp));
+  public TokenList sort(final boolean cs, final boolean ascending) {
+    return sort(cs ? COMP : LC_COMP, ascending);
+  }
+
+  /**
+   * Sorts the elements.
+   * @param comp comparator
+   * @param ascending ascending/descending order
+   * @return self reference
+   */
+  public TokenList sort(final Comparator<byte[]> comp, final boolean ascending) {
+    Arrays.sort(list, 0, size, ascending ? comp : Collections.reverseOrder(comp));
     return this;
   }
 

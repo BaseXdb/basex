@@ -2,10 +2,12 @@ package org.basex.gui.text;
 
 import static org.basex.util.Token.*;
 
+import java.text.*;
 import java.util.*;
 
 import org.basex.gui.*;
-import org.basex.gui.text.SearchBar.SearchDir;
+import org.basex.gui.text.SearchBar.*;
+import org.basex.query.util.collation.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -553,10 +555,14 @@ public final class TextEditor {
   boolean sort() {
     if(!extend()) return false;
 
-    // collect lines to be sorted
+    // count lines
+    int l = 1;
     final int s = start, e = end, ts = size();
     final byte[] tmp = Arrays.copyOf(text, ts);
-    final TokenList tl = new TokenList();
+    for(int i = s; i < e; i++) if(tmp[i] == '\n') l++;
+
+    // collect lines to be sorted
+    TokenList tl = new TokenList(l);
     final ByteList bl = new ByteList();
     for(int i = s; i < e; i++) {
       final byte ch = tmp[i];
@@ -566,11 +572,8 @@ public final class TextEditor {
         bl.add(ch);
       }
     }
-
-    // sort data and merge duplicate lines
     if(!bl.isEmpty()) tl.add(bl.finish());
-    tl.sort(gopts.get(GUIOptions.CASESORT), gopts.get(GUIOptions.ASCSORT));
-    if(gopts.get(GUIOptions.MERGEDUPL)) tl.unique();
+    sort(tl);
 
     // copy lines back to text
     int i = s;
@@ -584,6 +587,57 @@ public final class TextEditor {
     final boolean changed = text(i == e ? tmp : Arrays.copyOf(tmp, ts - e + i));
     select(s, i);
     return changed;
+  }
+
+  /**
+   * Sorts the specified data.
+   * @param tokens list of tokens
+   */
+  private void sort(final TokenList tokens) {
+    final boolean asc = gopts.get(GUIOptions.ASCSORT), cs = gopts.get(GUIOptions.CASESORT);
+    final Collator coll = collator(gopts.get(GUIOptions.COLLATION));
+    final int column = gopts.get(GUIOptions.COLUMN) - 1;
+
+    // if collation or column was specified: stable sort
+    if(coll != null || column > 0) tokens.sort(true, true);
+    // stable sort: before custom sort, use default sort
+    final Comparator<byte[]> cc = new Comparator<byte[]>() {
+      @Override
+      public int compare(final byte[] token1, final byte[] token2) {
+        final byte[] t1 = sub(token1, column), t2 = sub(token2, column);
+        return coll != null ? coll.compare(string(t1), string(t2)) :
+         diff(cs ? lc(t1) : t1, cs ? lc(t2) : t2);
+      }
+    };
+    tokens.sort(cc, asc);
+    if(gopts.get(GUIOptions.MERGEDUPL)) tokens.unique();
+  }
+
+  /**
+   * Returns a substring.
+   * @param token token
+   * @param column column position
+   * @return sub string
+   */
+  private byte[] sub(final byte[] token, final int column) {
+    final int tl = token.length;
+    int t = 0;
+    for(int c = 0; t < tl && c < column; t += cl(token, t), c++);
+    return substring(token, t);
+  }
+
+  /**
+   * Returns a collator.
+   * @param coll collation string
+   * @return collator
+   */
+  private Collator collator(final String coll) {
+    if(!coll.isEmpty()) {
+      try {
+        return new BaseXCollationOptions().collator(coll);
+      } catch(final IllegalArgumentException ignore) { }
+    }
+    return null;
   }
 
   /**

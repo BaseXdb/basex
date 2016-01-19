@@ -48,6 +48,7 @@ close_all            = Cerrar todo
 close_file_%         = ¿Salvar cambios a %?
 color_schema         = Esquema de Color
 colors               = Colores
+column               = Columna
 command              = Comando
 command_canceled     = El comando fue cancelado.
 comment              = Comentario

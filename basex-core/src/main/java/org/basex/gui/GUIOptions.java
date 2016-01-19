@@ -128,6 +128,10 @@ public final class GUIOptions extends Options {
   public static final BooleanOption CASESORT = new BooleanOption("CASESORT", true);
   /** Merge duplicate lines. */
   public static final BooleanOption MERGEDUPL = new BooleanOption("MERGEDUPL", false);
+  /** Column. */
+  public static final NumberOption COLUMN = new NumberOption("COLUMN", 1);
+  /** Collation. */
+  public static final StringOption COLLATION = new StringOption("COLLATION", "");
 
   /** Show line margin. */
   public static final BooleanOption SHOWMARGIN = new BooleanOption("SHOWMARGIN", true);

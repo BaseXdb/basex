@@ -48,6 +48,7 @@ close_all            = Összes bezárása
 close_file_%         = Menti a(z) % változásait?
 color_schema         = Színséma
 colors               = Színek
+column               = Oszlop
 command              = Parancs
 command_canceled     = Parancs futása megszakítva.
 comment              = Megjegyzés

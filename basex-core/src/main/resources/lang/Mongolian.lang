@@ -48,6 +48,7 @@ close_all            = Бүгдийг хаах
 close_file_%         = Өөрчлөлтийг %-нд хадгалах?
 color_schema         = Өнгөний загвар
 colors               = Өнгө
+column               = Столбец
 command              = Комманд
 command_canceled     = Command was canceled.
 comment              = Сэтгэгдэл

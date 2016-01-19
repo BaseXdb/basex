@@ -48,6 +48,7 @@ close_all            = Закрыть все
 close_file_%         = Сохранить изменения в файле '%'?
 color_schema         = Цветовая схема
 colors               = Цвета
+column               = Столбец
 command              = Команда
 command_canceled     = Команда была отменена
 comment              = Комментарий

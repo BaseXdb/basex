@@ -48,6 +48,7 @@ close_all            = Închidere tot
 close_file_%         = Salvaţi modificările la %?
 color_schema         = Schemă de culori
 colors               = Culori
+column               = Coloană
 command              = Comandă
 command_canceled     = Comanda a fost anulata.
 comment              = Observație

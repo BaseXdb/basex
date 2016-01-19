@@ -202,13 +202,13 @@ public class StringList extends ElementList implements Iterable<String> {
   /**
    * Sorts the elements.
    * @param cs respect case sensitivity
-   * @param asc ascending (true)/descending (false) flag
+   * @param ascending ascending/descending order
    * @param index index of element from which sorting starts
    * @return self reference
    */
-  public final StringList sort(final boolean cs, final boolean asc, final int index) {
+  public final StringList sort(final boolean cs, final boolean ascending, final int index) {
     final Comparator<String> comp = cs ? null : String.CASE_INSENSITIVE_ORDER;
-    Arrays.sort(list, index, size, asc ? comp : Collections.reverseOrder(comp));
+    Arrays.sort(list, index, size, ascending ? comp : Collections.reverseOrder(comp));
     return this;
   }
 

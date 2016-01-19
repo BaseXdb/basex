@@ -48,6 +48,7 @@ close_all            = Sluit alle
 close_file_%         = Bewaar wijzigingen in %?
 color_schema         = Kleurenschema
 colors               = Kleuren
+column               = Kolom
 command              = Commando
 command_canceled     = Commando is geannuleerd.
 comment              = Commentaar

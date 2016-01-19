@@ -19,6 +19,8 @@ import org.basex.util.options.*;
 public class BaseXTextField extends JTextField {
   /** Default width of text fields. */
   public static final int DWIDTH = 350;
+  /** Default foreground color. */
+  private static Color back;
 
   /** Options. */
   private Options options;
@@ -100,6 +102,7 @@ public class BaseXTextField extends JTextField {
   private BaseXTextField(final String text, final Window win, final BaseXDialog dialog) {
     BaseXLayout.setWidth(this, DWIDTH);
     BaseXLayout.addInteraction(this, win);
+    if(back == null) back = getBackground();
 
     if(text != null) setText(text);
 
@@ -109,7 +112,6 @@ public class BaseXTextField extends JTextField {
         selectAll();
       }
     });
-
     addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {
@@ -190,9 +192,9 @@ public class BaseXTextField extends JTextField {
   }
 
   @Override
-  public void setText(final String txt) {
-    last = txt;
-    super.setText(txt);
+  public void setText(final String text) {
+    last = text;
+    super.setText(text);
   }
 
   /**
@@ -202,7 +204,10 @@ public class BaseXTextField extends JTextField {
     if(option instanceof NumberOption) {
       try {
         options.set((NumberOption) option, Integer.parseInt(getText()));
-      } catch(final NumberFormatException ignored) { }
+        setBackground(back);
+      } catch(final NumberFormatException ignored) {
+        setBackground(GUIConstants.LRED);
+      }
     } else {
       options.set((StringOption) option, getText());
     }
