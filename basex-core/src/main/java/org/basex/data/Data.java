@@ -197,7 +197,7 @@ public abstract class Data {
    * @param type index type
    * @return index
    */
-  final Index index(final IndexType type) {
+  public final Index index(final IndexType type) {
     switch(type) {
       case ELEMNAME:  return elemNames;
       case ATTRNAME:  return attrNames;
@@ -499,22 +499,28 @@ public abstract class Data {
       final int sz = size(pre, kind);
 
       // write ids of namespace uri and name, and namespace flag
-      final IntList pres = new IntList();
       if(kind == ATTR) {
-        // update attribute index
-        if(meta.updindex && meta.attrindex) {
-          pres.add(pre);
-          attrIndex.delete(cache(pres, IndexType.ATTRIBUTE));
+        // delete old values from attribute indexes
+        if(meta.updindex) {
+          if(meta.attrindex) attrIndex.delete(cache(pre, IndexType.ATTRIBUTE));
+          if(meta.tokenindex) tokenIndex.delete(cache(pre, IndexType.TOKEN));
         }
         table.write1(pre, 11, uriId);
         table.write2(pre, 1, attrNames.index(name, null, false));
         if(nsFlag) table.write2(nsPre, 1, 1 << 15 | nameId(nsPre));
-        if(!pres.isEmpty()) attrIndex.add(cache(pres, IndexType.ATTRIBUTE));
+        // add new values to attribute indexes
+        if(meta.updindex) {
+          if(meta.attrindex) attrIndex.add(cache(pre, IndexType.ATTRIBUTE));
+          if(meta.tokenindex) tokenIndex.add(cache(pre, IndexType.TOKEN));
+        }
+
       } else {
+        // update element name
+        final IntList pres = new IntList();
         // update text index
         if(meta.updindex && meta.textindex) {
           final int last = pre + sz;
-          for(int curr = pre + attSize(pre, kind); curr != last; curr += size(curr, kind(curr))) {
+          for(int curr = pre + attSize(pre, kind); curr < last; curr += size(curr, kind(curr))) {
             if(kind(curr) == TEXT) pres.add(curr);
           }
           textIndex.delete(cache(pres, IndexType.TEXT));
@@ -1047,6 +1053,7 @@ public abstract class Data {
     if(meta.updindex) {
       if(meta.textindex) textIndex.delete(cache(pre, size, IndexType.TEXT));
       if(meta.attrindex) attrIndex.delete(cache(pre, size, IndexType.ATTRIBUTE));
+      if(meta.tokenindex) tokenIndex.delete(cache(pre, size, IndexType.TOKEN));
       if(id != -1) idmap.delete(pre, id, -size);
     }
   }
@@ -1064,7 +1071,18 @@ public abstract class Data {
       if(id != -1) idmap.insert(pre, id, size);
       if(meta.textindex) textIndex.add(cache(pre, size, IndexType.TEXT));
       if(meta.attrindex) attrIndex.add(cache(pre, size, IndexType.ATTRIBUTE));
+      if(meta.tokenindex) tokenIndex.add(cache(pre, size, IndexType.TOKEN));
     }
+  }
+
+  /**
+   * Caches the text and id for a node with specified pre value.
+   * @param pre pre value
+   * @param type index type
+   * @return cached texts and ids
+   */
+  private TokenObjMap<IntList> cache(final int pre, final IndexType type) {
+    return cache(new IntList(1).add(pre), type);
   }
 
   /**
@@ -1077,7 +1095,7 @@ public abstract class Data {
   private TokenObjMap<IntList> cache(final int pre, final int size, final IndexType type) {
     final IntList pres = new IntList(size);
     final int last = pre + size;
-    for(int curr = pre; curr < last; ++curr) pres.add(curr);
+    for(int curr = pre; curr < last; curr++) pres.add(curr);
     return cache(pres, type);
   }
 
@@ -1094,17 +1112,32 @@ public abstract class Data {
     final int ps = pres.size(), kind = text ? TEXT : ATTR;
     for(int p = 0; p < ps; p++) {
       final int pre = pres.get(p);
-      if(kind(pre) == kind && textLen(pre, text) <= meta.maxlen && in.contains(this, pre, text)) {
-        final byte[] key = text(pre, text);
-        IntList ids = map.get(key);
-        if(ids == null) {
-          ids = new IntList(1);
-          map.put(key, ids);
+      if(kind(pre) == kind && in.contains(this, pre, text)) {
+        if(type == IndexType.TOKEN) {
+          for(final byte[] token : distinctTokens(text(pre, text))) {
+            addId(map, token, pre);
+          }
+        } else if(textLen(pre, text) <= meta.maxlen) {
+          addId(map, text(pre, text), pre);
         }
-        ids.add(id(pre));
       }
     }
     return map;
+  }
+
+  /**
+   * Adds a node id to the specified map.
+   * @param map cached texts and ids
+   * @param text text
+   * @param pre pre value
+   */
+  private void addId(final TokenObjMap<IntList> map, final byte[] text, final int pre) {
+    IntList ids = map.get(text);
+    if(ids == null) {
+      ids = new IntList(1);
+      map.put(text, ids);
+    }
+    ids.add(id(pre));
   }
 
   // HELPER FUNCTIONS ===================================================================

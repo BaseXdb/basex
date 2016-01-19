@@ -68,8 +68,7 @@ public class DiskValues extends ValueIndex {
   public final byte[] info(final MainOptions options) {
     final TokenBuilder tb = new TokenBuilder();
     tb.add(LI_STRUCTURE).add(SORTED_LIST).add(NL);
-    tb.add(LI_NAMES).add(type == IndexType.TOKEN ? data.meta.tokeninclude :
-      type == IndexType.TEXT ? data.meta.textinclude : data.meta.attrinclude).add(NL);
+    tb.add(LI_NAMES).add(data.meta.names(type)).add(NL);
 
     final IndexStats stats = new IndexStats(options.get(MainOptions.MAXSTAT));
     synchronized(monitor) {

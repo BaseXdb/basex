@@ -49,7 +49,7 @@ public final class DiskValuesBuilder extends ValuesBuilder {
   public DiskValues build() throws IOException {
     Util.debug(det());
 
-    final boolean updindex = data.meta.updindex && !tokenize;
+    final boolean updindex = data.meta.updindex;
     for(pre = 0; pre < size; ++pre) {
       if((pre & 0x0FFF) == 0) check();
       if(indexEntry()) {

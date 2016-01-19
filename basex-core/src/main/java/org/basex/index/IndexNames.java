@@ -25,15 +25,7 @@ public final class IndexNames {
    * @param data data reference
    */
   public IndexNames(final IndexType type, final Data data) {
-    final String names;
-    switch(type) {
-      case TEXT: names = data.meta.textinclude; break;
-      case ATTRIBUTE: names = data.meta.attrinclude; break;
-      case TOKEN: names = data.meta.tokeninclude; break;
-      case FULLTEXT: names = data.meta.ftinclude; break;
-      default: throw Util.notExpected();
-    }
-
+    final String names = data.meta.names(type);
     final HashSet<String> inc = toSet(names.trim());
     for(final String entry : inc) {
       // global wildcard: ignore all assignments

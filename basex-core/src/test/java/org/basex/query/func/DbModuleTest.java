@@ -9,12 +9,12 @@ import java.util.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.core.cmd.Set;
 import org.basex.core.parse.Commands.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
+import org.basex.util.options.*;
 import org.junit.*;
 import org.junit.Test;
 
@@ -53,8 +53,12 @@ public final class DbModuleTest extends AdvancedQueryTest {
   /**
    * Finalizes tests.
    */
-  @AfterClass
-  public static void finish() {
+  @After
+  public void finish() {
+    set(MainOptions.TEXTINCLUDE, "");
+    set(MainOptions.ATTRINCLUDE, "");
+    set(MainOptions.TOKENINCLUDE, "");
+    set(MainOptions.FTINCLUDE, "");
     execute(new DropDB(NAME));
   }
 
@@ -545,7 +549,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
     for(final String k : nopt) {
       query(_DB_OPTIMIZE.args(NAME, false, " map { '" + k + "': 1 }"));
     }
-    final String[] bopt = { "textindex", "attrindex", "ftindex", "stemming",
+    final String[] bopt = { "textindex", "attrindex", "tokenindex", "ftindex", "stemming",
         "casesens", "diacritics" };
     for(final String k : bopt) {
       for(final boolean v : new boolean[] { true, false }) {
@@ -566,36 +570,46 @@ public final class DbModuleTest extends AdvancedQueryTest {
 
     // check if optimize call preserves original options
     query(_DB_OPTIMIZE.args(NAME));
-    final String[] indexes = { "textindex", "attrindex", "ftindex" };
-    final String[] includes = { "textinclude", "attrinclude", "ftinclude" };
-    for(final String i : indexes) query(_DB_INFO.args(NAME) + "//" + i + "/text()", "false");
-    for(final String i : includes) query(_DB_INFO.args(NAME) + "//" + i + "/text()", "");
+    final BooleanOption[] indexes = { MainOptions.TEXTINDEX, MainOptions.ATTRINDEX,
+        MainOptions.TOKENINDEX, MainOptions.FTINDEX };
+    final StringOption[] includes = { MainOptions.TEXTINCLUDE, MainOptions.ATTRINCLUDE,
+        MainOptions.TOKENINCLUDE, MainOptions.FTINCLUDE };
+    for(final BooleanOption bo : indexes) query(_DB_INFO.args(NAME) +
+        "//" + bo.name().toLowerCase(Locale.ENGLISH) + "/text()", "false");
+    for(final StringOption so : includes) query(_DB_INFO.args(NAME) +
+        "//" + so.name().toLowerCase(Locale.ENGLISH) + "/text()", "");
 
     execute(new Open(NAME));
-    final CmdIndex[] cmds = { CmdIndex.TEXT, CmdIndex.ATTRIBUTE, CmdIndex.FULLTEXT };
-    for(final String i : includes) execute(new Set(i, "a"));
-    for(final CmdIndex cmd : cmds) execute(new CreateIndex(cmd));
+    final CmdIndex[] cis = { CmdIndex.TEXT, CmdIndex.ATTRIBUTE, CmdIndex.TOKEN, CmdIndex.FULLTEXT };
+    for(final StringOption so : includes) set(so, "a");
+    for(final CmdIndex ci : cis) execute(new CreateIndex(ci));
     execute(new Close());
 
     query(_DB_OPTIMIZE.args(NAME));
-    for(final String i : indexes) query(_DB_INFO.args(NAME) + "//" + i + "/text()", "true");
-    for(final String i : includes) query(_DB_INFO.args(NAME) + "//" + i + "/text()", "a");
+    for(final BooleanOption bo : indexes) query(_DB_INFO.args(NAME) +
+        "//" + bo.name().toLowerCase(Locale.ENGLISH) + "/text()", "true");
+    for(final StringOption so : includes) query(_DB_INFO.args(NAME) +
+        "//" + so.name().toLowerCase(Locale.ENGLISH) + "/text()", "a");
 
     execute(new Open(NAME));
-    for(final String i : includes) execute(new Set(i, ""));
-    for(final CmdIndex cmd : cmds) execute(new DropIndex(cmd));
+    for(final StringOption so : includes) set(so, "");
+    for(final CmdIndex cmd : cis) execute(new DropIndex(cmd));
     execute(new Close());
 
     query(_DB_OPTIMIZE.args(NAME));
-    for(final String i : indexes) query(_DB_INFO.args(NAME) + "//" + i + "/text()", "false");
-    for(final String i : includes) query(_DB_INFO.args(NAME) + "//" + i + "/text()", "");
+    for(final BooleanOption bo : indexes) query(_DB_INFO.args(NAME) +
+        "//" + bo.name().toLowerCase(Locale.ENGLISH) + "/text()", "false");
+    for(final StringOption so : includes) query(_DB_INFO.args(NAME) +
+        "//" + so.name().toLowerCase(Locale.ENGLISH) + "/text()", "");
 
     query(_DB_OPTIMIZE.args(NAME, true, " map {"
-        + "'textindex':true(),'attrindex':true(),'ftindex':true(),'updindex':true(),"
-        + "'textinclude':'a','attrinclude':'a','ftinclude':'a'"
+        + "'textindex':true(),'attrindex':true(),'ftindex':true(),'tokenindex':true(),"
+        + "'updindex':true(),'textinclude':'a','attrinclude':'a','tokeninclude':'a','ftinclude':'a'"
         + " }"));
-    for(final String i : indexes) query(_DB_INFO.args(NAME) + "//" + i + "/text()", "true");
-    for(final String i : includes) query(_DB_INFO.args(NAME) + "//" + i + "/text()", "a");
+    for(final BooleanOption bo : indexes) query(_DB_INFO.args(NAME) +
+        "//" + bo.name().toLowerCase(Locale.ENGLISH) + "/text()", "true");
+    for(final StringOption so : includes) query(_DB_INFO.args(NAME) +
+        "//" + so.name().toLowerCase(Locale.ENGLISH) + "/text()", "a");
     query(_DB_INFO.args(NAME) + "//updindex/text()", "true");
   }
 

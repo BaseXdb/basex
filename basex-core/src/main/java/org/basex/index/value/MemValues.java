@@ -55,7 +55,7 @@ public final class MemValues extends ValueIndex {
     final int[] ids = idsList.get(id), pres;
     if(data.meta.updindex) {
       final IntList tmp = new IntList();
-      for(int i = 0; i < len; ++i) tmp.add(data.pre(ids[i])); //[JE]  support update token index
+      for(int i = 0; i < len; ++i) tmp.add(data.pre(ids[i]));
       pres = tmp.sort().finish();
     } else {
       pres = ids;
@@ -103,8 +103,7 @@ public final class MemValues extends ValueIndex {
   public byte[] info(final MainOptions options) {
     final TokenBuilder tb = new TokenBuilder();
     tb.add(LI_STRUCTURE).add(HASH).add(NL);
-    tb.add(LI_NAMES).add(type == IndexType.TOKEN ? data.meta.tokeninclude :
-      type == IndexType.TEXT ? data.meta.textinclude : data.meta.attrinclude).add(NL);
+    tb.add(LI_NAMES).add(data.meta.names(type)).add(NL);
 
     final IndexStats stats = new IndexStats(options.get(MainOptions.MAXSTAT));
     final int s = values.size();

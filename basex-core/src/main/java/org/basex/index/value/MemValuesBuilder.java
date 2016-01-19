@@ -29,7 +29,7 @@ public class MemValuesBuilder extends ValuesBuilder {
     Util.debug(det());
 
     final MemValues index = new MemValues(data, type);
-    final boolean updindex = data.meta.updindex && !tokenize;
+    final boolean updindex = data.meta.updindex;
     for(pre = 0; pre < size; pre++) {
       if((pre & 0x0FFF) == 0) check();
       if(indexEntry()) {

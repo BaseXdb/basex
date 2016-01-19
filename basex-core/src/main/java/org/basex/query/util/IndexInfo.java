@@ -95,7 +95,7 @@ public final class IndexInfo {
 
     // check if the index contains result for the specified elements or attributes
     final IndexType it = type != null ? type : text ? IndexType.TEXT : IndexType.ATTRIBUTE;
-    return new IndexNames(it, data).contains(qname()) && check(type, last) ? it : null;
+    return new IndexNames(it, data).contains(qname()) && check(it, last) ? it : null;
   }
 
   /**
@@ -189,14 +189,12 @@ public final class IndexInfo {
    * @return type of index that can be used; {@code null} otherwise
    */
   private boolean check(final IndexType type, final Step last) {
-    // full-text index
-    if(type == IndexType.FULLTEXT) return text && ic.data.meta.ftindex;
-    // token index
-    if(type == IndexType.TOKEN) return !text && ic.data.meta.tokenindex;
-    // text index
-    if(text) return ic.data.meta.textindex;
-    // attribute index
-    return last.test.type == NodeType.ATT && ic.data.meta.attrindex;
+    return ic.data.meta.index(type) && (
+      type == IndexType.FULLTEXT ? text :
+      type == IndexType.TOKEN ? !text :
+      type == IndexType.TEXT ? text :
+      !text && last.test.type == NodeType.ATT
+    );
   }
 
   /**

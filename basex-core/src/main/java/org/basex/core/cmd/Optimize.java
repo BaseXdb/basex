@@ -79,28 +79,9 @@ public final class Optimize extends ACreate {
    */
   public static void finish(final Data data) throws IOException {
     // GH-676: optimize database and rebuild index structures if ID has turned negative
-    if(data.meta.lastid < data.meta.size - 1) ids(data);
+    if(data.meta.lastid < data.meta.size - 1) optimizeIds(data);
     // GH-1035: auto-optimize database
     if(data.meta.autoopt) optimize(data, null);
-  }
-
-  /**
-   * Creates new node ids and recreates updatable index structures.
-   * @param data data
-   * @throws IOException I/O Exception during index rebuild
-   */
-  public static void ids(final Data data) throws IOException {
-    final MetaData md = data.meta;
-    final int size = md.size;
-    for(int pre = 0; pre < size; ++pre) data.id(pre, pre);
-    md.lastid = size - 1;
-    md.dirty = true;
-
-    if(data.meta.updindex) {
-      data.idmap = new IdPreMap(md.lastid);
-      if(data.meta.textindex) optimize(IndexType.TEXT, data, true, true, true, null);
-      if(data.meta.attrindex) optimize(IndexType.ATTRIBUTE, data, true, true, true, null);
-    }
   }
 
   /**
@@ -175,10 +156,10 @@ public final class Optimize extends ACreate {
     }
 
     // rebuild value indexes
-    optimize(IndexType.TEXT, data, md.createtext, md.textindex, enforceText, cmd);
-    optimize(IndexType.ATTRIBUTE, data, md.createattr, md.attrindex, enforceAttr, cmd);
-    optimize(IndexType.TOKEN, data, md.createtoken, md.tokenindex, enforceToken, cmd);
-    optimize(IndexType.FULLTEXT, data, md.createft, md.ftindex, enforceFt, cmd);
+    optimize(IndexType.TEXT, data, md.createtext, enforceText, cmd);
+    optimize(IndexType.ATTRIBUTE, data, md.createattr, enforceAttr, cmd);
+    optimize(IndexType.TOKEN, data, md.createtoken, enforceToken, cmd);
+    optimize(IndexType.FULLTEXT, data, md.createft, enforceFt, cmd);
   }
 
   /**
@@ -186,19 +167,37 @@ public final class Optimize extends ACreate {
    * @param type index type
    * @param data data reference
    * @param create new flag
-   * @param old old flag
    * @param enforce enforce operation
    * @param cmd calling command instance
    * @throws IOException I/O exception
    */
   private static void optimize(final IndexType type, final Data data, final boolean create,
-      final boolean old, final boolean enforce, final Optimize cmd) throws IOException {
+      final boolean enforce, final Optimize cmd) throws IOException {
 
     // check if flags have changed
-    if(create == old && !enforce) return;
-
+    if(create == data.meta.index(type) && !enforce) return;
     // create or drop index
     if(create) CreateIndex.create(type, data, cmd);
     else DropIndex.drop(type, data);
+  }
+
+  /**
+   * Creates new node ids and recreates updatable index structures.
+   * @param data data
+   * @throws IOException I/O Exception during index rebuild
+   */
+  private static void optimizeIds(final Data data) throws IOException {
+    final MetaData md = data.meta;
+    final int size = md.size;
+    for(int pre = 0; pre < size; ++pre) data.id(pre, pre);
+    md.lastid = size - 1;
+    md.dirty = true;
+
+    if(data.meta.updindex) {
+      data.idmap = new IdPreMap(md.lastid);
+      if(data.meta.textindex) optimize(IndexType.TEXT, data, true, true, null);
+      if(data.meta.attrindex) optimize(IndexType.ATTRIBUTE, data, true, true, null);
+      if(data.meta.tokenindex) optimize(IndexType.TOKEN, data, true, true, null);
+    }
   }
 }

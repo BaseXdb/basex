@@ -52,6 +52,8 @@ public interface DataText {
   String DBTXTINC = "TXTINC";
   /** Attribute index: names. */
   String DBATVINC = "ATVINC";
+  /** Token index: names. */
+  String DBTOKINC = "TOKINC";
   /** Full-text index: names. */
   String DBFTXINC = "FTXINC";
   /** Full-text stemming. */

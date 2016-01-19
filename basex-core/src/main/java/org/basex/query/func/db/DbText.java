@@ -31,9 +31,7 @@ public class DbText extends DbAccess {
   final ValueAccess valueAccess(final IndexType type, final QueryContext qc) throws QueryException {
     final Data data = checkData(qc);
     final MetaData meta = data.meta;
-    final boolean index = type == IndexType.TOKEN ? meta.tokenindex : type == IndexType.TEXT
-        ? meta.textindex : meta.attrindex;
-    if(!index) throw BXDB_INDEX_X.get(info, meta.name, type);
+    if(!data.meta.index(type)) throw BXDB_INDEX_X.get(info, meta.name, type);
     return new ValueAccess(info, exprs[1], type, null, new IndexContext(data, false));
   }
 }

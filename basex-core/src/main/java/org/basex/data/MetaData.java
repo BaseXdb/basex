@@ -9,6 +9,7 @@ import java.io.*;
 import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.index.*;
 import org.basex.io.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
@@ -290,6 +291,68 @@ public final class MetaData {
   }
 
   /**
+   * Returns if the specified index exists.
+   * @param type index type
+   * @return result of check
+   */
+  public boolean index(final IndexType type) {
+    switch(type) {
+      case TEXT:      return textindex;
+      case ATTRIBUTE: return attrindex;
+      case TOKEN:     return tokenindex;
+      case FULLTEXT:  return ftindex;
+      default:        throw Util.notExpected();
+    }
+  }
+
+  /**
+   * Sets availability of the specified index.
+   * @param type index type
+   * @param exists indicates if the index exists
+   */
+  public void index(final IndexType type, final boolean exists) {
+    switch(type) {
+      case TEXT:      textindex = exists; break;
+      case ATTRIBUTE: attrindex = exists; break;
+      case TOKEN:     tokenindex = exists; break;
+      case FULLTEXT:  ftindex = exists; break;
+      default:        throw Util.notExpected();
+    }
+  }
+
+  /**
+   * Returns the included names for the specified index type.
+   * @param type index type
+   * @return index
+   */
+  public String names(final IndexType type) {
+    switch(type) {
+      case TEXT:      return textinclude;
+      case ATTRIBUTE: return attrinclude;
+      case TOKEN:     return tokeninclude;
+      case FULLTEXT:  return ftinclude;
+      default:        throw Util.notExpected();
+    }
+  }
+
+  /**
+   * Assigns include names options to the specified index type.
+   * @param type index type
+   * @param options main options
+   */
+  public void names(final IndexType type, final MainOptions options) {
+    switch(type) {
+      case TEXT:      textinclude = options.get(MainOptions.TEXTINCLUDE); break;
+      case ATTRIBUTE: attrinclude = options.get(MainOptions.ATTRINCLUDE); break;
+      case TOKEN:     tokeninclude = options.get(MainOptions.TOKENINCLUDE); break;
+      case FULLTEXT:  ftinclude = options.get(MainOptions.FTINCLUDE); break;
+      default:        throw Util.notExpected();
+    }
+  }
+
+  // CLASS METHODS ================================================================================
+
+  /**
    * Reads in meta data from the specified stream.
    * @param in input stream
    * @throws IOException I/O exception
@@ -304,41 +367,42 @@ public final class MetaData {
         for(int u = in.readNum(); u > 0; --u) { in.readToken(); in.readToken(); in.readNum(); }
       } else {
         final String v = Token.string(in.readToken());
-        if(k.equals(DBSTR))           storage     = v;
-        else if(k.equals(IDBSTR))     istorage    = v;
-        else if(k.equals(DBFNAME))    original    = v;
-        else if(k.equals(DBENC))      encoding    = v;
-        else if(k.equals(DBFTSW))     stopwords   = v;
-        else if(k.equals(DBFTLN))     language    = Language.get(v);
-        else if(k.equals(DBSIZE))     size        = toInt(v);
-        else if(k.equals(DBNDOCS))    ndocs       = toInt(v);
-        else if(k.equals(DBSCTYPE))   scoring     = toInt(v);
-        else if(k.equals(DBMAXLEN))   maxlen      = toInt(v);
-        else if(k.equals(DBMAXCATS))  maxcats     = toInt(v);
-        else if(k.equals(DBLASTID))   lastid      = toInt(v);
-        else if(k.equals(DBTIME))     time        = toLong(v);
-        else if(k.equals(DBFSIZE))    filesize    = toLong(v);
-        else if(k.equals(DBFTDC))     diacritics  = toBool(v);
-        else if(k.equals(DBCHOP))     chop        = toBool(v);
-        else if(k.equals(DBUPDIDX))   updindex    = toBool(v);
-        else if(k.equals(DBAUTOOPT))  autoopt     = toBool(v);
-        else if(k.equals(DBTXTIDX))   textindex   = toBool(v);
-        else if(k.equals(DBATVIDX))   attrindex   = toBool(v);
-        else if(k.equals(DBTOKIDX))   tokenindex  = toBool(v);
-        else if(k.equals(DBFTXIDX))   ftindex     = toBool(v);
-        else if(k.equals(DBTXTINC))   textinclude = v;
-        else if(k.equals(DBATVINC))   attrinclude = v;
-        else if(k.equals(DBFTXINC))   ftinclude   = v;
-        else if(k.equals(DBSPLIT))    splitsize   = toInt(v);
-        else if(k.equals(DBFTSPLIT))  ftsplitsize = toInt(v);
-        else if(k.equals(DBCRTTXT))   createtext  = toBool(v);
-        else if(k.equals(DBCRTATV))   createattr  = toBool(v);
-        else if(k.equals(DBCRTTOK))   createtoken = toBool(v);
-        else if(k.equals(DBCRTFTX))   createft    = toBool(v);
-        else if(k.equals(DBWCIDX))    wcindex     = toBool(v);
-        else if(k.equals(DBFTST))     stemming    = toBool(v);
-        else if(k.equals(DBFTCS))     casesens    = toBool(v);
-        else if(k.equals(DBUPTODATE)) uptodate    = toBool(v);
+        if(k.equals(DBSTR))           storage      = v;
+        else if(k.equals(IDBSTR))     istorage     = v;
+        else if(k.equals(DBFNAME))    original     = v;
+        else if(k.equals(DBENC))      encoding     = v;
+        else if(k.equals(DBFTSW))     stopwords    = v;
+        else if(k.equals(DBFTLN))     language     = Language.get(v);
+        else if(k.equals(DBSIZE))     size         = toInt(v);
+        else if(k.equals(DBNDOCS))    ndocs        = toInt(v);
+        else if(k.equals(DBSCTYPE))   scoring      = toInt(v);
+        else if(k.equals(DBMAXLEN))   maxlen       = toInt(v);
+        else if(k.equals(DBMAXCATS))  maxcats      = toInt(v);
+        else if(k.equals(DBLASTID))   lastid       = toInt(v);
+        else if(k.equals(DBTIME))     time         = toLong(v);
+        else if(k.equals(DBFSIZE))    filesize     = toLong(v);
+        else if(k.equals(DBFTDC))     diacritics   = toBool(v);
+        else if(k.equals(DBCHOP))     chop         = toBool(v);
+        else if(k.equals(DBUPDIDX))   updindex     = toBool(v);
+        else if(k.equals(DBAUTOOPT))  autoopt      = toBool(v);
+        else if(k.equals(DBTXTIDX))   textindex    = toBool(v);
+        else if(k.equals(DBATVIDX))   attrindex    = toBool(v);
+        else if(k.equals(DBTOKIDX))   tokenindex   = toBool(v);
+        else if(k.equals(DBFTXIDX))   ftindex      = toBool(v);
+        else if(k.equals(DBTXTINC))   textinclude  = v;
+        else if(k.equals(DBATVINC))   attrinclude  = v;
+        else if(k.equals(DBTOKINC))   tokeninclude = v;
+        else if(k.equals(DBFTXINC))   ftinclude    = v;
+        else if(k.equals(DBSPLIT))    splitsize    = toInt(v);
+        else if(k.equals(DBFTSPLIT))  ftsplitsize  = toInt(v);
+        else if(k.equals(DBCRTTXT))   createtext   = toBool(v);
+        else if(k.equals(DBCRTATV))   createattr   = toBool(v);
+        else if(k.equals(DBCRTTOK))   createtoken  = toBool(v);
+        else if(k.equals(DBCRTFTX))   createft     = toBool(v);
+        else if(k.equals(DBWCIDX))    wcindex      = toBool(v);
+        else if(k.equals(DBFTST))     stemming     = toBool(v);
+        else if(k.equals(DBFTCS))     casesens     = toBool(v);
+        else if(k.equals(DBUPTODATE)) uptodate     = toBool(v);
         // legacy: set up-to-date flag to false if path index does not exist
         else if(k.equals(DBPTHIDX) && !toBool(v)) uptodate = false;
       }
@@ -378,6 +442,7 @@ public final class MetaData {
     writeInfo(out, DBFTXIDX,   ftindex);
     writeInfo(out, DBTXTINC,   textinclude);
     writeInfo(out, DBATVINC,   attrinclude);
+    writeInfo(out, DBTOKINC,   tokeninclude);
     writeInfo(out, DBFTXINC,   ftinclude);
     writeInfo(out, DBSPLIT,    splitsize);
     writeInfo(out, DBFTSPLIT,  ftsplitsize);
@@ -408,8 +473,8 @@ public final class MetaData {
     if(!updindex) {
       textindex = false;
       attrindex = false;
+      tokenindex = false;
     }
-    tokenindex = false;
     ftindex = false;
   }
 

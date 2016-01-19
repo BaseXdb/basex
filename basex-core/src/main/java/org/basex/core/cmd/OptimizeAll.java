@@ -8,7 +8,7 @@ import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.core.locks.*;
 import org.basex.core.parse.*;
-import org.basex.core.parse.Commands.Cmd;
+import org.basex.core.parse.Commands.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.io.*;
@@ -147,10 +147,8 @@ public final class OptimizeAll extends ACreate {
         dt.close();
       }
     }
-    // return database instance
+    // close old database instance, drop it and rename temporary database
     Close.close(data, context);
-
-    // drop old database and rename temporary to final name
     if(!DropDB.drop(name, sopts)) throw new BaseXException(DB_NOT_DROPPED_X, name);
     if(!AlterDB.alter(tname, name, sopts)) throw new BaseXException(DB_NOT_RENAMED_X, tname);
   }

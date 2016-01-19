@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 
 import java.io.*;
 
-import org.basex.core.*;
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.*;
 import org.basex.core.users.*;
@@ -34,24 +33,21 @@ public final class DropIndex extends ACreate {
     final CmdIndex ci = getOption(CmdIndex.class);
     final IndexType type;
     if(ci == CmdIndex.TEXT) {
-      data.meta.createtext = false;
-      data.meta.textinclude = options.get(MainOptions.TEXTINCLUDE);
       type = IndexType.TEXT;
+      data.meta.createtext = false;
     } else if(ci == CmdIndex.ATTRIBUTE) {
-      data.meta.createattr = false;
-      data.meta.attrinclude = options.get(MainOptions.ATTRINCLUDE);
       type = IndexType.ATTRIBUTE;
+      data.meta.createattr = false;
     } else if(ci == CmdIndex.TOKEN) {
-      data.meta.createtoken = false;
-      data.meta.tokeninclude = options.get(MainOptions.TOKENINCLUDE);
       type = IndexType.TOKEN;
+      data.meta.createtoken = false;
     } else if(ci == CmdIndex.FULLTEXT) {
-      data.meta.createft = false;
-      data.meta.ftinclude = options.get(MainOptions.FTINCLUDE);
       type = IndexType.FULLTEXT;
+      data.meta.createft = false;
     } else {
       return error(UNKNOWN_CMD_X, this);
     }
+    data.meta.names(type, options);
 
     if(!startUpdate()) return false;
     boolean ok = true;
@@ -79,17 +75,7 @@ public final class DropIndex extends ACreate {
    */
   static void drop(final IndexType type, final Data data) throws IOException {
     data.meta.dirty = true;
-    if(type == IndexType.TEXT) {
-      data.meta.textindex = false;
-    } else if(type == IndexType.ATTRIBUTE) {
-      data.meta.attrindex = false;
-    } else if(type == IndexType.TOKEN) {
-      data.meta.tokenindex = false;
-    } else if(type == IndexType.FULLTEXT) {
-      data.meta.ftindex = false;
-    } else {
-      throw Util.notExpected();
-    }
+    data.meta.index(type, false);
     data.dropIndex(type);
   }
 }

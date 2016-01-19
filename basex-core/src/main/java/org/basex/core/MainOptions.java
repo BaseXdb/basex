@@ -77,10 +77,10 @@ public final class MainOptions extends Options {
   public static final BooleanOption TEXTINDEX = new BooleanOption("TEXTINDEX", true);
   /** Flag for creating an attribute value index. */
   public static final BooleanOption ATTRINDEX = new BooleanOption("ATTRINDEX", true);
-  /** Flag for creating a full-text index. */
-  public static final BooleanOption FTINDEX = new BooleanOption("FTINDEX", false);
   /** Flag for creating a token index. */
   public static final BooleanOption TOKENINDEX = new BooleanOption("TOKENINDEX", false);
+  /** Flag for creating a full-text index. */
+  public static final BooleanOption FTINDEX = new BooleanOption("FTINDEX", false);
 
   /** Text index: names to include. */
   public static final StringOption TEXTINCLUDE = new StringOption("TEXTINCLUDE", "");

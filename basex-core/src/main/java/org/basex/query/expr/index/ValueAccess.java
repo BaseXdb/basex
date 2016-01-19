@@ -91,13 +91,9 @@ public final class ValueAccess extends IndexAccess {
     // check if index is available and if it may contain the requested term
     // otherwise, use sequential scan
     final Data data = ictx.data;
-    final boolean index;
-    if(type == IndexType.TEXT) {
-      index = data.meta.textindex && tl > 0 && tl <= data.meta.maxlen;
-    } else if(type == IndexType.ATTRIBUTE) {
-      index = data.meta.attrindex && tl > 0 && tl <= data.meta.maxlen;
-    } else {
-      index = data.meta.tokenindex;
+    boolean index = data.meta.index(type);
+    if(type == IndexType.TEXT || type == IndexType.ATTRIBUTE) {
+      index &= tl > 0 && tl <= data.meta.maxlen;
     }
 
     final IndexIterator ii = index ? data.iter(new StringToken(type, term)) : scan(term);

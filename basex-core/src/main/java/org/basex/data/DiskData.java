@@ -73,11 +73,12 @@ public final class DiskData extends Data {
       idmap = new IdPreMap(meta.dbfile(DATAIDP));
       if(meta.textindex) textIndex = new UpdatableDiskValues(this, IndexType.TEXT);
       if(meta.attrindex) attrIndex = new UpdatableDiskValues(this, IndexType.ATTRIBUTE);
+      if(meta.tokenindex) tokenIndex = new UpdatableDiskValues(this, IndexType.TOKEN);
     } else {
       if(meta.textindex) textIndex = new DiskValues(this, IndexType.TEXT);
       if(meta.attrindex) attrIndex = new DiskValues(this, IndexType.ATTRIBUTE);
+      if(meta.tokenindex) tokenIndex = new DiskValues(this, IndexType.TOKEN);
     }
-    if(meta.tokenindex) tokenIndex = new DiskValues(this, IndexType.TOKEN);
     if(meta.ftindex) ftIndex = new FTIndex(this);
   }
 

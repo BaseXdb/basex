@@ -51,8 +51,7 @@ public final class ValueIndexTest extends SandboxTest {
    * @param updindex UPDINDEX option
    * @return parameter set
    */
-  private static Object[] paramSet(final boolean mainmem,
-      final boolean updindex) {
+  private static Object[] paramSet(final boolean mainmem, final boolean updindex) {
     final ArrayList<Set> params = new ArrayList<>();
     params.add(new Set(MainOptions.MAINMEM, mainmem));
     params.add(new Set(MainOptions.UPDINDEX, updindex));
@@ -69,15 +68,11 @@ public final class ValueIndexTest extends SandboxTest {
     this.paramSet = paramSet;
   }
 
-  /** Set-up database. */
-  @Before
-  public void setUp() {
-  }
-
-  /** Set-up database. */
+  /** Set down database. */
   @After
   public void setDown() {
-    execute(new Set(MainOptions.TOKENINCLUDE, ""));
+    set(MainOptions.MAINMEM, false);
+    set(MainOptions.UPDINDEX, false);
     execute(new DropDB(NAME));
   }
 
@@ -109,8 +104,25 @@ public final class ValueIndexTest extends SandboxTest {
     tokens.put("blu", 0);
     tokens.put("", 0);
     tokens.put("nonexistant", 0);
-
     valueIndexTest(IndexType.ATTRIBUTE, tokens, paramSet);
+  }
+
+  /**
+   * Tests the token index.
+   */
+  @Test
+  public void tokenIndexTest() {
+    set(MainOptions.TOKENINDEX, true);
+
+    final LinkedHashMap<String, Integer> tokens = new LinkedHashMap<>();
+    tokens.put("context", 1);
+    tokens.put("baz bar blu", 0);
+    tokens.put("baz", 1);
+    tokens.put("bar", 1);
+    tokens.put("blu", 1);
+    tokens.put("", 0);
+    tokens.put("nonexistant", 0);
+    valueIndexTest(IndexType.TOKEN, tokens, paramSet);
   }
 
   /**
@@ -122,16 +134,15 @@ public final class ValueIndexTest extends SandboxTest {
    */
   private void valueIndexTest(final IndexType indexType, final LinkedHashMap<String,
       Integer> tokens, final Collection<Set> options) {
-    // Set up environment
+    // set up environment
     for(final Set option : options) execute(option);
     execute(new CreateDB(NAME, FILE));
 
-    // Fetch index reference to be tested
+    // fetch index reference to be tested
     final boolean text = IndexType.TEXT == indexType;
-    final ValueIndex index = text ? context.data().textIndex : IndexType.TOKEN == indexType
-        ? context.data().tokenIndex : context.data().attrIndex;
+    final ValueIndex index = (ValueIndex) context.data().index(indexType);
 
-    // Receive, verify and count results for passed tokens
+    // receive, verify and count results for passed tokens
     for(final Entry<String, Integer> entry : tokens.entrySet()) {
       final byte[] token = token(entry.getKey());
       final IndexIterator it = index.iter(new IndexEntries(token, indexType));
@@ -149,12 +160,6 @@ public final class ValueIndexTest extends SandboxTest {
       assertEquals("Wrong number of nodes returned: \"" + entry.getKey() + "\": ",
           (long) entry.getValue(), count);
     }
-
-    // Reset environment
-    execute(new Set(MainOptions.MAINMEM, false));
-    execute(new Set(MainOptions.UPDINDEX, false));
-    execute(new DropDB(NAME));
-
   }
 
 }

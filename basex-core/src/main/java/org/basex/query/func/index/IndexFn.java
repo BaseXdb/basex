@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.query.*;
-import org.basex.index.value.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
@@ -41,24 +40,9 @@ public abstract class IndexFn extends StandardFunc {
   public static Iter entries(final Data data, final IndexEntries entries, final StandardFunc call)
       throws QueryException {
 
-    final ValueIndex index;
-    final boolean avl;
     final IndexType type = entries.type();
-    if(type == IndexType.TEXT) {
-      index = data.textIndex;
-      avl = data.meta.textindex;
-    } else if(type == IndexType.ATTRIBUTE) {
-      index = data.attrIndex;
-      avl = data.meta.attrindex;
-    } else if(type == IndexType.TOKEN) {
-      index = data.tokenIndex;
-      avl = data.meta.tokenindex;
-    } else {
-      index = data.ftIndex;
-      avl = data.meta.ftindex;
-    }
-    if(!avl) throw BXDB_INDEX_X.get(call.info, data.meta.name, type);
-    return entries(index, entries);
+    if(!data.meta.index(type)) throw BXDB_INDEX_X.get(call.info, data.meta.name, type);
+    return entries(data.index(type), entries);
   }
 
   /**

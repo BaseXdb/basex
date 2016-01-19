@@ -36,33 +36,30 @@ public final class CreateIndex extends ACreate {
     if(ci == null) return error(UNKNOWN_CMD_X, this);
     final IndexType type;
     if(ci == CmdIndex.TEXT) {
-      data.meta.createtext = true;
-      data.meta.textinclude = options.get(MainOptions.TEXTINCLUDE);
-      data.meta.splitsize = options.get(MainOptions.INDEXSPLITSIZE);
       type = IndexType.TEXT;
+      data.meta.createtext = true;
+      data.meta.splitsize = options.get(MainOptions.INDEXSPLITSIZE);
     } else if(ci == CmdIndex.ATTRIBUTE) {
-      data.meta.createattr = true;
-      data.meta.attrinclude = options.get(MainOptions.ATTRINCLUDE);
-      data.meta.splitsize = options.get(MainOptions.INDEXSPLITSIZE);
       type = IndexType.ATTRIBUTE;
-    } else if(ci == CmdIndex.TOKEN) {
-      data.meta.createtoken = true;
-      data.meta.tokeninclude = options.get(MainOptions.TOKENINCLUDE);
+      data.meta.createattr = true;
       data.meta.splitsize = options.get(MainOptions.INDEXSPLITSIZE);
+    } else if(ci == CmdIndex.TOKEN) {
       type = IndexType.TOKEN;
+      data.meta.createtoken = true;
+      data.meta.splitsize = options.get(MainOptions.INDEXSPLITSIZE);
     } else if(ci == CmdIndex.FULLTEXT) {
+      type = IndexType.FULLTEXT;
       data.meta.createft = true;
-      data.meta.ftinclude = options.get(MainOptions.FTINCLUDE);
       data.meta.stemming = options.get(MainOptions.STEMMING);
       data.meta.casesens = options.get(MainOptions.CASESENS);
       data.meta.diacritics = options.get(MainOptions.DIACRITICS);
       data.meta.language = Language.get(options);
       data.meta.stopwords = options.get(MainOptions.STOPWORDS);
       data.meta.ftsplitsize = options.get(MainOptions.FTINDEXSPLITSIZE);
-      type = IndexType.FULLTEXT;
     } else {
       return error(UNKNOWN_CMD_X, this);
     }
+    data.meta.names(type, options);
 
     if(!startUpdate()) return false;
     boolean ok = true;
@@ -105,9 +102,6 @@ public final class CreateIndex extends ACreate {
   static void create(final IndexType type, final Data data, final ACreate cmd) throws IOException {
     DropIndex.drop(type, data);
     data.createIndex(type, cmd);
-    if(type == IndexType.TEXT) data.meta.textindex = true;
-    else if(type == IndexType.ATTRIBUTE) data.meta.attrindex = true;
-    else if(type == IndexType.TOKEN) data.meta.tokenindex = true;
-    else if(type == IndexType.FULLTEXT) data.meta.ftindex = true;
+    data.meta.index(type, true);
   }
 }
