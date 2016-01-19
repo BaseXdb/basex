@@ -3,6 +3,8 @@ package org.basex.query.func.fn;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
+import java.util.*;
+
 import org.basex.core.locks.*;
 import org.basex.data.*;
 import org.basex.index.*;
@@ -27,8 +29,8 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 abstract class Ids extends StandardFunc {
-  /** Index names (lazy instantiation). */
-  IndexNames names;
+  /** Hash set with index names. */
+  final IdentityHashMap<Data, IndexNames> map = new IdentityHashMap<>();
 
   /**
    * Returns referenced nodes.
@@ -72,7 +74,12 @@ abstract class Ids extends StandardFunc {
   private boolean scan(final ANode root, final boolean idref) {
     final Data data = root.data();
     if(data == null || (idref ? data.tokenIndex : data.attrIndex) == null) return true;
-    if(names == null) names = new IndexNames(IndexType.ATTRIBUTE, data);
+
+    IndexNames names = map.get(data);
+    if(names == null) {
+      names = new IndexNames(IndexType.ATTRIBUTE, data);
+      map.put(data, names);
+    }
     return !names.containsIds(idref);
   }
 
