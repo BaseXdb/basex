@@ -117,16 +117,6 @@ public class QueryParser extends InputParser {
   /**
    * Constructor.
    * @param query query string
-   * @param qctx query context
-   * @throws QueryException query exception
-   */
-  public QueryParser(final String query, final QueryContext qctx) throws QueryException {
-    this(query, null, qctx, null);
-  }
-
-  /**
-   * Constructor.
-   * @param query query string
    * @param path file path (if {@code null}, {@link MainOptions#QUERYPATH} will be assigned)
    * @param qctx query context
    * @param sctx static context (can be {@code null})

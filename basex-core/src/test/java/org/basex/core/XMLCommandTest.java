@@ -83,7 +83,10 @@ public final class XMLCommandTest extends SandboxTest {
     ok("<info-index type='X'/>");
     ok("<info-index/>");
     ok("<info-storage/>");
-    ok("<info-storage>X</info-storage>");
+    ok("<info-storage start='1'/>");
+    ok("<info-storage start='1' end='2'/>");
+    ok("<info-storage end='1'/>");
+    no("<info-storage>X</info-storage>");
 
     ok("<kill target='X'/>");
 

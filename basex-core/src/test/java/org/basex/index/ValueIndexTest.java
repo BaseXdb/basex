@@ -53,10 +53,10 @@ public final class ValueIndexTest extends SandboxTest {
    */
   private static Object[] paramSet(final boolean mainmem,
       final boolean updindex) {
-    ArrayList<Set> params = new ArrayList<>();
+    final ArrayList<Set> params = new ArrayList<>();
     params.add(new Set(MainOptions.MAINMEM, mainmem));
     params.add(new Set(MainOptions.UPDINDEX, updindex));
-    ArrayList<ArrayList<Set>> paramArray = new ArrayList<>();
+    final ArrayList<ArrayList<Set>> paramArray = new ArrayList<>();
     paramArray.add(params);
     return paramArray.toArray();
   }
@@ -123,22 +123,22 @@ public final class ValueIndexTest extends SandboxTest {
   private void valueIndexTest(final IndexType indexType, final LinkedHashMap<String,
       Integer> tokens, final Collection<Set> options) {
     // Set up environment
-    for (Set option : options) execute(option);
+    for (final Set option : options) execute(option);
     execute(new CreateDB(NAME, FILE));
 
     // Fetch index reference to be tested
-    boolean text = IndexType.TEXT == indexType;
-    ValueIndex index = text ? context.data().textIndex
+    final boolean text = IndexType.TEXT == indexType;
+    final ValueIndex index = text ? context.data().textIndex
                             : IndexType.TOKEN == indexType ? context.data().tokenIndex
                                                               : context.data().attrIndex;
 
     // Receive, verify and count results for passed tokens
     for(final Entry<String, Integer> entry : tokens.entrySet()) {
-      byte[] token = token(entry.getKey());
-      IndexIterator it = index.iter(new IndexEntries(token, indexType));
+      final byte[] token = token(entry.getKey());
+      final IndexIterator it = index.iter(new IndexEntries(token, indexType));
       long count = 0;
       while(it.more()) {
-        int pre = it.pre();
+        final int pre = it.pre();
         final byte[] result = context.data().text(pre, text);
         if(IndexType.TOKEN == indexType)
           assertTrue("Token '" + entry.getKey() + "' not found in match '" + string(result) + "'!",

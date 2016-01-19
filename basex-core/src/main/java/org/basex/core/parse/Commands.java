@@ -130,6 +130,10 @@ public interface Commands {
   String QUERY = "query";
   /** Command attribute: "type". */
   String TYPE = "type";
+  /** Command attribute: "start". */
+  String START = "start";
+  /** Command attribute: "end". */
+  String END = "end";
   /** Command attribute: "database". */
   String DATABASE = "database";
   /** Command attribute: "option". */

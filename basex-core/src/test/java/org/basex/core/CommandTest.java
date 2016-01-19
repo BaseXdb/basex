@@ -353,7 +353,6 @@ public class CommandTest extends SandboxTest {
     ok(new InfoStorage());
     ok(new InfoStorage("1", "2"));
     ok(new InfoStorage("1", null));
-    ok(new InfoStorage("// li", null));
   }
 
   /** Command test. */
