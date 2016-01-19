@@ -69,6 +69,7 @@ function _:create(
                 { html:checkbox("all", 'all', exists($all), 'Full optimization') }
                 <h3>{ html:option('textindex', 'Text Index', $opts) }</h3>
                 <h3>{ html:option('attrindex', 'Attribute Index', $opts) }</h3>
+                <h3>{ html:option('tokenindex', 'Token Index', $opts) }</h3>
                 <h3>{ html:option('ftindex', 'Fulltext Index', $opts) }</h3>
               </td>
             </tr>
@@ -115,7 +116,7 @@ function _:optimize(
   try {
     cons:check(),
     util:update("db:optimize($name, boolean($all), map:merge((
-  (('textindex','attrindex','ftindex','stemming','casesens','diacritics') !
+  (('textindex','attrindex','tokenindex','ftindex','stemming','casesens','diacritics') !
     map:entry(., $opts = .)),
     $lang ! map:entry('language', .)
   )

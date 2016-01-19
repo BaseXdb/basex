@@ -64,6 +64,7 @@ function _:create(
               <td colspan="2">{
                 <h3>{ html:option('textindex', 'Text Index', $opts) }</h3>,
                 <h3>{ html:option('attrindex', 'Attribute Index', $opts) }</h3>,
+                <h3>{ html:option('tokenindex', 'Token Index', $opts) }</h3>,
                 html:option('updindex', 'Incremental Indexing', $opts),
                 <div class='small'/>,
                 <h3>{ html:option('ftindex', 'Fulltext Indexing', $opts) }</h3>
@@ -108,13 +109,14 @@ function _:create(
   cons:check(),
   try {
     util:update("if(db:exists($name)) then (
-      error((), 'Database already exists: ' || $name || '.')
-    ) else (
-      db:create($name, (), (), map:merge((
-      (('textindex','attrindex','ftindex','stemming','casesens','diacritics','updindex') !
-         map:entry(., $opts = .)), $lang ! map:entry('language', .))
-      ))
-    )", map { 'name': $name, 'lang': $lang, 'opts': $opts }),
+  error((), 'Database already exists: ' || $name || '.')
+) else (
+  db:create($name, (), (), map:merge((
+  (('textindex','attrindex','tokenindex','ftindex','stemming','casesens','diacritics','updindex') !
+    map:entry(., $opts = .)),
+    $lang ! map:entry('language', .))
+  ))
+)", map { 'name': $name, 'lang': $lang, 'opts': $opts }),
     db:output(web:redirect($_:SUB, map {
       'info': 'Created Database: ' || $name,
       'name': $name
