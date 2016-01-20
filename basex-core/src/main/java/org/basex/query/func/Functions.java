@@ -217,13 +217,13 @@ public final class Functions extends TokenSet {
     final VarScope scp = new VarScope(sc);
     final FuncType jt = FuncType.arity(arity);
     final Var[] vs = new Var[arity];
-    final Expr[] refs = new Expr[vs.length];
+    final Expr[] args = new Expr[vs.length];
     final int vl = vs.length;
     for(int v = 0; v < vl; v++) {
       vs[v] = scp.newLocal(qc, new QNm(ARG + (v + 1), ""), SeqType.ITEM_ZM, true);
-      refs[v] = new VarRef(ii, vs[v]);
+      args[v] = new VarRef(ii, vs[v]);
     }
-    final Expr jf = JavaFunction.get(name, refs, qc, sc, ii);
+    final Expr jf = JavaFunction.get(name, args, qc, sc, ii);
     return jf == null ? null : new FuncLit(new AnnList(), name, vs, jf, jt, scp, sc, ii);
   }
 

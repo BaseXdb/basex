@@ -17,16 +17,22 @@ public final class JavaFunctionTest extends AdvancedQueryTest {
   public void constr() {
     // check java: prefix
     query("Q{java:java.lang.Integer}new('123')", 123);
+    query("Q{java:java.lang.Integer}new\u00b7java.lang.String('456')", 456);
+    query("Q{java:java.lang.Integer}new\u00b7int(xs:int(789))", 789);
+
     query("declare namespace f='java:java.util.Random'; f:nextInt(f:new())");
     query("declare namespace f='java:org.basex.util.list.StringList'; f:new()");
+
     error("declare namespace rand='java:java.util.random'; rand:new()", JAVAWHICH_X_X_X);
     error("Q{java:java.util.random}new()", JAVAWHICH_X_X_X);
+    error("Q{java:java.lang.Integer}new\u00b7int('abc')", WHICHCONSTR_X_X);
   }
 
   /** Tests namespace rewritings. */
   @Test
   public void rewriteURI() {
     query("Q{java.lang.integer}new('123')", 123);
+    query("Q{java.lang.Integer}new\u00b7int(xs:int(456))", 456);
     query("declare namespace j='java.util.random'; j:nextInt(j:new())");
     query("declare namespace j='http://basex.org/util/list/string-list'; j:new()");
   }
@@ -48,6 +54,7 @@ public final class JavaFunctionTest extends AdvancedQueryTest {
   @Test
   public void staticMethod() {
     query("Q{java.lang.Math}sqrt(xs:double(9.0))", 3);
+    query("Q{java.lang.Math}sqrt\u00b7double(xs:double(9.0))", 3);
     error("Q{java:org.basex.query.func.JavaFunctionExample}error()", JAVAERROR_X_X_X);
   }
 
@@ -66,6 +73,8 @@ public final class JavaFunctionTest extends AdvancedQueryTest {
         "let $a := (set:add('a'), set:add('b')) return set:size()", "2");
     query("import module namespace set='java.util.HashSet';" +
         "let $a := (set:add(128), set:add(128)) return set:size()", "1");
+    query("import module namespace set='java.util.HashSet';" +
+        "let $a := set:add\u00b7java.lang.Object(128) return set:size()", "1");
 
     // use class with capital and lower case
     query("import module namespace string='http://lang.java/String'; string:length()", "0");
@@ -106,11 +115,11 @@ public final class JavaFunctionTest extends AdvancedQueryTest {
   /** Tests ambiguous signatures. */
   @Test
   public void ambiguous() {
-    error("Q{java:org.basex.query.func.JavaFunctionExample}new(true())", JAVACONSAMBIG_X);
+    error("Q{java:org.basex.query.func.JavaFunctionExample}new(true())", JAVACONSAMB_X);
     error("import module namespace n='java:java.lang.StringBuilder'; n:append('x')",
-        JAVAAMBIG_X_X_X);
+        JAVAAMB_X_X_X);
     error("declare namespace n='java:java.lang.StringBuilder';n:append(n:new(), 'x')",
-        JAVAAMBIG_X_X_X);
+        JAVAAMB_X_X_X);
   }
 
   /** Pass on empty sequences. */
@@ -121,15 +130,15 @@ public final class JavaFunctionTest extends AdvancedQueryTest {
     error("declare namespace n='org.basex.query.func.JavaFunctionExample';"
         + "n:b(n:new(),())", WHICHMETHOD_X_X);
     error("declare namespace n='org.basex.query.func.JavaFunctionExample';"
-        + "n:g(n:new(),())", JAVAAMBIG_X_X_X);
+        + "n:g(n:new(),())", JAVAAMB_X_X_X);
 
     query("import module namespace n='org.basex.query.func.JavaFunctionExample'; n:f(())", "");
     error("import module namespace n='org.basex.query.func.JavaFunctionExample';"
-        + "n:a(())", JAVAAMBIG_X_X_X);
+        + "n:a(())", JAVAAMB_X_X_X);
     error("import module namespace n='org.basex.query.func.JavaFunctionExample';"
         + "n:b(())", JAVAARGS_X_X_X);
     error("import module namespace n='org.basex.query.func.JavaFunctionExample';"
-        + "n:g(())", JAVAAMBIG_X_X_X);
+        + "n:g(())", JAVAAMB_X_X_X);
   }
 
   /** Pass on empty sequences. */

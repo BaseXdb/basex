@@ -25,6 +25,8 @@ final class JavaFunc extends JavaFunction {
   private final Class<?> clazz;
   /** Java method. */
   private final String method;
+  /** Types provided in the query (can be {@code null}). */
+  private final String[] types;
 
   /**
    * Constructor.
@@ -32,13 +34,15 @@ final class JavaFunc extends JavaFunction {
    * @param info input info
    * @param clazz Java class
    * @param method Java method/field
+   * @param types types provided in the query (can be {@code null})
    * @param args arguments
    */
   JavaFunc(final StaticContext sc, final InputInfo info, final Class<?> clazz, final String method,
-      final Expr[] args) {
+      final String[] types, final Expr[] args) {
     super(sc, info, args, Perm.ADMIN);
     this.clazz = clazz;
     this.method = method;
+    this.types = types;
   }
 
   @Override
@@ -58,7 +62,7 @@ final class JavaFunc extends JavaFunction {
 
   @Override
   public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new JavaFunc(sc, info, clazz, method, copyAll(qc, scp, vs, exprs));
+    return new JavaFunc(sc, info, clazz, method, types, copyAll(qc, scp, vs, exprs));
   }
 
   /**
@@ -72,10 +76,11 @@ final class JavaFunc extends JavaFunction {
     Object[] cargs = null;
     for(final Constructor<?> c : clazz.getConstructors()) {
       final Class<?>[] pTypes = c.getParameterTypes();
+      if(!typeMatches(pTypes, types)) continue;
+
       final Object[] jArgs = javaArgs(pTypes, null, args, true);
       if(jArgs != null) {
-        if(cons != null) throw JAVACONSAMBIG_X.get(info,
-            Util.className(clazz) + '#' + pTypes.length);
+        if(cons != null) throw JAVACONSAMB_X.get(info, Util.className(clazz) + '#' + pTypes.length);
         cons = c;
         cargs = jArgs;
       }
@@ -95,31 +100,35 @@ final class JavaFunc extends JavaFunction {
   private Object method(final Value[] args, final QueryContext qc) throws Exception {
     // check if a field with the specified name exists
     try {
-      final Field f = clazz.getField(method);
-      final boolean st = Modifier.isStatic(f.getModifiers());
-      if(args.length == (st ? 0 : 1)) return f.get(st ? null : instObj(args[0]));
+      final Field field = clazz.getField(method);
+      final boolean stat = Modifier.isStatic(field.getModifiers());
+      if(args.length == (stat ? 0 : 1)) return field.get(stat ? null : instObj(args[0]));
     } catch(final NoSuchFieldException ex) { /* ignored */ }
 
+    // loop through all methods
     Method meth = null;
     Object inst = null;
     Object[] margs = null;
     for(final Method m : clazz.getMethods()) {
       if(!m.getName().equals(method)) continue;
-      final boolean st = Modifier.isStatic(m.getModifiers());
       final Class<?>[] pTypes = m.getParameterTypes();
-      final Object[] jArgs = javaArgs(pTypes, null, args, st);
-      if(jArgs != null) {
-        if(meth != null) throw JAVAAMBIG_X_X_X.get(info, clazz.getName(), method, pTypes.length);
-        meth = m;
-        margs = jArgs;
+      if(!typeMatches(pTypes, types)) continue;
 
-        if(!st) {
-          inst = instObj(args[0]);
-          if(inst instanceof QueryModule) {
-            final QueryModule mod = (QueryModule) inst;
-            mod.staticContext = sc;
-            mod.queryContext = qc;
-          }
+      final boolean stat = Modifier.isStatic(m.getModifiers());
+      final Object[] jArgs = javaArgs(pTypes, null, args, stat);
+      if(jArgs == null) continue;
+
+      // method found
+      if(meth != null) throw JAVAAMB_X_X_X.get(info, clazz.getName(), method, pTypes.length);
+      meth = m;
+      margs = jArgs;
+
+      if(!stat) {
+        inst = instObj(args[0]);
+        if(inst instanceof QueryModule) {
+          final QueryModule mod = (QueryModule) inst;
+          mod.staticContext = sc;
+          mod.queryContext = qc;
         }
       }
     }
@@ -129,8 +138,7 @@ final class JavaFunc extends JavaFunction {
   }
 
   /**
-   * Creates the instance on which a non-static field getter or method is
-   * invoked.
+   * Creates the instance on which a non-static field getter or method is invoked.
    * @param v XQuery value
    * @return Java object
    * @throws QueryException query exception

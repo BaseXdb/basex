@@ -167,8 +167,14 @@ public abstract class JavaFunction extends Arr {
   static JavaFunction get(final QNm qname, final Expr[] args, final QueryContext qc,
       final StaticContext sc, final InputInfo ii) throws QueryException {
 
-    // rewrite function name
-    final String name = Strings.camelCase(string(qname.local()));
+    // rewrite function name, extract argument types
+    String name = Strings.camelCase(string(qname.local()));
+    String[] types = null;
+    final int n = name.indexOf('\u00b7');
+    if(n != -1) {
+      types = Strings.split(name.substring(n + 1), '\u00b7');
+      name = name.substring(0, n);
+    }
     final String uri = string(qname.uri());
 
     // check if URI starts with "java:" prefix. if yes, skip rewritings
@@ -180,7 +186,7 @@ public abstract class JavaFunction extends Arr {
     final ModuleLoader modules = qc.resources.modules();
     final Object module  = modules.findModule(className);
     if(module != null) {
-      final Method meth = moduleMethod(module, name, args.length, qc, ii);
+      final Method meth = moduleMethod(module, name, args.length, types, qc, ii);
       if(meth != null) {
         final Requires req = meth.getAnnotation(Requires.class);
         final Perm perm = req == null ? Perm.ADMIN :
@@ -192,7 +198,8 @@ public abstract class JavaFunction extends Arr {
     // try to find matching Java variable or method
     try {
       final Class<?> clazz = modules.findClass(className);
-      if(name.equals(NEW) || exists(clazz, name)) return new JavaFunc(sc, ii, clazz, name, args);
+      if(name.equals(NEW) || exists(clazz, name))
+        return new JavaFunc(sc, ii, clazz, name, types, args);
     } catch(final ClassNotFoundException ex) {
       if(java) Util.debug(ex);
     } catch(final Throwable th) {
@@ -209,22 +216,24 @@ public abstract class JavaFunction extends Arr {
    * @param module query module object
    * @param name method name
    * @param arity number of arguments
+   * @param types types provided in the query (can be {@code null})
    * @param qc query context
    * @param ii input info
    * @return method if found, {@code null} otherwise
    * @throws QueryException query exception
    */
-  private static Method moduleMethod(final Object module, final String name, final long arity,
-      final QueryContext qc, final InputInfo ii) throws QueryException {
+  private static Method moduleMethod(final Object module, final String name, final int arity,
+      final String[] types, final QueryContext qc, final InputInfo ii) throws QueryException {
 
     // find method with identical name and arity
     Method meth = null;
     final Class<?> clazz = module.getClass();
     for(final Method m : clazz.getMethods()) {
-      if(m.getName().equals(name) && m.getParameterTypes().length == arity) {
-        if(meth != null) throw JAVAAMBIG_X_X_X.get(ii, clazz.getName(), name, arity);
-        meth = m;
-      }
+      if(!m.getName().equals(name)) continue;
+      final Class<?>[] pTypes = m.getParameterTypes();
+      if(pTypes.length != arity || !typeMatches(pTypes, types)) continue;
+      if(meth != null) throw JAVAAMB_X_X_X.get(ii, clazz.getName(), name, arity);
+      meth = m;
     }
     if(meth == null) throw JAVAWHICH_X_X_X.get(ii, clazz.getName(), name, arity);
 
@@ -238,17 +247,37 @@ public abstract class JavaFunction extends Arr {
   }
 
   /**
+   * Compares the types of method parameters with the specified types.
+   * @param pTypes parameter types
+   * @param qTypes query types
+   * @return result of check
+   */
+  protected static boolean typeMatches(final Class<?>[] pTypes, final String[] qTypes) {
+    // no query types: accept method
+    if(qTypes == null) return true;
+    // compare types
+    final int pl = pTypes.length;
+    if(pl != qTypes.length) return false;
+    for(int p = 0; p < pl; p++) {
+      if(!qTypes[p].equals(pTypes[p].getName())) return false;
+    }
+    return true;
+  }
+
+  /**
    * Checks if a method or variable with the specified name exists.
    * @param clazz clazz
    * @param name method/variable name
    * @return result of check
    */
   private static boolean exists(final Class<?> clazz, final String name) {
+    final int tp = name.indexOf('\u00b7');
+    final String nm = tp == -1 ? name : name.substring(0, tp);
     for(final Field f : clazz.getFields()) {
-      if(f.getName().equals(name)) return true;
+      if(f.getName().equals(nm)) return true;
     }
     for(final Method m : clazz.getMethods()) {
-      if(m.getName().equals(name)) return true;
+      if(m.getName().equals(nm)) return true;
     }
     return false;
   }

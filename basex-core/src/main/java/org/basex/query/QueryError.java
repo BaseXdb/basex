@@ -903,9 +903,9 @@ public enum QueryError {
   /** XPST0017. */
   JAVAWHICH_X_X_X(XPST, 17, "Unknown Java function: %:%#%."),
   /** XPST0017. */
-  JAVAAMBIG_X_X_X(XPST, 17, "Ambiguous Java function: %:%#%."),
+  JAVAAMB_X_X_X(XPST, 17, "Ambiguous Java function: %:%#%."),
   /** XPST0017. */
-  JAVACONSAMBIG_X(XPST, 17, "Ambiguous Java constructor: %."),
+  JAVACONSAMB_X(XPST, 17, "Ambiguous Java constructor: %."),
   /** XPST0017. */
   FUNCNOIMPL_X(XPST, 17, "Function not implemented: %."),
   /** XPST0017. */
