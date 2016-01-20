@@ -94,7 +94,7 @@ public final class Transform extends Arr {
 
   @Override
   public boolean has(final Flag flag) {
-    for(final Let copy : copies) if(!copy.has(flag)) return true;
+    for(final Let copy : copies) if(copy.has(flag)) return true;
     return flag == Flag.UPD ? exprs[1].has(flag) : super.has(flag);
   }
 

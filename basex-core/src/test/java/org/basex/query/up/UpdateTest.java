@@ -505,6 +505,7 @@ public final class UpdateTest extends AdvancedQueryTest {
     error(cmr, UPNOT_X);
     error("declare function local:f() { " + cmr + " }; local:f()", UPNOT_X);
     error("declare %updating function local:f() { " + cmr + " }; local:f()", UPNOT_X);
+    query("declare function local:f() { copy $o := <x/> modify () return 1 }; local:f()", "1");
   }
 
   /**
