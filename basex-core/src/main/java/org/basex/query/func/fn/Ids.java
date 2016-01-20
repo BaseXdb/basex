@@ -31,9 +31,7 @@ import org.basex.util.list.*;
  */
 abstract class Ids extends StandardFunc {
   /** Hash map for data references and id flags. */
-  final IdentityHashMap<Data, Boolean> indexIds = new IdentityHashMap<>();
-  /** Hash map for data references and idref flags. */
-  final IdentityHashMap<Data, Boolean> indexIdRefs = new IdentityHashMap<>();
+  final IdentityHashMap<Data, Boolean> indexed = new IdentityHashMap<>();
 
   /**
    * Returns referenced nodes.
@@ -75,14 +73,14 @@ abstract class Ids extends StandardFunc {
    * @return result of check
    */
   private boolean index(final ANode root, final boolean idref) {
+    // check if index exists
     final Data data = root.data();
     if(data == null || (idref ? data.tokenIndex : data.attrIndex) == null) return true;
-
-    final IdentityHashMap<Data, Boolean> map = idref ? indexIdRefs : indexIds;
-    if(!map.containsKey(data)) {
-      map.put(data, new IndexNames(IndexType.ATTRIBUTE, data).containsIds(idref));
+    // check if index names contain id attributes
+    if(!indexed.containsKey(data)) {
+      indexed.put(data, new IndexNames(IndexType.ATTRIBUTE, data).containsIds(idref));
     }
-    return map.get(data);
+    return indexed.get(data);
   }
 
   /**
