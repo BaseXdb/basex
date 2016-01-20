@@ -9,6 +9,7 @@ import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.gui.dialog.*;
 import org.basex.gui.layout.*;
+import org.basex.gui.text.TextEditor.*;
 import org.basex.gui.view.*;
 import org.basex.gui.view.editor.*;
 import org.basex.io.*;
@@ -219,6 +220,45 @@ public enum GUIMenuCmd implements GUICommand {
     @Override
     public void execute(final GUI gui) {
       gui.editor.getEditor().sort();
+    }
+
+    @Override
+    public boolean enabled(final GUI gui) {
+      return gui.gopts.get(GUIOptions.SHOWEDITOR);
+    }
+  },
+
+  /** Lower case. */
+  C_LOWERCASE(LOWER_CASE, "% shift L", false, false) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.getEditor().toCase(Case.LOWER);
+    }
+
+    @Override
+    public boolean enabled(final GUI gui) {
+      return gui.gopts.get(GUIOptions.SHOWEDITOR);
+    }
+  },
+
+  /** Upper case. */
+  C_UPPERCASE(UPPER_CASE, "% shift U", false, false) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.getEditor().toCase(Case.UPPER);
+    }
+
+    @Override
+    public boolean enabled(final GUI gui) {
+      return gui.gopts.get(GUIOptions.SHOWEDITOR);
+    }
+  },
+
+  /** Title case. */
+  C_TITLECASE(TITLE_CASE, "% shift T", false, false) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.getEditor().toCase(Case.TITLE);
     }
 
     @Override
@@ -850,17 +890,17 @@ public enum GUIMenuCmd implements GUICommand {
 
   /**
    * Constructor.
-   * @param l label of the menu item
-   * @param k shortcut
-   * @param d requires a database to be opened
-   * @param t indicates if this command has two states
+   * @param label label of the menu item
+   * @param key shortcut
+   * @param data requires a database to be opened
+   * @param toggle indicates if this command has two states
    */
-  GUIMenuCmd(final String l, final String k, final boolean d, final boolean t) {
-    label = l;
-    key = k;
-    data = d;
-    toggle = t;
-    shortcut = BaseXLayout.addShortcut(l, k);
+  GUIMenuCmd(final String label, final String key, final boolean data, final boolean toggle) {
+    this.label = label;
+    this.key = key;
+    this.data = data;
+    this.toggle = toggle;
+    shortcut = BaseXLayout.addShortcut(label, key);
   }
 
   @Override

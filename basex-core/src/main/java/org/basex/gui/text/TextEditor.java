@@ -18,6 +18,13 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class TextEditor {
+  /** Case conversions. */
+  public enum Case {
+    /** Lower case. */ LOWER,
+    /** Upper case. */ UPPER,
+    /** Title case. */ TITLE
+  };
+
   /** Opening brackets. */
   private static final String OPENING = "{([";
   /** Closing brackets. */
@@ -476,6 +483,26 @@ public final class TextEditor {
     System.arraycopy(string, 0, tmp, offset, al);
     System.arraycopy(text, rem, tmp, offset + al, ts - rem);
     return text(tmp);
+  }
+
+  /**
+   * Case conversion.
+   * @param cs case type
+   * @return {@code true} if text has changed
+   */
+  boolean toCase(final Case cs) {
+    if(!selected()) return false;
+    final int s = Math.min(start, end), e = Math.max(start, end), d = size() - e;
+    final byte[] tmp = substring(text, s, e);
+
+    final TokenBuilder tb = new TokenBuilder(size());
+    tb.add(text, 0, s);
+    tb.add(cs == Case.LOWER ? lc(tmp) : cs == Case.UPPER ? uc(tmp) : tc(tmp));
+    tb.add(text, e, size());
+    final boolean changed = text(tb.finish());
+
+    select(s, size() - d);
+    return changed;
   }
 
   /**

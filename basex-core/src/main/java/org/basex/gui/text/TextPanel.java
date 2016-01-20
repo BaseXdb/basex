@@ -18,6 +18,7 @@ import org.basex.gui.*;
 import org.basex.gui.dialog.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.text.SearchBar.*;
+import org.basex.gui.text.TextEditor.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.util.*;
@@ -277,6 +278,16 @@ public class TextPanel extends BaseXPanel {
   public void comment() {
     final int caret = editor.pos();
     if(editor.comment(rend.getSyntax())) hist.store(editor.text(), caret, editor.pos());
+    scrollCode.invokeLater(true);
+  }
+
+  /**
+   * Case conversion.
+   * @param cs case type
+   */
+  public void toCase(final Case cs) {
+    final int caret = editor.pos();
+    if(editor.toCase(cs)) hist.store(editor.text(), caret, editor.pos());
     scrollCode.invokeLater(true);
   }
 

@@ -1132,6 +1132,32 @@ public final class Token {
   }
 
   /**
+   * Converts the specified token to title case.
+   * @param token token to be converted
+   * @return resulting token
+   */
+  public static byte[] tc(final byte[] token) {
+    final int tl = token.length;
+    boolean title = true;
+    if(ascii(token)) {
+      final byte[] tok = new byte[tl];
+      for(int t = 0; t < tl; t++) {
+        final byte cp = token[t];
+        tok[t] = (byte) (title ? uc(cp) : lc(cp));
+        title = cp > 0 && cp <= ' ';
+      }
+      return tok;
+    }
+    final TokenBuilder tb = new TokenBuilder();
+    for(int t = 0; t < tl; t += cl(token, t)) {
+      final int cp = cp(token, t);
+      tb.add(title ? uc(cp) : lc(cp));
+      title = cp > 0 && cp <= ' ';
+    }
+    return tb.finish();
+  }
+
+  /**
    * Converts a character to upper case.
    * @param ch character to be converted
    * @return resulting character

@@ -1114,6 +1114,12 @@ public interface Text {
   String FORMAT = lang("format");
   /** Sort. */
   String SORT = lang("sort");
+  /** Lowercase. */
+  String LOWER_CASE = lang("lower_case");
+  /** Upper case. */
+  String UPPER_CASE = lang("upper_case");
+  /** Title case. */
+  String TITLE_CASE = lang("title_case");
   /** Split input lines. */
   String SPLIT_INPUT_LINES = lang("split_input_lines");
   /** Treat first line as header. */
