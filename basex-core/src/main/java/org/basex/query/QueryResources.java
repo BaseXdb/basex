@@ -63,6 +63,11 @@ public final class QueryResources {
     this.qc = qc;
   }
 
+  /**
+   * Contructor. Shallow copies the resources for use in paralle queries.
+   * @param qc query context
+   * @param qr resources to clone
+   */
   @SuppressWarnings("unchecked")
   QueryResources(QueryContext qc, QueryResources qr) {
     this.qc = qc;
