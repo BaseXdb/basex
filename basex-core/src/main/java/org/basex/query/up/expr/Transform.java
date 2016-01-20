@@ -40,16 +40,16 @@ public final class Transform extends Arr {
 
   @Override
   public void checkUp() throws QueryException {
-    for(final Let c : copies) c.checkUp();
-    final Expr m = exprs[0];
-    m.checkUp();
-    if(!m.isVacuous() && !m.has(Flag.UPD)) throw UPMODIFY.get(info);
+    for(final Let copy : copies) copy.checkUp();
+    final Expr modify = exprs[0];
+    modify.checkUp();
+    if(!modify.isVacuous() && !modify.has(Flag.UPD)) throw UPMODIFY.get(info);
     checkNoUp(exprs[1]);
   }
 
   @Override
   public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    for(final Let c : copies) c.expr = c.expr.compile(qc, scp);
+    for(final Let copy : copies) copy.expr = copy.expr.compile(qc, scp);
     return super.compile(qc, scp);
   }
 
@@ -67,17 +67,17 @@ public final class Transform extends Arr {
     updates.mod = pu;
 
     try {
-      for(final Let c : copies) {
-        final Iter ir = qc.iter(c.expr);
+      for(final Let copy : copies) {
+        final Iter ir = qc.iter(copy.expr);
         Item i = ir.next();
-        if(!(i instanceof ANode)) throw UPCOPYMULT_X_X.get(c.info, c.var.name, i);
+        if(!(i instanceof ANode)) throw UPSINGLE_X_X.get(copy.info, copy.var.name, i);
         final Item i2 = ir.next();
-        if(i2 != null) throw UPCOPYMULT_X_X.get(c.info, c.var.name, ValueBuilder.concat(i, i2));
+        if(i2 != null) throw UPSINGLE_X_X.get(copy.info, copy.var.name, ValueBuilder.concat(i, i2));
 
         // copy node to main memory data instance
         i = ((ANode) i).dbNodeCopy(qc.context.options);
         // add resulting node to variable
-        qc.set(c.var, i, info);
+        qc.set(copy.var, i, info);
         pu.addData(i.data());
       }
       final Value v = qc.value(exprs[0]);
@@ -94,12 +94,13 @@ public final class Transform extends Arr {
 
   @Override
   public boolean has(final Flag flag) {
-    return flag != Flag.UPD && super.has(flag);
+    for(final Let copy : copies) if(!copy.has(flag)) return true;
+    return flag == Flag.UPD ? exprs[1].has(flag) : super.has(flag);
   }
 
   @Override
   public boolean removable(final Var var) {
-    for(final Let c : copies) if(!c.removable(var)) return false;
+    for(final Let copy : copies) if(!copy.removable(var)) return false;
     return super.removable(var);
   }
 

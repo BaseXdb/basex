@@ -1258,7 +1258,7 @@ public enum QueryError {
   /** XUTY0012. */
   UPWRTRGSINGLE_X(XUTY, 12, "Target must be single node: %."),
   /** XUTY0013. */
-  UPCOPYMULT_X_X(XUTY, 13, "Value of $% must be single node: %."),
+  UPSINGLE_X_X(XUTY, 13, "Value of $% must be single node: %."),
   /** XUTY0013. */
   UPSOURCE_X(XUTY, 13, "Transformed expression must be single node: %."),
   /** XUTY0022. */

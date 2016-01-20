@@ -497,6 +497,17 @@ public final class UpdateTest extends AdvancedQueryTest {
   }
 
   /**
+   * Transform expression in function.
+   */
+  @Test
+  public void transformFunc() {
+    final String cmr = "copy $o := <x/> modify () return delete node <a/>";
+    error(cmr, UPNOT_X);
+    error("declare function local:f() { " + cmr + " }; local:f()", UPNOT_X);
+    error("declare %updating function local:f() { " + cmr + " }; local:f()", UPNOT_X);
+  }
+
+  /**
    * Tests a simple call of the optimize command.
    */
   @Test
@@ -510,8 +521,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   /** Variable from the inner scope shouldn't be visible. */
   @Test
   public void outOfScope() {
-    error("let $d := copy $e := <a/> modify () return $e return $e",
-        VARUNDEF_X);
+    error("let $d := copy $e := <a/> modify () return $e return $e", VARUNDEF_X);
   }
 
   /**
