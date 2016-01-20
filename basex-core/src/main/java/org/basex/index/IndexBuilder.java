@@ -85,8 +85,7 @@ public abstract class IndexBuilder extends Proc {
    * @return result of check
    */
   protected final boolean indexEntry() {
-    return data.kind(pre) == (text ? Data.TEXT : Data.ATTR) &&
-        includeNames.contains(data, pre, text);
+    return data.kind(pre) == (text ? Data.TEXT : Data.ATTR) && includeNames.contains(pre, text);
   }
 
   /**

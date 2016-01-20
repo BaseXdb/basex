@@ -103,7 +103,7 @@ public final class SelectiveIndexTest extends AdvancedQueryTest {
         "Q{}id", "id", "*:id", "Q{}idref", "idref", "*:idref",
         "Q{}x", "Q{}x", "x", "*:x", "Q{}x",
         // does not work, as it would currently indicate that idref is included in the index
-        // "Q{}ref", "ref", "*:ref",
+        "Q{}ref", "ref", "*:ref",
       };
       for(final String include : includes) {
         try {

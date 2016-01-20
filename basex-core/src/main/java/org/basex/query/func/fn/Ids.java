@@ -19,6 +19,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
@@ -29,8 +30,10 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 abstract class Ids extends StandardFunc {
-  /** Hash set with index names. */
-  final IdentityHashMap<Data, IndexNames> map = new IdentityHashMap<>();
+  /** Hash map for data references and id flags. */
+  final IdentityHashMap<Data, Boolean> indexIds = new IdentityHashMap<>();
+  /** Hash map for data references and idref flags. */
+  final IdentityHashMap<Data, Boolean> indexIdRefs = new IdentityHashMap<>();
 
   /**
    * Returns referenced nodes.
@@ -43,44 +46,43 @@ abstract class Ids extends StandardFunc {
     final TokenSet idSet = ids(exprs[0].atomIter(qc, info));
     final ANode root = checkRoot(toNode(ctxArg(1, qc), qc));
 
-    if(scan(root, idref)) {
-      // sequential scan: parse node and its descendants
-      final ANodeList list = new ANodeList().check();
-      add(idSet, list, root, idref);
-      return list.iter();
+    if(index(root, idref)) {
+      // create index iterator
+      final TokenList idList = new TokenList(idSet.size());
+      for(final byte[] id : idSet) idList.add(id);
+      final Value ids = StrSeq.get(idList);
+      final ValueAccess va = new ValueAccess(info, ids, idref ? IndexType.TOKEN :
+        IndexType.ATTRIBUTE, null, new IndexContext(root.data(), false));
+
+      // collect and return index results, filtered by id/idref attributes
+      final ANodeList results = new ANodeList();
+      for(final ANode attr : va.iter(qc)) {
+        if(XMLToken.isId(attr.name(), idref)) results.add(idref ? attr : attr.parent());
+      }
+      return results.iter();
     }
 
-    // create index iterator
-    final TokenList idList = new TokenList(idSet.size());
-    for(final byte[] id : idSet) idList.add(id);
-    final Value ids = StrSeq.get(idList);
-    final ValueAccess va = new ValueAccess(info, ids, idref ? IndexType.TOKEN : IndexType.ATTRIBUTE,
-        null, new IndexContext(root.data(), false));
-
-    // collect and return index results, filtered by id/idref attributes
-    final ANodeList results = new ANodeList();
-    for(final ANode attr : va.iter(qc)) {
-      if(isId(attr, idref)) results.add(idref ? attr : attr.parent());
-    }
-    return results.iter();
+    // otherwise, do sequential scan: parse node and its descendants
+    final ANodeList list = new ANodeList().check();
+    add(idSet, list, root, idref);
+    return list.iter();
   }
 
   /**
-   * Checks if the ids need to be found via sequential scanning.
+   * Checks if the ids can to be found in the index.
    * @param root root node
    * @param idref follow idref
    * @return result of check
    */
-  private boolean scan(final ANode root, final boolean idref) {
+  private boolean index(final ANode root, final boolean idref) {
     final Data data = root.data();
     if(data == null || (idref ? data.tokenIndex : data.attrIndex) == null) return true;
 
-    IndexNames names = map.get(data);
-    if(names == null) {
-      names = new IndexNames(IndexType.ATTRIBUTE, data);
-      map.put(data, names);
+    final IdentityHashMap<Data, Boolean> map = idref ? indexIdRefs : indexIds;
+    if(!map.containsKey(data)) {
+      map.put(data, new IndexNames(IndexType.ATTRIBUTE, data).containsIds(idref));
     }
-    return !names.containsIds(idref);
+    return map.get(data);
   }
 
   /**
@@ -94,7 +96,7 @@ abstract class Ids extends StandardFunc {
       final boolean idref) {
 
     for(final ANode attr : node.attributes()) {
-      if(isId(attr, idref)) {
+      if(XMLToken.isId(attr.name(), idref)) {
         // id/idref found
         for(final byte[] val : distinctTokens(attr.string())) {
           // correct value: add to results
@@ -106,19 +108,6 @@ abstract class Ids extends StandardFunc {
       }
     }
     for(final ANode child : node.children()) add(idSet, results, child, idref);
-  }
-
-  /**
-   * Checks if an attribute is an id/idref attribute ({@code idref}: local name must contain
-   * 'idref'; {@code id}: local name must contain 'if', but not 'idref').
-   * The correct approach would be to gather all id/idref attributes and store them as meta data.
-   * @param attr attribute
-   * @param idref id/idref flag
-   * @return result of check
-   */
-  private static boolean isId(final ANode attr, final boolean idref) {
-    final byte[] name = lc(local(attr.name()));
-    return idref ? contains(name, IDREF) : contains(name, ID) && !contains(name, IDREF);
   }
 
   /**

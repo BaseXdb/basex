@@ -1112,7 +1112,7 @@ public abstract class Data {
     final int ps = pres.size(), kind = text ? TEXT : ATTR;
     for(int p = 0; p < ps; p++) {
       final int pre = pres.get(p);
-      if(kind(pre) == kind && in.contains(this, pre, text)) {
+      if(kind(pre) == kind && in.contains(pre, text)) {
         if(type == IndexType.TOKEN) {
           for(final byte[] token : distinctTokens(text(pre, text))) {
             addId(map, token, pre);

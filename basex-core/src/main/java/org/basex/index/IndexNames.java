@@ -8,6 +8,7 @@ import java.util.regex.*;
 import org.basex.data.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Names and namespace uris of elements/attribute to index.
@@ -18,6 +19,8 @@ import org.basex.util.*;
 public final class IndexNames {
   /** Local names and namespace uris. All names are accepted if the list is empty. */
   private final Atts qnames = new Atts();
+  /** Data reference. */
+  private final Data data;
 
   /**
    * Constructor.
@@ -25,6 +28,7 @@ public final class IndexNames {
    * @param data data reference
    */
   public IndexNames(final IndexType type, final Data data) {
+    this.data = data;
     final String names = data.meta.names(type);
     final HashSet<String> inc = toSet(names.trim());
     for(final String entry : inc) {
@@ -63,12 +67,11 @@ public final class IndexNames {
 
   /**
    * Checks if the name of the addressed database entry is to be indexed.
-   * @param data data reference
    * @param pre pre value
    * @param text text flag
    * @return result of check
    */
-  public boolean contains(final Data data, final int pre, final boolean text) {
+  public boolean contains(final int pre, final boolean text) {
     final byte[][] qname = text ? data.qname(data.parent(pre, Data.TEXT), Data.ELEM) :
       data.qname(pre, Data.ATTR);
     qname[0] = local(qname[0]);
@@ -126,18 +129,26 @@ public final class IndexNames {
   }
 
   /**
-   * Checks if the name index contains id or idref names, or if it is empty.
+   * Checks if the index names contain all relevant id or idref attributes.
    * @param idref idref flag
    * @return result of check
    */
   public boolean containsIds(final boolean idref) {
-    // flawed... the correct solution would be to store all id/idref attributes as DB meta data
+    // no entries: all attributes are indexed
+    if(isEmpty()) return true;
+    // currently no support for documents with namespaces (cannot be resolved from name index)
+    if(data.nspaces.isEmpty()) return false;
+    // find id candidates
+    final TokenSet names = new TokenSet();
     final int ns = qnames.size();
     for(int n = 0; n < ns; n++) {
       final byte[] name = qnames.name(n);
-      if(name == null || (idref ? Token.contains(name, IDREF) :
-        Token.contains(name, ID) && !Token.contains(name, IDREF))) return true;
+      if(name != null && XMLToken.isId(name, idref)) names.add(name);
     }
-    return isEmpty();
+    // check if database name index consists of other ids
+    for(final byte[] name : data.attrNames) {
+      if(XMLToken.isId(name, idref && !names.contains(name))) return false;
+    }
+    return true;
   }
 }

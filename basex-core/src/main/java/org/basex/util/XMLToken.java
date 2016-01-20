@@ -142,6 +142,19 @@ public final class XMLToken {
   }
 
   /**
+   * Checks if the specified name is an id/idref attribute ({@code idref}: local name must contain
+   * 'idref'; {@code id}: local name must contain 'if', but not 'idref').
+   * The correct approach would be to gather all id/idref attributes and store them as meta data.
+   * @param name name
+   * @param idref id/idref flag
+   * @return result of check
+   */
+  public static boolean isId(final byte[] name, final boolean idref) {
+    final byte[] n = lc(local(name));
+    return idref ? Token.contains(n, IDREF) : Token.contains(n, ID) && !Token.contains(n, IDREF);
+  }
+
+  /**
    * Encodes a string to a valid NCName.
    * @param name token to be encoded
    * @param lax lax encoding (lossy, but better readable)
