@@ -158,8 +158,9 @@ final class DialogGeneralPrefs extends BaseXBack {
   /**
    * Reacts on user input.
    * @param source source
+   * @return success flag
    */
-  void action(final Object source) {
+  boolean action(final Object source) {
     mousefocus.assign();
     simplefd.assign();
 
@@ -183,5 +184,7 @@ final class DialogGeneralPrefs extends BaseXBack {
     creds.setText(TRANSLATION + COLS + creds(lang.getSelectedItem()));
     final int mh = HITS[limit.getValue()];
     label.setText(mh == -1 ? ALL : Integer.toString(mh));
+
+    return true;
   }
 }

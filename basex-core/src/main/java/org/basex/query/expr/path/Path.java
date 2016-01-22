@@ -456,7 +456,7 @@ public abstract class Path extends ParseExpr {
       final int name = data.elemNames.id(curr.test.name.local());
 
       final ArrayList<PathNode> tmp = new ArrayList<>();
-      for(final PathNode node : PathSummary.desc(nodes, desc)) {
+      for(final PathNode node : PathIndex.desc(nodes, desc)) {
         if(node.kind == Data.ELEM && name == node.name) {
           // skip test if an element name occurs on different levels
           if(!tmp.isEmpty() && tmp.get(0).level() != node.level()) return null;
@@ -579,7 +579,7 @@ public abstract class Path extends ParseExpr {
           if(nodes.get(0).name != p.name) nm = null;
         }
         qnm.add(nm);
-        nodes = PathSummary.parent(nodes);
+        nodes = PathIndex.parent(nodes);
       }
       qc.compInfo(OPTCHILD_X, steps[s]);
 

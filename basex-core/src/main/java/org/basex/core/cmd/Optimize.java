@@ -43,8 +43,8 @@ public final class Optimize extends ACreate {
     try {
       // reassign autooptimize flag
       final boolean autoopt = options.get(MainOptions.AUTOOPTIMIZE);
-      if(autoopt != data.meta.autoopt) {
-        data.meta.autoopt = autoopt;
+      if(autoopt != data.meta.autooptimize) {
+        data.meta.autooptimize = autoopt;
         data.meta.dirty = true;
       }
       optimize(data, this);
@@ -81,7 +81,7 @@ public final class Optimize extends ACreate {
     // GH-676: optimize database and rebuild index structures if ID has turned negative
     if(data.meta.lastid < data.meta.size - 1) optimizeIds(data);
     // GH-1035: auto-optimize database
-    if(data.meta.autoopt) optimize(data, null);
+    if(data.meta.autooptimize) optimize(data, null);
   }
 
   /**

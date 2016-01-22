@@ -13,7 +13,7 @@ import org.basex.io.out.DataOutput;
 import org.basex.util.*;
 
 /**
- * This class represents a node of the path summary.
+ * This class represents a node of the path index.
  *
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
@@ -187,7 +187,7 @@ public final class PathNode {
   }
 
   /**
-   * Returns a string representation of a path summary node.
+   * Returns a string representation of a path index node.
    * @param data data reference
    * @param level level
    * @return string representation

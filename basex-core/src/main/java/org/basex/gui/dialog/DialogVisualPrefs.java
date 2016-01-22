@@ -118,8 +118,9 @@ final class DialogVisualPrefs extends BaseXBack {
 
   /**
    * Reacts on user input.
+   * @return success flag
    */
-  void action() {
+  boolean action() {
     treeSlims.assign();
     treeAtts.assign();
     mapAtts.assign();
@@ -129,6 +130,7 @@ final class DialogVisualPrefs extends BaseXBack {
     mapOffsets.assign();
     scale.assign();
     gui.gopts.set(GUIOptions.LOOKANDFEEL, classes.get(lookfeel.getSelectedIndex()));
+    return true;
   }
 
   /** Look and feels. */

@@ -91,8 +91,8 @@ public abstract class Data {
   public Names attrNames;
   /** Namespace index. */
   public Namespaces nspaces;
-  /** Path summary index. */
-  public PathSummary paths;
+  /** Path index. */
+  public PathIndex paths;
   /** Text index. */
   public ValueIndex textIndex;
   /** Attribute value index. */

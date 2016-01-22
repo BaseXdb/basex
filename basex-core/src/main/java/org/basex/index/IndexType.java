@@ -9,10 +9,12 @@ import java.util.*;
  * @author Christian Gruen
  */
 public enum IndexType {
-  /** Attribute names. */
-  ATTRNAME,
   /** Element names. */
   ELEMNAME,
+  /** Attribute names. */
+  ATTRNAME,
+  /** Path index. */
+  PATH,
   /** Text index. */
   TEXT,
   /** Attribute index. */
@@ -20,9 +22,7 @@ public enum IndexType {
   /** Token index. */
   TOKEN,
   /** Full-text index. */
-  FULLTEXT,
-  /** Path index. */
-  PATH;
+  FULLTEXT;
 
   @Override
   public String toString() {

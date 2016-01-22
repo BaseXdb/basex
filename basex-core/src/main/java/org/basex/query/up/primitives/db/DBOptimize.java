@@ -75,11 +75,11 @@ public final class DBOptimize extends DBUpdate {
     options.assignIfEmpty(MainOptions.INDEXSPLITSIZE, meta.splitsize);
     options.assignIfEmpty(MainOptions.FTINDEXSPLITSIZE, meta.ftsplitsize);
     options.assignIfEmpty(MainOptions.UPDINDEX, meta.updindex);
-    options.assignIfEmpty(MainOptions.AUTOOPTIMIZE, meta.autoopt);
+    options.assignIfEmpty(MainOptions.AUTOOPTIMIZE, meta.autooptimize);
     options.assignTo(opts);
 
     // adopt options to database meta data
-    meta.autoopt = opts.get(MainOptions.AUTOOPTIMIZE);
+    meta.autooptimize = opts.get(MainOptions.AUTOOPTIMIZE);
     meta.createtext = opts.get(MainOptions.TEXTINDEX);
     meta.createattr = opts.get(MainOptions.ATTRINDEX);
     meta.createtoken = opts.get(MainOptions.TOKENINDEX);

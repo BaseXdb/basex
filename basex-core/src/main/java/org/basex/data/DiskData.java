@@ -60,7 +60,7 @@ public final class DiskData extends Data {
         switch(k) {
           case DBTAGS: elemNames = new Names(in, meta); break;
           case DBATTS: attrNames = new Names(in, meta); break;
-          case DBPATH: paths = new PathSummary(this, in); break;
+          case DBPATH: paths = new PathIndex(this, in); break;
           case DBNS:   nspaces = new Namespaces(in); break;
           case DBDOCS: resources.read(in); break;
         }
@@ -87,12 +87,12 @@ public final class DiskData extends Data {
    * @param meta meta data
    * @param elemNames element names
    * @param attrNames attribute names
-   * @param paths path summary
+   * @param paths path index
    * @param nspaces namespaces
    * @throws IOException I/O Exception
    */
   public DiskData(final MetaData meta, final Names elemNames, final Names attrNames,
-      final PathSummary paths, final Namespaces nspaces) throws IOException {
+      final PathIndex paths, final Namespaces nspaces) throws IOException {
 
     super(meta);
     this.elemNames = elemNames;

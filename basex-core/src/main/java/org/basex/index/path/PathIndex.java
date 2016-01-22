@@ -21,7 +21,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public final class PathSummary implements Index {
+public final class PathIndex implements Index {
   /** Node stack for building the summary. */
   private final ArrayList<PathNode> stack = new ArrayList<>();
   /** Data reference. */
@@ -33,7 +33,7 @@ public final class PathSummary implements Index {
    * Constructor.
    * The {@link Data} reference must be set in a second step via {@link #data(Data)}.
    */
-  public PathSummary() {
+  public PathIndex() {
     init();
   }
 
@@ -41,7 +41,7 @@ public final class PathSummary implements Index {
    * Constructor, specifying a data reference.
    * @param data data reference
    */
-  public PathSummary(final Data data) {
+  public PathIndex(final Data data) {
     this();
     this.data = data;
   }
@@ -52,7 +52,7 @@ public final class PathSummary implements Index {
    * @param in input stream
    * @throws IOException I/O exception
    */
-  public PathSummary(final Data data, final DataInput in) throws IOException {
+  public PathIndex(final Data data, final DataInput in) throws IOException {
     root = in.readBool() ? new PathNode(in, null) : new PathNode();
     this.data = data;
   }

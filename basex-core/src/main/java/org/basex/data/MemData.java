@@ -29,11 +29,11 @@ public final class MemData extends Data {
 
   /**
    * Constructor.
-   * @param paths path summary
+   * @param paths path index
    * @param nspaces namespaces
    * @param opts database options
    */
-  public MemData(final PathSummary paths, final Namespaces nspaces, final MainOptions opts) {
+  public MemData(final PathIndex paths, final Namespaces nspaces, final MainOptions opts) {
     this(null, null, paths, nspaces, null, null, opts);
   }
 
@@ -49,13 +49,13 @@ public final class MemData extends Data {
    * Constructor for building a new database.
    * @param elemNames element name index
    * @param attrNames attribute name index
-   * @param paths path summary
+   * @param paths path index
    * @param nspaces namespaces
    * @param texts texts
    * @param values values
    * @param options database options
    */
-  private MemData(final Names elemNames, final Names attrNames, final PathSummary paths,
+  private MemData(final Names elemNames, final Names attrNames, final PathIndex paths,
       final Namespaces nspaces, final TokenSet texts, final TokenSet values,
       final MainOptions options) {
 
@@ -66,7 +66,7 @@ public final class MemData extends Data {
     this.values = values == null ? new TokenSet() : values;
     this.elemNames = elemNames == null ? new Names(meta) : elemNames;
     this.attrNames = attrNames == null ? new Names(meta) : attrNames;
-    this.paths = paths == null ? new PathSummary(this) : paths;
+    this.paths = paths == null ? new PathIndex(this) : paths;
     this.nspaces = nspaces == null ? new Namespaces() : nspaces;
   }
 

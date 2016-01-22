@@ -59,21 +59,21 @@ public final class DialogPrefs extends BaseXDialog {
 
   @Override
   public void action(final Object cmp) {
-    general.action(cmp);
-    editor.action();
-    visual.action();
+    ok = general.action(cmp);
+    ok &= editor.action();
+    ok &= visual.action();
     gui.notify.layout();
   }
 
   @Override
   public void close() {
-    cancel();
+    if(ok) cancel();
   }
 
   @Override
   public void cancel() {
     gui.gopts.set(GUIOptions.PREFTAB, tabs.getSelectedIndex());
     gui.context.soptions.write();
-    super.cancel();
+    super.close();
   }
 }

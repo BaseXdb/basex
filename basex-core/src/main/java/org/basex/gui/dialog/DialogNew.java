@@ -22,6 +22,8 @@ import org.basex.util.list.*;
 public final class DialogNew extends BaseXDialog {
   /** General dialog. */
   private final DialogImport general;
+  /** Options dialog. */
+  private final DialogOptions options;
   /** Database name. */
   private final BaseXTextField dbname;
   /** Buttons. */
@@ -91,10 +93,14 @@ public final class DialogNew extends BaseXDialog {
     ftPanel.add(ftindex);
     ftPanel.add(index[3]);
 
+    // options panel
+    options = new DialogOptions(this, null);
+
     tabs.addTab(GENERAL, general);
     tabs.addTab(PARSING, parsePanel);
     tabs.addTab(INDEXES, indexPanel);
-    tabs.addTab(FULLTEXT_INDEX, ftPanel);
+    tabs.addTab(FULLTEXT, ftPanel);
+    tabs.addTab(OPTIONS, options);
     set(tabs, BorderLayout.CENTER);
 
     set(buttons, BorderLayout.SOUTH);
@@ -108,7 +114,7 @@ public final class DialogNew extends BaseXDialog {
 
   @Override
   public void action(final Object comp) {
-    final boolean valid = general.action(comp, true);
+    final boolean valid = general.action(comp, true) && options.action();
     index[0].action(textindex.isSelected());
     index[1].action(attrindex.isSelected());
     index[2].action(tokenindex.isSelected());
@@ -154,6 +160,7 @@ public final class DialogNew extends BaseXDialog {
     gui.set(MainOptions.TOKENINDEX, tokenindex.isSelected());
     gui.set(MainOptions.FTINDEX, ftindex.isSelected());
     general.setOptions();
+    options.setOptions(null);
     for(final DialogIndex di : index) di.setOptions();
   }
 }

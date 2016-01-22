@@ -89,8 +89,6 @@ public class XMLParser extends SingleParser {
       if(!scanner.more()) break;
     }
     scanner.close();
-    builder.encoding(scanner.encoding);
-
     if(!elms.isEmpty()) throw new BuildException(DOCOPEN, det(), elms.pop());
   }
 

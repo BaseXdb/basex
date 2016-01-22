@@ -816,7 +816,7 @@ public interface Text {
   String ATTRIBUTE_INDEX = lang("attribute_index");
   /** Info on full-text index. */
   String FULLTEXT_INDEX = lang("fulltext_index");
-  /** Info on path summary. */
+  /** Info on path index. */
   String PATH_INDEX = lang("path_index");
   /** Info on token index. */
   String TOKEN_INDEX = lang("token_index");
@@ -1092,6 +1092,13 @@ public interface Text {
   /** SAX parsing information. */
   String INPUT_FORMAT = lang("input_format") + COLS;
 
+  /** Index creation. */
+  String INDEX_CREATION = lang("index_creation");
+  /** Auto-optimize. */
+  String AUTOOPTIMIZE = lang("autooptimize");
+  /** Incremental updates. */
+  String UPD_INDEX = lang("upd_index");
+
   /** Full-text index information. */
   String STEMMING = lang("stemming");
   /** Full-text index information. */
@@ -1107,6 +1114,8 @@ public interface Text {
   String ASCENDING_ORDER = lang("ascending_order");
   /** Merge duplicate lines. */
   String MERGE_DUPLICATES = lang("merge_duplicates");
+  /** Unicode order. */
+  String UNICODE_ORDER = lang("unicode_order");
   /** Column. */
   String COLUMN = lang("column");
 
@@ -1147,6 +1156,8 @@ public interface Text {
   String PARSING = lang("parsing");
   /** Name indexes. */
   String NAMES = lang("names");
+  /** Paths. */
+  String PATHS = lang("paths");
   /** Value indexes. */
   String INDEXES = lang("indexes");
   /** Full-text index. */
@@ -1345,7 +1356,7 @@ public interface Text {
   /** Internal parser information. */
   String H_INT_PARSER = lang("h_int_parser");
 
-  /** Path summary information. */
+  /** Path index information. */
   String H_PATH_INDEX = lang("h_path_index");
   /** Text index information. */
   String H_TEXT_INDEX = lang("h_text_index");
@@ -1365,6 +1376,8 @@ public interface Text {
   String H_DIACRITICS = lang("h_diacritics");
   /** Full-text index information. */
   String H_STOPWORDS = lang("h_stopwords");
+  /** Help on database options. */
+  String H_DB_OPTIONS_X = lang("h_db_options_%", OPTIMIZE_ALL);
 
   /** "Failed to open a browser". */
   String H_BROWSER_ERROR_X = lang("h_browser_error_%");

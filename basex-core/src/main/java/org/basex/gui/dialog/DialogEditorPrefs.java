@@ -103,8 +103,11 @@ final class DialogEditorPrefs extends BaseXBack {
 
   /**
    * Reacts on user input.
+   * @return success flag
    */
-  void action() {
+  boolean action() {
+    boolean ok = margin.assign();
+    ok &= indent.assign();
     margin.setEnabled(showmargin.isSelected());
     indent.setEnabled(spaces.isSelected());
     showmargin.assign();
@@ -113,12 +116,11 @@ final class DialogEditorPrefs extends BaseXBack {
     numbers.assign();
     markline.assign();
     files.assign();
-    margin.assign();
     spaces.assign();
-    indent.assign();
     auto.assign();
     saverun.assign();
     parseproj.assign();
     showHidden.assign();
+    return ok;
   }
 }

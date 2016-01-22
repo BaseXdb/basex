@@ -6,7 +6,7 @@ import java.awt.*;
 
 import org.basex.core.cmd.*;
 import org.basex.data.*;
-import org.basex.gui.GUIConstants.Msg;
+import org.basex.gui.GUIConstants.*;
 import org.basex.gui.layout.*;
 import org.basex.util.*;
 
@@ -26,10 +26,6 @@ final class DialogAdd extends BaseXBack {
   private final DialogImport general;
   /** Add button. */
   private final BaseXButton add;
-  /** Optimize button. */
-  private final BaseXButton optimize;
-  /** Optimize all button. */
-  private final BaseXButton optimizeAll;
 
   /**
    * Constructor.
@@ -58,11 +54,8 @@ final class DialogAdd extends BaseXBack {
 
     // buttons
     add = new BaseXButton(ADD + DOTS, d);
-    optimize = new BaseXButton(OPTIMIZE, d);
-    optimizeAll = new BaseXButton(OPTIMIZE_ALL, d);
-    optimizeAll.setEnabled(!dialog.gui.context.data().inMemory());
 
-    add(d.newButtons(add, optimize, optimizeAll), BorderLayout.SOUTH);
+    add(d.newButtons(add), BorderLayout.SOUTH);
     action(general.parsers);
   }
 
@@ -84,12 +77,6 @@ final class DialogAdd extends BaseXBack {
       };
       DialogProgress.execute(dialog, run, new Add(trg, src));
 
-    } else if(comp == optimize) {
-      DialogProgress.execute(dialog, new Optimize());
-
-    } else if(comp == optimizeAll) {
-      DialogProgress.execute(dialog, new OptimizeAll());
-
     } else {
       boolean ok = general.action(comp, false);
       if(comp == general.browse || comp == general.input) target.setText(general.dbname);
@@ -104,7 +91,6 @@ final class DialogAdd extends BaseXBack {
       }
       general.info.setText(inf, Msg.ERROR);
       add.setEnabled(ok);
-      optimize.setEnabled(!dialog.gui.context.data().meta.uptodate);
     }
   }
 }

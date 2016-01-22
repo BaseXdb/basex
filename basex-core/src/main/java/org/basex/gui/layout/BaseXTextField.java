@@ -198,18 +198,39 @@ public class BaseXTextField extends JTextField {
   }
 
   /**
-   * Assigns the current checkbox value to the option specified in the constructor.
+   * Assigns the current value.
+   * @return success flag
    */
-  public void assign() {
+  public boolean assign() {
+    return check(true);
+  }
+
+  /**
+   * Checks the current value.
+   * @return success flag
+   */
+  public boolean check() {
+    return check(false);
+  }
+
+  /**
+   * Checks and assigns the current value.
+   * @param assign assign value
+   * @return success flag
+   */
+  private boolean check(final boolean assign) {
     if(option instanceof NumberOption) {
       try {
-        options.set((NumberOption) option, Integer.parseInt(getText()));
+        final int num = Integer.parseInt(getText());
+        if(assign) options.set((NumberOption) option, num);
         setBackground(back);
       } catch(final NumberFormatException ignored) {
         setBackground(GUIConstants.LRED);
+        return false;
       }
     } else {
       options.set((StringOption) option, getText());
     }
+    return true;
   }
 }

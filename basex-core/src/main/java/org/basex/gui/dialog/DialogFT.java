@@ -51,7 +51,7 @@ final class DialogFT extends DialogIndex {
    */
   DialogFT(final BaseXDialog dialog, final boolean create) {
     super(dialog);
-    layout(new TableLayout(create ? 10 : 16, 1));
+    layout(new TableLayout(create ? 10 : 16, 1, 0, 0));
 
     final MainOptions opts = dialog.gui.context.options;
     add(new BaseXLabel(H_FULLTEXT_INDEX, true, false).border(0, 0, 6, 0));

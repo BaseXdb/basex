@@ -111,7 +111,7 @@ public final class OptimizeAll extends ACreate {
     options.set(MainOptions.CHOP, ometa.chop);
     // adopt original index options
     options.set(MainOptions.UPDINDEX, ometa.updindex);
-    options.set(MainOptions.AUTOOPTIMIZE, ometa.autoopt);
+    options.set(MainOptions.AUTOOPTIMIZE, ometa.autooptimize);
     options.set(MainOptions.MAXCATS, ometa.maxcats);
     options.set(MainOptions.MAXLEN, ometa.maxlen);
     // adopt original full-text index options

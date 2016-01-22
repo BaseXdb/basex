@@ -100,7 +100,7 @@ public interface DataText {
   String DBTAGS = "TAGS";
   /** Attributes. */
   String DBATTS = "ATTS";
-  /** Path summary. */
+  /** Path index. */
   String DBPATH = "PATH";
   /** Namespace. */
   String DBNS = "NS";

@@ -25,7 +25,7 @@ import org.basex.util.list.*;
  */
 public abstract class Builder extends Proc {
   /** Tree structure. */
-  final PathSummary path = new PathSummary();
+  final PathIndex path = new PathIndex();
   /** Namespace index. */
   final Namespaces nspaces = new Namespaces();
   /** Parser instance. */
@@ -161,14 +161,6 @@ public abstract class Builder extends Proc {
    */
   public final void pi(final byte[] pi) throws IOException {
     addText(pi, Data.PI);
-  }
-
-  /**
-   * Sets the document encoding.
-   * @param encoding encoding
-   */
-  public final void encoding(final String encoding) {
-    meta.encoding = Strings.normEncoding(encoding);
   }
 
   // PROGRESS INFORMATION =====================================================

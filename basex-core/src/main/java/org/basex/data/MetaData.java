@@ -29,8 +29,6 @@ public final class MetaData {
   /** Database name. */
   public String name;
 
-  /** Encoding of original document. */
-  public String encoding = UTF8;
   /** Path to original document. */
   public String original = "";
   /** Size of original document. */
@@ -54,7 +52,7 @@ public final class MetaData {
   /** Flag for activated automatic index update. */
   public boolean updindex;
   /** Flag for automatic index updating. */
-  public boolean autoopt;
+  public boolean autooptimize;
 
   /** Indicates if the text index is to be recreated. */
   public boolean createtext;
@@ -140,7 +138,7 @@ public final class MetaData {
     stemming = options.get(MainOptions.STEMMING);
     casesens = options.get(MainOptions.CASESENS);
     updindex = options.get(MainOptions.UPDINDEX);
-    autoopt = options.get(MainOptions.AUTOOPTIMIZE);
+    autooptimize = options.get(MainOptions.AUTOOPTIMIZE);
     maxlen = options.get(MainOptions.MAXLEN);
     maxcats = options.get(MainOptions.MAXCATS);
     stopwords = options.get(MainOptions.STOPWORDS);
@@ -370,7 +368,6 @@ public final class MetaData {
         if(k.equals(DBSTR))           storage      = v;
         else if(k.equals(IDBSTR))     istorage     = v;
         else if(k.equals(DBFNAME))    original     = v;
-        else if(k.equals(DBENC))      encoding     = v;
         else if(k.equals(DBFTSW))     stopwords    = v;
         else if(k.equals(DBFTLN))     language     = Language.get(v);
         else if(k.equals(DBSIZE))     size         = toInt(v);
@@ -384,7 +381,7 @@ public final class MetaData {
         else if(k.equals(DBFTDC))     diacritics   = toBool(v);
         else if(k.equals(DBCHOP))     chop         = toBool(v);
         else if(k.equals(DBUPDIDX))   updindex     = toBool(v);
-        else if(k.equals(DBAUTOOPT))  autoopt      = toBool(v);
+        else if(k.equals(DBAUTOOPT))  autooptimize = toBool(v);
         else if(k.equals(DBTXTIDX))   textindex    = toBool(v);
         else if(k.equals(DBATVIDX))   attrindex    = toBool(v);
         else if(k.equals(DBTOKIDX))   tokenindex   = toBool(v);
@@ -431,11 +428,10 @@ public final class MetaData {
     writeInfo(out, IDBSTR,     ISTORAGE);
     writeInfo(out, DBFSIZE,    filesize);
     writeInfo(out, DBNDOCS,    ndocs);
-    writeInfo(out, DBENC,      encoding);
     writeInfo(out, DBSIZE,     size);
     writeInfo(out, DBCHOP,     chop);
     writeInfo(out, DBUPDIDX,   updindex);
-    writeInfo(out, DBAUTOOPT,  autoopt);
+    writeInfo(out, DBAUTOOPT,  autooptimize);
     writeInfo(out, DBTXTIDX,   textindex);
     writeInfo(out, DBATVIDX,   attrindex);
     writeInfo(out, DBTOKIDX,   tokenindex);

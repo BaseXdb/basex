@@ -130,8 +130,8 @@ public final class GUIOptions extends Options {
   public static final BooleanOption MERGEDUPL = new BooleanOption("MERGEDUPL", false);
   /** Column. */
   public static final NumberOption COLUMN = new NumberOption("COLUMN", 1);
-  /** Collation. */
-  public static final StringOption COLLATION = new StringOption("COLLATION", "");
+  /** Unicode order. */
+  public static final BooleanOption UNICODE = new BooleanOption("UNICODE", true);
 
   /** Show line margin. */
   public static final BooleanOption SHOWMARGIN = new BooleanOption("SHOWMARGIN", true);

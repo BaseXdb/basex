@@ -175,9 +175,7 @@ public final class BaseXList extends BaseXBack {
       }
       @Override
       public void mouseClicked(final MouseEvent e) {
-        if(e.getClickCount() == 2) {
-          d.close();
-        }
+        if(e.getClickCount() == 2) d.close();
       }
     };
 

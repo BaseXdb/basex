@@ -244,7 +244,7 @@ public final class BaseXLayout {
           final Object s = e.getSource();
           if(s instanceof BaseXCombo && ((BaseXCombo) s).isPopupVisible()) return;
 
-          // do not key close dialog of button or editor is focused
+          // do not key close dialog if button or editor is focused
           if(ENTER.is(e) && !(s instanceof BaseXButton || s instanceof TextPanel)) {
             d.close();
           } else if(ESCAPE.is(e)) {

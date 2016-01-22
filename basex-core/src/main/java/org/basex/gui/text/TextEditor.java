@@ -7,7 +7,6 @@ import java.util.*;
 
 import org.basex.gui.*;
 import org.basex.gui.text.SearchBar.*;
-import org.basex.query.util.collation.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -622,12 +621,11 @@ public final class TextEditor {
    */
   private void sort(final TokenList tokens) {
     final boolean asc = gopts.get(GUIOptions.ASCSORT), cs = gopts.get(GUIOptions.CASESORT);
-    final Collator coll = collator(gopts.get(GUIOptions.COLLATION));
+    final Collator coll = gopts.get(GUIOptions.UNICODE) ? null : Collator.getInstance();
     final int column = gopts.get(GUIOptions.COLUMN) - 1;
 
-    // if collation or column was specified: stable sort
-    if(coll != null || column > 0) tokens.sort(true, true);
     // stable sort: before custom sort, use default sort
+    if(coll != null || column > 0) tokens.sort(true, true);
     final Comparator<byte[]> cc = new Comparator<byte[]>() {
       @Override
       public int compare(final byte[] token1, final byte[] token2) {
@@ -651,20 +649,6 @@ public final class TextEditor {
     int t = 0;
     for(int c = 0; t < tl && c < column; t += cl(token, t), c++);
     return substring(token, t);
-  }
-
-  /**
-   * Returns a collator.
-   * @param coll collation string
-   * @return collator
-   */
-  private Collator collator(final String coll) {
-    if(!coll.isEmpty()) {
-      try {
-        return new BaseXCollationOptions().collator(coll);
-      } catch(final IllegalArgumentException ignore) { }
-    }
-    return null;
   }
 
   /**

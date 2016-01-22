@@ -71,7 +71,7 @@ final class DialogResources extends BaseXBack {
           filt = trgt;
         }
         filterText.setText(filt);
-        dp.add.target.setText(trgt);
+        dp.addPanel.target.setText(trgt);
         filtered = false;
       }
     });
