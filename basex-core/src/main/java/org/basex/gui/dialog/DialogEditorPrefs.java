@@ -106,8 +106,6 @@ final class DialogEditorPrefs extends BaseXBack {
    * @return success flag
    */
   boolean action() {
-    boolean ok = margin.assign();
-    ok &= indent.assign();
     margin.setEnabled(showmargin.isSelected());
     indent.setEnabled(spaces.isSelected());
     showmargin.assign();
@@ -121,6 +119,7 @@ final class DialogEditorPrefs extends BaseXBack {
     saverun.assign();
     parseproj.assign();
     showHidden.assign();
-    return ok;
+    // no short-circuiting, do all checks...
+    return margin.assign() & indent.assign();
   }
 }

@@ -110,16 +110,23 @@ public final class OptimizeAll extends ACreate {
     // adopt original meta information
     options.set(MainOptions.CHOP, ometa.chop);
     // adopt original index options
-    options.set(MainOptions.UPDINDEX, ometa.updindex);
-    options.set(MainOptions.AUTOOPTIMIZE, ometa.autooptimize);
-    options.set(MainOptions.MAXCATS, ometa.maxcats);
-    options.set(MainOptions.MAXLEN, ometa.maxlen);
+    options.set(MainOptions.TEXTINDEX, ometa.textindex);
+    options.set(MainOptions.ATTRINDEX, ometa.attrindex);
+    options.set(MainOptions.TOKENINDEX, ometa.tokenindex);
+    options.set(MainOptions.FTINDEX, ometa.ftindex);
+    options.set(MainOptions.TEXTINCLUDE, ometa.textinclude);
+    options.set(MainOptions.ATTRINCLUDE, ometa.attrinclude);
+    options.set(MainOptions.TOKENINCLUDE, ometa.tokeninclude);
+    options.set(MainOptions.FTINCLUDE, ometa.ftinclude);
     // adopt original full-text index options
     options.set(MainOptions.STEMMING, ometa.stemming);
     options.set(MainOptions.CASESENS, ometa.casesens);
     options.set(MainOptions.DIACRITICS, ometa.diacritics);
     options.set(MainOptions.LANGUAGE, ometa.language.toString());
     options.set(MainOptions.STOPWORDS, ometa.stopwords);
+    // adopt original index options
+    options.set(MainOptions.MAXLEN, ometa.maxlen);
+    options.set(MainOptions.MAXCATS, ometa.maxcats);
 
     // build database and index structures
     if(cmd != null) cmd.size = ometa.size;

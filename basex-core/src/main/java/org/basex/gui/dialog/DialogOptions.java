@@ -84,11 +84,8 @@ public class DialogOptions extends BaseXBack {
    * @return success flag
    */
   boolean action() {
-    boolean ok = maxlen.check();
-    ok &= maxcats.check();
-    ok &= indexsplitsize.check();
-    ok &= ftindexsplitsize.check();
-    return ok;
+    // no short-circuiting, do all checks...
+    return maxlen.check() & maxcats.check() & indexsplitsize.check() & ftindexsplitsize.check();
   }
 
   /**
@@ -98,16 +95,14 @@ public class DialogOptions extends BaseXBack {
   void setOptions(final Data data) {
     if(data != null) {
       final MetaData meta = data.meta;
-      meta.updindex = updindex.isSelected();
-      meta.autooptimize = autooptimize.isSelected();
       meta.maxlen = Integer.parseInt(maxlen.getText());
       meta.maxcats = Integer.parseInt(maxcats.getText());
     } else {
-      gui.set(MainOptions.UPDINDEX, updindex.isSelected());
-      gui.set(MainOptions.AUTOOPTIMIZE, autooptimize.isSelected());
       gui.set(MainOptions.MAXLEN, Integer.parseInt(maxlen.getText()));
       gui.set(MainOptions.MAXCATS, Integer.parseInt(maxcats.getText()));
     }
+    gui.set(MainOptions.UPDINDEX, updindex.isSelected());
+    gui.set(MainOptions.AUTOOPTIMIZE, autooptimize.isSelected());
     gui.set(MainOptions.INDEXSPLITSIZE, Integer.parseInt(indexsplitsize.getText()));
     gui.set(MainOptions.FTINDEXSPLITSIZE, Integer.parseInt(ftindexsplitsize.getText()));
   }
