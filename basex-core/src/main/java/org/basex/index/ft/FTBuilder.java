@@ -71,9 +71,9 @@ public final class FTBuilder extends IndexBuilder {
         // skip too long and stopword tokens
         if(tok.length <= data.meta.maxlen && (sw.isEmpty() || !sw.contains(tok))) {
           // check if main memory is exhausted
-          if((ntok++ & 0x0FFF) == 0 && splitRequired()) {
+          if((ntok++ & 0xFFFF) == 0 && splitRequired()) {
             writeIndex(true);
-            finishSplit();
+            clean();
           }
           tree.index(tok, pre, pos, splits);
           count++;
@@ -178,8 +178,7 @@ public final class FTBuilder extends IndexBuilder {
       final IntList ind = new IntList();
       tree.init();
       long dr = 0;
-      int tr = 0;
-      int j = 0;
+      int tr = 0, j = 0;
       while(tree.more(splits)) {
         final FTIndexTree t = tree.nextTree();
         t.next();

@@ -35,16 +35,16 @@ final class FTIndexTree extends IndexTree {
    * Checks if the specified token was already indexed. If yes, its pre
    * value is added to the existing values. Otherwise a new index entry
    * is created.
-   * @param tok token to be indexed
+   * @param token token to be indexed
    * @param id id value of the token
    * @param pos pos value of the token
-   * @param cf current file id
+   * @param index current file id
    */
-  void add(final byte[] tok, final int id, final int pos, final int cf) {
+  void add(final byte[] token, final int id, final int pos, final int index) {
     final int os = keys.size();
-    final int n = add(tok, id, 0, cf == 0);
+    final int n = add(token, id, 0, index == 0);
     if(os == keys.size()) {
-      final int i = cf > 0 ? maps.get(Num.num(n)) : n;
+      final int i = index > 0 ? maps.get(Num.num(n)) : n;
       if(poss.size() > i && poss.get(i) != null) {
         poss.set(i, Num.add(poss.get(i), pos));
         numpre.set(i, numpre.get(i) + 1);
@@ -67,14 +67,14 @@ final class FTIndexTree extends IndexTree {
 
   /**
    * Checks for more tokens.
-   * @param cf current index split counter
+   * @param index current index split counter
    * @return boolean more
    */
-  boolean more(final int cf) {
+  boolean more(final int index) {
     while(more()) {
       lcn = cn;
       // write compressed representation if the index has already been split
-      pft = cf > 0 ? maps.get(Num.num(lcn)) : lcn;
+      pft = index > 0 ? maps.get(Num.num(lcn)) : lcn;
       if(pft > -1) return true;
       next();
     }

@@ -38,15 +38,12 @@ public final class CreateIndex extends ACreate {
     if(ci == CmdIndex.TEXT) {
       type = IndexType.TEXT;
       data.meta.createtext = true;
-      data.meta.splitsize = options.get(MainOptions.INDEXSPLITSIZE);
     } else if(ci == CmdIndex.ATTRIBUTE) {
       type = IndexType.ATTRIBUTE;
       data.meta.createattr = true;
-      data.meta.splitsize = options.get(MainOptions.INDEXSPLITSIZE);
     } else if(ci == CmdIndex.TOKEN) {
       type = IndexType.TOKEN;
       data.meta.createtoken = true;
-      data.meta.splitsize = options.get(MainOptions.INDEXSPLITSIZE);
     } else if(ci == CmdIndex.FULLTEXT) {
       type = IndexType.FULLTEXT;
       data.meta.createft = true;
@@ -55,11 +52,11 @@ public final class CreateIndex extends ACreate {
       data.meta.diacritics = options.get(MainOptions.DIACRITICS);
       data.meta.language = Language.get(options);
       data.meta.stopwords = options.get(MainOptions.STOPWORDS);
-      data.meta.ftsplitsize = options.get(MainOptions.FTINDEXSPLITSIZE);
     } else {
       return error(UNKNOWN_CMD_X, this);
     }
     data.meta.names(type, options);
+    data.meta.splitsize = options.get(MainOptions.SPLITSIZE);
 
     if(!startUpdate()) return false;
     boolean ok = true;

@@ -551,7 +551,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
     final CmdIndex[] cis = { CmdIndex.TEXT, CmdIndex.ATTRIBUTE, CmdIndex.TOKEN, CmdIndex.FULLTEXT };
     // options
     final String[] numberOptions = lc(MainOptions.MAXCATS, MainOptions.MAXLEN,
-        MainOptions.INDEXSPLITSIZE, MainOptions.FTINDEXSPLITSIZE);
+        MainOptions.SPLITSIZE);
     final String[] boolOptions = lc(MainOptions.TEXTINDEX, MainOptions.ATTRINDEX,
         MainOptions.TOKENINDEX, MainOptions.FTINDEX, MainOptions.STEMMING,
         MainOptions.CASESENS, MainOptions.DIACRITICS);

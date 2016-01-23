@@ -86,15 +86,10 @@ public final class MainOptions extends Options {
   public static final StringOption TEXTINCLUDE = new StringOption("TEXTINCLUDE", "");
   /** Attribute index: names to include. */
   public static final StringOption ATTRINCLUDE = new StringOption("ATTRINCLUDE", "");
-  /** Full-text index: names to include. */
-  public static final StringOption FTINCLUDE = new StringOption("FTINCLUDE", "");
   /** Token index: names to include. */
   public static final StringOption TOKENINCLUDE = new StringOption("TOKENINCLUDE", "");
-
-  /** Maximum number of text/attribute index entries to keep in memory during index creation. */
-  public static final NumberOption INDEXSPLITSIZE = new NumberOption("INDEXSPLITSIZE", 0);
-  /** Maximum number of fulltext index entries to keep in memory during index creation. */
-  public static final NumberOption FTINDEXSPLITSIZE = new NumberOption("FTINDEXSPLITSIZE", 0);
+  /** Full-text index: names to include. */
+  public static final StringOption FTINCLUDE = new StringOption("FTINCLUDE", "");
 
   /** Maximum length of index entries. */
   public static final NumberOption MAXLEN = new NumberOption("MAXLEN", 96);
@@ -104,6 +99,8 @@ public final class MainOptions extends Options {
   public static final BooleanOption UPDINDEX = new BooleanOption("UPDINDEX", false);
   /** Flag for automatic index updates. */
   public static final BooleanOption AUTOOPTIMIZE = new BooleanOption("AUTOOPTIMIZE", false);
+  /** Index split size. */
+  public static final NumberOption SPLITSIZE = new NumberOption("SPLITSIZE", 0);
 
   // Full-Text
 

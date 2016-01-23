@@ -84,11 +84,8 @@ public final class MetaData {
   public int maxcats;
   /** Maximum length of index entries. */
   public int maxlen;
-
-  /** Split size for creating new index. */
+  /** Split size for creating indexes. */
   public int splitsize;
-  /** Split size for creating new full-text index. */
-  public int ftsplitsize;
 
   /** Language of full-text search index. */
   public Language language;
@@ -147,11 +144,10 @@ public final class MetaData {
     attrinclude = options.get(MainOptions.ATTRINCLUDE);
     tokeninclude = options.get(MainOptions.TOKENINCLUDE);
     ftinclude = options.get(MainOptions.FTINCLUDE);
-    splitsize = options.get(MainOptions.INDEXSPLITSIZE);
-    ftsplitsize = options.get(MainOptions.FTINDEXSPLITSIZE);
+    splitsize = options.get(MainOptions.SPLITSIZE);
   }
 
-  // STATIC METHODS ==========================================================
+  // STATIC METHODS ===============================================================================
 
   /**
    * Normalizes a database path. Converts backslashes and
@@ -203,7 +199,7 @@ public final class MetaData {
     return new IOFile(path, name + IO.BASEXSUFFIX);
   }
 
-  // PUBLIC METHODS ===========================================================
+  // PUBLIC METHODS ===============================================================================
 
   /**
    * Returns true if the indexes need to be updated.
@@ -390,8 +386,7 @@ public final class MetaData {
         else if(k.equals(DBATVINC))   attrinclude  = v;
         else if(k.equals(DBTOKINC))   tokeninclude = v;
         else if(k.equals(DBFTXINC))   ftinclude    = v;
-        else if(k.equals(DBSPLIT))    splitsize    = toInt(v);
-        else if(k.equals(DBFTSPLIT))  ftsplitsize  = toInt(v);
+        else if(k.equals(DBSPLITS))   splitsize    = toInt(v);
         else if(k.equals(DBCRTTXT))   createtext   = toBool(v);
         else if(k.equals(DBCRTATV))   createattr   = toBool(v);
         else if(k.equals(DBCRTTOK))   createtoken  = toBool(v);
@@ -440,8 +435,7 @@ public final class MetaData {
     writeInfo(out, DBATVINC,   attrinclude);
     writeInfo(out, DBTOKINC,   tokeninclude);
     writeInfo(out, DBFTXINC,   ftinclude);
-    writeInfo(out, DBSPLIT,    splitsize);
-    writeInfo(out, DBFTSPLIT,  ftsplitsize);
+    writeInfo(out, DBSPLITS,   splitsize);
     writeInfo(out, DBCRTTXT,   createtext);
     writeInfo(out, DBCRTATV,   createattr);
     writeInfo(out, DBCRTTOK,   createtoken);
@@ -485,7 +479,7 @@ public final class MetaData {
     time = file != null ? file.timeStamp() : System.currentTimeMillis();
   }
 
-  // PRIVATE METHODS ==========================================================
+  // PRIVATE METHODS ==============================================================================
 
   /**
    * Converts the specified string to a boolean value.

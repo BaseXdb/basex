@@ -93,8 +93,7 @@ public final class InfoDB extends AInfo {
         info(tb, MainOptions.AUTOOPTIMIZE.name(), meta.autooptimize);
         info(tb, MainOptions.MAXCATS.name(), meta.maxcats);
         info(tb, MainOptions.MAXLEN.name(), meta.maxlen);
-        info(tb, MainOptions.INDEXSPLITSIZE.name(), meta.splitsize);
-        info(tb, MainOptions.FTINDEXSPLITSIZE.name(), meta.ftsplitsize);
+        info(tb, MainOptions.SPLITSIZE.name(), meta.splitsize);
       }
     }
     return tb.toString();

@@ -70,7 +70,7 @@ public final class DiskValuesBuilder extends ValuesBuilder {
     writeIndex(splits > 0);
     if(splits > 1) {
       index = null;
-      Performance.gc(1);
+      clean();
       merge();
     }
 
@@ -85,7 +85,7 @@ public final class DiskValuesBuilder extends ValuesBuilder {
     if(splitRequired()) {
       writeIndex(true);
       index = new IndexTree(type);
-      finishSplit();
+      clean();
     }
   }
 

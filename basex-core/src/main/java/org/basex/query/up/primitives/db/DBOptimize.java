@@ -72,19 +72,20 @@ public final class DBOptimize extends DBUpdate {
     options.assignIfEmpty(MainOptions.ATTRINCLUDE, meta.attrinclude);
     options.assignIfEmpty(MainOptions.TOKENINCLUDE, meta.tokeninclude);
     options.assignIfEmpty(MainOptions.FTINCLUDE, meta.ftinclude);
-    options.assignIfEmpty(MainOptions.INDEXSPLITSIZE, meta.splitsize);
-    options.assignIfEmpty(MainOptions.FTINDEXSPLITSIZE, meta.ftsplitsize);
+    options.assignIfEmpty(MainOptions.SPLITSIZE, meta.splitsize);
     options.assignIfEmpty(MainOptions.UPDINDEX, meta.updindex);
     options.assignIfEmpty(MainOptions.AUTOOPTIMIZE, meta.autooptimize);
     options.assignTo(opts);
 
     // adopt options to database meta data
-    meta.autooptimize = opts.get(MainOptions.AUTOOPTIMIZE);
     meta.createtext = opts.get(MainOptions.TEXTINDEX);
     meta.createattr = opts.get(MainOptions.ATTRINDEX);
     meta.createtoken = opts.get(MainOptions.TOKENINDEX);
     meta.createft = opts.get(MainOptions.FTINDEX);
+
     meta.updindex = opts.get(MainOptions.UPDINDEX);
+    meta.autooptimize = opts.get(MainOptions.AUTOOPTIMIZE);
+    meta.splitsize = opts.get(MainOptions.SPLITSIZE);
 
     // check if other indexing options have changed
     final int maxcats = opts.get(MainOptions.MAXCATS);
@@ -101,7 +102,6 @@ public final class DBOptimize extends DBUpdate {
     meta.tokeninclude = tokeninclude;
     meta.maxcats = maxcats;
     meta.maxlen = maxlen;
-    meta.splitsize = opts.get(MainOptions.INDEXSPLITSIZE);
 
     // check if fulltext indexing options have changed
     final String ftinclude = opts.get(MainOptions.FTINCLUDE);
@@ -119,7 +119,6 @@ public final class DBOptimize extends DBUpdate {
     meta.diacritics = diacritics;
     meta.language   = language;
     meta.stopwords  = stopwords;
-    meta.ftsplitsize = opts.get(MainOptions.FTINDEXSPLITSIZE);
 
     try {
       if(all) OptimizeAll.optimizeAll(data, qc.context, opts, null);

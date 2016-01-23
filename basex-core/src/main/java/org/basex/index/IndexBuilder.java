@@ -53,14 +53,14 @@ public abstract class IndexBuilder extends Proc {
    */
   protected IndexBuilder(final Data data, final IndexType type) {
     this.data = data;
-    this.splitSize = type == IndexType.FULLTEXT ? data.meta.ftsplitsize : data.meta.splitsize;
     this.type = type;
+    splitSize = (int) Math.min(Integer.MAX_VALUE, (long) data.meta.splitsize * splitFactor());
     size = data.meta.size;
     includeNames = new IndexNames(type, data);
     text = type == IndexType.TEXT || type == IndexType.FULLTEXT;
 
     // run garbage collection if memory maximum is already reached
-    if(Performance.memory() >= maxMem) Performance.gc(1);
+    if(Performance.memory() >= maxMem) clean();
   }
 
   /**
@@ -119,8 +119,8 @@ public abstract class IndexBuilder extends Proc {
   /**
    * Performs memory cleanup after writing partial memory if necessary.
    */
-  protected final void finishSplit() {
-    if(splitSize <= 0) Performance.gc(1);
+  protected final void clean() {
+    if(splitSize <= 0) Performance.gc(2);
   }
 
   /**
@@ -130,10 +130,26 @@ public abstract class IndexBuilder extends Proc {
     if(!Prop.debug) return;
 
     final StringBuilder sb = new StringBuilder();
-    if(splits > 1) sb.append(' ').append(splits).append(" splits,");
-    sb.append(' ').append(count).append(" operations, ");
-    sb.append(perf).append(" (").append(Performance.getMemory()).append(')');
+    sb.append(' ').append((count / 10000) / 100d).append(" M operations, ");
+    sb.append(perf).append(" (").append(Performance.getMemory()).append(").");
+    if(splits > 1 && splitSize <= 0) {
+      sb.append(" Recommended ").append(MainOptions.SPLITSIZE.name()).append(": ");
+      sb.append((int) Math.ceil(((double) count / splits) / splitFactor())).append('.');
+    }
     Util.errln(sb);
+  }
+
+  /**
+   * Returns the split factor dependent on the index type.
+   * The following values are returned:
+   * <ul>
+   *   <li> Full-text index: 1'000'000</li>
+   *   <li> Other value indexes: 100'000</li>
+   * </ul>
+   * @return split factor
+   */
+  protected final int splitFactor() {
+    return type == IndexType.FULLTEXT ? 1000000 : 100000;
   }
 
   @Override

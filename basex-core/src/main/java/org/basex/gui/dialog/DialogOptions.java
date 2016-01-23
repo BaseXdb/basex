@@ -25,10 +25,8 @@ public class DialogOptions extends BaseXBack {
   private final BaseXTextField maxlen;
   /** Maximum categories. */
   private final BaseXTextField maxcats;
-  /** Index split size. */
-  private final BaseXTextField indexsplitsize;
-  /** Full-text index split size. */
-  private final BaseXTextField ftindexsplitsize;
+  /** Index splits. */
+  private final BaseXTextField splitsize;
 
   /**
    * Default constructor.
@@ -41,34 +39,29 @@ public class DialogOptions extends BaseXBack {
       final MetaData meta = data.meta;
       maxlen = new BaseXTextField(Integer.toString(meta.maxlen), d);
       maxcats = new BaseXTextField(Integer.toString(meta.maxcats), d);
-      indexsplitsize = new BaseXTextField(Integer.toString(meta.splitsize), d);
-      ftindexsplitsize = new BaseXTextField(Integer.toString(meta.ftsplitsize), d);
+      splitsize = new BaseXTextField(Integer.toString(meta.splitsize), d);
       updindex = new BaseXCheckBox(UPD_INDEX, meta.updindex, d);
       autooptimize = new BaseXCheckBox(AUTOOPTIMIZE, meta.autooptimize, d);
     } else {
       final MainOptions opts = d.gui.context.options;
       maxlen = new BaseXTextField(MainOptions.MAXLEN, opts, d);
       maxcats = new BaseXTextField(MainOptions.MAXCATS, opts, d);
-      indexsplitsize = new BaseXTextField(MainOptions.INDEXSPLITSIZE, opts, d);
-      ftindexsplitsize = new BaseXTextField(MainOptions.FTINDEXSPLITSIZE, opts, d);
+      splitsize = new BaseXTextField(MainOptions.SPLITSIZE, opts, d);
       updindex = new BaseXCheckBox(UPD_INDEX, MainOptions.UPDINDEX, opts, d);
       autooptimize = new BaseXCheckBox(AUTOOPTIMIZE, MainOptions.AUTOOPTIMIZE, opts, d);
     }
-    maxlen.setColumns(10);
-    maxcats.setColumns(10);
-    indexsplitsize.setColumns(10);
-    ftindexsplitsize.setColumns(10);
+    maxlen.setColumns(8);
+    maxcats.setColumns(8);
+    splitsize.setColumns(8);
 
-    final BaseXBack p = new BaseXBack(new TableLayout(4, 2, 8, 4));
+    final BaseXBack p = new BaseXBack(new TableLayout(4, 2, 6, 4));
     p.border(12, 0, 0, 0);
     p.add(new BaseXLabel(MainOptions.MAXLEN.name() + COL, true, true));
     p.add(maxlen);
     p.add(new BaseXLabel(MainOptions.MAXCATS.name() + COL, true, true));
     p.add(maxcats);
-    p.add(new BaseXLabel(MainOptions.INDEXSPLITSIZE.name() + COL, true, true));
-    p.add(indexsplitsize);
-    p.add(new BaseXLabel(MainOptions.FTINDEXSPLITSIZE.name() + COL, true, true));
-    p.add(ftindexsplitsize);
+    p.add(new BaseXLabel(MainOptions.SPLITSIZE.name() + COL, true, true));
+    p.add(splitsize);
 
     border(8);
     layout(new TableLayout(5, 1));
@@ -76,7 +69,7 @@ public class DialogOptions extends BaseXBack {
     add(updindex);
     add(autooptimize);
     add(p);
-    add(new BaseXLabel(H_DB_OPTIONS_X).border(12, 0, 0, 0));
+    add(new BaseXLabel(data != null ? H_DB_OPTIONS_X : "").border(12, 0, 0, 0));
   }
 
   /**
@@ -85,7 +78,7 @@ public class DialogOptions extends BaseXBack {
    */
   boolean action() {
     // no short-circuiting, do all checks...
-    return maxlen.check() & maxcats.check() & indexsplitsize.check() & ftindexsplitsize.check();
+    return maxlen.check() & maxcats.check() & splitsize.check();
   }
 
   /**
@@ -103,7 +96,6 @@ public class DialogOptions extends BaseXBack {
     }
     gui.set(MainOptions.UPDINDEX, updindex.isSelected());
     gui.set(MainOptions.AUTOOPTIMIZE, autooptimize.isSelected());
-    gui.set(MainOptions.INDEXSPLITSIZE, Integer.parseInt(indexsplitsize.getText()));
-    gui.set(MainOptions.FTINDEXSPLITSIZE, Integer.parseInt(ftindexsplitsize.getText()));
+    gui.set(MainOptions.SPLITSIZE, Integer.parseInt(splitsize.getText()));
   }
 }
