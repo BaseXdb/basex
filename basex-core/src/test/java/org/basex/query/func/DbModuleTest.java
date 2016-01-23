@@ -300,9 +300,11 @@ public final class DbModuleTest extends AdvancedQueryTest {
         COLLECTION.args('"' + NAME + "/doc\" || $i")), 3);
 
     // specify parsing options
-    query(_DB_ADD.args(NAME, " '<a> </a>'", "chop.xml", " map { 'chop':true() }"));
+    query(_DB_ADD.args(NAME, " '<a> </a>'", "chop.xml",
+        " map { '" + lc(MainOptions.CHOP) + "':true() }"));
     query(_DB_OPEN.args(NAME, "chop.xml"), "<a/>");
-    query(_DB_ADD.args(NAME, " '<a> </a>'", "nochop.xml", " map { 'chop':false() }"));
+    query(_DB_ADD.args(NAME, " '<a> </a>'", "nochop.xml",
+        " map { '" + lc(MainOptions.CHOP) + "':false() }"));
     query(_DB_OPEN.args(NAME, "nochop.xml"), "<a> </a>");
 
     // specify parsing options
@@ -408,38 +410,47 @@ public final class DbModuleTest extends AdvancedQueryTest {
 
     // specify index options
     for(final boolean b : new boolean[] { false, true }) {
-      query(_DB_CREATE.args(NAME, "()", "()", " map { 'updindex':" + b + "() }"));
-      query(_DB_INFO.args(NAME) + "//updindex/text()", b);
+      query(_DB_CREATE.args(NAME, "()", "()",
+          " map { '" + lc(MainOptions.UPDINDEX) + "':" + b + "() }"));
+      query(_DB_INFO.args(NAME) + "//" + lc(MainOptions.UPDINDEX) + "/text()", b);
     }
     assertEquals(context.options.get(MainOptions.UPDINDEX), false);
 
-    final String[] nopt = { "maxcats", "maxlen", "indexsplitsize", "ftindexsplitsize" };
-    for(final String k : nopt) {
-      query(_DB_CREATE.args(NAME, "()", "()", " map { '" + k + "':1 }"));
+    final String[] numberOptions = lc(MainOptions.MAXCATS, MainOptions.MAXLEN,
+        MainOptions.SPLITSIZE);
+    final String[] boolOptions = lc(MainOptions.TEXTINDEX, MainOptions.ATTRINDEX,
+        MainOptions.TOKENINDEX, MainOptions.FTINDEX, MainOptions.STEMMING,
+        MainOptions.CASESENS, MainOptions.DIACRITICS);
+    final String[] stringOptions = lc(MainOptions.LANGUAGE, MainOptions.STOPWORDS);
+
+    for(final String option : numberOptions) {
+      query(_DB_CREATE.args(NAME, "()", "()", " map { '" + option + "':1 }"));
     }
-    final String[] bopt = { "textindex", "attrindex", "ftindex", "stemming",
-        "casesens", "diacritics" };
-    for(final String k : bopt) {
+    for(final String option : boolOptions) {
       for(final boolean v : new boolean[] { true, false }) {
-        query(_DB_CREATE.args(NAME, "()", "()", " map { '" + k + "':" + v + "() }"));
+        query(_DB_CREATE.args(NAME, "()", "()", " map { '" + option + "':" + v + "() }"));
       }
     }
-    final String[] sopt = { "language", "stopwords" };
-    for(final String k : sopt) {
-      query(_DB_CREATE.args(NAME, "()", "()", " map { '" + k + "':'' }"));
+    for(final String option : stringOptions) {
+      query(_DB_CREATE.args(NAME, "()", "()", " map { '" + option + "':'' }"));
     }
 
     // specify parsing options
-    query(_DB_CREATE.args(NAME, " '<a> </a>'", "a.xml", " map { 'chop':true() }"));
+    query(_DB_CREATE.args(NAME, " '<a> </a>'", "a.xml",
+        " map { '" + lc(MainOptions.CHOP) + "':true() }"));
     query(_DB_OPEN.args(NAME), "<a/>");
-    query(_DB_CREATE.args(NAME, " '<a> </a>'", "a.xml", " map { 'chop':false() }"));
+    query(_DB_CREATE.args(NAME, " '<a> </a>'", "a.xml",
+        " map { '" + lc(MainOptions.CHOP) + "':false() }"));
     query(_DB_OPEN.args(NAME), "<a> </a>");
 
     // specify unknown or invalid options
     error(_DB_CREATE.args(NAME, "()", "()", " map { 'xyz':'abc' }"), BASX_OPTIONS_X);
-    error(_DB_CREATE.args(NAME, "()", "()", " map { 'maxlen':-1 }"), BASX_VALUE_X_X);
-    error(_DB_CREATE.args(NAME, "()", "()", " map { 'maxlen':'a' }"), BASX_VALUE_X_X);
-    error(_DB_CREATE.args(NAME, "()", "()", " map { 'textindex':'nope' }"), BASX_VALUE_X_X);
+    error(_DB_CREATE.args(NAME, "()", "()", " map { '" + lc(MainOptions.MAXLEN) + "':-1 }"),
+        BASX_VALUE_X_X);
+    error(_DB_CREATE.args(NAME, "()", "()", " map { '" + lc(MainOptions.MAXLEN) + "':'a' }"),
+        BASX_VALUE_X_X);
+    error(_DB_CREATE.args(NAME, "()", "()", " map { '" + lc(MainOptions.TEXTINDEX) + "':'nope' }"),
+        BASX_VALUE_X_X);
   }
 
   /** Test method. */
@@ -550,16 +561,15 @@ public final class DbModuleTest extends AdvancedQueryTest {
     // commands
     final CmdIndex[] cis = { CmdIndex.TEXT, CmdIndex.ATTRIBUTE, CmdIndex.TOKEN, CmdIndex.FULLTEXT };
     // options
-    final String[] numberOptions = lc(MainOptions.MAXCATS, MainOptions.MAXLEN,
-        MainOptions.SPLITSIZE);
-    final String[] boolOptions = lc(MainOptions.TEXTINDEX, MainOptions.ATTRINDEX,
-        MainOptions.TOKENINDEX, MainOptions.FTINDEX, MainOptions.STEMMING,
-        MainOptions.CASESENS, MainOptions.DIACRITICS);
-    final String[] stringOptions = lc(MainOptions.LANGUAGE, MainOptions.STOPWORDS);
     final String[] indexes = lc(MainOptions.TEXTINDEX, MainOptions.ATTRINDEX,
         MainOptions.TOKENINDEX, MainOptions.FTINDEX);
     final String[] includes = lc(MainOptions.TEXTINCLUDE, MainOptions.ATTRINCLUDE,
         MainOptions.TOKENINCLUDE, MainOptions.FTINCLUDE);
+    final String[] boolOptions = new StringList(indexes).add(lc(MainOptions.STEMMING,
+        MainOptions.CASESENS, MainOptions.DIACRITICS)).finish();
+    final String[] stringOptions = lc(MainOptions.LANGUAGE, MainOptions.STOPWORDS);
+    final String[] numberOptions = lc(MainOptions.MAXCATS, MainOptions.MAXLEN,
+        MainOptions.SPLITSIZE);
 
     // check single options
     for(final String option : numberOptions)
@@ -575,10 +585,14 @@ public final class DbModuleTest extends AdvancedQueryTest {
 
     // check invalid options
     error(_DB_OPTIMIZE.args(NAME, false, " map { 'xyz': 'abc' }"), BASX_OPTIONS_X);
-    error(_DB_OPTIMIZE.args(NAME, false, " map { 'updindex': 1 }"), BASX_OPTIONS_X);
-    error(_DB_OPTIMIZE.args(NAME, false, " map { 'maxlen': -1 }"), BASX_VALUE_X_X);
-    error(_DB_OPTIMIZE.args(NAME, false, " map { 'maxlen': 'a' }"), BASX_VALUE_X_X);
-    error(_DB_OPTIMIZE.args(NAME, false, " map { 'textindex':'nope' }"), BASX_VALUE_X_X);
+    error(_DB_OPTIMIZE.args(NAME, false, " map { '" + lc(MainOptions.UPDINDEX) + "': 1 }"),
+        BASX_OPTIONS_X);
+    error(_DB_OPTIMIZE.args(NAME, false, " map { '" + lc(MainOptions.MAXLEN) + "': -1 }"),
+        BASX_VALUE_X_X);
+    error(_DB_OPTIMIZE.args(NAME, false, " map { '" + lc(MainOptions.MAXLEN) + "': 'a' }"),
+        BASX_VALUE_X_X);
+    error(_DB_OPTIMIZE.args(NAME, false, " map { '" + lc(MainOptions.TEXTINDEX) + "':'nope' }"),
+        BASX_VALUE_X_X);
 
     // check if optimize call adopts original options
     query(_DB_OPTIMIZE.args(NAME));
@@ -606,13 +620,15 @@ public final class DbModuleTest extends AdvancedQueryTest {
     for(final String inc : includes) query(_DB_INFO.args(NAME) + "//" + inc + "/text()", "");
 
     // check if options specified in map are adopted
-    query(_DB_OPTIMIZE.args(NAME, true, " map {"
-        + "'textindex':true(),'attrindex':true(),'ftindex':true(),'tokenindex':true(),"
-        + "'updindex':true(),'textinclude':'a','attrinclude':'a','tokeninclude':'a','ftinclude':'a'"
-        + " }"));
+    final StringBuilder options = new StringBuilder();
+    for(final String option : indexes) options.append("'").append(option).append("':true(),");
+    for(final String option : includes) options.append("'").append(option).append("':'a',");
+    options.append("'").append(lc(MainOptions.UPDINDEX)).append("':true()");
+    query(_DB_OPTIMIZE.args(NAME, true, " map { " + options + "}"));
+
     for(final String ind : indexes) query(_DB_INFO.args(NAME) + "//" + ind + "/text()", "true");
     for(final String inc : includes) query(_DB_INFO.args(NAME) + "//" + inc + "/text()", "a");
-    query(_DB_INFO.args(NAME) + "//updindex/text()", "true");
+    query(_DB_INFO.args(NAME) + "//" + lc(MainOptions.UPDINDEX) + "/text()", "true");
   }
 
   /** Test method. */
@@ -820,7 +836,16 @@ public final class DbModuleTest extends AdvancedQueryTest {
    */
   private String[] lc(final Option<?>... options) {
     final StringList sl = new StringList();
-    for(final Option<?> option : options) sl.add(option.name().toLowerCase(Locale.ENGLISH));
+    for(final Option<?> option : options) sl.add(lc(option));
     return sl.finish();
+  }
+
+  /**
+   * Returns a lower-case representation of the specified option.
+   * @param option option
+   * @return string
+   */
+  private String lc(final Option<?> option) {
+    return option.name().toLowerCase(Locale.ENGLISH);
   }
 }
