@@ -40,18 +40,25 @@ public abstract class Parse extends StandardFunc {
     if(it == null) return check ? Bln.FALSE : null;
 
     final byte[] path = toToken(it);
-    final IO base = sc.baseIO();
 
     String enc = null;
     try {
-      if(base == null) throw STBASEURI.get(info);
       enc = encoding ? toEncoding(1, ENCODING_X, qc) : null;
 
       final String p = string(path);
       if(p.indexOf('#') != -1) throw FRAGID_X.get(info, p);
-      if(!Uri.uri(p).isValid()) throw INVURL_X.get(info, p);
+      final Uri uri = Uri.uri(p);
+      if(!uri.isValid()) throw INVURL_X.get(info, p);
 
-      IO io = base.merge(p);
+      IO io;
+      if(uri.isAbsolute()) {
+        io = IO.get(p);
+      } else {
+        final IO base = sc.baseIO();
+        if(base == null) throw STBASEURI.get(info);
+        io = base.merge(p);
+      }
+
       String[] rp = qc.resources.texts.get(p);
       if(rp == null) rp = qc.resources.texts.get(io.path());
 
