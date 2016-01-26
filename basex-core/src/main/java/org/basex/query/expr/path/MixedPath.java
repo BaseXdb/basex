@@ -87,11 +87,11 @@ public final class MixedPath extends Path {
           // all results are nodes: create new iterator
           iter = nodes.iter();
         } else {
-          // result contains non-nodes: raise error if result any contains nodes
-          if(!nodes.isEmpty()) throw MIXEDRESULTS.get(info);
           // raise error if this is not the final result
           if(s + 1 < sl)
             throw PATHNODE_X_X_X.get(info, steps[s + 1], items.get(0).type, items.get(0));
+          // result contains non-nodes: raise error if result any contains nodes
+          if(!nodes.isEmpty()) throw MIXEDRESULTS.get(info);
           iter = items.iter();
         }
         sz = iter.size();

@@ -1003,9 +1003,9 @@ public enum QueryError {
   /** XPTY0018. */
   MIXEDRESULTS(XPTY, 18, "Path returns both nodes and non-nodes."),
   /** XPTY0019. */
-  PATHNODE_X_X_X(XPTY, 19, "%: node expected as input, % found: %."),
+  PATHNODE_X_X_X(XPTY, 19, "%: node expected, % found: %."),
   /** XPTY0020. */
-  STEPNODE_X_X_X(XPTY, 20, "%: node expected as input, % found: %."),
+  STEPNODE_X_X_X(XPTY, 20, "%: node expected, % found: %."),
   /** XPTY0117. */
   NSSENS_X_X(XPTY, 117, "Cannot cast % to %."),
 
