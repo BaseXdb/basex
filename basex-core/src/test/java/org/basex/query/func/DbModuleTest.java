@@ -318,6 +318,14 @@ public final class DbModuleTest extends AdvancedQueryTest {
         " map { 'parser':'csv','csvparser': map { 'header': true() } }"));
     query(EXISTS.args(_DB_OPEN.args(NAME, "csv.xml") + "//City"), "true");
 
+    final String addcache = " map { 'addcache': true() }";
+    query(_DB_ADD.args(NAME, "<cache/>", "cache1.xml", addcache));
+    query(EXISTS.args(_DB_OPEN.args(NAME, "cache1.xml")), "true");
+    query(_DB_ADD.args(NAME, " \"<cache/>\"", "cache2.xml", addcache));
+    query(EXISTS.args(_DB_OPEN.args(NAME, "cache2.xml")), "true");
+    query(_DB_ADD.args(NAME, XML, "cache3.xml", addcache));
+    query(EXISTS.args(_DB_OPEN.args(NAME, "cache3.xml")), "true");
+
     error(_DB_ADD.args(NAME, CSV, "csv.xml",
         " map { 'parser':('csv','html') }"), INVALIDOPT_X);
     error(_DB_ADD.args(NAME, CSV, "csv.xml",
@@ -545,6 +553,14 @@ public final class DbModuleTest extends AdvancedQueryTest {
     query(COUNT.args(COLLECTION.args(NAME + '/' + XML) + "/R1"), 0);
     query(COUNT.args(COLLECTION.args(NAME + '/' + XML) + "/R2"), 0);
     query(COUNT.args(COLLECTION.args(NAME + '/' + XML) + "/html"), 1);
+
+    final String addcache = " map { 'addcache': true() }";
+    query(_DB_REPLACE.args(NAME, "cache1.xml", "<cache/>", addcache));
+    query(EXISTS.args(_DB_OPEN.args(NAME, "cache1.xml")), "true");
+    query(_DB_REPLACE.args(NAME, "cache2.xml", " \"<cache/>\"", addcache));
+    query(EXISTS.args(_DB_OPEN.args(NAME, "cache2.xml")), "true");
+    query(_DB_REPLACE.args(NAME, "cache3.xml", XML, addcache));
+    query(EXISTS.args(_DB_OPEN.args(NAME, "cache3.xml")), "true");
   }
 
   /** Test method. */

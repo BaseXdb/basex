@@ -78,11 +78,11 @@ public final class DirParser extends Parser {
    * Constructor.
    * @param source source path
    * @param options main options
-   * @param path future database path
+   * @param dbpath future database path (required for binary resources)
    */
-  public DirParser(final IO source, final MainOptions options, final IOFile path) {
+  public DirParser(final IO source, final MainOptions options, final IOFile dbpath) {
     this(source, options);
-    if(path != null && (addRaw || rawParser)) rawPath = new IOFile(path, IO.RAW);
+    if(dbpath != null && (addRaw || rawParser)) rawPath = new IOFile(dbpath, IO.RAW);
   }
 
   @Override

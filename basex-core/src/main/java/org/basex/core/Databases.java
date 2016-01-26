@@ -80,7 +80,7 @@ public final class Databases {
    */
   private StringList list(final boolean db, final boolean backup, final String name) {
     final Pattern pt = name == null ? null : regex(name);
-    final IOFile[] children = soptions.dbpath().children();
+    final IOFile[] children = soptions.dbPath().children();
     final StringList list = new StringList(children.length);
     final HashSet<String> map = new HashSet<>(children.length);
     for(final IOFile f : children) {
@@ -128,7 +128,7 @@ public final class Databases {
    */
   public StringList backups() {
     final StringList backups = new StringList();
-    for(final IOFile f : soptions.dbpath().children()) {
+    for(final IOFile f : soptions.dbPath().children()) {
       final String n = f.name();
       if(n.endsWith(IO.ZIPSUFFIX)) backups.add(n.substring(0, n.lastIndexOf('.')));
     }
@@ -143,12 +143,12 @@ public final class Databases {
    */
   public StringList backups(final String db) {
     final StringList backups = new StringList();
-    final IOFile file = soptions.dbpath(db + IO.ZIPSUFFIX);
+    final IOFile file = soptions.dbPath(db + IO.ZIPSUFFIX);
     if(file.exists()) {
       backups.add(db);
     } else {
       final Pattern regex = regex(db, '-' + DATE + '\\' + IO.ZIPSUFFIX);
-      for(final IOFile f : soptions.dbpath().children()) {
+      for(final IOFile f : soptions.dbPath().children()) {
         final String n = f.name();
         if(regex.matcher(n).matches()) backups.add(n.substring(0, n.lastIndexOf('.')));
       }

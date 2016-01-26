@@ -136,20 +136,20 @@ public final class StaticOptions extends Options {
    * @param name name of the file or database
    * @return database directory
    */
-  public IOFile dbpath(final String name) {
+  public IOFile dbPath(final String name) {
     return new IOFile(get(DBPATH), name);
   }
 
   /**
-   * Returns a random temporary name for the specified database.
+   * Returns a random temporary name for the specified database name.
    * @param db name of database
-   * @return random name
+   * @return random database name
    */
-  public String random(final String db) {
+  public String randomDbName(final String db) {
     String nm;
     do {
       nm = db + '_' + new Random().nextInt(0x7FFFFFFF);
-    } while(dbpath(nm).exists());
+    } while(dbPath(nm).exists());
     return nm;
   }
 
@@ -157,7 +157,7 @@ public final class StaticOptions extends Options {
    * Returns the current database path.
    * @return database filename
    */
-  public IOFile dbpath() {
+  public IOFile dbPath() {
     return new IOFile(get(DBPATH));
   }
 
@@ -166,7 +166,7 @@ public final class StaticOptions extends Options {
    * @param db name of the database
    * @return result of check
    */
-  public boolean dbexists(final String db) {
-    return !db.isEmpty() && dbpath(db).exists();
+  public boolean dbExists(final String db) {
+    return !db.isEmpty() && dbPath(db).exists();
   }
 }

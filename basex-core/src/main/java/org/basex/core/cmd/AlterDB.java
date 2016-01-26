@@ -36,9 +36,9 @@ public final class AlterDB extends ACreate {
     if(!Databases.validName(trg)) return error(NAME_INVALID_X, trg);
 
     // database does not exist
-    if(!soptions.dbexists(src)) return error(DB_NOT_FOUND_X, src);
+    if(!soptions.dbExists(src)) return error(DB_NOT_FOUND_X, src);
     // target database already exists
-    if(soptions.dbexists(trg)) return error(DB_EXISTS_X, trg);
+    if(soptions.dbExists(trg)) return error(DB_EXISTS_X, trg);
 
     // close database if it's currently opened and not opened by others
     if(!closed) closed = close(context, src);
@@ -67,7 +67,7 @@ public final class AlterDB extends ACreate {
 
     // drop target database
     DropDB.drop(target, sopts);
-    return sopts.dbpath(source).rename(sopts.dbpath(target));
+    return sopts.dbPath(source).rename(sopts.dbPath(target));
   }
 
   @Override

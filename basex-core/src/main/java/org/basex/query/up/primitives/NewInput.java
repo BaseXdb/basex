@@ -2,6 +2,7 @@ package org.basex.query.up.primitives;
 
 import org.basex.io.*;
 import org.basex.query.value.node.*;
+import org.basex.util.*;
 
 /**
  * Container for inputs that are to be added to a database.
@@ -10,13 +11,19 @@ import org.basex.query.value.node.*;
  * @author Christian Gruen
  */
 public final class NewInput {
-  /** Node to be added. */
+  /** Target path. */
+  public String path;
+  /** Node to be added (can be {@code null}). */
   public ANode node;
-  /** Input reference. */
+  /** Input reference (can be {@code null}). */
   public IO io;
 
-  /** Target path. */
-  public byte[] path;
-  /** Target database. */
-  public byte[] dbname;
+  @Override
+  public String toString() {
+    final TokenBuilder tb = new TokenBuilder(Util.className(getClass())).add('[');
+    tb.add("path: \"").add(path).add("\", ");
+    if(node != null) tb.add("node");
+    else tb.add("io: ").addExt(io);
+    return tb.add(']').toString();
+  }
 }

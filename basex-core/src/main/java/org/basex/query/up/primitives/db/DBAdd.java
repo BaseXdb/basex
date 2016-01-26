@@ -18,7 +18,7 @@ public final class DBAdd extends DBUpdate {
   /** Database update options. */
   private final DBOptions options;
   /** Container for new database documents. */
-  private final DBNew add;
+  private final DBNew newDocs;
   /** Size. */
   private int size;
 
@@ -39,24 +39,27 @@ public final class DBAdd extends DBUpdate {
 
     final ArrayList<NewInput> docs = new ArrayList<>();
     docs.add(input);
-    add = new DBNew(qc, docs, info);
+    newDocs = new DBNew(qc, docs, options, info);
   }
 
   @Override
   public void merge(final Update update) {
-    final DBAdd a = (DBAdd) update;
-    for(final NewInput input : a.add.inputs) add.inputs.add(input);
+    newDocs.merge(((DBAdd) update).newDocs);
   }
 
   @Override
   public void prepare() throws QueryException {
-    size = add.inputs.size();
-    add.addDocs(data.meta.name, options);
+    size = newDocs.inputs.size();
+    newDocs.prepare(data.meta.name);
   }
 
   @Override
   public void apply() {
-    data.insert(data.meta.size, -1, new DataClip(add.data));
+    try {
+      data.insert(data.meta.size, -1, new DataClip(newDocs.data));
+    } finally {
+      newDocs.finish();
+    }
   }
 
   @Override
@@ -66,6 +69,6 @@ public final class DBAdd extends DBUpdate {
 
   @Override
   public String toString() {
-    return Util.className(this) + '[' + add.inputs + ']';
+    return Util.className(this) + '[' + newDocs.inputs + ']';
   }
 }

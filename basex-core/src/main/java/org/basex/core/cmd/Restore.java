@@ -78,7 +78,7 @@ public final class Restore extends ABackup {
     // drop target database
     DropDB.drop(db, sopts);
 
-    final IOFile dbpath = sopts.dbpath();
+    final IOFile dbpath = sopts.dbPath();
     final Zip zip = new Zip(new IOFile(dbpath, backup + IO.ZIPSUFFIX));
     if(cmd != null) cmd.proc(zip);
     zip.unzip(dbpath);

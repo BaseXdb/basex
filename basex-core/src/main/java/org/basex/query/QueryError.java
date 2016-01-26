@@ -1197,7 +1197,7 @@ public enum QueryError {
   /** XUDY0016. */
   UPMULTREPL_X(XUDY, 16, "% can only be replaced once."),
   /** XUDY0016. */
-  UPMULTDOC_X_X(XUDY, 16, "Document can only be replaced once: %/%."),
+  UPMULTDOC_X_X(XUDY, 16, "Documents in path '%/%' can only be replaced once."),
   /** XUDY0017. */
   UPMULTREPV_X(XUDY, 17, "% can only be replaced once."),
   /** XUDY0021. */

@@ -54,7 +54,7 @@ abstract class DbNew extends DbAccess {
         nd = new FDoc(name).add(nd);
       }
       ni.node = nd;
-      ni.path = name;
+      ni.path = string(name);
       return ni;
     }
 
@@ -83,8 +83,7 @@ abstract class DbNew extends DbAccess {
     if(name.isEmpty()) throw RESINV_X.get(info, path);
 
     ni.io = qi.input;
-    ni.dbname = token(name);
-    ni.path = token(target);
+    ni.path = target;
     return ni;
   }
 }

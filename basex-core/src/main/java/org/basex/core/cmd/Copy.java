@@ -44,9 +44,9 @@ public final class Copy extends Command {
     if(!Databases.validName(trg)) return error(NAME_INVALID_X, trg);
 
     // source database does not exist
-    if(!soptions.dbexists(src)) return error(DB_NOT_FOUND_X, src);
+    if(!soptions.dbExists(src)) return error(DB_NOT_FOUND_X, src);
     // target database already exists
-    if(soptions.dbexists(trg)) return error(DB_EXISTS_X, trg);
+    if(soptions.dbExists(trg)) return error(DB_EXISTS_X, trg);
 
     // try to copy database
     try {
@@ -68,8 +68,8 @@ public final class Copy extends Command {
   public static void copy(final String source, final String target, final StaticOptions sopts,
       final Copy cmd) throws IOException {
 
-    final IOFile src = sopts.dbpath(source);
-    final IOFile trg = sopts.dbpath(target);
+    final IOFile src = sopts.dbPath(source);
+    final IOFile trg = sopts.dbPath(target);
 
     // drop target database
     DropDB.drop(target, sopts);

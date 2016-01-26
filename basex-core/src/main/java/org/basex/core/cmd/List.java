@@ -83,7 +83,7 @@ public final class List extends Command {
         dbsize = meta.dbsize();
         file = meta.original;
         // add number of raw files
-        count = meta.ndocs + new IOFile(soptions.dbpath(name), IO.RAW).descendants().size();
+        count = meta.ndocs + new IOFile(soptions.dbPath(name), IO.RAW).descendants().size();
       } catch(final IOException ex) {
         file = ERROR;
       }
@@ -157,7 +157,7 @@ public final class List extends Command {
    */
   public static StringList list(final StaticOptions sopts) {
     final StringList db = new StringList();
-    for(final IOFile f : sopts.dbpath().children()) {
+    for(final IOFile f : sopts.dbPath().children()) {
       final String name = f.name();
       if(f.isDir() && !name.startsWith(".")) db.add(name);
     }

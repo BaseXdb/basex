@@ -93,7 +93,7 @@ public final class TableDiskAccess extends TableAccess {
    * @return result of check
    */
   public static boolean locked(final String db, final Context ctx) {
-    final IOFile table = MetaData.file(ctx.soptions.dbpath(db), DATATBL);
+    final IOFile table = MetaData.file(ctx.soptions.dbPath(db), DATATBL);
     if(!table.exists()) return false;
 
     try(final RandomAccessFile file = new RandomAccessFile(table.file(), "rw")) {

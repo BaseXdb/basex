@@ -125,7 +125,7 @@ public final class MetaData {
    */
   public MetaData(final String name, final MainOptions options, final StaticOptions sopts) {
     this.name = name;
-    path = sopts != null ? sopts.dbpath(name) : null;
+    path = sopts != null ? sopts.dbPath(name) : null;
     chop = options.get(MainOptions.CHOP);
     createtext = options.get(MainOptions.TEXTINDEX);
     createattr = options.get(MainOptions.ATTRINDEX);

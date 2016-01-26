@@ -28,8 +28,6 @@ public final class Add extends ACreate {
 
   /** Data clip to insert. */
   DataClip clip;
-  /** Name of temporary database instance. */
-  private String clipDB;
 
   /**
    * Constructor, specifying a target path.
@@ -117,8 +115,7 @@ public final class Add extends ACreate {
 
       // create random database name for disk-based creation
       if(cache(parser)) {
-        clipDB = soptions.random(data.meta.name);
-        build = new DiskBuilder(clipDB, parser, soptions, options);
+        build = new DiskBuilder(soptions.randomDbName(data.meta.name), parser, soptions, options);
       } else {
         build = new MemBuilder(name, parser);
       }
@@ -133,9 +130,7 @@ public final class Add extends ACreate {
    * Finalizes an add operation.
    */
   void close() {
-    // close and drop intermediary database instance
-    if(clip != null) clip.data.close();
-    if(clipDB != null) DropDB.drop(clipDB, soptions);
+    if(clip != null) DropDB.drop(clip.data, soptions);
   }
 
   /**

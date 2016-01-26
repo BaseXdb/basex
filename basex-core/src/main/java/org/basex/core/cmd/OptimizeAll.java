@@ -131,7 +131,7 @@ public final class OptimizeAll extends ACreate {
     // build database and index structures
     if(cmd != null) cmd.size = ometa.size;
     final StaticOptions sopts = context.soptions;
-    final String tname = sopts.random(name);
+    final String tname = sopts.randomDbName(name);
     final DBParser parser = new DBParser(odata, options, cmd);
     try(final DiskBuilder builder = new DiskBuilder(tname, parser, sopts, options)) {
       final DiskData dt = builder.build();

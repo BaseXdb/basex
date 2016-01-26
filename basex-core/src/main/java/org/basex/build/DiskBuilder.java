@@ -70,7 +70,7 @@ public final class DiskBuilder extends Builder implements Closeable {
 
     // drop old database (if available) and create new one
     DropDB.drop(dbname, sopts);
-    sopts.dbpath(dbname).md();
+    sopts.dbPath(dbname).md();
 
     elemNames = new Names(meta);
     attrNames = new Names(meta);

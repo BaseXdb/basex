@@ -37,7 +37,7 @@ public class DbCopy extends DbFn {
     if(!Databases.validName(newname)) throw BXDB_NAME_X.get(info, newname);
 
     // source database does not exist
-    if(!qc.context.soptions.dbexists(name)) throw BXDB_WHICH_X.get(info, name);
+    if(!qc.context.soptions.dbExists(name)) throw BXDB_WHICH_X.get(info, name);
     if(name.equals(newname)) throw BXDB_SAME_X.get(info, name, newname);
 
     qc.resources.updates().add(keep ? new DBCopy(name, newname, info, qc) :

@@ -73,7 +73,7 @@ public final class CreateDB extends ACreate {
       // create parser instance
       if(io != null) {
         if(!io.exists()) return error(RES_NOT_FOUND_X, io);
-        parser = new DirParser(io, options, soptions.dbpath(name));
+        parser = new DirParser(io, options, soptions.dbPath(name));
       } else if(parser == null) {
         parser = Parser.emptyParser(options);
       }

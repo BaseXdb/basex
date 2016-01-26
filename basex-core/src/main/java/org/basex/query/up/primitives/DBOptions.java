@@ -96,6 +96,15 @@ public final class DBOptions {
   }
 
   /**
+   * Returns the value of the specified option.
+   * @param option option
+   * @return main options
+   */
+  public Object get(final Option<?> option) {
+    return map.get(option);
+  }
+
+  /**
    * Assigns the specified option if it has not been assigned before.
    * @param option option
    * @param value value
@@ -107,10 +116,12 @@ public final class DBOptions {
   /**
    * Assigns runtime options to the specified main options.
    * @param opts main options
+   * @return main options
    */
-  public void assignTo(final MainOptions opts) {
+  public MainOptions assignTo(final MainOptions opts) {
     for(final Entry<Option<?>, Object> entry : map.entrySet()) {
       opts.put(entry.getKey(), entry.getValue());
     }
+    return opts;
   }
 }
