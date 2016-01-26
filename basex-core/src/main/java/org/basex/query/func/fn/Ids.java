@@ -75,7 +75,7 @@ abstract class Ids extends StandardFunc {
   private boolean index(final ANode root, final boolean idref) {
     // check if index exists
     final Data data = root.data();
-    if(data == null || (idref ? data.tokenIndex : data.attrIndex) == null) return true;
+    if(data == null || (idref ? data.tokenIndex : data.attrIndex) == null) return false;
     // check if index names contain id attributes
     if(!indexed.containsKey(data)) {
       indexed.put(data, new IndexNames(IndexType.ATTRIBUTE, data).containsIds(idref));
