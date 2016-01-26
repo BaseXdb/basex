@@ -41,7 +41,11 @@ public final class JavaFunctionTest extends AdvancedQueryTest {
   @Test
   public void staticField() {
     query("Q{java:java.lang.Math}PI()", Math.PI);
-    query("Q{java:org.basex.util.Prop}gui()");
+    query("Q{java:org.basex.util.Prop}gui()", "false");
+
+    query("Q{java:org.basex.util.Prop}debug()", "false");
+    query("Q{org.basex.util.Prop}debug()", "false");
+    query("Q{http://basex.org/util/Prop}debug()", "false");
   }
 
   /** Tests calling some Java object fields from XQuery. */
@@ -165,6 +169,7 @@ public final class JavaFunctionTest extends AdvancedQueryTest {
     error("rest:XYZ()", WHICHFUNC_X);
     error("Q{java.lang.String}XYZ()", WHICHFUNC_X);
     error("Q{java:java.lang.String}XYZ()", JAVAWHICH_X_X_X);
+
   }
 
   /** Pass on Java items to functions. */
