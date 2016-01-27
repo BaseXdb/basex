@@ -20,6 +20,8 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 final class ASession {
+  /** Query context key. */
+  private static final String QC = "\u0000";
   /** Query context. */
   private QueryContext qc;
   /** Session. */
@@ -125,5 +127,16 @@ final class ASession {
    */
   void close() {
     session.invalidate();
+  }
+
+  /**
+   * Registers the query context.
+   * @param key user-defined query key
+   */
+  public void registerQuery(final Str key) {
+    final String name = QC + key.toJava();
+    final Object value = session.getAttribute(name);
+    if(value instanceof QueryContext) ((QueryContext) value).stop();
+    session.setAttribute(name, qc);
   }
 }

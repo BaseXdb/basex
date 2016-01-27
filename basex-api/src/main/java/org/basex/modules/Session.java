@@ -97,6 +97,16 @@ public final class Session extends QueryModule {
   }
 
   /**
+   * Registers the current query and interrupts a running instance with the same key.
+   * @param key key
+   * @throws QueryException query exception
+   */
+  @Requires(Permission.NONE)
+  public void registerQuery(final Str key) throws QueryException {
+    session().registerQuery(key);
+  }
+
+  /**
    * Closes a session.
    * @throws QueryException query exception
    */
