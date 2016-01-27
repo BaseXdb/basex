@@ -901,11 +901,13 @@ public enum QueryError {
   /** XPST0017. */
   WHICHFUNC_X(XPST, 17, "Unknown function: %."),
   /** XPST0017. */
-  JAVAWHICH_X_X_X(XPST, 17, "Unknown Java function: %:%#%."),
+  JAVAWHICH_X_X_X(XPST, 17, "Java function %:%#% is unknown."),
   /** XPST0017. */
-  JAVAAMB_X_X_X(XPST, 17, "Ambiguous Java function: %:%#%."),
+  JAVAARITY_X_X_X_X_X(XPTY, 4, "Java function %:%#%: % argument% supplied."),
   /** XPST0017. */
-  JAVACONSAMB_X(XPST, 17, "Ambiguous Java constructor: %."),
+  JAVAAMB_X_X_X(XPST, 17, "Java function %:%#% is ambiguous."),
+  /** XPST0017. */
+  JAVACONSAMB_X(XPST, 17, "Java constructor % is ambiguous."),
   /** XPST0017. */
   FUNCNOIMPL_X(XPST, 17, "Function not implemented: %."),
   /** XPST0017. */

@@ -227,15 +227,25 @@ public abstract class JavaFunction extends Arr {
 
     // find method with identical name and arity
     Method meth = null;
+    int methArity = -1;
+
     final Class<?> clazz = module.getClass();
     for(final Method m : clazz.getMethods()) {
       if(!m.getName().equals(name)) continue;
       final Class<?>[] pTypes = m.getParameterTypes();
-      if(pTypes.length != arity || !typeMatches(pTypes, types)) continue;
+      methArity = pTypes.length;
+      if(methArity != arity) continue;
+      methArity = -1;
+      if(!typeMatches(pTypes, types)) continue;
       if(meth != null) throw JAVAAMB_X_X_X.get(ii, clazz.getName(), name, arity);
       meth = m;
     }
-    if(meth == null) throw JAVAWHICH_X_X_X.get(ii, clazz.getName(), name, arity);
+
+    if(meth == null) {
+      if(methArity != -1) throw JAVAARITY_X_X_X_X_X.get(ii,
+          clazz.getName(), name, methArity, arity, arity == 1 ? "" : "s");
+      throw JAVAWHICH_X_X_X.get(ii, clazz.getName(), name, arity);
+    }
 
     // Add module locks to QueryContext.
     final Lock lock = meth.getAnnotation(Lock.class);

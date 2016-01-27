@@ -108,7 +108,9 @@ public final class JavaFunctionTest extends AdvancedQueryTest {
     error("declare namespace string = 'java.lang.String';" +
         "string:concat(string:new(), Q{java.awt.Point}new())", WHICHMETHOD_X_X);
     error("import module namespace qm='java:org.basex.query.func.QueryModuleTest';" +
-        "qm:fast()", JAVAWHICH_X_X_X);
+        "qm:xyz()", JAVAWHICH_X_X_X);
+    error("import module namespace qm='java:org.basex.query.func.QueryModuleTest';" +
+        "qm:fast()", JAVAARITY_X_X_X_X_X);
 
     query("declare namespace qm='java:org.basex.query.func.QueryModuleTest';" +
         "try{qm:error(qm:new())} catch * {local-name-from-QName($err:code)}", "BASX0000");
