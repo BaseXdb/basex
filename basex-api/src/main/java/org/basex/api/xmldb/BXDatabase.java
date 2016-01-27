@@ -32,7 +32,7 @@ final class BXDatabase implements Database, BXXMLDBText {
       throws XMLDBException {
     // create database context
     final String name = getCollectionName(uri);
-    final boolean exists = ctx.soptions.dbexists(name);
+    final boolean exists = ctx.soptions.dbExists(name);
     return exists ? new BXCollection(name, true, this) : null;
   }
 
