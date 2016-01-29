@@ -136,10 +136,7 @@ final class ASession {
   public void registerQuery(final Str key) {
     final String name = QC + key.toJava();
     final Object value = session.getAttribute(name);
-    if(value instanceof QueryContext) {
-      final QueryContext qctx = (QueryContext) value;
-      if(qctx != qc) qctx.stop();
-    }
+    if(value instanceof QueryContext && value != qc) ((QueryContext) value).stop();
     session.setAttribute(name, qc);
   }
 }
