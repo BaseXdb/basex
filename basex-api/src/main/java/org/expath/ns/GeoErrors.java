@@ -68,6 +68,15 @@ final class GeoErrors {
   }
 
   /**
+   * GEO0006: Illegal argument.
+   * @param arg argument
+   * @return query exception
+   */
+  static QueryException illegalArg(final Str arg) {
+    return thrw(6, "Illegal argument: %", arg);
+  }
+
+  /**
    * Creates an error QName for the specified code.
    * @param code code
    * @return query exception
