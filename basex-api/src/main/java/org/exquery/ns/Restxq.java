@@ -1,5 +1,7 @@
 package org.exquery.ns;
 
+import javax.servlet.http.*;
+
 import org.basex.http.*;
 import org.basex.http.restxq.*;
 import org.basex.query.*;
@@ -13,6 +15,9 @@ import org.basex.query.value.node.*;
  * @author Christian Gruen
  */
 public final class Restxq extends QueryModule {
+  /** Query context key. */
+  private static final String QC = "\u0000";
+
   /**
    * Returns an {Code application.wadl} description including all RESTXQ services.
    * @return wadl description
@@ -39,6 +44,19 @@ public final class Restxq extends QueryModule {
    */
   public Uri uri() throws QueryException {
     return Uri.uri(http().req.getRequestURI());
+  }
+
+  /**
+   * Registers the current query and interrupts a running instance with the same key.
+   * @param key key
+   * @throws QueryException query exception
+   */
+  public void watch(final Str key) throws QueryException {
+    final HttpSession session = http().req.getSession();
+    final String name = QC + key.toJava();
+    final Object value = session.getAttribute(name);
+    if(value instanceof QueryContext && value != queryContext) ((QueryContext) value).stop();
+    session.setAttribute(name, queryContext);
   }
 
   /**
