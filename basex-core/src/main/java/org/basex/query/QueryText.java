@@ -151,6 +151,8 @@ public interface QueryText {
   /** Parser token. */
   String INTO = "into";
   /** Parser token. */
+  String INVOKE = "invoke";
+  /** Parser token. */
   String ITEMM = "item";
   /** Parser token. */
   String LANGUAGE = "language";

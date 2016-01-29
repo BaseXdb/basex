@@ -60,10 +60,4 @@ public final class AnnotationsTest extends AdvancedQueryTest {
     error("declare %output:method function local:x() { 1 }; 1", BASX_ANNNUM_X_X_X);
     error("declare %output:method(1) function local:x() { 1 }; 1", BASX_ANNTYPE_X_X_X);
   }
-
-  /**  Test for empty-sequence() as function item. */
-  @Test
-  public void emptyFunTest() {
-    error("()()", EMPTYFOUND);
-  }
 }

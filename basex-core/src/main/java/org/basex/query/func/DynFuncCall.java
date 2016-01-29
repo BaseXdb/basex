@@ -103,7 +103,7 @@ public final class DynFuncCall extends FuncCall {
         if(in != null) return in;
       }
     } else if(f instanceof Item && !(f instanceof FItem)) {
-      throw INVFUNCITEM_X.get(info, ((Item) f).type, f);
+      throw INVFUNCITEM_X_X.get(info, ((Item) f).type, f);
     }
     return this;
   }
@@ -177,7 +177,7 @@ public final class DynFuncCall extends FuncCall {
   @Override
   FItem evalFunc(final QueryContext qc) throws QueryException {
     final Item it = toItem(body(), qc);
-    if(!(it instanceof FItem)) throw INVFUNCITEM_X.get(info, it.type, it);
+    if(!(it instanceof FItem)) throw INVFUNCITEM_X_X.get(info, it.type, it);
 
     final FItem f = (FItem) it;
     final int last = exprs.length - 1;

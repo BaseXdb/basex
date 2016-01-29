@@ -39,6 +39,7 @@ import org.basex.query.util.collation.*;
 import org.basex.query.util.format.*;
 import org.basex.query.util.list.*;
 import org.basex.query.util.parse.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -987,11 +988,11 @@ public class QueryParser extends InputParser {
     if(e == null) e = iff();
     if(e == null) e = tryCatch();
     if(e == null) e = insert();
-    if(e == null) e = deletee();
+    if(e == null) e = delete();
     if(e == null) e = rename();
     if(e == null) e = replace();
-    if(e == null) e = transform();
     if(e == null) e = updatingFunctionCall();
+    if(e == null) e = copyModify();
     if(e == null) e = or();
     return e;
   }
@@ -1674,14 +1675,14 @@ public class QueryParser extends InputParser {
         skipWs();
         final Expr ex = curr('(') ? parenthesized() : curr('$')
             ? localVars.resolve(varName(), info()) : eQName(ARROWSPEC, sc.funcNS);
+        final InputInfo ii = info();
         wsCheck(PAREN1);
 
         if(ex instanceof QNm) {
           final QNm name = (QNm) ex;
           if(keyword(name)) throw error(RESERVED_X, name.local());
-          e = function(name, e);
+          e = function(name, ii, new ExprList(e));
         } else {
-          final InputInfo ii = info();
           final ExprList argList = new ExprList(e);
           final int[] holes = argumentList(argList, e);
           final Expr[] args = argList.finish();
@@ -2054,6 +2055,7 @@ public class QueryParser extends InputParser {
           } while(wsConsume(SQUARE1));
           e = Filter.get(info(), e, el.finish());
         } else if(consume(PAREN1)) {
+          if(e instanceof Value && !(e instanceof FItem)) throw error(NOPAREN_X_X, e);
           // parses the "ArgumentList" rule
           final InputInfo ii = info();
           final ExprList argList = new ExprList();
@@ -2384,8 +2386,9 @@ public class QueryParser extends InputParser {
     final int i = pos;
     final QNm name = eQName(null, sc.funcNS);
     if(name != null && !keyword(name)) {
+      final InputInfo ii = info();
       if(wsConsume(PAREN1)) {
-        final Expr ret = function(name);
+        final Expr ret = function(name, ii, new ExprList());
         if(ret != null) return ret;
       }
     }
@@ -2396,13 +2399,13 @@ public class QueryParser extends InputParser {
   /**
    * Returns a function.
    * @param name function name
-   * @param exprs initial expressions
+   * @param ii input info
+   * @param argList list of arguments
    * @return function or {@code null}
    * @throws QueryException query exception
    */
-  private Expr function(final QNm name, final Expr... exprs) throws QueryException {
-    final InputInfo ii = info();
-    final ExprList argList = new ExprList().add(exprs);
+  private Expr function(final QNm name, final InputInfo ii, final ExprList argList)
+      throws QueryException {
     final int[] holes = argumentList(argList, name.string());
     final Expr[] args = argList.finish();
     alter = WHICHFUNC_X;
@@ -3583,7 +3586,7 @@ public class QueryParser extends InputParser {
    * @return query expression or {@code null}
    * @throws QueryException query exception
    */
-  private Expr deletee() throws QueryException {
+  private Expr delete() throws QueryException {
     final int i = pos;
     if(!wsConsumeWs(DELETE) || !wsConsumeWs(NODES) && !wsConsumeWs(NODE)) {
       pos = i;
@@ -3638,11 +3641,11 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "TransformExpr" rule.
+   * Parses the "CopyModifyExpr" rule.
    * @return query expression or {@code null}
    * @throws QueryException query exception
    */
-  private Expr transform() throws QueryException {
+  private Expr copyModify() throws QueryException {
     if(!wsConsumeWs(COPY, DOLLAR, INCOMPLETE)) return null;
     final int s = localVars.openScope();
 
@@ -3672,6 +3675,7 @@ public class QueryParser extends InputParser {
    */
   private Expr updatingFunctionCall() throws QueryException {
     final int p = pos;
+    wsConsume(INVOKE);
     final boolean upd = wsConsumeWs(UPDATING), ndt = wsConsumeWs(NON_DETERMINISTIC);
     if(upd || ndt) {
       final Expr func = primary();
@@ -3688,10 +3692,9 @@ public class QueryParser extends InputParser {
           if(!wsConsume(PAREN2)) throw funcMiss(func);
         }
         // skip if primary expression cannot be a function
-        if(!(func instanceof Item) || func instanceof FItem) {
-          if(upd) qc.updating();
-          return new DynFuncCall(ii, sc, upd, ndt, func, argList.finish());
-        }
+        if(func instanceof Value && !(func instanceof FItem)) throw error(NOPAREN_X_X, func);
+        if(upd) qc.updating();
+        return new DynFuncCall(ii, sc, upd, ndt, func, argList.finish());
       }
     }
     pos = p;

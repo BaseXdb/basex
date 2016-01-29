@@ -91,10 +91,14 @@ public final class HigherOrderTest extends AdvancedQueryTest {
     error("string-join(('a', 'b'), )(',')", FUNCMISS_X);
   }
 
-  /**  Test for empty-sequence() as function item. */
+  /**  Test for invalid function expressions. */
   @Test
-  public void emptyFunTest() {
-    error("()()", EMPTYFOUND);
+  public void invalidFunTest() {
+    error("()()", NOPAREN_X_X);
+    error("1()", NOPAREN_X_X);
+    error("1.0()", NOPAREN_X_X);
+    error("1e0()", NOPAREN_X_X);
+    error("'x'()", NOPAREN_X_X);
   }
 
   /**  Tests the creation of a cast function as function item. */

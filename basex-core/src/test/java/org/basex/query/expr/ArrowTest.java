@@ -39,6 +39,6 @@ public final class ArrowTest extends AdvancedQueryTest {
   /** Test. */
   @Test public void error() {
     error("1 => 1", ARROWSPEC);
-    error("1 => (1)()", INVFUNCITEM_X);
+    error("1 => (1)()", INVFUNCITEM_X_X);
   }
 }
