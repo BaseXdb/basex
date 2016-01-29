@@ -357,7 +357,7 @@ public final class EditorView extends View {
    */
   public void jumpToFile() {
     final EditorArea editor = getEditor();
-    if(editor.opened()) project.jumpTo(editor.file());
+    if(editor.opened()) project.jumpTo(editor.file(), true);
   }
 
   /**
@@ -446,7 +446,7 @@ public final class EditorView extends View {
    * @return success flag
    */
   public boolean delete(final IOFile file) {
-    final EditorArea edit = find(file, true);
+    final EditorArea edit = find(file);
     if(edit != null) close(edit);
     return file.delete();
   }
@@ -461,7 +461,7 @@ public final class EditorView extends View {
   }
 
   /**
-   * Opens the specified query file.
+   * Opens and focuses the specified query file.
    * @param file query file
    * @param parse parse contents
    * @param error display error if file does not exist
@@ -470,7 +470,7 @@ public final class EditorView extends View {
   private EditorArea open(final IOFile file, final boolean parse, final boolean error) {
     if(!visible()) GUIMenuCmd.C_SHOWEDITOR.execute(gui);
 
-    EditorArea edit = find(file, true);
+    EditorArea edit = find(file);
     if(edit != null) {
       // display open file
       tabs.setSelectedComponent(edit);
@@ -494,6 +494,7 @@ public final class EditorView extends View {
         return null;
       }
     }
+    edit.requestFocusInWindow();
     return edit;
   }
 
@@ -605,7 +606,7 @@ public final class EditorView extends View {
   /**
    * Retrieves the contents of the specified file, or opens it externally.
    * @param file query file
-   * @return contents or {@code null} reference
+   * @return contents, or {@code null} reference if file is opened externally
    * @throws IOException I/O exception
    */
   private byte[] read(final IOFile file) throws IOException {
@@ -787,23 +788,26 @@ public final class EditorView extends View {
     if(path == null) return;
 
     final IOFile file = new IOFile(path);
-    EditorArea edit = find(file, false);
+    EditorArea ea = find(file);
+    final EditorArea edit;
     if(jump) {
-      // no input info: parse opened file
-      if(edit == null) {
-        edit = open(file, error, true);
-        if(error) ii = inputInfo;
-      }
-      if(edit != null) tabs.setSelectedComponent(edit);
+      edit = open(file, error, true);
+      // only update error information if file was not already opened
+      if(ea == null && error) ii = inputInfo;
+    } else {
+      edit = ea;
     }
+    // no editor available, no input info
     if(edit == null || ii == null) return;
 
-    // mark and jump to error position
+    // mark error, jump to error position
     final int ep = pos(edit.last, ii.line(), ii.column());
     edit.error(ep);
     if(jump) {
       edit.setCaret(ep);
       posCode.invokeLater();
+      // open file in project view if it's visible and if new file was opened
+      if(ea == null && project.getWidth() != 0) project.jumpTo(edit.file(), false);
     }
   }
 
@@ -930,12 +934,11 @@ public final class EditorView extends View {
   /**
    * Finds the editor that contains the specified file.
    * @param file file to be found
-   * @param opened considers only opened files
    * @return editor
    */
-  private EditorArea find(final IO file, final boolean opened) {
+  private EditorArea find(final IO file) {
     for(final EditorArea edit : editors()) {
-      if(edit.file().eq(file) && (!opened || edit.opened())) return edit;
+      if(edit.file().eq(file)) return edit;
     }
     return null;
   }

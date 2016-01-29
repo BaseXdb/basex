@@ -212,7 +212,7 @@ public final class EditorArea extends TextPanel {
 
   /**
    * Jumps to the specified string.
-   * @param string search string
+   * @param string search string (ignored if empty)
    */
   public void jump(final String string) {
     if(string.isEmpty()) {
@@ -222,7 +222,6 @@ public final class EditorArea extends TextPanel {
       search.activate(string, false);
       jump(SearchDir.CURRENT, true);
     }
-    requestFocusInWindow();
   }
 
   /**

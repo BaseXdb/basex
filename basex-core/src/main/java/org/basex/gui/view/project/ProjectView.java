@@ -217,11 +217,12 @@ public final class ProjectView extends BaseXPanel {
   /**
    * Jumps to the specified file.
    * @param file file to be focused
+   * @param focus focus tree
    */
-  public void jumpTo(final IOFile file) {
+  public void jumpTo(final IOFile file, final boolean focus) {
     final IOFile fl = file.normalize();
     if(fl.path().startsWith(root.file.path())) tree.expand(root, fl.path());
-    tree.requestFocusInWindow();
+    if(focus) tree.requestFocusInWindow();
   }
 
   /**
@@ -304,13 +305,7 @@ public final class ProjectView extends BaseXPanel {
    */
   void open(final IOFile file, final String search) {
     final EditorArea ea = gui.editor.open(file);
-    if(ea == null) return;
-    SwingUtilities.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        ea.jump(search);
-      }
-    });
+    if(ea != null) ea.jump(search);
   }
 
   /**

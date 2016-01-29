@@ -224,8 +224,9 @@ public final class SearchBar extends BaseXBack {
   }
 
   /**
-   * Activates the search bar.
-   * @param string search string; triggers a new search if it differs from old string.
+   * Activates the search bar. A new search is triggered if the new seaerch term differs from
+   * the last one.
+   * @param string search string (ignored if empty)
    * @param focus indicates if the search field should be focused
    */
   public void activate(final String string, final boolean focus) {
