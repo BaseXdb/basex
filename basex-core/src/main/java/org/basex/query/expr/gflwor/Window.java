@@ -50,7 +50,7 @@ public final class Window extends Clause {
    * @param expr sequence
    * @param start start condition
    * @param only {@code only} flag
-   * @param end end condition
+   * @param end end condition (can be {@code null})
    * @throws QueryException query exception
    */
   public Window(final InputInfo info, final boolean sliding, final Var var, final Expr expr,
@@ -338,7 +338,9 @@ public final class Window extends Clause {
 
   @Override
   public void checkUp() throws QueryException {
-    checkNoneUp(expr, start, end);
+    checkNoUp(expr);
+    checkNoUp(start);
+    checkNoUp(end);
   }
 
   @Override

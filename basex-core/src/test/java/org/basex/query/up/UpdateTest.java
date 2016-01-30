@@ -1219,4 +1219,16 @@ public final class UpdateTest extends AdvancedQueryTest {
     query("declare %updating function local:f() as empty-sequence() {delete node <a/>};local:f()");
     query("updating function() as empty-sequence() {delete node <a/>}()");
   }
+
+  /**
+   * Window clauses.
+   */
+  @Test
+  public void window() {
+    query("for tumbling window $w in 1 start when true() return db:output($w)", "1");
+    query("for sliding window $w in 1 start when true() end when true() return db:output($w)", "1");
+    error("for tumbling window $w in 1 start when delete node <a/> return ()", UPNOT_X);
+    error("for tumbling window $w in 1 start when () end when delete node <a/> return ()", UPNOT_X);
+    error("for tumbling window $w in db:output(1) start when () return ()", UPNOT_X);
+  }
 }
