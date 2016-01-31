@@ -1,0 +1,13 @@
+**/.gitignore
+**/*.bat
+.git
+basex-examples
+basex-tests
+basex-api
+!basex-api/.classpath
+!basex-api/etc
+!basex-api/lib
+!basex-api/license.txt
+!basex-api/pom.xml
+!basex-api/src/main/java
+!basex-api/src/main/resources
