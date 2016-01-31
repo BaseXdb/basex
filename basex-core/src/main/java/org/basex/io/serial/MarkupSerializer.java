@@ -12,6 +12,7 @@ import org.basex.query.*;
 import org.basex.query.util.ft.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.http.*;
@@ -280,7 +281,7 @@ abstract class MarkupSerializer extends StandardSerializer {
 
   @Override
   protected boolean ignore(final ANode node) {
-    if(ct > 0 && eq(node.name(), META)) {
+    if(ct > 0 && node.type == NodeType.ELM && eq(node.name(), META)) {
       final byte[] value = node.attribute(HTTPEQUIV);
       if(value != null && eq(trim(value), CONTENT_TYPE)) return true;
     }
