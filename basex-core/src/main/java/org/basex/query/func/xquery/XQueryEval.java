@@ -82,7 +82,7 @@ public class XQueryEval extends StandardFunc {
         final Options opts = toOptions(2, Q_OPTIONS, new XQueryOptions(), qc);
         final Perm perm = Perm.get(opts.get(XQueryOptions.PERMISSION).toString());
         if(!user.has(perm)) throw BXXQ_PERM2_X.get(info, perm);
-        user.perm(perm, "");
+        user.perm(perm);
 
         // initial memory consumption: perform garbage collection and calculate usage
         final long mb = opts.get(XQueryOptions.MEMORY);

@@ -282,11 +282,11 @@ public enum QueryError {
   // User Module
 
   /** User error. */
-  USER_NAME_X(USER, "name", "Invalid user name: %."),
+  USER_NAME_X(USER, "name", "Invalid user name: '%'."),
   /** User error. */
-  USER_PATTERN_X(USER, "pattern", "Invalid database pattern: %."),
+  USER_PATTERN_X(USER, "pattern", "Invalid database pattern: '%'."),
   /** User error. */
-  USER_PERMISSION_X(USER, "permission", "Invalid permission: %."),
+  USER_PERMISSION_X(USER, "permission", "Invalid permission: '%'."),
   /** User error. */
   USER_UNKNOWN_X(USER, "unknown", "User '%' does not exist."),
   /** User error. */
@@ -300,7 +300,9 @@ public enum QueryError {
   /** User error. */
   USER_UPDATE_X_X(USER, "update", "User '%' can only be % once."),
   /** User error. */
-  USER_UPDATE_X_X_X(USER, "update", "Pattern '%' of user '%' can only be % once."),
+  USER_SAMEPAT_X(USER, "update", "Pattern '%' is specified more than once."),
+  /** User error. */
+  USER_SAMEPERM_X_X(USER, "update", "User '%' can only be % once."),
   /** User error. */
   USER_CONFLICT_X(USER, "conflict", "User '%' cannot be both altered and dropped."),
 

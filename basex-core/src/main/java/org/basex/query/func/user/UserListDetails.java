@@ -32,7 +32,7 @@ public final class UserListDetails extends UserList {
     for(final User us : qc.context.users.users(null)) {
       if(u != null && u != us) continue;
 
-      final String perm = us.perm(null).toString();
+      final String perm = us.perm((String) null).toString();
       final FElem user = new FElem(USER).add(NAME, us.name()).add(PERMISSION, perm);
       for(final Entry<Algorithm, EnumMap<Code, String>> codes : us.alg().entrySet()) {
         final FElem password = new FElem(PASSWORD).add(ALGORITHM, codes.getKey().toString());

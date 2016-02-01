@@ -34,13 +34,13 @@ public final class UserPassword extends UserFn {
      */
     private Password(final User user, final String pw, final InputInfo info,
         final QueryContext qc) {
-      super(UpdateType.USERPASSWORD, user, "", qc, info);
+      super(UpdateType.USERPASSWORD, user, qc, info);
       this.pw = pw;
     }
 
     @Override
     public void apply() {
-      users.password(user, pw);
+      user.password(pw);
     }
 
     @Override

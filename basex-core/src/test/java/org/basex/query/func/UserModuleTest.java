@@ -75,8 +75,9 @@ public final class UserModuleTest extends AdvancedQueryTest {
   @Test public void create() {
     // allow empty passwords, overwriting existing users
     query(_USER_CREATE.args(NAME, ""));
-    // specify permission
+    // specify permissions
     query(_USER_CREATE.args(NAME, NAME, Perm.ADMIN));
+    query(_USER_CREATE.args(NAME, NAME, "('admin','none')", "('','x')"));
 
     // invalid permission
     error(_USER_CREATE.args(NAME, NAME, ""), USER_PERMISSION_X);
@@ -88,18 +89,24 @@ public final class UserModuleTest extends AdvancedQueryTest {
 
     // redundant operations
     error(_USER_CREATE.args(NAME, "") + ',' + _USER_CREATE.args(NAME, ""), USER_UPDATE_X_X);
+    error(_USER_CREATE.args(NAME, "", "('admin','admin')", "('','')"), USER_SAMEPERM_X_X);
+    error(_USER_CREATE.args(NAME, "", "('admin','admin')", "('x','x')"), USER_SAMEPAT_X);
   }
 
   /** Test method. */
   @Test public void grant() {
     // change global and local permission
     query(_USER_GRANT.args(NAME, Perm.READ));
+    query(_USER_GRANT.args(NAME, Perm.READ, ""));
     query(_USER_GRANT.args(NAME, Perm.WRITE, NAME));
 
     // check permissions
     query(_USER_LIST_DETAILS.args() + "[@name = '" + NAME + "']/@permission/string()", "read");
     query(_USER_LIST_DETAILS.args() + "/database[@pattern = '" + NAME + "']/@permission/string()",
         "write");
+
+    // grant list of permissions
+    query(_USER_GRANT.args(NAME, "('admin','none')", "('','x')"));
 
     // admin permission can only be set globally
     error(_USER_GRANT.args(NAME, Perm.ADMIN, NAME), USER_LOCAL);
@@ -110,14 +117,14 @@ public final class UserModuleTest extends AdvancedQueryTest {
     // invalid names and permissions
     error(_USER_GRANT.args("", Perm.ADMIN), USER_NAME_X);
     error(_USER_GRANT.args("", Perm.ADMIN, NAME), USER_NAME_X);
-    error(_USER_GRANT.args(NAME, Perm.ADMIN, ""), USER_PATTERN_X);
+    error(_USER_GRANT.args(NAME, Perm.ADMIN, ";"), USER_PATTERN_X);
     error(_USER_GRANT.args(NAME, "x"), USER_PERMISSION_X);
 
     // redundant operations
     error(_USER_GRANT.args(NAME, Perm.READ) + ',' + _USER_GRANT.args(NAME, Perm.WRITE),
         USER_UPDATE_X_X);
     error(_USER_GRANT.args(NAME, Perm.READ, 'x') + ',' + _USER_GRANT.args(NAME, Perm.WRITE, 'x'),
-        USER_UPDATE_X_X_X);
+        USER_SAMEPAT_X);
   }
 
   /** Test method. */
@@ -126,11 +133,14 @@ public final class UserModuleTest extends AdvancedQueryTest {
     query(_USER_DROP.args(NAME, NAME));
     query(_USER_LIST_DETAILS.args() + "/database/@pattern = '" + NAME + '\'', "false");
 
+    // drop list of permissions
+    query(_USER_DROP.args(NAME, "('x','y')"));
+
     // invalid database pattern
-    error(_USER_DROP.args(NAME, ""), USER_PATTERN_X);
+    error(_USER_DROP.args(NAME, ";"), USER_PATTERN_X);
     // redundant operations
     error(_USER_DROP.args(NAME) + ',' + _USER_DROP.args(NAME), USER_UPDATE_X_X);
-    error(_USER_DROP.args(NAME, 'x') + ',' + _USER_DROP.args(NAME, 'x'), USER_UPDATE_X_X_X);
+    error(_USER_DROP.args(NAME, 'x') + ',' + _USER_DROP.args(NAME, 'x'), USER_SAMEPAT_X);
     error(_USER_DROP.args(NAME) + ',' + _USER_ALTER.args(NAME, "X"), USER_CONFLICT_X);
 
     // drop user
@@ -140,6 +150,7 @@ public final class UserModuleTest extends AdvancedQueryTest {
     // admin cannot be modified
     error(_USER_DROP.args(UserText.ADMIN), USER_ADMIN);
     // invalid name
+    error(_USER_DROP.args(NAME, ""), USER_UNKNOWN_X);
     error(_USER_DROP.args(""), USER_NAME_X);
     error(_USER_DROP.args("", NAME), USER_NAME_X);
   }

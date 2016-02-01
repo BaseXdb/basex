@@ -5,7 +5,6 @@ import static org.basex.query.QueryError.*;
 import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Update that operates on a global user.
@@ -18,30 +17,26 @@ public abstract class UserUpdate extends Update {
   protected final Users users;
   /** User. */
   protected final User user;
-  /** Database patterns. */
-  protected final StringList patterns = new StringList();
 
   /**
    * Constructor.
    * @param type type of this operation
    * @param user user
    * @param qc query context
-   * @param pattern pattern
    * @param info input info
    */
-  public UserUpdate(final UpdateType type, final User user, final String pattern,
-      final QueryContext qc, final InputInfo info) {
+  public UserUpdate(final UpdateType type, final User user, final QueryContext qc,
+      final InputInfo info) {
     super(type, info);
     this.user = user;
     users = qc.context.users;
-    patterns.add(pattern);
   }
 
   /**
    * Returns the name of the database.
    * @return name
    */
-  public String name() {
+  public final String name() {
     return user.name();
   }
 
@@ -62,12 +57,8 @@ public abstract class UserUpdate extends Update {
   }
 
   @Override
-  public final void merge(final Update update) throws QueryException {
-    final String db = ((UserUpdate) update).patterns.get(0);
-    if(patterns.contains(db)) {
-      if(db.isEmpty()) throw USER_UPDATE_X_X.get(info, name(), operation());
-      throw USER_UPDATE_X_X_X.get(info, db, name(), operation());
-    }
-    patterns.add(db);
+  public void merge(final Update update) throws QueryException {
+    final UserUpdate up = (UserUpdate) update;
+    if(user.equals(up.user)) throw USER_UPDATE_X_X.get(info, user, operation());
   }
 }

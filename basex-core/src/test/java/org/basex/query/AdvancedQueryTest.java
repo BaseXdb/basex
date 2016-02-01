@@ -72,10 +72,10 @@ public abstract class AdvancedQueryTest extends SandboxTest {
   protected static void error(final String query, final QueryError... error) {
     try {
       final String res = eval(query);
-      final StringBuilder sb = new StringBuilder("Query did not fail:\n");
-      sb.append(query).append("\n[E]");
-      for(final QueryError e : error) sb.append(' ').append(e);
-      fail(sb.append("\n[F] ").append(res).toString());
+      final TokenBuilder tb = new TokenBuilder("Query did not fail:\n");
+      tb.add(query).add("\n[E] Error: ");
+      for(final QueryError e : error) tb.add(' ').add(e.qname().prefixId());
+      fail(tb.add("\n[F] ").add(res).toString());
     } catch(final QueryIOException ex) {
       check(query, ex.getCause(), error);
     } catch(final QueryException ex) {

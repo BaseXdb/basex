@@ -1209,13 +1209,13 @@ public enum Function {
   _USER_LIST_DETAILS(UserListDetails.class, "list-details([name])",
       arg(STR), ELM_ZM, flag(NDT), USER_URI),
   /** XQuery function. */
-  _USER_CREATE(UserCreate.class, "create(name,password[,permission])",
-      arg(STR, STR, STR), EMP, flag(UPD), USER_URI),
+  _USER_CREATE(UserCreate.class, "create(name,password[,permissions[,patterns]])",
+      arg(STR, STR, STR_ZM, STR_ZM), EMP, flag(UPD), USER_URI),
   /** XQuery function. */
-  _USER_GRANT(UserGrant.class, "grant(name,permission[,pattern])",
-      arg(STR, STR, STR), EMP, flag(UPD), USER_URI),
+  _USER_GRANT(UserGrant.class, "grant(name,permissions[,patterns])",
+      arg(STR, STR_ZM, STR_ZM), EMP, flag(UPD), USER_URI),
   /** XQuery function. */
-  _USER_DROP(UserDrop.class, "drop(name[,pattern])", arg(STR, STR), EMP, flag(UPD), USER_URI),
+  _USER_DROP(UserDrop.class, "drop(name[,patterns])", arg(STR, STR_ZM), EMP, flag(UPD), USER_URI),
   /** XQuery function. */
   _USER_ALTER(UserAlter.class, "alter(name,newname)", arg(STR, STR), EMP, flag(UPD), USER_URI),
   /** XQuery function. */
