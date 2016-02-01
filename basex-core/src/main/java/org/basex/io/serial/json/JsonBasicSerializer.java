@@ -97,7 +97,7 @@ public final class JsonBasicSerializer extends JsonSerializer {
         if(value == null) throw error("Element '%' has no value.", type);
         final Boolean b = Bln.parse(value);
         if(b == null) throw error("Element '%' has invalid value: '%'.", type, value);
-        out.print(norm(Token.token(b.booleanValue())));
+        out.print(norm(token(b.booleanValue())));
       } else if(eq(type, STRING)) {
         final byte[] value = value(iter, type);
         out.print('"');
@@ -241,7 +241,7 @@ public final class JsonBasicSerializer extends JsonSerializer {
 
     final ByteList bl = new ByteList();
     for(final byte c : value) {
-      if(c >= 0 && c < 32 || c >= 128 && c <= 160) {
+      if(c >= 0 && c < 32 || c >= 128) {
         bl.add('\\');
         if(c == '\b') bl.add('b');
         else if(c == '\f') bl.add('f');

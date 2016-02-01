@@ -12,6 +12,7 @@ import java.util.*;
 import java.util.Map.*;
 
 import javax.swing.*;
+import javax.swing.Timer;
 
 import org.basex.core.*;
 import org.basex.gui.*;
@@ -752,7 +753,7 @@ public class TextPanel extends BaseXPanel {
   }
 
   /** Text caret. */
-  private final javax.swing.Timer caretTimer = new javax.swing.Timer(500, new ActionListener() {
+  private final Timer caretTimer = new Timer(500, new ActionListener() {
     @Override
     public void actionPerformed(final ActionEvent e) {
       rend.caret(!rend.caret());

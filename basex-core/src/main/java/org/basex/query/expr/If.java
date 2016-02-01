@@ -48,14 +48,12 @@ public final class If extends Arr {
     cond = cond.compile(qc, scp);
     // choose branches to compile
     final int[] branches = cond.isValue() ? new int[] { branch(qc) } : new int[] { 0, 1 };
-    final int bl = branches.length;
-    for(int b = 0; b < bl; b++) {
-      final int e = branches[b];
+    for(final int b : branches) {
       try {
-        exprs[e] = exprs[e].compile(qc, scp);
-      } catch(final QueryException ex) {
+        exprs[b] = exprs[b].compile(qc, scp);
+      } catch (final QueryException ex) {
         // replace original expression with error
-        exprs[e] = FnError.get(ex, seqType);
+        exprs[b] = FnError.get(ex, seqType);
       }
     }
     return optimize(qc, scp);

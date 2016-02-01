@@ -116,10 +116,10 @@ public final class Zip extends Proc {
   }
 
   /**
-   * Returns the contents of the specified entry or {@code null}.
+   * Returns the contents of the specified entry.
    * @param in input stream
    * @param entry entry to be found
-   * @return entry
+   * @return entry, or {@code null} if it is not found
    * @throws IOException I/O exception
    */
   private static byte[] getEntry(final ZipInputStream in, final String entry) throws IOException {

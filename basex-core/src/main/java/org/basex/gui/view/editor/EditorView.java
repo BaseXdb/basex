@@ -788,7 +788,7 @@ public final class EditorView extends View {
     if(path == null) return;
 
     final IOFile file = new IOFile(path);
-    EditorArea ea = find(file);
+    final EditorArea ea = find(file);
     final EditorArea edit;
     if(jump) {
       edit = open(file, error, true);

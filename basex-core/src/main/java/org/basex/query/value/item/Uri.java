@@ -6,6 +6,7 @@ import java.net.*;
 
 import org.basex.query.*;
 import org.basex.query.util.*;
+import org.basex.query.util.UriParser.ParsedUri;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -19,7 +20,7 @@ public final class Uri extends AStr {
   /** Empty URI. */
   public static final Uri EMPTY = new Uri(Token.EMPTY);
   /** Parsed URI (lazy instantiation). */
-  private UriParser.ParsedUri pUri;
+  private ParsedUri pUri;
 
   /**
    * Constructor.
@@ -120,7 +121,7 @@ public final class Uri extends AStr {
    * Caches and returns a parsed URI representation.
    * @return parsed uri
    */
-  private UriParser.ParsedUri parsed() {
+  private ParsedUri parsed() {
     if(pUri == null) pUri = UriParser.parse(Token.string(Token.uri(value, true)));
     return pUri;
   }

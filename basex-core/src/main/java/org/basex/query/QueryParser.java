@@ -1746,9 +1746,7 @@ public class QueryParser extends InputParser {
       enclosedExpr();
       throw error(IMPLVAL);
     }
-
     pos = i;
-    return;
   }
 
   /**

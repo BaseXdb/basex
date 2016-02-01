@@ -114,13 +114,13 @@ public final class DbListDetails extends DbList {
   }
 
   /**
-   * Create a <code>&lt;resource/&gt;</code> node.
+   * Create a {@code &lt;resource/&gt;} node.
    * @param path path
    * @param raw is the resource a raw file
    * @param size size
    * @param type media type
    * @param mdate modified date
-   * @return <code>&lt;resource/&gt;</code> node
+   * @return {@code &lt;resource/&gt;} node
    */
   private static FNode resource(final byte[] path, final boolean raw, final long size,
       final MediaType type, final long mdate) {

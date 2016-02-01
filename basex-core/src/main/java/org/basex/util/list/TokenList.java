@@ -140,7 +140,7 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
   /**
    * Returns the element at the specified position.
    * @param index index of the element to return
-   * @return element
+   * @return element, or {@code null} if index exceeds length of list
    */
   public byte[] get(final int index) {
     return index < list.length ? list[index] : null;

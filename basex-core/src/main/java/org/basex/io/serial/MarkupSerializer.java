@@ -266,7 +266,7 @@ abstract class MarkupSerializer extends StandardSerializer {
       try {
         out.print(cp);
       } catch(final QueryIOException ex) {
-        if(ex.getCause().error() == QueryError.SERENC_X_X) printHex(cp);
+        if(ex.getCause().error() == SERENC_X_X) printHex(cp);
         else throw ex;
       }
     }

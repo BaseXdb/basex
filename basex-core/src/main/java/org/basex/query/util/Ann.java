@@ -66,7 +66,7 @@ public final class Ann {
   @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder().add('%');
-    tb.add(sig == null ? name.prefixId(XQ_URI) : sig.id());
+    tb.add(sig != null ? sig.id() : name.prefixId(XQ_URI));
     if(args.length != 0) tb.add('(').addSep(args, SEP).add(')');
     return tb.add(' ').toString();
   }

@@ -69,7 +69,7 @@ public final class ModuleLoader {
     // add Java repository package
     final String repoPath = context.soptions.get(StaticOptions.REPOPATH);
     final boolean java = uri.startsWith(JAVAPREF);
-    String className;
+    final String className;
     if(java) {
       className = uri.substring(JAVAPREF.length());
     } else {

@@ -468,7 +468,9 @@ final class TextRenderer extends BaseXBack {
         g.drawLine(x + s, yy, xe, yy);
         g.drawLine(xe - as, yy - as, xe, yy);
         g.drawLine(xe - as, yy + as, xe, yy);
-      } else if(ch > ' ' && ch < TokenBuilder.PRIVATE_START || ch > TokenBuilder.PRIVATE_END) {
+      } else if(ch >= TokenBuilder.PRIVATE_START && ch <= TokenBuilder.PRIVATE_END) {
+        g.setFont(font);
+      } else if(ch > ' ') {
         g.setColor(color);
         String n = iter.nextString();
         int ww = width - x;
@@ -481,8 +483,6 @@ final class TextRenderer extends BaseXBack {
           n = n.substring(0, c);
         }
         g.drawString(n, x, y);
-      } else if(ch >= TokenBuilder.PRIVATE_START && ch <= TokenBuilder.PRIVATE_END) {
-        g.setFont(font);
       }
 
       // underline linked text

@@ -4,8 +4,6 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
-import org.basex.util.*;
-
 /**
  * This class is a stream-wrapper for textual data encoded in UTF8.
  *
@@ -68,11 +66,6 @@ public class PrintOutput extends OutputStream {
     if(size++ < max) os.write(b);
   }
 
-  @Override
-  public void write(final byte[] b) throws IOException {
-    super.write(b);
-  }
-
   /**
    * Prints a single codepoint.
    * @param cp codepoint to be printed
@@ -112,7 +105,7 @@ public class PrintOutput extends OutputStream {
    * @throws IOException I/O exception
    */
   public void print(final String string) throws IOException {
-    print(Token.token(string));
+    print(token(string));
   }
 
   /**

@@ -36,7 +36,7 @@ public class DbTextRange extends DbAccess {
     final byte[] min = toToken(exprs[1], qc);
     final byte[] max = toToken(exprs[2], qc);
 
-    if(!(type == IndexType.TEXT ? data.meta.textindex : data.meta.attrindex))
+    if(type == IndexType.TEXT ? !data.meta.textindex : !data.meta.attrindex)
       throw BXDB_INDEX_X.get(info, data.meta.name, type);
 
     final StringRange sr = new StringRange(type, min, true, max, true);

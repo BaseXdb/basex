@@ -108,7 +108,7 @@ final class TreeNodeCache implements TreeConstants {
   /**
    * Finds pre value in cached nodes and returns level and index position.
    * @param pre pre value
-   * @return level and position pair
+   * @return level and position pair, or {@code null} if it is not available
    */
   private int[] findPre(final int pre) {
     int pos = -1;

@@ -160,7 +160,7 @@ public final class FuncOptions {
    * @return name with resolved QNames
    */
   private static byte[] resolve(final ANode elem, final byte[] value) {
-    if(!Token.contains(value, ':')) return value;
+    if(!contains(value, ':')) return value;
 
     final TokenBuilder tb = new TokenBuilder();
     for(final byte[] name : split(normalize(value), ' ')) {

@@ -40,7 +40,7 @@ public class IndexTree {
    * @param type index type
    */
   public IndexTree(final IndexType type) {
-    this.tokenize = type == IndexType.TOKEN;
+    tokenize = type == IndexType.TOKEN;
   }
 
   /**

@@ -601,12 +601,12 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
     } else {
       final long midOff = from <= leftSize ? 0 : from - leftSize;
       slice = middle.slice(midOff, inMiddle);
-      if(!slice.isTree()) {
+      if(slice.isTree()) {
+        mid = slice.getTree();
+      } else {
         final NodeLike<N, E> sub = ((PartialInnerNode<N, E>) slice.getPartial()).sub;
         inBuffer = sub.append(buffer, inBuffer);
         mid = EmptyTree.getInstance();
-      } else {
-        mid = slice.getTree();
       }
     }
 

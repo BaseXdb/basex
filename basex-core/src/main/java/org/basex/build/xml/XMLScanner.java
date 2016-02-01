@@ -44,8 +44,6 @@ final class XMLScanner extends Proc {
 
   /** Character buffer for the current token. */
   final TokenBuilder token = new TokenBuilder();
-  /** Document encoding. */
-  final String encoding;
   /** Current token type. */
   Type type;
 
@@ -108,8 +106,6 @@ final class XMLScanner extends Proc {
           prev(5);
         }
       }
-      encoding = enc == null ? Strings.UTF8 : enc;
-
       if(!fragment) {
         final int n = consume();
         if(!s(n)) {

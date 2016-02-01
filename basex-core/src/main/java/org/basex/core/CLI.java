@@ -26,7 +26,7 @@ public abstract class CLI extends Main {
   protected boolean verbose;
 
   /** Password reader. */
-  private final PasswordReader pwReader = new PasswordReader() {
+  private static final PasswordReader PWREADER = new PasswordReader() {
     @Override
     public String password() {
       Util.out(PASSWORD + COLS);
@@ -71,7 +71,7 @@ public abstract class CLI extends Main {
    * @throws IOException database exception
    */
   protected final void execute(final String in) throws IOException {
-    execute(new CommandParser(in, context).pwReader(pwReader));
+    execute(new CommandParser(in, context).pwReader(PWREADER));
   }
 
   /**

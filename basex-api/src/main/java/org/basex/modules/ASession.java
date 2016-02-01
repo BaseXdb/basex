@@ -21,9 +21,9 @@ import org.basex.util.list.*;
  */
 final class ASession {
   /** Query context. */
-  private QueryContext qc;
+  private final QueryContext qc;
   /** Session. */
-  private HttpSession session;
+  private final HttpSession session;
 
   /**
    * Constructor.

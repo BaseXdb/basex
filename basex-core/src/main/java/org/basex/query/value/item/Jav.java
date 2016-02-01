@@ -45,7 +45,7 @@ public final class Jav extends Item {
   }
 
   @Override
-  public boolean sameKey(final Item it, final InputInfo ii) throws QueryException {
+  public boolean sameKey(final Item it, final InputInfo ii) {
     return false;
   }
 

@@ -150,9 +150,9 @@ public final class Num {
   public static String toString(final byte[] num) {
     final StringBuilder sb = new StringBuilder();
     final int pos = size(num);
-    for(int ip = 4; ip < pos; ip += Num.length(num, ip)) {
+    for(int ip = 4; ip < pos; ip += length(num, ip)) {
       if(ip > 4) sb.append(',');
-      sb.append(Num.get(num, ip));
+      sb.append(get(num, ip));
     }
     return sb.toString();
   }

@@ -82,12 +82,10 @@ public final class BaseXClientTest extends BaseXTest {
    */
   private static String run(final String[] args, final String[] sargs) throws IOException {
     final BaseXServer server = createServer(sargs);
-    final ArrayOutput ao = new ArrayOutput();
-    System.setOut(new PrintStream(ao));
-
     final StringList sl = new StringList(
         "-p" + DB_PORT, "-U" + UserText.ADMIN, "-P" + UserText.ADMIN).add(args);
-    try {
+    try(final ArrayOutput ao = new ArrayOutput()) {
+      System.setOut(new PrintStream(ao));
       new BaseXClient(sl.finish());
       return ao.toString();
     } finally {

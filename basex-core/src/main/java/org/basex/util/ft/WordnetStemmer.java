@@ -108,8 +108,7 @@ final class WordnetStemmer extends Stemmer {
   @Override
   protected byte[] stem(final byte[] word) {
     @SuppressWarnings("unchecked")
-    final List<String> l = (List<String>)
-      Reflect.invoke(FIND_STEMS, stemmer, string(word));
+    final List<String> l = (List<String>) Reflect.invoke(FIND_STEMS, stemmer, string(word));
     final byte[] result = l.isEmpty() ? word : token(l.get(0));
     return result.length == 0 ? word : result;
   }

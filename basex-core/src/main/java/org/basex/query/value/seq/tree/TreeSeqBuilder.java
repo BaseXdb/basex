@@ -251,11 +251,9 @@ public final class TreeSeqBuilder implements Iterable<Item> {
         }
 
         if(pos == 0) {
-          if(tree != null) {
-            if(sub == null) sub = tree.iterator();
-            if(sub.hasNext()) return sub.next();
-            sub = null;
-          }
+          if(sub == null) sub = tree.iterator();
+          if(sub.hasNext()) return sub.next();
+          sub = null;
           pos++;
         }
 

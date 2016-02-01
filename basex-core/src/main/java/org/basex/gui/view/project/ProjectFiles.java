@@ -20,14 +20,15 @@ import org.basex.util.list.*;
 final class ProjectFiles {
   /** Maximum number of filtered hits (speeds up search). */
   private static final int MAXHITS = 256;
+  /** Parse id. */
+  private static long parseId;
+  /** Filter id. */
+  private static long filterId;
+
   /** Files with errors. */
   private TreeMap<String, InputInfo> errors = new TreeMap<>();
   /** Current file cache (can be {@code null}). */
   private ProjectCache cache;
-  /** Filter id. */
-  private long filterId;
-  /** Parse id. */
-  private long parseId;
 
   /**
    * Returns the current file cache.
@@ -82,8 +83,9 @@ final class ProjectFiles {
    */
   void reset() {
     cache = null;
-    filterId = 0;
-    parseId = 0;
+    // stop existing operations
+    ++filterId;
+    ++parseId;
   }
 
   /**
@@ -155,7 +157,11 @@ final class ProjectFiles {
 
     // parse modules
     for(final String path : mods) {
-      if(id != parseId) throw new InterruptedException();
+      if(id != parseId) {
+        System.out.println(id + "/" + parseId);
+        throw new InterruptedException();
+      }
+      if(parsed.contains(path)) continue;
 
       final IOFile file = new IOFile(path);
       try(final TextInput ti = new TextInput(file)) {
@@ -163,7 +169,7 @@ final class ProjectFiles {
         try(final QueryContext qc = new QueryContext(ctx)) {
           final String input = ti.cache().toString();
           final boolean lib = QueryProcessor.isLibrary(input);
-          qc.parse(input, lib, file.path(), null);
+          qc.parse(input, lib, path, null);
           // parsing was successful: remember path
           parsed.add(path);
           for(final byte[] mod : qc.modParsed) parsed.add(Token.string(mod));

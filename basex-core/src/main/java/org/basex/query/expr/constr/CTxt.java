@@ -32,7 +32,7 @@ public final class CTxt extends CNode {
   }
 
   @Override
-  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+  public Expr optimize(final QueryContext qc, final VarScope scp) {
     return optPre(oneIsEmpty() ? null : this, qc);
   }
 

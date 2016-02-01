@@ -102,7 +102,7 @@ public final class DynFuncCall extends FuncCall {
         final Expr in = fe.inlineExpr(args, qc, scp, info);
         if(in != null) return in;
       }
-    } else if(f instanceof Item && !(f instanceof FItem)) {
+    } else if(f instanceof Item) {
       throw INVFUNCITEM_X_X.get(info, ((Item) f).type, f);
     }
     return this;

@@ -132,8 +132,8 @@ public final class ValueIndexTest extends SandboxTest {
    * @param tokens map of search tokens
    * @param options options to apply
    */
-  private void valueIndexTest(final IndexType indexType, final LinkedHashMap<String,
-      Integer> tokens, final Collection<Set> options) {
+  private static void valueIndexTest(final IndexType indexType, final LinkedHashMap<String,
+    Integer> tokens, final Collection<Set> options) {
     // set up environment
     for(final Set option : options) execute(option);
     execute(new CreateDB(NAME, FILE));

@@ -163,7 +163,7 @@ final class InnerNode<N, E> implements Node<Node<N, E>, E> {
       System.arraycopy(temp, ml, mid2, 0, ml - inR);
       System.arraycopy(ch, 0, mid2, ml - inR, inR);
       System.arraycopy(ch, inR, rs, 0, rl);
-      siblings[0] = left;
+      siblings[0] = null;
       siblings[1] = new InnerNode<>(mid1);
       siblings[2] = new InnerNode<>(mid2);
       siblings[3] = inR == 0 ? right : new InnerNode<>(rs);
@@ -283,7 +283,7 @@ final class InnerNode<N, E> implements Node<Node<N, E>, E> {
       final Node<N, E>[] rs = new Node[a + 1];
       rs[0] = single;
       System.arraycopy(ch, 0, rs, 1, a);
-      out[0] = left;
+      out[0] = null;
       out[2] = new InnerNode<>(rs);
       return out;
     }

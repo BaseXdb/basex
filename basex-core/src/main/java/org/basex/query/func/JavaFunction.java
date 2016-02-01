@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import java.lang.reflect.*;
+import java.lang.reflect.Array;
 import java.util.*;
 
 import javax.xml.datatype.*;
@@ -117,7 +118,7 @@ public abstract class JavaFunction extends Arr {
     if(!obj.getClass().isArray()) return new Jav(obj, qc);
 
     // empty array
-    final int s = java.lang.reflect.Array.getLength(obj);
+    final int s = Array.getLength(obj);
     if(s == 0) return Empty.SEQ;
     // string array
     if(obj instanceof String[]) {

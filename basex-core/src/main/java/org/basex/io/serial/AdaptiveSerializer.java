@@ -37,7 +37,7 @@ public class AdaptiveSerializer extends OutputSerializer {
     super(os, sopts);
     this.os = os;
 
-    sopts.set(SerializerOptions.OMIT_XML_DECLARATION, YesNo.YES);
+    sopts.set(OMIT_XML_DECLARATION, YesNo.YES);
     indent = sopts.yes(INDENT);
     itemsep("\n");
   }

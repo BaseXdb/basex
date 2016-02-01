@@ -96,8 +96,8 @@ public final class TableDiskAccess extends TableAccess {
     final IOFile table = MetaData.file(ctx.soptions.dbPath(db), DATATBL);
     if(!table.exists()) return false;
 
-    try(final RandomAccessFile file = new RandomAccessFile(table.file(), "rw")) {
-      return file.getChannel().tryLock() == null;
+    try(final FileChannel fc = new RandomAccessFile(table.file(), "rw").getChannel()) {
+      return fc.tryLock() == null;
     } catch(final IOException ex) {
       return true;
     }

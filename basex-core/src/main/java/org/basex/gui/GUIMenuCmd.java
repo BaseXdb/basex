@@ -145,7 +145,7 @@ public enum GUIMenuCmd implements GUICommand {
 
     @Override
     public boolean enabled(final GUI gui) {
-      final EditorArea ea = gui.editor == null ? null : gui.editor.getEditor();
+      final EditorArea ea = gui.editor.getEditor();
       return gui.gopts.get(GUIOptions.SHOWEDITOR) && ea != null && (ea.modified() || !ea.opened());
     }
   },

@@ -48,7 +48,7 @@ public abstract class OutputSerializer extends Serializer {
     indents = sopts.get(INDENTS);
     tab = sopts.yes(TABULATOR) ? '\t' : ' ';
 
-    encoding = Strings.normEncoding(sopts.get(SerializerOptions.ENCODING), true);
+    encoding = Strings.normEncoding(sopts.get(ENCODING), true);
     PrintOutput po;
     if(encoding == Strings.UTF8) {
       po = PrintOutput.get(os);
@@ -59,7 +59,7 @@ public abstract class OutputSerializer extends Serializer {
         throw SERENCODING_X.getIO(encoding);
       }
     }
-    final int limit = sopts.get(SerializerOptions.LIMIT);
+    final int limit = sopts.get(LIMIT);
     if(limit != -1) po.setLimit(limit);
 
     final byte[] nl = token(sopts.get(NEWLINE).newline());

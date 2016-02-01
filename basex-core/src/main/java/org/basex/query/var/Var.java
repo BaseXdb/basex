@@ -57,7 +57,7 @@ public final class Var extends ExprInfo {
     this.name = name;
     this.param = param;
     promote = param;
-    this.type = declType == null || declType.eq(SeqType.ITEM_ZM) ? null : declType;
+    type = declType == null || declType.eq(SeqType.ITEM_ZM) ? null : declType;
     seqType = SeqType.ITEM_ZM;
     id = qc.varIDs++;
     size = seqType.occ();

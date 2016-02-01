@@ -30,7 +30,7 @@ public final class VarContext {
    * @param queryParser TODO
    */
   VarContext(final QueryParser queryParser, final HashMap<Var, Expr> bindings) {
-    this.parser = queryParser;
+    parser = queryParser;
     this.bindings = bindings;
     scope = new VarScope(parser.sc);
   }

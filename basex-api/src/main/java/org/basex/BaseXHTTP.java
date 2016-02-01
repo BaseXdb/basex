@@ -387,9 +387,9 @@ public final class BaseXHTTP extends Main {
    * @return boolean success
    */
   private static boolean ping(final String host, final int port, final boolean ssl) {
-    try {
+    try(final InputStream is = new IOUrl((ssl ? "https://" : "http://") + host + ':' + port).
+      connection().getInputStream()) {
       // create connection
-      new IOUrl((ssl ? "https://" : "http://") + host + ':' + port).connection().getInputStream();
       return true;
     } catch(final FileNotFoundException | SSLHandshakeException ex) {
       // if page is not found, server is running

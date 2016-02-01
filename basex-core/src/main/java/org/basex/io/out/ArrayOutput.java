@@ -20,7 +20,7 @@ public final class ArrayOutput extends PrintOutput {
   private byte[] buffer = new byte[8];
 
   @Override
-  public void write(final int b) throws IOException {
+  public void write(final int b) {
     final int s = (int) size;
     if(s == max) return;
 

@@ -128,8 +128,8 @@ public abstract class IO {
    * <p>Returns a class instance for the specified location string. The type of the
    * returned instance depends on the string value:</p>
    * <ul>
-   * <li>{@link IOFile}: if the string starts with <code>file:</code>, or if it
-   *   does not contain the substring <code>://</code>, it is interpreted as
+   * <li>{@link IOFile}: if the string starts with {@code file:}, or if it
+   *   does not contain the substring {@code ://}, it is interpreted as
    *   local file instance</li>
    * <li>{@link IOUrl}: if it starts with a valid scheme, it is handled as URL</li>
    * <li>{@link IOContent}: otherwise, it is interpreted as XML fragment and internally

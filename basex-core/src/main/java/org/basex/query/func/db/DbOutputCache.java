@@ -18,7 +18,7 @@ public final class DbOutputCache extends StandardFunc {
   }
 
   @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
+  public Iter iter(final QueryContext qc) {
     return value(qc).iter();
   }
 }

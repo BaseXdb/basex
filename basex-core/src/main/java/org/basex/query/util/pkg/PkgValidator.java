@@ -117,7 +117,7 @@ public final class PkgValidator {
     if(dep.versions != null) {
       // get acceptable versions for secondary package/processor
       final HashSet<String> versList = new HashSet<>();
-      for(final String vers : Strings.split(dep.versions, ' ')) versList.add(vers);
+      Collections.addAll(versList, Strings.split(dep.versions, ' '));
       // check if any acceptable version is already installed
       for(final String v : versList) if(versions.contains(v)) return v;
     } else if(dep.semver != null) {
@@ -189,7 +189,7 @@ public final class PkgValidator {
     if(ids == null) return false;
 
     for(final String id : ids) {
-      if(id != null && !Pkg.name(id).equals(name)) {
+      if(id != null && !name(id).equals(name)) {
         // installed package is a different one, not just a different version of the current one
         final String pkgDir = repo.pkgDict().get(id).dir();
         final IO pkgDesc = new IOFile(repo.path(pkgDir), DESCRIPTOR);

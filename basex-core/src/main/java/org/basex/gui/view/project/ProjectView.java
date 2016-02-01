@@ -202,9 +202,11 @@ public final class ProjectView extends BaseXPanel {
       new GUIWorker<Boolean>() {
         @Override
         protected Boolean doInBackground() throws InterruptedException {
+          final Performance perf = new Performance();
           files.parse(root.file, gui.context);
           parsed = true;
-          return parsed;
+          gui.status.setText(PARSING_CC + perf.getTime());
+          return true;
         }
         @Override
         protected void done(final Boolean refresh) {

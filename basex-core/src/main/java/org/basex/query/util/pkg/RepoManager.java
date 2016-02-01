@@ -199,7 +199,7 @@ public final class RepoManager {
    * @param dir package directory
    * @param map map
    */
-  private void add(final String name, final String dir, final TreeMap<String, Pkg> map) {
+  private static void add(final String name, final String dir, final TreeMap<String, Pkg> map) {
     final Pkg pkg = new Pkg();
     pkg.name = name;
     pkg.dir(dir);

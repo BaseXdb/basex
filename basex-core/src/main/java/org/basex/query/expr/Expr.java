@@ -297,7 +297,7 @@ public abstract class Expr extends ExprInfo {
    * If the arguments of the called expression return a boolean anyway,
    * the expression will be simplified.</p>
    * <p>Example in {@link CmpV}:
-   * <code>if($x eq true())</code> is rewritten to <code>if($x)</code> if <code>$x</code>
+   * <code>if($x eq true())</code> is rewritten to <code>if($x)</code> if {@code $x}
    * is known to return a single boolean.</p>
    * @param qc query context
    * @param scp variable scope

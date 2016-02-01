@@ -40,12 +40,11 @@ public final class FTTest extends FTData {
   @Override
   protected String details() {
     final MainOptions opts = context.options;
-    final StringBuilder sb = new StringBuilder();
-    sb.append(toString(opts, MainOptions.FTINDEX)).append(';');
-    sb.append(toString(opts, MainOptions.STEMMING)).append(';');
-    sb.append(toString(opts, MainOptions.DIACRITICS)).append(';');
-    sb.append(toString(opts, MainOptions.CASESENS));
-    return sb.toString();
+    String sb = toString(opts, MainOptions.FTINDEX) + ';' +
+      toString(opts, MainOptions.STEMMING) + ';' +
+      toString(opts, MainOptions.DIACRITICS) + ';' +
+      toString(opts, MainOptions.CASESENS);
+    return sb;
   }
 
   /**

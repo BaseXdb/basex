@@ -280,7 +280,7 @@ public final class InfoView extends View implements LinkListener {
    * @param list list reference
    * @param tb token builder
    */
-  private void add(final String head, final StringList list, final TokenBuilder tb) {
+  private static void add(final String head, final StringList list, final TokenBuilder tb) {
     if(list.isEmpty()) return;
     tb.bold().add(head).norm().nline();
     for(final String s : list) tb.add(s).nline();

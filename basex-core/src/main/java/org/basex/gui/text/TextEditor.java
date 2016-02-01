@@ -588,7 +588,7 @@ public final class TextEditor {
     for(int i = s; i < e; i++) if(tmp[i] == '\n') l++;
 
     // collect lines to be sorted
-    TokenList tl = new TokenList(l);
+    final TokenList tl = new TokenList(l);
     final ByteList bl = new ByteList();
     for(int i = s; i < e; i++) {
       final byte ch = tmp[i];
@@ -644,7 +644,7 @@ public final class TextEditor {
    * @param column column position
    * @return sub string
    */
-  private byte[] sub(final byte[] token, final int column) {
+  private static byte[] sub(final byte[] token, final int column) {
     final int tl = token.length;
     int t = 0;
     for(int c = 0; t < tl && c < column; t += cl(token, t), c++);

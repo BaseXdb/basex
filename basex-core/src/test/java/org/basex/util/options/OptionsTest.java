@@ -54,7 +54,7 @@ public final class OptionsTest extends SandboxTest {
     final Boolean value = Boolean.FALSE;
     System.setProperty(Prop.DBPREFIX + name.name(), value.toString());
     try {
-      assertEquals(value, new MainOptions().get(name));
+      assertEquals(false, new MainOptions().get(name));
     } finally {
       System.clearProperty(Prop.DBPREFIX + name.name());
     }
