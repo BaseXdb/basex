@@ -15,7 +15,6 @@ import org.basex.index.value.*;
 import org.basex.io.*;
 import org.basex.io.random.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -502,16 +501,16 @@ public abstract class Data {
       if(kind == ATTR) {
         // delete old values from attribute indexes
         if(meta.updindex) {
-          if(meta.attrindex) attrIndex.delete(cache(pre, IndexType.ATTRIBUTE));
-          if(meta.tokenindex) tokenIndex.delete(cache(pre, IndexType.TOKEN));
+          if(meta.attrindex) attrIndex.delete(new ValueCache(pre, IndexType.ATTRIBUTE, this));
+          if(meta.tokenindex) tokenIndex.delete(new ValueCache(pre, IndexType.TOKEN, this));
         }
         table.write1(pre, 11, uriId);
         table.write2(pre, 1, attrNames.index(name, null, false));
         if(nsFlag) table.write2(nsPre, 1, 1 << 15 | nameId(nsPre));
         // add new values to attribute indexes
         if(meta.updindex) {
-          if(meta.attrindex) attrIndex.add(cache(pre, IndexType.ATTRIBUTE));
-          if(meta.tokenindex) tokenIndex.add(cache(pre, IndexType.TOKEN));
+          if(meta.attrindex) attrIndex.add(new ValueCache(pre, IndexType.ATTRIBUTE, this));
+          if(meta.tokenindex) tokenIndex.add(new ValueCache(pre, IndexType.TOKEN, this));
         }
 
       } else {
@@ -523,12 +522,12 @@ public abstract class Data {
           for(int curr = pre + attSize(pre, kind); curr < last; curr += size(curr, kind(curr))) {
             if(kind(curr) == TEXT) pres.add(curr);
           }
-          textIndex.delete(cache(pres, IndexType.TEXT));
+          textIndex.delete(new ValueCache(pres, IndexType.TEXT, this));
         }
         table.write1(pre, 3, uriId);
         final int nameId = elemNames.index(name, null, false);
         table.write2(nsPre, 1, (nsFlag || nsFlag(nsPre) ? 1 << 15 : 0) | nameId);
-        if(!pres.isEmpty()) textIndex.add(cache(pres, IndexType.TEXT));
+        if(!pres.isEmpty()) textIndex.add(new ValueCache(pres, IndexType.TEXT, this));
       }
     }
   }
@@ -1051,9 +1050,9 @@ public abstract class Data {
   protected final void indexDelete(final int pre, final int id, final int size) {
     if(id != -1) resources.delete(pre, size);
     if(meta.updindex) {
-      if(meta.textindex) textIndex.delete(cache(pre, size, IndexType.TEXT));
-      if(meta.attrindex) attrIndex.delete(cache(pre, size, IndexType.ATTRIBUTE));
-      if(meta.tokenindex) tokenIndex.delete(cache(pre, size, IndexType.TOKEN));
+      if(meta.textindex) textIndex.delete(new ValueCache(pre, size, IndexType.TEXT, this));
+      if(meta.attrindex) attrIndex.delete(new ValueCache(pre, size, IndexType.ATTRIBUTE, this));
+      if(meta.tokenindex) tokenIndex.delete(new ValueCache(pre, size, IndexType.TOKEN, this));
       if(id != -1) idmap.delete(pre, id, -size);
     }
   }
@@ -1069,75 +1068,10 @@ public abstract class Data {
     if(id != -1) resources.insert(pre, clip);
     if(meta.updindex) {
       if(id != -1) idmap.insert(pre, id, size);
-      if(meta.textindex) textIndex.add(cache(pre, size, IndexType.TEXT));
-      if(meta.attrindex) attrIndex.add(cache(pre, size, IndexType.ATTRIBUTE));
-      if(meta.tokenindex) tokenIndex.add(cache(pre, size, IndexType.TOKEN));
+      if(meta.textindex) textIndex.add(new ValueCache(pre, size, IndexType.TEXT, this));
+      if(meta.attrindex) attrIndex.add(new ValueCache(pre, size, IndexType.ATTRIBUTE, this));
+      if(meta.tokenindex) tokenIndex.add(new ValueCache(pre, size, IndexType.TOKEN, this));
     }
-  }
-
-  /**
-   * Caches the text and id for a node with specified pre value.
-   * @param pre pre value
-   * @param type index type
-   * @return cached texts and ids
-   */
-  private TokenObjMap<IntList> cache(final int pre, final IndexType type) {
-    return cache(new IntList(1).add(pre), type);
-  }
-
-  /**
-   * Caches all texts and ids in the specified database range.
-   * @param pre pre value
-   * @param size size value
-   * @param type index type
-   * @return cached texts and ids
-   */
-  private TokenObjMap<IntList> cache(final int pre, final int size, final IndexType type) {
-    final IntList pres = new IntList(size);
-    final int last = pre + size;
-    for(int curr = pre; curr < last; curr++) pres.add(curr);
-    return cache(pres, type);
-  }
-
-  /**
-   * Caches texts of the specified pre values.
-   * @param pres pre values
-   * @param type index type
-   * @return cached texts and ids
-   */
-  private TokenObjMap<IntList> cache(final IntList pres, final IndexType type) {
-    final TokenObjMap<IntList> map = new TokenObjMap<>();
-    final IndexNames in = new IndexNames(type, this);
-    final boolean text = type == IndexType.TEXT;
-    final int ps = pres.size(), kind = text ? TEXT : ATTR;
-    for(int p = 0; p < ps; p++) {
-      final int pre = pres.get(p);
-      if(kind(pre) == kind && in.contains(pre, text)) {
-        if(type == IndexType.TOKEN) {
-          for(final byte[] token : distinctTokens(text(pre, text))) {
-            addId(map, token, pre);
-          }
-        } else if(textLen(pre, text) <= meta.maxlen) {
-          addId(map, text(pre, text), pre);
-        }
-      }
-    }
-    return map;
-  }
-
-  /**
-   * Adds a node id to the specified map.
-   * @param map cached texts and ids
-   * @param text text
-   * @param pre pre value
-   */
-  private void addId(final TokenObjMap<IntList> map, final byte[] text, final int pre) {
-    IntList ids = map.get(text);
-    if(ids == null) {
-      ids = new IntList(1);
-      map.put(text, ids);
-    }
-    ids.add(id(pre));
   }
 
   // HELPER FUNCTIONS ===================================================================

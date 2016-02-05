@@ -9,7 +9,7 @@ package org.basex.index;
 public final class IndexEntry {
   /** Entry key. */
   public final byte[] key;
-  /** Number of ids. */
+  /** Number of index results. */
   public int size;
   /** File offset to the id list. */
   public long offset;
@@ -17,7 +17,7 @@ public final class IndexEntry {
   /**
    * Constructor.
    * @param key key
-   * @param size number of hits
+   * @param size number of index results
    * @param offset file offset to the id list
    */
   public IndexEntry(final byte[] key, final int size, final long offset) {

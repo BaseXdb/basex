@@ -31,7 +31,7 @@ public class DiskValues extends ValueIndex {
   final DataAccess idxl;
   /** Cached index entries: mapping between keys and index entries. */
   final IndexCache cache = new IndexCache();
-  /** Cached texts: mapping between key positions and indexed texts. */
+  /** Cached texts: mapping between key positions in the reference file, and the indexed texts. */
   final IntObjMap<byte[]> ctext = new IntObjMap<>();
   /** Number of current index entries. */
   final AtomicInteger size = new AtomicInteger();
@@ -119,12 +119,12 @@ public class DiskValues extends ValueIndex {
   }
 
   @Override
-  public void add(final TokenObjMap<IntList> map) {
+  public void add(final ValueCache vc) {
     throw Util.notExpected();
   }
 
   @Override
-  public void delete(final TokenObjMap<IntList> map) {
+  public void delete(final ValueCache vc) {
     throw Util.notExpected();
   }
 
@@ -189,15 +189,15 @@ public class DiskValues extends ValueIndex {
   /**
    * Returns an index entry.
    * <p><em>Important:</em> This method is thread-safe.</p>
-   * @param token token to be found or cached
+   * @param key key to be found or cached
    * @return cache entry
    */
-  private IndexEntry entry(final byte[] token) {
-    final IndexEntry ie = cache.get(token);
-    if(ie != null) return ie;
+  private IndexEntry entry(final byte[] key) {
+    final IndexEntry entry = cache.get(key);
+    if(entry != null) return entry;
 
-    final long index = get(token);
-    if(index < 0) return new IndexEntry(token, 0, 0);
+    final long index = get(key);
+    if(index < 0) return new IndexEntry(key, 0, 0);
 
     final int count;
     final long offset;
@@ -209,7 +209,7 @@ public class DiskValues extends ValueIndex {
       offset = idxl.cursor();
     }
 
-    return cache.add(token, count, offset);
+    return cache.add(key, count, offset);
   }
 
   /**

@@ -131,19 +131,18 @@ public final class MemValues extends ValueIndex {
   }
 
   @Override
-  public void add(final TokenObjMap<IntList> map) {
-    for(final byte[] key : new TokenList(map)) {
-      final IntList vals = map.get(key);
-      // [JE] tokenize:  for(final byte[] tok : distinctTokens(key)) { ... } ...
+  public void add(final ValueCache cache) {
+    for(final byte[] key : cache) {
+      final IntList vals = cache.ids(key);
       if(!vals.isEmpty()) add(key, vals.sort().finish());
     }
     finish();
   }
 
   @Override
-  public void delete(final TokenObjMap<IntList> map) {
-    for(final byte[] key : new TokenList(map)) {
-      delete(key, map.get(key).sort().finish());
+  public void delete(final ValueCache cache) {
+    for(final byte[] key : cache) {
+      delete(key, cache.ids(key).sort().finish());
     }
   }
 

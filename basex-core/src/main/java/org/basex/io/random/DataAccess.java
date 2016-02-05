@@ -283,24 +283,20 @@ public final class DataAccess implements Closeable {
   }
 
   /**
-   * Write a value to the file.
-   * @param pos write position
-   * @param value value to be written
+   * Appends a value to the file and return it's offset.
+   * @param value number to be appended
    */
-  public void writeNum(final long pos, final int value) {
-    cursor(pos);
-    writeNum(value);
-  }
-
-  /**
-   * Writes integers to the file in compressed form.
-   * @param p write position
-   * @param values integer values
-   */
-  public void writeNums(final long p, final int[] values) {
-    cursor(p);
-    writeNum(values.length);
-    for(final int n : values) writeNum(n);
+  public void writeNum(final int value) {
+    if(value < 0 || value > 0x3FFFFFFF) {
+      write(0xC0); write(value >>> 24); write(value >>> 16); write(value >>> 8); write(value);
+    } else if(value > 0x3FFF) {
+      write(value >>> 24 | 0x80); write(value >>> 16);
+      write(value >>> 8); write(value);
+    } else if(value > 0x3F) {
+      write(value >>> 8 | 0x40); write(value);
+    } else {
+      write(value);
+    }
   }
 
   /**
@@ -417,23 +413,6 @@ public final class DataAccess implements Closeable {
   private void writeToken(final byte[] buffer, final int offset, final int len) {
     writeNum(len);
     writeBytes(buffer, offset, len);
-  }
-
-  /**
-   * Appends a value to the file and return it's offset.
-   * @param value number to be appended
-   */
-  private void writeNum(final int value) {
-    if(value < 0 || value > 0x3FFFFFFF) {
-      write(0xC0); write(value >>> 24); write(value >>> 16); write(value >>> 8); write(value);
-    } else if(value > 0x3FFF) {
-      write(value >>> 24 | 0x80); write(value >>> 16);
-      write(value >>> 8); write(value);
-    } else if(value > 0x3F) {
-      write(value >>> 8 | 0x40); write(value);
-    } else {
-      write(value);
-    }
   }
 
   /**

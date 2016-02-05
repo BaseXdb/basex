@@ -2,8 +2,6 @@ package org.basex.index.value;
 
 import org.basex.data.*;
 import org.basex.index.*;
-import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * Index for texts, attribute values and full-texts.
@@ -35,15 +33,15 @@ public abstract class ValueIndex implements Index {
 
   /**
    * Deletes entries from the index.
-   * @param map a set of [key, id-list] pairs
+   * @param vc value cache with [key, id-list] pairs
    */
-  public abstract void delete(final TokenObjMap<IntList> map);
+  public abstract void delete(final ValueCache vc);
 
   /**
    * Add entries to the index.
-   * @param map a set of [key, id-list] pairs
+   * @param vc value cache with [key, id-list] pairs
    */
-  public abstract void add(final TokenObjMap<IntList> map);
+  public abstract void add(final ValueCache vc);
 
   /**
    * Flushes the buffered data.
