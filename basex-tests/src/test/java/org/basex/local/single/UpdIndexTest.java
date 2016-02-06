@@ -62,6 +62,7 @@ public final class UpdIndexTest extends SandboxTest {
     set(MainOptions.MAINMEM, mainmem);
     execute(new CreateDB(NAME, "<xml/>"));
     set(MainOptions.AUTOFLUSH, false);
+    set(MainOptions.TOKENINDEX, true);
   }
 
   /**
@@ -69,6 +70,7 @@ public final class UpdIndexTest extends SandboxTest {
    */
   @After
   public void finish() {
+    set(MainOptions.TOKENINDEX, false);
     execute(new DropDB(NAME));
   }
 
@@ -142,7 +144,8 @@ public final class UpdIndexTest extends SandboxTest {
     final Random rnd = new Random();
     final StringBuilder sb = new StringBuilder();
     for(int i = 0; i < MAX * STEPS; i++) {
-      sb.append((char) ('@' + (rnd.nextInt() & 0x1F)));
+      final char ch = (char) ('@' + (rnd.nextInt() & 0x1F));
+      sb.append(ch == '@' ? ' ' : ch);
       query("replace value of node /* with '" + sb + '\'');
       query("string-length(/*)", sb.length());
     }
