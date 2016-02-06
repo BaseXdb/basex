@@ -41,7 +41,7 @@ public final class ProjectView extends BaseXPanel {
 
   /** Last focused component. */
   private Component last;
-  /** Parsed flag. */
+  /** Indicates if the current project files have been parsed. */
   private boolean parsed;
 
   /** Remembers the last focused component. */
@@ -194,7 +194,8 @@ public final class ProjectView extends BaseXPanel {
     if(reset) files.reset();
     filter.refresh(true);
 
-    if(gui.gopts.get(GUIOptions.PARSEPROJ) && (!parsed || parse)) {
+    final boolean parseproj = gui.gopts.get(GUIOptions.PARSEPROJ);
+    if(parseproj && !root.file.eq(new IOFile(Prop.USERHOME)) && (!parsed || parse)) {
       parsed = false;
       // do not parse if project view is hidden
       if(getWidth() == 0) return;
