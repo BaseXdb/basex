@@ -26,6 +26,41 @@ Moreover, try `-h` to list the available command line options. For
 example, you can use BaseX to process XQuery expressions without
 entering the console.
 
+Docker Image
+------------
+
+The BaseX server is also available as automated build
+[`basex/basexhttp`](https://hub.docker.com/r/basex/basexhttp/)
+on the Docker Hub, providing both release and nightly builds. All images are
+automatically rebuild if Docker provides updated base images.
+
+To start a BaseX container based on the latest development release publishing
+the BaseX server and HTTP ports `1984` and `8984` and bind-mounting your user's `BaseXData` directory, run
+
+    docker run -ti \
+        --name basexhttp \
+        --publish 1984:1984 \
+        --publish 8984:8984 \
+        --volume ~/BaseXData:/srv/BaseXData \
+        basex/basexhttp:nightly
+
+By passing any other BaseX executable, you can also for example run a BaseX
+client connecting to the linked BaseX server for management opeartions on the
+BaseX command line:
+
+    docker run -ti \
+        --link basexhttp:basexhttp \
+        basex/basexhttp:nightly basexclient -nbasexhttp
+
+If you want to add your own application, create an image
+`FROM basex/basexhttp:[tag]` with `[tag]` being the BaseX version you're
+developing against. Usually, you will add your application code to
+`/srv/BaseXWeb` and modules to `/srv/BaseXModule`. `BaseXData` is persisted as
+a volume, which means it cannot be preinitialized in the application image.
+
+For further information on using the Docker image, refer to the
+[BaseX Docker documentation](http://docs.basex.org/wiki/Docker).
+
 Using Eclipse
 -------------
 
@@ -33,8 +68,7 @@ BaseX is being developed with the Eclipse environment. Some style
 guidelines are integrated in the sources of BaseX; they are being
 embedded as soon as you open the project.
 
-Running BaseX
--------------
+### Running BaseX
 
 The following steps can be performed to start BaseX with Eclipse:
 
@@ -44,8 +78,7 @@ The following steps can be performed to start BaseX with Eclipse:
  - Choose a `Main class` (e.g., org.basex.BaseXGUI)
  - Launch the project via `Run`
 
-Adding Checkstyle
------------------
+### Adding Checkstyle
 
 Some additional Checkstyle guidelines are defined in the project:
 
