@@ -120,6 +120,8 @@ public enum Annotation {
   /** XQuery annotation. */
   _REST_METHOD("method(name[,body])", arg(STR, STR), REST_URI, false),
   /** XQuery annotation. */
+  _REST_SINGLE("single([key])", arg(STR), REST_URI),
+  /** XQuery annotation. */
   _REST_GET("GET()", arg(), REST_URI),
   /** XQuery annotation. */
   _REST_POST("POST([body])", arg(STR), REST_URI),

@@ -70,7 +70,7 @@ public abstract class BaseXServlet extends HttpServlet {
     } catch(final IOException | QueryException ex) {
       http.status(SC_BAD_REQUEST, Util.message(ex), restxq);
     } catch(final ProcException ex) {
-      http.status(SC_BAD_REQUEST, Text.INTERRUPTED, restxq);
+      http.status(SC_GONE, Text.INTERRUPTED, restxq);
     } catch(final Exception ex) {
       final String msg = Util.bug(ex);
       Util.errln(msg);

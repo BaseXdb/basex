@@ -73,11 +73,11 @@ final class RestXqWadl {
         // create request
         final FElem request = elem("request", method);
         for(final RestXqParam rxp : func.queryParams)
-          addParam(rxp.key, "query",  request, xqdoc, func);
+          addParam(rxp.name, "query",  request, xqdoc, func);
         for(final RestXqParam rxp : func.formParams)
-          addParam(rxp.key, "query",  request, xqdoc, func);
+          addParam(rxp.name, "query",  request, xqdoc, func);
         for(final RestXqParam rxp : func.headerParams)
-          addParam(rxp.key, "header",  request, xqdoc, func);
+          addParam(rxp.name, "header",  request, xqdoc, func);
 
         // create response
         final FElem response = elem("response", method);
