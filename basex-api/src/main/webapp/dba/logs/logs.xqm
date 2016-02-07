@@ -94,6 +94,7 @@ declare
   %rest:query-param("sort",    "{$sort}")
   %rest:query-param("loglist", "{$loglist}")
   %output:method("html")
+  %rest:single
 function _:query(
   $name     as xs:string,
   $sort     as xs:string?,
@@ -134,6 +135,7 @@ declare
   %rest:path("/dba/loglist")
   %rest:query-param("sort",  "{$sort}")
   %output:method("html")
+  %rest:single
 function _:loglist(
   $sort   as xs:string?,
   $query  as xs:string?

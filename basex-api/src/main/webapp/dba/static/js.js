@@ -46,9 +46,10 @@ function setText(message, type) {
   i.textContent = message;
 };
 
-var searchDelay = 250;
+var _timestamp;
 function query(wait, success, key, query, enforce, target) {
-  if(wait) setWarning(wait);
+  var timestamp = new Date();
+  _timestamp = timestamp;
 
   var name = document.getElementById("name");
   var resource = document.getElementById("resource");
@@ -61,13 +62,19 @@ function query(wait, success, key, query, enforce, target) {
     "&loglist=" + encodeURIComponent(loglist ? loglist.value : "");
   request("POST", url, query,
     function(req) {
+      _timestamp = 0;
       target(req.responseText);
       setInfo(success);
     },
     function(req) {
+      _timestamp = 0;
       if(req.status != 410) setErrorFromResponse(req);
     }
   )
+
+  setTimeout(function() {
+    if(wait && _timestamp == timestamp) setWarning(wait);
+  }, 500);
 };
 
 // Jetty and Tomcat support (both return error messages differently)
