@@ -49,13 +49,15 @@ abstract class Ids extends StandardFunc {
       final TokenList idList = new TokenList(idSet.size());
       for(final byte[] id : idSet) idList.add(id);
       final Value ids = StrSeq.get(idList);
+      final Data data = root.data();
       final ValueAccess va = new ValueAccess(info, ids, idref ? IndexType.TOKEN :
-        IndexType.ATTRIBUTE, null, new IndexContext(root.data(), false));
+        IndexType.ATTRIBUTE, null, new IndexContext(data, false));
 
       // collect and return index results, filtered by id/idref attributes
       final ANodeList results = new ANodeList();
       for(final ANode attr : va.iter(qc)) {
-        if(XMLToken.isId(attr.name(), idref) && attr.root().is(root))
+        // check attribute name; check root if database has more than one document
+        if(XMLToken.isId(attr.name(), idref) && (data.meta.ndocs == 1 || attr.root().is(root)))
           results.add(idref ? attr : attr.parent());
       }
       return results.iter();
