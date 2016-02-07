@@ -162,20 +162,22 @@ public class TextPanel extends BaseXPanel {
 
   /**
    * Sets the output text.
-   * @param t output text
-   * @param s text size
+   * @param text output text
+   * @param size text size
    */
-  public final void setText(final byte[] t, final int s) {
-    byte[] txt = t;
-    if(Token.contains(t, '\r')) {
+  public final void setText(final byte[] text, final int size) {
+    byte[] txt = text;
+    if(Token.contains(text, '\r')) {
       // remove carriage returns
       int ns = 0;
-      for(int r = 0; r < s; ++r) {
-        final byte b = t[r];
-        if(b != '\r') t[ns++] = b;
+      for(int r = 0; r < size; ++r) {
+        final byte b = text[r];
+        if(b != '\r') text[ns++] = b;
       }
       // new text is different...
-      txt = Arrays.copyOf(t, ns);
+      txt = Arrays.copyOf(text, ns);
+    } else if(text.length != size) {
+      txt = Arrays.copyOf(text, size);
     }
     if(editor.text(txt)) {
       if(hist != null) hist.store(txt, editor.pos(), 0);
