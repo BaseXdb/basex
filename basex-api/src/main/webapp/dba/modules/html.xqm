@@ -18,9 +18,9 @@ declare variable $html:NUMBER := ('decimal', 'number', 'bytes');
  : @return checkbox
  :)
 declare function html:option(
-  $value    as xs:string,
-  $label    as xs:string,
-  $opts     as xs:string*
+  $value  as xs:string,
+  $label  as xs:string,
+  $opts   as xs:string*
 ) as node()+ {
   html:checkbox("opts", $value, $opts = $value, $label)
 };
@@ -48,8 +48,8 @@ declare function html:checkbox(
 
 (:~
  : Creates a checkbox.
- : @param  $name  name of checkbox
- : @param  $map   additional attributes
+ : @param  $label  label of checkbox
+ : @param  $map    additional attributes
  : @return checkbox
  :)
 declare function html:checkbox(
@@ -344,28 +344,28 @@ declare function html:focus(
 
 (:~
  : Creates a link to the specified target.
- : @param  $text   link text
- : @param  $target target
+ : @param  $text    link text
+ : @param  $target  target
  : @return link
  :)
 declare function html:link(
-  $text   as xs:string,
-  $target as xs:string
+  $text    as xs:string,
+  $target  as xs:string
 ) as element(a) {
   <a href="{ $target }">{ $text }</a>
 };
 
 (:~
  : Creates a link to the specified target.
- : @param  $text   link text
- : @param  $target target
- : @param  $params map with query parameters
+ : @param  $text    link text
+ : @param  $target  target
+ : @param  $params  map with query parameters
  : @return link
  :)
 declare function html:link(
-  $text   as xs:string,
-  $target as xs:string,
-  $params as map(*)
+  $text    as xs:string,
+  $target  as xs:string,
+  $params  as map(*)
 ) as element(a) {
   html:link($text, web:create-url($target, $params))
 };

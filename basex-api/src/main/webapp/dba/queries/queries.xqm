@@ -101,6 +101,7 @@ function _:queries(
 declare
   %rest:POST("{$query}")
   %rest:path("/dba/eval-query")
+  %rest:single
   %output:method("text")
 function _:eval-query(
   $query  as xs:string?

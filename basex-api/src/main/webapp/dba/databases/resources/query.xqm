@@ -20,6 +20,7 @@ declare
   %rest:path("/dba/query-resource")
   %rest:query-param("name",     "{$name}")
   %rest:query-param("resource", "{$resource}")
+  %rest:single
   %output:method("text")
 function _:query-resource(
   $name      as xs:string,

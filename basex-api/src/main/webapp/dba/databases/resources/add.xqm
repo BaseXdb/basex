@@ -17,11 +17,11 @@ declare variable $_:SUB := 'database';
 
 (:~
  : Form for adding a new resource.
- : @param  $name      entered name
- : @param  $opts      chosen parsing options
- : @param  $path      database path
- : @param  $binary    store as binary
- : @param  $error     error string
+ : @param  $name    entered name
+ : @param  $opts    chosen parsing options
+ : @param  $path    database path
+ : @param  $binary  store as binary
+ : @param  $error   error string
  : @return page
  :)
 declare
