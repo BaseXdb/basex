@@ -2,6 +2,8 @@ package org.basex.query.value.item;
 
 import static org.junit.Assert.*;
 
+import java.util.*;
+
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -20,8 +22,8 @@ public class UriTest {
    * @return object parameters
    */
   @Parameters(name = "{index}: \"{0}\": valid = {1}, absolute = {2}")
-  public static Object[][] sampleUris() {
-    return new Object[][] {
+  public static Collection<Object[]> sampleUris() {
+    return Arrays.asList(new Object[][] {
       {"x:", true, true},
       {"x", true, false},
       {"a string", true, false},
@@ -68,7 +70,7 @@ public class UriTest {
       {"//z:1%40", false, false},
       {"//x//x", true, false},
       {"/a/../b/./c/d/.x//x", true, false},
-    };
+    });
   }
 
   /** Current test URI. */
