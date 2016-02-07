@@ -31,11 +31,11 @@ public final class IdIdrefTest extends QueryTest {
   public static Collection<Object[]> generateParams() {
     final List<Object[]> paramsSet = new ArrayList<>();
     paramsSet.add(paramSet(false, false, false));
-    paramsSet.add(paramSet(false, false, true));
+    //paramsSet.add(paramSet(false, false, true));
     paramsSet.add(paramSet(false, true, false));
     paramsSet.add(paramSet(false, true, true));
     paramsSet.add(paramSet(true, false, false));
-    paramsSet.add(paramSet(true, false, true));
+    //paramsSet.add(paramSet(true, false, true));
     paramsSet.add(paramSet(true, true, false));
     paramsSet.add(paramSet(true, true, true));
     return paramsSet;
@@ -43,9 +43,9 @@ public final class IdIdrefTest extends QueryTest {
 
   /**
    * Return parameter set for parameterized execution.
-   * @param mainmem MAINMEM option
-   * @param updindex UPDINDEX option
-   * @param tokenindex TOKENINDEXoption
+   * @param mainmem {@link MainOptions#MAINMEM} option
+   * @param updindex {@link MainOptions#UPDINDEX} option
+   * @param tokenindex {@link MainOptions#TOKENINDEX} option
    * @return parameter set
    */
   private static Object[] paramSet(final boolean mainmem, final boolean updindex,
