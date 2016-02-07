@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import org.basex.core.*;
+import org.basex.core.Proc.*;
 import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
@@ -94,7 +95,7 @@ public class XQueryEval extends StandardFunc {
             @Override
             public void run() {
               // limit reached: perform garbage collection and check again
-              if(Performance.memory() > limit) qctx.stop();
+              if(Performance.memory() > limit) qctx.memory();
             }
           }, 500, 500);
         }
@@ -103,7 +104,7 @@ public class XQueryEval extends StandardFunc {
           if(to == null) to = new Timer(true);
           to.schedule(new TimerTask() {
             @Override
-            public void run() { qctx.stop(); }
+            public void run() { qctx.timeout(); }
           }, ms);
         }
       }
@@ -134,7 +135,9 @@ public class XQueryEval extends StandardFunc {
         }
         return cache;
       } catch(final ProcException ex) {
-        throw BXXQ_STOPPED.get(info);
+        if(qctx.state == State.TIMEOUT) throw BXXQ_TIMEOUT.get(info);
+        if(qctx.state == State.MEMORY)  throw BXXQ_MEMORY.get(info);
+        throw ex;
       } catch(final QueryException ex) {
         throw ex.error() == BASX_PERM_X ? BXXQ_PERM_X.get(info, ex.getLocalizedMessage()) :
           ex.info(info);

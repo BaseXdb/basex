@@ -48,9 +48,9 @@ public final class XQueryModuleTest extends AdvancedQueryTest {
     error(_XQUERY_EVAL.args(" '" + _FILE_EXISTS.args("x") + "'", " map { }",
         " map { 'permission': 'none' }"), BXXQ_PERM_X);
     error(_XQUERY_EVAL.args("\"(1 to 10000000000000)[. = 0]\"", " map { }",
-        " map { 'timeout': 1 }"), BXXQ_STOPPED);
+        " map { 'timeout': 1 }"), BXXQ_TIMEOUT);
     error(_XQUERY_EVAL.args("\"(1 to 10000000000000) ! <a/>\"", " map { }",
-        " map { 'memory': 10 }"), BXXQ_STOPPED);
+        " map { 'memory': 10 }"), BXXQ_MEMORY);
   }
 
   /** Test method. */

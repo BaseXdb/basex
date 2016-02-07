@@ -264,7 +264,9 @@ public enum QueryError {
   /** BXXQ0003. */
   BXXQ_PERM2_X(BASX, 3, "% permission required."),
   /** BXXQ0004. */
-  BXXQ_STOPPED(BXXQ, 4, "Timeout or assigned memory was exceeded."),
+  BXXQ_TIMEOUT(BXXQ, 4, "The timeout was exceeded."),
+  /** BXXQ0004. */
+  BXXQ_MEMORY(BXXQ, 4, "The memory limit was exceeded."),
 
   // Unit module
 

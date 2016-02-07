@@ -35,7 +35,7 @@ final class XMLScanner extends Proc {
   private static final byte[] AMPER = { '&' };
 
   /** Scanning states. */
-  private enum State {
+  private enum Scan {
     /** Content state.   */ CONTENT,
     /** Element state.   */ ELEMENT,
     /** Attribute state. */ ATT,
@@ -57,7 +57,7 @@ final class XMLScanner extends Proc {
   private final boolean fragment;
 
   /** Current scanner state. */
-  private State state = State.CONTENT;
+  private Scan scan = Scan.CONTENT;
   /** Scanning prolog (will be invalidated when root element is parsed). */
   private boolean prolog = true;
   /** Parameter entity parsing. */
@@ -134,7 +134,7 @@ final class XMLScanner extends Proc {
     }
 
     // checks the scanner state
-    switch(state) {
+    switch(scan) {
       case CONTENT: scanCONTENT(ch); break;
       case ELEMENT:
       case ATT: scanELEMENT(ch); break;
@@ -189,7 +189,7 @@ final class XMLScanner extends Proc {
     }
 
     prolog = false;
-    state = State.ELEMENT;
+    scan = Scan.ELEMENT;
 
     // closing element...
     if(c == '/') {
@@ -211,20 +211,20 @@ final class XMLScanner extends Proc {
     // scan element end...
     if(c == '>') {
       type = Type.R_BR;
-      state = State.CONTENT;
+      scan = Scan.CONTENT;
     } else if(c == '=') {
       // scan equal sign...
       type = Type.EQ;
     } else if(c == '\'' || c == '"') {
       // scan quote...
       type = Type.QUOTE;
-      state = State.QUOTE;
+      scan = Scan.QUOTE;
       quote = c;
     } else if(c == '/') {
       // scan empty element end...
       type = Type.CLOSE_R_BR;
       if((c = nextChar()) == '>') {
-        state = State.CONTENT;
+        scan = Scan.CONTENT;
       } else {
         token.add(c);
         throw error(CLOSING);
@@ -234,10 +234,10 @@ final class XMLScanner extends Proc {
       type = Type.WS;
     } else if(isStartChar(c)) {
       // scan name of attribute or element...
-      type = state == State.ATT ? Type.ATTNAME : Type.ELEMNAME;
+      type = scan == Scan.ATT ? Type.ATTNAME : Type.ELEMNAME;
       do token.add(c); while(isChar(c = nextChar()));
       prev(1);
-      state = State.ATT;
+      scan = Scan.ATT;
     } else {
       // undefined character...
       throw error(CHARACTER, (char) c);
@@ -252,7 +252,7 @@ final class XMLScanner extends Proc {
   private void scanATTVALUE(final int ch) throws IOException {
     if(ch == quote) {
       type = Type.QUOTE;
-      state = State.ATT;
+      scan = Scan.ATT;
     } else {
       type = Type.ATTVALUE;
       attValue(ch);

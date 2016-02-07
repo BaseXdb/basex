@@ -47,34 +47,27 @@ function setText(message, type) {
 };
 
 var searchDelay = 250;
-var _d;
 function query(wait, success, key, query, enforce, target) {
-  var d = new Date();
-  _d = d;
-  setTimeout(function() {
-    if(wait) setWarning(wait);
+  if(wait) setWarning(wait);
 
-    var name = document.getElementById("name");
-    var resource = document.getElementById("resource");
-    var sort = document.getElementById("sort");
-    var loglist = document.getElementById("loglist");
-    var url = key +
-      "?name=" + encodeURIComponent(name ? name.value : "") +
-      "&resource=" + encodeURIComponent(resource ? resource.value : "") +
-      "&sort=" + encodeURIComponent(sort ? sort.value : "") +
-      "&loglist=" + encodeURIComponent(loglist ? loglist.value : "");
-    request("POST", url, query,
-      function(req) {
-        if(_d != d) return;
-        target(req.responseText);
-        setInfo(success);
-      },
-      function(req) {
-        if(_d != d) return;
-        setErrorFromResponse(req);
-      }
-    )
-  }, enforce ? 0 : searchDelay);
+  var name = document.getElementById("name");
+  var resource = document.getElementById("resource");
+  var sort = document.getElementById("sort");
+  var loglist = document.getElementById("loglist");
+  var url = key +
+    "?name=" + encodeURIComponent(name ? name.value : "") +
+    "&resource=" + encodeURIComponent(resource ? resource.value : "") +
+    "&sort=" + encodeURIComponent(sort ? sort.value : "") +
+    "&loglist=" + encodeURIComponent(loglist ? loglist.value : "");
+  request("POST", url, query,
+    function(req) {
+      target(req.responseText);
+      setInfo(success);
+    },
+    function(req) {
+      if(req.status != 410) setErrorFromResponse(req);
+    }
+  )
 };
 
 // Jetty and Tomcat support (both return error messages differently)
