@@ -42,6 +42,8 @@ public final class ValueIndexTest extends SandboxTest {
     final List<Object[]> paramsSet = new ArrayList<>();
     paramsSet.add(paramSet(false, false));
     paramsSet.add(paramSet(true, false));
+    paramsSet.add(paramSet(false, true));
+    paramsSet.add(paramSet(true, true));
     return paramsSet;
   }
 

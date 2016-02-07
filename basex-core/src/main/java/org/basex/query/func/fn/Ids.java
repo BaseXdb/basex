@@ -55,7 +55,8 @@ abstract class Ids extends StandardFunc {
       // collect and return index results, filtered by id/idref attributes
       final ANodeList results = new ANodeList();
       for(final ANode attr : va.iter(qc)) {
-        if(XMLToken.isId(attr.name(), idref)) results.add(idref ? attr : attr.parent());
+        if(XMLToken.isId(attr.name(), idref) && attr.root().is(root))
+          results.add(idref ? attr : attr.parent());
       }
       return results.iter();
     }
