@@ -84,9 +84,10 @@ public class XQueryEval extends StandardFunc {
         if(!user.has(perm)) throw BXXQ_PERM2_X.get(info, perm);
         user.perm(perm);
 
-        // initial memory consumption: perform garbage collection and calculate usage
+        // initial memory consumption: enforce garbage collection and calculate usage
         final long mb = opts.get(XQueryOptions.MEMORY);
         if(mb != 0) {
+          Performance.gc(2);
           final long limit = Performance.memory() + (mb << 20);
           to = new Timer(true);
           to.schedule(new TimerTask() {
