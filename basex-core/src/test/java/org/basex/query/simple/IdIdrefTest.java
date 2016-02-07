@@ -1,5 +1,7 @@
 package org.basex.query.simple;
 
+import static org.basex.query.func.Function.*;
+
 import java.util.*;
 import java.util.List;
 
@@ -31,11 +33,11 @@ public final class IdIdrefTest extends QueryTest {
   public static Collection<Object[]> generateParams() {
     final List<Object[]> paramsSet = new ArrayList<>();
     paramsSet.add(paramSet(false, false, false));
-    //paramsSet.add(paramSet(false, false, true));
+    paramsSet.add(paramSet(false, false, true));
     paramsSet.add(paramSet(false, true, false));
     paramsSet.add(paramSet(false, true, true));
     paramsSet.add(paramSet(true, false, false));
-    //paramsSet.add(paramSet(true, false, true));
+    paramsSet.add(paramSet(true, false, true));
     paramsSet.add(paramSet(true, true, false));
     paramsSet.add(paramSet(true, true, true));
     return paramsSet;
@@ -79,12 +81,12 @@ public final class IdIdrefTest extends QueryTest {
     execute(new Add("2.xml", "<root2 id='batz' idref2='quix' />"));
 
     queries = new Object[][] {
-        { "id1", nodes(1), "db:open('" + NAME + "', '1.xml')/id('foo')"},
-        { "id2", nodes(5), "db:open('" + NAME + "', '2.xml')/id('batz')"},
-        { "idref1", nodes(3), "db:open('" + NAME + "', '1.xml')/idref('bar')"},
-        { "idref2", nodes(7), "db:open('" + NAME + "', '2.xml')/idref('quix')"},
-        { "idref2", nodes(3, 7),
-            "for $doc in collection('" + NAME + "') return idref('quix', $doc)"},
-      };
+      { "id1", nodes(1), _DB_OPEN.args(NAME, "1.xml") + "/id('foo')" },
+      { "id1", nodes(1), _DB_OPEN.args(NAME, "1.xml") + "/id('foo')" },
+      { "id2", nodes(5), _DB_OPEN.args(NAME, "2.xml") + "/id('batz')" },
+      { "idref1", nodes(3), _DB_OPEN.args(NAME, "1.xml") + "/idref('bar')" },
+      { "idref2", nodes(7), _DB_OPEN.args(NAME, "2.xml") + "/idref('quix')" },
+      { "idref2", nodes(3, 7), "collection('" + NAME + "')/idref('quix', .)" },
+    };
   }
 }

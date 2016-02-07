@@ -40,20 +40,15 @@ public abstract class QueryTest extends SandboxTest {
         final Value val = qp.value();
         if(!correct || !new DeepEqual().equal(val, cmp)) {
           sb.append("[" + qu[0] + "] " + query);
-          String s = correct && cmp.size() != 1 ? "#" + cmp.size() : "";
-          sb.append("\n[E" + s + "] ");
+          sb.append("\n[E] " + cmp.size() + " result(s): ");
           if(correct) {
-            final String cp = cmp.serialize().toString();
-            sb.append('\'');
-            sb.append(cp.length() > 5000 ? cp.substring(0, 5000) + "..." : cp);
-            sb.append('\'');
+            for(final Item it : cmp) sb.append(it.serialize()).append(", ");
           } else {
             sb.append("error");
           }
-          final TokenBuilder types = new TokenBuilder();
-          for(final Item it : val) types.add(it.type.toString()).add(" ");
-          s = val.size() == 1 ? "" : "#" + val.size();
-          sb.append("\n[F" + s + "] '" + val + "', " + types + details() + '\n');
+          sb.append("\n[F] " + val.size() + " result(s): ");
+          for(final Item it : val) sb.append(it.serialize()).append(", ");
+          sb.append(details()).append('\n');
           ++fail;
         }
       } catch(final Exception ex) {
