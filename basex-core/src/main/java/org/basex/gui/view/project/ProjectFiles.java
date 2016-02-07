@@ -157,10 +157,7 @@ final class ProjectFiles {
 
     // parse modules
     for(final String path : mods) {
-      if(id != parseId) {
-        System.out.println(id + "/" + parseId);
-        throw new InterruptedException();
-      }
+      if(id != parseId) throw new InterruptedException();
       if(parsed.contains(path)) continue;
 
       final IOFile file = new IOFile(path);

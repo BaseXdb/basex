@@ -92,7 +92,7 @@ public final class ValueCache implements Iterable<byte[]> {
    * @param data data reference
    */
   private void addId(final byte[] text, final int pre, final int ps, final Data data) {
-    int i = keys.put(text) - 1;
+    final int i = keys.put(text) - 1;
     final boolean exists = i < ids.size();
 
     IntList list;

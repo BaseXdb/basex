@@ -61,7 +61,7 @@ public abstract class UserPermUpdate extends UserUpdate {
    * Grants the specified permissions.
    */
   protected void grant() {
-    int ps = perms.size();
+    final int ps = perms.size();
     for(int p = 0; p < ps; p++) user.perm(perms.get(p), patterns.get(p));
   }
 }

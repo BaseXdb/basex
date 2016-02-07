@@ -26,7 +26,7 @@ public final class UserGrant extends UserFn {
     final StringList patterns = toPatterns(2, qc);
 
     if(user.name().equals(UserText.ADMIN)) throw USER_ADMIN.get(info);
-    int ps = perms.size();
+    final int ps = perms.size();
     for(int p = 0; p < ps; p++) {
       if(!patterns.get(p).isEmpty() && (perms.get(p) == Perm.CREATE || perms.get(p) == Perm.ADMIN))
         throw USER_LOCAL.get(info);
