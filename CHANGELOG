@@ -1,3 +1,29 @@
+VERSION 8.4 (February 8, 2016) -----------------------------------------
+
+ GUI
+ - Project View: parse all modules in a project in the background
+ - Create Database, Properties: access to advanced database options
+ - Sort Dialog: order by column positions and locale collation
+
+ INDEXING
+ - New Token Index: speedy token lookups in DITA and HTML documents 
+ - Including full support for incremental and main-memory databases
+ - XQuery optimizations for fn:contains-token, fn:tokenize, fn:idref
+
+ WEB APPLICATIONS
+ - Cancel server-side queries via %rest:single annotation
+ - DBA query editor: faster querying, better responsivity
+ 
+ XQUERY
+ - Database Module: ADDCACHE support (caching of large results)
+ - Direct output of binary data with new 'basex' serialization method
+ - Better XQuery 3.1 compliance: string constructors, new functions
+ - Java bindings: address specific Java function signatures
+ - User Module: create users and grant permissions in one step
+
+ DOCUMENTATION
+ - Many Wiki articles have been revised and updated
+
 VERSION 8.3.1 (October 29, 2015) ---------------------------------------
 
  - XQuery 3.1: alignments with latest spec
