@@ -189,4 +189,16 @@ final class SearchContext {
     return mcase == s.mcase && word == s.word && regex == s.regex && multi == s.multi &&
         Strings.eq(search, s.search);
   }
+
+  @Override
+  public int hashCode() {
+    int result = this.bar != null ? this.bar.hashCode() : 0;
+    result = 31 * result + (this.mcase ? 1 : 0);
+    result = 31 * result + (this.regex ? 1 : 0);
+    result = 31 * result + (this.multi ? 1 : 0);
+    result = 31 * result + (this.word ? 1 : 0);
+    result = 31 * result + (this.search != null ? this.search.hashCode() : 0);
+    result = 31 * result + this.nr;
+    return result;
+  }
 }
