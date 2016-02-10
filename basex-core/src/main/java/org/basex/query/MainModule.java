@@ -181,7 +181,7 @@ public final class MainModule extends StaticScope {
       // name is unknown at compile time: return false
       if(db == null) return false;
       // if context item is found on top level, it will refer to currently opened database
-      if(level == 0 || db != DBLocking.CONTEXT) sl.add(db);
+      if(level == 0 || !DBLocking.CONTEXT.equals(db)) sl.add(db);
       return true;
     }
 
