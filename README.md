@@ -35,7 +35,8 @@ on the Docker Hub, providing both release and nightly builds. All images are
 automatically rebuild if Docker provides updated base images.
 
 To start a BaseX container based on the latest development release publishing
-the BaseX server and HTTP ports `1984` and `8984` and bind-mounting your user's `BaseXData` directory, run
+the BaseX server and HTTP ports `1984` and `8984` and bind-mounting your user's
+`BaseXData` directory, run
 
     docker run -ti \
         --name basexhttp \
@@ -51,6 +52,15 @@ BaseX command line:
     docker run -ti \
         --link basexhttp:basexhttp \
         basex/basexhttp:nightly basexclient -nbasexhttp
+
+If you prefer the DBA web interface, this can also be linked against your
+server container:
+
+    docker run -d \
+        --name basex-dba \
+        --publix 18984:8984 \
+        --link basexhttp:basexhttp \
+        basex/dba
 
 If you want to add your own application, create an image
 `FROM basex/basexhttp:[tag]` with `[tag]` being the BaseX version you're
