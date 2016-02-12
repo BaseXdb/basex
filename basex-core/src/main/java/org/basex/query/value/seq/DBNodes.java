@@ -118,6 +118,7 @@ public final class DBNodes extends DBNodeSeq {
   public void toggle(final int pre) {
     final int[] n = { pre };
     pres = contains(pre) ? except(pres, n) : union(pres, n);
+    size = pres.length;
     sorted = null;
   }
 
@@ -127,6 +128,7 @@ public final class DBNodes extends DBNodeSeq {
    */
   public void union(final int[] pre) {
     pres = union(pres, pre);
+    size = pres.length;
     sorted = null;
   }
 

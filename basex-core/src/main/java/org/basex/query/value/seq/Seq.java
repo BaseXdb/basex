@@ -20,7 +20,7 @@ import org.basex.util.*;
  */
 public abstract class Seq extends Value {
   /** Length. */
-  protected final long size;
+  protected long size;
 
   /**
    * Constructor, specifying a type.

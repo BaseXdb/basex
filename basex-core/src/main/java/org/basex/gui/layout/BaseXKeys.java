@@ -74,7 +74,6 @@ public enum BaseXKeys {
   /** Close tab.             */ CLOSETAB(META, VK_F4),
 
   /** Browse back.           */ GOBACK(MAC ? META : ALT, VK_LEFT),
-  /** Browse back.           */ GOBACK2(VK_BACK_SPACE, NO_MOD),
   /** Browse forward.        */ GOFORWARD(MAC ? META : ALT, VK_RIGHT),
   /** Browse up.             */ GOUP(MAC ? META : ALT, VK_UP),
   /** Browse home.           */ GOHOME(MAC ? META : ALT, VK_HOME),
@@ -110,7 +109,7 @@ public enum BaseXKeys {
   /** Rename.                */ RENAME(NO_MOD, VK_F2),
   /** New directory.         */ NEWDIR(META | SHIFT, VK_N),
 
-  /** Space key.             */ SPACE(NO_MOD, VK_SPACE),
+  /** Space key.             */ SPACE(NO_MOD, VK_SPACE, SHIFT | META),
   /** Enter.                 */ ENTER(NO_MOD, VK_ENTER),
   /** Shift Enter.           */ SHIFT_ENTER(SHIFT, VK_ENTER);
 
@@ -150,7 +149,8 @@ public enum BaseXKeys {
   public boolean is(final KeyEvent e) {
     final int c = e.getKeyCode();
     final int m = e.getModifiers() | allowed;
-    return m == (modifiers | allowed) && (c == VK_UNDEFINED ? getExtendedKeyCodeForChar(e.getKeyChar()) : c) == key;
+    return m == (modifiers | allowed) &&
+        (c == VK_UNDEFINED ? getExtendedKeyCodeForChar(e.getKeyChar()) : c) == key;
   }
 
   /**
