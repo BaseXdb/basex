@@ -12,6 +12,7 @@ import java.awt.event.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  * @author Leo Woerteler
+ * @author Klavs Prieditis
  */
 public enum BaseXKeys {
 
@@ -149,7 +150,7 @@ public enum BaseXKeys {
   public boolean is(final KeyEvent e) {
     final int c = e.getKeyCode();
     final int m = e.getModifiers() | allowed;
-    return m == (modifiers | allowed) && (c == 0 ? e.getKeyChar() : c) == key;
+    return m == (modifiers | allowed) && (c == VK_UNDEFINED ? getExtendedKeyCodeForChar(e.getKeyChar()) : c) == key;
   }
 
   /**
