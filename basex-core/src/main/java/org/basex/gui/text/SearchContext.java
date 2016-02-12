@@ -188,7 +188,7 @@ final class SearchContext {
    * @return result of check
    */
   public boolean sameAs(final SearchContext sc) {
-    return mcase == sc.mcase && word == sc.word && regex == sc.regex && multi == sc.multi &&
-        Strings.eq(search, sc.search);
+    return sc != null && mcase == sc.mcase && word == sc.word && regex == sc.regex &&
+        multi == sc.multi && Strings.eq(search, sc.search);
   }
 }
