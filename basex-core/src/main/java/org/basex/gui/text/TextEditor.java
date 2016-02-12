@@ -79,7 +79,7 @@ public final class TextEditor {
    */
   void search(final SearchContext sc) {
     // skip search if criteria have not changed
-    if(sc.equals(search)) {
+    if(sc.sameAs(search)) {
       sc.nr = search.nr;
       sc.bar.refresh(sc);
     } else {
