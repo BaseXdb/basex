@@ -6,7 +6,6 @@ import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
-import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -18,14 +17,15 @@ import org.basex.util.*;
 public abstract class AxisPath extends Path {
   /** Caching states. */
   private enum Caching {
-    /** Caching is disabled. */ DISABLED,
+    /** Initialize caching.  */ INIT,
     /** Caching is possible. */ ENABLED,
     /** Ready to cache.      */ READY,
-    /** Results are cached.  */ CACHED
+    /** Results are cached.  */ CACHED,
+    /** Caching is disabled. */ DISABLED
   }
 
   /** Current state. */
-  private Caching state;
+  private Caching state = Caching.INIT;
   /** Cached result. */
   private Value cached;
   /** Cached context value. */
@@ -42,35 +42,37 @@ public abstract class AxisPath extends Path {
   }
 
   @Override
-  public final Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
-    // cache values if expression has no free variables, is deterministic and performs no updates
-    state = !hasFreeVars() && !has(Flag.NDT) && !has(Flag.UPD) && !has(Flag.HOF) ?
-      Caching.ENABLED : Caching.DISABLED;
-    return super.optimize(qc, scp);
-  }
-
-  @Override
   public final Iter iter(final QueryContext qc) throws QueryException {
-    if(state == Caching.CACHED) {
-      // last result was cached
-      if(!sameContext(qc)) {
-        // disable caching if context has changed (expected to change frequently)
-        cached = null;
-        state = Caching.DISABLED;
-      }
-    } else if (state == Caching.READY) {
-      // values are ready to cache
-      if(sameContext(qc)) {
-        cached = nodeIter(qc).value();
-        state = Caching.CACHED;
-      } else {
-        // disable caching if context has changed (expected to change frequently)
-        state = Caching.DISABLED;
-      }
-    } else if(state == Caching.ENABLED) {
-      // caching is possible: remember context value
-      cvalue = qc.value instanceof DBNode ? ((DBNode) qc.value).finish() : qc.value;
-      state = Caching.READY;
+    switch(state) {
+      case INIT:
+        // initialize caching flag
+        state = !hasFreeVars() && !has(Flag.NDT) && !has(Flag.UPD)// && !has(Flag.HOF)
+            ? Caching.ENABLED : Caching.DISABLED;
+        return iter(qc);
+      case ENABLED:
+        // caching is possible: remember context value
+        cvalue = qc.value instanceof DBNode ? ((DBNode) qc.value).finish() : qc.value;
+        state = Caching.READY;
+        break;
+      case READY:
+        // values are ready to cache
+        if(sameContext(qc)) {
+          cached = nodeIter(qc).value();
+          state = Caching.CACHED;
+        } else {
+          // disable caching if context has changed (expected to change frequently)
+          state = Caching.DISABLED;
+        }
+        break;
+      case CACHED:
+        // last result was cached
+        if(!sameContext(qc)) {
+          // disable caching if context has changed (expected to change frequently)
+          cached = null;
+          state = Caching.DISABLED;
+        }
+        break;
+      case DISABLED:
     }
     // return new iterator or cached values
     return cached == null ? nodeIter(qc) : cached.iter();
