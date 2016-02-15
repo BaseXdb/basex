@@ -47,8 +47,8 @@ public final class List extends Arr {
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     // remove empty sequences
     int p = 0;
-    for(final Expr e : exprs) {
-      if(!e.isEmpty()) exprs[p++] = e;
+    for(final Expr expr : exprs) {
+      if(!expr.isEmpty()) exprs[p++] = expr;
     }
 
     if(p != exprs.length) {
@@ -62,9 +62,9 @@ public final class List extends Arr {
     // compute number of results
     size = 0;
     boolean ne = false;
-    for(final Expr e : exprs) {
-      final long c = e.size();
-      ne |= c > 0 || e.seqType().occ.min == 1;
+    for(final Expr expr : exprs) {
+      final long c = expr.size();
+      ne |= c > 0 || expr.seqType().occ.min == 1;
       if(c == -1) {
         size = -1;
         break;
@@ -78,8 +78,8 @@ public final class List extends Arr {
         Type all = null;
         final Value[] vs = new Value[exprs.length];
         int c = 0;
-        for(final Expr e : exprs) {
-          final Value v = e.value(qc);
+        for(final Expr expr : exprs) {
+          final Value v = expr.value(qc);
           if(c == 0) all = v.type;
           else if(all != v.type) all = null;
           vs[c++] = v;
@@ -109,8 +109,8 @@ public final class List extends Arr {
     } else {
       final Occ o = size == 1 ? Occ.ONE : size < 0 && !ne ? Occ.ZERO_MORE : Occ.ONE_MORE;
       SeqType st = null;
-      for(final Expr e : exprs) {
-        final SeqType et = e.seqType();
+      for(final Expr expr : exprs) {
+        final SeqType et = expr.seqType();
         if(et.occ != Occ.ZERO) st = st == null ? et : st.union(et);
       }
       seqType = SeqType.get(st == null ? AtomType.ITEM : st.type, o);
@@ -145,7 +145,7 @@ public final class List extends Arr {
     // most common case
     if(exprs.length == 2) return ValueBuilder.concat(qc.value(exprs[0]), qc.value(exprs[1]));
     final ValueBuilder vb = new ValueBuilder();
-    for(final Expr e : exprs) vb.add(qc.value(e));
+    for(final Expr expr : exprs) vb.add(qc.value(expr));
     return vb.value();
   }
 
@@ -156,7 +156,7 @@ public final class List extends Arr {
 
   @Override
   public boolean isVacuous() {
-    for(final Expr e : exprs) if(!e.isVacuous()) return false;
+    for(final Expr expr : exprs) if(!expr.isVacuous()) return false;
     return true;
   }
 

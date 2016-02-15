@@ -180,7 +180,7 @@ public final class UriParser {
    */
   public static ParsedUri parse(final String uri) {
     final Matcher matcher = URI_REF.matcher(uri);
-    if (!matcher.matches()) return ParsedUri.INVALID;
+    if(!matcher.matches()) return ParsedUri.INVALID;
 
     final ParsedUri pu = new ParsedUri();
     pu.scheme = matcher.group("scheme");

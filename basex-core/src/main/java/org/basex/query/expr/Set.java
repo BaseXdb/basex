@@ -35,8 +35,8 @@ abstract class Set extends Arr {
   @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     boolean i = true;
-    for(final Expr e : exprs) {
-      if(!e.iterable()) {
+    for(final Expr expr : exprs) {
+      if(!expr.iterable()) {
         i = false;
         break;
       }

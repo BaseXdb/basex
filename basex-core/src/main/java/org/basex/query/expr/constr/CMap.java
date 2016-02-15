@@ -63,8 +63,8 @@ public final class CMap extends Arr {
   public String toString() {
     final TokenBuilder tb = new TokenBuilder("{ ");
     boolean key = true;
-    for(final Expr e : exprs) {
-      tb.add(key ? tb.size() > 2 ? ", " : "" : ":").add(e.toString());
+    for(final Expr expr : exprs) {
+      tb.add(key ? tb.size() > 2 ? ", " : "" : ":").add(expr.toString());
       key ^= true;
     }
     return tb.add(" }").toString();

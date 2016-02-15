@@ -24,11 +24,11 @@ public final class HofScanLeft extends StandardFunc {
       private Iter inner = acc.iter();
       @Override
       public Item next() throws QueryException {
-        while (true) {
+        while(true) {
           final Item i = inner.next();
-          if (i != null) return i;
+          if(i != null) return i;
           final Item o = outer.next();
-          if (o == null) return null;
+          if(o == null) return null;
           acc = f.invokeValue(qc, info, acc, o);
           inner = acc.iter();
         }

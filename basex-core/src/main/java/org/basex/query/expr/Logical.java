@@ -47,11 +47,11 @@ abstract class Logical extends Arr {
     final boolean and = this instanceof And;
     final int es = exprs.length;
     final ExprList el = new ExprList(es);
-    for(final Expr e : exprs) {
-      final Expr ex = e.optimizeEbv(qc, scp);
+    for(final Expr expr : exprs) {
+      final Expr ex = expr.optimizeEbv(qc, scp);
       if(ex.isValue()) {
         // atomic items can be pre-evaluated
-        qc.compInfo(OPTREMOVE_X_X, this, e);
+        qc.compInfo(OPTREMOVE_X_X, this, expr);
         if(ex.ebv(qc, info).bool(info) ^ and) return Bln.get(!and);
       } else {
         el.add(ex);
@@ -73,7 +73,7 @@ abstract class Logical extends Arr {
   public void plan(final FElem plan) {
     final FElem el = planElem();
     plan.add(el);
-    for(final ExprInfo e : exprs) if(e != null) e.plan(el);
+    for(final ExprInfo expr : exprs) if(expr != null) expr.plan(el);
   }
 
   @Override

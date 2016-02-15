@@ -219,7 +219,7 @@ public final class If extends Arr {
   @Override
   public int exprSize() {
     int sz = 1;
-    for(final Expr e : exprs) sz += e.exprSize();
+    for(final Expr expr : exprs) sz += expr.exprSize();
     return sz + cond.exprSize();
   }
 

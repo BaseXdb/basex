@@ -37,7 +37,7 @@ public final class FTAnd extends FTExpr {
   public FTExpr compile(final QueryContext qc, final VarScope scp) throws QueryException {
     super.compile(qc, scp);
     boolean not = true;
-    for(final FTExpr e : exprs) not &= e instanceof FTNot;
+    for(final FTExpr expr : exprs) not &= expr instanceof FTNot;
     if(not) {
       // convert (!A and !B and ...) to !(A or B or ...)
       final int es = exprs.length;

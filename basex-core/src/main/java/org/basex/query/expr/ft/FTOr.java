@@ -34,7 +34,7 @@ public final class FTOr extends FTExpr {
   public FTExpr compile(final QueryContext qc, final VarScope scp) throws QueryException {
     super.compile(qc, scp);
     boolean not = true;
-    for(final FTExpr e : exprs) not &= e instanceof FTNot;
+    for(final FTExpr expr : exprs) not &= expr instanceof FTNot;
     if(not) {
       // convert (!A or !B or ...) to !(A and B and ...)
       final int es = exprs.length;
@@ -107,9 +107,9 @@ public final class FTOr extends FTExpr {
   @Override
   public boolean indexAccessible(final IndexInfo ii) throws QueryException {
     int costs = 0;
-    for(final FTExpr e : exprs) {
+    for(final FTExpr expr : exprs) {
       // no index access if negated queries is found
-      if(!e.indexAccessible(ii)) return false;
+      if(!expr.indexAccessible(ii)) return false;
       costs += ii.costs;
     }
     // use summarized costs for estimation

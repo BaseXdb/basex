@@ -188,30 +188,30 @@ public abstract class ParseExpr extends Expr {
   /**
    * Ensures that none of the specified expressions performs an update.
    * Otherwise, throws an exception.
-   * @param ex expressions (may be {@code null}, and may contain {@code null} references)
+   * @param exprs expressions (may be {@code null}, and may contain {@code null} references)
    * @throws QueryException query exception
    */
-  protected final void checkNoneUp(final Expr... ex) throws QueryException {
-    if(ex == null) return;
-    checkAllUp(ex);
-    for(final Expr e : ex) {
-      if(e != null && e.has(Flag.UPD)) throw UPNOT_X.get(info, description());
+  protected final void checkNoneUp(final Expr... exprs) throws QueryException {
+    if(exprs == null) return;
+    checkAllUp(exprs);
+    for(final Expr expr : exprs) {
+      if(expr != null && expr.has(Flag.UPD)) throw UPNOT_X.get(info, description());
     }
   }
 
   /**
    * Ensures that all specified expressions are vacuous or either updating or non-updating.
    * Otherwise, throws an exception.
-   * @param ex expressions to be checked
+   * @param exprs expressions to be checked
    * @throws QueryException query exception
    */
-  void checkAllUp(final Expr... ex) throws QueryException {
+  void checkAllUp(final Expr... exprs) throws QueryException {
     // updating state: 0 = initial state, 1 = updating, -1 = non-updating
     int s = 0;
-    for(final Expr e : ex) {
-      e.checkUp();
-      if(e.isVacuous()) continue;
-      final boolean u = e.has(Flag.UPD);
+    for(final Expr expr : exprs) {
+      expr.checkUp();
+      if(expr.isVacuous()) continue;
+      final boolean u = expr.has(Flag.UPD);
       if(u && s == -1 || !u && s == 1) throw UPALL.get(info, description());
       s = u ? 1 : -1;
     }

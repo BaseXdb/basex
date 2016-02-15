@@ -318,8 +318,8 @@ abstract class MarkupSerializer extends StandardSerializer {
     } else if(indent) {
       final ArrayList<QNm> qnames = suppress();
       if(!qnames.isEmpty()) {
-        for(final QNm e : elems) {
-          if(qnames.contains(e)) return;
+        for(final QNm qname : elems) {
+          if(qnames.contains(qname)) return;
         }
       }
       super.indent();

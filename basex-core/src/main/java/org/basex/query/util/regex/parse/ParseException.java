@@ -97,8 +97,8 @@ public class ParseException extends Exception {
       if(maxSize < exp.length) {
         maxSize = exp.length;
       }
-      for(final int e : exp) {
-        expected.append(img[e]).append(' ');
+      for(final int ex : exp) {
+        expected.append(img[ex]).append(' ');
       }
       if(exp[exp.length - 1] != 0) {
         expected.append("...");

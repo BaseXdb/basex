@@ -60,8 +60,8 @@ abstract class CName extends CNode {
    */
   final byte[] value(final QueryContext qc, final InputInfo ii) throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
-    for(final Expr e : exprs) {
-      final Value v = qc.value(e);
+    for(final Expr expr : exprs) {
+      final Value v = qc.value(expr);
       boolean m = false;
       for(final Item it : v.atomValue(ii)) {
         if(m) tb.add(' ');

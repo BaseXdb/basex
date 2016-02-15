@@ -535,10 +535,10 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
     int i = 0;
     long off = pos;
     Node<N, E> node;
-    while (true) {
+    while(true) {
       node = arr[i];
       final long nodeSize = node.size();
-      if (off < nodeSize) break;
+      if(off < nodeSize) break;
       off -= nodeSize;
       i++;
     }

@@ -91,8 +91,8 @@ public final class GFLWOR extends ParseExpr {
         while(true) {
           final Item it = sub.next();
           qc.checkStop();
-          if (it != null) return it;
-          if (!ev.next(qc)) {
+          if(it != null) return it;
+          if(!ev.next(qc)) {
             sub = null;
             return null;
           }
@@ -479,6 +479,7 @@ public final class GFLWOR extends ParseExpr {
     boolean changed = false;
     for(int i = 1; i < clauses.size(); i++) {
       final Clause clause = clauses.get(i);
+      // do not move node constructors. example: for $x in 1 to 2 let $a := <x/> return $a
       if(!(clause instanceof Let) || clause.has(Flag.NDT) || clause.has(Flag.CNS) ||
           clause.has(Flag.UPD)) continue;
       final Let let = (Let) clause;

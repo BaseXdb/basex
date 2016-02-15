@@ -29,7 +29,7 @@ public final class Help extends Command {
     final String key = args[0];
     if(key.isEmpty()) {
       out.println(TRY_SPECIFIC_X);
-      for (final Cmd c : Cmd.values()) out.print(c.help(false));
+      for(final Cmd cmd : Cmd.values()) out.print(cmd.help(false));
     } else {
       final Cmd cmd = getOption(key, Cmd.class);
       if(cmd == null) return error(UNKNOWN_CMD_X, this);

@@ -407,7 +407,7 @@ public abstract class Expr extends ExprInfo {
    * @return success flag
    */
   protected static boolean visitAll(final ASTVisitor visitor, final Expr...exprs) {
-    for(final Expr e : exprs) if(!e.accept(visitor)) return false;
+    for(final Expr expr : exprs) if(!expr.accept(visitor)) return false;
     return true;
   }
 

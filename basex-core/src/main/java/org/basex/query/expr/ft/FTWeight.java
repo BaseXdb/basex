@@ -129,7 +129,7 @@ public final class FTWeight extends FTExpr {
   @Override
   public int exprSize() {
     int sz = 1;
-    for(final FTExpr e : exprs) sz += e.exprSize();
+    for(final FTExpr expr : exprs) sz += expr.exprSize();
     return sz + weight.exprSize();
   }
 

@@ -106,7 +106,7 @@ public final class SwitchCase extends Arr {
   @Override
   public int exprSize() {
     int sz = 0;
-    for(final Expr e : exprs) sz += e.exprSize();
+    for(final Expr expr : exprs) sz += expr.exprSize();
     return sz;
   }
 }

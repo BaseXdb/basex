@@ -65,8 +65,8 @@ public final class Or extends Logical {
     compFlatten(qc);
 
     boolean not = true;
-    for(final Expr e : exprs) {
-      if(!e.isFunction(Function.NOT)) {
+    for(final Expr expr : exprs) {
+      if(!expr.isFunction(Function.NOT)) {
         not = false;
         break;
       }
@@ -91,8 +91,8 @@ public final class Or extends Logical {
     if(qc.scoring) {
       double s = 0;
       boolean f = false;
-      for(final Expr e : exprs) {
-        final Item it = e.ebv(qc, info);
+      for(final Expr expr : exprs) {
+        final Item it = expr.ebv(qc, info);
         f |= it.bool(ii);
         s += it.score();
       }
@@ -100,8 +100,8 @@ public final class Or extends Logical {
     }
 
     // standard evaluation
-    for(final Expr e : exprs) {
-      if(e.ebv(qc, info).bool(ii)) return Bln.TRUE;
+    for(final Expr expr : exprs) {
+      if(expr.ebv(qc, info).bool(ii)) return Bln.TRUE;
     }
     return Bln.FALSE;
   }

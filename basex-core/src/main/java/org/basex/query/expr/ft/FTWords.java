@@ -452,7 +452,7 @@ public final class FTWords extends FTExpr {
   public int exprSize() {
     int sz = 1;
     if(occ != null) for(final Expr o : occ) sz += o.exprSize();
-    for(final Expr e : exprs) sz += e.exprSize();
+    for(final Expr expr : exprs) sz += expr.exprSize();
     return sz + query.exprSize();
   }
 
