@@ -60,11 +60,9 @@ public final class Transform extends Arr {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final int o = qc.resources.cache.size();
-    final Updates updates = qc.resources.updates();
-    final ContextModifier tmp = updates.mod;
-    final TransformModifier pu = new TransformModifier();
-    updates.mod = pu;
+    final Updates tmp = qc.updates();
+    final Updates updates = new Updates(true);
+    qc.updates = updates;
 
     try {
       for(final Let copy : copies) {
@@ -78,18 +76,17 @@ public final class Transform extends Arr {
         i = ((ANode) i).dbNodeCopy(qc.context.options);
         // add resulting node to variable
         qc.set(copy.var, i, info);
-        pu.addData(i.data());
+        updates.addData(i.data());
       }
       final Value v = qc.value(exprs[0]);
       if(!v.isEmpty()) throw BASX_UPMODIFY.get(info);
 
       updates.prepare(qc);
       updates.apply(qc);
+      return qc.value(exprs[1]);
     } finally {
-      qc.resources.cache.size(o);
-      updates.mod = tmp;
+      qc.updates = tmp;
     }
-    return qc.value(exprs[1]);
   }
 
   @Override
@@ -130,8 +127,8 @@ public final class Transform extends Arr {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(COPY + ' ');
-    for(final Let t : copies)
-      sb.append(t.var).append(' ').append(ASSIGN).append(' ').append(t.expr).append(' ');
+    for(final Let copy : copies)
+      sb.append(copy.var).append(' ').append(ASSIGN).append(' ').append(copy.expr).append(' ');
     return sb.append(MODIFY + ' ' + exprs[0] + ' ' + RETURN + ' ' + exprs[1]).toString();
   }
 
@@ -143,8 +140,8 @@ public final class Transform extends Arr {
   @Override
   public int exprSize() {
     int sz = 1;
-    for(final Let lt : copies) sz += lt.exprSize();
-    for(final Expr e : exprs) sz += e.exprSize();
+    for(final Let copy : copies) sz += copy.exprSize();
+    for(final Expr expr : exprs) sz += expr.exprSize();
     return sz;
   }
 }

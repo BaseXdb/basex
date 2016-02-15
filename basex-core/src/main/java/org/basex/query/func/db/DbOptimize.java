@@ -19,7 +19,7 @@ public final class DbOptimize extends DbNew {
     final Data data = checkData(qc);
     final boolean all = exprs.length > 1 && toBoolean(exprs[1], qc);
     final Options opts = toOptions(2, Q_OPTIONS, new Options(), qc);
-    qc.resources.updates().add(new DBOptimize(data, all, opts, qc, info), qc);
+    qc.updates().add(new DBOptimize(data, all, opts, qc, info), qc);
     return null;
   }
 }

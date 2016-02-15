@@ -29,7 +29,7 @@ public final class FnPut extends StandardFunc {
 
     final Uri u = Uri.uri(file);
     if(u == Uri.EMPTY || !u.isValid()) throw UPFOURI_X.get(info, file);
-    final Updates updates = qc.resources.updates();
+    final Updates updates = qc.updates();
     final DBNode target = updates.determineDataRef(nd, qc);
 
     final String uri = IO.get(string(u.string())).path();

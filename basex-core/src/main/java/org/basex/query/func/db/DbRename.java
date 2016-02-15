@@ -28,7 +28,7 @@ public final class DbRename extends DbAccess {
     final String target = path(2, qc);
 
     // the first step of the path should be the database name
-    final Updates updates = qc.resources.updates();
+    final Updates updates = qc.updates();
     final IntList il = data.resources.docs(source);
     final int is = il.size();
     for(int i = 0; i < is; i++) {
@@ -70,7 +70,7 @@ public final class DbRename extends DbAccess {
     } else if(src.exists()) {
       // file -> dir? error
       if(trg.isDir()) throw BXDB_PATH_X.get(info, src);
-      qc.resources.updates().add(new DBRename(data, src.path(), trg.path(), info), qc);
+      qc.updates().add(new DBRename(data, src.path(), trg.path(), info), qc);
     }
   }
 }

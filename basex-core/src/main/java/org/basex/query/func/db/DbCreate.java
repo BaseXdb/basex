@@ -55,7 +55,7 @@ public final class DbCreate extends DbNew {
     }
 
     final Options opts = toOptions(3, Q_OPTIONS, new Options(), qc);
-    qc.resources.updates().add(new DBCreate(name, inputs, opts, qc, info), qc);
+    qc.updates().add(new DBCreate(name, inputs, opts, qc, info), qc);
     return null;
   }
 }

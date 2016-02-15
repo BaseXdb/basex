@@ -30,6 +30,13 @@ public abstract class ContextModifier {
   private MemData tmp;
 
   /**
+   * Adds a data reference to list which keeps track of the nodes copied
+   * within a transform expression.
+   * @param data reference
+   */
+  abstract void addData(final Data data);
+
+  /**
    * Adds an update primitive to this context modifier.
    * @param update update primitive
    * @param qc query context

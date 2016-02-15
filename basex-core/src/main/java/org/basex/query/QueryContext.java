@@ -6,7 +6,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
-import java.util.Map.Entry;
+import java.util.Map.*;
 
 import org.basex.build.json.*;
 import org.basex.build.json.JsonOptions.*;
@@ -14,13 +14,11 @@ import org.basex.core.*;
 import org.basex.core.MainOptions.MainParser;
 import org.basex.core.locks.*;
 import org.basex.core.users.*;
-import org.basex.core.Context;
 import org.basex.data.*;
-import org.basex.io.*;
 import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.Expr.Flag;
+import org.basex.query.expr.Expr.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
@@ -35,6 +33,7 @@ import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.DateTime;
 import org.basex.util.ft.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
@@ -59,6 +58,7 @@ public final class QueryContext extends Proc implements Closeable {
 
   /** Parent query context. */
   private final QueryContext parent;
+
   /** Query info. */
   public final QueryInfo info;
   /** Database context. */
@@ -68,11 +68,9 @@ public final class QueryContext extends Proc implements Closeable {
   public QueryResources resources;
   /** HTTP context. */
   public Object http;
+  /** Pending updates. */
+  public Updates updates;
 
-  /** Cached stop word files. */
-  public HashMap<String, IO> stop;
-  /** Cached thesaurus files. */
-  public HashMap<String, IO> thes;
   /** Global database options (will be reassigned after query execution). */
   final HashMap<Option<?>, Object> staticOpts = new HashMap<>();
   /** Temporary query options (key/value pairs), supplied by option declarations. */
@@ -142,7 +140,7 @@ public final class QueryContext extends Proc implements Closeable {
   /** Serialization parameters. */
   private SerializerOptions serParams;
   /** Indicates if the default serialization parameters are used. */
-  public boolean defaultOutput;
+  private boolean defaultOutput;
 
   /** Indicates if the query has been compiled. */
   private boolean compiled;
@@ -154,9 +152,11 @@ public final class QueryContext extends Proc implements Closeable {
    * @param qcParent parent context
    */
   public QueryContext(final QueryContext qcParent) {
-    this(qcParent.context, qcParent);
+    this(qcParent.context, qcParent, qcParent.info);
     listen = qcParent.listen;
     resources = qcParent.resources;
+    http = qcParent.http;
+    updates = qcParent.updates;
   }
 
   /**
@@ -164,7 +164,7 @@ public final class QueryContext extends Proc implements Closeable {
    * @param context database context
    */
   public QueryContext(final Context context) {
-    this(context, null);
+    this(context, null, null);
     resources = new QueryResources(this);
   }
 
@@ -172,11 +172,12 @@ public final class QueryContext extends Proc implements Closeable {
    * Constructor.
    * @param context database context
    * @param parent parent context (can be {@code null})
+   * @param info query info
    */
-  private QueryContext(final Context context, final QueryContext parent) {
+  private QueryContext(final Context context, final QueryContext parent, final QueryInfo info) {
     this.context = context;
     this.parent = parent;
-    info = new QueryInfo(this);
+    this.info = info != null ? info : new QueryInfo(this);
   }
 
   /**
@@ -343,12 +344,11 @@ public final class QueryContext extends Proc implements Closeable {
       // cache results
       ItemList results = root.cache(this);
 
-      final Updates updates = resources.updates;
       if(updates != null) {
         // only perform updates if no parent context exists
         if(parent == null) {
           // create copies of results that will be modified by an update operation
-          final ItemList cache = resources.cache;
+          final ItemList cache = updates.cache;
           final HashSet<Data> datas = updates.prepare(this);
           final StringList dbs = updates.databases();
           check(results, datas, dbs);
@@ -418,6 +418,15 @@ public final class QueryContext extends Proc implements Closeable {
   public Value value(final Expr expr) throws QueryException {
     checkStop();
     return expr.value(this);
+  }
+
+  /**
+   * Returns a reference to the updates.
+   * @return updates
+   */
+  public Updates updates() {
+    if(updates == null) updates = new Updates(false);
+    return updates;
   }
 
   /**
@@ -593,6 +602,8 @@ public final class QueryContext extends Proc implements Closeable {
     if(parent == null) {
       closed = true;
       resources.close();
+    } else {
+      parent.updates = updates;
     }
 
     // reassign original database options

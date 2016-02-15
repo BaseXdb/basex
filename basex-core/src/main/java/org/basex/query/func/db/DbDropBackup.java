@@ -26,7 +26,7 @@ public final class DbDropBackup extends DbAccess {
     final StringList backups = qc.context.databases.backups(name);
     if(backups.isEmpty()) throw BXDB_WHICHBACK_X.get(info, name);
 
-    final Updates updates = qc.resources.updates();
+    final Updates updates = qc.updates();
     for(final String backup : backups) updates.add(new BackupDrop(backup, info, qc), qc);
     return null;
   }

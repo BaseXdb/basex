@@ -3495,7 +3495,7 @@ public class QueryParser extends InputParser {
             } else if(wsConsumeWs(AT)) {
               final String fn = string(stringLiteral());
               // optional: resolve URI reference
-              final IO fl = qc.stop != null ? qc.stop.get(fn) : sc.resolve(fn, null);
+              final IO fl = qc.resources.stopWords(fn, sc);
               if(!opt.sw.read(fl, except)) throw error(NOSTOPFILE_X, fl);
             } else if(!union && !except) {
               throw error(FTSTOP);
@@ -3531,7 +3531,7 @@ public class QueryParser extends InputParser {
 
     final String fn = string(stringLiteral());
     // optional: resolve URI reference
-    final IO fl = qc.thes != null ? qc.thes.get(fn) : sc.resolve(fn, null);
+    final IO fl = qc.resources.thesaurus(fn, sc);
     final byte[] rel = wsConsumeWs(RELATIONSHIP) ? stringLiteral() : EMPTY;
     final Expr[] range = ftRange(true);
     long min = 0;

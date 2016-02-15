@@ -22,7 +22,7 @@ public final class DbCreateBackup extends DbAccess {
     if(!Databases.validName(name)) throw BXDB_NAME_X.get(info, name);
     if(!qc.context.soptions.dbExists(name)) throw BXDB_WHICH_X.get(info, name);
 
-    qc.resources.updates().add(new BackupCreate(name, info, qc), qc);
+    qc.updates().add(new BackupCreate(name, info, qc), qc);
     return null;
   }
 }

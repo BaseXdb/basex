@@ -23,7 +23,7 @@ public final class UserAlter extends UserFn {
     if(Strings.eq(UserText.ADMIN, name, newname)) throw USER_ADMIN.get(info);
     if(Strings.eq(name, newname)) throw USER_EQUAL_X.get(info, name);
 
-    qc.resources.updates().add(new Alter(user, newname, qc, ii), qc);
+    qc.updates().add(new Alter(user, newname, qc, ii), qc);
     return null;
   }
 

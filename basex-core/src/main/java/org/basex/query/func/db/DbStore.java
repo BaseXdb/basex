@@ -25,7 +25,7 @@ public final class DbStore extends DbAccess {
 
     final IOFile file = data.meta.binary(path);
     if(file == null || path.isEmpty()) throw RESINV_X.get(info, path);
-    qc.resources.updates().add(new DBStore(data, path, item, info), qc);
+    qc.updates().add(new DBStore(data, path, item, info), qc);
     return null;
   }
 }

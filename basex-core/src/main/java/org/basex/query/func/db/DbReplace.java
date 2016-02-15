@@ -29,7 +29,7 @@ public final class DbReplace extends DbNew {
     final Item item = toNodeOrAtomItem(exprs[2], qc);
     final Options opts = toOptions(3, Q_OPTIONS, new Options(), qc);
 
-    final Updates updates = qc.resources.updates();
+    final Updates updates = qc.updates();
     final IntList docs = data.resources.docs(path);
     int d = 0;
 

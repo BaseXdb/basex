@@ -56,11 +56,8 @@ public final class TransformWith extends Arr {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final int o = qc.resources.cache.size();
-    final Updates updates = qc.resources.updates();
-    final ContextModifier tmp = updates.mod;
-    final TransformModifier pu = new TransformModifier();
-    updates.mod = pu;
+    final Updates updates = new Updates(true), upd = qc.updates();
+    qc.updates = updates;
 
     final Value cv = qc.value;
     try {
@@ -74,7 +71,7 @@ public final class TransformWith extends Arr {
       i = ((ANode) i).dbNodeCopy(qc.context.options);
       // set resulting node as context
       qc.value = i;
-      pu.addData(i.data());
+      updates.addData(i.data());
 
       final Value v = qc.value(exprs[1]);
       if(!v.isEmpty()) throw BASX_UPMODIFY.get(info);
@@ -83,8 +80,7 @@ public final class TransformWith extends Arr {
       updates.apply(qc);
       return qc.value;
     } finally {
-      qc.resources.cache.size(o);
-      updates.mod = tmp;
+      qc.updates = upd;
       qc.value = cv;
     }
   }
@@ -112,7 +108,7 @@ public final class TransformWith extends Arr {
   @Override
   public int exprSize() {
     int sz = 1;
-    for(final Expr e : exprs) sz += e.exprSize();
+    for(final Expr expr : exprs) sz += expr.exprSize();
     return sz;
   }
 }

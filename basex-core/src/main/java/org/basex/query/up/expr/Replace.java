@@ -58,7 +58,7 @@ public final class Replace extends Update {
     final Item i2 = t.next();
     if(i2 != null) throw UPTRGSINGLE_X.get(info, ValueBuilder.concat(i, i2));
     final ANode targ = (ANode) i;
-    final Updates updates = qc.resources.updates();
+    final Updates updates = qc.updates();
     final DBNode dbn = updates.determineDataRef(targ, qc);
 
     // replace node

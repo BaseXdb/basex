@@ -22,7 +22,7 @@ public final class UserDrop extends UserFn {
     final User user = toSafeUser(0, qc);
     final StringList patterns = toPatterns(1, qc);
     if(user.name().equals(UserText.ADMIN)) throw USER_ADMIN.get(info);
-    qc.resources.updates().add(new Drop(user, patterns, qc, ii), qc);
+    qc.updates().add(new Drop(user, patterns, qc, ii), qc);
     return null;
   }
 

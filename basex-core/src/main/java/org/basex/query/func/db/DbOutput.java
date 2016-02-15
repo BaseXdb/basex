@@ -18,11 +18,12 @@ import org.basex.util.*;
 public final class DbOutput extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    if(qc.resources.updates().mod instanceof TransformModifier) throw BASX_DBTRANSFORM.get(info);
+    final Updates updates = qc.updates();
+    if(updates.mod instanceof TransformModifier) throw BASX_DBTRANSFORM.get(info);
     final Iter iter = qc.iter(exprs[0]);
     for(Item it; (it = iter.next()) != null;) {
       qc.checkStop();
-      qc.resources.cache.add(it);
+      qc.updates.cache.add(it);
     }
     return null;
   }

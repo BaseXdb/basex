@@ -3,6 +3,7 @@ package org.basex.query.up;
 import static org.basex.query.QueryError.*;
 
 import org.basex.core.users.*;
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.up.primitives.name.*;
@@ -16,6 +17,11 @@ import org.basex.util.*;
  * @author Lukas Kircher
  */
 final class DatabaseModifier extends ContextModifier {
+  @Override
+  public void addData(final Data data) {
+    // ignore data
+  }
+
   @Override
   void add(final Update update, final QueryContext qc) throws QueryException {
     // check permissions

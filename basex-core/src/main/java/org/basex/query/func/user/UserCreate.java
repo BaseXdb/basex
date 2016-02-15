@@ -29,7 +29,7 @@ public final class UserCreate extends UserFn {
     final User user = new User(name, pw);
     if(name.equals(UserText.ADMIN)) throw USER_ADMIN.get(info);
 
-    qc.resources.updates().add(new Create(user, perms, patterns, qc, ii), qc);
+    qc.updates().add(new Create(user, perms, patterns, qc, ii), qc);
     return null;
   }
 

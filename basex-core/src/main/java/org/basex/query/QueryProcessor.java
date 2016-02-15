@@ -272,7 +272,7 @@ public final class QueryProcessor extends Proc implements Closeable {
    * @return number of updates
    */
   public int updates() {
-    return updating ? qc.resources.updates().size() : 0;
+    return updating ? qc.updates().size() : 0;
   }
 
   /**

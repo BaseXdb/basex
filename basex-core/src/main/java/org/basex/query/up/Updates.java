@@ -8,6 +8,7 @@ import org.basex.query.iter.*;
 import org.basex.query.up.atomic.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.up.primitives.node.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.node.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
@@ -58,13 +59,32 @@ import org.basex.util.list.*;
  */
 public final class Updates {
   /** Current context modifier. */
-  public ContextModifier mod;
+  public final ContextModifier mod;
   /** All file paths that are targeted during a snapshot by an fn:put expression. */
   public final TokenSet putPaths = new TokenSet();
+  /** Cached outputs. */
+  public final ItemList cache = new ItemList();
 
   /** Mapping between fragment IDs and the temporary data instances
    * to apply updates on the corresponding fragments. */
   private final IntObjMap<MemData> fragmentIDs = new IntObjMap<>();
+
+  /**
+   * Constructor.
+   * @param transform transform flag
+   */
+  public Updates(final boolean transform) {
+    mod = transform ? new TransformModifier() : new DatabaseModifier();
+  }
+
+  /**
+   * Adds a data reference to list which keeps track of the nodes copied
+   * within a transform expression.
+   * @param data reference
+   */
+  public void addData(final Data data) {
+    mod.addData(data);
+  }
 
   /**
    * Adds an update primitive to the current context modifier.
@@ -73,7 +93,6 @@ public final class Updates {
    * @throws QueryException query exception
    */
   public void add(final Update up, final QueryContext qc) throws QueryException {
-    if(mod == null) mod = new DatabaseModifier();
     mod.add(up, qc);
   }
 
@@ -121,7 +140,7 @@ public final class Updates {
    */
   public HashSet<Data> prepare(final QueryContext qc) throws QueryException {
     final HashSet<Data> datas = new HashSet<>();
-    if(mod != null) mod.prepare(datas, qc);
+    mod.prepare(datas, qc);
     return datas;
   }
 
@@ -131,7 +150,7 @@ public final class Updates {
    * @throws QueryException query exception
    */
   public void apply(final QueryContext qc) throws QueryException {
-    if(mod != null) mod.apply(qc);
+    mod.apply(qc);
   }
 
   /**
@@ -140,7 +159,7 @@ public final class Updates {
    */
   public StringList databases() {
     final StringList sl = new StringList(1);
-    if(mod != null) mod.databases(sl);
+    mod.databases(sl);
     return sl;
   }
 
@@ -149,7 +168,7 @@ public final class Updates {
    * @return #updates
    */
   public int size() {
-    return mod == null ? 0 : mod.size();
+    return mod.size();
   }
 
   /**

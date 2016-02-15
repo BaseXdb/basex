@@ -59,8 +59,8 @@ public abstract class Parse extends StandardFunc {
         io = base.merge(p);
       }
 
-      String[] rp = qc.resources.texts.get(p);
-      if(rp == null) rp = qc.resources.texts.get(io.path());
+      String[] rp = qc.resources.text(p);
+      if(rp == null) rp = qc.resources.text(io.path());
 
       if(rp != null && rp.length > 0) {
         io = IO.get(rp[0]);
