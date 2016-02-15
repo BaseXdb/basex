@@ -7,8 +7,6 @@ import static org.junit.Assert.*;
 
 import org.basex.query.value.item.QNm;
 import org.hamcrest.CustomTypeSafeMatcher;
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -103,6 +101,8 @@ public final class RestXqPathMatcherTest {
             new QNm("m:var2"));
   }
 
+  /** Test.
+   * @throws Exception exception */
   @Test
   public void testParseVariablesWithGroupsInRegex() throws Exception {
     testParse(
@@ -110,39 +110,57 @@ public final class RestXqPathMatcherTest {
             "/a1((/.*)?)", 1, ONE, new QNm("p"));
   }
 
+  /** Test.
+   * @throws Exception exception */
   @Test
   public void testValuesNoMatch() throws Exception {
     testValues("/a1{$p=(/.*)?}", "/a1b/c", "p", null);
   }
 
+  /** Test.
+   * @throws Exception exception */
   @Test
   public void testValuesNoTrailingSlash() throws Exception {
     testValues("/a1{$p=(/.*)?}", "/a1", "p", "");
   }
 
+  /** Test.
+   * @throws Exception exception */
   @Test
   public void testValuesWithTrailingSlash() throws Exception {
     testValues("/a1{$p=(/.*)?}", "/a1/", "p", "/");
   }
 
+  /** Test.
+   * @throws Exception exception */
   @Test
   public void testValuesMatched() throws Exception {
     testValues("/a1{$p=(/.*)?}", "/a1/b/c/d", "p", "/b/c/d");
   }
 
+  /** Test.
+   * @throws Exception exception */
   @Test
   public void testValuesMatchedSeveralVariables() throws Exception {
     testValues("/a1/{$l=(b|d)}/{$d=(0|((12)?3))}", "/a1/b/123", "l", "b");
     testValues("/a1/{$l=(b|d)}/{$d=(0|((12)?3))}", "/a1/b/123", "d", "123");
   }
 
-  private static void testValues(String template, String path, final String var, final String val) throws Exception {
-    Map<QNm, String> actual = RestXqPathMatcher.parse(template, null).values(path);
-    assertThat(actual, new CustomTypeSafeMatcher<Map<QNm, String>>("values differ")
-    {
+  /**
+   * Performs a test.
+   * @param template template
+   * @param path path
+   * @param var variable
+   * @param val value
+   * @throws Exception arbitrary exception
+   */
+  private static void testValues(final String template, final String path, final String var,
+      final String val) throws Exception {
+
+    final Map<QNm, String> actual = RestXqPathMatcher.parse(template, null).values(path);
+    assertThat(actual, new CustomTypeSafeMatcher<Map<QNm, String>>("values differ") {
       @Override
-      protected boolean matchesSafely(Map<QNm, String> item)
-      {
+      protected boolean matchesSafely(final Map<QNm, String> item) {
         return Objects.equals(val, item.get(new QNm(var)));
       }
     });

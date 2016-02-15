@@ -65,9 +65,9 @@ final class RestXqPathMatcher {
     final Matcher m = matcher(path);
     if(m.matches()) {
       final int groupCount = m.groupCount();
-      if (vars.size() <= groupCount) {
+      if(vars.size() <= groupCount) {
         int group = 1;
-        for (QNm var : vars) {
+        for(final QNm var : vars) {
           result.put(var, m.group(group));
           // skip nested groups
           final int end = m.end(group);
