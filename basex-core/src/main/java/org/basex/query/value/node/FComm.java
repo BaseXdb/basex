@@ -52,7 +52,7 @@ public final class FComm extends FNode {
 
   @Override
   public String toString() {
-    return Util.info("<!--%-->", value);
+    return new TokenBuilder("<!--").add(value).add("-->").toString();
   }
 
   /**

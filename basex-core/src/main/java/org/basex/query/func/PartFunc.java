@@ -53,9 +53,9 @@ public final class PartFunc extends Arr {
     final SeqType t = f.seqType();
     if(t.instanceOf(SeqType.FUN_O) && t.type != SeqType.ANY_FUN) {
       final FuncType ft = (FuncType) t.type;
-      final int ar = exprs.length + holes.length - 1;
-      if(ft.argTypes.length != ar)
-        throw INVARITY_X_X_X_X.get(info, f, ar, ar == 1 ? "" : "s", ft.argTypes.length);
+      final int nargs = exprs.length + holes.length - 1;
+      if(ft.argTypes.length != nargs)
+        throw INVARITY_X_X_X_X.get(info, nargs, nargs == 1 ? "" : "s", ft.argTypes.length, f);
       final SeqType[] args = new SeqType[holes.length];
       final int hl = holes.length;
       for(int h = 0; h < hl; h++) args[h] = ft.argTypes[holes[h]];
@@ -70,11 +70,12 @@ public final class PartFunc extends Arr {
     final FItem f = toFunc(exprs[exprs.length - 1], qc);
 
     final int hl = holes.length;
-    final int ar = exprs.length + hl - 1;
-    if(f.arity() != ar) throw INVARITY_X_X_X_X.get(info, f, ar, ar == 1 ? "" : "s", f.arity());
+    final int nargs = exprs.length + hl - 1;
+    if(f.arity() != nargs)
+      throw INVARITY_X_X_X_X.get(info, nargs, nargs == 1 ? "" : "s", f.arity(), f);
 
     final FuncType ft = f.funcType();
-    final Expr[] args = new Expr[ar];
+    final Expr[] args = new Expr[nargs];
     final VarScope scp = new VarScope(sc);
     final Var[] vars = new Var[hl];
     int a = -1;

@@ -978,7 +978,9 @@ public enum QueryError {
   /** XPTY0004. */
   DOCNS_X(XPTY, 4, "Cannot add namespaces to a document node: %."),
   /** XPTY0004. */
-  INVARITY_X_X_X_X(XPTY, 4, "%: % argument% supplied (% expected)."),
+  INVARITY_X_X_X_X(XPTY, 4, "% argument% supplied (% expected): %."),
+  /** XPTY0004. */
+  FUNARITY_X_X_X(XPTY, 4, "Function with % argument% supplied (% expected)."),
   /** XPTY0004. */
   INVNCNAME_X(XPTY, 4, "Invalid NCName: '%'."),
   /** XPTY0004. */
@@ -1195,19 +1197,19 @@ public enum QueryError {
   CONSFUNC_X(XQTY, 105, "Invalid content: %."),
 
   /** XUDY0009. */
-  UPNOPAR_X(XUDY, 9, "Target % has no parent."),
+  UPNOPAR_X(XUDY, 9, "Target has no parent: %."),
   /** XUDY0014. */
-  UPNOTCOPIED_X(XUDY, 14, "% was not created by copy clause."),
+  UPNOTCOPIED_X(XUDY, 14, "Node was not created by copy clause: %."),
   /** XUDY0015. */
-  UPMULTREN_X(XUDY, 15, "% can only be renamed once."),
+  UPMULTREN_X(XUDY, 15, "Node can only be renamed once: %."),
   /** XUDY0015. */
   UPPATHREN_X(XUDY, 15, "Path can only be renamed once: '%'."),
   /** XUDY0016. */
-  UPMULTREPL_X(XUDY, 16, "% can only be replaced once."),
+  UPMULTREPL_X(XUDY, 16, "Node can only be replaced once: %."),
   /** XUDY0016. */
   UPMULTDOC_X_X(XUDY, 16, "Documents in path '%/%' can only be replaced once."),
   /** XUDY0017. */
-  UPMULTREPV_X(XUDY, 17, "% can only be replaced once."),
+  UPMULTREPV_X(XUDY, 17, "Node can only be replaced once: %."),
   /** XUDY0021. */
   UPATTDUPL_X(XUDY, 21, "Duplicate attribute: %."),
   /** XUDY0023. */
@@ -1217,7 +1219,7 @@ public enum QueryError {
   /** XUDY0027. */
   UPSEQEMP_X(XUDY, 27, "% target is an empty sequence."),
   /** XUDY0029. */
-  UPPAREMPTY_X(XUDY, 29, "Target % has no parent."),
+  UPPAREMPTY_X(XUDY, 29, "Target has no parent: %."),
   /** XUDY0030. */
   UPATTELM_X(XUDY, 30, "Attribute cannot be added to %."),
   /** XUDY0031. */
@@ -1256,11 +1258,11 @@ public enum QueryError {
   /** XUTY0008. */
   UPTRGNODE_X(XUTY, 8, "Target must be element, text, attribute, comment or pi: %."),
   /** XUTY0008. */
-  UPTRGSINGLE_X(XUTY, 8, "Target must single node: %."),
+  UPTRGSINGLE_X(XUTY, 8, "Target must be single node: %."),
   /** XUTY0010. */
-  UPWRELM_X_X(XUTY, 10, "% cannot be replaced with attribute: %."),
+  UPWRELM_X(XUTY, 10, "Node cannot be replaced with attribute: %."),
   /** XUTY0011. */
-  UPWRATTR_X(XUTY, 11, "Attribute cannot be replaced with other type: %."),
+  UPWRATTR_X(XUTY, 11, "Target is no attribute: %."),
   /** XUTY0012. */
   UPWRTRGTYP_X(XUTY, 12, "Target must be element, attribute or pi: %."),
   /** XUTY0012. */

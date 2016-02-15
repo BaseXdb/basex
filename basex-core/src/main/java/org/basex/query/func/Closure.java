@@ -178,7 +178,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
         } else if(c instanceof Closure) {
           // nested closures are inlined if their size and number of closed-over variables is small
           final Closure cl = (Closure) c;
-          if(!cl.has(Flag.NDT) && cl.global.size() < 5
+          if(!cl.has(Flag.NDT) && !cl.has(Flag.UPD) && cl.global.size() < 5
               && expr.count(v) != VarUsage.MORE_THAN_ONCE
               && cl.exprSize() < qc.context.options.get(MainOptions.INLINELIMIT)) {
             qc.compInfo(OPTINLINE_X, e);

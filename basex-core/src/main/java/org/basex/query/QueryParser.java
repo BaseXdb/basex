@@ -158,7 +158,7 @@ public class QueryParser extends InputParser {
       versionDecl();
 
       final int i = pos;
-      if(wsConsumeWs(MODULE, NSPACE, null)) throw error(MAINMOD);
+      if(wsConsumeWs(MODULE, NAMESPACE, null)) throw error(MAINMOD);
       pos = i;
 
       prolog1();
@@ -194,7 +194,7 @@ public class QueryParser extends InputParser {
       versionDecl();
 
       wsCheck(MODULE);
-      wsCheck(NSPACE);
+      wsCheck(NAMESPACE);
       skipWs();
       final byte[] pref = ncName(NONAME_X);
       wsCheck(IS);
@@ -344,7 +344,7 @@ public class QueryParser extends InputParser {
           copyNamespacesDecl();
         } else if(wsConsumeWs(DECIMAL_FORMAT)) {
           decimalFormatDecl(false);
-        } else if(wsConsumeWs(NSPACE)) {
+        } else if(wsConsumeWs(NAMESPACE)) {
           namespaceDecl();
         } else if(wsConsumeWs(FT_OPTION)) {
           final FTOpt fto = new FTOpt();
@@ -515,7 +515,7 @@ public class QueryParser extends InputParser {
   private boolean defaultNamespaceDecl() throws QueryException {
     final boolean elem = wsConsumeWs(ELEMENT);
     if(!elem && !wsConsumeWs(FUNCTION)) return false;
-    wsCheck(NSPACE);
+    wsCheck(NAMESPACE);
     final byte[] uri = stringLiteral();
     if(eq(XML_URI, uri)) throw error(BINDXMLURI_X_X, uri, XML);
     if(eq(XMLNS_URI, uri)) throw error(BINDXMLURI_X_X, uri, XMLNS);
@@ -683,13 +683,13 @@ public class QueryParser extends InputParser {
    */
   private void schemaImport() throws QueryException {
     byte[] pref = null;
-    if(wsConsumeWs(NSPACE)) {
+    if(wsConsumeWs(NAMESPACE)) {
       pref = ncName(NONAME_X);
       if(eq(pref, XML, XMLNS)) throw error(BINDXML_X, pref);
       wsCheck(IS);
     } else if(wsConsumeWs(DEFAULT)) {
       wsCheck(ELEMENT);
-      wsCheck(NSPACE);
+      wsCheck(NAMESPACE);
     }
     byte[] ns = stringLiteral();
     if(pref != null && ns.length == 0) throw error(NSEMPTY);
@@ -709,7 +709,7 @@ public class QueryParser extends InputParser {
    */
   private void moduleImport() throws QueryException {
     byte[] pref = EMPTY;
-    if(wsConsumeWs(NSPACE)) {
+    if(wsConsumeWs(NAMESPACE)) {
       pref = ncName(NONAME_X);
       wsCheck(IS);
     }
@@ -2754,7 +2754,7 @@ public class QueryParser extends InputParser {
     if(wsConsumeWs(DOCUMENT))  return consume(compDoc(), i);
     if(wsConsumeWs(ELEMENT))   return consume(compElement(), i);
     if(wsConsumeWs(ATTRIBUTE)) return consume(compAttribute(), i);
-    if(wsConsumeWs(NSPACE))    return consume(compNamespace(), i);
+    if(wsConsumeWs(NAMESPACE))    return consume(compNamespace(), i);
     if(wsConsumeWs(TEXT))      return consume(compText(), i);
     if(wsConsumeWs(COMMENT))   return consume(compComment(), i);
     if(wsConsumeWs(PI))        return consume(compPI(), i);

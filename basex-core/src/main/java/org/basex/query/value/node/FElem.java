@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import org.basex.core.MainOptions;
+import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
@@ -358,7 +359,7 @@ public final class FElem extends FNode {
 
   @Override
   public byte[] baseURI() {
-    final byte[] b = attribute(new QNm(BASE, XML_URI));
+    final byte[] b = attribute(new QNm(BASE, QueryText.XML_URI));
     return b != null ? b : EMPTY;
   }
 
@@ -419,14 +420,24 @@ public final class FElem extends FNode {
     if(ns != null) {
       final int nl = ns.size();
       for(int n = 0; n < nl; n++) {
-        tb.add(new FNSpace(ns.name(n), ns.value(n)).toString());
+        tb.add(' ').addExt(new FNSpace(ns.name(n), ns.value(n)));
       }
     }
     if(atts != null) {
-      for(final ANode n : atts) tb.add(n.toString());
+      for(final ANode att : atts) tb.add(' ').addExt(att);
     }
-    if(hasChildren()) tb.add(">...</").add(name.string());
-    else tb.add("/");
-    return tb.add(">").toString();
+    if(hasChildren()) {
+      tb.add('>');
+      final ANode child = children.get(0);
+      if(child.type == NodeType.TXT && children.size() == 1) {
+        tb.add(Atm.toString(child.value, false));
+      } else {
+        tb.add(DOTS);
+      }
+      tb.add("</").add(name.string()).add('>');
+    } else {
+      tb.add("/>");
+    }
+    return tb.toString();
   }
 }

@@ -207,7 +207,7 @@ public enum Function {
   FUNCTION_ARITY(FnFunctionArity.class, "function-arity(function)", arg(FUN_O), ITR),
   /** XQuery function. */
   FUNCTION_LOOKUP(FnFunctionLookup.class, "function-lookup(name,arity)",
-      arg(QNM, ITR), FUN_OZ, flag(CTX, Flag.POS, NDT, HOF)),
+      arg(QNM, ITR), FUN_OZ, flag(CTX, Flag.POS, NDT)),
   /** XQuery function. */
   FUNCTION_NAME(FnFunctionName.class, "function-name(function)", arg(FUN_O), QNM_ZO),
   /** XQuery function. */
@@ -323,7 +323,7 @@ public enum Function {
   /** XQuery function. */
   PREFIX_FROM_QNAME(FnPrefixFromQName.class, "prefix-from-QName(qname)", arg(QNM_ZO), NCN_ZO),
   /** XQuery function. */
-  PUT(FnPut.class, "put(node,uri)", arg(NOD, STR_ZO), EMP, flag(UPD, NDT)),
+  PUT(FnPut.class, "put(node,uri)", arg(NOD, STR_ZO), EMP, flag(UPD)),
   /** XQuery function. */
   QNAME(FnQName.class, "QName(uri,name)", arg(STR_ZO, STR), QNM),
   /** XQuery function. */
@@ -775,22 +775,21 @@ public enum Function {
   /** XQuery function. */
   _DB_LIST(DbList.class, "list([database[,path]])", arg(STR, STR), STR_ZM, flag(NDT), DB_URI),
   /** XQuery function. */
-  _DB_LIST_DETAILS(DbListDetails.class, "list-details([database[,path]])", arg(STR, STR), ELM_ZM,
-      flag(NDT), DB_URI),
+  _DB_LIST_DETAILS(DbListDetails.class, "list-details([database[,path]])",
+      arg(STR, STR), ELM_ZM, flag(NDT), DB_URI),
   /** XQuery function. */
   _DB_BACKUPS(DbBackups.class, "backups([database])", arg(ITEM), ELM_ZM, DB_URI),
   /** XQuery function. */
-  _DB_CREATE_BACKUP(DbCreateBackup.class, "create-backup(database)", arg(STR), EMP,
-      flag(UPD, NDT), DB_URI),
+  _DB_CREATE_BACKUP(DbCreateBackup.class, "create-backup(database)",
+      arg(STR), EMP, flag(UPD), DB_URI),
   /** XQuery function. */
-  _DB_COPY(DbCopy.class, "copy(database, new-name)", arg(STR, STR), EMP, flag(UPD, NDT),
-      DB_URI),
+  _DB_COPY(DbCopy.class, "copy(database, new-name)", arg(STR, STR), EMP, flag(UPD), DB_URI),
   /** XQuery function. */
-  _DB_ALTER(DbAlter.class, "alter(database, new-name)", arg(STR, STR), EMP, flag(UPD, NDT), DB_URI),
+  _DB_ALTER(DbAlter.class, "alter(database, new-name)", arg(STR, STR), EMP, flag(UPD), DB_URI),
   /** XQuery function. */
-  _DB_DROP_BACKUP(DbDropBackup.class, "drop-backup(name)", arg(STR), EMP, flag(UPD, NDT), DB_URI),
+  _DB_DROP_BACKUP(DbDropBackup.class, "drop-backup(name)", arg(STR), EMP, flag(UPD), DB_URI),
   /** XQuery function. */
-  _DB_RESTORE(DbRestore.class, "restore(backup)", arg(STR), EMP, flag(UPD, NDT), DB_URI),
+  _DB_RESTORE(DbRestore.class, "restore(backup)", arg(STR), EMP, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_SYSTEM(DbSystem.class, "system()", arg(), STR, DB_URI),
   /** XQuery function. */
@@ -800,33 +799,33 @@ public enum Function {
   /** XQuery function. */
   _DB_NODE_PRE(DbNodePre.class, "node-pre(nodes)", arg(NOD_ZM), ITR_ZM, DB_URI),
   /** XQuery function. */
-  _DB_OUTPUT(DbOutput.class, "output(result)", arg(ITEM_ZM), EMP, flag(UPD, NDT), DB_URI),
+  _DB_OUTPUT(DbOutput.class, "output(result)", arg(ITEM_ZM), EMP, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_OUTPUT_CACHE(DbOutputCache.class, "output-cache()", arg(), ITEM_ZO, flag(NDT), DB_URI),
   /** XQuery function. */
   _DB_ADD(DbAdd.class, "add(database,input[,path[,options]])",
-      arg(STR, NOD, STR, ITEM), EMP, flag(UPD, NDT), DB_URI),
+      arg(STR, NOD, STR, ITEM), EMP, flag(UPD), DB_URI),
   /** XQuery function. */
-  _DB_DELETE(DbDelete.class, "delete(database,path)", arg(STR, STR), EMP, flag(UPD, NDT), DB_URI),
+  _DB_DELETE(DbDelete.class, "delete(database,path)", arg(STR, STR), EMP, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_CREATE(DbCreate.class, "create(name[,inputs[,paths[,options]]])",
-      arg(STR, ITEM_ZM, STR_ZM, ITEM), EMP, flag(UPD, NDT), DB_URI),
+      arg(STR, ITEM_ZM, STR_ZM, ITEM), EMP, flag(UPD), DB_URI),
   /** XQuery function. */
-  _DB_DROP(DbDrop.class, "drop(database)", arg(ITEM), EMP, flag(UPD, NDT), DB_URI),
+  _DB_DROP(DbDrop.class, "drop(database)", arg(ITEM), EMP, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_RENAME(DbRename.class, "rename(database,path,new-path)", arg(STR, STR, STR), EMP,
-      flag(UPD, NDT), DB_URI),
+      flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_REPLACE(DbReplace.class, "replace(database,path,input[,options])",
-      arg(STR, STR, ITEM, ITEM), EMP, flag(UPD, NDT), DB_URI),
+      arg(STR, STR, ITEM, ITEM), EMP, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_OPTIMIZE(DbOptimize.class, "optimize(database[,all[,options]])",
-      arg(STR, BLN, ITEM), EMP, flag(UPD, NDT), DB_URI),
+      arg(STR, BLN, ITEM), EMP, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_RETRIEVE(DbRetrieve.class, "retrieve(database,path)", arg(STR, STR), B64, flag(NDT), DB_URI),
   /** XQuery function. */
-  _DB_STORE(DbStore.class, "store(database,path,input)", arg(STR, STR, ITEM), EMP, flag(UPD, NDT),
-      DB_URI),
+  _DB_STORE(DbStore.class, "store(database,path,input)",
+      arg(STR, STR, ITEM), EMP, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_IS_XML(DbIsXml.class, "is-xml(database,path)", arg(STR, STR), BLN, DB_URI),
   /** XQuery function. */
@@ -836,10 +835,10 @@ public enum Function {
   /** XQuery function. */
   _DB_CONTENT_TYPE(DbContentType.class, "content-type(database,path)", arg(STR, STR), STR, DB_URI),
   /** XQuery function. */
-  _DB_FLUSH(DbFlush.class, "flush(database)", arg(ITEM), EMP, flag(UPD, NDT), DB_URI),
+  _DB_FLUSH(DbFlush.class, "flush(database)", arg(ITEM), EMP, flag(UPD), DB_URI),
   /** XQuery function. */
-  _DB_EXPORT(DbExport.class, "export(database,path[,param]])", arg(STR, STR, ITEM), EMP, flag(NDT),
-      DB_URI),
+  _DB_EXPORT(DbExport.class, "export(database,path[,param]])",
+      arg(STR, STR, ITEM), EMP, flag(NDT), DB_URI),
   /** XQuery function. */
   _DB_NAME(DbName.class, "name(node)", arg(NOD), STR, DB_URI),
   /** XQuery function. */
@@ -1056,14 +1055,13 @@ public enum Function {
   /** XQuery function. */
   _INSPECT_FUNCTION(InspectFunction.class, "function(function)", arg(STR), ELM, INSPECT_URI),
   /** XQuery function. */
-  _INSPECT_MODULE(InspectModule.class, "module(path)", arg(STR), ELM, INSPECT_URI),
+  _INSPECT_MODULE(InspectModule.class, "module(uri)", arg(STR), ELM, INSPECT_URI),
   /** XQuery function. */
   _INSPECT_CONTEXT(InspectContext.class, "context()", arg(), ELM, INSPECT_URI),
   /** XQuery function. */
-  _INSPECT_FUNCTIONS(InspectFunctions.class, "functions([uri])", arg(STR), FUN_ZM, flag(HOF),
-      INSPECT_URI),
+  _INSPECT_FUNCTIONS(InspectFunctions.class, "functions([uri])", arg(STR), FUN_ZM, INSPECT_URI),
   /** XQuery function. */
-  _INSPECT_XQDOC(InspectXqdoc.class, "xqdoc(path)", arg(STR), ELM, INSPECT_URI),
+  _INSPECT_XQDOC(InspectXqdoc.class, "xqdoc(uri)", arg(STR), ELM, INSPECT_URI),
 
   /* JSON Module. */
 
@@ -1275,7 +1273,7 @@ public enum Function {
       arg(STR, ITEM, ITEM), ITEM_ZM, flag(NDT), XQUERY_URI),
   /** XQuery function. */
   _XQUERY_UPDATE(XQueryUpdate.class, "update(string[,bindings[,options]])",
-      arg(STR, ITEM, ITEM), ITEM_ZM, flag(UPD, NDT), XQUERY_URI),
+      arg(STR, ITEM, ITEM), ITEM_ZM, flag(UPD), XQUERY_URI),
   /** XQuery function. */
   _XQUERY_INVOKE(XQueryInvoke.class, "invoke(uri[,bindings[,options]])",
       arg(STR, ITEM, ITEM), ITEM_ZM, flag(NDT), XQUERY_URI),

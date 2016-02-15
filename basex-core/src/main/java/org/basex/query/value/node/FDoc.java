@@ -1,8 +1,7 @@
 package org.basex.query.value.node;
 
-import static org.basex.query.QueryText.*;
-
 import org.basex.core.*;
+import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.type.*;
@@ -118,7 +117,7 @@ public final class FDoc extends FNode {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(BASE, uri));
+    addPlan(plan, planElem(QueryText.BASE, uri));
   }
 
   @Override
@@ -135,6 +134,6 @@ public final class FDoc extends FNode {
 
   @Override
   public String toString() {
-    return Util.info("% { % }", DOCUMENT, uri);
+    return new TokenBuilder(QueryText.DOCUMENT).add(" { ").add(uri).add(" }").toString();
   }
 }

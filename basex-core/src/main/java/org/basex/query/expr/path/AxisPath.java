@@ -46,7 +46,7 @@ public abstract class AxisPath extends Path {
     switch(state) {
       case INIT:
         // initialize caching flag
-        state = !hasFreeVars() && !has(Flag.NDT) && !has(Flag.UPD)// && !has(Flag.HOF)
+        state = !hasFreeVars() && !has(Flag.NDT) && !has(Flag.UPD)
             ? Caching.ENABLED : Caching.DISABLED;
         return iter(qc);
       case ENABLED:

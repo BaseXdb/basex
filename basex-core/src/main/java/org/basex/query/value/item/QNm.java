@@ -423,6 +423,5 @@ public final class QNm extends Item {
   @Override
   public String toString() {
     return Token.string(id());
-    //return new TokenBuilder().add("Q{").add(uri()).add('}').add(local()).toString();
   }
 }

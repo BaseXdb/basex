@@ -85,14 +85,26 @@ public final class Atm extends Item {
    * @return string
    */
   public static String toString(final byte[] value) {
-    final ByteList tb = new ByteList().add('"');
+    return toString(value, true);
+  }
+
+  /**
+   * Returns a string representation of the specified value.
+   * @param value value
+   * @param quotes wrap with quotes
+   * @return string
+   */
+  public static String toString(final byte[] value, final boolean quotes) {
+    final ByteList tb = new ByteList();
+    if(quotes) tb.add('"');
     for(final byte v : value) {
       if(v == '&') tb.add(E_AMP);
       else if(v == '\r') tb.add(E_CR);
       else if(v == '\n') tb.add(E_NL);
+      else if(v == '"' && quotes) tb.add('"').add('"');
       else tb.add(v);
-      if(v == '"') tb.add('"');
     }
-    return tb.add('"').toString();
+    if(quotes) tb.add('"');
+    return tb.toString();
   }
 }

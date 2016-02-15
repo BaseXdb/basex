@@ -1,7 +1,6 @@
 package org.basex.query.value.node;
 
 import static org.basex.query.QueryText.*;
-import static org.basex.util.Token.*;
 
 import org.basex.core.*;
 import org.basex.query.value.item.*;
@@ -20,13 +19,13 @@ public final class FNSpace extends FNode {
 
   /**
    * Default constructor.
-   * @param n name
-   * @param v value
+   * @param name name
+   * @param value value
    */
-  public FNSpace(final byte[] n, final byte[] v) {
+  public FNSpace(final byte[] name, final byte[] value) {
     super(NodeType.NSP);
-    name = n;
-    value = v;
+    this.name = name;
+    this.value = value;
   }
 
   @Override
@@ -51,9 +50,8 @@ public final class FNSpace extends FNode {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder().add(' ').add(XMLNS);
+    final TokenBuilder tb = new TokenBuilder().add(' ').add(Token.XMLNS);
     if(name.length != 0) tb.add(':').add(name);
-    return tb.add("=\"").add(Token.string(value).replaceAll("\"", "\"\"")).
-        add('"').toString();
+    return tb.add('=').add(Atm.toString(value)).toString();
   }
 }

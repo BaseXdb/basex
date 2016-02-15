@@ -347,19 +347,20 @@ public abstract class StandardFunc extends Arr {
 
   /**
    * Casts and checks the function item for its arity.
-   * @param e expression
-   * @param a arity
+   * @param expr expression
+   * @param nargs number of arguments (arity)
    * @param qc query context
    * @return function item
    * @throws QueryException query exception
    */
-  protected FItem checkArity(final Expr e, final int a, final QueryContext qc)
+  protected FItem checkArity(final Expr expr, final int nargs, final QueryContext qc)
       throws QueryException {
 
-    final FItem fun = toFunc(e, qc);
+    final FItem fun = toFunc(expr, qc);
     if(fun.annotations().contains(Annotation.UPDATING)) throw FUNCUP_X.get(info, fun);
-    if(fun.arity() == a) return fun;
-    throw castError(info, fun, FuncType.arity(a));
+    if(fun.arity() == nargs) return fun;
+    final int fargs = fun.arity();
+    throw FUNARITY_X_X_X.get(info, fargs, fargs == 1 ? "" : "s", nargs);
   }
 
   /**

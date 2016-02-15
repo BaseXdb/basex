@@ -181,7 +181,7 @@ public interface QueryText {
   /** Parser token. */
   String NEXT = "next";
   /** Parser token. */
-  String NSPACE = "namespace";
+  String NAMESPACE = "namespace";
   /** Parser token. */
   String NO_INHERIT = "no-inherit";
   /** Parser token. */

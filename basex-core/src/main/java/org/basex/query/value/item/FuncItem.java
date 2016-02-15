@@ -249,14 +249,29 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
+  public String toErrorString() {
+    return toString(true);
+  }
+
+  @Override
   public String toString() {
+    return toString(false);
+  }
+
+  /**
+   * Returns a string representation.
+   * @param error error flag
+   * @return string
+   */
+  private String toString(final boolean error) {
     final FuncType ft = (FuncType) type;
     final TokenBuilder tb = new TokenBuilder();
     if(name != null) tb.add("(: ").add(name.prefixId()).add("#").addInt(arity()).add(" :) ");
     tb.addExt(anns).add(FUNCTION).add('(');
     final int pl = params.length;
-    for(final Var v : params) tb.addExt(v).add(v == params[pl - 1] ? "" : ", ");
-    tb.add(')').add(ft.type != null ? " as " + ft.type : "");
-    return tb.add(" { ").addExt(expr).add(" }").toString();
+    for(final Var v : params) {
+      tb.addExt(error ? v.toErrorString() : v.toString()).add(v == params[pl - 1] ? "" : ",");
+    }
+    return tb.add(')').add(ft.type != null ? " as " + ft.type : "").add(" {...}").toString();
   }
 }

@@ -79,13 +79,11 @@ public final class DynFuncCall extends FuncCall {
     final Expr f = body();
     final Type t = f.seqType().type;
 
-    final int last = exprs.length - 1;
+    final int nargs = exprs.length - 1;
     if(t instanceof FuncType) {
       final FuncType ft = (FuncType) t;
-      if(ft.argTypes != null && ft.argTypes.length != last) {
-        final Expr e = f instanceof FuncItem ? ((FuncItem) f).expr : f;
-        throw INVARITY_X_X_X_X.get(info, e, last, last == 1 ? "" : "s", ft.argTypes.length);
-      }
+      if(ft.argTypes != null && ft.argTypes.length != nargs) throw INVARITY_X_X_X_X.get(
+          info, nargs, nargs == 1 ? "" : "s", ft.argTypes.length, f.toErrorString());
       if(ft.type != null) seqType = ft.type;
     }
 
@@ -98,7 +96,7 @@ public final class DynFuncCall extends FuncCall {
       final XQFunctionExpr fe = (XQFunctionExpr) f;
       if(!(f instanceof FuncItem && comesFrom((FuncItem) f))) {
         checkUpdating(fe);
-        final Expr[] args = Arrays.copyOf(exprs, last);
+        final Expr[] args = Arrays.copyOf(exprs, nargs);
         final Expr in = fe.inlineExpr(args, qc, scp, info);
         if(in != null) return in;
       }
@@ -180,11 +178,9 @@ public final class DynFuncCall extends FuncCall {
     if(!(it instanceof FItem)) throw INVFUNCITEM_X_X.get(info, it.type, it);
 
     final FItem f = (FItem) it;
-    final int last = exprs.length - 1;
-    if(f.arity() != last) {
-      final Expr e = f instanceof FuncItem ? ((FuncItem) f).expr : f;
-      throw INVARITY_X_X_X_X.get(info, e, last, last == 1 ? "" : "s", f.arity());
-    }
+    final int nargs = exprs.length - 1;
+    if(f.arity() != nargs) throw INVARITY_X_X_X_X.get(
+        info, nargs, nargs == 1 ? "" : "s", f.arity(), f.toErrorString());
     checkUpdating(f);
     return f;
   }

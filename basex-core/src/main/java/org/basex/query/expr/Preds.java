@@ -252,7 +252,8 @@ public abstract class Preds extends ParseExpr {
    */
   protected static boolean num(final Expr expr) {
     final SeqType st = expr.seqType();
-    return st.type.isNumber() && st.zeroOrOne() && !expr.has(Flag.CTX) && !expr.has(Flag.NDT);
+    return st.type.isNumber() && st.zeroOrOne() &&
+        !expr.has(Flag.CTX) && !expr.has(Flag.NDT) && !expr.has(Flag.UPD);
   }
 
   @Override

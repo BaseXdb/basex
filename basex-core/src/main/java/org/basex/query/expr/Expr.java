@@ -2,6 +2,7 @@ package org.basex.query.expr;
 
 import java.util.*;
 
+import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.gflwor.*;
@@ -29,12 +30,24 @@ import org.basex.util.hash.*;
 public abstract class Expr extends ExprInfo {
   /** Flags that influence query compilation. */
   public enum Flag {
-    /** Creates new fragments. Example: node constructor. */ CNS,
-    /** Depends on context. Example: context node. */        CTX,
-    /** Non-deterministic. Example: random:double(). */      NDT,
-    /** Positional access. Example: position(). */           POS,
-    /** Performs updates. Example: insert expression. */     UPD,
-    /** Invokes user-supplied functions. Example: fold. */   HOF,
+    /** Node creation. No relocation of expressions that would change number of node constructions
+     * Example: node constructor. */
+    CNS,
+    /** Context dependency. Checked to prevent relocations of expressions to different context.
+     * Example: context item ({@code .}). */
+    CTX,
+    /** Non-deterministic code. Cannot be relocated, pre-evaluated or optimized away.
+     * Examples: random:double(), file:write(). */
+    NDT,
+    /** Positional access. Prevents simple iterative evaluation.
+     * Examples: position(), last(). */
+    POS,
+    /** Performs updates. Checked to detect if an expression is updating or not, or if code
+     * can be optimized away when using {@link MainOptions#MIXUPDATES}. Example: delete node. */
+    UPD,
+    /** Function invocation. Used to suppress pre-evaluation of built-in functions with
+     * functions arguments. Example: fold-left. */
+    HOF,
   }
 
   /**
@@ -346,7 +359,8 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Compares the current and specified expression for equality.
+   * Compares the current and specified expression for equality. {@code false} may be returned,
+   * even if the expressions are equal.
    * @param cmp expression to be compared
    * @return result of check
    */
