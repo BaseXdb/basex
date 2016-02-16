@@ -95,7 +95,7 @@ declare
   %rest:query-param("loglist", "{$loglist}")
   %output:method("html")
   %rest:single
-function _:query(
+function _:log(
   $name     as xs:string,
   $sort     as xs:string?,
   $query    as xs:string?,

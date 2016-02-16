@@ -1,6 +1,3 @@
-var WAIT = "Please wait…";
-var SUCCESS = "Query was successful.";
-
 function buttons() {
   var forms = document.getElementsByTagName("form");
   for(var f = 0; f < forms.length; f++) {
@@ -46,10 +43,12 @@ function setText(message, type) {
   i.textContent = message;
 };
 
-var _timestamp;
-function query(wait, success, key, query, enforce, target) {
-  var timestamp = new Date();
-  _timestamp = timestamp;
+var _running = 0;
+function query(key, query, enforce, target) {
+  _running++;
+  setTimeout(function() {
+    if(_running) setWarning("Please wait…");
+  }, 500);
 
   var name = document.getElementById("name");
   var resource = document.getElementById("resource");
@@ -62,19 +61,15 @@ function query(wait, success, key, query, enforce, target) {
     "&loglist=" + encodeURIComponent(loglist ? loglist.value : "");
   request("POST", url, query,
     function(req) {
-      _timestamp = 0;
+      _running--;
       target(req.responseText);
-      setInfo(success);
+      setInfo("Query was successful.");
     },
     function(req) {
-      _timestamp = 0;
+      _running--;
       if(req.status != 410) setErrorFromResponse(req);
     }
   )
-
-  setTimeout(function() {
-    if(wait && _timestamp == timestamp) setWarning(wait);
-  }, 500);
 };
 
 // Jetty and Tomcat support (both return error messages differently)
@@ -92,7 +87,7 @@ function logList() {
   var list = document.getElementById('loglist').value.trim();
   if(_list == list) return false;
   _list = list;
-  query(WAIT, SUCCESS, 'loglist', list, false, function(text) {
+  query('loglist', list, false, function(text) {
     document.getElementById("list").innerHTML = text;
   })
 };
@@ -102,7 +97,7 @@ function logEntries() {
   var logs = document.getElementById('logs').value.trim();
   if(_logs == logs) return false;
   _logs = logs;
-  query(WAIT, SUCCESS, 'log', logs, false, function(text) {
+  query('log', logs, false, function(text) {
     document.getElementById("output").innerHTML = text;
   });
 };
@@ -112,7 +107,7 @@ function queryResource() {
   var input = document.getElementById('input').value.trim();
   if(_input == input) return false;
   _input = input;
-  query(WAIT, SUCCESS, 'query-resource', input, false, function(text) {
+  query('query-resource', input, false, function(text) {
     _outputMirror.setValue(text);
   });
 };
@@ -122,7 +117,7 @@ function evalQuery(reverse) {
   var editor = document.getElementById('editor').value;
   var update = (mode == 1) ^ reverse;
   var target = update ? 'update-query' : 'eval-query';
-  query(WAIT, SUCCESS, target, editor, true, function(text) {
+  query(target, editor, true, function(text) {
     _outputMirror.setValue(text);
   });
 };
