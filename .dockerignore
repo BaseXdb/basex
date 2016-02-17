@@ -10,4 +10,4 @@ basex-api
 !basex-api/license.txt
 !basex-api/pom.xml
 !basex-api/src/main/java
-!basex-api/src/main/resources
+!basex-api/src/main/webapp/WEB-INF
