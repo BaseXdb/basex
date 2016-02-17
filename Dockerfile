@@ -5,12 +5,13 @@ MAINTAINER BaseX Team <basex-talk@mailman.uni-konstanz.de>
 COPY . /usr/src/basex/
 RUN cd /usr/src/basex && \
     mvn clean install -DskipTests && \
-    ln -s /usr/src/basex/basex-*/etc/* /usr/local/bin
+    ln -s /usr/src/basex/basex-*/etc/* /usr/local/bin && \
+    cp -r /usr/src/basex/basex-api/src/main/webapp/WEB-INF /srv
 
 # Run as non-privileged user with fixed UID
 RUN adduser --system --home /srv --disabled-password --disabled-login --uid 1984 basex && \
     mkdir /srv/BaseXData /srv/BaseXRepo /srv/BaseXWeb && \
-    chown basex /srv /srv/*
+    chown -R basex /srv
 USER basex
 
 # 1984/tcp: API
