@@ -13,6 +13,8 @@ import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.query.*;
+import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -70,39 +72,38 @@ public final class DBNew {
    * @throws QueryException query exception
    */
   public void prepare(final String name) throws QueryException {
-    try {
-      if(!inputs.isEmpty()) {
-        // cache data if at least one input needs to be cached
-        boolean cache = false;
-        for(final DBOptions dbopts : dboptions) {
-          final Object obj = dbopts.get(MainOptions.ADDCACHE);
-          if(obj instanceof Boolean && ((Boolean) obj).booleanValue()) {
-            cache = true;
-            break;
-          }
-        }
+    if(inputs.isEmpty()) return;
 
-        // choose first options instance (relevant options are the same)
-        final Context ctx = qc.context;
-        final MainOptions mopts = ctx.options;
-        final StaticOptions sopts = ctx.soptions;
-        data = cache ? CreateDB.create(sopts.randomDbName(name),
-            Parser.emptyParser(mopts), ctx, mopts) : new MemData(mopts);
-
-        data.startUpdate(mopts);
-        final long ds = inputs.size();
-        for(int i = 0; i < ds; i++) {
-          final DataClip clip = data(name, i);
-          // clear list to recover memory
-          inputs.set(i, null);
-          try {
-            data.insert(data.meta.size, -1, clip);
-          } finally {
-            DropDB.drop(clip.data, sopts);
-          }
-        }
-        data.finishUpdate(mopts);
+    // cache data if at least one input needs to be cached
+    boolean cache = false;
+    for(final DBOptions dbopts : dboptions) {
+      final Object obj = dbopts.get(MainOptions.ADDCACHE);
+      if(obj instanceof Boolean && ((Boolean) obj).booleanValue()) {
+        cache = true;
+        break;
       }
+    }
+
+    // choose first options instance (relevant options are the same)
+    final Context ctx = qc.context;
+    final MainOptions mopts = ctx.options;
+    final StaticOptions sopts = ctx.soptions;
+    try {
+      data = cache ? CreateDB.create(sopts.randomDbName(name),
+          Parser.emptyParser(mopts), ctx, mopts) : new MemData(mopts);
+      data.startUpdate(mopts);
+      final long ds = inputs.size();
+      for(int i = 0; i < ds; i++) {
+        final DataClip clip = data(name, i);
+        // clear list to recover memory
+        inputs.set(i, null);
+        try {
+          data.insert(data.meta.size, -1, clip);
+        } finally {
+          DropDB.drop(clip.data, sopts);
+        }
+      }
+      data.finishUpdate(mopts);
     } catch(final IOException ex) {
       throw IOERR_X.get(info, ex);
     }
@@ -128,9 +129,12 @@ public final class DBNew {
     final StaticOptions soptions = ctx.soptions;
     final NewInput input = inputs.get(i);
     final MainOptions mopts = dboptions.get(i).assignTo(new MainOptions(qc.context.options, true));
+    final boolean addcache = mopts.get(MainOptions.ADDCACHE);
 
-    if(input.node != null) {
-      final MemData mdata = (MemData) input.node.dbNodeCopy(mopts).data();
+    ANode node = input.node;
+    if(node != null) {
+      if(node.type != NodeType.DOC) node = new FDoc(name).add(node);
+      final MemData mdata = (MemData) node.dbNodeCopy(mopts).data();
       mdata.update(0, Data.DOC, token(input.path));
       return new DataClip(mdata);
     }
@@ -138,7 +142,7 @@ public final class DBNew {
     // add input
     final String dbpath = soptions.randomDbName(name);
     final Parser parser = new DirParser(input.io, mopts, new IOFile(dbpath)).target(input.path);
-    return (mopts.get(MainOptions.ADDCACHE) ? new DiskBuilder(dbpath, parser, soptions, mopts)
-                                            : new MemBuilder(name, parser)).dataClip();
+    return (addcache ? new DiskBuilder(dbpath, parser, soptions, mopts)
+                     : new MemBuilder(name, parser)).dataClip();
   }
 }

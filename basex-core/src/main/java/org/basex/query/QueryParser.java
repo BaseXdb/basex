@@ -1103,18 +1103,18 @@ public class QueryParser extends InputParser {
    */
   private LinkedList<Clause> initialClause(final LinkedList<Clause> clauses) throws QueryException {
     LinkedList<Clause> cls = clauses;
-    // ForClause / LetClause
-    final boolean let = wsConsumeWs(LET, SCORE, NOLET) || wsConsumeWs(LET, DOLLAR, NOLET);
-    if(let || wsConsumeWs(FOR, DOLLAR, NOFOR)) {
+    // WindowClause
+    final boolean slide = wsConsumeWs(FOR, SLIDING, NOWINDOW);
+    if(slide || wsConsumeWs(FOR, TUMBLING, NOWINDOW)) {
       if(cls == null) cls = new LinkedList<>();
-      if(let) letClause(cls);
-      else    forClause(cls);
+      cls.add(windowClause(slide));
     } else {
-      // WindowClause
-      final boolean slide = wsConsumeWs(FOR, SLIDING, NOWINDOW);
-      if(slide || wsConsumeWs(FOR, TUMBLING, NOWINDOW)) {
+      // ForClause / LetClause
+      final boolean let = wsConsumeWs(LET, SCORE, NOLET) || wsConsumeWs(LET, DOLLAR, NOLET);
+      if(let || wsConsumeWs(FOR, DOLLAR, NOFOR)) {
         if(cls == null) cls = new LinkedList<>();
-        cls.add(windowClause(slide));
+        if(let) letClause(cls);
+        else    forClause(cls);
       }
     }
     return cls;
