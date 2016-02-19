@@ -41,6 +41,9 @@ public final class XQueryModuleTest extends AdvancedQueryTest {
     query(_DB_CREATE.args('"' + NAME + '"'));
     query("try { " + _XQUERY_EVAL.args("\"(1 to 10000000000000)[. = 0]\"", " map { }",
         " map { 'timeout': 1 }") + " } catch * { () }", "");
+    query(_XQUERY_EVAL.args(" 'static-base-uri()'", " map { }",
+        " map { 'base-uri': 'http://x.x/' }"), "http://x.x/");
+
     error(_XQUERY_EVAL.args(" '" + DOC.args(NAME) + "'", " map { }",
         " map { 'permission': 'none' }"), BXXQ_PERM_X);
     error(_XQUERY_EVAL.args(" '" + _DB_OPEN.args(NAME) + "'", " map { }",

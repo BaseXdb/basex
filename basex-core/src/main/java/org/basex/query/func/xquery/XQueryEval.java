@@ -1,7 +1,6 @@
 package org.basex.query.func.xquery;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import java.util.*;
@@ -28,7 +27,8 @@ import org.basex.util.options.*;
  */
 public class XQueryEval extends StandardFunc {
   /** QName. */
-  private static final QNm Q_OPTIONS = QNm.get(XQUERY_PREFIX, "options", XQUERY_URI);
+  private static final QNm Q_OPTIONS =
+      QNm.get(QueryText.XQUERY_PREFIX, "options", QueryText.XQUERY_URI);
 
   /** XQuery options. */
   public static class XQueryOptions extends Options {
@@ -38,6 +38,8 @@ public class XQueryEval extends StandardFunc {
     public static final NumberOption TIMEOUT = new NumberOption("timeout", 0);
     /** Maximum amount of megabytes that may be allocated by the query. */
     public static final NumberOption MEMORY = new NumberOption("memory", 0);
+    /** Query base-uri. */
+    public static final StringOption BASE_URI = new StringOption("base-uri");
   }
 
   @Override
@@ -76,6 +78,7 @@ public class XQueryEval extends StandardFunc {
     final HashMap<String, Value> bindings = toBindings(1, qc);
     final User user = qc.context.user();
     final Perm tmp = user.perm("");
+    String uri = path;
     Timer to = null;
 
     try(final QueryContext qctx = qc.proc(new QueryContext(qc))) {
@@ -107,6 +110,8 @@ public class XQueryEval extends StandardFunc {
             public void run() { qctx.timeout(); }
           }, ms);
         }
+        final String bu = opts.get(XQueryOptions.BASE_URI);
+        if(bu != null) uri = bu;
       }
 
       // evaluate query
@@ -118,7 +123,7 @@ public class XQueryEval extends StandardFunc {
           if(key.isEmpty()) qctx.context(val, sctx);
           else qctx.bind(key, val, sctx);
         }
-        qctx.parseMain(string(qu), path, sctx);
+        qctx.parseMain(string(qu), uri, sctx);
 
         if(updating) {
           if(!sc.mixUpdates && !qctx.updating && !qctx.root.expr.isVacuous())
