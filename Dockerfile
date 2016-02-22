@@ -15,10 +15,9 @@ RUN adduser --system --home /srv --disabled-password --disabled-login --uid 1984
 USER basex
 
 # 1984/tcp: API
-# 1985/tcp: Event
 # 8984/tcp: HTTP
 # 8985/tcp: HTTP stop
-EXPOSE 1984 1985 8984 8985
+EXPOSE 1984 8984 8985
 VOLUME ["/srv/BaseXData"]
 WORKDIR /srv
 

@@ -47,15 +47,15 @@ the BaseX server and HTTP ports `1984` and `8984` and bind-mounting your user's
         --publish 1984:1984 \
         --publish 8984:8984 \
         --volume ~/BaseXData:/srv/BaseXData \
-        basex/basexhttp:nightly
+        basex/basexhttp:latest
 
 By passing any other BaseX executable, you can also for example run a BaseX
-client connecting to the linked BaseX server for management opeartions on the
+client connecting to the linked BaseX server for management operations on the
 BaseX command line:
 
     docker run -ti \
         --link basexhttp:basexhttp \
-        basex/basexhttp:nightly basexclient -nbasexhttp
+        basex/basexhttp:latest basexclient -nbasexhttp
 
 If you prefer the DBA web interface, this can also be linked against your
 server container:
