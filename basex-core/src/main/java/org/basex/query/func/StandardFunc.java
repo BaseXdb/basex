@@ -259,7 +259,7 @@ public abstract class StandardFunc extends Arr {
    * Parses the options at the specified index.
    * @param <E> options type
    * @param i index of options argument
-   * @param qnm QName
+   * @param qnm QName (can be {@code null})
    * @param opts options
    * @param qc query context
    * @return passed on options

@@ -119,12 +119,8 @@ abstract class ValidateFn extends StandardFunc {
     try {
       v.process(handler);
     } catch(final SAXException ex) {
-      // fatal exception: get original message
-      Throwable e = ex;
-      while(e.getCause() != null) {
-        Util.debug(e);
-        e = e.getCause();
-      }
+      // fatal exception: send other exception to debug output
+      Util.rootException(ex);
       handler.add(ex, ErrorHandler.FATAL);
     } catch(final IOException | ParserConfigurationException | Error ex) {
       throw BXVA_START_X.get(info, ex);

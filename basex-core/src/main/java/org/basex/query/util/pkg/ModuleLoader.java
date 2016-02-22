@@ -115,12 +115,8 @@ public final class ModuleLoader {
       if(java) throw WHICHCLASS_X.get(ii, ex.getMessage());
       return false;
     } catch(final Throwable th) {
-      Throwable e = th;
-      while(e.getCause() != null) {
-        Util.debug(e);
-        e = e.getCause();
-      }
-      throw MODINIT_X_X_X.get(ii, className, e.getMessage(), Util.className(e));
+      final Throwable t = Util.rootException(th);
+      throw MODINIT_X_X_X.get(ii, className, t.getMessage(), Util.className(t));
     }
 
     // instantiate class

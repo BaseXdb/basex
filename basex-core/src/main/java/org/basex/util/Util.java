@@ -125,6 +125,20 @@ public final class Util {
   }
 
   /**
+   * Returns the root exception.
+   * @param throwable throwable
+   * @return root exception
+   */
+  public static Throwable rootException(final Throwable throwable) {
+    Throwable th = throwable;
+    while(th.getCause() != null) {
+      Util.debug(th);
+      th = th.getCause();
+    }
+    return th;
+  }
+
+  /**
    * Prints a string to standard error, followed by a newline.
    * @param object error object
    * @param ext text optional extensions

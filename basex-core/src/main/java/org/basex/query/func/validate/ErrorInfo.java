@@ -1,6 +1,7 @@
 package org.basex.query.func.validate;
 
 import org.basex.io.*;
+import org.basex.util.*;
 import org.xml.sax.*;
 
 /**
@@ -34,7 +35,7 @@ final class ErrorInfo {
     Throwable e = ex;
     if(m.contains("Exception:")) {
       // may be recursively called if external validator (e.g. Saxon) is used
-      while(e.getCause() != null) e = e.getCause();
+      e = Util.rootException(e);
       if(e instanceof SAXException) m = e.getLocalizedMessage();
     }
 

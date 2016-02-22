@@ -70,13 +70,9 @@ final class JavaModuleFunc extends JavaFunction {
       try {
         return method.invoke(module, jargs);
       } catch(final Exception ex) {
-        Throwable e = ex;
-        if(e.getCause() != null) {
-          Util.debug(e);
-          e = e.getCause();
-        }
-        if(e instanceof QueryException) throw ((QueryException) e).info(info);
-        throw JAVAERROR_X_X_X.get(info, name(), foundArgs(args), e);
+        final Throwable th = Util.rootException(ex);
+        if(th instanceof QueryException) throw ((QueryException) th).info(info);
+        throw JAVAERROR_X_X_X.get(info, name(), foundArgs(args), th);
       }
     }
 

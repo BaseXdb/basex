@@ -73,12 +73,7 @@ public class ValidateRng extends ValidateFn {
         } catch(final ClassNotFoundException ex) {
           throw BXVA_RELAXNG_X.get(info);
         } catch(final Exception ex) {
-          Throwable e = ex;
-          while(e.getCause() != null) {
-            Util.debug(e);
-            e = e.getCause();
-          }
-          throw BXVA_FAIL_X.get(info, e);
+          throw BXVA_FAIL_X.get(info, Util.rootException(ex));
         }
       }
     });
