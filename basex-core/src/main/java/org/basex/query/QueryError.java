@@ -336,7 +336,9 @@ public enum QueryError {
   // Async module
 
   /** ASYN0001. */
-  ASYNC_ERR_X(ASYNC, 1, "%"),
+  ASYNC_UNEXP_X(ASYNC, 1, "Unexpected error: %"),
+  /** ASYN0002. */
+  ASYNC_ARG_X(ASYNC, 2, "Specified value is outside allowed range: %"),
 
   /** Binary error. */
   BIN_DLA_X_X(BIN, "differing-length-arguments", "Inputs are of different length (%/%)."),

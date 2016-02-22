@@ -25,7 +25,7 @@ public final class ForkJoin extends StandardFunc {
     public static final NumberOption THREADS = new NumberOption("threads",
         Runtime.getRuntime().availableProcessors());
     /** Number of functions to be evaluated by each thread. */
-    public static final NumberOption SPLIT = new NumberOption("split", 1);
+    public static final NumberOption THREAD_SIZE = new NumberOption("thread-size", 1);
   }
 
   @Override
@@ -46,15 +46,21 @@ public final class ForkJoin extends StandardFunc {
     final Options opts = new ForkJoinOptions();
     if(exprs.length > 1) toOptions(1, null, opts, qc);
     final int threads = opts.get(ForkJoinOptions.THREADS);
-    final int split = opts.get(ForkJoinOptions.SPLIT);
+    final int threadSize = opts.get(ForkJoinOptions.THREAD_SIZE);
+    if(threadSize < 1) throw ASYNC_ARG_X.get(info, threadSize);
 
-    final ForkJoinPool pool = new ForkJoinPool(threads);
-    final ForkJoinTask<Value> task = new ForkJoinTask<>(funcs, split, qc, info);
+    final ForkJoinPool pool;
+    try {
+      pool = new ForkJoinPool(threads);
+    } catch(final IllegalArgumentException ex) {
+      throw ASYNC_ARG_X.get(info, threads);
+    }
+    final ForkJoinTask<Value> task = new ForkJoinTask<>(funcs, threadSize, qc, info);
     try {
       return pool.invoke(task);
     } catch(final Exception ex) {
       final Throwable e = Util.rootException(ex);
-      throw e instanceof QueryException ? (QueryException) e : ASYNC_ERR_X.get(info, e);
+      throw e instanceof QueryException ? (QueryException) e : ASYNC_UNEXP_X.get(info, e);
     } finally {
       // required?
       pool.shutdown();

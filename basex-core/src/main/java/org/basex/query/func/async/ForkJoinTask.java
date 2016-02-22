@@ -18,17 +18,17 @@ public final class ForkJoinTask<T extends Value> extends RecursiveTask<Value>
   implements Callable<T> {
 
   /** Functions to evaluate in parallel. */
-  private ArrayList<FItem> funcs;
+  private final ArrayList<FItem> funcs;
   /** Query context. */
-  private QueryContext qc;
+  private final QueryContext qc;
   /** Input info. */
-  private InputInfo ii;
+  private final InputInfo ii;
   /** Split value. */
-  private int split;
+  private final int split;
   /** First function to evaluate. */
-  private int start;
+  private final int start;
   /** Last function to evaluate. */
-  private int end;
+  private final int end;
 
   /**
    * Constructor.
@@ -70,27 +70,24 @@ public final class ForkJoinTask<T extends Value> extends RecursiveTask<Value>
   @Override
   protected T compute() {
     final ValueBuilder vb = new ValueBuilder();
-    final int length = end - start;
-    if(length <= split) {
+    if(end - start <= split) {
       // perform the work
       try {
-        for(int i = start, j = 0; i < end && j < split; i++, j++) {
-          vb.add(funcs.get(i).invokeValue(qc, ii));
+        final int last = Math.min(end, start + split);
+        for(int f = start; f < last; f++) {
+          vb.add(funcs.get(f).invokeValue(qc, ii));
         }
       } catch(final QueryException ex) {
         completeExceptionally(ex);
         cancel(true);
       }
     } else {
-      // split the work
-      final int spl = length / 2;
-      ForkJoinTask<Value> second;
-      second = new ForkJoinTask<>(funcs, split, qc, ii, start + spl, end);
-      end = start + spl;
-
-      second.fork();
-      vb.add(compute());
-      vb.add(second.join());
+      // split the work and join the results in the correct order
+      final int mid = start + (end - start) / 2;
+      final ForkJoinTask<Value> first  = new ForkJoinTask<>(funcs, split, qc, ii, start, mid);
+      final ForkJoinTask<Value> second = new ForkJoinTask<>(funcs, split, qc, ii, mid, end);
+      invokeAll(first, second);
+      vb.add(first.join()).add(second.join());
     }
     return (T) vb.value();
   }
