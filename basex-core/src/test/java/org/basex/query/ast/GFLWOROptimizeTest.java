@@ -278,4 +278,24 @@ public final class GFLWOROptimizeTest extends QueryPlanTest {
         "count(//GFLWOR/*) eq 2",
         "starts-with(//GFLWOR/*[last()]/@name, 'error(')");
   }
+
+  /** Tests flattening. */
+  @Test public void flattening1() {
+    check("for $a at $p in " +
+        "  for $x in (1 to 2) " +
+        "  return $x + 1 " +
+        "return $p",
+        "1\n2",
+        "count(//VarRef) = 1"
+    );
+  }
+
+  /** Tests flattening. */
+  @Test public void flattening2() {
+    // original and optimized query plan are identical...
+    check("for $a in (1 to 2) return let $b := <a>1</a> return $b + 1",
+        "2\n2",
+        "count(//VarRef) = 1"
+    );
+  }
 }

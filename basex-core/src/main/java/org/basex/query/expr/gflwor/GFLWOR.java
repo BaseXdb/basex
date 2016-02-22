@@ -174,8 +174,10 @@ public final class GFLWOR extends ParseExpr {
       if(!clauses.isEmpty() && clauses.getFirst() instanceof For) {
         final For fst = (For) clauses.getFirst();
         if(!fst.empty) {
+          // flat nested FLWOR expressions
           if(fst.expr instanceof GFLWOR) {
-            qc.compInfo(QueryText.OPTFLAT_X, fst);
+            // example: for $a at $p in for $x in (1 to 2) return $x + 1 return $p
+            qc.compInfo(QueryText.OPTFLAT_X_X, description(), fst.var);
             final GFLWOR sub = (GFLWOR) fst.expr;
             clauses.set(0, new For(fst.var, null, fst.score, sub.ret, false, fst.info));
             if(fst.pos != null) clauses.add(1, new Count(fst.pos, fst.info));
@@ -200,9 +202,12 @@ public final class GFLWOR extends ParseExpr {
       if(!clauses.isEmpty()) {
         if(ret instanceof GFLWOR) {
           final GFLWOR sub = (GFLWOR) ret;
-          if(sub.isFLWR()) {
+          if(sub.isFLW()) {
             // flatten nested FLWOR expressions
-            qc.compInfo(QueryText.OPTFLAT_X, this);
+            // example: for $a in (1 to 2) return let $f := <a>1</a> return $f + 1
+            final Clause c = sub.clauses.getFirst();
+            final ExprInfo var = c instanceof ForLet ? ((ForLet) c).var : c;
+            qc.compInfo(QueryText.OPTFLAT_X_X, description(), var);
             clauses.addAll(sub.clauses);
             ret = sub.ret;
             changed = true;
@@ -212,8 +217,10 @@ public final class GFLWOR extends ParseExpr {
         final TypeCheck tc = ret instanceof TypeCheck ? (TypeCheck) ret : null;
         if(ret instanceof GFLWOR || tc != null && tc.expr instanceof GFLWOR) {
           final GFLWOR sub = (GFLWOR) (tc == null ? ret : tc.expr);
-          if(sub.clauses.getFirst() instanceof Let) {
-            qc.compInfo(QueryText.OPTFLAT_X, this);
+          final Clause c = sub.clauses.getFirst();
+          if(c instanceof Let) {
+            // example: ?
+            qc.compInfo(QueryText.OPTFLAT_X_X, description(), ((Let) c).var);
             final LinkedList<Clause> cls = sub.clauses;
             // propagate all leading let bindings into outer clauses
             do {
@@ -401,8 +408,8 @@ public final class GFLWOR extends ParseExpr {
           final For fr = (For) clause;
           if(!fr.empty && fr.pos == null && fr.expr instanceof GFLWOR) {
             final GFLWOR fl = (GFLWOR) fr.expr;
-            if(fl.isFLWR()) {
-              qc.compInfo(QueryText.OPTFLAT_X, this);
+            if(fl.isFLW()) {
+              qc.compInfo(QueryText.OPTFLAT_X_X, description(), fr.var);
               iter.remove();
               for(final Clause cls : fl.clauses) iter.add(cls);
               fr.expr = fl.ret;
@@ -769,7 +776,7 @@ public final class GFLWOR extends ParseExpr {
    * Checks if this FLWOR expression only uses for, let and where clauses.
    * @return result of check
    */
-  private boolean isFLWR() {
+  private boolean isFLW() {
     for(final Clause clause : clauses)
       if(!(clause instanceof For || clause instanceof Let || clause instanceof Where)) return false;
     return true;

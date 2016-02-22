@@ -116,7 +116,7 @@ abstract class Logical extends Arr {
     for(final Expr ex : exprs) {
       if(and && ex instanceof And || or && ex instanceof Or) {
         for(final Expr e : ((Arr) ex).exprs) tmp.add(e);
-        qc.compInfo(OPTFLAT_X, ex);
+        qc.compInfo(OPTFLAT_X_X, description(), ex);
       } else {
         tmp.add(ex);
       }
