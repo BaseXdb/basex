@@ -539,6 +539,8 @@ public interface QueryText {
   byte[] STREAM_PREFIX = token("stream");
   /** Strings token. */
   byte[] STRINGS_PREFIX = token("strings");
+  /** Async token. */
+  byte[] ASYNC_PREFIX = token("async");
   /** Binary token. */
   byte[] BIN_PREFIX = token("bin");
   /** Cryptography token. */
@@ -605,6 +607,8 @@ public interface QueryText {
 
   /** EXPath URI. */
   String EXPATH = "http://expath.org/ns/";
+  /** URI of Async Module. */
+  byte[] ASYNC_URI = token(EXPATH + "async");
   /** URI of Binary Module. */
   byte[] BIN_URI = token(EXPATH + "binary");
   /** URI of Cryptographic Module. */

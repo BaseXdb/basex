@@ -51,6 +51,7 @@ public final class NSGlobal {
     // namespaces of built-in modules
     NS.add(ADMIN_PREFIX, ADMIN_URI);
     NS.add(ARCHIVE_PREFIX, ARCHIVE_URI);
+    NS.add(ASYNC_PREFIX, ASYNC_URI);
     NS.add(CLIENT_PREFIX, CLIENT_URI);
     NS.add(CONVERT_PREFIX, CONVERT_URI);
     NS.add(CSV_PREFIX, CSV_URI);

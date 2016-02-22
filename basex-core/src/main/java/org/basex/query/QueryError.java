@@ -333,6 +333,11 @@ public enum QueryError {
    /** ARCH9999. */
   ARCH_FAIL_X(ARCH, 9999, "Operation failed: %."),
 
+  // Async module
+
+  /** ASYN0001. */
+  ASYNC_ERR_X(ASYNC, 1, "%"),
+
   /** Binary error. */
   BIN_DLA_X_X(BIN, "differing-length-arguments", "Inputs are of different length (%/%)."),
   /** Binary error. */
@@ -907,8 +912,6 @@ public enum QueryError {
   /** XPST0017. */
   JAVAWHICH_X_X_X(XPST, 17, "Java function %:%#% is unknown."),
   /** XPST0017. */
-  JAVAARITY_X_X_X_X_X(XPTY, 4, "Java function %:%#%: % argument% supplied."),
-  /** XPST0017. */
   JAVAAMB_X_X_X(XPST, 17, "Java function %:%#% is ambiguous."),
   /** XPST0017. */
   JAVACONSAMB_X(XPST, 17, "Java constructor % is ambiguous."),
@@ -935,6 +938,10 @@ public enum QueryError {
   /** XPTY0004. */
   JAVAERROR_X_X_X(XPTY, 4, "%(%): %."),
 
+  /** XPTY0004. */
+  JAVAARITY_X_X_X_X_X(XPTY, 4, "Java function %:%#%: % argument% supplied."),
+  /** XPTY0004. */
+  ZEROFUNCS_X_X(XPTY, 4, "Zero-arity functions expected, % found: %."),
   /** XPTY0004. */
   NONAME_X(XPTY, 4, "Name expected, '%' found."),
   /** XPTY0004. */
@@ -1379,12 +1386,13 @@ public enum QueryError {
 
     // EXPath errors
 
-    /** ARCH Error type. */ ARCH(EXPERR_PREFIX, EXPERROR_URI),
-    /** BIN  Error type. */ BIN(BIN_PREFIX,     BIN_URI),
-    /** CX   Error type. */ CX(EXPERR_PREFIX,   EXPERROR_URI),
-    /** FILE Error type. */ FILE(FILE_PREFIX,   FILE_URI),
-    /** HC   Error type. */ HC(EXPERR_PREFIX,   EXPERROR_URI),
-    /** ZIP  Error type. */ ZIP(EXPERR_PREFIX,  EXPERROR_URI),
+    /** ARCH  Error type. */ ARCH(EXPERR_PREFIX, EXPERROR_URI),
+    /** ASYNC Error type. */ ASYNC(ASYNC_PREFIX, ASYNC_URI),
+    /** BIN   Error type. */ BIN(BIN_PREFIX,     BIN_URI),
+    /** CX    Error type. */ CX(EXPERR_PREFIX,   EXPERROR_URI),
+    /** FILE  Error type. */ FILE(FILE_PREFIX,   FILE_URI),
+    /** HC    Error type. */ HC(EXPERR_PREFIX,   EXPERROR_URI),
+    /** ZIP   Error type. */ ZIP(EXPERR_PREFIX,  EXPERROR_URI),
 
     // W3 errors
 
