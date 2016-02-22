@@ -43,8 +43,8 @@ public final class ForkJoin extends StandardFunc {
       throw ZEROFUNCS_X_X.get(info, item.type, item);
     }
 
-    Options opts = new ForkJoinOptions();
-    if(exprs.length > 2) opts = toOptions(1, null, opts, qc);
+    final Options opts = new ForkJoinOptions();
+    if(exprs.length > 1) toOptions(1, null, opts, qc);
     final int threads = opts.get(ForkJoinOptions.THREADS);
     final int split = opts.get(ForkJoinOptions.SPLIT);
 
