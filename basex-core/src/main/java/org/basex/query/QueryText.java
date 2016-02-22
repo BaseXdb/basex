@@ -795,7 +795,7 @@ public interface QueryText {
   /** Optimization info. */
   String OPTREWRITE_X = "rewriting %";
   /** Optimization info. */
-  String OPTFLAT_X = "flattening %";
+  String OPTFLAT_X_X = "flattening nested %: %";
   /** Optimization info. */
   String OPTREMOVE_X_X = "%: removing %";
   /** Optimization info. */
