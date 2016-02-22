@@ -2,7 +2,6 @@ package org.basex.query.func.async;
 
 import static org.basex.query.QueryError.*;
 
-import java.util.*;
 import java.util.concurrent.*;
 
 import org.basex.query.*;
@@ -30,17 +29,10 @@ public final class ForkJoin extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value items = qc.value(exprs[0]);
-    final ArrayList<FItem> funcs = new ArrayList<>();
-    for(final Item item : items) {
-      if(item instanceof FItem) {
-        final FItem func = (FItem) item;
-        if(func.arity() == 0) {
-          funcs.add(func);
-          continue;
-        }
-      }
-      throw ZEROFUNCS_X_X.get(info, item.type, item);
+    final Value funcs = qc.value(exprs[0]);
+    for(final Item func : funcs) {
+      if(!(func instanceof FItem) || ((FItem) func).arity() != 0)
+        throw ZEROFUNCS_X_X.get(info, func.type, func);
     }
 
     final Options opts = new ForkJoinOptions();
@@ -55,7 +47,7 @@ public final class ForkJoin extends StandardFunc {
     } catch(final IllegalArgumentException ex) {
       throw ASYNC_ARG_X.get(info, threads);
     }
-    final ForkJoinTask<Value> task = new ForkJoinTask<>(funcs, threadSize, qc, info);
+    final ForkJoinTask task = new ForkJoinTask(funcs, threadSize, qc, info);
     try {
       return pool.invoke(task);
     } catch(final Exception ex) {
