@@ -7,6 +7,7 @@ import java.net.*;
 import java.util.*;
 import java.util.Map.Entry;
 
+import org.basex.query.*;
 import org.basex.util.list.*;
 
 /**
@@ -125,17 +126,18 @@ public final class Util {
   }
 
   /**
-   * Returns the root exception.
+   * Returns the root query exception.
    * @param throwable throwable
    * @return root exception
    */
   public static Throwable rootException(final Throwable throwable) {
     Throwable th = throwable;
-    while(th.getCause() != null) {
+    while(true) {
+      final Throwable ca = th.getCause();
+      if(ca == null || th instanceof QueryException && !(ca instanceof QueryException)) return th;
       Util.debug(th);
-      th = th.getCause();
+      th = ca;
     }
-    return th;
   }
 
   /**
