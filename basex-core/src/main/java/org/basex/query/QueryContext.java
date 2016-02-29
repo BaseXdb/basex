@@ -598,8 +598,13 @@ public final class QueryContext extends Proc implements Closeable {
   public void close() {
     if(closed) return;
     closed = true;
-    // topmost query: close resources
-    if(parent == null) resources.close();
+    if(parent == null) {
+      // topmost query: close resources
+      resources.close();
+    } else {
+      // otherwise, adopt update reference (may have been initialized by sub query)
+      parent.updates = updates;
+    }
     // reassign original database options
     for(final Entry<Option<?>, Object> e : staticOpts.entrySet()) {
       context.options.put(e.getKey(), e.getValue());
