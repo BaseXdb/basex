@@ -149,18 +149,4 @@ public final class List extends Command {
     out.println(table.sort().finish());
     return true;
   }
-
-  /**
-   * Returns a list of all databases.
-   * @param sopts static options
-   * @return list of databases
-   */
-  public static StringList list(final StaticOptions sopts) {
-    final StringList db = new StringList();
-    for(final IOFile f : sopts.dbPath().children()) {
-      final String name = f.name();
-      if(f.isDir() && !name.startsWith(".")) db.add(name);
-    }
-    return db.sort(false);
-  }
 }

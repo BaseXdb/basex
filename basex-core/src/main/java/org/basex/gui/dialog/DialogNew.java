@@ -5,13 +5,11 @@ import static org.basex.core.Text.*;
 import java.awt.*;
 
 import org.basex.core.*;
-import org.basex.core.cmd.List;
 import org.basex.gui.*;
-import org.basex.gui.GUIConstants.Msg;
+import org.basex.gui.GUIConstants.*;
 import org.basex.gui.layout.*;
 import org.basex.index.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Dialog window for specifying options for creating a new database.
@@ -39,8 +37,6 @@ public final class DialogNew extends BaseXDialog {
   private final BaseXCheckBox tokenindex;
   /** Index creation options. */
   private final DialogIndex[] index;
-  /** Available databases. */
-  private final StringList db;
 
   /**
    * Default constructor.
@@ -52,7 +48,6 @@ public final class DialogNew extends BaseXDialog {
     // define buttons first to assign simplest mnemonics
     buttons = okCancel();
 
-    db = List.list(main.context.soptions);
     final MainOptions opts = gui.context.options;
     final GUIOptions gopts = main.gopts;
 
@@ -139,7 +134,7 @@ public final class DialogNew extends BaseXDialog {
         // database will be empty
         inf = EMPTY_DB;
         icon = Msg.WARN;
-      } else if(db.contains(nm)) {
+      } else if(gui.context.databases.listDBs().contains(nm)) {
         // old database will be overwritten
         inf = OVERWRITE_DB;
         icon = Msg.WARN;

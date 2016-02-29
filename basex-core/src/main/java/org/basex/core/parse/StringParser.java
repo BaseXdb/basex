@@ -282,17 +282,14 @@ final class StringParser extends CmdParser {
   }
 
   /**
-   * Parses and returns a name. A name may contain letters, numbers and any of the special
-   * characters <code>!#$%&'()+-=@[]^_`{}~</code>.
+   * Parses and returns a name. A name may contain letters, numbers and some special
+   * characters (see {@link Databases#DBCHARS}).
    * @param cmd referring command; if specified, the result must not be empty
    * @return name
    * @throws QueryException query exception
    */
   private String name(final Cmd cmd) throws QueryException {
-    consumeWS();
-    final StringBuilder sb = new StringBuilder();
-    while(Databases.validChar(parser.curr())) sb.append(parser.consume());
-    return finish(eoc() || ws(parser.curr()) ? sb : null, cmd);
+    return name(cmd, false);
   }
 
   /**
@@ -313,14 +310,29 @@ final class StringParser extends CmdParser {
    * @throws QueryException query exception
    */
   private String glob(final Cmd cmd) throws QueryException {
+    return name(cmd, true);
+  }
+
+  /**
+   * Parses and returns a glob expression, which extends {@link #name(Cmd)} function
+   * with asterisks, question marks and commands.
+   * @param cmd referring command; if specified, the result must not be empty
+   * @param glob allow glob syntax
+   * @return glob expression
+   * @throws QueryException query exception
+   */
+  private String name(final Cmd cmd, final boolean glob) throws QueryException {
     consumeWS();
     final StringBuilder sb = new StringBuilder();
+    char last = 0;
     while(true) {
       final char ch = parser.curr();
-      if(!Databases.validChar(ch) && ch != '*' && ch != '?' && ch != ',') {
-        return finish(eoc() || ws(ch) ? sb : null, cmd);
+      if(!Databases.validChar(ch, sb.length() == 0) &&
+          (!glob || ch != '*' && ch != '?' && ch != ',')) {
+        return finish((eoc() || ws(ch)) && last != '.' ? sb : null, cmd);
       }
       sb.append(parser.consume());
+      last = ch;
     }
   }
 

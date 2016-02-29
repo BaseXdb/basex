@@ -262,8 +262,8 @@ public abstract class IO {
   }
 
   /**
-   * Chops the path and the file suffix of the specified filename
-   * and returns the database name.
+   * Chops the path, file suffix and special characters from the specified filename and
+   * returns the database name.
    * @return database name
    */
   public final String dbname() {
@@ -273,7 +273,7 @@ public abstract class IO {
     if(i == -1) i = n.length;
     for(int c = 0; c < i; c += cl(n, c)) {
       final int ch = noDiacritics(cp(n, c));
-      if(Databases.validChar(ch)) tb.add(ch);
+      if(Databases.validChar(ch, c == 0 || c + 1 == i)) tb.add(ch);
     }
     return tb.toString();
   }

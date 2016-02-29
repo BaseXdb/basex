@@ -165,12 +165,16 @@ public class CommandTest extends SandboxTest {
     ok(new CreateDB(NAME, FILE));
     ok(new CreateDB("abcde"));
     ok(new DropDB("abcde"));
+    ok(new CreateDB("a.b"));
+    ok(new DropDB("a.b"));
     // invalid database names
     no(new CreateDB(""));
     no(new CreateDB(" "));
     no(new CreateDB(":"));
     no(new CreateDB("*?"));
     no(new CreateDB("/"));
+    no(new CreateDB(".x"));
+    no(new CreateDB("x."));
   }
 
   /** Command test. */

@@ -25,7 +25,7 @@ public final class Databases {
    *   <li> {@code :*?\"<>\/|}" are used for filenames and paths</li>
    * </ul>
    */
-  static final String DBCHARS = "-+=~!#$%^&()[]{}@'`";
+  public static final String DBCHARS = "-+=~!#$%^&()[]{}@'`";
 
   /** Regex representation of allowed database characters. */
   private static final String REGEXCHARS = DBCHARS.replaceAll("(.)", "\\\\$1");
@@ -89,7 +89,7 @@ public final class Databases {
       if(backup && fn.endsWith(IO.ZIPSUFFIX)) {
         final String nn = ZIPPATTERN.split(fn)[0];
         if(!nn.equals(fn)) add = nn;
-      } else if(db && f.isDir() && fn.indexOf('.') == -1) {
+      } else if(db && f.isDir() && !fn.startsWith(".")) {
         add = fn;
       }
       // add entry if it matches the pattern, and has not already been added
@@ -179,10 +179,11 @@ public final class Databases {
   /**
    * Checks if the specified character is a valid character for a database name.
    * @param ch the character to be checked
+   * @param firstLast character is first or last
    * @return result of check
    */
-  public static boolean validChar(final int ch) {
-    return Token.letterOrDigit(ch) || DBCHARS.indexOf(ch) != -1;
+  public static boolean validChar(final int ch, final boolean firstLast) {
+    return Token.letterOrDigit(ch) || DBCHARS.indexOf(ch) != -1 || !firstLast && ch == '.';
   }
 
   /**
@@ -205,7 +206,8 @@ public final class Databases {
     final int nl = name.length();
     for(int n = 0; n < nl; n++) {
       final char ch = name.charAt(n);
-      if((!glob || ch != '?' && ch != '*' && ch != ',') && !validChar(ch)) return false;
+      if((!glob || ch != '?' && ch != '*' && ch != ',') && !validChar(ch, n == 0 || n + 1 == nl))
+        return false;
     }
     return nl != 0;
   }
