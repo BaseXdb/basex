@@ -100,7 +100,7 @@ public final class DialogInsert extends BaseXDialog {
     change(radio[lkind]);
 
     action(null);
-    finish(null);
+    finish();
   }
 
   /**

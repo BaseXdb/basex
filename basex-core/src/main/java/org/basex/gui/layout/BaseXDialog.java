@@ -100,19 +100,33 @@ public abstract class BaseXDialog extends JDialog {
 
   /**
    * Finalizes the dialog layout and sets it visible.
+   */
+  protected final void finish() {
+    finish(null);
+  }
+
+
+  /**
+   * Finalizes the dialog layout and sets it visible.
    * @param l optional dialog location, relative to main window
    */
   protected final void finish(final int[] l) {
     pack();
     setMinimumSize(getPreferredSize());
     if(l == null) setLocationRelativeTo(gui);
-    else setLocation(gui.getX() + l[0], gui.getY() + l[1]);
+    else setLocationWithinScreen(gui.getX() + l[0], gui.getY() + l[1]);
     loc = l;
     setVisible(true);
   }
 
-  @Override
-  public void setLocation(final int x, final int y) {
+  /**
+   * Sets location relative to main window. Location is adjusted to be within the screen.
+   * This does not work well in a multiple screen setup. If the main window is not located on the primary display,
+   * the dialog will be placed at the edge of the primary display.
+   * @param x
+   * @param y
+     */
+  public void setLocationWithinScreen(final int x, final int y) {
     final Dimension scr = Toolkit.getDefaultToolkit().getScreenSize();
     final int xx = Math.max(0, Math.min(scr.width - getWidth(), x));
     final int yy = Math.max(0, Math.min(scr.height - getHeight(), y));

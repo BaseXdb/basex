@@ -96,7 +96,7 @@ public final class DialogPackages extends BaseXDialog {
 
     refresh = true;
     action(null);
-    finish(null);
+    finish();
   }
 
   @Override

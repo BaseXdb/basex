@@ -63,7 +63,7 @@ public final class DialogMessage extends BaseXDialog {
         ((Container) bttns.getComponent(0)).getComponent(0).requestFocusInWindow();
       }
     });
-    finish(null);
+    finish();
   }
 
   @Override

@@ -70,6 +70,6 @@ public final class DialogAbout extends BaseXDialog {
     p.add(newButtons(B_OK));
     add(p, BorderLayout.EAST);
 
-    finish(null);
+    finish();
   }
 }

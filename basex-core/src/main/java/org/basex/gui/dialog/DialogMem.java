@@ -44,7 +44,7 @@ public final class DialogMem extends BaseXDialog {
     final BaseXBack buttons = newButtons(gc);
     set(buttons, BorderLayout.SOUTH);
     addTimer();
-    finish(null);
+    finish();
   }
 
   /**
