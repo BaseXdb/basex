@@ -13,6 +13,7 @@ import org.basex.query.expr.Expr.Flag;
 import org.basex.query.func.admin.*;
 import org.basex.query.func.archive.*;
 import org.basex.query.func.array.*;
+import org.basex.query.func.async.*;
 import org.basex.query.func.basex.*;
 import org.basex.query.func.bin.*;
 import org.basex.query.func.client.*;
@@ -585,6 +586,12 @@ public enum Function {
   /** XQuery function (deprecated). */
   @Deprecated _ARCHIVE_WRITE(ArchiveWrite.class, "write(path,archive[,entries])",
       arg(STR, B64, ITEM_ZM), EMP, ARCHIVE_URI),
+
+  /* Async Module. */
+
+  /** XQuery function. */
+  _ASYNC_FORK_JOIN(ForkJoin.class, "fork-join(functions[,options])",
+      arg(FUN_ZM, MAP_O), ITEM_ZM, flag(HOF), ASYNC_URI),
 
   /* BaseX Module. */
 
