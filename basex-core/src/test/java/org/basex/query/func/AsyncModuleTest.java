@@ -88,7 +88,7 @@ public final class AsyncModuleTest extends AdvancedQueryTest {
   public void ids() {
     final String id = query(_ASYNC_EVAL.args("\"(1 to 100000000000)[.=0]\""));
     query(_ASYNC_IDS.args() + " = '" + id + "'", "true");
-    query(_ASYNC_STOP.args(id));
+    query(_ASYNC_IDS.args() + " ! " + _ASYNC_STOP.args(" ."));
   }
 
   /** Test method. */

@@ -25,11 +25,6 @@ public final class QueryPool {
   private final Map<String, Query> queries = new ConcurrentHashMap<>();
 
   /**
-   * Constructor.
-   */
-  public QueryPool() { }
-
-  /**
    * Adds and registers query.
    * @param qp query processor
    * @param cache cache results
@@ -148,6 +143,8 @@ public final class QueryPool {
     QueryProcessor qp;
     /** Query result. */
     Value result;
+    /** Timer. */
+    Timer timer;
     /** Exception. */
     QueryException exception;
 
@@ -187,7 +184,8 @@ public final class QueryPool {
           // cache result, discard it after timeout
           result = value;
           exception = exc;
-          new Timer(true).schedule(new TimerTask() {
+          timer = new Timer(true);
+          timer.schedule(new TimerTask() {
             @Override
             public void run() {
               queries.remove(id);
@@ -210,6 +208,8 @@ public final class QueryPool {
      */
     void close() {
       if(qp != null) qp.stop();
+      if(timer != null) timer.cancel();
+      queries.remove(id);
     }
   }
 }
