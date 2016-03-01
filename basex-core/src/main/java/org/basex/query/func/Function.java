@@ -602,6 +602,8 @@ public enum Function {
   /** XQuery function. */
   _ASYNC_IS_RUNNING(AsyncIsRunning.class, "is-running(id)", arg(STR), BLN, flag(NDT), ASYNC_URI),
   /** XQuery function. */
+  _ASYNC_IDS(AsyncIds.class, "ids()", arg(), STR_ZM, flag(NDT), ASYNC_URI),
+  /** XQuery function. */
   _ASYNC_FORK_JOIN(AsyncForkJoin.class, "fork-join(functions[,options])",
       arg(FUN_ZM, MAP_O), ITEM_ZM, flag(HOF), ASYNC_URI),
 

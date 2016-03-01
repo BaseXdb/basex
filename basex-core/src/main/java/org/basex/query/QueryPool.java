@@ -12,6 +12,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Pool with asynchronous queries.
@@ -69,6 +70,16 @@ public final class QueryPool {
    */
   public boolean isRunning(final String id, final InputInfo info) throws QueryException {
     return get(id, info).qp != null;
+  }
+
+  /**
+   * Returns all query ids.
+   * @return query ids
+   */
+  public TokenList ids() {
+    final TokenList list = new TokenList();
+    for(final String id : queries.keySet()) list.add(id);
+    return list;
   }
 
   /**
