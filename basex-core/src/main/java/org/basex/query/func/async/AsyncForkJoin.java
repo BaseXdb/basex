@@ -17,7 +17,7 @@ import org.basex.util.options.*;
  *
  * @author James Wright
  */
-public final class ForkJoin extends StandardFunc {
+public final class AsyncForkJoin extends StandardFunc {
   /** XQuery options. */
   public static class ForkJoinOptions extends Options {
     /** Number of threads to allow in the pool. */

@@ -590,7 +590,19 @@ public enum Function {
   /* Async Module. */
 
   /** XQuery function. */
-  _ASYNC_FORK_JOIN(ForkJoin.class, "fork-join(functions[,options])",
+  _ASYNC_EVAL(AsyncEval.class, "eval(string[,bindings[,options]])",
+      arg(STR, ITEM, MAP_O), STR, flag(NDT), ASYNC_URI),
+  /** XQuery function. */
+  _ASYNC_UPDATE(AsyncUpdate.class, "update(string[,bindings[,options]])",
+      arg(STR, ITEM, MAP_O), STR, flag(UPD), ASYNC_URI),
+  /** XQuery function. */
+  _ASYNC_RESULT(AsyncResult.class, "result(id)", arg(STR), ITEM_ZM, flag(NDT), ASYNC_URI),
+  /** XQuery function. */
+  _ASYNC_STOP(AsyncStop.class, "stop(id)", arg(STR), BLN, flag(NDT), ASYNC_URI),
+  /** XQuery function. */
+  _ASYNC_IS_RUNNING(AsyncIsRunning.class, "is-running(id)", arg(STR), BLN, flag(NDT), ASYNC_URI),
+  /** XQuery function. */
+  _ASYNC_FORK_JOIN(AsyncForkJoin.class, "fork-join(functions[,options])",
       arg(FUN_ZM, MAP_O), ITEM_ZM, flag(HOF), ASYNC_URI),
 
   /* BaseX Module. */

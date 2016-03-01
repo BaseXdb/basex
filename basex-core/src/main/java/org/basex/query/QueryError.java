@@ -61,6 +61,21 @@ public enum QueryError {
   /** BXAD0003. */
   BXAD_TYPE_X(BXAD, 3, "Log type must consist of uppercase letters: \"%\"."),
 
+  // Async module
+
+  /** ASYN0001. */
+  ASYNC_UNEXP_X(ASYNC, "unexpected", "Unexpected error: %"),
+  /** ASYN0002. */
+  ASYNC_ARG_X(ASYNC, "out-of-range", "Specified value is out of range: %."),
+  /** ASYN0003. */
+  ASYNC_UPDATING(ASYNC, "updating", "No updating expression allowed."),
+  /** ASYN0004. */
+  ASYNC_NOUPDATE(ASYNC, "not-updating", "Updating expression expected."),
+  /** ASYN0005. */
+  ASYNC_WHICH_X(ASYNC, "unknown", "Unknown query id: %."),
+  /** ASYN0005. */
+  ASYNC_RUNNING_X(ASYNC, "running", "Query is still running: %."),
+
   // Client module
 
   /** BXCL0001. */
@@ -332,13 +347,6 @@ public enum QueryError {
   ARCH_ONE_X(ARCH, 6, "% archives are limited to a single entry."),
    /** ARCH9999. */
   ARCH_FAIL_X(ARCH, 9999, "Operation failed: %."),
-
-  // Async module
-
-  /** ASYN0001. */
-  ASYNC_UNEXP_X(ASYNC, 1, "Unexpected error: %"),
-  /** ASYN0002. */
-  ASYNC_ARG_X(ASYNC, 2, "Specified value is outside allowed range: %"),
 
   /** Binary error. */
   BIN_DLA_X_X(BIN, "differing-length-arguments", "Inputs are of different length (%/%)."),

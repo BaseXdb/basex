@@ -601,28 +601,26 @@ public interface QueryText {
   byte[] XQ_URI = token(W3_URI + "/2012/xquery");
 
   /** EXQuery URI. */
-  String EXQUERY = "http://exquery.org/ns/";
+  String EXQUERY_URI = "http://exquery.org/ns/";
   /** RESTXQ URI. */
-  byte[] REST_URI = token(EXQUERY + "restxq");
+  byte[] REST_URI = token(EXQUERY_URI + "restxq");
 
   /** EXPath URI. */
-  String EXPATH = "http://expath.org/ns/";
-  /** URI of Async Module. */
-  byte[] ASYNC_URI = token(EXPATH + "async");
+  String EXPATH_URI = "http://expath.org/ns/";
   /** URI of Binary Module. */
-  byte[] BIN_URI = token(EXPATH + "binary");
+  byte[] BIN_URI = token(EXPATH_URI + "binary");
   /** URI of Cryptographic Module. */
-  byte[] CRYPTO_URI = token(EXPATH + "crypto");
+  byte[] CRYPTO_URI = token(EXPATH_URI + "crypto");
   /** URI of File Module. */
-  byte[] FILE_URI = token(EXPATH + "file");
+  byte[] FILE_URI = token(EXPATH_URI + "file");
   /** URI of HTTP Client Module. */
-  byte[] HTTP_URI = token(EXPATH + "http-client");
+  byte[] HTTP_URI = token(EXPATH_URI + "http-client");
   /** URI of Package API. */
-  byte[] PKG_URI = token(EXPATH + "pkg");
+  byte[] PKG_URI = token(EXPATH_URI + "pkg");
   /** URI of ZIP Module. */
-  byte[] ZIP_URI = token(EXPATH + "zip");
+  byte[] ZIP_URI = token(EXPATH_URI + "zip");
   /** URI of EXPath errors. */
-  byte[] EXPERROR_URI = token(EXPATH + "error");
+  byte[] EXPERROR_URI = token(EXPATH_URI + "error");
 
   /** Project URI. */
   byte[] BASEX_URI = token(Prop.URL);
@@ -635,6 +633,8 @@ public interface QueryText {
   byte[] ADMIN_URI = token(BXMODULES_URI + "admin");
   /** Archive module URI. */
   byte[] ARCHIVE_URI = token(BXMODULES_URI + "archive");
+  /** Async module URI. */
+  byte[] ASYNC_URI = token(BXMODULES_URI + "async");
   /** Client module URI. */
   byte[] CLIENT_URI = token(BXMODULES_URI + "client");
   /** Conversion module URI. */

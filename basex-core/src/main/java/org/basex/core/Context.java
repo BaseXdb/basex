@@ -4,6 +4,7 @@ import org.basex.core.locks.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.io.random.*;
+import org.basex.query.*;
 import org.basex.query.util.pkg.*;
 import org.basex.query.value.seq.*;
 import org.basex.server.*;
@@ -25,6 +26,8 @@ public final class Context {
   public final ClientListener listener;
   /** Blocked clients. */
   public final ClientBlocker blocker;
+  /** Asynchronous queries. */
+  public final QueryPool queries;
   /** Options. */
   public final MainOptions options;
   /** Static options. */
@@ -102,6 +105,7 @@ public final class Context {
     users = ctx.users;
     repo = ctx.repo;
     log = ctx.log;
+    queries = ctx.queries;
   }
 
   /**
@@ -120,6 +124,7 @@ public final class Context {
     users = new Users(soptions);
     repo = new EXPathRepo(soptions);
     log = new Log(soptions);
+    queries = new QueryPool();
     user = users.get(UserText.ADMIN);
     listener = null;
   }
@@ -149,6 +154,7 @@ public final class Context {
     while(!sessions.isEmpty()) sessions.get(0).quit();
     datas.close();
     log.close();
+    queries.close();
   }
 
   /**
