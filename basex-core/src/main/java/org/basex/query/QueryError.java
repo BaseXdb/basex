@@ -64,15 +64,15 @@ public enum QueryError {
   // Async module
 
   /** ASYN0001. */
-  ASYNC_UNEXP_X(ASYNC, "unexpected", "Unexpected error: %"),
+  ASYNC_UNEXPECTED_X(ASYNC, "unexpected", "Unexpected error: %"),
   /** ASYN0002. */
-  ASYNC_ARG_X(ASYNC, "out-of-range", "Specified value is out of range: %."),
+  ASYNC_OUTOFRANGE_X(ASYNC, "out-of-range", "Specified value is out of range: %."),
   /** ASYN0003. */
   ASYNC_UPDATING(ASYNC, "updating", "No updating expression allowed."),
   /** ASYN0004. */
-  ASYNC_NOUPDATE(ASYNC, "not-updating", "Updating expression expected."),
+  ASYNC_NONUPDATING(ASYNC, "non-updating", "Updating expression expected."),
   /** ASYN0005. */
-  ASYNC_WHICH_X(ASYNC, "unknown", "Unknown query id: %."),
+  ASYNC_UNKNOWN_X(ASYNC, "unknown", "Unknown query id: %."),
   /** ASYN0005. */
   ASYNC_RUNNING_X(ASYNC, "running", "Query is still running: %."),
 

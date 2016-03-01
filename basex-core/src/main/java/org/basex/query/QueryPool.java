@@ -63,8 +63,8 @@ public final class QueryPool {
    * @return result of check, or {@code null} if the query is unknown
    * @throws QueryException query exception
    */
-  public boolean isRunning(final String id, final InputInfo info) throws QueryException {
-    return get(id, info).qp != null;
+  public boolean finished(final String id, final InputInfo info) throws QueryException {
+    return get(id, info).qp == null;
   }
 
   /**
@@ -87,7 +87,7 @@ public final class QueryPool {
   private Query get(final String id, final InputInfo info) throws QueryException {
     final Query query = queries.get(id);
     if(query != null) return query;
-    throw ASYNC_WHICH_X.get(info, id);
+    throw ASYNC_UNKNOWN_X.get(info, id);
   }
 
   /**
@@ -178,7 +178,7 @@ public final class QueryPool {
       } catch(final QueryException ex) {
         exc = ex;
       } catch(final Throwable ex) {
-        exc = ASYNC_UNEXP_X.get(info, ex);
+        exc = ASYNC_UNEXPECTED_X.get(info, ex);
       } finally {
         if(cache) {
           // cache result, discard it after timeout

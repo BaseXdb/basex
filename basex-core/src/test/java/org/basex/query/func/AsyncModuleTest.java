@@ -39,10 +39,10 @@ public final class AsyncModuleTest extends AdvancedQueryTest {
     error(_ASYNC_FORK_JOIN.args(" count#1"), ZEROFUNCS_X_X);
     error(_ASYNC_FORK_JOIN.args(" 123"), ZEROFUNCS_X_X);
     error(_ASYNC_FORK_JOIN.args(" error#0"), FUNERR1);
-    error(_ASYNC_FORK_JOIN.args(" ()", " map {'threads':-1 }"), ASYNC_ARG_X);
-    error(_ASYNC_FORK_JOIN.args(" ()", " map {'threads':100000000 }"), ASYNC_ARG_X);
-    error(_ASYNC_FORK_JOIN.args(" ()", " map {'thread-size':0 }"), ASYNC_ARG_X);
-    error(_ASYNC_FORK_JOIN.args(" ()", " map {'thread-size':-1 }"), ASYNC_ARG_X);
+    error(_ASYNC_FORK_JOIN.args(" ()", " map {'threads':-1 }"), ASYNC_OUTOFRANGE_X);
+    error(_ASYNC_FORK_JOIN.args(" ()", " map {'threads':100000000 }"), ASYNC_OUTOFRANGE_X);
+    error(_ASYNC_FORK_JOIN.args(" ()", " map {'thread-size':0 }"), ASYNC_OUTOFRANGE_X);
+    error(_ASYNC_FORK_JOIN.args(" ()", " map {'thread-size':-1 }"), ASYNC_OUTOFRANGE_X);
   }
 
   /** Test method. */
@@ -72,15 +72,17 @@ public final class AsyncModuleTest extends AdvancedQueryTest {
   public void update() {
     query(_ASYNC_UPDATE.args("delete node <a/>"));
 
-    error(_ASYNC_UPDATE.args("1"), ASYNC_NOUPDATE);
+    error(_ASYNC_UPDATE.args("1"), ASYNC_NONUPDATING);
     error(_ASYNC_UPDATE.args("1, delete node <a/>"), UPALL);
   }
 
   /** Test method. */
   @Test
-  public void isRunning() {
-    final String id = query(_ASYNC_EVAL.args("\"(1 to 1000000)[.=0]\""));
-    query(_ASYNC_IS_RUNNING.args(id), "true");
+  public void finished() {
+    final String id = query(_ASYNC_EVAL.args("\"(1 to 100000000)[.=0]\""));
+    query(_ASYNC_FINISHED.args(id), "false");
+    query(_ASYNC_STOP.args(id));
+    error(_ASYNC_FINISHED.args(id), ASYNC_UNKNOWN_X);
   }
 
   /** Test method. */
@@ -104,7 +106,7 @@ public final class AsyncModuleTest extends AdvancedQueryTest {
         fail("Query was not stopped.");
       } catch(final QueryException ex) {
         // query was successfully stopped
-        if(ex.error() == ASYNC_WHICH_X) break;
+        if(ex.error() == ASYNC_UNKNOWN_X) break;
         // query is still running: check error code
         assertSame(ASYNC_RUNNING_X, ex.error());
       } catch(final IOException ex) {
@@ -120,7 +122,7 @@ public final class AsyncModuleTest extends AdvancedQueryTest {
     // receive result of asynchronous execution
     query("let $query := async:eval(" + query + ") "
         + "return (hof:until("
-        + "  function($result) { not(async:is-running($query)) },"
+        + "  function($result) { async:finished($query) },"
         + "  function($curr) { prof:sleep(10) },"
         + "  ()"
         + "), async:result($query))", "1");
@@ -147,7 +149,7 @@ public final class AsyncModuleTest extends AdvancedQueryTest {
         fail("Result was cached.");
       } catch(final QueryException ex) {
         // query was successfully stopped
-        if(ex.error() == ASYNC_WHICH_X) break;
+        if(ex.error() == ASYNC_UNKNOWN_X) break;
         // query is still running: check error code
         assertSame(ASYNC_RUNNING_X, ex.error());
       } catch(final IOException ex) {

@@ -72,7 +72,7 @@ public class AsyncEval extends StandardFunc {
 
     if(updating) {
       if(!sc.mixUpdates && !qp.qc.updating && !qp.qc.root.expr.isVacuous())
-        throw ASYNC_NOUPDATE.get(info);
+        throw ASYNC_NONUPDATING.get(info);
     } else {
       if(qp.qc.updating) throw ASYNC_UPDATING.get(info);
     }

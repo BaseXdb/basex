@@ -600,7 +600,7 @@ public enum Function {
   /** XQuery function. */
   _ASYNC_STOP(AsyncStop.class, "stop(id)", arg(STR), BLN, flag(NDT), ASYNC_URI),
   /** XQuery function. */
-  _ASYNC_IS_RUNNING(AsyncIsRunning.class, "is-running(id)", arg(STR), BLN, flag(NDT), ASYNC_URI),
+  _ASYNC_FINISHED(AsyncFinished.class, "finished(id)", arg(STR), BLN, flag(NDT), ASYNC_URI),
   /** XQuery function. */
   _ASYNC_IDS(AsyncIds.class, "ids()", arg(), STR_ZM, flag(NDT), ASYNC_URI),
   /** XQuery function. */

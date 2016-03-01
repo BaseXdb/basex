@@ -39,20 +39,20 @@ public final class AsyncForkJoin extends StandardFunc {
     if(exprs.length > 1) toOptions(1, null, opts, qc);
     final int threads = opts.get(ForkJoinOptions.THREADS);
     final int threadSize = opts.get(ForkJoinOptions.THREAD_SIZE);
-    if(threadSize < 1) throw ASYNC_ARG_X.get(info, threadSize);
+    if(threadSize < 1) throw ASYNC_OUTOFRANGE_X.get(info, threadSize);
 
     final ForkJoinPool pool;
     try {
       pool = new ForkJoinPool(threads);
     } catch(final IllegalArgumentException ex) {
-      throw ASYNC_ARG_X.get(info, threads);
+      throw ASYNC_OUTOFRANGE_X.get(info, threads);
     }
     final ForkJoinTask task = new ForkJoinTask(funcs, threadSize, qc, info);
     try {
       return pool.invoke(task);
     } catch(final Exception ex) {
       final Throwable e = Util.rootException(ex);
-      throw e instanceof QueryException ? (QueryException) e : ASYNC_UNEXP_X.get(info, e);
+      throw e instanceof QueryException ? (QueryException) e : ASYNC_UNEXPECTED_X.get(info, e);
     } finally {
       // required?
       pool.shutdown();
