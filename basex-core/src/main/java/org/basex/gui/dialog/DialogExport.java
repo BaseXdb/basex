@@ -130,7 +130,7 @@ public final class DialogExport extends BaseXDialog {
     set(pp, BorderLayout.SOUTH);
 
     action(method);
-    finish(null);
+    finish();
   }
 
   /**

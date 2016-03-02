@@ -105,7 +105,7 @@ public final class DialogEdit extends BaseXDialog {
     pp.add(buttons, BorderLayout.EAST);
 
     set(pp, BorderLayout.SOUTH);
-    finish(null);
+    finish();
   }
 
   @Override

@@ -182,7 +182,7 @@ public final class DialogProps extends BaseXDialog {
 
     action(this);
     setResizable(true);
-    finish(null);
+    finish();
   }
 
   /**

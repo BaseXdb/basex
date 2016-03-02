@@ -59,7 +59,7 @@ public final class DialogSort extends BaseXDialog {
     buttons = newButtons(B_OK, B_CANCEL);
     set(buttons, BorderLayout.SOUTH);
     action(null);
-    finish(null);
+    finish();
   }
 
   @Override

@@ -56,7 +56,7 @@ final class DialogInstallURL extends BaseXDialog {
 
     set(p, BorderLayout.SOUTH);
     action(null);
-    finish(null);
+    finish();
   }
 
   @Override
