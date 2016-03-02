@@ -30,9 +30,6 @@ public abstract class BaseXDialog extends JDialog {
   /** Reference to the root panel. */
   protected BaseXBack panel;
 
-  /** Dialog position. */
-  private int[] loc;
-
   /** Key listener, triggering an action with each click. */
   public final KeyAdapter keys = new KeyAdapter() {
     @Override
@@ -102,35 +99,10 @@ public abstract class BaseXDialog extends JDialog {
    * Finalizes the dialog layout and sets it visible.
    */
   protected final void finish() {
-    finish(null);
-  }
-
-
-  /**
-   * Finalizes the dialog layout and sets it visible.
-   * @param l optional dialog location, relative to main window
-   */
-  protected final void finish(final int[] l) {
     pack();
     setMinimumSize(getPreferredSize());
-    if(l == null) setLocationRelativeTo(gui);
-    else setLocationWithinScreen(gui.getX() + l[0], gui.getY() + l[1]);
-    loc = l;
+    setLocationRelativeTo(gui);
     setVisible(true);
-  }
-
-  /**
-   * Sets location relative to main window. Location is adjusted to be within the screen.
-   * This does not work well in a multiple screen setup. If the main window is not located on the primary display,
-   * the dialog will be placed at the edge of the primary display.
-   * @param x
-   * @param y
-     */
-  public void setLocationWithinScreen(final int x, final int y) {
-    final Dimension scr = Toolkit.getDefaultToolkit().getScreenSize();
-    final int xx = Math.max(0, Math.min(scr.width - getWidth(), x));
-    final int yy = Math.max(0, Math.min(scr.height - getHeight(), y));
-    super.setLocation(xx, yy);
   }
 
   /**
@@ -158,11 +130,6 @@ public abstract class BaseXDialog extends JDialog {
 
   @Override
   public void dispose() {
-    if(loc != null) {
-      final Container par = getParent();
-      loc[0] = getX() - par.getX();
-      loc[1] = getY() - par.getY();
-    }
     super.dispose();
     gui.gopts.write();
   }

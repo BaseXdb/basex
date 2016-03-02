@@ -102,13 +102,6 @@ public final class GUIOptions extends Options {
   /** Flag for activated project structure. */
   public static final BooleanOption SHOWPROJECT = new BooleanOption("SHOWPROJECT", true);
 
-  /** Dialog location. */
-  public static final NumbersOption FONTSLOC = new NumbersOption("FONTSLOC", 10, 530);
-  /** Dialog location. */
-  public static final NumbersOption COLORSLOC = new NumbersOption("COLORSLOC", 530, 620);
-  /** Dialog location. */
-  public static final NumbersOption BINDINGSLOC = new NumbersOption("BINDINGSLOC", 100, 230);
-
   /** Preferences tab. */
   public static final NumberOption PREFTAB = new NumberOption("PREFTAB", 0);
   /** Flag for Java look and feel. */

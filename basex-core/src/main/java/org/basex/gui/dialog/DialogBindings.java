@@ -42,7 +42,7 @@ public final class DialogBindings extends BaseXDialog {
     set(table, BorderLayout.CENTER);
 
     fill();
-    finish(gui.gopts.get(GUIOptions.BINDINGSLOC));
+    finish();
   }
 
   /**

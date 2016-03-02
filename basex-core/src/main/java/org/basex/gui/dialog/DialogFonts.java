@@ -74,7 +74,7 @@ public final class DialogFonts extends BaseXDialog {
     p.add(onlyMono);
 
     set(p, BorderLayout.CENTER);
-    finish(gopts.get(GUIOptions.FONTSLOC));
+    finish();
 
     monoFonts();
     action(onlyMono);

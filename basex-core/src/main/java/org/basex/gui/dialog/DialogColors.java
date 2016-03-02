@@ -34,9 +34,7 @@ public final class DialogColors extends BaseXDialog {
   private DialogColors(final GUI main) {
     super(main, COLOR_SCHEMA, false);
 
-    final GUIOptions gopts = gui.gopts;
     final BaseXBack p = new BaseXBack(new TableLayout(3, 2, 16, 8));
-
     p.add(new BaseXLabel(RED));
     sliderRed = newSlider(GUIOptions.COLORRED);
     p.add(sliderRed);
@@ -51,8 +49,7 @@ public final class DialogColors extends BaseXDialog {
 
     set(p, BorderLayout.CENTER);
     set(newButtons(RESET), BorderLayout.SOUTH);
-
-    finish(gopts.get(GUIOptions.COLORSLOC));
+    finish();
   }
 
   /**
