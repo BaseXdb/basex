@@ -43,7 +43,7 @@ public final class DialogLine extends BaseXDialog {
     buttons = newButtons(B_OK, B_CANCEL);
     set(buttons, BorderLayout.SOUTH);
     action(null);
-    finish(null);
+    finish();
   }
 
   @Override

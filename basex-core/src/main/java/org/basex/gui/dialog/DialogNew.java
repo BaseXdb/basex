@@ -104,7 +104,7 @@ public final class DialogNew extends BaseXDialog {
     action(general.parsers);
 
     setResizable(true);
-    finish(null);
+    finish();
   }
 
   @Override

@@ -116,7 +116,7 @@ public final class DialogManage extends BaseXDialog {
     set(tabs, BorderLayout.EAST);
 
     action(null);
-    if(dbs.length != 0) finish(null);
+    if(dbs.length != 0) finish();
   }
 
   /**

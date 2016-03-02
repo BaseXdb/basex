@@ -45,7 +45,7 @@ public final class DialogPrefs extends BaseXDialog {
 
     set(tabs, BorderLayout.CENTER);
     action(null);
-    finish(null);
+    finish();
   }
 
   /**
