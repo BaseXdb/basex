@@ -208,7 +208,7 @@ public enum Function {
   FUNCTION_ARITY(FnFunctionArity.class, "function-arity(function)", arg(FUN_O), ITR),
   /** XQuery function. */
   FUNCTION_LOOKUP(FnFunctionLookup.class, "function-lookup(name,arity)",
-      arg(QNM, ITR), FUN_OZ, flag(CTX, Flag.POS, NDT)),
+      arg(QNM, ITR), FUN_OZ, flag(CTX, Flag.POS, NDT, HOF)),
   /** XQuery function. */
   FUNCTION_NAME(FnFunctionName.class, "function-name(function)", arg(FUN_O), QNM_ZO),
   /** XQuery function. */
@@ -1061,13 +1061,15 @@ public enum Function {
   /* Inspection Module. */
 
   /** XQuery function. */
-  _INSPECT_FUNCTION(InspectFunction.class, "function(function)", arg(STR), ELM, INSPECT_URI),
+  _INSPECT_FUNCTION(InspectFunction.class, "function(function)",
+      arg(STR), ELM, flag(HOF), INSPECT_URI),
   /** XQuery function. */
   _INSPECT_MODULE(InspectModule.class, "module(uri)", arg(STR), ELM, INSPECT_URI),
   /** XQuery function. */
   _INSPECT_CONTEXT(InspectContext.class, "context()", arg(), ELM, INSPECT_URI),
   /** XQuery function. */
-  _INSPECT_FUNCTIONS(InspectFunctions.class, "functions([uri])", arg(STR), FUN_ZM, INSPECT_URI),
+  _INSPECT_FUNCTIONS(InspectFunctions.class, "functions([uri])",
+      arg(STR), FUN_ZM, flag(HOF), INSPECT_URI),
   /** XQuery function. */
   _INSPECT_XQDOC(InspectXqdoc.class, "xqdoc(uri)", arg(STR), ELM, INSPECT_URI),
 

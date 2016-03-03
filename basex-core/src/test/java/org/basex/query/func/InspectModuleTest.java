@@ -106,13 +106,20 @@ public final class InspectModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void functions() {
+    final String url = "src/test/resources/hello.xqm";
     query("declare function local:x() { 1 }; " + COUNT.args(_INSPECT_FUNCTIONS.args()), "1");
     query("declare function local:x() { 2 }; " + _INSPECT_FUNCTIONS.args() + "()", "2");
-    query("import module namespace hello='world' at 'src/test/resources/hello.xqm';" +
-        "inspect:functions()[last()] instance of function(*)", "true");
+    query("import module namespace hello='world' at '" + url + "';" +
+        _INSPECT_FUNCTIONS.args() + "[last()] instance of function(*)", "true");
 
-    query("for $f in " + _INSPECT_FUNCTIONS.args("src/test/resources/hello.xqm")
+    query("for $f in " + _INSPECT_FUNCTIONS.args(url)
         + "where local-name-from-QName(function-name($f)) = 'world' "
         + "return $f()", "hello world");
+
+    // ensure that closures will be compiled (GH-1194)
+    query(_INSPECT_FUNCTIONS.args(url)
+        + "[function-name(.) = QName('world','closure')]()", "1");
+    query("import module namespace hello='world' at '" + url + "';"
+        + _INSPECT_FUNCTIONS.args() + "[function-name(.) = xs:QName('hello:closure')]()", "1");
   }
 }

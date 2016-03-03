@@ -31,3 +31,8 @@ declare %public function hello:world() as xs:string {
 declare %private %Q{ns}ignored function hello:internal() as xs:string {
   "hello world"
 };
+
+(:~ Closure. :)
+declare function hello:closure() {
+  count#1(1)
+};

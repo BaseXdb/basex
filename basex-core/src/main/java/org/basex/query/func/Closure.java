@@ -157,8 +157,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
-    final SeqType r = expr.seqType();
-    final SeqType rt = type == null || r.instanceOf(type) ? r : type;
+    final SeqType r = expr.seqType(), rt = type == null || r.instanceOf(type) ? r : type;
     seqType = FuncType.get(anns, rt, args).seqType();
     size = 1;
 
@@ -211,16 +210,17 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   @Override
   public VarUsage count(final Var var) {
     VarUsage all = VarUsage.NEVER;
-    for(final Entry<Var, Expr> e : global.entrySet())
+    for(final Entry<Var, Expr> e : global.entrySet()) {
       if((all = all.plus(e.getValue().count(var))) == VarUsage.MORE_THAN_ONCE) break;
+    }
     return all;
   }
 
   @Override
-  public Expr inline(final QueryContext qc, final VarScope scp,
-      final Var var, final Expr ex) throws QueryException {
-    boolean change = false;
+  public Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
+      throws QueryException {
 
+    boolean change = false;
     for(final Entry<Var, Expr> entry : global.entrySet()) {
       final Expr e = entry.getValue().inline(qc, scp, var, ex);
       if(e != null) {
