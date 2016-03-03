@@ -1,4 +1,4 @@
-package org.basex.query.func.basex;
+package org.basex.query.func.util;
 
 import org.basex.query.func.fn.*;
 
@@ -8,5 +8,5 @@ import org.basex.query.func.fn.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public final class BaseXItemRange extends FnSubsequence {
+public final class UtilItemRange extends FnSubsequence {
 }

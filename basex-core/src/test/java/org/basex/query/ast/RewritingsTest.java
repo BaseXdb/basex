@@ -4,8 +4,8 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.core.cmd.*;
 import org.basex.query.expr.*;
-import org.basex.query.func.basex.*;
 import org.basex.query.func.fn.*;
+import org.basex.query.func.util.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.junit.Test;
@@ -136,13 +136,13 @@ public final class RewritingsTest extends QueryPlanTest {
 
     // {@link Pos} rewritings
     check("(<a/>,<b/>)[last()]", "<b/>",
-        "count(//" + Util.className(BaseXLastFrom.class) + ") = 1");
+        "count(//" + Util.className(UtilLastFrom.class) + ") = 1");
     check("(<a/>,<b/>)[position() > 1 and position() < 3]", "<b/>",
-        "count(//" + Util.className(BaseXItemAt.class) + ") = 1");
+        "count(//" + Util.className(UtilItemAt.class) + ") = 1");
     check("(<a/>,<b/>)[position() > 1 and position() < 4]", "<b/>",
-        "count(//" + Util.className(BaseXItemRange.class) + ") = 1");
+        "count(//" + Util.className(UtilItemRange.class) + ") = 1");
     check("(<a/>,<b/>)[position() > 1 and position() < 3 and <b/>]", "<b/>",
-        "count(//" + Util.className(BaseXItemAt.class) + ") = 1");
+        "count(//" + Util.className(UtilItemAt.class) + ") = 1");
 
     // {@link CmpR} rewritings
     check("<a>5</a>[text() > 1 and text() < 9]", "<a>5</a>", "count(//CmpR) = 1");

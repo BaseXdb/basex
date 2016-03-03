@@ -2,7 +2,7 @@ package org.basex.query.ast;
 
 import org.basex.query.expr.*;
 import org.basex.query.expr.gflwor.*;
-import org.basex.query.func.basex.*;
+import org.basex.query.func.util.*;
 import org.basex.util.*;
 import org.junit.*;
 
@@ -116,11 +116,11 @@ public final class GFLWOROptimizeTest extends QueryPlanTest {
   @Test public void whereToPred() {
     check("for $i in 1 to 10 where <x/>[$i] and $i < 3 return $i",
         "1",
-        "exists(//*[ends-with(name(), 'Filter')]/" + Util.className(BaseXItemAt.class) + ")"
+        "exists(//*[ends-with(name(), 'Filter')]/" + Util.className(UtilItemAt.class) + ")"
     );
     check("for $i in 1 to 10 where (<a/>)[$i] return $i",
         "1",
-        "exists(//*[ends-with(name(), 'Filter')]/" + Util.className(BaseXItemAt.class) + ")"
+        "exists(//*[ends-with(name(), 'Filter')]/" + Util.className(UtilItemAt.class) + ")"
     );
     check("for $i in 1 to 3 " +
         "where count(for $j in 1 to $i group by $k := $j mod 2 return $i) > 1 " +
@@ -137,7 +137,7 @@ public final class GFLWOROptimizeTest extends QueryPlanTest {
         "let $foo := $i * $i return $foo * $foo",
         "0\n1",
         "every $let in //Let satisfies $let << exactly-one(//" +
-            Util.className(BaseXItemAt.class) + ")"
+            Util.className(UtilItemAt.class) + ")"
     );
     check("<x/>/(for $i in 1 to 3 let $x := .  where $x return $x)",
         "<x/>",

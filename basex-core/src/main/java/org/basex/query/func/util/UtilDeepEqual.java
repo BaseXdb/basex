@@ -1,4 +1,4 @@
-package org.basex.query.func.basex;
+package org.basex.query.func.util;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
@@ -16,7 +16,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public final class BaseXDeepEqual extends StandardFunc {
+public final class UtilDeepEqual extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final DeepEqual cmp = new DeepEqual(info);

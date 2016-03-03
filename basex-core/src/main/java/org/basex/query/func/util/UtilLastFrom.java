@@ -1,4 +1,4 @@
-package org.basex.query.func.basex;
+package org.basex.query.func.util;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -15,7 +15,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public final class BaseXLastFrom extends StandardFunc {
+public final class UtilLastFrom extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Expr e = exprs[0];

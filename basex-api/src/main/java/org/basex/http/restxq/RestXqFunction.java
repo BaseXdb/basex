@@ -26,7 +26,6 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.expr.path.Test.*;
 import org.basex.query.func.*;
-import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -128,9 +127,10 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
       if(sig == null) continue;
 
       found |= eq(sig.uri, QueryText.REST_URI);
+      final Item[] args = ann.args();
       if(sig == _REST_PATH) {
         try {
-          path = new RestXqPath(toString(ann.args[0]), ann.info);
+          path = new RestXqPath(toString(args[0]), ann.info);
         } catch(final IllegalArgumentException ex) {
           throw error(ann.info, ex.getMessage());
         }
@@ -152,14 +152,14 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
       } else if(sig == _REST_ERROR_PARAM) {
         errorParams.add(param(ann, declared));
       } else if(sig == _REST_METHOD) {
-        final String mth = toString(ann.args[0]).toUpperCase(Locale.ENGLISH);
-        final Item body = ann.args.length > 1 ? ann.args[1] : null;
+        final String mth = toString(args[0]).toUpperCase(Locale.ENGLISH);
+        final Item body = args.length > 1 ? args[1] : null;
         addMethod(mth, body, declared, ann.info);
       } else if(sig == _REST_SINGLE) {
-        key = "\u0000" + (ann.args.length > 0 ? toString(ann.args[0]) :
+        key = "\u0000" + (args.length > 0 ? toString(args[0]) :
           (function.info.path() + ':' + function.info.line()));
       } else if(eq(sig.uri, QueryText.REST_URI)) {
-        final Item body = ann.args.length == 0 ? null : ann.args[0];
+        final Item body = args.length == 0 ? null : args[0];
         addMethod(string(sig.local()), body, declared, ann.info);
       } else if(sig == _INPUT_CSV) {
         final CsvParserOptions opts = new CsvParserOptions(options.get(MainOptions.CSVPARSER));
@@ -176,7 +176,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
       } else if(eq(sig.uri, QueryText.OUTPUT_URI)) {
         // serialization parameters
         try {
-          output.assign(string(sig.local()), toString(ann.args[0]));
+          output.assign(string(sig.local()), toString(args[0]));
         } catch(final BaseXException ex) {
           throw error(ann.info, UNKNOWN_SER, sig.local());
         }
@@ -205,7 +205,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @throws Exception any exception
    */
   private static <O extends Options> O parse(final O opts, final Ann ann) throws Exception {
-    for(final Item arg : ann.args) opts.assign(string(arg.string(ann.info)));
+    for(final Item arg : ann.args()) opts.assign(string(arg.string(ann.info)));
     return opts;
   }
 
@@ -491,7 +491,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @param list list to add values to
    */
   private static void strings(final Ann ann, final ArrayList<MediaType> list) {
-    for(final Item it : ann.args) list.add(new MediaType(toString(it)));
+    for(final Item it : ann.args()) list.add(new MediaType(toString(it)));
   }
 
   /**
@@ -503,7 +503,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    */
   private RestXqParam param(final Ann ann, final boolean... declared) throws QueryException {
     // name of parameter
-    final Item[] args = ann.args;
+    final Item[] args = ann.args();
     final String name = toString(args[0]);
     // variable template
     final QNm var = checkVariable(toString(args[1]), declared);
@@ -523,10 +523,9 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     if(error == null) error = new RestXqError();
 
     // name of parameter
-    final int al = ann.args.length;
     NameTest last = error.get(0);
-    for(int a = 0; a < al; a++) {
-      final String err = toString(ann.args[a]);
+    for(final Item arg : ann.args()) {
+      final String err = toString(arg);
       final Kind kind;
       QNm qnm = null;
       if(err.equals("*")) {

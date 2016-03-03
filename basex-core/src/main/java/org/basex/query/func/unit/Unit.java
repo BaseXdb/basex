@@ -12,10 +12,10 @@ import org.basex.core.*;
 import org.basex.core.Context;
 import org.basex.io.*;
 import org.basex.query.*;
+import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -116,7 +116,7 @@ final class Unit {
         // check arguments
         final AnnList anns = sf.anns;
         final Ann ann = anns.get(_UNIT_TEST);
-        final Item[] args = ann.args;
+        final Item[] args = ann.args();
         final int vs = args.length;
 
         // expected error code
@@ -158,7 +158,8 @@ final class Unit {
           }
         } else {
           // skip test
-          testcase.add(SKIPPED, ignore.args.length == 0 ? EMPTY : ignore.args[0].string(null));
+          final Item[] iargs = ignore.args();
+          testcase.add(SKIPPED, iargs.length == 0 ? EMPTY : iargs[0].string(null));
           skipped++;
         }
         testcase.add(TIME, time(perf2));
@@ -198,8 +199,9 @@ final class Unit {
    * @throws QueryException query exception
    */
   private static QNm name(final StaticFunc sf, final Ann ann) throws QueryException {
-    if(ann.args.length != 0) {
-      final byte[] name = ann.args[0].string(null);
+    final Item[] args = ann.args();
+    if(args.length != 0) {
+      final byte[] name = args[0].string(null);
       if(name.length != 0) return QNm.resolve(name, sf.name.uri(), sf.sc, sf.info);
     }
     return null;

@@ -282,9 +282,13 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    */
   public static boolean inline(final QueryContext qc, final AnnList anns, final Expr expr) {
     final Ann ann = anns.get(Annotation._BASEX_INLINE);
-    final long limit = ann != null
-        ? ann.args.length > 0 ? ((ANum) ann.args[0]).itr() : Long.MAX_VALUE
-        : qc.context.options.get(MainOptions.INLINELIMIT);
+    final long limit;
+    if(ann == null) {
+      limit = qc.context.options.get(MainOptions.INLINELIMIT);;
+    } else {
+      final Item[] args = ann.args();
+      limit = args.length > 0 ? ((ANum) args[0]).itr() : Long.MAX_VALUE;
+    }
     return expr.isValue() || expr.exprSize() < limit;
   }
 

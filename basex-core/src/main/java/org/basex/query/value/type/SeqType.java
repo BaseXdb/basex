@@ -231,6 +231,8 @@ public final class SeqType {
   public static final SeqType FUN_ZM = new SeqType(ANY_FUN, Occ.ZERO_MORE);
   /** Zero or more maps. */
   public static final SeqType MAP_ZM = new SeqType(ANY_MAP, Occ.ZERO_MORE);
+  /** Zero or one map. */
+  public static final SeqType MAP_ZO = new SeqType(ANY_MAP, Occ.ZERO_ONE);
   /** Single map. */
   public static final SeqType MAP_O = new SeqType(ANY_MAP);
   /** Zero or more arrays. */

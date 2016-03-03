@@ -14,7 +14,6 @@ import org.basex.query.func.admin.*;
 import org.basex.query.func.archive.*;
 import org.basex.query.func.array.*;
 import org.basex.query.func.async.*;
-import org.basex.query.func.basex.*;
 import org.basex.query.func.bin.*;
 import org.basex.query.func.client.*;
 import org.basex.query.func.convert.*;
@@ -44,6 +43,7 @@ import org.basex.query.func.stream.*;
 import org.basex.query.func.strings.*;
 import org.basex.query.func.unit.*;
 import org.basex.query.func.user.*;
+import org.basex.query.func.util.*;
 import org.basex.query.func.validate.*;
 import org.basex.query.func.web.*;
 import org.basex.query.func.xquery.*;
@@ -606,19 +606,6 @@ public enum Function {
   /** XQuery function. */
   _ASYNC_FORK_JOIN(AsyncForkJoin.class, "fork-join(functions[,options])",
       arg(FUN_ZM, MAP_O), ITEM_ZM, flag(HOF), ASYNC_URI),
-
-  /* BaseX Module. */
-
-  /** XQuery function. */
-  _BASEX_DEEP_EQUAL(BaseXDeepEqual.class, "deep-equal(items1,items2[,options])",
-      arg(ITEM_ZM, ITEM_ZM, ITEM), BLN, BASEX_URI),
-  /** XQuery function. */
-  _BASEX_ITEM_AT(BaseXItemAt.class, "item-at(items,pos)", arg(ITEM_ZM, DBL), ITEM_ZO, BASEX_URI),
-  /** XQuery function. */
-  _BASEX_ITEM_RANGE(BaseXItemRange.class, "item-range(items,first,last)",
-      arg(ITEM_ZM, DBL, DBL), ITEM_ZM, BASEX_URI),
-  /** XQuery function. */
-  _BASEX_LAST_FROM(BaseXLastFrom.class, "last-from(items)", arg(ITEM_ZM), ITEM_ZO, BASEX_URI),
 
   /* Binary Module. */
 
@@ -1240,6 +1227,22 @@ public enum Function {
   /** XQuery function. */
   _USER_PASSWORD(UserPassword.class, "password(name,password)",
       arg(STR, STR), EMP, flag(UPD), USER_URI),
+
+  /* Utility Module. */
+
+  /** XQuery function. */
+  _UTIL_DEEP_EQUAL(UtilDeepEqual.class, "deep-equal(items1,items2[,options])",
+      arg(ITEM_ZM, ITEM_ZM, ITEM), BLN, UTIL_URI),
+  /** XQuery function. */
+  _UTIL_ITEM_AT(UtilItemAt.class, "item-at(items,pos)", arg(ITEM_ZM, DBL), ITEM_ZO, UTIL_URI),
+  /** XQuery function. */
+  _UTIL_ITEM_RANGE(UtilItemRange.class, "item-range(items,first,last)",
+      arg(ITEM_ZM, DBL, DBL), ITEM_ZM, UTIL_URI),
+  /** XQuery function. */
+  _UTIL_LAST_FROM(UtilLastFrom.class, "last-from(items)", arg(ITEM_ZM), ITEM_ZO, UTIL_URI),
+  /** XQuery function. */
+  _UTIL_FUNCTION_ANNOTATIONS(UtilFunctionAnnotations.class, "function-annotations(function)",
+      arg(FUN_O), MAP_ZO, UTIL_URI),
 
   /* Validate Module. */
 

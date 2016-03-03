@@ -551,6 +551,8 @@ public interface QueryText {
   byte[] REPO_PREFIX = token("repo");
   /** User token. */
   byte[] USER_PREFIX = token("user");
+  /** Util token. */
+  byte[] UTIL_PREFIX = token("util");
   /** Validate token. */
   byte[] VALIDATE_PREFIX = token("validate");
   /** Web token. */
@@ -683,6 +685,8 @@ public interface QueryText {
   byte[] UNIT_URI = token(BXMODULES_URI + "unit");
   /** User module URI. */
   byte[] USER_URI = token(BXMODULES_URI + "user");
+  /** Utility module URI. */
+  byte[] UTIL_URI = token(BXMODULES_URI + "util");
   /** Validate module URI. */
   byte[] VALIDATE_URI = token(BXMODULES_URI + "validate");
   /** Web module URI. */

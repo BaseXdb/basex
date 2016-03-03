@@ -1,8 +1,7 @@
-package org.basex.query.util;
+package org.basex.query.ann;
 
 import static org.basex.query.QueryText.*;
 
-import org.basex.query.ann.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -18,9 +17,9 @@ public final class Ann {
   /** Annotation signature (is {@code null} if {@link #name} is assigned). */
   public final Annotation sig;
   /** No-standard annotation (is {@code null} if {@link #sig} is assigned). */
-  public final QNm name;
+  private final QNm name;
   /** Arguments. */
-  public final Item[] args;
+  private final Item[] args;
 
   /**
    * Constructor.
@@ -61,6 +60,22 @@ public final class Ann {
       if(!args[a].sameAs(ann.args[a])) return false;
     }
     return true;
+  }
+
+  /**
+   * Returns the name of the annotation.
+   * @return name
+   */
+  public QNm name() {
+    return name != null ? name : sig.qname();
+  }
+
+  /**
+   * Returns the value of the annotation.
+   * @return value
+   */
+  public Item[] args() {
+    return args;
   }
 
   @Override

@@ -7,7 +7,7 @@ import static org.basex.util.Token.*;
 import java.util.*;
 
 import org.basex.query.*;
-import org.basex.query.util.*;
+import org.basex.query.ann.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;

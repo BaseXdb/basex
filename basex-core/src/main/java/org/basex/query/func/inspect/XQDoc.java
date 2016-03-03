@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 
 import org.basex.io.*;
 import org.basex.query.*;
+import org.basex.query.ann.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -155,10 +156,8 @@ final class XQDoc extends Inspect {
    */
   private void annotations(final AnnList anns, final FElem parent) throws QueryException {
     if(!anns.isEmpty()) annotation(anns, elem("annotations", parent), false);
-    final int al = anns.size();
-    for(int a = 0; a < al; a++) {
-      final Ann ann = anns.get(a);
-      final byte[] uri = ann.sig != null ? ann.sig.uri : ann.name.uri();
+    for(final Ann ann : anns) {
+      final byte[] uri = ann.name().uri();
       if(uri.length > 0) nsCache.put(NSGlobal.prefix(uri), uri);
     }
   }

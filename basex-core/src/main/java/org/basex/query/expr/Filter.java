@@ -152,7 +152,7 @@ public abstract class Filter extends Preds {
           e = FnSubsequence.eval((Value) e, e.size(), 1);
         } else {
           // rewrite positional predicate to basex:last-from
-          e = Function._BASEX_LAST_FROM.get(null, info, e);
+          e = Function._UTIL_LAST_FROM.get(null, info, e);
         }
         opt = true;
       } else if(pos != null) {
@@ -161,10 +161,10 @@ public abstract class Filter extends Preds {
           e = FnSubsequence.eval((Value) e, pos.min, pos.max - pos.min + 1);
         } else if(pos.min == pos.max) {
           // example: expr[pos] -> basex:item-at(expr, pos.min)
-          e = Function._BASEX_ITEM_AT.get(null, info, e, Int.get(pos.min));
+          e = Function._UTIL_ITEM_AT.get(null, info, e, Int.get(pos.min));
         } else {
           // example: expr[pos] -> basex:item-range(expr, pos.min, pos.max)
-          e = Function._BASEX_ITEM_RANGE.get(null, info, e, Int.get(pos.min), Int.get(pos.max));
+          e = Function._UTIL_ITEM_RANGE.get(null, info, e, Int.get(pos.min), Int.get(pos.max));
         }
         opt = true;
       } else if(num(pred)) {
@@ -172,7 +172,7 @@ public abstract class Filter extends Preds {
          *   example: expr[pos] -> basex:item-at(expr, pos)
          * - only choose deterministic and context-independent offsets.
          *   example: (1 to 10)[random:integer(10)]  or  (1 to 10)[.] */
-        e = Function._BASEX_ITEM_AT.get(null, info, e, pred);
+        e = Function._UTIL_ITEM_AT.get(null, info, e, pred);
         opt = true;
       } else {
         // rebuild filter if no optimization can be applied

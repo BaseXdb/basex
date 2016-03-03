@@ -147,8 +147,6 @@ public enum Annotation {
   /** XQuery annotation. */
   _UNIT_TEST("test(['expected',error])", arg(STR, STR), UNIT_URI);
 
-  /** Descriptions. */
-  public final String desc;
   /** Argument types. */
   public final SeqType[] args;
   /** URI. */
@@ -157,6 +155,8 @@ public enum Annotation {
   public final int[] minMax;
   /** Annotation must only occur once. */
   public final boolean single;
+  /** Descriptions. */
+  private final String desc;
 
   /** Cached enums (faster). */
   public static final Annotation[] VALUES = values();
@@ -215,6 +215,14 @@ public enum Annotation {
    */
   public byte[] local() {
     return new TokenBuilder(desc.substring(0, desc.indexOf('('))).finish();
+  }
+
+  /**
+   * Returns the QName of the annotation.
+   * @return QName
+   */
+  public QNm qname() {
+    return new QNm(id(), uri);
   }
 
   /**
