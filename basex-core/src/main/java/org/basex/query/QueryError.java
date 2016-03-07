@@ -171,6 +171,11 @@ public enum QueryError {
   /** BXHL0001. */
   BXHL_IO_X(BXHL, 1, "%"),
 
+  // Inspection module
+
+  /** Util error. */
+  INSPECT_UNKNOWN_X(INSPECT, "unknown", "Component '%' does not exist."),
+
   // JSON module
 
   /** BXJS0001. */
@@ -322,11 +327,6 @@ public enum QueryError {
   USER_SAMEPERM_X_X(USER, "update", "User '%' can only be % once."),
   /** User error. */
   USER_CONFLICT_X(USER, "conflict", "User '%' cannot be both altered and dropped."),
-
-  // Utility Module
-
-  /** Util error. */
-  UTIL_UNKNOWN_X(UTIL, "unknown", "Key '%' is unknown."),
 
   // EXPath modules
 
@@ -1396,9 +1396,9 @@ public enum QueryError {
     /** BXWE Error type. */ BXWE(BXERR_PREFIX, BXERRORS_URI),
     /** BXXQ Error type. */ BXXQ(BXERR_PREFIX, BXERRORS_URI),
     /** HASH Error type. */ HASH(BXERR_PREFIX, BXERRORS_URI),
-    /** UNIT Error type. */ UNIT(UNIT_PREFIX,  UNIT_URI),
-    /** USER Error type. */ USER(USER_PREFIX,  USER_URI),
-    /** UTIL Error type. */ UTIL(UTIL_PREFIX,  UTIL_URI),
+    /** INSP Error type. */ INSPECT(INSPECT_PREFIX, INSPECT_URI),
+    /** UNIT Error type. */ UNIT(UNIT_PREFIX, UNIT_URI),
+    /** USER Error type. */ USER(USER_PREFIX, USER_URI),
 
     // EXPath errors
 

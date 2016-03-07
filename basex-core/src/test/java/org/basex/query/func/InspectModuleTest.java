@@ -134,4 +134,19 @@ public final class InspectModuleTest extends AdvancedQueryTest {
     query(_MAP_SIZE.args(_INSPECT_FUNCTION_ANNOTATIONS.args(
         " %basex:inline %basex:lazy function() {}")), 2);
   }
+
+  /** Test method. */
+  @Test
+  public void staticContext() {
+    query(_INSPECT_STATIC_CONTEXT.args(" ()", "namespaces") + "?xml",
+        "http://www.w3.org/XML/1998/namespace");
+    query(STARTS_WITH.args(_INSPECT_STATIC_CONTEXT.args(" ()", "base-uri"), "file:"), "true");
+    query(_INSPECT_STATIC_CONTEXT.args(" ()", "element-namespace"), "");
+    query(_INSPECT_STATIC_CONTEXT.args(" ()", "function-namespace"),
+        "http://www.w3.org/2005/xpath-functions");
+    query(_INSPECT_STATIC_CONTEXT.args(" ()", "collation"),
+        "http://www.w3.org/2005/xpath-functions/collation/codepoint");
+
+    error(_INSPECT_STATIC_CONTEXT.args(" ()", "unknown"), INSPECT_UNKNOWN_X);
+  }
 }

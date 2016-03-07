@@ -18,11 +18,17 @@ import org.basex.util.*;
 public final class InspectStaticContext extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final FItem func = toFunc(exprs[0], qc);
-    if(!(func instanceof FuncItem)) throw INVFUNCITEM_X_X.get(info, func.type, func);
+    Item it = exprs[0].item(qc, ii);
     final String name = Token.string(toToken(exprs[1], qc));
+    final StaticContext sctx;
+    if(it == null) {
+      sctx = sc;
+    } else {
+      it = toFunc(it, qc);
+      if(!(it instanceof FuncItem)) throw INVFUNCITEM_X_X.get(info, it.type, it);
+      sctx = ((FuncItem) it).sc;
+    }
 
-    final StaticContext sctx = ((FuncItem) func).sc;
     switch(name) {
       case "base-uri":
         return sctx.baseURI();
@@ -48,7 +54,7 @@ public final class InspectStaticContext extends StandardFunc {
         return Uri.uri(sctx.collation == null ? QueryText.COLLATION_URI : sctx.collation.uri());
 
       default:
-        throw UTIL_UNKNOWN_X.get(info, name);
+        throw INSPECT_UNKNOWN_X.get(info, name);
     }
   }
 }
