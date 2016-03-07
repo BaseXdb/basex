@@ -323,6 +323,11 @@ public enum QueryError {
   /** User error. */
   USER_CONFLICT_X(USER, "conflict", "User '%' cannot be both altered and dropped."),
 
+  // Utility Module
+
+  /** Util error. */
+  UTIL_UNKNOWN_X(UTIL, "unknown", "Key '%' is unknown."),
+
   // EXPath modules
 
   /** ARCH0001. */
@@ -1393,6 +1398,7 @@ public enum QueryError {
     /** HASH Error type. */ HASH(BXERR_PREFIX, BXERRORS_URI),
     /** UNIT Error type. */ UNIT(UNIT_PREFIX,  UNIT_URI),
     /** USER Error type. */ USER(USER_PREFIX,  USER_URI),
+    /** UTIL Error type. */ UTIL(UTIL_PREFIX,  UTIL_URI),
 
     // EXPath errors
 

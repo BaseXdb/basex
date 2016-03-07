@@ -71,16 +71,4 @@ public final class UtilModuleTest extends AdvancedQueryTest {
     query(_UTIL_DEEP_EQUAL.args("1", "1", "ALLNODES"), true);
     error(_UTIL_DEEP_EQUAL.args("(1 to 2)", "(1 to 2)", "X"), QueryError.INVALIDOPTION_X);
   }
-
-  /** Test method. */
-  @Test
-  public void functionAnnotations() {
-    query(_UTIL_FUNCTION_ANNOTATIONS.args(" true#0"), "map {\n}");
-    query(_UTIL_FUNCTION_ANNOTATIONS.args(" %local:x function() { }") +
-        "=> " + _MAP_CONTAINS.args("xs:QName('local:x')"), true);
-    query(_UTIL_FUNCTION_ANNOTATIONS.args(" %Q{uri}name('a','b') function() {}") +
-        "(QName('uri','name'))", "a\nb");
-    query(_MAP_SIZE.args(_UTIL_FUNCTION_ANNOTATIONS.args(
-        " %basex:inline %basex:lazy function() {}")), 2);
-  }
 }

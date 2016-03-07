@@ -13,7 +13,7 @@ import org.basex.util.*;
  */
 public final class NSGlobal {
   /** Namespace: prefixes and namespace URIs. */
-  private static final Atts NS = new Atts();
+  public static final Atts NS = new Atts();
   /** Reserved namespaces. */
   private static final int RESERVED;
 

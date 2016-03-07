@@ -1071,6 +1071,12 @@ public enum Function {
   _INSPECT_FUNCTIONS(InspectFunctions.class, "functions([uri])",
       arg(STR), FUN_ZM, flag(HOF), INSPECT_URI),
   /** XQuery function. */
+  _INSPECT_FUNCTION_ANNOTATIONS(InspectFunctionAnnotations.class, "function-annotations(function)",
+      arg(FUN_O), MAP_ZO, UTIL_URI),
+  /** XQuery function. */
+  _INSPECT_STATIC_CONTEXT(InspectStaticContext.class, "static-context(function,name)",
+      arg(FUN_O, STR), ITEM_ZO, UTIL_URI),
+  /** XQuery function. */
   _INSPECT_XQDOC(InspectXqdoc.class, "xqdoc(uri)", arg(STR), ELM, INSPECT_URI),
 
   /* JSON Module. */
@@ -1242,9 +1248,6 @@ public enum Function {
       arg(ITEM_ZM, DBL, DBL), ITEM_ZM, UTIL_URI),
   /** XQuery function. */
   _UTIL_LAST_FROM(UtilLastFrom.class, "last-from(items)", arg(ITEM_ZM), ITEM_ZO, UTIL_URI),
-  /** XQuery function. */
-  _UTIL_FUNCTION_ANNOTATIONS(UtilFunctionAnnotations.class, "function-annotations(function)",
-      arg(FUN_O), MAP_ZO, UTIL_URI),
 
   /* Validate Module. */
 

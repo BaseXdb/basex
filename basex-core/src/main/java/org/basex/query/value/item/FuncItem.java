@@ -27,13 +27,14 @@ import org.basex.util.hash.*;
  */
 public final class FuncItem extends FItem implements Scope {
   /** Static context. */
-  private final StaticContext sc;
+  public final StaticContext sc;
+  /** Function expression. */
+  public final Expr expr;
+
   /** Function name (may be {@code null}). */
   private final QNm name;
   /** Formal parameters. */
   private final Var[] params;
-  /** Function expression. */
-  public final Expr expr;
 
   /** Context value. */
   private final Value ctxValue;

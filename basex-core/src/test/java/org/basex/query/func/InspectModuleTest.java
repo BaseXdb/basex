@@ -122,4 +122,16 @@ public final class InspectModuleTest extends AdvancedQueryTest {
     query("import module namespace hello='world' at '" + url + "';"
         + _INSPECT_FUNCTIONS.args() + "[function-name(.) = xs:QName('hello:closure')]()", "1");
   }
+
+  /** Test method. */
+  @Test
+  public void functionAnnotations() {
+    query(_INSPECT_FUNCTION_ANNOTATIONS.args(" true#0"), "map {\n}");
+    query(_INSPECT_FUNCTION_ANNOTATIONS.args(" %local:x function() { }") +
+        "=> " + _MAP_CONTAINS.args("xs:QName('local:x')"), true);
+    query(_INSPECT_FUNCTION_ANNOTATIONS.args(" %Q{uri}name('a','b') function() {}") +
+        "(QName('uri','name'))", "a\nb");
+    query(_MAP_SIZE.args(_INSPECT_FUNCTION_ANNOTATIONS.args(
+        " %basex:inline %basex:lazy function() {}")), 2);
+  }
 }

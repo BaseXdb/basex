@@ -15,7 +15,7 @@ import org.basex.util.*;
  */
 public final class NSContext {
   /** Static namespaces, containing prefixes and URIs. */
-  private final Atts ns = new Atts();
+  public final Atts ns = new Atts();
   /** Dynamically added namespaces. */
   private Atts stack;
 
@@ -57,8 +57,8 @@ public final class NSContext {
   }
 
   /**
-   * Returns the namespace URI for the specified prefix if it is either
-   * found in the dynamic, static or predefined namespaces.
+   * Returns the namespace URI for the specified prefix if it is either found in the dynamic,
+   * static or predefined namespaces.
    * @param pref prefix of the namespace
    * @return namespace URI or {@code null}
    */
