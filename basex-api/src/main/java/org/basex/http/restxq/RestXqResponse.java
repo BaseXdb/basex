@@ -12,63 +12,49 @@ import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.util.http.*;
 
 /**
  * This class creates a new HTTP response.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class RestXqResponse {
-  /** Function to be evaluated. */
-  private final RestXqFunction function;
-  /** Query context. */
-  private final QueryContext query;
-  /** HTTP context. */
-  private final HTTPContext http;
-  /** Optional query error. */
-  private final QueryException error;
-
-  /**
-   * Constructor.
-   * @param rxf function to be evaluated
-   * @param qc query context
-   * @param hc HTTP context
-   * @param err optional query error
-   */
-  RestXqResponse(final RestXqFunction rxf, final QueryContext qc, final HTTPContext hc,
-      final QueryException err) {
-    function = rxf;
-    query = qc;
-    http = hc;
-    error = err;
-  }
+  /** Private constructor. */
+  private RestXqResponse() { }
 
   /**
    * Evaluates the specified function and creates a response.
+   * @param function function to be evaluated
+   * @param qc query context
+   * @param http HTTP context
+   * @param error optional query error
    * @throws Exception exception (including unexpected ones)
    */
-  void create() throws Exception {
+  static void create(final RestXqFunction function, final QueryContext qc,
+      final HTTPContext http, final QueryException error) throws Exception {
+
     // bind variables
-    final StaticFunc uf = function.function;
-    final Expr[] args = new Expr[uf.args.length];
-    function.bind(http, args, error);
+    final StaticFunc sf = function.function;
+    final Expr[] args = new Expr[sf.args.length];
+    function.bind(http, args, error, qc);
 
     // assign function call and http context and register process
-    query.mainModule(MainModule.get(uf, args));
-    query.http(http);
-    query.context.register(query);
+    qc.mainModule(MainModule.get(sf, args));
+    qc.http(http);
+    qc.context.register(qc);
 
+    final RestXqSession session = new RestXqSession(http, function.key, qc);
     String redirect = null, forward = null;
-    RestXqRespBuilder resp = null;
+    RestXqRespBuilder response = null;
     try {
-      // compile and evaluate query
-      query.compile();
-      final Iter iter = query.iter();
+      // evaluate query
+      final Iter iter = qc.iter();
       Item item = iter.next();
 
       // handle response element
-      if(item != null && item.type.isNode()) {
+      if(item instanceof ANode) {
         final ANode node = (ANode) item;
         // send redirect to browser
         if(REST_REDIRECT.eq(node)) {
@@ -85,35 +71,37 @@ final class RestXqResponse {
           return;
         }
         if(REST_RESPONSE.eq(node)) {
-          resp = new RestXqRespBuilder();
-          resp.build(node, function, iter, http);
+          response = new RestXqRespBuilder();
+          response.build(node, function, iter, http);
           return;
         }
       }
 
       // HEAD method must return a single response element
-      if(function.methods.size() == 1 && function.methods.contains(HTTPMethod.HEAD.name()))
+      if(function.methods.size() == 1 && function.methods.contains(HttpMethod.HEAD.name()))
         throw function.error(HEAD_METHOD);
 
       // serialize result
       final SerializerOptions sp = function.output;
       http.sopts(sp);
       http.initResponse();
-      final Serializer ser = Serializer.get(http.res.getOutputStream(), sp);
-      for(; item != null; item = iter.next()) ser.serialize(item);
-      ser.close();
+      try(final Serializer ser = Serializer.get(http.res.getOutputStream(), sp)) {
+        for(; item != null; item = iter.next()) ser.serialize(item);
+      }
 
     } finally {
-      query.close();
-      query.context.unregister(query);
+      qc.close();
+      qc.context.unregister(qc);
+      session.close();
 
       if(redirect != null) {
-        http.res.sendRedirect(redirect);
+        http.redirect(redirect);
       } else if(forward != null) {
-        http.req.getRequestDispatcher(forward).forward(http.req, http.res);
-      } else if(resp != null) {
-        if(resp.status != 0) http.status(resp.status, resp.message, resp.error);
-        http.res.getOutputStream().write(resp.cache.toArray());
+        http.forward(forward);
+      } else if(response != null) {
+        if(response.status != 0) http.status(response.status, response.message, response.error);
+        final byte[] out = response.cache.finish();
+        if(out.length != 0) http.res.getOutputStream().write(out);
       }
     }
   }

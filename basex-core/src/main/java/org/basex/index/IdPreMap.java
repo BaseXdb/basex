@@ -10,9 +10,9 @@ import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
- * ID -> PRE mapping.
+ * Updatable ID -> PRE mapping.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Dimitar Popov
  */
 public class IdPreMap {
@@ -41,14 +41,14 @@ public class IdPreMap {
   public IdPreMap(final int id) {
     baseid = id;
     pres = new int[1];
-    fids = new int[pres.length];
-    nids = new int[pres.length];
-    incs = new int[pres.length];
-    oids = new int[pres.length];
+    fids = new int[1];
+    nids = new int[1];
+    incs = new int[1];
+    oids = new int[1];
   }
 
   /**
-   * Construct a map by reading it from a file.
+   * Constructs a map by reading it from a file.
    * @param f file to read from
    * @throws IOException I/O error while reading from the file
    */
@@ -66,11 +66,11 @@ public class IdPreMap {
 
   /**
    * Write the map to the specified file.
-   * @param f file to write to
+   * @param file file to write to
    * @throws IOException I/O error while writing to the file
    */
-  public void write(final IOFile f) throws IOException {
-    try(final DataOutput out = new DataOutput(f)) {
+  public void write(final IOFile file) throws IOException {
+    try(final DataOutput out = new DataOutput(file)) {
       out.writeNum(baseid);
       out.writeNum(rows);
       out.writeNums(pres);
@@ -82,7 +82,15 @@ public class IdPreMap {
   }
 
   /**
-   * Find the PRE value of a given ID.
+   * Finishes database creation.
+   * @param base last id
+   */
+  public void finish(final int base) {
+    baseid = base;
+  }
+
+  /**
+   * Finds the PRE value of a given ID.
    * @param id ID
    * @return PRE or -1 if the ID is already deleted
    */
@@ -105,20 +113,7 @@ public class IdPreMap {
   }
 
   /**
-   * Find the PRE values of a given list of IDs.
-   * @param ids IDs
-   * @param off start position in ids (inclusive)
-   * @param len number of ids
-   * @return a sorted array of PRE values
-   */
-  public int[] pre(final int[] ids, final int off, final int len) {
-    final IntList p = new IntList(ids.length);
-    for(int i = off; i < len; ++i) p.add(pre(ids[i]));
-    return p.sort().toArray();
-  }
-
-  /**
-   * Insert new record.
+   * Inserts a new record.
    * @param pre record PRE
    * @param id record ID
    * @param c number of inserted records
@@ -176,10 +171,10 @@ public class IdPreMap {
   }
 
   /**
-   * Delete records.
+   * Deletes records.
    * @param pre PRE of the first record
    * @param id ID of the first deleted record
-   * @param c number of deleted records
+   * @param c number of deleted records (negative)
    */
   public void delete(final int pre, final int id, final int c) {
     if(rows == 0 && pre == id && id - c == baseid + 1) {
@@ -250,7 +245,7 @@ public class IdPreMap {
   }
 
   /**
-   * Shrink the given tuple from the start.
+   * Shrinks the given tuple from the start.
    * @param i index of the tuple
    * @param pre pre-value
    * @param c number of deleted records (negative number)
@@ -262,7 +257,7 @@ public class IdPreMap {
   }
 
   /**
-   * Shrink the given tuple from the end.
+   * Shrinks the given tuple from the end.
    * @param i index of the tuple
    * @param pre pre-value
    * @param inc new inc-value
@@ -273,7 +268,7 @@ public class IdPreMap {
   }
 
   /**
-   * Increment the pre- and inc-values of all tuples starting from the given index.
+   * Increments the pre- and inc-values of all tuples starting from the given index.
    * @param from start index
    * @param with increment value
    */
@@ -284,25 +279,8 @@ public class IdPreMap {
     }
   }
 
-  @Override
-  public String toString() {
-    final StringBuilder b = new StringBuilder();
-
-    b.append("pres, fids, nids, incs, oids");
-    for(int i = 0; i < rows; i++) {
-      b.append('\n');
-      b.append(pres[i]); b.append(", ");
-      b.append(fids[i]); b.append(", ");
-      b.append(nids[i]); b.append(", ");
-      b.append(incs[i]); b.append(", ");
-      b.append(oids[i]);
-    }
-
-    return b.toString();
-  }
-
   /**
-   * Size of the map.
+   * Returns the size of the map.
    * @return number of stored tuples.
    */
   public int size() {
@@ -310,10 +288,9 @@ public class IdPreMap {
   }
 
   /**
-   * Search for a given pre value.
+   * Searches for a given pre value.
    * @param pre pre value
-   * @return index of the record where the pre is found, or the insertion point, if not
-   * found
+   * @return index of the record where the pre is found, or the insertion point if not found
    */
   private int findPre(final int pre) {
     int low = 0;
@@ -345,7 +322,7 @@ public class IdPreMap {
   }
 
   /**
-   * Add a record to the table and the ID index.
+   * Adds a record to the table and the ID index.
    * @param i index in the table where the record should be inserted
    * @param pre pre value
    * @param fid first ID value
@@ -381,7 +358,7 @@ public class IdPreMap {
   }
 
   /**
-   * Remove a records from the table and the ID index.
+   * Removes a records from the table and the ID index.
    * @param s start index of records in the table (inclusive)
    * @param e end index of records in the table (inclusive)
    */
@@ -396,5 +373,18 @@ public class IdPreMap {
       System.arraycopy(oids, last, oids, s, length);
       rows -= last - s;
     }
+  }
+
+  @Override
+  public String toString() {
+    final Table t = new Table();
+    t.header.add("PRE").add("FID").add("NID").add("INC").add("OID");
+    for(int i = 0; i < 5; ++i) t.align.add(true);
+    for(int i = 0; i < rows; i++) {
+      final TokenList tl = new TokenList();
+      tl.add(pres[i]).add(fids[i]).add(nids[i]).add(incs[i]).add(oids[i]);
+      t.contents.add(tl);
+    }
+    return t + "\n- BaseID: " + baseid + '\n';
   }
 }

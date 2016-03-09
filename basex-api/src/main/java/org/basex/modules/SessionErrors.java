@@ -2,18 +2,20 @@ package org.basex.modules;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
+import org.basex.util.*;
 
 /**
  * This module contains static error functions for the Session module.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class SessionErrors {
   /** Error namespace. */
-  private static final byte[] NS = QueryText.BXERRORS;
+  private static final byte[] NS = QueryText.BXERRORS_URI;
   /** Namespace and error code prefix. */
-  private static final String PREFIX = "bxerr:BXSE";
+  private static final String PREFIX =
+      new TokenBuilder(QueryText.BXERR_PREFIX).add(':').add("BXSE").toString();
 
   /** Private constructor, preventing instantiation. */
   private SessionErrors() { }

@@ -11,7 +11,7 @@ import org.basex.util.list.*;
 /**
  * This class summarizes the result of a search.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class SearchContext {
@@ -32,20 +32,20 @@ final class SearchContext {
 
   /**
    * Constructor.
-   * @param sb search bar
+   * @param bar search bar
    * @param text search string
    */
-  SearchContext(final SearchBar sb, final String text) {
-    bar = sb;
-    mcase = sb.mcase.isSelected();
-    word = sb.word.isSelected();
-    regex = sb.regex.isSelected();
-    multi = sb.multi.isSelected();
-    String s = mcase ? text : text.toLowerCase(Locale.ENGLISH);
+  SearchContext(final SearchBar bar, final String text) {
+    this.bar = bar;
+    mcase = bar.mcase.isSelected();
+    word = bar.word.isSelected();
+    regex = bar.regex.isSelected();
+    multi = bar.multi.isSelected();
+    String srch = mcase ? text : text.toLowerCase(Locale.ENGLISH);
     // speed up regular expressions starting with wildcards
-    if(regex && (s.startsWith(".*") || s.startsWith("(.*") ||
-        s.startsWith(".+") || s.startsWith("(.+"))) s = '^' + s;
-    search = s;
+    if(regex && (srch.startsWith(".*") || srch.startsWith("(.*") ||
+        srch.startsWith(".+") || srch.startsWith("(.+"))) srch = '^' + srch;
+    search = srch;
   }
 
   /**
@@ -182,16 +182,13 @@ final class SearchContext {
     return nr;
   }
 
-  @Override
-  public boolean equals(final Object obj) {
-    if(!(obj instanceof SearchContext)) return false;
-    final SearchContext s = (SearchContext) obj;
-    return mcase == s.mcase && word == s.word && regex == s.regex && multi == s.multi &&
-        eq(search, s.search);
-  }
-
-  @Override
-  public int hashCode() {
-    return super.hashCode();
+  /**
+   * Compares a search context with another.
+   * @param sc search context
+   * @return result of check
+   */
+  public boolean sameAs(final SearchContext sc) {
+    return sc != null && mcase == sc.mcase && word == sc.word && regex == sc.regex &&
+        multi == sc.multi && Strings.eq(search, sc.search);
   }
 }

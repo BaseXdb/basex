@@ -12,12 +12,15 @@ import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.query.*;
 import org.basex.index.stats.*;
+import org.basex.index.value.*;
 import org.basex.io.random.*;
-import org.basex.query.ft.*;
+import org.basex.query.expr.ft.*;
+import org.basex.query.util.ft.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
+import org.basex.util.similarity.*;
 
 /**
  * <p>This class provides access to a fuzzy full-text index structure
@@ -43,10 +46,10 @@ import org.basex.util.list.*;
  *   {@code pre1/pos1, pre2/pos2, pre3/pos3, ...} [{@link Num}]</li>
  * </ul>
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public final class FTIndex implements Index {
+public final class FTIndex extends ValueIndex {
   /** Entry size. */
   private static final int ENTRY = 9;
 
@@ -54,8 +57,6 @@ public final class FTIndex implements Index {
   private final IntObjMap<byte[]> ctext = new IntObjMap<>();
   /** Levenshtein reference. */
   private final Levenshtein ls = new Levenshtein();
-  /** Data reference. */
-  private final Data data;
 
   /** Index storing each unique token length and pointer
    * on the first token with this length. */
@@ -72,23 +73,23 @@ public final class FTIndex implements Index {
 
   /**
    * Constructor, initializing the index structure.
-   * @param d data reference
+   * @param data data reference
    * @throws IOException I/O Exception
    */
-  public FTIndex(final Data d) throws IOException {
-    data = d;
-
+  public FTIndex(final Data data) throws IOException {
+    super(data, IndexType.FULLTEXT);
     // cache token length index
-    inY = new DataAccess(d.meta.dbfile(DATAFTX + 'y'));
-    inZ = new DataAccess(d.meta.dbfile(DATAFTX + 'z'));
-    inX = new DataAccess(d.meta.dbfile(DATAFTX + 'x'));
-    tp = new int[d.meta.maxlen + 3];
-    for(int i = 0; i < tp.length; ++i) tp[i] = -1;
+    inY = new DataAccess(data.meta.dbfile(DATAFTX + 'y'));
+    inZ = new DataAccess(data.meta.dbfile(DATAFTX + 'z'));
+    inX = new DataAccess(data.meta.dbfile(DATAFTX + 'x'));
+    tp = new int[data.meta.maxlen + 3];
+    final int tl = tp.length;
+    for(int i = 0; i < tl; ++i) tp[i] = -1;
     int is = inX.readNum();
     while(--is >= 0) {
       int p = inX.readNum();
       final int r;
-      if(p < tp.length) {
+      if(p < tl) {
         r = inX.read4();
       } else {
         // legacy issue (7.0.2 -> 7.1)
@@ -98,11 +99,8 @@ public final class FTIndex implements Index {
       }
       tp[p] = r;
     }
-    tp[tp.length - 1] = (int) inY.length();
+    tp[tl - 1] = (int) inY.length();
   }
-
-  @Override
-  public synchronized void init() { }
 
   @Override
   public synchronized int costs(final IndexToken it) {
@@ -121,18 +119,16 @@ public final class FTIndex implements Index {
     final byte[] tok = it.get();
 
     // wildcard search
-    final FTOpt opt = ((FTLexer) it).ftOpt();
+    final FTLexer lexer = (FTLexer) it;
+    final FTOpt opt = lexer.ftOpt();
     if(opt.is(WC)) return wc(tok);
 
     // fuzzy search
-    if(opt.is(FZ)) {
-      final int k = data.meta.options.get(MainOptions.LSERROR);
-      return fuzzy(tok, k == 0 ? tok.length >> 2 : k);
-    }
+    if(opt.is(FZ)) return fuzzy(tok, lexer.lserror(tok));
 
     // return cached or new result
     final IndexEntry e = entry(tok);
-    return e.size > 0 ? iter(e.pointer, e.size, inZ, tok) : FTIndexIterator.FTEMPTY;
+    return e.size > 0 ? iter(e.offset, e.size, inZ, tok) : FTIndexIterator.FTEMPTY;
   }
 
   /**
@@ -170,7 +166,8 @@ public final class FTIndex implements Index {
           }
         }
         // find next available entry group
-        while(++ti < tp.length - 1) {
+        final int tl = tp.length;
+        while(++ti < tl - 1) {
           i = tp[ti];
           if(i == -1) continue;
           int c = ti + 1;
@@ -195,40 +192,46 @@ public final class FTIndex implements Index {
   /**
    * Binary search.
    * @param token token to look for
-   * @param i start position
-   * @param e end position
+   * @param start start position
+   * @param end end position
    * @param ti entry length
    * @return position where the key was found, or would have been found
    */
-  private int find(final byte[] token, final int i, final int e, final int ti) {
+  private int find(final byte[] token, final int start, final int end, final int ti) {
     final int tl = ti + ENTRY;
-    int l = 0, h = (e - i) / tl;
+    int l = 0, h = (end - start) / tl;
     while(l <= h) {
       final int m = l + h >>> 1;
-      final int p = i + m * tl;
+      final int p = start + m * tl;
       byte[] txt = ctext.get(p);
       if(txt == null) {
         txt = inY.readBytes(p, ti);
         ctext.put(p, txt);
       }
       final int d = diff(txt, token);
-      if(d == 0) return i + m * tl;
+      if(d == 0) return start + m * tl;
       if(d < 0) l = m + 1;
       else h = m - 1;
     }
-    return i + l * tl;
+    return start + l * tl;
   }
 
   @Override
-  public synchronized byte[] info() {
+  public synchronized byte[] info(final MainOptions options) {
     final TokenBuilder tb = new TokenBuilder();
     final long l = inX.length() + inY.length() + inZ.length();
+    tb.add(LI_NAMES).add(data.meta.ftinclude).add(NL);
     tb.add(LI_SIZE + Performance.format(l, true) + NL);
 
-    final IndexStats stats = new IndexStats(data.meta.options.get(MainOptions.MAXSTAT));
+    final IndexStats stats = new IndexStats(options.get(MainOptions.MAXSTAT));
     addOccs(stats);
     stats.print(tb);
     return tb.finish();
+  }
+
+  @Override
+  public boolean drop() {
+    return data.meta.drop(DATAFTX + '.');
   }
 
   @Override
@@ -236,6 +239,19 @@ public final class FTIndex implements Index {
     inX.close();
     inY.close();
     inZ.close();
+  }
+
+  @Override
+  public int size() {
+    final int tl = tp.length;
+    int size = 0, t = tl - 1;
+    while(true) {
+      final int e = t;
+      while(tp[--t] == -1) {
+        if(t == 0) return size;
+      }
+      size += (tp[e] - tp[t]) / (t + ENTRY);
+    }
   }
 
   /**
@@ -274,17 +290,19 @@ public final class FTIndex implements Index {
    */
   private void addOccs(final IndexStats stats) {
     int i = 0;
-    while(i < tp.length && tp[i] == -1) ++i;
-    int p = tp[i];
-    int j = i + 1;
-    while(j < tp.length && tp[j] == -1) ++j;
+    final int tl = tp.length;
+    while(i < tl && tp[i] == -1) ++i;
+    int p = tp[i], j = i + 1;
+    while(j < tl && tp[j] == -1) ++j;
 
-    while(p < tp[tp.length - 1]) {
-      if(stats.adding(size(p, i))) stats.add(inY.readBytes(p, i));
+    final int max = tp[tl - 1];
+    while(p < max) {
+      final int oc = size(p, i);
+      if(stats.adding(oc)) stats.add(inY.readBytes(p, i), oc);
       p += i + ENTRY;
       if(p == tp[j]) {
         i = j;
-        while(j + 1 < tp.length && tp[++j] == -1);
+        while(j + 1 < tl && tp[++j] == -1);
       }
     }
   }
@@ -317,16 +335,15 @@ public final class FTIndex implements Index {
    */
   private synchronized IndexIterator fuzzy(final byte[] token, final int k) {
     FTIndexIterator it = FTIndexIterator.FTEMPTY;
-    final int tl = token.length;
-    final int e = Math.min(tp.length - 1, tl + k);
-    int s = Math.max(1, tl - k) - 1;
+    final int tokl = token.length, tl = tp.length;
+    final int e = Math.min(tl - 1, tokl + k);
+    int s = Math.max(1, tokl - k) - 1;
 
     while(++s <= e) {
       int p = tp[s];
       if(p == -1) continue;
-      int i = s + 1;
-      int r = -1;
-      while(i < tp.length && r == -1) r = tp[i++];
+      int t = s + 1, r = -1;
+      while(t < tl && r == -1) r = tp[t++];
       while(p < r) {
         if(ls.similar(inY.readBytes(p, s), token, k)) {
           it = FTIndexIterator.union(iter(pointer(p, s), size(p, s), inZ, token), it);
@@ -350,13 +367,14 @@ public final class FTIndex implements Index {
     final IntList pr = new IntList();
     final IntList ps = new IntList();
     final byte[] pref = wc.prefix();
-    final int l = Math.min(tp.length - 1, wc.max());
-    for(int ti = pref.length; ti <= l; ti++) {
+    final int pl = pref.length, tl = tp.length;
+    final int l = Math.min(tl - 1, wc.max());
+    for(int ti = pl; ti <= l; ti++) {
       int i = tp[ti];
       if(i == -1) continue;
       int c = ti + 1;
       int e = -1;
-      while(c < tp.length && e == -1) e = tp[c++];
+      while(c < tl && e == -1) e = tp[c++];
       i = find(pref, i, e, ti);
 
       while(i < e) {
@@ -451,20 +469,20 @@ public final class FTIndex implements Index {
   /**
    * Full-text cache.
    */
-  static final class FTCache {
+  private static final class FTCache {
     /** Order. */
-    final int[] order;
+    private final int[] order;
     /** Pre values. */
-    final IntList pre;
+    private final IntList pre;
     /** Pos values. */
-    final IntList pos;
+    private final IntList pos;
 
     /**
      * Constructor.
      * @param pr pre values
      * @param ps positions
      */
-    FTCache(final IntList pr, final IntList ps) {
+    private FTCache(final IntList pr, final IntList ps) {
       final int s = pr.size();
       final double[] v = new double[s];
       for(int i = 0; i < s; i++) v[i] = (long) pr.get(i) << 32 | ps.get(i);
@@ -473,4 +491,17 @@ public final class FTIndex implements Index {
       pos = ps;
     }
   }
+
+  @Override
+  public void add(final ValueCache vc) {
+    throw Util.notExpected();
+  }
+
+  @Override
+  public void delete(final ValueCache vc) {
+    throw Util.notExpected();
+  }
+
+  @Override
+  public void flush() { }
 }

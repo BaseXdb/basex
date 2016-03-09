@@ -13,7 +13,7 @@ import org.basex.util.list.*;
 /**
  * Sequence of items of type {@link Str xs:string}, containing at least two of them.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class StrSeq extends NativeSeq {
@@ -41,29 +41,22 @@ public final class StrSeq extends NativeSeq {
 
   @Override
   public String[] toJava() {
-    final String[] tmp = new String[values.length];
-    for(int v = 0; v < values.length; v++) tmp[v] = Token.string(values[v]);
+    final int vl = values.length;
+    final String[] tmp = new String[vl];
+    for(int v = 0; v < vl; v++) tmp[v] = Token.string(values[v]);
     return tmp;
-  }
-
-  @Override
-  public Value reverse() {
-    final int s = values.length;
-    final byte[][] tmp = new byte[s][];
-    for(int l = 0, r = s - 1; l < s; l++, r--) tmp[l] = values[r];
-    return get(tmp);
   }
 
   // STATIC METHODS =====================================================================
 
   /**
    * Creates a sequence with the specified items.
-   * @param items items
+   * @param items items (will be invalidated by this call)
    * @return value
    */
   public static Value get(final TokenList items) {
-    return items.isEmpty() ? Empty.SEQ : items.size() == 1 ?
-        Str.get(items.get(0)) : new StrSeq(items.toArray());
+    return items.isEmpty() ? Empty.SEQ : items.size() == 1 ? Str.get(items.get(0)) :
+      new StrSeq(items.finish());
   }
 
   /**
@@ -72,26 +65,24 @@ public final class StrSeq extends NativeSeq {
    * @return value
    */
   public static Value get(final byte[][] items) {
-    return items.length == 0 ? Empty.SEQ : items.length == 1 ?
-        Str.get(items[0]) : new StrSeq(items);
+    return items.length == 0 ? Empty.SEQ : items.length == 1 ? Str.get(items[0]) :
+      new StrSeq(items);
   }
 
   /**
    * Creates a sequence with the items in the specified expressions.
-   * @param vals values
+   * @param values values
    * @param size size of resulting sequence
    * @return value
    * @throws QueryException query exception
    */
-  public static Value get(final Value[] vals, final int size) throws QueryException {
+  public static Value get(final Value[] values, final int size) throws QueryException {
     final byte[][] tmp = new byte[size][];
     int t = 0;
-    for(final Value val : vals) {
+    for(final Value val : values) {
       // speed up construction, depending on input
       final int vs = (int) val.size();
-      if(val instanceof Item) {
-        tmp[t++] = ((Item) val).string(null);
-      } else if(val instanceof StrSeq) {
+      if(val instanceof StrSeq) {
         final StrSeq sq = (StrSeq) val;
         System.arraycopy(sq.values, 0, tmp, t, vs);
         t += vs;

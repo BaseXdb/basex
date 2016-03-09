@@ -1,15 +1,15 @@
 package org.basex.query.func;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.util.*;
 
 import org.basex.core.*;
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -17,11 +17,12 @@ import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
+import org.basex.util.similarity.*;
 
 /**
- * Container for a user-defined function.
+ * Container for user-defined functions.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class StaticFuncs extends ExprInfo {
@@ -34,38 +35,38 @@ public final class StaticFuncs extends ExprInfo {
    * @param arity function arity
    * @return the function's signature
    */
-  static byte[] sig(final QNm name, final long arity) {
-    return new TokenBuilder(name.id()).add('#').add(Token.token(arity)).finish();
+  static byte[] sig(final QNm name, final int arity) {
+    return new TokenBuilder(name.prefixId()).add('#').addInt(arity).finish();
   }
 
   /**
    * Declares a new user-defined function.
-   * @param ann annotations
+   * @param anns annotations
    * @param nm function name
    * @param args formal parameters
-   * @param ret return type
-   * @param body function body
+   * @param type declared return type
+   * @param expr function body
    * @param sc static context
-   * @param scp variable scope
-   * @param xqdoc current xqdoc cache
+   * @param scope variable scope
+   * @param doc current xqdoc cache
    * @param ii input info
    * @return static function reference
    * @throws QueryException query exception
    */
-  public StaticFunc declare(final Ann ann, final QNm nm, final Var[] args, final SeqType ret,
-      final Expr body, final StaticContext sc, final VarScope scp, final String xqdoc,
+  public StaticFunc declare(final AnnList anns, final QNm nm, final Var[] args, final SeqType type,
+      final Expr expr, final StaticContext sc, final VarScope scope, final String doc,
       final InputInfo ii) throws QueryException {
 
     final byte[] uri = nm.uri();
-    if(uri.length == 0) throw FUNNONS.get(ii, nm.string());
-    if(NSGlobal.reserved(uri)) throw NAMERES.get(ii, nm.string());
+    if(uri.length == 0) throw FUNNONS_X.get(ii, nm.string());
+    if(NSGlobal.reserved(uri)) throw NAMERES_X.get(ii, nm.string());
 
-    final StaticFunc fn = new StaticFunc(ann, nm, args, ret, body, sc, scp, xqdoc, ii);
-    final byte[] sig = fn.id();
+    final StaticFunc sf = new StaticFunc(anns, nm, args, type, expr, sc, scope, doc, ii);
+    final byte[] sig = sf.id();
     final FuncCache fc = funcs.get(sig);
-    if(fc != null) fc.setFunc(fn);
-    else funcs.put(sig, new FuncCache(fn));
-    return fn;
+    if(fc != null) fc.setFunc(sf);
+    else funcs.put(sig, new FuncCache(sf));
+    return sf;
   }
 
   /**
@@ -74,11 +75,11 @@ public final class StaticFuncs extends ExprInfo {
    * @param args optional arguments
    * @param sc static context
    * @param ii input info
-   * @return reference if the function is known, {@code false} otherwise
+   * @return reference if the function is known, {@code null} otherwise
    * @throws QueryException query exception
    */
-  TypedFunc getRef(final QNm name, final Expr[] args, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
+  TypedFunc getRef(final QNm name, final Expr[] args, final StaticContext sc, final InputInfo ii)
+      throws QueryException {
 
     // check if function has already been declared
     final FuncCache fc = funcs.get(sig(name, args.length));
@@ -94,7 +95,7 @@ public final class StaticFuncs extends ExprInfo {
    * @return function call
    * @throws QueryException query exception
    */
-  public TypedFunc getFuncRef(final QNm name, final Expr[] args, final StaticContext sc,
+  TypedFunc getFuncRef(final QNm name, final Expr[] args, final StaticContext sc,
       final InputInfo ii) throws QueryException {
 
     if(NSGlobal.reserved(name.uri())) {
@@ -104,6 +105,20 @@ public final class StaticFuncs extends ExprInfo {
     final byte[] sig = sig(name, args.length);
     if(!funcs.contains(sig)) funcs.put(sig, new FuncCache(null));
     return getRef(name, args, sc, ii);
+  }
+
+  /**
+   * Registers a literal for a function that was not yet encountered during parsing.
+   * @param lit the literal
+   */
+  public void registerFuncLit(final Closure lit) {
+    final byte[] sig = sig(lit.funcName(), lit.arity());
+    FuncCache cache = funcs.get(sig);
+    if(cache == null) {
+      cache = new FuncCache(null);
+      funcs.put(sig, cache);
+    }
+    cache.lits.add(lit);
   }
 
   /**
@@ -127,21 +142,31 @@ public final class StaticFuncs extends ExprInfo {
         if(!al.isEmpty()) {
           final StringBuilder exp = new StringBuilder();
           final int as = al.size();
+          int min = Integer.MAX_VALUE, max = Integer.MIN_VALUE;
           for(int a = 0; a < as; a++) {
-            if(a != 0) exp.append(a + 1 < as ? "," : " or ");
-            exp.append(al.get(a));
+            final int m = al.get(a);
+            if(m < min) min = m;
+            if(m > max) max = m;
           }
-          final int a = call.exprs.length;
-          throw (a == 1 ? FUNCTYPESG : FUNCTYPEPL).get(call.info, call.name.string(), a, exp);
+          if(as > 1 && max - min + 1 == as) {
+            exp.append(min).append('-').append(max);
+          } else {
+            for(int a = 0; a < as; a++) {
+              if(a != 0) exp.append(a + 1 < as ? ", " : " or ");
+              exp.append(al.get(a));
+            }
+          }
+          final int ar = call.exprs.length;
+          throw FUNCTYPES_X_X_X_X.get(call.info, call.name.string(), ar, ar == 1 ? "" : "s", exp);
         }
 
         // if not, indicate that function is unknown
         final QueryException qe = similarError(call.name, call.info);
-        throw qe == null ? FUNCUNKNOWN.get(call.info, call.name.string()) : qe;
+        throw qe == null ? WHICHFUNC_X.get(call.info, call.name.prefixId()) : qe;
       }
 
       if(call != null) {
-        if(fc.func.expr == null) throw FUNCNOIMPL.get(call.info, call.name.string());
+        if(fc.func.expr == null) throw FUNCNOIMPL_X.get(call.info, call.name.string());
         // set updating flag; this will trigger checks in {@link QueryContext#check}
         qc.updating |= fc.func.updating;
       }
@@ -150,7 +175,7 @@ public final class StaticFuncs extends ExprInfo {
   }
 
   /**
-   * Checks if the functions perform updates.
+   * Checks if the updating semantics are satisfied.
    * @throws QueryException query exception
    */
   public void checkUp() throws QueryException {
@@ -158,13 +183,22 @@ public final class StaticFuncs extends ExprInfo {
   }
 
   /**
-   * Compiles the functions.
+   * Compiles the used functions.
    * @param qc query context
    */
   public void compile(final QueryContext qc) {
+    compile(qc, false);
+  }
+
+  /**
+   * Compiles all functions.
+   * @param qc query context
+   * @param all compile all functions (not only used ones)
+   */
+  public void compile(final QueryContext qc, final boolean all) {
     // only compile those functions that are used
     for(final FuncCache fc : funcs.values()) {
-      if(!fc.calls.isEmpty()) fc.func.compile(qc);
+      if(all || !fc.calls.isEmpty()) fc.func.compile(qc);
     }
   }
 
@@ -173,11 +207,11 @@ public final class StaticFuncs extends ExprInfo {
    * @param name function name
    * @param arity function arity
    * @param ii input info
-   * @param error raise error if function is not found
+   * @param error raise error if function in reserved namespace is not found
    * @return function if found, {@code null} otherwise
    * @throws QueryException query exception
    */
-  public StaticFunc get(final QNm name, final long arity, final InputInfo ii, final boolean error)
+  public StaticFunc get(final QNm name, final int arity, final InputInfo ii, final boolean error)
       throws QueryException {
 
     final FuncCache fc = funcs.get(sig(name, arity));
@@ -185,7 +219,7 @@ public final class StaticFuncs extends ExprInfo {
 
     if(error && NSGlobal.reserved(name.uri())) {
       final QueryException qe = similarError(name, ii);
-      if(qe != null) throw qe;
+      throw qe == null ? WHICHFUNC_X.get(ii, name.prefixId()) : qe;
     }
     return null;
   }
@@ -204,7 +238,7 @@ public final class StaticFuncs extends ExprInfo {
     for(final FuncCache fc : funcs.values()) {
       final StaticFunc sf = fc.func;
       if(sf != null && sf.expr != null && ls.similar(nm, lc(sf.name.local()))) {
-        qe = FUNCSIMILAR.get(ii, name.string(), sf.name.string());
+        qe = FUNCSIMILAR_X_X.get(ii, name.prefixId(), sf.name.prefixId());
         break;
       }
     }
@@ -218,8 +252,9 @@ public final class StaticFuncs extends ExprInfo {
     if(!funcs.isEmpty()) {
       final FElem el = planElem();
       plan.add(el);
-      for(final StaticFunc f : funcs())
-        if(f != null && f.compiled()) f.plan(el);
+      for(final StaticFunc f : funcs()) {
+        if(f != null) f.plan(el);
+      }
     }
   }
 
@@ -250,26 +285,30 @@ public final class StaticFuncs extends ExprInfo {
   private static class FuncCache {
     /** Function calls. */
     final ArrayList<StaticFuncCall> calls = new ArrayList<>(0);
+    /** Function literals. */
+    final ArrayList<Closure> lits = new ArrayList<>(0);
     /** Function. */
     StaticFunc func;
 
     /**
      * Constructor.
-     * @param sf function
+     * @param func function
      */
-    FuncCache(final StaticFunc sf) {
-      func = sf;
+    FuncCache(final StaticFunc func) {
+      this.func = func;
     }
 
     /**
      * Assigns the given function to all of its references and checks their visibility.
-     * @param fn function to assign
+     * @param sf function to assign
      * @throws QueryException query exception
      */
-    public void setFunc(final StaticFunc fn) throws QueryException {
-      if(func != null) throw FUNCDEFINED.get(fn.info, fn.name.string());
-      func = fn;
-      for(final StaticFuncCall call : calls) call.init(fn);
+    public void setFunc(final StaticFunc sf) throws QueryException {
+      if(func != null) throw FUNCDEFINED_X.get(sf.info, sf.name.string());
+      func = sf;
+      for(final StaticFuncCall call : calls) call.init(sf);
+      final FuncType ft = sf.funcType();
+      for(final Closure lit : lits) lit.adoptSignature(ft);
     }
 
     /**
@@ -288,9 +327,9 @@ public final class StaticFuncs extends ExprInfo {
 
       if(func == null) {
         // [LW] should be deferred until the actual types are known (i.e. compile time)
-        return new TypedFunc(call, new Ann());
+        return new TypedFunc(call, new AnnList());
       }
-      return new TypedFunc(call.init(func), func.ann);
+      return new TypedFunc(call.init(func), func.anns);
     }
 
     /**

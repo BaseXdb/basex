@@ -13,7 +13,7 @@ import org.basex.util.hash.*;
 /**
  * Project specific try/catch expression.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Try extends Single {
@@ -34,9 +34,10 @@ public final class Try extends Single {
   @Override
   public void checkUp() throws QueryException {
     // check if no or all try/catch expressions are updating
-    final Expr[] tmp = new Expr[catches.length + 1];
+    final int cl = catches.length;
+    final Expr[] tmp = new Expr[cl + 1];
     tmp[0] = expr;
-    for(int c = 0; c < catches.length; ++c) tmp[c + 1] = catches[c].expr;
+    for(int c = 0; c < cl; ++c) tmp[c + 1] = catches[c].expr;
     checkAllUp(tmp);
   }
 
@@ -57,9 +58,15 @@ public final class Try extends Single {
     }
 
     for(final Catch c : catches) c.compile(qc, scp);
-    type = expr.type();
-    for(final Catch c : catches)
-      if(!c.expr.isFunction(Function.ERROR)) type = type.union(c.type());
+    return optimize(qc, scp);
+  }
+
+  @Override
+  public Expr optimize(final QueryContext qc, final VarScope scp) {
+    seqType = expr.seqType();
+    for(final Catch c : catches) {
+      if(!c.expr.isFunction(Function.ERROR)) seqType = seqType.union(c.seqType());
+    }
     return this;
   }
 
@@ -74,24 +81,27 @@ public final class Try extends Single {
     try {
       return qc.value(expr);
     } catch(final QueryException ex) {
-      if(!ex.isCatchable()) throw ex;
-      for(final Catch c : catches) if(c.matches(ex)) return c.value(qc, ex);
+      if(ex.isCatchable()) {
+        for(final Catch c : catches) {
+          if(c.matches(ex)) return c.value(qc, ex);
+        }
+      }
       throw ex;
     }
   }
 
   @Override
-  public VarUsage count(final Var v) {
-    return VarUsage.maximum(v, catches).plus(expr.count(v));
+  public VarUsage count(final Var var) {
+    return VarUsage.maximum(var, catches).plus(expr.count(var));
   }
 
   @Override
-  public Expr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
+  public Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
       throws QueryException {
 
     boolean change = false;
     try {
-      final Expr sub = expr.inline(qc, scp, v, e);
+      final Expr sub = expr.inline(qc, scp, var, ex);
       if(sub != null) {
         if(sub.isValue()) return optPre(sub, qc);
         expr = sub;
@@ -102,14 +112,14 @@ public final class Try extends Single {
       for(final Catch c : catches) {
         if(c.matches(qe)) {
           // found a matching clause, inline variable and error message
-          final Catch nw = c.inline(qc, scp, v, e);
+          final Catch nw = c.inline(qc, scp, var, ex);
           return optPre((nw == null ? c : nw).asExpr(qe, qc, scp), qc);
         }
       }
       throw qe;
     }
 
-    for(final Catch c : catches) change |= c.inline(qc, scp, v, e) != null;
+    for(final Catch c : catches) change |= c.inline(qc, scp, var, ex) != null;
     return change ? this : null;
   }
 
@@ -125,9 +135,9 @@ public final class Try extends Single {
   }
 
   @Override
-  public boolean removable(final Var v) {
-    for(final Catch c : catches) if(!c.removable(v)) return false;
-    return super.removable(v);
+  public boolean removable(final Var var) {
+    for(final Catch c : catches) if(!c.removable(var)) return false;
+    return super.removable(var);
   }
 
   @Override

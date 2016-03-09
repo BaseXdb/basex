@@ -14,7 +14,7 @@ import org.junit.Test;
 /**
  * This class tests transaction and locking cases.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Andreas Weiler
  */
 public final class PoolTest extends SandboxTest {
@@ -93,7 +93,7 @@ public final class PoolTest extends SandboxTest {
    * @param name name of database
    */
   private static void pins(final int pin, final String name) {
-    assertEquals(pin, server.context.dbs.pins(name));
+    assertEquals(pin, server.context.datas.pins(name));
   }
 
   /**

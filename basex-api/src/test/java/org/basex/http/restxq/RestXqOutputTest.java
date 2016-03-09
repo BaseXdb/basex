@@ -5,7 +5,7 @@ import org.junit.*;
 /**
  * This test contains RESTXQ outputs.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class RestXqOutputTest extends RestXqTest {
@@ -38,5 +38,13 @@ public final class RestXqOutputTest extends RestXqTest {
         "  <http:response status='200'/>" +
         "</R:response>," +
         "<X>1</X> };", "", "<X>1</X>");
+    getE("declare %R:path('') %output:method('text') function m:f() {" +
+        "<R:response>" +
+        "  <output:serialization-parameters>" +
+        "    <output:method value='xml'/>" +
+        "  </output:serialization-parameters>" +
+        "  <http:response status='200'/>" +
+        "</R:response>," +
+        "1+<a/> };", "");
   }
 }

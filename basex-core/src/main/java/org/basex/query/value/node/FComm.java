@@ -1,8 +1,9 @@
 package org.basex.query.value.node;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
+import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -11,7 +12,7 @@ import org.w3c.dom.*;
 /**
  * Comment node fragment.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class FComm extends FNode {
@@ -45,13 +46,13 @@ public final class FComm extends FNode {
   }
 
   @Override
-  public FNode copy() {
-    return new FComm(value).parent(par);
+  public FNode deepCopy(final MainOptions options) {
+    return new FComm(value).parent(parent);
   }
 
   @Override
   public String toString() {
-    return Util.info("<!--%-->", value);
+    return new TokenBuilder("<!--").add(value).add("-->").toString();
   }
 
   /**
@@ -62,7 +63,7 @@ public final class FComm extends FNode {
    * @throws QueryException query exception
    */
   public static byte[] parse(final byte[] str, final InputInfo ii) throws QueryException {
-    if(contains(str, DASHES) || endsWith(str, '-')) throw COMINVALID.get(ii, str);
+    if(contains(str, DASHES) || endsWith(str, '-')) throw COMINVALID.get(ii);
     return str;
   }
 }

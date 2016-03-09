@@ -2,6 +2,7 @@ package org.basex.query.expr;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
@@ -11,7 +12,7 @@ import org.basex.util.hash.*;
 /**
  * Intersect expression.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class InterSect extends Set {
@@ -25,34 +26,30 @@ public final class InterSect extends Set {
   }
 
   @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    super.compile(qc, scp);
-    return optimize(qc, scp);
-  }
-
-  @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
-    return oneIsEmpty() ? optPre(null, qc) : this;
+    super.optimize(qc, scp);
+    return oneIsEmpty() ? optPre(qc) : this;
   }
 
   @Override
-  protected NodeSeqBuilder eval(final Iter[] iter) throws QueryException {
-    NodeSeqBuilder nc = new NodeSeqBuilder();
+  protected ANodeList eval(final Iter[] iter) throws QueryException {
+    ANodeList list = new ANodeList();
 
-    for(Item it; (it = iter[0].next()) != null;) nc.add(checkNode(it));
-    final boolean db = nc.dbnodes();
+    for(Item it; (it = iter[0].next()) != null;) list.add(toNode(it));
+    final boolean db = list.dbnodes();
 
-    for(int e = 1; e != exprs.length && nc.size() != 0; ++e) {
-      final NodeSeqBuilder nt = new NodeSeqBuilder().check();
+    final int el = exprs.length;
+    for(int e = 1; e < el && list.size() != 0; ++e) {
+      final ANodeList nt = new ANodeList().check();
       final Iter ir = iter[e];
       for(Item it; (it = ir.next()) != null;) {
-        final ANode n = checkNode(it);
-        final int i = nc.indexOf(n, db);
+        final ANode n = toNode(it);
+        final int i = list.indexOf(n, db);
         if(i != -1) nt.add(n);
       }
-      nc = nt;
+      list = nt;
     }
-    return nc;
+    return list;
   }
 
   @Override
@@ -67,11 +64,13 @@ public final class InterSect extends Set {
     return new SetIter(iter) {
       @Override
       public ANode next() throws QueryException {
-        if(item == null) item = new ANode[iter.length];
+        final int irl = iter.length;
+        if(item == null) item = new ANode[irl];
 
-        for(int i = 0; i != iter.length; ++i) if(!next(i)) return null;
+        for(int i = 0; i < irl; i++) if(!next(i)) return null;
 
-        for(int i = 1; i != item.length;) {
+        final int il = item.length;
+        for(int i = 1; i < il;) {
           final int d = item[0].diff(item[i]);
           if(d > 0) {
             if(!next(i)) return null;

@@ -1,7 +1,7 @@
 (:~
  : This module contains helper functions for locking documents in WebDAV.
  :
- : @author BaseX Team 2005-14, BSD License
+ : @author BaseX Team 2005-16, BSD License
  :)
 module namespace w = 'http://basex.org/modules/webdav';
 
@@ -59,7 +59,7 @@ declare function w:has-locked(
         count($ancestor-segments) + $depth eq count($descendant-segments)
         and
         w:is-prefix($ancestor-segments, $descendant-segments)
-    case 'infinite'
+    case 'infinity'
       return
         w:is-prefix($ancestor-segments, $descendant-segments)
    default
@@ -86,7 +86,7 @@ declare function w:lock-db-exists() as xs:boolean {
 };
 
 (:~
- : Creates the database for the WebDAV locks, if it does not exist.
+ : Creates the database for the WebDAV locks if it does not exist.
  :)
 declare %updating function w:init-lock-db() {
   if(w:lock-db-exists()) then
@@ -96,7 +96,7 @@ declare %updating function w:init-lock-db() {
 };
 
 (:~
- : Opens the lock database, if it exists; otherwise, returns an empty sequence.
+ : Opens the lock database if it exists; otherwise, returns an empty sequence.
  : @return database or empty sequence
  :)
 declare function w:open-lock-db() as document-node()? {
@@ -115,7 +115,7 @@ declare function w:locks-on(
   $path as xs:string
 ) as element(w:lockinfo)* {
   w:open-lock-db()/w:locks/w:lockinfo[
-    w:has-locked(w:path, $path, 'infinite')
+    w:has-locked(w:path, $path, 'infinity')
     and
     xs:dateTime(w:expiry) gt current-dateTime()
   ]
@@ -135,8 +135,6 @@ declare function w:in-conflict(
    w:has-locked($lock2/w:path, $lock1/w:path, $lock2/w:depth))
   and
   (w:is-exclusive($lock1) or w:is-exclusive($lock2))
-  and
-  $lock1/w:owner ne $lock2/w:owner
 };
 
 (:~
@@ -206,6 +204,8 @@ declare %updating function w:create-lock(
   $owner    as xs:string,
   $timeout  as xs:integer
 ) {
+  (: limit timeout to one year (avoid overflow) :)
+  let $timeout := min((xs:integer($timeout), 31700000))
   let $expiry := w:expiry-dateTime($timeout),
       $requested-lock :=
         element w:lockinfo {

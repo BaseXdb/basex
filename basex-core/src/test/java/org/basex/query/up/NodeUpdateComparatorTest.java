@@ -5,12 +5,11 @@ import static org.junit.Assert.*;
 import java.util.*;
 import java.util.List;
 
-import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
-import org.basex.query.up.primitives.*;
 import org.basex.query.*;
-import org.basex.util.*;
+import org.basex.query.up.primitives.*;
+import org.basex.query.up.primitives.node.*;
 import org.junit.*;
 import org.junit.Test;
 import org.junit.rules.*;
@@ -19,10 +18,10 @@ import org.junit.rules.*;
  * Tests {@link NodeUpdateComparator} that creates an order on update primitives
  * and is part of the XQuery Update Facility implementation.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Lukas Kircher
  */
-public class NodeUpdateComparatorTest extends AdvancedQueryTest {
+public final class NodeUpdateComparatorTest extends AdvancedQueryTest {
   /** Expected exception. */
   @Rule
   public final ExpectedException thrown = ExpectedException.none();
@@ -65,7 +64,7 @@ public class NodeUpdateComparatorTest extends AdvancedQueryTest {
         new DeleteNode(4, d, null),
         new DeleteNode(2, d, null)
     });
-    query(transform(doc, "delete node ($input//b, $input//d)"), "<a><c/></a>");
+    query(transform(doc, "delete node ($input//b, $input//d)"), "<a>\n<c/>\n</a>");
   }
 
   /**
@@ -98,7 +97,7 @@ public class NodeUpdateComparatorTest extends AdvancedQueryTest {
     });
     query(transform(doc,
         "insert node <before/> before $input/b, insert node <after/> after $input/b"),
-        "<a><before/><b/><after/></a>");
+        "<a>\n<before/>\n<b/>\n<after/>\n</a>");
   }
 
   /**
@@ -118,7 +117,7 @@ public class NodeUpdateComparatorTest extends AdvancedQueryTest {
     });
     query(transform(doc,
         "insert node <smallerpre/> into $input/b, insert node <largerpre/> into $input"),
-        "<a><b><smallerpre/></b><largerpre/></a>");
+        "<a>\n<b>\n<smallerpre/>\n</b>\n<largerpre/>\n</a>");
   }
 
   /**
@@ -137,7 +136,7 @@ public class NodeUpdateComparatorTest extends AdvancedQueryTest {
     });
     query(transform(doc,
         "insert node <smallerpre/> after $input/b, insert node <largerpre/> into $input"),
-        "<a><b/><smallerpre/><largerpre/></a>");
+        "<a>\n<b/>\n<smallerpre/>\n<largerpre/>\n</a>");
   }
 
   /**
@@ -159,7 +158,7 @@ public class NodeUpdateComparatorTest extends AdvancedQueryTest {
     query(transform(doc,
         "insert node <smallerpre/> into $input/b," +
         "insert node <largerpre/> after $input/b"),
-        "<a><b><c/><smallerpre/></b><largerpre/></a>");
+        "<a>\n<b>\n<c/>\n<smallerpre/>\n</b>\n<largerpre/>\n</a>");
   }
 
   /**
@@ -200,13 +199,14 @@ public class NodeUpdateComparatorTest extends AdvancedQueryTest {
   /**
    * Simple tests for the {@link NodeUpdate} comparator.
    *
-   * Compares two primitives A and B based on the triple (LOCATION, SHIFTED,
-   * SUBTREE, TYPE);
-   * - LOCATION is the pre value where the update affects the table
-   * - SHIFTED states if the primitives location has been updated to support
-   *   InsertInto, InsertAfter statements
-   * - SUBTREE states if one update takes place in the subtree of the other's target node
-   * - TYPE relates to the {@link UpdateType} hierarchy
+   * Compares two primitives A and B based on the triple (LOCATION, SHIFTED, SUBTREE, TYPE):
+   * <ul>
+   *   <li> LOCATION is the pre value where the update affects the table
+   *   <li> SHIFTED states if the primitives location has been updated to support
+   *        InsertInto, InsertAfter statements
+   *   <li> SUBTREE states if one update takes place in the subtree of the other's target node
+   *   <li> TYPE relates to the {@link UpdateType} hierarchy
+   * </ul>
    */
   @Test
   public void comparatorTest() {
@@ -488,11 +488,7 @@ public class NodeUpdateComparatorTest extends AdvancedQueryTest {
    * @return database instance
    */
   private static Data data(final String s) {
-    try {
-      new CreateDB(NAME, s).execute(context);
-    } catch(final BaseXException ex) {
-      fail(Util.message(ex));
-    }
+    execute(new CreateDB(NAME, s));
     return context.data();
   }
 
@@ -513,7 +509,6 @@ public class NodeUpdateComparatorTest extends AdvancedQueryTest {
     final NodeUpdateComparator c = new NodeUpdateComparator();
     Collections.sort(l, c);
     Collections.sort(l2, c);
-
 
     final int s = order.length;
     // check if primitives are ordered as expected

@@ -2,6 +2,7 @@ package org.basex.query.var;
 
 import static org.basex.query.QueryText.*;
 
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -15,7 +16,7 @@ import org.basex.util.hash.*;
 /**
  * Local Variable Reference expression.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  * @author Leo Woerteler
  */
@@ -40,7 +41,7 @@ public final class VarRef extends ParseExpr {
 
   @Override
   public VarRef optimize(final QueryContext qc, final VarScope scp) {
-    type = var.type();
+    seqType = var.seqType();
     size = var.size;
     return this;
   }
@@ -61,6 +62,11 @@ public final class VarRef extends ParseExpr {
   }
 
   @Override
+  public Data data() {
+    return var.data;
+  }
+
+  @Override
   public boolean removable(final Var v) {
     return true;
   }
@@ -71,9 +77,9 @@ public final class VarRef extends ParseExpr {
   }
 
   @Override
-  public Expr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e) {
+  public Expr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr ex) {
     // [LW] Is copying always necessary?
-    return v.is(var) ? e.isValue() ? e : e.copy(qc, scp) : null;
+    return var.is(v) ? ex.isValue() ? ex : ex.copy(qc, scp, new IntObjMap<Var>()) : null;
   }
 
   @Override
@@ -109,8 +115,13 @@ public final class VarRef extends ParseExpr {
   }
 
   @Override
+  public String toErrorString() {
+    return new TokenBuilder(DOLLAR).addExt(var.name.string()).toString();
+  }
+
+  @Override
   public String toString() {
-    return new TokenBuilder(DOLLAR).add(var.name.toString()).add('_').addInt(var.id).toString();
+    return new TokenBuilder(DOLLAR).addExt(var.name.string()).add('_').addInt(var.id).toString();
   }
 
   @Override

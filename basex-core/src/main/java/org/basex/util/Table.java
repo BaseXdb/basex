@@ -12,7 +12,7 @@ import org.basex.util.list.*;
  * It should be guaranteed that the {@link #header} object has the
  * same number of entries as all {@link #contents} string arrays.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Table {
@@ -44,15 +44,16 @@ public final class Table {
     final Scanner scan = new Scanner(in);
     byte[] line = token(scan.nextLine());
     final IntList il = new IntList();
-    int i = 0;
-    while(i < line.length) {
-      il.add(i);
+    int l = 0;
+    final int ll = line.length;
+    while(l < ll) {
+      il.add(l);
       // find next two spaces
-      while(++i + 1 < line.length && (line[i] != ' ' || line[i + 1] != ' '));
-      header.add(substring(line, il.get(il.size() - 1), i));
-      while(++i < line.length && line[i] == ' ');
+      while(++l + 1 < ll && (line[l] != ' ' || line[l + 1] != ' '));
+      header.add(substring(line, il.get(il.size() - 1), l));
+      while(++l < ll && line[l] == ' ');
     }
-    il.add(i);
+    il.add(l);
 
     // skip delimiter
     scan.nextLine();
@@ -80,32 +81,6 @@ public final class Table {
       }
     });
     return this;
-  }
-
-  /**
-   * Returns the value for the specified table position.
-   * @param r row
-   * @param c column
-   * @return value
-   */
-  public String value(final int r, final int c) {
-    return string(contents.get(r).get(c));
-  }
-
-  /**
-   * Returns the number of rows.
-   * @return number of rows
-   */
-  public int rows() {
-    return contents.size();
-  }
-
-  /**
-   * Returns the number of columns.
-   * @return number of columns
-   */
-  public int cols() {
-    return header.size();
   }
 
   /**
@@ -172,18 +147,6 @@ public final class Table {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder();
-    for(final byte[] b : header) {
-      tb.add(b);
-      tb.add('\t');
-    }
-    tb.add(NL);
-    for(final TokenList e : contents) {
-      for(final byte[] b : e) {
-        tb.add(b);
-        tb.add('\t');
-      }
-    }
-    return tb.toString();
+    return string(finish());
   }
 }

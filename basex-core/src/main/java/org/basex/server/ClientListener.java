@@ -1,7 +1,6 @@
 package org.basex.server;
 
 import static org.basex.core.Text.*;
-import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.net.*;
@@ -11,16 +10,18 @@ import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.parse.*;
+import org.basex.core.users.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
+import org.basex.server.Log.LogType;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
  * Server-side client session in the client-server architecture.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Andreas Weiler
  * @author Christian Gruen
  */
@@ -41,12 +42,6 @@ public final class ClientListener extends Thread {
   /** Socket reference. */
   private final Socket socket;
 
-  /** Socket for events. */
-  private Socket esocket;
-  /** Output for events. */
-  private PrintOutput eout;
-  /** Flag for active events. */
-  private boolean events;
   /** Input stream. */
   private BufferInput in;
   /** Output stream. */
@@ -60,14 +55,14 @@ public final class ClientListener extends Thread {
 
   /**
    * Constructor.
-   * @param s socket
-   * @param c database context
-   * @param srv server reference
+   * @param socket socket
+   * @param context database context
+   * @param server server reference
    */
-  public ClientListener(final Socket s, final Context c, final BaseXServer srv) {
-    context = new Context(c, this);
-    socket = s;
-    server = srv;
+  public ClientListener(final Socket socket, final Context context, final BaseXServer server) {
+    this.context = new Context(context, this);
+    this.socket = socket;
+    this.server = server;
     last = System.currentTimeMillis();
     setDaemon(true);
   }
@@ -97,10 +92,6 @@ public final class ClientListener extends Thread {
             create();
           } else if(sc == ServerCmd.ADD) {
             add();
-          } else if(sc == ServerCmd.WATCH) {
-            watch();
-          } else if(sc == ServerCmd.UNWATCH) {
-            unwatch();
           } else if(sc == ServerCmd.REPLACE) {
             replace();
           } else if(sc == ServerCmd.STORE) {
@@ -121,16 +112,17 @@ public final class ClientListener extends Thread {
         // parse input and create command instance
         try {
           command = new CommandParser(cmd, context).parseSingle();
-          log(command, null);
+          log(LogType.REQUEST, command.toString(true));
         } catch(final QueryException ex) {
           // log invalid command
           final String msg = ex.getMessage();
-          log(cmd, null);
-          log(msg, false);
+          log(LogType.REQUEST, cmd);
+          log(LogType.ERROR, msg);
           // send 0 to mark end of potential result
           out.write(0);
           // send {INFO}0
-          out.writeString(msg);
+          out.print(msg);
+          out.write(0);
           // send 1 to mark error
           send(false);
           continue;
@@ -141,7 +133,7 @@ public final class ClientListener extends Thread {
         String info;
         try {
           // run command
-          command.execute(context, new EncodingOutput(out));
+          command.execute(context, new ServerOutput(out));
           info = command.info();
         } catch(final BaseXException ex) {
           ok = false;
@@ -161,7 +153,7 @@ public final class ClientListener extends Thread {
         }
       }
     } catch(final IOException ex) {
-      log(ex, false);
+      log(LogType.ERROR, Util.message(ex));
       command = null;
       quit();
     }
@@ -169,43 +161,44 @@ public final class ClientListener extends Thread {
   }
 
   /**
-   * Initializes a session via cram-md5.
+   * Initializes a session via digest authentication.
    * @return success flag
    */
   private boolean authenticate() {
     try {
-      final String ts = Long.toString(System.nanoTime());
+      final String nonce = Long.toString(System.nanoTime());
       final byte[] address = socket.getInetAddress().getAddress();
 
-      // send {TIMESTAMP}0
+      // send {REALM:TIMESTAMP}0
       out = PrintOutput.get(socket.getOutputStream());
-      out.print(ts);
+      out.print(Prop.NAME + ':' + nonce);
       send(true);
 
       // evaluate login data
       in = new BufferInput(socket.getInputStream());
-      // receive {USER}0{PASSWORD}0
-      final String us = in.readString();
-      final String pw = in.readString();
-      context.user = context.users.get(us);
-      running = context.user != null && md5(context.user.password + ts).equals(pw);
+      // receive {USER}0{DIGEST-HASH}0
+      final String us = in.readString(), hash = in.readString();
+      final User user = context.users.get(us);
+      running = user != null &&
+          Strings.md5(user.code(Algorithm.DIGEST, Code.HASH) + nonce).equals(hash);
 
       // write log information
       if(running) {
+        context.user(user);
         // send {OK}
         send(true);
         context.blocker.remove(address);
         context.sessions.add(this);
       } else {
-        if(!us.isEmpty()) log(ACCESS_DENIED, false);
+        if(!us.isEmpty()) log(LogType.ERROR, ACCESS_DENIED);
         // delay users with wrong passwords
-        for(int d = context.blocker.delay(address); d > 0; d--) Performance.sleep(100);
+        context.blocker.delay(address);
         send(false);
       }
     } catch(final IOException ex) {
       if(running) {
         Util.stack(ex);
-        log(ex, false);
+        log(LogType.ERROR, Util.message(ex));
         running = false;
       }
     }
@@ -220,9 +213,9 @@ public final class ClientListener extends Thread {
   public synchronized void quitAuth() {
     try {
       socket.close();
-      log(TIMEOUT_EXCEEDED, false);
+      log(LogType.ERROR, TIMEOUT_EXCEEDED);
     } catch(final Throwable ex) {
-      log(ex, false);
+      log(LogType.ERROR, Util.message(ex));
     }
   }
 
@@ -234,8 +227,9 @@ public final class ClientListener extends Thread {
     running = false;
 
     // wait until running command was stopped
-    if(command != null) {
-      command.stop();
+    final Command c = command;
+    if(c != null) {
+      c.stop();
       do Performance.sleep(50); while(command != null);
     }
     context.sessions.remove(this);
@@ -243,13 +237,8 @@ public final class ClientListener extends Thread {
     try {
       new Close().run(context);
       socket.close();
-      if(events) {
-        esocket.close();
-        // remove this session from all events in pool
-        for(final Sessions s : context.events.values()) s.remove(this);
-      }
     } catch(final Throwable ex) {
-      log(ex, false);
+      log(LogType.ERROR, Util.message(ex));
       Util.stack(ex);
     }
   }
@@ -260,33 +249,6 @@ public final class ClientListener extends Thread {
    */
   public Context context() {
     return context;
-  }
-
-  /**
-   * Registers the event socket.
-   * @param s socket
-   * @throws IOException I/O exception
-   */
-  public synchronized void register(final Socket s) throws IOException {
-    esocket = s;
-    eout = PrintOutput.get(s.getOutputStream());
-    eout.write(0);
-    eout.flush();
-  }
-
-  /**
-   * Sends a notification to the client.
-   * @param name event name
-   * @param msg event message
-   * @throws IOException I/O exception
-   */
-  public synchronized void notify(final byte[] name, final byte[] msg) throws IOException {
-    last = System.currentTimeMillis();
-    eout.print(name);
-    eout.write(0);
-    eout.print(msg);
-    eout.write(0);
-    eout.flush();
   }
 
   /**
@@ -332,9 +294,10 @@ public final class ClientListener extends Thread {
    */
   private void info(final String info, final boolean ok) throws IOException {
     // write feedback to log file
-    log(info, ok);
+    log(ok ? LogType.OK : LogType.ERROR, info);
     // send {MSG}0 and (0|1) as (success|error) flag
-    out.writeString(info);
+    out.print(info);
+    out.write(0);
     send(ok);
   }
 
@@ -376,67 +339,16 @@ public final class ClientListener extends Thread {
    * @throws IOException I/O exception
    */
   private void execute(final Command cmd) throws IOException {
-    log(cmd + " [...]", null);
-    final DecodingInput di = new DecodingInput(in);
+    log(LogType.REQUEST, cmd + " [...]");
+    final ServerInput si = new ServerInput(in);
     try {
-      cmd.setInput(di);
+      cmd.setInput(si);
       cmd.execute(context);
       success(cmd.info());
     } catch(final BaseXException ex) {
-      di.flush();
+      si.flush();
       error(ex.getMessage());
     }
-  }
-
-  /**
-   * Watches an event.
-   * @throws IOException I/O exception
-   */
-  private void watch() throws IOException {
-    server.initEvents();
-
-    // initialize server-based event handling
-    if(!events) {
-      out.writeString(Integer.toString(context.globalopts.get(GlobalOptions.EVENTPORT)));
-      out.writeString(Long.toString(getId()));
-      out.flush();
-      events = true;
-    }
-    final String name = in.readString();
-    final Sessions s = context.events.get(name);
-    final boolean ok = s != null && !s.contains(this);
-    final String message;
-    if(ok) {
-      s.add(this);
-      message = WATCHING_EVENT_X;
-    } else if(s == null) {
-      message = EVENT_UNKNOWN_X;
-    } else {
-      message = EVENT_WATCHED_X;
-    }
-    info(Util.info(message, name), ok);
-  }
-
-  /**
-   * Unwatches an event.
-   * @throws IOException I/O exception
-   */
-  private void unwatch() throws IOException {
-    final String name = in.readString();
-
-    final Sessions s = context.events.get(name);
-    final boolean ok = s != null && s.contains(this);
-    final String message;
-    if(ok) {
-      s.remove(this);
-      message = UNWATCHING_EVENT_X;
-    } else if(s == null) {
-      message = EVENT_UNKNOWN_X;
-    } else {
-      message = EVENT_NOT_WATCHED_X;
-    }
-    info(Util.info(message, name), ok);
-    out.flush();
   }
 
   /**
@@ -448,7 +360,7 @@ public final class ClientListener extends Thread {
     // iterator argument (query or identifier)
     String arg = in.readString();
 
-    String err = null;
+    String error = null;
     try {
       final ServerQuery qp;
       final StringBuilder info = new StringBuilder();
@@ -458,7 +370,8 @@ public final class ClientListener extends Thread {
         arg = Integer.toString(id++);
         queries.put(arg, qp);
         // send {ID}0
-        out.writeString(arg);
+        out.print(arg);
+        out.write(0);
         // write log file
         info.append(query);
       } else {
@@ -481,11 +394,11 @@ public final class ClientListener extends Thread {
           info.append(val);
           if(!typ.isEmpty()) info.append(" as ").append(typ);
         } else if(sc == ServerCmd.RESULTS) {
-          qp.execute(true, out, true, false);
+          qp.execute(out, true, true, false);
         } else if(sc == ServerCmd.EXEC) {
-          qp.execute(false, out, true, false);
+          qp.execute(out, false, true, false);
         } else if(sc == ServerCmd.FULL) {
-          qp.execute(true, out, true, true);
+          qp.execute(out, true, true, true);
         } else if(sc == ServerCmd.INFO) {
           out.print(qp.info());
         } else if(sc == ServerCmd.OPTIONS) {
@@ -503,21 +416,21 @@ public final class ClientListener extends Thread {
       // send 0 as success flag
       out.write(0);
       // write log file
-      log(new StringBuilder(sc.toString()).append('[').
-          append(arg).append("] ").append(info), true);
+      log(LogType.OK, sc.toString() + '[' + arg + "] " + info);
 
     } catch(final Throwable ex) {
       // log exception (static or runtime)
-      err = Util.message(ex);
-      log(sc + "[" + arg + ']', null);
-      log(err, false);
+      error = Util.message(ex);
+      log(LogType.REQUEST, sc + "[" + arg + ']');
+      log(LogType.ERROR, error);
       queries.remove(arg);
     }
-    if(err != null) {
+    if(error != null) {
       // send 0 as end marker, 1 as error flag, and {MSG}0
       out.write(0);
       out.write(1);
-      out.writeString(err);
+      out.print(error);
+      out.write(0);
     }
     out.flush();
   }
@@ -534,15 +447,10 @@ public final class ClientListener extends Thread {
 
   /**
    * Writes a log message.
+   * @param type log type
    * @param info message info
-   * @param type message type (true/false/null: OK, ERROR, REQUEST)
    */
-  private void log(final Object info, final Object type) {
-    // add evaluation time if any type is specified
-    final String user = context.user != null ? context.user.name : "";
-    final Log log = context.log;
-    if(log != null) log.write(type != null ?
-      new Object[] { address(), user, type, info, perf } :
-      new Object[] { address(), user, null, info });
+  private void log(final LogType type, final String info) {
+    context.log.write(address(), context.user(), type, info, perf);
   }
 }

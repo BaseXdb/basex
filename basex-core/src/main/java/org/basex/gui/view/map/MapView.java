@@ -14,6 +14,7 @@ import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.view.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.list.*;
@@ -21,12 +22,12 @@ import org.basex.util.list.*;
 /**
  * This view is a TreeMap implementation.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  * @author Joerg Hauser
  * @author Bastian Lemke
  */
-public final class MapView extends View implements Runnable {
+public final class MapView extends View {
   /** Dynamic zooming steps. */
   private static final int[] ZS = { 0, 0, 0, 0, 20, 80, 180, 320, 540, 840,
       1240, 1740, 2380, 3120, 4000, 4980, 5980, 6860, 7600, 8240, 8740, 9140,
@@ -136,11 +137,11 @@ public final class MapView extends View implements Runnable {
   @Override
   public void refreshContext(final boolean more, final boolean quick) {
     // use simple zooming animation for result node filtering
-    final Nodes context = gui.context.current();
+    final DBNodes context = gui.context.current();
     final int hist = gui.notify.hist;
     final boolean page = !more && rectHist[hist + 1] != null &&
       rectHist[hist + 1].pre == 0 || more && (context.size() != 1 ||
-      focused == null || context.pres[0] != focused.pre);
+      focused == null || context.pre(0) != focused.pre);
     if(page) focused = new MapRect(0, 0, getWidth(), 1);
 
     zoom(more, quick);
@@ -151,7 +152,7 @@ public final class MapView extends View implements Runnable {
     if(painter == null) return;
 
     // calculate map
-    final Nodes curr = gui.context.current();
+    final DBNodes curr = gui.context.current();
     calc(new MapRect(0, 0, getWidth(), getHeight(), 0, 0), curr, mainMap);
     repaint();
   }
@@ -217,28 +218,28 @@ public final class MapView extends View implements Runnable {
       repaint();
     } else {
       zoomStep = ZOOMSIZE;
-      new Thread(this).start();
+      new Thread() {
+        @Override
+        public void run() {
+          focused = null;
+
+          // run zooming
+          while(zoomStep > 1) {
+            Performance.sleep(zoomSpeed);
+            --zoomStep;
+            repaint();
+          }
+          // wait until current painting is finished
+          while(gui.painting) Performance.sleep(zoomSpeed);
+
+          // remove old rectangle and repaint map
+          zoomStep = 0;
+          gui.updating = false;
+          focus();
+          repaint();
+        }
+      }.start();
     }
-  }
-
-  @Override
-  public void run() {
-    focused = null;
-
-    // run zooming
-    while(zoomStep > 1) {
-      Performance.sleep(zoomSpeed);
-      --zoomStep;
-      repaint();
-    }
-    // wait until current painting is finished
-    while(gui.painting) Performance.sleep(zoomSpeed);
-
-    // remove old rectangle and repaint map
-    zoomStep = 0;
-    gui.updating = false;
-    focus();
-    repaint();
   }
 
   /**
@@ -275,13 +276,13 @@ public final class MapView extends View implements Runnable {
    * @param nodes nodes to draw in the map
    * @param map image to draw rectangles on
    */
-  private void calc(final MapRect rect, final Nodes nodes, final BufferedImage map) {
+  private void calc(final MapRect rect, final DBNodes nodes, final BufferedImage map) {
     // calculate new main rectangles
     gui.cursor(CURSORWAIT);
 
     initLen();
-    layout = new MapLayout(nodes.data, textLen, gui.gopts);
-    layout.makeMap(rect, new MapList(nodes.pres.clone()), 0, (int) nodes.size() - 1);
+    layout = new MapLayout(nodes.data(), textLen, gui.gopts);
+    layout.makeMap(rect, new MapList(nodes.pres().clone()), 0, (int) nodes.size() - 1);
     // rectangles are copied to avoid synchronization issues
     mainRects = layout.rectangles.copy();
 
@@ -358,9 +359,9 @@ public final class MapView extends View implements Runnable {
       g.drawRect(x, y, w, h);
       g.drawRect(x + 1, y + 1, w - 2, h - 2);
 
-      // draw tag label
+      // draw element label
       g.setFont(font);
-      smooth(g);
+      BaseXLayout.antiAlias(g);
       if(data.kind(f.pre) == Data.ELEM) {
         String tt = Token.string(ViewData.name(gopts, data, f.pre));
         if(tt.length() > 32) tt = tt.substring(0, 30) + DOTS;
@@ -446,7 +447,7 @@ public final class MapView extends View implements Runnable {
    */
   private void drawMap(final BufferedImage map, final MapRects rects, final float sc) {
     final Graphics g = map.getGraphics();
-    smooth(g);
+    BaseXLayout.antiAlias(g);
     painter.drawRectangles(g, rects, sc);
   }
 
@@ -469,7 +470,7 @@ public final class MapView extends View implements Runnable {
     if(!focus() && gui.context.focused == -1) return;
 
     // add or remove marked node
-    final Nodes marked = gui.context.marked;
+    final DBNodes marked = gui.context.marked;
     if(e.getClickCount() == 2) {
       if(mainRects.size != 1) gui.notify.context(marked, false, null);
     } else if(e.isShiftDown()) {
@@ -506,7 +507,7 @@ public final class MapView extends View implements Runnable {
         np = rect.pre + ViewData.size(data, rect.pre);
       }
     }
-    gui.notify.mark(new Nodes(il.toArray(), data), null);
+    gui.notify.mark(new DBNodes(data, il.finish()), null);
   }
 
   @Override
@@ -522,7 +523,7 @@ public final class MapView extends View implements Runnable {
   public void mouseWheelMoved(final MouseWheelEvent e) {
     if(gui.updating || gui.context.focused == -1) return;
     if(e.getWheelRotation() <= 0) {
-      final Nodes m = new Nodes(gui.context.focused, gui.context.data());
+      final DBNodes m = new DBNodes(gui.context.data(), gui.context.focused);
       gui.context.marked = m;
       gui.notify.context(m, false, null);
     } else {

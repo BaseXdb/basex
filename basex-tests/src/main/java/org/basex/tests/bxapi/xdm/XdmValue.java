@@ -3,18 +3,17 @@ package org.basex.tests.bxapi.xdm;
 import javax.xml.namespace.*;
 
 import org.basex.query.*;
-import org.basex.query.util.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.tests.bxapi.*;
-import org.basex.util.*;
 
 /**
  * Wrapper for representing XQuery values.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class XdmValue implements Iterable<XdmItem> {
@@ -33,7 +32,7 @@ public abstract class XdmValue implements Iterable<XdmItem> {
    * @return node name
    */
   public String getBaseURI() {
-    throw Util.notExpected("Item must be a node.");
+    throw new XQueryException(new QueryException("Item must be a node: " + internal()));
   }
 
   /**
@@ -41,7 +40,7 @@ public abstract class XdmValue implements Iterable<XdmItem> {
    * @return node name
    */
   public QName getName() {
-    throw Util.notExpected("Item must be a node.");
+    throw new XQueryException(new QueryException("Item must be a node: " + internal()));
   }
 
   /**
@@ -49,7 +48,8 @@ public abstract class XdmValue implements Iterable<XdmItem> {
    * @return node name
    */
   public boolean getBoolean() {
-    throw Util.notExpected("Value has no boolean representation.");
+    throw new XQueryException(new QueryException(
+        "Value has no boolean representation: " + internal()));
   }
 
   /**
@@ -60,7 +60,8 @@ public abstract class XdmValue implements Iterable<XdmItem> {
     try {
       return Long.parseLong(getString());
     } catch(final NumberFormatException ex) {
-      throw Util.notExpected("Value has no integer representation.");
+      throw new XQueryException(new QueryException(
+          "Value has no integer representation: " + internal()));
     }
   }
 
@@ -69,7 +70,8 @@ public abstract class XdmValue implements Iterable<XdmItem> {
    * @return node name
    */
   public String getString() {
-    throw Util.notExpected("Value has no string representation.");
+    throw new XQueryException(new QueryException(
+        "Value has no string representation: " + internal()));
   }
 
   /**
@@ -86,7 +88,7 @@ public abstract class XdmValue implements Iterable<XdmItem> {
    */
   public boolean deepEqual(final XdmValue value) {
     try {
-      return Compare.deep(internal(), value.internal(), null);
+      return new DeepEqual().equal(internal(), value.internal());
     } catch(final QueryException ex) {
       throw new XQueryException(ex);
     }
@@ -97,16 +99,13 @@ public abstract class XdmValue implements Iterable<XdmItem> {
    * @return value type
    */
   public abstract SeqType getType();
-
-  @Override
-  public abstract String toString();
-
-  // PACKAGE PROTECTED METHODS ================================================
-
   /**
    * Returns the internal value representation.
    * Should be made invisible to other packages.
    * @return value
    */
   public abstract Value internal();
+
+  @Override
+  public abstract String toString();
 }

@@ -10,7 +10,7 @@ import org.basex.gui.layout.*;
  * This is the status bar of the main window. It displays progress information
  * and includes a memory status.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class GUIStatus extends BaseXPanel {
@@ -21,9 +21,9 @@ public final class GUIStatus extends BaseXPanel {
    * Constructor.
    * @param main reference to the main window
    */
-  GUIStatus(final AGUI main) {
+  GUIStatus(final GUI main) {
     super(main);
-    BaseXLayout.setHeight(this, getFont().getSize() + 6);
+    setPreferredSize(new Dimension(getPreferredSize().width, (int) (getFont().getSize() * 1.5)));
     addMouseListener(this);
     addMouseMotionListener(this);
 
@@ -39,7 +39,7 @@ public final class GUIStatus extends BaseXPanel {
    */
   public void setText(final String txt) {
     label.setText(txt);
-    label.setForeground(Color.BLACK);
+    label.setForeground(GUIConstants.TEXT);
   }
 
   /**

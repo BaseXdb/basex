@@ -19,7 +19,7 @@ import org.basex.util.list.*;
  * This class recursively scans files and directories and parses all
  * relevant files.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class DirParser extends Parser {
@@ -42,6 +42,8 @@ public final class DirParser extends Parser {
   private final boolean dtd;
   /** Raw parsing. */
   private final boolean rawParser;
+  /** Archive name. */
+  private final boolean archiveName;
   /** Database path for storing binary files. */
   private IOFile rawPath;
 
@@ -64,6 +66,7 @@ public final class DirParser extends Parser {
     root = dir.endsWith("/") ? dir : dir + '/';
     skipCorrupt = options.get(MainOptions.SKIPCORRUPT);
     archives = options.get(MainOptions.ADDARCHIVES);
+    archiveName = options.get(MainOptions.ARCHIVENAME);
     addRaw = options.get(MainOptions.ADDRAW);
     dtd = options.get(MainOptions.DTD);
     rawParser = options.get(MainOptions.PARSER) == MainParser.RAW;
@@ -74,33 +77,33 @@ public final class DirParser extends Parser {
   /**
    * Constructor.
    * @param source source path
-   * @param context database context
-   * @param path future database path
+   * @param options main options
+   * @param dbpath future database path (required for binary resources)
    */
-  public DirParser(final IO source, final Context context, final IOFile path) {
-    this(source, context.options);
-    if(path != null && (addRaw || rawParser)) rawPath = new IOFile(path, IO.RAW);
+  public DirParser(final IO source, final MainOptions options, final IOFile dbpath) {
+    this(source, options);
+    if(dbpath != null && (addRaw || rawParser)) rawPath = new IOFile(dbpath, IO.RAW);
   }
 
   @Override
   public void parse(final Builder build) throws IOException {
     build.meta.filesize = 0;
-    build.meta.original = src.path();
-    parse(build, src);
+    build.meta.original = source.path();
+    parse(build, source);
   }
 
   /**
    * Parses the specified file or its children.
-   * @param b builder
-   * @param io current input
+   * @param builder builder
+   * @param input current input
    * @throws IOException I/O exception
    */
-  private void parse(final Builder b, final IO io) throws IOException {
-    if(io instanceof IOFile && io.isDir()) {
-      for(final IO f : ((IOFile) io).children()) parse(b, f);
-    } else if(archives && io.isArchive()) {
-      final String name = io.name().toLowerCase(Locale.ENGLISH);
-      InputStream in = io.inputStream();
+  private void parse(final Builder builder, final IO input) throws IOException {
+    if(input instanceof IOFile && input.isDir()) {
+      for(final IO f : ((IOFile) input).children()) parse(builder, f);
+    } else if(archives && input.isArchive()) {
+      final String name = input.name().toLowerCase(Locale.ENGLISH);
+      InputStream in = input.inputStream();
       if(name.endsWith(IO.TARSUFFIX) || name.endsWith(IO.TGZSUFFIX) ||
           name.endsWith(IO.TARGZSUFFIX)) {
         // process TAR files
@@ -108,53 +111,64 @@ public final class DirParser extends Parser {
         try(final TarInputStream is = new TarInputStream(in)) {
           for(TarEntry ze; (ze = is.getNextEntry()) != null;) {
             if(ze.isDirectory()) continue;
-            src = new IOStream(is, ze.getName());
-            src.length(ze.getSize());
-            parseResource(b);
+            source = newStream(is, ze.getName(), input);
+            source.length(ze.getSize());
+            parseResource(builder);
           }
         }
       } else if(name.endsWith(IO.GZSUFFIX)) {
         // process GZIP archive
         try(final GZIPInputStream is = new GZIPInputStream(in)) {
-          src = new IOStream(is, io.name().replaceAll("\\..*", IO.XMLSUFFIX));
-          parseResource(b);
+          source = newStream(is, input.name().replaceAll("\\..*", IO.XMLSUFFIX), input);
+          parseResource(builder);
         }
       } else {
         // process ZIP archive
         try(final ZipInputStream is = new ZipInputStream(in)) {
           for(ZipEntry ze; (ze = is.getNextEntry()) != null;) {
             if(ze.isDirectory()) continue;
-            src = new IOStream(is, ze.getName());
-            src.length(ze.getSize());
-            parseResource(b);
+            source = newStream(is, ze.getName(), input);
+            source.length(ze.getSize());
+            parseResource(builder);
           }
         }
       }
     } else {
       // process regular file
-      src = io;
-      parseResource(b);
+      source = input;
+      parseResource(builder);
     }
   }
 
   /**
+   * Creates a new stream.
+   * @param is input stream
+   * @param path path inside archive
+   * @param input input
+   * @return stream
+   */
+  private IOStream newStream(final InputStream is, final String path, final IO input) {
+    return new IOStream(is, archiveName ? (input.path() + '/' + path) : path);
+  }
+
+  /**
    * Parses the current source.
-   * @param b builder instance
+   * @param builder builder instance
    * @throws IOException I/O exception
    */
-  private void parseResource(final Builder b) throws IOException {
-    b.checkStop();
+  private void parseResource(final Builder builder) throws IOException {
+    builder.checkStop();
 
     // add file size for database meta information
-    final long l = src.length();
-    if(l != -1) b.meta.filesize += l;
+    final long l = source.length();
+    if(l != -1) builder.meta.filesize += l;
 
     // use global target as path prefix
+    final String name = source.name();
     String targ = target;
-    String path = src.path();
 
     // add relative path without root (prefix) and file name (suffix)
-    final String name = src.name();
+    String path = source.path();
     if(path.endsWith('/' + name)) {
       path = path.substring(0, path.length() - name.length());
       if(path.startsWith(root)) path = path.substring(root.length());
@@ -164,38 +178,38 @@ public final class DirParser extends Parser {
     // check if file passes the name filter pattern
     boolean exclude = false;
     if(filter != null) {
-      final String nm = Prop.CASE ? src.name() : src.name().toLowerCase(Locale.ENGLISH);
+      final String nm = Prop.CASE ? name : name.toLowerCase(Locale.ENGLISH);
       exclude = !filter.matcher(nm).matches();
     }
 
     if(exclude) {
       // exclude file: check if will be added as raw file
       if(addRaw && rawPath != null) {
-        Store.store(src.inputSource(), new IOFile(rawPath, targ + name));
+        Store.store(source.inputSource(), new IOFile(rawPath, targ + name));
       }
     } else {
       if(rawParser) {
         // store input in raw format if database path is known
         if(rawPath != null) {
-          Store.store(src.inputSource(), new IOFile(rawPath, targ + name));
+          Store.store(source.inputSource(), new IOFile(rawPath, targ + name));
         }
       } else {
         // store input as XML
         boolean ok = true;
-        IO in = src;
+        IO in = source;
         if(skipCorrupt) {
           // parse file twice to ensure that it is well-formed
           try {
             // cache file contents to allow or speed up a second run
-            if(!(src instanceof IOContent || dtd)) {
-              in = new IOContent(src.read());
-              in.name(src.name());
+            if(!(source instanceof IOContent || dtd)) {
+              in = new IOContent(source.read());
+              in.name(name);
             }
             parser = Parser.singleParser(in, options, targ);
             MemBuilder.build("", parser);
           } catch(final IOException ex) {
             Util.debug(ex);
-            skipped.add(src.path());
+            skipped.add(source.path());
             ok = false;
           }
         }
@@ -203,7 +217,7 @@ public final class DirParser extends Parser {
         // parse file
         if(ok) {
           parser = Parser.singleParser(in, options, targ);
-          parser.parse(b);
+          parser.parse(builder);
         }
         parser = null;
         // dump debug data
@@ -230,14 +244,14 @@ public final class DirParser extends Parser {
 
   @Override
   public String det() {
-    return parser != null ? parser.detail() : src.path();
+    return parser != null ? parser.detail() : source.path();
   }
 
   @Override
   public double prog() {
     if(parser != null) return parser.progress();
-    if(lastSrc == src) return 1;
-    lastSrc = src;
+    if(lastSrc == source) return 1;
+    lastSrc = source;
     return Math.random();
   }
 

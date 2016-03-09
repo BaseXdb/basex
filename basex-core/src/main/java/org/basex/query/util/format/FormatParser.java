@@ -1,6 +1,6 @@
 package org.basex.query.util.format;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import org.basex.query.*;
@@ -9,12 +9,12 @@ import org.basex.util.*;
 /**
  * Format parser for integers and dates.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class FormatParser extends FormatUtil {
   /** Input information. */
-  final InputInfo info;
+  private final InputInfo info;
 
   /** Case. */
   Case cs;
@@ -89,23 +89,23 @@ public abstract class FormatParser extends FormatUtil {
       final int d = zeroes(ch);
       if(d != -1) {
         // mandatory-digit-sign
-        if(first != d) throw DIFFMAND.get(info, pic);
+        if(first != d) throw DIFFMAND_X.get(info, pic);
         mds = true;
         gss = false;
       } else if(ch == '#') {
         // optional-digit-sign
-        if(mds) throw OPTAFTER.get(info, pic);
+        if(mds) throw OPTAFTER_X.get(info, pic);
         gss = false;
       } else if(!Character.isLetter(ch)) {
         // grouping-separator-sign
-        if(gss) throw INVGROUP.get(info, pic);
+        if(gss) throw INVGROUP_X.get(info, pic);
         gss = true;
       } else {
         // any other letter: return default primary token
-        throw INVDDPATTERN.get(info, pic);
+        throw INVDDPATTERN_X.get(info, pic);
       }
     }
-    if(gss) throw INVGROUP.get(info, pic);
+    if(gss) throw INVGROUP_X.get(info, pic);
     return pic;
   }
 

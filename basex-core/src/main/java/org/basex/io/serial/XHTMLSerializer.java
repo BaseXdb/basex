@@ -5,16 +5,18 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
+import org.basex.query.value.item.*;
+
 /**
- * This class serializes data as XHTML.
+ * This class serializes items as XHTML.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public class XHTMLSerializer extends OutputSerializer {
+final class XHTMLSerializer extends MarkupSerializer {
   /**
    * Constructor, specifying serialization options.
-   * @param os output stream reference
+   * @param os output stream
    * @param sopts serialization parameters
    * @throws IOException I/O exception
    */
@@ -23,49 +25,49 @@ public class XHTMLSerializer extends OutputSerializer {
   }
 
   @Override
-  protected void attribute(final byte[] n, final byte[] v) throws IOException {
+  protected void attribute(final byte[] name, final byte[] value, final boolean standalone)
+      throws IOException {
+
     // escape URI attributes
-    final byte[] tagatt = concat(lc(tag), COLON, lc(n));
-    final byte[] val = escuri && HTMLSerializer.URIS.contains(tagatt) ? escape(v) : v;
-    super.attribute(n, val);
+    final byte[] nm = concat(lc(elem.local()), COLON, lc(name));
+    final byte[] val = escuri && HTMLSerializer.URIS.contains(nm) ? escape(value) : value;
+    super.attribute(name, val, standalone);
   }
 
   @Override
-  protected void startOpen(final byte[] t) throws IOException {
-    super.startOpen(t);
-    if(content && eq(lc(tag), HEAD)) ct++;
+  protected void startOpen(final QNm value) throws IOException {
+    super.startOpen(value);
+    if(content && eq(lc(elem.local()), HEAD)) ct++;
   }
 
   @Override
   protected void finishOpen() throws IOException {
     super.finishOpen();
-    ct(false, false);
+    printCT(false, false);
   }
 
   @Override
   protected void finishEmpty() throws IOException {
-    if(ct(true, false)) return;
-    if((html5 ? HTMLSerializer.EMPTIES5 : HTMLSerializer.EMPTIES).contains(lc(tag))) {
-      print(' ');
-      print(ELEM_SC);
+    if(printCT(true, false)) return;
+    final byte[] lc = lc(elem.local());
+    if(html5 && HTMLSerializer.EMPTIES5.contains(lc)) {
+      out.print(ELEM_SC);
+    } else if(!html5 && HTMLSerializer.EMPTIES.contains(lc) && eq(elem.uri(), XHTML_URI)) {
+      out.print(' ');
+      out.print(ELEM_SC);
     } else {
-      print(ELEM_C);
+      out.print(ELEM_C);
       sep = false;
       finishClose();
     }
   }
 
   @Override
-  protected boolean doctype(final byte[] dt) throws IOException {
-    if(level != 0) return false;
-    if(!super.doctype(dt) && html5) {
-      if(sep) indent();
-      print(DOCTYPE);
-      if(dt == null) print(HTML);
-      else print(dt);
-      print(ELEM_C);
-      print(nl);
+  protected void doctype(final QNm type) throws IOException {
+    if(html5 && docsys == null) {
+      printDoctype(type, null, null);
+    } else if(docsys != null) {
+      printDoctype(type, docpub, docsys);
     }
-    return true;
   }
 }

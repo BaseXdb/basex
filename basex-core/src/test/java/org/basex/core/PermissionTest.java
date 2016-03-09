@@ -1,6 +1,7 @@
 package org.basex.core;
 
-import static org.basex.core.Text.*;
+import static org.basex.core.users.UserText.*;
+import static org.basex.query.func.Function.*;
 import static org.junit.Assert.*;
 
 import java.io.*;
@@ -16,12 +17,12 @@ import org.junit.Test;
 /**
  * This class tests user permissions.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Andreas Weiler
  */
 public final class PermissionTest extends SandboxTest {
   /** Name of the database to be renamed. */
-  private static final String RENAMED = Util.className(PermissionTest.class) + 'r';
+  private static final String NAME2 = NAME + '2';
   /** Test folder. */
   private static final String FOLDER = "src/test/resources/";
   /** Test repository. **/
@@ -61,9 +62,9 @@ public final class PermissionTest extends SandboxTest {
         ok(new DropUser(NAME), adminSession);
       }
 
-      ok(new CreateUser(NAME, Token.md5(NAME)), adminSession);
-      ok(new CreateDB(RENAMED), adminSession);
-      server.context.globalopts.set(GlobalOptions.REPOPATH, REPO);
+      ok(new CreateUser(NAME, NAME), adminSession);
+      ok(new CreateDB(NAME2), adminSession);
+      server.context.soptions.set(StaticOptions.REPOPATH, REPO);
       testSession = createClient(NAME, NAME);
 
       ok(new CreateDB(NAME, "<xml/>"), adminSession);
@@ -78,11 +79,11 @@ public final class PermissionTest extends SandboxTest {
   public void cleanUp() {
     try {
       testSession.close();
-      adminSession.execute(new DropDB(RENAMED));
+      adminSession.execute(new DropDB(NAME2));
       adminSession.execute(new DropDB(NAME));
       adminSession.close();
       // give the server some time to clean up the sessions before next test
-      Performance.sleep(50);
+      Performance.sleep(100);
     } catch(final Exception ex) {
       fail(Util.message(ex));
     }
@@ -93,7 +94,7 @@ public final class PermissionTest extends SandboxTest {
   public void noPermsNeeded() {
     ok(new Grant("none", NAME), adminSession);
 
-    ok(new Password(Token.md5(NAME)), testSession);
+    ok(new Password(NAME), testSession);
     ok(new Help("list"), testSession);
     ok(new Close(), testSession);
     no(new List(NAME), testSession);
@@ -106,7 +107,7 @@ public final class PermissionTest extends SandboxTest {
     ok(new Get(MainOptions.QUERYINFO), testSession);
     ok(new Set(MainOptions.QUERYINFO, false), testSession);
 
-    // repo Stuff
+    // repo stuff
     no(new RepoInstall(REPO + "/pkg3.xar", null), testSession);
     ok(new RepoList(), testSession);
     no(new RepoDelete("http://www.pkg3.com", null), testSession);
@@ -116,20 +117,22 @@ public final class PermissionTest extends SandboxTest {
     no(new Find(NAME), testSession);
     no(new Optimize(), testSession);
     // XQuery update
+    no(new XQuery("Q{java.lang.String}new('x')"), testSession);
     no(new XQuery("for $item in doc('" + NAME + "')//xml " +
       "return rename node $item as 'null'"), testSession);
     no(new CreateDB(NAME, "<xml/>"), testSession);
-    no(new Rename(RENAMED, RENAMED + '2'), testSession);
+    no(new Rename(NAME2, NAME2 + '2'), testSession);
     no(new CreateIndex("SUMMARY"), testSession);
     no(new DropDB(NAME), testSession);
     no(new DropIndex("SUMMARY"), testSession);
-    no(new CreateUser(NAME, Token.md5(NAME)), testSession);
+    no(new CreateUser(NAME, NAME), testSession);
     no(new DropUser(NAME), testSession);
     no(new Kill("dada"), testSession);
     no(new ShowUsers("Users"), testSession);
     no(new Grant("read", NAME), testSession);
     no(new Grant("none", NAME), testSession);
-    no(new AlterUser(NAME, Token.md5(NAME)), testSession);
+    no(new AlterPassword(NAME, NAME), testSession);
+    no(new AlterUser(NAME, "test2"), testSession);
     no(new Flush(), testSession);
   }
 
@@ -149,29 +152,31 @@ public final class PermissionTest extends SandboxTest {
     ok(new XQuery("//xml"), testSession);
     ok(new Find(NAME), testSession);
 
-    // repo Stuff
+    // repo stuff
     no(new RepoInstall(REPO + "/pkg3.xar", null), testSession);
     ok(new RepoList(), testSession);
     no(new RepoDelete("http://www.pkg3.com", null), testSession);
 
     // XQuery update
-    no(new XQuery("for $item in doc('" + NAME + "')//xml return delete node $item"), testSession);
-    no(new XQuery("db:create('" + NAME + "')"), testSession);
+    no(new XQuery("Q{java.lang.String}new('x')"), testSession);
+    no(new XQuery("for $n in " + DOC.args(NAME) + "//xml return delete node $n"), testSession);
+    no(new XQuery(_DB_CREATE.args(NAME)), testSession);
     no(new Optimize(), testSession);
     no(new CreateDB(NAME, "<xml/>"), testSession);
-    no(new Replace(RENAMED, "<xml />"), testSession);
-    no(new Rename(RENAMED, RENAMED + '2'), testSession);
+    no(new Replace(NAME2, "<xml />"), testSession);
+    no(new Rename(NAME2, NAME2 + '2'), testSession);
     no(new CreateIndex("SUMMARY"), testSession);
     no(new DropDB(NAME), testSession);
     no(new DropIndex("SUMMARY"), testSession);
-    no(new CreateUser(NAME, Token.md5(NAME)), testSession);
+    no(new CreateUser(NAME, NAME), testSession);
     no(new DropUser(NAME), testSession);
-    no(new Export(Prop.TMP + NAME), testSession);
+    no(new Export(Prop.TMP + NAME + "-export"), testSession);
     no(new Kill("dada"), testSession);
     no(new ShowUsers("Users"), testSession);
     no(new Grant("read", NAME), testSession);
     no(new Grant("none", NAME), testSession);
-    no(new AlterUser(NAME, Token.md5(NAME)), testSession);
+    no(new AlterPassword(NAME, NAME), testSession);
+    no(new AlterUser(NAME, "test2"), testSession);
     no(new Flush(), testSession);
     ok(new Close(), testSession);
   }
@@ -180,26 +185,27 @@ public final class PermissionTest extends SandboxTest {
   @Test
   public void writePermsNeeded() {
     ok(new Grant("write", NAME), adminSession);
-    ok(new Open(RENAMED), testSession);
-    ok(new Rename(RENAMED, RENAMED + '2'), testSession);
-    ok(new Rename(RENAMED + '2', RENAMED), testSession);
+    ok(new Open(NAME2), testSession);
+    ok(new Rename(NAME2, NAME2 + '2'), testSession);
+    ok(new Rename(NAME2 + '2', NAME2), testSession);
 
     // replace Test
     ok(new Close(), testSession);
-    ok(new Open(RENAMED), testSession);
+    ok(new Open(NAME2), testSession);
     ok(new Add(NAME + ".xml", "<xml>1</xml>"), testSession);
     ok(new Optimize(), testSession);
     ok(new Replace(NAME + ".xml", "<xmlr>2</xmlr>"), testSession);
 
-    // repo Stuff
+    // repo stuff
     no(new RepoInstall(REPO + "/pkg3.xar", null), testSession);
     ok(new RepoList(), testSession);
     no(new RepoDelete("http://www.pkg3.com", null), testSession);
 
     // XQuery Update
+    no(new XQuery("Q{java.lang.String}new('x')"), testSession);
     ok(new XQuery("for $item in doc('" + NAME + "')//xml " +
         "return rename node $item as 'null'"), testSession);
-    no(new XQuery("db:create('" + NAME + "')"), testSession);
+    no(new XQuery(_DB_CREATE.args(NAME)), testSession);
 
     ok(new Optimize(), testSession);
     for(final CmdIndex cmd : CmdIndex.values()) {
@@ -213,67 +219,71 @@ public final class PermissionTest extends SandboxTest {
     ok(new Close(), testSession);
     no(new CreateDB(NAME, "<xml/>"), testSession);
     no(new DropDB(NAME), testSession);
-    no(new CreateUser(NAME, Token.md5(NAME)), testSession);
+    no(new CreateUser(NAME, NAME), testSession);
     no(new DropUser(NAME), testSession);
-    no(new Export(Prop.TMP + NAME), testSession);
+    no(new Export(Prop.TMP + NAME + "-export"), testSession);
     no(new Kill("dada"), testSession);
     no(new ShowUsers("Users"), testSession);
     no(new Grant("read", NAME), testSession);
     no(new Grant("none", NAME), testSession);
-    no(new AlterUser(NAME, Token.md5(NAME)), testSession);
+    no(new AlterPassword(NAME, NAME), testSession);
+    no(new AlterUser(NAME, "test2"), testSession);
   }
 
   /** Tests all commands where create permission is needed. */
   @Test
   public void createPermsNeeded() {
     ok(new Grant("create", NAME), adminSession);
-    ok(new XQuery("db:create('" + NAME + "')"), testSession);
+    ok(new XQuery(_DB_CREATE.args(NAME)), testSession);
 
     ok(new Close(), testSession);
     ok(new CreateDB(NAME, "<xml/>"), testSession);
     for(final CmdIndex cmd : CmdIndex.values()) {
       ok(new CreateIndex(cmd), testSession);
     }
-    ok(new Export(Prop.TMP + NAME), testSession);
+    ok(new Export(Prop.TMP + NAME + "-export"), testSession);
 
-    // repo Stuff
+    // repo stuff
     ok(new RepoInstall(REPO + "/pkg3.xar", null), testSession);
     ok(new RepoList(), testSession);
     ok(new RepoDelete("http://www.pkg3.com", null), testSession);
 
-    no(new CreateUser(NAME, Token.md5(NAME)), testSession);
+    no(new CreateUser(NAME, NAME), testSession);
     no(new DropUser(NAME), testSession);
     no(new Kill("dada"), testSession);
     no(new ShowUsers("Users"), testSession);
     no(new Grant("read", NAME), testSession);
     no(new Grant("none", NAME), testSession);
-    no(new AlterUser(NAME, Token.md5(NAME)), testSession);
+    no(new AlterPassword(NAME, NAME), testSession);
     no(new org.basex.core.cmd.Test(FOLDER + "tests-ok.xqm"), testSession);
   }
 
   /** Tests all commands where admin permission is needed. */
   @Test
   public void adminPermsNeeded() {
-    ok(new Grant(S_ADMIN, NAME), adminSession);
+    ok(new Grant(ADMIN, NAME), adminSession);
     if(server.context.users.get("test2") != null) {
       ok(new DropUser("test2"), testSession);
     }
-    ok(new CreateUser("test2", Token.md5(NAME)), testSession);
+    ok(new CreateUser("test2", NAME), testSession);
     ok(new CreateDB(NAME, "<xml/>"), testSession);
     ok(new ShowUsers(), testSession);
-    ok(new Grant(S_ADMIN, "test2"), testSession);
+    ok(new Grant(ADMIN, "test2"), testSession);
     ok(new Grant("create", "test2"), testSession);
-    ok(new AlterUser(NAME, Token.md5(NAME)), testSession);
-    ok(new DropUser("test2"), testSession);
+    ok(new AlterPassword(NAME, NAME), testSession);
+    ok(new AlterUser("test2", "test4"), testSession);
+    ok(new DropUser("test3"), testSession);
     ok(new Close(), testSession);
     ok(new Close(), adminSession);
     ok(new DropDB(NAME), adminSession);
 
-    // repo Stuff
+    // repo stuff
     ok(new RepoInstall(REPO + "/pkg3.xar", null), testSession);
     ok(new RepoList(), testSession);
     ok(new RepoDelete("http://www.pkg3.com", null), testSession);
     ok(new org.basex.core.cmd.Test(FOLDER + "tests-ok.xqm"), testSession);
+
+    ok(new XQuery("Q{java.lang.String}new('x')"), testSession);
   }
 
   /** Drops users. */

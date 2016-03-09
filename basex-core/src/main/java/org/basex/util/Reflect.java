@@ -7,12 +7,12 @@ import java.util.*;
  * This class assembles some reflection methods. Most exceptions are caught and replaced
  * by a {@code null} value.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Reflect {
   /** Cached constructors. */
-  private static final HashMap<String, Constructor<?>> CONS = new HashMap<>();
+  private static final HashMap<String, Constructor<?>> CONSTRUCTORS = new HashMap<>();
   /** Cached classes. */
   private static final HashMap<String, Class<?>> CLASSES = new HashMap<>();
   /** Cached fields. */
@@ -37,9 +37,9 @@ public final class Reflect {
   }
 
   /**
-   * Caches and returns a reference to the specified class, or {@code null}.
+   * Caches and returns a reference to the specified class or {@code null}.
    * @param name fully qualified class name
-   * @return reference, or {@code null} if the class is not found
+   * @return reference or {@code null} if the class is not found
    */
   public static Class<?> find(final String name) {
     try {
@@ -66,10 +66,10 @@ public final class Reflect {
   }
 
   /**
-   * Caches and returns a reference to the specified field, or {@code null}.
+   * Caches and returns a reference to the specified field or {@code null}.
    * @param clazz class to search for the constructor
    * @param name field name
-   * @return reference, or {@code null} if the field is not found
+   * @return reference or {@code null} if the field is not found
    */
   public static Field field(final Class<?> clazz, final String name) {
     final String key = clazz.getName() + name;
@@ -88,16 +88,16 @@ public final class Reflect {
    * or {@code null}.
    * @param pattern class pattern
    * @param ext optional extension
-   * @return reference, or {@code null} if the class is not found
+   * @return reference or {@code null} if the class is not found
    */
   public static Class<?> find(final String pattern, final Object... ext) {
     return find(Util.info(pattern, ext));
   }
 
   /**
-   * Returns a class reference to one of the specified classes, or {@code null}.
+   * Returns a class reference to one of the specified classes or {@code null}.
    * @param names fully qualified class names
-   * @return reference, or {@code null} if the class is not found
+   * @return reference or {@code null} if the class is not found
    */
   public static Class<?> find(final String[] names) {
     for(final String n : names) {
@@ -122,7 +122,7 @@ public final class Reflect {
     final String key = sb.toString();
 
     @SuppressWarnings("unchecked")
-    Constructor<O> m = (Constructor<O>) CONS.get(key);
+    Constructor<O> m = (Constructor<O>) CONSTRUCTORS.get(key);
     if(m == null) {
       try {
         try {
@@ -131,7 +131,7 @@ public final class Reflect {
           m = clazz.getDeclaredConstructor(types);
           m.setAccessible(true);
         }
-        CONS.put(key, m);
+        CONSTRUCTORS.put(key, m);
       } catch(final Throwable ex) {
         Util.debug(ex);
       }
@@ -144,7 +144,7 @@ public final class Reflect {
    * @param clazz class to search for the method
    * @param name method name
    * @param types method parameters
-   * @return reference, or {@code null} if the method is not found
+   * @return reference or {@code null} if the method is not found
    */
   public static Method method(final Class<?> clazz, final String name, final Class<?>... types) {
     if(clazz == null) return null;
@@ -178,7 +178,7 @@ public final class Reflect {
   }
 
   /**
-   * Returns a class instance, or {@code null}.
+   * Returns a class instance or {@code null}.
    * @param clazz class
    * @param args arguments
    * @param <O> class type

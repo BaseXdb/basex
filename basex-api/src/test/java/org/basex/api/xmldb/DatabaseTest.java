@@ -9,11 +9,11 @@ import org.xmldb.api.base.*;
 /**
  * This class tests the XMLDB/API Database implementation.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 @SuppressWarnings("all")
-public class DatabaseTest extends XMLDBBaseTest {
+public final class DatabaseTest extends XMLDBBaseTest {
   /** Database. */
   private Database database;
 

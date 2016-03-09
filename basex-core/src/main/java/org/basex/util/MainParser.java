@@ -7,7 +7,7 @@ import org.basex.core.*;
 /**
  * This class parses command-line arguments provided by a class with main method.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class MainParser {
@@ -36,14 +36,17 @@ public final class MainParser {
   public boolean more() {
     // parse all arguments
     final String[] args = main.args();
-    while(arg < args.length) {
+    final int arl = args.length;
+
+    while(arg < arl) {
       // analyze current argument
       final String a = args[arg];
       if(pos == 0) {
         // start from first character
         dash = false;
         // find first relevant character
-        while(pos < a.length()) {
+        final int al = a.length();
+        while(pos < al) {
           final char ch = a.charAt(pos);
           if(ch == '-') {
             // treat input as flag
@@ -94,13 +97,15 @@ public final class MainParser {
    */
   public String string() {
     final String[] args = main.args();
-    while(arg < args.length) {
+    final int arl = args.length;
+    while(arg < arl) {
       final String a = args[arg++];
       int p = pos;
       pos = 0;
-      if(p == a.length()) continue;
+      final int al = a.length();
+      if(p == al) continue;
       final StringBuilder sb = new StringBuilder();
-      while(p < a.length()) sb.append(a.charAt(p++));
+      while(p < al) sb.append(a.charAt(p++));
       final String str = sb.toString();
       return "-".equals(str) ? new Scanner(System.in).useDelimiter("\0").next() : str;
     }
@@ -113,7 +118,7 @@ public final class MainParser {
    * @throws BaseXException database exception
    */
   public int number() throws BaseXException {
-    final int i = Token.toInt(string());
+    final int i = Strings.toInt(string());
     if(i < 0) throw usage();
     return i;
   }
@@ -124,6 +129,6 @@ public final class MainParser {
    */
   public BaseXException usage() {
     final String name = Util.className(main).toLowerCase(Locale.ENGLISH);
-    return new BaseXException(main.header() + "Usage: " + name + main.usage());
+    return new BaseXException(main.header() + Prop.NL + "Usage: " + name + main.usage());
   }
 }

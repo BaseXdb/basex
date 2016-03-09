@@ -1,14 +1,16 @@
 package org.basex.util.hash;
 
+import java.util.*;
+
 import org.basex.util.*;
 
 /**
  * This is an efficient and memory-saving hash map for storing tokens and objects.
  * {@link TokenSet hash set}.
- * @param <E> generic value type
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
+ * @param <E> generic value type
  */
 public final class TokenObjMap<E> extends TokenSet {
   /** Values. */
@@ -29,7 +31,7 @@ public final class TokenObjMap<E> extends TokenSet {
   /**
    * Returns the value for the specified key.
    * @param key key to be looked up
-   * @return value, or {@code null} if nothing was found
+   * @return value or {@code null} if nothing was found
    */
   @SuppressWarnings("unchecked")
   public E get(final byte[] key) {
@@ -52,9 +54,15 @@ public final class TokenObjMap<E> extends TokenSet {
   }
 
   @Override
-  protected void rehash(final int s) {
-    super.rehash(s);
-    values = Array.copy(values, new Object[s]);
+  public void clear() {
+    Arrays.fill(values, null);
+    super.clear();
+  }
+
+  @Override
+  protected void rehash(final int sz) {
+    super.rehash(sz);
+    values = Array.copy(values, new Object[sz]);
   }
 
   @Override

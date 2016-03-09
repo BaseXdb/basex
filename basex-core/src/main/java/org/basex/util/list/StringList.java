@@ -5,9 +5,9 @@ import java.util.*;
 import org.basex.util.*;
 
 /**
- * This is a simple container for strings.
+ * Resizable-array implementation for strings.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public class StringList extends ElementList implements Iterable<String> {
@@ -40,12 +40,16 @@ public class StringList extends ElementList implements Iterable<String> {
 
   /**
    * Adds an element to the array.
-   * @param e element to be added
+   * @param element element to be added
    * @return self reference
    */
-  public final StringList add(final String e) {
-    if(size == list.length) list = Array.copyOf(list, newSize());
-    list[size++] = e;
+  public final StringList add(final String element) {
+    String[] lst = list;
+    final int s = size;
+    if(s == lst.length) lst = Array.copyOf(lst, newSize());
+    lst[s] = element;
+    list = lst;
+    size = s + 1;
     return this;
   }
 
@@ -55,7 +59,12 @@ public class StringList extends ElementList implements Iterable<String> {
    * @return self reference
    */
   public final StringList add(final String... elements) {
-    for(final String s : elements) add(s);
+    String[] lst = list;
+    final int l = elements.length, s = size, ns = s + l;
+    if(ns > lst.length) lst = Array.copyOf(lst, newSize(ns));
+    System.arraycopy(elements, 0, lst, s, l);
+    list = lst;
+    size = ns;
     return this;
   }
 
@@ -95,7 +104,7 @@ public class StringList extends ElementList implements Iterable<String> {
    * @return result of check
    */
   public final boolean contains(final String element) {
-    for(int i = 0; i < size; ++i) if(list[i].equals(element)) return true;
+    for(int i = 0; i < size; i++) if(Strings.eq(list[i], element)) return true;
     return false;
   }
 
@@ -106,12 +115,11 @@ public class StringList extends ElementList implements Iterable<String> {
    * @return result of check
    */
   public final boolean containsAll(final StringList elements) {
-    if(isEmpty() && !elements.isEmpty()) return false;
     int i = 0;
+    final int s = size;
     for(final String e : elements) {
-      int result;
-      while((result = list[i].compareTo(e)) != 0) {
-        if(++i >= size() || result > 0) return false;
+      for(int d; (d = list[i].compareTo(e)) != 0;) {
+        if(++i >= s || d > 0) return false;
       }
     }
     return true;
@@ -122,7 +130,7 @@ public class StringList extends ElementList implements Iterable<String> {
    * @param index index of the element to delete
    * @return deleted element
    */
-  public final String deleteAt(final int index) {
+  public final String remove(final int index) {
     final String l = list[index];
     Array.move(list, index + 1, -1, --size - index);
     return l;
@@ -131,13 +139,17 @@ public class StringList extends ElementList implements Iterable<String> {
   /**
    * Removes all occurrences of the specified element from the list.
    * @param element element to be removed
+   * @return flag, indicating if any element was removed
    */
-  public final void delete(final String element) {
+  public final boolean delete(final String element) {
+    final String[] lst = list;
+    final int sz = size;
     int s = 0;
-    for(int i = 0; i < size; ++i) {
-      if(!list[i].equals(element)) list[s++] = list[i];
+    for(int i = 0; i < sz; ++i) {
+      if(!lst[i].equals(element)) lst[s++] = lst[i];
     }
     size = s;
+    return sz != s;
   }
 
   /**
@@ -146,6 +158,18 @@ public class StringList extends ElementList implements Iterable<String> {
    */
   public final String[] toArray() {
     return Array.copyOf(list, size);
+  }
+
+  /**
+   * Returns an array with all elements and invalidates the internal array.
+   * Warning: the function must only be called if the list is discarded afterwards.
+   * @return array (internal representation!)
+   */
+  public String[] finish() {
+    final String[] lst = list;
+    list = null;
+    final int s = size;
+    return s == lst.length ? lst : Array.copyOf(lst, s);
   }
 
   /**
@@ -178,13 +202,13 @@ public class StringList extends ElementList implements Iterable<String> {
   /**
    * Sorts the elements.
    * @param cs respect case sensitivity
-   * @param asc ascending (true)/descending (false) flag
+   * @param ascending ascending/descending order
    * @param index index of element from which sorting starts
    * @return self reference
    */
-  public final StringList sort(final boolean cs, final boolean asc, final int index) {
+  public final StringList sort(final boolean cs, final boolean ascending, final int index) {
     final Comparator<String> comp = cs ? null : String.CASE_INSENSITIVE_ORDER;
-    Arrays.sort(list, index, size, asc ? comp : Collections.reverseOrder(comp));
+    Arrays.sort(list, index, size, ascending ? comp : Collections.reverseOrder(comp));
     return this;
   }
 
@@ -210,6 +234,6 @@ public class StringList extends ElementList implements Iterable<String> {
 
   @Override
   public final String toString() {
-    return Arrays.toString(toArray());
+    return list == null ? "" : Arrays.toString(toArray());
   }
 }

@@ -14,7 +14,7 @@ import org.basex.util.list.*;
  * This class loads language specific texts when the {@link #lang}
  * method is called for the first time.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Lang {
@@ -91,11 +91,11 @@ public final class Lang {
   /**
    * Returns the specified string with some text extensions included.
    * @param key key
-   * @param e text text extensions
+   * @param ext text text extensions
    * @return string
    */
-  static synchronized String lang(final String key, final Object... e) {
-    return Util.info(lang(key), e);
+  static synchronized String lang(final String key, final Object... ext) {
+    return Util.info(lang(key), ext);
   }
 
   /**
@@ -132,7 +132,7 @@ public final class Lang {
     } catch(final IOException ex) {
       Util.errln(ex);
     }
-    return new String[][] { langs.toArray(), creds.toArray() };
+    return new String[][] { langs.finish(), creds.finish() };
   }
 
   /**
@@ -149,7 +149,7 @@ public final class Lang {
   /**
    * Checks the existing language files for correctness and completeness.
    */
-  public static void check() {
+  static void check() {
     read("English");
     final StringBuilder sb = new StringBuilder();
     final HashSet<String> set = new HashSet<>();

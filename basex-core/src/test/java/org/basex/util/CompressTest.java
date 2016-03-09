@@ -5,17 +5,17 @@ import static org.junit.Assert.*;
 
 import java.util.*;
 
+import org.basex.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
-import org.basex.*;
 import org.basex.util.list.*;
 import org.junit.*;
 
 /**
  * Class for testing the {@link Compress} methods.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class CompressTest extends SandboxTest {
@@ -41,25 +41,28 @@ public final class CompressTest extends SandboxTest {
   /** Test. */
   @Test
   public void test4() {
-    final byte[] b = new byte[65];
-    for(int i = 0; i < b.length; i++) b[i] = (byte) i;
-    run(b);
+    final int bl = 65;
+    final byte[] bytes = new byte[bl];
+    for(int b = 0; b < bl; b++) bytes[b] = (byte) b;
+    run(bytes);
   }
 
   /** Test. */
   @Test
   public void test5() {
-    final byte[] b = new byte[256];
-    for(int i = 0; i < b.length; i++) b[i] = (byte) i;
-    run(b);
+    final int bl = 256;
+    final byte[] bytes = new byte[bl];
+    for(int b = 0; b < bytes.length; b++) bytes[b] = (byte) b;
+    run(bytes);
   }
 
   /** Test. */
   @Test
   public void test6() {
-    final byte[] b = new byte[4096];
-    for(int i = 0; i < b.length; i++) b[i] = (byte) (i & 0xFF);
-    run(b);
+    final int bl = 4096;
+    final byte[] bytes = new byte[bl];
+    for(int b = 0; b < bytes.length; b++) bytes[b] = (byte) (b & 0xFF);
+    run(bytes);
   }
 
   /** Test.
@@ -87,16 +90,16 @@ public final class CompressTest extends SandboxTest {
 
     final TokenList tl = new TokenList();
     final TokenBuilder tb = new TokenBuilder();
-    final QueryProcessor qp = new QueryProcessor(query, context);
-    final Iter ir = qp.iter();
-    for(Item it; (it = ir.next()) != null;) {
-      final byte[] token = it.string(null);
-      tl.add(token);
-      tb.add(token).add(' ');
+    try(final QueryProcessor qp = new QueryProcessor(query, context)) {
+      final Iter ir = qp.iter();
+      for(Item it; (it = ir.next()) != null;) {
+        final byte[] token = it.string(null);
+        tl.add(token);
+        tb.add(token).add(' ');
+      }
     }
-    qp.close();
 
-    run(tl.toArray());
+    run(tl.finish());
     run(tb.finish());
   }
 

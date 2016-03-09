@@ -8,7 +8,7 @@ import java.util.*;
 import java.util.regex.*;
 
 import org.basex.http.*;
-import org.basex.query.util.inspect.*;
+import org.basex.query.func.inspect.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
@@ -19,7 +19,7 @@ import org.basex.util.list.*;
  * This class returns a Web Application Description Language (WADL) file,
  * listing all available RESTXQ services.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class RestXqWadl {
@@ -28,10 +28,10 @@ final class RestXqWadl {
 
   /**
    * Constructor.
-   * @param hc HTTP context
+   * @param http HTTP context
    */
-  RestXqWadl(final HTTPContext hc) {
-    http = hc;
+  RestXqWadl(final HTTPContext http) {
+    this.http = http;
   }
 
   /**
@@ -73,16 +73,16 @@ final class RestXqWadl {
         // create request
         final FElem request = elem("request", method);
         for(final RestXqParam rxp : func.queryParams)
-          addParam(rxp.key, "query",  request, xqdoc, func);
+          addParam(rxp.name, "query",  request, xqdoc, func);
         for(final RestXqParam rxp : func.formParams)
-          addParam(rxp.key, "query",  request, xqdoc, func);
+          addParam(rxp.name, "query",  request, xqdoc, func);
         for(final RestXqParam rxp : func.headerParams)
-          addParam(rxp.key, "header",  request, xqdoc, func);
+          addParam(rxp.name, "header",  request, xqdoc, func);
 
         // create response
         final FElem response = elem("response", method);
         final FElem representation = elem("representation", response);
-        representation.add("mediaType", HTTPContext.mediaType(func.output));
+        representation.add("mediaType", HTTPContext.mediaType(func.output).toString());
       }
     }
     // add resources in sorted order
@@ -98,15 +98,15 @@ final class RestXqWadl {
    * @param xqdoc documentation
    * @param func function
    */
-  private void addParam(final String name, final String style, final FElem root,
-      final TokenObjMap<TokenList> xqdoc, final RestXqFunction func) {
+  private static void addParam(final String name, final String style, final FElem root,
+                               final TokenObjMap<TokenList> xqdoc, final RestXqFunction func) {
 
     final FElem param = elem("param", root);
     param.add("name", name).add("style", style);
     final QNm qn = new QNm(name);
     for(final Var var : func.function.args) {
-      if(var.name.eq(qn) && var.declType != null) {
-        param.add("type", var.declType.toString());
+      if(var.name.eq(qn) && var.type != null) {
+        param.add("type", var.type.toString());
       }
     }
     addDoc(Inspect.doc(xqdoc, token(name)), param);
@@ -129,10 +129,10 @@ final class RestXqWadl {
    * @param xqdoc documentation (may be {@code null})
    * @param parent parent node
    */
-  private void addDoc(final byte[] xqdoc, final FElem parent) {
+  private static void addDoc(final byte[] xqdoc, final FElem parent) {
     if(xqdoc == null) return;
     final FElem doc = elem("doc", parent);
     doc.namespaces().add(EMPTY, token(XHTML_URL));
-    Inspect.add(xqdoc, http.context(), doc);
+    Inspect.add(xqdoc, doc);
   }
 }

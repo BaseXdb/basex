@@ -3,17 +3,16 @@ package org.basex.core.cmd;
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 
-import org.basex.core.*;
+import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
- * Evaluates the 'rename' command and renames resources or directories
- * in a collection.
+ * Evaluates the 'rename' command and renames resources or directories in a collection.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Rename extends ACreate {
@@ -35,7 +34,7 @@ public final class Rename extends ACreate {
     if(trg == null) return error(NAME_INVALID_X, args[1]);
 
     // start update
-    if(!data.startUpdate()) return error(DB_PINNED_X, data.meta.name);
+    if(!startUpdate()) return false;
 
     boolean ok = true;
     int c = 0;
@@ -52,15 +51,16 @@ public final class Rename extends ACreate {
       }
     }
 
-    final IOFile file = data.meta.binary(src);
+    final IOFile file = data.inMemory() ? null : data.meta.binary(src);
     if(file != null && file.exists()) {
       final IOFile target = data.meta.binary(trg);
       final IOFile trgdir = target.parent();
       if(!trgdir.md() || !file.rename(target)) ok = !info(NAME_INVALID_X, trg);
       c++;
     }
+
     // finish update
-    data.finishUpdate();
+    if(!finishUpdate()) return false;
 
     // return info message
     return info(RES_RENAMED_X_X, c, perf) && ok;
@@ -79,10 +79,10 @@ public final class Rename extends ACreate {
     final String path = string(data.text(pre, true));
     if(Prop.CASE ? path.equals(src) : path.equalsIgnoreCase(src)) return trg;
 
-    // source references a directory: merge target path and file name
-    final String name = src.isEmpty() ? path : path.substring(src.length() + 1);
-    if(trg.isEmpty()) return name;
-    if(trg.endsWith("/")) return trg + name;
-    return trg + '/' + name;
+    // directory references: add trailing slashes to non-empty paths
+    final String source = src.isEmpty() || src.endsWith("/") ? src : src + '/';
+    final String target = trg.isEmpty() || trg.endsWith("/") ? trg : trg + '/';
+    // merge target with old path
+    return target + path.substring(source.length());
   }
 }

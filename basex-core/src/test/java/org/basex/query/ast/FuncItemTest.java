@@ -1,8 +1,10 @@
 package org.basex.query.ast;
 
+import static org.basex.query.QueryError.*;
+
 import org.basex.query.func.*;
-import org.basex.query.util.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.junit.*;
@@ -10,7 +12,7 @@ import org.junit.*;
 /**
  * Tests for compiling function items.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public final class FuncItemTest extends QueryPlanTest {
@@ -46,7 +48,7 @@ public final class FuncItemTest extends QueryPlanTest {
   public void partApp2Test() {
     check("for $sub in ('foo', 'bar')" +
         "return starts-with(?, $sub)('foobar')",
-        "true false",
+        "true\nfalse",
         "exists(//" + Util.className(PartFunc.class) + ')'
     );
   }
@@ -113,7 +115,7 @@ public final class FuncItemTest extends QueryPlanTest {
     check("declare function local:Y($f) { $f(function() { $f }) };" +
         "for-each(function($x) { $x() }, local:Y#1)[2]",
         "",
-        "exists(//" + Util.className(FuncItem.class) + ')'
+        "exists(//" + Util.className(Empty.class) + ')'
     );
   }
 
@@ -123,7 +125,7 @@ public final class FuncItemTest extends QueryPlanTest {
     check("declare function local:Y($f) { $f(function() { $f }) };" +
         "let $f := for-each(function($x) { $x() }, local:Y#1) return $f[2]",
         "",
-        "exists(//" + Util.className(FuncItem.class) + ')'
+        "exists(//" + Util.className(Empty.class) + ')'
     );
   }
 
@@ -207,8 +209,19 @@ public final class FuncItemTest extends QueryPlanTest {
   @Test
   public void funcItemCoercion() {
     error("let $f := function($g as function() as item()) { $g() }" +
-        "return $f(function() { 1, 2 })",
-        Err.INVTREAT);
+        "return $f(function() { 1, 2 })", INVPROMOTE_X_X_X);
+  }
+
+  /** Checks if nested closures are inlined. */
+  @Test
+  public void nestedClosures() {
+    check("for $i in 1 to 3 "
+        + "let $f := function($x) { $i * $x },"
+        + "    $g := function($y) { 2 * $f($y) }"
+        + "return $g($g(42))",
+        "168\n672\n1512",
+        "count(//" + Util.className(Closure.class) + ") eq 1"
+    );
   }
 
   /** Tests if all functions are compiled when reflection takes places. */
@@ -234,8 +247,7 @@ public final class FuncItemTest extends QueryPlanTest {
         "  return $go($go, $root)" +
         "};" +
         "local:foo(document { <foo ID=\"a\"><foo ID=\"b\"/></foo> })",
-
-        "a b",
+        "a\nb",
         "empty(//" + Util.className(StaticFuncCall.class) + ')',
         "exists(//" + Util.className(DynFuncCall.class) + ')',
         "exists(//" + Util.className(FuncItem.class) + ')'
@@ -247,20 +259,43 @@ public final class FuncItemTest extends QueryPlanTest {
   public void gh953() {
     check("declare function local:go ($n) { $n, for-each($n/*, local:go(?)) };" +
         "let $source := <a><b/></a> return local:go($source)",
-
-        String.format("<a>%n  <b/>%n</a>%n<b/>")
+        "<a>\n<b/>\n</a>\n<b/>"
     );
   }
 
   /** Tests if {@code fn:error()} is allowed with impossible types. */
   @Test
   public void gh958() {
-    error("declare function local:f() as item()+ { error() }; local:f()",
-        Err.FUNERR1
-    );
+    error("declare function local:f() as item()+ { error() }; local:f()", FUNERR1);
+    error("function() as item()+ { error() }()", FUNERR1);
+  }
 
-    error("function() as item()+ { error() }()",
-        Err.FUNERR1
-    );
+  /** Checks that run-time values are not inlined into the static AST. */
+  @Test
+  public void gh1023() {
+    check("for $n in (<a/>, <b/>)"
+        + "let $f := function() as element()* { trace($n) }"
+        + "return $f()",
+        "<a/>\n<b/>");
+  }
+
+  /** Checks that functions circularly referenced through function literals are compiled. */
+  @Test
+  public void gh1038() {
+    check("declare function local:a() { let $a := local:c() return () };"
+        + "declare function local:b() { let $a := function() { local:a() } return () };"
+        + "declare function local:c() { local:b#0() };"
+        + "local:c() ",
+        "",
+        "exists(//" + Util.className(Empty.class) + ")");
+  }
+
+  /** Tests inlining of a function literal. */
+  @Test
+  public void gh1113() {
+    check("let $join := array:join#1 return $join(([], []))",
+        "[]",
+        "empty(//" + Util.className(DynFuncCall.class) + ')',
+        "empty(//" + Util.className(StaticFuncCall.class) + ')');
   }
 }

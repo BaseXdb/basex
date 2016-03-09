@@ -1,20 +1,21 @@
 package org.basex.query.value.seq;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.*;
+import org.basex.query.value.type.SeqType.Occ;
 import org.basex.util.*;
 
 /**
  * Sequence of items, which are stored in their primitive/native representation.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public abstract class NativeSeq extends Seq {
+abstract class NativeSeq extends Seq {
   /**
    * Constructor.
    * @param size number of items
@@ -26,13 +27,13 @@ public abstract class NativeSeq extends Seq {
 
   @Override
   public Item ebv(final QueryContext qc, final InputInfo ii) throws QueryException {
-    throw CONDTYPE.get(ii, this);
+    throw EBV_X.get(ii, this);
   }
 
   @Override
-  public final int writeTo(final Item[] arr, final int start) {
-    final int w = Math.min((int) size, arr.length - start);
-    for(int i = 0; i < w; i++) arr[start + i] = itemAt(i);
+  public final int writeTo(final Item[] arr, final int index) {
+    final int w = Math.min((int) size, arr.length - index);
+    for(int i = 0; i < w; i++) arr[index + i] = itemAt(i);
     return w;
   }
 
@@ -42,7 +43,38 @@ public abstract class NativeSeq extends Seq {
   }
 
   @Override
-  public final SeqType type() {
+  public final void materialize(final InputInfo ii) { }
+
+  @Override
+  public Value atomValue(final InputInfo ii) throws QueryException {
+    return this;
+  }
+
+  @Override
+  public final long atomSize() {
+    return size;
+  }
+
+  @Override
+  public final SeqType seqType() {
     return SeqType.get(type, Occ.ONE_MORE);
+  }
+
+  @Override
+  public final Value insert(final long pos, final Item item) {
+    return copyInsert(pos, item);
+  }
+
+  @Override
+  public final Value remove(final long pos) {
+    return size == 1 ? itemAt(1 - pos) : copyRemove(pos);
+  }
+
+  @Override
+  public final Value reverse() {
+    final int n = (int) size;
+    final ValueBuilder vb = new ValueBuilder();
+    for(int i = 0; i < n; i++) vb.add(itemAt(n - i - 1));
+    return vb.value(type);
   }
 }

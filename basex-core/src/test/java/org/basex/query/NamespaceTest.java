@@ -1,25 +1,27 @@
 package org.basex.query;
 
 import static org.basex.core.Text.*;
+import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 
+import java.io.*;
+
 import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
-import org.basex.io.serial.SerializerOptions.YesNo;
-import org.basex.query.up.primitives.*;
+import org.basex.query.up.primitives.node.*;
 import org.basex.query.util.*;
 import org.basex.query.value.node.*;
-import org.basex.util.*;
 import org.junit.*;
 import org.junit.Test;
 
 /**
  * This class tests namespaces.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Lukas Kircher
  */
 public final class NamespaceTest extends AdvancedQueryTest {
@@ -47,123 +49,144 @@ public final class NamespaceTest extends AdvancedQueryTest {
     { "d18", "<n xmlns:ns='ns'><a/></n>"},
     { "d19", "<x:n xmlns:x='X'/>"},
     { "d20", "<x:a xmlns:x='A'><x:b xmlns:x='B'/><x:c/></x:a>"},
+    { "d21", "<n><a xmlns:p1='u1'><b xmlns:p2='u2'/></a><c/></n>"}
   };
 
   /**
    * Checks if namespace hierarchy structure is updated correctly on the
    * descendant axis after a NSNode has been inserted.
-   * @throws Exception exception
    */
   @Test
-  public void insertIntoShiftPreValues() throws Exception {
+  public void insertIntoShiftPreValues() {
     create(12);
     query("insert node <b xmlns:ns='A'/> into doc('d12')/*:a/*:b");
     assertEquals(NL +
-        "  Pre[3] xmlns:ns=\"A\" " + NL +
-        "  Pre[4] xmlns=\"B\" ",
+        "  Pre[3] xmlns:ns=\"A\"" + NL +
+        "  Pre[4] xmlns=\"B\"",
         context.data().nspaces.toString());
   }
 
   /**
    * Checks if namespace hierarchy structure is updated correctly on the
    * descendant axis after a NSNode has been inserted.
-   * @throws Exception exception
    */
   @Test
-  public void insertIntoShiftPreValues2() throws Exception {
+  public void insertIntoShiftPreValues2() {
     create(13);
     query("insert node <c/> as first into doc('d13')/a");
     assertEquals(NL +
-        "  Pre[3] xmlns=\"A\" ",
+        "  Pre[3] xmlns=\"A\"",
         context.data().nspaces.toString());
   }
 
   /**
    * Checks if namespace hierarchy structure is updated correctly on the
    * descendant axis after a NSNode has been inserted.
-   * @throws Exception exception
    */
   @Test
-  public void insertIntoShiftPreValues3() throws Exception {
+  public void insertIntoShiftPreValues3() {
     create(14);
     query("insert node <n xmlns='D'/> into doc('d14')/*:a/*:b");
     assertEquals(NL +
-        "  Pre[1] xmlns=\"A\" " + NL +
-        "    Pre[2] xmlns=\"B\" " + NL +
-        "      Pre[3] xmlns=\"D\" " + NL +
-        "    Pre[4] xmlns=\"C\" ",
+        "  Pre[1] xmlns=\"A\"" + NL +
+        "    Pre[2] xmlns=\"B\"" + NL +
+        "      Pre[3] xmlns=\"D\"" + NL +
+        "    Pre[4] xmlns=\"C\"",
         context.data().nspaces.toString());
   }
 
   /**
    * Checks if namespace hierarchy structure is updated correctly on the
    * descendant axis after a NSNode has been deleted.
-   * @throws Exception exception
    */
   @Test
-  public void deleteShiftPreValues() throws Exception {
+  public void deleteShiftPreValues() {
     create(12);
     query("delete node doc('d12')/a/b");
     assertEquals(NL +
-        "  Pre[2] xmlns=\"B\" ",
+        "  Pre[2] xmlns=\"B\"",
         context.data().nspaces.toString());
   }
 
   /**
    * Checks if namespace hierarchy structure is updated correctly on the
    * descendant axis after a NSNode has been deleted.
-   * @throws Exception exception
    */
   @Test
-  public void deleteShiftPreValues2() throws Exception {
+  public void deleteShiftPreValues2() {
     create(14);
     query("delete node doc('d14')/*:a/*:b");
     assertEquals(NL +
-        "  Pre[1] xmlns=\"A\" " + NL +
-        "    Pre[2] xmlns=\"C\" ",
+        "  Pre[1] xmlns=\"A\"" + NL +
+        "    Pre[2] xmlns=\"C\"",
         context.data().nspaces.toString());
   }
 
   /**
    * Checks if namespace hierarchy structure is updated correctly on the
    * descendant axis after a NSNode has been deleted.
-   * @throws Exception exception
    */
   @Test
-  public void deleteShiftPreValues3() throws Exception {
+  public void deleteShiftPreValues3() {
     create(15);
     query("delete node doc('d15')/*:a/*:c");
     assertEquals(NL +
-        "  Pre[1] xmlns=\"A\" " + NL +
-        "    Pre[2] xmlns=\"B\" " + NL +
-        "    Pre[3] xmlns=\"E\" ",
+        "  Pre[1] xmlns=\"A\"" + NL +
+        "    Pre[2] xmlns=\"B\"" + NL +
+        "    Pre[3] xmlns=\"E\"",
         context.data().nspaces.toString());
   }
 
   /**
    * Checks if namespace hierarchy structure is updated correctly on the
    * descendant axis after a NSNode has been deleted.
-   * @throws Exception exception
    */
   @Test
-  public void deleteShiftPreValues4() throws Exception {
+  public void deleteShiftPreValues4() {
     create(16);
     query("delete node doc('d16')/a/b");
     assertTrue(context.data().nspaces.toString().isEmpty());
   }
 
   /**
+   * Inserts an attribute with namespace.
+   */
+  @Test
+  public void insertAttributeWithNs() {
+    create(1);
+    query("insert node attribute { QName('ns', 'pref:local') } { } into /*");
+    final Data data = context.data();
+    assertEquals(false, data.nsFlag(0));
+    assertEquals(true, data.nsFlag(1));
+    assertEquals(false, data.nsFlag(2));
+    assertEquals(0, data.uriId(1, data.kind(1)));
+    assertEquals(1, data.uriId(2, data.kind(2)));
+    assertEquals("ns", string(data.nspaces.uri(1)));
+  }
+
+  /**
    * Tests for correct namespace hierarchy, esp. if namespace nodes
    * on the following axis of an insert/delete operation are
    * updated correctly.
-   * @throws Exception exception
    */
   @Test
-  public void delete1() throws Exception {
+  public void delete1() {
     create(11);
     query("delete node doc('d11')/*:a/*:b",
         "doc('d11')/*:a",
         "<a xmlns='A'><c xmlns:ns1='AA'><d/></c></a>");
+  }
+
+  /**
+   * Tests if a namespace node is deleted.
+   */
+  @Test
+  public void delete2() {
+    create(21);
+    query("delete node //b");
+    assertEquals(NL +
+        "  Pre[2] xmlns:p1=\"u1\"",
+        context.data().nspaces.toString());
   }
 
   /** Test query. */
@@ -176,10 +199,9 @@ public final class NamespaceTest extends AdvancedQueryTest {
 
   /**
    * Detects corrupt namespace hierarchy.
-   * @throws Exception exception
    */
   @Test
-  public void copy2() throws Exception {
+  public void copy2() {
     create(4);
     query(
         "declare namespace a='aa';" +
@@ -189,10 +211,9 @@ public final class NamespaceTest extends AdvancedQueryTest {
 
   /**
    * Detects missing prefix declaration.
-   * @throws Exception exception
    */
   @Test
-  public void copy3() throws Exception {
+  public void copy3() {
     create(4);
     query(
         "declare namespace a='aa';" +
@@ -212,10 +233,9 @@ public final class NamespaceTest extends AdvancedQueryTest {
 
   /**
    * Detects bogus namespace after insert.
-   * @throws Exception exception
    */
   @Test
-  public void bogusDetector() throws Exception {
+  public void bogusDetector() {
     create(1);
     query(
         "insert node <a xmlns='test'><b><c/></b><d/></a> into doc('d1')/x",
@@ -243,41 +263,38 @@ public final class NamespaceTest extends AdvancedQueryTest {
 
   /**
    * Detects malformed namespace hierarchy.
-   * @throws Exception exception
    */
   @Test
-  public void nsHierarchy() throws Exception {
+  public void nsHierarchy() {
     create(9);
     query("insert node <f xmlns='F'/> into doc('d9')//*:e");
     assertEquals(NL +
-        "  Pre[1] xmlns=\"A\" " + NL +
-        "    Pre[4] xmlns=\"D\" " + NL +
-        "    Pre[6] xmlns=\"F\" ",
+        "  Pre[1] xmlns=\"A\"" + NL +
+        "    Pre[4] xmlns=\"D\"" + NL +
+        "    Pre[6] xmlns=\"F\"",
         context.data().nspaces.toString());
   }
 
   /**
    * Detects malformed namespace hierarchy.
-   * @throws Exception exception
    */
   @Test
-  public void nsHierarchy2() throws Exception {
+  public void nsHierarchy2() {
     create(10);
     query("insert node <f xmlns='F'/> into doc('d10')//*:e");
     assertEquals(NL +
-        "  Pre[1] xmlns=\"A\" " + NL +
-        "    Pre[4] xmlns=\"D\" " + NL +
-        "      Pre[5] xmlns=\"G\" " + NL +
-        "    Pre[7] xmlns=\"F\" ",
+        "  Pre[1] xmlns=\"A\"" + NL +
+        "    Pre[4] xmlns=\"D\"" + NL +
+        "      Pre[5] xmlns=\"G\"" + NL +
+        "    Pre[7] xmlns=\"F\"",
         context.data().nspaces.toString());
   }
 
   /**
    * Detects malformed namespace hierarchy inserting an element.
-   * @throws BaseXException exception
    */
   @Test
-  public void nsHierarchy3() throws BaseXException {
+  public void nsHierarchy3() {
     query(transform(
         "<a xmlns='x'/>",
         "insert node <a xmlns='y'/> into $input"),
@@ -287,19 +304,18 @@ public final class NamespaceTest extends AdvancedQueryTest {
     create(2);
     query("insert node <a xmlns='y'/> into doc('d2')//*:x");
     assertEquals(NL +
-        "  Pre[1] xmlns=\"xx\" " + NL +
-        "    Pre[2] xmlns=\"y\" ",
+        "  Pre[1] xmlns=\"xx\"" + NL +
+        "    Pre[2] xmlns=\"y\"",
         context.data().nspaces.toString());
   }
 
   /**
    * Detects malformed namespace hierarchy adding a document to an empty DB.
-   * @throws BaseXException exception
    */
   @Test
-  public void nsHierarchy4() throws BaseXException {
-    new CreateDB("d00x").execute(context);
-    new Add("x", "<A xmlns='A'><B/><C/></A>").execute(context);
+  public void nsHierarchy4() {
+    execute(new CreateDB("d00x"));
+    execute(new Add("x", "<A xmlns='A'><B/><C/></A>"));
     query("/", "<A xmlns='A'><B/><C/></A>");
   }
 
@@ -314,10 +330,9 @@ public final class NamespaceTest extends AdvancedQueryTest {
 
   /**
    * Test query.
-   * @throws Exception exception
    */
   @Test
-  public void insertD2intoD1() throws Exception {
+  public void insertD2intoD1() {
     create(1, 2);
     query(
         "insert node doc('d2') into doc('d1')/x",
@@ -327,10 +342,9 @@ public final class NamespaceTest extends AdvancedQueryTest {
 
   /**
    * Test query.
-   * @throws Exception exception
    */
   @Test
-  public void insertD3intoD1() throws Exception {
+  public void insertD3intoD1() {
     create(1, 3);
     query(
         "insert node doc('d3') into doc('d1')/x",
@@ -340,10 +354,9 @@ public final class NamespaceTest extends AdvancedQueryTest {
 
   /**
    * Test query.
-   * @throws Exception exception
    */
   @Test
-  public void insertD3intoD1b() throws Exception {
+  public void insertD3intoD1b() {
     create(1, 3);
     query(
         "insert node doc('d3') into doc('d1')/x",
@@ -353,10 +366,9 @@ public final class NamespaceTest extends AdvancedQueryTest {
 
   /**
    * Detects missing prefix declaration.
-   * @throws Exception exception
    */
   @Test
-  public void insertD4intoD1() throws Exception {
+  public void insertD4intoD1() {
     create(1, 4);
     query(
         "declare namespace a='aa'; insert node doc('d4')/a:x/a:y " +
@@ -370,10 +382,9 @@ public final class NamespaceTest extends AdvancedQueryTest {
    * insert.
    * Though result correct, prefix
    * a is declared twice. -> Solution?
-   * @throws Exception exception
    */
   @Test
-  public void insertD4intoD5() throws Exception {
+  public void insertD4intoD5() {
     create(4, 5);
     query(
         "declare namespace a='aa';insert node doc('d4')//a:y " +
@@ -384,10 +395,9 @@ public final class NamespaceTest extends AdvancedQueryTest {
 
   /**
    * Detects duplicate namespace declarations in MemData instance.
-   * @throws Exception exception
    */
   @Test
-  public void insertD7intoD1() throws Exception {
+  public void insertD7intoD1() {
     create(1, 7);
     query(
         "declare namespace x='xx';insert node doc('d7')/x:x into doc('d1')/x",
@@ -397,10 +407,9 @@ public final class NamespaceTest extends AdvancedQueryTest {
 
   /**
    * Detects general problems with namespace references.
-   * @throws Exception exception
    */
   @Test
-  public void insertD6intoD4() throws Exception {
+  public void insertD6intoD4() {
     create(4, 6);
     query(
         "declare namespace a='aa';insert node doc('d6') into doc('d4')/a:x",
@@ -444,10 +453,9 @@ public final class NamespaceTest extends AdvancedQueryTest {
 
   /**
    * Detects wrong namespace references.
-   * @throws Exception exception
    */
   @Test
-  public void uriStack() throws Exception {
+  public void uriStack() {
     create(8);
     query(
         "doc('d8')",
@@ -458,36 +466,33 @@ public final class NamespaceTest extends AdvancedQueryTest {
    * Deletes the document node and checks if namespace nodes of descendants
    * are deleted as well. F.i. adding a document via REST/PUT deletes a
    * document node if the given document/name is already stored in the target
-   * collection. If the test fails, this may lead to superfluous namespace
-   * nodes.
-   * @throws Exception exception
+   * collection. If the test fails, this may lead to superfluous namespace nodes.
+   * @throws IOException I/O exception
    */
   @Test
-  public void deleteDocumentNode() throws Exception {
+  public void deleteDocumentNode() throws IOException {
     create(2);
-    context.data().startUpdate();
+    context.data().startUpdate(context.options);
     context.data().delete(0);
-    context.data().finishUpdate();
-    final byte[] ns = context.data().nspaces.globalNS();
+    context.data().finishUpdate(context.options);
+    final byte[] ns = context.data().nspaces.globalUri();
     assertTrue(ns != null && ns.length == 0);
   }
 
   /**
    * Checks a path optimization fix.
-   * @throws BaseXException database exception
    */
   @Test
-  public void queryPathOpt() throws BaseXException {
+  public void queryPathOpt() {
     create(17);
     query("doc('d17')/descendant::*:b", "<b xmlns:ns='NS'/>");
   }
 
   /**
    * Checks a path optimization fix.
-   * @throws BaseXException database exception
    */
   @Test
-  public void queryPathOpt2() throws BaseXException {
+  public void queryPathOpt2() {
     create(17);
     query("doc('d17')/*:a/*:b", "<b xmlns:ns='NS'/>");
   }
@@ -495,10 +500,9 @@ public final class NamespaceTest extends AdvancedQueryTest {
   /**
    * GH-249: Inserts an element with a prefixed attribute and checks
    * if there are superfluous namespace declarations for the element.
-   * @throws BaseXException database exception
    */
   @Test
-  public void superfluousPrefixDeclaration() throws BaseXException {
+  public void superfluousPrefixDeclaration() {
     create(18);
     query(
       "declare namespace ns='ns'; " +
@@ -563,7 +567,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
       "copy $a := <a xmlns:p='A' a='v'/> " +
       "modify rename node $a/@a as QName('uri', 'p:a') " +
       "return $a",
-      Err.UPNSCONFL);
+      UPNSCONFL_X_X);
   }
 
   /**
@@ -590,7 +594,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
       "modify for $el in $a/descendant-or-self::element() return " +
       "rename node $el as QName('',local-name($el)) " +
       "return $a",
-      Err.UPNSCONFL);
+      UPNSCONFL_X_X);
   }
 
   /**
@@ -608,15 +612,14 @@ public final class NamespaceTest extends AdvancedQueryTest {
 
   /**
    * Checks duplicate namespace declarations.
-   * @throws BaseXException exception
    */
   @Test
-  public void avoidDuplicateNSDeclaration() throws BaseXException {
+  public void avoidDuplicateNSDeclaration() {
     create(19);
     query(
       "let $b := <a xmlns:x='X' x:id='0'/> " +
       "return insert node $b//@*:id into /*:n");
-    assertEquals(1, context.data().ns(1).size());
+    assertEquals(1, context.data().namespaces(1).size());
   }
 
   /** Handles duplicate prefixes. */
@@ -712,10 +715,10 @@ public final class NamespaceTest extends AdvancedQueryTest {
   @Test
   public void stripNS() throws Exception {
     final IO io = IO.get("<a xmlns:a='a'><b><c/><c/><c/></b></a>");
-    final ANode root = new DBNode(io, context.options);
-    final QueryProcessor qp = new QueryProcessor("/*:a/*:b", context).context(root);
-    final ANode sub = (ANode) qp.iter().next();
-    DataBuilder.stripNS(sub, token("a"), context);
+    try(final QueryProcessor qp = new QueryProcessor("/*:a/*:b", context).context(new DBNode(io))) {
+      final ANode sub = (ANode) qp.iter().next();
+      DataBuilder.stripNS(sub, token("a"), context);
+    }
   }
 
   /**
@@ -725,16 +728,17 @@ public final class NamespaceTest extends AdvancedQueryTest {
   @Test
   @Ignore
   public void xuty0004() {
-    try {
-      new QueryProcessor("declare variable $input-context external;" +
-          "let $source as node()* := (" +
-          "    <status>on leave</status>," +
-          "    <!-- for 6 months -->" +
-          "  )," +
-          "  $target := $input-context/works[1]/employee[1]" +
-          "return insert nodes $source into $target", context).execute();
+    final String query = "declare variable $input-context external;" +
+        "let $source as node()* := (" +
+        "    <status>on leave</status>," +
+        "    <!-- for 6 months -->" +
+        "  )," +
+        "  $target := $input-context/works[1]/employee[1]" +
+        "return insert nodes $source into $target";
+    try(final QueryProcessor qp = new QueryProcessor(query, context)) {
+      qp.value();
     } catch(final QueryException ex) {
-      assertEquals("XUTY0004", string(ex.qname().local()));
+      assertEquals("XUTY0004", ex.error().code);
     }
     fail("should throw XUTY0004");
   }
@@ -765,21 +769,18 @@ public final class NamespaceTest extends AdvancedQueryTest {
 
   /**
    * Checks if a query uses the outer default namespace.
-   * @throws Exception exception
    */
   @Test
-  @Ignore
-  public void defaultNS() throws Exception {
+  public void defaultNS() {
     create(1);
     query("<h xmlns='U'>{ doc('d1')/x }</h>/*", "");
   }
 
   /**
    * Test query.
-   * @throws Exception exception
    */
   @Test
-  public void precedingSiblingNsDecl() throws Exception {
+  public void precedingSiblingNsDecl() {
     create(20);
     query("//Q{A}a", "<x:a xmlns:x='A'><x:b xmlns:x='B'/><x:c/></x:a>");
     query("//Q{A}b", "");
@@ -791,14 +792,13 @@ public final class NamespaceTest extends AdvancedQueryTest {
 
   /**
    * Test query.
-   * @throws Exception exception
    */
   @Test
-  public void duplicateXMLNamespace() throws Exception {
+  public void duplicateXMLNamespace() {
     create(1);
     query("insert node attribute xml:space { 'preserve' } into /x", "");
     query(".", "<x xml:space='preserve'/>");
-    error("insert node attribute xml:space { 'preserve' } into /x", Err.UPATTDUPL);
+    error("insert node attribute xml:space { 'preserve' } into /x", UPATTDUPL_X);
   }
 
   /**
@@ -813,7 +813,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
     error("copy $c := <a xmlns='X'/> modify (" +
         "  rename node $c as QName('Y','b')," +
         "  insert node attribute c{'a'} into $c" +
-        ") return $c", Err.UPNSCONFL);
+        ") return $c", UPNSCONFL_X_X);
     query("copy $c := <a/> modify (" +
         "  rename node $c as QName('X','b')," +
         "  insert node attribute c{'a'} into $c" +
@@ -833,25 +833,21 @@ public final class NamespaceTest extends AdvancedQueryTest {
 
   /**
    * Creates the database context.
-   * @throws BaseXException database exception
    */
   @BeforeClass
-  public static void start() throws BaseXException {
+  public static void start() {
     // turn off pretty printing
-    final SerializerOptions sopts = new SerializerOptions();
-    sopts.set(SerializerOptions.INDENT, YesNo.NO);
-    new Set(MainOptions.SERIALIZER, sopts).execute(context);
+    set(MainOptions.SERIALIZER, SerializerMode.NOINDENT.get());
   }
 
   /**
    * Creates the specified test databases.
    * @param db database numbers
-   * @throws BaseXException database exception
    */
-  private static void create(final int... db) throws BaseXException {
+  private static void create(final int... db) {
     for(final int d : db) {
       final String[] doc = DOCS[d - 1];
-      new CreateDB(doc[0], doc[1]).execute(context);
+      execute(new CreateDB(doc[0], doc[1]));
     }
   }
 
@@ -872,16 +868,12 @@ public final class NamespaceTest extends AdvancedQueryTest {
    * @param expected expected output
    */
   private static void query(final String first, final String second, final String expected) {
-    try {
-      if(first != null) new XQuery(first).execute(context);
-      final String result = new XQuery(second).execute(context).trim();
+    if(first != null) Sandbox.query(first);
+    final String result = Sandbox.query(second).trim();
 
-      // quotes are replaced by apostrophes to simplify comparison
-      final String res = result.replaceAll("\"", "'");
-      final String exp = expected.replaceAll("\"", "'");
-      if(!exp.equals(res)) fail("\n[E] " + exp + "\n[F] " + res);
-    } catch(final BaseXException ex) {
-      fail(Util.message(ex));
-    }
+    // quotes are replaced by apostrophes to simplify comparison
+    final String res = result.replaceAll("\"", "'");
+    final String exp = expected.replaceAll("\"", "'");
+    if(!exp.equals(res)) fail("\n[E] " + exp + "\n[F] " + res);
   }
 }

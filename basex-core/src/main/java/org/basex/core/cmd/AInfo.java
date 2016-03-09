@@ -3,22 +3,23 @@ package org.basex.core.cmd;
 import static org.basex.core.Text.*;
 
 import org.basex.core.*;
+import org.basex.core.users.*;
 import org.basex.util.*;
 
 /**
  * Abstract class for database info.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 abstract class AInfo extends Command {
   /**
    * Protected constructor.
-   * @param d requires opened database
-   * @param a arguments
+   * @param openDB requires opened database
+   * @param args arguments
    */
-  AInfo(final boolean d, final String... a) {
-    super(Perm.READ, d, a);
+  AInfo(final boolean openDB, final String... args) {
+    super(Perm.READ, openDB, args);
   }
 
   /**

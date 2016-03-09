@@ -1,12 +1,12 @@
 package org.basex.gui.view.map;
 
-import org.basex.data.*;
 import org.basex.gui.view.*;
+import org.basex.query.util.ft.*;
 
 /**
  * View rectangle.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class MapRect extends ViewRect implements Comparable<MapRect> {

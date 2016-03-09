@@ -5,13 +5,15 @@ import static org.basex.core.Text.*;
 import java.io.*;
 
 import org.basex.core.*;
+import org.basex.core.locks.*;
+import org.basex.core.users.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
 
 /**
  * Evaluates the 'info' command and returns general database information.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Info extends AInfo {
@@ -42,15 +44,16 @@ public final class Info extends AInfo {
     final TokenBuilder tb = new TokenBuilder();
     tb.add(GENERAL_INFO + COL + NL);
     info(tb, VERSINFO, Prop.VERSION);
-    if(context.user.has(Perm.CREATE)) {
-      Performance.gc(1);
-      info(tb, USED_MEM, Performance.getMemory());
-    }
-    if(context.user.has(Perm.ADMIN)) {
-      final GlobalOptions gopts = context.globalopts;
+
+    final User user = context.user();
+    info(tb, USED_MEM, Performance.getMemory());
+
+    if(user.has(Perm.ADMIN)) {
+      final StaticOptions sopts = context.soptions;
       tb.add(NL + GLOBAL_OPTIONS + COL + NL);
-      for(final Option<?> o : gopts) info(tb, o.name(), gopts.get(o));
+      for(final Option<?> o : sopts) info(tb, o.name(), sopts.get(o));
     }
+
     final MainOptions opts = context.options;
     tb.add(NL + LOCAL_OPTIONS + NL);
     for(final Option<?> o : opts) info(tb, o.name(), opts.get(o));

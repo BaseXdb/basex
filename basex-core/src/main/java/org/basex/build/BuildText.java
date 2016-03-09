@@ -5,18 +5,18 @@ import static org.basex.util.Token.*;
 /**
  * This interface organizes textual information for the builder package.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public interface BuildText {
   /** Builder error. */
-  String LIMITNS = "%: Too many different namespaces (limit: %).";
+  String LIMITNS = "%: Too many distinct namespaces (limit: %).";
   /** Builder error. */
   String LIMITRANGE = "%: Input is too large for a single database.";
   /** Builder error. */
-  String LIMITELEMS = "%: Too many different element names (limit: %).";
+  String LIMITELEMS = "%: Too many distinct element names (limit: %).";
   /** Builder error. */
-  String LIMITATTS = "%: Too many different attribute names (limit: %).";
+  String LIMITATTS = "%: Too many distinct attribute names (limit: %).";
   /** Builder error. */
   String WHICHNS = "%: Undeclared namespace prefix '%'.";
 
@@ -194,10 +194,10 @@ public interface BuildText {
 
     /**
      * Enumeration constructor.
-     * @param s string representation
+     * @param string string representation
      */
-    Type(final String s) {
-      string = s;
+    Type(final String string) {
+      this.string = string;
     }
   }
 }

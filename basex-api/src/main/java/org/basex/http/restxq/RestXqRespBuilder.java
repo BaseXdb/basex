@@ -4,18 +4,18 @@ import static org.basex.http.restxq.RestXqText.*;
 import static org.basex.util.Token.*;
 
 import org.basex.http.*;
-import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.util.http.*;
 
 /**
  * This class holds information on a custom RESTXQ response.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class RestXqRespBuilder {
@@ -67,12 +67,12 @@ final class RestXqRespBuilder {
             final byte[] nam = c.attribute(Q_NAME);
             final byte[] val = c.attribute(Q_VALUE);
             if(nam != null && val != null) {
-              final String key = string(nam);
-              final String value = string(val);
-              if(key.equals(MimeTypes.CONTENT_TYPE)) {
+              final String key = string(nam), value = string(val);
+              if(key.equalsIgnoreCase(HttpText.CONTENT_TYPE)) {
                 cType = value;
               } else {
-                http.res.setHeader(key, value);
+                http.res.setHeader(key, key.equalsIgnoreCase(HttpText.LOCATION) ?
+                  http.resolve(value) : value);
               }
             }
           } else {
@@ -81,8 +81,7 @@ final class RestXqRespBuilder {
         }
       } else if(OUTPUT_SERIAL.eq(n)) {
         // parse output:serialization-parameters
-        sp = FuncOptions.serializer(n, func.function.info);
-        FuncOptions.serializer(n, func.output, func.function.info);
+        sp = FuncOptions.serializer(n, func.output, func.function.info);
       } else {
         throw func.error(UNEXP_NODE, n);
       }
@@ -95,15 +94,15 @@ final class RestXqRespBuilder {
     Item item = iter.next();
     if(item == null) {
       error = true;
-    } else if(func.methods.size() == 1 && func.methods.contains(HTTPMethod.HEAD.name())) {
+    } else if(func.methods.size() == 1 && func.methods.contains(HttpMethod.HEAD.name())) {
       throw func.error(HEAD_METHOD);
     }
 
     // cache result
     http.sopts(sp);
     http.initResponse();
-    final Serializer ser = Serializer.get(cache, sp);
-    for(; item != null; item = iter.next()) ser.serialize(item);
-    ser.close();
+    try(final Serializer ser = Serializer.get(cache, sp)) {
+      for(; item != null; item = iter.next()) ser.serialize(item);
+    }
   }
 }

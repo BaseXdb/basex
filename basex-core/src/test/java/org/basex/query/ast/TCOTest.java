@@ -9,10 +9,10 @@ import org.junit.*;
 /**
  * Tests for proper tail-calls.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
-public class TCOTest extends QueryPlanTest {
+public final class TCOTest extends QueryPlanTest {
   /** Checks if tail-call optimization was applied. */
   @Test
   public void facTest() {
@@ -143,8 +143,8 @@ public class TCOTest extends QueryPlanTest {
   @Test
   public void tailCallInTry() {
     check(
-        "declare option db:INLINELIMIT \"-1\";" +
-        "declare option db:TAILCALLS \"0\";" +
+        "declare option db:inlinelimit \"-1\";" +
+        "declare option db:tailcalls \"0\";" +
         "declare function local:foo() { try { local:bar() } catch * { 42 } };" +
         "declare function local:bar() { error() };" +
         "local:foo()",

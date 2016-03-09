@@ -8,7 +8,7 @@ import org.basex.gui.layout.*;
 /**
  * Editor preferences.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class DialogEditorPrefs extends BaseXBack {
@@ -30,10 +30,14 @@ final class DialogEditorPrefs extends BaseXBack {
   private final BaseXCheckBox markline;
   /** Save before executing file. */
   private final BaseXCheckBox saverun;
+  /** Parse project files. */
+  private final BaseXCheckBox parseproj;
   /** Automatically add characters. */
   private final BaseXCheckBox auto;
   /** Default file filter. */
   private final BaseXTextField files;
+  /** Show hidden files. */
+  private final BaseXCheckBox showHidden;
 
   /**
    * Default constructor.
@@ -52,10 +56,12 @@ final class DialogEditorPrefs extends BaseXBack {
     indent = new BaseXTextField(GUIOptions.INDENT, gopts, d);
     auto = new BaseXCheckBox(AUTO_ADD_CHARS, GUIOptions.AUTO, gopts, d);
     saverun = new BaseXCheckBox(SAVE_BEFORE_EXECUTE, GUIOptions.SAVERUN, gopts, d);
+    parseproj = new BaseXCheckBox(PARSE_PROJECT_FILES, GUIOptions.PARSEPROJ, gopts, d);
     files = new BaseXTextField(GUIOptions.FILES, gopts, d);
-    BaseXLayout.setWidth(margin, 30);
-    BaseXLayout.setWidth(indent, 30);
-    BaseXLayout.setWidth(files, 150);
+    showHidden = new BaseXCheckBox(SHOW_HIDDEN_FILES, GUIOptions.HIDDENFILES, gopts, d);
+    margin.setColumns(4);
+    indent.setColumns(3);
+    files.setColumns(18);
 
     BaseXBack p = new BaseXBack().layout(new TableLayout(8, 1));
     p.add(new BaseXLabel(VIEW + COL, true, true));
@@ -71,7 +77,7 @@ final class DialogEditorPrefs extends BaseXBack {
     p.add(files);
     add(p);
 
-    final BaseXBack pv = new BaseXBack().layout(new TableLayout(2, 1, 0, 8));
+    final BaseXBack pv = new BaseXBack().layout(new TableLayout(3, 1, 0, 8));
     p = new BaseXBack().layout(new TableLayout(4, 1));
     p.add(new BaseXLabel(EDIT + COL, true, true));
     pp = new BaseXBack().layout(new TableLayout(1, 2, 8, 0));
@@ -82,17 +88,24 @@ final class DialogEditorPrefs extends BaseXBack {
     p.add(auto);
     pv.add(p);
 
-    p = new BaseXBack().layout(new TableLayout(2, 1));
+    p = new BaseXBack().layout(new TableLayout(3, 1));
     p.add(new BaseXLabel(EVALUATING + COL, true, true));
     p.add(saverun);
+    p.add(parseproj);
+    pv.add(p);
+
+    p = new BaseXBack().layout(new TableLayout(2, 1));
+    p.add(new BaseXLabel(PROJECT + COL, true, true));
+    p.add(showHidden);
     pv.add(p);
     add(pv);
   }
 
   /**
    * Reacts on user input.
+   * @return success flag
    */
-  void action() {
+  boolean action() {
     margin.setEnabled(showmargin.isSelected());
     indent.setEnabled(spaces.isSelected());
     showmargin.assign();
@@ -101,10 +114,12 @@ final class DialogEditorPrefs extends BaseXBack {
     numbers.assign();
     markline.assign();
     files.assign();
-    margin.assign();
     spaces.assign();
-    indent.assign();
     auto.assign();
     saverun.assign();
+    parseproj.assign();
+    showHidden.assign();
+    // no short-circuiting, do all checks...
+    return margin.assign() & indent.assign();
   }
 }

@@ -13,7 +13,7 @@ import org.basex.util.hash.*;
 /**
  * Pragma extension.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public final class Extension extends Single {
@@ -41,11 +41,16 @@ public final class Extension extends Single {
     try {
       for(final Pragma p : pragmas) p.init(qc, info);
       expr = expr.compile(qc, scp);
-      type = expr.type();
-      size = expr.size();
     } finally {
       for(final Pragma p : pragmas) p.finish(qc);
     }
+    return optimize(qc, scp);
+  }
+
+  @Override
+  public Expr optimize(final QueryContext qc, final VarScope scp) {
+    seqType = expr.seqType();
+    size = expr.size();
     return this;
   }
 
@@ -67,7 +72,8 @@ public final class Extension extends Single {
   @Override
   public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
     final Pragma[] prag = pragmas.clone();
-    for(int i = 0; i < prag.length; i++) prag[i] = prag[i].copy();
+    final int pl = prag.length;
+    for(int p = 0; p < pl; p++) prag[p] = prag[p].copy();
     return copyType(new Extension(info, prag, expr.copy(qc, scp, vs)));
   }
 
@@ -77,9 +83,15 @@ public final class Extension extends Single {
   }
 
   @Override
+  public boolean has(final Flag flag) {
+    for(final Pragma p : pragmas) if(p.has(flag)) return true;
+    return super.has(flag);
+  }
+
+  @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     for(final Pragma p : pragmas) sb.append(p).append(' ');
-    return sb.append(BRACE1 + ' ').append(expr).append(' ').append(BRACE2).toString();
+    return sb.append(CURLY1 + ' ').append(expr).append(' ').append(CURLY2).toString();
   }
 }

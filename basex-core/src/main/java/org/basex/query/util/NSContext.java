@@ -1,7 +1,7 @@
 package org.basex.query.util;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
-import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import org.basex.query.*;
@@ -10,12 +10,12 @@ import org.basex.util.*;
 /**
  * This class references all statically known namespaces.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class NSContext {
   /** Static namespaces, containing prefixes and URIs. */
-  private final Atts ns = new Atts();
+  public final Atts ns = new Atts();
   /** Dynamically added namespaces. */
   private Atts stack;
 
@@ -27,9 +27,9 @@ public final class NSContext {
    * @throws QueryException query exception
    */
   public void add(final byte[] pref, final byte[] uri, final InputInfo ii) throws QueryException {
-    if(eq(pref, XML, XMLNS)) throw BINDXML.get(ii, pref);
-    if(eq(uri, XMLURI)) throw BINDXMLURI.get(ii, uri, XML);
-    if(eq(uri, XMLNSURI)) throw BINDXMLURI.get(ii, uri, XMLNS);
+    if(eq(pref, XML, XMLNS)) throw BINDXML_X.get(ii, pref);
+    if(eq(uri, XML_URI)) throw BINDXMLURI_X_X.get(ii, uri, XML);
+    if(eq(uri, XMLNS_URI)) throw BINDXMLURI_X_X.get(ii, uri, XMLNS);
     ns.add(pref, uri);
   }
 
@@ -44,7 +44,7 @@ public final class NSContext {
   }
 
   /**
-   * Finds the namespace URI for the specified prefix, if it is found
+   * Finds the namespace URI for the specified prefix if it is found
    * in statically declared namespaces.
    * @param pref prefix of the namespace
    * @return uri or {@code null}
@@ -57,8 +57,8 @@ public final class NSContext {
   }
 
   /**
-   * Returns the namespace URI for the specified prefix, if it is either
-   * found in the dynamic, static or predefined namespaces.
+   * Returns the namespace URI for the specified prefix if it is either found in the dynamic,
+   * static or predefined namespaces.
    * @param pref prefix of the namespace
    * @return namespace URI or {@code null}
    */
@@ -68,8 +68,8 @@ public final class NSContext {
         if(eq(stack.name(s), pref)) return stack.value(s);
       }
     }
-    final byte[] uri = staticURI(pref);
-    return uri == null ? NSGlobal.uri(pref) : uri.length == 0 ? null : uri;
+    final byte[] u = staticURI(pref);
+    return u == null ? pref.length == 0 ? null : NSGlobal.uri(pref) : u.length == 0 ? null : u;
   }
 
   /**
@@ -101,8 +101,21 @@ public final class NSContext {
    * Returns the namespace stack.
    * @return stack
    */
-  private Atts stack() {
+  public Atts stack() {
     if(stack == null) stack = new Atts();
     return stack;
+  }
+
+  /**
+   * Adds the namespaces that are currently in scope.
+   * @param atts namespaces
+   */
+  public void inScope(final Atts atts) {
+    if(stack != null) {
+      for(int s = stack.size() - 1; s >= 0; s--) {
+        final byte[] nm = stack.name(s);
+        if(!atts.contains(nm)) atts.add(nm, stack.value(s));
+      }
+    }
   }
 }

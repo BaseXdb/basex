@@ -1,16 +1,16 @@
 package org.basex.query.value.item;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
-import org.basex.query.util.*;
+import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
  * Base64 item ({@code xs:base64Binary}).
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public class B64 extends Bin {
@@ -51,13 +51,20 @@ public class B64 extends Bin {
 
   @Override
   public byte[] string(final InputInfo ii) throws QueryException {
-    return Base64.encode(binary(ii));
+    return org.basex.util.Base64.encode(binary(ii));
   }
 
   @Override
-  public final boolean eq(final Item it, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  public final boolean eq(final Item it, final Collation coll, final StaticContext sc,
+      final InputInfo ii) throws QueryException {
     return Token.eq(binary(ii), it instanceof Bin ? ((Bin) it).binary(ii) :
+      decode(it.string(ii), ii));
+  }
+
+  @Override
+  public final int diff(final Item it, final Collation coll, final InputInfo ii)
+      throws QueryException {
+    return Token.diff(binary(ii), it instanceof Bin ? ((Bin) it).binary(ii) :
       decode(it.string(ii), ii));
   }
 
@@ -70,15 +77,14 @@ public class B64 extends Bin {
    */
   private static byte[] decode(final byte[] d, final InputInfo ii) throws QueryException {
     try {
-      return Base64.decode(d);
+      return org.basex.util.Base64.decode(d);
     } catch(final IllegalArgumentException ex) {
-      final String chars = ex.getMessage().replaceAll("^.*?: |\\.$", "");
-      throw FUNCAST.get(ii, AtomType.B64, chars);
+      throw funCastError(ii, AtomType.B64, ex.getMessage().replaceAll("^.*?: |\\.$", ""));
     }
   }
 
   @Override
   public String toString() {
-    return Util.info("\"%\"", Base64.encode(data));
+    return Util.info("\"%\"", org.basex.util.Base64.encode(data));
   }
 }

@@ -6,19 +6,17 @@ import static org.junit.Assert.*;
 import java.nio.charset.*;
 
 import org.basex.*;
-import org.basex.core.*;
-import org.basex.core.cmd.*;
 import org.junit.Test;
 
 /**
  * This class tests String <-> Token conversions.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public final class UTF8Test extends SandboxTest {
   /** UTF8 character set. */
-  private static final Charset CS_UTF8 = Charset.availableCharsets().get(UTF8);
+  private static final Charset CS_UTF8 = Charset.availableCharsets().get(Strings.UTF8);
 
   /**
    * Tests for all valid code points if characters are properly converted.
@@ -45,12 +43,11 @@ public final class UTF8Test extends SandboxTest {
 
   /**
    * Tests entity parsing with codepoints.
-   * @throws BaseXException database exception
    */
   @Test
-  public void entities() throws BaseXException {
+  public void entities() {
     for(int i = 0xA0; i <= Character.MAX_CODE_POINT; i++) {
-      final String qu = new XQuery("'&#" + i + ";'").execute(context);
+      final String qu = query("'&#" + i + ";'");
       assertEquals(new String(Character.toChars(i)), qu);
       if(i == 0x400) i = 0xFFF;
       else if(i == 0x1400) i = 0xFFFF;

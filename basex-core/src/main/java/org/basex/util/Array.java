@@ -5,9 +5,9 @@ import java.util.*;
 import org.basex.util.list.*;
 
 /**
- * Convenience methods for handling arrays; serves as an extension to Java's {@link Arrays} class.
+ * Convenience functions for handling arrays; serves as an extension to Java's {@link Arrays} class.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Array {
@@ -132,8 +132,8 @@ public final class Array {
   }
 
   /**
-   * Sorts the specified tokens and returns an integer array with offsets to the sorted tokens.
-   * @param values values to sort by
+   * Sorts the specified tokens and returns an array with offsets to the sorted array.
+   * @param values values to sort by (will be sorted as well)
    * @param numeric numeric sort
    * @param ascending ascending
    * @return array containing the order
@@ -142,31 +142,43 @@ public final class Array {
       final boolean ascending) {
     final IntList il = number(values.length);
     il.sort(values, numeric, ascending);
-    return il.toArray();
+    return il.finish();
   }
 
   /**
-   * Sorts the specified doubles and returns an integer array with offsets to the sorted doubles.
-   * @param values values to sort by
+   * Sorts the specified double values and returns an array with offsets to the sorted array.
+   * @param values values to sort by (will be sorted as well)
    * @param ascending ascending
    * @return array containing the order
    */
   public static int[] createOrder(final double[] values, final boolean ascending) {
     final IntList il = number(values.length);
     il.sort(values, ascending);
-    return il.toArray();
+    return il.finish();
   }
 
   /**
-   * Sorts the specified integers and returns an integer array with offsets to the sorted integers.
-   * @param values values to sort by
+   * Sorts the specified int values and returns an array with offsets to the sorted array.
+   * @param values values to sort by (will be sorted as well)
    * @param ascending ascending
    * @return array containing the order
    */
   public static int[] createOrder(final int[] values, final boolean ascending) {
     final IntList il = number(values.length);
     il.sort(values, ascending);
-    return il.toArray();
+    return il.finish();
+  }
+
+  /**
+   * Sorts the specified long values and returns an array with offsets to the sorted array.
+   * @param values values to sort by (will be sorted as well)
+   * @param ascending ascending
+   * @return array containing the order
+   */
+  public static int[] createOrder(final long[] values, final boolean ascending) {
+    final IntList il = number(values.length);
+    il.sort(values, ascending);
+    return il.finish();
   }
 
   /**
@@ -174,7 +186,7 @@ public final class Array {
    * @param size array size
    * @return number list
    */
-  private static IntList number(final int size) {
+  public static IntList number(final int size) {
     final int[] tmp = new int[size];
     for(int i = 0; i < size; ++i) tmp[i] = i;
     return new IntList(tmp);
@@ -226,8 +238,7 @@ public final class Array {
   }
 
   /**
-   * Returns a value for a new array size, which will always be larger than
-   * the specified value.
+   * Returns a value for a new array size, which will always be larger than the specified value.
    * @param old old size
    * @param factor resize factor; must be larger than or equal to 1
    * @return resulting size

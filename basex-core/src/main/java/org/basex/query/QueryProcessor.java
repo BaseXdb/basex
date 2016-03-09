@@ -1,28 +1,28 @@
 package org.basex.query;
 
 import static org.basex.core.Text.*;
-import static org.basex.query.util.Err.*;
 
 import java.io.*;
 import java.util.regex.*;
 
 import org.basex.core.*;
-import org.basex.core.Context;
-import org.basex.data.*;
+import org.basex.core.locks.*;
 import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 
 /**
- * This class is an entry point for evaluating XQuery implementations.
+ * This class is an entry point for evaluating XQuery strings.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public final class QueryProcessor extends Proc {
+public final class QueryProcessor extends Proc implements Closeable {
   /** Pattern for detecting library modules. */
   private static final Pattern LIBMOD_PATTERN = Pattern.compile(
   "^(xquery( version ['\"].*?['\"])?( encoding ['\"].*?['\"])? ?; ?)?module namespace.*");
@@ -35,8 +35,6 @@ public final class QueryProcessor extends Proc {
   private final String query;
   /** Parsed flag. */
   private boolean parsed;
-  /** Compilation flag. */
-  private boolean compiled;
 
   /**
    * Default constructor.
@@ -46,7 +44,7 @@ public final class QueryProcessor extends Proc {
   public QueryProcessor(final String query, final Context ctx) {
     this.query = query;
     qc = proc(new QueryContext(ctx));
-    sc = new StaticContext(ctx);
+    sc = new StaticContext(qc);
   }
 
   /**
@@ -55,9 +53,12 @@ public final class QueryProcessor extends Proc {
    */
   public void parse() throws QueryException {
     if(parsed) return;
-    parsed = true;
-    qc.parseMain(query, null, sc);
-    updating = qc.updating;
+    try {
+      qc.parseMain(query, null, sc);
+    } finally {
+      parsed = true;
+      updating = qc.updating;
+    }
   }
 
   /**
@@ -65,57 +66,69 @@ public final class QueryProcessor extends Proc {
    * @throws QueryException query exception
    */
   public void compile() throws QueryException {
-    if(compiled) return;
-    compiled = true;
     parse();
     qc.compile();
   }
 
   /**
-   * Returns a result iterator.
+   * Returns a memory-efficient result iterator. In most cases, the query will only be fully
+   * evaluated if all items of this iterator are requested.
    * @return result iterator
    * @throws QueryException query exception
    */
   public Iter iter() throws QueryException {
-    compile();
+    parse();
     return qc.iter();
   }
 
   /**
-   * Returns a result value.
+   * Deprecated; use {@link #value} instead.
+   * @return result value
+   * @throws QueryException query exception
+   */
+  @Deprecated
+  public Value execute() throws QueryException {
+    return value();
+  }
+
+  /**
+   * Evaluates the query and returns the resulting value.
    * @return result value
    * @throws QueryException query exception
    */
   public Value value() throws QueryException {
-    compile();
+    parse();
     return qc.iter().value();
   }
 
   /**
-   * Evaluates the specified query and returns the result.
+   * This function is called by the GUI; use {@link #iter()} or {@link #value()} instead.
+   * Caches and returns the result of the specified query. If all nodes are of the same database
+   * instance, the returned value will be of type {@link DBNodes}.
+   * @param max maximum number of results to cache (negative: return all values)
    * @return result of query
    * @throws QueryException query exception
    */
-  public Result execute() throws QueryException {
-    compile();
-    return qc.execute();
+  public Value cache(final int max) throws QueryException {
+    parse();
+    return qc.cache(max);
   }
 
   /**
-   * Binds a value with the specified data type to a global variable.
+   * Binds a value with the specified type to a global variable.
    * If the value is an {@link Expr} instance, it is directly assigned.
    * Otherwise, it is first cast to the appropriate XQuery type. If {@code "json"}
-   * is specified as data type, the value is interpreted according to the rules
+   * is specified as type, the value is interpreted according to the rules
    * specified in {@link JsonMapConverter}.
    * @param name name of variable
    * @param value value to be bound
-   * @param type data type (may be {@code null})
+   * @param type type (may be {@code null})
    * @return self reference
    * @throws QueryException query exception
    */
   public QueryProcessor bind(final String name, final Object value, final String type)
       throws QueryException {
-    qc.bind(name, value, type);
+    qc.bind(name, value, type, sc);
     return this;
   }
 
@@ -131,13 +144,35 @@ public final class QueryProcessor extends Proc {
   }
 
   /**
-   * Binds a value to the context item.
+   * Binds an XQuery value to a global variable.
+   * @param name name of variable
+   * @param value value to be bound
+   * @return self reference
+   * @throws QueryException query exception
+   */
+  public QueryProcessor bind(final String name, final Value value) throws QueryException {
+    qc.bind(name, value, sc);
+    return this;
+  }
+
+  /**
+   * Binds the context value.
    * @param value value to be bound
    * @return self reference
    * @throws QueryException query exception
    */
   public QueryProcessor context(final Object value) throws QueryException {
     return context(value, null);
+  }
+
+  /**
+   * Binds the context value.
+   * @param value XQuery value to be bound
+   * @return self reference
+   */
+  public QueryProcessor context(final Value value) {
+    qc.context(value, sc);
+    return this;
   }
 
   /**
@@ -151,25 +186,15 @@ public final class QueryProcessor extends Proc {
   }
 
   /**
-   * Binds a value with the specified data type to the context item,
+   * Binds the context value with a specified type,
    * using the same rules as for {@link #bind binding variables}.
    * @param value value to be bound
-   * @param type data type (may be {@code null})
+   * @param type type (may be {@code null})
    * @return self reference
    * @throws QueryException query exception
    */
   public QueryProcessor context(final Object value, final String type) throws QueryException {
     qc.context(value, type, sc);
-    return this;
-  }
-
-  /**
-   * Binds an initial nodeset to the context item.
-   * @param nodes node set
-   * @return self reference
-   */
-  public QueryProcessor context(final Nodes nodes) {
-    qc.nodes = nodes;
     return this;
   }
 
@@ -188,6 +213,16 @@ public final class QueryProcessor extends Proc {
   }
 
   /**
+   * Assigns a URI resolver.
+   * @param resolver resolver
+   * @return self reference
+   */
+  public QueryProcessor uriResolver(final UriResolver resolver) {
+    sc.resolver = resolver;
+    return this;
+  }
+
+  /**
    * Returns a serializer for the given output stream.
    * Optional output declarations within the query will be included in the
    * serializer instance.
@@ -199,24 +234,10 @@ public final class QueryProcessor extends Proc {
   public Serializer getSerializer(final OutputStream os) throws IOException, QueryException {
     compile();
     try {
-      return Serializer.get(os, qc.serParams());
+      return Serializer.get(os, qc.serParams()).sc(sc);
     } catch(final QueryIOException ex) {
       throw ex.getCause();
     }
-  }
-
-  /**
-   * Evaluates the specified query and returns the result nodes.
-   * @return result nodes
-   * @throws QueryException query exception
-   */
-  public Nodes queryNodes() throws QueryException {
-    final Result res = execute();
-    if(res instanceof Nodes) return (Nodes) res;
-    // throw error
-    if(res.size() != 0) throw BXDB_DBRETURN.get(null);
-    // return empty result set
-    return new Nodes(qc.nodes.data);
   }
 
   /**
@@ -236,9 +257,7 @@ public final class QueryProcessor extends Proc {
     return query;
   }
 
-  /**
-   * Closes the processor.
-   */
+  @Override
   public void close() {
     qc.close();
   }
@@ -253,7 +272,7 @@ public final class QueryProcessor extends Proc {
    * @return number of updates
    */
   public int updates() {
-    return updating ? qc.resources.updates().size() : 0;
+    return updating ? qc.updates().size() : 0;
   }
 
   /**
@@ -313,9 +332,7 @@ public final class QueryProcessor extends Proc {
    * @return root node
    */
   public FDoc plan() {
-    final FDoc doc = new FDoc();
-    qc.plan(doc);
-    return doc;
+    return new FDoc().add(qc.plan());
   }
 
   @Override

@@ -5,7 +5,7 @@ import static javax.servlet.http.HttpServletResponse.*;
 /**
  * Enumeration with HTTP codes and error messages.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public enum HTTPCode {
@@ -18,8 +18,8 @@ public enum HTTPCode {
   ONEOP(SC_BAD_REQUEST, "Only one operation can be specified."),
   /** Error 400, "Unknown parameter: '%'". */
   UNKNOWN_PARAM_X(SC_BAD_REQUEST, "Unknown parameter: '%'."),
-  /** Error 400, "Multiple context items specified.". */
-  MULTIPLE_CONTEXT_X(SC_BAD_REQUEST, "Multiple context items specified."),
+  /** Error 400, "Multiple context values specified.". */
+  MULTIPLE_CONTEXT_X(SC_BAD_REQUEST, "Multiple context values specified."),
 
   /** Error: 404 (not found). */
   NOT_FOUND_X(SC_NOT_FOUND, "%"),
@@ -27,6 +27,8 @@ public enum HTTPCode {
   NO_PATH(SC_NOT_FOUND, "No path specified."),
   /** Error: 404, "No function found to process the request.". */
   NO_XQUERY(SC_NOT_FOUND, "No function found that matches the request."),
+  /** Error: 404, "RESTXQ directory not found.". */
+  NO_RESTXQ(SC_NOT_FOUND, "RESTXQ directory not found."),
 
   /** Error 501, "Method not supported: %.". */
   NOT_IMPLEMENTED_X(SC_NOT_IMPLEMENTED, "Method not supported: %.");
@@ -38,12 +40,12 @@ public enum HTTPCode {
 
   /**
    * Constructor.
-   * @param c status code
-   * @param d description
+   * @param code status code
+   * @param desc description
    */
-  HTTPCode(final int c, final String d) {
-    code = c;
-    desc = d;
+  HTTPCode(final int code, final String desc) {
+    this.code = code;
+    this.desc = desc;
   }
 
   /**

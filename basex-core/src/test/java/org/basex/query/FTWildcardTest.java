@@ -3,13 +3,13 @@ package org.basex.query;
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 
-import org.basex.query.ft.*;
+import org.basex.query.expr.ft.*;
 import org.junit.*;
 
 /**
  * Wild-card parsing and matching tests.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Dimitar Popov
  */
 public final class FTWildcardTest {
@@ -68,7 +68,8 @@ public final class FTWildcardTest {
    */
   @Test
   public void testMatch() {
-    for(int i = 0; i < VALIDWC.length; i++) {
+    final int vl = VALIDWC.length;
+    for(int i = 0; i < vl; i++) {
       final String q = VALIDWC[i];
       final FTWildcard wc = new FTWildcard(token(q));
       assertTrue(wc.parse());

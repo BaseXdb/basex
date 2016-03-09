@@ -9,20 +9,18 @@ import java.util.*;
 import java.util.List;
 
 import javax.swing.*;
-import javax.swing.border.*;
 
 import org.basex.core.cmd.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.io.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
  * List of filtered file entries.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class ProjectList extends JList<String> {
@@ -34,7 +32,7 @@ final class ProjectList extends JList<String> {
     new GUIPopupCmd(OPEN, BaseXKeys.ENTER) {
       @Override public void execute() { open(); }
     },
-    new GUIPopupCmd(OPEN_EXTERNALLY, BaseXKeys.OPEN) {
+    new GUIPopupCmd(OPEN_EXTERNALLY, BaseXKeys.SHIFT_ENTER) {
       @Override public void execute() { openExternal(); }
     }, null,
     new GUIPopupCmd(RUN_TESTS, BaseXKeys.UNIT) {
@@ -43,10 +41,10 @@ final class ProjectList extends JList<String> {
     }, null,
     new GUIPopupCmd(REFRESH, BaseXKeys.REFRESH) {
       @Override public void execute() { project.refresh(); }
-    },
+    }, null,
     new GUIPopupCmd(COPY_PATH, BaseXKeys.COPYPATH) {
       @Override public void execute() {
-        if(enabled(null)) BaseXLayout.copy(selectedValue());
+        BaseXLayout.copy(selectedValue());
       }
       @Override public boolean enabled(final GUI main) { return selectedValue() != null; }
     }
@@ -55,15 +53,15 @@ final class ProjectList extends JList<String> {
   /** Project view. */
   private final ProjectView project;
   /** Content search string. */
-  private String search;
+  private String search = "";
 
   /**
    * Constructor.
-   * @param view project view
+   * @param project project view
    */
-  ProjectList(final ProjectView view) {
-    project = view;
-    setBorder(new EmptyBorder(4, 4, 4, 4));
+  ProjectList(final ProjectView project) {
+    this.project = project;
+    setBorder(BaseXLayout.border(4, 4, 4, 4));
     setCellRenderer(new CellRenderer());
     addMouseListener(new MouseAdapter() {
       @Override
@@ -71,40 +69,33 @@ final class ProjectList extends JList<String> {
         if(SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) open();
       }
     });
-    new BaseXPopup(this, view.gui, commands);
+    new BaseXPopup(this, project.gui, commands);
   }
 
   /**
    * Assigns the specified list entries and selects the first entry.
-   * @param elements result elements
+   * @param list result elements
    * @param srch content search string
    */
-  void setElements(final TokenSet elements, final String srch) {
-    SwingUtilities.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        // set new values and selections
-        final int is = elements.size();
-        final String[] list = new String[is];
-        for(int i = 0; i < is; i++) list[i] = Token.string(elements.key(i + 1));
-        if(changed(list)) {
-          // check which old values had been selected
-          final List<String> vals = getSelectedValuesList();
-          final IntList il = new IntList();
-          for(final String val : vals) {
-            for(int i = 0; i < is; i++) {
-              if(val.equals(elements.key(i + 1))) {
-                il.add(i);
-                break;
-              }
-            }
+  void setElements(final String[] list, final String srch) {
+    // set new values and selections
+    if(changed(list)) {
+      // check which old values had been selected
+      final List<String> values = getSelectedValuesList();
+      final IntList il = new IntList();
+      for(final String value : values) {
+        final int is = list.length;
+        for(int i = 0; i < is; i++) {
+          if(value.equals(list[i])) {
+            il.add(i);
+            break;
           }
-          setListData(list);
-          setSelectedIndices(il.toArray());
         }
-        search = srch;
       }
-    });
+      setListData(list);
+      setSelectedIndices(il.finish());
+    }
+    search = srch;
   }
 
   /**
@@ -151,7 +142,7 @@ final class ProjectList extends JList<String> {
   }
 
   /** List cell renderer. */
-  class CellRenderer extends DefaultListCellRenderer {
+  private class CellRenderer extends DefaultListCellRenderer {
     /** Label. */
     private final BaseXLabel label;
     /** Current file. */
@@ -172,14 +163,17 @@ final class ProjectList extends JList<String> {
           int x = (int) label.getPreferredSize().getWidth() + 2;
 
           final String s = file.name();
-          g.setColor(label.getForeground());
+          g.setColor(GUIConstants.TEXT);
           g.drawString(s, x, y);
           x += fm.stringWidth(s);
 
           final String[] names = file.file().getParent().split("/|\\\\");
-          final StringBuilder sb = new StringBuilder(" ");
-          for(int n = names.length - 1; n >= 0; n--) sb.append('/').append(names[n]);
-          g.setColor(GUIConstants.GRAY);
+          final StringBuilder sb = new StringBuilder(" \u00b7 ");
+          for(int n = names.length - 1; n >= 0; n--) {
+            sb.append(names[n]);
+            if(n > 0) sb.append("/");
+          }
+          g.setColor(GUIConstants.dgray);
           g.drawString(sb.toString(), x, y);
         }
       };
@@ -199,15 +193,15 @@ final class ProjectList extends JList<String> {
         label.setBackground(getSelectionBackground());
         label.setForeground(getSelectionForeground());
       } else {
-        label.setBackground(Color.WHITE);
-        label.setForeground(getForeground());
+        label.setBackground(GUIConstants.BACK);
+        label.setForeground(GUIConstants.TEXT);
       }
       return label;
     }
   }
 
   /**
-   * Returns a single selected node, or {@code null} if zero or more than node is selected.
+   * Returns a single selected node or {@code null} if zero or more than node is selected.
    * @return selected node
    */
   private String selectedValue() {
@@ -216,7 +210,7 @@ final class ProjectList extends JList<String> {
   }
 
   /**
-   * Returns a single selected node, or {@code null} if zero or more than node is selected.
+   * Returns a single selected node or {@code null} if zero or more than node is selected.
    * @return selected node
    */
   private IOFile[] selectedValues() {

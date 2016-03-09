@@ -8,7 +8,8 @@ import java.io.*;
 import java.nio.charset.*;
 import java.util.*;
 
-import org.basex.build.*;
+import org.basex.build.csv.*;
+import org.basex.build.json.*;
 import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Msg;
@@ -24,7 +25,7 @@ import org.basex.util.options.*;
 /**
  * Dialog window for changing some project's preferences.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class DialogExport extends BaseXDialog {
@@ -66,8 +67,7 @@ public final class DialogExport extends BaseXDialog {
     BaseXBack pp = new BaseXBack(new TableLayout(1, 2, 8, 0));
 
     path = new BaseXTextField(main.gopts.get(GUIOptions.INPUTPATH), this);
-    path.history(GUIOptions.INPUTS, this);
-    pp.add(path);
+    pp.add(path.history(GUIOptions.INPUTS, this));
 
     final BaseXButton browse = new BaseXButton(BROWSE_D, this);
     browse.addActionListener(new ActionListener() {
@@ -84,12 +84,13 @@ public final class DialogExport extends BaseXDialog {
     // method (ignore last entry)
     final StringList sl = new StringList();
     for(final SerialMethod sm : SerialMethod.values()) sl.add(sm.name());
-    sl.deleteAt(sl.size() - 1);
-    method = new BaseXCombo(this, sl.toArray());
-    method.setSelectedItem(sopts.get(SerializerOptions.METHOD).name());
+    sl.remove(sl.size() - 1);
+    method = new BaseXCombo(this, sl.finish());
+    final SerialMethod sm = sopts.get(SerializerOptions.METHOD);
+    method.setSelectedItem((sm == null ? SerialMethod.BASEX : sm).name());
 
     mparams = new BaseXTextField(this);
-    BaseXLayout.setWidth(mparams, BaseXTextField.DWIDTH * 2 / 3);
+    mparams.setColumns(24);
 
     final BaseXBack mth = new BaseXBack(new TableLayout(1, 2, 8, 0));
     mth.add(method);
@@ -106,7 +107,7 @@ public final class DialogExport extends BaseXDialog {
     encoding.setSelectedItem(f ? enc : sopts.get(SerializerOptions.ENCODING));
 
     params = new BaseXTextField(sopts.toString(), this);
-    params.setToolTipText(tooltip(Serializer.OPTIONS));
+    params.setToolTipText(tooltip(SerializerMode.DEFAULT.get()));
 
     pp = new BaseXBack(new TableLayout(3, 2, 16, 6)).border(8, 0, 8, 0);
     pp.add(new BaseXLabel(METHOD + COL, true, true));
@@ -129,7 +130,7 @@ public final class DialogExport extends BaseXDialog {
     set(pp, BorderLayout.SOUTH);
 
     action(method);
-    finish(null);
+    finish();
   }
 
   /**
@@ -141,7 +142,7 @@ public final class DialogExport extends BaseXDialog {
   static BaseXCombo encoding(final BaseXDialog dialog, final String encoding) {
     final BaseXCombo cb = new BaseXCombo(dialog, ENCODINGS);
     boolean f = false;
-    String enc = encoding == null ? Token.UTF8 : encoding;
+    String enc = encoding == null ? Strings.UTF8 : encoding;
     for(final String s : ENCODINGS) f |= s.equals(enc);
     if(!f) {
       enc = enc.toUpperCase(Locale.ENGLISH);
@@ -207,12 +208,10 @@ public final class DialogExport extends BaseXDialog {
 
   @Override
   public void close() {
-    if(!ok) return;
-
-    final SerialMethod mth = SerialMethod.valueOf(method.getSelectedItem());
     try {
-      gui.set(MainOptions.EXPORTER, options(mth));
+      gui.set(MainOptions.EXPORTER, options(SerialMethod.valueOf(method.getSelectedItem())));
     } catch(final BaseXException ex) { throw Util.notExpected(ex); }
+    if(!ok) return;
 
     super.close();
     path.store();
@@ -226,16 +225,16 @@ public final class DialogExport extends BaseXDialog {
    */
   private SerializerOptions options(final SerialMethod mth) throws BaseXException {
     final SerializerOptions sopts = new SerializerOptions();
-    sopts.parse(params.getText());
+    sopts.assign(params.getText());
     sopts.set(SerializerOptions.METHOD, SerialMethod.valueOf(method.getSelectedItem()));
     sopts.set(SerializerOptions.ENCODING, encoding.getSelectedItem());
     if(mth == SerialMethod.JSON) {
       final JsonSerialOptions jopts = new JsonSerialOptions();
-      jopts.parse(mparams.getText());
+      jopts.assign(mparams.getText());
       sopts.set(SerializerOptions.JSON, jopts);
     } else if(mth == SerialMethod.CSV) {
       final CsvOptions copts = new CsvOptions();
-      copts.parse(mparams.getText());
+      copts.assign(mparams.getText());
       sopts.set(SerializerOptions.CSV, copts);
     }
     return sopts;

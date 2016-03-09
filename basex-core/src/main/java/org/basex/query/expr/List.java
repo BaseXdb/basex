@@ -16,12 +16,12 @@ import org.basex.util.hash.*;
 /**
  * List of expressions that have been separated by commas.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class List extends Arr {
   /** Limit for the size of sequences that are materialized at compile time. */
-  private static final int MAX_MAT_SIZE = 1 << 20;
+  private static final int MAX_MAT_SIZE = 1 << 16;
   /**
    * Constructor.
    * @param info input info
@@ -45,12 +45,26 @@ public final class List extends Arr {
 
   @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+    // remove empty sequences
+    int p = 0;
+    for(final Expr expr : exprs) {
+      if(!expr.isEmpty()) exprs[p++] = expr;
+    }
+
+    if(p != exprs.length) {
+      qc.compInfo(OPTREMOVE_X_X, this, Empty.SEQ);
+      if(p < 2) return p == 0 ? Empty.SEQ : exprs[0];
+      final Expr[] es = new Expr[p];
+      System.arraycopy(exprs, 0, es, 0, p);
+      exprs = es;
+    }
+
     // compute number of results
     size = 0;
     boolean ne = false;
-    for(final Expr e : exprs) {
-      final long c = e.size();
-      ne |= c > 0 || e.type().occ.min == 1;
+    for(final Expr expr : exprs) {
+      final long c = expr.size();
+      ne |= c > 0 || expr.seqType().occ.min == 1;
       if(c == -1) {
         size = -1;
         break;
@@ -60,13 +74,12 @@ public final class List extends Arr {
     }
 
     if(size >= 0) {
-      if(size == 0 && !has(Flag.NDT) && !has(Flag.UPD)) return optPre(null, qc);
       if(allAreValues() && size <= MAX_MAT_SIZE) {
         Type all = null;
         final Value[] vs = new Value[exprs.length];
         int c = 0;
-        for(final Expr e : exprs) {
-          final Value v = e.value(qc);
+        for(final Expr expr : exprs) {
+          final Value v = expr.value(qc);
           if(c == 0) all = v.type;
           else if(all != v.type) all = null;
           vs[c++] = v;
@@ -83,7 +96,7 @@ public final class List extends Arr {
         else if(all != null && all.instanceOf(AtomType.ITR)) {
           val = IntSeq.get(vs, s, all);
         } else {
-          final ValueBuilder vb = new ValueBuilder(s);
+          final ValueBuilder vb = new ValueBuilder();
           for(int i = 0; i < c; i++) vb.add(vs[i]);
           val = vb.value();
         }
@@ -92,15 +105,15 @@ public final class List extends Arr {
     }
 
     if(size == 0) {
-      type = SeqType.EMP;
+      seqType = SeqType.EMP;
     } else {
       final Occ o = size == 1 ? Occ.ONE : size < 0 && !ne ? Occ.ZERO_MORE : Occ.ONE_MORE;
-      SeqType t = null;
-      for(final Expr e : exprs) {
-        final SeqType st = e.type();
-        if(!e.isEmpty() && st.occ != Occ.ZERO) t = t == null ? st : t.union(st);
+      SeqType st = null;
+      for(final Expr expr : exprs) {
+        final SeqType et = expr.seqType();
+        if(et.occ != Occ.ZERO) st = st == null ? et : st.union(et);
       }
-      type = SeqType.get(t == null ? AtomType.ITEM : t.type, o);
+      seqType = SeqType.get(st == null ? AtomType.ITEM : st.type, o);
     }
 
     return this;
@@ -129,8 +142,10 @@ public final class List extends Arr {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
+    // most common case
+    if(exprs.length == 2) return ValueBuilder.concat(qc.value(exprs[0]), qc.value(exprs[1]));
     final ValueBuilder vb = new ValueBuilder();
-    for(final Expr e : exprs) vb.add(qc.value(e));
+    for(final Expr expr : exprs) vb.add(qc.value(expr));
     return vb.value();
   }
 
@@ -141,7 +156,7 @@ public final class List extends Arr {
 
   @Override
   public boolean isVacuous() {
-    for(final Expr e : exprs) if(!e.isVacuous()) return false;
+    for(final Expr expr : exprs) if(!expr.isVacuous()) return false;
     return true;
   }
 

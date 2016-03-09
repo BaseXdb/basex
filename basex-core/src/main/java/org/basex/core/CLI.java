@@ -1,7 +1,6 @@
 package org.basex.core;
 
 import static org.basex.core.Text.*;
-import static org.basex.util.Token.*;
 
 import java.io.*;
 
@@ -14,7 +13,7 @@ import org.basex.util.*;
 /**
  * This is the abstract main class for the starter classes.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class CLI extends Main {
@@ -25,15 +24,13 @@ public abstract class CLI extends Main {
   protected OutputStream out = System.out;
   /** Verbose mode. */
   protected boolean verbose;
-  /** Separate serialized items with newlines. */
-  protected boolean newline;
 
   /** Password reader. */
-  private final PasswordReader pwReader = new PasswordReader() {
+  private static final PasswordReader PWREADER = new PasswordReader() {
     @Override
     public String password() {
       Util.out(PASSWORD + COLS);
-      return md5(Util.password());
+      return Util.password();
     }
   };
   /** Session. */
@@ -51,7 +48,7 @@ public abstract class CLI extends Main {
   /**
    * Constructor.
    * @param args command-line arguments
-   * @param ctx database context, or {@code null}
+   * @param ctx database context or {@code null}
    * @throws IOException I/O exception
    */
   protected CLI(final String[] args, final Context ctx) throws IOException {
@@ -74,7 +71,7 @@ public abstract class CLI extends Main {
    * @throws IOException database exception
    */
   protected final void execute(final String in) throws IOException {
-    execute(new CommandParser(in, context).pwReader(pwReader));
+    execute(new CommandParser(in, context).pwReader(PWREADER));
   }
 
   /**
@@ -104,7 +101,6 @@ public abstract class CLI extends Main {
   protected final void execute(final Command cmd, final boolean info) throws IOException {
     final Session ss = session();
     ss.execute(cmd);
-    if(newline && cmd instanceof XQuery) out.write(token(NL));
     if(info) Util.out(ss.info());
   }
 

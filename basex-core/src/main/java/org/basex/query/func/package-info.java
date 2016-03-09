@@ -1,6 +1,2 @@
-/**
- * <body>
- * XQuery functions.
- * </body>
- */
+/** XQuery functions. */
 package org.basex.query.func;

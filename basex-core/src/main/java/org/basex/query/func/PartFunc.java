@@ -1,12 +1,13 @@
 package org.basex.query.func;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 
 import java.util.*;
 
 import org.basex.query.*;
+import org.basex.query.ann.*;
 import org.basex.query.expr.*;
-import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -18,7 +19,7 @@ import org.basex.util.hash.*;
 /**
  * Partial function application.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public final class PartFunc extends Arr {
@@ -41,13 +42,7 @@ public final class PartFunc extends Arr {
     super(info, Array.add(args, expr));
     this.sc = sc;
     this.holes = holes;
-    type = SeqType.FUN_O;
-  }
-
-  @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    super.compile(qc, scp);
-    return optimize(qc, scp);
+    seqType = SeqType.FUN_O;
   }
 
   @Override
@@ -55,14 +50,16 @@ public final class PartFunc extends Arr {
     final Expr f = exprs[exprs.length - 1];
     if(allAreValues()) return preEval(qc);
 
-    final SeqType t = f.type();
-    if(t.instanceOf(SeqType.FUN_O) && t.type != FuncType.ANY_FUN) {
+    final SeqType t = f.seqType();
+    if(t.instanceOf(SeqType.FUN_O) && t.type != SeqType.ANY_FUN) {
       final FuncType ft = (FuncType) t.type;
-      final int arity = exprs.length + holes.length - 1;
-      if(ft.args.length != arity) throw INVARITY.get(info, f, arity);
-      final SeqType[] ar = new SeqType[holes.length];
-      for(int i = 0; i < holes.length; i++) ar[i] = ft.args[holes[i]];
-      type = FuncType.get(ft.ret, ar).seqType();
+      final int nargs = exprs.length + holes.length - 1;
+      if(ft.argTypes.length != nargs)
+        throw INVARITY_X_X_X_X.get(info, nargs, nargs == 1 ? "" : "s", ft.argTypes.length, f);
+      final SeqType[] args = new SeqType[holes.length];
+      final int hl = holes.length;
+      for(int h = 0; h < hl; h++) args[h] = ft.argTypes[holes[h]];
+      seqType = FuncType.get(ft.type, args).seqType();
     }
 
     return this;
@@ -70,29 +67,32 @@ public final class PartFunc extends Arr {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Expr fn = exprs[exprs.length - 1];
-    final FItem f = (FItem) checkType(fn.item(qc, ii), FuncType.ANY_FUN);
+    final FItem f = toFunc(exprs[exprs.length - 1], qc);
+
+    final int hl = holes.length;
+    final int nargs = exprs.length + hl - 1;
+    if(f.arity() != nargs)
+      throw INVARITY_X_X_X_X.get(info, nargs, nargs == 1 ? "" : "s", f.arity(), f);
+
     final FuncType ft = f.funcType();
-
-    final int arity = exprs.length + holes.length - 1;
-    if(f.arity() != arity) throw INVARITY.get(ii, f, arity);
-    final Expr[] args = new Expr[arity];
-
+    final Expr[] args = new Expr[nargs];
     final VarScope scp = new VarScope(sc);
-    final Var[] vars = new Var[holes.length];
-    int p = -1;
-    for(int i = 0; i < holes.length; i++) {
-      while(++p < holes[i]) args[p] = exprs[p - i].value(qc);
-      vars[i] = scp.newLocal(qc, f.argName(holes[i]), null, false);
-      args[p] = new VarRef(info, vars[i]);
-      vars[i].refineType(ft.args[p], qc, ii);
+    final Var[] vars = new Var[hl];
+    int a = -1;
+    for(int h = 0; h < hl; h++) {
+      while(++a < holes[h]) args[a] = exprs[a - h].value(qc);
+      vars[h] = scp.newLocal(qc, f.argName(holes[h]), null, false);
+      args[a] = new VarRef(info, vars[h]);
+      vars[h].refineType(ft.argTypes[a], qc, ii);
     }
-    while(++p < args.length) args[p] = exprs[p - holes.length].value(qc);
+    final int al = args.length;
+    while(++a < al) args[a] = exprs[a - hl].value(qc);
 
-    final Ann ann = f.annotations();
-    final FuncType tp = FuncType.get(ann, vars, ft.ret);
-    final DynFuncCall fc = new DynFuncCall(info, sc, ann.contains(Ann.Q_UPDATING), f, args);
-    return new FuncItem(sc, ann, null, vars, tp, fc, qc.value, qc.pos, qc.size, scp.stackSize());
+    final AnnList anns = f.annotations();
+    final FuncType tp = FuncType.get(anns, ft.type, vars);
+    final DynFuncCall fc = new DynFuncCall(info, sc, anns.contains(Annotation.UPDATING),
+        false, f, args);
+    return new FuncItem(sc, anns, null, vars, tp, fc, qc.value, qc.pos, qc.size, scp.stackSize());
   }
 
   @Override
@@ -126,6 +126,16 @@ public final class PartFunc extends Arr {
     plan.add(e);
   }
 
+  /**
+   * Returns the function annotations.
+   * @return annotations
+   */
+  public AnnList annotations() {
+    final Expr fn = exprs[exprs.length - 1];
+    if(!(fn instanceof FItem)) return null;
+    return ((FItem) fn).annotations();
+  }
+
   @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder(exprs[exprs.length - 1].toString()).add('(');
@@ -138,15 +148,5 @@ public final class PartFunc extends Arr {
     }
     while(++p < es + hs - 1) tb.add(QueryText.SEP).add(exprs[p - hs].toString());
     return tb.add(')').toString();
-  }
-
-  /**
-   * Returns the function annotations.
-   * @return annotations
-   */
-  public Ann annotations() {
-    final Expr fn = exprs[exprs.length - 1];
-    if(!(fn instanceof FItem)) return null;
-    return ((FItem) fn).annotations();
   }
 }

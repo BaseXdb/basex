@@ -17,72 +17,63 @@ import org.basex.util.list.*;
 /**
  * This class contains common methods for full-text index builders.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class FTBuilder extends IndexBuilder {
   /** Value trees. */
   private final FTIndexTrees tree;
   /** Word parser. */
-  private final FTLexer lex;
+  private final FTLexer lexer;
   /** Number of indexed tokens. */
   private long ntok;
 
   /**
    * Constructor.
-   * @param d data reference
+   * @param data data reference
    * @throws IOException IOException
    */
-  public FTBuilder(final Data d) throws IOException {
-    super(d, d.meta.options.get(MainOptions.FTINDEXSPLITSIZE));
-    tree = new FTIndexTrees(d.meta.maxlen);
+  public FTBuilder(final Data data) throws IOException {
+    super(data, IndexType.FULLTEXT);
+    final MetaData meta = data.meta;
+    tree = new FTIndexTrees(data.meta.maxlen);
 
-    final MainOptions opts = d.meta.options;
     final FTOpt fto = new FTOpt();
-    fto.set(FTFlag.DC, opts.get(MainOptions.DIACRITICS));
-    fto.set(FTFlag.ST, opts.get(MainOptions.STEMMING));
-    fto.cs = opts.get(MainOptions.CASESENS) ? FTCase.SENSITIVE : FTCase.INSENSITIVE;
-    fto.sw = new StopWords(d, opts.get(MainOptions.STOPWORDS));
-    fto.ln = Language.get(opts);
+    fto.set(FTFlag.DC, meta.diacritics);
+    fto.set(FTFlag.ST, meta.stemming);
+    fto.cs = meta.casesens ? FTCase.SENSITIVE : FTCase.INSENSITIVE;
+    fto.sw = new StopWords(data, meta.stopwords);
+    fto.ln = data.meta.language;
 
     if(!Tokenizer.supportFor(fto.ln))
       throw new BaseXException(NO_TOKENIZER_X, fto.ln);
-    if(opts.get(MainOptions.STEMMING) && !Stemmer.supportFor(fto.ln))
+    if(meta.stemming && !Stemmer.supportFor(fto.ln))
       throw new BaseXException(NO_STEMMER_X, fto.ln);
 
-    lex = new FTLexer(fto);
+    lexer = new FTLexer(fto);
   }
 
-  /**
-   * Extracts and indexes words from the specified data reference.
-   * @throws IOException I/O Exception
-   */
-  private void index() throws IOException {
-    // delete old index
-    abort();
-
-    final Performance perf = Prop.debug ? new Performance() : null;
+  @Override
+  public FTIndex build() throws IOException {
     Util.debug(det());
 
     for(pre = 0; pre < size; ++pre) {
-      if((pre & 0xFFFF) == 0) check();
+      if((pre & 0x0FFF) == 0) check();
+      if(!indexEntry()) continue;
 
-      final int k = data.kind(pre);
-      if(k != Data.TEXT) continue;
-
-      /* Current lexer position. */
-      final StopWords sw = lex.ftOpt().sw;
-      lex.init(data.text(pre, true));
+      // current lexer position
+      final StopWords sw = lexer.ftOpt().sw;
+      lexer.init(data.text(pre, true));
       int pos = -1;
-      while(lex.hasNext()) {
-        final byte[] tok = lex.nextToken();
+      while(lexer.hasNext()) {
+        final byte[] tok = lexer.nextToken();
         ++pos;
         // skip too long and stopword tokens
         if(tok.length <= data.meta.maxlen && (sw.isEmpty() || !sw.contains(tok))) {
           // check if main memory is exhausted
-          if((ntok++ & 0x0FFF) == 0 && split()) {
+          if((ntok++ & 0xFFFF) == 0 && splitRequired()) {
             writeIndex(true);
-            finishSplit();
+            clean();
           }
           tree.index(tok, pre, pos, splits);
           count++;
@@ -93,13 +84,7 @@ public final class FTBuilder extends IndexBuilder {
     // finalize partial or all index structures
     write(splits > 0);
 
-    data.meta.ftxtindex = true;
-    finishIndex(perf);
-  }
-
-  @Override
-  public FTIndex build() throws IOException {
-    index();
+    finishIndex();
     return new FTIndex(data);
   }
 
@@ -193,8 +178,7 @@ public final class FTBuilder extends IndexBuilder {
       final IntList ind = new IntList();
       tree.init();
       long dr = 0;
-      int tr = 0;
-      int j = 0;
+      int tr = 0, j = 0;
       while(tree.more(splits)) {
         final FTIndexTree t = tree.nextTree();
         t.next();
@@ -242,7 +226,8 @@ public final class FTBuilder extends IndexBuilder {
     tbo.add(new byte[4]);
     // merge full-text data of all sorted lists with the same token
     int s = 0;
-    for(int j = 0; j < il.size(); ++j) {
+    final int is = il.size();
+    for(int j = 0; j < is; ++j) {
       final int m = il.get(j);
       for(final int p : v[m].prv) tbp.add(Num.num(p));
       for(final int p : v[m].pov) tbo.add(Num.num(p));
@@ -276,10 +261,8 @@ public final class FTBuilder extends IndexBuilder {
     while(np < ns) {
       // full-text data is stored here, with -scoreU, pre1, pos1, ...,
       // -scoreU, preU, posU
-      for(final int l = np + Num.length(vpre, np); np < l; ++np)
-        out.write(vpre[np]);
-      for(final int l = pp + Num.length(vpos, pp); pp < l; ++pp)
-        out.write(vpos[pp]);
+      for(final int l = np + Num.length(vpre, np); np < l; ++np) out.write(vpre[np]);
+      for(final int l = pp + Num.length(vpos, pp); pp < l; ++pp) out.write(vpos[pp]);
     }
   }
 
@@ -295,12 +278,7 @@ public final class FTBuilder extends IndexBuilder {
 
   @Override
   protected void abort() {
+    // drop index files
     data.meta.drop(DATAFTX + ".*");
-    data.meta.ftxtindex = false;
-  }
-
-  @Override
-  protected String det() {
-    return INDEX_FULLTEXT_D;
   }
 }

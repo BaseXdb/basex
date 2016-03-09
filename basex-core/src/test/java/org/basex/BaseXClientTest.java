@@ -1,21 +1,21 @@
 package org.basex;
 
 import static org.junit.Assert.*;
-
 import java.io.*;
 
 import org.basex.core.*;
+import org.basex.core.users.*;
 import org.basex.io.out.*;
-import org.basex.util.*;
 import org.basex.util.list.*;
 import org.junit.*;
 
 /**
  * Tests the command-line arguments of the client starter class.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
+@Ignore
 public final class BaseXClientTest extends BaseXTest {
   @Override
   protected String run(final String... args) throws IOException {
@@ -57,7 +57,7 @@ public final class BaseXClientTest extends BaseXTest {
   public void user() throws IOException {
     run("-cexit", "-cdrop user " + NAME);
     equals("5", new String[] { "-U" + NAME, "-P" + NAME, "-q5" },
-        new String[] {  "-ccreate user " + NAME + ' ' + Token.md5(NAME) });
+        new String[] { "-ccreate user " + NAME + ' ' + NAME });
     run("-cexit", "-cdrop user " + NAME);
   }
 
@@ -82,17 +82,13 @@ public final class BaseXClientTest extends BaseXTest {
    */
   private static String run(final String[] args, final String[] sargs) throws IOException {
     final BaseXServer server = createServer(sargs);
-    final ArrayOutput ao = new ArrayOutput();
-    System.setOut(new PrintStream(ao));
-    System.setErr(NULL);
-
-    final StringList sl = new StringList();
-    sl.add("-p9999").add("-U" + Text.S_ADMIN).add("-P" + Text.S_ADMIN).add(args);
-    try {
-      new BaseXClient(sl.toArray());
+    final StringList sl = new StringList(
+        "-p" + DB_PORT, "-U" + UserText.ADMIN, "-P" + UserText.ADMIN).add(args);
+    try(final ArrayOutput ao = new ArrayOutput()) {
+      System.setOut(new PrintStream(ao));
+      new BaseXClient(sl.finish());
       return ao.toString();
     } finally {
-      System.setErr(ERR);
       stopServer(server);
     }
   }

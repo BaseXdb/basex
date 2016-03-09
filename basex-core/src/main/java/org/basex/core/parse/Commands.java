@@ -5,7 +5,7 @@ import static org.basex.core.Text.*;
 /**
  * This class defines the available command-line commands.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 @SuppressWarnings("all")
@@ -17,6 +17,8 @@ public interface Commands {
   String ADD = "add";
   /** Command string: "alter-db". */
   String ALTER_DB = "alter-db";
+  /** Command string: "alter-password". */
+  String ALTER_PASSWORD = "alter-password";
   /** Command string: "alter-user". */
   String ALTER_USER = "alter-user";
   /** Command string: "check". */
@@ -29,22 +31,16 @@ public interface Commands {
   String CREATE_BACKUP = "create-backup";
   /** Command string: "create-db". */
   String CREATE_DB = "create-db";
-  /** Command string: "create-event". */
-  String CREATE_EVENT = "create-event";
   /** Command string: "create-index". */
   String CREATE_INDEX = "create-index";
   /** Command string: "create-user". */
   String CREATE_USER = "create-user";
-  /** Command string: "cs". */
-  String CS = "cs";
   /** Command string: "delete". */
   String DELETE = "delete";
   /** Command string: "drop-backup". */
   String DROP_BACKUP = "drop-backup";
   /** Command string: "drop-db". */
   String DROP_DB = "drop-db";
-  /** Command string: "drop-event". */
-  String DROP_EVENT = "drop-event";
   /** Command string: "drop-index". */
   String DROP_INDEX = "drop-index";
   /** Command string: "drop-user". */
@@ -85,6 +81,8 @@ public interface Commands {
   String OPTIMIZE_ALL = "optimize-all";
   /** Command string: "password". */
   String PASSWORD = "password";
+  /** Command string: "quit". */
+  String QUIT = "quit";
   /** Command string: "rename". */
   String RENAME = "rename";
   /** Command string: "replace". */
@@ -107,8 +105,6 @@ public interface Commands {
   String SET = "set";
   /** Command string: "show-backups". */
   String SHOW_BACKUPS = "show-backups";
-  /** Command string: "show-events". */
-  String SHOW_EVENTS = "show-events";
   /** Command string: "show-sessions". */
   String SHOW_SESSIONS = "show-sessions";
   /** Command string: "show-users". */
@@ -124,6 +120,8 @@ public interface Commands {
   String PATH = "path";
   /** Command attribute: "name". */
   String NAME = "name";
+  /** Command attribute: "pattern". */
+  String PATTERN = "pattern";
   /** Command attribute: "newname". */
   String NEWNAME = "newname";
   /** Command attribute: "input". */
@@ -132,6 +130,10 @@ public interface Commands {
   String QUERY = "query";
   /** Command attribute: "type". */
   String TYPE = "type";
+  /** Command attribute: "start". */
+  String START = "start";
+  /** Command attribute: "end". */
+  String END = "end";
   /** Command attribute: "database". */
   String DATABASE = "database";
   /** Command attribute: "option". */
@@ -150,46 +152,46 @@ public interface Commands {
   String COMMAND = "command";
 
   /** Create commands. */
-  enum CmdCreate { DATABASE, DB, INDEX, USER, BACKUP, EVENT }
+  enum CmdCreate { DATABASE, DB, INDEX, USER, BACKUP }
   /** Info commands. */
   enum CmdInfo { NULL, DATABASE, DB, INDEX, STORAGE }
   /** Drop commands. */
-  enum CmdDrop { DATABASE, DB, INDEX, USER, BACKUP, EVENT }
+  enum CmdDrop { DATABASE, DB, INDEX, USER, BACKUP }
   /** Optimize commands. */
   enum CmdOptimize { NULL, ALL }
   /** Show commands. */
-  enum CmdShow { SESSIONS, USERS, BACKUPS, EVENTS }
+  enum CmdShow { SESSIONS, USERS, BACKUPS }
   /** Permission commands. */
   enum CmdPerm { NONE, READ, WRITE, CREATE, ADMIN }
   /** Index types. */
-  enum CmdIndex { TEXT, ATTRIBUTE, FULLTEXT }
+  enum CmdIndex { TEXT, ATTRIBUTE, TOKEN, FULLTEXT }
   /** Index types. */
-  enum CmdIndexInfo { NULL, TEXT, ATTRIBUTE, FULLTEXT, PATH, TAG, ATTNAME }
+  enum CmdIndexInfo { NULL, TEXT, ATTRIBUTE, TOKEN, FULLTEXT, PATH, ELEMNAME, ATTRNAME }
   /** Alter types. */
-  enum CmdAlter { DATABASE, DB, USER }
+  enum CmdAlter { DATABASE, DB, PASSWORD, USER }
   /** Repo types. */
   enum CmdRepo { INSTALL, DELETE, LIST }
 
   /** Command definitions. */
   enum Cmd {
     ADD(HELPADD), ALTER(HELPALTER), CHECK(HELPCHECK), CLOSE(HELPCLOSE), COPY(HELPCOPY),
-    CREATE(HELPCREATE), CS(HELPCS), DELETE(HELPDELETE), DROP(HELPDROP), EXIT(HELPEXIT),
+    CREATE(HELPCREATE), DELETE(HELPDELETE), DROP(HELPDROP), EXIT(HELPEXIT),
     EXPORT(HELPEXPORT), FIND(HELPFIND), FLUSH(HELPFLUSH), GET(HELPGET), GRANT(HELPGRANT),
     HELP(HELPHELP), INFO(HELPINFO), INSPECT(HELPINSPECT), KILL(HELPKILL), LIST(HELPLIST),
-    OPEN(HELPOPEN), OPTIMIZE(HELPOPTIMIZE), PASSWORD(HELPPASSWORD), RENAME(HELPRENAME),
-    REPLACE(HELPREPLACE), REPO(HELPREPO), RESTORE(HELPRESTORE), RETRIEVE(HELPRETRIEVE),
-    RUN(HELPRUN), EXECUTE(HELPEXECUTE), SET(HELPSET), SHOW(HELPSHOW), STORE(HELPSTORE),
-    TEST(HELPTEST), XQUERY(HELPXQUERY);
+    OPEN(HELPOPEN), OPTIMIZE(HELPOPTIMIZE), PASSWORD(HELPPASSWORD), QUIT(HELPEXIT),
+    RENAME(HELPRENAME), REPLACE(HELPREPLACE), REPO(HELPREPO), RESTORE(HELPRESTORE),
+    RETRIEVE(HELPRETRIEVE), RUN(HELPRUN), EXECUTE(HELPEXECUTE), SET(HELPSET),
+    SHOW(HELPSHOW), STORE(HELPSTORE), TEST(HELPTEST), XQUERY(HELPXQUERY);
 
     /** Help texts. */
     private final String[] help;
 
     /**
      * Default constructor.
-     * @param h help texts, or {@code null} if command is hidden.
+     * @param help help texts or {@code null} if command is hidden.
      */
-    Cmd(final String... h) {
-      help = h;
+    Cmd(final String... help) {
+      this.help = help;
     }
 
     /**

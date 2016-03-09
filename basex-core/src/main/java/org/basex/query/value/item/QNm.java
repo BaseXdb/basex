@@ -1,12 +1,16 @@
 package org.basex.query.value.item;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
+
+import java.util.regex.*;
 
 import javax.xml.namespace.*;
 
 import org.basex.query.*;
 import org.basex.query.util.*;
+import org.basex.query.util.collation.*;
+import org.basex.query.util.hash.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -14,12 +18,15 @@ import org.basex.util.list.*;
 /**
  * QName item ({@code xs:QName}).
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class QNm extends Item {
+  /** URL pattern (matching Clark and EQName notation). */
+  public static final Pattern EQNAME = Pattern.compile("^Q?\\{(.*?)\\}(.+)$");
+
   /** Singleton instance. */
-  private static final QNmCache CACHE = new QNmCache();
+  private static final QNmMap CACHE = new QNmMap();
 
   /** Namespace URI. */
   private byte[] uri;
@@ -103,11 +110,53 @@ public final class QNm extends Item {
   }
 
   /**
+   * Resolves a QName string.
+   * @param name name to resolve
+   * @param sc static context (can be {@code null})
+   * @return string
+   * @throws QueryException query exception
+   */
+  public static QNm resolve(final byte[] name, final StaticContext sc) throws QueryException {
+    return resolve(name, null, sc, null);
+  }
+
+  /**
+   * Resolves a QName string.
+   * @param name name to resolve
+   * @param def default namespace (can be {@code null})
+   * @param sc static context (can be {@code null})
+   * @param info input info
+   * @return string
+   * @throws QueryException query exception
+   */
+  public static QNm resolve(final byte[] name, final byte[] def, final StaticContext sc,
+      final InputInfo info) throws QueryException {
+
+    // check for namespace declaration
+    final Matcher m = EQNAME.matcher(Token.string(name));
+    byte[] uri = null, nm = name;
+    if(m.find()) {
+      uri = token(m.group(1));
+      nm = token(m.group(2));
+    } else {
+      final int i = indexOf(nm, ':');
+      if(i == -1) {
+        uri = def;
+      } else {
+        if(sc != null) uri = sc.ns.uri(substring(nm, 0, i));
+        if(uri == null) throw NOURI_X.get(info, name);
+      }
+    }
+    if(!XMLToken.isQName(nm)) throw BINDNAME_X.get(info, name);
+    return new QNm(nm, uri);
+  }
+
+  /**
    * Sets the URI of this QName.
-   * @param u the uri to be set
+   * @param u the uri to be set (can be {@code null}, or an empty or non-empty string)
    */
   public void uri(final byte[] u) {
-    uri = u == null ? null : norm(u);
+    uri = u == null ? null : normalize(u);
   }
 
   /**
@@ -140,10 +189,19 @@ public final class QNm extends Item {
   }
 
   @Override
-  public boolean eq(final Item it, final Collation coll, final InputInfo ii)
-      throws QueryException {
-    if(it instanceof QNm) return eq((QNm) it);
-    throw INVTYPECMP.get(ii, it.type, type);
+  public boolean eq(final Item item, final Collation coll, final StaticContext sc,
+      final InputInfo ii) throws QueryException {
+
+    final QNm nm;
+    if(item instanceof QNm) {
+      nm = (QNm) item;
+    } else if(item.type.isUntyped() && sc != null) {
+      nm = new QNm(item.string(ii), sc);
+      if(!nm.hasURI() && nm.hasPrefix()) throw NSDECL_X.get(ii, nm.string());
+    } else {
+      throw diffError(ii, this, item);
+    }
+    return eq(nm);
   }
 
   /**
@@ -211,16 +269,24 @@ public final class QNm extends Item {
 
   /**
    * Returns a unique representation of the QName.
+   * @return unique representation
+   */
+  public byte[] prefixId() {
+    return prefixId(null);
+  }
+
+  /**
+   * Returns a unique representation of the QName.
    * <ul>
    *   <li> Skips the prefix if the namespace of the QName equals the specified one.</li>
    *   <li> Uses a prefix if its namespace URI is statically known.</li>
    *   <li> Otherwise, {@link #id()} is called.</li>
    * </ul>
-   * @param ns default uri (optional)
+   * @param ns default uri (can be {@code null})
    * @return unique representation
    */
   public byte[] prefixId(final byte[] ns) {
-    if(Token.eq(uri(), ns)) return local();
+    if(ns != null && Token.eq(uri(), ns)) return local();
     final byte[] p = NSGlobal.prefix(uri());
     return p.length == 0 ? id() : concat(p, token(":"), local());
   }
@@ -237,17 +303,12 @@ public final class QNm extends Item {
 
   @Override
   public byte[] xdmInfo() {
-    return new ByteList().add(typeId().bytes()).add(uri()).add(0).toArray();
-  }
-
-  @Override
-  public String toString() {
-    return Token.string(id());
+    return new ByteList().add(typeId().asByte()).add(uri()).add(0).finish();
   }
 
   @Override
   public boolean equals(final Object obj) {
-    return obj.getClass() == QNm.class && eq((QNm) obj);
+    return obj instanceof QNm && eq((QNm) obj);
   }
 
   @Override
@@ -300,8 +361,8 @@ public final class QNm extends Item {
    * @param uri namespace uri
    * @return instance
    */
-  public static QNm get(final String prefix, final String local, final byte[] uri) {
-    return CACHE.index(token(prefix), token(local), uri);
+  public static QNm get(final byte[] prefix, final String local, final byte[] uri) {
+    return CACHE.index(prefix, token(local), uri);
   }
 
   /**
@@ -329,8 +390,8 @@ public final class QNm extends Item {
   /**
    * Constructs an internal string representation for the components of a QName.
    * @param prefix prefix
-   * @param local name
-   * @param uri uri
+   * @param local name (can be {@code null})
+   * @param uri uri (can be {@code null})
    * @return EQName representation
    */
   public static byte[] internal(final byte[] prefix, final byte[] local, final byte[] uri) {
@@ -357,5 +418,10 @@ public final class QNm extends Item {
     }
     System.arraycopy(local, 0, key, i, local.length);
     return key;
+  }
+
+  @Override
+  public String toString() {
+    return Token.string(id());
   }
 }

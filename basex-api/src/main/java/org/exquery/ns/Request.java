@@ -7,7 +7,6 @@ import javax.servlet.http.*;
 
 import org.basex.http.*;
 import org.basex.query.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -17,7 +16,7 @@ import org.basex.util.list.*;
 /**
  * This module contains functions for handling servlet requests.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Request extends QueryModule {
@@ -153,7 +152,7 @@ public final class Request extends QueryModule {
       final HTTPParams params = context().params;
       final TokenSet cache = new TokenSet();
       for(final String name : params.query().keySet()) cache.add(name);
-      for(final String name : params.form().keySet()) cache.add(name);
+      for(final String name : params.form(queryContext.context.options).keySet()) cache.add(name);
       final TokenList names = new TokenList(cache.size());
       for(final byte[] name : cache) names.add(name);
       return StrSeq.get(names);
@@ -186,7 +185,7 @@ public final class Request extends QueryModule {
       final String name = key.toJava();
       final HTTPParams params = context().params;
       final Value query = params.query().get(name);
-      final Value form = params.form().get(name);
+      final Value form = params.form(queryContext.context.options).get(name);
       if(query == null && form == null) return def;
       if(query == null) return form;
       if(form == null) return query;

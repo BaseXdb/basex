@@ -4,21 +4,18 @@ import static org.junit.Assert.*;
 
 import java.util.*;
 
-import org.basex.core.*;
+import org.basex.*;
 import org.junit.*;
 
 /**
  * Runs parallel queries.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public final class ParallelQueryTest {
+public final class ParallelQueryTest extends SandboxTest {
   /** Query. */
   private static final String QUERY = "count((for $i in 1 to 50000 return <a><b/></a>)/b)";
-
-  /** Context. */
-  private final Context context = new Context();
   /** Error. */
   private Throwable error;
   /** Reference result. */
@@ -31,7 +28,7 @@ public final class ParallelQueryTest {
   @Test
   public void test() throws Throwable {
     // generate reference result
-    result = query();
+    result = query(QUERY);
     // generate results to be compared
     final ArrayList<Query> queries = new ArrayList<>();
     for(int i = 0; i < 10; i++) queries.add(new Query());
@@ -41,22 +38,13 @@ public final class ParallelQueryTest {
   }
 
   /**
-   * Runs a single query.
-   * @return result
-   * @throws QueryException exception
-   */
-  private String query() throws QueryException {
-    return new QueryProcessor(QUERY, context).value().toString();
-  }
-
-  /**
    * Query instance.
    */
   private class Query extends Thread {
     @Override
     public void run() {
       try {
-        assertEquals(result, query());
+        assertEquals(result, query(QUERY));
       } catch(final Throwable th) {
         error = th;
       }

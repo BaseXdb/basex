@@ -1,29 +1,28 @@
 package org.basex.query.value.item;
 
-import static java.lang.Double.*;
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 
 import java.math.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.util.*;
+import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
  * Double item ({@code xs:double}).
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Dbl extends ANum {
   /** Value "NaN". */
-  public static final Dbl NAN = new Dbl(NaN);
+  public static final Dbl NAN = new Dbl(Double.NaN);
   /** Value "0". */
-  private static final Dbl ZERO = new Dbl(0);
+  public static final Dbl ZERO = new Dbl(0);
   /** Value "1". */
-  private static final Dbl ONE = new Dbl(1);
+  public static final Dbl ONE = new Dbl(1);
   /** Data. */
   private final double value;
 
@@ -42,8 +41,8 @@ public final class Dbl extends ANum {
    * @return instance
    */
   public static Dbl get(final double value) {
-    return value == 0 && doubleToRawLongBits(value) == 0 ? ZERO : value == 1 ? ONE :
-      isNaN(value) ? NAN : new Dbl(value);
+    return value == 0 && Double.doubleToRawLongBits(value) == 0 ? ZERO : value == 1 ? ONE :
+      Double.isNaN(value) ? NAN : new Dbl(value);
   }
 
   /**
@@ -58,13 +57,13 @@ public final class Dbl extends ANum {
   }
 
   @Override
-  public byte[] string() {
+  protected byte[] string() {
     return Token.token(value);
   }
 
   @Override
   public boolean bool(final InputInfo ii) {
-    return !isNaN(value) && value != 0;
+    return !Double.isNaN(value) && value != 0;
   }
 
   @Override
@@ -84,21 +83,74 @@ public final class Dbl extends ANum {
 
   @Override
   public BigDecimal dec(final InputInfo ii) throws QueryException {
-    return Dec.parse(value, ii);
+    if(Double.isNaN(value) || Double.isInfinite(value))
+     throw valueError(ii, AtomType.DEC, string());
+    return new BigDecimal(value);
   }
 
   @Override
-  public boolean eq(final Item it, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  public Dbl abs() {
+    return value > 0d || 1 / value > 0 ? this : get(-value);
+  }
+
+  @Override
+  public Dbl ceiling() {
+    final double d = Math.ceil(value);
+    return d == value ? this : get(d);
+  }
+
+  @Override
+  public Dbl floor() {
+    final double d = Math.floor(value);
+    return d == value ? this : get(d);
+  }
+
+  @Override
+  public Dbl round(final int scale, final boolean even) {
+    final double v = rnd(scale, even);
+    return v == value ? this : get(v);
+  }
+
+  /**
+   * Returns a rounded value.
+   * @param s scale
+   * @param e half-to-even flag
+   * @return result
+   */
+  private double rnd(final int s, final boolean e) {
+    double v = value;
+    if(v == 0 || Double.isNaN(v) || Double.isInfinite(v) || s > 322) return v;
+    if(s < -308) return 0;
+    if(!e && s == 0) {
+      if(v >= -.5 && v < .0) return -.0;
+      if(v > Long.MIN_VALUE && v < Long.MAX_VALUE) return Math.round(v);
+    }
+
+    final boolean n = v < 0;
+    final double f = StrictMath.pow(10, s + 1);
+    v = (n ? -v : v) * f;
+    if(Double.isInfinite(v)) {
+      final RoundingMode m = e ? RoundingMode.HALF_EVEN : RoundingMode.HALF_UP;
+      v = new BigDecimal(value).setScale(s, m).doubleValue();
+    } else {
+      final double r = v % 10;
+      v += r < 5 ? -r : (e ? r > 5 : r >= 5) ? 10 - r : e ? v % 20 == 15 ? 5 : -5 : 0;
+      v /= f;
+      if(n) v = -v;
+    }
+    return v;
+  }
+
+  @Override
+  public boolean eq(final Item it, final Collation coll, final StaticContext sc,
+      final InputInfo ii) throws QueryException {
     return value == it.dbl(ii);
   }
 
   @Override
-  public int diff(final Item it, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  public int diff(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
     final double n = it.dbl(ii);
-    if(isNaN(n) || isNaN(value)) return UNDEF;
-    return value < n ? -1 : value > n ? 1 : 0;
+    return Double.isNaN(n) || Double.isNaN(value) ? UNDEF : value < n ? -1 : value > n ? 1 : 0;
   }
 
   @Override
@@ -119,12 +171,12 @@ public final class Dbl extends ANum {
    * @throws QueryException query exception
    */
   public static double parse(final byte[] value, final InputInfo ii) throws QueryException {
-    try {
-      return parseDouble(Token.string(value));
-    } catch(final NumberFormatException ex) {
-      if(Token.eq(Token.trim(value), Token.INF)) return POSITIVE_INFINITY;
-      if(Token.eq(Token.trim(value), Token.NINF)) return NEGATIVE_INFINITY;
-      throw FUNCAST.get(ii, ZERO.type, chop(value));
-    }
+    final double d = Token.toDouble(value);
+    if(!Double.isNaN(d)) return d;
+    final byte[] v = Token.trim(value);
+    if(Token.eq(v, Token.NAN)) return Double.NaN;
+    if(Token.eq(v, Token.INF)) return Double.POSITIVE_INFINITY;
+    if(Token.eq(v, Token.NINF)) return Double.NEGATIVE_INFINITY;
+    throw funCastError(ii, AtomType.DBL, value);
   }
 }

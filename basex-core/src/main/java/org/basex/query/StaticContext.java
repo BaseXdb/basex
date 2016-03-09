@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.util.*;
+import org.basex.query.util.collation.*;
 import org.basex.query.util.format.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -15,7 +16,7 @@ import org.basex.util.hash.*;
 /**
  * This class contains the static context of an expression.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class StaticContext {
@@ -26,41 +27,41 @@ public final class StaticContext {
   /** Mix updates flag. */
   public final boolean mixUpdates;
 
-  /** Default collation (default collection ({@link QueryText#COLLATIONURI}): {@code null}). */
+  /** Default collation (default collection ({@link QueryText#COLLATION_URI}): {@code null}). */
   public Collation collation;
   /** Default element/type namespace. */
   public byte[] elemNS;
   /** Default function namespace. */
-  public byte[] funcNS = FNURI;
-  /** Context item static type. */
-  public SeqType initType;
+  public byte[] funcNS = FN_URI;
+  /** Expression contains dynamic function call. */
+  public boolean dynFuncCall;
+  /** Static type of context value. */
+  SeqType contextType;
 
   /** Construction mode. */
-  public boolean strip;
+  boolean strip;
   /** Ordering mode. */
-  public boolean ordered;
+  boolean ordered;
   /** Default order for empty sequences. */
-  public boolean orderGreatest;
+  boolean orderGreatest;
   /** Boundary-space policy. */
-  public boolean spaces;
+  boolean spaces;
   /** Copy-namespaces mode: (no-)preserve. */
-  public boolean preserveNS = true;
+  boolean preserveNS = true;
   /** Copy-namespaces mode: (no-)inherit. */
-  public boolean inheritNS = true;
+  boolean inheritNS = true;
 
-  /** XQuery version flag. */
-  private boolean xquery3;
   /** Static Base URI. */
   private Uri baseURI = Uri.EMPTY;
+  /** Sets a module URI resolver. */
+  UriResolver resolver;
 
   /**
-   * Constructor setting the XQuery version.
-   * @param ctx database context
+   * Constructor.
+   * @param qc query context
    */
-  public StaticContext(final Context ctx) {
-    final MainOptions opts = ctx.options;
-    mixUpdates = opts.get(MainOptions.MIXUPDATES);
-    xquery3 = opts.get(MainOptions.XQUERY3);
+  public StaticContext(final QueryContext qc) {
+    mixUpdates = qc.context.options.get(MainOptions.MIXUPDATES);
   }
 
   /**
@@ -71,7 +72,7 @@ public final class StaticContext {
    * @param uri namespace URI
    * @throws QueryException query exception
    */
-  public void namespace(final String prefix, final String uri) throws QueryException {
+  void namespace(final String prefix, final String uri) throws QueryException {
     if(prefix.isEmpty()) {
       elemNS = uri.isEmpty() ? null : token(uri);
     } else if(uri.isEmpty()) {
@@ -82,21 +83,22 @@ public final class StaticContext {
   }
 
   /**
-   * Returns an IO representation of the static base URI, or {@code null}.
+   * Returns an IO representation of the static base URI or {@code null}.
    * @return IO reference
    */
   public IO baseIO() {
-    return baseURI == Uri.EMPTY ? null : IO.get(Token.string(baseURI.string()));
+    return baseURI == Uri.EMPTY ? null : IO.get(string(baseURI.string()));
   }
 
   /**
-   * Returns an IO reference for the specified filename.
-   * If a base URI exists, it is merged with the specified filename.
-   * Otherwise, a plain reference is returned.
+   * Returns an IO reference for the specified path.
+   * If a base URI exists, it is merged with the path.
    * @param path file path
+   * @param uri module namespace (can be {@code null})
    * @return io reference
    */
-  public IO io(final String path) {
+  IO resolve(final String path, final String uri) {
+    if(resolver != null) return resolver.resolve(path, uri, baseURI);
     final IO base = baseIO();
     return base != null ? base.merge(path) : IO.get(path);
   }
@@ -115,31 +117,19 @@ public final class StaticContext {
    */
   public void baseURI(final String uri) {
     final IO base = IO.get(uri);
+    String url;
     if(uri.isEmpty()) {
-      baseURI = Uri.EMPTY;
+      url = "";
     } else if(base instanceof IOContent) {
-      baseURI = Uri.uri(uri);
+      url = uri;
     } else if(baseURI == Uri.EMPTY) {
-      baseURI = Uri.uri(base.url());
+      url = base.url();
     } else {
-      baseURI = Uri.uri(baseIO().merge(uri).url());
+      url = baseIO().merge(uri).url();
     }
-  }
-
-  /**
-   * Assigns the XQuery 3.0 flag.
-   * @param xq30 XQuery 3.0 flag
-   */
-  public void xquery3(final boolean xq30) {
-    xquery3 = xq30;
-  }
-
-  /**
-   * Checks if XQuery 3.0 features are allowed.
-   * @return {@code true} if XQuery 3.0 is allowed, {@code false} otherwise
-   */
-  public boolean xquery3() {
-    return xquery3;
+    // #1062: check if specified URI points to a directory. if yes, add trailing slash
+    if(!url.endsWith("/") && (uri.endsWith(".") || uri.endsWith("/"))) url += '/';
+    baseURI = Uri.uri(url);
   }
 
   @Override

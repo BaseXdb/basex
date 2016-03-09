@@ -2,10 +2,9 @@ package org.basex.api.client;
 
 import java.io.*;
 import java.net.*;
-import java.util.*;
 
 import org.basex.core.*;
-import org.basex.core.parse.Commands.*;
+import org.basex.core.parse.Commands.Cmd;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
 import org.basex.server.*;
@@ -26,13 +25,10 @@ import org.basex.util.*;
  * command to the server.</li>
  * </ul>
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public class ClientSession extends Session {
-  /** Event notifications. */
-  private final Map<String, EventNotifier> notifiers =
-      Collections.synchronizedMap(new HashMap<String, EventNotifier>());
   /** Server output (buffered). */
   final PrintOutput sout;
   /** Server input. */
@@ -40,67 +36,60 @@ public class ClientSession extends Session {
 
   /** Socket reference. */
   private final Socket socket;
-  /** Socket event host. */
-  private final String ehost;
-  /** Socket event reference. */
-  private Socket esocket;
 
   /**
    * Constructor, specifying login data.
    * @param context database context
-   * @param user user name
-   * @param pass password
+   * @param username user name
+   * @param password password (plain text)
    * @throws IOException I/O exception
    */
-  public ClientSession(final Context context, final String user, final String pass)
+  public ClientSession(final Context context, final String username, final String password)
       throws IOException {
-    this(context, user, pass, null);
+    this(context, username, password, null);
   }
 
   /**
    * Constructor, specifying login data and an output stream.
    * @param context database context
-   * @param user user name
-   * @param pass password
-   * @param output client output; if set to {@code null}, results will
-   * be returned as strings.
+   * @param username user name
+   * @param password password (plain text)
+   * @param output client output; if set to {@code null}, results will be returned as strings
    * @throws IOException I/O exception
    */
-  public ClientSession(final Context context, final String user, final String pass,
+  public ClientSession(final Context context, final String username, final String password,
       final OutputStream output) throws IOException {
-    this(context.globalopts.get(GlobalOptions.HOST),
-         context.globalopts.get(GlobalOptions.PORT), user, pass, output);
+    this(context.soptions.get(StaticOptions.HOST),
+         context.soptions.get(StaticOptions.PORT), username, password, output);
   }
 
   /**
    * Constructor, specifying the server host:port combination and login data.
    * @param host server name
    * @param port server port
-   * @param user user name
-   * @param pass password
+   * @param username user name
+   * @param password password (plain text)
    * @throws IOException I/O exception
    */
-  public ClientSession(final String host, final int port, final String user, final String pass)
-      throws IOException {
-    this(host, port, user, pass, null);
+  public ClientSession(final String host, final int port, final String username,
+      final String password) throws IOException {
+    this(host, port, username, password, null);
   }
 
   /**
-   * Constructor, specifying the server host:port combination, login data and
-   * an output stream.
+   * Constructor, specifying the server host:port combination, login data and an output stream.
    * @param host server name
    * @param port server port
-   * @param user user name
-   * @param pass password
-   * @param output client output; if set to {@code null}, results will
-   * be returned as strings.
+   * @param username user name
+   * @param password password (plain text)
+   * @param output client output; if set to {@code null}, results will be returned as strings
    * @throws IOException I/O exception
    */
-  public ClientSession(final String host, final int port, final String user, final String pass,
-      final OutputStream output) throws IOException {
+  @SuppressWarnings("resource")
+  public ClientSession(final String host, final int port, final String username,
+      final String password, final OutputStream output) throws IOException {
 
     super(output);
-    ehost = host;
     socket = new Socket();
     try {
       // limit timeout to five seconds
@@ -110,14 +99,24 @@ public class ClientSession extends Session {
     }
     sin = socket.getInputStream();
 
-    // receive timestamp
+    // receive server response
     final BufferInput bi = new BufferInput(sin);
-    final String ts = bi.readString();
+    final String[] response = Strings.split(bi.readString(), ':');
+    final String code, nonce;
+    if(response.length > 1) {
+      // support for digest authentication
+      code = username + ':' + response[0] + ':' + password;
+      nonce = response[1];
+    } else {
+      // support for cram-md5 (Version < 8.0)
+      code = password;
+      nonce = response[0];
+    }
 
-    // send user name and hashed password/timestamp
+    // send user name and hashed password
     sout = PrintOutput.get(socket.getOutputStream());
-    send(user);
-    send(Token.md5(Token.md5(pass) + ts));
+    send(username);
+    send(Strings.md5(Strings.md5(code) + nonce));
     sout.flush();
 
     // receive success flag
@@ -151,7 +150,6 @@ public class ClientSession extends Session {
 
   @Override
   public synchronized void close() throws IOException {
-    if(esocket != null) esocket.close();
     socket.close();
   }
 
@@ -168,77 +166,13 @@ public class ClientSession extends Session {
   }
 
   /**
-   * Watches an event.
-   * @param name event name
-   * @param notifier event notification
-   * @throws IOException I/O exception
-   */
-  public void watch(final String name, final EventNotifier notifier) throws IOException {
-    sout.write(ServerCmd.WATCH.code);
-    if(esocket == null) {
-      sout.flush();
-      final BufferInput bi = new BufferInput(sin);
-      final int eport = Integer.parseInt(bi.readString());
-      // initialize event socket
-      esocket = new Socket();
-      esocket.connect(new InetSocketAddress(ehost, eport), 5000);
-      final OutputStream so = esocket.getOutputStream();
-      so.write(bi.readBytes());
-      so.write(0);
-      so.flush();
-      final InputStream is = esocket.getInputStream();
-      is.read();
-      listen(is);
-    }
-    send(name);
-    sout.flush();
-    receive(null);
-    notifiers.put(name, notifier);
-  }
-
-  /**
-   * Unwatches an event.
-   * @param name event name
-   * @throws IOException I/O exception
-   */
-  public void unwatch(final String name) throws IOException {
-    sout.write(ServerCmd.UNWATCH.code);
-    send(name);
-    sout.flush();
-    receive(null);
-    notifiers.remove(name);
-  }
-
-  /**
-   * Starts the listener thread.
-   * @param input input stream
-   */
-  private void listen(final InputStream input) {
-    final BufferInput bi = new BufferInput(input);
-    new Thread() {
-      @Override
-      public void run() {
-        try {
-          while(true) {
-            final EventNotifier n = notifiers.get(bi.readString());
-            final String l = bi.readString();
-            if(n != null) n.notify(l);
-          }
-        } catch(final IOException ex) {
-          // listener did not receive any more input
-        }
-      }
-    }.start();
-  }
-
-  /**
    * Sends the specified stream to the server.
    * @param input input stream
    * @throws IOException I/O exception
    */
   private void send(final InputStream input) throws IOException {
-    final EncodingOutput eo = new EncodingOutput(sout);
-    for(int b; (b = input.read()) != -1;) eo.write(b);
+    final ServerOutput so = new ServerOutput(sout);
+    for(int b; (b = input.read()) != -1;) so.write(b);
     sout.write(0);
     sout.flush();
     receive(null);
@@ -246,10 +180,10 @@ public class ClientSession extends Session {
 
   /**
    * Receives the info string.
-   * @param output output stream to send result to. If {@code null}, no result
-   *           will be requested
+   * @param output output stream to send result to. If {@code null}, no result will be requested
    * @throws IOException I/O exception
    */
+  @SuppressWarnings("resource")
   private void receive(final OutputStream output) throws IOException {
     final BufferInput bi = new BufferInput(sin);
     if(output != null) receive(bi, output);
@@ -289,8 +223,8 @@ public class ClientSession extends Session {
    * @throws IOException I/O exception
    */
   static void receive(final BufferInput input, final OutputStream output) throws IOException {
-    final DecodingInput di = new DecodingInput(input);
-    for(int b; (b = di.read()) != -1;) output.write(b);
+    final ServerInput si = new ServerInput(input);
+    for(int b; (b = si.read()) != -1;) output.write(b);
   }
 
   /**
@@ -311,6 +245,7 @@ public class ClientSession extends Session {
    * @return string
    * @throws IOException I/O exception
    */
+  @SuppressWarnings("resource")
   String exec(final ServerCmd command, final String arg, final OutputStream output)
       throws IOException {
 
@@ -322,10 +257,5 @@ public class ClientSession extends Session {
     receive(bi, o);
     if(!ok(bi)) throw new BaseXException(bi.readString());
     return o.toString();
-  }
-
-  @Override
-  public String toString() {
-     return ehost + ':' + socket.getPort();
   }
 }

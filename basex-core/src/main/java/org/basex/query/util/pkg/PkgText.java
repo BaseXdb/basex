@@ -8,7 +8,7 @@ import org.basex.util.*;
 /**
  * This class assembles textual information for package handling.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public interface PkgText {
@@ -24,6 +24,8 @@ public interface PkgText {
   String EXPATH = "EXPath";
   /** Internal type. */
   String INTERNAL = "Internal";
+  /** Content directory. */
+  String CONTENT = "content";
 
   /** <package/> root element. */
   /** Element package. */

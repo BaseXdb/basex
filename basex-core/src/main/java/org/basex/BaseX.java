@@ -19,18 +19,18 @@ import org.basex.util.list.*;
  * This is the starter class for the stand-alone console mode.
  * It executes all commands locally.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public class BaseX extends CLI {
+  /** Default prompt. */
+  private static final String PROMPT = "> ";
   /** Commands to be executed. */
   private IntList ops;
   /** Command arguments. */
   private StringList vals;
-  /** Flag for writing options to disk. */
-  private boolean writeOptions;
   /** Console mode. May be set to {@code false} during execution. */
-  protected boolean console;
+  private boolean console;
 
   /**
    * Main method, launching the standalone mode.
@@ -63,9 +63,10 @@ public class BaseX extends CLI {
       final StringBuilder bind = new StringBuilder();
       SerializerOptions sopts = null;
       boolean v = false, qi = false, qp = false;
-      for(int i = 0; i < ops.size(); i++) {
-        final int c = ops.get(i);
-        String val = vals.get(i);
+      final int os = ops.size();
+      for(int o = 0; o < os; o++) {
+        final int c = ops.get(o);
+        String val = vals.get(o);
 
         if(c == 'b') {
           // set/add variable binding
@@ -85,9 +86,6 @@ public class BaseX extends CLI {
           execute(val);
           execute(new Set(MainOptions.QUERYPATH, ""), false);
           console = false;
-        } else if(c == 'd') {
-          // toggle debug mode
-          Prop.debug ^= true;
         } else if(c == 'D') {
           // hidden option: show/hide dot query graph
           execute(new Set(MainOptions.DOTPLAN, null), false);
@@ -96,12 +94,12 @@ public class BaseX extends CLI {
           execute(new Set(MainOptions.MAINMEM, true), false);
           execute(new Check(val), verbose);
           execute(new Set(MainOptions.MAINMEM, false), false);
-        } else if(c == 'L') {
-          // toggle newline separators
-          newline ^= true;
-          if(sopts == null) sopts = new SerializerOptions();
-          sopts.set(SerializerOptions.ITEM_SEPARATOR, "\\n");
-          execute(new Set(MainOptions.SERIALIZER, sopts), false);
+        } else if(c == 'I') {
+          // set/add variable binding
+          if(bind.length() != 0) bind.append(',');
+          // commas are escaped by a second comma
+          val = bind.append("=").append(val.replaceAll(",", ",,")).toString();
+          execute(new Set(MainOptions.BINDINGS, val), false);
         } else if(c == 'o') {
           // change output stream
           if(out != System.out) out.close();
@@ -125,7 +123,7 @@ public class BaseX extends CLI {
           console = false;
         } else if(c == 'r') {
           // parse number of runs
-          execute(new Set(MainOptions.RUNS, Token.toInt(val)), false);
+          execute(new Set(MainOptions.RUNS, Strings.toInt(val)), false);
         } else if(c == 'R') {
           // toggle query evaluation
           execute(new Set(MainOptions.RUNQUERY, null), false);
@@ -152,9 +150,6 @@ public class BaseX extends CLI {
         } else if(c == 'w') {
           // toggle chopping of whitespaces
           execute(new Set(MainOptions.CHOP, null), false);
-        } else if(c == 'W') {
-          // hidden option: toggle writing of options before exit
-          writeOptions ^= true;
         } else if(c == 'x') {
           // show/hide xml query plan
           execute(new Set(MainOptions.XMLPLAN, null), false);
@@ -169,8 +164,6 @@ public class BaseX extends CLI {
         verbose = qi || qp || v;
       }
       if(console) console();
-
-      if(writeOptions) context.globalopts.write();
     } finally {
       quit();
     }
@@ -180,28 +173,30 @@ public class BaseX extends CLI {
    * Launches the console mode, which reads and executes user input.
    */
   private void console() {
-    Util.outln(S_CONSOLE + TRY_MORE_X, sa() ? S_STANDALONE : S_CLIENT);
+    Util.outln(header() + NL + TRY_MORE_X);
     verbose = true;
 
     // create console reader
-    final ConsoleReader cr = ConsoleReader.get();
-    // loop until console is set to false (may happen in server mode)
-    while(console) {
-      // get next line
-      final String in = cr.readLine();
-      // end of input: break loop
-      if(in == null) break;
-      // skip empty lines
-      if(in.isEmpty()) continue;
-      try {
-        if(!execute(new CommandParser(in, context).pwReader(cr.pwReader()))) {
-          // show goodbye message if method returns false
-          Util.outln(BYE[new Random().nextInt(4)]);
-          return;
+    try(final ConsoleReader cr = ConsoleReader.get()) {
+      // loop until console is set to false (may happen in server mode)
+      while(console) {
+        // get next line
+        final String in = cr.readLine(PROMPT);
+        // end of input: break loop
+        if(in == null) break;
+        // skip empty lines
+        if(in.isEmpty()) continue;
+
+        try {
+          if(!execute(new CommandParser(in, context).pwReader(cr.pwReader()))) {
+            // show goodbye message if method returns false
+            Util.outln(BYE[new Random().nextInt(4)]);
+            break;
+          }
+        } catch(final IOException ex) {
+          // output error messages
+          Util.errln(ex);
         }
-      } catch(final IOException ex) {
-        // output error messages
-        Util.errln(ex);
       }
     }
   }
@@ -210,16 +205,16 @@ public class BaseX extends CLI {
    * Quits the console mode.
    * @throws IOException I/O exception
    */
-  protected final void quit() throws IOException {
+  private void quit() throws IOException {
     if(out == System.out || out == System.err) out.flush();
     else out.close();
   }
 
   /**
-   * Tests if this client is stand-alone.
-   * @return stand-alone flag
+   * Tests if this is a local client.
+   * @return local mode
    */
-  protected boolean sa() {
+  boolean local() {
     return true;
   }
 
@@ -234,28 +229,31 @@ public class BaseX extends CLI {
       String v = null;
       if(arg.dash()) {
         c = arg.next();
-        if(c == 'b' || c == 'c' || c == 'C' || c == 'i' || c == 'o' || c == 'q' ||
-            c == 'r' || c == 's' || c == 't' && sa()) {
+        if(c == 'd') {
+          // activate debug mode
+          Prop.debug = true;
+        } else if(c == 'b' || c == 'c' || c == 'C' || c == 'i' || c == 'I' || c == 'o' ||
+            c == 'q' || c == 'r' || c == 's' || c == 't' && local()) {
           // options followed by a string
           v = arg.string();
-        } else if(c == 'd' || c == 'D' && sa() || c == 'L' || c == 'u' && sa() || c == 'R' ||
-            c == 'v' || c == 'V' || c == 'w' || c == 'W' || c == 'x' || c == 'X' || c == 'z') {
+        } else if(c == 'D' && local() || c == 'u' && local() || c == 'R' ||
+            c == 'v' || c == 'V' || c == 'w' || c == 'x' || c == 'X' || c == 'z') {
           // options to be toggled
           v = "";
-        } else if(!sa()) {
+        } else if(!local()) {
           // client options: need to be set before other options
           if(c == 'n') {
             // set server name
-            context.globalopts.set(GlobalOptions.HOST, arg.string());
+            context.soptions.set(StaticOptions.HOST, arg.string());
           } else if(c == 'p') {
             // set server port
-            context.globalopts.set(GlobalOptions.PORT, arg.number());
+            context.soptions.set(StaticOptions.PORT, arg.number());
           } else if(c == 'P') {
             // specify password
-            context.globalopts.set(GlobalOptions.PASSWORD, arg.string());
+            context.soptions.set(StaticOptions.PASSWORD, arg.string());
           } else if(c == 'U') {
             // specify user name
-            context.globalopts.set(GlobalOptions.USER, arg.string());
+            context.soptions.set(StaticOptions.USER, arg.string());
           } else {
             throw arg.usage();
           }
@@ -276,11 +274,18 @@ public class BaseX extends CLI {
 
   @Override
   public String header() {
-    return Util.info(S_CONSOLE, sa() ? S_STANDALONE : S_CLIENT);
+    return Util.info(S_CONSOLE_X, local() ? S_STANDALONE : S_CLIENT);
   }
 
   @Override
   public String usage() {
-    return sa() ? S_LOCALINFO : S_CLIENTINFO;
+    return local() ? S_LOCALINFO : S_CLIENTINFO;
+  }
+
+  /**
+   * Throws an exception.
+   */
+  public static void error() {
+    throw new RuntimeException("ERROR");
   }
 }

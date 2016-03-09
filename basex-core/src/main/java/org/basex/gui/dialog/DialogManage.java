@@ -18,7 +18,7 @@ import org.basex.util.list.*;
 /**
  * Open database dialog.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class DialogManage extends BaseXDialog {
@@ -60,11 +60,14 @@ public final class DialogManage extends BaseXDialog {
     panel.setLayout(new BorderLayout(4, 0));
 
     // create database chooser
-    final StringList dbs = main.context.databases.list();
-    choice = new BaseXList(dbs.toArray(), this, false);
+    final String[] dbs = main.context.databases.list().finish();
+    choice = new BaseXList(dbs, this, false);
     choice.setSize(200, 500);
     final Data data = main.context.data();
-    if(data != null) choice.setValue(data.meta.name);
+    if(data != null) {
+      data.flush(true);
+      choice.setValue(data.meta.name);
+    }
 
     doc1 = new BaseXLabel(" ").large();
     doc1.setSize(420, doc1.getHeight());
@@ -87,7 +90,7 @@ public final class DialogManage extends BaseXDialog {
     doc2 = new BaseXLabel(" ").border(0, 0, 6, 0);
     doc2.setFont(doc1.getFont());
 
-    backups = new BaseXList(new String[] { }, this);
+    backups = new BaseXList(new String[0], this);
     backups.setSize(400, 400);
 
     // backup buttons
@@ -113,7 +116,7 @@ public final class DialogManage extends BaseXDialog {
     set(tabs, BorderLayout.EAST);
 
     action(null);
-    if(!dbs.isEmpty()) finish(null);
+    if(dbs.length != 0) finish();
   }
 
   /**
@@ -129,7 +132,7 @@ public final class DialogManage extends BaseXDialog {
     final Context ctx = gui.context;
     if(refresh) {
       // rebuild databases and focus list chooser
-      choice.setData(ctx.databases.list().toArray());
+      choice.setData(ctx.databases.list().finish());
       choice.requestFocusInWindow();
       refresh = false;
     }
@@ -143,7 +146,7 @@ public final class DialogManage extends BaseXDialog {
 
     } else if(cmp == drop) {
       for(final String s : dbs) {
-        if(ctx.globalopts.dbexists(s)) cmds.add(new DropDB(s));
+        if(ctx.soptions.dbExists(s)) cmds.add(new DropDB(s));
       }
       if(!BaseXDialog.confirm(gui, Util.info(DROPPING_DB_X, cmds.size()))) return;
       refresh = true;
@@ -165,7 +168,7 @@ public final class DialogManage extends BaseXDialog {
 
     } else if(cmp == restore) {
       // show warning if existing database would be overwritten
-      if(!gui.context.globalopts.dbexists(db) || BaseXDialog.confirm(gui, OVERWRITE_DB_QUESTION))
+      if(!gui.context.soptions.dbExists(db) || BaseXDialog.confirm(gui, OVERWRITE_DB_QUESTION))
         cmds.add(new Restore(backups.getValue()));
 
     } else if(cmp == backups) {
@@ -188,11 +191,11 @@ public final class DialogManage extends BaseXDialog {
       doc1.setText(title);
       doc2.setText(BACKUPS + COLS + title);
 
-      boolean active = ctx.globalopts.dbexists(db);
+      boolean active = ctx.soptions.dbExists(db);
       String info = "";
       if(active) {
         // refresh info view
-        final MetaData meta = new MetaData(db, ctx);
+        final MetaData meta = new MetaData(db, ctx.options, ctx.soptions);
         try {
           meta.read();
           info = InfoDB.db(meta, true, true, true);
@@ -211,14 +214,14 @@ public final class DialogManage extends BaseXDialog {
       restore.setEnabled(active);
 
       active = false;
-      for(final String d : dbs) active |= ctx.globalopts.dbexists(d);
+      for(final String d : dbs) active |= ctx.soptions.dbExists(d);
       drop.setEnabled(active);
       backup.setEnabled(active);
 
       // enable/disable backup buttons
-      final StringList names = ctx.databases.backups(db);
-      active = !names.isEmpty();
-      backups.setData(names.toArray());
+      final String[] names = ctx.databases.backups(db).finish();
+      active = names.length != 0;
+      backups.setData(names);
       backups.setEnabled(active);
 
       restore.setEnabled(active);
@@ -235,7 +238,7 @@ public final class DialogManage extends BaseXDialog {
   @Override
   public void close() {
     final String db = choice.getValue();
-    if(gui.context.globalopts.dbexists(db)) {
+    if(gui.context.soptions.dbExists(db)) {
       DialogProgress.execute(this, new Open(db));
       dispose();
     }

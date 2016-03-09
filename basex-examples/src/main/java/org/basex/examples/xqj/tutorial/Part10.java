@@ -12,14 +12,13 @@ import org.xml.sax.*;
 import org.xml.sax.helpers.*;
 
 /**
- * XQJ Example, derived from the XQJ Tutorial
- * <a href="http://www.xquery.com/tutorials/xqj_tutorial">
- * http://www.xquery.com/tutorials/xqj_tutorial</a>
- * from Marc van Cappellen.
+ * XQJ Examples, derived from an
+ * <a href="https://www.progress.com/products/data-integration-suite/data-integration-suite-developer-center/data-integration-suite-tutorials/learning-xquery/introduction-to-the-xquery-api-for-java-xqj-">
+ * XQJ online tutorial</a>.
  *
  * Part 10: XML Pipelines.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  */
 public final class Part10 extends Main {
   /**
@@ -107,7 +106,7 @@ public final class Part10 extends Main {
      * Constructor.
      * @param xqp prepared expression
      */
-    public XQJFilter(final XQPreparedExpression xqp) {
+    XQJFilter(final XQPreparedExpression xqp) {
       expression = xqp;
     }
 

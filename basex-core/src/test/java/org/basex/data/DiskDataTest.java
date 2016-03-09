@@ -1,6 +1,5 @@
 package org.basex.data;
 
-import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.util.*;
 import org.junit.*;
@@ -8,25 +7,24 @@ import org.junit.*;
 /**
  * Test index updates when using disk storage ({@link DiskData}).
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Dimitar Popov
  */
-public class DiskDataTest extends MemDataTest {
+public final class DiskDataTest extends MemDataTest {
   /** Test database name. */
   private final String dbname = Util.className(DiskDataTest.class);
 
   @Override
   @Before
-  public void setUp() throws BaseXException {
-    new CreateDB(dbname, XMLSTR).execute(context);
+  public void setUp() {
+    execute(new CreateDB(dbname, XMLSTR));
   }
 
   /**
    * Clean up method; executed after each test; drops the database.
-   * @throws BaseXException the database cannot be dropped
    */
   @After
-  public void cleanUp() throws BaseXException {
-    new DropDB(dbname).execute(context);
+  public void cleanUp() {
+    execute(new DropDB(dbname));
   }
 }

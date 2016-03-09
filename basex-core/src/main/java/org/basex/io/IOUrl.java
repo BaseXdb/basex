@@ -4,7 +4,10 @@ import static org.basex.core.Text.*;
 
 import java.io.*;
 import java.net.*;
+import java.security.*;
+import java.security.cert.*;
 
+import javax.net.ssl.*;
 import javax.xml.transform.stream.*;
 
 import org.basex.core.*;
@@ -15,7 +18,7 @@ import org.xml.sax.*;
 /**
  * {@link IO} reference, representing a URL.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class IOUrl extends IO {
@@ -26,10 +29,10 @@ public final class IOUrl extends IO {
 
   /**
    * Constructor.
-   * @param u url
+   * @param url url
    */
-  public IOUrl(final String u) {
-    super(u);
+  public IOUrl(final String url) {
+    super(url);
   }
 
   @Override
@@ -39,12 +42,12 @@ public final class IOUrl extends IO {
 
   @Override
   public InputSource inputSource() {
-    return new InputSource(path);
+    return new InputSource(pth);
   }
 
   @Override
   public StreamSource streamSource() {
-    return new StreamSource(path);
+    return new StreamSource(pth);
   }
 
   @Override
@@ -59,8 +62,8 @@ public final class IOUrl extends IO {
       if(conn instanceof HttpURLConnection) {
         final InputStream es = ((HttpURLConnection) conn).getErrorStream();
         if(es != null) {
-          final byte[] err = new IOStream(es).read();
-          if(err.length != 0) msg.add(NL).add(INFORMATION).add(COL).add(NL).add(err);
+          final byte[] error = new IOStream(es).read();
+          if(error.length != 0) msg.add(NL).add(INFORMATION).add(COL).add(NL).add(error);
         }
       }
       final IOException io = new IOException(msg.toString());
@@ -69,7 +72,7 @@ public final class IOUrl extends IO {
     } catch(final RuntimeException ex) {
       // catch unexpected runtime exceptions
       Util.debug(ex);
-      throw new BaseXException(NOT_PARSED_X, path);
+      throw new BaseXException(NOT_PARSED_X, pth);
     }
   }
 
@@ -79,25 +82,26 @@ public final class IOUrl extends IO {
    * @throws IOException I/O exception
    */
   public URLConnection connection() throws IOException {
-    final URL url = new URL(path);
+    final URL url = new URL(pth);
     final URLConnection conn = url.openConnection();
     conn.setConnectTimeout(TIMEOUT * 1000);
     // use basic authentication if credentials are contained in the url
     final String ui = url.getUserInfo();
-    if(ui != null) conn.setRequestProperty(AUTHORIZATION, "Basic " + Base64.encode(ui));
+    if(ui != null) conn.setRequestProperty(AUTHORIZATION, "Basic " +
+        org.basex.util.Base64.encode(ui));
     return conn;
   }
 
   @Override
   public String dir() {
-    return path.endsWith("/") ? path : path.substring(0, path.lastIndexOf('/') + 1);
+    return pth.endsWith("/") ? pth : pth.substring(0, pth.lastIndexOf('/') + 1);
   }
 
   @Override
-  public IO merge(final String f) {
-    final IO io = IO.get(f);
-    if(!(io instanceof IOFile) || f.contains(":") || f.startsWith("/")) return io;
-    return IO.get((path.endsWith("/") ? path : path.replace("^(.*/).*", "$1")) + f);
+  public IO merge(final String path) {
+    final IO io = IO.get(path);
+    if(!(io instanceof IOFile) || path.contains(":") || path.startsWith("/")) return io;
+    return IO.get((pth.endsWith("/") ? pth : pth.replace("^(.*/).*", "$1")) + path);
   }
 
   /**
@@ -116,12 +120,12 @@ public final class IOUrl extends IO {
   }
 
   /**
-   * Checks if the specified string is a valid file URI.
-   * @param s source
+   * Checks if the specified string is a valid file URL.
+   * @param url url to be tested
    * @return result of check
    */
-  public static boolean isFileURL(final String s) {
-    return s.startsWith(FILEPREF + '/');
+  public static boolean isFileURL(final String url) {
+    return url.startsWith(FILEPREF + '/');
   }
 
   /**
@@ -160,5 +164,32 @@ public final class IOUrl extends IO {
       a = b;
     }
     return sb.toString();
+  }
+
+  /**
+   * Ignore certificates.
+   */
+  public static void ignoreCert() {
+    // http://www.rgagnon.com/javadetails/java-fix-certificate-problem-in-HTTPS.html
+    HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
+      @Override
+      public boolean verify(final String hostname, final SSLSession session) { return true; }
+    });
+
+    final TrustManager[] tm = { new X509TrustManager() {
+      @Override
+      public X509Certificate[] getAcceptedIssuers() { return null; }
+      @Override
+      public void checkClientTrusted(final X509Certificate[] certs, final String authType) { }
+      @Override
+      public void checkServerTrusted(final X509Certificate[] certs, final String authType) { }
+    }};
+    try {
+      final SSLContext sc = SSLContext.getInstance("SSL");
+      sc.init(null, tm, new SecureRandom());
+      HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+    } catch(final Exception ex) {
+      Util.errln(ex);
+    }
   }
 }

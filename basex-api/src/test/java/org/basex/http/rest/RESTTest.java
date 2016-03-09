@@ -5,27 +5,20 @@ import static org.junit.Assert.*;
 import java.io.*;
 import java.net.*;
 
-import org.basex.core.*;
 import org.basex.http.*;
+import org.basex.io.*;
+import org.basex.util.http.*;
 import org.junit.*;
 
 /**
  * This class tests the embedded REST API.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class RESTTest extends HTTPTest {
-  /** REST identifier. */
-  static final String REST = "rest";
-  /** Root path. */
-  static final String ROOT = "http://" + Text.S_LOCALHOST + ":9998/" + REST + '/';
-
   /** REST URI. */
-  static final String URI = RESTText.RESTURI;
-  /** Opening result. */
-  static final String WRAP =
-      '<' + REST + ":results xmlns:" + REST + "=\"" + URI + "\"/>";
+  static final String URI = RESTText.REST_URI;
   /** Input file. */
   static final String FILE = "src/test/resources/input.xml";
 
@@ -37,17 +30,26 @@ public abstract class RESTTest extends HTTPTest {
    */
   @BeforeClass
   public static void start() throws Exception {
-    init(ROOT, true);
+    init(REST_ROOT, true);
   }
 
   /**
-   * Compares two byte arrays for equality.
+   * Checks if a string starts with another.
    * @param string full string
    * @param prefix prefix
    */
   protected static void assertStartsWith(final String string, final String prefix) {
     assertTrue('\'' + string + "' does not start with '" + prefix + '\'',
         string.startsWith(prefix));
+  }
+
+  /**
+   * Compares media types.
+   * @param ret returned media type
+   * @param exp expected media type
+   */
+  protected static void assertMediaType(final MediaType ret, final MediaType exp) {
+    if(!ret.is(exp)) fail("Wrong media type: " + ret + " returned, " + exp + " expected.");
   }
 
   /**
@@ -60,17 +62,17 @@ public abstract class RESTTest extends HTTPTest {
   }
 
   /**
-   * Executes the specified GET request and returns the content type.
+   * Executes the specified GET request and returns the media type.
    * @param query request
    * @return string result, or {@code null} for a failure.
    * @throws IOException I/O exception
    */
-  protected static String contentType(final String query) throws IOException {
-    final URL url = new URL(ROOT + query);
-    final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+  protected static MediaType mediaType(final String query) throws IOException {
+    final IOUrl url = new IOUrl(REST_ROOT + query);
+    final HttpURLConnection conn = (HttpURLConnection) url.connection();
     try {
       read(conn.getInputStream());
-      return conn.getContentType();
+      return new MediaType(conn.getContentType());
     } catch(final IOException ex) {
       throw error(conn, ex);
     } finally {

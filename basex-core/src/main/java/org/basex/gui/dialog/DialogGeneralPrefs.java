@@ -14,7 +14,7 @@ import org.basex.io.*;
 /**
  * General preferences.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class DialogGeneralPrefs extends BaseXBack {
@@ -30,7 +30,9 @@ final class DialogGeneralPrefs extends BaseXBack {
   private static final String[][] LANGS = Lang.parse();
 
   /** Directory path. */
-  private final BaseXTextField path;
+  private final BaseXTextField dbPath;
+  /** Repository path. */
+  private final BaseXTextField repoPath;
   /** Number of hits. */
   private final BaseXSlider limit;
   /** Label for number of hits. */
@@ -45,26 +47,40 @@ final class DialogGeneralPrefs extends BaseXBack {
   /** Simple file dialog checkbox. */
   private final BaseXCheckBox simplefd;
   /** Browse button. */
-  private final BaseXButton button;
+  private final BaseXButton dbButton;
+  /** Browse button. */
+  private final BaseXButton repoButton;
 
   /**
    * Default constructor.
    * @param d dialog reference
    */
   DialogGeneralPrefs(final BaseXDialog d) {
-    border(8).setLayout(new TableLayout(8, 1));
+    border(8).setLayout(new TableLayout(10, 1));
     gui = d.gui;
 
-    final GlobalOptions opts = gui.context.globalopts;
+    final StaticOptions opts = gui.context.soptions;
     final GUIOptions gopts = gui.gopts;
-    path = new BaseXTextField(opts.dbpath().path(), d);
+    dbPath = new BaseXTextField(opts.get(StaticOptions.DBPATH), d);
+    repoPath = new BaseXTextField(opts.get(StaticOptions.REPOPATH), d);
 
-    button = new BaseXButton(BROWSE_D, d);
-    button.addActionListener(new ActionListener() {
+    dbButton = new BaseXButton(BROWSE_D, d);
+    dbButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
-        final IOFile dir = new BaseXFileChooser(CHOOSE_DIR, path.getText(), gui).select(Mode.DOPEN);
-        if(dir != null) path.setText(dir.dir());
+        final String path = dbPath.getText();
+        final IOFile dir = new BaseXFileChooser(CHOOSE_DIR, path, gui).select(Mode.DOPEN);
+        if(dir != null) dbPath.setText(dir.dir());
+      }
+    });
+
+    repoButton = new BaseXButton(BROWSE_D, d);
+    repoButton.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(final ActionEvent e) {
+        final String path = repoPath.getText();
+        final IOFile dir = new BaseXFileChooser(CHOOSE_DIR, path, gui).select(Mode.DOPEN);
+        if(dir != null) repoPath.setText(dir.dir());
       }
     });
 
@@ -78,15 +94,21 @@ final class DialogGeneralPrefs extends BaseXBack {
     });
     label = new BaseXLabel(" ");
     lang = new BaseXCombo(d, LANGS[0]);
-    lang.setSelectedItem(opts.get(GlobalOptions.LANG));
+    lang.setSelectedItem(opts.get(StaticOptions.LANG));
     creds = new BaseXLabel(" ");
 
     add(new BaseXLabel(DATABASE_PATH + COL, true, true));
-
     BaseXBack p = new BaseXBack(new TableLayout(1, 2, 8, 0));
-    p.add(path);
-    p.add(button);
+    p.add(dbPath);
+    p.add(dbButton);
     add(p);
+
+    add(new BaseXLabel(REPOSITORY_PATH + COL, true, true));
+    p = new BaseXBack(new TableLayout(1, 2, 8, 0));
+    p.add(repoPath);
+    p.add(repoButton);
+    add(p);
+
     add(new BaseXLabel(GUI_INTERACTIONS + COL, true, true).border(8, 0, 8, 0));
 
     p = new BaseXBack(new TableLayout(2, 2, 40, 0));
@@ -112,7 +134,7 @@ final class DialogGeneralPrefs extends BaseXBack {
    * @return maximum number of hits
    */
   private int hitsForSlider() {
-    int mh = gui.gopts.get(MainOptions.MAXHITS);
+    int mh = gui.gopts.get(GUIOptions.MAXRESULTS);
     if(mh == -1) mh = Integer.MAX_VALUE;
     final int hl = HITS.length - 1;
     int h = -1;
@@ -126,8 +148,9 @@ final class DialogGeneralPrefs extends BaseXBack {
    * @return credits
    */
   static String creds(final String lng) {
-    for(int i = 0; i < LANGS[0].length; ++i) {
-      if(LANGS[0][i].equals(lng)) return LANGS[1][i];
+    final int ll = LANGS[0].length;
+    for(int l = 0; l < ll; l++) {
+      if(LANGS[0][l].equals(lng)) return LANGS[1][l];
     }
     return "";
   }
@@ -135,27 +158,33 @@ final class DialogGeneralPrefs extends BaseXBack {
   /**
    * Reacts on user input.
    * @param source source
+   * @return success flag
    */
-  void action(final Object source) {
+  boolean action(final Object source) {
     mousefocus.assign();
     simplefd.assign();
 
     // new database path: close opened database
-    final GlobalOptions opts = gui.context.globalopts;
-    if(source == path || source == button) {
-      final String dbpath = path.getText();
-      if(!opts.get(GlobalOptions.DBPATH).equals(dbpath) && gui.context.data() != null) {
+    final StaticOptions opts = gui.context.soptions;
+    if(source == dbPath || source == dbButton) {
+      final String dbpath = dbPath.getText();
+      if(!opts.get(StaticOptions.DBPATH).equals(dbpath) && gui.context.data() != null) {
         new Close().run(gui.context);
         gui.notify.init();
       }
-      opts.set(GlobalOptions.DBPATH, dbpath);
+      opts.set(StaticOptions.DBPATH, dbpath);
+    } else if(source == repoPath || source == repoButton) {
+      gui.context.repo.reset();
+      opts.set(StaticOptions.REPOPATH, repoPath.getText());
     }
-    opts.set(GlobalOptions.LANG, lang.getSelectedItem());
+    opts.set(StaticOptions.LANG, lang.getSelectedItem());
 
-    gui.gopts.set(GUIOptions.MAXHITS, HITS[limit.getValue()]);
+    gui.gopts.set(GUIOptions.MAXRESULTS, HITS[limit.getValue()]);
 
     creds.setText(TRANSLATION + COLS + creds(lang.getSelectedItem()));
     final int mh = HITS[limit.getValue()];
     label.setText(mh == -1 ? ALL : Integer.toString(mh));
+
+    return true;
   }
 }

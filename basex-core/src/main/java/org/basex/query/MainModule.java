@@ -3,10 +3,12 @@ package org.basex.query;
 import java.util.*;
 
 import org.basex.core.*;
+import org.basex.core.locks.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -18,7 +20,7 @@ import org.basex.util.list.*;
 /**
  * An XQuery main module.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public final class MainModule extends Module {
@@ -60,17 +62,17 @@ public final class MainModule extends Module {
    * @param funcs user-defined functions
    * @param vars static variables
    * @param imports namespace URIs of imported modules
-   * @param type optional type
+   * @param declType optional type
    * @param sc static context
    * @param info input info
    */
-  public MainModule(final Expr expr, final VarScope scope, final SeqType type, final String doc,
+  public MainModule(final Expr expr, final VarScope scope, final SeqType declType, final String doc,
       final TokenObjMap<StaticFunc> funcs, final TokenObjMap<StaticVar> vars,
       final TokenSet imports, final StaticContext sc, final InputInfo info) {
 
     super(scope, doc, funcs, vars, imports, sc, info);
     this.expr = expr;
-    this.declType = type;
+    this.declType = declType;
   }
 
   @Override
@@ -90,23 +92,17 @@ public final class MainModule extends Module {
    * @return result
    * @throws QueryException evaluation exception
    */
-  public ValueBuilder cache(final QueryContext qc) throws QueryException {
+  ItemList cache(final QueryContext qc) throws QueryException {
     final int fp = scope.enter(qc);
     try {
       final Iter iter = expr.iter(qc);
-
-      final ValueBuilder cache;
-      if(iter instanceof ValueBuilder) {
-        cache = (ValueBuilder) iter;
-      } else {
-        cache = new ValueBuilder();
-        for(Item it; (it = iter.next()) != null;) cache.add(it);
-      }
+      final ItemList cache = new ItemList(Math.max(1, (int) iter.size()));
+      for(Item it; (it = iter.next()) != null;) cache.add(it);
       if(declType != null) declType.treat(cache.value(), info);
       return cache;
 
     } finally {
-      scope.exit(qc, fp);
+      VarScope.exit(qc, fp);
     }
   }
 
@@ -116,8 +112,8 @@ public final class MainModule extends Module {
    * @return result iterator
    * @throws QueryException query exception
    */
-  public Iter iter(final QueryContext qc) throws QueryException {
-    if(declType != null) return cache(qc);
+  Iter iter(final QueryContext qc) throws QueryException {
+    if(declType != null) return cache(qc).iter();
 
     final int fp = scope.enter(qc);
     final Iter iter = expr.iter(qc);
@@ -125,7 +121,7 @@ public final class MainModule extends Module {
       @Override
       public Item next() throws QueryException {
         final Item it = iter.next();
-        if(it == null) scope.exit(qc, fp);
+        if(it == null) VarScope.exit(qc, fp);
         return it;
       }
 
@@ -137,11 +133,6 @@ public final class MainModule extends Module {
       @Override
       public Item get(final long i) throws QueryException {
         return iter.get(i);
-      }
-
-      @Override
-      public boolean reset() {
-        return iter.reset();
       }
     };
   }
@@ -168,7 +159,7 @@ public final class MainModule extends Module {
    * @return result of check
    * @see Proc#databases(LockResult)
    */
-  public boolean databases(final LockResult lr, final QueryContext qc) {
+  boolean databases(final LockResult lr, final QueryContext qc) {
     return expr.accept(new LockVisitor(lr, qc));
   }
 
@@ -176,10 +167,10 @@ public final class MainModule extends Module {
    * Lock visitor.
    * @author Leo Woerteler
    */
-  static class LockVisitor extends ASTVisitor {
+  private static final class LockVisitor extends ASTVisitor {
     /** Already visited scopes. */
     private final IdentityHashMap<Scope, Object> funcs = new IdentityHashMap<>();
-    /** List of databases to be locked. */
+    /** Reference to process list of locked databases. */
     private final StringList sl;
     /** Focus level. */
     private int level;
@@ -189,15 +180,17 @@ public final class MainModule extends Module {
      * @param lr lock result
      * @param qc query context
      */
-    LockVisitor(final LockResult lr, final QueryContext qc) {
+    private LockVisitor(final LockResult lr, final QueryContext qc) {
       sl = qc.updating ? lr.write : lr.read;
       level = qc.ctxItem == null ? 0 : 1;
     }
 
     @Override
     public boolean lock(final String db) {
+      // name is unknown at compile time: return false
       if(db == null) return false;
-      if(level == 0 || db != DBLocking.CTX) sl.add(db);
+      // if context item is found on top level, it will refer to currently opened database
+      if(level == 0 || db != DBLocking.CONTEXT) sl.add(db);
       return true;
     }
 

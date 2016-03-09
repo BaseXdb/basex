@@ -5,7 +5,7 @@ import org.basex.gui.layout.*;
 /**
  * This class provides a default implementation for GUI popup commands.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class GUIPopupCmd implements GUICommand {
@@ -16,12 +16,12 @@ public abstract class GUIPopupCmd implements GUICommand {
 
   /**
    * Constructor.
-   * @param lbl label
-   * @param sc shortcut
+   * @param label label
+   * @param shortcut shortcut
    */
-  protected GUIPopupCmd(final String lbl, final BaseXKeys... sc) {
-    label = lbl;
-    shortcut = sc;
+  protected GUIPopupCmd(final String label, final BaseXKeys... shortcut) {
+    this.label = label;
+    this.shortcut = shortcut;
   }
 
   /**
@@ -45,7 +45,7 @@ public abstract class GUIPopupCmd implements GUICommand {
   }
 
   @Override
-  public final String shortcut() {
+  public final String shortCut() {
     return null;
   }
 

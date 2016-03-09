@@ -13,48 +13,52 @@ import org.basex.util.hash.*;
 /**
  * Instance test.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Instance extends Single {
-  /** Sequence type. */
-  private final SeqType seq;
+  /** Sequence type to check for. */
+  private final SeqType type;
 
   /**
    * Constructor.
    * @param info input info
    * @param expr expression
-   * @param seq sequence type
+   * @param type sequence type to check for
    */
-  public Instance(final InputInfo info, final Expr expr, final SeqType seq) {
+  public Instance(final InputInfo info, final Expr expr, final SeqType type) {
     super(info, expr);
-    this.seq = seq;
-    type = SeqType.BLN;
+    this.type = type;
+    seqType = SeqType.BLN;
   }
 
   @Override
   public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    super.compile(qc, scp);
+    return super.compile(qc, scp).optimize(qc, scp);
+  }
+
+  @Override
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     return expr.isValue() ? preEval(qc) : this;
   }
 
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Bln.get(seq.instance(qc.value(expr)));
+    return Bln.get(type.instance(qc.value(expr)));
   }
 
   @Override
   public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Instance(info, expr.copy(qc, scp, vs), seq);
+    return new Instance(info, expr.copy(qc, scp, vs), type);
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(TYP, seq), expr);
+    addPlan(plan, planElem(TYP, type), expr);
   }
 
   @Override
   public String toString() {
-    return Util.info("% instance of %", expr, seq);
+    return Util.info("% instance of %", expr, type);
   }
 }

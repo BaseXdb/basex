@@ -5,13 +5,13 @@ import static org.basex.util.Token.*;
 import java.io.*;
 
 import org.basex.build.*;
-import org.basex.query.value.item.*;
+import org.basex.query.util.ft.*;
 import org.basex.util.*;
 
 /**
  * A serializer that pipes the events directly through to a builder.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public class BuilderSerializer extends Serializer {
@@ -20,81 +20,72 @@ public class BuilderSerializer extends Serializer {
   /** Namespace cache. */
   private final Atts nsp = new Atts();
   /** The builder. */
-  private final Builder build;
+  private final Builder builder;
 
   /**
    * Constructor taking a Builder.
-   * @param b builder to be used
+   * @param builder builder to be used
    */
-  public BuilderSerializer(final Builder b) {
-    build = b;
+  public BuilderSerializer(final Builder builder) {
+    this.builder = builder;
   }
 
   @Override
-  protected final void finishText(final byte[] b) throws IOException {
-    build.text(b);
+  protected final void text(final byte[] value, final FTPos ftp) throws IOException {
+    builder.text(value);
   }
 
   @Override
-  protected void startOpen(final byte[] t) throws IOException {
-  }
-
-  @Override
-  protected final void finishPi(final byte[] n, final byte[] v) throws IOException {
-    build.pi(concat(n, SPACE, v));
-  }
-
-  @Override
-  protected final void atomic(final Item b, final boolean iter) {
-    throw Util.notExpected();
+  protected final void pi(final byte[] name, final byte[] value) throws IOException {
+    builder.pi(concat(name, SPACE, value));
   }
 
   @Override
   protected final void finishOpen() throws IOException {
-    build.openElem(tag, atts, nsp);
+    builder.openElem(elem.string(), atts, nsp);
     atts.clear();
     nsp.clear();
   }
 
   @Override
   protected void finishEmpty() throws IOException {
-    build.emptyElem(tag, atts, nsp);
+    builder.emptyElem(elem.string(), atts, nsp);
     atts.clear();
     nsp.clear();
   }
 
   @Override
   protected void finishClose() throws IOException {
-    build.closeElem();
+    builder.closeElem();
   }
 
   @Override
-  protected final void finishComment(final byte[] b) throws IOException {
-    build.comment(b);
+  protected final void comment(final byte[] value) throws IOException {
+    builder.comment(value);
   }
 
   @Override
-  protected final void attribute(final byte[] n, final byte[] v) {
-    if(startsWith(n, XMLNS)) {
-      if(n.length == 5) {
-        nsp.add(EMPTY, v);
-      } else if(n[5] == ':') {
-        nsp.add(substring(n, 6), v);
+  protected final void attribute(final byte[] name, final byte[] value, final boolean standalone) {
+    if(startsWith(name, XMLNS)) {
+      if(name.length == 5) {
+        nsp.add(EMPTY, value);
+      } else if(name[5] == ':') {
+        nsp.add(substring(name, 6), value);
       } else {
-        atts.add(n, v);
+        atts.add(name, value);
       }
     } else {
-      atts.add(n, v);
+      atts.add(name, value);
     }
   }
 
   @Override
   protected void openDoc(final byte[] name) throws IOException {
-    build.openDoc(name);
+    builder.openDoc(name);
   }
 
   @Override
   protected final void closeDoc() throws IOException {
-    build.closeDoc();
+    builder.closeDoc();
   }
 }

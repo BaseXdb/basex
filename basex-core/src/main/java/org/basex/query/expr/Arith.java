@@ -14,7 +14,7 @@ import org.basex.util.hash.*;
 /**
  * Arithmetic expression.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Arith extends Arr {
@@ -31,43 +31,37 @@ public final class Arith extends Arr {
   public Arith(final InputInfo info, final Expr expr1, final Expr expr2, final Calc calc) {
     super(info, expr1, expr2);
     this.calc = calc;
-    type = SeqType.ITEM_ZO;
-  }
-
-  @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    super.compile(qc, scp);
-    return optimize(qc, scp);
+    seqType = SeqType.ITEM_ZO;
   }
 
   @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
-    final SeqType s0 = exprs[0].type();
-    final SeqType s1 = exprs[1].type();
-    final Type t0 = s0.type;
-    final Type t1 = s1.type;
-    if(t0.isNumberOrUntyped() && t1.isNumberOrUntyped()) {
-      final Occ occ = s0.one() && s1.one() ? Occ.ONE : Occ.ZERO_ONE;
-      type = SeqType.get(Calc.type(t0, t1), occ);
-    } else if(s0.one() && s1.one()) {
-      type = SeqType.ITEM;
+    final SeqType st1 = exprs[0].seqType();
+    final SeqType st2 = exprs[1].seqType();
+    final Type t1 = st1.type, t2 = st2.type;
+    final boolean o1 = st1.one() && !st1.mayBeArray();
+    final boolean o2 = st2.one() && !st2.mayBeArray();
+    if(t1.isNumberOrUntyped() && t2.isNumberOrUntyped()) {
+      final Occ occ = o1 && o2 ? Occ.ONE : Occ.ZERO_ONE;
+      seqType = SeqType.get(Calc.type(t1, t2), occ);
+    } else if(o1 && o2) {
+      seqType = SeqType.ITEM;
     }
     return optPre(oneIsEmpty() ? null : allAreValues() ? item(qc, info) : this, qc);
   }
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item a = exprs[0].item(qc, info);
-    if(a == null) return null;
-    final Item b = exprs[1].item(qc, info);
-    if(b == null) return null;
-    return calc.ev(info, a, b);
+    final Item it1 = exprs[0].atomItem(qc, ii);
+    if(it1 == null) return null;
+    final Item it2 = exprs[1].atomItem(qc, ii);
+    if(it2 == null) return null;
+    return calc.ev(info, it1, it2);
   }
 
   @Override
   public Arith copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    final Expr a = exprs[0].copy(qc, scp, vs), b = exprs[1].copy(qc, scp, vs);
-    return copyType(new Arith(info, a, b, calc));
+    return copyType(new Arith(info, exprs[0].copy(qc, scp, vs), exprs[1].copy(qc, scp, vs), calc));
   }
 
   @Override

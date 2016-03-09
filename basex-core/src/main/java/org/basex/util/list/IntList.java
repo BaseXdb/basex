@@ -5,9 +5,9 @@ import java.util.*;
 import org.basex.util.*;
 
 /**
- * This is a simple container for native integers.
+ * Resizable-array implementation for native int values.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public class IntList extends ElementList {
@@ -51,10 +51,31 @@ public class IntList extends ElementList {
   /**
    * Adds an element to the array.
    * @param element element to be added
+   * @return self reference
    */
-  public final void add(final int element) {
-    if(size == list.length) list = Arrays.copyOf(list, newSize());
-    list[size++] = element;
+  public final IntList add(final int element) {
+    int[] lst = list;
+    final int s = size;
+    if(s == lst.length) lst = Arrays.copyOf(lst, newSize());
+    lst[s] = element;
+    list = lst;
+    size = s + 1;
+    return this;
+  }
+
+  /**
+   * Adds elements to the array.
+   * @param elements elements to be added
+   * @return self reference
+   */
+  public final IntList add(final int... elements) {
+    int[] lst = list;
+    final int l = elements.length, s = size, ns = s + l;
+    if(ns > lst.length) lst = Arrays.copyOf(lst, newSize(ns));
+    System.arraycopy(elements, 0, lst, s, l);
+    list = lst;
+    size = ns;
+    return this;
   }
 
   /**
@@ -83,21 +104,23 @@ public class IntList extends ElementList {
    * @return result of check
    */
   public final boolean contains(final int element) {
-    for(int i = 0; i < size; ++i) if(list[i] == element) return true;
+    final int s = size;
+    final int[] lst = list;
+    for(int i = 0; i < s; ++i) if(lst[i] == element) return true;
     return false;
   }
 
   /**
    * Inserts elements at the specified index position.
    * @param index inserting position
-   * @param element elements to be inserted
+   * @param elements elements to be inserted
    */
-  public final void insert(final int index, final int[] element) {
-    final int l = element.length;
+  public final void insert(final int index, final int... elements) {
+    final int l = elements.length;
     if(l == 0) return;
     if(size + l > list.length) list = Arrays.copyOf(list, newSize(size + l));
     Array.move(list, index, l, size - index);
-    System.arraycopy(element, 0, list, index, l);
+    System.arraycopy(elements, 0, list, index, l);
     size += l;
   }
 
@@ -106,9 +129,11 @@ public class IntList extends ElementList {
    * @param element element to be removed
    */
   public final void delete(final int element) {
+    final int[] lst = list;
+    final int sz = size;
     int s = 0;
-    for(int i = 0; i < size; ++i) {
-      if(list[i] != element) list[s++] = list[i];
+    for(int i = 0; i < sz; ++i) {
+      if(lst[i] != element) lst[s++] = lst[i];
     }
     size = s;
   }
@@ -118,9 +143,10 @@ public class IntList extends ElementList {
    * @param index index of the element to delete
    * @return deleted element
    */
-  public final int deleteAt(final int index) {
-    final int l = list[index];
-    Array.move(list, index + 1, -1, --size - index);
+  public final int remove(final int index) {
+    final int[] lst = list;
+    final int l = lst[index];
+    Array.move(lst, index + 1, -1, --size - index);
     return l;
   }
 
@@ -129,8 +155,10 @@ public class IntList extends ElementList {
    * @param diff difference
    * @param index index of the first element
    */
-  public final void move(final int diff, final int index) {
-    for(int a = index; a < size; a++) list[a] += diff;
+  public final void incFrom(final int diff, final int index) {
+    final int[] lst = list;
+    final int sz = size;
+    for(int a = index; a < sz; a++) lst[a] += diff;
   }
 
   /**
@@ -176,11 +204,60 @@ public class IntList extends ElementList {
   }
 
   /**
+   * Returns an array with all elements and resets the array size.
+   * @return array
+   */
+  public int[] next() {
+    final int[] lst = Arrays.copyOf(list, size);
+    reset();
+    return lst;
+  }
+
+  /**
+   * Returns an array with all elements and invalidates the internal array.
+   * Warning: the function must only be called if the list is discarded afterwards.
+   * @return array (internal representation!)
+   */
+  public int[] finish() {
+    final int[] lst = list;
+    list = null;
+    final int s = size;
+    return s == lst.length ? lst : Arrays.copyOf(lst, s);
+  }
+
+  /**
+   * Removes duplicate entries from a sorted list.
+   * @return self reference
+   */
+  public IntList distinct() {
+    int i = 1;
+    for(int j = 1; j < size; ++j) {
+      while(j < size && list[i - 1] == list[j]) j++;
+      if(j < size) list[i++] = list[j];
+    }
+    size = i;
+    return this;
+  }
+
+  /**
+   * Sorts the data and returns an array with offsets to the sorted array.
+   * See {@link Array#createOrder(int[], boolean)} for more details.
+   * @return array with new order
+   */
+  public int[] createOrder() {
+    final IntList il = Array.number(size);
+    il.sort(list, true);
+    return il.finish();
+  }
+
+
+  /**
    * Sorts the data.
    * @return self reference
    */
   public IntList sort() {
-    Arrays.sort(list, 0, size);
+    final int s = size;
+    if(s > 1) Arrays.sort(list, 0, s);
     return this;
   }
 
@@ -219,12 +296,23 @@ public class IntList extends ElementList {
   }
 
   /**
+   * Sorts the data in the order of the specified numeric array.
+   * Note that the input array will be resorted as well.
+   * The algorithm is derived from {@link Arrays#sort(int[])}.
+   * @param num token array to sort by
+   * @param asc ascending
+   */
+  public final void sort(final long[] num, final boolean asc) {
+    sort(0, size, asc, num);
+  }
+
+  /**
    * Sorts the array.
    * @param s offset
    * @param e length
    * @param g numeric sort
    * @param f ascending/descending sort
-   * @param t sort tokens
+   * @param t sort array
    */
   private void sort(final int s, final int e, final boolean g, final boolean f, final byte[][] t) {
     if(e < 7) {
@@ -285,7 +373,7 @@ public class IntList extends ElementList {
    * @param s offset
    * @param e length
    * @param f ascending/descending sort
-   * @param t sort tokens
+   * @param t sort array
    */
   private void sort(final int s, final int e, final boolean f, final double[] t) {
     if(e < 7) {
@@ -346,7 +434,7 @@ public class IntList extends ElementList {
    * @param s offset
    * @param e length
    * @param f ascending/descending sort
-   * @param t sort tokens
+   * @param t sort array
    */
   private void sort(final int s, final int e, final boolean f, final int[] t) {
     if(e < 7) {
@@ -403,6 +491,67 @@ public class IntList extends ElementList {
   }
 
   /**
+   * Sorts the array.
+   * @param s offset
+   * @param e length
+   * @param f ascending/descending sort
+   * @param t sort array
+   */
+  private void sort(final int s, final int e, final boolean f, final long[] t) {
+    if(e < 7) {
+      for(int i = s; i < e + s; ++i) {
+        for(int j = i; j > s; j--) {
+          final long h = t[j - 1] - t[j];
+          if(f ? h < 0 : h > 0) break;
+          s(j, j - 1, t);
+        }
+      }
+      return;
+    }
+
+    int m = s + (e >> 1);
+    if(e > 7) {
+      int l = s;
+      int n = s + e - 1;
+      if(e > 40) {
+        final int k = e >>> 3;
+        l = m(l, l + k, l + (k << 1));
+        m = m(m - k, m, m + k);
+        n = m(n - (k << 1), n - k, n);
+      }
+      m = m(l, m, n);
+    }
+    final long v = t[m];
+
+    int a = s, b = a, c = s + e - 1, d = c;
+    while(true) {
+      while(b <= c) {
+        final long h = t[b] - v;
+        if(f ? h > 0 : h < 0) break;
+        if(h == 0) s(a++, b, t);
+        ++b;
+      }
+      while(c >= b) {
+        final long h = t[c] - v;
+        if(f ? h < 0 : h > 0) break;
+        if(h == 0) s(c, d--, t);
+        --c;
+      }
+      if(b > c) break;
+      s(b++, c--, t);
+    }
+
+    final int n = s + e;
+    int k = Math.min(a - s, b - a);
+    s(s, b - k, k, t);
+    k = Math.min(d - c, n - d - 1);
+    s(b, n - k, k, t);
+
+    if((k = b - a) > 1) sort(s, k, f, t);
+    if((k = d - c) > 1) sort(n - k, k, f, t);
+  }
+
+  /**
    * Compares two numeric tokens and returns an integer.
    * @param a first token
    * @param b second token
@@ -427,7 +576,7 @@ public class IntList extends ElementList {
    * Swaps two array elements.
    * @param a first offset
    * @param b second offset
-   * @param t sort tokens
+   * @param t sort array
    */
   private void s(final int a, final int b, final byte[][] t) {
     final int l = list[a];
@@ -442,7 +591,7 @@ public class IntList extends ElementList {
    * Swaps two array elements.
    * @param a first offset
    * @param b second offset
-   * @param t sort tokens
+   * @param t sort array
    */
   private void s(final int a, final int b, final double[] t) {
     final int l = list[a];
@@ -457,7 +606,7 @@ public class IntList extends ElementList {
    * Swaps two array elements.
    * @param a first offset
    * @param b second offset
-   * @param t sort tokens
+   * @param t sort array
    */
   private void s(final int a, final int b, final int[] t) {
     final int l = list[a];
@@ -469,11 +618,26 @@ public class IntList extends ElementList {
   }
 
   /**
+   * Swaps two array elements.
+   * @param a first offset
+   * @param b second offset
+   * @param t sort array
+   */
+  private void s(final int a, final int b, final long[] t) {
+    final int l = list[a];
+    list[a] = list[b];
+    list[b] = l;
+    final long c = t[a];
+    t[a] = t[b];
+    t[b] = c;
+  }
+
+  /**
    * Swaps x[a .. (a+n-1)] with x[b .. (b+n-1)].
    * @param a first offset
    * @param b second offset
    * @param n number of elements
-   * @param t sort tokens
+   * @param t sort array
    */
   private void s(final int a, final int b, final int n, final byte[][] t) {
     for(int i = 0; i < n; ++i) s(a + i, b + i, t);
@@ -484,7 +648,7 @@ public class IntList extends ElementList {
    * @param a first offset
    * @param b second offset
    * @param n number of elements
-   * @param t sort tokens
+   * @param t sort array
    */
   private void s(final int a, final int b, final int n, final double[] t) {
     for(int i = 0; i < n; ++i) s(a + i, b + i, t);
@@ -495,9 +659,20 @@ public class IntList extends ElementList {
    * @param a first offset
    * @param b second offset
    * @param n number of elements
-   * @param t sort tokens
+   * @param t sort array
    */
   private void s(final int a, final int b, final int n, final int[] t) {
+    for(int i = 0; i < n; ++i) s(a + i, b + i, t);
+  }
+
+  /**
+   * Swaps x[a .. (a+n-1)] with x[b .. (b+n-1)].
+   * @param a first offset
+   * @param b second offset
+   * @param n number of elements
+   * @param t sort array
+   */
+  private void s(final int a, final int b, final int n, final long[] t) {
     for(int i = 0; i < n; ++i) s(a + i, b + i, t);
   }
 
@@ -516,6 +691,6 @@ public class IntList extends ElementList {
 
   @Override
   public String toString() {
-    return Arrays.toString(toArray());
+    return list == null ? "" : Arrays.toString(toArray());
   }
 }

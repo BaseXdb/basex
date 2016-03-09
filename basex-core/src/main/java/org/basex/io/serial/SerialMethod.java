@@ -5,17 +5,18 @@ import java.util.*;
 /**
  * Serialization methods.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public enum SerialMethod {
-  /** XML.   */ XML,
-  /** XHTML. */ XHTML,
-  /** HTML.  */ HTML,
-  /** Text.  */ TEXT,
-  /** Json.  */ JSON,
-  /** CSV.   */ CSV,
-  /** RAW.   */ RAW;
+  /** XML.      */ XML,
+  /** XHTML.    */ XHTML,
+  /** HTML.     */ HTML,
+  /** JSON.     */ JSON,
+  /** CSV.      */ CSV,
+  /** Text.     */ TEXT,
+  /** Adaptive. */ ADAPTIVE,
+  /** BaseX.    */ BASEX;
 
   @Override
   public String toString() {

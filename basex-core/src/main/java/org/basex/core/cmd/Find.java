@@ -4,14 +4,16 @@ import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 
 import org.basex.core.*;
-import org.basex.query.path.*;
+import org.basex.core.locks.*;
+import org.basex.core.users.*;
+import org.basex.query.expr.path.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
  * Evaluates the 'find' command and processes a simplified request as XQuery.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Find extends AQuery {
@@ -51,12 +53,12 @@ public final class Find extends AQuery {
 
   @Override
   public boolean updating(final Context ctx) {
-    return updating(ctx, find(args[0], ctx, root));
+    return updates(ctx, find(args[0], ctx, root));
   }
 
   @Override
   public void databases(final LockResult lr) {
-    lr.read.add(DBLocking.CTX);
+    lr.read.add(DBLocking.CONTEXT);
   }
 
   /**
@@ -107,8 +109,8 @@ public final class Find extends AQuery {
 
     // create final string
     final TokenBuilder tb = new TokenBuilder();
-    final String tag = "*";
-    tb.add(pre + (r ? "/" : "") + Axis.DESCORSELF + "::" + tag + preds);
+    final String name = "*";
+    tb.add(pre + (r ? "/" : "") + Axis.DESCORSELF + "::" + name + preds);
     return tb.toString();
   }
 
@@ -117,12 +119,12 @@ public final class Find extends AQuery {
    * @param filter filter terms
    * @param cols filter columns
    * @param elem element flag
-   * @param tag root tag
+   * @param name name of root element
    * @param root root flag
    * @return query
    */
   public static String findTable(final StringList filter, final TokenList cols, final BoolList elem,
-      final byte[] tag, final boolean root) {
+      final byte[] name, final boolean root) {
 
     final TokenBuilder tb = new TokenBuilder();
     final int is = filter.size();
@@ -150,7 +152,7 @@ public final class Find extends AQuery {
       }
     }
     return tb.isEmpty() ? "/" : (root ? "/" : "") +
-        Axis.DESCORSELF + "::*:" + string(tag) + tb;
+        Axis.DESCORSELF + "::*:" + string(name) + tb;
   }
 
   /**

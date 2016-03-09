@@ -11,7 +11,7 @@ import org.basex.server.*;
  * This class defines all methods for iteratively evaluating queries locally.
  * All data is interpreted by the {@link ServerQuery}.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public class LocalQuery extends Query {
@@ -27,7 +27,7 @@ public class LocalQuery extends Query {
    */
   LocalQuery(final String query, final Context context, final OutputStream output) {
     ql = new ServerQuery(query, context);
-    this.out = output;
+    out = output;
   }
 
   @Override
@@ -43,16 +43,16 @@ public class LocalQuery extends Query {
   }
 
   @Override
-  protected void cache() throws IOException {
+  public void cache(final boolean full) throws IOException {
     final ArrayOutput ao = new ArrayOutput();
-    ql.execute(true, ao, true, false);
-    cache(new ArrayInput(ao.toArray()));
+    ql.execute(ao, true, true, full);
+    cache(new ArrayInput(ao.finish()), full);
   }
 
   @Override
   public String execute() throws IOException {
     final OutputStream os = out == null ? new ArrayOutput() : out;
-    ql.execute(false, os, false, false);
+    ql.execute(os, false, false, false);
     return out == null ? os.toString() : null;
   }
 

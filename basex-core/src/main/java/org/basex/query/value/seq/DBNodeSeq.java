@@ -1,5 +1,8 @@
 package org.basex.query.value.seq;
 
+import static org.basex.query.QueryText.*;
+import static org.basex.query.func.Function.*;
+
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -13,29 +16,29 @@ import org.basex.util.list.*;
 /**
  * Sequence, containing at least two ordered database nodes.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public final class DBNodeSeq extends NativeSeq {
+public class DBNodeSeq extends NativeSeq {
   /** Data reference. */
-  private final Data data;
+  protected final Data data;
+  /** Pre values reference all documents of the database. */
+  protected final boolean all;
   /** Pre values. */
-  public final int[] pres;
-  /** Complete. */
-  public final boolean complete;
+  protected int[] pres;
 
   /**
    * Constructor.
    * @param pres pre values
    * @param data data reference
-   * @param t node type
-   * @param complete indicates if pre values represent all document nodes of a database
+   * @param type node type
+   * @param all pre values reference all documents of the database
    */
-  private DBNodeSeq(final int[] pres, final Data data, final Type t, final boolean complete) {
-    super(pres.length, t);
+  protected DBNodeSeq(final int[] pres, final Data data, final Type type, final boolean all) {
+    super(pres.length, type);
     this.pres = pres;
     this.data = data;
-    this.complete = complete;
+    this.all = all;
   }
 
   @Override
@@ -66,38 +69,76 @@ public final class DBNodeSeq extends NativeSeq {
   }
 
   @Override
-  public Value reverse() {
-    final int s = pres.length;
-    final int[] tmp = new int[s];
-    for(int l = 0, r = s - 1; l < s; l++, r--) tmp[l] = pres[r];
-    return get(tmp, data, type, false);
+  public Value atomValue(final InputInfo ii) throws QueryException {
+    final ValueBuilder vb = new ValueBuilder();
+    for(int s = 0; s < size; s++) vb.add(itemAt(s).atomValue(ii));
+    return vb.value();
+  }
+
+  /**
+   * Returns the internal pre value array.
+   * @return pre values
+   */
+  public int[] pres() {
+    return pres;
+  }
+
+  /**
+   * Returns the specified pre value.
+   * @param index index of pre value
+   * @return pre value
+   */
+  public int pre(final int index) {
+    return pres[index];
+  }
+
+  /**
+   * Indicates if pre values reference all documents of the database.
+   * @return flag
+   */
+  public boolean all() {
+    return all;
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder(PAREN1);
+    for(int i = 0; i < size; ++i) {
+      sb.append(i == 0 ? "" : SEP);
+      sb.append(_DB_OPEN_PRE.args(data.meta.name, pres[i]));
+      if(sb.length() <= 16 || i + 1 == size) continue;
+      // output is chopped to prevent too long error strings
+      sb.append(SEP).append(DOTS);
+      break;
+    }
+    return sb.append(PAREN2).toString();
   }
 
   // STATIC METHODS =====================================================================
 
   /**
    * Creates a node sequence with the given data reference and pre values.
-   * @param v pre values
-   * @param d data reference
-   * @param docs indicates if all values reference document nodes
-   * @param c indicates if values include all document nodes of a database
+   * @param pres pre values
+   * @param data data reference
+   * @param docs all values reference document nodes
+   * @param all pre values reference all documents of the database
    * @return resulting item or sequence
    */
-  public static Value get(final IntList v, final Data d, final boolean docs,
-      final boolean c) {
-    return get(v.toArray(), d, docs ? NodeType.DOC : NodeType.NOD, c);
+  public static Value get(final IntList pres, final Data data, final boolean docs,
+      final boolean all) {
+    return get(pres.toArray(), data, docs ? NodeType.DOC : NodeType.NOD, all);
   }
 
   /**
    * Creates a node sequence with the given data reference and pre values.
-   * @param v pre values
-   * @param d data reference
-   * @param t node type
-   * @param c indicates if values include all document nodes of a database
+   * @param pres pre values
+   * @param data data reference
+   * @param type node type
+   * @param all pre values reference all documents of the database
    * @return resulting item or sequence
    */
-  private static Value get(final int[] v, final Data d, final Type t, final boolean c) {
-    return v.length == 0 ? Empty.SEQ : v.length == 1 ? new DBNode(d, v[0]) :
-      new DBNodeSeq(v, d, t, c);
+  private static Value get(final int[] pres, final Data data, final Type type, final boolean all) {
+    return pres.length == 0 ? Empty.SEQ : pres.length == 1 ? new DBNode(data, pres[0]) :
+      new DBNodeSeq(pres, data, type, all);
   }
 }

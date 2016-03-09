@@ -1,6 +1,6 @@
 package org.basex.query;
 
-import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -9,16 +9,16 @@ import org.basex.util.*;
 /**
  * Common superclass for static functions and variables.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public abstract class StaticDecl extends StaticScope {
   /** Annotations. */
-  public final Ann ann;
-  /** This declaration's name. */
+  public final AnnList anns;
+  /** Name of the declaration. */
   public final QNm name;
   /** Declared type, {@code null} if not specified. */
-  protected final SeqType declType;
+  protected final SeqType type;
 
   /** Flag that is set during compilation and execution and prevents infinite loops. */
   protected boolean dontEnter;
@@ -26,20 +26,20 @@ public abstract class StaticDecl extends StaticScope {
   /**
    * Constructor.
    * @param sc static context
-   * @param ann annotations
+   * @param anns annotations
    * @param name name
    * @param type declared return type
    * @param scope variable scope
    * @param doc xqdoc documentation
    * @param info input info
    */
-  protected StaticDecl(final StaticContext sc, final Ann ann, final QNm name,
+  protected StaticDecl(final StaticContext sc, final AnnList anns, final QNm name,
       final SeqType type, final VarScope scope, final String doc, final InputInfo info) {
 
     super(scope, doc, sc, info);
-    this.ann = ann == null ? new Ann() : ann;
+    this.anns = anns;
     this.name = name;
-    this.declType = type;
+    this.type = type;
   }
 
   /**
@@ -49,11 +49,11 @@ public abstract class StaticDecl extends StaticScope {
   public abstract byte[] id();
 
   /**
-   * Returns the type of this expression. If no type has been declare in the expression,
+   * Returns the type of this expression. If no type has been declared in the expression,
    * it is derived from the expression type.
    * @return return type
    */
-  public SeqType type() {
-    return declType != null ? declType : expr.type();
+  public SeqType seqType() {
+    return type != null ? type : expr.seqType();
   }
 }

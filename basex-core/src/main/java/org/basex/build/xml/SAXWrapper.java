@@ -19,7 +19,7 @@ import org.xml.sax.*;
  * DBLP documents contain too many entities and cause an out of memory error.
  * The internal {@link XMLParser} can be used as alternative.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class SAXWrapper extends SingleParser {
@@ -48,7 +48,7 @@ public final class SAXWrapper extends SingleParser {
   @Override
   public void parse() throws IOException {
     final InputSource is = wrap(saxs.getInputSource());
-    final String in = saxs.getSystemId() == null ? DOTS : saxs.getSystemId();
+    //final String in = saxs.getSystemId() == null ? DOTS : saxs.getSystemId();
 
     try {
       XMLReader r = saxs.getXMLReader();
@@ -61,7 +61,7 @@ public final class SAXWrapper extends SingleParser {
 
         f.setNamespaceAware(true);
         f.setValidating(false);
-        f.setXIncludeAware(true);
+        f.setXIncludeAware(options.get(MainOptions.XINCLUDE));
         r = f.newSAXParser().getXMLReader();
       }
 
@@ -78,7 +78,7 @@ public final class SAXWrapper extends SingleParser {
       if(is != null) r.parse(is);
       else r.parse(saxs.getSystemId());
     } catch(final SAXParseException ex) {
-      final String msg = Util.info(SCANPOS_X_X, in, ex.getLineNumber(),
+      final String msg = Util.info(SCANPOS_X_X, source, ex.getLineNumber(),
           ex.getColumnNumber()) + COLS + Util.message(ex);
       throw new IOException(msg, ex);
     } catch(final ProcException ex) {
@@ -86,19 +86,13 @@ public final class SAXWrapper extends SingleParser {
     } catch(final Exception ex) {
       // occurs, e.g. if document encoding is invalid:
       // prefix message with source id
-      final String msg = '"' + in + '"' + COLS + Util.message(ex);
+      final String msg = "\"" + source + '"' + COLS + Util.message(ex);
       // wrap and return original message
       throw new IOException(msg, ex);
     } finally {
       if(is != null) {
-        try {
-          final Reader r = is.getCharacterStream();
-          if(r != null) r.close();
-          final InputStream ist = is.getByteStream();
-          if(ist != null) ist.close();
-        } catch(final IOException ex) {
-          Util.debug(ex);
-        }
+        try(final Reader r = is.getCharacterStream()) { }
+        try(final InputStream ist = is.getByteStream()) { }
       }
     }
   }
@@ -110,6 +104,7 @@ public final class SAXWrapper extends SingleParser {
    * @return resulting stream
    * @throws IOException I/O exception
    */
+  @SuppressWarnings("resource")
   private InputSource wrap(final InputSource is) throws IOException {
     if(is == null) return null;
 
@@ -119,15 +114,16 @@ public final class SAXWrapper extends SingleParser {
       in = is.getByteStream();
     } else if(is.getSystemId() == null || is.getSystemId().isEmpty()) {
       return is;
-    } else if(src instanceof IOFile) {
-      in = new FileInputStream(src.path());
-    } else if(src instanceof IOContent || src instanceof IOUrl) {
-      in = new ByteArrayInputStream(src.read());
+    } else if(source instanceof IOFile) {
+      in = new FileInputStream(source.path());
+    } else if(source instanceof IOContent || source instanceof IOUrl) {
+      in = new ByteArrayInputStream(source.read());
     } else {
       return is;
     }
+
     // retrieve/estimate number of bytes to be read
-    length = src.length();
+    length = source.length();
     try {
       if(length <= 0) length = in.available();
     } catch(final IOException ex) {
@@ -161,7 +157,7 @@ public final class SAXWrapper extends SingleParser {
 
   @Override
   public String det() {
-    return length == 0 ? super.det() : Util.info(SCANPOS_X_X, src.name(), line);
+    return length == 0 ? super.det() : Util.info(SCANPOS_X_X, source.name(), line);
   }
 
   @Override

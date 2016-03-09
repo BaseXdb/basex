@@ -2,22 +2,22 @@ package org.basex.core;
 
 import static org.junit.Assert.*;
 
+import org.basex.*;
 import org.basex.core.parse.*;
 import org.basex.query.*;
-import org.basex.*;
 import org.basex.util.*;
 import org.junit.*;
 
 /**
  * This class tests the XML syntax of the database commands.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public class XMLCommandTest extends SandboxTest {
+public final class XMLCommandTest extends SandboxTest {
   /** Check syntax of all commands. */
   @Test
-  public final void commands() {
+  public void commands() {
     // surrounded by <commands/> element (required to process more than one command)
     ok("<commands><add>x</add></commands>");
 
@@ -25,8 +25,10 @@ public class XMLCommandTest extends SandboxTest {
     ok("<add path='X'>X</add>");
     ok("<add path='X'><X/></add>");
 
-    ok("<alter-user name='X'/>");
-    ok("<alter-user name='X'>X</alter-user>");
+    ok("<alter-password name='X'/>");
+    ok("<alter-password name='X'>X</alter-password>");
+
+    ok("<alter-user name='X' newname='Y'/>");
 
     ok("<check input='X'/>");
 
@@ -40,14 +42,10 @@ public class XMLCommandTest extends SandboxTest {
     ok("<create-db name='X'>X</create-db>");
     ok("<create-db name='X'><X/></create-db>");
 
-    ok("<create-event name='X'/>");
-
     ok("<create-index type='X'/>");
 
     ok("<create-user name='X'/>");
     ok("<create-user name='X'>X</create-user>");
-
-    ok("<cs>X</cs>");
 
     ok("<delete path='X'/>");
 
@@ -55,11 +53,9 @@ public class XMLCommandTest extends SandboxTest {
 
     ok("<drop-db name='X'/>");
 
-    ok("<drop-event name='X'/>");
-
     ok("<drop-index type='X'/>");
 
-    ok("<drop-user name='X' database='X'/>");
+    ok("<drop-user name='X' pattern='X'/>");
     ok("<drop-user name='X'/>");
 
     ok("<execute><info/><info/></execute>");
@@ -73,9 +69,10 @@ public class XMLCommandTest extends SandboxTest {
 
     ok("<flush/>");
 
+    ok("<get/>");
     ok("<get option='X'/>");
 
-    ok("<grant name='X' permission='X' database='X'/>");
+    ok("<grant name='X' permission='X' pattern='X'/>");
     ok("<grant name='X' permission='X'/>");
 
     ok("<help>X</help>");
@@ -86,7 +83,10 @@ public class XMLCommandTest extends SandboxTest {
     ok("<info-index type='X'/>");
     ok("<info-index/>");
     ok("<info-storage/>");
-    ok("<info-storage>X</info-storage>");
+    ok("<info-storage start='1'/>");
+    ok("<info-storage start='1' end='2'/>");
+    ok("<info-storage end='1'/>");
+    no("<info-storage>X</info-storage>");
 
     ok("<kill target='X'/>");
 
@@ -95,6 +95,7 @@ public class XMLCommandTest extends SandboxTest {
     ok("<list name='X' path='X'/>");
 
     ok("<open name='X'/>");
+    ok("<open name='X' path='Y'/>");
 
     ok("<optimize/>");
 
@@ -125,8 +126,6 @@ public class XMLCommandTest extends SandboxTest {
 
     ok("<show-backups/>");
 
-    ok("<show-events/>");
-
     ok("<show-sessions/>");
 
     ok("<show-users/>");
@@ -141,7 +140,7 @@ public class XMLCommandTest extends SandboxTest {
 
   /** Evaluates some commands with invalid syntax. */
   @Test
-  public final void failing() {
+  public void failing() {
     no("<add/>");
     no("<add x='X'>X</add>");
     no("<add path='X' x='X'>X</add>");

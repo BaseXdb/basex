@@ -4,18 +4,18 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import org.basex.query.*;
-import org.basex.query.value.item.*;
-import org.basex.query.value.type.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
  * The scope of variables, either the query, a user-defined or an inline function.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public final class VarScope {
@@ -81,7 +81,7 @@ public final class VarScope {
    * @param qc query context
    * @param fp frame pointer
    */
-  public void exit(final QueryContext qc, final int fp) {
+  public static void exit(final QueryContext qc, final int fp) {
     qc.stack.exitFrame(fp);
   }
 
@@ -119,7 +119,7 @@ public final class VarScope {
 
     // remove unused entries from the closure
     if(expr instanceof Closure) {
-      final Iterator<Entry<Var, Expr>> cls = ((Closure) expr).nonLocalBindings();
+      final Iterator<Entry<Var, Expr>> cls = ((Closure) expr).globalBindings();
       while(cls.hasNext()) {
         final Entry<Var, Expr> e = cls.next();
         final Var v = e.getKey();

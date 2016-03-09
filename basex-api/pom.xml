@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.basex</groupId>
     <artifactId>basex-parent</artifactId>
-    <version>8.0-SNAPSHOT</version>
+    <version>8.4.2-SNAPSHOT</version>
     <relativePath>..</relativePath>
   </parent>
 
@@ -49,15 +49,15 @@
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-nop</artifactId>
+      <artifactId>slf4j-simple</artifactId>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
     </dependency>
     <dependency>
-    	<groupId>com.vividsolutions</groupId>
-    	<artifactId>jts</artifactId>
+      <groupId>com.vividsolutions</groupId>
+      <artifactId>jts</artifactId>
     </dependency>
   </dependencies>
 
@@ -84,23 +84,9 @@
         <artifactId>maven-source-plugin</artifactId>
       </plugin>
       <plugin>
-        <groupId>org.mortbay.jetty</groupId>
-        <artifactId>jetty-maven-plugin</artifactId>
-        <configuration>
-          <jettyXml>${basedir}/src/main/webapp/WEB-INF/jetty.xml</jettyXml>
-          <!-- Key and port for stopping Jetty
-          <stopKey>keyToStopJetty</stopKey>
-          <stopPort>8985</stopPort> -->
-        </configuration>
-      </plugin>
-      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-deploy-plugin</artifactId>
       </plugin>
-      <!--<plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-      </plugin>-->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
@@ -109,11 +95,24 @@
           <excludeArtifactIds>xstream</excludeArtifactIds>
         </configuration>
       </plugin>
-      <!-- Temporarily removed (takes some time)
-      <plugin>
+      <!-- <plugin>
+        <groupId>org.mortbay.jetty</groupId>
+        <artifactId>jetty-maven-plugin</artifactId>
+        <version>8.1.16.v20140903</version>
+        <configuration>
+          <jettyXml>${basedir}/src/main/webapp/WEB-INF/jetty.xml</jettyXml>
+          <stopKey>keyToStopJetty</stopKey>
+          <stopPort>8985</stopPort>
+        </configuration>
+      </plugin> -->
+      <!-- <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+      </plugin> -->
+      <!-- <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-      </plugin>-->
+      </plugin> -->
     </plugins>
   </build>
 </project>

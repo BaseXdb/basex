@@ -9,7 +9,7 @@ import org.basex.util.*;
 /**
  * Simple expression without arguments.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class Simple extends ParseExpr {
@@ -36,17 +36,17 @@ public abstract class Simple extends ParseExpr {
   }
 
   @Override
-  public boolean removable(final Var v) {
+  public boolean removable(final Var var) {
     return true;
   }
 
   @Override
-  public VarUsage count(final Var v) {
+  public VarUsage count(final Var var) {
     return VarUsage.NEVER;
   }
 
   @Override
-  public Expr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
+  public Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
       throws QueryException {
     return null;
   }

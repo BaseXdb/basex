@@ -1,20 +1,21 @@
 package org.basex.http.rest;
 
-import static org.basex.io.MimeTypes.*;
-
 import java.io.*;
 
-import org.basex.build.*;
-import org.basex.build.JsonOptions.JsonFormat;
+import org.basex.build.csv.*;
+import org.basex.build.html.*;
+import org.basex.build.json.*;
+import org.basex.build.text.*;
 import org.basex.core.*;
 import org.basex.core.MainOptions.MainParser;
 import org.basex.core.cmd.*;
 import org.basex.http.*;
+import org.basex.util.http.*;
 
 /**
  * REST-based evaluation of PUT operations.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class RESTPut {
@@ -23,60 +24,68 @@ final class RESTPut {
 
   /**
    * Creates REST code.
-   * @param rs REST session
+   * @param session REST session
    * @return code
    * @throws IOException I/O exception
    */
-  public static RESTExec get(final RESTSession rs) throws IOException {
+  public static RESTExec get(final RESTSession session) throws IOException {
     // create new database or update resource
-    final HTTPContext http = rs.http;
-    if(http.depth() == 0) throw HTTPCode.NO_PATH.get();
+    final HTTPContext http = session.http;
+    final String db = http.db();
+    if(db.isEmpty()) throw HTTPCode.NO_PATH.get();
 
-    RESTCmd.parseOptions(rs);
+    RESTCmd.parseOptions(session);
 
-    boolean xml = true;
+    final MainOptions options = session.context.options;
     final InputStream is = http.req.getInputStream();
-    final String ct = http.contentType();
+    final MediaType mt = http.contentType();
+
     // choose correct importer
-    MainParser parser = null;
-    if(isJSON(ct)) {
-      parser = MainParser.JSON;
-      if(APP_JSONML.equals(ct)) {
-        final JsonParserOptions jopts = new JsonParserOptions();
-        jopts.set(JsonOptions.FORMAT, JsonFormat.JSONML);
-        rs.context.options.set(MainOptions.JSONPARSER, jopts);
-      }
-    } else if(TEXT_CSV.equals(ct)) {
-      parser = MainParser.CSV;
-    } else if(TEXT_HTML.equals(ct)) {
-      parser = MainParser.HTML;
-    } else if(ct != null && isText(ct)) {
-      parser = MainParser.TEXT;
-    } else if(ct != null && !isXML(ct)) {
+    boolean xml = true;
+    final String ct = mt.type();
+    if(mt.is(MediaType.APPLICATION_JSON)) {
+      final JsonParserOptions opts = new JsonParserOptions();
+      opts.assign(mt);
+      options.set(MainOptions.JSONPARSER, opts);
+      options.set(MainOptions.PARSER, MainParser.JSON);
+    } else if(mt.is(MediaType.TEXT_CSV)) {
+      final CsvParserOptions opts = new CsvParserOptions();
+      opts.assign(mt);
+      options.set(MainOptions.CSVPARSER, opts);
+      options.set(MainOptions.PARSER, MainParser.CSV);
+    } else if(mt.is(MediaType.TEXT_HTML)) {
+      final HtmlOptions opts = new HtmlOptions();
+      opts.assign(mt);
+      options.set(MainOptions.HTMLPARSER, opts);
+      options.set(MainOptions.PARSER, MainParser.HTML);
+    } else if(mt.isText()) {
+      final TextOptions opts = new TextOptions();
+      opts.assign(mt);
+      options.set(MainOptions.TEXTPARSER, opts);
+      options.set(MainOptions.PARSER, MainParser.TEXT);
+    } else if(!ct.isEmpty() && !mt.isXML()) {
       xml = false;
     }
-    if(parser != null) rs.context.options.set(MainOptions.PARSER, parser);
 
     // store data as XML or raw file, depending on content type
-    final String db = http.db();
-    if(http.depth() == 1) {
+    final String path = http.dbpath();
+    if(path.isEmpty()) {
       if(xml) {
-        rs.add(new CreateDB(db), is);
+        session.add(new CreateDB(db), is);
       } else {
-        rs.add(new CreateDB(db));
-        rs.add(new Store(db), is);
+        session.add(new CreateDB(db));
+        session.add(new Store(db), is);
       }
     } else {
-      rs.add(new Open(db));
-      final String path = http.dbpath();
+      session.add(new Open(db));
       if(xml) {
-        rs.add(new Replace(path), is);
+        session.add(new Replace(path), is);
       } else {
-        rs.add(new Delete(path));
-        rs.add(new Store(path), is);
+        session.add(new Delete(path));
+        session.add(new Store(path), is);
       }
     }
-    final RESTExec cmd = new RESTExec(rs);
+    final RESTExec cmd = new RESTExec(session);
     cmd.code = HTTPCode.CREATED_X;
     return cmd;
   }

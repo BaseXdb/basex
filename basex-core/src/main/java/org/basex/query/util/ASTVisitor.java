@@ -12,13 +12,13 @@ import org.basex.query.var.*;
  *
  * @author Leo Woerteler
  */
-@SuppressWarnings("unused")
 public abstract class ASTVisitor {
   /**
    * Notifies the visitor of a variable declaration.
    * @param count declared variable
    * @return if more expressions should be visited
    */
+  @SuppressWarnings("unused")
   public boolean declared(final Var count) {
     return true;
   }
@@ -28,6 +28,7 @@ public abstract class ASTVisitor {
    * @param ref used variable
    * @return if more expressions should be visited
    */
+  @SuppressWarnings("unused")
   public boolean used(final VarRef ref) {
     return true;
   }
@@ -37,6 +38,7 @@ public abstract class ASTVisitor {
    * @param var static variable
    * @return if more expressions should be visited
    */
+  @SuppressWarnings("unused")
   public boolean staticVar(final StaticVar var) {
     return true;
   }
@@ -46,6 +48,7 @@ public abstract class ASTVisitor {
    * @param sub scope
    * @return if more expressions should be visited
    */
+  @SuppressWarnings("unused")
   public boolean inlineFunc(final Scope sub) {
     return true;
   }
@@ -55,6 +58,7 @@ public abstract class ASTVisitor {
    * @param call function call
    * @return if more expressions should be visited
    */
+  @SuppressWarnings("unused")
   public boolean staticFuncCall(final StaticFuncCall call) {
     return true;
   }
@@ -64,6 +68,7 @@ public abstract class ASTVisitor {
    * @param call function call
    * @return if more expressions should be visited
    */
+  @SuppressWarnings("unused")
   public boolean dynFuncCall(final DynFuncCall call) {
     return true;
   }
@@ -73,15 +78,17 @@ public abstract class ASTVisitor {
    * @param func the function item
    * @return if more expressions should be visited
    */
+  @SuppressWarnings("unused")
   public boolean funcItem(final FuncItem func) {
     return true;
   }
 
   /**
-   * Notifies the visitor of a database lock.
+   * Notifies the visitor of a database lock. Overwritten by {@link MainModule}.
    * @param db database to be locked
-   * @return if more expressions should be visited
+   * @return if database locks cannot be detected statically
    */
+  @SuppressWarnings("unused")
   public boolean lock(final String db) {
     return true;
   }

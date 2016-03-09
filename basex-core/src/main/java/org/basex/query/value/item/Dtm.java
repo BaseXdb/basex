@@ -1,10 +1,10 @@
 package org.basex.query.value.item;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
-import static org.basex.query.util.Err.*;
 
 import java.math.*;
-import java.util.Date;
+import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * DateTime item ({@code xs:dateTime}).
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Dtm extends ADate {
@@ -44,10 +44,10 @@ public final class Dtm extends ADate {
     hou = time.hou;
     min = time.min;
     sec = time.sec;
-    if(zon == Short.MAX_VALUE) {
-      zon = time.zon;
-    } else if(zon != time.zon && time.zon != Short.MAX_VALUE) {
-      throw FUNZONE.get(ii, date, time);
+    if(tz == Short.MAX_VALUE) {
+      tz = time.tz;
+    } else if(tz != time.tz && time.tz != Short.MAX_VALUE) {
+      throw FUNZONE_X_X.get(ii, date, time);
     }
   }
 
@@ -72,7 +72,7 @@ public final class Dtm extends ADate {
    * @throws QueryException query exception
    */
   public Dtm(final long ms, final InputInfo ii) throws QueryException {
-    this(Token.token(DateTime.format(new Date(ms), DateTime.FULL)), ii);
+    this(Token.token(DateTime.format(new Date(ms))), ii);
   }
 
   /**
@@ -89,16 +89,16 @@ public final class Dtm extends ADate {
     this(date);
     if(dur instanceof DTDur) {
       calc((DTDur) dur, plus);
-      if(yea <= MIN_YEAR || yea > MAX_YEAR) throw YEARRANGE.get(ii, yea);
+      if(yea <= MIN_YEAR || yea > MAX_YEAR) throw YEARRANGE_X.get(ii, yea);
     } else {
       calc((YMDur) dur, plus, ii);
     }
   }
 
   @Override
-  public void timeZone(final DTDur tz, final boolean spec, final InputInfo ii)
+  public void timeZone(final DTDur zone, final boolean spec, final InputInfo ii)
       throws QueryException {
-    tz(tz, spec, ii);
+    tz(zone, spec, ii);
   }
 
   @Override
@@ -106,7 +106,7 @@ public final class Dtm extends ADate {
     if(!(cmp instanceof Dtm)) return false;
     final Dtm dtm = (Dtm) cmp;
     return type == dtm.type && yea == dtm.yea && mon == dtm.mon && day == dtm.day &&
-        hou == dtm.hou && min == dtm.min && zon == dtm.zon &&
-        sec == null ? dtm.sec == null : sec.equals(dtm.sec);
+        hou == dtm.hou && min == dtm.min && tz == dtm.tz &&
+        sec == null ? dtm.sec == null : sec.compareTo(dtm.sec) == 0;
   }
 }

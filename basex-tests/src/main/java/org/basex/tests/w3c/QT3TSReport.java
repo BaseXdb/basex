@@ -11,44 +11,60 @@ import org.basex.util.*;
 /**
  * QT3TS Report builder.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class QT3TSReport {
   /** Dependencies. */
   private static final String[][] DEPENDENCIES = {
     { "calendar", "CB", "true" },
+    { "default-language", "fr-CA", "false" },
     { "default-language", "en", "true" },
     { "feature", "collection-stability", "true" },
     { "feature", "directory-as-collection-uri", "true" },
+    { "feature", "fn-format-integer-CLDR", "true" },
+    { "feature", "fn-load-xquery-module", "true" },
+    { "feature", "fn-transform-XSLT30", "true" },
+    { "feature", "fn-transform-XSLT", "true" },
     { "feature", "higherOrderFunctions", "true" },
+    { "feature", "infoset-dtd", "true" },
     { "feature", "moduleImport", "true" },
     { "feature", "namespace-axis", "true" },
-    { "feature", "schemaAware", "false" },
-    { "feature", "schemaImport", "false" },
+    { "feature", "non_empty_sequence_collection", "true" },
+    { "feature", "non_unicode_codepoint_collation", "true" },
     { "feature", "schema-location-hint", "false" },
+    { "feature", "schemaImport", "false" },
     { "feature", "schemaValidation", "false" },
+    { "feature", "serialization", "true" },
+    { "feature", "simple-uca-fallback", "true" },
     { "feature", "staticTyping", "false" },
+    { "feature", "typedData", "false" },
     { "feature", "xpath-1.0-compatibility", "true" },
-    { "format-integer-sequence", "\u03B1", "true" },
-    { "format-integer-sequence", "\u0661", "true" },
-    { "format-integer-sequence", "\u2460", "true" },
-    { "format-integer-sequence", "\u2474", "true" },
-    { "format-integer-sequence", "\u2488", "true" },
-    { "format-integer-sequence", "\u4E00", "true" },
-    { "format-integer-sequence", "\uFBF4", "true" },
     { "format-integer-sequence", "Α", "true" },
+    { "format-integer-sequence", "α", "true" },
+    { "format-integer-sequence", "١", "true" },
+    { "format-integer-sequence", "①", "true" },
+    { "format-integer-sequence", "⑴", "true" },
+    { "format-integer-sequence", "⒈", "true" },
+    { "format-integer-sequence", "一", "true" },
+    { "format-integer-sequence", "ﯴ", "true" },
     { "language", "de", "true" },
+    { "language", "en", "true" },
+    { "language", "fr", "true" },
+    { "language", "it", "true" },
     { "language", "xib", "true" },
     { "limits", "year_lt_0", "true" },
-    { "unicode-normalization-form", "FULLY-NORMALIZED", "false" },
     { "unicode-normalization-form", "NFD", "true" },
-    { "unicode-normalization-form", "NFKC", "true" },
     { "unicode-normalization-form", "NFKD", "true" },
+    { "unicode-normalization-form", "NFKC", "true" },
+    { "unicode-normalization-form", "FULLY-NORMALIZED", "false" },
+    { "unicode-version", "5.2", "true" },
+    { "unicode-version", "6.0", "true" },
+    { "unicode-version", "6.2", "true" },
     { "xml-version", "1.0", "true" },
+    { "xml-version", "1.1", "false" },
     { "xml-version", "1.0:4-", "false" },
-    { "xml-version", "1.0:5+ 1.1", "true" },
-    { "xml-version", "1.1", "false" }
+    { "xml-version", "1.0:5+ 1.1", "true" }
   };
 
   /** URI of test suite. */
@@ -109,7 +125,7 @@ public final class QT3TSReport {
     product.add("version", Prop.VERSION);
     product.add("released", "true");
     product.add("open-source", "true");
-    product.add("language", "XQ30");
+    product.add("language", "XQ31");
 
     // dependency element
     for(final String[] deps : DEPENDENCIES) {
@@ -139,7 +155,7 @@ public final class QT3TSReport {
    * @param name name of element
    * @return element node
    */
-  private FElem element(final String name) {
+  private static FElem element(final String name) {
     return new FElem(name, URI).declareNS();
   }
 
@@ -149,7 +165,7 @@ public final class QT3TSReport {
    * @param parent parent node
    * @return element node
    */
-  private FElem element(final String name, final FElem parent) {
+  private static FElem element(final String name, final FElem parent) {
     final FElem elem = new FElem(name, URI);
     parent.add(elem);
     return elem;

@@ -1,17 +1,18 @@
 package org.basex.query.up;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 
 import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.up.primitives.*;
+import org.basex.query.up.primitives.name.*;
 import org.basex.util.list.*;
 
 /**
  * This class 'caches' all update operations that use a database name as reference.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class NameUpdates {
@@ -29,7 +30,7 @@ final class NameUpdates {
     for(final NameUpdate o : nameUpdates) {
       if(o.type == up.type) o.merge(up);
       if(drop && o.type == UpdateType.DBALTER || alter && o.type == UpdateType.DBDROP) {
-        throw BXDB_ALTERDROP.get(o.info(), o.name());
+        throw BXDB_ALTERDROP_X.get(o.info(), o.name());
       }
     }
     nameUpdates.add(up);

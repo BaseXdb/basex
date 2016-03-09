@@ -4,8 +4,8 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import org.basex.query.*;
-import org.basex.query.func.*;
-import org.basex.query.path.*;
+import org.basex.query.expr.path.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -18,7 +18,7 @@ import org.basex.util.hash.*;
 /**
  * Catch clause.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Catch extends Single {
@@ -54,9 +54,9 @@ public final class Catch extends Single {
   public Catch compile(final QueryContext qc, final VarScope scp) {
     try {
       expr = expr.compile(qc, scp);
-      type = expr.type();
+      seqType = expr.seqType();
     } catch(final QueryException qe) {
-      expr = FNInfo.error(qe, expr.type());
+      expr = FnError.get(qe, expr.seqType());
     }
     return this;
   }
@@ -78,28 +78,30 @@ public final class Catch extends Single {
         Str.get(ex.getMessage().replaceAll("\r\n?", "\n")) }) {
       qc.set(vars[i++], v, info);
     }
+    Util.debug(ex);
     return qc.value(expr);
   }
 
   @Override
   public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
     final Var[] vrs = new Var[NAMES.length];
-    for(int i = 0; i < vrs.length; i++)
-      vrs[i] = scp.newLocal(qc, NAMES[i], TYPES[i], false);
+    final int vl = vrs.length;
+    for(int v = 0; v < vl; v++) vrs[v] = scp.newLocal(qc, NAMES[v], TYPES[v], false);
     final Catch ctch = new Catch(info, codes.clone(), vrs);
-    for(int i = 0; i < vars.length; i++) vs.put(vars[i].id, ctch.vars[i]);
+    final int val = vars.length;
+    for(int v = 0; v < val; v++) vs.put(vars[v].id, ctch.vars[v]);
     ctch.expr = expr.copy(qc, scp, vs);
     return ctch;
   }
 
   @Override
-  public Catch inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e) {
+  public Catch inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex) {
     try {
-      final Expr sub = expr.inline(qc, scp, v, e);
+      final Expr sub = expr.inline(qc, scp, var, ex);
       if(sub == null) return null;
       expr = sub;
     } catch(final QueryException qe) {
-      expr = FNInfo.error(qe, type);
+      expr = FnError.get(qe, seqType);
     }
     return this;
   }
@@ -162,7 +164,7 @@ public final class Catch extends Single {
    * @return QName
    */
   private static QNm create(final byte[] n) {
-    return new QNm(concat(ERR, COLON, n), ERRORURI);
+    return new QNm(concat(ERR_PREFIX, COLON, n), ERROR_URI);
   }
 
   @Override

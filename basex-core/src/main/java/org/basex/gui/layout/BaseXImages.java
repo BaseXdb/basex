@@ -1,20 +1,24 @@
 package org.basex.gui.layout;
 
 import java.awt.*;
+import java.awt.image.*;
+import java.io.*;
 import java.net.*;
 import java.util.*;
 
+import javax.imageio.*;
 import javax.swing.*;
 import javax.swing.filechooser.*;
 
 import org.basex.gui.*;
 import org.basex.io.*;
 import org.basex.util.*;
+import org.basex.util.http.*;
 
 /**
  * Organizes icons used all over the GUI.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class BaseXImages {
@@ -55,7 +59,20 @@ public final class BaseXImages {
    * @return image
    */
   public static Image get(final String name) {
-    return Toolkit.getDefaultToolkit().getImage(url(name));
+    return get(url(name));
+  }
+
+  /**
+   * Returns the specified image.
+   * @param url image url
+   * @return image
+   */
+  public static Image get(final URL url) {
+    try {
+      return ImageIO.read(url);
+    } catch(final IOException ex) {
+      throw Util.notExpected(ex);
+    }
   }
 
   /**
@@ -64,11 +81,36 @@ public final class BaseXImages {
    * @return icon
    */
   public static ImageIcon icon(final String name) {
-    ImageIcon img = ICONS.get(name);
-    if(img != null) return img;
-    img = new ImageIcon(get(name));
-    ICONS.put(name, img);
-    return img;
+    ImageIcon ii = ICONS.get(name);
+    if(ii != null) return ii;
+
+    Image img;
+    if(GUIConstants.scale > 1) {
+      // choose large image or none
+      final URL url = GUIConstants.large()
+          ? BaseXImages.class.getResource("/img/" + name + "_32.png") : null;
+
+      if(url == null) {
+        // resize low-res image if no hi-res image exists
+        img = get(url(name));
+        final int w = (int) (img.getWidth(null) * GUIConstants.scale);
+        final int h = (int) (img.getHeight(null) * GUIConstants.scale);
+        final BufferedImage tmp = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        final Graphics2D g2 = tmp.createGraphics();
+        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+            RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        g2.drawImage(img, 0, 0, w, h, null);
+        g2.dispose();
+        img = tmp;
+      } else {
+        img = get(url);
+      }
+    } else {
+      img = get(name);
+    }
+    ii = new ImageIcon(img);
+    ICONS.put(name, ii);
+    return ii;
   }
 
   /**
@@ -78,10 +120,10 @@ public final class BaseXImages {
    */
   private static URL url(final String name) {
     final String path = "/img/" + name + ".png";
-    URL url = GUI.class.getResource(path);
+    URL url = BaseXImages.class.getResource(path);
     if(url == null) {
       Util.stack("Image not found: " + path);
-      url = GUI.class.getResource("/img/" + Prop.NAME + ".png");
+      url = BaseXImages.class.getResource("/img/warn.png");
     }
     return url;
   }
@@ -114,15 +156,16 @@ public final class BaseXImages {
 
     // fallback code for displaying icons
     final String path = file.path();
-    final String mime = MimeTypes.get(path);
-    if(MimeTypes.isXML(mime)) return XML;
-    if(MimeTypes.isXQuery(mime)) return XQUERY;
+    final MediaType type = MediaType.get(path);
+    if(type.isXML()) return XML;
+    if(type.isXQuery()) return XQUERY;
     if(path.contains(IO.BASEXSUFFIX)) return BASEX;
 
-    if(Prop.WIN) {
+    // only works with standard dpi (https://bugs.openjdk.java.net/browse/JDK-6817929)
+    if(Prop.WIN && !GUIConstants.large()) {
       // retrieve system icons (only supported on Windows)
       final int p = path.lastIndexOf(path, '.');
-      final String suffix = p != -1 ? path.substring(p + 1) : null;
+      final String suffix = p == -1 ? null : path.substring(p + 1);
       Icon icon = null;
       if(suffix != null) icon = FILES.get(suffix);
       if(icon == null) {
@@ -132,6 +175,6 @@ public final class BaseXImages {
       return icon;
     }
     // default icon chooser
-    return MimeTypes.isText(mime) ? TEXT : UNKNOWN;
+    return type.isText() ? TEXT : UNKNOWN;
   }
 }

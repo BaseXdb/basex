@@ -8,10 +8,10 @@ import org.basex.util.*;
  * German stemming algorithm, derived from the Apache Lucene project and the report
  * "Development of a Stemmer for the Greek Language" by Georgios Ntais.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public class GreekStemmer extends InternalStemmer {
+final class GreekStemmer extends InternalStemmer {
   /**
    * Constructor.
    * @param fti full-text iterator
@@ -21,7 +21,7 @@ public class GreekStemmer extends InternalStemmer {
   }
 
   @Override
-  GreekStemmer get(final Language l, final FTIterator fti) {
+  GreekStemmer get(final Language lang, final FTIterator fti) {
     return new GreekStemmer(fti);
   }
 

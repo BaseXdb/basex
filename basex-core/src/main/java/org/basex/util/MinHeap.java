@@ -5,10 +5,10 @@ import java.util.*;
 /**
  * A min-heap.
  *
+ * @author BaseX Team 2005-16, BSD License
+ * @author Leo Woerteler
  * @param <K> key type
  * @param <V> value type
- * @author BaseX Team 2005-14, BSD License
- * @author Leo Woerteler
  */
 public final class MinHeap<K, V> {
   /** value array. */
@@ -17,6 +17,14 @@ public final class MinHeap<K, V> {
   private final Comparator<K> comp;
   /** Size of the heap. */
   private int size;
+
+  /**
+   * Constructs a heap with the given initial capacity and order.
+   * @param cmp comparator
+   */
+  public MinHeap(final Comparator<K> cmp) {
+    this(Array.CAPACITY, cmp);
+  }
 
   /**
    * Constructs a heap with the given initial capacity and order.
@@ -122,7 +130,7 @@ public final class MinHeap<K, V> {
    * Verifies the inner structure of the heap.
    * @throws IllegalStateException if the invariants don't hold
    */
-  public void verify() {
+  void verify() {
     verify(0);
   }
 

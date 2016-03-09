@@ -1,7 +1,7 @@
 package org.basex.query.value.item;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
-import static org.basex.query.util.Err.*;
 
 import java.math.*;
 import java.util.regex.*;
@@ -9,14 +9,14 @@ import java.util.regex.*;
 import javax.xml.datatype.*;
 
 import org.basex.query.*;
-import org.basex.query.util.*;
+import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
  * Duration item ({@code xs:duration}).
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public class Dur extends ADateDur {
@@ -42,7 +42,7 @@ public class Dur extends ADateDur {
 
   /**
    * Constructor.
-   * @param type data type
+   * @param type item type
    */
   Dur(final Type type) {
     super(type);
@@ -59,7 +59,7 @@ public class Dur extends ADateDur {
   /**
    * Constructor.
    * @param dur duration
-   * @param type data type
+   * @param type item type
    */
   private Dur(final Dur dur, final Type type) {
     this(type);
@@ -70,7 +70,7 @@ public class Dur extends ADateDur {
   /**
    * Constructor.
    * @param value value
-   * @param type data type
+   * @param type item type
    * @param ii input info
    * @throws QueryException query exception
    */
@@ -99,7 +99,7 @@ public class Dur extends ADateDur {
       mon = -mon;
       v = -v;
     }
-    if(v <= Long.MIN_VALUE || v >= Long.MAX_VALUE) throw DURRANGE.get(ii, type, vl);
+    if(v <= Long.MIN_VALUE || v >= Long.MAX_VALUE) throw DURRANGE_X_X.get(ii, type, vl);
   }
 
   /**
@@ -123,7 +123,7 @@ public class Dur extends ADateDur {
         add(BigDecimal.valueOf(m).multiply(BD60));
     if(!mt.group(1).isEmpty()) sec = sec.negate();
     final double v = sec.doubleValue();
-    if(v <= Long.MIN_VALUE || v >= Long.MAX_VALUE) throw DURRANGE.get(ii, type, vl);
+    if(v <= Long.MIN_VALUE || v >= Long.MAX_VALUE) throw DURRANGE_X_X.get(ii, type, vl);
   }
 
   @Override
@@ -206,8 +206,8 @@ public class Dur extends ADateDur {
   }
 
   @Override
-  public final boolean eq(final Item it, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  public final boolean eq(final Item it, final Collation coll, final StaticContext sc,
+      final InputInfo ii) throws QueryException {
     final Dur d = (Dur) (it instanceof Dur ? it : type.cast(it, null, null, ii));
     final BigDecimal s1 = sec == null ? BigDecimal.ZERO : sec;
     final BigDecimal s2 = d.sec == null ? BigDecimal.ZERO : d.sec;
@@ -221,7 +221,7 @@ public class Dur extends ADateDur {
 
   @Override
   public final Duration toJava() {
-    return ADate.df.newDuration(Token.string(string(null)));
+    return ADate.DF.newDuration(Token.string(string(null)));
   }
 
   @Override

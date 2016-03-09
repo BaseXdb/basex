@@ -9,11 +9,11 @@ import org.xmldb.api.modules.*;
 /**
  * This class tests the XMLDB/API ResourceSet implementation.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 @SuppressWarnings("all")
-public class ResourceSetTest extends XMLDBBaseTest {
+public final class ResourceSetTest extends XMLDBBaseTest {
   /** Collection. */
   private Collection coll;
   /** Resource. */

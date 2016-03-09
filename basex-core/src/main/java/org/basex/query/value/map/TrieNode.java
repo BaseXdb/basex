@@ -1,8 +1,8 @@
 package org.basex.query.value.map;
 
 import org.basex.query.*;
-import org.basex.query.iter.*;
-import org.basex.query.util.*;
+import org.basex.query.func.fn.*;
+import org.basex.query.util.collation.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * Abstract superclass of all trie nodes.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 abstract class TrieNode {
@@ -23,40 +23,41 @@ abstract class TrieNode {
   /** The empty node. */
   static final TrieNode EMPTY = new TrieNode(0) {
     @Override
-    StringBuilder toString(final StringBuilder sb, final String ind) {
-      return sb.append("{ }"); }
+    TrieNode delete(final int h, final Item k, final int l, final InputInfo i) { return this; }
     @Override
-    TrieNode delete(final int h, final Item k, final int l, final InputInfo i) {
-      return this; }
+    Value get(final int h, final Item k, final int l, final InputInfo i) { return null; }
     @Override
-    Value get(final int h, final Item k, final int l, final InputInfo i) {
-      return null; }
+    boolean contains(final int h, final Item k, final int l, final InputInfo ii) { return false; }
     @Override
-    boolean contains(final int h, final Item k, final int l, final InputInfo ii) {
-      return false; }
+    TrieNode addAll(final TrieNode o, final int l, final InputInfo ii) { return o; }
     @Override
-    TrieNode addAll(final TrieNode o, final int l, final InputInfo ii) {
-      return o; }
+    TrieNode add(final TrieLeaf o, final int l, final InputInfo ii) { return o; }
     @Override
-    TrieNode add(final Leaf o, final int l, final InputInfo ii) { return o; }
+    TrieNode add(final TrieList o, final int l, final InputInfo ii) { return o; }
     @Override
-    TrieNode add(final List o, final int l, final InputInfo ii) { return o; }
-    @Override
-    TrieNode add(final Branch o, final int l, final InputInfo ii) { return o; }
+    TrieNode add(final TrieBranch o, final int l, final InputInfo ii) { return o; }
     @Override
     boolean verify() { return true; }
     @Override
     void keys(final ValueBuilder ks) { }
     @Override
-    boolean hasType(final AtomType kt, final SeqType vt) { return true; }
+    void values(final ValueBuilder vs) { }
+    @Override
+    void materialize(final InputInfo ii) { }
+    @Override
+    boolean instanceOf(final AtomType kt, final SeqType vt) { return true; }
     @Override
     int hash(final InputInfo ii) { return 0; }
     @Override
-    boolean deep(final InputInfo ii, final TrieNode o) { return this == o; }
+    boolean deep(final InputInfo ii, final TrieNode o, final Collation coll) { return this == o; }
     @Override
-    public TrieNode insert(final int h, final Item k, final Value v,
-        final int l, final InputInfo i) {
-      return new Leaf(h, k, v); }
+    public TrieNode put(final int h, final Item k, final Value v, final int l,
+        final InputInfo i) { return new TrieLeaf(h, k, v); }
+    @Override
+    void forEach(final ValueBuilder vb, final FItem func, final QueryContext qc,
+        final InputInfo ii) { }
+    @Override
+    StringBuilder toString(final StringBuilder sb, final String ind) { return sb.append("{ }"); }
     @Override
     StringBuilder toString(final StringBuilder sb) { return sb; }
   };
@@ -72,7 +73,7 @@ abstract class TrieNode {
   }
 
   /**
-   * Inserts the given value into this map.
+   * Puts the given value into this map and replaces existing keys.
    * @param hash hash code used as key
    * @param key key to insert
    * @param val value to insert
@@ -81,7 +82,7 @@ abstract class TrieNode {
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  abstract TrieNode insert(final int hash, final Item key, final Value val,
+  abstract TrieNode put(final int hash, final Item key, final Value val,
       final int lvl, final InputInfo ii) throws QueryException;
 
   /**
@@ -90,8 +91,7 @@ abstract class TrieNode {
    * @param key key to delete
    * @param lvl level
    * @param ii input info
-   * @return updated map if changed, {@code null} if deleted,
-   *         {@code this} otherwise
+   * @return updated map if changed, {@code null} if deleted, {@code this} otherwise
    * @throws QueryException query exception
    */
   abstract TrieNode delete(int hash, Item key, int lvl, final InputInfo ii)
@@ -114,7 +114,7 @@ abstract class TrieNode {
    * @param key key to look for
    * @param lvl level
    * @param ii input info
-   * @return {@code true}, if the key exists, {@code false} otherwise
+   * @return {@code true} if the key exists, {@code false} otherwise
    * @throws QueryException query exception
    */
   abstract boolean contains(int hash, Item key, int lvl, final InputInfo ii)
@@ -134,24 +134,24 @@ abstract class TrieNode {
       throws QueryException;
 
   /**
-   * Add a leaf to this node, if the key isn't already used.
+   * Add a leaf to this node if the key isn't already used.
    * @param o leaf to insert
    * @param lvl level
    * @param ii input info
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  abstract TrieNode add(final Leaf o, final int lvl, final InputInfo ii) throws QueryException;
+  abstract TrieNode add(final TrieLeaf o, final int lvl, final InputInfo ii) throws QueryException;
 
   /**
-   * Add an overflow list to this node, if the key isn't already used.
+   * Add an overflow list to this node if the key isn't already used.
    * @param o leaf to insert
    * @param lvl level
    * @param ii input info
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  abstract TrieNode add(final List o, final int lvl, final InputInfo ii) throws QueryException;
+  abstract TrieNode add(final TrieList o, final int lvl, final InputInfo ii) throws QueryException;
 
   /**
    * Add all bindings of the given branch to this node for which the key isn't
@@ -162,7 +162,7 @@ abstract class TrieNode {
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  abstract TrieNode add(final Branch o, final int lvl, final InputInfo ii)
+  abstract TrieNode add(final TrieBranch o, final int lvl, final InputInfo ii)
       throws QueryException;
 
   /**
@@ -178,6 +178,30 @@ abstract class TrieNode {
   abstract void keys(final ValueBuilder ks);
 
   /**
+   * Collects all values in this subtree.
+   * @param vs value cache
+   */
+  abstract void values(final ValueBuilder vs);
+
+  /**
+   * Materializes all keys and values.
+   * @param ii input info
+   * @throws QueryException query exception
+   */
+  abstract void materialize(final InputInfo ii) throws QueryException;
+
+  /**
+   * Applies a function on all entries.
+   * @param vb value builder
+   * @param func function to apply on keys and values
+   * @param qc query context
+   * @param ii input info
+   * @throws QueryException query exception
+   */
+  abstract void forEach(final ValueBuilder vb, final FItem func, QueryContext qc, InputInfo ii)
+      throws QueryException;
+
+  /**
    * Calculates the hash key for the given level.
    * @param hash hash value
    * @param lvl current level
@@ -187,50 +211,26 @@ abstract class TrieNode {
     return hash >>> lvl * Map.BITS & MASK;
   }
 
-  @Override
-  public String toString() {
-    return toString(new StringBuilder(), "").toString();
-  }
-
-  /**
-   * Recursive {@link #toString()} helper.
-   *
-   * @param sb string builder
-   * @param ind indentation string
-   * @return string builder for convenience
-   */
-  abstract StringBuilder toString(final StringBuilder sb, final String ind);
-
   /**
    * Checks if the map has the specified key and value type.
    * @param kt key type
    * @param vt value type
    * @return {@code true} if the type fits, {@code false} otherwise
    */
-  abstract boolean hasType(final AtomType kt, final SeqType vt);
+  abstract boolean instanceOf(final AtomType kt, final SeqType vt);
 
   /**
    * Compares two values.
    * @param a first value
    * @param b second value
+   * @param coll collation
    * @param ii input info
    * @return {@code true} if both values are deep equal, {@code false} otherwise
    * @throws QueryException query exception
    */
-  static boolean deep(final Value a, final Value b, final InputInfo ii) throws QueryException {
-    return a.size() == b.size() && Compare.deep(a, b, ii);
-  }
-
-  /**
-   * Compares two items.
-   * @param a first item
-   * @param b second item
-   * @param ii input info
-   * @return {@code true} if both items are equal, {@code false} otherwise
-   * @throws QueryException query exception
-   */
-  static boolean eq(final Item a, final Item b, final InputInfo ii) throws QueryException {
-    return a.comparable(b) && a.eq(b, null, ii);
+  static boolean deep(final Value a, final Value b, final Collation coll, final InputInfo ii)
+      throws QueryException {
+    return a.size() == b.size() && new DeepEqual(ii).collation(coll).equal(a, b);
   }
 
   /**
@@ -245,10 +245,21 @@ abstract class TrieNode {
    * Checks if this node is indistinguishable from the given node.
    * @param ii input info
    * @param o other node
+   * @param coll collation
    * @return result of check
    * @throws QueryException query exception
    */
-  abstract boolean deep(final InputInfo ii, final TrieNode o) throws QueryException;
+  abstract boolean deep(final InputInfo ii, final TrieNode o, final Collation coll)
+      throws QueryException;
+
+  /**
+   * Recursive {@link #toString()} helper.
+   *
+   * @param sb string builder
+   * @param ind indentation string
+   * @return string builder for convenience
+   */
+  abstract StringBuilder toString(final StringBuilder sb, final String ind);
 
   /**
    * Recursive helper for {@link Map#toString()}.
@@ -256,4 +267,9 @@ abstract class TrieNode {
    * @return reference to {@code sb}
    */
   abstract StringBuilder toString(final StringBuilder sb);
+
+  @Override
+  public String toString() {
+    return toString(new StringBuilder(), "").toString();
+  }
 }

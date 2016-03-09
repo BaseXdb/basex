@@ -6,6 +6,8 @@ import java.io.*;
 import java.util.*;
 
 import org.basex.core.*;
+import org.basex.core.locks.*;
+import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
@@ -18,7 +20,7 @@ import org.basex.util.list.*;
  * Evaluates the 'export' command and saves the currently opened database
  * to disk.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Export extends Command {
@@ -41,7 +43,7 @@ public final class Export extends Command {
   protected boolean run() {
     try {
       final Data data = context.data();
-      export(data, args[0], this);
+      export(data, args[0], options, this);
       return info(DB_EXPORTED_X, data.meta.name, perf);
     } catch(final IOException ex) {
       return error(Util.message(ex));
@@ -50,7 +52,7 @@ public final class Export extends Command {
 
   @Override
   public void databases(final LockResult lr) {
-    lr.read.add(DBLocking.CTX);
+    lr.read.add(DBLocking.CONTEXT);
   }
 
   /**
@@ -58,12 +60,13 @@ public final class Export extends Command {
    * Files and directories in {@code path} will be possibly overwritten.
    * @param data data reference
    * @param path directory
+   * @param options main options
    * @param export calling instance
    * @throws IOException I/O exception
    */
-  public static void export(final Data data, final String path, final Export export)
-      throws IOException {
-    export(data, path, data.meta.options.get(MainOptions.EXPORTER), export);
+  public static void export(final Data data, final String path, final MainOptions options,
+      final Export export) throws IOException {
+    export(data, path, options.get(MainOptions.EXPORTER), export);
   }
 
   /**
@@ -80,8 +83,6 @@ public final class Export extends Command {
 
     final IOFile root = new IOFile(path);
     root.md();
-
-    final HashSet<String> exported = new HashSet<>();
 
     // XML documents
     final IntList il = data.resources.docs();
@@ -102,6 +103,7 @@ public final class Export extends Command {
     }
 
     // XML documents
+    final HashSet<String> exported = new HashSet<>();
     final int is = il.size();
     for(int i = 0; i < is; i++) {
       final int pre = il.get(i);
@@ -117,9 +119,9 @@ public final class Export extends Command {
 
       // serialize file
       try(final PrintOutput po = new PrintOutput(unique(exported, fl.path()))) {
-        final Serializer ser = Serializer.get(po, sopts);
-        ser.serialize(new DBNode(data, pre));
-        ser.close();
+        try(final Serializer ser = Serializer.get(po, sopts)) {
+          ser.serialize(new DBNode(data, pre));
+        }
       }
     }
 

@@ -4,7 +4,7 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
@@ -14,7 +14,7 @@ import org.basex.util.hash.*;
 /**
  * Except expression.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Except extends Set {
@@ -28,20 +28,15 @@ public final class Except extends Set {
   }
 
   @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    super.compile(qc, scp);
-    return optimize(qc, scp);
-  }
-
-  @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
-    final int es = exprs.length;
-    final ExprList el = new ExprList(es);
+    super.optimize(qc, scp);
+
+    final ExprList el = new ExprList(exprs.length);
     for(final Expr ex : exprs) {
       if(ex.isEmpty()) {
         // remove empty operands (return empty sequence if first value is empty)
-        if(el.isEmpty()) return optPre(null, qc);
-        qc.compInfo(OPTREMOVE, this, ex);
+        if(el.isEmpty()) return optPre(qc);
+        qc.compInfo(OPTREMOVE_X_X, this, ex);
       } else {
         el.add(ex);
       }
@@ -49,7 +44,7 @@ public final class Except extends Set {
     // ensure that results are always sorted
     if(el.size() == 1 && iterable) return el.get(0);
     // replace expressions with optimized list
-    if(el.size() != es) exprs = el.finish();
+    exprs = el.finish();
     return this;
   }
 
@@ -61,20 +56,21 @@ public final class Except extends Set {
   }
 
   @Override
-  protected NodeSeqBuilder eval(final Iter[] iter) throws QueryException {
-    final NodeSeqBuilder nc = new NodeSeqBuilder().check();
+  protected ANodeList eval(final Iter[] iter) throws QueryException {
+    final ANodeList list = new ANodeList().check();
 
-    for(Item it; (it = iter[0].next()) != null;) nc.add(checkNode(it));
-    final boolean db = nc.dbnodes();
+    for(Item it; (it = iter[0].next()) != null;) list.add(toNode(it));
+    final boolean db = list.dbnodes();
 
-    for(int e = 1; e != exprs.length && nc.size() != 0; ++e) {
+    final int el = exprs.length;
+    for(int e = 1; e < el && !list.isEmpty(); e++) {
       final Iter ir = iter[e];
       for(Item it; (it = ir.next()) != null;) {
-        final int i = nc.indexOf(checkNode(it), db);
-        if(i != -1) nc.delete(i);
+        final int i = list.indexOf(toNode(it), db);
+        if(i != -1) list.delete(i);
       }
     }
-    return nc;
+    return list;
   }
 
   @Override
@@ -83,16 +79,18 @@ public final class Except extends Set {
       @Override
       public ANode next() throws QueryException {
         if(item == null) {
-          item = new ANode[iter.length];
-          for(int i = 0; i != iter.length; ++i) next(i);
+          final int il = iter.length;
+          item = new ANode[il];
+          for(int i = 0; i < il; i++) next(i);
         }
 
-        for(int i = 1; i != item.length; ++i) {
+        final int il = item.length;
+        for(int i = 1; i < il; i++) {
           if(item[0] == null) return null;
           if(item[i] == null) continue;
           final int d = item[0].diff(item[i]);
 
-          if(d < 0 && i + 1 == item.length) break;
+          if(d < 0 && i + 1 == il) break;
           if(d == 0) {
             next(0);
             i = 0;

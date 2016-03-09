@@ -1,63 +1,35 @@
 package org.basex.query.value.seq;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
-import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.tree.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
  * Sequence, containing at least two items.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class Seq extends Value {
   /** Length. */
-  final long size;
-
-  /**
-   * Constructor.
-   * @param size size
-   */
-  Seq(final long size) {
-    this(size, AtomType.ITEM);
-  }
+  protected long size;
 
   /**
    * Constructor, specifying a type.
    * @param size size
    * @param type type
    */
-  Seq(final long size, final Type type) {
+  protected Seq(final long size, final Type type) {
     super(type);
     this.size = size;
-  }
-
-  /**
-   * Returns a value representation of the specified items.
-   * @param v value
-   * @param s size
-   * @return resulting item or sequence
-   */
-  public static Value get(final Item[] v, final int s) {
-    return get(v, s, null);
-  }
-
-  /**
-   * Returns a value representation of the specified items.
-   * @param v value
-   * @param s size
-   * @param t sequence type
-   * @return resulting item or sequence
-   */
-  public static Value get(final Item[] v, final int s, final Type t) {
-    return s == 0 ? Empty.SEQ : s == 1 ? v[0] : new ItemSeq(v, s, t);
   }
 
   @Override
@@ -73,8 +45,13 @@ public abstract class Seq extends Value {
   }
 
   @Override
+  public final boolean isEmpty() {
+    return false;
+  }
+
+  @Override
   public final Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    throw SEQCAST.get(ii, this);
+    throw SEQFOUND_X.get(ii, this);
   }
 
   @Override
@@ -83,7 +60,7 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  public final ValueIter iter() {
+  public ValueIter iter() {
     return new ValueIter() {
       int c;
       @Override
@@ -91,12 +68,71 @@ public abstract class Seq extends Value {
       @Override
       public Item next() { return c < size ? itemAt(c++) : null; }
       @Override
-      public boolean reset() { c = 0; return true; }
-      @Override
       public long size() { return size; }
       @Override
       public Value value() { return Seq.this; }
     };
+  }
+
+  @Override
+  public Value subSeq(final long start, final long len) {
+    return len == 0   ? Empty.SEQ
+         : len == 1   ? itemAt(start)
+         : len < size ? new SubSeq(this, start, len)
+                      : this;
+  }
+
+  /**
+   * Inserts a value at the given position into this sequence and returns the resulting sequence.
+   * @param pos position at which the value should be inserted, must be between 0 and {@link #size}
+   * @param val value to insert
+   * @return resulting value
+   */
+  public Value insertBefore(final long pos, final Value val) {
+    final long n = val.size();
+    return n == 1 ? insert(pos, (Item) val) : copyInsert(pos, val);
+  }
+
+  /**
+   * Inserts an item at the given position into this sequence and returns the resulting sequence.
+   * @param pos position at which the item should be inserted, must be between 0 and {@link #size}
+   * @param val value to insert
+   * @return resulting value
+   */
+  public abstract Value insert(final long pos, final Item val);
+
+  /**
+   * Helper for {@link #insertBefore(long, Value)} that copies all items into a {@link TreeSeq}.
+   * @param pos position at which the value should be inserted, must be between 0 and {@link #size}
+   * @param val value to insert
+   * @return resulting value
+   */
+  final Value copyInsert(final long pos, final Value val) {
+    if(val.isEmpty()) return this;
+    final ValueBuilder vb = new ValueBuilder();
+    for(long i = 0; i < pos; i++) vb.add(itemAt(i));
+    vb.add(val);
+    for(long i = pos; i < size; i++) vb.add(itemAt(i));
+    return vb.value(type);
+  }
+
+  /**
+   * Removes the item at the given position in this sequence and returns the resulting sequence.
+   * @param pos position of the item to remove, must be between 0 and {@link #size} - 1
+   * @return resulting sequence
+   */
+  public abstract Value remove(final long pos);
+
+  /**
+   * Helper for {@link #remove(long)} that copies all items into a {@link TreeSeq}.
+   * @param pos position of the item to remove, must be between 0 and {@link #size} - 1
+   * @return resulting sequence
+   */
+  final Value copyRemove(final long pos) {
+    final ValueBuilder vb = new ValueBuilder();
+    for(long i = 0; i < pos; i++) vb.add(itemAt(i));
+    for(long i = pos + 1; i < size; i++) vb.add(itemAt(i));
+    return vb.value(type);
   }
 
   @Override
@@ -110,11 +146,10 @@ public abstract class Seq extends Value {
     return h;
   }
 
-  /**
-   * Returns a sequence in reverse order.
-   * @return sequence
-   */
-  public abstract Value reverse();
+  @Override
+  public final Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
+    throw SEQFOUND_X.get(ii, this);
+  }
 
   @Override
   public void plan(final FElem plan) {
@@ -124,7 +159,7 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  public String toErrorString() {
+  public final String toErrorString() {
     return toString(true);
   }
 
@@ -139,16 +174,16 @@ public abstract class Seq extends Value {
    * @return string
    */
   private String toString(final boolean error) {
-    final StringBuilder sb = new StringBuilder(PAR1);
+    final StringBuilder sb = new StringBuilder(PAREN1);
     for(int i = 0; i < size; ++i) {
       sb.append(i == 0 ? "" : SEP);
       final Item it = itemAt(i);
       sb.append(error ? it.toErrorString() : it.toString());
-      if(sb.length() <= 32 || i + 1 == size) continue;
+      if(sb.length() <= 16 || i + 1 == size) continue;
       // output is chopped to prevent too long error strings
-      sb.append(SEP + DOTS);
+      sb.append(SEP).append(DOTS);
       break;
     }
-    return sb.append(PAR2).toString();
+    return sb.append(PAREN2).toString();
   }
 }

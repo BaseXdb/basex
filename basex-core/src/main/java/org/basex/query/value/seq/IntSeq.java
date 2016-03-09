@@ -11,7 +11,7 @@ import org.basex.query.value.type.*;
 /**
  * Sequence of items of type {@link Int xs:integer}, containing at least two of them.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public final class IntSeq extends NativeSeq {
@@ -62,14 +62,6 @@ public final class IntSeq extends NativeSeq {
     }
   }
 
-  @Override
-  public Value reverse() {
-    final int s = values.length;
-    final long[] tmp = new long[s];
-    for(int l = 0, r = s - 1; l < s; l++, r--) tmp[l] = values[r];
-    return get(tmp, type);
-  }
-
   // STATIC METHODS =====================================================================
 
   /**
@@ -79,29 +71,27 @@ public final class IntSeq extends NativeSeq {
    * @return value
    */
   public static Value get(final long[] items, final Type type) {
-    return items.length == 0 ? Empty.SEQ : items.length == 1 ?
-        Int.get(items[0], type) : new IntSeq(items, type);
+    return items.length == 0 ? Empty.SEQ : items.length == 1 ? Int.get(items[0], type) :
+      new IntSeq(items, type);
   }
 
   /**
    * Creates a sequence with the items in the specified expressions.
-   * @param vals values
+   * @param values values
    * @param size size of resulting sequence
-   * @param type data type
+   * @param type item type
    * @return value
    * @throws QueryException query exception
    */
-  public static Value get(final Value[] vals, final int size, final Type type)
+  public static Value get(final Value[] values, final int size, final Type type)
       throws QueryException {
 
     final long[] tmp = new long[size];
     int t = 0;
-    for(final Value val : vals) {
+    for(final Value val : values) {
       // speed up construction, depending on input
       final int vs = (int) val.size();
-      if(val instanceof Item) {
-        tmp[t++] = ((Item) val).itr(null);
-      } else if(val instanceof IntSeq) {
+      if(val instanceof IntSeq) {
         final IntSeq sq = (IntSeq) val;
         System.arraycopy(sq.values, 0, tmp, t, vs);
         t += vs;

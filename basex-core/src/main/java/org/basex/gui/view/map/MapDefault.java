@@ -6,11 +6,12 @@ import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.view.*;
+import org.basex.query.util.ft.*;
 
 /**
  * Adds default paint operations to TreeMap.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class MapDefault extends MapPainter {
@@ -33,6 +34,7 @@ final class MapDefault extends MapPainter {
     final int hh = view.getWidth();
 
     final Data data = view.gui.context.data();
+    final FTPosData ftpos = view.gui.context.marked.ftpos();
     final int fsz = GUIConstants.fontSize;
 
     final int off = gopts.get(GUIOptions.MAPOFFSETS);
@@ -44,13 +46,11 @@ final class MapDefault extends MapPainter {
 
       // level 1: next context node, set marker pointer to 0
       final int lvl = r.level;
-
       final boolean full = r.w == ww && r.h == hh;
       Color col = color(rects, ri);
       final boolean mark = col != null;
 
-      r.pos = view.gui.context.marked.ftpos != null ?
-          view.gui.context.marked.ftpos.get(data, pre) : null;
+      r.pos = ftpos != null ? ftpos.get(data, pre) : null;
       g.setColor(mark ? col : GUIConstants.color(lvl));
 
       if(r.w < l.x + l.w || r.h < l.y + l.h || off < 2 ||
@@ -83,7 +83,7 @@ final class MapDefault extends MapPainter {
 
       final int kind = data.kind(pre);
       if(kind == Data.ELEM || kind == Data.DOC) {
-        g.setColor(Color.black);
+        g.setColor(GUIConstants.TEXT);
         g.setFont(GUIConstants.font);
         BaseXLayout.chopString(g, ViewData.name(gopts, data, pre), r.x, r.y, r.w, fsz);
       } else {

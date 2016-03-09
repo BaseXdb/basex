@@ -1,6 +1,7 @@
 package org.basex.io;
 
 import static org.basex.util.Token.*;
+import static org.basex.util.FTToken.*;
 
 import java.io.*;
 import java.util.*;
@@ -18,10 +19,12 @@ import org.xml.sax.*;
  * be a local file ({@link IOFile}), a URL ({@link IOUrl}), a byte array
  * ({@link IOContent}), or a stream ({@link IOStream}).
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class IO {
+  /** Temporary file suffix. */
+  public static final String TMPSUFFIX = ".tmp";
   /** Database file suffix. */
   public static final String BASEXSUFFIX = ".basex";
   /** Command script suffix. */
@@ -40,6 +43,8 @@ public abstract class IO {
   public static final String JSONSUFFIX = ".json";
   /** JAR file suffix. */
   public static final String JARSUFFIX = ".jar";
+  /** JS file suffix. */
+  public static final String JSSUFFIX = ".js";
   /** TGZIP file suffix. */
   public static final String TARGZSUFFIX = ".tar.gz";
   /** TGZIP file suffix. */
@@ -52,6 +57,8 @@ public abstract class IO {
   public static final String XARSUFFIX = ".xar";
   /** XQuery log suffix. */
   public static final String LOGSUFFIX = ".log";
+  /** Ignore suffix. */
+  public static final String IGNORESUFFIX = ".ignore";
   /** Directory for raw files. */
   public static final String RAW = "raw";
   /** File prefix. */
@@ -92,38 +99,37 @@ public abstract class IO {
   public static final long OFFCOMP = 0x4000000000L;
 
   /** File path. The path uses forward slashes, no matter which OS is used. */
-  protected String path;
+  String pth;
   /** File length. */
-  protected long len = -1;
+  long len = -1;
   /** File name. */
-  private String name;
+  private String nm;
 
   /**
    * Protected constructor.
-   * @param p path
+   * @param path path
    */
-  IO(final String p) {
-    init(p);
+  IO(final String path) {
+    init(path);
   }
 
   /**
    * Sets the file path and name.
-   * @param p file path
+   * @param path file path
    */
-  private void init(final String p) {
-    path = p;
-    final String n = p.substring(p.lastIndexOf('/') + 1);
+  private void init(final String path) {
+    pth = path;
+    final String n = path.substring(path.lastIndexOf('/') + 1);
     // use current time if no name is given
-    name = n.isEmpty() ? Long.toString(System.currentTimeMillis()) + BASEXSUFFIX +
-                       XMLSUFFIX : n;
+    nm = n.isEmpty() ? Long.toString(System.currentTimeMillis()) + BASEXSUFFIX + XMLSUFFIX : n;
   }
 
   /**
-   * <p>Returns a class instance for the specified string. The type of the
+   * <p>Returns a class instance for the specified location string. The type of the
    * returned instance depends on the string value:</p>
    * <ul>
-   * <li>{@link IOFile}: if the string starts with <code>file:</code>, or if it
-   *   does not contain the substring <code>://</code>, it is interpreted as
+   * <li>{@link IOFile}: if the string starts with {@code file:}, or if it
+   *   does not contain the substring {@code ://}, it is interpreted as
    *   local file instance</li>
    * <li>{@link IOUrl}: if it starts with a valid scheme, it is handled as URL</li>
    * <li>{@link IOContent}: otherwise, it is interpreted as XML fragment and internally
@@ -132,12 +138,12 @@ public abstract class IO {
    * If the content of the string value is known in advance, it is advisable
    * to call the direct constructors of the correspondent sub class.
    *
-   * @param source source string
+   * @param location location
    * @return IO reference
    */
-  public static IO get(final String source) {
-    if(source == null) return new IOContent("");
-    final String s = source.trim();
+  public static IO get(final String location) {
+    if(location == null) return new IOContent("");
+    final String s = location.trim();
     return s.indexOf('<') == 0 ? new IOContent(s) :
            IOUrl.isFileURL(s)  ? new IOFile(IOUrl.toFile(s)) :
            IOFile.isValid(s)   ? new IOFile(s) :
@@ -186,9 +192,9 @@ public abstract class IO {
    * @return result of check
    */
   public boolean hasSuffix(final String... suffixes) {
-    final int i = path.lastIndexOf('.');
+    final int i = pth.lastIndexOf('.');
     if(i == -1) return false;
-    final String suf = path.substring(i).toLowerCase(Locale.ENGLISH);
+    final String suf = pth.substring(i).toLowerCase(Locale.ENGLISH);
     for(final String z : suffixes) if(suf.equals(z)) return true;
     return false;
   }
@@ -204,10 +210,10 @@ public abstract class IO {
 
   /**
    * Sets the input length.
-   * @param l length
+   * @param length length
    */
-  public void length(final long l) {
-    len = l;
+  public void length(final long length) {
+    len = length;
   }
 
   /**
@@ -256,8 +262,8 @@ public abstract class IO {
   }
 
   /**
-   * Chops the path and the file suffix of the specified filename
-   * and returns the database name.
+   * Chops the path, file suffix and special characters from the specified filename and
+   * returns the database name.
    * @return database name
    */
   public final String dbname() {
@@ -266,8 +272,8 @@ public abstract class IO {
     int i = lastIndexOf(n, '.');
     if(i == -1) i = n.length;
     for(int c = 0; c < i; c += cl(n, c)) {
-      final int ch = norm(cp(n, c));
-      if(Databases.validChar(ch)) tb.add(ch);
+      final int ch = noDiacritics(cp(n, c));
+      if(Databases.validChar(ch, c == 0 || c + 1 == i)) tb.add(ch);
     }
     return tb.toString();
   }
@@ -277,16 +283,16 @@ public abstract class IO {
    * @return file name
    */
   public final String name() {
-    return name;
+    return nm;
   }
 
   /**
    * Sets the name of the resource.
-   * @param n file name
+   * @param name file name
    */
-  public final void name(final String n) {
-    name = n;
-    if(path.isEmpty()) path = n;
+  public final void name(final String name) {
+    nm = name;
+    if(pth.isEmpty()) pth = name;
   }
 
   /**
@@ -295,7 +301,7 @@ public abstract class IO {
    * @return path
    */
   public final String path() {
-    return path;
+    return pth;
   }
 
   /**
@@ -304,7 +310,7 @@ public abstract class IO {
    * @return URL
    */
   public String url() {
-    return path;
+    return pth;
   }
 
   /**
@@ -321,11 +327,11 @@ public abstract class IO {
    * @return result of check
    */
   public boolean eq(final IO io) {
-    return path.equals(io.path);
+    return pth.equals(io.pth);
   }
 
   @Override
   public String toString() {
-    return path;
+    return pth;
   }
 }

@@ -3,7 +3,7 @@ package org.basex.util.options;
 /**
  * Option containing a boolean value.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class BooleanOption extends Option<Boolean> {
@@ -12,20 +12,20 @@ public final class BooleanOption extends Option<Boolean> {
 
   /**
    * Default constructor.
-   * @param n name
-   * @param v value
+   * @param name name
+   * @param value value
    */
-  public BooleanOption(final String n, final boolean v) {
-    super(n);
-    value = v;
+  public BooleanOption(final String name, final boolean value) {
+    super(name);
+    this.value = value;
   }
 
   /**
    * Constructor without default value.
-   * @param n name
+   * @param name name
    */
-  public BooleanOption(final String n) {
-    super(n);
+  public BooleanOption(final String name) {
+    super(name);
     value = null;
   }
 

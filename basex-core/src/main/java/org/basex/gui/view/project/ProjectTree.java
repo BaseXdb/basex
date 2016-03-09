@@ -19,10 +19,10 @@ import org.basex.util.*;
 /**
  * Tree of project view.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public class ProjectTree extends BaseXTree implements TreeWillExpandListener {
+final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
   /** Project view. */
   private final ProjectView view;
 
@@ -30,7 +30,7 @@ public class ProjectTree extends BaseXTree implements TreeWillExpandListener {
    * Constructor.
    * @param pv project view
    */
-  public ProjectTree(final ProjectView pv) {
+  ProjectTree(final ProjectView pv) {
     super(new DefaultMutableTreeNode(), pv.gui);
     view = pv;
 
@@ -49,12 +49,14 @@ public class ProjectTree extends BaseXTree implements TreeWillExpandListener {
 
     setCellEditor(new ProjectCellEditor(this, renderer));
     setEditable(true);
+    final int h = getFontMetrics(getFont()).getHeight();
+    if(h > 16) setRowHeight(Math.max(32, h));
 
     // add popup
     new BaseXPopup(this, pv.gui,
       new OpenCmd(), new OpenExternalCmd(), new TestCmd(), null,
       new DeleteCmd(), new RenameCmd(), new NewDirCmd(), null,
-      new RefreshCmd(), new CopyPathCmd()
+      new RefreshCmd(), null, new CopyPathCmd()
     );
   }
 
@@ -77,7 +79,7 @@ public class ProjectTree extends BaseXTree implements TreeWillExpandListener {
    * @param path file path
    * @return {@code true} if file was found
    */
-  public boolean expand(final ProjectNode node, final String path) {
+  boolean expand(final ProjectNode node, final String path) {
     final TreePath tp = node.path();
     if(!isExpanded(tp)) expandPath(tp);
 
@@ -99,7 +101,7 @@ public class ProjectTree extends BaseXTree implements TreeWillExpandListener {
   }
 
   @Override
-  public void treeWillExpand(final TreeExpansionEvent event) throws ExpandVetoException {
+  public void treeWillExpand(final TreeExpansionEvent event) {
     final Object obj = event.getPath().getLastPathComponent();
     if(obj instanceof ProjectNode) {
       final ProjectNode node = (ProjectNode) obj;
@@ -109,7 +111,7 @@ public class ProjectTree extends BaseXTree implements TreeWillExpandListener {
   }
 
   @Override
-  public void treeWillCollapse(final TreeExpansionEvent event) throws ExpandVetoException {
+  public void treeWillCollapse(final TreeExpansionEvent event) {
     final Object obj = event.getPath().getLastPathComponent();
     if(obj instanceof ProjectNode) {
       final ProjectNode node = (ProjectNode) obj;
@@ -121,7 +123,7 @@ public class ProjectTree extends BaseXTree implements TreeWillExpandListener {
   // PRIVATE METHOS ===============================================================================
 
   /**
-   * Returns a single selected node, or {@code null} if zero or more than node is selected.
+   * Returns a single selected node or {@code null} if zero or more than node is selected.
    * @return selected node
    */
   ProjectNode selectedNode() {
@@ -161,12 +163,12 @@ public class ProjectTree extends BaseXTree implements TreeWillExpandListener {
   // COMMANDS =====================================================================================
 
   /** Refresh command. */
-  final class RefreshCmd extends GUIPopupCmd {
+  private final class RefreshCmd extends GUIPopupCmd {
     /** Constructor. */
     RefreshCmd() { super(REFRESH, BaseXKeys.REFRESH); }
 
     @Override public void execute() {
-      view.reset();
+      view.refresh();
       selectedNode().refresh();
     }
 
@@ -176,7 +178,7 @@ public class ProjectTree extends BaseXTree implements TreeWillExpandListener {
   }
 
   /** New directory command. */
-  final class NewDirCmd extends GUIPopupCmd {
+  private final class NewDirCmd extends GUIPopupCmd {
     /** Constructor. */
     NewDirCmd() { super(NEW_DIR, BaseXKeys.NEWDIR); }
 
@@ -207,25 +209,28 @@ public class ProjectTree extends BaseXTree implements TreeWillExpandListener {
         }
       }
     }
-    @Override public boolean enabled(final GUI main) { return selectedNode() != null; }
+    @Override public boolean enabled(final GUI main) {
+      return selectedNode() != null;
+    }
   }
 
   /** Delete command. */
-  final class DeleteCmd extends GUIPopupCmd {
+  private final class DeleteCmd extends GUIPopupCmd {
     /** Constructor. */
     DeleteCmd() { super(DELETE + DOTS, BaseXKeys.DELNEXT); }
 
     @Override public void execute() {
       final ProjectNode node = selectedNode();
-      if(BaseXDialog.confirm(view.gui, Util.info(DELETE_FILE_X, node.file))) {
+      final GUI gui = view.gui;
+      if(BaseXDialog.confirm(gui, Util.info(DELETE_FILE_X, node.file))) {
         final ProjectNode parent = (ProjectNode) node.getParent();
         // delete file or show error dialog
-        if(!view.editor.delete(node.file)) {
-          BaseXDialog.error(view.gui, Util.info(FILE_NOT_DELETED_X, node.file));
-        } else {
+        if(gui.editor.delete(node.file)) {
           parent.refresh();
           setSelectionPath(parent.path());
-          view.reset();
+          view.refresh();
+        } else {
+          BaseXDialog.error(gui, Util.info(FILE_NOT_DELETED_X, node.file));
         }
       }
     }
@@ -237,13 +242,13 @@ public class ProjectTree extends BaseXTree implements TreeWillExpandListener {
   }
 
   /** Rename command. */
-  final class RenameCmd extends GUIPopupCmd {
+  private final class RenameCmd extends GUIPopupCmd {
     /** Constructor. */
     RenameCmd() { super(RENAME, BaseXKeys.RENAME); }
 
     @Override public void execute() {
       startEditingAtPath(selectedNode().path());
-      view.reset();
+      view.refresh();
     }
 
     @Override public boolean enabled(final GUI main) {
@@ -253,12 +258,12 @@ public class ProjectTree extends BaseXTree implements TreeWillExpandListener {
   }
 
   /** Open command. */
-  final class OpenCmd extends GUIPopupCmd {
+  private final class OpenCmd extends GUIPopupCmd {
     /** Constructor. */
     OpenCmd() { super(OPEN, BaseXKeys.ENTER); }
 
     @Override public void execute() {
-      for(final ProjectNode node : selectedNodes()) view.open(node.file, null);
+      for(final ProjectNode node : selectedNodes()) view.open(node.file, "");
     }
 
     @Override public boolean enabled(final GUI main) {
@@ -270,9 +275,9 @@ public class ProjectTree extends BaseXTree implements TreeWillExpandListener {
   }
 
   /** Open externally command. */
-  final class OpenExternalCmd extends GUIPopupCmd {
+  private final class OpenExternalCmd extends GUIPopupCmd {
     /** Constructor. */
-    OpenExternalCmd() { super(OPEN_EXTERNALLY, BaseXKeys.OPEN); }
+    OpenExternalCmd() { super(OPEN_EXTERNALLY, BaseXKeys.SHIFT_ENTER); }
 
     @Override public void execute() {
       for(final ProjectNode node : selectedNodes()) {
@@ -286,7 +291,7 @@ public class ProjectTree extends BaseXTree implements TreeWillExpandListener {
   }
 
   /** Test command. */
-  final class TestCmd extends GUIPopupCmd {
+  private final class TestCmd extends GUIPopupCmd {
     /** Constructor. */
     TestCmd() { super(RUN_TESTS, BaseXKeys.UNIT); }
 
@@ -298,7 +303,7 @@ public class ProjectTree extends BaseXTree implements TreeWillExpandListener {
   }
 
   /** Copy path command. */
-  final class CopyPathCmd extends GUIPopupCmd {
+  private final class CopyPathCmd extends GUIPopupCmd {
     /** Constructor. */
     CopyPathCmd() { super(COPY_PATH, BaseXKeys.COPYPATH); }
 

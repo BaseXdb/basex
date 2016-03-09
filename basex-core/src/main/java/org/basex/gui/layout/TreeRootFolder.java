@@ -1,25 +1,26 @@
 package org.basex.gui.layout;
 
-import org.basex.data.*;
+import org.basex.core.*;
 
 /**
  * JTree node which represents the root folder. The root folder carries
  * the name of the database and has basically an artificial path ('/')
  * which leads to problems if treated like an ordinary folder node.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Lukas Kircher
  */
-public class TreeRootFolder extends TreeFolder {
+public final class TreeRootFolder extends TreeFolder {
   /**
    * Constructor.
-   * @param nm name
-   * @param pth path
-   * @param bxt tree reference
-   * @param d data reference
+   * @param name name
+   * @param path path
+   * @param tree tree reference
+   * @param context database context
    */
-  public TreeRootFolder(final byte[] nm, final byte[] pth, final BaseXTree bxt, final Data d) {
-    super(nm, pth, bxt, d);
+  public TreeRootFolder(final byte[] name, final byte[] path, final BaseXTree tree,
+      final Context context) {
+    super(name, path, tree, context);
   }
 
   @Override

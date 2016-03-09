@@ -5,39 +5,40 @@ import static org.basex.util.Token.*;
 import javax.swing.event.*;
 import javax.swing.tree.*;
 
+import org.basex.core.*;
 import org.basex.data.*;
 
 /**
  * JTree node for representing database content (raw files / documents).
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Lukas Kircher
  */
 public abstract class TreeNode extends DefaultMutableTreeNode implements TreeWillExpandListener {
   /** Node name. */
   public final byte[] name;
   /** Relative path to this node. Starts with one slash, no trailing slashes.
-   *  File / folder name is not part of the path. */
+   *  File/folder name is not part of the path. */
   final byte[] path;
   /** Tree reference for lazy loading. */
   final BaseXTree tree;
-  /** Data reference. */
-  final Data data;
+  /** Database context. */
+  final Context context;
   /** Updating. */
   boolean updating;
 
   /**
    * Constructor.
-   * @param nm displayed node name
-   * @param pth folder path
-   * @param bxt tree reference
-   * @param d data reference
+   * @param name displayed node name
+   * @param path folder path
+   * @param tree tree reference
+   * @param context database context
    */
-  TreeNode(final byte[] nm, final byte[] pth, final BaseXTree bxt, final Data d) {
-    name = nm;
-    path = pth;
-    tree = bxt;
-    data = d;
+  TreeNode(final byte[] name, final byte[] path, final BaseXTree tree, final Context context) {
+    this.name = name;
+    this.path = path;
+    this.tree = tree;
+    this.context = context;
     tree.addTreeWillExpandListener(this);
   }
 

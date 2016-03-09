@@ -1,50 +1,27 @@
 package org.basex.query.value.item;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.math.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.util.*;
+import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
  * Decimal item ({@code xs:decimal}).
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Dec extends ANum {
-  /** Maximum unsigned long values. */
-  public static final BigDecimal MAXULNG = new BigDecimal(Long.MAX_VALUE).multiply(
-      BigDecimal.valueOf(2)).add(BigDecimal.ONE);
-
   /** Zero value. */
   private static final Dec ZERO = new Dec(BigDecimal.ZERO);
   /** Decimal value. */
   private final BigDecimal value;
-
-  /**
-   * Constructor.
-   * @param t string representation
-   */
-  public Dec(final byte[] t) {
-    super(AtomType.DEC);
-    value = new BigDecimal(Token.string(trim(t)));
-  }
-
-  /**
-   * Constructor.
-   * @param value decimal value
-   * @param type string representation
-   */
-  public Dec(final BigDecimal value, final Type type) {
-    super(type);
-    this.value = value;
-  }
 
   /**
    * Constructor.
@@ -70,7 +47,7 @@ public final class Dec extends ANum {
    * @return value
    */
   public static Dec get(final double value) {
-    return get(BigDecimal.valueOf(value));
+    return get(new BigDecimal(value));
   }
 
   @Override
@@ -104,15 +81,36 @@ public final class Dec extends ANum {
   }
 
   @Override
-  public boolean eq(final Item it, final Collation coll, final InputInfo ii)
-      throws QueryException {
-    return it.type == AtomType.DBL || it.type == AtomType.FLT ?
-        it.eq(this, coll, ii) : value.compareTo(it.dec(ii)) == 0;
+  public Dec abs() {
+    return value.signum() == -1 ? get(value.negate()) : this;
   }
 
   @Override
-  public int diff(final Item it, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  public Dec ceiling() {
+    return get(value.setScale(0, RoundingMode.CEILING));
+  }
+
+  @Override
+  public Dec floor() {
+    return get(value.setScale(0, RoundingMode.FLOOR));
+  }
+
+  @Override
+  public Dec round(final int scale, final boolean even) {
+    final int s = value.signum();
+    return s == 0 ? this : get(value.setScale(scale, even ? RoundingMode.HALF_EVEN :
+           s == 1 ? RoundingMode.HALF_UP : RoundingMode.HALF_DOWN));
+  }
+
+  @Override
+  public boolean eq(final Item it, final Collation coll, final StaticContext sc,
+      final InputInfo ii) throws QueryException {
+    return it.type == AtomType.DBL || it.type == AtomType.FLT ?
+        it.eq(this, coll, sc, ii) : value.compareTo(it.dec(ii)) == 0;
+  }
+
+  @Override
+  public int diff(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
     final double d = it.dbl(ii);
     return d == Double.NEGATIVE_INFINITY ? -1 : d == Double.POSITIVE_INFINITY ? 1 :
       Double.isNaN(d) ? UNDEF : value.compareTo(it.dec(ii));
@@ -120,24 +118,12 @@ public final class Dec extends ANum {
 
   @Override
   public Object toJava() {
-    return type == AtomType.ULN ? new BigInteger(value.toString()) : value;
+    return value;
   }
 
   @Override
   public boolean sameAs(final Expr cmp) {
     return cmp instanceof Dec && value.compareTo(((Dec) cmp).value) == 0;
-  }
-
-  /**
-   * Converts the given double into a decimal value.
-   * @param value value to be converted
-   * @param ii input info
-   * @return double value
-   * @throws QueryException query exception
-   */
-  public static BigDecimal parse(final double value, final InputInfo ii) throws QueryException {
-    if(Double.isNaN(value) || Double.isInfinite(value)) throw valueError(ii, AtomType.DEC, value);
-    return BigDecimal.valueOf(value);
   }
 
   /**
@@ -153,6 +139,6 @@ public final class Dec extends ANum {
         return new BigDecimal(Token.string(value).trim());
     } catch(final NumberFormatException ignored) { }
 
-    throw FUNCAST.get(ii, AtomType.DEC, chop(value));
+    throw funCastError(ii, AtomType.DEC, value);
   }
 }

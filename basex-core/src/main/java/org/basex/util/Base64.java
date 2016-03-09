@@ -7,7 +7,7 @@ import org.basex.util.list.*;
 /**
  * This class provides functions for encoding and decoding Base64 strings.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Base64 {
@@ -64,7 +64,7 @@ public final class Base64 {
         bl.add('=');
       }
     }
-    return bl.toArray();
+    return bl.finish();
   }
 
   /** Hex to byte conversion table. */
@@ -92,7 +92,8 @@ public final class Base64 {
   public static byte[] decode(final byte[] token) {
     final ByteList bl = new ByteList();
     for(final byte c : token) if(c < 0 || c > ' ') bl.add(c);
-    final byte[] s = bl.toArray();
+    final byte[] s = bl.finish();
+
     // input must be a multiple of four characters
     if((s.length & 3) != 0) throw error(s);
 

@@ -10,7 +10,7 @@ import org.basex.util.*;
  * Abstract super class for all numeric items.
  * Useful for removing exceptions and unifying hash values.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public abstract class ANum extends Item {
@@ -44,6 +44,18 @@ public abstract class ANum extends Item {
     return flt();
   }
 
+  @Override
+  public boolean sameKey(final Item it, final InputInfo ii) throws QueryException {
+    if(it instanceof ANum) {
+      final double d1 = dbl(ii), d2 = it.dbl(ii);
+      final boolean n1 = Double.isNaN(d1), n2 = Double.isNaN(d2);
+      if(n1 || n2) return n1 == n2;
+      if(Double.isInfinite(d1) || Double.isInfinite(d2)) return d1 == d2;
+      return dec(ii).compareTo(it.dec(ii)) == 0;
+    }
+    return false;
+  }
+
   /**
    * Returns a string representation of the value.
    * @return string value
@@ -67,6 +79,32 @@ public abstract class ANum extends Item {
    * @return float value
    */
   protected abstract float flt();
+
+  /**
+   * Returns an absolute value.
+   * @return absolute value
+   */
+  public abstract ANum abs();
+
+  /**
+   * Returns an ceiling value.
+   * @return ceiling value
+   */
+  public abstract ANum ceiling();
+
+  /**
+   * Returns an floor value.
+   * @return floor value
+   */
+  public abstract ANum floor();
+
+  /**
+   * Returns a rounded value.
+   * @param scale scale
+   * @param even half-to-even flag
+   * @return rounded value
+   */
+  public abstract ANum round(final int scale, final boolean even);
 
   @Override
   public Item test(final QueryContext qc, final InputInfo ii) throws QueryException {

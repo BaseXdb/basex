@@ -1,5 +1,6 @@
 package org.basex.gui.text;
 
+import static org.basex.util.FTToken.*;
 import static org.basex.util.Token.*;
 
 import org.basex.util.*;
@@ -8,7 +9,7 @@ import org.basex.util.list.*;
 /**
  * Returns an iterator for the visualized text.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class TextIterator {
@@ -62,10 +63,10 @@ final class TextIterator {
     // find next token boundary
     int ch = cp(text, p);
     p += cl(text, p);
-    if(ftChar(ch)) {
+    if(lod(ch)) {
       while(p < length) {
         ch = cp(text, p);
-        if(!ftChar(ch)) break;
+        if(!lod(ch)) break;
         p += cl(text, p);
       }
     }
@@ -158,8 +159,7 @@ final class TextIterator {
    */
   boolean selectStart() {
     return start != end && (inSelect() ||
-        (start < end ? start >= pos && start < posEnd :
-          end >= pos && end < posEnd));
+        (start < end ? start >= pos && start < posEnd : end >= pos && end < posEnd));
   }
 
   /**
@@ -167,8 +167,7 @@ final class TextIterator {
    * @return result of check
    */
   boolean inSelect() {
-    return start < end ? pos >= start && pos < end :
-      pos >= end && pos < start;
+    return start < end ? pos >= start && pos < end : pos >= end && pos < start;
   }
 
   /**
@@ -221,15 +220,15 @@ final class TextIterator {
 
   /**
    * Retrieves the current hyperlink.
-   * @return link string
+   * @return link string, or {@code null}
    */
   String link() {
     if(!link) return null;
-
     // find beginning and end of link
     int ls = pos, le = ls;
-    while(ls > 0 && text[ls - 1] != TokenBuilder.ULINE) ls--;
-    while(le < length && text[le] != TokenBuilder.ULINE) le++;
-    return Token.string(text, ls, le - ls);
+    while(--ls > 0 && (text[ls] < -64 || cp(text, ls) != TokenBuilder.ULINE));
+    while(++le < length && (text[le] < -64 || cp(text, le) != TokenBuilder.ULINE));
+    ls += cl(text, ls);
+    return string(text, ls, le - ls);
   }
 }

@@ -1,6 +1,6 @@
 package org.basex.query.util.format;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.util.regex.*;
@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * Parser for formatting integers in dates and times.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class DateFormat extends FormatParser {
@@ -49,11 +49,11 @@ final class DateFormat extends FormatParser {
     final byte[] width = comma == -1 ? null : substring(picture, comma + 1);
     if(width != null) {
       final Matcher m = WIDTH.matcher(string(width));
-      if(!m.find()) throw PICDATE.get(info, width);
-      int i = toInt(m.group(1));
+      if(!m.find()) throw PICDATE_X.get(info, width);
+      int i = Strings.toInt(m.group(1));
       if(i != Integer.MIN_VALUE) min = i;
       final String mc = m.group(3);
-      i = mc != null ? toInt(mc) : Integer.MIN_VALUE;
+      i = mc != null ? Strings.toInt(mc) : Integer.MIN_VALUE;
       if(i != Integer.MIN_VALUE) max = i;
     }
   }

@@ -10,11 +10,12 @@ import org.basex.io.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
+import org.basex.util.http.*;
 
 /**
  * This class caches RESTXQ modules found in the HTTP root directory.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class RestXqModules {
@@ -23,8 +24,6 @@ public final class RestXqModules {
 
   /** Module cache. */
   private HashMap<String, RestXqModule> modules = new HashMap<>();
-  /** RESTXQ path. */
-  private IOFile restxq;
   /** Private constructor. */
   private RestXqModules() { }
 
@@ -34,6 +33,13 @@ public final class RestXqModules {
    */
   public static RestXqModules get() {
     return INSTANCE;
+  }
+
+  /**
+   * Initializes the module cache.
+   */
+  void init() {
+    modules = new HashMap<>();
   }
 
   /**
@@ -54,54 +60,98 @@ public final class RestXqModules {
    * @throws Exception exception (including unexpected ones)
    */
   RestXqFunction find(final HTTPContext http, final QNm error) throws Exception {
-    cache(http);
     // collect all functions
     final ArrayList<RestXqFunction> list = new ArrayList<>();
-    for(final RestXqModule mod : modules.values()) {
+    for(final RestXqModule mod : cache(http).values()) {
       for(final RestXqFunction rxf : mod.functions()) {
         if(rxf.matches(http, error)) list.add(rxf);
       }
     }
     // no path matches
     if(list.isEmpty()) return null;
-    // choose most appropriate function
-    RestXqFunction first = list.get(0);
-    if(list.size() > 1) {
-      // sort by specifity
-      Collections.sort(list);
-      first = list.get(0);
-      // disallow more than one path with the same specifity
-      if(first.compareTo(list.get(1)) == 0) {
-        final TokenBuilder tb = new TokenBuilder();
-        for(final RestXqFunction rxf : list) {
-          if(first.compareTo(rxf) != 0) break;
-          tb.add(Prop.NL).add(rxf.function.info.toString());
+
+    // sort by relevance
+    Collections.sort(list);
+
+    // return best matching function
+    final RestXqFunction best = list.get(0);
+    if(list.size() == 1 || best.compareTo(list.get(1)) != 0) return best;
+
+    final RestXqFunction bestQf = bestQf(list, http);
+    if(bestQf != null) return bestQf;
+
+    // show error if more than one path with the same specifity exists
+    final TokenBuilder tb = new TokenBuilder();
+    for(final RestXqFunction rxf : list) {
+      if(best.compareTo(rxf) != 0) break;
+      tb.add(Prop.NL).add(rxf.function.info.toString());
+    }
+    throw best.path == null ?
+      best.error(ERROR_CONFLICT, error, tb) :
+      best.error(PATH_CONFLICT, best.path, tb);
+  }
+
+  /**
+   * Returns the function that has a media type whose quality factor matches the HTTP request best.
+   * @param list list of functions
+   * @param http http context
+   * @return best function, or {@code null} if more than one function exists
+   */
+  private static RestXqFunction bestQf(final ArrayList<RestXqFunction> list,
+      final HTTPContext http) {
+
+    // media types accepted by the client
+    final MediaType[] accepts = http.accepts();
+
+    double bestQf = 0;
+    RestXqFunction best = list.get(0);
+    for(final RestXqFunction rxf : list) {
+      // skip remaining functions with a weaker specifity
+      if(best.compareTo(rxf) != 0) break;
+      if(rxf.produces.isEmpty()) return null;
+
+      for(final MediaType produce : rxf.produces) {
+        for(final MediaType accept : accepts) {
+          final String value = accept.parameters().get("q");
+          final double qf = value == null ? 1 : Double.parseDouble(value);
+          if(produce.matches(accept)) {
+            // multiple functions with the same quality factor
+            if(bestQf == qf) return null;
+            if(bestQf < qf) {
+              bestQf = qf;
+              best = rxf;
+            }
+          }
         }
-        throw first.path == null ?
-          first.error(ERROR_CONFLICT, error, tb) :
-          first.error(PATH_CONFLICT, first.path, tb);
       }
     }
-    // choose most specific function
-    return first;
+    return best;
   }
 
   /**
    * Updates the module cache. Parses new modules and discards obsolete ones.
    * @param http http context
+   * @return module cache
    * @throws Exception exception (including unexpected ones)
    */
-  private synchronized void cache(final HTTPContext http) throws Exception {
-    // initialize RESTXQ directory (may be relative against WEBPATH)
-    if(restxq == null) {
-      final GlobalOptions gopts = http.context().globalopts;
-      restxq = new IOFile(gopts.get(GlobalOptions.WEBPATH)).resolve(
-          gopts.get(GlobalOptions.RESTXQPATH));
+  private synchronized HashMap<String, RestXqModule> cache(final HTTPContext http)
+      throws Exception {
+
+    final StaticOptions sopts = http.context(false).soptions;
+    HashMap<String, RestXqModule> cache = modules;
+
+    // create new cache if it is empty, or if cache is to be recreated every time
+    if(cache.isEmpty() || !sopts.get(StaticOptions.CACHERESTXQ)) {
+      cache = new HashMap<>();
+      final String webpath = sopts.get(StaticOptions.WEBPATH);
+      final String rxqpath = sopts.get(StaticOptions.RESTXQPATH);
+      final IOFile restxq = new IOFile(webpath).resolve(rxqpath);
+      if(!restxq.exists()) throw HTTPCode.NO_RESTXQ.get();
+
+      cache(http, restxq, cache, modules);
+      modules = cache;
     }
-    // create new cache
-    final HashMap<String, RestXqModule> cache = new HashMap<>();
-    cache(http, restxq, cache);
-    modules = cache;
+    return cache;
   }
 
   /**
@@ -109,18 +159,24 @@ public final class RestXqModules {
    * @param root root path
    * @param http http context
    * @param cache cached modules
+   * @param old old cache
    * @throws Exception exception (including unexpected ones)
    */
-  private synchronized void cache(final HTTPContext http, final IOFile root,
-      final HashMap<String, RestXqModule> cache) throws Exception {
+  private static synchronized void cache(final HTTPContext http, final IOFile root,
+      final HashMap<String, RestXqModule> cache, final HashMap<String, RestXqModule> old)
+      throws Exception {
 
-    for(final IOFile file : root.children()) {
+    // check if directory is to be skipped
+    final IOFile[] files = root.children();
+    for(final IOFile file : files) if(file.name().equals(IO.IGNORESUFFIX)) return;
+
+    for(final IOFile file : files) {
       if(file.isDir()) {
-        cache(http, file, cache);
+        cache(http, file, cache, old);
       } else {
         final String path = file.path();
         if(file.hasSuffix(IO.XQSUFFIXES)) {
-          RestXqModule module = modules.get(path);
+          RestXqModule module = old.get(path);
           boolean parsed = false;
           if(module != null) {
             // check if module has been modified

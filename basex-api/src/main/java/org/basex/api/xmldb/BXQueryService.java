@@ -4,8 +4,11 @@ import static org.basex.util.Token.*;
 
 import java.util.*;
 
-import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.value.*;
+import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
+import org.basex.util.list.*;
 import org.xmldb.api.base.*;
 import org.xmldb.api.base.Collection;
 import org.xmldb.api.modules.*;
@@ -13,7 +16,7 @@ import org.xmldb.api.modules.*;
 /**
  * Abstract QueryService definition for the XMLDB:API.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class BXQueryService implements XPathQueryService, BXXMLDBText {
@@ -33,30 +36,30 @@ final class BXQueryService implements XPathQueryService, BXXMLDBText {
 
   /**
    * Standard constructor.
-   * @param c for collection reference
-   * @param n service name
-   * @param v version
+   * @param coll for collection reference
+   * @param name service name
+   * @param version version
    */
-  BXQueryService(final BXCollection c, final String n, final String v) {
-    coll = c;
-    name = n;
-    version = v;
+  BXQueryService(final BXCollection coll, final String name, final String version) {
+    this.coll = coll;
+    this.name = name;
+    this.version = version;
   }
 
   @Override
-  public void setNamespace(final String pre, final String uri) throws XMLDBException {
-    if(uri != null && !uri.isEmpty()) ns.put(pre == null ? "" : pre, uri);
-    else throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_NSURI + pre);
+  public void setNamespace(final String prefix, final String uri) throws XMLDBException {
+    if(uri != null && !uri.isEmpty()) ns.put(prefix == null ? "" : prefix, uri);
+    else throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_NSURI + prefix);
   }
 
   @Override
-  public String getNamespace(final String pre) {
-    return ns.get(pre == null ? "" : pre);
+  public String getNamespace(final String prefix) {
+    return ns.get(prefix == null ? "" : prefix);
   }
 
   @Override
-  public void removeNamespace(final String pre) {
-    ns.remove(pre == null ? "" : pre);
+  public void removeNamespace(final String prefix) {
+    ns.remove(prefix == null ? "" : prefix);
   }
 
   @Override
@@ -66,7 +69,9 @@ final class BXQueryService implements XPathQueryService, BXXMLDBText {
 
   @Override
   public BXResourceSet query(final String query) throws XMLDBException {
-    return query(coll.ctx.current(), query);
+    final DBNodes nodes = coll.ctx.current();
+    final boolean all = nodes.all();
+    return query(query, DBNodeSeq.get(new IntList(nodes.pres()), nodes.data(), all, all));
   }
 
   @Override
@@ -74,7 +79,7 @@ final class BXQueryService implements XPathQueryService, BXXMLDBText {
       throws XMLDBException {
 
     final BXXMLResource xml = coll.getResource(id);
-    if(xml != null) return query(new Nodes(xml.pos, xml.data), query);
+    if(xml != null) return query(query, new DBNode(xml.data, xml.pre));
     // throw exception if id was not found...
     throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_RES + id);
   }
@@ -105,25 +110,25 @@ final class BXQueryService implements XPathQueryService, BXXMLDBText {
   }
 
   /**
-   * Method for both query actions.
-   * @param nodes initial node set
+   * Runs a query and returns the result set.
    * @param query query string
+   * @param nodes nodes
    * @return resource set
    * @throws XMLDBException exception
    */
-  private BXResourceSet query(final Nodes nodes, final String query) throws XMLDBException {
+  private BXResourceSet query(final String query, final Value nodes) throws XMLDBException {
     // creates a query instance
-    final QueryProcessor qp = new QueryProcessor(query, coll.ctx).context(nodes);
-    try {
+    try(final QueryProcessor qp = new QueryProcessor(query, coll.ctx)) {
+      qp.context(nodes);
       qp.parse();
       try {
         coll.ctx.register(qp);
         // add default namespaces
-        for(final String n : ns.keySet()) {
-          qp.sc.ns.add(token(n), token(ns.get(n)), null);
+        for(final Map.Entry<String, String> entry : ns.entrySet()) {
+          qp.sc.ns.add(token(entry.getKey()), token(entry.getValue()), null);
         }
         // perform query and return result
-        return new BXResourceSet(qp.execute(), coll);
+        return new BXResourceSet(qp.value(), coll);
       } finally {
         qp.close();
         coll.ctx.unregister(qp);

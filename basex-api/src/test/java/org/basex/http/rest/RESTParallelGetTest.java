@@ -4,7 +4,6 @@ import static org.junit.Assert.*;
 
 import java.io.*;
 
-import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.util.*;
 import org.junit.*;
@@ -12,14 +11,10 @@ import org.junit.*;
 /**
  * This class sends parallel GET requests to the REST API.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class RESTParallelGetTest extends HTTPTest {
-  /** REST identifier. */
-  private static final String REST = "rest";
-  /** Root path. */
-  private static final String ROOT = "http://" + Text.S_LOCALHOST + ":9998/" + REST + '/';
   /** Client count. */
   private static final int CLIENTS = 10;
   /** Runs per client. */
@@ -35,7 +30,7 @@ public final class RESTParallelGetTest extends HTTPTest {
    */
   @BeforeClass
   public static void start() throws Exception {
-    init(ROOT, true);
+    init(REST_ROOT, true);
   }
 
   // TEST METHODS =============================================================

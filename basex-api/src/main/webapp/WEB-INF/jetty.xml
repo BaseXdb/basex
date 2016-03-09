@@ -7,8 +7,8 @@
   <Call name="addConnector">
     <Arg>
       <New class="org.eclipse.jetty.server.nio.SelectChannelConnector">
-        <Set name="host"><SystemProperty name="org.basex.serverhost" default="0.0.0.0"/></Set>
-        <Set name="port"><SystemProperty name="org.basex.serverport" default="8984"/></Set>
+        <Set name="host">0.0.0.0</Set>
+        <Set name="port">8984</Set>
         <Set name="maxIdleTime">60000</Set>
         <Set name="reuseAddress">true</Set>
         <Set name="Acceptors">2</Set>
@@ -18,11 +18,6 @@
       </New>
     </Arg>
   </Call>
-
-  <!-- Debugging
-  <Get class="org.eclipse.jetty.util.log.Log" name="log">
-    <Set name="debugEnabled">true</Set>
-  </Get> -->
 
   <!-- Support for SSL connections.
   <Call name="addConnector">
@@ -38,4 +33,10 @@
       </New>
     </Arg>
   </Call>-->
+
+  <!-- Debugging
+  <Get class="org.eclipse.jetty.util.log.Log" name="log">
+    <Set name="debugEnabled">true</Set>
+  </Get> -->
+
 </Configure>

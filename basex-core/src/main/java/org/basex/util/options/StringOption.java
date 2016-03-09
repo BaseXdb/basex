@@ -3,7 +3,7 @@ package org.basex.util.options;
 /**
  * Option containing a string value.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class StringOption extends Option<String> {
@@ -12,20 +12,20 @@ public final class StringOption extends Option<String> {
 
   /**
    * Constructor without default value.
-   * @param n name
+   * @param name name
    */
-  public StringOption(final String n) {
-    this(n, null);
+  public StringOption(final String name) {
+    this(name, null);
   }
 
   /**
    * Default constructor.
-   * @param n name
-   * @param v value
+   * @param name name
+   * @param value value
    */
-  public StringOption(final String n, final String v) {
-    super(n);
-    value = v;
+  public StringOption(final String name, final String value) {
+    super(name);
+    this.value = value;
   }
 
   @Override

@@ -8,21 +8,20 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
-import org.basex.data.*;
 import org.basex.gui.*;
-import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.*;
 import org.basex.gui.view.*;
+import org.basex.query.value.seq.*;
 
 /**
  * This view allows the input of database queries.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class ExploreView extends View {
   /** Header string. */
-  private final BaseXLabel label;
+  private final BaseXHeader header;
   /** Current search panel. */
   private final ExploreArea search;
   /** Filter button. */
@@ -36,19 +35,16 @@ public final class ExploreView extends View {
     super(EXPLOREVIEW, man);
     border(5).layout(new BorderLayout(0, 4));
 
-    label = new BaseXLabel(EXPLORER, true, false);
-    label.setForeground(GRAY);
-
+    header = new BaseXHeader(EXPLORER);
     filter = BaseXButton.command(GUIMenuCmd.C_FILTER, gui);
-    filter.addKeyListener(this);
 
-    final BaseXBack buttons = new BaseXBack(Fill.NONE);
+    final BaseXBack buttons = new BaseXBack(false);
     buttons.layout(new TableLayout(1, 1, 1, 0)).border(0, 0, 4, 0);
     buttons.add(filter);
 
-    final BaseXBack b = new BaseXBack(Fill.NONE).layout(new BorderLayout());
+    final BaseXBack b = new BaseXBack(false).layout(new BorderLayout());
     b.add(buttons, BorderLayout.WEST);
-    b.add(label, BorderLayout.EAST);
+    b.add(header, BorderLayout.EAST);
     add(b, BorderLayout.NORTH);
 
     search = new ExploreArea(this);
@@ -67,9 +63,8 @@ public final class ExploreView extends View {
 
   @Override
   public void refreshMark() {
-    final Nodes marked = gui.context.marked;
-    filter.setEnabled(!gui.gopts.get(GUIOptions.FILTERRT) &&
-        marked != null && marked.size() != 0);
+    final DBNodes marked = gui.context.marked;
+    filter.setEnabled(!gui.gopts.get(GUIOptions.FILTERRT) && marked != null);
   }
 
   @Override
@@ -82,7 +77,7 @@ public final class ExploreView extends View {
 
   @Override
   public void refreshLayout() {
-    label.border(-6, 0, 0, 2).setFont(lfont);
+    header.refreshLayout();
     refreshMark();
   }
 

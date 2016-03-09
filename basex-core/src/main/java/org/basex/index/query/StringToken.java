@@ -5,23 +5,23 @@ import org.basex.index.*;
 /**
  * This class defines access to index text tokens.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class StringToken implements IndexToken {
   /** Index type. */
   private final IndexType type;
   /** Index string. */
-  private final byte[] token;
+  private final byte[] value;
 
   /**
    * Constructor.
-   * @param text text index
-   * @param token token
+   * @param type index type
+   * @param value value to be found
    */
-  public StringToken(final boolean text, final byte[] token) {
-    type = text ? IndexType.TEXT : IndexType.ATTRIBUTE;
-    this.token = token;
+  public StringToken(final IndexType type, final byte[] value) {
+    this.type = type;
+    this.value = value;
   }
 
   @Override
@@ -31,6 +31,6 @@ public final class StringToken implements IndexToken {
 
   @Override
   public byte[] get() {
-    return token;
+    return value;
   }
 }

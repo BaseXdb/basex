@@ -13,13 +13,13 @@ import org.basex.io.out.DataOutput;
 import org.basex.util.*;
 
 /**
- * This class represents a node of the path summary.
+ * This class represents a node of the path index.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class PathNode {
-  /** Tag/attribute name id. */
+  /** Element/attribute name. */
   public final short name;
   /** Node kind, defined in the {@link Data} class. */
   public final byte kind;
@@ -55,7 +55,7 @@ public final class PathNode {
    * @param count counter
    */
   private PathNode(final int name, final byte kind, final PathNode parent, final int count) {
-    this.children = new PathNode[0];
+    children = new PathNode[0];
     this.name = (short) name;
     this.kind = kind;
     this.parent = parent;
@@ -73,7 +73,8 @@ public final class PathNode {
     name = (short) in.readNum();
     kind = (byte) in.read();
     final int count = in.readNum();
-    children = new PathNode[in.readNum()];
+    final int cl = in.readNum();
+    children = new PathNode[cl];
     if(in.readDouble() == 1) {
       // "1" indicates the format introduced with Version 7.1
       stats = new Stats(in);
@@ -83,28 +84,28 @@ public final class PathNode {
       stats.count = count;
     }
     parent = node;
-    for(int c = 0; c < children.length; ++c) children[c] = new PathNode(in, this);
+    for(int c = 0; c < cl; ++c) children[c] = new PathNode(in, this);
   }
 
   /**
    * Indexes the specified name and its kind.
    * @param nm name id
    * @param knd node kind
-   * @param val value
+   * @param value value
    * @param meta meta data
    * @return node reference
    */
-  PathNode index(final int nm, final byte knd, final byte[] val, final MetaData meta) {
+  PathNode index(final int nm, final byte knd, final byte[] value, final MetaData meta) {
     for(final PathNode c : children) {
       if(c.kind == knd && c.name == nm) {
-        if(val != null) c.stats.add(val, meta);
+        if(value != null) c.stats.add(value, meta);
         c.stats.count++;
         return c;
       }
     }
 
     final PathNode node = new PathNode(nm, knd, this);
-    if(val != null) node.stats.add(val, meta);
+    if(value != null) node.stats.add(value, meta);
 
     final int cs = children.length;
     final PathNode[] nodes = new PathNode[cs + 1];
@@ -146,15 +147,13 @@ public final class PathNode {
   }
 
   /**
-   * Recursively adds the node and its descendants to the specified list
-   * with the specified name.
+   * Recursively adds the node and its descendants to the specified list with the specified name.
    * @param nodes node list
    * @param nm name id
-   * @param knd node kind
    */
-  void addDesc(final ArrayList<PathNode> nodes, final int nm, final int knd) {
-    if(nm == name && knd == kind) nodes.add(this);
-    for(final PathNode child : children) child.addDesc(nodes, nm, knd);
+  void addDesc(final ArrayList<PathNode> nodes, final int nm) {
+    if(kind == Data.ELEM && nm == name) nodes.add(this);
+    for(final PathNode child : children) child.addDesc(nodes, nm);
   }
 
   /**
@@ -164,8 +163,8 @@ public final class PathNode {
    */
   public byte[] token(final Data data) {
     switch(kind) {
-      case Data.ELEM: return data.tagindex.key(name);
-      case Data.ATTR: return Token.concat(ATT, data.atnindex.key(name));
+      case Data.ELEM: return data.elemNames.key(name);
+      case Data.ATTR: return Token.concat(ATT, data.attrNames.key(name));
       case Data.TEXT: return TEXT;
       case Data.COMM: return COMMENT;
       case Data.PI:   return PI;
@@ -188,7 +187,7 @@ public final class PathNode {
   }
 
   /**
-   * Returns a string representation of a path summary node.
+   * Returns a string representation of a path index node.
    * @param data data reference
    * @param level level
    * @return string representation
@@ -199,9 +198,9 @@ public final class PathNode {
     for(int i = 0; i < level << 1; ++i) tb.add(' ');
     switch(kind) {
       case Data.DOC:  tb.add(DOC); break;
-      case Data.ELEM: tb.add(data.tagindex.key(name)); break;
+      case Data.ELEM: tb.add(data.elemNames.key(name)); break;
       case Data.TEXT: tb.add(TEXT); break;
-      case Data.ATTR: tb.add(ATT); tb.add(data.atnindex.key(name)); break;
+      case Data.ATTR: tb.add(ATT); tb.add(data.attrNames.key(name)); break;
       case Data.COMM: tb.add(COMMENT); break;
       case Data.PI:   tb.add(PI); break;
     }

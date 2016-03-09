@@ -1,11 +1,13 @@
 package org.basex.core.cmd;
 
 import org.basex.core.*;
+import org.basex.core.locks.*;
+import org.basex.core.users.*;
 
 /**
  * Evaluates the 'exit' command and quits the console.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Exit extends Command {
@@ -21,6 +23,6 @@ public final class Exit extends Command {
 
   @Override
   public void databases(final LockResult lr) {
-    lr.read.add(DBLocking.CTX);
+    lr.read.add(DBLocking.CONTEXT);
   }
 }

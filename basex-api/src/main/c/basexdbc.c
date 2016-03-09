@@ -1,5 +1,6 @@
 /**
  * basexdbc.c : communicate with BaseX database server
+ * Works with BaseX 7.x (but not with BaseX 8.0 and later)
  *
  * Copyright (c) 2005-12, Alexander Holupirek <alex@holupirek.de>, BSD license
  */

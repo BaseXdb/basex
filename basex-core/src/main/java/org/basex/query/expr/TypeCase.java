@@ -1,24 +1,23 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
+
 import org.basex.query.*;
-import org.basex.query.func.*;
-import org.basex.query.iter.Iter;
+import org.basex.query.func.fn.*;
+import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
-import org.basex.util.InputInfo;
-import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
+import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
  * Case expression for typeswitch.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class TypeCase extends Single {
@@ -64,18 +63,23 @@ public final class TypeCase extends Single {
       }
     } catch(final QueryException ex) {
       // replace original expression with error
-      expr = FNInfo.error(ex, expr.type());
+      expr = FnError.get(ex, expr.seqType());
     }
-    type = expr.type();
+    return optimize(qc, scp);
+  }
+
+  @Override
+  public TypeCase optimize(final QueryContext qc, final VarScope scp) {
+    seqType = expr.seqType();
     return this;
   }
 
   @Override
-  public Expr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e) {
+  public Expr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr ex) {
     try {
-      return super.inline(qc, scp, v, e);
+      return super.inline(qc, scp, v, ex);
     } catch(final QueryException qe) {
-      expr = FNInfo.error(qe, expr.type());
+      expr = FnError.get(qe, expr.seqType());
       return this;
     }
   }
@@ -93,7 +97,7 @@ public final class TypeCase extends Single {
    * @param val value to be matched
    * @return {@code true} if it matches, {@code false} otherwise
    */
-  public boolean matches(final Value val) {
+  boolean matches(final Value val) {
     if(types.length == 0) return true;
     for(final SeqType t : types) if(t.instance(val)) return true;
     return false;
@@ -126,7 +130,7 @@ public final class TypeCase extends Single {
         if(!bl.isEmpty()) bl.add(or);
         bl.add(Token.token(t.toString()));
       }
-      e.add(planAttr(Token.token(TYPE), bl.toArray()));
+      e.add(planAttr(Token.token(TYPE), bl.finish()));
     }
     if(var != null) e.add(planAttr(VAR, Token.token(var.toString())));
     expr.plan(e);
@@ -135,15 +139,16 @@ public final class TypeCase extends Single {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(types.length == 0 ? DEFAULT : CASE);
+    final int tl = types.length;
+    final TokenBuilder tb = new TokenBuilder(tl == 0 ? DEFAULT : CASE);
     if(var != null) {
       tb.add(' ').add(var.toString());
-      if(types.length != 0) tb.add(' ').add(AS);
+      if(tl != 0) tb.add(' ').add(AS);
     }
-    if(types.length != 0) {
-      for(int i = 0; i < types.length; i++) {
-        if(i > 0) tb.add(" |");
-        tb.add(' ').add(types[i].toString());
+    if(tl != 0) {
+      for(int t = 0; t < tl; t++) {
+        if(t > 0) tb.add(" |");
+        tb.add(' ').add(types[t].toString());
       }
     }
     return tb.add(' ' + RETURN + ' ' + expr).toString();

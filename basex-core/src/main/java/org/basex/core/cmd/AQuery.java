@@ -1,50 +1,53 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.Map.Entry;
 
 import org.basex.core.*;
+import org.basex.core.locks.*;
 import org.basex.core.parse.*;
-import org.basex.data.*;
+import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.io.serial.dot.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
  * Abstract class for database queries.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class AQuery extends Command {
-  /** Query result. */
-  Result result;
-
   /** Variables. */
-  private final HashMap<String, String[]> vars = new HashMap<>();
+  protected final HashMap<String, String[]> vars = new HashMap<>();
+
   /** HTTP context. */
   private Object http;
   /** Query processor. */
   private QueryProcessor qp;
   /** Query info. */
   private QueryInfo info;
+  /** Query result. */
+  private Value result;
 
   /**
    * Protected constructor.
-   * @param p required permission
-   * @param d requires opened database
-   * @param arg arguments
+   * @param perm required permission
+   * @param openDB requires opened database
+   * @param args arguments
    */
-  AQuery(final Perm p, final boolean d, final String... arg) {
-    super(p, d, arg);
+  AQuery(final Perm perm, final boolean openDB, final String... args) {
+    super(perm, openDB, args);
   }
 
   /**
@@ -54,9 +57,9 @@ public abstract class AQuery extends Command {
    */
   final boolean query(final String query) {
     final Performance p = new Performance();
-    String err;
-    if(cause != null) {
-      err = Util.message(cause);
+    String error;
+    if(exception != null) {
+      error = Util.message(exception);
     } else {
       try {
         long hits = 0;
@@ -76,48 +79,44 @@ public abstract class AQuery extends Command {
           if(!run) continue;
 
           final PrintOutput po = r == 0 && serial ? out : new NullOutput();
-          final Serializer ser;
-
-          if(options.get(MainOptions.CACHEQUERY)) {
-            result = qp.execute();
-            info.evaluating += p.time();
-            ser = qp.getSerializer(po);
-            result.serialize(ser);
-            hits = result.size();
-          } else {
-            hits = 0;
-            final Iter ir = qp.iter();
-            info.evaluating += p.time();
-            Item it = ir.next();
-            ser = qp.getSerializer(po);
-            while(it != null) {
-              checkStop();
-              ser.serialize(it);
-              it = ir.next();
-              ++hits;
+          try(final Serializer ser = qp.getSerializer(po)) {
+            if(maxResults >= 0) {
+              result = qp.cache(maxResults);
+              info.evaluating += p.time();
+              result.serialize(ser);
+              hits = result.size();
+            } else {
+              hits = 0;
+              final Iter ir = qp.iter();
+              info.evaluating += p.time();
+              for(Item it; (it = ir.next()) != null;) {
+                ser.serialize(it);
+                ++hits;
+                checkStop();
+              }
             }
           }
-          ser.close();
           qp.close();
           info.serializing += p.time();
         }
         // dump some query info
-        out.flush();
+        //out.flush();
+
         // remove string list if global locking is used and if query is updating
-        if(goptions.get(GlobalOptions.GLOBALLOCK) && qp.updating) {
+        if(soptions.get(StaticOptions.GLOBALLOCK) && qp.updating) {
           info.readLocked = null;
           info.writeLocked = null;
         }
         return info(info.toString(qp, out.size(), hits, options.get(MainOptions.QUERYINFO)));
 
       } catch(final QueryException | IOException ex) {
-        cause = ex;
-        err = Util.message(ex);
+        exception = ex;
+        error = Util.message(ex);
       } catch(final ProcException ex) {
-        err = INTERRUPTED;
+        error = INTERRUPTED;
       } catch(final StackOverflowError ex) {
         Util.debug(ex);
-        err = BASX_STACKOVERFLOW.desc;
+        error = BASX_STACKOVERFLOW.desc;
       } catch(final RuntimeException ex) {
         extError("");
         Util.debug(info());
@@ -127,7 +126,7 @@ public abstract class AQuery extends Command {
         if(qp != null) qp.close();
       }
     }
-    return extError(err);
+    return extError(error);
   }
 
   /**
@@ -137,8 +136,9 @@ public abstract class AQuery extends Command {
    */
   private void parse(final Performance p) throws QueryException {
     qp.http(http);
-    for(final String name : vars.keySet()) {
-      final String[] value = vars.get(name);
+    for(final Entry<String, String[]> entry : vars.entrySet()) {
+      final String name = entry.getKey();
+      final String[] value = entry.getValue();
       if(name == null) qp.context(value[0], value[1]);
       else qp.bind(name, value[0], value[1]);
     }
@@ -147,36 +147,22 @@ public abstract class AQuery extends Command {
   }
 
   /**
-   * Checks if the query might perform updates.
+   * Checks if the query possibly performs updates.
    * @param ctx database context
-   * @param qu query
+   * @param query query string
    * @return result of check
    */
-  final boolean updating(final Context ctx, final String qu) {
+  final boolean updates(final Context ctx, final String query) {
     try {
       final Performance p = new Performance();
-      qp(qu, ctx);
+      qp(query, ctx);
       parse(p);
       return qp.updating;
     } catch(final QueryException ex) {
       Util.debug(ex);
-      cause = ex;
+      exception = ex;
       qp.close();
       return false;
-    }
-  }
-
-  /**
-   * Parses the XQuery and returns a node set.
-   */
-  final void queryNodes() {
-    try {
-      result = qp(args[0], context).queryNodes();
-      qp.close();
-    } catch(final QueryException ex) {
-      qp.close();
-      qp = null;
-      error(Util.message(ex));
     }
   }
 
@@ -186,7 +172,7 @@ public abstract class AQuery extends Command {
    * @param ctx database context
    * @return query processor
    */
-  private QueryProcessor qp(final String query, final Context ctx) {
+  protected QueryProcessor qp(final String query, final Context ctx) {
     if(qp == null) {
       qp = proc(new QueryProcessor(query, ctx));
       if(info == null) info = qp.qc.info;
@@ -195,43 +181,31 @@ public abstract class AQuery extends Command {
   }
 
   /**
+   * Closes the query processor.
+   */
+  protected void closeQp() {
+    if(qp != null) {
+      qp.close();
+      qp = null;
+    }
+  }
+
+  /**
    * Returns the serialization parameters.
    * @param ctx context
    * @return serialization parameters
    */
-  public SerializerOptions parameters(final Context ctx) {
-    SerializerOptions params = Serializer.OPTIONS;
+  public String parameters(final Context ctx) {
     try {
       qp(args[0], ctx);
       parse(null);
-      params = qp.qc.serParams();
+      return qp.qc.serParams().toString();
     } catch(final QueryException ex) {
       error(Util.message(ex));
+    } finally {
+      qp = null;
     }
-    qp = null;
-    return params;
-  }
-
-  /**
-   * Binds a variable.
-   * @param name name of variable (if {@code null}, value will be bound as context value)
-   * @param value value to be bound
-   * @return reference
-   */
-  public AQuery bind(final String name, final String value) {
-    return bind(name, value, null);
-  }
-
-  /**
-   * Binds a variable.
-   * @param name name of variable (if {@code null}, value will be bound as context value)
-   * @param value value to be bound
-   * @param type type
-   * @return reference
-   */
-  public AQuery bind(final String name, final String value, final String type) {
-    vars.put(name, new String[] { value, type });
-    return this;
+    return SerializerMode.DEFAULT.get().toString();
   }
 
   /**
@@ -267,14 +241,14 @@ public abstract class AQuery extends Command {
     // show dot plan
     try {
       if(options.get(MainOptions.DOTPLAN)) {
-        final String path = context.options.get(MainOptions.QUERYPATH);
+        final String path = options.get(MainOptions.QUERYPATH);
         final String dot = path.isEmpty() ? "plan.dot" :
             new IOFile(path).name().replaceAll("\\..*?$", ".dot");
 
         try(final BufferOutput bo = new BufferOutput(dot)) {
-          final DOTSerializer d = new DOTSerializer(bo, options.get(MainOptions.DOTCOMPACT));
-          d.serialize(qp.plan());
-          d.close();
+          try(final DOTSerializer d = new DOTSerializer(bo, options.get(MainOptions.DOTCOMPACT))) {
+            d.serialize(qp.plan());
+          }
         }
       }
 
@@ -290,11 +264,11 @@ public abstract class AQuery extends Command {
 
   @Override
   public boolean updating(final Context ctx) {
-    return args[0] != null && updating(ctx, args[0]);
+    return updates(ctx, args[0]);
   }
 
   @Override
-  public boolean updated(final Context ctx) {
+  public final boolean updated(final Context ctx) {
     return qp != null && qp.updates() != 0;
   }
 
@@ -320,8 +294,8 @@ public abstract class AQuery extends Command {
   }
 
   @Override
-  public final Result result() {
-    final Result r = result;
+  public final Value finish() {
+    final Value r = result;
     result = null;
     return r;
   }

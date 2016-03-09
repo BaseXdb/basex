@@ -2,10 +2,9 @@ package org.basex.build;
 
 import static org.junit.Assert.*;
 
-import org.basex.core.*;
+import org.basex.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
-import org.basex.*;
 import org.basex.util.*;
 import org.junit.*;
 import org.junit.Test;
@@ -13,7 +12,7 @@ import org.junit.Test;
 /**
  * Tests for creating databases and adding documents.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class CreateTest extends SandboxTest {
@@ -50,32 +49,30 @@ public final class CreateTest extends SandboxTest {
 
   /**
    * Drops the initial collection.
-   * @throws BaseXException exception
    */
   @After
-  public void tearDown() throws BaseXException {
-    new DropDB(NAME).execute(context);
+  public void tearDown() {
+    execute(new DropDB(NAME));
   }
 
   /**
    * CREATE DB {DB}.
-   * @throws BaseXException exception
    */
   @Test
-  public void createDB() throws BaseXException {
-    new CreateDB(NAME).execute(context);
+  public void createDB() {
+    execute(new CreateDB(NAME));
     // check if database name equals argument of create command
     assertEquals(db(), NAME);
   }
 
   /**
    * CREATE DB {DB} {INPUT[]}.
-   * @throws BaseXException exception
    */
   @Test
-  public void createDBWithInput() throws BaseXException {
-    for(int i = 0; i < INPUTS.length; ++i) {
-      new CreateDB(NAME, INPUTS[i]).execute(context);
+  public void createDBWithInput() {
+    final int il = INPUTS.length;
+    for(int i = 0; i < il; i++) {
+      execute(new CreateDB(NAME, INPUTS[i]));
       // check name of database
       assertEquals(NAME, db());
       // check name of document
@@ -85,56 +82,56 @@ public final class CreateTest extends SandboxTest {
 
   /**
    * CREATE DB {DB}; ADD {INPUT[]}.
-   * @throws BaseXException exception
    */
   @Test
-  public void createDBandAdd() throws BaseXException {
+  public void createDBandAdd() {
     // add file and folder, skip fragment
-    for(int i = 0; i < INPUTS.length - 1; i++) {
-      new CreateDB(NAME).execute(context);
-      new Add("", INPUTS[i]).execute(context);
+    final int il = INPUTS.length;
+    for(int i = 0; i < il - 1; i++) {
+      execute(new CreateDB(NAME));
+      execute(new Add("", INPUTS[i]));
       assertEquals(NAMES[i], docName());
     }
   }
 
   /**
    * CREATE DB {DB}; ADD TO {DOCNAME} {INPUT[]}.
-   * @throws BaseXException exception
    */
   @Test
-  public void createDBandAddToName() throws BaseXException {
+  public void createDBandAddToName() {
     // add file and fragment, skip folder
-    for(int i = 0; i < INPUTS.length; i += 2) {
-      new CreateDB(NAME).execute(context);
-      new Add(DOCNAME, INPUTS[i]).execute(context);
+    final int il = INPUTS.length;
+    for(int i = 0; i < il; i += 2) {
+      execute(new CreateDB(NAME));
+      execute(new Add(DOCNAME, INPUTS[i]));
       assertEquals(DOCNAME, docName());
     }
   }
 
   /**
    * CREATE DB {DB}; ADD TO {TARGET} {INPUT[]}.
-   * @throws BaseXException exception
    */
   @Test
-  public void createDBandAddToTarget() throws BaseXException {
+  public void createDBandAddToTarget() {
     // add file and folder, skip fragment
-    for(int i = 0; i < INPUTS.length - 1; i++) {
-      new CreateDB(NAME).execute(context);
-      new Add(TARGET, INPUTS[i]).execute(context);
+    final int il = INPUTS.length;
+    for(int i = 0; i < il - 1; i++) {
+      execute(new CreateDB(NAME));
+      execute(new Add(TARGET, INPUTS[i]));
       assertEquals(TARGET + NAMES[i], docName());
     }
   }
 
   /**
    * CREATE DB {DB}; ADD TO {TARGET/DOCNAME} {INPUT[]}.
-   * @throws BaseXException exception
    */
   @Test
-  public void createDBandAddToTargetName() throws BaseXException {
+  public void createDBandAddToTargetName() {
     // add file and fragment, skip folder
-    for(int i = 0; i < INPUTS.length; i += 2) {
-      new CreateDB(NAME).execute(context);
-      new Add(TARGET + DOCNAME, INPUTS[i]).execute(context);
+    final int il = INPUTS.length;
+    for(int i = 0; i < il; i += 2) {
+      execute(new CreateDB(NAME));
+      execute(new Add(TARGET + DOCNAME, INPUTS[i]));
       assertEquals(TARGET + DOCNAME, docName());
     }
   }
@@ -152,6 +149,6 @@ public final class CreateTest extends SandboxTest {
    * @return first document name
    */
   private static String docName() {
-    return Token.string(context.data().text(context.current().pres[0], true));
+    return Token.string(context.data().text(context.current().pre(0), true));
   }
 }

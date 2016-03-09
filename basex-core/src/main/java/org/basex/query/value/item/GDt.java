@@ -1,12 +1,12 @@
 package org.basex.query.value.item;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
-import static org.basex.query.util.Err.*;
 
 import java.util.regex.*;
 
 import org.basex.query.*;
-import org.basex.query.util.*;
+import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -14,7 +14,7 @@ import org.basex.util.*;
  * Simple date item, used for {@code xs:gYearMonth}, {@code xs:gYear},
  * {@code xs:gMonthDay}, {@code xs:gDay} and {@code xs:gMonth}.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class GDt extends ADate {
@@ -38,7 +38,7 @@ public final class GDt extends ADate {
   /**
    * Constructor.
    * @param date date
-   * @param type data type
+   * @param type item type
    */
   public GDt(final ADate date, final Type type) {
     super(type, date);
@@ -53,7 +53,7 @@ public final class GDt extends ADate {
   /**
    * Constructor.
    * @param date date
-   * @param type data type
+   * @param type item type
    * @param ii input info
    * @throws QueryException query exception
    */
@@ -69,14 +69,14 @@ public final class GDt extends ADate {
       yea = toLong(mt.group(1), false, ii);
       // +1 is added to BC values to simplify computations
       if(yea < 0) yea++;
-      if(yea < MIN_YEAR || yea >= MAX_YEAR) throw DATERANGE.get(ii, type, chop(date));
+      if(yea < MIN_YEAR || yea >= MAX_YEAR) throw DATERANGE_X_X.get(ii, type, chop(date, ii));
     }
     if(i > 0 && i < 4) {
-      mon = (byte) (Token.toLong(mt.group(i == 1 ? 3 : 1)) - 1);
+      mon = (byte) (Strings.toLong(mt.group(i == 1 ? 3 : 1)) - 1);
       if(mon < 0 || mon > 11) throw dateError(date, EXAMPLES[i], ii);
     }
     if(i > 2) {
-      day = (byte) (Token.toLong(mt.group(i == 3 ? 2 : 1)) - 1);
+      day = (byte) (Strings.toLong(mt.group(i == 3 ? 2 : 1)) - 1);
       final int m = Math.max(mon, 0);
       if(day < 0 || day >= DAYS[m] + (m == 1 ? 1 : 0)) throw dateError(date, EXAMPLES[i], ii);
     }
@@ -89,12 +89,13 @@ public final class GDt extends ADate {
    * @return offset
    */
   private static int type(final Type type) {
-    for(int t = 0; t < TYPES.length; ++t) if(TYPES[t] == type) return t;
+    final int tl = TYPES.length;
+    for(int t = 0; t < tl; t++) if(TYPES[t] == type) return t;
     throw Util.notExpected();
   }
 
   @Override
-  public void timeZone(final DTDur tz, final boolean d, final InputInfo ii) {
+  public void timeZone(final DTDur zone, final boolean d, final InputInfo ii) {
     throw Util.notExpected();
   }
 

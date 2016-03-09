@@ -1,23 +1,14 @@
 package org.basex.modules;
 
-import java.util.*;
-
-import javax.servlet.http.*;
-
-import org.basex.data.*;
 import org.basex.http.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
-import org.basex.query.value.seq.*;
-import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * This module contains functions for processing server-side session data.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Session extends QueryModule {
@@ -28,7 +19,7 @@ public final class Session extends QueryModule {
    */
   @Requires(Permission.NONE)
   public Str id() throws QueryException {
-    return Str.get(session().getId());
+    return session().id();
   }
 
   /**
@@ -38,7 +29,7 @@ public final class Session extends QueryModule {
    */
   @Requires(Permission.NONE)
   public Dtm created() throws QueryException {
-    return new Dtm(session().getCreationTime(), null);
+    return session().created();
   }
 
   /**
@@ -48,7 +39,7 @@ public final class Session extends QueryModule {
    */
   @Requires(Permission.NONE)
   public Dtm accessed() throws QueryException {
-    return new Dtm(session().getLastAccessedTime(), null);
+    return session().accessed();
   }
 
   /**
@@ -58,10 +49,7 @@ public final class Session extends QueryModule {
    */
   @Requires(Permission.NONE)
   public Value names() throws QueryException {
-    final TokenList tl = new TokenList();
-    final Enumeration<String> en = session().getAttributeNames();
-    while(en.hasMoreElements()) tl.add(en.nextElement());
-    return StrSeq.get(tl);
+    return session().names();
   }
 
   /**
@@ -71,42 +59,31 @@ public final class Session extends QueryModule {
    * @throws QueryException query exception
    */
   @Requires(Permission.NONE)
-  public Item get(final Str key) throws QueryException {
-    return get(key, null);
+  public Value get(final Str key) throws QueryException {
+    return session().get(key);
   }
 
   /**
    * Returns a session attribute.
    * @param key key to be requested
-   * @param def default item
+   * @param def default value
    * @return session attribute
    * @throws QueryException query exception
    */
   @Requires(Permission.NONE)
-  public Item get(final Str key, final Item def) throws QueryException {
-    final Object o = session().getAttribute(key.toJava());
-    if(o == null) return def;
-    if(o instanceof Item) return (Item) o;
-    throw SessionErrors.noAttribute(Util.className(o));
+  public Value get(final Str key, final Value def) throws QueryException {
+    return session().get(key, def);
   }
 
   /**
    * Updates a session attribute.
    * @param key key of the attribute
-   * @param item item to be stored
+   * @param value value to be stored
    * @throws QueryException query exception
    */
   @Requires(Permission.NONE)
-  public void set(final Str key, final Item item) throws QueryException {
-    Item it = item;
-    final Data d = it.data();
-    if(d != null && !d.inMemory()) {
-      // convert database node to main memory data instance
-      it = ((ANode) it).dbCopy(queryContext.context.options);
-    } else if(it instanceof FItem) {
-      throw SessionErrors.functionItem();
-    }
-    session().setAttribute(key.toJava(), it);
+  public void set(final Str key, final Value value) throws QueryException {
+    session().set(key, value);
   }
 
   /**
@@ -116,25 +93,25 @@ public final class Session extends QueryModule {
    */
   @Requires(Permission.NONE)
   public void delete(final Str key) throws QueryException {
-    session().removeAttribute(key.toJava());
+    session().delete(key);
   }
 
   /**
-   * Invalidates a session.
+   * Closes a session.
    * @throws QueryException query exception
    */
   @Requires(Permission.NONE)
   public void close() throws QueryException {
-    session().invalidate();
+    session().close();
   }
 
   /**
-   * Returns the session instance.
+   * Returns a session instance.
    * @return request
    * @throws QueryException query exception
    */
-  private HttpSession session() throws QueryException {
+  private ASession session() throws QueryException {
     if(queryContext.http == null) throw SessionErrors.noContext();
-    return ((HTTPContext) queryContext.http).req.getSession();
+    return new ASession(((HTTPContext) queryContext.http).req.getSession(), queryContext);
   }
 }

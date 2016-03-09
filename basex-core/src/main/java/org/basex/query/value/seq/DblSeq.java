@@ -11,7 +11,7 @@ import org.basex.query.value.type.*;
 /**
  * Sequence of items of type {@link Int xs:double}, containing at least two of them.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class DblSeq extends NativeSeq {
@@ -42,14 +42,6 @@ public final class DblSeq extends NativeSeq {
     return values;
   }
 
-  @Override
-  public Value reverse() {
-    final int s = values.length;
-    final double[] tmp = new double[s];
-    for(int l = 0, r = s - 1; l < s; l++, r--) tmp[l] = values[r];
-    return get(tmp);
-  }
-
   // STATIC METHODS =====================================================================
 
   /**
@@ -58,26 +50,24 @@ public final class DblSeq extends NativeSeq {
    * @return value
    */
   public static Value get(final double[] items) {
-    return items.length == 0 ? Empty.SEQ : items.length == 1 ?
-        Dbl.get(items[0]) : new DblSeq(items);
+    return items.length == 0 ? Empty.SEQ : items.length == 1 ? Dbl.get(items[0]) :
+      new DblSeq(items);
   }
 
   /**
    * Creates a sequence with the items in the specified expressions.
-   * @param vals values
+   * @param values values
    * @param size size of resulting sequence
    * @return value
    * @throws QueryException query exception
    */
-  public static Value get(final Value[] vals, final int size) throws QueryException {
+  public static Value get(final Value[] values, final int size) throws QueryException {
     final double[] tmp = new double[size];
     int t = 0;
-    for(final Value val : vals) {
+    for(final Value val : values) {
       // speed up construction, depending on input
       final int vs = (int) val.size();
-      if(val instanceof Item) {
-        tmp[t++] = ((Item) val).dbl(null);
-      } else if(val instanceof DblSeq) {
+      if(val instanceof DblSeq) {
         final DblSeq sq = (DblSeq) val;
         System.arraycopy(sq.values, 0, tmp, t, vs);
         t += vs;

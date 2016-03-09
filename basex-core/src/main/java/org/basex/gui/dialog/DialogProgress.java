@@ -15,7 +15,7 @@ import org.basex.util.*;
 /**
  * Dialog window for displaying the progress of a command execution.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class DialogProgress extends BaseXDialog implements ActionListener {
@@ -77,7 +77,7 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
     s.add(m, BorderLayout.WEST);
 
     if(cmd.stoppable()) {
-      final BaseXButton cancel = new BaseXButton(CANCEL, this);
+      final BaseXButton cancel = new BaseXButton(B_CANCEL, this);
       s.add(cancel, BorderLayout.EAST);
     }
     set(s, BorderLayout.SOUTH);
@@ -120,7 +120,7 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
    * @param dialog reference to the dialog window
    * @param cmds commands to be run
    */
-  public static void execute(final BaseXDialog dialog, final Command... cmds) {
+  static void execute(final BaseXDialog dialog, final Command... cmds) {
     execute(dialog, null, cmds);
   }
 
@@ -141,13 +141,13 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
    * @param post post-processing step
    * @param cmds commands to be run
    */
-  public static void execute(final BaseXDialog dialog, final Runnable post, final Command... cmds) {
+  static void execute(final BaseXDialog dialog, final Runnable post, final Command... cmds) {
     execute(dialog.gui, dialog, post, cmds);
   }
 
   /**
-   * Runs the specified commands, decorated by a progress dialog, and
-   * calls {@link BaseXDialog#action} if the dialog is closed.
+   * Runs the specified commands, decorated by a progress dialog, and calls
+   * {@link BaseXDialog#action} if the dialog is closed.
    * @param gui reference to the main window
    * @param dialog reference to the dialog window (may be {@code null})
    * @param post post-processing step
@@ -203,6 +203,6 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
       else if(cmd.updating(gui.context)) gui.notify.update();
     }
     if(dialog != null) dialog.action(dialog);
-    if(post != null) post.run();
+    if(post != null) SwingUtilities.invokeLater(post);
   }
 }

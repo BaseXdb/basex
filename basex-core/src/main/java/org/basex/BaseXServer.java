@@ -9,8 +9,8 @@ import java.util.*;
 import org.basex.api.client.*;
 import org.basex.core.*;
 import org.basex.io.*;
-import org.basex.io.in.*;
 import org.basex.server.*;
+import org.basex.server.Log.LogType;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -18,30 +18,29 @@ import org.basex.util.list.*;
  * This is the starter class for running the database server. It handles
  * concurrent requests from multiple users.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  * @author Andreas Weiler
  */
 public final class BaseXServer extends CLI implements Runnable {
-  /** Flag for server activity. */
-  private volatile boolean running;
-  /** Event server socket. */
-  private ServerSocket esocket;
-  /** Stop file. */
-  private IOFile stop;
-
   /** New sessions. */
   private final HashSet<ClientListener> auth = new HashSet<>();
-  /** Stopped flag. */
-  private volatile boolean stopped;
-  /** EventsListener. */
-  private EventListener events;
+  /** Indicates if server is running. */
+  private volatile boolean running;
+  /** Indicates if server is to be stopped. */
+  private volatile boolean stop;
   /** Initial commands. */
   private StringList commands;
   /** Server socket. */
   private ServerSocket socket;
-  /** Start as daemon. */
+  /** Start as service. */
   private boolean service;
+  /** Daemon flag. */
+  private boolean daemon;
+  /** Quiet flag. */
+  private boolean quiet;
+  /** Stop file. */
+  private IOFile stopFile;
 
   /**
    * Main method, launching the server process.
@@ -75,61 +74,59 @@ public final class BaseXServer extends CLI implements Runnable {
   public BaseXServer(final Context ctx, final String... args) throws IOException {
     super(args, ctx);
 
-    final GlobalOptions gopts = context.globalopts;
-    final int port = gopts.get(GlobalOptions.SERVERPORT);
-    final int eport = gopts.get(GlobalOptions.EVENTPORT);
-    // check if ports are distinct
-    if(port == eport) throw new BaseXException(PORT_TWICE_X, port);
-
-    final String host = gopts.get(GlobalOptions.SERVERHOST);
+    final StaticOptions sopts = context.soptions;
+    final int port = sopts.get(StaticOptions.SERVERPORT);
+    final String host = sopts.get(StaticOptions.SERVERHOST);
     final InetAddress addr = host.isEmpty() ? null : InetAddress.getByName(host);
 
-    if(service) {
-      start(port, args);
-      Util.outln(SRV_STARTED_PORT_X, port);
+    if(stop) {
+      stop();
+      if(!quiet) Util.outln(SRV_STOPPED_PORT_X, port);
+      // keep message visible for a while
       Performance.sleep(1000);
       return;
     }
 
-    if(stopped) {
-      stop(port, eport);
-      Util.outln(SRV_STOPPED_PORT_X, port);
+    if(service) {
+      start(port, args);
+      if(!quiet) Util.outln(SRV_STARTED_PORT_X, port);
       Performance.sleep(1000);
       return;
     }
 
     try {
       // execute initial command-line arguments
-      for(final String c : commands) execute(c);
+      for(final String cmd : commands) execute(cmd);
 
       socket = new ServerSocket();
-      // reuse address (on non-Windows machines: !Prop.WIN);
       socket.setReuseAddress(true);
       socket.bind(new InetSocketAddress(addr, port));
-      esocket = new ServerSocket();
-      esocket.setReuseAddress(true);
-      esocket.bind(new InetSocketAddress(addr, eport));
-      stop = stopFile(port);
-
-      // show info when server is aborted
-      context.log.writeServer(OK, Util.info(SRV_STARTED_PORT_X, port));
-      Runtime.getRuntime().addShutdownHook(new Thread() {
-        @Override
-        public void run() {
-          context.log.writeServer(OK, Util.info(SRV_STOPPED_PORT_X, port));
-          Util.outln(SRV_STOPPED_PORT_X, port);
-        }
-      });
-
-      new Thread(this).start();
-      while(!running) Performance.sleep(10);
-
-      Util.outln(S_CONSOLE + Util.info(SRV_STARTED_PORT_X, port), S_SERVER);
-
+      stopFile = stopFile(port);
     } catch(final IOException ex) {
-      context.log.writeError(ex);
-      throw ex;
+      context.log.writeServer(LogType.ERROR, Util.message(ex));
+      throw ex instanceof BindException ? new IOException(Util.info(SRV_RUNNING_X, port)) : ex;
     }
+
+    new Thread(this).start();
+    do Thread.yield(); while(!running);
+
+    // show info that server has been started
+    final String startX = Util.info(SRV_STARTED_PORT_X, port);
+    if(!quiet) {
+      if(!daemon) Util.outln(header());
+      Util.outln(startX);
+    }
+    context.log.writeServer(LogType.OK, startX);
+
+    // show info when server is aborted
+    Runtime.getRuntime().addShutdownHook(new Thread() {
+      @Override
+      public void run() {
+        final String stopX = Util.info(SRV_STOPPED_PORT_X, port);
+        if(!quiet) Util.outln(stopX);
+        context.log.writeServer(LogType.OK, stopX);
+      }
+    });
   }
 
   @Override
@@ -138,14 +135,14 @@ public final class BaseXServer extends CLI implements Runnable {
     while(running) {
       try {
         final Socket s = socket.accept();
-        if(stop.exists()) {
-          if(!stop.delete()) {
-            context.log.writeServer(ERROR + COL + Util.info(FILE_NOT_DELETED_X, stop));
+        if(stopFile.exists()) {
+          if(!stopFile.delete()) {
+            context.log.writeServer(LogType.ERROR, Util.info(FILE_NOT_DELETED_X, stopFile));
           }
           quit();
         } else {
           // drop inactive connections
-          final long ka = context.globalopts.get(GlobalOptions.KEEPALIVE) * 1000L;
+          final long ka = context.soptions.get(StaticOptions.KEEPALIVE) * 1000L;
           if(ka > 0) {
             final long ms = System.currentTimeMillis();
             for(final ClientListener cs : context.sessions) {
@@ -154,7 +151,7 @@ public final class BaseXServer extends CLI implements Runnable {
           }
           final ClientListener cl = new ClientListener(s, context, this);
           // start authentication timeout
-          final long to = context.globalopts.get(GlobalOptions.KEEPALIVE) * 1000L;
+          final long to = context.soptions.get(StaticOptions.KEEPALIVE) * 1000L;
           if(to > 0) {
             cl.auth.schedule(new TimerTask() {
               @Override
@@ -171,7 +168,7 @@ public final class BaseXServer extends CLI implements Runnable {
       } catch(final Throwable ex) {
         // socket may have been unexpectedly closed
         Util.errln(ex);
-        context.log.writeError(ex);
+        context.log.writeServer(LogType.ERROR, Util.message(ex));
         break;
       }
     }
@@ -189,7 +186,7 @@ public final class BaseXServer extends CLI implements Runnable {
   /**
    * Shuts down the server.
    */
-  protected synchronized void quit() {
+  private synchronized void quit() {
     if(!running) return;
     running = false;
 
@@ -203,11 +200,10 @@ public final class BaseXServer extends CLI implements Runnable {
 
     try {
       // close interactive input if server was stopped by another process
-      esocket.close();
       socket.close();
     } catch(final IOException ex) {
       Util.errln(ex);
-      context.log.writeError(ex);
+      context.log.writeServer(LogType.ERROR, Util.message(ex));
     }
   }
 
@@ -215,7 +211,6 @@ public final class BaseXServer extends CLI implements Runnable {
   protected void parseArgs() throws IOException {
     final MainParser arg = new MainParser(this);
     commands = new StringList();
-    boolean daemon = false;
 
     while(arg.more()) {
       if(arg.dash()) {
@@ -229,27 +224,27 @@ public final class BaseXServer extends CLI implements Runnable {
           case 'D': // hidden flag: daemon mode
             daemon = true;
             break;
-          case 'e': // parse event port
-            context.globalopts.set(GlobalOptions.EVENTPORT, arg.number());
-            break;
           case 'n': // parse host the server is bound to
-            context.globalopts.set(GlobalOptions.SERVERHOST, arg.string());
+            context.soptions.set(StaticOptions.SERVERHOST, arg.string());
             break;
           case 'p': // parse server port
-            context.globalopts.set(GlobalOptions.SERVERPORT, arg.number());
+            context.soptions.set(StaticOptions.SERVERPORT, arg.number());
+            break;
+          case 'q': // quiet flag (hidden)
+            quiet = true;
             break;
           case 'S': // set service flag
             service = !daemon;
             break;
           case 'z': // suppress logging
-            context.globalopts.set(GlobalOptions.LOG, false);
+            context.soptions.set(StaticOptions.LOG, false);
             break;
           default:
             throw arg.usage();
         }
       } else {
         if("stop".equalsIgnoreCase(arg.string())) {
-          stopped = true;
+          stop = true;
         } else {
           throw arg.usage();
         }
@@ -262,8 +257,10 @@ public final class BaseXServer extends CLI implements Runnable {
    * @throws IOException I/O exception
    */
   public void stop() throws IOException {
-    final GlobalOptions gopts = context.globalopts;
-    stop(gopts.get(GlobalOptions.SERVERPORT), gopts.get(GlobalOptions.EVENTPORT));
+    final StaticOptions sopts = context.soptions;
+    final int port = sopts.get(StaticOptions.SERVERPORT);
+    final String host = sopts.get(StaticOptions.SERVERHOST);
+    stop(host.isEmpty() ? S_LOCALHOST : host, port);
   }
 
   // STATIC METHODS ===========================================================
@@ -276,16 +273,17 @@ public final class BaseXServer extends CLI implements Runnable {
    */
   public static void start(final int port, final String... args) throws BaseXException {
     // check if server is already running (needs some time)
-    if(ping(S_LOCALHOST, port)) throw new BaseXException(SRV_RUNNING);
+    final String host = S_LOCALHOST;
+    if(ping(host, port)) throw new BaseXException(SRV_RUNNING_X, port);
 
     Util.start(BaseXServer.class, args);
 
     // try to connect to the new server instance
     for(int c = 1; c < 10; ++c) {
-      Performance.sleep(c * 100);
-      if(ping(S_LOCALHOST, port)) return;
+      Performance.sleep(c * 100L);
+      if(ping(host, port)) return;
     }
-    throw new BaseXException(CONNECTION_ERROR);
+    throw new BaseXException(CONNECTION_ERROR_X, port);
   }
 
   /**
@@ -297,7 +295,7 @@ public final class BaseXServer extends CLI implements Runnable {
   public static boolean ping(final String host, final int port) {
     try {
       // connect server with invalid login data
-      new ClientSession(host, port, "", "");
+      try(final ClientSession cs = new ClientSession(host, port, "", "")) { }
       return false;
     } catch(final LoginException ex) {
       // if login was checked, server is running
@@ -309,21 +307,21 @@ public final class BaseXServer extends CLI implements Runnable {
 
   /**
    * Stops the server.
+   * @param host server host
    * @param port server port
-   * @param eport event port
    * @throws IOException I/O exception
    */
-  public static void stop(final int port, final int eport) throws IOException {
-    final IOFile stop = stopFile(port);
+  public static void stop(final String host, final int port) throws IOException {
+    final IOFile stopFile = stopFile(port);
     try {
-      stop.touch();
-      new Socket(S_LOCALHOST, eport).close();
-      new Socket(S_LOCALHOST, port).close();
+      stopFile.touch();
+      try(final Socket s = new Socket(host, port)) { }
       // wait and check if server was really stopped
       do Performance.sleep(100); while(ping(S_LOCALHOST, port));
-    } catch(final IOException ex) {
-      stop.delete();
-      throw ex;
+    } catch(final ConnectException ex) {
+      throw new IOException(Util.info(CONNECTION_ERROR_X, port));
+    } finally {
+      stopFile.delete();
     }
   }
 
@@ -338,50 +336,9 @@ public final class BaseXServer extends CLI implements Runnable {
     }
   }
 
-  /**
-   * Initializes the event listener.
-   */
-  public void initEvents() {
-    if(events == null) {
-      events = new EventListener();
-      events.start();
-    }
-  }
-
-  /**
-   * Inner class to listen for event registrations.
-   *
-   * @author BaseX Team 2005-14, BSD License
-   * @author Andreas Weiler
-   */
-  private final class EventListener extends Thread {
-    @Override
-    public void run() {
-      while(running) {
-        try {
-          final Socket es = esocket.accept();
-          if(stop.exists()) {
-            esocket.close();
-            break;
-          }
-          final BufferInput bi = new BufferInput(es.getInputStream());
-          final long id = Token.toLong(bi.readString());
-          for(final ClientListener s : context.sessions) {
-            if(s.getId() == id) {
-              s.register(es);
-              break;
-            }
-          }
-        } catch(final IOException ex) {
-          break;
-        }
-      }
-    }
-  }
-
   @Override
   public String header() {
-    return Util.info(S_CONSOLE, S_SERVER);
+    return Util.info(S_CONSOLE_X, S_SERVER);
   }
 
   @Override

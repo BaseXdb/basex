@@ -1,6 +1,6 @@
 package org.basex.query.value.item;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 
 import java.math.*;
 
@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * Abstract super class for dates and durations.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class ADateDur extends Item {
@@ -53,7 +53,7 @@ public abstract class ADateDur extends Item {
 
   /**
    * Constructor.
-   * @param type data type
+   * @param type item type
    */
   ADateDur(final Type type) {
     super(type);
@@ -103,7 +103,7 @@ public abstract class ADateDur extends Item {
    * @return date format exception
    */
   final QueryException dateError(final byte[] i, final String ex, final InputInfo ii) {
-    return DATEFORMAT.get(ii, type, i, ex);
+    return DATEFORMAT_X_X_X.get(ii, type, i, ex);
   }
 
   /**
@@ -119,7 +119,7 @@ public abstract class ADateDur extends Item {
     try {
       return Long.parseLong(s);
     } catch(final NumberFormatException ex) {
-      throw (dur ? DURRANGE : DATERANGE).get(ii, type, chop(s));
+      throw (dur ? DURRANGE_X_X : DATERANGE_X_X).get(ii, type, chop(s, ii));
     }
   }
 
@@ -138,7 +138,7 @@ public abstract class ADateDur extends Item {
     try {
       return new BigDecimal(s);
     } catch(final NumberFormatException ex) {
-      throw (dur ? DURRANGE : DATERANGE).get(ii, type, chop(s));
+      throw (dur ? DURRANGE_X_X : DATERANGE_X_X).get(ii, type, chop(s, ii));
     }
   }
 }

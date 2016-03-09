@@ -3,6 +3,7 @@ package org.basex;
 import static org.basex.core.Text.*;
 
 import java.io.*;
+import java.net.*;
 
 import org.basex.api.client.*;
 import org.basex.core.*;
@@ -12,7 +13,7 @@ import org.basex.util.*;
  * This is the starter class for the client console mode.
  * All input is sent to the server instance.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class BaseXClient extends BaseX {
@@ -40,15 +41,15 @@ public final class BaseXClient extends BaseX {
   }
 
   @Override
-  protected boolean sa() {
+  protected boolean local() {
     return false;
   }
 
   @Override
   protected Session init() throws IOException {
     // user/password input
-    String user = context.globalopts.get(GlobalOptions.USER);
-    String pass = context.globalopts.get(GlobalOptions.PASSWORD);
+    String user = context.soptions.get(StaticOptions.USER);
+    String pass = context.soptions.get(StaticOptions.PASSWORD);
     while(user.isEmpty()) {
       Util.out(USERNAME + COLS);
       user = Util.input();
@@ -57,6 +58,13 @@ public final class BaseXClient extends BaseX {
       Util.out(PASSWORD + COLS);
       pass = Util.password();
     }
-    return new ClientSession(context, user, pass, out);
+
+    final String host = context.soptions.get(StaticOptions.HOST);
+    final int port = context.soptions.get(StaticOptions.PORT);
+    try {
+      return new ClientSession(host, port, user, pass, out);
+    } catch(final ConnectException ex) {
+      throw new BaseXException(CONNECTION_ERROR_X, port);
+    }
   }
 }

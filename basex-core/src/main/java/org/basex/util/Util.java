@@ -5,8 +5,9 @@ import static org.basex.core.Text.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.Map.Entry;
 
-import org.basex.server.*;
+import org.basex.query.*;
 import org.basex.util.list.*;
 
 /**
@@ -14,7 +15,7 @@ import org.basex.util.list.*;
  * The methods are used for dumping error output, debugging information,
  * getting the application path, etc.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Util {
@@ -44,24 +45,20 @@ public final class Util {
 
   /**
    * Throws a runtime exception for an unexpected exception.
-   * @param ext optional extension
    * @return runtime exception (indicates that an error is raised)
    */
-  public static RuntimeException notExpected(final Object... ext) {
-    final TokenBuilder tb = new TokenBuilder();
-    tb.addExt("%", ext.length == 0 ? "Not Expected." : ext[0]);
-    return new RuntimeException(tb.toString());
+  public static RuntimeException notExpected() {
+    return notExpected("Not Expected.");
   }
 
   /**
-   * Throws a runtime exception for an unimplemented method.
+   * Throws a runtime exception for an unexpected exception.
+   * @param message message
    * @param ext optional extension
    * @return runtime exception (indicates that an error is raised)
    */
-  public static UnsupportedOperationException notImplemented(final Object... ext) {
-    final TokenBuilder tb = new TokenBuilder("Not Implemented");
-    if(ext.length != 0) tb.addExt(" (%)", ext);
-    return new UnsupportedOperationException(tb.add('.').toString());
+  public static RuntimeException notExpected(final Object message, final Object... ext) {
+    return new RuntimeException(info(message, ext));
   }
 
   /**
@@ -93,7 +90,7 @@ public final class Util {
 
   /**
    * Returns a password from standard input.
-   * @return password
+   * @return password or empty string
    */
   public static String password() {
     // use standard input if no console if defined (such as in Eclipse)
@@ -129,6 +126,21 @@ public final class Util {
   }
 
   /**
+   * Returns the root query exception.
+   * @param throwable throwable
+   * @return root exception
+   */
+  public static Throwable rootException(final Throwable throwable) {
+    Throwable th = throwable;
+    while(true) {
+      final Throwable ca = th.getCause();
+      if(ca == null || th instanceof QueryException && !(ca instanceof QueryException)) return th;
+      Util.debug(th);
+      th = ca;
+    }
+  }
+
+  /**
    * Prints a string to standard error, followed by a newline.
    * @param object error object
    * @param ext text optional extensions
@@ -154,12 +166,12 @@ public final class Util {
   public static String message(final Throwable throwable) {
     debug(throwable);
     if(throwable instanceof BindException) return SRV_RUNNING;
-    if(throwable instanceof LoginException) return ACCESS_DENIED;
     if(throwable instanceof ConnectException) return CONNECTION_ERROR;
     if(throwable instanceof SocketTimeoutException) return TIMEOUT_EXCEEDED;
     if(throwable instanceof SocketException) return CONNECTION_ERROR;
     String msg = throwable.getMessage();
-    if(msg == null || msg.isEmpty()) msg = throwable.toString();
+    if(msg == null || msg.isEmpty() || throwable instanceof RuntimeException)
+      msg = throwable.toString();
     if(throwable instanceof FileNotFoundException) return info(RES_NOT_FOUND_X, msg);
     if(throwable instanceof UnknownHostException) return info(UNKNOWN_HOST_X, msg);
     return msg;
@@ -247,9 +259,10 @@ public final class Util {
    */
   private static String[] toArray(final Throwable throwable) {
     final StackTraceElement[] st = throwable.getStackTrace();
-    final String[] obj = new String[st.length + 1];
+    final int sl = st.length;
+    final String[] obj = new String[sl + 1];
     obj[0] = throwable.toString();
-    for(int i = 0; i < st.length; i++) obj[i + 1] = "\tat " + st[i];
+    for(int s = 0; s < sl; s++) obj[s + 1] = "\tat " + st[s];
     return obj;
   }
 
@@ -264,34 +277,16 @@ public final class Util {
         "-cp", System.getProperty("java.class.path") };
     final StringList sl = new StringList().add(largs);
 
-    for(final Map.Entry<Object, Object> o : System.getProperties().entrySet()) {
+    for(final Entry<Object, Object> o : System.getProperties().entrySet()) {
       final String k = o.getKey().toString();
-      if(k.startsWith(Prop.DBPREFIX)) sl.add("-D" + o.getValue());
+      if(k.startsWith(Prop.DBPREFIX)) sl.add("-D" + k + "=" + o.getValue());
     }
     sl.add(clazz.getName()).add("-D").add(args);
 
     try {
-      return new ProcessBuilder(sl.toArray()).start();
+      return new ProcessBuilder(sl.finish()).start();
     } catch(final IOException ex) {
       throw notExpected(ex);
     }
-  }
-
-  /**
-   * Checks if the specified string is "yes", "true" or "on".
-   * @param string string to be checked
-   * @return result of check
-   */
-  public static boolean yes(final String string) {
-    return Token.eqic(string, YES, TRUE, ON);
-  }
-
-  /**
-   * Checks if the specified string is "no", "false" or "off".
-   * @param string string to be checked
-   * @return result of check
-   */
-  public static boolean no(final String string) {
-    return Token.eqic(string, NO, FALSE, OFF);
   }
 }

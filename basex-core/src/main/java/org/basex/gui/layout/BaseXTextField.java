@@ -13,12 +13,14 @@ import org.basex.util.options.*;
 /**
  * Project specific text field implementation.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public class BaseXTextField extends JTextField {
   /** Default width of text fields. */
   public static final int DWIDTH = 350;
+  /** Default foreground color. */
+  private static Color back;
 
   /** Options. */
   private Options options;
@@ -100,6 +102,7 @@ public class BaseXTextField extends JTextField {
   private BaseXTextField(final String text, final Window win, final BaseXDialog dialog) {
     BaseXLayout.setWidth(this, DWIDTH);
     BaseXLayout.addInteraction(this, win);
+    if(back == null) back = getBackground();
 
     if(text != null) setText(text);
 
@@ -109,7 +112,6 @@ public class BaseXTextField extends JTextField {
         selectAll();
       }
     });
-
     addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {
@@ -133,8 +135,9 @@ public class BaseXTextField extends JTextField {
    * Attaches a history.
    * @param so option
    * @param win windows reference
+   * @return self reference
    */
-  public void history(final StringsOption so, final Window win) {
+  public BaseXTextField history(final StringsOption so, final Window win) {
     final GUI gui;
     final BaseXDialog dialog;
     if(win instanceof BaseXDialog) {
@@ -161,6 +164,7 @@ public class BaseXTextField extends JTextField {
         }
       }
     });
+    return this;
   }
 
   /**
@@ -175,32 +179,58 @@ public class BaseXTextField extends JTextField {
   /**
    * Adds a hint to the text field.
    * @param label text of the hint
+   * @return self reference
    */
-  public void hint(final String label) {
+  public BaseXTextField hint(final String label) {
     if(hint == null) {
       hint = new BaseXTextHint(label, this);
     } else {
       hint.setText(label);
     }
     setToolTipText(label.replaceAll("\\.\\.\\.$", ""));
+    return this;
   }
 
   @Override
-  public void setText(final String txt) {
-    last = txt;
-    super.setText(txt);
+  public void setText(final String text) {
+    last = text;
+    super.setText(text);
   }
 
   /**
-   * Assigns the current checkbox value to the option specified in the constructor.
+   * Assigns the current value.
+   * @return success flag
    */
-  public void assign() {
+  public boolean assign() {
+    return check(true);
+  }
+
+  /**
+   * Checks the current value.
+   * @return success flag
+   */
+  public boolean check() {
+    return check(false);
+  }
+
+  /**
+   * Checks and assigns the current value.
+   * @param assign assign value
+   * @return success flag
+   */
+  private boolean check(final boolean assign) {
     if(option instanceof NumberOption) {
       try {
-        options.set((NumberOption) option, Integer.parseInt(getText()));
-      } catch(final NumberFormatException ignored) { }
+        final int num = Integer.parseInt(getText());
+        if(assign) options.set((NumberOption) option, num);
+        setBackground(back);
+      } catch(final NumberFormatException ignored) {
+        setBackground(GUIConstants.LRED);
+        return false;
+      }
     } else {
       options.set((StringOption) option, getText());
     }
+    return true;
   }
 }

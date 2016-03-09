@@ -9,7 +9,7 @@
 -- Portability : portable
 --
 -- Haskell client for BaseX.
--- Works with BaseX 6.1
+-- Works with BaseX 6.x (but not with BaseX 7 and later)
 --
 -- It requires the PureMD5 package fom Hackage: 'cabal install PureMD5'.
 --

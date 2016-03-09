@@ -3,12 +3,14 @@ package org.basex.core.cmd;
 import static org.basex.core.Text.*;
 
 import org.basex.core.*;
+import org.basex.core.locks.*;
+import org.basex.core.users.*;
 import org.basex.data.*;
 
 /**
  * Evaluates the 'close' command and closes the current database.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Close extends Command {
@@ -31,7 +33,7 @@ public final class Close extends Command {
 
   @Override
   public void databases(final LockResult lr) {
-    lr.read.add(DBLocking.CTX);
+    lr.read.add(DBLocking.CONTEXT);
   }
 
   /**
@@ -40,6 +42,6 @@ public final class Close extends Command {
    * @param ctx database context
    */
   public static void close(final Data data, final Context ctx) {
-    synchronized(ctx.dbs) { if(ctx.dbs.unpin(data)) data.close(); }
+    synchronized(ctx.datas) { ctx.datas.unpin(data); }
   }
 }

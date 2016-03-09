@@ -1,11 +1,12 @@
 package org.basex.server;
 
+import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
  * This class delays blocked clients.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class ClientBlocker {
@@ -13,15 +14,14 @@ public final class ClientBlocker {
   private final TokenIntMap blocked = new TokenIntMap();
 
   /**
-   * Registers the client and returns a delay time.
+   * Registers the client and delays the process.
    * @param client client address
-   * @return number of seconds to wait
    */
-  public synchronized int delay(final byte[] client) {
+  public synchronized void delay(final byte[] client) {
     int delay = blocked.get(client);
     delay = delay == -1 ? 1 : Math.min(delay, 1024) << 1;
     blocked.put(client, delay);
-    return delay;
+    for(int d = delay; d > 0; d--) Performance.sleep(100);
   }
 
   /**

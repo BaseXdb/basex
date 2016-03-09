@@ -5,9 +5,9 @@ import java.util.*;
 import javax.servlet.http.*;
 
 /**
- * This class bundles context-based information on a single HTTP operation.
+ * This class creates and destroys HTTP sessions.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class SessionListener implements HttpSessionListener {

@@ -1,9 +1,10 @@
 package org.basex.query.value.node;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
-import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
+import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -13,7 +14,7 @@ import org.w3c.dom.*;
 /**
  * PI node fragment.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class FPI extends FNode {
@@ -63,8 +64,8 @@ public final class FPI extends FNode {
   }
 
   @Override
-  public FNode copy() {
-    return new FPI(name, value).parent(par);
+  public FNode deepCopy(final MainOptions options) {
+    return new FPI(name, value).parent(parent);
   }
 
   @Override
@@ -85,7 +86,7 @@ public final class FPI extends FNode {
    * @throws QueryException query exception
    */
   public static byte[] parse(final byte[] atom, final InputInfo ii) throws QueryException {
-    if(contains(atom, CLOSE)) throw CPICONT.get(ii, atom);
+    if(contains(atom, CLOSE)) throw CPICONT_X.get(ii, atom);
     return atom;
   }
 }

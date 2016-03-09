@@ -6,25 +6,20 @@ import java.io.*;
 import java.security.*;
 
 import org.basex.core.*;
-import org.basex.core.cmd.*;
 import org.basex.io.serial.*;
-import org.basex.io.serial.SerializerOptions.*;
 import org.basex.util.*;
 import org.junit.*;
-import org.junit.Test;
 
 /**
  * This class tests the functions of the EXPath Cryptographic module. The tests
  * in basex-test package are only executable after a java keystore has been
  * created.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Lukas Kircher
  */
-public class FNCryptoTest {
-  /** Database context. */
-  private static Context context;
-
+@SuppressWarnings("unused")
+public final class FNCryptoTest extends SandboxTest{
   /** User home directory. */
   private static final String KEYSTORE_DIR = System.getProperty("user.home");
   /** Java home directory. */
@@ -120,11 +115,8 @@ public class FNCryptoTest {
     Thread.sleep(2000); // give the keytool some time to finish
     if(proc.exitValue() != 0) throw new RuntimeException("Cannot initialize keystore.");
 
-    context = new Context();
     // turn off pretty printing
-    final SerializerOptions sopts = new SerializerOptions();
-    sopts.set(SerializerOptions.INDENT, YesNo.NO);
-    new Set(MainOptions.SERIALIZER, sopts).execute(context);
+    set(MainOptions.SERIALIZER, SerializerMode.NOINDENT.get());
   }
 
   /**
@@ -132,7 +124,6 @@ public class FNCryptoTest {
    */
   @AfterClass
   public static void finish() {
-    context.close();
     new File(KEYSTORE).delete();
   }
 
@@ -155,14 +146,9 @@ public class FNCryptoTest {
   private static void query(final String first, final String second,
       final String expected) {
 
-    try {
-      if(first != null) new XQuery(first).execute(context);
-      final String result = new XQuery(second).execute(context);
-      // quotes are replaced by apostrophes to simplify comparison
-      assertEquals(expected.replaceAll("\"", "'"),
-              result.replaceAll("\"", "'"));
-    } catch(final BaseXException ex) {
-      fail(Util.message(ex));
-    }
+    if(first != null) query(first);
+    final String result = query(second);
+    // quotes are replaced by apostrophes to simplify comparison
+    assertEquals(expected.replaceAll("\"", "'"), result.replaceAll("\"", "'"));
   }
 }

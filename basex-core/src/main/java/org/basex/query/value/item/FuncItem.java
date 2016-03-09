@@ -1,15 +1,17 @@
 package org.basex.query.value.item;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import java.util.*;
 
-import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.gflwor.*;
+import org.basex.query.expr.gflwor.GFLWOR.Clause;
 import org.basex.query.func.*;
-import org.basex.query.gflwor.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -20,21 +22,22 @@ import org.basex.util.hash.*;
 /**
  * Function item.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public final class FuncItem extends FItem implements Scope {
   /** Static context. */
-  private final StaticContext sc;
-  /** Function name. */
-  private final QNm name;
-  /** Formal parameters. */
-  private final Var[] params;
+  public final StaticContext sc;
   /** Function expression. */
   public final Expr expr;
 
+  /** Function name (may be {@code null}). */
+  private final QNm name;
+  /** Formal parameters. */
+  private final Var[] params;
+
   /** Context value. */
-  private final Value ctxVal;
+  private final Value ctxValue;
   /** Context position. */
   private final long pos;
   /** Context length. */
@@ -46,23 +49,23 @@ public final class FuncItem extends FItem implements Scope {
   /**
    * Constructor.
    * @param sc static context
-   * @param ann function annotations
-   * @param name function name
+   * @param anns function annotations
+   * @param name function name (may be {@code null})
    * @param params function arguments
    * @param type function type
    * @param expr function body
    * @param stackSize stack-frame size
    */
-  public FuncItem(final StaticContext sc, final Ann ann, final QNm name, final Var[] params,
+  public FuncItem(final StaticContext sc, final AnnList anns, final QNm name, final Var[] params,
       final FuncType type, final Expr expr, final int stackSize) {
-    this(sc, ann, name, params, type, expr, null, 0, 0, stackSize);
+    this(sc, anns, name, params, type, expr, null, 0, 0, stackSize);
   }
 
   /**
    * Constructor.
    * @param sc static context
-   * @param ann function annotations
-   * @param name function name
+   * @param anns function annotations
+   * @param name function name (may be {@code null})
    * @param params function arguments
    * @param type function type
    * @param expr function body
@@ -71,18 +74,17 @@ public final class FuncItem extends FItem implements Scope {
    * @param size context size
    * @param stackSize stack-frame size
    */
-  public FuncItem(final StaticContext sc, final Ann ann, final QNm name, final Var[] params,
-      final FuncType type, final Expr expr, final Value ctxValue,
-      final long pos, final long size, final int stackSize) {
+  public FuncItem(final StaticContext sc, final AnnList anns, final QNm name, final Var[] params,
+      final FuncType type, final Expr expr, final Value ctxValue, final long pos, final long size,
+      final int stackSize) {
 
-    super(type, ann);
+    super(type, anns);
     this.name = name;
     this.params = params;
     this.expr = expr;
     this.stackSize = stackSize;
     this.sc = sc;
-
-    this.ctxVal = ctxValue;
+    this.ctxValue = ctxValue;
     this.pos = pos;
     this.size = size;
   }
@@ -119,10 +121,11 @@ public final class FuncItem extends FItem implements Scope {
     final Value cv = qc.value;
     final long ps = qc.pos, sz = qc.size;
     try {
-      qc.value = ctxVal;
+      qc.value = ctxValue;
       qc.pos = pos;
       qc.size = size;
-      for(int i = 0; i < params.length; i++) qc.set(params[i], args[i], ii);
+      final int pl = params.length;
+      for(int p = 0; p < pl; p++) qc.set(params[p], args[p], ii);
       return qc.value(expr);
     } finally {
       qc.value = cv;
@@ -138,10 +141,11 @@ public final class FuncItem extends FItem implements Scope {
     final Value cv = qc.value;
     final long ps = qc.pos, sz = qc.size;
     try {
-      qc.value = ctxVal;
+      qc.value = ctxValue;
       qc.pos = pos;
       qc.size = size;
-      for(int i = 0; i < params.length; i++) qc.set(params[i], args[i], ii);
+      final int pl = params.length;
+      for(int p = 0; p < pl; p++) qc.set(params[p], args[p], ii);
       return expr.item(qc, ii);
     } finally {
       qc.value = cv;
@@ -154,33 +158,29 @@ public final class FuncItem extends FItem implements Scope {
   public FItem coerceTo(final FuncType ft, final QueryContext qc, final InputInfo ii,
       final boolean opt) throws QueryException {
 
-    if(params.length != ft.args.length) throw Err.castError(ii, ft, this);
+    if(params.length != ft.argTypes.length) throw INVPROMOTE_X_X_X.get(ii, seqType(), ft, this);
     final FuncType tp = funcType();
     if(tp.instanceOf(ft)) return this;
 
     final VarScope vsc = new VarScope(sc);
-    final Var[] vs = new Var[params.length];
-    final Expr[] refs = new Expr[vs.length];
-    for(int i = vs.length; i-- > 0;) {
-      vs[i] = vsc.newLocal(qc, params[i].name, ft.args[i], true);
-      refs[i] = new VarRef(ii, vs[i]);
+    final int pl = params.length;
+    final Var[] vars = new Var[pl];
+    final Expr[] refs = new Expr[pl];
+    for(int p = pl; p-- > 0;) {
+      vars[p] = vsc.newLocal(qc, params[p].name, ft.argTypes[p], true);
+      refs[p] = new VarRef(ii, vars[p]);
     }
 
-    final Expr e = new DynFuncCall(ii, sc, false, this, refs);
+    final Expr e = new DynFuncCall(ii, sc, this, refs);
     final Expr optimized = opt ? e.optimize(qc, vsc) : e, checked;
-    if(ft.ret == null || tp.ret != null && tp.ret.instanceOf(ft.ret)) {
+    if(ft.type == null || tp.type != null && tp.type.instanceOf(ft.type)) {
       checked = optimized;
     } else {
-      final TypeCheck tc = new TypeCheck(sc, ii, optimized, ft.ret, true);
+      final TypeCheck tc = new TypeCheck(sc, ii, optimized, ft.type, true);
       checked = opt ? tc.optimize(qc, vsc) : tc;
     }
     checked.markTailCalls(null);
-    return new FuncItem(sc, ann, name, vs, ft, checked, vsc.stackSize());
-  }
-
-  @Override
-  public void plan(final FElem plan) {
-    addPlan(plan, planElem(TYPE, type), params, expr);
+    return new FuncItem(sc, anns, name, vars, ft, checked, vsc.stackSize());
   }
 
   @Override
@@ -210,30 +210,20 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public String toString() {
-    final FuncType ft = (FuncType) type;
-    final TokenBuilder tb = new TokenBuilder(FUNCTION).add('(');
-    for(final Var v : params) tb.addExt(v).add(v == params[params.length - 1] ? "" : ", ");
-    tb.add(')').add(ft.ret != null ? " as " + ft.ret : "").add(" { ").addExt(expr).add(" }");
-    return tb.toString();
-  }
-
-  @Override
   public Expr inlineExpr(final Expr[] exprs, final QueryContext qc, final VarScope scp,
       final InputInfo ii) throws QueryException {
 
-    if(!(expr.isValue() || expr.exprSize() < qc.context.options.get(MainOptions.INLINELIMIT) &&
-        !expr.has(Flag.CTX) && !expr.has(Flag.UPD))) return null;
-    qc.compInfo(OPTINLINE, this);
+    if(!StaticFunc.inline(qc, anns, expr) || expr.has(Flag.CTX)) return null;
+    qc.compInfo(OPTINLINE_X, this);
 
     // create let bindings for all variables
-    final LinkedList<GFLWOR.Clause> cls =
-        exprs.length == 0 ? null : new LinkedList<GFLWOR.Clause>();
+    final LinkedList<Clause> cls = exprs.length == 0 ? null : new LinkedList<Clause>();
     final IntObjMap<Var> vs = new IntObjMap<>();
-    for(int i = 0; i < params.length; i++) {
-      final Var old = params[i], v = scp.newCopyOf(qc, old);
+    final int pl = params.length;
+    for(int p = 0; p < pl; p++) {
+      final Var old = params[p], v = scp.newCopyOf(qc, old);
       vs.put(old.id, v);
-      cls.add(new Let(v, exprs[i], false, ii).optimize(qc, scp));
+      cls.add(new Let(v, exprs[p], false, ii).optimize(qc, scp));
     }
 
     // copy the function body
@@ -252,5 +242,37 @@ public final class FuncItem extends FItem implements Scope {
       }
     });
     return cls == null ? rt : new GFLWOR(ii, cls, rt).optimize(qc, scp);
+  }
+
+  @Override
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(TYPE, type), params, expr);
+  }
+
+  @Override
+  public String toErrorString() {
+    return toString(true);
+  }
+
+  @Override
+  public String toString() {
+    return toString(false);
+  }
+
+  /**
+   * Returns a string representation.
+   * @param error error flag
+   * @return string
+   */
+  private String toString(final boolean error) {
+    final FuncType ft = (FuncType) type;
+    final TokenBuilder tb = new TokenBuilder();
+    if(name != null) tb.add("(: ").add(name.prefixId()).add("#").addInt(arity()).add(" :) ");
+    tb.addExt(anns).add(FUNCTION).add('(');
+    final int pl = params.length;
+    for(final Var v : params) {
+      tb.addExt(error ? v.toErrorString() : v.toString()).add(v == params[pl - 1] ? "" : ",");
+    }
+    return tb.add(')').add(ft.type != null ? " as " + ft.type : "").add(" {...}").toString();
   }
 }

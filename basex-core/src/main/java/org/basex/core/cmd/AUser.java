@@ -2,35 +2,32 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
-import java.util.regex.*;
-
 import org.basex.core.*;
-import org.basex.io.*;
-import org.basex.util.*;
-import org.basex.util.list.*;
+import org.basex.core.locks.*;
+import org.basex.core.users.*;
 
 /**
  * Abstract class for user commands.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 abstract class AUser extends Command {
   /**
    * Protected constructor, specifying command arguments.
-   * @param p required permission
-   * @param a arguments
+   * @param perm required permission
+   * @param args arguments
    */
-  AUser(final Perm p, final String... a) {
-    super(p, a);
+  AUser(final Perm perm, final String... args) {
+    super(perm, args);
   }
 
   /**
    * Protected constructor, specifying command arguments.
-   * @param a arguments
+   * @param args arguments
    */
-  AUser(final String... a) {
-    this(Perm.ADMIN, a);
+  AUser(final String... args) {
+    this(Perm.ADMIN, args);
   }
 
   /**
@@ -40,52 +37,33 @@ abstract class AUser extends Command {
    * @return success flag
    */
   boolean run(final int off, final boolean opt) {
-    final String u = args[off];
-    final String d = off + 1 < args.length ? args[off + 1] : null;
+    final String name = args[off];
+    final String pattern = off + 1 < args.length ? args[off + 1] : "";
 
-    if(!Databases.validName(u, true)) return error(NAME_INVALID_X, u);
-    if(d != null && !Databases.validName(d, true)) return error(NAME_INVALID_X, d);
+    if(!Databases.validName(name, true)) return error(NAME_INVALID_X, name);
+    if(!pattern.isEmpty() && !Databases.validName(pattern, true))
+      return error(NAME_INVALID_X, pattern);
 
     // retrieve all users; stop if no user is found
-    final String[] users = users(u);
-    if(users.length == 0) return info(UNKNOWN_USER_X, u) && opt;
-    // retrieve all databases
-    StringList dbs = null;
-    if(d != null) {
-      dbs = context.databases.listDBs(d);
-      if(dbs.isEmpty()) return info(DB_NOT_FOUND_X, d) && opt;
-    }
+    final String[] users = users(name);
+    if(users.length == 0) return info(UNKNOWN_USER_X, name) && opt;
 
     // loop through all users
     boolean ok = true;
-    for(final String user : users) {
-      if(dbs == null) {
-        ok &= run(user, null);
-      } else {
-        for(final String db : dbs) ok &= run(user, db);
-      }
-    }
+    for(final String user : users) ok &= run(user, pattern);
+    context.users.write();
     return ok;
   }
 
   /**
-   * Runs the command for the specified user and database.
+   * Runs the command for the specified user and database pattern.
    * @param user user to be modified
-   * @param db database to be modified
+   * @param pattern database pattern
    * @return success flag
    */
   @SuppressWarnings("unused")
-  boolean run(final String user, final String db) {
+  boolean run(final String user, final String pattern) {
     return true;
-  }
-
-  /**
-   * Checks if the specified string is a valid MD5 hash value.
-   * @param md5 string to be checked
-   * @return result of check
-   */
-  static boolean isMD5(final String md5) {
-    return md5 != null && md5.matches("[0-9a-fA-F]{32}");
   }
 
   /**
@@ -96,9 +74,7 @@ abstract class AUser extends Command {
    * @return array with database names
    */
   private String[] users(final String name) {
-    final String pat = name.matches(".*[*?,].*") ? IOFile.regex(name) :
-      name.replaceAll("([" + Databases.REGEXCHARS + "])", "\\\\$1");
-    return context.users.find(Pattern.compile(pat, Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE));
+    return context.users.find(Databases.regex(name));
   }
 
   @Override

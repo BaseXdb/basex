@@ -7,7 +7,7 @@ import org.basex.util.options.*;
 /**
  * This class remembers previous text inputs of a GUI component.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class BaseXHistory {
@@ -20,12 +20,12 @@ public final class BaseXHistory {
 
   /**
    * Constructor.
-   * @param main main window
-   * @param option option
+   * @param gui main window
+   * @param history history values
    */
-  public BaseXHistory(final GUI main, final StringsOption option) {
-    history = option;
-    gui = main;
+  public BaseXHistory(final GUI gui, final StringsOption history) {
+    this.history = history;
+    this.gui = gui;
   }
 
   /**
@@ -38,6 +38,6 @@ public final class BaseXHistory {
     for(final String s : gui.gopts.get(history)) {
       if(sl.size() < MAX &&  !input.equals(s)) sl.add(s);
     }
-    gui.gopts.set(history, sl.toArray());
+    gui.gopts.set(history, sl.finish());
   }
 }

@@ -5,7 +5,8 @@ import static org.basex.query.QueryText.*;
 import java.util.*;
 
 import org.basex.query.*;
-import org.basex.query.gflwor.*;
+import org.basex.query.expr.gflwor.*;
+import org.basex.query.expr.gflwor.GFLWOR.Clause;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -18,7 +19,7 @@ import org.basex.util.hash.*;
 /**
  * Some/Every satisfier clause.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Quantifier extends Single {
@@ -34,7 +35,7 @@ public final class Quantifier extends Single {
    */
   public Quantifier(final InputInfo info, final For[] inputs, final Expr expr,
       final boolean every) {
-    this(info, new GFLWOR(info, new LinkedList<GFLWOR.Clause>(Arrays.asList(inputs)),
+    this(info, new GFLWOR(info, new LinkedList<Clause>(Arrays.asList(inputs)),
         compBln(expr, info)), every);
   }
 
@@ -47,13 +48,12 @@ public final class Quantifier extends Single {
   private Quantifier(final InputInfo info, final Expr tests, final boolean every) {
     super(info, tests);
     this.every = every;
-    type = SeqType.BLN;
+    seqType = SeqType.BLN;
   }
 
   @Override
   public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    super.compile(qc, scp);
-    return optimize(qc, scp);
+    return super.compile(qc, scp).optimize(qc, scp);
   }
 
   @Override
@@ -66,7 +66,7 @@ public final class Quantifier extends Single {
       final GFLWOR gflwor = (GFLWOR) expr;
       if(gflwor.size() > 0 && gflwor.ret.isValue()) {
         final Value value = (Value) gflwor.ret;
-        qc.compInfo(OPTPRE, value);
+        qc.compInfo(OPTPRE_X, value);
         return Bln.get(value.ebv(qc, info).bool(info));
       }
     }
@@ -76,8 +76,9 @@ public final class Quantifier extends Single {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter iter = expr.iter(qc);
-    for(Item it; (it = iter.next()) != null;)
+    for(Item it; (it = iter.next()) != null;) {
       if(every ^ it.ebv(qc, ii).bool(ii)) return Bln.get(!every);
+    }
     return Bln.get(every);
   }
 
@@ -93,7 +94,7 @@ public final class Quantifier extends Single {
 
   @Override
   public String toString() {
-    return every ? EVERY : SOME + '(' + expr + ')';
+    return (every ? EVERY : SOME) + '(' + expr + ')';
   }
 
   @Override

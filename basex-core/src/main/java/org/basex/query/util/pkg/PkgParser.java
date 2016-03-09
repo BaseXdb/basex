@@ -1,6 +1,6 @@
 package org.basex.query.util.pkg;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 import static org.basex.query.util.pkg.PkgText.*;
 import static org.basex.util.Token.*;
 
@@ -9,8 +9,6 @@ import java.io.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.pkg.Package.Component;
-import org.basex.query.util.pkg.Package.Dependency;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -19,22 +17,18 @@ import org.basex.util.*;
 /**
  * Parses the package descriptors and performs schema checks.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Rositsa Shadura
  */
 public final class PkgParser {
-  /** Repository context. */
-  private final Repo repo;
   /** Input info. */
   private final InputInfo info;
 
   /**
    * Constructor.
-   * @param repo repository context
    * @param info input info
    */
-  public PkgParser(final Repo repo, final InputInfo info) {
-    this.repo = repo;
+  public PkgParser(final InputInfo info) {
     this.info = info;
   }
 
@@ -44,23 +38,19 @@ public final class PkgParser {
    * @return package container
    * @throws QueryException query exception
    */
-  public Package parse(final IO io) throws QueryException {
-    final Package pkg = new Package();
+  public Pkg parse(final IO io) throws QueryException {
+    final Pkg pkg = new Pkg();
     try {
-      final byte[] content = io.read();
-
-      final DBNode doc = new DBNode(new IOContent(content), repo.context.options);
-      final ANode node = childElements(doc).next();
-
       // checks root node
+      final ANode node = childElements(new DBNode(new IOContent(io.read()))).next();
       if(!eqNS(PACKAGE, node.qname()))
-        throw BXRE_DESC.get(info, Util.info(WHICHELEM, node.qname()));
+        throw BXRE_DESC_X.get(info, Util.info(WHICHELEM, node.qname()));
 
       parseAttributes(node, pkg, PACKAGE);
       parseChildren(node, pkg);
       return pkg;
     } catch(final IOException ex) {
-      throw BXRE_PARSE.get(info, io.name(), ex);
+      throw BXRE_PARSE_X_X.get(info, io.name(), ex);
     }
   }
 
@@ -71,28 +61,28 @@ public final class PkgParser {
    * @param root root node
    * @throws QueryException query exception
    */
-  private void parseAttributes(final ANode node, final Package p, final byte[] root)
+  private void parseAttributes(final ANode node, final Pkg p, final byte[] root)
       throws QueryException {
 
-    final AxisIter atts = node.attributes();
+    final BasicNodeIter atts = node.attributes();
     for(ANode next; (next = atts.next()) != null;) {
       final byte[] name = next.name();
-      if(eq(A_NAME, name))         p.name = next.string();
-      else if(eq(A_ABBREV, name))  p.abbrev = next.string();
-      else if(eq(A_VERSION, name)) p.version = next.string();
-      else if(eq(A_SPEC, name))    p.spec = next.string();
-      else throw BXRE_DESC.get(info, Util.info(WHICHATTR, name));
+      if(eq(A_NAME, name))         p.name = string(next.string());
+      else if(eq(A_ABBREV, name))  p.abbrev = string(next.string());
+      else if(eq(A_VERSION, name)) p.version = string(next.string());
+      else if(eq(A_SPEC, name))    p.spec = string(next.string());
+      else throw BXRE_DESC_X.get(info, Util.info(WHICHATTR, name));
     }
 
     // check mandatory attributes
-    if(p.name == null)
-      throw BXRE_DESC.get(info, Util.info(MISSATTR, A_NAME, root));
-    if(p.version == null)
-      throw BXRE_DESC.get(info, Util.info(MISSATTR, A_VERSION, root));
-    if(p.abbrev == null)
-      throw BXRE_DESC.get(info, Util.info(MISSATTR, A_ABBREV, root));
-    if(p.spec == null)
-      throw BXRE_DESC.get(info, Util.info(MISSATTR, A_SPEC, root));
+    if(p.name() == null)
+      throw BXRE_DESC_X.get(info, Util.info(MISSATTR, A_NAME, root));
+    if(p.version() == null)
+      throw BXRE_DESC_X.get(info, Util.info(MISSATTR, A_VERSION, root));
+    if(p.abbrev() == null)
+      throw BXRE_DESC_X.get(info, Util.info(MISSATTR, A_ABBREV, root));
+    if(p.spec() == null)
+      throw BXRE_DESC_X.get(info, Util.info(MISSATTR, A_SPEC, root));
   }
 
   /**
@@ -101,8 +91,8 @@ public final class PkgParser {
    * @param p package container
    * @throws QueryException query exception
    */
-  private void parseChildren(final ANode node, final Package p) throws QueryException {
-    final AxisIter ch = childElements(node);
+  private void parseChildren(final ANode node, final Pkg p) throws QueryException {
+    final BasicNodeIter ch = childElements(node);
     for(ANode next; (next = ch.next()) != null;) {
       final QNm name = next.qname();
       if(eqNS(DEPEND, name)) p.dep.add(parseDependency(next));
@@ -116,18 +106,18 @@ public final class PkgParser {
    * @return dependency container
    * @throws QueryException query exception
    */
-  private Dependency parseDependency(final ANode node) throws QueryException {
-    final AxisIter atts = node.attributes();
-    final Dependency d = new Dependency();
+  private PkgDep parseDependency(final ANode node) throws QueryException {
+    final BasicNodeIter atts = node.attributes();
+    final PkgDep d = new PkgDep();
     for(ANode next; (next = atts.next()) != null;) {
       final byte[] name = next.name();
-      if(eq(A_PACKAGE, name))            d.pkg = next.string();
-      else if(eq(A_PROCESSOR, name))      d.processor = next.string();
-      else if(eq(A_VERSIONS, name))      d.versions = next.string();
-      else if(eq(A_SEMVER, name))    d.semver = next.string();
-      else if(eq(A_SEMVER_MIN, name)) d.semverMin = next.string();
-      else if(eq(A_SEMVER_MAX, name)) d.semverMax = next.string();
-      else throw BXRE_DESC.get(info, Util.info(WHICHATTR, name));
+      if(eq(A_PACKAGE, name)) d.name = string(next.string());
+      else if(eq(A_PROCESSOR, name)) d.processor = string(next.string());
+      else if(eq(A_VERSIONS, name)) d.versions = string(next.string());
+      else if(eq(A_SEMVER, name)) d.semver = string(next.string());
+      else if(eq(A_SEMVER_MIN, name)) d.semverMin = string(next.string());
+      else if(eq(A_SEMVER_MAX, name)) d.semverMax = string(next.string());
+      else throw BXRE_DESC_X.get(info, Util.info(WHICHATTR, name));
     }
     return d;
   }
@@ -138,19 +128,19 @@ public final class PkgParser {
    * @return component container
    * @throws QueryException query exception
    */
-  private Component parseComp(final ANode node) throws QueryException {
-    final AxisIter ch = childElements(node);
-    final Component c = new Component();
+  private PkgComponent parseComp(final ANode node) throws QueryException {
+    final BasicNodeIter ch = childElements(node);
+    final PkgComponent c = new PkgComponent();
     for(ANode next; (next = ch.next()) != null;) {
       final QNm name = next.qname();
-      if(eqNS(A_NAMESPACE, name)) c.uri = next.string();
-      else if(eqNS(A_FILE, name)) c.file = next.string();
-      else throw BXRE_DESC.get(info, Util.info(WHICHELEM, name));
+      if(eqNS(A_NAMESPACE, name)) c.uri = string(next.string());
+      else if(eqNS(A_FILE, name)) c.file = string(next.string());
+      else throw BXRE_DESC_X.get(info, Util.info(WHICHELEM, name));
     }
 
     // check mandatory children
-    if(c.uri == null) throw BXRE_DESC.get(info, Util.info(MISSCOMP, A_NAMESPACE));
-    if(c.file == null) throw BXRE_DESC.get(info, Util.info(MISSCOMP, A_FILE));
+    if(c.uri == null) throw BXRE_DESC_X.get(info, Util.info(MISSCOMP, A_NAMESPACE));
+    if(c.file == null) throw BXRE_DESC_X.get(info, Util.info(MISSCOMP, A_FILE));
     return c;
   }
 
@@ -160,10 +150,10 @@ public final class PkgParser {
    * @param node root node
    * @return child element iterator
    */
-  private static AxisIter childElements(final ANode node) {
-    return new AxisIter() {
+  private static BasicNodeIter childElements(final ANode node) {
+    return new BasicNodeIter() {
       /** Child iterator. */
-      final AxisIter ch = node.children();
+      final BasicNodeIter ch = node.children();
 
       @Override
       public ANode next() {
@@ -183,6 +173,6 @@ public final class PkgParser {
    * @return result of check
    */
   private static boolean eqNS(final byte[] cmp, final QNm name) {
-    return name.eq(new QNm(cmp, QueryText.PKGURI));
+    return name.eq(new QNm(cmp, QueryText.PKG_URI));
   }
 }

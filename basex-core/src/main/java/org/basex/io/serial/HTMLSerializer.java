@@ -1,21 +1,22 @@
 package org.basex.io.serial;
 
 import static org.basex.data.DataText.*;
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
 
+import org.basex.query.value.item.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
- * This class serializes data as HTML.
+ * This class serializes items as HTML.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public class HTMLSerializer extends OutputSerializer {
+final class HTMLSerializer extends MarkupSerializer {
   /** (X)HTML: elements with an empty content model. */
   static final TokenList EMPTIES = new TokenList();
   /** HTML5: elements with an empty content model. */
@@ -30,7 +31,7 @@ public class HTMLSerializer extends OutputSerializer {
 
   /**
    * Constructor, specifying serialization options.
-   * @param os output stream reference
+   * @param os output stream
    * @param sopts serialization parameters
    * @throws IOException I/O exception
    */
@@ -39,84 +40,91 @@ public class HTMLSerializer extends OutputSerializer {
   }
 
   @Override
-  protected void attribute(final byte[] n, final byte[] v) throws IOException {
-    print(' ');
-    print(n);
+  protected void attribute(final byte[] name, final byte[] value, final boolean standalone)
+      throws IOException {
+
+    if(!standalone) out.print(' ');
+    out.print(name);
 
     // don't append value for boolean attributes
-    final byte[] tagatt = concat(lc(tag), COLON, lc(n));
-    if(BOOLEAN.contains(tagatt) && eq(n, v)) return;
-    // escape URI attributes
-    final byte[] val = escuri && URIS.contains(tagatt) ? escape(v) : v;
+    byte[] val = value;
+    if(!BOOLEAN.isEmpty() || !URIS.isEmpty()) {
+      final byte[] nm = concat(lc(elem.string()), ATT, lc(name));
+      if(BOOLEAN.contains(nm) && eq(name, val)) return;
+      // escape URI attributes
+      if(escuri && URIS.contains(nm)) val = escape(val);
+    }
 
-    print(ATT1);
-    for(int k = 0; k < val.length; k += cl(val, k)) {
-      final int ch = cp(val, k);
-      if(ch == '<' || ch == '&' && val[Math.min(k + 1, val.length - 1)] == '{') {
-        print(ch);
+    out.print(ATT1);
+    final int vl = val.length;
+    for(int v = 0; v < vl; v += cl(val, v)) {
+      final int ch = cp(val, v);
+      if(ch == '<' || ch == '&' && val[Math.min(v + 1, vl - 1)] == '{') {
+        out.print(ch);
       } else if(ch == '"') {
-        print(E_QU);
+        out.print(E_QUOT);
       } else if(ch == 0x9 || ch == 0xA) {
-        hex(ch);
+        printHex(ch);
       } else {
-        encode(ch);
+        printChar(ch);
       }
     }
-    print(ATT2);
+    out.print(ATT2);
   }
 
   @Override
-  protected void finishComment(final byte[] n) throws IOException {
+  protected void comment(final byte[] value) throws IOException {
     if(sep) indent();
-    print(COMM_O);
-    print(n);
-    print(COMM_C);
+    out.print(COMM_O);
+    out.print(value);
+    out.print(COMM_C);
   }
 
   @Override
-  protected void finishPi(final byte[] n, final byte[] v) throws IOException {
+  protected void pi(final byte[] name, final byte[] value) throws IOException {
     if(sep) indent();
-    if(contains(v, '>')) throw SERPI.getIO();
-    print(PI_O);
-    print(n);
-    print(' ');
-    print(v);
-    print(ELEM_C);
+    if(contains(value, '>')) throw SERPI.getIO();
+    out.print(PI_O);
+    out.print(name);
+    out.print(' ');
+    out.print(value);
+    out.print(ELEM_C);
   }
 
   @Override
-  protected void encode(final int ch) throws IOException {
-    if(script) printChar(ch);
-    else if(ch > 0x7F && ch < 0xA0 && !html5) throw SERILL.getIO(Integer.toHexString(ch));
-    else if(ch == 0xA0) print(E_NBSP);
-    else super.encode(ch);
+  protected void printChar(final int cp) throws IOException {
+    if(script) out.print(cp);
+    else if(cp > 0x7F && cp < 0xA0 && !html5) throw SERILL_X.getIO(Integer.toHexString(cp));
+    else if(cp == 0xA0) out.print(E_NBSP);
+    else super.printChar(cp);
   }
 
   @Override
-  protected void startOpen(final byte[] t) throws IOException {
+  protected void startOpen(final QNm name) throws IOException {
     doctype(null);
     if(sep) indent();
-    print(ELEM_O);
-    print(t);
+    out.print(ELEM_O);
+    out.print(name.string());
     sep = indent;
-    script = SCRIPTS.contains(lc(t));
-    if(content && eq(lc(tag), HEAD)) ct++;
+    script = SCRIPTS.contains(lc(name.local()));
+    if(content && eq(lc(elem.local()), HEAD)) ct++;
   }
 
   @Override
   protected void finishOpen() throws IOException {
     super.finishOpen();
-    ct(false, true);
+    printCT(false, true);
   }
 
   @Override
   protected void finishEmpty() throws IOException {
-    if(ct(true, true)) return;
-    print(ELEM_C);
+    if(printCT(true, true)) return;
+    out.print(ELEM_C);
+    final byte[] lc = lc(elem.local());
     if(html5) {
-      if(EMPTIES5.contains(lc(tag))) return;
+      if(EMPTIES5.contains(lc)) return;
     } else {
-      if(EMPTIES.contains(lc(tag))) {
+      if(EMPTIES.contains(lc)) {
         final byte[] u = nsUri(EMPTY);
         if(u == null || u.length == 0) return;
       }
@@ -128,21 +136,17 @@ public class HTMLSerializer extends OutputSerializer {
   @Override
   protected void finishClose() throws IOException {
     super.finishClose();
-    script = script && !SCRIPTS.contains(lc(tag));
+    script = script && !SCRIPTS.contains(lc(elem.local()));
   }
 
   @Override
-  boolean doctype(final byte[] dt) throws IOException {
-    if(level != 0) return false;
-    if(!super.doctype(dt) && html5) {
-      if(sep) indent();
-      print(DOCTYPE);
-      if(dt == null) print(HTML);
-      else print(dt);
-      print(ELEM_C);
-      if(indent) print(nl);
+  protected void doctype(final QNm type) throws IOException {
+    final boolean doc = docpub != null || docsys != null;
+    if(doc) {
+      printDoctype(type, docpub, docsys);
+    } else if(html5) {
+      printDoctype(type, null, null);
     }
-    return true;
   }
 
   // HTML Serializer: cache elements
@@ -151,44 +155,44 @@ public class HTMLSerializer extends OutputSerializer {
     SCRIPTS.add("script");
     SCRIPTS.add("style");
     // boolean attributes
-    BOOLEAN.add("area:nohref");
-    BOOLEAN.add("button:disabled");
-    BOOLEAN.add("dir:compact");
-    BOOLEAN.add("dl:compact");
-    BOOLEAN.add("frame:noresize");
-    BOOLEAN.add("hr:noshade");
-    BOOLEAN.add("img:ismap");
-    BOOLEAN.add("input:checked");
-    BOOLEAN.add("input:disabled");
-    BOOLEAN.add("input:readonly");
-    BOOLEAN.add("menu:compact");
-    BOOLEAN.add("object:declare");
-    BOOLEAN.add("ol:compact");
-    BOOLEAN.add("optgroup:disabled");
-    BOOLEAN.add("option:selected");
-    BOOLEAN.add("option:disabled");
-    BOOLEAN.add("script:defer");
-    BOOLEAN.add("select:multiple");
-    BOOLEAN.add("select:disabled");
-    BOOLEAN.add("td:nowrap");
-    BOOLEAN.add("textarea:disabled");
-    BOOLEAN.add("textarea:readonly");
-    BOOLEAN.add("th:nowrap");
-    BOOLEAN.add("ul:compact");
+    BOOLEAN.add("area@nohref");
+    BOOLEAN.add("button@disabled");
+    BOOLEAN.add("dir@compact");
+    BOOLEAN.add("dl@compact");
+    BOOLEAN.add("frame@noresize");
+    BOOLEAN.add("hr@noshade");
+    BOOLEAN.add("img@ismap");
+    BOOLEAN.add("input@checked");
+    BOOLEAN.add("input@disabled");
+    BOOLEAN.add("input@readonly");
+    BOOLEAN.add("menu@compact");
+    BOOLEAN.add("object@declare");
+    BOOLEAN.add("ol@compact");
+    BOOLEAN.add("optgroup@disabled");
+    BOOLEAN.add("option@selected");
+    BOOLEAN.add("option@disabled");
+    BOOLEAN.add("script@defer");
+    BOOLEAN.add("select@multiple");
+    BOOLEAN.add("select@disabled");
+    BOOLEAN.add("td@nowrap");
+    BOOLEAN.add("textarea@disabled");
+    BOOLEAN.add("textarea@readonly");
+    BOOLEAN.add("th@nowrap");
+    BOOLEAN.add("ul@compact");
     // elements with an empty content model
     EMPTIES.add("area");
     EMPTIES.add("base");
+    EMPTIES.add("basefont");
     EMPTIES.add("br");
     EMPTIES.add("col");
     EMPTIES.add("embed");
+    EMPTIES.add("frame");
     EMPTIES.add("hr");
     EMPTIES.add("img");
     EMPTIES.add("input");
+    EMPTIES.add("isindex");
     EMPTIES.add("link");
     EMPTIES.add("meta");
-    EMPTIES.add("basefont");
-    EMPTIES.add("frame");
-    EMPTIES.add("isindex");
     EMPTIES.add("param");
     // elements with an empty content model
     EMPTIES5.add("area");
@@ -207,46 +211,43 @@ public class HTMLSerializer extends OutputSerializer {
     EMPTIES5.add("source");
     EMPTIES5.add("track");
     EMPTIES5.add("wbr");
-    EMPTIES5.add("basefont");
-    EMPTIES5.add("frame");
-    EMPTIES5.add("isindex");
     // URI attributes
-    URIS.add("a:href");
-    URIS.add("a:name");
-    URIS.add("applet:codebase");
-    URIS.add("area:href");
-    URIS.add("base:href");
-    URIS.add("blockquote:cite");
-    URIS.add("body:background");
-    URIS.add("button:datasrc");
-    URIS.add("del:cite");
-    URIS.add("div:datasrc");
-    URIS.add("form:action");
-    URIS.add("frame:longdesc");
-    URIS.add("frame:src");
-    URIS.add("head:profile");
-    URIS.add("iframe:longdesc");
-    URIS.add("iframe:src");
-    URIS.add("img:longdesc");
-    URIS.add("img:src");
-    URIS.add("img:usemap");
-    URIS.add("input:datasrc");
-    URIS.add("input:src");
-    URIS.add("input:usemap");
-    URIS.add("ins:cite");
-    URIS.add("link:href");
-    URIS.add("object:archive");
-    URIS.add("object:classid");
-    URIS.add("object:codebase");
-    URIS.add("object:data");
-    URIS.add("object:datasrc");
-    URIS.add("object:usemap");
-    URIS.add("q:cite");
-    URIS.add("script:for");
-    URIS.add("script:src");
-    URIS.add("select:datasrc");
-    URIS.add("span:datasrc");
-    URIS.add("table:datasrc");
-    URIS.add("textarea:datasrc");
+    URIS.add("a@href");
+    URIS.add("a@name");
+    URIS.add("applet@codebase");
+    URIS.add("area@href");
+    URIS.add("base@href");
+    URIS.add("blockquote@cite");
+    URIS.add("body@background");
+    URIS.add("button@datasrc");
+    URIS.add("del@cite");
+    URIS.add("div@datasrc");
+    URIS.add("form@action");
+    URIS.add("frame@longdesc");
+    URIS.add("frame@src");
+    URIS.add("head@profile");
+    URIS.add("iframe@longdesc");
+    URIS.add("iframe@src");
+    URIS.add("img@longdesc");
+    URIS.add("img@src");
+    URIS.add("img@usemap");
+    URIS.add("input@datasrc");
+    URIS.add("input@src");
+    URIS.add("input@usemap");
+    URIS.add("ins@cite");
+    URIS.add("link@href");
+    URIS.add("object@archive");
+    URIS.add("object@classid");
+    URIS.add("object@codebase");
+    URIS.add("object@data");
+    URIS.add("object@datasrc");
+    URIS.add("object@usemap");
+    URIS.add("q@cite");
+    URIS.add("script@for");
+    URIS.add("script@src");
+    URIS.add("select@datasrc");
+    URIS.add("span@datasrc");
+    URIS.add("table@datasrc");
+    URIS.add("textarea@datasrc");
   }
 }

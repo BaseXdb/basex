@@ -12,14 +12,11 @@ import java.util.*;
  *
  * Documentation: http://docs.basex.org/wiki/Clients
  *
- * (C) BaseX Team 2005-14, BSD License
+ * (C) BaseX Team 2005-16, BSD License
  */
 public final class BaseXClient {
   /** UTF-8 charset. */
   private static final Charset UTF8 = Charset.forName("UTF-8");
-  /** Event notifications. */
-  private final Map<String, EventNotifier> notifiers =
-      Collections.synchronizedMap(new HashMap<String, EventNotifier>());
   /** Output stream. */
   private final OutputStream out;
   /** Input stream (buffered). */
@@ -29,33 +26,38 @@ public final class BaseXClient {
   private final Socket socket;
   /** Command info. */
   private String info;
-  /** Socket event reference. */
-  private Socket esocket;
-  /** Socket event host. */
-  private final String ehost;
 
   /**
    * Constructor.
    * @param host server name
    * @param port server port
-   * @param user user name
-   * @param pass password
+   * @param username user name
+   * @param password password
    * @throws IOException Exception
    */
-  public BaseXClient(final String host, final int port, final String user, final String pass)
-      throws IOException {
+  public BaseXClient(final String host, final int port, final String username,
+      final String password) throws IOException {
 
     socket = new Socket();
     socket.connect(new InetSocketAddress(host, port), 5000);
     in = new BufferedInputStream(socket.getInputStream());
     out = socket.getOutputStream();
-    ehost = host;
 
-    // receive timestamp
-    final String ts = receive();
-    // send {Username}0 and hashed {Password/Timestamp}0
-    send(user);
-    send(md5(md5(pass) + ts));
+    // receive server response
+    final String[] response = receive().split(":");
+    final String code, nonce;
+    if(response.length > 1) {
+      // support for digest authentication
+      code = username + ':' + response[0] + ':' + password;
+      nonce = response[1];
+    } else {
+      // support for cram-md5 (Version < 8.0)
+      code = password;
+      nonce = response[0];
+    }
+
+    send(username);
+    send(md5(md5(code) + nonce));
 
     // receive success flag
     if(!ok()) throw new IOException("Access denied.");
@@ -138,46 +140,6 @@ public final class BaseXClient {
   }
 
   /**
-   * Watches an event.
-   * @param name event name
-   * @param notifier event notification
-   * @throws IOException I/O exception
-   */
-  public void watch(final String name, final EventNotifier notifier) throws IOException {
-    out.write(10);
-    if(esocket == null) {
-      final int eport = Integer.parseInt(receive());
-      // initialize event socket
-      esocket = new Socket();
-      esocket.connect(new InetSocketAddress(ehost, eport), 5000);
-      final OutputStream os = esocket.getOutputStream();
-      receive(in, os);
-      os.write(0);
-      os.flush();
-      final InputStream is = esocket.getInputStream();
-      is.read();
-      listen(is);
-    }
-    send(name);
-    info = receive();
-    if(!ok()) throw new IOException(info);
-    notifiers.put(name, notifier);
-  }
-
-  /**
-   * Unwatches an event.
-   * @param name event name
-   * @throws IOException I/O exception
-   */
-  public void unwatch(final String name) throws IOException {
-    out.write(11);
-    send(name);
-    info = receive();
-    if(!ok()) throw new IOException(info);
-    notifiers.remove(name);
-  }
-
-  /**
    * Returns command information.
    * @return string info
    */
@@ -192,7 +154,6 @@ public final class BaseXClient {
   public void close() throws IOException {
     send("exit");
     out.flush();
-    if(esocket != null) esocket.close();
     socket.close();
   }
 
@@ -251,32 +212,6 @@ public final class BaseXClient {
     out.write(code);
     send(path);
     send(input);
-  }
-
-  /**
-   * Starts the listener thread.
-   * @param input input stream
-   */
-  private void listen(final InputStream input) {
-    final BufferedInputStream bis = new BufferedInputStream(input);
-    new Thread() {
-      @Override
-      public void run() {
-        try {
-          while(true) {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            receive(bis, baos);
-            final String name = new String(baos.toByteArray(), UTF8);
-            baos = new ByteArrayOutputStream();
-            receive(bis, baos);
-            final String data = new String(baos.toByteArray(), UTF8);
-            notifiers.get(name).notify(data);
-          }
-        } catch(final IOException ex) {
-          // loop will be quit if no data can be received anymore
-        }
-      }
-    }.start();
   }
 
   /**
@@ -464,16 +399,5 @@ public final class BaseXClient {
       if(!ok()) throw new IOException(receive());
       return s;
     }
-  }
-
-  /**
-   * Interface for event notifications.
-   */
-  public interface EventNotifier {
-    /**
-     * Invoked when a database event was fired.
-     * @param value event string
-     */
-    void notify(final String value);
   }
 }

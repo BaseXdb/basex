@@ -1,45 +1,47 @@
 package org.basex.util;
 
 import static org.basex.core.Text.*;
-import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.lang.reflect.*;
 
 import org.basex.core.parse.*;
+import org.basex.core.parse.Commands.Cmd;
 import org.basex.io.*;
 
 /**
  * Console reader.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Dimitar Popov
  */
-public abstract class ConsoleReader {
+public abstract class ConsoleReader implements AutoCloseable {
   /** Password prompt. */
   private static final String PW_PROMPT = PASSWORD + COLS;
-  /** Default prompt. */
-  private static final String PROMPT = "> ";
 
   /** Password reader. */
   private final PasswordReader pwReader = new PasswordReader() {
     @Override
     public String password() {
-      return md5(readPassword());
+      return readPassword();
     }
   };
 
   /**
    * Reads next line. If no input, then the method blocks the thread.
+   * @param prompt prompt
    * @return next line or {@code null} if EOF is reached
    */
-  public abstract String readLine();
+  public abstract String readLine(final String prompt);
 
   /**
    * Reads a password.
    * @return password as plain text
    */
   protected abstract String readPassword();
+
+  @Override
+  public abstract void close();
 
   /**
    * Create a new password reader for this console.
@@ -75,13 +77,13 @@ public abstract class ConsoleReader {
     }
 
     @Override
-    public String readLine() {
+    public String readLine(final String prompt) {
       try {
-        Util.out(PROMPT);
+        Util.out(prompt);
         return in.readLine();
-      } catch(final IOException e) {
+      } catch(final IOException ex) {
         // should not happen
-        throw new RuntimeException(e);
+        throw new RuntimeException(ex);
       }
     }
 
@@ -90,29 +92,43 @@ public abstract class ConsoleReader {
       Util.out(PW_PROMPT);
       return Util.password();
     }
+
+    @Override
+    public void close() {
+    }
   }
 
   /** Implementation which provides advanced features, such as history. */
   private static class JLineConsoleReader extends ConsoleReader {
     /** JLine console reader class name. */
-    private static final String JLINE_CONSOLE_READER = "jline.ConsoleReader";
+    private static final String JLINE_CONSOLE_READER = "jline.console.ConsoleReader";
+    /** JLine file history class name. */
+    private static final String JLINE_FILE_HISTORY = "jline.console.history.FileHistory";
     /** JLine history class name. */
-    private static final String JLINE_HISTORY = "jline.History";
+    private static final String JLINE_HISTORY = "jline.console.history.History";
+    /** JLine history class name. */
+    private static final String JLINE_COMPLETER = "jline.console.completer.Completer";
+    /** JLine history class name. */
+    private static final String JLINE_ENUM_COMPLETER = "jline.console.completer.EnumCompleter";
+    /** JLine history class name. */
+    private static final String JLINE_FILE_NAME_COMPLETER =
+        "jline.console.completer.FileNameCompleter";
     /** Command history file. */
     private static final String HISTORY_FILE = IO.BASEXSUFFIX + "history";
     /** Password echo character. */
     private static final Character PASSWORD_ECHO = (char) 0;
 
-    /** JLine console reader class. */
-    private final Class<?> readerClass;
     /** Method to read the next line. */
     private final Method readLine;
     /** Method to read the next line with echoing a character. */
     private final Method readEcho;
-    /** Method to set the default prompt. */
-    private final Method setDefaultPrompt;
     /** Implementation. */
     private final Object reader;
+
+    /** File history class. */
+    private final Class<?> fileHistoryC;
+    /** File history. */
+    private final Object fileHistory;
 
     /**
      * Checks if JLine implementation is available?
@@ -128,49 +144,46 @@ public abstract class ConsoleReader {
      */
     JLineConsoleReader() throws Exception {
       // reflection
-      readerClass = Reflect.find(JLINE_CONSOLE_READER);
-
-      readLine = Reflect.method(readerClass, "readLine");
-      readEcho = Reflect.method(readerClass, "readLine", String.class, Character.class);
-      setDefaultPrompt = Reflect.method(readerClass, "setDefaultPrompt", String.class);
+      final Class<?> readerC = Reflect.find(JLINE_CONSOLE_READER);
+      readLine = Reflect.method(readerC, "readLine", String.class);
+      readEcho = Reflect.method(readerC, "readLine", String.class, Character.class);
 
       // initialization
-      reader = readerClass.newInstance();
+      reader = readerC.newInstance();
 
-      defaultConfiguration();
-    }
+      final Class<?> history = Reflect.find(JLINE_HISTORY);
+      fileHistoryC = Reflect.find(JLINE_FILE_HISTORY);
+      fileHistory = Reflect.get(Reflect.find(fileHistoryC, File.class),
+          new File(Prop.HOME, HISTORY_FILE));
 
-    /** Apply default configuration. */
-    private void defaultConfiguration() {
-      final Class<?> historyClass = Reflect.find(JLINE_HISTORY);
-      final File hist = new File(Prop.HOME, HISTORY_FILE);
-      final Object history = Reflect.get(Reflect.find(historyClass, File.class), hist);
+      final Class<?> completer = Reflect.find(JLINE_COMPLETER);
+      final Class<?> enumCompleter = Reflect.find(JLINE_ENUM_COMPLETER);
+      final Class<?> fileNameCompleter = Reflect.find(JLINE_FILE_NAME_COMPLETER);
 
-      Reflect.invoke(Reflect.method(readerClass, "setUseHistory", boolean.class),
-          reader, true);
-      Reflect.invoke(Reflect.method(readerClass, "setBellEnabled", boolean.class),
-          reader, false);
-      Reflect.invoke(Reflect.method(readerClass, "setHistory", historyClass),
-          reader, history);
+      Reflect.invoke(Reflect.method(readerC, "setBellEnabled", boolean.class), reader, false);
+      Reflect.invoke(Reflect.method(readerC, "setHistory", history), reader, fileHistory);
+      Reflect.invoke(Reflect.method(readerC, "setHistoryEnabled", boolean.class), reader, true);
 
-      restoreDefaultPrompt();
-    }
-
-    /** Restore the default prompt. */
-    private void restoreDefaultPrompt() {
-      Reflect.invoke(setDefaultPrompt, reader, PROMPT);
+      // command completions
+      Reflect.invoke(Reflect.method(readerC, "addCompleter", completer), reader,
+          Reflect.get(Reflect.find(enumCompleter, Class.class), Cmd.class));
+      Reflect.invoke(Reflect.method(readerC, "addCompleter", completer), reader,
+          Reflect.get(Reflect.find(fileNameCompleter)));
     }
 
     @Override
-    public String readLine() {
-      return (String) Reflect.invoke(readLine, reader);
+    public String readLine(final String prompt) {
+      return (String) Reflect.invoke(readLine, reader, prompt);
     }
 
     @Override
     public String readPassword() {
-      final Object pw = Reflect.invoke(readEcho, reader, PW_PROMPT, PASSWORD_ECHO);
-      restoreDefaultPrompt();
-      return (String) pw;
+      return (String) Reflect.invoke(readEcho, reader, PW_PROMPT, PASSWORD_ECHO);
+    }
+
+    @Override
+    public void close() {
+      Reflect.invoke(Reflect.method(fileHistoryC, "flush"), fileHistory);
     }
   }
 }

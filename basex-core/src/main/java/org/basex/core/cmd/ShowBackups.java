@@ -5,8 +5,10 @@ import static org.basex.core.Text.*;
 import java.io.*;
 
 import org.basex.core.*;
+import org.basex.core.locks.*;
 import org.basex.core.parse.*;
-import org.basex.core.parse.Commands.*;
+import org.basex.core.parse.Commands.Cmd;
+import org.basex.core.parse.Commands.CmdShow;
 import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -14,7 +16,7 @@ import org.basex.util.list.*;
 /**
  * Evaluates the 'show backups' command and shows available backups.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class ShowBackups extends ABackup {
@@ -25,7 +27,7 @@ public final class ShowBackups extends ABackup {
     table.header.add(NAME);
     table.header.add(SIZE);
 
-    final IOFile dbpath = context.globalopts.dbpath();
+    final IOFile dbpath = soptions.dbPath();
     for(final String name : context.databases.backups()) {
       final TokenList tl = new TokenList();
       tl.add(name);

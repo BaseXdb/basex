@@ -1,5 +1,9 @@
 package org.basex.data;
 
+import static org.basex.core.Text.*;
+
+import java.io.*;
+
 import org.basex.core.*;
 import org.basex.index.*;
 import org.basex.index.name.*;
@@ -7,91 +11,126 @@ import org.basex.index.path.*;
 import org.basex.index.value.*;
 import org.basex.io.random.*;
 import org.basex.util.*;
-import org.basex.util.hash.TokenSet;
+import org.basex.util.hash.*;
 
 /**
  * This class stores and organizes the database table and the index structures
  * for textual content in a compressed memory structure.
  * The table mapping is documented in {@link Data}.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class MemData extends Data {
-  /**
-   * Constructor.
-   * @param ps path summary
-   * @param ns namespaces
-   * @param opts database options
-   */
-  public MemData(final PathSummary ps, final Namespaces ns, final MainOptions opts) {
-    this(null, null, ps, ns, opts, null, null);
-  }
+  /** Texts. */
+  private final TokenSet texts;
+  /** Attribute Values. */
+  private final TokenSet values;
 
   /**
    * Constructor.
-   * @param tag tag index
-   * @param att attribute name index
-   * @param ps path summary
-   * @param ns namespaces
+   * @param paths path index
+   * @param nspaces namespaces
    * @param opts database options
-   * @param txt text index
-   * @param atv attribute value index
    */
-  private MemData(final Names tag, final Names att, final PathSummary ps, final Namespaces ns,
-      final MainOptions opts, final Index txt, final Index atv) {
-
-    meta = new MetaData(opts);
-    table = new TableMemAccess(meta);
-    if(meta.updindex) {
-      idmap = new IdPreMap(meta.lastid);
-      txtindex = txt == null ? new UpdatableMemValues(this) : txt;
-      atvindex = atv == null ? new UpdatableMemValues(this) : atv;
-    } else {
-      txtindex = txt == null ? new MemValues(this) : txt;
-      atvindex = atv == null ? new MemValues(this) : atv;
-    }
-    tagindex = tag == null ? new Names(meta) : tag;
-    atnindex = att == null ? new Names(meta) : att;
-    paths = ps == null ? new PathSummary(this) : ps;
-    nspaces = ns == null ? new Namespaces() : ns;
+  public MemData(final PathIndex paths, final Namespaces nspaces, final MainOptions opts) {
+    this(null, null, paths, nspaces, null, null, opts);
   }
 
   /**
-   * Light-weight constructor, adopting data structures from the specified database.
-   * @param data data reference
-   */
-  public MemData(final Data data) {
-    this(data.tagindex, data.atnindex, data.paths, null, data.meta.options, data.txtindex,
-        data.atvindex);
-  }
-
-  /**
-   * Constructor, creating a new, empty database.
+   * Constructor for creating a new, empty database.
    * @param opts database options
    */
   public MemData(final MainOptions opts) {
     this(null, null, opts);
   }
 
+  /**
+   * Constructor for building a new database.
+   * @param elemNames element name index
+   * @param attrNames attribute name index
+   * @param paths path index
+   * @param nspaces namespaces
+   * @param texts texts
+   * @param values values
+   * @param options database options
+   */
+  private MemData(final Names elemNames, final Names attrNames, final PathIndex paths,
+      final Namespaces nspaces, final TokenSet texts, final TokenSet values,
+      final MainOptions options) {
+
+    super(new MetaData(options));
+    table = new TableMemAccess(meta);
+    if(meta.updindex) idmap = new IdPreMap(meta.lastid);
+    this.texts = texts == null ? new TokenSet() : texts;
+    this.values = values == null ? new TokenSet() : values;
+    this.elemNames = elemNames == null ? new Names(meta) : elemNames;
+    this.attrNames = attrNames == null ? new Names(meta) : attrNames;
+    this.paths = paths == null ? new PathIndex(this) : paths;
+    this.nspaces = nspaces == null ? new Namespaces() : nspaces;
+  }
+
+  @Override
+  public void unpin() { }
+
   @Override
   public void close() { }
 
   @Override
-  public void closeIndex(final IndexType type) { }
+  public void createIndex(final IndexType type, final Command cmd) throws IOException {
+    final IndexBuilder ib;
+    switch(type) {
+      case TEXT: case ATTRIBUTE: case TOKEN:
+        ib = new MemValuesBuilder(this, type); break;
+      case FULLTEXT:
+        throw new BaseXException(NO_MAINMEM);
+      default:
+        throw Util.notExpected();
+    }
+    if(cmd != null) cmd.proc(ib);
+    set(type, ib.build());
+  }
 
   @Override
-  public void setIndex(final IndexType type, final Index index) { }
+  public void dropIndex(final IndexType type) throws BaseXException {
+    switch(type) {
+      case TEXT:      break;
+      case ATTRIBUTE: break;
+      case TOKEN:     break;
+      case FULLTEXT:  throw new BaseXException(NO_MAINMEM);
+      default:        throw Util.notExpected();
+    }
+    set(type, null);
+  }
+
+  /**
+   * Assigns the specified index.
+   * @param type index to be opened
+   * @param index index instance
+   */
+  private void set(final IndexType type, final ValueIndex index) {
+    meta.dirty = true;
+    switch(type) {
+      case TEXT:      textIndex = index; break;
+      case ATTRIBUTE: attrIndex = index; break;
+      case TOKEN:     tokenIndex = index; break;
+      case FULLTEXT:  ftIndex = index; break;
+      default:        break;
+    }
+  }
 
   @Override
-  public boolean startUpdate() { return true; }
+  public void startUpdate(final MainOptions opts) { }
 
   @Override
-  public void finishUpdate() { }
+  public void finishUpdate(final MainOptions opts) { }
+
+  @Override
+  public void flush(final boolean all) { }
 
   @Override
   public byte[] text(final int pre, final boolean text) {
-    return ((TokenSet) (text ? txtindex : atvindex)).key((int) textOff(pre));
+    return (text ? texts : values).key((int) textRef(pre));
   }
 
   @Override
@@ -109,43 +148,34 @@ public final class MemData extends Data {
     return text(pre, text).length;
   }
 
+  @Override
+  public boolean inMemory() {
+    return true;
+  }
+
+  /**
+   * Returns the string values of the database.
+   * @param text text/attribute flag
+   * @return set
+   */
+  public TokenSet values(final boolean text) {
+    return text ? texts : values;
+  }
+
   // UPDATE OPERATIONS ========================================================
 
   @Override
   protected void delete(final int pre, final boolean text) { }
 
   @Override
-  public void updateText(final int pre, final byte[] val, final int kind) {
-    final int id = id(pre);
-    if(meta.updindex) {
-      final boolean txt = kind != ATTR;
-      ((MemValues) (txt ? txtindex : atvindex)).delete(text(pre, txt), id);
-    }
-    textOff(pre, index(pre, id, val, kind));
+  protected void updateText(final int pre, final byte[] value, final int kind) {
+    indexDelete(pre, -1, 1);
+    textRef(pre, textRef(value, kind != ATTR));
+    indexAdd(pre, -1, 1, null);
   }
 
   @Override
-  protected long index(final int pre, final int id, final byte[] txt, final int kind) {
-    return ((MemValues) (kind == ATTR ? atvindex : txtindex)).
-        put(txt, meta.updindex ? id : pre);
-  }
-
-  @Override
-  protected void indexDelete(final int pre, final int size) {
-    final int l = pre + size;
-    for(int p = pre; p < l; ++p) {
-      final int k = kind(p);
-      final boolean isAttr = k == ATTR;
-      // skip nodes which are not attribute, text, comment, or proc. instruction
-      if(isAttr || k == TEXT || k == COMM || k == PI) {
-        final byte[] key = text(p, !isAttr);
-        ((MemValues) (isAttr ? atvindex : txtindex)).delete(key, id(p));
-      }
-    }
-  }
-
-  @Override
-  public boolean inMemory() {
-    return true;
+  protected long textRef(final byte[] value, final boolean text) {
+    return (text ? texts : values).put(value);
   }
 }

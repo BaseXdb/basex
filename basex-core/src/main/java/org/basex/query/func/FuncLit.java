@@ -1,10 +1,10 @@
 package org.basex.query.func;
 
-import static org.basex.query.util.Err.*;
-
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -14,7 +14,7 @@ import org.basex.util.hash.*;
 /**
  * A named function literal.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public final class FuncLit extends Single implements Scope {
@@ -23,7 +23,7 @@ public final class FuncLit extends Single implements Scope {
   /** Static context. */
   private final StaticContext sc;
   /** Annotations. */
-  private Ann ann;
+  private AnnList anns;
   /** Function name. */
   private final QNm name;
   /** Formal parameters. */
@@ -35,25 +35,26 @@ public final class FuncLit extends Single implements Scope {
 
   /**
    * Constructor.
-   * @param ann annotations
+   * @param anns annotations
    * @param name function name
-   * @param arg formal parameters
+   * @param args formal parameters
    * @param expr function body
    * @param ft function type
    * @param scope variable scope
    * @param sc static context
    * @param info input info
    */
-  public FuncLit(final Ann ann, final QNm name, final Var[] arg, final Expr expr, final FuncType ft,
+  FuncLit(final AnnList anns, final QNm name, final Var[] args, final Expr expr, final FuncType ft,
       final VarScope scope, final StaticContext sc, final InputInfo info) {
+
     super(info, expr);
-    this.ann = ann;
+    this.anns = anns;
     this.name = name;
-    this.args = arg;
+    this.args = args;
     this.scope = scope;
     this.sc = sc;
     check = ft == null;
-    type = (ft == null ? FuncType.arity(args.length) : ft).seqType();
+    seqType = (ft == null ? FuncType.arity(args.length) : ft).seqType();
   }
 
   @Override
@@ -63,16 +64,15 @@ public final class FuncLit extends Single implements Scope {
 
     if(check) {
       final StaticFunc sf = qc.funcs.get(name, args.length, info, true);
-      if(sf == null) throw FUNCUNKNOWN.get(info, name.string());
-      ann = sf.ann;
-      type = sf.funcType().seqType();
+      anns = sf.anns;
+      seqType = sf.funcType().seqType();
     }
 
     try {
       expr = expr.compile(qc, scope);
       expr.markTailCalls(null);
     } catch(final QueryException e) {
-      expr = FNInfo.error(e, type);
+      expr = FnError.get(e, seqType);
     } finally {
       scope.cleanUp(this);
     }
@@ -86,49 +86,23 @@ public final class FuncLit extends Single implements Scope {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) {
-    return new FuncItem(sc, ann == null ? new Ann() : ann, name, args, (FuncType) type.type,
-        expr, qc.value, qc.pos, qc.size, scope.stackSize());
+    return new FuncItem(sc, anns, name, args, (FuncType) seqType.type, expr, qc.value, qc.pos,
+        qc.size, scope.stackSize());
   }
 
   @Override
   public Expr copy(final QueryContext qc, final VarScope o, final IntObjMap<Var> vs) {
-    final Ann a = ann == null ? null : new Ann();
-    if(a != null) for(int i = 0; i < ann.size(); i++) a.add(ann.names[i], ann.values[i], info);
     final VarScope scp = new VarScope(sc);
-    final Var[] arg = new Var[args.length];
-    for(int i = 0; i < arg.length; i++)
-      vs.put(args[i].id, arg[i] = scp.newCopyOf(qc, args[i]));
+    final int al = args.length;
+    final Var[] arg = new Var[al];
+    for(int a = 0; a < al; a++) vs.put(args[a].id, arg[a] = scp.newCopyOf(qc, args[a]));
     final Expr call = expr.copy(qc, scp, vs);
-    return new FuncLit(a, name, arg, call, (FuncType) type.type, scp, sc, info);
+    return new FuncLit(anns, name, arg, call, (FuncType) seqType.type, scp, sc, info);
   }
 
   @Override
   public boolean has(final Flag flag) {
-    return flag == Flag.CTX || flag == Flag.FCS;
-  }
-
-  /**
-   * Creates a function literal for a function that was not yet encountered while parsing.
-   * @param name function name
-   * @param arity function arity
-   * @param qc query context
-   * @param sc static context
-   * @param ii input info
-   * @return function literal
-   * @throws QueryException query exception
-   */
-  public static FuncLit unknown(final QNm name, final long arity, final QueryContext qc,
-      final StaticContext sc, final InputInfo ii) throws QueryException {
-
-    final VarScope scp = new VarScope(sc);
-    final Var[] arg = new Var[(int) arity];
-    final Expr[] refs = new Expr[arg.length];
-    for(int i = 0; i < arg.length; i++) {
-      arg[i] = scp.newLocal(qc, new QNm(QueryText.ARG + (i + 1), ""), SeqType.ITEM_ZM, true);
-      refs[i] = new VarRef(ii, arg[i]);
-    }
-    final TypedFunc call = qc.funcs.getFuncRef(name, refs, sc, ii);
-    return new FuncLit(null, name, arg, call.fun, null, scp, sc, ii);
+    return flag == Flag.CTX || flag == Flag.POS;
   }
 
   @Override
@@ -156,7 +130,7 @@ public final class FuncLit extends Single implements Scope {
    * Returns annotations.
    * @return annotations
    */
-  public Ann annotations() {
-    return ann;
+  public AnnList annotations() {
+    return anns;
   }
 }

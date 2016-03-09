@@ -2,16 +2,18 @@ package org.basex.query.expr;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Filter expression.
+ * Filter expression, caching all results.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class CachedFilter extends Filter {
@@ -27,6 +29,11 @@ final class CachedFilter extends Filter {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
+    return value(qc).iter();
+  }
+
+  @Override
+  public Value value(final QueryContext qc) throws QueryException {
     Value val = root.value(qc);
     final Value cv = qc.value;
     final long cs = qc.size;
@@ -34,18 +41,20 @@ final class CachedFilter extends Filter {
 
     try {
       // evaluate first predicate, based on incoming value
-      final ValueBuilder vb = new ValueBuilder();
-      Expr p = preds[0];
-      long is = val.size();
-      qc.size = is;
+      final ItemList buffer = new ItemList();
+      Expr pred = preds[0];
+      long vs = val.size();
+      qc.size = vs;
       qc.pos = 1;
-      for(int s = 0; s < is; ++s) {
-        final Item it = val.itemAt(s);
-        qc.value = it;
-        final Item i = p.test(qc, info);
-        if(i != null) {
-          it.score(i.score());
-          vb.add(it);
+
+      final boolean scoring = qc.scoring;
+      for(int s = 0; s < vs; s++) {
+        final Item item = val.itemAt(s);
+        qc.value = item;
+        final Item test = pred.test(qc, info);
+        if(test != null) {
+          if(scoring) item.score(test.score());
+          buffer.add(item);
         }
         qc.pos++;
       }
@@ -55,22 +64,26 @@ final class CachedFilter extends Filter {
       // evaluate remaining predicates, based on value builder
       final int pl = preds.length;
       for(int i = 1; i < pl; i++) {
-        is = vb.size();
-        p = preds[i];
-        qc.size = is;
+        vs = buffer.size();
+        pred = preds[i];
+        qc.size = vs;
         qc.pos = 1;
         int c = 0;
-        for(int s = 0; s < is; ++s) {
-          final Item it = vb.get(s);
-          qc.value = it;
-          if(p.test(qc, info) != null) vb.set(c++, it);
+        for(int s = 0; s < vs; ++s) {
+          final Item item = buffer.get(s);
+          qc.value = item;
+          final Item test = pred.test(qc, info);
+          if(test != null) {
+            if(scoring) item.score(test.score());
+            buffer.set(c++, item);
+          }
           qc.pos++;
         }
-        vb.size(c);
+        buffer.size(c);
       }
 
       // return resulting values
-      return vb;
+      return buffer.value();
     } finally {
       qc.value = cv;
       qc.size = cs;
@@ -79,17 +92,15 @@ final class CachedFilter extends Filter {
   }
 
   @Override
-  public Filter addPred(final QueryContext qc, final VarScope scp, final Expr p) {
-    preds = Array.add(preds, new Expr[preds.length + 1], p);
-    return this;
+  public Filter copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return copyType(new CachedFilter(info, root.copy(qc, scp, vs),
+        Arr.copyAll(qc, scp, vs, preds)));
   }
 
   @Override
-  public Filter copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    final Filter f = new CachedFilter(info, root == null ? null : root.copy(qc, scp, vs),
-        Arr.copyAll(qc, scp, vs, preds));
-    f.pos = pos;
-    f.last = last;
-    return f;
+  public void plan(final FElem plan) {
+    final FElem el = planElem();
+    addPlan(plan, el, root);
+    super.plan(el);
   }
 }

@@ -1,42 +1,41 @@
 package org.basex.query.util.pkg;
 
 import static org.basex.core.Text.*;
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 import static org.basex.query.util.pkg.PkgText.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
+import java.util.*;
 import java.util.regex.*;
 
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
-import org.basex.query.util.pkg.Package.Dependency;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
  * Repository manager.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Rositsa Shadura
  */
 public final class RepoManager {
   /** Main-class pattern. */
   private static final Pattern MAIN_CLASS = Pattern.compile("^Main-Class: *(.+?) *$");
-  /** Repository context. */
-  private final Repo repo;
+  /** Context. */
+  private final Context context;
   /** Input info. */
-  private InputInfo info;
+  private final InputInfo info;
 
   /**
    * Constructor.
    * @param context database context
    */
   public RepoManager(final Context context) {
-    repo = context.repo;
+    this(context, null);
   }
 
   /**
@@ -45,7 +44,7 @@ public final class RepoManager {
    * @param info input info
    */
   public RepoManager(final Context context, final InputInfo info) {
-    this(context);
+    this.context = context;
     this.info = info;
   }
 
@@ -63,7 +62,7 @@ public final class RepoManager {
       cont = io.read();
     } catch(final IOException ex) {
       Util.debug(ex);
-      throw BXRE_WHICH.get(info, path);
+      throw BXRE_WHICH_X.get(info, path);
     }
 
     try {
@@ -71,7 +70,7 @@ public final class RepoManager {
       if(io.hasSuffix(IO.JARSUFFIX)) return installJAR(cont);
       return installXAR(cont);
     } catch(final IOException ex) {
-      throw BXRE_PARSE.get(info, io.name(), ex);
+      throw BXRE_PARSE_X_X.get(info, io.name(), ex);
     }
   }
 
@@ -86,47 +85,16 @@ public final class RepoManager {
     t.header.add(VERSINFO);
     t.header.add(TYPE);
     t.header.add(PATH);
-
-    final TokenMap pkg = repo.pkgDict();
-    // traverse EXPath packages
-    for(final byte[] p : pkg) {
-      if(p != null) t.contents.add(entry(string(Package.name(p)),
-          string(Package.version(p)), EXPATH, string(pkg.get(p))));
+    for(final Pkg pkg : all()) {
+      final String version = pkg.version();
+      final TokenList tl = new TokenList();
+      tl.add(pkg.name());
+      tl.add(version == null ? "-" : version);
+      tl.add(version == null ? INTERNAL : EXPATH);
+      tl.add(pkg.dir());
+      t.contents.add(tl);
     }
-
-    // traverse all directories, ignore root entries with dashes
-    for(final IOFile ch : repo.path().children()) {
-      final String n = ch.name();
-      if(!ch.isDir()) {
-        t.contents.add(entry(n.replaceAll("\\..*", "").
-            replace('/', '.'), "-", INTERNAL, n));
-      } else if(n.indexOf('-') == -1) {
-        for(final String s : ch.descendants()) {
-          t.contents.add(entry(n + '.' + s.replaceAll("\\..*", "").replace('/', '.'),
-              "-", INTERNAL, n + '/' + s));
-        }
-      }
-    }
-    return t.sort();
-  }
-
-  /**
-   * Adds a single table entry.
-   * @param name package name
-   * @param version package version
-   * @param type package type
-   * @param path package path
-   * @return new entry
-   */
-  private static TokenList entry(final String name, final String version, final String type,
-      final String path) {
-
-    final TokenList tl = new TokenList();
-    tl.add(name);
-    tl.add(version);
-    tl.add(type);
-    tl.add(path);
-    return tl;
+    return t;
   }
 
   /**
@@ -135,83 +103,108 @@ public final class RepoManager {
    */
   public StringList list() {
     final StringList sl = new StringList();
-    // traverse EXPath packages
-    for(final byte[] p : repo.pkgDict()) {
-      if(p != null) sl.add(string(p));
-    }
-
-    // traverse all directories, ignore root entries with dashes
-    for(final IOFile ch : repo.path().children()) {
-      final String n = ch.name();
-      if(!ch.isDir()) {
-        sl.add(n.replaceAll("\\..*", "").replace('/', '.'));
-      } else if(n.indexOf('-') == -1) {
-        for(final String s : ch.descendants()) {
-          sl.add(n + '.' + s.replaceAll("\\..*", "").replace('/', '.'));
-        }
-      }
-    }
-    return sl.sort(false);
+    for(final Pkg pkg : all()) sl.add(pkg.id());
+    return sl;
   }
 
   /**
    * Removes a package from the package repository.
-   * @param pkg package
+   * @param name name or id of the package
    * @throws QueryException query exception
    */
-  public void delete(final String pkg) throws QueryException {
-    boolean found = false;
-    final TokenMap dict = repo.pkgDict();
-    final byte[] pp = token(pkg);
-    for(final byte[] nextPkg : dict) {
-      if(nextPkg == null) continue;
+  public void delete(final String name) throws QueryException {
+    // find registered packages to be deleted
+    final EXPathRepo repo = context.repo;
+    final ArrayList<Pkg> delete = new ArrayList<>();
+    for(final Pkg pkg : repo.pkgDict().values()) {
       // a package can be deleted by its name or the name suffixed with its version
-      if(eq(nextPkg, pp) || eq(Package.name(nextPkg), pp)) {
+      if(pkg.name().equals(name) || pkg.id().equals(name)) {
         // check if package to be deleted participates in a dependency
-        final byte[] primPkg = primary(nextPkg);
-        if(primPkg != null) throw BXRE_DEP.get(info, string(primPkg), pkg);
-
-        // clean package repository
-        final IOFile f = repo.path(string(dict.get(nextPkg)));
-        repo.delete(new PkgParser(repo, info).parse(new IOFile(f, DESCRIPTOR)));
-        // package does not participate in a dependency => delete it
-        if(!f.delete()) throw BXRE_DELETE.get(info, f);
-        found = true;
+        final String dep = primary(pkg);
+        if(dep != null) throw BXRE_DEP_X_X.get(info, dep, name);
+        delete.add(pkg);
       }
     }
 
-    // traverse all files
-    final IOFile file = file(pkg, repo);
+    // delete registered packages
+    for(final Pkg pkg : delete) {
+      repo.delete(pkg);
+      // delete files on disk
+      final IOFile dir = repo.path(pkg.dir());
+      if(!dir.delete()) throw BXRE_DELETE_X.get(info, dir);
+    }
+
+    // delete internal package
+    final IOFile file = find(name);
     if(file != null) {
-      if(!file.delete()) throw BXRE_DELETE.get(info, file);
+      if(!file.delete()) throw BXRE_DELETE_X.get(info, file);
       return;
     }
 
-    if(!found) throw BXRE_WHICH.get(info, pkg);
+    if(delete.isEmpty()) throw BXRE_WHICH_X.get(info, name);
   }
 
   /**
    * Looks for a file with the specified name.
    * @param name name
-   * @param repo repository
-   * @return file, or {@code null}
+   * @return file or {@code null}
    */
-  public static IOFile file(final String name, final Repo repo) {
+  public IOFile find(final String name) {
     // traverse all files, find exact matches
-    IOFile path = new IOFile(repo.path(), name);
-    for(final IOFile ch : path.parent().children()) {
-      if(ch.name().equals(path.name())) return ch;
+    final IOFile root = context.repo.path();
+    String start = new IOFile(root, name).name();
+    for(final IOFile dir : root.children("^[^.].*")) {
+      if(dir.name().equals(start)) return dir;
     }
     // traverse all files, find prefix matches
-    path = new IOFile(repo.path(), name.replace('.', '/'));
-    final String start = path.name() + '.';
-    for(final IOFile ch : path.parent().children()) {
-      if(ch.name().startsWith(start)) return ch;
+    start = new IOFile(root, name.replace('.', '/')).name() + '.';
+    for(final IOFile dir : root.children("^[^.].*")) {
+      if(dir.name().startsWith(start)) return dir;
     }
     return null;
   }
 
+  /**
+   * Returns a sorted list of all currently available packages.
+   * @return packages
+   */
+  public ArrayList<Pkg> all() {
+    final TreeMap<String, Pkg> map = new TreeMap<>();
+    final EXPathRepo repo = context.repo.reset();
+    final HashSet<String> cache = new HashSet<>();
+    for(final Pkg pkg : repo.pkgDict().values()) {
+      map.put(pkg.id(), pkg);
+      cache.add(pkg.dir());
+    }
+    // ignore files and directories starting with dot (#1122)
+    for(final IOFile ch : repo.path().children("^[^.].*")) {
+      final String dir = ch.name();
+      if(!ch.isDir()) {
+        add(dir.replaceAll("\\..*", "").replace('/', '.'), dir, map);
+      } else if(!cache.contains(dir)) {
+        for(final String s : ch.descendants()) {
+          if(new IOFile(s).name().startsWith(".")) continue;
+          add(dir + '.' + s.replaceAll("\\..*", "").replace('/', '.'), dir + '/' + s, map);
+        }
+      }
+    }
+    return new ArrayList<>(map.values());
+  }
+
   // PRIVATE METHODS ====================================================================
+
+  /**
+   * Adds a package to the specified map.
+   * @param name package name
+   * @param dir package directory
+   * @param map map
+   */
+  private static void add(final String name, final String dir, final TreeMap<String, Pkg> map) {
+    final Pkg pkg = new Pkg();
+    pkg.name = name;
+    pkg.dir(dir);
+    map.put(pkg.id(), pkg);
+  }
 
   /**
    * Installs an XQuery module.
@@ -225,13 +218,11 @@ public final class RepoManager {
       throws QueryException, IOException {
 
     // parse module to find namespace uri
-    final Context ctx = repo.context;
-    final byte[] uri = new QueryContext(ctx).parseLibrary(string(content), path, null).name.uri();
-
-    // copy file to rewritten URI file path
-    final String uriPath = ModuleLoader.uri2path(string(uri));
-    if(uriPath == null) throw BXRE_URI.get(info, uri);
-    return write(uriPath + IO.XQMSUFFIX, content);
+    try(final QueryContext qc = new QueryContext(context)) {
+      final byte[] uri = qc.parseLibrary(string(content), path, null).name.uri();
+      // copy file to rewritten URI file path
+      return write(Strings.uri2path(string(uri)) + IO.XQMSUFFIX, content);
+    }
   }
 
   /**
@@ -260,7 +251,7 @@ public final class RepoManager {
    * @throws IOException I/O exception
    */
   private boolean write(final String path, final byte[] content) throws IOException {
-    final IOFile rp = new IOFile(repo.context.globalopts.get(GlobalOptions.REPOPATH));
+    final IOFile rp = new IOFile(context.soptions.get(StaticOptions.REPOPATH));
     final IOFile target = new IOFile(rp, path);
     final boolean exists = target.exists();
     target.parent().md();
@@ -279,18 +270,19 @@ public final class RepoManager {
     final Zip zip = new Zip(new IOContent(content));
     // parse and validate descriptor file
     final IOContent dsc = new IOContent(zip.read(DESCRIPTOR));
-    final Package pkg = new PkgParser(repo, info).parse(dsc);
+    final Pkg pkg = new PkgParser(info).parse(dsc);
 
     // remove existing package
-    final byte[] name = pkg.uniqueName();
-    final boolean exists = repo.pkgDict().get(name) != null;
-    if(exists) delete(string(name));
+    final String id = pkg.id();
+    final EXPathRepo repo = context.repo;
+    final boolean exists = repo.pkgDict().get(id) != null;
+    if(exists) delete(id);
     new PkgValidator(repo, info).check(pkg);
 
     // choose unique directory, unzip files and register repository
-    final IOFile file = uniqueDir(string(name).replaceAll("[^\\w.-]+", "-"));
+    final IOFile file = uniqueDir(id.replaceAll("[^\\w.-]+", "-"));
     zip.unzip(file);
-    repo.add(pkg, file.name());
+    repo.add(pkg.dir(file.name()));
     return exists;
   }
 
@@ -303,7 +295,7 @@ public final class RepoManager {
     String nm = name;
     int c = 0;
     do {
-      final IOFile io = repo.path(nm);
+      final IOFile io = context.repo.path(nm);
       if(!io.exists()) return io;
       nm = name + '-' + ++c;
     } while(true);
@@ -311,21 +303,23 @@ public final class RepoManager {
 
   /**
    * Checks if a package participates in a dependency.
-   * @param pkgName package
-   * @return package depending on the current one
+   * @param p package
+   * @return package depending on the current one, or {@code null}
    * @throws QueryException query exception
    */
-  private byte[] primary(final byte[] pkgName) throws QueryException {
-    final TokenMap dict = repo.pkgDict();
-    for(final byte[] nextPkg : dict) {
-      if(nextPkg != null && !eq(nextPkg, pkgName)) {
+  private String primary(final Pkg p) throws QueryException {
+    final String id = p.id();
+    final EXPathRepo repo = context.repo;
+    final HashMap<String, Pkg> dict = repo.pkgDict();
+    for(final Pkg pkg : dict.values()) {
+      if(!pkg.id().equals(id)) {
         // check only packages different from the current one
-        final IOFile desc = new IOFile(repo.path(string(dict.get(nextPkg))), DESCRIPTOR);
-        final Package pkg = new PkgParser(repo, info).parse(desc);
-        final byte[] name = Package.name(pkgName);
-        for(final Dependency dep : pkg.dep)
-          // Check only package dependencies
-          if(dep.pkg != null && eq(dep.pkg, name)) return Package.name(nextPkg);
+        final IOFile desc = new IOFile(repo.path(pkg.dir()), DESCRIPTOR);
+        final String n = p.name();
+        for(final PkgDep dep : new PkgParser(info).parse(desc).dep) {
+          // check only package dependencies
+          if(n.equals(dep.name)) return pkg.name();
+        }
       }
     }
     return null;

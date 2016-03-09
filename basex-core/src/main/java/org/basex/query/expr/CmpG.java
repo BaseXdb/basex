@@ -1,20 +1,18 @@
 package org.basex.query.expr;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
-import java.util.*;
-
-import org.basex.data.*;
-import org.basex.index.query.*;
+import org.basex.index.*;
 import org.basex.query.*;
-import org.basex.query.expr.CmpV.OpV;
+import org.basex.query.expr.CmpV.*;
 import org.basex.query.func.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
-import org.basex.query.value.*;
+import org.basex.query.util.collation.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -23,7 +21,7 @@ import org.basex.util.hash.*;
 /**
  * General comparison.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class CmpG extends Cmp {
@@ -82,16 +80,16 @@ public final class CmpG extends Cmp {
     /** String representation. */
     public final String name;
     /** Comparator. */
-    final OpV op;
+    public final OpV op;
 
     /**
      * Constructor.
-     * @param n string representation
-     * @param c comparator
+     * @param name string representation
+     * @param op comparator
      */
-    OpG(final String n, final OpV c) {
-      name = n;
-      op = c;
+    OpG(final String name, final OpV op) {
+      this.name = name;
+      this.op = op;
     }
 
     /**
@@ -110,8 +108,10 @@ public final class CmpG extends Cmp {
     public String toString() { return name; }
   }
 
+  /** Static context. */
+  final StaticContext sc;
   /** Comparator. */
-  public OpG op;
+  OpG op;
   /** Flag for atomic evaluation. */
   private boolean atomic;
 
@@ -121,79 +121,101 @@ public final class CmpG extends Cmp {
    * @param expr2 second expression
    * @param op operator
    * @param coll collation
+   * @param sc static context
    * @param info input info
    */
   public CmpG(final Expr expr1, final Expr expr2, final OpG op, final Collation coll,
-      final InputInfo info) {
+      final StaticContext sc, final InputInfo info) {
     super(info, expr1, expr2, coll);
     this.op = op;
-    type = SeqType.BLN;
-  }
-
-  @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    super.compile(qc, scp);
-    return optimize(qc, scp);
+    this.sc = sc;
+    seqType = SeqType.BLN;
   }
 
   @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
-    // avoid reoptimization
-    if(atomic) return this;
-
     // swap expressions; add text() to location paths to simplify optimizations
     if(swap()) {
+      qc.compInfo(OPTSWAP_X, this);
       op = op.swap();
-      qc.compInfo(OPTSWAP, this);
     }
-
-    final Expr e1 = exprs[0];
-    final Expr e2 = exprs[1];
-    Expr e = this;
-    if(oneIsEmpty()) {
-      e = optPre(Bln.FALSE, qc);
-    } else if(allAreValues()) {
-      e = preEval(qc);
-    } else if(e1.isFunction(Function.COUNT)) {
-      e = compCount(op.op);
-      if(e != this) qc.compInfo(e instanceof Bln ? OPTPRE : OPTWRITE, this);
-    } else if(e1.isFunction(Function.POSITION)) {
-      if(e2 instanceof RangeSeq && op.op == OpV.EQ) {
-        // position() CMP range
-        final long p1 = ((Value) e2).itemAt(0).itr(info);
-        final long p2 = p1 + e2.size() - 1;
-        e = Pos.get(p1, p2, info);
-      } else {
-        // position() CMP number
-        e = Pos.get(op.op, e2, e, info);
-      }
-      if(e != this) qc.compInfo(OPTWRITE, this);
-    } else if(e1.type().eq(SeqType.BLN) && (op == OpG.EQ && e2 == Bln.FALSE ||
-        op == OpG.NE && e2 == Bln.TRUE)) {
-      // (A = false()) -> not(A)
-      e = Function.NOT.get(null, info, e1);
-      qc.compInfo(OPTWRITE, this);
-    } else {
-      // rewrite path CMP number
-      e = CmpR.get(this);
-      if(e == this) e = CmpSR.get(this);
-      if(e != this) qc.compInfo(OPTWRITE, this);
-    }
-    if(e != this) return e;
 
     // check if both arguments will always yield one result
-    atomic = e1.type().zeroOrOne() && e2.type().zeroOrOne();
-    if(atomic) qc.compInfo(OPTATOMIC, this);
+    final Expr e1 = exprs[0], e2 = exprs[1];
+    final SeqType st1 = e1.seqType();
+
+    // one value is empty (e.g.: () = local:expensive() )
+    if(oneIsEmpty()) return optPre(Bln.FALSE, qc);
+
+    // rewrite count() function
+    if(e1.isFunction(Function.COUNT)) {
+      final Expr e = compCount(op.op);
+      if(e != this) {
+        qc.compInfo(e instanceof Bln ? OPTPRE_X : OPTREWRITE_X, this);
+        return e;
+      }
+    }
+
+    // rewrite string-length() function
+    if(e1.isFunction(Function.STRING_LENGTH)) {
+      final Expr e = compStringLength(op.op);
+      if(e != this) {
+        qc.compInfo(e instanceof Bln ? OPTPRE_X : OPTREWRITE_X, this);
+        return e;
+      }
+    }
+
+    // position() CMP expr
+    if(e1.isFunction(Function.POSITION)) {
+      final Expr e = Pos.get(op.op, e2, this, info);
+      if(e != this) {
+        qc.compInfo(OPTREWRITE_X, this);
+        return e;
+      }
+    }
+
+    // (A = false()) -> not(A)
+    if(st1.eq(SeqType.BLN) && (op == OpG.EQ && e2 == Bln.FALSE || op == OpG.NE && e2 == Bln.TRUE)) {
+      qc.compInfo(OPTREWRITE_X, this);
+      return Function.NOT.get(null, info, e1);
+    }
+
+    // rewrite expr CMP (range expression or number)
+    ParseExpr e = CmpR.get(this);
+    // rewrite expr CMP string)
+    if(e == this) e = CmpSR.get(this);
+    if(e != this) {
+      // pre-evaluate optimized expression
+      qc.compInfo(OPTREWRITE_X, this);
+      return allAreValues() ? e.preEval(qc) : e;
+    }
+
+    // choose evaluation strategy
+    final SeqType st2 = e2.seqType();
+    if(st1.zeroOrOne() && !st1.mayBeArray() && st2.zeroOrOne() && !st2.mayBeArray()) {
+      atomic = true;
+      qc.compInfo(OPTATOMIC_X, this);
+    }
+
+    // pre-evaluate values
+    if(allAreValues()) return preEval(qc);
+
+    // pre-evaluate equality test if operands are equal, deterministic, and can be compared
+    if(op == OpG.EQ && e1.sameAs(e2) && !e1.has(Flag.NDT) && !e1.has(Flag.UPD) &&
+        (!e1.has(Flag.CTX) || qc.value != null)) {
+      // currently limited to strings (function items are invalid, numbers may be NaN)
+      final SeqType st = e1.seqType();
+      if(st.oneOrMore() && st.type.isStringOrUntyped()) return optPre(Bln.TRUE, qc);
+    }
     return this;
   }
 
   @Override
-  public Expr compEbv(final QueryContext qc) {
+  public Expr optimizeEbv(final QueryContext qc, final VarScope scp) {
     // e.g.: exists(...) = true() -> exists(...)
     // checking one direction is sufficient, as operators may have been swapped
-    return (op == OpG.EQ && exprs[1] == Bln.TRUE ||
-            op == OpG.NE && exprs[1] == Bln.FALSE) &&
-      exprs[0].type().eq(SeqType.BLN) ? exprs[0] : this;
+    return (op == OpG.EQ && exprs[1] == Bln.TRUE || op == OpG.NE && exprs[1] == Bln.FALSE) &&
+      exprs[0].seqType().eq(SeqType.BLN) ? exprs[0] : this;
   }
 
   @Override
@@ -204,83 +226,78 @@ public final class CmpG extends Cmp {
       if(it1 == null) return Bln.FALSE;
       final Item it2 = exprs[1].item(qc, info);
       if(it2 == null) return Bln.FALSE;
-      return Bln.get(eval(it1, it2, coll));
+      return Bln.get(eval(it1, it2));
     }
 
-    final Iter ir1 = qc.iter(exprs[0]);
+    // retrieve iterators
+    Iter ir1 = exprs[0].atomIter(qc, info);
     final long is1 = ir1.size();
-
-    // skip empty result
     if(is1 == 0) return Bln.FALSE;
     final boolean s1 = is1 == 1;
 
-    // evaluate single items
-    if(s1 && exprs[1].size() == 1)
-      return Bln.get(eval(ir1.next(), exprs[1].item(qc, info), coll));
-
-    Iter ir2 = qc.iter(exprs[1]);
+    Iter ir2 = exprs[1].atomIter(qc, info);
     final long is2 = ir2.size();
-
-    // skip empty result
     if(is2 == 0) return Bln.FALSE;
-    final boolean s2 = is2 == 1;
 
     // evaluate single items
-    if(s1 && s2) return Bln.get(eval(ir1.next(), ir2.next(), coll));
+    final boolean s2 = is2 == 1;
+    if(s1 && s2) return Bln.get(eval(ir1.next(), ir2.next()));
 
-    // evaluate iterator and single item
-    Item it1, it2;
-    if(s2) {
-      it2 = ir2.next();
-      while((it1 = ir1.next()) != null) {
-        if(eval(it1, it2, coll)) return Bln.TRUE;
-      }
+    if(s1) {
+      // first iterator yields single result
+      final Item it1 = ir1.next();
+      for(Item it2; (it2 = ir2.next()) != null;) if(eval(it1, it2)) return Bln.TRUE;
       return Bln.FALSE;
     }
 
-    // evaluate two iterators
-    if(!ir2.reset()) {
-      // cache items for next comparisons
-      final ValueBuilder vb = new ValueBuilder();
-      it1 = ir1.next();
-      if(it1 == null) return Bln.FALSE;
-      while((it2 = ir2.next()) != null) {
-        if(eval(it1, it2, coll)) return Bln.TRUE;
-        vb.add(it2);
-      }
-      ir2 = vb;
+    if(s2) {
+      // second iterator yields single result
+      final Item it2 = ir2.next();
+      for(Item it1; (it1 = ir1.next()) != null;) if(eval(it1, it2)) return Bln.TRUE;
+      return Bln.FALSE;
     }
 
-    while((it1 = ir1.next()) != null) {
-      ir2.reset();
-      while((it2 = ir2.next()) != null) {
-        if(eval(it1, it2, coll)) return Bln.TRUE;
-      }
+    // swap iterators if first iterator returns more results than second
+    final boolean swap = is1 > is2;
+    if(swap) {
+      final Iter ir = ir1;
+      ir1 = ir2;
+      ir2 = ir;
     }
+
+    // loop through all items of first and second iterator
+    for(Item it1; (it1 = ir1.next()) != null;) {
+      if(ir2 == null) ir2 = exprs[swap ? 0 : 1].atomIter(qc, info);
+      for(Item it2; (it2 = ir2.next()) != null;) {
+        if(swap ? eval(it2, it1) : eval(it1, it2)) return Bln.TRUE;
+      }
+      ir2 = null;
+    }
+    // give up
     return Bln.FALSE;
   }
 
   /**
    * Compares a single item.
-   * @param a first item to be compared
-   * @param b second item to be compared
-   * @param cl collation
+   * @param it1 first item to be compared
+   * @param it2 second item to be compared
    * @return result of check
    * @throws QueryException query exception
    */
-  private boolean eval(final Item a, final Item b, final Collation cl) throws QueryException {
-    final Type ta = a.type, tb = b.type;
-    if(!(a instanceof FItem || b instanceof FItem) &&
-        (ta == tb || ta.isUntyped() || tb.isUntyped() ||
-        a instanceof ANum && b instanceof ANum ||
-        a instanceof AStr && b instanceof AStr)) return op.op.eval(a, b, cl, info);
-    throw Err.INVTYPECMP.get(info, ta, tb);
+  private boolean eval(final Item it1, final Item it2) throws QueryException {
+    final Type t1 = it1.type, t2 = it2.type;
+    if(!(it1 instanceof FItem || it2 instanceof FItem) &&
+        (t1 == t2 || t1.isUntyped() || t2.isUntyped() ||
+        it1 instanceof ANum && it2 instanceof ANum ||
+        it1 instanceof AStr && it2 instanceof AStr)) return op.op.eval(it1, it2, coll, sc, info);
+    throw diffError(info, it1, it2);
   }
 
   @Override
   public CmpG invert() {
-    return exprs[0].size() != 1 || exprs[1].size() != 1 ? this :
-      new CmpG(exprs[0], exprs[1], op.invert(), coll, info);
+    final Expr e1 = exprs[0], e2 = exprs[1];
+    return e1.size() != 1 || e1.seqType().mayBeArray() || e2.size() != 1 ||
+        e2.seqType().mayBeArray() ? this : new CmpG(e1, e2, op.invert(), coll, sc, info);
   }
 
   /**
@@ -288,14 +305,17 @@ public final class CmpG extends Cmp {
    * @param g general comparison
    * @param qc query context
    * @param scp variable scope
-   * @return true if union was successful
+   * @return resulting expression or {@code null}
    * @throws QueryException query exception
    */
-  boolean union(final CmpG g, final QueryContext qc, final VarScope scp) throws QueryException {
-    if(op != g.op || !exprs[0].sameAs(g.exprs[0])) return false;
-    exprs[1] = new List(info, exprs[1], g.exprs[1]).compile(qc, scp);
-    atomic = atomic && exprs[1].type().zeroOrOne();
-    return true;
+  CmpG union(final CmpG g, final QueryContext qc, final VarScope scp) throws QueryException {
+    if(op != g.op || coll != g.coll || !exprs[0].sameAs(g.exprs[0])) return null;
+
+    final Expr list = new List(info, exprs[1], g.exprs[1]).optimize(qc, scp);
+    final CmpG cmp = new CmpG(exprs[0], list, op, coll, sc, info);
+    final SeqType st = list.seqType();
+    cmp.atomic = atomic && st.zeroOrOne() && !st.mayBeArray();
+    return cmp;
   }
 
   @Override
@@ -303,63 +323,15 @@ public final class CmpG extends Cmp {
     // only equality expressions on default collation can be rewritten
     if(op != OpG.EQ || coll != null) return false;
 
-    // check if index rewriting is possible
-    if(!ii.check(exprs[0], false)) return false;
-
-    // support expressions
-    final Data data = ii.ic.data;
-    final Expr arg = exprs[1];
-    final ParseExpr root;
-    if(!arg.isValue()) {
-      /* index access is not possible if returned type is not a string or untyped; if
-         expression depends on context; or if it is non-deterministic. examples:
-         for $x in ('a', 1) return //*[text() = $x]
-         //*[text() = .]
-         //*[text() = (if(random:double() < .5) then 'X' else 'Y')]
-       */
-      if(!arg.type().type.isStringOrUntyped() || arg.has(Flag.CTX) || arg.has(Flag.NDT) ||
-          arg.has(Flag.UPD)) return false;
-
-      // estimate costs (tend to worst case)
-      ii.costs = Math.max(1, data.meta.size / 10);
-      root = new ValueAccess(info, arg, ii.text, ii.name, ii.ic);
-
-    } else {
-      // loop through all items
-      ii.costs = 0;
-      final Iter ir = arg.iter(ii.qc);
-      final ArrayList<ValueAccess> va = new ArrayList<>();
-      final TokenSet strings = new TokenSet();
-      for(Item it; (it = ir.next()) != null;) {
-        // only strings and untyped items are supported
-        if(!it.type.isStringOrUntyped()) return false;
-        // do not use index if string is empty
-        final byte[] string = it.string(info);
-        if(string.length == 0) return false;
-
-        // add only expressions that yield results and have not been requested before
-        if(!strings.contains(string)) {
-          strings.put(string);
-          final int costs = data.costs(new StringToken(ii.text, string));
-          if(costs != 0) {
-            va.add(new ValueAccess(info, it, ii.text, ii.name, ii.ic));
-            ii.costs += costs;
-          }
-        }
-      }
-      // more than one string - merge index results
-      final int vs = va.size();
-      root = vs == 1 ? va.get(0) : new Union(info, va.toArray(new ValueAccess[vs]));
-    }
-
-    ii.create(root, info, Util.info(ii.text ? OPTTXTINDEX : OPTATVINDEX, arg), false);
-    return true;
+    Expr expr1 = exprs[0];
+    final boolean tokenize = expr1 instanceof FnTokenize;
+    if(tokenize) expr1 = ((FnTokenize) expr1).input();
+    return ii.create(exprs[1], ii.type(expr1, tokenize ? IndexType.TOKEN : null), info, false);
   }
 
   @Override
-  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    final Expr a = exprs[0].copy(qc, scp, vs), b = exprs[1].copy(qc, scp, vs);
-    return new CmpG(a, b, op, coll, info);
+  public CmpG copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return new CmpG(exprs[0].copy(qc, scp, vs), exprs[1].copy(qc, scp, vs), op, coll, sc, info);
   }
 
   @Override

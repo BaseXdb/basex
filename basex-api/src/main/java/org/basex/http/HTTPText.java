@@ -3,17 +3,10 @@ package org.basex.http;
 /**
  * This class assembles texts which are used in the HTTP classes.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public interface HTTPText {
-  /** WWW-Authentication string. */
-  String WWW_AUTHENTICATE = "WWW-Authenticate";
-  /** HTTP header: Authorization. */
-  String AUTHORIZATION = "Authorization";
-  /** HTTP basic authentication. */
-  String BASIC = "Basic";
-
   /** HTTP String. */
   String HTTP = "HTTP";
   /** WEB-INF directory. */
@@ -23,10 +16,12 @@ public interface HTTPText {
   /** Path to web configuration file. */
   String WEBCONF = WEB_INF + "web.xml";
 
-  /** Error: no password. */
-  String NOPASSWD = "No username/password specified.";
+  /** Error: credentials missing. */
+  String NOUSERNAME = "No username specified.";
   /** Error: unsupported authorization method. */
-  String WHICHAUTH = "Unsupported Authorization method: %.";
+  String WHICHAUTH = "Unsupported authentication method: %.";
+  /** Error: digest authorization. */
+  String DIGESTAUTH = "Digest authentication expected.";
   /** Error message. */
   String UNEXPECTED = "Unexpected error: %";
 }

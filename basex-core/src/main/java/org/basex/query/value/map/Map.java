@@ -1,15 +1,17 @@
 package org.basex.query.value.map;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
-import static org.basex.query.util.Err.*;
 
 import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
+import org.basex.query.util.collation.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
+import org.basex.query.value.array.Array;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -20,7 +22,7 @@ import org.basex.util.*;
 /**
  * The map item.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public final class Map extends FItem {
@@ -39,7 +41,7 @@ public final class Map extends FItem {
    * @param root map
    */
   private Map(final TrieNode root) {
-    super(SeqType.ANY_MAP, new Ann());
+    super(SeqType.ANY_MAP, new AnnList());
     this.root = root;
   }
 
@@ -64,6 +66,11 @@ public final class Map extends FItem {
   }
 
   @Override
+  public void materialize(final InputInfo ii) throws QueryException {
+    root.materialize(ii);
+  }
+
+  @Override
   public int stackFrameSize() {
     return 0;
   }
@@ -71,120 +78,112 @@ public final class Map extends FItem {
   @Override
   public Item invItem(final QueryContext qc, final InputInfo ii, final Value... args)
       throws QueryException {
-    return get(args[0].item(qc, ii), ii).item(qc, ii);
+    return invValue(qc, ii, args).item(qc, ii);
   }
 
   @Override
   public Value invValue(final QueryContext qc, final InputInfo ii, final Value... args)
       throws QueryException {
-    return get(args[0].item(qc, ii), ii);
-  }
-
-  /**
-   * Checks the key item.
-   * @param it item
-   * @param ii input info
-   * @return possibly atomized item if non {@code NaN}, {@code null} otherwise
-   * @throws QueryException query exception
-   */
-  private Item key(final Item it, final InputInfo ii) throws QueryException {
-    // no empty sequence allowed
-    if(it == null) throw INVEMPTY.get(ii, description());
-
-    // function items can't be keys
-    if(it instanceof FItem) throw FIATOM.get(ii, it.type);
-
-    // NaN can't be stored as key, as it isn't equal to anything
-    if(it == Flt.NAN || it == Dbl.NAN) return null;
-
-    // untyped items are converted to strings
-   return it.type.isUntyped() ? Str.get(it.string(ii)) : it;
+    final Item key = args[0].atomItem(qc, ii);
+    if(key == null) throw EMPTYFOUND.get(ii);
+    return get(key, ii);
   }
 
   /**
    * Deletes a key from this map.
-   * @param key key to delete
+   * @param key key to delete (must not be {@code null})
    * @param ii input info
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
   public Map delete(final Item key, final InputInfo ii) throws QueryException {
-    final Item k = key(key, ii);
-    if(k == null) return this;
-
-    final TrieNode del = root.delete(k.hash(ii), k, 0, ii);
-    return del == root ? this : del != null ? new Map(del) : EMPTY;
+    final TrieNode del = root.delete(key.hash(ii), key, 0, ii);
+    return del == root ? this : del == null ? EMPTY : new Map(del);
   }
 
   /**
    * Gets the value from this map.
-   * @param key key to look for
+   * @param key key to look for (must not be {@code null})
    * @param ii input info
    * @return bound value if found, the empty sequence {@code ()} otherwise
    * @throws QueryException query exception
    */
   public Value get(final Item key, final InputInfo ii) throws QueryException {
-    final Item k = key(key, ii);
-    if(k == null) return Empty.SEQ;
-
-    final Value val = root.get(k.hash(ii), k, 0, ii);
-    return val == null ? Empty.SEQ : val;
+    final Value v = root.get(key.hash(ii), key, 0, ii);
+    return v == null ? Empty.SEQ : v;
   }
 
   /**
    * Checks if the given key exists in the map.
-   * @param k key to look for
+   * @param key key to look for (must not be {@code null})
    * @param ii input info
-   * @return {@code true()}, if the key exists, {@code false()} otherwise
+   * @return {@code true()} if the key exists, {@code false()} otherwise
    * @throws QueryException query exception
    */
-  public boolean contains(final Item k, final InputInfo ii) throws QueryException {
-    final Item key = key(k, ii);
-    return key != null && root.contains(key.hash(ii), key, 0, ii);
+  public boolean contains(final Item key, final InputInfo ii) throws QueryException {
+    return root.contains(key.hash(ii), key, 0, ii);
   }
 
   /**
    * Adds all bindings from the given map into {@code this}.
-   * @param other map to add
+   * @param map map to add
    * @param ii input info
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  public Map addAll(final Map other, final InputInfo ii) throws QueryException {
-    if(other == EMPTY) return this;
-    final TrieNode upd = root.addAll(other.root, 0, ii);
-    return upd == other.root ? other : new Map(upd);
+  public Map addAll(final Map map, final InputInfo ii) throws QueryException {
+    if(map == EMPTY) return this;
+    final TrieNode upd = root.addAll(map.root, 0, ii);
+    return upd == map.root ? map : new Map(upd);
   }
 
-  /**
-   * Checks if the map has the given type.
-   * @param t type
-   * @return {@code true} if the type fits, {@code false} otherwise
-   */
-  public boolean hasType(final MapType t) {
-    return root.hasType(t.keyType == AtomType.AAT ? null : t.keyType,
-        t.ret.eq(SeqType.ITEM_ZM) ? null : t.ret);
+  @Override
+  public boolean instanceOf(final Type tp) {
+    return tp == AtomType.ITEM || tp instanceof FuncType && instOf((FuncType) tp, false);
   }
 
   @Override
   public Map coerceTo(final FuncType ft, final QueryContext qc, final InputInfo ii,
       final boolean opt) throws QueryException {
-    if(!(ft instanceof MapType) || !hasType((MapType) ft)) throw castError(ii, ft, this);
-    return this;
+
+    if(instOf(ft, true)) return this;
+    throw castError(ii, this, ft);
   }
 
   /**
-   * Inserts the given value into this map.
-   * @param k key to insert
-   * @param v value to insert
+   * Checks if this is an instance of the specified type.
+   * @param tp type
+   * @param coerce coerce value
+   * @return result of check
+   */
+  private boolean instOf(final FuncType tp, final boolean coerce) {
+    if(tp instanceof ArrayType) return false;
+
+    final SeqType[] at = tp.argTypes;
+    if(at != null && (at.length != 1 || !at[0].one())) return false;
+
+    SeqType ret = tp.type;
+    if(tp instanceof MapType) {
+      AtomType arg = ((MapType) tp).keyType();
+      if(arg == AtomType.AAT) arg = null;
+      if(ret == null || ret.eq(SeqType.ITEM_ZM)) ret = null;
+      // map { ... } instance of function(...) as item() -> false (result may be empty sequence)
+      return (arg == null && ret == null) || root.instanceOf(arg, ret);
+    }
+    // allow coercion
+    return coerce || ret == null || ret.eq(SeqType.ITEM_ZM);
+  }
+
+  /**
+   * Puts the given value into this map and replaces existing keys.
+   * @param key key to insert (must not be {@code null})
+   * @param value value to insert
    * @param ii input info
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  public Map insert(final Item k, final Value v, final InputInfo ii) throws QueryException {
-    final Item key = key(k, ii);
-    if(key == null) return this;
-    final TrieNode ins = root.insert(key.hash(ii), key, v, 0, ii);
+  public Map put(final Item key, final Value value, final InputInfo ii) throws QueryException {
+    final TrieNode ins = root.put(key.hash(ii), key, value, 0, ii);
     return ins == root ? this : new Map(ins);
   }
 
@@ -202,7 +201,7 @@ public final class Map extends FItem {
    */
   public Value keys() {
     if(keys == null) {
-      final ValueBuilder res = new ValueBuilder(root.size);
+      final ValueBuilder res = new ValueBuilder();
       root.keys(res);
       keys = res.value();
     }
@@ -210,33 +209,48 @@ public final class Map extends FItem {
   }
 
   /**
-   * Collation of this map.
-   * @return collation
+   * All values defined in this map.
+   * @return list of keys
    */
-  public Str collation() {
-    return Str.get(COLLATIONURI);
+  public Value values() {
+    final ValueBuilder res = new ValueBuilder();
+    root.values(res);
+    return res.value();
   }
 
   /**
-   * Checks if the this map is deep-equal to the given one.
+   * Applies a function on all entries.
+   * @param func function to apply on keys and values
+   * @param qc query context
    * @param ii input info
-   * @param o other map
-   * @return result of check
+   * @return resulting value
    * @throws QueryException query exception
    */
-  public boolean deep(final InputInfo ii, final Map o) throws QueryException {
-    return root.deep(ii, o.root);
+  public Value forEach(final FItem func, final QueryContext qc, final InputInfo ii)
+      throws QueryException {
+    final ValueBuilder vb = new ValueBuilder();
+    root.forEach(vb, func, qc, ii);
+    return vb.value();
+  }
+
+  @Override
+  public boolean deep(final Item item, final InputInfo ii, final Collation coll)
+      throws QueryException {
+
+    if(item instanceof Map) return root.deep(ii, ((Map) item).root, coll);
+    return item instanceof FItem && !(item instanceof Array) && super.deep(item, ii, coll);
   }
 
   /**
    * Returns a string representation of the map.
+   * @param indent indent output
    * @param ii input info
    * @return string
    * @throws QueryException query exception
    */
-  public byte[] serialize(final InputInfo ii) throws QueryException {
+  public byte[] serialize(final boolean indent, final InputInfo ii) throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
-    string(tb, 0, ii);
+    string(indent, tb, 0, ii);
     return tb.finish();
   }
 
@@ -257,7 +271,7 @@ public final class Map extends FItem {
 
   @Override
   public String description() {
-    return BRACE1 + DOTS + BRACE2;
+    return CURLY1 + DOTS + CURLY2;
   }
 
   @Override
@@ -281,34 +295,44 @@ public final class Map extends FItem {
 
   /**
    * Returns a string representation of the map.
+   * @param indent indent output
    * @param tb token builder
    * @param level current level
    * @param ii input info
    * @throws QueryException query exception
    */
-  private void string(final TokenBuilder tb, final int level, final InputInfo ii)
-      throws QueryException {
+  public void string(final boolean indent, final TokenBuilder tb, final int level,
+      final InputInfo ii) throws QueryException {
 
-    tb.add("{");
+    tb.add("map{");
     int c = 0;
     for(final Item key : keys()) {
       if(c++ > 0) tb.add(',');
-      tb.add('\n');
-      indent(tb, level + 1);
-      tb.add(key.toString());
-      tb.add(": ");
+      if(indent) {
+        tb.add('\n');
+        indent(tb, level + 1);
+      }
+      tb.add(key.toString()).add(':');
+      if(indent) tb.add(' ');
       final Value v = get(key, ii);
-      if(v.size() != 1) tb.add('(');
+      final boolean par = v.size() != 1;
+      if(par) tb.add('(');
       int cc = 0;
       for(final Item it : v) {
-        if(cc++ > 0) tb.add(", ");
-        if(it instanceof Map) ((Map) it).string(tb, level + 1, ii);
+        if(cc++ > 0) {
+          tb.add(',');
+          if(indent) tb.add(' ');
+        }
+        if(it instanceof Map) ((Map) it).string(indent, tb, level + 1, ii);
+        else if(it instanceof Array) ((Array) it).string(indent, tb, level, ii);
         else tb.add(it.toString());
       }
-      if(v.size() != 1) tb.add(')');
+      if(par) tb.add(')');
     }
-    tb.add('\n');
-    indent(tb, level);
+    if(indent) {
+      tb.add('\n');
+      indent(tb, level);
+    }
     tb.add('}');
   }
 
@@ -322,16 +346,16 @@ public final class Map extends FItem {
   }
 
   @Override
+  public Expr inlineExpr(final Expr[] exprs, final QueryContext qc, final VarScope scp,
+      final InputInfo ii) {
+    return null;
+  }
+
+  @Override
   public String toString() {
     final StringBuilder sb = root.toString(new StringBuilder(MAPSTR).append(" { "));
     // remove superfluous comma
     if(root.size > 0) sb.deleteCharAt(sb.length() - 2);
     return sb.append('}').toString();
-  }
-
-  @Override
-  public Expr inlineExpr(final Expr[] exprs, final QueryContext qc, final VarScope scp,
-      final InputInfo ii) {
-    return null;
   }
 }

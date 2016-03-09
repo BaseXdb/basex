@@ -1,41 +1,43 @@
 package org.basex.build;
 
+import static org.basex.core.Text.*;
+
 import java.io.*;
 
-import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.io.*;
+import org.basex.util.*;
 
 /**
  * This class creates a database instance in main memory.
  * The storage layout is described in the {@link Data} class.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class MemBuilder extends Builder {
   /** Data reference. */
   private MemData data;
-
+  /** Debug counter. */
+  private int c;
 
   /**
    * Constructor.
-   * @param nm name of database
+   * @param name name of database
    * @param parse parser
    */
-  public MemBuilder(final String nm, final Parser parse) {
-    super(nm, parse);
+  public MemBuilder(final String name, final Parser parse) {
+    super(name, parse);
   }
 
   /**
    * Builds a main memory database instance.
    * @param input input
-   * @param context database context
    * @return data database instance
    * @throws IOException I/O exception
    */
-  public static MemData build(final IO input, final Context context) throws IOException {
-    return build(Parser.xmlParser(input, context.options));
+  public static MemData build(final IO input) throws IOException {
+    return build(Parser.xmlParser(input));
   }
 
   /**
@@ -45,7 +47,7 @@ public final class MemBuilder extends Builder {
    * @throws IOException I/O exception
    */
   public static MemData build(final Parser parser) throws IOException {
-    return build(parser.src.dbname(), parser);
+    return build(parser.source.dbname(), parser);
   }
 
   /**
@@ -61,37 +63,37 @@ public final class MemBuilder extends Builder {
 
   @Override
   public MemData build() throws IOException {
+    dataClip();
+    return data;
+  }
+
+  @Override
+  public DataClip dataClip() throws IOException {
     init();
+    meta.assign(parser);
     try {
+      final Performance perf = Prop.debug ? new Performance() : null;
+      Util.debug(tit() + DOTS);
       parse();
+      if(Prop.debug) Util.errln(" " + perf + " (" + Performance.getMemory() + ')');
+
     } catch(final IOException ex) {
-      try { close(); } catch(final IOException ignored) { }
+      try { close(); } catch(final IOException ignore) { }
       throw ex;
     }
     close();
-    return data;
+    return new DataClip(data);
   }
 
   /**
    * Initializes the builder.
    */
   public void init() {
-    data = new MemData(path, ns, parser.options);
-
-    final MetaData md = data.meta;
-    md.name = dbname;
-    // all contents will be indexed in main memory mode
-    md.createtext = true;
-    md.createattr = true;
-    md.textindex = true;
-    md.attrindex = true;
-    final IO file = parser.src;
-    md.original = file != null ? file.path() : "";
-    md.filesize = file != null ? file.length() : 0;
-    md.time = file != null ? file.timeStamp() : System.currentTimeMillis();
+    data = new MemData(path, nspaces, parser.options);
     meta = data.meta;
-    tags = data.tagindex;
-    atts = data.atnindex;
+    meta.name = dbname;
+    elemNames = data.elemNames;
+    attrNames = data.attrNames;
     path.data(data);
   }
 
@@ -106,30 +108,33 @@ public final class MemBuilder extends Builder {
   @Override
   public void close() throws IOException {
     parser.close();
+    if(data.meta.updindex) data.idmap.finish(data.meta.lastid);
   }
 
   @Override
   protected void addDoc(final byte[] value) {
-    data.doc(meta.size, 0, value);
+    data.doc(0, value);
     data.insert(meta.size);
   }
 
   @Override
-  protected void addElem(final int dist, final int nm, final int asize, final int uri,
+  protected void addElem(final int dist, final int nameId, final int asize, final int uriId,
       final boolean ne) {
-    data.elem(dist, nm, asize, asize, uri, ne);
+    data.elem(dist, nameId, asize, asize, uriId, ne);
     data.insert(meta.size);
+
+    if(Prop.debug && (c++ & 0x7FFFF) == 0) Util.err(".");
   }
 
   @Override
-  protected void addAttr(final int nm, final byte[] value, final int dist, final int uri) {
-    data.attr(meta.size, dist, nm, value, uri, false);
+  protected void addAttr(final int nameId, final byte[] value, final int dist, final int uriId) {
+    data.attr(dist, nameId, value, uriId);
     data.insert(meta.size);
   }
 
   @Override
   protected void addText(final byte[] value, final int dist, final byte kind) {
-    data.text(meta.size, dist, value, kind);
+    data.text(dist, value, kind);
     data.insert(meta.size);
   }
 

@@ -1,7 +1,9 @@
 package org.basex.query.var;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
+
 import org.basex.query.*;
+import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -14,10 +16,10 @@ import org.basex.util.hash.*;
 /**
  * Reference to a static variable.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
-public final class StaticVarRef extends ParseExpr {
+final class StaticVarRef extends ParseExpr {
   /** Variable name. */
   private final QNm name;
   /** Referenced variable. */
@@ -31,7 +33,7 @@ public final class StaticVarRef extends ParseExpr {
    * @param name variable name
    * @param sc static context
    */
-  public StaticVarRef(final InputInfo info, final QNm name, final StaticContext sc) {
+  StaticVarRef(final InputInfo info, final QNm name, final StaticContext sc) {
     super(info);
     this.name = name;
     this.sc = sc;
@@ -44,8 +46,8 @@ public final class StaticVarRef extends ParseExpr {
   @Override
   public Expr compile(final QueryContext qc, final VarScope o) throws QueryException {
     var.compile(qc);
-    type = var.type();
-    return var.value != null ? var.value : this;
+    seqType = var.seqType();
+    return var.val != null ? var.val : this;
   }
 
   @Override
@@ -97,7 +99,7 @@ public final class StaticVarRef extends ParseExpr {
   }
 
   @Override
-  public Expr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e) {
+  public Expr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr ex) {
     return null;
   }
 
@@ -111,9 +113,9 @@ public final class StaticVarRef extends ParseExpr {
    * @param vr variable
    * @throws QueryException query exception
    */
-  public void init(final StaticVar vr) throws QueryException {
-    if(vr.ann.contains(Ann.Q_PRIVATE) && !Token.eq(sc.baseURI().string(),
-       vr.sc.baseURI().string())) throw VARPRIVATE.get(info, vr);
+  void init(final StaticVar vr) throws QueryException {
+    if(vr.anns.contains(Annotation.PRIVATE) && !sc.baseURI().eq(vr.sc.baseURI()))
+      throw VARPRIVATE_X.get(info, vr);
     var = vr;
   }
 }

@@ -5,12 +5,12 @@ import static org.junit.Assert.*;
 import java.io.*;
 import java.lang.reflect.*;
 
+import org.basex.*;
 import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
 import org.basex.io.random.*;
-import org.basex.*;
 import org.basex.util.*;
 import org.junit.*;
 import org.junit.Test;
@@ -18,7 +18,7 @@ import org.junit.Test;
 /**
  * This class tests the update functionality of the block storage.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Tim Petrowsky
  */
 public final class DiskTableTest extends SandboxTest {
@@ -43,8 +43,8 @@ public final class DiskTableTest extends SandboxTest {
    */
   @BeforeClass
   public static void setUpBeforeClass() {
-    context.options.set(MainOptions.TEXTINDEX, false);
-    context.options.set(MainOptions.ATTRINDEX, false);
+    set(MainOptions.TEXTINDEX, false);
+    set(MainOptions.ATTRINDEX, false);
   }
 
   /**
@@ -53,8 +53,8 @@ public final class DiskTableTest extends SandboxTest {
    */
   @Before
   public void setUp() throws Exception {
-    final Parser parser = Parser.xmlParser(IO.get(TESTFILE), context.options);
-    data = new DiskBuilder(NAME, parser, context).build();
+    final Parser parser = Parser.xmlParser(IO.get(TESTFILE));
+    data = new DiskBuilder(NAME, parser, context.soptions, context.options).build();
     size = data.meta.size;
     data.close();
     tda = new TableDiskAccess(data.meta, true);
@@ -75,7 +75,7 @@ public final class DiskTableTest extends SandboxTest {
   @After
   public void tearDown() throws Exception {
     if(tda != null) tda.close();
-    DropDB.drop(NAME, context);
+    DropDB.drop(NAME, context.soptions);
   }
 
   /**
@@ -346,8 +346,9 @@ public final class DiskTableTest extends SandboxTest {
    * @return byte array containing the number of entries (all bytes 5)
    */
   private static byte[] getTestEntries(final int e) {
-    final byte[] result = new byte[e << IO.NODEPOWER];
-    for(int i = 0; i < result.length; ++i) result[i] = 5;
+    final int rl = e << IO.NODEPOWER;
+    final byte[] result = new byte[rl];
+    for(int r = 0; r < rl; ++r) result[r] = 5;
     return result;
   }
 }

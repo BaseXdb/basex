@@ -1,20 +1,19 @@
 package org.basex.query.value.item;
 
-import static java.lang.Double.*;
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 
 import java.math.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.util.*;
+import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
  * Float item ({@code xs:float}).
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Flt extends ANum {
@@ -43,17 +42,17 @@ public final class Flt extends ANum {
    */
   public static Flt get(final float value) {
     return value == 0 && Float.floatToRawIntBits(value) == 0 ? ZERO : value == 1 ? ONE :
-      isNaN(value) ? NAN : new Flt(value);
+      Float.isNaN(value) ? NAN : new Flt(value);
   }
 
   @Override
-  public byte[] string() {
+  protected byte[] string() {
     return Token.token(value);
   }
 
   @Override
   public boolean bool(final InputInfo ii) {
-    return !isNaN(value) && value != 0;
+    return !Float.isNaN(value) && value != 0;
   }
 
   @Override
@@ -73,21 +72,43 @@ public final class Flt extends ANum {
 
   @Override
   public BigDecimal dec(final InputInfo ii) throws QueryException {
-    return Dec.parse(value, ii);
+    if(Float.isNaN(value) || Float.isInfinite(value)) throw valueError(ii, AtomType.DEC, string());
+    return new BigDecimal(value);
   }
 
   @Override
-  public boolean eq(final Item it, final Collation coll, final InputInfo ii)
-      throws QueryException {
-    return it.type == AtomType.DBL ? it.eq(this, coll, ii) : value == it.flt(ii);
+  public Flt abs() {
+    return value > 0d || 1 / value > 0 ? this : get(-value);
   }
 
   @Override
-  public int diff(final Item it, final Collation coll, final InputInfo ii)
-      throws QueryException {
-    final double n = it.flt(ii);
-    if(isNaN(n) || isNaN(value)) return UNDEF;
-    return value < n ? -1 : value > n ? 1 : 0;
+  public Flt ceiling() {
+    final float v = (float) Math.ceil(value);
+    return v == value ? this : get(v);
+  }
+
+  @Override
+  public Flt floor() {
+    final float v = (float) Math.floor(value);
+    return v == value ? this : get(v);
+  }
+
+  @Override
+  public Flt round(final int scale, final boolean even) {
+    final float v = Dbl.get(value).round(scale, even).flt();
+    return value == v ? this : get(v);
+  }
+
+  @Override
+  public boolean eq(final Item it, final Collation coll, final StaticContext sc,
+      final InputInfo ii) throws QueryException {
+    return it.type == AtomType.DBL ? it.eq(this, coll, sc, ii) : value == it.flt(ii);
+  }
+
+  @Override
+  public int diff(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
+    final float n = it.flt(ii);
+    return Float.isNaN(n) || Float.isNaN(value) ? UNDEF : value < n ? -1 : value > n ? 1 : 0;
   }
 
   @Override
@@ -97,24 +118,24 @@ public final class Flt extends ANum {
 
   @Override
   public boolean sameAs(final Expr cmp) {
-    return cmp instanceof Flt && value == ((Flt) cmp).value ||
-      this == NAN && cmp == NAN;
+    return cmp instanceof Flt && value == ((Flt) cmp).value || this == NAN && cmp == NAN;
   }
 
   /**
-   * Converts the given token into a double value.
+   * Converts the given token into a float value.
    * @param value value to be converted
    * @param ii input info
-   * @return double value
+   * @return float value
    * @throws QueryException query exception
    */
   static float parse(final byte[] value, final InputInfo ii) throws QueryException {
     try {
       return Float.parseFloat(Token.string(value));
     } catch(final NumberFormatException ex) {
-      if(Token.eq(Token.trim(value), Token.INF)) return Float.POSITIVE_INFINITY;
-      if(Token.eq(Token.trim(value), Token.NINF)) return Float.NEGATIVE_INFINITY;
-      throw FUNCAST.get(ii, ZERO.type, chop(value));
+      final byte[] v = Token.trim(value);
+      if(Token.eq(v, Token.INF)) return Float.POSITIVE_INFINITY;
+      if(Token.eq(v, Token.NINF)) return Float.NEGATIVE_INFINITY;
+      throw funCastError(ii, AtomType.FLT, value);
     }
   }
 }

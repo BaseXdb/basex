@@ -1,21 +1,20 @@
 package org.basex.io.parse.json;
 
 import static org.basex.io.parse.json.JsonConstants.*;
-import static org.basex.util.Token.*;
 
-import org.basex.build.*;
+import org.basex.build.json.*;
 import org.basex.query.value.node.*;
 
 /**
  * This class converts a JSON document to a XML structure. JSON keys will be stored in attributes.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  * @author Leo Woerteler
  */
 public final class JsonAttsConverter extends JsonXmlConverter {
   /** Current name of a pair. */
-  private byte[] name;
+  private byte[] nm;
 
   /**
    * Constructor.
@@ -31,16 +30,18 @@ public final class JsonAttsConverter extends JsonXmlConverter {
   }
 
   @Override
-  void openPair(final byte[] n) {
-    final FElem e = new FElem(PAIR).add(NAME, n);
-    elem.add(e);
-    elem = e;
-    name = n;
+  void openPair(final byte[] name, final boolean add) {
+    if(add) {
+      final FElem e = new FElem(PAIR).add(NAME, name);
+      curr.add(e);
+      curr = e;
+      nm = name;
+    }
   }
 
   @Override
-  void closePair() {
-    elem = (FElem) elem.parent();
+  void closePair(final boolean add) {
+    if(add) curr = (FElem) curr.parent();
   }
 
   @Override
@@ -50,47 +51,23 @@ public final class JsonAttsConverter extends JsonXmlConverter {
   @Override
   void openArray() {
     addType(ARRAY);
-    name = null;
+    nm = null;
   }
 
   @Override
   void openItem() {
     final FElem e = new FElem(ITEM);
-    elem.add(e);
-    elem = e;
+    curr.add(e);
+    curr = e;
   }
 
   @Override
   void closeItem() {
-    elem = (FElem) elem.parent();
+    curr = (FElem) curr.parent();
   }
 
   @Override
   void closeArray() {
-  }
-
-  @Override
-  public void openConstr(final byte[] nm) {
-    openObject();
-    openPair(nm);
-    openArray();
-  }
-
-  @Override
-  public void openArg() {
-    openItem();
-  }
-
-  @Override
-  public void closeArg() {
-    closeItem();
-  }
-
-  @Override
-  public void closeConstr() {
-    closeArray();
-    closePair();
-    closeObject();
   }
 
   @Override
@@ -120,7 +97,7 @@ public final class JsonAttsConverter extends JsonXmlConverter {
    */
   private FElem addType(final byte[] type) {
     final FElem e = element();
-    addType(e, name, type);
+    addType(e, nm, type);
     return e;
   }
 }

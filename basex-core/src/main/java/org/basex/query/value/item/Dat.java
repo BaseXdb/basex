@@ -1,7 +1,7 @@
 package org.basex.query.value.item;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
-import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
 import org.basex.query.value.type.*;
@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * Date item ({@code xs:date}).
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Dat extends ADate {
@@ -48,7 +48,7 @@ public final class Dat extends ADate {
     this(value);
     if(dur instanceof DTDur) {
       calc((DTDur) dur, plus);
-      if(yea <= MIN_YEAR || yea > MAX_YEAR) throw YEARRANGE.get(ii, yea);
+      if(yea <= MIN_YEAR || yea > MAX_YEAR) throw YEARRANGE_X.get(ii, yea);
     } else {
       calc((YMDur) dur, plus, ii);
     }
@@ -56,9 +56,9 @@ public final class Dat extends ADate {
   }
 
   @Override
-  public void timeZone(final DTDur tz, final boolean spec, final InputInfo ii)
+  public void timeZone(final DTDur zone, final boolean spec, final InputInfo ii)
       throws QueryException {
-    tz(tz, spec, ii);
+    tz(zone, spec, ii);
     clean();
   }
 

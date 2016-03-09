@@ -2,12 +2,10 @@ package org.basex.build;
 
 import static org.junit.Assert.*;
 
-import java.io.*;
-
+import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
-import org.basex.*;
 import org.basex.util.*;
 import org.junit.*;
 import org.junit.Test;
@@ -15,7 +13,7 @@ import org.junit.Test;
 /**
  * Tests adding files/folders/zip files/urls to collections.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Michael Seiferle
  */
 public final class AddDeleteTest extends SandboxTest {
@@ -49,20 +47,18 @@ public final class AddDeleteTest extends SandboxTest {
 
   /**
    * Creates a database.
-   * @throws BaseXException exception
    */
   @Before
-  public void setUp() throws BaseXException {
-    new CreateDB(NAME).execute(context);
+  public void setUp() {
+    execute(new CreateDB(NAME));
   }
 
   /**
    * Drops the database.
-   * @throws BaseXException exception
    */
   @After
-  public void tearDown() throws BaseXException {
-    new DropDB(NAME).execute(context);
+  public void tearDown() {
+    execute(new DropDB(NAME));
   }
 
   /**
@@ -70,114 +66,121 @@ public final class AddDeleteTest extends SandboxTest {
    * <li> with name and w/o target</li>
    * <li> with name and target set</li>
    * <li> w/o name and target set</li></ol>
-   * @throws BaseXException database exception
    */
   @Test
-  public void addXMLString() throws BaseXException {
-    new Add("index.xml", XMLFRAG).execute(context);
+  public void addXMLString() {
+    execute(new Add("index.xml", XMLFRAG));
     assertEquals(1, docs());
-    new Add("a/b/c/index2.xml", XMLFRAG).execute(context);
+    execute(new Add("a/b/c/index2.xml", XMLFRAG));
     assertEquals(2, docs());
-    new Add("a/d/c", XMLFRAG).execute(context);
+    execute(new Add("a/d/c", XMLFRAG));
     assertEquals(3, docs());
   }
 
   /**
    * Adds a single file to the database.
-   * @throws BaseXException exception
    */
   @Test
-  public void addFile() throws BaseXException {
-    new Add(null, FILE).execute(context);
+  public void addFile() {
+    execute(new Add(null, FILE));
     assertEquals(1, docs());
   }
 
   /**
    * Adds a zip file.
-   * @throws BaseXException exception
    */
   @Test
-  public void addZip() throws BaseXException {
-    new Add("target", ZIPFILE).execute(context);
+  public void addZip() {
+    execute(new Add("target", ZIPFILE));
     assertEquals(4, docs());
+
     // do not add archives
-    new Set(MainOptions.ADDARCHIVES, false).execute(context);
-    new Add("", ZIPFILE).execute(context);
-    assertEquals(4, docs());
-    new Set(MainOptions.ADDARCHIVES, true).execute(context);
+    try {
+      set(MainOptions.ADDARCHIVES, false);
+      execute(new Add("", ZIPFILE));
+      assertEquals(4, docs());
+    } finally {
+      set(MainOptions.ADDARCHIVES, true);
+    }
+
+    // prefix database path with name of archive
+    try {
+      set(MainOptions.ARCHIVENAME, true);
+      execute(new Add("", ZIPFILE));
+      assertEquals(4, context.data().resources.docs("xml.zip/").size());
+      execute(new Add("", GZIPFILE));
+      assertEquals(1, context.data().resources.docs("xml.gz/").size());
+    } finally {
+      set(MainOptions.ARCHIVENAME, false);
+    }
   }
 
   /**
    * Adds/deletes a GZIP file.
-   * @throws BaseXException exception
    */
   @Test
-  public void addGzip() throws BaseXException {
-    new Add("", GZIPFILE).execute(context);
-    new Add("bar", GZIPFILE).execute(context);
-    new Delete("bar").execute(context);
+  public void addGzip() {
+    execute(new Add("", GZIPFILE));
+    execute(new Add("bar", GZIPFILE));
+    execute(new Delete("bar"));
     assertEquals(1, docs());
   }
 
   /**
    * Adds a folder. The contained a zip file is added as well.
-   * @throws BaseXException exception
    */
   @Test
-  public void addFolder() throws BaseXException {
-    new Add("", FLDR).execute(context);
+  public void addFolder() {
+    execute(new Add("", FLDR));
     assertEquals(NFLDR, docs());
   }
 
   /**
    * Adds/deletes with target.
-   * @throws BaseXException exception
    */
   @Test
-  public void deletePath() throws BaseXException {
-    new Add("foo/pub", FLDR).execute(context);
+  public void deletePath() {
+    execute(new Add("foo/pub", FLDR));
     assertEquals(NFLDR, docs());
-    new Delete("foo").execute(context);
+    execute(new Delete("foo"));
     assertEquals(0, docs());
-    new Add("/foo///bar////", FILE).execute(context);
-    new Add("foobar", FLDR).execute(context);
-    new Delete("foo").execute(context);
+    execute(new Add("/foo///bar////", FILE));
+    execute(new Add("foobar", FLDR));
+    execute(new Delete("foo"));
     assertEquals(NFLDR, docs());
   }
 
   /**
    * Adds/deletes a file/folder.
-   * @throws BaseXException exception
    */
   @Test
-  public void addFoldersDeleteFiles() throws BaseXException {
-    new Add("folder", FLDR).execute(context);
-    new Add("", FILE).execute(context);
-    new Delete("input.xml").execute(context);
-    new Delete("folder/input.xml").execute(context);
+  public void addFoldersDeleteFiles() {
+    execute(new Add("folder", FLDR));
+    execute(new Add("", FILE));
+    execute(new Delete("input.xml"));
+    execute(new Delete("folder/input.xml"));
     assertEquals(NFLDR - 1, docs());
   }
 
   /**
    * Adds/deletes with target.
-   * @throws BaseXException exception
    */
   @Test
-  public void createDeleteAdd() throws BaseXException {
-    new CreateDB(NAME, "<a/>").execute(context);
-    new Delete("/").execute(context);
+  public void createDeleteAdd() {
+    execute(new CreateDB(NAME, "<a/>"));
+    execute(new Delete("/"));
     assertEquals(0, docs());
     final StringBuilder sb = new StringBuilder();
     for(int i = 0; i < 256; i++) sb.append("<a").append(i).append("/>");
-    new Add("x", "<x>" + sb + "</x>").execute(context);
+    execute(new Add("x", "<x>" + sb + "</x>"));
     assertEquals(1, docs());
-    assertEquals("1", new XQuery("count(//x)").execute(context));
-    assertEquals("0", new XQuery("count(//a)").execute(context));
+    assertEquals("1", query("count(//x)"));
+    assertEquals("0", query("count(//a)"));
   }
 
   /**
    * Adds a non-existent file.
-   * @throws BaseXException expected.
+   * @throws BaseXException database exception
    */
   @Test(expected = BaseXException.class)
   public void addFileFail() throws BaseXException {
@@ -187,23 +190,22 @@ public final class AddDeleteTest extends SandboxTest {
   /**
    * Adds a broken input file to the database and checks if the file can be
    * deleted afterwards.
-   * @throws Exception exception
    */
   @Test
-  public void addCorrupt() throws Exception {
+  public void addCorrupt() {
     final IOFile io = new IOFile(TEMP);
-    io.write(Token.token("<x"));
+    write(io, "<x");
     try {
       new Add("", io.path()).execute(context);
       fail("Broken file was added to the database.");
-    } catch(final Exception ignored) { }
+    } catch(final BaseXException ignored) { }
 
     assertTrue(io.delete());
   }
 
   /**
    * Creates a database from a broken input.
-   * @throws BaseXException exception
+   * @throws BaseXException database exception
    */
   @Test(expected = BaseXException.class)
   public void createCorrupt() throws BaseXException {
@@ -212,41 +214,37 @@ public final class AddDeleteTest extends SandboxTest {
 
   /**
    * Creates a database from a broken input file.
-   * @throws IOException exception
+   * @throws BaseXException database exception
    */
   @Test(expected = BaseXException.class)
-  public void createCorruptFromFile() throws IOException {
+  public void createCorruptFromFile() throws BaseXException {
     final IOFile io = new IOFile(TEMP);
-    io.write(Token.token("<x"));
-    try {
-      new CreateDB(NAME, io.path()).execute(context);
-    } finally {
-      io.delete();
-    }
+    write(io, "<x");
+    new CreateDB(NAME, io.path()).execute(context);
   }
 
   /**
    * Skips a corrupt file.
-   * @throws Exception exception
    */
   @Test
-  public void skipCorrupt() throws Exception {
+  public void skipCorrupt() {
     final IOFile io = new IOFile(TEMP);
-    io.write(Token.token("<x"));
+    write(io, "<x");
 
-    new Set(MainOptions.SKIPCORRUPT, true).execute(context);
-    assertEquals(0, context.data().resources.docs("").size());
-    new Add("x", "<x").execute(context);
-    new Add("x", CORRUPT).execute(context);
-    assertEquals(0, context.data().resources.docs("").size());
-    new Set(MainOptions.SKIPCORRUPT, false).execute(context);
+    try {
+      set(MainOptions.SKIPCORRUPT, true);
+      assertEquals(0, docs());
+      execute(new Add("x", "<x"));
+      execute(new Add("x", CORRUPT));
+      assertEquals(0, docs());
+    } finally {
+      set(MainOptions.SKIPCORRUPT, false);
+    }
 
     try {
       new Add("", "<x").execute(context);
       fail("Broken file was added to the database.");
-    } catch(final Exception ignored) { }
-
-    assertTrue(io.delete());
+    } catch(final BaseXException ignored) { }
   }
 
   /**

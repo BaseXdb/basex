@@ -9,7 +9,7 @@ import org.basex.*;
  * This class is a simple example to demonstrate the REST implementation.
  * It shows the function of the HTTP DELETE method.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  */
 public final class RESTPost {
   /**
@@ -27,7 +27,6 @@ public final class RESTPost {
     String request =
       "<query xmlns='http://basex.org/rest'>\n" +
       "  <text>(//city/name)[position() le 3]</text>\n" +
-      "  <parameter name='wrap' value='yes'/>\n" +
       "</query>";
     System.out.println("\n* Query:\n" + request);
 

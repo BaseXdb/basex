@@ -9,7 +9,7 @@ import org.basex.util.*;
  * report "A Fast and Simple Stemming Algorithm for German Words" by
  * J&ouml;rg Caumanns.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class GermanStemmer extends InternalStemmer {
@@ -25,7 +25,7 @@ final class GermanStemmer extends InternalStemmer {
   }
 
   @Override
-  Stemmer get(final Language l, final FTIterator fti) {
+  Stemmer get(final Language lang, final FTIterator fti) {
     return new GermanStemmer(fti);
   }
 
@@ -105,12 +105,9 @@ final class GermanStemmer extends InternalStemmer {
    */
   private TokenBuilder strip(final TokenBuilder tb) {
     while(tb.size() > 3) {
-      final int tl = tb.size();
-      final int c1 = tb.get(tl - 1);
-      final int c2 = tb.get(tl - 2);
-      if(tl + subst > 5 && c2 == 'n' && c1 == 'd') {
-        tb.size(tl - 2);
-      } else if(tl + subst > 4 && c2 == 'e' && (c1 == 'm' || c1 == 'r')) {
+      final int tl = tb.size(), c1 = tb.get(tl - 1), c2 = tb.get(tl - 2);
+      if(tl + subst > 5 && c2 == 'n' && c1 == 'd' ||
+         tl + subst > 4 && c2 == 'e' && (c1 == 'm' || c1 == 'r')) {
         tb.size(tl - 2);
       } else if(c1 == 'e' || c1 == 's' || c1 == 'n' || c1 == 't') {
         tb.size(tl - 1);
@@ -134,7 +131,7 @@ final class GermanStemmer extends InternalStemmer {
       strip(tb);
     }
     tl = tb.size();
-    if(tb.get(tl - 1) == 'z') tb.set(tl - 1, (byte) 'x');
+    if(tl > 0 && tb.get(tl - 1) == 'z') tb.set(tl - 1, (byte) 'x');
     return tb;
   }
 
@@ -175,9 +172,8 @@ final class GermanStemmer extends InternalStemmer {
    * @return token builder
    */
   private static TokenBuilder part(final TokenBuilder tb) {
-    for(int c = 0; c < tb.size() - 4; c++) {
-      if(tb.get(c) == 'g' && tb.get(c + 1) == 'e' &&
-          tb.get(c + 2) == 'g' && tb.get(c + 3) == 'e') {
+    for(int c = 0; c < tb.size() - 3; c++) {
+      if(tb.get(c) == 'g' && tb.get(c + 1) == 'e' && tb.get(c + 2) == 'g' && tb.get(c + 3) == 'e') {
         tb.delete(c, 2);
         break;
       }

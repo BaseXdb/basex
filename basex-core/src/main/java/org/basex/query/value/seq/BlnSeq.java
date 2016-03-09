@@ -9,9 +9,9 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 
 /**
- * Sequence of items of type {@link Int xs:boolean}, containing at least two of them.
+ * Sequence of items of type {@link Bln xs:boolean}, containing at least two of them.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class BlnSeq extends NativeSeq {
@@ -42,14 +42,6 @@ public final class BlnSeq extends NativeSeq {
     return values;
   }
 
-  @Override
-  public Value reverse() {
-    final int s = values.length;
-    final boolean[] tmp = new boolean[s];
-    for(int l = 0, r = s - 1; l < s; l++, r--) tmp[l] = values[r];
-    return get(tmp);
-  }
-
   // STATIC METHODS =====================================================================
 
   /**
@@ -58,26 +50,24 @@ public final class BlnSeq extends NativeSeq {
    * @return value
    */
   public static Value get(final boolean[] items) {
-    return items.length == 0 ? Empty.SEQ : items.length == 1 ?
-        Bln.get(items[0]) : new BlnSeq(items);
+    return items.length == 0 ? Empty.SEQ : items.length == 1 ? Bln.get(items[0]) :
+      new BlnSeq(items);
   }
 
   /**
    * Creates a sequence with the items in the specified expressions.
-   * @param vals values
+   * @param values values
    * @param size size of resulting sequence
    * @return value
    * @throws QueryException query exception
    */
-  public static Value get(final Value[] vals, final int size) throws QueryException {
+  public static Value get(final Value[] values, final int size) throws QueryException {
     final boolean[] tmp = new boolean[size];
     int t = 0;
-    for(final Value val : vals) {
+    for(final Value val : values) {
       // speed up construction, depending on input
       final int vs = (int) val.size();
-      if(val instanceof Item) {
-        tmp[t++] = ((Item) val).bool(null);
-      } else if(val instanceof BlnSeq) {
+      if(val instanceof BlnSeq) {
         final BlnSeq sq = (BlnSeq) val;
         System.arraycopy(sq.values, 0, tmp, t, vs);
         t += vs;

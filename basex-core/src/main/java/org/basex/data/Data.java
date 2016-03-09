@@ -2,20 +2,19 @@ package org.basex.data;
 
 import static org.basex.util.Token.*;
 
+import java.io.*;
 import java.util.*;
-import java.util.List;
 
-import org.basex.core.cmd.*;
-import org.basex.data.atomic.*;
+import org.basex.core.*;
 import org.basex.index.*;
 import org.basex.index.name.*;
 import org.basex.index.path.*;
 import org.basex.index.query.*;
 import org.basex.index.resource.*;
+import org.basex.index.value.*;
 import org.basex.io.*;
 import org.basex.io.random.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -40,7 +39,7 @@ import org.basex.util.list.*;
  * - Byte  8-11:  SIZE: Number of descendants
  * ELEMENT NODES (kind = 1):
  * - Byte     0:  ATTS: Number of attributes (bits: 7-3).
- *                      Calculated in real-time, if bit range is too small
+ *                      Calculated in real-time if bit range is too small
  * - Byte  1- 2:  NAME: Namespace Flag (bit: 15), Name (bits: 14-0)
  * - Byte     3:  NURI: Namespace URI
  * - Byte  4- 7:  DIST: Distance to parent node
@@ -50,7 +49,7 @@ import org.basex.util.list.*;
  * - Byte  8-11:  DIST: Distance to parent node
  * ATTRIBUTE NODES (kind = 3):
  * - Byte     0:  DIST: Distance to parent node (bits: 7-3)
- *                      Calculated in real-time, if bit range is too small
+ *                      Calculated in real-time if bit range is too small
  * - Byte  1- 2:  NAME: Namespace Flag (bit: 15), Name (bits: 14-0)
  * - Byte  3- 7:  TEXT: Attribute value reference
  * - Byte    11:  NURI: Namespace (bits: 7-3)
@@ -63,7 +62,7 @@ import org.basex.util.list.*;
  * NOTE: the class is not thread-safe. It is imperative that all read/write accesses
  * are synchronized over a single context's read/write lock.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class Data {
@@ -83,30 +82,45 @@ public abstract class Data {
   /** Resource index. */
   public final Resources resources = new Resources(this);
   /** Meta data. */
-  public MetaData meta;
-  /** Tag index. */
-  public Names tagindex;
-  /** Attribute name index. */
-  public Names atnindex;
+  public final MetaData meta;
+
+  /** Element names. */
+  public Names elemNames;
+  /** Attribute names. */
+  public Names attrNames;
   /** Namespace index. */
   public Namespaces nspaces;
-  /** Path summary index. */
-  public PathSummary paths;
+  /** Path index. */
+  public PathIndex paths;
   /** Text index. */
-  public Index txtindex;
+  public ValueIndex textIndex;
   /** Attribute value index. */
-  public Index atvindex;
-  /** Full-text index instance. */
-  public Index ftxindex;
-  /** Number of current database users. */
-  public int pins = 1;
+  public ValueIndex attrIndex;
+  /** Token index. */
+  public ValueIndex tokenIndex;
+  /** Full-text index. */
+  public ValueIndex ftIndex;
+
+  /** Indicates if distances are to be updated. */
+  public boolean updateDists = true;
+  /** ID->PRE mapping. */
+  public IdPreMap idmap;
 
   /** Table access file. */
-  TableAccess table;
-  /** ID->PRE mapping. */
-  IdPreMap idmap;
-  /** States if distance caching is active. */
-  public boolean cache;
+  protected TableAccess table;
+
+  /**
+   * Default constructor.
+   * @param meta meta data
+   */
+  protected Data(final MetaData meta) {
+    this.meta = meta;
+  }
+
+  /**
+   * Unpins the database.
+   */
+  public abstract void unpin();
 
   /**
    * Closes the database.
@@ -114,29 +128,39 @@ public abstract class Data {
   public abstract void close();
 
   /**
-   * Closes the specified index.
-   * @param type index to be closed
+   * Drops the specified index.
+   * @param type index to be dropped
+   * @param cmd calling command
+   * @throws IOException I/O exception
    */
-  public abstract void closeIndex(IndexType type);
+  public abstract void createIndex(IndexType type, Command cmd) throws IOException;
 
   /**
-   * Assigns the specified index.
-   * @param type index to be opened
-   * @param index index instance
+   * Drops the specified index.
+   * @param type index to be dropped
+   * @throws IOException I/O exceptions
    */
-  public abstract void setIndex(IndexType type, Index index);
+  public abstract void dropIndex(IndexType type) throws IOException;
 
   /**
    * Starts an update operation: writes a file to disk to indicate that an update is
    * going on, and exclusively locks the table file.
-   * @return success flag
+   * @param opts main options
+   * @throws IOException I/O exception
    */
-  public abstract boolean startUpdate();
+  public abstract void startUpdate(final MainOptions opts) throws IOException;
 
   /**
    * Finishes an update operation: removes the update file and the exclusive lock.
+   * @param opts main options
    */
-  public abstract void finishUpdate();
+  public abstract void finishUpdate(final MainOptions opts);
+
+  /**
+   * Flushes updated data.
+   * @param all flush all data
+   */
+  public abstract void flush(final boolean all);
 
   /**
    * Returns an index iterator for the specified token.
@@ -160,24 +184,26 @@ public abstract class Data {
   /**
    * Returns info on the specified index structure.
    * @param type index type
+   * @param options main options
    * @return info
    */
-  public final byte[] info(final IndexType type) {
-    return index(type).info();
+  public final byte[] info(final IndexType type, final MainOptions options) {
+    return index(type).info(options);
   }
 
   /**
-   * Returns the index reference for the specified index type.
+   * Returns an index for the specified index type.
    * @param type index type
    * @return index
    */
-  final Index index(final IndexType type) {
+  public final Index index(final IndexType type) {
     switch(type) {
-      case TAG:       return tagindex;
-      case ATTNAME:   return atnindex;
-      case TEXT:      return txtindex;
-      case ATTRIBUTE: return atvindex;
-      case FULLTEXT:  return ftxindex;
+      case ELEMNAME:  return elemNames;
+      case ATTRNAME:  return attrNames;
+      case TEXT:      return textIndex;
+      case ATTRIBUTE: return attrIndex;
+      case TOKEN:     return tokenIndex;
+      case FULLTEXT:  return ftIndex;
       case PATH:      return paths;
       default:        throw Util.notExpected();
     }
@@ -205,7 +231,7 @@ public abstract class Data {
         byte[] t = EMPTY;
         int p = pre;
         final int s = p + size(p, kind(p));
-        while(p != s) {
+        while(p < s) {
           final int k = kind(p);
           if(k == TEXT) {
             txt = text(p, true);
@@ -225,44 +251,20 @@ public abstract class Data {
   // RETRIEVING VALUES ========================================================
 
   /**
-   * Returns a pre value.
+   * Returns a pre value for the specified id.
    * @param id unique node id
-   * @return pre value or -1 if id was not found
-   */
-  private int preold(final int id) {
-    // find pre value in table
-    for(int p = Math.max(0, id); p < meta.size; ++p)
-      if(id == id(p)) return p;
-    final int ps = Math.min(meta.size, id);
-    for(int p = 0; p < ps; ++p)
-      if(id == id(p)) return p;
-
-    // id not found
-    return -1;
-  }
-
-  /**
-   * Returns a pre value.
-   * @param id unique node id
-   * @return pre value or -1 if id was not found
+   * @return pre value or {@code -1} if id was not found
    */
   public final int pre(final int id) {
-    return meta.updindex ? idmap.pre(id) : preold(id);
-  }
+    if(meta.updindex) return idmap.pre(id);
 
-  /**
-   * Returns pre values.
-   * @param ids unique node ids
-   * @param off start offset
-   * @param len number of ids
-   * @return sorted pre values
-   */
-  public final int[] pre(final int[] ids, final int off, final int len) {
-    if(meta.updindex) return idmap.pre(ids, off, len);
-
-    final IntList p = new IntList(ids.length);
-    for(int i = off; i < len; ++i) p.add(preold(ids[i]));
-    return p.sort().toArray();
+    // find pre value in the table; start with specified id
+    final int size = meta.size;
+    for(int p = Math.max(0, id); p < meta.size; ++p) if(id == id(p)) return p;
+    final int ps = Math.min(size, id);
+    for(int p = 0; p < ps; ++p) if(id == id(p)) return p;
+    // id not found
+    return -1;
   }
 
   /**
@@ -310,7 +312,7 @@ public abstract class Data {
         return table.read4(pre, 8);
       case ATTR:
         int d = table.read1(pre, 0) >> 3 & IO.MAXATTS;
-        // skip additional attributes, if value is larger than maximum range
+        // skip additional attributes if value is larger than maximum range
         if(d >= IO.MAXATTS) while(d < pre && kind(pre - d) == ATTR) d++;
         return d;
       default:
@@ -336,7 +338,7 @@ public abstract class Data {
    */
   public final int attSize(final int pre, final int kind) {
     int s = kind == ELEM ? table.read1(pre, 0) >> 3 & IO.MAXATTS : 1;
-    // skip additional attributes, if value is larger than maximum range
+    // skip additional attributes if value is larger than maximum range
     if(s >= IO.MAXATTS) while(s < meta.size - pre && kind(pre + s) == ATTR) s++;
     return s;
   }
@@ -345,21 +347,21 @@ public abstract class Data {
    * Finds the specified attribute and returns its value.
    * @param att the attribute id of the attribute to be found
    * @param pre pre value
-   * @return attribute value
+   * @return attribute value, or {@code null}
    */
   public final byte[] attValue(final int att, final int pre) {
     final int a = pre + attSize(pre, kind(pre));
     int p = pre;
-    while(++p != a) if(name(p) == att) return text(p, false);
+    while(++p != a) if(nameId(p) == att) return text(p, false);
     return null;
   }
 
   /**
-   * Returns a reference to the name of an element, attribute or processing instruction.
+   * Returns the id of the name of an element, attribute or processing instruction.
    * @param pre pre value
-   * @return token reference
+   * @return name id
    */
-  public final int name(final int pre) {
+  public final int nameId(final int pre) {
     return table.read2(pre, 1) & 0x7FFF;
   }
 
@@ -367,7 +369,7 @@ public abstract class Data {
    * Returns the name of an element, attribute or processing instruction.
    * @param pre pre value
    * @param kind node kind
-   * @return name reference
+   * @return name
    */
   public final byte[] name(final int pre, final int kind) {
     if(kind == PI) {
@@ -375,18 +377,38 @@ public abstract class Data {
       final int i = indexOf(name, ' ');
       return i == -1 ? name : substring(name, 0, i);
     }
-    return (kind == ELEM ? tagindex : atnindex).key(name(pre));
+    return (kind == ELEM ? elemNames : attrNames).key(nameId(pre));
   }
 
   /**
-   * Returns a reference to the namespace of the addressed element or attribute.
+   * Returns the id of the namespace uri of the addressed element or attribute.
    * @param pre pre value
    * @param kind node kind
-   * @return namespace URI
+   * @return id of the namespace uri
    */
-  public final int uri(final int pre, final int kind) {
-    return kind == ELEM || kind == ATTR ?
-        table.read1(pre, kind == ELEM ? 3 : 11) & 0xFF : 0;
+  public final int uriId(final int pre, final int kind) {
+    return kind == ELEM || kind == ATTR ? table.read1(pre, kind == ELEM ? 3 : 11) & 0xFF : 0;
+  }
+
+  /**
+   * Returns the name and namespace uri of the addressed element or attribute.
+   * @param pre pre value
+   * @param kind node kind
+   * @return array with name and namespace uri
+   */
+  public final byte[][] qname(final int pre, final int kind) {
+    final byte[] name = name(pre, kind);
+    byte[] uri = null;
+    final boolean hasPrefix = indexOf(name, ':') != -1;
+    if(hasPrefix || !nspaces.isEmpty()) {
+      final int uriId = uriId(pre, kind);
+      if(uriId > 0) {
+        uri = nspaces.uri(uriId);
+      } else if(hasPrefix && eq(prefix(name), XML)) {
+        uri = DataText.XML_URI;
+      }
+    }
+    return new byte[][] { name, uri == null ? EMPTY : uri };
   }
 
   /**
@@ -399,32 +421,26 @@ public abstract class Data {
   }
 
   /**
-   * Returns all namespace keys and values.
+   * Returns all namespace prefixes and uris that are defined for the specified pre value.
    * Should only be called for element nodes.
    * @param pre pre value
    * @return key and value ids
    */
-  public final Atts ns(final int pre) {
-    final Atts as = new Atts();
-    if(nsFlag(pre)) {
-      final int[] nsp = nspaces.get(pre, this);
-      for(int n = 0; n < nsp.length; n += 2)
-        as.add(nspaces.prefix(nsp[n]), nspaces.uri(nsp[n + 1]));
-    }
-    return as;
+  public final Atts namespaces(final int pre) {
+    return nsFlag(pre) ? nspaces.values(pre, this) : new Atts();
   }
 
   /**
-   * Returns the disk offset of a text (text, comment, pi) or attribute value.
+   * Returns the reference to a text (text, comment, pi, pi, document) or attribute value.
    * @param pre pre value
    * @return disk offset
    */
-  final long textOff(final int pre) {
+  public final long textRef(final int pre) {
     return table.read5(pre, 3);
   }
 
   /**
-   * Returns a text (text, comment, pi) or attribute value.
+   * Returns a text (text, comment, pi, document) or attribute value.
    * @param pre pre value
    * @param text text/attribute flag
    * @return atomized value
@@ -432,7 +448,8 @@ public abstract class Data {
   public abstract byte[] text(int pre, boolean text);
 
   /**
-   * Returns a text (text, comment, pi) or attribute value as integer value.
+   * Returns a text (text, comment, pi, document) or attribute value as integer value.
+   * {@link Long#MIN_VALUE} is returned if the input is no valid integer.
    * @param pre pre value
    * @param text text/attribute flag
    * @return numeric value
@@ -440,7 +457,8 @@ public abstract class Data {
   public abstract long textItr(int pre, boolean text);
 
   /**
-   * Returns a text (text, comment, pi) or attribute value as double value.
+   * Returns a text (text, comment, pi, document) or attribute value as double value.
+   * {@link Double#NaN} is returned if the input is no valid double.
    * @param pre pre value
    * @param text text/attribute flag
    * @return numeric value
@@ -448,7 +466,7 @@ public abstract class Data {
   public abstract double textDbl(int pre, boolean text);
 
   /**
-   * Returns the byte length of a text (text, comment, pi).
+   * Returns the byte length of a (possibly compressed) text (text, comment, pi, document).
    * @param pre pre value
    * @param text text/attribute flag
    * @return length
@@ -459,10 +477,10 @@ public abstract class Data {
 
   /**
    * Updates (renames) the name of an element, attribute or processing instruction.
-   * @param pre pre value
-   * @param kind node kind
-   * @param name name of new element, attribute or processing instruction
-   * @param uri uri
+   * @param pre pre value of the node to be updated
+   * @param kind node kind of the updated node
+   * @param name name of the new element, attribute or processing instruction
+   * @param uri namespace uri
    */
   public final void update(final int pre, final int kind, final byte[] name, final byte[] uri) {
     meta.update();
@@ -470,351 +488,328 @@ public abstract class Data {
     if(kind == PI) {
       updateText(pre, trim(concat(name, SPACE, atom(pre))), PI);
     } else {
-      // update/set namespace reference
-      final int ouri = nspaces.uri(name, pre, this);
-      final boolean ne = ouri == 0 && uri.length != 0;
-      final int npre = kind == ATTR ? parent(pre, kind) : pre;
-      final int nuri = ne ? nspaces.add(npre, npre, prefix(name), uri, this) :
-        ouri != 0 && eq(nspaces.uri(ouri), uri) ? ouri : 0;
+      // check if namespace has changed
+      final byte[] prefix = prefix(name);
+      final int oldUriId = nspaces.uriIdForPrefix(prefix, pre, this);
+      final boolean nsFlag = oldUriId == 0 && uri.length != 0 && !eq(prefix, XML);
+      final int nsPre = kind == ATTR ? parent(pre, kind) : pre;
+      final int uriId = nsFlag ? nspaces.add(nsPre, prefix, uri, this) :
+        oldUriId != 0 && eq(nspaces.uri(oldUriId), uri) ? oldUriId : 0;
+      final int sz = size(pre, kind);
 
-      // write namespace uri reference
-      table.write1(pre, kind == ELEM ? 3 : 11, nuri);
-      // write name reference
-      table.write2(pre, 1, (nsFlag(pre) ? 1 << 15 : 0) |
-        (kind == ELEM ? tagindex : atnindex).index(name, null, false));
-      // write namespace flag
-      table.write2(npre, 1, (ne || nsFlag(npre) ? 1 << 15 : 0) | name(npre));
+      // write ids of namespace uri and name, and namespace flag
+      if(kind == ATTR) {
+        // delete old values from attribute indexes
+        if(meta.updindex) {
+          if(meta.attrindex) attrIndex.delete(new ValueCache(pre, IndexType.ATTRIBUTE, this));
+          if(meta.tokenindex) tokenIndex.delete(new ValueCache(pre, IndexType.TOKEN, this));
+        }
+        table.write1(pre, 11, uriId);
+        table.write2(pre, 1, attrNames.index(name, null, false));
+        if(nsFlag) table.write2(nsPre, 1, 1 << 15 | nameId(nsPre));
+        // add new values to attribute indexes
+        if(meta.updindex) {
+          if(meta.attrindex) attrIndex.add(new ValueCache(pre, IndexType.ATTRIBUTE, this));
+          if(meta.tokenindex) tokenIndex.add(new ValueCache(pre, IndexType.TOKEN, this));
+        }
+
+      } else {
+        // update element name
+        final IntList pres = new IntList();
+        // update text index
+        if(meta.updindex && meta.textindex) {
+          final int last = pre + sz;
+          for(int curr = pre + attSize(pre, kind); curr < last; curr += size(curr, kind(curr))) {
+            if(kind(curr) == TEXT) pres.add(curr);
+          }
+          textIndex.delete(new ValueCache(pres, IndexType.TEXT, this));
+        }
+        table.write1(pre, 3, uriId);
+        final int nameId = elemNames.index(name, null, false);
+        table.write2(nsPre, 1, (nsFlag || nsFlag(nsPre) ? 1 << 15 : 0) | nameId);
+        if(!pres.isEmpty()) textIndex.add(new ValueCache(pres, IndexType.TEXT, this));
+      }
     }
   }
 
   /**
-   * Updates (replaces) the value of a single document, text, comment, pi or
-   * attribute node.
-   * @param pre pre value to be replaced
+   * Updates (replaces) the value of a single text, comment, pi, attribute or document node.
+   * @param pre pre value of the node to be updated
    * @param kind node kind
-   * @param value value to be updated (element name, text, comment, pi)
+   * @param value value to be updated (text, comment, pi, attribute, document name)
    */
   public final void update(final int pre, final int kind, final byte[] value) {
-    final byte[] v = kind == PI ? trim(concat(name(pre, kind), SPACE, value)) : value;
-    if(eq(v, text(pre, kind != ATTR))) return;
+    final byte[] val = kind == PI ? trim(concat(name(pre, kind), SPACE, value)) : value;
+    if(eq(val, text(pre, kind != ATTR))) return;
 
     meta.update();
-    updateText(pre, v, kind);
+    updateText(pre, val, kind);
     if(kind == DOC) resources.rename(pre, value);
   }
 
   /**
-   * Rapid Replace implementation. Replaces parts of the database with the specified
-   * data instance.
-   * @param tpre pre value of target node to be replaced
+   * Rapid Replace implementation. Replaces parts of the database with the specified data instance.
+   * @param pre pre value of the node to be replaced
    * @param source clip with source data
    */
-  public final void replace(final int tpre, final DataClip source) {
+  public final void replace(final int pre, final DataClip source) {
     meta.update();
 
-    final int size = source.size();
-    final Data data = source.data;
+    final int sCount = source.size();
+    final int tKind = kind(pre);
+    final int tSize = size(pre, tKind);
+    final int tPar = parent(pre, tKind);
+    bufferSize(sCount);
 
-    final int tkind = kind(tpre);
-    final int tsize = size(tpre, tkind);
-    final int tpar = parent(tpre, tkind);
-    final int diff = size - tsize;
-    buffer(size);
-    resources.replace(tpre, tsize, source);
+    // update index structures
+    indexDelete(pre, id(pre), tSize);
 
-    if(meta.updindex) {
-      // update index
-      indexDelete(tpre, tsize);
-      indexBegin();
-    }
-
+    final Data sData = source.data;
     int sTopPre = source.start;
-    for(int spre = sTopPre; spre < source.end; ++spre) {
-      final int kind = data.kind(spre);
-      // size and parent value of source node
-      final int ssize = data.size(spre, kind);
-      final int spar = data.parent(spre, kind);
-      final int pre = tpre + spre - source.start;
+    for(int sPre = source.start; sPre < source.end; ++sPre) {
+      // properties of the source node
+      final int sKind = sData.kind(sPre);
+      final int sSize = sData.size(sPre, sKind);
+      final int sPar = sData.parent(sPre, sKind);
+      final int cPre = pre + sPre - source.start;
 
       // calculate new distance value
-      final int dist;
-      if(spre == sTopPre) {
+      final int cDist;
+      if(sPre == sTopPre) {
         // handle top level entry: calculate distance based on target database
-        dist = pre - tpar;
+        cDist = cPre - tPar;
         // calculate pre value of next top level entry
-        sTopPre += ssize;
+        sTopPre += sSize;
       } else {
-        dist = spre - spar;
+        cDist = sPre - sPar;
       }
 
-      switch(kind) {
+      switch(sKind) {
         case DOC:
           // add document
-          doc(pre, ssize, data.text(spre, true));
-          meta.ndocs++;
+          doc(sSize, sData.text(sPre, true));
+          ++meta.ndocs;
           break;
         case ELEM:
           // add element
-          byte[] nm = data.name(spre, kind);
-          elem(dist, tagindex.index(nm, null, false), data.attSize(spre, kind), ssize,
-              nspaces.uri(nm, true), false);
+          final byte[] en = sData.name(sPre, sKind);
+          elem(cDist, elemNames.index(en, null, false), sData.attSize(sPre, sKind), sSize,
+              nspaces.uriIdForPrefix(prefix(en), true), false);
           break;
         case TEXT:
         case COMM:
         case PI:
           // add text
-          text(pre, dist, data.text(spre, true), kind);
+          text(cDist, sData.text(sPre, true), sKind);
           break;
         case ATTR:
           // add attribute
-          nm = data.name(spre, kind);
-          attr(pre, dist, atnindex.index(nm, null, false), data.text(spre, false),
-              nspaces.uri(nm, false), false);
+          final byte[] an = sData.name(sPre, sKind);
+          attr(cDist, attrNames.index(an, null, false), sData.text(sPre, false),
+              nspaces.uriIdForPrefix(prefix(an), false));
           break;
       }
     }
 
-    if(meta.updindex) {
-      indexEnd();
-      // update ID -> PRE map:
-      idmap.delete(tpre, id(tpre), -tsize);
-      idmap.insert(tpre, meta.lastid - size + 1, size);
+    // replace table entries, reset buffer size
+    table.replace(pre, buffer(), tSize);
+    bufferSize(1);
+
+    // if necessary, increase/decrease size of ancestors and adjust distances of siblings
+    final int diff = sCount - tSize;
+    if(diff != 0) {
+      int p = tPar;
+      while(p >= 0) {
+        final int k = kind(p);
+        size(p, k, size(p, k) + diff);
+        p = parent(p, k);
+      }
+      updateDist(pre + sCount, diff);
     }
-
-    // update table:
-    table.replace(tpre, buffer(), tsize);
-    buffer(1);
-
-    // no distance/size update if the two subtrees are of equal size
-    if(diff == 0) return;
-
-    // increase/decrease size of ancestors, adjust distances of siblings
-    int p = tpar;
-    while(p >= 0) {
-      final int k = kind(p);
-      size(p, k, size(p, k) + diff);
-      p = parent(p, k);
-    }
-
-    if(!cache)
-      updateDist(tpre + size, diff);
 
     // adjust attribute size of parent if attributes inserted. attribute size
-    // of parent cannot be reduced via a replace expression.
-    int spre = source.start;
-    if(data.kind(spre) == ATTR) {
+    // of parent cannot be decreased via a replace expression.
+    int sPre = source.start;
+    if(sData.kind(sPre) == ATTR) {
       int d = 0;
-      while(spre < source.end && data.kind(spre++) == ATTR) d++;
-      if(d > 1) attSize(tpar, kind(tpar), d + attSize(tpar, ELEM) - 1);
+      while(sPre < source.end && sData.kind(sPre++) == ATTR) d++;
+      if(d > 1) attSize(tPar, kind(tPar), d + attSize(tPar, ELEM) - 1);
     }
+
+    // add entries to index structures
+    indexAdd(pre, meta.lastid - sCount + 1, sCount, source);
   }
 
   /**
    * Deletes a node and its descendants.
-   * @param pre pre value of the node to delete
+   * @param pre pre value of the node to be deleted
    */
   public final void delete(final int pre) {
     meta.update();
 
-    // size of the subtree to delete
-    int k = kind(pre);
-    final int s = size(pre, k);
-    resources.delete(pre, s);
+    // delete references in document index
+    int kind = kind(pre);
+    final int size = size(pre, kind);
 
-    if(meta.updindex) {
-      // delete child records from indexes
-      indexDelete(pre, s);
-    }
+    // delete entries in value indexes
+    indexDelete(pre, id(pre), size);
 
-    /// explicitly delete text or attribute value
-    if(k != DOC && k != ELEM) delete(pre, k != ATTR);
+    /// delete textual values
+    if(kind != DOC && kind != ELEM) delete(pre, kind != ATTR);
 
     // reduce size of ancestors
     int par = pre;
     // check if we are an attribute (different size counters)
-    if(k == ATTR) {
+    if(kind == ATTR) {
       par = parent(par, ATTR);
       attSize(par, ELEM, attSize(par, ELEM) - 1);
       size(par, ELEM, size(par, ELEM) - 1);
-      k = kind(par);
+      kind = kind(par);
     }
 
+    // delete namespace nodes and propagate pre value shifts (before node sizes are touched!)
+    nspaces.delete(pre, size, this);
+
     // reduce size of ancestors
-    while(par > 0 && k != DOC) {
-      par = parent(par, k);
-      k = kind(par);
-      size(par, k, size(par, k) - s);
+    while(par > 0 && kind != DOC) {
+      par = parent(par, kind);
+      kind = kind(par);
+      size(par, kind, size(par, kind) - size);
     }
 
     // preserve empty root node
     if(kind(pre) == DOC) --meta.ndocs;
 
-    if(meta.updindex) {
-      // delete node and descendants from ID -> PRE map:
-      idmap.delete(pre, id(pre), -s);
-    }
-
     // delete node from table structure and reduce document size
-    table.delete(pre, s);
+    table.delete(pre, size);
 
-    if(!cache) updateDist(pre, -s);
-
-    // delete namespace nodes and propagate PRE value shifts
-    nspaces.delete(pre, s, this);
+    updateDist(pre, -size);
   }
 
   /**
-   * Inserts attributes.
-   * @param pre pre value
-   * @param par parent of node
+   * Inserts standalone attributes (without root element).
+   * @param pre target pre value (insertion position)
+   * @param par target parent pre value of node
    * @param source clip with source data
    */
   public final void insertAttr(final int pre, final int par, final DataClip source) {
-    insert(pre, par, source);
+    // #1168/2: store one by one (otherwise, namespace declarations may be added more than once)
+    for(int s = 0; s < source.fragments; s++) {
+      final int start = source.start + s;
+      insert(pre + s, par, new DataClip(source.data, start, start + 1));
+    }
     attSize(par, ELEM, attSize(par, ELEM) + source.size());
   }
 
   /**
-   * Inserts a data instance at the specified pre value.
-   * Note that the specified data instance must differ from this instance.
-   * @param tpre target pre value
-   * @param tpar target parent pre value of node ({@code -1} if document is added)
+   * Inserts a data instance at the specified pre value. Notes:
+   * <ul>
+   *   <li> The data instance in the specified data clip must differ from this instance.</li>
+   *   <li> Attributes must be inserted via {@link #insertAttr}.</li>
+   * </ul>
+   * @param pre target pre value (insertion position)
+   * @param par target parent pre value of node ({@code -1} if document is added)
    * @param source clip with source data
    */
-  public final void insert(final int tpre, final int tpar, final DataClip source) {
+  public final void insert(final int pre, final int par, final DataClip source) {
+    final int sCount = source.size();
+    if(sCount == 0) return;
+
     meta.update();
+    resources.docs();
 
-    // update value and document indexes
-    if(meta.updindex) indexBegin();
-    resources.insert(tpre, source);
-
-    final int size = source.size();
-    final int buf = Math.min(size, IO.BLOCKSIZE >> IO.NODEPOWER);
     // resize buffer to cache more entries
-    buffer(buf);
+    final int bSize = Math.min(sCount, IO.BLOCKSIZE >> IO.NODEPOWER);
+    bufferSize(bSize);
 
-    // find all namespaces in scope to avoid duplicate declarations
-    final TokenMap nsScope = nspaces.scope(tpar, this);
-
-    // loop through all entries
-    final IntList preStack = new IntList();
-    final NSNode nsRoot = nspaces.getCurrent();
-    final IntList flagPres = new IntList();
-    // track existing NSNodes - their PRE values have to be shifted after each tuple insertion
-    final List<NSNode> nsNodesShift = nspaces.getNSNodes(tpre);
+    // organize namespaces to avoid duplicate declarations
+    final NSScope nsScope = new NSScope(pre, this);
 
     // indicates if database only contains a dummy node
-    final Data data = source.data;
+    final Data sdata = source.data;
     int c = 0, sTopPre = source.start;
-    for(int spre = sTopPre; spre < source.end; ++spre, ++c) {
-      if(c != 0 && c % buf == 0) insert(tpre + c - buf);
+    for(int sPre = sTopPre; sPre < source.end; ++sPre, ++c) {
+      if(c != 0 && c % bSize == 0) insert(pre + c - bSize);
 
-      final int pre = tpre + c;
-      final int kind = data.kind(spre);
-      // size and parent value of source node
-      final int ssize = data.size(spre, kind);
-      final int spar = data.parent(spre, kind);
+      // values of source node
+      final int sKind = sdata.kind(sPre);
+      final int sSize = sdata.size(sPre, sKind);
+      final int sPar = sdata.parent(sPre, sKind);
 
-      // calculate new distance value
-      final int dist;
-      if(spre == sTopPre) {
+      // pre and dist value of new node
+      final int nPre = pre + c, nDist;
+      if(sPre == sTopPre) {
         // handle top level entry: calculate distance based on target database
-        dist = pre - tpar;
+        nDist = nPre - par;
         // calculate pre value of next top level entry
-        sTopPre += ssize;
+        sTopPre += sSize;
       } else {
         // handle descendant node: calculate distance based on source database
-        dist = spre - spar;
+        nDist = sPre - sPar;
       }
-
       // documents: use -1 as namespace root
-      final int nsPre = kind == DOC ? -1 : pre - dist;
-      if(c == 0) nspaces.root(nsPre, this);
-      while(!preStack.isEmpty() && preStack.peek() > nsPre) nspaces.close(preStack.pop());
+      final int nsPre = sKind == DOC ? -1 : nPre - nDist;
+      nsScope.loop(nsPre, c);
 
-      switch(kind) {
+      switch(sKind) {
         case DOC:
           // add document
-          nspaces.prepare();
-          doc(pre, ssize, data.text(spre, true));
-          meta.ndocs++;
-          preStack.push(pre);
+          nsScope.open(nPre);
+          doc(sSize, sdata.text(sPre, true));
+          ++meta.ndocs;
           break;
-        case ELEM:
-          // add element
-          nspaces.prepare();
-          boolean ne = false;
-          if(data.nsFlag(spre)) {
-            final Atts at = data.ns(spre);
-            for(int a = 0; a < at.size(); ++a) {
-              // see if prefix has been declared/ is part of current ns scope
-              final byte[] old = nsScope.get(at.name(a));
-              if(old == null || !eq(old, at.value(a))) {
-                nspaces.add(at.name(a), at.value(a), pre);
-                ne = true;
-              }
-            }
-          }
-          byte[] nm = data.name(spre, kind);
-          elem(dist, tagindex.index(nm, null, false), data.attSize(spre, kind), ssize,
-              nspaces.uri(nm, true), ne);
-          preStack.push(pre);
+        case ELEM: {
+          // add element.
+          final boolean nsFlag = nsScope.open(nPre, sdata.namespaces(sPre));
+          final byte[] name = sdata.name(sPre, sKind);
+          elem(nDist, elemNames.index(name, null, false), sdata.attSize(sPre, sKind), sSize,
+              nspaces.uriIdForPrefix(prefix(name), true), nsFlag);
           break;
+        }
         case TEXT:
         case COMM:
         case PI:
-          // add text
-          text(pre, dist, data.text(spre, true), kind);
+          // add text, comment or processing instruction
+          text(nDist, sdata.text(sPre, true), sKind);
           break;
-        case ATTR:
+        case ATTR: {
           // add attribute
-          nm = data.name(spre, kind);
-          // check if prefix already in nsScope or not
-          final byte[] attPref = prefix(nm);
-          if(data.nsFlag(spre) && nsScope.get(attPref) == null) {
-            // add declaration to parent node
-            nspaces.add(nsPre, preStack.isEmpty() ? -1 : preStack.peek(), attPref,
-            data.nspaces.uri(data.uri(spre, kind)), this);
-            // save pre value to set ns flag later for this node. can't be done
-            // here as direct table access would interfere with the buffer
-            flagPres.add(nsPre);
+          final byte[] name = sdata.name(sPre, sKind);
+          int uriId = sdata.uriId(sPre, sKind);
+          // extend namespace scope and write namespace flag if attribute has a new namespaces
+          if(uriId != 0) {
+            final byte[] prefix = prefix(name), uri = sdata.nspaces.uri(uriId);
+            uriId = nspaces.uriIdForPrefix(prefix, false);
+            if(uriId == 0 && !eq(prefix, XML)) {
+              uriId = nspaces.add(nsPre, prefix, uri, this);
+              table.write2(nsPre, 1, 1 << 15 | nameId(nsPre));
+            }
           }
-          attr(pre, dist, atnindex.index(nm, null, false), data.text(spre, false),
-              nspaces.uri(nm, false), false);
-          break;
+          attr(nDist, attrNames.index(name, null, false), sdata.text(sPre, false), uriId);
+        }
       }
-      // propagate PRE value shifts to keep namespace structure valid
-      Namespaces.incrementPre(nsNodesShift, 1);
+      nsScope.shift(1);
     }
     // finalize and update namespace structure
-    while(!preStack.isEmpty()) nspaces.close(preStack.pop());
-    nspaces.setCurrent(nsRoot);
+    nsScope.close();
 
-    if(bp != 0) insert(tpre + c - 1 - (c - 1) % buf);
-    // reset buffer to old size
-    buffer(1);
-
-    // set ns flags
-    for(int f = 0; f < flagPres.size(); f++) {
-      final int fl = flagPres.get(f);
-      table.write2(fl, 1, name(fl) | 1 << 15);
-    }
+    // write final entries and reset buffer
+    if(bp != 0) insert(pre + c - 1 - (c - 1) % bSize);
+    bufferSize(1);
 
     // increase size of ancestors
-    int p = tpar;
-    while(p >= 0) {
-      final int k = kind(p);
-      size(p, k, size(p, k) + size);
-      p = parent(p, k);
+    int cPre = par;
+    while(cPre >= 0) {
+      final int cKind = kind(cPre);
+      size(cPre, cKind, size(cPre, cKind) + sCount);
+      cPre = parent(cPre, cKind);
     }
 
-    if(meta.updindex) {
-      // add the entries to the ID -> PRE mapping:
-      idmap.insert(tpre, id(tpre), size);
-      indexEnd();
-    }
+    // update index structures
+    indexAdd(pre, id(pre), sCount, source);
 
-    if(!cache) updateDist(tpre + size, size);
+    // finally, update distances
+    updateDist(pre + sCount, sCount);
   }
 
   /**
@@ -824,18 +819,29 @@ public abstract class Data {
    * @param size size to be added/removed
    */
   private void updateDist(final int pre, final int size) {
-    int p = pre;
-    while(p < meta.size) {
-      final int k = kind(p);
-      if(k == DOC) break;
-      dist(p, k, dist(p, k) + size);
-      p += size(p, k);
+    if(updateDists) {
+      int p = pre;
+      while(p < meta.size) {
+        final int k = kind(p);
+        if(k == DOC) break;
+        dist(p, k, dist(p, k) + size);
+        p += size(p, k);
+      }
     }
   }
 
   /**
+   * Sets the node id.
+   * @param pre pre value
+   * @param value value to be stored
+   */
+  public final void id(final int pre, final int value) {
+    table.write4(pre, 12, value);
+  }
+
+  /**
    * Sets the size value.
-   * @param pre pre reference
+   * @param pre pre value
    * @param kind node kind
    * @param value value to be stored
    */
@@ -844,11 +850,11 @@ public abstract class Data {
   }
 
   /**
-   * Sets the disk offset of a text/attribute value.
+   * Sets the reference to a text/attribute value.
    * @param pre pre value
    * @param off offset
    */
-  final void textOff(final int pre, final long off) {
+  protected final void textRef(final int pre, final long off) {
     table.write5(pre, 3, off);
   }
 
@@ -886,15 +892,14 @@ public abstract class Data {
    * Sets the namespace flag.
    * Should be only called for element nodes.
    * @param pre pre value
-   * @param ne namespace flag
+   * @param nsFlag namespace flag
    */
-  public final void nsFlag(final int pre, final boolean ne) {
-    table.write1(pre, 1, table.read1(pre, 1) & 0x7F | (ne ? 0x80 : 0));
+  public final void nsFlag(final int pre, final boolean nsFlag) {
+    table.write1(pre, 1, table.read1(pre, 1) & 0x7F | (nsFlag ? 0x80 : 0));
   }
 
   /**
-   * Inserts the internal buffer to the storage
-   * without updating the table structure.
+   * Inserts the internal buffer to the storage without updating the table structure.
    * @param pre insert position
    */
   public final void insert(final int pre) {
@@ -919,86 +924,79 @@ public abstract class Data {
    * Sets the update buffer to a new size.
    * @param size number of table entries
    */
-  private void buffer(final int size) {
+  private void bufferSize(final int size) {
     final int bs = size << IO.NODEPOWER;
     if(b.length != bs) b = new byte[bs];
   }
 
   /**
-   * Adds a document entry to the internal update buffer.
-   * @param pre pre value
+   * Adds a document to the internal update buffer.
    * @param size node size
    * @param value document name
    */
-  public final void doc(final int pre, final int size, final byte[] value) {
-    final int i = newID();
-    final long v = index(pre, i, value, DOC);
+  public final void doc(final int size, final byte[] value) {
+    final int id = newID();
+    final long v = textRef(value, true);
     s(DOC); s(0); s(0); s(v >> 32);
     s(v >> 24); s(v >> 16); s(v >> 8); s(v);
     s(size >> 24); s(size >> 16); s(size >> 8); s(size);
-    s(i >> 24); s(i >> 16); s(i >> 8); s(i);
+    s(id >> 24); s(id >> 16); s(id >> 8); s(id);
   }
 
   /**
-   * Adds an element entry to the internal update buffer.
+   * Adds an element to the internal update buffer.
    * @param dist parent distance
-   * @param name element name index
+   * @param nameId id of element name
    * @param asize number of attributes
    * @param size node size
-   * @param uri namespace uri reference
-   * @param ne namespace flag
+   * @param uriId id of namespace uri
+   * @param nsFlag namespace flag
    */
-  public final void elem(final int dist, final int name, final int asize, final int size,
-      final int uri, final boolean ne) {
+  public final void elem(final int dist, final int nameId, final int asize, final int size,
+      final int uriId, final boolean nsFlag) {
 
     // build and insert new entry
-    final int i = newID();
-    final int n = ne ? 1 << 7 : 0;
+    final int id = newID();
+    final int n = nsFlag ? 1 << 7 : 0;
     s(Math.min(IO.MAXATTS, asize) << 3 | ELEM);
-    s(n | (byte) (name >> 8)); s(name); s(uri);
+    s(n | (byte) (nameId >> 8)); s(nameId); s(uriId);
     s(dist >> 24); s(dist >> 16); s(dist >> 8); s(dist);
     s(size >> 24); s(size >> 16); s(size >> 8); s(size);
-    s(i >> 24); s(i >> 16); s(i >> 8); s(i);
+    s(id >> 24); s(id >> 16); s(id >> 8); s(id);
   }
 
   /**
-   * Adds a text entry to the internal update buffer.
-   * @param pre pre value
+   * Adds a text, comment or processing instruction to the internal update buffer.
    * @param dist parent distance
    * @param value string value
    * @param kind node kind
    */
-  public final void text(final int pre, final int dist, final byte[] value, final int kind) {
+  public final void text(final int dist, final byte[] value, final int kind) {
     // build and insert new entry
-    final int i = newID();
-    final long v = index(pre, i, value, kind);
+    final int id = newID();
+    final long v = textRef(value, true);
     s(kind); s(0); s(0); s(v >> 32);
     s(v >> 24); s(v >> 16); s(v >> 8); s(v);
     s(dist >> 24); s(dist >> 16); s(dist >> 8); s(dist);
-    s(i >> 24); s(i >> 16); s(i >> 8); s(i);
+    s(id >> 24); s(id >> 16); s(id >> 8); s(id);
   }
 
   /**
-   * Adds an attribute entry to the internal update buffer.
-   * @param pre pre value
+   * Adds an attribute to the internal update buffer.
    * @param dist parent distance
-   * @param name attribute name
+   * @param nameId id of attribute name
    * @param value attribute value
-   * @param uri namespace uri reference
-   * @param ne namespace flag (only {@code true} if this is a stand-alone attribute)
+   * @param uriId id of namespace uri
    */
-  public final void attr(final int pre, final int dist, final int name, final byte[] value,
-      final int uri, final boolean ne) {
-
+  public final void attr(final int dist, final int nameId, final byte[] value, final int uriId) {
     // add attribute to text storage
-    final int i = newID();
-    final long v = index(pre, i, value, ATTR);
-    final int n = ne ? 1 << 7 : 0;
+    final int id = newID();
+    final long v = textRef(value, false);
     s(Math.min(IO.MAXATTS, dist) << 3 | ATTR);
-    s(n | (byte) (name >> 8)); s(name); s(v >> 32);
+    s(nameId >> 8); s(nameId); s(v >> 32);
     s(v >> 24); s(v >> 16); s(v >> 8); s(v);
-    s(0); s(0); s(0); s(uri);
-    s(i >> 24); s(i >> 16); s(i >> 8); s(i);
+    s(0); s(0); s(0); s(uriId);
+    s(id >> 24); s(id >> 16); s(id >> 8); s(id);
   }
 
   /**
@@ -1036,27 +1034,45 @@ public abstract class Data {
   }
 
   /**
-   * Indexes a text and returns the reference.
-   * @param pre pre value
-   * @param id id value
+   * Generates a reference for a text (text, comment, pi, pi, document) or attribute value.
    * @param value text to be indexed
-   * @param kind node kind
+   * @param text text/attribute flag
    * @return reference
    */
-  protected abstract long index(final int pre, final int id, final byte[] value, final int kind);
-
-  /** Notify the index structures that an update operation is started. */
-  void indexBegin() { }
-
-  /** Notify the index structures that an update operation is finished. */
-  void indexEnd() { }
+  protected abstract long textRef(final byte[] value, final boolean text);
 
   /**
-   * Delete a node and its descendants from the corresponding indexes.
-   * @param pre pre value of the node to delete
+   * Deletes entries from the index structures.
+   * @param pre first pre value of the nodes to delete
+   * @param id id (a simple value update is indicated by the value {@code -1})
    * @param size number of descendants
    */
-  protected abstract void indexDelete(final int pre, final int size);
+  protected final void indexDelete(final int pre, final int id, final int size) {
+    if(id != -1) resources.delete(pre, size);
+    if(meta.updindex) {
+      if(meta.textindex) textIndex.delete(new ValueCache(pre, size, IndexType.TEXT, this));
+      if(meta.attrindex) attrIndex.delete(new ValueCache(pre, size, IndexType.ATTRIBUTE, this));
+      if(meta.tokenindex) tokenIndex.delete(new ValueCache(pre, size, IndexType.TOKEN, this));
+      if(id != -1) idmap.delete(pre, id, -size);
+    }
+  }
+
+  /**
+   * Inserts new entries in the index structure.
+   * @param pre first pre value of the nodes to insert
+   * @param id id (a simple value update is indicated by the value {@code -1})
+   * @param size number of descendants
+   * @param clip data clip to be inserted
+   */
+  protected final void indexAdd(final int pre, final int id, final int size, final DataClip clip) {
+    if(id != -1) resources.insert(pre, clip);
+    if(meta.updindex) {
+      if(id != -1) idmap.insert(pre, id, size);
+      if(meta.textindex) textIndex.add(new ValueCache(pre, size, IndexType.TEXT, this));
+      if(meta.attrindex) attrIndex.add(new ValueCache(pre, size, IndexType.ATTRIBUTE, this));
+      if(meta.tokenindex) tokenIndex.add(new ValueCache(pre, size, IndexType.TOKEN, this));
+    }
+  }
 
   // HELPER FUNCTIONS ===================================================================
 
@@ -1066,20 +1082,11 @@ public abstract class Data {
    */
   public abstract boolean inMemory();
 
-  /**
-   * Returns a string representation of the specified table range. Can be called
-   * for debugging.
-   * @param start start pre value
-   * @param end end pre value
-   * @return table
-   */
-  private String toString(final int start, final int end) {
-    return string(InfoStorage.table(this, start, end));
-  }
-
   @Override
   public final String toString() {
     final int max = 20;
-    return meta.size > max ? toString(0, max) + "..." : toString(0, meta.size);
+    final DataPrinter dp = new DataPrinter(this);
+    dp.add(0, max);
+    return meta.size > max ? dp + "..." : dp.toString();
   }
 }

@@ -1,23 +1,22 @@
 package org.basex.io.serial.json;
 
-import static org.basex.query.util.Err.*;
-import static org.basex.util.Token.*;
+import static org.basex.query.QueryError.*;
 
 import java.io.*;
 
 import org.basex.io.serial.*;
+import org.basex.query.util.ft.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 
 /**
- * This class serializes data as described in the
+ * This class serializes items as described in the
  * <a href="http://jsonml.org">JsonML</a> specification.
  * JsonML can be used to transform any XML document to JSON and back.
  * Note, however, that namespaces, comments and processing instructions will be
  * discarded in the transformation process. More details are found in the
  * <a href="http://jsonml.org/XML/">JsonML documentation</a>.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class JsonMLSerializer extends JsonSerializer {
@@ -26,7 +25,7 @@ public final class JsonMLSerializer extends JsonSerializer {
 
   /**
    * Constructor.
-   * @param os output stream reference
+   * @param os output stream
    * @param opts serialization parameters
    * @throws IOException I/O exception
    */
@@ -35,79 +34,61 @@ public final class JsonMLSerializer extends JsonSerializer {
   }
 
   @Override
-  protected void startOpen(final byte[] name) throws IOException {
+  protected void startOpen(final QNm name) throws IOException {
     if(level != 0) {
-      print(',');
+      out.print(',');
       indent();
     }
-    print("[\"");
-    for(final byte ch : local(name)) encode(ch);
-    print('"');
+    out.print("[\"");
+    for(final byte ch : name.local()) printChar(ch);
+    out.print('"');
     att = false;
   }
 
   @Override
-  protected void attribute(final byte[] name, final byte[] value) throws IOException {
-    print(",");
-    if(indent) print(' ');
+  protected void attribute(final byte[] name, final byte[] value, final boolean standalone)
+      throws IOException {
+
+    out.print(",");
+    out.print(' ');
     if(!att) {
-      print("{");
+      out.print("{");
       att = true;
     }
-    print('"');
-    for(final byte ch : name) encode(ch);
-    print("\":\"");
-    for(final byte ch : value) encode(ch);
-    print("\"");
-  }
-
-  @Override
-  protected void namespace(final byte[] n, final byte[] v) {
+    out.print('"');
+    for(final byte ch : name) printChar(ch);
+    out.print("\":\"");
+    for(final byte ch : norm(value)) printChar(ch);
+    out.print("\"");
   }
 
   @Override
   protected void finishOpen() throws IOException {
-    if(att) print("}");
+    if(att) out.print("}");
   }
 
   @Override
-  protected void finishText(final byte[] text) throws IOException {
-    print(',');
+  protected void text(final byte[] value, final FTPos ftp) throws IOException {
+    out.print(',');
     indent();
-    print('"');
-    for(final byte ch : text) encode(ch);
-    print('"');
+    out.print('"');
+    for(final byte ch : value) printChar(ch);
+    out.print('"');
   }
 
   @Override
   protected void finishEmpty() throws IOException {
     finishOpen();
-    print(']');
+    out.print(']');
   }
 
   @Override
   protected void finishClose() throws IOException {
-    print(']');
+    out.print(']');
   }
 
   @Override
-  protected void finishComment(final byte[] value) { }
-
-  @Override
-  protected void finishPi(final byte[] name, final byte[] value) { }
-
-  @Override
-  protected void atomic(final Item value, final boolean iter) throws IOException {
-    error("Atomic values cannot be serialized");
-  }
-
-  /**
-   * Raises an error with the specified message.
-   * @param msg error message
-   * @param ext error details
-   * @throws IOException I/O exception
-   */
-  private static void error(final String msg, final Object... ext) throws IOException {
-    throw BXJS_SERIAL.getIO(Util.inf(msg, ext));
+  protected void atomic(final Item value) throws IOException {
+    throw BXJS_SERIAL_X.getIO("Atomic values cannot be serialized");
   }
 }

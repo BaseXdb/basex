@@ -5,16 +5,15 @@ import static org.basex.util.Token.*;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 import org.w3c.dom.*;
 
 /**
  * DOM - Node implementation.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class BXNode implements Node {
@@ -29,14 +28,14 @@ public abstract class BXNode implements Node {
     "#document", null, "#text", null, "#comment", null, "#cdata-section", "#document-fragment"
   };
   /** Node reference. */
-  final ANode node;
+  final ANode nd;
 
   /**
    * Constructor.
-   * @param n node reference
+   * @param nd node reference
    */
-  BXNode(final ANode n) {
-    node = n;
+  BXNode(final ANode nd) {
+    this.nd = nd;
   }
 
   /**
@@ -73,7 +72,7 @@ public abstract class BXNode implements Node {
    * @return node kind
    */
   int kind() {
-    return node.kind();
+    return nd.kind();
   }
 
   @Override
@@ -88,12 +87,12 @@ public abstract class BXNode implements Node {
 
   @Override
   public final BXNode cloneNode(final boolean deep) {
-    return node.toJava();
+    return nd.toJava();
   }
 
   @Override
-  public final short compareDocumentPosition(final Node other) {
-    final int d = node.diff(((BXNode) other).node);
+  public final short compareDocumentPosition(final Node node) {
+    final int d = nd.diff(((BXNode) node).nd);
     return (short) (d < 0 ? -1 : d > 0 ? 1 : 0);
   }
 
@@ -104,23 +103,23 @@ public abstract class BXNode implements Node {
 
   @Override
   public final String getBaseURI() {
-    return IO.get(string(node.baseURI())).url();
+    return IO.get(string(nd.baseURI())).url();
   }
 
   @Override
   public BXNList getChildNodes() {
-    return new BXNList(finish(node.children()));
+    return new BXNList(finish(nd.children()));
   }
 
   @Override
   public BXNode getFirstChild() {
-    return get(node.children().next());
+    return get(nd.children().next());
   }
 
   @Override
   public final BXNode getLastChild() {
     ANode n = null;
-    for(final ANode t : node.children()) n = t;
+    for(final ANode t : nd.children()) n = t;
     return n != null ? get(n) : null;
   }
 
@@ -131,17 +130,17 @@ public abstract class BXNode implements Node {
 
   @Override
   public BXNode getNextSibling() {
-    return get(node.followingSibling().next());
+    return get(nd.followingSibling().next());
   }
 
   @Override
   public BXNode getPreviousSibling() {
-    return get(node.precedingSibling().next());
+    return get(nd.precedingSibling().next());
   }
 
   @Override
   public final BXNode getParentNode() {
-    return get(node.parent());
+    return get(nd.parent());
   }
 
   @Override
@@ -150,13 +149,13 @@ public abstract class BXNode implements Node {
   }
 
   @Override
-  public final boolean isSameNode(final Node other) {
-    return other instanceof BXNode && ((BXNode) other).node.is(node);
+  public final boolean isSameNode(final Node node) {
+    return node instanceof BXNode && ((BXNode) node).nd.is(nd);
   }
 
   @Override
   public BXDoc getOwnerDocument() {
-    ANode n = node;
+    ANode n = nd;
     for(ANode p; (p = n.parent()) != null;) n = p;
     return n.type == NodeType.DOC ? (BXDoc) get(n) : null;
   }
@@ -178,47 +177,47 @@ public abstract class BXNode implements Node {
 
   @Override
   public final String getTextContent() {
-    return string(node.string());
+    return string(nd.string());
   }
 
   @Override
-  public final BXNode appendChild(final Node newChild) {
+  public final BXNode appendChild(final Node node) {
     throw readOnly();
   }
 
   @Override
-  public final Object getUserData(final String key) {
+  public final Object getUserData(final String name) {
     return null;
   }
 
   @Override
-  public final boolean isSupported(final String feature, final String version) {
+  public final boolean isSupported(final String name, final String version) {
     return false;
   }
 
   @Override
-  public final BXNode insertBefore(final Node newChild, final Node refChild) {
+  public final BXNode insertBefore(final Node node, final Node ref) {
     throw readOnly();
   }
 
   @Override
-  public final boolean isDefaultNamespace(final String namespaceURI) {
-    throw Util.notImplemented();
+  public final boolean isDefaultNamespace(final String uri) {
+    throw notImplemented();
   }
 
   @Override
   public final boolean isEqualNode(final Node cmp) {
-    throw Util.notImplemented();
+    throw notImplemented();
   }
 
   @Override
   public final String lookupNamespaceURI(final String prefix) {
-    throw Util.notImplemented();
+    throw notImplemented();
   }
 
   @Override
-  public final String lookupPrefix(final String namespaceURI) {
-    throw Util.notImplemented();
+  public final String lookupPrefix(final String uri) {
+    throw notImplemented();
   }
 
   @Override
@@ -227,17 +226,17 @@ public abstract class BXNode implements Node {
   }
 
   @Override
-  public final BXNode removeChild(final Node oldChild) {
+  public final BXNode removeChild(final Node node) {
     throw readOnly();
   }
 
   @Override
-  public final BXNode replaceChild(final Node newChild, final Node oldChild) {
+  public final BXNode replaceChild(final Node node, final Node old) {
     throw readOnly();
   }
 
   @Override
-  public final void setNodeValue(final String nodeValue) {
+  public final void setNodeValue(final String value) {
     throw readOnly();
   }
 
@@ -247,12 +246,12 @@ public abstract class BXNode implements Node {
   }
 
   @Override
-  public final void setTextContent(final String textContent) {
+  public final void setTextContent(final String value) {
     throw readOnly();
   }
 
   @Override
-  public final Object setUserData(final String key, final Object dat,
+  public final Object setUserData(final String name, final Object value,
       final UserDataHandler handler) {
     throw readOnly();
   }
@@ -263,15 +262,14 @@ public abstract class BXNode implements Node {
   }
 
   /**
-   * Returns all nodes with the given tag name.
-   * @param tag tag name
+   * Returns all nodes with the given element name.
+   * @param name element name
    * @return nodes
    */
-  final BXNList getElements(final String tag) {
+  final BXNList getElements(final String name) {
     final ANodeList nb = new ANodeList();
-    final AxisIter ai = node.descendant();
-    final byte[] nm = "*".equals(tag) ? null : token(tag);
-    for(ANode n; (n = ai.next()) != null;) {
+    final byte[] nm = "*".equals(name) ? null : token(name);
+    for(final ANode n : nd.descendant()) {
       if(n.type == NodeType.ELM && (nm == null || eq(nm, n.name()))) nb.add(n.finish());
     }
     return new BXNList(nb);
@@ -279,12 +277,12 @@ public abstract class BXNode implements Node {
 
   /**
    * Returns a node cache with the specified nodes.
-   * @param ai axis iterator
+   * @param iter axis iterator
    * @return node cache
    */
-  static ANodeList finish(final AxisIter ai) {
+  static ANodeList finish(final BasicNodeIter iter) {
     final ANodeList nl = new ANodeList();
-    for(ANode n; (n = ai.next()) != null;) nl.add(n.finish());
+    for(final ANode n : iter) nl.add(n.finish());
     return nl;
   }
 
@@ -293,7 +291,7 @@ public abstract class BXNode implements Node {
    * @return xquery node
    */
   public final ANode getNode() {
-    return node;
+    return nd;
   }
 
   /**
@@ -303,5 +301,13 @@ public abstract class BXNode implements Node {
   static DOMException readOnly() {
     return new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
         "DOM implementation is read-only.");
+  }
+
+  /**
+   * Throws a runtime exception for an unimplemented method.
+   * @return runtime exception
+   */
+  static UnsupportedOperationException notImplemented() {
+    return new UnsupportedOperationException();
   }
 }

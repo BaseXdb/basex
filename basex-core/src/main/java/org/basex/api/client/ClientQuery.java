@@ -2,8 +2,10 @@ package org.basex.api.client;
 
 import java.io.*;
 
+import org.basex.api.dom.*;
 import org.basex.core.*;
 import org.basex.io.in.*;
+import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -16,7 +18,7 @@ import org.basex.util.*;
  * client/server architecture. All sent data is received by the
  * {@link ClientListener} and interpreted by the {@link ServerQuery}.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public class ClientQuery extends Query {
@@ -34,10 +36,9 @@ public class ClientQuery extends Query {
    */
   ClientQuery(final String query, final ClientSession session, final OutputStream output)
       throws IOException {
-
     cs = session;
-    id = cs.exec(ServerCmd.QUERY, query, null);
     out = output;
+    id = session.exec(ServerCmd.QUERY, query, null);
   }
 
   @Override
@@ -59,18 +60,23 @@ public class ClientQuery extends Query {
   public void bind(final String name, final Object value, final String type) throws IOException {
     cache = null;
 
-    String t = type, v;
-    if(value instanceof Value) {
-      final Value val = (Value) value;
+    final Object vl = value  instanceof BXNode ? ((BXNode) value).getNode() : value;
+    String t = type == null ? "" : type;
+    final String v;
+    if(vl instanceof Value) {
+      final Value val = (Value) vl;
       final Type tp = val.type;
-      if(t == null || t.isEmpty())
-        t = val.isEmpty() ? QueryText.EMPTY_SEQUENCE + "()" : tp.toString();
+      if(t.isEmpty()) t = val.isEmpty() ? QueryText.EMPTY_SEQUENCE + "()" : tp.toString();
 
       try {
         final TokenBuilder tb = new TokenBuilder();
         for(final Item it : val) {
           if(!tb.isEmpty()) tb.add(1);
-          tb.add(it.type instanceof NodeType ? it.serialize().toArray() : it.string(null));
+          if(it.type instanceof NodeType) {
+            tb.add(it.serialize(SerializerMode.NOINDENT.get()).finish());
+          } else {
+            tb.add(it.string(null));
+          }
           if(it.type != tp) tb.add(2).add(it.type.toString());
         }
         v = tb.toString();
@@ -79,18 +85,16 @@ public class ClientQuery extends Query {
       }
     } else {
       v = value.toString();
-      if(t == null) t = "";
     }
 
     final ServerCmd cmd = name == null ? ServerCmd.CONTEXT : ServerCmd.BIND;
-    final String n = name == null ? "" : (name + '\0');
+    final String n = name == null ? "" : name + '\0';
     cs.exec(cmd, id + '\0' + n + v + '\0' + t, null);
   }
 
   @Override
   public void context(final Object value, final String type) throws IOException {
-    cache = null;
-    cs.exec(ServerCmd.CONTEXT, id + '\0' + value + '\0' + (type == null ? "" : type), null);
+    bind(null, value, type);
   }
 
   @Override
@@ -104,12 +108,14 @@ public class ClientQuery extends Query {
   }
 
   @Override
-  protected void cache() throws IOException {
-    cs.sout.write(ServerCmd.RESULTS.code);
+  public void cache(final boolean full) throws IOException {
+    cs.sout.write((full ? ServerCmd.FULL : ServerCmd.RESULTS).code);
     cs.send(id);
     cs.sout.flush();
+
+    @SuppressWarnings("resource")
     final BufferInput bi = new BufferInput(cs.sin);
-    cache(bi);
+    cache(bi, full);
     if(!ClientSession.ok(bi)) throw new BaseXException(bi.readString());
   }
 }

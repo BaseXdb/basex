@@ -9,7 +9,7 @@ import org.basex.util.*;
 /**
  * This class summarizes the result of a replacement.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class ReplaceContext {
@@ -20,10 +20,10 @@ final class ReplaceContext {
 
   /**
    * Constructor.
-   * @param rplc replacement text
+   * @param replace replacement text
    */
-  ReplaceContext(final String rplc) {
-    replace = rplc;
+  ReplaceContext(final String replace) {
+    this.replace = replace;
   }
 
   /**

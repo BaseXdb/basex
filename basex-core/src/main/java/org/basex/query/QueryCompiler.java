@@ -1,6 +1,6 @@
 package org.basex.query;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 
 import java.util.*;
 
@@ -15,7 +15,7 @@ import org.basex.util.list.*;
  * This class compiles all components of the query that are needed in an order that
  * maximizes the amount of inlining possible.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 final class QueryCompiler {
@@ -194,7 +194,8 @@ final class QueryCompiler {
       return id == null ? -1 : id;
     }
 
-    for(int i = 0; i < scopes.size(); i++) if(scopes.get(i) == scp) return i;
+    final int ss = scopes.size();
+    for(int s = 0; s < ss; s++) if(scopes.get(s) == scp) return s;
     return -1;
   }
 
@@ -238,27 +239,16 @@ final class QueryCompiler {
    * @throws QueryException if a variable directly calls itself
    */
   private int[] neighbors(final Scope curr) throws QueryException {
-    final IntList adj = new IntList();
+    final IntList adj = new IntList(0);
     final boolean ok = curr.visit(new ASTVisitor() {
       @Override
-      public boolean staticVar(final StaticVar var) {
-        return var != curr && neighbor(var);
-      }
-
+      public boolean staticVar(final StaticVar var) { return var != curr && neighbor(var); }
       @Override
-      public boolean staticFuncCall(final StaticFuncCall call) {
-        return neighbor(call.func());
-      }
-
+      public boolean staticFuncCall(final StaticFuncCall call) { return neighbor(call.func()); }
       @Override
-      public boolean inlineFunc(final Scope sub) {
-        return sub.visit(this);
-      }
-
+      public boolean inlineFunc(final Scope sub) { return sub.visit(this); }
       @Override
-      public boolean funcItem(final FuncItem func) {
-        return neighbor(func);
-      }
+      public boolean funcItem(final FuncItem func) { return neighbor(func); }
 
       /**
        * Adds a neighbor of the currently inspected scope.
@@ -271,10 +261,11 @@ final class QueryCompiler {
         return true;
       }
     });
+
     if(!ok) {
       final StaticVar var = (StaticVar) curr;
-      throw Err.CIRCREF.get(var.info, "$" + var.name);
+      throw CIRCREF_X.get(var.info, "$" + var.name);
     }
-    return adj.toArray();
+    return adj.finish();
   }
 }

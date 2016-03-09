@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * This class serves as a container for updated names.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class NamePool {
@@ -41,7 +41,7 @@ public final class NamePool {
   }
 
   /**
-   * Returns the name of a duplicate attribute, or {@code null}.
+   * Returns the name of a duplicate attribute or {@code null}.
    * @return name of duplicate attribute
    */
   QNm duplicate() {
@@ -54,9 +54,9 @@ public final class NamePool {
 
   /**
    * Checks if no namespace conflicts occur.
-   * @return success flag
+   * @return {@code null} or conflicting namespaces
    */
-  boolean nsOK() {
+  byte[][] nsOK() {
     final Atts at = new Atts();
     for(int i = 0; i < size; ++i) {
       if(cache[i].add <= (cache[i].del ? 1 : 0)) continue;
@@ -68,9 +68,9 @@ public final class NamePool {
       final byte[] u = at.value(pref);
       if(u == null) at.add(pref, uri);
       // check if only one uri is assigned to a prefix
-      else if(!eq(uri, u)) return false;
+      else if(!eq(uri, u)) return new byte[][] { uri, u };
     }
-    return true;
+    return null;
   }
 
   /**
@@ -94,14 +94,14 @@ public final class NamePool {
   }
 
   /** Name cache. */
-  static final class NameCache {
+  private static final class NameCache {
     /** Name. */
-    QNm name;
+    private QNm name;
     /** Attribute/element flag. */
-    boolean attr;
+    private boolean attr;
     /** Counts the number of times the name is added. */
-    int add;
+    private int add;
     /** States if the name is deleted. */
-    boolean del;
+    private boolean del;
   }
 }

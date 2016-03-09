@@ -5,14 +5,14 @@ import java.io.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.parse.*;
+import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.server.*;
-import org.basex.util.*;
 
 /**
  * This class offers methods to locally execute database commands.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public class LocalSession extends Session {
@@ -28,42 +28,52 @@ public class LocalSession extends Session {
   }
 
   /**
+   * Constructor, specifying an output stream.
+   * @param context context
+   * @param output client output; if set to {@code null}, results will be returned as strings
+   */
+  public LocalSession(final Context context, final OutputStream output) {
+    this(context, output, context.user());
+  }
+
+  /**
    * Constructor, specifying login data.
    * @param context context
-   * @param user user name
-   * @param pass password
+   * @param username user name
+   * @param password password (plain text)
    * @throws LoginException login exception
    */
-  public LocalSession(final Context context, final String user, final String pass)
+  public LocalSession(final Context context, final String username, final String password)
       throws LoginException {
-    this(context, user, pass, null);
+    this(context, username, password, null);
   }
 
   /**
    * Constructor, specifying login data and an output stream.
    * @param context context
-   * @param user user name
-   * @param pass password
-   * @param output output stream
+   * @param username user name
+   * @param password password (plain text)
+   * @param output client output; if set to {@code null}, results will be returned as strings
    * @throws LoginException login exception
    */
-  private LocalSession(final Context context, final String user, final String pass,
+  public LocalSession(final Context context, final String username, final String password,
       final OutputStream output) throws LoginException {
 
-    this(context, output);
-    ctx.user = ctx.users.get(user);
-    if(ctx.user == null || !ctx.user.password.equals(Token.md5(pass))) throw new LoginException();
+    this(context, output, context.users.get(username));
+    final User user = ctx.user();
+    if(user == null || !user.matches(password)) throw new LoginException();
   }
 
   /**
    * Constructor, specifying an output stream.
    * @param context context
    * @param output output stream
+   * @param user user
    */
-  public LocalSession(final Context context, final OutputStream output) {
+  private LocalSession(final Context context, final OutputStream output, final User user) {
     super(output);
     ctx = new Context(context, null);
-    ctx.user = context.user;
+    ctx.user(user);
   }
 
   @Override
@@ -121,5 +131,14 @@ public class LocalSession extends Session {
   protected void execute(final Command command, final OutputStream output) throws BaseXException {
     command.execute(ctx, output);
     info = command.info();
+  }
+
+  /**
+   * Returns the associated database context.
+   * Called from the XQJ driver.
+   * @return database context
+   */
+  public Context context() {
+    return ctx;
   }
 }

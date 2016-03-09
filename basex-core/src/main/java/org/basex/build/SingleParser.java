@@ -10,7 +10,7 @@ import org.basex.io.*;
 /**
  * This class defines an abstract parser for single resources.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class SingleParser extends Parser {
@@ -29,7 +29,7 @@ public abstract class SingleParser extends Parser {
   @Override
   public final void parse(final Builder build) throws IOException {
     builder = build;
-    builder.openDoc(token(target + src.name()));
+    builder.openDoc(token(target + source.name()));
     parse();
     builder.closeDoc();
   }

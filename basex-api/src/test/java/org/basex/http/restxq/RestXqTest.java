@@ -1,6 +1,5 @@
 package org.basex.http.restxq;
 
-import static org.basex.core.Text.*;
 import static org.junit.Assert.*;
 
 import java.io.*;
@@ -9,17 +8,16 @@ import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.io.*;
 import org.basex.util.*;
+import org.basex.util.http.*;
 import org.junit.*;
 
 /**
  * This class contains RESTXQ tests.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class RestXqTest extends HTTPTest {
-  /** Root path. */
-  private static final String ROOT = "http://" + S_LOCALHOST + ":9998/";
   /** Query header. */
   private static final String HEADER =
     "module  namespace m = 'http://basex.org/modules/restxq/test';" + Prop.NL +
@@ -33,7 +31,7 @@ public abstract class RestXqTest extends HTTPTest {
    */
   @BeforeClass
   public static void start() throws Exception {
-    init(ROOT, true);
+    init(HTTP_ROOT, true);
   }
 
   /**
@@ -65,13 +63,28 @@ public abstract class RestXqTest extends HTTPTest {
   }
 
   /**
+   * Executes the specified POST request and tests the result.
+   * @param function function to test
+   * @param query request
+   * @param request request
+   * @param type media type
+   * @param exp expected result
+   * @throws IOException I/O exception
+   */
+  protected static void post(final String function, final String query, final String request,
+      final MediaType type, final String exp) throws IOException {
+    install(function);
+    assertEquals(exp, post(query, request, type));
+  }
+
+  /**
    * Installs a new module and removes all others.
    * @param function function to be tested
    * @throws IOException I/O exception
    */
   protected static void install(final String function) throws IOException {
     // delete old module
-    final String path = context.globalopts.get(GlobalOptions.WEBPATH);
+    final String path = context.soptions.get(StaticOptions.WEBPATH);
     for(final IOFile f : new IOFile(path).children()) assertTrue(f.delete());
     // create new module
     module().write(new TokenBuilder(HEADER).add(function).finish());
@@ -82,7 +95,7 @@ public abstract class RestXqTest extends HTTPTest {
    * @return test module
    */
   private static IOFile module() {
-    final String path = context.globalopts.get(GlobalOptions.WEBPATH);
+    final String path = context.soptions.get(StaticOptions.WEBPATH);
     return new IOFile(path, NAME + count++ + IO.XQMSUFFIX);
   }
 }

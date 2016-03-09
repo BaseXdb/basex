@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * Wrapper for representing an XQuery node.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class XdmNode extends XdmItem {
@@ -19,10 +19,10 @@ final class XdmNode extends XdmItem {
 
   /**
    * Constructor.
-   * @param n node
+   * @param node node
    */
-  XdmNode(final ANode n) {
-    node = n;
+  XdmNode(final ANode node) {
+    this.node = node;
   }
 
   @Override
@@ -47,7 +47,12 @@ final class XdmNode extends XdmItem {
 
   @Override
   public SeqType getType() {
-    return node.type();
+    return node.seqType();
+  }
+
+  @Override
+  public ANode internal() {
+    return node;
   }
 
   @Override
@@ -55,14 +60,7 @@ final class XdmNode extends XdmItem {
     try {
       return node.serialize().toString();
     } catch(final QueryIOException ex) {
-      throw Util.notExpected(ex);
+      return node.toString();
     }
-  }
-
-  // PACKAGE PROTECTED METHODS ================================================
-
-  @Override
-  public ANode internal() {
-    return node;
   }
 }

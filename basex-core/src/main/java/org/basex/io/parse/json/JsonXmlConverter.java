@@ -3,7 +3,7 @@ package org.basex.io.parse.json;
 import static org.basex.io.parse.json.JsonConstants.*;
 import static org.basex.util.Token.*;
 
-import org.basex.build.*;
+import org.basex.build.json.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -12,7 +12,7 @@ import org.basex.util.list.*;
 /**
  * This class provides a parse method to convert JSON data to XML nodes.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 abstract class JsonXmlConverter extends JsonConverter {
@@ -24,7 +24,7 @@ abstract class JsonXmlConverter extends JsonConverter {
   private final boolean strings;
 
   /** Current element. */
-  FElem elem;
+  FElem curr;
 
   /**
    * Constructor.
@@ -41,8 +41,8 @@ abstract class JsonXmlConverter extends JsonConverter {
    * @return element
    */
   FElem element() {
-    if(elem == null) elem = new FElem(JSON);
-    return elem;
+    if(curr == null) curr = new FElem(JSON);
+    return curr;
   }
 
   @Override
@@ -52,7 +52,8 @@ abstract class JsonXmlConverter extends JsonConverter {
       final ByteList[] types = new ByteList[ATTRS.length];
       for(final TypeCache arr : names.values()) {
         if(arr != null) {
-          for(int i = 0; i < TYPES.length; i++) {
+          final int tl = TYPES.length;
+          for(int i = 0; i < tl; i++) {
             if(arr.type == TYPES[i] && (strings || arr.type != STRING)) {
               if(types[i] == null) types[i] = new ByteList();
               else types[i].add(' ');
@@ -62,8 +63,9 @@ abstract class JsonXmlConverter extends JsonConverter {
           }
         }
       }
-      for(int i = 0; i < types.length; i++) {
-        if(types[i] != null) e.add(ATTRS[i], types[i].toArray());
+      final int tl = types.length;
+      for(int t = 0; t < tl; t++) {
+        if(types[t] != null) e.add(ATTRS[t], types[t].finish());
       }
     }
     return new FDoc().add(e);
@@ -71,11 +73,11 @@ abstract class JsonXmlConverter extends JsonConverter {
 
   /**
    * Adds type information to an element or the type cache.
-   * @param e element
+   * @param elem element
    * @param name JSON name
    * @param type data type
    */
-  void addType(final FElem e, final byte[] name, final byte[] type) {
+  void addType(final FElem elem, final byte[] name, final byte[] type) {
     // merge type information
     if(merge) {
       // check if name exists and contains no whitespaces
@@ -85,7 +87,7 @@ abstract class JsonXmlConverter extends JsonConverter {
           final TypeCache arr = names.get(name);
           if(arr != null && arr.type == type) {
             // add element if all types are identical
-            arr.add(e);
+            arr.add(elem);
           } else {
             // different types for same element
             if(arr != null) {
@@ -94,44 +96,44 @@ abstract class JsonXmlConverter extends JsonConverter {
               names.put(name, null);
             }
             // add type attribute, ignore string type
-            addType(e, type);
+            addType(elem, type);
           }
         } else {
           // new name: create new type cache
-          names.put(name, new TypeCache(name, type, e));
+          names.put(name, new TypeCache(name, type, elem));
         }
       } else {
         // no name, or name with whitespaces: add type attribute, ignore string type
-        addType(e, type);
+        addType(elem, type);
       }
     } else {
       // add type attribute
-      addType(e, type);
+      addType(elem, type);
     }
   }
 
   /**
    * Adds a type attribute to the specified element. Ignore string types.
-   * @param e element
+   * @param elem element
    * @param type type
    */
-  private void addType(final FElem e, final byte[] type) {
-    if(strings || type != STRING) e.add(TYPE, type);
+  private void addType(final FElem elem, final byte[] type) {
+    if(strings || type != STRING) elem.add(TYPE, type);
   }
 
   /**
    * A simple container for all elements having the same name.
    * @author Leo Woerteler
    */
-  static final class TypeCache {
+  private static final class TypeCache {
     /** Shared JSON type. */
-    public final byte[] type;
+    private final byte[] type;
     /** JSON name. */
-    public final byte[] name;
+    private final byte[] name;
     /** Nodes. */
-    public FElem[] vals = new FElem[8];
+    private FElem[] vals = new FElem[8];
     /** Logical size of {@link #vals}.  */
-    public int size;
+    private int size;
 
     /**
      * Constructor.
@@ -139,7 +141,7 @@ abstract class JsonXmlConverter extends JsonConverter {
      * @param tp JSON type
      * @param nd element
      */
-    TypeCache(final byte[] nm, final byte[] tp, final FElem nd) {
+    private TypeCache(final byte[] nm, final byte[] tp, final FElem nd) {
       name = nm;
       type = tp;
       vals[0] = nd;
@@ -150,7 +152,7 @@ abstract class JsonXmlConverter extends JsonConverter {
      * Adds a new element to the list.
      * @param nd element to add
      */
-    public void add(final FElem nd) {
+    private void add(final FElem nd) {
       if(size == vals.length) vals = Array.copy(vals, new FElem[Array.newSize(size)]);
       vals[size++] = nd;
     }

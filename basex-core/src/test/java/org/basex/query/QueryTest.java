@@ -3,106 +3,66 @@ package org.basex.query;
 import static org.junit.Assert.*;
 
 import org.basex.*;
-import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.data.*;
-import org.basex.query.iter.*;
-import org.basex.query.simple.*;
+import org.basex.query.func.fn.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
-import org.junit.*;
+import org.basex.util.list.*;
 import org.junit.Test;
 
 /**
  * This class tests the database commands.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class QueryTest extends SandboxTest {
-  /** Document. */
-  protected static String doc;
   /** Queries. */
   protected static Object[][] queries;
 
-  /** Prepares the tests. */
-  @BeforeClass
-  public static void startTest() {
-    context.options.set(MainOptions.CACHEQUERY, true);
-  }
-
   /**
    * Tests the specified instance.
-   * @throws BaseXException database exception
    */
   @Test
-  public void test() throws BaseXException {
-    final String file = doc.replaceAll("\"", "\\\\\"");
-    final String name = Util.className(QueryTest.class);
-    final boolean up = this instanceof XQUPTest;
-    new CreateDB(name, file).execute(context);
-
+  public void test() {
     final StringBuilder sb = new StringBuilder();
     int fail = 0;
 
     for(final Object[] qu : queries) {
-      // added to renew document after each update test
-      final String title = (String) qu[0];
-      if(up && title.startsWith("xxx")) {
-        new CreateDB(name, file).execute(context);
-      }
-
       final boolean correct = qu.length == 3;
       final String query = qu[correct ? 2 : 1].toString();
-      final Result cmp = correct ? (Result) qu[1] : null;
+      final Value cmp = correct ? (Value) qu[1] : null;
 
-      final QueryProcessor qp = new QueryProcessor(query, context);
-      try {
-        final Result val = qp.execute();
-        if(cmp instanceof Nodes) {
-          ((Nodes) cmp).data = context.data();
-        }
-
-        if(!correct || !val.sameAs(cmp)) {
+      try(final QueryProcessor qp = new QueryProcessor(query, context)) {
+        final Value val = qp.value();
+        if(!correct || !new DeepEqual().equal(val, cmp)) {
           sb.append("[" + qu[0] + "] " + query);
-          String s = correct && cmp.size() != 1 ? "#" + cmp.size() : "";
-          sb.append("\n[E" + s + "] ");
+          sb.append("\n[E] " + cmp.size() + " result(s): ");
           if(correct) {
-            final String cp = cmp.toString();
-            sb.append('\'');
-            sb.append(cp.length() > 1000 ? cp.substring(0, 1000) + "..." : cp);
-            sb.append('\'');
+            for(final Item it : cmp) sb.append(it.serialize()).append(", ");
           } else {
             sb.append("error");
           }
-          final TokenBuilder types = new TokenBuilder();
-          if(val instanceof ValueBuilder) {
-            final ValueBuilder vb = (ValueBuilder) val;
-            for(final Item i : vb) types.add(i.type.toString()).add(" ");
-          } else {
-            types.add(Util.className(val));
-          }
-          s = val.size() == 1 ? "" : "#" + val.size();
-          sb.append("\n[F" + s + "] '" + val + "', " + types + details() + '\n');
+          sb.append("\n[F] " + val.size() + " result(s): ");
+          for(final Item it : val) sb.append(it.serialize()).append(", ");
+          sb.append(details()).append('\n');
           ++fail;
         }
       } catch(final Exception ex) {
         final String msg = ex.getMessage();
         if(correct || msg == null || msg.contains("mailman")) {
-          final String cp = correct && (!(cmp instanceof Nodes) || ((Nodes) cmp).data != null)
-              ? cmp.toString() : "()";
+          final String cp = correct && cmp.data() != null ? cmp.toString() : "()";
           sb.append("[" + qu[0] + "] " + query + "\n[E] " + cp + "\n[F] "
-              + (msg == null ? Util.className(ex) : msg.replaceAll("\r\n?|\n", " ")) + ' '
-              + details() + '\n');
+              + (msg == null ? Util.className(ex) : normNL(msg)) + ' ' + details() + '\n');
           ex.printStackTrace();
           ++fail;
         }
-      } finally {
-        qp.close();
       }
     }
-    if(fail != 0) fail(fail + " Errors. [E] = expected, [F] = found:\n" +
-        sb.toString().trim());
+    if(fail != 0) fail(fail + " Errors. [E] = expected, [F] = found:\n" + sb.toString().trim());
   }
 
   /**
@@ -115,10 +75,18 @@ public abstract class QueryTest extends SandboxTest {
 
   /**
    * Creates a container for the specified node values.
+   * @param doc document
+   */
+  protected static void create(final String doc) {
+    execute(new CreateDB(Util.className(SandboxTest.class), doc));
+  }
+
+  /**
+   * Creates a container for the specified node values.
    * @return node array
    */
-  protected static ValueBuilder empty() {
-    return new ValueBuilder();
+  protected static Value empty() {
+    return Empty.SEQ;
   }
 
   /**
@@ -126,28 +94,28 @@ public abstract class QueryTest extends SandboxTest {
    * @param nodes node values
    * @return node array
    */
-  protected static Nodes node(final int... nodes) {
-    return new Nodes(nodes);
+  protected static Value nodes(final int... nodes) {
+    return DBNodeSeq.get(new IntList(nodes), context.data(), false, false);
   }
 
   /**
-   * Creates an iterator for the specified string.
-   * @param str string
+   * Creates a container for the specified string.
+   * @param strings string
    * @return iterator
    */
-  protected static ValueBuilder str(final String... str) {
-    final ValueBuilder ii = new ValueBuilder();
-    for(final String s : str) ii.add(Str.get(s));
-    return ii;
+  protected static Value strings(final String... strings) {
+    final TokenList tl = new TokenList(strings.length);
+    for(final String s : strings) tl.add(s);
+    return StrSeq.get(tl.finish());
   }
 
   /**
    * Creates an iterator for the specified double.
-   * @param d double value
+   * @param doubles double value
    * @return iterator
    */
-  protected static ValueBuilder dbl(final double d) {
-    return item(Dbl.get(d));
+  protected static Value doubles(final double... doubles) {
+    return DblSeq.get(doubles);
   }
 
   /**
@@ -155,19 +123,17 @@ public abstract class QueryTest extends SandboxTest {
    * @param d decimal value
    * @return iterator
    */
-  protected static ValueBuilder dec(final double d) {
-    return item(Dec.get(d));
+  protected static Item decimal(final double d) {
+    return Dec.get(d);
   }
 
   /**
    * Creates an iterator for the specified integer.
-   * @param d double value
+   * @param integers double value
    * @return iterator
    */
-  protected static ValueBuilder itr(final long... d) {
-    final ValueBuilder ii = new ValueBuilder();
-    for(final long dd : d) ii.add(Int.get(dd));
-    return ii;
+  protected static Value integers(final long... integers) {
+    return IntSeq.get(integers, AtomType.ITR);
   }
 
   /**
@@ -175,18 +141,7 @@ public abstract class QueryTest extends SandboxTest {
    * @param b boolean value
    * @return iterator
    */
-  protected static ValueBuilder bool(final boolean... b) {
-    final ValueBuilder ii = new ValueBuilder();
-    for(final boolean bb : b) ii.add(Bln.get(bb));
-    return ii;
-  }
-
-  /**
-   * Creates an iterator for the specified item.
-   * @param i item
-   * @return iterator
-   */
-  private static ValueBuilder item(final Item i) {
-    return new ValueBuilder().add(i);
+  protected static Value booleans(final boolean... b) {
+    return BlnSeq.get(b);
   }
 }

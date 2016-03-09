@@ -1,19 +1,20 @@
 package org.basex.gui.text;
 
 import static org.basex.data.DataText.*;
+
 import java.awt.*;
 
 /**
  * This class defines syntax highlighting for XML files.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class SyntaxXML extends Syntax {
   /** Last quote. */
   private int quote;
-  /** Tag flag. */
-  private boolean tag;
+  /** Element name flag. */
+  private boolean name;
   /** Flag for printing element name. */
   private boolean elem;
   /** Current state of comment. */
@@ -25,7 +26,7 @@ public final class SyntaxXML extends Syntax {
   public void init(final Color color) {
     super.init(color);
     quote = 0;
-    tag = false;
+    name = false;
     elem = false;
     comment = 0;
     pi = 0;
@@ -38,7 +39,7 @@ public final class SyntaxXML extends Syntax {
     if(pi > 0) return pi(ch);
 
     // last token was an opening angle bracket (<)
-    if(tag) {
+    if(name) {
       if(quote != 0) {
         if(quote == ch) quote = 0;
         return STRING;
@@ -48,7 +49,7 @@ public final class SyntaxXML extends Syntax {
         return STRING;
       }
       if(ch == '>') {
-        tag = false;
+        name = false;
         return KEYWORD;
       }
       if(ch == '=' || ch == '/') {
@@ -56,12 +57,12 @@ public final class SyntaxXML extends Syntax {
       }
       if(ch == '!') {
         comment = 1;
-        tag = false;
+        name = false;
         return COMMENT;
       }
       if(ch == '?') {
         pi = 1;
-        tag = false;
+        name = false;
         return FUNCTION;
       }
 
@@ -74,7 +75,7 @@ public final class SyntaxXML extends Syntax {
 
     // start of a new element, comment or processing instruction
     if(ch == '<') {
-      tag = true;
+      name = true;
       elem = true;
       return KEYWORD;
     }
@@ -88,9 +89,8 @@ public final class SyntaxXML extends Syntax {
    */
   private Color comment(final int ch) {
     switch(comment) {
-      // "<!"
-      case 1: comment = ch == '-' ? comment + 1 : 6; break;
-      // "<!-"
+      // "<!", "<!-"
+      case 1:
       case 2: comment = ch == '-' ? comment + 1 : 6; break;
       // "<!--"
       case 3: if(ch == '-') comment = 4; break;

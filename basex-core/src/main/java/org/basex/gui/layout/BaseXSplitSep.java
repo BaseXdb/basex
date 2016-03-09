@@ -10,16 +10,12 @@ import org.basex.gui.*;
 /**
  * This separator splits several panels and allows panel resizing.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class BaseXSplitSep extends BaseXBack {
   /** Size of splitter. */
   static final int SIZE = 8;
-  /** Color foreground. */
-  private final Color fore;
-  /** Color background. */
-  private final Color back;
   /** Layout: horizontal = true, vertical = false. */
   private final boolean l;
 
@@ -29,8 +25,6 @@ final class BaseXSplitSep extends BaseXBack {
    */
   BaseXSplitSep(final boolean lay) {
     setCursor(lay ? GUIConstants.CURSORMOVEH : GUIConstants.CURSORMOVEV);
-    fore = getBackground();
-    back = fore.darker();
     final MouseInputAdapter mouse = new MouseInputAdapter() {
       @Override
       public void mousePressed(final MouseEvent e) {
@@ -52,9 +46,9 @@ final class BaseXSplitSep extends BaseXBack {
     final int w = getWidth();
     final int h = getHeight();
 
-    g.setColor(fore);
+    g.setColor(GUIConstants.PANEL);
     g.fillRect(0, 0, w, h);
-    g.setColor(back);
+    g.setColor(GUIConstants.gray);
     g.drawLine(0, 0, l ? 0 : w, l ? h : 0);
     g.drawLine(l ? w - 1 : 0, l ? 0 : h - 1, l ? w - 1 : w, l ? h : h - 1);
   }

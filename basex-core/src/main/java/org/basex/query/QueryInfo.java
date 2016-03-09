@@ -17,7 +17,7 @@ import org.basex.util.list.*;
 /**
  * This class remembers descriptive query information sent back to the client.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class QueryInfo {
@@ -36,9 +36,9 @@ public final class QueryInfo {
   public long evaluating;
   /** Serialization time. */
   public long serializing;
-  /** Query. */
-  public String query;
 
+  /** Query. */
+  String query;
   /** Runtime flag. */
   boolean runtime;
   /** Compilation info. */
@@ -74,8 +74,8 @@ public final class QueryInfo {
    * Adds some evaluation info.
    * @param string evaluation info
    */
-  public void evalInfo(final String string) {
-    if(verbose) evaluate.add(token(string.replaceAll("\r?\n\\s*", " ")));
+  void evalInfo(final String string) {
+    if(verbose) evaluate.add(token(string.replaceAll("\r?\n", "|")));
   }
 
   /**
@@ -124,7 +124,7 @@ public final class QueryInfo {
    * @param qc query context
    * @return string
    */
-  public String toString(final QueryContext qc) {
+  String toString(final QueryContext qc) {
     final TokenBuilder tb = new TokenBuilder();
     if(query != null) {
       final String qu = QueryProcessor.removeComments(query, Integer.MAX_VALUE);

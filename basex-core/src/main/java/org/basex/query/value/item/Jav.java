@@ -1,14 +1,14 @@
 package org.basex.query.value.item;
 
 import org.basex.query.*;
-import org.basex.query.util.*;
+import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
  * Java item.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Jav extends Item {
@@ -30,12 +30,7 @@ public final class Jav extends Item {
 
   @Override
   public byte[] string(final InputInfo ii) throws QueryException {
-    return materialize(ii).value;
-  }
-
-  @Override
-  public Str materialize(final InputInfo ii) throws QueryException {
-    return Str.get(value, qc, ii);
+    return Str.get(value, qc, ii).value;
   }
 
   @Override
@@ -44,14 +39,18 @@ public final class Jav extends Item {
   }
 
   @Override
-  public boolean eq(final Item it, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  public boolean eq(final Item it, final Collation coll, final StaticContext sc,
+      final InputInfo ii) throws QueryException {
     return Token.eq(string(ii), it.string(ii));
   }
 
   @Override
-  public int diff(final Item it, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  public boolean sameKey(final Item it, final InputInfo ii) {
+    return false;
+  }
+
+  @Override
+  public int diff(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
     return Token.diff(string(ii), it.string(ii));
   }
 

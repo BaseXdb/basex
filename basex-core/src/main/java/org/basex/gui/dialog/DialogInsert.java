@@ -19,7 +19,7 @@ import org.basex.util.list.*;
 /**
  * Dialog window for inserting new database nodes.
 
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Lukas Kircher
  */
 public final class DialogInsert extends BaseXDialog {
@@ -73,8 +73,9 @@ public final class DialogInsert extends BaseXDialog {
     };
 
     final int lkind = gui.gopts.get(GUIOptions.LASTINSERT);
-    radio = new BaseXRadio[NODE_KINDS.length];
-    for(int i = 1; i < NODE_KINDS.length; ++i) {
+    final int nl = NODE_KINDS.length;
+    radio = new BaseXRadio[nl];
+    for(int i = 1; i < nl; ++i) {
       radio[i] = new BaseXRadio(NODE_KINDS[i], false, this);
       radio[i].addActionListener(al);
       radio[i].setSelected(i == lkind);
@@ -99,7 +100,7 @@ public final class DialogInsert extends BaseXDialog {
     change(radio[lkind]);
 
     action(null);
-    finish(null);
+    finish();
   }
 
   /**
@@ -108,8 +109,10 @@ public final class DialogInsert extends BaseXDialog {
    */
   private void change(final Object src) {
     int n = 0;
-    for(int r = 0; r < radio.length; ++r) if(src == radio[r]) n = r;
-    BaseXLayout.setHeight(input2, n == Data.ATTR ? 25 : 350);
+    final int rl = radio.length;
+    for(int r = 0; r < rl; ++r) if(src == radio[r]) n = r;
+    final int h = n == Data.ATTR ? input1.getHeight() : (int) (GUIConstants.scale * 350);
+    input2.setPreferredSize(new Dimension(input2.getPreferredSize().width, h));
 
     back.removeAll();
     back.layout(new BorderLayout(0, 4));
@@ -130,8 +133,9 @@ public final class DialogInsert extends BaseXDialog {
 
   @Override
   public void action(final Object cmp) {
-    for(int i = 1; i < NODE_KINDS.length; ++i) {
-      if(radio[i].isSelected()) kind = i;
+    final int nl = NODE_KINDS.length;
+    for(int n = 1; n < nl; ++n) {
+      if(radio[n].isSelected()) kind = n;
     }
     gui.gopts.set(GUIOptions.LASTINSERT, kind);
 

@@ -10,16 +10,16 @@ import org.basex.core.*;
  * As specified by W3C, the values of the attribute are language identifiers as
  * defined by IETF BCP 47, Tags for the Identification of Languages.
  *
+ * @author BaseX Team 2005-16, BSD License
+ * @author Dimitar Popov
+ * @author Jens Erat
+ *
  * @see <a href="http://www.w3.org/TR/REC-xml/#sec-lang-tag"
  *      >http://www.w3.org/TR/REC-xml/#sec-lang-tag</a>
  * @see <a href="http://tools.ietf.org/html/bcp47"
  *      >http://tools.ietf.org/html/bcp47</a>
  * @see <a href="http://www.iana.org/assignments/language-subtag-registry"
  *      >http://www.iana.org/assignments/language-subtag-registry</a>
- *
- * @author BaseX Team 2005-14, BSD License
- * @author Dimitar Popov
- * @author Jens Erat
  */
 public final class Language implements Comparable<Language> {
   /** Available languages, indexed by language code. */
@@ -38,14 +38,14 @@ public final class Language implements Comparable<Language> {
 
   /**
    * Private Constructor.
-   * @param loc locale
+   * @param locale locale
    */
-  private Language(final Locale loc) {
-    locale = loc;
+  private Language(final Locale locale) {
+    this.locale = locale;
   }
 
   /**
-   * Returns an instance for the specified language code, or {@code null}.
+   * Returns an instance for the specified language code or {@code null}.
    * @param lang name or code of language
    * @return language code
    */
@@ -68,8 +68,7 @@ public final class Language implements Comparable<Language> {
   }
 
   /**
-   * Returns the user language as default language, or English, if the user
-   * language cannot be assigned.
+   * Returns the user language as default language, or English if the language cannot be assigned.
    * @return default language
    */
   public static Language def() {

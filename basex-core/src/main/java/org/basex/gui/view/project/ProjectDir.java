@@ -2,12 +2,13 @@ package org.basex.gui.view.project;
 
 import java.util.*;
 
+import org.basex.gui.*;
 import org.basex.io.*;
 
 /**
  * Single directory node.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class ProjectDir extends ProjectNode {
@@ -33,20 +34,24 @@ final class ProjectDir extends ProjectNode {
   void expand() {
     removeAllChildren();
     // cache and sort directories and files
-    final ArrayList<IOFile> dirs = new ArrayList<>();
-    final ArrayList<IOFile> files = new ArrayList<>();
-    for(final IOFile f : file.children()) (f.isDir() ? dirs : files).add(f);
+    final ArrayList<IOFile> dirs = new ArrayList<>(), files = new ArrayList<>();
+    final boolean hidden = project.gui.gopts.get(GUIOptions.HIDDENFILES);
+    for(final IOFile child : file.children()) {
+      if(hidden || !child.file().isHidden()) (child.isDir() ? dirs : files).add(child);
+    }
     Collections.sort(dirs, COMP);
     Collections.sort(files, COMP);
     // create child nodes
     for(final IOFile f : dirs) add(new ProjectDir(f, project));
     for(final IOFile f : files) add(new ProjectFile(f, project));
+    project.refreshTree();
   }
 
   @Override
   void collapse() {
     removeAllChildren();
     addDummy();
+    project.refreshTree();
   }
 
   /**

@@ -1,19 +1,19 @@
 package org.basex.query.value.item;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 
 import java.math.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.util.*;
+import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
  * Integer item ({@code xs:int}, {@code xs:integer}, {@code xs:short}, etc.).
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Int extends ANum {
@@ -24,8 +24,9 @@ public final class Int extends ANum {
 
   // caches the first 128 integers
   static {
-    NUMS = new Int[128];
-    for(int i = 0; i < NUMS.length; ++i) NUMS[i] = new Int(i);
+    final int nl = 128;
+    NUMS = new Int[nl];
+    for(int n = 0; n < nl; n++) NUMS[n] = new Int(n);
   }
 
   /**
@@ -39,7 +40,7 @@ public final class Int extends ANum {
   /**
    * Constructor.
    * @param value value
-   * @param type data type
+   * @param type item type
    */
   public Int(final long value, final Type type) {
     super(type);
@@ -58,7 +59,7 @@ public final class Int extends ANum {
   /**
    * Returns an instance of this class.
    * @param value value
-   * @param type data type
+   * @param type item type
    * @return instance
    */
   public static Int get(final long value, final Type type) {
@@ -101,14 +102,55 @@ public final class Int extends ANum {
   }
 
   @Override
-  public boolean eq(final Item it, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  public Int abs() {
+    return value < 0 ? get(-value) : type == AtomType.ITR ? this : get(value);
+  }
+
+  @Override
+  public Int ceiling() {
+    return this;
+  }
+
+  @Override
+  public Int floor() {
+    return this;
+  }
+
+  @Override
+  public ANum round(final int scale, final boolean even) {
+    final long v = rnd(scale, even);
+    return v == value ? this : get(v);
+  }
+
+  /**
+   * Returns a rounded value.
+   * @param s scale
+   * @param e half-to-even flag
+   * @return result
+   */
+  private long rnd(final int s, final boolean e) {
+    long v = value;
+    if(s >= 0 || v == 0) return v;
+    if(s < -15) return Dec.get(new BigDecimal(v)).round(s, e).itr();
+
+    long f = 1;
+    final int c = -s;
+    for(long i = 0; i < c; i++) f = (f << 3) + (f << 1);
+    final boolean n = v < 0;
+    final long a = n ? -v : v, m = a % f, d = m << 1;
+    v = a - m;
+    if(e ? d > f || d == f && v % (f << 1) != 0 : n ? d > f : d >= f) v += f;
+    return n ? -v : v;
+  }
+
+  @Override
+  public boolean eq(final Item it, final Collation coll, final StaticContext sc,
+      final InputInfo ii) throws QueryException {
     return it instanceof Int ? value == ((Int) it).value : value == it.dbl(ii);
   }
 
   @Override
-  public int diff(final Item it, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  public int diff(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
     if(it instanceof Int) {
       final long i = ((Int) it).value;
       return value < i ? -1 : value > i ? 1 : 0;
@@ -140,20 +182,26 @@ public final class Int extends ANum {
 
   /**
    * Converts the given item into a long value.
-   * @param val value to be converted
+   * @param value value to be converted
    * @param ii input info
    * @return long value
    * @throws QueryException query exception
    */
-  public static long parse(final byte[] val, final InputInfo ii) throws QueryException {
-    // try fast conversion
-    final long l = Token.toLong(val);
-    if(l != Long.MIN_VALUE) return l;
-    // fails; choose default conversion
-    try {
-      return Long.parseLong(Token.string(val).trim());
-    } catch(final NumberFormatException ex) {
-      throw FUNCAST.get(ii, NUMS[0].type, chop(val));
+  public static long parse(final byte[] value, final InputInfo ii) throws QueryException {
+    final byte[] val = Token.trim(value);
+    // fast check for valid characters
+    boolean valid = true;
+    for(final byte v : val) {
+      if(!Token.digit(v) && v != '+' && v != '-') {
+        valid = false;
+        break;
+      }
     }
+    // valid: try fast conversion
+    if(valid) {
+      final long l = Token.toLong(val);
+      if(l != Long.MIN_VALUE || Token.eq(val, Token.MINLONG)) return l;
+    }
+    throw funCastError(ii, AtomType.INT, val);
   }
 }

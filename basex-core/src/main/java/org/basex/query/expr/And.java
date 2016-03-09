@@ -5,15 +5,17 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.ft.*;
 import org.basex.util.hash.*;
 
 /**
  * And expression.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class And extends Logical {
@@ -27,69 +29,73 @@ public final class And extends Logical {
   }
 
   @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    // remove atomic values
-    final Expr c = super.compile(qc, scp);
-    return c != this ? c : optimize(qc, scp);
-  }
-
-  @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
-    // merge predicates if possible
+    final Expr c = super.optimize(qc, scp);
+    if(c != this) return c;
+
     final int es = exprs.length;
-    final ExprList el = new ExprList(es);
-    Pos ps = null;
-    CmpR cr = null;
-    CmpSR cs = null;
-    for(final Expr e : exprs) {
-      Expr tmp = null;
+    final ExprList list = new ExprList(es);
+    for(int i = 0; i < es; i++) {
+      Expr e = exprs[i];
       if(e instanceof Pos) {
-        // merge numeric predicates
-        tmp = ps == null ? e : ps.intersect((Pos) e, info);
-        if(!(tmp instanceof Pos)) return tmp;
-        ps = (Pos) tmp;
+        // merge adjacent numeric predicates
+        while(i + 1 < es && exprs[i + 1] instanceof Pos) {
+          e = ((Pos) e).intersect((Pos) exprs[++i], info);
+        }
       } else if(e instanceof CmpR) {
-        // merge comparisons
-        tmp = cr == null ? e : cr.intersect((CmpR) e);
-        if(tmp instanceof CmpR) cr = (CmpR) tmp;
-        else if(tmp != null) return tmp;
+        // merge adjacent range comparisons
+        while(i + 1 < es && exprs[i + 1] instanceof CmpR) {
+          final Expr tmp = ((CmpR) e).intersect((CmpR) exprs[i + 1]);
+          if(tmp != null) {
+            e = tmp;
+            i++;
+          } else {
+            break;
+          }
+        }
       } else if(e instanceof CmpSR) {
-        // merge comparisons
-        tmp = cs == null ? e : cs.intersect((CmpSR) e);
-        if(tmp instanceof CmpSR) cs = (CmpSR) tmp;
-        else if(tmp != null) return tmp;
+        // merge adjacent string range comparisons
+        while(i + 1 < es && exprs[i + 1] instanceof CmpSR) {
+          final Expr tmp = ((CmpSR) e).intersect((CmpSR) exprs[i + 1]);
+          if(tmp != null) {
+            e = tmp;
+            i++;
+          } else {
+            break;
+          }
+        }
       }
-      // no optimization found; add original expression
-      if(tmp == null && e != Bln.TRUE) {
-        if(e == Bln.FALSE) return optPre(Bln.FALSE, qc);
-        el.add(e);
-      }
+
+      // expression will always return false
+      if(e == Bln.FALSE) return optPre(Bln.FALSE, qc);
+      // skip expression yielding true
+      if(e != Bln.TRUE) list.add(e);
     }
-    if(ps != null) el.add(ps);
-    if(cr != null) el.add(cr);
-    if(cs != null) el.add(cs);
 
-    // all arguments were true()
-    if(el.isEmpty()) return optPre(Bln.TRUE, qc);
+    // all arguments return true
+    if(list.isEmpty()) return optPre(Bln.TRUE, qc);
 
-    if(es != el.size()) qc.compInfo(OPTWRITE, this);
-    exprs = el.finish();
+    if(es != list.size()) {
+      qc.compInfo(OPTREWRITE_X, this);
+      exprs = list.finish();
+    }
     compFlatten(qc);
 
     boolean not = true;
-    for(final Expr e : exprs) {
-      if(!e.isFunction(Function.NOT)) {
+    for(final Expr expr : exprs) {
+      if(!expr.isFunction(Function.NOT)) {
         not = false;
         break;
       }
     }
 
     if(not) {
-      qc.compInfo(OPTWRITE, this);
-      final Expr[] inner = new Expr[exprs.length];
-      for(int i = 0; i < inner.length; i++) inner[i] = ((Arr) exprs[i]).exprs[0];
-      final Expr or = new Or(info, inner).optimize(qc, scp);
-      return Function.NOT.get(null, or).optimize(qc, scp);
+      qc.compInfo(OPTREWRITE_X, this);
+      final int el = exprs.length;
+      final Expr[] inner = new Expr[el];
+      for(int e = 0; e < el; e++) inner[e] = ((Arr) exprs[e]).exprs[0];
+      final Expr ex = new Or(info, inner).optimize(qc, scp);
+      return Function.NOT.get(null, info, ex).optimize(qc, scp);
     }
 
     // return single expression if it yields a boolean
@@ -98,18 +104,27 @@ public final class And extends Logical {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    for(int i = 0; i < exprs.length - 1; i++)
-      if(!exprs[i].ebv(qc, info).bool(info)) return Bln.FALSE;
-    final Expr last = exprs[exprs.length - 1];
-    return tailCall ? last.item(qc, ii) : last.ebv(qc, ii).bool(ii) ? Bln.TRUE : Bln.FALSE;
+    // compute scoring
+    if(qc.scoring) {
+      double s = 0;
+      for(final Expr expr : exprs) {
+        final Item it = expr.ebv(qc, info);
+        if(!it.bool(info)) return Bln.FALSE;
+        s += it.score();
+      }
+      return Bln.get(true, Scoring.avg(s, exprs.length));
+    }
+
+    // standard evaluation
+    for(final Expr expr : exprs) {
+      if(!expr.ebv(qc, info).bool(info)) return Bln.FALSE;
+    }
+    return Bln.TRUE;
   }
 
   @Override
   public And copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vars) {
-    final int es = exprs.length;
-    final Expr[] ex = new Expr[es];
-    for(int i = 0; i < es; i++) ex[i] = exprs[i].copy(qc, scp, vars);
-    return new And(info, ex);
+    return new And(info, copyAll(qc, scp, vars, exprs));
   }
 
   @Override

@@ -3,10 +3,12 @@ package org.basex.query.up;
 import java.util.*;
 
 import org.basex.data.*;
-import org.basex.data.atomic.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.up.atomic.*;
 import org.basex.query.up.primitives.*;
+import org.basex.query.up.primitives.node.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.node.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
@@ -52,18 +54,37 @@ import org.basex.util.list.*;
  *      merging.</li>
  * </ol>
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Lukas Kircher
  */
 public final class Updates {
   /** Current context modifier. */
-  public ContextModifier mod;
+  public final ContextModifier mod;
   /** All file paths that are targeted during a snapshot by an fn:put expression. */
   public final TokenSet putPaths = new TokenSet();
+  /** Cached outputs. */
+  public final ItemList cache = new ItemList();
 
   /** Mapping between fragment IDs and the temporary data instances
    * to apply updates on the corresponding fragments. */
   private final IntObjMap<MemData> fragmentIDs = new IntObjMap<>();
+
+  /**
+   * Constructor.
+   * @param transform transform flag
+   */
+  public Updates(final boolean transform) {
+    mod = transform ? new TransformModifier() : new DatabaseModifier();
+  }
+
+  /**
+   * Adds a data reference to list which keeps track of the nodes copied
+   * within a transform expression.
+   * @param data reference
+   */
+  public void addData(final Data data) {
+    mod.addData(data);
+  }
 
   /**
    * Adds an update primitive to the current context modifier.
@@ -72,7 +93,6 @@ public final class Updates {
    * @throws QueryException query exception
    */
   public void add(final Update up, final QueryContext qc) throws QueryException {
-    if(mod == null) mod = new DatabaseModifier();
     mod.add(up, qc);
   }
 
@@ -92,7 +112,7 @@ public final class Updates {
 
     // determine highest ancestor node
     ANode anc = target;
-    final AxisIter it = target.ancestor();
+    final BasicNodeIter it = target.ancestor();
     for(ANode p; (p = it.next()) != null;) anc = p;
 
     /* See if this ancestor has already been added to the pending update list.
@@ -102,7 +122,7 @@ public final class Updates {
     MemData data = fragmentIDs.get(ancID);
     // if data doesn't exist, create a new one
     if(data == null) {
-      data =  (MemData) anc.dbCopy(qc.context.options).data;
+      data = (MemData) anc.dbNodeCopy(qc.context.options).data();
       // create a mapping between the fragment id and the data reference
       fragmentIDs.put(ancID, data);
     }
@@ -114,28 +134,32 @@ public final class Updates {
 
   /**
    * Prepares update operations.
+   * @param qc query context
    * @return updated data references
    * @throws QueryException query exception
    */
-  public HashSet<Data> prepare() throws QueryException {
-    return mod == null ? null : mod.prepare();
+  public HashSet<Data> prepare(final QueryContext qc) throws QueryException {
+    final HashSet<Data> datas = new HashSet<>();
+    mod.prepare(datas, qc);
+    return datas;
   }
 
   /**
    * Executes all updates.
+   * @param qc query context
    * @throws QueryException query exception
    */
-  public void apply() throws QueryException {
-    if(mod != null) mod.apply();
+  public void apply(final QueryContext qc) throws QueryException {
+    mod.apply(qc);
   }
 
   /**
-   * Adds all databases to be updated to the specified list.
+   * Returns the names of all databases that will be updated.
    * @return databases
    */
   public StringList databases() {
     final StringList sl = new StringList(1);
-    if(mod != null) mod.databases(sl);
+    mod.databases(sl);
     return sl;
   }
 
@@ -144,7 +168,7 @@ public final class Updates {
    * @return #updates
    */
   public int size() {
-    return mod == null ? 0 : mod.size();
+    return mod.size();
   }
 
   /**
@@ -158,16 +182,14 @@ public final class Updates {
     if(node.id == trgID) return 0;
 
     int s = 1;
-    AxisIter it = node.attributes();
-    for(ANode n; (n = it.next()) != null;) {
+    for(final ANode n : node.attributes()) {
       final int st = preSteps(n, trgID);
       if(st == 0) return s;
       s += st;
     }
-
-    it = node.children();
-    // n.id <= trgID: rewritten to catch ID overflow
-    for(ANode n; (n = it.next()) != null && trgID - n.id >= 0;) {
+    for(final ANode n : node.children()) {
+      // n.id <= trgID: rewritten to catch ID overflow
+      if(trgID - n.id < 0) break;
       s += preSteps(n, trgID);
     }
     return s;

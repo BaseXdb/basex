@@ -2,22 +2,24 @@ package org.basex.data;
 
 import static org.junit.Assert.*;
 
-import org.basex.data.atomic.*;
+import java.io.*;
+
 import org.basex.util.*;
 import org.junit.*;
 
 /**
  * This class tests the update features of the {@link Data} class.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Tim Petrowsky
  */
-public final class UpdateTestTags extends UpdateTest {
+public final class UpdateTestTags extends DataUpdateTest {
   /**
    * Tests insert as last child.
+   * @throws IOException I/O exception
    */
   @Test
-  public void insertTagAsOnly1() {
+  public void insertTagAsOnly1() throws IOException {
     final Data data = context.data();
     final long nextid = data.meta.lastid;
     insertTag(3, 0, T_JUNIT, Data.ELEM);
@@ -41,9 +43,10 @@ public final class UpdateTestTags extends UpdateTest {
 
   /**
    * Tests insert as last child.
+   * @throws IOException I/O exception
    */
   @Test
-  public void insertTagAsOnly2() {
+  public void insertTagAsOnly2() throws IOException {
     final Data data = context.data();
     final long nextid = data.meta.lastid;
     insertTag(3, 1, T_JUNIT, Data.ELEM);
@@ -67,9 +70,10 @@ public final class UpdateTestTags extends UpdateTest {
 
   /**
    * Tests insert as last child.
+   * @throws IOException I/O exception
    */
   @Test
-  public void insertTagAsOnly3() {
+  public void insertTagAsOnly3() throws IOException {
     final Data data = context.data();
     final long nextid = data.meta.lastid;
     insertTag(3, 2, T_JUNIT, Data.ELEM);
@@ -93,9 +97,10 @@ public final class UpdateTestTags extends UpdateTest {
 
   /**
    * Tests insert as last child.
+   * @throws IOException I/O exception
    */
   @Test
-  public void insertTagAfterAttsAsFirst() {
+  public void insertTagAfterAttsAsFirst() throws IOException {
     final Data data = context.data();
     final long nextid = data.meta.lastid;
     insertTag(6, 1, T_JUNIT, Data.ELEM);
@@ -118,9 +123,10 @@ public final class UpdateTestTags extends UpdateTest {
 
   /**
    * Tests insert as last child.
+   * @throws IOException I/O exception
    */
   @Test
-  public void insertTagAfterAttsAsSecond() {
+  public void insertTagAfterAttsAsSecond() throws IOException {
     final Data data = context.data();
     final long nextid = data.meta.lastid;
     insertTag(6, 2, T_JUNIT, Data.ELEM);
@@ -143,9 +149,10 @@ public final class UpdateTestTags extends UpdateTest {
 
   /**
    * Tests insert as last child.
+   * @throws IOException I/O exception
    */
   @Test
-  public void insertTagAfterAttsAsLast() {
+  public void insertTagAfterAttsAsLast() throws IOException {
     final Data data = context.data();
     final long nextid = data.meta.lastid;
     insertTag(6, 0, T_JUNIT, Data.ELEM);
@@ -168,13 +175,14 @@ public final class UpdateTestTags extends UpdateTest {
 
   /**
    * Tests updateTagName.
+   * @throws IOException I/O exception
    */
   @Test
-  public void updateTagName() {
+  public void updateTagName() throws IOException {
     final Data data = context.data();
-    data.startUpdate();
+    data.startUpdate(context.options);
     data.update(6, Data.ELEM, T_JUNIT, Token.EMPTY);
-    data.finishUpdate();
+    data.finishUpdate(context.options);
     assertEquals(Data.ELEM, data.kind(6));
     assertArraysEquals(T_JUNIT, data.name(6, Data.ELEM));
     reload();
@@ -188,8 +196,11 @@ public final class UpdateTestTags extends UpdateTest {
    * @param pos inserting position
    * @param name tag name
    * @param kind node kind
+   * @throws IOException I/O exception
    */
-  private static void insertTag(final int par, final int pos, final byte[] name, final int kind) {
+  private static void insertTag(final int par, final int pos, final byte[] name, final int kind)
+      throws IOException {
+
     int root;
     final Data data = context.data();
     if(pos == 0) {
@@ -204,11 +215,12 @@ public final class UpdateTestTags extends UpdateTest {
         ++currPos;
       }
     }
-    final MemData md = new MemData(data);
-    md.elem(1, data.tagindex.index(name, null, false), 1, 1, 0, false);
+
+    final MemData md = new MemData(context.options);
+    md.elem(1, md.elemNames.index(name, null, false), 1, 1, 0, false);
     md.insert(0);
-    data.startUpdate();
+    data.startUpdate(context.options);
     data.insert(root, par, new DataClip(md));
-    data.finishUpdate();
+    data.finishUpdate(context.options);
   }
 }

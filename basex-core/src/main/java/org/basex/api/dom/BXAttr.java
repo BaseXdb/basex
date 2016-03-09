@@ -1,6 +1,6 @@
 package org.basex.api.dom;
 
-import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.w3c.dom.*;
@@ -8,31 +8,31 @@ import org.w3c.dom.*;
 /**
  * DOM - Attribute implementation.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class BXAttr extends BXNode implements Attr {
   /**
    * Constructor.
-   * @param n node reference
+   * @param node node reference
    */
-  public BXAttr(final ANode n) {
-    super(n);
+  BXAttr(final ANode node) {
+    super(node);
   }
 
   @Override
   public String getNodeName() {
-    return Token.string(node.name());
+    return Token.string(nd.name());
   }
 
   @Override
   public String getLocalName() {
-    return Token.string(Token.local(node.name()));
+    return Token.string(Token.local(nd.name()));
   }
 
   @Override
   public String getNodeValue() {
-    return Token.string(node.string());
+    return Token.string(nd.string());
   }
 
   @Override
@@ -42,7 +42,7 @@ public final class BXAttr extends BXNode implements Attr {
 
   @Override
   public String getNamespaceURI() {
-    final byte[] uri = node.qname().uri();
+    final byte[] uri = nd.qname().uri();
     return uri.length == 0 ? null : Token.string(uri);
   }
 
@@ -78,7 +78,7 @@ public final class BXAttr extends BXNode implements Attr {
 
   @Override
   public TypeInfo getSchemaTypeInfo() {
-    throw Util.notImplemented();
+    throw notImplemented();
   }
 
   @Override
@@ -101,6 +101,6 @@ public final class BXAttr extends BXNode implements Attr {
    * @return text node
    */
   private FNode text() {
-    return new FTxt(node.string()).parent(node);
+    return new FTxt(nd.string()).parent(nd);
   }
 }

@@ -12,16 +12,16 @@ import org.basex.util.*;
 /**
  * Lists REST resources.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class RESTList extends RESTCmd {
   /**
    * Constructor.
-   * @param rs REST session
+   * @param session REST session
    */
-  RESTList(final RESTSession rs) {
-    super(rs);
+  RESTList(final RESTSession session) {
+    super(session);
   }
 
   @Override
@@ -34,8 +34,8 @@ final class RESTList extends RESTCmd {
 
     final HTTPContext http = session.http;
     http.initResponse();
-    final Serializer ser = Serializer.get(http.res.getOutputStream(), http.sopts());
-    ser.serialize(el);
-    ser.close();
+    try(final Serializer ser = Serializer.get(http.res.getOutputStream(), http.sopts())) {
+      ser.serialize(el);
+    }
   }
 }

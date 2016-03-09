@@ -1,14 +1,13 @@
 package net.xqj.basex.local;
 
-import com.xqj2.XQConnection2;
-import static org.junit.Assert.*;
 import static net.xqj.basex.BaseXXQInsertOptions.*;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.*;
 
 import javax.xml.xquery.*;
+
+import org.junit.*;
+
+import com.xqj2.*;
 
 /**
  * Testing XQJ insert.

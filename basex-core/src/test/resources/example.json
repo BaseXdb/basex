@@ -1,0 +1,10 @@
+{
+  "name": "Smith",
+  "address": {
+    "city": "New York",
+    "state": "NY",
+    "streetAddress": "21 2nd Street",
+    "postalCode": 10021
+  },
+  "active": true
+}

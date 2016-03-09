@@ -1,11 +1,12 @@
 package org.basex.query.value.node;
 
 import org.basex.data.*;
+import org.basex.query.util.ft.*;
 
 /**
  * Database node with full-text positions.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class FTPosNode extends DBNode {

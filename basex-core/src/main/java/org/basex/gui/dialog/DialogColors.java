@@ -11,10 +11,13 @@ import org.basex.util.options.*;
 /**
  * Dialog window for changing the used colors.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class DialogColors extends BaseXDialog {
+  /** Dialog. */
+  private static Dialog dialog;
+
   /** Maximum color range. */
   private static final int MAXCOLOR = 32;
   /** Slider reference. */
@@ -28,12 +31,10 @@ public final class DialogColors extends BaseXDialog {
    * Default constructor.
    * @param main reference to the main window
    */
-  public DialogColors(final GUI main) {
+  private DialogColors(final GUI main) {
     super(main, COLOR_SCHEMA, false);
 
-    final GUIOptions gopts = gui.gopts;
     final BaseXBack p = new BaseXBack(new TableLayout(3, 2, 16, 8));
-
     p.add(new BaseXLabel(RED));
     sliderRed = newSlider(GUIOptions.COLORRED);
     p.add(sliderRed);
@@ -48,8 +49,16 @@ public final class DialogColors extends BaseXDialog {
 
     set(p, BorderLayout.CENTER);
     set(newButtons(RESET), BorderLayout.SOUTH);
+    finish();
+  }
 
-    finish(gopts.get(GUIOptions.COLORSLOC));
+  /**
+   * Activates the dialog window.
+   * @param main reference to the main window
+   */
+  public static void show(final GUI main) {
+    if(dialog == null) dialog = new DialogColors(main);
+    dialog.setVisible(true);
   }
 
   /**
@@ -67,9 +76,9 @@ public final class DialogColors extends BaseXDialog {
   public void action(final Object comp) {
     if(comp instanceof BaseXButton) {
       // reset default values
-      sliderRed.setValue(GUIOptions.COLORRED.value);
-      sliderGreen.setValue(GUIOptions.COLORGREEN.value);
-      sliderBlue.setValue(GUIOptions.COLORBLUE.value);
+      sliderRed.setValue(GUIOptions.COLORRED.value());
+      sliderGreen.setValue(GUIOptions.COLORGREEN.value());
+      sliderBlue.setValue(GUIOptions.COLORBLUE.value());
     }
     sliderRed.assign();
     sliderGreen.assign();

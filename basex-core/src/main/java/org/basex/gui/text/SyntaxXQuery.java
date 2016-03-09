@@ -6,29 +6,22 @@ import java.awt.*;
 import java.lang.reflect.*;
 import java.util.*;
 
-import org.basex.core.*;
-import org.basex.io.serial.*;
 import org.basex.query.*;
-import org.basex.query.func.*;
 import org.basex.util.*;
-import org.basex.util.options.*;
 
 /**
  * This class defines syntax highlighting for XQuery files.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public final class SyntaxXQuery extends Syntax {
+final class SyntaxXQuery extends Syntax {
   /** Opening brackets. */
   private static final String OPENING = "{(";
   /** Closing brackets. */
   private static final String CLOSING = "})";
-
   /** Keywords. */
   private static final HashSet<String> KEYWORDS = new HashSet<>();
-  /** Functions. */
-  private static final HashSet<String> FUNCTIONS = new HashSet<>();
 
   /** Comment. */
   private int comment;
@@ -36,8 +29,6 @@ public final class SyntaxXQuery extends Syntax {
   private int quote;
   /** Variable flag. */
   private boolean var;
-  /** Function flag. */
-  private boolean fun;
 
   // initialize xquery keys
   static {
@@ -45,32 +36,10 @@ public final class SyntaxXQuery extends Syntax {
       // add query tokens
       for(final Field f : QueryText.class.getFields()) {
         if("IGNORE".equals(f.getName())) break;
-        final String s = (String) f.get(null);
-        Collections.addAll(KEYWORDS, s.split("-"));
+        Collections.addAll(KEYWORDS, ((String) f.get(null)).split("-"));
       }
-      // add function names
-      for(final Function f : Function.values()) {
-        final String s = f.toString();
-        Collections.addAll(FUNCTIONS, s.substring(0, s.indexOf('(')).split(":|-"));
-      }
-      // add serialization parameters and database options
-      addOptions(SerializerOptions.class);
-      addOptions(GlobalOptions.class);
-      addOptions(MainOptions.class);
     } catch(final Exception ex) {
       Util.stack(ex);
-    }
-  }
-
-  /**
-   * Adds the specified options.
-   * @param opt option class
-   * @throws Exception exception
-   */
-  private static void addOptions(final Class<? extends Options> opt) throws Exception {
-    for(final Option<?> o : Options.options(opt)) {
-      if(o instanceof Comment) continue;
-      Collections.addAll(FUNCTIONS, o.name().toLowerCase(Locale.ENGLISH).split("-"));
     }
   }
 
@@ -102,7 +71,10 @@ public final class SyntaxXQuery extends Syntax {
     } else if(comment == 3 && ch != ':') {
       comment = ch == ')' ? 0 : 2;
     }
-    if(comment != 0) return COMMENT;
+    if(comment != 0) {
+      var = false;
+      return COMMENT;
+    }
 
     // quotes
     if(ch == '"' || ch == '\'') {
@@ -120,24 +92,14 @@ public final class SyntaxXQuery extends Syntax {
       return VARIABLE;
     }
 
+    // digits
+    if(Token.digit(ch)) return FUNCTION;
     // special characters
-    if(!XMLToken.isNCChar(ch)) {
-      fun = false;
-      return COMMENT;
-    }
+    if(!XMLToken.isNCChar(ch)) return COMMENT;
+    // check for keywords
+    if(KEYWORDS.contains(iter.nextString())) return KEYWORD;
 
-    // check for keywords and function names
-    final String word = iter.nextString();
-    final boolean keys = KEYWORDS.contains(word);
-    final boolean func = FUNCTIONS.contains(word);
-    if(fun && func) return FUNCTION;
-    if(keys) return KEYWORD;
-    if(func) {
-      fun = true;
-      return FUNCTION;
-    }
-
-    // letters and numbers
+    // standard text
     return plain;
   }
 

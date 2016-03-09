@@ -4,7 +4,6 @@ import static org.basex.query.QueryText.*;
 
 import java.io.*;
 
-import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.expr.*;
@@ -16,7 +15,7 @@ import org.basex.util.list.*;
 /**
  * Superclass for static functions, variables and the main expression.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public abstract class StaticScope extends ExprInfo implements Scope {
@@ -55,7 +54,7 @@ public abstract class StaticScope extends ExprInfo implements Scope {
   }
 
   /**
-   * Returns a map with all documentation tags found for this scope, or {@code null} if
+   * Returns a map with all documentation tags found for this scope or {@code null} if
    * no documentation exists. The main description is flagged with the "description" key.
    * The supported tags are defined in {@link QueryText#DOC_TAGS} (other tags will be
    * included in the map, too).
@@ -76,7 +75,6 @@ public abstract class StaticScope extends ExprInfo implements Scope {
           add(key, val, map);
           key = Token.token(l.replaceAll("^@(\\w*).*", "$1"));
           l = l.replaceAll("^@\\w+ *", "");
-          val.reset();
         }
         val.add(l).add('\n');
       }
@@ -102,6 +100,6 @@ public abstract class StaticScope extends ExprInfo implements Scope {
       tl = new TokenList();
       map.put(k, tl);
     }
-    tl.add(val.trim().finish());
+    tl.add(val.trim().next());
   }
 }

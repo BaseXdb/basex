@@ -1,14 +1,14 @@
 package org.basex.query.func;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
-import static org.basex.query.util.Err.*;
 
 import java.lang.reflect.*;
 
+import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -17,14 +17,16 @@ import org.basex.util.hash.*;
 /**
  * Java function binding.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public final class JavaFunc extends JavaMapping {
+final class JavaFunc extends JavaFunction {
   /** Java class. */
   private final Class<?> clazz;
   /** Java method. */
   private final String method;
+  /** Types provided in the query (can be {@code null}). */
+  private final String[] types;
 
   /**
    * Constructor.
@@ -32,90 +34,111 @@ public final class JavaFunc extends JavaMapping {
    * @param info input info
    * @param clazz Java class
    * @param method Java method/field
+   * @param types types provided in the query (can be {@code null})
    * @param args arguments
    */
   JavaFunc(final StaticContext sc, final InputInfo info, final Class<?> clazz, final String method,
-      final Expr[] args) {
-    super(sc, info, args);
+      final String[] types, final Expr[] args) {
+    super(sc, info, args, Perm.ADMIN);
     this.clazz = clazz;
     this.method = method;
+    this.types = types;
   }
 
   @Override
   protected Object eval(final Value[] args, final QueryContext qc) throws QueryException {
     try {
       return method.equals(NEW) ? constructor(args) : method(args, qc);
+    } catch(final QueryException ex) {
+      throw ex;
     } catch(final InvocationTargetException ex) {
       final Throwable cause = ex.getCause();
       throw cause instanceof QueryException ? ((QueryException) cause).info(info) :
-        JAVAERR.get(info, cause);
-    } catch(final QueryException ex) {
-      throw ex;
+        JAVAERROR_X_X_X.get(info, name(), foundArgs(args), cause);
     } catch(final Throwable ex) {
-      Util.debug(ex);
-      throw JAVAFUN.get(info, name(), foundArgs(args));
+      throw JAVAERROR_X_X_X.get(info, name(), foundArgs(args), ex);
     }
   }
 
   @Override
   public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new JavaFunc(sc, info, clazz, method, copyAll(qc, scp, vs, exprs));
+    return new JavaFunc(sc, info, clazz, method, types, copyAll(qc, scp, vs, exprs));
   }
 
   /**
    * Calls a constructor.
-   * @param ar arguments
+   * @param args arguments
    * @return resulting object
    * @throws Exception exception
    */
-  private Object constructor(final Value[] ar) throws Exception {
-    for(final Constructor<?> con : clazz.getConstructors()) {
-      final Object[] arg = args(con.getParameterTypes(), null, ar, true);
-      if(arg != null) return con.newInstance(arg);
+  private Object constructor(final Value[] args) throws Exception {
+    Constructor<?> cons = null;
+    Object[] cargs = null;
+    for(final Constructor<?> c : clazz.getConstructors()) {
+      final Class<?>[] pTypes = c.getParameterTypes();
+      if(!typeMatches(pTypes, types)) continue;
+
+      final Object[] jArgs = javaArgs(pTypes, null, args, true);
+      if(jArgs != null) {
+        if(cons != null) throw JAVACONSAMB_X.get(info, Util.className(clazz) + '#' + pTypes.length);
+        cons = c;
+        cargs = jArgs;
+      }
     }
-    throw JAVACON.get(info, name(), foundArgs(ar));
+    if(cons != null) return cons.newInstance(cargs);
+
+    throw WHICHCONSTR_X_X.get(info, name(), foundArgs(args));
   }
 
   /**
    * Calls a method.
-   * @param ar arguments
+   * @param args arguments
    * @param qc query context
    * @return resulting object
    * @throws Exception exception
    */
-  private Object method(final Value[] ar, final QueryContext qc) throws Exception {
+  private Object method(final Value[] args, final QueryContext qc) throws Exception {
     // check if a field with the specified name exists
     try {
-      final Field f = clazz.getField(method);
-      final boolean st = Modifier.isStatic(f.getModifiers());
-      if(ar.length == (st ? 0 : 1)) {
-        return f.get(st ? null : instObj(ar[0]));
-      }
+      final Field field = clazz.getField(method);
+      final boolean stat = Modifier.isStatic(field.getModifiers());
+      if(args.length == (stat ? 0 : 1)) return field.get(stat ? null : instObj(args[0]));
     } catch(final NoSuchFieldException ex) { /* ignored */ }
 
-    for(final Method meth : clazz.getMethods()) {
-      if(!meth.getName().equals(method)) continue;
-      final boolean st = Modifier.isStatic(meth.getModifiers());
-      final Object[] arg = args(meth.getParameterTypes(), null, ar, st);
-      if(arg != null) {
-        Object inst = null;
-        if(!st) {
-          inst = instObj(ar[0]);
-          if(inst instanceof QueryModule) {
-            final QueryModule mod = (QueryModule) inst;
-            mod.staticContext = sc;
-            mod.queryContext = qc;
-          }
+    // loop through all methods
+    Method meth = null;
+    Object inst = null;
+    Object[] margs = null;
+    for(final Method m : clazz.getMethods()) {
+      if(!m.getName().equals(method)) continue;
+      final Class<?>[] pTypes = m.getParameterTypes();
+      if(!typeMatches(pTypes, types)) continue;
+
+      final boolean stat = Modifier.isStatic(m.getModifiers());
+      final Object[] jArgs = javaArgs(pTypes, null, args, stat);
+      if(jArgs == null) continue;
+
+      // method found
+      if(meth != null) throw JAVAAMB_X_X_X.get(info, clazz.getName(), method, pTypes.length);
+      meth = m;
+      margs = jArgs;
+
+      if(!stat) {
+        inst = instObj(args[0]);
+        if(inst instanceof QueryModule) {
+          final QueryModule mod = (QueryModule) inst;
+          mod.staticContext = sc;
+          mod.queryContext = qc;
         }
-        return meth.invoke(inst, arg);
       }
     }
-    throw JAVAMTH.get(info, name(), foundArgs(ar));
+    if(meth != null) return meth.invoke(inst, margs);
+
+    throw WHICHMETHOD_X_X.get(info, name(), foundArgs(args));
   }
 
   /**
-   * Creates the instance on which a non-static field getter or method is
-   * invoked.
+   * Creates the instance on which a non-static field getter or method is invoked.
    * @param v XQuery value
    * @return Java object
    * @throws QueryException query exception
@@ -125,55 +148,11 @@ public final class JavaFunc extends JavaMapping {
   }
 
   /**
-   * Converts the arguments to objects that match the specified function parameters.
-   * {@code null} is returned if conversion is not possible.
-   * @param params parameters
-   * @param vTypes value types
-   * @param args arguments
-   * @param stat static flag
-   * @return argument array, or {@code null}
-   * @throws QueryException query exception
+   * Returns the function descriptor.
+   * @return string
    */
-  static Object[] args(final Class<?>[] params, final boolean[] vTypes, final Value[] args,
-      final boolean stat) throws QueryException {
-
-    final int s = stat ? 0 : 1;
-    final int l = args.length - s;
-    if(l != params.length) return null;
-
-    // function arguments
-    final boolean[] vType = vTypes == null ? values(params) : vTypes;
-    final Object[] vals = new Object[l];
-    for(int a = 0; a < l; a++) {
-      final Class<?> param = params[a];
-      final Value arg = args[s + a];
-
-      if(arg.type.instanceOf(type(param))) {
-        // convert to Java object if an XQuery type exists for the function parameter
-        vals[a] = arg.toJava();
-      } else {
-        // convert to Java object if
-        // - argument is of type {@link Jav}, wrapping a Java object, or
-        // - function parameter is not of type {@link Value}, or a sub-class of it
-        vals[a] = arg instanceof Jav || !vType[a] ? arg.toJava() : arg;
-        // abort conversion if argument is not an instance of function parameter
-        if(!param.isInstance(vals[a])) return null;
-      }
-    }
-    return vals;
-  }
-
-  /**
-   * Returns a boolean array that indicated which of the specified function parameters are of
-   * (sub)class {@link Value}.
-   * @param params parameters
-   * @return array
-   */
-  static boolean[] values(final Class<?>[] params) {
-    final int l = params.length;
-    final boolean[] vals = new boolean[l];
-    for(int a = 0; a < l; a++) vals[a] = Value.class.isAssignableFrom(params[a]);
-    return vals;
+  private String name() {
+    return Util.className(clazz) + '.' + method;
   }
 
   @Override
@@ -189,16 +168,8 @@ public final class JavaFunc extends JavaMapping {
     return sb.append("(...)").toString();
   }
 
-  /**
-   * Returns the function descriptor.
-   * @return string
-   */
-  private String name() {
-    return Util.className(clazz) + '.' + method;
-  }
-
   @Override
   public String toString() {
-    return clazz + "." + method + PAR1 + toString(SEP) + PAR2;
+    return clazz + "." + method + PAREN1 + toString(SEP) + PAREN2;
   }
 }

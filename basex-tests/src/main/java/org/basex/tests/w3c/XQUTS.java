@@ -1,14 +1,15 @@
 package org.basex.tests.w3c;
 
 import org.basex.core.*;
-import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
  * XQuery Update Test Suite wrapper.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class XQUTS extends W3CTS {
@@ -28,11 +29,10 @@ public final class XQUTS extends W3CTS {
   public XQUTS(final String[] args) {
     super(args, Util.className(XQUTS.class));
     context.options.set(MainOptions.FORCECREATE, true);
-    context.options.set(MainOptions.MIXUPDATES, false);
   }
 
   @Override
-  protected Nodes states(final Nodes root) throws QueryException {
+  protected Value states(final Item root) throws QueryException {
     return nodes("*:state", root);
   }
 

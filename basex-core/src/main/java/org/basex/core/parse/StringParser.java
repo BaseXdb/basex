@@ -24,15 +24,16 @@ import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
+import org.basex.util.similarity.*;
 
 /**
  * This is a parser for command strings, creating {@link Command} instances.
  * Several commands can be formulated in one string and separated by semicolons.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public final class StringParser extends CmdParser {
+final class StringParser extends CmdParser {
   /** Current parser. */
   private InputParser parser;
 
@@ -41,7 +42,7 @@ public final class StringParser extends CmdParser {
    * @param input input
    * @param context database context
    */
-  public StringParser(final String input, final Context context) {
+  StringParser(final String input, final Context context) {
     super(input, context);
   }
 
@@ -74,13 +75,11 @@ public final class StringParser extends CmdParser {
           case BACKUP:
             return new CreateBackup(glob(cmd));
           case DATABASE: case DB:
-            return new CreateDB(name(cmd), remaining(null));
+            return new CreateDB(name(cmd), remaining(null, true));
           case INDEX:
             return new CreateIndex(consume(CmdIndex.class, cmd));
           case USER:
             return new CreateUser(name(cmd), password());
-          case EVENT:
-            return new CreateEvent(name(cmd));
         }
         break;
       case COPY:
@@ -89,20 +88,22 @@ public final class StringParser extends CmdParser {
         switch(consume(CmdAlter.class, cmd)) {
           case DATABASE: case DB:
             return new AlterDB(name(cmd), name(cmd));
+          case PASSWORD:
+            return new AlterPassword(name(cmd), password());
           case USER:
-            return new AlterUser(name(cmd), password());
+            return new AlterUser(name(cmd), name(cmd));
         }
         break;
       case OPEN:
-        return new Open(name(cmd));
+        return new Open(name(cmd), string(null));
       case CHECK:
         return new Check(string(cmd));
       case ADD:
-        String arg = key(S_TO, null) ? string(cmd) : null;
-        return new Add(arg, remaining(cmd));
+        final String aa = key(S_TO, null) ? string(cmd) : null;
+        return new Add(aa, remaining(cmd, true));
       case STORE:
-        arg = key(S_TO, null) ? string(cmd) : null;
-        return new Store(arg, remaining(cmd));
+        final String sa = key(S_TO, null) ? string(cmd) : null;
+        return new Store(sa, remaining(cmd, true));
       case RETRIEVE:
         return new Retrieve(string(cmd));
       case DELETE:
@@ -110,7 +111,7 @@ public final class StringParser extends CmdParser {
       case RENAME:
         return new Rename(string(cmd), string(cmd));
       case REPLACE:
-        return new Replace(string(cmd), remaining(cmd));
+        return new Replace(string(cmd), remaining(cmd, true));
       case INFO:
         switch(consume(CmdInfo.class, cmd)) {
           case NULL:
@@ -120,9 +121,8 @@ public final class StringParser extends CmdParser {
           case INDEX:
             return new InfoIndex(consume(CmdIndexInfo.class, null));
           case STORAGE:
-            String arg1 = number(null);
-            final String arg2 = arg1 != null ? number(null) : null;
-            if(arg1 == null) arg1 = xquery(null);
+            final String arg1 = number();
+            final String arg2 = arg1 != null ? number() : null;
             return new InfoStorage(arg1, arg2);
         }
         break;
@@ -142,8 +142,6 @@ public final class StringParser extends CmdParser {
             return new DropUser(glob(cmd), key(ON, null) ? glob(cmd) : null);
           case BACKUP:
             return new DropBackup(glob(cmd));
-          case EVENT:
-            return new DropEvent(name(cmd));
         }
         break;
       case OPTIMIZE:
@@ -157,7 +155,7 @@ public final class StringParser extends CmdParser {
       case EXPORT:
         return new Export(string(cmd));
       case XQUERY:
-        return new XQuery(xquery(cmd));
+        return new XQuery(remaining(cmd, false));
       case RUN:
         return new Run(string(cmd));
       case TEST:
@@ -166,8 +164,6 @@ public final class StringParser extends CmdParser {
         return new Execute(string(cmd, false));
       case FIND:
         return new Find(string(cmd, false));
-      case CS:
-        return new Cs(xquery(cmd));
       case GET:
         return new Get(name(null));
       case SET:
@@ -177,6 +173,7 @@ public final class StringParser extends CmdParser {
       case HELP:
         return new Help(name(null));
       case EXIT:
+      case QUIT:
         return new Exit();
       case FLUSH:
         return new Flush();
@@ -192,8 +189,6 @@ public final class StringParser extends CmdParser {
             return new ShowUsers(key(ON, null) ? name(cmd) : null);
           case BACKUPS:
             return new ShowBackups();
-          case EVENTS:
-            return new ShowEvents();
         }
         break;
       case GRANT:
@@ -213,7 +208,7 @@ public final class StringParser extends CmdParser {
         }
         break;
     }
-    throw Util.notExpected("command specified, but not implemented yet");
+    throw Util.notExpected("Command specified, but not implemented yet");
   }
 
   /**
@@ -250,19 +245,19 @@ public final class StringParser extends CmdParser {
   }
 
   /**
-   * Parses and returns the remaining string. Quotes at the beginning and end
-   * of the argument will be stripped.
+   * Parses and returns the remaining string.
    * @param cmd referring command; if specified, the result must not be empty
+   * @param quotes strip quotes and the beginning and end of the argument
    * @return remaining string
    * @throws QueryException query exception
    */
-  private String remaining(final Cmd cmd) throws QueryException {
+  private String remaining(final Cmd cmd, final boolean quotes) throws QueryException {
     if(single) {
       final StringBuilder sb = new StringBuilder();
       consumeWS();
       while(parser.more()) sb.append(parser.consume());
       String arg = finish(sb, cmd);
-      if(arg != null) {
+      if(quotes && arg != null) {
         // chop quotes; substrings are faster than replaces...
         if(arg.startsWith("\"")) arg = arg.substring(1);
         if(arg.endsWith("\"")) arg = arg.substring(0, arg.length() - 1);
@@ -273,56 +268,28 @@ public final class StringParser extends CmdParser {
   }
 
   /**
-   * Parses and returns an xquery expression.
-   * @param cmd referring command; if specified, the result must not be empty
-   * @return path
-   * @throws QueryException query exception
-   */
-  private String xquery(final Cmd cmd) throws QueryException {
-    consumeWS();
-    final StringBuilder sb = new StringBuilder();
-    if(!eoc()) {
-      final QueryContext qc = new QueryContext(ctx);
-      try {
-        final QueryParser p = new QueryParser(parser.input, null, qc, null);
-        p.pos = parser.pos;
-        p.parseMain();
-        sb.append(parser.input.substring(parser.pos, p.pos));
-        parser.pos = p.pos;
-      } finally {
-        qc.close();
-      }
-    }
-    return finish(sb, cmd);
-  }
-
-  /**
    * Parses and returns a command. A command is limited to letters.
-   * @param cmd referring command; if specified, the result must not be empty
    * @return name
    * @throws QueryException query exception
    */
-  private String command(final Cmd cmd) throws QueryException {
+  private String command() throws QueryException {
     consumeWS();
     final StringBuilder sb = new StringBuilder();
     while(!eoc() && !ws(parser.curr())) {
       sb.append(parser.consume());
     }
-    return finish(sb, cmd);
+    return finish(sb, null);
   }
 
   /**
-   * Parses and returns a name. A name may contain letters, numbers and any of the special
-   * characters <code>!#$%&'()+-=@[]^_`{}~</code>.
+   * Parses and returns a name. A name may contain letters, numbers and some special
+   * characters (see {@link Databases#DBCHARS}).
    * @param cmd referring command; if specified, the result must not be empty
    * @return name
    * @throws QueryException query exception
    */
   private String name(final Cmd cmd) throws QueryException {
-    consumeWS();
-    final StringBuilder sb = new StringBuilder();
-    while(Databases.validChar(parser.curr())) sb.append(parser.consume());
-    return finish(eoc() || ws(parser.curr()) ? sb : null, cmd);
+    return name(cmd, false);
   }
 
   /**
@@ -343,14 +310,29 @@ public final class StringParser extends CmdParser {
    * @throws QueryException query exception
    */
   private String glob(final Cmd cmd) throws QueryException {
+    return name(cmd, true);
+  }
+
+  /**
+   * Parses and returns a glob expression, which extends {@link #name(Cmd)} function
+   * with asterisks, question marks and commands.
+   * @param cmd referring command; if specified, the result must not be empty
+   * @param glob allow glob syntax
+   * @return glob expression
+   * @throws QueryException query exception
+   */
+  private String name(final Cmd cmd, final boolean glob) throws QueryException {
     consumeWS();
     final StringBuilder sb = new StringBuilder();
+    char last = 0;
     while(true) {
       final char ch = parser.curr();
-      if(!Databases.validChar(ch) && ch != '*' && ch != '?' && ch != ',') {
-        return finish(eoc() || ws(ch) ? sb : null, cmd);
+      if(!Databases.validChar(ch, sb.length() == 0) &&
+          (!glob || ch != '*' && ch != '?' && ch != ',')) {
+        return finish((eoc() || ws(ch)) && last != '.' ? sb : null, cmd);
       }
       sb.append(parser.consume());
+      last = ch;
     }
   }
 
@@ -375,29 +357,28 @@ public final class StringParser extends CmdParser {
 
   /**
    * Parses and returns a string result.
-   * @param s input string, or {@code null} if invalid
+   * @param string input string or {@code null} if invalid
    * @param cmd referring command; if specified, the result must not be empty
-   * @return string result, or {@code null}
+   * @return string result or {@code null}
    * @throws QueryException query exception
    */
-  private String finish(final StringBuilder s, final Cmd cmd) throws QueryException {
-    if(s != null && s.length() != 0) return s.toString();
+  private String finish(final StringBuilder string, final Cmd cmd) throws QueryException {
+    if(string != null && string.length() != 0) return string.toString();
     if(cmd != null) throw help(null, cmd);
     return null;
   }
 
   /**
    * Parses and returns a number.
-   * @param cmd referring command; if specified, the result must not be empty
    * @return name
    * @throws QueryException query exception
    */
-  private String number(final Cmd cmd) throws QueryException {
+  private String number() throws QueryException {
     consumeWS();
     final StringBuilder sb = new StringBuilder();
     if(parser.curr() == '-') sb.append(parser.consume());
     while(digit(parser.curr())) sb.append(parser.consume());
-    return finish(eoc() || ws(parser.curr()) ? sb : null, cmd);
+    return finish(eoc() || ws(parser.curr()) ? sb : null, null);
   }
 
   /**
@@ -405,8 +386,8 @@ public final class StringParser extends CmdParser {
    * query.
    */
   private void consumeWS() {
-    while(parser.pos < parser.length && parser.input.charAt(parser.pos) <= ' ')
-      ++parser.pos;
+    final int pl = parser.length;
+    while(parser.pos < pl && parser.input.charAt(parser.pos) <= ' ') ++parser.pos;
     parser.mark = parser.pos - 1;
   }
 
@@ -418,10 +399,8 @@ public final class StringParser extends CmdParser {
    * @return index
    * @throws QueryException query exception
    */
-  private <E extends Enum<E>> E consume(final Class<E> cmp, final Cmd par)
-      throws QueryException {
-
-    final String token = command(null);
+  private <E extends Enum<E>> E consume(final Class<E> cmp, final Cmd par) throws QueryException {
+    final String token = command();
     if(!suggest || token == null || !token.isEmpty()) {
       try {
         // return command reference; allow empty strings as input ("NULL")
@@ -443,7 +422,7 @@ public final class StringParser extends CmdParser {
     for(final Enum<?> s : startWith(cmp, null)) {
       final byte[] sm = uc(token(s.name()));
       if(ls.similar(name, sm) && Cmd.class.isInstance(s)) {
-        throw error(alt, UNKNOWN_SIMILAR_X, name, sm);
+        throw error(alt, UNKNOWN_SIMILAR_X_X, name, sm);
       }
     }
 
@@ -493,12 +472,12 @@ public final class StringParser extends CmdParser {
   /**
    * Returns a query exception instance.
    * @param comp input completions
-   * @param m message
-   * @param e extension
+   * @param msg message
+   * @param ext extension
    * @return query exception
    */
-  private QueryException error(final Enum<?>[] comp, final String m, final Object... e) {
-    return new QueryException(parser.info(), new QNm(), m, e).suggest(parser, list(comp));
+  private QueryException error(final Enum<?>[] comp, final String msg, final Object... ext) {
+    return new QueryException(parser.info(), new QNm(), msg, ext).suggest(parser, list(comp));
   }
 
   /**

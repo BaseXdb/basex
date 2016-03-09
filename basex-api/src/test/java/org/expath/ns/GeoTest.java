@@ -1,27 +1,28 @@
 package org.expath.ns;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 import static org.junit.Assert.*;
 
-import org.basex.AdvancedQueryTest;
+import org.basex.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
+import org.basex.util.*;
 import org.junit.*;
 
 /**
  * This class tests the XQuery Geo functions prefixed with "geo".
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Masoumeh Seydi
  */
-public final class GeoTest extends AdvancedQueryTest {
+public final class GeoTest extends SandboxTest {
   /** Test method. */
   @Test
   public void dimension() {
     run("geo:dimension(" +
             "<gml:Point><gml:coordinates>1,2</gml:coordinates></gml:Point>)", "0");
 
-    error("geo:dimension(text {'a'})", FUNCMP.qname());
+    error("geo:dimension(text {'a'})", INVCAST_X_X_X);
     error("geo:dimension(<gml:unknown/>)", GeoErrors.qname(1));
     error("geo:dimension(<gml:Point>" +
             "<gml:coordinates>1 2</gml:coordinates></gml:Point>)",
@@ -36,7 +37,7 @@ public final class GeoTest extends AdvancedQueryTest {
             "<gml:Point><gml:coordinates>1,2</gml:coordinates></gml:Point>" +
             "</gml:MultiPoint>)", "gml:MultiPoint");
 
-    error("geo:geometryType(text {'srsName'})", FUNCMP.qname());
+    error("geo:geometryType(text {'srsName'})", INVCAST_X_X_X);
     error("geo:geometryType(<gml:unknown/>)", GeoErrors.qname(1));
     error("geo:geometryType(<gml:Point><gml:coordinates>1 2</gml:coordinates>" +
             "</gml:Point>)", GeoErrors.qname(2));
@@ -51,7 +52,7 @@ public final class GeoTest extends AdvancedQueryTest {
             "-150,50 -150,60 -125,60 -125,50 -150,50" +
             "</coordinates></gml:LinearRing></outerboundaryIs></gml:Polygon>)", "0");
 
-    error("geo:srid(text {'a'})", FUNCMP.qname());
+    error("geo:srid(text {'a'})", INVCAST_X_X_X);
     error("geo:srid(<gml:unknown/>)", GeoErrors.qname(1));
     error("geo:srid(<gml:LinearRing><gml:pos>1,1 20,1 50,30 1,1</gml:pos>" +
             "</gml:LinearRing>)", GeoErrors.qname(2));
@@ -67,7 +68,7 @@ public final class GeoTest extends AdvancedQueryTest {
             "<gml:coordinates>1.0,1.0 1.0,30.0 50.0,30.0 50.0,1.0 1.0,1.0" +
             "</gml:coordinates></gml:LinearRing></gml:outerBoundaryIs></gml:Polygon>");
 
-    error("geo:envelope(text {'a'})", FUNCMP.qname());
+    error("geo:envelope(text {'a'})", INVCAST_X_X_X);
     error("geo:envelope(<gml:unknown/>)", GeoErrors.qname(1));
     error("geo:envelope(<gml:LinearRing><gml:pos>1,1 20,1 50,30 1,1</gml:pos>" +
             "</gml:LinearRing>)", GeoErrors.qname(2));
@@ -79,7 +80,7 @@ public final class GeoTest extends AdvancedQueryTest {
     run("geo:asText(<gml:LineString><gml:coordinates>1,1 55,99 2,1" +
             "</gml:coordinates></gml:LineString>)", "LINESTRING (1 1, 55 99, 2 1)");
 
-    error("geo:asText(text {'a'})", FUNCMP.qname());
+    error("geo:asText(text {'a'})", INVCAST_X_X_X);
     error("geo:asText(<gml:unknown/>)", GeoErrors.qname(1));
     error("geo:asText(<gml:LineString><gml:coordinates>1,1</gml:coordinates>" +
             "</gml:LineString>)", GeoErrors.qname(2));
@@ -88,11 +89,11 @@ public final class GeoTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void asBinary() {
-    run("geo:asBinary(<gml:LineString><gml:coordinates>1,1 55,99 2,1" +
-            "</gml:coordinates></gml:LineString>)",
+    run("string(geo:asBinary(<gml:LineString><gml:coordinates>1,1 55,99 2,1" +
+            "</gml:coordinates></gml:LineString>))",
           "AAAAAAIAAAADP/AAAAAAAAA/8AAAAAAAAEBLgAAAAAAAQFjAAAAAAABAAAAAAAAAAD/wAAAAAAAA");
 
-    error("geo:asBinary(text {'a'})", FUNCMP.qname());
+    error("geo:asBinary(text {'a'})", INVCAST_X_X_X);
     error("geo:asBinary(<gml:unknown/>)", GeoErrors.qname(1));
     error("geo:asBinary(<gml:LinearRing><gml:coordinates>1,1 55,99 2,1" +
             "</gml:coordinates></gml:LinearRing>)", GeoErrors.qname(2));
@@ -104,7 +105,7 @@ public final class GeoTest extends AdvancedQueryTest {
     run("geo:isSimple(<gml:LineString><gml:coordinates>1,1 20,1 10,4 20,-10" +
             "</gml:coordinates></gml:LineString>)", "false");
 
-    error("geo:isSimple(text {'a'})", FUNCMP.qname());
+    error("geo:isSimple(text {'a'})", INVCAST_X_X_X);
     error("geo:isSimple(<gml:unknown/>)", GeoErrors.qname(1));
     error("geo:isSimple(<gml:LinearRing><gml:coordinates>1,1 55,99 2,1" +
             "</gml:coordinates></gml:LinearRing>)", GeoErrors.qname(2));
@@ -117,14 +118,14 @@ public final class GeoTest extends AdvancedQueryTest {
         "<gml:coordinates>11,11 18,11 18,18 11,18 11,11</gml:coordinates>" +
         "</gml:LinearRing></gml:outerBoundaryIs></gml:Polygon>)",
         "<gml:LineString xmlns:gml=\"http://www.opengis.net/gml\">" +
-        "<gml:coordinates>11.0,11.0 18.0,11.0 18.0,18.0 11.0,18.0 " +
-        "11.0,11.0</gml:coordinates></gml:LineString>");
+        "<gml:coordinates>11.0,11.0 18.0,11.0 18.0,18.0 11.0,18.0 11.0,11.0</gml:coordinates>" +
+        "</gml:LineString>");
 
     run("geo:boundary(" +
         "<gml:Point><gml:coordinates>2,3</gml:coordinates></gml:Point>)",
         "<gml:MultiGeometry xmlns:gml=\"http://www.opengis.net/gml\"/>");
-    error("geo:boundary(text {'a'})", FUNCMP.qname());
-    error("geo:boundary(a)", NOCTX.qname());
+    error("geo:boundary(text {'a'})", INVCAST_X_X_X);
+    error("geo:boundary(a)", NOCTX_X);
     error("geo:boundary(<gml:geo/>)", GeoErrors.qname(1));
     error("geo:boundary(<gml:Point><gml:pos>1 2</gml:pos></gml:Point>)",
         GeoErrors.qname(2));
@@ -139,7 +140,7 @@ public final class GeoTest extends AdvancedQueryTest {
             "<gml:coordinates>1,1 2,1 5,3 1,1</gml:coordinates></gml:LinearRing>" +
             "</gml:outerBoundaryIs></gml:Polygon>)", "false");
 
-    error("geo:equals(text {'a'}, a)", NOCTX.qname());
+    error("geo:equals(text {'a'}, a)", NOCTX_X);
     error("geo:equals(<gml:unknown/>, <gml:LinearRing><gml:coordinates>" +
             "1,1 2,1 5,3 1,1</gml:coordinates></gml:LinearRing>)", GeoErrors.qname(1));
     error("geo:equals(<gml:LinearRing><gml:coordinates>1,1 55,99 2,1" +
@@ -158,12 +159,12 @@ public final class GeoTest extends AdvancedQueryTest {
             "<gml:LineString><gml:coordinates>0,0 2,1 3,3</gml:coordinates>" +
             "</gml:LineString>)", "false");
 
-    error("geo:disjoint(a, text {'a'})", NOCTX.qname());
+    error("geo:disjoint(a, text {'a'})", NOCTX_X);
     error("geo:disjoint(<gml:Ring/>, " +
             "<gml:LinearRing><gml:coordinates>1,1 2,1 5,3 1,1</gml:coordinates>" +
             "</gml:LinearRing>)", GeoErrors.qname(1));
     error("geo:disjoint(<gml:LineString><gml:coordinates></gml:coordinates>" +
-                  "</gml:LineString>)", FUNCARGSG.qname());
+                  "</gml:LineString>)", JAVAARITY_X_X_X_X_X);
   }
 
   /** Test method. */
@@ -175,7 +176,7 @@ public final class GeoTest extends AdvancedQueryTest {
             "</gml:MultiLineString>, <gml:LineString><gml:coordinates>0,0 2,1 3,3" +
             "</gml:coordinates></gml:LineString>)", "true");
 
-    error("geo:intersects(a, text {'a'})", NOCTX.qname());
+    error("geo:intersects(a, text {'a'})", NOCTX_X);
     error("geo:intersects(<gml:Point><gml:coordinates>10,10 12,11</gml:coordinates>" +
             "</gml:Point>, <gml:LinearRing><gml:coordinates>1,1 2,1 5,3 1,1" +
             "</gml:coordinates></gml:LinearRing>)", GeoErrors.qname(2));
@@ -193,7 +194,7 @@ public final class GeoTest extends AdvancedQueryTest {
         "</gml:MultiLineString>, <gml:LineString><gml:coordinates>0,0 2,1 3,3" +
         "</gml:coordinates></gml:LineString>)", "false");
 
-    error("geo:touches(a, text {'a'})", NOCTX.qname());
+    error("geo:touches(a, text {'a'})", NOCTX_X);
     error("geo:touches(<gml:Point><gml:coordinates>10,10 12,11</gml:coordinates>" +
             "</gml:Point>, <gml:LinearRing><gml:coordinates>1,1 2,1 5,3 1,1" +
             "</gml:coordinates></gml:LinearRing>)", GeoErrors.qname(2));
@@ -210,13 +211,13 @@ public final class GeoTest extends AdvancedQueryTest {
         "<gml:LineString><gml:coordinates>0,0 2,2</gml:coordinates></gml:LineString>)",
         "false");
 
-    error("geo:crosses(a, text {'a'})", NOCTX.qname());
+    error("geo:crosses(a, text {'a'})", NOCTX_X);
     error("geo:crosses(<gml:Point><gml:coordinates>10,10 12,11" +
             "</gml:coordinates></gml:Point>, " +
             "<gml:LinearRing><gml:coordinates>1,1 2,1 5,3 1,1</gml:coordinates>" +
             "</gml:LinearRing>)", GeoErrors.qname(2));
     error("geo:crosses(<gml:Point><gml:coordinates>1,1</gml:coordinates></gml:Point>)",
-            FUNCARGSG.qname());
+        JAVAARITY_X_X_X_X_X);
   }
 
   /** Test method. */
@@ -227,13 +228,13 @@ public final class GeoTest extends AdvancedQueryTest {
             "<gml:LinearRing><gml:coordinates>1,1 20,1 50,30 1,1</gml:coordinates>" +
             "</gml:LinearRing>)", "false");
 
-    error("geo:within()", FUNCARGSG.qname());
+    error("geo:within()", JAVAARITY_X_X_X_X_X);
     error("geo:within(" +
             "<gml:unknown><gml:coordinates>1,1</gml:coordinates></gml:unknown>, " +
             "<gml:LinearRing><gml:coordinates>1,1 2,1 5,3 1,1" +
             "</gml:coordinates></gml:LinearRing>)", GeoErrors.qname(1));
     error("geo:within(<gml:Point><gml:coordinates>1,1</gml:coordinates></gml:Point>)",
-            FUNCARGSG.qname());
+        JAVAARITY_X_X_X_X_X);
   }
 
   /** Test method. */
@@ -244,76 +245,76 @@ public final class GeoTest extends AdvancedQueryTest {
             "<gml:Point><gml:coordinates>1.00,1.00</gml:coordinates></gml:Point>)",
             "true");
 
-    error("geo:contains()", FUNCARGSG.qname());
+    error("geo:contains()", JAVAARITY_X_X_X_X_X);
     error("geo:contains(" +
             "<gml:Point><gml:coordinates>1,1</gml:coordinates></gml:Point>, " +
             "<gml:Line><gml:coordinates>1,1 2,1 5,3 1,1</gml:coordinates></gml:Line>)",
             GeoErrors.qname(1));
     error("geo:contains(" +
             "<gml:Point><gml:coordinates>1,1</gml:coordinates></gml:Point>)",
-            FUNCARGSG.qname());
+            JAVAARITY_X_X_X_X_X);
   }
 
   /** Test method. */
   @Test
   public void overlaps() {
     run("geo:overlaps(" +
-            "<gml:LineString><gml:coordinates>1,1 55,99 2,1</gml:coordinates>" +
-            "</gml:LineString>, <gml:LineString><gml:coordinates>1,1 55,0" +
-            "</gml:coordinates></gml:LineString>)", "false");
+        "<gml:LineString><gml:coordinates>1,1 55,99 2,1</gml:coordinates>" +
+        "</gml:LineString>, <gml:LineString><gml:coordinates>1,1 55,0" +
+        "</gml:coordinates></gml:LineString>)", "false");
 
-    error("geo:overlaps()", FUNCARGSG.qname());
+    error("geo:overlaps()", JAVAARITY_X_X_X_X_X);
     error("geo:overlaps(<gml:LineString><gml:coordinates>1,1 55,99 2,1" +
-            "</gml:coordinates></gml:LineString>," +
-            "<gml:LineString></gml:LineString>)", GeoErrors.qname(2));
+        "</gml:coordinates></gml:LineString>," +
+        "<gml:LineString></gml:LineString>)", GeoErrors.qname(2));
     error("geo:overlaps(" +
-            "<gml:unknown><gml:coordinates>1,1</gml:coordinates></gml:unknown>)",
-            FUNCARGSG.qname());
+        "<gml:unknown><gml:coordinates>1,1</gml:coordinates></gml:unknown>)",
+        JAVAARITY_X_X_X_X_X);
   }
 
   /** Test method. */
   @Test
   public void relate() {
     run("geo:relate(" +
-            "<gml:Point><gml:coordinates>18,11</gml:coordinates></gml:Point>, " +
-            "<gml:Polygon><gml:outerBoundaryIs><gml:LinearRing><gml:coordinates>" +
-            "10,10 20,10 30,40 20,40 10,10</gml:coordinates></gml:LinearRing>" +
-            "</gml:outerBoundaryIs></gml:Polygon>, \"0********\")", "true");
+        "<gml:Point><gml:coordinates>18,11</gml:coordinates></gml:Point>, " +
+        "<gml:Polygon><gml:outerBoundaryIs><gml:LinearRing><gml:coordinates>" +
+        "10,10 20,10 30,40 20,40 10,10</gml:coordinates></gml:LinearRing>" +
+        "</gml:outerBoundaryIs></gml:Polygon>, \"0********\")", "true");
 
     error("geo:relate(<gml:Point><gml:coordinates>18,11</gml:coordinates></gml:Point>,"
-          + "<gml:LineString><gml:coordinates>11,10 20,1 20,20</gml:coordinates>" +
-            "</gml:LineString>, \"0******\")", FUNCMP.qname());
+        + "<gml:LineString><gml:coordinates>11,10 20,1 20,20</gml:coordinates>" +
+          "</gml:LineString>, \"0******\")", GeoErrors.qname(6));
 
     error("geo:relate(" +
-            "<gml:Point><gml:coordinates>18,11</gml:coordinates></gml:Point>," +
-            "<gml:LineString><gml:coordinates>11,10 20,1 20,20</gml:coordinates>" +
-            "</gml:LineString>, \"0*******12*F\")", FUNCMP.qname());
+        "<gml:Point><gml:coordinates>18,11</gml:coordinates></gml:Point>," +
+        "<gml:LineString><gml:coordinates>11,10 20,1 20,20</gml:coordinates>" +
+        "</gml:LineString>, \"0*******12*F\")", GeoErrors.qname(6));
 
-    error("geo:relate()", FUNCARGSG.qname());
+    error("geo:relate()", JAVAARITY_X_X_X_X_X);
     error("geo:relate(" +
-            "<gml:Line><gml:coordinates>1,1 55,99 2,1</gml:coordinates></gml:Line>," +
-            "<gml:LineString></gml:LineString>, \"0********\")", GeoErrors.qname(1));
+        "<gml:Line><gml:coordinates>1,1 55,99 2,1</gml:coordinates></gml:Line>," +
+        "<gml:LineString></gml:LineString>, \"0********\")", GeoErrors.qname(1));
     error("geo:relate(" +
-            "<gml:Point><gml:coordinates>1,1</gml:coordinates></gml:Point>," +
-            " \"0********\")", FUNCARGSG.qname());
+        "<gml:Point><gml:coordinates>1,1</gml:coordinates></gml:Point>," +
+        " \"0********\")", JAVAARITY_X_X_X_X_X);
   }
 
   /** Test method. */
   @Test
   public void distance() {
     run("geo:distance(<gml:LinearRing><gml:coordinates>10,400 20,200 30,100 " +
-            "20,100 10,400</gml:coordinates></gml:LinearRing>, " +
-            "<gml:Polygon><gml:outerBoundaryIs><gml:LinearRing><gml:coordinates>" +
-            "10,10 20,10 30,40 20,40 10,10</gml:coordinates></gml:LinearRing>" +
-            "</gml:outerBoundaryIs></gml:Polygon>)", "60");
+        "20,100 10,400</gml:coordinates></gml:LinearRing>, " +
+        "<gml:Polygon><gml:outerBoundaryIs><gml:LinearRing><gml:coordinates>" +
+        "10,10 20,10 30,40 20,40 10,10</gml:coordinates></gml:LinearRing>" +
+        "</gml:outerBoundaryIs></gml:Polygon>)", "60");
 
-    error("geo:distance()", FUNCARGSG.qname());
+    error("geo:distance()", JAVAARITY_X_X_X_X_X);
     error("geo:distance(" +
-            "<gml:LinearRing><gml:coordinates>1,1 55,99 2,1</gml:coordinates>" +
-            "</gml:LinearRing>, <gml:LineString></gml:LineString>)", GeoErrors.qname(2));
+        "<gml:LinearRing><gml:coordinates>1,1 55,99 2,1</gml:coordinates>" +
+        "</gml:LinearRing>, <gml:LineString></gml:LineString>)", GeoErrors.qname(2));
     error("geo:distance(" +
-            "<gml:Point><gml:coordinates>1,1</gml:coordinates></gml:Point>)",
-            FUNCARGSG.qname());
+        "<gml:Point><gml:coordinates>1,1</gml:coordinates></gml:Point>)",
+        JAVAARITY_X_X_X_X_X);
   }
 
   /** Test method. */
@@ -336,8 +337,8 @@ public final class GeoTest extends AdvancedQueryTest {
             "<gml:LinearRing><gml:coordinates>1,1 55,99 2,1</gml:coordinates>" +
             "</gml:LinearRing>, xs:double(1))", GeoErrors.qname(2));
     error("geo:buffer(<gml:LinearRing><gml:coordinates>1,1 55,99 1,1" +
-            "</gml:coordinates></gml:LinearRing>, 1)", FUNCMP.qname());
-    error("geo:buffer(xs:double(1))", FUNCARGSG.qname());
+            "</gml:coordinates></gml:LinearRing>, 's')", JAVAARGS_X_X_X);
+    error("geo:buffer(xs:double(1))", JAVAARITY_X_X_X_X_X);
   }
 
   /** Test method. */
@@ -352,7 +353,7 @@ public final class GeoTest extends AdvancedQueryTest {
 
     error("geo:convexHull(<gml:LinearRing><gml:coordinates>1,1 55,99 1,1" +
             "</gml:coordinates></gml:LinearRing>)", GeoErrors.qname(2));
-    error("geo:convexHull()", FUNCARGSG.qname());
+    error("geo:convexHull()", JAVAARITY_X_X_X_X_X);
     error("geo:convexHull(<gml:LinearRing/>)", GeoErrors.qname(2));
   }
 
@@ -374,7 +375,7 @@ public final class GeoTest extends AdvancedQueryTest {
             "<gml:coordinates>2.0,3.0</gml:coordinates></gml:Point>");
 
     error("geo:intersection(<gml:LinearRing><gml:coordinates></gml:coordinates>" +
-            "</gml:LinearRing>)", FUNCARGSG.qname());
+            "</gml:LinearRing>)", JAVAARITY_X_X_X_X_X);
     error("geo:intersection(<gml:Geo><gml:coordinates>2,3</gml:coordinates>" +
             "</gml:Geo>,<gml:Point><gml:coordinates>2,3</gml:coordinates></gml:Point>)",
             GeoErrors.qname(1));
@@ -404,7 +405,7 @@ public final class GeoTest extends AdvancedQueryTest {
             "<gml:Point><gml:coordinates>2,3</gml:coordinates></gml:Point>)",
             GeoErrors.qname(2));
     error("geo:union(text {'a'}, <gml:Point><gml:coordinates>2,3" +
-            "</gml:coordinates></gml:Point>)", FUNCMP.qname());
+            "</gml:coordinates></gml:Point>)", INVCAST_X_X_X);
   }
 
   /** Test method. */
@@ -422,7 +423,7 @@ public final class GeoTest extends AdvancedQueryTest {
         "<gml:Point><gml:coordinates>2,3</gml:coordinates></gml:Point>)",
         GeoErrors.qname(2));
     error("geo:difference(text {'a'}, <gml:Point><gml:coordinates>2,3" +
-        "</gml:coordinates></gml:Point>)", FUNCMP.qname());
+        "</gml:coordinates></gml:Point>)", INVCAST_X_X_X);
   }
 
   /** Test method. */
@@ -445,7 +446,7 @@ public final class GeoTest extends AdvancedQueryTest {
             GeoErrors.qname(1));
 
     error("geo:symDifference(text {'a'}, <gml:Point><gml:coordinates>2,3" +
-            "</gml:coordinates></gml:Point>)", FUNCMP.qname());
+            "</gml:coordinates></gml:Point>)", INVCAST_X_X_X);
   }
 
   /** Test method. */
@@ -466,7 +467,8 @@ public final class GeoTest extends AdvancedQueryTest {
             "<gml:Point><gml:coordinates>2,1</gml:coordinates></gml:Point>, 2)",
             GeoErrors.qname(4));
     error("geo:geometryN(text {'a'}, <gml:Point><gml:coordinates>2,3" +
-            "</gml:coordinates></gml:Point>)", FUNCMP.qname());
+            "</gml:coordinates></gml:Point>)", JAVAARGS_X_X_X
+            );
   }
 
   /** Test method. */
@@ -486,7 +488,7 @@ public final class GeoTest extends AdvancedQueryTest {
         GeoErrors.qname(2));
     error("geo:x(<gml:geo><gml:coordinates>2,1</gml:coordinates></gml:geo>)",
         GeoErrors.qname(1));
-    error("geo:x(text {'a'})", FUNCMP.qname());
+    error("geo:x(text {'a'})", INVCAST_X_X_X);
   }
 
   /** Test method. */
@@ -507,7 +509,7 @@ public final class GeoTest extends AdvancedQueryTest {
         GeoErrors.qname(2));
     error("geo:y(<gml:geo><gml:coordinates>2,1</gml:coordinates></gml:geo>)",
         GeoErrors.qname(1));
-    error("geo:y(a)", NOCTX.qname());
+    error("geo:y(a)", NOCTX_X);
   }
 
   /** Test method. */
@@ -528,7 +530,7 @@ public final class GeoTest extends AdvancedQueryTest {
             GeoErrors.qname(2));
     error("geo:z(<gml:geo><gml:coordinates>2,1</gml:coordinates></gml:geo>)",
         GeoErrors.qname(1));
-    error("geo:z(a)", NOCTX.qname());
+    error("geo:z(a)", NOCTX_X);
   }
 
   /** Test method. */
@@ -573,8 +575,8 @@ public final class GeoTest extends AdvancedQueryTest {
     error("geo:startPoint(" +
             "<gml:LineString><gml:coordinates>1,1</gml:coordinates></gml:LineString>)",
             GeoErrors.qname(2));
-    error("geo:startPoint()", FUNCARGSG.qname());
-    error("geo:startPoint(text {'gml:Point'})", FUNCMP.qname());
+    error("geo:startPoint()", JAVAARITY_X_X_X_X_X);
+    error("geo:startPoint(text {'gml:Point'})", INVCAST_X_X_X);
     error("geo:startPoint(<gml:geo><gml:coordinates>2,1</gml:coordinates></gml:geo>)",
             GeoErrors.qname(1));
   }
@@ -599,8 +601,8 @@ public final class GeoTest extends AdvancedQueryTest {
     error("geo:endPoint(" +
             "<gml:LineString><gml:coordinates>1,1</gml:coordinates></gml:LineString>)",
             GeoErrors.qname(2));
-    error("geo:endPoint()", FUNCARGSG.qname());
-    error("geo:endPoint(text {'gml:Point'})", FUNCMP.qname());
+    error("geo:endPoint()", JAVAARITY_X_X_X_X_X);
+    error("geo:endPoint(text {'gml:Point'})", INVCAST_X_X_X);
     error("geo:endPoint(<gml:geo><gml:coordinates>2,1</gml:coordinates></gml:geo>)",
             GeoErrors.qname(1));
   }
@@ -624,8 +626,8 @@ public final class GeoTest extends AdvancedQueryTest {
     error("geo:isClosed(" +
             "<gml:LineString><gml:coordinates>1,1</gml:coordinates></gml:LineString>)",
             GeoErrors.qname(2));
-    error("geo:isClosed()", FUNCARGSG.qname());
-    error("geo:isClosed(text {'gml:Point'})", FUNCMP.qname());
+    error("geo:isClosed()", JAVAARITY_X_X_X_X_X);
+    error("geo:isClosed(text {'gml:Point'})", INVCAST_X_X_X);
     error("geo:isClosed(" +
             "<gml:Point><gml:coordinates>2,1</gml:coordinates></gml:Point>)",
             GeoErrors.qname(3));
@@ -650,8 +652,8 @@ public final class GeoTest extends AdvancedQueryTest {
     error("geo:isRing(" +
             "<gml:LineString><gml:coordinates>1,1</gml:coordinates></gml:LineString>)",
             GeoErrors.qname(2));
-    error("geo:isRing()", FUNCARGSG.qname());
-    error("geo:isRing(text {'gml:Point'})", FUNCMP.qname());
+    error("geo:isRing()", JAVAARITY_X_X_X_X_X);
+    error("geo:isRing(text {'gml:Point'})", INVCAST_X_X_X);
     error("geo:isRing(<Point><gml:coordinates>2,1</gml:coordinates></Point>)",
             GeoErrors.qname(1));
   }
@@ -672,8 +674,8 @@ public final class GeoTest extends AdvancedQueryTest {
 
     error("geo:numPoints(<gml:LineString><gml:coordinates>1,1</gml:coordinates>" +
             "</gml:LineString>)", GeoErrors.qname(2));
-    error("geo:numPoints()", FUNCARGSG.qname());
-    error("geo:numPoints(text {'gml:Point'})", FUNCMP.qname());
+    error("geo:numPoints()", JAVAARITY_X_X_X_X_X);
+    error("geo:numPoints(text {'gml:Point'})", INVCAST_X_X_X);
     error("geo:numPoints(<Point><gml:coordinates>2,1</gml:coordinates></Point>)",
             GeoErrors.qname(1));
   }
@@ -703,7 +705,7 @@ public final class GeoTest extends AdvancedQueryTest {
             "</gml:coordinates></gml:LineString>, 5)", GeoErrors.qname(4));
     error("geo:pointN(<gml:LineString><gml:coordinates>11,10 20,1 20,20 12,13" +
             "</gml:coordinates></gml:LineString>, 0)", GeoErrors.qname(4));
-    error("geo:pointN(text {'a'},3)", FUNCMP.qname());
+    error("geo:pointN(text {'a'},3)", INVCAST_X_X_X);
   }
 
   /** Test method. */
@@ -722,7 +724,7 @@ public final class GeoTest extends AdvancedQueryTest {
 
     error("geo:area(<gml:LinearRing><gml:coordinates>0,0 0,20 0,0" +
             "</gml:coordinates></gml:LinearRing>)", GeoErrors.qname(2));
-    error("geo:area()", FUNCARGSG.qname());
+    error("geo:area()", JAVAARITY_X_X_X_X_X);
     error("geo:area(<gml:geo><gml:coordinates>2,1</gml:coordinates></gml:geo>)",
             GeoErrors.qname(1));
   }
@@ -752,8 +754,8 @@ public final class GeoTest extends AdvancedQueryTest {
     error("geo:centroid(" +
             "<gml:unknown><gml:coordinates>1,1</gml:coordinates></gml:unknown>)",
             GeoErrors.qname(1));
-    error("geo:centroid()", FUNCARGSG.qname());
-    error("geo:centroid(text {'a'})", FUNCMP.qname());
+    error("geo:centroid()", JAVAARITY_X_X_X_X_X);
+    error("geo:centroid(text {'a'})", INVCAST_X_X_X);
   }
 
   /** Test method. */
@@ -781,8 +783,8 @@ public final class GeoTest extends AdvancedQueryTest {
             "<gml:unknown><gml:coordinates>1,1</gml:coordinates></gml:unknown>)",
             GeoErrors.qname(1));
 
-    error("geo:pointOnSurface()", FUNCARGSG.qname());
-    error("geo:pointOnSurface(text {'a'})", FUNCMP.qname());
+    error("geo:pointOnSurface()", JAVAARITY_X_X_X_X_X);
+    error("geo:pointOnSurface(text {'a'})", INVCAST_X_X_X);
   }
 
   /** Test method. */
@@ -801,8 +803,8 @@ public final class GeoTest extends AdvancedQueryTest {
     error("geo:exteriorRing(" +
             "<gml:unknown><gml:coordinates>1,1</gml:coordinates></gml:unknown>)",
             GeoErrors.qname(1));
-    error("geo:exteriorRing()", FUNCARGSG.qname());
-    error("geo:exteriorRing(text {'a'})", FUNCMP.qname());
+    error("geo:exteriorRing()", JAVAARITY_X_X_X_X_X);
+    error("geo:exteriorRing(text {'a'})", INVCAST_X_X_X);
   }
 
   /** Test method. */
@@ -821,8 +823,8 @@ public final class GeoTest extends AdvancedQueryTest {
             "<gml:unknown><gml:coordinates>1,1</gml:coordinates></gml:unknown>)",
             GeoErrors.qname(1));
 
-    error("geo:numInteriorRing()", FUNCARGSG.qname());
-    error("geo:numInteriorRing(text {'a'})", FUNCMP.qname());
+    error("geo:numInteriorRing()", JAVAARITY_X_X_X_X_X);
+    error("geo:numInteriorRing(text {'a'})", INVCAST_X_X_X);
   }
 
   /** Test method. */
@@ -854,8 +856,8 @@ public final class GeoTest extends AdvancedQueryTest {
             "<gml:Point><gml:coordinates>2.0,3.0</gml:coordinates></gml:Point>, 1)",
             GeoErrors.qname(3));
 
-    error("geo:interiorRingN(text {'<gml:Polygon/'}, 1)", FUNCMP.qname());
-    error("geo:interiorRingN()", FUNCARGSG.qname());
+    error("geo:interiorRingN(text {'<gml:Polygon/'}, 1)", INVCAST_X_X_X);
+    error("geo:interiorRingN()", JAVAARITY_X_X_X_X_X);
   }
 
   /**
@@ -864,29 +866,56 @@ public final class GeoTest extends AdvancedQueryTest {
    * @param result result
    */
   private static void run(final String query, final String result) {
-    query("import module namespace geo='http://expath.org/ns/geo'; " +
-          "declare namespace gml='http://www.opengis.net/gml';" + query, result);
+    final String qu = "import module namespace geo='http://expath.org/ns/geo'; " +
+        "declare namespace gml='http://www.opengis.net/gml';" + query;
+    assertEquals(result, query(qu).replaceAll(Prop.NL + "\\s*", ""));
+  }
+
+  /**
+   * Checks if a query yields the specified error code.
+   * @param query query string
+   * @param qe expected error
+   */
+  private static void error(final String query, final QueryError qe) {
+    error(query, qe.qname(), qe);
+  }
+
+  /**
+   * Checks if a query yields the specified error code.
+   * @param query query string
+   * @param name name of error
+   */
+  private static void error(final String query, final QNm name) {
+    error(query, name, null);
   }
 
   /**
    * Checks if a query yields the specified error code.
    * @param query query string
    * @param error expected error
+   * @param qe query error
    */
-  private static void error(final String query, final QNm error) {
+  private static void error(final String query, final QNm error, final QueryError qe) {
     final String q = "import module namespace geo='http://expath.org/ns/geo'; " +
         "declare namespace gml='http://www.opengis.net/gml';" + query;
 
-    final QueryProcessor qp = new QueryProcessor(q, context);
-    try {
-      final String res = qp.execute().toString().replaceAll("(\\r|\\n) *", "");
-      fail("Query did not fail:\n" + query + "\n[E] " +
-          error + "...\n[F] " + res);
+    try(final QueryProcessor qp = new QueryProcessor(q, context)) {
+      final String res = qp.value().serialize().toString().replaceAll("(\\r|\\n) *", "");
+      fail("Query did not fail:\n" + query + "\n[E] " + error + "...\n[F] " + res);
     } catch(final QueryException ex) {
-      if(!ex.qname().eq(error))
-        fail("Wrong error code:\n[E] " + error + "\n[F] " + ex.qname());
-    } finally {
-      qp.close();
+      final QueryError qerr = ex.error();
+      if(qe != null && qerr != null && qe != qerr) {
+        Util.stack(ex);
+        final StringBuilder sb = new StringBuilder("Wrong error code:\n[E] ");
+        fail(sb.append(qe.name()).append("\n[F] ").append(qerr.name()).toString());
+      } else if(!ex.qname().eq(error)) {
+        Util.stack(ex);
+        final StringBuilder sb = new StringBuilder("Wrong error code:\n[E] ");
+        fail(sb.append(error).append("\n[F] ").append(ex.qname()).toString());
+      }
+    } catch(final Exception ex) {
+      Util.stack(ex);
+      fail(ex.toString());
     }
   }
 }

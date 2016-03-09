@@ -5,11 +5,12 @@ import java.awt.*;
 import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.view.*;
+import org.basex.query.value.seq.*;
 
 /**
  * Provides an interface for data specific TreeMap visualizations.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 abstract class MapPainter {
@@ -20,12 +21,12 @@ abstract class MapPainter {
 
   /**
    * Constructor.
-   * @param m map reference
-   * @param opts gui options
+   * @param view map reference
+   * @param gopts gui options
    */
-  MapPainter(final MapView m, final GUIOptions opts) {
-    view = m;
-    gopts = opts;
+  MapPainter(final MapView view, final GUIOptions gopts) {
+    this.view = view;
+    this.gopts = gopts;
   }
 
   /**
@@ -36,13 +37,13 @@ abstract class MapPainter {
    */
   final Color color(final MapRects rects, final int ri) {
     // find marked node
-    final Nodes marked = view.gui.context.marked;
+    final DBNodes marked = view.gui.context.marked;
     if(marked != null) {
       final int p = -marked.find(rects.get(ri).pre) - 1;
       if(p >= 0) {
         // mark ancestor of invisible node;
         final int i = rects.find(rects.get(ri));
-        return p < marked.size() && i + 1 < rects.size && marked.sorted[p] <
+        return p < marked.size() && i + 1 < rects.size && marked.sorted(p) <
           rects.sorted[i + 1].pre ? GUIConstants.colormark2 : null;
       }
     }

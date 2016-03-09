@@ -2,9 +2,12 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -15,12 +18,12 @@ import org.basex.util.hash.*;
 /**
  * Switch expression.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Switch extends ParseExpr {
   /** Cases. */
-  private final SwitchCase[] cases;
+  private SwitchCase[] cases;
   /** Condition. */
   private Expr cond;
 
@@ -41,8 +44,9 @@ public final class Switch extends ParseExpr {
     checkNoUp(cond);
     for(final SwitchCase sc : cases) sc.checkUp();
     // check if none or all return expressions are updating
-    final Expr[] tmp = new Expr[cases.length];
-    for(int i = 0; i < tmp.length; ++i) tmp[i] = cases[i].exprs[0];
+    final int cl = cases.length;
+    final Expr[] tmp = new Expr[cl];
+    for(int c = 0; c < cl; c++) tmp[c] = cases[c].exprs[0];
     checkAllUp(tmp);
   }
 
@@ -50,35 +54,70 @@ public final class Switch extends ParseExpr {
   public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
     cond = cond.compile(qc, scp);
     for(final SwitchCase sc : cases) sc.compile(qc, scp);
+    return optimize(qc, scp);
+  }
 
+  @Override
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     // check if expression can be pre-evaluated
-    Expr ex = this;
-    if(cond.isValue()) {
-      final Item it = cond.item(qc, info);
-      LOOP:
-      for(final SwitchCase sc : cases) {
-        final int sl = sc.exprs.length;
-        for(int e = 1; e < sl; e++) {
-          if(!sc.exprs[e].isValue()) break LOOP;
-
-          // includes check for empty sequence (null reference)
-          final Item cs = sc.exprs[e].item(qc, info);
-          if(it == cs || cs != null && it != null && it.equiv(cs, null, info)) {
-            ex = sc.exprs[0];
-            break LOOP;
-          }
-        }
-        if(sl == 1) ex = sc.exprs[0];
-      }
-    }
+    final Expr ex = opt(qc);
     if(ex != this) return optPre(ex, qc);
 
     // expression could not be pre-evaluated
-    type = cases[0].exprs[0].type();
-    for(int c = 1; c < cases.length; c++) {
-      type = type.union(cases[c].exprs[0].type());
-    }
+    seqType = cases[0].exprs[0].seqType();
+    final int cl = cases.length;
+    for(int c = 1; c < cl; c++) seqType = seqType.union(cases[c].exprs[0].seqType());
     return ex;
+  }
+
+  /**
+   * Optimizes the expression.
+   * @param qc query context
+   * @return optimized or original expression
+   * @throws QueryException query exception
+   */
+  private Expr opt(final QueryContext qc) throws QueryException {
+    // pre-evaluate cases
+    final boolean pre = cond.isValue();
+    // cache expressions
+    final ExprList cache = new ExprList();
+
+    final Item it = pre ? cond.atomItem(qc, info) : null;
+    final ArrayList<SwitchCase> tmp = new ArrayList<>();
+    for(final SwitchCase sc : cases) {
+      final int sl = sc.exprs.length;
+      final Expr ret = sc.exprs[0];
+      final ExprList el = new ExprList(sl).add(ret);
+      for(int e = 1; e < sl; e++) {
+        final Expr ex = sc.exprs[e];
+        if(pre && ex.isValue()) {
+          // includes check for empty sequence (null reference)
+          final Item cs = ex.item(qc, info);
+          if(it == cs || cs != null && it != null && it.equiv(cs, null, info)) return ret;
+          qc.compInfo(OPTREMOVE_X_X, description(), ex);
+        } else if(cache.contains(ex)) {
+          // case has already been checked before
+          qc.compInfo(OPTREMOVE_X_X, description(), ex);
+        } else {
+          cache.add(ex);
+          el.add(ex);
+        }
+      }
+      // return default branch (last one) if all others were discarded
+      if(sl == 1 && tmp.isEmpty()) return ret;
+      // build list of branches (add default branch and those that could not be pre-evaluated)
+      if(sl == 1 || el.size() > 1) {
+        sc.exprs = el.finish();
+        tmp.add(sc);
+      }
+    }
+
+    if(tmp.size() != cases.length) {
+      // branches have changed
+      qc.compInfo(OPTREWRITE_X, this);
+      cases = tmp.toArray(new SwitchCase[tmp.size()]);
+    }
+    return this;
   }
 
   @Override
@@ -109,26 +148,26 @@ public final class Switch extends ParseExpr {
   }
 
   @Override
-  public boolean removable(final Var v) {
-    for(final SwitchCase sc : cases) if(!sc.removable(v)) return false;
-    return cond.removable(v);
+  public boolean removable(final Var var) {
+    for(final SwitchCase sc : cases) if(!sc.removable(var)) return false;
+    return cond.removable(var);
   }
 
   @Override
-  public VarUsage count(final Var v) {
+  public VarUsage count(final Var var) {
     VarUsage max = VarUsage.NEVER, curr = VarUsage.NEVER;
     for(final SwitchCase cs : cases) {
-      curr = curr.plus(cs.countCases(v));
-      max = max.max(curr.plus(cs.count(v)));
+      curr = curr.plus(cs.countCases(var));
+      max = max.max(curr.plus(cs.count(var)));
     }
-    return max.plus(cond.count(v));
+    return max.plus(cond.count(var));
   }
 
   @Override
-  public Expr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
+  public Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
       throws QueryException {
-    boolean change = inlineAll(qc, scp, cases, v, e);
-    final Expr cn = cond.inline(qc, scp, v, e);
+    boolean change = inlineAll(qc, scp, cases, var, ex);
+    final Expr cn = cond.inline(qc, scp, var, ex);
     if(cn != null) {
       change = true;
       cond = cn;
@@ -143,7 +182,7 @@ public final class Switch extends ParseExpr {
    * @throws QueryException query exception
    */
   private Expr getCase(final QueryContext qc) throws QueryException {
-    final Item it = cond.item(qc, info);
+    final Item it = cond.atomItem(qc, info);
     for(final SwitchCase sc : cases) {
       final int sl = sc.exprs.length;
       for(int e = 1; e < sl; e++) {
@@ -170,7 +209,7 @@ public final class Switch extends ParseExpr {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(SWITCH + PAR1 + cond + PAR2);
+    final StringBuilder sb = new StringBuilder(SWITCH + PAREN1 + cond + PAREN2);
     for(final SwitchCase sc : cases) sb.append(sc);
     return sb.toString();
   }

@@ -1,10 +1,11 @@
 package org.basex.query.value.node;
 
-import static org.basex.query.QueryText.*;
-
+import org.basex.core.*;
+import org.basex.query.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.type.*;
+import org.basex.query.value.type.Type.ID;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
@@ -13,7 +14,7 @@ import org.w3c.dom.*;
 /**
  * Document node fragment.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class FDoc extends FNode {
@@ -95,7 +96,7 @@ public final class FDoc extends FNode {
   }
 
   @Override
-  public AxisMoreIter children() {
+  public BasicNodeIter children() {
     return iter(children);
   }
 
@@ -110,29 +111,29 @@ public final class FDoc extends FNode {
   }
 
   @Override
-  public FDoc copy() {
+  public FNode deepCopy(final MainOptions options) {
     return new FDoc(children, uri).optimize();
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(BASE, uri));
+    addPlan(plan, planElem(QueryText.BASE, uri));
   }
 
   @Override
   public byte[] xdmInfo() {
-    return new ByteList().add(typeId().bytes()).add(uri).add(0).toArray();
+    return new ByteList().add(typeId().asByte()).add(uri).add(0).finish();
   }
 
   @Override
-  public Type.ID typeId() {
+  public ID typeId() {
     // check if a document has a single element as child
-    return children.size() == 1 && children.get(0).type == NodeType.ELM ?
-      NodeType.DEL.id() : type.id();
+    return (children.size() == 1 && children.get(0).type == NodeType.ELM
+        ? NodeType.DEL : type).id();
   }
 
   @Override
   public String toString() {
-    return Util.info("%(%)", type, uri);
+    return new TokenBuilder(QueryText.DOCUMENT).add(" { ").add(uri).add(" }").toString();
   }
 }

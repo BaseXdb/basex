@@ -1,0 +1,7 @@
+<xml xmlns:p='ns'>
+  <a a='A'>A</a>
+  <b b='B'>B</b>
+  <c c='C'>C</c>
+  <p:c p:c='PC'>PC</p:c>
+  <p:d p:d='PD'>PD</p:d>
+</xml>

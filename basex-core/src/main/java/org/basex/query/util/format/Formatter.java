@@ -1,11 +1,10 @@
 package org.basex.query.util.format;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.math.*;
 import java.util.*;
-import java.util.regex.*;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
@@ -17,12 +16,10 @@ import org.basex.util.list.*;
 /**
  * Abstract class for formatting data in different languages.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class Formatter extends FormatUtil {
-  /** Calendar pattern. */
-  private static final Pattern CALENDAR = Pattern.compile("(Q\\{([^}]*)\\})?([^}]+)");
   /** Military timezones. */
   private static final byte[] MIL = token("YXWVUTSRQPONZABCDEFGHIKLM");
   /** Token: Nn. */
@@ -33,7 +30,7 @@ public abstract class Formatter extends FormatUtil {
     "JE", "KE", "KY", "ME", "MS", "NS", "OS", "RS", "SE", "SH", "SS", "TE", "VE", "VS");
 
   /** Default language: English. */
-  private static final byte[] EN = token("en");
+  public static final byte[] EN = token("en");
   /** Formatter instances. */
   private static final TokenObjMap<Formatter> MAP = new TokenObjMap<>();
 
@@ -122,26 +119,30 @@ public abstract class Formatter extends FormatUtil {
    * @param cal calendar
    * @param plc place
    * @param ii input info
+   * @param sc static context
    * @return formatted string
    * @throws QueryException query exception
    */
   public final byte[] formatDate(final ADate date, final byte[] lng, final byte[] pic,
-      final byte[] cal, final byte[] plc, final InputInfo ii) throws QueryException {
+      final byte[] cal, final byte[] plc, final InputInfo ii,
+      final StaticContext sc) throws QueryException {
 
     final TokenBuilder tb = new TokenBuilder();
     if(lng.length != 0 && MAP.get(lng) == null) tb.add("[Language: en]");
     boolean iso = false;
     if(cal.length != 0) {
-      final Matcher m = CALENDAR.matcher(string(cal));
-      if(!m.matches()) throw CALQNAME.get(ii, cal);
-      final QNm qnm = new QNm(m.group(3), m.group(1) == null ||
-          m.group(2).isEmpty() ? null : m.group(2));
-      if(!qnm.hasURI()) {
+      final QNm qnm;
+      try {
+        qnm = QNm.resolve(cal, sc);
+      } catch(final QueryException ex) {
+        throw CALQNAME_X.get(ii, cal);
+      }
+      if(qnm.uri().length == 0) {
         int c = -1;
         final byte[] ln = qnm.local();
         final int cl = CALENDARS.length;
         while(++c < cl && !eq(CALENDARS[c], ln));
-        if(c == cl) throw CALWHICH.get(ii, cal);
+        if(c == cl) throw CALWHICH_X.get(ii, cal);
         if(c > 1) tb.add("[Calendar: AD]");
         iso = c == 0;
       }
@@ -154,7 +155,7 @@ public abstract class Formatter extends FormatUtil {
       if(ch == -1) {
         // retrieve variable marker
         final byte[] marker = dp.marker();
-        if(marker.length == 0) throw PICDATE.get(ii, pic);
+        if(marker.length == 0) throw PICDATE_X.get(ii, pic);
 
         // parse component specifier
         final int compSpec = ch(marker, 0);
@@ -232,7 +233,7 @@ public abstract class Formatter extends FormatUtil {
             break;
           case 'Z':
           case 'z':
-            num = date.zon();
+            num = date.tz();
             pres = token("01:01");
             break;
           case 'C':
@@ -244,9 +245,9 @@ public abstract class Formatter extends FormatUtil {
             err = tim;
             break;
           default:
-            throw INVCOMPSPEC.get(ii, marker);
+            throw INVCOMPSPEC_X.get(ii, marker);
         }
-        if(err) throw PICINVCOMP.get(ii, marker, date.type);
+        if(err) throw PICINVCOMP_X_X.get(ii, marker, date.type);
         if(pres == null) continue;
 
         // parse presentation modifier(s) and width modifier
@@ -254,7 +255,8 @@ public abstract class Formatter extends FormatUtil {
         if(max) {
           // limit maximum length of numeric output
           int mx = 0;
-          for(int s = 0; s < fp.primary.length; s += cl(fp.primary, s)) mx++;
+          final int fl = fp.primary.length;
+          for(int s = 0; s < fl; s += cl(fp.primary, s)) mx++;
           if(mx > 1) fp.max = mx;
         }
 
@@ -287,7 +289,7 @@ public abstract class Formatter extends FormatUtil {
           }
         } else {
           // output fractional component
-          if(frac != null && !frac.equals(BigDecimal.ZERO)) {
+          if(frac != null && frac.compareTo(BigDecimal.ZERO) != 0) {
             String s = frac.toString().replace("0.", "");
             final int sl = s.length();
             if(fp.min > sl) {
@@ -298,7 +300,7 @@ public abstract class Formatter extends FormatUtil {
               final int fl = fp.primary.length;
               if(fl != 1 && fl != sl) s = frac(frac, fl);
             }
-            num = toLong(s);
+            num = Strings.toLong(s);
           }
           tb.add(formatInt(num, fp));
         }
@@ -317,7 +319,7 @@ public abstract class Formatter extends FormatUtil {
    * @return string representation
    */
   private static String frac(final BigDecimal num, final int len) {
-    final String s = num.setScale(len, BigDecimal.ROUND_HALF_UP).toString();
+    final String s = num.setScale(len, RoundingMode.HALF_UP).toString();
     final int d = s.indexOf('.');
     return d == -1 ? s : s.substring(d + 1);
   }
@@ -336,7 +338,6 @@ public abstract class Formatter extends FormatUtil {
 
     final TokenBuilder tb = new TokenBuilder();
     final int ch = fp.first;
-
     if(ch == 'w') {
       tb.add(word(n, fp.ordinal));
     } else if(ch == KANJI[1]) {
@@ -436,7 +437,7 @@ public abstract class Formatter extends FormatUtil {
 
     int n = c == 0 ? num / 60 : num % 60;
     if(num < 0) n = -n;
-    return number(n, new IntFormat(format.finish(), null), zeroes(format.cp(0)));
+    return number(n, new IntFormat(format.toArray(), null), zeroes(format.cp(0)));
   }
 
   /**
@@ -545,58 +546,71 @@ public abstract class Formatter extends FormatUtil {
    * Creates a number character sequence.
    * @param num number to be formatted
    * @param fp format parser
-   * @param z zero digit
+   * @param zero zero digit
    * @return number character sequence
    */
-  private byte[] number(final long num, final FormatParser fp, final int z) {
+  private byte[] number(final long num, final FormatParser fp, final int zero) {
     // cache characters of presentation modifier
-    final IntList pr = new TokenParser(fp.primary).toList();
+    final int[] mod = new TokenParser(fp.primary).toArray();
+    final int modSize = mod.length;
+    int modStart = 0;
+    while(modStart < modSize && mod[modStart] == '#') modStart++;
 
-    // check for a regular separator pattern
-    int rp = -1;
-    boolean reg = false;
-    for(int p = pr.size() - 1; p >= 0; --p) {
-      final int ch = pr.get(p);
-      if(ch == '#' || ch >= z && ch <= z + 9) continue;
-      if(rp == -1) rp = pr.size() - p;
-      reg = (pr.size() - p) % rp == 0;
+    // try to find regular separator pattern
+    int sepPos = -1, sepChar = -1, digitPos = 0;
+    boolean regSep = false;
+    for(int mp = modSize - 1; mp >= modStart; --mp) {
+      final int ch = mod[mp];
+      if(ch >= zero && ch <= zero + 9) {
+        digitPos = mp;
+        continue;
+      }
+      if(ch == '#') continue;
+      if(sepPos == -1) {
+        sepPos = modSize - mp;
+        sepChar = ch;
+        regSep = true;
+      } else if(regSep) {
+        regSep = (modSize - mp) % sepPos == 0 && ch == sepChar;
+      }
     }
-    final int rc = reg ? pr.get(pr.size() - rp) : 0;
-    if(!reg) rp = Integer.MAX_VALUE;
+    if(!regSep) sepPos = Integer.MAX_VALUE;
 
-    // build string representation in a reverse order
-    final IntList cache = new IntList();
-    final byte[] n = token(num);
-    int b = n.length - 1, p = pr.size() - 1;
+    // cache characters in reverse order
+    final IntList reverse = new IntList();
+    final byte[] in = token(num);
+    int inPos = in.length - 1, modPos = modSize - 1;
 
     // add numbers and separators
-    int mn = fp.min;
-    int mx = fp.max;
-    while((--mn >= 0 || b >= 0 || p >= 0) && --mx >= 0) {
-      final boolean sep = cache.size() % rp == rp - 1;
-      if(p >= 0) {
-        final int c = pr.get(p--);
-        if(b >= 0) {
-          if(c == '#' && sep) cache.add(rc);
-          cache.add(c == '#' || c >= z && c <= z + 9 ? n[b--] - '0' + z : c);
+    int min = fp.min, max = fp.max;
+    while((--min >= 0 || inPos >= 0 || modPos >= modStart) && --max >= 0) {
+      final boolean sep = reverse.size() % sepPos == sepPos - 1;
+      int ch;
+      if(modPos >= modStart) {
+        ch = mod[modPos--];
+        if(inPos >= 0) {
+          if(ch == '#' && sep) reverse.add(sepChar);
+          if(ch == '#' || ch >= zero && ch <= zero + 9) ch = in[inPos--] - '0' + zero;
         } else {
           // add remaining modifiers
-          if(c == '#') break;
-          cache.add(c >= z && c <= z + 9 ? z : c);
+          if(ch == '#') break;
+          if(ch >= zero && ch <= zero + 9) ch = zero;
+          if(regSep && modPos + 1 < digitPos) break;
         }
-      } else if(b >= 0) {
+      } else if(inPos >= 0) {
         // add remaining numbers
-        if(sep) cache.add(rc);
-        cache.add(n[b--] - '0' + z);
+        if(sep) reverse.add(sepChar);
+        ch = in[inPos--] - '0' + zero;
       } else {
-        // add minimum numbers
-        cache.add(z);
+        // add minimum number of digits
+        ch = zero;
       }
+      reverse.add(ch);
     }
 
     // reverse result and add ordinal suffix
-    final TokenBuilder tb = new TokenBuilder();
-    for(int c = cache.size() - 1; c >= 0; --c) tb.add(cache.get(c));
-    return tb.add(ordinal(num, fp.ordinal)).finish();
+    final TokenBuilder result = new TokenBuilder();
+    for(int rs = reverse.size() - 1; rs >= 0; --rs) result.add(reverse.get(rs));
+    return result.add(ordinal(num, fp.ordinal)).finish();
   }
 }

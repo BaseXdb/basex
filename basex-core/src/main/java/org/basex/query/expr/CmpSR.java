@@ -1,13 +1,17 @@
 package org.basex.query.expr;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
-import static org.basex.query.util.Err.*;
 
 import org.basex.data.*;
+import org.basex.index.*;
 import org.basex.index.query.*;
 import org.basex.query.*;
+import org.basex.query.expr.CmpG.*;
+import org.basex.query.expr.index.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.util.collation.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -18,10 +22,10 @@ import org.basex.util.hash.*;
 /**
  * String range expression.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public final class CmpSR extends Single {
+final class CmpSR extends Single {
   /** Collation. */
   private final Collation coll;
   /** Minimum. */
@@ -54,8 +58,14 @@ public final class CmpSR extends Single {
     this.mni = mni;
     this.max = max;
     this.mxi = mxi;
-    type = SeqType.BLN;
-    atomic = expr.type().zeroOrOne();
+    seqType = SeqType.BLN;
+    final SeqType st = expr.seqType();
+    atomic = st.zeroOrOne() && !st.mayBeArray();
+  }
+
+  @Override
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+    return expr.isValue() ? optPre(item(qc, info), qc) : this;
   }
 
   /**
@@ -64,15 +74,16 @@ public final class CmpSR extends Single {
    * @return new or original expression
    * @throws QueryException query exception
    */
-  static Expr get(final CmpG cmp) throws QueryException {
-    if(!(cmp.exprs[1] instanceof AStr)) return cmp;
-    final byte[] d = ((Item) cmp.exprs[1]).string(cmp.info);
-    final Expr e = cmp.exprs[0];
+  static ParseExpr get(final CmpG cmp) throws QueryException {
+    final Expr e1 = cmp.exprs[0], e2 = cmp.exprs[1];
+    if(e1.has(Flag.NDT) || e1.has(Flag.UPD) || !(e2 instanceof AStr)) return cmp;
+
+    final byte[] d = ((AStr) e2).string(cmp.info);
     switch(cmp.op.op) {
-      case GE: return new CmpSR(e, d,    true,  null, true,  cmp.coll, cmp.info);
-      case GT: return new CmpSR(e, d,    false, null, true,  cmp.coll, cmp.info);
-      case LE: return new CmpSR(e, null, true,  d,    true,  cmp.coll, cmp.info);
-      case LT: return new CmpSR(e, null, true,  d,    false, cmp.coll, cmp.info);
+      case GE: return new CmpSR(e1, d,    true,  null, true,  cmp.coll, cmp.info);
+      case GT: return new CmpSR(e1, d,    false, null, true,  cmp.coll, cmp.info);
+      case LE: return new CmpSR(e1, null, true,  d,    true,  cmp.coll, cmp.info);
+      case LT: return new CmpSR(e1, null, true,  d,    false, cmp.coll, cmp.info);
       default: return cmp;
     }
   }
@@ -86,7 +97,7 @@ public final class CmpSR extends Single {
     }
 
     // iterative evaluation
-    final Iter ir = qc.iter(expr);
+    final Iter ir = expr.atomIter(qc, info);
     for(Item it; (it = ir.next()) != null;) {
       if(eval(it)) return Bln.TRUE;
     }
@@ -100,7 +111,7 @@ public final class CmpSR extends Single {
    * @throws QueryException query exception
    */
   private boolean eval(final Item it) throws QueryException {
-    if(!it.type.isStringOrUntyped()) throw INVTYPECMP.get(info, it.type, AtomType.STR);
+    if(!it.type.isStringOrUntyped()) throw diffError(info, it, Str.ZERO);
     final byte[] s = it.string(info);
     final int mn = min == null ?  1 :
       coll == null ? Token.diff(s, min) : coll.compare(s, min);
@@ -128,7 +139,7 @@ public final class CmpSR extends Single {
       if(d > 0) return Bln.FALSE;
       if(d == 0) {
         // return simplified comparison for exact hit, or false if value is not included
-        return mni && mxi ? new CmpG(expr, Str.get(mn), CmpG.OpG.EQ, null, info) : Bln.FALSE;
+        return mni && mxi ? new CmpG(expr, Str.get(mn), OpG.EQ, null, null, info) : Bln.FALSE;
       }
     }
     return new CmpSR(c.expr, mn, mni && c.mni, mx, mxi && c.mxi, null, info);
@@ -141,15 +152,20 @@ public final class CmpSR extends Single {
 
     // accept only location path, string and equality expressions
     final Data data = ii.ic.data;
-    // no range index support in main-memory index structures
-    if(data.inMemory() || !ii.check(expr, false)) return false;
+    // no support for main-memory databases
+    if(data.inMemory()) return false;
+    final IndexType type = ii.type(expr, null);
+    if(type == null) return false;
 
     // create range access
-    final StringRange sr = new StringRange(ii.text, min, mni, max, mxi);
-    ii.costs = Math.max(1, data.meta.size / 10);
+    final StringRange sr = new StringRange(type, min, mni, max, mxi);
+    ii.costs = data.costs(sr);
+    if(ii.costs < 0) return false;
+
     final TokenBuilder tb = new TokenBuilder();
     tb.add(mni ? '[' : '(').addExt(min).add(',').addExt(max).add(mxi ? ']' : ')');
-    ii.create(new StringRangeAccess(info, sr, ii.ic), info, Util.info(OPTSRNGINDEX, tb), true);
+    ii.create(new StringRangeAccess(info, sr, ii.ic), true, info,
+        Util.info(OPTINDEX_X_X, type + " string range", tb));
     return true;
   }
 
@@ -160,8 +176,7 @@ public final class CmpSR extends Single {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(MIN, min != null ? min : "",
-      MAX, max != null ? max : ""), expr);
+    addPlan(plan, planElem(MIN, min != null ? min : "", MAX, max != null ? max : ""), expr);
   }
 
   @Override

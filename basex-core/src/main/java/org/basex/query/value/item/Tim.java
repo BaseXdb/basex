@@ -9,7 +9,7 @@ import org.basex.util.*;
 /**
  * Time item ({@code xs:time}).
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Tim extends ADate {
@@ -47,9 +47,9 @@ public final class Tim extends ADate {
   }
 
   @Override
-  public void timeZone(final DTDur tz, final boolean spec, final InputInfo ii)
+  public void timeZone(final DTDur zone, final boolean spec, final InputInfo ii)
       throws QueryException {
-    tz(tz, spec, ii);
+    tz(zone, spec, ii);
     clean();
   }
 

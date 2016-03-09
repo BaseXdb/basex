@@ -2,17 +2,20 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
-import org.basex.core.*;
+import java.io.*;
+
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.*;
+import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.index.*;
+import org.basex.util.*;
 
 /**
  * Evaluates the 'drop index' command and deletes indexes in the currently
  * opened database.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class DropIndex extends ACreate {
@@ -27,39 +30,52 @@ public final class DropIndex extends ACreate {
   @Override
   protected boolean run() {
     final Data data = context.data();
-    if(data.inMemory()) return error(NO_MAINMEM);
-
     final CmdIndex ci = getOption(CmdIndex.class);
-    if(ci == null) return error(UNKNOWN_CMD_X, this);
-    final IndexType it;
-    switch(ci) {
-      case TEXT:
-        data.meta.createtext = false;
-        it = IndexType.TEXT;
-        break;
-      case ATTRIBUTE:
-        data.meta.createattr = false;
-        it = IndexType.ATTRIBUTE;
-        break;
-      case FULLTEXT:
-        data.meta.createftxt = false;
-        it = IndexType.FULLTEXT;
-        break;
-      default:
-        return error(UNKNOWN_CMD_X, this);
+    final IndexType type;
+    if(ci == CmdIndex.TEXT) {
+      type = IndexType.TEXT;
+      data.meta.createtext = false;
+    } else if(ci == CmdIndex.ATTRIBUTE) {
+      type = IndexType.ATTRIBUTE;
+      data.meta.createattr = false;
+    } else if(ci == CmdIndex.TOKEN) {
+      type = IndexType.TOKEN;
+      data.meta.createtoken = false;
+    } else if(ci == CmdIndex.FULLTEXT) {
+      type = IndexType.FULLTEXT;
+      data.meta.createft = false;
+    } else {
+      return error(UNKNOWN_CMD_X, this);
     }
+    data.meta.names(type, options);
 
-    if(!data.startUpdate()) return error(DB_PINNED_X, data.meta.name);
+    if(!startUpdate()) return false;
+    boolean ok = true;
     try {
-      return drop(it, context.data()) ? info(INDEX_DROPPED_X_X, it, perf) :
-        error(INDEX_NOT_DROPPED_X, it);
+      drop(type, data);
+      ok = info(INDEX_DROPPED_X_X, type, perf);
+    } catch(final IOException ex) {
+      ok = error(Util.message(ex));
     } finally {
-      data.finishUpdate();
+      ok &= finishUpdate();
     }
+    return ok;
   }
 
   @Override
   public void build(final CmdBuilder cb) {
     cb.init(Cmd.DROP + " " + CmdDrop.INDEX).args();
+  }
+
+  /**
+   * Drops the specified index.
+   * @param type index type
+   * @param data data reference
+   * @throws IOException I/O exception
+   */
+  static void drop(final IndexType type, final Data data) throws IOException {
+    data.meta.dirty = true;
+    data.meta.index(type, false);
+    data.dropIndex(type);
   }
 }

@@ -1,6 +1,6 @@
 package org.basex.query.up;
 
-import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryError.*;
 
 import java.io.*;
 import java.util.*;
@@ -9,9 +9,12 @@ import java.util.List;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
-import org.basex.data.atomic.*;
 import org.basex.query.*;
+import org.basex.query.func.fn.*;
+import org.basex.query.up.atomic.*;
 import org.basex.query.up.primitives.*;
+import org.basex.query.up.primitives.db.*;
+import org.basex.query.up.primitives.node.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -23,7 +26,7 @@ import org.basex.util.list.*;
  * are initiated within a snapshot. Regarding the XQUF specification it fulfills the purpose of
  * a 'pending update list'.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Lukas Kircher
  */
 final class DataUpdates {
@@ -43,15 +46,19 @@ final class DataUpdates {
    * after updates have been carried out. */
   private final IntObjMap<Put> puts = new IntObjMap<>();
 
+  /** Write databases back to disk. */
+  private final boolean writeback;
   /** Number of updates. */
   private int size;
 
   /**
    * Constructor.
    * @param data data reference
+   * @param qc query context
    */
-  DataUpdates(final Data data) {
+  DataUpdates(final Data data, final QueryContext qc) {
     this.data = data;
+    writeback = qc.context.options.get(MainOptions.WRITEBACK);
   }
 
   /**
@@ -98,7 +105,7 @@ final class DataUpdates {
    */
   void prepare(final MemData tmp) throws QueryException {
     // Prepare/check database operations
-    for(final DBUpdate d : dbUpdates) d.prepare(tmp);
+    for(final DBUpdate d : dbUpdates) d.prepare();
 
     // Prepare/check XQUP primitives:
     final int s = nodeUpdates.size();
@@ -108,9 +115,7 @@ final class DataUpdates {
 
     for(int i = 0; i < s; ++i) {
       final NodeUpdates ups = nodeUpdates.get(nodes.get(i));
-      for(final NodeUpdate p : ups.updates) {
-        if(p instanceof NodeCopy) ((NodeCopy) p).prepare(tmp);
-      }
+      for(final NodeUpdate p : ups.updates) p.prepare(tmp);
     }
 
     // check attribute duplicates
@@ -133,7 +138,7 @@ final class DataUpdates {
           --p;
         }
         if(par != -1) il.add(par);
-        checkNames(il.toArray());
+        checkNames(il.finish());
       } else {
         if(k == Data.ELEM) checkNames(pre);
         --p;
@@ -142,13 +147,6 @@ final class DataUpdates {
 
     // build atomic update cache
     auc = createAtomicUpdates(preparePrimitives());
-  }
-
-  /**
-   * Locks the database for write operations.
-   */
-  void finishUpdate() {
-    data.finishUpdate();
   }
 
   /**
@@ -161,9 +159,10 @@ final class DataUpdates {
 
   /**
    * Applies all updates for this specific database.
+   * @param qc query context
    * @throws QueryException query exception
    */
-  void apply() throws QueryException {
+  void apply(final QueryContext qc) throws QueryException {
     // execute database updates
     auc.execute(true);
     auc = null;
@@ -179,14 +178,27 @@ final class DataUpdates {
     // execute fn:put operations
     for(final Put put : puts.values()) put.apply();
 
-    // optional: write main memory databases of file instances back to disk
-    if(data.inMemory() && !data.meta.original.isEmpty() &&
-        data.meta.options.get(MainOptions.WRITEBACK)) {
-      try {
-        Export.export(data, data.meta.original, null);
-      } catch(final IOException ex) {
-        Util.debug(ex);
-        throw UPPUTERR.get(null, data.meta.original);
+    try {
+      Optimize.finish(data);
+    } catch(final IOException ex) {
+      throw UPDBOPTERR_X.get(null, ex);
+    }
+
+    /* optional: export file if...
+     * - WRITEBACK option is turned on
+     * - an original file path exists
+     * - data is a main-memory instance
+     */
+    final String original = data.meta.original;
+    if(!original.isEmpty() && data.inMemory()) {
+      if(writeback) {
+        try {
+          Export.export(data, original, qc.context.options, null);
+        } catch(final IOException ex) {
+          throw UPDBOPTERR_X.get(null, ex);
+        }
+      } else {
+        FnTrace.trace(Token.token(original + ": Updates are not written back."), null, qc);
       }
     }
   }
@@ -221,15 +233,15 @@ final class DataUpdates {
    * @return list of atomic updates ready for execution
    */
   private AtomicUpdateCache createAtomicUpdates(final List<NodeUpdate> l) {
-    final AtomicUpdateCache atomics = new AtomicUpdateCache(data);
+    final AtomicUpdateCache ac = new AtomicUpdateCache(data);
     //  from the lowest to the highest score, corresponds w/ from lowest to highest PRE
     final int s = l.size();
     for(int i = 0; i < s; i++) {
       final NodeUpdate u = l.get(i);
-      u.addAtomics(atomics);
+      u.addAtomics(ac);
       l.set(i, null);
     }
-    return atomics;
+    return ac;
   }
 
   /**
@@ -254,7 +266,8 @@ final class DataUpdates {
       if(ups != null) for(final NodeUpdate up : ups.updates) up.update(pool);
     }
     // check namespaces
-    if(!pool.nsOK()) throw UPNSCONFL2.get(null);
+    final byte[][] ns = pool.nsOK();
+    if(ns != null) throw UPNSCONFL2_X_X.get(null, ns[0], ns[1]);
 
     // add the already existing attributes to the name pool
     final IntSet il = new IntSet();
@@ -263,8 +276,8 @@ final class DataUpdates {
       if(data.kind(pre) == Data.ATTR) {
         final byte[] nm = data.name(pre, Data.ATTR);
         final QNm name = new QNm(nm);
-        final byte[] uri = data.nspaces.uri(data.nspaces.uri(nm, pre, data));
-        if(uri != null) name.uri(uri);
+        final int uriId = data.nspaces.uriIdForPrefix(Token.prefix(nm), pre, data);
+        if(uriId != 0) name.uri(data.nspaces.uri(uriId));
         pool.add(name, NodeType.ATT);
         il.add(pre);
       } else {
@@ -273,14 +286,14 @@ final class DataUpdates {
           final byte[] nm = data.name(p, Data.ATTR);
           if(!il.contains(p)) {
             final QNm name = new QNm(nm);
-            final byte[] uri = data.nspaces.uri(data.nspaces.uri(nm, p, data));
-            if(uri != null) name.uri(uri);
+            final int uriId = data.nspaces.uriIdForPrefix(Token.prefix(nm), p, data);
+            if(uriId != 0) name.uri(data.nspaces.uri(uriId));
             pool.add(name, NodeType.ATT);
           }
         }
       }
     }
     final QNm dup = pool.duplicate();
-    if(dup != null) throw UPATTDUPL.get(null, dup);
+    if(dup != null) throw UPATTDUPL_X.get(null, dup);
   }
 }

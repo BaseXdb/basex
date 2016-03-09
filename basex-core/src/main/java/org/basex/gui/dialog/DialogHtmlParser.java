@@ -5,17 +5,17 @@ import static org.basex.core.Text.*;
 import java.awt.*;
 import java.io.*;
 
-import org.basex.build.*;
+import org.basex.build.html.*;
 import org.basex.core.*;
 import org.basex.gui.*;
-import org.basex.gui.GUIConstants.*;
+import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.layout.*;
 import org.basex.util.options.*;
 
 /**
  * CSV parser panel.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class DialogHtmlParser extends DialogParser {
@@ -33,13 +33,13 @@ final class DialogHtmlParser extends DialogParser {
    */
   DialogHtmlParser(final BaseXDialog d, final MainOptions opts) {
     super(d);
-    hopts = opts.get(MainOptions.HTMLPARSER);
+    hopts = new HtmlOptions(opts.get(MainOptions.HTMLPARSER));
 
     final boolean avl = HtmlParser.available();
     final BaseXBack pp  = new BaseXBack(new TableLayout(3, 1, 0, 8));
     pp.add(new BaseXLabel(avl ? H_HTML_PARSER : H_NO_HTML_PARSER));
 
-    options = new BaseXTextField(opts.get(MainOptions.HTMLPARSER).toString(), d);
+    options = new BaseXTextField(hopts.toString(), d);
     options.setToolTipText(tooltip(hopts));
 
     if(avl) {
@@ -58,7 +58,7 @@ final class DialogHtmlParser extends DialogParser {
   @Override
   boolean action(final boolean active) {
     try {
-      hopts.parse(options.getText());
+      hopts.assign(options.getText());
       info.setText(null, null);
       return true;
     } catch(final IOException ex) {

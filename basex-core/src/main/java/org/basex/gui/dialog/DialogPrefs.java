@@ -10,10 +10,13 @@ import org.basex.gui.layout.*;
 /**
  * Dialog window for changing some project's preferences.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class DialogPrefs extends BaseXDialog {
+  /** Dialog. */
+  private static Dialog dialog;
+
   /** General preferences. */
   private final DialogGeneralPrefs general;
   /** Editor preferences. */
@@ -27,7 +30,7 @@ public final class DialogPrefs extends BaseXDialog {
    * Default constructor.
    * @param main reference to the main window
    */
-  public DialogPrefs(final GUI main) {
+  private DialogPrefs(final GUI main) {
     super(main, PREFERENCES, false);
 
     tabs = new BaseXTabs(this);
@@ -42,27 +45,34 @@ public final class DialogPrefs extends BaseXDialog {
 
     set(tabs, BorderLayout.CENTER);
     action(null);
-    finish(null);
+    finish();
+  }
+
+  /**
+   * Activates the dialog window.
+   * @param main reference to the main window
+   */
+  public static void show(final GUI main) {
+    if(dialog == null) dialog = new DialogPrefs(main);
+    dialog.setVisible(true);
   }
 
   @Override
   public void action(final Object cmp) {
-    general.action(cmp);
-    editor.action();
-    visual.action();
+    // no short-circuiting, do all checks...
+    ok = general.action(cmp) & editor.action() & visual.action();
     gui.notify.layout();
   }
 
   @Override
   public void close() {
-    cancel();
+    if(ok) cancel();
   }
 
   @Override
   public void cancel() {
     gui.gopts.set(GUIOptions.PREFTAB, tabs.getSelectedIndex());
-    gui.context.globalopts.write();
-    gui.gopts.write();
-    super.cancel();
+    gui.context.soptions.write();
+    super.close();
   }
 }

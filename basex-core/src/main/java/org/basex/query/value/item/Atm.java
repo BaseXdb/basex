@@ -4,7 +4,7 @@ import static org.basex.data.DataText.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.util.*;
+import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -12,7 +12,7 @@ import org.basex.util.list.*;
 /**
  * Untyped atomic item ({@code xs:untypedAtomic}).
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Atm extends Item {
@@ -47,15 +47,19 @@ public final class Atm extends Item {
   }
 
   @Override
-  public boolean eq(final Item it, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  public boolean eq(final Item it, final Collation coll, final StaticContext sc,
+      final InputInfo ii) throws QueryException {
     return it.type.isUntyped() ? coll == null ? Token.eq(value, it.string(ii)) :
-      coll.compare(value, it.string(ii)) == 0 : it.eq(this, coll, ii);
+      coll.compare(value, it.string(ii)) == 0 : it.eq(this, coll, sc, ii);
   }
 
   @Override
-  public int diff(final Item it, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  public boolean sameKey(final Item it, final InputInfo ii) throws QueryException {
+    return it.type.isStringOrUntyped() && eq(it, null, null, ii);
+  }
+
+  @Override
+  public int diff(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
     return it.type.isUntyped() ? coll == null ? Token.diff(value, it.string(ii)) :
       coll.compare(value, it.string(ii)) : -it.diff(this, coll, ii);
   }
@@ -72,13 +76,35 @@ public final class Atm extends Item {
 
   @Override
   public String toString() {
+    return toString(value);
+  }
+
+  /**
+   * Returns a string representation of the specified value.
+   * @param value value
+   * @return string
+   */
+  public static String toString(final byte[] value) {
+    return toString(value, true);
+  }
+
+  /**
+   * Returns a string representation of the specified value.
+   * @param value value
+   * @param quotes wrap with quotes
+   * @return string
+   */
+  public static String toString(final byte[] value, final boolean quotes) {
     final ByteList tb = new ByteList();
-    tb.add('"');
+    if(quotes) tb.add('"');
     for(final byte v : value) {
       if(v == '&') tb.add(E_AMP);
+      else if(v == '\r') tb.add(E_CR);
+      else if(v == '\n') tb.add(E_NL);
+      else if(v == '"' && quotes) tb.add('"').add('"');
       else tb.add(v);
-      if(v == '"') tb.add('"');
     }
-    return tb.add('"').toString();
+    if(quotes) tb.add('"');
+    return tb.toString();
   }
 }

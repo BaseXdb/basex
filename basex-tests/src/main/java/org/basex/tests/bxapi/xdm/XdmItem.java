@@ -1,5 +1,7 @@
 package org.basex.tests.bxapi.xdm;
 
+import static org.basex.query.QueryError.*;
+
 import java.util.*;
 
 import org.basex.query.*;
@@ -11,7 +13,7 @@ import org.basex.util.*;
 /**
  * Wrapper for representing XQuery items.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class XdmItem extends XdmValue {
@@ -33,14 +35,17 @@ public abstract class XdmItem extends XdmValue {
   public abstract Item internal();
 
   /**
-   * Checks if the two items are equal, according to XQuery.
+   * Checks if the two items are equal, according to XQuery semantics.
    * @param item second item
    * @return result of check
    * @throws XQueryException exception
    */
   public boolean equal(final XdmItem item) {
+    if(item == null) return false;
+    final Item it1 = internal(), it2 = item.internal();
     try {
-      return item != null && internal().eq(item.internal(), null, null);
+      if(it1.comparable(it2)) return it1.eq(it2, null, null, null);
+      throw diffError(null, it1, it2);
     } catch(final QueryException ex) {
       throw new XQueryException(ex);
     }

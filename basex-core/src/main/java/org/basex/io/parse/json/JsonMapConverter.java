@@ -1,9 +1,13 @@
 package org.basex.io.parse.json;
 
+import static org.basex.query.QueryError.*;
+
 import java.util.*;
 
-import org.basex.build.*;
+import org.basex.build.json.*;
+import org.basex.build.json.JsonParserOptions.JsonDuplicates;
 import org.basex.query.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.Map;
@@ -28,95 +32,86 @@ import org.basex.util.*;
  *     <code>{'foo':42, 'bar':()}</code>)
  * </dl>
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public final class JsonMapConverter extends JsonConverter {
   /** Stack for intermediate values. */
   private final Stack<Value> stack = new Stack<>();
+  /** Stack for intermediate array values. */
+  private final Stack<ValueList> arrays = new Stack<>();
+  /** Stack for intermediate maps values. */
+  private final Stack<Map> maps = new Stack<>();
 
   /**
    * Constructor.
    * @param opts json options
+   * @throws QueryIOException query I/O exception
    */
-  public JsonMapConverter(final JsonParserOptions opts) {
+  JsonMapConverter(final JsonParserOptions opts) throws QueryIOException {
     super(opts);
+    final JsonDuplicates dupl = jopts.get(JsonParserOptions.DUPLICATES);
+    if(dupl == JsonDuplicates.RETAIN) throw new QueryIOException(
+        BXJS_INVALID_X.get(null, JsonParserOptions.DUPLICATES.name(), dupl));
   }
 
   @Override
   public Item finish() {
-    return stack.peek().isEmpty() ? null : (Item) stack.pop();
+    final Value v = stack.pop();
+    return v.isEmpty() ? null : (Item) v;
   }
 
   @Override
   void openObject() {
-    stack.push(Map.EMPTY);
+    maps.push(Map.EMPTY);
   }
 
   @Override
-  void openPair(final byte[] key) {
+  void openPair(final byte[] key, final boolean add) {
     stack.push(Str.get(key));
   }
 
   @Override
-  void closePair() throws QueryIOException {
+  void closePair(final boolean add) throws QueryIOException {
     final Value val = stack.pop();
     final Item key = (Item) stack.pop();
-    final Map map = (Map) stack.pop();
-    try {
-      stack.push(map.insert(key, val, null));
-    } catch(final QueryException ex) {
-      throw new QueryIOException(ex);
+    if(add) {
+      try {
+        maps.push(maps.pop().put(key, val, null));
+      } catch(final QueryException ex) {
+        throw new QueryIOException(ex);
+      }
     }
   }
 
   @Override
-  void closeObject() { }
+  void closeObject() {
+    stack.push(maps.pop());
+  }
 
   @Override
   void openArray() {
-    stack.push(Map.EMPTY);
+    arrays.push(new ValueList());
   }
 
   @Override
   void openItem() {
-    stack.push(Int.get(((Map) stack.peek()).mapSize() + 1));
   }
 
   @Override
-  void closeItem() throws QueryIOException {
-    closePair();
+  void closeItem() {
+    arrays.peek().add(stack.pop());
   }
 
   @Override
-  void closeArray() { }
-
-  @Override
-  public void openConstr(final byte[] name) {
-    openObject();
-    openPair(name);
-    openArray();
-  }
-
-  @Override public void openArg() {
-    openItem();
-  }
-
-  @Override public void closeArg() throws QueryIOException {
-    closeItem();
+  void closeArray() {
+    stack.push(arrays.pop().array());
   }
 
   @Override
-  public void closeConstr() throws QueryIOException {
-    closeArray();
-    closePair();
-    closeObject();
-  }
-
-  @Override
-  public void numberLit(final byte[] val) throws QueryIOException {
+  public void numberLit(final byte[] value) throws QueryIOException {
     try {
-      stack.push(Dbl.get(val, null));
+      stack.push(Dbl.get(value, null));
     } catch(final QueryException ex) {
       throw new QueryIOException(ex);
     }
@@ -133,7 +128,7 @@ public final class JsonMapConverter extends JsonConverter {
   }
 
   @Override
-  public void booleanLit(final byte[] b) {
-    stack.push(Bln.get(Token.eq(b, Token.TRUE)));
+  public void booleanLit(final byte[] value) {
+    stack.push(Bln.get(Token.eq(value, Token.TRUE)));
   }
 }

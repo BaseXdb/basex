@@ -1,17 +1,19 @@
 package org.basex.tests.bxapi;
 
+import java.io.*;
 import java.util.*;
+import java.util.Map.Entry;
 
 import javax.xml.namespace.*;
 
 import org.basex.core.Context;
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.format.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.tests.bxapi.xdm.*;
 import org.basex.util.*;
@@ -21,10 +23,10 @@ import org.basex.util.list.*;
 /**
  * Wrapper for evaluating XQuery expressions.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public final class XQuery implements Iterable<XdmItem> {
+public final class XQuery implements Iterable<XdmItem>, Closeable {
   /** Query processor. */
   private final QueryProcessor qp;
   /** Query iterator. */
@@ -33,10 +35,10 @@ public final class XQuery implements Iterable<XdmItem> {
   /**
    * Constructor.
    * @param query query
-   * @param ctx database context
+   * @param context database context
    */
-  public XQuery(final String query, final Context ctx) {
-    qp = new QueryProcessor(query, ctx);
+  public XQuery(final String query, final Context context) {
+    qp = new QueryProcessor(query, context);
   }
 
   /**
@@ -46,12 +48,8 @@ public final class XQuery implements Iterable<XdmItem> {
    * @throws XQueryException exception
    */
   public XQuery context(final XdmValue value) {
-    try {
-      qp.context(value.internal());
-      return this;
-    } catch(final QueryException ex) {
-      throw new XQueryException(ex);
-    }
+    qp.context(value.internal());
+    return this;
   }
 
   /**
@@ -96,7 +94,7 @@ public final class XQuery implements Iterable<XdmItem> {
   public XQuery decimalFormat(final QName name, final HashMap<String, String> map) {
     try {
       final TokenMap tm = new TokenMap();
-      for(final Map.Entry<String, String> e : map.entrySet()) {
+      for(final Entry<String, String> e : map.entrySet()) {
         tm.put(Token.token(e.getKey()), Token.token(e.getValue()));
       }
       qp.sc.decFormats.put(new QNm(name).id(), new DecFormatter(null, tm));
@@ -202,12 +200,11 @@ public final class XQuery implements Iterable<XdmItem> {
    * @return the function call
    */
   public StandardFunc funcCall(final String fName, final Expr... args) {
-    if(!fName.equals("fn:doc")) System.out.print(" FUNC: " + fName);
     final QNm qName = new QNm(fName);
     qName.uri(qName.hasPrefix() ? NSGlobal.uri(qName.prefix()) : qp.sc.funcNS);
     try {
       return Functions.get().get(qName, args, qp.sc, null);
-    } catch(QueryException ex) {
+    } catch(final QueryException ex) {
       throw new XQueryException(ex);
     }
   }
@@ -237,7 +234,9 @@ public final class XQuery implements Iterable<XdmItem> {
    */
   public XdmValue value() {
     try {
-      return XdmValue.get(qp.value());
+      final Value v = qp.value();
+      v.materialize(null);
+      return XdmValue.get(v);
     } catch(final QueryException ex) {
       throw new XQueryException(ex);
     } finally {
@@ -246,18 +245,14 @@ public final class XQuery implements Iterable<XdmItem> {
   }
 
   /**
-   * Returns serialization properties.
-   * @return serialization properties
+   * Returns the query processor.
+   * @return query processor
    */
-  public SerializerOptions serializer() {
-    return qp.qc.serParams();
+  public QueryProcessor qp() {
+    return qp;
   }
 
-  /**
-   * Closes the query; will be called whenever if items have been returned.
-   * Should be manually called if not all items are retrieved.
-   * @throws XQueryException exception
-   */
+  @Override
   public void close() {
     qp.close();
   }
@@ -291,12 +286,12 @@ public final class XQuery implements Iterable<XdmItem> {
   /**
    * Returns the string representation of a query result.
    * @param query query string
-   * @param val optional context
-   * @param ctx database context
+   * @param value optional context
+   * @param context database context
    * @return optional expected test suite result
    */
-  public static String string(final String query, final XdmValue val, final Context ctx) {
-    final XdmValue xv = new XQuery(query, ctx).context(val).value();
+  public static String string(final String query, final XdmValue value, final Context context) {
+    final XdmValue xv = new XQuery(query, context).context(value).value();
     return xv.size() == 0 ? "" : xv.getString();
   }
 

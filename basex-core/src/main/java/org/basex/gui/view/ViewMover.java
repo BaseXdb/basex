@@ -10,7 +10,7 @@ import org.basex.gui.layout.*;
 /**
  * This panel is added to each view to allow drag and drop operations.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class ViewMover extends BaseXPanel {
@@ -25,7 +25,7 @@ final class ViewMover extends BaseXPanel {
    * Constructor.
    * @param main reference to the main window
    */
-  ViewMover(final AGUI main) {
+  ViewMover(final GUI main) {
     super(main);
     setLayout(new BorderLayout());
     addKeyListener(this);
@@ -100,6 +100,6 @@ final class ViewMover extends BaseXPanel {
    */
   public void refreshLayout() {
     height = Math.max(10, 6 + (int) (GUIConstants.fontSize * 0.333));
-    BaseXLayout.setHeight(this, height);
+    setPreferredSize(new Dimension(getPreferredSize().width, height));
   }
 }

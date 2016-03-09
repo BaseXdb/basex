@@ -15,20 +15,20 @@ import org.basex.io.out.*;
  *
  * <p>The class is implemented by the {@link ClientSession} and {@link LocalSession} classes.</p>
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public abstract class Session {
+public abstract class Session implements Closeable {
   /** Client output stream. */
   protected OutputStream out;
   /** Command info. */
-  protected String info;
+  protected String info = "";
 
   /**
    * Executes a {@link Command} and returns the result as string or serializes
    * it to the specified output stream.
    * @param command command to be executed
-   * @return result, or {@code null} reference
+   * @return result or {@code null} reference
    * @throws IOException I/O exception
    */
   public final String execute(final Command command) throws IOException {
@@ -41,7 +41,7 @@ public abstract class Session {
    * Executes a command and returns the result as string or serializes
    * it to the specified output stream.
    * @param command command to be parsed
-   * @return result, or {@code null} reference
+   * @return result or {@code null} reference
    * @throws IOException I/O exception
    */
   public final String execute(final String command) throws IOException {
@@ -115,12 +115,6 @@ public abstract class Session {
   public OutputStream getOutputStream() {
     return out;
   }
-
-  /**
-   * Closes the session.
-   * @throws IOException I/O exception
-   */
-  public abstract void close() throws IOException;
 
   // PROTECTED METHODS ========================================================
 

@@ -4,7 +4,7 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -15,7 +15,7 @@ import org.basex.util.hash.*;
 /**
  * Union expression.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Union extends Set {
@@ -29,19 +29,14 @@ public final class Union extends Set {
   }
 
   @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    super.compile(qc, scp);
-    return optimize(qc, scp);
-  }
-
-  @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
-    final int es = exprs.length;
-    final ExprList el = new ExprList(es);
+    super.optimize(qc, scp);
+
+    final ExprList el = new ExprList(exprs.length);
     for(final Expr ex : exprs) {
       if(ex.isEmpty()) {
         // remove empty operands
-        qc.compInfo(OPTREMOVE, this, ex);
+        qc.compInfo(OPTREMOVE_X_X, this, ex);
       } else {
         el.add(ex);
       }
@@ -51,7 +46,7 @@ public final class Union extends Set {
     // ensure that results are always sorted
     if(el.size() == 1 && iterable) return el.get(0);
     // replace expressions with optimized list
-    if(el.size() != es) exprs = el.finish();
+    exprs = el.finish();
     return this;
   }
 
@@ -63,12 +58,12 @@ public final class Union extends Set {
   }
 
   @Override
-  protected NodeSeqBuilder eval(final Iter[] iter) throws QueryException {
-    final NodeSeqBuilder nc = new NodeSeqBuilder().check();
+  public ANodeList eval(final Iter[] iter) throws QueryException {
+    final ANodeList list = new ANodeList().check();
     for(final Iter ir : iter) {
-      for(Item it; (it = ir.next()) != null;) nc.add(checkNode(it));
+      for(Item it; (it = ir.next()) != null;) list.add(toNode(it));
     }
-    return nc;
+    return list;
   }
 
   @Override
@@ -77,12 +72,14 @@ public final class Union extends Set {
       @Override
       public ANode next() throws QueryException {
         if(item == null) {
-          item = new ANode[iter.length];
-          for(int i = 0; i != iter.length; ++i) next(i);
+          final int il = iter.length;
+          item = new ANode[il];
+          for(int i = 0; i < il; i++) next(i);
         }
 
         int m = -1;
-        for(int i = 0; i != item.length; ++i) {
+        final int il = item.length;
+        for(int i = 0; i < il; i++) {
           if(item[i] == null) continue;
           final int d = m == -1 ? 1 : item[m].diff(item[i]);
           if(d == 0) {

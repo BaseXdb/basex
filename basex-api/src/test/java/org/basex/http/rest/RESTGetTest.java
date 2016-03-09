@@ -1,6 +1,5 @@
 package org.basex.http.rest;
 
-import static org.basex.io.MimeTypes.*;
 import static org.junit.Assert.*;
 
 import java.io.*;
@@ -9,12 +8,13 @@ import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.util.*;
+import org.basex.util.http.*;
 import org.junit.*;
 
 /**
  * This class tests the embedded REST API and the GET method.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class RESTGetTest extends RESTTest {
@@ -25,11 +25,10 @@ public final class RESTGetTest extends RESTTest {
   @Test
   public void basic() throws Exception {
     assertEquals("1", get("?query=1"));
-    assertEquals("1 2 3", get("?query=1+to+3&wrap=no"));
-    assertEquals(WRAP, get("?query=()&wrap=yes"));
+    assertEquals("a,b", get("?query=string-join(('a','b'),',')"));
 
     put(NAME, new ArrayInput("<a/>"));
-    put(NAME + "/raw", new ArrayInput("XXX"), APP_OCTET);
+    put(NAME + "/raw", new ArrayInput("XXX"), MediaType.APPLICATION_OCTET_STREAM);
     assertEquals("<a/>", get(NAME + '/' + NAME + ".xml"));
     assertEquals("XXX", get(NAME + "/raw"));
     delete(NAME);
@@ -59,9 +58,9 @@ public final class RESTGetTest extends RESTTest {
   public void bind() throws IOException {
     assertEquals("123", get('?'
         + "query=declare+variable+$x+as+xs:integer+external;$x&$x=123"));
-    assertEquals("124", get("?wrap=no&$x=123&"
+    assertEquals("124", get("?$x=123&"
         + "query=declare+variable+$x+as+xs:integer+external;$x%2b1"));
-    assertEquals("6", get("?wrap=no&"
+    assertEquals("6", get("?"
         + "query=declare+variable+$a++as+xs:integer+external;"
         + "declare+variable+$b+as+xs:integer+external;"
         + "declare+variable+$c+as+xs:integer+external;" + "$a*$b*$c&"
@@ -95,19 +94,21 @@ public final class RESTGetTest extends RESTTest {
    */
   @Test
   public void contentType() throws Exception {
-    assertStartsWith(contentType("?query=1"), APP_XML);
-    assertStartsWith(contentType("?command=info"), TEXT_PLAIN);
+    assertMediaType(mediaType("?query=1"), MediaType.APPLICATION_XML);
+    assertMediaType(mediaType("?command=info"), MediaType.TEXT_PLAIN);
 
-    assertStartsWith(contentType("?query=1&method=xml"), APP_XML);
-    assertStartsWith(contentType("?query=1&method=xhtml"), TEXT_HTML);
-    assertStartsWith(contentType("?query=1&method=html"), TEXT_HTML);
-    assertStartsWith(contentType("?query=1&method=text"), TEXT_PLAIN);
-    assertStartsWith(contentType("?query=1&method=raw"), APP_OCTET);
-    assertStartsWith(contentType("?query=<json+type='object'/>&method=json"), APP_JSON);
+    assertMediaType(mediaType("?query=1&method=xml"), MediaType.APPLICATION_XML);
+    assertMediaType(mediaType("?query=1&method=xhtml"), MediaType.TEXT_HTML);
+    assertMediaType(mediaType("?query=1&method=html"), MediaType.TEXT_HTML);
+    assertMediaType(mediaType("?query=1&method=text"), MediaType.TEXT_PLAIN);
+    assertMediaType(mediaType("?query=<json+type='object'/>&method=json"),
+        MediaType.APPLICATION_JSON);
 
-    assertStartsWith(contentType("?query=1&media-type=application/xml"), APP_XML);
-    assertStartsWith(contentType("?query=1&media-type=text/html"), TEXT_HTML);
-    assertStartsWith(contentType("?query=1&media-type=xxx"), "xxx");
+    assertMediaType(mediaType("?query=1&media-type=application/octet-stream"),
+        MediaType.APPLICATION_OCTET_STREAM);
+    assertMediaType(mediaType("?query=1&media-type=application/xml"), MediaType.APPLICATION_XML);
+    assertMediaType(mediaType("?query=1&media-type=text/html"), MediaType.TEXT_HTML);
+    assertMediaType(mediaType("?query=1&media-type=xxx"), new MediaType("xxx"));
   }
 
   /**
@@ -116,16 +117,12 @@ public final class RESTGetTest extends RESTTest {
    */
   @Test
   public void queryOption() throws IOException {
-    assertEquals("2",
-        get("?query=switch(1)+case+1+return+2+default+return+3&" +
-        MainOptions.XQUERY3.name() + "=true")
-    );
+    assertEquals("2", get("?query=2,delete+node+<a/>&" + MainOptions.MIXUPDATES.name() + "=true"));
     try {
-      get("?query=switch(1)+case+1+return+2+default+return+3&" +
-          MainOptions.XQUERY3.name() + "=false");
+      get("?query=1,delete+node+<a/>&" + MainOptions.MIXUPDATES.name() + "=false");
       fail("Error expected.");
     } catch(final IOException ex) {
-      assertContains(ex.getMessage(), "[XPST0003]");
+      assertContains(ex.getMessage(), "[XUST0001]");
     }
   }
 
@@ -135,7 +132,7 @@ public final class RESTGetTest extends RESTTest {
    */
   @Test
   public void runOption() throws IOException {
-    final String path = context.globalopts.get(GlobalOptions.WEBPATH);
+    final String path = context.soptions.get(StaticOptions.WEBPATH);
     new IOFile(path, "x.xq").write(Token.token("1"));
     assertEquals("1", get("?run=x.xq"));
 

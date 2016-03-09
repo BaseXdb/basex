@@ -4,13 +4,12 @@ import java.awt.*;
 import java.awt.event.*;
 
 import javax.swing.*;
-import javax.swing.border.*;
 import javax.swing.tree.*;
 
 /**
  * Project specific tree implementation.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public class BaseXTree extends JTree {
@@ -22,11 +21,11 @@ public class BaseXTree extends JTree {
   public BaseXTree(final DefaultMutableTreeNode root, final Window w) {
     super(root);
     BaseXLayout.addInteraction(this, w);
+    setLargeModel(true);
     addMouseListener(new MouseAdapter() {
       @Override
       public void mousePressed(final MouseEvent e) {
-        if(SwingUtilities.isRightMouseButton(e))
-          setSelectionRow(getClosestRowForLocation(e.getX(), e.getY()));
+        if(!e.isShiftDown()) setSelectionRow(getClosestRowForLocation(e.getX(), e.getY()));
       }
     });
   }
@@ -40,7 +39,7 @@ public class BaseXTree extends JTree {
    * @return self reference
    */
   public BaseXTree border(final int t, final int l, final int b, final int r) {
-    setBorder(new EmptyBorder(t, l, b, r));
+    setBorder(BaseXLayout.border(t, l, b, r));
     return this;
   }
 }

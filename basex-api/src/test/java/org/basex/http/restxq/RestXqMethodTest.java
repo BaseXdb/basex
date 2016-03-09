@@ -5,13 +5,13 @@ import static org.junit.Assert.*;
 import java.io.*;
 
 import org.basex.core.*;
-import org.basex.io.*;
+import org.basex.util.http.*;
 import org.junit.*;
 
 /**
  * This test contains RESTXQ methods.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class RestXqMethodTest extends RestXqTest {
@@ -21,18 +21,20 @@ public final class RestXqMethodTest extends RestXqTest {
    */
   @Test
   public void post() throws Exception {
+    // text
     String f = "declare %R:POST('{$x}') %R:path('') function m:f($x) {$x};";
-    post(f, "12", "12", MimeTypes.TEXT_PLAIN);
-    post(f, "<x>A</x>", "<x>A</x>", MimeTypes.APP_XML);
+    post(f, "12", "12", MediaType.TEXT_PLAIN);
+    post(f, "<x>A</x>", "<x>A</x>", MediaType.APPLICATION_XML);
+    // json
     f = "declare %R:POST('{$x}') %R:path('') function m:f($x) {$x/json/*};";
-    post(f, "<A>B</A>", "{ \"A\":\"B\" }", MimeTypes.APP_JSON);
-    f = "declare %R:POST('{$x}') %R:path('') function m:f($x) {$x};";
-    post(f, "<A/>", "[\"A\"]", MimeTypes.APP_JSONML);
+    post(f, "<A>B</A>", "{ \"A\":\"B\" }", MediaType.APPLICATION_JSON);
+    // csv
     f = "declare %R:POST('{$x}') %R:path('') function m:f($x) {$x/csv/*/*};";
-    post(f, "<entry>A</entry>", "A", MimeTypes.TEXT_CSV);
+    post(f, "<entry>A</entry>", "A", MediaType.TEXT_CSV);
+    // binary
     f = "declare %R:POST('{$x}') %R:path('') function m:f($x) {$x};";
-    post(f, "QUFB", "AAA", MimeTypes.APP_OCTET);
-    post(f, "QUFB", "AAA", "whatever/type");
+    post(f, "AAA", "AAA", MediaType.APPLICATION_OCTET_STREAM);
+    post(f, "AAA", "AAA", new MediaType("whatever/type"));
   }
 
   /**
@@ -48,7 +50,7 @@ public final class RestXqMethodTest extends RestXqTest {
     getE("declare %R:method('GET', '{$b}') %R:path('') function m:f($b) {$b};", "");
     // standard HTTP method with body, body provided in request
     post("declare %R:method('POST', '{$b}') %R:path('') function m:f($b) {$b};", "12", "12",
-        MimeTypes.TEXT_PLAIN);
+        MediaType.TEXT_PLAIN);
 
     // ignore case
     get("declare %R:method('get') %R:path('') function m:f() {'x'};", "", "x");
@@ -57,20 +59,20 @@ public final class RestXqMethodTest extends RestXqTest {
 
     // custom HTTP method without body
     install("declare %R:method('RETRIEVE') %R:path('') function m:f() {'x'};");
-    // TODO java.net.HttpUrlConnection does not support custom HTTP methods
+    // java.net.HttpUrlConnection does not support custom HTTP methods
     // assertEquals("x", request("", "RETRIEVE"));
 
     // custom HTTP method with body
     install("declare %R:method('RETRIEVE', '{$b}') %R:path('') function m:f($b) {$b};");
-    // TODO java.net.HttpUrlConnection does not support custom HTTP methods
-    // assertEquals("12", request("", "RETRIEVE", "12", MimeTypes.TEXT_PLAIN));
+    // java.net.HttpUrlConnection does not support custom HTTP methods
+    // assertEquals("12", request("", "RETRIEVE", "12", MediaType.TEXT_PLAIN));
 
     // custom HTTP method specified twice
     final String q = "declare %R:method('RETRIEVE') %R:method('RETRIEVE') %R:path('') "
         + "function m:f() {'x'};";
     install(q);
     try {
-      // TODO java.net.HttpUrlConnection does not support custom HTTP methods
+      // java.net.HttpUrlConnection does not support custom HTTP methods
       request("", "RETRIEVE");
       fail("Error expected: " + q);
     } catch (final BaseXException ignored) {
@@ -98,11 +100,11 @@ public final class RestXqMethodTest extends RestXqTest {
    * @param function function to test
    * @param exp expected result
    * @param request request body
-   * @param type content type
+   * @param type media type
    * @throws IOException I/O exception
    */
   private static void post(final String function, final String exp, final String request,
-      final String type) throws IOException {
+      final MediaType type) throws IOException {
     install(function);
     assertEquals(exp, post("", request, type));
   }

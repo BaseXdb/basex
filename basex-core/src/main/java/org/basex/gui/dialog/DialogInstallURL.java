@@ -6,17 +6,17 @@ import java.awt.*;
 import java.awt.event.*;
 
 import org.basex.gui.*;
-import org.basex.gui.GUIConstants.*;
+import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.layout.*;
 import org.basex.util.*;
 
 /**
  * URL dialog.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public final class DialogInstallURL extends BaseXDialog {
+final class DialogInstallURL extends BaseXDialog {
   /** URL. */
   private final BaseXTextField url;
   /** Buttons. */
@@ -51,12 +51,12 @@ public final class DialogInstallURL extends BaseXDialog {
 
     p = new BaseXBack(new BorderLayout());
     p.add(link, BorderLayout.WEST);
-    buttons = newButtons(B_OK, CANCEL);
+    buttons = newButtons(B_OK, B_CANCEL);
     p.add(buttons, BorderLayout.EAST);
 
     set(p, BorderLayout.SOUTH);
     action(null);
-    finish(null);
+    finish();
   }
 
   @Override
@@ -76,7 +76,7 @@ public final class DialogInstallURL extends BaseXDialog {
    * Returns the url.
    * @return url
    */
-  public String url() {
+  String url() {
     return url.getText();
   }
 }

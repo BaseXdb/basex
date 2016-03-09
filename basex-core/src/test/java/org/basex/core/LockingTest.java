@@ -2,21 +2,23 @@ package org.basex.core;
 
 import static org.junit.Assert.*;
 
-import java.lang.reflect.Array;
+import java.lang.reflect.*;
 import java.util.*;
-import java.util.List;
 import java.util.concurrent.*;
+
 import org.basex.*;
+import org.basex.core.locks.*;
+import org.basex.core.users.*;
 import org.basex.util.list.*;
 import org.junit.*;
 import org.junit.runner.*;
 import org.junit.runners.*;
-import org.junit.runners.Parameterized.*;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Tests for {@link DBLocking}.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Jens Erat
  */
 @RunWith(Parameterized.class)
@@ -45,10 +47,8 @@ public final class LockingTest extends SandboxTest {
     return params;
   }
 
-  /** Global options, used to read parallel transactions limit. */
-  private final GlobalOptions gopts = new Context().globalopts;
   /** Locking instance used for testing. */
-  private final DBLocking locks = new DBLocking(gopts);
+  private final DBLocking locks = new DBLocking(context.soptions);
   /** Objects used for locking. */
   private final String[] objects = new String[5];
   /** Empty string array for convenience. */
@@ -59,9 +59,23 @@ public final class LockingTest extends SandboxTest {
    */
   @Before
   public void before() {
-    for(int i = 0; i < objects.length; i++) {
-      objects[i] = Integer.toString(i);
-    }
+    final int ol = objects.length;
+    for(int o = 0; o < ol; o++) objects[o] = Integer.toString(o);
+  }
+
+  /**
+   * Single thread acquires both global read lock and a single write lock.
+   * @throws InterruptedException Got interrupted.
+   */
+  @Test
+  public void singleThreadGlobalReadLocalWriteTest() throws InterruptedException {
+    final CountDownLatch test = new CountDownLatch(1);
+    final LockTester th1 = new LockTester(null, null, objects, test);
+
+    th1.start();
+    assertTrue("Thread should be able to acquire lock.",
+        test.await(WAIT, TimeUnit.MILLISECONDS));
+    th1.release();
   }
 
   /**
@@ -149,23 +163,24 @@ public final class LockingTest extends SandboxTest {
   @Test
   public void parallelTransactionLimitTest() throws InterruptedException {
     final CountDownLatch latch =
-        new CountDownLatch(Math.max(gopts.get(GlobalOptions.PARALLEL), 1));
+        new CountDownLatch(Math.max(context.soptions.get(StaticOptions.PARALLEL), 1));
     // Container for(maximum number allowed transactions) + 1 testers
     final LockTester[] testers = (LockTester[]) Array.newInstance(
         LockTester.class, (int) (latch.getCount() + 1));
 
     // Start maximum number of allowed transactions
-    for(int i = 0; i < testers.length - 1; i++) {
-      testers[i] = new LockTester(null, objects, NONE, latch);
-      testers[i].start();
+    final int tl = testers.length;
+    for(int t = 0; t < tl - 1; t++) {
+      testers[t] = new LockTester(null, objects, NONE, latch);
+      testers[t].start();
     }
     assertTrue("Couldn't start maximum allowed number of parallel transactions!",
         latch.await(WAIT, TimeUnit.MILLISECONDS));
 
     // Start one more transaction
     final CountDownLatch latch2 = new CountDownLatch(1);
-    testers[testers.length - 1] = new LockTester(null, objects, NONE, latch2);
-    testers[testers.length - 1].start();
+    testers[tl - 1] = new LockTester(null, objects, NONE, latch2);
+    testers[tl - 1].start();
     assertFalse("Shouldn't be able to start another parallel transaction yet!",
         latch2.await(WAIT, TimeUnit.MILLISECONDS));
 
@@ -175,9 +190,7 @@ public final class LockingTest extends SandboxTest {
         latch2.await(WAIT, TimeUnit.MILLISECONDS));
 
     // Stop all other transactions
-    for(int i = 1; i < testers.length; i++) {
-      testers[i].release();
-    }
+    for(int t = 1; t < tl; t++) testers[t].release();
   }
 
   /**
@@ -527,8 +540,7 @@ public final class LockingTest extends SandboxTest {
             final CountDownLatch latch = new CountDownLatch(1);
             final String[] read = randomSubset(objects, true);
             final String[] write = randomSubset(objects, true);
-            final LockTester th = new LockTester(null, read,
-                write, latch);
+            final LockTester th = new LockTester(null, read, write, latch);
             th.start();
             try {
               Thread.sleep(HOLD_TIME);

@@ -15,6 +15,7 @@ LIMITATIONS:
 Documentation: http://docs.basex.org/wiki/Clients
 
 (C) 2012, Hiroaki Itoh. BSD License
+    updated 2014 by Marc van Grootel
 
 """
 
@@ -111,19 +112,21 @@ class Session(object):
 
         self.__swrapper.connect((host, port))
 
-        self.__event_socket_wrapper = None
-        self.__event_host = host
-        self.__event_listening_thread = None
-        self.__event_callbacks = {}
-
         # receive timestamp
-        timestamp = self.recv_c_str()
+        response = self.recv_c_str().split(':')
 
         # send username and hashed password/timestamp
         hfun = hashlib.md5()
-        #FIXME: should we allow to customize password encoding?
-        hfun.update(hashlib.md5(password.encode('us-ascii')).hexdigest().encode('us-ascii'))
-        hfun.update(timestamp.encode('us-ascii'))
+
+        if len(response) > 1:
+            code = "%s:%s:%s" % (user,response[0],password)
+            nonce = response[1]
+        else:
+            code = password
+            nonce = response[0]
+
+        hfun.update(hashlib.md5(code.encode('us-ascii')).hexdigest().encode('us-ascii'))
+        hfun.update(nonce.encode('us-ascii'))
         self.send(user + chr(0) + hfun.hexdigest())
 
         # evaluate success flag
@@ -177,76 +180,6 @@ yourself explicitly."""
         """Close the session"""
         self.send('exit')
         self.__swrapper.close()
-        if not self.__event_socket_wrapper is None:
-            self.__event_socket_wrapper.close()
-
-    def __register_and_start_listener(self,
-                                      receive_bytes_encoding=None,
-                                      send_bytes_encoding=None):
-        """register and start listener."""
-
-        if receive_bytes_encoding:
-            receive_bytes_encoding_ = receive_bytes_encoding
-        else:
-            receive_bytes_encoding_ = self.__swrapper.receive_bytes_encoding
-        if send_bytes_encoding:
-            send_bytes_encoding_ = send_bytes_encoding
-        else:
-            send_bytes_encoding_ = self.__swrapper.send_bytes_encoding
-
-        self.__swrapper.sendall(chr(10))
-        event_port = int(self.recv_c_str())
-        self.__event_socket_wrapper = SocketWrapper(
-            socket.socket(socket.AF_INET, socket.SOCK_STREAM),
-            receive_bytes_encoding=receive_bytes_encoding_,
-            send_bytes_encoding=send_bytes_encoding_)
-        self.__event_socket_wrapper.settimeout(5000)
-        self.__event_socket_wrapper.connect((self.__event_host, event_port))
-        token = self.recv_c_str()
-        self.__event_socket_wrapper.sendall(token + chr(0))
-        #if self.__event_socket_wrapper.recv_single_byte() != chr(0):
-        #    raise IOError("Could not register event listener")
-        #java example client does skip next byte...
-        ign = self.__event_socket_wrapper.recv_single_byte()
-
-        self.__event_listening_thread = threading.Thread(
-            target=self.__event_listening_loop
-        )
-        self.__event_listening_thread.daemon = True
-        self.__event_listening_thread.start()
-
-    def __event_listening_loop(self):
-        """event listening loop (in subthread)"""
-        reader = self.__event_socket_wrapper
-        reader.clear_buffer()
-        while True:
-            name = reader.recv_until_terminator()
-            data = reader.recv_until_terminator()
-            self.__event_callbacks[name](data)
-
-    def is_listening(self):
-        """true if registered and started listener, false otherwise"""
-        return not self.__event_socket_wrapper is None
-
-    def watch(self, name, callback):
-        """Watch the specified event"""
-        if not self.is_listening():
-            self.__register_and_start_listener()
-        else:
-            self.__swrapper.sendall(chr(10))
-        self.send(name)
-        info = self.recv_c_str()
-        if not self.server_response_success():
-            raise IOError(info)
-        self.__event_callbacks[name] = callback
-
-    def unwatch(self, name):
-        """Unwatch the specified event"""
-        self.send(chr(11) + name)
-        info = self.recv_c_str()
-        if not self.server_response_success():
-            raise IOError(info)
-        del self.__event_callbacks[name]
 
     def recv_c_str(self):
         """Retrieve a string from the socket"""

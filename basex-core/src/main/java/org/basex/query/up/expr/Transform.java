@@ -1,11 +1,11 @@
 package org.basex.query.up.expr;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
-import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.gflwor.*;
+import org.basex.query.expr.gflwor.*;
 import org.basex.query.iter.*;
 import org.basex.query.up.*;
 import org.basex.query.util.*;
@@ -19,7 +19,7 @@ import org.basex.util.hash.*;
 /**
  * Transform expression.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Lukas Kircher
  */
 public final class Transform extends Arr {
@@ -40,18 +40,17 @@ public final class Transform extends Arr {
 
   @Override
   public void checkUp() throws QueryException {
-    for(final Let c : copies) c.checkUp();
-    final Expr m = exprs[0];
-    m.checkUp();
-    if(!m.isVacuous() && !m.has(Flag.UPD)) throw UPMODIFY.get(info);
+    for(final Let copy : copies) copy.checkUp();
+    final Expr modify = exprs[0];
+    modify.checkUp();
+    if(!modify.isVacuous() && !modify.has(Flag.UPD)) throw UPMODIFY.get(info);
     checkNoUp(exprs[1]);
   }
 
   @Override
   public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    for(final Let c : copies) c.expr = c.expr.compile(qc, scp);
-    super.compile(qc, scp);
-    return this;
+    for(final Let copy : copies) copy.expr = copy.expr.compile(qc, scp);
+    return super.compile(qc, scp);
   }
 
   @Override
@@ -61,57 +60,57 @@ public final class Transform extends Arr {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final int o = (int) qc.resources.output.size();
-    final Updates updates = qc.resources.updates();
-    final ContextModifier tmp = updates.mod;
-    final TransformModifier pu = new TransformModifier();
-    updates.mod = pu;
+    final Updates tmp = qc.updates();
+    final Updates updates = new Updates(true);
+    qc.updates = updates;
 
     try {
-      for(final Let fo : copies) {
-        final Iter ir = qc.iter(fo.expr);
+      for(final Let copy : copies) {
+        final Iter ir = qc.iter(copy.expr);
         Item i = ir.next();
-        if(!(i instanceof ANode) || ir.next() != null) throw UPCOPYMULT.get(fo.info, fo.var.name);
+        if(!(i instanceof ANode)) throw UPSINGLE_X_X.get(copy.info, copy.var.name, i);
+        final Item i2 = ir.next();
+        if(i2 != null) throw UPSINGLE_X_X.get(copy.info, copy.var.name, ValueBuilder.concat(i, i2));
 
         // copy node to main memory data instance
-        i = ((ANode) i).dbCopy(qc.context.options);
+        i = ((ANode) i).dbNodeCopy(qc.context.options);
         // add resulting node to variable
-        qc.set(fo.var, i, info);
-        pu.addData(i.data());
+        qc.set(copy.var, i, info);
+        updates.addData(i.data());
       }
       final Value v = qc.value(exprs[0]);
-      if(!v.isEmpty()) throw BASEX_MOD.get(info);
+      if(!v.isEmpty()) throw BASX_UPMODIFY.get(info);
 
-      updates.prepare();
-      updates.apply();
+      updates.prepare(qc);
+      updates.apply(qc);
       return qc.value(exprs[1]);
     } finally {
-      qc.resources.output.size(o);
-      updates.mod = tmp;
+      qc.updates = tmp;
     }
   }
 
   @Override
   public boolean has(final Flag flag) {
-    return flag != Flag.UPD && super.has(flag);
+    for(final Let copy : copies) if(copy.has(flag)) return true;
+    return flag == Flag.UPD ? exprs[1].has(flag) : super.has(flag);
   }
 
   @Override
-  public boolean removable(final Var v) {
-    for(final Let c : copies) if(!c.removable(v)) return false;
-    return super.removable(v);
+  public boolean removable(final Var var) {
+    for(final Let copy : copies) if(!copy.removable(var)) return false;
+    return super.removable(var);
   }
 
   @Override
-  public VarUsage count(final Var v) {
-    return VarUsage.sum(v, copies).plus(super.count(v));
+  public VarUsage count(final Var var) {
+    return VarUsage.sum(var, copies).plus(super.count(var));
   }
 
   @Override
-  public Expr inline(final QueryContext qc, final VarScope scp, final Var v, final Expr e)
+  public Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
       throws QueryException {
-    final boolean cp = inlineAll(qc, scp, copies, v, e);
-    return inlineAll(qc, scp, exprs, v, e) || cp ? optimize(qc, scp) : null;
+    final boolean cp = inlineAll(qc, scp, copies, var, ex);
+    return inlineAll(qc, scp, exprs, var, ex) || cp ? optimize(qc, scp) : null;
   }
 
   @Override
@@ -128,8 +127,8 @@ public final class Transform extends Arr {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(COPY + ' ');
-    for(final Let t : copies)
-      sb.append(t.var).append(' ').append(ASSIGN).append(' ').append(t.expr).append(' ');
+    for(final Let copy : copies)
+      sb.append(copy.var).append(' ').append(ASSIGN).append(' ').append(copy.expr).append(' ');
     return sb.append(MODIFY + ' ' + exprs[0] + ' ' + RETURN + ' ' + exprs[1]).toString();
   }
 
@@ -141,8 +140,8 @@ public final class Transform extends Arr {
   @Override
   public int exprSize() {
     int sz = 1;
-    for(final Let lt : copies) sz += lt.exprSize();
-    for(final Expr e : exprs) sz += e.exprSize();
+    for(final Let copy : copies) sz += copy.exprSize();
+    for(final Expr expr : exprs) sz += expr.exprSize();
     return sz;
   }
 }

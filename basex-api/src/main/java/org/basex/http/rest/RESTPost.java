@@ -22,7 +22,7 @@ import org.basex.util.*;
 /**
  * REST-based evaluation of POST operations.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class RESTPost {
@@ -31,23 +31,23 @@ final class RESTPost {
 
   /**
    * Creates REST code.
-   * @param rs REST session
+   * @param session REST session
    * @return code
    * @throws IOException I/O exception
    */
-  public static RESTCmd get(final RESTSession rs) throws IOException {
-    final HTTPContext http = rs.http;
+  public static RESTCmd get(final RESTSession session) throws IOException {
+    final HTTPContext http = session.http;
     String enc = http.req.getCharacterEncoding();
-    if(enc == null) enc = Token.UTF8;
+    if(enc == null) enc = Strings.UTF8;
 
     // perform queries
     final byte[] input = new NewlineInput(http.req.getInputStream()).encoding(enc).content();
     validate(input);
 
-    final Context ctx = rs.context;
+    final Context ctx = session.context;
     final DBNode doc;
     try {
-      doc = new DBNode(new IOContent(input), ctx.options);
+      doc = new DBNode(new IOContent(input));
     } catch(final IOException ex) {
       throw HTTPCode.BAD_REQUEST_X.get(ex);
     }
@@ -55,53 +55,56 @@ final class RESTPost {
     try {
       // handle serialization parameters
       final SerializerOptions sopts = http.sopts();
-      QueryProcessor qp = new QueryProcessor("*/*:parameter", ctx).context(doc);
-      for(final Item param : qp.value()) {
-        final String name = value("@name", param, ctx);
-        final String value = value("@value", param, ctx);
-        if(sopts.option(name) != null) {
-          sopts.assign(name, value);
-        } else if(name.equals(WRAP)) {
-          http.wrapping = Util.yes(value);
-        } else {
-          throw HTTPCode.UNKNOWN_PARAM_X.get(name);
+      try(final QueryProcessor qp = new QueryProcessor("*/*:parameter", ctx).context(doc)) {
+        for(final Item param : qp.value()) {
+          final String name = value("@name", param, ctx);
+          final String value = value("@value", param, ctx);
+          if(sopts.option(name) != null) {
+            sopts.assign(name, value);
+          } else {
+            throw HTTPCode.UNKNOWN_PARAM_X.get(name);
+          }
         }
       }
 
       // handle database options
-      qp = new QueryProcessor("*/*:option", ctx).context(doc);
-      for(final Item it : qp.value()) {
-        final String name = value("@name", it, ctx).toUpperCase(Locale.ENGLISH);
-        final String value = value("@value", it, ctx);
-        ctx.options.assign(name, value);
+      try(final QueryProcessor qp = new QueryProcessor("*/*:option", ctx).context(doc)) {
+        for(final Item it : qp.value()) {
+          final String name = value("@name", it, ctx).toUpperCase(Locale.ENGLISH);
+          final String value = value("@value", it, ctx);
+          ctx.options.assign(name, value);
+        }
       }
 
       // handle variables
       final Map<String, String[]> vars = new HashMap<>();
-      qp = new QueryProcessor("*/*:variable", ctx).context(doc);
-      for(final Item it : qp.value()) {
-        final String name = value("@name", it, ctx);
-        final String value = value("@value", it, ctx);
-        final String type = value("@type", it, ctx);
-        vars.put(name, new String[] { value, type });
+      try(final QueryProcessor qp = new QueryProcessor("*/*:variable", ctx).context(doc)) {
+        for(final Item it : qp.value()) {
+          final String name = value("@name", it, ctx);
+          final String value = value("@value", it, ctx);
+          final String type = value("@type", it, ctx);
+          vars.put(name, new String[] { value, type });
+        }
       }
 
       // handle input
-      qp = new QueryProcessor("*/*:context/node()", ctx).context(doc);
-      String value = null;
-      for(final Item it : qp.value()) {
-        if(value != null) throw HTTPCode.MULTIPLE_CONTEXT_X.get();
-        // create main memory instance of the specified node
-        value = DataBuilder.stripNS((ANode) it, Token.token(RESTURI), ctx).serialize().toString();
+      String val = null;
+      try(final QueryProcessor qp = new QueryProcessor(
+          "*/*:context/(*, text()[normalize-space()])", ctx).context(doc)) {
+        for(final Item it : qp.value()) {
+          if(val != null) throw HTTPCode.MULTIPLE_CONTEXT_X.get();
+          // create main memory instance of the specified node
+          val = DataBuilder.stripNS((ANode) it, Token.token(REST_URI), ctx).serialize().toString();
+        }
       }
 
       // handle request
       final String request = value("local-name(*)", doc, ctx);
       final String text = value("*/*:text/text()", doc, ctx);
 
-      if(request.equals(COMMAND)) return RESTCommand.get(rs, text);
-      if(request.equals(RUN)) return RESTRun.get(rs, text, vars, value);
-      return RESTQuery.get(rs, text, vars, value);
+      if(request.equals(COMMAND)) return RESTCommand.get(session, text);
+      if(request.equals(RUN)) return RESTRun.get(session, text, vars, val);
+      return RESTQuery.get(session, text, vars, val);
 
     } catch(final QueryException ex) {
       throw HTTPCode.BAD_REQUEST_X.get(ex);
@@ -111,17 +114,18 @@ final class RESTPost {
   /**
    * Returns the atomized item for the specified query.
    * @param query query
-   * @param item context item
+   * @param value context value
    * @param ctx database context
    * @return atomized item
    * @throws QueryException query exception
    */
-  private static String value(final String query, final Item item, final Context ctx)
+  private static String value(final String query, final Item value, final Context ctx)
       throws QueryException {
 
-    final QueryProcessor qp = new QueryProcessor(query, ctx).context(item);
-    final Item it = qp.iter().next();
-    return it == null ? null : Token.string(it.string(null));
+    try(final QueryProcessor qp = new QueryProcessor(query, ctx).context(value)) {
+      final Item it = qp.iter().next();
+      return it == null ? null : Token.string(it.string(null));
+    }
   }
 
   /**

@@ -3,6 +3,8 @@ package org.basex.core.cmd;
 import java.io.*;
 
 import org.basex.core.*;
+import org.basex.core.locks.*;
+import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.util.*;
 
@@ -10,7 +12,7 @@ import org.basex.util.*;
  * Evaluates the 'inspect' command: checks if the currently opened database has
  * inconsistent data structures.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Inspect extends Command {
@@ -30,7 +32,7 @@ public final class Inspect extends Command {
 
   @Override
   public void databases(final LockResult lr) {
-    lr.read.add(DBLocking.CTX);
+    lr.read.add(DBLocking.CONTEXT);
   }
 
   /**
@@ -53,7 +55,7 @@ public final class Inspect extends Command {
       final int par = data.parent(pre, kind);
       if(par >= 0) {
         final int parKind = data.kind(par);
-        if(par >= pre || (kind == Data.DOC ? par != -1 : par < 0)) parRef.add(pre);
+        if(par >= pre) parRef.add(pre);
         // check if parent is no doc and no element, or if node is a descendant
         // of its parent node
         if(parKind != Data.DOC && parKind != Data.ELEM ||
@@ -78,17 +80,17 @@ public final class Inspect extends Command {
   }
 
   /** Contains information on single check. */
-  static final class Check {
+  private static final class Check {
     /** Number of invalid. */
-    int invalid;
+    private int invalid;
     /** First invalid hit. */
-    int first = -1;
+    private int first = -1;
 
     /**
      * Adds an entry.
      * @param pre pre value
      */
-    void add(final int pre) {
+    private void add(final int pre) {
       invalid++;
       if(first == -1) first = pre;
     }
@@ -98,7 +100,7 @@ public final class Inspect extends Command {
      * @param info info label
      * @return info string
      */
-    String info(final String info) {
+    private String info(final String info) {
       final StringBuilder sb = new StringBuilder("- % " + info);
       if(invalid > 0) sb.append(" (pre: %,..)");
       return Util.info(sb, invalid, first) + Prop.NL;

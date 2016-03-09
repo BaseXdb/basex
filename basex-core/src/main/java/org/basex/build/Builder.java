@@ -20,14 +20,14 @@ import org.basex.util.list.*;
  * are to be added or closed. The builder implementation decides whether
  * the nodes are stored on disk or kept in memory.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class Builder extends Proc {
   /** Tree structure. */
-  final PathSummary path = new PathSummary();
+  final PathIndex path = new PathIndex();
   /** Namespace index. */
-  final Namespaces ns = new Namespaces();
+  final Namespaces nspaces = new Namespaces();
   /** Parser instance. */
   final Parser parser;
   /** Database name. */
@@ -40,26 +40,26 @@ public abstract class Builder extends Proc {
 
   /** Meta data on built database. */
   MetaData meta;
-  /** Tag name index. */
-  Names tags;
+  /** Element name index. */
+  Names elemNames;
   /** Attribute name index. */
-  Names atts;
+  Names attrNames;
 
   /** Parent stack. */
-  private final IntList pstack = new IntList();
-  /** Tag stack. */
-  private final IntList tstack = new IntList();
+  private final IntList parStack = new IntList();
+  /** Stack with element names. */
+  private final IntList elemStack = new IntList();
   /** Current tree height. */
   private int level;
 
   /**
    * Constructor.
-   * @param name name of database
-   * @param parse parser
+   * @param dbname name of database
+   * @param parser parser
    */
-  Builder(final String name, final Parser parse) {
-    parser = parse;
-    dbname = name;
+  Builder(final String dbname, final Parser parser) {
+    this.dbname = dbname;
+    this.parser = parser;
   }
 
   // PUBLIC METHODS ===========================================================
@@ -81,9 +81,9 @@ public abstract class Builder extends Proc {
    */
   public final void openDoc(final byte[] value) throws IOException {
     path.put(0, Data.DOC, level);
-    pstack.set(level++, meta.size);
+    parStack.set(level++, meta.size);
     addDoc(value);
-    ns.prepare();
+    nspaces.open();
   }
 
   /**
@@ -91,36 +91,36 @@ public abstract class Builder extends Proc {
    * @throws IOException I/O exception
    */
   public final void closeDoc() throws IOException {
-    final int pre = pstack.get(--level);
+    final int pre = parStack.get(--level);
     setSize(pre, meta.size - pre);
-    meta.ndocs++;
-    ns.close(meta.size);
+    ++meta.ndocs;
+    nspaces.close(meta.size);
   }
 
   /**
    * Opens a new element node.
-   *
-   * @param nm tag name
+   * @param name name of element
    * @param att attributes
    * @param nsp namespaces
    * @throws IOException I/O exception
    */
-  public final void openElem(final byte[] nm, final Atts att, final Atts nsp) throws IOException {
-    addElem(nm, att, nsp);
+  public final void openElem(final byte[] name, final Atts att, final Atts nsp) throws IOException {
+    addElem(name, att, nsp);
     ++level;
   }
 
   /**
    * Stores an empty element.
-   * @param nm tag name
+   * @param name name of element
    * @param att attributes
    * @param nsp namespaces
    * @throws IOException I/O exception
    */
-  public final void emptyElem(final byte[] nm, final Atts att, final Atts nsp) throws IOException {
-    addElem(nm, att, nsp);
-    final int pre = pstack.get(level);
-    ns.close(pre);
+  public final void emptyElem(final byte[] name, final Atts att, final Atts nsp)
+      throws IOException {
+    addElem(name, att, nsp);
+    final int pre = parStack.get(level);
+    nspaces.close(pre);
     if(att.size() > IO.MAXATTS) setSize(pre, meta.size - pre);
   }
 
@@ -131,9 +131,9 @@ public abstract class Builder extends Proc {
   public final void closeElem() throws IOException {
     checkStop();
     --level;
-    final int pre = pstack.get(level);
+    final int pre = parStack.get(level);
     setSize(pre, meta.size - pre);
-    ns.close(pre);
+    nspaces.close(pre);
   }
 
   /**
@@ -163,14 +163,6 @@ public abstract class Builder extends Proc {
     addText(pi, Data.PI);
   }
 
-  /**
-   * Sets the document encoding.
-   * @param enc encoding
-   */
-  public final void encoding(final String enc) {
-    meta.encoding = normEncoding(enc);
-  }
-
   // PROGRESS INFORMATION =====================================================
 
   @Override
@@ -198,6 +190,13 @@ public abstract class Builder extends Proc {
   public abstract Data build() throws IOException;
 
   /**
+   * Returns a data clip with the parsed input.
+   * @return data data clip
+   * @throws IOException I/O exception
+   */
+  public abstract DataClip dataClip() throws IOException;
+
+  /**
    * Closes open references.
    * @throws IOException I/O exception
    */
@@ -215,28 +214,28 @@ public abstract class Builder extends Proc {
    * size value; if this node has further descendants, {@link #setSize} must
    * be called to set the final size value.
    * @param dist distance to parent
-   * @param nm the tag name reference
+   * @param nameId id of element name
    * @param asize number of attributes
-   * @param uri namespace uri reference
-   * @param ne namespace flag
+   * @param uriId id of namespace uri
+   * @param ne namespace flag (indicates if this element introduces new namespaces)
    * @throws IOException I/O exception
    */
-  protected abstract void addElem(int dist, int nm, int asize, int uri, boolean ne)
+  protected abstract void addElem(int dist, int nameId, int asize, int uriId, boolean ne)
       throws IOException;
 
   /**
    * Adds an attribute to the database.
-   * @param nm attribute name
+   * @param nameId id of attribute name
    * @param value attribute value
    * @param dist distance to parent
-   * @param uri namespace uri reference
+   * @param uriId id of namespace uri
    * @throws IOException I/O exception
    */
-  protected abstract void addAttr(int nm, byte[] value, int dist, int uri) throws IOException;
+  protected abstract void addAttr(int nameId, byte[] value, int dist, int uriId) throws IOException;
 
   /**
    * Adds a text node to the database.
-   * @param value the token to be added (tag name or content)
+   * @param value the token to be added
    * @param dist distance to parent
    * @param kind the node kind
    * @throws IOException I/O exception
@@ -256,55 +255,53 @@ public abstract class Builder extends Proc {
   /**
    * Adds an element node to the storage.
    * @param name element name
-   * @param att attributes
+   * @param atts attributes
    * @param nsp namespaces
    * @throws IOException I/O exception
    */
-  private void addElem(final byte[] name, final Atts att, final Atts nsp) throws IOException {
-    // get tag reference
-    int n = tags.index(name, null, true);
-    path.put(n, Data.ELEM, level);
+  private void addElem(final byte[] name, final Atts atts, final Atts nsp) throws IOException {
+    // get reference of element name
+    int nameId = elemNames.index(name, null, true);
+    path.put(nameId, Data.ELEM, level);
 
     // cache pre value
     final int pre = meta.size;
-    // remember tag id and parent reference
-    tstack.set(level, n);
-    pstack.set(level, pre);
+    // remember id of element name and parent reference
+    elemStack.set(level, nameId);
+    parStack.set(level, pre);
 
     // parse namespaces
-    ns.prepare();
-    final int nl = nsp.size();
-    for(int nx = 0; nx < nl; nx++) ns.add(nsp.name(nx), nsp.value(nx), meta.size);
+    nspaces.open(pre, nsp);
 
     // get and store element references
-    final int dis = level == 0 ? 1 : pre - pstack.get(level - 1);
-    final int as = att.size();
-    int u = ns.uri(name, true);
-    if(u == 0 && indexOf(name, ':') != -1 && !eq(prefix(name), XML))
+    final int dis = level == 0 ? 1 : pre - parStack.get(level - 1);
+    final int as = atts.size();
+    final byte[] pref = prefix(name);
+    int uriId = nspaces.uriIdForPrefix(pref, true);
+    if(uriId == 0 && pref.length != 0 && !eq(pref, XML))
       throw new BuildException(WHICHNS, parser.detail(), prefix(name));
-    addElem(dis, n, Math.min(IO.MAXATTS, as + 1), u, nl != 0);
+    addElem(dis, nameId, Math.min(IO.MAXATTS, as + 1), uriId, !nsp.isEmpty());
 
     // get and store attribute references
     for(int a = 0; a < as; ++a) {
-      final byte[] av = att.value(a);
-      final byte[] an = att.name(a);
-      n = atts.index(an, av, true);
-      u = ns.uri(an, false);
-      if(u == 0 && indexOf(an, ':') != -1 && !eq(prefix(an), XML))
+      final byte[] an = atts.name(a), av = atts.value(a);
+      final byte[] ap = prefix(an);
+      nameId = attrNames.index(an, av, true);
+      uriId = nspaces.uriIdForPrefix(ap, false);
+      if(uriId == 0 && ap.length != 0 && !eq(ap, XML))
         throw new BuildException(WHICHNS, parser.detail(), an);
 
-      path.put(n, Data.ATTR, level + 1, av, meta);
-      addAttr(n, av, Math.min(IO.MAXATTS, a + 1), u);
+      path.put(nameId, Data.ATTR, level + 1, av, meta);
+      addAttr(nameId, av, Math.min(IO.MAXATTS, a + 1), uriId);
     }
 
     // set leaf node information in index
-    if(level > 1) tags.stat(tstack.get(level - 1)).setLeaf(false);
+    if(level > 1) elemNames.stat(elemStack.get(level - 1)).setLeaf(false);
 
-    // check if data ranges exceed database limits,
-    // based on the storage details in {@link Data}
-    limit(tags.size(), 0x8000, LIMITELEMS);
-    limit(atts.size(), 0x8000, LIMITATTS);
-    limit(ns.size(), 0x100, LIMITNS);
+    // check if data ranges exceed database limits, based on the storage details in {@link Data}
+    limit(elemNames.size(), 0x8000, LIMITELEMS);
+    limit(attrNames.size(), 0x8000, LIMITATTS);
+    limit(nspaces.size(), 0x100, LIMITNS);
     if(meta.size < 0) limit(0, 0, LIMITRANGE);
   }
 
@@ -328,14 +325,14 @@ public abstract class Builder extends Proc {
   private void addText(final byte[] value, final byte kind) throws IOException {
     final int l = level;
     if(l > 1) {
-      final int tag = tstack.get(l - 1);
+      final int i = elemStack.get(l - 1);
       // text node processing for statistics
-      if(kind == Data.TEXT) tags.index(tag, value);
+      if(kind == Data.TEXT) elemNames.index(i, value);
       // set leaf node information in index
-      else tags.stat(tag).setLeaf(false);
+      else elemNames.stat(i).setLeaf(false);
     }
 
     path.put(0, kind, l, value, meta);
-    addText(value, l == 0 ? 1 : meta.size - pstack.get(l - 1), kind);
+    addText(value, l == 0 ? 1 : meta.size - parStack.get(l - 1), kind);
   }
 }

@@ -1,7 +1,7 @@
 package org.basex.query.expr;
 
 import org.basex.query.*;
-import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * Interface for possibly non-compiled XQuery functions.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public interface XQFunctionExpr {
@@ -43,17 +43,17 @@ public interface XQFunctionExpr {
    * Annotations of this function.
    * @return this function's annotations
    */
-  Ann annotations();
+  AnnList annotations();
 
   /**
    * Tries to inline this function with the given argument expressions.
    * @param exprs argument expressions
-   * @param ctx query context
+   * @param qc query context
    * @param scp variable scope
    * @param ii input info
    * @return the expression to inline if successful, {@code null} otherwise
    * @throws QueryException query exception
    */
-  Expr inlineExpr(Expr[] exprs, QueryContext ctx, VarScope scp, InputInfo ii)
+  Expr inlineExpr(Expr[] exprs, QueryContext qc, VarScope scp, InputInfo ii)
       throws QueryException;
 }

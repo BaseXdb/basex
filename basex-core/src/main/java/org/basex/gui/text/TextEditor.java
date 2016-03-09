@@ -2,23 +2,28 @@ package org.basex.gui.text;
 
 import static org.basex.util.Token.*;
 
-import java.io.*;
+import java.text.*;
 import java.util.*;
 
 import org.basex.gui.*;
-import org.basex.gui.text.TextPanel.SearchDir;
-import org.basex.io.*;
-import org.basex.io.in.*;
+import org.basex.gui.text.SearchBar.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
  * Provides methods for editing a text that is visualized by the {@link TextPanel}.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class TextEditor {
+  /** Case conversions. */
+  public enum Case {
+    /** Lower case. */ LOWER,
+    /** Upper case. */ UPPER,
+    /** Title case. */ TITLE
+  };
+
   /** Opening brackets. */
   private static final String OPENING = "{([";
   /** Closing brackets. */
@@ -59,10 +64,12 @@ public final class TextEditor {
    */
   boolean text(final byte[] txt) {
     if(eq(txt, text)) return false;
+    final int tl = txt.length;
     text = txt;
     lines = -1;
     noSelect();
     if(search != null) searchPos = search.search(txt);
+    if(pos > tl) pos = tl;
     return true;
   }
 
@@ -72,7 +79,7 @@ public final class TextEditor {
    */
   void search(final SearchContext sc) {
     // skip search if criteria have not changed
-    if(sc.equals(search)) {
+    if(sc.sameAs(search)) {
       sc.nr = search.nr;
       sc.bar.refresh(sc);
     } else {
@@ -158,15 +165,14 @@ public final class TextEditor {
     int ch = curr();
     forward(select);
     if(ch != '\n') {
-      if(Character.isLetterOrDigit(ch)) {
-        while(Character.isLetterOrDigit(ch)) ch = next();
-        while(ch != '\n' && Character.isWhitespace(ch)) ch = next();
-      } else if(Character.isWhitespace(ch)) {
-        while(ch != '\n' && Character.isWhitespace(ch)) ch = next();
+      if(FTToken.lod(ch)) {
+        while(FTToken.lod(ch)) ch = next();
+        while(ch != '\n' && FTToken.ws(ch)) ch = next();
+      } else if(FTToken.ws(ch)) {
+        while(ch != '\n' && FTToken.ws(ch)) ch = next();
       } else {
-        while(ch != '\n' && !Character.isLetterOrDigit(ch) &&
-            !Character.isWhitespace(ch)) ch = next();
-        while(ch != '\n' && Character.isWhitespace(ch)) ch = next();
+        while(ch != '\n' && !FTToken.lod(ch) && !FTToken.ws(ch)) ch = next();
+        while(ch != '\n' && FTToken.ws(ch)) ch = next();
       }
       if(pos != size()) prev();
     }
@@ -182,18 +188,27 @@ public final class TextEditor {
 
     int ch = back(select);
     if(ch != '\n') {
-      if(Character.isLetterOrDigit(ch)) {
-        while(Character.isLetterOrDigit(ch)) ch = prev();
-      } else if(Character.isWhitespace(ch)) {
-        while(ch != '\n' && Character.isWhitespace(ch)) ch = prev();
-        while(Character.isLetterOrDigit(ch)) ch = prev();
+      if(FTToken.lod(ch)) {
+        while(FTToken.lod(ch)) ch = prev();
+      } else if(FTToken.ws(ch)) {
+        while(ch != '\n' && FTToken.ws(ch)) ch = prev();
+        while(FTToken.lod(ch)) ch = prev();
       } else {
-        while(ch != '\n' && !Character.isLetterOrDigit(ch) &&
-            !Character.isWhitespace(ch)) ch = prev();
+        while(ch != '\n' && !FTToken.lod(ch) && !FTToken.ws(ch)) ch = prev();
       }
       if(pos != 0) next();
     }
     if(select) endSelection();
+  }
+
+  /**
+   * Returns the position of first character of the current auto-completion input.
+   * @return position
+   */
+  int completionStart() {
+    int p = pos;
+    while(p > 0 && !ws(text[p - 1])) --p;
+    return p;
   }
 
   /**
@@ -276,11 +291,11 @@ public final class TextEditor {
     final int p = pos;
     boolean s = true;
     // find beginning of line
-    while(back(select) != '\n') s &= Character.isWhitespace(curr());
+    while(back(select) != '\n') s &= FTToken.ws(curr());
     if(pos != 0 || curr() == '\n') forward(select);
     // move to first non-whitespace character
     if(p == pos || !s) {
-      while(Character.isWhitespace(curr()) && curr() != '\n') forward(select);
+      while(FTToken.ws(curr()) && curr() != '\n') forward(select);
     }
 
     if(select) endSelection();
@@ -310,12 +325,11 @@ public final class TextEditor {
   /**
    * Moves one character back and returns the found character. A newline character is
    * returned if the cursor is placed at the beginning of the text.
-   * @return character
+   * @return previous character, or newline
    */
   private int prev() {
     if(pos == 0) return '\n';
-    // UTF-8 encoded bytes: move to first byte
-    while(--pos > 0 && text[pos] < -64 && text[pos] >= -128);
+    while(--pos > 0 && text[pos] < -64);
     return curr();
   }
 
@@ -411,16 +425,25 @@ public final class TextEditor {
     final byte[] ste = concat(st, SPACE), ene = concat(SPACE, en);
     final int sl = st.length, el = en.length, sle = ste.length, ele = ene.length;
 
-    // no selection: select line
     if(!selected()) {
+      // no selection: select line
       start = pos;
       end = pos;
       while(start > 0 && text[start - 1] != '\n') --start;
       while(end < size() && text[end] != '\n') ++end;
+    } else if(start > end) {
+      // selection -> start < end
+      final int s = start;
+      start = end;
+      end = s;
     }
 
-    final int min = Math.min(start, end);
-    int max = Math.max(start, end);
+    // ignore whitespaces
+    while(start < end && ws(text[start])) ++start;
+    while(end > start && ws(text[end - 1])) --end;
+
+    final int min = start;
+    int max = end;
     if(selected() && text[max - 1] == '\n') max--;
 
     // create new text with or without comment
@@ -462,6 +485,26 @@ public final class TextEditor {
   }
 
   /**
+   * Case conversion.
+   * @param cs case type
+   * @return {@code true} if text has changed
+   */
+  boolean toCase(final Case cs) {
+    if(!selected()) return false;
+    final int s = Math.min(start, end), e = Math.max(start, end), d = size() - e;
+    final byte[] tmp = substring(text, s, e);
+
+    final TokenBuilder tb = new TokenBuilder(size());
+    tb.add(text, 0, s);
+    tb.add(cs == Case.LOWER ? lc(tmp) : cs == Case.UPPER ? uc(tmp) : tc(tmp));
+    tb.add(text, e, size());
+    final boolean changed = text(tb.finish());
+
+    select(s, size() - d);
+    return changed;
+  }
+
+  /**
    * Moves the current line or the selected lines up or down.
    * @param down down/up flag
    */
@@ -494,48 +537,26 @@ public final class TextEditor {
   }
 
   /**
-   * Code completion.
+   * Inserts the specified value and updates the cursor position.
+   * @param value value
+   * @param p position to start completion from
    */
-  void complete() {
-    if(selected()) return;
-
-    // ignore space before cursor
-    final boolean space = pos > 0 && ws(text[pos - 1]);
-    if(space) pos--;
-
-    // replace pre-defined completion strings
-    for(int s = 0; s < REPLACE.size(); s += 2) {
-      final String key = REPLACE.get(s);
-      if(!find(key)) continue;
-      // key found
-      String value = REPLACE.get(s + 1);
-      final int p = pos - key.length(), car = value.indexOf('_');
-      if(car != -1) value = value.replace("_", "");
-      // adopt current indentation
-      final int ind = open();
-      if(ind != 0) {
-        final StringBuilder spaces = new StringBuilder();
-        for(int i = 0; i < ind; i++) spaces.append(' ');
-        value = new TokenBuilder().addSep(value.split("\n"), "\n" + spaces).toString();
-      }
-      // delete old string, add new one
-      replace(p, pos + (space ? 1 : 0), value);
-      // adjust cursor
-      if(car != -1) pos = p + car;
+  void complete(final String value, final int p) {
+    // key found
+    String v = value;
+    final int car = v.indexOf('_');
+    if(car != -1) v = v.replace("_", "");
+    // adopt current indentation
+    final int ind = open();
+    if(ind != 0) {
+      final StringBuilder spaces = new StringBuilder();
+      for(int i = 0; i < ind; i++) spaces.append(' ');
+      v = new TokenBuilder().addSep(v.split("\n"), "\n" + spaces).toString();
     }
-
-    // replace entities
-    int p = pos;
-    while(--p >= 0 && XMLToken.isChar(text[p]));
-    ++p;
-    final String key = Token.string(text, p, pos - p);
-    final byte[] value = XMLToken.getEntity(token(key));
-    if(value != null) {
-      replace(p, pos + (space ? 1 : 0), string(value));
-      return;
-    }
-
-    if(space) pos++;
+    // delete old string, add new one
+    replace(p, pos, v);
+    // adjust cursor
+    if(car != -1) pos = p + car;
   }
 
   /**
@@ -560,25 +581,25 @@ public final class TextEditor {
   boolean sort() {
     if(!extend()) return false;
 
-    // collect lines to be sorted
+    // count lines
+    int l = 1;
     final int s = start, e = end, ts = size();
     final byte[] tmp = Arrays.copyOf(text, ts);
-    final TokenList tl = new TokenList();
+    for(int i = s; i < e; i++) if(tmp[i] == '\n') l++;
+
+    // collect lines to be sorted
+    final TokenList tl = new TokenList(l);
     final ByteList bl = new ByteList();
     for(int i = s; i < e; i++) {
       final byte ch = tmp[i];
       if(ch == '\n') {
-        tl.add(bl.toArray());
-        bl.reset();
+        tl.add(bl.next());
       } else {
         bl.add(ch);
       }
     }
-
-    // sort data and merge duplicate lines
-    if(!bl.isEmpty()) tl.add(bl.toArray());
-    tl.sort(gopts.get(GUIOptions.CASESORT), gopts.get(GUIOptions.ASCSORT));
-    if(gopts.get(GUIOptions.MERGEDUPL)) tl.unique();
+    if(!bl.isEmpty()) tl.add(bl.finish());
+    sort(tl);
 
     // copy lines back to text
     int i = s;
@@ -592,6 +613,42 @@ public final class TextEditor {
     final boolean changed = text(i == e ? tmp : Arrays.copyOf(tmp, ts - e + i));
     select(s, i);
     return changed;
+  }
+
+  /**
+   * Sorts the specified data.
+   * @param tokens list of tokens
+   */
+  private void sort(final TokenList tokens) {
+    final boolean asc = gopts.get(GUIOptions.ASCSORT), cs = gopts.get(GUIOptions.CASESORT);
+    final Collator coll = gopts.get(GUIOptions.UNICODE) ? null : Collator.getInstance();
+    final int column = gopts.get(GUIOptions.COLUMN) - 1;
+
+    // stable sort: before custom sort, use default sort
+    if(coll != null || column > 0) tokens.sort(true, true);
+    final Comparator<byte[]> cc = new Comparator<byte[]>() {
+      @Override
+      public int compare(final byte[] token1, final byte[] token2) {
+        final byte[] t1 = sub(token1, column), t2 = sub(token2, column);
+        return coll != null ? coll.compare(string(t1), string(t2)) :
+         diff(cs ? lc(t1) : t1, cs ? lc(t2) : t2);
+      }
+    };
+    tokens.sort(cc, asc);
+    if(gopts.get(GUIOptions.MERGEDUPL)) tokens.unique();
+  }
+
+  /**
+   * Returns a substring.
+   * @param token token
+   * @param column column position
+   * @return sub string
+   */
+  private static byte[] sub(final byte[] token, final int column) {
+    final int tl = token.length;
+    int t = 0;
+    for(int c = 0; t < tl && c < column; t += cl(token, t), c++);
+    return substring(token, t);
   }
 
   /**
@@ -705,14 +762,14 @@ public final class TextEditor {
       } else if(ch == '~') {
         // closes XQuery comments
         if(prev == ':' && pprv == '(') {
-          sb.append("\n : \n ");
+          sb.append("  ");
           if(curr != ':') {
             sb.append(':');
             if(curr != ')') sb.append(')');
           } else if(next != ')') {
             sb.append(')');
           }
-          move = 5;
+          move = 2;
         }
       } else if(ch == '-') {
         // closes XML comments
@@ -753,20 +810,19 @@ public final class TextEditor {
    * @param sb string builder
    */
   private void closeElem(final StringBuilder sb) {
-    int p = pos - 1;
-    for(; p >= 0; p--) {
-      final byte b = text[p];
-      if(!XMLToken.isNCChar(b) && b != ':') {
-        if(b == '<' && p < pos - 1) {
+    final int p = pos;
+    while(pos() > 0) {
+      final int cp = prev();
+      if(!XMLToken.isNCChar(cp) && cp != ':') {
+        if(cp == '<' && pos < p - 1) {
           // add closing element
-          sb.append("</");
-          while(++p < pos) sb.append((char) text[p]);
-          sb.append('>');
-          break;
+          next();
+          sb.append("</").append(new TokenBuilder().add(text, pos, p)).append('>');
         }
-        return;
+        break;
       }
     }
+    pos = p;
   }
 
   /**
@@ -868,17 +924,6 @@ public final class TextEditor {
     select(s, e);
     delete();
     add(value);
-  }
-
-  /**
-   * Checks if the specified key is found before the current cursor position.
-   * @param key string to be found
-   * @return result of check
-   */
-  private boolean find(final String key) {
-    final byte[] k = token(key);
-    final int s = pos - k.length;
-    return s >= 0 && indexOf(text, k, s) == s && (s == 0 || !XMLToken.isChar(text[s - 1]));
   }
 
   /**
@@ -1063,7 +1108,8 @@ public final class TextEditor {
     final int e = start < end ? end : start;
     for(int s = start < end ? start : end; s < e; s += cl(text, s)) {
       final int cp = cp(text, s);
-      if(cp >= ' ' || cp == 0x0A || cp == 0x09) tb.add(cp);
+      if(cp >= ' ' && cp < TokenBuilder.PRIVATE_START || cp == 0x0A || cp == 0x09 ||
+          cp > TokenBuilder.PRIVATE_END) tb.add(cp);
     }
     return tb.toString();
   }
@@ -1072,10 +1118,10 @@ public final class TextEditor {
    * Selects the word at the cursor position.
    */
   void selectWord() {
-    final boolean ch = ftChar(curr());
+    final boolean ch = FTToken.lod(curr());
     while(pos() > 0) {
       final int cp = back(true);
-      if(cp == '\n' || ch != ftChar(cp)) {
+      if(cp == '\n' || ch != FTToken.lod(cp)) {
         forward(true);
         break;
       }
@@ -1083,7 +1129,7 @@ public final class TextEditor {
     startSelect();
     while(pos() < size()) {
       final int cp = curr();
-      if(cp == '\n' || ch != ftChar(cp)) break;
+      if(cp == '\n' || ch != FTToken.lod(cp)) break;
       forward(true);
     }
     endSelection();
@@ -1102,7 +1148,7 @@ public final class TextEditor {
 
   /**
    * Returns the current character, or the newline character if the position is out of bounds.
-   * @return current character
+   * @return current character, or newline
    */
   private int curr() {
     return pos < 0 || pos >= size() ? '\n' : cp(text, pos);
@@ -1173,30 +1219,5 @@ public final class TextEditor {
   @Override
   public String toString() {
     return copy();
-  }
-
-  /** Index for all replacements. */
-  private static final StringList REPLACE = new StringList();
-
-  /** Reads in the property file. */
-  static {
-    try {
-      final String file = "/completions.properties";
-      final InputStream is = MimeTypes.class.getResourceAsStream(file);
-      if(is == null) {
-        Util.errln(file + " not found.");
-      } else {
-        try(final NewlineInput nli = new NewlineInput(is)) {
-          for(String line; (line = nli.readLine()) != null;) {
-            final int i = line.indexOf('=');
-            if(i == -1 || line.startsWith("#")) continue;
-            REPLACE.add(line.substring(0, i));
-            REPLACE.add(line.substring(i + 1).replace("\\n", "\n"));
-          }
-        }
-      }
-    } catch(final IOException ex) {
-      Util.errln(ex);
-    }
   }
 }

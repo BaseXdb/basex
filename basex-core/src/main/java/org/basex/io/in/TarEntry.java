@@ -5,36 +5,32 @@ import org.basex.util.list.*;
 /**
  * Representation of a single TAR entry.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class TarEntry {
-  /** Name of an entry. */
-  private final String name;
+  /** GNU tar entry with a long name. */
+  public static final String LONGNAME = "././@LongLink";
+
   /** Entry size. */
   private final long size;
   /** File type. */
   private final byte type;
+  /** Name of an entry. */
+  private String name;
 
   /**
    * Constructor.
    * @param buffer header buffer
    */
-  public TarEntry(final byte[] buffer) {
+  TarEntry(final byte[] buffer) {
     // file name
     final ByteList result = new ByteList();
     for(int i = 0; i < 100; ++i) {
       if(buffer[i] == 0) break;
       result.add(buffer[i]);
     }
-    String n;
-    try {
-      n = new String(result.toArray());
-    } catch(final Exception ex) {
-      // fallback: UTF8
-      n = result.toString();
-    }
-    name = n;
+    name = name(result);
 
     // file size
     long s = 0;
@@ -46,7 +42,6 @@ public final class TarEntry {
       s = (s << 3) + (b - '0');
       p = false;
     }
-
     size = s;
     type = buffer[156];
   }
@@ -68,10 +63,40 @@ public final class TarEntry {
   }
 
   /**
+   * Sets a file name.
+   * @param nm name
+   */
+  public void setName(final String nm) {
+    name = nm;
+  }
+
+  /**
    * Checks if the the current entry is a directory.
    * @return result of check
    */
   public boolean isDirectory() {
     return type == '5' || name.endsWith("/");
+  }
+
+  /**
+   * Indicate if this entry is a GNU long name block.
+   * @return true if this is a long name extension provided by GNU tar
+   */
+  public boolean isLongName() {
+    return type == 'L' && name.equals(LONGNAME);
+  }
+
+  /**
+   * Converts a byte list to a file name.
+   * @param result byte list
+   * @return file name
+   */
+  static String name(final ByteList result) {
+    try {
+      return new String(result.toArray());
+    } catch(final Exception ex) {
+      // fallback: UTF8
+      return result.toString();
+    }
   }
 }

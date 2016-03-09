@@ -4,6 +4,7 @@ import java.io.*;
 
 import org.basex.io.in.*;
 import org.basex.query.value.type.*;
+import org.basex.query.value.type.Type.ID;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -15,10 +16,10 @@ import org.basex.util.list.*;
  * stream that has been specified via the constructor or via
  * {@link Session#setOutputStream(OutputStream)}.</p>
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public abstract class Query {
+public abstract class Query implements Closeable {
   /** Client output stream. */
   protected OutputStream out;
   /** Cached results. */
@@ -31,26 +32,26 @@ public abstract class Query {
 
   /**
    * Binds a value to an external variable.
-   * @param n name of variable
-   * @param v value to be bound
+   * @param name name of variable
+   * @param value value to be bound
    * @throws IOException I/O exception
    */
-  public final void bind(final String n, final Object v) throws IOException {
-    bind(n, v, "");
+  public final void bind(final String name, final Object value) throws IOException {
+    bind(name, value, "");
   }
 
   /**
    * Binds a value with an optional type to an external variable.
    * @param name name of variable
    * @param value value to be bound
-   * @param type data type (may be {@code null})
+   * @param type value type (may be {@code null})
    * @throws IOException I/O exception
    */
   public abstract void bind(final String name, final Object value, final String type)
       throws IOException;
 
   /**
-   * Binds a value to the context item.
+   * Binds a value to the context value.
    * @param value value to be bound
    * @throws IOException I/O exception
    */
@@ -61,7 +62,7 @@ public abstract class Query {
   /**
    * Binds a value with an optional type to an external variable.
    * @param value value to be bound
-   * @param type data type (may be {@code null})
+   * @param type value type (may be {@code null})
    * @throws IOException I/O exception
    */
   public abstract void context(final Object value, final String type) throws IOException;
@@ -72,7 +73,7 @@ public abstract class Query {
    * @throws IOException I/O exception
    */
   public boolean more() throws IOException {
-    if(cache == null) cache();
+    if(cache == null) cache(false);
     if(pos < cache.size()) return true;
     cache = null;
     types = null;
@@ -81,13 +82,14 @@ public abstract class Query {
 
   /**
    * Caches the query result.
+   * @param full retrieve full type information
    * @throws IOException I/O exception
    */
-  protected abstract void cache() throws IOException;
+  public abstract void cache(final boolean full) throws IOException;
 
   /**
    * Returns the next item of the query.
-   * @return item string or {@code null}.
+   * @return item string or {@code null}
    * @throws IOException I/O exception
    */
   public final String next() throws IOException {
@@ -100,35 +102,40 @@ public abstract class Query {
   }
 
   /**
-   * Returns the current XQuery type (must be called after {@link #next()}.
+   * Returns the XQuery type of the current item (must be called after {@link #next()}.
    * @return item type
    */
   public final Type type() {
-    return Type.ID.getType(types.get(pos - 1));
+    return ID.getType(types.get(pos - 1));
   }
 
   /**
    * Caches the incoming input.
    * @param input input stream
+   * @param full retrieve full type information
    * @throws IOException I/O exception
    */
-  void cache(final InputStream input) throws IOException {
+  void cache(final InputStream input, final boolean full) throws IOException {
     cache = new TokenList();
     types = new ByteList();
     final ByteList bl = new ByteList();
     for(int t; (t = input.read()) > 0;) {
-      final DecodingInput di = new DecodingInput(input);
-      for(int b; (b = di.read()) != -1;) bl.add(b);
-      cache.add(bl.toArray());
+      // skip type information
+      if(full && ID.get(t).isExtended()) {
+        while(input.read() > 0);
+      }
+      // read and decode result
+      final ServerInput si = new ServerInput(input);
+      for(int b; (b = si.read()) != -1;) bl.add(b);
+      cache.add(bl.next());
       types.add(t);
-      bl.reset();
     }
     pos = 0;
   }
 
   /**
    * Returns the complete result of the query.
-   * @return item string or {@code null}.
+   * @return item string or {@code null}
    * @throws IOException I/O exception
    */
   public abstract String execute() throws IOException;
@@ -153,10 +160,4 @@ public abstract class Query {
    * @throws IOException I/O exception
    */
   public abstract String info() throws IOException;
-
-  /**
-   * Closes the query.
-   * @throws IOException I/O exception
-   */
-  public abstract void close() throws IOException;
 }

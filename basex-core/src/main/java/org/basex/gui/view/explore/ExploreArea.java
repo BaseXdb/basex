@@ -5,9 +5,10 @@ import static org.basex.core.Text.*;
 import java.awt.*;
 import java.awt.event.*;
 
+import javax.swing.text.*;
+
 import org.basex.core.cmd.*;
 import org.basex.data.*;
-import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.index.name.*;
@@ -15,12 +16,10 @@ import org.basex.index.stats.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
-import javax.swing.text.JTextComponent;
-
 /**
  * This view provides standard GUI components to browse the currently opened database.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  * @author Bastian Lemke
  */
@@ -52,7 +51,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
     super(m.gui);
     main = m;
 
-    layout(new BorderLayout(0, 5)).mode(Fill.NONE);
+    layout(new BorderLayout(0, 5)).setOpaque(false);
 
     all = new BaseXTextField(gui);
     all.addKeyListener(main);
@@ -64,7 +63,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
     });
     add(all, BorderLayout.NORTH);
 
-    panel = new BaseXBack(Fill.NONE).layout(new TableLayout(32, 2, 10, 5));
+    panel = new BaseXBack(false).layout(new TableLayout(32, 2, 10, 5));
     add(panel, BorderLayout.CENTER);
   }
 
@@ -95,7 +94,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
   private void addInput(final int pos) {
     final BaseXTextField txt = new BaseXTextField(gui);
     BaseXLayout.setWidth(txt, COMPW);
-    BaseXLayout.setHeight(txt, txt.getFont().getSize() + 11);
+    txt.setPreferredSize(new Dimension(getPreferredSize().width, txt.getFont().getSize() + 11));
     txt.setMargin(new Insets(0, 0, 0, 10));
     txt.addKeyListener(new KeyAdapter() {
       @Override
@@ -170,7 +169,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
       for(int c = 0; c < cs; ++c) if(panel.getComponent(c) == source) cp = c;
 
       if((cp & 1) == 0) {
-        // combo box with tags/attributes
+        // combo box with element/attribute names
         final BaseXCombo combo = (BaseXCombo) source;
         panel.remove(cp + 1);
 
@@ -179,7 +178,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
         if(selected) {
           final String item = combo.getSelectedItem();
           final boolean att = item.startsWith("@");
-          final Names names = att ? data.atnindex : data.tagindex;
+          final Names names = att ? data.attrNames : data.elemNames;
           final byte[] key = Token.token(att ? item.substring(1) : item);
           final Stats stat = names.stat(names.id(key));
           switch(stat.type) {
@@ -241,8 +240,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
             val1 = val1.replaceAll("\"", "");
             pattern = PATEX;
           } else {
-            pattern = attr && data.meta.attrindex ||
-              !attr && data.meta.textindex ? PATSUB : PATEX;
+            pattern = attr && data.meta.attrindex || !attr && data.meta.textindex ? PATSUB : PATEX;
           }
         }
       } else if(comp instanceof BaseXCombo) {
@@ -298,8 +296,8 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
    */
   private static String[] entries(final TokenList names) {
     final StringList entries = new StringList();
-    entries.add(Util.info(ENTRIES, names.size()));
+    entries.add(Util.info(ENTRIES_X, names.size()));
     for(final byte[] k : names) entries.add(Token.string(k));
-    return entries.sort(true, true, 1).toArray();
+    return entries.sort(true, true, 1).finish();
   }
 }

@@ -1,45 +1,36 @@
 package org.basex.gui.text;
 
+import static org.basex.gui.GUIConstants.*;
 import static org.basex.gui.layout.BaseXKeys.*;
 import static org.basex.util.Token.*;
 
 import java.awt.*;
 import java.awt.datatransfer.*;
 import java.awt.event.*;
+import java.io.*;
 import java.util.*;
+import java.util.Map.*;
 
 import javax.swing.*;
 import javax.swing.Timer;
-import javax.swing.border.*;
 
 import org.basex.core.*;
 import org.basex.gui.*;
-import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.dialog.*;
 import org.basex.gui.layout.*;
+import org.basex.gui.text.SearchBar.*;
+import org.basex.gui.text.TextEditor.*;
 import org.basex.io.*;
+import org.basex.io.in.*;
 import org.basex.util.*;
 
 /**
  * Renders and provides edit capabilities for text.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public class TextPanel extends BaseXPanel {
-  /** Delay for highlighting an error. */
-  private static final int ERROR_DELAY = 500;
-
-  /** Search direction. */
-  public enum SearchDir {
-    /** Current hit. */
-    CURRENT,
-    /** Next hit. */
-    FORWARD,
-    /** Previous hit. */
-    BACKWARD,
-  }
-
   /** Editor action. */
   public enum Action {
     /** Check for changes; do nothing if input has not changed. */
@@ -53,11 +44,9 @@ public class TextPanel extends BaseXPanel {
   }
 
   /** Text editor. */
-  protected final TextEditor editor;
+  public final TextEditor editor;
   /** Undo history. */
   public final History hist;
-  /** Search bar. */
-  protected SearchBar search;
 
   /** Renderer reference. */
   private final TextRenderer rend;
@@ -65,6 +54,9 @@ public class TextPanel extends BaseXPanel {
   private final BaseXScrollBar scroll;
   /** Editable flag. */
   private final boolean editable;
+
+  /** Search bar. */
+  protected SearchBar search;
   /** Link listener. */
   private LinkListener linkListener;
 
@@ -74,22 +66,24 @@ public class TextPanel extends BaseXPanel {
    * @param win parent window
    */
   public TextPanel(final boolean edit, final Window win) {
-    this(EMPTY, edit, win);
+    this("", edit, win);
   }
 
   /**
    * Default constructor.
    * @param txt initial text
-   * @param edit editable flag
+   * @param editable editable flag
    * @param win parent window
    */
-  public TextPanel(final byte[] txt, final boolean edit, final Window win) {
+  public TextPanel(final String txt, final boolean editable, final Window win) {
     super(win);
-    editable = edit;
+    this.editable = editable;
     editor = new TextEditor(gui);
 
     setFocusable(true);
-    setFocusTraversalKeysEnabled(!edit);
+    setFocusTraversalKeysEnabled(!editable);
+    setBackground(BACK);
+    setOpaque(editable);
 
     addMouseMotionListener(this);
     addMouseWheelListener(this);
@@ -109,7 +103,7 @@ public class TextPanel extends BaseXPanel {
       }
     });
 
-    setFont(GUIConstants.dmfont);
+    setFont(dmfont);
     layout(new BorderLayout());
 
     scroll = new BaseXScrollBar(this);
@@ -119,16 +113,9 @@ public class TextPanel extends BaseXPanel {
     add(scroll, BorderLayout.EAST);
 
     setText(txt);
-    hist = new History(edit ? editor.text() : null);
+    hist = new History(editable ? editor.text() : null);
 
-    if(edit) {
-      setBackground(Color.white);
-      setBorder(new MatteBorder(1, 1, 0, 0, GUIConstants.color(6)));
-    } else {
-      mode(Fill.NONE);
-    }
-
-    new BaseXPopup(this, edit ?
+    new BaseXPopup(this, editable ?
       new GUICommand[] {
         new FindCmd(), new FindNextCmd(), new FindPrevCmd(), null, new GotoCmd(), null,
         new UndoCmd(), new RedoCmd(), null,
@@ -158,11 +145,11 @@ public class TextPanel extends BaseXPanel {
 
   /**
    * Returns a currently marked string if it does not extend over more than one line.
-   * @return search string, or {@code null}
+   * @return search string
    */
   public String searchString() {
     final String string = editor.copy();
-    return string.isEmpty() || string.contains("\n") ? null : string;
+    return string.indexOf('\n') != -1 ? "" : string;
   }
 
   /**
@@ -175,25 +162,27 @@ public class TextPanel extends BaseXPanel {
 
   /**
    * Sets the output text.
-   * @param t output text
-   * @param s text size
+   * @param text output text
+   * @param size text size
    */
-  public final void setText(final byte[] t, final int s) {
-    byte[] txt = t;
-    if(Token.contains(t, '\r')) {
+  public final void setText(final byte[] text, final int size) {
+    byte[] txt = text;
+    if(Token.contains(text, '\r')) {
       // remove carriage returns
       int ns = 0;
-      for(int r = 0; r < s; ++r) {
-        final byte b = t[r];
-        if(b != '\r') t[ns++] = b;
+      for(int r = 0; r < size; ++r) {
+        final byte b = text[r];
+        if(b != '\r') text[ns++] = b;
       }
       // new text is different...
-      txt = Arrays.copyOf(t, ns);
+      txt = Arrays.copyOf(text, ns);
+    } else if(text.length != size) {
+      txt = Arrays.copyOf(text, size);
     }
     if(editor.text(txt)) {
       if(hist != null) hist.store(txt, editor.pos(), 0);
     }
-    componentResized(null);
+    if(isShowing()) resizeCode.invokeLater();
   }
 
   /**
@@ -204,6 +193,7 @@ public class TextPanel extends BaseXPanel {
   protected final void setSyntax(final IO file, final boolean opened) {
     setSyntax(!opened || file.hasSuffix(IO.XQSUFFIXES) ? new SyntaxXQuery() :
       file.hasSuffix(IO.JSONSUFFIX) ? new SyntaxJSON() :
+      file.hasSuffix(IO.JSSUFFIX) ? new SyntaxJS() :
       file.hasSuffix(IO.XMLSUFFIXES) || file.hasSuffix(IO.HTMLSUFFIXES) ||
       file.hasSuffix(IO.XSLSUFFIXES) || file.hasSuffix(IO.BXSSUFFIX) ?
       new SyntaxXML() : Syntax.SIMPLE);
@@ -244,19 +234,6 @@ public class TextPanel extends BaseXPanel {
   }
 
   /**
-   * Jumps to the end of the text.
-   */
-  public final void scrollToEnd() {
-    SwingUtilities.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        editor.pos(editor.size());
-        cursorCode.execute(2);
-      }
-    });
-  }
-
-  /**
    * Returns the output text.
    * @return output text
    */
@@ -281,14 +258,10 @@ public class TextPanel extends BaseXPanel {
     }
   }
 
-  /** Thread counter. */
-  private int errorID;
-
   /**
    * Removes the error marker.
    */
   public final void resetError() {
-    ++errorID;
     editor.error(-1);
     rend.repaint();
   }
@@ -298,15 +271,8 @@ public class TextPanel extends BaseXPanel {
    * @param pos start of optional error mark
    */
   public final void error(final int pos) {
-    final int eid = ++errorID;
     editor.error(pos);
-    new Thread() {
-      @Override
-      public void run() {
-        Performance.sleep(ERROR_DELAY);
-        if(eid == errorID) rend.repaint();
-      }
-    }.start();
+    rend.repaint();
   }
 
   /**
@@ -319,15 +285,26 @@ public class TextPanel extends BaseXPanel {
   }
 
   /**
+   * Case conversion.
+   * @param cs case type
+   */
+  public void toCase(final Case cs) {
+    final int caret = editor.pos();
+    if(editor.toCase(cs)) hist.store(editor.text(), caret, editor.pos());
+    scrollCode.invokeLater(true);
+  }
+
+  /**
    * Sorts text.
    */
   public void sort() {
-    final DialogSort ds = new DialogSort(gui);
-    if(!ds.ok()) return;
-
     final int caret = editor.pos();
-    if(editor.sort()) hist.store(editor.text(), caret, editor.pos());
+    final DialogSort ds = new DialogSort(gui);
+    if(!ds.ok() || !editor.sort()) return;
+
+    hist.store(editor.text(), caret, editor.pos());
     scrollCode.invokeLater(true);
+    repaint();
   }
 
   /**
@@ -436,19 +413,19 @@ public class TextPanel extends BaseXPanel {
 
   @Override
   public final void mouseEntered(final MouseEvent e) {
-    gui.cursor(GUIConstants.CURSORTEXT);
+    gui.cursor(CURSORTEXT);
   }
 
   @Override
   public final void mouseExited(final MouseEvent e) {
-    gui.cursor(GUIConstants.CURSORARROW);
+    gui.cursor(CURSORARROW);
   }
 
   @Override
   public final void mouseMoved(final MouseEvent e) {
     if(linkListener == null) return;
     final TextIterator iter = rend.jump(e.getPoint());
-    gui.cursor(iter.link() != null ? GUIConstants.CURSORHAND : GUIConstants.CURSORARROW);
+    gui.cursor(iter.link() != null ? CURSORHAND : CURSORARROW);
   }
 
   @Override
@@ -591,10 +568,10 @@ public class TextPanel extends BaseXPanel {
       down = false;
     } else if(NEXTPAGE_RO.is(e) && !hist.active()) {
       lc = editor.linesDown(getHeight() / fh, false, lastCol);
-    } else if(PREVPAGE.is(e) && !BaseXKeys.sc(e)) {
+    } else if(PREVPAGE.is(e) && !sc(e)) {
       lc = editor.linesUp(getHeight() / fh, shift, lastCol);
       down = false;
-    } else if(NEXTPAGE.is(e) && !BaseXKeys.sc(e)) {
+    } else if(NEXTPAGE.is(e) && !sc(e)) {
       lc = editor.linesDown(getHeight() / fh, shift, lastCol);
     } else if(NEXTLINE.is(e) && !MOVEDOWN.is(e)) {
       lc = editor.linesDown(1, shift, lastCol);
@@ -613,12 +590,15 @@ public class TextPanel extends BaseXPanel {
 
     // edit text
     if(hist.active()) {
+      if(COMPLETE.is(e)) {
+        complete();
+        return;
+      }
+
       if(MOVEDOWN.is(e)) {
         editor.move(true);
       } else if(MOVEUP.is(e)) {
         editor.move(false);
-      } else if(COMPLETE.is(e)) {
-        editor.complete();
       } else if(DELLINE.is(e)) {
         editor.deleteLine();
       } else if(DELNEXTWORD.is(e)) {
@@ -683,7 +663,8 @@ public class TextPanel extends BaseXPanel {
 
   @Override
   public void keyTyped(final KeyEvent e) {
-    if(!hist.active() || control(e) || DELNEXT.is(e) || DELPREV.is(e) || ESCAPE.is(e)) return;
+    if(!hist.active() || control(e) || DELNEXT.is(e) || DELPREV.is(e) || ESCAPE.is(e) || CUT2.is(e))
+      return;
 
     final int caret = editor.pos();
 
@@ -713,7 +694,27 @@ public class TextPanel extends BaseXPanel {
   @SuppressWarnings("unused")
   protected void release(final Action action) { }
 
+  /**
+   * Refreshes the layout.
+   * @param f used font
+   */
+  public void refreshLayout(final Font f) {
+    setFont(f);
+    scroll.refreshLayout();
+  }
+
   // EDITOR COMMANDS ==========================================================
+
+  /**
+   * Pastes a string.
+   * @param string string to be pasted
+   */
+  public void paste(final String string) {
+    final int pos = editor.pos();
+    if(editor.selected()) editor.delete();
+    editor.add(string);
+    finish(pos);
+  }
 
   /**
    * Copies the selected text to the clipboard.
@@ -736,7 +737,10 @@ public class TextPanel extends BaseXPanel {
     // copy selection to clipboard
     final Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
     final Transferable tr = clip.getContents(null);
-    if(tr != null) for(final Object o : BaseXLayout.contents(tr)) return o.toString();
+    if(tr != null) {
+      final ArrayList<Object> contents = BaseXLayout.contents(tr);
+      if(!contents.isEmpty()) return contents.get(0).toString();
+    }
     return null;
   }
 
@@ -791,7 +795,7 @@ public class TextPanel extends BaseXPanel {
   }
 
   /** Undo command. */
-  class UndoCmd extends GUIPopupCmd {
+  private class UndoCmd extends GUIPopupCmd {
     /** Constructor. */
     UndoCmd() { super(Text.UNDO, UNDOSTEP); }
 
@@ -809,7 +813,7 @@ public class TextPanel extends BaseXPanel {
   }
 
   /** Redo command. */
-  class RedoCmd extends GUIPopupCmd {
+  private class RedoCmd extends GUIPopupCmd {
     /** Constructor. */
     RedoCmd() { super(Text.REDO, REDOSTEP); }
 
@@ -827,7 +831,7 @@ public class TextPanel extends BaseXPanel {
   }
 
   /** Cut command. */
-  class CutCmd extends GUIPopupCmd {
+  private class CutCmd extends GUIPopupCmd {
     /** Constructor. */
     CutCmd() { super(Text.CUT, CUT1, CUT2); }
 
@@ -843,7 +847,7 @@ public class TextPanel extends BaseXPanel {
   }
 
   /** Copy command. */
-  class CopyCmd extends GUIPopupCmd {
+  private class CopyCmd extends GUIPopupCmd {
     /** Constructor. */
     CopyCmd() { super(Text.COPY, COPY1, COPY2); }
 
@@ -854,25 +858,21 @@ public class TextPanel extends BaseXPanel {
   }
 
   /** Paste command. */
-  class PasteCmd extends GUIPopupCmd {
+  private class PasteCmd extends GUIPopupCmd {
     /** Constructor. */
     PasteCmd() { super(Text.PASTE, PASTE1, PASTE2); }
 
     @Override
     public void execute() {
-      final int pos = editor.pos();
       final String clip = clip();
-      if(clip == null) return;
-      if(editor.selected()) editor.delete();
-      editor.add(clip);
-      finish(pos);
+      if(clip != null) paste(clip);
     }
     @Override
     public boolean enabled(final GUI main) { return hist.active() && clip() != null; }
   }
 
   /** Delete command. */
-  class DelCmd extends GUIPopupCmd {
+  private class DelCmd extends GUIPopupCmd {
     /** Constructor. */
     DelCmd() { super(Text.DELETE, DELNEXT); }
 
@@ -887,7 +887,7 @@ public class TextPanel extends BaseXPanel {
   }
 
   /** Select all command. */
-  class AllCmd extends GUIPopupCmd {
+  private class AllCmd extends GUIPopupCmd {
     /** Constructor. */
     AllCmd() { super(Text.SELECT_ALL, SELECTALL); }
 
@@ -896,7 +896,7 @@ public class TextPanel extends BaseXPanel {
   }
 
   /** Find next hit. */
-  class FindCmd extends GUIPopupCmd {
+  private class FindCmd extends GUIPopupCmd {
     /** Constructor. */
     FindCmd() { super(Text.FIND + Text.DOTS, FIND); }
 
@@ -907,7 +907,7 @@ public class TextPanel extends BaseXPanel {
   }
 
   /** Find next hit. */
-  class FindNextCmd extends GUIPopupCmd {
+  private class FindNextCmd extends GUIPopupCmd {
     /** Constructor. */
     FindNextCmd() { super(Text.FIND_NEXT, FINDNEXT1, FINDNEXT2); }
 
@@ -918,7 +918,7 @@ public class TextPanel extends BaseXPanel {
   }
 
   /** Find previous hit. */
-  class FindPrevCmd extends GUIPopupCmd {
+  private class FindPrevCmd extends GUIPopupCmd {
     /** Constructor. */
     FindPrevCmd() { super(Text.FIND_PREVIOUS, FINDPREV1, FINDPREV2); }
 
@@ -939,7 +939,7 @@ public class TextPanel extends BaseXPanel {
   }
 
   /** Go to line. */
-  class GotoCmd extends GUIPopupCmd {
+  private class GotoCmd extends GUIPopupCmd {
     /** Constructor. */
     GotoCmd() { super(Text.GO_TO_LINE + Text.DOTS, GOTOLINE); }
 
@@ -972,5 +972,94 @@ public class TextPanel extends BaseXPanel {
     }
     setCaret(p);
     gui.editor.posCode.invokeLater();
+  }
+
+  /**
+   * Code completion.
+   */
+  private void complete() {
+    if(selected()) return;
+
+    // find first character
+    final int caret = editor.pos(), startPos = editor.completionStart();
+    final String prefix = string(substring(editor.text(), startPos, caret));
+    if(prefix.isEmpty()) return;
+
+    // find insertion candidates
+    final TreeMap<String, String> tmp = new TreeMap<>();
+    for(final Entry<String, String> entry : REPLACE.entrySet()) {
+      final String key = entry.getKey();
+      if(key.startsWith(prefix)) tmp.put(key, entry.getValue());
+    }
+
+    if(tmp.size() == 1) {
+      // insert single candidate
+      complete(tmp.values().iterator().next(), startPos);
+    } else if(!tmp.isEmpty()) {
+      // show popup menu
+      final JPopupMenu pm = new JPopupMenu();
+      final ActionListener al = new ActionListener() {
+        @Override
+        public void actionPerformed(final ActionEvent ae) {
+          complete(ae.getActionCommand().replaceAll("^.*?\\] ", ""), startPos);
+        }
+      };
+
+      for(final Entry<String, String> entry : tmp.entrySet()) {
+        final JMenuItem mi = new JMenuItem("[" + entry.getKey() + "] " + entry.getValue());
+        pm.add(mi);
+        mi.addActionListener(al);
+      }
+      pm.addSeparator();
+      final JMenuItem mi = new JMenuItem(Text.INPUT + Text.COLS + prefix);
+      mi.setEnabled(false);
+      pm.add(mi);
+
+      final int[] cursor = rend.cursor();
+      pm.show(this, cursor[0], cursor[1]);
+
+      // highlight first entry
+      final MenuElement[] me = { pm, (JMenuItem) pm.getComponent(0) };
+      MenuSelectionManager.defaultManager().setSelectedPath(me);
+    }
+  }
+
+  /**
+   * Auto-completes a string at the specified position.
+   * @param string string
+   * @param start start position
+   */
+  private void complete(final String string, final int start) {
+    final int caret = editor.pos();
+    editor.complete(string, start);
+    hist.store(editor.text(), caret, editor.pos());
+    scrollCode.invokeLater(true);
+  }
+
+  /** Index for all replacements. */
+  private static final HashMap<String, String> REPLACE = new HashMap<>();
+
+  /** Reads in the property file. */
+  static {
+    try {
+      final String file = "/completions.properties";
+      final InputStream is = TextPanel.class.getResourceAsStream(file);
+      if(is == null) {
+        Util.errln(file + " not found.");
+      } else {
+        try(final NewlineInput nli = new NewlineInput(is)) {
+          for(String line; (line = nli.readLine()) != null;) {
+            final int i = line.indexOf('=');
+            if(i == -1 || line.startsWith("#")) continue;
+            final String key = line.substring(0, i), value = line.substring(i + 1);
+            if(REPLACE.put(key, value.replace("\\n", "\n")) != null) {
+              Util.errln(file + ": " + key + " was assigned twice");
+            }
+          }
+        }
+      }
+    } catch(final IOException ex) {
+      Util.errln(ex);
+    }
   }
 }

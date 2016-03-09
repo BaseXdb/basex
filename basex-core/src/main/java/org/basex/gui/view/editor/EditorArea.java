@@ -12,22 +12,23 @@ import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.text.*;
+import org.basex.gui.text.SearchBar.*;
 import org.basex.io.*;
 import org.basex.util.*;
 
 /**
  * This class extends the text panel by editor features.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class EditorArea extends TextPanel {
   /** File label. */
   final BaseXLabel label;
   /** File in tab. */
-  IOFile file;
+  private IOFile file;
   /** Flag for modified content. */
-  boolean modified;
+  private boolean modified;
   /** Last input. */
   byte[] last;
   /** This flag indicates if the input is a command script. */
@@ -40,23 +41,24 @@ public final class EditorArea extends TextPanel {
 
   /**
    * Constructor.
-   * @param v view reference
-   * @param f file reference
+   * @param view view reference
+   * @param file file reference
    */
-  EditorArea(final EditorView v, final IOFile f) {
-    super(true, v.gui);
-    view = v;
-    file = f;
-    label = new BaseXLabel(f.name());
+  EditorArea(final EditorView view, final IOFile file) {
+    super(true, view.gui);
+    this.view = view;
+    this.file = file;
+    label = new BaseXLabel(file.name());
     label.setIcon(BaseXImages.file(new IOFile(IO.XQSUFFIX)));
-    setSyntax(f, false);
+    setSyntax(file, false);
 
     addFocusListener(new FocusAdapter() {
       @Override
       public void focusGained(final FocusEvent e) {
         // refresh query path and working directory
-        gui.context.options.set(MainOptions.QUERYPATH, file.path());
-        gui.gopts.set(GUIOptions.WORKPATH, file.dir());
+        final IOFile f = EditorArea.this.file;
+        gui.context.options.set(MainOptions.QUERYPATH, f.path());
+        gui.gopts.set(GUIOptions.WORKPATH, f.dir());
 
         // reload file if it has been changed
         SwingUtilities.invokeLater(new Runnable() {
@@ -70,11 +72,27 @@ public final class EditorArea extends TextPanel {
   }
 
   /**
-   * Returns {@code true} if the file was opened from disk, or was saved to disk.
+   * Returns {@code true} if the tab content was opened from disk, or was saved to disk.
    * @return result of check
    */
   public boolean opened() {
     return tstamp != 0;
+  }
+
+  /**
+   * Returns {@code true} if the tab content was modified.
+   * @return result of check
+   */
+  public boolean modified() {
+    return modified;
+  }
+
+  /**
+   * Sets the modified flag.
+   * @param mod modified flag
+   */
+  void modified(final boolean mod) {
+    modified = mod;
   }
 
   /**
@@ -89,7 +107,7 @@ public final class EditorArea extends TextPanel {
    * Initializes the text.
    * @param t text to be set
    */
-  public void initText(final byte[] t) {
+  void initText(final byte[] t) {
     last = t;
     super.setText(t);
     hist.init(getText());
@@ -194,17 +212,16 @@ public final class EditorArea extends TextPanel {
 
   /**
    * Jumps to the specified string.
-   * @param string search string
+   * @param string search string (ignored if empty)
    */
   public void jump(final String string) {
-    if(string != null) {
+    if(string.isEmpty()) {
+      search.deactivate(true);
+    } else {
       search.reset();
       search.activate(string, false);
       jump(SearchDir.CURRENT, true);
-    } else {
-      search.deactivate(true);
     }
-    requestFocusInWindow();
   }
 
   /**
@@ -216,6 +233,7 @@ public final class EditorArea extends TextPanel {
       file = io;
       label.setIcon(BaseXImages.file(io));
       setSyntax(io, true);
+      repaint();
     }
     tstamp = file.timeStamp();
     hist.save();

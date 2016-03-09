@@ -35,12 +35,26 @@ namespace BaseXClient
       socket = new TcpClient(host, port);
       stream = socket.GetStream();
       ehost = host;
-      string ts = Receive();
+      string[] response = Receive().Split(':');
+
+      string nonce;
+      string code;
+      if (response.Length > 1)
+      {
+          code = username + ":" + response[0] + ":" + pw;
+          nonce = response[1];
+      }
+      else
+      {
+          code = pw;
+          nonce = response[0];
+      }
+
       Send(username);
-      Send(MD5(MD5(pw) + ts));
+      Send(MD5(MD5(code) + nonce));
       if (stream.ReadByte() != 0)
       {
-        throw new IOException("Access denied.");
+          throw new IOException("Access denied.");
       }
     }
 
@@ -198,7 +212,8 @@ namespace BaseXClient
       {
         byte b = Read();
         if (b == 0) break;
-        ms.WriteByte(b);
+        // read next byte if 0xFF is received
+        ms.WriteByte(b == 0xFF ? Read() : b);
       }
     }
 

@@ -4,7 +4,8 @@ import static org.basex.core.Text.*;
 
 import java.io.*;
 
-import org.basex.core.*;
+import org.basex.core.locks.*;
+import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
@@ -12,7 +13,7 @@ import org.basex.io.in.*;
 /**
  * Evaluates the 'retrieve' command and retrieves binary content.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Retrieve extends ACreate {
@@ -27,11 +28,13 @@ public final class Retrieve extends ACreate {
   @Override
   protected boolean run() {
     final String path = MetaData.normPath(args[0]);
-    if(path == null) return error(NAME_INVALID_X, args[0]);
+    if(path == null) return error(PATH_INVALID_X, args[0]);
 
-    final IOFile bin = context.data().meta.binary(path);
-    if(bin == null || !bin.exists() || bin.isDir())
-      return error(RES_NOT_FOUND_X, path);
+    final Data data = context.data();
+    if(data.inMemory()) return error(NO_MAINMEM);
+
+    final IOFile bin = data.meta.binary(path);
+    if(bin == null || !bin.exists() || bin.isDir()) return error(RES_NOT_FOUND_X, path);
 
     try(final BufferInput bi = new BufferInput(bin)) {
       for(int b; (b = bi.read()) != -1;) out.write(b);
@@ -43,6 +46,6 @@ public final class Retrieve extends ACreate {
 
   @Override
   public void databases(final LockResult lr) {
-    lr.read.add(DBLocking.CTX);
+    lr.read.add(DBLocking.CONTEXT);
   }
 }

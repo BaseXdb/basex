@@ -5,33 +5,35 @@ import static org.basex.core.Text.*;
 import java.io.*;
 
 import org.basex.core.*;
-import org.basex.core.parse.Commands.*;
+import org.basex.core.locks.*;
+import org.basex.core.parse.Commands.Cmd;
+import org.basex.core.users.*;
 
 /**
  * Evaluates the 'help' command and returns help on the database commands.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Help extends Command {
   /**
    * Default constructor.
-   * @param arg optional argument
+   * @param arg argument (can be {@code null})
    */
   public Help(final String arg) {
-    super(Perm.NONE, arg);
+    super(Perm.NONE, arg == null ? "" : arg);
   }
 
   @Override
   protected boolean run() throws IOException {
     final String key = args[0];
-    if(key != null && !key.isEmpty()) {
+    if(key.isEmpty()) {
+      out.println(TRY_SPECIFIC_X);
+      for(final Cmd cmd : Cmd.values()) out.print(cmd.help(false));
+    } else {
       final Cmd cmd = getOption(key, Cmd.class);
       if(cmd == null) return error(UNKNOWN_CMD_X, this);
       out.println(cmd.help(true));
-    } else {
-      out.println(TRY_SPECIFIC_X);
-      for(final Cmd c : Cmd.values()) out.print(c.help(false));
     }
     return true;
   }

@@ -5,7 +5,7 @@ import static java.lang.StrictMath.*;
 /**
  * Default scoring model, assembling all score calculations.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Scoring {
@@ -18,43 +18,60 @@ public final class Scoring {
   /**
    * Calculates a score value, based on the token length
    * and complete text length.
-   * @param tl token length
-   * @param l complete length
+   * @param token token length
+   * @param length complete length
    * @return result
    */
-  public static double word(final int tl, final double l) {
-    return min(1, log(1 + LOG * tl / l));
+  public static double word(final int token, final double length) {
+    return min(1, log(1 + LOG * token / length));
   }
 
   /**
-   * Combines two scoring values.
-   * @param o old value
-   * @param n new value
-   * @return result
-   */
-  public static double merge(final double o, final double n) {
-    return 1 - (1 - o) * (1 - n);
+   * <p>Combines two scoring values. Both values will be inverted, multiplied with each other,
+   * and the inverted result will be returned. This has the following effects:</p>
+   * <ul>
+   *   <li> The returned value will always be the same as, or higher than the maximum value.</li>
+   *   <li> If one value is {@code 1}, {@code 1} will be returned.</li>
+   *   <li> If one value is {@code 0}, the other value will be returned.</li>
+   * </ul>
+   * @param value1 old value
+   * @param value2 new value
+   * @return score
+  public static double merge(final double value1, final double value2) {
+    return 1 - (1 - value1) * (1 - value2);
   }
+   */
 
   /**
    * Inverses the scoring value for FTNot.
-   * @param d scoring value
-   * @return inverse scoring value
+   * @param value scoring value
+   * @return score
    */
-  public static double not(final double d) {
-    return 1 - d;
+  public static double not(final double value) {
+    return 1 - value;
+  }
+
+  /**
+   * Returns an average scoring value.
+   * @param sum summarized scoring value
+   * @param count number of values
+   * @return score
+   */
+  public static double avg(final double sum, final int count) {
+    return sum / count;
   }
 
   /**
    * Calculates the score for a text node.
    * Used if no index score is available.
-   * @param npv number of pos values
-   * @param is total number of index entries
-   * @param tokl token length
-   * @param tl text length
-   * @return score value
+   * @param number number of pos values
+   * @param size total number of index entries
+   * @param token token length
+   * @param length text length
+   * @return score
    */
-  public static double textNode(final int npv, final int is, final int tokl, final int tl) {
-    return max((double) npv / is, log(tokl * npv + 1) / log(tl + 1));
+  public static double textNode(final int number, final int size, final int token,
+      final int length) {
+    return max((double) number / size, log(token * number + 1) / log(length + 1));
   }
 }

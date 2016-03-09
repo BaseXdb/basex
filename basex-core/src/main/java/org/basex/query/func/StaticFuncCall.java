@@ -1,9 +1,10 @@
 package org.basex.query.func;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
-import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
+import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -16,7 +17,7 @@ import org.basex.util.hash.*;
 /**
  * Function call for user-defined functions.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class StaticFuncCall extends FuncCall {
@@ -60,8 +61,8 @@ public final class StaticFuncCall extends FuncCall {
     super.compile(qc, scp);
 
     // disallow call of private functions from module with different uri
-    if(func.ann.contains(Ann.Q_PRIVATE) && !Token.eq(func.sc.baseURI().string(),
-        sc.baseURI().string())) throw FUNCPRIV.get(info, name.string());
+    if(func.anns.contains(Annotation.PRIVATE) && !func.sc.baseURI().eq(sc.baseURI()))
+      throw FUNCPRIVATE_X.get(info, name.string());
 
     // compile mutually recursive functions
     func.compile(qc);
@@ -69,7 +70,8 @@ public final class StaticFuncCall extends FuncCall {
     // try to inline the function
     final Expr inl = func.inlineExpr(exprs, qc, scp, info);
     if(inl != null) return inl;
-    type = func.type();
+
+    seqType = func.seqType();
     return this;
   }
 
@@ -81,24 +83,23 @@ public final class StaticFuncCall extends FuncCall {
 
   @Override
   public StaticFuncCall copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    final Expr[] arg = new Expr[exprs.length];
-    for(int i = 0; i < arg.length; i++) arg[i] = exprs[i].copy(qc, scp, vs);
-    final StaticFuncCall call = new StaticFuncCall(name, arg, sc, func, info);
-    call.type = type;
+    final Expr[] args = Arr.copyAll(qc, scp, vs, exprs);
+    final StaticFuncCall call = new StaticFuncCall(name, args, sc, func, info);
+    call.seqType = seqType;
     call.size = size;
     return call;
   }
 
   /**
    * Initializes the function and checks for visibility.
-   * @param f function reference
+   * @param sf function reference
    * @return self reference
    * @throws QueryException query exception
    */
-  public StaticFuncCall init(final StaticFunc f) throws QueryException {
-    func = f;
-    if(f.ann.contains(Ann.Q_PRIVATE) && !Token.eq(sc.baseURI().string(),
-        f.sc.baseURI().string())) throw FUNCPRIV.get(info, f.name.string());
+  public StaticFuncCall init(final StaticFunc sf) throws QueryException {
+    func = sf;
+    if(sf.anns.contains(Annotation.PRIVATE) && !sc.baseURI().eq(sf.sc.baseURI()))
+      throw FUNCPRIVATE_X.get(info, sf.name.string());
     return this;
   }
 
@@ -112,22 +113,22 @@ public final class StaticFuncCall extends FuncCall {
 
   @Override
   public boolean isVacuous() {
-    return func != null && func.isVacuous();
+    return func.isVacuous();
   }
 
   @Override
   public boolean has(final Flag flag) {
     // check arguments, which will be evaluated before running the function code
     if(super.has(flag)) return true;
-    // function code: position or context references will have no effect on calling code
-    if(flag == Flag.FCS || flag == Flag.CTX) return false;
+    // function code: position or context references of expression body have no effect
+    if(flag == Flag.POS || flag == Flag.CTX) return false;
     // pass on check to function code
-    return func == null || (flag == Flag.UPD && !sc.mixUpdates ? func.updating : func.has(flag));
+    return flag == Flag.UPD ? func.updating : func.has(flag);
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(NAM, name, TCL, tailCall), exprs);
+    addPlan(plan, planElem(NAM, name.string(), TCL, tailCall), exprs);
   }
 
   @Override

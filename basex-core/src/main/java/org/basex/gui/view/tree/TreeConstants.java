@@ -1,11 +1,9 @@
 package org.basex.gui.view.tree;
 
-import java.awt.*;
-
 /**
  * This interface contains tree view constants.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Wolfgang Miller
  */
 interface TreeConstants {
@@ -19,8 +17,6 @@ interface TreeConstants {
   int LEFT_AND_RIGHT_MARGIN = 4;
   /** Changes Color until given level. */
   int CHANGE_COLOR_TILL = 4;
-  /** Highlight Color small space. */
-  Color SMALL_SPACE_COLOR = Color.GREEN;
 
   /** Minimum rectangle space for text. */
   int MIN_TXT_SPACE = 4;
@@ -34,8 +30,6 @@ interface TreeConstants {
   int BEST_NODE_HEIGHT = 8;
   /** Minimum node height. */
   int MIN_NODE_HEIGHT = 1;
-  /** Maximum node height. */
-  int MAX_NODE_HEIGHT = 26;
   /** Minimum node distance to draw node connections. */
   int MIN_NODE_DIST_CONN = 5;
 

@@ -9,20 +9,22 @@ import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.gui.dialog.*;
 import org.basex.gui.layout.*;
+import org.basex.gui.text.TextEditor.*;
 import org.basex.gui.view.*;
+import org.basex.gui.view.editor.*;
 import org.basex.io.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
- * This enumeration encapsulates all commands that are triggered by
- * GUI operations.
+ * This enumeration encapsulates all commands that are triggered by GUI operations.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public enum GUIMenuCmd implements GUICommand {
@@ -72,11 +74,11 @@ public enum GUIMenuCmd implements GUICommand {
       if(root.exists()) {
         IOFile file = null;
         boolean overwrite = false;
-        final Data d = gui.context.data();
-        final IntList il = d.resources.docs();
-        final int is = il.size();
-        for(int i = 0; i < is; i++) {
-          file = root.resolve(Token.string(d.text(il.get(i), true)));
+        final Data data = gui.context.data();
+        final IntList docs = data.resources.docs();
+        final int ds = docs.size();
+        for(int d = 0; d < ds; d++) {
+          file = root.resolve(Token.string(data.text(docs.get(d), true)));
           if(file.exists()) {
             if(overwrite) {
               // more than one file will be overwritten; check remaining tests
@@ -102,15 +104,6 @@ public enum GUIMenuCmd implements GUICommand {
     @Override
     public void execute(final GUI gui) {
       gui.execute(new Close());
-    }
-  },
-
-  /** Server Dialog. */
-  C_SERVER(S_SERVER_ADMIN + DOTS, null, false, false) {
-    @Override
-    public void execute(final GUI gui) {
-      // open file chooser for XML creation
-      new DialogServer(gui);
     }
   },
 
@@ -152,7 +145,8 @@ public enum GUIMenuCmd implements GUICommand {
 
     @Override
     public boolean enabled(final GUI gui) {
-      return gui.gopts.get(GUIOptions.SHOWEDITOR) && gui.editor.modified();
+      final EditorArea ea = gui.editor.getEditor();
+      return gui.gopts.get(GUIOptions.SHOWEDITOR) && ea != null && (ea.modified() || !ea.opened());
     }
   },
 
@@ -186,7 +180,7 @@ public enum GUIMenuCmd implements GUICommand {
   C_NEXTERROR(NEXT_ERROR, "% PERIOD", false, false) {
     @Override
     public void execute(final GUI gui) {
-      gui.editor.jumpToError();
+      gui.editor.markError(true);
     }
 
     @Override
@@ -234,6 +228,45 @@ public enum GUIMenuCmd implements GUICommand {
     }
   },
 
+  /** Lower case. */
+  C_LOWERCASE(LOWER_CASE, "% shift L", false, false) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.getEditor().toCase(Case.LOWER);
+    }
+
+    @Override
+    public boolean enabled(final GUI gui) {
+      return gui.gopts.get(GUIOptions.SHOWEDITOR);
+    }
+  },
+
+  /** Upper case. */
+  C_UPPERCASE(UPPER_CASE, "% shift U", false, false) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.getEditor().toCase(Case.UPPER);
+    }
+
+    @Override
+    public boolean enabled(final GUI gui) {
+      return gui.gopts.get(GUIOptions.SHOWEDITOR);
+    }
+  },
+
+  /** Title case. */
+  C_TITLECASE(TITLE_CASE, "% shift T", false, false) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.getEditor().toCase(Case.TITLE);
+    }
+
+    @Override
+    public boolean enabled(final GUI gui) {
+      return gui.gopts.get(GUIOptions.SHOWEDITOR);
+    }
+  },
+
   /** Exits the application. */
   C_EXIT(EXIT, "% Q", false, false) {
     @Override
@@ -248,14 +281,14 @@ public enum GUIMenuCmd implements GUICommand {
   C_COPYPATH(COPY_PATH, "% shift C", true, false) {
     @Override
     public void execute(final GUI gui) {
-      final int pre = gui.context.marked.pres[0];
+      final int pre = gui.context.marked.pre(0);
       BaseXLayout.copy(Token.string(ViewData.path(gui.context.data(), pre)));
     }
 
     @Override
     public boolean enabled(final GUI gui) {
       // disallow copy of empty node set or root node
-      final Nodes marked = gui.context.marked;
+      final DBNodes marked = gui.context.marked;
       return marked != null && marked.size() != 0;
     }
   },
@@ -265,8 +298,8 @@ public enum GUIMenuCmd implements GUICommand {
     @Override
     public void execute(final GUI gui) {
       final Context ctx = gui.context;
-      final Nodes n = ctx.marked;
-      ctx.copied = new Nodes(n.pres, n.data);
+      final DBNodes n = ctx.marked;
+      ctx.copied = new DBNodes(n.data(), n.pres());
     }
 
     @Override
@@ -281,8 +314,9 @@ public enum GUIMenuCmd implements GUICommand {
     @Override
     public void execute(final GUI gui) {
       final StringBuilder sb = new StringBuilder();
-      final Nodes n = gui.context.copied;
-      for(int i = 0; i < n.size(); ++i) {
+      final DBNodes n = gui.context.copied;
+      final long ns = n.size();
+      for(int i = 0; i < ns; ++i) {
         if(i > 0) sb.append(',');
         sb.append(openPre(n, i));
       }
@@ -305,12 +339,13 @@ public enum GUIMenuCmd implements GUICommand {
     public void execute(final GUI gui) {
       if(!BaseXDialog.confirm(gui, DELETE_NODES)) return;
       final StringBuilder sb = new StringBuilder();
-      final Nodes n = gui.context.marked;
-      for(int i = 0; i < n.size(); ++i) {
+      final DBNodes n = gui.context.marked;
+      final long ns = n.size();
+      for(int i = 0; i < ns; ++i) {
         if(i > 0) sb.append(',');
         sb.append(openPre(n, i));
       }
-      gui.context.marked = new Nodes(n.data);
+      gui.context.marked = new DBNodes(n.data());
       gui.context.copied = null;
       gui.context.focused = -1;
       gui.execute(new XQuery("delete nodes (" + sb + ')'));
@@ -318,8 +353,7 @@ public enum GUIMenuCmd implements GUICommand {
 
     @Override
     public boolean enabled(final GUI gui) {
-      // disallow deletion of empty node set or root node
-      return updatable(gui.context.marked);
+      return updatable(gui.context.marked, Data.DOC);
     }
   },
 
@@ -327,7 +361,7 @@ public enum GUIMenuCmd implements GUICommand {
   C_INSERT(NEW + DOTS, null, true, false) {
     @Override
     public void execute(final GUI gui) {
-      final Nodes n = gui.context.marked;
+      final DBNodes n = gui.context.marked;
       final DialogInsert insert = new DialogInsert(gui);
       if(!insert.ok()) return;
 
@@ -356,8 +390,8 @@ public enum GUIMenuCmd implements GUICommand {
   C_EDIT(EDIT + DOTS, null, true, false) {
     @Override
     public void execute(final GUI gui) {
-      final Nodes n = gui.context.marked;
-      final DialogEdit edit = new DialogEdit(gui, n.pres[0]);
+      final DBNodes n = gui.context.marked;
+      final DialogEdit edit = new DialogEdit(gui, n.pre(0));
       if(!edit.ok()) return;
 
       String rename = null;
@@ -387,18 +421,18 @@ public enum GUIMenuCmd implements GUICommand {
     @Override
     public void execute(final GUI gui) {
       final Context ctx = gui.context;
-      Nodes marked = ctx.marked;
+      DBNodes marked = ctx.marked;
       if(marked.size() == 0) {
         final int pre = gui.context.focused;
         if(pre == -1) return;
-        marked = new Nodes(pre, ctx.data());
+        marked = new DBNodes(ctx.data(), pre);
       }
       gui.notify.context(marked, false, null);
     }
 
     @Override
     public boolean enabled(final GUI gui) {
-      final Nodes marked = gui.context.marked;
+      final DBNodes marked = gui.context.marked;
       return marked != null && marked.size() != 0;
     }
   },
@@ -675,15 +709,15 @@ public enum GUIMenuCmd implements GUICommand {
       final Data data = ctx.data();
       if(rt) {
         if(root) {
-          gui.notify.mark(new Nodes(data), null);
+          gui.notify.mark(new DBNodes(data), null);
         } else {
-          final Nodes mark = ctx.marked;
-          ctx.marked = new Nodes(data);
+          final DBNodes mark = ctx.marked;
+          ctx.marked = new DBNodes(data);
           gui.notify.context(mark, true, null);
         }
       } else {
         if(!root) {
-          gui.notify.context(new Nodes(0, data), true, null);
+          gui.notify.context(new DBNodes(data, 0), true, null);
           gui.notify.mark(ctx.current(), null);
         }
       }
@@ -699,7 +733,7 @@ public enum GUIMenuCmd implements GUICommand {
   C_COLOR(COLORS + DOTS, null, false, false) {
     @Override
     public void execute(final GUI gui) {
-      new DialogColors(gui);
+      DialogColors.show(gui);
     }
   },
 
@@ -707,7 +741,7 @@ public enum GUIMenuCmd implements GUICommand {
   C_FONTS(FONTS_D, null, false, false) {
     @Override
     public void execute(final GUI gui) {
-      new DialogFonts(gui);
+      DialogFonts.show(gui);
     }
   },
 
@@ -715,7 +749,7 @@ public enum GUIMenuCmd implements GUICommand {
   C_PREFS(PREFERENCES + DOTS, Prop.MAC ? "% COMMA" : "% shift P", false, false) {
     @Override
     public void execute(final GUI gui) {
-      new DialogPrefs(gui);
+      DialogPrefs.show(gui);
     }
   },
 
@@ -791,15 +825,23 @@ public enum GUIMenuCmd implements GUICommand {
       // check if all nodes are document nodes
       boolean doc = true;
       final Data data = ctx.data();
-      for(final int pre : ctx.current().pres) doc &= data.kind(pre) == Data.DOC;
+      for(final int pre : ctx.current().pres()) doc &= data.kind(pre) == Data.DOC;
+      final DBNodes nodes;
       if(doc) {
         // if yes, jump to database root
         ctx.invalidate();
-        gui.notify.context(ctx.current(), false, null);
+        nodes = ctx.current();
       } else {
         // otherwise, jump to parent nodes
-        gui.execute(new Cs(".."));
+        final IntList pres = new IntList();
+        for(final int pre : ctx.current().pres()) {
+          final int k = data.kind(pre);
+          pres.add(k == Data.DOC ? pre : data.parent(pre, k));
+        }
+        nodes = new DBNodes(data, pres.sort().distinct().finish());
+        ctx.current(nodes);
       }
+      gui.notify.context(nodes, false, null);
     }
 
     @Override
@@ -848,17 +890,17 @@ public enum GUIMenuCmd implements GUICommand {
 
   /**
    * Constructor.
-   * @param l label of the menu item
-   * @param k shortcut
-   * @param d requires a database to be opened
-   * @param t indicates if this command has two states
+   * @param label label of the menu item
+   * @param key shortcut
+   * @param data requires a database to be opened
+   * @param toggle indicates if this command has two states
    */
-  GUIMenuCmd(final String l, final String k, final boolean d, final boolean t) {
-    label = l;
-    key = k;
-    data = d;
-    toggle = t;
-    shortcut = BaseXLayout.addShortcut(l, k);
+  GUIMenuCmd(final String label, final String key, final boolean data, final boolean toggle) {
+    this.label = label;
+    this.key = key;
+    this.data = data;
+    this.toggle = toggle;
+    shortcut = BaseXLayout.addShortcut(label, key);
   }
 
   @Override
@@ -878,7 +920,7 @@ public enum GUIMenuCmd implements GUICommand {
   public final boolean toggle() { return toggle; }
 
   @Override
-  public String shortcut() { return shortcut; }
+  public String shortCut() { return shortcut; }
 
   @Override
   public Object shortcuts() { return key; }
@@ -891,9 +933,9 @@ public enum GUIMenuCmd implements GUICommand {
    * @param no disallowed node types
    * @return result of check
    */
-  private static boolean updatable(final Nodes n, final int... no) {
+  private static boolean updatable(final DBNodes n, final int... no) {
     if(n == null || (no.length == 0 ? n.size() < 1 : n.size() != 1)) return false;
-    final int k = n.data.kind(n.pres[0]);
+    final int k = n.data().kind(n.pre(0));
     for(final int i : no) if(k == i) return false;
     return true;
   }
@@ -913,8 +955,8 @@ public enum GUIMenuCmd implements GUICommand {
    * @param i offset
    * @return function string
    */
-  private static String openPre(final Nodes n, final int i) {
-    return Function._DB_OPEN_PRE.get(null, Str.get(n.data.meta.name),
-        Int.get(n.pres[i])).toString();
+  private static String openPre(final DBNodes n, final int i) {
+    return Function._DB_OPEN_PRE.get(null, null, Str.get(n.data().meta.name),
+        Int.get(n.pre(i))).toString();
   }
 }

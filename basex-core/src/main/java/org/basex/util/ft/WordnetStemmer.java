@@ -13,7 +13,7 @@ import org.basex.util.*;
  * The WordNet stemmer is developed by George A. Miller and is based on
  * the WordNet 3.0 License: {@code http://wordnet.princeton.edu/}.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Dimitar Popov
  */
 final class WordnetStemmer extends Stemmer {
@@ -84,7 +84,7 @@ final class WordnetStemmer extends Stemmer {
   }
 
   @Override
-  Stemmer get(final Language l, final FTIterator fti) {
+  Stemmer get(final Language lang, final FTIterator fti) {
     return new WordnetStemmer(fti);
   }
 
@@ -108,8 +108,7 @@ final class WordnetStemmer extends Stemmer {
   @Override
   protected byte[] stem(final byte[] word) {
     @SuppressWarnings("unchecked")
-    final List<String> l = (List<String>)
-      Reflect.invoke(FIND_STEMS, stemmer, string(word));
+    final List<String> l = (List<String>) Reflect.invoke(FIND_STEMS, stemmer, string(word));
     final byte[] result = l.isEmpty() ? word : token(l.get(0));
     return result.length == 0 ? word : result;
   }

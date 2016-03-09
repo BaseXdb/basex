@@ -7,9 +7,10 @@ import java.io.*;
 import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.core.parse.*;
+import org.basex.core.users.*;
 import org.basex.data.*;
-import org.basex.data.atomic.*;
 import org.basex.io.*;
+import org.basex.query.up.atomic.*;
 import org.basex.util.*;
 
 /**
@@ -18,14 +19,15 @@ import org.basex.util.*;
  * the target path and file name have been merged and are now specified
  * as first argument.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Add extends ACreate {
   /** Builder. */
   private Builder build;
-  /** Indicates if database should be locked. */
-  boolean lock = true;
+
+  /** Data clip to insert. */
+  DataClip clip;
 
   /**
    * Constructor, specifying a target path.
@@ -48,8 +50,34 @@ public final class Add extends ACreate {
 
   @Override
   protected boolean run() {
+    try {
+      if(!build()) return false;
+
+      // skip update if fragment is empty
+      if(clip.data.meta.size > 1) {
+        if(!startUpdate()) return false;
+
+        context.invalidate();
+        final Data data = context.data();
+        final AtomicUpdateCache auc = new AtomicUpdateCache(data);
+        auc.addInsert(data.meta.size, -1, clip);
+        auc.execute(false);
+
+        if(!finishUpdate()) return false;
+      }
+      return info(RES_ADDED_X, perf);
+    } finally {
+      close();
+    }
+  }
+
+  /**
+   * Builds a data clip for the document(s) to be added.
+   * @return success flag
+   */
+  boolean build() {
     String name = MetaData.normPath(args[0]);
-    if(name == null) return error(NAME_INVALID_X, args[0]);
+    if(name == null) return error(PATH_INVALID_X, args[0]);
 
     // retrieve input
     final IO io;
@@ -62,7 +90,7 @@ public final class Add extends ACreate {
     // check if resource exists
     if(io == null) return error(RES_NOT_FOUND);
     if(!io.exists()) return in != null ? error(RES_NOT_FOUND) :
-        error(RES_NOT_FOUND_X, context.user.has(Perm.CREATE) ? io : args[1]);
+        error(RES_NOT_FOUND_X, context.user().has(Perm.CREATE) ? io : args[1]);
 
     if(!name.endsWith("/") && (io.isDir() || io.isArchive())) name += '/';
 
@@ -73,8 +101,6 @@ public final class Add extends ACreate {
       name = name.substring(s + 1);
     }
 
-    final Data data = context.data();
-
     // get name from io reference
     if(name.isEmpty()) name = io.name();
     else io.name(name);
@@ -82,37 +108,29 @@ public final class Add extends ACreate {
     // ensure that the final name is not empty
     if(name.isEmpty()) return error(NAME_INVALID_X, name);
 
-    String db = null;
-    Data tmp = null;
     try {
-      final Parser parser = new DirParser(io, context, data.meta.path);
+      final Data data = context.data();
+      final Parser parser = new DirParser(io, options, data.meta.path);
       parser.target(target);
 
       // create random database name for disk-based creation
       if(cache(parser)) {
-        db = context.globalopts.random(data.meta.name);
-        build = new DiskBuilder(db, parser, context);
+        build = new DiskBuilder(soptions.randomDbName(data.meta.name), parser, soptions, options);
       } else {
         build = new MemBuilder(name, parser);
       }
-
-      tmp = build.build();
-      // skip update if fragment is empty
-      if(tmp.meta.size > 1) {
-        if(lock && !data.startUpdate()) return error(DB_PINNED_X, data.meta.name);
-        data.insert(data.meta.size, -1, new DataClip(tmp));
-        context.invalidate();
-        if(lock) data.finishUpdate();
-      }
-      // return info message
-      return info(parser.info() + PATH_ADDED_X_X, name, perf);
+      clip = build.dataClip();
+      return true;
     } catch(final IOException ex) {
       return error(Util.message(ex));
-    } finally {
-      // close and drop intermediary database instance
-      if(tmp != null) tmp.close();
-      if(db != null) DropDB.drop(db, context);
     }
+  }
+
+  /**
+   * Finalizes an add operation.
+   */
+  void close() {
+    if(clip != null) DropDB.drop(clip.data, soptions);
   }
 
   /**
@@ -128,9 +146,9 @@ public final class Add extends ACreate {
 
     // create disk instances for large documents
     // (does not work for input streams and directories)
-    long fl = parser.src.length();
-    if(parser.src instanceof IOFile) {
-      final IOFile f = (IOFile) parser.src;
+    long fl = parser.source.length();
+    if(parser.source instanceof IOFile) {
+      final IOFile f = (IOFile) parser.source;
       if(f.isDir()) {
         for(final String d : f.descendants()) fl += new IOFile(f, d).length();
       }

@@ -5,6 +5,7 @@ import static org.basex.query.func.Function.*;
 
 import java.io.*;
 
+import org.basex.api.dom.*;
 import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.data.*;
@@ -23,18 +24,16 @@ import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
- * Database nodes.
+ * Database node.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public class DBNode extends ANode {
   /** Data reference. */
-  public final Data data;
+  private final Data data;
   /** Pre value. */
-  public int pre;
-  /** Namespaces. */
-  private Atts nsp;
+  private int pre;
 
   /**
    * Constructor, creating a document node from the specified data reference.
@@ -74,17 +73,16 @@ public class DBNode extends ANode {
     super(type);
     this.data = data;
     this.pre = pre;
-    this.par = par;
+    parent = par;
   }
 
   /**
    * Constructor, specifying an XML input reference.
    * @param input input reference
-   * @param opts database options
    * @throws IOException I/O exception
    */
-  public DBNode(final IO input, final MainOptions opts) throws IOException {
-    this(Parser.xmlParser(input, opts));
+  public DBNode(final IO input) throws IOException {
+    this(MemBuilder.build(input));
   }
 
   /**
@@ -103,15 +101,30 @@ public class DBNode extends ANode {
    */
   private void set(final int p, final int k) {
     type = type(k);
-    par = null;
+    parent = null;
     value = null;
-    nsp = null;
     pre = p;
   }
 
   @Override
   public final Data data() {
     return data;
+  }
+
+  /**
+   * Assigns a pre value.
+   * @param p pre value
+   */
+  public final void pre(final int p) {
+    pre = p;
+  }
+
+  /**
+   * Returns the pre value.
+   * @return pre value
+   */
+  public final int pre() {
+    return pre;
   }
 
   @Override
@@ -122,9 +135,14 @@ public class DBNode extends ANode {
 
   @Override
   public final long itr(final InputInfo ii) throws QueryException {
-    final boolean txt = type == NodeType.TXT || type == NodeType.COM;
-    if(txt || type == NodeType.ATT) {
-      final long l = data.textItr(pre, txt);
+    if(type == NodeType.ELM) {
+      final int as = data.attSize(pre, Data.ELEM);
+      if(data.size(pre, Data.ELEM) - as == 1 && data.kind(pre + as) == Data.TEXT) {
+        final long l = data.textItr(pre + as, true);
+        if(l != Long.MIN_VALUE) return l;
+      }
+    } else if(type == NodeType.TXT || type == NodeType.ATT) {
+      final long l = data.textItr(pre, type == NodeType.TXT);
       if(l != Long.MIN_VALUE) return l;
     }
     return Int.parse(data.atom(pre), ii);
@@ -132,12 +150,18 @@ public class DBNode extends ANode {
 
   @Override
   public final double dbl(final InputInfo ii) throws QueryException {
-    final boolean txt = type == NodeType.TXT || type == NodeType.COM;
-    if(txt || type == NodeType.ATT) {
-      final double d = data.textDbl(pre, txt);
-      if(!Double.isNaN(d)) return d;
+    // try to directly retrieve inlined numeric value from XML storage
+    double d = Double.NaN;
+    if(type == NodeType.ELM) {
+      final int as = data.attSize(pre, Data.ELEM);
+      if(data.size(pre, Data.ELEM) - as == 1 && data.kind(pre + as) == Data.TEXT) {
+        d = data.textDbl(pre + as, true);
+      }
+    } else if(type == NodeType.TXT || type == NodeType.ATT) {
+      d = data.textDbl(pre, type == NodeType.TXT);
     }
-    return Dbl.parse(data.atom(pre), ii);
+    // GH-1206: parse invalid values again
+    return Double.isNaN(d) ? Dbl.parse(data.atom(pre), ii) : d;
   }
 
   @Override
@@ -155,23 +179,14 @@ public class DBNode extends ANode {
   @Override
   public final QNm qname(final QNm name) {
     // update the name and uri strings in the specified QName
-    final byte[] nm = name();
-    byte[] uri = Token.EMPTY;
-    final boolean pref = Token.indexOf(nm, ':') != -1;
-    if(pref || data.nspaces.size() != 0) {
-      final int n = pref ? data.nspaces.uri(nm, pre, data) :
-        data.uri(pre, data.kind(pre));
-      final byte[] u = n > 0 ? data.nspaces.uri(n) : pref ? NSGlobal.uri(Token.prefix(nm)) : null;
-      if(u != null) uri = u;
-    }
-    name.set(nm, uri);
+    final byte[][] qname = data.qname(pre, kind());
+    name.set(qname[0], qname[1]);
     return name;
   }
 
   @Override
   public final Atts namespaces() {
-    if(type == NodeType.ELM && nsp == null) nsp = data.ns(pre);
-    return nsp;
+    return data.namespaces(pre);
   }
 
   @Override
@@ -186,7 +201,7 @@ public class DBNode extends ANode {
       }
       return new TokenBuilder(data.meta.name).add('/').add(base).finish();
     }
-    final byte[] b = attribute(new QNm(BASE, XMLURI));
+    final byte[] b = attribute(new QNm(BASE, XML_URI));
     return b != null ? b : Token.EMPTY;
   }
 
@@ -210,220 +225,206 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final DBNode copy() {
-    final DBNode n = new DBNode(data, pre, par, nodeType());
+  public final Value copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
+    return finish();
+  }
+
+  @Override
+  public final DBNode dbNodeCopy(final MainOptions opts) {
+    final MemData md = new MemData(opts);
+    new DataBuilder(md).build(this);
+    return new DBNode(md).parent(parent);
+  }
+
+  @Override
+  public final DBNode deepCopy(final MainOptions options) {
+    return dbNodeCopy(options);
+  }
+
+  @Override
+  public final DBNode finish() {
+    final DBNode n = new DBNode(data, pre, parent, nodeType());
     n.score = score;
     return n;
   }
 
   @Override
-  public final Value copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return copy();
-  }
-
-  @Override
-  public final DBNode dbCopy(final MainOptions opts) {
-    final MemData md = new MemData(opts);
-    new DataBuilder(md).build(this);
-    return new DBNode(md).parent(par);
-  }
-
-  @Override
-  public final DBNode deepCopy() {
-    return dbCopy(data.meta.options);
-  }
-
-  @Override
-  public final DBNode finish() {
-    return copy();
-  }
-
-  @Override
   public final ANode parent() {
-    if(par != null) return par;
+    if(parent != null) return parent;
     final int p = data.parent(pre, data.kind(pre));
     if(p == -1) return null;
 
-    final DBNode node = copy();
+    final DBNode node = finish();
     node.set(p, data.kind(p));
     return node;
   }
 
   @Override
-  protected final DBNode parent(final ANode p) {
-    par = p;
+  protected final DBNode parent(final ANode par) {
+    parent = par;
     return this;
   }
 
   @Override
   public final boolean hasChildren() {
-    final int k = data.kind(pre);
-    return data.attSize(pre, k) != data.size(pre, k);
+    final int kind = data.kind(pre);
+    return data.attSize(pre, kind) != data.size(pre, kind);
   }
 
   @Override
-  public final AxisIter ancestor() {
-    return new AxisIter() {
-      private final DBNode node = copy();
-      int p = pre, k = data.kind(p);
+  public final BasicNodeIter ancestor() {
+    return new BasicNodeIter() {
+      private final DBNode node = finish();
+      int curr = pre, kind = data.kind(curr);
 
       @Override
       public ANode next() {
-        p = data.parent(p, k);
-        if(p == -1) return null;
-        k = data.kind(p);
-        node.set(p, k);
+        curr = data.parent(curr, kind);
+        if(curr == -1) return null;
+        kind = data.kind(curr);
+        node.set(curr, kind);
         return node;
       }
     };
   }
 
   @Override
-  public final AxisIter ancestorOrSelf() {
-    return new AxisIter() {
-      private final DBNode node = copy();
-      int p = pre, k = data.kind(p);
+  public final BasicNodeIter ancestorOrSelf() {
+    return new BasicNodeIter() {
+      private final DBNode node = finish();
+      int curr = pre, kind = data.kind(curr);
 
       @Override
       public ANode next() {
-        if(p == -1) return null;
-        k = data.kind(p);
-        node.set(p, k);
-        p = data.parent(p, k);
+        if(curr == -1) return null;
+        kind = data.kind(curr);
+        node.set(curr, kind);
+        curr = data.parent(curr, kind);
         return node;
       }
     };
   }
 
   @Override
-  public final AxisMoreIter attributes() {
-    return new AxisMoreIter() {
-      final DBNode node = copy();
-      final int s = pre + data.attSize(pre, data.kind(pre));
-      int p = pre + 1;
-
-      @Override
-      public boolean more() {
-        return p != s;
-      }
+  public final BasicNodeIter attributes() {
+    return new BasicNodeIter() {
+      final DBNode node = finish();
+      final int last = pre + data.attSize(pre, data.kind(pre));
+      int curr = pre + 1;
 
       @Override
       public DBNode next() {
-        if(!more()) return null;
-        node.set(p++, Data.ATTR);
-        return node;
+        if(curr == last) return null;
+        final DBNode n = node;
+        n.set(curr++, Data.ATTR);
+        return n;
       }
     };
   }
 
   @Override
-  public final AxisMoreIter children() {
-    return new AxisMoreIter() {
-      int k = data.kind(pre), p = pre + data.attSize(pre, k);
-      final int s = pre + data.size(pre, k);
-      final DBNode node = copy();
-
-      @Override
-      public boolean more() {
-        return p < s;
-      }
+  public final BasicNodeIter children() {
+    return new BasicNodeIter() {
+      int kind = data.kind(pre), curr = pre + data.attSize(pre, kind);
+      final int last = pre + data.size(pre, kind);
+      final DBNode node = finish();
 
       @Override
       public ANode next() {
-        if(!more()) return null;
-        k = data.kind(p);
-        node.set(p, k);
-        p += data.size(p, k);
+        if(curr == last) return null;
+        final Data d = data;
+        kind = d.kind(curr);
+        node.set(curr, kind);
+        curr += d.size(curr, kind);
         return node;
       }
     };
   }
 
   @Override
-  public final AxisIter descendant() {
-    return new AxisIter() {
-      int k = data.kind(pre), p = pre + data.attSize(pre, k);
-      final int s = pre + data.size(pre, k);
-      final DBNode node = copy();
+  public final BasicNodeIter descendant() {
+    return new BasicNodeIter() {
+      int kind = data.kind(pre), curr = pre + data.attSize(pre, kind);
+      final int last = pre + data.size(pre, kind);
+      final DBNode node = finish();
 
       @Override
       public DBNode next() {
-        if(p == s) return null;
-        k = data.kind(p);
-        node.set(p, k);
-        p += data.attSize(p, k);
+        if(curr == last) return null;
+        kind = data.kind(curr);
+        node.set(curr, kind);
+        curr += data.attSize(curr, kind);
         return node;
       }
     };
   }
 
   @Override
-  public final AxisIter descendantOrSelf() {
-    return new AxisIter() {
-      final DBNode node = copy();
-      final int s = pre + data.size(pre, data.kind(pre));
-      int p = pre;
+  public final BasicNodeIter descendantOrSelf() {
+    return new BasicNodeIter() {
+      final DBNode node = finish();
+      final int last = pre + data.size(pre, data.kind(pre));
+      int curr = pre;
 
       @Override
       public ANode next() {
-        if(p == s) return null;
-        final int k = data.kind(p);
-        node.set(p, k);
-        p += data.attSize(p, k);
+        if(curr == last) return null;
+        final int k = data.kind(curr);
+        node.set(curr, k);
+        curr += data.attSize(curr, k);
         return node;
       }
     };
   }
 
   @Override
-  public final AxisIter following() {
-    return new AxisIter() {
-      private final DBNode node = copy();
-      final int s = data.meta.size;
-      int k = data.kind(pre);
-      int p = pre + data.size(pre, k);
+  public final BasicNodeIter following() {
+    return new BasicNodeIter() {
+      private final DBNode node = finish();
+      final int sz = data.meta.size;
+      int kind = data.kind(pre);
+      int curr = pre + data.size(pre, kind);
 
       @Override
       public ANode next() {
-        if(p == s) return null;
-        k = data.kind(p);
-        node.set(p, k);
-        p += data.attSize(p, k);
+        if(curr == sz) return null;
+        kind = data.kind(curr);
+        node.set(curr, kind);
+        curr += data.attSize(curr, kind);
         return node;
       }
     };
   }
 
   @Override
-  public final AxisIter followingSibling() {
-    return new AxisIter() {
-      private final DBNode node = copy();
-      int k = data.kind(pre);
-      private final int pp = data.parent(pre, k);
-      final int s = pp == -1 ? 0 : pp + data.size(pp, data.kind(pp));
-      int p = pp == -1 ? 0 : pre + data.size(pre, k);
+  public final BasicNodeIter followingSibling() {
+    return new BasicNodeIter() {
+      private final DBNode node = finish();
+      int kind = data.kind(pre);
+      private final int pp = data.parent(pre, kind);
+      final int sz = pp == -1 ? 0 : pp + data.size(pp, data.kind(pp));
+      int curr = pp == -1 ? 0 : pre + data.size(pre, kind);
 
       @Override
       public ANode next() {
-        if(p == s) return null;
-        k = data.kind(p);
-        node.set(p, k);
-        p += data.size(p, k);
+        if(curr == sz) return null;
+        kind = data.kind(curr);
+        node.set(curr, kind);
+        curr += data.size(curr, kind);
         return node;
       }
     };
   }
 
   @Override
-  public final AxisIter parentIter() {
-    return new AxisIter() {
-      /** First call. */
-      private boolean more;
+  public final BasicNodeIter parentIter() {
+    return new BasicNodeIter() {
+      private boolean all;
 
       @Override
       public ANode next() {
-        if(more) return null;
-        more = true;
+        if(all) return null;
+        all = true;
         return parent();
       }
     };
@@ -431,8 +432,7 @@ public class DBNode extends ANode {
 
   @Override
   public final boolean sameAs(final Expr cmp) {
-    return cmp instanceof DBNode && data == ((DBNode) cmp).data &&
-      pre == ((DBNode) cmp).pre;
+    return cmp instanceof DBNode && data == ((DBNode) cmp).data && pre == ((DBNode) cmp).pre;
   }
 
   @Override
@@ -442,10 +442,10 @@ public class DBNode extends ANode {
 
   @Override
   public final byte[] xdmInfo() {
-    final ByteList bl = new ByteList().add(typeId().bytes());
+    final ByteList bl = new ByteList().add(typeId().asByte());
     if(type == NodeType.DOC) bl.add(baseURI()).add(0);
     else if(type == NodeType.ATT) bl.add(qname().uri()).add(0);
-    return bl.toArray();
+    return bl.finish();
   }
 
   @Override
@@ -453,12 +453,12 @@ public class DBNode extends ANode {
     // check if a document has a single element as child
     ID t = type.id();
     if(type == NodeType.DOC) {
-      final AxisMoreIter ai = children();
-      if(ai.more() && ai.next().type == NodeType.ELM && !ai.more()) t = NodeType.DEL.id();
+      final BasicNodeIter ir = children();
+      final ANode n = ir.next();
+      if(n != null && n.type == NodeType.ELM && ir.next() == null) t = NodeType.DEL.id();
     }
     return t;
   }
-
 
   @Override
   public String toErrorString() {
@@ -495,5 +495,10 @@ public class DBNode extends ANode {
         break;
     }
     return tb.toString();
+  }
+
+  @Override
+  public final BXNode toJava() {
+    return BXNode.get(deepCopy(new MainOptions()));
   }
 }

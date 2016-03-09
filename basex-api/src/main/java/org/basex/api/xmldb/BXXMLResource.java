@@ -16,6 +16,7 @@ import org.basex.io.out.*;
 import org.basex.io.parse.xml.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.w3c.dom.*;
 import org.xml.sax.*;
@@ -25,7 +26,7 @@ import org.xmldb.api.modules.*;
 /**
  * Implementation of the XMLResource Interface for the XMLDB:API.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class BXXMLResource implements XMLResource, BXXMLDBText {
@@ -34,48 +35,46 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
   /** String id. */
   private String id;
   /** Query result. */
-  private Result result;
+  private Item item;
   /** Cached content. */
   Object content;
   /** Data reference. */
   Data data;
   /** Pre value or result position. */
-  int pos;
+  int pre;
 
   /**
    * Constructor for generated results.
-   * @param d content data
-   * @param c Collection
+   * @param content content data
+   * @param coll Collection
    */
-  BXXMLResource(final byte[] d, final Collection c) {
-    content = d;
-    coll = c;
+  BXXMLResource(final byte[] content, final Collection coll) {
+    this.content = content;
+    this.coll = coll;
   }
 
   /**
    * Constructor for query results.
-   * @param res query result
-   * @param p query counter
-   * @param c Collection
+   * @param item query result
+   * @param coll Collection
    */
-  BXXMLResource(final Result res, final int p, final Collection c) {
-    result = res;
-    coll = c;
-    pos = p;
+  BXXMLResource(final Item item, final Collection coll) {
+    this.item = item;
+    this.coll = coll;
   }
 
   /**
    * Standard constructor.
-   * @param d data reference
-   * @param p pre value
-   * @param i id
-   * @param c collection
+   * @param data data reference
+   * @param pre pre value
+   * @param id id
+   * @param coll collection
    */
-  BXXMLResource(final Data d, final int p, final String i, final Collection c) {
-    id = i;
-    coll = c;
-    data = d;
-    pos = p;
+  BXXMLResource(final Data data, final int pre, final String id, final Collection coll) {
+    this.id = id;
+    this.coll = coll;
+    this.data = data;
+    this.pre = pre;
   }
 
   @Override
@@ -99,13 +98,14 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
       try {
         // serialize and cache content
         final ArrayOutput ao = new ArrayOutput();
-        final Serializer ser = Serializer.get(ao);
-        if(data != null) {
-          ser.serialize(new DBNode(data, pos));
-        } else if(result != null) {
-          result.serialize(ser, pos);
-        } else {
-          return null;
+        try(final Serializer ser = Serializer.get(ao, SerializerMode.NOINDENT.get())) {
+          if(data != null) {
+            ser.serialize(new DBNode(data, pre));
+          } else if(item != null) {
+            ser.serialize(item);
+          } else {
+            return null;
+          }
         }
         content = ao.toArray();
       } catch(final IOException ex) {
@@ -136,15 +136,14 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
 
   @Override
   public String getDocumentId() throws XMLDBException {
-    // throw exception if resource result from query; does not conform to the
+    // throw exception if resource results from query; does not conform to the
     // specs, but many query results are not related to a document anymore
-    if(result != null)
-     throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_DOC);
+    if(item != null) throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_DOC);
 
     // resource does not result from a query - return normal id
     if(id != null) return id;
     // get document root id
-    int p = pos;
+    int p = pre;
     while(p >= 0) {
       final int k = data.kind(p);
       if(k == Data.DOC) return string(data.text(p, true));
@@ -155,7 +154,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
 
   @Override
   public Node getContentAsDOM() {
-    if(!(content instanceof Node)) content = new BXDoc(new DBNode(data, pos));
+    if(!(content instanceof Node)) content = new BXDoc(new DBNode(data, pre));
     return (Node) content;
   }
 
@@ -188,22 +187,23 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
   /** SAX parser. */
   private static final class BXSAXContentHandler extends SAXHandler {
     /** XMLResource. */
-    private final BXXMLResource res;
+    private final BXXMLResource resource;
 
     /**
      * Default constructor.
-     * @param mb memory builder
-     * @param r resource
+     * @param builder memory builder
+     * @param resource resource
      */
-    BXSAXContentHandler(final BXXMLResource r, final MemBuilder mb) {
-      super(mb, false, false);
-      res = r;
+    BXSAXContentHandler(final BXXMLResource resource, final MemBuilder builder) {
+      super(builder, false, false);
+      this.resource = resource;
     }
 
     @Override
     public void endDocument() throws SAXException {
       try {
-        res.content = new DBNode(((MemBuilder) builder).data()).serialize().toArray();
+        resource.content = new DBNode(((MemBuilder) builder).data()).serialize(
+            SerializerMode.NOINDENT.get()).toArray();
       } catch(final QueryIOException ex) {
         error(new BaseXException(ex));
       }

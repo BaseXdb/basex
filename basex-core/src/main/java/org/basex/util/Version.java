@@ -5,7 +5,7 @@ import static org.basex.util.Token.*;
 /**
  * Version according to the SemVer syntax.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Rositsa Shadura
  */
 public final class Version implements Comparable<Version> {
@@ -30,7 +30,7 @@ public final class Version implements Comparable<Version> {
    */
   public Version(final byte[] version) {
     final byte[][] versions = split(version, '.');
-    major = toInt(versions[0]);
+    major = versions.length > 0 ? toInt(versions[0]) : -1;
     minor = versions.length > 1 ? toInt(versions[1]) : -1;
     patch = versions.length > 2 ? toInt(versions[2]) : -1;
   }
@@ -65,7 +65,6 @@ public final class Version implements Comparable<Version> {
 
   @Override
   public String toString() {
-    return major + (minor == -1 ? "" : "." + minor +
-        (patch == -1 ? "" : "." + patch));
+    return major + (minor == -1 ? "" : "." + minor + (patch == -1 ? "" : "." + patch));
   }
 }

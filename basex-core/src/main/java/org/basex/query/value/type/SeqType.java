@@ -1,24 +1,20 @@
 package org.basex.query.value.type;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
-import static org.basex.query.util.Err.*;
 
-import org.basex.data.*;
 import org.basex.query.*;
-import org.basex.query.func.*;
-import org.basex.query.iter.*;
-import org.basex.query.path.*;
-import org.basex.query.util.*;
+import org.basex.query.expr.path.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
  * Stores a sequence type definition.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class SeqType {
@@ -114,6 +110,10 @@ public final class SeqType {
   public static final SeqType AAT_ZO = new SeqType(AtomType.AAT, Occ.ZERO_ONE);
   /** Zero or more xs:anyAtomicType. */
   public static final SeqType AAT_ZM = new SeqType(AtomType.AAT, Occ.ZERO_MORE);
+  /** Zero or one xs:numeric. */
+  public static final SeqType NUM = AtomType.NUM.seqType();
+  /** Zero or one xs:numeric. */
+  public static final SeqType NUM_ZO = new SeqType(AtomType.NUM, Occ.ZERO_ONE);
   /** Single xs:boolean. */
   public static final SeqType BLN = AtomType.BLN.seqType();
   /** Zero or one xs:boolean. */
@@ -136,14 +136,6 @@ public final class SeqType {
   public static final SeqType ITR_ZM = new SeqType(AtomType.ITR, Occ.ZERO_MORE);
   /** One or more integers. */
   public static final SeqType ITR_OM = new SeqType(AtomType.ITR, Occ.ONE_MORE);
-  /** One or more bytes. */
-  public static final SeqType BYT_OM = new SeqType(AtomType.BYT, Occ.ONE_MORE);
-  /** Single node. */
-  public static final SeqType NOD = NodeType.NOD.seqType();
-  /** Zero or one nodes. */
-  public static final SeqType NOD_ZO = new SeqType(NodeType.NOD, Occ.ZERO_ONE);
-  /** Zero or more nodes. */
-  public static final SeqType NOD_ZM = new SeqType(NodeType.NOD, Occ.ZERO_MORE);
   /** Single QName. */
   public static final SeqType QNM = AtomType.QNM.seqType();
   /** Zero or one QNames. */
@@ -154,6 +146,8 @@ public final class SeqType {
   public static final SeqType URI_ZO = new SeqType(AtomType.URI, Occ.ZERO_ONE);
   /** Zero or more URIs. */
   public static final SeqType URI_ZM = new SeqType(AtomType.URI, Occ.ZERO_MORE);
+  /** Single language. */
+  public static final SeqType LAN = AtomType.LAN.seqType();
   /** Single string. */
   public static final SeqType STR = AtomType.STR.seqType();
   /** Zero or one strings. */
@@ -180,24 +174,35 @@ public final class SeqType {
   public static final SeqType TIM_ZO = new SeqType(AtomType.TIM, Occ.ZERO_ONE);
   /** Zero or one duration. */
   public static final SeqType DUR_ZO = new SeqType(AtomType.DUR, Occ.ZERO_ONE);
-  /** Zero of single function. */
-  public static final SeqType FUN_OZ = new SeqType(FuncType.ANY_FUN, Occ.ZERO_ONE);
-  /** Single function. */
-  public static final SeqType FUN_O = FuncType.ANY_FUN.seqType();
-  /** Zero of more functions. */
-  public static final SeqType FUN_ZM = new SeqType(FuncType.ANY_FUN, Occ.ZERO_MORE);
   /** Zero or more bytes. */
   public static final SeqType BYT_ZM = new SeqType(AtomType.BYT, Occ.ZERO_MORE);
+  /** One xs:hexBinary. */
+  public static final SeqType HEX = AtomType.HEX.seqType();
+  /** Single xs:base64Binary. */
+  public static final SeqType B64 = AtomType.B64.seqType();
+  /** Zero or one xs:base64Binary. */
+  public static final SeqType B64_ZO = new SeqType(AtomType.B64, Occ.ZERO_ONE);
+  /** Zero or more xs:base64Binary. */
+  public static final SeqType B64_ZM = new SeqType(AtomType.B64, Occ.ZERO_MORE);
+  /** Single binary. */
+  public static final SeqType BIN = AtomType.BIN.seqType();
+
+  /** Single node. */
+  public static final SeqType NOD = NodeType.NOD.seqType();
+  /** Zero or one nodes. */
+  public static final SeqType NOD_ZO = new SeqType(NodeType.NOD, Occ.ZERO_ONE);
+  /** Zero or more nodes. */
+  public static final SeqType NOD_ZM = new SeqType(NodeType.NOD, Occ.ZERO_MORE);
   /** One attribute node. */
   public static final SeqType ATT = NodeType.ATT.seqType();
+  /** Zero or one attribute. */
+  public static final SeqType ATT_ZO = new SeqType(NodeType.ATT, Occ.ZERO_ONE);
   /** One comment node. */
   public static final SeqType COM = NodeType.COM.seqType();
   /** One document node. */
   public static final SeqType DOC_O = NodeType.DOC.seqType();
   /** Zero or one document node. */
   public static final SeqType DOC_ZO = new SeqType(NodeType.DOC, Occ.ZERO_ONE);
-  /** One or more document node. */
-  public static final SeqType DOC_OM = new SeqType(NodeType.DOC, Occ.ONE_MORE);
   /** Zero or more document node. */
   public static final SeqType DOC_ZM = new SeqType(NodeType.DOC, Occ.ZERO_MORE);
   /** One element node. */
@@ -211,27 +216,31 @@ public final class SeqType {
   /** Namespace node. */
   public static final SeqType TXT_ZO = new SeqType(NodeType.TXT, Occ.ZERO_ONE);
 
+  /** Any function type. */
+  public static final FuncType ANY_FUN = new FuncType(null, (SeqType[]) null);
+  /** The general array type. */
+  public static final ArrayType ANY_ARRAY = new ArrayType(ITEM_ZM);
   /** The general map type. */
   public static final MapType ANY_MAP = new MapType(AtomType.AAT, ITEM_ZM);
+
+  /** Zero of single function. */
+  public static final SeqType FUN_OZ = new SeqType(ANY_FUN, Occ.ZERO_ONE);
   /** Single function. */
+  public static final SeqType FUN_O = ANY_FUN.seqType();
+  /** Zero of more functions. */
+  public static final SeqType FUN_ZM = new SeqType(ANY_FUN, Occ.ZERO_MORE);
+  /** Zero or more maps. */
   public static final SeqType MAP_ZM = new SeqType(ANY_MAP, Occ.ZERO_MORE);
-  /** Single function. */
+  /** Zero or one map. */
+  public static final SeqType MAP_ZO = new SeqType(ANY_MAP, Occ.ZERO_ONE);
+  /** Single map. */
   public static final SeqType MAP_O = new SeqType(ANY_MAP);
-  /** One xs:hexBinary. */
-  public static final SeqType HEX = AtomType.HEX.seqType();
-  /** Single xs:base64Binary. */
-  public static final SeqType B64 = AtomType.B64.seqType();
-  /** Zero or one xs:base64Binary. */
-  public static final SeqType B64_ZO = new SeqType(AtomType.B64, Occ.ZERO_ONE);
-  /** Zero or more xs:base64Binary. */
-  public static final SeqType B64_ZM = new SeqType(AtomType.B64, Occ.ZERO_MORE);
+  /** Zero or more arrays. */
+  public static final SeqType ARRAY_ZM = new SeqType(ANY_ARRAY, Occ.ZERO_MORE);
+  /** Single array. */
+  public static final SeqType ARRAY_O = ANY_ARRAY.seqType();
 
-  /** Single binary. */
-  public static final SeqType BIN = AtomType.BIN.seqType();
-  /** Zero or more binaries. */
-  public static final SeqType BIN_ZM = new SeqType(AtomType.BIN, Occ.ZERO_MORE);
-
-  /** Sequence type. */
+  /** Item type. */
   public final Type type;
   /** Number of occurrences. */
   public final Occ occ;
@@ -248,7 +257,7 @@ public final class SeqType {
   }
 
   /**
-   * Constructor. This one is called by {@link Type#seqType} to create
+   * Constructor. This one is called by {@link Type#seqType()} to create
    * unique sequence type instances.
    * @param type type
    */
@@ -293,11 +302,11 @@ public final class SeqType {
    * Returns a sequence type.
    * @param type type
    * @param occ occurrences
-   * @param test kind test
+   * @param kind kind test
    * @return sequence type
    */
-  public static SeqType get(final Type type, final Occ occ, final Test test) {
-    return test == null ? get(type, occ) : new SeqType(type, occ, test);
+  public static SeqType get(final Type type, final Occ occ, final Test kind) {
+    return kind == null ? get(type, occ) : new SeqType(type, occ, kind);
   }
 
   /**
@@ -310,138 +319,111 @@ public final class SeqType {
   }
 
   /**
+   * Returns a version of this sequence type that is adapted to the given {@link Occ}.
+   * @param o occurrence indicator
+   * @return sequence type
+   */
+  public SeqType withSize(final long o) {
+    return withOcc(o == 0 ? Occ.ZERO : o == 1 ? Occ.ONE : o > 1 ? Occ.ONE_MORE : Occ.ZERO_MORE);
+  }
+
+  /**
    * Matches a value against this sequence type.
-   * @param val value to be checked
+   * @param value value to be checked
    * @return result of check
    */
-  public boolean instance(final Value val) {
-    final long size = val.size();
+  public boolean instance(final Value value) {
+    final long size = value.size();
     if(!occ.check(size)) return false;
     for(long i = 0; i < size; i++) {
-      if(!instance(val.itemAt(i), true)) return false;
-      if(i == 0 && val.homogeneous()) break;
+      if(!instance(value.itemAt(i))) return false;
+      if(i == 0 && value.homogeneous()) break;
     }
     return true;
   }
 
   /**
-   * Checks if an item can be part of a sequence that is instance of this type.
-   * @param it item to check
-   * @param knd check kind
+   * Checks if the specified item can be part of a sequence that is instance of this type.
+   * @param item item to check
    * @return result of check
    */
-  private boolean instance(final Item it, final boolean knd) {
-    // maps don't have type information attached to them, you have to look...
-    return type instanceof MapType
-      ? it instanceof Map && ((Map) it).hasType((MapType) type)
-      : it.type.instanceOf(type) && (!knd || kind == null || kind.eq(it));
+  public boolean instance(final Item item) {
+    return item.instanceOf(type) && (kind == null || kind.eq(item));
   }
 
   /**
    * Tries to cast the given item to this sequence type.
-   * @param it item to cast
+   * @param item item to cast
    * @param qc query context
    * @param sc static context
-   * @param ii input info
-   * @param e expression for error message
+   * @param info input info
+   * @param error return error
    * @return promoted item
    * @throws QueryException query exception
    */
-  public Value cast(final Item it, final QueryContext qc, final StaticContext sc,
-      final InputInfo ii, final ExprInfo e) throws QueryException {
+  public Value cast(final Item item, final QueryContext qc, final StaticContext sc,
+      final InputInfo info, final boolean error) throws QueryException {
 
-    if(it == null) {
-      if(!occ.check(0)) throw INVEMPTYEX.get(ii, e, this);
-      return Empty.SEQ;
+    if(item.type.eq(type)) return item;
+    try {
+      if(!error && info != null) info.check(true);
+      final Value v = type.cast(item, qc, sc, info);
+      if(kind != null) {
+        for(final Item i : v) if(!kind.eq(item)) throw castError(info, i, type);
+      }
+      return v;
+    } catch(final QueryException ex) {
+      if(error) throw ex;
+      return null;
+    } finally {
+      if(!error && info != null) info.check(false);
     }
-
-    if(!occ.check(1)) throw INVCAST.get(ii, it.type, this);
-    final Value v = it.type.eq(type) ? it : type.cast(it, qc, sc, ii);
-    if(kind != null) {
-      for(final Item i : v) if(!kind.eq(it)) throw Err.castError(ii, type, i);
-    }
-    return v;
   }
 
   /**
    * Casts a sequence to this type.
-   * @param val value to cast
+   * @param value value to cast
    * @param qc query context
    * @param sc static context
    * @param ii input info
-   * @param e expression
    * @return resulting value
    * @throws QueryException query exception
    */
-  public Value cast(final Value val, final QueryContext qc, final StaticContext sc,
-      final InputInfo ii, final ExprInfo e) throws QueryException {
-    if(val.size() < 2) return cast(val.isEmpty() ? null : val.itemAt(0), qc, sc, ii, e);
+  public Value cast(final Value value, final QueryContext qc, final StaticContext sc,
+      final InputInfo ii) throws QueryException {
 
-    if(!occ.check(val.size())) throw INVCAST.get(ii, val.type(), this);
-    final ValueBuilder vb = new ValueBuilder((int) val.size());
-    for(int i = 0; i < val.size(); i++) vb.add(cast(val.itemAt(i), qc, sc, ii, e));
+    final long vs = value.size();
+    if(!occ.check(vs)) throw INVCAST_X_X_X.get(ii, value.seqType(), this, value);
+
+    if(value.isEmpty()) return Empty.SEQ;
+    if(value instanceof Item) return cast((Item) value, qc, sc, ii, true);
+
+    final ValueBuilder vb = new ValueBuilder();
+    for(final Item it : value) vb.add(cast(it, qc, sc, ii, true));
     return vb.value();
   }
 
   /**
    * Checks the specified value for this sequence type.
-   * @param val value to be checked
+   * @param value value to be checked
    * @param ii input info
    * @throws QueryException query exception
    */
-  public void treat(final Value val, final InputInfo ii) throws QueryException {
-    if(val.type().instanceOf(this)) return;
+  public void treat(final Value value, final InputInfo ii) throws QueryException {
+    if(value.seqType().instanceOf(this)) return;
 
-    final int size = (int) val.size();
-    if(!occ.check(size)) throw Err.treatError(ii, this, val);
+    final int size = (int) value.size();
+    if(!occ.check(size)) throw INVTREAT_X_X_X.get(ii, value.seqType(), this, value);
 
     // empty sequence has all types
     if(size == 0) return;
     // check first item
-    boolean ins = instance(val.itemAt(0), true);
+    boolean ins = instance(value.itemAt(0));
 
     // check heterogeneous sequences
-    if(!val.homogeneous())
-      for(int i = 1; ins && i < size; i++) ins = instance(val.itemAt(i), true);
-    if(!ins) throw Err.treatError(ii, this, val);
-  }
-
-  /**
-   * Promotes an item to the type of this sequence type.
-   * @param qc query context
-   * @param sc static context
-   * @param ii input info
-   * @param it item to promote
-   * @param opt if the result should be optimized
-   * @return promoted item
-   * @throws QueryException query exception
-   */
-  private Value promote(final QueryContext qc, final StaticContext sc, final InputInfo ii,
-      final Item it, final boolean opt) throws QueryException {
-
-    if(type instanceof AtomType) {
-      final Item atom = StandardFunc.atom(it, ii);
-      if(atom != it && atom.type.instanceOf(type)) return it;
-      if(atom.type == AtomType.ATM) {
-        if(type.nsSensitive()) {
-          if(sc.xquery3()) throw NSSENS.get(ii, it.type, type);
-          throw Err.treatError(ii, withOcc(Occ.ONE), it);
-        }
-        return type.cast(atom, qc, sc, ii);
-      }
-
-      final Type at = atom.type, tt = type;
-      if(tt == AtomType.DBL && (at.instanceOf(AtomType.FLT) || at.instanceOf(AtomType.DEC)))
-        return Dbl.get(atom.dbl(ii));
-      if(tt == AtomType.FLT && at.instanceOf(AtomType.DEC))
-        return Flt.get(atom.flt(ii));
-      if(tt == AtomType.STR && at.instanceOf(AtomType.URI))
-        return Str.get(atom.string(ii));
-    } else if(it instanceof FItem && type instanceof FuncType) {
-      return ((FItem) it).coerceTo((FuncType) type, qc, ii, opt);
-    }
-
-    throw Err.treatError(ii, withOcc(Occ.ONE), it);
+    if(!value.homogeneous())
+      for(int i = 1; ins && i < size; i++) ins = instance(value.itemAt(i));
+    if(!ins) throw INVTREAT_X_X_X.get(ii, value.seqType(), this, value);
   }
 
   /**
@@ -449,40 +431,72 @@ public final class SeqType {
    * @param qc query context
    * @param sc static context
    * @param ii input info
-   * @param val value to convert
+   * @param value value to convert
    * @param opt if the result should be optimized
    * @return converted value
    * @throws QueryException if the conversion was not possible
    */
   public Value promote(final QueryContext qc, final StaticContext sc, final InputInfo ii,
-      final Value val, final boolean opt) throws QueryException {
+      final Value value, final boolean opt) throws QueryException {
 
-    final long n = val.size();
-    if(!occ.check(n)) throw Err.treatError(ii, this, val);
+    final int n = (int) value.size();
+    if(!occ.check(n)) throw INVPROMOTE_X_X_X.get(ii, value.seqType(), withOcc(Occ.ONE), value);
+
     if(n == 0) return Empty.SEQ;
-    if(val.isItem())
-      return instance((Item) val, true) ? val : promote(qc, sc, ii, (Item) val, opt);
 
-    ValueBuilder vb = null;
-    final Item fst = val.itemAt(0);
-    if(!instance(fst, true)) {
-      vb = new ValueBuilder(new Item[(int) val.size()], 0);
-      vb.add(promote(qc, sc, ii, fst, opt));
-    } else if(val.homogeneous()) {
-      return val;
-    }
-
-    for(int i = 1; i < n; i++) {
-      final Item it = val.itemAt(i);
-      if(vb != null) {
-        vb.add(instance(it, true) ? it : promote(qc, sc, ii, it, opt));
-      } else if(!instance(it, true)) {
-        vb = new ValueBuilder(new Item[(int) val.size()], 0);
-        for(int j = 0; j < i; j++) vb.add(val.itemAt(j));
-        vb.add(promote(qc, sc, ii, it, opt));
+    ItemList cache = null;
+    for(int i = 0; i < n; i++) {
+      final Item it = value.itemAt(i);
+      if(instance(it)) {
+        if(i == 0 && value.homogeneous()) return value;
+        if(cache != null) cache.add(it);
+      } else {
+        if(cache == null) {
+          cache = new ItemList(n);
+          for(int j = 0; j < i; j++) cache.add(value.itemAt(j));
+        }
+        promote(qc, sc, ii, it, opt, cache);
       }
     }
-    return vb != null ? Seq.get(vb.items(), (int) vb.size(), type) : val;
+    return cache != null ? cache.value(type) : value;
+  }
+
+  /**
+   * Promotes an item to the type of this sequence type.
+   * @param qc query context
+   * @param sc static context
+   * @param ii input info
+   * @param item item to promote
+   * @param opt if the result should be optimized
+   * @param cache item cache
+   * @throws QueryException query exception
+   */
+  public void promote(final QueryContext qc, final StaticContext sc, final InputInfo ii,
+      final Item item, final boolean opt, final ItemList cache) throws QueryException {
+
+    if(type instanceof AtomType) {
+      for(final Item atom : item.atomValue(ii)) {
+        final Type tp = atom.type;
+        if(tp.instanceOf(type)) {
+          cache.add(atom);
+        } else if(tp == AtomType.ATM) {
+          if(type.nsSensitive()) throw NSSENS_X_X.get(ii, item.type, type);
+          for(final Item it : type.cast(atom, qc, sc, ii)) cache.add(it);
+        } else if(type == AtomType.DBL && (tp == AtomType.FLT || tp.instanceOf(AtomType.DEC))) {
+          cache.add(Dbl.get(atom.dbl(ii)));
+        } else if(type == AtomType.FLT && tp.instanceOf(AtomType.DEC)) {
+          cache.add(Flt.get(atom.flt(ii)));
+        } else if(type == AtomType.STR && atom instanceof Uri) {
+          cache.add(Str.get(atom.string(ii)));
+        } else {
+          throw INVPROMOTE_X_X_X.get(ii, item.seqType(), withOcc(Occ.ONE), item);
+        }
+      }
+    } else if(item instanceof FItem && type instanceof FuncType) {
+      cache.add(((FItem) item).coerceTo((FuncType) type, qc, ii, opt));
+    } else {
+      throw INVPROMOTE_X_X_X.get(ii, item.seqType(), withOcc(Occ.ONE), item);
+    }
   }
 
   /**
@@ -564,6 +578,14 @@ public final class SeqType {
   }
 
   /**
+   * Tests if the type exactly one or more items.
+   * @return result of check
+   */
+  public boolean oneOrMore() {
+    return occ.min >= 1;
+  }
+
+  /**
    * Tests if the type may yield zero items.
    * @return result of check
    */
@@ -572,11 +594,20 @@ public final class SeqType {
   }
 
   /**
-   * Tests if the type may be numeric.
+   * Tests if the type may be numeric. User for predicate rewritings.
    * @return result of check
    */
   public boolean mayBeNumber() {
     return type.isNumber() || AtomType.AAT.instanceOf(type);
+  }
+
+  /**
+   * Tests if the type may be an array.
+   * @return result of check
+   */
+  public boolean mayBeArray() {
+    return !(type.instanceOf(AtomType.AAT) || type instanceof ListType || type instanceof MapType ||
+        type instanceof NodeType);
   }
 
   /**
@@ -595,9 +626,20 @@ public final class SeqType {
    * @return result of check
    */
   public boolean instanceOf(final SeqType t) {
-    return (t.type == AtomType.ITEM || type.instanceOf(t.type)) && occ.instanceOf(t.occ)
+    return (t.type == AtomType.ITEM || type.instanceOf(t.type)) && occ.instanceOf(t.occ) &&
       // [LW] complete kind check
-      && (t.kind == null || kind != null && kind.intersect(t.kind) != null);
+      (t.kind == null || kind != null && kind.intersect(t.kind) != null);
+  }
+
+  /**
+   * Returns a string representation of the type.
+   * @return string
+   */
+  public String typeString() {
+    final StringBuilder sb = new StringBuilder();
+    sb.append(occ == Occ.ZERO ? EMPTY_SEQUENCE + "()" : type);
+    if(kind != null) sb.deleteCharAt(sb.length() - 1).append(kind).append(')');
+    return sb.toString();
   }
 
   @Override
@@ -609,17 +651,6 @@ public final class SeqType {
       sb.append(typeString());
     }
     if(!(type instanceof ListType)) sb.append(occ);
-    return sb.toString();
-  }
-
-  /**
-   * Returns a string representation of the type.
-   * @return string
-   */
-  public String typeString() {
-    final StringBuilder sb = new StringBuilder();
-    sb.append(occ == Occ.ZERO ? EMPTY_SEQUENCE + "()" : type);
-    if(kind != null) sb.deleteCharAt(sb.length() - 1).append(kind).append(')');
     return sb.toString();
   }
 }

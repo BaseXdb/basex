@@ -4,19 +4,16 @@ import static org.junit.Assert.*;
 
 import java.io.*;
 
-import org.basex.build.*;
-import org.basex.core.*;
-import org.basex.core.cmd.*;
-import org.basex.io.*;
 import org.basex.*;
+import org.basex.io.*;
+import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.junit.*;
-import org.junit.Test;
 
 /**
  * Test index updates when using memory storage ({@link MemData}).
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Dimitar Popov
  */
 public class MemDataTest extends SandboxTest {
@@ -33,7 +30,7 @@ public class MemDataTest extends SandboxTest {
    */
   @Before
   public void setUp() throws IOException {
-    data = MemBuilder.build(new IOContent(XML), context);
+    data = new DBNode(new IOContent(XML)).data();
     context.openDB(data);
   }
 
@@ -46,76 +43,69 @@ public class MemDataTest extends SandboxTest {
 
   /**
    * Replace value update test.
-   * @throws BaseXException query exception
    */
   @Test
-  public void replaceValue() throws BaseXException {
-    new XQuery("replace value of node /a/b with 'test2'").execute(context);
-    final String o = new XQuery("/a/b[text() = 'test']").execute(context);
+  public void replaceValue() {
+    query("replace value of node /a/b with 'test2'");
+    final String o = query("/a/b[text() = 'test']");
     assertTrue("Old node found", o.isEmpty());
-    final String n = new XQuery("/a/b[text() = 'test2']").execute(context);
+    final String n = query("/a/b[text() = 'test2']");
     assertFalse("New node not found", n.isEmpty());
   }
 
   /**
    * Replace node update test.
-   * @throws BaseXException query exception
    */
   @Test
-  public void replaceNode() throws BaseXException {
-    new XQuery("replace node /a/b with <d f='test2'/>").execute(context);
-    final String o = new XQuery("/a/b").execute(context);
+  public void replaceNode() {
+    query("replace node /a/b with <d f='test2'/>");
+    final String o = query("/a/b");
     assertTrue("Old node found", o.isEmpty());
-    final String n = new XQuery("//d[@f = 'test2']").execute(context);
+    final String n = query("//d[@f = 'test2']");
     assertFalse("New node not found", n.isEmpty());
   }
 
   /**
    * Insert node update test.
-   * @throws BaseXException query exception
    */
   @Test
-  public void insertNode() throws BaseXException {
-    new XQuery("insert node <d>test2</d> as first into /a").execute(context);
-    final String r = new XQuery("//d[text() = 'test2']").execute(context);
+  public void insertNode() {
+    query("insert node <d>test2</d> as first into /a");
+    final String r = query("//d[text() = 'test2']");
     assertFalse("Node not found", r.isEmpty());
-    new XQuery("insert node <d>test2</d> as first into /a").execute(context);
-    final String c = new XQuery("count(//d[text() = 'test2'])").execute(context);
+    query("insert node <d>test2</d> as first into /a");
+    final String c = query("count(//d[text() = 'test2'])");
     assertEquals("Second node not found", 2, Integer.parseInt(c));
   }
 
-
   /**
    * Insert node update test.
-   * @throws BaseXException query exception
    */
   @Test
-  public void insertDuplicateNode() throws BaseXException {
-    new XQuery("insert node <d>test</d> as first into /a").execute(context);
-    final String r = new XQuery("//d[text() = 'test']").execute(context);
+  public void insertDuplicateNode() {
+    query("insert node <d>test</d> as first into /a");
+    final String r = query("//d[text() = 'test']");
     assertFalse("Node not found", r.isEmpty());
-    final String c = new XQuery("count(//*[text() = 'test'])").execute(context);
+    final String c = query("count(//*[text() = 'test'])");
     assertEquals("Second node not found", 2, Integer.parseInt(c));
   }
 
   /**
    * Delete node update test.
-   * @throws BaseXException query exception
    */
   @Test
-  public void deleteNode() throws BaseXException {
-    new XQuery("delete node //b").execute(context);
-    final String r = new XQuery("//*[text() = 'test']").execute(context);
+  public void deleteNode() {
+    query("delete node //b");
+    final String r = query("//*[text() = 'test']");
     assertTrue("Node not deleted", r.isEmpty());
   }
 
   /**
    * Try to find non-existing node.
-   * @throws BaseXException query exception
    */
   @Test
-  public void findNonexistingNode() throws BaseXException {
-    final String r = new XQuery("//*[text() = 'test0']").execute(context);
+  public void findNonexistingNode() {
+    final String r = query("//*[text() = 'test0']");
     assertTrue("Found non-existing node", r.isEmpty());
   }
 }

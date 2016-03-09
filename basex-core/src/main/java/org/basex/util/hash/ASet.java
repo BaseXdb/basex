@@ -6,12 +6,12 @@ import java.util.*;
  * This is the basic structure of an efficient and memory-saving hash set.
  * The first entry of the token set (offset 0) will always be kept empty.
  *
- * @author BaseX Team 2005-14, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class ASet {
   /** Hash table buckets. */
-  protected int[] bucket;
+  protected int[] buckets;
   /** Pointers to the next entry. */
   protected int[] next;
   /** Hash entries. The actual number of entries is {@code size - 1}. */
@@ -29,7 +29,7 @@ public abstract class ASet {
   protected ASet(final int capacity) {
     int c = 1;
     while(c < capacity) c <<= 1;
-    bucket = new int[c];
+    buckets = new int[c];
     next = new int[c];
   }
 
@@ -37,7 +37,7 @@ public abstract class ASet {
    * Resets the data structure. Must be called when data structure is initialized.
    */
   void clear() {
-    Arrays.fill(bucket, 0);
+    Arrays.fill(buckets, 0);
     size = 1;
   }
 
@@ -67,7 +67,7 @@ public abstract class ASet {
     final int s = size << 1;
     final int[] tmp = new int[s];
 
-    for(final int b : bucket) {
+    for(final int b : buckets) {
       int id = b;
       while(id != 0) {
         final int p = hash(id) & s - 1;
@@ -77,7 +77,7 @@ public abstract class ASet {
         id = nx;
       }
     }
-    bucket = tmp;
+    buckets = tmp;
     next = Arrays.copyOf(next, s);
     rehash(s);
   }
