@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 import javax.swing.event.*;
 import javax.swing.tree.*;
 
+import org.basex.core.*;
 import org.basex.data.*;
 
 /**
@@ -21,8 +22,8 @@ public abstract class TreeNode extends DefaultMutableTreeNode implements TreeWil
   final byte[] path;
   /** Tree reference for lazy loading. */
   final BaseXTree tree;
-  /** Data reference. */
-  final Data data;
+  /** Database context. */
+  final Context context;
   /** Updating. */
   boolean updating;
 
@@ -31,13 +32,13 @@ public abstract class TreeNode extends DefaultMutableTreeNode implements TreeWil
    * @param name displayed node name
    * @param path folder path
    * @param tree tree reference
-   * @param data data reference
+   * @param context database context
    */
-  TreeNode(final byte[] name, final byte[] path, final BaseXTree tree, final Data data) {
+  TreeNode(final byte[] name, final byte[] path, final BaseXTree tree, final Context context) {
     this.name = name;
     this.path = path;
     this.tree = tree;
-    this.data = data;
+    this.context = context;
     tree.addTreeWillExpandListener(this);
   }
 
