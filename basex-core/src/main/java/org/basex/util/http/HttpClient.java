@@ -105,7 +105,7 @@ public final class HttpClient {
         conn.setRequestProperty(AUTHORIZATION, BASIC + ' ' +
             org.basex.util.Base64.encode(user + ':' + pass));
 
-      } else {
+      } else if(request.authMethod == AuthMethod.DIGEST) {
         conn.setRequestProperty(AUTHORIZATION, DIGEST);
 
         final EnumMap<Request, String> map = digestHeaders(conn.getHeaderField(WWW_AUTHENTICATE));
