@@ -116,11 +116,9 @@ public final class HTTPContext {
     final String value = req.getHeader(AUTHORIZATION);
     if(value == null) return;
 
+    // overwrite credentials with client data (basic or digest)
     final String[] ams = Strings.split(value, ' ', 2);
     final AuthMethod am = StaticOptions.AUTHMETHOD.get(ams[0]);
-    if(am == null) throw new BaseXException(WHICHAUTH, value);
-
-    // overwrite credentials with client data (basic or digest)
     if(am == AuthMethod.BASIC) {
       final String details = ams.length > 1 ? ams[1] : "";
       final String[] cred = Strings.split(org.basex.util.Base64.decode(details), ':', 2);
