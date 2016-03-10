@@ -5,7 +5,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 
 /**
- * An XQuery main module.
+ * An XQuery library module.
  *
  * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler

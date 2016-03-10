@@ -781,15 +781,15 @@ public class QueryParser extends InputParser {
 
     // get absolute path
     final IO io = sc.resolve(path, uri);
-    final byte[] p = token(io.path());
+    final byte[] pth = token(io.path());
 
     // check if module has already been parsed
-    final byte[] u = qc.modParsed.get(p);
+    final byte[] u = qc.modParsed.get(pth);
     if(u != null) {
       if(!uri.equals(string(u))) throw WRONGMODULE_X_X_X.get(info, io.name(), uri, u);
       return;
     }
-    qc.modParsed.put(p, token(uri));
+    qc.modParsed.put(pth, token(uri));
 
     // read module
     final String qu;
@@ -799,7 +799,7 @@ public class QueryParser extends InputParser {
       throw error(WHICHMODFILE_X, io);
     }
 
-    qc.modStack.push(p);
+    qc.modStack.push(pth);
     final StaticContext sub = new StaticContext(qc);
     final LibraryModule lib = new QueryParser(qu, io.path(), qc, sub).parseLibrary(false);
     final byte[] muri = lib.name.uri();
