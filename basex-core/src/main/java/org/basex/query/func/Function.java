@@ -1075,7 +1075,7 @@ public enum Function {
       arg(FUN_O), MAP_ZO, UTIL_URI),
   /** XQuery function. */
   _INSPECT_STATIC_CONTEXT(InspectStaticContext.class, "static-context(function,name)",
-      arg(FUN_O, STR), ITEM_ZO, INSPECT_URI),
+      arg(FUN_O, STR), ITEM_ZM, INSPECT_URI),
   /** XQuery function. */
   _INSPECT_XQDOC(InspectXqdoc.class, "xqdoc(uri)", arg(STR), ELM, INSPECT_URI),
 

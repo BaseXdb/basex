@@ -24,31 +24,32 @@ public final class DecFormatter extends FormatUtil {
   private final byte[] digits;
   /** Active characters. */
   private final byte[] actives;
+
   /** Zero digit sign. */
-  private final int zero;
+  public final int zero;
 
   /** Infinity. */
-  private byte[] inf = token("Infinity");
+  public byte[] inf = token("Infinity");
   /** NaN. */
-  private byte[] nan = token("NaN");
+  public byte[] nan = token("NaN");
   /** Pattern-separator sign. */
-  private int pattern = ';';
+  public int pattern = ';';
 
   /** Decimal-separator sign. */
-  private int decimal = '.';
-  /** Grouping-separator sign. */
-  private int grouping = ',';
+  public int decimal = '.';
   /** Exponent-separator sign. */
-  private int exponent = 'e';
+  public int exponent = 'e';
+  /** Grouping-separator sign. */
+  public int grouping = ',';
   /** Optional-digit sign. */
-  private int optional = '#';
+  public int optional = '#';
 
   /** Minus sign. */
-  private int minus = '-';
+  public int minus = '-';
   /** Percent sign. */
-  private int percent = '%';
+  public int percent = '%';
   /** Permille sign. */
-  private int permille = '\u2030';
+  public int permille = '\u2030';
 
   /**
    * Default constructor.

@@ -435,6 +435,17 @@ public interface QueryText {
   /** Java prefix. */
   String JAVAPREF = "java:";
 
+  /** Parser token. */
+  String NAMESPACES = "namespaces";
+  /** Parser token. */
+  String ELEMENT_NAMESPACE = "element-namespace";
+  /** Parser token. */
+  String FUNCTION_NAMESPACE = "function-namespace";
+  /** Parser token. */
+  String DEFAULT_ORDER_EMPTY = "default-order-empty";
+  /** Parser token. */
+  String DECIMAL_FORMATS = "decimal-formats";
+
   // TOKENS ===================================================================
 
   /** Base token. */
