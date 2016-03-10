@@ -578,6 +578,9 @@ public final class EditorView extends View {
       }
     } else if(action != Action.CHECK) {
       info(null);
+    } else {
+      // no particular file format, no particular action: reset status info
+      info.setText(OK, Msg.SUCCESS);
     }
   }
 
