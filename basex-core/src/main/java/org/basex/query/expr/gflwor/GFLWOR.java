@@ -8,12 +8,13 @@ import org.basex.query.expr.path.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.Occ;
+import org.basex.query.value.type.SeqType.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -638,7 +639,7 @@ public final class GFLWOR extends ParseExpr {
           final Expr e = before.expr;
           if(e instanceof And) {
             final And and = (And) e;
-            and.exprs = Array.add(and.exprs, wh.expr);
+            and.exprs = ExprList.concat(and.exprs, wh.expr);
           } else {
             before.expr = new And(before.info, e, wh.expr);
           }

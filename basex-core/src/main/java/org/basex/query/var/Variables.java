@@ -62,9 +62,11 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
    * @throws QueryException query exception
    */
   public void check() throws QueryException {
-    for(final Entry<QNm, VarEntry> e : vars.entrySet()) {
-      final VarEntry ve = e.getValue();
-      if(ve.var == null) throw VARUNDEF_X.get(ve.refs[0].info, ve.refs[0]);
+    for(final VarEntry ve : vars.values()) {
+      if(ve.var == null) {
+        final StaticVarRef vr = ve.refs.get(0);
+        throw VARUNDEF_X.get(vr.info, vr);
+      }
     }
   }
 
@@ -142,14 +144,14 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
     /** The static variable. */
     StaticVar var;
     /** Variable references. */
-    StaticVarRef[] refs = { };
+    ArrayList<StaticVarRef> refs = new ArrayList<>(1);
 
     /**
      * Constructor.
-     * @param vr variable, possibly {@code null}
+     * @param var variable, possibly {@code null}
      */
-    VarEntry(final StaticVar vr) {
-      var = vr;
+    VarEntry(final StaticVar var) {
+      this.var = var;
     }
 
     /**
@@ -169,7 +171,7 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
      * @throws QueryException query exception
      */
     void addRef(final StaticVarRef ref) throws QueryException {
-      refs = Array.add(refs, new StaticVarRef[refs.length + 1], ref);
+      refs.add(ref);
       if(var != null) ref.init(var);
     }
   }

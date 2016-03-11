@@ -785,16 +785,16 @@ public class QueryParser extends InputParser {
 
     // get absolute path
     final IO io = sc.resolve(path, uri);
-    final byte[] pth = token(io.path());
+    final byte[] tPath = token(io.path());
 
     // check if module has already been parsed
-    final byte[] u = qc.modParsed.get(pth);
-    if(u != null) {
-      if(!uri.equals(string(u))) throw WRONGMODULE_X_X_X.get(info, io.name(), uri, u);
+    final byte[] tUri = token(uri), pUri = qc.modParsed.get(tPath);
+    if(pUri != null) {
+      if(!eq(tUri, pUri)) throw WRONGMODULE_X_X_X.get(info, io.name(), uri, pUri);
       return;
     }
-    qc.modParsed.put(pth, token(uri));
-    imports.put(token(uri));
+    qc.modParsed.put(tPath, tUri);
+    imports.put(tUri);
 
     // read module
     final String qu;
@@ -804,7 +804,7 @@ public class QueryParser extends InputParser {
       throw error(WHICHMODFILE_X, io);
     }
 
-    qc.modStack.push(pth);
+    qc.modStack.push(tPath);
     final StaticContext sub = new StaticContext(qc);
     final LibraryModule lib = new QueryParser(qu, io.path(), qc, sub).parseLibrary(false);
     final byte[] muri = lib.name.uri();
@@ -948,7 +948,7 @@ public class QueryParser extends InputParser {
       for(final Var v : args)
         if(v.name.eq(var.name)) throw error(FUNCDUPL_X, var);
 
-      args = Array.add(args, new Var[args.length + 1], var);
+      args = Array.add(args, var);
       if(!consume(',')) break;
     }
     return args;
@@ -1349,26 +1349,26 @@ public class QueryParser extends InputParser {
     if(!wsConsumeWs(SWITCH, PAREN1, TYPEPAR)) return null;
     final InputInfo ii = info();
     wsCheck(PAREN1);
-    final Expr expr = check(expr(), NOSWITCH);
-    SwitchCase[] exprs = { };
+    final Expr cond = check(expr(), NOSWITCH);
+    SwitchCase[] cases = { };
     wsCheck(PAREN2);
 
     // collect all cases
-    ExprList cases;
+    ExprList exprs;
     do {
-      cases = new ExprList(null);
-      while(wsConsumeWs(CASE)) add(cases, single());
-      if(cases.size() == 1) {
+      exprs = new ExprList(null);
+      while(wsConsumeWs(CASE)) add(exprs, single());
+      if(exprs.size() == 1) {
         // add default case
-        if(exprs.length == 0) throw error(WRONGCHAR_X_X, CASE, found());
+        if(cases.length == 0) throw error(WRONGCHAR_X_X, CASE, found());
         wsCheck(DEFAULT);
       }
       wsCheck(RETURN);
-      cases.set(0, check(single(), NOSWITCH));
-      exprs = Array.add(exprs, new SwitchCase(info(), cases.finish()));
-    } while(cases.size() != 1);
+      exprs.set(0, check(single(), NOSWITCH));
+      cases = Array.add(cases, new SwitchCase(info(), exprs.finish()));
+    } while(exprs.size() != 1);
 
-    return new Switch(ii, expr, exprs);
+    return new Switch(ii, cond, cases);
   }
 
   /**
@@ -3162,10 +3162,10 @@ public class QueryParser extends InputParser {
   private Expr tryCatch() throws QueryException {
     if(!wsConsumeWs(TRY)) return null;
 
-    final Expr tr = enclosedExpr();
+    final Expr expr = enclosedExpr();
     wsCheck(CATCH);
 
-    Catch[] ct = { };
+    Catch[] catches = { };
     do {
       NameTest[] codes = { };
       do {
@@ -3183,10 +3183,10 @@ public class QueryParser extends InputParser {
       c.expr = enclosedExpr();
       localVars.closeScope(s);
 
-      ct = Array.add(ct, c);
+      catches = Array.add(catches, c);
     } while(wsConsumeWs(CATCH));
 
-    return new Try(info(), tr, ct);
+    return new Try(info(), expr, catches);
   }
 
   /**

@@ -95,7 +95,8 @@ public final class StaticOptions extends Options {
   /** Authorization method. */
   public enum AuthMethod {
     /** Basic.  */ BASIC,
-    /** Digest. */ DIGEST;
+    /** Digest. */ DIGEST,
+    /** Custom. */ CUSTOM;
 
     @Override
     public String toString() {

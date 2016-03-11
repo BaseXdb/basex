@@ -116,21 +116,21 @@ public final class HTTPContext {
     final String value = req.getHeader(AUTHORIZATION);
     if(value == null) return;
 
+    // overwrite credentials with client data (basic or digest)
     final String[] ams = Strings.split(value, ' ', 2);
     final AuthMethod am = StaticOptions.AUTHMETHOD.get(ams[0]);
-    if(am == null) throw new BaseXException(WHICHAUTH, value);
-
-    // overwrite credentials with client data (basic or digest)
     if(am == AuthMethod.BASIC) {
       final String details = ams.length > 1 ? ams[1] : "";
       final String[] cred = Strings.split(org.basex.util.Base64.decode(details), ':', 2);
       if(cred.length != 2) throw new BaseXException(NOUSERNAME);
       username = cred[0];
       password = cred[1];
-    } else { // (will always be) digest
+    } else if(am == AuthMethod.DIGEST) {
       final EnumMap<Request, String> map = HttpClient.digestHeaders(value);
       username = map.get(Request.USERNAME);
       password = map.get(Request.RESPONSE);
+    } else {
+      // custom authorization
     }
   }
 
@@ -306,8 +306,7 @@ public final class HTTPContext {
 
       if(auth == AuthMethod.BASIC) {
         if(password == null || !us.matches(password)) throw new LoginException();
-      } else {
-        // digest authentication
+      } else if(auth == AuthMethod.DIGEST) {
         final EnumMap<Request, String> map = HttpClient.digestHeaders(req.getHeader(AUTHORIZATION));
         final String am = map.get(Request.AUTH_METHOD);
         if(!AuthMethod.DIGEST.toString().equals(am)) throw new LoginException(DIGESTAUTH);
@@ -331,6 +330,8 @@ public final class HTTPContext {
         rsp.append(':').append(ha2);
 
         if(!Strings.md5(rsp.toString()).equals(password)) throw new LoginException();
+      } else {
+        // custom authorization
       }
       context.blocker.remove(address);
       return us;

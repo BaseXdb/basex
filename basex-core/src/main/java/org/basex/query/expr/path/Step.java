@@ -13,6 +13,7 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.path.Test.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -179,12 +180,11 @@ public abstract class Step extends Preds {
 
   /**
    * Adds predicates to the step.
-   * @param prds predicates to be added
+   * @param add predicates to be added
    * @return resulting step instance
    */
-  final Step addPreds(final Expr... prds) {
-    for(final Expr pred : prds) preds = Array.add(preds, pred);
-    return get(info, axis, test, preds);
+  final Step addPreds(final Expr... add) {
+    return get(info, axis, test, ExprList.concat(preds, add));
   }
 
   /**

@@ -39,17 +39,25 @@ public final class PartFunc extends Arr {
   public PartFunc(final StaticContext sc, final InputInfo info, final Expr expr, final Expr[] args,
       final int[] holes) {
 
-    super(info, Array.add(args, expr));
+    super(info, ExprList.concat(args, expr));
     this.sc = sc;
     this.holes = holes;
     seqType = SeqType.FUN_O;
   }
 
+  /**
+   * Returns the function body expression.
+   * @return body
+   */
+  private Expr body() {
+    return exprs[exprs.length - 1];
+  }
+
   @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
-    final Expr f = exprs[exprs.length - 1];
     if(allAreValues()) return preEval(qc);
 
+    final Expr f = body();
     final SeqType t = f.seqType();
     if(t.instanceOf(SeqType.FUN_O) && t.type != SeqType.ANY_FUN) {
       final FuncType ft = (FuncType) t.type;
@@ -67,7 +75,7 @@ public final class PartFunc extends Arr {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final FItem f = toFunc(exprs[exprs.length - 1], qc);
+    final FItem f = toFunc(body(), qc);
 
     final int hl = holes.length;
     final int nargs = exprs.length + hl - 1;
@@ -107,7 +115,7 @@ public final class PartFunc extends Arr {
 
   @Override
   public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    return new PartFunc(sc, info, exprs[exprs.length - 1].copy(qc, scp, vs),
+    return new PartFunc(sc, info, body().copy(qc, scp, vs),
         copyAll(qc, scp, vs, Arrays.copyOf(exprs, exprs.length - 1)), holes.clone());
   }
 
@@ -126,19 +134,9 @@ public final class PartFunc extends Arr {
     plan.add(e);
   }
 
-  /**
-   * Returns the function annotations.
-   * @return annotations
-   */
-  public AnnList annotations() {
-    final Expr fn = exprs[exprs.length - 1];
-    if(!(fn instanceof FItem)) return null;
-    return ((FItem) fn).annotations();
-  }
-
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(exprs[exprs.length - 1].toString()).add('(');
+    final TokenBuilder tb = new TokenBuilder(body().toString()).add('(');
     int p = -1;
     final int es = exprs.length, hs = holes.length;
     for(int i = 0; i < hs; i++) {

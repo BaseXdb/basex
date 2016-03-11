@@ -18,8 +18,6 @@ public interface HTTPText {
 
   /** Error: credentials missing. */
   String NOUSERNAME = "No username specified.";
-  /** Error: unsupported authorization method. */
-  String WHICHAUTH = "Unsupported authentication method: %.";
   /** Error: digest authorization. */
   String DIGESTAUTH = "Digest authentication expected.";
   /** Error message. */

@@ -39,17 +39,17 @@ public final class StaticContext {
   SeqType contextType;
 
   /** Construction mode. */
-  boolean strip;
+  public boolean strip;
   /** Ordering mode. */
-  boolean ordered;
+  public boolean ordered = true;
   /** Default order for empty sequences. */
-  boolean orderGreatest;
+  public boolean orderGreatest;
   /** Boundary-space policy. */
-  boolean spaces;
+  public boolean spaces;
   /** Copy-namespaces mode: (no-)preserve. */
-  boolean preserveNS = true;
+  public boolean preserveNS = true;
   /** Copy-namespaces mode: (no-)inherit. */
-  boolean inheritNS = true;
+  public boolean inheritNS = true;
 
   /** Static Base URI. */
   private Uri baseURI = Uri.EMPTY;

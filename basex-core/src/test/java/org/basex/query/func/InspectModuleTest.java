@@ -146,7 +146,21 @@ public final class InspectModuleTest extends AdvancedQueryTest {
         "http://www.w3.org/2005/xpath-functions");
     query(_INSPECT_STATIC_CONTEXT.args(" ()", "collation"),
         "http://www.w3.org/2005/xpath-functions/collation/codepoint");
+    query(_INSPECT_STATIC_CONTEXT.args(" ()", "boundary-space"), "strip");
+    query(_INSPECT_STATIC_CONTEXT.args(" ()", "ordering"), "ordered");
+    query(_INSPECT_STATIC_CONTEXT.args(" ()", "construction"), "preserve");
+    query(_INSPECT_STATIC_CONTEXT.args(" ()", "default-order-empty"), "least");
+    query("declare boundary-space preserve;" +
+        _INSPECT_STATIC_CONTEXT.args(" ()", "boundary-space"), "preserve");
+    query(_INSPECT_STATIC_CONTEXT.args(" ()", "copy-namespaces"), "preserve\ninherit");
+    query(_INSPECT_STATIC_CONTEXT.args(" ()", "decimal-formats") + "('')('percent')", "%");
 
+    // check different function types
+    query(_INSPECT_STATIC_CONTEXT.args(" true#0", "boundary-space"), "strip");
+    query(_INSPECT_STATIC_CONTEXT.args(" function(){}", "boundary-space"), "strip");
+    query(_INSPECT_STATIC_CONTEXT.args(" function($a){}(?)", "boundary-space"), "strip");
+
+    // errors
     error(_INSPECT_STATIC_CONTEXT.args(" ()", "unknown"), INSPECT_UNKNOWN_X);
   }
 }
