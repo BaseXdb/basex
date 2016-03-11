@@ -2,7 +2,6 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
-import static org.basex.util.Array.*;
 
 import java.util.*;
 
@@ -10,8 +9,8 @@ import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
-import org.basex.query.value.array.Array;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.Map;
 import org.basex.query.value.node.*;
@@ -61,7 +60,7 @@ public final class DynFuncCall extends FuncCall {
   public DynFuncCall(final InputInfo info, final StaticContext sc, final boolean upd,
       final boolean ndt, final Expr expr, final Expr... arg) {
 
-    super(info, add(arg, expr));
+    super(info, ExprList.concat(arg, expr));
     this.sc = sc;
     this.upd = upd;
     this.ndt = ndt;
@@ -88,7 +87,7 @@ public final class DynFuncCall extends FuncCall {
     }
 
     // maps and arrays can only contain fully evaluated values, so this is safe
-    if((f instanceof Map || f instanceof Array) && allAreValues())
+    if((f instanceof Map || f instanceof org.basex.query.value.array.Array) && allAreValues())
       return optPre(value(qc), qc);
 
     if(f instanceof XQFunctionExpr) {
@@ -118,7 +117,7 @@ public final class DynFuncCall extends FuncCall {
    */
   public void markInlined(final FuncItem it) {
     final int hash = it.hashCode();
-    inlinedFrom = inlinedFrom == null ? new int[] { hash } : add(inlinedFrom, hash);
+    inlinedFrom = inlinedFrom == null ? new int[] { hash } : Array.add(inlinedFrom, hash);
   }
 
   /**

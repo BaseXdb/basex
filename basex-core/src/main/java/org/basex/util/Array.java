@@ -54,6 +54,7 @@ public final class Array {
     return tmp;
   }
 
+
   /**
    * Adds an entry to the end of an array and returns the new array.
    * @param array array to be resized
@@ -66,20 +67,6 @@ public final class Array {
     final T[] t = Arrays.copyOf(array, s + 1);
     t[s] = entry;
     return t;
-  }
-
-  /**
-   * Adds an entry to the end of an array and returns the specified new array.
-   * @param array array to be resized
-   * @param target target array (must have one more entry than the source array)
-   * @param entry entry to be added
-   * @param <T> array type
-   * @return array
-   */
-  public static <T> T[] add(final T[] array, final T[] target, final T entry) {
-    copy(array, target);
-    target[array.length] = entry;
-    return target;
   }
 
   /**

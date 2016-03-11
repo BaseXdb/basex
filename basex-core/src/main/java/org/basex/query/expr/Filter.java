@@ -8,6 +8,7 @@ import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;
@@ -102,7 +103,7 @@ public abstract class Filter extends Preds {
    * @return self reference
    */
   public Expr addPred(final Expr p) {
-    preds = Array.add(preds, new Expr[preds.length + 1], p);
+    preds = new ExprList(preds.length + 1).add(preds).add(p).finish();
     return new CachedFilter(info, root, preds);
   }
 
