@@ -17,8 +17,8 @@ public abstract class Module extends StaticScope {
   private final TokenObjMap<StaticFunc> funcs;
   /** Static variables. */
   private final TokenObjMap<StaticVar> vars;
-  /** Namespace URIs of imported modules. */
-  private final TokenSet imports;
+  /** Namespace URIs of imported modules (currently not used). */
+  protected final TokenSet imports;
 
   /**
    * Constructor.
