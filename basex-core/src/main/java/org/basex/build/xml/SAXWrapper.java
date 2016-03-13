@@ -68,7 +68,30 @@ public final class SAXWrapper extends SingleParser {
       saxh = new SAXHandler(builder, options.get(MainOptions.CHOP),
           options.get(MainOptions.STRIPNS));
       final String cat = options.get(MainOptions.CATFILE);
-      if(!cat.isEmpty()) CatalogWrapper.set(r, cat);
+      if(!cat.isEmpty()) {
+        // System.out.println("+ [DEBUG] parse(): cat=\"" + cat + "\"");
+        String url = cat;
+        if (!url.matches("(file|http):/")) {
+          // System.out.println("+ [DEBUG] parse(): not a URL, make it one.");
+          if (url.contains("\\")) {
+            url = url.replace("\\", "//");
+          }
+           // System.out.println("+ [DEBUG] parse(): trying to make URL from the file path...");
+           File f = new File(url);
+           try {
+            url = f.toURI().toURL().toExternalForm();
+            // System.out.println("+ [DEBUG] parse(): url=\"" + url + "\"");
+
+          } catch(Exception e) {
+            // System.out.println("+ [DEBUG] parse(): Got unexpected " + e.getClass().getSimpleName() );
+            // Should never happen but if it does, not much we can do at this point
+            // Not sure how to report this exception usefully.
+          }
+        }
+        // System.out.println("+ [DEBUG] parse(): Before set(), url=\"" + url + "\"");
+
+        CatalogWrapper.set(r, url);
+      };
 
       r.setDTDHandler(saxh);
       r.setContentHandler(saxh);
