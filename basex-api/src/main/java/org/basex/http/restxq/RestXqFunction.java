@@ -7,7 +7,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
-import java.util.Map.Entry;
+import java.util.Map.*;
 import java.util.Set;
 import java.util.regex.*;
 
@@ -18,16 +18,14 @@ import org.basex.build.html.*;
 import org.basex.build.json.*;
 import org.basex.build.text.*;
 import org.basex.core.*;
-import org.basex.core.Context;
 import org.basex.http.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
-import org.basex.query.expr.path.Test.Kind;
+import org.basex.query.expr.path.Test.*;
 import org.basex.query.func.*;
-import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -41,7 +39,7 @@ import org.basex.util.options.*;
 /**
  * This class represents a single RESTXQ function.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class RestXqFunction implements Comparable<RestXqFunction> {
@@ -50,37 +48,38 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
   /** EQName pattern. */
   private static final Pattern EQNAME = Pattern.compile("^Q\\{(.*?)\\}(.*)$");
 
-  /** Supported methods. */
-  final Set<String> methods = new HashSet<>();
-  /** Serialization parameters. */
-  final SerializerOptions output;
-  /** Associated function. */
-  final StaticFunc function;
-  /** Associated module. */
-  private final RestXqModule module;
-  /** Path. */
-  RestXqPath path;
-
-  /** Error. */
-  private RestXqError error;
-  /** Query parameters. */
-  private final ArrayList<RestXqParam> errorParams = new ArrayList<>();
-
   /** Query parameters. */
   final ArrayList<RestXqParam> queryParams = new ArrayList<>();
   /** Form parameters. */
   final ArrayList<RestXqParam> formParams = new ArrayList<>();
   /** Header parameters. */
   final ArrayList<RestXqParam> headerParams = new ArrayList<>();
-  /** Cookie parameters. */
-  private final ArrayList<RestXqParam> cookieParams = new ArrayList<>();
-
-  /** Query context. */
-  private final QueryContext qc;
-  /** Consumed media types. */
-  private final ArrayList<MediaType> consumes = new ArrayList<>();
   /** Returned media types. */
   final ArrayList<MediaType> produces = new ArrayList<>();
+
+  /** Supported methods. */
+  final Set<String> methods = new HashSet<>();
+  /** Serialization parameters. */
+  final SerializerOptions output;
+  /** Associated function. */
+  final StaticFunc function;
+
+  /** Associated module. */
+  private final RestXqModule module;
+  /** Query parameters. */
+  private final ArrayList<RestXqParam> errorParams = new ArrayList<>();
+
+  /** Cookie parameters. */
+  private final ArrayList<RestXqParam> cookieParams = new ArrayList<>();
+  /** Consumed media types. */
+  private final ArrayList<MediaType> consumes = new ArrayList<>();
+
+  /** Path. */
+  RestXqPath path;
+  /** Function key for single instances. */
+  String key;
+  /** Error. */
+  private RestXqError error;
   /** Post/Put variable. */
   private QNm requestBody;
 
@@ -92,7 +91,6 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    */
   RestXqFunction(final StaticFunc function, final QueryContext qc, final RestXqModule module) {
     this.function = function;
-    this.qc = qc;
     this.module = module;
     output = qc.serParams();
   }
@@ -129,9 +127,10 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
       if(sig == null) continue;
 
       found |= eq(sig.uri, QueryText.REST_URI);
+      final Item[] args = ann.args();
       if(sig == _REST_PATH) {
         try {
-          path = new RestXqPath(toString(ann.args[0]), ann.info);
+          path = new RestXqPath(toString(args[0]), ann.info);
         } catch(final IllegalArgumentException ex) {
           throw error(ann.info, ex.getMessage());
         }
@@ -153,11 +152,14 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
       } else if(sig == _REST_ERROR_PARAM) {
         errorParams.add(param(ann, declared));
       } else if(sig == _REST_METHOD) {
-        final String mth = toString(ann.args[0]).toUpperCase(Locale.ENGLISH);
-        final Item body = ann.args.length > 1 ? ann.args[1] : null;
+        final String mth = toString(args[0]).toUpperCase(Locale.ENGLISH);
+        final Item body = args.length > 1 ? args[1] : null;
         addMethod(mth, body, declared, ann.info);
+      } else if(sig == _REST_SINGLE) {
+        key = "\u0000" + (args.length > 0 ? toString(args[0]) :
+          (function.info.path() + ':' + function.info.line()));
       } else if(eq(sig.uri, QueryText.REST_URI)) {
-        final Item body = ann.args.length == 0 ? null : ann.args[0];
+        final Item body = args.length == 0 ? null : args[0];
         addMethod(string(sig.local()), body, declared, ann.info);
       } else if(sig == _INPUT_CSV) {
         final CsvParserOptions opts = new CsvParserOptions(options.get(MainOptions.CSVPARSER));
@@ -174,7 +176,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
       } else if(eq(sig.uri, QueryText.OUTPUT_URI)) {
         // serialization parameters
         try {
-          output.assign(string(sig.local()), toString(ann.args[0]));
+          output.assign(string(sig.local()), toString(args[0]));
         } catch(final BaseXException ex) {
           throw error(ann.info, UNKNOWN_SER, sig.local());
         }
@@ -203,7 +205,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @throws Exception any exception
    */
   private static <O extends Options> O parse(final O opts, final Ann ann) throws Exception {
-    for(final Item arg : ann.args) opts.parse(string(arg.string(ann.info)));
+    for(final Item arg : ann.args()) opts.assign(string(arg.string(ann.info)));
     return opts;
   }
 
@@ -246,43 +248,44 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @param http http context
    * @param arg argument array
    * @param err optional query error
+   * @param qc query context
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  void bind(final HTTPContext http, final Expr[] arg, final QueryException err)
-      throws QueryException, IOException {
+  void bind(final HTTPContext http, final Expr[] arg, final QueryException err,
+      final QueryContext qc) throws QueryException, IOException {
 
     // bind variables from segments
     if(path != null) {
       for(final Entry<QNm, String> entry : path.values(http).entrySet()) {
         final QNm qnm = new QNm(entry.getKey().string(), function.sc);
         if(function.sc.elemNS != null && eq(qnm.uri(), function.sc.elemNS)) qnm.uri(EMPTY);
-        bind(qnm, arg, new Atm(entry.getValue()));
+        bind(qnm, arg, new Atm(entry.getValue()), qc);
       }
     }
 
     // bind request body in the correct format
-    final MainOptions options = http.context(false).options;
+    final MainOptions mo = http.context(false).options;
     if(requestBody != null) {
       try {
-        bind(requestBody, arg, HttpPayload.value(http.params.body(), options, http.contentType()));
+        bind(requestBody, arg, HttpPayload.value(http.params.body(), mo, http.contentType()), qc);
       } catch(final IOException ex) {
         throw error(INPUT_CONV, ex);
       }
     }
 
     // bind query and form parameters
-    for(final RestXqParam rxp : queryParams) bind(rxp, arg, http.params.query().get(rxp.key));
-    for(final RestXqParam rxp : formParams) bind(rxp, arg, http.params.form(options).get(rxp.key));
+    for(final RestXqParam rxp : queryParams) bind(rxp, arg, http.params.query().get(rxp.name), qc);
+    for(final RestXqParam rxp : formParams) bind(rxp, arg, http.params.form(mo).get(rxp.name), qc);
 
     // bind header parameters
     for(final RestXqParam rxp : headerParams) {
       final TokenList tl = new TokenList();
-      final Enumeration<?> en =  http.req.getHeaders(rxp.key);
+      final Enumeration<?> en =  http.req.getHeaders(rxp.name);
       while(en.hasMoreElements()) {
         for(final String s : en.nextElement().toString().split(", *")) tl.add(s);
       }
-      bind(rxp, arg, StrSeq.get(tl));
+      bind(rxp, arg, StrSeq.get(tl), qc);
     }
 
     // bind cookie parameters
@@ -291,10 +294,10 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
       Value val = Empty.SEQ;
       if(ck != null) {
         for(final Cookie c : ck) {
-          if(rxp.key.equals(c.getName())) val = Str.get(c.getValue());
+          if(rxp.name.equals(c.getName())) val = Str.get(c.getValue());
         }
       }
-      bind(rxp, arg, val);
+      bind(rxp, arg, val, qc);
     }
 
     // bind errors
@@ -305,7 +308,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
       final int nl = names.length;
       for(int n = 0; n < nl; n++) errs.put(string(names[n].local()), values[n]);
     }
-    for(final RestXqParam rxp : errorParams) bind(rxp, arg, errs.get(rxp.key));
+    for(final RestXqParam rxp : errorParams) bind(rxp, arg, errs.get(rxp.name), qc);
   }
 
   /**
@@ -436,11 +439,12 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @param args argument array
    * @param value values to be bound; the parameter's default value is assigned
    *        if the argument is {@code null} or empty
+   * @param qc query context
    * @throws QueryException query exception
    */
-  private void bind(final RestXqParam rxp, final Expr[] args, final Value value)
-      throws QueryException {
-    bind(rxp.name, args, value == null || value.isEmpty() ? rxp.value : value);
+  private void bind(final RestXqParam rxp, final Expr[] args, final Value value,
+      final QueryContext qc) throws QueryException {
+    bind(rxp.var, args, value == null || value.isEmpty() ? rxp.value : value, qc);
   }
 
   /**
@@ -448,9 +452,12 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @param name variable name
    * @param args argument array
    * @param value value to be bound
+   * @param qc query context
    * @throws QueryException query exception
    */
-  private void bind(final QNm name, final Expr[] args, final Value value) throws QueryException {
+  private void bind(final QNm name, final Expr[] args, final Value value, final QueryContext qc)
+      throws QueryException {
+
     // skip nulled values
     if(value == null) return;
 
@@ -484,7 +491,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @param list list to add values to
    */
   private static void strings(final Ann ann, final ArrayList<MediaType> list) {
-    for(final Item it : ann.args) list.add(new MediaType(toString(it)));
+    for(final Item it : ann.args()) list.add(new MediaType(toString(it)));
   }
 
   /**
@@ -496,15 +503,15 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    */
   private RestXqParam param(final Ann ann, final boolean... declared) throws QueryException {
     // name of parameter
-    final Item[] args = ann.args;
-    final String key = toString(args[0]);
+    final Item[] args = ann.args();
+    final String name = toString(args[0]);
     // variable template
-    final QNm qnm = checkVariable(toString(args[1]), declared);
+    final QNm var = checkVariable(toString(args[1]), declared);
     // default value
     final int al = args.length;
     final ValueBuilder vb = new ValueBuilder();
     for(int a = 2; a < al; a++) vb.add(args[a]);
-    return new RestXqParam(qnm, key, vb.value());
+    return new RestXqParam(var, name, vb.value());
   }
 
   /**
@@ -516,10 +523,9 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     if(error == null) error = new RestXqError();
 
     // name of parameter
-    final int al = ann.args.length;
     NameTest last = error.get(0);
-    for(int a = 0; a < al; a++) {
-      final String err = toString(ann.args[a]);
+    for(final Item arg : ann.args()) {
+      final String err = toString(arg);
       final Kind kind;
       QNm qnm = null;
       if(err.equals("*")) {

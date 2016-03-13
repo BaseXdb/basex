@@ -13,7 +13,7 @@ import org.basex.util.*;
 /**
  * Update primitive for the {@link Function#_DB_RESTORE} function.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Lukas Kircher
  */
 public final class DBRestore extends NameUpdate {
@@ -46,7 +46,7 @@ public final class DBRestore extends NameUpdate {
   }
 
   @Override
-  public void prepare() throws QueryException { }
+  public void prepare() { }
 
   @Override
   public String operation() { return "restored"; }

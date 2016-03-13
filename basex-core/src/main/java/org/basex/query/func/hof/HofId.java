@@ -12,7 +12,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public class HofId extends StandardFunc {
@@ -32,7 +32,7 @@ public class HofId extends StandardFunc {
   }
 
   @Override
-  protected final Expr opt(final QueryContext qc, final VarScope scp) throws QueryException {
+  protected final Expr opt(final QueryContext qc, final VarScope scp) {
     return exprs[0];
   }
 }

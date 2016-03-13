@@ -4,6 +4,7 @@ import org.basex.core.locks.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.io.random.*;
+import org.basex.query.*;
 import org.basex.query.util.pkg.*;
 import org.basex.query.value.seq.*;
 import org.basex.server.*;
@@ -17,14 +18,18 @@ import org.basex.util.list.*;
  * all operations, as it organizes concurrent data access, ensuring that no
  * process will concurrently write to the same data instances.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Context {
+  /** Client listener. Set to {@code null} in standalone/server mode. */
+  public final ClientListener listener;
   /** Blocked clients. */
   public final ClientBlocker blocker;
+  /** Asynchronous queries. */
+  public final QueryPool queries;
   /** Options. */
-  public final MainOptions options = new MainOptions();
+  public final MainOptions options;
   /** Static options. */
   public final StaticOptions soptions;
   /** Client sessions. */
@@ -33,15 +38,12 @@ public final class Context {
   public final Datas datas;
   /** Users. */
   public final Users users;
-  /** Package repository. */
-  public final Repo repo;
+  /** EXPath package repository. */
+  public final EXPathRepo repo;
   /** Databases list. */
   public final Databases databases;
   /** Log. */
   public final Log log;
-
-  /** Client listener. Set to {@code null} in standalone/server mode. */
-  public ClientListener listener;
 
   /** Current node context. Set if it does not contain all documents of the current database. */
   private DBNodes current;
@@ -77,20 +79,12 @@ public final class Context {
   }
 
   /**
-   * Constructor, called by clients, and adopting the variables of the main process.
+   * Constructor, called by clients, and adopting the variables of the specified context.
    * The {@link #user} reference must be set after calling this method.
    * @param ctx context of the main process
    */
   public Context(final Context ctx) {
-    soptions = ctx.soptions;
-    datas = ctx.datas;
-    sessions = ctx.sessions;
-    databases = ctx.databases;
-    blocker = ctx.blocker;
-    locks = ctx.locks;
-    users = ctx.users;
-    repo = ctx.repo;
-    log = ctx.log;
+    this(ctx, null);
   }
 
   /**
@@ -100,8 +94,18 @@ public final class Context {
    * @param listener client listener
    */
   public Context(final Context ctx, final ClientListener listener) {
-    this(ctx);
     this.listener = listener;
+    soptions = ctx.soptions;
+    options = new MainOptions(ctx.options);
+    datas = ctx.datas;
+    sessions = ctx.sessions;
+    databases = ctx.databases;
+    blocker = ctx.blocker;
+    locks = ctx.locks;
+    users = ctx.users;
+    repo = ctx.repo;
+    log = ctx.log;
+    queries = ctx.queries;
   }
 
   /**
@@ -110,6 +114,7 @@ public final class Context {
    */
   private Context(final StaticOptions soptions) {
     this.soptions = soptions;
+    options = new MainOptions();
     datas = new Datas();
     sessions = new Sessions();
     blocker = new ClientBlocker();
@@ -117,9 +122,11 @@ public final class Context {
     locks = soptions.get(StaticOptions.GLOBALLOCK) ? new ProcLocking(soptions) :
       new DBLocking(soptions);
     users = new Users(soptions);
-    repo = new Repo(soptions);
+    repo = new EXPathRepo(soptions);
     log = new Log(soptions);
+    queries = new QueryPool();
     user = users.get(UserText.ADMIN);
+    listener = null;
   }
 
   /**
@@ -147,6 +154,7 @@ public final class Context {
     while(!sessions.isEmpty()) sessions.get(0).quit();
     datas.close();
     log.close();
+    queries.close();
   }
 
   /**
@@ -216,7 +224,7 @@ public final class Context {
   }
 
   /**
-   * Invalidates the current node set.
+   * Invalidates the current node set. Will be recreated once it is requested.
    */
   public void invalidate() {
     current = null;

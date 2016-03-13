@@ -4,11 +4,12 @@ import java.util.*;
 
 import org.basex.query.util.fingertree.*;
 import org.basex.query.value.*;
+import org.basex.util.*;
 
 /**
  * A leaf node containing {@link Value}s.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 final class LeafNode implements Node<Value, Value> {
@@ -221,7 +222,7 @@ final class LeafNode implements Node<Value, Value> {
   @Override
   public long checkInvariants() {
     if(values.length < Array.MIN_LEAF || values.length > Array.MAX_LEAF)
-      throw new AssertionError("Wrong " + getClass().getSimpleName() + " size: " + values.length);
+      throw new AssertionError("Wrong " + Util.className(this) + " size: " + values.length);
     return values.length;
   }
 
@@ -237,6 +238,6 @@ final class LeafNode implements Node<Value, Value> {
 
   @Override
   public String toString() {
-    return getClass().getSimpleName() + "(" + size() + ")" + Arrays.toString(values);
+    return Util.className(this) + "(" + size() + ")" + Arrays.toString(values);
   }
 }

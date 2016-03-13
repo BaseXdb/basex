@@ -16,7 +16,7 @@ import org.basex.util.list.*;
 /**
  * Fn:put operation primitive.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Lukas Kircher
  */
 public final class Put extends DBUpdate {
@@ -49,8 +49,9 @@ public final class Put extends DBUpdate {
       final DBNode node = new DBNode(data, pre);
       try(final PrintOutput po = new PrintOutput(u)) {
         // try to reproduce non-chopped documents correctly
-        final SerializerOptions so = SerializerOptions.get(node.data().meta.chop);
-        try(final Serializer ser = Serializer.get(po, so)) {
+        final SerializerOptions sopts =
+            (node.data().meta.chop ? SerializerMode.DEFAULT : SerializerMode.NOINDENT).get();
+        try(final Serializer ser = Serializer.get(po, sopts)) {
           ser.serialize(node);
         }
       } catch(final IOException ex) {
@@ -75,5 +76,5 @@ public final class Put extends DBUpdate {
   }
 
   @Override
-  public void prepare(final MemData tmp) { }
+  public void prepare() { }
 }

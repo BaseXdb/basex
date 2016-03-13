@@ -10,13 +10,15 @@ import org.basex.index.name.*;
 import org.basex.index.path.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.path.Test.Kind;
+import org.basex.query.expr.path.Test.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.query.value.type.SeqType.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -24,12 +26,12 @@ import org.basex.util.hash.*;
 /**
  * Abstract axis step expression.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class Step extends Preds {
   /** Axis. */
-  Axis axis;
+  public Axis axis;
   /** Kind test. */
   public final Test test;
 
@@ -73,13 +75,7 @@ public abstract class Step extends Preds {
     super(info, preds);
     this.axis = axis;
     this.test = test;
-    seqType = SeqType.NOD_ZM;
-  }
-
-  @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    super.compile(qc, scp);
-    return optimize(qc, scp);
+    seqType = SeqType.get(test.type, Occ.ZERO_MORE);
   }
 
   @Override
@@ -184,12 +180,11 @@ public abstract class Step extends Preds {
 
   /**
    * Adds predicates to the step.
-   * @param prds predicates to be added
+   * @param add predicates to be added
    * @return resulting step instance
    */
-  final Step addPreds(final Expr... prds) {
-    for(final Expr pred : prds) preds = Array.add(preds, pred);
-    return get(info, axis, test, preds);
+  final Step addPreds(final Expr... add) {
+    return get(info, axis, test, ExprList.concat(preds, add));
   }
 
   /**

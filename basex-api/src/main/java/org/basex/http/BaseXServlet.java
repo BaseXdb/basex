@@ -19,7 +19,7 @@ import org.basex.util.*;
 /**
  * <p>Base class for all servlets.</p>
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class BaseXServlet extends HttpServlet {
@@ -70,7 +70,7 @@ public abstract class BaseXServlet extends HttpServlet {
     } catch(final IOException | QueryException ex) {
       http.status(SC_BAD_REQUEST, Util.message(ex), restxq);
     } catch(final ProcException ex) {
-      http.status(SC_BAD_REQUEST, Text.INTERRUPTED, restxq);
+      http.status(SC_GONE, Text.INTERRUPTED, restxq);
     } catch(final Exception ex) {
       final String msg = Util.bug(ex);
       Util.errln(msg);

@@ -5,10 +5,10 @@ import org.basex.query.util.ft.*;
 /**
  * This interface provides methods for returning index results.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public abstract class FTIndexIterator extends IndexIterator {
+public abstract class FTIndexIterator implements IndexIterator {
   /** Empty iterator. */
   public static final FTIndexIterator FTEMPTY = new FTIndexIterator() {
     @Override

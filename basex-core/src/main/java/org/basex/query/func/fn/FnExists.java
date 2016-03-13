@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class FnExists extends StandardFunc {
@@ -24,8 +24,7 @@ public final class FnExists extends StandardFunc {
   protected Expr opt(final QueryContext qc, final VarScope scp) {
     // ignore non-deterministic expressions (e.g.: error())
     final Expr e = exprs[0];
-    return e.size() == -1 || e.has(Flag.NDT) || e.has(Flag.CNS) || e.has(Flag.UPD) ? this :
-      Bln.get(e.size() != 0);
+    return e.size() == -1 || e.has(Flag.NDT) || e.has(Flag.UPD) ? this : Bln.get(e.size() != 0);
   }
 
   @Override
@@ -33,7 +32,7 @@ public final class FnExists extends StandardFunc {
     // if(exists(node*)) -> if(node*)
     final Expr e = exprs[0];
     if(e.seqType().type instanceof NodeType) {
-      qc.compInfo(QueryText.OPTWRITE, this);
+      qc.compInfo(QueryText.OPTREWRITE_X, this);
       return e;
     }
     return this;

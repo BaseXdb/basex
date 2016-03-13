@@ -8,7 +8,7 @@ import org.basex.util.*;
  * This class assembles text string and tokens required by the XQuery processor
  * implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public interface QueryText {
@@ -151,6 +151,8 @@ public interface QueryText {
   /** Parser token. */
   String INTO = "into";
   /** Parser token. */
+  String INVOKE = "invoke";
+  /** Parser token. */
   String ITEMM = "item";
   /** Parser token. */
   String LANGUAGE = "language";
@@ -179,11 +181,13 @@ public interface QueryText {
   /** Parser token. */
   String NEXT = "next";
   /** Parser token. */
-  String NSPACE = "namespace";
+  String NAMESPACE = "namespace";
   /** Parser token. */
   String NO_INHERIT = "no-inherit";
   /** Parser token. */
   String NO_PRESERVE = "no-preserve";
+  /** Parser token. */
+  String NON_DETERMINISTIC = "non-deterministic";
   /** Parser token. */
   String NODE = "node";
   /** Parser token. */
@@ -218,12 +222,8 @@ public interface QueryText {
   String PRESERVE = "preserve";
   /** Parser token. */
   String PREVIOUS = "previous";
-  /** Public token. */
-  String PRIVATE = "private";
   /** Parser token. */
   String PI = "processing-instruction";
-  /** Public token. */
-  String PUBLIC = "public";
   /** Parser token. */
   String RELATIONSHIP = "relationship";
   /** Parser token. */
@@ -432,14 +432,24 @@ public interface QueryText {
   /** Parser token. */
   String ARROW = "=>";
 
+  /** Java prefix. */
+  String JAVAPREF = "java:";
+
+  /** Parser token. */
+  String NAMESPACES = "namespaces";
+  /** Parser token. */
+  String ELEMENT_NAMESPACE = "element-namespace";
+  /** Parser token. */
+  String FUNCTION_NAMESPACE = "function-namespace";
+  /** Parser token. */
+  String DEFAULT_ORDER_EMPTY = "default-order-empty";
+  /** Parser token. */
+  String DECIMAL_FORMATS = "decimal-formats";
+
   // TOKENS ===================================================================
 
   /** Base token. */
   byte[] BASE = token("base");
-  /** ID token. */
-  byte[] ID = token("id");
-  /** IDRef token. */
-  byte[] IDREF = token("ref");
 
   /** Error token. */
   byte[] E_CODE = token("code");
@@ -538,6 +548,10 @@ public interface QueryText {
   byte[] SQL_PREFIX = token("sql");
   /** SQL token. */
   byte[] STREAM_PREFIX = token("stream");
+  /** Strings token. */
+  byte[] STRINGS_PREFIX = token("strings");
+  /** Async token. */
+  byte[] ASYNC_PREFIX = token("async");
   /** Binary token. */
   byte[] BIN_PREFIX = token("bin");
   /** Cryptography token. */
@@ -548,11 +562,13 @@ public interface QueryText {
   byte[] REPO_PREFIX = token("repo");
   /** User token. */
   byte[] USER_PREFIX = token("user");
+  /** Util token. */
+  byte[] UTIL_PREFIX = token("util");
   /** Validate token. */
-  byte[] VLDT_PREFIX = token("validate");
+  byte[] VALIDATE_PREFIX = token("validate");
   /** Web token. */
   byte[] WEB_PREFIX = token("web");
-  /** XQDoc token. */
+  /** Inspect token. */
   byte[] INSPECT_PREFIX = token("inspect");
   /** XQuery token. */
   byte[] XQUERY_PREFIX = token(XQUERY);
@@ -598,26 +614,26 @@ public interface QueryText {
   byte[] XQ_URI = token(W3_URI + "/2012/xquery");
 
   /** EXQuery URI. */
-  String EXQUERY = "http://exquery.org/ns/";
+  String EXQUERY_URI = "http://exquery.org/ns/";
   /** RESTXQ URI. */
-  byte[] REST_URI = token(EXQUERY + "restxq");
+  byte[] REST_URI = token(EXQUERY_URI + "restxq");
 
   /** EXPath URI. */
-  String EXPATH = "http://expath.org/ns/";
+  String EXPATH_URI = "http://expath.org/ns/";
   /** URI of Binary Module. */
-  byte[] BIN_URI = token(EXPATH + "binary");
+  byte[] BIN_URI = token(EXPATH_URI + "binary");
   /** URI of Cryptographic Module. */
-  byte[] CRYPTO_URI = token(EXPATH + "crypto");
+  byte[] CRYPTO_URI = token(EXPATH_URI + "crypto");
   /** URI of File Module. */
-  byte[] FILE_URI = token(EXPATH + "file");
+  byte[] FILE_URI = token(EXPATH_URI + "file");
   /** URI of HTTP Client Module. */
-  byte[] HTTP_URI = token(EXPATH + "http-client");
+  byte[] HTTP_URI = token(EXPATH_URI + "http-client");
   /** URI of Package API. */
-  byte[] PKG_URI = token(EXPATH + "pkg");
-  /** URI of ZIP Module.*/
-  byte[] ZIP_URI = token(EXPATH + "zip");
+  byte[] PKG_URI = token(EXPATH_URI + "pkg");
+  /** URI of ZIP Module. */
+  byte[] ZIP_URI = token(EXPATH_URI + "zip");
   /** URI of EXPath errors. */
-  byte[] EXPERROR_URI = token(EXPATH + "error");
+  byte[] EXPERROR_URI = token(EXPATH_URI + "error");
 
   /** Project URI. */
   byte[] BASEX_URI = token(Prop.URL);
@@ -628,8 +644,10 @@ public interface QueryText {
 
   /** Database module URI. */
   byte[] ADMIN_URI = token(BXMODULES_URI + "admin");
-  /** Archive module URI.*/
+  /** Archive module URI. */
   byte[] ARCHIVE_URI = token(BXMODULES_URI + "archive");
+  /** Async module URI. */
+  byte[] ASYNC_URI = token(BXMODULES_URI + "async");
   /** Client module URI. */
   byte[] CLIENT_URI = token(BXMODULES_URI + "client");
   /** Conversion module URI. */
@@ -672,10 +690,14 @@ public interface QueryText {
   byte[] SQL_URI = token(BXMODULES_URI + "sql");
   /** Streaming module URI. */
   byte[] STREAM_URI = token(BXMODULES_URI + "stream");
+  /** Strings module URI. */
+  byte[] STRINGS_URI = token(BXMODULES_URI + "strings");
   /** Unit module URI. */
   byte[] UNIT_URI = token(BXMODULES_URI + "unit");
   /** User module URI. */
   byte[] USER_URI = token(BXMODULES_URI + "user");
+  /** Utility module URI. */
+  byte[] UTIL_URI = token(BXMODULES_URI + "util");
   /** Validate module URI. */
   byte[] VALIDATE_URI = token(BXMODULES_URI + "validate");
   /** Web module URI. */
@@ -685,8 +707,6 @@ public interface QueryText {
   /** XSLT module URI. */
   byte[] XSLT_URI = token(BXMODULES_URI + "xslt");
 
-  /** Java prefix. */
-  byte[] JAVAPREF = token("java:");
   /** URI of default collation. */
   byte[] COLLATION_URI = concat(FN_URI, token("/collation/codepoint"));
 
@@ -784,55 +804,47 @@ public interface QueryText {
   /** Optimization info. */
   String OPTDESC = "rewriting descendant-or-self step(s)";
   /** Optimization info. */
-  String OPTATOMIC = "atomic evaluation of %";
+  String OPTATOMIC_X = "atomic evaluation of %";
   /** Optimization info. */
-  String OPTPRE = "pre-evaluating %";
+  String OPTPRE_X = "pre-evaluating %";
   /** Optimization info. */
-  String OPTWRITE = "rewriting %";
+  String OPTREWRITE_X = "rewriting %";
   /** Optimization info. */
-  String OPTFLAT = "flattening %";
+  String OPTFLAT_X_X = "flattening nested %: %";
   /** Optimization info. */
-  String OPTREMOVE = "%: removing %";
+  String OPTREMOVE_X_X = "%: removing %";
   /** Optimization info. */
-  String OPTTCE = "marking as tail call: %";
+  String OPTTCE_X = "marking as tail call: %";
   /** Optimization info. */
   String OPTFORLET = "moving for/let clauses";
   /** Optimization info. */
   String OPTFORTOLET = "rewriting singleton for to let";
   /** Optimization info. */
-  String OPTSWAP = "swapping operands: %";
+  String OPTSWAP_X = "swapping operands: %";
   /** Optimization info. */
   String OPTFLWOR = "simplifying flwor expression";
   /** Optimization info. */
-  String OPTINLINE = "inlining %";
+  String OPTINLINE_X = "inlining %";
   /** Optimization info. */
-  String OPTWHERE2 = "rewriting where clause(s)";
+  String OPTWHERE = "rewriting where clause(s)";
   /** Optimization info. */
-  String OPTPRED = "rewriting % to predicate(s)";
+  String OPTPRED_X = "rewriting % to predicate(s)";
   /** Optimization info. */
-  String OPTCAST = "removing redundant % cast.";
+  String OPTCAST_X = "removing redundant % cast.";
   /** Optimization info. */
-  String OPTVAR = "removing variable %";
+  String OPTVAR_X = "removing variable %";
   /** Optimization info. */
-  String OPTNAME = "removing unknown element/attribute %";
+  String OPTNAME_X = "removing unknown element/attribute %";
   /** Optimization info. */
-  String OPTPATH = "removing non-existing path %";
+  String OPTPATH_X = "removing non-existing path %";
   /** Optimization info. */
-  String OPTTXTINDEX = "applying text index for %";
-  /** Optimization info. */
-  String OPTATVINDEX = "applying attribute index for %";
-  /** Optimization info. */
-  String OPTFTXINDEX = "applying full-text index for %";
-  /** Optimization info. */
-  String OPTRNGINDEX = "applying range index for %";
-  /** Optimization info. */
-  String OPTSRNGINDEX = "applying string range index for %";
+  String OPTINDEX_X_X = "applying % index for %";
   /** Optimization info. */
   String OPTNOINDEX = "removing path with no index results";
   /** Optimization info. */
-  String OPTCHILD = "converting % to child steps";
+  String OPTCHILD_X = "converting % to child steps";
   /** Optimization info. */
-  String OPTUNROLL = "unrolling %";
+  String OPTUNROLL_X = "unrolling %";
 
   // DEBUGGING INFO
 

@@ -15,7 +15,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public class FnParseJson extends Parse {
@@ -44,30 +44,24 @@ public class FnParseJson extends Parse {
     final JsonParserOptions opts = new JsonParserOptions();
     if(exprs.length > 1) {
       final Map options = toMap(exprs[1], qc);
-      try {
-        new FuncOptions(null, info).acceptUnknown().parse(options, opts);
-      } catch(final QueryException ex) {
-        throw JSON_OPT_X.get(ii, ex.getLocalizedMessage());
-      }
+      new FuncOptions(null, info).acceptUnknown().assign(options, opts);
     }
 
-    final boolean unesc = opts.get(JsonParserOptions.UNESCAPE);
+    final boolean esc = opts.get(JsonParserOptions.ESCAPE);
     final FuncItem fb = opts.get(JsonParserOptions.FALLBACK);
     final FItem fallback;
     if(fb == null) {
       fallback = null;
     } else {
-      try {
-        fallback = STRFUNC.cast(fb, qc, sc, ii);
-      } catch(final QueryException ex) {
-        throw JSON_OPT_X.get(ii, ex.getLocalizedMessage());
-      }
+      fallback = STRFUNC.cast(fb, qc, sc, ii);
     }
+    if(esc && fallback != null) throw JSON_OPT_X.get(ii,
+        "Escaping cannot be combined with a fallback function.");
 
     try {
       opts.set(JsonOptions.FORMAT, xml ? JsonFormat.BASIC : JsonFormat.MAP);
       final JsonConverter conv = JsonConverter.get(opts);
-      if(unesc && fallback != null) conv.fallback(new JsonFallback() {
+      if(!esc && fallback != null) conv.fallback(new JsonFallback() {
         @Override
         public String convert(final String string) {
           try {
@@ -79,11 +73,7 @@ public class FnParseJson extends Parse {
       });
       return conv.convert(json, null);
     } catch(final QueryRTException ex) {
-      final QueryException qe = ex.getCause();
-      final QueryError err = qe.error();
-      if(err != INVPROMOTE_X_X && err != INVPROMOTE_X_X_X) throw qe;
-      Util.debug(ex);
-      throw JSON_OPT_X.get(ii, qe.getLocalizedMessage());
+      throw ex.getCause();
     } catch(final QueryIOException ex) {
       Util.debug(ex);
       final QueryException qe = ex.getCause(info);

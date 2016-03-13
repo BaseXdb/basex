@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * Archive writer.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 abstract class ArchiveOut implements Closeable {

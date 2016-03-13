@@ -13,25 +13,20 @@ import org.junit.Test;
 /**
  * Module tests.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public final class ModuleTest extends SandboxTest {
   /**
    * Imports a built-in module.
-   * @throws Exception exception
    */
   @Test
-  public void builtIn() throws Exception {
-    final String query = "import module namespace xquery = 'http://basex.org/modules/xquery'; 1";
-    try(final QueryProcessor qp = new QueryProcessor(query, context)) {
-      qp.value();
-    }
+  public void builtIn() {
+    query("import module namespace xquery = 'http://basex.org/modules/xquery'; 1");
   }
 
   /**
-   * Tests the {@link QueryContext#parseLibrary(String, String, StaticContext)}
-   * method.
+   * Tests the {@link QueryContext#parseLibrary(String, String, StaticContext)} method.
    */
   @Test
   public void module() {
@@ -39,7 +34,7 @@ public final class ModuleTest extends SandboxTest {
       qc.parseLibrary("module namespace m='foo'; declare function m:foo() { m:bar() }; ", "", null);
       fail("Unknown function 'm:bar()' was not detected.");
     } catch(final QueryException e) {
-      assertSame(QueryError.FUNCUNKNOWN_X, e.error());
+      assertSame(QueryError.WHICHFUNC_X, e.error());
     }
   }
 
@@ -56,6 +51,22 @@ public final class ModuleTest extends SandboxTest {
   }
 
   /**
+   * Tests a repository import.
+   * @throws Exception exception
+   */
+  @Test
+  public void repoFile() throws Exception {
+    // repository files
+    final IOFile repo = new IOFile(sandbox(), "repo");
+    repo.md();
+    write(new IOFile(repo, "a.xqm"), "module namespace a='a'; declare function a:a(){()};");
+
+    try(final QueryContext qc = new QueryContext(context)) {
+      qc.parseMain("import module namespace a='a'; a:a()", null, null);
+    }
+  }
+
+  /**
    * Tests circular dependencies.
    * @throws Exception exception
    */
@@ -64,20 +75,20 @@ public final class ModuleTest extends SandboxTest {
     // module files in same directory
     final IOFile sandbox = sandbox();
     final IOFile file = new IOFile(sandbox, "x.xq");
-    file.write(Token.token("import module namespace a='a'at'a.xqm'; ()"));
-    new IOFile(sandbox, "a.xqm").write(Token.token("module namespace a='a';"
-        + "import module namespace b='b' at 'b.xqm'; declare function a:a(){()};"));
-    new IOFile(sandbox, "b.xqm").write(Token.token("module namespace b='b';"
-        + "import module namespace a='a' at 'a.xqm'; declare function b:b(){a:a()};"));
-    new Run(file.path()).execute(context);
+    write(file, "import module namespace a='a'at'a.xqm'; ()");
+    write(new IOFile(sandbox, "a.xqm"), "module namespace a='a';"
+        + "import module namespace b='b' at 'b.xqm'; declare function a:a(){()};");
+    write(new IOFile(sandbox, "b.xqm"), "module namespace b='b';"
+        + "import module namespace a='a' at 'a.xqm'; declare function b:b(){a:a()};");
+    execute(new Run(file.path()));
 
     // repository files
     final IOFile repo = new IOFile(sandbox, "repo");
     repo.md();
-    new IOFile(repo, "a.xqm").write(Token.token("module namespace a='a';"
-        + "import module namespace b='b'; declare function a:a(){()};"));
-    new IOFile(repo, "b.xqm").write(Token.token("module namespace b='b';"
-        + "import module namespace a='a'; declare function b:b(){a:a()};"));
+    write(new IOFile(repo, "a.xqm"), "module namespace a='a';"
+        + "import module namespace b='b'; declare function a:a(){()};");
+    write(new IOFile(repo, "b.xqm"), "module namespace b='b';"
+        + "import module namespace a='a'; declare function b:b(){a:a()};");
 
     try(final QueryContext qc = new QueryContext(context)) {
       qc.parseMain("import module namespace a='a'; ()", null, null);

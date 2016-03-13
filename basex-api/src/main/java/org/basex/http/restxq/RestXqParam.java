@@ -6,26 +6,26 @@ import org.basex.query.value.item.*;
 /**
  * This class contains a single RESTXQ parameter.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class RestXqParam {
   /** Variable name. */
-  final QNm name;
+  final QNm var;
   /** Name of parameter. */
-  final String key;
+  final String name;
   /** Default value. */
   final Value value;
 
   /**
    * Constructor.
-   * @param name variable name
-   * @param key name of parameter
+   * @param var variable name
+   * @param name name of parameter
    * @param value default value
    */
-  RestXqParam(final QNm name, final String key, final Value value) {
+  RestXqParam(final QNm var, final String name, final Value value) {
+    this.var = var;
     this.name = name;
-    this.key = key;
     this.value = value;
   }
 }

@@ -6,6 +6,7 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.gflwor.*;
+import org.basex.query.expr.gflwor.GFLWOR.Clause;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
@@ -21,7 +22,7 @@ import org.basex.util.hash.*;
 /**
  * Unary lookup expression.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Lookup extends Arr {
@@ -37,12 +38,6 @@ public final class Lookup extends Arr {
   public Lookup(final InputInfo info, final StaticContext sc, final Expr... expr) {
     super(info, expr);
     this.sc = sc;
-  }
-
-  @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    super.compile(qc, scp);
-    return optimize(qc, scp);
   }
 
   @Override
@@ -62,19 +57,19 @@ public final class Lookup extends Arr {
       if(fs.size() == 1 || fs.seqType().one()) {
         // one function, rewrite to for-each or function call
         final Expr opt = ks.size() == 1 || ks.seqType().one()
-            ? new DynFuncCall(info, sc, false, fs, ks) : Function.FOR_EACH.get(sc, info, exprs);
+            ? new DynFuncCall(info, sc, fs, ks) : Function.FOR_EACH.get(sc, info, exprs);
         return optPre(opt, qc).optimize(qc, scp);
       }
 
       if(ks.isValue()) {
         // keys are constant, so we do not duplicate work in the inner loop
-        final LinkedList<GFLWOR.Clause> clauses = new LinkedList<>();
+        final LinkedList<Clause> clauses = new LinkedList<>();
         final Var f = scp.newLocal(qc, QNm.get("f"), null, false);
         clauses.add(new For(f, null, null, fs, false, info));
         final Var k = scp.newLocal(qc, QNm.get("k"), null, false);
         clauses.add(new For(k, null, null, ks, false, info));
         final VarRef rf = new VarRef(info, f), rk = new VarRef(info, k);
-        final DynFuncCall ret = new DynFuncCall(info, sc, false, rf, rk);
+        final DynFuncCall ret = new DynFuncCall(info, sc, rf, rk);
         return optPre(new GFLWOR(info, clauses, ret), qc).optimize(qc, scp);
       }
     }

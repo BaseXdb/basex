@@ -14,7 +14,7 @@ import org.basex.query.value.item.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class FnSort extends StandardFunc {
@@ -26,9 +26,9 @@ public final class FnSort extends StandardFunc {
     final ValueList vl = new ValueList(sz);
     if(exprs.length > 1) {
       final FItem key = checkArity(exprs[1], 1, qc);
-      for(final Value v : value) vl.add(key.invokeValue(qc, info, v));
+      for(final Item it : value) vl.add(key.invokeValue(qc, info, it));
     } else {
-      for(final Value v : value) vl.add(v);
+      for(final Item it : value) vl.add(it.atomValue(qc, info));
     }
 
     final Integer[] order = sort(vl, this);
@@ -75,12 +75,12 @@ public final class FnSort extends StandardFunc {
             for(int v = 0; v < sl; v++) {
               final Item it1 = v1.itemAt(v), it2 = v2.itemAt(v);
               if(!it1.comparable(it2)) {
-                if(it1 instanceof FItem) throw FIEQ_X.get(sf.info, it1.type);
-                if(it2 instanceof FItem) throw FIEQ_X.get(sf.info, it2.type);
-                throw diffError(sf.info, it1, it2);
+                throw it1 instanceof FItem ? FIEQ_X.get(sf.info, it1.type) :
+                      it2 instanceof FItem ? FIEQ_X.get(sf.info, it2.type) :
+                      diffError(sf.info, it1, it2);
               }
               final int d = it1.diff(it2, sf.sc.collation, sf.info);
-              if(d != 0) return d;
+              if(d != 0 && d != Item.UNDEF) return d;
             }
             return (int) (s1 - s2);
           } catch(final QueryException ex) {

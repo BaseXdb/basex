@@ -21,7 +21,7 @@ import org.basex.util.list.*;
 /**
  * Server-side client session in the client-server architecture.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Andreas Weiler
  * @author Christian Gruen
  */
@@ -133,7 +133,7 @@ public final class ClientListener extends Thread {
         String info;
         try {
           // run command
-          command.execute(context, new EncodingOutput(out));
+          command.execute(context, new ServerOutput(out));
           info = command.info();
         } catch(final BaseXException ex) {
           ok = false;
@@ -340,13 +340,13 @@ public final class ClientListener extends Thread {
    */
   private void execute(final Command cmd) throws IOException {
     log(LogType.REQUEST, cmd + " [...]");
-    final DecodingInput di = new DecodingInput(in);
+    final ServerInput si = new ServerInput(in);
     try {
-      cmd.setInput(di);
+      cmd.setInput(si);
       cmd.execute(context);
       success(cmd.info());
     } catch(final BaseXException ex) {
-      di.flush();
+      si.flush();
       error(ex.getMessage());
     }
   }
@@ -394,11 +394,11 @@ public final class ClientListener extends Thread {
           info.append(val);
           if(!typ.isEmpty()) info.append(" as ").append(typ);
         } else if(sc == ServerCmd.RESULTS) {
-          qp.execute(true, out, true, false);
+          qp.execute(out, true, true, false);
         } else if(sc == ServerCmd.EXEC) {
-          qp.execute(false, out, true, false);
+          qp.execute(out, false, true, false);
         } else if(sc == ServerCmd.FULL) {
-          qp.execute(true, out, true, true);
+          qp.execute(out, true, true, true);
         } else if(sc == ServerCmd.INFO) {
           out.print(qp.info());
         } else if(sc == ServerCmd.OPTIONS) {

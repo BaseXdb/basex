@@ -3,7 +3,6 @@ package org.basex.query.expr;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
-import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.query.*;
 import org.junit.*;
@@ -12,7 +11,7 @@ import org.junit.Test;
 /**
  * Mixed XQuery tests.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class MixedTest extends AdvancedQueryTest {
@@ -21,11 +20,10 @@ public final class MixedTest extends AdvancedQueryTest {
 
   /**
    * Drops the collection.
-   * @throws BaseXException exception
    */
   @AfterClass
-  public static void after() throws BaseXException {
-    new DropDB(NAME).execute(context);
+  public static void after() {
+    execute(new DropDB(NAME));
   }
 
   /** Catches duplicate module import. */
@@ -49,7 +47,7 @@ public final class MixedTest extends AdvancedQueryTest {
   public void duplLocation() {
     error("import module namespace a='world' at '" + XQMFILE + "';" +
       "import module namespace b='galaxy' at '" + XQMFILE + "'; 1",
-      WRONGMODULE_X_X);
+      WRONGMODULE_X_X_X);
   }
 
   /** Checks static context scoping in variables. */
@@ -67,11 +65,10 @@ public final class MixedTest extends AdvancedQueryTest {
 
   /**
    * Overwrites an empty attribute value.
-   * @throws BaseXException database exception
    */
   @Test
-  public void emptyAttValues() throws BaseXException {
-    new CreateDB(NAME, "<A a='' b=''/>").execute(context);
+  public void emptyAttValues() {
+    execute(new CreateDB(NAME, "<A a='' b=''/>"));
     query("replace value of node /A/@a with 'A'");
     query("/", "<A a=\"A\" b=\"\"/>");
   }
@@ -90,25 +87,23 @@ public final class MixedTest extends AdvancedQueryTest {
 
   /**
    * Performs count() on parts of a collection.
-   * @throws BaseXException database exception
    */
   @Test
-  public void countCollection() throws BaseXException {
-    new CreateDB(NAME).execute(context);
-    new Add("a", "<a/>").execute(context);
-    new Add("b", "<a/>").execute(context);
-    new Optimize().execute(context);
+  public void countCollection() {
+    execute(new CreateDB(NAME));
+    execute(new Add("a", "<a/>"));
+    execute(new Add("b", "<a/>"));
+    execute(new Optimize());
     query(COUNT.args(_DB_OPEN.args(NAME, "a") + "/a"), "1");
     query(COUNT.args(_DB_OPEN.args(NAME) + "/a"), "2");
   }
 
   /**
    * Tests constant-propagating variables that were introduced by inlining.
-   * @throws BaseXException database exception
    */
   @Test
-  public void gh907() throws BaseXException {
-    new CreateDB(NAME, "<x/>").execute(context);
+  public void gh907() {
+    execute(new CreateDB(NAME, "<x/>"));
     query("declare function local:a($a) { contains($a, 'a') }; //x[local:a(.)]", "");
   }
 }

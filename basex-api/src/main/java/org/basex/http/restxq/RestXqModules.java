@@ -15,7 +15,7 @@ import org.basex.util.http.*;
 /**
  * This class caches RESTXQ modules found in the HTTP root directory.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class RestXqModules {
@@ -38,7 +38,7 @@ public final class RestXqModules {
   /**
    * Initializes the module cache.
    */
-  public void init() {
+  void init() {
     modules = new HashMap<>();
   }
 
@@ -168,7 +168,7 @@ public final class RestXqModules {
 
     // check if directory is to be skipped
     final IOFile[] files = root.children();
-    for(final IOFile file : files) if(file.name().equals(IGNORE)) return;
+    for(final IOFile file : files) if(file.name().equals(IO.IGNORESUFFIX)) return;
 
     for(final IOFile file : files) {
       if(file.isDir()) {

@@ -1,7 +1,7 @@
 (:~
  : Provides HTML components.
  :
- : @author Christian Grün, BaseX GmbH, 2014-15
+ : @author Christian Grün, BaseX Team, 2014-16
  :)
 module namespace html = 'dba/html';
 
@@ -9,6 +9,21 @@ import module namespace cons = 'dba/cons' at '../modules/cons.xqm';
 
 (: Number formats. :)
 declare variable $html:NUMBER := ('decimal', 'number', 'bytes');
+
+(:~
+ : Creates an option checkbox.
+ : @param  $value  value
+ : @param  $label  label
+ : @param  $opts   checked options
+ : @return checkbox
+ :)
+declare function html:option(
+  $value  as xs:string,
+  $label  as xs:string,
+  $opts   as xs:string*
+) as node()+ {
+  html:checkbox("opts", $value, $opts = $value, $label)
+};
 
 (:~
  : Creates a checkbox.
@@ -33,8 +48,8 @@ declare function html:checkbox(
 
 (:~
  : Creates a checkbox.
- : @param  $name  name of checkbox
- : @param  $map   additional attributes
+ : @param  $label  label of checkbox
+ : @param  $map    additional attributes
  : @return checkbox
  :)
 declare function html:checkbox(
@@ -45,7 +60,8 @@ declare function html:checkbox(
     attribute type { "checkbox" },
     map:for-each($map, function($key, $value) { attribute { $key } { $value } })
   },
-  text { $label }
+  text { $label },
+  element br { }
 };
 
 (:~
@@ -328,28 +344,28 @@ declare function html:focus(
 
 (:~
  : Creates a link to the specified target.
- : @param  $text   link text
- : @param  $target target
+ : @param  $text    link text
+ : @param  $target  target
  : @return link
  :)
 declare function html:link(
-  $text   as xs:string,
-  $target as xs:string
+  $text    as xs:string,
+  $target  as xs:string
 ) as element(a) {
   <a href="{ $target }">{ $text }</a>
 };
 
 (:~
  : Creates a link to the specified target.
- : @param  $text   link text
- : @param  $target target
- : @param  $params map with query parameters
+ : @param  $text    link text
+ : @param  $target  target
+ : @param  $params  map with query parameters
  : @return link
  :)
 declare function html:link(
-  $text   as xs:string,
-  $target as xs:string,
-  $params as map(*)
+  $text    as xs:string,
+  $target  as xs:string,
+  $params  as map(*)
 ) as element(a) {
   html:link($text, web:create-url($target, $params))
 };

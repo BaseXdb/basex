@@ -23,7 +23,7 @@ import org.basex.util.list.*;
 /**
  * FTWords expression.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class FTWords extends FTExpr {
@@ -154,18 +154,20 @@ public final class FTWords extends FTExpr {
               }
             } while(lexer.hasNext());
 
-            // create or combine iterator
-            if(ftiter == null) {
-              len = t;
-              ftiter = ii;
-            } else if(mode == FTMode.ALL || mode == FTMode.ALL_WORDS) {
-              if(ii.size() == 0) return null;
-              len += t;
-              ftiter = FTIndexIterator.intersect(ftiter, ii, 0);
-            } else {
-              if(ii.size() == 0) continue;
-              len = Math.max(t, len);
-              ftiter = FTIndexIterator.union(ftiter, ii);
+            if(ii != null) {
+              // create or combine iterator
+              if(ftiter == null) {
+                len = t;
+                ftiter = ii;
+              } else if(mode == FTMode.ALL || mode == FTMode.ALL_WORDS) {
+                if(ii.size() == 0) return null;
+                len += t;
+                ftiter = FTIndexIterator.intersect(ftiter, ii, 0);
+              } else {
+                if(ii.size() == 0) continue;
+                len = Math.max(t, len);
+                ftiter = FTIndexIterator.union(ftiter, ii);
+              }
             }
           }
         }
@@ -380,6 +382,7 @@ public final class FTWords extends FTExpr {
         }
         // favor full-text index requests over exact queries
         final int costs = data.costs(ft);
+        if(costs < 0) return false;
         if(costs != 0) ii.costs += Math.max(2, costs / 100);
       }
     }
@@ -449,7 +452,7 @@ public final class FTWords extends FTExpr {
   public int exprSize() {
     int sz = 1;
     if(occ != null) for(final Expr o : occ) sz += o.exprSize();
-    for(final Expr e : exprs) sz += e.exprSize();
+    for(final Expr expr : exprs) sz += expr.exprSize();
     return sz + query.exprSize();
   }
 

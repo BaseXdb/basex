@@ -13,7 +13,7 @@ import org.basex.util.*;
 /**
  * This is the abstract main class for the starter classes.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class CLI extends Main {
@@ -26,7 +26,7 @@ public abstract class CLI extends Main {
   protected boolean verbose;
 
   /** Password reader. */
-  private final PasswordReader pwReader = new PasswordReader() {
+  private static final PasswordReader PWREADER = new PasswordReader() {
     @Override
     public String password() {
       Util.out(PASSWORD + COLS);
@@ -71,7 +71,7 @@ public abstract class CLI extends Main {
    * @throws IOException database exception
    */
   protected final void execute(final String in) throws IOException {
-    execute(new CommandParser(in, context).pwReader(pwReader));
+    execute(new CommandParser(in, context).pwReader(PWREADER));
   }
 
   /**

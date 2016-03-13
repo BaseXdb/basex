@@ -16,7 +16,7 @@ import org.basex.util.hash.*;
 /**
  * Range expression.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Range extends Arr {
@@ -29,12 +29,6 @@ public final class Range extends Arr {
   public Range(final InputInfo info, final Expr expr1, final Expr expr2) {
     super(info, expr1, expr2);
     seqType = SeqType.ITR_ZM;
-  }
-
-  @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    super.compile(qc, scp);
-    return optimize(qc, scp);
   }
 
   @Override

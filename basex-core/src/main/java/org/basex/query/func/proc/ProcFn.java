@@ -17,7 +17,7 @@ import org.basex.util.list.*;
 /**
  * Process function.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 abstract class ProcFn extends StandardFunc {
@@ -55,7 +55,7 @@ abstract class ProcFn extends StandardFunc {
     } catch(final IOException ex) {
       try {
         result.error.write(token(Util.message(ex)));
-      } catch(final IOException ignored) { }
+      } catch(final IOException ignore) { }
       result.code = 9999;
       return result;
     }

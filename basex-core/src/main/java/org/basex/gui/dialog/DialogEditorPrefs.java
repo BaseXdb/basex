@@ -8,7 +8,7 @@ import org.basex.gui.layout.*;
 /**
  * Editor preferences.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class DialogEditorPrefs extends BaseXBack {
@@ -30,6 +30,8 @@ final class DialogEditorPrefs extends BaseXBack {
   private final BaseXCheckBox markline;
   /** Save before executing file. */
   private final BaseXCheckBox saverun;
+  /** Parse project files. */
+  private final BaseXCheckBox parseproj;
   /** Automatically add characters. */
   private final BaseXCheckBox auto;
   /** Default file filter. */
@@ -54,6 +56,7 @@ final class DialogEditorPrefs extends BaseXBack {
     indent = new BaseXTextField(GUIOptions.INDENT, gopts, d);
     auto = new BaseXCheckBox(AUTO_ADD_CHARS, GUIOptions.AUTO, gopts, d);
     saverun = new BaseXCheckBox(SAVE_BEFORE_EXECUTE, GUIOptions.SAVERUN, gopts, d);
+    parseproj = new BaseXCheckBox(PARSE_PROJECT_FILES, GUIOptions.PARSEPROJ, gopts, d);
     files = new BaseXTextField(GUIOptions.FILES, gopts, d);
     showHidden = new BaseXCheckBox(SHOW_HIDDEN_FILES, GUIOptions.HIDDENFILES, gopts, d);
     margin.setColumns(4);
@@ -85,9 +88,10 @@ final class DialogEditorPrefs extends BaseXBack {
     p.add(auto);
     pv.add(p);
 
-    p = new BaseXBack().layout(new TableLayout(2, 1));
+    p = new BaseXBack().layout(new TableLayout(3, 1));
     p.add(new BaseXLabel(EVALUATING + COL, true, true));
     p.add(saverun);
+    p.add(parseproj);
     pv.add(p);
 
     p = new BaseXBack().layout(new TableLayout(2, 1));
@@ -99,8 +103,9 @@ final class DialogEditorPrefs extends BaseXBack {
 
   /**
    * Reacts on user input.
+   * @return success flag
    */
-  void action() {
+  boolean action() {
     margin.setEnabled(showmargin.isSelected());
     indent.setEnabled(spaces.isSelected());
     showmargin.assign();
@@ -109,11 +114,12 @@ final class DialogEditorPrefs extends BaseXBack {
     numbers.assign();
     markline.assign();
     files.assign();
-    margin.assign();
     spaces.assign();
-    indent.assign();
     auto.assign();
     saverun.assign();
+    parseproj.assign();
     showHidden.assign();
+    // no short-circuiting, do all checks...
+    return margin.assign() & indent.assign();
   }
 }

@@ -10,6 +10,7 @@ import org.basex.data.*;
 import org.basex.index.path.*;
 import org.basex.query.*;
 import org.basex.query.expr.constr.*;
+import org.basex.query.expr.index.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.List;
 import org.basex.query.expr.path.Test.*;
@@ -28,7 +29,7 @@ import org.basex.util.*;
 /**
  * Path expression.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class Path extends ParseExpr {
@@ -54,8 +55,8 @@ public abstract class Path extends ParseExpr {
   }
 
   /**
-   * Returns a new path instance. A path implementation is chosen that works fastest for the
-   * given steps.
+   * Returns a new path instance.
+   * A path implementation is chosen that works fastest for the given steps.
    * @param info input info
    * @param root root expression, may be {@code null}
    * @param steps steps
@@ -164,7 +165,7 @@ public abstract class Path extends ParseExpr {
     Expr e = mergeSteps(qc);
     if(e != this) return e.optimize(qc, scp);
 
-    if(v != null && v.type == NodeType.DOC) {
+    if(v != null) {
       // check index access
       e = index(qc, v);
       // recompile path
@@ -179,18 +180,23 @@ public abstract class Path extends ParseExpr {
       if(e != this) return e.optimize(qc, scp);
     }
 
-    // set atomic type for single attribute steps to speed up predicate tests
-    if(root == null && steps.length == 1 && steps[0] instanceof Step) {
-      final Step step = (Step) steps[0];
-      if(step.axis == ATTR && step.test.kind == Kind.URI_NAME) {
-        step.seqType(SeqType.NOD_ZO);
-      }
-    }
-
     // choose best path implementation and set type information
     final Path path = get(info, root, steps);
+    final int sl = path.steps.length;
+    final Expr lastExpr = path.steps[sl - 1];
+
+    // try to compute result size and derive result type from last step
     path.size = path.size(qc);
-    path.seqType = SeqType.get(steps[steps.length - 1].seqType().type, path.size);
+    path.seqType = SeqType.get(lastExpr.seqType().type, path.size);
+
+    // single attribute with exact name test will return at most one result
+    if(path.root == null && sl == 1 && lastExpr instanceof Step) {
+      final Step lastStep = (Step) lastExpr;
+      if(lastStep.axis == ATTR && lastStep.test.unique) {
+        lastStep.seqType = lastStep.seqType.withOcc(Occ.ZERO_ONE);
+        path.seqType = lastStep.seqType;
+      }
+    }
     return path;
   }
 
@@ -204,7 +210,7 @@ public abstract class Path extends ParseExpr {
         // merge nested predicates. example: if(a[b]) ->  if(a/b)
         final Expr s = step.merge(this, qc, scp);
         if(s != step) {
-          qc.compInfo(OPTWRITE, this);
+          qc.compInfo(OPTREWRITE_X, this);
           step.preds = new Expr[0];
           return s;
         }
@@ -450,7 +456,7 @@ public abstract class Path extends ParseExpr {
       final int name = data.elemNames.id(curr.test.name.local());
 
       final ArrayList<PathNode> tmp = new ArrayList<>();
-      for(final PathNode node : PathSummary.desc(nodes, desc)) {
+      for(final PathNode node : PathIndex.desc(nodes, desc)) {
         if(node.kind == Data.ELEM && name == node.name) {
           // skip test if an element name occurs on different levels
           if(!tmp.isEmpty() && tmp.get(0).level() != node.level()) return null;
@@ -541,6 +547,9 @@ public abstract class Path extends ParseExpr {
    * @return original or new expression
    */
   private Expr children(final QueryContext qc, final Value rt) {
+    // only rewrite on document level
+    if(rt.type != NodeType.DOC) return this;
+
     // skip if index does not exist or is out-dated, or if several namespaces occur in the input
     final Data data = rt.data();
     if(data == null || !data.meta.uptodate || data.nspaces.globalUri() == null) return this;
@@ -570,9 +579,9 @@ public abstract class Path extends ParseExpr {
           if(nodes.get(0).name != p.name) nm = null;
         }
         qnm.add(nm);
-        nodes = PathSummary.parent(nodes);
+        nodes = PathIndex.parent(nodes);
       }
-      qc.compInfo(OPTCHILD, steps[s]);
+      qc.compInfo(OPTCHILD_X, steps[s]);
 
       // build new steps
       int ts = qnm.size();
@@ -592,7 +601,7 @@ public abstract class Path extends ParseExpr {
     // check if all steps yield results; if not, return empty sequence
     final ArrayList<PathNode> nodes = pathNodes(qc);
     if(nodes != null && nodes.isEmpty()) {
-      qc.compInfo(OPTPATH, path);
+      qc.compInfo(OPTPATH_X, path);
       return Empty.SEQ;
     }
 
@@ -624,8 +633,9 @@ public abstract class Path extends ParseExpr {
    * @throws QueryException query exception
    */
   public Expr index(final QueryContext qc, final Value rt) throws QueryException {
+    // only rewrite on document level
+    if(rt == null || rt.type != NodeType.DOC) return this;
     // only rewrite paths with data reference
-    if(rt == null) return this;
     final Data data = rt.data();
     if(data == null) return this;
 
@@ -657,6 +667,7 @@ public abstract class Path extends ParseExpr {
           qc.compInfo(OPTNOINDEX, this);
           return Empty.SEQ;
         }
+
         if(index == null || index.costs > ii.costs) {
           index = ii;
           iPred = p;
@@ -669,7 +680,7 @@ public abstract class Path extends ParseExpr {
     if(index == null || index.costs > data.meta.size) return this;
 
     // rewrite for index access
-    qc.compInfo(index.info);
+    qc.compInfo(index.optInfo);
 
     // invert steps that occur before index step and add them as predicate
     final ExprList newPreds = new ExprList();
@@ -712,7 +723,7 @@ public abstract class Path extends ParseExpr {
     if(index.costs == 1) {
       // set sequence type
       if(resultRoot instanceof IndexAccess) ((IndexAccess) resultRoot).size(1);
-      else ((ParseExpr) resultRoot).seqType(resultRoot.seqType().withOcc(Occ.ZERO_ONE));
+      else ((ParseExpr) resultRoot).seqType = resultRoot.seqType().withOcc(Occ.ZERO_ONE);
     }
 
     if(!newPreds.isEmpty()) {
@@ -868,7 +879,16 @@ public abstract class Path extends ParseExpr {
   public final Expr inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
       throws QueryException {
 
-    boolean changed = inlineAll(qc, scp, steps, var, ex);
+    // #1202: during inlining, expressions will be optimized, which are based on the context value
+    boolean changed = false;
+    final Value init = qc.value;
+    qc.value = null;
+    try {
+      changed = inlineAll(qc, scp, steps, var, ex);
+    } finally {
+      qc.value = init;
+    }
+
     if(root != null) {
       final Expr rt = root.inline(qc, scp, var, ex);
       if(rt != null) {

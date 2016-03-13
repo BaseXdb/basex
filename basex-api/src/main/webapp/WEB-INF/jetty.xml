@@ -19,11 +19,6 @@
     </Arg>
   </Call>
 
-  <!-- Debugging
-  <Get class="org.eclipse.jetty.util.log.Log" name="log">
-    <Set name="debugEnabled">true</Set>
-  </Get> -->
-
   <!-- Support for SSL connections.
   <Call name="addConnector">
     <Arg>
@@ -38,4 +33,10 @@
       </New>
     </Arg>
   </Call>-->
+
+  <!-- Debugging
+  <Get class="org.eclipse.jetty.util.log.Log" name="log">
+    <Set name="debugEnabled">true</Set>
+  </Get> -->
+
 </Configure>

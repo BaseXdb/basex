@@ -16,7 +16,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class FnSum extends Aggr {
@@ -39,6 +39,9 @@ public final class FnSum extends Aggr {
     }
 
     final Iter iter = exprs[0].atomIter(qc, ii);
+    final Item it = iter.next();
+    if(it != null) return sum(iter, it, false);
+
     Item def;
     if(exprs.length == 2) {
       def = exprs[1].atomItem(qc, ii);
@@ -50,9 +53,7 @@ public final class FnSum extends Aggr {
     } else {
       def = Int.get(0);
     }
-
-    final Item it = iter.next();
-    return it != null ? sum(iter, it, false) : def;
+    return def;
   }
 
   @Override

@@ -3,8 +3,6 @@ package org.basex.query.func;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
-import java.io.*;
-
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.parse.Commands.CmdIndex;
@@ -16,7 +14,7 @@ import org.junit.Test;
 /**
  * This class tests the functions of the Fulltext Module.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class FtModuleTest extends AdvancedQueryTest {
@@ -25,17 +23,14 @@ public final class FtModuleTest extends AdvancedQueryTest {
 
   /**
    * Initializes a test.
-   * @throws BaseXException database exception
    */
   @Before
-  public void initTest() throws BaseXException {
-    new CreateDB(NAME, FILE).execute(context);
-    new CreateIndex(CmdIndex.FULLTEXT).execute(context);
+  public void initTest() {
+    execute(new CreateDB(NAME, FILE));
+    execute(new CreateIndex(CmdIndex.FULLTEXT));
   }
 
-  /**
-   * Test method.
-   */
+  /** Test method. */
   @Test
   public void contains() {
     // check index results
@@ -75,12 +70,9 @@ public final class FtModuleTest extends AdvancedQueryTest {
     error(_FT_CONTAINS.args("x", "x", " 1"), ELMMAP_X_X_X);
   }
 
-  /**
-   * Test method.
-   * @throws BaseXException database exception
-   */
+  /** Test method. */
   @Test
-  public void search() throws BaseXException {
+  public void search() {
     // check index results
     query(_FT_SEARCH.args(NAME, "assignments"), "Assignments");
     query(_FT_SEARCH.args(NAME, " ('exercise','1')"), "Exercise 1\nExercise 2");
@@ -89,11 +81,11 @@ public final class FtModuleTest extends AdvancedQueryTest {
     query(_FT_SEARCH.args(NAME, "XXX"), "");
 
     // apply index options to query term
-    new Set(MainOptions.STEMMING, true).execute(context);
-    new CreateIndex("fulltext").execute(context);
+    set(MainOptions.STEMMING, true);
+    execute(new CreateIndex("fulltext"));
     contains(_FT_SEARCH.args(NAME, "Exercises") + "/..", "<li>Exercise 1</li>");
-    new Set(MainOptions.STEMMING, false).execute(context);
-    new CreateIndex(CmdIndex.FULLTEXT).execute(context);
+    set(MainOptions.STEMMING, false);
+    execute(new CreateIndex(CmdIndex.FULLTEXT));
 
     // check match options
     query(_FT_SEARCH.args(NAME, "Assignments", " map { }"), "Assignments");
@@ -131,12 +123,9 @@ public final class FtModuleTest extends AdvancedQueryTest {
        _FT_COUNT.args("$i[text() contains text 'exercise']"), "1\n1");
   }
 
-  /**
-   * Test method.
-   * @throws IOException query exception
-   */
+  /** Test method. */
   @Test
-  public void mark() throws IOException {
+  public void mark() {
     query(_FT_MARK.args(" //*[text() contains text '1']"),
       "<li>Exercise <mark>1</mark>\n</li>");
     query(_FT_MARK.args(" //*[text() contains text '2'], 'b'"),
@@ -152,10 +141,10 @@ public final class FtModuleTest extends AdvancedQueryTest {
 
     query(COUNT.args(_FT_MARK.args(" //*[text() contains text '1']/../../../../..")), "1");
 
-    new CreateDB(NAME, "<a:a xmlns:a='A'>C</a:a>").execute(context);
+    execute(new CreateDB(NAME, "<a:a xmlns:a='A'>C</a:a>"));
     query(_FT_MARK.args(" /descendant::*[text() contains text 'C']", 'b'),
         "<a:a xmlns:a=\"A\">\n<b>C</b>\n</a:a>");
-    new DropDB(NAME).execute(context);
+    execute(new DropDB(NAME));
     query("copy $c := <A xmlns='A'>A</A> modify () return <X>{ " +
         _FT_MARK.args(" $c[text() contains text 'A']") + " }</X>/*");
   }
@@ -180,13 +169,10 @@ public final class FtModuleTest extends AdvancedQueryTest {
     query(_FT_SCORE.args(_FT_SEARCH.args(NAME, "XML")), "1\n0.5");
   }
 
-  /**
-   * Test method.
-   * @throws BaseXException database exception
-   */
+  /** Test method. */
   @Test
-  public void tokens() throws BaseXException {
-    new CreateIndex(IndexType.FULLTEXT).execute(context);
+  public void tokens() {
+    execute(new CreateIndex(IndexType.FULLTEXT));
 
     String entries = _FT_TOKENS.args(NAME);
     query("count(" + entries + ')', 7);

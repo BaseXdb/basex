@@ -5,28 +5,29 @@ import static org.basex.query.QueryError.*;
 import java.net.*;
 
 import org.basex.query.*;
+import org.basex.query.util.*;
+import org.basex.query.util.UriParser.ParsedUri;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
  * URI item ({@code xs:anyURI}).
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Uri extends AStr {
   /** Empty URI. */
   public static final Uri EMPTY = new Uri(Token.EMPTY);
-  /** String data. */
-  private final byte[] value;
+  /** Parsed URI (lazy instantiation). */
+  private ParsedUri pUri;
 
   /**
    * Constructor.
    * @param value value
    */
   private Uri(final byte[] value) {
-    super(AtomType.URI);
-    this.value = value;
+    super(AtomType.URI, value);
   }
 
   /**
@@ -92,7 +93,7 @@ public final class Uri extends AStr {
    * @return result of check
    */
   public boolean isAbsolute() {
-    return Token.contains(value, ':');
+    return isValid() && parsed().scheme() != null;
   }
 
   /**
@@ -100,12 +101,7 @@ public final class Uri extends AStr {
    * @return result of check
    */
   public boolean isValid() {
-    try {
-      new URI(Token.string(Token.uri(value, true)));
-      return true;
-    } catch(final URISyntaxException ex) {
-      return false;
-    }
+    return parsed().valid();
   }
 
   @Override
@@ -119,6 +115,15 @@ public final class Uri extends AStr {
    */
   public byte[] string() {
     return value;
+  }
+
+  /**
+   * Caches and returns a parsed URI representation.
+   * @return parsed uri
+   */
+  private ParsedUri parsed() {
+    if(pUri == null) pUri = UriParser.parse(Token.string(Token.uri(value, true)));
+    return pUri;
   }
 
   @Override

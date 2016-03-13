@@ -10,6 +10,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.tree.*;
 
+import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.gui.*;
@@ -21,7 +22,7 @@ import org.basex.gui.layout.TreeNode;
  * content including raw files and documents. The search field allows to
  * quickly access specific files/documents.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Lukas Kircher
  */
 final class DialogResources extends BaseXBack {
@@ -71,15 +72,16 @@ final class DialogResources extends BaseXBack {
           filt = trgt;
         }
         filterText.setText(filt);
-        dp.add.target.setText(trgt);
+        dp.addPanel.target.setText(trgt);
         filtered = false;
       }
     });
 
     // add default children to tree
-    final Data data = dp.gui.context.data();
+    final Context context = dp.gui.context;
+    final Data data = context.data();
     final String label = data.meta.name + " (/)";
-    root = new TreeRootFolder(token(label), token("/"), tree, data);
+    root = new TreeRootFolder(token(label), token("/"), tree, context);
     ((DefaultTreeModel) tree.getModel()).insertNodeInto(root, rootNode, 0);
 
     filter = new BaseXButton(FILTER, dp);
@@ -160,6 +162,8 @@ final class DialogResources extends BaseXBack {
       filterText.requestFocusInWindow();
       refreshFolder(root);
       filtered = false;
+    } else {
+      tree.repaint();
     }
   }
 
@@ -173,7 +177,8 @@ final class DialogResources extends BaseXBack {
       return;
     }
 
-    final Data data = dialog.gui.context.data();
+    final Context context = dialog.gui.context;
+    final Data data = context.data();
     // clear tree to append filtered nodes
     root.removeAllChildren();
 
@@ -182,18 +187,18 @@ final class DialogResources extends BaseXBack {
     // create a folder if there's either a raw or document folder
     if(data.resources.isDir(filterPath)) {
       root.add(new TreeFolder(TreeFolder.name(filterPath), TreeFolder.path(filterPath),
-          tree, data));
+          tree, context));
       cmax--;
     }
 
     // now add the actual files (if there are any)
     final byte[] name = TreeFolder.name(filterPath);
     final byte[] sub = TreeFolder.path(filterPath);
-    final TreeFolder f = new TreeFolder(TreeFolder.name(sub), TreeFolder.path(sub), tree, data);
+    final TreeFolder f = new TreeFolder(TreeFolder.name(sub), TreeFolder.path(sub), tree, context);
     cmax = f.addLeaves(name, cmax, root);
 
     // add dummy node if maximum number of nodes is exceeded
-    if(cmax <= 0) root.add(new TreeLeaf(token(DOTS), sub, false, true, tree, data));
+    if(cmax <= 0) root.add(new TreeLeaf(token(DOTS), sub, false, true, tree, context));
 
     ((DefaultTreeModel) tree.getModel()).nodeStructureChanged(root);
   }
@@ -229,7 +234,7 @@ final class DialogResources extends BaseXBack {
 
   /**
    * Custom tree cell renderer to distinguish between raw and xml leaf nodes.
-   * @author BaseX Team 2005-15, BSD License
+   * @author BaseX Team 2005-16, BSD License
    * @author Lukas Kircher
    */
   private static final class TreeNodeRenderer extends DefaultTreeCellRenderer {

@@ -10,7 +10,7 @@ import org.junit.*;
 /**
  * This class tests standard XQuery functions.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  * @author Leo Woerteler
  */
@@ -28,6 +28,12 @@ public final class FnTest extends AdvancedQueryTest {
 
   /** Test method. */
   @Test
+  public void unparsedTextLines() {
+    query(UNPARSED_TEXT_LINES.args("()"), "");
+  }
+
+  /** Test method. */
+  @Test
   public void parseXML() {
     contains(PARSE_XML.args("\"<x>a</x>\"") + "//text()", "a");
   }
@@ -38,6 +44,14 @@ public final class FnTest extends AdvancedQueryTest {
     contains(JSON_TO_XML.args("null"), "xmlns");
     contains(JSON_TO_XML.args("null") + " update ()", "xmlns");
   }
+
+  /** Test method. */
+  @Test
+  public void xmlToJson() {
+    query(XML_TO_JSON.args("<map xmlns='http://www.w3.org/2005/xpath-functions'>"
+        + "<string key=''>í</string></map>"), "{\"\":\"\u00ed\"}");
+  }
+
 
   /** Test method. */
   @Test

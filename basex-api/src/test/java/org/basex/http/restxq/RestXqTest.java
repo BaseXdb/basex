@@ -14,7 +14,7 @@ import org.junit.*;
 /**
  * This class contains RESTXQ tests.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class RestXqTest extends HTTPTest {
@@ -31,7 +31,7 @@ public abstract class RestXqTest extends HTTPTest {
    */
   @BeforeClass
   public static void start() throws Exception {
-    init(RESTXQ_ROOT, true);
+    init(HTTP_ROOT, true);
   }
 
   /**

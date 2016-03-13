@@ -1,18 +1,18 @@
 package org.basex.io.out;
 
-import java.io.*;
+import static org.basex.util.Token.*;
 
-import org.basex.util.*;
+import java.io.*;
 
 /**
  * This class is a stream-wrapper for textual data encoded in UTF8.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public class PrintOutput extends OutputStream {
   /** Output stream reference. */
-  private final OutputStream os;
+  protected final OutputStream os;
   /** Maximum numbers of bytes to write. */
   long max = Long.MAX_VALUE;
   /** Number of bytes written. */
@@ -54,7 +54,7 @@ public class PrintOutput extends OutputStream {
 
   /**
    * Sets the maximum number of bytes to be written.
-   * Note that the limit might break unicode characters.
+   * Note that a specified limit might break unicode characters.
    * @param limit maximum
    */
   public final void setLimit(final int limit) {
@@ -95,7 +95,8 @@ public class PrintOutput extends OutputStream {
    * @throws IOException I/O exception
    */
   public void print(final byte[] token) throws IOException {
-    for(final byte cp : token) write(cp);
+    final int tl = token.length;
+    for(int t = 0; t < tl; t += cl(token, t)) print(cp(token, t));
   }
 
   /**
@@ -104,7 +105,7 @@ public class PrintOutput extends OutputStream {
    * @throws IOException I/O exception
    */
   public void print(final String string) throws IOException {
-    print(Token.token(string));
+    print(token(string));
   }
 
   /**
@@ -114,7 +115,7 @@ public class PrintOutput extends OutputStream {
    */
   public final void println(final String string) throws IOException {
     print(string);
-    print(Prop.NL);
+    print('\n');
   }
 
   /**
@@ -124,7 +125,7 @@ public class PrintOutput extends OutputStream {
    */
   public final void println(final byte[] token) throws IOException {
     print(token);
-    print(Prop.NL);
+    print('\n');
   }
 
   /**
@@ -152,15 +153,7 @@ public class PrintOutput extends OutputStream {
    * Checks if stream can output more characters.
    * @return {@code true} if stream is exhausted
    */
-  public final boolean finished() {
+  public boolean finished() {
     return size == max;
-  }
-
-  /**
-   * Returns the encoding.
-   * @return encoding
-   */
-  public String encoding() {
-    return Strings.UTF8;
   }
 }

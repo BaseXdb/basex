@@ -8,10 +8,9 @@ import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.core.locks.*;
 import org.basex.core.parse.*;
-import org.basex.core.parse.Commands.Cmd;
+import org.basex.core.parse.Commands.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
-import org.basex.index.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
 import org.basex.query.value.item.*;
@@ -24,7 +23,7 @@ import org.basex.util.list.*;
  * the currently opened database. This effectively eliminates all fragmentation
  * and can lead to significant space savings after updates.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public final class OptimizeAll extends ACreate {
@@ -111,34 +110,40 @@ public final class OptimizeAll extends ACreate {
     // adopt original meta information
     options.set(MainOptions.CHOP, ometa.chop);
     // adopt original index options
-    options.set(MainOptions.UPDINDEX, ometa.updindex);
-    options.set(MainOptions.AUTOOPTIMIZE, ometa.autoopt);
-    options.set(MainOptions.MAXCATS,  ometa.maxcats);
-    options.set(MainOptions.MAXLEN,   ometa.maxlen);
+    options.set(MainOptions.TEXTINDEX, ometa.textindex);
+    options.set(MainOptions.ATTRINDEX, ometa.attrindex);
+    options.set(MainOptions.TOKENINDEX, ometa.tokenindex);
+    options.set(MainOptions.FTINDEX, ometa.ftindex);
+    options.set(MainOptions.TEXTINCLUDE, ometa.textinclude);
+    options.set(MainOptions.ATTRINCLUDE, ometa.attrinclude);
+    options.set(MainOptions.TOKENINCLUDE, ometa.tokeninclude);
+    options.set(MainOptions.FTINCLUDE, ometa.ftinclude);
     // adopt original full-text index options
-    options.set(MainOptions.STEMMING,   ometa.stemming);
-    options.set(MainOptions.CASESENS,   ometa.casesens);
+    options.set(MainOptions.STEMMING, ometa.stemming);
+    options.set(MainOptions.CASESENS, ometa.casesens);
     options.set(MainOptions.DIACRITICS, ometa.diacritics);
-    options.set(MainOptions.LANGUAGE,   ometa.language.toString());
-    options.set(MainOptions.STOPWORDS,  ometa.stopwords);
+    options.set(MainOptions.LANGUAGE, ometa.language.toString());
+    options.set(MainOptions.STOPWORDS, ometa.stopwords);
+    // adopt original index options
+    options.set(MainOptions.MAXLEN, ometa.maxlen);
+    options.set(MainOptions.MAXCATS, ometa.maxcats);
 
     // build database and index structures
     if(cmd != null) cmd.size = ometa.size;
     final StaticOptions sopts = context.soptions;
-    final String tname = sopts.random(name);
+    final String tname = sopts.randomDbName(name);
     final DBParser parser = new DBParser(odata, options, cmd);
     try(final DiskBuilder builder = new DiskBuilder(tname, parser, sopts, options)) {
       final DiskData dt = builder.build();
       try {
-        if(ometa.createtext) create(IndexType.TEXT, dt, options, cmd);
-        if(ometa.createattr) create(IndexType.ATTRIBUTE, dt, options, cmd);
-        if(ometa.createftxt) create(IndexType.FULLTEXT, dt, options, cmd);
         // adopt original meta data
         dt.meta.createtext = ometa.createtext;
         dt.meta.createattr = ometa.createattr;
-        dt.meta.createftxt = ometa.createftxt;
-        dt.meta.filesize   = ometa.filesize;
-        dt.meta.dirty      = true;
+        dt.meta.createtoken = ometa.createtoken;
+        dt.meta.createft = ometa.createft;
+        dt.meta.filesize = ometa.filesize;
+        dt.meta.dirty = true;
+        CreateIndex.create(dt, cmd);
 
         // move binary files
         final IOFile bin = data.meta.binaries();
@@ -149,10 +154,8 @@ public final class OptimizeAll extends ACreate {
         dt.close();
       }
     }
-    // return database instance
+    // close old database instance, drop it and rename temporary database
     Close.close(data, context);
-
-    // drop old database and rename temporary to final name
     if(!DropDB.drop(name, sopts)) throw new BaseXException(DB_NOT_DROPPED_X, name);
     if(!AlterDB.alter(tname, name, sopts)) throw new BaseXException(DB_NOT_RENAMED_X, tname);
   }
@@ -160,7 +163,7 @@ public final class OptimizeAll extends ACreate {
   /**
    * Parser for rebuilding existing databases.
    *
-   * @author BaseX Team 2005-15, BSD License
+   * @author BaseX Team 2005-16, BSD License
    * @author Leo Woerteler
    */
   private static final class DBParser extends Parser {

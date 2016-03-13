@@ -10,7 +10,7 @@ import org.junit.*;
 
 /**
  * Base class with common functionality for all ID -> PRE mapping tests.
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Dimitar Popov
  */
 public abstract class IdPreMapBulkTestBase {
@@ -51,7 +51,7 @@ public abstract class IdPreMapBulkTestBase {
   /**
    * Delete a &lt;pre, id&gt; pair from {@link #basemap} and {@link #testedmap}.
    * @param pre pre value
-   * @param c number of deleted records
+   * @param c number of deleted records (negative)
    */
   final void delete(final int pre, final int c) {
     ops.add(new int[] { pre, basemap.id(pre), c});
@@ -90,7 +90,7 @@ public abstract class IdPreMapBulkTestBase {
 
   /**
    * Dummy implementation of ID -> PRE map: very slow, but simple and correct.
-   * @author BaseX Team 2005-15, BSD License
+   * @author BaseX Team 2005-16, BSD License
    * @author Dimitar Popov
    */
   protected static class DummyIdPreMap extends IdPreMap {

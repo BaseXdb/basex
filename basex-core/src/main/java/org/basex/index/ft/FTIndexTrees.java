@@ -4,7 +4,7 @@ package org.basex.index.ft;
  * This class provides an array with several {@link FTIndexTree} instances,
  * one for each token length.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  * @author Sebastian Gath
  */
@@ -24,15 +24,15 @@ final class FTIndexTrees {
 
   /**
    * Indexes a token with full-text data.
-   * @param tok token to be indexed
+   * @param token token to be indexed
    * @param pre pre value for the token
    * @param pos pos value of the token
-   * @param cf current file id
+   * @param index current file id
    */
-  void index(final byte[] tok, final int pre, final int pos, final int cf) {
-    final int tl = tok.length;
+  void index(final byte[] token, final int pre, final int pos, final int index) {
+    final int tl = token.length;
     if(trees[tl] == null) trees[tl] = new FTIndexTree();
-    trees[tl].index(tok, pre, pos, cf);
+    trees[tl].add(token, pre, pos, index);
   }
 
   /**
@@ -52,13 +52,13 @@ final class FTIndexTrees {
 
   /**
    * Checks for more tokens.
-   * @param cf current index split counter
+   * @param index current index split counter
    * @return boolean more
    */
-  boolean more(final int cf) {
-    if(ctree != -1 && trees[ctree].more(cf)) return true;
+  boolean more(final int index) {
+    if(ctree != -1 && trees[ctree].more(index)) return true;
     final int tl = trees.length;
-    while(++ctree < tl) if(trees[ctree] != null) return more(cf);
+    while(++ctree < tl) if(trees[ctree] != null) return more(index);
     return false;
   }
 

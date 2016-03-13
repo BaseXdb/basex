@@ -8,7 +8,7 @@ import org.basex.util.*;
 /**
  * XQuery item types.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public interface Type {
@@ -22,9 +22,9 @@ public interface Type {
     /** text().                   */ TXT(9),
     /** processing-instruction(). */ PI(10),
     /** element().                */ ELM(11),
-    /** document-node().          */ DOC(12),
-    /** document-node(element()). */ DEL(13),
-    /** attribute().              */ ATT(14),
+    /** document-node().          */ DOC(12, true),
+    /** document-node(element()). */ DEL(13, true),
+    /** attribute().              */ ATT(14, true),
     /** comment().                */ COM(15),
     /** namespace-node().         */ NSP(16),
     /** schema-element().         */ SCE(17),
@@ -83,7 +83,7 @@ public interface Type {
     /** xs:base64Binary.          */ B64(79),
     /** xs:hexBinary.             */ HEX(80),
     /** xs:anyURI.                */ URI(81),
-    /** xs:QName.                 */ QNM(82),
+    /** xs:QName.                 */ QNM(82, true),
     /** xs:NOTATION.              */ NOT(83),
     /** xs:numeric.               */ NUM(84),
     /** java().                   */ JAVA(86);
@@ -92,17 +92,29 @@ public interface Type {
     public static final ID[] VALUES = values();
     /** Node ID. */
     private final byte id;
+    /** Extended type information. */
+    private final boolean ext;
 
     /**
      * Constructor.
      * @param id type id
      */
     ID(final int id) {
-      this.id = (byte) id;
+      this(id, false);
     }
 
     /**
-     * Returns the type ID as a byte.
+     * Constructor.
+     * @param id type id
+     * @param ext extended type information
+     */
+    ID(final int id, final boolean ext) {
+      this.id = (byte) id;
+      this.ext = ext;
+    }
+
+    /**
+     * Returns the type ID. Also called by XQJ.
      * @return type ID
      */
     public byte asByte() {
@@ -110,34 +122,34 @@ public interface Type {
     }
 
     /**
-     * Wraps the type ID in a byte array.
-     * @return type ID
+     * Indicates if this type returns extended type information.
+     * @return result of check
      */
-    public byte[] bytes() {
-      return new byte[] { id };
+    public boolean isExtended() {
+      return ext;
     }
 
     /**
-     * Gets the ID for the given byte value.
-     * @param b byte
+     * Gets the specified ID.
+     * @param id id
      * @return type ID if found, {@code null} otherwise
      */
-    public static ID get(final byte b) {
-      for(final ID i : VALUES) if(i.id == b) return i;
+    public static ID get(final int id) {
+      for(final ID i : VALUES) if(i.id == id) return i;
       return null;
     }
 
     /**
-     * Gets the type instance for the given ID.
-     * @param b type ID
+     * Gets the specified type instance.
+     * @param id id
      * @return corresponding type if found, {@code null} otherwise
      */
-    public static Type getType(final byte b) {
-      final ID id = get(b);
-      if(id == null) return null;
-      if(id == FUN) return FuncType.ANY_FUN;
-      final Type t = AtomType.getType(id);
-      return t != null ? t : NodeType.getType(id);
+    public static Type getType(final int id) {
+      final ID i = get(id);
+      if(i == null) return null;
+      if(i == FUN) return SeqType.ANY_FUN;
+      final Type t = AtomType.getType(i);
+      return t != null ? t : NodeType.getType(i);
     }
   }
 

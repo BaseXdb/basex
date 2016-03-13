@@ -19,7 +19,7 @@ import org.basex.util.list.*;
  * This class returns a Web Application Description Language (WADL) file,
  * listing all available RESTXQ services.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class RestXqWadl {
@@ -73,11 +73,11 @@ final class RestXqWadl {
         // create request
         final FElem request = elem("request", method);
         for(final RestXqParam rxp : func.queryParams)
-          addParam(rxp.key, "query",  request, xqdoc, func);
+          addParam(rxp.name, "query",  request, xqdoc, func);
         for(final RestXqParam rxp : func.formParams)
-          addParam(rxp.key, "query",  request, xqdoc, func);
+          addParam(rxp.name, "query",  request, xqdoc, func);
         for(final RestXqParam rxp : func.headerParams)
-          addParam(rxp.key, "header",  request, xqdoc, func);
+          addParam(rxp.name, "header",  request, xqdoc, func);
 
         // create response
         final FElem response = elem("response", method);
@@ -105,8 +105,8 @@ final class RestXqWadl {
     param.add("name", name).add("style", style);
     final QNm qn = new QNm(name);
     for(final Var var : func.function.args) {
-      if(var.name.eq(qn) && var.declType != null) {
-        param.add("type", var.declType.toString());
+      if(var.name.eq(qn) && var.type != null) {
+        param.add("type", var.type.toString());
       }
     }
     addDoc(Inspect.doc(xqdoc, token(name)), param);

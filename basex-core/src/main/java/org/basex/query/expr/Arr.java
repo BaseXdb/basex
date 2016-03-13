@@ -12,7 +12,7 @@ import org.basex.util.hash.*;
 /**
  * Abstract array expression.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class Arr extends ParseExpr {
@@ -38,18 +38,18 @@ public abstract class Arr extends ParseExpr {
   public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
     final int el = exprs.length;
     for(int e = 0; e < el; e++) exprs[e] = exprs[e].compile(qc, scp);
-    return this;
+    return optimize(qc, scp);
   }
 
   @Override
   public boolean has(final Flag flag) {
-    for(final Expr e : exprs) if(e.has(flag)) return true;
+    for(final Expr expr : exprs) if(expr.has(flag)) return true;
     return false;
   }
 
   @Override
   public boolean removable(final Var var) {
-    for(final Expr e : exprs) if(!e.removable(var)) return false;
+    for(final Expr expr : exprs) if(!expr.removable(var)) return false;
     return true;
   }
 
@@ -88,7 +88,7 @@ public abstract class Arr extends ParseExpr {
    * @return result of check
    */
   protected final boolean allAreValues() {
-    for(final Expr e : exprs) if(!e.isValue()) return false;
+    for(final Expr expr : exprs) if(!expr.isValue()) return false;
     return true;
   }
 
@@ -97,7 +97,7 @@ public abstract class Arr extends ParseExpr {
    * @return result of check
    */
   protected final boolean oneIsEmpty() {
-    for(final Expr e : exprs) if(e.isEmpty()) return true;
+    for(final Expr expr : exprs) if(expr.isEmpty()) return true;
     return false;
   }
 
@@ -123,7 +123,7 @@ public abstract class Arr extends ParseExpr {
   @Override
   public int exprSize() {
     int sz = 1;
-    for(final Expr e : exprs) sz += e.exprSize();
+    for(final Expr expr : exprs) sz += expr.exprSize();
     return sz;
   }
 }

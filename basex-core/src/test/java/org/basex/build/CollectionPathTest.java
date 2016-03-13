@@ -3,16 +3,14 @@ package org.basex.build;
 import static org.junit.Assert.*;
 
 import org.basex.*;
-import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.query.*;
 import org.junit.*;
 import org.junit.Test;
 
 /**
  * Tests queries on collections.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Michael Seiferle
  */
 public final class CollectionPathTest extends SandboxTest {
@@ -27,62 +25,47 @@ public final class CollectionPathTest extends SandboxTest {
 
   /**
    * Creates an initial database.
-   * @throws BaseXException exception
    */
   @BeforeClass
-  public static void before() throws BaseXException {
-    new CreateDB(NAME).execute(context);
-    for(final String file : FILES) {
-      new Add(DIR, file).execute(context);
-    }
-    new Add("test/zipped", ZIP).execute(context);
+  public static void before() {
+    execute(new CreateDB(NAME));
+    for(final String file : FILES) execute(new Add(DIR, file));
+    execute(new Add("test/zipped", ZIP));
   }
 
   /**
    * Drops the initial collection.
-   * @throws BaseXException exception
    */
   @AfterClass
-  public static void after() throws BaseXException {
-    new DropDB(NAME).execute(context);
+  public static void after() {
+    execute(new DropDB(NAME));
   }
 
   /**
    * Finds single doc.
-   * @throws Exception exception
    */
   @Test
-  public void findDoc() throws Exception {
-    final String find =
-      "for $x in collection('" + NAME + '/' + DIR + "xmark.xml') " +
+  public void findDoc() {
+    assertEquals("1", query(
+      "count(for $x in collection('" + NAME + '/' + DIR + "xmark.xml') " +
       "where $x//location contains text 'uzbekistan' " +
-      "return $x";
-    try(final QueryProcessor qp = new QueryProcessor(find, context)) {
-      assertEquals(1, qp.value().size());
-    }
+      "return $x)"));
   }
 
   /**
    * Finds documents in path.
-   * @throws Exception exception
    */
   @Test
-  public void findDocs() throws Exception {
-    final String find = "collection('" + NAME + "/test/zipped') ";
-    try(final QueryProcessor qp = new QueryProcessor(find, context)) {
-      assertEquals(4, qp.value().size());
-    }
+  public void findDocs() {
+    assertEquals("4", query("count(collection('" + NAME + "/test/zipped'))"));
   }
 
   /**
    * Checks if the constructed base-uri matches the base-uri of added documents.
-   * @throws Exception exception
    */
   @Test
-  public void baseUri() throws Exception {
-    final String find = "base-uri(collection('" + NAME + '/' + DIR + "xmark.xml'))";
-    try(final QueryProcessor qp = new QueryProcessor(find, context)) {
-      assertEquals(NAME + '/' + FILES[1], qp.value().serialize().toString());
-    }
+  public void baseUri() {
+    assertEquals(NAME + '/' + FILES[1],
+        query("base-uri(collection('" + NAME + '/' + DIR + "xmark.xml'))"));
   }
 }

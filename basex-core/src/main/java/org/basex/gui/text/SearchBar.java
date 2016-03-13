@@ -16,7 +16,7 @@ import org.basex.util.options.*;
 /**
  * This panel provides search and replace facilities.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class SearchBar extends BaseXBack {
@@ -74,14 +74,12 @@ public final class SearchBar extends BaseXBack {
 
     gui = main;
     search = new BaseXTextField(main);
-    search.history(GUIOptions.SEARCHED, gui);
+    search.history(GUIOptions.SEARCHED, gui).hint(Text.FIND + Text.DOTS);
     search.setPreferredSize(null);
-    search.hint(Text.FIND + Text.DOTS);
 
     replace = new BaseXTextField(main);
-    replace.history(GUIOptions.REPLACED, gui);
+    replace.history(GUIOptions.REPLACED, gui).hint(Text.REPLACE_WITH + Text.DOTS);
     replace.setPreferredSize(null);
-    replace.hint(Text.REPLACE_WITH + Text.DOTS);
 
     regex = onOffButton("f_regex", Text.REGULAR_EXPR, GUIOptions.SR_REGEX);
     mcase = onOffButton("f_case", Text.MATCH_CASE, GUIOptions.SR_CASE);
@@ -199,7 +197,7 @@ public final class SearchBar extends BaseXBack {
       @Override
       public void actionPerformed(final ActionEvent e) {
         if(isVisible()) deactivate(true);
-        else activate(null, true);
+        else activate("", true);
       }
     });
     return button;
@@ -210,7 +208,7 @@ public final class SearchBar extends BaseXBack {
    */
   public void refreshLayout() {
     if(editor == null) return;
-    final Font ef = editor.getFont().deriveFont(7f + (GUIConstants.fontSize >> 1));
+    final Font ef = editor.getFont().deriveFont((float) (7 + (GUIConstants.fontSize >> 1)));
     search.setFont(ef);
     replace.setFont(ef);
   }
@@ -226,9 +224,9 @@ public final class SearchBar extends BaseXBack {
   }
 
   /**
-   * Activates the search bar.
-   * @param string search string; triggers a new search if it differs from old string.
-   * Will be ignored if set to {@code null}
+   * Activates the search bar. A new search is triggered if the new seaerch term differs from
+   * the last one.
+   * @param string search string (ignored if empty)
    * @param focus indicates if the search field should be focused
    */
   public void activate(final String string, final boolean focus) {
@@ -240,7 +238,7 @@ public final class SearchBar extends BaseXBack {
     if(focus) search.requestFocusInWindow();
 
     // set new, different search string
-    if(string != null && !new SearchContext(this, search.getText()).matches(string)) {
+    if(!string.isEmpty() && !new SearchContext(this, search.getText()).matches(string)) {
       search.setText(string);
       search.store();
       regex.setSelected(false);

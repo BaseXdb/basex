@@ -12,7 +12,7 @@ import org.basex.util.list.*;
 /**
  * Update primitive for the {@link Function#_DB_ALTER} function.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class DBAlter extends NameUpdate {
@@ -42,7 +42,7 @@ public final class DBAlter extends NameUpdate {
   }
 
   @Override
-  public void prepare() throws QueryException { }
+  public void prepare() { }
 
   @Override
   protected String operation() { return "renamed"; }

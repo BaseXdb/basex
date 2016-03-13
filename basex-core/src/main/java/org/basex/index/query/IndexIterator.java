@@ -3,12 +3,12 @@ package org.basex.index.query;
 /**
  * Iterator for returning index results.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public abstract class IndexIterator {
+public interface IndexIterator {
   /** Empty iterator. */
-  public static final IndexIterator EMPTY = new IndexIterator() {
+  IndexIterator EMPTY = new IndexIterator() {
     @Override
     public boolean more() { return false; }
     @Override
@@ -21,17 +21,17 @@ public abstract class IndexIterator {
    * Returns true if more results can be returned.
    * @return size
    */
-  public abstract boolean more();
+  boolean more();
 
   /**
    * Returns the next pre value.
    * @return result
    */
-  public abstract int pre();
+  int pre();
 
   /**
    * Returns an approximate number of index results.
    * @return result approximate number of results
    */
-  public abstract int size();
+  int size();
 }

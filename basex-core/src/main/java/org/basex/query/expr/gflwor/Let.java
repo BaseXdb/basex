@@ -23,7 +23,7 @@ import org.basex.util.hash.*;
 /**
  * FLWOR {@code let} clause, binding an expression to a variable.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public final class Let extends ForLet {
@@ -92,7 +92,7 @@ public final class Let extends ForLet {
     if(!scoring && expr instanceof TypeCheck) {
       final TypeCheck tc = (TypeCheck) expr;
       if(tc.isRedundant(var) || var.adoptCheck(tc.seqType(), tc.promote)) {
-        qc.compInfo(OPTCAST, tc.seqType());
+        qc.compInfo(OPTCAST_X, tc.seqType());
         expr = tc.expr;
       }
     }

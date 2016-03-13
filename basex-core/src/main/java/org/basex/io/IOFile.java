@@ -15,7 +15,7 @@ import org.xml.sax.*;
 /**
  * {@link IO} reference, representing a local file or directory path.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class IOFile extends IO {
@@ -239,7 +239,9 @@ public final class IOFile extends IO {
   public boolean delete() {
     boolean ok = true;
     if(file.exists()) {
-      if(isDir()) for(final IOFile ch : children()) ok &= ch.delete();
+      if(isDir()) {
+        for(final IOFile ch : children()) ok &= ch.delete();
+      }
       try {
         Files.delete(toPath());
       } catch(final IOException ex) {
@@ -330,19 +332,6 @@ public final class IOFile extends IO {
       return new IOFile(toPath().toRealPath().toFile());
     } catch(final IOException ex) {
       return this;
-    }
-  }
-
-  /**
-   * Returns a path to the specified path. If rewriting fails, the absolute path is returned.
-   * @param path relative path
-   * @return path
-   */
-  public String relative(final IOFile path) {
-    try {
-      return toPath().relativize(path.toPath()).toString();
-    } catch(final Exception ex) {
-      return path.path();
     }
   }
 

@@ -1,7 +1,7 @@
 (:~
  : Download resources.
  :
- : @author Christian Grün, BaseX GmbH, 2014-15
+ : @author Christian Grün, BaseX Team, 2014-16
  :)
 module namespace _ = 'dba/databases';
 
@@ -28,13 +28,9 @@ function _:download(
   try {
     let $options := map { 'n': $name, 'r': $resource }
     let $raw := util:eval("db:is-raw($n, $r)", $options)
+    let $ct := util:eval("db:content-type($n, $r)", $options)
     return (
-      <rest:response>
-        <output:serialization-parameters>
-          <output:method value='{ if($raw) then "raw" else "xml" }'/>
-          <output:media-type value='{ util:eval("db:content-type($n, $r)", $options) }'/>
-        </output:serialization-parameters>
-      </rest:response>,
+      web:response-header(map { 'media-type': $ct }),
       util:eval(if($raw) then "db:retrieve($n, $r)" else "db:open($n, $r)", $options)
     )
   } catch * {
@@ -51,7 +47,6 @@ function _:download(
  :)
 declare
   %rest:path("/dba/backup/{$backup}")
-  %output:method("raw")
   %output:media-type("application/octet-stream")
 function _:download(
   $backup  as xs:string

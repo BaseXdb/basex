@@ -9,7 +9,7 @@ import org.basex.util.*;
 /**
  * A CSV parser generating parse events similar to a SAX XML parser.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class CsvParser {
@@ -136,7 +136,7 @@ final class CsvParser {
    * @param ch character
    */
   private static void add(final TokenBuilder entry, final int ch) {
-    entry.add(XMLToken.valid(ch) ? ch : '?');
+    entry.add(XMLToken.valid(ch) ? ch : Token.INVALID);
   }
 
   /**

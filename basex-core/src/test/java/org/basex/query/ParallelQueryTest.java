@@ -10,7 +10,7 @@ import org.junit.*;
 /**
  * Runs parallel queries.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class ParallelQueryTest extends SandboxTest {
@@ -28,7 +28,7 @@ public final class ParallelQueryTest extends SandboxTest {
   @Test
   public void test() throws Throwable {
     // generate reference result
-    result = query();
+    result = query(QUERY);
     // generate results to be compared
     final ArrayList<Query> queries = new ArrayList<>();
     for(int i = 0; i < 10; i++) queries.add(new Query());
@@ -38,24 +38,13 @@ public final class ParallelQueryTest extends SandboxTest {
   }
 
   /**
-   * Runs a single query.
-   * @return result
-   * @throws Exception exception
-   */
-  private static String query() throws Exception {
-    try(final QueryProcessor qp = new QueryProcessor(QUERY, context)) {
-      return qp.value().serialize().toString();
-    }
-  }
-
-  /**
    * Query instance.
    */
   private class Query extends Thread {
     @Override
     public void run() {
       try {
-        assertEquals(result, query());
+        assertEquals(result, query(QUERY));
       } catch(final Throwable th) {
         error = th;
       }

@@ -13,7 +13,7 @@ import org.basex.util.*;
 /**
  * Calculation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public enum Calc {
@@ -25,7 +25,7 @@ public enum Calc {
       final boolean n1 = t1.isNumberOrUntyped(), n2 = t2.isNumberOrUntyped();
       if(n1 ^ n2) throw numberError(ii, n1 ? it2 : it1);
 
-      if(n1 && n2) {
+      if(n1) {
         // numbers or untyped values
         final Type t = type(t1, t2);
         if(t == ITR) {
@@ -41,7 +41,7 @@ public enum Calc {
 
       // dates or durations
       if(t1 == t2) {
-        if(!(it1 instanceof Dur)) throw numberError(ii, n1 ? it2 : it1);
+        if(!(it1 instanceof Dur)) throw numberError(ii, it1);
         if(t1 == YMD) return new YMDur((YMDur) it1, (YMDur) it2, true, ii);
         if(t1 == DTD) return new DTDur((DTDur) it1, (DTDur) it2, true, ii);
       }
@@ -63,7 +63,7 @@ public enum Calc {
       final boolean n1 = t1.isNumberOrUntyped(), n2 = t2.isNumberOrUntyped();
       if(n1 ^ n2) throw numberError(ii, n1 ? it2 : it1);
 
-      if(n1 && n2) {
+      if(n1) {
         // numbers or untyped values
         final Type t = type(t1, t2);
         if(t == ITR) {
@@ -82,7 +82,7 @@ public enum Calc {
         if(t1 == DTM || t1 == DAT || t1 == TIM) return new DTDur((ADate) it1, (ADate) it2, ii);
         if(t1 == YMD) return new YMDur((YMDur) it1, (YMDur) it2, false, ii);
         if(t1 == DTD) return new DTDur((DTDur) it1, (DTDur) it2, false, ii);
-        throw numberError(ii, n1 ? it2 : it1);
+        throw numberError(ii, it1);
       }
       if(t1 == DTM) return new Dtm((Dtm) it1, checkDur(ii, it2), false, ii);
       if(t1 == DAT) return new Dat((Dat) it1, checkDur(ii, it2), false, ii);
@@ -115,7 +115,7 @@ public enum Calc {
 
       final boolean b1 = t1.isNumberOrUntyped(), b2 = t2.isNumberOrUntyped();
       if(b1 ^ b2) throw typeError(ii, t1, t2);
-      if(b1 && b2) {
+      if(b1) {
         final Type t = type(t1, t2);
         if(t == ITR) {
           final long l1 = it1.itr(ii);
@@ -130,7 +130,7 @@ public enum Calc {
         if(t == FLT) return Flt.get(it1.flt(ii) * it2.flt(ii));
         return Dec.get(it1.dec(ii).multiply(it2.dec(ii)));
       }
-      throw numberError(ii, b1 ? it2 : it1);
+      throw numberError(ii, it1);
     }
   },
 

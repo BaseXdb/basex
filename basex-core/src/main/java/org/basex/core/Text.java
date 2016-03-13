@@ -16,7 +16,7 @@ import org.basex.util.*;
  * This class contains internationalized text strings, which are used throughout the project.
  * If this class is called first, the Strings are initialized by the {@link Lang} class.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public interface Text {
@@ -118,13 +118,17 @@ public interface Text {
   String S_GUI = "GUI";
   /** GUI start information. */
   String S_GUIINFO =
-    " [file]" + NL +
-    "  [file]  Open specified XML or XQuery file";
+    " [-d] [file]" + NL +
+    "  [file]  Open specified XML or XQuery file" + NL +
+    "  -d  Activate debugging mode";
 
+  /** HTTP server mode. */
+  String S_HTTP_SERVER = "HTTP Server";
   /** HTTP information. */
   String S_HTTPINFO =
     " [-dhlnpPsSUz] [stop]" + NL +
     "  stop      Stop running server" + NL +
+    "  -c        Start in client mode" + NL +
     "  -d        Activate debugging mode" + NL +
     "  -h<port>  Set port of HTTP server" + NL +
     "  -l        Start in local mode" + NL +
@@ -139,7 +143,7 @@ public interface Text {
   /** Bug info. */
   String S_BUGINFO = "Improper use? Potential bug? Your feedback is welcome:";
   /** Console text. */
-  String S_CONSOLE = Prop.TITLE + " [%]" + NL;
+  String S_CONSOLE_X = Prop.TITLE + " [%]";
 
   /** Localhost. */
   String S_LOCALHOST = "localhost";
@@ -159,14 +163,12 @@ public interface Text {
   /** Command keyword. */
   String S_PW = "password";
   /** Command keyword. */
-  String S_PKGPATH = "path";
-  /** Command keyword. */
-  String S_PKGNAME = "name";
-  /** Command keyword. */
-  String S_PKGDIR = "dir";
+  String S_DIR = "dir";
 
   /** Index info. */
   String LI_STRUCTURE = LI + "Structure: ";
+  /** Index info. */
+  String LI_NAMES = LI + "Names: ";
   /** Index info. */
   String LI_SIZE = LI + "Size: ";
   /** Index info. */
@@ -189,21 +191,21 @@ public interface Text {
   String NONE = "none";
 
   /** Options error. */
-  String OPT_OFFSET = "List counter for '%' is invalid.";
+  String OPT_OFFSET_X = "List counter for '%' is invalid.";
   /** Options error. */
-  String OPT_BOOLEAN = "Value of '%' must be 'yes', 'no', or a boolean.";
+  String OPT_BOOLEAN_X = "Value of '%' must be 'yes', 'no', or a boolean.";
   /** Options error. */
-  String OPT_NUMBER = "Value of '%' must be a number.";
+  String OPT_NUMBER_X = "Value of '%' must be a number.";
   /** Options error. */
-  String OPT_STRING = "Value of '%' must be a string.";
+  String OPT_STRING_X = "Value of '%' must be a string.";
   /** Options error. */
-  String OPT_MAP = "Value of '%' must be a map.";
+  String OPT_MAP_X = "Value of '%' must be a map.";
   /** Options error. */
-  String OPT_FUNC = "Value of '%' must be a function.";
+  String OPT_FUNC_X = "Value of '%' must be a function.";
   /** Options error. */
-  String OPT_ONEOF = "Value of '%' must be one of (%).";
+  String OPT_ONEOF_X_X = "Value of '%' must be one of (%).";
   /** Options error. */
-  String OPT_EXPECT = "% expected, % found: %.";
+  String OPT_EXPECT_X_X_X = "% expected, % found: %.";
 
   /** "log". */
   String PLOTLOG = "log";
@@ -234,7 +236,7 @@ public interface Text {
   /** "Stack Trace". */
   String STACK_TRACE = "Stack Trace";
   /** Copyright info. */
-  String COPYRIGHT = "\u00A9 2005-15 " + Prop.ENTITY;
+  String COPYRIGHT = "\u00A9 2005-16 " + Prop.ENTITY;
 
   // SERVER ===================================================================
 
@@ -266,7 +268,7 @@ public interface Text {
   // COMMANDS =================================================================
 
   /** Console text. */
-  String TRY_MORE_X = lang("try_more_%", "help") + NL;
+  String TRY_MORE_X = lang("try_more_%", "'help'");
   /** Version information. */
   String VERSINFO = lang("version");
 
@@ -286,8 +288,8 @@ public interface Text {
     "  " + lang("c_create22", S_NAME) + NL +
     LI + CmdCreate.DATABASE + " [" + S_NAME + "] ([" + S_INPUT + "]):"  + NL +
     "  " + lang("c_create21", S_NAME, S_INPUT) + NL +
-    LI + CmdCreate.INDEX + " [" + CmdIndex.TEXT + '|' + CmdIndex.ATTRIBUTE +
-    '|' + CmdIndex.FULLTEXT + "]:" + NL +
+    LI + CmdCreate.INDEX + " [" + CmdIndex.TEXT + '|' + CmdIndex.ATTRIBUTE + '|' +
+      CmdIndex.TOKEN + '|' + CmdIndex.FULLTEXT + "]:" + NL +
     "  " + lang("c_create23") + NL +
     LI + CmdCreate.USER + " [" + S_NAME + "] ([" + S_PW + "]):" + NL +
     "  " + lang("c_create24")
@@ -350,12 +352,12 @@ public interface Text {
     lang("c_drop1"),
     lang("c_drop2") + NL +
     LI + CmdDrop.BACKUP + " [" + S_NAME + "]:" + NL +
-      "  " + lang("c_drop24") + NL +
+    "  " + lang("c_drop24") + NL +
     LI + CmdDrop.DATABASE + " [" + S_NAME + "]:" + NL +
-      "  " + lang("c_drop21") + NL +
-    LI + CmdDrop.INDEX + " [" + CmdIndex.TEXT + '|' +
-      CmdIndex.ATTRIBUTE + '|' + CmdIndex.FULLTEXT + "]:" + NL +
-      "  " + lang("c_drop22") + NL +
+    "  " + lang("c_drop21") + NL +
+    LI + CmdDrop.INDEX + " [" + CmdIndex.TEXT + '|' + CmdIndex.ATTRIBUTE + '|' +
+      CmdIndex.TOKEN + '|' + CmdIndex.FULLTEXT + "]:" + NL +
+    "  " + lang("c_drop22") + NL +
     LI + CmdDrop.USER + " [" + S_NAME + "] (" + ON + " [pattern]): " + NL +
       "  " + lang("c_drop23")
   };
@@ -459,10 +461,10 @@ public interface Text {
     "[" + CmdRepo.DELETE + '|' + CmdRepo.INSTALL + '|' + CmdRepo.LIST + ']',
     lang("c_repo1"),
     lang("c_repo2") + NL +
-    LI + CmdRepo.DELETE + " [" + S_PKGNAME + '|' + S_PKGDIR + "]:" +  NL +
-    "  " + lang("c_repo3", S_PKGNAME, S_PKGDIR) + NL +
-    LI + CmdRepo.INSTALL + " [" + S_PKGPATH + "]:" + NL +
-    "  " + lang("c_repo4", S_PKGPATH) + NL +
+    LI + CmdRepo.DELETE + " [" + S_NAME + '|' + S_DIR + "]:" +  NL +
+    "  " + lang("c_repo3", S_NAME, S_DIR) + NL +
+    LI + CmdRepo.INSTALL + " [" + S_PATH + "]:" + NL +
+    "  " + lang("c_repo4", S_PATH) + NL +
     LI + CmdRepo.LIST + ':' + NL +
     "  " + lang("c_repo5")
   };
@@ -482,7 +484,7 @@ public interface Text {
   /** Command syntax information. */
   String SYNTAX_X = lang("syntax") + ": %";
   /** Command execution error. */
-  String EXEC_ERROR = lang("exec_error_%") + COL + NL + '%';
+  String EXEC_ERROR_X_X = lang("exec_error_%") + COL + NL + '%';
 
   /** No database error. */
   String NO_DB_OPENED = lang("no_db_opened");
@@ -493,18 +495,18 @@ public interface Text {
   /** Progress exception. */
   String INTERRUPTED = lang("interrupted");
 
-  /** Unknown command error. */
+  /** Expecting command. */
   String EXPECTING_CMD = lang("expecting_cmd");
-  /** Unknown command error. */
+  /** Unknown command: %. */
   String UNKNOWN_CMD_X = lang("unknown_cmd_%");
-  /** Command syntax information. */
+  /** Single command expected. */
   String SINGLE_CMD = lang("single_cmd");
-  /** Unknown command error. */
-  String UNKNOWN_TRY_X = UNKNOWN_CMD_X + ' ' + lang("try_%", "HELP");
+  /** Unknown command: % (try help). */
+  String UNKNOWN_TRY_X = UNKNOWN_CMD_X + ' ' + lang("try_%", "'help'");
   /** Try "help [...]" to get.. */
   String TRY_SPECIFIC_X = lang("try_specific_%", "HELP [...]") + NL;
-  /** Unknown command error. */
-  String UNKNOWN_SIMILAR_X = UNKNOWN_CMD_X + ' ' + lang("similar_cmd_%");
+  /** Unknown command: % (similar: %). */
+  String UNKNOWN_SIMILAR_X_X = UNKNOWN_CMD_X + ' ' + lang("similar_cmd_%");
 
   // CREATE COMMAND ===========================================================
 
@@ -519,16 +521,18 @@ public interface Text {
   /** "Command was canceled". */
   String COMMAND_CANCELED = lang("command_canceled");
   /** Create database information. */
-  String NODES_PARSED_X = " \"%\" (" + lang("nodes_parsed_%") + ')';
+  String NODES_PARSED_X_X = " \"%\" (" + lang("nodes_parsed_%") + ')';
   /** Scanner position. */
   String SCANPOS_X_X = "\"%\" (" + lang("line") + " %)";
 
   /** Finish database creation. */
   String FINISHING_D = lang("finishing") + DOTS;
   /** Create text index. */
-  String INDEX_TEXT_D = lang("index_text") + DOTS;
+  String INDEX_TEXTS_D = lang("index_texts") + DOTS;
   /** Create attribute index. */
   String INDEX_ATTRIBUTES_D = lang("index_attributes") + DOTS;
+  /** Create token index. */
+  String INDEX_TOKENS_D = lang("index_tokens") + DOTS;
   /** Create full-text index. */
   String INDEX_FULLTEXT_D = lang("index_fulltext") + DOTS;
 
@@ -539,7 +543,7 @@ public interface Text {
 
   /** Resource not found. */
   String RES_NOT_FOUND_X = lang("res_not_found_%");
-  /** Resource "%" not found. */
+  /** Resource not found. */
   String RES_NOT_FOUND = lang("res_not_found");
   /** Resource deleted. */
   String RES_DELETED_X_X = lang("res_deleted_%_%");
@@ -806,14 +810,16 @@ public interface Text {
   /** "Strings were replaced.". */
   String STRINGS_REPLACED = lang("strings_replaced");
 
-  /** Info on text indexing. */
+  /** Info on text index. */
   String TEXT_INDEX = lang("text_index");
-  /** Info on attribute indexing. */
+  /** Info on attribute index. */
   String ATTRIBUTE_INDEX = lang("attribute_index");
-  /** Info on full-text indexing. */
+  /** Info on full-text index. */
   String FULLTEXT_INDEX = lang("fulltext_index");
-  /** Info on path summary. */
+  /** Info on path index. */
   String PATH_INDEX = lang("path_index");
+  /** Info on token index. */
+  String TOKEN_INDEX = lang("token_index");
   /** Info on up-to-date. */
   String UP_TO_DATE = lang("up_to_date");
 
@@ -838,7 +844,7 @@ public interface Text {
   /** "(chopped)". */
   String CHOPPED = '(' + lang("chopped") + ") ";
   /** "(% entries)". */
-  String ENTRIES = '(' + lang("entries_%") + ')';
+  String ENTRIES_X = '(' + lang("entries_%") + ')';
   /** "Error". */
   String ERROR = lang("error");
 
@@ -875,8 +881,6 @@ public interface Text {
   String SELECT_ALL = lang("select_all");
   /** Command info. */
   String COPY_PATH = lang("copy_path");
-  /** Command info. */
-  String ADD_AS_IMPORT = lang("add_as_import");
   /** Command info. */
   String NEW = lang("new");
   /** Command info. */
@@ -972,10 +976,10 @@ public interface Text {
   /** Button: " no ". */
   String B_NO = "  " + lang("no") + "  ";
   /** Button: "cancel". */
-  String CANCEL = lang("cancel");
-  /** Button for refreshing. */
-  String REFRESH = lang("refresh");
+  String B_CANCEL = lang("cancel");
 
+  /** "Refresh". */
+  String REFRESH = lang("refresh");
   /** "Find". */
   String FIND = lang("find");
   /** "Find files". */
@@ -1077,6 +1081,8 @@ public interface Text {
   String INT_PARSER = lang("int_parser");
   /** Parse files inside archives. */
   String PARSE_ARCHIVES = lang("parse_archives");
+  /** Include name of archive in database path. */
+  String ADD_ARCHIVE_NAME = lang("add_archive_name");
   /** Add remaining files as raw files. */
   String ADD_RAW_FILES = lang("add_raw_files");
   /** "Add Resources". */
@@ -1085,6 +1091,13 @@ public interface Text {
   String SKIP_CORRUPT_FILES = lang("skip_corrupt_files");
   /** SAX parsing information. */
   String INPUT_FORMAT = lang("input_format") + COLS;
+
+  /** Index creation. */
+  String INDEX_CREATION = lang("index_creation");
+  /** Auto-optimize. */
+  String AUTOOPTIMIZE = lang("autooptimize");
+  /** Incremental updates. */
+  String UPD_INDEX = lang("upd_index");
 
   /** Full-text index information. */
   String STEMMING = lang("stemming");
@@ -1101,11 +1114,21 @@ public interface Text {
   String ASCENDING_ORDER = lang("ascending_order");
   /** Merge duplicate lines. */
   String MERGE_DUPLICATES = lang("merge_duplicates");
+  /** Unicode order. */
+  String UNICODE_ORDER = lang("unicode_order");
+  /** Column. */
+  String COLUMN = lang("column");
 
   /** Format. */
   String FORMAT = lang("format");
   /** Sort. */
   String SORT = lang("sort");
+  /** Lowercase. */
+  String LOWER_CASE = lang("lower_case");
+  /** Upper case. */
+  String UPPER_CASE = lang("upper_case");
+  /** Title case. */
+  String TITLE_CASE = lang("title_case");
   /** Split input lines. */
   String SPLIT_INPUT_LINES = lang("split_input_lines");
   /** Treat first line as header. */
@@ -1120,8 +1143,8 @@ public interface Text {
   String MERGE_TYPES = lang("merge_types");
   /** Merge type information. */
   String INCLUDE_STRINGS = lang("include_strings");
-  /** Unescape characters. */
-  String UNESCAPE_CHARS = lang("unescape_chars");
+  /** Escape characters. */
+  String ESCAPE_CHARS = lang("escape_chars");
   /** Liberal parsing. */
   String LIBERAL_PARSING = lang("liberal_parsing");
   /** Backslash. */
@@ -1133,6 +1156,8 @@ public interface Text {
   String PARSING = lang("parsing");
   /** Name indexes. */
   String NAMES = lang("names");
+  /** Paths. */
+  String PATHS = lang("paths");
   /** Value indexes. */
   String INDEXES = lang("indexes");
   /** Full-text index. */
@@ -1238,6 +1263,8 @@ public interface Text {
   String MARK_EDITED_LINE = lang("mark_edited_line");
   /** Save before executing file. */
   String SAVE_BEFORE_EXECUTE = lang("save_before_execute");
+  /** Parse project files. */
+  String PARSE_PROJECT_FILES = lang("parse_project_files");
   /** Automatically add characters. */
   String AUTO_ADD_CHARS = lang("auto_add_chars");
   /** Default file filter. */
@@ -1272,6 +1299,8 @@ public interface Text {
   /** Color schema information. */
   String BLUE = lang("blue");
 
+  /** Scale interface. */
+  String SCALE_GUI = lang("scale_gui");
   /** Show attributes. */
   String SHOW_ATTS = lang("show_atts");
   /** Algorithm. */
@@ -1327,12 +1356,14 @@ public interface Text {
   /** Internal parser information. */
   String H_INT_PARSER = lang("h_int_parser");
 
-  /** Path summary information. */
+  /** Path index information. */
   String H_PATH_INDEX = lang("h_path_index");
   /** Text index information. */
   String H_TEXT_INDEX = lang("h_text_index");
   /** Attribute value index information. */
   String H_ATTR_INDEX = lang("h_attr_index");
+  /** Token index information. */
+  String H_TOKEN_INDEX = lang("h_token_index");
   /** Full-text index information. */
   String H_FULLTEXT_INDEX = lang("h_fulltext_index");
   /** Full-text index information. */
@@ -1345,6 +1376,8 @@ public interface Text {
   String H_DIACRITICS = lang("h_diacritics");
   /** Full-text index information. */
   String H_STOPWORDS = lang("h_stopwords");
+  /** Help on database options. */
+  String H_DB_OPTIONS_X = lang("h_db_options_%", OPTIMIZE_ALL);
 
   /** "Failed to open a browser". */
   String H_BROWSER_ERROR_X = lang("h_browser_error_%");

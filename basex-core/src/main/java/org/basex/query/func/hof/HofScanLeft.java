@@ -11,7 +11,7 @@ import org.basex.query.var.*;
 /**
  * Implements the {@code hof:scan-left($seq, $start, $f)} function.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public final class HofScanLeft extends StandardFunc {
@@ -24,7 +24,7 @@ public final class HofScanLeft extends StandardFunc {
       private Iter inner = acc.iter();
       @Override
       public Item next() throws QueryException {
-        for(;;) {
+        while(true) {
           final Item i = inner.next();
           if(i != null) return i;
           final Item o = outer.next();
@@ -37,7 +37,7 @@ public final class HofScanLeft extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext qc, final VarScope scp) throws QueryException {
+  protected Expr opt(final QueryContext qc, final VarScope scp) {
     return exprs[0].isEmpty() ? exprs[1] : this;
   }
 }

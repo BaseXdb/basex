@@ -24,7 +24,7 @@ import org.basex.util.options.*;
 /**
  * Functions for performing XSLT transformations.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public class XsltTransform extends XsltFn {
@@ -75,7 +75,7 @@ public class XsltTransform extends XsltFn {
     final Item it = toNodeOrAtomItem(ex, qc);
     if(it instanceof ANode) {
       try {
-        final IO io = new IOContent(it.serialize(SerializerOptions.get(false)).finish());
+        final IO io = new IOContent(it.serialize(SerializerMode.NOINDENT.get()).finish());
         io.name(string(((ANode) it).baseURI()));
         return io;
       } catch(final QueryIOException e) {

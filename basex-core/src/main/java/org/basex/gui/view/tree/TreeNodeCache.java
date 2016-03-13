@@ -8,7 +8,7 @@ import org.basex.util.list.*;
 /**
  * This class determines nodes per level and caches them.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Wolfgang Miller
  */
 final class TreeNodeCache implements TreeConstants {
@@ -108,7 +108,7 @@ final class TreeNodeCache implements TreeConstants {
   /**
    * Finds pre value in cached nodes and returns level and index position.
    * @param pre pre value
-   * @return level and position pair
+   * @return level and position pair, or {@code null} if it is not available
    */
   private int[] findPre(final int pre) {
     int pos = -1;

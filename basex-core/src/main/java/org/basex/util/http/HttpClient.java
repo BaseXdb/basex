@@ -25,11 +25,12 @@ import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.http.HttpRequest.Part;
 import org.basex.util.http.HttpText.Request;
+import org.basex.util.options.Options.*;
 
 /**
  * HTTP Client.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Rositsa Shadura
  */
 public final class HttpClient {
@@ -104,7 +105,7 @@ public final class HttpClient {
         conn.setRequestProperty(AUTHORIZATION, BASIC + ' ' +
             org.basex.util.Base64.encode(user + ':' + pass));
 
-      } else {
+      } else if(request.authMethod == AuthMethod.DIGEST) {
         conn.setRequestProperty(AUTHORIZATION, DIGEST);
 
         final EnumMap<Request, String> map = digestHeaders(conn.getHeaderField(WWW_AUTHENTICATE));
@@ -167,7 +168,7 @@ public final class HttpClient {
       conn.setDoOutput(true);
 
       final String timeout = request.attribute(TIMEOUT);
-      if(timeout != null) conn.setConnectTimeout(Strings.toInt(timeout));
+      if(timeout != null) conn.setConnectTimeout(Strings.toInt(timeout) * 1000);
       final String redirect = request.attribute(FOLLOW_REDIRECT);
       if(redirect != null) setFollowRedirects(Strings.yes(redirect));
 
@@ -185,9 +186,9 @@ public final class HttpClient {
    */
   private static void setContentType(final HttpURLConnection conn, final HttpRequest request) {
     String ct;
-    final String contType = request.headers.get(lc(token(CONTENT_TYPE)));
+    final String contType = request.headers.get(CONTENT_TYPE.toLowerCase(Locale.ENGLISH));
     if(contType != null) {
-      // if content type is set explicitly in the header, its value is used
+      // if content type is set in the header, its value is used
       ct = contType;
     } else {
       // otherwise @media-type of <http:body/> is considered
@@ -299,6 +300,7 @@ public final class HttpClient {
     // extract serialization parameters
     final SerializerOptions sopts = new SerializerOptions();
     sopts.set(SerializerOptions.METHOD, method);
+    sopts.set(SerializerOptions.INDENT, YesNo.NO);
     for(final Entry<String, String> attr : attrs.entrySet()) {
       final String key = attr.getKey();
       if(!key.equals(SRC)) sopts.assign(key, attr.getValue());

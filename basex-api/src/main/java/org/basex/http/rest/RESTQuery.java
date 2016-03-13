@@ -12,7 +12,7 @@ import org.basex.query.value.type.*;
 /**
  * Evaluate queries via REST.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 class RESTQuery extends RESTCmd {
@@ -67,7 +67,7 @@ class RESTQuery extends RESTCmd {
         }
 
         // initializes the response with query serialization options
-        http.sopts().parse(xq.parameters(context));
+        http.sopts().assign(xq.parameters(context));
         http.initResponse();
       }
       // run command

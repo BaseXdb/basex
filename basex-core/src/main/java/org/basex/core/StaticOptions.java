@@ -10,7 +10,7 @@ import org.basex.util.options.*;
  * This class defines options which are used all around the project.
  * The initial keys and values are also stored in the project's home directory.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class StaticOptions extends Options {
@@ -48,7 +48,7 @@ public final class StaticOptions extends Options {
   public static final StringOption USER = new StringOption("USER", "");
   /** Default password. */
   public static final StringOption PASSWORD = new StringOption("PASSWORD", "");
-  /** Server: host, used for binding the server. Empty string for wildcard.*/
+  /** Server: host, used for binding the server. Empty string for wildcard. */
   public static final StringOption SERVERHOST = new StringOption("SERVERHOST", "");
   /** Server: proxy host (default: ignored). */
   public static final StringOption PROXYHOST = new StringOption("PROXYHOST", "");
@@ -69,6 +69,8 @@ public final class StaticOptions extends Options {
   public static final BooleanOption LOG = new BooleanOption("LOG", true);
   /** Log message cut-off. */
   public static final NumberOption LOGMSGMAXLEN = new NumberOption("LOGMSGMAXLEN", 1000);
+  /** Timeout (seconds) for remembering result of asynchronous queries. */
+  public static final NumberOption ASYNCTIMEOUT = new NumberOption("ASYNCTIMEOUT", 3600);
 
   /** Comment: written to options file. */
   public static final Comment C_HTTP = new Comment("HTTP Services");
@@ -93,7 +95,8 @@ public final class StaticOptions extends Options {
   /** Authorization method. */
   public enum AuthMethod {
     /** Basic.  */ BASIC,
-    /** Digest. */ DIGEST;
+    /** Digest. */ DIGEST,
+    /** Custom. */ CUSTOM;
 
     @Override
     public String toString() {
@@ -136,20 +139,20 @@ public final class StaticOptions extends Options {
    * @param name name of the file or database
    * @return database directory
    */
-  public IOFile dbpath(final String name) {
+  public IOFile dbPath(final String name) {
     return new IOFile(get(DBPATH), name);
   }
 
   /**
-   * Returns a random temporary name for the specified database.
+   * Returns a random temporary name for the specified database name.
    * @param db name of database
-   * @return random name
+   * @return random database name
    */
-  public String random(final String db) {
+  public String randomDbName(final String db) {
     String nm;
     do {
       nm = db + '_' + new Random().nextInt(0x7FFFFFFF);
-    } while(dbpath(nm).exists());
+    } while(dbPath(nm).exists());
     return nm;
   }
 
@@ -157,7 +160,7 @@ public final class StaticOptions extends Options {
    * Returns the current database path.
    * @return database filename
    */
-  public IOFile dbpath() {
+  public IOFile dbPath() {
     return new IOFile(get(DBPATH));
   }
 
@@ -166,7 +169,7 @@ public final class StaticOptions extends Options {
    * @param db name of the database
    * @return result of check
    */
-  public boolean dbexists(final String db) {
-    return !db.isEmpty() && dbpath(db).exists();
+  public boolean dbExists(final String db) {
+    return !db.isEmpty() && dbPath(db).exists();
   }
 }

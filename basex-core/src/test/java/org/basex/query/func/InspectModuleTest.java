@@ -9,7 +9,7 @@ import org.junit.*;
 /**
  * This class tests the functions of the Inspection Module.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class InspectModuleTest extends AdvancedQueryTest {
@@ -77,7 +77,7 @@ public final class InspectModuleTest extends AdvancedQueryTest {
     query(func1 + "/return/@occurrence/data()", "");
 
     final String func2 = query(result + "/function[@name = 'hello:internal']").
-        replace("{", "{{").replace("}", "}}");;
+        replace("{", "{{").replace("}", "}}");
     query(func2 + "/@uri/data()", "world");
     query(func2 + "/annotation/@name/data()[ends-with(., 'ignored')]", "ignored");
     query(func2 + "/annotation/@uri/data()[. = 'ns']", "ns");
@@ -106,13 +106,61 @@ public final class InspectModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void functions() {
+    final String url = "src/test/resources/hello.xqm";
     query("declare function local:x() { 1 }; " + COUNT.args(_INSPECT_FUNCTIONS.args()), "1");
     query("declare function local:x() { 2 }; " + _INSPECT_FUNCTIONS.args() + "()", "2");
-    query("import module namespace hello='world' at 'src/test/resources/hello.xqm';" +
-        "inspect:functions()[last()] instance of function(*)", "true");
+    query("import module namespace hello='world' at '" + url + "';" +
+        _INSPECT_FUNCTIONS.args() + "[last()] instance of function(*)", "true");
 
-    query("for $f in " + _INSPECT_FUNCTIONS.args("src/test/resources/hello.xqm")
+    query("for $f in " + _INSPECT_FUNCTIONS.args(url)
         + "where local-name-from-QName(function-name($f)) = 'world' "
         + "return $f()", "hello world");
+
+    // ensure that closures will be compiled (GH-1194)
+    query(_INSPECT_FUNCTIONS.args(url)
+        + "[function-name(.) = QName('world','closure')]()", "1");
+    query("import module namespace hello='world' at '" + url + "';"
+        + _INSPECT_FUNCTIONS.args() + "[function-name(.) = xs:QName('hello:closure')]()", "1");
+  }
+
+  /** Test method. */
+  @Test
+  public void functionAnnotations() {
+    query(_INSPECT_FUNCTION_ANNOTATIONS.args(" true#0"), "map {\n}");
+    query(_INSPECT_FUNCTION_ANNOTATIONS.args(" %local:x function() { }") +
+        "=> " + _MAP_CONTAINS.args("xs:QName('local:x')"), true);
+    query(_INSPECT_FUNCTION_ANNOTATIONS.args(" %Q{uri}name('a','b') function() {}") +
+        "(QName('uri','name'))", "a\nb");
+    query(_MAP_SIZE.args(_INSPECT_FUNCTION_ANNOTATIONS.args(
+        " %basex:inline %basex:lazy function() {}")), 2);
+  }
+
+  /** Test method. */
+  @Test
+  public void staticContext() {
+    query(_INSPECT_STATIC_CONTEXT.args(" ()", "namespaces") + "?xml",
+        "http://www.w3.org/XML/1998/namespace");
+    query(STARTS_WITH.args(_INSPECT_STATIC_CONTEXT.args(" ()", "base-uri"), "file:"), "true");
+    query(_INSPECT_STATIC_CONTEXT.args(" ()", "element-namespace"), "");
+    query(_INSPECT_STATIC_CONTEXT.args(" ()", "function-namespace"),
+        "http://www.w3.org/2005/xpath-functions");
+    query(_INSPECT_STATIC_CONTEXT.args(" ()", "collation"),
+        "http://www.w3.org/2005/xpath-functions/collation/codepoint");
+    query(_INSPECT_STATIC_CONTEXT.args(" ()", "boundary-space"), "strip");
+    query(_INSPECT_STATIC_CONTEXT.args(" ()", "ordering"), "ordered");
+    query(_INSPECT_STATIC_CONTEXT.args(" ()", "construction"), "preserve");
+    query(_INSPECT_STATIC_CONTEXT.args(" ()", "default-order-empty"), "least");
+    query("declare boundary-space preserve;" +
+        _INSPECT_STATIC_CONTEXT.args(" ()", "boundary-space"), "preserve");
+    query(_INSPECT_STATIC_CONTEXT.args(" ()", "copy-namespaces"), "preserve\ninherit");
+    query(_INSPECT_STATIC_CONTEXT.args(" ()", "decimal-formats") + "('')('percent')", "%");
+
+    // check different function types
+    query(_INSPECT_STATIC_CONTEXT.args(" true#0", "boundary-space"), "strip");
+    query(_INSPECT_STATIC_CONTEXT.args(" function(){}", "boundary-space"), "strip");
+    query(_INSPECT_STATIC_CONTEXT.args(" function($a){}(?)", "boundary-space"), "strip");
+
+    // errors
+    error(_INSPECT_STATIC_CONTEXT.args(" ()", "unknown"), INSPECT_UNKNOWN_X);
   }
 }

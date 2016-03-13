@@ -21,7 +21,7 @@ import org.basex.util.*;
 /**
  * An array storing {@link Value}s.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public abstract class Array extends FItem {
@@ -44,9 +44,9 @@ public abstract class Array extends FItem {
   }
 
   /**
-   * The empty sequence.
+   * The empty array.
    * Running time: <i>O(1)</i> and no allocation
-   * @return (unique) instance of an empty sequence
+   * @return (unique) instance of an empty array
    */
   public static Array empty() {
     return EmptyArray.INSTANCE;
@@ -193,6 +193,11 @@ public abstract class Array extends FItem {
    */
   public abstract Array remove(final long pos);
 
+  @Override
+  public final void materialize(final InputInfo ii) throws QueryException {
+    for(final Value v : members()) v.materialize(ii);
+  }
+
   /**
    * Iterator over the members of this array.
    * @param start starting position
@@ -238,7 +243,7 @@ public abstract class Array extends FItem {
    * @param to last index, exclusive (may be greater than {@code arr.length})
    * @return resulting array
    */
-  static final Value[] slice(final Value[] arr, final int from, final int to) {
+  static Value[] slice(final Value[] arr, final int from, final int to) {
     final Value[] out = new Value[to - from];
     final int in0 = Math.max(0, from), in1 = Math.min(to, arr.length);
     final int out0 = Math.max(-from, 0);
@@ -252,7 +257,7 @@ public abstract class Array extends FItem {
    * @param bs second array
    * @return resulting array
    */
-  static final Value[] concat(final Value[] as, final Value[] bs) {
+  static Value[] concat(final Value[] as, final Value[] bs) {
     final int l = as.length, r = bs.length, n = l + r;
     final Value[] out = new Value[n];
     System.arraycopy(as, 0, out, 0, l);
@@ -328,13 +333,6 @@ public abstract class Array extends FItem {
   }
 
   @Override
-  public Array materialize(final InputInfo ii) throws QueryException {
-    final ArrayBuilder builder = new ArrayBuilder();
-    for(final Value val : members()) builder.append(val.materialize(ii));
-    return builder.freeze();
-  }
-
-  @Override
   public Value atomValue(final InputInfo ii) throws QueryException {
     return atm(ii, false);
   }
@@ -372,35 +370,46 @@ public abstract class Array extends FItem {
 
   /**
    * Returns a string representation of the array.
+   * @param indent indent output
    * @param ii input info
    * @return string
    * @throws QueryException query exception
    */
-  public byte[] serialize(final InputInfo ii) throws QueryException {
+  public byte[] serialize(final boolean indent, final InputInfo ii) throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
-    string(tb, ii);
+    string(indent, tb, 0, ii);
     return tb.finish();
   }
 
   /**
    * Returns a string representation of the array.
+   * @param indent indent output
    * @param tb token builder
+   * @param level current level
    * @param ii input info
    * @throws QueryException query exception
    */
-  public void string(final TokenBuilder tb, final InputInfo ii) throws QueryException {
+  public void string(final boolean indent, final TokenBuilder tb, final int level,
+      final InputInfo ii) throws QueryException {
+
     tb.add('[');
     int c = 0;
     for(final Value val : members()) {
-      if(c++ > 0) tb.add(", ");
+      if(c++ > 0) {
+        tb.add(',');
+        if(indent) tb.add(' ');
+      }
       final long vs = val.size();
       if(vs != 1) tb.add('(');
       int cc = 0;
       for(int i = 0; i < vs; i++) {
-        if(cc++ > 0) tb.add(", ");
+        if(cc++ > 0) {
+          tb.add(',');
+          if(indent) tb.add(' ');
+        }
         final Item it = val.itemAt(i);
-        if(it instanceof Array) ((Array) it).string(tb, ii);
-        else if(it instanceof Map) ((Map) it).string(tb, 0, ii);
+        if(it instanceof Array) ((Array) it).string(indent, tb, level, ii);
+        else if(it instanceof Map) ((Map) it).string(indent, tb, level + 1, ii);
         else tb.add(it.toString());
       }
       if(vs != 1) tb.add(')');
@@ -408,23 +417,43 @@ public abstract class Array extends FItem {
     tb.add(']');
   }
 
-  /**
-   * Checks if the array has the given type.
-   * @param t type
-   * @return {@code true} if the type fits, {@code false} otherwise
-   */
-  public boolean hasType(final ArrayType t) {
-    if(!t.retType.eq(SeqType.ITEM_ZM)) {
-      for(final Value val : members()) if(!t.retType.instance(val)) return false;
-    }
-    return true;
+  @Override
+  public boolean instanceOf(final Type tp) {
+    return tp == AtomType.ITEM || tp instanceof FuncType && instOf((FuncType) tp, false);
   }
 
   @Override
   public FItem coerceTo(final FuncType ft, final QueryContext qc, final InputInfo ii,
       final boolean opt) throws QueryException {
-    if(!(ft instanceof ArrayType) || !hasType((ArrayType) ft)) throw castError(ii, this, ft);
-    return this;
+
+    if(instOf(ft, true)) return this;
+    throw castError(ii, this, ft);
+  }
+
+  /**
+   * Checks if this is an instance of the specified type.
+   * @param tp type
+   * @param coerce coerce value
+   * @return result of check
+   */
+  private boolean instOf(final FuncType tp, final boolean coerce) {
+    if(tp instanceof MapType) return false;
+
+    final SeqType[] at = tp.argTypes;
+    if(at != null && (at.length != 1 || !at[0].instanceOf(SeqType.ITR))) return false;
+
+    final SeqType ret = tp.type;
+    if(tp instanceof ArrayType) {
+      // no argument and return type: no check required
+      if(ret == null || ret.eq(SeqType.ITEM_ZM)) return true;
+      // check types of members
+      for(final Value val : members()) {
+        if(!ret.instance(val)) return false;
+      }
+      return true;
+    }
+    // allow coercion
+    return coerce || ret == null || ret.eq(SeqType.ITEM_ZM);
   }
 
   @Override
@@ -437,7 +466,7 @@ public abstract class Array extends FItem {
       final Iterator<Value> it1 = iterator(0), it2 = o.iterator(0);
       while(it1.hasNext()) {
         final Value v1 = it1.next(), v2 = it2.next();
-        if(v1.size() != v2.size() || !new Compare(ii).collation(coll).equal(v1, v2))
+        if(v1.size() != v2.size() || !new DeepEqual(ii).collation(coll).equal(v1, v2))
           return false;
       }
       return true;

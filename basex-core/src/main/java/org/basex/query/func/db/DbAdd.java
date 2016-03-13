@@ -13,7 +13,7 @@ import org.basex.util.options.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class DbAdd extends DbNew {
@@ -23,7 +23,7 @@ public final class DbAdd extends DbNew {
     final byte[] path = exprs.length < 3 ? EMPTY : token(path(2, qc));
     final NewInput input = checkInput(toNodeOrAtomItem(exprs[1], qc), path);
     final Options opts = toOptions(3, Q_OPTIONS, new Options(), qc);
-    qc.resources.updates().add(new DBAdd(data, input, opts, qc, info), qc);
+    qc.updates().add(new DBAdd(data, input, opts, qc, info), qc);
     return null;
   }
 }

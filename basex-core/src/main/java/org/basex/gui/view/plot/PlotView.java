@@ -22,7 +22,7 @@ import org.basex.util.list.*;
 /**
  * A scatter plot visualization of the database.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Lukas Kircher
  */
 public final class PlotView extends View {
@@ -774,9 +774,9 @@ public final class PlotView extends View {
       return (int) (d * xSpace) + MARGIN[1] + sz;
     }
 
-    final int height = getHeight();
-    if(d == -1) return height - MARGIN[2] - sz / 4;
-    final int ySpace = height - (MARGIN[0] + MARGIN[2]) - sz;
+    final int h = getHeight();
+    if(d == -1) return h - MARGIN[2] - sz / 4;
+    final int ySpace = h - (MARGIN[0] + MARGIN[2]) - sz;
     return ySpace - (int) (d * ySpace) + MARGIN[0];
   }
 

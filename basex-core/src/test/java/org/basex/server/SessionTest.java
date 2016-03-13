@@ -26,12 +26,10 @@ import org.junit.Test;
 /**
  * This class tests the client/server query API.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class SessionTest extends SandboxTest {
-  /** Raw output method. */
-  private static final String RAW = "declare option output:method 'raw';";
   /** Output stream. */
   ArrayOutput out;
   /** Client session. */
@@ -184,8 +182,7 @@ public abstract class SessionTest extends SandboxTest {
     session.store("X", new ArrayInput(""));
     assertEqual("", session.query(_DB_RETRIEVE.args(NAME, "X")).execute());
     session.store("X", new ArrayInput(new byte[] { 0, 1, -1 }));
-    assertEqual("0001FF", session.query(
-        "xs:hexBinary(" + _DB_RETRIEVE.args(NAME, "X") + ')').execute());
+    assertEqual("AAH/", session.query(STRING.args(_DB_RETRIEVE.args(NAME, "X"))).execute());
     session.execute("drop db " + NAME);
   }
 
@@ -266,11 +263,9 @@ public abstract class SessionTest extends SandboxTest {
    * @throws IOException I/O exception */
   @Test
   public void queryClose() throws IOException {
-    final Query q;
     try(final Query query = session.query("()")) {
-      q = query;
+      query.close();
     }
-    q.close();
   }
 
   /** Runs a query, using more().
@@ -287,7 +282,7 @@ public abstract class SessionTest extends SandboxTest {
   public void queryMore() throws IOException {
     try(final Query query = session.query("1 to 3")) {
       int c = 0;
-      while(query.more()) assertEqual(++c, query.next());
+      while(query.more()) assertEqual(Integer.toString(++c), query.next());
     }
   }
 
@@ -297,9 +292,9 @@ public abstract class SessionTest extends SandboxTest {
   public void queryNullBinary() throws IOException {
     session.execute("create db " + NAME);
     session.store("X", new ArrayInput("\0"));
-    assertEqual("\0", session.execute("xquery " + RAW + _DB_RETRIEVE.args(NAME, "X")));
-    assertEqual("\0", session.query(RAW + _DB_RETRIEVE.args(NAME, "X")).execute());
-    final Query q = session.query(RAW + _DB_RETRIEVE.args(NAME, "X"));
+    assertEqual("\0", session.execute("xquery " + _DB_RETRIEVE.args(NAME, "X")));
+    assertEqual("\0", session.query(_DB_RETRIEVE.args(NAME, "X")).execute());
+    final Query q = session.query(_DB_RETRIEVE.args(NAME, "X"));
     assertTrue(q.more());
     assertEqual("\0", q.next());
     assertFalse(q.more());
@@ -311,9 +306,9 @@ public abstract class SessionTest extends SandboxTest {
   public void queryEmptyBinary() throws IOException {
     session.execute("create db " + NAME);
     session.store("X", new ArrayInput(""));
-    assertEqual("", session.execute("xquery " + RAW + _DB_RETRIEVE.args(NAME, "X")));
-    assertEqual("", session.query(RAW + _DB_RETRIEVE.args(NAME, "X")).execute());
-    final Query q = session.query(RAW + _DB_RETRIEVE.args(NAME, "X"));
+    assertEqual("", session.execute("xquery " + _DB_RETRIEVE.args(NAME, "X")));
+    assertEqual("", session.query(_DB_RETRIEVE.args(NAME, "X")).execute());
+    final Query q = session.query(_DB_RETRIEVE.args(NAME, "X"));
     assertTrue(q.more());
     assertEqual("", q.next());
     assertNull(q.next());
@@ -341,20 +336,20 @@ public abstract class SessionTest extends SandboxTest {
     session.store("X", new ArrayInput(tmp));
     final String retr = _DB_RETRIEVE.args(NAME, "X");
     // check command
-    session.execute("xquery " + RAW + retr + ',' + retr);
-    assertTrue(eq(out.toArray(), concat(tmp, tmp)));
+    session.execute("xquery " + retr + ',' + retr);
+    assertArrayEquals(concat(tmp, token(Prop.NL), tmp), out.toArray());
     out.reset();
     // check query execution
-    session.query(RAW + retr + ',' + retr).execute();
-    assertTrue(eq(out.toArray(), concat(tmp, tmp)));
+    session.query(retr + ',' + retr).execute();
+    assertArrayEquals(concat(tmp, token(Prop.NL), tmp), out.toArray());
     out.reset();
     // check iterator
-    final Query q = session.query(RAW + retr + ',' + retr);
+    final Query q = session.query(retr + ',' + retr);
     q.next();
-    assertTrue(eq(out.toArray(), tmp));
+    assertArrayEquals(tmp, out.toArray());
     out.reset();
     q.next();
-    assertTrue(eq(out.toArray(), tmp));
+    assertArrayEquals(tmp, out.toArray());
     assertNull(q.next());
   }
 
@@ -438,7 +433,7 @@ public abstract class SessionTest extends SandboxTest {
 
     try(Query query = session.query("declare variable $a external; $a")) {
       query.bind("a", "09\u0002xs:hexBinary\u00012", "xs:integer");
-      assertEqual("09", query.next());
+      assertEqual("\t", query.next());
       assertEqual("2", query.next());
     }
 
@@ -560,10 +555,10 @@ public abstract class SessionTest extends SandboxTest {
    * @throws IOException I/O exception */
   @Test
   public void queryOptions() throws IOException {
-    try(final Query query = session.query("declare option output:encoding 'US-ASCII';()")) {
+    try(final Query query = session.query(SerializerOptions.ENCODING.arg("US-ASCII") + "()")) {
       query.execute();
       final SerializerOptions sp = new SerializerOptions();
-      sp.parse(query.options());
+      sp.assign(query.options());
       assertEquals("US-ASCII", sp.get(SerializerOptions.ENCODING));
     }
   }
@@ -632,7 +627,7 @@ public abstract class SessionTest extends SandboxTest {
     final int size = 8;
     final Query[] cqs = new Query[size];
     for(int q = 0; q < size; q++) cqs[q] = session.query(Integer.toString(q));
-    for(int q = 0; q < size; q++) assertEqual(q, cqs[q].next());
+    for(int q = 0; q < size; q++) assertEqual(Integer.toString(q), cqs[q].next());
     for(final Query query : cqs) query.close();
   }
 
@@ -663,12 +658,12 @@ public abstract class SessionTest extends SandboxTest {
     assertEqual("&<>'\"", query.next());
   }
 
-  /** Runs a query and retrieves JSON.
+  /** Runs a query and retrieves a map.
    * @throws IOException I/O exception */
   @Test
   public void queryJSON() throws IOException {
-    final Query query = session.query("declare option output:indent 'no'; map { 'a': '\n' }");
-    assertEqual("{\"a\":\"\\n\"}", query.next());
+    final Query query = session.query(SerializerOptions.INDENT.arg("no") + "map { 'a': '&amp;' }");
+    assertEqual("map{\"a\":\"&amp;\"}", query.next());
   }
 
   /**
@@ -676,9 +671,9 @@ public abstract class SessionTest extends SandboxTest {
    * @param exp expected string
    * @param ret string returned from the client API
    */
-  private void assertEqual(final Object exp, final Object ret) {
+  protected void assertEqual(final String exp, final String ret) {
     final String result = (out != null ? out : ret).toString();
     if(out != null) out.reset();
-    assertEquals(exp.toString(), normNL(result));
+    assertEquals(exp, normNL(result));
   }
 }

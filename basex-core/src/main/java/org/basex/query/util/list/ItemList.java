@@ -12,7 +12,7 @@ import org.basex.util.list.*;
 /**
  * Resizable-array implementation for items.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public final class ItemList extends ElementList implements Iterable<Item> {
@@ -32,15 +32,6 @@ public final class ItemList extends ElementList implements Iterable<Item> {
    */
   public ItemList(final int capacity) {
     list = new Item[capacity];
-  }
-
-  /**
-   * Constructor, specifying an initial entry.
-   * @param element array capacity
-   */
-  public ItemList(final Item element) {
-    list = new Item[] { element };
-    size = 1;
   }
 
   /**

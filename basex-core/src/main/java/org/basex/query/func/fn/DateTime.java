@@ -10,7 +10,7 @@ import org.basex.query.value.type.*;
 /**
  * Date/time functions.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 abstract class DateTime extends StandardFunc {
@@ -48,7 +48,7 @@ abstract class DateTime extends StandardFunc {
    * @return timezone
    */
   static DTDur zon(final ADate it) {
-    return it.tzDefined() ? new DTDur(0, it.tz()) : null;
+    return it.hasTz() ? new DTDur(0, it.tz()) : null;
   }
 
   /**

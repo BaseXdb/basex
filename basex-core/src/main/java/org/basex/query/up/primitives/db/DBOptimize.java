@@ -17,11 +17,11 @@ import org.basex.util.options.*;
 /**
  * Update primitive for the optimize function.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Dimitar Popov
  */
 public final class DBOptimize extends DBUpdate {
-  /** Database update options. */
+  /** Options supplied with the function call. */
   private final DBOptions options;
   /** Query context. */
   private final QueryContext qc;
@@ -57,50 +57,72 @@ public final class DBOptimize extends DBUpdate {
   }
 
   @Override
-  public void prepare(final MemData tmp) { }
+  public void prepare() { }
 
   @Override
   public void apply() throws QueryException {
-    final MainOptions opts = new MainOptions(qc.context.options);
+    // create new options, based on global defaults, and overwrite with database options
+    final MainOptions opts = new MainOptions(qc.context.options, true);
     final MetaData meta = data.meta;
-    options.assign(MainOptions.TEXTINDEX,    meta.createtext);
-    options.assign(MainOptions.ATTRINDEX,    meta.createattr);
-    options.assign(MainOptions.FTINDEX,      meta.createftxt);
-    options.assign(MainOptions.UPDINDEX,     meta.updindex);
-    options.assign(MainOptions.AUTOOPTIMIZE, meta.autoopt);
+    options.assignIfEmpty(MainOptions.TEXTINDEX, meta.createtext);
+    options.assignIfEmpty(MainOptions.ATTRINDEX, meta.createattr);
+    options.assignIfEmpty(MainOptions.TOKENINDEX, meta.createtoken);
+    options.assignIfEmpty(MainOptions.FTINDEX, meta.createft);
+    options.assignIfEmpty(MainOptions.TEXTINCLUDE, meta.textinclude);
+    options.assignIfEmpty(MainOptions.ATTRINCLUDE, meta.attrinclude);
+    options.assignIfEmpty(MainOptions.TOKENINCLUDE, meta.tokeninclude);
+    options.assignIfEmpty(MainOptions.FTINCLUDE, meta.ftinclude);
+    options.assignIfEmpty(MainOptions.SPLITSIZE, meta.splitsize);
+    options.assignIfEmpty(MainOptions.UPDINDEX, meta.updindex);
+    options.assignIfEmpty(MainOptions.AUTOOPTIMIZE, meta.autooptimize);
     options.assignTo(opts);
 
-    // adopt runtime options
+    // adopt options to database meta data
     meta.createtext = opts.get(MainOptions.TEXTINDEX);
     meta.createattr = opts.get(MainOptions.ATTRINDEX);
-    meta.createftxt = opts.get(MainOptions.FTINDEX);
-    meta.updindex = opts.get(MainOptions.UPDINDEX);
+    meta.createtoken = opts.get(MainOptions.TOKENINDEX);
+    meta.createft = opts.get(MainOptions.FTINDEX);
 
-    // check if indexing options have changed
-    final int mc = opts.get(MainOptions.MAXCATS);
-    final int ml = opts.get(MainOptions.MAXLEN);
-    final boolean rebuild = mc != meta.maxcats || ml != meta.maxlen;
+    meta.updindex = opts.get(MainOptions.UPDINDEX);
+    meta.autooptimize = opts.get(MainOptions.AUTOOPTIMIZE);
+    meta.splitsize = opts.get(MainOptions.SPLITSIZE);
+
+    // check if other indexing options have changed
+    final int maxcats = opts.get(MainOptions.MAXCATS);
+    final int maxlen = opts.get(MainOptions.MAXLEN);
+    final String textinclude = opts.get(MainOptions.TEXTINCLUDE);
+    final String attrinclude = opts.get(MainOptions.ATTRINCLUDE);
+    final String tokeninclude = opts.get(MainOptions.TOKENINCLUDE);
+    final boolean rebuild = maxlen != meta.maxlen;
+    final boolean rebuildText = !meta.textinclude.equals(textinclude) || rebuild;
+    final boolean rebuildAttr = !meta.attrinclude.equals(attrinclude) || rebuild;
+    final boolean rebuildToken = !meta.tokeninclude.equals(tokeninclude);
+    meta.textinclude = textinclude;
+    meta.attrinclude = attrinclude;
+    meta.tokeninclude = tokeninclude;
+    meta.maxcats = maxcats;
+    meta.maxlen = maxlen;
 
     // check if fulltext indexing options have changed
-    final boolean st = opts.get(MainOptions.STEMMING);
-    final boolean cs = opts.get(MainOptions.CASESENS);
-    final boolean dc = opts.get(MainOptions.DIACRITICS);
-    final String sw = opts.get(MainOptions.STOPWORDS);
-    final Language ln = Language.get(opts);
-    final boolean rebuildFT = rebuild || !ln.equals(meta.language) || st != meta.stemming ||
-        cs != meta.casesens || dc != meta.diacritics || !sw.equals(meta.stopwords);
-
-    meta.language   = ln;
-    meta.stemming   = st;
-    meta.casesens   = cs;
-    meta.diacritics = dc;
-    meta.stopwords  = sw;
-    meta.maxcats    = mc;
-    meta.maxlen     = ml;
+    final String ftinclude = opts.get(MainOptions.FTINCLUDE);
+    final boolean stemming = opts.get(MainOptions.STEMMING);
+    final boolean casesens = opts.get(MainOptions.CASESENS);
+    final boolean diacritics = opts.get(MainOptions.DIACRITICS);
+    final Language language = Language.get(opts);
+    final String stopwords = opts.get(MainOptions.STOPWORDS);
+    final boolean rebuildFt = !meta.ftinclude.equals(ftinclude) || rebuild ||
+        stemming != meta.stemming || casesens != meta.casesens || diacritics != meta.diacritics ||
+        !language.equals(meta.language) || !stopwords.equals(meta.stopwords);
+    meta.ftinclude = ftinclude;
+    meta.stemming   = stemming;
+    meta.casesens   = casesens;
+    meta.diacritics = diacritics;
+    meta.language   = language;
+    meta.stopwords  = stopwords;
 
     try {
       if(all) OptimizeAll.optimizeAll(data, qc.context, opts, null);
-      else Optimize.optimize(data, opts, rebuild, rebuildFT, null);
+      else Optimize.optimize(data, rebuildText, rebuildAttr, rebuildToken, rebuildFt, null);
     } catch(final IOException ex) {
       throw UPDBOPTERR_X.get(info, ex);
     }

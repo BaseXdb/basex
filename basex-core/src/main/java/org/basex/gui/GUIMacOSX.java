@@ -9,7 +9,7 @@ import org.basex.util.*;
 /**
  * Sets some Mac OS X specific interface options.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Bastian Lemke
  */
 public final class GUIMacOSX {
@@ -163,10 +163,8 @@ public final class GUIMacOSX {
      * Unlike other handles, quit mustn't set {@code setHandled} or OS X will quit the
      * application.
      *
-     * @see com.apple.eawt.ApplicationListener#handleQuit
      * @return always false
      */
-    @SuppressWarnings("all") // ApplicationListener is deprecated
     public boolean handleQuit() {
       // explicit cast to circumvent Java compiler bug
       ((GUICommand) GUIMenuCmd.C_EXIT).execute(main);
@@ -206,7 +204,7 @@ public final class GUIMacOSX {
       final Class<?>[] params = { Window.class, Boolean.TYPE };
       final Method method = util.getMethod("setWindowCanFullScreen", params);
       method.invoke(util, window, true);
-    } catch(final Exception ignored) { }
+    } catch(final Exception ignore) { }
   }
 
   /**

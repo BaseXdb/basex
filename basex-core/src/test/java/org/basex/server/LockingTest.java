@@ -20,7 +20,7 @@ import org.junit.runners.Parameterized.Parameters;
  * forced to be executed in parallel. If this fails, locking prevents these queries to
  * run in parallel.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Jens Erat
  */
 @RunWith(Parameterized.class)
@@ -29,9 +29,9 @@ public final class LockingTest extends SandboxTest {
   private static final int REPEAT = 1;
 
   /** Maximum sleep time in ms. */
-  private static final long SLEEP = 200L;
+  private static final long SLEEP = 500L;
   /** Additional allowed holding time for client creation overhead, ... in ms. */
-  private static final long SYNC = 100L;
+  private static final long SYNC = 200L;
 
   /** Test document. */
   private static final String DOC = "src/test/resources/test.xml";
@@ -216,13 +216,12 @@ public final class LockingTest extends SandboxTest {
 
   /**
    * Test for concurrent writes.
-   * @throws BaseXException database exception
    */
   @Test
-  public void downgradeTest() throws BaseXException {
+  public void downgradeTest() {
     // hangs if QueryContext.downgrade call is activated..
-    new CreateDB(NAME, "<x/>").execute(context);
-    new XQuery("delete node /y").execute(context);
-    new XQuery("let $d := '" + NAME + "' return doc($d)").execute(context);
+    execute(new CreateDB(NAME, "<x/>"));
+    query("delete node /y");
+    query("let $d := '" + NAME + "' return doc($d)");
   }
 }

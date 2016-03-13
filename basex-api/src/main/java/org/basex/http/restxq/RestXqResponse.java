@@ -17,7 +17,7 @@ import org.basex.util.http.*;
 /**
  * This class creates a new HTTP response.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class RestXqResponse {
@@ -27,32 +27,30 @@ final class RestXqResponse {
   /**
    * Evaluates the specified function and creates a response.
    * @param function function to be evaluated
-   * @param query query context
+   * @param qc query context
    * @param http HTTP context
    * @param error optional query error
    * @throws Exception exception (including unexpected ones)
    */
-  static void create(final RestXqFunction function, final QueryContext query,
+  static void create(final RestXqFunction function, final QueryContext qc,
       final HTTPContext http, final QueryException error) throws Exception {
 
     // bind variables
     final StaticFunc sf = function.function;
     final Expr[] args = new Expr[sf.args.length];
-    function.bind(http, args, error);
+    function.bind(http, args, error, qc);
 
-    // wrap function with a function call
-    final MainModule mm = new MainModule(sf, args);
+    // assign function call and http context and register process
+    qc.mainModule(MainModule.get(sf, args));
+    qc.http(http);
+    qc.context.register(qc);
 
-    // assign main module and http context and register process
-    query.mainModule(mm);
-    query.http(http);
-    query.context.register(query);
-
+    final RestXqSession session = new RestXqSession(http, function.key, qc);
     String redirect = null, forward = null;
     RestXqRespBuilder response = null;
     try {
       // evaluate query
-      final Iter iter = query.iter();
+      final Iter iter = qc.iter();
       Item item = iter.next();
 
       // handle response element
@@ -92,8 +90,9 @@ final class RestXqResponse {
       }
 
     } finally {
-      query.close();
-      query.context.unregister(query);
+      qc.close();
+      qc.context.unregister(qc);
+      session.close();
 
       if(redirect != null) {
         http.redirect(redirect);

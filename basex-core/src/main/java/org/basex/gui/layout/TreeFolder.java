@@ -7,7 +7,6 @@ import java.util.*;
 import javax.swing.tree.*;
 
 import org.basex.core.*;
-import org.basex.data.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
@@ -15,7 +14,7 @@ import org.basex.util.list.*;
 /**
  * JTree node which represents a folder.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Lukas Kircher
  */
 public class TreeFolder extends TreeNode {
@@ -26,13 +25,14 @@ public class TreeFolder extends TreeNode {
 
   /**
    * Constructor.
-   * @param nm displayed node name
-   * @param pth folder path
-   * @param t tree reference
-   * @param d data reference
+   * @param name displayed node name
+   * @param path folder path
+   * @param tree tree reference
+   * @param context database context
    */
-  public TreeFolder(final byte[] nm, final byte[] pth, final BaseXTree t, final Data d) {
-    super(nm, pth, t, d);
+  public TreeFolder(final byte[] name, final byte[] path, final BaseXTree tree,
+      final Context context) {
+    super(name, path, tree, context);
   }
 
   @Override
@@ -43,16 +43,16 @@ public class TreeFolder extends TreeNode {
     int cmax = MAXC;
     // add folders
     final byte[] sub = subfolder();
-    final TokenSet set = data.resources.children(subfolder(), true);
+    final TokenSet set = context.data().resources.children(subfolder(), true);
     for(final byte[] f : new TokenList(set).sort(Prop.CASE)) {
-      add(new TreeFolder(f, sub, tree, data));
+      add(new TreeFolder(f, sub, tree, context));
       if(--cmax == 0) break;
     }
     // add leaves
     cmax = addLeaves(EMPTY, cmax, this);
     // add dummy node if not all nodes are displayed
     if(cmax <= 0)
-      add(new TreeLeaf(token(Text.DOTS), sub, false, true, tree, data));
+      add(new TreeLeaf(token(Text.DOTS), sub, false, true, tree, context));
 
     loaded = true;
     ((DefaultTreeModel) tree.getModel()).nodeStructureChanged(this);
@@ -68,7 +68,7 @@ public class TreeFolder extends TreeNode {
    * @return number of remaining nodes that can be added
    */
   public int addLeaves(final byte[] filter, final int cmax, final TreeFolder target) {
-    final TokenBoolMap tbm = data.resources.children(subfolder(), false);
+    final TokenBoolMap tbm = context.data().resources.children(subfolder(), false);
     final List<byte[]> keys = new ArrayList<>(tbm.size());
 
     // get desired leaves, depending on the given filter
@@ -88,7 +88,7 @@ public class TreeFolder extends TreeNode {
     final int ks = keys.size();
     while(k < ks && m-- > 0) {
       final byte[] nm = keys.get(k++);
-      target.add(new TreeLeaf(nm, sub, tbm.get(nm), false, tree, data));
+      target.add(new TreeLeaf(nm, sub, tbm.get(nm), false, tree, context));
     }
 
     return m;

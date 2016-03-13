@@ -13,21 +13,21 @@ import org.basex.gui.*;
  * Displays a text hint on empty text fields.
  * Inspired by {@code http://tips4java.wordpress.com/2009/11/29/text-prompt/}.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class BaseXTextHint extends JLabel implements DocumentListener {
   /** Text component. */
-  private final JTextComponent component;
+  private final JTextComponent comp;
 
   /**
    * Constructor.
    * @param text text
    * @param comp text component
    */
-  public BaseXTextHint(final String text, final JTextComponent comp) {
+  BaseXTextHint(final String text, final JTextComponent comp) {
     super(text);
-    component = comp;
+    this.comp = comp;
 
     setForeground(GUIConstants.gray);
     setBorder(new EmptyBorder(comp.getInsets()));
@@ -44,7 +44,7 @@ final class BaseXTextHint extends JLabel implements DocumentListener {
    * Document and on focus changes.
    */
   private void update() {
-    setVisible(component.getText().isEmpty());
+    setVisible(comp.getText().isEmpty());
   }
 
   @Override

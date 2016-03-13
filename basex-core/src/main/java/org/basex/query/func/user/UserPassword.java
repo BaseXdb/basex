@@ -9,14 +9,14 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class UserPassword extends UserFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     checkAdmin(qc);
-    qc.resources.updates().add(new Password(toUser(0, qc), toString(1, qc), ii, qc), qc);
+    qc.updates().add(new Password(toUser(0, qc), toString(1, qc), ii, qc), qc);
     return null;
   }
 
@@ -34,13 +34,13 @@ public final class UserPassword extends UserFn {
      */
     private Password(final User user, final String pw, final InputInfo info,
         final QueryContext qc) {
-      super(UpdateType.USERPASSWORD, user, "", qc, info);
+      super(UpdateType.USERPASSWORD, user, qc, info);
       this.pw = pw;
     }
 
     @Override
     public void apply() {
-      users.password(user, pw);
+      user.password(pw);
     }
 
     @Override

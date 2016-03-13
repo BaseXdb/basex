@@ -17,7 +17,7 @@ import org.junit.Test;
 /**
  * Tests the SAXSerializer.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Michael Hedenus
  */
 public final class SAXSerializerTest extends SandboxTest {
@@ -33,7 +33,7 @@ public final class SAXSerializerTest extends SandboxTest {
     final ArrayOutput marshalled = new ArrayOutput();
     jaxbContext.createMarshaller().marshal(
         new SAXSerializerObject("Object1", 42), marshalled);
-    new CreateDB(NAME, marshalled.toString()).execute(context);
+    execute(new CreateDB(NAME, marshalled.toString()));
 
     // get object from DB
     try(final QueryProcessor queryProcessor = new QueryProcessor(

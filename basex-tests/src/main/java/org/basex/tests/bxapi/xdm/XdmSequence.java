@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * Wrapper for representing XQuery values.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class XdmSequence extends XdmValue {
@@ -68,7 +68,7 @@ final class XdmSequence extends XdmValue {
     final StringBuilder sb = new StringBuilder("(");
     for(final XdmItem it : this) {
       if(sb.length() != 1) sb.append(',');
-      sb.append(it.toString());
+      sb.append(it);
     }
     return sb.append(')').toString();
   }

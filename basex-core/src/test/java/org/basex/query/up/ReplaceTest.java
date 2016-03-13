@@ -2,7 +2,6 @@ package org.basex.query.up;
 
 import static org.basex.query.func.Function.*;
 
-import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.query.*;
 import org.junit.Test;
@@ -10,16 +9,15 @@ import org.junit.Test;
 /**
  * Tests on the various replace operations.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class ReplaceTest extends AdvancedQueryTest {
   /**
    * Replaces the first document in a database, using lazy replace.
-   * @throws Exception exception
    */
   @Test
-  public void lazyReplace() throws Exception {
+  public void lazyReplace() {
     prepare("<a/>", "<c/>");
     query(_DB_REPLACE.args(NAME, "a.xml", "<a/>"));
     query("a, c", "<a/>\n<c/>");
@@ -29,10 +27,9 @@ public final class ReplaceTest extends AdvancedQueryTest {
 
   /**
    * Replaces the first document in a database, using rapid replace.
-   * @throws Exception exception
    */
   @Test
-  public void rapidReplace() throws Exception {
+  public void rapidReplace() {
     prepare("<a/>", "<c/>");
     query(_DB_REPLACE.args(NAME, "a.xml", "<a><b/></a>"));
     query("a, c", "<a>\n<b/>\n</a>\n<c/>");
@@ -42,10 +39,9 @@ public final class ReplaceTest extends AdvancedQueryTest {
 
   /**
    * Replaces the first document in a database.
-   * @throws Exception exception
    */
   @Test
-  public void replaceWithNs() throws Exception {
+  public void replaceWithNs() {
     // first document: introduce namespace
     prepare("<a/>", "<c/>");
     query(_DB_REPLACE.args(NAME, "a.xml", "<a xmlns='a'/>"));
@@ -76,13 +72,12 @@ public final class ReplaceTest extends AdvancedQueryTest {
   /**
    * Prepares the updates.
    * @param docs documents to add
-   * @throws BaseXException database exception
    */
-  private static void prepare(final String... docs) throws BaseXException {
-    new CreateDB(NAME).execute(context);
+  private static void prepare(final String... docs) {
+    execute(new CreateDB(NAME));
     for(final String doc : docs) {
       // choose first letter of input as document name
-      new Add(doc.replaceAll("^.*?(\\w).*", "$1") + ".xml", doc).execute(context);
+      execute(new Add(doc.replaceAll("^.*?(\\w).*", "$1") + ".xml", doc));
     }
   }
 }

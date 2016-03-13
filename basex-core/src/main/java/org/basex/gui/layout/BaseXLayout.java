@@ -23,7 +23,7 @@ import org.basex.util.*;
  * This class provides static layout and paint helper methods which are used all over
  * the GUI.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class BaseXLayout {
@@ -94,7 +94,7 @@ public final class BaseXLayout {
    * @param w width
    */
   public static void setWidth(final Component comp, final int w) {
-    comp.setPreferredSize(new Dimension((int) (w * SCALE), comp.getPreferredSize().height));
+    comp.setPreferredSize(new Dimension((int) (w * scale), comp.getPreferredSize().height));
   }
 
   /**
@@ -103,7 +103,7 @@ public final class BaseXLayout {
    * @param h height
    */
   public static void setHeight(final Component comp, final int h) {
-    comp.setPreferredSize(new Dimension(comp.getPreferredSize().width, (int) (h * SCALE)));
+    comp.setPreferredSize(new Dimension(comp.getPreferredSize().width, (int) (h * scale)));
   }
 
   /**
@@ -115,8 +115,8 @@ public final class BaseXLayout {
    * @return border
    */
   public static EmptyBorder border(final int t, final int l, final int b, final int r) {
-    return new EmptyBorder((int) (t * ASCALE), (int) (l * ASCALE),
-        (int) (b * ASCALE), (int) (r * ASCALE));
+    return new EmptyBorder((int) (t * ascale), (int) (l * ascale),
+        (int) (b * ascale), (int) (r * ascale));
   }
 
   /**
@@ -211,7 +211,7 @@ public final class BaseXLayout {
 
   /**
    * Drag and drop handler.
-   * @author BaseX Team 2005-15, BSD License
+   * @author BaseX Team 2005-16, BSD License
    * @author Christian Gruen
    */
   public interface DropHandler {
@@ -244,7 +244,7 @@ public final class BaseXLayout {
           final Object s = e.getSource();
           if(s instanceof BaseXCombo && ((BaseXCombo) s).isPopupVisible()) return;
 
-          // do not key close dialog of button or editor is focused
+          // do not key close dialog if button or editor is focused
           if(ENTER.is(e) && !(s instanceof BaseXButton || s instanceof TextPanel)) {
             d.close();
           } else if(ESCAPE.is(e)) {

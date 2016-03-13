@@ -19,10 +19,12 @@ import org.xml.sax.*;
  * be a local file ({@link IOFile}), a URL ({@link IOUrl}), a byte array
  * ({@link IOContent}), or a stream ({@link IOStream}).
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class IO {
+  /** Temporary file suffix. */
+  public static final String TMPSUFFIX = ".tmp";
   /** Database file suffix. */
   public static final String BASEXSUFFIX = ".basex";
   /** Command script suffix. */
@@ -55,6 +57,8 @@ public abstract class IO {
   public static final String XARSUFFIX = ".xar";
   /** XQuery log suffix. */
   public static final String LOGSUFFIX = ".log";
+  /** Ignore suffix. */
+  public static final String IGNORESUFFIX = ".ignore";
   /** Directory for raw files. */
   public static final String RAW = "raw";
   /** File prefix. */
@@ -124,8 +128,8 @@ public abstract class IO {
    * <p>Returns a class instance for the specified location string. The type of the
    * returned instance depends on the string value:</p>
    * <ul>
-   * <li>{@link IOFile}: if the string starts with <code>file:</code>, or if it
-   *   does not contain the substring <code>://</code>, it is interpreted as
+   * <li>{@link IOFile}: if the string starts with {@code file:}, or if it
+   *   does not contain the substring {@code ://}, it is interpreted as
    *   local file instance</li>
    * <li>{@link IOUrl}: if it starts with a valid scheme, it is handled as URL</li>
    * <li>{@link IOContent}: otherwise, it is interpreted as XML fragment and internally
@@ -258,8 +262,8 @@ public abstract class IO {
   }
 
   /**
-   * Chops the path and the file suffix of the specified filename
-   * and returns the database name.
+   * Chops the path, file suffix and special characters from the specified filename and
+   * returns the database name.
    * @return database name
    */
   public final String dbname() {
@@ -269,7 +273,7 @@ public abstract class IO {
     if(i == -1) i = n.length;
     for(int c = 0; c < i; c += cl(n, c)) {
       final int ch = noDiacritics(cp(n, c));
-      if(Databases.validChar(ch)) tb.add(ch);
+      if(Databases.validChar(ch, c == 0 || c + 1 == i)) tb.add(ch);
     }
     return tb.toString();
   }

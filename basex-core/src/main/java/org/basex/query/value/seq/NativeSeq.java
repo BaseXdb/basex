@@ -12,7 +12,7 @@ import org.basex.util.*;
 /**
  * Sequence of items, which are stored in their primitive/native representation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 abstract class NativeSeq extends Seq {
@@ -43,9 +43,7 @@ abstract class NativeSeq extends Seq {
   }
 
   @Override
-  public final Value materialize(final InputInfo ii) {
-    return this;
-  }
+  public final void materialize(final InputInfo ii) { }
 
   @Override
   public Value atomValue(final InputInfo ii) throws QueryException {

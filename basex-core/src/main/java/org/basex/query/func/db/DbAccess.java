@@ -5,7 +5,7 @@ import static org.basex.util.Token.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
-import org.basex.query.expr.*;
+import org.basex.query.expr.index.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.expr.path.Test.Kind;
 import org.basex.query.iter.*;
@@ -17,7 +17,7 @@ import org.basex.query.value.seq.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 abstract class DbAccess extends DbFn {

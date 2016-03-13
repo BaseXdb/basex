@@ -7,7 +7,7 @@ import org.basex.core.*;
 /**
  * This class parses command-line arguments provided by a class with main method.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class MainParser {
@@ -129,6 +129,6 @@ public final class MainParser {
    */
   public BaseXException usage() {
     final String name = Util.className(main).toLowerCase(Locale.ENGLISH);
-    return new BaseXException(main.header() + "Usage: " + name + main.usage());
+    return new BaseXException(main.header() + Prop.NL + "Usage: " + name + main.usage());
   }
 }

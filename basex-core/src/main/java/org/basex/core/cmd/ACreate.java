@@ -7,15 +7,12 @@ import java.io.*;
 import org.basex.core.*;
 import org.basex.core.locks.*;
 import org.basex.core.users.*;
-import org.basex.data.*;
-import org.basex.index.*;
 import org.basex.io.*;
-import org.basex.util.*;
 
 /**
  * Abstract class for database creation commands.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class ACreate extends Command {
@@ -88,56 +85,6 @@ public abstract class ACreate extends Command {
    */
   final boolean finishUpdate() {
     return finishUpdate(context.data());
-  }
-
-  /**
-   * Builds the specified index.
-   * @param type index to be built
-   * @param data data reference
-   * @param options main options
-   * @param cmd calling command
-   * @throws IOException I/O exception
-   */
-  static void create(final IndexType type, final Data data, final MainOptions options,
-      final ACreate cmd) throws IOException {
-
-    data.meta.dirty = true;
-    final boolean ok = data.dropIndex(type);
-    if(ok) {
-      if(type == IndexType.TEXT) {
-        data.meta.textindex = true;
-      } else if(type == IndexType.ATTRIBUTE) {
-        data.meta.attrindex = true;
-      } else if(type == IndexType.FULLTEXT) {
-        data.meta.ftxtindex = true;
-      } else {
-        throw Util.notExpected();
-      }
-    }
-    data.createIndex(type, options, cmd);
-  }
-
-  /**
-   * Drops the specified index.
-   * @param type index type
-   * @param data data reference
-   * @return success flag
-   */
-  static boolean drop(final IndexType type, final Data data) {
-    data.meta.dirty = true;
-    final boolean ok = data.dropIndex(type);
-    if(ok) {
-      if(type == IndexType.TEXT) {
-        data.meta.textindex = false;
-      } else if(type == IndexType.ATTRIBUTE) {
-        data.meta.attrindex = false;
-      } else if(type == IndexType.FULLTEXT) {
-        data.meta.ftxtindex = false;
-      } else {
-        throw Util.notExpected();
-      }
-    }
-    return ok;
   }
 
   @Override

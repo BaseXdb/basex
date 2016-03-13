@@ -8,12 +8,12 @@ import org.junit.*;
 /**
  * Tests for the {@link JsonParser} class.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public final class JsonParserTest {
   /** Tests if the empty JSON string is rejected. */
-  public void emptyQuery() {
+  @Test public void emptyQuery() {
     error("", false);
     error(" \t\r\n", false);
   }
@@ -73,20 +73,22 @@ public final class JsonParserTest {
     parse("\"\\u000A\"", "\"\\n\"", false);
     parse("\"\n\"", "\"\\n\"", true);
     parse("\"\uD834\"", "\"\uFFFD\"", false);
-    parse("\"\uD853\uFFFF\"", "\"\uFFFD\uFFFD\"", false);
     parse("\"\uFFFF\"", "\"\uFFFD\"", false);
-    parse("\"\uD853a\"", "\"\uFFFDa\"", false);
     parse("\"\\b\\f\\t\\r\\n\"", "\"\uFFFD\uFFFD\\t\\r\\n\"", false);
     parse("\"\\u0000\\u001F\"", "\"\uFFFD\uFFFD\"", false);
+    parse("\"\uD853\uFFFF\"", "\"\uFFFD\uFFFD\"", false);
+    parse("\"\uD853a\"", "\"\uFFFDa\"", false);
 
-    unescape("\"\\b\\f\\t\\r\\n\"", "\"\\\\b\\\\f\\\\t\\\\r\\\\n\"");
+    escape("\"\\u0008\\u000c\\u0009\\u000d\\u000a\"", "\"\\\\b\\\\f\\\\t\\\\r\\\\n\"");
+    escape("\"\\b\\f\\t\\r\\n\"", "\"\\\\b\\\\f\\\\t\\\\r\\\\n\"");
     // Unicode in JSON notation
-    unescape("\"\\uD853\\uDF5C\"", "\"\\\\uD853\\\\uDF5C\"");
-    unescape("\"\\uD853asdf\"", "\"\\\\uD853asdf\"");
-    unescape("\"\\uD853\"", "\"\\\\uD853\"");
+    //escape("\"\\uD853\\uDF5C\"", "\"\\\\uD853\\\\uDF5C\"");
+    escape("\"\\uD853asdf\"", "\"\\\\uD853asdf\"");
+    escape("\"\\uD853\"", "\"\\\\uD853\"");
+
     // Unicode in Java notation
-    unescape("\"\u00E4\\t\"", "\"\u00E4\\\\t\"");
-    unescape("\"\u00E4\\u00E4\\t\"", "\"\u00E4\\\\u00E4\\\\t\"");
+    escape("\"\u00E4\\t\"", "\"\u00E4\\\\t\"");
+    escape("\"\u00E4\\u00E4\\t\"", "\"\u00E4\u00E4\\\\t\"");
 
     error("\"\\u0A", false);
     error("\"\\uXX0A\"", false);
@@ -150,7 +152,7 @@ public final class JsonParserTest {
    * @param json JSON string
    * @param liberal liberal parsing
    */
-  private void error(final String json, final boolean liberal) {
+  private static void error(final String json, final boolean liberal) {
     try {
       parse(json, liberal);
       fail("Should have failed: '" + json + '\'');
@@ -178,17 +180,17 @@ public final class JsonParserTest {
    */
   private static void parse(final String json, final String exp, final boolean liberal)
       throws QueryIOException {
-    assertEquals(exp, JsonStringConverter.toString(json, liberal, true));
+    assertEquals(exp, JsonStringConverter.toString(json, liberal, false));
   }
 
   /**
-   * Checks if the given JSON string is correct and produces the given output with unescaping
-   * deactivated.
+   * Checks if the given JSON string is correct and produces the given output with escaping
+   * activated.
    * @param json JSON string
    * @param exp expected output
    * @throws QueryIOException parse error
    */
-  private static void unescape(final String json, final String exp) throws QueryIOException {
-    assertEquals(exp, JsonStringConverter.toString(json, false, false));
+  private static void escape(final String json, final String exp) throws QueryIOException {
+    assertEquals(exp, JsonStringConverter.toString(json, false, true));
   }
 }

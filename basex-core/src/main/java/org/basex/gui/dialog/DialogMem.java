@@ -16,7 +16,7 @@ import org.basex.util.*;
 /**
  * Dialog with a single text field.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class DialogMem extends BaseXDialog {
@@ -25,6 +25,8 @@ public final class DialogMem extends BaseXDialog {
 
   /** Info text. */
   private final TextPanel text;
+  /** GC Button. */
+  private final BaseXButton gc;
 
   /**
    * Default constructor.
@@ -34,21 +36,15 @@ public final class DialogMem extends BaseXDialog {
     super(main, USED_MEM, false);
     panel.setLayout(new BorderLayout());
 
-    text = new TextPanel(Token.token(info()), false, this);
+    text = new TextPanel(info(), false, this);
     text.setFont(panel.getFont());
     set(text, BorderLayout.CENTER);
 
-    final BaseXButton gc = new BaseXButton("GC", this);
+    gc = new BaseXButton("GC", this);
     final BaseXBack buttons = newButtons(gc);
     set(buttons, BorderLayout.SOUTH);
-
-    SwingUtilities.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        gc.requestFocusInWindow();
-      }
-    });
-    finish(null);
+    addTimer();
+    finish();
   }
 
   /**
@@ -62,19 +58,14 @@ public final class DialogMem extends BaseXDialog {
 
   @Override
   public void setVisible(final boolean v) {
-    final boolean vis = isVisible();
-    if(vis == v) return;
-
     super.setVisible(v);
-    if(vis) return;
-
-    // regularly refresh panel
-    new Timer(true).scheduleAtFixedRate(new TimerTask() {
+    SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
-        if(isVisible() && !text.selected()) text.setText(info());
+        // focus GC button
+        gc.requestFocusInWindow();
       }
-    }, 0, 500);
+    });
   }
 
   @Override
@@ -95,5 +86,18 @@ public final class DialogMem extends BaseXDialog {
     return TOTAL_MEM_C + Performance.format(max, true) + NL
         + RESERVED_MEM_C + Performance.format(total, true) + NL + MEMUSED_C
         + Performance.format(used, true) + NL + NL + H_USED_MEM;
+  }
+
+
+  /**
+   * Add timer for updating display of memory consumption.
+   */
+  private void addTimer() {
+    new Timer(true).scheduleAtFixedRate(new TimerTask() {
+      @Override
+      public void run() {
+        if(isVisible() && !text.selected()) text.setText(info());
+      }
+    }, 0, 500);
   }
 }

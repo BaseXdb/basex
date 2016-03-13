@@ -22,18 +22,19 @@ import org.basex.util.hash.*;
 /**
  * Function item.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public final class FuncItem extends FItem implements Scope {
   /** Static context. */
-  private final StaticContext sc;
+  public final StaticContext sc;
+  /** Function expression. */
+  public final Expr expr;
+
   /** Function name (may be {@code null}). */
   private final QNm name;
   /** Formal parameters. */
   private final Var[] params;
-  /** Function expression. */
-  public final Expr expr;
 
   /** Context value. */
   private final Value ctxValue;
@@ -163,23 +164,23 @@ public final class FuncItem extends FItem implements Scope {
 
     final VarScope vsc = new VarScope(sc);
     final int pl = params.length;
-    final Var[] vs = new Var[pl];
+    final Var[] vars = new Var[pl];
     final Expr[] refs = new Expr[pl];
     for(int p = pl; p-- > 0;) {
-      vs[p] = vsc.newLocal(qc, params[p].name, ft.argTypes[p], true);
-      refs[p] = new VarRef(ii, vs[p]);
+      vars[p] = vsc.newLocal(qc, params[p].name, ft.argTypes[p], true);
+      refs[p] = new VarRef(ii, vars[p]);
     }
 
-    final Expr e = new DynFuncCall(ii, sc, false, this, refs);
+    final Expr e = new DynFuncCall(ii, sc, this, refs);
     final Expr optimized = opt ? e.optimize(qc, vsc) : e, checked;
-    if(ft.retType == null || tp.retType != null && tp.retType.instanceOf(ft.retType)) {
+    if(ft.type == null || tp.type != null && tp.type.instanceOf(ft.type)) {
       checked = optimized;
     } else {
-      final TypeCheck tc = new TypeCheck(sc, ii, optimized, ft.retType, true);
+      final TypeCheck tc = new TypeCheck(sc, ii, optimized, ft.type, true);
       checked = opt ? tc.optimize(qc, vsc) : tc;
     }
     checked.markTailCalls(null);
-    return new FuncItem(sc, anns, name, vs, ft, checked, vsc.stackSize());
+    return new FuncItem(sc, anns, name, vars, ft, checked, vsc.stackSize());
   }
 
   @Override
@@ -213,11 +214,10 @@ public final class FuncItem extends FItem implements Scope {
       final InputInfo ii) throws QueryException {
 
     if(!StaticFunc.inline(qc, anns, expr) || expr.has(Flag.CTX)) return null;
-    qc.compInfo(OPTINLINE, this);
+    qc.compInfo(OPTINLINE_X, this);
 
     // create let bindings for all variables
-    final LinkedList<Clause> cls =
-        exprs.length == 0 ? null : new LinkedList<Clause>();
+    final LinkedList<Clause> cls = exprs.length == 0 ? null : new LinkedList<Clause>();
     final IntObjMap<Var> vs = new IntObjMap<>();
     final int pl = params.length;
     for(int p = 0; p < pl; p++) {
@@ -250,14 +250,29 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
+  public String toErrorString() {
+    return toString(true);
+  }
+
+  @Override
   public String toString() {
+    return toString(false);
+  }
+
+  /**
+   * Returns a string representation.
+   * @param error error flag
+   * @return string
+   */
+  private String toString(final boolean error) {
     final FuncType ft = (FuncType) type;
     final TokenBuilder tb = new TokenBuilder();
     if(name != null) tb.add("(: ").add(name.prefixId()).add("#").addInt(arity()).add(" :) ");
     tb.addExt(anns).add(FUNCTION).add('(');
     final int pl = params.length;
-    for(final Var v : params) tb.addExt(v).add(v == params[pl - 1] ? "" : ", ");
-    tb.add(')').add(ft.retType != null ? " as " + ft.retType : "");
-    return tb.add(" { ").addExt(expr).add(" }").toString();
+    for(final Var v : params) {
+      tb.addExt(error ? v.toErrorString() : v.toString()).add(v == params[pl - 1] ? "" : ",");
+    }
+    return tb.add(')').add(ft.type != null ? " as " + ft.type : "").add(" {...}").toString();
   }
 }

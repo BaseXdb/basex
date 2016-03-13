@@ -12,7 +12,7 @@ import org.basex.util.*;
  * {@link ByteArrayOutputStream} class. Bytes that exceed an
  * optional maximum are ignored.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class ArrayOutput extends PrintOutput {
@@ -20,13 +20,13 @@ public final class ArrayOutput extends PrintOutput {
   private byte[] buffer = new byte[8];
 
   @Override
-  public void write(final int value) {
+  public void write(final int b) {
     final int s = (int) size;
     if(s == max) return;
 
     byte[] bffr = buffer;
     if(s == bffr.length) bffr = Arrays.copyOf(bffr, Array.newSize(s));
-    bffr[s] = (byte) value;
+    bffr[s] = (byte) b;
     buffer = bffr;
     size = s + 1;
   }

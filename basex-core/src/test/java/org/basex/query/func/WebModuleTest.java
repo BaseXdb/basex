@@ -10,7 +10,7 @@ import org.junit.*;
 /**
  * This class tests the functions of the Web Module.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class WebModuleTest extends AdvancedQueryTest {
@@ -51,8 +51,6 @@ public final class WebModuleTest extends AdvancedQueryTest {
   public void responseHeader() {
     query(_WEB_RESPONSE_HEADER.args() +
         "/*:response/*:header[@name = 'Cache-Control']/@value/string()", "max-age=3600,public");
-    query(_WEB_RESPONSE_HEADER.args() +
-        "/*:serialization-parameters/*:method/@value/string()", "raw");
     query(_WEB_RESPONSE_HEADER.args() +
         "/*:serialization-parameters/*:media-type/@value/string()", "application/octet-stream");
 

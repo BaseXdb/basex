@@ -12,7 +12,7 @@ import java.util.*;
  *
  * Documentation: http://docs.basex.org/wiki/Clients
  *
- * (C) BaseX Team 2005-15, BSD License
+ * (C) BaseX Team 2005-16, BSD License
  */
 public final class BaseXClient {
   /** UTF-8 charset. */

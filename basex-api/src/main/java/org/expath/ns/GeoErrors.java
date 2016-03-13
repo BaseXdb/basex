@@ -2,21 +2,14 @@ package org.expath.ns;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 
 /**
  * This module contains static error functions for the Geo module.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Masoumeh Seydi
  */
 final class GeoErrors {
-  /** Error namespace. */
-  private static final byte[] NS = QueryText.EXPERROR_URI;
-  /** Namespace and error code prefix. */
-  private static final String PREFIX =
-      new TokenBuilder(QueryText.EXPERR_PREFIX).add(":GEO").toString();
-
   /** Private constructor, preventing instantiation. */
   private GeoErrors() { }
 
@@ -58,7 +51,6 @@ final class GeoErrors {
     return thrw(4, "Out of range input index: %", geoNumber);
   }
 
-
   /**
    * GEO0005: GML writer error massage (JTS).
    * @param th throwable
@@ -69,12 +61,22 @@ final class GeoErrors {
   }
 
   /**
+   * GEO0006: Illegal argument.
+   * @param arg argument
+   * @return query exception
+   */
+  static QueryException illegalArg(final Str arg) {
+    return thrw(6, "Illegal argument: %", arg);
+  }
+
+  /**
    * Creates an error QName for the specified code.
    * @param code code
    * @return query exception
    */
   static QNm qname(final int code) {
-    return new QNm(String.format("%s:GEO%04d", PREFIX, code), NS);
+    return new QNm(String.format("%s:GEO%04d", QueryText.EXPERR_PREFIX, code),
+        QueryText.EXPERROR_URI);
   }
 
   /**

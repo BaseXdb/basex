@@ -18,7 +18,7 @@ import org.basex.util.options.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class DbReplace extends DbNew {
@@ -29,18 +29,19 @@ public final class DbReplace extends DbNew {
     final Item item = toNodeOrAtomItem(exprs[2], qc);
     final Options opts = toOptions(3, Q_OPTIONS, new Options(), qc);
 
-    final Updates updates = qc.resources.updates();
+    final Updates updates = qc.updates();
     final IntList docs = data.resources.docs(path);
     int d = 0;
 
     // delete binary resources
     final IOFile bin = data.meta.binary(path);
-    if(bin == null || bin.isDir()) throw BXDB_REPLACE_X.get(info, path);
+    final boolean disk = !data.inMemory();
+    if(disk && (bin == null || bin.isDir())) throw BXDB_REPLACE_X.get(info, path);
 
-    if(item instanceof Bin) {
+    if(disk && item instanceof Bin) {
       updates.add(new DBStore(data, path, item, info), qc);
     } else {
-      if(bin.exists()) updates.add(new DBDelete(data, path, info), qc);
+      if(disk && bin.exists()) updates.add(new DBDelete(data, path, info), qc);
       final NewInput input = checkInput(item, token(path));
       if(docs.isEmpty()) {
         updates.add(new DBAdd(data, input, opts, qc, info), qc);

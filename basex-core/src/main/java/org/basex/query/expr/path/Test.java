@@ -9,7 +9,7 @@ import org.basex.util.*;
 /**
  * Abstract node test.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class Test {
@@ -42,11 +42,13 @@ public abstract class Test {
   }
 
   /** Node kind. */
-  public NodeType type;
-  /** Kind of name test. Set to {@code null} for other kind tests. */
+  public final NodeType type;
+  /** Kind of name test (can be {@code null}). */
   public Kind kind;
-  /** Name test. Set to {@code null} for other kind tests. */
+  /** Name test (can be {@code null}). */
   public QNm name;
+  /** Indicates if test will match exactly one node (e.g.: @id). */
+  public boolean unique;
 
   /** Mutable QName instance. */
   final QNm tmpq = new QNm();
@@ -68,6 +70,14 @@ public abstract class Test {
       case NSP: return NSP;
       default: throw Util.notExpected();
     }
+  }
+
+  /**
+   * Constructor.
+   * @param type node type
+   */
+  Test(final NodeType type) {
+    this.type = type;
   }
 
   /**

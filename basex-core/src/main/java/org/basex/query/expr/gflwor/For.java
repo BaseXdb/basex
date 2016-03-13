@@ -25,7 +25,7 @@ import org.basex.util.hash.*;
 /**
  * FLWOR {@code for} clause, iterating over a sequence.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public final class For extends ForLet {
@@ -175,16 +175,18 @@ public final class For extends ForLet {
   }
 
   /**
-   * Adds a predicate to the loop expression.
+   * Adds a predicate to the looped expression.
    * @param pred predicate
    */
   void addPredicate(final Expr pred) {
-    // add to clause expression
-    if(expr instanceof AxisPath) {
+    if(expr instanceof AxisPath && !pred.has(Flag.POS)) {
+      // add to axis path, provided that predicate is not positional
       expr = ((AxisPath) expr).addPreds(pred);
     } else if(expr instanceof Filter) {
+      // add to existing filter expression
       expr = ((Filter) expr).addPred(pred);
     } else {
+      // create new filter expression
       expr = Filter.get(info, expr, pred);
     }
   }
@@ -209,7 +211,7 @@ public final class For extends ForLet {
       qc.value = null;
       // assign type of iterated items to context expression
       final ContextValue c = new ContextValue(info);
-      c.seqType(expr.seqType().type.seqType());
+      c.seqType = expr.seqType().type.seqType();
       final Expr r = ex.inline(qc, scp, var, c);
       if(r != null) pred = r;
     } finally {

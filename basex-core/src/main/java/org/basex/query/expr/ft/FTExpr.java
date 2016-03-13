@@ -13,7 +13,7 @@ import org.basex.util.hash.*;
 /**
  * This class defines is an abstract class for full-text expressions.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class FTExpr extends ParseExpr {
@@ -68,13 +68,13 @@ public abstract class FTExpr extends ParseExpr {
 
   @Override
   public boolean has(final Flag flag) {
-    for(final FTExpr e : exprs) if(e.has(flag)) return true;
+    for(final FTExpr expr : exprs) if(expr.has(flag)) return true;
     return false;
   }
 
   @Override
   public boolean removable(final Var var) {
-    for(final Expr e : exprs) if(!e.removable(var)) return false;
+    for(final Expr expr : exprs) if(!expr.removable(var)) return false;
     return true;
   }
 
@@ -97,7 +97,7 @@ public abstract class FTExpr extends ParseExpr {
    * @return result of check
    */
   boolean usesExclude() {
-    for(final FTExpr e : exprs) if(e.usesExclude()) return true;
+    for(final FTExpr expr : exprs) if(expr.usesExclude()) return true;
     return false;
   }
 
@@ -114,7 +114,7 @@ public abstract class FTExpr extends ParseExpr {
   @Override
   public int exprSize() {
     int sz = 1;
-    for(final Expr e : exprs) sz += e.exprSize();
+    for(final Expr expr : exprs) sz += expr.exprSize();
     return sz;
   }
 

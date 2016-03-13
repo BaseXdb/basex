@@ -17,131 +17,134 @@ import org.basex.util.list.*;
 /**
  * This class provides main memory access to attribute values and text contents.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public final class MemValues extends TokenSet implements ValueIndex {
-  /** Updating index. */
-  private final boolean updindex;
-  /** Indexing flag. */
-  private boolean index = true;
-  /** Data instance. */
-  private final Data data;
-  /** IDs. */
-  private int[][] ids = new int[Array.CAPACITY][];
+public final class MemValues extends ValueIndex {
+  /** Values. */
+  private final TokenSet values;
+  /** IDs lists. */
+  private ArrayList<int[]> idsList;
   /** ID array lengths. */
-  private int[] len = new int[Array.CAPACITY];
+  private IntList lenList;
+  /** Order flags. */
+  private BoolList reorder;
 
   /**
    * Constructor.
    * @param data data instance
-   * @param updindex updating index
+   * @param type index type
    */
-  public MemValues(final Data data, final boolean updindex) {
-    this.data = data;
-    this.updindex = updindex;
+  public MemValues(final Data data, final IndexType type) {
+    super(data, type);
+    // token index: work extra token set instance
+    values = type == IndexType.TOKEN ? new TokenSet() :
+      ((MemData) data).values(type == IndexType.TEXT);
+    final int s = values.size() + 1;
+    idsList = new ArrayList<>(s);
+    lenList = new IntList(s);
+    reorder = new BoolList(s);
   }
 
   @Override
   public IndexIterator iter(final IndexToken token) {
-    final byte k = token.type() == IndexType.TEXT ? Data.TEXT : Data.ATTR;
-    final int i = id(token.get());
-    if(i > 0) {
-      final int[] pres = updindex ? data.pre(ids[i], 0, len[i]) : ids[i];
-      final int s = updindex ? pres.length : len[i];
-      if(s > 0) {
-        return new IndexIterator() {
-          int p;
-          @Override
-          public boolean more() { return p < s; }
-          @Override
-          public int pre() {
-            while(more() && data.kind(pres[p++]) != k);
-            return pres[p - 1];
-          }
-          @Override
-          public int size() { return s; }
-        };
-      }
+    final int id = values.id(token.get());
+    if(id == 0) return IndexIterator.EMPTY;
+
+    final int len = lenList.get(id);
+    final int[] ids = idsList.get(id), pres;
+    if(data.meta.updindex) {
+      final IntList tmp = new IntList();
+      for(int i = 0; i < len; ++i) tmp.add(data.pre(ids[i]));
+      pres = tmp.sort().finish();
+    } else {
+      pres = ids;
     }
-    return IndexIterator.EMPTY;
+
+    return new IndexIterator() {
+      int p;
+      @Override
+      public boolean more() { return p < len; }
+      @Override
+      public int pre() { return pres[p++]; }
+      @Override
+      public int size() { return len; }
+    };
   }
 
   @Override
-  public int costs(final IndexToken token) {
-    final int i = id(token.get());
-    return i == 0 ? 0 : len[i];
+  public int costs(final IndexToken it) {
+    return lenList.get(values.id(it.get()));
   }
 
   @Override
   public EntryIterator entries(final IndexEntries entries) {
     final byte[] prefix = entries.get();
     return new EntryIterator() {
-      int c;
+      final int s = values.size();
+      int p;
       @Override
       public byte[] next() {
-        while(++c < size) {
-          if(startsWith(keys[c], prefix)) return keys[c];
+        while(++p <= s) {
+          if(lenList.get(p) == 0) continue;
+          final byte[] key = values.key(p);
+          if(startsWith(key, prefix)) return key;
         }
         return null;
       }
       @Override
       public int count() {
-        return len[c];
+        return lenList.get(p);
       }
     };
   }
 
   @Override
   public byte[] info(final MainOptions options) {
-    final TokenBuilder tb = new TokenBuilder(LI_STRUCTURE).add(HASH).add(NL);
+    final TokenBuilder tb = new TokenBuilder();
+    tb.add(LI_STRUCTURE).add(HASH).add(NL);
+    tb.add(LI_NAMES).add(data.meta.names(type)).add(NL);
+
     final IndexStats stats = new IndexStats(options.get(MainOptions.MAXSTAT));
-    for(int m = 1; m < size; m++) {
-      if(stats.adding(len[m])) stats.add(key(m));
+    final int s = values.size();
+    for(int p = 1; p <= s; p++) {
+      final int oc = lenList.get(p);
+      if(oc > 0 && stats.adding(oc)) stats.add(values.key(p), oc);
     }
     stats.print(tb);
     return tb.finish();
   }
 
-  /**
-   * Finishes the build process.
-   */
-  public void finish() {
-    index = updindex;
+  @Override
+  public int size() {
+    // returns the actual number of indexed entries
+    int s = 0;
+    for(int c = 1; c < s; c++) if(lenList.get(c) > 0) s++;
+    return s;
   }
 
-  /**
-   * Creates an index.
-   * @param type index type
-   */
-  public void create(final IndexType type) {
-    final byte kind = type == IndexType.TEXT ? Data.TEXT : Data.ATTR;
-    ids = new int[keys.length][];
-    len = new int[keys.length];
-    index = true;
-    final int s = data.meta.size;
-    for(int p = 0; p < s; p++) {
-      if(data.kind(p) == kind) put(key((int) data.textOff(p)), data.id(p));
+  @Override
+  public boolean drop() {
+    idsList = null;
+    lenList = null;
+    return true;
+  }
+
+  @Override
+  public void add(final ValueCache cache) {
+    for(final byte[] key : cache) {
+      final IntList vals = cache.ids(key);
+      if(!vals.isEmpty()) add(key, vals.sort().finish());
     }
     finish();
   }
 
   @Override
-  public boolean drop() {
-    ids = null;
-    len = null;
-    index = false;
-    return true;
+  public void delete(final ValueCache cache) {
+    for(final byte[] key : cache) {
+      delete(key, cache.ids(key).sort().finish());
+    }
   }
-
-  @Override
-  public void add(final TokenObjMap<IntList> map) { }
-
-  @Override
-  public void delete(final TokenObjMap<IntList> map) { }
-
-  @Override
-  public void replace(final byte[] old, final byte[] key, final int id) { }
 
   @Override
   public void flush() { }
@@ -149,66 +152,113 @@ public final class MemValues extends TokenSet implements ValueIndex {
   @Override
   public void close() { }
 
-  @Override
-  public void rehash(final int s) {
-    super.rehash(s);
-    if(ids != null) {
-      ids = Array.copyOf(ids, s);
-      len = Arrays.copyOf(len, s);
-    }
-  }
-
   /**
-   * Stores the specified key and id.
-   * @param key key
-   * @param id id value
-   * @return index id
+   * Adds values to the index.
+   * @param key key to be indexed
+   * @param vals sorted values
    */
-  public int put(final byte[] key, final int id) {
-    // new entries must be indexed, but inverted index structures will be invalidated
-    final int i = put(key);
-    if(index()) {
-      int[] tmp = ids[i];
-      if(tmp == null) {
-        tmp = new int[] { id };
-      } else {
-        final int l = len[i];
-        if(l == tmp.length) tmp = Arrays.copyOf(tmp, Array.newSize(l));
-        tmp[l] = id;
+  void add(final byte[] key, final int... vals) {
+    // token index: add values. otherwise, reference existing values
+    final int id = type == IndexType.TOKEN ? values.put(key) : values.id(key), vl = vals.length;
+    // updatable index: if required, resize existing arrays
+    while(idsList.size() < id + 1) idsList.add(null);
+    if(lenList.size() < id + 1) lenList.set(id, 0);
+
+    final int len = lenList.get(id), size = len + vl;
+    int[] ids = idsList.get(id);
+    if(ids == null) {
+      ids = vals;
+    } else {
+      if(ids.length < size) ids = Arrays.copyOf(ids, Array.newSize(size));
+      System.arraycopy(vals, 0, ids, len, vl);
+      if(ids[len - 1] > vals[0]) {
+        if(reorder == null) reorder = new BoolList(values.size());
+        reorder.set(id, true);
       }
-      ids[i] = tmp;
-      len[i]++;
     }
-    return i;
+    idsList.set(id, ids);
+    lenList.set(id, size);
   }
 
   /**
-   * Removes a record from the index.
-   * @param key record key
-   * @param id record id
+   * Finishes the index creation.
    */
-  public void delete(final byte[] key, final int id) {
-    if(index()) {
-      final int i = id(key);
-      if(i == 0 || len[i] == 0) return;
+  void finish() {
+    if(reorder == null) return;
+    for(int i = 1; i < reorder.size(); i++) {
+      if(reorder.get(i)) Arrays.sort(idsList.get(i), 0, lenList.get(i));
+    }
+    reorder = null;
+  }
 
-      // find the position where the id is stored
-      int p = -1;
-      while(++p < len[i]) if(ids[i][p] == id) break;
+  /**
+   * Removes values from the index.
+   * @param key key
+   * @param vals sorted values
+   */
+  void delete(final byte[] key, final int... vals) {
+    final int id = values.id(key), vl = vals.length, l = lenList.get(id), s = l - vl;
+    final int[] ids = idsList.get(id);
+    for(int i = 0, n = 0, v = 0; i < l; i++) {
+      if(v == vl || ids[i] != vals[v]) ids[n++] = ids[i];
+      else v++;
+    }
+    lenList.set(id, s);
+    if(s == 0) idsList.set(id, null);
+  }
 
-      // if not the last element, we need to shift forwards
-      if(p < len[i] - 1) Array.move(ids[i], p + 1, -1, len[i] - (p + 1));
-      len[i]--;
+  /**
+   * Checks the consistency of the index structure.
+   */
+  public void check() {
+    final IntMap set = new IntMap();
+    final int s = lenList.size();
+    for(int m = 1; m < s; m++) {
+      final int len = lenList.get(m);
+      final int[] ids = idsList.get(m);
+      for(int i = 0; i < len; i++) {
+        if(set.contains(ids[i])) {
+          final int old = set.get(ids[i]);
+          throw Util.notExpected(
+            "Duplicate id: " + ids[i] + ", pos: " + old + "/" + m + ", text: " +
+            string(values.key(m)) + "/" + string(values.key(old)));
+        }
+        set.put(ids[i], m);
+      }
     }
   }
 
   /**
-   * Checks if full index structure is to be updated.
-   * @return result of check
+   * Returns a string representation of the index structure.
+   * @param all include database contents in the representation. During updates, database lookups
+   *        must be avoided, as the data structures will be inconsistent.
+   * @return string
    */
-  private boolean index() {
-    if(index) return true;
-    if(ids != null) drop();
-    return false;
+  public String toString(final boolean all) {
+    final TokenBuilder tb = new TokenBuilder();
+    tb.addExt(type).add(" INDEX, '").add(data.meta.name).add("':\n");
+    final int s = lenList.size();
+    for(int m = 1; m < s; m++) {
+      final int len = lenList.get(m);
+      if(len == 0) continue;
+      final int[] ids = idsList.get(m);
+      tb.add("  ").addInt(m);
+      if(all) tb.add(", key: \"").add(data.text(data.pre(ids[0]), type == IndexType.TEXT)).add('"');
+      tb.add(", ids");
+      if(all) tb.add("/pres");
+      tb.add(": ");
+      for(int n = 0; n < len; n++) {
+        if(n != 0) tb.add(",");
+        tb.addInt(ids[n]);
+        if(all) tb.add('/').addInt(data.pre(ids[n]));
+      }
+      tb.add("\n");
+    }
+    return tb.toString();
+  }
+
+  @Override
+  public String toString() {
+    return toString(false);
   }
 }

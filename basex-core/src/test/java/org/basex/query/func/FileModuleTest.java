@@ -15,7 +15,7 @@ import org.junit.*;
 /**
  * This class tests the functions of the File Module.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Rositsa Shadura
  */
 public final class FileModuleTest extends AdvancedQueryTest {
@@ -235,9 +235,9 @@ public final class FileModuleTest extends AdvancedQueryTest {
     error(_FILE_READ_BINARY.args(PATH), FILE_IS_DIR_X);
     // file with single codepoint
     query(_FILE_WRITE.args(PATH1, "0"));
-    query(_FILE_READ_BINARY.args(PATH1), "MA==");
-    query(_FILE_READ_BINARY.args(PATH1, 0), "MA==");
-    query(_FILE_READ_BINARY.args(PATH1, 0, 1), "MA==");
+    query(_FILE_READ_BINARY.args(PATH1), "0");
+    query(_FILE_READ_BINARY.args(PATH1, 0), "0");
+    query(_FILE_READ_BINARY.args(PATH1, 0, 1), "0");
     query(_FILE_READ_BINARY.args(PATH1, 1), "");
     query(_FILE_READ_BINARY.args(PATH1, 1, 0), "");
     query(_FILE_READ_BINARY.args(PATH1, 0, 0), "");
@@ -248,10 +248,10 @@ public final class FileModuleTest extends AdvancedQueryTest {
     error(_FILE_READ_BINARY.args(PATH1, 2, 1), FILE_OUT_OF_RANGE_X_X);
     // file with two codepoints
     query(_FILE_WRITE.args(PATH1, "a\u00e4"));
-    query(_FILE_READ_BINARY.args(PATH1), "YcOk");
+    query(_FILE_READ_BINARY.args(PATH1), "a\u00e4");
     // file with two codepoints
     query(_FILE_WRITE_BINARY.args(PATH1, _CONVERT_STRING_TO_BASE64.args("a\u00e4")));
-    query(_FILE_READ_BINARY.args(PATH1), "YcOk");
+    query(_FILE_READ_BINARY.args(PATH1), "a\u00e4");
     // delete file
     query(_FILE_DELETE.args(PATH1));
   }
@@ -439,7 +439,8 @@ public final class FileModuleTest extends AdvancedQueryTest {
     query(ENDS_WITH.args(_FILE_RESOLVE_PATH.args("."), File.separator), "true");
 
     query(CONTAINS.args(_FILE_RESOLVE_PATH.args(can1, can2), can1), "true");
-    query(CONTAINS.args(_FILE_RESOLVE_PATH.args("X", can1), can1 + File.separator + "X"), "true");
+    query(CONTAINS.args(_FILE_RESOLVE_PATH.args("X", can1 + File.separator),
+        can1 + File.separator + "X"), "true");
     error(_FILE_RESOLVE_PATH.args(can1, "b"), FILE_IS_RELATIVE_X);
     error(_FILE_RESOLVE_PATH.args("X", "b"), FILE_IS_RELATIVE_X);
   }

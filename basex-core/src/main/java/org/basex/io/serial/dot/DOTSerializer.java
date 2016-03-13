@@ -18,7 +18,7 @@ import org.basex.util.list.*;
 /**
  * This class serializes items in the DOT syntax.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class DOTSerializer extends OutputSerializer {
@@ -41,7 +41,7 @@ public final class DOTSerializer extends OutputSerializer {
    * @throws IOException I/O exception
    */
   public DOTSerializer(final OutputStream os, final boolean compact) throws IOException {
-    super(PrintOutput.get(os), SerializerOptions.get(true));
+    super(PrintOutput.get(os), SerializerMode.DEFAULT.get());
     this.compact = compact;
     out.print(HEADER);
   }

@@ -2,13 +2,14 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
+
 import org.basex.query.*;
 import org.junit.*;
 
 /**
  * This class tests the functions of the XQuery Module.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class XQueryModuleTest extends AdvancedQueryTest {
@@ -40,6 +41,9 @@ public final class XQueryModuleTest extends AdvancedQueryTest {
     query(_DB_CREATE.args('"' + NAME + '"'));
     query("try { " + _XQUERY_EVAL.args("\"(1 to 10000000000000)[. = 0]\"", " map { }",
         " map { 'timeout': 1 }") + " } catch * { () }", "");
+    query(_XQUERY_EVAL.args(" 'static-base-uri()'", " map { }",
+        " map { 'base-uri': 'http://x.x/' }"), "http://x.x/");
+
     error(_XQUERY_EVAL.args(" '" + DOC.args(NAME) + "'", " map { }",
         " map { 'permission': 'none' }"), BXXQ_PERM_X);
     error(_XQUERY_EVAL.args(" '" + _DB_OPEN.args(NAME) + "'", " map { }",
@@ -47,9 +51,9 @@ public final class XQueryModuleTest extends AdvancedQueryTest {
     error(_XQUERY_EVAL.args(" '" + _FILE_EXISTS.args("x") + "'", " map { }",
         " map { 'permission': 'none' }"), BXXQ_PERM_X);
     error(_XQUERY_EVAL.args("\"(1 to 10000000000000)[. = 0]\"", " map { }",
-        " map { 'timeout': 1 }"), BXXQ_STOPPED);
+        " map { 'timeout': 1 }"), BXXQ_TIMEOUT);
     error(_XQUERY_EVAL.args("\"(1 to 10000000000000) ! <a/>\"", " map { }",
-        " map { 'memory': 10 }"), BXXQ_STOPPED);
+        " map { 'memory': 10 }"), BXXQ_MEMORY);
   }
 
   /** Test method. */
@@ -86,19 +90,24 @@ public final class XQueryModuleTest extends AdvancedQueryTest {
     query(_XQUERY_PARSE.args("delete node <a/>") + "/@updating/string()", "true");
 
     error(_XQUERY_PARSE.args("1+"), CALCEXPR);
+    query("\n\ntry {" + _XQUERY_PARSE.args("1+",
+        " map{'pass':true()}") + "} catch * { $err:line-number }", "1");
+  }
+
+  /** Test method. */
+  @Test
+  public void parseUri() {
+    query(_XQUERY_PARSE_URI.args("src/test/resources/input.xq") + "/name()", "MainModule");
+    query(_XQUERY_PARSE_URI.args("src/test/resources/input.xq") + "/@updating/string()", "false");
+    error(_XQUERY_PARSE_URI.args("src/test/resources/xxx.xq"), WHICHRES_X);
   }
 
   /** Test method. */
   @Test
   public void type() {
-    try {
-      System.setErr(NULL);
-      query(_XQUERY_TYPE.args("()"), "");
-      query(_XQUERY_TYPE.args("1"), "1");
-      query(_XQUERY_TYPE.args("(1, 2, 3)"), "1\n2\n3");
-      query(_XQUERY_TYPE.args("<x a='1' b='2' c='3'/>/@*/data()"), "1\n2\n3");
-    } finally {
-      System.setErr(ERR);
-    }
+    query(_XQUERY_TYPE.args("()"), "");
+    query(_XQUERY_TYPE.args("1"), "1");
+    query(_XQUERY_TYPE.args("(1, 2, 3)"), "1\n2\n3");
+    query(_XQUERY_TYPE.args("<x a='1' b='2' c='3'/>/@*/data()"), "1\n2\n3");
   }
 }

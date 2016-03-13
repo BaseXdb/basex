@@ -10,10 +10,9 @@ import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
- * Evaluates the 'rename' command and renames resources or directories
- * in a collection.
+ * Evaluates the 'rename' command and renames resources or directories in a collection.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Rename extends ACreate {

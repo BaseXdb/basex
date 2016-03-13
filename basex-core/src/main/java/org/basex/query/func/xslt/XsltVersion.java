@@ -7,12 +7,12 @@ import org.basex.util.*;
 /**
  * Functions for performing XSLT transformations.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class XsltVersion extends XsltFn {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Item item(final QueryContext qc, final InputInfo ii) {
     return Str.get(IMPL[OFFSET + 2]);
   }
 }

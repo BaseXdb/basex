@@ -14,7 +14,7 @@ import org.basex.util.hash.*;
 /**
  * Document fragment.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class CDoc extends CNode {
@@ -31,14 +31,14 @@ public final class CDoc extends CNode {
 
   @Override
   public FDoc item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    // create node
+    // create document node and add children
     final Constr c = new Constr(ii, sc);
     final FDoc doc = new FDoc(c.children, Token.EMPTY);
-
-    // add child nodes
     c.add(qc, exprs);
-    if(c.errAtt || !c.atts.isEmpty()) throw DOCATTS.get(ii);
-    if(c.errNS || !c.nspaces.isEmpty()) throw DOCNS.get(ii);
+    if(c.errAtt != null) throw DOCATTS_X.get(ii, c.errAtt);
+    if(!c.atts.isEmpty()) throw DOCATTS_X.get(ii, c.atts.get(0).name());
+    if(c.errNS != null) throw DOCNS_X.get(ii, c.errNS);
+    if(!c.nspaces.isEmpty()) throw DOCNS_X.get(ii, c.nspaces.name(0));
     return doc.optimize();
   }
 

@@ -15,7 +15,7 @@ import org.basex.util.hash.*;
 /**
  * Text fragment.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class CTxt extends CNode {
@@ -28,29 +28,26 @@ public final class CTxt extends CNode {
   public CTxt(final StaticContext sc, final InputInfo info, final Expr text) {
     super(sc, info, text);
     seqType = SeqType.TXT_ZO;
+    size = -1;
   }
 
   @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    super.compile(qc, scp);
+  public Expr optimize(final QueryContext qc, final VarScope scp) {
     return optPre(oneIsEmpty() ? null : this, qc);
   }
 
   @Override
   public FTxt item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter iter = qc.iter(exprs[0]);
-    Item it = iter.next();
-    if(it == null) return null;
-
     final TokenBuilder tb = new TokenBuilder();
     boolean more = false;
-    do {
+
+    final Iter iter = qc.iter(exprs[0]);
+    for(Item it; (it = iter.next()) != null;) {
       if(more) tb.add(' ');
       tb.add(it.string(ii));
       more = true;
-    } while((it = iter.next()) != null);
-
-    return new FTxt(tb.finish());
+    }
+    return more ? new FTxt(tb.finish()) : null;
   }
 
   @Override

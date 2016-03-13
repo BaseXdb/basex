@@ -6,7 +6,7 @@ import org.junit.*;
 /**
  * This test contains RESTXQ filters.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class RestXqInputTest extends RestXqTest {

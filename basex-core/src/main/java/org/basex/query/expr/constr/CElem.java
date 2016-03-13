@@ -17,7 +17,7 @@ import org.basex.util.hash.*;
 /**
  * Element constructor.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class CElem extends CName {
@@ -43,11 +43,13 @@ public final class CElem extends CName {
   }
 
   @Override
-  public CElem compile(final QueryContext qc, final VarScope scp) throws QueryException {
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
     final int s = addNS();
-    super.compile(qc, scp);
-    sc.ns.size(s);
-    return this;
+    try {
+      return super.compile(qc, scp);
+    } finally {
+      sc.ns.size(s);
+    }
   }
 
   @Override
@@ -90,8 +92,8 @@ public final class CElem extends CName {
 
       // add child and attribute nodes
       constr.add(qc, exprs);
-      if(constr.errAtt) throw NOATTALL.get(info);
-      if(constr.errNS) throw NONSALL.get(info);
+      if(constr.errAtt != null) throw NOATTALL_X.get(info, constr.errAtt);
+      if(constr.errNS != null) throw NONSALL_X.get(info, constr.errNS);
       if(constr.duplAtt != null) throw CATTDUPL_X.get(info, constr.duplAtt);
       if(constr.duplNS != null) throw DUPLNSCONS_X.get(info, constr.duplNS);
 

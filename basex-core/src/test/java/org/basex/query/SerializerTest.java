@@ -2,26 +2,26 @@ package org.basex.query;
 
 import static org.basex.query.QueryError.*;
 
+import org.basex.io.serial.*;
 import org.junit.*;
 
 /**
  * This class tests the serializers.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class SerializerTest extends AdvancedQueryTest {
   /** Test: method=xml. */
   @Test
   public void xml() {
-    final String option = "declare option output:method 'xml';";
-    query(option + "<html/>", "<html/>");
+    query(SerializerOptions.METHOD.arg("xml") + "<html/>", "<html/>");
   }
 
   /** Test: method=xhtml. */
   @Test
   public void xhtml() {
-    final String option = "declare option output:method 'xhtml';";
+    final String option = SerializerOptions.METHOD.arg("xhtml");
     query(option + "<html/>", "<html></html>");
     final String[] empties = { "area", "base", "br", "col", "embed", "hr", "img", "input",
         "link", "meta", "basefont", "frame", "isindex", "param" };
@@ -34,7 +34,7 @@ public final class SerializerTest extends AdvancedQueryTest {
   /** Test: method=html. */
   @Test
   public void html() {
-    final String option = "declare option output:method 'html';";
+    final String option = SerializerOptions.METHOD.arg("html");
     query(option + "<html/>", "<html></html>");
     final String[] empties = { "area", "base", "br", "col", "embed", "hr", "img", "input",
         "link", "meta", "basefont", "frame", "isindex", "param" };
@@ -56,8 +56,8 @@ public final class SerializerTest extends AdvancedQueryTest {
   /** Test: method=html, version=5.0. */
   @Test
   public void version50() {
-    final String option = "declare option output:method 'html';" +
-        "declare option output:version '5.0';";
+    final String option = SerializerOptions.METHOD.arg("html") +
+        SerializerOptions.VERSION.arg("5.0");
     query(option + "<html/>", "<!DOCTYPE html>\n<html></html>");
     final String[] empties = { "area", "base", "br", "col", "command", "embed", "hr",
         "img", "input", "keygen", "link", "meta", "param", "source", "track", "wbr" };
@@ -65,20 +65,13 @@ public final class SerializerTest extends AdvancedQueryTest {
       query(option + '<' + e + "/>", "<!DOCTYPE html>\n<" + e + '>');
     }
     query(option + "<a>&#x90;</a>", "<!DOCTYPE html>\n<a>&#x90;</a>");
-  }
-
-  /** Test: method=html, html-version=5.0. */
-  @Test
-  public void htmlVersion50() {
-    final String option = "declare option output:method 'html';" +
-        "declare option output:html-version '5.0';";
     query(option + "<html/>", "<!DOCTYPE html>\n<html></html>");
   }
 
   /** Test: method=text. */
   @Test
   public void text() {
-    final String option = "declare option output:method 'text';";
+    final String option = SerializerOptions.METHOD.arg("text");
     query(option + "1,2", "1 2");
     query(option + "<a>1</a>", "1");
     query(option + "1,<a>2</a>,3", "123");
@@ -87,13 +80,13 @@ public final class SerializerTest extends AdvancedQueryTest {
   /** Test: item-separator. */
   @Test
   public void itemSeparator() {
-    final String option = "declare option output:item-separator ";
-    query(option + "'-'; 1,2", "1-2");
-    query(option + "''; 1,2", "12");
-    query(option + "'ABC'; 1 to 3", "1ABC2ABC3");
+    query(SerializerOptions.ITEM_SEPARATOR.arg("-") + "1,2", "1-2");
+    query(SerializerOptions.ITEM_SEPARATOR.arg("") + "1,2", "12");
+    query(SerializerOptions.ITEM_SEPARATOR.arg("ABC") + "1 to 3", "1ABC2ABC3");
 
-    query(option + "'&#xa;'; <a/>,<b/>", "<a/>\n<b/>");
-    query(option + "'&#xa;'; declare option output:method 'text'; 1,2", "1\n2");
+    query(SerializerOptions.ITEM_SEPARATOR.arg("&#xa;") + "<a/>,<b/>", "<a/>\n<b/>");
+    query(SerializerOptions.ITEM_SEPARATOR.arg("&#xa;") +
+        SerializerOptions.METHOD.arg("text") + "1,2", "1\n2");
   }
 
   /** Test: xml:space='preserve'. */
@@ -103,12 +96,12 @@ public final class SerializerTest extends AdvancedQueryTest {
     query("<a xml:space='default'>T<b/></a>", "<a xml:space=\"default\">T<b/>\n</a>");
     query("<a xml:space='x'>T<b/></a>", "<a xml:space=\"x\">T<b/>\n</a>");
 
-    String option = "declare option output:indent 'yes'; ";
+    String option = SerializerOptions.INDENT.arg("yes");
     query(option + "<a xml:space='preserve'>T<b/></a>", "<a xml:space=\"preserve\">T<b/></a>");
     query(option + "<a xml:space='default'>T<b/></a>", "<a xml:space=\"default\">T<b/>\n</a>");
     query(option + "<a xml:space='x'>T<b/></a>", "<a xml:space=\"x\">T<b/>\n</a>");
 
-    option = "declare option output:indent 'no'; ";
+    option = SerializerOptions.INDENT.arg("no");
     query(option + "<a xml:space='preserve'>T<b/></a>", "<a xml:space=\"preserve\">T<b/></a>");
     query(option + "<a xml:space='default'>T<b/></a>", "<a xml:space=\"default\">T<b/></a>");
     query(option + "<a xml:space='x'>T<b/></a>", "<a xml:space=\"x\">T<b/></a>");

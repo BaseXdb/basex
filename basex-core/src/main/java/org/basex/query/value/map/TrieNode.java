@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * Abstract superclass of all trie nodes.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 abstract class TrieNode {
@@ -23,8 +23,6 @@ abstract class TrieNode {
   /** The empty node. */
   static final TrieNode EMPTY = new TrieNode(0) {
     @Override
-    StringBuilder toString(final StringBuilder sb, final String ind) { return sb.append("{ }"); }
-    @Override
     TrieNode delete(final int h, final Item k, final int l, final InputInfo i) { return this; }
     @Override
     Value get(final int h, final Item k, final int l, final InputInfo i) { return null; }
@@ -33,11 +31,11 @@ abstract class TrieNode {
     @Override
     TrieNode addAll(final TrieNode o, final int l, final InputInfo ii) { return o; }
     @Override
-    TrieNode add(final Leaf o, final int l, final InputInfo ii) { return o; }
+    TrieNode add(final TrieLeaf o, final int l, final InputInfo ii) { return o; }
     @Override
-    TrieNode add(final List o, final int l, final InputInfo ii) { return o; }
+    TrieNode add(final TrieList o, final int l, final InputInfo ii) { return o; }
     @Override
-    TrieNode add(final Branch o, final int l, final InputInfo ii) { return o; }
+    TrieNode add(final TrieBranch o, final int l, final InputInfo ii) { return o; }
     @Override
     boolean verify() { return true; }
     @Override
@@ -45,19 +43,23 @@ abstract class TrieNode {
     @Override
     void values(final ValueBuilder vs) { }
     @Override
-    boolean hasType(final AtomType kt, final SeqType vt) { return true; }
+    void materialize(final InputInfo ii) { }
+    @Override
+    boolean instanceOf(final AtomType kt, final SeqType vt) { return true; }
     @Override
     int hash(final InputInfo ii) { return 0; }
     @Override
     boolean deep(final InputInfo ii, final TrieNode o, final Collation coll) { return this == o; }
     @Override
     public TrieNode put(final int h, final Item k, final Value v, final int l,
-        final InputInfo i) { return new Leaf(h, k, v); }
+        final InputInfo i) { return new TrieLeaf(h, k, v); }
+    @Override
+    void forEach(final ValueBuilder vb, final FItem func, final QueryContext qc,
+        final InputInfo ii) { }
+    @Override
+    StringBuilder toString(final StringBuilder sb, final String ind) { return sb.append("{ }"); }
     @Override
     StringBuilder toString(final StringBuilder sb) { return sb; }
-    @Override
-    void apply(final ValueBuilder vb, final FItem func, final QueryContext qc,
-        final InputInfo ii) { }
   };
 
   /** Size of this node. */
@@ -139,7 +141,7 @@ abstract class TrieNode {
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  abstract TrieNode add(final Leaf o, final int lvl, final InputInfo ii) throws QueryException;
+  abstract TrieNode add(final TrieLeaf o, final int lvl, final InputInfo ii) throws QueryException;
 
   /**
    * Add an overflow list to this node if the key isn't already used.
@@ -149,7 +151,7 @@ abstract class TrieNode {
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  abstract TrieNode add(final List o, final int lvl, final InputInfo ii) throws QueryException;
+  abstract TrieNode add(final TrieList o, final int lvl, final InputInfo ii) throws QueryException;
 
   /**
    * Add all bindings of the given branch to this node for which the key isn't
@@ -160,7 +162,7 @@ abstract class TrieNode {
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  abstract TrieNode add(final Branch o, final int lvl, final InputInfo ii)
+  abstract TrieNode add(final TrieBranch o, final int lvl, final InputInfo ii)
       throws QueryException;
 
   /**
@@ -182,14 +184,21 @@ abstract class TrieNode {
   abstract void values(final ValueBuilder vs);
 
   /**
+   * Materializes all keys and values.
+   * @param ii input info
+   * @throws QueryException query exception
+   */
+  abstract void materialize(final InputInfo ii) throws QueryException;
+
+  /**
    * Applies a function on all entries.
    * @param vb value builder
    * @param func function to apply on keys and values
    * @param qc query context
    * @param ii input info
-   * @throws QueryException TODO
+   * @throws QueryException query exception
    */
-  abstract void apply(final ValueBuilder vb, final FItem func, QueryContext qc, InputInfo ii)
+  abstract void forEach(final ValueBuilder vb, final FItem func, QueryContext qc, InputInfo ii)
       throws QueryException;
 
   /**
@@ -202,27 +211,13 @@ abstract class TrieNode {
     return hash >>> lvl * Map.BITS & MASK;
   }
 
-  @Override
-  public String toString() {
-    return toString(new StringBuilder(), "").toString();
-  }
-
-  /**
-   * Recursive {@link #toString()} helper.
-   *
-   * @param sb string builder
-   * @param ind indentation string
-   * @return string builder for convenience
-   */
-  abstract StringBuilder toString(final StringBuilder sb, final String ind);
-
   /**
    * Checks if the map has the specified key and value type.
    * @param kt key type
    * @param vt value type
    * @return {@code true} if the type fits, {@code false} otherwise
    */
-  abstract boolean hasType(final AtomType kt, final SeqType vt);
+  abstract boolean instanceOf(final AtomType kt, final SeqType vt);
 
   /**
    * Compares two values.
@@ -235,19 +230,7 @@ abstract class TrieNode {
    */
   static boolean deep(final Value a, final Value b, final Collation coll, final InputInfo ii)
       throws QueryException {
-    return a.size() == b.size() && new Compare(ii).collation(coll).equal(a, b);
-  }
-
-  /**
-   * Compares two items.
-   * @param a first item
-   * @param b second item
-   * @param ii input info
-   * @return {@code true} if both items are equal, {@code false} otherwise
-   * @throws QueryException query exception
-   */
-  static boolean eq(final Item a, final Item b, final InputInfo ii) throws QueryException {
-    return a.equiv(b, null, ii);
+    return a.size() == b.size() && new DeepEqual(ii).collation(coll).equal(a, b);
   }
 
   /**
@@ -270,9 +253,23 @@ abstract class TrieNode {
       throws QueryException;
 
   /**
+   * Recursive {@link #toString()} helper.
+   *
+   * @param sb string builder
+   * @param ind indentation string
+   * @return string builder for convenience
+   */
+  abstract StringBuilder toString(final StringBuilder sb, final String ind);
+
+  /**
    * Recursive helper for {@link Map#toString()}.
    * @param sb string builder
    * @return reference to {@code sb}
    */
   abstract StringBuilder toString(final StringBuilder sb);
+
+  @Override
+  public String toString() {
+    return toString(new StringBuilder(), "").toString();
+  }
 }

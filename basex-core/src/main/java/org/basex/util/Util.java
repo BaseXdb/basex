@@ -7,6 +7,7 @@ import java.net.*;
 import java.util.*;
 import java.util.Map.Entry;
 
+import org.basex.query.*;
 import org.basex.util.list.*;
 
 /**
@@ -14,7 +15,7 @@ import org.basex.util.list.*;
  * The methods are used for dumping error output, debugging information,
  * getting the application path, etc.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Util {
@@ -89,7 +90,7 @@ public final class Util {
 
   /**
    * Returns a password from standard input.
-   * @return password
+   * @return password or empty string
    */
   public static String password() {
     // use standard input if no console if defined (such as in Eclipse)
@@ -125,6 +126,21 @@ public final class Util {
   }
 
   /**
+   * Returns the root query exception.
+   * @param throwable throwable
+   * @return root exception
+   */
+  public static Throwable rootException(final Throwable throwable) {
+    Throwable th = throwable;
+    while(true) {
+      final Throwable ca = th.getCause();
+      if(ca == null || th instanceof QueryException && !(ca instanceof QueryException)) return th;
+      Util.debug(th);
+      th = ca;
+    }
+  }
+
+  /**
    * Prints a string to standard error, followed by a newline.
    * @param object error object
    * @param ext text optional extensions
@@ -154,7 +170,8 @@ public final class Util {
     if(throwable instanceof SocketTimeoutException) return TIMEOUT_EXCEEDED;
     if(throwable instanceof SocketException) return CONNECTION_ERROR;
     String msg = throwable.getMessage();
-    if(msg == null || msg.isEmpty()) msg = throwable.toString();
+    if(msg == null || msg.isEmpty() || throwable instanceof RuntimeException)
+      msg = throwable.toString();
     if(throwable instanceof FileNotFoundException) return info(RES_NOT_FOUND_X, msg);
     if(throwable instanceof UnknownHostException) return info(UNKNOWN_HOST_X, msg);
     return msg;

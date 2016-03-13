@@ -14,7 +14,7 @@ import org.basex.io.parse.json.*;
  * <p>The parser provides some options, which can be specified via the
  * {@link MainOptions#JSONPARSER} option.</p>
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class JsonParser extends XMLParser {
@@ -47,7 +47,7 @@ public final class JsonParser extends XMLParser {
    * @return parser
    * @throws IOException I/O exception
    */
-  public static IOContent toXML(final IO io, final JsonParserOptions options) throws IOException {
+  private static IOContent toXML(final IO io, final JsonParserOptions options) throws IOException {
     final JsonConverter conv = JsonConverter.get(options);
     final IOContent xml = new IOContent(conv.convert(io).serialize().finish());
     xml.name(io.name());

@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class FnError extends StandardFunc {
@@ -46,7 +46,7 @@ public final class FnError extends StandardFunc {
   public static StandardFunc get(final QueryException ex, final SeqType tp) {
     final StandardFunc sf = ERROR.get(null, ex.info(), ex.qname(),
         Str.get(ex.getLocalizedMessage()));
-    sf.seqType(tp);
+    sf.seqType = tp;
     return sf;
   }
 }

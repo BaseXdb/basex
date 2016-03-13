@@ -12,7 +12,7 @@ import org.basex.util.hash.*;
 /**
  * Iterative step expression without numeric predicates.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class IterStep extends Step {
@@ -35,7 +35,7 @@ final class IterStep extends Step {
       @Override
       public ANode next() throws QueryException {
         if(iter == null) iter = axis.iter(checkNode(qc));
-        for(ANode node; (node = iter.next()) != null;) {
+        for(final ANode node : iter) {
           qc.checkStop();
           if(test.eq(node) && preds(node, qc)) return node.finish();
         }

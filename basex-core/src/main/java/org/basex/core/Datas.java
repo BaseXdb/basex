@@ -9,7 +9,7 @@ import org.basex.util.*;
 /**
  * This class organizes pins of currently opened databases.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Datas {

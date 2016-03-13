@@ -11,7 +11,7 @@ import org.basex.util.hash.*;
 /**
  * Iterative step expression with a single last() predicate.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class IterLastStep extends Step {
@@ -37,12 +37,11 @@ final class IterLastStep extends Step {
         stop = true;
 
         // return last items
-        final BasicNodeIter iter = axis.iter(checkNode(qc));
         ANode litem = null;
         final Test tst = test;
-        for(ANode item; (item = iter.next()) != null;) {
+        for(final ANode node : axis.iter(checkNode(qc))) {
           qc.checkStop();
-          if(tst.eq(item)) litem = item.finish();
+          if(tst.eq(node)) litem = node.finish();
         }
         return litem == null ? null : litem;
       }

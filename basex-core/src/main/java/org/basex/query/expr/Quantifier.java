@@ -19,7 +19,7 @@ import org.basex.util.hash.*;
 /**
  * Some/Every satisfier clause.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Quantifier extends Single {
@@ -53,8 +53,7 @@ public final class Quantifier extends Single {
 
   @Override
   public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    super.compile(qc, scp);
-    return optimize(qc, scp);
+    return super.compile(qc, scp).optimize(qc, scp);
   }
 
   @Override
@@ -67,7 +66,7 @@ public final class Quantifier extends Single {
       final GFLWOR gflwor = (GFLWOR) expr;
       if(gflwor.size() > 0 && gflwor.ret.isValue()) {
         final Value value = (Value) gflwor.ret;
-        qc.compInfo(OPTPRE, value);
+        qc.compInfo(OPTPRE_X, value);
         return Bln.get(value.ebv(qc, info).bool(info));
       }
     }

@@ -13,12 +13,12 @@ import org.basex.query.value.item.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class FileReadBinary extends FileFn {
   @Override
-  public Item item(final QueryContext qc) throws QueryException, IOException {
+  public B64 item(final QueryContext qc) throws QueryException, IOException {
     final Path path = toPath(0, qc);
     final long off = exprs.length > 1 ? toLong(exprs[1], qc) : 0;
     long len = exprs.length > 2 ? toLong(exprs[2], qc) : 0;

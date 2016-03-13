@@ -19,7 +19,7 @@ import org.basex.util.list.*;
 /**
  * This class organizes all users.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Users {
@@ -33,10 +33,10 @@ public final class Users {
    * @param sopts static options
    */
   public Users(final StaticOptions sopts) {
-    file = sopts.dbpath(string(USERS) + IO.XMLSUFFIX);
+    file = sopts.dbPath(string(USERS) + IO.XMLSUFFIX);
     read();
     // ensure that default admin user exists
-    if(get(ADMIN) == null) users.put(ADMIN, new User(ADMIN, ADMIN, Perm.ADMIN));
+    if(get(ADMIN) == null) add(new User(ADMIN, ADMIN).perm(Perm.ADMIN));
   }
 
   /**
@@ -95,32 +95,11 @@ public final class Users {
   }
 
   /**
-   * Stores a user and encrypted password.
-   * @param name user name
-   * @param password password (plain text)
-   * @param perm permission (can be {@code null})
+   * Adds a user.
+   * @param user user to be added
    */
-  public synchronized void create(final String name, final String password, final Perm perm) {
-    users.put(name, new User(name, password, perm == null ? Perm.NONE : perm));
-  }
-
-  /**
-   * Changes the password of a user.
-   * @param user user
-   * @param password password
-   */
-  public synchronized void password(final User user, final String password) {
-    user.password(password);
-  }
-
-  /**
-   * Sets the permission of a user.
-   * @param user user
-   * @param prm permission
-   * @param pattern database pattern (can be empty)
-   */
-  public static void perm(final User user, final Perm prm, final String pattern) {
-    user.perm(prm, pattern);
+  public synchronized void add(final User user) {
+    users.put(user.name(), user);
   }
 
   /**
@@ -135,24 +114,18 @@ public final class Users {
   }
 
   /**
-   * Drops a user from the list, or removes the specified pattern if non-empty.
+   * Drops a user from the list.
    * @param user user reference
-   * @param pattern database pattern (can be empty)
    * @return success flag
    */
-  public synchronized boolean drop(final User user, final String pattern) {
-    if(pattern.isEmpty()) {
-      if(users.remove(user.name()) == null) return false;
-    } else {
-      user.remove(pattern);
-    }
-    return true;
+  public synchronized boolean drop(final User user) {
+    return users.remove(user.name()) != null;
   }
 
   /**
    * Returns user with the specified name.
    * @param name user name
-   * @return success of operation
+   * @return user name, or {@code null}
    */
   public synchronized User get(final String name) {
     return users.get(name);

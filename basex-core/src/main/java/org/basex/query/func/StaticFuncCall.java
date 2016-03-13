@@ -17,7 +17,7 @@ import org.basex.util.hash.*;
 /**
  * Function call for user-defined functions.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class StaticFuncCall extends FuncCall {
@@ -70,6 +70,7 @@ public final class StaticFuncCall extends FuncCall {
     // try to inline the function
     final Expr inl = func.inlineExpr(exprs, qc, scp, info);
     if(inl != null) return inl;
+
     seqType = func.seqType();
     return this;
   }
@@ -112,7 +113,7 @@ public final class StaticFuncCall extends FuncCall {
 
   @Override
   public boolean isVacuous() {
-    return func != null && func.isVacuous();
+    return func.isVacuous();
   }
 
   @Override
@@ -122,7 +123,7 @@ public final class StaticFuncCall extends FuncCall {
     // function code: position or context references of expression body have no effect
     if(flag == Flag.POS || flag == Flag.CTX) return false;
     // pass on check to function code
-    return func == null || (flag == Flag.UPD && !sc.mixUpdates ? func.updating : func.has(flag));
+    return flag == Flag.UPD ? func.updating : func.has(flag);
   }
 
   @Override

@@ -5,12 +5,13 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.tree.*;
 
+import org.basex.gui.*;
 import org.basex.gui.layout.*;
 
 /**
  * Custom tree cell renderer to distinguish between raw and xml leaf nodes.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class ProjectCellRenderer extends DefaultTreeCellRenderer {
@@ -19,8 +20,15 @@ final class ProjectCellRenderer extends DefaultTreeCellRenderer {
       final boolean select, final boolean expanded, final boolean leaf, final int row,
       final boolean focus) {
 
+    final Color tnsc = getTextNonSelectionColor(), tsc = getTextSelectionColor();
+    if(val instanceof ProjectNode && ((ProjectNode) val).error) {
+      textNonSelectionColor = GUIConstants.RED;
+      textSelectionColor = GUIConstants.RED;
+    }
     super.getTreeCellRendererComponent(tree, val, select, expanded, leaf, row, focus);
     setIcon(icon(val, expanded));
+    textNonSelectionColor = tnsc;
+    textSelectionColor = tsc;
     return this;
   }
 

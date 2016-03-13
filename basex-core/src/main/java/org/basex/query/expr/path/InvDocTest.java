@@ -12,7 +12,7 @@ import org.basex.util.list.*;
 /**
  * Document test for inverted location paths.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class InvDocTest extends Test {
@@ -27,9 +27,9 @@ final class InvDocTest extends Test {
    * @param data data reference
    */
   private InvDocTest(final IntList pres, final Data data) {
+    super(NodeType.DOC);
     this.pres = pres;
     this.data = data;
-    type = NodeType.DOC;
   }
 
   /**

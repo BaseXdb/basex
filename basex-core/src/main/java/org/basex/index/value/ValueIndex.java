@@ -1,39 +1,50 @@
 package org.basex.index.value;
 
+import org.basex.data.*;
 import org.basex.index.*;
-import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
- * This class provides index-supported access to values
- * (attribute values, text contents, full-texts).
+ * Index for texts, attribute values and full-texts.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public interface ValueIndex extends Index {
+public abstract class ValueIndex implements Index {
+  /** Index type. */
+  protected final IndexType type;
+  /** Data instance. */
+  protected final Data data;
+
+  /**
+   * Constructor, initializing the index structure.
+   * @param data data reference
+   * @param type index type
+   */
+  protected ValueIndex(final Data data, final IndexType type) {
+    this.data = data;
+    this.type = type;
+  }
+
+  /**
+   * Returns the number of index entries.
+   * @return number of index entries
+   */
+  public abstract int size();
+
+  /**
+   * Deletes entries from the index.
+   * @param vc value cache with [key, id-list] pairs
+   */
+  public abstract void delete(final ValueCache vc);
+
   /**
    * Add entries to the index.
-   * @param map a set of [key, id-list] pairs
+   * @param vc value cache with [key, id-list] pairs
    */
-  void add(final TokenObjMap<IntList> map);
-
-  /**
-   * Deletes index entries from the index.
-   * @param map a set of [key, id-list] pairs
-   */
-  void delete(final TokenObjMap<IntList> map);
-
-  /**
-   * Replaces an index entry in the index.
-   * @param old old record key
-   * @param key new record key
-   * @param id record id
-   */
-  void replace(final byte[] old, final byte[] key, final int id);
+  public abstract void add(final ValueCache vc);
 
   /**
    * Flushes the buffered data.
    */
-  void flush();
+  public abstract void flush();
 }

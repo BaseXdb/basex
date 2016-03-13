@@ -19,7 +19,7 @@ import org.basex.util.list.*;
  * This is the starter class for the stand-alone console mode.
  * It executes all commands locally.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public class BaseX extends CLI {
@@ -173,7 +173,7 @@ public class BaseX extends CLI {
    * Launches the console mode, which reads and executes user input.
    */
   private void console() {
-    Util.outln(S_CONSOLE + TRY_MORE_X, local() ? S_STANDALONE : S_CLIENT);
+    Util.outln(header() + NL + TRY_MORE_X);
     verbose = true;
 
     // create console reader
@@ -236,7 +236,7 @@ public class BaseX extends CLI {
             c == 'q' || c == 'r' || c == 's' || c == 't' && local()) {
           // options followed by a string
           v = arg.string();
-        } else if(c == 'd' || c == 'D' && local() || c == 'u' && local() || c == 'R' ||
+        } else if(c == 'D' && local() || c == 'u' && local() || c == 'R' ||
             c == 'v' || c == 'V' || c == 'w' || c == 'x' || c == 'X' || c == 'z') {
           // options to be toggled
           v = "";
@@ -274,11 +274,18 @@ public class BaseX extends CLI {
 
   @Override
   public String header() {
-    return Util.info(S_CONSOLE, local() ? S_STANDALONE : S_CLIENT);
+    return Util.info(S_CONSOLE_X, local() ? S_STANDALONE : S_CLIENT);
   }
 
   @Override
   public String usage() {
     return local() ? S_LOCALINFO : S_CLIENTINFO;
+  }
+
+  /**
+   * Throws an exception.
+   */
+  public static void error() {
+    throw new RuntimeException("ERROR");
   }
 }

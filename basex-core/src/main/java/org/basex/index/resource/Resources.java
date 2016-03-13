@@ -15,7 +15,7 @@ import org.basex.util.list.*;
 /**
  * <p>This index organizes the resources of a database (XML documents and raw files).</p>
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Resources implements Index {
@@ -84,16 +84,6 @@ public final class Resources implements Index {
    */
   public void rename(final int pre, final byte[] value) {
     docs.rename(pre, value);
-  }
-
-  /**
-   * Replaces entries in the index.
-   * @param pre insertion position
-   * @param size number of deleted nodes
-   * @param clip data clip
-   */
-  public void replace(final int pre, final int size, final DataClip clip) {
-    docs.replace(pre, size, clip);
   }
 
   /**

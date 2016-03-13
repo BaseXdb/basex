@@ -3,12 +3,9 @@ package org.basex.query.func.index;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
-import java.util.*;
-
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.query.*;
-import org.basex.index.value.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
@@ -18,7 +15,7 @@ import org.basex.query.value.node.*;
 /**
  * Index function.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class IndexFn extends StandardFunc {
@@ -43,22 +40,9 @@ public abstract class IndexFn extends StandardFunc {
   public static Iter entries(final Data data, final IndexEntries entries, final StandardFunc call)
       throws QueryException {
 
-    final ValueIndex index;
-    final boolean avl;
-    final IndexType it = entries.type();
-    if(it == IndexType.TEXT) {
-      index = data.textIndex;
-      avl = data.meta.textindex;
-    } else if(it == IndexType.ATTRIBUTE) {
-      index = data.attrIndex;
-      avl = data.meta.attrindex;
-    } else {
-      index = data.ftxtIndex;
-      avl = data.meta.ftxtindex;
-    }
-    if(!avl) throw BXDB_INDEX_X.get(call.info, data.meta.name,
-        it.toString().toLowerCase(Locale.ENGLISH));
-    return entries(index, entries);
+    final IndexType type = entries.type();
+    if(!data.meta.index(type)) throw BXDB_INDEX_X.get(call.info, data.meta.name, type);
+    return entries(data.index(type), entries);
   }
 
   /**
@@ -73,8 +57,7 @@ public abstract class IndexFn extends StandardFunc {
       @Override
       public ANode next() {
         final byte[] token = ei.next();
-        return token == null ? null :
-          new FElem(ENTRY).add(COUNT, token(ei.count())).add(token);
+        return token == null ? null : new FElem(ENTRY).add(COUNT, token(ei.count())).add(token);
       }
     };
   }

@@ -10,10 +10,10 @@ import org.junit.*;
 /**
  * This class tests the update features of the {@link Data} class.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Tim Petrowsky
  */
-public final class UpdateTestTags extends UpdateTest {
+public final class UpdateTestTags extends DataUpdateTest {
   /**
    * Tests insert as last child.
    * @throws IOException I/O exception
@@ -200,6 +200,7 @@ public final class UpdateTestTags extends UpdateTest {
    */
   private static void insertTag(final int par, final int pos, final byte[] name, final int kind)
       throws IOException {
+
     int root;
     final Data data = context.data();
     if(pos == 0) {
@@ -214,8 +215,9 @@ public final class UpdateTestTags extends UpdateTest {
         ++currPos;
       }
     }
-    final MemData md = new MemData(data, context.options);
-    md.elem(1, data.elemNames.index(name, null, false), 1, 1, 0, false);
+
+    final MemData md = new MemData(context.options);
+    md.elem(1, md.elemNames.index(name, null, false), 1, 1, 0, false);
     md.insert(0);
     data.startUpdate(context.options);
     data.insert(root, par, new DataClip(md));

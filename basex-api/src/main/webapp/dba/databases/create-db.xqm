@@ -1,7 +1,7 @@
 (:~
  : Create new database.
  :
- : @author Christian Grün, BaseX GmbH, 2014-15
+ : @author Christian Grün, BaseX Team, 2014-16
  :)
 module namespace _ = 'dba/databases';
 
@@ -27,7 +27,7 @@ declare
   %rest:GET
   %rest:path("/dba/create-db")
   %rest:query-param("name",  "{$name}")
-  %rest:query-param("opts",  "{$opts}", "textindex", "attrindex")
+  %rest:query-param("opts",  "{$opts}")
   %rest:query-param("lang",  "{$lang}", "en")
   %rest:query-param("error", "{$error}")
   %output:method("html")
@@ -38,7 +38,9 @@ function _:create(
   $error  as xs:string?
 ) as element(html) {
   cons:check(),
-  tmpl:wrap(map { 'top': $_:CAT, 'error': $error },
+
+  let $opts := if($opts = 'x') then $opts else ('textindex', 'attrindex')
+  return tmpl:wrap(map { 'top': $_:CAT, 'error': $error },
     <tr>
       <td>
         <form action="create-db" method="post" autocomplete="off">
@@ -52,26 +54,28 @@ function _:create(
             <tr>
               <td>Name:</td>
               <td>
+                <input type="hidden" name="opts" value="x"/>
                 <input type="text" name="name" value="{ $name }" id="name"/>
                 { html:focus('name') }
                 <div class='small'/>
               </td>
             </tr>
             <tr>
-              <td colspan="2">
-                <h3>{ "textindex" ! html:checkbox("opts", ., $opts = ., 'Text Index') }</h3>
-                <h3>{ "attrindex" ! html:checkbox("opts", ., $opts = ., 'Attribute Index') }</h3>
-                { "updindex" ! html:checkbox("opts", ., $opts = ., 'Incremental Indexing') }<br/>
-                <div class='small'/>
-                <h3>{ "ftindex" ! html:checkbox("opts", ., $opts = ., 'Fulltext Index') }</h3>
-              </td>
+              <td colspan="2">{
+                <h3>{ html:option('textindex', 'Text Index', $opts) }</h3>,
+                <h3>{ html:option('attrindex', 'Attribute Index', $opts) }</h3>,
+                <h3>{ html:option('tokenindex', 'Token Index', $opts) }</h3>,
+                html:option('updindex', 'Incremental Indexing', $opts),
+                <div class='small'/>,
+                <h3>{ html:option('ftindex', 'Fulltext Indexing', $opts) }</h3>
+              }</td>
             </tr>
             <tr>
-              <td colspan="2">
-                { "stemming" ! html:checkbox("opts", ., $opts = ., 'Stemming') }<br/>
-                { "casesens" ! html:checkbox("opts", ., $opts = ., 'Case Sensitivity') }<br/>
-                { "diacritics" ! html:checkbox("opts", ., $opts = ., 'Diacritics') }<br/>
-              </td>
+              <td colspan="2">{
+                html:option('stemming', 'Stemming', $opts),
+                html:option('casesens', 'Case Sensitivity', $opts),
+                html:option('diacritics', 'Diacritics', $opts)
+              }</td>
             </tr>
             <tr>
               <td>Language:</td>
@@ -105,13 +109,14 @@ function _:create(
   cons:check(),
   try {
     util:update("if(db:exists($name)) then (
-      error((), 'Database already exists: ' || $name || '.')
-    ) else (
-      db:create($name, (), (), map:merge((
-      (('textindex','attrindex','ftindex','stemming','casesens','diacritics','updindex') !
-         map:entry(., $opts = .)), $lang ! map:entry('language', .))
-      ))
-    )", map { 'name': $name, 'lang': $lang, 'opts': $opts }),
+  error((), 'Database already exists: ' || $name || '.')
+) else (
+  db:create($name, (), (), map:merge((
+  (('textindex','attrindex','tokenindex','ftindex','stemming','casesens','diacritics','updindex') !
+    map:entry(., $opts = .)),
+    $lang ! map:entry('language', .))
+  ))
+)", map { 'name': $name, 'lang': $lang, 'opts': $opts }),
     db:output(web:redirect($_:SUB, map {
       'info': 'Created Database: ' || $name,
       'name': $name

@@ -2,14 +2,14 @@ package org.basex.query.ast;
 
 import org.basex.query.expr.*;
 import org.basex.query.expr.gflwor.*;
-import org.basex.query.func.basex.*;
+import org.basex.query.func.util.*;
 import org.basex.util.*;
 import org.junit.*;
 
 /**
  * Tests for rewritings of FLWOR-expressions.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public final class GFLWOROptimizeTest extends QueryPlanTest {
@@ -60,6 +60,18 @@ public final class GFLWOROptimizeTest extends QueryPlanTest {
     );
   }
 
+  /** Tests the relocation of a let clause (GH-1236). */
+  @Test public void dontMove3() {
+    check("for $x in 1 to 2 " +
+        "for $y in 1 to 2 " +
+        "where $x + $y > 4 " +
+        "let $z := $x + 1 " +
+        "return $z",
+        "",
+        "empty((//Let, //Where))"
+    );
+  }
+
   /** Tests the relocation of a static let clause. */
   @Test public void moveFor() {
     check("let $x := <x/> " +
@@ -104,11 +116,11 @@ public final class GFLWOROptimizeTest extends QueryPlanTest {
   @Test public void whereToPred() {
     check("for $i in 1 to 10 where <x/>[$i] and $i < 3 return $i",
         "1",
-        "exists(//*[ends-with(name(), 'Filter')]/" + Util.className(BaseXItemAt.class) + ")"
+        "exists(//*[ends-with(name(), 'Filter')]/" + Util.className(UtilItemAt.class) + ")"
     );
     check("for $i in 1 to 10 where (<a/>)[$i] return $i",
         "1",
-        "exists(//*[ends-with(name(), 'Filter')]/" + Util.className(BaseXItemAt.class) + ")"
+        "exists(//*[ends-with(name(), 'Filter')]/" + Util.className(UtilItemAt.class) + ")"
     );
     check("for $i in 1 to 3 " +
         "where count(for $j in 1 to $i group by $k := $j mod 2 return $i) > 1 " +
@@ -125,7 +137,7 @@ public final class GFLWOROptimizeTest extends QueryPlanTest {
         "let $foo := $i * $i return $foo * $foo",
         "0\n1",
         "every $let in //Let satisfies $let << exactly-one(//" +
-            Util.className(BaseXItemAt.class) + ")"
+            Util.className(UtilItemAt.class) + ")"
     );
     check("<x/>/(for $i in 1 to 3 let $x := .  where $x return $x)",
         "<x/>",
@@ -265,5 +277,25 @@ public final class GFLWOROptimizeTest extends QueryPlanTest {
         "count(//For) eq 1",
         "count(//GFLWOR/*) eq 2",
         "starts-with(//GFLWOR/*[last()]/@name, 'error(')");
+  }
+
+  /** Tests flattening. */
+  @Test public void flattening1() {
+    check("for $a at $p in " +
+        "  for $x in (1 to 2) " +
+        "  return $x + 1 " +
+        "return $p",
+        "1\n2",
+        "count(//VarRef) = 1"
+    );
+  }
+
+  /** Tests flattening. */
+  @Test public void flattening2() {
+    // original and optimized query plan are identical...
+    check("for $a in (1 to 2) return let $b := <a>1</a> return $b + 1",
+        "2\n2",
+        "count(//VarRef) = 1"
+    );
   }
 }

@@ -8,7 +8,7 @@ import org.basex.query.value.*;
 /**
  * An array containing more elements than fit into a {@link SmallArray}.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 final class BigArray extends Array {
@@ -40,7 +40,7 @@ final class BigArray extends Array {
    */
   BigArray(final Value[] left, final Value[] right) {
     this.left = left;
-    this.middle = FingerTree.empty();
+    middle = FingerTree.empty();
     this.right = right;
     assert left.length >= MIN_DIGIT && left.length <= MAX_DIGIT
         && right.length >= MIN_DIGIT && right.length <= MAX_DIGIT;
@@ -527,7 +527,7 @@ final class BigArray extends Array {
    * @param merged the merged digits
    * @return the array
    */
-  private Array fromMerged(final Value[] merged) {
+  private static Array fromMerged(final Value[] merged) {
     if(merged.length <= MAX_SMALL) return new SmallArray(merged);
     final int mid = merged.length / 2;
     return new BigArray(slice(merged, 0, mid), slice(merged, mid, merged.length));

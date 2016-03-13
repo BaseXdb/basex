@@ -92,6 +92,20 @@ public final class XQJConcurrencyTest extends XQJBaseTest {
   }
 
   /**
+   * Closes a connection.
+   * @param conn connection to be closed
+   */
+  private static void close(final XQConnection conn) {
+    if(conn != null) {
+      try {
+        conn.close();
+      } catch(final XQException ignored) {
+        /* ... superfluous ... */
+      }
+    }
+  }
+
+  /**
    * Query Thread.
    */
   private class SimpleQueryThread extends Thread {
@@ -134,7 +148,7 @@ public final class XQJConcurrencyTest extends XQJBaseTest {
   }
 
   /** Insertion thread. */
-  private class InsertItemThread extends Thread {
+  private final class InsertItemThread extends Thread {
     /** URI of document being inserted. */
     private final String uri;
     /** Content of document being inserted. */
@@ -145,7 +159,7 @@ public final class XQJConcurrencyTest extends XQJBaseTest {
      * @param u uri
      * @param it item
      */
-    public InsertItemThread(final String u, final XQItem it) {
+    private InsertItemThread(final String u, final XQItem it) {
       uri = u;
       item = it;
     }
@@ -161,19 +175,4 @@ public final class XQJConcurrencyTest extends XQJBaseTest {
       }
     }
   }
-
-  /**
-   * Closes a connection.
-   * @param conn connection to be closed
-   */
-  private static void close(final XQConnection conn) {
-    if(conn != null) {
-      try {
-        conn.close();
-      } catch(final XQException ignored) {
-        /* ... superfluous ... */
-      }
-    }
-  }
-
 }

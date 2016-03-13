@@ -13,7 +13,7 @@ import org.junit.*;
 /**
  * Performs simple tests on Charles Forster's XQJ client implementation for BaseX.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class XQJTest extends SandboxTest {

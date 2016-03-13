@@ -7,6 +7,7 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.constr.*;
 import org.basex.query.expr.ft.*;
 import org.basex.query.expr.gflwor.*;
+import org.basex.query.expr.index.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
@@ -17,7 +18,7 @@ import org.basex.util.*;
 /**
  * This class contains formatting information for the DOT output.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class DOTData {

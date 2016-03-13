@@ -12,7 +12,7 @@ import org.junit.*;
 /**
  * Tests the command-line arguments of the client starter class.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 @Ignore
@@ -82,17 +82,13 @@ public final class BaseXClientTest extends BaseXTest {
    */
   private static String run(final String[] args, final String[] sargs) throws IOException {
     final BaseXServer server = createServer(sargs);
-    final ArrayOutput ao = new ArrayOutput();
-    System.setOut(new PrintStream(ao));
-    System.setErr(NULL);
-
     final StringList sl = new StringList(
         "-p" + DB_PORT, "-U" + UserText.ADMIN, "-P" + UserText.ADMIN).add(args);
-    try {
+    try(final ArrayOutput ao = new ArrayOutput()) {
+      System.setOut(new PrintStream(ao));
       new BaseXClient(sl.finish());
       return ao.toString();
     } finally {
-      System.setErr(ERR);
       stopServer(server);
     }
   }

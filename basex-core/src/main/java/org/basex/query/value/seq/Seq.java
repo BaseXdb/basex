@@ -15,20 +15,12 @@ import org.basex.util.*;
 /**
  * Sequence, containing at least two items.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class Seq extends Value {
   /** Length. */
-  protected final long size;
-
-  /**
-   * Constructor.
-   * @param size size
-   */
-  protected Seq(final long size) {
-    this(size, AtomType.ITEM);
-  }
+  protected long size;
 
   /**
    * Constructor, specifying a type.

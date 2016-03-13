@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * This class caches sizes and offsets from index results.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Dimitar Popov
  */
 public final class IndexCache {
@@ -51,11 +51,11 @@ public final class IndexCache {
    * Adds a new cache entry. If an entry with the specified key already exists,
    * it will be updated.
    * @param key key
-   * @param sz number of index hits
-   * @param off offset to id list
+   * @param count number of index hits
+   * @param offset offset to id list
    * @return cache entry
    */
-  public IndexEntry add(final byte[] key, final int sz, final long off) {
+  public IndexEntry add(final byte[] key, final int count, final long offset) {
     final int hash = hash(key);
     rwl.writeLock().lock();
 
@@ -69,14 +69,14 @@ public final class IndexCache {
         if(entry == null) {
           delete(i, current, prev, next);
         } else if(current.hash == hash && eq(entry.key, key)) {
-          update(entry, sz, off);
+          update(entry, count, offset);
           return entry;
         }
         prev = current;
         current = next;
       }
 
-      final IndexEntry entry = new IndexEntry(key, sz, off);
+      final IndexEntry entry = new IndexEntry(key, count, offset);
       add(i, hash, entry);
       return entry;
     } finally {
@@ -147,12 +147,12 @@ public final class IndexCache {
   /**
    * Update an existing index entry.
    * @param entry index entry to update
-   * @param sz new size
-   * @param off new offset
+   * @param size new size
+   * @param offset new offset
    */
-  private static void update(final IndexEntry entry, final int sz, final long off) {
-    entry.size = sz;
-    entry.offset = off;
+  private static void update(final IndexEntry entry, final int size, final long offset) {
+    entry.size = size;
+    entry.offset = offset;
   }
 
   /**

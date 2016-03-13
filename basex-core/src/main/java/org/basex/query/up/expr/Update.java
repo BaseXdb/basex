@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * Abstract update expression.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 abstract class Update extends Arr {
@@ -53,7 +53,7 @@ abstract class Update extends Arr {
       if(pref.length == 0) continue;
       // check if attribute and target have the same namespace
       final byte[] uri = targ.uri(pref);
-      if(uri != null && !eq(name.uri(), uri)) throw UPNSCONFL.get(info);
+      if(uri != null && !eq(name.uri(), uri)) throw UPNSCONFL_X_X.get(info, name.uri(), uri);
     }
     return list;
   }

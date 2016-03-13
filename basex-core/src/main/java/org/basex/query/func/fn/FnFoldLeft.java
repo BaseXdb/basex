@@ -11,7 +11,7 @@ import org.basex.query.var.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class FnFoldLeft extends StandardFunc {
@@ -43,11 +43,11 @@ public final class FnFoldLeft extends StandardFunc {
   protected Expr opt(final QueryContext qc, final VarScope scp) throws QueryException {
     if(allAreValues() && exprs[0].size() < FnForEach.UNROLL_LIMIT) {
       // unroll the loop
-      qc.compInfo(QueryText.OPTUNROLL, this);
+      qc.compInfo(QueryText.OPTUNROLL_X, this);
       final Value seq = (Value) exprs[0];
       Expr e = exprs[1];
       for(final Item it : seq) {
-        e = new DynFuncCall(info, sc, false, exprs[2], e, it).optimize(qc, scp);
+        e = new DynFuncCall(info, sc, exprs[2], e, it).optimize(qc, scp);
       }
       return e;
     }

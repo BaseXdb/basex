@@ -25,7 +25,7 @@ import org.basex.util.ft.*;
 /**
  * Abstract predicate expression, implemented by {@link Filter} and {@link Step}.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class Preds extends ParseExpr {
@@ -56,23 +56,25 @@ public abstract class Preds extends ParseExpr {
       final int pl = preds.length;
       for(int p = 0; p < pl; ++p) {
         try {
-          preds[p] = preds[p].compile(qc, scp).optimizeEbv(qc, scp);
+          preds[p] = preds[p].compile(qc, scp);
         } catch(final QueryException ex) {
           // replace original expression with error
           preds[p] = FnError.get(ex, seqType);
         }
       }
-      return this;
     } finally {
       qc.value = init;
     }
+    return optimize(qc, scp);
   }
 
   @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     // number of predicates may change in loop
     for(int p = 0; p < preds.length; p++) {
-      Expr pred = preds[p];
+      Expr pred = preds[p].optimizeEbv(qc, scp);
+      preds[p] = pred;
+
       if(pred instanceof CmpG || pred instanceof CmpV) {
         final Cmp cmp = (Cmp) pred;
         final Expr e1 = cmp.exprs[0], e2 = cmp.exprs[1];
@@ -83,7 +85,7 @@ public abstract class Preds extends ParseExpr {
           if(e2.isFunction(Function.LAST) || st2.one() && st2.type.isNumber()) {
             if(cmp instanceof CmpG && ((CmpG) cmp).op == OpG.EQ ||
                cmp instanceof CmpV && ((CmpV) cmp).op == OpV.EQ) {
-              qc.compInfo(OPTWRITE, pred);
+              qc.compInfo(OPTREWRITE_X, pred);
               preds[p] = e2;
             }
           }
@@ -91,7 +93,7 @@ public abstract class Preds extends ParseExpr {
       } else if(pred instanceof And) {
         if(!pred.has(Flag.POS)) {
           // replace AND expression with predicates (don't swap position tests)
-          qc.compInfo(OPTPRED, pred);
+          qc.compInfo(OPTPRED_X, pred);
           final Expr[] and = ((Arr) pred).exprs;
           final int m = and.length - 1;
           final ExprList el = new ExprList(preds.length + m);
@@ -115,7 +117,7 @@ public abstract class Preds extends ParseExpr {
       } else if(pred.isValue()) {
         if(pred.ebv(qc, info).bool(info)) {
           // example: ....[true()]
-          qc.compInfo(OPTREMOVE, this, pred);
+          qc.compInfo(OPTREMOVE_X_X, this, pred);
           preds = Array.delete(preds, p--);
         } else {
           // example: ....[false()]
@@ -250,7 +252,8 @@ public abstract class Preds extends ParseExpr {
    */
   protected static boolean num(final Expr expr) {
     final SeqType st = expr.seqType();
-    return st.type.isNumber() && st.zeroOrOne() && !expr.has(Flag.CTX) && !expr.has(Flag.NDT);
+    return st.type.isNumber() && st.zeroOrOne() &&
+        !expr.has(Flag.CTX) && !expr.has(Flag.NDT) && !expr.has(Flag.UPD);
   }
 
   @Override

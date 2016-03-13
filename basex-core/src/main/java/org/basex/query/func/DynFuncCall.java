@@ -2,7 +2,6 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
-import static org.basex.util.Array.*;
 
 import java.util.*;
 
@@ -10,8 +9,8 @@ import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
-import org.basex.query.value.array.Array;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.Map;
 import org.basex.query.value.node.*;
@@ -23,78 +22,93 @@ import org.basex.util.hash.*;
 /**
  * Dynamic function call.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public final class DynFuncCall extends FuncCall {
   /** Static context. */
   private final StaticContext sc;
+  /** Updating flag. */
+  private final boolean upd;
+
+  /** Non-deterministic flag. */
+  private boolean ndt;
   /** Hash values of all function items that this call was copied from, possibly {@code null}. */
   private int[] inlinedFrom;
-  /** Updating flag. */
-  private final boolean updating;
 
   /**
    * Function constructor.
    * @param info input info
    * @param sc static context
-   * @param updating updating flag
    * @param expr function expression
    * @param arg arguments
    */
-  public DynFuncCall(final InputInfo info, final StaticContext sc, final boolean updating,
-      final Expr expr, final Expr... arg) {
+  public DynFuncCall(final InputInfo info, final StaticContext sc, final Expr expr,
+      final Expr... arg) {
+    this(info, sc, false, false, expr, arg);
+  }
 
-    super(info, add(arg, expr));
+  /**
+   * Function constructor.
+   * @param info input info
+   * @param sc static context
+   * @param upd updating flag
+   * @param ndt non-deterministic flag
+   * @param expr function expression
+   * @param arg arguments
+   */
+  public DynFuncCall(final InputInfo info, final StaticContext sc, final boolean upd,
+      final boolean ndt, final Expr expr, final Expr... arg) {
+
+    super(info, ExprList.concat(arg, expr));
     this.sc = sc;
-    this.updating = updating;
+    this.upd = upd;
+    this.ndt = ndt;
+    sc.dynFuncCall = true;
   }
 
   @Override
   public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    super.compile(qc, scp);
-    return optimize(qc, scp);
+    if(body().has(Flag.NDT)) ndt = true;
+    return super.compile(qc, scp);
   }
 
   @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
-    final int ar = exprs.length - 1;
-    final Expr f = exprs[ar];
+    final Expr f = body();
     final Type t = f.seqType().type;
+
+    final int nargs = exprs.length - 1;
     if(t instanceof FuncType) {
       final FuncType ft = (FuncType) t;
-      if(ft.argTypes != null && ft.argTypes.length != ar) {
-        final Expr e = f instanceof FuncItem ? ((FuncItem) f).expr : f;
-        throw INVARITY_X_X_X_X.get(info, e, ar, ar == 1 ? "" : "s", ft.argTypes.length);
-      }
-      if(ft.retType != null) seqType = ft.retType;
+      if(ft.argTypes != null && ft.argTypes.length != nargs) throw INVARITY_X_X_X_X.get(
+          info, nargs, nargs == 1 ? "" : "s", ft.argTypes.length, f.toErrorString());
+      if(ft.type != null) seqType = ft.type;
     }
 
     // maps and arrays can only contain fully evaluated values, so this is safe
-    if((f instanceof Map || f instanceof Array) && allAreValues()) return optPre(value(qc), qc);
+    if((f instanceof Map || f instanceof org.basex.query.value.array.Array) && allAreValues())
+      return optPre(value(qc), qc);
 
     if(f instanceof XQFunctionExpr) {
       // try to inline the function
       final XQFunctionExpr fe = (XQFunctionExpr) f;
       if(!(f instanceof FuncItem && comesFrom((FuncItem) f))) {
-        if(!sc.mixUpdates && updating != fe.annotations().contains(Annotation.UPDATING))
-          throw (updating ? UPFUNCNOTUP : UPFUNCUP).get(info);
-
-        final Expr[] args = Arrays.copyOf(exprs, ar);
+        checkUpdating(fe);
+        final Expr[] args = Arrays.copyOf(exprs, nargs);
         final Expr in = fe.inlineExpr(args, qc, scp, info);
         if(in != null) return in;
       }
-    } else if(f instanceof Item && !(f instanceof FItem)) {
-      throw INVFUNCITEM_X.get(info, ((Item) f).type, f);
+    } else if(f instanceof Item) {
+      throw INVFUNCITEM_X_X.get(info, ((Item) f).type, f);
     }
     return this;
   }
 
   @Override
   public void checkUp() throws QueryException {
-    final int ar = exprs.length - 1;
-    checkNoneUp(Arrays.copyOf(exprs, ar));
-    exprs[ar].checkUp();
+    checkNoneUp(Arrays.copyOf(exprs, exprs.length - 1));
+    body().checkUp();
   }
 
   /**
@@ -103,7 +117,7 @@ public final class DynFuncCall extends FuncCall {
    */
   public void markInlined(final FuncItem it) {
     final int hash = it.hashCode();
-    inlinedFrom = inlinedFrom == null ? new int[] { hash } : add(inlinedFrom, hash);
+    inlinedFrom = inlinedFrom == null ? new int[] { hash } : Array.add(inlinedFrom, hash);
   }
 
   /**
@@ -121,12 +135,20 @@ public final class DynFuncCall extends FuncCall {
     return false;
   }
 
+  /**
+   * Returns the function body expression.
+   * @return body
+   */
+  private Expr body() {
+    return exprs[exprs.length - 1];
+  }
+
   @Override
   public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
     final Expr[] copy = copyAll(qc, scp, vs, exprs);
     final int last = copy.length - 1;
     final Expr[] args = Arrays.copyOf(copy, last);
-    final DynFuncCall call = new DynFuncCall(info, sc, updating, copy[last], args);
+    final DynFuncCall call = new DynFuncCall(info, sc, upd, ndt, copy[last], args);
     if(inlinedFrom != null) call.inlinedFrom = inlinedFrom.clone();
     return copyType(call);
   }
@@ -139,55 +161,60 @@ public final class DynFuncCall extends FuncCall {
   @Override
   public void plan(final FElem plan) {
     final FElem el = planElem(TCL, tailCall);
-    final int es = exprs.length;
-    addPlan(plan, el, exprs[es - 1]);
-    for(int e = 0; e < es - 1; e++) exprs[e].plan(el);
+    addPlan(plan, el, body());
+    final int last = exprs.length - 1;
+    for(int e = 0; e < last; e++) exprs[e].plan(el);
   }
 
   @Override
   public String description() {
-    return exprs[exprs.length - 1].description() + "(...)";
-  }
-
-  @Override
-  public String toString() {
-    final int es = exprs.length;
-    final TokenBuilder tb = new TokenBuilder(exprs[es - 1].toString()).add('(');
-    for(int e = 0; e < es - 1; e++) {
-      tb.add(exprs[e].toString());
-      if(e < es - 2) tb.add(", ");
-    }
-    return tb.add(')').toString();
+    return body().description() + "(...)";
   }
 
   @Override
   FItem evalFunc(final QueryContext qc) throws QueryException {
-    final int ar = exprs.length - 1;
-    final Item it = toItem(exprs[ar], qc);
-    if(!(it instanceof FItem)) throw INVFUNCITEM_X.get(info, it.type, it);
+    final Item it = toItem(body(), qc);
+    if(!(it instanceof FItem)) throw INVFUNCITEM_X_X.get(info, it.type, it);
 
     final FItem f = (FItem) it;
-    if(f.arity() != ar) {
-      final Expr e = f instanceof FuncItem ? ((FuncItem) f).expr : f;
-      throw INVARITY_X_X_X_X.get(info, e, ar, ar == 1 ? "" : "s", f.arity());
-    }
-    if(!sc.mixUpdates && updating != f.annotations().contains(Annotation.UPDATING))
-      throw (updating ? UPFUNCNOTUP : UPFUNCUP).get(info);
-
+    final int nargs = exprs.length - 1;
+    if(f.arity() != nargs) throw INVARITY_X_X_X_X.get(
+        info, nargs, nargs == 1 ? "" : "s", f.arity(), f.toErrorString());
+    checkUpdating(f);
     return f;
+  }
+
+  /**
+   * Checks if the function is updating or not.
+   * @param item function expression
+   * @throws QueryException query exception
+   */
+  private void checkUpdating(final XQFunctionExpr item) throws QueryException {
+    if(!sc.mixUpdates && upd != item.annotations().contains(Annotation.UPDATING))
+      throw (upd ? FUNCNOTUP : FUNCUP).get(info);
   }
 
   @Override
   Value[] evalArgs(final QueryContext qc) throws QueryException {
-    final int al = exprs.length - 1;
-    final Value[] args = new Value[al];
-    for(int a = 0; a < al; ++a) args[a] = qc.value(exprs[a]);
+    final int last = exprs.length - 1;
+    final Value[] args = new Value[last];
+    for(int a = 0; a < last; a++) args[a] = qc.value(exprs[a]);
     return args;
   }
 
   @Override
   public boolean has(final Flag flag) {
-    // MIXUPDATES: all function calls may be updating
-    return flag == Flag.UPD ? sc.mixUpdates || updating : super.has(flag);
+    return flag == Flag.UPD ? upd : flag == Flag.NDT ? ndt : super.has(flag);
+  }
+
+  @Override
+  public String toString() {
+    final TokenBuilder tb = new TokenBuilder(body().toString()).add('(');
+    final int last = exprs.length - 1;
+    for(int e = 0; e < last; e++) {
+      tb.add(exprs[e].toString());
+      if(e < last - 1) tb.add(", ");
+    }
+    return tb.add(')').toString();
   }
 }

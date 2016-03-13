@@ -11,7 +11,7 @@ import org.basex.util.hash.*;
 /**
  * Single case of a switch expression.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class SwitchCase extends Arr {
@@ -106,7 +106,7 @@ public final class SwitchCase extends Arr {
   @Override
   public int exprSize() {
     int sz = 0;
-    for(final Expr e : exprs) sz += e.exprSize();
+    for(final Expr expr : exprs) sz += expr.exprSize();
     return sz;
   }
 }

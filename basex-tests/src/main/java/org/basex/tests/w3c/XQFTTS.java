@@ -13,7 +13,7 @@ import org.basex.util.ft.*;
 /**
  * XQuery Full Text Test Suite wrapper.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class XQFTTS extends W3CTS {
@@ -67,8 +67,7 @@ public final class XQFTTS extends W3CTS {
   @Override
   protected void parse(final QueryProcessor qp, final Item root) throws QueryException {
     final QueryContext qc = qp.qc;
-    qc.stop = stop;
-    qc.thes = thes;
+    qc.resources.ftmaps(stop, thes);
 
     final FTOpt opt = qc.ftOpt();
     for(final String s : aux("stopwords", root)) {

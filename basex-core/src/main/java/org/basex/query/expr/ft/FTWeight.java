@@ -14,7 +14,7 @@ import org.basex.util.hash.*;
 /**
  * FTOptions expression.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class FTWeight extends FTExpr {
@@ -129,7 +129,7 @@ public final class FTWeight extends FTExpr {
   @Override
   public int exprSize() {
     int sz = 1;
-    for(final FTExpr e : exprs) sz += e.exprSize();
+    for(final FTExpr expr : exprs) sz += expr.exprSize();
     return sz + weight.exprSize();
   }
 

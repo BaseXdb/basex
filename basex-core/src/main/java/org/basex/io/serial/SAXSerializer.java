@@ -20,7 +20,7 @@ import org.xml.sax.helpers.*;
  *   <li>notify endDocument()</li>
  * </ol>
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Michael Hedenus
  */
 public final class SAXSerializer extends Serializer implements XMLReader {
@@ -196,8 +196,10 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   @Override
   protected void finishClose() throws IOException {
     try {
-      final String name = string(elem.string());
-      contentHandler.endElement("", name, name);
+      final String uri = string(namespaces.get(elem.prefix()));
+      final String lname = string(elem.local());
+      final String rname = string(elem.string());
+      contentHandler.endElement(uri, lname, rname);
       namespaces = namespaces.getParent();
     } catch(final SAXException ex) {
       throw new IOException(ex);

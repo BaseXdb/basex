@@ -18,7 +18,7 @@ import org.xml.sax.helpers.*;
  *
  * Part 10: XML Pipelines.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  */
 public final class Part10 extends Main {
   /**
@@ -106,7 +106,7 @@ public final class Part10 extends Main {
      * Constructor.
      * @param xqp prepared expression
      */
-    public XQJFilter(final XQPreparedExpression xqp) {
+    XQJFilter(final XQPreparedExpression xqp) {
       expression = xqp;
     }
 

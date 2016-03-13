@@ -14,7 +14,7 @@ import org.basex.query.var.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public final class HofFoldLeft1 extends StandardFunc {
@@ -36,14 +36,14 @@ public final class HofFoldLeft1 extends StandardFunc {
   @Override
   protected Expr opt(final QueryContext qc, final VarScope scp) throws QueryException {
     if(allAreValues() && exprs[0].size() <= FnForEach.UNROLL_LIMIT) {
-      qc.compInfo(QueryText.OPTUNROLL, this);
+      qc.compInfo(QueryText.OPTUNROLL_X, this);
       final Value seq = (Value) exprs[0];
       if(seq.isEmpty()) throw EMPTYFOUND.get(info);
       final FItem f = checkArity(exprs[1], 2, qc);
       Expr e = seq.itemAt(0);
       final long is = seq.size();
       for(int i = 1; i < is; i++)
-        e = new DynFuncCall(info, sc, false, f, e, seq.itemAt(i)).optimize(qc, scp);
+        e = new DynFuncCall(info, sc, f, e, seq.itemAt(i)).optimize(qc, scp);
       return e;
     }
     return this;

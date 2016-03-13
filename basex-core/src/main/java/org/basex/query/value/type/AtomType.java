@@ -18,7 +18,7 @@ import org.basex.util.*;
 /**
  * XQuery atomic types.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public enum AtomType implements Type {
@@ -400,6 +400,7 @@ public enum AtomType implements Type {
         final InputInfo ii) throws QueryException {
       final Item it = value instanceof Item ? (Item) value : Str.get(value.toString());
       final BigDecimal v = checkNum(it, ii).dec(ii), i = v.setScale(0, RoundingMode.DOWN);
+      // equals() used to also test fractional digits
       if(v.signum() < 0 || v.compareTo(Uln.MAXULN) > 0 ||
         it.type.isStringOrUntyped() && !v.equals(i)) throw funCastError(ii, this, it);
       return Uln.get(i.toBigInteger());

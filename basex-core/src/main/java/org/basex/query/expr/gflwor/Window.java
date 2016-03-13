@@ -25,7 +25,7 @@ import org.basex.util.hash.*;
 /**
  * the GFLWOR {@code window} clause.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public final class Window extends Clause {
@@ -50,7 +50,7 @@ public final class Window extends Clause {
    * @param expr sequence
    * @param start start condition
    * @param only {@code only} flag
-   * @param end end condition
+   * @param end end condition (can be {@code null})
    * @throws QueryException query exception
    */
   public Window(final InputInfo info, final boolean sliding, final Var var, final Expr expr,
@@ -338,7 +338,9 @@ public final class Window extends Clause {
 
   @Override
   public void checkUp() throws QueryException {
-    checkNoneUp(expr, start, end);
+    checkNoUp(expr);
+    checkNoUp(start);
+    checkNoUp(end);
   }
 
   @Override
@@ -356,7 +358,7 @@ public final class Window extends Clause {
   /**
    * A window {@code start} of {@code end} condition.
    *
-   * @author BaseX Team 2005-15, BSD License
+   * @author BaseX Team 2005-16, BSD License
    * @author Leo Woerteler
    */
   public static final class Condition extends Single {
@@ -393,12 +395,13 @@ public final class Window extends Clause {
 
     @Override
     public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-      expr = expr.compile(qc, scp).optimizeEbv(qc, scp);
-      return this;
+      expr = expr.compile(qc, scp);
+      return optimize(qc, scp);
     }
 
     @Override
-    public Condition optimize(final QueryContext qc, final VarScope scp) {
+    public Condition optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+      expr = expr.optimizeEbv(qc, scp);
       return this;
     }
 
@@ -540,7 +543,7 @@ public final class Window extends Clause {
   /**
    * Evaluator for the Window clause.
    *
-   * @author BaseX Team 2005-15, BSD License
+   * @author BaseX Team 2005-16, BSD License
    * @author Leo Woerteler
    */
   private abstract class WindowEval extends Eval {
@@ -583,7 +586,7 @@ public final class Window extends Clause {
   /**
    * Evaluator for the Tumbling Window clause.
    *
-   * @author BaseX Team 2005-15, BSD License
+   * @author BaseX Team 2005-16, BSD License
    * @author Leo Woerteler
    */
   private abstract class TumblingEval extends WindowEval {

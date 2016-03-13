@@ -14,54 +14,63 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
  * An XQuery main module.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
-public final class MainModule extends StaticScope {
+public final class MainModule extends Module {
   /** Declared type, {@code null} if not specified. */
   private final SeqType declType;
 
   /**
-   * Constructor for a function call.
-   * @param sf static function
-   * @param args function arguments
+   * Creates a new main module for a context item declared in the prolog.
+   * @param expr root expression
+   * @param scope variable scope
+   * @param doc documentation
+   * @param type optional type
+   * @param sc static context
+   * @param info input info
+   * @return main module
+   */
+  public static MainModule get(final Expr expr, final VarScope scope, final SeqType type,
+      final String doc, final StaticContext sc, final InputInfo info) {
+    return new MainModule(expr, scope, type, doc, null, null, null, sc, info);
+  }
+
+  /**
+   * Creates a new main module for the specified function.
+   * @param uf user-defined function
+   * @param args arguments
+   * @return main module
    * @throws QueryException query exception
    */
-  public MainModule(final StaticFunc sf, final Expr[] args) throws QueryException {
-    this(new StaticFuncCall(sf.name, args, sf.sc, sf.info).init(sf),
-        new VarScope(sf.sc), null, sf.sc);
+  public static MainModule get(final StaticFunc uf, final Expr[] args) throws QueryException {
+    final StaticFuncCall sfc = new StaticFuncCall(uf.name, args, uf.sc, uf.info).init(uf);
+    return new MainModule(sfc, new VarScope(uf.sc), null, null, null, null, null, uf.sc, null);
   }
 
   /**
    * Constructor.
    * @param expr root expression
    * @param scope variable scope
-   * @param doc xqdoc documentation
-   * @param sc static context
-   */
-  public MainModule(final Expr expr, final VarScope scope, final String doc,
-      final StaticContext sc) {
-    this(expr, scope, null, doc, sc, null);
-  }
-
-  /**
-   * Constructor.
-   * @param expr root expression
-   * @param scope variable scope
-   * @param doc xqdoc documentation
-   * @param declType declared type (optional)
+   * @param doc documentation
+   * @param funcs user-defined functions
+   * @param vars static variables
+   * @param imports namespace URIs of imported modules
+   * @param declType optional type
    * @param sc static context
    * @param info input info
    */
-  MainModule(final Expr expr, final VarScope scope, final SeqType declType, final String doc,
-      final StaticContext sc, final InputInfo info) {
+  public MainModule(final Expr expr, final VarScope scope, final SeqType declType, final String doc,
+      final TokenObjMap<StaticFunc> funcs, final TokenObjMap<StaticVar> vars,
+      final TokenSet imports, final StaticContext sc, final InputInfo info) {
 
-    super(scope, doc, sc, info);
+    super(scope, doc, funcs, vars, imports, sc, info);
     this.expr = expr;
     this.declType = declType;
   }

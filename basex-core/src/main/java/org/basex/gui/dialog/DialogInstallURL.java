@@ -13,7 +13,7 @@ import org.basex.util.*;
 /**
  * URL dialog.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class DialogInstallURL extends BaseXDialog {
@@ -51,12 +51,12 @@ final class DialogInstallURL extends BaseXDialog {
 
     p = new BaseXBack(new BorderLayout());
     p.add(link, BorderLayout.WEST);
-    buttons = newButtons(B_OK, CANCEL);
+    buttons = newButtons(B_OK, B_CANCEL);
     p.add(buttons, BorderLayout.EAST);
 
     set(p, BorderLayout.SOUTH);
     action(null);
-    finish(null);
+    finish();
   }
 
   @Override

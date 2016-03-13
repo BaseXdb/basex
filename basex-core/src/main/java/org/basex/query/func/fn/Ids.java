@@ -1,13 +1,15 @@
 package org.basex.query.func.fn;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
+
+import java.util.*;
 
 import org.basex.core.locks.*;
 import org.basex.data.*;
+import org.basex.index.*;
 import org.basex.query.*;
-import org.basex.query.expr.*;
+import org.basex.query.expr.index.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -17,16 +19,20 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
  * Id functions.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 abstract class Ids extends StandardFunc {
+  /** Hash map for data references and id flags. */
+  final IdentityHashMap<Data, Boolean> indexed = new IdentityHashMap<>();
+
   /**
    * Returns referenced nodes.
    * @param qc query context
@@ -35,30 +41,49 @@ abstract class Ids extends StandardFunc {
    * @throws QueryException query exception
    */
   protected BasicNodeIter ids(final QueryContext qc, final boolean idref) throws QueryException {
-    // [CG] XQuery: ID-IDREF Parsing: consider schema information
-
     final TokenSet idSet = ids(exprs[0].atomIter(qc, info));
     final ANode root = checkRoot(toNode(ctxArg(1, qc), qc));
 
+    if(index(root, idref)) {
+      // create index iterator
+      final TokenList idList = new TokenList(idSet.size());
+      for(final byte[] id : idSet) idList.add(id);
+      final Value ids = StrSeq.get(idList);
+      final Data data = root.data();
+      final ValueAccess va = new ValueAccess(info, ids, idref ? IndexType.TOKEN :
+        IndexType.ATTRIBUTE, null, new IndexContext(data, false));
+
+      // collect and return index results, filtered by id/idref attributes
+      final ANodeList results = new ANodeList();
+      for(final ANode attr : va.iter(qc)) {
+        // check attribute name; check root if database has more than one document
+        if(XMLToken.isId(attr.name(), idref) && (data.meta.ndocs == 1 || attr.root().is(root)))
+          results.add(idref ? attr : attr.parent());
+      }
+      return results.iter();
+    }
+
+    // otherwise, do sequential scan: parse node and its descendants
+    final ANodeList list = new ANodeList().check();
+    add(idSet, list, root, idref);
+    return list.iter();
+  }
+
+  /**
+   * Checks if the ids can to be found in the index.
+   * @param root root node
+   * @param idref follow idref
+   * @return result of check
+   */
+  private boolean index(final ANode root, final boolean idref) {
+    // check if index exists
     final Data data = root.data();
-    if(idref || data == null) {
-      final ANodeList list = new ANodeList().check();
-      add(idSet, list, root, idref);
-      return list.iter();
+    if(data == null || !(idref ? data.meta.tokenindex : data.meta.attrindex)) return false;
+    // check if index names contain id attributes
+    if(!indexed.containsKey(data)) {
+      indexed.put(data, new IndexNames(IndexType.ATTRIBUTE, data).containsIds(idref));
     }
-
-    // database value index can be utilized. create index iterator
-    final TokenList idList = new TokenList(idSet.size());
-    for(final byte[] id : idSet) idList.add(id);
-    final Value ids = StrSeq.get(idList);
-    final ValueAccess va = new ValueAccess(info, ids, false, null, new IndexContext(data, false));
-
-    // collect and return index results, filtered by id/idref attributes
-    final ANodeList results = new ANodeList();
-    for(final ANode attr : va.iter(qc)) {
-      if(isId(attr, idref)) results.add(attr.parent());
-    }
-    return results.iter();
+    return indexed.get(data);
   }
 
   /**
@@ -72,9 +97,9 @@ abstract class Ids extends StandardFunc {
       final boolean idref) {
 
     for(final ANode attr : node.attributes()) {
-      if(isId(attr, idref)) {
+      if(XMLToken.isId(attr.name(), idref)) {
         // id/idref found
-        for(final byte[] val : split(normalize(attr.string()), ' ')) {
+        for(final byte[] val : distinctTokens(attr.string())) {
           // correct value: add to results
           if(idSet.contains(val)) {
             results.add(idref ? attr.finish() : node);
@@ -84,17 +109,6 @@ abstract class Ids extends StandardFunc {
       }
     }
     for(final ANode child : node.children()) add(idSet, results, child, idref);
-  }
-
-  /**
-   * Checks if an attribute is an id/idref attribute.
-   * @param attr attribute
-   * @param idref id/idref flag
-   * @return result of check
-   */
-  private static boolean isId(final ANode attr, final boolean idref) {
-    final byte[] name = lc(attr.name());
-    return idref ? contains(name, IDREF) : contains(name, ID) && !contains(name, IDREF);
   }
 
   /**
@@ -118,7 +132,7 @@ abstract class Ids extends StandardFunc {
   private TokenSet ids(final Iter iter) throws QueryException {
     final TokenSet ts = new TokenSet();
     for(Item ids; (ids = iter.next()) != null;) {
-      for(final byte[] id : split(normalize(toToken(ids)), ' ')) ts.put(id);
+      for(final byte[] id : distinctTokens(toToken(ids))) ts.put(id);
     }
     return ts;
   }

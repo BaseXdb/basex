@@ -14,7 +14,7 @@ import org.basex.util.hash.*;
 /**
  * Castable expression.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Castable extends Single {
@@ -40,8 +40,7 @@ public final class Castable extends Single {
 
   @Override
   public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    super.compile(qc, scp);
-    return optimize(qc, scp);
+    return super.compile(qc, scp).optimize(qc, scp);
   }
 
   @Override

@@ -14,7 +14,7 @@ import org.basex.query.value.node.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class UserListDetails extends UserList {
@@ -32,7 +32,7 @@ public final class UserListDetails extends UserList {
     for(final User us : qc.context.users.users(null)) {
       if(u != null && u != us) continue;
 
-      final String perm = us.perm(null).toString().toLowerCase(Locale.ENGLISH);
+      final String perm = us.perm((String) null).toString();
       final FElem user = new FElem(USER).add(NAME, us.name()).add(PERMISSION, perm);
       for(final Entry<Algorithm, EnumMap<Code, String>> codes : us.alg().entrySet()) {
         final FElem password = new FElem(PASSWORD).add(ALGORITHM, codes.getKey().toString());

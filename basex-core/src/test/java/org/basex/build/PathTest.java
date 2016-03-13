@@ -7,7 +7,6 @@ import org.basex.core.*;
 import org.basex.core.MainOptions.MainParser;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
-import org.basex.query.*;
 import org.basex.util.*;
 import org.junit.*;
 import org.junit.Test;
@@ -15,7 +14,7 @@ import org.junit.Test;
 /**
  * Tests queries with path in it on collections.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Andreas Weiler
  */
 public final class PathTest extends SandboxTest {
@@ -32,59 +31,48 @@ public final class PathTest extends SandboxTest {
 
   /**
    * Creates initial databases.
-   * @throws BaseXException exception
    */
   @BeforeClass
-  public static void before() throws BaseXException {
-    new CreateDB(INPUT).execute(context);
-    new Add("input", INPUTF).execute(context);
-    new Add("input2", INPUTF).execute(context);
-    new CreateDB(WEEK1, WEEK).execute(context);
-    new CreateDB(WEEK2, WEEK).execute(context);
-    new Close().execute(context);
+  public static void before() {
+    execute(new CreateDB(INPUT));
+    execute(new Add("input", INPUTF));
+    execute(new Add("input2", INPUTF));
+    execute(new CreateDB(WEEK1, WEEK));
+    execute(new CreateDB(WEEK2, WEEK));
+    execute(new Close());
   }
 
   /**
    * Drops the initial databases.
-   * @throws BaseXException exception
    */
   @AfterClass
-  public static void after() throws BaseXException {
-    new DropDB(INPUT).execute(context);
-    new DropDB(WEEK1).execute(context);
-    new DropDB(WEEK2).execute(context);
+  public static void after() {
+    execute(new DropDB(INPUT));
+    execute(new DropDB(WEEK1));
+    execute(new DropDB(WEEK2));
   }
 
   /**
    * Checks the number of documents under the specified path.
-   * @throws Exception exception
    */
   @Test
-  public void documentTestInput() throws Exception {
-    final String count = "count(collection('" + INPUT + "/input'))";
-    try(final QueryProcessor qp = new QueryProcessor(count, context)) {
-      assertEquals(1, Integer.parseInt(qp.value().serialize().toString()));
-    }
+  public void documentTestInput() {
+    assertEquals("1", query("count(collection('" + INPUT + "/input'))"));
   }
 
   /**
    * Checks the number of documents under the specified path.
-   * @throws Exception exception
    */
   @Test
-  public void documentTestWeek() throws Exception {
-    final String count = "count(collection('" + WEEK1 + "/week/monday'))";
-    try(final QueryProcessor qp = new QueryProcessor(count, context)) {
-      assertEquals(3, Integer.parseInt(qp.value().serialize().toString()));
-    }
+  public void documentTestWeek() {
+    assertEquals("3", query("count(collection('" + WEEK1 + "/week/monday'))"));
   }
 
   /**
    * Checks the results of the query with index access.
-   * @throws Exception exception
    */
   @Test
-  public void withIndexTest() throws Exception {
+  public void withIndexTest() {
     weekTest();
     weekTest2();
   }
@@ -92,59 +80,44 @@ public final class PathTest extends SandboxTest {
   /**
    * #905: Ensure that parser options will not affect doc() and collection().
    * May be moved to a separate test class in future.
-   * @throws Exception exception
    */
   @Test
-  public void docParsing() throws Exception {
+  public void docParsing() {
     final IOFile path = new IOFile(sandbox(), "doc.xml");
-    path.write(Token.token("<a/>"));
-    context.options.set(MainOptions.PARSER, MainParser.JSON);
-    try(final QueryProcessor qp = new QueryProcessor("doc('" + path + "')", context)) {
-      assertEquals("<a/>", qp.value().serialize().toString());
-    }
+    write(path, "<a/>");
+    set(MainOptions.PARSER, MainParser.JSON);
+    assertEquals("<a/>", query("doc('" + path + "')"));
   }
 
   /**
    * Checks the results of the query without index access.
-   * @throws Exception exception
    */
   @Test
-  public void withoutIndexTest() throws Exception {
-    new Open(WEEK1).execute(context);
-    new DropIndex("text").execute(context);
-    new Open(WEEK2).execute(context);
-    new DropIndex("text").execute(context);
+  public void withoutIndexTest() {
+    execute(new Open(WEEK1));
+    execute(new DropIndex("text"));
+    execute(new Open(WEEK2));
+    execute(new DropIndex("text"));
     weekTest();
     weekTest2();
   }
 
   /** Checks the results of the queries with the db week.
-   * @throws Exception exception
    */
-  private static void weekTest() throws Exception {
-    final String count = "count(collection('" + WEEK1 +
-      "/week/monday')/root/monday/text[text() = 'text'])";
-    try(final QueryProcessor qp = new QueryProcessor(count, context)) {
-      assertEquals(3, Integer.parseInt(qp.value().serialize().toString()));
-    }
+  private static void weekTest() {
+    assertEquals("3", query("count(collection('" + WEEK1 +
+      "/week/monday')/root/monday/text[text() = 'text'])"));
     // cross-check
-    final String count2 = "count(collection('" + WEEK1 +
-      "/week')/root/monday/text[text() = 'text'])";
-    try(final QueryProcessor qp2 = new QueryProcessor(count2, context)) {
-      assertEquals(4, Integer.parseInt(qp2.value().serialize().toString()));
-    }
+    assertEquals("4", query("count(collection('" + WEEK1 +
+      "/week')/root/monday/text[text() = 'text'])"));
   }
 
   /** Checks the results of the queries with the db week.
-   * @throws Exception exception
    */
-  private static void weekTest2() throws Exception {
-    final String count = "count(collection('" + WEEK1 +
-      "/week/monday')/root/monday/text[text() = 'text'])," +
+  private static void weekTest2() {
+    assertEquals("3,1", query("count(collection('" + WEEK1 +
+      "/week/monday')/root/monday/text[text() = 'text']) || ',' ||" +
       " count(collection('" + WEEK2 +
-      "/week/tuesday')/root/monday/text[text() = 'text']) ";
-    try(final QueryProcessor qp = new QueryProcessor(count, context)) {
-      assertEquals("3\n1", normNL(qp.value().serialize().toString()));
-    }
+      "/week/tuesday')/root/monday/text[text() = 'text']) "));
   }
 }

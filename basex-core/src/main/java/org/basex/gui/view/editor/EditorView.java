@@ -21,8 +21,8 @@ import org.basex.core.parse.*;
 import org.basex.gui.*;
 import org.basex.gui.dialog.*;
 import org.basex.gui.layout.*;
-import org.basex.gui.layout.BaseXFileChooser.Mode;
-import org.basex.gui.layout.BaseXLayout.DropHandler;
+import org.basex.gui.layout.BaseXFileChooser.*;
+import org.basex.gui.layout.BaseXLayout.*;
 import org.basex.gui.text.*;
 import org.basex.gui.text.TextPanel.Action;
 import org.basex.gui.view.*;
@@ -39,16 +39,21 @@ import org.xml.sax.*;
 /**
  * This view allows the input and evaluation of queries and documents.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class EditorView extends View {
+  /** Delay for highlighting an error. */
+  private static final int SEARCH_DELAY = 200;
   /** Link pattern. */
   private static final Pattern LINK = Pattern.compile("(.*?), ([0-9]+)/([0-9]+)");
   /** Number of files in the history. */
   private static final int HISTORY = 18;
   /** Number of files in the compact history. */
   private static final int HISTCOMP = 7;
+
+  /** Project files. */
+  final ProjectView project;
 
   /** History Button. */
   private final AbstractButton hist;
@@ -70,15 +75,13 @@ public final class EditorView extends View {
   private final BaseXHeader header;
   /** Query area. */
   private final BaseXTabs tabs;
+
   /** Query file that has last been evaluated. */
   private IOFile execFile;
   /** Thread counter. */
   private int threadID;
-
-  /** Project files. */
-  final ProjectView project;
   /** Input info. */
-  private InputInfo errorInfo;
+  private InputInfo inputInfo;
 
   /**
    * Default constructor.
@@ -222,7 +225,7 @@ public final class EditorView extends View {
     info.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseClicked(final MouseEvent e) {
-        jumpToError();
+        markError(true);
       }
     });
     stop.addActionListener(new ActionListener() {
@@ -295,7 +298,7 @@ public final class EditorView extends View {
     header.refreshLayout();
     for(final EditorArea edit : editors()) edit.refreshLayout(mfont);
     search.refreshLayout();
-    final Font f = font.deriveFont((float) ((FONTSIZE * SCALE + fontSize) / 2));
+    final Font f = font.deriveFont((float) ((FONTSIZE * scale + fontSize) / 2));
     info.setFont(f);
     pos.setFont(f);
     project.refreshLayout();
@@ -354,7 +357,7 @@ public final class EditorView extends View {
    */
   public void jumpToFile() {
     final EditorArea editor = getEditor();
-    if(editor.opened()) project.jump(editor.file());
+    if(editor.opened()) project.jumpTo(editor.file(), true);
   }
 
   /**
@@ -443,7 +446,7 @@ public final class EditorView extends View {
    * @return success flag
    */
   public boolean delete(final IOFile file) {
-    final EditorArea edit = find(file, true);
+    final EditorArea edit = find(file);
     if(edit != null) close(edit);
     return file.delete();
   }
@@ -458,7 +461,7 @@ public final class EditorView extends View {
   }
 
   /**
-   * Opens the specified query file.
+   * Opens and focuses the specified query file.
    * @param file query file
    * @param parse parse contents
    * @param error display error if file does not exist
@@ -467,7 +470,7 @@ public final class EditorView extends View {
   private EditorArea open(final IOFile file, final boolean parse, final boolean error) {
     if(!visible()) GUIMenuCmd.C_SHOWEDITOR.execute(gui);
 
-    EditorArea edit = find(file, true);
+    EditorArea edit = find(file);
     if(edit != null) {
       // display open file
       tabs.setSelectedComponent(edit);
@@ -491,6 +494,7 @@ public final class EditorView extends View {
         return null;
       }
     }
+    edit.requestFocusInWindow();
     return edit;
   }
 
@@ -574,6 +578,9 @@ public final class EditorView extends View {
       }
     } else if(action != Action.CHECK) {
       info(null);
+    } else {
+      // no particular file format, no particular action: reset status info
+      info.setText(OK, Msg.SUCCESS);
     }
   }
 
@@ -602,7 +609,7 @@ public final class EditorView extends View {
   /**
    * Retrieves the contents of the specified file, or opens it externally.
    * @param file query file
-   * @return contents or {@code null} reference
+   * @return contents, or {@code null} reference if file is opened externally
    * @throws IOException I/O exception
    */
   private byte[] read(final IOFile file) throws IOException {
@@ -618,9 +625,9 @@ public final class EditorView extends View {
         } catch(final InputException ex) {
           if(valid) {
             valid = false;
-            final String action = BaseXDialog.yesNoCancel(gui, H_FILE_BINARY);
-            if(action == null) return null;
-            if(action == YES) {
+            final String button = BaseXDialog.yesNoCancel(gui, H_FILE_BINARY);
+            if(button == null) return null;
+            if(button == B_YES) {
               try {
                 file.open();
               } catch(final IOException ioex) {
@@ -695,16 +702,16 @@ public final class EditorView extends View {
    * Starts a thread, which shows a waiting info after a short timeout.
    */
   public void start() {
-    final int thread = threadID;
+    final int id = threadID;
     new Timer(true).schedule(new TimerTask() {
       @Override
       public void run() {
-        if(thread == threadID) {
+        if(id == threadID) {
           info.setText(PLEASE_WAIT_D, Msg.SUCCESS).setToolTipText(null);
           stop.setEnabled(true);
         }
       }
-    }, 200);
+    }, SEARCH_DELAY);
   }
 
   /**
@@ -729,7 +736,7 @@ public final class EditorView extends View {
       info.setCursor(CURSORARROW);
       info.setText(stopped ? INTERRUPTED : OK, Msg.SUCCESS);
       info.setToolTipText(null);
-      errorInfo = null;
+      inputInfo = null;
     } else {
       info.setCursor(CURSORHAND);
       info.setText(th.getLocalizedMessage(), Msg.ERROR);
@@ -738,25 +745,18 @@ public final class EditorView extends View {
       info.setToolTipText("<html>" + tt + "</html>");
 
       if(th instanceof QueryIOException) {
-        errorInfo = ((QueryIOException) th).getCause().info();
+        inputInfo = ((QueryIOException) th).getCause().info();
       } else if(th instanceof QueryException) {
-        errorInfo = ((QueryException) th).info();
+        inputInfo = ((QueryException) th).info();
       } else if(th instanceof SAXParseException) {
         final SAXParseException ex = (SAXParseException) th;
         final String path = getEditor().file().path();
-        errorInfo = new InputInfo(path, ex.getLineNumber(), ex.getColumnNumber());
+        inputInfo = new InputInfo(path, ex.getLineNumber(), ex.getColumnNumber());
       } else {
-        errorInfo = new InputInfo(getEditor().file().path(), 1, 1);
+        inputInfo = new InputInfo(getEditor().file().path(), 1, 1);
       }
-      error(false);
+      markError(false);
     }
-  }
-
-  /**
-   * Jumps to the current error.
-   */
-  public void jumpToError() {
-    error(true);
   }
 
   /**
@@ -766,8 +766,8 @@ public final class EditorView extends View {
   public void jump(final String link) {
     final Matcher m = LINK.matcher(link);
     if(m.matches()) {
-      errorInfo = new InputInfo(m.group(1), Strings.toInt(m.group(2)), Strings.toInt(m.group(3)));
-      error(true);
+      inputInfo = new InputInfo(m.group(1), Strings.toInt(m.group(2)), Strings.toInt(m.group(3)));
+      markError(true);
     } else {
       Util.stack("No match found: " + link);
     }
@@ -775,26 +775,42 @@ public final class EditorView extends View {
 
   /**
    * Jumps to the current error.
-   * @param jump jump to error position
+   * @param jump jump to error position (if necessary, open file)
    */
-  private void error(final boolean jump) {
-    final InputInfo ei = errorInfo;
-    if(ei == null) return;
-
-    final IOFile file = new IOFile(ei.path());
-    EditorArea edit = find(file, false);
-    if(jump) {
-      if(edit == null) edit = open(file, false, true);
-      if(edit != null) tabs.setSelectedComponent(edit);
+  public void markError(final boolean jump) {
+    InputInfo ii = inputInfo;
+    final String path;
+    final boolean error = ii == null;
+    if(error) {
+      final TreeMap<String, InputInfo> errors = project.errors();
+      if(errors.isEmpty()) return;
+      path = errors.get(errors.keySet().iterator().next()).path();
+    } else {
+      path = ii.path();
     }
-    if(edit == null) return;
+    if(path == null) return;
 
-    // mark and jump to error position
-    final int ep = pos(edit.last, ei.line(), ei.column());
+    final IOFile file = new IOFile(path);
+    final EditorArea ea = find(file);
+    final EditorArea edit;
+    if(jump) {
+      edit = open(file, error, true);
+      // only update error information if file was not already opened
+      if(ea == null && error) ii = inputInfo;
+    } else {
+      edit = ea;
+    }
+    // no editor available, no input info
+    if(edit == null || ii == null) return;
+
+    // mark error, jump to error position
+    final int ep = pos(edit.last, ii.line(), ii.column());
     edit.error(ep);
     if(jump) {
       edit.setCaret(ep);
       posCode.invokeLater();
+      // open file in project view if it's visible and if new file was opened
+      if(ea == null && project.getWidth() != 0) project.jumpTo(edit.file(), false);
     }
   }
 
@@ -921,12 +937,11 @@ public final class EditorView extends View {
   /**
    * Finds the editor that contains the specified file.
    * @param file file to be found
-   * @param opened considers only opened files
    * @return editor
    */
-  private EditorArea find(final IO file, final boolean opened) {
+  private EditorArea find(final IO file) {
     for(final EditorArea edit : editors()) {
-      if(edit.file().eq(file) && (!opened || edit.opened())) return edit;
+      if(edit.file().eq(file)) return edit;
     }
     return null;
   }

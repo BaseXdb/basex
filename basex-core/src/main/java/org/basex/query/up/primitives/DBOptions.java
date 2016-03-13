@@ -13,22 +13,22 @@ import org.basex.util.options.*;
 /**
  * Contains various helper variables and methods for database operations.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class DBOptions {
   /** Parsing options. */
   public static final Option<?>[] PARSING = { MainOptions.CREATEFILTER, MainOptions.ADDARCHIVES,
-    MainOptions.SKIPCORRUPT, MainOptions.ADDRAW, MainOptions.ADDCACHE, MainOptions.CSVPARSER,
-    MainOptions.TEXTPARSER, MainOptions.JSONPARSER, MainOptions.HTMLPARSER, MainOptions.PARSER,
-    MainOptions.CHOP, MainOptions.INTPARSE, MainOptions.STRIPNS, MainOptions.DTD,
-    MainOptions.CATFILE };
+    MainOptions.ARCHIVENAME, MainOptions.SKIPCORRUPT, MainOptions.ADDRAW, MainOptions.ADDCACHE,
+    MainOptions.CSVPARSER, MainOptions.TEXTPARSER, MainOptions.JSONPARSER, MainOptions.HTMLPARSER,
+    MainOptions.PARSER, MainOptions.CHOP, MainOptions.INTPARSE, MainOptions.STRIPNS,
+    MainOptions.DTD, MainOptions.CATFILE, MainOptions.XINCLUDE };
   /** Indexing options. */
   public static final Option<?>[] INDEXING = { MainOptions.MAXCATS, MainOptions.MAXLEN,
-    MainOptions.INDEXSPLITSIZE, MainOptions.FTINDEXSPLITSIZE, MainOptions.LANGUAGE,
-    MainOptions.STOPWORDS, MainOptions.TEXTINDEX, MainOptions.ATTRINDEX, MainOptions.FTINDEX,
-    MainOptions.STEMMING, MainOptions.CASESENS, MainOptions.DIACRITICS, MainOptions.UPDINDEX,
-    MainOptions.AUTOOPTIMIZE };
+    MainOptions.SPLITSIZE, MainOptions.LANGUAGE, MainOptions.STOPWORDS, MainOptions.TEXTINDEX,
+    MainOptions.ATTRINDEX, MainOptions.TOKENINDEX, MainOptions.FTINDEX, MainOptions.TEXTINCLUDE,
+    MainOptions.ATTRINCLUDE, MainOptions.TOKENINCLUDE, MainOptions.FTINCLUDE, MainOptions.STEMMING,
+    MainOptions.CASESENS, MainOptions.DIACRITICS, MainOptions.UPDINDEX, MainOptions.AUTOOPTIMIZE };
 
   /** Runtime options. */
   private final HashMap<Option<?>, Object> map = new HashMap<>();
@@ -74,15 +74,34 @@ public final class DBOptions {
         final boolean yes = Strings.yes(value);
         if(!yes && !Strings.no(value)) throw BASX_VALUE_X_X.get(info, key, value);
         map.put(option, yes);
+      } else if(option instanceof StringOption) {
+        map.put(option, value);
       } else if(option instanceof EnumOption) {
         final EnumOption<?> eo = (EnumOption<?>) option;
         final Object ev = eo.get(value);
         if(ev == null) throw BASX_VALUE_X_X.get(info, key, value);
         map.put(option, ev);
+      } else if(option instanceof OptionsOption) {
+        try {
+          final Options o = ((OptionsOption<?>) option).newInstance();
+          o.assign(value);
+          map.put(option, o);
+        } catch(final BaseXException ex) {
+          throw BASX_WHICH_X.get(info, ex);
+        }
       } else {
-        map.put(option, value);
+        throw Util.notExpected();
       }
     }
+  }
+
+  /**
+   * Returns the value of the specified option.
+   * @param option option
+   * @return main options
+   */
+  public Object get(final Option<?> option) {
+    return map.get(option);
   }
 
   /**
@@ -90,17 +109,19 @@ public final class DBOptions {
    * @param option option
    * @param value value
    */
-  public void assign(final Option<?> option, final Object value) {
+  public void assignIfEmpty(final Option<?> option, final Object value) {
     if(!map.containsKey(option)) map.put(option, value);
   }
 
   /**
    * Assigns runtime options to the specified main options.
    * @param opts main options
+   * @return main options
    */
-  public void assignTo(final MainOptions opts) {
+  public MainOptions assignTo(final MainOptions opts) {
     for(final Entry<Option<?>, Object> entry : map.entrySet()) {
       opts.put(entry.getKey(), entry.getValue());
     }
+    return opts;
   }
 }

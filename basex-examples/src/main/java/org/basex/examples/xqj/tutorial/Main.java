@@ -9,7 +9,7 @@ import net.xqj.basex.*;
  * <a href="https://www.progress.com/products/data-integration-suite/data-integration-suite-developer-center/data-integration-suite-tutorials/learning-xquery/introduction-to-the-xquery-api-for-java-xqj-">
  * XQJ online tutorial</a>.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  */
 abstract class Main {
   /**

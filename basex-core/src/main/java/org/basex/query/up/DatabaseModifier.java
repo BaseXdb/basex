@@ -3,6 +3,7 @@ package org.basex.query.up;
 import static org.basex.query.QueryError.*;
 
 import org.basex.core.users.*;
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.up.primitives.name.*;
@@ -12,10 +13,15 @@ import org.basex.util.*;
  * The database modifier holds all database updates during a snapshot.
  * Database permissions are checked to ensure that a user has enough privileges.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Lukas Kircher
  */
 final class DatabaseModifier extends ContextModifier {
+  @Override
+  public void addData(final Data data) {
+    // ignore data
+  }
+
   @Override
   void add(final Update update, final QueryContext qc) throws QueryException {
     // check permissions
@@ -26,7 +32,7 @@ final class DatabaseModifier extends ContextModifier {
       if(!qc.context.perm(Perm.WRITE, ((DataUpdate) update).data().meta.name))
         throw BASX_PERM_X.get(update.info(), Perm.WRITE);
     } else if(update instanceof UserUpdate) {
-      if(!qc.context.perm(Perm.ADMIN, (String) null))
+      if(!qc.context.perm(Perm.ADMIN, null))
         throw BASX_PERM_X.get(update.info(), Perm.ADMIN);
     } else {
       throw Util.notExpected("Unknown update type: " + update);

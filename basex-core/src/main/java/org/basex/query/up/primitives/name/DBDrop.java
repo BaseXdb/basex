@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * Update primitive for the {@link Function#_DB_DROP} function.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Lukas Kircher
  */
 public final class DBDrop extends NameUpdate {
@@ -32,8 +32,7 @@ public final class DBDrop extends NameUpdate {
   public void apply() throws QueryException {
     close();
     // check if database files can be safely removed
-    if(!DropDB.drop(name, qc.context.soptions))
-      throw UPDBERROR_X_X.get(info, name, operation());
+    if(!DropDB.drop(name, qc.context.soptions)) throw UPDBERROR_X_X.get(info, name, operation());
   }
 
   @Override

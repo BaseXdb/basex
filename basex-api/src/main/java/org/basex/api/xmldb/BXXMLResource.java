@@ -26,7 +26,7 @@ import org.xmldb.api.modules.*;
 /**
  * Implementation of the XMLResource Interface for the XMLDB:API.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class BXXMLResource implements XMLResource, BXXMLDBText {
@@ -98,13 +98,14 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
       try {
         // serialize and cache content
         final ArrayOutput ao = new ArrayOutput();
-        final Serializer ser = Serializer.get(ao);
-        if(data != null) {
-          ser.serialize(new DBNode(data, pre));
-        } else if(item != null) {
-          ser.serialize(item);
-        } else {
-          return null;
+        try(final Serializer ser = Serializer.get(ao, SerializerMode.NOINDENT.get())) {
+          if(data != null) {
+            ser.serialize(new DBNode(data, pre));
+          } else if(item != null) {
+            ser.serialize(item);
+          } else {
+            return null;
+          }
         }
         content = ao.toArray();
       } catch(final IOException ex) {
@@ -186,7 +187,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
   /** SAX parser. */
   private static final class BXSAXContentHandler extends SAXHandler {
     /** XMLResource. */
-    private final BXXMLResource res;
+    private final BXXMLResource resource;
 
     /**
      * Default constructor.
@@ -195,13 +196,14 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
      */
     BXSAXContentHandler(final BXXMLResource resource, final MemBuilder builder) {
       super(builder, false, false);
-      res = resource;
+      this.resource = resource;
     }
 
     @Override
     public void endDocument() throws SAXException {
       try {
-        res.content = new DBNode(((MemBuilder) builder).data()).serialize().toArray();
+        resource.content = new DBNode(((MemBuilder) builder).data()).serialize(
+            SerializerMode.NOINDENT.get()).toArray();
       } catch(final QueryIOException ex) {
         error(new BaseXException(ex));
       }

@@ -1,7 +1,5 @@
 package org.basex.query.func;
 
-import static org.basex.query.QueryError.*;
-
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.fn.*;
@@ -16,7 +14,7 @@ import org.basex.util.hash.*;
 /**
  * A named function literal.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public final class FuncLit extends Single implements Scope {
@@ -66,7 +64,6 @@ public final class FuncLit extends Single implements Scope {
 
     if(check) {
       final StaticFunc sf = qc.funcs.get(name, args.length, info, true);
-      if(sf == null) throw FUNCUNKNOWN_X.get(info, name.string());
       anns = sf.anns;
       seqType = sf.funcType().seqType();
     }

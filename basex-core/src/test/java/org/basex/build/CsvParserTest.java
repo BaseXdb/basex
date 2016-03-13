@@ -1,9 +1,6 @@
 package org.basex.build;
 
-import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
-
-import java.io.*;
 
 import org.basex.*;
 import org.basex.build.csv.*;
@@ -19,7 +16,7 @@ import org.junit.Test;
 /**
  * CSV Parser Test.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class CsvParserTest extends SandboxTest {
@@ -33,11 +30,10 @@ public final class CsvParserTest extends SandboxTest {
 
   /**
    * Creates the initial database.
-   * @throws BaseXException exception
    */
   @BeforeClass
-  public static void before() throws BaseXException {
-    new Set(MainOptions.PARSER, MainParser.CSV).execute(context);
+  public static void before() {
+    set(MainOptions.PARSER, MainParser.CSV);
   }
 
   /**
@@ -59,113 +55,96 @@ public final class CsvParserTest extends SandboxTest {
 
   /**
    * Drops the database.
-   * @throws BaseXException exception
    */
   @After
-  public void finish() throws BaseXException {
-    new DropDB(NAME).execute(context);
+  public void finish() {
+    execute(new DropDB(NAME));
   }
 
   /**
    * Adds an empty CSV file.
-   * @throws Exception exception
    */
   @Test
-  public void empty() throws Exception {
-    write("");
-    new CreateDB(NAME, TEMP).execute(context);
-    assertEquals("<csv/>", new XQuery(".").execute(context));
+  public void empty() {
+    write(new IOFile(TEMP), "");
+    execute(new CreateDB(NAME, TEMP));
+    assertEquals("<csv/>", query("."));
   }
 
   /**
    * Adds the sample CSV file.
-   * @throws Exception exception
    */
   @Test
-  public void one() throws Exception {
+  public void one() {
     copts.set(CsvOptions.HEADER, true);
-    new CreateDB(NAME, FILE).execute(context);
-    assertEquals("3", new XQuery("count(//Name)").execute(context));
-    assertEquals("2", new XQuery("count(//Email)").execute(context));
+    execute(new CreateDB(NAME, FILE));
+    assertEquals("3", query("count(//Name)"));
+    assertEquals("2", query("count(//Email)"));
 
-    new CreateDB(NAME, FILE).execute(context);
-    assertEquals("3", new XQuery("count(//record)").execute(context));
-    assertEquals("true", new XQuery("//text() = 'Picard'").execute(context));
+    execute(new CreateDB(NAME, FILE));
+    assertEquals("3", query("count(//record)"));
+    assertEquals("true", query("//text() = 'Picard'"));
   }
 
   /**
    * Adds the sample CSV file, using different separators.
-   * @throws Exception exception
    */
   @Test
-  public void separator() throws Exception {
+  public void separator() {
     copts.set(CsvOptions.HEADER, true);
 
     copts.set(CsvOptions.SEPARATOR, "tab");
-    new CreateDB(NAME, FILE).execute(context);
-    assertEquals("0", new XQuery("count(//Name)").execute(context));
+    execute(new CreateDB(NAME, FILE));
+    assertEquals("0", query("count(//Name)"));
 
     copts.set(CsvOptions.SEPARATOR, ";");
-    new CreateDB(NAME, FILE).execute(context);
-    assertEquals("0", new XQuery("count(//Name)").execute(context));
+    execute(new CreateDB(NAME, FILE));
+    assertEquals("0", query("count(//Name)"));
   }
 
   /**
    * Checks the quotes flag.
-   * @throws Exception exception
    */
   @Test
-  public void quotes() throws Exception {
+  public void quotes() {
     copts.set(CsvOptions.HEADER, true);
 
     copts.set(CsvOptions.QUOTES, false);
-    new CreateDB(NAME, FILE).execute(context);
-    assertEquals("\"H ", new XQuery("(//Props[1])/text()").execute(context));
+    execute(new CreateDB(NAME, FILE));
+    assertEquals("\"H ", query("(//Props[1])/text()"));
 
     copts.set(CsvOptions.QUOTES, true);
-    new CreateDB(NAME, FILE).execute(context);
-    assertEquals("H \"U\\", new XQuery("normalize-space((//Props)[1])").execute(context));
+    execute(new CreateDB(NAME, FILE));
+    assertEquals("H \"U\\", query("normalize-space((//Props)[1])"));
   }
 
   /**
    * Checks the backslash flag.
-   * @throws Exception exception
    */
   @Test
-  public void backslash() throws Exception {
+  public void backslash() {
     copts.set(CsvOptions.HEADER, true);
 
     // "H \n""U\",a@b.c....
     copts.set(CsvOptions.BACKSLASHES, false);
-    new CreateDB(NAME, FILE).execute(context);
+    execute(new CreateDB(NAME, FILE));
     // H \n"U\
-    assertEquals("H \"U\\", new XQuery("normalize-space((//Props)[1])").execute(context));
+    assertEquals("H \"U\\", query("normalize-space((//Props)[1])"));
 
     copts.set(CsvOptions.BACKSLASHES, true);
-    new CreateDB(NAME, FILE).execute(context);
+    execute(new CreateDB(NAME, FILE));
     // H \nU,a
-    assertEquals("H U\"", new XQuery("replace(normalize-space((//Props)[1]), ',.*', '')").
-        execute(context));
+    assertEquals("H U\"", query("replace(normalize-space((//Props)[1]), ',.*', '')"));
   }
 
   /**
    * Adds the sample CSV file, using different separators.
-   * @throws Exception exception
    */
   @Test
-  public void atts() throws Exception {
+  public void atts() {
     copts.set(CsvOptions.HEADER, true);
     copts.set(CsvOptions.FORMAT, CsvFormat.ATTRIBUTES);
-    new CreateDB(NAME, FILE).execute(context);
-    assertEquals("true", new XQuery("exists(//entry[@name = 'Name'])").execute(context));
-  }
-
-  /**
-   * Writes the specified test file.
-   * @param data data to write
-   * @throws IOException I/O exception
-   */
-  private static void write(final String data) throws IOException {
-    new IOFile(TEMP).write(token(data));
+    execute(new CreateDB(NAME, FILE));
+    assertEquals("true", query("exists(//entry[@name = 'Name'])"));
   }
 }

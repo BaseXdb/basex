@@ -15,7 +15,7 @@ import org.basex.util.*;
 /**
  * RESTXQ path template.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Dimitar Popov
  */
 final class RestXqPathMatcher {
@@ -64,8 +64,16 @@ final class RestXqPathMatcher {
     final Map<QNm, String> result = new HashMap<>();
     final Matcher m = matcher(path);
     if(m.matches()) {
-      final int ml = m.groupCount();
-      for(int i = 0; i < ml; i++) result.put(vars.get(i), m.group(i + 1));
+      final int groupCount = m.groupCount();
+      if(vars.size() <= groupCount) {
+        int group = 1;
+        for(final QNm var : vars) {
+          result.put(var, m.group(group));
+          // skip nested groups
+          final int end = m.end(group);
+          while (++group <= groupCount && m.start(group) < end);
+        }
+      }
     }
     return result;
   }

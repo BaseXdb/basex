@@ -17,7 +17,7 @@ import org.basex.util.*;
  * <p>The parser provides some options, which can be specified via the
  * {@link MainOptions#TEXTPARSER} option.</p>
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class TextParser extends SingleParser {
@@ -55,7 +55,7 @@ public final class TextParser extends SingleParser {
           builder.text(tb.next());
           builder.closeElem();
         } else {
-          tb.add(XMLToken.valid(ch) ? ch : '?');
+          tb.add(XMLToken.valid(ch) ? ch : INVALID);
         }
       }
     }

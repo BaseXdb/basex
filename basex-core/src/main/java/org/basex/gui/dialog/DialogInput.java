@@ -14,7 +14,7 @@ import org.basex.util.list.*;
 /**
  * Dialog with a single text field.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class DialogInput extends BaseXDialog {
@@ -63,10 +63,10 @@ final class DialogInput extends BaseXDialog {
     p.add(info, BorderLayout.CENTER);
     set(p, BorderLayout.CENTER);
 
-    buttons = newButtons(B_OK, CANCEL);
+    buttons = newButtons(B_OK, B_CANCEL);
     set(buttons, BorderLayout.SOUTH);
     action(null);
-    finish(null);
+    finish();
   }
 
   /**

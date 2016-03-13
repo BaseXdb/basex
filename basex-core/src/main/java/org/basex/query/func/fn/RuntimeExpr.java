@@ -14,7 +14,7 @@ import org.basex.util.hash.*;
 /**
  * Runtime expression, created by non-deterministic functions.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 abstract class RuntimeExpr extends ParseExpr {
@@ -36,7 +36,7 @@ abstract class RuntimeExpr extends ParseExpr {
     final Var[] params = new Var[args];
     for(int p = 0; p < args; p++) params[p] = vsc.newLocal(qc, null, null, true);
     expr.params = params;
-    return new FuncItem(sc, new AnnList(), null, expr.params, FuncType.ANY_FUN, expr,
+    return new FuncItem(sc, new AnnList(), null, expr.params, SeqType.ANY_FUN, expr,
         qc.value, qc.pos, qc.size, args);
   }
 

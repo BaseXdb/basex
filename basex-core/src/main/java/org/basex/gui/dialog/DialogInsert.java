@@ -19,7 +19,7 @@ import org.basex.util.list.*;
 /**
  * Dialog window for inserting new database nodes.
 
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Lukas Kircher
  */
 public final class DialogInsert extends BaseXDialog {
@@ -100,7 +100,7 @@ public final class DialogInsert extends BaseXDialog {
     change(radio[lkind]);
 
     action(null);
-    finish(null);
+    finish();
   }
 
   /**
@@ -111,7 +111,7 @@ public final class DialogInsert extends BaseXDialog {
     int n = 0;
     final int rl = radio.length;
     for(int r = 0; r < rl; ++r) if(src == radio[r]) n = r;
-    final int h = n == Data.ATTR ? input1.getHeight() : (int) (GUIConstants.SCALE * 350);
+    final int h = n == Data.ATTR ? input1.getHeight() : (int) (GUIConstants.scale * 350);
     input2.setPreferredSize(new Dimension(input2.getPreferredSize().width, h));
 
     back.removeAll();

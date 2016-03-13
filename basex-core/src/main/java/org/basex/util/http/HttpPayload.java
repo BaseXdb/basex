@@ -14,6 +14,8 @@ import org.basex.build.json.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
+import org.basex.io.parse.csv.*;
+import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.util.list.*;
@@ -28,7 +30,7 @@ import org.basex.util.list.*;
 /**
  * HTTP payload helper functions.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class HttpPayload {
@@ -266,7 +268,10 @@ public final class HttpPayload {
           } else {
             val = Str.get(cont.next());
           }
-          if(!name.isEmpty()) map.put(name, val);
+          if(!name.isEmpty()) {
+            final Value v = map.get(name);
+            map.put(name, v == null ? val : new ValueBuilder().add(val).add(v).value());
+          }
           lines = -1;
           if(eq(line, last)) break;
         } else {
@@ -302,15 +307,15 @@ public final class HttpPayload {
     Value val = null;
     if(type.is(MediaType.APPLICATION_JSON)) {
       final JsonParserOptions opts = new JsonParserOptions(options.get(MainOptions.JSONPARSER));
-      opts.parse(type);
-      val = new DBNode(new JsonParser(input, options, opts));
+      opts.assign(type);
+      val = JsonConverter.get(opts).convert(input);
     } else if(type.is(MediaType.TEXT_CSV)) {
       final CsvParserOptions opts = new CsvParserOptions(options.get(MainOptions.CSVPARSER));
-      opts.parse(type);
-      val = new DBNode(new CsvParser(input, options, opts));
+      opts.assign(type);
+      val = CsvConverter.get(opts).convert(input);
     } else if(type.is(MediaType.TEXT_HTML)) {
       final HtmlOptions opts = new HtmlOptions(options.get(MainOptions.HTMLPARSER));
-      opts.parse(type);
+      opts.assign(type);
       val = new DBNode(new HtmlParser(input, options, opts));
     } else if(type.is(MediaType.APPLICATION_X_WWW_FORM_URLENCODED)) {
       final String enc = type.parameters().get(CHARSET);

@@ -8,7 +8,7 @@ import org.basex.util.options.*;
 /**
  * Project-specific collation options.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class BaseXCollationOptions extends CollationOptions {
@@ -68,7 +68,17 @@ public final class BaseXCollationOptions extends CollationOptions {
   }
 
   @Override
-  Collation get(final String args) {
+  public Collation get(final String args) {
+    return new BaseXCollation(collator(args));
+  }
+
+  /**
+   * Returns a collator for the specified arguments.
+   * @param args argument to be parsed
+   * @return collator collator
+   * @throws IllegalArgumentException illegal arguments
+   */
+  public Collator collator(final String args) throws IllegalArgumentException {
     final String error = check(args);
     if(error != null) throw new IllegalArgumentException("Invalid option \"" + error + "\"");
 
@@ -81,6 +91,6 @@ public final class BaseXCollationOptions extends CollationOptions {
     final Collator coll = Collator.getInstance(locale);
     if(contains(STRENGTH)) coll.setStrength(get(STRENGTH).value);
     if(contains(DECOMPOSITION)) coll.setDecomposition(get(DECOMPOSITION).value);
-    return new BaseXCollation(coll);
+    return coll;
   }
 }

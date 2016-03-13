@@ -19,7 +19,7 @@ import org.basex.util.list.*;
 /**
  * This is the starter class for the graphical frontend.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class BaseXGUI extends Main {
@@ -63,7 +63,6 @@ public final class BaseXGUI extends Main {
 
     // read options
     final GUIOptions gopts = new GUIOptions();
-
     // initialize look and feel
     init(gopts);
     // initialize fonts and colors
@@ -124,14 +123,23 @@ public final class BaseXGUI extends Main {
   protected void parseArgs() throws BaseXException {
     final MainParser arg = new MainParser(this);
     while(arg.more()) {
-      if(arg.dash()) throw arg.usage();
-      files.add(arg.string());
+      if(arg.dash()) {
+        final char c = arg.next();
+        if(c == 'd') {
+          // activate debug mode
+          Prop.debug = true;
+        } else {
+          throw arg.usage();
+        }
+      } else {
+        files.add(arg.string());
+      }
     }
   }
 
   @Override
   public String header() {
-    return Util.info(S_CONSOLE, S_GUI);
+    return Util.info(S_CONSOLE_X, S_GUI);
   }
 
   @Override

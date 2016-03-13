@@ -7,12 +7,12 @@ import org.basex.query.iter.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class IndexAttributeNames extends IndexElementNames {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    return names(qc, IndexType.ATTNAME);
+    return names(qc, IndexType.ATTRNAME);
   }
 }

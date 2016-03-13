@@ -22,12 +22,12 @@ import org.basex.util.*;
 /**
  * The map item.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public final class Map extends FItem {
   /** The empty map. */
-  public static final Map EMPTY = new Map(TrieNode.EMPTY, 0);
+  public static final Map EMPTY = new Map(TrieNode.EMPTY);
   /** Number of bits per level, maximum is 5 because {@code 1 << 5 == 32}. */
   static final int BITS = 5;
 
@@ -35,18 +35,14 @@ public final class Map extends FItem {
   private final TrieNode root;
   /** Key sequence. */
   private Value keys;
-  /** Date/time entries (negative: without timezone). */
-  private final int dt;
 
   /**
    * Constructor.
    * @param root map
-   * @param dt number of date/time entries (negative: without timezone)
    */
-  private Map(final TrieNode root, final int dt) {
+  private Map(final TrieNode root) {
     super(SeqType.ANY_MAP, new AnnList());
     this.root = root;
-    this.dt = dt;
   }
 
   @Override
@@ -67,6 +63,11 @@ public final class Map extends FItem {
   @Override
   public FuncType funcType() {
     return MapType.get(AtomType.AAT, SeqType.ITEM_ZM);
+  }
+
+  @Override
+  public void materialize(final InputInfo ii) throws QueryException {
+    root.materialize(ii);
   }
 
   @Override
@@ -97,8 +98,7 @@ public final class Map extends FItem {
    */
   public Map delete(final Item key, final InputInfo ii) throws QueryException {
     final TrieNode del = root.delete(key.hash(ii), key, 0, ii);
-    return del == root ? this : del == null ? EMPTY :
-      new Map(del, dt + (key instanceof ADate ? ((ADate) key).tzDefined() ? -1 : 1 : 0));
+    return del == root ? this : del == null ? EMPTY : new Map(del);
   }
 
   /**
@@ -133,26 +133,45 @@ public final class Map extends FItem {
    */
   public Map addAll(final Map map, final InputInfo ii) throws QueryException {
     if(map == EMPTY) return this;
-    if(map.dt != 0 && dt != 0 && (map.dt > 0 ? dt < 0 : dt > 0)) throw MAP_TZ.get(ii);
     final TrieNode upd = root.addAll(map.root, 0, ii);
-    return upd == map.root ? map : new Map(upd, map.dt + dt);
+    return upd == map.root ? map : new Map(upd);
   }
 
-  /**
-   * Checks if the map has the given type.
-   * @param mt type
-   * @return {@code true} if the type fits, {@code false} otherwise
-   */
-  public boolean hasType(final MapType mt) {
-    return root.hasType(mt.keyType == AtomType.AAT ? null : mt.keyType,
-        mt.retType.eq(SeqType.ITEM_ZM) ? null : mt.retType);
+  @Override
+  public boolean instanceOf(final Type tp) {
+    return tp == AtomType.ITEM || tp instanceof FuncType && instOf((FuncType) tp, false);
   }
 
   @Override
   public Map coerceTo(final FuncType ft, final QueryContext qc, final InputInfo ii,
       final boolean opt) throws QueryException {
-    if(!(ft instanceof MapType) || !hasType((MapType) ft)) throw castError(ii, this, ft);
-    return this;
+
+    if(instOf(ft, true)) return this;
+    throw castError(ii, this, ft);
+  }
+
+  /**
+   * Checks if this is an instance of the specified type.
+   * @param tp type
+   * @param coerce coerce value
+   * @return result of check
+   */
+  private boolean instOf(final FuncType tp, final boolean coerce) {
+    if(tp instanceof ArrayType) return false;
+
+    final SeqType[] at = tp.argTypes;
+    if(at != null && (at.length != 1 || !at[0].one())) return false;
+
+    SeqType ret = tp.type;
+    if(tp instanceof MapType) {
+      AtomType arg = ((MapType) tp).keyType();
+      if(arg == AtomType.AAT) arg = null;
+      if(ret == null || ret.eq(SeqType.ITEM_ZM)) ret = null;
+      // map { ... } instance of function(...) as item() -> false (result may be empty sequence)
+      return (arg == null && ret == null) || root.instanceOf(arg, ret);
+    }
+    // allow coercion
+    return coerce || ret == null || ret.eq(SeqType.ITEM_ZM);
   }
 
   /**
@@ -165,17 +184,7 @@ public final class Map extends FItem {
    */
   public Map put(final Item key, final Value value, final InputInfo ii) throws QueryException {
     final TrieNode ins = root.put(key.hash(ii), key, value, 0, ii);
-    return ins == root ? this :
-      new Map(ins, dt + (key instanceof ADate ? ((ADate) key).tzDefined() ? 1 : -1 : 0));
-  }
-
-  /**
-   * Checks if the specified key has a different timezone than the stored keys.
-   * @param key key to check
-   * @return result of check
-   */
-  public boolean checkTz(final Item key) {
-    return !(key instanceof ADate) || (((ADate) key).tzDefined() ? dt >= 0 : dt <= 0);
+    return ins == root ? this : new Map(ins);
   }
 
   /**
@@ -217,10 +226,10 @@ public final class Map extends FItem {
    * @return resulting value
    * @throws QueryException query exception
    */
-  public Value apply(final FItem func, final QueryContext qc, final InputInfo ii)
+  public Value forEach(final FItem func, final QueryContext qc, final InputInfo ii)
       throws QueryException {
     final ValueBuilder vb = new ValueBuilder();
-    root.apply(vb, func, qc, ii);
+    root.forEach(vb, func, qc, ii);
     return vb.value();
   }
 
@@ -234,13 +243,14 @@ public final class Map extends FItem {
 
   /**
    * Returns a string representation of the map.
+   * @param indent indent output
    * @param ii input info
    * @return string
    * @throws QueryException query exception
    */
-  public byte[] serialize(final InputInfo ii) throws QueryException {
+  public byte[] serialize(final boolean indent, final InputInfo ii) throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
-    string(tb, 0, ii);
+    string(indent, tb, 0, ii);
     return tb.finish();
   }
 
@@ -285,35 +295,44 @@ public final class Map extends FItem {
 
   /**
    * Returns a string representation of the map.
+   * @param indent indent output
    * @param tb token builder
    * @param level current level
    * @param ii input info
    * @throws QueryException query exception
    */
-  public void string(final TokenBuilder tb, final int level, final InputInfo ii)
-      throws QueryException {
+  public void string(final boolean indent, final TokenBuilder tb, final int level,
+      final InputInfo ii) throws QueryException {
 
-    tb.add("{");
+    tb.add("map{");
     int c = 0;
     for(final Item key : keys()) {
       if(c++ > 0) tb.add(',');
-      tb.add('\n');
-      indent(tb, level + 1);
-      tb.add(key.toString());
-      tb.add(": ");
+      if(indent) {
+        tb.add('\n');
+        indent(tb, level + 1);
+      }
+      tb.add(key.toString()).add(':');
+      if(indent) tb.add(' ');
       final Value v = get(key, ii);
-      if(v.size() != 1) tb.add('(');
+      final boolean par = v.size() != 1;
+      if(par) tb.add('(');
       int cc = 0;
       for(final Item it : v) {
-        if(cc++ > 0) tb.add(", ");
-        if(it instanceof Map) ((Map) it).string(tb, level + 1, ii);
-        else if(it instanceof Array) ((Array) it).string(tb, ii);
+        if(cc++ > 0) {
+          tb.add(',');
+          if(indent) tb.add(' ');
+        }
+        if(it instanceof Map) ((Map) it).string(indent, tb, level + 1, ii);
+        else if(it instanceof Array) ((Array) it).string(indent, tb, level, ii);
         else tb.add(it.toString());
       }
-      if(v.size() != 1) tb.add(')');
+      if(par) tb.add(')');
     }
-    tb.add('\n');
-    indent(tb, level);
+    if(indent) {
+      tb.add('\n');
+      indent(tb, level);
+    }
     tb.add('}');
   }
 

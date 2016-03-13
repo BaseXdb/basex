@@ -15,7 +15,7 @@ import org.basex.util.hash.*;
 /**
  * Namespace constructor.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class CNSpace extends CName {
@@ -27,12 +27,12 @@ public final class CNSpace extends CName {
    * @param value value
    */
   public CNSpace(final StaticContext sc, final InputInfo info, final Expr name, final Expr value) {
-    super(NSPACE, sc, info, name, value);
+    super(NAMESPACE, sc, info, name, value);
     seqType = SeqType.NSP;
   }
 
   @Override
-  public FNames item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public FNSpace item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] cp = toEmptyToken(name, qc);
     if(cp.length != 0 && !XMLToken.isNCName(cp)) throw INVNSNAME_X.get(info, cp);
 
@@ -41,7 +41,7 @@ public final class CNSpace extends CName {
     if(eq(cp, XMLNS)) throw CNINV_X.get(info, cp);
     if(eq(cu, XMLNS_URI) || cu.length == 0) throw CNINVNS_X.get(info, cu);
 
-    return new FNames(cp, cu);
+    return new FNSpace(cp, cu);
   }
 
   @Override

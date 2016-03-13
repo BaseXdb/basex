@@ -14,7 +14,7 @@ import org.basex.util.hash.*;
 /**
  * Except expression.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Except extends Set {
@@ -36,7 +36,7 @@ public final class Except extends Set {
       if(ex.isEmpty()) {
         // remove empty operands (return empty sequence if first value is empty)
         if(el.isEmpty()) return optPre(qc);
-        qc.compInfo(OPTREMOVE, this, ex);
+        qc.compInfo(OPTREMOVE_X_X, this, ex);
       } else {
         el.add(ex);
       }

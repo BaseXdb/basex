@@ -15,13 +15,13 @@ import org.basex.util.list.*;
  * nodes will be sorted and duplicates will before removed before they are returned as value or
  * via an iterator.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class ANodeList extends ElementList implements Iterable<ANode> {
   /** Element container. */
   private ANode[] list;
-  /** Sort flag. */
+  /** Sort flags: nodes need to be sorted before they can be returned. */
   private boolean sort;
   /** Check incoming nodes for potential duplicates and unsorted entries. */
   private boolean check;
@@ -64,12 +64,16 @@ public final class ANodeList extends ElementList implements Iterable<ANode> {
    * @param element element to be added
    */
   public void add(final ANode element) {
-    ANode[] lst = list;
+    ANode[] nodes = list;
     final int s = size;
-    if(s == lst.length) lst = copyOf(newSize());
-    if(s != 0 && check && !sort) sort = lst[s - 1].diff(element) > 0;
-    lst[s] = element;
-    list = lst;
+    if(s != 0 && check && !sort) {
+      final int d = element.diff(nodes[s - 1]);
+      if(d == 0) return;
+      if(d < 0) sort = true;
+    }
+    if(s == nodes.length) nodes = copyOf(newSize());
+    nodes[s] = element;
+    list = nodes;
     size = s + 1;
   }
 
@@ -79,10 +83,10 @@ public final class ANodeList extends ElementList implements Iterable<ANode> {
    * @param element element to be set
    */
   public void set(final int index, final ANode element) {
-    ANode[] lst = list;
-    if(index >= lst.length) lst = copyOf(newSize(index + 1));
-    lst[index] = element;
-    list = lst;
+    ANode[] nodes = list;
+    if(index >= nodes.length) nodes = copyOf(newSize(index + 1));
+    nodes[index] = element;
+    list = nodes;
     size = Math.max(size, index + 1);
   }
 
@@ -163,10 +167,10 @@ public final class ANodeList extends ElementList implements Iterable<ANode> {
     sort();
 
     final int s = size;
-    final ANode[] lst = list;
-    final Data data = s > 0 ? lst[0].data() : null;
+    final ANode[] nodes = list;
+    final Data data = s > 0 ? nodes[0].data() : null;
     if(data == null) return false;
-    for(int l = 1; l < s; ++l) if(data != lst[l].data()) return false;
+    for(int l = 1; l < s; ++l) if(data != nodes[l].data()) return false;
     return true;
   }
 
@@ -180,8 +184,8 @@ public final class ANodeList extends ElementList implements Iterable<ANode> {
     if(db) return node instanceof DBNode ? Math.max(binarySearch((DBNode) node, 0, size), -1) : -1;
 
     final long sz = size();
-    final ANode[] lst = list;
-    for(int s = 0; s < sz; ++s) if(lst[s].is(node)) return s;
+    final ANode[] nodes = list;
+    for(int s = 0; s < sz; ++s) if(nodes[s].is(node)) return s;
     return -1;
   }
 
@@ -197,9 +201,9 @@ public final class ANodeList extends ElementList implements Iterable<ANode> {
   public int binarySearch(final DBNode node, final int start, final int length) {
     if(size == 0 || node.data() != list[0].data()) return -start - 1;
     int l = start, r = start + length - 1;
-    final ANode[] lst = list;
+    final ANode[] nodes = list;
     while(l <= r) {
-      final int m = l + r >>> 1, mpre = ((DBNode) lst[m]).pre(), npre = node.pre();
+      final int m = l + r >>> 1, mpre = ((DBNode) nodes[m]).pre(), npre = node.pre();
       if(mpre == npre) return m;
       if(mpre < npre) l = m + 1;
       else r = m - 1;
@@ -230,10 +234,10 @@ public final class ANodeList extends ElementList implements Iterable<ANode> {
 
       // remove duplicates
       int i = 1;
-      final ANode[] lst = list;
+      final ANode[] nodes = list;
       for(int j = 1; j < s; ++j) {
-        while(j < s && lst[i - 1].is(lst[j])) j++;
-        if(j < s) lst[i++] = lst[j];
+        while(j < s && nodes[i - 1].is(nodes[j])) j++;
+        if(j < s) nodes[i++] = nodes[j];
       }
       size = i;
     }
@@ -247,9 +251,10 @@ public final class ANodeList extends ElementList implements Iterable<ANode> {
    * @param e end position
    */
   private void sort(final int s, final int e) {
+    final ANode[] nodes = list;
     if(e < 7) {
       for(int i = s; i < e + s; ++i) {
-        for(int j = i; j > s && list[j - 1].diff(list[j]) > 0; j--) s(j, j - 1);
+        for(int j = i; j > s && nodes[j - 1].diff(nodes[j]) > 0; j--) s(j, j - 1);
       }
       return;
     }
@@ -266,18 +271,18 @@ public final class ANodeList extends ElementList implements Iterable<ANode> {
       }
       m = m(l, m, n);
     }
-    final ANode v = list[m];
+    final ANode v = nodes[m];
 
     int a = s, b = a, c = s + e - 1, d = c;
     while(true) {
       while(b <= c) {
-        final int h = list[b].diff(v);
+        final int h = nodes[b].diff(v);
         if(h > 0) break;
         if(h == 0) s(a++, b);
         ++b;
       }
       while(c >= b) {
-        final int h = list[c].diff(v);
+        final int h = nodes[c].diff(v);
         if(h < 0) break;
         if(h == 0) s(c, d--);
         --c;
@@ -314,9 +319,11 @@ public final class ANodeList extends ElementList implements Iterable<ANode> {
    * @return median
    */
   private int m(final int a, final int b, final int c) {
-    return list[a].diff(list[b]) < 0 ?
-      list[b].diff(list[c]) < 0 ? b : list[a].diff(list[c]) < 0 ? c : a :
-      list[b].diff(list[c]) > 0 ? b : list[a].diff(list[c]) > 0 ? c : a;
+    final ANode[] nodes = list;
+    final ANode nodeA = nodes[a], nodeB = nodes[b], nodeC = nodes[c];
+    return nodeA.diff(nodeB) < 0 ?
+      nodeB.diff(nodeC) < 0 ? b : nodeA.diff(nodeC) < 0 ? c : a :
+      nodeB.diff(nodeC) > 0 ? b : nodeA.diff(nodeC) > 0 ? c : a;
   }
 
   /**
@@ -325,8 +332,9 @@ public final class ANodeList extends ElementList implements Iterable<ANode> {
    * @param b second position
    */
   private void s(final int a, final int b) {
-    final ANode tmp = list[a];
-    list[a] = list[b];
-    list[b] = tmp;
+    final ANode[] nodes = list;
+    final ANode tmp = nodes[a];
+    nodes[a] = nodes[b];
+    nodes[b] = tmp;
   }
 }

@@ -9,6 +9,7 @@ import java.util.zip.*;
 
 import org.basex.core.*;
 import org.basex.io.*;
+import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
@@ -21,7 +22,7 @@ import org.basex.util.list.*;
 /**
  * Functions on zip files.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public class ZipZipFile extends ZipFn {
@@ -100,7 +101,6 @@ public class ZipZipFile extends ZipFn {
         if(src != null) {
           // write file to zip archive
           if(!new IOFile(src).exists()) throw ZIP_NOTFOUND_X.get(info, src);
-
           try(final BufferedInputStream bis = new BufferedInputStream(new FileInputStream(src))) {
             for(int c; (c = bis.read(data)) != -1;) zos.write(data, 0, c);
           }
@@ -130,13 +130,16 @@ public class ZipZipFile extends ZipFn {
               zos.write((hex ? new Hex(bytes) : new B64(bytes)).toJava());
             } else {
               // serialize new nodes
-              try(final Serializer ser = Serializer.get(zos, so(node))) {
+              final ArrayOutput ao = new ArrayOutput();
+              try(final Serializer ser = Serializer.get(ao, sopts(node))) {
                 do {
                   ser.serialize(DataBuilder.stripNS(n, ZIP_URI, qc.context));
                 } while((n = ch.next()) != null);
               } catch(final QueryIOException ex) {
                 throw ex.getCause(info);
               }
+              zos.write(ao.finish());
+
             }
           }
         }
@@ -168,7 +171,7 @@ public class ZipZipFile extends ZipFn {
    * @return parameters
    * @throws BaseXException database exception
    */
-  private static SerializerOptions so(final ANode node) throws BaseXException {
+  private static SerializerOptions sopts(final ANode node) throws BaseXException {
     // interpret query parameters
     final SerializerOptions sopts = new SerializerOptions();
     final BasicNodeIter ati = node.attributes();

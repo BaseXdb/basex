@@ -3,6 +3,8 @@ package org.basex.query.value.node;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
+import org.basex.core.MainOptions;
+import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
@@ -14,7 +16,7 @@ import org.w3c.dom.*;
 /**
  * Element node fragment.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class FElem extends FNode {
@@ -357,7 +359,7 @@ public final class FElem extends FNode {
 
   @Override
   public byte[] baseURI() {
-    final byte[] b = attribute(new QNm(BASE, XML_URI));
+    final byte[] b = attribute(new QNm(BASE, QueryText.XML_URI));
     return b != null ? b : EMPTY;
   }
 
@@ -387,7 +389,7 @@ public final class FElem extends FNode {
   }
 
   @Override
-  public FElem copy() {
+  public FNode deepCopy(final MainOptions options) {
     // nodes must be added after root constructor in order to ensure ascending node ids
     final ANodeList ch = children != null ? new ANodeList(children.size()) : null;
     final ANodeList at = atts != null ? new ANodeList(atts.size()) : null;
@@ -398,10 +400,10 @@ public final class FElem extends FNode {
       for(int n = 0; n < nl; ++n) as.add(ns.name(n), ns.value(n));
     }
     if(at != null) {
-      for(final ANode n : atts) at.add(n.copy());
+      for(final ANode n : atts) at.add(n.deepCopy(options));
     }
     if(ch != null) {
-      for(final ANode n : children) ch.add(n.copy());
+      for(final ANode n : children) ch.add(n.deepCopy(options));
     }
     node.parent(parent);
     return node.optimize();
@@ -418,14 +420,24 @@ public final class FElem extends FNode {
     if(ns != null) {
       final int nl = ns.size();
       for(int n = 0; n < nl; n++) {
-        tb.add(new FNames(ns.name(n), ns.value(n)).toString());
+        tb.add(' ').addExt(new FNSpace(ns.name(n), ns.value(n)));
       }
     }
     if(atts != null) {
-      for(final ANode n : atts) tb.add(n.toString());
+      for(final ANode att : atts) tb.add(' ').addExt(att);
     }
-    if(hasChildren()) tb.add(">...</").add(name.string());
-    else tb.add("/");
-    return tb.add(">").toString();
+    if(hasChildren()) {
+      tb.add('>');
+      final ANode child = children.get(0);
+      if(child.type == NodeType.TXT && children.size() == 1) {
+        tb.add(Atm.toString(child.value, false));
+      } else {
+        tb.add(DOTS);
+      }
+      tb.add("</").add(name.string()).add('>');
+    } else {
+      tb.add("/>");
+    }
+    return tb.toString();
   }
 }

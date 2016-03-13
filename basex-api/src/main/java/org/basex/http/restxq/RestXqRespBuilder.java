@@ -15,7 +15,7 @@ import org.basex.util.http.*;
 /**
  * This class holds information on a custom RESTXQ response.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class RestXqRespBuilder {
@@ -81,8 +81,7 @@ final class RestXqRespBuilder {
         }
       } else if(OUTPUT_SERIAL.eq(n)) {
         // parse output:serialization-parameters
-        sp = FuncOptions.serializer(n, func.function.info);
-        FuncOptions.serializer(n, func.output, func.function.info);
+        sp = FuncOptions.serializer(n, func.output, func.function.info);
       } else {
         throw func.error(UNEXP_NODE, n);
       }

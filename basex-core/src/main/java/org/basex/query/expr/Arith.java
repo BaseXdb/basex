@@ -14,7 +14,7 @@ import org.basex.util.hash.*;
 /**
  * Arithmetic expression.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Arith extends Arr {
@@ -32,12 +32,6 @@ public final class Arith extends Arr {
     super(info, expr1, expr2);
     this.calc = calc;
     seqType = SeqType.ITEM_ZO;
-  }
-
-  @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    super.compile(qc, scp);
-    return optimize(qc, scp);
   }
 
   @Override

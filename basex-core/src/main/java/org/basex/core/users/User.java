@@ -15,7 +15,7 @@ import org.basex.util.*;
 /**
  * This class contains information on a single user.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class User {
@@ -33,11 +33,10 @@ public final class User {
    * Constructor.
    * @param name user name
    * @param password password
-   * @param perm rights
    */
-  User(final String name, final String password, final Perm perm) {
+  public User(final String name, final String password) {
     this.name = name;
-    this.perm = perm;
+    this.perm = Perm.NONE;
     for(final Algorithm algo : Algorithm.values()) {
       passwords.put(algo, new EnumMap<Code, String>(Code.class));
     }
@@ -118,10 +117,10 @@ public final class User {
   }
 
   /**
-   * Removes local permissions.
+   * Drops the specified database pattern.
    * @param pattern database pattern
    */
-  synchronized void remove(final String pattern) {
+  public synchronized void drop(final String pattern) {
     locals.remove(pattern);
   }
 
@@ -145,7 +144,7 @@ public final class User {
    * Computes new password hashes.
    * @param password password (plain text)
    */
-  synchronized void password(final String password) {
+  public synchronized void password(final String password) {
     EnumMap<Code, String> codes = passwords.get(Algorithm.DIGEST);
     codes.put(Code.HASH, digest(name, password));
 
@@ -199,16 +198,28 @@ public final class User {
   }
 
   /**
+   * Sets the global permission.
+   * @param prm permission
+   * @return self reference
+   */
+  public synchronized User perm(final Perm prm) {
+    perm = prm;
+    return this;
+  }
+
+  /**
    * Sets the permission.
    * @param prm permission
    * @param pattern database pattern (can be empty)
+   * @return self reference
    */
-  public synchronized void perm(final Perm prm, final String pattern) {
+  public synchronized User perm(final Perm prm, final String pattern) {
     if(pattern.isEmpty()) {
-      perm = prm;
+      perm(prm);
     } else {
       locals.put(pattern, prm);
     }
+    return this;
   }
 
 

@@ -8,36 +8,26 @@ import org.junit.*;
 /**
  * This class tests the functions of the Profiling Module.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class ProfModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void mem() {
-    try {
-      System.setErr(NULL);
-      query(_PROF_MEM.args("()"));
-      query(COUNT.args(_PROF_MEM.args(" 1 to 100 ", false)), "100");
-      query(COUNT.args(_PROF_MEM.args(" 1 to 100 ", true)), "100");
-      query(COUNT.args(_PROF_MEM.args(" 1 to 100 ", true, "label")), "100");
-    } finally {
-      System.setErr(ERR);
-    }
+    query(_PROF_MEM.args("()"));
+    query(COUNT.args(_PROF_MEM.args(" 1 to 100 ", false)), "100");
+    query(COUNT.args(_PROF_MEM.args(" 1 to 100 ", true)), "100");
+    query(COUNT.args(_PROF_MEM.args(" 1 to 100 ", true, "label")), "100");
   }
 
   /** Test method. */
   @Test
   public void time() {
-    try {
-      System.setErr(NULL);
-      query(_PROF_TIME.args("()"));
-      query(COUNT.args(_PROF_TIME.args(" 1 to 100 ", false)), "100");
-      query(COUNT.args(_PROF_TIME.args(" 1 to 100 ", true)), "100");
-      query(COUNT.args(_PROF_TIME.args(" 1 to 100 ", true, "label")), "100");
-    } finally {
-      System.setErr(ERR);
-    }
+    query(_PROF_TIME.args("()"));
+    query(COUNT.args(_PROF_TIME.args(" 1 to 100 ", false)), "100");
+    query(COUNT.args(_PROF_TIME.args(" 1 to 100 ", true)), "100");
+    query(COUNT.args(_PROF_TIME.args(" 1 to 100 ", true, "label")), "100");
   }
 
   /** Test method. */
@@ -62,24 +52,14 @@ public final class ProfModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void dump() {
-    try {
-      System.setErr(NULL);
-      query(_PROF_DUMP.args("a"), "");
-    } finally {
-      System.setErr(ERR);
-    }
+    query(_PROF_DUMP.args("a"), "");
   }
 
   /** Test method. */
   @Test
   public void variables() {
-    try {
-      System.setErr(NULL);
-      query("for $x in 1 to 2 return " + _PROF_VARIABLES.args(), "");
-      query(_PROF_VARIABLES.args() + ", let $x := random:double() return floor($x * $x)", "0");
-    } finally {
-      System.setErr(ERR);
-    }
+    query("for $x in 1 to 2 return " + _PROF_VARIABLES.args(), "");
+    query(_PROF_VARIABLES.args() + ", let $x := random:double() return floor($x * $x)", "0");
   }
 
   /** Test method. */

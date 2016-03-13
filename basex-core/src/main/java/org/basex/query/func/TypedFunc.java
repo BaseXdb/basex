@@ -6,7 +6,7 @@ import org.basex.query.util.list.*;
 /**
  * Wrapper that provides types for function expressions.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public final class TypedFunc {
@@ -39,7 +39,7 @@ public final class TypedFunc {
    * @param f java function
    * @return typed function
    */
-  static TypedFunc java(final JavaMapping f) {
+  static TypedFunc java(final JavaFunction f) {
     return new TypedFunc(f, new AnnList());
   }
 }

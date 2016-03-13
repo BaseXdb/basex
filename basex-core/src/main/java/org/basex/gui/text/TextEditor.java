@@ -2,20 +2,28 @@ package org.basex.gui.text;
 
 import static org.basex.util.Token.*;
 
+import java.text.*;
 import java.util.*;
 
 import org.basex.gui.*;
-import org.basex.gui.text.SearchBar.SearchDir;
+import org.basex.gui.text.SearchBar.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
  * Provides methods for editing a text that is visualized by the {@link TextPanel}.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class TextEditor {
+  /** Case conversions. */
+  public enum Case {
+    /** Lower case. */ LOWER,
+    /** Upper case. */ UPPER,
+    /** Title case. */ TITLE
+  };
+
   /** Opening brackets. */
   private static final String OPENING = "{([";
   /** Closing brackets. */
@@ -71,7 +79,7 @@ public final class TextEditor {
    */
   void search(final SearchContext sc) {
     // skip search if criteria have not changed
-    if(sc.equals(search)) {
+    if(sc.sameAs(search)) {
       sc.nr = search.nr;
       sc.bar.refresh(sc);
     } else {
@@ -317,12 +325,11 @@ public final class TextEditor {
   /**
    * Moves one character back and returns the found character. A newline character is
    * returned if the cursor is placed at the beginning of the text.
-   * @return character
+   * @return previous character, or newline
    */
   private int prev() {
     if(pos == 0) return '\n';
-    // UTF-8 encoded bytes: move to first byte
-    while(--pos > 0 && text[pos] < -64 && text[pos] >= -128);
+    while(--pos > 0 && text[pos] < -64);
     return curr();
   }
 
@@ -478,6 +485,26 @@ public final class TextEditor {
   }
 
   /**
+   * Case conversion.
+   * @param cs case type
+   * @return {@code true} if text has changed
+   */
+  boolean toCase(final Case cs) {
+    if(!selected()) return false;
+    final int s = Math.min(start, end), e = Math.max(start, end), d = size() - e;
+    final byte[] tmp = substring(text, s, e);
+
+    final TokenBuilder tb = new TokenBuilder(size());
+    tb.add(text, 0, s);
+    tb.add(cs == Case.LOWER ? lc(tmp) : cs == Case.UPPER ? uc(tmp) : tc(tmp));
+    tb.add(text, e, size());
+    final boolean changed = text(tb.finish());
+
+    select(s, size() - d);
+    return changed;
+  }
+
+  /**
    * Moves the current line or the selected lines up or down.
    * @param down down/up flag
    */
@@ -554,10 +581,14 @@ public final class TextEditor {
   boolean sort() {
     if(!extend()) return false;
 
-    // collect lines to be sorted
+    // count lines
+    int l = 1;
     final int s = start, e = end, ts = size();
     final byte[] tmp = Arrays.copyOf(text, ts);
-    final TokenList tl = new TokenList();
+    for(int i = s; i < e; i++) if(tmp[i] == '\n') l++;
+
+    // collect lines to be sorted
+    final TokenList tl = new TokenList(l);
     final ByteList bl = new ByteList();
     for(int i = s; i < e; i++) {
       final byte ch = tmp[i];
@@ -567,11 +598,8 @@ public final class TextEditor {
         bl.add(ch);
       }
     }
-
-    // sort data and merge duplicate lines
     if(!bl.isEmpty()) tl.add(bl.finish());
-    tl.sort(gopts.get(GUIOptions.CASESORT), gopts.get(GUIOptions.ASCSORT));
-    if(gopts.get(GUIOptions.MERGEDUPL)) tl.unique();
+    sort(tl);
 
     // copy lines back to text
     int i = s;
@@ -585,6 +613,42 @@ public final class TextEditor {
     final boolean changed = text(i == e ? tmp : Arrays.copyOf(tmp, ts - e + i));
     select(s, i);
     return changed;
+  }
+
+  /**
+   * Sorts the specified data.
+   * @param tokens list of tokens
+   */
+  private void sort(final TokenList tokens) {
+    final boolean asc = gopts.get(GUIOptions.ASCSORT), cs = gopts.get(GUIOptions.CASESORT);
+    final Collator coll = gopts.get(GUIOptions.UNICODE) ? null : Collator.getInstance();
+    final int column = gopts.get(GUIOptions.COLUMN) - 1;
+
+    // stable sort: before custom sort, use default sort
+    if(coll != null || column > 0) tokens.sort(true, true);
+    final Comparator<byte[]> cc = new Comparator<byte[]>() {
+      @Override
+      public int compare(final byte[] token1, final byte[] token2) {
+        final byte[] t1 = sub(token1, column), t2 = sub(token2, column);
+        return coll != null ? coll.compare(string(t1), string(t2)) :
+         diff(cs ? lc(t1) : t1, cs ? lc(t2) : t2);
+      }
+    };
+    tokens.sort(cc, asc);
+    if(gopts.get(GUIOptions.MERGEDUPL)) tokens.unique();
+  }
+
+  /**
+   * Returns a substring.
+   * @param token token
+   * @param column column position
+   * @return sub string
+   */
+  private static byte[] sub(final byte[] token, final int column) {
+    final int tl = token.length;
+    int t = 0;
+    for(int c = 0; t < tl && c < column; t += cl(token, t), c++);
+    return substring(token, t);
   }
 
   /**
@@ -747,13 +811,13 @@ public final class TextEditor {
    */
   private void closeElem(final StringBuilder sb) {
     final int p = pos;
-    while(pos > 0) {
+    while(pos() > 0) {
       final int cp = prev();
       if(!XMLToken.isNCChar(cp) && cp != ':') {
         if(cp == '<' && pos < p - 1) {
           // add closing element
           next();
-          sb.append("</").append(new TokenBuilder().add(text, pos, p).toString()).append('>');
+          sb.append("</").append(new TokenBuilder().add(text, pos, p)).append('>');
         }
         break;
       }
@@ -1044,7 +1108,8 @@ public final class TextEditor {
     final int e = start < end ? end : start;
     for(int s = start < end ? start : end; s < e; s += cl(text, s)) {
       final int cp = cp(text, s);
-      if(cp >= ' ' || cp == 0x0A || cp == 0x09) tb.add(cp);
+      if(cp >= ' ' && cp < TokenBuilder.PRIVATE_START || cp == 0x0A || cp == 0x09 ||
+          cp > TokenBuilder.PRIVATE_END) tb.add(cp);
     }
     return tb.toString();
   }
@@ -1083,7 +1148,7 @@ public final class TextEditor {
 
   /**
    * Returns the current character, or the newline character if the position is out of bounds.
-   * @return current character
+   * @return current character, or newline
    */
   private int curr() {
     return pos < 0 || pos >= size() ? '\n' : cp(text, pos);

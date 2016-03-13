@@ -5,7 +5,7 @@ import static org.basex.util.Token.*;
 /**
  * This class contains constants used for parsing and serializing JSON.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public interface JsonConstants {
@@ -36,8 +36,6 @@ public interface JsonConstants {
   byte[] OBJECT = token("object");
   /** Token: map. */
   byte[] MAP = token("map");
-  /** Allowed elements. */
-  byte[][] ELEMENTS = { STRING, NUMBER, BOOLEAN, NULL, MAP };
 
   /** Token: pair. */
   byte[] PAIR = token("pair");

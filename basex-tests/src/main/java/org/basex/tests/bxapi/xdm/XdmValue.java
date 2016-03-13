@@ -13,7 +13,7 @@ import org.basex.tests.bxapi.*;
 /**
  * Wrapper for representing XQuery values.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class XdmValue implements Iterable<XdmItem> {
@@ -88,7 +88,7 @@ public abstract class XdmValue implements Iterable<XdmItem> {
    */
   public boolean deepEqual(final XdmValue value) {
     try {
-      return new Compare().equal(internal(), value.internal());
+      return new DeepEqual().equal(internal(), value.internal());
     } catch(final QueryException ex) {
       throw new XQueryException(ex);
     }

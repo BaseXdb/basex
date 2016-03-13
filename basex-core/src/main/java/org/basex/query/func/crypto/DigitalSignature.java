@@ -31,7 +31,7 @@ import org.xml.sax.*;
 /**
  * This class generates and validates digital signatures for XML data.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Lukas Kircher
  */
 final class DigitalSignature {
@@ -301,7 +301,7 @@ final class DigitalSignature {
    */
   private static byte[] nodeToBytes(final ANode node) throws IOException {
     final ArrayOutput ao = new ArrayOutput();
-    try(final Serializer ser = Serializer.get(ao, SerializerOptions.get(false))) {
+    try(final Serializer ser = Serializer.get(ao, SerializerMode.NOINDENT.get())) {
       ser.serialize(node);
     }
     return ao.finish();

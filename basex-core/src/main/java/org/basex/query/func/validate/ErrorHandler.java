@@ -1,65 +1,68 @@
 package org.basex.query.func.validate;
 
-import org.basex.core.*;
+import java.util.*;
+
 import org.basex.io.*;
-import org.basex.util.*;
-import org.basex.util.list.*;
 import org.xml.sax.*;
 import org.xml.sax.helpers.*;
 
 /**
  * Error handler.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class ErrorHandler extends DefaultHandler {
-  /** Will contain all raised validation exception messages. */
-  private final TokenList exceptions = new TokenList();
+  /** Fatal error. */
+  static final String FATAL = "Fatal";
+  /** Error. */
+  static final String ERROR = "Error";
+  /** Warning. */
+  static final String WARNING = "Warning";
+
+  /** Errors. */
+  private final ArrayList<ErrorInfo> errors = new ArrayList<>();
+
+  /** Schema URL. */
+  private IO schema;
 
   @Override
   public void fatalError(final SAXParseException ex) {
-    error(ex, "Fatal");
+    add(ex, FATAL);
   }
 
   @Override
   public void error(final SAXParseException ex) {
-    error(ex, "Error");
+    add(ex, ERROR);
   }
 
   @Override
   public void warning(final SAXParseException ex) {
-    error(ex, "Warning");
+    add(ex, WARNING);
   }
 
   /**
-   * Adds an error message.
+   * Adds a new error info.
    * @param ex exception
-   * @param type type of error
+   * @param level level
    */
-  private void error(final SAXParseException ex, final String type) {
-    // may be recursively called if external validator (e.g. Saxon) is used
-    String msg = ex.getMessage();
-    if(msg.contains("Exception:")) {
-      Throwable e = ex;
-      while(e.getCause() != null) e = e.getCause();
-      if(e instanceof SAXException) msg = e.getLocalizedMessage();
-    } else {
-      final TokenBuilder report = new TokenBuilder();
-      final String id = ex.getSystemId();
-      if(id != null) report.add(IO.get(id).name()).add(", ");
-      report.addExt(ex.getLineNumber()).add(Text.COL).addExt(ex.getColumnNumber());
-      report.add(": ").add(msg);
-      msg = report.toString();
-    }
-    exceptions.add(type + Text.COL + msg);
+  void add(final SAXException ex, final String level) {
+    errors.add(new ErrorInfo(ex, level, schema));
   }
 
   /**
-   * Returns the exception messages.
-   * @return exception messages
+   * Assigns the schema reference.
+   * @param io schema reference
    */
-  public TokenList getExceptions() {
-    return exceptions;
+  void schema(final IO io) {
+    schema = io;
+  }
+
+  /**
+   * Returns the errors.
+   * @return errors
+   */
+  ArrayList<ErrorInfo> getErrors() {
+    return errors;
   }
 }

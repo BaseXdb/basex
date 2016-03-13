@@ -20,12 +20,12 @@ import org.basex.util.list.*;
  * are to be added or closed. The builder implementation decides whether
  * the nodes are stored on disk or kept in memory.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class Builder extends Proc {
   /** Tree structure. */
-  final PathSummary path = new PathSummary();
+  final PathIndex path = new PathIndex();
   /** Namespace index. */
   final Namespaces nspaces = new Namespaces();
   /** Parser instance. */
@@ -161,14 +161,6 @@ public abstract class Builder extends Proc {
    */
   public final void pi(final byte[] pi) throws IOException {
     addText(pi, Data.PI);
-  }
-
-  /**
-   * Sets the document encoding.
-   * @param encoding encoding
-   */
-  public final void encoding(final String encoding) {
-    meta.encoding = Strings.normEncoding(encoding);
   }
 
   // PROGRESS INFORMATION =====================================================

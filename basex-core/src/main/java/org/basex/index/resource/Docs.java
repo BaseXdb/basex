@@ -13,15 +13,14 @@ import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
- * <p>This data structure contains references to all document nodes in a
- * database. The document nodes are incrementally updated.</p>
+ * <p>This data structure contains references to all document nodes in a database.
+ * The document nodes are incrementally updated.</p>
  *
- * <p>If updates are performed, the path order is discarded, as its continuous
- * update would be more expensive in some cases (e.g. when bulk insertions of
- * new documents are performed). A tree structure could be introduced to
- * offer better general performance.</p>
+ * <p>If updates are performed, the path order is discarded, as the update would be more expensive
+ * in some cases (e.g. when bulk insertions of new documents are performed). A tree structure could
+ * be introduced to offer better general performance.</p>
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  * @author Lukas Kircher
  */
@@ -31,10 +30,10 @@ final class Docs {
   /** Pre values of document nodes (may be {@code null}).
    * This variable should always be requested via {@link #docs()}. */
   private IntList docList;
-  /** Sorted document paths (may be {@code null}).
+  /** Document paths (may be {@code null}).
    * This variable should always be requested via {@link #paths()}. */
   private TokenList pathList;
-  /** Ordered path indexes (may be {@code null}).
+  /** Mapping for path order (may be {@code null}).
    * This variable should always be requested via {@link #order()}. */
   private int[] pathOrder;
   /** Dirty flag. */
@@ -205,17 +204,6 @@ final class Docs {
   }
 
   /**
-   * Replaces entries in the index.
-   * @param pre insertion position
-   * @param size number of deleted nodes
-   * @param clip data clip
-   */
-  void replace(final int pre, final int size, final DataClip clip) {
-    delete(pre, size);
-    insert(pre, clip);
-  }
-
-  /**
    * Notifies the meta structures of an update and invalidates the indexes.
    */
   private synchronized void update() {
@@ -228,7 +216,7 @@ final class Docs {
    * Returns the pre values of all document nodes matching the specified path.
    * @param path input path
    * @param exact exact (no prefix) matches
-   * @return pre values (internal representation!)
+   * @return pre values (can be internal representation!)
    */
   synchronized IntList docs(final String path, final boolean exact) {
     // invalid path, or no documents: return empty list
@@ -276,8 +264,8 @@ final class Docs {
    * @return path to a directory or not
    */
   synchronized boolean isDir(final byte[] path) {
-    final byte[] pa = concat(path, SLASH);
-    for(final byte[] b : paths()) if(startsWith(b, pa)) return true;
+    final byte[] pref = concat(path, SLASH);
+    for(final byte[] pth : paths()) if(startsWith(pth, pref)) return true;
     return false;
   }
 
@@ -337,5 +325,19 @@ final class Docs {
    */
   private static byte[] normalize(final byte[] path) {
     return concat(SLASH, Prop.CASE ? path : lc(path));
+  }
+
+  @Override
+  public String toString() {
+    final Table table = new Table();
+    table.header.add(TABLEPRE);
+    table.header.add(TABLECON);
+
+    final TokenList tl = new TokenList();
+    final int ds = paths().size();
+    for(int d = 0; d < ds; d++) {
+      table.contents.add(tl.add(docList.get(d)).add(pathList.get(d)));
+    }
+    return table.toString();
   }
 }

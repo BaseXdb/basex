@@ -15,7 +15,7 @@ import org.w3c.dom.Text;
 /**
  * This class converts an DOM document instance to a database representation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class DOMWrapper extends Parser {
@@ -92,7 +92,7 @@ public final class DOMWrapper extends Parser {
 
   @Override
   public String det() {
-    return Util.info(NODES_PARSED_X, filename, nodes);
+    return Util.info(NODES_PARSED_X_X, filename, nodes);
   }
 
   @Override

@@ -16,11 +16,11 @@ import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
+import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.Map;
@@ -34,7 +34,7 @@ import org.basex.util.options.*;
 /**
  * Built-in functions.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class StandardFunc extends Arr {
@@ -51,7 +51,7 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Constructor.
+   * Constructor. Invoked by {@link Function#get(StaticContext, InputInfo, Expr...)}.
    * @param ii input info
    * @param sctx static context
    * @param f function definition
@@ -64,22 +64,15 @@ public abstract class StandardFunc extends Arr {
     sig = f;
     info = ii;
     exprs = args;
-    seqType = f.ret;
+    seqType = f.type;
     return this;
-  }
-
-  @Override
-  public final Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    // compile all arguments
-    super.compile(qc, scp);
-    return optimize(qc, scp);
   }
 
   @Override
   public final Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     // skip context-based or non-deterministic functions, and non-values
     return optPre(has(Flag.CTX) || has(Flag.NDT) || has(Flag.HOF) || has(Flag.UPD) ||
-        !allAreValues() ? opt(qc, scp) : sig.ret.zeroOrOne() ? item(qc, info) : value(qc), qc);
+        !allAreValues() ? opt(qc, scp) : sig.type.zeroOrOne() ? item(qc, info) : value(qc), qc);
   }
 
   /**
@@ -200,17 +193,25 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   protected Path toPath(final int i, final QueryContext qc) throws QueryException {
-    if(i >= exprs.length) return null;
-    final String file = string(toToken(exprs[i], qc));
+    return i < exprs.length ? toPath(string(toToken(exprs[i], qc))) : null;
+  }
+
+  /**
+   * Converts the specified string to a file path.
+   * @param path path string
+   * @return file instance
+   * @throws QueryException query exception
+   */
+  protected Path toPath(final String path) throws QueryException {
     try {
-      return Paths.get(IOUrl.isFileURL(file) ? IOUrl.toFile(file) : file);
+      return Paths.get(IOUrl.isFileURL(path) ? IOUrl.toFile(path) : path);
     } catch(final InvalidPathException ex) {
-      throw FILE_INVALID_PATH_X.get(info, file);
+      throw FILE_INVALID_PATH_X.get(info, path);
     }
   }
 
   /**
-   * Returns a valid reference if a file is found in the specified path or the static base uri.
+   * Returns a valid reference if a file is found at the specified path or the static base uri.
    * Otherwise, returns an error.
    * @param path file path
    * @param qc query context
@@ -218,7 +219,19 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   protected IO checkPath(final Expr path, final QueryContext qc) throws QueryException {
-    return QueryResources.checkPath(new QueryInput(string(toToken(path, qc))), sc.baseIO(), info);
+    return checkPath(toToken(path, qc));
+  }
+
+  /**
+   * Returns a valid reference if a file is found at the specified path or the static base uri.
+   * Otherwise, returns an error.
+   * @param path file path
+   * @return input source, or exception
+   * @throws QueryException query exception
+   */
+  protected IO checkPath(final byte[] path) throws QueryException {
+    return path == null ? null :
+      QueryResources.checkPath(new QueryInput(string(path)), sc.baseIO(), info);
   }
 
   /**
@@ -246,7 +259,7 @@ public abstract class StandardFunc extends Arr {
    * Parses the options at the specified index.
    * @param <E> options type
    * @param i index of options argument
-   * @param qnm QName
+   * @param qnm QName (can be {@code null})
    * @param opts options
    * @param qc query context
    * @return passed on options
@@ -256,7 +269,7 @@ public abstract class StandardFunc extends Arr {
       final QueryContext qc) throws QueryException {
 
     return i >= exprs.length ? opts :
-      new FuncOptions(qnm, info).parse(exprs[i].item(qc, info), opts);
+      new FuncOptions(qnm, info).assign(exprs[i].item(qc, info), opts);
   }
 
   /**
@@ -334,18 +347,20 @@ public abstract class StandardFunc extends Arr {
 
   /**
    * Casts and checks the function item for its arity.
-   * @param e expression
-   * @param a arity
+   * @param expr expression
+   * @param nargs number of arguments (arity)
    * @param qc query context
    * @return function item
    * @throws QueryException query exception
    */
-  protected FItem checkArity(final Expr e, final int a, final QueryContext qc)
+  protected FItem checkArity(final Expr expr, final int nargs, final QueryContext qc)
       throws QueryException {
 
-    final FItem it = toFunc(e, qc);
-    if(it.arity() == a) return it;
-    throw castError(info, it, FuncType.arity(a));
+    final FItem fun = toFunc(expr, qc);
+    if(fun.annotations().contains(Annotation.UPDATING)) throw FUNCUP_X.get(info, fun);
+    if(fun.arity() == nargs) return fun;
+    final int fargs = fun.arity();
+    throw FUNARITY_X_X_X.get(info, fargs, fargs == 1 ? "" : "s", nargs);
   }
 
   /**
@@ -369,23 +384,6 @@ public abstract class StandardFunc extends Arr {
    */
   protected final boolean dataLock(final ASTVisitor visitor, final int i) {
     return visitor.lock(exprs[i] instanceof Str ? string(((Str) exprs[i]).string()) : null);
-  }
-
-  /**
-   * Caches and materializes all items of the specified iterator.
-   * @param iter iterator
-   * @param cache item list
-   * @param qc query context
-   * @throws QueryException query exception
-   */
-  protected final void cache(final Iter iter, final ItemList cache, final QueryContext qc)
-      throws QueryException {
-
-    for(Item it; (it = iter.next()) != null;) {
-      qc.checkStop();
-      if(it instanceof FItem) throw FISTRING_X.get(info, it.type);
-      cache.add(it.materialize(info));
-    }
   }
 
   /**

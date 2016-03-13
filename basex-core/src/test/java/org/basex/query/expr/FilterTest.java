@@ -6,7 +6,7 @@ import org.junit.*;
 /**
  * Tests for optimizations of the filter expression.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class FilterTest extends AdvancedQueryTest {
@@ -282,5 +282,14 @@ public final class FilterTest extends AdvancedQueryTest {
     query("for $i in (1,'a',2) "
         + "return <a b='{$i}'/>[<a b='{random:integer()}'/>][<b c='{random:integer()}'/>][$i]",
         "<a b=\"1\"/>\n<a b=\"a\"/>");
+  }
+
+  /**
+   * Start position.
+   */
+  @Test public void startPos() {
+    query("(<a/>,<b/>)[position() > 1]", "<b/>");
+    query("(<a/>,<b/>,<c/>)[position() > 2]", "<c/>");
+    query("(<a/>,<b/>,<c/>)[position() = 2 to 3]", "<b/>\n<c/>");
   }
 }

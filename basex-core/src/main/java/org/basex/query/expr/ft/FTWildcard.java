@@ -7,7 +7,7 @@ import org.basex.util.*;
 /**
  * Wildcard expression.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  * @author Dimitar Popov
  */
@@ -33,7 +33,7 @@ public final class FTWildcard {
    */
   public FTWildcard(final byte[] query) {
     this.query = query;
-    this.simple = !contains(query, '.') && !contains(query, '\\');
+    simple = !contains(query, '.') && !contains(query, '\\');
   }
 
   /**

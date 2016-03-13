@@ -2,7 +2,6 @@ package org.basex.query.func;
 
 import static org.basex.query.func.Function.*;
 
-import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.query.*;
 import org.junit.*;
@@ -11,7 +10,7 @@ import org.junit.Test;
 /**
  * This class tests the functions of the Index Module.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Andreas Weiler
  */
 public final class IndexModuleTest extends AdvancedQueryTest {
@@ -20,20 +19,18 @@ public final class IndexModuleTest extends AdvancedQueryTest {
 
   /**
    * Initializes a test.
-   * @throws BaseXException database exception
    */
   @Before
-  public void initTest() throws BaseXException {
-    new CreateDB(NAME, FILE).execute(context);
+  public void initTest() {
+    execute(new CreateDB(NAME, FILE));
   }
 
   /**
    * Finishes the code.
-   * @throws BaseXException database exception
    */
   @AfterClass
-  public static void finish() throws BaseXException {
-    new DropDB(NAME).execute(context);
+  public static void finish() {
+    execute(new DropDB(NAME));
   }
 
   /** Test method. */

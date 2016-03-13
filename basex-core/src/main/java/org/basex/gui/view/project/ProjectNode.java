@@ -7,7 +7,7 @@ import org.basex.io.*;
 /**
  * Single tree node.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 abstract class ProjectNode extends DefaultMutableTreeNode {
@@ -15,6 +15,8 @@ abstract class ProjectNode extends DefaultMutableTreeNode {
   final ProjectView project;
   /** Path. */
   IOFile file;
+  /** Error flag. */
+  boolean error;
 
   /**
    * Constructor.

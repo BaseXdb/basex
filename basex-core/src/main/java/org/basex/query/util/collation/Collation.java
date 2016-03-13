@@ -12,7 +12,7 @@ import org.basex.util.hash.*;
 /**
  * This class organizes collations.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class Collation {
@@ -106,7 +106,7 @@ public abstract class Collation {
       coll.uri = uri;
       return coll;
     } catch(final IllegalArgumentException ex) {
-      throw err.get(info, ex);
+      throw err.get(info, ex.getMessage());
     }
   }
 

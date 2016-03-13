@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
-import org.basex.io.out.*;
 import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
@@ -16,28 +15,31 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
  * This class serializes items as JSON. The input must conform to the rules
  * defined in the {@link JsonDirectConverter} and {@link JsonAttsConverter} class.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class JsonBasicSerializer extends JsonSerializer {
-  /** Output key. */
+  /** Output key (false for arrays). */
   private boolean printKey;
+  /** Printed keys. */
+  private TokenSet printedKeys = new TokenSet();
 
   /**
    * Constructor.
-   * @param out print output
+   * @param os output stream
    * @param opts serialization parameters
    * @throws IOException I/O exception
    */
-  public JsonBasicSerializer(final PrintOutput out, final SerializerOptions opts)
+  public JsonBasicSerializer(final OutputStream os, final SerializerOptions opts)
       throws IOException {
-    super(out, opts);
+    super(os, opts);
   }
 
   @Override
@@ -46,21 +48,42 @@ public final class JsonBasicSerializer extends JsonSerializer {
 
     final BasicNodeIter iter = node.children();
     if(node.type == NodeType.DOC || node.type == NodeType.DEL) {
-      final ANode child = iter.next();
-      if(child == null) throw error("Document has no child.");
-      if(iter.next() != null) throw error("Document has more than one child.");
-      node(child);
+      for(ANode child; (child = iter.next()) != null;) node(child);
     } else if(node.type == NodeType.ELM) {
       final QNm name = node.qname();
       final byte[] type = name.local();
       if(!eq(name.uri(), QueryText.FN_URI))
         throw error("Element '%' has invalid namespace: '%'.", type, name.uri());
 
-      byte[] key = node.attribute(KEY);
+      byte[] key = null;
+      boolean escaped = false, escapedKey = false;
+      for(final ANode attr : node.attributes()) {
+        final QNm qnm = attr.qname();
+        final byte[] au = qnm.uri(), an = qnm.local(), av = attr.string();
+        if(au.length != 0) {
+          if(!eq(au, QueryText.FN_URI)) continue;
+          throw error("Element '%' has invalid attribute: %.", type, an);
+        }
+        if(eq(an, KEY)) {
+          key = attr.string();
+        } else if(eq(an, ESCAPED_KEY) && printKey) {
+          final Boolean b = Bln.parse(av);
+          if(b == null) throw error("Value of '%' attribute is invalid: '%'.", an, av);
+          escapedKey = b;
+        } else if(eq(an, ESCAPED) && eq(type, STRING)) {
+          final Boolean b = Bln.parse(av);
+          if(b == null) throw error("Value of '%' attribute is invalid: '%'.", an, av);
+          escaped = b;
+        } else {
+          throw error("Element '%' has invalid attribute: %.", type, an);
+        }
+      }
+
       if(printKey) {
         if(key == null) throw error("Element '%' has no key.", type);
+        if(!printedKeys.add(key)) throw error("Duplicate key: %.", key);
         out.print('"');
-        out.print(escape(key, node.attribute(ESCAPED_KEY)));
+        out.print(norm(escape(key, escapedKey)));
         out.print("\":");
       } else {
         if(key != null) throw error("Element '%' must have no key.", type);
@@ -70,22 +93,23 @@ public final class JsonBasicSerializer extends JsonSerializer {
         out.print(NULL);
         if(iter.next() != null) throw error("Element '%' must have no children.", type);
       } else if(eq(type, BOOLEAN)) {
-        byte[] value = value(iter, type);
+        final byte[] value = value(iter, type);
         if(value == null) throw error("Element '%' has no value.", type);
-        if(!eq(value, TRUE, FALSE)) throw error("Element '%' has invalid value: '%'.", type, value);
-        out.print(value);
+        final Boolean b = Bln.parse(value);
+        if(b == null) throw error("Element '%' has invalid value: '%'.", type, value);
+        out.print(norm(token(b.booleanValue())));
       } else if(eq(type, STRING)) {
-        byte[] value = value(iter, type);
+        final byte[] value = value(iter, type);
         out.print('"');
-        if(value != null) out.print(escape(value, node.attribute(ESCAPED)));
+        if(value != null) out.print(norm(escape(value, escaped)));
         out.print('"');
       } else if(eq(type, NUMBER)) {
-        byte[] value = value(iter, type);
+        final byte[] value = value(iter, type);
         if(value == null) throw error("Element '%' has no value.", type);
-        final Double d = toDouble(value);
-        if(d.isNaN() || d.isInfinite())
+        final double d = toDouble(value);
+        if(Double.isNaN(d) || Double.isInfinite(d))
           throw error("Element '%' has invalid value: '%'.", type, value);
-        out.print(value);
+        out.print(token(d));
       } else if(eq(type, ARRAY)) {
         out.print('[');
         children(iter, false);
@@ -97,39 +121,38 @@ public final class JsonBasicSerializer extends JsonSerializer {
       } else {
         throw error("Invalid element: '%'", name);
       }
-    } else {
-      throw error("Node must be an element.");
+    //} else {
+    //  throw error("Node must be an element.");
     }
   }
 
   @Override
-  protected void startOpen(final QNm name) throws IOException {
+  protected void startOpen(final QNm name) {
     throw Util.notExpected();
   }
 
   @Override
-  protected void attribute(final byte[] name, final byte[] value, final boolean standalone)
-      throws IOException {
+  protected void attribute(final byte[] name, final byte[] value, final boolean standalone) {
     throw Util.notExpected();
   }
 
   @Override
-  protected void finishOpen() throws IOException {
+  protected void finishOpen() {
     throw Util.notExpected();
   }
 
   @Override
-  protected void text(final byte[] value, final FTPos ftp) throws IOException {
+  protected void text(final byte[] value, final FTPos ftp) {
     throw Util.notExpected();
   }
 
   @Override
-  protected void finishEmpty() throws IOException {
+  protected void finishEmpty() {
     throw Util.notExpected();
   }
 
   @Override
-  protected void finishClose() throws IOException {
+  protected void finishClose() {
     throw Util.notExpected();
   }
 
@@ -145,8 +168,10 @@ public final class JsonBasicSerializer extends JsonSerializer {
    * @throws IOException I/O exception
    */
   private void children(final BasicNodeIter iter, final boolean pk) throws IOException {
-    boolean tmp = printKey;
+    final boolean p = printKey;
+    final TokenSet keys = printedKeys;
     printKey = pk;
+    printedKeys = new TokenSet();
     level++;
     boolean comma = false;
     for(ANode child; (child = iter.next()) != null;) {
@@ -160,7 +185,8 @@ public final class JsonBasicSerializer extends JsonSerializer {
     }
     level--;
     indent();
-    printKey = tmp;
+    printKey = p;
+    printedKeys = keys;
   }
 
   /**
@@ -170,32 +196,28 @@ public final class JsonBasicSerializer extends JsonSerializer {
    * @return value
    * @throws QueryIOException query exception
    */
-  private byte[] value(final BasicNodeIter iter, final byte[] type) throws QueryIOException {
-    byte[] value = null;
+  private static byte[] value(final BasicNodeIter iter, final byte[] type) throws QueryIOException {
+    TokenBuilder tb = null;
     for(ANode child; (child = iter.next()) != null;) {
       if(child.type == NodeType.TXT) {
-        if(value != null) throw error("Element '%' has more than one child.", type);
-        value = child.string();
+        if(tb == null) tb = new TokenBuilder();
+        tb.add(child.string());
       } else if(child.type == NodeType.ELM) {
-        throw error("Element '%' must have no elements as child.", type);
+        throw error("Element '%' must have no child elements.", type);
       }
     }
-    return value;
+    return tb == null ? null : tb.finish();
   }
 
   /**
    * Returns a possibly escaped value.
    * @param value value to escape
-   * @param flag escape flag
+   * @param escape escape flag
    * @return escaped value
    * @throws QueryIOException I/O exception
    */
-  private byte[] escape(final byte[] value, final byte[] flag) throws QueryIOException {
-    if(flag != null && !eq(flag, FALSE, TRUE))
-      throw error("Value of escape attribute is invalid: '%'.", flag);
-
-    final boolean check = flag != null && eq(flag, TRUE);
-    if(check) {
+  private static byte[] escape(final byte[] value, final boolean escape) throws QueryIOException {
+    if(escape) {
       if(contains(value, '\\')) {
         final TokenParser tp = new TokenParser(value);
         while(tp.more()) {
@@ -219,7 +241,7 @@ public final class JsonBasicSerializer extends JsonSerializer {
 
     final ByteList bl = new ByteList();
     for(final byte c : value) {
-      if(c < 32 || c >= 128 && c <= 160) {
+      if(c >= 0 && c < 32 || c >= 128) {
         bl.add('\\');
         if(c == '\b') bl.add('b');
         else if(c == '\f') bl.add('f');
@@ -228,7 +250,7 @@ public final class JsonBasicSerializer extends JsonSerializer {
         else if(c == '\t') bl.add('t');
         else bl.add('u').add('0').add('0').add(HEX[c >> 4]).add(HEX[c & 0xF]);
       } else {
-        if(c == '"' || !check && c == '\\') bl.add('\\');
+        if(c == '"' || !escape && c == '\\') bl.add('\\');
         bl.add(c);
       }
     }

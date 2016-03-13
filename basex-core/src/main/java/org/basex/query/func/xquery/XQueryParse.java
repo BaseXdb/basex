@@ -12,10 +12,10 @@ import org.basex.util.options.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public final class XQueryParse extends StandardFunc {
+public class XQueryParse extends StandardFunc {
   /** Token. */
   private static final byte[] LIBRARY_MODULE = token("LibraryModule");
   /** Token. */
@@ -37,21 +37,36 @@ public final class XQueryParse extends StandardFunc {
     public static final BooleanOption PLAN = new BooleanOption("plan", true);
     /** Compile query. */
     public static final BooleanOption COMPILE = new BooleanOption("compile", false);
+    /** Pass on error info. */
+    public static final BooleanOption PASS = new BooleanOption("pass", false);
   }
 
   @Override
   public FElem item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] query = toToken(exprs[0], qc);
+    return parse(qc, toToken(exprs[0], qc), null);
+  }
 
-    boolean compile = false, plan = true;
+  /**
+   * Parses the specified query and returns the resulting query plan.
+   * @param qc query context
+   * @param query query
+   * @param path file path (may be {@code null})
+   * @return query plan
+   * @throws QueryException query exception
+   */
+  protected final FElem parse(final QueryContext qc, final byte[] query, final String path)
+      throws QueryException {
+
+    boolean compile = false, plan = true, pass = false;
     if(exprs.length > 1) {
       final Options opts = toOptions(1, Q_OPTIONS, new XQueryOptions(), qc);
       compile = opts.get(XQueryOptions.COMPILE);
       plan = opts.get(XQueryOptions.PLAN);
+      pass = opts.get(XQueryOptions.PASS);
     }
 
     try(final QueryContext qctx = new QueryContext(qc.context)) {
-      final StaticScope ss = qctx.parse(string(query), null, null);
+      final StaticScope ss = qctx.parse(string(query), path, null);
       final boolean library = ss instanceof LibraryModule;
 
       final FElem root;
@@ -69,7 +84,8 @@ public final class XQueryParse extends StandardFunc {
       if(plan) root.add(qctx.plan());
       return root;
     } catch(final QueryException ex) {
-      throw ex.info(info);
+      if(!pass) ex.info(info);
+      throw ex;
     }
   }
 }

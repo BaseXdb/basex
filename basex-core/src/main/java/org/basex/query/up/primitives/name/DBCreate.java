@@ -19,12 +19,12 @@ import org.basex.util.options.*;
 /**
  * Update primitive for the {@link Function#_DB_CREATE} function.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Lukas Kircher
  */
 public final class DBCreate extends NameUpdate {
   /** Container for new database documents. */
-  private final DBNew add;
+  private final DBNew newDocs;
   /** Database update options. */
   private final DBOptions options;
 
@@ -45,47 +45,45 @@ public final class DBCreate extends NameUpdate {
     Collections.addAll(supported, DBOptions.INDEXING);
     Collections.addAll(supported, DBOptions.PARSING);
     options = new DBOptions(opts, supported, info);
-    add = new DBNew(qc, input, info);
+    newDocs = new DBNew(qc, input, options, info);
   }
 
   @Override
   public void prepare() throws QueryException {
-    if(add.inputs == null || add.inputs.isEmpty()) return;
-
-    final MainOptions opts = new MainOptions(qc.context.options);
-    options.assignTo(opts);
-    add.addDocs(new MemData(opts), name, opts);
+    newDocs.prepare(name);
   }
 
   @Override
   public void apply() throws QueryException {
     close();
 
-    final MainOptions opts = new MainOptions(qc.context.options);
-    options.assignTo(opts);
+    final MainOptions mopts = options.assignTo(new MainOptions(qc.context.options, true));
+    final boolean add = newDocs.data != null;
     try {
-      final Data data = CreateDB.create(name, Parser.emptyParser(opts), qc.context, opts);
+      final Data data = CreateDB.create(name, Parser.emptyParser(mopts), qc.context, mopts);
 
       // add initial documents and optimize database
-      if(add.data != null) {
-        data.startUpdate(opts);
+      if(add) {
+        data.startUpdate(mopts);
         try {
-          data.insert(data.meta.size, -1, new DataClip(add.data));
-          Optimize.optimize(data, opts, null);
+          data.insert(data.meta.size, -1, new DataClip(newDocs.data));
+          Optimize.optimize(data, null);
         } finally {
-          data.finishUpdate(opts);
+          data.finishUpdate(mopts);
         }
       }
       Close.close(data, qc.context);
 
     } catch(final IOException ex) {
       throw UPDBOPTERR_X.get(info, ex);
+    } finally {
+      if(add) newDocs.finish();
     }
   }
 
   @Override
   public String toString() {
-    return Util.className(this) + '[' + add.inputs + ']';
+    return Util.className(this) + '[' + newDocs.inputs + ']';
   }
 
   @Override

@@ -7,26 +7,25 @@ import static org.basex.util.Token.*;
 import java.io.*;
 
 import org.basex.build.json.*;
-import org.basex.build.json.JsonOptions.JsonFormat;
+import org.basex.build.json.JsonOptions.*;
 import org.basex.io.out.*;
 import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.util.ft.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
-import org.basex.util.options.Options.YesNo;
+import org.basex.util.options.Options.*;
 
 /**
  * This class serializes items as JSON. The input must conform to the rules
  * defined in the {@link JsonDirectConverter} and {@link JsonAttsConverter} class.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class JsonNodeSerializer extends JsonSerializer {
@@ -45,34 +44,21 @@ public final class JsonNodeSerializer extends JsonSerializer {
 
   /** Current name of a pair. */
   private byte[] key;
-  /** Custom serialization. */
+  /** BaseX JSON serialization. */
   private boolean custom;
   /** Node serializer. */
   private Serializer nodeSerializer;
 
   /**
    * Constructor.
-   * @param out print output
-   * @param opts serialization parameters
-   * @param adaptive adaptive serializer (can be {@code null})
-   * @throws IOException I/O exception
-   */
-  public JsonNodeSerializer(final PrintOutput out, final SerializerOptions opts,
-      final AdaptiveSerializer adaptive) throws IOException {
-    this(out, opts);
-    this.adaptive = adaptive;
-  }
-
-  /**
-   * Constructor.
-   * @param out print output
+   * @param os output stream
    * @param opts serialization parameters
    * @throws IOException I/O exception
    */
-  public JsonNodeSerializer(final PrintOutput out, final SerializerOptions opts)
+  public JsonNodeSerializer(final OutputStream os, final SerializerOptions opts)
       throws IOException {
 
-    super(out, opts);
+    super(os, opts);
     final int tl = typeCache.length;
     for(int t = 0; t < tl; t++) typeCache[t] = new TokenMap();
     atts = jopts.get(JsonOptions.FORMAT) == JsonFormat.ATTRIBUTES;
@@ -81,15 +67,13 @@ public final class JsonNodeSerializer extends JsonSerializer {
 
   @Override
   protected void node(final ANode node) throws IOException {
-    final boolean doc = node.type == NodeType.DOC;
-    final boolean elm = node.type == NodeType.ELM && eq(JSON, node.name());
-    if(custom || doc || elm) {
+    if(node.type == NodeType.DOC || custom) {
+      super.node(node);
+    } else if(node.type == NodeType.ELM && eq(JSON, node.name())) {
       final boolean c = custom;
-      if(!custom) custom = elm;
+      custom = true;
       super.node(node);
       custom = c;
-    } else if(adaptive != null && node.type == NodeType.ATT || node.type == NodeType.NSP) {
-      adaptive.serialize((Value) node);
     } else {
       try(final Serializer ser = nodeSerializer()) {
         ser.serialize(node);
@@ -101,7 +85,7 @@ public final class JsonNodeSerializer extends JsonSerializer {
   }
 
   @Override
-  protected void startOpen(final QNm name) throws IOException {
+  protected void startOpen(final QNm name) {
     types.set(level, null);
     comma.set(level + 1, false);
     key = atts ? null : name.string();
@@ -148,7 +132,7 @@ public final class JsonNodeSerializer extends JsonSerializer {
         out.print('"');
         final byte[] name = atts ? key : XMLToken.decode(key, lax);
         if(name == null) throw error("Name of element <%> is invalid", key);
-        out.print(name);
+        out.print(norm(name));
         out.print("\":");
       } else if(eq(ptype, ARRAY)) {
         if(atts) {
@@ -186,7 +170,7 @@ public final class JsonNodeSerializer extends JsonSerializer {
     final byte[] type = types.get(level - 1);
     if(eq(type, STRING)) {
       out.print('"');
-      for(final byte ch : norm(value)) encode(ch);
+      for(final byte ch : norm(value)) printChar(ch);
       out.print('"');
     } else if(eq(type, BOOLEAN)) {
       if(!eq(value, TRUE, FALSE))

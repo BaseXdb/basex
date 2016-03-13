@@ -17,7 +17,7 @@ import org.basex.util.*;
 /**
  * This superclass in inherited by all dialog windows.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class BaseXDialog extends JDialog {
@@ -29,9 +29,6 @@ public abstract class BaseXDialog extends JDialog {
   protected boolean ok;
   /** Reference to the root panel. */
   protected BaseXBack panel;
-
-  /** Dialog position. */
-  private int[] loc;
 
   /** Key listener, triggering an action with each click. */
   public final KeyAdapter keys = new KeyAdapter() {
@@ -100,23 +97,12 @@ public abstract class BaseXDialog extends JDialog {
 
   /**
    * Finalizes the dialog layout and sets it visible.
-   * @param l optional dialog location, relative to main window
    */
-  protected final void finish(final int[] l) {
+  protected final void finish() {
     pack();
     setMinimumSize(getPreferredSize());
-    if(l == null) setLocationRelativeTo(gui);
-    else setLocation(gui.getX() + l[0], gui.getY() + l[1]);
-    loc = l;
+    setLocationRelativeTo(gui);
     setVisible(true);
-  }
-
-  @Override
-  public void setLocation(final int x, final int y) {
-    final Dimension scr = Toolkit.getDefaultToolkit().getScreenSize();
-    final int xx = Math.max(0, Math.min(scr.width - getWidth(), x));
-    final int yy = Math.max(0, Math.min(scr.height - getHeight(), y));
-    super.setLocation(xx, yy);
   }
 
   /**
@@ -144,11 +130,6 @@ public abstract class BaseXDialog extends JDialog {
 
   @Override
   public void dispose() {
-    if(loc != null) {
-      final Container par = getParent();
-      loc[0] = getX() - par.getX();
-      loc[1] = getY() - par.getY();
-    }
     super.dispose();
     gui.gopts.write();
   }
@@ -166,7 +147,7 @@ public abstract class BaseXDialog extends JDialog {
    * @return button list
    */
   protected BaseXBack okCancel() {
-    return newButtons(B_OK, CANCEL);
+    return newButtons(B_OK, B_CANCEL);
   }
 
   /**
@@ -218,7 +199,7 @@ public abstract class BaseXDialog extends JDialog {
    * @param gui parent reference
    * @param text text
    * @param buttons additional buttons
-   * @return true if dialog was confirmed
+   * @return chosen action (button text): {@link #B_YES}, {@link #B_NO}, {@link #B_CANCEL}
    */
   public static String yesNoCancel(final GUI gui, final String text, final String... buttons) {
     return new DialogMessage(gui, text.trim(), Msg.YESNOCANCEL, buttons).action();
@@ -228,7 +209,7 @@ public abstract class BaseXDialog extends JDialog {
    * Static yes/no dialog.
    * @param gui parent reference
    * @param text text
-   * @return true if dialog was confirmed
+   * @return {@code true} if dialog was confirmed
    */
   public static boolean confirm(final GUI gui, final String text) {
     return B_YES.equals(new DialogMessage(gui, text.trim(), Msg.QUESTION).action());

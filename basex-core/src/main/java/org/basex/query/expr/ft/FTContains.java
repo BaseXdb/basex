@@ -2,6 +2,7 @@ package org.basex.query.expr.ft;
 
 import static org.basex.query.QueryText.*;
 
+import org.basex.index.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -18,7 +19,7 @@ import org.basex.util.hash.*;
 /**
  * Abstract FTContains expression.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class FTContains extends Single {
@@ -115,10 +116,12 @@ public final class FTContains extends Single {
 
   @Override
   public boolean indexAccessible(final IndexInfo ii) throws QueryException {
-    // return false if step is no text node, or if no index is available
-    if(!ii.check(expr, true) || !ftexpr.indexAccessible(ii)) return false;
+    // check if index can be utilized
+    final IndexType type = ii.type(expr, IndexType.FULLTEXT);
+    if(type == null || !ftexpr.indexAccessible(ii)) return false;
 
-    ii.create(new FTIndexAccess(info, ftexpr, ii.ic), info, Util.info(OPTFTXINDEX, ftexpr), true);
+    ii.create(new FTIndexAccess(info, ftexpr, ii.ic), true,
+        info, Util.info(OPTINDEX_X_X, "full-text", ftexpr));
     return true;
   }
 

@@ -15,7 +15,7 @@ import org.basex.util.hash.*;
 /**
  * This class indexes and organizes the element or attribute names used in an XML document.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  * @author Lukas Kircher
  */
@@ -37,12 +37,12 @@ public final class Names extends TokenSet implements Index {
   /**
    * Constructor, specifying an input file.
    * @param in input stream
-   * @param md meta data
+   * @param meta meta data
    * @throws IOException I/O exception
    */
-  public Names(final DataInput in, final MetaData md) throws IOException {
+  public Names(final DataInput in, final MetaData meta) throws IOException {
     super(in);
-    this.meta = md;
+    this.meta = meta;
     stats = new Stats[keys.length];
     for(int s = 1; s < size; ++s) stats[s] = new Stats(in);
   }
@@ -57,7 +57,7 @@ public final class Names extends TokenSet implements Index {
   /**
    * Indexes a name and returns its unique id.
    * @param name name to be added
-   * @param value value, added to statistics
+   * @param value value, added to statistics (can be {@code null})
    * @param stat statistics flag
    * @return name id
    */

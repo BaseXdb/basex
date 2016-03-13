@@ -19,7 +19,7 @@ import org.basex.util.*;
 /**
  * Static variable to which an expression can be assigned.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public final class StaticVar extends StaticDecl {
@@ -117,14 +117,14 @@ public final class StaticVar extends StaticDecl {
   }
 
   /**
-   * Binds an expression to this variable from outside the query.
+   * Binds an external value.
    * @param value value to bind
    * @param qc query context
    * @throws QueryException query exception
    */
   void bind(final Value value, final QueryContext qc) throws QueryException {
     if(!external || compiled) return;
-    bind(declType == null || declType.instance(value) ? value : declType.cast(value, qc, sc, info));
+    bind(type == null || type.instance(value) ? value : type.cast(value, qc, sc, info));
   }
 
   /**
@@ -136,7 +136,7 @@ public final class StaticVar extends StaticDecl {
   private Value bind(final Value value) throws QueryException {
     expr = value;
     val = value;
-    if(declType != null) declType.treat(value, info);
+    if(type != null) type.treat(value, info);
     return val;
   }
 
@@ -156,7 +156,7 @@ public final class StaticVar extends StaticDecl {
   public String toString() {
     final TokenBuilder tb = new TokenBuilder(DECLARE).add(' ').addExt(anns);
     tb.add(VARIABLE).add(' ').add(DOLLAR).add(name.string());
-    if(declType != null) tb.add(' ').add(AS).add(' ').addExt(declType);
+    if(type != null) tb.add(' ').add(AS).add(' ').addExt(type);
     if(external) tb.add(' ').add(EXTERNAL);
     if(expr != null) tb.add(' ').add(ASSIGN).add(' ').addExt(expr);
     return tb.add(';').toString();

@@ -10,7 +10,7 @@ import org.basex.gui.layout.*;
 /**
  * Dialog window for changing some project's preferences.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class DialogPrefs extends BaseXDialog {
@@ -45,7 +45,7 @@ public final class DialogPrefs extends BaseXDialog {
 
     set(tabs, BorderLayout.CENTER);
     action(null);
-    finish(null);
+    finish();
   }
 
   /**
@@ -59,21 +59,20 @@ public final class DialogPrefs extends BaseXDialog {
 
   @Override
   public void action(final Object cmp) {
-    general.action(cmp);
-    editor.action();
-    visual.action();
+    // no short-circuiting, do all checks...
+    ok = general.action(cmp) & editor.action() & visual.action();
     gui.notify.layout();
   }
 
   @Override
   public void close() {
-    cancel();
+    if(ok) cancel();
   }
 
   @Override
   public void cancel() {
     gui.gopts.set(GUIOptions.PREFTAB, tabs.getSelectedIndex());
     gui.context.soptions.write();
-    super.cancel();
+    super.close();
   }
 }

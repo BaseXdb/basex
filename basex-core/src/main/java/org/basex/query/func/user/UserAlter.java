@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class UserAlter extends UserFn {
@@ -23,7 +23,7 @@ public final class UserAlter extends UserFn {
     if(Strings.eq(UserText.ADMIN, name, newname)) throw USER_ADMIN.get(info);
     if(Strings.eq(name, newname)) throw USER_EQUAL_X.get(info, name);
 
-    qc.resources.updates().add(new Alter(user, newname, qc, ii), qc);
+    qc.updates().add(new Alter(user, newname, qc, ii), qc);
     return null;
   }
 
@@ -41,14 +41,14 @@ public final class UserAlter extends UserFn {
      */
     private Alter(final User user, final String newname, final QueryContext qc,
         final InputInfo info) {
-      super(UpdateType.USERALTER, user, "", qc, info);
+      super(UpdateType.USERALTER, user, qc, info);
       this.newname = newname;
     }
 
     @Override
     public void apply() {
       final User old = users.get(newname);
-      if(old != null) users.drop(old, "");
+      if(old != null) users.drop(old);
       users.alter(user, newname);
     }
 

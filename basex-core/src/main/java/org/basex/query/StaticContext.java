@@ -16,7 +16,7 @@ import org.basex.util.hash.*;
 /**
  * This class contains the static context of an expression.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class StaticContext {
@@ -33,21 +33,23 @@ public final class StaticContext {
   public byte[] elemNS;
   /** Default function namespace. */
   public byte[] funcNS = FN_URI;
+  /** Expression contains dynamic function call. */
+  public boolean dynFuncCall;
   /** Static type of context value. */
   SeqType contextType;
 
   /** Construction mode. */
-  boolean strip;
+  public boolean strip;
   /** Ordering mode. */
-  boolean ordered;
+  public boolean ordered = true;
   /** Default order for empty sequences. */
-  boolean orderGreatest;
+  public boolean orderGreatest;
   /** Boundary-space policy. */
-  boolean spaces;
+  public boolean spaces;
   /** Copy-namespaces mode: (no-)preserve. */
-  boolean preserveNS = true;
+  public boolean preserveNS = true;
   /** Copy-namespaces mode: (no-)inherit. */
-  boolean inheritNS = true;
+  public boolean inheritNS = true;
 
   /** Static Base URI. */
   private Uri baseURI = Uri.EMPTY;
@@ -55,7 +57,7 @@ public final class StaticContext {
   UriResolver resolver;
 
   /**
-   * Constructor setting the XQuery version.
+   * Constructor.
    * @param qc query context
    */
   public StaticContext(final QueryContext qc) {

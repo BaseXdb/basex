@@ -9,10 +9,10 @@ import org.junit.*;
 /**
  * This class tests the update features of the {@link Data} class.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Tim Petrowsky
  */
-public final class UpdateTestDeletes extends UpdateTest {
+public final class UpdateTestDeletes extends DataUpdateTest {
   /**
    * Tests deletion of a simple node.
    * @throws IOException I/O exception

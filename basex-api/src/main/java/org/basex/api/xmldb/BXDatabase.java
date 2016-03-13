@@ -14,7 +14,7 @@ import org.xmldb.api.base.Collection;
 /**
  * Implementation of the Database Interface for the XMLDB:API.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class BXDatabase implements Database, BXXMLDBText {
@@ -32,7 +32,7 @@ final class BXDatabase implements Database, BXXMLDBText {
       throws XMLDBException {
     // create database context
     final String name = getCollectionName(uri);
-    final boolean exists = ctx.soptions.dbexists(name);
+    final boolean exists = ctx.soptions.dbExists(name);
     return exists ? new BXCollection(name, true, this) : null;
   }
 

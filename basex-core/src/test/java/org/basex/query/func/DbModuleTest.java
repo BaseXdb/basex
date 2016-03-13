@@ -5,71 +5,76 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 import static org.junit.Assert.*;
 
-import java.io.*;
 import java.util.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.core.parse.Commands.CmdIndex;
+import org.basex.core.cmd.Set;
+import org.basex.core.parse.Commands.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
+import org.basex.util.list.*;
+import org.basex.util.options.*;
 import org.junit.*;
 import org.junit.Test;
 
 /**
  * This class tests the functions of the Database Module.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class DbModuleTest extends AdvancedQueryTest {
   /** Test file. */
-  private static final String FILE = "src/test/resources/input.xml";
+  private static final String XML = "src/test/resources/input.xml";
+  /** Test file. */
+  private static final String CSV = "src/test/resources/input.csv";
   /** Test folder. */
   private static final String FLDR = "src/test/resources/dir/";
   /** Number of XML files for folder. */
-  private static final int NFLDR;
+  private static final int XMLFILES;
 
   static {
-    int fc = 0;
-    for(final IOFile c : new IOFile(FLDR).children()) {
-      if(c.name().endsWith(IO.XMLSUFFIX)) ++fc;
+    int files = 0;
+    for(final IOFile file : new IOFile(FLDR).children()) {
+      if(file.name().endsWith(IO.XMLSUFFIX)) ++files;
     }
-    NFLDR = fc;
+    XMLFILES = files;
   }
 
   /**
    * Initializes a test.
-   * @throws BaseXException database exception
    */
   @Before
-  public void initTest() throws BaseXException {
-    new CreateDB(NAME, FILE).execute(context);
+  public void initTest() {
+    execute(new CreateDB(NAME, XML));
   }
 
   /**
    * Finalizes tests.
-   * @throws IOException I/O exception
    */
-  @AfterClass
-  public static void finish() throws IOException {
-    new DropDB(NAME).execute(context);
+  @After
+  public void finish() {
+    set(MainOptions.TEXTINCLUDE, "");
+    set(MainOptions.ATTRINCLUDE, "");
+    set(MainOptions.TOKENINCLUDE, "");
+    set(MainOptions.FTINCLUDE, "");
+    execute(new DropDB(NAME));
   }
 
   /**
    * Test method.
-   * @throws BaseXException database exception
    */
   @Test
-  public void open() throws BaseXException {
+  public void open() {
     query(COUNT.args(_DB_OPEN.args(NAME)), "1");
     query(COUNT.args(_DB_OPEN.args(NAME, "")), "1");
     query(COUNT.args(_DB_OPEN.args(NAME, "unknown")), "0");
 
     // close database instance
-    new Close().execute(context);
+    execute(new Close());
     query(COUNT.args(_DB_OPEN.args(NAME, "unknown")), "0");
     query(_DB_OPEN.args(NAME) + "//title/text()", "XML");
 
@@ -77,7 +82,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
     if(Prop.WIN) error(_DB_OPEN.args(NAME, "*"), RESINV_X);
 
     // run function on non-existing database
-    new DropDB(NAME).execute(context);
+    execute(new DropDB(NAME));
     error(_DB_OPEN.args(NAME), BXDB_OPEN_X);
   }
 
@@ -97,72 +102,70 @@ public final class DbModuleTest extends AdvancedQueryTest {
     error(_DB_OPEN_ID.args(NAME, Integer.MAX_VALUE), BXDB_RANGE_X_X_X);
   }
 
-  /**
-   * Test method.
-   * @throws BaseXException database exception
-   */
+  /** Test method. */
   @Test
-  public void text() throws BaseXException {
+  public void text() {
     // run function without and with index
-    new DropIndex(CmdIndex.TEXT).execute(context);
-    query(_DB_TEXT.args(NAME, "XML"), "XML");
-    new CreateIndex(CmdIndex.TEXT).execute(context);
+    execute(new DropIndex(CmdIndex.TEXT));
+    error(_DB_TEXT.args(NAME, "XML"), BXDB_INDEX_X);
+    execute(new CreateIndex(CmdIndex.TEXT));
     query(_DB_TEXT.args(NAME, "XML"), "XML");
     query(_DB_TEXT.args(NAME, "XXX"), "");
   }
 
-  /**
-   * Test method.
-   * @throws BaseXException database exception
-   */
+  /** Test method. */
   @Test
-  public void textRange() throws BaseXException {
+  public void textRange() {
     // run function without and with index
-    new DropIndex(CmdIndex.TEXT).execute(context);
-    query(_DB_TEXT_RANGE.args(NAME, "Exercise", "Fun"), "Exercise 1\nExercise 2");
-    new CreateIndex(CmdIndex.TEXT).execute(context);
+    execute(new DropIndex(CmdIndex.TEXT));
+    error(_DB_TEXT_RANGE.args(NAME, "Exercise", "Fun"), BXDB_INDEX_X);
+    execute(new CreateIndex(CmdIndex.TEXT));
     query(_DB_TEXT_RANGE.args(NAME, "Exercise", "Fun"), "Exercise 1\nExercise 2");
     query(_DB_TEXT_RANGE.args(NAME, "XXX", "XXX"), "");
   }
 
-  /**
-   * Test method.
-   * @throws BaseXException database exception
-   */
+  /** Test method. */
   @Test
-  public void attribute() throws BaseXException {
+  public void attribute() {
     // run function without and with index
-    new DropIndex(CmdIndex.ATTRIBUTE).execute(context);
-    query(DATA.args(_DB_ATTRIBUTE.args(NAME, "0")), "0");
-    new CreateIndex(CmdIndex.ATTRIBUTE).execute(context);
+    execute(new DropIndex(CmdIndex.ATTRIBUTE));
+    error(DATA.args(_DB_ATTRIBUTE.args(NAME, "0")), BXDB_INDEX_X);
+    execute(new CreateIndex(CmdIndex.ATTRIBUTE));
     query(DATA.args(_DB_ATTRIBUTE.args(NAME, "0")), "0");
     query(DATA.args(_DB_ATTRIBUTE.args(NAME, "0", "id")), "0");
     query(DATA.args(_DB_ATTRIBUTE.args(NAME, "0", "XXX")), "");
     query(DATA.args(_DB_ATTRIBUTE.args(NAME, "XXX")), "");
   }
 
-  /**
-   * Test method.
-   * @throws BaseXException database exception
-   */
+  /** Test method. */
   @Test
-  public void attributeRange() throws BaseXException {
+  public void attributeRange() {
     // run function without and with index
-    new CreateIndex(CmdIndex.ATTRIBUTE).execute(context);
-    query(_DB_ATTRIBUTE_RANGE.args(NAME, "0", "9") + "/data()", "0\n1");
-    new CreateIndex(CmdIndex.ATTRIBUTE).execute(context);
+    execute(new DropIndex(CmdIndex.ATTRIBUTE));
+    error(_DB_ATTRIBUTE_RANGE.args(NAME, "0", "9") + "/data()", BXDB_INDEX_X);
+    execute(new CreateIndex(CmdIndex.ATTRIBUTE));
     query(_DB_ATTRIBUTE_RANGE.args(NAME, "0", "9") + "/data()", "0\n1");
     query(_DB_ATTRIBUTE_RANGE.args(NAME, "XXX", "XXX"), "");
   }
 
-  /**
-   * Test method.
-   * @throws BaseXException database exception
-   */
+  /** Test method. */
   @Test
-  public void list() throws BaseXException {
+  public void token() {
+    // run function without and with index
+    execute(new DropIndex(CmdIndex.TOKEN));
+    error(DATA.args(_DB_TOKEN.args(NAME, "0")), BXDB_INDEX_X);
+    execute(new CreateIndex(CmdIndex.TOKEN));
+    query(DATA.args(_DB_TOKEN.args(NAME, "0")), "0");
+    query(DATA.args(_DB_TOKEN.args(NAME, "0", "id")), "0");
+    query(DATA.args(_DB_TOKEN.args(NAME, "0", "XXX")), "");
+    query(DATA.args(_DB_TOKEN.args(NAME, "XXX")), "");
+  }
+
+  /** Test method. */
+  @Test
+  public void list() {
     // add documents
-    new Add("test/docs", FLDR).execute(context);
+    execute(new Add("test/docs", FLDR));
     contains(_DB_LIST.args(NAME), "test/docs");
     contains(_DB_LIST.args(NAME, "test/"), "test/docs");
     contains(_DB_LIST.args(NAME, "test/docs/input.xml"), "input.xml");
@@ -170,11 +173,11 @@ public final class DbModuleTest extends AdvancedQueryTest {
     query(_DB_LIST.args(NAME, "bin/"), "bin/b");
     query(_DB_LIST.args(NAME, "bin/b"), "bin/b");
     // create two other database and compare substring
-    new CreateDB(NAME + 1).execute(context);
-    new CreateDB(NAME + 2).execute(context);
+    execute(new CreateDB(NAME + 1));
+    execute(new CreateDB(NAME + 2));
     contains(_DB_LIST.args(), NAME + 1 + '\n' + NAME + 2);
-    new DropDB(NAME + 1).execute(context);
-    new DropDB(NAME + 2).execute(context);
+    execute(new DropDB(NAME + 1));
+    execute(new DropDB(NAME + 2));
   }
 
   /** Test method. */
@@ -204,17 +207,16 @@ public final class DbModuleTest extends AdvancedQueryTest {
     error(_DB_LIST_DETAILS.args("mostProbablyNotAvailable"), BXDB_OPEN_X);
   }
 
-  /** Test method.
-   * @throws BaseXException database exception */
+  /** Test method. */
   @Test
-  public void backups() throws BaseXException {
+  public void backups() {
     query(COUNT.args(_DB_BACKUPS.args(NAME)), "0");
-    new CreateBackup(NAME).execute(context);
+    execute(new CreateBackup(NAME));
     query(COUNT.args(_DB_BACKUPS.args()), "1");
     query(COUNT.args(_DB_BACKUPS.args(NAME)), "1");
     query(COUNT.args(_DB_BACKUPS.args(NAME) + "/(@database, @date, @size)"), "3");
     query(COUNT.args(_DB_BACKUPS.args(NAME + 'X')), "0");
-    new DropBackup(NAME).execute(context);
+    execute(new DropBackup(NAME));
     query(COUNT.args(_DB_BACKUPS.args(NAME)), "0");
   }
 
@@ -251,8 +253,8 @@ public final class DbModuleTest extends AdvancedQueryTest {
     query(_DB_OUTPUT.args("x"), "x");
     query(_DB_OUTPUT.args("('x','y')"), "x\ny");
     query(_DB_OUTPUT.args("<a/>"), "<a/>");
-    error(_DB_OUTPUT.args("x") + ",1", UPALL_X);
-    error(_DB_OUTPUT.args(" count#1"), FISTRING_X);
+    error(_DB_OUTPUT.args("x") + ",1", UPALL);
+    error(_DB_OUTPUT.args(" count#1"), BASX_FITEM_X);
     error("copy $c := <a/> modify " + _DB_OUTPUT.args("x") + " return $c", BASX_DBTRANSFORM);
   }
 
@@ -267,7 +269,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
   @Test
   public void add() {
     query(COUNT.args(COLLECTION.args(NAME)), "1");
-    query(_DB_ADD.args(NAME, FILE));
+    query(_DB_ADD.args(NAME, XML));
     query(COUNT.args(COLLECTION.args(NAME)), "2");
 
     query(_DB_ADD.args(NAME, "\"<root/>\"", "t1.xml"));
@@ -279,18 +281,18 @@ public final class DbModuleTest extends AdvancedQueryTest {
     query(_DB_ADD.args(NAME, " <root/>", "test/t3.xml"));
     query(COUNT.args(COLLECTION.args(NAME + "/test/t3.xml") + "/root"), "1");
 
-    query(_DB_ADD.args(NAME, FILE, "in/"));
+    query(_DB_ADD.args(NAME, XML, "in/"));
     query(COUNT.args(COLLECTION.args(NAME + "/in/input.xml") + "/html"), "1");
 
-    query(_DB_ADD.args(NAME, FILE, "test/t4.xml"));
+    query(_DB_ADD.args(NAME, XML, "test/t4.xml"));
     query(COUNT.args(COLLECTION.args(NAME + "/test/t4.xml") + "/html"), "1");
 
     query(_DB_ADD.args(NAME, FLDR, "test/dir"));
-    query(COUNT.args(COLLECTION.args(NAME + "/test/dir")), NFLDR);
+    query(COUNT.args(COLLECTION.args(NAME + "/test/dir")), XMLFILES);
 
     query("for $f in " + _FILE_LIST.args(FLDR, true, "*.xml") +
         " return " + _DB_ADD.args(NAME, " '" + FLDR + "' || $f", "dir"));
-    query(COUNT.args(COLLECTION.args(NAME + "/dir")), NFLDR);
+    query(COUNT.args(COLLECTION.args(NAME + "/dir")), XMLFILES);
 
     query("for $i in 1 to 3 return " +
         _DB_ADD.args(NAME, "\"<root/>\"", "\"doc\" || $i"));
@@ -298,10 +300,40 @@ public final class DbModuleTest extends AdvancedQueryTest {
         COLLECTION.args('"' + NAME + "/doc\" || $i")), 3);
 
     // specify parsing options
-    query(_DB_ADD.args(NAME, " '<a> </a>'", "chop.xml", " map { 'chop':true() }"));
+    query(_DB_ADD.args(NAME, " '<a> </a>'", "chop.xml",
+        " map { '" + lc(MainOptions.CHOP) + "':true() }"));
     query(_DB_OPEN.args(NAME, "chop.xml"), "<a/>");
-    query(_DB_ADD.args(NAME, " '<a> </a>'", "nochop.xml", " map { 'chop':false() }"));
+    query(_DB_ADD.args(NAME, " '<a> </a>'", "nochop.xml",
+        " map { '" + lc(MainOptions.CHOP) + "':false() }"));
     query(_DB_OPEN.args(NAME, "nochop.xml"), "<a> </a>");
+
+    // specify parsing options
+    query(_DB_ADD.args(NAME, CSV, "csv.xml",
+        " map { 'parser':'csv','csvparser': 'header=true' }"));
+    query(EXISTS.args(_DB_OPEN.args(NAME, "csv.xml") + "//City"), "true");
+    query(_DB_ADD.args(NAME, CSV, "csv.xml",
+        " map { 'parser':'csv','csvparser': map { 'header': 'true' } }"));
+    query(EXISTS.args(_DB_OPEN.args(NAME, "csv.xml") + "//City"), "true");
+    query(_DB_ADD.args(NAME, CSV, "csv.xml",
+        " map { 'parser':'csv','csvparser': map { 'header': true() } }"));
+    query(EXISTS.args(_DB_OPEN.args(NAME, "csv.xml") + "//City"), "true");
+
+    final String addcache = " map { 'addcache': true() }";
+    query(_DB_ADD.args(NAME, "<cache/>", "cache1.xml", addcache));
+    query(EXISTS.args(_DB_OPEN.args(NAME, "cache1.xml")), "true");
+    query(_DB_ADD.args(NAME, " \"<cache/>\"", "cache2.xml", addcache));
+    query(EXISTS.args(_DB_OPEN.args(NAME, "cache2.xml")), "true");
+    query(_DB_ADD.args(NAME, XML, "cache3.xml", addcache));
+    query(EXISTS.args(_DB_OPEN.args(NAME, "cache3.xml")), "true");
+
+    error(_DB_ADD.args(NAME, CSV, "csv.xml",
+        " map { 'parser':('csv','html') }"), INVALIDOPT_X);
+    error(_DB_ADD.args(NAME, CSV, "csv.xml",
+        " map { 'parser':'csv','csvparser': map { 'header': ('true','false') } }"), INVALIDOPT_X);
+    error(_DB_ADD.args(NAME, CSV, "csv.xml",
+        " map { 'parser':'csv','csvparser': map { 'headr': 'true' } }"), BASX_WHICH_X);
+    error(_DB_ADD.args(NAME, CSV, "csv.xml",
+        " map { 'parser':'csv','csvparser': 'headr=true' }"), BASX_WHICH_X);
   }
 
   /** Test method. */
@@ -310,24 +342,18 @@ public final class DbModuleTest extends AdvancedQueryTest {
     query(_DB_ADD.args(NAME, " document { <x xmlns:a='a' a:y='' /> }", "x"));
   }
 
-  /**
-   * Test method.
-   * @throws BaseXException database exception
-   */
+  /** Test method. */
   @Test
-  public void delete() throws BaseXException {
-    new Add("test/docs", FLDR).execute(context);
+  public void delete() {
+    execute(new Add("test/docs", FLDR));
     query(_DB_DELETE.args(NAME, "test"));
     query(COUNT.args(COLLECTION.args(NAME + "/test")), 0);
   }
 
-  /**
-   * Test method.
-   * @throws BaseXException database exception
-   */
+  /** Test method. */
   @Test
-  public void create() throws BaseXException {
-    new Close().execute(context);
+  public void create() {
+    execute(new Close());
 
     // create DB without initial content
     query(_DB_CREATE.args(NAME));
@@ -354,16 +380,16 @@ public final class DbModuleTest extends AdvancedQueryTest {
     error(_DB_CREATE.args(NAME) + ',' + _DB_CREATE.args(NAME), BXDB_ONCE_X_X);
 
     // create DB from file
-    query(_DB_CREATE.args(NAME, FILE, "in/"));
+    query(_DB_CREATE.args(NAME, XML, "in/"));
     query(COUNT.args(COLLECTION.args(NAME + "/in/input.xml") + "/html"), "1");
 
     // create DB from folder
     query(_DB_CREATE.args(NAME, FLDR, "test/dir"));
-    query(COUNT.args(COLLECTION.args(NAME + "/test/dir")), NFLDR);
+    query(COUNT.args(COLLECTION.args(NAME + "/test/dir")), XMLFILES);
 
     // create DB w/ more than one input
     query(_DB_CREATE.args(NAME, "(<a/>,<b/>)", "('1.xml','2.xml')"));
-    query(_DB_CREATE.args(NAME, "(<a/>,'" + FILE + "')", "('1.xml','2.xml')"));
+    query(_DB_CREATE.args(NAME, "(<a/>,'" + XML + "')", "('1.xml','2.xml')"));
 
     error(_DB_CREATE.args(NAME, "()", "1.xml"), BXDB_CREATEARGS_X_X);
     error(_DB_CREATE.args(NAME, "(<a/>,<b/>)", "1.xml"), BXDB_CREATEARGS_X_X);
@@ -392,43 +418,50 @@ public final class DbModuleTest extends AdvancedQueryTest {
 
     // specify index options
     for(final boolean b : new boolean[] { false, true }) {
-      query(_DB_CREATE.args(NAME, "()", "()", " map { 'updindex':" + b + "() }"));
-      query(_DB_INFO.args(NAME) + "//updindex/text()", b);
+      query(_DB_CREATE.args(NAME, "()", "()",
+          " map { '" + lc(MainOptions.UPDINDEX) + "':" + b + "() }"));
+      query(_DB_INFO.args(NAME) + "//" + lc(MainOptions.UPDINDEX) + "/text()", b);
     }
     assertEquals(context.options.get(MainOptions.UPDINDEX), false);
 
-    final String[] nopt = { "maxcats", "maxlen", "indexsplitsize", "ftindexsplitsize" };
-    for(final String k : nopt) {
-      query(_DB_CREATE.args(NAME, "()", "()", " map { '" + k + "':1 }"));
+    final String[] numberOptions = lc(MainOptions.MAXCATS, MainOptions.MAXLEN,
+        MainOptions.SPLITSIZE);
+    final String[] boolOptions = lc(MainOptions.TEXTINDEX, MainOptions.ATTRINDEX,
+        MainOptions.TOKENINDEX, MainOptions.FTINDEX, MainOptions.STEMMING,
+        MainOptions.CASESENS, MainOptions.DIACRITICS);
+    final String[] stringOptions = lc(MainOptions.LANGUAGE, MainOptions.STOPWORDS);
+
+    for(final String option : numberOptions) {
+      query(_DB_CREATE.args(NAME, "()", "()", " map { '" + option + "':1 }"));
     }
-    final String[] bopt = { "textindex", "attrindex", "ftindex", "stemming",
-        "casesens", "diacritics" };
-    for(final String k : bopt) {
+    for(final String option : boolOptions) {
       for(final boolean v : new boolean[] { true, false }) {
-        query(_DB_CREATE.args(NAME, "()", "()", " map { '" + k + "':" + v + "() }"));
+        query(_DB_CREATE.args(NAME, "()", "()", " map { '" + option + "':" + v + "() }"));
       }
     }
-    final String[] sopt = { "language", "stopwords" };
-    for(final String k : sopt) {
-      query(_DB_CREATE.args(NAME, "()", "()", " map { '" + k + "':'' }"));
+    for(final String option : stringOptions) {
+      query(_DB_CREATE.args(NAME, "()", "()", " map { '" + option + "':'' }"));
     }
 
     // specify parsing options
-    query(_DB_CREATE.args(NAME, " '<a> </a>'", "a.xml", " map { 'chop':true() }"));
+    query(_DB_CREATE.args(NAME, " '<a> </a>'", "a.xml",
+        " map { '" + lc(MainOptions.CHOP) + "':true() }"));
     query(_DB_OPEN.args(NAME), "<a/>");
-    query(_DB_CREATE.args(NAME, " '<a> </a>'", "a.xml", " map { 'chop':false() }"));
+    query(_DB_CREATE.args(NAME, " '<a> </a>'", "a.xml",
+        " map { '" + lc(MainOptions.CHOP) + "':false() }"));
     query(_DB_OPEN.args(NAME), "<a> </a>");
 
     // specify unknown or invalid options
     error(_DB_CREATE.args(NAME, "()", "()", " map { 'xyz':'abc' }"), BASX_OPTIONS_X);
-    error(_DB_CREATE.args(NAME, "()", "()", " map { 'maxlen':-1 }"), BASX_VALUE_X_X);
-    error(_DB_CREATE.args(NAME, "()", "()", " map { 'maxlen':'a' }"), BASX_VALUE_X_X);
-    error(_DB_CREATE.args(NAME, "()", "()", " map { 'textindex':'nope' }"), BASX_VALUE_X_X);
+    error(_DB_CREATE.args(NAME, "()", "()", " map { '" + lc(MainOptions.MAXLEN) + "':-1 }"),
+        BASX_VALUE_X_X);
+    error(_DB_CREATE.args(NAME, "()", "()", " map { '" + lc(MainOptions.MAXLEN) + "':'a' }"),
+        BASX_VALUE_X_X);
+    error(_DB_CREATE.args(NAME, "()", "()", " map { '" + lc(MainOptions.TEXTINDEX) + "':'nope' }"),
+        BASX_VALUE_X_X);
   }
 
-  /**
-   * Test method.
-   */
+  /** Test method. */
   @Test
   public void drop() {
     // non-existing DB name
@@ -445,145 +478,173 @@ public final class DbModuleTest extends AdvancedQueryTest {
     error(_DB_DROP.args(dbname), BXDB_WHICH_X);
   }
 
-  /**
-   * Test method, using a mix of command and XQuery calls.
-   * @throws BaseXException database exception
-   */
+  /** Test method. */
   @Test
-  public void createCommand() throws BaseXException {
+  public void createCommand() {
     final String dbname = NAME + "DBCreate";
     query(_DB_CREATE.args(dbname));
-    new Open(dbname).execute(context);
+    execute(new Open(dbname));
     error(_DB_CREATE.args(dbname), BXDB_OPENED_X);
     // close and try again
-    new Close().execute(context);
+    execute(new Close());
     query(_DB_CREATE.args(dbname));
     // eventually drop database
     query(_DB_DROP.args(dbname));
   }
 
-  /**
-   * Test method.
-   * @throws BaseXException database exception
-   */
+  /** Test method. */
   @Test
-  public void rename() throws BaseXException {
-    new Add("test/docs", FLDR).execute(context);
-    query(COUNT.args(COLLECTION.args(NAME + "/test")), NFLDR);
+  public void rename() {
+    execute(new Add("test/docs", FLDR));
+    query(COUNT.args(COLLECTION.args(NAME + "/test")), XMLFILES);
 
     // rename document
     query(_DB_RENAME.args(NAME, "test", "newtest"));
     query(COUNT.args(COLLECTION.args(NAME + "/test")), 0);
-    query(COUNT.args(COLLECTION.args(NAME + "/newtest")), NFLDR);
+    query(COUNT.args(COLLECTION.args(NAME + "/newtest")), XMLFILES);
+
+    // invalid target
+    error(_DB_RENAME.args(NAME, "input.xml", " ''"), BXDB_PATH_X);
+    error(_DB_RENAME.args(NAME, "input.xml", " '/'"), BXDB_PATH_X);
+    error(_DB_RENAME.args(NAME, "input.xml", " '.'"), BXDB_PATH_X);
 
     // rename paths
     query(_DB_RENAME.args(NAME, "", "x"));
-    query(COUNT.args(COLLECTION.args(NAME + "/x/newtest")), NFLDR);
+    query(COUNT.args(COLLECTION.args(NAME + "/x/newtest")), XMLFILES);
 
     // rename binary file
-    query(_DB_STORE.args(NAME, "one", ""));
-    query(_DB_RENAME.args(NAME, "one", "two"));
-    query(_DB_RETRIEVE.args(NAME, "two"));
-    error(_DB_RETRIEVE.args(NAME, "one"), WHICHRES_X);
+    query(_DB_STORE.args(NAME, "file1", ""));
+    query(_DB_RENAME.args(NAME, "file1", "file2"));
+    query(_DB_RETRIEVE.args(NAME, "file2"));
+    error(_DB_RETRIEVE.args(NAME, "file1"), WHICHRES_X);
 
-    // invalid target
-    error(_DB_RENAME.args(NAME, "x/input.xml", " ''"), BXDB_RENAME_X);
-    error(_DB_RENAME.args(NAME, "x/input.xml", " '/'"), BXDB_RENAME_X);
-    error(_DB_RENAME.args(NAME, "x/input.xml", " '.'"), BXDB_RENAME_X);
+    query(_DB_RENAME.args(NAME, "file2", "dir1/file3"));
+    query(_DB_RETRIEVE.args(NAME, "dir1/file3"));
+    query(_DB_RENAME.args(NAME, "dir1", "dir2"));
+    query(_DB_RETRIEVE.args(NAME, "dir2/file3"));
+    error(_DB_RETRIEVE.args(NAME, "dir1"), WHICHRES_X);
+
+    query(_DB_STORE.args(NAME, "file4", ""));
+    query(_DB_STORE.args(NAME, "dir3/file5", ""));
+
+    error(_DB_RENAME.args(NAME, "dir2", "file4"), BXDB_PATH_X);
+    error(_DB_RENAME.args(NAME, "file4", "dir2"), BXDB_PATH_X);
+
+    // move files in directories
+    query(_DB_RENAME.args(NAME, "dir2", "dir3"));
+    query(_DB_RETRIEVE.args(NAME, "dir3/file3"));
+    query(_DB_RETRIEVE.args(NAME, "dir3/file5"));
   }
 
-  /**
-   * Test method.
-   * @throws BaseXException database exception
-   */
+  /** Test method. */
   @Test
-  public void replace() throws BaseXException {
-    new Add("test", FILE).execute(context);
+  public void replace() {
+    execute(new Add("test", XML));
 
-    query(_DB_REPLACE.args(NAME, FILE, "\"<R1/>\""));
-    query(COUNT.args(COLLECTION.args(NAME + '/' + FILE) + "/R1"), 1);
-    query(COUNT.args(COLLECTION.args(NAME + '/' + FILE) + "/R2"), 0);
+    query(_DB_REPLACE.args(NAME, XML, "\"<R1/>\""));
+    query(COUNT.args(COLLECTION.args(NAME + '/' + XML) + "/R1"), 1);
+    query(COUNT.args(COLLECTION.args(NAME + '/' + XML) + "/R2"), 0);
 
-    query(_DB_REPLACE.args(NAME, FILE, " document { <R2/> }"));
-    query(COUNT.args(COLLECTION.args(NAME + '/' + FILE) + "/R1"), 0);
-    query(COUNT.args(COLLECTION.args(NAME + '/' + FILE) + "/R2"), 1);
+    query(_DB_REPLACE.args(NAME, XML, " document { <R2/> }"));
+    query(COUNT.args(COLLECTION.args(NAME + '/' + XML) + "/R1"), 0);
+    query(COUNT.args(COLLECTION.args(NAME + '/' + XML) + "/R2"), 1);
 
-    query(_DB_REPLACE.args(NAME, FILE, FILE));
-    query(COUNT.args(COLLECTION.args(NAME + '/' + FILE) + "/R1"), 0);
-    query(COUNT.args(COLLECTION.args(NAME + '/' + FILE) + "/R2"), 0);
-    query(COUNT.args(COLLECTION.args(NAME + '/' + FILE) + "/html"), 1);
+    query(_DB_REPLACE.args(NAME, XML, XML));
+    query(COUNT.args(COLLECTION.args(NAME + '/' + XML) + "/R1"), 0);
+    query(COUNT.args(COLLECTION.args(NAME + '/' + XML) + "/R2"), 0);
+    query(COUNT.args(COLLECTION.args(NAME + '/' + XML) + "/html"), 1);
+
+    final String addcache = " map { 'addcache': true() }";
+    query(_DB_REPLACE.args(NAME, "cache1.xml", "<cache/>", addcache));
+    query(EXISTS.args(_DB_OPEN.args(NAME, "cache1.xml")), "true");
+    query(_DB_REPLACE.args(NAME, "cache2.xml", " \"<cache/>\"", addcache));
+    query(EXISTS.args(_DB_OPEN.args(NAME, "cache2.xml")), "true");
+    query(_DB_REPLACE.args(NAME, "cache3.xml", XML, addcache));
+    query(EXISTS.args(_DB_OPEN.args(NAME, "cache3.xml")), "true");
   }
 
-  /**
-   * Test method.
-   * @throws BaseXException database exception
-   */
+  /** Test method. */
   @Test
-  public void optimize() throws BaseXException {
+  public void optimize() {
+    // simple optimize call
     query(_DB_OPTIMIZE.args(NAME));
     query(_DB_OPTIMIZE.args(NAME));
+    // opened database cannot be fully optimized
     error(_DB_OPTIMIZE.args(NAME, true), UPDBOPTERR_X);
-    new Close().execute(context);
+    execute(new Close());
     query(_DB_OPTIMIZE.args(NAME, true));
 
-    // specify additional index options
-    final String[] nopt = { "maxcats", "maxlen", "indexsplitsize", "ftindexsplitsize" };
-    for(final String k : nopt) {
-      query(_DB_OPTIMIZE.args(NAME, false, " map { '" + k + "': 1 }"));
+    // commands
+    final CmdIndex[] cis = { CmdIndex.TEXT, CmdIndex.ATTRIBUTE, CmdIndex.TOKEN, CmdIndex.FULLTEXT };
+    // options
+    final String[] indexes = lc(MainOptions.TEXTINDEX, MainOptions.ATTRINDEX,
+        MainOptions.TOKENINDEX, MainOptions.FTINDEX);
+    final String[] includes = lc(MainOptions.TEXTINCLUDE, MainOptions.ATTRINCLUDE,
+        MainOptions.TOKENINCLUDE, MainOptions.FTINCLUDE);
+    final String[] boolOptions = new StringList(indexes).add(lc(MainOptions.STEMMING,
+        MainOptions.CASESENS, MainOptions.DIACRITICS)).finish();
+    final String[] stringOptions = lc(MainOptions.LANGUAGE, MainOptions.STOPWORDS);
+    final String[] numberOptions = lc(MainOptions.MAXCATS, MainOptions.MAXLEN,
+        MainOptions.SPLITSIZE);
+
+    // check single options
+    for(final String option : numberOptions)
+      query(_DB_OPTIMIZE.args(NAME, false, " map { '" + option + "': 1 }"));
+    for(final String option : boolOptions) {
+      for(final boolean bool : new boolean[] { true, false })
+        query(_DB_OPTIMIZE.args(NAME, false, " map { '" + option + "':" + bool + "() }"));
     }
-    final String[] bopt = { "textindex", "attrindex", "ftindex", "stemming",
-        "casesens", "diacritics" };
-    for(final String k : bopt) {
-      for(final boolean v : new boolean[] { true, false }) {
-        query(_DB_OPTIMIZE.args(NAME, false, " map { '" + k + "':" + v + "() }"));
-      }
-    }
-    final String[] sopt = { "language", "stopwords" };
-    for(final String k : sopt) {
-      query(_DB_OPTIMIZE.args(NAME, false, " map { '" + k + "':'' }"));
-    }
+    for(final String option : stringOptions)
+      query(_DB_OPTIMIZE.args(NAME, false, " map { '" + option + "':'' }"));
+    // ensure that option in context was not changed
     assertEquals(context.options.get(MainOptions.TEXTINDEX), true);
 
+    // check invalid options
     error(_DB_OPTIMIZE.args(NAME, false, " map { 'xyz': 'abc' }"), BASX_OPTIONS_X);
-    error(_DB_OPTIMIZE.args(NAME, false, " map { 'updindex': 1 }"), BASX_OPTIONS_X);
-    error(_DB_OPTIMIZE.args(NAME, false, " map { 'maxlen': -1 }"), BASX_VALUE_X_X);
-    error(_DB_OPTIMIZE.args(NAME, false, " map { 'maxlen': 'a' }"), BASX_VALUE_X_X);
-    error(_DB_OPTIMIZE.args(NAME, false, " map { 'textindex':'nope' }"), BASX_VALUE_X_X);
+    error(_DB_OPTIMIZE.args(NAME, false, " map { '" + lc(MainOptions.UPDINDEX) + "': 1 }"),
+        BASX_OPTIONS_X);
+    error(_DB_OPTIMIZE.args(NAME, false, " map { '" + lc(MainOptions.MAXLEN) + "': -1 }"),
+        BASX_VALUE_X_X);
+    error(_DB_OPTIMIZE.args(NAME, false, " map { '" + lc(MainOptions.MAXLEN) + "': 'a' }"),
+        BASX_VALUE_X_X);
+    error(_DB_OPTIMIZE.args(NAME, false, " map { '" + lc(MainOptions.TEXTINDEX) + "':'nope' }"),
+        BASX_VALUE_X_X);
 
-    // check if optimize call preserves original options
+    // check if optimize call adopts original options
     query(_DB_OPTIMIZE.args(NAME));
-    query(_DB_INFO.args(NAME) + "//textindex/text()", "false");
-    query(_DB_INFO.args(NAME) + "//attrindex/text()", "false");
-    query(_DB_INFO.args(NAME) + "//ftindex/text()", "false");
+    for(final String ind : indexes) query(_DB_INFO.args(NAME) + "//" + ind + "/text()", "false");
+    for(final String inc : includes) query(_DB_INFO.args(NAME) + "//" + inc + "/text()", "");
 
-    new Open(NAME).execute(context);
-    new CreateIndex(CmdIndex.TEXT).execute(context);
-    new CreateIndex(CmdIndex.ATTRIBUTE).execute(context);
-    new CreateIndex(CmdIndex.FULLTEXT).execute(context);
-    new Close().execute(context);
-
+    // check if options in context are adopted
+    execute(new Open(NAME));
+    for(final String inc : includes) execute(new Set(inc, "a"));
+    for(final CmdIndex ci : cis) execute(new CreateIndex(ci));
+    execute(new Close());
     query(_DB_OPTIMIZE.args(NAME));
-    query(_DB_INFO.args(NAME) + "//textindex/text()", "true");
-    query(_DB_INFO.args(NAME) + "//attrindex/text()", "true");
-    query(_DB_INFO.args(NAME) + "//ftindex/text()", "true");
+    for(final String ind : indexes) query(_DB_INFO.args(NAME) + "//" + ind + "/text()", "true");
+    for(final String inc : includes) query(_DB_INFO.args(NAME) + "//" + inc + "/text()", "a");
 
-    new Open(NAME).execute(context);
-    new DropIndex(CmdIndex.TEXT).execute(context);
-    new DropIndex(CmdIndex.ATTRIBUTE).execute(context);
-    new DropIndex(CmdIndex.FULLTEXT).execute(context);
-    new Close().execute(context);
-
+    // check if options in context are adopted, even if database is closed (reset options)
+    execute(new Open(NAME));
+    for(final String inc : includes) execute(new Set(inc, ""));
+    for(final CmdIndex cmd : cis) execute(new DropIndex(cmd));
+    for(final String ind : indexes) query(_DB_INFO.args(NAME) + "//" + ind + "/text()", "false");
+    for(final String inc : includes) query(_DB_INFO.args(NAME) + "//" + inc + "/text()", "");
+    execute(new Close());
     query(_DB_OPTIMIZE.args(NAME));
-    query(_DB_INFO.args(NAME) + "//textindex/text()", "false");
-    query(_DB_INFO.args(NAME) + "//attrindex/text()", "false");
-    query(_DB_INFO.args(NAME) + "//ftindex/text()", "false");
+    for(final String ind : indexes) query(_DB_INFO.args(NAME) + "//" + ind + "/text()", "false");
+    for(final String inc : includes) query(_DB_INFO.args(NAME) + "//" + inc + "/text()", "");
 
-    query(_DB_OPTIMIZE.args(NAME, true,
-        " map { 'textindex':true(),'attrindex':true(),'ftindex':true(),'updindex':true() }"));
-    query(_DB_INFO.args(NAME) + "//textindex/text()", "true");
-    query(_DB_INFO.args(NAME) + "//attrindex/text()", "true");
-    query(_DB_INFO.args(NAME) + "//ftindex/text()", "true");
-    query(_DB_INFO.args(NAME) + "//updindex/text()", "true");
+    // check if options specified in map are adopted
+    final StringBuilder options = new StringBuilder();
+    for(final String option : indexes) options.append("'").append(option).append("':true(),");
+    for(final String option : includes) options.append("'").append(option).append("':'a',");
+    options.append("'").append(lc(MainOptions.UPDINDEX)).append("':true()");
+    query(_DB_OPTIMIZE.args(NAME, true, " map { " + options + "}"));
+
+    for(final String ind : indexes) query(_DB_INFO.args(NAME) + "//" + ind + "/text()", "true");
+    for(final String inc : includes) query(_DB_INFO.args(NAME) + "//" + inc + "/text()", "a");
+    query(_DB_INFO.args(NAME) + "//" + lc(MainOptions.UPDINDEX) + "/text()", "true");
   }
 
   /** Test method. */
@@ -591,7 +652,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
   public void retrieve() {
     error(_DB_RETRIEVE.args(NAME, "raw"), WHICHRES_X);
     query(_DB_STORE.args(NAME, "raw", "xs:hexBinary('41')"));
-    query("xs:hexBinary(" + _DB_RETRIEVE.args(NAME, "raw") + ')', "41");
+    query("xs:hexBinary(" + _DB_RETRIEVE.args(NAME, "raw") + ')', "A");
     query(_DB_DELETE.args(NAME, "raw"));
     error(_DB_RETRIEVE.args(NAME, "raw"), WHICHRES_X);
   }
@@ -601,9 +662,9 @@ public final class DbModuleTest extends AdvancedQueryTest {
   public void store() {
     query(_DB_STORE.args(NAME, "raw1", "xs:hexBinary('41')"));
     query(_DB_STORE.args(NAME, "raw2", "b"));
-    query("xs:hexBinary(" + _DB_RETRIEVE.args(NAME, "raw2") + ')', "62");
+    query(_DB_RETRIEVE.args(NAME, "raw2"), "b");
     query(_DB_STORE.args(NAME, "raw3", 123));
-    query("xs:hexBinary(" + _DB_RETRIEVE.args(NAME, "raw3") + ')', "313233");
+    query(_DB_RETRIEVE.args(NAME, "raw3"), "123");
   }
 
   /** Test method. */
@@ -623,12 +684,9 @@ public final class DbModuleTest extends AdvancedQueryTest {
     query(_DB_IS_RAW.args(NAME, "xxx"), "false");
   }
 
-  /**
-   * Test method.
-   * @throws BaseXException database exception
-   */
+  /** Test method. */
   @Test
-  public void exists() throws BaseXException {
+  public void exists() {
     query(_DB_ADD.args(NAME, "\"<a/>\"", "x/xml"));
     query(_DB_STORE.args(NAME, "x/raw", "bla"));
     // checks if the specified resources exist (false expected for directories)
@@ -639,7 +697,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
     query(_DB_EXISTS.args(NAME, "x"), "false");
     query(_DB_EXISTS.args(NAME, ""), "false");
     // false expected for missing database
-    new DropDB(NAME).execute(context);
+    execute(new DropDB(NAME));
     query(_DB_EXISTS.args(NAME), "false");
   }
 
@@ -668,7 +726,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
   public void export() {
     // exports the database
     query(_DB_EXPORT.args(NAME, new IOFile(Prop.TMP, NAME)));
-    final IOFile f = new IOFile(new IOFile(Prop.TMP, NAME), FILE.replaceAll(".*/", ""));
+    final IOFile f = new IOFile(new IOFile(Prop.TMP, NAME), XML.replaceAll(".*/", ""));
     query(_FILE_EXISTS.args(f));
     // serializes as text; ensures that the output contains no angle bracket
     query(_DB_EXPORT.args(NAME, new IOFile(Prop.TMP, NAME), " map {'method':'text'}"));
@@ -687,14 +745,12 @@ public final class DbModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void path() {
-    query(_DB_PATH.args(_DB_OPEN.args(NAME)), FILE.replaceAll(".*/", ""));
-    query(_DB_PATH.args(_DB_OPEN.args(NAME) + "/*"), FILE.replaceAll(".*/", ""));
+    query(_DB_PATH.args(_DB_OPEN.args(NAME)), XML.replaceAll(".*/", ""));
+    query(_DB_PATH.args(_DB_OPEN.args(NAME) + "/*"), XML.replaceAll(".*/", ""));
     query(_DB_PATH.args("<x/> update ()"), "");
   }
 
-  /**
-   * db:create-backup test method.
-   */
+  /** Test method. */
   @Test
   public void createBackup() {
     query(COUNT.args(_DB_BACKUPS.args(NAME)), "0");
@@ -707,9 +763,7 @@ public final class DbModuleTest extends AdvancedQueryTest {
     error(_DB_CREATE_BACKUP.args(NAME + "backup"), BXDB_WHICH_X);
   }
 
-  /**
-   * db:drop-backup test method.
-   */
+  /** Test method. */
   @Test
   public void dropBackup() {
     // create and drop backup
@@ -729,14 +783,11 @@ public final class DbModuleTest extends AdvancedQueryTest {
     error(_DB_CREATE_BACKUP.args(NAME) + ',' + _DB_DROP_BACKUP.args(NAME), BXDB_WHICHBACK_X);
   }
 
-  /**
-   * db:copy test method.
-   * @throws BaseXException database exception
-   */
+  /** Test method. */
   @Test
-  public void copy() throws BaseXException {
+  public void copy() {
     // close database in global context
-    new Close().execute(context);
+    execute(new Close());
 
     // copy database to new name and vice versa
     query(_DB_COPY.args(NAME, NAME + 'c'));
@@ -756,14 +807,11 @@ public final class DbModuleTest extends AdvancedQueryTest {
     error(_DB_COPY.args(NAME + "copy", NAME), BXDB_WHICH_X);
   }
 
-  /**
-   * db:alter test method.
-   * @throws BaseXException database exception
-   */
+  /** Test method. */
   @Test
-  public void alter() throws BaseXException {
+  public void alter() {
     // close database in global context
-    new Close().execute(context);
+    execute(new Close());
 
     // rename database to new name and vice versa
     query(_DB_ALTER.args(NAME, NAME + 'a'));
@@ -779,13 +827,10 @@ public final class DbModuleTest extends AdvancedQueryTest {
     error(_DB_ALTER.args(NAME + "alter", NAME), BXDB_WHICH_X);
   }
 
-  /**
-   * db:restore test method.
-   * @throws BaseXException database exception
-   */
+  /** Test method. */
   @Test
-  public void restore() throws BaseXException {
-    new Close().execute(context);
+  public void restore() {
+    execute(new Close());
 
     // backup and restore file
     query(_DB_CREATE_BACKUP.args(NAME));
@@ -798,5 +843,25 @@ public final class DbModuleTest extends AdvancedQueryTest {
 
     // invalid names
     error(_DB_RESTORE.args(" ''"), BXDB_NAME_X);
+  }
+
+  /**
+   * Returns lower-case representations of the specified options.
+   * @param options options
+   * @return string
+   */
+  private String[] lc(final Option<?>... options) {
+    final StringList sl = new StringList();
+    for(final Option<?> option : options) sl.add(lc(option));
+    return sl.finish();
+  }
+
+  /**
+   * Returns a lower-case representation of the specified option.
+   * @param option option
+   * @return string
+   */
+  private String lc(final Option<?> option) {
+    return option.name().toLowerCase(Locale.ENGLISH);
   }
 }

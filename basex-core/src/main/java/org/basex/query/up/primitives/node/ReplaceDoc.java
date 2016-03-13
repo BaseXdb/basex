@@ -15,12 +15,12 @@ import org.basex.util.options.*;
 /**
  * Replace document primitive.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class ReplaceDoc extends NodeUpdate {
   /** Container for new database documents. */
-  private final DBNew replace;
+  private final DBNew newDocs;
   /** Database update options. */
   private final DBOptions options;
 
@@ -39,17 +39,17 @@ public final class ReplaceDoc extends NodeUpdate {
 
     super(UpdateType.REPLACENODE, pre, data, info);
     options = new DBOptions(opts, DBOptions.PARSING, info);
-    replace = new DBNew(qc, Arrays.asList(input), info);
+    newDocs = new DBNew(qc, Arrays.asList(input), options, info);
   }
 
   @Override
   public void prepare(final MemData tmp) throws QueryException {
-    replace.addDocs(tmp, data.meta.name, options);
+    newDocs.prepare(data.meta.name);
   }
 
   @Override
   public void merge(final Update update) throws QueryException {
-    throw UPMULTDOC_X_X.get(info, data.meta.name, replace.inputs.get(0).path);
+    throw UPMULTDOC_X_X.get(info, data.meta.name, newDocs.inputs.get(0).path);
   }
 
   @Override
@@ -59,7 +59,7 @@ public final class ReplaceDoc extends NodeUpdate {
 
   @Override
   public void addAtomics(final AtomicUpdateCache auc) {
-    auc.addReplace(pre, new DataClip(replace.data));
+    auc.addReplace(pre, new DataClip(newDocs.data));
   }
 
   @Override

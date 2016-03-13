@@ -20,7 +20,7 @@ import org.basex.util.list.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class DbListDetails extends DbList {
@@ -94,7 +94,7 @@ public final class DbListDetails extends DbList {
           final MetaData meta = new MetaData(name, ctx.options, ctx.soptions);
           meta.read();
           // count number of raw files
-          final int bin = new IOFile(ctx.soptions.dbpath(name), IO.RAW).descendants().size();
+          final int bin = new IOFile(ctx.soptions.dbPath(name), IO.RAW).descendants().size();
           final FElem res = new FElem(DATABASE);
           res.add(RESOURCES, token(meta.ndocs + bin));
           res.add(MDATE, DateTime.format(new Date(meta.dbtime())));
@@ -114,13 +114,13 @@ public final class DbListDetails extends DbList {
   }
 
   /**
-   * Create a <code>&lt;resource/&gt;</code> node.
+   * Create a {@code &lt;resource/&gt;} node.
    * @param path path
    * @param raw is the resource a raw file
    * @param size size
    * @param type media type
    * @param mdate modified date
-   * @return <code>&lt;resource/&gt;</code> node
+   * @return {@code &lt;resource/&gt;} node
    */
   private static FNode resource(final byte[] path, final boolean raw, final long size,
       final MediaType type, final long mdate) {

@@ -22,7 +22,7 @@ import org.basex.util.list.*;
 /**
  * This class offers a real tree view.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Wolfgang Miller
  */
 public final class TreeView extends View implements TreeConstants {
@@ -159,86 +159,89 @@ public final class TreeView extends View implements TreeConstants {
     else if(slimToTextChanged() && paintType == Refresh.VOID) paintType = Refresh.RESIZE;
 
     super.paintComponent(g);
+
     gui.painting = true;
+    try {
+      final DBNodes nodes = gui.context.current();
+      roots = nodes.pres();
+      final int rl = roots.length;
+      if(rl == 0) return;
 
-    final DBNodes nodes = gui.context.current();
-    roots = nodes.pres();
-    final int rl = roots.length;
-    if(rl == 0) return;
+      for(int i = 0; !showAtts && i < rl; ++i) {
+        if(roots[i] >= data.meta.size) break;
+        if(data.kind(roots[i]) == Data.ATTR) {
+          drawMessage(g, NO_ATTS);
+          return;
+        }
+      }
 
-    for(int i = 0; !showAtts && i < rl; ++i) {
-      if(roots[i] >= data.meta.size) break;
-      if(data.kind(roots[i]) == Data.ATTR) {
-        drawMessage(g, NO_ATTS);
+      BaseXLayout.antiAlias(g);
+      g.setFont(font);
+      fontHeight = g.getFontMetrics().getHeight();
+
+      if(paintType == Refresh.INIT) {
+        sub = new TreeSubtree(data, showAtts);
+        tr = new TreeRects(this);
+      }
+      tr.nodes = nodes;
+
+      if(paintType == Refresh.INIT || paintType == Refresh.CONTEXT) {
+        sub.generateBorders(data, roots);
+      }
+
+      // if window-size changed
+      final boolean winChange = windowSizeChanged();
+      if(winChange && paintType == Refresh.VOID
+          || paintType == Refresh.INIT || paintType == Refresh.CONTEXT
+          || paintType == Refresh.RESIZE) {
+        treedist = tr.generateRects(sub, g, wstart, wwidth, slimToText);
+        nes = treedist == -1;
+        if(!nes) {
+          markedImage = null;
+          setLevelDistance();
+          createMainImage();
+          if(gui.context.marked.size() > 0) markNodes();
+        }
+      }
+
+      if(nes) {
+        drawMessage(g, NOT_ENOUGH_SPACE);
         return;
       }
-    }
 
-    BaseXLayout.antiAlias(g);
-    g.setFont(font);
-    fontHeight = g.getFontMetrics().getHeight();
+      g.drawImage(treeImage, 0, 0, wwidth, wheight, this);
 
-    if(paintType == Refresh.INIT) {
-      sub = new TreeSubtree(data, showAtts);
-      tr = new TreeRects(this);
-    }
-    tr.nodes = nodes;
-
-    if(paintType == Refresh.INIT || paintType == Refresh.CONTEXT) {
-      sub.generateBorders(data, roots);
-    }
-
-    // if window-size changed
-    final boolean winChange = windowSizeChanged();
-    if(winChange && paintType == Refresh.VOID
-        || paintType == Refresh.INIT || paintType == Refresh.CONTEXT
-        || paintType == Refresh.RESIZE) {
-      treedist = tr.generateRects(sub, g, wstart, wwidth, slimToText);
-      nes = treedist == -1;
-      if(!nes) {
-        markedImage = null;
-        setLevelDistance();
-        createMainImage();
-        if(gui.context.marked.size() > 0) markNodes();
-      }
-    }
-
-    if(nes) {
-      drawMessage(g, NOT_ENOUGH_SPACE);
-      return;
-    }
-
-    g.drawImage(treeImage, 0, 0, wwidth, wheight, this);
-
-    if(selection) {
-      if(selectRect != null) {
-        // draw selection
-        final int x = selectRect.w < 0 ? selectRect.x + selectRect.w : selectRect.x;
-        final int y = selectRect.h < 0 ? selectRect.y + selectRect.h : selectRect.y;
-        final int w = Math.abs(selectRect.w);
-        final int h = Math.abs(selectRect.h);
-        g.setColor(colormark1);
-        g.drawRect(x, y, w, h);
-      }
-      markNodes();
-    }
-
-    if(markedImage != null) g.drawImage(markedImage, 0, 0, wwidth, wheight, this);
-
-    // highlights the focused node
-    inFocus = paintType == Refresh.VOID && focus();
-
-    if(inFocus && !winChange) {
-      if(!refreshedFocus && tr.bigRect(sub, frn, flv)) {
-        final int f = getMostSizedNode(data, frn, flv, frect, fpre);
-        if(f >= 0) fpre = f;
+      if(selection) {
+        if(selectRect != null) {
+          // draw selection
+          final int x = selectRect.w < 0 ? selectRect.x + selectRect.w : selectRect.x;
+          final int y = selectRect.h < 0 ? selectRect.y + selectRect.h : selectRect.y;
+          final int w = Math.abs(selectRect.w);
+          final int h = Math.abs(selectRect.h);
+          g.setColor(colormark1);
+          g.drawRect(x, y, w, h);
+        }
+        markNodes();
       }
 
-      highlightNode(g, frn, flv, frect, fpre, -1, Draw.HIGHLIGHT);
-      refreshedFocus = false;
+      if(markedImage != null) g.drawImage(markedImage, 0, 0, wwidth, wheight, this);
+
+      // highlights the focused node
+      inFocus = paintType == Refresh.VOID && focus();
+
+      if(inFocus && !winChange) {
+        if(!refreshedFocus && tr.bigRect(sub, frn, flv)) {
+          final int f = getMostSizedNode(data, frn, flv, frect, fpre);
+          if(f >= 0) fpre = f;
+        }
+
+        highlightNode(g, frn, flv, frect, fpre, -1, Draw.HIGHLIGHT);
+        refreshedFocus = false;
+      }
+      paintType = Refresh.VOID;
+    } finally {
+      gui.painting = false;
     }
-    paintType = Refresh.VOID;
-    gui.painting = false;
   }
 
   /**
@@ -253,7 +256,6 @@ public final class TreeView extends View implements TreeConstants {
 
     for(int rn = 0; rn < rl; ++rn) {
       final int h = sub.subtreeHeight(rn);
-
       for(int lv = 0; lv < h; ++lv) {
         final boolean br = tr.bigRect(sub, rn, lv);
         final TreeRect[] lr = tr.getTreeRectsPerLevel(rn, lv);
@@ -658,7 +660,7 @@ public final class TreeView extends View implements TreeConstants {
 
     final boolean br = tr.bigRect(sub, rn, lv);
     final boolean root = roots[rn] == pre;
-    final int height = sub.subtreeHeight(rn);
+    final int h = sub.subtreeHeight(rn);
 
     final Data d = gui.context.data();
     final int k = d.kind(pre);
@@ -687,7 +689,7 @@ public final class TreeView extends View implements TreeConstants {
     }
 
     // if there are descendants draw them
-    if((t == Draw.CONNECTION || t == Draw.HIGHLIGHT) && size > 1 && lv + 1 < height)
+    if((t == Draw.CONNECTION || t == Draw.HIGHLIGHT) && size > 1 && lv + 1 < h)
       highlightDescendants(g, rn, lv, r, pre, rc, t);
 
     // draws node text

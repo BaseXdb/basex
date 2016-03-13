@@ -1,6 +1,6 @@
 (:~
  : This XQuery module is evaluated by some JUnit tests.
- : @author BaseX Team 2005-15, BSD License
+ : @author BaseX Team 2005-16, BSD License
  : @version 1.0
  : @unknown tag
  :)
@@ -30,4 +30,9 @@ declare %public function hello:world() as xs:string {
 (:~ Private function returning a simple string. :)
 declare %private %Q{ns}ignored function hello:internal() as xs:string {
   "hello world"
+};
+
+(:~ Closure. :)
+declare function hello:closure() {
+  count#1(1)
 };

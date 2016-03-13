@@ -14,7 +14,7 @@ import org.basex.util.list.*;
  * This class analyzes the current path and gives suggestions for code
  * completions.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class QuerySuggest extends QueryParser {
@@ -72,7 +72,7 @@ public final class QuerySuggest extends QueryParser {
   @Override
   void checkAxis(final Axis axis) {
     all = axis != Axis.CHILD && axis != Axis.DESC ?
-      new ArrayList<PathNode>() : PathSummary.desc(curr, axis == Axis.DESC);
+      new ArrayList<PathNode>() : PathIndex.desc(curr, axis == Axis.DESC);
     curr = all;
     show = true;
   }

@@ -33,7 +33,7 @@ import org.junit.Test;
 /**
  * This class tests the server-based HTTP Client.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Rositsa Shadura
  */
 public class FnHttpTest extends HTTPTest {
@@ -506,8 +506,7 @@ public class FnHttpTest extends HTTPTest {
         + "--boundary42--" + CRLF;
 
     // Compare results
-    final String fake = fakeConn.getOutputStream().toString();
-    assertEquals(expResult, fake);
+    assertEquals(expResult, fakeConn.getOutputStream().toString());
   }
 
   /**
@@ -527,7 +526,7 @@ public class FnHttpTest extends HTTPTest {
     // String item child
     req1.bodyContent.add(Str.get("<b>b</b>"));
     HttpClient.setRequestContent(fakeConn1.getOutputStream(), req1);
-    assertEquals("<a>a</a>&lt;b&gt;b&lt;/b&gt;", fakeConn1.out.toString());
+    assertEquals("<a>a</a>&lt;b&gt;b&lt;/b&gt;", fakeConn1.out.toString(Strings.UTF8));
 
     // Case 2: No method, media-type='text/plain'
     final HttpRequest req2 = new HttpRequest();
@@ -563,21 +562,20 @@ public class FnHttpTest extends HTTPTest {
   public void writeBase64() throws IOException {
     // Case 1: content is xs:base64Binary
     final HttpRequest req1 = new HttpRequest();
-    req1.payloadAttrs.put("method", "raw");
-
-    req1.bodyContent.add(new B64(token("dGVzdA==")));
+    req1.payloadAttrs.put("method", SerialMethod.BASEX.toString());
+    req1.bodyContent.add(new B64(token("test")));
     final FakeHttpConnection fakeConn1 = new FakeHttpConnection(new URL("http://www.test.com"));
     HttpClient.setRequestContent(fakeConn1.getOutputStream(), req1);
-    assertEquals(fakeConn1.out.toString(), "dGVzdA==");
+    assertEquals(fakeConn1.out.toString(Strings.UTF8), "test");
 
     // Case 2: content is a node
     final HttpRequest req2 = new HttpRequest();
-    req2.payloadAttrs.put("method", "raw");
-    final FElem e3 = new FElem("a").add("dGVzdA==");
+    req2.payloadAttrs.put("method", SerialMethod.BASEX.toString());
+    final FElem e3 = new FElem("a").add("test");
     req2.bodyContent.add(e3);
     final FakeHttpConnection fakeConn2 = new FakeHttpConnection(new URL("http://www.test.com"));
     HttpClient.setRequestContent(fakeConn2.getOutputStream(), req2);
-    assertEquals(fakeConn2.out.toString(), "dGVzdA==");
+    assertEquals(fakeConn2.out.toString(), "<a>test</a>");
   }
 
   /**
@@ -588,20 +586,20 @@ public class FnHttpTest extends HTTPTest {
   public void writeHex() throws IOException {
     // Case 1: content is xs:hexBinary
     final HttpRequest req1 = new HttpRequest();
-    req1.payloadAttrs.put("method", "raw");
-    req1.bodyContent.add(new Hex(token("74657374")));
+    req1.payloadAttrs.put("method", SerialMethod.BASEX.toString());
+    req1.bodyContent.add(new Hex(token("test")));
     final FakeHttpConnection fakeConn1 = new FakeHttpConnection(new URL("http://www.test.com"));
     HttpClient.setRequestContent(fakeConn1.getOutputStream(), req1);
-    assertEquals(fakeConn1.out.toString(), "74657374");
+    assertEquals(fakeConn1.out.toString(Strings.UTF8), "test");
 
     // Case 2: content is a node
     final HttpRequest req2 = new HttpRequest();
-    req2.payloadAttrs.put("method", "raw");
-    final FElem e3 = new FElem("a").add("74657374");
+    req2.payloadAttrs.put("method", SerialMethod.BASEX.toString());
+    final FElem e3 = new FElem("a").add("test");
     req2.bodyContent.add(e3);
     final FakeHttpConnection fakeConn2 = new FakeHttpConnection(new URL("http://www.test.com"));
     HttpClient.setRequestContent(fakeConn2.getOutputStream(), req2);
-    assertEquals(fakeConn2.out.toString(), "74657374");
+    assertEquals(fakeConn2.out.toString(), "<a>test</a>");
   }
 
   /**
@@ -625,7 +623,7 @@ public class FnHttpTest extends HTTPTest {
     // Delete file
     file.delete();
 
-    assertEquals(fakeConn.out.toString(), "test");
+    assertEquals(fakeConn.out.toString(Strings.UTF8), "test");
   }
 
   /**
@@ -808,7 +806,7 @@ public class FnHttpTest extends HTTPTest {
     final long es = expected.size();
     for(int e = 0; e < es; e++) {
       final Item exp = expected.get(e), ret = returned.get(e);
-      if(!new Compare().equal(exp, ret)) {
+      if(!new DeepEqual().equal(exp, ret)) {
         final TokenBuilder tb = new TokenBuilder("Result ").addLong(e).add(" differs:\nReturned: ");
         tb.addExt(ret.serialize()).add("\nExpected: ").addExt(exp.serialize());
         fail(tb.toString());
@@ -859,7 +857,7 @@ public class FnHttpTest extends HTTPTest {
 
 /**
  * Fake HTTP connection.
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Rositsa Shadura
  */
 final class FakeHttpConnection extends HttpURLConnection {

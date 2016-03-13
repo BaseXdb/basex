@@ -19,7 +19,7 @@ import org.junit.Test;
 /**
  * This class tests the database commands.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public class CommandTest extends SandboxTest {
@@ -165,12 +165,16 @@ public class CommandTest extends SandboxTest {
     ok(new CreateDB(NAME, FILE));
     ok(new CreateDB("abcde"));
     ok(new DropDB("abcde"));
+    ok(new CreateDB("a.b"));
+    ok(new DropDB("a.b"));
     // invalid database names
     no(new CreateDB(""));
     no(new CreateDB(" "));
     no(new CreateDB(":"));
     no(new CreateDB("*?"));
     no(new CreateDB("/"));
+    no(new CreateDB(".x"));
+    no(new CreateDB("x."));
   }
 
   /** Command test. */
@@ -296,6 +300,7 @@ public class CommandTest extends SandboxTest {
   public final void get() {
     ok(new Get());
     ok(new Get(MainOptions.CHOP));
+    ok(new Get(MainOptions.TOKENINCLUDE));
     no(new Get(NAME2));
   }
 
@@ -352,7 +357,6 @@ public class CommandTest extends SandboxTest {
     ok(new InfoStorage());
     ok(new InfoStorage("1", "2"));
     ok(new InfoStorage("1", null));
-    ok(new InfoStorage("// li", null));
   }
 
   /** Command test. */
@@ -573,6 +577,8 @@ public class CommandTest extends SandboxTest {
     ok(new Set(MainOptions.CHOP, true));
     ok(new Set("chop", true));
     ok(new Set("runs", 1));
+    ok(new Set(MainOptions.TOKENINCLUDE, "id"));
+    ok(new Set(MainOptions.TOKENINCLUDE, ""));
     no(new Set("runs", true));
     no(new Set(NAME2, NAME2));
   }

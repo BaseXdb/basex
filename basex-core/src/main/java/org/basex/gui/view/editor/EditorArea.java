@@ -12,14 +12,14 @@ import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.text.*;
-import org.basex.gui.text.SearchBar.SearchDir;
+import org.basex.gui.text.SearchBar.*;
 import org.basex.io.*;
 import org.basex.util.*;
 
 /**
  * This class extends the text panel by editor features.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class EditorArea extends TextPanel {
@@ -212,17 +212,16 @@ public final class EditorArea extends TextPanel {
 
   /**
    * Jumps to the specified string.
-   * @param string search string
+   * @param string search string (ignored if empty)
    */
   public void jump(final String string) {
-    if(string != null) {
+    if(string.isEmpty()) {
+      search.deactivate(true);
+    } else {
       search.reset();
       search.activate(string, false);
       jump(SearchDir.CURRENT, true);
-    } else {
-      search.deactivate(true);
     }
-    requestFocusInWindow();
   }
 
   /**

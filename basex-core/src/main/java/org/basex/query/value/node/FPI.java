@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
+import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -13,7 +14,7 @@ import org.w3c.dom.*;
 /**
  * PI node fragment.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class FPI extends FNode {
@@ -63,7 +64,7 @@ public final class FPI extends FNode {
   }
 
   @Override
-  public FNode copy() {
+  public FNode deepCopy(final MainOptions options) {
     return new FPI(name, value).parent(parent);
   }
 

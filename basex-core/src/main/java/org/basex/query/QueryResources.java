@@ -11,8 +11,6 @@ import org.basex.core.cmd.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.io.*;
-import org.basex.query.up.*;
-import org.basex.query.util.list.*;
 import org.basex.query.util.pkg.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
@@ -25,13 +23,10 @@ import org.basex.util.list.*;
  * This class provides access to all kinds of resources (databases, documents, database connections,
  * sessions) used by an XQuery expression.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class QueryResources {
-  /** Textual resources. */
-  public final HashMap<String, String[]> texts = new HashMap<>();
-
   /** Database context. */
   private final QueryContext qc;
 
@@ -47,12 +42,14 @@ public final class QueryResources {
   /** Module loader. */
   private ModuleLoader modules;
   /** External resources. */
-  private final HashMap<Class<? extends QueryResource>, QueryResource> external = new HashMap<>();
+  private Map<Class<? extends QueryResource>, QueryResource> external;
 
-  /** Pending output. */
-  public final ItemList output = new ItemList();
-  /** Pending updates. */
-  Updates updates;
+  /** Textual resources. Required for test APIs. */
+  private Map<String, String[]> texts;
+  /** Cached stop word files. Required for test APIs. */
+  private Map<String, IO> stop;
+  /** Cached thesaurus files. Required for test APIs. */
+  private Map<String, IO> thes;
 
   /**
    * Constructor.
@@ -88,7 +85,8 @@ public final class QueryResources {
    * Adds an external resource.
    * @param ext external resource
    */
-  public void add(final QueryResource ext) {
+  public synchronized void add(final QueryResource ext) {
+    if(external == null) external = new HashMap<>();
     external.put(ext.getClass(), ext);
   }
 
@@ -99,8 +97,8 @@ public final class QueryResources {
    * @return resource
    */
   @SuppressWarnings("unchecked")
-  public <R extends QueryResource> R get(final Class<? extends R> resource) {
-    return (R) external.get(resource);
+  public synchronized <R extends QueryResource> R get(final Class<? extends R> resource) {
+    return external != null ? (R) external.get(resource) : null;
   }
 
   /**
@@ -112,7 +110,9 @@ public final class QueryResources {
     // close dynamically loaded JAR files
     if(modules != null) modules.close();
     // close external resources
-    for(final QueryResource c : external.values()) c.close();
+    if(external != null) {
+      for(final QueryResource c : external.values()) c.close();
+    }
   }
 
   /**
@@ -122,7 +122,7 @@ public final class QueryResources {
    * @return database instance
    * @throws QueryException query exception
    */
-  public Data database(final String name, final InputInfo info) throws QueryException {
+  public synchronized Data database(final String name, final InputInfo info) throws QueryException {
     // check if a database with the same name has already been opened
     for(final Data data : datas) {
       if(data.inMemory()) continue;
@@ -147,7 +147,7 @@ public final class QueryResources {
    * @return document
    * @throws QueryException query exception
    */
-  public DBNode doc(final QueryInput qi, final IO baseIO, final InputInfo info)
+  public synchronized DBNode doc(final QueryInput qi, final IO baseIO, final InputInfo info)
       throws QueryException {
 
     // favor default database
@@ -181,7 +181,7 @@ public final class QueryResources {
    * @return collection
    * @throws QueryException query exception
    */
-  public Value collection(final InputInfo info) throws QueryException {
+  public synchronized Value collection(final InputInfo info) throws QueryException {
     if(colls.isEmpty()) throw NODEFCOLL.get(info);
     return colls.get(0);
   }
@@ -195,7 +195,7 @@ public final class QueryResources {
    * @return collection
    * @throws QueryException query exception
    */
-  public Value collection(final QueryInput qi, final IO baseIO, final InputInfo info)
+  public synchronized Value collection(final QueryInput qi, final IO baseIO, final InputInfo info)
       throws QueryException {
 
     // favor default database
@@ -237,16 +237,7 @@ public final class QueryResources {
   }
 
   /**
-   * Returns a reference to the updates.
-   * @return updates
-   */
-  public Updates updates() {
-    if(updates == null) updates = new Updates();
-    return updates;
-  }
-
-  /**
-   * Returns the module loader.
+   * Returns the module loader. Called during parsing.
    * @return module loader
    */
   public ModuleLoader modules() {
@@ -256,6 +247,7 @@ public final class QueryResources {
 
   /**
    * Removes and closes a database if it has not been added by the global context.
+   * Called during updates.
    * @param name name of database to be removed
    */
   public void remove(final String name) {
@@ -271,6 +263,35 @@ public final class QueryResources {
   }
 
   /**
+   * Returns the document path of a textual resource and its encoding.
+   * @param uri resource uri
+   * @return path and encoding, or {@code null}
+   */
+  public String[] text(final String uri) {
+    return texts == null ? null : texts.get(uri);
+  }
+
+  /**
+   * Returns stop words. Called during parsing.
+   * @param path resource path
+   * @param sc static context
+   * @return file reference
+   */
+  public IO stopWords(final String path, final StaticContext sc) {
+    return stop != null ? stop.get(path) : sc.resolve(path, null);
+  }
+
+  /**
+   * Returns a thesaurus file. Called during parsing.
+   * @param path resource path
+   * @param sc static context
+   * @return file reference
+   */
+  public IO thesaurus(final String path, final StaticContext sc) {
+    return thes != null ? thes.get(path) : sc.resolve(path, null);
+  }
+
+  /**
    * Returns the globally opened database.
    * @return database or {@code null} if no database is globally opened
    */
@@ -279,8 +300,8 @@ public final class QueryResources {
   }
 
   /**
-   * Returns a valid reference if a file is found in the specified path or the static base uri.
-   * Otherwise, returns an error.
+   * Returns a valid reference if a file is found at the specified path, or at the static base uri
+   * location. Otherwise, returns an error.
    * @param input query input
    * @param baseIO base IO
    * @param info input info
@@ -320,6 +341,7 @@ public final class QueryResources {
    * @param strings resource strings (path, encoding)
    */
   public void addResource(final String uri, final String... strings) {
+    if(texts == null) texts = new HashMap<>();
     texts.put(uri, strings);
   }
 
@@ -340,6 +362,16 @@ public final class QueryResources {
       nodes[n] = new DBNode(create(qi, true, baseIO, null), 0, Data.DOC);
     }
     addCollection(ValueBuilder.value(nodes, ns, NodeType.DOC), name);
+  }
+
+  /**
+   * Attaches full-text maps. Only called from the test APIs.
+   * @param sw stop words
+   * @param th thesaurus
+   */
+  public void ftmaps(final HashMap<String, IO> sw, final HashMap<String, IO> th) {
+    stop = sw;
+    thes = th;
   }
 
   // PRIVATE METHODS ==============================================================================
@@ -381,12 +413,12 @@ public final class QueryResources {
 
     // check if input is an existing file
     final IO source = checkPath(input, baseIO, info);
-    if(single && source.isDir()) WHICHRES_X.get(info, baseIO);
+    if(single && source.isDir()) throw WHICHRES_X.get(info, baseIO);
 
     // overwrite parsing options with default values
     try {
       final boolean mem = !context.options.get(MainOptions.FORCECREATE);
-      final MainOptions opts = new MainOptions(context.options);
+      final MainOptions opts = new MainOptions(context.options, true);
       return addData(CreateDB.create(source.dbname(),
           new DirParser(source, opts), context, opts, mem));
     } catch(final IOException ex) {

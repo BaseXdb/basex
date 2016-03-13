@@ -10,7 +10,7 @@ import org.basex.util.hash.*;
 /**
  * Resizable-array implementation for tokens (byte arrays).
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class TokenList extends ElementList implements Iterable<byte[]> {
@@ -94,17 +94,21 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
   /**
    * Adds a long value.
    * @param element element to be added
+   * @return self reference
    */
-  public void add(final long element) {
+  public TokenList add(final long element) {
     add(token(element));
+    return this;
   }
 
   /**
    * Adds a string.
    * @param element element to be added
+   * @return self reference
    */
-  public void add(final String element) {
+  public TokenList add(final String element) {
     add(token(element));
+    return this;
   }
 
   /**
@@ -136,7 +140,7 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
   /**
    * Returns the element at the specified position.
    * @param index index of the element to return
-   * @return element
+   * @return element, or {@code null} if index exceeds length of list
    */
   public byte[] get(final int index) {
     return index < list.length ? list[index] : null;
@@ -231,6 +235,14 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
 
   /**
    * Sorts the elements.
+   * @return self reference
+   */
+  public TokenList sort() {
+    return sort(true);
+  }
+
+  /**
+   * Sorts the elements.
    * @param cs respect case sensitivity
    * @return self reference
    */
@@ -241,12 +253,21 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
   /**
    * Sorts the elements.
    * @param cs respect case sensitivity
-   * @param asc ascending (true)/descending (false) flag
+   * @param ascending ascending/descending order
    * @return self reference
    */
-  public TokenList sort(final boolean cs, final boolean asc) {
-    final Comparator<byte[]> comp = cs ? COMP : LC_COMP;
-    Arrays.sort(list, 0, size, asc ? comp : Collections.reverseOrder(comp));
+  public TokenList sort(final boolean cs, final boolean ascending) {
+    return sort(cs ? COMP : LC_COMP, ascending);
+  }
+
+  /**
+   * Sorts the elements.
+   * @param comp comparator
+   * @param ascending ascending/descending order
+   * @return self reference
+   */
+  public TokenList sort(final Comparator<byte[]> comp, final boolean ascending) {
+    Arrays.sort(list, 0, size, ascending ? comp : Collections.reverseOrder(comp));
     return this;
   }
 
@@ -273,7 +294,8 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(Util.className(this) + '[');
+    if(list == null) return "";
+    final TokenBuilder tb = new TokenBuilder().add('[');
     for(int i = 0; i < size; ++i) {
       if(i != 0) tb.add(", ");
       tb.addExt(list[i]);

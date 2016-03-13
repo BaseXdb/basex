@@ -15,7 +15,7 @@ import org.basex.util.*;
 /**
  * Abstract fragment constructor with a QName argument.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 abstract class CName extends CNode {
@@ -30,11 +30,11 @@ abstract class CName extends CNode {
    * @param sc static context
    * @param info input info
    * @param name name
-   * @param v attribute values
+   * @param cont contents
    */
   CName(final String desc, final StaticContext sc, final InputInfo info, final Expr name,
-      final Expr... v) {
-    super(sc, info, v);
+      final Expr... cont) {
+    super(sc, info, cont);
     this.name = name;
     this.desc = desc;
   }
@@ -60,8 +60,8 @@ abstract class CName extends CNode {
    */
   final byte[] value(final QueryContext qc, final InputInfo ii) throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
-    for(final Expr e : exprs) {
-      final Value v = qc.value(e);
+    for(final Expr expr : exprs) {
+      final Value v = qc.value(expr);
       boolean m = false;
       for(final Item it : v.atomValue(ii)) {
         if(m) tb.add(' ');

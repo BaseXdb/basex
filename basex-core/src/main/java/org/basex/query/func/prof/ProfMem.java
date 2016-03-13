@@ -13,7 +13,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class ProfMem extends StandardFunc {
@@ -54,6 +54,6 @@ public final class ProfMem extends StandardFunc {
     Performance.gc(2);
     final long max = Performance.memory();
     final long mb = Math.max(0, max - min);
-    FnTrace.dump(token(Performance.format(mb)), msg, qc);
+    FnTrace.trace(token(Performance.format(mb)), msg, qc);
   }
 }

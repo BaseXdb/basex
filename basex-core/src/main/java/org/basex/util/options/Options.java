@@ -20,6 +20,7 @@ import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
 import org.basex.util.list.*;
+import org.basex.util.similarity.*;
 
 /**
  * This class provides methods for accessing, reading and storing options.
@@ -27,7 +28,7 @@ import org.basex.util.list.*;
  * If an instance of this class contains no pre-defined options, assigned options will
  * be added as free options.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public class Options implements Iterable<Option<?>> {
@@ -38,7 +39,7 @@ public class Options implements Iterable<Option<?>> {
 
     @Override
     public String toString() {
-      return super.toString().toLowerCase(Locale.ENGLISH);
+      return name().toLowerCase(Locale.ENGLISH);
     }
   }
 
@@ -50,7 +51,7 @@ public class Options implements Iterable<Option<?>> {
 
     @Override
     public String toString() {
-      return super.toString().toLowerCase(Locale.ENGLISH);
+      return name().toLowerCase(Locale.ENGLISH);
     }
   }
 
@@ -58,7 +59,7 @@ public class Options implements Iterable<Option<?>> {
   private static final String PROPUSER = "# Local Options";
 
   /** Map with option names and definition. */
-  protected final TreeMap<String, Option<?>> options = new TreeMap<>();
+  private final TreeMap<String, Option<?>> options = new TreeMap<>();
   /** Map with option names and values. */
   private final TreeMap<String, Object> values = new TreeMap<>();
   /** Free option definitions. */
@@ -366,19 +367,35 @@ public class Options implements Iterable<Option<?>> {
    * Assigns a value after casting it to the correct type. If the option is unknown,
    * it will be added as free option.
    * @param name name of option
-   * @param val value
+   * @param value value
    * @param error error
+   * @param info input info
    * @throws BaseXException database exception
    * @throws QueryException query exception
    */
-  public synchronized void assign(final Item name, final Item val, final boolean error)
-      throws BaseXException, QueryException {
+  public synchronized void assign(final Item name, final Item value, final boolean error,
+      final InputInfo info) throws BaseXException, QueryException {
 
-    final String key = string(name.string(null));
+    final String key = string(name.string(info));
     if(options.isEmpty()) {
-      free.put(key, string(val.string(null)));
+      final byte[] val;
+      if(value instanceof Map) {
+        final TokenBuilder tb = new TokenBuilder();
+        final Map map = (Map) value;
+        for(final Item it : map.keys()) {
+          if(!tb.isEmpty()) tb.add(',');
+          tb.add(it.string(info)).add('=');
+          final Value v = map.get(it, info);
+          if(v instanceof Item) tb.add(string(((Item) v).string(info)).replace(",", ",,"));
+          else throw new BaseXException(Text.OPT_EXPECT_X_X_X, AtomType.ITEM, v.seqType(), v);
+        }
+        val = tb.finish();
+      } else {
+        val = value.string(info);
+      }
+      free.put(key, string(val));
     } else {
-      assign(key, val, error);
+      assign(key, value, error, info);
     }
   }
 
@@ -388,6 +405,45 @@ public class Options implements Iterable<Option<?>> {
    */
   public final synchronized HashMap<String, String> free() {
     return free;
+  }
+
+  /**
+   * Returns a map representation of the entries of the requested string (separated by commas).
+   * @param option option to be found
+   * @return map
+   */
+  public HashMap<String, String> toMap(final StringOption option) {
+    final String input = get(option).trim();
+    final HashMap<String, String> map = new HashMap<>();
+    final StringBuilder key = new StringBuilder();
+    final StringBuilder value = new StringBuilder();
+    boolean first = true;
+    final int sl = input.length();
+    for(int s = 0; s < sl; s++) {
+      final char ch = input.charAt(s);
+      if(first) {
+        if(ch == '=') {
+          first = false;
+        } else {
+          key.append(ch);
+        }
+      } else {
+        if(ch == ',') {
+          if(s + 1 == sl || input.charAt(s + 1) != ',') {
+            map.put(key.toString().trim(), value.toString());
+            key.setLength(0);
+            value.setLength(0);
+            first = true;
+            continue;
+          }
+          // literal commas are escaped by a second comma
+          s++;
+        }
+        value.append(ch);
+      }
+    }
+    if(!first) map.put(key.toString().trim(), value.toString());
+    return map;
   }
 
   /**
@@ -412,17 +468,21 @@ public class Options implements Iterable<Option<?>> {
   }
 
   /**
-   * Overwrites the options with system properties.
+   * Overwrites the options with global options and system properties.
    * All properties starting with {@code org.basex.} will be assigned as options.
    */
   public final void setSystem() {
     // assign global options
-    for(final Entry<String, String> entry : Prop.entries()) {
-      final String n = entry.getKey(), v = entry.getValue().toString();
-      try {
-        if(assign(n, v, -1, false)) Util.debug(n + Text.COLS + v);
-      } catch(final BaseXException ex) {
-        Util.errln(ex);
+    for(final Entry<String, String> entry : entries()) {
+      String name = entry.getKey();
+      final String value = entry.getValue();
+      if(name.startsWith(DBPREFIX)) {
+        name = name.substring(DBPREFIX.length()).toUpperCase(Locale.ENGLISH);
+        try {
+          if(assign(name, value, -1, false)) Util.debug(name + Text.COLS + value);
+        } catch(final BaseXException ex) {
+          Util.errln(ex);
+        }
       }
     }
   }
@@ -432,7 +492,7 @@ public class Options implements Iterable<Option<?>> {
    * @param type media type
    * @throws BaseXException database exception
    */
-  public synchronized void parse(final MediaType type) throws BaseXException {
+  public synchronized void assign(final MediaType type) throws BaseXException {
     for(final Entry<String, String> entry : type.parameters().entrySet()) {
       if(options.isEmpty()) {
         free.put(entry.getKey(), entry.getValue());
@@ -444,11 +504,11 @@ public class Options implements Iterable<Option<?>> {
   }
 
   /**
-   * Parses an option string and sets the options accordingly.
+   * Parses and assigns options string from the specified string.
    * @param string options string
    * @throws BaseXException database exception
    */
-  public synchronized void parse(final String string) throws BaseXException {
+  public synchronized void assign(final String string) throws BaseXException {
     final int sl = string.length();
     int i = 0;
     while(i < sl) {
@@ -467,24 +527,25 @@ public class Options implements Iterable<Option<?>> {
   }
 
   /**
-   * Parses options in the specified map.
+   * Parses and assigns options from the specified map.
    * @param map map
    * @param error raise error if option is unknown
+   * @param info input info
    * @throws BaseXException database exception
    * @throws QueryException query exception
    */
-  public synchronized void parse(final Map map, final boolean error)
+  public synchronized void assign(final Map map, final boolean error, final InputInfo info)
       throws BaseXException, QueryException {
 
     for(final Item name : map.keys()) {
       if(!name.type.isStringOrUntyped())
-        throw new BaseXException(Text.OPT_EXPECT, AtomType.STR, name.type, name);
+        throw new BaseXException(Text.OPT_EXPECT_X_X_X, AtomType.STR, name.type, name);
 
-      final Value value = map.get(name, null);
+      final Value value = map.get(name, info);
       if(!(value instanceof Item))
-        throw new BaseXException(Text.OPT_EXPECT, AtomType.ITEM, value.seqType(), value);
+        throw new BaseXException(Text.OPT_EXPECT_X_X_X, AtomType.ITEM, value.seqType(), value);
 
-      assign(name, (Item) value, error);
+      assign(name, (Item) value, error, info);
     }
   }
 
@@ -533,7 +594,7 @@ public class Options implements Iterable<Option<?>> {
   public static String allowed(final Option<?> option, final Object... all) {
     final TokenBuilder vals = new TokenBuilder();
     for(final Object a : all) vals.add(vals.isEmpty() ? "" : ",").add(a.toString());
-    return Util.info(Text.OPT_ONEOF, option.name(), vals);
+    return Util.info(Text.OPT_ONEOF_X_X, option.name(), vals);
   }
 
   // PRIVATE METHODS ====================================================================
@@ -601,8 +662,8 @@ public class Options implements Iterable<Option<?>> {
           }
 
           if(local) {
-            // cache local options as system properties
-            Prop.put(name, val);
+            // cache local options as global options
+            Prop.put(DBPREFIX + name.toLowerCase(Locale.ENGLISH), val);
           } else {
             try {
               assign(name, val, num, true);
@@ -661,12 +722,13 @@ public class Options implements Iterable<Option<?>> {
    * @param name name of option
    * @param item value of option
    * @param error raise error if option is unknown
+   * @param info input info
    * @return success flag
    * @throws BaseXException database exception
    * @throws QueryException query exception
    */
-  private synchronized boolean assign(final String name, final Item item, final boolean error)
-      throws BaseXException, QueryException {
+  private synchronized boolean assign(final String name, final Item item, final boolean error,
+      final InputInfo info) throws BaseXException, QueryException {
 
     final Option<?> option = options.get(name);
     if(option == null) {
@@ -679,24 +741,24 @@ public class Options implements Iterable<Option<?>> {
       if(item.type.isStringOrUntyped()) {
         v = Strings.yes(string(item.string(null)));
         if(!v && !Strings.no(string(item.string(null))))
-          throw new BaseXException(Text.OPT_BOOLEAN, option.name());
+          throw new BaseXException(Text.OPT_BOOLEAN_X, option.name());
       } else if(item instanceof Bln) {
         v = ((Bln) item).bool(null);
       } else {
-        throw new BaseXException(Text.OPT_BOOLEAN, option.name());
+        throw new BaseXException(Text.OPT_BOOLEAN_X, option.name());
       }
       put(option, v);
     } else if(option instanceof NumberOption) {
       if(item instanceof ANum) {
         put(option, (int) ((ANum) item).itr(null));
       } else {
-        throw new BaseXException(Text.OPT_NUMBER, option.name());
+        throw new BaseXException(Text.OPT_NUMBER_X, option.name());
       }
     } else if(option instanceof StringOption) {
       if(item.type.isStringOrUntyped()) {
         put(option, string(item.string(null)));
       } else {
-        throw new BaseXException(Text.OPT_STRING, option.name());
+        throw new BaseXException(Text.OPT_STRING_X, option.name());
       }
     } else if(option instanceof EnumOption) {
       if(item.type.isStringOrUntyped()) {
@@ -705,21 +767,21 @@ public class Options implements Iterable<Option<?>> {
         if(v == null) throw new BaseXException(allowed(option, (Object[]) eo.values()));
         put(option, v);
       } else {
-        throw new BaseXException(Text.OPT_STRING, option.name());
+        throw new BaseXException(Text.OPT_STRING_X, option.name());
       }
     } else if(option instanceof OptionsOption) {
       final Options o = ((OptionsOption<?>) option).newInstance();
       if(item instanceof Map) {
-        o.parse((Map) item, error);
+        o.assign((Map) item, error, info);
       } else {
-        throw new BaseXException(Text.OPT_MAP, option.name());
+        throw new BaseXException(Text.OPT_MAP_X, option.name());
       }
       put(option, o);
     } else if(option instanceof MapOption) {
-      if(!(item instanceof Map)) throw new BaseXException(Text.OPT_FUNC, option.name());
+      if(!(item instanceof Map)) throw new BaseXException(Text.OPT_FUNC_X, option.name());
       put(option, item);
     } else if(option instanceof FuncOption) {
-      if(!(item instanceof FuncItem)) throw new BaseXException(Text.OPT_FUNC, option.name());
+      if(!(item instanceof FuncItem)) throw new BaseXException(Text.OPT_FUNC_X, option.name());
       put(option, item);
     } else {
       throw Util.notExpected("Unsupported option: " + option);
@@ -749,16 +811,16 @@ public class Options implements Iterable<Option<?>> {
       final boolean v;
       if(val == null || val.isEmpty()) {
         final Boolean b = get((BooleanOption) option);
-        if(b == null) throw new BaseXException(Text.OPT_BOOLEAN, option.name());
+        if(b == null) throw new BaseXException(Text.OPT_BOOLEAN_X, option.name());
         v = !b;
       } else {
         v = Strings.yes(val);
-        if(!v && !Strings.no(val)) throw new BaseXException(Text.OPT_BOOLEAN, option.name());
+        if(!v && !Strings.no(val)) throw new BaseXException(Text.OPT_BOOLEAN_X, option.name());
       }
       put(option, v);
     } else if(option instanceof NumberOption) {
       final int v = Strings.toInt(val);
-      if(v == MIN_VALUE) throw new BaseXException(Text.OPT_NUMBER, option.name());
+      if(v == MIN_VALUE) throw new BaseXException(Text.OPT_NUMBER_X, option.name());
       put(option, v);
     } else if(option instanceof StringOption) {
       put(option, val);
@@ -769,11 +831,11 @@ public class Options implements Iterable<Option<?>> {
       put(option, v);
     } else if(option instanceof OptionsOption) {
       final Options o = ((OptionsOption<?>) option).newInstance();
-      o.parse(val);
+      o.assign(val);
       put(option, o);
     } else if(option instanceof NumbersOption) {
       final int v = Strings.toInt(val);
-      if(v == MIN_VALUE) throw new BaseXException(Text.OPT_NUMBER, option.name());
+      if(v == MIN_VALUE) throw new BaseXException(Text.OPT_NUMBER_X, option.name());
       int[] ii = (int[]) get(option);
       if(index == -1) {
         if(ii == null) ii = new int[0];
@@ -782,7 +844,7 @@ public class Options implements Iterable<Option<?>> {
         put(option, il.add(v).finish());
       } else {
         if(index < 0 || index >= ii.length)
-          throw new BaseXException(Text.OPT_OFFSET, option.name());
+          throw new BaseXException(Text.OPT_OFFSET_X, option.name());
         ii[index] = v;
       }
     } else if(option instanceof StringsOption) {
@@ -794,11 +856,11 @@ public class Options implements Iterable<Option<?>> {
         put(option, sl.add(val).finish());
       } else if(index == 0) {
         final int v = Strings.toInt(val);
-        if(v == MIN_VALUE) throw new BaseXException(Text.OPT_NUMBER, option.name());
+        if(v == MIN_VALUE) throw new BaseXException(Text.OPT_NUMBER_X, option.name());
         values.put(name, new String[v]);
       } else {
         if(index <= 0 || index > ss.length)
-          throw new BaseXException(Text.OPT_OFFSET, option.name());
+          throw new BaseXException(Text.OPT_OFFSET_X, option.name());
         ss[index - 1] = val;
       }
     } else {

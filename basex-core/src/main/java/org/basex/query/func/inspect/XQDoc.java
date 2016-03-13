@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 
 import org.basex.io.*;
 import org.basex.query.*;
+import org.basex.query.ann.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -19,7 +20,7 @@ import org.basex.util.list.*;
 /**
  * This class contains functions for generating a xqDoc documentation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class XQDoc extends Inspect {
@@ -71,7 +72,7 @@ final class XQDoc extends Inspect {
 
     // variables
     final FElem variables = elem("variables", xqdoc);
-    for(final StaticVar sv : qp.vars) {
+    for(final StaticVar sv : module.vars().values()) {
       final FElem variable = elem("variable", variables);
       elem("name", variable).add(sv.name.string());
       if(sv.name.hasPrefix()) nsCache.put(sv.name.prefix(), sv.name.uri());
@@ -82,7 +83,7 @@ final class XQDoc extends Inspect {
 
     // functions
     final FElem functions = elem("functions", xqdoc);
-    for(final StaticFunc sf : qp.funcs) {
+    for(final StaticFunc sf : module.funcs().values()) {
       final int al = sf.arity();
       final QNm name = sf.funcName();
       final FuncType t = sf.funcType();
@@ -99,7 +100,7 @@ final class XQDoc extends Inspect {
         if(i > 0) tb.add(SEP);
         tb.add(DOLLAR).add(v.name.string()).add(' ').add(AS).add(' ').addExt(t.argTypes[i]);
       }
-      tb.add(PAREN2).add(' ' + AS + ' ' + t.retType);
+      tb.add(PAREN2).add(' ' + AS + ' ' + t.type);
       if(sf.expr == null) tb.add(" external");
 
       elem("signature", function).add(tb.toString());
@@ -155,10 +156,8 @@ final class XQDoc extends Inspect {
    */
   private void annotations(final AnnList anns, final FElem parent) throws QueryException {
     if(!anns.isEmpty()) annotation(anns, elem("annotations", parent), false);
-    final int al = anns.size();
-    for(int a = 0; a < al; a++) {
-      final Ann ann = anns.get(a);
-      final byte[] uri = ann.sig != null ? ann.sig.uri : ann.name.uri();
+    for(final Ann ann : anns) {
+      final byte[] uri = ann.name().uri();
       if(uri.length > 0) nsCache.put(NSGlobal.prefix(uri), uri);
     }
   }

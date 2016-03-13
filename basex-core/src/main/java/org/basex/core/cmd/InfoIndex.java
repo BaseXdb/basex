@@ -18,7 +18,7 @@ import org.basex.util.*;
  * Evaluates the 'info index' command and returns information on the indexes
  * of the currently opened database.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class InfoIndex extends AInfo {
@@ -49,10 +49,11 @@ public final class InfoIndex extends AInfo {
     }
 
     final TokenBuilder tb = new TokenBuilder();
-    tb.add(info(CmdIndexInfo.TAG, data, options));
-    tb.add(info(CmdIndexInfo.ATTNAME, data, options));
+    tb.add(info(CmdIndexInfo.ELEMNAME, data, options));
+    tb.add(info(CmdIndexInfo.ATTRNAME, data, options));
     tb.add(info(CmdIndexInfo.TEXT, data, options));
     tb.add(info(CmdIndexInfo.ATTRIBUTE, data, options));
+    tb.add(info(CmdIndexInfo.TOKEN, data, options));
     tb.add(info(CmdIndexInfo.FULLTEXT, data, options));
     tb.add(info(CmdIndexInfo.PATH, data, options));
     out.print(tb.finish());
@@ -73,18 +74,20 @@ public final class InfoIndex extends AInfo {
    */
   private static byte[] info(final CmdIndexInfo idx, final Data data, final MainOptions options) {
     switch(idx) {
-      case TAG:
-        return info(ELEMENTS, IndexType.TAG, data, options, true);
-      case ATTNAME:
-        return info(ATTRIBUTES, IndexType.ATTNAME, data, options, true);
+      case ELEMNAME:
+        return info(ELEMENTS, IndexType.ELEMNAME, data, options, true);
+      case ATTRNAME:
+        return info(ATTRIBUTES, IndexType.ATTRNAME, data, options, true);
       case PATH:
         return info(PATH_INDEX, IndexType.PATH, data, options, true);
       case TEXT:
         return info(TEXT_INDEX, IndexType.TEXT, data, options, data.meta.textindex);
       case ATTRIBUTE:
         return info(ATTRIBUTE_INDEX, IndexType.ATTRIBUTE, data, options, data.meta.attrindex);
+      case TOKEN:
+        return info(TOKEN_INDEX, IndexType.TOKEN, data, options, data.meta.tokenindex);
       case FULLTEXT:
-        return info(FULLTEXT_INDEX, IndexType.FULLTEXT, data, options, data.meta.ftxtindex);
+        return info(FULLTEXT_INDEX, IndexType.FULLTEXT, data, options, data.meta.ftindex);
       default:
         return Token.token(LI + NOT_AVAILABLE);
     }

@@ -8,7 +8,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class DbSystem extends DbFn {
@@ -16,7 +16,7 @@ public final class DbSystem extends DbFn {
   private static final String SYSTEM = "system";
 
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Item item(final QueryContext qc, final InputInfo ii) {
     return toNode(Info.info(qc.context), SYSTEM);
   }
 }

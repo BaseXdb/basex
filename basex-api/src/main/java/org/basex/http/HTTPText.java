@@ -3,7 +3,7 @@ package org.basex.http;
 /**
  * This class assembles texts which are used in the HTTP classes.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public interface HTTPText {
@@ -18,8 +18,6 @@ public interface HTTPText {
 
   /** Error: credentials missing. */
   String NOUSERNAME = "No username specified.";
-  /** Error: unsupported authorization method. */
-  String WHICHAUTH = "Unsupported authentication method: %.";
   /** Error: digest authorization. */
   String DIGESTAUTH = "Digest authentication expected.";
   /** Error message. */

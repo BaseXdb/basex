@@ -11,7 +11,7 @@ import org.basex.gui.layout.*;
  * View observer pattern. All inheriting classes are attached to the
  * views array
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class View extends BaseXPanel {
@@ -109,8 +109,6 @@ public abstract class View extends BaseXPanel {
       gui.notify.mark(sc(e) ? 2 : e.isShiftDown() ? 1 : 0, null);
     } else if(ENTER.is(e)) {
       GUIMenuCmd.C_FILTER.execute(gui);
-    } else if(GOBACK2.is(e)) {
-      GUIMenuCmd.C_GOBACK.execute(gui);
     }
   }
 

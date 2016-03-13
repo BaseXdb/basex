@@ -14,14 +14,14 @@ import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.text.*;
 import org.basex.io.*;
-import org.basex.query.value.node.*;
+import org.basex.io.parse.csv.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
  * CSV parser panel.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class DialogCsvParser extends DialogParser {
@@ -122,8 +122,8 @@ final class DialogCsvParser extends DialogParser {
       format.setEnabled(head);
       lax.setEnabled(head && copts.get(CsvOptions.FORMAT) == CsvFormat.DIRECT);
 
-      final DBNode node = new DBNode(CsvParser.toXML(new IOContent(EXAMPLE), copts));
-      example.setText(example(MainParser.CSV.name(), EXAMPLE, node.serialize().toString()));
+      example.setText(example(MainParser.CSV.name(), EXAMPLE,
+          CsvConverter.get(copts).convert(new IOContent(EXAMPLE)).serialize().toString()));
     } catch(final IOException ex) {
       example.setText(error(ex));
     }

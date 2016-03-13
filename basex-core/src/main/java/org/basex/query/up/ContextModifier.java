@@ -16,7 +16,7 @@ import org.basex.util.list.*;
  * Base class for the different context modifiers. A context modifier aggregates
  * all updates for a specific context.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Lukas Kircher
  */
 public abstract class ContextModifier {
@@ -28,6 +28,13 @@ public abstract class ContextModifier {
   private final Map<String, UserUpdates> userUpdates = new HashMap<>();
   /** Temporary data reference, containing all XML fragments to be inserted. */
   private MemData tmp;
+
+  /**
+   * Adds a data reference to list which keeps track of the nodes copied
+   * within a transform expression.
+   * @param data reference
+   */
+  abstract void addData(final Data data);
 
   /**
    * Adds an update primitive to this context modifier.

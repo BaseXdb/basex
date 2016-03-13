@@ -14,7 +14,7 @@ import org.basex.util.hash.*;
 /**
  * GFLWOR {@code where} clause, filtering tuples not satisfying the predicate.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public final class Where extends Clause {
@@ -61,12 +61,13 @@ public final class Where extends Clause {
 
   @Override
   public Where compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    expr = expr.compile(qc, scp).optimizeEbv(qc, scp);
+    expr = expr.compile(qc, scp);
     return optimize(qc, scp);
   }
 
   @Override
   public Where optimize(final QueryContext qc, final VarScope sc) throws QueryException {
+    expr = expr.optimizeEbv(qc, sc);
     if(expr.isValue()) expr = expr.ebv(qc, info);
     return this;
   }
@@ -102,7 +103,8 @@ public final class Where extends Clause {
 
   @Override
   boolean skippable(final Clause cl) {
-    return true;
+    // do not slide LET clauses over WHERE (WHERE may filter out many items)
+    return !(cl instanceof Let);
   }
 
   @Override

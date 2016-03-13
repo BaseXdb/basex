@@ -14,7 +14,7 @@ import org.basex.query.up.primitives.node.*;
  * expression. It especially keeps track of all nodes that are copied in the
  * 'copy' statement of a transform expression.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Lukas Kircher
  */
 public final class TransformModifier extends ContextModifier {
@@ -25,24 +25,21 @@ public final class TransformModifier extends ContextModifier {
    * part of this set, hence the target node has not been copied. */
   private final Set<Data> refs = new HashSet<>();
 
-  /**
-   * Adds a data reference to list which keeps track of the nodes copied
-   * within a transform expression.
-   * @param d reference
-   */
-  public void addData(final Data d) {
-    refs.add(d);
+  @Override
+  public void addData(final Data data) {
+    refs.add(data);
   }
 
   @Override
   void add(final Update up, final QueryContext qc) throws QueryException {
     // Disallow side-effecting updates within transform expressions.
     if(!(up instanceof NodeUpdate)) throw BASX_DBTRANSFORM.get(up.info());
-    super.add(up, qc);
 
     // Check if the target node of the given primitive has been copied in the
     // 'copy' statement of this transform expression.
     final NodeUpdate nodeUp = (NodeUpdate) up;
     if(!refs.contains(nodeUp.data())) throw UPNOTCOPIED_X.get(nodeUp.info(), nodeUp.node());
+
+    super.add(up, qc);
   }
 }

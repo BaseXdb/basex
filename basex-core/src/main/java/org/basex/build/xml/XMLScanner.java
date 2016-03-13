@@ -1,6 +1,7 @@
 package org.basex.build.xml;
 
 import static org.basex.build.BuildText.*;
+import static org.basex.build.BuildText.ID;
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.XMLToken.*;
@@ -19,7 +20,7 @@ import org.basex.util.hash.*;
 /**
  * This class scans an XML document and creates atomic tokens.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class XMLScanner extends Proc {
@@ -34,7 +35,7 @@ final class XMLScanner extends Proc {
   private static final byte[] AMPER = { '&' };
 
   /** Scanning states. */
-  private enum State {
+  private enum Scan {
     /** Content state.   */ CONTENT,
     /** Element state.   */ ELEMENT,
     /** Attribute state. */ ATT,
@@ -43,8 +44,6 @@ final class XMLScanner extends Proc {
 
   /** Character buffer for the current token. */
   final TokenBuilder token = new TokenBuilder();
-  /** Document encoding. */
-  final String encoding;
   /** Current token type. */
   Type type;
 
@@ -58,7 +57,7 @@ final class XMLScanner extends Proc {
   private final boolean fragment;
 
   /** Current scanner state. */
-  private State state = State.CONTENT;
+  private Scan scan = Scan.CONTENT;
   /** Scanning prolog (will be invalidated when root element is parsed). */
   private boolean prolog = true;
   /** Parameter entity parsing. */
@@ -107,8 +106,6 @@ final class XMLScanner extends Proc {
           prev(5);
         }
       }
-      encoding = enc == null ? Strings.UTF8 : enc;
-
       if(!fragment) {
         final int n = consume();
         if(!s(n)) {
@@ -137,7 +134,7 @@ final class XMLScanner extends Proc {
     }
 
     // checks the scanner state
-    switch(state) {
+    switch(scan) {
       case CONTENT: scanCONTENT(ch); break;
       case ELEMENT:
       case ATT: scanELEMENT(ch); break;
@@ -192,7 +189,7 @@ final class XMLScanner extends Proc {
     }
 
     prolog = false;
-    state = State.ELEMENT;
+    scan = Scan.ELEMENT;
 
     // closing element...
     if(c == '/') {
@@ -214,20 +211,20 @@ final class XMLScanner extends Proc {
     // scan element end...
     if(c == '>') {
       type = Type.R_BR;
-      state = State.CONTENT;
+      scan = Scan.CONTENT;
     } else if(c == '=') {
       // scan equal sign...
       type = Type.EQ;
     } else if(c == '\'' || c == '"') {
       // scan quote...
       type = Type.QUOTE;
-      state = State.QUOTE;
+      scan = Scan.QUOTE;
       quote = c;
     } else if(c == '/') {
       // scan empty element end...
       type = Type.CLOSE_R_BR;
       if((c = nextChar()) == '>') {
-        state = State.CONTENT;
+        scan = Scan.CONTENT;
       } else {
         token.add(c);
         throw error(CLOSING);
@@ -237,10 +234,10 @@ final class XMLScanner extends Proc {
       type = Type.WS;
     } else if(isStartChar(c)) {
       // scan name of attribute or element...
-      type = state == State.ATT ? Type.ATTNAME : Type.ELEMNAME;
+      type = scan == Scan.ATT ? Type.ATTNAME : Type.ELEMNAME;
       do token.add(c); while(isChar(c = nextChar()));
       prev(1);
-      state = State.ATT;
+      scan = Scan.ATT;
     } else {
       // undefined character...
       throw error(CHARACTER, (char) c);
@@ -255,7 +252,7 @@ final class XMLScanner extends Proc {
   private void scanATTVALUE(final int ch) throws IOException {
     if(ch == quote) {
       type = Type.QUOTE;
-      state = State.ATT;
+      scan = Scan.ATT;
     } else {
       type = Type.ATTVALUE;
       attValue(ch);

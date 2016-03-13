@@ -15,7 +15,7 @@ import org.basex.util.hash.*;
 /**
  * And expression.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class And extends Logical {
@@ -29,14 +29,10 @@ public final class And extends Logical {
   }
 
   @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    // remove atomic values
-    final Expr c = super.compile(qc, scp);
-    return c == this ? optimize(qc, scp) : c;
-  }
-
-  @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
+    final Expr c = super.optimize(qc, scp);
+    if(c != this) return c;
+
     final int es = exprs.length;
     final ExprList list = new ExprList(es);
     for(int i = 0; i < es; i++) {
@@ -80,21 +76,21 @@ public final class And extends Logical {
     if(list.isEmpty()) return optPre(Bln.TRUE, qc);
 
     if(es != list.size()) {
-      qc.compInfo(OPTWRITE, this);
+      qc.compInfo(OPTREWRITE_X, this);
       exprs = list.finish();
     }
     compFlatten(qc);
 
     boolean not = true;
-    for(final Expr e : exprs) {
-      if(!e.isFunction(Function.NOT)) {
+    for(final Expr expr : exprs) {
+      if(!expr.isFunction(Function.NOT)) {
         not = false;
         break;
       }
     }
 
     if(not) {
-      qc.compInfo(OPTWRITE, this);
+      qc.compInfo(OPTREWRITE_X, this);
       final int el = exprs.length;
       final Expr[] inner = new Expr[el];
       for(int e = 0; e < el; e++) inner[e] = ((Arr) exprs[e]).exprs[0];
@@ -111,8 +107,8 @@ public final class And extends Logical {
     // compute scoring
     if(qc.scoring) {
       double s = 0;
-      for(final Expr e : exprs) {
-        final Item it = e.ebv(qc, info);
+      for(final Expr expr : exprs) {
+        final Item it = expr.ebv(qc, info);
         if(!it.bool(info)) return Bln.FALSE;
         s += it.score();
       }
@@ -120,8 +116,8 @@ public final class And extends Logical {
     }
 
     // standard evaluation
-    for(final Expr e : exprs) {
-      if(!e.ebv(qc, info).bool(info)) return Bln.FALSE;
+    for(final Expr expr : exprs) {
+      if(!expr.ebv(qc, info).bool(info)) return Bln.FALSE;
     }
     return Bln.TRUE;
   }

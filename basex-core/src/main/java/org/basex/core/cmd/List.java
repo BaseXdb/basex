@@ -11,7 +11,6 @@ import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.index.resource.*;
 import org.basex.io.*;
-import org.basex.io.serial.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
 import org.basex.util.list.*;
@@ -19,7 +18,7 @@ import org.basex.util.list.*;
 /**
  * Evaluates the 'list' command and shows all available databases.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class List extends Command {
@@ -74,7 +73,7 @@ public final class List extends Command {
     if(create) table.header.add(INPUT_PATH);
 
     for(final String name : context.filter(Perm.READ, context.databases.listDBs())) {
-      String file = null;
+      String file;
       long dbsize = 0;
       int count = 0;
 
@@ -84,7 +83,7 @@ public final class List extends Command {
         dbsize = meta.dbsize();
         file = meta.original;
         // add number of raw files
-        count = meta.ndocs + new IOFile(soptions.dbpath(name), IO.RAW).descendants().size();
+        count = meta.ndocs + new IOFile(soptions.dbPath(name), IO.RAW).descendants().size();
       } catch(final IOException ex) {
         file = ERROR;
       }
@@ -128,7 +127,7 @@ public final class List extends Command {
         final TokenList tl = new TokenList(3);
         final byte[] file = data.text(pre, true);
         tl.add(file);
-        tl.add(SerialMethod.XML.toString());
+        tl.add(XML);
         tl.add(MediaType.APPLICATION_XML.toString());
         tl.add(data.size(pre, Data.DOC));
         table.contents.add(tl);
@@ -138,7 +137,7 @@ public final class List extends Command {
         final String f = string(file);
         final TokenList tl = new TokenList(3);
         tl.add(file);
-        tl.add(SerialMethod.RAW.toString());
+        tl.add(IO.RAW);
         tl.add(MediaType.get(f).toString());
         tl.add(data.meta.binary(f).length());
         table.contents.add(tl);
@@ -149,19 +148,5 @@ public final class List extends Command {
     }
     out.println(table.sort().finish());
     return true;
-  }
-
-  /**
-   * Returns a list of all databases.
-   * @param sopts static options
-   * @return list of databases
-   */
-  public static StringList list(final StaticOptions sopts) {
-    final StringList db = new StringList();
-    for(final IOFile f : sopts.dbpath().children()) {
-      final String name = f.name();
-      if(f.isDir() && !name.startsWith(".")) db.add(name);
-    }
-    return db.sort(false);
   }
 }

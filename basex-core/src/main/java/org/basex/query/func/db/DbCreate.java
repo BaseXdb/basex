@@ -20,7 +20,7 @@ import org.basex.util.options.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class DbCreate extends DbNew {
@@ -55,7 +55,7 @@ public final class DbCreate extends DbNew {
     }
 
     final Options opts = toOptions(3, Q_OPTIONS, new Options(), qc);
-    qc.resources.updates().add(new DBCreate(name, inputs, opts, qc, info), qc);
+    qc.updates().add(new DBCreate(name, inputs, opts, qc, info), qc);
     return null;
   }
 }

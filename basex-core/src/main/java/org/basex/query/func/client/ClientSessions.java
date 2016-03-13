@@ -11,7 +11,7 @@ import org.basex.util.hash.*;
 /**
  * Opened database client sessions.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class ClientSessions implements QueryResource {
@@ -51,10 +51,8 @@ final class ClientSessions implements QueryResource {
   @Override
   public void close() {
     for(final byte[] c : conns) {
-      final ClientSession cs = conns.get(c);
-      if(cs == null) continue;
-      try {
-        cs.close();
+      try(final ClientSession cs = conns.get(c)) {
+        /* close */
       } catch(final IOException ex) {
         Util.debug(ex);
       }

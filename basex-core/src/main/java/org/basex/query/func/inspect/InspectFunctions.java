@@ -19,7 +19,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class InspectFunctions extends StandardFunc {
@@ -39,7 +39,7 @@ public final class InspectFunctions extends StandardFunc {
       try {
         final IO io = checkPath(exprs[0], qc);
         qc.parse(Token.string(io.read()), io.path(), sc);
-        qc.compile();
+        qc.funcs.compile(qc, true);
       } catch(final IOException ex) {
         throw IOERR_X.get(info, ex);
       }
@@ -56,10 +56,7 @@ public final class InspectFunctions extends StandardFunc {
 
   @Override
   protected Expr opt(final QueryContext qc, final VarScope scp) throws QueryException {
-    if(exprs.length == 0) {
-      for(final StaticFunc sf : qc.funcs.funcs()) sf.compile(qc);
-      return iter(qc).value();
-    }
+    if(exprs.length == 0) qc.funcs.compile(qc, true);
     return this;
   }
 

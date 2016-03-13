@@ -18,7 +18,7 @@ import org.basex.util.hash.*;
 /**
  * Catch clause.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Catch extends Single {
@@ -78,6 +78,7 @@ public final class Catch extends Single {
         Str.get(ex.getMessage().replaceAll("\r\n?", "\n")) }) {
       qc.set(vars[i++], v, info);
     }
+    Util.debug(ex);
     return qc.value(expr);
   }
 

@@ -10,7 +10,7 @@ import org.xmldb.api.modules.*;
 /**
  * This class tests the XMLDB/API XPathQueryService implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 @SuppressWarnings("all")
@@ -114,7 +114,7 @@ public final class XPathQueryServiceTest extends XMLDBBaseTest {
     try {
       serv.queryResource("UnknownDoc", "/");
       fail("Query was executed on unknown document.");
-    } catch(final XMLDBException ex) { /* ignored. */ }
+    } catch(final XMLDBException ignored) { }
   }
 
   @Test

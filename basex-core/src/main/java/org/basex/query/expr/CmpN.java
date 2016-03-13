@@ -14,7 +14,7 @@ import org.basex.util.hash.*;
 /**
  * Node comparison.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class CmpN extends Cmp {
@@ -85,12 +85,6 @@ public final class CmpN extends Cmp {
     super(info, expr1, expr2, null);
     this.op = op;
     seqType = SeqType.BLN_ZO;
-  }
-
-  @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    super.compile(qc, scp);
-    return optimize(qc, scp);
   }
 
   @Override

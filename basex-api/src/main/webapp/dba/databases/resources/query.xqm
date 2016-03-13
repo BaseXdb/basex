@@ -1,7 +1,7 @@
 (:~
  : Query resources.
  :
- : @author Christian Grün, BaseX GmbH, 2014-15
+ : @author Christian Grün, BaseX Team, 2014-16
  :)
 module namespace _ = 'dba/databases';
 
@@ -20,6 +20,7 @@ declare
   %rest:path("/dba/query-resource")
   %rest:query-param("name",     "{$name}")
   %rest:query-param("resource", "{$resource}")
+  %rest:single
   %output:method("text")
 function _:query-resource(
   $name      as xs:string,

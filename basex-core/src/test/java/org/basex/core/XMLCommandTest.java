@@ -11,7 +11,7 @@ import org.junit.*;
 /**
  * This class tests the XML syntax of the database commands.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class XMLCommandTest extends SandboxTest {
@@ -83,7 +83,10 @@ public final class XMLCommandTest extends SandboxTest {
     ok("<info-index type='X'/>");
     ok("<info-index/>");
     ok("<info-storage/>");
-    ok("<info-storage>X</info-storage>");
+    ok("<info-storage start='1'/>");
+    ok("<info-storage start='1' end='2'/>");
+    ok("<info-storage end='1'/>");
+    no("<info-storage>X</info-storage>");
 
     ok("<kill target='X'/>");
 

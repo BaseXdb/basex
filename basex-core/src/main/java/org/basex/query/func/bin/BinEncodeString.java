@@ -12,12 +12,12 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class BinEncodeString extends BinFn {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public B64 item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] str = str(0, qc);
     final String enc = toEncoding(1, BIN_UE_X, qc);
     if(str == null) return null;

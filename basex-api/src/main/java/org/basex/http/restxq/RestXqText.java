@@ -10,7 +10,7 @@ import org.basex.query.value.item.*;
 /**
  * This class assembles texts which are used in the HTTP classes.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public interface RestXqText {
@@ -44,8 +44,6 @@ public interface RestXqText {
   String WADL_URI = "http://wadl.dev.java.net/2009/02";
   /** XHTML namespace. */
   String XHTML_URL = "http://www.w3.org/1999/xhtml";
-  /** Ignore directory. */
-  String IGNORE = ".ignore";
   /** Init call. */
   String INIT = ".init";
 

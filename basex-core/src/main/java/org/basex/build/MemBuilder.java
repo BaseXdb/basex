@@ -1,20 +1,25 @@
 package org.basex.build;
 
+import static org.basex.core.Text.*;
+
 import java.io.*;
 
 import org.basex.data.*;
 import org.basex.io.*;
+import org.basex.util.*;
 
 /**
  * This class creates a database instance in main memory.
  * The storage layout is described in the {@link Data} class.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class MemBuilder extends Builder {
   /** Data reference. */
   private MemData data;
+  /** Debug counter. */
+  private int c;
 
   /**
    * Constructor.
@@ -65,15 +70,18 @@ public final class MemBuilder extends Builder {
   @Override
   public DataClip dataClip() throws IOException {
     init();
-    data.meta.assign(parser);
+    meta.assign(parser);
     try {
+      final Performance perf = Prop.debug ? new Performance() : null;
+      Util.debug(tit() + DOTS);
       parse();
+      if(Prop.debug) Util.errln(" " + perf + " (" + Performance.getMemory() + ')');
+
     } catch(final IOException ex) {
-      try { close(); } catch(final IOException ignored) { }
+      try { close(); } catch(final IOException ignore) { }
       throw ex;
     }
     close();
-    data.finish();
     return new DataClip(data);
   }
 
@@ -82,14 +90,8 @@ public final class MemBuilder extends Builder {
    */
   public void init() {
     data = new MemData(path, nspaces, parser.options);
-
     meta = data.meta;
     meta.name = dbname;
-    // values are always indexed in main memory mode
-    meta.createtext = true;
-    meta.createattr = true;
-    meta.textindex = true;
-    meta.attrindex = true;
     elemNames = data.elemNames;
     attrNames = data.attrNames;
     path.data(data);
@@ -106,11 +108,12 @@ public final class MemBuilder extends Builder {
   @Override
   public void close() throws IOException {
     parser.close();
+    if(data.meta.updindex) data.idmap.finish(data.meta.lastid);
   }
 
   @Override
   protected void addDoc(final byte[] value) {
-    data.doc(meta.size, 0, value);
+    data.doc(0, value);
     data.insert(meta.size);
   }
 
@@ -119,17 +122,19 @@ public final class MemBuilder extends Builder {
       final boolean ne) {
     data.elem(dist, nameId, asize, asize, uriId, ne);
     data.insert(meta.size);
+
+    if(Prop.debug && (c++ & 0x7FFFF) == 0) Util.err(".");
   }
 
   @Override
   protected void addAttr(final int nameId, final byte[] value, final int dist, final int uriId) {
-    data.attr(meta.size, dist, nameId, value, uriId);
+    data.attr(dist, nameId, value, uriId);
     data.insert(meta.size);
   }
 
   @Override
   protected void addText(final byte[] value, final int dist, final byte kind) {
-    data.text(meta.size, dist, value, kind);
+    data.text(dist, value, kind);
     data.insert(meta.size);
   }
 

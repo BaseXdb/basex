@@ -8,11 +8,10 @@ import org.basex.util.*;
 /**
  * Interface for XQuery functions.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public interface XQFunction extends XQFunctionExpr {
-
   /**
    * Internally invokes this function with the given arguments.
    * This method does not deal with tail calls, so it is unsafe to call.

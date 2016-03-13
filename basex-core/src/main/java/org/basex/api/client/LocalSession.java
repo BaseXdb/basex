@@ -12,7 +12,7 @@ import org.basex.server.*;
 /**
  * This class offers methods to locally execute database commands.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public class LocalSession extends Session {
@@ -30,7 +30,7 @@ public class LocalSession extends Session {
   /**
    * Constructor, specifying an output stream.
    * @param context context
-   * @param output output stream
+   * @param output client output; if set to {@code null}, results will be returned as strings
    */
   public LocalSession(final Context context, final OutputStream output) {
     this(context, output, context.user());
@@ -53,7 +53,7 @@ public class LocalSession extends Session {
    * @param context context
    * @param username user name
    * @param password password (plain text)
-   * @param output output stream
+   * @param output client output; if set to {@code null}, results will be returned as strings
    * @throws LoginException login exception
    */
   public LocalSession(final Context context, final String username, final String password,

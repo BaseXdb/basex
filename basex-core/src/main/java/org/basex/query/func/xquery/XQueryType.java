@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class XQueryType extends StandardFunc {
@@ -39,7 +39,7 @@ public final class XQueryType extends StandardFunc {
    * @return the argument expression
    */
   private Expr type(final QueryContext qc) {
-    FnTrace.dump(Util.inf("{ type: %, size: %, exprSize: % }", exprs[0].seqType(), exprs[0].size(),
+    FnTrace.trace(Util.inf("{ type: %, size: %, exprSize: % }", exprs[0].seqType(), exprs[0].size(),
         exprs[0].exprSize()), token(exprs[0].toString()), qc);
     return exprs[0];
   }

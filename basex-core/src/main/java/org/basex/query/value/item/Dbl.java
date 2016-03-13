@@ -13,7 +13,7 @@ import org.basex.util.*;
 /**
  * Double item ({@code xs:double}).
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Dbl extends ANum {
@@ -119,7 +119,7 @@ public final class Dbl extends ANum {
    */
   private double rnd(final int s, final boolean e) {
     double v = value;
-    if(v == .0 || v == -.0 || Double.isNaN(v) || Double.isInfinite(v) || s > 322) return v;
+    if(v == 0 || Double.isNaN(v) || Double.isInfinite(v) || s > 322) return v;
     if(s < -308) return 0;
     if(!e && s == 0) {
       if(v >= -.5 && v < .0) return -.0;

@@ -11,14 +11,14 @@ import org.basex.util.options.*;
 /**
  * Project specific slider implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class BaseXSlider extends BaseXPanel {
   /** Default width of slider. */
-  private static final int DWIDTH = (int) (GUIConstants.SCALE * 120);
+  private static final int DWIDTH = (int) (GUIConstants.scale * 120);
   /** Width of slider mover. */
-  private static final double SLIDERW = (int) (GUIConstants.SCALE * 20);
+  private static final double SLIDERW = (int) (GUIConstants.scale * 20);
   /** Listener. */
   private final BaseXDialog dialog;
   /** Minimum slider value. */
@@ -109,7 +109,7 @@ public final class BaseXSlider extends BaseXPanel {
     final int w = getWidth();
     final int h = getHeight();
     final int hh = h / 2;
-    final int s = (int) (3 * GUIConstants.SCALE);
+    final int s = (int) (3 * GUIConstants.scale);
 
     g.setColor(hasFocus() ? GUIConstants.BACK : GUIConstants.lgray);
     g.fillRect(0, hh - s, w, s * 2 - 1);

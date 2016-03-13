@@ -17,7 +17,7 @@ import org.basex.util.hash.*;
 /**
  * Checks the argument expression's result type.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public final class TypeCheck extends Single {
@@ -54,7 +54,7 @@ public final class TypeCheck extends Single {
 
     // return type is already correct
     if(argType.instanceOf(seqType)) {
-      qc.compInfo(QueryText.OPTCAST, seqType);
+      qc.compInfo(QueryText.OPTCAST_X, seqType);
       return expr;
     }
 
@@ -103,7 +103,7 @@ public final class TypeCheck extends Single {
           c = 0;
 
           final Item it = iter.next();
-          if(it == null || st.instance(it, true)) {
+          if(it == null || st.instance(it)) {
             cache.add(it);
           } else {
             st.promote(qc, sc, info, it, false, cache);

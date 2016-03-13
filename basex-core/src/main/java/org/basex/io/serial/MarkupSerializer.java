@@ -8,11 +8,11 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.util.*;
 
-import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.util.ft.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.http.*;
@@ -22,7 +22,7 @@ import org.basex.util.options.Options.YesNoOmit;
 /**
  * This class serializes items to in a markup language.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 abstract class MarkupSerializer extends StandardSerializer {
@@ -52,15 +52,15 @@ abstract class MarkupSerializer extends StandardSerializer {
 
   /**
    * Constructor.
-   * @param out print output
+   * @param os output stream
    * @param sopts serialization parameters
    * @param versions supported versions
    * @throws IOException I/O exception
    */
-  protected MarkupSerializer(final PrintOutput out, final SerializerOptions sopts,
+  protected MarkupSerializer(final OutputStream os, final SerializerOptions sopts,
       final String... versions) throws IOException {
 
-    super(out, sopts);
+    super(os, sopts);
 
     final String ver = supported(VERSION, sopts, versions);
     final String htmlver = supported(HTML_VERSION, sopts, V40, V401, V50);
@@ -83,19 +83,17 @@ abstract class MarkupSerializer extends StandardSerializer {
 
     if(bom) {
       // comparison by reference
-      final String enc = out.encoding();
-      if(enc == Strings.UTF8) {
+      if(encoding == Strings.UTF8) {
         out.write(0xEF); out.write(0xBB); out.write(0xBF);
-      } else if(enc == Strings.UTF16LE) {
+      } else if(encoding == Strings.UTF16LE) {
         out.write(0xFF); out.write(0xFE);
-      } else if(enc == Strings.UTF16BE) {
+      } else if(encoding == Strings.UTF16BE) {
         out.write(0xFE); out.write(0xFF);
       }
     }
 
     final boolean html = this instanceof HTMLSerializer;
     final boolean xml = this instanceof XMLSerializer || this instanceof XHTMLSerializer;
-
     if(xml || html) {
       if(undecl && ver.equals(V10)) throw SERUNDECL.getIO();
       if(xml) {
@@ -113,7 +111,7 @@ abstract class MarkupSerializer extends StandardSerializer {
           }
           out.print(ATT2);
           out.print(PI_C);
-          sep = true;
+          out.print('\n');
         }
       }
     }
@@ -143,7 +141,7 @@ abstract class MarkupSerializer extends StandardSerializer {
       } else if(cp == 0x9 || cp == 0xA) {
         printHex(cp);
       } else {
-        encode(cp);
+        printChar(cp);
       }
     }
     out.print(ATT2);
@@ -152,11 +150,13 @@ abstract class MarkupSerializer extends StandardSerializer {
   @Override
   protected void text(final byte[] value, final FTPos ftp) throws IOException {
     final byte[] val = norm(value);
-    final int vl = val.length;
     if(ftp == null) {
       final ArrayList<QNm> qnames = cdata();
+      final int vl = val.length;
       if(qnames.isEmpty() || elems.isEmpty() || !qnames.contains(elems.peek())) {
-        for(int k = 0; k < vl; k += cl(val, k)) encode(cp(val, k));
+        for(int k = 0; k < vl; k += cl(val, k)) {
+          printChar(cp(val, k));
+        }
       } else {
         out.print(CDATA_O);
         int c = 0;
@@ -171,7 +171,7 @@ abstract class MarkupSerializer extends StandardSerializer {
             }
             c = 0;
           }
-          printChar(cp);
+          out.print(cp);
         }
         out.print(CDATA_C);
       }
@@ -182,7 +182,7 @@ abstract class MarkupSerializer extends StandardSerializer {
         if(!span.del && ftp.contains(span.pos)) out.print((char) TokenBuilder.MARK);
         final byte[] text = span.text;
         final int tl = text.length;
-        for(int t = 0; t < tl; t += cl(text, t)) encode(cp(text, t));
+        for(int t = 0; t < tl; t += cl(text, t)) printChar(cp(text, t));
       }
     }
     sep = false;
@@ -242,9 +242,9 @@ abstract class MarkupSerializer extends StandardSerializer {
   }
 
   @Override
-  protected void encode(final int cp) throws IOException {
-    // character map
+  protected void printChar(final int cp) throws IOException {
     if(map != null) {
+      // character map
       final byte[] value = map.get(cp);
       if(value != null) {
         out.print(value);
@@ -263,7 +263,12 @@ abstract class MarkupSerializer extends StandardSerializer {
     } else if(cp == 0x2028) {
       out.print(E_2028);
     } else {
-      printChar(cp);
+      try {
+        out.print(cp);
+      } catch(final QueryIOException ex) {
+        if(ex.getCause().error() == SERENC_X_X) printHex(cp);
+        else throw ex;
+      }
     }
   }
 
@@ -276,7 +281,11 @@ abstract class MarkupSerializer extends StandardSerializer {
 
   @Override
   protected boolean ignore(final ANode node) {
-    return ct > 0 && eq(node.name(), META) && node.attribute(HTTPEQUIV) != null;
+    if(ct > 0 && node.type == NodeType.ELM && eq(node.name(), META)) {
+      final byte[] value = node.attribute(HTTPEQUIV);
+      if(value != null && eq(trim(value), CONTENT_TYPE)) return true;
+    }
+    return false;
   }
 
   /**
@@ -309,24 +318,12 @@ abstract class MarkupSerializer extends StandardSerializer {
     } else if(indent) {
       final ArrayList<QNm> qnames = suppress();
       if(!qnames.isEmpty()) {
-        for(final QNm e : elems) {
-          if(qnames.contains(e)) return;
+        for(final QNm qname : elems) {
+          if(qnames.contains(qname)) return;
         }
       }
       super.indent();
     }
-  }
-
-  /**
-   * Returns a hex entity for the specified codepoint.
-   * @param cp codepoint (00-FF)
-   * @throws IOException I/O exception
-   */
-  protected final void printHex(final int cp) throws IOException {
-    out.print("&#x");
-    if(cp > 0xF) out.print(HEX[cp >> 4]);
-    out.print(HEX[cp & 0xF]);
-    out.print(';');
   }
 
   /**
@@ -344,7 +341,7 @@ abstract class MarkupSerializer extends StandardSerializer {
     startOpen(new QNm(META));
     attribute(HTTPEQUIV, CONTENT_TYPE, false);
     attribute(CONTENT, new TokenBuilder(media.isEmpty() ? MediaType.TEXT_HTML.toString() : media).
-        add("; ").add(CHARSET).add('=').addExt(out.encoding()).finish(), false);
+        add("; ").add(CHARSET).add('=').add(encoding).finish(), false);
     if(html) {
       out.print(ELEM_C);
     } else {

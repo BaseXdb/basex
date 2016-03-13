@@ -20,7 +20,7 @@ import org.basex.util.list.*;
 /**
  * Evaluates the 'backup' command and creates a backup of a database.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class CreateBackup extends ABackup {
@@ -45,7 +45,7 @@ public final class CreateBackup extends ABackup {
     boolean ok = true;
     for(final String db : dbs) {
       // don't open databases marked as updating
-      if(MetaData.file(soptions.dbpath(db), DATAUPD).exists()) {
+      if(MetaData.file(soptions.dbPath(db), DATAUPD).exists()) {
         // reject backups of databases that are currently being updated (or corrupt)
         info(DB_UPDATED_X, db);
         ok = false;
@@ -74,12 +74,12 @@ public final class CreateBackup extends ABackup {
       throws IOException {
 
     final String backup = db + '-' + DateTime.format(new Date(), DateTime.DATETIME) + IO.ZIPSUFFIX;
-    final IOFile zf = sopts.dbpath(backup);
+    final IOFile zf = sopts.dbPath(backup);
     final Zip zip = new Zip(zf);
     if(cmd != null) cmd.proc(zip);
 
     // skip file that indicates a current update operation (will be the case when using XQuery)
-    final IOFile dbpath = sopts.dbpath(db);
+    final IOFile dbpath = sopts.dbPath(db);
     final StringList files = dbpath.descendants();
     files.delete(DATAUPD + IO.BASEXSUFFIX);
     zip.zip(dbpath, files);

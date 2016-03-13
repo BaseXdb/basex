@@ -15,7 +15,7 @@ import org.basex.util.*;
 /**
  * Set expression.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 abstract class Set extends Arr {
@@ -33,16 +33,10 @@ abstract class Set extends Arr {
   }
 
   @Override
-  public final Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    super.compile(qc, scp);
-    return optimize(qc, scp);
-  }
-
-  @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     boolean i = true;
-    for(final Expr e : exprs) {
-      if(!e.iterable()) {
+    for(final Expr expr : exprs) {
+      if(!expr.iterable()) {
         i = false;
         break;
       }

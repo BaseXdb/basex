@@ -7,7 +7,7 @@ import org.basex.query.value.type.*;
 /**
  * Document kind test.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class DocTest extends Test {
@@ -19,8 +19,8 @@ public final class DocTest extends Test {
    * @param test child test
    */
   public DocTest(final Test test) {
+    super(NodeType.DOC);
     this.test = test;
-    type = NodeType.DOC;
   }
 
   @Override

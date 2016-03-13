@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * Serialization methods.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public enum SerialMethod {
@@ -15,8 +15,8 @@ public enum SerialMethod {
   /** JSON.     */ JSON,
   /** CSV.      */ CSV,
   /** Text.     */ TEXT,
-  /** Raw.      */ RAW,
-  /** Adaptive. */ ADAPTIVE;
+  /** Adaptive. */ ADAPTIVE,
+  /** BaseX.    */ BASEX;
 
   @Override
   public String toString() {

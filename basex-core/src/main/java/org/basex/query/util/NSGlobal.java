@@ -8,12 +8,12 @@ import org.basex.util.*;
 /**
  * Global namespaces.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class NSGlobal {
   /** Namespace: prefixes and namespace URIs. */
-  private static final Atts NS = new Atts();
+  public static final Atts NS = new Atts();
   /** Reserved namespaces. */
   private static final int RESERVED;
 
@@ -51,6 +51,7 @@ public final class NSGlobal {
     // namespaces of built-in modules
     NS.add(ADMIN_PREFIX, ADMIN_URI);
     NS.add(ARCHIVE_PREFIX, ARCHIVE_URI);
+    NS.add(ASYNC_PREFIX, ASYNC_URI);
     NS.add(CLIENT_PREFIX, CLIENT_URI);
     NS.add(CONVERT_PREFIX, CONVERT_URI);
     NS.add(CSV_PREFIX, CSV_URI);
@@ -72,9 +73,11 @@ public final class NSGlobal {
     NS.add(REPO_PREFIX, REPO_URI);
     NS.add(SQL_PREFIX, SQL_URI);
     NS.add(STREAM_PREFIX, STREAM_URI);
+    NS.add(STRINGS_PREFIX, STRINGS_URI);
     NS.add(UNIT_PREFIX, UNIT_URI);
     NS.add(USER_PREFIX, USER_URI);
-    NS.add(VLDT_PREFIX, VALIDATE_URI);
+    NS.add(UTIL_PREFIX, UTIL_URI);
+    NS.add(VALIDATE_PREFIX, VALIDATE_URI);
     NS.add(WEB_PREFIX, WEB_URI);
     NS.add(XSLT_PREFIX, XSLT_URI);
     NS.add(XQUERY_PREFIX, XQUERY_URI);

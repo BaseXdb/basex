@@ -10,7 +10,7 @@ import org.junit.*;
 /**
  * This class tests the functions of the Archive Module.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class ArchiveModuleTest extends AdvancedQueryTest {
@@ -233,7 +233,7 @@ public final class ArchiveModuleTest extends AdvancedQueryTest {
    * @param archive archive
    * @param exp expected number of results
    */
-  private void count(final String archive, final int exp) {
+  private static void count(final String archive, final int exp) {
     query(COUNT.args(_ARCHIVE_ENTRIES.args(archive)), exp);
   }
 }

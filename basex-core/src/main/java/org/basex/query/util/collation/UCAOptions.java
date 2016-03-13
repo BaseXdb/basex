@@ -12,7 +12,7 @@ import org.basex.util.options.*;
 /**
  * UCA collation options.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class UCAOptions extends CollationOptions {
@@ -77,7 +77,8 @@ public final class UCAOptions extends CollationOptions {
         if(vi == null || vic == null || ((Comparable<Object>) vi).compareTo(vic) > 0)
           throw error(VERSION);
       } catch(final IllegalArgumentException ex) {
-        throw error(VERSION);
+        if(get(FALLBACK) == YesNo.NO)
+          throw new IllegalArgumentException("Version not supported: \"" + v + "\"");
       }
     }
 
@@ -137,7 +138,7 @@ public final class UCAOptions extends CollationOptions {
       final IntList list = new IntList();
       final Method uscript = method(find("com.ibm.icu.lang.UScript"), "getCode", String.class);
       for(final String code : split(v, ',')) {
-        switch (code) {
+        switch(code) {
           case "space":    list.add(0x1000); break;
           case "punct":    list.add(0x1001); break;
           case "symbol":   list.add(0x1002); break;

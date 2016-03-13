@@ -3,20 +3,17 @@ package org.basex.query.expr;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
-import java.util.*;
-
-import org.basex.data.*;
-import org.basex.index.query.*;
+import org.basex.index.*;
 import org.basex.query.*;
-import org.basex.query.expr.CmpV.OpV;
+import org.basex.query.expr.CmpV.*;
 import org.basex.query.func.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.Occ;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -24,7 +21,7 @@ import org.basex.util.hash.*;
 /**
  * General comparison.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class CmpG extends Cmp {
@@ -136,16 +133,10 @@ public final class CmpG extends Cmp {
   }
 
   @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    super.compile(qc, scp);
-    return optimize(qc, scp);
-  }
-
-  @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     // swap expressions; add text() to location paths to simplify optimizations
     if(swap()) {
-      qc.compInfo(OPTSWAP, this);
+      qc.compInfo(OPTSWAP_X, this);
       op = op.swap();
     }
 
@@ -160,7 +151,7 @@ public final class CmpG extends Cmp {
     if(e1.isFunction(Function.COUNT)) {
       final Expr e = compCount(op.op);
       if(e != this) {
-        qc.compInfo(e instanceof Bln ? OPTPRE : OPTWRITE, this);
+        qc.compInfo(e instanceof Bln ? OPTPRE_X : OPTREWRITE_X, this);
         return e;
       }
     }
@@ -169,7 +160,7 @@ public final class CmpG extends Cmp {
     if(e1.isFunction(Function.STRING_LENGTH)) {
       final Expr e = compStringLength(op.op);
       if(e != this) {
-        qc.compInfo(e instanceof Bln ? OPTPRE : OPTWRITE, this);
+        qc.compInfo(e instanceof Bln ? OPTPRE_X : OPTREWRITE_X, this);
         return e;
       }
     }
@@ -178,14 +169,14 @@ public final class CmpG extends Cmp {
     if(e1.isFunction(Function.POSITION)) {
       final Expr e = Pos.get(op.op, e2, this, info);
       if(e != this) {
-        qc.compInfo(OPTWRITE, this);
+        qc.compInfo(OPTREWRITE_X, this);
         return e;
       }
     }
 
     // (A = false()) -> not(A)
     if(st1.eq(SeqType.BLN) && (op == OpG.EQ && e2 == Bln.FALSE || op == OpG.NE && e2 == Bln.TRUE)) {
-      qc.compInfo(OPTWRITE, this);
+      qc.compInfo(OPTREWRITE_X, this);
       return Function.NOT.get(null, info, e1);
     }
 
@@ -195,7 +186,7 @@ public final class CmpG extends Cmp {
     if(e == this) e = CmpSR.get(this);
     if(e != this) {
       // pre-evaluate optimized expression
-      qc.compInfo(OPTWRITE, this);
+      qc.compInfo(OPTREWRITE_X, this);
       return allAreValues() ? e.preEval(qc) : e;
     }
 
@@ -203,18 +194,18 @@ public final class CmpG extends Cmp {
     final SeqType st2 = e2.seqType();
     if(st1.zeroOrOne() && !st1.mayBeArray() && st2.zeroOrOne() && !st2.mayBeArray()) {
       atomic = true;
-      qc.compInfo(OPTATOMIC, this);
+      qc.compInfo(OPTATOMIC_X, this);
     }
 
     // pre-evaluate values
     if(allAreValues()) return preEval(qc);
 
     // pre-evaluate equality test if operands are equal, deterministic, and can be compared
-    if(op == OpG.EQ && e1.sameAs(e2) && !e1.has(Flag.NDT) &&
-        !e1.has(Flag.UPD) && (!e1.has(Flag.CTX) || qc.value != null)) {
+    if(op == OpG.EQ && e1.sameAs(e2) && !e1.has(Flag.NDT) && !e1.has(Flag.UPD) &&
+        (!e1.has(Flag.CTX) || qc.value != null)) {
       // currently limited to strings (function items are invalid, numbers may be NaN)
       final SeqType st = e1.seqType();
-      if(st.occ.min > 0 && st.type.isStringOrUntyped()) return optPre(Bln.TRUE, qc);
+      if(st.oneOrMore() && st.type.isStringOrUntyped()) return optPre(Bln.TRUE, qc);
     }
     return this;
   }
@@ -282,7 +273,6 @@ public final class CmpG extends Cmp {
       }
       ir2 = null;
     }
-
     // give up
     return Bln.FALSE;
   }
@@ -333,58 +323,10 @@ public final class CmpG extends Cmp {
     // only equality expressions on default collation can be rewritten
     if(op != OpG.EQ || coll != null) return false;
 
-    // check if index rewriting is possible
-    if(!ii.check(exprs[0], false)) return false;
-
-    // support expressions
-    final Data data = ii.ic.data;
-    final Expr arg = exprs[1];
-    final ParseExpr root;
-    if(arg.isValue()) {
-      // loop through all items
-      ii.costs = 0;
-      final Iter ir = arg.iter(ii.qc);
-      final ArrayList<ValueAccess> tmp = new ArrayList<>();
-      final TokenSet strings = new TokenSet();
-      for(Item it; (it = ir.next()) != null;) {
-        // only strings and untyped items are supported
-        if(!it.type.isStringOrUntyped()) return false;
-        // do not use index if string is empty
-        final byte[] string = it.string(info);
-        if(string.length == 0) return false;
-
-        // add only expressions that yield results and have not been requested before
-        if(!strings.contains(string)) {
-          strings.put(string);
-          final int costs = data.costs(new StringToken(ii.text, string));
-          if(costs != 0) {
-            final ValueAccess va = new ValueAccess(info, it, ii.text, ii.test, ii.ic);
-            tmp.add(va);
-            if(costs == 1) va.seqType(va.seqType().withOcc(Occ.ZERO_ONE));
-            ii.costs += costs;
-          }
-        }
-      }
-      // more than one string - merge index results
-      final int vs = tmp.size();
-      root = vs == 1 ? tmp.get(0) : new Union(info, tmp.toArray(new ValueAccess[vs]));
-    } else {
-      /* index access is not possible if returned type is not a string or untyped; if
-         expression depends on context; or if it is non-deterministic. examples:
-         for $x in ('a', 1) return //*[text() = $x]
-         //*[text() = .]
-         //*[text() = (if(random:double() < .5) then 'X' else 'Y')]
-       */
-      if(!arg.seqType().type.isStringOrUntyped() || arg.has(Flag.CTX) || arg.has(Flag.NDT) ||
-        arg.has(Flag.UPD)) return false;
-
-      // estimate costs (tend to worst case)
-      ii.costs = Math.max(2, data.meta.size / 10);
-      root = new ValueAccess(info, arg, ii.text, ii.test, ii.ic);
-    }
-
-    ii.create(root, info, Util.info(ii.text ? OPTTXTINDEX : OPTATVINDEX, arg), false);
-    return true;
+    Expr expr1 = exprs[0];
+    final boolean tokenize = expr1 instanceof FnTokenize;
+    if(tokenize) expr1 = ((FnTokenize) expr1).input();
+    return ii.create(exprs[1], ii.type(expr1, tokenize ? IndexType.TOKEN : null), info, false);
   }
 
   @Override

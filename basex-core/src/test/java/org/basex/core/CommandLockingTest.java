@@ -15,7 +15,7 @@ import org.junit.Test;
  * This class tests commands and XQueries for correct identification of databases
  * to lock.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Jens Erat
  */
 public final class CommandLockingTest extends SandboxTest {
@@ -109,10 +109,9 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new Store(FILE), true, CTX_LIST);
   }
 
-  /** Tests locked databases in XQuery queries.
-   * @throws BaseXException database exception */
+  /** Tests locked databases in XQuery queries. */
   @Test
-  public void xquery() throws BaseXException {
+  public void xquery() {
     // Basic document access
     ckDBs(new XQuery(COLLECTION.args(NAME)), false, NAME_LIST);
     ckDBs(new XQuery(COLLECTION.args()), false, CTX_LIST);
@@ -179,12 +178,12 @@ public final class CommandLockingTest extends SandboxTest {
     XQuery query = new XQuery(
         "import module namespace qm='java:org.basex.query.func.QueryModuleTest';" +
         "qm:readLock()");
-    query.execute(context);
+    execute(query);
     ckDBs(query, false, MODULE_LIST);
     query = new XQuery(
         "import module namespace qm='java:org.basex.query.func.QueryModuleTest';" +
         "qm:writeLock()");
-    query.execute(context);
+    execute(query);
     ckDBs(query, true, MODULE_LIST);
   }
 
@@ -223,6 +222,8 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new XQuery(_DB_RETRIEVE.args(NAME, "foo")), false, NAME_LIST);
     ckDBs(new XQuery(_DB_TEXT.args(NAME, "foo")), false, NAME_LIST);
     ckDBs(new XQuery(_DB_TEXT_RANGE.args(NAME, 23, 42)), false, NAME_LIST);
+    ckDBs(new XQuery(_DB_TOKEN.args(NAME, "foo")), false, NAME_LIST);
+    ckDBs(new XQuery(_DB_TOKEN.args(NAME, 23, 42)), false, NAME_LIST);
 
     // Updates
     ckDBs(new XQuery(_DB_CREATE.args(NAME)), true, NAME_LIST);

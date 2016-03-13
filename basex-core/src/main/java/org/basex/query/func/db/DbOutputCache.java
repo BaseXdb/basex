@@ -8,17 +8,17 @@ import org.basex.query.value.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class DbOutputCache extends StandardFunc {
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
-    return qc.resources.output.value();
+  public Value value(final QueryContext qc) {
+    return qc.updates().cache.value();
   }
 
   @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
+  public Iter iter(final QueryContext qc) {
     return value(qc).iter();
   }
 }

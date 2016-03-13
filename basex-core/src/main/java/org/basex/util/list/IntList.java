@@ -7,7 +7,7 @@ import org.basex.util.*;
 /**
  * Resizable-array implementation for native int values.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public class IntList extends ElementList {
@@ -238,6 +238,18 @@ public class IntList extends ElementList {
     size = i;
     return this;
   }
+
+  /**
+   * Sorts the data and returns an array with offsets to the sorted array.
+   * See {@link Array#createOrder(int[], boolean)} for more details.
+   * @return array with new order
+   */
+  public int[] createOrder() {
+    final IntList il = Array.number(size);
+    il.sort(list, true);
+    return il.finish();
+  }
+
 
   /**
    * Sorts the data.
@@ -679,6 +691,6 @@ public class IntList extends ElementList {
 
   @Override
   public String toString() {
-    return Arrays.toString(toArray());
+    return list == null ? "" : Arrays.toString(toArray());
   }
 }

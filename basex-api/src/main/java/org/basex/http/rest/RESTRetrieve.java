@@ -16,7 +16,7 @@ import org.basex.util.*;
 /**
  * Retrieve resources via REST.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class RESTRetrieve extends RESTCmd {
@@ -34,17 +34,14 @@ final class RESTRetrieve extends RESTCmd {
     for(final Command cmd : cmds) run(cmd);
 
     final HTTPContext http = session.http;
+    final SerializerOptions sopts = http.sopts();
     if(run(query(_DB_EXISTS)).equals(Text.TRUE)) {
       // return database resource
       final boolean raw = run(query(_DB_IS_RAW)).equals(Text.TRUE);
-      if(raw) {
-        final SerializerOptions sopts = http.sopts();
-        sopts.set(SerializerOptions.METHOD, SerialMethod.RAW);
-        sopts.set(SerializerOptions.MEDIA_TYPE, run(query(_DB_CONTENT_TYPE)));
-      }
+      if(raw) sopts.set(SerializerOptions.MEDIA_TYPE, run(query(_DB_CONTENT_TYPE)));
       http.initResponse();
 
-      context.options.set(MainOptions.SERIALIZER, http.sopts());
+      context.options.set(MainOptions.SERIALIZER, sopts);
       run(query(raw ? _DB_RETRIEVE : _DB_OPEN), http.res.getOutputStream());
 
     } else {
@@ -55,7 +52,7 @@ final class RESTRetrieve extends RESTCmd {
       list(table, el, RESTText.Q_RESOURCE, 0);
 
       http.initResponse();
-      try(final Serializer ser = Serializer.get(http.res.getOutputStream(), http.sopts())) {
+      try(final Serializer ser = Serializer.get(http.res.getOutputStream(), sopts)) {
         ser.serialize(el);
       }
     }
@@ -66,7 +63,7 @@ final class RESTRetrieve extends RESTCmd {
    * @param f function
    * @return query
    */
-  private AQuery query(final Function f) {
+  private XQuery query(final Function f) {
     final HTTPContext http = session.http;
     final String query = "declare variable $d external;" +
         "declare variable $p external;" + f.args("$d", "$p");

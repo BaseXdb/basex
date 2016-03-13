@@ -10,7 +10,7 @@ import org.basex.query.value.seq.*;
 /**
  * Provides an interface for data specific TreeMap visualizations.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 abstract class MapPainter {
@@ -21,11 +21,11 @@ abstract class MapPainter {
 
   /**
    * Constructor.
-   * @param map map reference
+   * @param view map reference
    * @param gopts gui options
    */
-  MapPainter(final MapView map, final GUIOptions gopts) {
-    this.view = map;
+  MapPainter(final MapView view, final GUIOptions gopts) {
+    this.view = view;
     this.gopts = gopts;
   }
 

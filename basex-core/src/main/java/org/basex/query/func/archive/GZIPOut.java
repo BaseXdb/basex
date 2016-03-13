@@ -8,7 +8,7 @@ import org.basex.util.*;
 /**
  * GZIP output.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class GZIPOut extends ArchiveOut {
@@ -19,7 +19,7 @@ final class GZIPOut extends ArchiveOut {
    * Writing constructor.
    * @throws IOException I/O exception
    */
-  public GZIPOut() throws IOException {
+  GZIPOut() throws IOException {
     zos = new GZIPOutputStream(ao);
   }
 

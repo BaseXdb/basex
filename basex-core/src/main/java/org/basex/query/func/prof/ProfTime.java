@@ -13,7 +13,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class ProfTime extends StandardFunc {
@@ -28,7 +28,7 @@ public final class ProfTime extends StandardFunc {
     // check caching flag
     if(exprs.length > 1 && toBoolean(exprs[1], qc)) {
       final Value v = qc.value(exprs[0]).cache().value();
-      FnTrace.dump(token(p.getTime()), msg, qc);
+      FnTrace.trace(token(p.getTime()), msg, qc);
       return v.iter();
     }
 
@@ -37,7 +37,7 @@ public final class ProfTime extends StandardFunc {
       @Override
       public Item next() throws QueryException {
         final Item it = ir.next();
-        if(it == null) FnTrace.dump(token(p.getTime()), msg, qc);
+        if(it == null) FnTrace.trace(token(p.getTime()), msg, qc);
         return it;
       }
     };

@@ -15,7 +15,7 @@ import org.basex.query.func.*;
 /**
  * This class caches information on a single XQuery module with RESTXQ annotations.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class RestXqModule {
@@ -49,10 +49,10 @@ final class RestXqModule {
     try(final QueryContext qc = qc(ctx)) {
       // loop through all functions
       final String name = file.name();
-      for(final StaticFunc uf : qc.funcs.funcs()) {
+      for(final StaticFunc sf : qc.funcs.funcs()) {
         // only add functions that are defined in the same module (file)
-        if(name.equals(new IOFile(uf.info.path()).name())) {
-          final RestXqFunction rxf = new RestXqFunction(uf, qc, this);
+        if(name.equals(new IOFile(sf.info.path()).name())) {
+          final RestXqFunction rxf = new RestXqFunction(sf, qc, this);
           if(rxf.parse(ctx)) functions.add(rxf);
         }
       }

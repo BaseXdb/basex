@@ -5,7 +5,7 @@ import static org.basex.util.Token.*;
 /**
  * This class assembles texts which are used in the data classes.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public interface DataText {
@@ -40,12 +40,22 @@ public interface DataText {
   String DBUPDIDX = "UPDINDEX";
   /** Automatic optimization. */
   String DBAUTOOPT = "AUTOOPT";
-  /** Text indexing. */
+  /** Text index. */
   String DBTXTIDX = "TXTINDEX";
-  /** Attribute indexing. */
+  /** Attribute index. */
   String DBATVIDX = "ATVINDEX";
-  /** Full-text indexing. */
+  /** Token index. */
+  String DBTOKIDX = "TOKINDEX";
+  /** Full-text index. */
   String DBFTXIDX = "FTXINDEX";
+  /** Text index: names. */
+  String DBTXTINC = "TXTINC";
+  /** Attribute index: names. */
+  String DBATVINC = "ATVINC";
+  /** Token index: names. */
+  String DBTOKINC = "TOKINC";
+  /** Full-text index: names. */
+  String DBFTXINC = "FTXINC";
   /** Full-text stemming. */
   String DBFTST = "FTSTEM";
   /** Full-text language. */
@@ -56,10 +66,12 @@ public interface DataText {
   String DBFTCS = "FTCS";
   /** Full-text diacritics removal. */
   String DBFTDC = "FTDC";
-  /** Maximum token length. */
+  /** Maximum length of index entries. */
   String DBMAXLEN = "MAXLEN";
   /** Maximum number of categories. */
   String DBMAXCATS = "MAXCATS";
+  /** Index split size. */
+  String DBSPLITS = "SPLITS";
   /** Up-to-date flag. */
   String DBUPTODATE = "UPTODATE";
   /** Last (highest) id. */
@@ -68,11 +80,13 @@ public interface DataText {
   String DBPERM = "PERM";
   /** Documents. */
   String DBDOCS = "DOCS";
-  /** Text indexing. */
+  /** Recreate text index. */
   String DBCRTTXT = "CRTTXT";
-  /** Attribute indexing. */
+  /** Recreate attribute index. */
   String DBCRTATV = "CRTATV";
-  /** Full-text indexing. */
+  /** Recreate token index. */
+  String DBCRTTOK = "CRTTOK";
+  /** Recreate full-text index. */
   String DBCRTFTX = "CRTFTX";
 
   /** Full-text wildcards indexing (legacy, obsolete). */
@@ -84,7 +98,7 @@ public interface DataText {
   String DBTAGS = "TAGS";
   /** Attributes. */
   String DBATTS = "ATTS";
-  /** Path summary. */
+  /** Path index. */
   String DBPATH = "PATH";
   /** Namespace. */
   String DBNS = "NS";
@@ -101,6 +115,8 @@ public interface DataText {
   String DATATXT = "txt";
   /** Database - Attribute value index. */
   String DATAATV = "atv";
+  /** Database - Token index. */
+  String DATATOK = "tok";
   /** Database - Full-text index. */
   String DATAFTX = "ftx";
   /** Database - Stopword list. */
@@ -150,9 +166,9 @@ public interface DataText {
   /** LessThan entity. */
   byte[] E_LT = token("&lt;");
   /** Carriage return. */
-  byte[] E_0D = token("&#x0D;");
-  /** Line feed. */
-  byte[] E_0A = token("&#x0A;");
+  byte[] E_CR = token("&#xD;");
+  /** Newline. */
+  byte[] E_NL = token("&#xA;");
   /** Line separator. */
   byte[] E_2028 = token("&#x2028;");
   /** HTML: Non-breaking space entity. */

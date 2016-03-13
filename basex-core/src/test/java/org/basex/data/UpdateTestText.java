@@ -9,10 +9,10 @@ import org.junit.*;
 /**
  * This class tests the update features of the {@link Data} class.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Tim Petrowsky
  */
-public final class UpdateTestText extends UpdateTest {
+public final class UpdateTestText extends DataUpdateTest {
   /**
    * Tests insert as last child.
    * @throws IOException I/O exception
@@ -246,8 +246,8 @@ public final class UpdateTestText extends UpdateTest {
         data.kind(pre - 1)) == par && data.kind(pre - 1) == Data.TEXT))
       throw new IOException("May not insert TEXT before/after TEXT!");
 
-    final MemData md = new MemData(context.data(), context.options);
-    md.text(0, pre - par, val, kind);
+    final MemData md = new MemData(context.options);
+    md.text(pre - par, val, kind);
     md.insert(0);
     data.startUpdate(context.options);
     data.insert(pre, par, new DataClip(md));

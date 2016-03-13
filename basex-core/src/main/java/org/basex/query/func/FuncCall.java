@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * An XQuery function call, either static or dynamic.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public abstract class FuncCall extends Arr {
@@ -45,7 +45,7 @@ public abstract class FuncCall extends Arr {
 
   @Override
   public final void markTailCalls(final QueryContext qc) {
-    if(qc != null) qc.compInfo(QueryText.OPTTCE, this);
+    if(qc != null) qc.compInfo(QueryText.OPTTCE_X, this);
     tailCall = true;
   }
 

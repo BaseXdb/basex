@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * Archive reader.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 abstract class ArchiveIn implements Closeable {
@@ -34,7 +34,7 @@ abstract class ArchiveIn implements Closeable {
       if(li.lookup() == 0x50) return new ZIPIn(li);
       if(li.lookup() == 0x1f) return new GZIPIn(li);
     } catch(final IOException ex) {
-      try { bi.close(); } catch(final IOException ignored) { }
+      try { bi.close(); } catch(final IOException ignore) { }
       throw ARCH_FAIL_X.get(info, ex);
     }
     throw ARCH_UNKNOWN.get(info);

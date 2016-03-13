@@ -9,7 +9,7 @@ import org.junit.*;
 /**
  * This class tests the functions of the Conversion Module.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class ConvertModuleTest extends AdvancedQueryTest {
@@ -25,9 +25,9 @@ public final class ConvertModuleTest extends AdvancedQueryTest {
     query(_CONVERT_INTEGER_TO_BASE.args(4, 10), 4);
     query(_CONVERT_INTEGER_TO_BASE.args(65535, 10), 65535);
     query(_CONVERT_INTEGER_TO_BASE.args(65536, 10), 65536);
-    error(_CONVERT_INTEGER_TO_BASE.args(1, 1), INVBASE_X);
-    error(_CONVERT_INTEGER_TO_BASE.args(1, 100), INVBASE_X);
-    error(_CONVERT_INTEGER_TO_BASE.args(1, 100), INVBASE_X);
+    error(_CONVERT_INTEGER_TO_BASE.args(1, 1), BXCO_INVBASE_X);
+    error(_CONVERT_INTEGER_TO_BASE.args(1, 100), BXCO_INVBASE_X);
+    error(_CONVERT_INTEGER_TO_BASE.args(1, 100), BXCO_INVBASE_X);
   }
 
   /** Test method. */
@@ -43,10 +43,10 @@ public final class ConvertModuleTest extends AdvancedQueryTest {
     query(_CONVERT_INTEGER_FROM_BASE.args("4", 10), 4);
     query(_CONVERT_INTEGER_FROM_BASE.args("65535", 10), 65535);
     query(_CONVERT_INTEGER_FROM_BASE.args("65536", 10), 65536);
-    error(_CONVERT_INTEGER_FROM_BASE.args("1", 1), INVBASE_X);
-    error(_CONVERT_INTEGER_FROM_BASE.args("1", 100), INVBASE_X);
-    error(_CONVERT_INTEGER_FROM_BASE.args("abc", 10), INVBASEDIG_X_X);
-    error(_CONVERT_INTEGER_FROM_BASE.args("012", 2), INVBASEDIG_X_X);
+    error(_CONVERT_INTEGER_FROM_BASE.args("1", 1), BXCO_INVBASE_X);
+    error(_CONVERT_INTEGER_FROM_BASE.args("1", 100), BXCO_INVBASE_X);
+    error(_CONVERT_INTEGER_FROM_BASE.args("abc", 10), BXCO_INVBASEDIG_X_X);
+    error(_CONVERT_INTEGER_FROM_BASE.args("012", 2), BXCO_INVBASEDIG_X_X);
   }
 
   /** Test method. */
@@ -74,23 +74,23 @@ public final class ConvertModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void bytesToHex() {
-    query(_CONVERT_BYTES_TO_HEX.args("xs:byte(1)"), "01");
-    query(_CONVERT_BYTES_TO_HEX.args(" for $i in 1 to 3 return xs:byte($i)"), "010203");
+    query(_CONVERT_BYTES_TO_HEX.args("xs:byte(65)"), "A");
+    query(_CONVERT_BYTES_TO_HEX.args(" for $i in 48 to 50 return xs:byte($i)"), "012");
   }
 
   /** Test method. */
   @Test
   public void bytesToBase64() {
-    query(_CONVERT_BYTES_TO_BASE64.args("xs:byte(97)"), "YQ==");
+    query(_CONVERT_BYTES_TO_BASE64.args("xs:byte(97)"), "a");
     query(_CONVERT_BYTES_TO_BASE64.args("()"), "");
   }
 
   /** Test method. */
   @Test
   public void stringToBase64() {
-    query(_CONVERT_STRING_TO_BASE64.args("a"), "YQ==");
-    query(_CONVERT_STRING_TO_BASE64.args("a", "UTF-8"), "YQ==");
-    query(_CONVERT_STRING_TO_BASE64.args("a", "US-ASCII"), "YQ==");
+    query(STRING.args(_CONVERT_STRING_TO_BASE64.args("a")), "YQ==");
+    query(STRING.args(_CONVERT_STRING_TO_BASE64.args("a", "UTF-8")), "YQ==");
+    query(STRING.args(_CONVERT_STRING_TO_BASE64.args("a", "US-ASCII")), "YQ==");
     error(_CONVERT_STRING_TO_BASE64.args("\u00fc", "US-ASCII"), BXCO_BASE64_X_X);
     error(_CONVERT_STRING_TO_BASE64.args("a", "X"), BXCO_ENCODING_X);
   }
@@ -98,9 +98,9 @@ public final class ConvertModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void stringToHex() {
-    query(_CONVERT_STRING_TO_HEX.args("a"), "61");
-    query(_CONVERT_STRING_TO_HEX.args("a", "UTF-8"), "61");
-    query(_CONVERT_STRING_TO_HEX.args("a", "US-ASCII"), "61");
+    query(STRING.args(_CONVERT_STRING_TO_HEX.args("a")), "61");
+    query(STRING.args(_CONVERT_STRING_TO_HEX.args("a", "UTF-8")), "61");
+    query(STRING.args(_CONVERT_STRING_TO_HEX.args("a", "US-ASCII")), "61");
     error(_CONVERT_STRING_TO_HEX.args("\u00fc", "US-ASCII"), BXCO_BASE64_X_X);
     error(_CONVERT_STRING_TO_HEX.args("a", "X"), BXCO_ENCODING_X);
   }

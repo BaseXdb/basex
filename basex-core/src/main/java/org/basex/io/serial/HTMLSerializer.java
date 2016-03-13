@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
-import org.basex.io.out.*;
 import org.basex.query.value.item.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
@@ -14,7 +13,7 @@ import org.basex.util.list.*;
 /**
  * This class serializes items as HTML.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class HTMLSerializer extends MarkupSerializer {
@@ -32,12 +31,12 @@ final class HTMLSerializer extends MarkupSerializer {
 
   /**
    * Constructor, specifying serialization options.
-   * @param out print output
+   * @param os output stream
    * @param sopts serialization parameters
    * @throws IOException I/O exception
    */
-  HTMLSerializer(final PrintOutput out, final SerializerOptions sopts) throws IOException {
-    super(out, sopts, V40, V401, V50);
+  HTMLSerializer(final OutputStream os, final SerializerOptions sopts) throws IOException {
+    super(os, sopts, V40, V401, V50);
   }
 
   @Override
@@ -67,7 +66,7 @@ final class HTMLSerializer extends MarkupSerializer {
       } else if(ch == 0x9 || ch == 0xA) {
         printHex(ch);
       } else {
-        encode(ch);
+        printChar(ch);
       }
     }
     out.print(ATT2);
@@ -93,11 +92,11 @@ final class HTMLSerializer extends MarkupSerializer {
   }
 
   @Override
-  protected void encode(final int cp) throws IOException {
-    if(script) printChar(cp);
+  protected void printChar(final int cp) throws IOException {
+    if(script) out.print(cp);
     else if(cp > 0x7F && cp < 0xA0 && !html5) throw SERILL_X.getIO(Integer.toHexString(cp));
     else if(cp == 0xA0) out.print(E_NBSP);
-    else super.encode(cp);
+    else super.printChar(cp);
   }
 
   @Override

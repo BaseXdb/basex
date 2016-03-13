@@ -17,7 +17,7 @@ import org.basex.util.list.*;
  * They are used in the GUI and in the {@link Context} class to reference currently opened,
  * marked, and copied database nodes.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class DBNodes extends DBNodeSeq {
@@ -118,6 +118,7 @@ public final class DBNodes extends DBNodeSeq {
   public void toggle(final int pre) {
     final int[] n = { pre };
     pres = contains(pre) ? except(pres, n) : union(pres, n);
+    size = pres.length;
     sorted = null;
   }
 
@@ -127,6 +128,7 @@ public final class DBNodes extends DBNodeSeq {
    */
   public void union(final int[] pre) {
     pres = union(pres, pre);
+    size = pres.length;
     sorted = null;
   }
 

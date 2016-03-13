@@ -2,11 +2,12 @@ package org.basex.query.value.array;
 
 import org.basex.query.util.fingertree.*;
 import org.basex.query.value.*;
+import org.basex.util.*;
 
 /**
  * A builder for creating an {@link Array} by prepending and appending elements.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public final class ArrayBuilder {
@@ -185,7 +186,7 @@ public final class ArrayBuilder {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    final StringBuilder sb = new StringBuilder(Util.className(this)).append('[');
     if(tree.isEmpty()) {
       final int n = inLeft + inRight, first = (mid - inLeft + CAP) % CAP;
       if(n > 0) {

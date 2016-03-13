@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * Single Internet media type.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class MediaType {
@@ -104,7 +104,7 @@ public final class MediaType {
    * @return type
    */
   public String type() {
-    return sub.isEmpty() ? main : new StringBuilder(main).append('/').append(sub).toString();
+    return sub.isEmpty() ? main : (main + '/' + sub);
   }
 
   /**

@@ -15,7 +15,7 @@ import org.basex.util.list.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class DbDelete extends DbAccess {
@@ -27,14 +27,14 @@ public final class DbDelete extends DbAccess {
     // delete XML resources
     final IntList docs = data.resources.docs(path);
     final int is = docs.size();
-    final Updates updates = qc.resources.updates();
+    final Updates updates = qc.updates();
     for(int i = 0; i < is; i++) {
       updates.add(new DeleteNode(docs.get(i), data, info), qc);
     }
     // delete raw resources
     if(!data.inMemory()) {
       final IOFile bin = data.meta.binary(path);
-      if(bin == null) throw UPDBDELETE_X.get(info, path);
+      if(bin == null) throw BXDB_PATH_X.get(info, path);
       updates.add(new DBDelete(data, path, info), qc);
     }
     return null;

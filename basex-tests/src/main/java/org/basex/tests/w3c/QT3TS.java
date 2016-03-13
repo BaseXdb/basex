@@ -7,6 +7,7 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.regex.*;
 
 import javax.xml.namespace.*;
@@ -17,7 +18,7 @@ import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.func.fn.Compare.Mode;
+import org.basex.query.func.fn.DeepEqual.Mode;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.tests.bxapi.*;
@@ -30,7 +31,7 @@ import org.basex.util.options.Options.YesNo;
  * {@code http://dev.w3.org/2011/QT3-test-suite/}. The driver needs to be
  * executed from the test suite directory.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class QT3TS extends Main {
@@ -165,8 +166,8 @@ public final class QT3TS extends Main {
 
     // save report
     if(report != null) {
-      final String file = "ReportingResults/results_" +
-          Prop.NAME + "_" + Prop.VERSION + IO.XMLSUFFIX;
+      sopts.set(SerializerOptions.OMIT_XML_DECLARATION, YesNo.YES);
+      final String file = "ReportingResults/results_" + NAME + "_" + VERSION + IO.XMLSUFFIX;
       new IOFile(file).write(report.create(ctx).toArray());
       Util.outln("Creating report '" + file + "'...");
     }
@@ -176,7 +177,7 @@ public final class QT3TS extends Main {
 
     if(slow != null && !slow.isEmpty()) {
       Util.outln(NL + "Slow queries:");
-      for(final Map.Entry<Long, String> l : slow.entrySet()) {
+      for(final Entry<Long, String> l : slow.entrySet()) {
         Util.outln("- " + -(l.getKey() / 1000000) + " ms: " + l.getValue());
       }
     }
@@ -347,7 +348,7 @@ public final class QT3TS extends Main {
         // set base uri
         if(env.baseURI != null) query.baseURI(env.baseURI);
         // bind decimal formats
-        for(final Map.Entry<QName, HashMap<String, String>> df :
+        for(final Entry<QName, HashMap<String, String>> df :
           env.decFormats.entrySet()) {
           query.decimalFormat(df.getKey(), df.getValue());
         }
@@ -410,7 +411,7 @@ public final class QT3TS extends Main {
    * @param env environment
    * @return query;
    */
-  private XQuery environment(XQuery query, QT3Env env) {
+  private XQuery environment(final XQuery query, final QT3Env env) {
     if(env != null) {
       // bind namespaces
       for(final HashMap<String, String> ns : env.namespaces) {
@@ -430,14 +431,13 @@ public final class QT3TS extends Main {
    * @return result
    */
   private String normSpecial(final String in) {
-    return in.replaceAll("<\\?xml.*?>", "").replace("\n", "%0A").replace("\r", "%0D").
+    return in.replaceAll("^<\\?xml.*?>\r?\n?", "").replace("\n", "%0A").replace("\r", "%0D").
         replace("\t", "%09");
   }
 
   /** Flags for dependencies that are not supported. */
   private static final String NOSUPPORT =
-    "('schema-location-hint','schemaAware','schemaImport'," +
-    "'schemaValidation','staticTyping')";
+    "('schema-location-hint','schemaImport','schemaValidation','staticTyping','typedData')";
 
   /**
    * Checks if the current test case is supported.
@@ -457,10 +457,10 @@ public final class QT3TS extends Main {
       "@type = 'unicode-normalization-form' and @value = 'FULLY-NORMALIZED' or " +
       // skip xml/xsd 1.1 tests
       "@type = ('xml-version', 'xsd-version') and @value = ('1.1', '1.0:4-') or " +
-      // skip limits
-      "@type = 'limits' and @value = ('big_integer') or " +
+      // skip default-language
+      "@type = 'default-language' and @value != 'en' or " +
       // skip non-XQuery tests
-      "@type = 'spec' and not(matches(@value, 'XQ\\d\\d\\+'))" +
+      "@type = 'spec' and not(matches(@value, 'XQ(\\d\\d\\+|31)'))" +
       "]", ctx).context(test).value().size() == 0;
   }
 
@@ -484,7 +484,7 @@ public final class QT3TS extends Main {
   private String test(final QT3Result result, final XdmValue expected) {
     final String type = expected.getName().getLocalPart();
     try {
-      String msg;
+      final String msg;
       if(type.equals("error")) {
         msg = assertError(result, expected);
       } else if(type.equals("assert-serialization-error")) {
@@ -568,7 +568,7 @@ public final class QT3TS extends Main {
       final String msg = test(result, it);
       if(msg != null) tb.add(tb.isEmpty() ? "" : ", ").add(msg);
     }
-    return tb.isEmpty() ? "Error" : null;
+    return tb.isEmpty() ? "not(...)" : null;
   }
 
   /**
@@ -712,13 +712,14 @@ public final class QT3TS extends Main {
           asString("serialize(., map{ 'indent':'no','method':'xml' })", returned));
       if(exp.equals(res)) return null;
       final String r = normNL(asString(
-          "serialize(., map{ 'indent':'no','method':'xml','omit-xml-declaration':'no' })", returned));
+          "serialize(., map{ 'indent':'no','method':'xml','omit-xml-declaration':'no' })",
+          returned));
       if(exp.equals(r)) return null;
 
       // include check for comments, processing instructions and namespaces
       String flags = "'" + Mode.ALLNODES + "'";
       if(!pref) flags += ",'" + Mode.NAMESPACES + "'";
-      final String query = Function._BASEX_DEEP_EQUAL.args("<X>" + exp + "</X>",
+      final String query = Function._UTIL_DEEP_EQUAL.args("<X>" + exp + "</X>",
           "<X>" + res + "</X>" , "(" + flags + ")");
       return asBoolean(query, expected) ? null : exp;
     } catch(final IOException ex) {
@@ -920,7 +921,7 @@ public final class QT3TS extends Main {
         } else if(c == 'a') {
           all = true;
         } else if(c == 'd') {
-          Prop.debug = true;
+          debug = true;
         } else if(c == 'i') {
           ignoring = true;
         } else if(c == 'e') {
@@ -999,12 +1000,12 @@ public final class QT3TS extends Main {
    * @return database path
    */
   private IOFile sandbox() {
-    return new IOFile(Prop.TMP, testid);
+    return new IOFile(TMP, testid);
   }
 
   @Override
   public String header() {
-    return Util.info(Text.S_CONSOLE, Util.className(this));
+    return Util.info(Text.S_CONSOLE_X, Util.className(this));
   }
 
   @Override

@@ -16,7 +16,7 @@ import org.basex.util.hash.*;
 /**
  * Mixed path expression.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class MixedPath extends Path {
@@ -57,21 +57,19 @@ public final class MixedPath extends Path {
     }
 
     final Value cv = qc.value;
-    final long cs = qc.size;
-    final long cp = qc.pos;
+    final long cp = qc.pos, cs = qc.size;
     try {
       // loop through all expressions
       final int sl = steps.length;
       for(int s = 0; s < sl; s++) {
-        final Expr step = steps[s];
-        final ItemList cache = new ItemList();
-
-        // map operator: don't remove duplicates and check for nodes
+        // set context position and size
         qc.size = sz;
         qc.pos = 1;
 
-        // loop through all input items
-        long nodes = 0;
+        // loop through all input items; cache nodes and items
+        final ANodeList nodes = new ANodeList().check();
+        final ItemList items = new ItemList();
+        final Expr step = steps[s];
         for(Item it; (it = iter.next()) != null;) {
           if(!(it instanceof ANode)) throw PATHNODE_X_X_X.get(info, step, it.type, it);
           qc.value = it;
@@ -79,31 +77,24 @@ public final class MixedPath extends Path {
           // loop through all resulting items
           final Iter ir = qc.iter(step);
           for(Item i; (i = ir.next()) != null;) {
-            if(i instanceof ANode) nodes++;
-            cache.add(i);
+            if(i instanceof ANode) nodes.add((ANode) i);
+            else items.add(i);
           }
           qc.pos++;
         }
 
-        final long vs = cache.size();
-        if(nodes < vs) {
-          // check if both nodes and atomic values occur in last result
-          if(nodes > 0) throw EVALNODESVALS.get(info);
-          // check if input for next axis step consists items other than nodes
-          if(s + 1 < sl) {
-            final Item it = cache.get(0);
-            throw PATHNODE_X_X_X.get(info, steps[s + 1], it.type, it);
-          }
-        }
-
-        if(nodes == vs) {
-          // remove potential duplicates from node sets
-          final ANodeList list = new ANodeList().check();
-          for(final Item nd : cache) list.add((ANode) nd);
-          iter = list.iter();
+        if(items.isEmpty()) {
+          // all results are nodes: create new iterator
+          iter = nodes.iter();
         } else {
-          iter = cache.iter();
+          // raise error if this is not the final result
+          if(s + 1 < sl)
+            throw PATHNODE_X_X_X.get(info, steps[s + 1], items.get(0).type, items.get(0));
+          // result contains non-nodes: raise error if result any contains nodes
+          if(!nodes.isEmpty()) throw MIXEDRESULTS.get(info);
+          iter = items.iter();
         }
+        sz = iter.size();
       }
       return iter;
     } finally {

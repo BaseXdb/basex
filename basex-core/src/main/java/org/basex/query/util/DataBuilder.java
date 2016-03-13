@@ -18,7 +18,7 @@ import org.basex.util.*;
 /**
  * Data builder. Provides methods for copying XML nodes into a main-memory database instance.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class DataBuilder {
@@ -91,9 +91,9 @@ public final class DataBuilder {
    * @return pre value of next node
    */
   private int addDoc(final ANode node, final int pre) {
-    final int last = data.meta.size;
     final int size = size(node, false);
-    data.doc(last, size, node.baseURI());
+    data.doc(size, node.baseURI());
+    final int last = data.meta.size;
     data.insert(last);
     int next = pre + 1;
     for(final ANode child : node.children()) next = addNode(child, next, pre);
@@ -117,7 +117,7 @@ public final class DataBuilder {
       par != -1 ? data.nspaces.uriId(uri) : data.nspaces.add(last, prefix, uri, data);
 
     final int nameId = data.attrNames.index(qname.string(), null, false);
-    data.attr(last, pre - par, nameId, node.string(), uriId);
+    data.attr(pre - par, nameId, node.string(), uriId);
     data.insert(last);
     return pre + 1;
   }
@@ -160,9 +160,8 @@ public final class DataBuilder {
    * @param dist distance
    */
   private void addText(final byte[] text, final int dist) {
-    final int last = data.meta.size;
-    data.text(last, dist, text, Data.TEXT);
-    data.insert(last);
+    data.text(dist, text, Data.TEXT);
+    data.insert(data.meta.size);
   }
 
   /**
@@ -173,10 +172,9 @@ public final class DataBuilder {
    * @return pre value of next node
    */
   private int addPI(final ANode node, final int pre, final int par) {
-    final int last = data.meta.size;
     final byte[] value = trim(concat(node.name(), SPACE, node.string()));
-    data.text(last, pre - par, value, Data.PI);
-    data.insert(last);
+    data.text(pre - par, value, Data.PI);
+    data.insert(data.meta.size);
     return pre + 1;
   }
 
@@ -188,9 +186,8 @@ public final class DataBuilder {
    * @return pre value of next node
    */
   private int addComm(final ANode node, final int pre, final int par) {
-    final int last = data.meta.size;
-    data.text(last, pre - par, node.string(), Data.COMM);
-    data.insert(last);
+    data.text(pre - par, node.string(), Data.COMM);
+    data.insert(data.meta.size);
     return pre + 1;
   }
 
@@ -247,7 +244,7 @@ public final class DataBuilder {
     }
 
     int size = 1;
-    BasicNodeIter iter = node.attributes();
+    final BasicNodeIter iter = node.attributes();
     while(iter.next() != null) ++size;
     if(!att) {
       for(final ANode child : node.children()) size += size(child, false);

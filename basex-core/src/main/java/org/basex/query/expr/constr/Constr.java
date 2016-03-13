@@ -16,7 +16,7 @@ import org.basex.util.*;
 /**
  * Element constructor.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Constr {
@@ -27,11 +27,11 @@ public final class Constr {
   /** Namespace array. */
   final Atts nspaces = new Atts();
   /** Error: attribute position. */
-  public boolean errAtt;
+  public QNm errAtt;
   /** Error: namespace position. */
-  boolean errNS;
+  public QNm errNS;
   /** Error: duplicate attribute. */
-  public byte[] duplAtt;
+  public QNm duplAtt;
   /** Error: duplicate namespace. */
   byte[] duplNS;
 
@@ -57,16 +57,16 @@ public final class Constr {
   /**
    * Constructs child and attribute nodes.
    * @param qc query context
-   * @param expr input expressions
+   * @param exprs input expressions
    * @return self reference
    * @throws QueryException query exception
    */
-  public Constr add(final QueryContext qc, final Expr... expr) throws QueryException {
+  public Constr add(final QueryContext qc, final Expr... exprs) throws QueryException {
     final int s = sc.ns.size();
     try {
-      for(final Expr e : expr) {
+      for(final Expr expr : exprs) {
         more = false;
-        final Iter iter = qc.iter(e);
+        final Iter iter = qc.iter(expr);
         for(Item it; (it = iter.next()) != null && add(qc, it););
       }
       if(!text.isEmpty()) children.add(new FTxt(text.toArray()));
@@ -77,8 +77,7 @@ public final class Constr {
   }
 
   /**
-   * Recursively adds nodes to the element arrays. Recursion is necessary
-   * as documents are resolved to their child nodes.
+   * Recursively adds nodes to the element arrays.
    * @param qc query context
    * @param it current item
    * @return true if item was added
@@ -108,16 +107,16 @@ public final class Constr {
       } else if(ip == NodeType.ATT) {
         // type: attribute node
 
-        // no attribute allowed after texts or child nodes
+        // check if attribute is specified after texts or child nodes
+        final QNm name = node.qname();
         if(!text.isEmpty() || !children.isEmpty()) {
-          errAtt = true;
+          errAtt = name;
           return false;
         }
         // check for duplicate attribute names
-        final QNm name = node.qname();
         for(final ANode att : atts) {
           if(name.eq(att.qname())) {
-            duplAtt = name.string();
+            duplAtt = name;
             return false;
           }
         }
@@ -131,17 +130,15 @@ public final class Constr {
 
         // no attribute allowed after texts or child nodes
         if(!text.isEmpty() || !children.isEmpty()) {
-          errNS = true;
+          errNS = node.qname();
           return false;
         }
 
         // add namespace
-        final byte[] name = node.name();
-        final byte[] uri = node.string();
-        final byte[] u = nspaces.value(name);
-        if(u == null) {
+        final byte[] name = node.name(), uri = node.string(), knownUri = nspaces.value(name);
+        if(knownUri == null) {
           nspaces.add(name, uri);
-        } else if(!Token.eq(uri, u)) {
+        } else if(!Token.eq(uri, knownUri)) {
           // duplicate namespace (ignore duplicates with same uri)
           duplNS = name;
           return false;
@@ -158,8 +155,6 @@ public final class Constr {
 
         // add text node
         if(!text.isEmpty()) children.add(new FTxt(text.next()));
-
-        // [CG] XQuery, element construction: avoid full copy of sub tree if not needed
         node = node.deepCopy(qc.context.options);
         children.add(node);
       }

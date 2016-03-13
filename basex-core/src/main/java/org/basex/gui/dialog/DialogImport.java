@@ -23,7 +23,7 @@ import org.basex.util.list.*;
 /**
  * Panel for importing new database resources.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Lukas Kircher
  */
 final class DialogImport extends BaseXBack {
@@ -43,13 +43,15 @@ final class DialogImport extends BaseXBack {
   /** Parsing options. */
   private final DialogParsing parsing;
   /** Add contents of archives. */
-  private final BaseXCheckBox archives;
+  private final BaseXCheckBox addArchives;
+  /** Prefix database path with name of archive. */
+  private final BaseXCheckBox archiveName;
   /** Skip corrupt files. */
   private final BaseXCheckBox skipCorrupt;
   /** Add remaining files as raw files. */
   private final BaseXCheckBox addRaw;
   /** Document filter. */
-  private final BaseXTextField filter;
+  private final BaseXTextField createFilter;
 
   /**
    * Constructor.
@@ -61,15 +63,14 @@ final class DialogImport extends BaseXBack {
     gui = dial.gui;
     this.parsing = parsing;
 
-    layout(new TableLayout(10, 1));
+    layout(new TableLayout(11, 1));
     border(8);
 
     // add options
     add(new BaseXLabel(FILE_OR_DIR + COL, true, true).border(0, 0, 6, 0));
 
     final String path = gui.gopts.get(GUIOptions.INPUTPATH);
-    input = new BaseXTextField(path, dial);
-    input.history(GUIOptions.INPUTS, dial);
+    input = new BaseXTextField(path, dial).history(GUIOptions.INPUTS, dial);
 
     final IO io = IO.get(path);
     if(io instanceof IOFile && !path.isEmpty()) dbname = io.dbname();
@@ -94,26 +95,28 @@ final class DialogImport extends BaseXBack {
     parsers = new BaseXCombo(dial, ps.finish());
     parsers.setSelectedItem(opts.get(MainOptions.PARSER).name());
 
-    filter = new BaseXTextField(opts.get(MainOptions.CREATEFILTER), dial);
-    filter.setColumns(30);
+    createFilter = new BaseXTextField(opts.get(MainOptions.CREATEFILTER), dial);
+    createFilter.setColumns(30);
 
     addRaw = new BaseXCheckBox(ADD_RAW_FILES, MainOptions.ADDRAW, opts, dial);
     skipCorrupt = new BaseXCheckBox(SKIP_CORRUPT_FILES, MainOptions.SKIPCORRUPT, opts, dial);
-    archives = new BaseXCheckBox(PARSE_ARCHIVES, MainOptions.ADDARCHIVES, opts, dial);
+    addArchives = new BaseXCheckBox(PARSE_ARCHIVES, MainOptions.ADDARCHIVES, opts, dial);
+    archiveName = new BaseXCheckBox(ADD_ARCHIVE_NAME, MainOptions.ARCHIVENAME, opts, dial);
 
     final BaseXBack p = new BaseXBack(new TableLayout(2, 2, 20, 0));
     p.add(new BaseXLabel(INPUT_FORMAT, false, true).border(0, 0, 6, 0));
     p.add(new BaseXLabel(FILE_PATTERNS + COL, false, true).border(0, 0, 6, 0));
     p.add(parsers);
-    p.add(filter);
+    p.add(createFilter);
     add(p);
     add(Box.createVerticalStrut(8));
     add(addRaw);
     add(skipCorrupt);
-    add(archives);
+    add(addArchives);
+    add(archiveName);
 
     // add info label
-    info = new BaseXLabel(" ").border(32, 0, 6, 0);
+    info = new BaseXLabel(" ").border(20, 0, 6, 0);
     add(info);
 
     final DropHandler dh = new DropHandler() {
@@ -163,10 +166,10 @@ final class DialogImport extends BaseXBack {
     final IO io = IO.get(in);
     gui.gopts.set(GUIOptions.INPUTPATH, in);
 
-    boolean multi = io.isDir() || io.isArchive();
-    archives.setEnabled(multi);
-    multi &= archives.isSelected();
-    filter.setEnabled(multi);
+    final boolean multi = io.isDir() || io.isArchive();
+    addArchives.setEnabled(multi);
+    createFilter.setEnabled(multi);
+    archiveName.setEnabled(addArchives.isSelected());
 
     final MainParser parser = MainParser.valueOf(parsers.getSelectedItem());
     final boolean raw = parser == MainParser.RAW;
@@ -175,7 +178,7 @@ final class DialogImport extends BaseXBack {
 
     if(comp == parsers) {
       parsing.setType(parser);
-      if(multi) filter.setText(raw ? "*" : "*." + parser);
+      if(multi) createFilter.setText(raw ? "*" : "*." + parser);
     }
 
     ok &= empty ? in.isEmpty() || io.exists() : !in.isEmpty() && io.exists();
@@ -190,8 +193,9 @@ final class DialogImport extends BaseXBack {
    */
   void setOptions() {
     gui.set(MainOptions.PARSER, MainParser.valueOf(parsers.getSelectedItem()));
-    gui.set(MainOptions.CREATEFILTER, filter.getText());
-    gui.set(MainOptions.ADDARCHIVES, archives.isSelected());
+    gui.set(MainOptions.CREATEFILTER, createFilter.getText());
+    gui.set(MainOptions.ADDARCHIVES, addArchives.isSelected());
+    gui.set(MainOptions.ARCHIVENAME, archiveName.isSelected());
     gui.set(MainOptions.SKIPCORRUPT, skipCorrupt.isSelected());
     gui.set(MainOptions.ADDRAW, addRaw.isSelected());
     input.store();
@@ -221,10 +225,7 @@ final class DialogImport extends BaseXBack {
 
     final boolean dir = io.isDir();
     final boolean archive = io.isArchive();
-    if(dir || archive) {
-      return;
-      //filter.setText('*' + IO.XMLSUFFIX);
-    }
+    if(dir || archive) return;
 
     // evaluate input type
     MainParser type = null;

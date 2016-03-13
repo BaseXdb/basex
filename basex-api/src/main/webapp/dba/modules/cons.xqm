@@ -1,7 +1,7 @@
 (:~
  : Global constants and functions.
  :
- : @author Christian Grün, BaseX GmbH, 2014-15
+ : @author Christian Grün, BaseX Team, 2014-16
  :)
 module namespace cons = 'dba/cons';
 
@@ -40,8 +40,8 @@ declare variable $cons:OPTION :=
   let $defaults := map {
     'maxchars': 100000,
     'maxrows': 500,
-    'timeout': 5,
-    'memory': 100,
+    'timeout': 10,
+    'memory': 200,
     'permission': 'admin'
   }
   return try {

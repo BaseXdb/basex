@@ -20,7 +20,7 @@ import org.basex.util.*;
 /**
  * This is a parser for XML input, creating {@link Command} instances.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class XMLParser extends CmdParser {
@@ -116,8 +116,8 @@ final class XMLParser extends CmdParser {
       return new InfoDB();
     if(e.equals(INFO_INDEX) && check(root, TYPE + '?'))
       return new InfoIndex(value(root, TYPE));
-    if(e.equals(INFO_STORAGE) && check(root, '#' + QUERY + '?'))
-      return new InfoStorage(value(root));
+    if(e.equals(INFO_STORAGE) && check(root, START + '?', END + '?'))
+      return new InfoStorage(value(root, START), value(root, END));
     if(e.equals(KILL) && check(root, TARGET))
       return new Kill(value(root, TARGET));
     if(e.equals(LIST) && check(root, NAME + '?', PATH + '?'))

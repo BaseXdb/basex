@@ -4,7 +4,7 @@ package org.basex.query.util.fingertree;
  * A <i>deep</i> node containing elements in the left and right digit and a sub-tree in
  * the middle.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  *
  * @param <N> node type
@@ -129,7 +129,7 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
     final Node<N, E>[] newLeft = slice(left, -1, m), sub = slice(left, m, ll);
     newLeft[0] = fst;
     final FingerTree<Node<N, E>, E> mid = middle.cons(new InnerNode<>(sub));
-    return DeepTree.get(newLeft, mid, right, size + sz);
+    return get(newLeft, mid, right, size + sz);
   }
 
   @Override
@@ -171,7 +171,7 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
       if(left.length == 1) return new SingletonTree<>(left[0]);
 
       final int mid = left.length / 2;
-      return DeepTree.get(slice(left, 0, mid), slice(left, mid, left.length), newSize);
+      return get(slice(left, 0, mid), slice(left, mid, left.length), newSize);
     }
 
     // extract values for the right digit from the middle
@@ -194,7 +194,7 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
       if(right.length == 1) return new SingletonTree<>(right[0]);
 
       final int mid = right.length / 2;
-      return DeepTree.get(slice(right, 0, mid), slice(right, mid, right.length), newSize);
+      return get(slice(right, 0, mid), slice(right, mid, right.length), newSize);
     }
 
     // extract values for the left digit from the middle
@@ -204,7 +204,7 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
 
   @Override
   public long size() {
-    return this.size;
+    return size;
   }
 
   @Override
@@ -294,7 +294,7 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
       // digit has to be split
       final int m = temp.length - NODE_SIZE;
       final Node<N, E>[] newLeft = slice(temp, 0, m), ch = slice(temp, m, temp.length);
-      return DeepTree.get(newLeft, middle.cons(new InnerNode<>(ch)), right, size + 1);
+      return get(newLeft, middle.cons(new InnerNode<>(ch)), right, size + 1);
     }
 
     long p = pos - leftSize;
@@ -365,14 +365,14 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
       // merge into left digit
       final Node<N, E>[] newLeft = slice(left, 0, left.length + 1);
       newLeft[left.length] = node;
-      return slice.setTree(DeepTree.get(newLeft, leftSize + node.size(), right, size - 1));
+      return slice.setTree(get(newLeft, leftSize + node.size(), right, size - 1));
     }
 
     if(right.length < MAX_DIGIT) {
       // merge into right digit
       final Node<N, E>[] newRight = slice(right, -1, right.length);
       newRight[0] = node;
-      return slice.setTree(DeepTree.get(left, leftSize, newRight, size - 1));
+      return slice.setTree(get(left, leftSize, newRight, size - 1));
     }
 
     // redistribute the nodes
@@ -385,7 +385,7 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
     System.arraycopy(right, 0, ch, inL + 1, inR);
     final Node<N, E>[] newRight = slice(right, inR, MAX_DIGIT);
     final Node<Node<N, E>, E> newMid = new InnerNode<>(ch);
-    return slice.setTree(DeepTree.get(newLeft, new SingletonTree<>(newMid), newRight, size - 1));
+    return slice.setTree(get(newLeft, new SingletonTree<>(newMid), newRight, size - 1));
   }
 
   /**
@@ -413,7 +413,7 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
         // nodes were merged
         final Node<N, E>[] newLeft = head.children.clone();
         newLeft[0] = newFirst;
-        return DeepTree.get(newLeft, middle.tail(), right, size - 1);
+        return get(newLeft, middle.tail(), right, size - 1);
       }
 
       @SuppressWarnings("unchecked")
@@ -439,7 +439,7 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
       final int mid = right.length / 2;
       final Node<N, E>[] newLeft = slice(right, 0, mid);
       newLeft[0] = newFirstRight;
-      return DeepTree.get(newLeft, middle, slice(right, mid, right.length), size - 1);
+      return get(newLeft, middle, slice(right, mid, right.length), size - 1);
     }
 
     // structure does not change
@@ -506,7 +506,7 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
 
       @SuppressWarnings("unchecked")
       final Node<N, E>[] newRight = new Node[] { newLastLeft };
-      return DeepTree.get(slice(left, 0, left.length - 1), newRight, size - 1);
+      return get(slice(left, 0, left.length - 1), newRight, size - 1);
     }
 
     @SuppressWarnings("unchecked")
@@ -514,13 +514,13 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
 
     if(newLastLeft == lastLeft) {
       // deletion could be absorbed
-      return DeepTree.get(left, leftSize, newRight, size - 1);
+      return get(left, leftSize, newRight, size - 1);
     }
 
     // adapt the left digit
     final Node<N, E>[] newLeft = left.clone();
     newLeft[newLeft.length - 1] = newLastLeft;
-    return DeepTree.get(newLeft, newRight, size - 1);
+    return get(newLeft, newRight, size - 1);
   }
 
   /**
@@ -535,7 +535,7 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
     int i = 0;
     long off = pos;
     Node<N, E> node;
-    for(;;) {
+    while(true) {
       node = arr[i];
       final long nodeSize = node.size();
       if(off < nodeSize) break;
@@ -586,11 +586,10 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
     final NodeLike<N, E>[] buffer = new NodeLike[2 * MAX_DIGIT + 1];
     int inBuffer = splitDigit(left, from, inLeft, buffer, 0);
     if(inLeft == len) {
-      final int n = inBuffer;
-      if(n == 1) return new TreeSlice<>(buffer[0]);
-      final int mid1 = n / 2;
-      final Node<N, E>[] ls = slice(buffer, 0, mid1), rs = slice(buffer, mid1, n);
-      return new TreeSlice<>(DeepTree.get(ls, rs, len));
+      if(inBuffer == 1) return new TreeSlice<>(buffer[0]);
+      final int mid1 = inBuffer / 2;
+      final Node<N, E>[] ls = slice(buffer, 0, mid1), rs = slice(buffer, mid1, inBuffer);
+      return new TreeSlice<>(get(ls, rs, len));
     }
 
     final long inMiddle = len - inLeft - inRight;
@@ -602,12 +601,12 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
     } else {
       final long midOff = from <= leftSize ? 0 : from - leftSize;
       slice = middle.slice(midOff, inMiddle);
-      if(!slice.isTree()) {
+      if(slice.isTree()) {
+        mid = slice.getTree();
+      } else {
         final NodeLike<N, E> sub = ((PartialInnerNode<N, E>) slice.getPartial()).sub;
         inBuffer = sub.append(buffer, inBuffer);
         mid = EmptyTree.getInstance();
-      } else {
-        mid = slice.getTree();
       }
     }
 
@@ -654,7 +653,7 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
       newRight = slice(buffer, 0, inBuffer);
     }
 
-    return slice.setTree(DeepTree.get(newLeft, mid3, newRight, len));
+    return slice.setTree(get(newLeft, mid3, newRight, len));
   }
 
   /**
@@ -725,7 +724,7 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
       int l = k + left.length;
       final Node<N, E>[] ls = slice(nodes, 0, l);
       System.arraycopy(left, 0, ls, k, left.length);
-      if(l <= MAX_DIGIT) return DeepTree.get(ls, middle, right);
+      if(l <= MAX_DIGIT) return get(ls, middle, right);
 
       FingerTree<Node<N, E>, E> newMid = middle;
       for(int rem = (l + MAX_ARITY - 1) / MAX_ARITY; rem > 1; rem--) {
@@ -734,13 +733,13 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
         l -= curr;
       }
 
-      return DeepTree.get(slice(ls, 0, l), newMid, right);
+      return get(slice(ls, 0, l), newMid, right);
     }
 
     final int r = right.length + k;
     final Node<N, E>[] rs = slice(right, 0, r);
     System.arraycopy(nodes, 0, rs, right.length, k);
-    if(k + right.length <= MAX_DIGIT) return DeepTree.get(left, middle, rs);
+    if(k + right.length <= MAX_DIGIT) return get(left, middle, rs);
 
     int i = 0;
     FingerTree<Node<N, E>, E> newMid = middle;
@@ -750,7 +749,7 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
       i += curr;
     }
 
-    return DeepTree.get(left, newMid, slice(rs, i, r));
+    return get(left, newMid, slice(rs, i, r));
   }
 
   @Override

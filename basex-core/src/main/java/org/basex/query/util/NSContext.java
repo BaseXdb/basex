@@ -10,12 +10,12 @@ import org.basex.util.*;
 /**
  * This class references all statically known namespaces.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class NSContext {
   /** Static namespaces, containing prefixes and URIs. */
-  private final Atts ns = new Atts();
+  public final Atts ns = new Atts();
   /** Dynamically added namespaces. */
   private Atts stack;
 
@@ -57,8 +57,8 @@ public final class NSContext {
   }
 
   /**
-   * Returns the namespace URI for the specified prefix if it is either
-   * found in the dynamic, static or predefined namespaces.
+   * Returns the namespace URI for the specified prefix if it is either found in the dynamic,
+   * static or predefined namespaces.
    * @param pref prefix of the namespace
    * @return namespace URI or {@code null}
    */

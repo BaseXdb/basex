@@ -19,7 +19,7 @@ import org.basex.util.*;
 /**
  * Tree of project view.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
@@ -54,9 +54,9 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
 
     // add popup
     new BaseXPopup(this, pv.gui,
-      new OpenCmd(), new OpenExternalCmd(), new TestCmd(),
-      null, new DeleteCmd(), new RenameCmd(), new NewDirCmd(), null,
-      new RefreshCmd(), null, new AddImportCmd(), new CopyPathCmd()
+      new OpenCmd(), new OpenExternalCmd(), new TestCmd(), null,
+      new DeleteCmd(), new RenameCmd(), new NewDirCmd(), null,
+      new RefreshCmd(), null, new CopyPathCmd()
     );
   }
 
@@ -101,7 +101,7 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
   }
 
   @Override
-  public void treeWillExpand(final TreeExpansionEvent event) throws ExpandVetoException {
+  public void treeWillExpand(final TreeExpansionEvent event) {
     final Object obj = event.getPath().getLastPathComponent();
     if(obj instanceof ProjectNode) {
       final ProjectNode node = (ProjectNode) obj;
@@ -111,7 +111,7 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
   }
 
   @Override
-  public void treeWillCollapse(final TreeExpansionEvent event) throws ExpandVetoException {
+  public void treeWillCollapse(final TreeExpansionEvent event) {
     final Object obj = event.getPath().getLastPathComponent();
     if(obj instanceof ProjectNode) {
       final ProjectNode node = (ProjectNode) obj;
@@ -168,7 +168,7 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
     RefreshCmd() { super(REFRESH, BaseXKeys.REFRESH); }
 
     @Override public void execute() {
-      view.reset();
+      view.refresh();
       selectedNode().refresh();
     }
 
@@ -209,7 +209,9 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
         }
       }
     }
-    @Override public boolean enabled(final GUI main) { return selectedNode() != null; }
+    @Override public boolean enabled(final GUI main) {
+      return selectedNode() != null;
+    }
   }
 
   /** Delete command. */
@@ -219,15 +221,16 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
 
     @Override public void execute() {
       final ProjectNode node = selectedNode();
-      if(BaseXDialog.confirm(view.gui, Util.info(DELETE_FILE_X, node.file))) {
+      final GUI gui = view.gui;
+      if(BaseXDialog.confirm(gui, Util.info(DELETE_FILE_X, node.file))) {
         final ProjectNode parent = (ProjectNode) node.getParent();
         // delete file or show error dialog
-        if(view.editor.delete(node.file)) {
+        if(gui.editor.delete(node.file)) {
           parent.refresh();
           setSelectionPath(parent.path());
-          view.reset();
+          view.refresh();
         } else {
-          BaseXDialog.error(view.gui, Util.info(FILE_NOT_DELETED_X, node.file));
+          BaseXDialog.error(gui, Util.info(FILE_NOT_DELETED_X, node.file));
         }
       }
     }
@@ -245,7 +248,7 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
 
     @Override public void execute() {
       startEditingAtPath(selectedNode().path());
-      view.reset();
+      view.refresh();
     }
 
     @Override public boolean enabled(final GUI main) {
@@ -260,7 +263,7 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
     OpenCmd() { super(OPEN, BaseXKeys.ENTER); }
 
     @Override public void execute() {
-      for(final ProjectNode node : selectedNodes()) view.open(node.file, null);
+      for(final ProjectNode node : selectedNodes()) view.open(node.file, "");
     }
 
     @Override public boolean enabled(final GUI main) {
@@ -310,21 +313,6 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener {
 
     @Override public boolean enabled(final GUI main) {
       return selectedNode() != null;
-    }
-  }
-
-  /** Add as import command. */
-  private final class AddImportCmd extends GUIPopupCmd {
-    /** Constructor. */
-    AddImportCmd() { super(ADD_AS_IMPORT, BaseXKeys.ADDIMPORT); }
-
-    @Override public void execute() {
-      view.addImport(selectedNode().file);
-    }
-
-    @Override public boolean enabled(final GUI main) {
-      final ProjectNode node = selectedNode();
-      return node != null && node.file.hasSuffix(IO.XQSUFFIXES);
     }
   }
 }

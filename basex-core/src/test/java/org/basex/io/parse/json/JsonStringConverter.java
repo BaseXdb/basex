@@ -8,7 +8,7 @@ import org.basex.util.*;
 /**
  * Writes the parsed JSON file to the given {@link TokenBuilder}.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 final class JsonStringConverter extends JsonConverter {
@@ -32,16 +32,16 @@ final class JsonStringConverter extends JsonConverter {
    *
    * @param json JSON string
    * @param liberal liberal parsing
-   * @param unescape unescape flag
+   * @param escape escape flag
    * @return resulting string
    * @throws QueryIOException query I/O exception
    */
-  public static String toString(final String json, final boolean liberal, final boolean unescape)
+  public static String toString(final String json, final boolean liberal, final boolean escape)
       throws QueryIOException {
 
     final JsonParserOptions jopts = new JsonParserOptions();
     jopts.set(JsonParserOptions.LIBERAL, liberal);
-    jopts.set(JsonParserOptions.UNESCAPE, unescape);
+    jopts.set(JsonParserOptions.ESCAPE, escape);
     final TokenBuilder tb = new TokenBuilder();
     JsonParser.parse(json, null, jopts, new JsonStringConverter(jopts, tb));
     return tb.toString();

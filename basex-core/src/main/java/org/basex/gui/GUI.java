@@ -37,7 +37,7 @@ import org.basex.util.options.*;
 /**
  * This class is the main window of the GUI. It is the central instance for user interactions.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class GUI extends JFrame {
@@ -403,23 +403,20 @@ public final class GUI extends JFrame {
   public void execute(final boolean edit, final Command... cmd) {
     // ignore command if updates take place
     if(updating) return;
-
-    final Thread t = new Thread() {
+    new Thread() {
       @Override
       public void run() {
         if(cmd.length == 0) info.setInfo("", null, true, true);
         for(final Command c : cmd)
           if(!exec(c, edit)) break;
       }
-    };
-    t.setDaemon(true);
-    t.start();
+    }.start();
   }
 
   /**
    * Executes the specified command.
    * @param cmd command to be executed
-   * @param edit call from editor panel
+   * @param edit called from editor panel
    * @return success flag
    */
   private boolean exec(final Command cmd, final boolean edit) {
@@ -479,27 +476,32 @@ public final class GUI extends JFrame {
       } finally {
         updating = false;
       }
-      final String time = perf.getTime();
 
       // show query info
+      final String time = perf.getTime();
       info.setInfo(inf, cmd, time, ok, true);
 
       // sends feedback to the query editor
       final boolean stopped = inf.endsWith(INTERRUPTED);
       if(edit) editor.info(cause, stopped, true);
 
+      // get query result and node references to currently opened database
+      final Value result = cmd.finish();
+      DBNodes nodes = result instanceof DBNodes && !result.isEmpty() ? (DBNodes) result : null;
+
+      // show text view if a non-empty result does not reference the currently opened database
+      if(!text.visible() && ao.size() != 0 && nodes == null) {
+        GUIMenuCmd.C_SHOWRESULT.execute(this);
+      }
+
       // check if query feedback was evaluated in the query view
       if(!ok && !stopped) {
         // display error in info view
         text.setText(ao);
-        if((!edit || inf.startsWith(S_BUGINFO)) && !info.visible()) {
+        if(!info.visible() && (!edit || inf.startsWith(S_BUGINFO))) {
           GUIMenuCmd.C_SHOWINFO.execute(this);
         }
       } else {
-        // get query result
-        final Value result = cmd.finish();
-        DBNodes nodes = result instanceof DBNodes && result.size() != 0 ? (DBNodes) result : null;
-
         final boolean updated = cmd.updated(context);
         if(context.data() != data) {
           // database reference has changed - notify views
@@ -523,7 +525,7 @@ public final class GUI extends JFrame {
               // use query result
               m = nodes;
             } else if(m.size() != 0) {
-              // remove old highlight
+              // remove old highlighting
               m = new DBNodes(data);
             }
             // refresh views
@@ -536,20 +538,15 @@ public final class GUI extends JFrame {
           status.setText(Util.info(TIME_NEEDED_X, time));
           // show number of hits
           if(result != null) setResults(result.size());
-
-          if(nodes == null) {
-            // make text view visible
-            if(!text.visible() && ao.size() != 0) GUIMenuCmd.C_SHOWRESULT.execute(this);
-            // assign textual output if no node result was created
-            text.setText(ao);
-          }
+          // assign textual output if no node result was created
+          if(nodes == null) text.setText(ao);
           // only cache output if data has not been updated (in which case notifyUpdate was called)
           if(!updated) text.cache(ao, cmd, result);
         }
       }
     } catch(final Exception ex) {
       // unexpected error
-      BaseXDialog.error(this, Util.info(EXEC_ERROR, cmd, Util.bug(ex)));
+      BaseXDialog.error(this, Util.info(EXEC_ERROR_X_X, cmd, Util.bug(ex)));
       updating = false;
     }
     stop();
@@ -744,9 +741,9 @@ public final class GUI extends JFrame {
     // ignore snapshots and beta versions
     if(Strings.contains(Prop.VERSION, ' ')) return;
 
-    final Thread t = new Thread() {
+    new GUIWorker<Version>() {
       @Override
-      public void run() {
+      protected Version doInBackground() throws Exception {
         final Version disk = new Version(gopts.get(GUIOptions.UPDATEVERSION));
         final Version used = new Version(Prop.VERSION);
 
@@ -754,38 +751,32 @@ public final class GUI extends JFrame {
           // update version option to latest used version
           writeVersion(used);
         } else {
-          try {
-            final String page = Token.string(new IOUrl(Prop.VERSION_URL).read());
-            final Matcher m = Pattern.compile("^(Version )?([\\w\\d.]*?)( .*|$)",
-                Pattern.DOTALL).matcher(page);
-            if(m.matches()) {
-              final Version latest = new Version(m.group(2));
-              if(disk.compareTo(latest) < 0) {
-                if(BaseXDialog.confirm(GUI.this, Util.info(H_NEW_VERSION, Prop.NAME, latest))) {
-                  // jump to browser
-                  BaseXDialog.browse(GUI.this, Prop.UPDATE_URL);
-                } else {
-                  // don't show update dialog anymore if it has been rejected once
-                  writeVersion(latest);
-                }
-              }
-            }
-          } catch(final Exception ex) {
-            // ignore connection failure
+          final String page = Token.string(new IOUrl(Prop.VERSION_URL).read());
+          final Matcher m = Pattern.compile("^(Version )?([\\w\\d.]*?)( .*|$)",
+              Pattern.DOTALL).matcher(page);
+          if(m.matches()) {
+            final Version latest = new Version(m.group(2));
+            if(disk.compareTo(latest) < 0) return latest;
           }
         }
+        return null;
       }
-    };
-    t.setDaemon(true);
-    SwingUtilities.invokeLater(t);
-  }
 
-  /**
-   * Writes a version to the options.
-   * @param version version
-   */
-  private void writeVersion(final Version version) {
-    gopts.set(GUIOptions.UPDATEVERSION, version.toString());
-    gopts.write();
+      @Override
+      protected void done(final Version latest) {
+        if(BaseXDialog.confirm(GUI.this, Util.info(H_NEW_VERSION, Prop.NAME, latest))) {
+          // jump to browser
+          BaseXDialog.browse(GUI.this, Prop.UPDATE_URL);
+        } else {
+          // don't show update dialog anymore if it has been rejected once
+          writeVersion(latest);
+        }
+      }
+
+      private void writeVersion(final Version version) {
+        gopts.set(GUIOptions.UPDATEVERSION, version.toString());
+        gopts.write();
+      }
+    }.execute();
   }
 }

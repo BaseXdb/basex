@@ -13,7 +13,7 @@ import org.basex.util.*;
 /**
  * Japanese lexer using igo (http://igo.sourceforge.jp/).
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Toshio HIRAI
  */
 final class JapaneseTokenizer extends Tokenizer {
@@ -561,7 +561,7 @@ final class JapaneseTokenizer extends Tokenizer {
         hinshi = HINSHI_KIGOU;
       } else {
         final String h = getPos();
-        switch (h) {
+        switch(h) {
           case MEISHI:       hinshi = HINSHI_MEISHI; break;
           case RENTAISHI:    hinshi = HINSHI_RENTAISHI; break;
           case HUKUSHI:      hinshi = HINSHI_HUKUSHI; break;

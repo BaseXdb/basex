@@ -4,10 +4,12 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import org.basex.data.*;
+import org.basex.index.*;
 import org.basex.index.name.*;
 import org.basex.index.query.*;
 import org.basex.index.stats.*;
 import org.basex.query.*;
+import org.basex.query.expr.index.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.expr.path.Test.Kind;
 import org.basex.query.iter.*;
@@ -23,7 +25,7 @@ import org.basex.util.hash.*;
 /**
  * Numeric range expression.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class CmpR extends Single {
@@ -148,29 +150,31 @@ public final class CmpR extends Single {
   public boolean indexAccessible(final IndexInfo ii) {
     // accept only location path, string and equality expressions
     final Data data = ii.ic.data;
-    // sequential main memory scan is assumed to be faster than range index access
-    if(!mni || !mxi || data.inMemory() || !ii.check(expr, false)) return false;
+    // sequential main memory scan is assumed to be faster than range index access;
+    // no support for main-memory databases
+    if(!mni || !mxi || data.inMemory()) return false;
+    final IndexType type = ii.type(expr, null);
+    if(type == null) return false;
 
-    final Stats key = key(ii, ii.text);
+    final Stats key = key(ii, type);
     if(key == null) return false;
 
     // estimate costs for range access; all values out of range: no results
-    final NumericRange nr = new NumericRange(ii.text,
-        Math.max(min, key.min), Math.min(max, key.max));
-
+    final NumericRange nr = new NumericRange(type, Math.max(min, key.min), Math.min(max, key.max));
     // skip queries with no results
     if(nr.min > nr.max || nr.max < key.min || nr.min > key.max) {
       ii.costs = 0;
       return true;
     }
 
+    // estimate costs
+    ii.costs = data.costs(nr);
+    if(ii.costs == -1) return false;
+
     // skip if numbers are negative, doubles, or of different string length
     final int mnl = min >= 0 && (long) min == min ? token(min).length : -1;
     final int mxl = max >= 0 && (long) max == max ? token(max).length : -1;
     if(mnl != mxl || mnl == -1) return false;
-
-    // estimate costs (conservative value)
-    ii.costs = Math.max(2, data.meta.size / 3);
 
     // don't use index if min/max values are infinite
     if(min == Double.NEGATIVE_INFINITY && max == Double.POSITIVE_INFINITY ||
@@ -178,17 +182,17 @@ public final class CmpR extends Single {
 
     final TokenBuilder tb = new TokenBuilder();
     tb.add(mni ? '[' : '(').addExt(min).add(',').addExt(max).add(mxi ? ']' : ')');
-    ii.create(new RangeAccess(info, nr, ii.ic), info, Util.info(OPTRNGINDEX, tb), true);
+    ii.create(new RangeAccess(info, nr, ii.ic), true, info, Util.info(OPTINDEX_X_X, "range", tb));
     return true;
   }
 
   /**
    * Retrieves the statistics key for the element/attribute name.
    * @param ii index info
-   * @param text text flag
+   * @param type index type
    * @return key
    */
-  private Stats key(final IndexInfo ii, final boolean text) {
+  private Stats key(final IndexInfo ii, final IndexType type) {
     // statistics are not up-to-date
     final Data data = ii.ic.data;
     if(!data.meta.uptodate || !data.nspaces.isEmpty() || !(expr instanceof AxisPath)) return null;
@@ -198,7 +202,7 @@ public final class CmpR extends Single {
       final Step step;
       final AxisPath path = (AxisPath) expr;
       final int st = path.steps.length - 1;
-      if(text) {
+      if(type == IndexType.TEXT) {
         step = st == 0 ? ii.step : path.step(st - 1);
         if(step.test.kind != Kind.NAME) return null;
       } else {
@@ -208,7 +212,7 @@ public final class CmpR extends Single {
       test = (NameTest) step.test;
     }
 
-    final Names names = text ? data.elemNames : data.attrNames;
+    final Names names = type == IndexType.TEXT ? data.elemNames : data.attrNames;
     final Stats key = names.stat(names.id(test.name.local()));
     return key == null || key.type == StatsType.INTEGER ||
         key.type == StatsType.DOUBLE ? key : null;

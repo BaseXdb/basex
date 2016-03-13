@@ -22,7 +22,7 @@ import org.basex.util.*;
 /**
  * REST-based evaluation of POST operations.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class RESTPost {
@@ -55,7 +55,7 @@ final class RESTPost {
     try {
       // handle serialization parameters
       final SerializerOptions sopts = http.sopts();
-      try(QueryProcessor qp = new QueryProcessor("*/*:parameter", ctx).context(doc)) {
+      try(final QueryProcessor qp = new QueryProcessor("*/*:parameter", ctx).context(doc)) {
         for(final Item param : qp.value()) {
           final String name = value("@name", param, ctx);
           final String value = value("@value", param, ctx);

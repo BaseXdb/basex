@@ -14,7 +14,7 @@ import org.basex.util.hash.*;
 /**
  * Array constructor.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class CArray extends Arr {
@@ -31,12 +31,6 @@ public final class CArray extends Arr {
     super(info, exprs);
     this.create = create;
     seqType = SeqType.ARRAY_O;
-  }
-
-  @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    super.compile(qc, scp);
-    return optimize(qc, scp);
   }
 
   @Override

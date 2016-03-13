@@ -8,22 +8,28 @@ import java.util.*;
  * This class serves as an efficient constructor for {@link Token Tokens}.
  * It bears some resemblance to Java's {@link StringBuilder}.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class TokenBuilder {
-  /** Half new line. */
-  public static final byte HLINE = 0x01;
-  /** Bold flag. */
-  public static final byte BOLD = 0x02;
-  /** Standard flag. */
-  public static final byte NORM = 0x03;
-  /** Mark flag. */
-  public static final byte MARK = 0x04;
-  /** Underline flag. */
-  public static final byte ULINE = 0x05;
   /** New line. */
   public static final byte NLINE = 0x0A;
+
+  /** Unicode, private area (start). */
+  public static final int PRIVATE_START = 0xE000;
+  /** Unicode, private area (end). */
+  public static final int PRIVATE_END = 0xF8FF;
+
+  /** Half new line. */
+  public static final int HLINE = PRIVATE_END;
+  /** Bold flag. */
+  public static final int BOLD = PRIVATE_END - 1;
+  /** Standard flag. */
+  public static final int NORM = PRIVATE_END - 2;
+  /** Mark flag. */
+  public static final int MARK = PRIVATE_END - 3;
+  /** Underline flag. */
+  public static final int ULINE = PRIVATE_END - 4;
 
   /** Byte array, storing all characters as UTF8. */
   private byte[] chars;
@@ -111,7 +117,7 @@ public final class TokenBuilder {
    * @return self reference
    */
   public TokenBuilder bold() {
-    return addByte(BOLD);
+    return add(BOLD);
   }
 
   /**
@@ -120,7 +126,7 @@ public final class TokenBuilder {
    * @return self reference
    */
   public TokenBuilder uline() {
-    return addByte(ULINE);
+    return add(ULINE);
   }
 
   /**
@@ -129,16 +135,7 @@ public final class TokenBuilder {
    * @return self reference
    */
   public TokenBuilder norm() {
-    return addByte(NORM);
-  }
-
-  /**
-   * Adds a new line. This method should only be called to control text
-   * rendering in the visual front end.
-   * @return self reference
-   */
-  public TokenBuilder nline() {
-    return addByte(NLINE);
+    return add(NORM);
   }
 
   /**
@@ -147,7 +144,16 @@ public final class TokenBuilder {
    * @return self reference
    */
   public TokenBuilder hline() {
-    return addByte(HLINE);
+    return add(HLINE);
+  }
+
+  /**
+   * Adds a new line. This method should only be called to control text
+   * rendering in the visual front end.
+   * @return self reference
+   */
+  public TokenBuilder nline() {
+    return add(NLINE);
   }
 
   /**
@@ -181,24 +187,6 @@ public final class TokenBuilder {
       addByte((byte) (cp >>  6 & 0x3F | 0x80));
       addByte((byte) (cp & 0x3F | 0x80));
     }
-    return this;
-  }
-
-  /**
-   * Inserts the specified UTF8 character.
-   * @param pos insertion position
-   * @param cp the character to be added
-   * @return self reference
-   */
-  public TokenBuilder insert(final int pos, final int cp) {
-    final int s = size;
-    final int cl = chars.length;
-    final int l = cp <= 0x7F ? 1 : cp <= 0x7FF ? 2 : cp <= 0xFFF ? 3 : 4;
-    if(s + l > cl) chars = Arrays.copyOf(chars, Math.max(s + l, (int) (cl * Array.RESIZE)));
-    Array.move(chars, pos, l, size - pos);
-    size = pos;
-    add(cp);
-    size = s + l;
     return this;
   }
 
@@ -440,6 +428,6 @@ public final class TokenBuilder {
 
   @Override
   public String toString() {
-    return string(chars, 0, size);
+    return chars == null ? "" : string(chars, 0, size);
   }
 }

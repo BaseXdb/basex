@@ -15,7 +15,7 @@ import org.basex.util.*;
 /**
  * Update primitive for the {@link Function#_DB_RENAME} function.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class DBRename extends DBUpdate {
@@ -48,7 +48,14 @@ public final class DBRename extends DBUpdate {
     for(final Entry<String, String> op : map.entrySet()) {
       final IOFile src = new IOFile(op.getKey());
       final IOFile trg = new IOFile(op.getValue());
-      if(src.exists()) src.rename(trg);
+      if(src.exists()) {
+        if(trg.exists()) {
+          trg.delete();
+        } else {
+          trg.parent().md();
+        }
+        src.rename(trg);
+      }
     }
   }
 
@@ -58,5 +65,5 @@ public final class DBRename extends DBUpdate {
   }
 
   @Override
-  public void prepare(final MemData tmp) { }
+  public void prepare() { }
 }

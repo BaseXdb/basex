@@ -12,7 +12,7 @@ import org.basex.util.*;
 /**
  * Interface for converters from JSON to XQuery values.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public abstract class JsonConverter {
@@ -117,9 +117,8 @@ public abstract class JsonConverter {
 
   /**
    * Called when an item of a JSON array is closed.
-   * @throws QueryIOException query exception
    */
-  abstract void closeItem() throws QueryIOException;
+  abstract void closeItem();
 
   /**
    * Called when a JSON array is closed.

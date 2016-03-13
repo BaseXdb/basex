@@ -13,7 +13,7 @@ import org.basex.util.list.*;
 /**
  * Evaluates the 'find' command and processes a simplified request as XQuery.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Find extends AQuery {
@@ -53,7 +53,7 @@ public final class Find extends AQuery {
 
   @Override
   public boolean updating(final Context ctx) {
-    return updating(ctx, find(args[0], ctx, root));
+    return updates(ctx, find(args[0], ctx, root));
   }
 
   @Override

@@ -10,18 +10,10 @@ import java.util.*;
  * <p>In order to ensure a consistent representation of tokens in the project, all string
  * conversions should be done via the methods of this class.</p>
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Token {
-  /** Maximum length for hash calculation. */
-  private static final byte MAXLENGTH = 96;
-
-  /** Maximum values for converting tokens to integer values. */
-  private static final int MAXINT = Integer.MAX_VALUE / 10;
-  /** Maximum values for converting tokens to long values. */
-  private static final long MAXLONG = Long.MAX_VALUE / 10;
-
   /** Empty token. */
   public static final byte[] EMPTY = {};
   /** XML token. */
@@ -32,6 +24,10 @@ public final class Token {
   public static final byte[] XMLNS = token("xmlns");
   /** XMLNS token with colon. */
   public static final byte[] XMLNSC = token("xmlns:");
+  /** ID token. */
+  public static final byte[] ID = token("id");
+  /** IDRef token. */
+  public static final byte[] IDREF = token("ref");
   /** Token 'true'. */
   public static final byte[] TRUE = token("true");
   /** Token 'false'. */
@@ -56,6 +52,16 @@ public final class Token {
   public static final byte[] SLASH = { '/' };
   /** Colon. */
   public static final byte[] COLON = { ':' };
+
+  /** Invalid Unicode character. */
+  public static final char INVALID = '\uFFFD';
+
+  /** Maximum length for hash calculation. */
+  private static final byte MAXLENGTH = 96;
+  /** Maximum values for converting tokens to integer values. */
+  private static final int MAXINT = Integer.MAX_VALUE / 10;
+  /** Maximum values for converting tokens to long values. */
+  private static final long MAXLONG = Long.MAX_VALUE / 10;
 
   /** Hex codes. */
   public static final byte[] HEX = token("0123456789ABCDEF");
@@ -215,8 +221,7 @@ public final class Token {
 
   /**
    * Returns the codepoint (unicode value) of the specified token, starting at
-   * the specified position. Returns a unicode replacement character for invalid
-   * values.
+   * the specified position. Returns a unicode replacement character for invalid values.
    * @param token token
    * @param pos character position
    * @return current character
@@ -227,7 +232,7 @@ public final class Token {
     if((v & 0xFF) < 192) return v & 0xFF;
     // number of bytes to be read
     final int vl = cl(v);
-    if(pos + vl > token.length) return 0xFFFD;
+    if(pos + vl > token.length) return INVALID;
     // 110xxxxx 10xxxxxx
     if(vl == 2) return (v & 0x1F) << 6 | token[pos + 1] & 0x3F;
     // 1110xxxx 10xxxxxx 10xxxxxx
@@ -356,17 +361,13 @@ public final class Token {
   private static final DecimalFormatSymbols LOC =
     new DecimalFormatSymbols(Locale.US);
   /** Scientific double output. */
-  private static final DecimalFormat SD =
-    new DecimalFormat("0.0##################E0", LOC);
+  private static final DecimalFormat SD = new DecimalFormat("0.0##################E0", LOC);
   /** Decimal double output. */
-  private static final DecimalFormat DD =
-    new DecimalFormat("#####0.0################", LOC);
+  private static final DecimalFormat DD = new DecimalFormat("#####0.0################", LOC);
   /** Scientific float output. */
-  private static final DecimalFormat SF =
-    new DecimalFormat("0.0######E0", LOC);
+  private static final DecimalFormat SF = new DecimalFormat("0.0######E0", LOC);
   /** Decimal float output. */
-  private static final DecimalFormat DF =
-    new DecimalFormat("#####0.0######", LOC);
+  private static final DecimalFormat DF = new DecimalFormat("#####0.0######", LOC);
 
   /**
    * Creates a byte array representation from the specified double value;
@@ -838,7 +839,7 @@ public final class Token {
 
   /**
    * Returns a substring of the specified token.
-   * Note that this method does not correctly split UTF8 character;
+   * Note that this method ignores Unicode codepoints.
    * use {@link #subtoken} instead.
    * @param token input token
    * @param start start position
@@ -850,7 +851,7 @@ public final class Token {
 
   /**
    * Returns a substring of the specified token.
-   * Note that this method does not correctly split UTF8 character;
+   * Note that this method ignores Unicode codepoints.
    * use {@link #subtoken} instead.
    * @param token input token
    * @param start start position
@@ -902,21 +903,41 @@ public final class Token {
    * @return array
    */
   public static byte[][] split(final byte[] token, final int sep) {
-    final int l = token.length;
-    final byte[][] split = new byte[l][];
+    final int tl = token.length;
+    final byte[][] split = new byte[tl][];
 
-    int s = 0;
+    int sl = 0;
     final TokenBuilder tb = new TokenBuilder();
-    for(int i = 0; i < l; i += cl(token, i)) {
-      final int c = cp(token, i);
+    for(int t = 0; t < tl; t += cl(token, t)) {
+      final int c = cp(token, t);
       if(c == sep) {
-        if(!tb.isEmpty()) split[s++] = tb.next();
+        if(!tb.isEmpty()) split[sl++] = tb.next();
       } else {
         tb.add(c);
       }
     }
-    if(!tb.isEmpty()) split[s++] = tb.finish();
-    return Array.copyOf(split, s);
+    if(!tb.isEmpty()) split[sl++] = tb.finish();
+    return Array.copyOf(split, sl);
+  }
+
+  /**
+   * Normalizes the specified input and returns its distinct tokens.
+   * Optimized for small number of tokens.
+   * @param token token
+   * @return distinct tokens
+   */
+  public static byte[][] distinctTokens(final byte[] token) {
+    final byte[][] tokens = split(normalize(token), ' ');
+    int tl = tokens.length;
+    for(int i = 0; i < tl - 1; i++) {
+      for(int j = i + 1; j < tl; j++) {
+        if(eq(tokens[i], tokens[j])) {
+          Array.move(tokens, j + 1, -1, tl - j  - 1);
+          j--; tl--;
+        }
+      }
+    }
+    return Array.copyOf(tokens, tl);
   }
 
   /**
@@ -1111,6 +1132,32 @@ public final class Token {
   }
 
   /**
+   * Converts the specified token to title case.
+   * @param token token to be converted
+   * @return resulting token
+   */
+  public static byte[] tc(final byte[] token) {
+    final int tl = token.length;
+    boolean title = true;
+    if(ascii(token)) {
+      final byte[] tok = new byte[tl];
+      for(int t = 0; t < tl; t++) {
+        final byte cp = token[t];
+        tok[t] = (byte) (title ? uc(cp) : lc(cp));
+        title = cp > 0 && cp <= ' ';
+      }
+      return tok;
+    }
+    final TokenBuilder tb = new TokenBuilder();
+    for(int t = 0; t < tl; t += cl(token, t)) {
+      final int cp = cp(token, t);
+      tb.add(title ? uc(cp) : lc(cp));
+      title = cp > 0 && cp <= ' ';
+    }
+    return tb.finish();
+  }
+
+  /**
    * Converts a character to upper case.
    * @param ch character to be converted
    * @return resulting character
@@ -1222,4 +1269,5 @@ public final class Token {
     }
     return data;
   }
+
 }

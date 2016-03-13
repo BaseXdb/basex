@@ -20,7 +20,7 @@ import org.basex.util.list.*;
  * of the typed in text. Moreover, the cursor keys can be used to scroll
  * through the list, and list entries can be chosen with mouse clicks.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class BaseXList extends BaseXBack {
@@ -175,9 +175,7 @@ public final class BaseXList extends BaseXBack {
       }
       @Override
       public void mouseClicked(final MouseEvent e) {
-        if(e.getClickCount() == 2) {
-          d.close();
-        }
+        if(e.getClickCount() == 2) d.close();
       }
     };
 
@@ -208,6 +206,11 @@ public final class BaseXList extends BaseXBack {
   public void setEnabled(final boolean en) {
     list.setEnabled(en);
     text.setEnabled(en);
+  }
+
+  @Override
+  public boolean isEnabled() {
+    return list.isEnabled();
   }
 
   /**

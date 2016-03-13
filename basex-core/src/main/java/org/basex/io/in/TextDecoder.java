@@ -13,7 +13,7 @@ import org.basex.util.*;
  * The inheriting classes are optimized for performance and faster than Java's
  * default decoders.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 abstract class TextDecoder {
@@ -49,13 +49,13 @@ abstract class TextDecoder {
 
   /**
    * Processes an invalid character. Throws an exception if input must be valid,
-   * or returns a question mark as replacement.
+   * or returns a replacement character as replacement.
    * @return question mark
    * @throws IOException I/O exception
    */
   int invalid() throws IOException {
     if(valid) throw new InputException();
-    return '?';
+    return Token.INVALID;
   }
 
   /** UTF8 Decoder. */

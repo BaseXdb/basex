@@ -7,12 +7,13 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 
 /**
  * A builder for creating a {@link Seq}uence (with at least 2 items) by prepending and appending
  * {@link Item}s.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public final class TreeSeqBuilder implements Iterable<Item> {
@@ -160,7 +161,7 @@ public final class TreeSeqBuilder implements Iterable<Item> {
       tree.append(midTree);
       for(int i = ls.length; --i >= 0;) addFront(ls[i]);
       for(int i = k; --i >= 0;) addFront(temp[i]);
-      for(int i = 0; i < rs.length; i++) add(rs[i]);
+      for(final Item r : rs) add(r);
       return this;
     }
 
@@ -188,30 +189,30 @@ public final class TreeSeqBuilder implements Iterable<Item> {
    * @return resulting sequence
    */
   Seq seq() {
-    return seq((Type) null);
+    return seq(null);
   }
 
   /**
    * Creates a sequence containing the current elements of this builder.
-   * @param ret type of all elements, may be {@code null}
+   * @param type type of all elements, may be {@code null}
    * @return resulting sequence
    */
-  public Seq seq(final Type ret) {
+  public Seq seq(final Type type) {
     final int n = inLeft + inRight;
     final int start = (mid - inLeft + CAP) % CAP;
     if(n < 2) throw new AssertionError("At least 2 items expected");
 
     // small int array, fill directly
-    if(n <= TreeSeq.MAX_SMALL) return new SmallSeq(items(start, n), ret);
+    if(n <= TreeSeq.MAX_SMALL) return new SmallSeq(items(start, n), type);
 
     // deep array
     final int ll = tree.isEmpty() ? n / 2 : inLeft;
-    return new BigSeq(items(start, ll), tree.freeze(), items(start + ll, n - ll), ret);
+    return new BigSeq(items(start, ll), tree.freeze(), items(start + ll, n - ll), type);
   }
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    final StringBuilder sb = new StringBuilder(Util.className(this)).append('[');
     if(tree.isEmpty()) {
       final int n = inLeft + inRight, first = (mid - inLeft + CAP) % CAP;
       if(n > 0) {
@@ -250,11 +251,9 @@ public final class TreeSeqBuilder implements Iterable<Item> {
         }
 
         if(pos == 0) {
-          if(tree != null) {
-            if(sub == null) sub = tree.iterator();
-            if(sub.hasNext()) return sub.next();
-            sub = null;
-          }
+          if(sub == null) sub = tree.iterator();
+          if(sub.hasNext()) return sub.next();
+          sub = null;
           pos++;
         }
 

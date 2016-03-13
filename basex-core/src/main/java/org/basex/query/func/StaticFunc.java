@@ -26,7 +26,7 @@ import org.basex.util.hash.*;
 /**
  * A static user-defined function.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public final class StaticFunc extends StaticDecl implements XQFunction {
@@ -73,14 +73,14 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     try {
       expr = expr.compile(qc, scope);
 
-      if(declType != null) {
+      if(type != null) {
         // remove redundant casts
-        if((declType.type == AtomType.BLN || declType.type == AtomType.FLT ||
-            declType.type == AtomType.DBL || declType.type == AtomType.QNM ||
-            declType.type == AtomType.URI) && declType.eq(expr.seqType())) {
-          qc.compInfo(OPTCAST, declType);
+        if((type.type == AtomType.BLN || type.type == AtomType.FLT ||
+            type.type == AtomType.DBL || type.type == AtomType.QNM ||
+            type.type == AtomType.URI) && type.eq(expr.seqType())) {
+          qc.compInfo(OPTCAST_X, type);
         } else {
-          expr = new TypeCheck(sc, info, expr, declType, true).optimize(qc, scope);
+          expr = new TypeCheck(sc, info, expr, type, true).optimize(qc, scope);
         }
       }
     } catch(final QueryException qe) {
@@ -102,17 +102,6 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     addPlan(plan, el, expr);
     final int al = args.length;
     for(int a = 0; a < al; ++a) el.add(planAttr(ARG + a, args[a].name.string()));
-  }
-
-  @Override
-  public String toString() {
-    final TokenBuilder tb = new TokenBuilder(DECLARE).add(' ').addExt(anns);
-    tb.add(FUNCTION).add(' ').add(name.string());
-    tb.add(PAREN1).addSep(args, SEP).add(PAREN2);
-    if(declType != null) tb.add(' ' + AS + ' ' + declType);
-    if(expr != null) tb.add(" { ").addExt(expr).add(" }; ");
-    else tb.add(" external; ");
-    return tb.toString();
   }
 
   /**
@@ -150,7 +139,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
   @Override
   public FuncType funcType() {
-    return FuncType.get(anns, args, declType);
+    return FuncType.get(anns, type, args);
   }
 
   @Override
@@ -208,7 +197,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   }
 
   /**
-   * Checks if all updating expressions in the function are correctly declared and placed.
+   * Checks if the updating semantics are satisfied.
    * @throws QueryException query exception
    */
   void checkUp() throws QueryException {
@@ -217,7 +206,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     final InputInfo ii = expr instanceof ParseExpr ? ((ParseExpr) expr).info : info;
     if(updating) {
       // updating function
-      if(declType != null) throw UUPFUNCTYPE.get(info);
+      if(type != null && !type.eq(SeqType.EMP)) throw UUPFUNCTYPE.get(info);
       if(!u && !expr.isVacuous()) throw UPEXPECTF.get(ii);
     } else if(u) {
       // uses updates, but is not declared as such
@@ -230,7 +219,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    * @return result of check
    */
   public boolean isVacuous() {
-    return !has(Flag.UPD) && declType != null && declType.eq(SeqType.EMP);
+    return type != null && type.eq(SeqType.EMP) && !has(Flag.UPD);
   }
 
   /**
@@ -244,7 +233,8 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     Boolean b = map.get(flag);
     if(b == null) {
       map.put(flag, false);
-      b = expr == null || expr.has(flag);
+      // function itself does not perform any updates
+      b = flag != Flag.UPD && expr.has(flag);
       map.put(flag, b);
     }
     return b;
@@ -266,7 +256,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
       final InputInfo ii) throws QueryException {
 
     if(!inline(qc, anns, expr) || has(Flag.CTX) || compiling || selfRecursive()) return null;
-    qc.compInfo(OPTINLINE, id());
+    qc.compInfo(OPTINLINE_X, id());
 
     // create let bindings for all variables
     final LinkedList<Clause> cls = exprs.length == 0 ? null : new LinkedList<Clause>();
@@ -292,9 +282,24 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    */
   public static boolean inline(final QueryContext qc, final AnnList anns, final Expr expr) {
     final Ann ann = anns.get(Annotation._BASEX_INLINE);
-    final long limit = ann != null
-        ? ann.args.length > 0 ? ((ANum) ann.args[0]).itr() : Long.MAX_VALUE
-        : qc.context.options.get(MainOptions.INLINELIMIT);
+    final long limit;
+    if(ann == null) {
+      limit = qc.context.options.get(MainOptions.INLINELIMIT);;
+    } else {
+      final Item[] args = ann.args();
+      limit = args.length > 0 ? ((ANum) args[0]).itr() : Long.MAX_VALUE;
+    }
     return expr.isValue() || expr.exprSize() < limit;
+  }
+
+  @Override
+  public String toString() {
+    final TokenBuilder tb = new TokenBuilder(DECLARE).add(' ').addExt(anns);
+    tb.add(FUNCTION).add(' ').add(name.string());
+    tb.add(PAREN1).addSep(args, SEP).add(PAREN2);
+    if(type != null) tb.add(' ' + AS + ' ' + type);
+    if(expr != null) tb.add(" { ").addExt(expr).add(" }; ");
+    else tb.add(" external; ");
+    return tb.toString();
   }
 }

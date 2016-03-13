@@ -3,11 +3,12 @@ package org.basex.query.value.array;
 import java.util.*;
 
 import org.basex.query.value.*;
+import org.basex.util.*;
 
 /**
  * A small array that is represented in a single Java array.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 final class SmallArray extends Array {
@@ -205,7 +206,7 @@ final class SmallArray extends Array {
   @Override
   void checkInvariants() {
     final int n = elems.length;
-    if(n == 0) throw new AssertionError("Empty array in " + getClass().getSimpleName());
+    if(n == 0) throw new AssertionError("Empty array in " + Util.className(this));
     if(n > MAX_SMALL) throw new AssertionError("Array too big: " + n);
   }
 

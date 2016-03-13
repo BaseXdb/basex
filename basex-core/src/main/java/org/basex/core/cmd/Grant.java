@@ -9,7 +9,7 @@ import org.basex.core.users.*;
 /**
  * Evaluates the 'grant' command and grants permissions to users.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Grant extends AUser {
@@ -63,7 +63,7 @@ public final class Grant extends AUser {
 
     final Users users = context.users;
     final User user = users.get(name);
-    Users.perm(user, prm, pattern);
+    user.perm(prm, pattern);
     return info(pattern.isEmpty() ? GRANTED_X_X : GRANTED_ON_X_X_X, args[0], name, pattern);
   }
 

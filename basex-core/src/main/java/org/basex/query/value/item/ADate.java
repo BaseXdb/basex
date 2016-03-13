@@ -16,7 +16,7 @@ import org.basex.util.*;
 /**
  * Abstract super class for date items.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class ADate extends ADateDur {
@@ -309,7 +309,7 @@ public abstract class ADate extends ADateDur {
    * Returns if the timezone is defined.
    * @return time zone
    */
-  public final boolean tzDefined() {
+  public final boolean hasTz() {
     return tz != Short.MAX_VALUE;
   }
 
@@ -373,6 +373,11 @@ public abstract class ADate extends ADateDur {
     final BigDecimal d1 = seconds().add(days().multiply(DAYSECONDS));
     final BigDecimal d2 = d.seconds().add(d.days().multiply(DAYSECONDS));
     return d1.compareTo(d2) == 0;
+  }
+
+  @Override
+  public boolean sameKey(final Item it, final InputInfo ii) throws QueryException {
+    return it instanceof ADate && hasTz() == ((ADate) it).hasTz() && eq(it, null, null, ii);
   }
 
   @Override

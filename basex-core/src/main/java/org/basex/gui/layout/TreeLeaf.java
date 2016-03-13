@@ -1,12 +1,12 @@
 package org.basex.gui.layout;
 
-import org.basex.data.*;
+import org.basex.core.*;
 
 /**
  * JTree node which represents a leaf (which represents either a raw file
  * or a document).
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Lukas Kircher
  */
 public final class TreeLeaf extends TreeNode {
@@ -17,18 +17,18 @@ public final class TreeLeaf extends TreeNode {
 
   /**
    * Constructor.
-   * @param nm name of content node
-   * @param pth node path
-   * @param rw represented node is raw file
-   * @param ab abbreviated node listing
-   * @param bxt tree reference
-   * @param d data reference
+   * @param name name of content node
+   * @param path node path
+   * @param raw represented node is raw file
+   * @param abbr abbreviated node listing
+   * @param tree tree reference
+   * @param context database context
    */
-  public TreeLeaf(final byte[] nm, final byte[] pth, final boolean rw, final boolean ab,
-      final BaseXTree bxt, final Data d) {
-    super(nm, pth, bxt, d);
-    raw = rw;
-    abbr = ab;
+  public TreeLeaf(final byte[] name, final byte[] path, final boolean raw, final boolean abbr,
+      final BaseXTree tree, final Context context) {
+    super(name, path, tree, context);
+    this.raw = raw;
+    this.abbr = abbr;
   }
 
   @Override

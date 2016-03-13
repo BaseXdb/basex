@@ -2,14 +2,16 @@ package org.basex.query.value.node;
 
 import static org.basex.query.QueryText.*;
 
+import org.basex.core.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
-import org.w3c.dom.*;
+import org.w3c.dom.Text;
 
 /**
  * Text node fragment.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class FTxt extends FNode {
@@ -23,11 +25,11 @@ public final class FTxt extends FNode {
 
   /**
    * Constructor.
-   * @param t text value
+   * @param value text value
    */
-  public FTxt(final byte[] t) {
+  public FTxt(final byte[] value) {
     super(NodeType.TXT);
-    value = t;
+    this.value = value;
   }
 
   /**
@@ -40,7 +42,7 @@ public final class FTxt extends FNode {
   }
 
   @Override
-  public FNode copy() {
+  public FNode deepCopy(final MainOptions options) {
     return new FTxt(value).parent(parent);
   }
 
@@ -51,6 +53,6 @@ public final class FTxt extends FNode {
 
   @Override
   public String toString() {
-    return Token.string(value);
+    return Atm.toString(value);
   }
 }

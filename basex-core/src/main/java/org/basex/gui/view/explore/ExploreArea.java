@@ -19,7 +19,7 @@ import org.basex.util.list.*;
 /**
  * This view provides standard GUI components to browse the currently opened database.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  * @author Bastian Lemke
  */
@@ -240,8 +240,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
             val1 = val1.replaceAll("\"", "");
             pattern = PATEX;
           } else {
-            pattern = attr && data.meta.attrindex ||
-              !attr && data.meta.textindex ? PATSUB : PATEX;
+            pattern = attr && data.meta.attrindex || !attr && data.meta.textindex ? PATSUB : PATEX;
           }
         }
       } else if(comp instanceof BaseXCombo) {
@@ -297,7 +296,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
    */
   private static String[] entries(final TokenList names) {
     final StringList entries = new StringList();
-    entries.add(Util.info(ENTRIES, names.size()));
+    entries.add(Util.info(ENTRIES_X, names.size()));
     for(final byte[] k : names) entries.add(Token.string(k));
     return entries.sort(true, true, 1).finish();
   }

@@ -3,7 +3,6 @@ package org.basex.query.value.item;
 import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
-import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.collation.*;
@@ -18,7 +17,7 @@ import org.basex.util.*;
  * Abstract super class for function items.
  * This class is inherited by either {@link Map}, {@link Array}, or {@link FuncItem}.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public abstract class FItem extends Item implements XQFunction {
@@ -76,8 +75,8 @@ public abstract class FItem extends Item implements XQFunction {
   }
 
   @Override
-  public boolean has(final Flag flag) {
-    return flag == Flag.UPD && annotations().contains(Annotation.UPDATING) || super.has(flag);
+  public boolean sameKey(final Item it, final InputInfo ii) throws QueryException {
+    return false;
   }
 
   @Override

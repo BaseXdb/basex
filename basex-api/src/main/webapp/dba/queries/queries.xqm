@@ -1,7 +1,7 @@
 (:~
  : Queries page.
  :
- : @author Christian Grün, BaseX GmbH, 2014-15
+ : @author Christian Grün, BaseX Team, 2014-16
  :)
 module namespace _ = 'dba/queries';
 
@@ -33,8 +33,7 @@ function _:queries(
 ) as element() {
   cons:check(),
 
-  let $f := function($b) { "editor('Please wait…', 'Query was successful.', " || $b || ");" }
-  return tmpl:wrap(
+  tmpl:wrap(
     map {
       'top': $_:CAT, 'info': $info, 'error': $error,
       'css': 'codemirror/lib/codemirror.css',
@@ -46,17 +45,18 @@ function _:queries(
         <table width='100%'>
           <tr>
             <td width='80%'>
-              <select id='mode' onchange='{ $f(false()) }'>{
-                ('Standard', 'Realtime', 'Updating') ! element option { . }
+              <select id='mode'>{
+                ('Read-Only', 'Updating') ! element option { . }
               }</select>
-              <button id='run' onclick="{ $f(true()) }">Run</button>
+              <button id='run' onclick="evalQuery()"
+                title='Ctrl-Enter'>Run</button>
             </td>
             <td width='20%' align='right'>
               <h2>Editor</h2>
             </td>
           </tr>
         </table>
-        <textarea id='editor' name='editor' rows='20' spellcheck='false' onkeyup="{ $f(false()) }"/>
+        <textarea id='editor' name='editor' rows='20' spellcheck='false'/>
         <table width='100%'>
           <tr>
             <td>
@@ -86,7 +86,7 @@ function _:queries(
             </td>
           </tr>
         </table>
-        <textarea id='output' rows='20' readonly='' spellcheck='false'/>
+        <textarea name='output' id='output' rows='20' readonly='' spellcheck='false'/>
         <script type="text/javascript">loadCodeMirror();</script>
       </td>
     </tr>
@@ -101,6 +101,7 @@ function _:queries(
 declare
   %rest:POST("{$query}")
   %rest:path("/dba/eval-query")
+  %rest:single
   %output:method("text")
 function _:eval-query(
   $query  as xs:string?
@@ -168,8 +169,8 @@ function _:save-query(
  :)
 declare
   %updating
+  %rest:POST("{$query}")
   %rest:path("/dba/update-query")
-  %rest:query-param("query", "{$query}")
   %output:method("text")
 function _:update-query(
   $query  as xs:string?

@@ -5,6 +5,7 @@ import static org.basex.query.QueryError.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.Map.Entry;
 
 import org.basex.core.*;
 import org.basex.core.locks.*;
@@ -23,19 +24,19 @@ import org.basex.util.*;
 /**
  * Abstract class for database queries.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class AQuery extends Command {
   /** Variables. */
-  private final HashMap<String, String[]> vars = new HashMap<>();
+  protected final HashMap<String, String[]> vars = new HashMap<>();
+
   /** HTTP context. */
   private Object http;
   /** Query processor. */
   private QueryProcessor qp;
   /** Query info. */
   private QueryInfo info;
-
   /** Query result. */
   private Value result;
 
@@ -99,7 +100,8 @@ public abstract class AQuery extends Command {
           info.serializing += p.time();
         }
         // dump some query info
-        out.flush();
+        //out.flush();
+
         // remove string list if global locking is used and if query is updating
         if(soptions.get(StaticOptions.GLOBALLOCK) && qp.updating) {
           info.readLocked = null;
@@ -134,8 +136,9 @@ public abstract class AQuery extends Command {
    */
   private void parse(final Performance p) throws QueryException {
     qp.http(http);
-    for(final String name : vars.keySet()) {
-      final String[] value = vars.get(name);
+    for(final Entry<String, String[]> entry : vars.entrySet()) {
+      final String name = entry.getKey();
+      final String[] value = entry.getValue();
       if(name == null) qp.context(value[0], value[1]);
       else qp.bind(name, value[0], value[1]);
     }
@@ -149,7 +152,7 @@ public abstract class AQuery extends Command {
    * @param query query string
    * @return result of check
    */
-  final boolean updating(final Context ctx, final String query) {
+  final boolean updates(final Context ctx, final String query) {
     try {
       final Performance p = new Performance();
       qp(query, ctx);
@@ -202,29 +205,7 @@ public abstract class AQuery extends Command {
     } finally {
       qp = null;
     }
-    return SerializerOptions.get(true).toString();
-  }
-
-  /**
-   * Binds a variable.
-   * @param name name of variable (if {@code null}, value will be bound as context value)
-   * @param value value to be bound
-   * @return reference
-   */
-  public AQuery bind(final String name, final String value) {
-    return bind(name, value, null);
-  }
-
-  /**
-   * Binds a variable.
-   * @param name name of variable (if {@code null}, value will be bound as context value)
-   * @param value value to be bound
-   * @param type type
-   * @return reference
-   */
-  public AQuery bind(final String name, final String value, final String type) {
-    vars.put(name, new String[] { value, type });
-    return this;
+    return SerializerMode.DEFAULT.get().toString();
   }
 
   /**
@@ -283,11 +264,11 @@ public abstract class AQuery extends Command {
 
   @Override
   public boolean updating(final Context ctx) {
-    return args[0] != null && updating(ctx, args[0]);
+    return updates(ctx, args[0]);
   }
 
   @Override
-  public boolean updated(final Context ctx) {
+  public final boolean updated(final Context ctx) {
     return qp != null && qp.updates() != 0;
   }
 

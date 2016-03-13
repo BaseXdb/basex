@@ -2,6 +2,7 @@ package org.basex.query.value.node;
 
 import java.util.*;
 
+import org.basex.api.dom.*;
 import org.basex.core.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
@@ -13,7 +14,7 @@ import org.basex.util.*;
 /**
  * Main-memory node fragment.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class FNode extends ANode {
@@ -37,8 +38,11 @@ public abstract class FNode extends ANode {
   }
 
   @Override
-  public final ANode deepCopy(final MainOptions options) {
-    return copy();
+  public abstract FNode deepCopy(final MainOptions options);
+
+  @Override
+  public FNode finish() {
+    return this;
   }
 
   @Override
@@ -50,9 +54,9 @@ public abstract class FNode extends ANode {
   public final int diff(final ANode node) {
     // compare fragment with database node
     if(node instanceof DBNode) return diff(this, node);
-    // compare fragments. subtraction is used instead of comparison to support overflow of node id
-    final int i = id - node.id;
-    return i > 0 ? 1 : i < 0 ? -1 : 0;
+    // compare fragments. due to subtraction, node id can overflow
+    final int d = id - node.id;
+    return d > 0 ? 1 : d < 0 ? -1 : 0;
   }
 
   @Override
@@ -226,8 +230,12 @@ public abstract class FNode extends ANode {
           ANode node = FNode.this, par = node.parent();
           while(par != null) {
             final BasicNodeIter i = par.children();
-            for(ANode n; node.type != NodeType.ATT && (n = i.next()) != null && !n.is(node););
-            for(ANode n; (n = i.next()) != null;) {
+            if(node.type != NodeType.ATT) {
+              for(final ANode n : i) {
+                if(n.is(node)) break;
+              }
+            }
+            for(final ANode n : i) {
               list.add(n.finish());
               addDesc(n.children(), list);
             }
@@ -239,5 +247,10 @@ public abstract class FNode extends ANode {
         return iter.next();
       }
     };
+  }
+
+  @Override
+  public final BXNode toJava() {
+    return BXNode.get(this);
   }
 }

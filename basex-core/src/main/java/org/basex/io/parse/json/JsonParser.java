@@ -13,12 +13,10 @@ import org.basex.util.hash.*;
 /**
  * A JSON parser generating parse events similar to a SAX XML parser.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 final class JsonParser extends InputParser {
-  /** Invalid Unicode character. */
-  private static final int INVALID = '\uFFFD';
   /** Names of control characters not allowed in string literals. */
   private static final String[] CTRL = {
     // U+0000 -- U+001F
@@ -32,8 +30,8 @@ final class JsonParser extends InputParser {
   private final JsonConverter conv;
   /** Spec. */
   private final boolean liberal;
-  /** Unescape flag. */
-  private final boolean unescape;
+  /** Escape flag. */
+  private final boolean escape;
   /** Duplicates. */
   private final JsonDuplicates duplicates;
   /** Token builder for string literals. */
@@ -48,7 +46,7 @@ final class JsonParser extends InputParser {
   private JsonParser(final String in, final JsonParserOptions opts, final JsonConverter conv) {
     super(in);
     liberal = opts.get(JsonParserOptions.LIBERAL);
-    unescape = opts.get(JsonParserOptions.UNESCAPE);
+    escape = opts.get(JsonParserOptions.ESCAPE);
     final JsonDuplicates dupl = opts.get(JsonParserOptions.DUPLICATES);
     duplicates = dupl != null ? dupl : opts.get(JsonOptions.FORMAT) == JsonFormat.BASIC ?
       JsonDuplicates.RETAIN : JsonDuplicates.USE_FIRST;
@@ -274,79 +272,70 @@ final class JsonParser extends InputParser {
     while(pos < length) {
       final int p = pos;
       int ch = consume();
+
+      // string is closed..
       if(ch == '"') {
+        // unpaired surrogate?
         if(high != 0) add(high, pos - 7, p);
         skipWs();
         return tb.toArray();
       }
 
+      // escape sequence
       if(ch == '\\') {
-        if(!unescape) {
-          if(high != 0) {
-            tb.add(high);
-            high = 0;
-          }
-          tb.add('\\');
-        }
-
-        final int n = consume();
-        switch(n) {
-          case '/':
+        ch = consume();
+        switch(ch) {
           case '\\':
+          case '/':
           case '"':
-            ch = n;
             break;
           case 'b':
-            ch = unescape ? '\b' : 'b';
+            ch = '\b';
             break;
           case 'f':
-            ch = unescape ? '\f' : 'f';
-            break;
-          case 't':
-            ch = unescape ? '\t' : 't';
-            break;
-          case 'r':
-            ch = unescape ? '\r' : 'r';
+            ch = '\f';
             break;
           case 'n':
-            ch = unescape ? '\n' : 'n';
+            ch = '\n';
+            break;
+          case 'r':
+            ch = '\r';
+            break;
+          case 't':
+            ch = '\t';
             break;
           case 'u':
             if(pos + 4 >= length) throw eof(", expected four-digit hex value");
-            if(unescape) {
-              ch = 0;
-              for(int i = 0; i < 4; i++) {
-                final char x = consume();
-                if(x >= '0' && x <= '9')      ch = 16 * ch + x      - '0';
-                else if(x >= 'a' && x <= 'f') ch = 16 * ch + x + 10 - 'a';
-                else if(x >= 'A' && x <= 'F') ch = 16 * ch + x + 10 - 'A';
-                else throw error("Illegal hexadecimal digit: '%'", x);
-              }
-            } else {
-              tb.add('u');
-              for(int i = 0; i < 4; i++) {
-                final char x = consume();
-                if(x >= '0' && x <= '9' || x >= 'a' && x <= 'f' || x >= 'A' && x <= 'F') {
-                  tb.add(x);
-                } else throw error("Illegal hexadecimal digit: '%'", x);
-              }
-              continue;
+            ch = 0;
+            for(int i = 0; i < 4; i++) {
+              final char x = consume();
+              if(x >= '0' && x <= '9')      ch = 16 * ch + x      - '0';
+              else if(x >= 'a' && x <= 'f') ch = 16 * ch + x + 10 - 'a';
+              else if(x >= 'A' && x <= 'F') ch = 16 * ch + x + 10 - 'A';
+              else throw error("Illegal hexadecimal digit: '%'", x);
             }
             break;
+
           default:
-            throw error("Unknown character escape: '\\%'", n);
+            throw error("Unknown character escape: '\\%'", ch);
         }
       } else if(!liberal && ch <= 0x1F) {
         throw error("Non-escaped control character: '\\%'", CTRL[ch]);
       }
 
       if(high != 0) {
-        if(ch >= 0xDC00 && ch <= 0xDFFF) ch = (high - 0xD800 << 10) + ch - 0xDC00 + 0x10000;
-        else add(high, p, pos);
+        if(ch >= 0xDC00 && ch <= 0xDFFF) {
+          // compute resulting codepoint
+          ch = (high - 0xD800 << 10) + ch - 0xDC00 + 0x10000;
+        } else {
+          // add invalid high surrogate, treat expected low surrogate as new character
+          add(high, p, pos);
+        }
         high = 0;
       }
 
       if(ch >= 0xD800 && ch <= 0xDBFF) {
+        // remember high surrogate
         high = (char) ch;
       } else {
         add(ch, p, pos);
@@ -362,7 +351,26 @@ final class JsonParser extends InputParser {
    * @param e end position
    */
   private void add(final int ch, final int s, final int e) {
-    if(XMLToken.valid(ch)) {
+    if(escape) {
+      if(ch == '\\') {
+        tb.add("\\\\");
+      } else if(ch == '\b') {
+        tb.add("\\b");
+      } else if(ch == '\f') {
+        tb.add("\\f");
+      } else if(ch == '\n') {
+        tb.add("\\n");
+      } else if(ch == '\r') {
+        tb.add("\\r");
+      } else if(ch == '\t') {
+        tb.add("\\t");
+      } else if(XMLToken.valid(ch)) {
+        tb.add(ch);
+      } else {
+        tb.add('\\').add('u').add(HEX[ch >> 12 & 0xF]).add(HEX[ch >> 8 & 0xF]);
+        tb.add(HEX[ch >> 4 & 0xF]).add(HEX[ch & 0xF]);
+      }
+    } else if(XMLToken.valid(ch)) {
       tb.add(ch);
     } else if(conv.fallback == null) {
       tb.add(INVALID);

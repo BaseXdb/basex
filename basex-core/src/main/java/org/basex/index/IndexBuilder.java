@@ -13,19 +13,29 @@ import org.basex.util.*;
  * This interface defines the functions which are needed for building
  * new index structures.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class IndexBuilder extends Proc {
+  /** Performance. */
+  protected final Performance perf = new Performance();
+
   /** Data reference. */
   protected final Data data;
   /** Total parsing value. */
   protected final int size;
+  /** Index type. */
+  protected final IndexType type;
+  /** Text node flag. */
+  protected final boolean text;
+
   /** Number of index operations to perform before writing a partial index to disk. */
   private final int splitSize;
-
   /** Maximum memory to consume. */
   private final long maxMem = (long) (Runtime.getRuntime().maxMemory() * 0.8);
+
+  /** Names and namespace uri of element or attributes to include. */
+  private final IndexNames includeNames;
 
   /** Current pre value. */
   protected int pre;
@@ -39,13 +49,18 @@ public abstract class IndexBuilder extends Proc {
   /**
    * Constructor.
    * @param data reference
-   * @param max maximum number of operations per partial index
+   * @param type index type
    */
-  protected IndexBuilder(final Data data, final int max) {
+  protected IndexBuilder(final Data data, final IndexType type) {
     this.data = data;
+    this.type = type;
+    splitSize = (int) Math.min(Integer.MAX_VALUE, (long) data.meta.splitsize * splitFactor());
     size = data.meta.size;
-    splitSize = max;
-    if(Performance.memory() >= maxMem) Performance.gc(1);
+    includeNames = new IndexNames(type, data);
+    text = type == IndexType.TEXT || type == IndexType.FULLTEXT;
+
+    // run garbage collection if memory maximum is already reached
+    if(Performance.memory() >= maxMem) clean();
   }
 
   /**
@@ -57,10 +72,20 @@ public abstract class IndexBuilder extends Proc {
 
   /**
    * Checks if the command was interrupted, and prints some debug output.
+   * @throws IOException I/O Exception
    */
-  protected final void check() {
+  @SuppressWarnings("unused")
+  protected void check() throws IOException {
     checkStop();
     if(Prop.debug && (pre & 0x1FFFFF) == 0) Util.err(".");
+  }
+
+  /**
+   * Checks if the current entry should be indexed.
+   * @return result of check
+   */
+  protected final boolean indexEntry() {
+    return data.kind(pre) == (text ? Data.TEXT : Data.ATTR) && includeNames.contains(pre, text);
   }
 
   /**
@@ -69,7 +94,7 @@ public abstract class IndexBuilder extends Proc {
    * @return true if structures shall be flushed to disk
    * @throws IOException I/O Exception
    */
-  protected final boolean split() throws IOException {
+  protected final boolean splitRequired() throws IOException {
     // checks if a fixed split size has been specified
     final boolean split;
     if(splitSize > 0) {
@@ -94,22 +119,37 @@ public abstract class IndexBuilder extends Proc {
   /**
    * Performs memory cleanup after writing partial memory if necessary.
    */
-  protected final void finishSplit() {
-    if(splitSize <= 0) Performance.gc(1);
+  protected final void clean() {
+    if(splitSize <= 0) Performance.gc(2);
   }
 
   /**
    * Prints some final debugging information.
-   * @param perf performance
    */
-  protected final void finishIndex(final Performance perf) {
+  protected final void finishIndex() {
     if(!Prop.debug) return;
 
     final StringBuilder sb = new StringBuilder();
-    if(splits > 1) sb.append(' ').append(splits).append(" splits,");
-    sb.append(' ').append(count).append(" operations, ");
-    sb.append(perf).append(" (").append(Performance.getMemory()).append(')');
+    sb.append(' ').append((count / 10000) / 100d).append(" M operations, ");
+    sb.append(perf).append(" (").append(Performance.getMemory()).append(").");
+    if(splits > 1 && splitSize <= 0) {
+      sb.append(" Recommended ").append(MainOptions.SPLITSIZE.name()).append(": ");
+      sb.append((int) Math.ceil(((double) count / splits) / splitFactor())).append('.');
+    }
     Util.errln(sb);
+  }
+
+  /**
+   * Returns the split factor dependent on the index type.
+   * The following values are returned:
+   * <ul>
+   *   <li> Full-text index: 1'000'000</li>
+   *   <li> Other value indexes: 100'000</li>
+   * </ul>
+   * @return split factor
+   */
+  protected final int splitFactor() {
+    return type == IndexType.FULLTEXT ? 1000000 : 100000;
   }
 
   @Override
@@ -120,5 +160,16 @@ public abstract class IndexBuilder extends Proc {
   @Override
   public final double prog() {
     return pre / (size + (splits > 0 ? size / 50d : 0d));
+  }
+
+  @Override
+  protected final String det() {
+    switch(type) {
+      case TEXT: return INDEX_TEXTS_D;
+      case ATTRIBUTE: return INDEX_ATTRIBUTES_D;
+      case TOKEN: return INDEX_TOKENS_D;
+      case FULLTEXT: return INDEX_FULLTEXT_D;
+      default: throw Util.notExpected();
+    }
   }
 }

@@ -3,7 +3,7 @@ package org.basex.query.util.fingertree;
 /**
  * A tree consisting of a single value.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  *
  * @param <N> node type
@@ -17,7 +17,7 @@ final class SingletonTree<N, E> extends FingerTree<N, E> {
    * Constructor.
    * @param elem element
    */
-  public SingletonTree(final Node<N, E> elem) {
+  SingletonTree(final Node<N, E> elem) {
     this.elem = elem;
   }
 

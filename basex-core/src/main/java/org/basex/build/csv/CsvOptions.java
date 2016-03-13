@@ -11,7 +11,7 @@ import org.basex.util.options.*;
 /**
  * Options for parsing and serializing CSV data.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public class CsvOptions extends Options {
@@ -73,9 +73,9 @@ public class CsvOptions extends Options {
   }
 
   @Override
-  public synchronized void assign(final Item name, final Item value, final boolean error)
-      throws BaseXException, QueryException {
-    super.assign(name, value, error);
+  public synchronized void assign(final Item name, final Item value, final boolean error,
+      final InputInfo info) throws BaseXException, QueryException {
+    super.assign(name, value, error, info);
     check();
   }
 

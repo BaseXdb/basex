@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * Node constructor.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class CNode extends Arr {
@@ -20,10 +20,10 @@ public abstract class CNode extends Arr {
    * Constructor.
    * @param sc static context
    * @param info input info
-   * @param name name
+   * @param exprs expressions
    */
-  CNode(final StaticContext sc, final InputInfo info, final Expr... name) {
-    super(info, name);
+  CNode(final StaticContext sc, final InputInfo info, final Expr... exprs) {
+    super(info, exprs);
     this.sc = sc;
     size = 1;
   }
@@ -47,6 +47,6 @@ public abstract class CNode extends Arr {
 
   @Override
   protected String toString(final String pref) {
-    return pref + " { " + (exprs.length == 0 ? "()" : super.toString(SEP)) + " }";
+    return pref + " { " + super.toString(SEP) + " }";
   }
 }

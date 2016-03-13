@@ -8,7 +8,7 @@ import org.basex.util.hash.*;
  * This class provides convenience operations for XML-specific character
  * operations.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class XMLToken {
@@ -139,6 +139,19 @@ public final class XMLToken {
       if(i == start ? !isNCStartChar(c) : !isNCChar(c)) return i;
     }
     return l;
+  }
+
+  /**
+   * Checks if the specified name is an id/idref attribute ({@code idref}: local name must contain
+   * 'idref'; {@code id}: local name must contain 'if', but not 'idref').
+   * The correct approach would be to gather all id/idref attributes and store them as meta data.
+   * @param name name
+   * @param idref id/idref flag
+   * @return result of check
+   */
+  public static boolean isId(final byte[] name, final boolean idref) {
+    final byte[] n = lc(local(name));
+    return idref ? contains(n, IDREF) : contains(n, ID) && !contains(n, IDREF);
   }
 
   /**

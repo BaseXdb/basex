@@ -10,7 +10,7 @@ import org.basex.query.value.item.*;
 /**
  * HTTP strings.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Rositsa Shadura
  */
 public interface HttpText {
@@ -89,7 +89,7 @@ public interface HttpText {
   String BINARY = "binary";
 
   /** Request attributes. */
-  public enum Request {
+  enum Request {
     /** NC. */ NC,
     /** QOP. */ QOP,
     /** URI. */ URI,
@@ -97,7 +97,7 @@ public interface HttpText {
     /** Nonce. */ NONCE,
     /** Realm. */ REALM,
     /** Opaque. */ OPAQUE,
-    /** Cnonce .*/ CNONCE,
+    /** Cnonce. */ CNONCE,
     /** Method. */ METHOD,
     /** Timeout. */ TIMEOUT,
     /** Response. */ RESPONSE,

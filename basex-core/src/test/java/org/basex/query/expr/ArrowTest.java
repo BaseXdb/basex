@@ -8,7 +8,7 @@ import org.junit.*;
 /**
  * Arrow operator tests.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class ArrowTest extends AdvancedQueryTest {
@@ -39,6 +39,6 @@ public final class ArrowTest extends AdvancedQueryTest {
   /** Test. */
   @Test public void error() {
     error("1 => 1", ARROWSPEC);
-    error("1 => (1)()", INVFUNCITEM_X);
+    error("1 => (1)()", INVFUNCITEM_X_X);
   }
 }

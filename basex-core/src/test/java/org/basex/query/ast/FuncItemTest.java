@@ -12,7 +12,7 @@ import org.junit.*;
 /**
  * Tests for compiling function items.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public final class FuncItemTest extends QueryPlanTest {
@@ -294,7 +294,7 @@ public final class FuncItemTest extends QueryPlanTest {
   @Test
   public void gh1113() {
     check("let $join := array:join#1 return $join(([], []))",
-        "[\n]",
+        "[]",
         "empty(//" + Util.className(DynFuncCall.class) + ')',
         "empty(//" + Util.className(StaticFuncCall.class) + ')');
   }

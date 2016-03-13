@@ -16,7 +16,7 @@ import org.basex.util.hash.*;
 /**
  * Local Variable Reference expression.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  * @author Leo Woerteler
  */
@@ -115,8 +115,13 @@ public final class VarRef extends ParseExpr {
   }
 
   @Override
+  public String toErrorString() {
+    return new TokenBuilder(DOLLAR).addExt(var.name.string()).toString();
+  }
+
+  @Override
   public String toString() {
-    return new TokenBuilder(DOLLAR).add(var.name.toString()).add('_').addInt(var.id).toString();
+    return new TokenBuilder(DOLLAR).addExt(var.name.string()).add('_').addInt(var.id).toString();
   }
 
   @Override

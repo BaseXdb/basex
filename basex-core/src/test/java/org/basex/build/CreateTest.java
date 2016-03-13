@@ -3,7 +3,6 @@ package org.basex.build;
 import static org.junit.Assert.*;
 
 import org.basex.*;
-import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
 import org.basex.util.*;
@@ -13,7 +12,7 @@ import org.junit.Test;
 /**
  * Tests for creating databases and adding documents.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class CreateTest extends SandboxTest {
@@ -50,33 +49,30 @@ public final class CreateTest extends SandboxTest {
 
   /**
    * Drops the initial collection.
-   * @throws BaseXException exception
    */
   @After
-  public void tearDown() throws BaseXException {
-    new DropDB(NAME).execute(context);
+  public void tearDown() {
+    execute(new DropDB(NAME));
   }
 
   /**
    * CREATE DB {DB}.
-   * @throws BaseXException exception
    */
   @Test
-  public void createDB() throws BaseXException {
-    new CreateDB(NAME).execute(context);
+  public void createDB() {
+    execute(new CreateDB(NAME));
     // check if database name equals argument of create command
     assertEquals(db(), NAME);
   }
 
   /**
    * CREATE DB {DB} {INPUT[]}.
-   * @throws BaseXException exception
    */
   @Test
-  public void createDBWithInput() throws BaseXException {
+  public void createDBWithInput() {
     final int il = INPUTS.length;
     for(int i = 0; i < il; i++) {
-      new CreateDB(NAME, INPUTS[i]).execute(context);
+      execute(new CreateDB(NAME, INPUTS[i]));
       // check name of database
       assertEquals(NAME, db());
       // check name of document
@@ -86,60 +82,56 @@ public final class CreateTest extends SandboxTest {
 
   /**
    * CREATE DB {DB}; ADD {INPUT[]}.
-   * @throws BaseXException exception
    */
   @Test
-  public void createDBandAdd() throws BaseXException {
+  public void createDBandAdd() {
     // add file and folder, skip fragment
     final int il = INPUTS.length;
     for(int i = 0; i < il - 1; i++) {
-      new CreateDB(NAME).execute(context);
-      new Add("", INPUTS[i]).execute(context);
+      execute(new CreateDB(NAME));
+      execute(new Add("", INPUTS[i]));
       assertEquals(NAMES[i], docName());
     }
   }
 
   /**
    * CREATE DB {DB}; ADD TO {DOCNAME} {INPUT[]}.
-   * @throws BaseXException exception
    */
   @Test
-  public void createDBandAddToName() throws BaseXException {
+  public void createDBandAddToName() {
     // add file and fragment, skip folder
     final int il = INPUTS.length;
     for(int i = 0; i < il; i += 2) {
-      new CreateDB(NAME).execute(context);
-      new Add(DOCNAME, INPUTS[i]).execute(context);
+      execute(new CreateDB(NAME));
+      execute(new Add(DOCNAME, INPUTS[i]));
       assertEquals(DOCNAME, docName());
     }
   }
 
   /**
    * CREATE DB {DB}; ADD TO {TARGET} {INPUT[]}.
-   * @throws BaseXException exception
    */
   @Test
-  public void createDBandAddToTarget() throws BaseXException {
+  public void createDBandAddToTarget() {
     // add file and folder, skip fragment
     final int il = INPUTS.length;
     for(int i = 0; i < il - 1; i++) {
-      new CreateDB(NAME).execute(context);
-      new Add(TARGET, INPUTS[i]).execute(context);
+      execute(new CreateDB(NAME));
+      execute(new Add(TARGET, INPUTS[i]));
       assertEquals(TARGET + NAMES[i], docName());
     }
   }
 
   /**
    * CREATE DB {DB}; ADD TO {TARGET/DOCNAME} {INPUT[]}.
-   * @throws BaseXException exception
    */
   @Test
-  public void createDBandAddToTargetName() throws BaseXException {
+  public void createDBandAddToTargetName() {
     // add file and fragment, skip folder
     final int il = INPUTS.length;
     for(int i = 0; i < il; i += 2) {
-      new CreateDB(NAME).execute(context);
-      new Add(TARGET + DOCNAME, INPUTS[i]).execute(context);
+      execute(new CreateDB(NAME));
+      execute(new Add(TARGET + DOCNAME, INPUTS[i]));
       assertEquals(TARGET + DOCNAME, docName());
     }
   }

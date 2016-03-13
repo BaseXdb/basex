@@ -9,7 +9,7 @@ import org.basex.util.*;
 /**
  * Resizable-array implementation for native bytes.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public class ByteList extends ElementList {
@@ -113,6 +113,6 @@ public class ByteList extends ElementList {
 
   @Override
   public String toString() {
-    return string(list, 0, size);
+    return list == null ? "" : string(list, 0, size);
   }
 }

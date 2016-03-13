@@ -11,7 +11,7 @@ import org.junit.*;
 /**
  * Tests for {@link Array#reverse()}.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public final class ArrayReverseTest {

@@ -15,13 +15,12 @@ import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.io.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
  * List of filtered file entries.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class ProjectList extends JList<String> {
@@ -48,19 +47,13 @@ final class ProjectList extends JList<String> {
         BaseXLayout.copy(selectedValue());
       }
       @Override public boolean enabled(final GUI main) { return selectedValue() != null; }
-    },
-    new GUIPopupCmd(ADD_AS_IMPORT, BaseXKeys.ADDIMPORT) {
-      @Override public void execute() {
-        project.addImport(selectedValues()[0]);
-      }
-      @Override public boolean enabled(final GUI main) { return selectedValue() != null; }
     }
   };
 
   /** Project view. */
   private final ProjectView project;
   /** Content search string. */
-  private String search;
+  private String search = "";
 
   /**
    * Constructor.
@@ -81,36 +74,28 @@ final class ProjectList extends JList<String> {
 
   /**
    * Assigns the specified list entries and selects the first entry.
-   * @param elements result elements
+   * @param list result elements
    * @param srch content search string
    */
-  void setElements(final TokenSet elements, final String srch) {
-    SwingUtilities.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        // set new values and selections
-        final int is = elements.size();
-        final String[] list = new String[is];
-        for(int i = 0; i < is; i++) list[i] = Token.string(elements.key(i + 1));
-        if(changed(list)) {
-          // check which old values had been selected
-          final List<String> values = getSelectedValuesList();
-          final IntList il = new IntList();
-          for(final String value : values) {
-            final byte[] val = Token.token(value);
-            for(int i = 0; i < is; i++) {
-              if(Token.eq(val, elements.key(i + 1))) {
-                il.add(i);
-                break;
-              }
-            }
+  void setElements(final String[] list, final String srch) {
+    // set new values and selections
+    if(changed(list)) {
+      // check which old values had been selected
+      final List<String> values = getSelectedValuesList();
+      final IntList il = new IntList();
+      for(final String value : values) {
+        final int is = list.length;
+        for(int i = 0; i < is; i++) {
+          if(value.equals(list[i])) {
+            il.add(i);
+            break;
           }
-          setListData(list);
-          setSelectedIndices(il.finish());
         }
-        search = srch;
       }
-    });
+      setListData(list);
+      setSelectedIndices(il.finish());
+    }
+    search = srch;
   }
 
   /**
@@ -183,9 +168,12 @@ final class ProjectList extends JList<String> {
           x += fm.stringWidth(s);
 
           final String[] names = file.file().getParent().split("/|\\\\");
-          final StringBuilder sb = new StringBuilder(" ");
-          for(int n = names.length - 1; n >= 0; n--) sb.append('/').append(names[n]);
-          g.setColor(GUIConstants.gray);
+          final StringBuilder sb = new StringBuilder(" \u00b7 ");
+          for(int n = names.length - 1; n >= 0; n--) {
+            sb.append(names[n]);
+            if(n > 0) sb.append("/");
+          }
+          g.setColor(GUIConstants.dgray);
           g.drawString(sb.toString(), x, y);
         }
       };

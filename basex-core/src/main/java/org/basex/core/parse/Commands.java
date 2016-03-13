@@ -5,7 +5,7 @@ import static org.basex.core.Text.*;
 /**
  * This class defines the available command-line commands.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 @SuppressWarnings("all")
@@ -130,6 +130,10 @@ public interface Commands {
   String QUERY = "query";
   /** Command attribute: "type". */
   String TYPE = "type";
+  /** Command attribute: "start". */
+  String START = "start";
+  /** Command attribute: "end". */
+  String END = "end";
   /** Command attribute: "database". */
   String DATABASE = "database";
   /** Command attribute: "option". */
@@ -160,9 +164,9 @@ public interface Commands {
   /** Permission commands. */
   enum CmdPerm { NONE, READ, WRITE, CREATE, ADMIN }
   /** Index types. */
-  enum CmdIndex { TEXT, ATTRIBUTE, FULLTEXT }
+  enum CmdIndex { TEXT, ATTRIBUTE, TOKEN, FULLTEXT }
   /** Index types. */
-  enum CmdIndexInfo { NULL, TEXT, ATTRIBUTE, FULLTEXT, PATH, TAG, ATTNAME }
+  enum CmdIndexInfo { NULL, TEXT, ATTRIBUTE, TOKEN, FULLTEXT, PATH, ELEMNAME, ATTRNAME }
   /** Alter types. */
   enum CmdAlter { DATABASE, DB, PASSWORD, USER }
   /** Repo types. */

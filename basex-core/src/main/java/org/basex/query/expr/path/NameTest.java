@@ -12,13 +12,13 @@ import org.basex.util.*;
 /**
  * Name test.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class NameTest extends Test {
-  /** Local name. */
+  /** Local name (can be {@code null}). */
   public final byte[] local;
-  /** Default element namespace. */
+  /** Default element namespace (can be {@code null}). */
   private final byte[] defElemNS;
 
   /**
@@ -37,11 +37,12 @@ public final class NameTest extends Test {
    * @param elemNS default element namespace (may be {@code null})
    */
   public NameTest(final QNm name, final Kind kind, final boolean attr, final byte[] elemNS) {
+    super(attr ? NodeType.ATT : NodeType.ELM);
     this.name = name;
     this.kind = kind;
-    type = attr ? NodeType.ATT : NodeType.ELM;
     local = name != null ? name.local() : null;
     defElemNS = elemNS != null ? elemNS : Token.EMPTY;
+    unique = kind == Kind.URI_NAME;
   }
 
   @Override
@@ -70,7 +71,7 @@ public final class NameTest extends Test {
     if(results) results = kind != Kind.NAME ||
         (type == NodeType.ELM ? data.elemNames : data.attrNames).contains(local);
 
-    if(!results) qc.compInfo(OPTNAME, name);
+    if(!results) qc.compInfo(OPTNAME_X, name);
     return results;
   }
 
@@ -92,7 +93,7 @@ public final class NameTest extends Test {
       // name wildcard: only check namespace
       case URI: return Token.eq(name.uri(), node.qname(tmpq).uri());
       // check attributes, or check everything
-      default: return type == NodeType.ATT && !name.hasURI() ?
+      default: return type == NodeType.ATT && name.uri().length == 0 ?
         Token.eq(local, node.name()) : name.eq(node.qname(tmpq));
     }
   }

@@ -10,7 +10,7 @@ import org.basex.gui.layout.*;
 /**
  * Sort dialog.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class DialogSort extends BaseXDialog {
@@ -20,6 +20,12 @@ public final class DialogSort extends BaseXDialog {
   private final BaseXCheckBox asc;
   /** Merge duplicate lines. */
   private final BaseXCheckBox merge;
+  /** Unicode order. */
+  private final BaseXCheckBox unicode;
+  /** Column. */
+  private final BaseXTextField column;
+  /** Buttons. */
+  private final BaseXBack buttons;
 
   /**
    * Default constructor.
@@ -28,27 +34,48 @@ public final class DialogSort extends BaseXDialog {
   public DialogSort(final GUI main) {
     super(main, SORT);
 
-    final BaseXBack p = new BaseXBack(new TableLayout(3, 1));
+    final BaseXBack p = new BaseXBack(new TableLayout(6, 1));
 
     final GUIOptions gopts = gui.gopts;
     asc = new BaseXCheckBox(ASCENDING_ORDER, GUIOptions.ASCSORT, gopts, this);
     cs = new BaseXCheckBox(CASE_SENSITIVE, GUIOptions.CASESORT, gopts, this);
     merge = new BaseXCheckBox(MERGE_DUPLICATES, GUIOptions.MERGEDUPL, gopts, this);
-    p.add(asc);
+    unicode = new BaseXCheckBox(UNICODE_ORDER, GUIOptions.UNICODE, gopts, this);
+    column = new BaseXTextField(GUIOptions.COLUMN, gopts, this);
+    column.setColumns(4);
+
+    final BaseXBack pp = new BaseXBack(new TableLayout(1, 2, 8, 4));
+    pp.border(12, 0, 0, 0);
+    pp.add(new BaseXLabel(COLUMN + COLS));
+    pp.add(column);
+
     p.add(cs);
+    p.add(asc);
     p.add(merge);
+    p.add(unicode);
+    p.add(pp);
     set(p, BorderLayout.CENTER);
 
-    set(newButtons(B_OK, CANCEL), BorderLayout.SOUTH);
+    buttons = newButtons(B_OK, B_CANCEL);
+    set(buttons, BorderLayout.SOUTH);
     action(null);
-    finish(null);
+    finish();
+  }
+
+  @Override
+  public void action(final Object source) {
+    ok = column.check();
+    enableOK(buttons, B_OK, ok);
   }
 
   @Override
   public void close() {
+    if(!ok) return;
+    super.close();
     cs.assign();
     asc.assign();
+    unicode.assign();
     merge.assign();
-    super.close();
+    column.assign();
   }
 }

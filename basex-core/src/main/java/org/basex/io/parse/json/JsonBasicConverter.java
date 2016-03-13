@@ -13,14 +13,14 @@ import org.basex.util.list.*;
 /**
  * <p>This class converts a JSON document to XML.</p>
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class JsonBasicConverter extends JsonXmlConverter {
   /** Add pairs. */
   private final BoolList addPairs = new BoolList();
-  /** Unescape characters. */
-  private final boolean unescape;
+  /** Escape characters. */
+  private final boolean escape;
   /** Name of next element. */
   private byte[] name;
 
@@ -31,7 +31,7 @@ public final class JsonBasicConverter extends JsonXmlConverter {
    */
   JsonBasicConverter(final JsonParserOptions opts) throws QueryIOException {
     super(opts);
-    unescape = jopts.get(JsonParserOptions.UNESCAPE);
+    escape = jopts.get(JsonParserOptions.ESCAPE);
     addPairs.add(true);
     final JsonDuplicates dupl = jopts.get(JsonParserOptions.DUPLICATES);
     if(dupl == JsonDuplicates.USE_LAST) throw new QueryIOException(
@@ -84,7 +84,7 @@ public final class JsonBasicConverter extends JsonXmlConverter {
   public void stringLit(final byte[] value) {
     if(add()) {
       final FElem e = addElem(STRING).add(value);
-      if(!unescape && contains(value, '\\')) e.add(ESCAPED, TRUE);
+      if(escape && contains(value, '\\')) e.add(ESCAPED, TRUE);
     }
   }
 
@@ -110,7 +110,7 @@ public final class JsonBasicConverter extends JsonXmlConverter {
 
     if(name != null) {
       e.add(KEY, name);
-      if(!unescape && contains(name, '\\')) e.add(ESCAPED_KEY, TRUE);
+      if(escape && contains(name, '\\')) e.add(ESCAPED_KEY, TRUE);
       name = null;
     }
 

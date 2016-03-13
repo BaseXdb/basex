@@ -6,7 +6,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
-import java.util.Map.Entry;
+import java.util.Map.*;
 
 import org.basex.build.json.*;
 import org.basex.build.json.JsonOptions.*;
@@ -14,13 +14,11 @@ import org.basex.core.*;
 import org.basex.core.MainOptions.MainParser;
 import org.basex.core.locks.*;
 import org.basex.core.users.*;
-import org.basex.core.Context;
 import org.basex.data.*;
-import org.basex.io.*;
 import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.Expr.Flag;
+import org.basex.query.expr.Expr.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
@@ -35,6 +33,7 @@ import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.DateTime;
 import org.basex.util.ft.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
@@ -44,7 +43,7 @@ import org.basex.util.options.*;
  * This class organizes both static and dynamic properties that are specific to a
  * single query.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class QueryContext extends Proc implements Closeable {
@@ -58,7 +57,8 @@ public final class QueryContext extends Proc implements Closeable {
   private final HashMap<QNm, Value> bindings = new HashMap<>();
 
   /** Parent query context. */
-  private final QueryContext qcParent;
+  private final QueryContext parent;
+
   /** Query info. */
   public final QueryInfo info;
   /** Database context. */
@@ -68,11 +68,9 @@ public final class QueryContext extends Proc implements Closeable {
   public QueryResources resources;
   /** HTTP context. */
   public Object http;
+  /** Pending updates. */
+  public Updates updates;
 
-  /** Cached stop word files. */
-  public HashMap<String, IO> stop;
-  /** Cached thesaurus files. */
-  public HashMap<String, IO> thes;
   /** Global database options (will be reassigned after query execution). */
   final HashMap<Option<?>, Object> staticOpts = new HashMap<>();
   /** Temporary query options (key/value pairs), supplied by option declarations. */
@@ -126,10 +124,10 @@ public final class QueryContext extends Proc implements Closeable {
   /** Counter for variable IDs. */
   public int varIDs;
 
+  /** Parsed modules, containing the file path and module uri. */
+  public final TokenMap modParsed = new TokenMap();
   /** Pre-declared modules, containing module uri and their file paths (required for test APIs). */
   final TokenMap modDeclared = new TokenMap();
-  /** Parsed modules, containing the file path and module uri. */
-  final TokenMap modParsed = new TokenMap();
   /** Stack of module files that are currently parsed. */
   final TokenList modStack = new TokenList();
 
@@ -142,7 +140,7 @@ public final class QueryContext extends Proc implements Closeable {
   /** Serialization parameters. */
   private SerializerOptions serParams;
   /** Indicates if the default serialization parameters are used. */
-  public boolean defaultOutput;
+  private boolean defaultOutput;
 
   /** Indicates if the query has been compiled. */
   private boolean compiled;
@@ -154,9 +152,11 @@ public final class QueryContext extends Proc implements Closeable {
    * @param qcParent parent context
    */
   public QueryContext(final QueryContext qcParent) {
-    this(qcParent.context, qcParent);
+    this(qcParent.context, qcParent, qcParent.info);
     listen = qcParent.listen;
     resources = qcParent.resources;
+    http = qcParent.http;
+    updates = qcParent.updates;
   }
 
   /**
@@ -164,26 +164,27 @@ public final class QueryContext extends Proc implements Closeable {
    * @param context database context
    */
   public QueryContext(final Context context) {
-    this(context, null);
+    this(context, null, null);
     resources = new QueryResources(this);
   }
 
   /**
    * Constructor.
    * @param context database context
-   * @param qcParent parent context (optional)
+   * @param parent parent context (can be {@code null})
+   * @param info query info
    */
-  private QueryContext(final Context context, final QueryContext qcParent) {
+  private QueryContext(final Context context, final QueryContext parent, final QueryInfo info) {
     this.context = context;
-    this.qcParent = qcParent;
-    info = new QueryInfo(this);
+    this.parent = parent;
+    this.info = info != null ? info : new QueryInfo(this);
   }
 
   /**
    * Parses the specified query.
    * @param query query string
    * @param path file path (may be {@code null})
-   * @param sc static context
+   * @param sc static context (may be {@code null})
    * @return main module
    * @throws QueryException query exception
    */
@@ -197,7 +198,7 @@ public final class QueryContext extends Proc implements Closeable {
    * @param query query string
    * @param library library/main module
    * @param path file path (may be {@code null})
-   * @param sc static context
+   * @param sc static context (may be {@code null})
    * @return main module
    * @throws QueryException query exception
    */
@@ -210,7 +211,7 @@ public final class QueryContext extends Proc implements Closeable {
    * Parses the specified query.
    * @param query query string
    * @param path file path (may be {@code null})
-   * @param sc static context
+   * @param sc static context (may be {@code null})
    * @return main module
    * @throws QueryException query exception
    */
@@ -218,8 +219,11 @@ public final class QueryContext extends Proc implements Closeable {
       throws QueryException {
 
     info.query = query;
-    root = new QueryParser(query, path, this, sc).parseMain();
-    updating = updating && root.expr.has(Flag.UPD);
+    final QueryParser qp = new QueryParser(query, path, this, sc);
+    root = qp.parseMain();
+    if(updating) {
+      updating = (qp.sc.mixUpdates && qp.sc.dynFuncCall) || root.expr.has(Flag.UPD);
+    }
     return root;
   }
 
@@ -227,7 +231,7 @@ public final class QueryContext extends Proc implements Closeable {
    * Parses the specified module.
    * @param query query string
    * @param path file path (may be {@code null})
-   * @param sc static context
+   * @param sc static context (may be {@code null})
    * @return name of module
    * @throws QueryException query exception
    */
@@ -235,7 +239,12 @@ public final class QueryContext extends Proc implements Closeable {
       throws QueryException {
 
     info.query = query;
-    return new QueryParser(query, path, this, sc).parseLibrary(true);
+    try {
+      return new QueryParser(query, path, this, sc).parseLibrary(true);
+    } finally {
+      // library module itself is not updating
+      updating = false;
+    }
   }
 
   /**
@@ -248,76 +257,60 @@ public final class QueryContext extends Proc implements Closeable {
   }
 
   /**
-   * Checks function calls and variable references.
-   * @param main main module
-   * @param sc static context
-   * @throws QueryException query exception
-   */
-  void check(final MainModule main, final StaticContext sc) throws QueryException {
-    // check function calls and variable references
-    funcs.check(this);
-    vars.check();
-
-    // check placement of updating expressions if any have been found
-    if(!sc.mixUpdates && updating) {
-      funcs.checkUp();
-      vars.checkUp();
-      if(main != null) main.expr.checkUp();
-    }
-  }
-
-  /**
    * Compiles and optimizes the expression.
    * @throws QueryException query exception
    */
   public void compile() throws QueryException {
     if(compiled) return;
-    compiled = true;
 
-    // set database options
-    final StringList opts = tempOpts;
-    final int os = opts.size();
-    for(int o = 0; o < os; o += 2) {
-      try {
-        context.options.assign(opts.get(o).toUpperCase(Locale.ENGLISH), opts.get(o + 1));
-      } catch(final BaseXException ex) {
-        throw BASX_VALUE_X_X.get(null, opts.get(o), opts.get(o + 1));
+    try {
+      // set database options
+      final StringList opts = tempOpts;
+      final int os = opts.size();
+      for(int o = 0; o < os; o += 2) {
+        try {
+          context.options.assign(opts.get(o).toUpperCase(Locale.ENGLISH), opts.get(o + 1));
+        } catch(final BaseXException ex) {
+          throw BASX_VALUE_X_X.get(null, opts.get(o), opts.get(o + 1));
+        }
       }
-    }
-    // set tail call option after assignment database option
-    maxCalls = context.options.get(MainOptions.TAILCALLS);
+      // set tail call option after assignment database option
+      maxCalls = context.options.get(MainOptions.TAILCALLS);
 
-    // bind external variables
-    vars.bindExternal(this, bindings);
+      // bind external variables
+      vars.bindExternal(this, bindings);
 
-    if(ctxItem != null) {
-      // evaluate initial expression
-      try {
-        ctxItem.compile(this);
-        value = ctxItem.cache(this).value();
-      } catch(final QueryException ex) {
-        // only {@link ParseExpr} instances may lead to a missing context
-        throw ex.error() == NOCTX_X ? CIRCCTX.get(ctxItem.info) : ex;
+      if(ctxItem != null) {
+        // evaluate initial expression
+        try {
+          ctxItem.compile(this);
+          value = ctxItem.cache(this).value();
+        } catch(final QueryException ex) {
+          // only {@link ParseExpr} instances may lead to a missing context
+          throw ex.error() == NOCTX_X ? CIRCCTX.get(ctxItem.info) : ex;
+        }
+      } else {
+        // cache the initial context nodes
+        final DBNodes nodes = context.current();
+        if(nodes != null) {
+          if(!context.perm(Perm.READ, nodes.data().meta.name))
+            throw BASX_PERM_X.get(null, Perm.READ);
+          value = resources.compile(nodes);
+        }
       }
-    } else {
-      // cache the initial context nodes
-      final DBNodes nodes = context.current();
-      if(nodes != null) {
-        if(!context.perm(Perm.READ, nodes.data().meta.name))
-          throw BASX_PERM_X.get(null, Perm.READ);
-        value = resources.compile(nodes);
+
+      // if specified, convert context value to specified type
+      // [LW] should not be necessary
+      if(value != null && root.sc.contextType != null) {
+        value = root.sc.contextType.promote(this, root.sc, null, value, true);
       }
-    }
 
-    // if specified, convert context value to specified type
-    // [LW] should not be necessary
-    if(value != null && root.sc.contextType != null) {
-      value = root.sc.contextType.promote(this, root.sc, null, value, true);
+      // dynamic compilation
+      analyze();
+      info.runtime = true;
+    } finally {
+      compiled = true;
     }
-
-    // dynamic compilation
-    analyze();
-    info.runtime = true;
   }
 
   /**
@@ -349,31 +342,30 @@ public final class QueryContext extends Proc implements Closeable {
       if(!updating) return root.iter(this);
 
       // cache results
-      ItemList cache = root.cache(this);
+      ItemList results = root.cache(this);
 
-      final Updates updates = resources.updates;
       if(updates != null) {
-        // if parent context exists, updates will be performed by main context
-        if(qcParent == null) {
-          final ItemList output = resources.output;
-
-          // copy nodes that will be affected by an update operation
+        // only perform updates if no parent context exists
+        if(parent == null) {
+          // create copies of results that will be modified by an update operation
+          final ItemList cache = updates.cache;
           final HashSet<Data> datas = updates.prepare(this);
           final StringList dbs = updates.databases();
-          copy(cache, datas, dbs);
-          copy(output, datas, dbs);
+          check(results, datas, dbs);
+          check(cache, datas, dbs);
 
+          // invalidate current node set in context, apply updates
           if(context.data() != null) context.invalidate();
           updates.apply(this);
 
           // append cached outputs
-          if(output.size() != 0) {
-            if(cache.size() == 0) cache = output;
-            else cache.add(output.value());
+          if(!cache.isEmpty()) {
+            if(results.isEmpty()) results = cache;
+            else results.add(cache.value());
           }
         }
       }
-      return cache.iter();
+      return results.iter();
 
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
@@ -382,19 +374,26 @@ public final class QueryContext extends Proc implements Closeable {
   }
 
   /**
-   * Creates copies of nodes that will be affected by an update operation.
-   * @param cache node cache
+   * Checks the specified results, and replaces nodes with their copies if they will be
+   * affected by update operations.
+   * @param results node cache
    * @param datas data references
    * @param dbs database names
+   * @throws QueryException query exception
    */
-  private void copy(final ItemList cache, final HashSet<Data> datas, final StringList dbs) {
-    final long cs = cache.size();
+  private void check(final ItemList results, final HashSet<Data> datas, final StringList dbs)
+      throws QueryException {
+
+    final long cs = results.size();
     for(int c = 0; c < cs; c++) {
-      final Item it = cache.get(c);
-      if(!(it instanceof DBNode)) continue;
-      final Data data = it.data();
-      if(datas.contains(data) || !data.inMemory() && dbs.contains(data.meta.name)) {
-        cache.set(c, ((DBNode) it).dbCopy(context.options));
+      final Item it = results.get(c);
+      // all updates are performed on database nodes
+      if(it instanceof FItem) throw BASX_FITEM_X.get(null, it);
+      if(it instanceof DBNode) {
+        final Data data = it.data();
+        if(datas.contains(data) || !data.inMemory() && dbs.contains(data.meta.name)) {
+          results.set(c, ((DBNode) it).dbNodeCopy(context.options));
+        }
       }
     }
   }
@@ -419,6 +418,15 @@ public final class QueryContext extends Proc implements Closeable {
   public Value value(final Expr expr) throws QueryException {
     checkStop();
     return expr.value(this);
+  }
+
+  /**
+   * Returns a reference to the updates.
+   * @return updates
+   */
+  public Updates updates() {
+    if(updates == null) updates = new Updates(false);
+    return updates;
   }
 
   /**
@@ -471,7 +479,7 @@ public final class QueryContext extends Proc implements Closeable {
    * @param sc static context
    */
   public void context(final Value val, final StaticContext sc) {
-    ctxItem = new MainModule(val, new VarScope(sc), null, sc);
+    ctxItem = MainModule.get(val, new VarScope(sc), null, null, sc, null);
   }
 
   /**
@@ -504,7 +512,7 @@ public final class QueryContext extends Proc implements Closeable {
   public void bind(final String name, final Value val, final StaticContext sc)
       throws QueryException {
     final byte[] n = token(name);
-    bindings.put(QNm.resolve(indexOf(n, '$') == 0 ? substring(n, 1) : n, null, sc, null), val);
+    bindings.put(QNm.resolve(indexOf(n, '$') == 0 ? substring(n, 1) : n, sc), val);
   }
 
   /**
@@ -521,7 +529,7 @@ public final class QueryContext extends Proc implements Closeable {
    * @param string evaluation info
    */
   public void evalInfo(final String string) {
-    (qcParent != null ? qcParent.info : info).evalInfo(string);
+    (parent != null ? parent.info : info).evalInfo(string);
   }
 
   /**
@@ -588,14 +596,15 @@ public final class QueryContext extends Proc implements Closeable {
 
   @Override
   public void close() {
-    // close only once
     if(closed) return;
-
-    if(qcParent == null) {
-      closed = true;
+    closed = true;
+    if(parent == null) {
+      // topmost query: close resources
       resources.close();
+    } else {
+      // otherwise, adopt update reference (may have been initialized by sub query)
+      parent.updates = updates;
     }
-
     // reassign original database options
     for(final Entry<Option<?>, Object> e : staticOpts.entrySet()) {
       context.options.put(e.getKey(), e.getValue());
@@ -620,7 +629,6 @@ public final class QueryContext extends Proc implements Closeable {
   // CLASS METHODS ======================================================================
 
   /**
-   * This function is called by the GUI; use {@link #iter()} instead.
    * Caches and returns the result of the specified query. If all nodes are of the same database
    * instance, the returned value will be of type {@link DBNodes}.
    * @param max maximum number of results to cache (negative: return all values)
@@ -659,7 +667,8 @@ public final class QueryContext extends Proc implements Closeable {
     // use standard iterator
     while((it = ir.next()) != null && cache.size() < mx) {
       checkStop();
-      cache.add(it.materialize(null));
+      it.materialize(null);
+      cache.add(it);
     }
     return cache.value();
   }
@@ -705,7 +714,7 @@ public final class QueryContext extends Proc implements Closeable {
 
     // no type specified: return original value or convert Java object
     if(type == null || type.isEmpty()) {
-      return vl instanceof Value ? (Value) vl : JavaMapping.toValue(vl, this, sc);
+      return vl instanceof Value ? (Value) vl : JavaFunction.toValue(vl, this, sc);
     }
 
     // convert to json
@@ -713,8 +722,7 @@ public final class QueryContext extends Proc implements Closeable {
       try {
         final JsonParserOptions jp = new JsonParserOptions();
         jp.set(JsonOptions.FORMAT, JsonFormat.MAP);
-        final JsonConverter conv = JsonConverter.get(jp);
-        return conv.convert(token(vl.toString()), null);
+        return JsonConverter.get(jp).convert(token(vl.toString()), null);
       } catch(final QueryIOException ex) {
         throw ex.getCause();
       }

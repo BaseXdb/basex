@@ -11,7 +11,7 @@ import org.basex.core.users.*;
 /**
  * Evaluates the 'create user' command and creates a new user.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class CreateUser extends AUser {
@@ -31,15 +31,14 @@ public final class CreateUser extends AUser {
     if(name.equals(UserText.ADMIN)) return error(ADMIN_STATIC);
 
     final Users users = context.users;
-    users.create(name, pw, null);
+    users.add(new User(name, pw));
     users.write();
     return info(USER_CREATED_X, args[0]);
   }
 
   @Override
   public void build(final CmdBuilder cb) {
-    cb.init(Cmd.CREATE + " " + CmdCreate.USER);
-    cb.arg(0);
+    cb.init(Cmd.CREATE + " " + CmdCreate.USER).arg(0);
     if(!cb.conf()) cb.arg(1);
   }
 }

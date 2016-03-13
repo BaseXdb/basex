@@ -2,6 +2,7 @@ package org.basex.query.expr;
 
 import java.util.*;
 
+import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.gflwor.*;
@@ -23,22 +24,34 @@ import org.basex.util.hash.*;
  * Abstract class for representing XQuery expressions.
  * Expression are divided into {@link ParseExpr} and {@link Value} classes.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class Expr extends ExprInfo {
   /** Flags that influence query compilation. */
   public enum Flag {
-    /** Creates new fragments. Example: node constructor. */ CNS,
-    /** Depends on context. Example: context node. */        CTX,
-    /** Non-deterministic. Example: random:double(). */      NDT,
-    /** Positional access. Example: position(). */           POS,
-    /** Performs updates. Example: insert expression. */     UPD,
-    /** Invokes user-supplied functions. Example: fold. */   HOF,
+    /** Node creation. No relocation of expressions that would change number of node constructions
+     * Example: node constructor. */
+    CNS,
+    /** Context dependency. Checked to prevent relocations of expressions to different context.
+     * Example: context item ({@code .}). */
+    CTX,
+    /** Non-deterministic code. Cannot be relocated, pre-evaluated or optimized away.
+     * Examples: random:double(), file:write(). */
+    NDT,
+    /** Positional access. Prevents simple iterative evaluation.
+     * Examples: position(), last(). */
+    POS,
+    /** Performs updates. Checked to detect if an expression is updating or not, or if code
+     * can be optimized away when using {@link MainOptions#MIXUPDATES}. Example: delete node. */
+    UPD,
+    /** Function invocation. Used to suppress pre-evaluation of built-in functions with
+     * functions arguments. Example: fold-left. */
+    HOF,
   }
 
   /**
-   * Checks if all updating expressions are correctly placed.
+   * Checks if the updating semantics are satisfied.
    * This function is only called if any updating expression was found in the query.
    * @throws QueryException query exception
    */
@@ -83,7 +96,7 @@ public abstract class Expr extends ExprInfo {
    * expression, as it may be called by this method.
    * @param qc query context
    * @param ii input info
-   * @return iterator or {@code null}
+   * @return item or {@code null}
    * @throws QueryException query exception
    */
   public abstract Item item(final QueryContext qc, final InputInfo ii) throws QueryException;
@@ -98,7 +111,7 @@ public abstract class Expr extends ExprInfo {
   public abstract Value value(final QueryContext qc) throws QueryException;
 
   /**
-   * Evaluates the expression and returns zero or one atomized item, or an error.
+   * Evaluates the expression and returns an iterator on the resulting, atomized items.
    * @param qc query context
    * @param ii input info
    * @return iterator
@@ -109,10 +122,11 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Evaluates the expression and returns zero or one atomized item, or an error.
+   * Evaluates the expression and returns the resulting, atomized item,
+   * or a {@code null} reference if the expression yields an empty sequence.
    * @param qc query context
    * @param ii input info
-   * @return iterator
+   * @return item or {@code null}
    * @throws QueryException query exception
    */
   public abstract Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException;
@@ -296,7 +310,7 @@ public abstract class Expr extends ExprInfo {
    * If the arguments of the called expression return a boolean anyway,
    * the expression will be simplified.</p>
    * <p>Example in {@link CmpV}:
-   * <code>if($x eq true())</code> is rewritten to <code>if($x)</code> if <code>$x</code>
+   * <code>if($x eq true())</code> is rewritten to <code>if($x)</code> if {@code $x}
    * is known to return a single boolean.</p>
    * @param qc query context
    * @param scp variable scope
@@ -307,8 +321,8 @@ public abstract class Expr extends ExprInfo {
   public Expr optimizeEbv(final QueryContext qc, final VarScope scp) throws QueryException {
     // return true if a deterministic expression returns at least one node
     final SeqType st = seqType();
-    if(st.type instanceof NodeType && st.occ.min >= 1 && !has(Flag.UPD) && !has(Flag.NDT)) {
-      qc.compInfo(QueryText.OPTWRITE, this);
+    if(st.type instanceof NodeType && st.oneOrMore() && !has(Flag.UPD) && !has(Flag.NDT)) {
+      qc.compInfo(QueryText.OPTREWRITE_X, this);
       return Bln.TRUE;
     }
     return this;
@@ -345,7 +359,8 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Compares the current and specified expression for equality.
+   * Compares the current and specified expression for equality. {@code false} may be returned,
+   * even if the expressions are equal.
    * @param cmp expression to be compared
    * @return result of check
    */
@@ -406,7 +421,7 @@ public abstract class Expr extends ExprInfo {
    * @return success flag
    */
   protected static boolean visitAll(final ASTVisitor visitor, final Expr...exprs) {
-    for(final Expr e : exprs) if(!e.accept(visitor)) return false;
+    for(final Expr expr : exprs) if(!expr.accept(visitor)) return false;
     return true;
   }
 

@@ -8,7 +8,7 @@ import org.junit.*;
 /**
  * Annotations tests.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class AnnotationsTest extends AdvancedQueryTest {
@@ -59,11 +59,5 @@ public final class AnnotationsTest extends AdvancedQueryTest {
     error("declare %output:xx function local:x() { 1 }; 1", BASX_ANNOT_X_X);
     error("declare %output:method function local:x() { 1 }; 1", BASX_ANNNUM_X_X_X);
     error("declare %output:method(1) function local:x() { 1 }; 1", BASX_ANNTYPE_X_X_X);
-  }
-
-  /**  Test for empty-sequence() as function item. */
-  @Test
-  public void emptyFunTest() {
-    error("()()", EMPTYFOUND);
   }
 }

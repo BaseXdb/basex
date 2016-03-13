@@ -17,7 +17,7 @@ import org.basex.util.list.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class DbRename extends DbAccess {
@@ -28,24 +28,49 @@ public final class DbRename extends DbAccess {
     final String target = path(2, qc);
 
     // the first step of the path should be the database name
-    final Updates updates = qc.resources.updates();
+    final Updates updates = qc.updates();
     final IntList il = data.resources.docs(source);
     final int is = il.size();
     for(int i = 0; i < is; i++) {
       final int pre = il.get(i);
       final String trg = Rename.target(data, pre, source, target);
-      if(trg.isEmpty() || trg.endsWith("/") || trg.endsWith("."))
-        throw BXDB_RENAME_X.get(info, trg);
+      if(trg.isEmpty() || trg.endsWith("/") || trg.endsWith(".")) throw BXDB_PATH_X.get(info, trg);
       updates.add(new ReplaceValue(pre, data, info, token(trg)), qc);
     }
 
-    // rename files
+    // rename raw data
     if(!data.inMemory()) {
       final IOFile src = data.meta.binary(source);
       final IOFile trg = data.meta.binary(target);
-      if(src == null || trg == null) throw UPDBRENAME_X.get(info, src);
-      updates.add(new DBRename(data, src.path(), trg.path(), info), qc);
+      if(src == null || trg == null) throw BXDB_PATH_X.get(info, src);
+      if(!src.eq(trg)) {
+        rename(data, src, trg, qc);
+        updates.add(new DBDelete(data, source, ii), qc);
+      }
     }
     return null;
+  }
+
+  /**
+   * Recursively creates rename operations for binary files.
+   * @param data data reference
+   * @param src source path
+   * @param trg target path
+   * @param qc query context
+   * @throws QueryException query exception
+   */
+  private void rename(final Data data, final IOFile src, final IOFile trg,
+      final QueryContext qc) throws QueryException {
+
+    if(src.isDir()) {
+      // dir -> file? error
+      if(trg.exists() && !trg.isDir()) throw BXDB_PATH_X.get(info, src);
+      // rename children
+      for(final IOFile f : src.children()) rename(data, f, new IOFile(trg, f.name()), qc);
+    } else if(src.exists()) {
+      // file -> dir? error
+      if(trg.isDir()) throw BXDB_PATH_X.get(info, src);
+      qc.updates().add(new DBRename(data, src.path(), trg.path(), info), qc);
+    }
   }
 }

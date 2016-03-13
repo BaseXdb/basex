@@ -7,7 +7,7 @@ import org.basex.util.*;
 /**
  * This class assembles some index statistics.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class IndexStats {
@@ -23,8 +23,6 @@ public final class IndexStats {
   private final byte[][] txtMax;
   /** Number of index entries. */
   private int size;
-  /** Current number of occurrence. */
-  private int co;
 
   /**
    * Default constructor.
@@ -49,7 +47,7 @@ public final class IndexStats {
    * @return result of check
    */
   public boolean adding(final int oc) {
-    co = oc;
+    if(oc == 0) return false;
     ++size;
     return oc > occMax[max - 1] || oc < occMin[max - 1];
   }
@@ -57,15 +55,16 @@ public final class IndexStats {
   /**
    * Adds the specified token.
    * @param tx token to be added
+   * @param oc number of occurrences
    */
-  public void add(final byte[] tx) {
-    final boolean dsc = co > occMax[max - 1];
+  public void add(final byte[] tx, final int oc) {
+    final boolean dsc = oc > occMax[max - 1];
     final byte[][] txt = dsc ? txtMax : txtMin;
     final int[] ocs = dsc ? occMax : occMin;
     for(int a = max - 1; a >= 0; a--) {
-      if(a == 0 || dsc && co < ocs[a - 1] || !dsc && co > ocs[a - 1]) {
+      if(a == 0 || dsc && oc < ocs[a - 1] || !dsc && oc > ocs[a - 1]) {
         txt[a] = tx;
-        ocs[a] = co;
+        ocs[a] = oc;
         break;
       }
       txt[a] = txt[a - 1];

@@ -7,7 +7,7 @@ import org.basex.util.*;
 /**
  * Resizable-array implementation for native long values.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public class LongList extends ElementList {
@@ -124,6 +124,6 @@ public class LongList extends ElementList {
 
   @Override
   public String toString() {
-    return Arrays.toString(toArray());
+    return list == null ? "" : Arrays.toString(toArray());
   }
 }

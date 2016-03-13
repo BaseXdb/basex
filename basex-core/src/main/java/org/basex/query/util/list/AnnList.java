@@ -6,14 +6,13 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.ann.*;
-import org.basex.query.util.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
  * List of annotations.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class AnnList extends ElementList implements Iterable<Ann> {
@@ -49,6 +48,20 @@ public final class AnnList extends ElementList implements Iterable<Ann> {
   public boolean contains(final Ann ann) {
     for(final Ann a : anns) if(a.eq(ann)) return true;
     return false;
+  }
+
+  /**
+   * Removes an annotation.
+   * @param sig signature to be found
+   */
+  public void delete(final Annotation sig) {
+    final Ann[] lst = anns;
+    final int sz = size;
+    int s = 0;
+    for(int i = 0; i < sz; ++i) {
+      if(lst[i].sig != sig) lst[s++] = lst[i];
+    }
+    size = s;
   }
 
   /**
@@ -119,7 +132,7 @@ public final class AnnList extends ElementList implements Iterable<Ann> {
 
   /**
    * Checks all annotations for parsing errors.
-   * @param var variable flag
+   * @param var variable flag (triggers different error codes)
    * @return self reference
    * @throws QueryException query exception
    */

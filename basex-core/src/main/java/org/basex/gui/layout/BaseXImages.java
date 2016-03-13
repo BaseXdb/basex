@@ -18,7 +18,7 @@ import org.basex.util.http.*;
 /**
  * Organizes icons used all over the GUI.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class BaseXImages {
@@ -35,8 +35,6 @@ public final class BaseXImages {
   /** Icon for raw files. */
   private static final Icon RAWTEXT = icon("text_raw");
 
-  /** Large icons. */
-  private static final boolean LARGE = GUIConstants.HEIGHT > 16;
   /** Icon for closed directories. */
   private static final Icon DIR1 = icon("file_dir1");
   /** Icon for opened directories. */
@@ -87,14 +85,16 @@ public final class BaseXImages {
     if(ii != null) return ii;
 
     Image img;
-    if(GUIConstants.SCALE > 1) {
+    if(GUIConstants.scale > 1) {
       // choose large image or none
-      final URL url = LARGE ? BaseXImages.class.getResource("/img/" + name + "_32.png") : null;
+      final URL url = GUIConstants.large()
+          ? BaseXImages.class.getResource("/img/" + name + "_32.png") : null;
+
       if(url == null) {
-        // resize low-res image
+        // resize low-res image if no hi-res image exists
         img = get(url(name));
-        final int w = (int) (img.getWidth(null) * GUIConstants.SCALE);
-        final int h = (int) (img.getHeight(null) * GUIConstants.SCALE);
+        final int w = (int) (img.getWidth(null) * GUIConstants.scale);
+        final int h = (int) (img.getHeight(null) * GUIConstants.scale);
         final BufferedImage tmp = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
         final Graphics2D g2 = tmp.createGraphics();
         g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
@@ -162,7 +162,7 @@ public final class BaseXImages {
     if(path.contains(IO.BASEXSUFFIX)) return BASEX;
 
     // only works with standard dpi (https://bugs.openjdk.java.net/browse/JDK-6817929)
-    if(Prop.WIN && !LARGE) {
+    if(Prop.WIN && !GUIConstants.large()) {
       // retrieve system icons (only supported on Windows)
       final int p = path.lastIndexOf(path, '.');
       final String suffix = p == -1 ? null : path.substring(p + 1);

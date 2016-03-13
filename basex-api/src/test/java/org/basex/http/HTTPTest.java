@@ -22,21 +22,10 @@ import org.junit.*;
 /**
  * This class contains common methods for the HTTP services.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class HTTPTest extends SandboxTest {
-  /** HTTP stop port. */
-  protected static final int STOP_PORT = 9999;
-  /** HTTP port. */
-  protected static final int HTTP_PORT = 9998;
-  /** REST identifier. */
-  protected static final String REST = "rest";
-  /** Root path. */
-  protected static final String RESTXQ_ROOT = "http://" + Text.S_LOCALHOST + ':' + HTTP_PORT + '/';
-  /** Root path. */
-  protected static final String REST_ROOT = RESTXQ_ROOT + REST + '/';
-
   /** Database context. */
   private static final Context CONTEXT = HTTPContext.init();
   /** HTTP server. */
@@ -59,13 +48,8 @@ public abstract class HTTPTest extends SandboxTest {
     final StringList sl = new StringList();
     if(local) sl.add("-l");
     sl.add("-p" + DB_PORT, "-h" + HTTP_PORT, "-s" + STOP_PORT, "-z");
-    sl.add("-U" + ADMIN, "-P" + ADMIN);
-    System.setOut(NULL);
-    try {
-      http = new BaseXHTTP(sl.toArray());
-    } finally {
-      System.setOut(OUT);
-    }
+    sl.add("-U" + ADMIN, "-P" + ADMIN, "-q");
+    http = new BaseXHTTP(sl.toArray());
   }
 
   /**
@@ -74,12 +58,7 @@ public abstract class HTTPTest extends SandboxTest {
    */
   @AfterClass
   public static void stop() throws Exception {
-    System.setOut(NULL);
-    try {
-      http.stop();
-    } finally {
-      System.setOut(OUT);
-    }
+    http.stop();
 
     // cleanup: remove project specific system properties
     final StringList sl = new StringList();
@@ -209,7 +188,7 @@ public abstract class HTTPTest extends SandboxTest {
    * @throws IOException I/O exception
    */
   protected static String read(final InputStream is) throws IOException {
-    return is == null ? "" : normNL(string(new BufferInput(is).content()));
+    return is == null ? "" : string(new BufferInput(is).content());
   }
 
   /**

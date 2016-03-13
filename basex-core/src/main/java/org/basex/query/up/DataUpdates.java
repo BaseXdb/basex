@@ -26,7 +26,7 @@ import org.basex.util.list.*;
  * are initiated within a snapshot. Regarding the XQUF specification it fulfills the purpose of
  * a 'pending update list'.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Lukas Kircher
  */
 final class DataUpdates {
@@ -105,7 +105,7 @@ final class DataUpdates {
    */
   void prepare(final MemData tmp) throws QueryException {
     // Prepare/check database operations
-    for(final DBUpdate d : dbUpdates) d.prepare(tmp);
+    for(final DBUpdate d : dbUpdates) d.prepare();
 
     // Prepare/check XQUP primitives:
     final int s = nodeUpdates.size();
@@ -178,14 +178,10 @@ final class DataUpdates {
     // execute fn:put operations
     for(final Put put : puts.values()) put.apply();
 
-    // Feature #1035: auto-optimize database
-    final MainOptions opts = qc.context.options;
-    if(data.meta.autoopt) {
-      try {
-        Optimize.optimize(data, opts, null);
-      } catch(final IOException ex) {
-        throw UPDBOPTERR_X.get(null, ex);
-      }
+    try {
+      Optimize.finish(data);
+    } catch(final IOException ex) {
+      throw UPDBOPTERR_X.get(null, ex);
     }
 
     /* optional: export file if...
@@ -202,7 +198,7 @@ final class DataUpdates {
           throw UPDBOPTERR_X.get(null, ex);
         }
       } else {
-        FnTrace.dump(Token.token(original + ": Updates are not written back."), null, qc);
+        FnTrace.trace(Token.token(original + ": Updates are not written back."), null, qc);
       }
     }
   }
@@ -270,7 +266,8 @@ final class DataUpdates {
       if(ups != null) for(final NodeUpdate up : ups.updates) up.update(pool);
     }
     // check namespaces
-    if(!pool.nsOK()) throw UPNSCONFL2.get(null);
+    final byte[][] ns = pool.nsOK();
+    if(ns != null) throw UPNSCONFL2_X_X.get(null, ns[0], ns[1]);
 
     // add the already existing attributes to the name pool
     final IntSet il = new IntSet();

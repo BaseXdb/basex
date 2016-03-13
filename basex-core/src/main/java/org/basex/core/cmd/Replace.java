@@ -13,7 +13,7 @@ import org.basex.util.list.*;
 /**
  * Evaluates the 'replace' command and replaces documents in a collection.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Replace extends ACreate {
@@ -49,7 +49,7 @@ public final class Replace extends ACreate {
 
     final Data data = context.data();
     final IOFile bin = data.meta.binary(path);
-    if(bin == null) return error(PATH_INVALID_X, args[0]);
+    if(!data.inMemory() && bin == null) return error(PATH_INVALID_X, args[0]);
 
     if(!startUpdate()) return false;
     boolean ok = true;
@@ -64,7 +64,7 @@ public final class Replace extends ACreate {
   /**
    * Replaces files in the specified database.
    * @param data database
-   * @param bin binary file
+   * @param bin binary file (can be {@code null})
    * @param path target path
    * @return success flag
    */
@@ -74,7 +74,7 @@ public final class Replace extends ACreate {
 
     final IntList docs = data.resources.docs(path);
     int d = 0, bs = 0;
-    if(bin.exists()) {
+    if(bin != null && bin.exists()) {
       // replace binary file if it already exists
       final Store store = new Store(path);
       store.setInput(in);

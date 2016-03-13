@@ -9,7 +9,7 @@ import org.junit.*;
 /**
  * This class tests the functions of the JSON Module.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class JsonModuleTest extends AdvancedQueryTest {
@@ -76,13 +76,13 @@ public final class JsonModuleTest extends AdvancedQueryTest {
   @Test
   public void parseMap() {
     final String map = " map { 'format':'map' }";
-    query(_MAP_SERIALIZE.args(_JSON_PARSE.args("{}", map)), "{\n}");
-    query(_MAP_SERIALIZE.args(_JSON_PARSE.args("{\"A\":1}", map)), "{\n\"A\": 1\n}");
-    query(_MAP_SERIALIZE.args(_JSON_PARSE.args("{\"\":null}", map)), "{\n\"\": ()\n}");
+    query(_JSON_PARSE.args("{}", map), "map {\n}");
+    query(_JSON_PARSE.args("{\"A\":1}", map), "map {\n\"A\": 1\n}");
+    query(_JSON_PARSE.args("{\"\":null}", map), "map {\n\"\": ()\n}");
 
-    query(_ARRAY_SERIALIZE.args(_JSON_PARSE.args("[]", map)), "[]");
-    query(_ARRAY_SERIALIZE.args(_JSON_PARSE.args("[\"A\"]", map)), "[\"A\"]");
-    query(_ARRAY_SERIALIZE.args(_JSON_PARSE.args("[1,true]", map)), "[1, true()]");
+    query(_JSON_PARSE.args("[]", map), "[]");
+    query(_JSON_PARSE.args("[\"A\"]", map), "[\"A\"]");
+    query(_JSON_PARSE.args("[1,true]", map), "[1, true()]");
 
     query(_JSON_PARSE.args("1", map), "1");
     query(_JSON_PARSE.args("\"\"\"f\"\"\"", map), "f");
@@ -121,10 +121,10 @@ public final class JsonModuleTest extends AdvancedQueryTest {
         "<foo test=\"asdf\"/>");
     query("array:size(json:parse('[\"foo\",{\"test\":\"asdf\"}]', map {'format':'map'}))",
         "2");
-    query("json:parse('\"\\t\\u000A\"', map {'format':'map','unescape':false(),'liberal':true()})",
-        "\\t\\u000A");
+    query("json:parse('\"\\t\\u000A\"', map {'format':'map','escape':true(),'liberal':true()})",
+        "\\t\\n");
     query("string-to-codepoints(json:parse('\"\\t\\u000A\"'," +
-        "  map {'format':'map','unescape':true(),'liberal':true()}))", "9\n10");
+        "  map {'format':'map','escape':false(),'liberal':true()}))", "9\n10");
     error("json:parse('42', map {'spec':'garbage'})", INVALIDOPT_X);
   }
 

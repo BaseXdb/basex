@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class FnEmpty extends StandardFunc {
@@ -23,7 +23,6 @@ public final class FnEmpty extends StandardFunc {
   protected Expr opt(final QueryContext qc, final VarScope scp) {
     // ignore non-deterministic expressions (e.g.: error())
     final Expr e = exprs[0];
-    return e.size() == -1 || e.has(Flag.NDT) || e.has(Flag.CNS) || e.has(Flag.UPD) ? this :
-      Bln.get(e.size() == 0);
+    return e.size() == -1 || e.has(Flag.NDT) || e.has(Flag.UPD) ? this : Bln.get(e.size() == 0);
   }
 }

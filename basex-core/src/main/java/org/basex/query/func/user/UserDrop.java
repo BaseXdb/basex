@@ -7,11 +7,12 @@ import org.basex.query.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class UserDrop extends UserFn {
@@ -19,34 +20,35 @@ public final class UserDrop extends UserFn {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     checkAdmin(qc);
     final User user = toSafeUser(0, qc);
-    final String db = exprs.length > 1 ? toDB(1, qc) : "";
+    final StringList patterns = toPatterns(1, qc);
     if(user.name().equals(UserText.ADMIN)) throw USER_ADMIN.get(info);
-    qc.resources.updates().add(new Drop(user, db, qc, ii), qc);
+    qc.updates().add(new Drop(user, patterns, qc, ii), qc);
     return null;
   }
 
   /** Update primitive. */
-  private static final class Drop extends UserUpdate {
+  private static final class Drop extends UserPermUpdate {
     /**
      * Constructor.
      * @param user user
-     * @param pattern database (optional)
+     * @param patterns database (optional)
      * @param qc query context
      * @param info input info
+     * @throws QueryException query exception
      */
-    private Drop(final User user, final String pattern, final QueryContext qc,
-        final InputInfo info) {
-      super(UpdateType.USERDROP, user, pattern, qc, info);
+    private Drop(final User user, final StringList patterns, final QueryContext qc,
+        final InputInfo info) throws QueryException {
+      super(UpdateType.USERDROP, user, null, patterns, qc, info);
     }
 
     @Override
     public void apply() {
       boolean global = false;
-      for(final String db : patterns) global |= db == null;
+      for(final String pattern : patterns) global |= pattern.isEmpty();
       if(global) {
-        users.drop(user, "");
+        users.drop(user);
       } else {
-        for(final String db : patterns) users.drop(user, db);
+        for(final String db : patterns) user.drop(db);
       }
     }
 

@@ -13,7 +13,7 @@ import org.basex.query.expr.Expr.Flag;
 import org.basex.query.func.admin.*;
 import org.basex.query.func.archive.*;
 import org.basex.query.func.array.*;
-import org.basex.query.func.basex.*;
+import org.basex.query.func.async.*;
 import org.basex.query.func.bin.*;
 import org.basex.query.func.client.*;
 import org.basex.query.func.convert.*;
@@ -40,8 +40,10 @@ import org.basex.query.func.random.*;
 import org.basex.query.func.repo.*;
 import org.basex.query.func.sql.*;
 import org.basex.query.func.stream.*;
+import org.basex.query.func.strings.*;
 import org.basex.query.func.unit.*;
 import org.basex.query.func.user.*;
+import org.basex.query.func.util.*;
 import org.basex.query.func.validate.*;
 import org.basex.query.func.web.*;
 import org.basex.query.func.xquery.*;
@@ -59,7 +61,7 @@ import org.basex.util.hash.*;
  * New namespace mappings for function prefixes and URIs must be added to the static initializer of
  * the {@link NSGlobal} class.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public enum Function {
@@ -99,7 +101,7 @@ public enum Function {
   /** XQuery function. */
   CODEPOINTS_TO_STRING(FnCodepointsToString.class, "codepoints-to-string(nums)", arg(ITR_ZM), STR),
   /** XQuery function. */
-  COLLECTION(FnCollection.class, "collection([uri])", arg(STR_ZO), NOD_ZM),
+  COLLECTION(FnCollection.class, "collection([uri])", arg(STR_ZO), DOC_ZM),
   /** XQuery function. */
   COMPARE(FnCompare.class, "compare(first,second[,collation])", arg(STR_ZO, STR_ZO, STR), ITR_ZO),
   /** XQuery function. */
@@ -132,6 +134,8 @@ public enum Function {
       arg(ITEM_ZM, ITEM_ZM, STR), BLN),
   /** XQuery function. */
   DEFAULT_COLLATION(FnDefaultCollation.class, "default-collation()", arg(), STR),
+  /** XQuery function. */
+  DEFAULT_LANGUAGE(FnDefaultLanguage.class, "default-language()", arg(), LAN),
   /** XQuery function. */
   DISTINCT_VALUES(FnDistinctValues.class, "distinct-values(items[,collation])",
       arg(AAT_ZM, STR), AAT_ZM),
@@ -311,7 +315,8 @@ public enum Function {
   /** XQuery function. */
   PARSE_XML(FnParseXml.class, "parse-xml(string)", arg(STR_ZO), DOC_O, flag(CNS)),
   /** XQuery function. */
-  PARSE_XML_FRAGMENT(FnParseXmlFragment.class, "parse-xml-fragment(string)", arg(STR_ZO), DOC_ZO),
+  PARSE_XML_FRAGMENT(FnParseXmlFragment.class, "parse-xml-fragment(string)", arg(STR_ZO), DOC_ZO,
+      flag(CNS)),
   /** XQuery function. */
   PATH(FnPath.class, "path([node])", arg(NOD_ZO), STR_ZO),
   /** XQuery function. */
@@ -319,7 +324,7 @@ public enum Function {
   /** XQuery function. */
   PREFIX_FROM_QNAME(FnPrefixFromQName.class, "prefix-from-QName(qname)", arg(QNM_ZO), NCN_ZO),
   /** XQuery function. */
-  PUT(FnPut.class, "put(node,uri)", arg(NOD, STR_ZO), EMP, flag(UPD, NDT)),
+  PUT(FnPut.class, "put(node,uri)", arg(NOD, STR_ZO), EMP, flag(UPD)),
   /** XQuery function. */
   QNAME(FnQName.class, "QName(uri,name)", arg(STR_ZO, STR), QNM),
   /** XQuery function. */
@@ -364,7 +369,7 @@ public enum Function {
   /** XQuery function. */
   STRING(FnString.class, "string([item])", arg(ITEM_ZO), STR),
   /** XQuery function. */
-  STRING_JOIN(FnStringJoin.class, "string-join(strings[,sep])", arg(STR_ZM, STR), STR),
+  STRING_JOIN(FnStringJoin.class, "string-join(items[,sep])", arg(ITEM_ZM, STR), STR),
   /** XQuery function. */
   STRING_LENGTH(FnStringLength.class, "string-length([string])", arg(STR_ZO), ITR),
   /** XQuery function. */
@@ -445,8 +450,6 @@ public enum Function {
   /** XQuery function. */
   _MAP_FOR_EACH(MapForEach.class, "for-each(map,function)",
       arg(MAP_O, FuncType.get(ITEM_ZM, AAT, ITEM_ZM).seqType()), ITEM_ZM, flag(HOF), MAP_URI),
-  /** XQuery function. */
-  _MAP_SERIALIZE(MapSerialize.class, "serialize(map)", arg(MAP_O), STR, MAP_URI),
 
   /* Array Module. */
 
@@ -497,8 +500,6 @@ public enum Function {
   /** XQuery function. */
   _ARRAY_SORT(ArraySort.class, "sort(array[,key-func])",
       arg(ARRAY_O, FuncType.arity(1).seqType()), ARRAY_O, flag(HOF), ARRAY_URI),
-  /** XQuery function. */
-  _ARRAY_SERIALIZE(ArraySerialize.class, "serialize(array)", arg(ARRAY_O), STR, ARRAY_URI),
 
   /* Math Module. */
 
@@ -586,18 +587,25 @@ public enum Function {
   @Deprecated _ARCHIVE_WRITE(ArchiveWrite.class, "write(path,archive[,entries])",
       arg(STR, B64, ITEM_ZM), EMP, ARCHIVE_URI),
 
-  /* BaseX Module. */
+  /* Async Module. */
 
   /** XQuery function. */
-  _BASEX_DEEP_EQUAL(BaseXDeepEqual.class, "deep-equal(items1,items2[,options])",
-      arg(ITEM_ZM, ITEM_ZM, ITEM), BLN, BASEX_URI),
+  _ASYNC_EVAL(AsyncEval.class, "eval(string[,bindings[,options]])",
+      arg(STR, ITEM, MAP_O), STR, flag(NDT), ASYNC_URI),
   /** XQuery function. */
-  _BASEX_ITEM_AT(BaseXItemAt.class, "item-at(items,pos)", arg(ITEM_ZM, DBL), ITEM_ZO, BASEX_URI),
+  _ASYNC_UPDATE(AsyncUpdate.class, "update(string[,bindings[,options]])",
+      arg(STR, ITEM, MAP_O), STR, flag(UPD), ASYNC_URI),
   /** XQuery function. */
-  _BASEX_ITEM_RANGE(BaseXItemRange.class, "item-range(items,first,last)",
-      arg(ITEM_ZM, DBL, DBL), ITEM_ZM, BASEX_URI),
+  _ASYNC_RESULT(AsyncResult.class, "result(id)", arg(STR), ITEM_ZM, flag(NDT), ASYNC_URI),
   /** XQuery function. */
-  _BASEX_LAST_FROM(BaseXLastFrom.class, "last-from(items)", arg(ITEM_ZM), ITEM_ZO, BASEX_URI),
+  _ASYNC_STOP(AsyncStop.class, "stop(id)", arg(STR), BLN, flag(NDT), ASYNC_URI),
+  /** XQuery function. */
+  _ASYNC_FINISHED(AsyncFinished.class, "finished(id)", arg(STR), BLN, flag(NDT), ASYNC_URI),
+  /** XQuery function. */
+  _ASYNC_IDS(AsyncIds.class, "ids()", arg(), STR_ZM, flag(NDT), ASYNC_URI),
+  /** XQuery function. */
+  _ASYNC_FORK_JOIN(AsyncForkJoin.class, "fork-join(functions[,options])",
+      arg(FUN_ZM, MAP_O), ITEM_ZM, flag(HOF), ASYNC_URI),
 
   /* Binary Module. */
 
@@ -770,24 +778,26 @@ public enum Function {
   _DB_ATTRIBUTE_RANGE(DbAttributeRange.class, "attribute-range(database,from,to[,name])",
       arg(STR, ITEM, ITEM, STR), NOD_ZM, flag(NDT), DB_URI),
   /** XQuery function. */
+  _DB_TOKEN(DbToken.class, "token(database,string[,name])",
+      arg(STR, ITEM, STR), NOD_ZM, flag(NDT), DB_URI),
+  /** XQuery function. */
   _DB_LIST(DbList.class, "list([database[,path]])", arg(STR, STR), STR_ZM, flag(NDT), DB_URI),
   /** XQuery function. */
-  _DB_LIST_DETAILS(DbListDetails.class, "list-details([database[,path]])", arg(STR, STR), ELM_ZM,
-      flag(NDT), DB_URI),
+  _DB_LIST_DETAILS(DbListDetails.class, "list-details([database[,path]])",
+      arg(STR, STR), ELM_ZM, flag(NDT), DB_URI),
   /** XQuery function. */
   _DB_BACKUPS(DbBackups.class, "backups([database])", arg(ITEM), ELM_ZM, DB_URI),
   /** XQuery function. */
-  _DB_CREATE_BACKUP(DbCreateBackup.class, "create-backup(database)", arg(STR), EMP,
-      flag(UPD, NDT), DB_URI),
+  _DB_CREATE_BACKUP(DbCreateBackup.class, "create-backup(database)",
+      arg(STR), EMP, flag(UPD), DB_URI),
   /** XQuery function. */
-  _DB_COPY(DbCopy.class, "copy(database, new-name)", arg(STR, STR), EMP, flag(UPD, NDT),
-      DB_URI),
+  _DB_COPY(DbCopy.class, "copy(database, new-name)", arg(STR, STR), EMP, flag(UPD), DB_URI),
   /** XQuery function. */
-  _DB_ALTER(DbAlter.class, "alter(database, new-name)", arg(STR, STR), EMP, flag(UPD, NDT), DB_URI),
+  _DB_ALTER(DbAlter.class, "alter(database, new-name)", arg(STR, STR), EMP, flag(UPD), DB_URI),
   /** XQuery function. */
-  _DB_DROP_BACKUP(DbDropBackup.class, "drop-backup(name)", arg(STR), EMP, flag(UPD, NDT), DB_URI),
+  _DB_DROP_BACKUP(DbDropBackup.class, "drop-backup(name)", arg(STR), EMP, flag(UPD), DB_URI),
   /** XQuery function. */
-  _DB_RESTORE(DbRestore.class, "restore(backup)", arg(STR), EMP, flag(UPD, NDT), DB_URI),
+  _DB_RESTORE(DbRestore.class, "restore(backup)", arg(STR), EMP, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_SYSTEM(DbSystem.class, "system()", arg(), STR, DB_URI),
   /** XQuery function. */
@@ -797,33 +807,33 @@ public enum Function {
   /** XQuery function. */
   _DB_NODE_PRE(DbNodePre.class, "node-pre(nodes)", arg(NOD_ZM), ITR_ZM, DB_URI),
   /** XQuery function. */
-  _DB_OUTPUT(DbOutput.class, "output(result)", arg(ITEM_ZM), EMP, flag(UPD, NDT), DB_URI),
+  _DB_OUTPUT(DbOutput.class, "output(result)", arg(ITEM_ZM), EMP, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_OUTPUT_CACHE(DbOutputCache.class, "output-cache()", arg(), ITEM_ZO, flag(NDT), DB_URI),
   /** XQuery function. */
   _DB_ADD(DbAdd.class, "add(database,input[,path[,options]])",
-      arg(STR, NOD, STR, ITEM), EMP, flag(UPD, NDT), DB_URI),
+      arg(STR, NOD, STR, ITEM), EMP, flag(UPD), DB_URI),
   /** XQuery function. */
-  _DB_DELETE(DbDelete.class, "delete(database,path)", arg(STR, STR), EMP, flag(UPD, NDT), DB_URI),
+  _DB_DELETE(DbDelete.class, "delete(database,path)", arg(STR, STR), EMP, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_CREATE(DbCreate.class, "create(name[,inputs[,paths[,options]]])",
-      arg(STR, ITEM_ZM, STR_ZM, ITEM), EMP, flag(UPD, NDT), DB_URI),
+      arg(STR, ITEM_ZM, STR_ZM, ITEM), EMP, flag(UPD), DB_URI),
   /** XQuery function. */
-  _DB_DROP(DbDrop.class, "drop(database)", arg(ITEM), EMP, flag(UPD, NDT), DB_URI),
+  _DB_DROP(DbDrop.class, "drop(database)", arg(ITEM), EMP, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_RENAME(DbRename.class, "rename(database,path,new-path)", arg(STR, STR, STR), EMP,
-      flag(UPD, NDT), DB_URI),
+      flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_REPLACE(DbReplace.class, "replace(database,path,input[,options])",
-      arg(STR, STR, ITEM, ITEM), EMP, flag(UPD, NDT), DB_URI),
+      arg(STR, STR, ITEM, ITEM), EMP, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_OPTIMIZE(DbOptimize.class, "optimize(database[,all[,options]])",
-      arg(STR, BLN, ITEM), EMP, flag(UPD, NDT), DB_URI),
+      arg(STR, BLN, ITEM), EMP, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_RETRIEVE(DbRetrieve.class, "retrieve(database,path)", arg(STR, STR), B64, flag(NDT), DB_URI),
   /** XQuery function. */
-  _DB_STORE(DbStore.class, "store(database,path,input)", arg(STR, STR, ITEM), EMP, flag(UPD, NDT),
-      DB_URI),
+  _DB_STORE(DbStore.class, "store(database,path,input)",
+      arg(STR, STR, ITEM), EMP, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_IS_XML(DbIsXml.class, "is-xml(database,path)", arg(STR, STR), BLN, DB_URI),
   /** XQuery function. */
@@ -833,10 +843,10 @@ public enum Function {
   /** XQuery function. */
   _DB_CONTENT_TYPE(DbContentType.class, "content-type(database,path)", arg(STR, STR), STR, DB_URI),
   /** XQuery function. */
-  _DB_FLUSH(DbFlush.class, "flush(database)", arg(ITEM), EMP, flag(UPD, NDT), DB_URI),
+  _DB_FLUSH(DbFlush.class, "flush(database)", arg(ITEM), EMP, flag(UPD), DB_URI),
   /** XQuery function. */
-  _DB_EXPORT(DbExport.class, "export(database,path[,param]])", arg(STR, STR, ITEM), EMP, flag(NDT),
-      DB_URI),
+  _DB_EXPORT(DbExport.class, "export(database,path[,param]])",
+      arg(STR, STR, ITEM), EMP, flag(NDT), DB_URI),
   /** XQuery function. */
   _DB_NAME(DbName.class, "name(node)", arg(NOD), STR, DB_URI),
   /** XQuery function. */
@@ -1040,6 +1050,8 @@ public enum Function {
   _INDEX_ATTRIBUTES(IndexAttributes.class, "attributes(database[,prefix[,ascending]])",
       arg(STR, STR, BLN), NOD_ZM, flag(NDT), INDEX_URI),
   /** XQuery function. */
+  _INDEX_TOKENS(IndexTokens.class, "tokens(database)", arg(STR), NOD_ZM, flag(NDT), INDEX_URI),
+  /** XQuery function. */
   _INDEX_ELEMENT_NAMES(IndexElementNames.class, "element-names(database)", arg(STR), NOD_ZM,
       INDEX_URI),
   /** XQuery function. */
@@ -1049,16 +1061,23 @@ public enum Function {
   /* Inspection Module. */
 
   /** XQuery function. */
-  _INSPECT_FUNCTION(InspectFunction.class, "function(function)", arg(STR), ELM, INSPECT_URI),
+  _INSPECT_FUNCTION(InspectFunction.class, "function(function)",
+      arg(STR), ELM, flag(HOF), INSPECT_URI),
   /** XQuery function. */
-  _INSPECT_MODULE(InspectModule.class, "module(path)", arg(STR), ELM, INSPECT_URI),
+  _INSPECT_MODULE(InspectModule.class, "module(uri)", arg(STR), ELM, INSPECT_URI),
   /** XQuery function. */
   _INSPECT_CONTEXT(InspectContext.class, "context()", arg(), ELM, INSPECT_URI),
   /** XQuery function. */
-  _INSPECT_FUNCTIONS(InspectFunctions.class, "functions([uri])", arg(STR), FUN_ZM, flag(HOF),
-      INSPECT_URI),
+  _INSPECT_FUNCTIONS(InspectFunctions.class, "functions([uri])",
+      arg(STR), FUN_ZM, flag(HOF), INSPECT_URI),
   /** XQuery function. */
-  _INSPECT_XQDOC(InspectXqdoc.class, "xqdoc(path)", arg(STR), ELM, INSPECT_URI),
+  _INSPECT_FUNCTION_ANNOTATIONS(InspectFunctionAnnotations.class, "function-annotations(function)",
+      arg(FUN_O), MAP_ZO, UTIL_URI),
+  /** XQuery function. */
+  _INSPECT_STATIC_CONTEXT(InspectStaticContext.class, "static-context(function,name)",
+      arg(FUN_O, STR), ITEM_ZM, INSPECT_URI),
+  /** XQuery function. */
+  _INSPECT_XQDOC(InspectXqdoc.class, "xqdoc(uri)", arg(STR), ELM, INSPECT_URI),
 
   /* JSON Module. */
 
@@ -1085,6 +1104,11 @@ public enum Function {
   /** XQuery function. */
   _PROC_EXECUTE(ProcExecute.class, "execute(command[,args[,encoding]]])",
       arg(STR, STR_ZM, STR), ELM, flag(NDT), PROC_URI),
+  /** XQuery function. */
+  _PROC_PROPERTY_NAMES(ProcPropertyNames.class, "property-names()",
+      arg(), STR_ZO, flag(NDT), PROC_URI),
+  /** XQuery function. */
+  _PROC_PROPERTY(ProcProperty.class, "property(name)", arg(STR), STR, flag(NDT), PROC_URI),
 
   /* Profiling Module. */
 
@@ -1165,6 +1189,17 @@ public enum Function {
   _STREAM_IS_STREAMABLE(StreamIsStreamable.class, "is-streamable(item)", arg(ITEM), BLN,
       STREAM_URI),
 
+  /* Strings Module. */
+
+  /** XQuery function. */
+  _STRINGS_LEVENSHTEIN(StringsLevenshtein.class, "levenshtein(string1,string2)",
+      arg(STR, STR), DBL, STRINGS_URI),
+  /** XQuery function. */
+  _STRINGS_SOUNDEX(StringsSoundex.class, "soundex(string)", arg(STR), STR, STRINGS_URI),
+  /** XQuery function. */
+  _STRINGS_COLOGNE_PHONETIC(StringsColognePhonetic.class, "cologne-phonetic(string)",
+      arg(STR), STR, STRINGS_URI),
+
   /* Unit Module. */
 
   /** XQuery function. */
@@ -1188,39 +1223,61 @@ public enum Function {
   _USER_LIST_DETAILS(UserListDetails.class, "list-details([name])",
       arg(STR), ELM_ZM, flag(NDT), USER_URI),
   /** XQuery function. */
-  _USER_CREATE(UserCreate.class, "create(name,password[,permission])",
-      arg(STR, STR, STR), EMP, flag(UPD), USER_URI),
+  _USER_CREATE(UserCreate.class, "create(name,password[,permissions[,patterns]])",
+      arg(STR, STR, STR_ZM, STR_ZM), EMP, flag(UPD), USER_URI),
   /** XQuery function. */
-  _USER_GRANT(UserGrant.class, "grant(name,permission[,pattern])",
-      arg(STR, STR, STR), EMP, flag(UPD), USER_URI),
+  _USER_GRANT(UserGrant.class, "grant(name,permissions[,patterns])",
+      arg(STR, STR_ZM, STR_ZM), EMP, flag(UPD), USER_URI),
   /** XQuery function. */
-  _USER_DROP(UserDrop.class, "drop(name[,pattern])", arg(STR, STR), EMP, flag(UPD), USER_URI),
+  _USER_DROP(UserDrop.class, "drop(name[,patterns])", arg(STR, STR_ZM), EMP, flag(UPD), USER_URI),
   /** XQuery function. */
   _USER_ALTER(UserAlter.class, "alter(name,newname)", arg(STR, STR), EMP, flag(UPD), USER_URI),
   /** XQuery function. */
   _USER_PASSWORD(UserPassword.class, "password(name,password)",
       arg(STR, STR), EMP, flag(UPD), USER_URI),
 
+  /* Utility Module. */
+
+  /** XQuery function. */
+  _UTIL_DEEP_EQUAL(UtilDeepEqual.class, "deep-equal(items1,items2[,options])",
+      arg(ITEM_ZM, ITEM_ZM, ITEM), BLN, UTIL_URI),
+  /** XQuery function. */
+  _UTIL_ITEM_AT(UtilItemAt.class, "item-at(items,pos)", arg(ITEM_ZM, DBL), ITEM_ZO, UTIL_URI),
+  /** XQuery function. */
+  _UTIL_ITEM_RANGE(UtilItemRange.class, "item-range(items,first,last)",
+      arg(ITEM_ZM, DBL, DBL), ITEM_ZM, UTIL_URI),
+  /** XQuery function. */
+  _UTIL_LAST_FROM(UtilLastFrom.class, "last-from(items)", arg(ITEM_ZM), ITEM_ZO, UTIL_URI),
+
   /* Validate Module. */
 
   /** XQuery function. */
-  _VALIDATE_XSD(ValidateXsd.class, "xsd(input[,schema])", arg(ITEM, ITEM), EMP, flag(NDT),
-      VALIDATE_URI),
+  _VALIDATE_XSD(ValidateXsd.class, "xsd(input[,schema[,version]])",
+      arg(ITEM, ITEM, STR), EMP, flag(NDT), VALIDATE_URI),
   /** XQuery function. */
-  _VALIDATE_XSD_INFO(ValidateXsdInfo.class, "xsd-info(input[,schema])",
-      arg(ITEM, ITEM), STR_ZM, flag(NDT), VALIDATE_URI),
+  _VALIDATE_XSD_INFO(ValidateXsdInfo.class, "xsd-info(input[,schema[,version]])",
+      arg(ITEM, ITEM, STR), STR_ZM, flag(NDT), VALIDATE_URI),
   /** XQuery function. */
-  _VALIDATE_DTD(ValidateDtd.class, "dtd(input[,schema])", arg(ITEM, ITEM), EMP, flag(NDT),
-      VALIDATE_URI),
+  _VALIDATE_XSD_REPORT(ValidateXsdReport.class, "xsd-report(input[,schema[,version]])",
+      arg(ITEM, ITEM, STR), ELM, flag(NDT), VALIDATE_URI),
+  /** XQuery function. */
+  _VALIDATE_DTD(ValidateDtd.class, "dtd(input[,schema])",
+      arg(ITEM, ITEM), EMP, flag(NDT), VALIDATE_URI),
   /** XQuery function. */
   _VALIDATE_DTD_INFO(ValidateDtdInfo.class, "dtd-info(input[,schema])",
       arg(ITEM, ITEM), STR_ZM, flag(NDT), VALIDATE_URI),
+  /** XQuery function. */
+  _VALIDATE_DTD_REPORT(ValidateDtdReport.class, "dtd-report(input[,schema])",
+      arg(ITEM, ITEM), ELM, flag(NDT), VALIDATE_URI),
   /** XQuery function. */
   _VALIDATE_RNG(ValidateRng.class, "rng(input,schema[,compact])",
       arg(ITEM, ITEM, BLN), STR_ZM, flag(NDT), VALIDATE_URI),
   /** XQuery function. */
   _VALIDATE_RNG_INFO(ValidateRngInfo.class, "rng-info(input,schema[,compact])",
       arg(ITEM, ITEM, BLN), STR_ZM, flag(NDT), VALIDATE_URI),
+  /** XQuery function. */
+  _VALIDATE_RNG_REPORT(ValidateRngReport.class, "rng-report(input,schema[,compact])",
+      arg(ITEM, ITEM, BLN), ELM, flag(NDT), VALIDATE_URI),
 
   /* Web Module. */
 
@@ -1245,12 +1302,15 @@ public enum Function {
       arg(STR, ITEM, ITEM), ITEM_ZM, flag(NDT), XQUERY_URI),
   /** XQuery function. */
   _XQUERY_UPDATE(XQueryUpdate.class, "update(string[,bindings[,options]])",
-      arg(STR, ITEM, ITEM), ITEM_ZM, flag(UPD, NDT), XQUERY_URI),
+      arg(STR, ITEM, ITEM), ITEM_ZM, flag(UPD), XQUERY_URI),
   /** XQuery function. */
   _XQUERY_INVOKE(XQueryInvoke.class, "invoke(uri[,bindings[,options]])",
       arg(STR, ITEM, ITEM), ITEM_ZM, flag(NDT), XQUERY_URI),
   /** XQuery function. */
   _XQUERY_PARSE(XQueryParse.class, "parse(string[,options])",
+      arg(STR, ITEM), NOD, flag(NDT), XQUERY_URI),
+  /** XQuery function. */
+  _XQUERY_PARSE_URI(XQueryParseUri.class, "parse-uri(uri[,options])",
       arg(STR, ITEM), NOD, flag(NDT), XQUERY_URI),
   /** XQuery function. */
   _XQUERY_TYPE(XQueryType.class, "type(value)", arg(ITEM_ZM), ITEM_ZM, XQUERY_URI),
@@ -1314,7 +1374,7 @@ public enum Function {
   /** Descriptions. */
   final String desc;
   /** Return type. */
-  final SeqType ret;
+  final SeqType type;
 
   /** Compiler flags. */
   private final EnumSet<Flag> flags;
@@ -1329,11 +1389,11 @@ public enum Function {
    * @param func reference to the class containing the function implementation
    * @param desc descriptive function string
    * @param args types of the function arguments
-   * @param ret return type
+   * @param type return type
    */
   Function(final Class<? extends StandardFunc> func, final String desc, final SeqType[] args,
-      final SeqType ret) {
-    this(func, desc, args, ret, EnumSet.noneOf(Flag.class));
+      final SeqType type) {
+    this(func, desc, args, type, EnumSet.noneOf(Flag.class));
   }
 
   /**
@@ -1342,12 +1402,12 @@ public enum Function {
    * @param func reference to the class containing the function implementation
    * @param desc descriptive function string
    * @param args types of the function arguments
-   * @param ret return type
+   * @param type return type
    * @param uri uri
    */
   Function(final Class<? extends StandardFunc> func, final String desc, final SeqType[] args,
-      final SeqType ret, final byte[] uri) {
-    this(func, desc, args, ret, EnumSet.noneOf(Flag.class), uri);
+      final SeqType type, final byte[] uri) {
+    this(func, desc, args, type, EnumSet.noneOf(Flag.class), uri);
   }
 
   /**
@@ -1356,12 +1416,12 @@ public enum Function {
    * @param func reference to the class containing the function implementation
    * @param desc descriptive function string
    * @param args types of the function arguments
-   * @param ret return type
+   * @param type return type
    * @param flag static function properties
    */
   Function(final Class<? extends StandardFunc> func, final String desc, final SeqType[] args,
-      final SeqType ret, final EnumSet<Flag> flag) {
-    this(func, desc, args, ret, flag, FN_URI);
+      final SeqType type, final EnumSet<Flag> flag) {
+    this(func, desc, args, type, flag, FN_URI);
   }
 
   /**
@@ -1372,16 +1432,16 @@ public enum Function {
    *             square brackets; three dots indicate that the number of arguments of a
    *             function is not limited
    * @param args types of the function arguments
-   * @param ret return type
+   * @param type return type
    * @param flags static function properties
    * @param uri uri
    */
   Function(final Class<? extends StandardFunc> func, final String desc, final SeqType[] args,
-      final SeqType ret, final EnumSet<Flag> flags, final byte[] uri) {
+      final SeqType type, final EnumSet<Flag> flags, final byte[] uri) {
 
     this.func = func;
     this.desc = desc;
-    this.ret = ret;
+    this.type = type;
     this.args = args;
     this.flags = flags;
     this.uri = uri;
@@ -1449,7 +1509,7 @@ public enum Function {
     } else {
       System.arraycopy(args, 0, st, 0, arity);
     }
-    return FuncType.get(anns, ret, st);
+    return FuncType.get(anns, type, st);
   }
 
   /**
@@ -1554,7 +1614,7 @@ public enum Function {
    * All function names are listed in reverse order to give precedence to longer names.
    * @param args ignored
   public static void main(final String... args) {
-    final StringList sl = new StringList();
+    final org.basex.util.list.StringList sl = new org.basex.util.list.StringList();
     for(Function f : VALUES) {
       sl.add(f.toString().replaceAll("^fn:|\\(.*", ""));
     }

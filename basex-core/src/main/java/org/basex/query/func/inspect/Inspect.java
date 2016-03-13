@@ -11,7 +11,7 @@ import org.basex.build.xml.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.util.*;
+import org.basex.query.ann.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -22,7 +22,7 @@ import org.basex.util.list.*;
 /**
  * Inspect function.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class Inspect {
@@ -32,7 +32,7 @@ public abstract class Inspect {
   final InputInfo info;
 
   /** Parsed main module. */
-  StaticScope module;
+  Module module;
 
   /**
    * Constructor.
@@ -93,17 +93,12 @@ public abstract class Inspect {
 
     for(final Ann ann : anns) {
       final FElem annotation = elem("annotation", parent);
-      if(ann.sig != null) {
-        annotation.add("name", ann.sig.id());
-        if(uri) annotation.add("uri", ann.sig.uri);
-      } else {
-        annotation.add("name", ann.name.string());
-        if(uri) annotation.add("uri", ann.name.uri());
-      }
+      final QNm name = ann.name();
+      annotation.add("name", name.string());
+      if(uri) annotation.add("uri", name.uri());
 
-      for(final Item it : ann.args) {
-        final FElem literal = elem("literal", annotation);
-        literal.add("type", it.type.toString()).add(it.string(null));
+      for(final Item item : ann.args()) {
+        elem("literal", annotation).add("type", item.type.toString()).add(item.string(null));
       }
     }
   }
@@ -130,10 +125,9 @@ public abstract class Inspect {
    * @param elem element
    */
   public static void add(final byte[] value, final FElem elem) {
-
     try {
       final Parser parser = new XMLParser(new IOContent(value), MainOptions.get(), true);
-      for(final ANode node : new DBNode(parser).children()) elem.add(node.copy());
+      for(final ANode node : new DBNode(parser).children()) elem.add(node.finish());
     } catch(final IOException ex) {
       // fallback: add string representation
       Util.debug(ex);

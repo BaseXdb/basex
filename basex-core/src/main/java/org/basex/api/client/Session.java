@@ -15,14 +15,14 @@ import org.basex.io.out.*;
  *
  * <p>The class is implemented by the {@link ClientSession} and {@link LocalSession} classes.</p>
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class Session implements Closeable {
   /** Client output stream. */
   protected OutputStream out;
   /** Command info. */
-  protected String info;
+  protected String info = "";
 
   /**
    * Executes a {@link Command} and returns the result as string or serializes

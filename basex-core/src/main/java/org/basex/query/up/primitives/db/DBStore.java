@@ -18,7 +18,7 @@ import org.basex.util.hash.*;
 /**
  * Update primitive for the {@link Function#_DB_STORE} function.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class DBStore extends DBUpdate {
@@ -66,5 +66,5 @@ public final class DBStore extends DBUpdate {
   }
 
   @Override
-  public void prepare(final MemData tmp) { }
+  public void prepare() { }
 }

@@ -3,11 +3,12 @@ package org.basex.io.in;
 import java.io.*;
 
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Input stream filter for reading files in the TAR file format.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class TarInputStream extends FilterInputStream {
@@ -85,12 +86,39 @@ public final class TarInputStream extends FilterInputStream {
       if(res < 0) break;
       tr += res;
     }
-    for(final byte b : header) {
-      if(b != 0) {
-        entry = new TarEntry(header);
-        break;
-      }
+    if(eof(header)) return null;
+
+    // create entry
+    entry = new TarEntry(header);
+    if(entry.isLongName()) {
+      final String name = longName();
+      entry = getNextEntry();
+      entry.setName(name);
     }
     return entry;
+  }
+
+  /**
+   * Checks if end of data is reached.
+   * @param header header data
+   * @return result of check
+   */
+  private static boolean eof(final byte[] header) {
+    for(final byte b : header) if(b != 0) return false;
+    return true;
+  }
+
+  /**
+   * Reads a long file name.
+   * @return name
+   * @throws IOException I/O exception
+   */
+  private String longName() throws IOException {
+    // read name, remove trailing zero byte
+    final ByteList result = new ByteList();
+    for(int b; (b = read()) != -1;) result.add(b);
+    final int sz = result.size() - 1;
+    if(sz >= 0 && result.get(sz) == 0) result.size(sz);
+    return TarEntry.name(result);
   }
 }

@@ -7,6 +7,7 @@ import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -17,7 +18,7 @@ import org.basex.util.hash.*;
 /**
  * Root node.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Root extends Simple {
@@ -32,7 +33,13 @@ public final class Root extends Simple {
 
   @Override
   public Expr compile(final QueryContext qc, final VarScope scp) {
-    return qc.value != null && qc.value.type == NodeType.DOC ? qc.value : this;
+    return optimize(qc, scp);
+  }
+
+  @Override
+  public Expr optimize(final QueryContext qc, final VarScope scp) {
+    final Value v = qc.value;
+    return v != null && v.type == NodeType.DOC && v.size() == 1 ? v : this;
   }
 
   @Override

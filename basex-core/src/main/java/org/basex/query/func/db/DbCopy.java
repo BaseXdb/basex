@@ -13,7 +13,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public class DbCopy extends DbFn {
@@ -37,10 +37,10 @@ public class DbCopy extends DbFn {
     if(!Databases.validName(newname)) throw BXDB_NAME_X.get(info, newname);
 
     // source database does not exist
-    if(!qc.context.soptions.dbexists(name)) throw BXDB_WHICH_X.get(info, name);
+    if(!qc.context.soptions.dbExists(name)) throw BXDB_WHICH_X.get(info, name);
     if(name.equals(newname)) throw BXDB_SAME_X.get(info, name, newname);
 
-    qc.resources.updates().add(keep ? new DBCopy(name, newname, info, qc) :
+    qc.updates().add(keep ? new DBCopy(name, newname, info, qc) :
       new DBAlter(name, newname, info, qc), qc);
     return null;
   }

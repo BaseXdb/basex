@@ -20,7 +20,7 @@ import org.basex.util.*;
  * This class creates a database instance on disk.
  * The storage layout is described in the {@link Data} class.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class DiskBuilder extends Builder implements Closeable {
@@ -70,7 +70,7 @@ public final class DiskBuilder extends Builder implements Closeable {
 
     // drop old database (if available) and create new one
     DropDB.drop(dbname, sopts);
-    sopts.dbpath(dbname).md();
+    sopts.dbPath(dbname).md();
 
     elemNames = new Names(meta);
     attrNames = new Names(meta);
@@ -86,7 +86,7 @@ public final class DiskBuilder extends Builder implements Closeable {
       if(Prop.debug) Util.errln(" " + perf + " (" + Performance.getMemory() + ')');
 
     } catch(final IOException ex) {
-      try { close(); } catch(final IOException ignored) { }
+      try { close(); } catch(final IOException ignore) { }
       throw ex;
     }
     close();
@@ -94,8 +94,11 @@ public final class DiskBuilder extends Builder implements Closeable {
     // copy temporary values into database table
     try(final DataInput in = new DataInput(meta.dbfile(DATATMP))) {
       final TableAccess ta = new TableDiskAccess(meta, true);
-      for(; spos < ssize; ++spos) ta.write4(in.readNum(), 8, in.readNum());
-      ta.close();
+      try {
+        for(; spos < ssize; ++spos) ta.write4(in.readNum(), 8, in.readNum());
+      } finally {
+        ta.close();
+      }
     }
     meta.dbfile(DATATMP).delete();
 
@@ -137,7 +140,7 @@ public final class DiskBuilder extends Builder implements Closeable {
   protected void addDoc(final byte[] value) throws IOException {
     tout.write1(Data.DOC);
     tout.write2(0);
-    tout.write5(textOff(value, true));
+    tout.write5(textRef(value, true));
     tout.write4(0);
     tout.write4(meta.size++);
   }
@@ -162,7 +165,7 @@ public final class DiskBuilder extends Builder implements Closeable {
 
     tout.write1(dist << 3 | Data.ATTR);
     tout.write2(nameId);
-    tout.write5(textOff(value, false));
+    tout.write5(textRef(value, false));
     tout.write4(uriId);
     tout.write4(meta.size++);
   }
@@ -171,7 +174,7 @@ public final class DiskBuilder extends Builder implements Closeable {
   protected void addText(final byte[] value, final int dist, final byte kind) throws IOException {
     tout.write1(kind);
     tout.write2(0);
-    tout.write5(textOff(value, true));
+    tout.write5(textRef(value, true));
     tout.write4(dist);
     tout.write4(meta.size++);
   }
@@ -190,12 +193,12 @@ public final class DiskBuilder extends Builder implements Closeable {
    * @return inline value or text position
    * @throws IOException I/O exception
    */
-  private long textOff(final byte[] value, final boolean text) throws IOException {
-    // inline integer values...
+  private long textRef(final byte[] value, final boolean text) throws IOException {
+    // inline integer value
     final long v = Token.toSimpleInt(value);
     if(v != Integer.MIN_VALUE) return v | IO.OFFNUM;
 
-    // store text
+    // store text to heap file
     final DataOutput store = text ? xout : vout;
     final long off = store.size();
     final byte[] val = comp.pack(value);

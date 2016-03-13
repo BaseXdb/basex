@@ -5,24 +5,23 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
-import org.basex.io.out.*;
 import org.basex.query.value.item.*;
 
 /**
  * This class serializes items as XHTML.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class XHTMLSerializer extends MarkupSerializer {
   /**
    * Constructor, specifying serialization options.
-   * @param po print output
+   * @param os output stream
    * @param sopts serialization parameters
    * @throws IOException I/O exception
    */
-  XHTMLSerializer(final PrintOutput po, final SerializerOptions sopts) throws IOException {
-    super(po, sopts, V10, V11);
+  XHTMLSerializer(final OutputStream os, final SerializerOptions sopts) throws IOException {
+    super(os, sopts, V10, V11);
   }
 
   @Override

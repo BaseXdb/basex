@@ -42,7 +42,7 @@ import org.basex.util.hash.*;
  * remembered. This avoids additional traversals of the AUC during consistency checks and
  * further optimizations.</p>
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Lukas Kircher
  */
 public final class AtomicUpdateCache {
@@ -277,11 +277,11 @@ public final class AtomicUpdateCache {
    * @param mergeTexts adjacent text nodes are to be expected and must be merged
    */
   public void execute(final boolean mergeTexts) {
-    data.cache = true;
+    data.updateDists = false;
     applyUpdates();
     adjustDistances();
     if(mergeTexts) resolveTextAdjacency();
-    data.cache = false;
+    data.updateDists = true;
     clear();
   }
 

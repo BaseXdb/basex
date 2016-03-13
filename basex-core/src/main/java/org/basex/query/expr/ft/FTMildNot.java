@@ -15,7 +15,7 @@ import org.basex.util.hash.*;
 /**
  * FTMildnot expression.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class FTMildNot extends FTExpr {
@@ -95,8 +95,8 @@ public final class FTMildNot extends FTExpr {
   @Override
   public boolean indexAccessible(final IndexInfo ii) throws QueryException {
     int costs = ii.costs;
-    for(final FTExpr e : exprs) {
-      if(!e.indexAccessible(ii)) return false;
+    for(final FTExpr expr : exprs) {
+      if(!expr.indexAccessible(ii)) return false;
       costs += ii.costs;
     }
     // use summarized costs for estimation

@@ -14,7 +14,7 @@ import org.basex.util.list.*;
 /**
  * Update primitive for the {@link Function#_DB_COPY} function.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class DBCopy extends NameUpdate {
@@ -47,7 +47,7 @@ public final class DBCopy extends NameUpdate {
   }
 
   @Override
-  public void prepare() throws QueryException { }
+  public void prepare() { }
 
   @Override
   public String operation() { return "copied"; }

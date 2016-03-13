@@ -8,7 +8,6 @@ import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.Expr.Flag;
-import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -16,11 +15,12 @@ import org.basex.query.value.type.SeqType.Occ;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
+import org.basex.util.similarity.*;
 
 /**
  * This class provides access to built-in and user-defined functions.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Functions extends TokenSet {
@@ -77,10 +77,10 @@ public final class Functions extends TokenSet {
       if(t.parent == null) continue;
       final byte[] u = t.name.uri();
       if(eq(u, XS_URI) && t != AtomType.NOT && t != AtomType.AAT && ls.similar(
-          lc(ln), lc(t.string()))) throw FUNCSIMILAR_X_X.get(ii, name.string(), t.string());
+          lc(ln), lc(t.string()))) throw FUNCSIMILAR_X_X.get(ii, name.prefixId(), t.string());
     }
     // no similar name: constructor function found, or abstract type specified
-    throw FUNCUNKNOWN_X.get(ii, name.string());
+    throw WHICHFUNC_X.get(ii, name.prefixId());
   }
 
   /**
@@ -138,7 +138,7 @@ public final class Functions extends TokenSet {
       final FuncType ft, final Expr expr, final VarScope scp, final StaticContext sc,
       final InputInfo ii, final boolean runtime, final boolean updating) {
     return runtime ? new FuncItem(sc, anns, name, params, ft, expr, scp.stackSize()) :
-      new Closure(ii, name, updating ? null : ft.retType, params, expr, anns, null, sc, scp);
+      new Closure(ii, name, updating ? null : ft.type, params, expr, anns, null, sc, scp);
   }
 
   /**
@@ -162,7 +162,7 @@ public final class Functions extends TokenSet {
       final Var[] args = { scp.newLocal(qc, new QNm(ITEMM, ""), SeqType.AAT_ZO, true) };
       final Expr e = new Cast(sc, ii, new VarRef(ii, args[0]), type.seqType());
       final AnnList anns = new AnnList();
-      final FuncType ft = FuncType.get(anns, args, e.seqType());
+      final FuncType ft = FuncType.get(anns, e.seqType(), args);
       return closureOrFItem(anns, name, args, ft, e, scp, sc, ii, runtime, false);
     }
 
@@ -184,17 +184,17 @@ public final class Functions extends TokenSet {
       final StandardFunc sf = fn.get(sc, ii, calls);
       final boolean upd = sf.has(Flag.UPD);
       if(upd) {
-        qc.updating();
         anns.add(new Ann(ii, Annotation.UPDATING));
+        qc.updating();
       }
-      if(!sf.has(Flag.CTX) && !sf.has(Flag.POS)) return closureOrFItem(
-          anns, name, args, fn.type(arity, anns), sf, scp, sc, ii, runtime, upd);
 
-      return new FuncLit(anns, name, args, sf, ft, scp, sc, ii);
+      return sf.has(Flag.CTX) || sf.has(Flag.POS)
+          ? new FuncLit(anns, name, args, sf, ft, scp, sc, ii)
+          : closureOrFItem(anns, name, args, fn.type(arity, anns), sf, scp, sc, ii, runtime, upd);
     }
 
     // user-defined function
-    final StaticFunc sf = qc.funcs.get(name, arity, ii, true);
+    final StaticFunc sf = qc.funcs.get(name, arity, ii, false);
     if(sf != null) {
       final FuncType ft = sf.funcType();
       final VarScope scp = new VarScope(sc);
@@ -212,18 +212,18 @@ public final class Functions extends TokenSet {
       return f;
     }
 
-    // Java function (only allowed with administrator permissions)
+    // Java function
     final VarScope scp = new VarScope(sc);
     final FuncType jt = FuncType.arity(arity);
     final Var[] vs = new Var[arity];
-    final Expr[] refs = new Expr[vs.length];
+    final Expr[] args = new Expr[vs.length];
     final int vl = vs.length;
     for(int v = 0; v < vl; v++) {
       vs[v] = scp.newLocal(qc, new QNm(ARG + (v + 1), ""), SeqType.ITEM_ZM, true);
-      refs[v] = new VarRef(ii, vs[v]);
+      args[v] = new VarRef(ii, vs[v]);
     }
-    final Expr jm = JavaMapping.get(name, refs, qc, sc, ii);
-    return jm == null ? null : new FuncLit(new AnnList(), name, vs, jm, jt, scp, sc, ii);
+    final Expr jf = JavaFunction.get(name, args, qc, sc, ii);
+    return jf == null ? null : new FuncLit(new AnnList(), name, vs, jf, jt, scp, sc, ii);
   }
 
   /**
@@ -253,14 +253,13 @@ public final class Functions extends TokenSet {
   }
 
   /**
-   * Returns a function with the specified name and number of arguments,
-   * or {@code null}.
+   * Returns a function with the specified name and number of arguments.
    * @param name name of the function
    * @param args optional arguments
    * @param qc query context
    * @param sc static context
    * @param ii input info
-   * @return function instance
+   * @return function instance, or {@code null}
    * @throws QueryException query exception
    */
   public static TypedFunc get(final QNm name, final Expr[] args, final QueryContext qc,
@@ -279,18 +278,21 @@ public final class Functions extends TokenSet {
     if(fun != null) {
       final AnnList anns = new AnnList();
       if(fun.sig.has(Flag.UPD)) {
-        qc.updating();
         anns.add(new Ann(ii, Annotation.UPDATING));
+        qc.updating();
       }
       return new TypedFunc(fun, anns);
     }
 
     // user-defined function
     final TypedFunc tf = qc.funcs.getRef(name, args, sc, ii);
-    if(tf != null) return tf;
+    if(tf != null) {
+      if(tf.anns.contains(Annotation.UPDATING)) qc.updating();
+      return tf;
+    }
 
-    // Java function (only allowed with administrator permissions)
-    final JavaMapping jf = JavaMapping.get(name, args, qc, sc, ii);
+    // Java function
+    final JavaFunction jf = JavaFunction.get(name, args, qc, sc, ii);
     if(jf != null) return TypedFunc.java(jf);
 
     // add user-defined function that has not been declared yet
@@ -307,39 +309,26 @@ public final class Functions extends TokenSet {
    * @return query exception or {@code null}
    */
   QueryException similarError(final QNm name, final InputInfo ii) {
-    // find functions with identical URIs and similar local names
+    // find similar function in three runs
     final byte[] local = name.local(), uri = name.uri();
     final Levenshtein ls = new Levenshtein();
-    for(final byte[] key : this) {
-      final int i = indexOf(key, '}');
-      if(eq(uri, substring(key, 2, i)) && ls.similar(local, substring(key, i + 1)))
-        return similarError(name, ii, key);
-    }
-    // find functions with identical local names
-    for(final byte[] key : this) {
-      final int i = indexOf(key, '}');
-      if(eq(local, substring(key, i + 1))) return similarError(name, ii, key);
-    }
-    // find functions with identical URIs and local names that start with the specified name
-    for(final byte[] key : this) {
-      final int i = indexOf(key, '}');
-      if(eq(uri, substring(key, 2, i)) && startsWith(substring(key, i + 1), local))
-        return similarError(name, ii, key);
+    for(int mode = 0; mode < 3; mode++) {
+      for(final byte[] key : this) {
+        final int i = indexOf(key, '}');
+        final byte[] slocal = substring(key, i + 1), suri = substring(key, 2, i);
+        if(mode == 0 ?
+          // find functions with identical URIs and similar local names
+          eq(uri, suri) && ls.similar(local, slocal) : mode == 1 ?
+          // find functions with identical local names
+          eq(local, substring(key, i + 1)) :
+          // find functions with identical URIs and local names that start with the specified name
+          eq(uri, substring(key, 2, i)) && startsWith(substring(key, i + 1), local)) {
+          final QNm sim = new QNm(slocal, suri);
+          return FUNCSIMILAR_X_X.get(ii, name.prefixId(), sim.prefixId());
+        }
+      }
     }
     return null;
-  }
-
-  /**
-   * Returns an exception for the specified function.
-   * @param name name of input function
-   * @param ii input info
-   * @param key key of built-in function
-   * @return query exception
-   */
-  private static QueryException similarError(final QNm name, final InputInfo ii, final byte[] key) {
-    final int i = indexOf(key, '}');
-    return FUNCSIMILAR_X_X.get(ii, name.prefixId(FN_URI), new TokenBuilder(
-        NSGlobal.prefix(substring(key, 2, i))).add(':').add(substring(key, i + 1)).finish());
   }
 
   @Override

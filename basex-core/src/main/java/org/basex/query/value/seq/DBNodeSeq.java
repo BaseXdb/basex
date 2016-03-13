@@ -16,16 +16,16 @@ import org.basex.util.list.*;
 /**
  * Sequence, containing at least two ordered database nodes.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public class DBNodeSeq extends NativeSeq {
   /** Data reference. */
   protected final Data data;
+  /** Pre values reference all documents of the database. */
+  protected final boolean all;
   /** Pre values. */
   protected int[] pres;
-  /** Pre values reference all documents of the database. */
-  protected boolean all;
 
   /**
    * Constructor.

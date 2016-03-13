@@ -3,12 +3,13 @@ package org.basex.util;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.jar.*;
 
 /**
  * Utility class to retrieve the manifest attributes of a JAR in the classpath.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Dimitar Popov
  */
 final class JarManifest {
@@ -48,8 +49,8 @@ final class JarManifest {
    */
   public static Object get(final String key) {
     if(MAP != null) {
-      for(final Object o : MAP.keySet()) {
-        if(key.equals(o.toString())) return MAP.get(o);
+      for(final Entry<Object, Object> entry : MAP.entrySet()) {
+        if(key.equals(entry.getKey().toString())) return entry.getValue();
       }
     }
     return null;

@@ -10,7 +10,7 @@ import org.basex.util.list.*;
  * their pre and pos values. An iterator returns all compressed pre and pos
  * values in a sorted manner.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  * @author Sebastian Gath
  */
@@ -25,19 +25,26 @@ final class FTIndexTree extends IndexTree {
   private int pft;
 
   /**
+   * Constructor.
+   */
+  FTIndexTree() {
+    super(IndexType.FULLTEXT);
+  }
+
+  /**
    * Checks if the specified token was already indexed. If yes, its pre
    * value is added to the existing values. Otherwise a new index entry
    * is created.
-   * @param tok token to be indexed
-   * @param pre pre value for the token
+   * @param token token to be indexed
+   * @param id id value of the token
    * @param pos pos value of the token
-   * @param cf current file id
+   * @param index current file id
    */
-  void index(final byte[] tok, final int pre, final int pos, final int cf) {
+  void add(final byte[] token, final int id, final int pos, final int index) {
     final int os = keys.size();
-    final int n = index(tok, pre, cf == 0);
+    final int n = add(token, id, 0, index == 0);
     if(os == keys.size()) {
-      final int i = cf > 0 ? maps.get(Num.num(n)) : n;
+      final int i = index > 0 ? maps.get(Num.num(n)) : n;
       if(poss.size() > i && poss.get(i) != null) {
         poss.set(i, Num.add(poss.get(i), pos));
         numpre.set(i, numpre.get(i) + 1);
@@ -53,21 +60,21 @@ final class FTIndexTree extends IndexTree {
    */
   void initFT() {
     poss = new TokenList(FACTOR);
-    values = new TokenList(FACTOR);
+    ids = new TokenList(FACTOR);
     numpre = new IntList(FACTOR);
     maps = new TokenIntMap();
   }
 
   /**
    * Checks for more tokens.
-   * @param cf current index split counter
+   * @param index current index split counter
    * @return boolean more
    */
-  boolean more(final int cf) {
+  boolean more(final int index) {
     while(more()) {
       lcn = cn;
       // write compressed representation if the index has already been split
-      pft = cf > 0 ? maps.get(Num.num(lcn)) : lcn;
+      pft = index > 0 ? maps.get(Num.num(lcn)) : lcn;
       if(pft > -1) return true;
       next();
     }
@@ -87,7 +94,7 @@ final class FTIndexTree extends IndexTree {
    * @return byte[] compressed pre values
    */
   byte[] nextPres() {
-    return values.get(pft);
+    return ids.get(pft);
   }
 
   /**

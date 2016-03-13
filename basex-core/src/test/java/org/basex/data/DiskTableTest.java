@@ -18,7 +18,7 @@ import org.junit.Test;
 /**
  * This class tests the update functionality of the block storage.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Tim Petrowsky
  */
 public final class DiskTableTest extends SandboxTest {
@@ -43,8 +43,8 @@ public final class DiskTableTest extends SandboxTest {
    */
   @BeforeClass
   public static void setUpBeforeClass() {
-    context.options.set(MainOptions.TEXTINDEX, false);
-    context.options.set(MainOptions.ATTRINDEX, false);
+    set(MainOptions.TEXTINDEX, false);
+    set(MainOptions.ATTRINDEX, false);
   }
 
   /**

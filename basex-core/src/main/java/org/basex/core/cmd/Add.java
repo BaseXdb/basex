@@ -19,7 +19,7 @@ import org.basex.util.*;
  * the target path and file name have been merged and are now specified
  * as first argument.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Add extends ACreate {
@@ -28,8 +28,6 @@ public final class Add extends ACreate {
 
   /** Data clip to insert. */
   DataClip clip;
-  /** Name of temporary database instance. */
-  private String clipDB;
 
   /**
    * Constructor, specifying a target path.
@@ -117,8 +115,7 @@ public final class Add extends ACreate {
 
       // create random database name for disk-based creation
       if(cache(parser)) {
-        clipDB = soptions.random(data.meta.name);
-        build = new DiskBuilder(clipDB, parser, soptions, options);
+        build = new DiskBuilder(soptions.randomDbName(data.meta.name), parser, soptions, options);
       } else {
         build = new MemBuilder(name, parser);
       }
@@ -133,9 +130,7 @@ public final class Add extends ACreate {
    * Finalizes an add operation.
    */
   void close() {
-    // close and drop intermediary database instance
-    if(clip != null) clip.data.close();
-    if(clipDB != null) DropDB.drop(clipDB, soptions);
+    if(clip != null) DropDB.drop(clip.data, soptions);
   }
 
   /**

@@ -4,7 +4,6 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
 import org.basex.core.*;
-import org.basex.core.cmd.*;
 import org.basex.query.*;
 import org.junit.*;
 import org.junit.Test;
@@ -12,33 +11,23 @@ import org.junit.Test;
 /**
  * Tests for the {@link MainOptions#MIXUPDATES} flag.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class MixUpdatesTest extends AdvancedQueryTest {
   /**
    * Prepare tests.
-   * @throws BaseXException database exception
    */
   @BeforeClass
-  public static void beforeClass() throws BaseXException {
-    new Set(MainOptions.MIXUPDATES, true).execute(context);
-  }
-
-  /**
-   * Finalize tests.
-   * @throws BaseXException database exception
-   */
-  @AfterClass
-  public static void afterClass() throws BaseXException {
-    new Set(MainOptions.MIXUPDATES, false).execute(context);
+  public static void beforeClass() {
+    set(MainOptions.MIXUPDATES, true);
   }
 
   /** Transform expression containing a simple expression. */
   @Test
   public void transSimple() {
-    error("<a/> update ('')", BASEX_MOD);
-    error("copy $a := <a/> modify ('') return $a", BASEX_MOD);
+    error("<a/> update ('')", BASX_UPMODIFY);
+    error("copy $a := <a/> modify ('') return $a", BASX_UPMODIFY);
   }
 
   /** Update test. */
@@ -69,8 +58,10 @@ public final class MixUpdatesTest extends AdvancedQueryTest {
   /** Updating functions. */
   @Test
   public void updatingFunctions() {
+    query("declare %updating function local:b() { db:output('1') }; local:b()", "1");
+
     query("declare function local:not-used() { local:b#0 };"
-        + "declare updating function local:b() { db:output('1') }; local:b()", "1");
+        + "declare %updating function local:b() { db:output('1') }; local:b()", "1");
 
     query("function($a) { db:output($a) }(1)", "1");
     query("db:output(?)(1)", "1");
@@ -92,5 +83,17 @@ public final class MixUpdatesTest extends AdvancedQueryTest {
   public void flwor() {
     query("<x>X</x> update (let $_ := delete node text() where 0 return $_)", "<x/>");
     query("<x>X</x> update (let $_ := delete node text() return ())", "<x/>");
+  }
+
+  /** Test method. */
+  @Test
+  public void functionItem() {
+    error("let $x := <a>a</a> update () return (delete node $x/text(), [$x])", BASX_FITEM_X);
+  }
+
+  /** Test method. */
+  @Test
+  public void xqueryEval() {
+    query(_XQUERY_EVAL.args(" \"function($x) { function() { $x }  }(4)\"") + "()", "4");
   }
 }

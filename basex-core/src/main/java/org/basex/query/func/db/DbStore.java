@@ -12,7 +12,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class DbStore extends DbAccess {
@@ -25,7 +25,7 @@ public final class DbStore extends DbAccess {
 
     final IOFile file = data.meta.binary(path);
     if(file == null || path.isEmpty()) throw RESINV_X.get(info, path);
-    qc.resources.updates().add(new DBStore(data, path, item, info), qc);
+    qc.updates().add(new DBStore(data, path, item, info), qc);
     return null;
   }
 }

@@ -20,7 +20,7 @@ import java.util.*;
  * the following four bytes</li>
  * </ul>
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Num {
@@ -142,6 +142,21 @@ public final class Num {
     return v < 0 || v > 0x3FFFFFFF ? 5 : v > 0x3FFF ? 4 : v > 0x3F ? 2 : 1;
   }
 
+  /**
+   * Returns a string representation of the specified number array.
+   * @param num numbers
+   * @return string
+   */
+  public static String toString(final byte[] num) {
+    final StringBuilder sb = new StringBuilder();
+    final int pos = size(num);
+    for(int ip = 4; ip < pos; ip += length(num, ip)) {
+      if(ip > 4) sb.append(',');
+      sb.append(get(num, ip));
+    }
+    return sb.toString();
+  }
+
   // PRIVATE STATIC METHODS ===================================================
 
   /**
@@ -149,7 +164,7 @@ public final class Num {
    * @param a array to be resized
    * @param p current array position
    * @param l length of new entry
-   * @return new array
+   * @return original or new array
    */
   private static byte[] check(final byte[] a, final int p, final int l) {
     final int s = a.length;

@@ -13,7 +13,7 @@ import org.basex.util.list.*;
 /**
  * Evaluates the 'drop backup' command and deletes backups of a database.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class DropBackup extends ABackup {
@@ -50,7 +50,7 @@ public final class DropBackup extends ABackup {
    * @return success flag
    */
   public static boolean drop(final String name, final StaticOptions sopts) {
-    return new IOFile(sopts.dbpath(), name + IO.ZIPSUFFIX).delete();
+    return new IOFile(sopts.dbPath(), name + IO.ZIPSUFFIX).delete();
   }
 
   @Override

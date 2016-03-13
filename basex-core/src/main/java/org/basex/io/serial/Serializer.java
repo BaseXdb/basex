@@ -1,19 +1,16 @@
 package org.basex.io.serial;
 
 import static org.basex.data.DataText.*;
-import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
-import java.nio.charset.*;
 import java.util.*;
 
 import org.basex.build.csv.*;
-import org.basex.build.csv.CsvOptions.CsvFormat;
+import org.basex.build.csv.CsvOptions.*;
 import org.basex.build.json.*;
-import org.basex.build.json.JsonOptions.JsonFormat;
+import org.basex.build.json.JsonOptions.*;
 import org.basex.data.*;
-import org.basex.io.out.*;
 import org.basex.io.serial.csv.*;
 import org.basex.io.serial.json.*;
 import org.basex.query.*;
@@ -29,7 +26,7 @@ import org.basex.util.list.*;
 /**
  * This is an interface for serializing XQuery values.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class Serializer implements Closeable {
@@ -49,13 +46,13 @@ public abstract class Serializer implements Closeable {
 
   /** Static context. */
   protected StaticContext sc;
-  /** Indicates if more than one item was serialized. */
+  /** Indicates if at least one item was already serialized. */
   protected boolean more;
   /** Indicates if an element is currently being opened. */
   private boolean opening;
 
   /**
-   * Returns an adaptive serializer.
+   * Returns a default serializer.
    * @param os output stream reference
    * @return serializer
    * @throws IOException I/O exception
@@ -74,43 +71,29 @@ public abstract class Serializer implements Closeable {
   public static Serializer get(final OutputStream os, final SerializerOptions sopts)
       throws IOException {
 
-    // create print output
-    final SerializerOptions so = sopts == null ? SerializerOptions.get(true) : sopts;
-    final String enc = Strings.normEncoding(so.get(SerializerOptions.ENCODING), true);
-    final PrintOutput po;
-    if(enc == Strings.UTF8) {
-      po = PrintOutput.get(os);
-    } else {
-      try {
-        po = new EncoderOutput(os, Charset.forName(enc));
-      } catch(final Exception ex) {
-        throw SERENCODING_X.getIO(enc);
-      }
-    }
-    final int limit = so.get(SerializerOptions.LIMIT);
-    if(limit != -1) po.setLimit(so.get(SerializerOptions.LIMIT));
-
-    // no parameters given: serialize adaptively
+    // choose serializer
+    final SerializerOptions so = sopts == null ? SerializerMode.DEFAULT.get() : sopts;
     switch(so.get(SerializerOptions.METHOD)) {
-      case XHTML: return new XHTMLSerializer(po, so);
-      case HTML:  return new HTMLSerializer(po, so);
-      case TEXT:  return new TextSerializer(po, so);
-      case RAW:   return new RawSerializer(po, so);
+      case XHTML: return new XHTMLSerializer(os, so);
+      case HTML:  return new HTMLSerializer(os, so);
+      case TEXT:  return new TextSerializer(os, so);
       case CSV:
         final CsvOptions copts = so.get(SerializerOptions.CSV);
         return copts.get(CsvOptions.FORMAT) == CsvFormat.MAP
-               ? new CsvMapSerializer(po, so)
-               : new CsvDirectSerializer(po, so);
+               ? new CsvMapSerializer(os, so)
+               : new CsvDirectSerializer(os, so);
       case JSON:
         final JsonSerialOptions jopts = so.get(SerializerOptions.JSON);
         final JsonFormat jformat = jopts.get(JsonOptions.FORMAT);
-        return jformat == JsonFormat.JSONML ? new JsonMLSerializer(po, so) :
-               jformat == JsonFormat.BASIC  ? new JsonBasicSerializer(po, so) :
-               new JsonNodeSerializer(po, so);
+        return jformat == JsonFormat.JSONML ? new JsonMLSerializer(os, so) :
+               jformat == JsonFormat.BASIC  ? new JsonBasicSerializer(os, so) :
+               new JsonNodeSerializer(os, so);
       case XML:
-        return new XMLSerializer(po, so);
+        return new XMLSerializer(os, so);
+      case ADAPTIVE:
+        return new AdaptiveSerializer(os, so);
       default:
-        return new AdaptiveSerializer(po, so);
+        return new BaseXSerializer(os, so);
     }
   }
 
@@ -155,7 +138,7 @@ public abstract class Serializer implements Closeable {
   /**
    * Assigns the static context.
    * @param sctx static context
-   * @return serializer
+   * @return self-reference
    */
   public Serializer sc(final StaticContext sctx) {
     sc = sctx;
@@ -171,52 +154,10 @@ public abstract class Serializer implements Closeable {
    */
   protected void node(final ANode node) throws IOException {
     if(ignore(node)) return;
-
     if(node instanceof DBNode) {
       node((DBNode) node);
     } else {
-      final Type type = node.type;
-      if(type == NodeType.COM) {
-        prepareComment(node.string());
-      } else if(type == NodeType.TXT) {
-        prepareText(node.string(), null);
-      } else if(type == NodeType.PI) {
-        preparePi(node.name(), node.string());
-      } else if(type == NodeType.ATT) {
-        attribute(node.name(), node.string(), true);
-      } else if(type == NodeType.NSP) {
-        namespace(node.name(), node.string(), true);
-      } else if(type == NodeType.DOC) {
-        openDoc(node.baseURI());
-        for(final ANode n : node.children()) node(n);
-        closeDoc();
-      } else {
-        // serialize elements (code will never be called for attributes)
-        final QNm name = node.qname();
-        openElement(name);
-
-        // serialize declared namespaces
-        final Atts nsp = node.namespaces();
-        for(int p = nsp.size() - 1; p >= 0; p--) namespace(nsp.name(p), nsp.value(p), false);
-        // add new or updated namespace
-        namespace(name.prefix(), name.uri(), false);
-
-        // serialize attributes
-        final boolean i = indent;
-        BasicNodeIter iter = node.attributes();
-        for(ANode nd; (nd = iter.next()) != null;) {
-          final byte[] n = nd.name();
-          final byte[] v = nd.string();
-          attribute(n, v, false);
-          if(eq(n, XML_SPACE) && indent) indent = !eq(v, PRESERVE);
-        }
-
-        // serialize children
-        iter = node.children();
-        for(ANode n; (n = iter.next()) != null;) node(n);
-        closeElement();
-        indent = i;
-      }
+      node((FNode) node);
     }
   }
 
@@ -386,28 +327,34 @@ public abstract class Serializer implements Closeable {
   @SuppressWarnings("unused")
   protected void function(final FItem item) throws IOException { }
 
-  // PRIVATE METHODS ==========================================================
-
   /**
    * Serializes a node of the specified data reference.
    * @param node database node
    * @throws IOException I/O exception
    */
-  private void node(final DBNode node) throws IOException {
+  protected final void node(final DBNode node) throws IOException {
     final FTPosData ft = node instanceof FTPosNode ? ((FTPosNode) node).ftpos : null;
     final Data data = node.data();
-    int pre = node.pre();
-    int kind = data.kind(pre);
-    if(kind == Data.ATTR) throw SERATTR_X.getIO(node);
+    int pre = node.pre(), kind = data.kind(pre);
 
-    boolean doc = false;
+    // document node: output all children
+    final int size = pre + data.size(pre, kind);
+    if(kind == Data.DOC) {
+      openDoc(data.text(pre++, true));
+      while(pre < size && !finished()) {
+        node((ANode) new DBNode(data, pre));
+        pre += data.size(pre, data.kind(pre));
+      }
+      closeDoc();
+      return;
+    }
+
     final TokenSet nsp = data.nspaces.isEmpty() ? null : new TokenSet();
     final IntList pars = new IntList();
     final BoolList indt = new BoolList();
 
     // loop through all table entries
-    final int s = pre + data.size(pre, kind);
-    while(pre < s && !finished()) {
+    while(pre < size && !finished()) {
       kind = data.kind(pre);
       final int r = data.parent(pre, kind);
 
@@ -418,58 +365,52 @@ public abstract class Serializer implements Closeable {
         pars.pop();
       }
 
-      if(kind == Data.DOC) {
-        if(doc) closeDoc();
-        openDoc(data.text(pre++, true));
-        doc = true;
-      } else if(kind == Data.TEXT) {
+      if(kind == Data.TEXT) {
         prepareText(data.text(pre, true), ft != null ? ft.get(data, pre) : null);
         pre++;
       } else if(kind == Data.COMM) {
         prepareComment(data.text(pre++, true));
+      } else if(kind == Data.PI) {
+        preparePi(data.name(pre, Data.PI), data.atom(pre++));
       } else {
-        if(kind == Data.PI) {
-          preparePi(data.name(pre, Data.PI), data.atom(pre++));
-        } else {
-          // add element node
-          final byte[] name = data.name(pre, kind);
-          final byte[] uri = data.nspaces.uri(data.uriId(pre, kind));
-          openElement(new QNm(name, uri));
+        // add element node
+        final byte[] name = data.name(pre, kind);
+        final byte[] uri = data.nspaces.uri(data.uriId(pre, kind));
+        openElement(new QNm(name, uri));
 
-          // add namespace definitions
-          if(nsp != null) {
-            // add namespaces from database
-            nsp.clear();
-            int pp = pre;
+        // add namespace definitions
+        if(nsp != null) {
+          // add namespaces from database
+          nsp.clear();
+          int pp = pre;
 
-            // check namespace of current element
-            namespace(prefix(name), uri == null ? EMPTY : uri, false);
+          // check namespace of current element
+          namespace(prefix(name), uri == null ? EMPTY : uri, false);
 
-            do {
-              final Atts ns = data.namespaces(pp);
-              final int nl = ns.size();
-              for(int n = 0; n < nl; n++) {
-                final byte[] pref = ns.name(n);
-                if(nsp.add(pref)) namespace(pref, ns.value(n), false);
-              }
-              // check ancestors only on top level
-              if(level != 0) break;
+          do {
+            final Atts ns = data.namespaces(pp);
+            final int nl = ns.size();
+            for(int n = 0; n < nl; n++) {
+              final byte[] pref = ns.name(n);
+              if(nsp.add(pref)) namespace(pref, ns.value(n), false);
+            }
+            // check ancestors only on top level
+            if(level != 0) break;
 
-              pp = data.parent(pp, data.kind(pp));
-            } while(pp >= 0 && data.kind(pp) == Data.ELEM);
-          }
-
-          // serialize attributes
-          indt.push(indent);
-          final int as = pre + data.attSize(pre, kind);
-          while(++pre != as) {
-            final byte[] n = data.name(pre, Data.ATTR);
-            final byte[] v = data.text(pre, false);
-            attribute(n, v, false);
-            if(eq(n, XML_SPACE) && indent) indent = !eq(v, PRESERVE);
-          }
-          pars.push(r);
+            pp = data.parent(pp, data.kind(pp));
+          } while(pp >= 0 && data.kind(pp) == Data.ELEM);
         }
+
+        // serialize attributes
+        indt.push(indent);
+        final int as = pre + data.attSize(pre, kind);
+        while(++pre != as) {
+          final byte[] n = data.name(pre, Data.ATTR);
+          final byte[] v = data.text(pre, false);
+          attribute(n, v, false);
+          if(eq(n, XML_SPACE) && indent) indent = !eq(v, PRESERVE);
+        }
+        pars.push(r);
       }
     }
 
@@ -479,8 +420,59 @@ public abstract class Serializer implements Closeable {
       indent = indt.pop();
       pars.pop();
     }
-    if(doc) closeDoc();
   }
+
+  /**
+   * Serializes a node fragment.
+   * @param node database node
+   * @throws IOException I/O exception
+   */
+  protected final void node(final FNode node) throws IOException {
+    final Type type = node.type;
+    if(type == NodeType.COM) {
+      prepareComment(node.string());
+    } else if(type == NodeType.TXT) {
+      prepareText(node.string(), null);
+    } else if(type == NodeType.PI) {
+      preparePi(node.name(), node.string());
+    } else if(type == NodeType.ATT) {
+      attribute(node.name(), node.string(), true);
+    } else if(type == NodeType.NSP) {
+      namespace(node.name(), node.string(), true);
+    } else if(type == NodeType.DOC) {
+      openDoc(node.baseURI());
+      for(final ANode n : node.children()) node(n);
+      closeDoc();
+    } else {
+      // serialize elements (code will never be called for attributes)
+      final QNm name = node.qname();
+      openElement(name);
+
+      // serialize declared namespaces
+      final Atts nsp = node.namespaces();
+      for(int p = nsp.size() - 1; p >= 0; p--) namespace(nsp.name(p), nsp.value(p), false);
+      // add new or updated namespace
+      namespace(name.prefix(), name.uri(), false);
+
+      // serialize attributes
+      final boolean i = indent;
+      BasicNodeIter iter = node.attributes();
+      for(ANode nd; (nd = iter.next()) != null;) {
+        final byte[] n = nd.name();
+        final byte[] v = nd.string();
+        attribute(n, v, false);
+        if(eq(n, XML_SPACE) && indent) indent = !eq(v, PRESERVE);
+      }
+
+      // serialize children
+      iter = node.children();
+      for(ANode n; (n = iter.next()) != null;) node(n);
+      closeElement();
+      indent = i;
+    }
+  }
+
+  // PRIVATE METHODS ==========================================================
 
   /**
    * Serializes a comment.

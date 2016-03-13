@@ -14,7 +14,7 @@ import org.basex.util.list.*;
 /**
  * This class stores a single namespace node.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class NSNode {
@@ -149,22 +149,6 @@ final class NSNode {
       else h = m - 1;
     }
     return l - 1;
-  }
-
-  /**
-   * Returns the index of the specified pre value.
-   * @param p int pre value
-   * @return index, or possible insertion position
-   */
-  int find2(final int p) {
-    int l = 0, h = size - 1;
-    while(l <= h) { // binary search
-      final int m = l + h >>> 1, v = nodes[m].pre;
-      if(v == p) return m;
-      if(v < p) l = m + 1;
-      else h = m - 1;
-    }
-    return l;
   }
 
   /**

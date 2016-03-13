@@ -15,7 +15,7 @@ import org.basex.util.hash.*;
 /**
  * FTDistance expression.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class FTDistance extends FTFilter {
@@ -131,7 +131,7 @@ public final class FTDistance extends FTFilter {
   @Override
   public int exprSize() {
     int sz = 1;
-    for(final FTExpr e : exprs) sz += e.exprSize();
+    for(final FTExpr expr : exprs) sz += expr.exprSize();
     return min.exprSize() + max.exprSize() + sz;
   }
 }

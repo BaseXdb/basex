@@ -2,40 +2,74 @@ package org.basex.data;
 
 import static org.basex.query.func.Function.*;
 
+import java.util.*;
+import java.util.List;
+
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.query.*;
 import org.junit.*;
 import org.junit.Test;
+import org.junit.runner.*;
+import org.junit.runners.*;
+import org.junit.runners.Parameterized.*;
 
 /**
  * This class tests the {@link MainOptions#UPDINDEX} and {@link MainOptions#AUTOOPTIMIZE} options.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
+@RunWith(Parameterized.class)
 public final class IndexTest extends AdvancedQueryTest {
+  /** Main memory flag. */
+  @Parameter
+  public Object mainmem;
+
+  /**
+   * Mainmem parameters.
+   * @return parameters
+   */
+  @Parameters
+  public static Collection<Object[]> params() {
+    final List<Object[]> params = new ArrayList<>();
+    params.add(new Object[] { false });
+    params.add(new Object[] { true });
+    return params;
+  }
+
+  /** Test file. */
+  public static final String FILE = "src/test/resources/selective.xml";
+
+  /**
+   * Initializes a test.
+   */
+  @Before
+  public void before() {
+    set(MainOptions.MAINMEM, mainmem);
+  }
+
   /**
    * Finalize test.
-   * @throws BaseXException database exception
    */
   @After
-  public void after() throws BaseXException {
-    run(new Close());
-    run(new Set(MainOptions.UPDINDEX, false));
-    run(new Set(MainOptions.AUTOOPTIMIZE, false));
+  public void after() {
+    execute(new DropDB(NAME));
+    set(MainOptions.TOKENINDEX, false);
+    set(MainOptions.UPDINDEX, false);
+    set(MainOptions.AUTOOPTIMIZE, false);
+    set(MainOptions.MAINMEM, false);
   }
 
   /**
    * Test.
-   * @throws BaseXException database exception
    */
   @Test
-  public void updindex() throws BaseXException {
-    run(new Set(MainOptions.UPDINDEX, true));
-    run(new CreateDB(NAME));
+  public void updindexText() {
+    set(MainOptions.UPDINDEX, true);
+    execute(new CreateDB(NAME));
     for(int i = 0; i < 5; i++) {
-      run(new Replace("x.xml", "<x><a>A</a><a>B</a></x>"));
+      execute(new Replace("x.xml", "<x><a>A</a><a>B</a></x>"));
     }
     query(_DB_TEXT.args(NAME, "A"), "A");
     query(_DB_TEXT.args(NAME, "B"), "B");
@@ -44,151 +78,155 @@ public final class IndexTest extends AdvancedQueryTest {
 
   /**
    * Test.
-   * @throws BaseXException database exception
    */
   @Test
-  public void updindex2() throws BaseXException {
-    run(new Set(MainOptions.UPDINDEX, true));
-    run(new CreateDB(NAME));
+  public void updindexText2() {
+    set(MainOptions.UPDINDEX, true);
+    execute(new CreateDB(NAME));
     for(int i = 0; i < 5; i++) {
-      run(new Replace("x.xml", "<x><a>A</a><a>B</a></x>"));
-      run(new Replace("x.xml", "<x><a>A</a><a>C</a></x>"));
+      execute(new Replace("x.xml", "<x><a>A</a><a>B</a></x>"));
+      execute(new Replace("x.xml", "<x><a>A</a><a>C</a></x>"));
     }
     query(_DB_TEXT.args(NAME, "A"), "A");
     query(_DB_TEXT.args(NAME, "C"), "C");
     query(_DB_TEXT.args(NAME, "B"), "");
-    query(_DB_INFO.args(NAME) + "//textindex/text()", "true");
   }
 
   /**
    * Test.
-   * @throws BaseXException database exception
    */
   @Test
-  public void updindex3() throws BaseXException {
-    run(new Set(MainOptions.UPDINDEX, true));
-    run(new CreateDB(NAME));
+  public void updindexText3() {
+    set(MainOptions.UPDINDEX, true);
+    execute(new CreateDB(NAME));
     for(int i = 0; i < 5; i++) {
-      run(new Replace("x.xml", "<x><a>A</a><a>BC</a><a>DEF</a></x>"));
+      execute(new Replace("x.xml", "<x><a>A</a><a>BC</a><a>DEF</a></x>"));
     }
     query(_DB_TEXT.args(NAME, "A"), "A");
     query(_DB_TEXT.args(NAME, "BC"), "BC");
     query(_DB_TEXT.args(NAME, "DEF"), "DEF");
-    query(_DB_INFO.args(NAME) + "//textindex/text()", "true");
   }
 
   /**
    * Test.
-   * @throws BaseXException database exception
    */
   @Test
-  public void updindex4() throws BaseXException {
-    run(new Set(MainOptions.UPDINDEX, true));
-    run(new CreateDB(NAME));
+  public void updindexAttribute() {
+    set(MainOptions.UPDINDEX, true);
+    execute(new CreateDB(NAME));
     for(int i = 0; i < 5; i++) {
-      run(new Open(NAME));
-      run(new Replace("x.xml", "<x><a>A</a><a>BC</a></x>"));
-      run(new Close());
-    }
-    query(_DB_TEXT.args(NAME, "A"), "A");
-    query(_DB_TEXT.args(NAME, "BC"), "BC");
-    query(_DB_INFO.args(NAME) + "//textindex/text()", "true");
-  }
-
-  /**
-   * Test.
-   * @throws BaseXException database exception
-   */
-  @Test
-  public void updindex5() throws BaseXException {
-    run(new Set(MainOptions.UPDINDEX, true));
-    run(new CreateDB(NAME));
-    for(int i = 0; i < 5; i++) {
-      run(new Add("a", "<x c='c'/>"));
-      run(new Add("a", "<x a='a' b='b'/>"));
-      run(new Replace("a", "<x/>"));
+      execute(new Add("a", "<x c='c'/>"));
+      execute(new Add("a", "<x a='a' b='b'/>"));
+      execute(new Replace("a", "<x/>"));
     }
     query(_DB_ATTRIBUTE.args(NAME, "a"), "");
     query(_DB_ATTRIBUTE.args(NAME, "b"), "");
     query(_DB_ATTRIBUTE.args(NAME, "c"), "");
-    query(_DB_INFO.args(NAME) + "//textindex/text()", "true");
   }
 
   /**
    * Test.
-   * @throws BaseXException database exception
    */
   @Test
-  public void updindex6() throws BaseXException {
-    run(new Set(MainOptions.UPDINDEX, true));
-    run(new CreateDB(NAME, "<X><A>q</A><B>q</B></X>"));
+  public void updindexToken() {
+    set(MainOptions.UPDINDEX, true);
+    set(MainOptions.TOKENINDEX, true);
+    execute(new CreateDB(NAME));
+
+    execute(new Add("a", "<x c='c'/>"));
+    query(_DB_TOKEN.args(NAME, "a"), "");
+    query(DATA.args(_DB_TOKEN.args(NAME, "c")), "c");
+
+    for(int i = 0; i < 5; i++) {
+      execute(new Add("a", "<x c='c'/>"));
+      execute(new Add("a", "<x a='a' b='b'/>"));
+      execute(new Replace("a", "<x/>"));
+    }
+    query(_DB_TOKEN.args(NAME, "a"), "");
+    query(_DB_TOKEN.args(NAME, "b"), "");
+    query(_DB_TOKEN.args(NAME, "c"), "");
+    query(_DB_INFO.args(NAME) + "//tokenindex/text()", "true");
+  }
+
+  /**
+   * Test.
+   */
+  @Test
+  public void updindexReplace1() {
+    set(MainOptions.UPDINDEX, true);
+    execute(new CreateDB(NAME, "<X><A>q</A><B>q</B></X>"));
     query("replace node /X/A with 'x', replace node /X/B with 'y'", "");
-    query(_DB_INFO.args(NAME) + "//textindex/text()", "true");
   }
 
   /**
    * Test.
-   * @throws BaseXException database exception
    */
   @Test
-  public void updindex7() throws BaseXException {
-    run(new Set(MainOptions.UPDINDEX, true));
-    run(new CreateDB(NAME));
-    run(new Replace("A", "<a/>"));
-    run(new Replace("B", "<a a='1'/>"));
-    run(new Replace("C", "<a a='1'/>"));
-    run(new Replace("A", "<a a='1'/>"));
-    query(_DB_INFO.args(NAME) + "//textindex/text()", "true");
-    run(new Close());
-    run(new Open(NAME));
-    run(new Delete("A"));
+  public void updindexReplace2() {
+    set(MainOptions.UPDINDEX, true);
+    execute(new CreateDB(NAME));
+    execute(new Replace("A", "<X a='?' b='a' c='1'/>"));
+    execute(new Replace("A", "<X a='?' b='b' c='2'/>"));
+    execute(new Replace("A", "<X/>"));
   }
 
   /**
    * Test.
-   * @throws BaseXException database exception
    */
   @Test
-  public void updindex8() throws BaseXException {
-    run(new Set(MainOptions.UPDINDEX, true));
-    run(new CreateDB(NAME));
-    run(new Replace("A", "<X a='?' b='a' c='1'/>"));
-    run(new Replace("A", "<X a='?' b='b' c='2'/>"));
-    run(new Replace("A", "<X/>"));
+  public void updindexOpenClose1() {
+    final boolean openClose = !(Boolean) mainmem;
+    set(MainOptions.UPDINDEX, true);
+    execute(new CreateDB(NAME));
+    for(int i = 0; i < 5; i++) {
+      if(openClose) execute(new Open(NAME));
+      execute(new Replace("x.xml", "<x><a>A</a><a>BC</a></x>"));
+      if(openClose) execute(new Close());
+    }
+    query(_DB_TEXT.args(NAME, "A"), "A");
+    query(_DB_TEXT.args(NAME, "BC"), "BC");
   }
 
   /**
    * Test.
-   * @throws BaseXException database exception
    */
   @Test
-  public void autooptimize() throws BaseXException {
-    run(new Set(MainOptions.AUTOOPTIMIZE, true));
-    run(new CreateDB(NAME));
+  public void updindexOpenClose2() {
+    final boolean openClose = !(Boolean) mainmem;
+    set(MainOptions.UPDINDEX, true);
+    execute(new CreateDB(NAME));
+    execute(new Replace("A", "<a/>"));
+    execute(new Replace("B", "<a a='1'/>"));
+    execute(new Replace("C", "<a a='1'/>"));
+    execute(new Replace("A", "<a a='1'/>"));
+    if(openClose) {
+      execute(new Close());
+      execute(new Open(NAME));
+    }
+    execute(new Delete("A"));
+  }
+
+  /**
+   * Test.
+   */
+  @Test
+  public void autooptimize() {
+    set(MainOptions.AUTOOPTIMIZE, true);
+    execute(new CreateDB(NAME));
     query(_DB_INFO.args(NAME) + "//textindex/text()", "true");
-    run(new Replace("x.xml", "<a>A</a>"));
+    execute(new Replace("x.xml", "<a>A</a>"));
     query(_DB_INFO.args(NAME) + "//textindex/text()", "true");
     query(_DB_REPLACE.args(NAME, "x.xml", "<a>B</a>"));
     query(_DB_INFO.args(NAME) + "//textindex/text()", "true");
 
-    run(new Set(MainOptions.AUTOOPTIMIZE, false));
-    run(new Optimize());
-    run(new Replace("x.xml", "<a>C</a>"));
+    set(MainOptions.AUTOOPTIMIZE, false);
+    execute(new Optimize());
+    execute(new Replace("x.xml", "<a>C</a>"));
     query(_DB_INFO.args(NAME) + "//textindex/text()", "false");
 
-    run(new Optimize());
+    execute(new Optimize());
     query(_DB_INFO.args(NAME) + "//textindex/text()", "true");
     query(_DB_REPLACE.args(NAME, "x.xml", "<a>D</a>"));
     query(_DB_INFO.args(NAME) + "//textindex/text()", "false");
-  }
-
-  /**
-   * Runs the specified command.
-   * @param cmd command to be run
-   * @return string result
-   * @throws BaseXException database exception
-   */
-  private static String run(final Command cmd) throws BaseXException {
-    return cmd.execute(context);
   }
 }

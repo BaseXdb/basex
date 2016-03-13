@@ -1,6 +1,5 @@
 package org.basex.api.dom;
 
-import org.basex.query.iter.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.w3c.dom.*;
@@ -8,7 +7,7 @@ import org.w3c.dom.*;
 /**
  * DOM - Element implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class BXElem extends BXNode implements Element {
@@ -148,9 +147,8 @@ public final class BXElem extends BXNode implements Element {
    * @return node or {@code null}
    */
   private ANode attribute(final String name) {
-    final BasicNodeIter iter = nd.attributes();
     final byte[] nm = Token.token(name);
-    for(ANode n; (n = iter.next()) != null;) if(Token.eq(nm, n.name())) return n.finish();
+    for(final ANode n : nd.attributes()) if(Token.eq(nm, n.name())) return n.finish();
     return null;
   }
 }

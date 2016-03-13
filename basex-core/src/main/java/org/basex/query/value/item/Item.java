@@ -13,13 +13,13 @@ import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.Type.ID;
+import org.basex.query.value.type.Type.*;
 import org.basex.util.*;
 
 /**
  * Abstract super class for all items.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class Item extends Value {
@@ -80,7 +80,7 @@ public abstract class Item extends Value {
    * Returns a string representation of the value.
    * @param ii input info, use {@code null} if none is available
    * @return string value
-   * @throws QueryException if the item can't be atomized
+   * @throws QueryException if the item cannot be atomized (caused by function or streaming items)
    */
   public abstract byte[] string(final InputInfo ii) throws QueryException;
 
@@ -135,14 +135,25 @@ public abstract class Item extends Value {
   }
 
   /**
+   * Checks if this item is instance of the specified type.
+   * @param tp type
+   * @return result of check
+   */
+  public boolean instanceOf(final Type tp) {
+    return type.instanceOf(tp);
+  }
+
+  /**
    * Checks if the items can be compared.
    * @param it item to be compared
    * @return result of check
    */
   public final boolean comparable(final Item it) {
     final Type t1 = type, t2 = it.type;
-    return t1 == t2 || this instanceof ANum && it instanceof ANum ||
-      t1.isStringOrUntyped() && t2.isStringOrUntyped() || this instanceof Dur && it instanceof Dur;
+    return t1 == t2
+        || this instanceof ANum && it instanceof ANum
+        || t1.isStringOrUntyped() && t2.isStringOrUntyped()
+        || this instanceof Dur && it instanceof Dur;
   }
 
   /**
@@ -168,8 +179,19 @@ public abstract class Item extends Value {
   public final boolean equiv(final Item it, final Collation coll, final InputInfo ii)
       throws QueryException {
     // check if both values are NaN, or if values are equal..
-    return (this == Dbl.NAN || this == Flt.NAN) && it instanceof ANum && Double.isNaN(it.dbl(ii)) ||
+    return it instanceof ANum && (this == Dbl.NAN || this == Flt.NAN) && Double.isNaN(it.dbl(ii)) ||
         comparable(it) && eq(it, coll, null, ii);
+  }
+
+  /**
+   * Checks the items as keys.
+   * @param it item to be compared
+   * @param ii input info
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  public boolean sameKey(final Item it, final InputInfo ii) throws QueryException {
+    return comparable(it) && eq(it, null, null, ii);
   }
 
   /**
@@ -200,11 +222,9 @@ public abstract class Item extends Value {
     return len == 0 ? Empty.SEQ : this;
   }
 
-  // Overridden by B64Stream, StrStream, Jav and Array.
+  // Overridden by B64Stream, StrStream, Map and Array.
   @Override
-  public Item materialize(final InputInfo ii) throws QueryException {
-    return this;
-  }
+  public void materialize(final InputInfo ii) throws QueryException { }
 
   // Overridden by Array.
   @Override
@@ -300,14 +320,16 @@ public abstract class Item extends Value {
 
   /**
    * Returns data model info.
+   * Overwritten by xs:QName, attribute() and document-node().
    * @return type string
    */
   public byte[] xdmInfo() {
-    return typeId().bytes();
+    return new byte[] { typeId().asByte() };
   }
 
   /**
    * Returns a type id.
+   * Overwritten by document-node() to check if document has an element as child.
    * @return type string
    */
   public ID typeId() {

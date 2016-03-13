@@ -13,7 +13,7 @@ import org.basex.util.hash.*;
 /**
  * Instance test.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Instance extends Single {
@@ -34,7 +34,11 @@ public final class Instance extends Single {
 
   @Override
   public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    super.compile(qc, scp);
+    return super.compile(qc, scp).optimize(qc, scp);
+  }
+
+  @Override
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     return expr.isValue() ? preEval(qc) : this;
   }
 

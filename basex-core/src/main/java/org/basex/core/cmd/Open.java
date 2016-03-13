@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * Evaluates the 'open' command and opens a database.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Open extends Command {
@@ -89,7 +89,7 @@ public final class Open extends Command {
       Data data = context.datas.pin(name);
       if(data == null) {
         // check if the addressed database exists
-        if(!context.soptions.dbexists(name)) throw new BaseXException(dbnf(name));
+        if(!context.soptions.dbExists(name)) throw new BaseXException(dbnf(name));
 
         // do not open a database that is currently updated
         final MetaData meta = new MetaData(name, options, context.soptions);

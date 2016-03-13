@@ -16,7 +16,7 @@ import org.junit.*;
 /**
  * This class tests the functions of the ZIP Module.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class ZipModuleTest extends AdvancedQueryTest {
@@ -52,7 +52,8 @@ public final class ZipModuleTest extends AdvancedQueryTest {
   @Test
   public void binaryEntry() {
     query(_ZIP_BINARY_ENTRY.args(ZIP, ENTRY1));
-    contains("xs:hexBinary(" + _ZIP_BINARY_ENTRY.args(ZIP, ENTRY1) + ')', "610A61626F");
+    contains(STRING.args("xs:hexBinary(" + _ZIP_BINARY_ENTRY.args(ZIP, ENTRY1) + ')'),
+        "610A61626F");
 
     error(_ZIP_BINARY_ENTRY.args("abc", "xyz"), ZIP_NOTFOUND_X);
     error(_ZIP_BINARY_ENTRY.args(ZIP, ""), ZIP_NOTFOUND_X);

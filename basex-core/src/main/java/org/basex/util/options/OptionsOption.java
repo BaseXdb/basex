@@ -5,7 +5,7 @@ import org.basex.util.*;
 /**
  * Option containing another {@link Options} value.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  * @param <O> options value
  */
@@ -48,7 +48,7 @@ public final class OptionsOption<O extends Options> extends Option<O> {
     if(value == null) return null;
     final O o = newInstance();
     try {
-      o.parse(value.toString());
+      o.assign(value.toString());
     } catch(final Exception ex) {
       throw Util.notExpected(ex);
     }

@@ -12,7 +12,7 @@ import org.basex.util.options.*;
 /**
  * This class contains database options which are used all around the project.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class MainOptions extends Options {
@@ -20,7 +20,7 @@ public final class MainOptions extends Options {
 
   /** Flag for creating a main memory database. */
   public static final BooleanOption MAINMEM = new BooleanOption("MAINMEM", false);
-  /** Flag for opening a database after creating it. */
+  /** Flag for closing a database after creating it. */
   public static final BooleanOption CREATEONLY = new BooleanOption("CREATEONLY", false);
 
   // Parsing
@@ -29,6 +29,8 @@ public final class MainOptions extends Options {
   public static final StringOption CREATEFILTER = new StringOption("CREATEFILTER", "*.xml");
   /** Flag for adding archives to a database. */
   public static final BooleanOption ADDARCHIVES = new BooleanOption("ADDARCHIVES", true);
+  /** Flag for prefixing database paths with name of archive. */
+  public static final BooleanOption ARCHIVENAME = new BooleanOption("ARCHIVENAME", false);
   /** Flag for skipping corrupt files. */
   public static final BooleanOption SKIPCORRUPT = new BooleanOption("SKIPCORRUPT", false);
   /** Flag for adding remaining files as raw files. */
@@ -75,13 +77,19 @@ public final class MainOptions extends Options {
   public static final BooleanOption TEXTINDEX = new BooleanOption("TEXTINDEX", true);
   /** Flag for creating an attribute value index. */
   public static final BooleanOption ATTRINDEX = new BooleanOption("ATTRINDEX", true);
+  /** Flag for creating a token index. */
+  public static final BooleanOption TOKENINDEX = new BooleanOption("TOKENINDEX", false);
   /** Flag for creating a full-text index. */
   public static final BooleanOption FTINDEX = new BooleanOption("FTINDEX", false);
 
-  /** Maximum number of text/attribute index entries to keep in memory during index creation. */
-  public static final NumberOption INDEXSPLITSIZE = new NumberOption("INDEXSPLITSIZE", 0);
-  /** Maximum number of fulltext index entries to keep in memory during index creation. */
-  public static final NumberOption FTINDEXSPLITSIZE = new NumberOption("FTINDEXSPLITSIZE", 0);
+  /** Text index: names to include. */
+  public static final StringOption TEXTINCLUDE = new StringOption("TEXTINCLUDE", "");
+  /** Attribute index: names to include. */
+  public static final StringOption ATTRINCLUDE = new StringOption("ATTRINCLUDE", "");
+  /** Token index: names to include. */
+  public static final StringOption TOKENINCLUDE = new StringOption("TOKENINCLUDE", "");
+  /** Full-text index: names to include. */
+  public static final StringOption FTINCLUDE = new StringOption("FTINCLUDE", "");
 
   /** Maximum length of index entries. */
   public static final NumberOption MAXLEN = new NumberOption("MAXLEN", 96);
@@ -91,6 +99,8 @@ public final class MainOptions extends Options {
   public static final BooleanOption UPDINDEX = new BooleanOption("UPDINDEX", false);
   /** Flag for automatic index updates. */
   public static final BooleanOption AUTOOPTIMIZE = new BooleanOption("AUTOOPTIMIZE", false);
+  /** Index split size. */
+  public static final NumberOption SPLITSIZE = new NumberOption("SPLITSIZE", 0);
 
   // Full-Text
 
@@ -162,7 +172,7 @@ public final class MainOptions extends Options {
   // Other
 
   /** Options that are adopted from parent options. */
-  private static final Option<?>[] PARENT = { CHOP, INTPARSE, STRIPNS, DTD, XINCLUDE, CATFILE };
+  private static final Option<?>[] INHERIT = { CHOP, INTPARSE, STRIPNS, DTD, XINCLUDE, CATFILE };
 
   /** Parser. */
   public enum MainParser {
@@ -195,17 +205,27 @@ public final class MainOptions extends Options {
   }
 
   /**
-   * Constructor, adopting XML parsing options from specified options.
+   * Constructor, adopting the specified options.
    * @param options parent options
    */
   public MainOptions(final MainOptions options) {
-    this(false);
-    for(final Option<?> o : PARENT) put(o, options.get(o));
+    super(options);
   }
 
   /**
-   * Creates an options instance with whitespace chopping turned off.
-   * The returned instance should not be modified.
+   * Constructor, adopting XML parsing options from the specified options.
+   * @param options parent options
+   * @param xml adopt xml options
+   */
+  public MainOptions(final MainOptions options, final boolean xml) {
+    this(false);
+    if(xml) {
+      for(final Option<?> option : INHERIT) put(option, options.get(option));
+    }
+  }
+
+  /**
+   * Creates a new options instance with whitespace chopping turned off.
    * @return main options
    */
   public static MainOptions get() {

@@ -10,7 +10,7 @@ import org.basex.util.list.*;
 /**
  * Provides central access to all databases and backups.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Jens Erat
  */
 public final class Databases {
@@ -25,7 +25,7 @@ public final class Databases {
    *   <li> {@code :*?\"<>\/|}" are used for filenames and paths</li>
    * </ul>
    */
-  static final String DBCHARS = "-+=~!#$%^&()[]{}@'`";
+  public static final String DBCHARS = "-+=~!#$%^&()[]{}@'`";
 
   /** Regex representation of allowed database characters. */
   private static final String REGEXCHARS = DBCHARS.replaceAll("(.)", "\\\\$1");
@@ -80,7 +80,7 @@ public final class Databases {
    */
   private StringList list(final boolean db, final boolean backup, final String name) {
     final Pattern pt = name == null ? null : regex(name);
-    final IOFile[] children = soptions.dbpath().children();
+    final IOFile[] children = soptions.dbPath().children();
     final StringList list = new StringList(children.length);
     final HashSet<String> map = new HashSet<>(children.length);
     for(final IOFile f : children) {
@@ -89,7 +89,7 @@ public final class Databases {
       if(backup && fn.endsWith(IO.ZIPSUFFIX)) {
         final String nn = ZIPPATTERN.split(fn)[0];
         if(!nn.equals(fn)) add = nn;
-      } else if(db && f.isDir() && fn.indexOf('.') == -1) {
+      } else if(db && f.isDir() && !fn.startsWith(".")) {
         add = fn;
       }
       // add entry if it matches the pattern, and has not already been added
@@ -128,7 +128,7 @@ public final class Databases {
    */
   public StringList backups() {
     final StringList backups = new StringList();
-    for(final IOFile f : soptions.dbpath().children()) {
+    for(final IOFile f : soptions.dbPath().children()) {
       final String n = f.name();
       if(n.endsWith(IO.ZIPSUFFIX)) backups.add(n.substring(0, n.lastIndexOf('.')));
     }
@@ -143,12 +143,12 @@ public final class Databases {
    */
   public StringList backups(final String db) {
     final StringList backups = new StringList();
-    final IOFile file = soptions.dbpath(db + IO.ZIPSUFFIX);
+    final IOFile file = soptions.dbPath(db + IO.ZIPSUFFIX);
     if(file.exists()) {
       backups.add(db);
     } else {
       final Pattern regex = regex(db, '-' + DATE + '\\' + IO.ZIPSUFFIX);
-      for(final IOFile f : soptions.dbpath().children()) {
+      for(final IOFile f : soptions.dbPath().children()) {
         final String n = f.name();
         if(regex.matcher(n).matches()) backups.add(n.substring(0, n.lastIndexOf('.')));
       }
@@ -179,10 +179,11 @@ public final class Databases {
   /**
    * Checks if the specified character is a valid character for a database name.
    * @param ch the character to be checked
+   * @param firstLast character is first or last
    * @return result of check
    */
-  public static boolean validChar(final int ch) {
-    return Token.letterOrDigit(ch) || DBCHARS.indexOf(ch) != -1;
+  public static boolean validChar(final int ch, final boolean firstLast) {
+    return Token.letterOrDigit(ch) || DBCHARS.indexOf(ch) != -1 || !firstLast && ch == '.';
   }
 
   /**
@@ -205,7 +206,8 @@ public final class Databases {
     final int nl = name.length();
     for(int n = 0; n < nl; n++) {
       final char ch = name.charAt(n);
-      if((!glob || ch != '?' && ch != '*' && ch != ',') && !validChar(ch)) return false;
+      if((!glob || ch != '?' && ch != '*' && ch != ',') && !validChar(ch, n == 0 || n + 1 == nl))
+        return false;
     }
     return nl != 0;
   }

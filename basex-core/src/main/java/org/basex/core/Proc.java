@@ -1,29 +1,35 @@
 package org.basex.core;
 
-import static org.basex.core.Text.*;
-
 import java.util.*;
 
 import org.basex.core.locks.*;
 
 /**
  * This class is implemented by all kinds of processes.
- * It gives feedback on the current process. Moreover, it allows to
- * interrupt the process by calling the {@link #stop()} method.
+ * It gives feedback on the current process. A process can be canceled by calling {@link #stop()}.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class Proc {
+  /** State of process. */
+  public enum State {
+    /** OK.      */ OK,
+    /** Stopped. */ STOPPED,
+    /** Timeout. */ TIMEOUT,
+    /** Memory.  */ MEMORY;
+  }
+
   /** Listener, reacting on process information. */
   public InfoListener listen;
   /** This flag indicates that a command may perform updates. */
   public boolean updating;
+  /** Stopped flag. */
+  public State state = State.OK;
 
   /** Indicates if a process is currently registered. */
-  boolean registered;
-  /** Stopped flag. */
-  private boolean stopped;
+  protected boolean registered;
+
   /** Timer. */
   private Timer timer;
   /** Sub process. */
@@ -75,7 +81,7 @@ public abstract class Proc {
       proc.listen = listen;
       proc.registered = registered;
       proc.proc(sub.sub);
-      if(stopped) proc.stop();
+      if(state != State.OK) proc.state(state);
     }
     return proc;
   }
@@ -84,8 +90,30 @@ public abstract class Proc {
    * Stops a process or sub process.
    */
   public final void stop() {
-    if(sub != null) sub.stop();
-    stopped = true;
+    state(State.STOPPED);
+  }
+
+  /**
+   * Stops a process because of a timeout.
+   */
+  public final void timeout() {
+    state(State.TIMEOUT);
+  }
+
+  /**
+   * Stops a process because a memory limit was exceeded.
+   */
+  public final void memory() {
+    state(State.MEMORY);
+  }
+
+  /**
+   * Sets a new process state.
+   * @param st new state
+   */
+  final void state(final State st) {
+    if(sub != null) sub.state(st);
+    state = st;
     stopTimeout();
   }
 
@@ -93,7 +121,7 @@ public abstract class Proc {
    * Checks if the process was interrupted; if yes, sends a runtime exception.
    */
   public final void checkStop() {
-    if(stopped) throw new ProcException();
+    if(state != State.OK) throw new ProcException();
   }
 
   /**
@@ -113,7 +141,7 @@ public abstract class Proc {
     timer = new Timer(true);
     timer.schedule(new TimerTask() {
       @Override
-      public void run() { stop(); }
+      public void run() { timeout(); }
     }, ms);
   }
 
@@ -159,7 +187,7 @@ public abstract class Proc {
    * @return header information
    */
   protected String tit() {
-    return PLEASE_WAIT_D;
+    return Text.PLEASE_WAIT_D;
   }
 
   /**
@@ -167,7 +195,7 @@ public abstract class Proc {
    * @return header information
    */
   protected String det() {
-    return PLEASE_WAIT_D;
+    return Text.PLEASE_WAIT_D;
   }
 
   /**

@@ -15,7 +15,7 @@ import org.basex.util.hash.*;
 /**
  * The scope of variables, either the query, a user-defined or an inline function.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public final class VarScope {
@@ -119,7 +119,7 @@ public final class VarScope {
 
     // remove unused entries from the closure
     if(expr instanceof Closure) {
-      final Iterator<Entry<Var, Expr>> cls = ((Closure) expr).nonLocalBindings();
+      final Iterator<Entry<Var, Expr>> cls = ((Closure) expr).globalBindings();
       while(cls.hasNext()) {
         final Entry<Var, Expr> e = cls.next();
         final Var v = e.getKey();

@@ -11,7 +11,7 @@ import org.junit.*;
 /**
  * This class tests the embedded REST API and the POST method.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class RESTPostTest extends RESTTest {
@@ -42,9 +42,9 @@ public final class RESTPostTest extends RESTTest {
   @Test
   public void post3() throws IOException {
     assertEquals(
-      "<?xml version=\"1.0\" encoding=\"UTF-8\"?>123",
+      "1",
       post("", "<query xmlns=\"" + URI + "\">" +
-        "<text>123</text><parameter name='omit-xml-declaration' value='no'/></query>",
+        "<text><![CDATA[<a>1</a>]]></text><parameter name='method' value='text'/></query>",
         MediaType.APPLICATION_XML));
   }
 

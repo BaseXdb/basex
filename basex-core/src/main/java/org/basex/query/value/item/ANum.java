@@ -10,7 +10,7 @@ import org.basex.util.*;
  * Abstract super class for all numeric items.
  * Useful for removing exceptions and unifying hash values.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public abstract class ANum extends Item {
@@ -42,6 +42,18 @@ public abstract class ANum extends Item {
   @Override
   public final float flt(final InputInfo ii) {
     return flt();
+  }
+
+  @Override
+  public boolean sameKey(final Item it, final InputInfo ii) throws QueryException {
+    if(it instanceof ANum) {
+      final double d1 = dbl(ii), d2 = it.dbl(ii);
+      final boolean n1 = Double.isNaN(d1), n2 = Double.isNaN(d2);
+      if(n1 || n2) return n1 == n2;
+      if(Double.isInfinite(d1) || Double.isInfinite(d2)) return d1 == d2;
+      return dec(ii).compareTo(it.dec(ii)) == 0;
+    }
+    return false;
   }
 
   /**

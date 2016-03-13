@@ -9,12 +9,12 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class FnDefaultCollation extends StandardFunc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) {
+  public Uri item(final QueryContext qc, final InputInfo ii) {
     final Collation coll = sc.collation;
     return Uri.uri(coll == null ? QueryText.COLLATION_URI : coll.uri());
   }

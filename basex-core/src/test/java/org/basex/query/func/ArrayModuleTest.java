@@ -9,7 +9,7 @@ import org.junit.*;
 /**
  * This class tests the functions of the Array Module.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class ArrayModuleTest extends AdvancedQueryTest {
@@ -159,6 +159,6 @@ public final class ArrayModuleTest extends AdvancedQueryTest {
    * @param exp expected result
    */
   private static void array(final String query, final String exp) {
-    query(_ARRAY_SERIALIZE.args(' ' + query), exp);
+    query(query, exp);
   }
 }

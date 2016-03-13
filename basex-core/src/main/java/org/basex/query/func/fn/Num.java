@@ -14,7 +14,7 @@ import org.basex.query.value.type.*;
 /**
  * Numeric functions.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 abstract class Num extends StandardFunc {
@@ -51,7 +51,7 @@ abstract class Num extends StandardFunc {
     // strings
     if(curr instanceof AStr) {
       for(Item it; (it = iter.next()) != null;) {
-        if(!(it instanceof AStr)) throw EXPTYPE_X_X_X.get(info, curr.type, it.type, it);
+        if(!(it instanceof AStr)) throw MINMAX_X_X_X.get(info, curr.type, it.type, it);
         final Type rt = curr.type, ri = it.type;
         if(cmp.eval(curr, it, coll, sc, info)) curr = it;
         if(rt != ri && curr.type == URI) curr = STR.cast(curr, qc, sc, info);
@@ -61,7 +61,7 @@ abstract class Num extends StandardFunc {
     // dates, durations, booleans, binary values
     if(curr instanceof ADate || curr instanceof Dur || curr instanceof Bin || curr.type == BLN) {
       for(Item it; (it = iter.next()) != null;) {
-        if(curr.type != it.type) throw EXPTYPE_X_X_X.get(info, curr.type, it.type, it);
+        if(curr.type != it.type) throw MINMAX_X_X_X.get(info, curr.type, it.type, it);
         if(cmp.eval(curr, it, coll, sc, info)) curr = it;
       }
       return curr;
@@ -87,7 +87,7 @@ abstract class Num extends StandardFunc {
     final Type ti = it.type;
     if(ti.isUntyped()) return DBL;
     final Type tc = curr.type;
-    if(!(it instanceof ANum)) throw EXPTYPE_X_X_X.get(info, tc, ti, it);
+    if(!(it instanceof ANum)) throw MINMAX_X_X_X.get(info, tc, ti, it);
     return tc == ti ? null :
            tc == DBL || ti == DBL ? DBL :
            tc == FLT || ti == FLT ? FLT :

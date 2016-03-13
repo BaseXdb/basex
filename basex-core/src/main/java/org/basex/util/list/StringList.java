@@ -7,7 +7,7 @@ import org.basex.util.*;
 /**
  * Resizable-array implementation for strings.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public class StringList extends ElementList implements Iterable<String> {
@@ -115,7 +115,6 @@ public class StringList extends ElementList implements Iterable<String> {
    * @return result of check
    */
   public final boolean containsAll(final StringList elements) {
-    if(isEmpty()) return elements.isEmpty();
     int i = 0;
     final int s = size;
     for(final String e : elements) {
@@ -162,16 +161,6 @@ public class StringList extends ElementList implements Iterable<String> {
   }
 
   /**
-   * Returns an array with all elements and resets the array size.
-   * @return array
-   */
-  public final String[] next() {
-    final String[] lst = Array.copyOf(list, size);
-    reset();
-    return lst;
-  }
-
-  /**
    * Returns an array with all elements and invalidates the internal array.
    * Warning: the function must only be called if the list is discarded afterwards.
    * @return array (internal representation!)
@@ -213,13 +202,13 @@ public class StringList extends ElementList implements Iterable<String> {
   /**
    * Sorts the elements.
    * @param cs respect case sensitivity
-   * @param asc ascending (true)/descending (false) flag
+   * @param ascending ascending/descending order
    * @param index index of element from which sorting starts
    * @return self reference
    */
-  public final StringList sort(final boolean cs, final boolean asc, final int index) {
+  public final StringList sort(final boolean cs, final boolean ascending, final int index) {
     final Comparator<String> comp = cs ? null : String.CASE_INSENSITIVE_ORDER;
-    Arrays.sort(list, index, size, asc ? comp : Collections.reverseOrder(comp));
+    Arrays.sort(list, index, size, ascending ? comp : Collections.reverseOrder(comp));
     return this;
   }
 
@@ -245,6 +234,6 @@ public class StringList extends ElementList implements Iterable<String> {
 
   @Override
   public final String toString() {
-    return Arrays.toString(toArray());
+    return list == null ? "" : Arrays.toString(toArray());
   }
 }

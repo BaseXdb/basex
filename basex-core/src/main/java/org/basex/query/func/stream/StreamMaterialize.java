@@ -10,7 +10,7 @@ import org.basex.query.var.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class StreamMaterialize extends StandardFunc {
@@ -21,7 +21,9 @@ public final class StreamMaterialize extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return qc.value(exprs[0]).materialize(info);
+    final Value v = qc.value(exprs[0]);
+    v.materialize(info);
+    return v;
   }
 
   @Override

@@ -15,12 +15,12 @@ import org.basex.util.options.*;
 /**
  * This class contains constants and system properties which are used all around the project.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Prop {
-  /** Global options. */
-  private static final java.util.Map<String, String> OPTIONS = new ConcurrentHashMap<>();
+  /** Global options, assigned by the starter classes and the web.xml context parameters. */
+  private static final Map<String, String> OPTIONS = new ConcurrentHashMap<>();
 
   /** User's home directory. */
   public static final String USERHOME;
@@ -45,7 +45,7 @@ public final class Prop {
   /** Project name. */
   public static final String NAME = "BaseX";
   /** Code version (may contain major, minor and optional patch number). */
-  public static final String VERSION = version("8.2.4 beta");
+  public static final String VERSION = version("8.4.2 beta");
   /** Main author. */
   public static final String AUTHOR = "Christian Gr\u00FCn";
   /** Co-authors (1). */
@@ -96,7 +96,7 @@ public final class Prop {
   public static final String PATH = DBPREFIX + "path";
 
   /** Directory for storing the property files, database directory, etc. */
-  public static final String HOME = dir(homePath());
+  public static final String HOME = dir(homeDir());
 
   // STATIC OPTIONS =====================================================================
 
@@ -130,9 +130,9 @@ public final class Prop {
    *   <li> Otherwise, the <b>user's home directory</b> (defined in
    *        {@code "user.home"}) is chosen.</li>
    * </ol>
-   * @return home directory
+   * @return path to home directory
    */
-  private static String homePath() {
+  private static String homeDir() {
     // check for system property
     String dir = System.getProperty(PATH);
     if(dir != null) return dir;
@@ -191,8 +191,8 @@ public final class Prop {
    * @param option option
    * @param value value
    */
-  public static void put(final Option<?> option, final Object value) {
-    put(option.name(), value);
+  public static void put(final Option<?> option, final String value) {
+    put(key(option), value);
   }
 
   /**
@@ -200,8 +200,8 @@ public final class Prop {
    * @param name name of the option
    * @param value value
    */
-  public static void put(final String name, final Object value) {
-    OPTIONS.put(normalizeKey(name), value.toString());
+  public static void put(final String name, final String value) {
+    OPTIONS.put(name, value);
   }
 
   /**
@@ -209,53 +209,67 @@ public final class Prop {
    * @param option option
    */
   public static void remove(final Option<?> option) {
-    OPTIONS.remove(option);
+    remove(key(option));
+  }
+
+  /**
+   * Removes a global option.
+   * @param name name of the option
+   */
+  public static void remove(final String name) {
+    OPTIONS.remove(name);
+  }
+
+  /**
+   * Returns a system property or global option. System properties override global options.
+   * @param name name of the option
+   * @return global option
+   */
+  public static String get(final String name) {
+    final String value = System.getProperty(name);
+    return value != null ? value : OPTIONS.get(name);
   }
 
   /**
    * Returns a system property or global option. System properties override global options.
    * @param option option
-   * @return value, or empty string
+   * @return value, or {@code null}
    */
   public static String get(final Option<?> option) {
-    String v = System.getProperty(DBPREFIX + option.name().toLowerCase(Locale.ENGLISH));
-    if(v == null) v = OPTIONS.get(option);
-    return v == null ? "" : v;
+    return get(key(option));
   }
 
   /**
-   * Returns the names of all system properties and global options.
+   * Returns all global options and system properties.
    * System properties override global options.
    * @return entry set
    */
   public static Set<Entry<String, String>> entries() {
-    // override with system properties
+    // properties from starter classes and web.xml context parameters
     final HashMap<String, String> entries = new HashMap<>();
     entries.putAll(OPTIONS);
     // override with system properties
-    for(final Object key : System.getProperties().keySet()) {
-      final String name = key.toString();
-      if(name.startsWith(DBPREFIX)) entries.put(normalizeKey(name), System.getProperty(name));
+    for(final Entry<Object, Object> entry : System.getProperties().entrySet()) {
+      entries.put(entry.getKey().toString(), entry.getValue().toString());
     }
     return entries.entrySet();
   }
 
   /**
    * Sets a system property if it has not been set before.
-   * @param key key
+   * @param name name of the property
    * @param value value
    */
-  public static void setSystem(final String key, final String value) {
-    if(System.getProperty(key) == null) System.setProperty(key, value);
+  public static void setSystem(final String name, final String value) {
+    if(System.getProperty(name) == null) System.setProperty(name, value);
   }
 
   /**
-   * Normalizes the key of an option. Removes {@link #DBPREFIX} and converts the key to upper-case.
-   * @param name name of the option
-   * @return normalized string
+   * Returns the key of an option. The returned key is prefixed with {@link #DBPREFIX}.
+   * @param option option
+   * @return key
    */
-  private static String normalizeKey(final String name) {
-    final String n = name.startsWith(DBPREFIX) ? name.substring(DBPREFIX.length()) : name;
-    return n.toUpperCase(Locale.ENGLISH);
+  private static String key(final Option<?> option) {
+    return DBPREFIX + option.name().toLowerCase(Locale.ENGLISH);
   }
 }

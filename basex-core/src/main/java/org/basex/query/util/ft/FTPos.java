@@ -6,7 +6,7 @@ import org.basex.util.list.*;
 /**
  * This class contains full-text positions for a single database node.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class FTPos {
@@ -32,8 +32,8 @@ public final class FTPos {
   void union(final IntList pos) {
     final int ps = list.size(), ls = pos.size();
     final IntSet set = new IntSet(ps + ls);
-    for(int p = 0, s = ps; p < s; p++) set.add(list.get(p));
-    for(int l = 0, s = ls; l < s; l++) set.add(pos.get(l));
+    for(int p = 0; p < ps; p++) set.add(list.get(p));
+    for(int l = 0; l < ls; l++) set.add(pos.get(l));
     list = new IntList(set.toArray()).sort();
   }
 

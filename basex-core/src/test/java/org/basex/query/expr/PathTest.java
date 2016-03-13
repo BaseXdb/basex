@@ -1,6 +1,5 @@
 package org.basex.query.expr;
 
-import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.query.*;
 import org.junit.*;
@@ -9,7 +8,7 @@ import org.junit.Test;
 /**
  * Tests for optimizations of the path expression (similar to {@link FilterTest}).
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class PathTest extends AdvancedQueryTest {
@@ -22,20 +21,18 @@ public final class PathTest extends AdvancedQueryTest {
 
   /**
    * Creates a database.
-   * @throws BaseXException exception
    */
   @Before
-  public void setUp() throws BaseXException {
-    new CreateDB(NAME, FILE).execute(context);
+  public void setUp() {
+    execute(new CreateDB(NAME, FILE));
   }
 
   /**
    * Drops the database.
-   * @throws BaseXException exception
    */
   @After
-  public void tearDown() throws BaseXException {
-    new DropDB(NAME).execute(context);
+  public void tearDown() {
+    execute(new DropDB(NAME));
   }
 
   /**
@@ -197,5 +194,49 @@ public final class PathTest extends AdvancedQueryTest {
     query("for $i in (1,'a') return //ul/li[$i][1]", LI1 + '\n' + LI1);
     query("for $i in (1,'a') return //ul/li[$i][2]");
     query("for $i in (1,'a') return //ul/li[$i][last()]", LI1 + '\n' + LI2);
+  }
+
+  /**
+   * Caching of path expression results (GH-1197).
+   */
+  @Test public void pathCaching() {
+    execute(new CreateDB(NAME));
+    execute(new Add("a.xml", "<a><b/><b/></a>"));
+    execute(new Add("a.xml", "<c><b/></c>"));
+    query("//b[/a]", "<b/>\n<b/>");
+  }
+
+  /**
+   * Utilization of database statistics (GH-1202).
+   */
+  @Test public void nameIndex() {
+    execute(new CreateDB(NAME, "<x/>"));
+    query("let $x := 'e' return element e {}/self::e[name() = $x]", "<e/>");
+  }
+
+  /**
+   * Retrieve double values from disk (GH-1206).
+   */
+  @Test public void diskDoubles() {
+    execute(new CreateDB(NAME, "<x>a</x>"));
+    query("/* castable as xs:double", "false");
+  }
+
+  /**
+   * Index rewritings in nested XPath expressions (GH-1210).
+   */
+  @Test public void indexContext() {
+    execute(new CreateDB(NAME, "<a><b>x</b></a>"));
+    query("/a[b = .[b = 'x']/b]/b/text()", "x");
+  }
+
+  /**
+   * Single root expressions (GH-1231).
+   */
+  @Test public void singleRoot() {
+    execute(new CreateDB(NAME));
+    execute(new Add("a.xml", "<a/>"));
+    execute(new Add("b.xml", "<b/>"));
+    query(".[/a]", "<a/>");
   }
 }

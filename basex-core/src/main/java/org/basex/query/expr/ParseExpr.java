@@ -19,15 +19,16 @@ import org.basex.util.*;
 /**
  * Abstract parse expression. All non-value expressions are derived from this class.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class ParseExpr extends Expr {
   /** Input information. */
   public InputInfo info;
   /** Static type. */
-  protected SeqType seqType;
-  /** Cardinality of result; {@code -1} if unknown. */
+  public SeqType seqType;
+  /** Cardinality of result; {@code -1} if unknown
+   * ({@link #seqType} will then be requested to estimate result size). */
   protected long size = -1;
 
   /**
@@ -129,14 +130,6 @@ public abstract class ParseExpr extends Expr {
   // OPTIMIZATIONS ================================================================================
 
   /**
-   * Assigns a sequence type.
-   * @param type sequence type
-   */
-  public void seqType(final SeqType type) {
-    seqType = type;
-  }
-
-  /**
    * Pre-evaluates the specified expression.
    * @param qc query context
    * @return optimized expression
@@ -162,7 +155,7 @@ public abstract class ParseExpr extends Expr {
    * @return optimized expression
    */
   protected final Expr optPre(final Expr ex, final QueryContext qc) {
-    if(ex != this) qc.compInfo(OPTPRE, this);
+    if(ex != this) qc.compInfo(OPTPRE_X, this);
     return ex == null ? Empty.SEQ : ex;
   }
 
@@ -195,31 +188,31 @@ public abstract class ParseExpr extends Expr {
   /**
    * Ensures that none of the specified expressions performs an update.
    * Otherwise, throws an exception.
-   * @param ex expressions (may be {@code null}, and may contain {@code null} references)
+   * @param exprs expressions (may be {@code null}, and may contain {@code null} references)
    * @throws QueryException query exception
    */
-  protected final void checkNoneUp(final Expr... ex) throws QueryException {
-    if(ex == null) return;
-    checkAllUp(ex);
-    for(final Expr e : ex) {
-      if(e != null && e.has(Flag.UPD)) throw UPNOT_X.get(info, description());
+  protected final void checkNoneUp(final Expr... exprs) throws QueryException {
+    if(exprs == null) return;
+    checkAllUp(exprs);
+    for(final Expr expr : exprs) {
+      if(expr != null && expr.has(Flag.UPD)) throw UPNOT_X.get(info, description());
     }
   }
 
   /**
    * Ensures that all specified expressions are vacuous or either updating or non-updating.
    * Otherwise, throws an exception.
-   * @param ex expressions to be checked
+   * @param exprs expressions to be checked
    * @throws QueryException query exception
    */
-  void checkAllUp(final Expr... ex) throws QueryException {
+  void checkAllUp(final Expr... exprs) throws QueryException {
     // updating state: 0 = initial state, 1 = updating, -1 = non-updating
     int s = 0;
-    for(final Expr e : ex) {
-      e.checkUp();
-      if(e.isVacuous()) continue;
-      final boolean u = e.has(Flag.UPD);
-      if(u && s == -1 || !u && s == 1) throw UPALL_X.get(info, description());
+    for(final Expr expr : exprs) {
+      expr.checkUp();
+      if(expr.isVacuous()) continue;
+      final boolean u = expr.has(Flag.UPD);
+      if(u && s == -1 || !u && s == 1) throw UPALL.get(info, description());
       s = u ? 1 : -1;
     }
   }
@@ -282,7 +275,7 @@ public abstract class ParseExpr extends Expr {
   /**
    * Checks if the specified expression yields a boolean.
    * Returns the boolean or throws an exception.
-   * @param ex expression to be checked
+   * @param ex expression to be evaluated
    * @param qc query context
    * @return boolean
    * @throws QueryException query exception
@@ -309,7 +302,7 @@ public abstract class ParseExpr extends Expr {
   /**
    * Checks if the specified expression yields a double.
    * Returns the double or throws an exception.
-   * @param ex expression to be checked
+   * @param ex expression to be evaluated
    * @param qc query context
    * @return double
    * @throws QueryException query exception
@@ -333,7 +326,7 @@ public abstract class ParseExpr extends Expr {
   /**
    * Checks if the specified expression yields a number or {@code null}.
    * Returns the number, {@code null}, or throws an exception.
-   * @param ex expression to be checked
+   * @param ex expression to be evaluated
    * @param qc query context
    * @return double
    * @throws QueryException query exception
@@ -346,8 +339,8 @@ public abstract class ParseExpr extends Expr {
   /**
    * Checks if the specified, non-empty item is a double.
    * Returns the double or throws an exception.
-   * @param it item
-   * @return double
+   * @param it item to be checked
+   * @return number
    * @throws QueryException query exception
    */
   private ANum toNumber(final Item it) throws QueryException {
@@ -359,7 +352,7 @@ public abstract class ParseExpr extends Expr {
   /**
    * Checks if the specified expression yields a float.
    * Returns the float or throws an exception.
-   * @param ex expression to be checked
+   * @param ex expression to be evaluated
    * @param qc query context
    * @return float
    * @throws QueryException query exception
@@ -373,7 +366,7 @@ public abstract class ParseExpr extends Expr {
   /**
    * Checks if the specified expression yields an integer.
    * Returns a token representation or throws an exception.
-   * @param ex expression to be checked
+   * @param ex expression to be evaluated
    * @param qc query context
    * @return integer value
    * @throws QueryException query exception
@@ -398,7 +391,7 @@ public abstract class ParseExpr extends Expr {
   /**
    * Checks if the specified expression yields a node.
    * Returns the boolean or throws an exception.
-   * @param ex expression to be checked
+   * @param ex expression to be evaluated
    * @param qc query context
    * @return node
    * @throws QueryException query exception
@@ -410,7 +403,7 @@ public abstract class ParseExpr extends Expr {
   /**
    * Checks if the specified expression yields a node or {@code null}.
    * Returns the node, {@code null}, or throws an exception.
-   * @param ex expression to be checked
+   * @param ex expression to be evaluated
    * @param qc query context
    * @return node or {@code null}
    * @throws QueryException query exception
@@ -421,7 +414,7 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the specified non-item is a node.
+   * Checks if the specified non-empty item is a node.
    * Returns the node or throws an exception.
    * @param it item to be checked
    * @return node
@@ -444,19 +437,27 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the evaluated expression yields a non-empty node or item.
+   * Checks if the evaluated expression yields a node or item.
    * Returns the item or throws an exception.
    * @param ex expression to be evaluated
    * @param qc query context
-   * @return item
+   * @return node or atomized item
    * @throws QueryException query exception
    */
   protected final Item toNodeOrAtomItem(final Expr ex, final QueryContext qc)
       throws QueryException {
+    return toNodeOrAtomItem(toItem(ex, qc));
+  }
 
-    Item it = toItem(ex, qc);
-    if(!(it instanceof ANode)) it = it.atomItem(info);
-    return it;
+  /**
+   * Checks if the specified item yields a node or item.
+   * Returns the item or throws an exception.
+   * @param it item to be checked (can be {@code null})
+   * @return node or atomized item
+   * @throws QueryException query exception
+   */
+  protected final Item toNodeOrAtomItem(final Item it) throws QueryException {
+    return it == null || it instanceof ANode ? it : it.atomItem(info);
   }
 
   /**
@@ -586,7 +587,7 @@ public abstract class ParseExpr extends Expr {
   /**
    * Checks if the specified expression yields a QName.
    * Returns the item or throws an exception.
-   * @param ex expression to be checked
+   * @param ex expression to be evaluated
    * @param qc query context
    * @param empty allow empty result
    * @return QNm item
@@ -622,7 +623,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected FItem toFunc(final Expr ex, final QueryContext qc) throws QueryException {
-    return (FItem) checkType(toItem(ex, qc, FuncType.ANY_FUN), FuncType.ANY_FUN);
+    return (FItem) checkType(toItem(ex, qc, SeqType.ANY_FUN), SeqType.ANY_FUN);
   }
 
   /**

@@ -12,7 +12,7 @@ import org.basex.util.list.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public class UserList extends UserFn {
@@ -24,7 +24,6 @@ public class UserList extends UserFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     checkAdmin(qc);
-
     final ArrayList<User> users = qc.context.users.users(null);
     final TokenList tl = new TokenList(users.size());
     for(final User user : users) tl.add(user.name());

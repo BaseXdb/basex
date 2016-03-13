@@ -1,17 +1,17 @@
 package org.basex.index.value;
 
-import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
 
 import org.basex.data.*;
+import org.basex.index.*;
 import org.basex.io.in.DataInput;
 
 /**
  * This class provides data for merging temporary value indexes.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class DiskValuesMerger {
@@ -32,14 +32,14 @@ final class DiskValuesMerger {
   /**
    * Constructor.
    * @param data data reference
-   * @param text text flag
+   * @param type index type
    * @param i merge id
    * @throws IOException I/O exception
    */
-  DiskValuesMerger(final Data data, final boolean text, final int i) throws IOException {
-    pref = (text ? DATATXT : DATAATV) + i;
+  DiskValuesMerger(final Data data, final IndexType type, final int i) throws IOException {
+    pref = DiskValues.fileSuffix(type) + i;
     dk = new DataInput(data.meta.dbfile(pref + 't'));
-    dv = new DiskValues(data, text, pref);
+    dv = new DiskValues(data, type, pref);
     this.data = data;
     next();
   }

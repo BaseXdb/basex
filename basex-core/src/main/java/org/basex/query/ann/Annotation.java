@@ -14,7 +14,7 @@ import org.basex.util.hash.*;
 /**
  * Definitions of all built-in XQuery annotations.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public enum Annotation {
@@ -120,6 +120,8 @@ public enum Annotation {
   /** XQuery annotation. */
   _REST_METHOD("method(name[,body])", arg(STR, STR), REST_URI, false),
   /** XQuery annotation. */
+  _REST_SINGLE("single([key])", arg(STR), REST_URI),
+  /** XQuery annotation. */
   _REST_GET("GET()", arg(), REST_URI),
   /** XQuery annotation. */
   _REST_POST("POST([body])", arg(STR), REST_URI),
@@ -145,8 +147,6 @@ public enum Annotation {
   /** XQuery annotation. */
   _UNIT_TEST("test(['expected',error])", arg(STR, STR), UNIT_URI);
 
-  /** Descriptions. */
-  public final String desc;
   /** Argument types. */
   public final SeqType[] args;
   /** URI. */
@@ -155,6 +155,8 @@ public enum Annotation {
   public final int[] minMax;
   /** Annotation must only occur once. */
   public final boolean single;
+  /** Descriptions. */
+  private final String desc;
 
   /** Cached enums (faster). */
   public static final Annotation[] VALUES = values();
@@ -213,6 +215,14 @@ public enum Annotation {
    */
   public byte[] local() {
     return new TokenBuilder(desc.substring(0, desc.indexOf('('))).finish();
+  }
+
+  /**
+   * Returns the QName of the annotation.
+   * @return QName
+   */
+  public QNm qname() {
+    return new QNm(id(), uri);
   }
 
   /**

@@ -9,16 +9,17 @@ import java.awt.datatransfer.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
-import java.util.Map.Entry;
-import java.util.Timer;
+import java.util.Map.*;
 
 import javax.swing.*;
+import javax.swing.Timer;
 
 import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.dialog.*;
 import org.basex.gui.layout.*;
-import org.basex.gui.text.SearchBar.SearchDir;
+import org.basex.gui.text.SearchBar.*;
+import org.basex.gui.text.TextEditor.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.util.*;
@@ -26,13 +27,10 @@ import org.basex.util.*;
 /**
  * Renders and provides edit capabilities for text.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public class TextPanel extends BaseXPanel {
-  /** Delay for highlighting an error. */
-  private static final int ERROR_DELAY = 500;
-
   /** Editor action. */
   public enum Action {
     /** Check for changes; do nothing if input has not changed. */
@@ -68,7 +66,7 @@ public class TextPanel extends BaseXPanel {
    * @param win parent window
    */
   public TextPanel(final boolean edit, final Window win) {
-    this(EMPTY, edit, win);
+    this("", edit, win);
   }
 
   /**
@@ -77,7 +75,7 @@ public class TextPanel extends BaseXPanel {
    * @param editable editable flag
    * @param win parent window
    */
-  public TextPanel(final byte[] txt, final boolean editable, final Window win) {
+  public TextPanel(final String txt, final boolean editable, final Window win) {
     super(win);
     this.editable = editable;
     editor = new TextEditor(gui);
@@ -147,11 +145,11 @@ public class TextPanel extends BaseXPanel {
 
   /**
    * Returns a currently marked string if it does not extend over more than one line.
-   * @return search string or {@code null}
+   * @return search string
    */
   public String searchString() {
     final String string = editor.copy();
-    return string.isEmpty() || string.contains("\n") ? null : string;
+    return string.indexOf('\n') != -1 ? "" : string;
   }
 
   /**
@@ -164,25 +162,27 @@ public class TextPanel extends BaseXPanel {
 
   /**
    * Sets the output text.
-   * @param t output text
-   * @param s text size
+   * @param text output text
+   * @param size text size
    */
-  public final void setText(final byte[] t, final int s) {
-    byte[] txt = t;
-    if(Token.contains(t, '\r')) {
+  public final void setText(final byte[] text, final int size) {
+    byte[] txt = text;
+    if(Token.contains(text, '\r')) {
       // remove carriage returns
       int ns = 0;
-      for(int r = 0; r < s; ++r) {
-        final byte b = t[r];
-        if(b != '\r') t[ns++] = b;
+      for(int r = 0; r < size; ++r) {
+        final byte b = text[r];
+        if(b != '\r') text[ns++] = b;
       }
       // new text is different...
-      txt = Arrays.copyOf(t, ns);
+      txt = Arrays.copyOf(text, ns);
+    } else if(text.length != size) {
+      txt = Arrays.copyOf(text, size);
     }
     if(editor.text(txt)) {
       if(hist != null) hist.store(txt, editor.pos(), 0);
     }
-    componentResized(null);
+    if(isShowing()) resizeCode.invokeLater();
   }
 
   /**
@@ -258,14 +258,10 @@ public class TextPanel extends BaseXPanel {
     }
   }
 
-  /** Thread counter. */
-  private int errorID;
-
   /**
    * Removes the error marker.
    */
   public final void resetError() {
-    ++errorID;
     editor.error(-1);
     rend.repaint();
   }
@@ -275,13 +271,8 @@ public class TextPanel extends BaseXPanel {
    * @param pos start of optional error mark
    */
   public final void error(final int pos) {
-    final int eid = ++errorID;
     editor.error(pos);
-
-    new Timer(true).schedule(new TimerTask() {
-      @Override
-      public void run() { if(eid == errorID) rend.repaint(); }
-    }, ERROR_DELAY);
+    rend.repaint();
   }
 
   /**
@@ -294,15 +285,26 @@ public class TextPanel extends BaseXPanel {
   }
 
   /**
+   * Case conversion.
+   * @param cs case type
+   */
+  public void toCase(final Case cs) {
+    final int caret = editor.pos();
+    if(editor.toCase(cs)) hist.store(editor.text(), caret, editor.pos());
+    scrollCode.invokeLater(true);
+  }
+
+  /**
    * Sorts text.
    */
   public void sort() {
-    final DialogSort ds = new DialogSort(gui);
-    if(!ds.ok()) return;
-
     final int caret = editor.pos();
-    if(editor.sort()) hist.store(editor.text(), caret, editor.pos());
+    final DialogSort ds = new DialogSort(gui);
+    if(!ds.ok() || !editor.sort()) return;
+
+    hist.store(editor.text(), caret, editor.pos());
     scrollCode.invokeLater(true);
+    repaint();
   }
 
   /**
@@ -753,7 +755,7 @@ public class TextPanel extends BaseXPanel {
   }
 
   /** Text caret. */
-  private final javax.swing.Timer caretTimer = new javax.swing.Timer(500, new ActionListener() {
+  private final Timer caretTimer = new Timer(500, new ActionListener() {
     @Override
     public void actionPerformed(final ActionEvent e) {
       rend.caret(!rend.caret());
@@ -1003,17 +1005,22 @@ public class TextPanel extends BaseXPanel {
         }
       };
 
-      JMenuItem mi = new JMenuItem(Text.INPUT + Text.COLS + prefix);
-      mi.setEnabled(false);
-      pm.add(mi);
-      pm.addSeparator();
       for(final Entry<String, String> entry : tmp.entrySet()) {
-        mi = new JMenuItem("[" + entry.getKey() + "] " + entry.getValue());
+        final JMenuItem mi = new JMenuItem("[" + entry.getKey() + "] " + entry.getValue());
         pm.add(mi);
         mi.addActionListener(al);
       }
+      pm.addSeparator();
+      final JMenuItem mi = new JMenuItem(Text.INPUT + Text.COLS + prefix);
+      mi.setEnabled(false);
+      pm.add(mi);
+
       final int[] cursor = rend.cursor();
       pm.show(this, cursor[0], cursor[1]);
+
+      // highlight first entry
+      final MenuElement[] me = { pm, (JMenuItem) pm.getComponent(0) };
+      MenuSelectionManager.defaultManager().setSelectedPath(me);
     }
   }
 

@@ -12,7 +12,7 @@ import org.basex.query.var.*;
 /**
  * Implements the {@code hof:take-while($seq, $pred)} function.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public final class HofTakeWhile extends StandardFunc {
@@ -43,7 +43,7 @@ public final class HofTakeWhile extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext qc, final VarScope scp) throws QueryException {
+  protected Expr opt(final QueryContext qc, final VarScope scp) {
     return exprs[0].isEmpty() ? Empty.SEQ : this;
   }
 }

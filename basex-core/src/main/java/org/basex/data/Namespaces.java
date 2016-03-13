@@ -15,7 +15,7 @@ import org.basex.util.list.*;
 /**
  * This class organizes the namespaces of a database.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Namespaces {
@@ -413,8 +413,7 @@ public final class Namespaces {
     final TokenBuilder tb = new TokenBuilder();
     for(final byte[] key : map) {
       tb.add("  ");
-      final TokenList values = map.get(key);
-      values.sort(false);
+      final TokenList values = map.get(key).sort();
       final int ks = values.size();
       if(ks > 1 || values.get(0).length != 0) {
         if(values.size() != 1) tb.add("(");

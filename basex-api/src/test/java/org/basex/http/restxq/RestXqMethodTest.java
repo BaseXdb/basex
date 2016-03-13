@@ -11,7 +11,7 @@ import org.junit.*;
 /**
  * This test contains RESTXQ methods.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class RestXqMethodTest extends RestXqTest {
@@ -33,8 +33,8 @@ public final class RestXqMethodTest extends RestXqTest {
     post(f, "<entry>A</entry>", "A", MediaType.TEXT_CSV);
     // binary
     f = "declare %R:POST('{$x}') %R:path('') function m:f($x) {$x};";
-    post(f, "QUFB", "AAA", MediaType.APPLICATION_OCTET_STREAM);
-    post(f, "QUFB", "AAA", new MediaType("whatever/type"));
+    post(f, "AAA", "AAA", MediaType.APPLICATION_OCTET_STREAM);
+    post(f, "AAA", "AAA", new MediaType("whatever/type"));
   }
 
   /**
@@ -59,12 +59,12 @@ public final class RestXqMethodTest extends RestXqTest {
 
     // custom HTTP method without body
     install("declare %R:method('RETRIEVE') %R:path('') function m:f() {'x'};");
-    // TODO java.net.HttpUrlConnection does not support custom HTTP methods
+    // java.net.HttpUrlConnection does not support custom HTTP methods
     // assertEquals("x", request("", "RETRIEVE"));
 
     // custom HTTP method with body
     install("declare %R:method('RETRIEVE', '{$b}') %R:path('') function m:f($b) {$b};");
-    // TODO java.net.HttpUrlConnection does not support custom HTTP methods
+    // java.net.HttpUrlConnection does not support custom HTTP methods
     // assertEquals("12", request("", "RETRIEVE", "12", MediaType.TEXT_PLAIN));
 
     // custom HTTP method specified twice
@@ -72,7 +72,7 @@ public final class RestXqMethodTest extends RestXqTest {
         + "function m:f() {'x'};";
     install(q);
     try {
-      // TODO java.net.HttpUrlConnection does not support custom HTTP methods
+      // java.net.HttpUrlConnection does not support custom HTTP methods
       request("", "RETRIEVE");
       fail("Error expected: " + q);
     } catch (final BaseXException ignored) {

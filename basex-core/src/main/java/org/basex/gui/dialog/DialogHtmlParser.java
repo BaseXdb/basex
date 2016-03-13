@@ -15,7 +15,7 @@ import org.basex.util.options.*;
 /**
  * CSV parser panel.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class DialogHtmlParser extends DialogParser {
@@ -58,7 +58,7 @@ final class DialogHtmlParser extends DialogParser {
   @Override
   boolean action(final boolean active) {
     try {
-      hopts.parse(options.getText());
+      hopts.assign(options.getText());
       info.setText(null, null);
       return true;
     } catch(final IOException ex) {

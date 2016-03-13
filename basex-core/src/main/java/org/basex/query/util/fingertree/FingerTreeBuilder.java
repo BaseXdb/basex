@@ -2,10 +2,12 @@ package org.basex.query.util.fingertree;
 
 import java.util.*;
 
+import org.basex.util.*;
+
 /**
  * A builder for {@link FingerTree}s from leaf nodes.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  *
  * @param <E> element type
@@ -13,7 +15,7 @@ import java.util.*;
 @SuppressWarnings("unchecked")
 public final class FingerTreeBuilder<E> implements Iterable<E> {
   /** The root node, {@code null} if the tree is empty. */
-  private Object root;
+  private BufferNode<E, E> root;
 
   /**
    * Checks if this builder is empty, i.e. if no leaf nodes were added to it.
@@ -30,12 +32,8 @@ public final class FingerTreeBuilder<E> implements Iterable<E> {
   public void prepend(final Node<E, E> leaf) {
     if(root == null) {
       root = new BufferNode<>(leaf);
-    } else if(root instanceof BufferNode) {
-      ((BufferNode<E, E>) root).prepend(leaf);
     } else {
-      final BufferNode<E, E> newRoot = new BufferNode<>((FingerTree<E, E>) root);
-      newRoot.prepend(leaf);
-      root = newRoot;
+      root.prepend(leaf);
     }
   }
 
@@ -46,12 +44,8 @@ public final class FingerTreeBuilder<E> implements Iterable<E> {
   public void append(final Node<E, E> leaf) {
     if(root == null) {
       root = new BufferNode<>(leaf);
-    } else if(root instanceof BufferNode) {
-      ((BufferNode<E, E>) root).append(leaf);
     } else {
-      final BufferNode<E, E> newRoot = new BufferNode<>((FingerTree<E, E>) root);
-      newRoot.append(leaf);
-      root = newRoot;
+      root.append(leaf);
     }
   }
 
@@ -63,12 +57,8 @@ public final class FingerTreeBuilder<E> implements Iterable<E> {
     if(!tree.isEmpty()) {
       if(root == null) {
         root = new BufferNode<>(tree);
-      } else if(root instanceof BufferNode) {
-        ((BufferNode<E, E>) root).append(tree);
       } else {
-        final BufferNode<E, E> newRoot = new BufferNode<>((FingerTree<E, E>) root);
-        newRoot.append(tree);
-        root = newRoot;
+        root.append(tree);
       }
     }
   }
@@ -78,13 +68,12 @@ public final class FingerTreeBuilder<E> implements Iterable<E> {
    * @return the resulting finger tree
    */
   public FingerTree<E, E> freeze() {
-    return root == null ? FingerTree.<E>empty() :
-      root instanceof BufferNode ? ((BufferNode<E, E>) root).freeze() : (FingerTree<E, E>) root;
+    return root == null ? FingerTree.<E>empty() : root.freeze();
   }
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    final StringBuilder sb = new StringBuilder(Util.className(this)).append('[');
     final Iterator<E> iter = iterator();
     if(iter.hasNext()) {
       sb.append(iter.next());
@@ -96,8 +85,7 @@ public final class FingerTreeBuilder<E> implements Iterable<E> {
   @Override
   public Iterator<E> iterator() {
     if(root == null) return Collections.emptyIterator();
-    if(root instanceof FingerTree) return ((FingerTree<E, E>) root).iterator();
-    return new BufferNodeIterator<>((BufferNode<E, E>) root);
+    return new BufferNodeIterator<>(root);
   }
 
   /**

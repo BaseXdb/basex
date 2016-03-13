@@ -16,7 +16,7 @@ import org.junit.Test;
 /**
  * This class tests the functions of the Database Module in a client/server environment.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class DbModuleServerTest extends AdvancedQueryTest {
@@ -29,11 +29,10 @@ public final class DbModuleServerTest extends AdvancedQueryTest {
 
   /**
    * Initializes a test.
-   * @throws BaseXException database exception
    */
   @Before
-  public void finishTest() throws BaseXException {
-    new DropDB(NAME).execute(context);
+  public void finishTest() {
+    execute(new DropDB(NAME));
   }
 
   /**

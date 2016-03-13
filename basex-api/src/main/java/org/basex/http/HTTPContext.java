@@ -28,7 +28,7 @@ import org.basex.util.http.HttpText.Request;
 /**
  * Bundles context-based information on a single HTTP operation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class HTTPContext {
@@ -49,9 +49,9 @@ public final class HTTPContext {
   public final String method;
   /** Request method. */
   public final HTTPParams params;
-
   /** Authentication method. */
-  public AuthMethod auth;
+  public final AuthMethod auth;
+
   /** User name. */
   public String username;
   /** Password (plain text). */
@@ -116,21 +116,21 @@ public final class HTTPContext {
     final String value = req.getHeader(AUTHORIZATION);
     if(value == null) return;
 
+    // overwrite credentials with client data (basic or digest)
     final String[] ams = Strings.split(value, ' ', 2);
     final AuthMethod am = StaticOptions.AUTHMETHOD.get(ams[0]);
-    if(am == null) throw new BaseXException(WHICHAUTH, value);
-
-    // overwrite credentials with client data (basic or digest)
     if(am == AuthMethod.BASIC) {
       final String details = ams.length > 1 ? ams[1] : "";
       final String[] cred = Strings.split(org.basex.util.Base64.decode(details), ':', 2);
       if(cred.length != 2) throw new BaseXException(NOUSERNAME);
       username = cred[0];
       password = cred[1];
-    } else { // (will always be) digest
+    } else if(am == AuthMethod.DIGEST) {
       final EnumMap<Request, String> map = HttpClient.digestHeaders(value);
       username = map.get(Request.USERNAME);
       password = map.get(Request.RESPONSE);
+    } else {
+      // custom authorization
     }
   }
 
@@ -166,8 +166,8 @@ public final class HTTPContext {
 
     // determine content type dependent on output method
     final SerialMethod sm = sopts.get(SerializerOptions.METHOD);
-    if(sm == SerialMethod.RAW) return MediaType.APPLICATION_OCTET_STREAM;
-    if(sm == SerialMethod.ADAPTIVE || sm == SerialMethod.XML) return MediaType.APPLICATION_XML;
+    if(sm == SerialMethod.BASEX || sm == SerialMethod.ADAPTIVE || sm == SerialMethod.XML)
+      return MediaType.APPLICATION_XML;
     if(sm == SerialMethod.XHTML || sm == SerialMethod.HTML) return MediaType.TEXT_HTML;
     if(sm == SerialMethod.JSON) return MediaType.APPLICATION_JSON;
     return MediaType.TEXT_PLAIN;
@@ -256,9 +256,10 @@ public final class HTTPContext {
         res.setStatus(code);
         if(info != null) {
           res.setContentType(MediaType.TEXT_PLAIN.toString());
-          final ArrayOutput ao = new ArrayOutput();
-          ao.write(token(info));
-          res.getOutputStream().write(ao.normalize().finish());
+          try(final ArrayOutput ao = new ArrayOutput()) {
+            ao.write(token(info));
+            res.getOutputStream().write(ao.normalize().finish());
+          }
         }
       }
     } catch(final IllegalStateException ex) {
@@ -305,8 +306,7 @@ public final class HTTPContext {
 
       if(auth == AuthMethod.BASIC) {
         if(password == null || !us.matches(password)) throw new LoginException();
-      } else {
-        // digest authentication
+      } else if(auth == AuthMethod.DIGEST) {
         final EnumMap<Request, String> map = HttpClient.digestHeaders(req.getHeader(AUTHORIZATION));
         final String am = map.get(Request.AUTH_METHOD);
         if(!AuthMethod.DIGEST.toString().equals(am)) throw new LoginException(DIGESTAUTH);
@@ -330,6 +330,8 @@ public final class HTTPContext {
         rsp.append(':').append(ha2);
 
         if(!Strings.md5(rsp.toString()).equals(password)) throw new LoginException();
+      } else {
+        // custom authorization
       }
       context.blocker.remove(address);
       return us;
@@ -434,19 +436,18 @@ public final class HTTPContext {
     if(init) return;
     init = true;
 
-    // set web application path as home directory and HTTPPATH
     final String webapp = sc.getRealPath("/");
+    // system property (requested in Prop#homePath)
     System.setProperty(Prop.PATH, webapp);
+    // global option (will later be assigned to StaticOptions#WEBPATH)
     Prop.put(StaticOptions.WEBPATH, webapp);
 
-    // bind all parameters that start with "org.basex." to system properties
+    // set all parameters that start with "org.basex." as global options
     final Enumeration<String> en = sc.getInitParameterNames();
     while(en.hasMoreElements()) {
       final String key = en.nextElement();
-      if(!key.startsWith(Prop.DBPREFIX)) continue;
-
       String val = sc.getInitParameter(key);
-      if(key.endsWith("path") && !new File(val).isAbsolute()) {
+      if(key.startsWith(Prop.DBPREFIX) && key.endsWith("path") && !new File(val).isAbsolute()) {
         // prefix relative path with absolute servlet path
         Util.debug(key.toUpperCase(Locale.ENGLISH) + ": " + val);
         val = new IOFile(webapp, val).path();
@@ -465,7 +466,7 @@ public final class HTTPContext {
     // start server instance
     if(!context.soptions.get(StaticOptions.HTTPLOCAL)) {
       try {
-        server = new BaseXServer(context);
+        server = new BaseXServer(context, "-D");
       } catch(final IOException ex) {
         exception = ex;
         throw ex;
@@ -476,7 +477,7 @@ public final class HTTPContext {
   /**
    * Closes the database context.
    */
-  public static synchronized void close() {
+  static synchronized void close() {
     if(server != null) {
       try {
         server.stop();
@@ -489,23 +490,22 @@ public final class HTTPContext {
   }
 
   /**
-   * Decodes the specified path segments.
-   * @param segments strings to be decoded
+   * Decodes the specified path.
+   * @param path strings to be decoded
    * @return argument
-   * @throws IllegalArgumentException invalid path segments
    */
-  public static String decode(final String segments) {
+  public static String decode(final String path) {
     try {
-      return URLDecoder.decode(segments, Prop.ENCODING);
-    } catch(final UnsupportedEncodingException ex) {
-      throw new IllegalArgumentException(ex);
+      return URLDecoder.decode(path, Prop.ENCODING);
+    } catch(final UnsupportedEncodingException | IllegalArgumentException ex) {
+      return path;
     }
   }
 
   // PRIVATE METHODS ====================================================================
 
   /**
-   * Normalizes the path information.
+   * Normalizes the specified path.
    * @param path path, or {@code null}
    * @return normalized path
    */

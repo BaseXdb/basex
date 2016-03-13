@@ -8,6 +8,7 @@ import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;
@@ -16,7 +17,7 @@ import org.basex.util.*;
 /**
  * Abstract filter expression.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class Filter extends Preds {
@@ -79,18 +80,17 @@ public abstract class Filter extends Preds {
     final Value init = qc.value;
     qc.value = Path.initial(qc, root);
     try {
-      super.compile(qc, scp);
+      return super.compile(qc, scp);
     } finally {
       qc.value = init;
     }
-    return optimize(qc, scp);
   }
 
   @Override
   public final Expr optimizeEbv(final QueryContext qc, final VarScope scp) throws QueryException {
     final Expr e = merge(root, qc, scp);
     if(e != this) {
-      qc.compInfo(QueryText.OPTWRITE, this);
+      qc.compInfo(QueryText.OPTREWRITE_X, this);
       return e;
     }
     return super.optimizeEbv(qc, scp);
@@ -103,7 +103,7 @@ public abstract class Filter extends Preds {
    * @return self reference
    */
   public Expr addPred(final Expr p) {
-    preds = Array.add(preds, new Expr[preds.length + 1], p);
+    preds = new ExprList(preds.length + 1).add(preds).add(p).finish();
     return new CachedFilter(info, root, preds);
   }
 
@@ -143,9 +143,7 @@ public abstract class Filter extends Preds {
     // evaluate positional predicates
     Expr e = root;
     boolean opt = false;
-    final int pl = preds.length;
-    for(int p = 0; p < pl; p++) {
-      final Expr pred = preds[p];
+    for(final Expr pred : preds) {
       final Pos pos = pred instanceof Pos ? (Pos) pred : null;
       final boolean last = pred.isFunction(Function.LAST);
 
@@ -155,7 +153,7 @@ public abstract class Filter extends Preds {
           e = FnSubsequence.eval((Value) e, e.size(), 1);
         } else {
           // rewrite positional predicate to basex:last-from
-          e = Function._BASEX_LAST_FROM.get(null, info, e);
+          e = Function._UTIL_LAST_FROM.get(null, info, e);
         }
         opt = true;
       } else if(pos != null) {
@@ -164,10 +162,10 @@ public abstract class Filter extends Preds {
           e = FnSubsequence.eval((Value) e, pos.min, pos.max - pos.min + 1);
         } else if(pos.min == pos.max) {
           // example: expr[pos] -> basex:item-at(expr, pos.min)
-          e = Function._BASEX_ITEM_AT.get(null, info, e, Int.get(pos.min));
+          e = Function._UTIL_ITEM_AT.get(null, info, e, Int.get(pos.min));
         } else {
           // example: expr[pos] -> basex:item-range(expr, pos.min, pos.max)
-          e = Function._BASEX_ITEM_RANGE.get(null, info, e, Int.get(pos.min), Int.get(pos.max));
+          e = Function._UTIL_ITEM_RANGE.get(null, info, e, Int.get(pos.min), Int.get(pos.max));
         }
         opt = true;
       } else if(num(pred)) {
@@ -175,7 +173,7 @@ public abstract class Filter extends Preds {
          *   example: expr[pos] -> basex:item-at(expr, pos)
          * - only choose deterministic and context-independent offsets.
          *   example: (1 to 10)[random:integer(10)]  or  (1 to 10)[.] */
-        e = Function._BASEX_ITEM_AT.get(null, info, e, pred);
+        e = Function._UTIL_ITEM_AT.get(null, info, e, pred);
         opt = true;
       } else {
         // rebuild filter if no optimization can be applied
@@ -184,7 +182,7 @@ public abstract class Filter extends Preds {
     }
 
     if(opt) {
-      qc.compInfo(QueryText.OPTWRITE, this);
+      qc.compInfo(QueryText.OPTREWRITE_X, this);
       return e.optimize(qc, scp);
     }
 

@@ -5,7 +5,6 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
-import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.in.DataInput;
@@ -16,7 +15,7 @@ import org.basex.util.hash.*;
 /**
  * Simple stop words set for full-text requests.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class StopWords extends TokenSet {
@@ -29,11 +28,10 @@ public final class StopWords extends TokenSet {
    * Constructor, reading stopword list from disk.
    * And creating database stopword file.
    * @param data data reference
-   * @param options main options
+   * @param file stopwords file
    * @throws IOException I/O exception
    */
-  public StopWords(final Data data, final MainOptions options) throws IOException {
-    final String file = options.get(MainOptions.STOPWORDS);
+  public StopWords(final Data data, final String file) throws IOException {
     if(!file.isEmpty()) read(IO.get(file), false);
     try(final DataOutput out = new DataOutput(data.meta.dbfile(DATASWL))) {
       write(out);
@@ -45,16 +43,16 @@ public final class StopWords extends TokenSet {
    * @param data data reference
    */
   public void comp(final Data data) {
-    // no data reference, or stop words have already been defined..
-    if(data == null || size() != 0 || data.inMemory()) return;
-
-    // try to parse the stop words file of the current database
-    final IOFile file = data.meta.dbfile(DATASWL);
-    if(!file.exists()) return;
-    try(final DataInput in = new DataInput(data.meta.dbfile(DATASWL))) {
-      read(in);
-    } catch(final Exception ex) {
-      Util.debug(ex);
+    // stop words have not been initialized, database is on disk...
+    if(isEmpty() && data != null && !data.inMemory()) {
+      // try to parse the stop words file of the current database
+      final IOFile file = data.meta.dbfile(DATASWL);
+      if(!file.exists()) return;
+      try(final DataInput in = new DataInput(data.meta.dbfile(DATASWL))) {
+        read(in);
+      } catch(final Exception ex) {
+        Util.debug(ex);
+      }
     }
   }
 

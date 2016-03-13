@@ -14,7 +14,7 @@ import org.basex.util.hash.*;
 /**
  * Iterative step expression with one or more simple numeric predicates.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class IterPosStep extends Step {
@@ -61,7 +61,7 @@ final class IterPosStep extends Step {
           }
         }
 
-        for(ANode node; (node = iter.next()) != null;) {
+        for(final ANode node : iter) {
           qc.checkStop();
           if(test.eq(node) && preds(node)) return node.finish();
         }

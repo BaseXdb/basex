@@ -16,7 +16,7 @@ import org.basex.util.list.*;
 /**
  * Evaluates the 'show backups' command and shows available backups.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class ShowBackups extends ABackup {
@@ -27,7 +27,7 @@ public final class ShowBackups extends ABackup {
     table.header.add(NAME);
     table.header.add(SIZE);
 
-    final IOFile dbpath = soptions.dbpath();
+    final IOFile dbpath = soptions.dbPath();
     for(final String name : context.databases.backups()) {
       final TokenList tl = new TokenList();
       tl.add(name);

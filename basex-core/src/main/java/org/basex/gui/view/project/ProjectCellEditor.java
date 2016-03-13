@@ -10,7 +10,7 @@ import javax.swing.tree.*;
  * Custom tree cell editor. The edited node name will be updated in
  * {@link ProjectNode#setUserObject}.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class ProjectCellEditor extends DefaultTreeCellEditor {
@@ -19,7 +19,7 @@ final class ProjectCellEditor extends DefaultTreeCellEditor {
    * @param tr tree
    * @param rend renderer
    */
-  public ProjectCellEditor(final JTree tr, final DefaultTreeCellRenderer rend) {
+  ProjectCellEditor(final JTree tr, final DefaultTreeCellRenderer rend) {
     super(tr, rend);
   }
 

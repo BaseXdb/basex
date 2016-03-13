@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * This class contains all query error messages.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public enum QueryError {
@@ -29,6 +29,8 @@ public enum QueryError {
   BASX_OPTIONS_X(BASX, 2, "Unknown database option '%'."),
   /** BASX0002. */
   BASX_VALUE_X_X(BASX, 2, "Database option '%' cannot be set to '%'."),
+  /** BASX0002. */
+  BASX_WHICH_X(BASX, 2, "%"),
   /** BASX0003. */
   BASX_RESTXQ_X(BASX, 3, "%"),
   /** BASX0004. */
@@ -43,18 +45,36 @@ public enum QueryError {
   BASX_ANNTYPE_X_X_X(BASX, 6, "%: % expected, % found."),
   /** BASX0007. */
   BASX_TWICE_X_X(BASX, 6, "Annotation %% was declared twice."),
-
-  /** XUST0002. */
-  BASEX_MOD(XUST, 2, "All transform expressions must be updating or return an empty sequence."),
+  /** BASX0008. */
+  BASX_FITEM_X(BASX, 8, "Function items cannot be cached: %."),
+  /** BASX0009. */
+  BASX_UPMODIFY(BASX, 9, "Transform expressions must all be updating or return an empty sequence."),
+  /** XQST0010. */
+  BASX_OPTDECL_X(BASX, 10, "Database option not allowed in library module: %."),
 
   // Admin module
 
-  /** FODC0001. */
-  BXAD_TODAY(FOAD, 1, "Today's log file cannot be deleted."),
-  /** FODC0002. */
-  BXAD_DELETE_X(FOAD, 2, "Log file could not be deleted: %."),
-  /** FODC0003. */
-  BXAD_TYPE_X(FOAD, 3, "Log type must consist of uppercase letters: \"%\"."),
+  /** BXAD0001. */
+  BXAD_TODAY(BXAD, 1, "Today's log file cannot be deleted."),
+  /** BXAD0002. */
+  BXAD_DELETE_X(BXAD, 2, "Log file could not be deleted: %."),
+  /** BXAD0003. */
+  BXAD_TYPE_X(BXAD, 3, "Log type must consist of uppercase letters: \"%\"."),
+
+  // Async module
+
+  /** ASYN0001. */
+  ASYNC_UNEXPECTED_X(ASYNC, "unexpected", "Unexpected error: %"),
+  /** ASYN0002. */
+  ASYNC_OUTOFRANGE_X(ASYNC, "out-of-range", "Specified value is out of range: %."),
+  /** ASYN0003. */
+  ASYNC_UPDATING(ASYNC, "updating", "No updating expression allowed."),
+  /** ASYN0004. */
+  ASYNC_NONUPDATING(ASYNC, "non-updating", "Updating expression expected."),
+  /** ASYN0005. */
+  ASYNC_UNKNOWN_X(ASYNC, "unknown", "Unknown query id: %."),
+  /** ASYN0005. */
+  ASYNC_RUNNING_X(ASYNC, "running", "Query is still running: %."),
 
   // Client module
 
@@ -68,6 +88,8 @@ public enum QueryError {
   BXCL_COMMAND_X(BXCL, 4, "Command could not be executed: %"),
   /** BXCL0005. */
   BXCL_QUERY_X(BXCL, 5, "Query could not be executed: %"),
+  /** BXCL0006. */
+  BXCL_FITEM_X(BXCL, 6, "Result is a function item: %."),
 
   // Conversion module
 
@@ -77,6 +99,10 @@ public enum QueryError {
   BXCO_BASE64_X_X(BXCO, 1, "Conversion of '%' to encoding '%' failed."),
   /** BXCO0002. */
   BXCO_ENCODING_X(BXCO, 2, "Unknown encoding '%'."),
+  /** BXCO0003. */
+  BXCO_INVBASE_X(BXCO, 3, "Unsupported base: %."),
+  /** BXCO0004. */
+  BXCO_INVBASEDIG_X_X(BXCO, 4, "Invalid digit for base %: %."),
 
   // CSV module
 
@@ -108,7 +134,7 @@ public enum QueryError {
   /** BXDB0007. */
   BXDB_LOCK_X(BXDB, 7, "%"),
   /** BXDB0008. */
-  BXDB_RENAME_X(BXDB, 8, "Invalid target path: %."),
+  BXDB_PATH_X(BXDB, 8, "Invalid path: %."),
   /** BXDB0009. */
   BXDB_RANGE_X_X_X(BXDB, 9, "Database '%' has no node with % value %."),
   /** BXDB0011. */
@@ -145,6 +171,11 @@ public enum QueryError {
   /** BXHL0001. */
   BXHL_IO_X(BXHL, 1, "%"),
 
+  // Inspection module
+
+  /** Util error. */
+  INSPECT_UNKNOWN_X(INSPECT, "unknown", "Component '%' does not exist."),
+
   // JSON module
 
   /** BXJS0001. */
@@ -157,6 +188,11 @@ public enum QueryError {
   BXJS_SERIAL_X(BXJS, 2, "JSON serializer: %."),
   /** BXJS0003. */
   BXJS_INVALID_X(BXJS, 1, "'%':'%' is not supported by the target format."),
+
+  // Output module
+
+  /** BXOU0001. */
+  ERRFORMAT_X_X(BXOU, 1, "%: %."),
 
   // Process module
 
@@ -175,7 +211,7 @@ public enum QueryError {
   /** BXRE0001. */
   BXRE_WHICH_X(BXRE, 1, "Package '%' does not exist."),
   /** BXRE0002. */
-  BXRE_URI_X(BXRE, 2, "URI is invalid or has no path component: '%'."),
+  BXRE_URI_X(BXRE, 2, "URI is invalid: '%'."),
   /** BXRE0003. */
   BXRE_NOTINST_X(BXRE, 3, "Required package '%' is not installed."),
   /** BXRE0004. */
@@ -227,6 +263,8 @@ public enum QueryError {
   BXVA_START_X(BXVA, 2, "Validation could not be started: %"),
   /** BXVA0003. */
   BXVA_RELAXNG_X(BXVA, 3, "RelaxNG validation is not available."),
+  /** BXVA0004. */
+  BXVA_XSDVERSION_X(BXVA, 4, "No XML Schema implementation found for version '%'."),
 
   // Web module
 
@@ -246,7 +284,9 @@ public enum QueryError {
   /** BXXQ0003. */
   BXXQ_PERM2_X(BASX, 3, "% permission required."),
   /** BXXQ0004. */
-  BXXQ_STOPPED(BXXQ, 4, "Timeout or assigned memory was exceeded."),
+  BXXQ_TIMEOUT(BXXQ, 4, "The timeout was exceeded."),
+  /** BXXQ0004. */
+  BXXQ_MEMORY(BXXQ, 4, "The memory limit was exceeded."),
 
   // Unit module
 
@@ -264,11 +304,11 @@ public enum QueryError {
   // User Module
 
   /** User error. */
-  USER_NAME_X(USER, "name", "Invalid user name: %."),
+  USER_NAME_X(USER, "name", "Invalid user name: '%'."),
   /** User error. */
-  USER_PATTERN_X(USER, "pattern", "Invalid database pattern: %."),
+  USER_PATTERN_X(USER, "pattern", "Invalid database pattern: '%'."),
   /** User error. */
-  USER_PERMISSION_X(USER, "permission", "Invalid permission: %."),
+  USER_PERMISSION_X(USER, "permission", "Invalid permission: '%'."),
   /** User error. */
   USER_UNKNOWN_X(USER, "unknown", "User '%' does not exist."),
   /** User error. */
@@ -282,7 +322,9 @@ public enum QueryError {
   /** User error. */
   USER_UPDATE_X_X(USER, "update", "User '%' can only be % once."),
   /** User error. */
-  USER_UPDATE_X_X_X(USER, "update", "Pattern '%' of user '%' can only be % once."),
+  USER_SAMEPAT_X(USER, "update", "Pattern '%' is specified more than once."),
+  /** User error. */
+  USER_SAMEPERM_X_X(USER, "update", "User '%' can only be % once."),
   /** User error. */
   USER_CONFLICT_X(USER, "conflict", "User '%' cannot be both altered and dropped."),
 
@@ -540,9 +582,6 @@ public enum QueryError {
   /** FOJS0007. */
   JSON_ESCAPE_X(FOJS, 7, "Invalid escape sequence: %."),
 
-  /** FOMP0001. */
-  MAP_TZ(FOMP, 1, "Map cannot contain keys with and without timezone."),
-
   /** FONS0004. */
   NSDECL_X(FONS, 4, "No namespace declared for prefix '%'."),
 
@@ -565,8 +604,9 @@ public enum QueryError {
   ONEORMORE(FORG, 4, "One or more values expected."),
   /** FORG0005. */
   EXACTLYONE(FORG, 5, "Exactly one value expected."),
+
   /** FORG0006. */
-  EXPTYPE_X_X_X(FORG, 6, "% expected, % found: %."),
+  MINMAX_X_X_X(FORG, 6, "% expected, % found: %."),
   /** FORG0006. */
   NOTCMP_X(FORG, 6, "Items of type % cannot be compared."),
   /** FORG0006. */
@@ -579,38 +619,6 @@ public enum QueryError {
   SUMNUM_X_X(FORG, 6, "Number expected, % found: %."),
   /** FORG0006. */
   SUMDUR_X_X(FORG, 6, "Duration expected, % found: %."),
-  /** FORG0006. */
-  BINARY_X(FORG, 6, "Binary expected, % found."),
-  /** FORG0006. */
-  STRNOD_X_X(FORG, 6, "String or node expected, % found: %."),
-  /** FORG0006. */
-  MAP_X_X(FORG, 6, "Map expected, % found: %."),
-  /** FORG0006. */
-  ELMMAP_X_X_X(FORG, 6, "element(%) or map expected, % found: %."),
-  /** FORG0006. */
-  ELMSTR_X_X_X(FORG, 6, "element(%) or string expected, % found: %."),
-  /** FORG0006. */
-  STRBIN_X_X(FORG, 6, "String or binary expected, % found: %."),
-  /** FORG0006. */
-  JAVACONSTR_X_X(FORG, 6, "Unknown constructor: %(%)."),
-  /** FORG0006. */
-  JAVAMETHOD_X_X(FORG, 6, "Unknown method: %(%)."),
-  /** FORG0006. */
-  JAVACALL_X_X(FORG, 6, "Invalid call of Java function: %(%)."),
-  /** FORG0006. */
-  JAVAARGS_X_X(FORG, 6, "Invalid arguments: % expected, % found."),
-  /** FORG0006. */
-  JAVAERROR_X(FORG, 6, "Java function call failed: %."),
-  /** FORG0006. */
-  INVBASE_X(FORG, 6, "Unsupported base: %."),
-  /** FORG0006. */
-  INVBASEDIG_X_X(FORG, 6, "Invalid digit for base %: %."),
-  /** FORG0006. */
-  ERRFORMAT_X_X(FORG, 6, "%: %."),
-  /** FORG0006. */
-  INVALIDOPT_X(FORG, 6, "%"),
-  /** FORG0006. */
-  INVALIDOPTION_X(FORG, 6, "Unknown option '%'."),
 
   /** FORG0008. */
   FUNZONE_X_X(FORG, 8, "% and % have different timezones."),
@@ -649,15 +657,11 @@ public enum QueryError {
   /** FOUP0002. */
   UPPUTERR_X(FOUP, 2, "File '%' could not be written."),
   /** FOUP0002. */
+  UPDBPUT_X(FOUP, 2, "Resource '%' could not be written."),
+  /** FOUP0002. */
   UPDROPBACK_X_X(FOUP, 2, "Backup '%' could not be %."),
   /** FOUP0002. */
   UPDBERROR_X_X(FOUP, 2, "Database '%' could not be %."),
-  /** FOUP0002. */
-  UPDBPUT_X(FOUP, 2, "Resource '%' could not be written."),
-  /** FOUP0002. */
-  UPDBDELETE_X(FOUP, 2, "Resource '%' could not be deleted."),
-  /** FOUP0002. */
-  UPDBRENAME_X(FOUP, 2, "Resource '%' could not be renamed."),
   /** FOUP0002. */
   UPDBOPTERR_X(FOUP, 2, "%"),
 
@@ -708,8 +712,8 @@ public enum QueryError {
   SERDT(SEPM, 4, "If 'doctype-system' is specified, the root must be a single element."),
   /** SESU0007. */
   SERENCODING_X(SESU, 7, "Unknown encoding '%'."),
-  /** SESU0007. */
-  SERMAP_X_X(SESU, 7, "Character '#x%;' cannot be mapped to '%'."),
+  /** SERE0008. */
+  SERENC_X_X(SERE, 8, "Character '#x%;' cannot be mapped to '%'."),
   /** SEPM0009. */
   SERSTAND(SEPM, 9, "Invalid combination of 'omit-xml-declaration'."),
   /** SEPM0010. */
@@ -727,7 +731,7 @@ public enum QueryError {
   /** SEPM0017. */
   SERMAP_X(SEPM, 17, "Character map '%' is not defined."),
   /** SEPM0017. */
-  SEROPT_X(SEPM, 17, "%."),
+  SEROPT_X(SEPM, 17, "%"),
   /** SEPM0017. */
   SEROPTION_X(SEPM, 17, "Serialization parameter '%' is invalid."),
   /** SERE0020. */
@@ -756,8 +760,6 @@ public enum QueryError {
   QUERYINV_X(XPST, 3, "Query contains an illegal character (#%)."),
   /** XPST0003. */
   NOQUOTE_X(XPST, 3, "Expecting quote%."),
-  /** XPST0003. */
-  NOVALIDATE(XPST, 3, "Invalid validation expression."),
   /** XPST0003. */
   NUMBERWS(XPST, 3, "Expecting separator after number."),
   /** XPST0003. */
@@ -811,21 +813,9 @@ public enum QueryError {
   /** XPST0003. */
   PIWRONG(XPST, 3, "Expecting name of processing-instruction."),
   /** XPST0003. */
-  NSWRONG(XPST, 3, "Expecting namespace prefix."),
-  /** XPST0003. */
-  NOENCLEXPR(XPST, 3, "Expecting valid expression after curly brace."),
-  /** XPST0003. */
   NOFTSELECT_X(XPST, 3, "Expecting quote or opening curly brace%."),
   /** XPST0003. */
-  NODOCCONS(XPST, 3, "Expecting expression in document constructor."),
-  /** XPST0003. */
-  NOTXTCONS(XPST, 3, "Expecting expression in text constructor."),
-  /** XPST0003. */
-  NOCOMCONS(XPST, 3, "Expecting expression in comment constructor."),
-  /** XPST0003. */
-  NOFUNBODY(XPST, 3, "Expecting function body."),
-  /** XPST0003. */
-  FUNCMISS_X(XPST, 3, "Expecting closing bracket for function '%'."),
+  FUNCMISS_X(XPST, 3, "Expecting closing bracket: %."),
   /** XPST0003. */
   MAPTAAT_X(XPST, 3, "Expecting atomic key type for map, found '%'."),
   /** XPST0003. */
@@ -925,23 +915,25 @@ public enum QueryError {
   SCHEMAINV_X(XPST, 8, "Undefined schema name '%'."),
 
   /** XPST0017. */
-  FUNCPRIVATE_X(XPST, 17, "Function '%' is not visible from this module."),
+  FUNCPRIVATE_X(XPST, 17, "Function not visible: %."),
   /** XPST0017. */
-  FUNCSIMILAR_X_X(XPST, 17, "Unknown function '%'; similar: '%'."),
+  FUNCSIMILAR_X_X(XPST, 17, "Unknown function: % (similar: %)."),
   /** XPST0017. */
   FUNCARGNUM_X_X_X(XPST, 17, "%: % argument% supplied."),
   /** XPST0017. */
   FUNCTYPES_X_X_X_X(XPST, 17, "%: % argument% supplied (% expected)."),
   /** XPST0017. */
-  FUNCUNKNOWN_X(XPST, 17, "Unknown function '%'."),
+  WHICHFUNC_X(XPST, 17, "Unknown function: %."),
   /** XPST0017. */
-  FUNCNOIMPL_X(XPST, 17, "Function '%' not implemented."),
+  JAVAWHICH_X_X_X(XPST, 17, "Java function %:%#% is unknown."),
   /** XPST0017. */
-  FUNCJAVA_X(XPST, 17, "Java function '%' not found."),
+  JAVAAMB_X_X_X(XPST, 17, "Java function %:%#% is ambiguous."),
   /** XPST0017. */
-  JAVAAMBIG_X(XPST, 17, "Several implementations found for '%'."),
+  JAVACONSAMB_X(XPST, 17, "Java constructor % is ambiguous."),
   /** XPST0017. */
-  JAVAINIT_X(XPST, 17, "Class cannot be initialized: %."),
+  FUNCNOIMPL_X(XPST, 17, "Function not implemented: %."),
+  /** XPST0017. */
+  JAVAINIT_X_X(XPST, 17, "%: %."),
 
   /** XPST0051. */
   TYPEUNKNOWN_X(XPST, 51, "Unknown type: %."),
@@ -952,6 +944,19 @@ public enum QueryError {
   /** XPST0081. */
   NSMISS_X(XPST, 81, "QName '%' has no namespace."),
 
+  /** XPTY0004. */
+  WHICHCONSTR_X_X(XPTY, 4, "Unknown Java constructor: %(%)."),
+  /** XPTY0004. */
+  WHICHMETHOD_X_X(XPTY, 4, "Unknown Java method: %(%)."),
+  /** XPTY0004. */
+  JAVAARGS_X_X_X(XPTY, 4, "Function %(%) cannot be called with (%)."),
+  /** XPTY0004. */
+  JAVAERROR_X_X_X(XPTY, 4, "%(%): %."),
+
+  /** XPTY0004. */
+  JAVAARITY_X_X_X_X_X(XPTY, 4, "Java function %:%#%: % argument% supplied."),
+  /** XPTY0004. */
+  ZEROFUNCS_X_X(XPTY, 4, "Zero-arity functions expected, % found: %."),
   /** XPTY0004. */
   NONAME_X(XPTY, 4, "Name expected, '%' found."),
   /** XPTY0004. */
@@ -970,7 +975,6 @@ public enum QueryError {
   STRQNM_X_X(XPTY, 4, "String or QName expected, % found: %."),
   /** XPTY0004. */
   CPIWRONG_X_X(XPTY, 4, "String or NCName expected, % found: %."),
-
   /** XPTY0004. */
   INVCAST_X_X(XPTY, 4, "Cannot cast % to %."),
   /** XPTY0004. */
@@ -984,31 +988,56 @@ public enum QueryError {
   /** XPTY0004. */
   CALCTYPE_X_X_X(XPTY, 4, "% not defined for % and %."),
   /** XPTY0004. */
-  INVFUNCITEM_X(XPTY, 4, "Function expected, % found: %."),
-
+  INVFUNCITEM_X_X(XPTY, 4, "Function expected, % found: %."),
+  /** XPTY0004. */
+  NOPAREN_X_X(XPTY, 4, "No parenthesis expected after %."),
   /** XPTY0004. */
   CMPTYPE_X(XPTY, 4, "Items of type % cannot be compared."),
   /** XPTY0004. */
   CMPTYPES_X_X(XPTY, 4, "Items of type % and % cannot be compared."),
   /** XPTY0004. */
-  DOCATTS(XPTY, 4, "Cannot add attributes to a document node."),
+  DOCATTS_X(XPTY, 4, "Cannot add attributes to a document node: %."),
   /** XPTY0004. */
-  DOCNS(XPTY, 4, "Cannot add namespaces to a document node."),
+  DOCNS_X(XPTY, 4, "Cannot add namespaces to a document node: %."),
   /** XPTY0004. */
-  INVARITY_X_X_X_X(XPTY, 4, "%: % argument% supplied (% expected)."),
+  INVARITY_X_X_X_X(XPTY, 4, "% argument% supplied (% expected): %."),
+  /** XPTY0004. */
+  FUNARITY_X_X_X(XPTY, 4, "Function with % argument% supplied (% expected)."),
   /** XPTY0004. */
   INVNCNAME_X(XPTY, 4, "Invalid NCName: '%'."),
   /** XPTY0004. */
   CITYPES_X_X(XPTY, 4, "Incompatible types in context value declarations: % vs. %."),
   /** XPTY0004. */
   LOOKUP_X(XPTY, 4, "Input of lookup operator is not a map or array: %."),
+  /** XPTY0004. */
+  INVALIDOPT_X(XPTY, 4, "%"),
+  /** XPTY0004. */
+  BINARY_X(XPTY, 4, "Binary expected, % found."),
+  /** FORG0006. */
+  STRNOD_X_X(XPTY, 4, "String or node expected, % found: %."),
+  /** XPTY0004. */
+  MAP_X_X(XPTY, 4, "Map expected, % found: %."),
+  /** XPTY0004. */
+  ELMMAP_X_X_X(XPTY, 4, "element(%) or map expected, % found: %."),
+  /** XPTY0004. */
+  ELMSTR_X_X_X(XPTY, 4, "element(%) or string expected, % found: %."),
+  /** XPTY0004. */
+  STRBIN_X_X(XPTY, 4, "String or binary expected, % found: %."),
+  /** XPTY0004. */
+  INVALIDOPTION_X(XPTY, 4, "Unknown option '%'."),
+  /** XPTY0004. */
+  FUNCUP_X(XPTY, 4, "Function must not be updating: %."),
+  /** XPTY0004. */
+  FUNCUP(XPTY, 4, "Function must not be updating."),
+  /** XPTY0004. */
+  FUNCNOTUP(XPTY, 4, "Function is not updating."),
 
   /** XPTY0018. */
-  EVALNODESVALS(XPTY, 18, "Path yields both nodes and atomic values."),
+  MIXEDRESULTS(XPTY, 18, "Path returns both nodes and non-nodes."),
   /** XPTY0019. */
-  PATHNODE_X_X_X(XPTY, 19, "%: node expected as input, % found: %."),
+  PATHNODE_X_X_X(XPTY, 19, "%: node expected, % found: %."),
   /** XPTY0020. */
-  STEPNODE_X_X_X(XPTY, 20, "%: node expected as input, % found: %."),
+  STEPNODE_X_X_X(XPTY, 20, "%: node expected, % found: %."),
   /** XPTY0117. */
   NSSENS_X_X(XPTY, 117, "Cannot cast % to %."),
 
@@ -1050,8 +1079,6 @@ public enum QueryError {
   DUPLNSCONS_X(XQDY, 102, "Duplicate namespace declaration: '%'."),
   /** XQDY0137. */
   MAPDUPLKEY_X_X_X(XQDY, 137, "Key % already exists in map (values: % vs. %)."),
-  /** XPDY0139. */
-  MAPTZ(XPDY, 139, "Map cannot contains keys with and without timezone."),
 
   /** XQST0009. */
   IMPLSCHEMA(XQST, 9, "Schema import not supported."),
@@ -1092,17 +1119,17 @@ public enum QueryError {
   /** XQST0057. */
   NSEMPTY(XQST, 57, "Namespace URI cannot be empty."),
   /** XQST0059. */
-  INSTERR_X(XQST, 59, "Could not instantiate module '%'."),
+  WHICHMODULE_X(XQST, 59, "Module not found: %."),
   /** XQST0059. */
-  WHICHMODULE_X(XQST, 59, "Module '%' not found."),
+  WHICHCLASS_X(XQST, 59, "Java class not found: %."),
   /** XQST0059. */
-  WHICHCLASS_X(XQST, 59, "Class not found: '%'."),
+  MODINIT_X_X_X(XQST, 59, "Could not initialize %: % (%)."),
   /** XQST0059. */
-  MODINITERR_X(XQST, 59, "Module not initialized: %."),
+  MODINST_X_X(XQST, 59, "Could not instantiate %: %."),
   /** XQST0059. */
-  WHICHMODFILE_X(XQST, 59, "Could not retrieve module '%'."),
+  WHICHMODFILE_X(XQST, 59, "Could not retrieve module: %."),
   /** XQST0059. */
-  WRONGMODULE_X_X(XQST, 59, "Wrong URI '%' in imported module '%'."),
+  WRONGMODULE_X_X_X(XQST, 59, "Imported module '%' has unexpected namespace: '%' vs '%'."),
   /** XQST0060. */
   FUNNONS_X(XQST, 60, "Namespace needed for function '%'."),
   /** XQST0065. */
@@ -1160,7 +1187,7 @@ public enum QueryError {
   /** XQST0106. */
   DUPLFUNVIS(XQST, 106, "More than one visibility annotation declared."),
   /** XQST0108. */
-  MODOUT(XQST, 108, "No output declarations allowed in library modules."),
+  OPTDECL_X(XQST, 108, "Output declaration not allowed library module: %."),
   /** XQST0109. */
   OUTMAP_X(XQST, 109, "Character map '%' is not defined."),
   /** XQST0109. */
@@ -1179,24 +1206,22 @@ public enum QueryError {
   TAGWRONG_X_X(XQST, 118, "Different start and end tag: <%>...</%>."),
   /** XQST0119. */
   OUTDOC_X(XQST, 119, "Serialization document '%' cannot be parsed."),
-  /** XQST0123. */
-  DECLOPTION_X(XQST, 123, "Unknown option: %."),
   /** XQST0125. */
-  INVISIBLE(XQST, 125, "No visibility annotation allowed in inline function."),
+  NOVISALLOWED(XQST, 125, "No visibility annotation allowed in inline function."),
   /** XQST034. */
   NSAXIS(XQST, 134, "Namespace axis is not supported."),
 
   /** XQTY0024. */
-  NOATTALL(XQTY, 24, "Attribute must follow the root element."),
+  NOATTALL_X(XQTY, 24, "Attribute does not follow root element: %."),
   /** XQTY0024. */
-  NONSALL(XQTY, 24, "Namespaces must follow the root element."),
+  NONSALL_X(XQTY, 24, "Namespaces does not follow root element: %."),
   /** XQTY0105. */
   CONSFUNC_X(XQTY, 105, "Invalid content: %."),
 
   /** XUDY0009. */
-  UPNOPAR_X(XUDY, 9, "Target % has no parent."),
+  UPNOPAR_X(XUDY, 9, "Target has no parent: %."),
   /** XUDY0014. */
-  UPNOTCOPIED_X(XUDY, 14, "% was not created by copy clause."),
+  UPNOTCOPIED_X(XUDY, 14, "Node was not created by copy clause: %."),
   /** XUDY0015. */
   UPMULTREN_X(XUDY, 15, "Node can only be renamed once: %."),
   /** XUDY0015. */
@@ -1204,37 +1229,33 @@ public enum QueryError {
   /** XUDY0016. */
   UPMULTREPL_X(XUDY, 16, "Node can only be replaced once: %."),
   /** XUDY0016. */
-  UPMULTDOC_X_X(XUDY, 16, "Document can only be replaced once: %/%."),
+  UPMULTDOC_X_X(XUDY, 16, "Documents in path '%/%' can only be replaced once."),
   /** XUDY0017. */
-  UPMULTREPV_X(XUDY, 17, "Node can only be replaced once: %"),
+  UPMULTREPV_X(XUDY, 17, "Node can only be replaced once: %."),
   /** XUDY0021. */
-  UPATTDUPL_X(XUDY, 21, "Duplicate attribute %."),
+  UPATTDUPL_X(XUDY, 21, "Duplicate attribute: %."),
   /** XUDY0023. */
-  UPNSCONFL(XUDY, 23, "Conflicts with existing namespaces."),
+  UPNSCONFL_X_X(XUDY, 23, "Namespace conflicts: % vs. %."),
   /** XUDY0024. */
-  UPNSCONFL2(XUDY, 24, "New namespaces conflict with each other."),
+  UPNSCONFL2_X_X(XUDY, 24, "Namespaces conflicts: % vs. %."),
   /** XUDY0027. */
-  UPSEQEMP_X(XUDY, 27, "% target must not be empty."),
+  UPSEQEMP_X(XUDY, 27, "% target is an empty sequence."),
   /** XUDY0029. */
-  UPPAREMPTY(XUDY, 29, "Target has no parent node."),
+  UPPAREMPTY_X(XUDY, 29, "Target has no parent: %."),
   /** XUDY0030. */
-  UPATTELM(XUDY, 30, "Attributes cannot be inserted as child of a document."),
+  UPATTELM_X(XUDY, 30, "Attribute cannot be added to %."),
   /** XUDY0031. */
   UPURIDUP_X(XUDY, 31, "URI '%' is addressed multiple times."),
-
-  /** XUDY0032 (WIP). */
-  UPFUNCNOTUP(XUDY, 32, "Function has no %updating annotation."),
-  /** XUDY0032 (WIP). */
-  UPFUNCUP(XUDY, 32, "No 'updating' keyword specified before function call."),
 
   /** XUST0001. */
   UPNOT_X(XUST, 1, "%: no updating expression allowed."),
   /** XUST0001. */
-  UPALL_X(XUST, 1, "%: all expressions must be updating or return an empty sequence."),
+  UPALL(XUST, 1, "Expressions must all be updating or return an empty sequence."),
   /** XUST0001. */
   UPCTX(XUST, 1, "Context value may not declare an updating expression."),
+
   /** XUST0002. */
-  UPMODIFY(XUST, 2, "Modify clause: all expressions must be updating or return an empty sequence."),
+  UPMODIFY(XUST, 2, "Expressions must all be updating or return an empty sequence."),
   /** XUST0002. */
   UPEXPECTF(XUST, 2, "Function body must be an updating expression."),
   /** XUST0003. */
@@ -1245,27 +1266,35 @@ public enum QueryError {
   UUPFUNCTYPE(XUST, 28, "No return type allowed in updating functions."),
 
   /** XUTY0004. */
-  UPNOATTRPER(XUTY, 4, "Attribute must follow the root element."),
+  UPNOATTRPER_X(XUTY, 4, "Attribute does not follow root element: %."),
   /** XUTY0005. */
-  UPTRGTYP(XUTY, 5, "Single element or document expected as insert target."),
+  UPTRGTYP_X(XUTY, 5, "Target must be element or document: %."),
+  /** XUTY0005. */
+  UPTRGSNGL_X(XUTY, 5, "Target must be single node: %."),
   /** XUTY0006. */
-  UPTRGTYP2(XUTY, 6, "Single element, text, comment or pi expected as insert target."),
+  UPTRGTYP2_X(XUTY, 6, "Target must be element, text, comment or pi: %."),
+  /** XUTY0006. */
+  UPTRGSNGL2_X(XUTY, 6, "Target must be single node: %."),
   /** XUTY0007. */
-  UPTRGDELEMPT(XUTY, 7, "Only nodes can be deleted."),
+  UPTRGDELEMPT_X(XUTY, 7, "Target must be node: %."),
   /** XUTY0008. */
-  UPTRGMULT(XUTY, 8, "Single element, text, attribute, comment or pi expected as replace target."),
+  UPTRGNODE_X(XUTY, 8, "Target must be element, text, attribute, comment or pi: %."),
+  /** XUTY0008. */
+  UPTRGSINGLE_X(XUTY, 8, "Target must be single node: %."),
   /** XUTY0010. */
-  UPWRELM(XUTY, 10, "Replacing nodes must be no attribute nodes."),
+  UPWRELM_X(XUTY, 10, "Node cannot be replaced with attribute: %."),
   /** XUTY0011. */
-  UPWRATTR(XUTY, 11, "Replacing nodes must be attribute nodes."),
+  UPWRATTR_X(XUTY, 11, "Target is no attribute: %."),
   /** XUTY0012. */
-  UPWRTRGTYP(XUTY, 12, "Single element, attribute or pi expected as rename target."),
+  UPWRTRGTYP_X(XUTY, 12, "Target must be element, attribute or pi: %."),
+  /** XUTY0012. */
+  UPWRTRGSINGLE_X(XUTY, 12, "Target must be single node: %."),
   /** XUTY0013. */
-  UPCOPYMULT_X(XUTY, 13, "Value assigned to $% must be a single node."),
+  UPSINGLE_X_X(XUTY, 13, "Value of $% must be single node: %."),
   /** XUTY0013. */
-  UPSOURCE(XUTY, 13, "Source of transform expression must be a single node."),
+  UPSOURCE_X(XUTY, 13, "Transformed expression must be single node: %."),
   /** XUTY0022. */
-  UPATTELM2(XUTY, 22, "Insert target must be an element.");
+  UPATTELM2_X(XUTY, 22, "Attribute cannot be added to %.");
 
   /** Cached enums (faster). */
   private static final QueryError[] VALUES = values();
@@ -1340,7 +1369,7 @@ public enum QueryError {
 
   /**
    * Error types.
-   * @author BaseX Team 2005-15, BSD License
+   * @author BaseX Team 2005-16, BSD License
    * @author Leo Woerteler
    */
   public enum ErrType {
@@ -1348,6 +1377,7 @@ public enum QueryError {
 
     /** BASX Error type. */ BASX(BXERR_PREFIX, BXERRORS_URI),
 
+    /** BXAD Error type. */ BXAD(BXERR_PREFIX, BXERRORS_URI),
     /** BXCL Error type. */ BXCL(BXERR_PREFIX, BXERRORS_URI),
     /** BXCO Error type. */ BXCO(BXERR_PREFIX, BXERRORS_URI),
     /** BXCS Error type. */ BXCS(BXERR_PREFIX, BXERRORS_URI),
@@ -1356,6 +1386,7 @@ public enum QueryError {
     /** BXFT Error type. */ BXFT(BXERR_PREFIX, BXERRORS_URI),
     /** BXHL Error type. */ BXHL(BXERR_PREFIX, BXERRORS_URI),
     /** BXJS Error type. */ BXJS(BXERR_PREFIX, BXERRORS_URI),
+    /** BXOU Error type. */ BXOU(BXERR_PREFIX, BXERRORS_URI),
     /** BXPR Error type. */ BXPR(BXERR_PREFIX, BXERRORS_URI),
     /** BXRA Error type. */ BXRA(BXERR_PREFIX, BXERRORS_URI),
     /** BXRE Error type. */ BXRE(BXERR_PREFIX, BXERRORS_URI),
@@ -1365,21 +1396,22 @@ public enum QueryError {
     /** BXWE Error type. */ BXWE(BXERR_PREFIX, BXERRORS_URI),
     /** BXXQ Error type. */ BXXQ(BXERR_PREFIX, BXERRORS_URI),
     /** HASH Error type. */ HASH(BXERR_PREFIX, BXERRORS_URI),
-    /** UNIT Error type. */ UNIT(UNIT_PREFIX,  UNIT_URI),
-    /** USER Error type. */ USER(USER_PREFIX,  USER_URI),
+    /** INSP Error type. */ INSPECT(INSPECT_PREFIX, INSPECT_URI),
+    /** UNIT Error type. */ UNIT(UNIT_PREFIX, UNIT_URI),
+    /** USER Error type. */ USER(USER_PREFIX, USER_URI),
 
     // EXPath errors
 
-    /** ARCH Error type. */ ARCH(EXPERR_PREFIX, EXPERROR_URI),
-    /** BIN  Error type. */ BIN(BIN_PREFIX,     BIN_URI),
-    /** CX   Error type. */ CX(EXPERR_PREFIX,   EXPERROR_URI),
-    /** FILE Error type. */ FILE(FILE_PREFIX,   FILE_URI),
-    /** HC   Error type. */ HC(EXPERR_PREFIX,   EXPERROR_URI),
-    /** ZIP  Error type. */ ZIP(EXPERR_PREFIX,  EXPERROR_URI),
+    /** ARCH  Error type. */ ARCH(EXPERR_PREFIX, EXPERROR_URI),
+    /** ASYNC Error type. */ ASYNC(ASYNC_PREFIX, ASYNC_URI),
+    /** BIN   Error type. */ BIN(BIN_PREFIX,     BIN_URI),
+    /** CX    Error type. */ CX(EXPERR_PREFIX,   EXPERROR_URI),
+    /** FILE  Error type. */ FILE(FILE_PREFIX,   FILE_URI),
+    /** HC    Error type. */ HC(EXPERR_PREFIX,   EXPERROR_URI),
+    /** ZIP   Error type. */ ZIP(EXPERR_PREFIX,  EXPERROR_URI),
 
     // W3 errors
 
-    /** FOAD Error type. */ FOAD,
     /** FOAP Error type. */ FOAP,
     /** FOAR Error type. */ FOAR,
     /** FOAY Error type. */ FOAY,
@@ -1391,7 +1423,6 @@ public enum QueryError {
     /** FOFD Error type. */ FOFD,
     /** FOER Error type. */ FOER,
     /** FOJS Error type. */ FOJS,
-    /** FOMP Error type. */ FOMP,
     /** FONS Error type. */ FONS,
     /** FORG Error type. */ FORG,
     /** FORX Error type. */ FORX,

@@ -43,36 +43,33 @@ function setText(message, type) {
   i.textContent = message;
 };
 
-var searchDelay = 200;
-var _d;
-function query(wait, success, key, query, enforce, target) {
-  var d = new Date();
-  _d = d;
+var _running = 0;
+function query(key, query, enforce, target) {
+  _running++;
   setTimeout(function() {
-    if(_d != d) return;
-    if(wait) setWarning(wait);
+    if(_running) setWarning("Please wait…");
+  }, 500);
 
-    var name = document.getElementById("name");
-    var resource = document.getElementById("resource");
-    var sort = document.getElementById("sort");
-    var loglist = document.getElementById("loglist");
-    var url = key +
-      "?name=" + encodeURIComponent(name ? name.value : "") +
-      "&resource=" + encodeURIComponent(resource ? resource.value : "") +
-      "&sort=" + encodeURIComponent(sort ? sort.value : "") +
-      "&loglist=" + encodeURIComponent(loglist ? loglist.value : "");
-    request("POST", url, query,
-      function(req) {
-        if(_d != d) return;
-        target(req.responseText);
-        if(success) setInfo(success);
-      },
-      function(req) {
-        if(_d != d) return;
-        setErrorFromResponse(req);
-      }
-    )
-  }, enforce ? 0 : searchDelay);
+  var name = document.getElementById("name");
+  var resource = document.getElementById("resource");
+  var sort = document.getElementById("sort");
+  var loglist = document.getElementById("loglist");
+  var url = key +
+    "?name=" + encodeURIComponent(name ? name.value : "") +
+    "&resource=" + encodeURIComponent(resource ? resource.value : "") +
+    "&sort=" + encodeURIComponent(sort ? sort.value : "") +
+    "&loglist=" + encodeURIComponent(loglist ? loglist.value : "");
+  request("POST", url, query,
+    function(req) {
+      _running--;
+      target(req.responseText);
+      setInfo("Query was successful.");
+    },
+    function(req) {
+      _running--;
+      if(req.status != 410) setErrorFromResponse(req);
+    }
+  )
 };
 
 // Jetty and Tomcat support (both return error messages differently)
@@ -86,55 +83,43 @@ function setErrorFromResponse(req) {
 };
 
 var _list;
-function logslist(wait, success) {
-  var input = document.getElementById('loglist').value.trim();
-  if(_list == input) return false;
-  _list = input;
-  query(wait, success, 'loglist', input, false, function(text) {
+function logList() {
+  var list = document.getElementById('loglist').value.trim();
+  if(_list == list) return false;
+  _list = list;
+  query('loglist', list, false, function(text) {
     document.getElementById("list").innerHTML = text;
   })
 };
 
 var _logs;
-function logentries(wait, success) {
-  var input = document.getElementById('logs').value.trim();
-  if(_logs == input) return false;
-  _logs = input;
-  query(wait, success, 'log', input, false, function(text) {
+function logEntries() {
+  var logs = document.getElementById('logs').value.trim();
+  if(_logs == logs) return false;
+  _logs = logs;
+  query('log', logs, false, function(text) {
     document.getElementById("output").innerHTML = text;
   });
 };
 
 var _input;
-function queryResource(wait, success) {
+function queryResource() {
   var input = document.getElementById('input').value.trim();
   if(_input == input) return false;
   _input = input;
-  var target = 'query-resource';
-  var enforce = false;
-  query(wait, success, target, input, enforce, function(text) {
-    document.getElementById("output").value = text;
+  query('query-resource', input, false, function(text) {
+    _outputMirror.setValue(text);
   });
 };
 
-var _editor;
-function editor(wait, success, enforce) {
+function evalQuery(reverse) {
   var mode = document.getElementById("mode").selectedIndex;
-  var update = mode == 2;
-  var realtime = mode == 1;
-  document.getElementById("run").disabled = realtime;
-
   var editor = document.getElementById('editor').value;
-  if(enforce || (realtime && _editor != editor)) {
-    _editor = editor;
-    var target = update ? 'update-query' : 'eval-query';
-    query(wait, success, target, editor, enforce, function(text) {
-      document.getElementById("output").value = text;
-      var evt = document.createEvent("HTMLEvents");
-      evt.initEvent("change",false,false);
-      document.getElementById("output").dispatchEvent(evt);
-    });
-  }
+  var update = (mode == 1) ^ reverse;
+  var target = update ? 'update-query' : 'eval-query';
+  query(target, editor, true, function(text) {
+    _outputMirror.setValue(text);
+  });
 };
 
 function request(method, url, data, success, failure) {
@@ -153,3 +138,47 @@ function request(method, url, data, success, failure) {
   req.setRequestHeader("Content-Type", "text/plain");
   req.send(data);
 };
+
+var _editorMirror;
+var _outputMirror;
+function loadCodeMirror() {
+  if (CodeMirror && dispatchEvent) {
+    var editorArea = document.getElementById("editor");
+    if(editorArea) {
+      _editorMirror = CodeMirror.fromTextArea(editorArea, {
+        mode: "xquery",
+        lineNumbers: true,
+        extraKeys: {
+          "Ctrl-Enter": function(cm) { evalQuery(); },
+          "Cmd-Enter": function(cm) { evalQuery(); },
+          "Shift-Ctrl-Enter": function(cm) { evalQuery(true); },
+          "Shift-Cmd-Enter": function(cm) { evalQuery(true); }
+        }
+      });
+      _editorMirror.on("change",function(cm, cmo) { cm.save(); });
+      _editorMirror.display.wrapper.style.border = "solid 1px grey";
+    }
+
+    var outputArea = document.getElementById("output");
+    _outputMirror = CodeMirror.fromTextArea(outputArea, {
+      mode: "xml",
+      readOnly: true,
+    });
+    _outputMirror.display.wrapper.style.border = "solid 1px grey";
+
+    window.addEventListener("load",setDisplayHeight);
+    window.addEventListener("resize",setDisplayHeight);
+  }
+}
+
+function setDisplayHeight() {
+  var elem = document.createElement("div");
+  document.body.appendChild(elem);
+  p = elem.offsetTop + 24;
+  var elems = document.getElementsByClassName("CodeMirror");
+  var c = elems[0].offsetHeight;
+  var s = window.innerHeight;
+  Array.prototype.forEach.call(elems,function(cm) {
+    cm.CodeMirror.setSize("100%",Math.max(200,s-(p-c)));
+  });
+}

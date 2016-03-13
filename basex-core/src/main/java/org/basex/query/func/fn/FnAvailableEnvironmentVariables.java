@@ -9,12 +9,12 @@ import org.basex.query.value.item.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class FnAvailableEnvironmentVariables extends StandardFunc {
   @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
+  public Iter iter(final QueryContext qc) {
     return value(qc).iter();
   }
 

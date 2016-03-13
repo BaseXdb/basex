@@ -28,7 +28,7 @@ import org.basex.util.*;
 /**
  * This class offers a fast text view, using the {@link TextPanel} class.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class TextView extends View {
@@ -216,7 +216,7 @@ public final class TextView extends View {
       } else if(ns != null) {
         ns.serialize(Serializer.get(out));
       } else {
-        for(final byte t : text.getText()) if(t < 0 || t > ' ' || ws(t)) out.write(t);
+        out.write(text.getText());
       }
     } catch(final IOException ex) {
       BaseXDialog.error(gui, Util.info(FILE_NOT_SAVED_X, file));

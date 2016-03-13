@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * Logical expression, extended by {@link And} and {@link Or}.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 abstract class Logical extends Arr {
@@ -29,16 +29,29 @@ abstract class Logical extends Arr {
   }
 
   @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    super.compile(qc, scp);
+  public final Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
+    for(int i = 0; i < exprs.length; i++) {
+      try {
+        exprs[i] = exprs[i].compile(qc, scp);
+      } catch(final QueryException qe) {
+        // first expression is evaluated eagerly
+        if(i == 0) throw qe;
+        exprs[i] = FnError.get(qe, exprs[i].seqType());
+      }
+    }
+    return optimize(qc, scp);
+  }
+
+  @Override
+  public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     final boolean and = this instanceof And;
     final int es = exprs.length;
     final ExprList el = new ExprList(es);
-    for(final Expr e : exprs) {
-      final Expr ex = e.optimizeEbv(qc, scp);
+    for(final Expr expr : exprs) {
+      final Expr ex = expr.optimizeEbv(qc, scp);
       if(ex.isValue()) {
         // atomic items can be pre-evaluated
-        qc.compInfo(OPTREMOVE, this, e);
+        qc.compInfo(OPTREMOVE_X_X, this, expr);
         if(ex.ebv(qc, info).bool(info) ^ and) return Bln.get(!and);
       } else {
         el.add(ex);
@@ -60,7 +73,7 @@ abstract class Logical extends Arr {
   public void plan(final FElem plan) {
     final FElem el = planElem();
     plan.add(el);
-    for(final ExprInfo e : exprs) if(e != null) e.plan(el);
+    for(final ExprInfo expr : exprs) if(expr != null) expr.plan(el);
   }
 
   @Override
@@ -103,7 +116,7 @@ abstract class Logical extends Arr {
     for(final Expr ex : exprs) {
       if(and && ex instanceof And || or && ex instanceof Or) {
         for(final Expr e : ((Arr) ex).exprs) tmp.add(e);
-        qc.compInfo(OPTFLAT, ex);
+        qc.compInfo(OPTFLAT_X_X, description(), ex);
       } else {
         tmp.add(ex);
       }

@@ -20,7 +20,7 @@ import org.xml.sax.*;
  * implementations. It evaluates queries that are sent by the GUI, the client or
  * the standalone version.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public abstract class Command extends Proc {
@@ -90,7 +90,7 @@ public abstract class Command extends Proc {
     if(!ctx.perm(perm, data != null && !data.inMemory() ? data.meta.name : null))
       throw new BaseXException(PERM_REQUIRED_X, perm);
 
-    // set updating flag
+    // checks if the command performs updates
     updating = updating(ctx);
 
     try {
@@ -337,7 +337,7 @@ public abstract class Command extends Proc {
    */
   protected final boolean finishUpdate(final Data data) {
     try {
-      if(data.meta.autoopt) Optimize.optimize(data, options, null);
+      Optimize.finish(data);
       data.finishUpdate(options);
       return true;
     } catch(final IOException ex) {
@@ -414,7 +414,7 @@ public abstract class Command extends Proc {
       // flushes the output
       try {
         if(out != null) out.flush();
-      } catch(final IOException ignored) { }
+      } catch(final IOException ignore) { }
     }
   }
 }

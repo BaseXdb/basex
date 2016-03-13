@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class FnDeepEqual extends StandardFunc {
@@ -18,6 +18,6 @@ public final class FnDeepEqual extends StandardFunc {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter ir1 = qc.iter(exprs[0]), ir2 = qc.iter(exprs[1]);
     final Collation coll = toCollation(2, qc);
-    return Bln.get(new Compare(info).collation(coll).equal(ir1, ir2));
+    return Bln.get(new DeepEqual(info).collation(coll).equal(ir1, ir2));
   }
 }

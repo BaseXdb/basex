@@ -9,9 +9,10 @@ import java.awt.event.*;
 /**
  * This class offers system-dependent key mappings.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  * @author Leo Woerteler
+ * @author Klavs Prieditis
  */
 public enum BaseXKeys {
 
@@ -73,7 +74,6 @@ public enum BaseXKeys {
   /** Close tab.             */ CLOSETAB(META, VK_F4),
 
   /** Browse back.           */ GOBACK(MAC ? META : ALT, VK_LEFT),
-  /** Browse back.           */ GOBACK2(VK_BACK_SPACE, NO_MOD),
   /** Browse forward.        */ GOFORWARD(MAC ? META : ALT, VK_RIGHT),
   /** Browse up.             */ GOUP(MAC ? META : ALT, VK_UP),
   /** Browse home.           */ GOHOME(MAC ? META : ALT, VK_HOME),
@@ -104,13 +104,12 @@ public enum BaseXKeys {
   /** Escape.                */ ESCAPE(NO_MOD, VK_ESCAPE),
   /** Context menu.          */ CONTEXT(NO_MOD, VK_CONTEXT_MENU),
   /** Copy path.             */ COPYPATH(META | SHIFT, VK_C),
-  /** Add as import.         */ ADDIMPORT(META | SHIFT, VK_I),
 
   /** Refresh.               */ REFRESH(NO_MOD, VK_F5),
   /** Rename.                */ RENAME(NO_MOD, VK_F2),
   /** New directory.         */ NEWDIR(META | SHIFT, VK_N),
 
-  /** Space key.             */ SPACE(NO_MOD, VK_SPACE),
+  /** Space key.             */ SPACE(NO_MOD, VK_SPACE, SHIFT | META),
   /** Enter.                 */ ENTER(NO_MOD, VK_ENTER),
   /** Shift Enter.           */ SHIFT_ENTER(SHIFT, VK_ENTER);
 
@@ -150,7 +149,8 @@ public enum BaseXKeys {
   public boolean is(final KeyEvent e) {
     final int c = e.getKeyCode();
     final int m = e.getModifiers() | allowed;
-    return m == (modifiers | allowed) && (c == 0 ? e.getKeyChar() : c) == key;
+    return m == (modifiers | allowed) &&
+        (c == VK_UNDEFINED ? getExtendedKeyCodeForChar(e.getKeyChar()) : c) == key;
   }
 
   /**

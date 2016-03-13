@@ -11,7 +11,7 @@ import org.basex.util.options.*;
  * This class contains options which are used in the GUI.
  * They are also stored in the project's home directory.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class GUIOptions extends Options {
@@ -47,6 +47,8 @@ public final class GUIOptions extends Options {
   public static final NumberOption FONTTYPE = new NumberOption("FONTTYPE", 0);
   /** Font size. */
   public static final NumberOption FONTSIZE = new NumberOption("FONTSIZE", GUIConstants.FONTSIZE);
+  /** Only display monospace fonts. */
+  public static final BooleanOption ONLYMONO = new BooleanOption("ONLYMONO", false);
 
   /** Red GUI color factor. */
   public static final NumberOption COLORRED = new NumberOption("COLORRED", 15);
@@ -100,17 +102,12 @@ public final class GUIOptions extends Options {
   /** Flag for activated project structure. */
   public static final BooleanOption SHOWPROJECT = new BooleanOption("SHOWPROJECT", true);
 
-  /** Dialog location. */
-  public static final NumbersOption FONTSLOC = new NumbersOption("FONTSLOC", 10, 530);
-  /** Dialog location. */
-  public static final NumbersOption COLORSLOC = new NumbersOption("COLORSLOC", 530, 620);
-  /** Dialog location. */
-  public static final NumbersOption BINDINGSLOC = new NumbersOption("BINDINGSLOC", 100, 230);
-
   /** Preferences tab. */
   public static final NumberOption PREFTAB = new NumberOption("PREFTAB", 0);
   /** Flag for Java look and feel. */
   public static final StringOption LOOKANDFEEL = new StringOption("LOOKANDFEEL", "");
+  /** Scale UI components. */
+  public static final BooleanOption SCALE = new BooleanOption("SCALE", true);
   /** Flag for dissolving name attributes. */
   public static final BooleanOption SHOWNAME = new BooleanOption("SHOWNAME", true);
   /** Focus follows mouse. */
@@ -124,6 +121,10 @@ public final class GUIOptions extends Options {
   public static final BooleanOption CASESORT = new BooleanOption("CASESORT", true);
   /** Merge duplicate lines. */
   public static final BooleanOption MERGEDUPL = new BooleanOption("MERGEDUPL", false);
+  /** Column. */
+  public static final NumberOption COLUMN = new NumberOption("COLUMN", 1);
+  /** Unicode order. */
+  public static final BooleanOption UNICODE = new BooleanOption("UNICODE", true);
 
   /** Show line margin. */
   public static final BooleanOption SHOWMARGIN = new BooleanOption("SHOWMARGIN", true);
@@ -143,6 +144,8 @@ public final class GUIOptions extends Options {
   public static final BooleanOption MARKLINE = new BooleanOption("MARKLINE", true);
   /** Save before executing file. */
   public static final BooleanOption SAVERUN = new BooleanOption("SAVERUN", false);
+  /** Parse project files. */
+  public static final BooleanOption PARSEPROJ = new BooleanOption("PARSEPROJ", true);
   /** Automatically add characters. */
   public static final BooleanOption AUTO = new BooleanOption("AUTO", true);
   /** Default file filter. */

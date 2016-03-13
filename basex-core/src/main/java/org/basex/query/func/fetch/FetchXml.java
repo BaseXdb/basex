@@ -19,7 +19,7 @@ import org.basex.util.options.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class FetchXml extends StandardFunc {
@@ -32,10 +32,12 @@ public final class FetchXml extends StandardFunc {
     final Options opts = toOptions(1, Q_OPTIONS, new Options(), qc);
     if(!Uri.uri(in).isValid()) throw INVDOC_X.get(info, in);
 
+    final IO input = IO.get(string(in));
     final MainOptions mo = MainOptions.get();
     new DBOptions(opts, DBOptions.PARSING, info).assignTo(mo);
+
     try {
-      return new DBNode(Parser.singleParser(IO.get(string(in)), mo, ""));
+      return new DBNode(Parser.singleParser(input, mo, ""));
     } catch(final IOException ex) {
       throw BXFE_IO_X.get(info, ex);
     }

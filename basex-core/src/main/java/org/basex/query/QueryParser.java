@@ -12,7 +12,6 @@ import java.util.Map.Entry;
 
 import org.basex.core.*;
 import org.basex.core.locks.*;
-import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
 import org.basex.query.ann.*;
@@ -39,6 +38,8 @@ import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.format.*;
 import org.basex.query.util.list.*;
+import org.basex.query.util.parse.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -47,13 +48,12 @@ import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 import org.basex.util.options.*;
 
 /**
  * Parser for XQuery expressions.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public class QueryParser extends InputParser {
@@ -61,36 +61,41 @@ public class QueryParser extends InputParser {
   private static final byte[] URICHECK = {};
   /** QName check: skip namespace check. */
   private static final byte[] SKIPCHECK = {};
-  /** Reserved function names (XQuery 3.0). */
-  private static final TokenSet KEYWORDS30 = new TokenSet();
+  /** Reserved function names. */
+  private static final TokenSet KEYWORDS = new TokenSet();
 
   static {
     final byte[][] keys = {
-      FuncType.ANY_FUN.string(), ARRAY, NodeType.ATT.string(), NodeType.COM.string(),
+      SeqType.ANY_FUN.string(), ARRAY, NodeType.ATT.string(), NodeType.COM.string(),
       NodeType.DOC.string(), NodeType.ELM.string(), token(EMPTY_SEQUENCE), token(IF),
       AtomType.ITEM.string(), MAP, NodeType.NSP.string(), NodeType.NOD.string(),
       NodeType.PI.string(), token(SCHEMA_ATTRIBUTE), token(SCHEMA_ELEMENT), token(SWITCH),
       NodeType.TXT.string(), token(TYPESWITCH)
     };
-    for(final byte[] key : keys) KEYWORDS30.add(key);
+    for(final byte[] key : keys) KEYWORDS.add(key);
   }
 
+  /** Imported modules. */
+  final TokenSet imports = new TokenSet();
   /** Modules loaded by the current file. */
   public final TokenSet modules = new TokenSet();
   /** List of modules to be parsed. */
   public final ArrayList<ModInfo> mods = new ArrayList<>();
+  /** Name of current module. */
+  public QNm module;
 
   /** Parsed variables. */
-  public final ArrayList<StaticVar> vars = new ArrayList<>();
+  public final TokenObjMap<StaticVar> vars = new TokenObjMap<>();
   /** Parsed functions. */
-  public final ArrayList<StaticFunc> funcs = new ArrayList<>();
+  public final TokenObjMap<StaticFunc> funcs = new TokenObjMap<>();
+
   /** Namespaces. */
   public final TokenMap namespaces = new TokenMap();
 
   /** Query context. */
-  private final QueryContext qc;
+  public final QueryContext qc;
   /** Static context. */
-  private final StaticContext sc;
+  public final StaticContext sc;
 
   /** Temporary token cache. */
   private final TokenBuilder tok = new TokenBuilder();
@@ -98,9 +103,6 @@ public class QueryParser extends InputParser {
   private final StringBuilder currDoc = new StringBuilder();
   /** Current XQDoc string. */
   private String moduleDoc = "";
-
-  /** Name of current module. */
-  private QNm module;
 
   /** Alternative error code. */
   private QueryError alter;
@@ -111,38 +113,37 @@ public class QueryParser extends InputParser {
 
   /** Declared flags. */
   private final HashSet<String> decl = new HashSet<>();
-  /** Cached QNames. */
-  private final ArrayList<QNmCheck> names = new ArrayList<>();
-  /** Stack of variable contexts. */
-  private final ArrayList<VarContext> localVars = new ArrayList<>();
+  /** QName cache. */
+  private final QNmCache qnames = new QNmCache();
+  /** Local variable. */
+  private final LocalVars localVars = new LocalVars(this);
 
   /**
    * Constructor.
    * @param query query string
    * @param path file path (if {@code null}, {@link MainOptions#QUERYPATH} will be assigned)
-   * @param qc query context
-   * @param sc static context
+   * @param qctx query context
+   * @param sctx static context (can be {@code null})
    * @throws QueryException query exception
    */
-  public QueryParser(final String query, final String path, final QueryContext qc,
-      final StaticContext sc) throws QueryException {
+  public QueryParser(final String query, final String path, final QueryContext qctx,
+      final StaticContext sctx) throws QueryException {
 
     super(query);
-    this.qc = qc;
+    qc = qctx;
+    sc = sctx != null ? sctx : new StaticContext(qctx);
 
     // set path to query file
-    final MainOptions opts = qc.context.options;
-    final String bi = path != null ? path : opts.get(MainOptions.QUERYPATH);
-    final StaticContext sctx = sc != null ? sc : new StaticContext(qc);
-    if(!bi.isEmpty()) sctx.baseURI(bi);
-    this.sc = sctx;
+    final MainOptions opts = qctx.context.options;
+    final String uri = path != null ? path : opts.get(MainOptions.QUERYPATH);
+    if(!uri.isEmpty()) sc.baseURI(uri);
 
     // bind external variables
-    for(final Entry<String, String> entry : QueryProcessor.bindings(opts).entrySet()) {
+    for(final Entry<String, String> entry : opts.toMap(MainOptions.BINDINGS).entrySet()) {
       final String key = entry.getKey();
       final Atm value = new Atm(entry.getValue());
-      if(key.isEmpty()) qc.context(value, sc);
-      else qc.bind(key, value, sc);
+      if(key.isEmpty()) qctx.context(value, sc);
+      else qctx.bind(key, value, sc);
     }
   }
 
@@ -160,20 +161,22 @@ public class QueryParser extends InputParser {
       versionDecl();
 
       final int i = pos;
-      if(wsConsumeWs(MODULE, NSPACE, null)) throw error(MAINMOD);
+      if(wsConsumeWs(MODULE, NAMESPACE, null)) throw error(MAINMOD);
       pos = i;
 
       prolog1();
       importModules();
       prolog2();
 
-      pushVarContext(null);
+      localVars.pushContext(null);
       final Expr expr = expr();
       if(expr == null) throw alter == null ? error(EXPREMPTY) : error();
-      final VarScope scope = popVarContext();
+      final VarScope scope = localVars.popContext();
 
-      final MainModule mm = new MainModule(expr, scope, moduleDoc, sc);
-      finish(mm, true);
+      final MainModule mm = new MainModule(
+          expr, scope, null, moduleDoc, funcs, vars, imports, sc, null);
+      finish(mm);
+      check(mm);
       return mm;
     } catch(final QueryException ex) {
       mark();
@@ -195,7 +198,7 @@ public class QueryParser extends InputParser {
       versionDecl();
 
       wsCheck(MODULE);
-      wsCheck(NSPACE);
+      wsCheck(NAMESPACE);
       skipWs();
       final byte[] pref = ncName(NONAME_X);
       wsCheck(IS);
@@ -216,10 +219,11 @@ public class QueryParser extends InputParser {
       prolog1();
       importModules();
       prolog2();
-      finish(null, check);
+      finish(null);
+      if(check) check(null);
 
       qc.modStack.pop();
-      return new LibraryModule(module, moduleDoc, sc);
+      return new LibraryModule(module, moduleDoc, funcs, vars, imports, sc);
     } catch(final QueryException ex) {
       mark();
       ex.pos(this);
@@ -233,8 +237,7 @@ public class QueryParser extends InputParser {
    */
   private void init() throws QueryException {
     final IO baseIO = sc.baseIO();
-    file = baseIO == null ? null : qc.context.user().has(Perm.ADMIN) ? baseIO.path() :
-      baseIO.name();
+    file = baseIO == null ? null : baseIO.path();
     if(!more()) throw error(QUERYEMPTY);
 
     // checks if the query string contains invalid characters
@@ -254,10 +257,9 @@ public class QueryParser extends InputParser {
   /**
    * Finishes the parsing step.
    * @param mm main module; {@code null} for library modules
-   * @param check check function calls and variable references and update constraints
    * @throws QueryException query exception
    */
-  private void finish(final MainModule mm, final boolean check) throws QueryException {
+  private void finish(final MainModule mm) throws QueryException {
     if(more()) {
       if(alter != null) throw error();
       final String rest = rest();
@@ -267,7 +269,7 @@ public class QueryParser extends InputParser {
     }
 
     // completes the parsing step
-    assignURI(0);
+    qnames.assignURI(this, 0);
     if(sc.elemNS != null) sc.ns.add(EMPTY, sc.elemNS, null);
 
     // set default decimal format
@@ -275,8 +277,23 @@ public class QueryParser extends InputParser {
     if(sc.decFormats.get(empty) == null) {
       sc.decFormats.put(empty, new DecFormatter());
     }
+  }
 
-    if(check) qc.check(mm, sc);
+  /**
+   * Checks function calls, variable references and updating semantics.
+   * @param mm main module; {@code null} for library modules
+   * @throws QueryException query exception
+   */
+  private void check(final MainModule mm) throws QueryException {
+    // check function calls and variable references
+    qc.funcs.check(qc);
+    qc.vars.check();
+    // check updating semantics (skip if updates and values can be mixed)
+    if(qc.updating && !sc.mixUpdates) {
+      qc.funcs.checkUp();
+      qc.vars.checkUp();
+      if(mm != null) mm.expr.checkUp();
+    }
   }
 
   /**
@@ -331,7 +348,7 @@ public class QueryParser extends InputParser {
           copyNamespacesDecl();
         } else if(wsConsumeWs(DECIMAL_FORMAT)) {
           decimalFormatDecl(false);
-        } else if(wsConsumeWs(NSPACE)) {
+        } else if(wsConsumeWs(NAMESPACE)) {
           namespaceDecl();
         } else if(wsConsumeWs(FT_OPTION)) {
           final FTOpt fto = new FTOpt();
@@ -397,15 +414,16 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "Annotation" rule.
-   * @param updating updating flag
+   * @param updating also check for updating keyword
    * @return annotations
    * @throws QueryException query exception
    */
   private AnnList annotations(final boolean updating) throws QueryException {
     final AnnList anns = new AnnList();
     while(true) {
+      final Ann ann;
       if(updating && wsConsumeWs(UPDATING)) {
-        anns.add(new Ann(info(), Annotation.UPDATING));
+        ann = new Ann(info(), Annotation.UPDATING);
       } else if(consume('%')) {
         skipWs();
         final InputInfo info = info();
@@ -423,7 +441,7 @@ public class QueryParser extends InputParser {
         skipWs();
 
         final Annotation sig = Annotation.get(name);
-        // annotation is not statically known...
+        // check if annotation is a pre-defined one
         if(sig == null) {
           // reject unknown annotations with pre-defined namespaces, ignore others
           final byte[] uri = name.uri();
@@ -431,7 +449,7 @@ public class QueryParser extends InputParser {
             throw (NSGlobal.reserved(uri) ? ANNWHICH_X_X : BASX_ANNOT_X_X).get(
                 info, '%', name.string());
           }
-          anns.add(new Ann(info, name, items.finish()));
+          ann = new Ann(info, name, items.finish());
 
         } else {
           // check if annotation is specified more than once
@@ -446,12 +464,14 @@ public class QueryParser extends InputParser {
             final Item it = items.get(a);
             if(!st.instance(it)) throw BASX_ANNTYPE_X_X_X.get(info, sig, st, it.seqType());
           }
-
-          anns.add(new Ann(info, sig, items.finish()));
+          ann = new Ann(info, sig, items.finish());
         }
       } else {
         break;
       }
+
+      anns.add(ann);
+      if(ann.sig == Annotation.UPDATING) qc.updating();
     }
     skipWs();
     return anns;
@@ -499,7 +519,7 @@ public class QueryParser extends InputParser {
   private boolean defaultNamespaceDecl() throws QueryException {
     final boolean elem = wsConsumeWs(ELEMENT);
     if(!elem && !wsConsumeWs(FUNCTION)) return false;
-    wsCheck(NSPACE);
+    wsCheck(NAMESPACE);
     final byte[] uri = stringLiteral();
     if(eq(XML_URI, uri)) throw error(BINDXMLURI_X_X, uri, XML);
     if(eq(XMLNS_URI, uri)) throw error(BINDXMLURI_X_X, uri, XMLNS);
@@ -526,17 +546,16 @@ public class QueryParser extends InputParser {
 
     if(eq(qnm.uri(), OUTPUT_URI)) {
       // output declaration
-      if(module != null) throw error(MODOUT);
+      if(module != null) throw error(OPTDECL_X, qnm.string());
 
       final SerializerOptions sopts = qc.serParams();
       if(!decl.add("S " + name)) throw error(OUTDUPL_X, name);
       sopts.parse(name, val, sc, info());
 
-    } else if(eq(qnm.uri(), XQ_URI)) {
-      throw error(DECLOPTION_X, qnm);
-
     } else if(eq(qnm.uri(), DB_URI)) {
       // project-specific declaration
+      if(module != null) throw error(BASX_OPTDECL_X, qnm.local());
+
       final String ukey = name.toUpperCase(Locale.ENGLISH);
       final Option<?> opt = qc.context.options.option(ukey);
       if(opt == null) throw error(BASX_OPTIONS_X, ukey);
@@ -546,7 +565,7 @@ public class QueryParser extends InputParser {
 
     } else if(eq(qnm.uri(), QUERY_URI)) {
       // query-specific options
-      switch (name) {
+      switch(name) {
         case READ_LOCK:
           for(final byte[] lock : split(val, ','))
             qc.readLocks.add(DBLocking.USER_PREFIX + string(lock).trim());
@@ -668,13 +687,13 @@ public class QueryParser extends InputParser {
    */
   private void schemaImport() throws QueryException {
     byte[] pref = null;
-    if(wsConsumeWs(NSPACE)) {
+    if(wsConsumeWs(NAMESPACE)) {
       pref = ncName(NONAME_X);
       if(eq(pref, XML, XMLNS)) throw error(BINDXML_X, pref);
       wsCheck(IS);
     } else if(wsConsumeWs(DEFAULT)) {
       wsCheck(ELEMENT);
-      wsCheck(NSPACE);
+      wsCheck(NAMESPACE);
     }
     byte[] ns = stringLiteral();
     if(pref != null && ns.length == 0) throw error(NSEMPTY);
@@ -694,7 +713,7 @@ public class QueryParser extends InputParser {
    */
   private void moduleImport() throws QueryException {
     byte[] pref = EMPTY;
-    if(wsConsumeWs(NSPACE)) {
+    if(wsConsumeWs(NAMESPACE)) {
       pref = ncName(NONAME_X);
       wsCheck(IS);
     }
@@ -727,16 +746,6 @@ public class QueryParser extends InputParser {
     }
   }
 
-  /** Information required for parsing a module. */
-  private static final class ModInfo {
-    /** Paths. */
-    private final TokenList paths = new TokenList(1);
-    /** URI. */
-    private byte[] uri;
-    /** Input info. */
-    private InputInfo info;
-  }
-
   /**
    * Imports all modules parsed in the prolog.
    * @throws QueryException query exception
@@ -753,52 +762,55 @@ public class QueryParser extends InputParser {
   private void importModule(final ModInfo mi) throws QueryException {
     final byte[] uri = mi.uri;
     if(mi.paths.isEmpty()) {
-      // skip statically available modules
+      // no paths specified: skip statically available modules
       for(final byte[] u : Function.URIS) if(eq(uri, u)) return;
       // try to resolve module uri
-      if(qc.resources.modules().addImport(uri, mi.info, this)) return;
+      if(qc.resources.modules().addImport(string(uri), mi.info, this)) return;
       // module not found
-      throw error(WHICHMODULE_X, uri);
+      throw WHICHMODULE_X.get(mi.info, uri);
     }
     // parse supplied paths
-    for(final byte[] path : mi.paths) module(path, uri);
+    for(final byte[] path : mi.paths) module(string(path), string(uri), mi.info);
   }
 
   /**
    * Parses the specified module, checking function and variable references at the end.
    * @param path file path
    * @param uri module uri
+   * @param info input info
    * @throws QueryException query exception
    */
-  public void module(final byte[] path, final byte[] uri) throws QueryException {
+  public void module(final String path, final String uri, final InputInfo info)
+      throws QueryException {
+
     // get absolute path
-    final IO io = sc.resolve(string(path), string(uri));
-    final byte[] p = token(io.path());
+    final IO io = sc.resolve(path, uri);
+    final byte[] tPath = token(io.path());
 
     // check if module has already been parsed
-    final byte[] u = qc.modParsed.get(p);
-    if(u != null) {
-      if(!eq(uri, u)) throw error(WRONGMODULE_X_X, uri,
-          qc.context.user().has(Perm.ADMIN) ? io.path() : io.name());
+    final byte[] tUri = token(uri), pUri = qc.modParsed.get(tPath);
+    if(pUri != null) {
+      if(!eq(tUri, pUri)) throw WRONGMODULE_X_X_X.get(info, io.name(), uri, pUri);
       return;
     }
-    qc.modParsed.put(p, uri);
+    qc.modParsed.put(tPath, tUri);
+    imports.put(tUri);
 
     // read module
     final String qu;
     try {
       qu = string(io.read());
     } catch(final IOException ex) {
-      throw error(WHICHMODFILE_X, qc.context.user().has(Perm.ADMIN) ? io.path() : io.name());
+      throw error(WHICHMODFILE_X, io);
     }
 
-    qc.modStack.push(p);
+    qc.modStack.push(tPath);
     final StaticContext sub = new StaticContext(qc);
     final LibraryModule lib = new QueryParser(qu, io.path(), qc, sub).parseLibrary(false);
     final byte[] muri = lib.name.uri();
 
     // check if import and declaration uri match
-    if(!eq(uri, muri)) throw error(WRONGMODULE_X_X, muri, file);
+    if(!uri.equals(string(muri))) throw WRONGMODULE_X_X_X.get(info, io.name(), uri, muri);
 
     // check if context value declaration types are compatible to each other
     if(sub.contextType != null) {
@@ -831,11 +843,11 @@ public class QueryParser extends InputParser {
     if(!wsConsumeWs(EXTERNAL)) wsCheck(ASSIGN);
     else if(!wsConsumeWs(ASSIGN)) return;
 
-    pushVarContext(null);
+    localVars.pushContext(null);
     final Expr e = check(single(), NOVARDECL);
     final SeqType declType = sc.contextType == null ? SeqType.ITEM : sc.contextType;
-    final VarScope scope = popVarContext();
-    qc.ctxItem = new MainModule(e, scope, declType, currDoc.toString(), sc, info());
+    final VarScope scope = localVars.popContext();
+    qc.ctxItem = MainModule.get(e, scope, declType, currDoc.toString(), sc, info());
 
     if(module != null) throw error(DECITEM);
     if(!sc.mixUpdates && e.has(Flag.UPD)) throw error(UPCTX, e);
@@ -851,7 +863,7 @@ public class QueryParser extends InputParser {
     final SeqType tp = optAsType();
     if(module != null && !eq(vn.uri(), module.uri())) throw error(MODULENS_X, vn);
 
-    pushVarContext(null);
+    localVars.pushContext(null);
     final boolean external = wsConsumeWs(EXTERNAL);
     final Expr bind;
     if(external) {
@@ -861,13 +873,15 @@ public class QueryParser extends InputParser {
       bind = check(single(), NOVARDECL);
     }
 
-    final VarScope scope = popVarContext();
-    vars.add(qc.vars.declare(vn, tp, anns, bind, external, sc, scope, currDoc.toString(), info()));
+    final VarScope scope = localVars.popContext();
+    final StaticVar var = qc.vars.declare(vn, tp, anns, bind, external, sc, scope,
+        currDoc.toString(), info());
+    vars.put(var.id(), var);
   }
 
   /**
    * Parses an optional SeqType declaration.
-   * @return type if preceded by {@code as} (may be {@code null})
+   * @return type if preceded by {@code as} or {@code null}
    * @throws QueryException query exception
    */
   private SeqType optAsType() throws QueryException {
@@ -896,14 +910,16 @@ public class QueryParser extends InputParser {
     wsCheck(PAREN1);
     if(module != null && !eq(name.uri(), module.uri())) throw error(MODULENS_X, name);
 
-    pushVarContext(null);
+    localVars.pushContext(null);
     final Var[] args = paramList();
     wsCheck(PAREN2);
+
     final SeqType type = optAsType();
-    if(anns.contains(Annotation.UPDATING)) qc.updating();
-    final Expr expr = wsConsumeWs(EXTERNAL) ? null : enclosed(NOFUNBODY);
-    final VarScope scope = popVarContext();
-    funcs.add(qc.funcs.declare(anns, name, args, type, expr, sc, scope, currDoc.toString(), ii));
+    final Expr expr = wsConsumeWs(EXTERNAL) ? null : enclosedExpr();
+    final VarScope scope = localVars.popContext();
+    final StaticFunc func = qc.funcs.declare(anns, name, args, type, expr, sc, scope,
+        currDoc.toString(), ii);
+    funcs.put(func.id(), func);
   }
 
   /**
@@ -912,7 +928,7 @@ public class QueryParser extends InputParser {
    * @return result of check
    */
   private static boolean keyword(final QNm name) {
-    return !name.hasPrefix() && KEYWORDS30.contains(name.string());
+    return !name.hasPrefix() && KEYWORDS.contains(name.string());
   }
 
   /**
@@ -928,11 +944,11 @@ public class QueryParser extends InputParser {
         if(args.length == 0) break;
         check('$');
       }
-      final Var var = addVar(varName(), optAsType(), true);
+      final Var var = localVars.add(varName(), optAsType(), true);
       for(final Var v : args)
         if(v.name.eq(var.name)) throw error(FUNCDUPL_X, var);
 
-      args = Array.add(args, new Var[args.length + 1], var);
+      args = Array.add(args, var);
       if(!consume(',')) break;
     }
     return args;
@@ -940,20 +956,19 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "EnclosedExpr" rule.
-   * @param err error message
    * @return query expression
    * @throws QueryException query exception
    */
-  private Expr enclosed(final QueryError err) throws QueryException {
+  private Expr enclosedExpr() throws QueryException {
     wsCheck(CURLY1);
-    final Expr e = check(expr(), err);
+    final Expr e = expr();
     wsCheck(CURLY2);
-    return e;
+    return e == null ? Empty.SEQ : e;
   }
 
   /**
    * Parses the "Expr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr expr() throws QueryException {
@@ -971,7 +986,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "ExprSingle" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr single() throws QueryException {
@@ -983,11 +998,11 @@ public class QueryParser extends InputParser {
     if(e == null) e = iff();
     if(e == null) e = tryCatch();
     if(e == null) e = insert();
-    if(e == null) e = deletee();
+    if(e == null) e = delete();
     if(e == null) e = rename();
     if(e == null) e = replace();
-    if(e == null) e = transform();
     if(e == null) e = updatingFunctionCall();
+    if(e == null) e = copyModify();
     if(e == null) e = or();
     return e;
   }
@@ -998,11 +1013,11 @@ public class QueryParser extends InputParser {
    * Parses the "OrderByClause" rule.
    * Parses the "OrderSpecList" rule.
    * Parses the "GroupByClause" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr flwor() throws QueryException {
-    final int s = openSubScope();
+    final int s = localVars.openScope();
     final LinkedList<Clause> clauses = initialClause(null);
     if(clauses == null) return null;
 
@@ -1023,7 +1038,6 @@ public class QueryParser extends InputParser {
       if(wsConsumeWs(WHERE)) {
         alterPos = pos;
         clauses.add(new Where(check(single(), NOWHERE), info()));
-        alter = NOWHERE;
       }
 
       if(wsConsumeWs(GROUP)) {
@@ -1048,7 +1062,7 @@ public class QueryParser extends InputParser {
 
           // if one groups variables such as $x as xs:integer, then the resulting
           // sequence isn't compatible with the type and can't be assigned
-          final Var nv = addVar(v.var.name, null, false);
+          final Var nv = localVars.add(v.var.name, null, false);
           // [LW] should be done everywhere
           if(v.seqType().one())
             nv.refineType(SeqType.get(v.seqType().type, Occ.ONE_MORE), qc, info());
@@ -1058,7 +1072,6 @@ public class QueryParser extends InputParser {
 
         final VarRef[] pre = new VarRef[ng.size()];
         clauses.add(new GroupBy(specs, ng.toArray(pre), ngrp, specs[0].info));
-        alter = GRPBY;
       }
 
       final boolean stable = wsConsumeWs(STABLE);
@@ -1076,11 +1089,10 @@ public class QueryParser extends InputParser {
         int i = 0;
         for(final Var v : curr.values()) vs[i++] = new VarRef(ob[0].info, v);
         clauses.add(new OrderBy(vs, ob, ob[0].info));
-        alter = ORDERBY;
       }
 
       if(wsConsumeWs(COUNT, DOLLAR, NOCOUNT)) {
-        final Var v = addVar(varName(), SeqType.ITR, false);
+        final Var v = localVars.add(varName(), SeqType.ITR, false);
         curr.put(v.name.id(), v);
         clauses.add(new Count(v, info()));
       }
@@ -1089,7 +1101,7 @@ public class QueryParser extends InputParser {
     if(!wsConsumeWs(RETURN)) throw alter == null ? error(FLWORRETURN) : error();
 
     final Expr ret = check(single(), NORETURN);
-    closeSubScope(s);
+    localVars.closeScope(s);
     return new GFLWOR(clauses.get(0).info, clauses, ret);
   }
 
@@ -1101,18 +1113,18 @@ public class QueryParser extends InputParser {
    */
   private LinkedList<Clause> initialClause(final LinkedList<Clause> clauses) throws QueryException {
     LinkedList<Clause> cls = clauses;
-    // ForClause / LetClause
-    final boolean let = wsConsumeWs(LET, SCORE, NOLET) || wsConsumeWs(LET, DOLLAR, NOLET);
-    if(let || wsConsumeWs(FOR, DOLLAR, NOFOR)) {
+    // WindowClause
+    final boolean slide = wsConsumeWs(FOR, SLIDING, NOWINDOW);
+    if(slide || wsConsumeWs(FOR, TUMBLING, NOWINDOW)) {
       if(cls == null) cls = new LinkedList<>();
-      if(let) letClause(cls);
-      else    forClause(cls);
+      cls.add(windowClause(slide));
     } else {
-      // WindowClause
-      final boolean slide = wsConsumeWs(FOR, SLIDING, NOWINDOW);
-      if(slide || wsConsumeWs(FOR, TUMBLING, NOWINDOW)) {
+      // ForClause / LetClause
+      final boolean let = wsConsumeWs(LET, SCORE, NOLET) || wsConsumeWs(LET, DOLLAR, NOLET);
+      if(let || wsConsumeWs(FOR, DOLLAR, NOFOR)) {
         if(cls == null) cls = new LinkedList<>();
-        cls.add(windowClause(slide));
+        if(let) letClause(cls);
+        else    forClause(cls);
       }
     }
     return cls;
@@ -1139,9 +1151,9 @@ public class QueryParser extends InputParser {
       final Expr e = check(single(), NOVARDECL);
 
       // declare late because otherwise it would shadow the wrong variables
-      final Var var = addVar(nm, tp, false);
-      final Var ps = p != null ? addVar(p, SeqType.ITR, false) : null;
-      final Var scr = s != null ? addVar(s, SeqType.DBL, false) : null;
+      final Var var = localVars.add(nm, tp, false);
+      final Var ps = p != null ? localVars.add(p, SeqType.ITR, false) : null;
+      final Var scr = s != null ? localVars.add(s, SeqType.DBL, false) : null;
       if(p != null) {
         if(nm.eq(p)) throw error(DUPLVAR_X, var);
         if(s != null && p.eq(s)) throw error(DUPLVAR_X, ps);
@@ -1165,7 +1177,7 @@ public class QueryParser extends InputParser {
       final SeqType tp = score ? SeqType.DBL : optAsType();
       wsCheck(ASSIGN);
       final Expr e = check(single(), NOVARDECL);
-      cls.add(new Let(addVar(nm, tp, false), e, score, info()));
+      cls.add(new Let(localVars.add(nm, tp, false), e, score, info()));
     } while(wsConsume(COMMA));
   }
 
@@ -1198,7 +1210,7 @@ public class QueryParser extends InputParser {
       if(check) wsCheck(END);
       end = windowCond(false);
     }
-    return new Window(info(), slide, addVar(nm, tp, false), e, start, only, end);
+    return new Window(info(), slide, localVars.add(nm, tp, false), e, start, only, end);
   }
 
   /**
@@ -1210,10 +1222,10 @@ public class QueryParser extends InputParser {
   private Condition windowCond(final boolean start) throws QueryException {
     skipWs();
     final InputInfo ii = info();
-    final Var var = curr('$')             ? addVar(varName(), null, false) : null,
-              at  = wsConsumeWs(AT)       ? addVar(varName(), null, false) : null,
-              prv = wsConsumeWs(PREVIOUS) ? addVar(varName(), null, false) : null,
-              nxt = wsConsumeWs(NEXT)     ? addVar(varName(), null, false) : null;
+    final Var var = curr('$')             ? localVars.add(varName(), null, false) : null,
+              at  = wsConsumeWs(AT)       ? localVars.add(varName(), null, false) : null,
+              prv = wsConsumeWs(PREVIOUS) ? localVars.add(varName(), null, false) : null,
+              nxt = wsConsumeWs(NEXT)     ? localVars.add(varName(), null, false) : null;
     wsCheck(WHEN);
     return new Condition(start, var, at, prv, nxt, check(single(), NOEXPR), ii);
   }
@@ -1259,7 +1271,7 @@ public class QueryParser extends InputParser {
         if(declType != null) wsCheck(ASSIGN);
         by = check(single(), NOVARDECL);
       } else {
-        final VarRef vr = resolveLocalVar(name, ii);
+        final VarRef vr = localVars.resolveLocal(name, ii);
         // the grouping variable has to be declared by the same FLWOR expression
         boolean dec = false;
         if(vr != null) {
@@ -1287,7 +1299,7 @@ public class QueryParser extends InputParser {
 
       final Collation coll = wsConsumeWs(COLLATION) ? Collation.get(stringLiteral(),
           qc, sc, info(), FLWORCOLL_X) : sc.collation;
-      final Spec spec = new Spec(ii, addVar(name, declType, false), by, coll);
+      final Spec spec = new Spec(ii, localVars.add(name, declType, false), by, coll);
       if(specs == null) {
         specs = new Spec[] { spec };
       } else {
@@ -1305,63 +1317,63 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "QuantifiedExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr quantified() throws QueryException {
     final boolean some = wsConsumeWs(SOME, DOLLAR, NOSOME);
     if(!some && !wsConsumeWs(EVERY, DOLLAR, NOSOME)) return null;
 
-    final int s = openSubScope();
+    final int s = localVars.openScope();
     For[] fl = { };
     do {
       final QNm nm = varName();
       final SeqType tp = optAsType();
       wsCheck(IN);
       final Expr e = check(single(), NOSOME);
-      fl = Array.add(fl, new For(addVar(nm, tp, false), null, null, e, false, info()));
+      fl = Array.add(fl, new For(localVars.add(nm, tp, false), null, null, e, false, info()));
     } while(wsConsumeWs(COMMA));
 
     wsCheck(SATISFIES);
     final Expr e = check(single(), NOSOME);
-    closeSubScope(s);
+    localVars.closeScope(s);
     return new Quantifier(info(), fl, e, !some);
   }
 
   /**
    * Parses the "SwitchExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr switchh() throws QueryException {
     if(!wsConsumeWs(SWITCH, PAREN1, TYPEPAR)) return null;
     final InputInfo ii = info();
     wsCheck(PAREN1);
-    final Expr expr = check(expr(), NOSWITCH);
-    SwitchCase[] exprs = { };
+    final Expr cond = check(expr(), NOSWITCH);
+    SwitchCase[] cases = { };
     wsCheck(PAREN2);
 
     // collect all cases
-    ExprList cases;
+    ExprList exprs;
     do {
-      cases = new ExprList(null);
-      while(wsConsumeWs(CASE)) add(cases, single());
-      if(cases.size() == 1) {
+      exprs = new ExprList(null);
+      while(wsConsumeWs(CASE)) add(exprs, single());
+      if(exprs.size() == 1) {
         // add default case
-        if(exprs.length == 0) throw error(WRONGCHAR_X_X, CASE, found());
+        if(cases.length == 0) throw error(WRONGCHAR_X_X, CASE, found());
         wsCheck(DEFAULT);
       }
       wsCheck(RETURN);
-      cases.set(0, check(single(), NOSWITCH));
-      exprs = Array.add(exprs, new SwitchCase(info(), cases.finish()));
-    } while(cases.size() != 1);
+      exprs.set(0, check(single(), NOSWITCH));
+      cases = Array.add(cases, new SwitchCase(info(), exprs.finish()));
+    } while(exprs.size() != 1);
 
-    return new Switch(ii, expr, exprs);
+    return new Switch(ii, cond, cases);
   }
 
   /**
    * Parses the "TypeswitchExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr typeswitch() throws QueryException {
@@ -1373,7 +1385,7 @@ public class QueryParser extends InputParser {
 
     TypeCase[] cases = { };
     final ArrayList<SeqType> types = new ArrayList<>();
-    final int s = openSubScope();
+    final int s = localVars.openScope();
     boolean cs;
     do {
       types.clear();
@@ -1384,7 +1396,7 @@ public class QueryParser extends InputParser {
       }
       Var var = null;
       if(curr('$')) {
-        var = addVar(varName(), null, false);
+        var = localVars.add(varName(), null, false);
         if(cs) wsCheck(AS);
       }
       if(cs) {
@@ -1395,7 +1407,7 @@ public class QueryParser extends InputParser {
       final Expr ret = check(single(), NOTYPESWITCH);
       cases = Array.add(cases, new TypeCase(info(), var,
           types.toArray(new SeqType[types.size()]), ret));
-      closeSubScope(s);
+      localVars.closeScope(s);
     } while(cs);
     if(cases.length == 1) throw error(NOTYPESWITCH);
     return new TypeSwitch(ii, ts, cases);
@@ -1403,7 +1415,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "IfExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr iff() throws QueryException {
@@ -1421,7 +1433,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "OrExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr or() throws QueryException {
@@ -1451,18 +1463,19 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "UpdateExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr update() throws QueryException {
     final Expr e = comparison();
     if(e != null) {
       if(wsConsumeWs(UPDATE)) {
-        final int s = openSubScope();
+        final InputInfo ii = info();
+        final int s = localVars.openScope();
         qc.updating();
         final Expr m = check(single(), COPYEXPR);
-        closeSubScope(s);
-        return new Modify(info(), e, m);
+        localVars.closeScope(s);
+        return new TransformWith(ii, e, m);
       }
     }
     return e;
@@ -1470,7 +1483,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "ComparisonExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr comparison() throws QueryException {
@@ -1488,7 +1501,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "FTContainsExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr ftContains() throws QueryException {
@@ -1511,7 +1524,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "StringConcatExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr stringConcat() throws QueryException {
@@ -1525,7 +1538,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "RangeExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr range() throws QueryException {
@@ -1536,7 +1549,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "AdditiveExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr additive() throws QueryException {
@@ -1551,7 +1564,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "MultiplicativeExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr multiplicative() throws QueryException {
@@ -1567,7 +1580,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "UnionExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr union() throws QueryException {
@@ -1593,7 +1606,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "IntersectExceptExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr intersect() throws QueryException {
@@ -1614,7 +1627,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "InstanceofExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr instanceoff() throws QueryException {
@@ -1626,7 +1639,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "TreatExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr treat() throws QueryException {
@@ -1638,7 +1651,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "CastableExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr castable() throws QueryException {
@@ -1650,7 +1663,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "CastExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr cast() throws QueryException {
@@ -1662,28 +1675,32 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "ArrowExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr arrow() throws QueryException {
     Expr e = unary();
     if(e != null) {
       while(wsConsume(ARROW)) {
-        final Expr ex = wsConsume(PAREN1) ? parenthesized() : curr() == '$'
-            ? resolveVar(varName(), info()) : eQName(ARROWSPEC, sc.funcNS);
+        skipWs();
+        final Expr ex = curr('(') ? parenthesized() : curr('$')
+            ? localVars.resolve(varName(), info()) : eQName(ARROWSPEC, sc.funcNS);
+        final InputInfo ii = info();
         wsCheck(PAREN1);
 
         if(ex instanceof QNm) {
           final QNm name = (QNm) ex;
           if(keyword(name)) throw error(RESERVED_X, name.local());
-          e = function(name, e);
+          e = function(name, ii, new ExprList(e));
         } else {
-          final InputInfo ii = info();
           final ExprList argList = new ExprList(e);
           final int[] holes = argumentList(argList, e);
           final Expr[] args = argList.finish();
-          e = holes == null ? new DynFuncCall(ii, sc, false, ex, args) :
-            new PartFunc(sc, ii, ex, args, holes);
+          if(holes == null) {
+            e = new DynFuncCall(ii, sc, ex, args);
+          } else {
+            e = new PartFunc(sc, ii, ex, args, holes);
+          }
         }
       }
     }
@@ -1692,7 +1709,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "UnaryExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr unary() throws QueryException {
@@ -1714,7 +1731,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "ValueExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr value() throws QueryException {
@@ -1731,38 +1748,32 @@ public class QueryParser extends InputParser {
     final int i = pos;
     if(!wsConsumeWs(VALIDATE)) return;
 
-    boolean brace = true;
-    if(consume(CURLY1)) {
-      brace = false;
-    } else if(consume(TYPE)) {
-      final QNm qnm = eQName(QNAME_X, SKIPCHECK);
-      names.add(new QNmCheck(qnm));
-    } else if(!consume(STRICT) && !consume(LAX)) {
-      pos = i;
-      return;
+    if(consume(TYPE)) qnames.add(eQName(QNAME_X, SKIPCHECK));
+    consume(STRICT);
+    consume(LAX);
+    skipWs();
+    if(curr('{')) {
+      enclosedExpr();
+      throw error(IMPLVAL);
     }
-
-    if(brace) wsCheck(CURLY1);
-    check(single(), NOVALIDATE);
-    wsCheck(CURLY2);
-    throw error(IMPLVAL);
+    pos = i;
   }
 
   /**
    * Parses the "ExtensionExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr extension() throws QueryException {
     final Pragma[] pragmas = pragma();
     if(pragmas == null) return null;
-    final Expr expr = enclosed(NOPRAGMA);
+    final Expr expr = enclosedExpr();
     return pragmas.length == 0 ? expr : new Extension(info(), pragmas, expr);
   }
 
   /**
    * Parses the "Pragma" rule.
-   * @return array of pragmas (may be {@code null})
+   * @return array of pragmas or {@code null}
    * @throws QueryException query exception
    */
   private Pragma[] pragma() throws QueryException {
@@ -1798,7 +1809,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "MapExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr map() throws QueryException {
@@ -1813,7 +1824,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "PathExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr path() throws QueryException {
@@ -1910,7 +1921,7 @@ public class QueryParser extends InputParser {
   /**
    * Parses the "StepExpr" rule.
    * @param error show error if nothing is found
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr step(final boolean error) throws QueryException {
@@ -1921,7 +1932,7 @@ public class QueryParser extends InputParser {
   /**
    * Parses the "AxisStep" rule.
    * @param error show error if nothing is found
-   * @return step (may be {@code null})
+   * @return step or {@code null}
    * @throws QueryException query exception
    */
   private Step axisStep(final boolean error) throws QueryException {
@@ -1984,7 +1995,7 @@ public class QueryParser extends InputParser {
    * Parses the "KindTest" rule.
    * @param att attribute flag
    * @param all check all tests, or only names
-   * @return test (may be {@code null})
+   * @return test or {@code null}
    * @throws QueryException query exception
    */
   private Test nodeTest(final boolean att, final boolean all) throws QueryException {
@@ -2017,13 +2028,13 @@ public class QueryParser extends InputParser {
         // name test: prefix:name, name, Q{uri}name
         if(name.hasPrefix() || !consume(':')) {
           skipWs();
-          names.add(new QNmCheck(name, !att));
+          qnames.add(name, !att);
           return new NameTest(name, Kind.URI_NAME, att, sc.elemNS);
         }
         // name test: prefix:*
         if(consume('*')) {
           final QNm nm = new QNm(concat(name.string(), COLON));
-          names.add(new QNmCheck(nm, !att));
+          qnames.add(nm, !att);
           return new NameTest(nm, Kind.URI, att, sc.elemNS);
         }
       }
@@ -2034,7 +2045,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "PostfixExpr" rule.
-   * @return postfix expression (may be {@code null})
+   * @return postfix expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr postfix() throws QueryException {
@@ -2052,20 +2063,17 @@ public class QueryParser extends InputParser {
           } while(wsConsume(SQUARE1));
           e = Filter.get(info(), e, el.finish());
         } else if(consume(PAREN1)) {
+          if(e instanceof Value && !(e instanceof FItem)) throw error(NOPAREN_X_X, e);
           // parses the "ArgumentList" rule
           final InputInfo ii = info();
           final ExprList argList = new ExprList();
           final int[] holes = argumentList(argList, e);
           final Expr[] args = argList.finish();
-          // only set updating flag if updating and non-updating expressions are mixed
-          AnnList anns = null;
-          if(e instanceof FuncItem) anns = ((FuncItem) e).annotations();
-          else if(e instanceof FuncLit) anns = ((FuncLit) e).annotations();
-          else if(e instanceof PartFunc) anns = ((PartFunc) e).annotations();
-          final boolean up = sc.mixUpdates && anns != null && anns.contains(Annotation.UPDATING);
-          if(up) qc.updating();
-          e = holes == null ? new DynFuncCall(ii, sc, up, e, args) :
-            new PartFunc(sc, ii, e, args, holes);
+          if(holes == null) {
+            e = new DynFuncCall(ii, sc, e, args);
+          } else {
+            e = new PartFunc(sc, ii, e, args, holes);
+          }
         } else if(consume(QUESTION)) {
           // parses the "Lookup" rule
           e = new Lookup(info(), sc, keySpecifier(), e);
@@ -2080,7 +2088,7 @@ public class QueryParser extends InputParser {
    * Parses the "VarRef" rule.
    * Parses the "ContextItem" rule.
    * Parses the "Literal" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr primary() throws QueryException {
@@ -2089,12 +2097,14 @@ public class QueryParser extends InputParser {
     // variables
     if(c == '$') {
       final InputInfo ii = info();
-      return resolveVar(varName(), ii);
+      return localVars.resolve(varName(), ii);
     }
     // parentheses
-    if(next() != '#' && consume('(')) return parenthesized();
+    if(c == '(' && next() != '#') return parenthesized();
     // direct constructor
-    if(c == '<') return constructor();
+    if(c == '<') return dirConstructor();
+    // string constructor
+    if(c == '`') return stringConstructor();
     // function item
     Expr e = functionItem();
     if(e != null) return e;
@@ -2105,9 +2115,12 @@ public class QueryParser extends InputParser {
     e = compConstructor();
     if(e != null) return e;
     // ordered expression
-    if(wsConsumeWs(ORDERED, CURLY1, INCOMPLETE) || wsConsumeWs(UNORDERED, CURLY1, INCOMPLETE))
-      return enclosed(NOENCLEXPR);
-    // map
+    final int p = pos;
+    if(wsConsumeWs(ORDERED) || wsConsumeWs(UNORDERED)) {
+      if(curr('{')) return enclosedExpr();
+      pos = p;
+    }
+    // map constructor
     if(wsConsumeWs(MAPSTR, CURLY1, INCOMPLETE)) return new CMap(info(), keyValues());
     // square array constructor
     if(wsConsumeWs(SQUARE1)) return new CArray(info(), false, values());
@@ -2125,10 +2138,12 @@ public class QueryParser extends InputParser {
       pos = ip;
     }
     // context value
-    if(c == '.' && !digit(next())) {
+    if(c == '.') {
       if(next() == '.') return null;
-      consume('.');
-      return new ContextValue(info());
+      if(!digit(next())) {
+        consume();
+        return new ContextValue(info());
+      }
     }
     // literals
     return literal();
@@ -2140,9 +2155,14 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr keySpecifier() throws QueryException {
-    return wsConsume(ASTERISK) ? Str.WC :
-      consume(PAREN1) ? parenthesized() :
-      digit(curr()) ? numericLiteral(true) :
+    skipWs();
+    final int c = curr();
+    if(c == '*') {
+      consume();
+      return Str.WC;
+    }
+    return c == '(' ? parenthesized() :
+      digit(c) ? numericLiteral(true) :
       Str.get(ncName(KEYSPEC));
   }
 
@@ -2186,7 +2206,7 @@ public class QueryParser extends InputParser {
    * Parses the "NamedFunctionRef" rule.
    * Parses the "LiteralFunctionItem" rule.
    * Parses the "InlineFunction" rule.
-   * @return function item (may be {@code null})
+   * @return function item or {@code null}
    * @throws QueryException query exception
    */
   private Expr functionItem() throws QueryException {
@@ -2198,15 +2218,16 @@ public class QueryParser extends InputParser {
     // inline function
     if(wsConsume(FUNCTION) && wsConsume(PAREN1)) {
       if(anns.contains(Annotation.PRIVATE) || anns.contains(Annotation.PUBLIC))
-        throw error(INVISIBLE);
-      final HashMap<Var, Expr> nonLocal = new HashMap<>();
-      pushVarContext(nonLocal);
+        throw error(NOVISALLOWED);
+
+      final HashMap<Var, Expr> global = new HashMap<>();
+      localVars.pushContext(global);
       final Var[] args = paramList();
       wsCheck(PAREN2);
       final SeqType type = optAsType();
-      final Expr body = enclosed(NOFUNBODY);
-      final VarScope scope = popVarContext();
-      return new Closure(info(), type, args, body, anns, nonLocal, sc, scope);
+      final Expr body = enclosedExpr();
+      final VarScope scope = localVars.popContext();
+      return new Closure(info(), type, args, body, anns, global, sc, scope);
     }
     // annotations not allowed here
     if(!anns.isEmpty()) throw error(NOANN);
@@ -2244,7 +2265,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "Literal" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr literal() throws QueryException {
@@ -2343,7 +2364,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "VarName" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private QNm varName() throws QueryException {
@@ -2353,11 +2374,12 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "ParenthesizedExpr" rule without the opening parenthesis.
+   * Parses the "ParenthesizedExpr" rule.
    * @return query expression
    * @throws QueryException query exception
    */
   private Expr parenthesized() throws QueryException {
+    check('(');
     final Expr e = expr();
     wsCheck(PAREN2);
     return e == null ? Empty.SEQ : e;
@@ -2365,15 +2387,16 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "FunctionCall" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr functionCall() throws QueryException {
     final int i = pos;
     final QNm name = eQName(null, sc.funcNS);
     if(name != null && !keyword(name)) {
+      final InputInfo ii = info();
       if(wsConsume(PAREN1)) {
-        final Expr ret = function(name);
+        final Expr ret = function(name, ii, new ExprList());
         if(ret != null) return ret;
       }
     }
@@ -2384,16 +2407,16 @@ public class QueryParser extends InputParser {
   /**
    * Returns a function.
    * @param name function name
-   * @param exprs initial expressions
-   * @return function (may be {@code null})
+   * @param ii input info
+   * @param argList list of arguments
+   * @return function or {@code null}
    * @throws QueryException query exception
    */
-  private Expr function(final QNm name, final Expr... exprs) throws QueryException {
-    final InputInfo ii = info();
-    final ExprList argList = new ExprList().add(exprs);
+  private Expr function(final QNm name, final InputInfo ii, final ExprList argList)
+      throws QueryException {
     final int[] holes = argumentList(argList, name.string());
     final Expr[] args = argList.finish();
-    alter = FUNCUNKNOWN_X;
+    alter = WHICHFUNC_X;
     alterFunc = name;
     alterPos = pos;
 
@@ -2403,16 +2426,9 @@ public class QueryParser extends InputParser {
       final Expr lit = Functions.getLiteral(name, card, qc, sc, ii, false);
       final Expr f = lit != null ? lit : unknownLit(name, card, ii);
       ret = new PartFunc(sc, ii, f, args, holes);
-      if(lit != null && (lit instanceof XQFunctionExpr ? ((XQFunctionExpr) f).annotations() :
-        ((FuncLit) lit).annotations()).contains(Annotation.UPDATING)) qc.updating();
     } else {
       final TypedFunc f = Functions.get(name, args, qc, sc, ii);
-      if(f == null) {
-        ret = null;
-      } else {
-        if(f.anns.contains(Annotation.UPDATING)) qc.updating();
-        ret = f.fun;
-      }
+      ret = f != null ? f.fun : null;
     }
 
     if(ret != null) alter = null;
@@ -2437,22 +2453,55 @@ public class QueryParser extends InputParser {
         } else if(wsConsume(QUESTION)) {
           holes = holes == null ? new int[] { i } : Array.add(holes, i);
         } else {
-          throw error(FUNCMISS_X, name);
+          throw funcMiss(name);
         }
         i++;
       } while(wsConsume(COMMA));
-      if(!wsConsume(PAREN2)) throw error(FUNCMISS_X, name);
+      if(!wsConsume(PAREN2)) throw funcMiss(name);
     }
     return holes;
   }
 
   /**
-   * Parses the "Constructor" rule.
+   * Parses the "StringConstructor" rule.
+   * @return query expression
+   * @throws QueryException query exception
+   */
+  private Expr stringConstructor() throws QueryException {
+    check('`');
+    check('`');
+    check('[');
+
+    final ExprList el = new ExprList();
+    final TokenBuilder tb = new TokenBuilder();
+    while(more()) {
+      final int p = pos;
+      if(consume(']') && consume('`') && consume('`')) {
+        if(!tb.isEmpty()) el.add(Str.get(tb.next()));
+        return Function.CONCAT.get(sc, info(), el.finish());
+      }
+      pos = p;
+      if(consume('`') && consume('{')) {
+        if(!tb.isEmpty()) el.add(Str.get(tb.next()));
+        final Expr e = expr();
+        if(e != null) el.add(Function.STRING_JOIN.get(sc, info(), e, Str.get(" ")));
+        skipWs();
+        check('}');
+        check('`');
+      } else {
+        pos = p;
+        tb.add(consume());
+      }
+    }
+    throw error(INCOMPLETE);
+  }
+
+  /**
    * Parses the "DirectConstructor" rule.
    * @return query expression
    * @throws QueryException query exception
    */
-  private Expr constructor() throws QueryException {
+  private Expr dirConstructor() throws QueryException {
     check('<');
     return consume('!') ? dirComment() : consume('?') ? dirPI() : dirElement();
   }
@@ -2467,10 +2516,10 @@ public class QueryParser extends InputParser {
     // cache namespace information
     final int s = sc.ns.size();
     final byte[] nse = sc.elemNS;
-    final int npos = names.size();
+    final int npos = qnames.size();
 
     final QNm name = new QNm(qName(ELEMNAME_X));
-    names.add(new QNmCheck(name));
+    qnames.add(name);
     consumeWS();
 
     final Atts ns = new Atts();
@@ -2502,7 +2551,7 @@ public class QueryParser extends InputParser {
             } else {
               final byte[] text = tb.next();
               if(text.length == 0) {
-                add(attv, enclosed(NOENCLEXPR));
+                add(attv, enclosedExpr());
                 simple = false;
               } else {
                 add(attv, Str.get(text));
@@ -2558,7 +2607,7 @@ public class QueryParser extends InputParser {
         final QNm attn = new QNm(atn);
         if(atts == null) atts = new ArrayList<>(1);
         atts.add(attn);
-        names.add(new QNmCheck(attn, false));
+        qnames.add(attn, false);
         add(cont, new CAttr(sc, info(), false, attn, attv.finish()));
       }
       if(!consumeWS()) break;
@@ -2580,7 +2629,7 @@ public class QueryParser extends InputParser {
       if(!eq(name.string(), close)) throw error(TAGWRONG_X_X, name.string(), close);
     }
 
-    assignURI(npos);
+    qnames.assignURI(this, npos);
 
     // check for duplicate attribute names
     if(atts != null) {
@@ -2614,7 +2663,7 @@ public class QueryParser extends InputParser {
           strip = false;
         } else {
           final Str txt = text(tb, strip);
-          return txt != null ? txt : next() == '/' ? null : constructor();
+          return txt != null ? txt : next() == '/' ? null : dirConstructor();
         }
       } else if(c == '{') {
         if(next() == '{') {
@@ -2622,7 +2671,7 @@ public class QueryParser extends InputParser {
           consume();
         } else {
           final Str txt = text(tb, strip);
-          return txt != null ? txt : enclosed(NOENCLEXPR);
+          return txt != null ? txt : enclosedExpr();
         }
       } else if(c == '}') {
         consume();
@@ -2640,7 +2689,7 @@ public class QueryParser extends InputParser {
    * Returns a string item.
    * @param tb token builder
    * @param strip strip flag
-   * @return string item (may be {@code null})
+   * @return string item or {@code null}
    */
   private Str text(final TokenBuilder tb, final boolean strip) {
     final byte[] t = tb.toArray();
@@ -2707,7 +2756,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "ComputedConstructor" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr compConstructor() throws QueryException {
@@ -2715,7 +2764,7 @@ public class QueryParser extends InputParser {
     if(wsConsumeWs(DOCUMENT))  return consume(compDoc(), i);
     if(wsConsumeWs(ELEMENT))   return consume(compElement(), i);
     if(wsConsumeWs(ATTRIBUTE)) return consume(compAttribute(), i);
-    if(wsConsumeWs(NSPACE))    return consume(compNamespace(), i);
+    if(wsConsumeWs(NAMESPACE))    return consume(compNamespace(), i);
     if(wsConsumeWs(TEXT))      return consume(compText(), i);
     if(wsConsumeWs(COMMENT))   return consume(compComment(), i);
     if(wsConsumeWs(PI))        return consume(compPI(), i);
@@ -2726,7 +2775,7 @@ public class QueryParser extends InputParser {
    * Consumes the specified expression or resets the query position.
    * @param expr expression
    * @param p query position
-   * @return expression (may be {@code null})
+   * @return expression or {@code null}
    */
   private Expr consume(final Expr expr, final int p) {
     if(expr == null) pos = p;
@@ -2739,10 +2788,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr compDoc() throws QueryException {
-    if(!wsConsume(CURLY1)) return null;
-    final Expr e = check(expr(), NODOCCONS);
-    wsCheck(CURLY2);
-    return new CDoc(sc, info(), e);
+    return curr('{') ? new CDoc(sc, info(), enclosedExpr()) : null;
   }
 
   /**
@@ -2758,17 +2804,15 @@ public class QueryParser extends InputParser {
     final QNm qn = eQName(null, SKIPCHECK);
     if(qn != null) {
       name = qn;
-      names.add(new QNmCheck(qn));
+      qnames.add(qn);
     } else {
       if(!wsConsume(CURLY1)) return null;
       name = check(expr(), NOELEMNAME);
       wsCheck(CURLY2);
     }
 
-    if(!wsConsume(CURLY1)) return null;
-    final Expr e = expr();
-    wsCheck(CURLY2);
-    return new CElem(sc, info(), name, null, e == null ? new Expr[0] : new Expr[] { e });
+    skipWs();
+    return curr('{') ? new CElem(sc, info(), name, null, enclosedExpr()) : null;
   }
 
   /**
@@ -2783,17 +2827,15 @@ public class QueryParser extends InputParser {
     final QNm qn = eQName(null, SKIPCHECK);
     if(qn != null) {
       name = qn;
-      names.add(new QNmCheck(qn, false));
+      qnames.add(qn, false);
     } else {
       if(!wsConsume(CURLY1)) return null;
       name = check(expr(), NOATTNAME);
       wsCheck(CURLY2);
     }
 
-    if(!wsConsume(CURLY1)) return null;
-    final Expr e = expr();
-    wsCheck(CURLY2);
-    return new CAttr(sc, info(), true, name, e == null ? Empty.SEQ : e);
+    skipWs();
+    return curr('{') ? new CAttr(sc, info(), true, name, enclosedExpr()) : null;
   }
 
   /**
@@ -2807,17 +2849,13 @@ public class QueryParser extends InputParser {
     final Expr name;
     final byte[] str = ncName(null);
     if(str.length == 0) {
-      if(!wsConsume(CURLY1)) return null;
-      name = check(expr(), NSWRONG);
-      wsCheck(CURLY2);
+      if(!curr('{')) return null;
+      name = enclosedExpr();
     } else {
       name = Str.get(str);
     }
-
-    if(!wsConsume(CURLY1)) return null;
-    final Expr e = expr();
-    wsCheck(CURLY2);
-    return new CNSpace(sc, info(), name, e == null ? Empty.SEQ : e);
+    skipWs();
+    return curr('{') ? new CNSpace(sc, info(), name, enclosedExpr()) : null;
   }
 
   /**
@@ -2826,10 +2864,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr compText() throws QueryException {
-    if(!wsConsume(CURLY1)) return null;
-    final Expr e = check(expr(), NOTXTCONS);
-    wsCheck(CURLY2);
-    return new CTxt(sc, info(), e);
+    return curr('{') ? new CTxt(sc, info(), enclosedExpr()) : null;
   }
 
   /**
@@ -2838,10 +2873,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr compComment() throws QueryException {
-    if(!wsConsume(CURLY1)) return null;
-    final Expr e = check(expr(), NOCOMCONS);
-    wsCheck(CURLY2);
-    return new CComm(sc, info(), e);
+    return curr('{') ? new CComm(sc, info(), enclosedExpr()) : null;
   }
 
   /**
@@ -2862,10 +2894,8 @@ public class QueryParser extends InputParser {
       name = Str.get(str);
     }
 
-    if(!wsConsume(CURLY1)) return null;
-    final Expr e = expr();
-    wsCheck(CURLY2);
-    return new CPI(sc, info(), name, e == null ? Empty.SEQ : e);
+    skipWs();
+    return curr('{') ? new CPI(sc, info(), name, enclosedExpr()) : null;
   }
 
   /**
@@ -2926,9 +2956,9 @@ public class QueryParser extends InputParser {
 
     // parenthesized item type
     if(consume(PAREN1)) {
-      final SeqType ret = itemType();
+      final SeqType type = itemType();
       wsCheck(PAREN2);
-      return ret;
+      return type;
     }
 
     // parse optional annotation and type name
@@ -3126,16 +3156,16 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "TryCatch" rules.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr tryCatch() throws QueryException {
     if(!wsConsumeWs(TRY)) return null;
 
-    final Expr tr = enclosed(NOENCLEXPR);
+    final Expr expr = enclosedExpr();
     wsCheck(CATCH);
 
-    Catch[] ct = { };
+    Catch[] catches = { };
     do {
       NameTest[] codes = { };
       do {
@@ -3145,18 +3175,18 @@ public class QueryParser extends InputParser {
         codes = Array.add(codes, test);
       } while(wsConsumeWs(PIPE));
 
-      final int s = openSubScope();
+      final int s = localVars.openScope();
       final int cl = Catch.NAMES.length;
       final Var[] vs = new Var[cl];
-      for(int i = 0; i < cl; i++) vs[i] = addVar(Catch.NAMES[i], Catch.TYPES[i], false);
+      for(int i = 0; i < cl; i++) vs[i] = localVars.add(Catch.NAMES[i], Catch.TYPES[i], false);
       final Catch c = new Catch(info(), codes, vs);
-      c.expr = enclosed(NOENCLEXPR);
-      closeSubScope(s);
+      c.expr = enclosedExpr();
+      localVars.closeScope(s);
 
-      ct = Array.add(ct, c);
+      catches = Array.add(catches, c);
     } while(wsConsumeWs(CATCH));
 
-    return new Try(info(), tr, ct);
+    return new Try(info(), expr, catches);
   }
 
   /**
@@ -3291,7 +3321,7 @@ public class QueryParser extends InputParser {
     if(fto.is(ST) && fto.sd == null && !Stemmer.supportFor(fto.ln)) throw error(FTNOSTEM_X, fto.ln);
 
     // consume weight option
-    if(wsConsumeWs(WEIGHT)) expr = new FTWeight(info(), expr, enclosed(NOENCLEXPR));
+    if(wsConsumeWs(WEIGHT)) expr = new FTWeight(info(), expr, enclosedExpr());
 
     // skip options if none were specified...
     return found ? new FTOpts(info(), expr, fto) : expr;
@@ -3323,7 +3353,7 @@ public class QueryParser extends InputParser {
     if(quote(curr())) {
       e = Str.get(stringLiteral());
     } else if(curr('{')) {
-      e = enclosed(NOENCLEXPR);
+      e = enclosedExpr();
     } else {
       throw error(prg ? NOPRAGMA : NOFTSELECT_X, found());
     }
@@ -3463,8 +3493,7 @@ public class QueryParser extends InputParser {
         if(wsConsumeWs(DEFAULT)) {
           if(!using) throw error(FTSTOP);
         } else {
-          boolean union = false;
-          boolean except = false;
+          boolean union = false, except = false;
           while(using) {
             if(wsConsume(PAREN1)) {
               do {
@@ -3476,7 +3505,7 @@ public class QueryParser extends InputParser {
             } else if(wsConsumeWs(AT)) {
               final String fn = string(stringLiteral());
               // optional: resolve URI reference
-              final IO fl = qc.stop != null ? qc.stop.get(fn) : sc.resolve(fn, null);
+              final IO fl = qc.resources.stopWords(fn, sc);
               if(!opt.sw.read(fl, except)) throw error(NOSTOPFILE_X, fl);
             } else if(!union && !except) {
               throw error(FTSTOP);
@@ -3512,7 +3541,7 @@ public class QueryParser extends InputParser {
 
     final String fn = string(stringLiteral());
     // optional: resolve URI reference
-    final IO fl = qc.thes != null ? qc.thes.get(fn) : sc.resolve(fn, null);
+    final IO fl = qc.resources.thesaurus(fn, sc);
     final byte[] rel = wsConsumeWs(RELATIONSHIP) ? stringLiteral() : EMPTY;
     final Expr[] range = ftRange(true);
     long min = 0;
@@ -3528,7 +3557,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "InsertExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr insert() throws QueryException {
@@ -3562,10 +3591,10 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "DeleteExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
-  private Expr deletee() throws QueryException {
+  private Expr delete() throws QueryException {
     final int i = pos;
     if(!wsConsumeWs(DELETE) || !wsConsumeWs(NODES) && !wsConsumeWs(NODE)) {
       pos = i;
@@ -3577,7 +3606,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "RenameExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr rename() throws QueryException {
@@ -3596,7 +3625,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "ReplaceExpr" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr replace() throws QueryException {
@@ -3620,40 +3649,43 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "TransformExpr" rule.
-   * @return query expression (may be {@code null})
+   * Parses the "CopyModifyExpr" rule.
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
-  private Expr transform() throws QueryException {
+  private Expr copyModify() throws QueryException {
     if(!wsConsumeWs(COPY, DOLLAR, INCOMPLETE)) return null;
-    final int s = openSubScope();
+    final int s = localVars.openScope();
 
     Let[] fl = { };
     do {
       final QNm name = varName();
       wsCheck(ASSIGN);
       final Expr e = check(single(), INCOMPLETE);
-      fl = Array.add(fl, new Let(addVar(name, SeqType.NOD, false), e, false, info()));
+      fl = Array.add(fl, new Let(localVars.add(name, SeqType.NOD, false), e, false, info()));
     } while(wsConsumeWs(COMMA));
     wsCheck(MODIFY);
 
+    final InputInfo ii = info();
     final Expr m = check(single(), INCOMPLETE);
     wsCheck(RETURN);
     final Expr r = check(single(), INCOMPLETE);
 
-    closeSubScope(s);
+    localVars.closeScope(s);
     qc.updating();
-    return new Transform(info(), fl, m, r);
+    return new Transform(ii, fl, m, r);
   }
 
   /**
    * Parses the "UpdatingFunctionCall" rule.
-   * @return query expression (may be {@code null})
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr updatingFunctionCall() throws QueryException {
     final int p = pos;
-    if(wsConsumeWs(UPDATING)) {
+    wsConsume(INVOKE);
+    final boolean upd = wsConsumeWs(UPDATING), ndt = wsConsumeWs(NON_DETERMINISTIC);
+    if(upd || ndt) {
       final Expr func = primary();
       if(wsConsume(PAREN1)) {
         final InputInfo ii = info();
@@ -3662,13 +3694,15 @@ public class QueryParser extends InputParser {
         if(!wsConsume(PAREN2)) {
           do {
             final Expr e = single();
-            if(e == null) throw error(FUNCMISS_X, func);
+            if(e == null) throw funcMiss(func);
             argList.add(e);
           } while(wsConsume(COMMA));
-          if(!wsConsume(PAREN2)) throw error(FUNCMISS_X, func);
+          if(!wsConsume(PAREN2)) throw funcMiss(func);
         }
-        qc.updating();
-        return new DynFuncCall(ii, sc, true, func, argList.finish());
+        // skip if primary expression cannot be a function
+        if(func instanceof Value && !(func instanceof FItem)) throw error(NOPAREN_X_X, func);
+        if(upd) qc.updating();
+        return new DynFuncCall(ii, sc, upd, ndt, func, argList.finish());
       }
     }
     pos = p;
@@ -3693,7 +3727,7 @@ public class QueryParser extends InputParser {
    * @param err optional error message. Will be thrown if no EQName is found, or ignored if set to
    * {@code null}
    * @param def default namespace, or operation mode ({@link #URICHECK}, {@link #SKIPCHECK})
-   * @return QName (may be {@code null})
+   * @return QName or {@code null}
    * @throws QueryException query exception
    */
   private QNm eQName(final QueryError err, final byte[] def) throws QueryException {
@@ -3725,7 +3759,7 @@ public class QueryParser extends InputParser {
       }
       if(name.hasPrefix()) {
         pos = i;
-        throw error(NOURI_X, name);
+        throw error(NOURI_X, name.string());
       }
       name.uri(def);
     }
@@ -3870,108 +3904,6 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Creates and registers a new local variable in the current scope.
-   * @param name variable name
-   * @param tp variable type
-   * @param prm if the variable is a function parameter
-   * @return registered variable
-   */
-  private Var addVar(final QNm name, final SeqType tp, final boolean prm) {
-    return localVars.get(localVars.size() - 1).addVar(name, tp, prm);
-  }
-
-  /**
-   * Tries to resolve a local variable reference.
-   * @param name variable name
-   * @param ii input info
-   * @return variable reference (may be {@code null})
-   */
-  private VarRef resolveLocalVar(final QNm name, final InputInfo ii) {
-    int l = localVars.size();
-    Var var = null;
-
-    // look up through the scopes until we find the declaring scope
-    while(--l >= 0) {
-      var = localVars.get(l).stack.get(name);
-      if(var != null) break;
-    }
-
-    // looked through all scopes, must be a static variable
-    if(var == null) return null;
-
-    // go down through the scopes and add bindings to their closures
-    final int ls = localVars.size();
-    while(++l < ls) {
-      final VarContext vctx = localVars.get(l);
-      final Var local = vctx.addVar(var.name, var.seqType(), false);
-      vctx.nonLocal.put(local, new VarRef(ii, var));
-      var = local;
-    }
-
-    // return the properly propagated variable reference
-    return new VarRef(ii, var);
-  }
-
-  /**
-   * Resolves the referenced variable as a local or static variable and returns a reference to it.
-   * IF the variable is not declared, the specified error is thrown.
-   * @param name variable name
-   * @param ii input info
-   * @return referenced variable
-   * @throws QueryException if the variable isn't defined
-   */
-  private Expr resolveVar(final QNm name, final InputInfo ii) throws QueryException {
-    // local variable
-    final VarRef local = resolveLocalVar(name, ii);
-    if(local != null) return local;
-
-    // static variable
-    final byte[] uri = name.uri();
-
-    // accept variable reference...
-    // - if a variable uses the module or an imported URI, or
-    // - if it is specified in the main module
-    if(module == null || eq(module.uri(), uri) || modules.contains(uri))
-      return qc.vars.newRef(name, sc, ii);
-
-    throw error(VARUNDEF_X, '$' + string(name.string()));
-  }
-
-  /**
-   * Pushes a new variable context onto the stack.
-   * @param nonLocal mapping for non-local variables
-   */
-  private void pushVarContext(final HashMap<Var, Expr> nonLocal) {
-    localVars.add(new VarContext(nonLocal));
-  }
-
-  /**
-   * Pops one variable context from the stack.
-   * @return the removed context's variable scope
-   */
-  private VarScope popVarContext() {
-    return localVars.remove(localVars.size() - 1).scope;
-  }
-
-  /**
-   * Opens a new sub-scope inside the current one. The returned marker has to be supplied to the
-   * corresponding call to {@link #closeSubScope(int)} in order to mark the variables as
-   * inaccessible.
-   * @return marker for the current bindings
-   */
-  private int openSubScope() {
-    return localVars.get(localVars.size() - 1).stack.size();
-  }
-
-  /**
-   * Closes the sub-scope and marks all contained variables as inaccessible.
-   * @param marker marker for the start of the sub-scope
-   */
-  private void closeSubScope(final int marker) {
-    localVars.get(localVars.size() - 1).stack.size(marker);
-  }
-
-  /**
    * Consumes the next character and normalizes new line characters.
    * @return next character
    * @throws QueryException query exception
@@ -4113,7 +4045,7 @@ public class QueryParser extends InputParser {
    */
   private QueryException error() {
     pos = alterPos;
-    if(alter != FUNCUNKNOWN_X) return error(alter);
+    if(alter != WHICHFUNC_X) return error(alter);
     final QueryException qe = qc.funcs.similarError(alterFunc, info());
     return qe == null ? error(alter, alterFunc.string()) : qe;
   }
@@ -4130,98 +4062,26 @@ public class QueryParser extends InputParser {
   }
 
   /**
+   * Creates a function parsing error.
+   * @param func function
+   * @return error
+   */
+  private QueryException funcMiss(final Object func) {
+    Object name = func;
+    if(func instanceof XQFunctionExpr) {
+      final QNm qnm = ((XQFunctionExpr) func).funcName();
+      if(qnm != null) name = qnm.prefixId();
+    }
+    return error(FUNCMISS_X, name);
+  }
+
+  /**
    * Creates the specified error.
    * @param err error to be thrown
    * @param arg error arguments
    * @return error
    */
-  QueryException error(final QueryError err, final Object... arg) {
+  public QueryException error(final QueryError err, final Object... arg) {
     return err.get(info(), arg);
-  }
-
-  /**
-   * Finalizes the QNames by assigning namespace URIs.
-   * @param npos first entry to be checked
-   * @throws QueryException query exception
-   */
-  private void assignURI(final int npos) throws QueryException {
-    for(int i = npos; i < names.size(); i++) {
-      if(names.get(i).assign(npos == 0)) names.remove(i--);
-    }
-  }
-
-  /** Cache for checking QNames after their construction. */
-  private class QNmCheck {
-    /** QName to be checked. */
-    final QNm name;
-    /** Flag for assigning default element namespace. */
-    final boolean nsElem;
-
-    /**
-     * Constructor.
-     * @param nm qname
-     */
-    QNmCheck(final QNm nm) {
-      this(nm, true);
-    }
-
-    /**
-     * Constructor.
-     * @param nm qname
-     * @param nse default check
-     */
-    QNmCheck(final QNm nm, final boolean nse) {
-      name = nm;
-      nsElem = nse;
-    }
-
-    /**
-     * Assigns the namespace URI that is currently in scope.
-     * @param check check if prefix URI was assigned
-     * @return true if URI has a URI
-     * @throws QueryException query exception
-     */
-    boolean assign(final boolean check) throws QueryException {
-      if(name.hasURI()) return true;
-
-      if(name.hasPrefix()) {
-        name.uri(sc.ns.uri(name.prefix()));
-        if(check && !name.hasURI()) throw error(NOURI_X, name.string());
-      } else if(nsElem) {
-        name.uri(sc.elemNS);
-      }
-      return name.hasURI();
-    }
-  }
-
-  /** Variable context for resolving local variables. */
-  private class VarContext {
-    /** Stack of local variables. */
-    final VarStack stack = new VarStack();
-    /** Current scope containing all variables and the closure. */
-    final VarScope scope = new VarScope(sc);
-    /** Non-local variable bindings for closures. */
-    final HashMap<Var, Expr> nonLocal;
-
-    /**
-     * Constructor.
-     * @param bindings non-local variable bindings for closures
-     */
-    public VarContext(final HashMap<Var, Expr> bindings) {
-      nonLocal = bindings;
-    }
-
-    /**
-     * Adds a new variable to this context.
-     * @param name variable name
-     * @param tp variable type
-     * @param prm promotion flag
-     * @return the variable
-     */
-    public Var addVar(final QNm name, final SeqType tp, final boolean prm) {
-      final Var var = scope.newLocal(qc, name, tp, prm);
-      stack.push(var);
-      return var;
-    }
   }
 }

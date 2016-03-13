@@ -1,13 +1,13 @@
 package org.basex.query.func.xquery;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import java.util.*;
 import java.util.Map.Entry;
 
 import org.basex.core.*;
+import org.basex.core.Proc.*;
 import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
@@ -22,12 +22,13 @@ import org.basex.util.options.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public class XQueryEval extends StandardFunc {
   /** QName. */
-  private static final QNm Q_OPTIONS = QNm.get(XQUERY_PREFIX, "options", XQUERY_URI);
+  private static final QNm Q_OPTIONS =
+      QNm.get(QueryText.XQUERY_PREFIX, "options", QueryText.XQUERY_URI);
 
   /** XQuery options. */
   public static class XQueryOptions extends Options {
@@ -37,6 +38,8 @@ public class XQueryEval extends StandardFunc {
     public static final NumberOption TIMEOUT = new NumberOption("timeout", 0);
     /** Maximum amount of megabytes that may be allocated by the query. */
     public static final NumberOption MEMORY = new NumberOption("memory", 0);
+    /** Query base-uri. */
+    public static final StringOption BASE_URI = new StringOption("base-uri");
   }
 
   @Override
@@ -75,6 +78,7 @@ public class XQueryEval extends StandardFunc {
     final HashMap<String, Value> bindings = toBindings(1, qc);
     final User user = qc.context.user();
     final Perm tmp = user.perm("");
+    String uri = path;
     Timer to = null;
 
     try(final QueryContext qctx = qc.proc(new QueryContext(qc))) {
@@ -82,18 +86,19 @@ public class XQueryEval extends StandardFunc {
         final Options opts = toOptions(2, Q_OPTIONS, new XQueryOptions(), qc);
         final Perm perm = Perm.get(opts.get(XQueryOptions.PERMISSION).toString());
         if(!user.has(perm)) throw BXXQ_PERM2_X.get(info, perm);
-        user.perm(perm, "");
+        user.perm(perm);
 
-        // initial memory consumption: perform garbage collection and calculate usage
+        // initial memory consumption: enforce garbage collection and calculate usage
         final long mb = opts.get(XQueryOptions.MEMORY);
         if(mb != 0) {
+          Performance.gc(2);
           final long limit = Performance.memory() + (mb << 20);
           to = new Timer(true);
           to.schedule(new TimerTask() {
             @Override
             public void run() {
               // limit reached: perform garbage collection and check again
-              if(Performance.memory() > limit) qctx.stop();
+              if(Performance.memory() > limit) qctx.memory();
             }
           }, 500, 500);
         }
@@ -102,9 +107,11 @@ public class XQueryEval extends StandardFunc {
           if(to == null) to = new Timer(true);
           to.schedule(new TimerTask() {
             @Override
-            public void run() { qctx.stop(); }
+            public void run() { qctx.timeout(); }
           }, ms);
         }
+        final String bu = opts.get(XQueryOptions.BASE_URI);
+        if(bu != null) uri = bu;
       }
 
       // evaluate query
@@ -116,7 +123,7 @@ public class XQueryEval extends StandardFunc {
           if(key.isEmpty()) qctx.context(val, sctx);
           else qctx.bind(key, val, sctx);
         }
-        qctx.parseMain(string(qu), path, sctx);
+        qctx.parseMain(string(qu), uri, sctx);
 
         if(updating) {
           if(!sc.mixUpdates && !qctx.updating && !qctx.root.expr.isVacuous())
@@ -126,19 +133,25 @@ public class XQueryEval extends StandardFunc {
         }
 
         final ItemList cache = new ItemList();
-        cache(qctx.iter(), cache, qctx);
+        final Iter iter = qctx.iter();
+        for(Item it; (it = iter.next()) != null;) {
+          qc.checkStop();
+          cache.add(it);
+        }
         return cache;
       } catch(final ProcException ex) {
-        throw BXXQ_STOPPED.get(info);
+        if(qctx.state == State.TIMEOUT) throw BXXQ_TIMEOUT.get(info);
+        if(qctx.state == State.MEMORY)  throw BXXQ_MEMORY.get(info);
+        throw ex;
       } catch(final QueryException ex) {
         throw ex.error() == BASX_PERM_X ? BXXQ_PERM_X.get(info, ex.getLocalizedMessage()) :
           ex.info(info);
       }
 
     } finally {
+      if(to != null) to.cancel();
       user.perm(tmp, "");
       qc.proc(null);
-      if(to != null) to.cancel();
     }
   }
 

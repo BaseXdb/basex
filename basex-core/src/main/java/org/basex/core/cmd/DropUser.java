@@ -11,7 +11,7 @@ import org.basex.server.*;
 /**
  * Evaluates the 'drop user' command and drops a user.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class DropUser extends AUser {
@@ -50,8 +50,10 @@ public final class DropUser extends AUser {
         for(final ClientListener s : context.sessions) {
           if(s.context().user().name().equals(name)) return !info(USER_LOGGED_IN_X, name);
         }
+        users.drop(user);
+      } else {
+        user.drop(pattern);
       }
-      users.drop(users.get(name), pattern);
       return info(pattern.isEmpty() ? USER_DROPPED_X : USER_DROPPED_X_X, name, pattern);
     }
     return true;

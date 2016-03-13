@@ -15,7 +15,7 @@ import org.basex.util.hash.*;
 /**
  * Map constructor.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
  */
 public final class CMap extends Arr {
@@ -27,12 +27,6 @@ public final class CMap extends Arr {
   public CMap(final InputInfo info, final Expr[] expr) {
     super(info, expr);
     seqType = SeqType.MAP_O;
-  }
-
-  @Override
-  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    super.compile(qc, scp);
-    return optimize(qc, scp);
   }
 
   @Override
@@ -48,7 +42,6 @@ public final class CMap extends Arr {
       final Value key = exprs[e].atomValue(qc, ii);
       if(!(key instanceof Item)) throw SEQFOUND_X.get(ii, key);
       final Item k = (Item) key;
-      if(!map.checkTz(k)) throw MAPTZ.get(ii);
       final Value v = qc.value(exprs[e + 1]);
       if(map.contains(k, ii)) throw MAPDUPLKEY_X_X_X.get(ii, k, map.get(k, ii), v);
       map = map.put(k, v, ii);
@@ -70,8 +63,8 @@ public final class CMap extends Arr {
   public String toString() {
     final TokenBuilder tb = new TokenBuilder("{ ");
     boolean key = true;
-    for(final Expr e : exprs) {
-      tb.add(key ? tb.size() > 2 ? ", " : "" : ":").add(e.toString());
+    for(final Expr expr : exprs) {
+      tb.add(key ? tb.size() > 2 ? ", " : "" : ":").add(expr.toString());
       key ^= true;
     }
     return tb.add(" }").toString();

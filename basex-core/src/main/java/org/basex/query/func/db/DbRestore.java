@@ -13,7 +13,7 @@ import org.basex.util.list.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class DbRestore extends DbAccess {
@@ -29,7 +29,7 @@ public final class DbRestore extends DbAccess {
 
     final String backup = backups.get(0);
     final String db = Databases.name(backup);
-    qc.resources.updates().add(new DBRestore(db, backup, qc, info), qc);
+    qc.updates().add(new DBRestore(db, backup, qc, info), qc);
     return null;
   }
 }

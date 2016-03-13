@@ -12,7 +12,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class DbDrop extends DbAccess {
@@ -20,8 +20,8 @@ public final class DbDrop extends DbAccess {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final String name = string(toToken(exprs[0], qc));
     if(!Databases.validName(name)) throw BXDB_NAME_X.get(info, name);
-    if(!qc.context.soptions.dbexists(name)) throw BXDB_WHICH_X.get(info, name);
-    qc.resources.updates().add(new DBDrop(name, info, qc), qc);
+    if(!qc.context.soptions.dbExists(name)) throw BXDB_WHICH_X.get(info, name);
+    qc.updates().add(new DBDrop(name, info, qc), qc);
     return null;
   }
 }

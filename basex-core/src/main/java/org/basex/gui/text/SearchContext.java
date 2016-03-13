@@ -11,7 +11,7 @@ import org.basex.util.list.*;
 /**
  * This class summarizes the result of a search.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 final class SearchContext {
@@ -182,11 +182,13 @@ final class SearchContext {
     return nr;
   }
 
-  @Override
-  public boolean equals(final Object obj) {
-    if(!(obj instanceof SearchContext)) return false;
-    final SearchContext s = (SearchContext) obj;
-    return mcase == s.mcase && word == s.word && regex == s.regex && multi == s.multi &&
-        Strings.eq(search, s.search);
+  /**
+   * Compares a search context with another.
+   * @param sc search context
+   * @return result of check
+   */
+  public boolean sameAs(final SearchContext sc) {
+    return sc != null && mcase == sc.mcase && word == sc.word && regex == sc.regex &&
+        multi == sc.multi && Strings.eq(search, sc.search);
   }
 }

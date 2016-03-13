@@ -8,7 +8,6 @@ import org.basex.build.html.*;
 import org.basex.build.json.*;
 import org.basex.build.text.*;
 import org.basex.core.*;
-import org.basex.core.cmd.*;
 import org.basex.io.*;
 import org.basex.query.func.archive.*;
 import org.basex.query.func.ft.*;
@@ -22,7 +21,7 @@ import org.junit.Test;
 /**
  * Tests on options.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class OptionsTest extends SandboxTest {
@@ -55,7 +54,7 @@ public final class OptionsTest extends SandboxTest {
     final Boolean value = Boolean.FALSE;
     System.setProperty(Prop.DBPREFIX + name.name(), value.toString());
     try {
-      assertEquals(value, new MainOptions().get(name));
+      assertEquals(false, new MainOptions().get(name));
     } finally {
       System.clearProperty(Prop.DBPREFIX + name.name());
     }
@@ -74,17 +73,17 @@ public final class OptionsTest extends SandboxTest {
     file.write(Token.token(input));
 
     // check if original file will be updated
-    context.options.set(name, true);
+    set(name, true);
     try {
-      new XQuery("delete node doc('" + file + "')/a").execute(context);
+      query("delete node doc('" + file + "')/a");
       assertEquals("", Token.string(file.read()));
     } finally {
-      context.options.set(name, false);
+      set(name, false);
     }
 
     // original file will stay untouched
     file.write(Token.token(input));
-    new XQuery("delete node doc('" + file + "')/a").execute(context);
+    query("delete node doc('" + file + "')/a");
     assertEquals(input, Token.string(file.read()));
   }
 

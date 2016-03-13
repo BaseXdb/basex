@@ -13,7 +13,7 @@ import org.basex.util.hash.*;
 /**
  * Project specific try/catch expression.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class Try extends Single {
@@ -81,8 +81,11 @@ public final class Try extends Single {
     try {
       return qc.value(expr);
     } catch(final QueryException ex) {
-      if(!ex.isCatchable()) throw ex;
-      for(final Catch c : catches) if(c.matches(ex)) return c.value(qc, ex);
+      if(ex.isCatchable()) {
+        for(final Catch c : catches) {
+          if(c.matches(ex)) return c.value(qc, ex);
+        }
+      }
       throw ex;
     }
   }

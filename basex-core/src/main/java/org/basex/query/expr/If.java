@@ -18,7 +18,7 @@ import org.basex.util.hash.*;
 /**
  * If expression.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class If extends Arr {
@@ -45,18 +45,15 @@ public final class If extends Arr {
 
   @Override
   public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-    cond = cond.compile(qc, scp).optimizeEbv(qc, scp);
-    // static condition: return branch in question
-    if(cond.isValue()) return optPre(eval(qc).compile(qc, scp), qc);
-
-    // compile and simplify branches
-    final int es = exprs.length;
-    for(int e = 0; e < es; e++) {
+    cond = cond.compile(qc, scp);
+    // choose branches to compile
+    final int[] branches = cond.isValue() ? new int[] { branch(qc) } : new int[] { 0, 1 };
+    for(final int b : branches) {
       try {
-        exprs[e] = exprs[e].compile(qc, scp);
-      } catch(final QueryException ex) {
+        exprs[b] = exprs[b].compile(qc, scp);
+      } catch (final QueryException ex) {
         // replace original expression with error
-        exprs[e] = FnError.get(ex, seqType);
+        exprs[b] = FnError.get(ex, seqType);
       }
     }
     return optimize(qc, scp);
@@ -65,14 +62,15 @@ public final class If extends Arr {
   @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     // static condition: return branch in question
-    if(cond.isValue()) return optPre(eval(qc), qc);
+    cond = cond.optimizeEbv(qc, scp);
+    if(cond.isValue()) return optPre(exprs[branch(qc)], qc);
 
     // if A then B else B -> B (errors in A will be ignored)
     if(exprs[0].sameAs(exprs[1])) return optPre(exprs[0], qc);
 
     // if not(A) then B else C -> if A then C else B
     if(cond.isFunction(Function.NOT)) {
-      qc.compInfo(OPTWRITE, this);
+      qc.compInfo(OPTREWRITE_X, this);
       cond = ((Arr) cond).exprs[0];
       final Expr tmp = exprs[0];
       exprs[0] = exprs[1];
@@ -85,36 +83,36 @@ public final class If extends Arr {
       if(b == Bln.TRUE) {
         if(c == Bln.FALSE) {
           // if(A) then true() else false() -> xs:boolean(A)
-          qc.compInfo(OPTPRE, this);
+          qc.compInfo(OPTPRE_X, this);
           return compBln(a, info);
         }
         // if(A) then true() else C -> A or C
-        qc.compInfo(OPTWRITE, this);
+        qc.compInfo(OPTREWRITE_X, this);
         return new Or(info, a, c).optimize(qc, scp);
       }
 
       if(c == Bln.TRUE) {
         if(b == Bln.FALSE) {
           // if(A) then false() else true() -> not(A)
-          qc.compInfo(OPTPRE, this);
+          qc.compInfo(OPTPRE_X, this);
           return Function.NOT.get(null, info, a).optimize(qc, scp);
         }
         // if(A) then B else true() -> not(A) or B
-        qc.compInfo(OPTWRITE, this);
+        qc.compInfo(OPTREWRITE_X, this);
         final Expr notA = Function.NOT.get(null, info, a).optimize(qc, scp);
         return new Or(info, notA, b).optimize(qc, scp);
       }
 
       if(b == Bln.FALSE) {
         // if(A) then false() else C -> not(A) and C
-        qc.compInfo(OPTWRITE, this);
+        qc.compInfo(OPTREWRITE_X, this);
         final Expr notA = Function.NOT.get(null, info, a).optimize(qc, scp);
         return new And(info, notA, c).optimize(qc, scp);
       }
 
       if(c == Bln.FALSE) {
         // if(A) then B else false() -> A and B
-        qc.compInfo(OPTWRITE, this);
+        qc.compInfo(OPTREWRITE_X, this);
         return new And(info, a, b).optimize(qc, scp);
       }
     }
@@ -125,27 +123,27 @@ public final class If extends Arr {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    return qc.iter(eval(qc));
+    return qc.iter(exprs[branch(qc)]);
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return qc.value(eval(qc));
+    return qc.value(exprs[branch(qc)]);
   }
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return eval(qc).item(qc, info);
+    return exprs[branch(qc)].item(qc, info);
   }
 
   /**
-   * Evaluates the condition and returns the matching expression.
+   * Evaluates the condition and returns the offset of the resulting branch.
    * @param qc query context
-   * @return resulting expression
+   * @return branch offset
    * @throws QueryException query exception
    */
-  private Expr eval(final QueryContext qc) throws QueryException {
-    return exprs[cond.ebv(qc, info).bool(info) ? 0 : 1];
+  private int branch(final QueryContext qc) throws QueryException {
+    return cond.ebv(qc, info).bool(info) ? 0 : 1;
   }
 
   @Override
@@ -221,7 +219,7 @@ public final class If extends Arr {
   @Override
   public int exprSize() {
     int sz = 1;
-    for(final Expr e : exprs) sz += e.exprSize();
+    for(final Expr expr : exprs) sz += expr.exprSize();
     return sz + cond.exprSize();
   }
 

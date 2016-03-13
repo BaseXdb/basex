@@ -3,11 +3,9 @@ package org.basex.query;
 import static org.basex.core.Text.*;
 
 import java.io.*;
-import java.util.*;
 import java.util.regex.*;
 
 import org.basex.core.*;
-import org.basex.core.Context;
 import org.basex.core.locks.*;
 import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
@@ -21,7 +19,7 @@ import org.basex.query.value.seq.*;
 /**
  * This class is an entry point for evaluating XQuery strings.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class QueryProcessor extends Proc implements Closeable {
@@ -55,9 +53,12 @@ public final class QueryProcessor extends Proc implements Closeable {
    */
   public void parse() throws QueryException {
     if(parsed) return;
-    parsed = true;
-    qc.parseMain(query, null, sc);
-    updating = qc.updating;
+    try {
+      qc.parseMain(query, null, sc);
+    } finally {
+      parsed = true;
+      updating = qc.updating;
+    }
   }
 
   /**
@@ -78,6 +79,16 @@ public final class QueryProcessor extends Proc implements Closeable {
   public Iter iter() throws QueryException {
     parse();
     return qc.iter();
+  }
+
+  /**
+   * Deprecated; use {@link #value} instead.
+   * @return result value
+   * @throws QueryException query exception
+   */
+  @Deprecated
+  public Value execute() throws QueryException {
+    return value();
   }
 
   /**
@@ -261,7 +272,7 @@ public final class QueryProcessor extends Proc implements Closeable {
    * @return number of updates
    */
   public int updates() {
-    return updating ? qc.resources.updates().size() : 0;
+    return updating ? qc.updates().size() : 0;
   }
 
   /**
@@ -314,45 +325,6 @@ public final class QueryProcessor extends Proc implements Closeable {
     }
     if(sb.length() >= max) sb.append("...");
     return sb.toString().trim();
-  }
-
-  /**
-   * Returns a map with variable bindings.
-   * @param opts main options
-   * @return bindings
-   */
-  public static HashMap<String, String> bindings(final MainOptions opts) {
-    final HashMap<String, String> bindings = new HashMap<>();
-    final String bind = opts.get(MainOptions.BINDINGS).trim();
-    final StringBuilder key = new StringBuilder();
-    final StringBuilder val = new StringBuilder();
-    boolean first = true;
-    final int sl = bind.length();
-    for(int s = 0; s < sl; s++) {
-      final char ch = bind.charAt(s);
-      if(first) {
-        if(ch == '=') {
-          first = false;
-        } else {
-          key.append(ch);
-        }
-      } else {
-        if(ch == ',') {
-          if(s + 1 == sl || bind.charAt(s + 1) != ',') {
-            bindings.put(key.toString().trim(), val.toString());
-            key.setLength(0);
-            val.setLength(0);
-            first = true;
-            continue;
-          }
-          // literal commas are escaped by a second comma
-          s++;
-        }
-        val.append(ch);
-      }
-    }
-    if(!first) bindings.put(key.toString().trim(), val.toString());
-    return bindings;
   }
 
   /**

@@ -16,7 +16,7 @@ import org.basex.query.value.seq.*;
 /**
  * This view allows the input of database queries.
  *
- * @author BaseX Team 2005-15, BSD License
+ * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
 public final class ExploreView extends View {
@@ -64,8 +64,7 @@ public final class ExploreView extends View {
   @Override
   public void refreshMark() {
     final DBNodes marked = gui.context.marked;
-    filter.setEnabled(!gui.gopts.get(GUIOptions.FILTERRT) &&
-        marked != null && marked.size() != 0);
+    filter.setEnabled(!gui.gopts.get(GUIOptions.FILTERRT) && marked != null);
   }
 
   @Override
