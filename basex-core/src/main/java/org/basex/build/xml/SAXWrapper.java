@@ -48,11 +48,9 @@ public final class SAXWrapper extends SingleParser {
   @Override
   public void parse() throws IOException {
     final InputSource is = wrap(saxs.getInputSource());
-    //final String in = saxs.getSystemId() == null ? DOTS : saxs.getSystemId();
-
     try {
-      XMLReader r = saxs.getXMLReader();
-      if(r == null) {
+      XMLReader reader = saxs.getXMLReader();
+      if(reader == null) {
         final boolean dtd = options.get(MainOptions.DTD);
         final SAXParserFactory f = SAXParserFactory.newInstance();
         f.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", dtd);
@@ -62,21 +60,21 @@ public final class SAXWrapper extends SingleParser {
         f.setNamespaceAware(true);
         f.setValidating(false);
         f.setXIncludeAware(options.get(MainOptions.XINCLUDE));
-        r = f.newSAXParser().getXMLReader();
+        reader = f.newSAXParser().getXMLReader();
       }
 
       saxh = new SAXHandler(builder, options.get(MainOptions.CHOP),
           options.get(MainOptions.STRIPNS));
-      final String cat = options.get(MainOptions.CATFILE);
-      if(!cat.isEmpty()) CatalogWrapper.set(r, cat);
+      final String path = options.get(MainOptions.CATFILE);
+      if(!path.isEmpty()) CatalogWrapper.set(reader, path);
 
-      r.setDTDHandler(saxh);
-      r.setContentHandler(saxh);
-      r.setProperty("http://xml.org/sax/properties/lexical-handler", saxh);
-      r.setErrorHandler(saxh);
+      reader.setDTDHandler(saxh);
+      reader.setContentHandler(saxh);
+      reader.setProperty("http://xml.org/sax/properties/lexical-handler", saxh);
+      reader.setErrorHandler(saxh);
 
-      if(is != null) r.parse(is);
-      else r.parse(saxs.getSystemId());
+      if(is != null) reader.parse(is);
+      else reader.parse(saxs.getSystemId());
     } catch(final SAXParseException ex) {
       final String msg = Util.info(SCANPOS_X_X, source, ex.getLineNumber(),
           ex.getColumnNumber()) + COLS + Util.message(ex);

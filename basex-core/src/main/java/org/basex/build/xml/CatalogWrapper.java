@@ -39,15 +39,15 @@ public final class CatalogWrapper {
   }
 
   /**
-   * Decorates the {@link XMLReader} with the catalog resolver if it is found
-   * in the classpath. Does nothing otherwise.
+   * Decorates the {@link XMLReader} with the catalog resolver if it is found in the classpath.
+   * Does nothing otherwise.
    * @param reader XML reader
-   * @param cat path to catalog file
+   * @param path path to catalog file
    */
-  static void set(final XMLReader reader, final String cat) {
+  static void set(final XMLReader reader, final String path) {
     if(CM == null) return;
     invoke(method(CMP, "setIgnoreMissingProperties", boolean.class), CM, true);
-    invoke(method(CMP, "setCatalogFiles", String.class), CM, cat);
+    invoke(method(CMP, "setCatalogFiles", String.class), CM, path);
     invoke(method(CMP, "setPreferPublic", boolean.class), CM, true);
     invoke(method(CMP, "setUseStaticCatalog", boolean.class), CM, false);
     invoke(method(CMP, "setVerbosity", int.class), CM, 0);
