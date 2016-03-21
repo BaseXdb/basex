@@ -1610,19 +1610,31 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr intersect() throws QueryException {
-    final Expr e = instanceoff();
+    Expr e = instanceoff();
+    boolean lastIs = false;
+    ExprList el = null;
+    while(true) {
+      boolean is = wsConsumeWs(INTERSECT);
+      if(!is && !wsConsumeWs(EXCEPT)) break;
+      if((is != lastIs) && el != null) {
+        e = intersectExcept(lastIs, el);
+        el = null;
+      }
+      lastIs = is;
+      if(el == null) el = new ExprList(e);
+      add(el, instanceoff());
+    }
+    return el != null ? intersectExcept(lastIs, el) : e;
+  }
 
-    if(wsConsumeWs(INTERSECT)) {
-      final ExprList el = new ExprList(e);
-      do add(el, instanceoff()); while(wsConsumeWs(INTERSECT));
-      return new InterSect(info(), el.finish());
-    }
-    if(wsConsumeWs(EXCEPT)) {
-      final ExprList el = new ExprList(e);
-      do add(el, instanceoff()); while(wsConsumeWs(EXCEPT));
-      return new Except(info(), el.finish());
-    }
-    return e;
+  /**
+   * Parses the "IntersectExceptExpr" rule.
+   * @param intersect intersect flag
+   * @param el expression list
+   * @return expression
+   */
+  private Expr intersectExcept(final boolean intersect, final ExprList el) {
+    return intersect ? new InterSect(info(), el.finish()) : new Except(info(), el.finish());
   }
 
   /**

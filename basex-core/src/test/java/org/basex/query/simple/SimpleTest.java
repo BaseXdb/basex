@@ -89,6 +89,11 @@ public final class SimpleTest extends QueryTest {
       { "Seq 6", "()()" },
       { "Seq 7", "() ()" },
 
+      { "IntersectExcept 1", empty(), "<a/> intersect <b/>" },
+      { "IntersectExcept 2", empty(), "<a/> intersect <b/> except <c/>" },
+      { "IntersectExcept 3", empty(), "<a/> except <b/> intersect <c/>" },
+      { "IntersectExcept 4", integers(1), "count(<a/> except <b/>)" },
+
       { "Filter 1", "1[1][error()]" },
       { "Filter 2", empty(), "1[1][<x/>/a]" },
       { "Filter 3", strings("b"), "name(<x><a/><b c='d'/></x>/(a,b)[@c])" },
