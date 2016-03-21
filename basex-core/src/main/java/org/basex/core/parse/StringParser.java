@@ -63,7 +63,7 @@ final class StringParser extends CmdParser {
   }
 
   /**
-   * Parses a single command.
+   * Parses a command.
    * @param cmd command definition
    * @return resulting command
    * @throws QueryException query exception
@@ -155,7 +155,7 @@ final class StringParser extends CmdParser {
       case EXPORT:
         return new Export(string(cmd));
       case XQUERY:
-        return new XQuery(remaining(cmd, false));
+        return new XQuery(remaining(cmd));
       case RUN:
         return new Run(string(cmd));
       case TEST:
@@ -247,24 +247,29 @@ final class StringParser extends CmdParser {
   /**
    * Parses and returns the remaining string.
    * @param cmd referring command; if specified, the result must not be empty
-   * @param quotes strip quotes and the beginning and end of the argument
+   * @param quotes strip heading and trailing quotes
    * @return remaining string
    * @throws QueryException query exception
    */
   private String remaining(final Cmd cmd, final boolean quotes) throws QueryException {
     if(single) {
-      final StringBuilder sb = new StringBuilder();
-      consumeWS();
-      while(parser.more()) sb.append(parser.consume());
-      String arg = finish(sb, cmd);
-      if(quotes && arg != null) {
-        // chop quotes; substrings are faster than replaces...
-        if(arg.startsWith("\"")) arg = arg.substring(1);
-        if(arg.endsWith("\"")) arg = arg.substring(0, arg.length() - 1);
-      }
-      return arg;
+      final String arg = remaining(cmd);
+      return arg != null && quotes ? arg.replace("^\"|\"$", "") : arg;
     }
     return string(cmd, false);
+  }
+
+  /**
+   * Parses and returns the remaining string.
+   * @param cmd referring command; if specified, the result must not be empty
+   * @return remaining string
+   * @throws QueryException query exception
+   */
+  private String remaining(final Cmd cmd) throws QueryException {
+    final StringBuilder sb = new StringBuilder();
+    consumeWS();
+    while(parser.more()) sb.append(parser.consume());
+    return finish(sb, cmd);
   }
 
   /**

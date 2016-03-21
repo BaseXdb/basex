@@ -19,7 +19,7 @@ abstract class CmdParser {
 
   /** Suggest possible completions. */
   boolean suggest;
-  /** Single command flag. */
+  /** Parse input as single command. */
   boolean single;
   /** Password reader. */
   PasswordReader pwReader;
@@ -45,7 +45,7 @@ abstract class CmdParser {
   /**
    * Parses the input and returns a command list.
    * @param cmds container for created commands
-   * @param sngl single command flag
+   * @param sngl parse input as single command
    * @param sggst suggest flag
    * @throws QueryException query exception
    */

@@ -97,6 +97,7 @@ public abstract class BaseXTest extends MainTest {
   @Test
   public void command() throws IOException {
     equals("1", "-cxquery 1");
+    equals("\t", "-cxquery '&#x9;'");
   }
 
   /**
