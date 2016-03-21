@@ -740,6 +740,8 @@ public class TextPanel extends BaseXPanel {
     if(tr != null) {
       final ArrayList<Object> contents = BaseXLayout.contents(tr);
       if(!contents.isEmpty()) return contents.get(0).toString();
+    } else {
+      Util.debug("Clipboard has no contents.");
     }
     return null;
   }

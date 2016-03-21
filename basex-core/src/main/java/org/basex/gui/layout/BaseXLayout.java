@@ -194,6 +194,10 @@ public final class BaseXLayout {
             tr.getTransferData(DataFlavor.javaFileListFlavor)) list.add(fl);
       } else if(tr.isDataFlavorSupported(DataFlavor.stringFlavor)) {
         list.add(tr.getTransferData(DataFlavor.stringFlavor));
+      } else {
+        final StringBuilder sb = new StringBuilder("Data flavors not supported:\n");
+        for(final DataFlavor df : tr.getTransferDataFlavors()) sb.append("- " + df + '\n');
+        Util.debug(sb);
       }
     } catch(final Exception ex) {
       Util.stack(ex);
