@@ -366,10 +366,10 @@ abstract class MarkupSerializer extends StandardSerializer {
   private static String supported(final StringOption option, final Options opts,
       final String... allowed) throws QueryIOException {
 
-    final String val = opts.get(option);
-    if(val.isEmpty()) return allowed.length > 0 ? allowed[0] : val;
-    for(final String a : allowed) if(a.equals(val)) return val;
-    throw SERNOTSUPP_X.getIO(Options.allowed(option, (Object[]) allowed));
+    final String string = opts.get(option);
+    if(string.isEmpty()) return allowed.length > 0 ? allowed[0] : string;
+    for(final String value : allowed) if(value.equals(string)) return string;
+    throw SERNOTSUPP_X.getIO(Options.allowed(option, string, (Object[]) allowed));
   }
 
   /** CData elements. */
