@@ -100,7 +100,8 @@ public final class List extends Arr {
           for(int i = 0; i < c; i++) vb.add(vs[i]);
           val = vb.value();
         }
-        return optPre(val, qc);
+        qc.compInfo(OPTREWRITE_X, val);
+        return val;
       }
     }
 

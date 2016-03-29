@@ -2067,13 +2067,12 @@ public class QueryParser extends InputParser {
         old = e;
         if(wsConsume(SQUARE1)) {
           // parses the "Predicate" rule
-          if(e == null) throw error(PREDMISSING);
           final ExprList el = new ExprList();
           do {
             add(el, expr());
             wsCheck(SQUARE2);
           } while(wsConsume(SQUARE1));
-          e = Filter.get(info(), e, el.finish());
+          e = new CachedFilter(info(), e, el.finish());
         } else if(consume(PAREN1)) {
           if(e instanceof Value && !(e instanceof FItem)) throw error(NOPAREN_X_X, e);
           // parses the "ArgumentList" rule

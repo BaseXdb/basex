@@ -43,17 +43,24 @@ public abstract class Filter extends Preds {
    * @return filter expression
    */
   public static Expr get(final InputInfo info, final Expr root, final Expr... preds) {
-    final Expr p = path(root, preds);
-    return p == null ? new CachedFilter(info, root, preds) : p;
+    final Expr expr = simplify(root, preds);
+    if(expr != null) return expr;
+
+    // use simple filter for single deterministic predicate
+    final Expr pred = preds[0];
+    if(preds.length == 1 && !(pred.has(Flag.CTX) || pred.has(Flag.NDT) || pred.has(Flag.HOF) ||
+        pred.has(Flag.UPD) || pred.has(Flag.POS))) return new SimpleFilter(info, root, preds);
+
+    return new CachedFilter(info, root, preds);
   }
 
   /**
-   * Checks if the specified filter input can be rewritten to an axis path.
+   * Checks if the specified filter input can be rewritten to the root or an axis path.
    * @param root root expression
    * @param preds predicate expressions
-   * @return filter expression
+   * @return filter expression, or {@code null}
    */
-  private static Expr path(final Expr root, final Expr... preds) {
+  private static Expr simplify(final Expr root, final Expr... preds) {
     // no predicates: return root
     if(preds.length == 0) return root;
     // axis path: attach predicates to last step
@@ -100,7 +107,7 @@ public abstract class Filter extends Preds {
    * Adds a predicate to the filter.
    * This function is e.g. called by {@link For#addPredicate}.
    * @param p predicate to be added
-   * @return self reference
+   * @return new filter
    */
   public Expr addPred(final Expr p) {
     preds = new ExprList(preds.length + 1).add(preds).add(p).finish();
@@ -126,8 +133,8 @@ public abstract class Filter extends Preds {
     seqType(root.seqType(), root.size());
     if(size == 0) return optPre(qc);
 
-    // if possible, convert filter to path
-    final Expr ex = path(root, preds);
+    // if possible, convert filter to root or path expression
+    final Expr ex = simplify(root, preds);
     if(ex != null) return ex.optimize(qc, scp);
 
     // try to rewrite filter to index access

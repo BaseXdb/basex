@@ -805,8 +805,6 @@ public enum QueryError {
   /** XPST0003. */
   RESERVED_X(XPST, 3, "'%' is a reserved keyword."),
   /** XPST0003. */
-  PREDMISSING(XPST, 3, "Expecting expression before predicate."),
-  /** XPST0003. */
   NOVARNAME(XPST, 3, "Variable name expected, '%' found."),
   /** XPST0003. */
   NOVARDECL(XPST, 3, "Expecting variable declaration."),

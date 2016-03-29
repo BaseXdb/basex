@@ -16,19 +16,19 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-final class CachedFilter extends Filter {
+public class CachedFilter extends Filter {
   /**
    * Constructor.
    * @param info input info
    * @param root root expression
    * @param preds predicates
    */
-  CachedFilter(final InputInfo info, final Expr root, final Expr... preds) {
+  public CachedFilter(final InputInfo info, final Expr root, final Expr... preds) {
     super(info, root, preds);
   }
 
   @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
+  public final Iter iter(final QueryContext qc) throws QueryException {
     return value(qc).iter();
   }
 
@@ -36,8 +36,7 @@ final class CachedFilter extends Filter {
   public Value value(final QueryContext qc) throws QueryException {
     Value val = root.value(qc);
     final Value cv = qc.value;
-    final long cs = qc.size;
-    final long cp = qc.pos;
+    final long cs = qc.size, cp = qc.pos;
 
     try {
       // evaluate first predicate, based on incoming value
@@ -98,7 +97,7 @@ final class CachedFilter extends Filter {
   }
 
   @Override
-  public void plan(final FElem plan) {
+  public final void plan(final FElem plan) {
     final FElem el = planElem();
     addPlan(plan, el, root);
     super.plan(el);
