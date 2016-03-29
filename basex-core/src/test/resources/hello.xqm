@@ -12,10 +12,16 @@ declare %basex:lazy variable $hello:lazy := xs:QName(string(<a>hello:foo</a>));
 (:~ Variable. :)
 declare variable $hello:eager := xs:QName(string(<a>hello:foo</a>));
 
+(:~ External variable. :)
+declare %basex:lazy variable $hello:ext external;
+
 (:~ Function marked as lazy. :)
 declare %basex:lazy variable $hello:func := function() {
   xs:QName(string(<a>hello:foo</a>))
 };
+
+(:~ External function. :)
+declare function hello:ext() external;
 
 (:~ Function returning a QName. :)
 declare function hello:inlined() {

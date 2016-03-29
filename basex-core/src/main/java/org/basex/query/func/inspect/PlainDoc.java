@@ -73,6 +73,7 @@ final class PlainDoc extends Inspect {
     variable.add("name", sv.name.string());
     if(sv.name.uri().length != 0) variable.add("uri", sv.name.uri());
     type(sv.seqType(), variable);
+    variable.add("external", Boolean.toString(sv.external));
     comment(sv, variable);
     annotation(sv.anns, variable, true);
     return variable;
@@ -81,7 +82,7 @@ final class PlainDoc extends Inspect {
   /**
    * Creates a description for the specified function.
    * @param fname name of function
-   * @param sf function reference
+   * @param sf function reference (can be {@code null})
    * @param ftype function type
    * @param anns annotations
    * @param parent node
@@ -96,6 +97,7 @@ final class PlainDoc extends Inspect {
       function.add("name", fname.string());
       if(fname.uri().length != 0) function.add("uri", fname.uri());
     }
+    function.add("external", Boolean.toString(sf != null && sf.expr == null));
 
     final TokenObjMap<TokenList> doc = sf != null ? sf.doc() : null;
     final int al = ftype.argTypes.length;
@@ -132,8 +134,9 @@ final class PlainDoc extends Inspect {
       }
     }
 
-    final SeqType rt = sf != null ? sf.seqType() : ftype.type;
-    final FElem ret = type(rt, elem("return", function));
+    final SeqType st = sf != null ? sf.seqType() : ftype.type;
+    final FElem ret = elem("return", function);
+    type(st, ret);
     final TokenList returns = doc != null ? doc.get(DOC_RETURN) : null;
     if(returns != null) for(final byte[] val : returns) add(val, ret);
     return function;
@@ -169,17 +172,15 @@ final class PlainDoc extends Inspect {
   }
 
   /**
-   * Returns an element with type information.
+   * Attaches type information to the specified element.
    * @param st sequence type
    * @param elem element
-   * @return element
    */
-  private static FElem type(final SeqType st, final FElem elem) {
+  private static void type(final SeqType st, final FElem elem) {
     if(st != null) {
       elem.add("type", st.typeString());
       final String occ = st.occ.toString();
       if(!occ.isEmpty()) elem.add("occurrence", occ);
     }
-    return elem;
   }
 }

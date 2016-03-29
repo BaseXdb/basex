@@ -24,7 +24,7 @@ import org.basex.util.*;
  */
 public final class StaticVar extends StaticDecl {
   /** If this variable can be bound from outside the query. */
-  private final boolean external;
+  public final boolean external;
   /** Flag for lazy evaluation. */
   private final boolean lazy;
 

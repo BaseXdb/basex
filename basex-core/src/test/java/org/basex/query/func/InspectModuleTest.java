@@ -64,13 +64,18 @@ public final class InspectModuleTest extends AdvancedQueryTest {
     final String result = query(_INSPECT_MODULE.args(module)).
         replace("{", "{{").replace("}", "}}");
 
-    final String var = query(result + "/variable[@name = 'hello:lazy']");
-    query(var + "/@uri/data()", "world");
-    query(var + "/annotation/@name/data()", "basex:lazy");
-    query(var + "/annotation/@uri/data()", "http://basex.org");
+    final String var1 = query(result + "/variable[@name = 'hello:lazy']");
+    query(var1 + "/@uri/data()", "world");
+    query(var1 + "/@external/data()", "false");
+    query(var1 + "/annotation/@name/data()", "basex:lazy");
+    query(var1 + "/annotation/@uri/data()", "http://basex.org");
+
+    final String var2 = query(result + "/variable[@name = 'hello:ext']");
+    query(var2 + "/@external/data()", "true");
 
     final String func1 = query(result + "/function[@name = 'hello:world']");
     query(func1 + "/@uri/data()", "world");
+    query(func1 + "/@external/data()", "false");
     query(func1 + "/annotation/@name/data()", "public");
     query(func1 + "/annotation/@uri/data()", "http://www.w3.org/2012/xquery");
     query(func1 + "/return/@type/data()", "xs:string");
@@ -81,6 +86,9 @@ public final class InspectModuleTest extends AdvancedQueryTest {
     query(func2 + "/@uri/data()", "world");
     query(func2 + "/annotation/@name/data()[ends-with(., 'ignored')]", "ignored");
     query(func2 + "/annotation/@uri/data()[. = 'ns']", "ns");
+
+    final String func3 = query(result + "/function[@name = 'hello:ext']");
+    query(func3 + "/@external/data()", "true");
   }
 
   /** Test method. */

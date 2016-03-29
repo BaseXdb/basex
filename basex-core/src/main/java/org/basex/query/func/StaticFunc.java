@@ -64,7 +64,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
   @Override
   public void compile(final QueryContext qc) {
-    if(compiled) return;
+    if(compiled || expr == null) return;
     compiling = compiled = true;
 
     final Value cv = qc.value;
@@ -243,7 +243,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   @Override
   public boolean visit(final ASTVisitor visitor) {
     for(final Var v : args) if(!visitor.declared(v)) return false;
-    return expr.accept(visitor);
+    return expr == null || expr.accept(visitor);
   }
 
   @Override
