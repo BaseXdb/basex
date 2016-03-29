@@ -808,6 +808,8 @@ public interface QueryText {
   /** Optimization info. */
   String OPTPRE_X = "pre-evaluating %";
   /** Optimization info. */
+  String OPTTYPE_X = "type check removed: %";
+  /** Optimization info. */
   String OPTREWRITE_X = "rewriting %";
   /** Optimization info. */
   String OPTFLAT_X_X = "flattening nested %: %";

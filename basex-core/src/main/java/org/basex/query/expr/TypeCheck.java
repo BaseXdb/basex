@@ -1,6 +1,7 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryError.*;
+import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
@@ -77,7 +78,10 @@ public final class TypeCheck extends Single {
     }
 
     final Expr opt = expr.typeCheck(this, qc, scp);
-    if(opt != null) return optPre(opt, qc);
+    if(opt != null) {
+      qc.compInfo(OPTTYPE_X, seqType);
+      return opt;
+    }
 
     return this;
   }
