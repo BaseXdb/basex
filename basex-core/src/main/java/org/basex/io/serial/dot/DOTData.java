@@ -2,7 +2,6 @@ package org.basex.io.serial.dot;
 
 import static org.basex.core.Text.*;
 
-import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.constr.*;
 import org.basex.query.expr.ft.*;
@@ -65,7 +64,7 @@ final class DOTData {
                 CNSpace.class, CPI.class, CTxt.class },
     { "9933CC", And.class, Or.class, Union.class, InterSect.class, Except.class },
     // pink
-    { "CC3399", If.class, Quantifier.class, QueryText.WHR },
+    { "CC3399", If.class, Quantifier.class },
     { "CC6699", OrderBy.class },
     // red
     { "FF3333", Arith.class, CmpG.class, CmpN.class, CmpV.class, CmpR.class,
@@ -79,8 +78,7 @@ final class DOTData {
     // green
     { "009900", GFLWOR.class },
     { "339933", VarStack.class },
-    { "33CC33", For.class, Let.class, List.class, Range.class, ContextValue.class,
-                QueryText.RET },
+    { "33CC33", For.class, Let.class, List.class, Range.class, ContextValue.class },
     { "66CC66", Var.class, Cast.class },
     // cyan
     { "009999", StaticFuncCall.class, StandardFunc.class, Root.class, VarRef.class,

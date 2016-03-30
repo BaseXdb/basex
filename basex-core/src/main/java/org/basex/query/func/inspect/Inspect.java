@@ -1,7 +1,6 @@
 package org.basex.query.func.inspect;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
@@ -25,7 +24,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public abstract class Inspect {
+public abstract class Inspect implements InspectText {
   /** Query context. */
   final QueryContext qc;
   /** Input info. */

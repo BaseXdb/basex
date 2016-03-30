@@ -212,8 +212,8 @@ public class FuncType implements Type {
     if(type.uri().length == 0) {
       final byte[] ln = type.local();
       if(Token.eq(ln, token(FUNCTION))) return SeqType.ANY_FUN;
-      if(Token.eq(ln, MAP)) return SeqType.ANY_MAP;
-      if(Token.eq(ln, ARRAY)) return SeqType.ANY_ARRAY;
+      if(Token.eq(ln, token(MAP))) return SeqType.ANY_MAP;
+      if(Token.eq(ln, token(ARRAY))) return SeqType.ANY_ARRAY;
     }
     return null;
   }

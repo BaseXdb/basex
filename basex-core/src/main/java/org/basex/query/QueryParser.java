@@ -63,12 +63,16 @@ public class QueryParser extends InputParser {
   private static final byte[] SKIPCHECK = {};
   /** Reserved function names. */
   private static final TokenSet KEYWORDS = new TokenSet();
+  /** Decimal declarations. */
+  private static final byte[][] DECFORMATS = tokens(
+    DF_DEC, DF_DIG, DF_GRP, DF_EXP, DF_INF, DF_MIN, DF_NAN, DF_PAT, DF_PC, DF_PM, DF_ZD
+  );
 
   static {
     final byte[][] keys = {
-      SeqType.ANY_FUN.string(), ARRAY, NodeType.ATT.string(), NodeType.COM.string(),
+      SeqType.ANY_FUN.string(), token(ARRAY), NodeType.ATT.string(), NodeType.COM.string(),
       NodeType.DOC.string(), NodeType.ELM.string(), token(EMPTY_SEQUENCE), token(IF),
-      AtomType.ITEM.string(), MAP, NodeType.NSP.string(), NodeType.NOD.string(),
+      AtomType.ITEM.string(), token(MAP), NodeType.NSP.string(), NodeType.NOD.string(),
       NodeType.PI.string(), token(SCHEMA_ATTRIBUTE), token(SCHEMA_ELEMENT), token(SWITCH),
       NodeType.TXT.string(), token(TYPESWITCH)
     };
@@ -1467,15 +1471,11 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr update() throws QueryException {
-    final Expr e = comparison();
+    Expr e = comparison();
     if(e != null) {
-      if(wsConsumeWs(UPDATE)) {
-        final InputInfo ii = info();
-        final int s = localVars.openScope();
+      while(wsConsumeWs(UPDATE)) {
         qc.updating();
-        final Expr m = check(single(), COPYEXPR);
-        localVars.closeScope(s);
-        return new TransformWith(ii, e, m);
+        e = new TransformWith(info(), e, curr('{') ? enclosedExpr() : check(single(), UPDATEEXPR));
       }
     }
     return e;
@@ -1679,10 +1679,26 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr cast() throws QueryException {
-    final Expr e = arrow();
+    final Expr e = transformWith();
     if(!wsConsumeWs(CAST)) return e;
     wsCheck(AS);
     return new Cast(sc, info(), e, simpleType());
+  }
+
+  /**
+   * Parses the "TransformWithExpr" rule.
+   * @return query expression or {@code null}
+   * @throws QueryException query exception
+   */
+  private Expr transformWith() throws QueryException {
+    final Expr e = arrow();
+    final int p = pos;
+    if(e != null && wsConsume(TRANSFORM) && wsConsume(WITH)) {
+      qc.updating();
+      return new TransformWith(info(), e, enclosedExpr());
+    }
+    pos = p;
+    return e;
   }
 
   /**
@@ -2132,11 +2148,11 @@ public class QueryParser extends InputParser {
       pos = p;
     }
     // map constructor
-    if(wsConsumeWs(MAPSTR, CURLY1, INCOMPLETE)) return new CMap(info(), keyValues());
+    if(wsConsumeWs(MAP, CURLY1, INCOMPLETE)) return new CMap(info(), keyValues());
     // square array constructor
     if(wsConsumeWs(SQUARE1)) return new CArray(info(), false, values());
     // curly array constructor
-    if(wsConsumeWs(ARRAYSTR, CURLY1, INCOMPLETE)) {
+    if(wsConsumeWs(ARRAY, CURLY1, INCOMPLETE)) {
       wsCheck(CURLY1);
       final Expr a = expr();
       wsCheck(CURLY2);
@@ -3948,7 +3964,7 @@ public class QueryParser extends InputParser {
    * found, the cursor is placed after the first token.
    * @param s1 string to be consumed
    * @param s2 second string
-   * @param expr alternative error message
+   * @param expr alternative error message (can be {@code null})
    * @return result of check
    * @throws QueryException query exception
    */

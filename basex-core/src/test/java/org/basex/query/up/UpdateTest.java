@@ -75,7 +75,7 @@ public final class UpdateTest extends AdvancedQueryTest {
 
   /** Transform expression shadowing another variable. */
   @Test
-  public void transform() {
+  public void shadowing() {
     query("let $c := <x/> return copy $c := $c modify () return $c", "<x/>");
     query("declare variable $d := document{ <x/> } update (); $d/x", "<x/>");
   }
@@ -1130,11 +1130,24 @@ public final class UpdateTest extends AdvancedQueryTest {
     );
   }
 
-  /** Tests the experimental modify operator ("update"). */
+  /** Tests the "update" and "transform with" operators. */
   @Test
-  public void modify() {
-    query("let $c := <x/> return $c update ()", "<x/>");
-    query("let $c := <x/> return $c update insert node <y/> into .", "<x>\n<y/>\n</x>");
+  public void transform() {
+    query("<x/> update ()", "<x/>");
+    query("<x/> update insert node <y/> into .", "<x>\n<y/>\n</x>");
+    query("<x/> update (insert node <y/> into .)", "<x>\n<y/>\n</x>");
+    query("<x/> update { insert node <y/> into . }", "<x>\n<y/>\n</x>");
+    query("<x/> update {}", "<x/>");
+    query("<x/> update {} update {}", "<x/>");
+    query("<x/> update {}", "<x/>");
+    query("(<x/>,<y/>) update {}", "<x/>\n<y/>");
+    error("db:output('a') update ()", UPNOT_X);
+    error("<x/> update 1", UPALL);
+
+    query("<x/> transform with {}", "<x/>");
+    query("<x/> transform with { insert node <y/> into . }", "<x>\n<y/>\n</x>");
+    error("db:output('a') transform with {}", UPNOT_X);
+    error("<x/> transform with { 1 }", UPALL);
   }
 
   /**

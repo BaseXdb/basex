@@ -87,7 +87,7 @@ public final class DecFormatter extends FormatUtil {
             case DF_DIG: optional = cp; break;
             case DF_PC:  percent  = cp; break;
             case DF_PM:  permille = cp; break;
-            case DF_ZG:
+            case DF_ZD:
               z = zeroes(cp);
               if(z == -1) throw INVDECFORM_X_X.get(info, k, v);
               if(z != cp) throw INVDECZERO_X.get(info, (char) cp);

@@ -23,11 +23,11 @@ public final class TransformWith extends Arr {
   /**
    * Constructor.
    * @param info input info
-   * @param src source expression
-   * @param mod modify expression
+   * @param source source expression
+   * @param modify modify expression
    */
-  public TransformWith(final InputInfo info, final Expr src, final Expr mod) {
-    super(info, src, mod);
+  public TransformWith(final InputInfo info, final Expr source, final Expr modify) {
+    super(info, source, modify);
   }
 
   @Override
@@ -44,9 +44,9 @@ public final class TransformWith extends Arr {
   @Override
   public void checkUp() throws QueryException {
     checkNoUp(exprs[0]);
-    final Expr m = exprs[1];
-    m.checkUp();
-    if(!m.isVacuous() && !m.has(Flag.UPD)) throw UPMODIFY.get(info);
+    final Expr modify = exprs[1];
+    modify.checkUp();
+    if(!modify.isVacuous() && !modify.has(Flag.UPD)) throw UPMODIFY.get(info);
   }
 
   @Override
@@ -56,38 +56,42 @@ public final class TransformWith extends Arr {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Updates updates = new Updates(true), upd = qc.updates();
-    qc.updates = updates;
-
+    final Updates upd = qc.updates();
     final Value cv = qc.value;
+
+    final ValueBuilder vb = new ValueBuilder();
     try {
       final Iter ir = qc.iter(exprs[0]);
-      Item i = ir.next();
-      if(!(i instanceof ANode)) throw UPSOURCE_X.get(info, i);
-      final Item i2 = ir.next();
-      if(i2 != null) throw UPSOURCE_X.get(info, ValueBuilder.concat(i, i2));
+      for(Item it; (it = ir.next()) != null;) {
+        if(!(it instanceof ANode)) throw UPSOURCE_X.get(info, it);
 
-      // copy node to main memory data instance
-      i = ((ANode) i).dbNodeCopy(qc.context.options);
-      // set resulting node as context
-      qc.value = i;
-      updates.addData(i.data());
+        // copy node to main memory data instance
+        it = ((ANode) it).dbNodeCopy(qc.context.options);
+        // set resulting node as context
+        qc.value = it;
 
-      final Value v = qc.value(exprs[1]);
-      if(!v.isEmpty()) throw BASX_UPMODIFY.get(info);
+        final Updates updates = new Updates(true);
+        qc.updates = updates;
+        updates.addData(it.data());
 
-      updates.prepare(qc);
-      updates.apply(qc);
-      return qc.value;
+        final Value v = qc.value(exprs[1]);
+        if(!v.isEmpty()) throw BASX_UPMODIFY.get(info);
+
+        updates.prepare(qc);
+        updates.apply(qc);
+        vb.add(it);
+      }
     } finally {
       qc.updates = upd;
       qc.value = cv;
     }
+    return vb.value();
   }
 
   @Override
   public boolean has(final Flag flag) {
-    return flag != Flag.UPD && super.has(flag);
+    return flag == Flag.UPD ? exprs[0].has(flag) : super.has(flag);
+    //return flag != Flag.UPD && super.has(flag);
   }
 
   @Override

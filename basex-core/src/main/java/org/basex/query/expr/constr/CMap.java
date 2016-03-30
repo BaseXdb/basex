@@ -56,7 +56,7 @@ public final class CMap extends Arr {
 
   @Override
   public String description() {
-    return QueryText.MAPSTR;
+    return QueryText.MAP;
   }
 
   @Override

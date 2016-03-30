@@ -575,7 +575,7 @@ public final class QueryContext extends Proc implements Closeable {
    */
   public FElem plan() {
     // only show root node if functions or variables exist
-    final FElem e = new FElem(QueryText.PLAN);
+    final FElem e = new FElem(QueryText.QUERY_PLAN);
     e.add(QueryText.COMPILED, token(compiled));
     if(root != null) {
       for(final StaticScope scp : QueryCompiler.usedDecls(root)) scp.plan(e);
@@ -588,7 +588,7 @@ public final class QueryContext extends Proc implements Closeable {
   }
 
   /**
-   * Indicates that the query contains any updating expressions.
+   * Indicates that the query contains updating expressions.
    */
   public void updating() {
     updating = true;

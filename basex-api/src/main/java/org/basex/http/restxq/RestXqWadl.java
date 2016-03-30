@@ -1,7 +1,6 @@
 package org.basex.http.restxq;
 
 import static org.basex.http.restxq.RestXqText.*;
-import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import java.util.*;
@@ -67,7 +66,7 @@ final class RestXqWadl {
 
         // create method, add function documentation
         final FElem method = elem("method", resource).add("name", methods);
-        final TokenList descs = xqdoc != null ? xqdoc.get(DOC_DESCRIPTION) : null;
+        final TokenList descs = xqdoc != null ? xqdoc.get(InspectText.DOC_DESCRIPTION) : null;
         if(descs != null) for(final byte[] desc : descs) addDoc(desc, method);
 
         // create request

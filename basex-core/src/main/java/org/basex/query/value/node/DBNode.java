@@ -201,8 +201,8 @@ public class DBNode extends ANode {
       }
       return new TokenBuilder(data.meta.name).add('/').add(base).finish();
     }
-    final byte[] b = attribute(new QNm(BASE, XML_URI));
-    return b != null ? b : Token.EMPTY;
+    final byte[] base = attribute(new QNm(BASE, XML_URI));
+    return base != null ? base : Token.EMPTY;
   }
 
   @Override

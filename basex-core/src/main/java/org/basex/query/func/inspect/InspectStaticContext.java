@@ -81,7 +81,7 @@ public final class InspectStaticContext extends StandardFunc {
               put(Str.get(DF_GRP), Str.get(token(df.grouping)), info).
               put(Str.get(DF_PC), Str.get(token(df.percent)), info).
               put(Str.get(DF_PM), Str.get(token(df.permille)), info).
-              put(Str.get(DF_ZG), Str.get(token(df.zero)), info).
+              put(Str.get(DF_ZD), Str.get(token(df.zero)), info).
               put(Str.get(DF_DIG), Str.get(token(df.optional)), info).
               put(Str.get(DF_PAT), Str.get(token(df.pattern)), info).
               put(Str.get(DF_INF), Str.get(df.inf), info).

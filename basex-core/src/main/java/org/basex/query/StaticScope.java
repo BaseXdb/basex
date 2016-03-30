@@ -1,12 +1,11 @@
 package org.basex.query;
 
-import static org.basex.query.QueryText.*;
-
 import java.io.*;
 
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.inspect.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -56,7 +55,7 @@ public abstract class StaticScope extends ExprInfo implements Scope {
   /**
    * Returns a map with all documentation tags found for this scope or {@code null} if
    * no documentation exists. The main description is flagged with the "description" key.
-   * The supported tags are defined in {@link QueryText#DOC_TAGS} (other tags will be
+   * The supported tags are defined in {@link InspectText#DOC_TAGS} (other tags will be
    * included in the map, too).
    * @return documentation
    */
@@ -94,7 +93,7 @@ public abstract class StaticScope extends ExprInfo implements Scope {
   private static void add(final byte[] key, final TokenBuilder val,
       final TokenObjMap<TokenList> map) {
 
-    final byte[] k = key == null ? DOC_TAGS[0] : key;
+    final byte[] k = key == null ? InspectText.DOC_TAGS[0] : key;
     TokenList tl = map.get(k);
     if(tl == null) {
       tl = new TokenList();

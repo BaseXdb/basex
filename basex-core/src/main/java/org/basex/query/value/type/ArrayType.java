@@ -25,7 +25,7 @@ public final class ArrayType extends FuncType {
 
   @Override
   public byte[] string() {
-    return ARRAY;
+    return Token.token(ARRAY);
   }
 
   @Override

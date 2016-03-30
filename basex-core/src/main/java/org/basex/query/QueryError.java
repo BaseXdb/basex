@@ -777,7 +777,7 @@ public enum QueryError {
   /** XPST0003. */
   CMPEXPR(XPST, 3, "Comparison is incomplete."),
   /** XPST0003. */
-  COPYEXPR(XPST, 3, "Copy expression is incomplete."),
+  UPDATEEXPR(XPST, 3, "Expecting update expression."),
   /** XPST0003. */
   NOELEMNAME(XPST, 3, "Expecting element name."),
   /** XPST0003. */
@@ -1290,7 +1290,7 @@ public enum QueryError {
   /** XUTY0013. */
   UPSINGLE_X_X(XUTY, 13, "Value of $% must be single node: %."),
   /** XUTY0013. */
-  UPSOURCE_X(XUTY, 13, "Transformed expression must be single node: %."),
+  UPSOURCE_X(XUTY, 13, "Source must be node: %."),
   /** XUTY0022. */
   UPATTELM2_X(XUTY, 22, "Attribute cannot be added to %.");
 

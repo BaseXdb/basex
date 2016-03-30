@@ -26,7 +26,7 @@ public final class MapType extends FuncType {
 
   @Override
   public byte[] string() {
-    return MAP;
+    return Token.token(MAP);
   }
 
   @Override
