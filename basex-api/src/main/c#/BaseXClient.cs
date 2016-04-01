@@ -17,24 +17,19 @@ using System.Collections.Generic;
 
 namespace BaseXClient
 {
-  class Session
+  public class Session
   {
     private byte[] cache = new byte[4096];
     public NetworkStream stream;
     private TcpClient socket;
     private string info = "";
-    private string ehost;
     private int bpos;
     private int bsize;
-    private TcpClient esocket;
-    private NetworkStream estream;
-    private Dictionary<string, EventNotification> en;
 
     public Session(string host, int port, string username, string pw)
     {
       socket = new TcpClient(host, port);
       stream = socket.GetStream();
-      ehost = host;
       string[] response = Receive().Split(':');
 
       string nonce;
@@ -109,68 +104,6 @@ namespace BaseXClient
       Send(path);
       Send(s);
     }
-    
-    /* Watches an event. */
-    public void Watch(string name, EventNotification notify)
-    {
-      stream.WriteByte(10);
-      if(esocket == null)
-      {    
-        int eport = Convert.ToInt32(Receive());
-        en = new Dictionary<string, EventNotification>();
-        esocket = new TcpClient(ehost, eport);
-        estream = esocket.GetStream();
-        string id = Receive();
-        byte[] msg = System.Text.Encoding.UTF8.GetBytes(id);
-        estream.Write(msg, 0, msg.Length);
-        estream.WriteByte(0);
-        estream.ReadByte();
-        new Thread(Listen).Start();
-      }
-      Send(name);
-      info = Receive();
-      if(!Ok())
-      {
-        throw new IOException(info);
-      }
-      en.Add(name, notify);
-    }
-    
-  
-    private void Listen() 
-    {
-      while (true)
-      {
-        String name = readS();
-        String val = readS();
-        en[name].Update(val);
-      }
-    }
-    
-    private string readS() 
-    {
-      MemoryStream ms = new MemoryStream();
-      while (true) 
-      {
-        int b = estream.ReadByte();
-        if (b == 0) break;
-        ms.WriteByte((byte) b);
-      }
-      return System.Text.Encoding.UTF8.GetString(ms.ToArray()); 
-    }
-    
-    /* Unwatches an event. */
-    public void Unwatch(string name)
-    {
-      stream.WriteByte(11);
-      Send(name);
-      info = Receive();
-      if(!Ok())
-      {
-        throw new IOException(info);
-      }
-      en.Remove(name);
-    }
 
     public string Info
     {
@@ -183,10 +116,6 @@ namespace BaseXClient
     public void Close()
     {
       Send("exit");
-      if (esocket != null) 
-      {
-        esocket.Close();
-      }
       socket.Close();
     }
 
@@ -268,7 +197,7 @@ namespace BaseXClient
     }
   }
 
-  class Query
+  public class Query
   {
     private Session session;
     private string id;
@@ -370,9 +299,4 @@ namespace BaseXClient
       return s;
     }
   }
-    
-  interface EventNotification 
-    {
-        void Update(string data);
-    }
 }
