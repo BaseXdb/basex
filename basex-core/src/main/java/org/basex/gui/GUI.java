@@ -103,7 +103,7 @@ public final class GUI extends JFrame {
   /** Fullscreen Window. */
   private JFrame fullscr;
   /** Thread counter. */
-  private int threadID;
+  private int execID;
 
   /** Password reader. */
   private static PasswordReader pwReader;
@@ -421,13 +421,13 @@ public final class GUI extends JFrame {
    */
   private boolean exec(final Command cmd, final boolean edit) {
     // wait when command is still running
-    final int thread = ++threadID;
+    final int thread = ++execID;
     while(true) {
       final Command c = command;
       if(c == null) break;
       c.stop();
       Thread.yield();
-      if(threadID != thread) return true;
+      if(execID != thread) return true;
     }
     cursor(CURSORWAIT);
     input.setCursor(CURSORWAIT);
@@ -455,7 +455,7 @@ public final class GUI extends JFrame {
       updating = cmd.updating(context);
 
       // updates the query editor
-      if(edit) editor.start();
+      if(edit) editor.pleaseWait();
 
       // reset visualizations if data reference will be changed
       if(cmd.newData(context)) notify.init();
@@ -533,7 +533,7 @@ public final class GUI extends JFrame {
           }
         }
 
-        if(thread == threadID && !stopped) {
+        if(thread == execID && !stopped) {
           // show status info
           status.setText(Util.info(TIME_NEEDED_X, time));
           // show number of hits

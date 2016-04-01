@@ -44,7 +44,7 @@ import org.xml.sax.*;
  */
 public final class EditorView extends View {
   /** Delay for highlighting an error. */
-  private static final int SEARCH_DELAY = 200;
+  private static final int SEARCH_DELAY = 250;
   /** Link pattern. */
   private static final Pattern LINK = Pattern.compile("(.*?), ([0-9]+)/([0-9]+)");
   /** Number of files in the history. */
@@ -78,8 +78,12 @@ public final class EditorView extends View {
 
   /** Query file that has last been evaluated. */
   private IOFile execFile;
-  /** Thread counter. */
-  private int threadID;
+  /** Evaluation counter. */
+  private int evalID;
+  /** Parse counter. */
+  private int parseID;
+  /** Parse query context. */
+  private QueryContext parseQC;
   /** Input info. */
   private InputInfo inputInfo;
 
@@ -548,13 +552,7 @@ public final class EditorView extends View {
         gui.execute(true, new Test(file.path()));
         execFile = file;
       } else {
-        // parse query
-        try(final QueryContext qc = new QueryContext(gui.context)) {
-          qc.parse(input, lib, null, null);
-          info(null);
-        } catch(final QueryException ex) {
-          info(ex);
-        }
+        parse(input, lib);
       }
     } else if(file.hasSuffix(IO.JSONSUFFIX)) {
       try {
@@ -701,14 +699,41 @@ public final class EditorView extends View {
   /**
    * Starts a thread, which shows a waiting info after a short timeout.
    */
-  public void start() {
-    final int id = threadID;
+  public void pleaseWait() {
+    final int id = evalID;
     new Timer(true).schedule(new TimerTask() {
       @Override
       public void run() {
-        if(id == threadID) {
-          info.setText(PLEASE_WAIT_D, Msg.SUCCESS).setToolTipText(null);
-          stop.setEnabled(true);
+        if(id != evalID) return;
+        info.setText(PLEASE_WAIT_D, Msg.SUCCESS).setToolTipText(null);
+        stop.setEnabled(true);
+      }
+    }, SEARCH_DELAY);
+  }
+
+  /**
+   * Parses the current query after a little delay.
+   * @param input query input
+   * @param lib library flag
+   */
+  public void parse(final String input, final boolean lib) {
+    final int id = ++parseID;
+    new Timer(true).schedule(new TimerTask() {
+      @Override
+      public void run() {
+        // let current parser finish; check if thread is obsolete
+        while(parseQC != null) Thread.yield();
+        if(id != parseID) return;
+
+        // parse query
+        try(final QueryContext qc = new QueryContext(gui.context)) {
+          parseQC = qc;
+          qc.parse(input, lib, null, null);
+          if(id == parseID) info(null);
+        } catch(final QueryException ex) {
+          if(id == parseID) info(ex);
+        } finally {
+          parseQC = null;
         }
       }
     }, SEARCH_DELAY);
@@ -724,7 +749,7 @@ public final class EditorView extends View {
     // do not refresh view when query is running
     if(!refresh && stop.isEnabled()) return;
 
-    ++threadID;
+    ++evalID;
     getEditor().resetError();
 
     if(refresh) {
