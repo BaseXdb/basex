@@ -68,12 +68,8 @@ public enum QueryError {
   /** ASYN0002. */
   ASYNC_OUTOFRANGE_X(ASYNC, "out-of-range", "Specified value is out of range: %."),
   /** ASYN0003. */
-  ASYNC_UPDATING(ASYNC, "updating", "No updating expression allowed."),
-  /** ASYN0004. */
-  ASYNC_NONUPDATING(ASYNC, "non-updating", "Updating expression expected."),
-  /** ASYN0005. */
   ASYNC_UNKNOWN_X(ASYNC, "unknown", "Unknown query id: %."),
-  /** ASYN0005. */
+  /** ASYN0004. */
   ASYNC_RUNNING_X(ASYNC, "running", "Query is still running: %."),
 
   // Client module

@@ -593,9 +593,6 @@ public enum Function {
   _ASYNC_EVAL(AsyncEval.class, "eval(string[,bindings[,options]])",
       arg(STR, ITEM, MAP_O), STR, flag(NDT), ASYNC_URI),
   /** XQuery function. */
-  _ASYNC_UPDATE(AsyncUpdate.class, "update(string[,bindings[,options]])",
-      arg(STR, ITEM, MAP_O), STR, flag(UPD), ASYNC_URI),
-  /** XQuery function. */
   _ASYNC_RESULT(AsyncResult.class, "result(id)", arg(STR), ITEM_ZM, flag(NDT), ASYNC_URI),
   /** XQuery function. */
   _ASYNC_STOP(AsyncStop.class, "stop(id)", arg(STR), BLN, flag(NDT), ASYNC_URI),

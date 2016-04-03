@@ -60,20 +60,12 @@ public final class AsyncModuleTest extends AdvancedQueryTest {
     // database creation
     error(_DB_OPEN.args("db"), BXDB_OPEN_X);
     query(_PROF_VOID.args(_ASYNC_EVAL.args("\"db:open('db')\"")) + ',' + _DB_CREATE.args("db"));
-    query(_ASYNC_UPDATE.args("\"db:drop('db')\"") + ',' + _PROF_VOID.args(_DB_OPEN.args("db")));
+    query(_ASYNC_EVAL.args("\"db:drop('db')\"") + ',' + _PROF_VOID.args(_DB_OPEN.args("db")));
+    query(_ASYNC_EVAL.args("delete node <a/>"));
 
     // errors
-    error(_ASYNC_EVAL.args("delete node <a/>"), ASYNC_UPDATING);
     error(_ASYNC_EVAL.args("1+"), CALCEXPR);
-  }
-
-  /** Test method. */
-  @Test
-  public void update() {
-    query(_ASYNC_UPDATE.args("delete node <a/>"));
-
-    error(_ASYNC_UPDATE.args("1"), ASYNC_NONUPDATING);
-    error(_ASYNC_UPDATE.args("1, delete node <a/>"), UPALL);
+    error(_ASYNC_EVAL.args("1, delete node <a/>"), UPALL);
   }
 
   /** Test method. */

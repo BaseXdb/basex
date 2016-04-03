@@ -1,6 +1,5 @@
 package org.basex.query.func.async;
 
-import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.util.*;
@@ -20,7 +19,7 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public class AsyncEval extends StandardFunc {
+public final class AsyncEval extends StandardFunc {
   /** Async options. */
   public static class AsyncOptions extends Options {
     /** Query base-uri. */
@@ -31,17 +30,6 @@ public class AsyncEval extends StandardFunc {
 
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return item(qc, false);
-  }
-
-  /**
-   * Creates a new query instance and returns its id.
-   * @param qc query context
-   * @param updating updating flag
-   * @return query id
-   * @throws QueryException query exception
-   */
-  protected final Str item(final QueryContext qc, final boolean updating) throws QueryException {
     final byte[] query = toToken(exprs[0], qc);
     final HashMap<String, Value> bindings = toBindings(1, qc);
 
@@ -69,14 +57,6 @@ public class AsyncEval extends StandardFunc {
     } finally {
       ctx.options.set(MainOptions.QUERYPATH, path);
     }
-
-    if(updating) {
-      if(!sc.mixUpdates && !qp.qc.updating && !qp.qc.root.expr.isVacuous())
-        throw ASYNC_NONUPDATING.get(info);
-    } else {
-      if(qp.qc.updating) throw ASYNC_UPDATING.get(info);
-    }
-
     return Str.get(queries.add(qp, cache, info));
   }
 }
