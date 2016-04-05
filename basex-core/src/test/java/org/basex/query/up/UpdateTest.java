@@ -1142,12 +1142,12 @@ public final class UpdateTest extends AdvancedQueryTest {
     query("<x/> update {}", "<x/>");
     query("(<x/>,<y/>) update {}", "<x/>\n<y/>");
     error("db:output('a') update ()", UPNOT_X);
-    error("<x/> update 1", UPALL);
+    error("<x/> update 1", UPMODIFY);
 
     query("<x/> transform with {}", "<x/>");
     query("<x/> transform with { insert node <y/> into . }", "<x>\n<y/>\n</x>");
     error("db:output('a') transform with {}", UPNOT_X);
-    error("<x/> transform with { 1 }", UPALL);
+    error("<x/> transform with { 1 }", UPMODIFY);
   }
 
   /**
