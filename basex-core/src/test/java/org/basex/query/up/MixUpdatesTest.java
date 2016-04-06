@@ -96,4 +96,12 @@ public final class MixUpdatesTest extends AdvancedQueryTest {
   public void xqueryEval() {
     query(_XQUERY_EVAL.args(" \"function($x) { function() { $x }  }(4)\"") + "()", "4");
   }
+
+
+  /** Test method (GH-1281). */
+  @Test
+  public void inlineFunction() {
+    query("declare function local:f() { db:output('1') }; local:f()", "1");
+  }
+
 }
