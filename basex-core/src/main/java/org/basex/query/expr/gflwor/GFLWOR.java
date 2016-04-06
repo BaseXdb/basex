@@ -307,7 +307,8 @@ public final class GFLWOR extends ParseExpr {
       final Clause clause = iter.next();
       if(clause instanceof Let) {
         final Let lt = (Let) clause;
-        if(removingVar(lt.var, pos + 1, qc) && !lt.has(Flag.NDT) && !lt.has(Flag.UPD)) {
+        if(count(lt.var, pos + 1) == VarUsage.NEVER && !lt.has(Flag.NDT) && !lt.has(Flag.UPD)) {
+          qc.compInfo(QueryText.OPTVAR_X, lt.var);
           // check type before removing variable (see {@link FuncType#funcConv})
           lt.var.checkType(lt.expr, lt.info);
           iter.remove();
@@ -315,33 +316,19 @@ public final class GFLWOR extends ParseExpr {
         }
       } else if(clause instanceof For) {
         final For f = (For) clause;
-        if(removingVar(f.score, pos, qc)) {
+        if(f.score != null && count(f.score, pos) == VarUsage.NEVER) {
+          qc.compInfo(QueryText.OPTVAR_X, f.score);
           f.score = null;
           changed = true;
         }
-        if(removingVar(f.pos, pos, qc)) {
+        if(f.pos != null && count(f.pos, pos) == VarUsage.NEVER) {
+          qc.compInfo(QueryText.OPTVAR_X, f.pos);
           f.pos = null;
           changed = true;
         }
       }
     }
     return changed;
-  }
-
-  /**
-   * Remove unused variables.
-   * Counts the number of usages of the given variable starting from the given clause.
-   * @param var variable (may be {@code null})
-   * @param index start position
-   * @param qc query context
-   * @return result of check
-   */
-  private boolean removingVar(final Var var, final int index, final QueryContext qc) {
-    if(var != null && count(var, index) == VarUsage.NEVER) {
-      qc.compInfo(QueryText.OPTVAR_X, var);
-      return true;
-    }
-    return false;
   }
 
   /**
