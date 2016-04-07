@@ -28,13 +28,8 @@ public final class RepoList extends RepoFn {
     for(final Pkg pkg : new RepoManager(qc.context).all()) {
       final FElem elem = new FElem(PACKAGE);
       elem.add(NAME, pkg.name());
-      final String version = pkg.version();
-      if(version == null) {
-        elem.add(TYPE, PkgText.INTERNAL);
-      } else {
-        elem.add(VERSION, version);
-        elem.add(TYPE, PkgText.EXPATH);
-      }
+      elem.add(VERSION, pkg.version());
+      elem.add(TYPE, pkg.type());
       list.add(elem);
     }
     return list.iter();

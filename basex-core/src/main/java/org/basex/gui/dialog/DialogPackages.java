@@ -12,7 +12,6 @@ import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXFileChooser.*;
 import org.basex.io.*;
 import org.basex.query.util.pkg.*;
-import org.basex.query.util.pkg.Pkg;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -137,20 +136,15 @@ public final class DialogPackages extends BaseXDialog {
 
     } else {
       final String key = packages.getValue();
-      final Pkg pkg = ctx.repo.pkgDict().get(key);
-      if(pkg != null) {
-        title.setText(key.isEmpty() ? DOTS : key);
-        name.setText(pkg.name());
-        version.setText(pkg.version());
-        type.setText(PkgText.EXPATH);
-        path.setText(pkg.dir());
-      } else {
-        final IOFile file = new RepoManager(ctx).find(key);
-        title.setText(key.isEmpty() ? DOTS : key);
-        name.setText(file != null ? file.name() : "-");
-        version.setText("-");
-        type.setText(PkgText.INTERNAL);
-        path.setText(key.replace('.', '/'));
+      for(final Pkg pkg : new RepoManager(ctx).all()) {
+        if(pkg.id().equals(key)) {
+          title.setText(key);
+          name.setText(pkg.name());
+          version.setText(pkg.version());
+          type.setText(pkg.type());
+          path.setText(pkg.dir());
+          break;
+        }
       }
       // enable or disable buttons
       delete.setEnabled(!pkgs.isEmpty());

@@ -86,11 +86,10 @@ public final class RepoManager {
     t.header.add(TYPE);
     t.header.add(PATH);
     for(final Pkg pkg : all()) {
-      final String version = pkg.version();
       final TokenList tl = new TokenList();
       tl.add(pkg.name());
-      tl.add(version == null ? "-" : version);
-      tl.add(version == null ? INTERNAL : EXPATH);
+      tl.add(pkg.version());
+      tl.add(pkg.type());
       tl.add(pkg.dir());
       t.contents.add(tl);
     }
@@ -98,7 +97,7 @@ public final class RepoManager {
   }
 
   /**
-   * Returns a list of all packages.
+   * Returns a list of all package ids.
    * @return packages
    */
   public StringList list() {
@@ -114,54 +113,23 @@ public final class RepoManager {
    */
   public void delete(final String name) throws QueryException {
     // find registered packages to be deleted
+    boolean deleted = false;
     final EXPathRepo repo = context.repo;
-    final ArrayList<Pkg> delete = new ArrayList<>();
-    for(final Pkg pkg : repo.pkgDict().values()) {
-      // a package can be deleted by its name or the name suffixed with its version
-      if(pkg.name().equals(name) || pkg.id().equals(name)) {
-        // check if package to be deleted participates in a dependency
-        final String dep = primary(pkg);
-        if(dep != null) throw BXRE_DEP_X_X.get(info, dep, name);
-        delete.add(pkg);
+    for(final Pkg pkg : all()) {
+      final String dir = pkg.dir();
+      if(pkg.name().equals(name) || pkg.id().equals(name) || dir.equals(name)) {
+        if(pkg.expath()) {
+          // check if package to be deleted participates in a dependency
+          final String dep = primary(pkg);
+          if(dep != null) throw BXRE_DEP_X_X.get(info, dep, name);
+          // delete files in main-memory repository
+          repo.delete(pkg);
+        }
+        if(!repo.path(dir).delete()) throw BXRE_DELETE_X.get(info, dir);
+        deleted = true;
       }
     }
-
-    // delete registered packages
-    for(final Pkg pkg : delete) {
-      repo.delete(pkg);
-      // delete files on disk
-      final IOFile dir = repo.path(pkg.dir());
-      if(!dir.delete()) throw BXRE_DELETE_X.get(info, dir);
-    }
-
-    // delete internal package
-    final IOFile file = find(name);
-    if(file != null) {
-      if(!file.delete()) throw BXRE_DELETE_X.get(info, file);
-      return;
-    }
-
-    if(delete.isEmpty()) throw BXRE_WHICH_X.get(info, name);
-  }
-
-  /**
-   * Looks for a file with the specified name.
-   * @param name name
-   * @return file or {@code null}
-   */
-  public IOFile find(final String name) {
-    // traverse all files, find exact matches
-    final IOFile root = context.repo.path();
-    String start = new IOFile(root, name).name();
-    for(final IOFile dir : root.children("^[^.].*")) {
-      if(dir.name().equals(start)) return dir;
-    }
-    // traverse all files, find prefix matches
-    start = new IOFile(root, name.replace('.', '/')).name() + '.';
-    for(final IOFile dir : root.children("^[^.].*")) {
-      if(dir.name().startsWith(start)) return dir;
-    }
-    return null;
+    if(!deleted) throw BXRE_WHICH_X.get(info, name);
   }
 
   /**
@@ -202,7 +170,7 @@ public final class RepoManager {
   private static void add(final String name, final String dir, final TreeMap<String, Pkg> map) {
     final Pkg pkg = new Pkg();
     pkg.name = name;
-    pkg.dir(dir);
+    pkg.dir = dir;
     map.put(pkg.id(), pkg);
   }
 
@@ -282,7 +250,8 @@ public final class RepoManager {
     // choose unique directory, unzip files and register repository
     final IOFile file = uniqueDir(id.replaceAll("[^\\w.-]+", "-"));
     zip.unzip(file);
-    repo.add(pkg.dir(file.name()));
+    pkg.dir = file.name();
+    repo.add(pkg);
     return exists;
   }
 

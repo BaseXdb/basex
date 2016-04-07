@@ -133,7 +133,9 @@ public final class EXPathRepo {
     if(!desc.exists()) return;
 
     try {
-      addPkg(new PkgParser(null).parse(desc).dir(dir.name()));
+      final Pkg pkg = new PkgParser(null).parse(desc);
+      pkg.dir = dir.name();
+      addPkg(pkg);
     } catch(final QueryException ex) {
       Util.errln(ex);
     }

@@ -75,14 +75,10 @@ public final class PkgParser {
     }
 
     // check mandatory attributes
-    if(p.name() == null)
-      throw BXRE_DESC_X.get(info, Util.info(MISSATTR, A_NAME, root));
-    if(p.version() == null)
-      throw BXRE_DESC_X.get(info, Util.info(MISSATTR, A_VERSION, root));
-    if(p.abbrev() == null)
-      throw BXRE_DESC_X.get(info, Util.info(MISSATTR, A_ABBREV, root));
-    if(p.spec() == null)
-      throw BXRE_DESC_X.get(info, Util.info(MISSATTR, A_SPEC, root));
+    if(p.name() == null)   throw BXRE_DESC_X.get(info, Util.info(MISSATTR, A_NAME, root));
+    if(p.abbrev() == null) throw BXRE_DESC_X.get(info, Util.info(MISSATTR, A_ABBREV, root));
+    if(p.spec() == null)   throw BXRE_DESC_X.get(info, Util.info(MISSATTR, A_SPEC, root));
+    if(!p.expath())        throw BXRE_DESC_X.get(info, Util.info(MISSATTR, A_VERSION, root));
   }
 
   /**

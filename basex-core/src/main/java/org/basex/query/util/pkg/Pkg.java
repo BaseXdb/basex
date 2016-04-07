@@ -3,7 +3,7 @@ package org.basex.query.util.pkg;
 import java.util.*;
 
 /**
- * Package.
+ * EXPath or internal package. Internal packages have no version.
  *
  * @author BaseX Team 2005-16, BSD License
  * @author Rositsa Shadura
@@ -14,23 +14,31 @@ public final class Pkg {
   /** Package components. */
   final ArrayList<PkgComponent> comps = new ArrayList<>();
 
+  /** Package version ({@code null} if this is not an EXPath package). */
+  String version;
   /** Package short name. */
   String abbrev;
   /** Package uri. */
   String name;
-  /** Package version. */
-  String version;
   /** Version of packaging specification the package conforms to. */
   String spec;
   /** Package directory. */
   String dir;
 
   /**
-   * Returns the package id, consisting of the package URI and its version.
+   * Indicates if this is an EXPath package.
+   * @return result of check
+   */
+  public boolean expath() {
+    return version != null;
+  }
+
+  /**
+   * Returns the package id, consisting of the package name/URI and, optionally, its version.
    * @return id
    */
-  String id() {
-    return version == null ? name : (name + '-' + version);
+  public String id() {
+    return expath() ? (name + '-' + version) : name;
   }
 
   /**
@@ -67,20 +75,18 @@ public final class Pkg {
 
   /**
    * Returns the package version.
-   * @return version ({@code null} if package is an internal one)
+   * @return version ("{@code -}" if this is no EXPath type)
    */
   public String version() {
-    return version;
+    return expath() ? version : "-";
   }
 
   /**
-   * Assigns the package directory.
-   * @param d directory
-   * @return self reference
+   * Returns the package type (EXPath/internal).
+   * @return package type
    */
-  Pkg dir(final String d) {
-    dir = d;
-    return this;
+  public String type() {
+    return expath() ? PkgText.EXPATH : PkgText.INTERNAL;
   }
 
   /**
