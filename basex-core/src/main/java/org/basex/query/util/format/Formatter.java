@@ -129,7 +129,6 @@ public abstract class Formatter extends FormatUtil {
 
     final TokenBuilder tb = new TokenBuilder();
     if(lng.length != 0 && MAP.get(lng) == null) tb.add("[Language: en]");
-    boolean iso = false;
     if(cal.length != 0) {
       final QNm qnm;
       try {
@@ -144,7 +143,6 @@ public abstract class Formatter extends FormatUtil {
         while(++c < cl && !eq(CALENDARS[c], ln));
         if(c == cl) throw CALWHICH_X.get(ii, cal);
         if(c > 1) tb.add("[Calendar: AD]");
-        iso = c == 0;
       }
     }
     if(plc.length != 0) tb.add("[Place: ]");
@@ -199,7 +197,9 @@ public abstract class Formatter extends FormatUtil {
             break;
           case 'w':
             num = date.toJava().toGregorianCalendar().get(Calendar.WEEK_OF_MONTH);
-            if(iso && num == 0) num = 5;
+            // first week of month: fix value, according to ISO 8601
+            if(num == 0) num = new Dtm(new Dtm(date), new DTDur(date.day() * 24, 0), false, ii).
+                toJava().toGregorianCalendar().get(Calendar.WEEK_OF_MONTH);
             err = tim;
             break;
           case 'H':
