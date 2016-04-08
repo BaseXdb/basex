@@ -607,6 +607,7 @@ public abstract class Formatter extends FormatUtil {
       }
       reverse.add(ch);
     }
+    while(min-- >= 0) reverse.add(zero);
 
     // reverse result and add ordinal suffix
     final TokenBuilder result = new TokenBuilder();
