@@ -45,11 +45,12 @@ public final class FnSum extends Aggr {
     Item def;
     if(exprs.length == 2) {
       def = exprs[1].atomItem(qc, ii);
+      /*
       if(def != null) {
         if(def.type.isUntyped()) def = Dbl.get(def.dbl(info));
         else if(!(def instanceof ANum) && !(def instanceof Dur))
           throw SUM_X_X.get(info, def.type, def);
-      }
+      }*/
     } else {
       def = Int.get(0);
     }
