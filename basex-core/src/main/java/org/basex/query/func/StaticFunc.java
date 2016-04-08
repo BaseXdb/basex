@@ -229,16 +229,35 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    * @see Expr#has(Flag)
    */
   boolean has(final Flag flag) {
-    // handle recursive calls: set dummy value, eventually replace it with final value
-    Boolean b = map.get(flag);
-    if(b == null) {
-      map.put(flag, false);
-      // function itself does not perform any updates
-      b = flag != Flag.UPD && expr.has(flag);
-      map.put(flag, b);
-    }
-    return b;
+    // function itself does not perform any updates
+    return flag != Flag.UPD && check(flag);
   }
+
+  /**
+   * Checks if the function body is updating.
+   * @return result of check
+   * @see Expr#has(Flag)
+   */
+  boolean updating() {
+    // MIXUPDATES: recursive check; otherwise, rely on flag (GH-1281)
+    return sc.mixUpdates ? check(Flag.UPD) : updating;
+  }
+
+  /**
+   * Checks if the function body is updating.
+   * @param flag feature
+   * @return result of check
+   */
+  private boolean check(final Flag flag) {
+    // handle recursive calls: set dummy value, eventually replace it with final value
+    if(!map.containsKey(flag)) {
+      map.put(flag, false);
+      map.put(flag, expr.has(flag));
+    }
+    return map.get(flag);
+  }
+
+
 
   @Override
   public boolean visit(final ASTVisitor visitor) {

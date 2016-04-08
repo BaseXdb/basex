@@ -123,9 +123,7 @@ public final class StaticFuncCall extends FuncCall {
     // function code: position or context references of expression body have no effect
     if(flag == Flag.POS || flag == Flag.CTX) return false;
     // pass on check to function code
-    if(flag != Flag.UPD) return func.has(flag);
-    // updates: check function body. otherwise, rely on flag (GH-1281)
-    return sc.mixUpdates ? func.expr.has(Flag.UPD) : func.updating;
+    return flag != Flag.UPD ? func.has(flag) : func.updating();
   }
 
   @Override
