@@ -42,18 +42,8 @@ public final class FnSum extends Aggr {
     final Item it = iter.next();
     if(it != null) return sum(iter, it, false);
 
-    Item def;
-    if(exprs.length == 2) {
-      def = exprs[1].atomItem(qc, ii);
-      if(def != null) {
-        if(def.type.isUntyped()) def = Dbl.get(def.dbl(info));
-        else if(!(def instanceof ANum) && !(def instanceof Dur))
-          throw SUM_X_X.get(info, def.type, def);
-      }
-    } else {
-      def = Int.get(0);
-    }
-    return def;
+    // return default item
+    return exprs.length == 2 ? exprs[1].atomItem(qc, ii) : Int.get(0);
   }
 
   @Override
