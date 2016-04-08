@@ -34,7 +34,7 @@ declare function util:query(
   let $limit := $cons:OPTION($cons:K-MAX-CHARS)
   let $query := if($query) then $query else '()'
   let $q := "xquery:eval($query, map {" || $map || "}, " || util:query-options() || ")"
-  let $s := "serialize(" || $q || ", map{ 'limit': $limit*2, 'method': 'adaptive' })"
+  let $s := "serialize(" || $q || ", map{ 'limit': $limit*2, 'method': 'basex' })"
   return util:eval(
     $s ||
     "! (if(string-length(.) > $limit) then substring(., 1, $limit) || '...' else .)",
@@ -91,6 +91,7 @@ declare function util:eval(
   return if($cons:SESSION/host) then (
     util:remote-query($query, $vars)
   ) else (
+    prof:dump($query),
     xquery:eval($query, $vars)
   )
 };
