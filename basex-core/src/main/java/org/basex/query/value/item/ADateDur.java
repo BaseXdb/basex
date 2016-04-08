@@ -81,13 +81,13 @@ public abstract class ADateDur extends Item {
    * Returns the hours (0-23).
    * @return day
    */
-  public abstract long hou();
+  public abstract long hour();
 
   /**
    * Returns the minutes (0-59).
    * @return day
    */
-  public abstract long min();
+  public abstract long minute();
 
   /**
    * Returns the seconds (0-59), including the fractional part.

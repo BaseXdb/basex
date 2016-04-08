@@ -203,21 +203,21 @@ public abstract class Formatter extends FormatUtil {
             err = tim;
             break;
           case 'H':
-            num = date.hou();
+            num = date.hour();
             err = dat;
             break;
           case 'h':
-            num = date.hou() % 12;
+            num = date.hour() % 12;
             if(num == 0) num = 12;
             err = dat;
             break;
           case 'P':
-            num = date.hou() / 12;
+            num = date.hour() / 12;
             pres = NN;
             err = dat;
             break;
           case 'm':
-            num = date.min();
+            num = date.minute();
             pres = token("01");
             err = dat;
             break;

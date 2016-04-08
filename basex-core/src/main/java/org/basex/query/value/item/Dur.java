@@ -142,12 +142,12 @@ public class Dur extends ADateDur {
   }
 
   @Override
-  public final long hou() {
+  public final long hour() {
     return tim() / 3600;
   }
 
   @Override
-  public final long min() {
+  public final long minute() {
     return tim() % 3600 / 60;
   }
 
@@ -196,9 +196,9 @@ public class Dur extends ADateDur {
   final void time(final TokenBuilder tb) {
     if(sec.remainder(DAYSECONDS).signum() == 0) return;
     tb.add('T');
-    final long h = hou();
+    final long h = hour();
     if(h != 0) { tb.addLong(Math.abs(h)); tb.add('H'); }
-    final long m = min();
+    final long m = minute();
     if(m != 0) { tb.addLong(Math.abs(m)); tb.add('M'); }
     final BigDecimal sc = sec();
     if(sc.signum() == 0) return;

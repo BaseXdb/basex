@@ -198,7 +198,7 @@ public abstract class ADate extends ADateDur {
     sec = sc.signum() >= 0 ? sc.remainder(BD60) :
       sc.negate().add(sc.remainder(BD60)).add(BD60).add(sc).remainder(BD60);
 
-    final long mn = Math.max(min(), 0) + div(sc.longValue(), 60);
+    final long mn = Math.max(minute(), 0) + div(sc.longValue(), 60);
     min = (byte) mod(mn, 60);
     final long ho = Math.max(hou, 0) + div(mn, 60);
     hou = (byte) mod(ho, 24);
@@ -256,7 +256,7 @@ public abstract class ADate extends ADateDur {
         final Calendar c = Calendar.getInstance();
         t = (short) ((c.get(Calendar.ZONE_OFFSET) + c.get(Calendar.DST_OFFSET)) / 60000);
       } else {
-        t = (short) (zone.min() + zone.hou() * 60);
+        t = (short) (zone.minute() + zone.hour() * 60);
         if(zone.sec().signum() != 0) throw ZONESEC_X.get(ii, zone);
         if(Math.abs(t) > 60 * 14 || zone.day() != 0) throw INVALZONE_X.get(ii, zone);
       }
@@ -283,12 +283,12 @@ public abstract class ADate extends ADateDur {
   }
 
   @Override
-  public final long hou() {
+  public final long hour() {
     return hou;
   }
 
   @Override
-  public final long min() {
+  public final long minute() {
     return min;
   }
 
@@ -327,9 +327,9 @@ public abstract class ADate extends ADateDur {
     }
     if(hou >= 0) {
       if(ymd) tb.add('T');
-      prefix(tb, hou(), 2);
+      prefix(tb, hour(), 2);
       tb.add(':');
-      prefix(tb, min(), 2);
+      prefix(tb, minute(), 2);
       tb.add(':');
       if(sec.intValue() < 10) tb.add('0');
       tb.addExt(Token.chopNumber(Token.token(sec().abs().toPlainString())));
