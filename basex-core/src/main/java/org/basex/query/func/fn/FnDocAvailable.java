@@ -18,10 +18,10 @@ public final class FnDocAvailable extends Docs {
       return Bln.get(doc(qc) != null);
     } catch(final QueryException ex) {
       final QueryError error = ex.error();
-      if(error != null) {
-        final String num = error.code.length() == 8 ? error.code.substring(4) : "";
-        if(error.is(ErrType.FODC) && (num.equals("0002") || num.equals("0004")) ||
-           error.is(ErrType.BXDB) && num.equals("0006")) return Bln.FALSE;
+      if(error != null && error.code.matches("^.*\\d+$")) {
+        final int num = Strings.toInt(error.code.replaceAll("^.*(\\d+)$", "$1"));
+        if(error.is(ErrType.FODC) && (num == 2 || num == 4 || num == 5) ||
+           error.is(ErrType.BXDB) && num == 6) return Bln.FALSE;
       }
       throw ex;
     }
