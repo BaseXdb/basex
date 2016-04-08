@@ -562,6 +562,8 @@ public enum QueryError {
   CALQNAME_X(FOFD, 1340, "Invalid EQName: '%'."),
   /** FOFD1340. */
   CALWHICH_X(FOFD, 1340, "Unknown calendar: '%'."),
+  /** FOFD1340. */
+  INVFDPATTERN_X(FOFD, 1340, "%"),
   /** FOFD1350. */
   PICINVCOMP_X_X(FOFD, 1350, "Component '[%]' not applicable to % values."),
 

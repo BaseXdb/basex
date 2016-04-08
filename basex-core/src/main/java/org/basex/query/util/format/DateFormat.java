@@ -43,7 +43,11 @@ final class DateFormat extends FormatParser {
     }
 
     // choose first character and case
-    finish(pres.length == 0 ? def : presentation(pres, def, true));
+    try {
+      finish(pres.length == 0 ? def : presentation(pres, def, true));
+    } catch(final QueryException ex) {
+      throw INVFDPATTERN_X.get(info, ex.getLocalizedMessage());
+    }
 
     // check width modifier
     final byte[] width = comma == -1 ? null : substring(picture, comma + 1);
