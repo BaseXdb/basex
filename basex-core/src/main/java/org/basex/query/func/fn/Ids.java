@@ -102,7 +102,7 @@ abstract class Ids extends StandardFunc {
         for(final byte[] val : distinctTokens(attr.string())) {
           // correct value: add to results
           if(idSet.contains(val)) {
-            results.add(idref ? attr.finish() : node);
+            results.add(idref ? attr.finish() : node.finish());
             break;
           }
         }
