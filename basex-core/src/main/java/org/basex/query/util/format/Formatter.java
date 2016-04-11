@@ -124,8 +124,8 @@ public abstract class Formatter extends FormatUtil {
    * @throws QueryException query exception
    */
   public final byte[] formatDate(final ADate date, final byte[] lng, final byte[] pic,
-      final byte[] cal, final byte[] plc, final InputInfo ii,
-      final StaticContext sc) throws QueryException {
+      final byte[] cal, final byte[] plc, final InputInfo ii, final StaticContext sc)
+      throws QueryException {
 
     final TokenBuilder tb = new TokenBuilder();
     if(lng.length != 0 && MAP.get(lng) == null) tb.add("[Language: en]");

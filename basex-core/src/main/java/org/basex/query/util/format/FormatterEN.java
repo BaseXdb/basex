@@ -57,7 +57,7 @@ final class FormatterEN extends Formatter {
       "August", "September", "October", "November", "December");
 
   /** AM/PM Markers. */
-  private static final byte[][] AMPM = tokens("am", "pm");
+  private static final byte[][] AMPM = tokens("Am", "Pm");
   /** And. */
   private static final byte[] AND = token("and");
   /** Ordinal suffixes (st, nr, rd, th). */
