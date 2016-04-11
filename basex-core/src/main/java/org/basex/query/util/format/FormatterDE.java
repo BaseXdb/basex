@@ -11,11 +11,8 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 final class FormatterDE extends Formatter {
-  /** Written number (0). */
-  private static final byte[] ZERO = token("Null");
-
   /** Written numbers (1-20). */
-  private static final byte[][] WORDS = tokens("", "eins", "zwei", "drei",
+  private static final byte[][] WORDS = tokens("null", "eins", "zwei", "drei",
       "vier", "f\u00fcnf", "sechs", "sieben", "acht", "neun", "zehn", "elf",
       "zw\u00f6lf", "dreizehn", "vierzehn", "f\u00fcnfzehn", "sechzehn",
       "siebzehn", "achtzehn", "neunzehn");
@@ -33,7 +30,7 @@ final class FormatterDE extends Formatter {
     1000000, 1000000000, 1000000000000L, 1000000000000000L, 1000000000000000000L };
 
   /** Ordinal Numbers (1-20). */
-  private static final byte[][] ORDINALS = tokens("", "erst", "zweit",
+  private static final byte[][] ORDINALS = tokens("nullt", "erst", "zweit",
       "dritt", "viert", "f\u00fcnft", "sechst", "siebt", "acht", "neunt",
       "zehnt", "elft", "zw\u00f6lft", "dreizehnt", "vierzehnt", "f\u00fcnfzehnt",
       "sechzehnt", "siebzehnt", "achtzehnt", "neunzehnt");
@@ -76,12 +73,7 @@ final class FormatterDE extends Formatter {
   @Override
   public byte[] word(final long n, final byte[] ord) {
     final TokenBuilder tb = new TokenBuilder();
-    if(n == 0) {
-      tb.add(ZERO);
-      if(ord != null) tb.add("t").add(ord.length == 0 ? E : ord);
-    } else {
-      word(tb, n, ord);
-    }
+    word(tb, n, ord);
     // create title case
     final TokenParser tp = new TokenParser(tb.next());
     for(boolean u = true; tp.more(); u = false) {
@@ -138,7 +130,7 @@ final class FormatterDE extends Formatter {
    * @param ord ordinal suffix
    */
   private static void word(final TokenBuilder tb, final long n, final byte[] ord) {
-    if(n == 0) {
+    if(n == 0 && !tb.isEmpty()) {
       if(ord != null) tb.add("st").add(ord.length == 0 ? E : ord);
     } else if(n < 20) {
       if(ord == null) tb.add(WORDS[(int) n]);

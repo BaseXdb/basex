@@ -11,11 +11,8 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 final class FormatterEN extends Formatter {
-  /** Written number (0). */
-  private static final byte[] ZERO = token("Zero");
-
   /** Written numbers (1-20). */
-  private static final byte[][] WORDS = tokens("", "One", "Two", "Three",
+  private static final byte[][] WORDS = tokens("Zero", "One", "Two", "Three",
       "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven",
       "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen",
       "Seventeen", "Eighteen", "Nineteen");
@@ -33,7 +30,7 @@ final class FormatterEN extends Formatter {
     1000000000000L, 1000000000000000L, 1000000000000000000L };
 
   /** Ordinal Numbers (1-20). */
-  private static final byte[][] ORDINALS = tokens("", "First", "Second",
+  private static final byte[][] ORDINALS = tokens("Zeroth", "First", "Second",
       "Third", "Fourth", "Fifth", "Sixth", "Seventh", "Eighth", "Ninth",
       "Tenth", "Eleventh", "Twelfth", "Thirteenth", "Fourteenth", "Fifteenth",
       "Sixteenth", "Seventeenth", "Eighteenth", "Nineteenth");
@@ -71,8 +68,7 @@ final class FormatterEN extends Formatter {
   @Override
   public byte[] word(final long n, final byte[] ord) {
     final TokenBuilder tb = new TokenBuilder();
-    if(n == 0) tb.add(ZERO);
-    else word(tb, n, ord);
+    word(tb, n, ord != null);
     return tb.finish();
   }
 
@@ -122,36 +118,36 @@ final class FormatterEN extends Formatter {
   /**
    * Creates a word character sequence for the specified number.
    * @param tb token builder
-   * @param n number to be formatted
-   * @param ord ordinal suffix
+   * @param number number to be formatted
+   * @param ordinal ordinal suffix
    */
-  private static void word(final TokenBuilder tb, final long n, final byte[] ord) {
-    if(n == 0) {
-    } else if(n < 20) {
-      tb.add((ord != null ? ORDINALS : WORDS)[(int) n]);
-    } else if(n < 100) {
-      final int r = (int) (n % 10);
+  private static void word(final TokenBuilder tb, final long number, final boolean ordinal) {
+    if(number == 0 && !tb.isEmpty()) {
+    } else if(number < 20) {
+      tb.add((ordinal ? ORDINALS : WORDS)[(int) number]);
+    } else if(number < 100) {
+      final int r = (int) (number % 10);
       if(r == 0) {
-        tb.add((ord != null ? ORDINALS10 : WORDS10)[(int) n / 10]);
+        tb.add((ordinal ? ORDINALS10 : WORDS10)[(int) number / 10]);
       } else {
-        tb.add(WORDS10[(int) n / 10]).add(' ');
-        tb.add((ord != null ? ORDINALS : WORDS)[r]);
+        tb.add(WORDS10[(int) number / 10]).add(' ');
+        tb.add((ordinal ? ORDINALS : WORDS)[r]);
       }
     } else {
       for(int w = WORDS100.length - 1; w >= 0; w--) {
         final long f = UNITS100[w];
-        if(n < f) continue;
+        if(number < f) continue;
 
-        word(tb, n / f, null);
+        word(tb, number / f, false);
         tb.add(' ').add(WORDS100[w]);
-        final long r = n % f;
+        final long r = number % f;
         if(r == 0) {
-          if(ord != null) tb.add(ORDSUFFIX[3]);
+          if(ordinal) tb.add(ORDSUFFIX[3]);
         } else {
           tb.add(' ');
           if(r < 100) tb.add(AND).add(' ');
         }
-        word(tb, r, ord);
+        word(tb, r, ordinal);
         break;
       }
     }
