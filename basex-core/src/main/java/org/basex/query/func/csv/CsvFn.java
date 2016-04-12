@@ -13,6 +13,6 @@ import org.basex.query.value.item.*;
  */
 abstract class CsvFn extends StandardFunc {
   /** Element: options. */
-  static final QNm Q_OPTIONS = QNm.get(CSV_PREFIX, "options", CSV_URI);
+  static final QNm Q_OPTIONS = new QNm(CSV_PREFIX, "options", CSV_URI);
 
 }

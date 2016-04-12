@@ -61,13 +61,13 @@ public interface HttpText {
   String AUTH_INT = "auth-int";
 
   /** QName. */
-  QNm Q_BODY = QNm.get(HTTP_PREFIX, "body", HTTP_URI);
+  QNm Q_BODY = new QNm(HTTP_PREFIX, "body", HTTP_URI);
   /** QName. */
-  QNm Q_RESPONSE = QNm.get(HTTP_PREFIX, "response", HTTP_URI);
+  QNm Q_RESPONSE = new QNm(HTTP_PREFIX, "response", HTTP_URI);
   /** QName. */
-  QNm Q_HEADER = QNm.get(HTTP_PREFIX, "header", HTTP_URI);
+  QNm Q_HEADER = new QNm(HTTP_PREFIX, "header", HTTP_URI);
   /** QName. */
-  QNm Q_MULTIPART = QNm.get(HTTP_PREFIX, "multipart", HTTP_URI);
+  QNm Q_MULTIPART = new QNm(HTTP_PREFIX, "multipart", HTTP_URI);
 
   /** Carriage return/line feed. */
   byte[] CRLF = { '\r', '\n' };

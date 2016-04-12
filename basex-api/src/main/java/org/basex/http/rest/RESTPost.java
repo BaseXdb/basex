@@ -94,7 +94,7 @@ final class RESTPost {
         for(final Item it : qp.value()) {
           if(val != null) throw HTTPCode.MULTIPLE_CONTEXT_X.get();
           // create main memory instance of the specified node
-          val = DataBuilder.stripNS((ANode) it, Token.token(REST_URI), ctx).serialize().toString();
+          val = DataBuilder.stripNS((ANode) it, REST_URI, ctx).serialize().toString();
         }
       }
 

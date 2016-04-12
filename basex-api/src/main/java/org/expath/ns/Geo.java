@@ -30,19 +30,19 @@ public final class Geo extends QueryModule {
   private static final byte[] GML = token("gml");
 
   /** QName gml:Point. */
-  private static final QNm Q_GML_POINT = QNm.get(GML, "Point", URI);
+  private static final QNm Q_GML_POINT = new QNm(GML, "Point", URI);
   /** QName gml:MultiPoint. */
-  private static final QNm Q_GML_MULTIPOINT = QNm.get(GML, "MultiPoint", URI);
+  private static final QNm Q_GML_MULTIPOINT = new QNm(GML, "MultiPoint", URI);
   /** QName gml:LineString. */
-  private static final QNm Q_GML_LINESTRING = QNm.get(GML, "LineString", URI);
+  private static final QNm Q_GML_LINESTRING = new QNm(GML, "LineString", URI);
   /** QName gml:LinearRing. */
-  private static final QNm Q_GML_LINEARRING = QNm.get(GML, "LinearRing", URI);
+  private static final QNm Q_GML_LINEARRING = new QNm(GML, "LinearRing", URI);
   /** QName gml:Polygon. */
-  private static final QNm Q_GML_POLYGON = QNm.get(GML, "Polygon", URI);
+  private static final QNm Q_GML_POLYGON = new QNm(GML, "Polygon", URI);
   /** QName gml:MultiPolygon. */
-  private static final QNm Q_GML_MULTIPOLYGON = QNm.get(GML, "MultiPolygon", URI);
+  private static final QNm Q_GML_MULTIPOLYGON = new QNm(GML, "MultiPolygon", URI);
   /** QName gml:MultiLineString. */
-  private static final QNm Q_GML_MULTILINESTRING = QNm.get(GML, "MultiLineString", URI);
+  private static final QNm Q_GML_MULTILINESTRING = new QNm(GML, "MultiLineString", URI);
 
   /** Array containing all QNames. */
   private static final QNm[] QNAMES = {
@@ -69,7 +69,7 @@ public final class Geo extends QueryModule {
    */
   @Deterministic @Requires(Permission.NONE)
   public QNm geometryType(final ANode node) throws QueryException {
-    return QNm.get(GML, checkGeo(node).getGeometryType(), URI);
+    return new QNm(GML, checkGeo(node).getGeometryType(), URI);
   }
 
   /**

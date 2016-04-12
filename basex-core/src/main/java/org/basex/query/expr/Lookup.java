@@ -64,9 +64,9 @@ public final class Lookup extends Arr {
       if(ks.isValue()) {
         // keys are constant, so we do not duplicate work in the inner loop
         final LinkedList<Clause> clauses = new LinkedList<>();
-        final Var f = scp.newLocal(qc, QNm.get("f"), null, false);
+        final Var f = scp.newLocal(qc, new QNm("f"), null, false);
         clauses.add(new For(f, null, null, fs, false, info));
-        final Var k = scp.newLocal(qc, QNm.get("k"), null, false);
+        final Var k = scp.newLocal(qc, new QNm("k"), null, false);
         clauses.add(new For(k, null, null, ks, false, info));
         final VarRef rf = new VarRef(info, f), rk = new VarRef(info, k);
         final DynFuncCall ret = new DynFuncCall(info, sc, rf, rk);

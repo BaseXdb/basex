@@ -20,7 +20,7 @@ import org.basex.util.*;
  */
 abstract class DbNew extends DbAccess {
   /** Element: parameters. */
-  static final QNm Q_OPTIONS = QNm.get("options");
+  static final QNm Q_OPTIONS = new QNm("options");
 
   /**
    * Creates a {@link Data} instance for the specified document.

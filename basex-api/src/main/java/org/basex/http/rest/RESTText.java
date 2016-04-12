@@ -12,16 +12,14 @@ import org.basex.util.*;
  */
 interface RESTText {
   /** REST URI. */
-  String REST_PREFIX = Token.string(QueryText.REST_PREFIX);
-  /** REST URI. */
-  String REST_URI = new TokenBuilder(Prop.URL).add('/').add(QueryText.REST_PREFIX).toString();
+  byte[] REST_URI = new TokenBuilder(Prop.URL).add('/').add(QueryText.REST_PREFIX).finish();
 
   /** Name. */
-  QNm Q_DATABASES = QNm.get(REST_PREFIX, "databases", REST_URI);
+  QNm Q_DATABASES = new QNm(QueryText.REST_PREFIX, "databases", REST_URI);
   /** Name. */
-  QNm Q_DATABASE = QNm.get(REST_PREFIX, "database", REST_URI);
+  QNm Q_DATABASE = new QNm(QueryText.REST_PREFIX, "database", REST_URI);
   /** Name. */
-  QNm Q_RESOURCE = QNm.get(REST_PREFIX, "resource", REST_URI);
+  QNm Q_RESOURCE = new QNm(QueryText.REST_PREFIX, "resource", REST_URI);
 
   /** Attribute. */
   String RESOURCES = "resources";

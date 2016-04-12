@@ -37,7 +37,7 @@ public final class FAttr extends FNode {
    * @param value value
    */
   public FAttr(final byte[] name, final byte[] value) {
-    this(QNm.get(name), value);
+    this(new QNm(name), value);
   }
 
   /**

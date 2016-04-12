@@ -30,7 +30,7 @@ public final class FPI extends FNode {
    * @param value value
    */
   public FPI(final String name, final String value) {
-    this(QNm.get(name), token(value));
+    this(new QNm(name), token(value));
   }
 
   /**

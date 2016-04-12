@@ -10,7 +10,6 @@ import javax.xml.namespace.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
-import org.basex.query.util.hash.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -24,9 +23,6 @@ import org.basex.util.list.*;
 public final class QNm extends Item {
   /** URL pattern (matching Clark and EQName notation). */
   public static final Pattern EQNAME = Pattern.compile("^Q?\\{(.*?)\\}(.+)$");
-
-  /** Singleton instance. */
-  private static final QNmMap CACHE = new QNmMap();
 
   /** Namespace URI. */
   private byte[] uri;
@@ -107,6 +103,27 @@ public final class QNm extends Item {
   public QNm(final QName name) {
     this(token(name.getPrefix().isEmpty() ? name.getLocalPart() :
       name.getPrefix() + ':' + name.getLocalPart()), token(name.getNamespaceURI()));
+  }
+
+  /**
+   * Constructor.
+   * @param prefix prefix
+   * @param local local name
+   * @param uri namespace uri
+   */
+  public QNm(final byte[] prefix, final String local, final byte[] uri) {
+    this(prefix, token(local), uri);
+  }
+
+  /**
+   * Constructor.
+   * @param prefix prefix
+   * @param local local name
+   * @param uri namespace uri
+   */
+  public QNm(final byte[] prefix, final byte[] local, final byte[] uri) {
+    this(new TokenBuilder(prefix.length + local.length + 1).add(prefix).
+        add(':').add(local).finish(), uri);
   }
 
   /**
@@ -286,8 +303,9 @@ public final class QNm extends Item {
    * @return unique representation
    */
   public byte[] prefixId(final byte[] ns) {
-    if(ns != null && Token.eq(uri(), ns)) return local();
-    final byte[] p = NSGlobal.prefix(uri());
+    final byte[] u = uri();
+    if(ns != null && Token.eq(u, ns)) return local();
+    final byte[] p = NSGlobal.prefix(u);
     return p.length == 0 ? id() : concat(p, token(":"), local());
   }
 
@@ -314,77 +332,6 @@ public final class QNm extends Item {
   @Override
   public int hashCode() {
     return Token.hash(id());
-  }
-
-  /**
-   * Returns a cached QName with the specified local name.
-   * @param local local name
-   * @return instance
-   */
-  public static QNm get(final String local) {
-    return CACHE.index(null, token(local), null);
-  }
-
-  /**
-   * Returns a cached QName with the specified local name.
-   * @param local local name
-   * @return instance
-   */
-  public static QNm get(final byte[] local) {
-    return CACHE.index(null, local, null);
-  }
-
-  /**
-   * Returns a cached QName with the specified local name and uri.
-   * @param local local name
-   * @param uri namespace uri
-   * @return instance
-   */
-  public static QNm get(final String local, final byte[] uri) {
-    return CACHE.index(null, token(local), uri);
-  }
-
-  /**
-   * Returns a cached QName with the specified local name and uri.
-   * @param local local name
-   * @param uri namespace uri
-   * @return instance
-   */
-  public static QNm get(final byte[] local, final byte[] uri) {
-    return CACHE.index(null, local, uri);
-  }
-
-  /**
-   * Returns a cached QName with the specified prefix, local name and uri.
-   * @param prefix prefix
-   * @param local local name
-   * @param uri namespace uri
-   * @return instance
-   */
-  public static QNm get(final byte[] prefix, final String local, final byte[] uri) {
-    return CACHE.index(prefix, token(local), uri);
-  }
-
-  /**
-   * Returns a cached QName with the specified prefix, local name and uri.
-   * @param prefix prefix
-   * @param local local name
-   * @param uri namespace uri
-   * @return instance
-   */
-  public static QNm get(final String prefix, final String local, final String uri) {
-    return CACHE.index(token(prefix), token(local), token(uri));
-  }
-
-  /**
-   * Returns a cached QName with the specified prefix, local name and uri.
-   * @param prefix prefix
-   * @param local local name
-   * @param uri namespace uri
-   * @return instance
-   */
-  public static QNm get(final byte[] prefix, final byte[] local, final byte[] uri) {
-    return CACHE.index(prefix, local, uri);
   }
 
   /**

@@ -20,10 +20,10 @@ public final class WebRedirect extends WebFn {
     final byte[] url = createUrl(toToken(exprs[0], qc),
         exprs.length < 2 ? Map.EMPTY : toMap(exprs[1], qc));
 
-    final FElem hhead = new FElem(QNm.get(HTTP_PREFIX, "header", HTTP_URI)).
+    final FElem hhead = new FElem(new QNm(HTTP_PREFIX, "header", HTTP_URI)).
         add("name", "location").add("value", url);
-    final FElem hresp = new FElem(QNm.get(HTTP_PREFIX, "response", HTTP_URI)).
+    final FElem hresp = new FElem(new QNm(HTTP_PREFIX, "response", HTTP_URI)).
         add("status", "302").add(hhead);
-    return new FElem(QNm.get(REST_PREFIX, "response", REST_URI)).add(hresp);
+    return new FElem(new QNm(REST_PREFIX, "response", REST_URI)).add(hresp);
   }
 }

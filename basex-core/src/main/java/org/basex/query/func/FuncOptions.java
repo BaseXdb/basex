@@ -23,7 +23,7 @@ import org.basex.util.options.*;
  */
 public final class FuncOptions {
   /** QName. */
-  public static final QNm Q_SPARAM = QNm.get(SERIALIZATION_PARAMETERS, OUTPUT_URI);
+  public static final QNm Q_SPARAM = new QNm(SERIALIZATION_PARAMETERS, OUTPUT_URI);
   /** Value. */
   private static final byte[] VALUE = token("value");
 

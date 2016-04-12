@@ -32,7 +32,6 @@ public final class FElem extends FNode {
 
   /**
    * Convenience constructor for creating an element.
-   * All QNames that are created from the specified name will be cached.
    * @param name element name
    */
   public FElem(final String name) {
@@ -41,16 +40,14 @@ public final class FElem extends FNode {
 
   /**
    * Convenience constructor for creating an element.
-   * All QNames that are created from the specified name will be cached.
    * @param name element name
    */
   public FElem(final byte[] name) {
-    this(QNm.get(name));
+    this(new QNm(name));
   }
 
   /**
    * Convenience constructor for creating an element with a new namespace.
-   * QNames will be cached and reused.
    * @param local local name
    * @param uri namespace uri
    */
@@ -60,7 +57,6 @@ public final class FElem extends FNode {
 
   /**
    * Convenience constructor for creating an element with a new namespace.
-   * QNames will be cached and reused.
    * @param local local name
    * @param uri namespace uri
    */
@@ -70,7 +66,6 @@ public final class FElem extends FNode {
 
   /**
    * Convenience constructor for creating an element with a new namespace.
-   * QNames will be cached and reused.
    * @param prefix prefix (a default namespace will be created if the string is empty)
    * @param local local name
    * @param uri namespace uri
@@ -81,13 +76,12 @@ public final class FElem extends FNode {
 
   /**
    * Convenience constructor for creating an element with a new namespace.
-   * QNames will be cached and reused.
    * @param prefix prefix (a default namespace will be created if the string is empty)
    * @param local local name
    * @param uri namespace uri
    */
   public FElem(final byte[] prefix, final byte[] local, final byte[] uri) {
-    this(QNm.get(prefix, local, uri));
+    this(new QNm(prefix, local, uri));
   }
 
   /**

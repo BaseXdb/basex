@@ -28,7 +28,7 @@ public class XQueryParse extends StandardFunc {
   private static final byte[] URI = token("uri");
 
   /** QName. */
-  private static final QNm Q_OPTIONS = QNm.get(QueryText.XQUERY_PREFIX, "options",
+  private static final QNm Q_OPTIONS = new QNm(QueryText.XQUERY_PREFIX, "options",
     QueryText.XQUERY_URI);
 
   /** XQuery options. */

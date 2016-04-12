@@ -18,13 +18,13 @@ interface ArchiveText {
   String ZIP = "zip";
 
   /** QName. */
-  QNm Q_ENTRY = QNm.get(ARCHIVE_PREFIX, "entry", ARCHIVE_URI);
+  QNm Q_ENTRY = new QNm(ARCHIVE_PREFIX, "entry", ARCHIVE_URI);
   /** QName. */
-  QNm Q_OPTIONS = QNm.get(ARCHIVE_PREFIX, "options", ARCHIVE_URI);
+  QNm Q_OPTIONS = new QNm(ARCHIVE_PREFIX, "options", ARCHIVE_URI);
   /** QName. */
-  QNm Q_FORMAT = QNm.get(ARCHIVE_PREFIX, "format", ARCHIVE_URI);
+  QNm Q_FORMAT = new QNm(ARCHIVE_PREFIX, "format", ARCHIVE_URI);
   /** QName. */
-  QNm Q_ALGORITHM = QNm.get(ARCHIVE_PREFIX, "algorithm", ARCHIVE_URI);
+  QNm Q_ALGORITHM = new QNm(ARCHIVE_PREFIX, "algorithm", ARCHIVE_URI);
   /** Root node test. */
   NodeTest TEST = new NodeTest(Q_ENTRY);
 

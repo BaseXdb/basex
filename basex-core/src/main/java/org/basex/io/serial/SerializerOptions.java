@@ -208,8 +208,8 @@ public final class SerializerOptions extends Options {
         final HashMap<String, String> free = free();
         if(!free.isEmpty()) throw SEROPTION_X.get(info, free.keySet().iterator().next());
 
-        final byte[] mapsId = QNm.get(USE_CHARACTER_MAPS.name(), QueryText.OUTPUT_URI).id();
-        final byte[] mapId = QNm.get("character-map", QueryText.OUTPUT_URI).id();
+        final byte[] mapsId = new QNm(USE_CHARACTER_MAPS.name(), QueryText.OUTPUT_URI).id();
+        final byte[] mapId = new QNm("character-map", QueryText.OUTPUT_URI).id();
         if(!get(USE_CHARACTER_MAPS).isEmpty()) {
           final TokenBuilder tb = new TokenBuilder();
           for(final ANode option : XMLAccess.children(root, mapsId)) {

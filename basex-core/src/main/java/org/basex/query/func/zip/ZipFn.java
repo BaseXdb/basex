@@ -14,11 +14,11 @@ import org.basex.query.value.item.*;
  */
 abstract class ZipFn extends StandardFunc {
   /** QName. */
-  static final QNm Q_FILE = QNm.get(ZIP_PREFIX, "file", ZIP_URI);
+  static final QNm Q_FILE = new QNm(ZIP_PREFIX, "file", ZIP_URI);
   /** QName. */
-  static final QNm Q_DIR = QNm.get(ZIP_PREFIX, "dir", ZIP_URI);
+  static final QNm Q_DIR = new QNm(ZIP_PREFIX, "dir", ZIP_URI);
   /** QName. */
-  static final QNm Q_ENTRY = QNm.get(ZIP_PREFIX, "entry", ZIP_URI);
+  static final QNm Q_ENTRY = new QNm(ZIP_PREFIX, "entry", ZIP_URI);
 
   /** Attribute: href. */
   static final byte[] HREF = token("href");

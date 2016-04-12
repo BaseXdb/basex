@@ -28,7 +28,7 @@ import org.basex.util.options.*;
 public class XQueryEval extends StandardFunc {
   /** QName. */
   private static final QNm Q_OPTIONS =
-      QNm.get(QueryText.XQUERY_PREFIX, "options", QueryText.XQUERY_URI);
+      new QNm(QueryText.XQUERY_PREFIX, "options", QueryText.XQUERY_URI);
 
   /** XQuery options. */
   public static class XQueryOptions extends Options {

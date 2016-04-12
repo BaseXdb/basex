@@ -18,13 +18,13 @@ import org.basex.util.*;
  */
 public final class FnAnalyzeString extends RegEx {
   /** QName. */
-  private static final QNm Q_ANALYZE = QNm.get(FN_PREFIX, "analyze-string-result", FN_URI);
+  private static final QNm Q_ANALYZE = new QNm(FN_PREFIX, "analyze-string-result", FN_URI);
   /** QName. */
-  private static final QNm Q_MATCH = QNm.get(FN_PREFIX, "match", FN_URI);
+  private static final QNm Q_MATCH = new QNm(FN_PREFIX, "match", FN_URI);
   /** QName. */
-  private static final QNm Q_NONMATCH = QNm.get(FN_PREFIX, "non-match", FN_URI);
+  private static final QNm Q_NONMATCH = new QNm(FN_PREFIX, "non-match", FN_URI);
   /** QName. */
-  private static final QNm Q_MGROUP = QNm.get(FN_PREFIX, "group", FN_URI);
+  private static final QNm Q_MGROUP = new QNm(FN_PREFIX, "group", FN_URI);
   /** Attribute for the analyze-string-result function. */
   private static final String NR = "nr";
 

@@ -41,10 +41,10 @@ public final class WebResponseHeader extends StandardFunc {
     // HTTP response
     if(!http.containsKey(CACHE_CONTROL)) http.put(CACHE_CONTROL, CACHE_CONTROL_DEFAULT);
 
-    final FElem hresp = new FElem(QNm.get(HTTP_PREFIX, "response", HTTP_URI));
+    final FElem hresp = new FElem(new QNm(HTTP_PREFIX, "response", HTTP_URI));
     for(final Entry<String, String> entry : http.entrySet()) {
       final String name = entry.getKey(), value = entry.getValue();
-      if(!value.isEmpty()) hresp.add(new FElem(QNm.get(HTTP_PREFIX, "header", HTTP_URI)).
+      if(!value.isEmpty()) hresp.add(new FElem(new QNm(HTTP_PREFIX, "header", HTTP_URI)).
           add("name", name).add("value", value));
     }
 
@@ -53,16 +53,16 @@ public final class WebResponseHeader extends StandardFunc {
         SerializerOptions.MEDIA_TYPE.name(), MediaType.APPLICATION_OCTET_STREAM.toString());
 
     final SerializerOptions so = SerializerMode.DEFAULT.get();
-    final FElem oseri = new FElem(QNm.get(OUTPUT_PREFIX, SERIALIZATION_PARAMETERS, OUTPUT_URI));
+    final FElem oseri = new FElem(new QNm(OUTPUT_PREFIX, SERIALIZATION_PARAMETERS, OUTPUT_URI));
     for(final Entry<String, String> entry : output.entrySet()) {
       final String name = entry.getKey(), value = entry.getValue();
       if(so.option(name) == null) throw INVALIDOPTION_X.get(info, name);
-      if(!value.isEmpty()) oseri.add(new FElem(QNm.get(OUTPUT_PREFIX, name, OUTPUT_URI)).
+      if(!value.isEmpty()) oseri.add(new FElem(new QNm(OUTPUT_PREFIX, name, OUTPUT_URI)).
           add("value", value));
     }
 
     // REST response
-    final FElem resp = new FElem(QNm.get(REST_PREFIX, "response", REST_URI));
+    final FElem resp = new FElem(new QNm(REST_PREFIX, "response", REST_URI));
     if(hresp.children().next() != null) resp.add(hresp);
     if(oseri.children().next() != null) resp.add(oseri);
     return resp;

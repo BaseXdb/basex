@@ -7,6 +7,7 @@ import java.net.*;
 
 import org.basex.http.*;
 import org.basex.io.*;
+import org.basex.util.*;
 import org.basex.util.http.*;
 import org.junit.*;
 
@@ -18,7 +19,7 @@ import org.junit.*;
  */
 public abstract class RESTTest extends HTTPTest {
   /** REST URI. */
-  static final String URI = RESTText.REST_URI;
+  static final String URI = Token.string(RESTText.REST_URI);
   /** Input file. */
   static final String FILE = "src/test/resources/input.xml";
 

@@ -24,7 +24,7 @@ import org.basex.util.options.*;
  */
 public final class FetchXml extends StandardFunc {
   /** Element: options. */
-  private static final QNm Q_OPTIONS = QNm.get("options");
+  private static final QNm Q_OPTIONS = new QNm("options");
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {

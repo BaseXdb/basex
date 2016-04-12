@@ -91,26 +91,26 @@ public interface RestXqText {
   String NO_VALUE = "'%' element has no string value.";
 
   /** QName. */
-  QNm Q_STATUS = QNm.get(STATUS);
+  QNm Q_STATUS = new QNm(STATUS);
   /** QName. */
-  QNm Q_REASON = QNm.get(REASON);
+  QNm Q_REASON = new QNm(REASON);
   /** QName. */
-  QNm Q_MESSAGE = QNm.get(MESSAGE);
+  QNm Q_MESSAGE = new QNm(MESSAGE);
   /** QName. */
-  QNm Q_NAME = QNm.get(NAME);
+  QNm Q_NAME = new QNm(NAME);
   /** QName. */
-  QNm Q_VALUE = QNm.get(VALUE);
+  QNm Q_VALUE = new QNm(VALUE);
 
   /** Serializer node test. */
   NodeTest OUTPUT_SERIAL = new NodeTest(FuncOptions.Q_SPARAM);
   /** HTTP Response test. */
-  NodeTest HTTP_RESPONSE = new NodeTest(QNm.get(RESPONSE, HTTP_URI));
+  NodeTest HTTP_RESPONSE = new NodeTest(new QNm(RESPONSE, HTTP_URI));
   /** RESTXQ Response test. */
-  NodeTest REST_RESPONSE = new NodeTest(QNm.get(RESPONSE, REST_URI));
+  NodeTest REST_RESPONSE = new NodeTest(new QNm(RESPONSE, REST_URI));
   /** RESTXQ Redirect test. */
-  NodeTest REST_REDIRECT = new NodeTest(QNm.get(REDIRECT, REST_URI));
+  NodeTest REST_REDIRECT = new NodeTest(new QNm(REDIRECT, REST_URI));
   /** RESTXQ Forward test. */
-  NodeTest REST_FORWARD = new NodeTest(QNm.get(FORWARD, REST_URI));
+  NodeTest REST_FORWARD = new NodeTest(new QNm(FORWARD, REST_URI));
   /** HTTP Header test. */
-  NodeTest HTTP_HEADER = new NodeTest(QNm.get(HEADER, HTTP_URI));
+  NodeTest HTTP_HEADER = new NodeTest(new QNm(HEADER, HTTP_URI));
 }

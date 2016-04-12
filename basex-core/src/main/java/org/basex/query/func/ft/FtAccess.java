@@ -13,7 +13,7 @@ import org.basex.util.ft.*;
  */
 abstract class FtAccess extends StandardFunc {
   /** Element: options. */
-  static final QNm Q_OPTIONS = QNm.get("options");
+  static final QNm Q_OPTIONS = new QNm("options");
 
   /**
    * Parses fulltext options.

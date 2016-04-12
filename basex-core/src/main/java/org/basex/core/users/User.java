@@ -60,6 +60,7 @@ public final class User {
       passwords.put(algo, ec);
 
       for(final ANode code : children(password, null)) {
+        System.out.println(Token.string(code.qname().id()));
         final Code cd = value(name, code.qname().id(), algo.codes);
         if(ec.containsKey(cd)) throw new BaseXException(
             name + ", " + algo + ": Code \"" + code + "\" supplied more than once.");
