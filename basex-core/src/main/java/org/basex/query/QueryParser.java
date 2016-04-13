@@ -2053,18 +2053,16 @@ public class QueryParser extends InputParser {
         if(type != null) return kindTest(type);
       } else {
         pos = i2;
-        // name test: prefix:name, name, Q{uri}name
-        if(name.hasPrefix() || !consume(':')) {
-          skipWs();
-          qnames.add(name, !att);
-          return new NameTest(name, Kind.URI_NAME, att, sc.elemNS);
-        }
         // name test: prefix:*
-        if(consume('*')) {
+        if(consume(":*") && !name.hasPrefix()) {
           final QNm nm = new QNm(concat(name.string(), COLON));
           qnames.add(nm, !att);
           return new NameTest(nm, Kind.URI, att, sc.elemNS);
         }
+        // name test: prefix:name, name, Q{uri}name
+        skipWs();
+        qnames.add(name, !att);
+        return new NameTest(name, Kind.URI_NAME, att, sc.elemNS);
       }
     }
     pos = i;
