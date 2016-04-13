@@ -157,8 +157,7 @@ public final class Log {
    * @return log directory
    */
   public synchronized IOFile dir() {
-    // log suffix, plural
-    return sopts.dbPath(IO.LOGSUFFIX + 's');
+    return sopts.dbPath(".").resolve(sopts.get(StaticOptions.LOGPATH));
   }
 
   /**

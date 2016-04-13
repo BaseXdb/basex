@@ -25,6 +25,8 @@ public final class StaticOptions extends Options {
   /** Database path. */
   public static final StringOption DBPATH = new StringOption("DBPATH",
       Prop.HOME + (USERHOME ? Prop.NAME + "Data" : "data"));
+  /** Log path (relative to database path). */
+  public static final StringOption LOGPATH = new StringOption("LOGPATH", ".logs");
   /** Package repository path. */
   public static final StringOption REPOPATH = new StringOption("REPOPATH",
       Prop.HOME + (USERHOME ? Prop.NAME + "Repo" : "repo"));
