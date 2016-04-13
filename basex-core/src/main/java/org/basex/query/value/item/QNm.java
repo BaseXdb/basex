@@ -122,8 +122,18 @@ public final class QNm extends Item {
    * @param uri namespace uri
    */
   public QNm(final byte[] prefix, final byte[] local, final byte[] uri) {
-    this(new TokenBuilder(prefix.length + local.length + 1).add(prefix).
-        add(':').add(local).finish(), uri);
+    this(name(prefix, local), uri);
+  }
+
+  /**
+   * Creates the name string.
+   * @param prefix prefix
+   * @param local local name
+   * @return name
+   */
+  private static byte[] name(final byte[] prefix, final byte[] local) {
+    final int pl = prefix.length, ll = local.length;
+    return pl == 0 ? local : new TokenBuilder(pl + ll + 1).add(prefix).add(':').add(local).finish();
   }
 
   /**
