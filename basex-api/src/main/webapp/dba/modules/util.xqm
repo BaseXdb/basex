@@ -91,7 +91,6 @@ declare function util:eval(
   return if($cons:SESSION/host) then (
     util:remote-query($query, $vars)
   ) else (
-    prof:dump($query),
     xquery:eval($query, $vars)
   )
 };

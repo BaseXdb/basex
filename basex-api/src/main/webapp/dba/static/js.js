@@ -45,6 +45,7 @@ function setText(message, type) {
 
 var _running = 0;
 function query(key, query, enforce, target) {
+  setInfo("");
   _running++;
   setTimeout(function() {
     if(_running) setWarning("Please wait…");
