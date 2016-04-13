@@ -22,8 +22,8 @@ import org.basex.util.list.*;
 public abstract class Formatter extends FormatUtil {
   /** Military timezones. */
   private static final byte[] MIL = token("YXWVUTSRQPONZABCDEFGHIKLM");
-  /** Token: Nn. */
-  private static final byte[] NN = { 'N', 'n' };
+  /** Token: n. */
+  private static final byte[] N = { 'n' };
   /** Allowed calendars. */
   private static final byte[][] CALENDARS = tokens(
     "ISO", "AD", "AH", "AME", "AM", "AP", "AS", "BE", "CB", "CE", "CL", "CS", "EE", "FE",
@@ -188,7 +188,7 @@ public abstract class Formatter extends FormatUtil {
           case 'F':
             num = date.toJava().toGregorianCalendar().get(Calendar.DAY_OF_WEEK) - 1;
             if(num == 0) num = 7;
-            pres = NN;
+            pres = N;
             err = tim;
             break;
           case 'W':
@@ -213,7 +213,7 @@ public abstract class Formatter extends FormatUtil {
             break;
           case 'P':
             num = date.hour() / 12;
-            pres = NN;
+            pres = N;
             err = dat;
             break;
           case 'm':
@@ -237,11 +237,11 @@ public abstract class Formatter extends FormatUtil {
             pres = token("01:01");
             break;
           case 'C':
-            pres = NN;
+            pres = N;
             break;
           case 'E':
             num = date.yea();
-            pres = NN;
+            pres = N;
             err = tim;
             break;
           default:

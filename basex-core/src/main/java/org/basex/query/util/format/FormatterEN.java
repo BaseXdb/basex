@@ -63,7 +63,7 @@ final class FormatterEN extends Formatter {
   /** Ordinal suffixes (st, nr, rd, th). */
   private static final byte[][] ORDSUFFIX = tokens("st", "nd", "rd", "th");
   /** Eras: BC, AD. */
-  private static final byte[][] ERAS = tokens("BC", "AD");
+  private static final byte[][] ERAS = tokens("Bc", "Ad");
 
   @Override
   public byte[] word(final long n, final byte[] ord) {
