@@ -14,7 +14,7 @@ import java.util.*;
  *
  * (C) BaseX Team 2005-16, BSD License
  */
-public final class BaseXClient {
+public final class BaseXClient implements Closeable {
   /** UTF-8 charset. */
   private static final Charset UTF8 = Charset.forName("UTF-8");
   /** Output stream. */
@@ -258,7 +258,7 @@ public final class BaseXClient {
   /**
    * Inner class for iterative query execution.
    */
-  public class Query {
+  public class Query implements Closeable {
     /** Query id. */
     private final String id;
     /** Cached results. */
