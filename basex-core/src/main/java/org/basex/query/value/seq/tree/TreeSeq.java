@@ -40,6 +40,9 @@ public abstract class TreeSeq extends Seq {
    */
   TreeSeq(final long size, final Type type) {
     super(size, type == null ? AtomType.ITEM : type);
+    // abort if sequence gets too large
+    if(size > Integer.MAX_VALUE) throw new IndexOutOfBoundsException(
+        "Sequence has too many items (> " + Integer.MAX_VALUE + ").");
   }
 
   @Override
