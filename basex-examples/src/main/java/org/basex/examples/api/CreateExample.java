@@ -14,38 +14,24 @@ public final class CreateExample {
   /**
    * Main method.
    * @param args command-line arguments
+   * @throws IOException I/O exception
    */
-  public static void main(final String[] args) {
-    try {
-      // create session
-      final BaseXClient session = new BaseXClient("localhost", 1984, "admin", "admin");
+  public static void main(final String[] args) throws IOException {
+    // create session
+    try(final BaseXClient session = new BaseXClient("localhost", 1984, "admin", "admin")) {
+      // define input stream
+      final InputStream bais =
+        new ByteArrayInputStream("<xml>Hello World!</xml>".getBytes());
 
-      try {
-        // define input stream
-        final InputStream bais =
-          new ByteArrayInputStream("<xml>Hello World!</xml>".getBytes());
+      // create new database
+      session.create("database", bais);
+      System.out.println(session.info());
 
-        // create new database
-        session.create("database", bais);
-        System.out.println(session.info());
+      // run query on database
+      System.out.println(session.execute("xquery doc('database')"));
 
-        // run query on database
-        System.out.println(session.execute("xquery doc('database')"));
-
-        // drop database
-        session.execute("drop db database");
-
-      } catch(final IOException ex) {
-        // print exception
-        ex.printStackTrace();
-      }
-
-      // close session
-      session.close();
-
-    } catch(final IOException ex) {
-      // print exception
-      ex.printStackTrace();
+      // drop database
+      session.execute("drop db database");
     }
   }
 }

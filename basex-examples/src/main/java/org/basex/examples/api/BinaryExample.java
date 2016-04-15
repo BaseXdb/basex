@@ -20,9 +20,7 @@ public final class BinaryExample {
    */
   public static void main(final String[] args) throws IOException {
     // create session
-    final BaseXClient session = new BaseXClient("localhost", 1984, "admin", "admin");
-
-    try {
+    try(final BaseXClient session = new BaseXClient("localhost", 1984, "admin", "admin")) {
       // create empty database
       session.execute("create db database");
       System.out.println(session.info());
@@ -49,10 +47,6 @@ public final class BinaryExample {
 
       // drop database
       session.execute("drop db database");
-
-    } finally {
-      // close session
-      session.close();
     }
   }
 }

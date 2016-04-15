@@ -15,17 +15,15 @@ public final class QueryExample {
   /**
    * Main method.
    * @param args command-line arguments
+   * @throws IOException I/O exception
    */
-  public static void main(final String[] args) {
-    try {
-      // create session
-      final BaseXClient session = new BaseXClient("localhost", 1984, "admin", "admin");
+  public static void main(final String[] args) throws IOException {
+    // create session
+    try(final BaseXClient session = new BaseXClient("localhost", 1984, "admin", "admin")) {
+      // create query instance
+      final String input = "for $i in 1 to 10 return <xml>Text { $i }</xml>";
 
-      try {
-        // create query instance
-        final String input = "for $i in 1 to 10 return <xml>Text { $i }</xml>";
-        final BaseXClient.Query query = session.query(input);
-
+      try(final BaseXClient.Query query = session.query(input)) {
         // loop through all results
         while(query.more()) {
           System.out.println(query.next());
@@ -33,21 +31,7 @@ public final class QueryExample {
 
         // print query info
         System.out.println(query.info());
-
-        // close query instance
-        query.close();
-
-      } catch(final IOException ex) {
-        // print exception
-        ex.printStackTrace();
       }
-
-      // close session
-      session.close();
-
-    } catch(final IOException ex) {
-      // print exception
-      ex.printStackTrace();
     }
   }
 }

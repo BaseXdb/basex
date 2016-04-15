@@ -14,14 +14,13 @@ public final class Example {
   /**
    * Main method.
    * @param args command-line arguments
+   * @throws IOException I/O exception
    */
-  public static void main(final String[] args) {
-    try {
+  public static void main(final String[] args) throws IOException {
+    // create session
+    try(final BaseXClient session = new BaseXClient("localhost", 1984, "admin", "admin")) {
       // initialize timer
       final long time = System.nanoTime();
-
-      // create session
-      final BaseXClient session = new BaseXClient("localhost", 1984, "admin", "admin");
 
       // version 1: perform command and print returned string
       System.out.println(session.execute("info"));
@@ -30,16 +29,9 @@ public final class Example {
       final OutputStream out = System.out;
       session.execute("xquery 1 to 10", out);
 
-      // close session
-      session.close();
-
       // print time needed
       final double ms = (System.nanoTime() - time) / 1000000d;
       System.out.println("\n\n" + ms + " ms");
-
-    } catch(final IOException ex) {
-      // print exception
-      ex.printStackTrace();
     }
   }
 }

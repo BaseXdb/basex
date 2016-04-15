@@ -151,6 +151,7 @@ public final class BaseXClient implements Closeable {
    * Closes the session.
    * @throws IOException Exception
    */
+  @Override
   public void close() throws IOException {
     send("exit");
     out.flush();
@@ -381,6 +382,7 @@ public final class BaseXClient implements Closeable {
      * Closes the query.
      * @throws IOException I/O exception
      */
+    @Override
     public void close() throws IOException {
       exec(2, id);
     }
