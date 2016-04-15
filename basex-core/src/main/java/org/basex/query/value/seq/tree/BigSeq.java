@@ -38,6 +38,10 @@ final class BigSeq extends TreeSeq {
     this.right = right;
     assert left.length >= MIN_DIGIT && left.length <= MAX_DIGIT
         && right.length >= MIN_DIGIT && right.length <= MAX_DIGIT;
+
+    // integer overflow, caused by too many items
+    if(size < 0) throw new IndexOutOfBoundsException(
+        "Sequence has too many items (> " + Long.MAX_VALUE + ").");
   }
 
   @Override
