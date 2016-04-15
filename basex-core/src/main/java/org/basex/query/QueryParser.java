@@ -2260,7 +2260,7 @@ public class QueryParser extends InputParser {
     // named function reference
     pos = ip;
     final QNm name = eQName(null, sc.funcNS);
-    if(name != null && consume('#')) {
+    if(name != null && wsConsumeWs("#")) {
       if(keyword(name)) throw error(RESERVED_X, name.local());
       final Expr ex = numericLiteral(true);
       if(!(ex instanceof Int)) return ex;
