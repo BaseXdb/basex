@@ -54,8 +54,7 @@ final class SearchContext {
    * @return result positions
    */
   IntList[] search(final byte[] txt) {
-    final IntList start = new IntList();
-    final IntList end = new IntList();
+    final IntList start = new IntList(), end = new IntList();
     if(!search.isEmpty()) {
       if(regex) searchRegEx(start, end, txt);
       else searchSimple(start, end, txt);

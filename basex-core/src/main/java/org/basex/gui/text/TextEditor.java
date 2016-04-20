@@ -29,8 +29,8 @@ public final class TextEditor {
   /** Closing brackets. */
   private static final String CLOSING = "})]";
 
-  /** Start and end positions of search terms. */
-  IntList[] searchPos;
+  /** Start and end positions of search terms (initally empty). */
+  IntList[] searchPos = { new IntList(), new IntList() };
   /** Start position of a text selection. */
   int start = -1;
   /** End position of a text selection (+1). */
