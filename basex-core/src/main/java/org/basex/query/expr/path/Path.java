@@ -140,7 +140,7 @@ public abstract class Path extends ParseExpr {
           steps[s] = step.compile(qc, scp);
         } catch(final QueryException ex) {
           // replace original expression with error
-          steps[s] = FnError.get(ex, seqType);
+          steps[s] = FnError.get(ex, seqType, scp.sc);
         }
         // no axis step: invalidate context value
         if(!as) qc.value = null;

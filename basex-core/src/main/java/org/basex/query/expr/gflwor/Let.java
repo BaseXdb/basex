@@ -133,7 +133,7 @@ public final class Let extends ForLet {
    * @throws QueryException query exception
    */
   Expr inlineExpr(final QueryContext qc, final VarScope scp) throws QueryException {
-    return scoring ? Function._FT_SCORE.get(null, info, expr).optimize(qc, scp)
+    return scoring ? Function._FT_SCORE.get(scp.sc, info, expr).optimize(qc, scp)
                    : var.checked(expr, qc, scp, info);
   }
 

@@ -20,7 +20,7 @@ import org.basex.util.hash.*;
  */
 public final class VarScope {
   /** Static context. */
-  private final StaticContext sc;
+  public final StaticContext sc;
 
   /** Local variables in this scope. */
   private final ArrayList<Var> vars = new ArrayList<>();

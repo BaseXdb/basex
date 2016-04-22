@@ -224,7 +224,7 @@ public final class ValueAccess extends IndexAccess {
     final TokenBuilder tb = new TokenBuilder();
     final Function func = type == IndexType.TEXT ? Function._DB_TEXT : type == IndexType.ATTRIBUTE
         ? Function._DB_ATTRIBUTE : Function._DB_TOKEN;
-    tb.addExt(func.get(null, info, Str.get(ictx.data.meta.name), expr));
+    tb.add(func.toString(Str.get(ictx.data.meta.name), expr));
     if(test != null) tb.add("/parent::").addExt(test);
     return tb.toString();
   }

@@ -15,8 +15,8 @@ public final class InputInfo {
   private boolean check;
   /** Input path. */
   private final String path;
-  /** Input query. */
-  private String query;
+  /** Input string (can be {@code null}). */
+  private String input;
   /** Parse position. */
   private int pos = -1;
   /** Line number ({@code 0} if not initialized). */
@@ -29,7 +29,7 @@ public final class InputInfo {
    * @param parser input parser, containing information on the current parsing state
    */
   public InputInfo(final InputParser parser) {
-    query = parser.input;
+    input = parser.input;
     path = parser.file;
     pos = parser.pos;
   }
@@ -76,8 +76,8 @@ public final class InputInfo {
    * Calculates the column and line number in a string.
    */
   private void lineCol() {
-    final int cl = Math.min(pos, query.length());
-    final String q = query;
+    final int cl = Math.min(pos, input.length());
+    final String q = input;
     int l = 1, c = 1;
     for(int i = 0, ch; i < cl; i += Character.charCount(ch)) {
       ch = q.codePointAt(i);
@@ -107,12 +107,12 @@ public final class InputInfo {
   public boolean equals(final Object object) {
     if(!(object instanceof InputInfo)) return false;
     final InputInfo ii = (InputInfo) object;
-    return (path != null ? path.equals(ii.path) : query.equals(ii.query)) && pos == ii.pos;
+    return (path != null ? path.equals(ii.path) : input.equals(ii.input)) && pos == ii.pos;
   }
 
   @Override
   public int hashCode() {
-    return (path != null ? path.hashCode() : query.hashCode()) + pos;
+    return (path != null ? path.hashCode() : input.hashCode()) + pos;
   }
 
   @Override

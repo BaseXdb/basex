@@ -72,14 +72,14 @@ public final class FuncLit extends Single implements Scope {
       expr = expr.compile(qc, scope);
       expr.markTailCalls(null);
     } catch(final QueryException e) {
-      expr = FnError.get(e, seqType);
+      expr = FnError.get(e, seqType, sc);
     } finally {
       scope.cleanUp(this);
     }
   }
 
   @Override
-  public Expr compile(final QueryContext qc, final VarScope o) throws QueryException {
+  public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
     compile(qc);
     return expr.isValue() ? preEval(qc) : this;
   }
@@ -91,13 +91,13 @@ public final class FuncLit extends Single implements Scope {
   }
 
   @Override
-  public Expr copy(final QueryContext qc, final VarScope o, final IntObjMap<Var> vs) {
-    final VarScope scp = new VarScope(sc);
+  public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vars) {
+    final VarScope vs = new VarScope(sc);
     final int al = args.length;
     final Var[] arg = new Var[al];
-    for(int a = 0; a < al; a++) vs.put(args[a].id, arg[a] = scp.newCopyOf(qc, args[a]));
-    final Expr call = expr.copy(qc, scp, vs);
-    return new FuncLit(anns, name, arg, call, (FuncType) seqType.type, scp, sc, info);
+    for(int a = 0; a < al; a++) vars.put(args[a].id, arg[a] = vs.newCopyOf(qc, args[a]));
+    final Expr call = expr.copy(qc, vs, vars);
+    return new FuncLit(anns, name, arg, call, (FuncType) seqType.type, vs, sc, info);
   }
 
   @Override

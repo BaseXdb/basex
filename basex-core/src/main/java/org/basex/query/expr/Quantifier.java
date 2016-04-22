@@ -32,11 +32,12 @@ public final class Quantifier extends Single {
    * @param inputs variable inputs
    * @param expr satisfier
    * @param every every flag
+   * @param sc static context
    */
   public Quantifier(final InputInfo info, final For[] inputs, final Expr expr,
-      final boolean every) {
+      final boolean every, final StaticContext sc) {
     this(info, new GFLWOR(info, new LinkedList<Clause>(Arrays.asList(inputs)),
-        compBln(expr, info)), every);
+        compBln(expr, info, sc)), every);
   }
 
   /**

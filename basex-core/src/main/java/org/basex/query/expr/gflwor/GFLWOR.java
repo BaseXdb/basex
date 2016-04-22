@@ -110,13 +110,13 @@ public final class GFLWOR extends ParseExpr {
       while(iter.hasNext()) iter.next().compile(qc, scp);
     } catch(final QueryException qe) {
       iter.remove();
-      clauseError(qe, iter);
+      clauseError(qe, iter, scp);
     }
 
     try {
       ret = ret.compile(qc, scp);
     } catch(final QueryException qe) {
-      clauseError(qe, iter);
+      clauseError(qe, iter, scp);
     }
 
     return optimize(qc, scp);
@@ -709,7 +709,7 @@ public final class GFLWOR extends ParseExpr {
         }
       } catch(final QueryException qe) {
         iter.remove();
-        return clauseError(qe, iter);
+        return clauseError(qe, iter, scp);
       }
     }
 
@@ -720,7 +720,7 @@ public final class GFLWOR extends ParseExpr {
         ret = rt;
       }
     } catch(final QueryException qe) {
-      return clauseError(qe, iter);
+      return clauseError(qe, iter, scp);
     }
 
     return changed;
@@ -730,11 +730,13 @@ public final class GFLWOR extends ParseExpr {
    * Tries to recover from a compile-time exception inside a FLWOR clause.
    * @param qe thrown exception
    * @param iter iterator positioned where the failing clause was before
+   * @param scp variable scope
    * @return {@code true} if the GFLWOR expression has to stay
    * @throws QueryException query exception if the whole expression fails
    */
-  private boolean clauseError(final QueryException qe, final ListIterator<Clause> iter)
-      throws QueryException {
+  private boolean clauseError(final QueryException qe, final ListIterator<Clause> iter,
+      final VarScope scp) throws QueryException {
+
     // check if an outer clause can prevent the error
     while(iter.hasPrevious()) {
       final Clause b4 = iter.previous();
@@ -744,7 +746,7 @@ public final class GFLWOR extends ParseExpr {
           iter.next();
           iter.remove();
         }
-        ret = FnError.get(qe, ret.seqType());
+        ret = FnError.get(qe, ret.seqType(), scp.sc);
         return true;
       }
     }

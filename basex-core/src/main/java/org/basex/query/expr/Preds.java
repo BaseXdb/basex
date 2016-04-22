@@ -59,7 +59,7 @@ public abstract class Preds extends ParseExpr {
           preds[p] = preds[p].compile(qc, scp);
         } catch(final QueryException ex) {
           // replace original expression with error
-          preds[p] = FnError.get(ex, seqType);
+          preds[p] = FnError.get(ex, seqType, scp.sc);
         }
       }
     } finally {
@@ -100,7 +100,7 @@ public abstract class Preds extends ParseExpr {
           for(final Expr e : Arrays.asList(preds).subList(0, p)) el.add(e);
           for(final Expr a : and) {
             // wrap test with boolean() if the result is numeric
-            el.add(Function.BOOLEAN.get(null, info, a).optimizeEbv(qc, scp));
+            el.add(Function.BOOLEAN.get(scp.sc, info, a).optimizeEbv(qc, scp));
           }
           for(final Expr e : Arrays.asList(preds).subList(p + 1, preds.length)) el.add(e);
           preds = el.finish();

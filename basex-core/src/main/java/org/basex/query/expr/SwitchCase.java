@@ -39,7 +39,7 @@ public final class SwitchCase extends Arr {
         exprs[e] = exprs[e].compile(qc, scp);
       } catch(final QueryException ex) {
         // replace original expression with error
-        exprs[e] = FnError.get(ex, exprs[e].seqType());
+        exprs[e] = FnError.get(ex, exprs[e].seqType(), scp.sc);
       }
     }
     return this;
@@ -60,7 +60,7 @@ public final class SwitchCase extends Arr {
       try {
         nw = exprs[i].inline(qc, scp, var, ex);
       } catch(final QueryException qe) {
-        nw = FnError.get(qe, exprs[i].seqType());
+        nw = FnError.get(qe, exprs[i].seqType(), scp.sc);
       }
       if(nw != null) {
         exprs[i] = nw;

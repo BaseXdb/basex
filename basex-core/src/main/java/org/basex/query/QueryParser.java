@@ -1341,7 +1341,7 @@ public class QueryParser extends InputParser {
     wsCheck(SATISFIES);
     final Expr e = check(single(), NOSOME);
     localVars.closeScope(s);
-    return new Quantifier(info(), fl, e, !some);
+    return new Quantifier(info(), fl, e, !some, sc);
   }
 
   /**
@@ -2331,7 +2331,7 @@ public class QueryParser extends InputParser {
     final long l = toLong(tok.toArray());
     if(l != Long.MIN_VALUE) return Int.get(l);
     final InputInfo ii = info();
-    return FnError.get(RANGE_X.get(ii, chop(tok, ii)), SeqType.ITR);
+    return FnError.get(RANGE_X.get(ii, chop(tok, ii)), SeqType.ITR, sc);
   }
 
   /**

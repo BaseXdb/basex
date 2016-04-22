@@ -1606,6 +1606,15 @@ public enum Function {
     return new TokenBuilder(NSGlobal.prefix(uri)).add(':').add(desc).toString();
   }
 
+  /**
+   * Returns a string representation of the function with the specified arguments.
+   * @param exprs arguments
+   * @return function
+   */
+  public String toString(final Expr... exprs) {
+    return new TokenBuilder(id()).add('(').addSep(exprs, SEP).add(')').toString();
+  }
+
   /*
    * Returns the names of all functions. Used to update MediaWiki syntax highlighter.
    * All function names are listed in reverse order to give precedence to longer names.

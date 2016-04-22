@@ -36,7 +36,7 @@ abstract class Logical extends Arr {
       } catch(final QueryException qe) {
         // first expression is evaluated eagerly
         if(i == 0) throw qe;
-        exprs[i] = FnError.get(qe, exprs[i].seqType());
+        exprs[i] = FnError.get(qe, exprs[i].seqType(), scp.sc);
       }
     }
     return optimize(qc, scp);
@@ -95,7 +95,7 @@ abstract class Logical extends Arr {
         // everything behind the error is dead anyway
         final Expr[] nw = new Expr[i + 1];
         System.arraycopy(arr, 0, nw, 0, i);
-        nw[i] = FnError.get(qe, seqType());
+        nw[i] = FnError.get(qe, seqType(), scp.sc);
         exprs = nw;
         change = true;
         break;

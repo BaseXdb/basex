@@ -63,7 +63,7 @@ public final class TypeCase extends Single {
       }
     } catch(final QueryException ex) {
       // replace original expression with error
-      expr = FnError.get(ex, expr.seqType());
+      expr = FnError.get(ex, expr.seqType(), scp.sc);
     }
     return optimize(qc, scp);
   }
@@ -79,7 +79,7 @@ public final class TypeCase extends Single {
     try {
       return super.inline(qc, scp, v, ex);
     } catch(final QueryException qe) {
-      expr = FnError.get(qe, expr.seqType());
+      expr = FnError.get(qe, expr.seqType(), scp.sc);
       return this;
     }
   }

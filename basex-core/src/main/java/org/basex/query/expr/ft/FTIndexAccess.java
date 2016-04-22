@@ -112,6 +112,6 @@ public final class FTIndexAccess extends Simple {
       final FTWords f = (FTWords) ftexpr;
       if(f.mode == FTMode.ANY && f.occ == null && f.ftt == null) e = f.query;
     }
-    return Function._FT_SEARCH.get(null, info, Str.get(ictx.data.meta.name), e).toString();
+    return Function._FT_SEARCH.toString(Str.get(ictx.data.meta.name), e);
   }
 }

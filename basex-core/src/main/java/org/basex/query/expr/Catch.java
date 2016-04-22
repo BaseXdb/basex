@@ -56,7 +56,7 @@ public final class Catch extends Single {
       expr = expr.compile(qc, scp);
       seqType = expr.seqType();
     } catch(final QueryException qe) {
-      expr = FnError.get(qe, expr.seqType());
+      expr = FnError.get(qe, expr.seqType(), scp.sc);
     }
     return this;
   }
@@ -101,7 +101,7 @@ public final class Catch extends Single {
       if(sub == null) return null;
       expr = sub;
     } catch(final QueryException qe) {
-      expr = FnError.get(qe, seqType);
+      expr = FnError.get(qe, seqType, scp.sc);
     }
     return this;
   }

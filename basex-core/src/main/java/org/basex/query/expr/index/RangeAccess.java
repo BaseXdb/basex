@@ -63,9 +63,8 @@ public final class RangeAccess extends IndexAccess {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder();
-    return tb.addExt((index.type() == IndexType.TEXT ? Function._DB_TEXT_RANGE :
-      Function._DB_ATTRIBUTE_RANGE).get(null, info, Str.get(ictx.data.meta.name),
-        Dbl.get(index.min), Dbl.get(index.max))).toString();
+    final Function func = index.type() == IndexType.TEXT ? Function._DB_TEXT_RANGE :
+      Function._DB_ATTRIBUTE_RANGE;
+    return func.toString(Str.get(ictx.data.meta.name), Dbl.get(index.min), Dbl.get(index.max));
   }
 }

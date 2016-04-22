@@ -187,10 +187,10 @@ public final class CmpV extends Cmp {
     } else if(allAreValues()) {
       e = preEval(qc);
     } else if(e1.isFunction(Function.COUNT)) {
-      e = compCount(op);
+      e = compCount(op, scp);
       if(e != this) qc.compInfo(e instanceof Bln ? OPTPRE_X : OPTREWRITE_X, this);
     } else if(e1.isFunction(Function.STRING_LENGTH)) {
-      e = compStringLength(op);
+      e = compStringLength(op, scp);
       if(e != this) qc.compInfo(e instanceof Bln ? OPTPRE_X : OPTREWRITE_X, this);
     } else if(e1.isFunction(Function.POSITION)) {
       // position() CMP number
@@ -199,7 +199,7 @@ public final class CmpV extends Cmp {
     } else if(st1.eq(SeqType.BLN) && (op == OpV.EQ && e2 == Bln.FALSE ||
         op == OpV.NE && e2 == Bln.TRUE)) {
       // (A eq false()) -> not(A)
-      e = Function.NOT.get(null, info, e1);
+      e = Function.NOT.get(scp.sc, info, e1);
     }
     return e;
   }

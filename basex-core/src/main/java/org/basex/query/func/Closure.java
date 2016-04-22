@@ -144,7 +144,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     try {
       expr = expr.compile(qc, scope);
     } catch(final QueryException qe) {
-      expr = FnError.get(qe, type != null ? type : expr.seqType());
+      expr = FnError.get(qe, type != null ? type : expr.seqType(), scp.sc);
     } finally {
       scope.cleanUp(this);
     }
@@ -198,7 +198,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       // add all newly added bindings
       if(add != null) global.putAll(add);
     } catch(final QueryException qe) {
-      expr = FnError.get(qe, type != null ? type : expr.seqType());
+      expr = FnError.get(qe, type != null ? type : expr.seqType(), scp.sc);
     } finally {
       scope.cleanUp(this);
     }

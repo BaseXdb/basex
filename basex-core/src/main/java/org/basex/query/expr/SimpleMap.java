@@ -55,7 +55,7 @@ public abstract class SimpleMap extends Arr {
           exprs[e] = exprs[e].compile(qc, scp);
         } catch(final QueryException ex) {
           // replace original expression with error
-          exprs[e] = FnError.get(ex, seqType);
+          exprs[e] = FnError.get(ex, seqType, scp.sc);
         }
         qc.value = null;
       }

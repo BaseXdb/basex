@@ -149,7 +149,7 @@ public final class CmpG extends Cmp {
 
     // rewrite count() function
     if(e1.isFunction(Function.COUNT)) {
-      final Expr e = compCount(op.op);
+      final Expr e = compCount(op.op, scp);
       if(e != this) {
         qc.compInfo(e instanceof Bln ? OPTPRE_X : OPTREWRITE_X, this);
         return e;
@@ -158,7 +158,7 @@ public final class CmpG extends Cmp {
 
     // rewrite string-length() function
     if(e1.isFunction(Function.STRING_LENGTH)) {
-      final Expr e = compStringLength(op.op);
+      final Expr e = compStringLength(op.op, scp);
       if(e != this) {
         qc.compInfo(e instanceof Bln ? OPTPRE_X : OPTREWRITE_X, this);
         return e;
@@ -177,7 +177,7 @@ public final class CmpG extends Cmp {
     // (A = false()) -> not(A)
     if(st1.eq(SeqType.BLN) && (op == OpG.EQ && e2 == Bln.FALSE || op == OpG.NE && e2 == Bln.TRUE)) {
       qc.compInfo(OPTREWRITE_X, this);
-      return Function.NOT.get(null, info, e1);
+      return Function.NOT.get(scp.sc, info, e1);
     }
 
     // rewrite expr CMP (range expression or number)

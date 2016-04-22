@@ -40,13 +40,14 @@ public final class FnError extends StandardFunc {
   /**
    * Creates an error function instance.
    * @param ex query exception
-   * @param tp type of the expression
+   * @param st type of the expression
+   * @param sc static context
    * @return function
    */
-  public static StandardFunc get(final QueryException ex, final SeqType tp) {
-    final StandardFunc sf = ERROR.get(null, ex.info(), ex.qname(),
-        Str.get(ex.getLocalizedMessage()));
-    sf.seqType = tp;
+  public static StandardFunc get(final QueryException ex, final SeqType st,
+      final StaticContext sc) {
+    final StandardFunc sf = ERROR.get(sc, ex.info(), ex.qname(), Str.get(ex.getLocalizedMessage()));
+    sf.seqType = st;
     return sf;
   }
 }

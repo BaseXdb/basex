@@ -64,7 +64,7 @@ public final class StaticVar extends StaticDecl {
       } catch(final QueryException qe) {
         compiled = true;
         if(lazy) {
-          expr = FnError.get(qe, expr.seqType());
+          expr = FnError.get(qe, expr.seqType(), sc);
           return;
         }
         throw qe.notCatchable();

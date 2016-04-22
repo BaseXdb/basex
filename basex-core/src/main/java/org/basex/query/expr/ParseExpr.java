@@ -165,10 +165,11 @@ public abstract class ParseExpr extends Expr {
    * returned as is. Otherwise, it will be wrapped into a boolean function.
    * @param ex expression to be rewritten
    * @param info input info
+   * @param sc static context
    * @return expression
    */
-  protected static Expr compBln(final Expr ex, final InputInfo info) {
-    return ex.seqType().eq(SeqType.BLN) ? ex : Function.BOOLEAN.get(null, info, ex);
+  protected static Expr compBln(final Expr ex, final InputInfo info, final StaticContext sc) {
+    return ex.seqType().eq(SeqType.BLN) ? ex : Function.BOOLEAN.get(sc, info, ex);
   }
 
   // VALIDITY CHECKS ==============================================================================

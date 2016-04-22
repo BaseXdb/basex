@@ -219,7 +219,7 @@ public final class For extends ForLet {
     }
 
     // attach predicates to axis path or filter, or create a new filter
-    if(pred.seqType().mayBeNumber()) pred = Function.BOOLEAN.get(null, info, pred);
+    if(pred.seqType().mayBeNumber()) pred = Function.BOOLEAN.get(scp.sc, info, pred);
 
     addPredicate(pred);
     return true;

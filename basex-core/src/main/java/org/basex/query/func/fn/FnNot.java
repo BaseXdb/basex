@@ -41,7 +41,7 @@ public final class FnNot extends StandardFunc {
     }
     // simplify: not(not(A)) -> boolean(A)
     if(e.isFunction(Function.NOT)) {
-      return compBln(((Arr) e).exprs[0], info);
+      return compBln(((Arr) e).exprs[0], info, scp.sc);
     }
     // simplify, e.g.: not(boolean(A)) -> not(A)
     exprs[0] = e.optimizeEbv(qc, scp);

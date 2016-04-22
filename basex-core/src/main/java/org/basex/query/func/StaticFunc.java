@@ -84,7 +84,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
         }
       }
     } catch(final QueryException qe) {
-      expr = FnError.get(qe, expr.seqType());
+      expr = FnError.get(qe, expr.seqType(), sc);
     } finally {
       scope.cleanUp(this);
       qc.value = cv;
