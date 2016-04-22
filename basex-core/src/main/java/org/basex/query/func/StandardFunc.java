@@ -122,7 +122,12 @@ public abstract class StandardFunc extends Arr {
 
   @Override
   public boolean has(final Flag flag) {
-    return sig.has(flag) || flag != Flag.HOF && super.has(flag);
+    // check signature flags
+    return sig.has(flag) ||
+      // update, mix updates: check if function invokes another function
+      flag == Flag.UPD && sc.mixUpdates && sig.has(Flag.HOF) ||
+      // otherwise, check arguments (function invocation only applies to function itself)
+      flag != Flag.HOF && super.has(flag);
   }
 
   @Override
@@ -357,7 +362,9 @@ public abstract class StandardFunc extends Arr {
       throws QueryException {
 
     final FItem fun = toFunc(expr, qc);
-    if(fun.annotations().contains(Annotation.UPDATING)) throw FUNCUP_X.get(info, fun);
+    if(!sc.mixUpdates && fun.annotations().contains(Annotation.UPDATING))
+      throw FUNCUP_X.get(info, fun);
+
     if(fun.arity() == nargs) return fun;
     final int fargs = fun.arity();
     throw FUNARITY_X_X_X.get(info, fargs, fargs == 1 ? "" : "s", nargs);

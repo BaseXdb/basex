@@ -26,7 +26,9 @@ public final class FnApply extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final FItem fun = toFunc(exprs[0], qc);
-    if(fun.annotations().contains(Annotation.UPDATING)) throw FUNCUP_X.get(info, fun);
+    if(!sc.mixUpdates && fun.annotations().contains(Annotation.UPDATING))
+      throw FUNCUP_X.get(info, fun);
+
     final Array array = toArray(exprs[1], qc);
     final long as = array.arraySize();
     if(fun.arity() != as) throw APPLY_X_X.get(info, fun.arity(), as);

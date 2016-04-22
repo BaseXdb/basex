@@ -104,4 +104,12 @@ public final class MixUpdatesTest extends AdvancedQueryTest {
     query("declare function local:f() { db:output('1') }; local:f()", "1");
   }
 
+  /**
+   * Reject updating functions in built-in higher-order function.
+   */
+  @Test
+  public void updatingHof() {
+    query(FOR_EACH.args("1", " db:output#1"), "1");
+    query(APPLY.args(" db:output#1", " [1]"), "1");
+  }
 }
