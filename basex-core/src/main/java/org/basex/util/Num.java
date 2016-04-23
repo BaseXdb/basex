@@ -91,13 +91,15 @@ public final class Num {
   }
 
   /**
-   * Compresses and stores an integer value to the specified byte array.
+   * Compresses and stores an integer value at the beginning of the byte array.
    * @param array array
    * @param value value to be stored
-   * @param pos position where the value is to be stored
+   * @return length
    */
-  public static void set(final byte[] array, final int value, final int pos) {
-    set(array, value, pos, length(value));
+  public static int set(final byte[] array, final int value) {
+    final int l = length(value);
+    set(array, value, 0, l);
+    return l;
   }
 
   /**

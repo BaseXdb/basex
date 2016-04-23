@@ -24,9 +24,6 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class DiskBuilder extends Builder implements Closeable {
-  /** Text compressor. */
-  private final Compress comp = new Compress();
-
   /** Database table. */
   private DataOutput tout;
   /** Database texts. */
@@ -201,7 +198,7 @@ public final class DiskBuilder extends Builder implements Closeable {
     // store text to heap file
     final DataOutput store = text ? xout : vout;
     final long off = store.size();
-    final byte[] val = comp.pack(value);
+    final byte[] val = Compress.pack(value);
     store.writeToken(val);
     return val == value ? off : off | IO.OFFCOMP;
   }

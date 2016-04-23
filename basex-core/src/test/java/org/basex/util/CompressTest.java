@@ -34,8 +34,7 @@ public final class CompressTest extends SandboxTest {
   /** Test. */
   @Test
   public void test3() {
-    run(token("abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ " +
-        "1234567890"));
+    run(token("abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ 1234567890"));
   }
 
   /** Test. */
@@ -108,14 +107,12 @@ public final class CompressTest extends SandboxTest {
    * @param tokens test tokens
    */
   private static void run(final byte[]... tokens) {
-    final Compress comp = new Compress();
     for(final byte[] token : tokens) {
-      final byte[] cpr = comp.pack(token);
+      final byte[] cpr = Compress.pack(token);
       if(token != cpr) {
-        final byte[] pln = comp.unpack(cpr);
+        final byte[] pln = Compress.unpack(cpr);
         if(!eq(token, pln)) {
-          fail("\n[E] " + Arrays.toString(token) + ",\n[F] " +
-              Arrays.toString(pln));
+          fail("\n[E] " + Arrays.toString(token) + ",\n[F] " + Arrays.toString(pln));
         }
       }
     }

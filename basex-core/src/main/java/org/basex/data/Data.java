@@ -118,11 +118,6 @@ public abstract class Data {
   }
 
   /**
-   * Unpins the database.
-   */
-  public abstract void unpin();
-
-  /**
    * Closes the database.
    */
   public abstract void close();

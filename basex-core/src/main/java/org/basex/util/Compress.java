@@ -1,168 +1,140 @@
 package org.basex.util;
 
-import org.basex.util.list.*;
+import java.util.*;
 
 /**
  * This class compresses and decompresses tokens. It is inspired by the
  * Huffman coding, but was simplified to speed up processing.
  *
- * NOTE: this class is not thread-safe.
- *
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
- * @author Wolfgang Kronberg
  */
 public final class Compress {
-  /** A ByteList instance serving as a buffer. */
-  private final LocalList bl = new LocalList();
-  /** Temporary value. */
-  private int pc;
-  /** Pack offset. */
-  private int po;
-  /** Current unpack position. */
-  private int uc;
-  /** Unpack offset. */
-  private int uo;
+  /** Private constructor. */
+  private Compress() { }
 
   /**
    * Compresses the specified text. Returns the original text if the packed text is not shorter.
-   * @param txt text to be packed
+   * @param text text to be packed
    * @return packed or original text
    */
-  public byte[] pack(final byte[] txt) {
-    // initialize compression
-    final int tl = txt.length;
-    bl.reset();
-    Num.set(bl.get(), tl, 0);
-    bl.size(Num.length(tl));
-    pc = 0;
-    po = 0;
+  public static byte[] pack(final byte[] text) {
+    // only compress texts with more than 4 characters
+    final int length = text.length - 1;
+    if(length < 4) return text;
 
-    // write packer version bit (0)
-    push(0, 1);
+    // store length at beginning of array
+    final byte[] bytes = new byte[length];
+    int size = Num.set(bytes, length + 1);
 
-    // relate upper with lower case and write mapping bit
-    int lc = 0;
-    for(final byte b : txt) lc += b >= 'A' && b <= 'Z' ? -1 : 1;
-    final byte[] pack = lc >= 0 ? PACK1 : PACK2;
-    push(lc >= 0 ? 1 : 0, 1);
+    // find lower-case and non-ascii characters
+    int lc = 0, uc = 0, out = 0;
+    for(final byte t : text) {
+      lc += t >= 'A' && t <= 'Z' ? -1 : 1;
+      uc += t >= 0 ? 1 : -1;
+    }
+    // too many non-ascii characters: skip compression
+    if(uc < 0) return text;
 
-    // compress all characters
-    for(final byte t : txt) {
-      int b = t;
-      if(b >= 0) b = pack[b];
+    // first bit: packer version (0), second bit: mapping type (upper/lower case)
+    final byte[] map;
+    if(lc >= 0) {
+      out = 2;
+      map = PACK1;
+    } else {
+      map = PACK2;
+    }
+
+    // loop through and compress all characters
+    int in = 0, off = 2;
+    for(final byte t : text) {
+      final int b = t >= 0 ? map[t] : t, s;
       if(b >= 0x00 && b < 0x08) { // 1 xxx
-        push(1 | b << 1, 4);
+        in = 1 | b << 1;
+        s = 4;
       } else if(b >= 0x08 && b < 0x10) { // 01 xxx
-        push(2 | b << 2, 5);
+        in = 2 | b << 2;
+        s = 5;
       } else if(b >= 0x10 && b < 0x20) { // 001 xxxx
-        push(4 | b << 3, 7);
+        in = 4 | b << 3;
+        s = 7;
       } else if(b >= 0x20 && b < 0x40) { // 0001 xxxxx
-        push(8 | b << 4, 9);
+        in = 8 | b << 4;
+        s = 9;
       } else { // 0000 xxxxxxxx
-        push(b << 4, 12);
+        in = b << 4;
+        s = 12;
+      }
+      for(int i = 0; i < s; i++) {
+        out |= (in & 1) << off;
+        in >>>= 1;
+        off = (off + 1) & 7;
+        if(off == 0) {
+          // skip compression if packed array gets too large
+          if(size == length) return text;
+          bytes[size++] = (byte) out;
+          out = 0;
+        }
       }
     }
-    if(po != 0) bl.add(pc);
-    return bl.size() < tl ? bl.toArray() : txt;
-  }
-
-  /**
-   * Pushes bits to the byte cache.
-   * @param b value to be pushed.
-   * @param s number of bits
-   */
-  private void push(final int b, final int s) {
-    int bb = b, oo = po, cc = pc;
-    for(int i = 0; i < s; i++) {
-      cc |= (bb & 1) << oo;
-      bb >>= 1;
-      if(++oo == 8) {
-        bl.add(cc);
-        oo = 0;
-        cc = 0;
-      }
+    if(off != 0) {
+      // skip compression if packed array gets too large
+      if(size == length) return text;
+      bytes[size++] = (byte) out;
     }
-    po = oo;
-    pc = cc;
+    return size < length ? Arrays.copyOf(bytes, size) : bytes;
   }
 
   /**
    * Decompresses the specified text.
-   * @param txt text to be unpacked
+   * @param text compressed text
    * @return unpacked text
    */
-  public byte[] unpack(final byte[] txt) {
-    // initialize decompression
-    final byte[] tmp = bl.get();
-    bl.set(txt);
-    uc = Num.length(txt, 0);
-    uo = 0;
-
-    // read packer bit
-    pull();
+  public static byte[] unpack(final byte[] text) {
+    // bit position: skip stored length and packer bit
+    int pos = (Num.length(text, 0) << 3) + 1;
     // choose mapping
-    final byte[] unpack = pull() ? UNPACK1 : UNPACK2;
+    final byte[] map = isSet(text, pos++) ? UNPACK1 : UNPACK2;
 
     // decompress all characters
-    final int l = Num.get(txt, 0);
-    final byte[] res = new byte[l];
-    for(int r = 0; r < l; r++) {
-      final int b;
-      if(pull()) { // 1 xxx
-        b = pull(3);
-      } else if(pull()) { // 01 xxx
-        b = pull(3) | 0x08;
-      } else if(pull()) { // 001 xxxx
-        b = pull(4) | 0x10;
-      } else if(pull()) { // 0001 xxxxx
-        b = pull(5) | 0x20;
+    final int size = Num.get(text, 0);
+    final byte[] bytes = new byte[size];
+    for(int b = 0; b < size; b++) {
+      final int bits;
+      int out = 0;
+      if(isSet(text, pos++)) { // 1 xxx
+        bits = 3;
+      } else if(isSet(text, pos++)) { // 01 xxx
+        bits = 3;
+        out = 0x08;
+      } else if(isSet(text, pos++)) { // 001 xxxx
+        bits = 4;
+        out = 0x10;
+      } else if(isSet(text, pos++)) { // 0001 xxxxx
+        bits = 5;
+        out = 0x20;
       } else { // 0000 xxxxxxxx
-        b = pull(8);
+        bits = 8;
       }
-      res[r] = (byte) (b >= 128 ? b : unpack[b]);
+      for(int bit = 0; bit < bits; bit++, pos++) {
+        if((text[pos >>> 3] & 1 << (pos & 7)) != 0) out |= 1 << bit;
+      }
+      bytes[b] = (byte) (out >= 0x80 ? out : map[out]);
     }
-    // make sure that the external txt byte array does not remain in this class
-    bl.set(tmp);
-    return res;
+    return bytes;
   }
 
   /**
-   * Pulls the specified number of bits and returns the result.
-   * @param s number of bytes
+   * Checks if a specified bit is set.
+   * @param txt text to be unpacked
+   * @param pos current position
    * @return result
    */
-  private int pull(final int s) {
-    int oo = uo, oc = uc, x = 0;
-    final byte[] l = bl.get();
-    for(int i = 0; i < s; i++) {
-      if((l[oc] & 1 << oo) != 0) x |= 1 << i;
-      if(++oo == 8) {
-        oo = 0;
-        ++oc;
-      }
-    }
-    uo = oo;
-    uc = oc;
-    return x;
+  private static boolean isSet(final byte[] txt, final int pos) {
+    return (txt[pos >>> 3] & 1 << (pos & 7)) != 0;
   }
 
-  /**
-   * Pulls a single bit.
-   * @return result
-   */
-  private boolean pull() {
-    int oo = uo;
-    final boolean b = (bl.get()[uc] & 1 << oo) != 0;
-    if(++oo == 8) {
-      oo = 0;
-      ++uc;
-    }
-    uo = oo;
-    return b;
-  }
-
-  /** First mapping for unpacking data. */
+  /** First mapping for unpacking data (lower-case texts). */
   private static final byte[] UNPACK1 = {
     0x20, 0x61, 0x65, 0x6E, 0x69, 0x6F, 0x72, 0x73, // encode via 1 xxx
     0x74, 0x6C, 0x75, 0x68, 0x64, 0x63, 0x67, 0x6D, // encode via 01 xxx
@@ -181,13 +153,12 @@ public final class Compress {
     0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
     0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F
   };
-  /** First mapping for packing data. */
-  private static final byte[] PACK1 = new byte[UNPACK1.length];
-
-  /** Second mapping for unpacking data. */
+  /** Second mapping for unpacking data (upper-case texts). */
   private static final byte[] UNPACK2 = new byte[UNPACK1.length];
-  /** Second mapping for packing data. */
-  private static final byte[] PACK2 = new byte[UNPACK2.length];
+  /** First mapping for packing data (lower-case texts). */
+  private static final byte[] PACK1 = new byte[UNPACK1.length];
+  /** Second mapping for packing data (upper-case texts). */
+  private static final byte[] PACK2 = new byte[UNPACK1.length];
 
   // initializes the character mappings
   static {
@@ -200,26 +171,6 @@ public final class Compress {
       UNPACK2[p] = b2;
       PACK1[b1] = (byte) p;
       PACK2[b2] = (byte) p;
-    }
-  }
-
-  /** Local ByteList implementation to make protected fields accessible. */
-  private static final class LocalList extends ByteList {
-    /**
-     * Exchanges the actual byte array backing this list instance.
-     * @param list new value
-     */
-    private void set(final byte[] list) {
-      this.list = list;
-      size = list.length;
-    }
-
-    /**
-     * Direct access to the backing byte array.
-     * @return list
-     */
-    private byte[] get() {
-      return list;
     }
   }
 }

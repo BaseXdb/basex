@@ -48,7 +48,6 @@ public final class Datas {
     // main-memory instances are not pinned
     if(pins == null) return;
 
-    data.unpin();
     final int p = pins;
     if(p == 1) {
       data.close();
