@@ -140,7 +140,7 @@ declare %rest:path("/dba/logout") function _:logout(
   let $name := $cons:SESSION/name
   let $url := string-join($cons:SESSION/(host, port), ':')
   return (
-    admin:write-log('User was logged out: ' || $name),
+    admin:write-log('DBA user was logged out: ' || $name),
     Session:delete($cons:SESSION-KEY),
     Session:close(),
     web:redirect("/dba/login", map { 'nane': $name, 'url': $url })
@@ -166,7 +166,7 @@ declare %private function _:accept(
       element port { $port }[$port]
     }
   ),
-  admin:write-log('User was logged in: ' || $name),
+  admin:write-log('DBA user was logged in: ' || $name),
   web:redirect("databases")
 };
 
@@ -182,6 +182,6 @@ declare %private function _:reject(
   $url      as xs:string,
   $message  as xs:string
 ) as element(rest:response) {
-  admin:write-log('Login was denied: ' || $name),
+  admin:write-log('DBA login was denied: ' || $name),
   web:redirect("login", map { 'name': $name, 'url': $url, 'error': $message })
 };
