@@ -21,12 +21,12 @@ public final class FnNumber extends StandardFunc {
     if(it == null) return Dbl.NAN;
     if(it.type == AtomType.DBL) return it;
     try {
-      if(info != null) info.check(true);
+      if(info != null) info.internal(true);
       return AtomType.DBL.cast(it, qc, sc, info);
     } catch(final QueryException ex) {
       return Dbl.NAN;
     } finally {
-      if(info != null) info.check(false);
+      if(info != null) info.internal(false);
     }
   }
 

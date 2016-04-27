@@ -1333,14 +1333,14 @@ public enum QueryError {
   }
 
   /**
-   * Throws a query exception. If {@link InputInfo#check()} returns {@code true},
+   * Throws a query exception. If {@link InputInfo#internal()} returns {@code true},
    * a static error instance ({@link QueryException#ERROR}) will be returned.
    * @param ii input info
    * @param ext extended info
    * @return query exception
    */
   public QueryException get(final InputInfo ii, final Object... ext) {
-    return ii != null && ii.check() ? QueryException.ERROR : new QueryException(ii, this, ext);
+    return ii != null && ii.internal() ? QueryException.ERROR : new QueryException(ii, this, ext);
   }
 
   /**
@@ -1620,7 +1620,7 @@ public enum QueryError {
    * @return exception or null
    */
   public static byte[] chop(final Object value, final InputInfo ii) {
-    return ii != null && ii.check() ? Token.EMPTY :
+    return ii != null && ii.internal() ? Token.EMPTY :
            value instanceof byte[] ? chop((byte[]) value, ii) :
            chop(value.toString(), ii);
   }
@@ -1632,7 +1632,7 @@ public enum QueryError {
    * @return exception or null
    */
   public static byte[] chop(final String string, final InputInfo ii) {
-    return ii != null && ii.check() ? Token.EMPTY : chop(Token.token(string), ii);
+    return ii != null && ii.internal() ? Token.EMPTY : chop(Token.token(string), ii);
   }
 
   /**
@@ -1642,7 +1642,7 @@ public enum QueryError {
    * @return exception or null
    */
   public static byte[] chop(final byte[] token, final InputInfo ii) {
-    if(ii != null && ii.check()) return Token.EMPTY;
+    if(ii != null && ii.internal()) return Token.EMPTY;
 
     final TokenBuilder tb = new TokenBuilder();
     byte l = 0;

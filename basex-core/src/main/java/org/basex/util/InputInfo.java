@@ -1,7 +1,7 @@
 package org.basex.util;
 
 import org.basex.query.*;
-import org.basex.query.expr.*;
+import org.basex.query.value.type.*;
 
 /**
  * This class contains information on the original query, which will be evaluated for
@@ -11,8 +11,11 @@ import org.basex.query.expr.*;
  * @author Christian Gruen
  */
 public final class InputInfo {
-  /** Indicates if a raised error should be static. */
-  private boolean check;
+  /**
+   * Indicates if a raised error will only be handled internally.
+   * If this flag is activated, only light-weight errors will be created.
+   */
+  private boolean internal;
   /** Input path. */
   private final String path;
   /** Input string (can be {@code null}). */
@@ -91,16 +94,17 @@ public final class InputInfo {
    * Returns the check flag (invoked by {@link QueryError#get(InputInfo, Object...)}).
    * @return check flag
    */
-  public boolean check() {
-    return check;
+  public boolean internal() {
+    return internal;
   }
 
   /**
-   * Sets the check flag (invoked e.g. by {@link Castable#optimize}).
+   * Activates light-weight error handling (invoked e.g. by {@link SeqType#cast(
+   * org.basex.query.value.item.Item, QueryContext, StaticContext, InputInfo, boolean)}).
    * @param value value to set
    */
-  public void check(final boolean value) {
-    check = value;
+  public void internal(final boolean value) {
+    internal = value;
   }
 
   @Override

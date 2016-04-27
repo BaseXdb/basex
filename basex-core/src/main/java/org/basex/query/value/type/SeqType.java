@@ -366,7 +366,7 @@ public final class SeqType {
 
     if(item.type.eq(type)) return item;
     try {
-      if(!error && info != null) info.check(true);
+      if(!error && info != null) info.internal(true);
       final Value v = type.cast(item, qc, sc, info);
       if(kind != null) {
         for(final Item i : v) if(!kind.eq(item)) throw castError(info, i, type);
@@ -376,7 +376,7 @@ public final class SeqType {
       if(error) throw ex;
       return null;
     } finally {
-      if(!error && info != null) info.check(false);
+      if(!error && info != null) info.internal(false);
     }
   }
 
