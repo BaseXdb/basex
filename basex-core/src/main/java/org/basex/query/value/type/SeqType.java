@@ -440,8 +440,7 @@ public final class SeqType {
       final Value value, final boolean opt) throws QueryException {
 
     final int n = (int) value.size();
-    if(!occ.check(n)) throw INVPROMOTE_X_X_X.get(ii, value.seqType(), withOcc(Occ.ONE), value);
-
+    if(!occ.check(n)) throw INVPROMOTE_X_X_X.get(ii, value.seqType(), this, value);
     if(n == 0) return Empty.SEQ;
 
     ItemList cache = null;
