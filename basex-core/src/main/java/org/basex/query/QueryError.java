@@ -586,7 +586,7 @@ public enum QueryError {
   /** FORG0001. */
   INVALIDZONE_X(FORG, 1, "Invalid timezone: %."),
   /** FORG0001. */
-  FUNCAST_X_X(FORG, 1, "Cannot cast to %: \"%\"."),
+  FUNCAST_X_X(FORG, 1, "Cannot cast to %: %."),
   /** FORG0001. */
   FUNCCAST_X_X_X(FORG, 1, "Cannot cast % to %: %."),
   /** FORG0001. */
@@ -972,15 +972,13 @@ public enum QueryError {
   /** XPTY0004. */
   CPIWRONG_X_X(XPTY, 4, "String or NCName expected, % found: %."),
   /** XPTY0004. */
-  INVCAST_X_X(XPTY, 4, "Cannot cast % to %."),
-  /** XPTY0004. */
   INVCAST_X_X_X(XPTY, 4, "Cannot cast % to %: %."),
   /** XPTY0004. */
-  INVPROMOTE_X_X(XPTY, 4, "Cannot promote % to %."),
+  INVPROMOTE_X(XPTY, 4, "%."),
   /** XPTY0004. */
-  INVPROMOTE_X_X_X(XPTY, 4, "Cannot promote % to %: %."),
+  INVPROMOTE_X_X_X(XPTY, 4, "%: Cannot promote % to %."),
   /** XPTY0004. */
-  INVTREAT_X_X_X(XPTY, 4, "Cannot treat % as %: %."),
+  INVTREAT_X(XPTY, 4, "%."),
   /** XPTY0004. */
   CALCTYPE_X_X_X(XPTY, 4, "% not defined for % and %."),
   /** XPTY0004. */
@@ -1339,7 +1337,7 @@ public enum QueryError {
    * a static error instance ({@link QueryException#ERROR}) will be returned.
    * @param ii input info
    * @param ext extended info
-   * @return query exception (indicates that an error is raised)
+   * @return query exception
    */
   public QueryException get(final InputInfo ii, final Object... ext) {
     return ii != null && ii.check() ? QueryException.ERROR : new QueryException(ii, this, ext);
@@ -1348,7 +1346,7 @@ public enum QueryError {
   /**
    * Throws a query I/O exception without {@link InputInfo} reference.
    * @param ext extended info
-   * @return query I/O exception (indicates that an error is raised)
+   * @return query I/O exception
    */
   public QueryIOException getIO(final Object... ext) {
     return new QueryIOException(get(null, ext));
@@ -1501,7 +1499,7 @@ public enum QueryError {
    * @param ii input info
    * @param item1 first item
    * @param item2 second item
-   * @return query exception (indicates that an error is raised)
+   * @return query exception
    */
   public static QueryException diffError(final InputInfo ii, final Item item1, final Item item2) {
     final Type t1 = item1.type, t2 = item2.type;
@@ -1509,11 +1507,55 @@ public enum QueryError {
   }
 
   /**
+   * Throws a treat exception.
+   * @param ii input info
+   * @param expr expression
+   * @param type target type
+   * @param name name (can be {@code null})
+   * @return query exception
+   */
+  public static QueryException treatError(final InputInfo ii, final Expr expr, final SeqType type,
+      final QNm name) {
+    return promoteError(ii, expr, type, name, true);
+  }
+
+  /**
+   * Throws a promotion exception.
+   * @param ii input info
+   * @param expr expression
+   * @param type target type
+   * @param name name (can be {@code null})
+   * @return query exception
+   */
+  public static QueryException promoteError(final InputInfo ii, final Expr expr, final SeqType type,
+      final QNm name) {
+    return promoteError(ii, expr, type, name, false);
+  }
+
+  /**
+   * Throws a promotion exception.
+   * @param ii input info
+   * @param expr expression
+   * @param type target type
+   * @param name name (can be {@code null})
+   * @param treat treat flag
+   * @return query exception
+   */
+  private static QueryException promoteError(final InputInfo ii, final Expr expr,
+      final SeqType type, final QNm name, final boolean treat) {
+    final String msg = treat ? "Cannot treat % as " : "Cannot promote % to ";
+    final TokenBuilder tb = new TokenBuilder();
+    if(name != null) tb.add('$').add(name.string()).add(": ");
+    tb.addExt(msg, expr.seqType()).addExt(type).add(": ").add(chop(expr, ii));
+    return (treat ? INVTREAT_X : INVPROMOTE_X).get(ii, tb.finish());
+  }
+
+  /**
    * Throws a type cast exception.
    * @param ii input info
    * @param value value
    * @param type expression cast type
-   * @return query exception (indicates that an error is raised)
+   * @return query exception
    */
   public static QueryException castError(final InputInfo ii, final Value value, final Type type) {
     return INVCAST_X_X_X.get(ii, value.type, type, value);
@@ -1524,11 +1566,10 @@ public enum QueryError {
    * @param ii input info
    * @param value value
    * @param type expression cast type
-   * @return query exception (indicates that an error is raised)
-   * @throws QueryException query exception
+   * @return query exception
    */
-  public static QueryException funCastError(final InputInfo ii, final Type type, final Object value)
-      throws QueryException {
+  public static QueryException funCastError(final InputInfo ii, final Type type,
+      final Object value) {
     return FUNCAST_X_X.get(ii, type, chop(value, ii));
   }
 
@@ -1536,7 +1577,7 @@ public enum QueryError {
    * Throws a number exception.
    * @param expr parsing expression
    * @param item item
-   * @return query exception (indicates that an error is raised)
+   * @return query exception
    */
   public static QueryException numberError(final ParseExpr expr, final Item item) {
     return numberError(expr.info, item);
@@ -1546,7 +1587,7 @@ public enum QueryError {
    * Throws a number exception.
    * @param ii input info
    * @param item found item
-   * @return query exception (indicates that an error is raised)
+   * @return query exception
    */
   public static QueryException numberError(final InputInfo ii, final Item item) {
     return NONUMBER_X_X.get(ii, item.type, item);
@@ -1557,7 +1598,7 @@ public enum QueryError {
    * @param ii input info
    * @param type expected type
    * @param value value
-   * @return query exception (indicates that an error is raised)
+   * @return query exception
    */
   public static QueryException valueError(final InputInfo ii, final Type type, final byte[] value) {
     return INVALUE_X_X.get(ii, type, value);
@@ -1577,12 +1618,10 @@ public enum QueryError {
    * @param value value
    * @param ii input info
    * @return exception or null
-   * @throws QueryException query exception
    */
-  public static byte[] chop(final Object value, final InputInfo ii) throws QueryException {
+  public static byte[] chop(final Object value, final InputInfo ii) {
     return ii != null && ii.check() ? Token.EMPTY :
            value instanceof byte[] ? chop((byte[]) value, ii) :
-           value instanceof Item ? chop(((Item) value).string(ii), ii) :
            chop(value.toString(), ii);
   }
 

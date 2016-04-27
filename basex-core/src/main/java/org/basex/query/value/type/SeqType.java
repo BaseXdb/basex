@@ -407,13 +407,16 @@ public final class SeqType {
    * Checks the specified value for this sequence type.
    * @param value value to be checked
    * @param ii input info
+   * @param name name of variable (can be {@code null})
    * @throws QueryException query exception
    */
-  public void treat(final Value value, final InputInfo ii) throws QueryException {
+  public void treat(final Value value, final InputInfo ii, final QNm name)
+      throws QueryException {
+
     if(value.seqType().instanceOf(this)) return;
 
     final int size = (int) value.size();
-    if(!occ.check(size)) throw INVTREAT_X_X_X.get(ii, value.seqType(), this, value);
+    if(!occ.check(size)) throw QueryError.treatError(ii, value, this, name);
 
     // empty sequence has all types
     if(size == 0) return;
@@ -423,7 +426,7 @@ public final class SeqType {
     // check heterogeneous sequences
     if(!value.homogeneous())
       for(int i = 1; ins && i < size; i++) ins = instance(value.itemAt(i));
-    if(!ins) throw INVTREAT_X_X_X.get(ii, value.seqType(), this, value);
+    if(!ins) throw QueryError.treatError(ii, value, this, name);
   }
 
   /**
@@ -433,14 +436,15 @@ public final class SeqType {
    * @param ii input info
    * @param value value to convert
    * @param opt if the result should be optimized
+   * @param name variable name (can be {@code null})
    * @return converted value
    * @throws QueryException if the conversion was not possible
    */
   public Value promote(final QueryContext qc, final StaticContext sc, final InputInfo ii,
-      final Value value, final boolean opt) throws QueryException {
+      final Value value, final boolean opt, final QNm name) throws QueryException {
 
     final int n = (int) value.size();
-    if(!occ.check(n)) throw INVPROMOTE_X_X_X.get(ii, value.seqType(), this, value);
+    if(!occ.check(n)) throw QueryError.promoteError(ii, value, this, name);
     if(n == 0) return Empty.SEQ;
 
     ItemList cache = null;
@@ -454,7 +458,7 @@ public final class SeqType {
           cache = new ItemList(n);
           for(int j = 0; j < i; j++) cache.add(value.itemAt(j));
         }
-        promote(qc, sc, ii, it, opt, cache);
+        promote(qc, sc, ii, it, opt, cache, name);
       }
     }
     return cache != null ? cache.value(type) : value;
@@ -468,10 +472,12 @@ public final class SeqType {
    * @param item item to promote
    * @param opt if the result should be optimized
    * @param cache item cache
+   * @param name variable name (can be {@code null})
    * @throws QueryException query exception
    */
   public void promote(final QueryContext qc, final StaticContext sc, final InputInfo ii,
-      final Item item, final boolean opt, final ItemList cache) throws QueryException {
+      final Item item, final boolean opt, final ItemList cache, final QNm name)
+      throws QueryException {
 
     if(type instanceof AtomType) {
       for(final Item atom : item.atomValue(ii)) {
@@ -488,13 +494,13 @@ public final class SeqType {
         } else if(type == AtomType.STR && atom instanceof Uri) {
           cache.add(Str.get(atom.string(ii)));
         } else {
-          throw INVPROMOTE_X_X_X.get(ii, item.seqType(), withOcc(Occ.ONE), item);
+          throw QueryError.promoteError(ii, item, withOcc(Occ.ONE), name);
         }
       }
     } else if(item instanceof FItem && type instanceof FuncType) {
       cache.add(((FItem) item).coerceTo((FuncType) type, qc, ii, opt));
     } else {
-      throw INVPROMOTE_X_X_X.get(ii, item.seqType(), withOcc(Occ.ONE), item);
+      throw QueryError.promoteError(ii, item, withOcc(Occ.ONE), name);
     }
   }
 

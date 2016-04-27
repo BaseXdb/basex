@@ -956,7 +956,7 @@ public enum AtomType implements Type {
   }
 
   /**
-   * Returns a casting exception.
+   * Returns a cast exception.
    * @param it item to be included in the error message
    * @param ii input info
    * @return query exception

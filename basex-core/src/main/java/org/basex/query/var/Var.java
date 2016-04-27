@@ -107,9 +107,9 @@ public final class Var extends ExprInfo {
     if(st == null) return;
 
     if(type != null) {
-      if(type.occ.intersect(st.occ) == null) throw INVCAST_X_X.get(ii, st, type);
+      if(type.occ.intersect(st.occ) == null) throw INVPROMOTE_X_X_X.get(ii, this, st, type);
       if(st.instanceOf(type)) {
-        qc.compInfo(QueryText.OPTCAST_X, this);
+        qc.compInfo(QueryText.OPTTYPE_X, this);
         type = null;
       } else if(!st.promotable(type)) {
         return;
@@ -158,8 +158,8 @@ public final class Var extends ExprInfo {
       final boolean opt) throws QueryException {
 
     if(!checksType() || type.instance(val)) return val;
-    if(promote) return type.promote(qc, sc, ii, val, opt);
-    throw INVCAST_X_X.get(ii, val.seqType(), type);
+    if(promote) return type.promote(qc, sc, ii, val, opt, name);
+    throw QueryError.treatError(ii, val, type, name);
   }
 
   /**
@@ -184,7 +184,8 @@ public final class Var extends ExprInfo {
         et.type.instanceOf(vt.type) && et.occ.instanceOf(vt.occ)) return;
 
     if(!promote || !(et.type instanceof NodeType) && !et.promotable(vt)) {
-      throw (vt.type.nsSensitive() ? NSSENS_X_X : INVCAST_X_X).get(info, et, vt);
+      if(vt.type.nsSensitive()) throw NSSENS_X_X.get(info, et, vt);
+      throw QueryError.treatError(info, expr, vt, name);
     }
   }
 

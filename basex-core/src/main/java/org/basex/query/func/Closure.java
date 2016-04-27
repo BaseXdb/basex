@@ -304,19 +304,19 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       checked = body;
     } else if(body instanceof FuncItem && type.type instanceof FuncType) {
       // function item coercion
-      if(!type.occ.check(1)) throw INVPROMOTE_X_X.get(info, argType, type);
+      if(!type.occ.check(1)) throw QueryError.promoteError(info, body, type, null);
       final FuncItem fi = (FuncItem) body;
       checked = fi.coerceTo((FuncType) type.type, qc, info, true);
     } else if(body.isValue()) {
       // we can type check immediately
       final Value val = (Value) body;
-      checked = type.instance(val) ? val : type.promote(qc, sc, info, val, false);
+      checked = type.instance(val) ? val : type.promote(qc, sc, info, val, false, null);
     } else {
       // check at each call
       if(argType.type.instanceOf(type.type) && !body.has(Flag.NDT) && !body.has(Flag.UPD)) {
         // reject impossible arities
         final Occ occ = argType.occ.intersect(type.occ);
-        if(occ == null) throw INVPROMOTE_X_X.get(info, argType, type);
+        if(occ == null) throw QueryError.promoteError(info, body, type, null);
       }
       checked = new TypeCheck(sc, info, body, type, true);
     }

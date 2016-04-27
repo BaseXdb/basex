@@ -302,7 +302,7 @@ public final class QueryContext extends Proc implements Closeable {
       // if specified, convert context value to specified type
       // [LW] should not be necessary
       if(value != null && root.sc.contextType != null) {
-        value = root.sc.contextType.promote(this, root.sc, null, value, true);
+        value = root.sc.contextType.promote(this, root.sc, null, value, true, null);
       }
 
       // dynamic compilation

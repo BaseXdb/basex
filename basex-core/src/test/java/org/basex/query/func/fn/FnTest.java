@@ -213,6 +213,6 @@ public final class FnTest extends AdvancedQueryTest {
         + "let $f := function-lookup(xs:QName('fn:concat'), $a) "
         + "return " + APPLY.args("$f", " array { 1 to $a }"), "12\n123");
     error(APPLY.args(" false#0", " ['x']"), APPLY_X_X);
-    error(APPLY.args(" string-length#1", " [ ('a','b') ]"), INVPROMOTE_X_X_X);
+    error(APPLY.args(" string-length#1", " [ ('a','b') ]"), INVPROMOTE_X);
   }
 }

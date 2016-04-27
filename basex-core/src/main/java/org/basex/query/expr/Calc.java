@@ -270,9 +270,8 @@ public enum Calc {
    * @param ii input info
    * @param it item
    * @return query exception (indicates that an error is raised)
-   * @throws QueryException query exception
    */
-  private static QueryException zeroError(final InputInfo ii, final Item it) throws QueryException {
+  private static QueryException zeroError(final InputInfo ii, final Item it) {
     return DIVZERO_X.get(ii, chop(it, ii));
   }
 

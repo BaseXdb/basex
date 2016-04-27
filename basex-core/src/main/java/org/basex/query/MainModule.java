@@ -98,7 +98,7 @@ public final class MainModule extends Module {
       final Iter iter = expr.iter(qc);
       final ItemList cache = new ItemList(Math.max(1, (int) iter.size()));
       for(Item it; (it = iter.next()) != null;) cache.add(it);
-      if(declType != null) declType.treat(cache.value(), info);
+      if(declType != null) declType.treat(cache.value(), info, null);
       return cache;
 
     } finally {

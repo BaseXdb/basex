@@ -401,7 +401,6 @@ public interface QueryText {
   /** Optimization info. */ String OPTINLINE_X = "inlining %";
   /** Optimization info. */ String OPTWHERE = "rewriting where clause(s)";
   /** Optimization info. */ String OPTPRED_X = "rewriting % to predicate(s)";
-  /** Optimization info. */ String OPTCAST_X = "removing redundant % cast.";
   /** Optimization info. */ String OPTVAR_X = "removing variable %";
   /** Optimization info. */ String OPTNAME_X = "removing unknown element/attribute %";
   /** Optimization info. */ String OPTPATH_X = "removing non-existing path %";

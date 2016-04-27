@@ -136,7 +136,7 @@ public final class StaticVar extends StaticDecl {
   private Value bind(final Value value) throws QueryException {
     expr = value;
     val = value;
-    if(type != null) type.treat(value, info);
+    if(type != null) type.treat(value, info, name);
     return val;
   }
 
