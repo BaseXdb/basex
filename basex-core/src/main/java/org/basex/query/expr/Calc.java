@@ -23,7 +23,7 @@ public enum Calc {
     public Item ev(final InputInfo ii, final Item it1, final Item it2) throws QueryException {
       final Type t1 = it1.type, t2 = it2.type;
       final boolean n1 = t1.isNumberOrUntyped(), n2 = t2.isNumberOrUntyped();
-      if(n1 ^ n2) throw numberError(ii, n1 ? it2 : it1);
+      if(n1 ^ n2) throw numberError(n1 ? it2 : it1, ii);
 
       if(n1) {
         // numbers or untyped values
@@ -41,7 +41,7 @@ public enum Calc {
 
       // dates or durations
       if(t1 == t2) {
-        if(!(it1 instanceof Dur)) throw numberError(ii, it1);
+        if(!(it1 instanceof Dur)) throw numberError(it1, ii);
         if(t1 == YMD) return new YMDur((YMDur) it1, (YMDur) it2, true, ii);
         if(t1 == DTD) return new DTDur((DTDur) it1, (DTDur) it2, true, ii);
       }
@@ -61,7 +61,7 @@ public enum Calc {
     public Item ev(final InputInfo ii, final Item it1, final Item it2) throws QueryException {
       final Type t1 = it1.type, t2 = it2.type;
       final boolean n1 = t1.isNumberOrUntyped(), n2 = t2.isNumberOrUntyped();
-      if(n1 ^ n2) throw numberError(ii, n1 ? it2 : it1);
+      if(n1 ^ n2) throw numberError(n1 ? it2 : it1, ii);
 
       if(n1) {
         // numbers or untyped values
@@ -82,7 +82,7 @@ public enum Calc {
         if(t1 == DTM || t1 == DAT || t1 == TIM) return new DTDur((ADate) it1, (ADate) it2, ii);
         if(t1 == YMD) return new YMDur((YMDur) it1, (YMDur) it2, false, ii);
         if(t1 == DTD) return new DTDur((DTDur) it1, (DTDur) it2, false, ii);
-        throw numberError(ii, it1);
+        throw numberError(it1, ii);
       }
       if(t1 == DTM) return new Dtm((Dtm) it1, checkDur(ii, it2), false, ii);
       if(t1 == DAT) return new Dat((Dat) it1, checkDur(ii, it2), false, ii);
@@ -98,19 +98,19 @@ public enum Calc {
       final Type t1 = it1.type, t2 = it2.type;
       if(t1 == YMD) {
         if(it2 instanceof ANum) return new YMDur((Dur) it1, it2.dbl(ii), true, ii);
-        throw numberError(ii, it2);
+        throw numberError(it2, ii);
       }
       if(t2 == YMD) {
         if(it1 instanceof ANum) return new YMDur((Dur) it2, it1.dbl(ii), true, ii);
-        throw numberError(ii, it1);
+        throw numberError(it1, ii);
       }
       if(t1 == DTD) {
         if(it2 instanceof ANum) return new DTDur((Dur) it1, it2.dbl(ii), true, ii);
-        throw numberError(ii, it2);
+        throw numberError(it2, ii);
       }
       if(t2 == DTD) {
         if(it1 instanceof ANum) return new DTDur((Dur) it2, it1.dbl(ii), true, ii);
-        throw numberError(ii, it1);
+        throw numberError(it1, ii);
       }
 
       final boolean b1 = t1.isNumberOrUntyped(), b2 = t2.isNumberOrUntyped();
@@ -130,7 +130,7 @@ public enum Calc {
         if(t == FLT) return Flt.get(it1.flt(ii) * it2.flt(ii));
         return Dec.get(it1.dec(ii).multiply(it2.dec(ii)));
       }
-      throw numberError(ii, it1);
+      throw numberError(it1, ii);
     }
   },
 
@@ -154,11 +154,11 @@ public enum Calc {
       }
       if(t1 == YMD) {
         if(it2 instanceof ANum) return new YMDur((Dur) it1, it2.dbl(ii), false, ii);
-        throw numberError(ii, it2);
+        throw numberError(it2, ii);
       }
       if(t1 == DTD) {
         if(it2 instanceof ANum) return new DTDur((Dur) it1, it2.dbl(ii), false, ii);
-        throw numberError(ii, it2);
+        throw numberError(it2, ii);
       }
 
       checkNum(ii, it1, it2);
@@ -309,8 +309,8 @@ public enum Calc {
    */
   static void checkNum(final InputInfo ii, final Item it1, final Item it2)
       throws QueryException {
-    if(!it1.type.isNumberOrUntyped()) throw numberError(ii, it1);
-    if(!it2.type.isNumberOrUntyped()) throw numberError(ii, it2);
+    if(!it1.type.isNumberOrUntyped()) throw numberError(it1, ii);
+    if(!it2.type.isNumberOrUntyped()) throw numberError(it2, ii);
   }
 
   /**

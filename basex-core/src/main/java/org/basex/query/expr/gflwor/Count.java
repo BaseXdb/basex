@@ -35,7 +35,6 @@ public final class Count extends Clause {
   @Override
   Eval eval(final Eval sub) {
     return new Eval() {
-      /** Counter. */
       private long i = 1;
       @Override
       public boolean next(final QueryContext qc) throws QueryException {
@@ -89,7 +88,7 @@ public final class Count extends Clause {
 
   @Override
   public Count copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    final Var v = scp.newCopyOf(qc, var);
+    final Var v = scp.newCopyOf(var, qc);
     vs.put(var.id, v);
     return new Count(v, info);
   }

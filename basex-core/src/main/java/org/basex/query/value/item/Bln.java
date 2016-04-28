@@ -129,7 +129,7 @@ public final class Bln extends Item {
   public static boolean parse(final byte[] value, final InputInfo ii) throws QueryException {
     final Boolean b = parse(value);
     if(b != null) return b;
-    throw funCastError(ii, AtomType.BLN, value);
+    throw castError(AtomType.BLN, value, ii);
   }
 
   /**

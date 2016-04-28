@@ -26,27 +26,27 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
 
   /**
    * Declares a new static variable.
-   * @param nm variable name
+   * @param name variable name
    * @param type declared type
    * @param anns annotations
    * @param expr bound expression, possibly {@code null}
    * @param ext {@code external} flag
+   * @param doc current xqdoc cache
    * @param sc static context
    * @param scope variable scope
-   * @param doc current xqdoc cache
    * @param ii input info
    * @return static variable reference
    * @throws QueryException query exception
    */
-  public StaticVar declare(final QNm nm, final SeqType type, final AnnList anns, final Expr expr,
-      final boolean ext, final StaticContext sc, final VarScope scope, final String doc,
+  public StaticVar declare(final QNm name, final SeqType type, final AnnList anns, final Expr expr,
+      final boolean ext, final String doc, final StaticContext sc, final VarScope scope,
       final InputInfo ii) throws QueryException {
 
-    final StaticVar var = new StaticVar(sc, scope, anns, nm, type, expr, ext, doc, ii);
-    final VarEntry ve = vars.get(nm);
-    if(ve != null) ve.setVar(var);
-    else vars.put(nm, new VarEntry(var));
-    return var;
+    final StaticVar sv = new StaticVar(sc, scope, anns, name, type, expr, ext, doc, ii);
+    final VarEntry ve = vars.get(name);
+    if(ve != null) ve.setVar(sv);
+    else vars.put(name, new VarEntry(sv));
+    return sv;
   }
 
   /**

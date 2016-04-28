@@ -290,7 +290,7 @@ public final class CmpG extends Cmp {
         (t1 == t2 || t1.isUntyped() || t2.isUntyped() ||
         it1 instanceof ANum && it2 instanceof ANum ||
         it1 instanceof AStr && it2 instanceof AStr)) return op.op.eval(it1, it2, coll, sc, info);
-    throw diffError(info, it1, it2);
+    throw diffError(it1, it2, info);
   }
 
   @Override

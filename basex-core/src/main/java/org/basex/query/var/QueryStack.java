@@ -121,7 +121,7 @@ public final class QueryStack {
   public void set(final Var var, final Value val, final QueryContext qc, final InputInfo ii)
       throws QueryException {
     final int pos = pos(var);
-    stack[pos] = var.checkType(val, qc, ii, false);
+    stack[pos] = var.checkType(val, qc, false, ii);
     vars[pos] = var;
   }
 

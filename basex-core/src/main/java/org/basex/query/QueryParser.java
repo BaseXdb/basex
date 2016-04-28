@@ -878,8 +878,8 @@ public class QueryParser extends InputParser {
     }
 
     final VarScope scope = localVars.popContext();
-    final StaticVar var = qc.vars.declare(vn, tp, anns, bind, external, sc, scope,
-        currDoc.toString(), info());
+    final StaticVar var = qc.vars.declare(vn, tp, anns, bind, external, currDoc.toString(), sc,
+        scope, info());
     vars.put(var.id(), var);
   }
 
@@ -921,8 +921,8 @@ public class QueryParser extends InputParser {
     final SeqType type = optAsType();
     final Expr expr = wsConsumeWs(EXTERNAL) ? null : enclosedExpr();
     final VarScope scope = localVars.popContext();
-    final StaticFunc func = qc.funcs.declare(anns, name, args, type, expr, sc, scope,
-        currDoc.toString(), ii);
+    final StaticFunc func = qc.funcs.declare(anns, name, args, type, expr, currDoc.toString(), sc,
+        scope, ii);
     funcs.put(func.id(), func);
   }
 

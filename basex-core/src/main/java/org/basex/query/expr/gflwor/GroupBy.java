@@ -253,7 +253,7 @@ public final class GroupBy extends Clause {
     final int pl = ps.length;
     for(int p = 0; p < pl; p++) {
       final Var old = post[p];
-      ps[p] = scp.newCopyOf(qc, old);
+      ps[p] = scp.newCopyOf(old, qc);
       vs.put(old.id, ps[p]);
     }
 
@@ -362,7 +362,7 @@ public final class GroupBy extends Clause {
 
     @Override
     public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-      final Var v = scp.newCopyOf(qc, var);
+      final Var v = scp.newCopyOf(var, qc);
       vs.put(var.id, v);
       final Spec spec = new Spec(info, v, expr.copy(qc, scp, vs), coll);
       spec.occluded = occluded;

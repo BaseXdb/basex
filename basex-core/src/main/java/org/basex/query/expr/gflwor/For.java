@@ -132,11 +132,11 @@ public final class For extends ForLet {
 
   @Override
   public For copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    final Var v = scp.newCopyOf(qc, var);
+    final Var v = scp.newCopyOf(var, qc);
     vs.put(var.id, v);
-    final Var p = pos == null ? null : scp.newCopyOf(qc, pos);
+    final Var p = pos == null ? null : scp.newCopyOf(pos, qc);
     if(p != null) vs.put(pos.id, p);
-    final Var s = score == null ? null : scp.newCopyOf(qc, score);
+    final Var s = score == null ? null : scp.newCopyOf(score, qc);
     if(s != null) vs.put(score.id, s);
     return new For(v, p, s, expr.copy(qc, scp, vs), empty, info);
   }

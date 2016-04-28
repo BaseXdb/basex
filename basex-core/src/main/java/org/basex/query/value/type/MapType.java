@@ -37,7 +37,7 @@ public final class MapType extends FuncType {
       final Map m = (Map) item;
       if(m.instanceOf(this)) return m;
     }
-    throw castError(ii, item, this);
+    throw castError(item, this, ii);
   }
 
   @Override

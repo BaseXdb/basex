@@ -47,13 +47,13 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    * @param args arguments
    * @param type declared return type
    * @param expr function body
+   * @param doc current xqdoc cache
    * @param sc static context
    * @param scope variable scope
-   * @param doc current xqdoc cache
    * @param info input info
    */
   StaticFunc(final AnnList anns, final QNm name, final Var[] args, final SeqType type,
-      final Expr expr, final StaticContext sc, final VarScope scope, final String doc,
+      final Expr expr, final String doc, final StaticContext sc, final VarScope scope,
       final InputInfo info) {
 
     super(sc, anns, name, type, scope, doc, info);
@@ -282,7 +282,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     final IntObjMap<Var> vs = new IntObjMap<>();
     final int al = args.length;
     for(int a = 0; a < al; a++) {
-      final Var old = args[a], v = scp.newCopyOf(qc, old);
+      final Var old = args[a], v = scp.newCopyOf(old, qc);
       vs.put(old.id, v);
       cls.add(new Let(v, exprs[a], false, info).optimize(qc, scp));
     }

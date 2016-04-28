@@ -29,12 +29,12 @@ abstract class RuntimeExpr extends ParseExpr {
    * @param qc query context
    * @return function item
    */
-  static FuncItem funcItem(final RuntimeExpr expr, final int args,
-      final StaticContext sc, final QueryContext qc) {
+  static FuncItem funcItem(final RuntimeExpr expr, final int args, final StaticContext sc,
+      final QueryContext qc) {
 
     final VarScope vsc = new VarScope(sc);
     final Var[] params = new Var[args];
-    for(int p = 0; p < args; p++) params[p] = vsc.newLocal(qc, null, null, true);
+    for(int p = 0; p < args; p++) params[p] = vsc.newLocal(null, null, true, qc);
     expr.params = params;
     return new FuncItem(sc, new AnnList(), null, expr.params, SeqType.ANY_FUN, expr,
         qc.value, qc.pos, qc.size, args);

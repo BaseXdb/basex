@@ -79,7 +79,7 @@ public class B64 extends Bin {
     try {
       return org.basex.util.Base64.decode(d);
     } catch(final IllegalArgumentException ex) {
-      throw funCastError(ii, AtomType.B64, ex.getMessage().replaceAll("^.*?: |\\.$", ""));
+      throw castError(AtomType.B64, ex.getMessage().replaceAll("^.*?: |\\.$", ""), ii);
     }
   }
 

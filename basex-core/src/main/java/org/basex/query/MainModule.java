@@ -98,11 +98,11 @@ public final class MainModule extends Module {
       final Iter iter = expr.iter(qc);
       final ItemList cache = new ItemList(Math.max(1, (int) iter.size()));
       for(Item it; (it = iter.next()) != null;) cache.add(it);
-      if(declType != null) declType.treat(cache.value(), info, null);
+      if(declType != null) declType.treat(cache.value(), null, info);
       return cache;
 
     } finally {
-      VarScope.exit(qc, fp);
+      VarScope.exit(fp, qc);
     }
   }
 
@@ -121,7 +121,7 @@ public final class MainModule extends Module {
       @Override
       public Item next() throws QueryException {
         final Item it = iter.next();
-        if(it == null) VarScope.exit(qc, fp);
+        if(it == null) VarScope.exit(fp, qc);
         return it;
       }
 

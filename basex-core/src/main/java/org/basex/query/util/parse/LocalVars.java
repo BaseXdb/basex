@@ -83,7 +83,7 @@ public final class LocalVars {
    * @return referenced variable
    * @throws QueryException if the variable isn't defined
    */
-  public Expr resolve(final QNm name, final InputInfo ii) throws QueryException {
+  public ParseExpr resolve(final QNm name, final InputInfo ii) throws QueryException {
     // local variable
     final VarRef local = resolveLocal(name, ii);
     if(local != null) return local;
@@ -105,7 +105,7 @@ public final class LocalVars {
    * @param global mapping for non-local variables
    */
   public void pushContext(final HashMap<Var, Expr> global) {
-    vars.add(new VarContext(qp, global));
+    vars.add(new VarContext(global, qp));
   }
 
   /**

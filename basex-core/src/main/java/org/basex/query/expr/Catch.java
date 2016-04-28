@@ -86,7 +86,7 @@ public final class Catch extends Single {
   public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
     final Var[] vrs = new Var[NAMES.length];
     final int vl = vrs.length;
-    for(int v = 0; v < vl; v++) vrs[v] = scp.newLocal(qc, NAMES[v], TYPES[v], false);
+    for(int v = 0; v < vl; v++) vrs[v] = scp.newLocal(NAMES[v], TYPES[v], false, qc);
     final Catch ctch = new Catch(info, codes.clone(), vrs);
     final int val = vars.length;
     for(int v = 0; v < val; v++) vs.put(vars[v].id, ctch.vars[v]);

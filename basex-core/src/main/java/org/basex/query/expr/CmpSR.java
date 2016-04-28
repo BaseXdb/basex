@@ -111,7 +111,7 @@ final class CmpSR extends Single {
    * @throws QueryException query exception
    */
   private boolean eval(final Item it) throws QueryException {
-    if(!it.type.isStringOrUntyped()) throw diffError(info, it, Str.ZERO);
+    if(!it.type.isStringOrUntyped()) throw diffError(it, Str.ZERO, info);
     final byte[] s = it.string(info);
     final int mn = min == null ?  1 :
       coll == null ? Token.diff(s, min) : coll.compare(s, min);

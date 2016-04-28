@@ -139,6 +139,6 @@ public final class Dec extends ANum {
         return new BigDecimal(Token.string(value).trim());
     } catch(final NumberFormatException ignored) { }
 
-    throw funCastError(ii, AtomType.DEC, value);
+    throw castError(AtomType.DEC, value, ii);
   }
 }

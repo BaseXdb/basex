@@ -36,7 +36,7 @@ public final class ArrayType extends FuncType {
       final Array a = (Array) item;
       if(a.instanceOf(this)) return a;
     }
-    throw castError(ii, item, this);
+    throw castError(item, this, ii);
   }
 
   @Override

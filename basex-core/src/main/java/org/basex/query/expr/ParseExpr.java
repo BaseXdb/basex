@@ -270,7 +270,7 @@ public abstract class ParseExpr extends Expr {
   protected final byte[] toToken(final Item it) throws QueryException {
     final Type ip = it.type;
     if(ip.isStringOrUntyped()) return it.string(info);
-    throw it instanceof FItem ? FIATOM_X.get(info, it.type) : castError(info, it, AtomType.STR);
+    throw it instanceof FItem ? FIATOM_X.get(info, it.type) : castError(it, AtomType.STR, info);
   }
 
   /**
@@ -296,7 +296,7 @@ public abstract class ParseExpr extends Expr {
     final Type ip = checkNoEmpty(it, AtomType.BLN).type;
     if(ip == AtomType.BLN) return it.bool(info);
     if(ip.isUntyped()) return Bln.parse(it.string(info), info);
-    throw castError(info, it, AtomType.BLN);
+    throw castError(it, AtomType.BLN, info);
   }
 
 
@@ -386,7 +386,7 @@ public abstract class ParseExpr extends Expr {
   protected final long toLong(final Item it) throws QueryException {
     final Type ip = checkNoEmpty(it, AtomType.ITR).type;
     if(ip.instanceOf(AtomType.ITR) || ip.isUntyped()) return it.itr(info);
-    throw castError(info, it, AtomType.ITR);
+    throw castError(it, AtomType.ITR, info);
   }
 
   /**
@@ -423,7 +423,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected final ANode toNode(final Item it) throws QueryException {
     if(it instanceof ANode) return (ANode) it;
-    throw castError(info, it, NodeType.NOD);
+    throw castError(it, NodeType.NOD, info);
   }
 
   /**
@@ -612,7 +612,7 @@ public abstract class ParseExpr extends Expr {
     final Type ip = checkNoEmpty(it, AtomType.QNM).type;
     if(ip == AtomType.QNM) return (QNm) it;
     if(ip.isUntyped()) throw NSSENS_X_X.get(info, ip, AtomType.QNM);
-    throw castError(info, it, AtomType.QNM);
+    throw castError(it, AtomType.QNM, info);
   }
 
   /**
@@ -648,7 +648,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected Map toMap(final Item it) throws QueryException {
     if(it instanceof Map) return (Map) it;
-    throw castError(info, it, SeqType.ANY_MAP);
+    throw castError(it, SeqType.ANY_MAP, info);
   }
 
   /**
@@ -670,7 +670,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected Array toArray(final Item it) throws QueryException {
     if(it instanceof Array) return (Array) it;
-    throw castError(info, it, SeqType.ANY_ARRAY);
+    throw castError(it, SeqType.ANY_ARRAY, info);
   }
 
   /**
@@ -697,7 +697,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected Item checkType(final Item it, final Type type) throws QueryException {
     if(checkNoEmpty(it, type).type.instanceOf(type)) return it;
-    throw castError(info, it, type);
+    throw castError(it, type, info);
   }
 
   /**

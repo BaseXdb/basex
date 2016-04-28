@@ -297,7 +297,7 @@ public final class Window extends Clause {
 
   @Override
   public Window copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    final Var v = scp.newCopyOf(qc, var);
+    final Var v = scp.newCopyOf(var, qc);
     vs.put(var.id, v);
     try {
       return new Window(info, sliding, v, expr.copy(qc, scp, vs),
@@ -413,10 +413,10 @@ public final class Window extends Clause {
 
     @Override
     public Condition copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-      final Var it = item == null ? null : scp.newCopyOf(qc, item),
-                ps = pos  == null ? null : scp.newCopyOf(qc, pos),
-                pr = prev == null ? null : scp.newCopyOf(qc, prev),
-                nx = next == null ? null : scp.newCopyOf(qc, next);
+      final Var it = item == null ? null : scp.newCopyOf(item, qc),
+                ps = pos  == null ? null : scp.newCopyOf(pos, qc),
+                pr = prev == null ? null : scp.newCopyOf(prev, qc),
+                nx = next == null ? null : scp.newCopyOf(next, qc);
       if(it != null) vs.put(item.id, it);
       if(ps != null) vs.put(pos.id,  ps);
       if(pr != null) vs.put(prev.id, pr);

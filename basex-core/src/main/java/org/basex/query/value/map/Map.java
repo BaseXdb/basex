@@ -147,7 +147,7 @@ public final class Map extends FItem {
       final boolean opt) throws QueryException {
 
     if(instOf(ft, true)) return this;
-    throw castError(ii, this, ft);
+    throw castError(this, ft, ii);
   }
 
   /**

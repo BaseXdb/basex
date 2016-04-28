@@ -369,7 +369,7 @@ public final class SeqType {
       if(!error && info != null) info.internal(true);
       final Value v = type.cast(item, qc, sc, info);
       if(kind != null) {
-        for(final Item i : v) if(!kind.eq(item)) throw castError(info, i, type);
+        for(final Item i : v) if(!kind.eq(item)) throw castError(i, type, info);
       }
       return v;
     } catch(final QueryException ex) {
@@ -406,17 +406,17 @@ public final class SeqType {
   /**
    * Checks the specified value for this sequence type.
    * @param value value to be checked
-   * @param ii input info
    * @param name name of variable (can be {@code null})
+   * @param ii input info
    * @throws QueryException query exception
    */
-  public void treat(final Value value, final InputInfo ii, final QNm name)
+  public void treat(final Value value, final QNm name, final InputInfo ii)
       throws QueryException {
 
     if(value.seqType().instanceOf(this)) return;
 
     final int size = (int) value.size();
-    if(!occ.check(size)) throw QueryError.typeError(ii, value, this, name);
+    if(!occ.check(size)) throw QueryError.typeError(value, this, name, ii);
 
     // empty sequence has all types
     if(size == 0) return;
@@ -426,25 +426,25 @@ public final class SeqType {
     // check heterogeneous sequences
     if(!value.homogeneous())
       for(int i = 1; ins && i < size; i++) ins = instance(value.itemAt(i));
-    if(!ins) throw QueryError.typeError(ii, value, this, name);
+    if(!ins) throw QueryError.typeError(value, this, name, ii);
   }
 
   /**
    * Promotes a value to the type of this sequence type.
+   * @param value value to convert
+   * @param name variable name (can be {@code null})
+   * @param opt if the result should be optimized
    * @param qc query context
    * @param sc static context
    * @param ii input info
-   * @param value value to convert
-   * @param opt if the result should be optimized
-   * @param name variable name (can be {@code null})
    * @return converted value
    * @throws QueryException if the conversion was not possible
    */
-  public Value promote(final QueryContext qc, final StaticContext sc, final InputInfo ii,
-      final Value value, final boolean opt, final QNm name) throws QueryException {
+  public Value promote(final Value value, final QNm name, final boolean opt, final QueryContext qc,
+      final StaticContext sc, final InputInfo ii) throws QueryException {
 
     final int n = (int) value.size();
-    if(!occ.check(n)) throw QueryError.typeError(ii, value, this, name);
+    if(!occ.check(n)) throw QueryError.typeError(value, this, name, ii);
     if(n == 0) return Empty.SEQ;
 
     ItemList cache = null;
@@ -458,7 +458,7 @@ public final class SeqType {
           cache = new ItemList(n);
           for(int j = 0; j < i; j++) cache.add(value.itemAt(j));
         }
-        promote(qc, sc, ii, it, opt, cache, name);
+        promote(it, name, opt, cache, qc, sc, ii);
       }
     }
     return cache != null ? cache.value(type) : value;
@@ -466,18 +466,17 @@ public final class SeqType {
 
   /**
    * Promotes an item to the type of this sequence type.
+   * @param item item to promote
+   * @param name variable name (can be {@code null})
+   * @param opt if the result should be optimized
+   * @param cache item cache
    * @param qc query context
    * @param sc static context
    * @param ii input info
-   * @param item item to promote
-   * @param opt if the result should be optimized
-   * @param cache item cache
-   * @param name variable name (can be {@code null})
    * @throws QueryException query exception
    */
-  public void promote(final QueryContext qc, final StaticContext sc, final InputInfo ii,
-      final Item item, final boolean opt, final ItemList cache, final QNm name)
-      throws QueryException {
+  public void promote(final Item item, final QNm name, final boolean opt, final ItemList cache,
+      final QueryContext qc, final StaticContext sc, final InputInfo ii) throws QueryException {
 
     if(type instanceof AtomType) {
       for(final Item atom : item.atomValue(ii)) {
@@ -494,13 +493,13 @@ public final class SeqType {
         } else if(type == AtomType.STR && atom instanceof Uri) {
           cache.add(Str.get(atom.string(ii)));
         } else {
-          throw QueryError.typeError(ii, item, withOcc(Occ.ONE), name);
+          throw QueryError.typeError(item, withOcc(Occ.ONE), name, ii);
         }
       }
     } else if(item instanceof FItem && type instanceof FuncType) {
       cache.add(((FItem) item).coerceTo((FuncType) type, qc, ii, opt));
     } else {
-      throw QueryError.typeError(ii, item, withOcc(Occ.ONE), name);
+      throw QueryError.typeError(item, withOcc(Occ.ONE), name, ii);
     }
   }
 

@@ -171,7 +171,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
         final Expr c = e.getValue();
         if(c instanceof Value) {
           // values are always inlined into the closure
-          final Expr inlined = expr.inline(qc, scope, v, v.checkType((Value) c, qc, info, true));
+          final Expr inlined = expr.inline(qc, scope, v, v.checkType((Value) c, qc, true, info));
           if(inlined != null) expr = inlined;
           cls.remove();
         } else if(c instanceof Closure) {
@@ -182,7 +182,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
               && cl.exprSize() < qc.context.options.get(MainOptions.INLINELIMIT)) {
             qc.compInfo(OPTINLINE_X, e);
             for(final Entry<Var, Expr> e2 : cl.global.entrySet()) {
-              final Var v2 = e2.getKey(), v2c = scope.newCopyOf(qc, v2);
+              final Var v2 = e2.getKey(), v2c = scope.newCopyOf(v2, qc);
               if(add == null) add = new HashMap<>();
               add.put(v2c, e2.getValue());
               e2.setValue(new VarRef(cl.info, v2c));
@@ -262,13 +262,13 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     final IntObjMap<Var> vs = new IntObjMap<>();
     final int al = args.length;
     for(int a = 0; a < al; a++) {
-      final Var old = args[a], v = scp.newCopyOf(qc, old);
+      final Var old = args[a], v = scp.newCopyOf(old, qc);
       vs.put(old.id, v);
       cls.add(new Let(v, exprs[a], false, ii).optimize(qc, scp));
     }
 
     for(final Entry<Var, Expr> e : global.entrySet()) {
-      final Var old = e.getKey(), v = scp.newCopyOf(qc, old);
+      final Var old = e.getKey(), v = scp.newCopyOf(old, qc);
       vs.put(old.id, v);
       cls.add(new Let(v, e.getValue(), false, ii).optimize(qc, scp));
     }
@@ -304,19 +304,19 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       checked = body;
     } else if(body instanceof FuncItem && type.type instanceof FuncType) {
       // function item coercion
-      if(!type.occ.check(1)) throw QueryError.typeError(info, body, type, null);
+      if(!type.occ.check(1)) throw QueryError.typeError(body, type, null, info);
       final FuncItem fi = (FuncItem) body;
       checked = fi.coerceTo((FuncType) type.type, qc, info, true);
     } else if(body.isValue()) {
       // we can type check immediately
       final Value val = (Value) body;
-      checked = type.instance(val) ? val : type.promote(qc, sc, info, val, false, null);
+      checked = type.instance(val) ? val : type.promote(val, null, false, qc, sc, info);
     } else {
       // check at each call
       if(argType.type.instanceOf(type.type) && !body.has(Flag.NDT) && !body.has(Flag.UPD)) {
         // reject impossible arities
         final Occ occ = argType.occ.intersect(type.occ);
-        if(occ == null) throw QueryError.typeError(info, body, type, null);
+        if(occ == null) throw QueryError.typeError(body, type, null, info);
       }
       checked = new TypeCheck(sc, info, body, type, true);
     }
@@ -455,7 +455,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     final Var[] arg = new Var[arity];
     final Expr[] refs = new Expr[arity];
     for(int a = 0; a < arity; a++) {
-      arg[a] = scp.newLocal(qc, new QNm(ARG + (a + 1), ""), SeqType.ITEM_ZM, true);
+      arg[a] = scp.newLocal(new QNm(ARG + (a + 1), ""), null, true, qc);
       refs[a] = new VarRef(ii, arg[a]);
     }
     final TypedFunc call = qc.funcs.getFuncRef(name, refs, sc, ii);

@@ -100,7 +100,7 @@ public final class Let extends ForLet {
     seqType = scoring ? SeqType.DBL : expr.seqType();
     var.refineType(seqType, qc, info);
     if(var.checksType() && expr.isValue()) {
-      expr = var.checkType((Value) expr, qc, info, true);
+      expr = var.checkType((Value) expr, qc, true, info);
       var.refineType(expr.seqType(), qc, info);
     }
     size = scoring ? 1 : expr.size();
@@ -111,7 +111,7 @@ public final class Let extends ForLet {
 
   @Override
   public Let copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    final Var v = scp.newCopyOf(qc, var);
+    final Var v = scp.newCopyOf(var, qc);
     vs.put(var.id, v);
     return new Let(v, expr.copy(qc, scp, vs), scoring, info);
   }

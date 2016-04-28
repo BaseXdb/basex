@@ -1492,12 +1492,12 @@ public enum QueryError {
 
   /**
    * Throws a comparison exception.
-   * @param ii input info
    * @param item1 first item
    * @param item2 second item
+   * @param ii input info
    * @return query exception
    */
-  public static QueryException diffError(final InputInfo ii, final Item item1, final Item item2) {
+  public static QueryException diffError(final Item item1, final Item item2, final InputInfo ii) {
     final Type t1 = item1.type, t2 = item2.type;
     return (item1 == item2 ? NOTCMP_X : t1 == t2 ? CMPTYPE_X : CMPTYPES_X_X).get(ii, t1, t2);
   }
@@ -1510,8 +1510,9 @@ public enum QueryError {
    * @param name name (can be {@code null})
    * @return query exception
    */
-  public static QueryException typeError(final InputInfo ii, final Expr expr, final SeqType type,
-      final QNm name) {
+  public static QueryException typeError(final Expr expr, final SeqType type, final QNm name,
+      final InputInfo ii) {
+
     final TokenBuilder tb = new TokenBuilder("Cannot ");
     if(name == null) {
       tb.add("return ").addExt(expr.seqType()).add(" as ");
@@ -1523,24 +1524,23 @@ public enum QueryError {
 
   /**
    * Throws a type cast exception.
-   * @param ii input info
    * @param value value
    * @param type expression cast type
+   * @param ii input info
    * @return query exception
    */
-  public static QueryException castError(final InputInfo ii, final Value value, final Type type) {
+  public static QueryException castError(final Value value, final Type type, final InputInfo ii) {
     return INVCAST_X_X_X.get(ii, value.type, type, value);
   }
 
   /**
    * Throws a type cast exception.
-   * @param ii input info
-   * @param value value
    * @param type expression cast type
+   * @param value value
+   * @param ii input info
    * @return query exception
    */
-  public static QueryException funCastError(final InputInfo ii, final Type type,
-      final Object value) {
+  public static QueryException castError(final Type type, final Object value, final InputInfo ii) {
     return FUNCAST_X_X.get(ii, type, chop(value, ii));
   }
 
@@ -1551,27 +1551,27 @@ public enum QueryError {
    * @return query exception
    */
   public static QueryException numberError(final ParseExpr expr, final Item item) {
-    return numberError(expr.info, item);
+    return numberError(item, expr.info);
   }
 
   /**
    * Throws a number exception.
-   * @param ii input info
    * @param item found item
+   * @param ii input info
    * @return query exception
    */
-  public static QueryException numberError(final InputInfo ii, final Item item) {
+  public static QueryException numberError(final Item item, final InputInfo ii) {
     return NONUMBER_X_X.get(ii, item.type, item);
   }
 
   /**
    * Throws an invalid value exception.
-   * @param ii input info
    * @param type expected type
    * @param value value
+   * @param ii input info
    * @return query exception
    */
-  public static QueryException valueError(final InputInfo ii, final Type type, final byte[] value) {
+  public static QueryException valueError(final Type type, final byte[] value, final InputInfo ii) {
     return INVALUE_X_X.get(ii, type, value);
   }
 

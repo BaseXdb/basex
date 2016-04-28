@@ -216,7 +216,7 @@ public class Dur extends ADateDur {
 
   @Override
   public int diff(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
-    throw diffError(ii, it, this);
+    throw diffError(it, this, ii);
   }
 
   @Override

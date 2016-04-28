@@ -222,7 +222,7 @@ public final class CmpV extends Cmp {
 
     if(it1 instanceof FItem) throw FIEQ_X.get(info, it1.type);
     if(it2 instanceof FItem) throw FIEQ_X.get(info, it2.type);
-    throw diffError(info, it1, it2);
+    throw diffError(it1, it2, info);
   }
 
   @Override

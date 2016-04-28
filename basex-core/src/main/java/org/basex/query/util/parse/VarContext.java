@@ -27,9 +27,9 @@ public final class VarContext {
   /**
    * Constructor.
    * @param bindings non-local variable bindings for closures
-   * @param queryParser TODO
+   * @param queryParser query parser
    */
-  VarContext(final QueryParser queryParser, final HashMap<Var, Expr> bindings) {
+  VarContext(final HashMap<Var, Expr> bindings, final QueryParser queryParser) {
     parser = queryParser;
     this.bindings = bindings;
     scope = new VarScope(parser.sc);
@@ -43,7 +43,7 @@ public final class VarContext {
    * @return the variable
    */
   Var add(final QNm name, final SeqType tp, final boolean prm) {
-    final Var var = scope.newLocal(parser.qc, name, tp, prm);
+    final Var var = scope.newLocal(name, tp, prm, parser.qc);
     stack.push(var);
     return var;
   }

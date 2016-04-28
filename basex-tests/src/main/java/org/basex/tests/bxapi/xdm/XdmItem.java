@@ -45,7 +45,7 @@ public abstract class XdmItem extends XdmValue {
     final Item it1 = internal(), it2 = item.internal();
     try {
       if(it1.comparable(it2)) return it1.eq(it2, null, null, null);
-      throw diffError(null, it1, it2);
+      throw diffError(it1, it2, null);
     } catch(final QueryException ex) {
       throw new XQueryException(ex);
     }

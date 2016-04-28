@@ -46,25 +46,25 @@ public final class VarScope {
 
   /**
    * Creates a new local variable in this scope.
-   * @param qc query context
    * @param name variable name
-   * @param typ type of the variable
+   * @param st type of the variable
    * @param param function parameter flag
+   * @param qc query context
    * @return the variable
    */
-  public Var newLocal(final QueryContext qc, final QNm name, final SeqType typ,
-      final boolean param) {
-    return add(new Var(qc, sc, name, typ, param));
+  public Var newLocal(final QNm name, final SeqType st, final boolean param,
+      final QueryContext qc) {
+    return add(new Var(name, st, param, qc, sc));
   }
 
   /**
    * Creates a new copy of the given variable in this scope.
-   * @param qc query context
    * @param var variable to copy
+   * @param qc query context
    * @return the variable
    */
-  public Var newCopyOf(final QueryContext qc, final Var var) {
-    return add(new Var(qc, sc, var));
+  public Var newCopyOf(final Var var, final QueryContext qc) {
+    return add(new Var(var, qc, sc));
   }
 
   /**
@@ -78,10 +78,10 @@ public final class VarScope {
 
   /**
    * Exits this scope.
-   * @param qc query context
    * @param fp frame pointer
+   * @param qc query context
    */
-  public static void exit(final QueryContext qc, final int fp) {
+  public static void exit(final int fp, final QueryContext qc) {
     qc.stack.exitFrame(fp);
   }
 
@@ -156,7 +156,7 @@ public final class VarScope {
    */
   public VarScope copy(final QueryContext qc, final IntObjMap<Var> vs) {
     final VarScope cscp = new VarScope(sc);
-    for(final Var v : vars) vs.put(v.id, cscp.newCopyOf(qc, v));
+    for(final Var v : vars) vs.put(v.id, cscp.newCopyOf(v, qc));
     return cscp;
   }
 }

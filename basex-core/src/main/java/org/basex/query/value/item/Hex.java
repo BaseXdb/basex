@@ -69,7 +69,7 @@ public final class Hex extends Bin {
    * @throws QueryException query exception
    */
   public static byte[] decode(final byte[] d, final InputInfo ii) throws QueryException {
-    if((d.length & 1) != 0) throw funCastError(ii, AtomType.HEX, (char) d[0]);
+    if((d.length & 1) != 0) throw castError(AtomType.HEX, (char) d[0], ii);
     final int l = d.length >>> 1;
     final byte[] v = new byte[l];
     for(int i = 0; i < l; ++i) {
@@ -88,7 +88,7 @@ public final class Hex extends Bin {
   private static int dec(final byte b, final InputInfo ii) throws QueryException {
     if(b >= '0' && b <= '9') return b - '0';
     if(b >= 'a' && b <= 'f' || b >= 'A' && b <= 'F') return (b & 0x0F) + 9;
-    throw funCastError(ii, AtomType.HEX, (char) b);
+    throw castError(AtomType.HEX, (char) b, ii);
   }
 
   @Override

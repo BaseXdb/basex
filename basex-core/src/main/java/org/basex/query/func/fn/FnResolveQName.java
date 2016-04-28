@@ -23,7 +23,7 @@ public final class FnResolveQName extends StandardFunc {
     final ANode base = toElem(exprs[1], qc);
 
     final byte[] name = toToken(it);
-    if(!XMLToken.isQName(name)) throw valueError(info, AtomType.QNM, name);
+    if(!XMLToken.isQName(name)) throw valueError(AtomType.QNM, name, info);
 
     final QNm nm = new QNm(name);
     final byte[] pref = nm.prefix();

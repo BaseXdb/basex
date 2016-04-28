@@ -89,7 +89,7 @@ public final class PartFunc extends Arr {
     int a = -1;
     for(int h = 0; h < hl; h++) {
       while(++a < holes[h]) args[a] = exprs[a - h].value(qc);
-      vars[h] = scp.newLocal(qc, f.argName(holes[h]), null, false);
+      vars[h] = scp.newLocal(f.argName(holes[h]), null, false, qc);
       args[a] = new VarRef(info, vars[h]);
       vars[h].refineType(ft.argTypes[a], qc, ii);
     }

@@ -158,7 +158,7 @@ public final class FuncItem extends FItem implements Scope {
       final boolean opt) throws QueryException {
 
     final int pl = params.length;
-    if(pl != ft.argTypes.length) throw QueryError.typeError(ii, this, ft.seqType(), null);
+    if(pl != ft.argTypes.length) throw QueryError.typeError(this, ft.seqType(), null, ii);
 
     final FuncType tp = funcType();
     if(tp.instanceOf(ft)) return this;
@@ -167,7 +167,7 @@ public final class FuncItem extends FItem implements Scope {
     final Var[] vars = new Var[pl];
     final Expr[] refs = new Expr[pl];
     for(int p = pl; p-- > 0;) {
-      vars[p] = vsc.newLocal(qc, params[p].name, ft.argTypes[p], true);
+      vars[p] = vsc.newLocal(params[p].name, ft.argTypes[p], true, qc);
       refs[p] = new VarRef(ii, vars[p]);
     }
 
@@ -221,7 +221,7 @@ public final class FuncItem extends FItem implements Scope {
     final IntObjMap<Var> vs = new IntObjMap<>();
     final int pl = params.length;
     for(int p = 0; p < pl; p++) {
-      final Var old = params[p], v = scp.newCopyOf(qc, old);
+      final Var old = params[p], v = scp.newCopyOf(old, qc);
       vs.put(old.id, v);
       cls.add(new Let(v, exprs[p], false, ii).optimize(qc, scp));
     }

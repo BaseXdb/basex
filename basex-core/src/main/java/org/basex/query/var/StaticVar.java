@@ -103,7 +103,7 @@ public final class StaticVar extends StaticDecl {
       if(lazy) qe.notCatchable();
       throw qe;
     } finally {
-      VarScope.exit(qc, fp);
+      VarScope.exit(fp, qc);
       dontEnter = false;
     }
   }
@@ -136,7 +136,7 @@ public final class StaticVar extends StaticDecl {
   private Value bind(final Value value) throws QueryException {
     expr = value;
     val = value;
-    if(type != null) type.treat(value, info, name);
+    if(type != null) type.treat(value, name, info);
     return val;
   }
 

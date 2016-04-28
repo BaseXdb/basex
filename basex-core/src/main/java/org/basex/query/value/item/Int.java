@@ -202,6 +202,6 @@ public final class Int extends ANum {
       final long l = Token.toLong(val);
       if(l != Long.MIN_VALUE || Token.eq(val, Token.MINLONG)) return l;
     }
-    throw funCastError(ii, AtomType.INT, val);
+    throw castError(AtomType.INT, val, ii);
   }
 }

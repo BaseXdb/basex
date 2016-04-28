@@ -294,7 +294,7 @@ public abstract class Array extends FItem {
    */
   public final Value get(final Item key, final InputInfo ii) throws QueryException {
     if(!key.type.instanceOf(AtomType.ITR) && !key.type.isUntyped())
-      throw castError(ii, key, AtomType.ITR);
+      throw castError(key, AtomType.ITR, ii);
 
     final long pos = key.itr(ii), size = arraySize();
     if(pos > 0 && pos <= size) return get(pos - 1);
@@ -427,7 +427,7 @@ public abstract class Array extends FItem {
       final boolean opt) throws QueryException {
 
     if(instOf(ft, true)) return this;
-    throw castError(ii, this, ft);
+    throw castError(this, ft, ii);
   }
 
   /**

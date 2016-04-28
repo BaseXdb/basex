@@ -54,7 +54,7 @@ public final class TypeCase extends Single {
    */
   TypeCase compile(final QueryContext qc, final VarScope scp, final Value v)
       throws QueryException {
-    final Value val = var != null && v != null ? var.checkType(v, qc, info, true) : null;
+    final Value val = var != null && v != null ? var.checkType(v, qc, true, info) : null;
     try {
       super.compile(qc, scp);
       if(val != null) {
@@ -87,7 +87,7 @@ public final class TypeCase extends Single {
   @Override
   public TypeCase copy(final QueryContext qc, final VarScope scp,
       final IntObjMap<Var> vs) {
-    final Var v = var == null ? null : scp.newCopyOf(qc, var);
+    final Var v = var == null ? null : scp.newCopyOf(var, qc);
     if(var != null) vs.put(var.id, v);
     return new TypeCase(info, v, types.clone(), expr.copy(qc, scp, vs));
   }

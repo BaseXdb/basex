@@ -45,17 +45,17 @@ public final class Var extends ExprInfo {
 
   /**
    * Constructor.
-   * @param qc query context, used for generating a variable ID
-   * @param sc static context
    * @param name variable name, {@code null} for unnamed variable
    * @param declType declared sequence type, {@code null} for no check
    * @param param function parameter flag
+   * @param qc query context, used for generating a variable ID
+   * @param sc static context
    */
-  Var(final QueryContext qc, final StaticContext sc, final QNm name, final SeqType declType,
-      final boolean param) {
-    this.sc = sc;
+  public Var(final QNm name, final SeqType declType, final boolean param, final QueryContext qc,
+      final StaticContext sc) {
     this.name = name;
     this.param = param;
+    this.sc = sc;
     promote = param;
     type = declType == null || declType.eq(SeqType.ITEM_ZM) ? null : declType;
     seqType = SeqType.ITEM_ZM;
@@ -65,12 +65,12 @@ public final class Var extends ExprInfo {
 
   /**
    * Copy constructor.
+   * @param var variable to copy
    * @param qc query context
    * @param sc static context
-   * @param var variable to copy
    */
-  Var(final QueryContext qc, final StaticContext sc, final Var var) {
-    this(qc, sc, var.name, var.type, var.param);
+  Var(final Var var, final QueryContext qc, final StaticContext sc) {
+    this(var.name, var.type, var.param, qc, sc);
     promote = var.promote;
     seqType = var.seqType;
     size = var.size;
@@ -149,17 +149,17 @@ public final class Var extends ExprInfo {
    * Checks the type of this value and casts/promotes it when necessary.
    * @param val value to be checked
    * @param qc query context
-   * @param ii input info
    * @param opt if the result should be optimized
+   * @param ii input info
    * @return checked and possibly cast value
    * @throws QueryException if the check failed
    */
-  public Value checkType(final Value val, final QueryContext qc, final InputInfo ii,
-      final boolean opt) throws QueryException {
+  public Value checkType(final Value val, final QueryContext qc, final boolean opt,
+      final InputInfo ii) throws QueryException {
 
     if(!checksType() || type.instance(val)) return val;
-    if(promote) return type.promote(qc, sc, ii, val, opt, name);
-    throw QueryError.typeError(ii, val, type, name);
+    if(promote) return type.promote(val, name, opt, qc, sc, ii);
+    throw QueryError.typeError(val, type, name, ii);
   }
 
   /**
@@ -185,7 +185,7 @@ public final class Var extends ExprInfo {
 
     if(!promote || !(et.type instanceof NodeType) && !et.promotable(vt)) {
       if(vt.type.nsSensitive()) throw NSSENS_X_X.get(info, et, vt);
-      throw QueryError.typeError(info, expr, vt, name);
+      throw QueryError.typeError(expr, vt, name, info);
     }
   }
 
