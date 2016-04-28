@@ -761,11 +761,9 @@ public enum QueryError {
   /** XPST0003. */
   NUMBERWS(XPST, 3, "Expecting separator after number."),
   /** XPST0003. */
-  NUMBERDBL_X(XPST, 3, "Incomplete double value: '%'."),
+  NUMBER_X(XPST, 3, "Incomplete number: '%'."),
   /** XPST0003. */
-  NUMBERDEC_X(XPST, 3, "Incomplete decimal value: '%'."),
-  /** XPST0003. */
-  NUMBERITR(XPST, 3, "Unexpected decimal point."),
+  NUMBERITR(XPST, 3, "Integer expected, decimal point found: '%'."),
   /** XPST0003. */
   QUERYEND_X(XPST, 3, "Unexpected end of query: '%'."),
   /** XPST0003. */

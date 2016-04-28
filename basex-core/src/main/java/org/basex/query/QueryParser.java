@@ -2313,42 +2313,40 @@ public class QueryParser extends InputParser {
     tok.reset();
     while(digit(curr())) tok.add(consume());
 
-    final boolean dec = consume('.');
-    if(dec) {
+    final boolean dot = consume('.');
+    if(dot) {
       // decimal literal
-      if(itr) throw error(NUMBERITR);
       tok.add('.');
+      if(itr) throw error(NUMBERITR, tok);
       while(digit(curr())) tok.add(consume());
     }
-    if(XMLToken.isNCStartChar(curr())) return checkDbl();
 
-    if(dec) {
-      final byte[] t = tok.toArray();
-      if(t.length == 1 && t[0] == '.') throw error(NUMBERDEC_X, t);
-      return Dec.get(new BigDecimal(string(trim(t))));
+    if(XMLToken.isNCStartChar(curr())) {
+      if(!consume('e') && !consume('E')) throw error(NUMBERWS);
+      // double literal
+      tok.add('e');
+      if(curr('+') || curr('-')) tok.add(consume());
+      final int s = tok.size();
+      while(digit(curr())) tok.add(consume());
+      if(s == tok.size()) throw error(NUMBER_X, tok);
+
+      if(XMLToken.isNCStartChar(curr())) throw error(NUMBERWS);
+      return Dbl.get(tok.toArray(), info());
     }
 
-    final long l = toLong(tok.toArray());
+    final byte[] tmp = tok.toArray();
+    final int tl = tmp.length;
+    if(tl == 0) throw error(NUMBER_X, tmp);
+    if(dot) {
+      if(tl == 1 && tmp[0] == '.') throw error(NUMBER_X, tmp);
+      return Dec.get(new BigDecimal(string(trim(tmp))));
+    }
+
+    final long l = toLong(tmp);
     if(l != Long.MIN_VALUE) return Int.get(l);
+
     final InputInfo ii = info();
     return FnError.get(RANGE_X.get(ii, chop(tok, ii)), SeqType.ITR, sc);
-  }
-
-  /**
-   * Parses the "DoubleLiteral" rule. Checks if a number is followed by a whitespace.
-   * @return expression
-   * @throws QueryException query exception
-   */
-  private Dbl checkDbl() throws QueryException {
-    if(!consume('e') && !consume('E')) throw error(NUMBERWS);
-    tok.add('e');
-    if(curr('+') || curr('-')) tok.add(consume());
-    final int s = tok.size();
-    while(digit(curr())) tok.add(consume());
-    if(s == tok.size()) throw error(NUMBERDBL_X, tok);
-
-    if(XMLToken.isNCStartChar(curr())) throw error(NUMBERWS);
-    return Dbl.get(tok.toArray(), info());
   }
 
   /**

@@ -135,8 +135,15 @@ public class InputParser {
    * @return query substring
    */
   protected final String rest() {
-    final int ie = Math.min(length, pos + 15);
-    return input.substring(pos, ie) + (ie == length ? "" : DOTS);
+    final StringBuilder sb = new StringBuilder();
+    final int pl = Math.min(length, pos + 15);
+    int p = pos;
+    for(; p < pl; p++) {
+      final char ch = input.charAt(p);
+      if(ch == '\n') break;
+      sb.append(ch);
+    }
+    return sb + (pl == length ? "" : DOTS);
   }
 
   /**
