@@ -61,7 +61,7 @@ public final class TypeCheck extends Single {
 
     // function item coercion
     if(expr instanceof FuncItem && seqType.type instanceof FuncType) {
-      if(!seqType.occ.check(1)) throw QueryError.promoteError(info, expr, seqType, null);
+      if(!seqType.occ.check(1)) throw QueryError.typeError(info, expr, seqType, null);
       final FuncItem fi = (FuncItem) expr;
       return optPre(fi.coerceTo((FuncType) seqType.type, qc, info, true), qc);
     }
@@ -74,7 +74,7 @@ public final class TypeCheck extends Single {
     // check at each call
     if(argType.type.instanceOf(seqType.type) && !expr.has(Flag.NDT) && !expr.has(Flag.UPD)) {
       final Occ occ = argType.occ.intersect(seqType.occ);
-      if(occ == null) throw QueryError.promoteError(info, expr, seqType, null);
+      if(occ == null) throw QueryError.typeError(info, expr, seqType, null);
     }
 
     final Expr opt = expr.typeCheck(this, qc, scp);
@@ -118,7 +118,7 @@ public final class TypeCheck extends Single {
         cache.set(c++, null);
 
         if(it == null && i < st.occ.min || i > st.occ.max)
-          throw QueryError.promoteError(info, TypeCheck.this, st, null);
+          throw QueryError.typeError(info, TypeCheck.this, st, null);
 
         i++;
         return it;

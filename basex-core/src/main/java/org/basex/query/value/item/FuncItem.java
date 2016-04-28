@@ -158,7 +158,7 @@ public final class FuncItem extends FItem implements Scope {
       final boolean opt) throws QueryException {
 
     final int pl = params.length;
-    if(pl != ft.argTypes.length) throw QueryError.promoteError(ii, this, ft.seqType(), null);
+    if(pl != ft.argTypes.length) throw QueryError.typeError(ii, this, ft.seqType(), null);
 
     final FuncType tp = funcType();
     if(tp.instanceOf(ft)) return this;

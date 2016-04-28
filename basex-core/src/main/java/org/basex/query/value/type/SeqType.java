@@ -416,7 +416,7 @@ public final class SeqType {
     if(value.seqType().instanceOf(this)) return;
 
     final int size = (int) value.size();
-    if(!occ.check(size)) throw QueryError.treatError(ii, value, this, name);
+    if(!occ.check(size)) throw QueryError.typeError(ii, value, this, name);
 
     // empty sequence has all types
     if(size == 0) return;
@@ -426,7 +426,7 @@ public final class SeqType {
     // check heterogeneous sequences
     if(!value.homogeneous())
       for(int i = 1; ins && i < size; i++) ins = instance(value.itemAt(i));
-    if(!ins) throw QueryError.treatError(ii, value, this, name);
+    if(!ins) throw QueryError.typeError(ii, value, this, name);
   }
 
   /**
@@ -444,7 +444,7 @@ public final class SeqType {
       final Value value, final boolean opt, final QNm name) throws QueryException {
 
     final int n = (int) value.size();
-    if(!occ.check(n)) throw QueryError.promoteError(ii, value, this, name);
+    if(!occ.check(n)) throw QueryError.typeError(ii, value, this, name);
     if(n == 0) return Empty.SEQ;
 
     ItemList cache = null;
@@ -494,13 +494,13 @@ public final class SeqType {
         } else if(type == AtomType.STR && atom instanceof Uri) {
           cache.add(Str.get(atom.string(ii)));
         } else {
-          throw QueryError.promoteError(ii, item, withOcc(Occ.ONE), name);
+          throw QueryError.typeError(ii, item, withOcc(Occ.ONE), name);
         }
       }
     } else if(item instanceof FItem && type instanceof FuncType) {
       cache.add(((FItem) item).coerceTo((FuncType) type, qc, ii, opt));
     } else {
-      throw QueryError.promoteError(ii, item, withOcc(Occ.ONE), name);
+      throw QueryError.typeError(ii, item, withOcc(Occ.ONE), name);
     }
   }
 

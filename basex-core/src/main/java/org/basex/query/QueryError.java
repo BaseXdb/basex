@@ -976,8 +976,6 @@ public enum QueryError {
   /** XPTY0004. */
   INVPROMOTE_X_X_X(XPTY, 4, "%: Cannot promote % to %."),
   /** XPTY0004. */
-  INVTREAT_X(XPTY, 4, "%."),
-  /** XPTY0004. */
   CALCTYPE_X_X_X(XPTY, 4, "% not defined for % and %."),
   /** XPTY0004. */
   INVFUNCITEM_X_X(XPTY, 4, "Function expected, % found: %."),
@@ -1505,47 +1503,22 @@ public enum QueryError {
   }
 
   /**
-   * Throws a treat exception.
+   * Throws a type exception.
    * @param ii input info
    * @param expr expression
    * @param type target type
    * @param name name (can be {@code null})
    * @return query exception
    */
-  public static QueryException treatError(final InputInfo ii, final Expr expr, final SeqType type,
+  public static QueryException typeError(final InputInfo ii, final Expr expr, final SeqType type,
       final QNm name) {
-    return promoteError(ii, expr, type, name, true);
-  }
-
-  /**
-   * Throws a promotion exception.
-   * @param ii input info
-   * @param expr expression
-   * @param type target type
-   * @param name name (can be {@code null})
-   * @return query exception
-   */
-  public static QueryException promoteError(final InputInfo ii, final Expr expr, final SeqType type,
-      final QNm name) {
-    return promoteError(ii, expr, type, name, false);
-  }
-
-  /**
-   * Throws a promotion exception.
-   * @param ii input info
-   * @param expr expression
-   * @param type target type
-   * @param name name (can be {@code null})
-   * @param treat treat flag
-   * @return query exception
-   */
-  private static QueryException promoteError(final InputInfo ii, final Expr expr,
-      final SeqType type, final QNm name, final boolean treat) {
-    final String msg = treat ? "Cannot treat % as " : "Cannot promote % to ";
-    final TokenBuilder tb = new TokenBuilder();
-    if(name != null) tb.add('$').add(name.string()).add(": ");
-    tb.addExt(msg, expr.seqType()).addExt(type).add(": ").add(chop(expr, ii));
-    return (treat ? INVTREAT_X : INVPROMOTE_X).get(ii, tb.finish());
+    final TokenBuilder tb = new TokenBuilder("Cannot ");
+    if(name == null) {
+      tb.add("return ").addExt(expr.seqType()).add(" as ");
+    } else {
+      tb.add("promote ").addExt(expr.seqType()).add(" to ").add('$').add(name.string()).add(" as ");
+    }
+    return INVPROMOTE_X.get(ii, tb.addExt(type).add(": ").add(chop(expr, ii)).finish());
   }
 
   /**

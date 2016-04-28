@@ -159,7 +159,7 @@ public final class Var extends ExprInfo {
 
     if(!checksType() || type.instance(val)) return val;
     if(promote) return type.promote(qc, sc, ii, val, opt, name);
-    throw QueryError.treatError(ii, val, type, name);
+    throw QueryError.typeError(ii, val, type, name);
   }
 
   /**
@@ -185,7 +185,7 @@ public final class Var extends ExprInfo {
 
     if(!promote || !(et.type instanceof NodeType) && !et.promotable(vt)) {
       if(vt.type.nsSensitive()) throw NSSENS_X_X.get(info, et, vt);
-      throw QueryError.treatError(info, expr, vt, name);
+      throw QueryError.typeError(info, expr, vt, name);
     }
   }
 
