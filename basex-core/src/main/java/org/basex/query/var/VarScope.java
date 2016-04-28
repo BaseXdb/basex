@@ -38,7 +38,7 @@ public final class VarScope {
    * @param var variable to be added
    * @return the variable (for convenience)
    */
-  private Var add(final Var var) {
+  public Var add(final Var var) {
     var.slot = vars.size();
     vars.add(var);
     return var;
@@ -50,11 +50,12 @@ public final class VarScope {
    * @param st type of the variable
    * @param param function parameter flag
    * @param qc query context
+   * @param info input info
    * @return the variable
    */
-  public Var newLocal(final QNm name, final SeqType st, final boolean param,
-      final QueryContext qc) {
-    return add(new Var(name, st, param, qc, sc));
+  public Var addNew(final QNm name, final SeqType st, final boolean param,
+      final QueryContext qc, final InputInfo info) {
+    return add(new Var(name, st, param, qc, sc, info));
   }
 
   /**
@@ -63,7 +64,7 @@ public final class VarScope {
    * @param qc query context
    * @return the variable
    */
-  public Var newCopyOf(final Var var, final QueryContext qc) {
+  public Var addCopy(final Var var, final QueryContext qc) {
     return add(new Var(var, qc, sc));
   }
 
@@ -156,7 +157,7 @@ public final class VarScope {
    */
   public VarScope copy(final QueryContext qc, final IntObjMap<Var> vs) {
     final VarScope cscp = new VarScope(sc);
-    for(final Var v : vars) vs.put(v.id, cscp.newCopyOf(v, qc));
+    for(final Var v : vars) vs.put(v.id, cscp.addCopy(v, qc));
     return cscp;
   }
 }

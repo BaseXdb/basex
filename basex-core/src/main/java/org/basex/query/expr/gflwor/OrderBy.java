@@ -61,7 +61,7 @@ public final class OrderBy extends Clause {
         // free the space occupied by the tuple
         tpls[p] = null;
         final int rl = refs.length;
-        for(int r = 0; r < rl; r++) qc.set(refs[r].var, tuple[r], info);
+        for(int r = 0; r < rl; r++) qc.set(refs[r].var, tuple[r]);
         return true;
       }
 

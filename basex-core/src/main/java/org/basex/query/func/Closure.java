@@ -171,7 +171,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
         final Expr c = e.getValue();
         if(c instanceof Value) {
           // values are always inlined into the closure
-          final Expr inlined = expr.inline(qc, scope, v, v.checkType((Value) c, qc, true, info));
+          final Expr inlined = expr.inline(qc, scope, v, v.checkType((Value) c, qc, true));
           if(inlined != null) expr = inlined;
           cls.remove();
         } else if(c instanceof Closure) {
@@ -182,7 +182,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
               && cl.exprSize() < qc.context.options.get(MainOptions.INLINELIMIT)) {
             qc.compInfo(OPTINLINE_X, e);
             for(final Entry<Var, Expr> e2 : cl.global.entrySet()) {
-              final Var v2 = e2.getKey(), v2c = scope.newCopyOf(v2, qc);
+              final Var v2 = e2.getKey(), v2c = scope.addCopy(v2, qc);
               if(add == null) add = new HashMap<>();
               add.put(v2c, e2.getValue());
               e2.setValue(new VarRef(cl.info, v2c));
@@ -262,15 +262,15 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     final IntObjMap<Var> vs = new IntObjMap<>();
     final int al = args.length;
     for(int a = 0; a < al; a++) {
-      final Var old = args[a], v = scp.newCopyOf(old, qc);
+      final Var old = args[a], v = scp.addCopy(old, qc);
       vs.put(old.id, v);
-      cls.add(new Let(v, exprs[a], false, ii).optimize(qc, scp));
+      cls.add(new Let(v, exprs[a], false).optimize(qc, scp));
     }
 
     for(final Entry<Var, Expr> e : global.entrySet()) {
-      final Var old = e.getKey(), v = scp.newCopyOf(old, qc);
+      final Var old = e.getKey(), v = scp.addCopy(old, qc);
       vs.put(old.id, v);
-      cls.add(new Let(v, e.getValue(), false, ii).optimize(qc, scp));
+      cls.add(new Let(v, e.getValue(), false).optimize(qc, scp));
     }
 
     // copy the function body
@@ -293,7 +293,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       // collect closure
       final LinkedList<Clause> cls = new LinkedList<>();
       for(final Entry<Var, Expr> e : global.entrySet())
-        cls.add(new Let(e.getKey(), e.getValue().value(qc), false, ii));
+        cls.add(new Let(e.getKey(), e.getValue().value(qc), false));
       body = new GFLWOR(ii, cls, expr);
     }
 
@@ -444,22 +444,22 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
    * @param arity function arity
    * @param qc query context
    * @param sc static context
-   * @param ii input info
+   * @param info input info
    * @return function literal
    * @throws QueryException query exception
    */
   public static Closure unknownLit(final QNm name, final int arity, final QueryContext qc,
-      final StaticContext sc, final InputInfo ii) throws QueryException {
+      final StaticContext sc, final InputInfo info) throws QueryException {
 
     final VarScope scp = new VarScope(sc);
     final Var[] arg = new Var[arity];
     final Expr[] refs = new Expr[arity];
     for(int a = 0; a < arity; a++) {
-      arg[a] = scp.newLocal(new QNm(ARG + (a + 1), ""), null, true, qc);
-      refs[a] = new VarRef(ii, arg[a]);
+      arg[a] = scp.addNew(new QNm(ARG + (a + 1), ""), null, true, qc, info);
+      refs[a] = new VarRef(info, arg[a]);
     }
-    final TypedFunc call = qc.funcs.getFuncRef(name, refs, sc, ii);
-    return new Closure(ii, name, SeqType.ITEM_ZM, arg, call.fun, new AnnList(), null, sc, scp);
+    final TypedFunc call = qc.funcs.getFuncRef(name, refs, sc, info);
+    return new Closure(info, name, SeqType.ITEM_ZM, arg, call.fun, new AnnList(), null, sc, scp);
   }
 
   @Override

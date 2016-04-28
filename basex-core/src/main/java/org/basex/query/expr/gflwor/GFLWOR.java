@@ -180,19 +180,19 @@ public final class GFLWOR extends ParseExpr {
             // example: for $a at $p in for $x in (1 to 2) return $x + 1 return $p
             qc.compInfo(QueryText.OPTFLAT_X_X, description(), fst.var);
             final GFLWOR sub = (GFLWOR) fst.expr;
-            clauses.set(0, new For(fst.var, null, fst.score, sub.ret, false, fst.info));
-            if(fst.pos != null) clauses.add(1, new Count(fst.pos, fst.info));
+            clauses.set(0, new For(fst.var, null, fst.score, sub.ret, false));
+            if(fst.pos != null) clauses.add(1, new Count(fst.pos));
             clauses.addAll(0, sub.clauses);
             changed = true;
           } else if(clauses.size() > 1 && clauses.get(1) instanceof Count) {
             final Count cnt = (Count) clauses.get(1);
             if(fst.pos != null) {
-              final Let lt = new Let(cnt.var,
-                  new VarRef(cnt.info, fst.pos).optimize(qc, scp), false, cnt.info);
+              final VarRef vr = new VarRef(cnt.info, fst.pos);
+              final Let lt = new Let(cnt.var, vr.optimize(qc, scp), false);
               clauses.set(1, lt.optimize(qc, scp));
             } else {
-              clauses.set(0, new For(fst.var, cnt.var, fst.score,
-                  fst.expr, false, fst.info).optimize(qc, scp));
+              final For fr = new For(fst.var, cnt.var, fst.score, fst.expr, false);
+              clauses.set(0, fr.optimize(qc, scp));
               clauses.remove(1);
             }
             changed = true;
@@ -310,7 +310,7 @@ public final class GFLWOR extends ParseExpr {
         if(count(lt.var, pos + 1) == VarUsage.NEVER && !lt.has(Flag.NDT) && !lt.has(Flag.UPD)) {
           qc.compInfo(QueryText.OPTVAR_X, lt.var);
           // check type before removing variable (see {@link FuncType#funcConv})
-          lt.var.checkType(lt.expr, lt.info);
+          lt.var.checkType(lt.expr);
           iter.remove();
           changed = true;
         }

@@ -43,11 +43,9 @@ public final class For extends ForLet {
    * @param score score variable or {@code null}
    * @param expr bound expression
    * @param empty {@code allowing empty} flag
-   * @param info input info
    */
-  public For(final Var var, final Var pos, final Var score, final Expr expr, final boolean empty,
-      final InputInfo info) {
-    super(info, var, expr, score != null, vars(var, pos, score));
+  public For(final Var var, final Var pos, final Var score, final Expr expr, final boolean empty) {
+    super(var.info, var, expr, score != null, vars(var, pos, score));
     this.pos = pos;
     this.score = score;
     this.empty = empty;
@@ -82,16 +80,16 @@ public final class For extends ForLet {
           if(it != null) {
             // there's another item to serve
             ++p;
-            qc.set(var, it, info);
-            if(pos != null) qc.set(pos, Int.get(p), info);
-            if(score != null) qc.set(score, Dbl.get(it.score()), info);
+            qc.set(var, it);
+            if(pos != null) qc.set(pos, Int.get(p));
+            if(score != null) qc.set(score, Dbl.get(it.score()));
             return true;
           }
           if(empty && iter != null && p == 0) {
             // expression yields no items, bind the empty sequence instead
-            qc.set(var, Empty.SEQ, info);
-            if(pos != null) qc.set(pos, Int.get(p), info);
-            if(score != null) qc.set(score, Dbl.ZERO, info);
+            qc.set(var, Empty.SEQ);
+            if(pos != null) qc.set(pos, Int.get(p));
+            if(score != null) qc.set(score, Dbl.ZERO);
             iter = null;
             return true;
           }
@@ -132,13 +130,13 @@ public final class For extends ForLet {
 
   @Override
   public For copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    final Var v = scp.newCopyOf(var, qc);
+    final Var v = scp.addCopy(var, qc);
     vs.put(var.id, v);
-    final Var p = pos == null ? null : scp.newCopyOf(pos, qc);
+    final Var p = pos == null ? null : scp.addCopy(pos, qc);
     if(p != null) vs.put(pos.id, p);
-    final Var s = score == null ? null : scp.newCopyOf(score, qc);
+    final Var s = score == null ? null : scp.addCopy(score, qc);
     if(s != null) vs.put(score.id, s);
-    return new For(v, p, s, expr.copy(qc, scp, vs), empty, info);
+    return new For(v, p, s, expr.copy(qc, scp, vs), empty);
   }
 
   @Override
@@ -170,7 +168,7 @@ public final class For extends ForLet {
     if(expr.size() != 1 && !expr.seqType().one()) return false;
     clauses.set(p, Let.fromFor(this));
     if(score != null) clauses.add(p + 1, Let.fromForScore(this));
-    if(pos != null) clauses.add(p + 1, new Let(pos, Int.get(1), false, info));
+    if(pos != null) clauses.add(p + 1, new Let(pos, Int.get(1), false));
     return true;
   }
 

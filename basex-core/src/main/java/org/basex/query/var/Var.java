@@ -28,6 +28,8 @@ public final class Var extends ExprInfo {
   public final int id;
   /** Declared type, {@code null} if not specified. */
   public SeqType type;
+  /** Input info. */
+  public final InputInfo info;
 
   /** Stack slot number. */
   int slot = -1;
@@ -50,12 +52,14 @@ public final class Var extends ExprInfo {
    * @param param function parameter flag
    * @param qc query context, used for generating a variable ID
    * @param sc static context
+   * @param info input info
    */
   public Var(final QNm name, final SeqType declType, final boolean param, final QueryContext qc,
-      final StaticContext sc) {
+      final StaticContext sc, final InputInfo info) {
     this.name = name;
     this.param = param;
     this.sc = sc;
+    this.info = info;
     promote = param;
     type = declType == null || declType.eq(SeqType.ITEM_ZM) ? null : declType;
     seqType = SeqType.ITEM_ZM;
@@ -70,7 +74,7 @@ public final class Var extends ExprInfo {
    * @param sc static context
    */
   Var(final Var var, final QueryContext qc, final StaticContext sc) {
-    this(var.name, var.type, var.param, qc, sc);
+    this(var.name, var.type, var.param, qc, sc, var.info);
     promote = var.promote;
     seqType = var.seqType;
     size = var.size;
@@ -150,16 +154,15 @@ public final class Var extends ExprInfo {
    * @param val value to be checked
    * @param qc query context
    * @param opt if the result should be optimized
-   * @param ii input info
    * @return checked and possibly cast value
    * @throws QueryException if the check failed
    */
-  public Value checkType(final Value val, final QueryContext qc, final boolean opt,
-      final InputInfo ii) throws QueryException {
+  public Value checkType(final Value val, final QueryContext qc, final boolean opt)
+      throws QueryException {
 
     if(!checksType() || type.instance(val)) return val;
-    if(promote) return type.promote(val, name, opt, qc, sc, ii);
-    throw QueryError.typeError(val, type, name, ii);
+    if(promote) return type.promote(val, name, opt, qc, sc, info);
+    throw QueryError.typeError(val, type, name, info);
   }
 
   /**
@@ -175,10 +178,9 @@ public final class Var extends ExprInfo {
    * </ul>
    *
    * @param expr expression
-   * @param info input info
    * @throws QueryException query exception
    */
-  public void checkType(final Expr expr, final InputInfo info) throws QueryException {
+  public void checkType(final Expr expr) throws QueryException {
     final SeqType et = expr.seqType(), vt = seqType();
     if(!checksType() || vt.type.instanceOf(et.type) ||
         et.type.instanceOf(vt.type) && et.occ.instanceOf(vt.occ)) return;

@@ -95,7 +95,7 @@ public final class FuncLit extends Single implements Scope {
     final VarScope vs = new VarScope(sc);
     final int al = args.length;
     final Var[] arg = new Var[al];
-    for(int a = 0; a < al; a++) vars.put(args[a].id, arg[a] = vs.newCopyOf(args[a], qc));
+    for(int a = 0; a < al; a++) vars.put(args[a].id, arg[a] = vs.addCopy(args[a], qc));
     final Expr call = expr.copy(qc, vs, vars);
     return new FuncLit(anns, name, arg, call, (FuncType) seqType.type, vs, sc, info);
   }

@@ -161,7 +161,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     qc.value = null;
     try {
       final int al = args.length;
-      for(int a = 0; a < al; a++) qc.set(args[a], arg[a], ii);
+      for(int a = 0; a < al; a++) qc.set(args[a], arg[a]);
       return expr.item(qc, ii);
     } finally {
       qc.value = cv;
@@ -177,7 +177,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     qc.value = null;
     try {
       final int al = args.length;
-      for(int a = 0; a < al; a++) qc.set(args[a], arg[a], ii);
+      for(int a = 0; a < al; a++) qc.set(args[a], arg[a]);
       return qc.value(expr);
     } finally {
       qc.value = cv;
@@ -282,9 +282,9 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     final IntObjMap<Var> vs = new IntObjMap<>();
     final int al = args.length;
     for(int a = 0; a < al; a++) {
-      final Var old = args[a], v = scp.newCopyOf(old, qc);
+      final Var old = args[a], v = scp.addCopy(old, qc);
       vs.put(old.id, v);
-      cls.add(new Let(v, exprs[a], false, info).optimize(qc, scp));
+      cls.add(new Let(v, exprs[a], false).optimize(qc, scp));
     }
 
     // copy the function body

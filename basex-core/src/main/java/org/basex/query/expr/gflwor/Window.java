@@ -15,7 +15,6 @@ import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
 import org.basex.query.var.*;
@@ -23,7 +22,7 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * the GFLWOR {@code window} clause.
+ * The GFLWOR {@code window} clause.
  *
  * @author BaseX Team 2005-16, BSD License
  * @author Leo Woerteler
@@ -44,7 +43,6 @@ public final class Window extends Clause {
 
   /**
    * Constructor.
-   * @param info input info
    * @param sliding {@code sliding window} flag
    * @param var window variable
    * @param expr sequence
@@ -53,9 +51,9 @@ public final class Window extends Clause {
    * @param end end condition (can be {@code null})
    * @throws QueryException query exception
    */
-  public Window(final InputInfo info, final boolean sliding, final Var var, final Expr expr,
-      final Condition start, final boolean only, final Condition end) throws QueryException {
-    super(info, vars(var, start, end, info));
+  public Window(final boolean sliding, final Var var, final Expr expr, final Condition start,
+      final boolean only, final Condition end) throws QueryException {
+    super(var.info, vars(var, start, end));
     this.sliding = sliding;
     this.var = var;
     this.expr = expr;
@@ -69,12 +67,12 @@ public final class Window extends Clause {
    * @param vr window variable
    * @param st start condition
    * @param nd end condition, might be {@code null}
-   * @param info input info for the error message
    * @return non-{@code null} variables
    * @throws QueryException query exception if the variable names aren't unique
    */
-  private static Var[] vars(final Var vr, final Condition st, final Condition nd,
-      final InputInfo info) throws QueryException {
+  private static Var[] vars(final Var vr, final Condition st, final Condition nd)
+      throws QueryException {
+
     // determine the size of the array beforehand
     final int stn = st.nVars();
     final Var[] vs = new Var[1 + stn + (nd == null ? 0 : nd.nVars())];
@@ -88,8 +86,9 @@ public final class Window extends Clause {
     // check for duplicates
     for(int v = 0; v < vl; v++) {
       final Var var = vs[v];
-      for(int w = v; --w >= 0;)
-        if(var.name.eq(vs[w].name)) throw WINDOWUNIQ_X.get(info, vs[w]);
+      for(int w = v; --w >= 0;) {
+        if(var.name.eq(vs[w].name)) throw DUPLWIND_X.get(vr.info, vs[w]);
+      }
     }
     return vs;
   }
@@ -133,7 +132,7 @@ public final class Window extends Clause {
             }
 
             start.bind(qc, st[0], ps, st[1], st[2]);
-            qc.set(var, window.value(), info);
+            qc.set(var, window.value());
             return true;
           }
 
@@ -169,7 +168,7 @@ public final class Window extends Clause {
 
             // don't return dangling items if the {@code only} flag was specified
             if(found || !only) {
-              qc.set(var, window.value(), info);
+              qc.set(var, window.value());
               return true;
             }
           }
@@ -225,7 +224,7 @@ public final class Window extends Clause {
             if(!(it == null && only)) {
               start.bind(qc, curr, p, prev, next);
               prev = curr;
-              qc.set(var, cache.value(), info);
+              qc.set(var, cache.value());
               return true;
             }
           }
@@ -285,7 +284,6 @@ public final class Window extends Clause {
   @Override
   public Clause inline(final QueryContext qc, final VarScope scp, final Var v, final Expr ex)
       throws QueryException {
-
     final Expr e = expr.inline(qc, scp, v, ex);
     final Condition st = start.inline(qc, scp, v, ex);
     final Condition en = end == null ? null : end.inline(qc, scp, v, ex);
@@ -297,11 +295,11 @@ public final class Window extends Clause {
 
   @Override
   public Window copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    final Var v = scp.newCopyOf(var, qc);
+    final Var v = scp.addCopy(var, qc);
     vs.put(var.id, v);
     try {
-      return new Window(info, sliding, v, expr.copy(qc, scp, vs),
-          start.copy(qc, scp, vs), only, end != null ? end.copy(qc, scp, vs) : null);
+      return new Window(sliding, v, expr.copy(qc, scp, vs), start.copy(qc, scp, vs), only,
+          end != null ? end.copy(qc, scp, vs) : null);
     } catch(final QueryException e) {
       // checks have already been done
       throw Util.notExpected(e);
@@ -353,191 +351,6 @@ public final class Window extends Clause {
   @Override
   public int exprSize() {
     return expr.exprSize() + start.exprSize() + (end == null ? 0 : end.exprSize());
-  }
-
-  /**
-   * A window {@code start} of {@code end} condition.
-   *
-   * @author BaseX Team 2005-16, BSD License
-   * @author Leo Woerteler
-   */
-  public static final class Condition extends Single {
-    /** Start condition flag. */
-    private final boolean start;
-    /** Item variable. */
-    private final Var item;
-    /** Position variable. */
-    private final Var pos;
-    /** Previous item. */
-    private final Var prev;
-    /** Next item. */
-    private final Var next;
-
-    /**
-     * Constructor.
-     * @param start start condition flag
-     * @param item item variable
-     * @param pos position variable
-     * @param prev previous variable
-     * @param next next variable
-     * @param cond condition expression
-     * @param info input info
-     */
-    public Condition(final boolean start, final Var item, final Var pos, final Var prev,
-        final Var next, final Expr cond, final InputInfo info) {
-      super(info, cond);
-      this.start = start;
-      this.item = item;
-      this.pos = pos;
-      this.prev = prev;
-      this.next = next;
-    }
-
-    @Override
-    public Expr compile(final QueryContext qc, final VarScope scp) throws QueryException {
-      expr = expr.compile(qc, scp);
-      return optimize(qc, scp);
-    }
-
-    @Override
-    public Condition optimize(final QueryContext qc, final VarScope scp) throws QueryException {
-      expr = expr.optimizeEbv(qc, scp);
-      return this;
-    }
-
-    @Override
-    public Condition inline(final QueryContext qc, final VarScope scp, final Var var, final Expr ex)
-        throws QueryException {
-      return (Condition) super.inline(qc, scp, var, ex);
-    }
-
-    @Override
-    public Condition copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-      final Var it = item == null ? null : scp.newCopyOf(item, qc),
-                ps = pos  == null ? null : scp.newCopyOf(pos, qc),
-                pr = prev == null ? null : scp.newCopyOf(prev, qc),
-                nx = next == null ? null : scp.newCopyOf(next, qc);
-      if(it != null) vs.put(item.id, it);
-      if(ps != null) vs.put(pos.id,  ps);
-      if(pr != null) vs.put(prev.id, pr);
-      if(nx != null) vs.put(next.id, nx);
-      return new Condition(start, it, ps, pr, nx, expr.copy(qc, scp, vs), info);
-    }
-
-    /**
-     * Number of non-{@code null} variables in this condition.
-     * @return number of variables
-     */
-    private int nVars() {
-      int i = 0;
-      if(item != null) i++;
-      if(pos  != null) i++;
-      if(prev != null) i++;
-      if(next != null) i++;
-      return i;
-    }
-
-    /**
-     * Checks if this condition binds the item following the current one in the input.
-     * @return result of check
-     */
-    private boolean usesNext() {
-      return next != null;
-    }
-
-    /**
-     * Write all non-{@code null} variables in this condition to the given array.
-     *
-     * @param arr array to write to
-     * @param p start position
-     */
-    private void writeVars(final Var[] arr, final int p) {
-      int i = p;
-      if(item != null) arr[i++] = item;
-      if(pos  != null) arr[i++] = pos;
-      if(prev != null) arr[i++] = prev;
-      if(next != null) arr[i]   = next;
-    }
-
-    /**
-     * Binds the variables and checks if the item satisfies this condition.
-     * @param qc query context for variable binding
-     * @param it current item
-     * @param p position in the input sequence
-     * @param pr previous item
-     * @param nx next item
-     * @return {@code true} if {@code it} matches the condition, {@code false} otherwise
-     * @throws QueryException query exception
-     */
-    private boolean matches(final QueryContext qc, final Item it, final long p, final Item pr,
-        final Item nx) throws QueryException {
-
-      // bind variables
-      bind(qc, it, p, pr, nx);
-      // evaluate as effective boolean value
-      return expr.ebv(qc, info).bool(info);
-    }
-
-    /**
-     * Binds this condition's variables to the given values.
-     * @param qc query context
-     * @param it current item
-     * @param p position
-     * @param pr previous item
-     * @param nx next item
-     * @throws QueryException query exception
-     */
-    private void bind(final QueryContext qc, final Item it, final long p, final Item pr,
-        final Item nx) throws QueryException {
-      if(item != null) qc.set(item, it == null ? Empty.SEQ : it, info);
-      if(pos  != null) qc.set(pos,  Int.get(p),                  info);
-      if(prev != null) qc.set(prev, pr == null ? Empty.SEQ : pr, info);
-      if(next != null) qc.set(next, nx == null ? Empty.SEQ : nx, info);
-    }
-
-    @Override
-    public String toString() {
-      final StringBuilder sb = new StringBuilder(start ? START : END);
-      if(item != null) sb.append(' ').append(item);
-      if(pos  != null) sb.append(' ').append(AT).append(' ').append(pos);
-      if(prev != null) sb.append(' ').append(PREVIOUS).append(' ').append(prev);
-      if(next != null) sb.append(' ').append(NEXT).append(' ').append(next);
-      return sb.append(' ').append(WHEN).append(' ').append(expr).toString();
-    }
-
-    @Override
-    public void plan(final FElem plan) {
-      final FElem e = new FElem(start ? START : END);
-
-      // mapping variable names to roles
-      if(item != null) e.add(planAttr(VAR, token(item.toString())));
-      if(pos  != null) e.add(planAttr(token(AT), token(pos.toString())));
-      if(prev != null) e.add(planAttr(token(PREVIOUS), token(prev.toString())));
-      if(next != null) e.add(planAttr(token(NEXT), token(next.toString())));
-
-      // IDs and stack slots
-      if(item != null) item.plan(e);
-      if(pos  != null) pos.plan(e);
-      if(prev != null) prev.plan(e);
-      if(next != null) next.plan(e);
-
-      expr.plan(e);
-      plan.add(e);
-    }
-
-    @Override
-    public boolean accept(final ASTVisitor visitor) {
-      return (item == null || visitor.declared(item))
-          && (pos  == null || visitor.declared(pos))
-          && (prev == null || visitor.declared(prev))
-          && (next == null || visitor.declared(next))
-          && expr.accept(visitor);
-    }
-
-    @Override
-    public int exprSize() {
-      return expr.exprSize();
-    }
   }
 
   /**
@@ -628,8 +441,9 @@ public final class Window extends Clause {
      * @throws QueryException evaluation exception
      */
     final boolean findStart(final QueryContext qc) throws QueryException {
-      while(readNext())
+      while(readNext()) {
         if(start.matches(qc, curr, p, prev, next)) return true;
+      }
       return false;
     }
 

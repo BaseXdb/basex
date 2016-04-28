@@ -159,7 +159,7 @@ public final class Functions extends TokenSet {
     if(eq(name.uri(), XS_URI)) {
       final Type type = getCast(name, arity, info);
       final VarScope scp = new VarScope(sc);
-      final Var[] args = { scp.newLocal(new QNm(ITEMM, ""), SeqType.AAT_ZO, true, qc) };
+      final Var[] args = { scp.addNew(new QNm(ITEMM, ""), SeqType.AAT_ZO, true, qc, info) };
       final Expr e = new Cast(sc, info, new VarRef(info, args[0]), type.seqType());
       final AnnList anns = new AnnList();
       final FuncType ft = FuncType.get(anns, e.seqType(), args);
@@ -177,7 +177,7 @@ public final class Functions extends TokenSet {
       final Var[] args = new Var[arity];
       final Expr[] calls = new Expr[arity];
       for(int i = 0; i < arity; i++) {
-        args[i] = scp.newLocal(argNames[i], ft.argTypes[i], true, qc);
+        args[i] = scp.addNew(argNames[i], ft.argTypes[i], true, qc, info);
         calls[i] = new VarRef(info, args[i]);
       }
 
@@ -201,7 +201,7 @@ public final class Functions extends TokenSet {
       final Var[] args = new Var[arity];
       final Expr[] calls = new Expr[arity];
       for(int a = 0; a < arity; a++) {
-        args[a] = scp.newLocal(sf.argName(a), ft.argTypes[a], true, qc);
+        args[a] = scp.addNew(sf.argName(a), ft.argTypes[a], true, qc, info);
         calls[a] = new VarRef(info, args[a]);
       }
 
@@ -220,7 +220,7 @@ public final class Functions extends TokenSet {
     final Expr[] args = new Expr[vs.length];
     final int vl = vs.length;
     for(int v = 0; v < vl; v++) {
-      vs[v] = scp.newLocal(new QNm(ARG + (v + 1), ""), null, true, qc);
+      vs[v] = scp.addNew(new QNm(ARG + (v + 1), ""), null, true, qc, info);
       args[v] = new VarRef(info, vs[v]);
     }
     final Expr jf = JavaFunction.get(name, args, qc, sc, info);
@@ -246,7 +246,7 @@ public final class Functions extends TokenSet {
     final int al = args.length;
     final Expr[] calls = new Expr[al];
     for(int a = 0; a < al; a++) {
-      args[a] = scp.newLocal(sf.argName(a), ft.argTypes[a], true, qc);
+      args[a] = scp.addNew(sf.argName(a), ft.argTypes[a], true, qc, info);
       calls[a] = new VarRef(info, args[a]);
     }
     final TypedFunc tf = qc.funcs.getFuncRef(sf.name, calls, sc, info);

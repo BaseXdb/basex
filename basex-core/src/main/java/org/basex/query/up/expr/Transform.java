@@ -75,7 +75,7 @@ public final class Transform extends Arr {
         // copy node to main memory data instance
         i = ((ANode) i).dbNodeCopy(qc.context.options);
         // add resulting node to variable
-        qc.set(copy.var, i, info);
+        qc.set(copy.var, i);
         updates.addData(i.data());
       }
       final Value v = qc.value(exprs[0]);

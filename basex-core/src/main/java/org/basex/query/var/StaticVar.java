@@ -11,9 +11,7 @@ import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -36,17 +34,14 @@ public final class StaticVar extends StaticDecl {
    * @param sc static context
    * @param scope variable scope
    * @param anns annotations
-   * @param name variable name
-   * @param type declared variable type
+   * @param var variable
    * @param expr expression to be bound
    * @param external external flag
    * @param doc current xqdoc cache
-   * @param info input info
    */
-  StaticVar(final StaticContext sc, final VarScope scope, final AnnList anns, final QNm name,
-      final SeqType type, final Expr expr, final boolean external, final String doc,
-      final InputInfo info) {
-    super(sc, anns, name, type, scope, doc, info);
+  StaticVar(final StaticContext sc, final VarScope scope, final AnnList anns, final Var var,
+      final Expr expr, final boolean external, final String doc) {
+    super(sc, anns, var.name, var.type, scope, doc, var.info);
     this.expr = expr;
     this.external = external;
     lazy = anns.contains(Annotation._BASEX_LAZY);

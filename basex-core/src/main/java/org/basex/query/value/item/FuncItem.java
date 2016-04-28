@@ -124,7 +124,7 @@ public final class FuncItem extends FItem implements Scope {
       qc.pos = pos;
       qc.size = size;
       final int pl = params.length;
-      for(int p = 0; p < pl; p++) qc.set(params[p], args[p], ii);
+      for(int p = 0; p < pl; p++) qc.set(params[p], args[p]);
       return qc.value(expr);
     } finally {
       qc.value = cv;
@@ -144,7 +144,7 @@ public final class FuncItem extends FItem implements Scope {
       qc.pos = pos;
       qc.size = size;
       final int pl = params.length;
-      for(int p = 0; p < pl; p++) qc.set(params[p], args[p], ii);
+      for(int p = 0; p < pl; p++) qc.set(params[p], args[p]);
       return expr.item(qc, ii);
     } finally {
       qc.value = cv;
@@ -167,7 +167,7 @@ public final class FuncItem extends FItem implements Scope {
     final Var[] vars = new Var[pl];
     final Expr[] refs = new Expr[pl];
     for(int p = pl; p-- > 0;) {
-      vars[p] = vsc.newLocal(params[p].name, ft.argTypes[p], true, qc);
+      vars[p] = vsc.addNew(params[p].name, ft.argTypes[p], true, qc, ii);
       refs[p] = new VarRef(ii, vars[p]);
     }
 
@@ -221,9 +221,9 @@ public final class FuncItem extends FItem implements Scope {
     final IntObjMap<Var> vs = new IntObjMap<>();
     final int pl = params.length;
     for(int p = 0; p < pl; p++) {
-      final Var old = params[p], v = scp.newCopyOf(old, qc);
+      final Var old = params[p], v = scp.addCopy(old, qc);
       vs.put(old.id, v);
-      cls.add(new Let(v, exprs[p], false, ii).optimize(qc, scp));
+      cls.add(new Let(v, exprs[p], false).optimize(qc, scp));
     }
 
     // copy the function body

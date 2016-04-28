@@ -76,7 +76,7 @@ public final class Catch extends Single {
         Str.get(ex.getLocalizedMessage()), val == null ? Empty.SEQ : val,
         Str.get(io), Int.get(ex.line()), Int.get(ex.column()),
         Str.get(ex.getMessage().replaceAll("\r\n?", "\n")) }) {
-      qc.set(vars[i++], v, info);
+      qc.set(vars[i++], v);
     }
     Util.debug(ex);
     return qc.value(expr);
@@ -86,7 +86,7 @@ public final class Catch extends Single {
   public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
     final Var[] vrs = new Var[NAMES.length];
     final int vl = vrs.length;
-    for(int v = 0; v < vl; v++) vrs[v] = scp.newLocal(NAMES[v], TYPES[v], false, qc);
+    for(int v = 0; v < vl; v++) vrs[v] = scp.addNew(NAMES[v], TYPES[v], false, qc, info);
     final Catch ctch = new Catch(info, codes.clone(), vrs);
     final int val = vars.length;
     for(int v = 0; v < val; v++) vs.put(vars[v].id, ctch.vars[v]);

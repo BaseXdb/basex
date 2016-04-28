@@ -11,7 +11,6 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -26,26 +25,23 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
 
   /**
    * Declares a new static variable.
-   * @param name variable name
-   * @param type declared type
+   * @param var variable
    * @param anns annotations
    * @param expr bound expression, possibly {@code null}
    * @param ext {@code external} flag
    * @param doc current xqdoc cache
    * @param sc static context
    * @param scope variable scope
-   * @param ii input info
    * @return static variable reference
    * @throws QueryException query exception
    */
-  public StaticVar declare(final QNm name, final SeqType type, final AnnList anns, final Expr expr,
-      final boolean ext, final String doc, final StaticContext sc, final VarScope scope,
-      final InputInfo ii) throws QueryException {
+  public StaticVar declare(final Var var, final AnnList anns, final Expr expr, final boolean ext,
+      final String doc, final StaticContext sc, final VarScope scope) throws QueryException {
 
-    final StaticVar sv = new StaticVar(sc, scope, anns, name, type, expr, ext, doc, ii);
-    final VarEntry ve = vars.get(name);
+    final StaticVar sv = new StaticVar(sc, scope, anns, var, expr, ext, doc);
+    final VarEntry ve = vars.get(var.name);
     if(ve != null) ve.setVar(sv);
-    else vars.put(name, new VarEntry(sv));
+    else vars.put(var.name, new VarEntry(sv));
     return sv;
   }
 

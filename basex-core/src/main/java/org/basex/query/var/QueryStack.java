@@ -97,7 +97,9 @@ public final class QueryStack {
    */
   private int pos(final Var var) {
     final int pos = start + var.slot;
-    if(pos < start || end <= pos) throw Util.notExpected(var);
+    if(pos < start || end <= pos) {
+      throw Util.notExpected(var + " index: " + pos + ", slot: " + var.slot);
+    }
     return pos;
   }
 
@@ -115,13 +117,11 @@ public final class QueryStack {
    * @param var variable to bind the value to
    * @param val value to bind
    * @param qc query context
-   * @param ii input info
    * @throws QueryException if the value does not have the right type
    */
-  public void set(final Var var, final Value val, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
+  public void set(final Var var, final Value val, final QueryContext qc) throws QueryException {
     final int pos = pos(var);
-    stack[pos] = var.checkType(val, qc, false, ii);
+    stack[pos] = var.checkType(val, qc, false);
     vars[pos] = var;
   }
 

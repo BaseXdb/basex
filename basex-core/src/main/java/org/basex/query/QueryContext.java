@@ -783,11 +783,10 @@ public final class QueryContext extends Proc implements Closeable {
    * Binds an expression to a local variable.
    * @param vr variable
    * @param vl expression to be bound
-   * @param ii input info
    * @throws QueryException exception
    */
-  public void set(final Var vr, final Value vl, final InputInfo ii) throws QueryException {
-    stack.set(vr, vl, this, ii);
+  public void set(final Var vr, final Value vl) throws QueryException {
+    stack.set(vr, vl, this);
   }
 
   /**

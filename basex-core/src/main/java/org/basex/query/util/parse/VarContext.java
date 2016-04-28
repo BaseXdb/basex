@@ -4,8 +4,6 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.value.item.*;
-import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 
 /**
@@ -15,8 +13,6 @@ import org.basex.query.var.*;
  * @author Christian Gruen
  */
 public final class VarContext {
-  /** Query parser. */
-  private final QueryParser parser;
   /** Stack of local variables. */
   final VarStack stack = new VarStack();
   /** Non-local variable bindings for closures. */
@@ -27,24 +23,19 @@ public final class VarContext {
   /**
    * Constructor.
    * @param bindings non-local variable bindings for closures
-   * @param queryParser query parser
+   * @param sc static context
    */
-  VarContext(final HashMap<Var, Expr> bindings, final QueryParser queryParser) {
-    parser = queryParser;
+  VarContext(final HashMap<Var, Expr> bindings, final StaticContext sc) {
     this.bindings = bindings;
-    scope = new VarScope(parser.sc);
+    scope = new VarScope(sc);
   }
 
   /**
    * Adds a new variable to this context.
-   * @param name variable name
-   * @param tp variable type
-   * @param prm promotion flag
-   * @return the variable
+   * @param var variable
    */
-  Var add(final QNm name, final SeqType tp, final boolean prm) {
-    final Var var = scope.newLocal(name, tp, prm, parser.qc);
+  void add(final Var var) {
+    scope.add(var);
     stack.push(var);
-    return var;
   }
 }

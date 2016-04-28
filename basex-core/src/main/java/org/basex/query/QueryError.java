@@ -1171,7 +1171,7 @@ public enum QueryError {
   /** XQST0099. */
   DUPLITEM(XQST, 99, "Duplicate declaration of context value."),
   /** XQST0103. */
-  WINDOWUNIQ_X(XQST, 103, "Duplicate variable name in window clause: %"),
+  DUPLWIND_X(XQST, 103, "Duplicate declaration of %."),
   /** XQST0106. */
   DUPLUPD(XQST, 106, "More than one updating annotation declared."),
   /** XQST0106. */

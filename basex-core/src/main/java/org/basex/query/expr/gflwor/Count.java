@@ -9,7 +9,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
-import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
@@ -25,10 +24,9 @@ public final class Count extends Clause {
   /**
    * Constructor.
    * @param var variable
-   * @param info input info
    */
-  public Count(final Var var, final InputInfo info) {
-    super(info, var);
+  public Count(final Var var) {
+    super(var.info, var);
     this.var = var;
   }
 
@@ -36,10 +34,11 @@ public final class Count extends Clause {
   Eval eval(final Eval sub) {
     return new Eval() {
       private long i = 1;
+
       @Override
       public boolean next(final QueryContext qc) throws QueryException {
         if(!sub.next(qc)) return false;
-        qc.set(var, Int.get(i++), info);
+        qc.set(var, Int.get(i++));
         return true;
       }
     };
@@ -88,9 +87,9 @@ public final class Count extends Clause {
 
   @Override
   public Count copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    final Var v = scp.newCopyOf(var, qc);
+    final Var v = scp.addCopy(var, qc);
     vs.put(var.id, v);
-    return new Count(v, info);
+    return new Count(v);
   }
 
   @Override

@@ -28,7 +28,6 @@ import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.gflwor.GFLWOR.Clause;
 import org.basex.query.expr.gflwor.GroupBy.Spec;
 import org.basex.query.expr.gflwor.OrderBy.Key;
-import org.basex.query.expr.gflwor.Window.Condition;
 import org.basex.query.expr.path.*;
 import org.basex.query.expr.path.Test.Kind;
 import org.basex.query.func.*;
@@ -863,24 +862,22 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void varDecl(final AnnList anns) throws QueryException {
-    final QNm vn = varName();
-    final SeqType tp = optAsType();
-    if(module != null && !eq(vn.uri(), module.uri())) throw error(MODULENS_X, vn);
+    final Var var = newVar();
+    if(module != null && !eq(var.name.uri(), module.uri())) throw error(MODULENS_X, var);
 
     localVars.pushContext(null);
-    final boolean external = wsConsumeWs(EXTERNAL);
+    final boolean ext = wsConsumeWs(EXTERNAL);
     final Expr bind;
-    if(external) {
+    if(ext) {
       bind = wsConsumeWs(ASSIGN) ? check(single(), NOVARDECL) : null;
     } else {
       wsCheck(ASSIGN);
       bind = check(single(), NOVARDECL);
     }
-
     final VarScope scope = localVars.popContext();
-    final StaticVar var = qc.vars.declare(vn, tp, anns, bind, external, currDoc.toString(), sc,
-        scope, info());
-    vars.put(var.id(), var);
+    final String doc = currDoc.toString();
+    final StaticVar sv = qc.vars.declare(var, anns, bind, ext, doc, sc, scope);
+    vars.put(sv.id(), sv);
   }
 
   /**
@@ -944,14 +941,12 @@ public class QueryParser extends InputParser {
     Var[] args = { };
     while(true) {
       skipWs();
-      if(curr() != '$') {
-        if(args.length == 0) break;
-        check('$');
-      }
-      final Var var = localVars.add(varName(), optAsType(), true);
-      for(final Var v : args)
+      if(curr() != '$' && args.length == 0) break;
+      final InputInfo ii = info();
+      final Var var = localVars.add(new Var(varName(), optAsType(), true, qc, sc, ii));
+      for(final Var v : args) {
         if(v.name.eq(var.name)) throw error(FUNCDUPL_X, var);
-
+      }
       args = Array.add(args, var);
       if(!consume(',')) break;
     }
@@ -1066,7 +1061,7 @@ public class QueryParser extends InputParser {
 
           // if one groups variables such as $x as xs:integer, then the resulting
           // sequence isn't compatible with the type and can't be assigned
-          final Var nv = localVars.add(v.var.name, null, false);
+          final Var nv = localVars.add(new Var(v.var.name, null, false, qc, sc, v.var.info));
           // [LW] should be done everywhere
           if(v.seqType().one())
             nv.refineType(SeqType.get(v.seqType().type, Occ.ONE_MORE), qc, info());
@@ -1091,14 +1086,14 @@ public class QueryParser extends InputParser {
 
         final VarRef[] vs = new VarRef[curr.size()];
         int i = 0;
-        for(final Var v : curr.values()) vs[i++] = new VarRef(ob[0].info, v);
+        for(final Var var : curr.values()) vs[i++] = new VarRef(ob[0].info, var);
         clauses.add(new OrderBy(vs, ob, ob[0].info));
       }
 
       if(wsConsumeWs(COUNT, DOLLAR, NOCOUNT)) {
-        final Var v = localVars.add(varName(), SeqType.ITR, false);
-        curr.put(v.name.id(), v);
-        clauses.add(new Count(v, info()));
+        final Var var = localVars.add(newVar(SeqType.ITR));
+        curr.put(var.name.id(), var);
+        clauses.add(new Count(var));
       }
     } while(size < clauses.size());
 
@@ -1142,29 +1137,21 @@ public class QueryParser extends InputParser {
    */
   private void forClause(final LinkedList<Clause> cls) throws QueryException {
     do {
-      final QNm nm = varName();
-      final SeqType tp = optAsType();
-
+      final Var var = newVar();
       final boolean emp = wsConsume(ALLOWING);
       if(emp) wsCheck(EMPTYORD);
-
-      final QNm p = wsConsumeWs(AT) ? varName() : null;
-      final QNm s = wsConsumeWs(SCORE) ? varName() : null;
-
-      wsCheck(IN);
-      final Expr e = check(single(), NOVARDECL);
-
-      // declare late because otherwise it would shadow the wrong variables
-      final Var var = localVars.add(nm, tp, false);
-      final Var ps = p != null ? localVars.add(p, SeqType.ITR, false) : null;
-      final Var scr = s != null ? localVars.add(s, SeqType.DBL, false) : null;
-      if(p != null) {
-        if(nm.eq(p)) throw error(DUPLVAR_X, var);
-        if(s != null && p.eq(s)) throw error(DUPLVAR_X, ps);
+      final Var at = wsConsumeWs(AT) ? newVar(SeqType.ITR) : null;
+      final Var score = wsConsumeWs(SCORE) ? newVar(SeqType.DBL) : null;
+      // check for duplicate variable names
+      if(at != null) {
+        if(var.name.eq(at.name)) throw error(DUPLVAR_X, at);
+        if(score != null && at.name.eq(score.name)) throw error(DUPLVAR_X, score);
       }
-      if(s != null && nm.eq(s)) throw error(DUPLVAR_X, var);
-
-      cls.add(new For(var, ps, scr, e, emp, info()));
+      if(score != null && var.name.eq(score.name)) throw error(DUPLVAR_X, score);
+      wsCheck(IN);
+      final Expr expr = check(single(), NOVARDECL);
+      // declare late because otherwise it would shadow the wrong variables
+      cls.add(new For(localVars.add(var), localVars.add(at), localVars.add(score), expr, emp));
     } while(wsConsumeWs(COMMA));
   }
 
@@ -1177,11 +1164,10 @@ public class QueryParser extends InputParser {
   private void letClause(final LinkedList<Clause> cls) throws QueryException {
     do {
       final boolean score = wsConsumeWs(SCORE);
-      final QNm nm = varName();
-      final SeqType tp = score ? SeqType.DBL : optAsType();
+      final Var var = score ? newVar(SeqType.DBL) : newVar();
       wsCheck(ASSIGN);
       final Expr e = check(single(), NOVARDECL);
-      cls.add(new Let(localVars.add(nm, tp, false), e, score, info()));
+      cls.add(new Let(localVars.add(var), e, score));
     } while(wsConsume(COMMA));
   }
 
@@ -1197,9 +1183,7 @@ public class QueryParser extends InputParser {
     wsCheck(WINDOW);
     skipWs();
 
-    final QNm nm = varName();
-    final SeqType tp = optAsType();
-
+    final Var var = newVar();
     wsCheck(IN);
     final Expr e = check(single(), NOVARDECL);
 
@@ -1214,7 +1198,7 @@ public class QueryParser extends InputParser {
       if(check) wsCheck(END);
       end = windowCond(false);
     }
-    return new Window(info(), slide, localVars.add(nm, tp, false), e, start, only, end);
+    return new Window(slide, localVars.add(var), e, start, only, end);
   }
 
   /**
@@ -1226,12 +1210,13 @@ public class QueryParser extends InputParser {
   private Condition windowCond(final boolean start) throws QueryException {
     skipWs();
     final InputInfo ii = info();
-    final Var var = curr('$')             ? localVars.add(varName(), null, false) : null,
-              at  = wsConsumeWs(AT)       ? localVars.add(varName(), null, false) : null,
-              prv = wsConsumeWs(PREVIOUS) ? localVars.add(varName(), null, false) : null,
-              nxt = wsConsumeWs(NEXT)     ? localVars.add(varName(), null, false) : null;
+    final Var var = curr('$')             ? newVar(SeqType.ITEM_ZM) : null;
+    final Var at  = wsConsumeWs(AT)       ? newVar(SeqType.ITEM_ZM) : null;
+    final Var prv = wsConsumeWs(PREVIOUS) ? newVar(SeqType.ITEM_ZM) : null;
+    final Var nxt = wsConsumeWs(NEXT)     ? newVar(SeqType.ITEM_ZM) : null;
     wsCheck(WHEN);
-    return new Condition(start, var, at, prv, nxt, check(single(), NOEXPR), ii);
+    return new Condition(start, localVars.add(var), localVars.add(at), localVars.add(prv),
+        localVars.add(nxt), check(single(), NOEXPR), ii);
   }
 
   /**
@@ -1266,16 +1251,13 @@ public class QueryParser extends InputParser {
   private Spec[] groupSpecs(final LinkedList<Clause> cl) throws QueryException {
     Spec[] specs = null;
     do {
-      final InputInfo ii = info();
-      final QNm name = varName();
-      final SeqType declType = optAsType();
-
+      final Var var = newVar();
       final Expr by;
-      if(declType != null || wsConsume(ASSIGN)) {
-        if(declType != null) wsCheck(ASSIGN);
+      if(var.type != null || wsConsume(ASSIGN)) {
+        if(var.type != null) wsCheck(ASSIGN);
         by = check(single(), NOVARDECL);
       } else {
-        final VarRef vr = localVars.resolveLocal(name, ii);
+        final VarRef vr = localVars.resolveLocal(var.name, var.info);
         // the grouping variable has to be declared by the same FLWOR expression
         boolean dec = false;
         if(vr != null) {
@@ -1297,13 +1279,13 @@ public class QueryParser extends InputParser {
             }
           }
         }
-        if(!dec) throw error(GVARNOTDEFINED_X, '$' + string(name.string()));
+        if(!dec) throw error(GVARNOTDEFINED_X, var);
         by = vr;
       }
 
       final Collation coll = wsConsumeWs(COLLATION) ? Collation.get(stringLiteral(),
           qc, sc, info(), FLWORCOLL_X) : sc.collation;
-      final Spec spec = new Spec(ii, localVars.add(name, declType, false), by, coll);
+      final Spec spec = new Spec(var.info, localVars.add(var), by, coll);
       if(specs == null) {
         specs = new Spec[] { spec };
       } else {
@@ -1331,11 +1313,10 @@ public class QueryParser extends InputParser {
     final int s = localVars.openScope();
     For[] fl = { };
     do {
-      final QNm nm = varName();
-      final SeqType tp = optAsType();
+      final Var var = newVar();
       wsCheck(IN);
       final Expr e = check(single(), NOSOME);
-      fl = Array.add(fl, new For(localVars.add(nm, tp, false), null, null, e, false, info()));
+      fl = Array.add(fl, new For(localVars.add(var), null, null, e, false));
     } while(wsConsumeWs(COMMA));
 
     wsCheck(SATISFIES);
@@ -1400,7 +1381,7 @@ public class QueryParser extends InputParser {
       }
       Var var = null;
       if(curr('$')) {
-        var = localVars.add(varName(), null, false);
+        var = localVars.add(newVar(SeqType.ITEM_ZM));
         if(cs) wsCheck(AS);
       }
       if(cs) {
@@ -1409,8 +1390,8 @@ public class QueryParser extends InputParser {
       }
       wsCheck(RETURN);
       final Expr ret = check(single(), NOTYPESWITCH);
-      cases = Array.add(cases, new TypeCase(info(), var,
-          types.toArray(new SeqType[types.size()]), ret));
+      final TypeCase tc = new TypeCase(info(), var, types.toArray(new SeqType[types.size()]), ret);
+      cases = Array.add(cases, tc);
       localVars.closeScope(s);
     } while(cs);
     if(cases.length == 1) throw error(NOTYPESWITCH);
@@ -1711,8 +1692,15 @@ public class QueryParser extends InputParser {
     if(e != null) {
       while(wsConsume(ARROW)) {
         skipWs();
-        final Expr ex = curr('(') ? parenthesized() : curr('$')
-            ? localVars.resolve(varName(), info()) : eQName(ARROWSPEC, sc.funcNS);
+        final Expr ex;
+        if(curr('(')) {
+          ex = parenthesized();
+        } else if(curr('$')) {
+          final InputInfo ii = info();
+          ex = localVars.resolve(varName(), ii);
+        } else {
+          ex = eQName(ARROWSPEC, sc.funcNS);
+        }
         final InputInfo ii = info();
         wsCheck(PAREN1);
 
@@ -2394,6 +2382,28 @@ public class QueryParser extends InputParser {
     check('$');
     skipWs();
     return eQName(NOVARNAME, null);
+  }
+
+  /**
+   * Parses a variable with an optional type declaration.
+   * @return variable
+   * @throws QueryException query exception
+   */
+  private Var newVar() throws QueryException {
+    return newVar(null);
+  }
+
+  /**
+   * Parses a variable.
+   * @param type type (if {@code null}, optional type will be parsed)
+   * @return variable
+   * @throws QueryException query exception
+   */
+  private Var newVar(final SeqType type) throws QueryException {
+    final InputInfo ii = info();
+    final QNm name = varName();
+    final SeqType st = type != null ? type : optAsType();
+    return new Var(name, st, false, qc, sc, ii);
   }
 
   /**
@@ -3201,8 +3211,11 @@ public class QueryParser extends InputParser {
       final int s = localVars.openScope();
       final int cl = Catch.NAMES.length;
       final Var[] vs = new Var[cl];
-      for(int i = 0; i < cl; i++) vs[i] = localVars.add(Catch.NAMES[i], Catch.TYPES[i], false);
-      final Catch c = new Catch(info(), codes, vs);
+      final InputInfo ii = info();
+      for(int i = 0; i < cl; i++) {
+        vs[i] = localVars.add(new Var(Catch.NAMES[i], Catch.TYPES[i], false, qc, sc, ii));
+      }
+      final Catch c = new Catch(ii, codes, vs);
       c.expr = enclosedExpr();
       localVars.closeScope(s);
 
@@ -3682,10 +3695,10 @@ public class QueryParser extends InputParser {
 
     Let[] fl = { };
     do {
-      final QNm name = varName();
+      final Var var = newVar(SeqType.NOD);
       wsCheck(ASSIGN);
       final Expr e = check(single(), INCOMPLETE);
-      fl = Array.add(fl, new Let(localVars.add(name, SeqType.NOD, false), e, false, info()));
+      fl = Array.add(fl, new Let(localVars.add(var), e, false));
     } while(wsConsumeWs(COMMA));
     wsCheck(MODIFY);
 

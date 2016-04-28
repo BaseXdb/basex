@@ -470,7 +470,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
         final SeqType decl = var.declaredType();
         final Value val = value.seqType().instanceOf(decl) ? value :
           decl.cast(value, qc, function.sc, null);
-        args[f] = var.checkType(val, qc, false, null);
+        args[f] = var.checkType(val, qc, false);
         break;
       }
     }

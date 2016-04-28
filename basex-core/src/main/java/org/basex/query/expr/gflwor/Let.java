@@ -32,10 +32,9 @@ public final class Let extends ForLet {
    * @param var variable
    * @param expr expression
    * @param score score flag
-   * @param info input info
    */
-  public Let(final Var var, final Expr expr, final boolean score, final InputInfo info) {
-    super(info, var, expr, score, var);
+  public Let(final Var var, final Expr expr, final boolean score) {
+    super(var.info, var, expr, score, var);
   }
 
   /**
@@ -44,7 +43,7 @@ public final class Let extends ForLet {
    * @return let binding
    */
   static Let fromFor(final For fr) {
-    final Let lt = new Let(fr.var, fr.expr, false, fr.info);
+    final Let lt = new Let(fr.var, fr.expr, false);
     lt.seqType = fr.expr.seqType();
     return lt;
   }
@@ -56,7 +55,7 @@ public final class Let extends ForLet {
    */
   static Let fromForScore(final For fr) {
     final Expr varRef = new VarRef(fr.info, fr.var);
-    return new Let(fr.score, varRef, true, fr.info);
+    return new Let(fr.score, varRef, true);
   }
 
   @Override
@@ -100,7 +99,7 @@ public final class Let extends ForLet {
     seqType = scoring ? SeqType.DBL : expr.seqType();
     var.refineType(seqType, qc, info);
     if(var.checksType() && expr.isValue()) {
-      expr = var.checkType((Value) expr, qc, true, info);
+      expr = var.checkType((Value) expr, qc, true);
       var.refineType(expr.seqType(), qc, info);
     }
     size = scoring ? 1 : expr.size();
@@ -111,9 +110,9 @@ public final class Let extends ForLet {
 
   @Override
   public Let copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-    final Var v = scp.newCopyOf(var, qc);
+    final Var v = scp.addCopy(var, qc);
     vs.put(var.id, v);
-    return new Let(v, expr.copy(qc, scp, vs), scoring, info);
+    return new Let(v, expr.copy(qc, scp, vs), scoring);
   }
 
   @Override
@@ -186,7 +185,7 @@ public final class Let extends ForLet {
         } else {
           vl = qc.value(let.expr);
         }
-        qc.set(let.var, vl, let.info);
+        qc.set(let.var, vl);
       }
       return true;
     }

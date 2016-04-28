@@ -8,7 +8,6 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 
@@ -34,13 +33,12 @@ public final class LocalVars {
 
   /**
    * Creates and registers a new local variable in the current scope.
-   * @param name variable name
-   * @param tp variable type
-   * @param prm if the variable is a function parameter
-   * @return registered variable
+   * @param var variable to be added (can be {@code null})
+   * @return variable
    */
-  public Var add(final QNm name, final SeqType tp, final boolean prm) {
-    return vars.get(vars.size() - 1).add(name, tp, prm);
+  public Var add(final Var var) {
+    if(var != null) vars.get(vars.size() - 1).add(var);
+    return var;
   }
 
   /**
@@ -66,7 +64,8 @@ public final class LocalVars {
     final int ls = vars.size();
     while(++l < ls) {
       final VarContext vctx = vars.get(l);
-      final Var local = vctx.add(var.name, var.seqType(), false);
+      final Var local = new Var(var.name, var.seqType(), false, qp.qc, qp.sc, ii);
+      vctx.add(local);
       vctx.bindings.put(local, new VarRef(ii, var));
       var = local;
     }
@@ -105,7 +104,7 @@ public final class LocalVars {
    * @param global mapping for non-local variables
    */
   public void pushContext(final HashMap<Var, Expr> global) {
-    vars.add(new VarContext(global, qp));
+    vars.add(new VarContext(global, qp.sc));
   }
 
   /**

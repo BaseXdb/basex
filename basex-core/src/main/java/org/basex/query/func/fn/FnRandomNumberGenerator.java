@@ -90,7 +90,7 @@ public final class FnRandomNumberGenerator extends StandardFunc {
         }
         return cache.value();
       }
-    }, 1, sc, qctx);
+    }, 1, sc, qctx, info);
   }
 
   /**
@@ -110,6 +110,6 @@ public final class FnRandomNumberGenerator extends StandardFunc {
       public Value value(final QueryContext qc) throws QueryException {
         return result(seed, qc);
       }
-    }, 0, sc, qctx);
+    }, 0, sc, qctx, info);
   }
 }

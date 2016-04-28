@@ -106,11 +106,11 @@ public final class GroupBy extends Clause {
         for(final Spec spec : specs) {
           if(!spec.occluded) {
             final Item key = curr.key[p++];
-            qc.set(spec.var, key == null ? Empty.SEQ : key, info);
+            qc.set(spec.var, key == null ? Empty.SEQ : key);
           }
         }
         final int pl = post.length;
-        for(int i = 0; i < pl; i++) qc.set(post[i], curr.ngv[i].value(), info);
+        for(int i = 0; i < pl; i++) qc.set(post[i], curr.ngv[i].value());
         return true;
       }
 
@@ -140,7 +140,7 @@ public final class GroupBy extends Clause {
               // This enables other non-collation specs to avoid the collision.
               hash = 31 * hash + (atom == null || spec.coll != null ? 0 : atom.hash(info));
             }
-            qc.set(spec.var, atom == null ? Empty.SEQ : atom, info);
+            qc.set(spec.var, atom == null ? Empty.SEQ : atom);
           }
 
           // find the group for this key
@@ -253,7 +253,7 @@ public final class GroupBy extends Clause {
     final int pl = ps.length;
     for(int p = 0; p < pl; p++) {
       final Var old = post[p];
-      ps[p] = scp.newCopyOf(old, qc);
+      ps[p] = scp.addCopy(old, qc);
       vs.put(old.id, ps[p]);
     }
 
@@ -362,7 +362,7 @@ public final class GroupBy extends Clause {
 
     @Override
     public Expr copy(final QueryContext qc, final VarScope scp, final IntObjMap<Var> vs) {
-      final Var v = scp.newCopyOf(var, qc);
+      final Var v = scp.addCopy(var, qc);
       vs.put(var.id, v);
       final Spec spec = new Spec(info, v, expr.copy(qc, scp, vs), coll);
       spec.occluded = occluded;
