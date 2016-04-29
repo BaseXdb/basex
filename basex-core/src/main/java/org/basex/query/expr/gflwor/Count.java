@@ -66,7 +66,7 @@ public final class Count extends Clause {
 
   @Override
   public Count optimize(final QueryContext qc, final VarScope scp) throws QueryException {
-    var.refineType(SeqType.ITR, qc, info);
+    var.refineType(SeqType.ITR, qc);
     return this;
   }
 

@@ -57,9 +57,9 @@ public final class GFLWOR extends ParseExpr {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     Item out = null;
     for(final Eval eval = newEval(); eval.next(qc);) {
-      final Item it = ret.item(qc, ii);
+      final Item it = ret.item(qc, info);
       if(it != null) {
-        if(out != null) throw QueryError.SEQFOUND_X.get(ii, ValueBuilder.concat(out, it));
+        if(out != null) throw QueryError.SEQFOUND_X.get(info, ValueBuilder.concat(out, it));
         out = it;
       }
     }

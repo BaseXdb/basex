@@ -91,7 +91,7 @@ public final class PartFunc extends Arr {
       while(++a < holes[h]) args[a] = exprs[a - h].value(qc);
       vars[h] = scp.addNew(f.argName(holes[h]), null, false, qc, info);
       args[a] = new VarRef(info, vars[h]);
-      vars[h].refineType(ft.argTypes[a], qc, ii);
+      vars[h].refineType(ft.argTypes[a], qc);
     }
     final int al = args.length;
     while(++a < al) args[a] = exprs[a - hl].value(qc);

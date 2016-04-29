@@ -54,18 +54,17 @@ abstract class CName extends CNode {
   /**
    * Returns the atomized value of the constructor.
    * @param qc query context
-   * @param ii input info
    * @return resulting value
    * @throws QueryException query exception
    */
-  final byte[] value(final QueryContext qc, final InputInfo ii) throws QueryException {
+  final byte[] atomValue(final QueryContext qc) throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
     for(final Expr expr : exprs) {
       final Value v = qc.value(expr);
       boolean m = false;
-      for(final Item it : v.atomValue(ii)) {
+      for(final Item it : v.atomValue(info)) {
         if(m) tb.add(' ');
-        tb.add(it.string(ii));
+        tb.add(it.string(info));
         m = true;
       }
     }
@@ -76,20 +75,17 @@ abstract class CName extends CNode {
    * Returns an updated name expression.
    * @param qc query context
    * @param elem element
-   * @param ii input info
    * @return result
    * @throws QueryException query exception
    */
-  final QNm qname(final QueryContext qc, final boolean elem, final InputInfo ii)
-      throws QueryException {
-
+  final QNm qname(final QueryContext qc, final boolean elem) throws QueryException {
     final Item it = checkNoEmpty(name.atomItem(qc, info), AtomType.QNM);
     final Type ip = it.type;
     if(ip == AtomType.QNM) return (QNm) it;
     if(!ip.isStringOrUntyped() || ip == AtomType.URI) throw STRQNM_X_X.get(info, ip, it);
 
     // create and update namespace
-    final byte[] str = it.string(ii);
+    final byte[] str = it.string(info);
     if(XMLToken.isQName(str)) {
       return elem || Token.contains(str, ':') ? new QNm(str, sc) : new QNm(str);
     }

@@ -261,7 +261,7 @@ public final class Window extends Clause {
   @Override
   public Clause optimize(final QueryContext qc, final VarScope sc) throws QueryException {
     final SeqType st = expr.seqType();
-    var.refineType(st.withOcc(Occ.ZERO_MORE), qc, info);
+    var.refineType(st.withOcc(Occ.ZERO_MORE), qc);
     return this;
   }
 

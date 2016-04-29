@@ -119,9 +119,9 @@ public final class For extends ForLet {
     final SeqType tp = expr.seqType();
     final boolean emp = empty && tp.mayBeZero();
     seqType = SeqType.get(tp.type, emp ? Occ.ZERO_ONE : Occ.ONE);
-    var.refineType(seqType, qc, info);
-    if(pos != null) pos.refineType(SeqType.ITR, qc, info);
-    if(score != null) score.refineType(SeqType.DBL, qc, info);
+    var.refineType(seqType, qc);
+    if(pos != null) pos.refineType(SeqType.ITR, qc);
+    if(score != null) score.refineType(SeqType.DBL, qc);
     size = emp ? -1 : 1;
     var.size = size;
     var.data = expr.data();

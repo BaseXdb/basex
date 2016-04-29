@@ -14,6 +14,6 @@ import org.basex.util.*;
 public final class MapRemove extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return toMap(exprs[0], qc).delete(toAtomItem(exprs[1], qc), ii);
+    return toMap(exprs[0], qc).delete(toAtomItem(exprs[1], qc), info);
   }
 }

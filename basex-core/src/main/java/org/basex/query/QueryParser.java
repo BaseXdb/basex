@@ -429,7 +429,7 @@ public class QueryParser extends InputParser {
         ann = new Ann(info(), Annotation.UPDATING);
       } else if(consume('%')) {
         skipWs();
-        final InputInfo info = info();
+        final InputInfo ii = info();
         final QNm name = eQName(QNAME_X, XQ_URI);
 
         final ItemList items = new ItemList();
@@ -450,24 +450,24 @@ public class QueryParser extends InputParser {
           final byte[] uri = name.uri();
           if(NSGlobal.prefix(uri).length != 0 && !eq(uri, LOCAL_URI, ERROR_URI)) {
             throw (NSGlobal.reserved(uri) ? ANNWHICH_X_X : BASX_ANNOT_X_X).get(
-                info, '%', name.string());
+                ii, '%', name.string());
           }
-          ann = new Ann(info, name, items.finish());
+          ann = new Ann(ii, name, items.finish());
 
         } else {
           // check if annotation is specified more than once
-          if(sig.single && anns.contains(sig)) throw BASX_TWICE_X_X.get(info, '%', sig.id());
+          if(sig.single && anns.contains(sig)) throw BASX_TWICE_X_X.get(ii, '%', sig.id());
 
           final long arity = items.size();
           if(arity < sig.minMax[0] || arity > sig.minMax[1])
-            throw BASX_ANNNUM_X_X_X.get(info, sig, arity, arity == 1 ? "" : "s");
+            throw BASX_ANNNUM_X_X_X.get(ii, sig, arity, arity == 1 ? "" : "s");
           final int al = sig.args.length;
           for(int a = 0; a < arity; a++) {
             final SeqType st = sig.args[Math.min(al - 1, a)];
             final Item it = items.get(a);
-            if(!st.instance(it)) throw BASX_ANNTYPE_X_X_X.get(info, sig, st, it.seqType());
+            if(!st.instance(it)) throw BASX_ANNTYPE_X_X_X.get(ii, sig, st, it.seqType());
           }
-          ann = new Ann(info, sig, items.finish());
+          ann = new Ann(ii, sig, items.finish());
         }
       } else {
         break;
@@ -1063,8 +1063,7 @@ public class QueryParser extends InputParser {
           // sequence isn't compatible with the type and can't be assigned
           final Var nv = localVars.add(new Var(v.var.name, null, false, qc, sc, v.var.info));
           // [LW] should be done everywhere
-          if(v.seqType().one())
-            nv.refineType(SeqType.get(v.seqType().type, Occ.ONE_MORE), qc, info());
+          if(v.seqType().one()) nv.refineType(SeqType.get(v.seqType().type, Occ.ONE_MORE), qc);
           ngrp[i] = nv;
           curr.put(nv.name.id(), nv);
         }

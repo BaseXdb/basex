@@ -82,7 +82,7 @@ public final class Let extends ForLet {
   @Override
   public Clause compile(final QueryContext qc, final VarScope scp) throws QueryException {
     final Clause c = super.compile(qc, scp);
-    var.refineType(scoring ? SeqType.DBL : expr.seqType(), qc, info);
+    var.refineType(scoring ? SeqType.DBL : expr.seqType(), qc);
     return c;
   }
 
@@ -97,10 +97,10 @@ public final class Let extends ForLet {
     }
 
     seqType = scoring ? SeqType.DBL : expr.seqType();
-    var.refineType(seqType, qc, info);
+    var.refineType(seqType, qc);
     if(var.checksType() && expr.isValue()) {
       expr = var.checkType((Value) expr, qc, true);
-      var.refineType(expr.seqType(), qc, info);
+      var.refineType(expr.seqType(), qc);
     }
     size = scoring ? 1 : expr.size();
     var.size = size;
@@ -133,7 +133,7 @@ public final class Let extends ForLet {
    */
   Expr inlineExpr(final QueryContext qc, final VarScope scp) throws QueryException {
     return scoring ? Function._FT_SCORE.get(scp.sc, info, expr).optimize(qc, scp)
-                   : var.checked(expr, qc, scp, info);
+                   : var.checked(expr, qc, scp);
   }
 
   @Override

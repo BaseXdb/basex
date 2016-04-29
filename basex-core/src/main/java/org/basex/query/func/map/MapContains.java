@@ -14,6 +14,6 @@ import org.basex.util.*;
 public final class MapContains extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Bln.get(toMap(exprs[0], qc).contains(toAtomItem(exprs[1], qc), ii));
+    return Bln.get(toMap(exprs[0], qc).contains(toAtomItem(exprs[1], qc), info));
   }
 }

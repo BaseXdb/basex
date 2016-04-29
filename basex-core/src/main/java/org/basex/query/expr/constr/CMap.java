@@ -39,12 +39,12 @@ public final class CMap extends Arr {
     Map map = Map.EMPTY;
     final int es = exprs.length;
     for(int e = 0; e < es; e += 2) {
-      final Value key = exprs[e].atomValue(qc, ii);
-      if(!(key instanceof Item)) throw SEQFOUND_X.get(ii, key);
+      final Value key = exprs[e].atomValue(qc, info);
+      if(!(key instanceof Item)) throw SEQFOUND_X.get(info, key);
       final Item k = (Item) key;
       final Value v = qc.value(exprs[e + 1]);
-      if(map.contains(k, ii)) throw MAPDUPLKEY_X_X_X.get(ii, k, map.get(k, ii), v);
-      map = map.put(k, v, ii);
+      if(map.contains(k, info)) throw MAPDUPLKEY_X_X_X.get(info, k, map.get(k, info), v);
+      map = map.put(k, v, info);
     }
     return map;
   }

@@ -32,7 +32,7 @@ public final class UserGrant extends UserFn {
         throw USER_LOCAL.get(info);
     }
 
-    qc.updates().add(new Grant(user, perms, patterns, qc, ii), qc);
+    qc.updates().add(new Grant(user, perms, patterns, qc, info), qc);
     return null;
   }
 

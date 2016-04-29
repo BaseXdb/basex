@@ -397,23 +397,23 @@ public final class QueryResources {
    * @param input query input
    * @param single expect single document
    * @param baseIO base URI
-   * @param info input info
+   * @param ii input info
    * @return data reference
    * @throws QueryException query exception
    */
   private Data create(final QueryInput input, final boolean single, final IO baseIO,
-      final InputInfo info) throws QueryException {
+      final InputInfo ii) throws QueryException {
 
     // check if new databases can be created
     final Context context = qc.context;
 
     // do not check input if no read permissions are given
     if(!context.user().has(Perm.READ))
-      throw BXXQ_PERM_X.get(info, Util.info(Text.PERM_REQUIRED_X, Perm.READ));
+      throw BXXQ_PERM_X.get(ii, Util.info(Text.PERM_REQUIRED_X, Perm.READ));
 
     // check if input is an existing file
-    final IO source = checkPath(input, baseIO, info);
-    if(single && source.isDir()) throw WHICHRES_X.get(info, baseIO);
+    final IO source = checkPath(input, baseIO, ii);
+    if(single && source.isDir()) throw WHICHRES_X.get(ii, baseIO);
 
     // overwrite parsing options with default values
     try {
@@ -422,7 +422,7 @@ public final class QueryResources {
       return addData(CreateDB.create(source.dbname(),
           new DirParser(source, opts), context, opts, mem));
     } catch(final IOException ex) {
-      throw IOERR_X.get(info, ex);
+      throw IOERR_X.get(ii, ex);
     } finally {
       input.path = "";
     }
@@ -432,18 +432,18 @@ public final class QueryResources {
    * Returns a single document node for the specified data reference.
    * @param dt data reference
    * @param qi query input
-   * @param info input info
+   * @param ii input info
    * @return document node
    * @throws QueryException query exception
    */
-  private static DBNode doc(final Data dt, final QueryInput qi, final InputInfo info)
+  private static DBNode doc(final Data dt, final QueryInput qi, final InputInfo ii)
       throws QueryException {
 
     // get all document nodes of the specified database
     final IntList docs = dt.resources.docs(qi.path);
     // ensure that a single document was filtered
     if(docs.size() == 1) return new DBNode(dt, docs.get(0), Data.DOC);
-    throw (docs.isEmpty() ? BXDB_NODOC_X : BXDB_SINGLE_X).get(info, qi.original);
+    throw (docs.isEmpty() ? BXDB_NODOC_X : BXDB_SINGLE_X).get(ii, qi.original);
   }
 
   /**

@@ -90,11 +90,11 @@ final class RestXqPathMatcher {
   /**
    * Parses a path template.
    * @param path path template string to be parsed
-   * @param info input info
+   * @param ii input info
    * @return parsed path template
    * @throws QueryException if given template is invalid
    */
-  static RestXqPathMatcher parse(final String path, final InputInfo info) throws QueryException {
+  static RestXqPathMatcher parse(final String path, final InputInfo ii) throws QueryException {
     if(path.isEmpty()) return EMPTY;
 
     final ArrayList<QNm> vars = new ArrayList<>();
@@ -115,7 +115,7 @@ final class RestXqPathMatcher {
         decodeAndEscape(literals, result);
 
         // variable
-        if(!i.hasNext() || i.nextNonWS() != '$') throw error(info, INV_TEMPLATE, path);
+        if(!i.hasNext() || i.nextNonWS() != '$') throw error(ii, INV_TEMPLATE, path);
 
         // default variable regular expression
         regex.append("[^/]+?");
@@ -127,7 +127,7 @@ final class RestXqPathMatcher {
           if(ch == '=') {
             regex.setLength(0);
             addRegex(i, regex);
-            if(regex.length() == 0) throw error(info, INV_TEMPLATE, path);
+            if(regex.length() == 0) throw error(ii, INV_TEMPLATE, path);
             break;
           } else if(ch == '{') {
             ++braces;
@@ -140,7 +140,7 @@ final class RestXqPathMatcher {
         }
 
         final byte[] var = variable.toArray();
-        if(!XMLToken.isQName(var)) throw error(info, INV_VARNAME, variable);
+        if(!XMLToken.isQName(var)) throw error(ii, INV_VARNAME, variable);
         vars.add(new QNm(var));
         variable.reset();
         varsPos.set(segment);
@@ -202,13 +202,13 @@ final class RestXqPathMatcher {
 
   /**
    * Creates a query exception.
-   * @param info input info
+   * @param ii input info
    * @param msg exception message
    * @param e text extensions
    * @return query exception
    */
-  private static QueryException error(final InputInfo info, final String msg, final Object... e) {
-    return QueryError.BASX_RESTXQ_X.get(info, Util.info(msg, e));
+  private static QueryException error(final InputInfo ii, final String msg, final Object... e) {
+    return QueryError.BASX_RESTXQ_X.get(ii, Util.info(msg, e));
   }
 
   /** Character iterator. */

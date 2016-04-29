@@ -45,7 +45,7 @@ public final class DbRename extends DbAccess {
       if(src == null || trg == null) throw BXDB_PATH_X.get(info, src);
       if(!src.eq(trg)) {
         rename(data, src, trg, qc);
-        updates.add(new DBDelete(data, source, ii), qc);
+        updates.add(new DBDelete(data, source, info), qc);
       }
     }
     return null;

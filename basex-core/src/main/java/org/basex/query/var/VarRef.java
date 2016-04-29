@@ -48,7 +48,7 @@ public final class VarRef extends ParseExpr {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return qc.get(var).item(qc, ii);
+    return qc.get(var).item(qc, info);
   }
 
   @Override

@@ -138,7 +138,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     for(final Entry<Var, Expr> e : global.entrySet()) {
       final Expr bound = e.getValue().compile(qc, scp);
       e.setValue(bound);
-      e.getKey().refineType(bound.seqType(), qc, info);
+      e.getKey().refineType(bound.seqType(), qc);
     }
 
     try {
@@ -294,7 +294,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       final LinkedList<Clause> cls = new LinkedList<>();
       for(final Entry<Var, Expr> e : global.entrySet())
         cls.add(new Let(e.getKey(), e.getValue().value(qc), false));
-      body = new GFLWOR(ii, cls, expr);
+      body = new GFLWOR(info, cls, expr);
     }
 
     final SeqType argType = body.seqType();

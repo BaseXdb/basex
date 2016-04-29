@@ -42,7 +42,7 @@ public final class CAttr extends CName {
 
   @Override
   public FAttr item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    QNm nm = qname(qc, false, ii);
+    QNm nm = qname(qc, false);
     final byte[] cp = nm.prefix();
     if(comp) {
       final byte[] cu = nm.uri();
@@ -57,7 +57,7 @@ public final class CAttr extends CName {
     }
     if(!nm.hasURI() && nm.hasPrefix()) throw INVPREF_X.get(info, nm);
 
-    byte[] val = value(qc, ii);
+    byte[] val = atomValue(qc);
     if(eq(cp, XML) && eq(nm.local(), ID)) val = normalize(val);
 
     return new FAttr(nm, val);

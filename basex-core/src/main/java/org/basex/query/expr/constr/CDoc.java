@@ -32,13 +32,13 @@ public final class CDoc extends CNode {
   @Override
   public FDoc item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // create document node and add children
-    final Constr c = new Constr(ii, sc);
+    final Constr c = new Constr(info, sc);
     final FDoc doc = new FDoc(c.children, Token.EMPTY);
     c.add(qc, exprs);
-    if(c.errAtt != null) throw DOCATTS_X.get(ii, c.errAtt);
-    if(!c.atts.isEmpty()) throw DOCATTS_X.get(ii, c.atts.get(0).name());
-    if(c.errNS != null) throw DOCNS_X.get(ii, c.errNS);
-    if(!c.nspaces.isEmpty()) throw DOCNS_X.get(ii, c.nspaces.name(0));
+    if(c.errAtt != null) throw DOCATTS_X.get(info, c.errAtt);
+    if(!c.atts.isEmpty()) throw DOCATTS_X.get(info, c.atts.get(0).name());
+    if(c.errNS != null) throw DOCNS_X.get(info, c.errNS);
+    if(!c.nspaces.isEmpty()) throw DOCNS_X.get(info, c.nspaces.name(0));
     return doc.optimize();
   }
 

@@ -54,7 +54,7 @@ public abstract class ParseExpr extends Expr {
     if(n != null) {
       final ValueBuilder vb = new ValueBuilder().add(it).add(n);
       if(ir.next() != null) vb.add(Str.get(DOTS));
-      throw SEQFOUND_X.get(ii, vb.value());
+      throw SEQFOUND_X.get(info, vb.value());
     }
     return it;
   }
@@ -70,13 +70,13 @@ public abstract class ParseExpr extends Expr {
 
   @Override
   public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return value(qc).atomValue(ii);
+    return value(qc).atomValue(info);
   }
 
   @Override
   public final Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item it1 = item(qc, ii);
-    return it1 == null ? null : it1.atomItem(ii);
+    final Item it1 = item(qc, info);
+    return it1 == null ? null : it1.atomItem(info);
   }
 
   /**
@@ -104,7 +104,7 @@ public abstract class ParseExpr extends Expr {
         if(n != null) {
           final ValueBuilder vb = new ValueBuilder().add(it).add(n);
           if(ir.next() != null) vb.add(Str.get(DOTS));
-          throw EBV_X.get(ii, vb.value());
+          throw EBV_X.get(info, vb.value());
         }
       }
     }

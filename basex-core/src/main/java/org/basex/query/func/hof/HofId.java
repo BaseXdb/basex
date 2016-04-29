@@ -28,7 +28,7 @@ public class HofId extends StandardFunc {
 
   @Override
   public final Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return exprs[0].item(qc, ii);
+    return exprs[0].item(qc, info);
   }
 
   @Override

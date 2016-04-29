@@ -14,6 +14,6 @@ import org.basex.util.*;
 public final class CryptoValidateSignature extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return new DigitalSignature(ii).validateSignature(toNode(exprs[0], qc));
+    return new DigitalSignature(info).validateSignature(toNode(exprs[0], qc));
   }
 }

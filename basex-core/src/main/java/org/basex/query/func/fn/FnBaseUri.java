@@ -29,7 +29,7 @@ public final class FnBaseUri extends StandardFunc {
     do {
       if(n == null) return sc.baseURI().resolve(base, info);
       final Uri bu = Uri.uri(n.baseURI(), false);
-      if(!bu.isValid()) throw INVURI_X.get(ii, n.baseURI());
+      if(!bu.isValid()) throw INVURI_X.get(info, n.baseURI());
       base = bu.resolve(base, info);
       if(n.type == NodeType.DOC && n instanceof DBNode) break;
       n = n.parent();

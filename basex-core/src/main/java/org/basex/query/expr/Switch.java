@@ -132,7 +132,7 @@ public final class Switch extends ParseExpr {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return getCase(qc).item(qc, ii);
+    return getCase(qc).item(qc, info);
   }
 
   @Override

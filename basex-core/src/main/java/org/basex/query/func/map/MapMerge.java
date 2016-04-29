@@ -20,7 +20,7 @@ public final class MapMerge extends StandardFunc {
     final Iter maps = exprs[0].iter(qc);
     for(Item it; (it = maps.next()) != null;) {
       final Map m = toMap(it);
-      map = map == Map.EMPTY ? m : map.addAll(m, ii);
+      map = map == Map.EMPTY ? m : map.addAll(m, info);
     }
     return map;
   }

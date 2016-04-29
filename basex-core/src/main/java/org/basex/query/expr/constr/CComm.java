@@ -32,13 +32,13 @@ public final class CComm extends CNode {
 
   @Override
   public FComm item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter iter = exprs[0].atomIter(qc, ii);
+    final Iter iter = exprs[0].atomIter(qc, info);
 
     final TokenBuilder tb = new TokenBuilder();
     boolean more = false;
     for(Item it; (it = iter.next()) != null;) {
       if(more) tb.add(' ');
-      tb.add(it.string(ii));
+      tb.add(it.string(info));
       more = true;
     }
     return new FComm(FComm.parse(tb.finish(), info));

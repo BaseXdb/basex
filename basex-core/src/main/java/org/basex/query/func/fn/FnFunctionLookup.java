@@ -20,8 +20,8 @@ public final class FnFunctionLookup extends StandardFunc {
     final long arity = toLong(exprs[1], qc);
     if(arity >= 0 && arity <= Integer.MAX_VALUE) {
       try {
-        final Expr lit = Functions.getLiteral(name, (int) arity, qc, sc, ii, true);
-        if(lit != null) return lit.item(qc, ii);
+        final Expr lit = Functions.getLiteral(name, (int) arity, qc, sc, info, true);
+        if(lit != null) return lit.item(qc, info);
       } catch(final QueryException ignore) { }
     }
     // function not found

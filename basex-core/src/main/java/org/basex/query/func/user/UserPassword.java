@@ -16,7 +16,7 @@ public final class UserPassword extends UserFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     checkAdmin(qc);
-    qc.updates().add(new Password(toUser(0, qc), toString(1, qc), ii, qc), qc);
+    qc.updates().add(new Password(toUser(0, qc), toString(1, qc), info, qc), qc);
     return null;
   }
 

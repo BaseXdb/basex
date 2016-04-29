@@ -375,8 +375,8 @@ public final class DecFormatter extends FormatUtil {
 
     // Rule 3: percent/permille
     ANum num = item;
-    if(pic.pc) num = (ANum) Calc.MULT.ev(ii, num, Int.get(100));
-    if(pic.pm) num = (ANum) Calc.MULT.ev(ii, num, Int.get(1000));
+    if(pic.pc) num = (ANum) Calc.MULT.ev(num, Int.get(100), ii);
+    if(pic.pm) num = (ANum) Calc.MULT.ev(num, Int.get(1000), ii);
 
     if(Double.isInfinite(num.dbl(ii))) {
       // Rule 4: infinity
@@ -398,7 +398,7 @@ public final class DecFormatter extends FormatUtil {
         exp = scl - pic.min[0];
         if(exp != 0) {
           final BigDecimal n = BigDecimal.TEN.pow(Math.abs(exp));
-          num = (ANum) Calc.MULT.ev(ii, num, Dec.get(exp > 0 ? BigDecimal.ONE.divide(n) : n));
+          num = (ANum) Calc.MULT.ev(num, Dec.get(exp > 0 ? BigDecimal.ONE.divide(n) : n), ii);
         }
       }
       num = num.round(pic.maxFrac, true).abs();

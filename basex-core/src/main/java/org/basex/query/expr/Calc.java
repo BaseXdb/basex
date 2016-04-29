@@ -20,7 +20,7 @@ public enum Calc {
   /** Addition. */
   PLUS("+") {
     @Override
-    public Item ev(final InputInfo ii, final Item it1, final Item it2) throws QueryException {
+    public Item ev(final Item it1, final Item it2, final InputInfo ii) throws QueryException {
       final Type t1 = it1.type, t2 = it2.type;
       final boolean n1 = t1.isNumberOrUntyped(), n2 = t2.isNumberOrUntyped();
       if(n1 ^ n2) throw numberError(n1 ? it2 : it1, ii);
@@ -58,7 +58,7 @@ public enum Calc {
   /** Subtraction. */
   MINUS("-") {
     @Override
-    public Item ev(final InputInfo ii, final Item it1, final Item it2) throws QueryException {
+    public Item ev(final Item it1, final Item it2, final InputInfo ii) throws QueryException {
       final Type t1 = it1.type, t2 = it2.type;
       final boolean n1 = t1.isNumberOrUntyped(), n2 = t2.isNumberOrUntyped();
       if(n1 ^ n2) throw numberError(n1 ? it2 : it1, ii);
@@ -94,7 +94,7 @@ public enum Calc {
   /** Multiplication. */
   MULT("*") {
     @Override
-    public Item ev(final InputInfo ii, final Item it1, final Item it2) throws QueryException {
+    public Item ev(final Item it1, final Item it2, final InputInfo ii) throws QueryException {
       final Type t1 = it1.type, t2 = it2.type;
       if(t1 == YMD) {
         if(it2 instanceof ANum) return new YMDur((Dur) it1, it2.dbl(ii), true, ii);
@@ -137,7 +137,7 @@ public enum Calc {
   /** Division. */
   DIV("div") {
     @Override
-    public Item ev(final InputInfo ii, final Item it1, final Item it2) throws QueryException {
+    public Item ev(final Item it1, final Item it2, final InputInfo ii) throws QueryException {
       final Type t1 = it1.type, t2 = it2.type;
       if(t1 == t2) {
         if(t1 == YMD) {
@@ -177,7 +177,7 @@ public enum Calc {
   /** Integer division. */
   IDIV("idiv") {
     @Override
-    public Item ev(final InputInfo ii, final Item it1, final Item ti2) throws QueryException {
+    public Item ev(final Item it1, final Item ti2, final InputInfo ii) throws QueryException {
       checkNum(ii, it1, ti2);
       final Type t = type(it1.type, ti2.type);
       if(t == DBL || t == FLT) {
@@ -208,7 +208,7 @@ public enum Calc {
   /** Modulo. */
   MOD("mod") {
     @Override
-    public Item ev(final InputInfo ii, final Item it1, final Item it2) throws QueryException {
+    public Item ev(final Item it1, final Item it2, final InputInfo ii) throws QueryException {
       checkNum(ii, it1, it2);
       final Type t = type(it1.type, it2.type);
       if(t == DBL) return Dbl.get(it1.dbl(ii) % it2.dbl(ii));
@@ -244,13 +244,13 @@ public enum Calc {
 
   /**
    * Performs the calculation.
-   * @param ii input info
    * @param it1 first item
    * @param it2 second item
+   * @param ii input info
    * @return result type
    * @throws QueryException query exception
    */
-  public abstract Item ev(final InputInfo ii, final Item it1, final Item it2) throws QueryException;
+  public abstract Item ev(final Item it1, final Item it2, final InputInfo ii) throws QueryException;
 
   /**
    * Returns the numeric type with the highest precedence.

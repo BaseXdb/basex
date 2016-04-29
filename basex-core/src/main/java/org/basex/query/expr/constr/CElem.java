@@ -62,7 +62,7 @@ public final class CElem extends CName {
       for(int i = 0; i < nl; i++) ns.add(nspaces.name(i), nspaces.value(i));
 
       // create and check QName
-      final QNm nm = qname(qc, true, ii);
+      final QNm nm = qname(qc, true);
       final byte[] cp = nm.prefix(), cu = nm.uri();
       if(eq(cp, XML) ^ eq(cu, XML_URI)) throw CEXML.get(info, cu, cp);
       if(eq(cu, XMLNS_URI)) throw CEINV_X.get(info, cu);
@@ -87,7 +87,7 @@ public final class CElem extends CName {
       }
 
       // create node
-      final Constr constr = new Constr(ii, sc);
+      final Constr constr = new Constr(info, sc);
       final FElem node = new FElem(nm, ns, constr.children, constr.atts);
 
       // add child and attribute nodes

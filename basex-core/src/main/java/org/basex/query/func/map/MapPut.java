@@ -19,6 +19,6 @@ public final class MapPut extends StandardFunc {
     final Map map = toMap(exprs[0], qc);
     final Item key = toAtomItem(exprs[1], qc);
     final Value val = qc.value(exprs[2]);
-    return map.put(key, val, ii);
+    return map.put(key, val, info);
   }
 }

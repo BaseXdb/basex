@@ -44,7 +44,7 @@ public final class CTxt extends CNode {
     final Iter iter = qc.iter(exprs[0]);
     for(Item it; (it = iter.next()) != null;) {
       if(more) tb.add(' ');
-      tb.add(it.string(ii));
+      tb.add(it.string(info));
       more = true;
     }
     return more ? new FTxt(tb.finish()) : null;

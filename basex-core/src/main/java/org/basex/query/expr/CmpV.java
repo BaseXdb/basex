@@ -214,9 +214,9 @@ public final class CmpV extends Cmp {
 
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item it1 = exprs[0].atomItem(qc, ii);
+    final Item it1 = exprs[0].atomItem(qc, info);
     if(it1 == null) return null;
-    final Item it2 = exprs[1].atomItem(qc, ii);
+    final Item it2 = exprs[1].atomItem(qc, info);
     if(it2 == null) return null;
     if(it1.comparable(it2)) return Bln.get(op.eval(it1, it2, coll, sc, info));
 

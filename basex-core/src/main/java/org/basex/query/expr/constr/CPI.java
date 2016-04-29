@@ -42,13 +42,13 @@ public final class CPI extends CName {
     } else {
       if(!ip.isStringOrUntyped() || ip == AtomType.URI) throw CPIWRONG_X_X.get(info, ip, it);
 
-      final byte[] nm = trim(it.string(ii));
+      final byte[] nm = trim(it.string(info));
       if(eq(lc(nm), XML)) throw CPIXML_X.get(info, nm);
       if(!XMLToken.isNCName(nm)) throw CPIINVAL_X.get(info, nm);
       qnm = new QNm(nm);
     }
 
-    byte[] v = value(qc, ii);
+    byte[] v = atomValue(qc);
     int i = -1;
     final int vl = v.length;
     while(++i < vl && v[i] >= 0 && v[i] <= ' ');

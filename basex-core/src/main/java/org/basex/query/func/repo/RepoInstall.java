@@ -15,7 +15,7 @@ public final class RepoInstall extends RepoFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     checkCreate(qc);
-    new RepoManager(qc.context, ii).install(Token.string(toToken(exprs[0], qc)));
+    new RepoManager(qc.context, info).install(Token.string(toToken(exprs[0], qc)));
     return null;
   }
 }

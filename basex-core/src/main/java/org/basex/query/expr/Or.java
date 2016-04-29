@@ -93,7 +93,7 @@ public final class Or extends Logical {
       boolean f = false;
       for(final Expr expr : exprs) {
         final Item it = expr.ebv(qc, info);
-        f |= it.bool(ii);
+        f |= it.bool(info);
         s += it.score();
       }
       return Bln.get(f, Scoring.avg(s, exprs.length));
@@ -101,7 +101,7 @@ public final class Or extends Logical {
 
     // standard evaluation
     for(final Expr expr : exprs) {
-      if(expr.ebv(qc, info).bool(ii)) return Bln.TRUE;
+      if(expr.ebv(qc, info).bool(info)) return Bln.TRUE;
     }
     return Bln.FALSE;
   }

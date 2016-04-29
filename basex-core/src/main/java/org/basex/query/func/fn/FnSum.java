@@ -35,15 +35,15 @@ public final class FnSum extends Aggr {
       final long l = bi.longValue();
       // check if result is small enough to be represented as long value
       if(bi.equals(BigInteger.valueOf(l))) return Int.get(l);
-      throw RANGE_X.get(ii, bi);
+      throw RANGE_X.get(info, bi);
     }
 
-    final Iter iter = exprs[0].atomIter(qc, ii);
+    final Iter iter = exprs[0].atomIter(qc, info);
     final Item it = iter.next();
     if(it != null) return sum(iter, it, false);
 
     // return default item
-    return exprs.length == 2 ? exprs[1].atomItem(qc, ii) : Int.get(0);
+    return exprs.length == 2 ? exprs[1].atomItem(qc, info) : Int.get(0);
   }
 
   @Override

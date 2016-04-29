@@ -14,7 +14,7 @@ import org.basex.util.*;
 public final class FnAvg extends Aggr {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter iter = exprs[0].atomIter(qc, ii);
+    final Iter iter = exprs[0].atomIter(qc, info);
     final Item it = iter.next();
     return it == null ? null : sum(iter, it, true);
   }

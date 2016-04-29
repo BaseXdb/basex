@@ -14,7 +14,7 @@ import org.basex.util.*;
 public final class CryptoHmac extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return new Encryption(ii).hmac(toToken(exprs[0], qc), toToken(exprs[1], qc),
+    return new Encryption(info).hmac(toToken(exprs[0], qc), toToken(exprs[1], qc),
         toToken(exprs[2], qc), exprs.length == 4 ? toToken(exprs[3], qc) : Token.EMPTY);
   }
 }

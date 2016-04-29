@@ -220,7 +220,7 @@ public final class GroupBy extends Clause {
     final int pl = preExpr.length;
     for(int p = 0; p < pl; p++) {
       final SeqType it = preExpr[p].seqType();
-      post[p].refineType(it.withOcc(it.mayBeZero() ? Occ.ZERO_MORE : Occ.ONE_MORE), qc, info);
+      post[p].refineType(it.withOcc(it.mayBeZero() ? Occ.ZERO_MORE : Occ.ONE_MORE), qc);
     }
     return this;
   }
@@ -357,7 +357,7 @@ public final class GroupBy extends Clause {
 
     @Override
     public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-      return expr.item(qc, ii);
+      return expr.item(qc, info);
     }
 
     @Override
