@@ -51,7 +51,7 @@ final class RestXqModule {
       final String name = file.name();
       for(final StaticFunc sf : qc.funcs.funcs()) {
         // only add functions that are defined in the same module (file)
-        if(name.equals(new IOFile(sf.info.path()).name())) {
+        if(sf.expr != null && name.equals(new IOFile(sf.info.path()).name())) {
           final RestXqFunction rxf = new RestXqFunction(sf, qc, this);
           if(rxf.parse(ctx)) functions.add(rxf);
         }
@@ -96,7 +96,11 @@ final class RestXqModule {
     // create new XQuery instance
     final Context ctx = http.context(false);
     try(final QueryContext qc = qc(ctx)) {
-      final RestXqFunction rxf = new RestXqFunction(find(qc, func.function), qc, this);
+      final StaticFunc sf = find(qc, func.function);
+      // will only happen if file has been swapped between caching and parsing
+      if(sf == null) throw HTTPCode.NO_XQUERY.get();
+
+      final RestXqFunction rxf = new RestXqFunction(sf, qc, this);
       rxf.parse(ctx);
       RestXqResponse.create(rxf, qc, http, error);
     }

@@ -25,7 +25,7 @@ public abstract class StaticScope extends ExprInfo implements Scope {
   /** Input info. */
   public final InputInfo info;
 
-  /** Root expression of this declaration. */
+  /** Root expression of this declaration ({@code null} if this is an external function). */
   public Expr expr;
   /** Compilation flag. */
   protected boolean compiled;
