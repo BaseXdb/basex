@@ -181,10 +181,8 @@ public final class FnParseIetfDate extends StandardFunc {
      * @return success flag
      */
     private boolean daynum() {
-      if(!digit(curr())) return false;
-      final int d = number();
-      day = digit(curr()) ? d * 10 + number() : d;
-      return true;
+      day = oneOrTwoDigits();
+      return day != -1;
     }
 
     /**
@@ -230,10 +228,8 @@ public final class FnParseIetfDate extends StandardFunc {
      * @return success flag
      */
     private boolean hours() {
-      final int d = twoDigits();
-      if(d == -1) return false;
-      hours = d;
-      return true;
+      hours = oneOrTwoDigits();
+      return hours != -1;
     }
 
     /**
@@ -241,10 +237,8 @@ public final class FnParseIetfDate extends StandardFunc {
      * @return success flag
      */
     private boolean minutes() {
-      final int d = twoDigits();
-      if(d == -1) return false;
-      minutes = d;
-      return true;
+      minutes = twoDigits();
+      return minutes != -1;
     }
 
     /**
@@ -308,14 +302,35 @@ public final class FnParseIetfDate extends StandardFunc {
      * @throws QueryException query exception
      */
     private boolean tzoffset() throws QueryException {
-      final int m = consume('-') ? -1 : 1;
-      if(m == 1 && !consume('+')) return false;
-      final int d = twoDigits();
-      if(d == -1) throw error("timezone digits");
-      zone = m * d * 60;
-      consume(':');
-      final int n = twoDigits();
-      if(n != -1) zone += m * n;
+      final int s = consume('-') ? -1 : 1;
+      if(s == 1 && !consume('+')) return false;
+      if(!digit(curr())) throw error("timezone digits");
+
+      int h = number(), m = 0;
+      if(consume(':')) {
+        final int n = twoDigits();
+        if(n != -1) m = n;
+      } else if(digit(curr())) {
+        final int n = number();
+        if(digit(curr())) {
+          final int n2 = number();
+          if(digit(curr())) {
+            h = h * 10 + n;
+            m = n2 * 10 + number();
+          } else {
+            m = n * 10 + n2;
+          }
+        } else {
+          h = h * 10 + n;
+          if(consume(':')) {
+            final int n2 = twoDigits();
+            if(n2 != -1) m = n2;
+          }
+        }
+      }
+      if(m >= 60) throw QueryError.IETF_INV_X.get(info, m);
+
+      zone = s * (h * 60 + m);
       return true;
     }
 
@@ -325,6 +340,16 @@ public final class FnParseIetfDate extends StandardFunc {
      */
     private int twoDigits() {
       return digit(curr()) && digit(next()) ? number() * 10 + number() : -1;
+    }
+
+    /**
+     * Parses one or two digits.
+     * @return number or {@code -1}
+     */
+    private int oneOrTwoDigits() {
+      if(!digit(curr())) return -1;
+      final int d = number();
+      return digit(curr()) ? d * 10 + number() : d;
     }
 
     /**
