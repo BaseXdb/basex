@@ -84,7 +84,7 @@ public final class StaticContext {
 
   /**
    * Returns an IO representation of the static base URI or {@code null}.
-   * @return IO reference
+   * @return IO reference (can be {@code null})
    */
   public IO baseIO() {
     return baseURI == Uri.EMPTY ? null : IO.get(string(baseURI.string()));

@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.query.func.*;
 import org.junit.*;
 import org.junit.Test;
 
@@ -90,7 +91,7 @@ public final class StoreTest extends SandboxTest {
           execute(new CreateDB(NAME));
           final String input = "<a>0</a>";
           execute(new Add("a.xml", input));
-          final String query = "doc('" + NAME + "')//*[text()='0']";
+          final String query = Function._DB_OPEN.args(NAME) + "//*[text()='0']";
           assertEquals(input, query(query));
           execute(new Close());
           assertEquals(input, query(query));

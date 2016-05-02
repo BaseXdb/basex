@@ -59,7 +59,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
   @Test
   public void insertIntoShiftPreValues() {
     create(12);
-    query("insert node <b xmlns:ns='A'/> into doc('d12')/*:a/*:b");
+    query("insert node <b xmlns:ns='A'/> into db:open('d12')/*:a/*:b");
     assertEquals(NL +
         "  Pre[3] xmlns:ns=\"A\"" + NL +
         "  Pre[4] xmlns=\"B\"",
@@ -73,7 +73,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
   @Test
   public void insertIntoShiftPreValues2() {
     create(13);
-    query("insert node <c/> as first into doc('d13')/a");
+    query("insert node <c/> as first into db:open('d13')/a");
     assertEquals(NL +
         "  Pre[3] xmlns=\"A\"",
         context.data().nspaces.toString());
@@ -86,7 +86,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
   @Test
   public void insertIntoShiftPreValues3() {
     create(14);
-    query("insert node <n xmlns='D'/> into doc('d14')/*:a/*:b");
+    query("insert node <n xmlns='D'/> into db:open('d14')/*:a/*:b");
     assertEquals(NL +
         "  Pre[1] xmlns=\"A\"" + NL +
         "    Pre[2] xmlns=\"B\"" + NL +
@@ -102,7 +102,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
   @Test
   public void deleteShiftPreValues() {
     create(12);
-    query("delete node doc('d12')/a/b");
+    query("delete node db:open('d12')/a/b");
     assertEquals(NL +
         "  Pre[2] xmlns=\"B\"",
         context.data().nspaces.toString());
@@ -115,7 +115,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
   @Test
   public void deleteShiftPreValues2() {
     create(14);
-    query("delete node doc('d14')/*:a/*:b");
+    query("delete node db:open('d14')/*:a/*:b");
     assertEquals(NL +
         "  Pre[1] xmlns=\"A\"" + NL +
         "    Pre[2] xmlns=\"C\"",
@@ -129,7 +129,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
   @Test
   public void deleteShiftPreValues3() {
     create(15);
-    query("delete node doc('d15')/*:a/*:c");
+    query("delete node db:open('d15')/*:a/*:c");
     assertEquals(NL +
         "  Pre[1] xmlns=\"A\"" + NL +
         "    Pre[2] xmlns=\"B\"" + NL +
@@ -144,7 +144,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
   @Test
   public void deleteShiftPreValues4() {
     create(16);
-    query("delete node doc('d16')/a/b");
+    query("delete node db:open('d16')/a/b");
     assertTrue(context.data().nspaces.toString().isEmpty());
   }
 
@@ -172,8 +172,8 @@ public final class NamespaceTest extends AdvancedQueryTest {
   @Test
   public void delete1() {
     create(11);
-    query("delete node doc('d11')/*:a/*:b",
-        "doc('d11')/*:a",
+    query("delete node db:open('d11')/*:a/*:b",
+        "db:open('d11')/*:a",
         "<a xmlns='A'><c xmlns:ns1='AA'><d/></c></a>");
   }
 
@@ -205,7 +205,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
     create(4);
     query(
         "declare namespace a='aa';" +
-        "copy $c:=doc('d4') modify () return $c//a:y",
+        "copy $c:=db:open('d4') modify () return $c//a:y",
         "<a:y xmlns:a='aa' xmlns:b='bb'/>");
   }
 
@@ -217,7 +217,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
     create(4);
     query(
         "declare namespace a='aa';" +
-        "copy $c:=doc('d4')//a:y modify () return $c",
+        "copy $c:=db:open('d4')//a:y modify () return $c",
         "<a:y xmlns:a='aa' xmlns:b='bb'/>");
   }
 
@@ -238,8 +238,8 @@ public final class NamespaceTest extends AdvancedQueryTest {
   public void bogusDetector() {
     create(1);
     query(
-        "insert node <a xmlns='test'><b><c/></b><d/></a> into doc('d1')/x",
-        "declare namespace na = 'test';doc('d1')/x/na:a",
+        "insert node <a xmlns='test'><b><c/></b><d/></a> into db:open('d1')/x",
+        "declare namespace na = 'test';db:open('d1')/x/na:a",
         "<a xmlns='test'><b><c/></b><d/></a>");
   }
 
@@ -267,7 +267,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
   @Test
   public void nsHierarchy() {
     create(9);
-    query("insert node <f xmlns='F'/> into doc('d9')//*:e");
+    query("insert node <f xmlns='F'/> into db:open('d9')//*:e");
     assertEquals(NL +
         "  Pre[1] xmlns=\"A\"" + NL +
         "    Pre[4] xmlns=\"D\"" + NL +
@@ -281,7 +281,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
   @Test
   public void nsHierarchy2() {
     create(10);
-    query("insert node <f xmlns='F'/> into doc('d10')//*:e");
+    query("insert node <f xmlns='F'/> into db:open('d10')//*:e");
     assertEquals(NL +
         "  Pre[1] xmlns=\"A\"" + NL +
         "    Pre[4] xmlns=\"D\"" + NL +
@@ -302,7 +302,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
 
     // in-depth test
     create(2);
-    query("insert node <a xmlns='y'/> into doc('d2')//*:x");
+    query("insert node <a xmlns='y'/> into db:open('d2')//*:x");
     assertEquals(NL +
         "  Pre[1] xmlns=\"xx\"" + NL +
         "    Pre[2] xmlns=\"y\"",
@@ -335,8 +335,8 @@ public final class NamespaceTest extends AdvancedQueryTest {
   public void insertD2intoD1() {
     create(1, 2);
     query(
-        "insert node doc('d2') into doc('d1')/x",
-        "doc('d1')",
+        "insert node db:open('d2') into db:open('d1')/x",
+        "db:open('d1')",
         "<x><x xmlns='xx'/></x>");
   }
 
@@ -347,8 +347,8 @@ public final class NamespaceTest extends AdvancedQueryTest {
   public void insertD3intoD1() {
     create(1, 3);
     query(
-        "insert node doc('d3') into doc('d1')/x",
-        "doc('d1')/x/*",
+        "insert node db:open('d3') into db:open('d1')/x",
+        "db:open('d1')/x/*",
         "<a:x xmlns:a='aa'><b:y xmlns:b='bb'/></a:x>");
   }
 
@@ -359,8 +359,8 @@ public final class NamespaceTest extends AdvancedQueryTest {
   public void insertD3intoD1b() {
     create(1, 3);
     query(
-        "insert node doc('d3') into doc('d1')/x",
-        "doc('d1')/x/*/*",
+        "insert node db:open('d3') into db:open('d1')/x",
+        "db:open('d1')/x/*/*",
         "<b:y xmlns:b='bb' xmlns:a='aa'/>");
   }
 
@@ -371,9 +371,9 @@ public final class NamespaceTest extends AdvancedQueryTest {
   public void insertD4intoD1() {
     create(1, 4);
     query(
-        "declare namespace a='aa'; insert node doc('d4')/a:x/a:y " +
-        "into doc('d1')/x",
-        "doc('d1')/x",
+        "declare namespace a='aa'; insert node db:open('d4')/a:x/a:y " +
+        "into db:open('d1')/x",
+        "db:open('d1')/x",
         "<x><a:y xmlns:a='aa' xmlns:b='bb'/></x>");
   }
 
@@ -387,9 +387,9 @@ public final class NamespaceTest extends AdvancedQueryTest {
   public void insertD4intoD5() {
     create(4, 5);
     query(
-        "declare namespace a='aa';insert node doc('d4')//a:y " +
-        "into doc('d5')/a:x",
-        "declare namespace a='aa';doc('d5')//a:y",
+        "declare namespace a='aa';insert node db:open('d4')//a:y " +
+        "into db:open('d5')/a:x",
+        "declare namespace a='aa';db:open('d5')//a:y",
         "<a:y xmlns:a='aa' xmlns:b='bb'/>");
   }
 
@@ -400,8 +400,8 @@ public final class NamespaceTest extends AdvancedQueryTest {
   public void insertD7intoD1() {
     create(1, 7);
     query(
-        "declare namespace x='xx';insert node doc('d7')/x:x into doc('d1')/x",
-        "doc('d1')/x",
+        "declare namespace x='xx';insert node db:open('d7')/x:x into db:open('d1')/x",
+        "db:open('d1')/x",
         "<x><x xmlns='xx'><y/></x></x>");
   }
 
@@ -412,8 +412,8 @@ public final class NamespaceTest extends AdvancedQueryTest {
   public void insertD6intoD4() {
     create(4, 6);
     query(
-        "declare namespace a='aa';insert node doc('d6') into doc('d4')/a:x",
-        "declare namespace a='aa';doc('d4')/a:x/a:y",
+        "declare namespace a='aa';insert node db:open('d6') into db:open('d4')/a:x",
+        "declare namespace a='aa';db:open('d4')/a:x/a:y",
         "<a:y xmlns:a='aa' xmlns:b='bb'/>");
   }
 
@@ -458,7 +458,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
   public void uriStack() {
     create(8);
     query(
-        "doc('d8')",
+        "db:open('d8')",
         "<a><b xmlns='B'/><c/></a>");
   }
 
@@ -485,7 +485,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
   @Test
   public void queryPathOpt() {
     create(17);
-    query("doc('d17')/descendant::*:b", "<b xmlns:ns='NS'/>");
+    query("db:open('d17')/descendant::*:b", "<b xmlns:ns='NS'/>");
   }
 
   /**
@@ -494,7 +494,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
   @Test
   public void queryPathOpt2() {
     create(17);
-    query("doc('d17')/*:a/*:b", "<b xmlns:ns='NS'/>");
+    query("db:open('d17')/*:a/*:b", "<b xmlns:ns='NS'/>");
   }
 
   /**
@@ -762,8 +762,8 @@ public final class NamespaceTest extends AdvancedQueryTest {
         "(copy $c := <my:n><my:a/></my:n>" +
         "modify insert node <new/> into $c " +
         "return $c)" +
-        "return insert node $v into doc('d2')/n",
-        "namespace-uri-for-prefix('my', doc('d2')//*:new)",
+        "return insert node $v into db:open('d2')/n",
+        "namespace-uri-for-prefix('my', db:open('d2')//*:new)",
         "");
   }
 
@@ -773,7 +773,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
   @Test
   public void defaultNS() {
     create(1);
-    query("<h xmlns='U'>{ doc('d1')/x }</h>/*", "");
+    query("<h xmlns='U'>{ db:open('d1')/x }</h>/*", "");
   }
 
   /**

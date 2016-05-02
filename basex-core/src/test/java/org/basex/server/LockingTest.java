@@ -46,10 +46,10 @@ public final class LockingTest extends SandboxTest {
    */
   private static final String[] QUERIES = {
     "%2$s",
-    "(doc('%1$s'), %2$s)",
-    "insert node %2$s into doc('%1$s')",
-    "for $i in ('%1$s') return insert node %2$s into doc($i)",
-    "for $i in ('%1$s') return (doc($i), %2$s)"
+    "(db:open('%1$s'), %2$s)",
+    "insert node %2$s into db:open('%1$s')",
+    "for $i in ('%1$s') return insert node %2$s into db:open($i)",
+    "for $i in ('%1$s') return (db:open($i), %2$s)"
   };
 
   /** Server reference. */
@@ -149,43 +149,43 @@ public final class LockingTest extends SandboxTest {
         true);
     // Reading the same database twice
     testQueries(
-        new XQuery(f("(doc('%s'), %s)", NAME, Q)),
-        new XQuery(f("(doc('%s'), %s)", NAME, Q)),
+        new XQuery(f("(db:open('%s'), %s)", NAME, Q)),
+        new XQuery(f("(db:open('%s'), %s)", NAME, Q)),
         true);
     // Reading two different databases
     testQueries(
-        new XQuery(f("(doc('%s'), %s)", NAME, Q)),
-        new XQuery(f("(doc('%s1'), %s)", NAME, Q)),
+        new XQuery(f("(db:open('%s'), %s)", NAME, Q)),
+        new XQuery(f("(db:open('%s1'), %s)", NAME, Q)),
         true);
     // Writing to the same database twice
     testQueries(
-        new XQuery(f("insert node %s into doc('%s')", Q, NAME)),
-        new XQuery(f("insert node %s into doc('%s')", Q, NAME)),
+        new XQuery(f("insert node %s into db:open('%s')", Q, NAME)),
+        new XQuery(f("insert node %s into db:open('%s')", Q, NAME)),
         false);
     // Writing to different databases
     testQueries(
-        new XQuery(f("insert node %s into doc('%s')", Q, NAME)),
-        new XQuery(f("insert node %s into doc('%s1')", Q, NAME)),
+        new XQuery(f("insert node %s into db:open('%s')", Q, NAME)),
+        new XQuery(f("insert node %s into db:open('%s1')", Q, NAME)),
         true);
     // Read from and write to the same database
     testQueries(
-        new XQuery(f("(doc('%s'), %s)", NAME, Q)),
-        new XQuery(f("insert node %s into doc('%s')", Q, NAME)),
+        new XQuery(f("(db:open('%s'), %s)", NAME, Q)),
+        new XQuery(f("insert node %s into db:open('%s')", Q, NAME)),
         false);
     // Read from and write to different databases
     testQueries(
-        new XQuery(f("(doc('%s'), %s)", NAME, Q)),
-        new XQuery(f("insert node %s into doc('%s1')", Q, NAME)),
+        new XQuery(f("(db:open('%s'), %s)", NAME, Q)),
+        new XQuery(f("insert node %s into db:open('%s1')", Q, NAME)),
         true);
     // Read from a database, perform global write lock
     testQueries(
-        new XQuery(f("(doc('%s'), %s)", NAME, Q)),
-        new XQuery(f("for $i in ('%s') return insert node %s into doc($i)", NAME, Q)),
+        new XQuery(f("(db:open('%s'), %s)", NAME, Q)),
+        new XQuery(f("for $i in ('%s') return insert node %s into db:open($i)", NAME, Q)),
         false);
     // Global write lock twice
     testQueries(
-        new XQuery(f("for $i in ('%s') return insert node %s into doc($i)", NAME, Q)),
-        new XQuery(f("for $i in ('%s') return insert node %s into doc($i)", NAME, Q)),
+        new XQuery(f("for $i in ('%s') return insert node %s into db:open($i)", NAME, Q)),
+        new XQuery(f("for $i in ('%s') return insert node %s into db:open($i)", NAME, Q)),
         false);
     // Custom Java module locking
     testQueries(new XQuery(f(
@@ -222,6 +222,6 @@ public final class LockingTest extends SandboxTest {
     // hangs if QueryContext.downgrade call is activated..
     execute(new CreateDB(NAME, "<x/>"));
     query("delete node /y");
-    query("let $d := '" + NAME + "' return doc($d)");
+    query("let $d := '" + NAME + "' return db:open($d)");
   }
 }

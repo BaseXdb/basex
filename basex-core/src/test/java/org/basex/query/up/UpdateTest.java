@@ -97,7 +97,7 @@ public final class UpdateTest extends AdvancedQueryTest {
       execute(new CreateDB("DBtransform", "<instance><data><vocable hits='1'/></data></instance>"));
       query(
           "for $voc in 1 to 2 " +
-          "let $xml := doc('DBtransform') " +
+          "let $xml := db:open('DBtransform') " +
           "return (" +
           "$xml update (" +
           "for $i in 1 to 2 return " +
@@ -492,7 +492,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   public void emptyInsert3() {
     createDB("<a/>");
     query("delete node /a");
-    query("insert nodes <X/> into doc('" + NAME + "')");
+    query("insert nodes <X/> into db:open('" + NAME + "')");
     query("/", "<X/>");
   }
 

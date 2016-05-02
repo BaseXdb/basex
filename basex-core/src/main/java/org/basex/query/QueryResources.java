@@ -142,7 +142,7 @@ public final class QueryResources {
    * Evaluates {@code fn:doc()}: opens an existing database document, or creates a new
    * database and node.
    * @param qi query input
-   * @param baseIO base URI
+   * @param baseIO base URI (can be {@code null})
    * @param info input info
    * @return document
    * @throws QueryException query exception
@@ -151,22 +151,25 @@ public final class QueryResources {
       throws QueryException {
 
     // favor default database
-    final Data gd = globalData();
-    if(gd != null && qc.context.options.get(MainOptions.DEFAULTDB)) {
-      final int pre = gd.resources.doc(qi.original);
-      if(pre != -1) return new DBNode(gd, pre, Data.DOC);
+    final Data global = globalData();
+    if(global != null && qc.context.options.get(MainOptions.DEFAULTDB)) {
+      final int pre = global.resources.doc(qi.original);
+      if(pre != -1) return new DBNode(global, pre, Data.DOC);
     }
 
     // check currently opened databases
     for(final Data data : datas) {
       // check if database has a single document with an identical input path
-      if(data.meta.ndocs == 1 && IO.get(data.meta.original).eq(qi.input))
+      if(data.meta.ndocs == 1 && IO.get(data.meta.original).eq(qi.input)) {
         return new DBNode(data, 0, Data.DOC);
+      }
 
       // check if database and input have identical name
       // database instance has same name as input path
       final String n = data.meta.name;
-      if(Prop.CASE ? n.equals(qi.db) : n.equalsIgnoreCase(qi.db)) return doc(data, qi, info);
+      if(Prop.CASE ? n.equals(qi.db) : n.equalsIgnoreCase(qi.db)) {
+        return doc(data, qi, info);
+      }
     }
 
     // open new database, or create new instance
@@ -190,7 +193,7 @@ public final class QueryResources {
    * Evaluates {@code fn:collection()}: opens an existing database collection, or creates
    * a new data reference.
    * @param qi query input
-   * @param baseIO base URI
+   * @param baseIO base URI (can be {@code null})
    * @param info input info
    * @return collection
    * @throws QueryException query exception
@@ -303,7 +306,7 @@ public final class QueryResources {
    * Returns a valid reference if a file is found at the specified path, or at the static base uri
    * location. Otherwise, returns an error.
    * @param input query input
-   * @param baseIO base IO
+   * @param baseIO base IO (can be {@code null})
    * @param info input info
    * @return input source, or exception
    * @throws QueryException query exception
@@ -326,7 +329,7 @@ public final class QueryResources {
    * Adds a document with the specified path. Only called from the test APIs.
    * @param name document identifier (may be {@code null})
    * @param path documents path
-   * @param baseIO base URI
+   * @param baseIO base URI (can be {@code null})
    * @throws QueryException query exception
    */
   public void addDoc(final String name, final String path, final IO baseIO) throws QueryException {
@@ -349,7 +352,7 @@ public final class QueryResources {
    * Adds a collection with the specified paths. Only called from the test APIs.
    * @param name name of collection
    * @param paths documents paths
-   * @param baseIO base URI
+   * @param baseIO base URI (can be {@code null})
    * @throws QueryException query exception
    */
   public void addCollection(final String name, final String[] paths, final IO baseIO)
