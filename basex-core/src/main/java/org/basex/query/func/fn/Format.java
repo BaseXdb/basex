@@ -1,5 +1,6 @@
 package org.basex.query.func.fn;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import org.basex.query.*;
@@ -23,11 +24,14 @@ abstract class Format extends StandardFunc {
    * @throws QueryException query exception
    */
   Item formatDate(final AtomType tp, final QueryContext qc) throws QueryException {
+    final int el = exprs.length;
+    if(el == 3 || el == 4) throw FUNCARGNUM_X_X_X.get(info, sig, el, "s");
+
     final Item it = exprs[0].atomItem(qc, info);
     final byte[] pic = toEmptyToken(exprs[1], qc);
-    final byte[] lng = exprs.length == 5 ? toEmptyToken(exprs[2], qc) : EMPTY;
-    final byte[] cal = exprs.length == 5 ? toEmptyToken(exprs[3], qc) : EMPTY;
-    final byte[] plc = exprs.length == 5 ? toEmptyToken(exprs[4], qc) : EMPTY;
+    final byte[] lng = el == 5 ? toEmptyToken(exprs[2], qc) : EMPTY;
+    final byte[] cal = el == 5 ? toEmptyToken(exprs[3], qc) : EMPTY;
+    final byte[] plc = el == 5 ? toEmptyToken(exprs[4], qc) : EMPTY;
     if(it == null) return null;
 
     final ADate date = (ADate) checkType(it, tp);
