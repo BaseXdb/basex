@@ -19,8 +19,6 @@ public final class ForkJoinTask extends RecursiveTask<Value> {
   private final QueryContext qc;
   /** Input info. */
   private final InputInfo ii;
-  /** Split value. */
-  private final int split;
   /** First function to evaluate. */
   private final int start;
   /** Last function to evaluate. */
@@ -29,28 +27,24 @@ public final class ForkJoinTask extends RecursiveTask<Value> {
   /**
    * Constructor.
    * @param funcs functions to evaluate
-   * @param split split factor
    * @param qc query context
    * @param ii input info
    */
-  public ForkJoinTask(final Value funcs, final int split, final QueryContext qc,
-      final InputInfo ii) {
-    this(funcs, split, qc, ii, 0, (int) funcs.size());
+  public ForkJoinTask(final Value funcs, final QueryContext qc, final InputInfo ii) {
+    this(funcs, qc, ii, 0, (int) funcs.size());
   }
 
   /**
    * Private constructor.
    * @param funcs functions to evaluate
-   * @param split split factor
    * @param qc query context
    * @param ii input info
    * @param start first function to evaluate
    * @param end last function to evaluate
    */
-  private ForkJoinTask(final Value funcs, final int split, final QueryContext qc,
-      final InputInfo ii, final int start, final int end) {
+  private ForkJoinTask(final Value funcs, final QueryContext qc, final InputInfo ii,
+      final int start, final int end) {
     this.funcs = funcs;
-    this.split = split;
     this.qc = new QueryContext(qc);
     this.ii = ii;
     this.start = start;
@@ -60,24 +54,22 @@ public final class ForkJoinTask extends RecursiveTask<Value> {
   @Override
   protected Value compute() {
     final ValueBuilder vb = new ValueBuilder();
-    if(end - start <= split) {
+    final int s = start, e = end, l = e - s;
+    if(l == 1) {
       // perform the work
       try {
-        final int last = Math.min(end, start + split);
-        for(int f = start; f < last; f++) {
-          vb.add(((FItem) funcs.itemAt(f)).invokeValue(qc, ii));
-        }
+        vb.add(((FItem) funcs.itemAt(s)).invokeValue(qc, ii));
       } catch(final QueryException ex) {
         completeExceptionally(ex);
         cancel(true);
       }
     } else {
       // split the work and join the results in the correct order
-      final int mid = start + (end - start) / 2;
-      final ForkJoinTask first  = new ForkJoinTask(funcs, split, qc, ii, start, mid);
-      final ForkJoinTask second = new ForkJoinTask(funcs, split, qc, ii, mid, end);
-      invokeAll(first, second);
-      vb.add(first.join()).add(second.join());
+      final int m = s + l / 2;
+      final ForkJoinTask task2 = new ForkJoinTask(funcs, qc, ii, m, e);
+      task2.fork();
+      final ForkJoinTask task1  = new ForkJoinTask(funcs, qc, ii, s, m);
+      vb.add(task1.invoke()).add(task2.join());
     }
     return vb.value();
   }

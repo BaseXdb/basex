@@ -29,20 +29,10 @@ public final class AsyncModuleTest extends AdvancedQueryTest {
     query(_ASYNC_FORK_JOIN.args("(function() { (1 to 10000000)[.=1] }, true#0)"), "1\ntrue");
     query(_ASYNC_FORK_JOIN.args("(true#0, function() { (1 to 10000000)[.=1] })"), "true\n1");
 
-    // try different options
-    query(_ASYNC_FORK_JOIN.args(" (false#0,true#0)", " map {'threads':1 }"), "false\ntrue");
-    query(_ASYNC_FORK_JOIN.args(" (false#0,true#0)", " map {'threads':64 }"), "false\ntrue");
-    query(_ASYNC_FORK_JOIN.args(" (false#0,true#0)", " map {'thread-size':1 }"), "false\ntrue");
-    query(_ASYNC_FORK_JOIN.args(" (false#0,true#0)", " map {'thread-size':1000 }"), "false\ntrue");
-
     // errors
     error(_ASYNC_FORK_JOIN.args(" count#1"), ZEROFUNCS_X_X);
     error(_ASYNC_FORK_JOIN.args(" 123"), ZEROFUNCS_X_X);
     error(_ASYNC_FORK_JOIN.args(" error#0"), FUNERR1);
-    error(_ASYNC_FORK_JOIN.args(" ()", " map {'threads':-1 }"), ASYNC_OUTOFRANGE_X);
-    error(_ASYNC_FORK_JOIN.args(" ()", " map {'threads':100000000 }"), ASYNC_OUTOFRANGE_X);
-    error(_ASYNC_FORK_JOIN.args(" ()", " map {'thread-size':0 }"), ASYNC_OUTOFRANGE_X);
-    error(_ASYNC_FORK_JOIN.args(" ()", " map {'thread-size':-1 }"), ASYNC_OUTOFRANGE_X);
   }
 
   /** Test method. */
