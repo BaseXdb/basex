@@ -161,6 +161,9 @@ public final class ValidateModuleTest extends AdvancedQueryTest {
       "let $doc := <root/> " +
       "let $dtd := '<!ELEMENT root (#PCDATA)>' " +
       "return validate:dtd($doc, $dtd) ", "");
+    // specify embedded schema
+    query(_VALIDATE_DTD.args(" ``[<!DOCTYPE p [<!ELEMENT p ANY>]><p/>]``"), "");
+    query(_VALIDATE_DTD.args(" ``[<!DOCTYPE p [<!ELEMENT p ANY>]><p/>]``", "()"), "");
 
     // invalid arguments
     error(_VALIDATE_DTD.args("unknown"), WHICHRES_X);

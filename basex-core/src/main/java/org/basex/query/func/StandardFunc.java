@@ -235,8 +235,9 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   protected IO checkPath(final byte[] path) throws QueryException {
-    return path == null ? null :
-      QueryResources.checkPath(new QueryInput(string(path)), sc.baseIO(), info);
+    final IO io = QueryResources.checkPath(new QueryInput(string(path)), sc.baseIO());
+    if(io == null) throw WHICHRES_X.get(info, path);
+    return io;
   }
 
   /**

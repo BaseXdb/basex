@@ -6,7 +6,7 @@ import org.basex.core.*;
 import org.basex.core.locks.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
-import org.basex.util.*;
+import org.basex.io.*;
 
 /**
  * Evaluates the 'check' command: opens an existing database or
@@ -18,10 +18,10 @@ import org.basex.util.*;
 public final class Check extends Command {
   /**
    * Default constructor.
-   * @param path file path
+   * @param input input (name of database, file path, XML string)
    */
-  public Check(final String path) {
-    super(Perm.NONE, path);
+  public Check(final String input) {
+    super(Perm.NONE, input);
   }
 
   @Override
@@ -29,16 +29,18 @@ public final class Check extends Command {
     // close existing database
     new Close().run(context);
 
-    // get path and database name
-    final QueryInput qi = new QueryInput(args[0]);
-    qi.db = qi.input.dbname();
+    // input (can be path or XML string)
+    final String input = args[0];
+    // get path and database name, overwrite database name with generated name
+    final IO io = IO.get(input);
+    final String dbName = io.dbName();
 
     // choose OPEN if user has no create permissions, or if database exists
     final Command cmd;
-    if(open(qi)) {
-      cmd = new Open(qi.db);
+    if(open(io, dbName)) {
+      cmd = new Open(dbName);
     } else {
-      cmd = new CreateDB(qi.db, qi.input.exists() ? qi.original : null);
+      cmd = new CreateDB(dbName, io.exists() ? input : null);
     }
     proc(cmd);
 
@@ -49,27 +51,27 @@ public final class Check extends Command {
   }
 
   /**
-   * Checks if the addressed database can simply be opened, or needs to be (re)built.
-   * @param qi query input
+   * Checks if the addressed database can be opened, or needs to be (re)built.
+   * @param input query input
+   * @param dbName database name
    * @return result of check
    */
-  private boolean open(final QueryInput qi) {
+  private boolean open(final IO input, final String dbName) {
     // minimum permissions: create
     if(!context.user().has(Perm.CREATE)) return true;
     // database with given name does not exist
-    if(!soptions.dbPath(qi.db).exists()) return false;
+    if(!soptions.dbPath(dbName).exists()) return false;
     // open database if addressed file does not exist
-    if(!qi.input.exists()) return true;
+    if(!input.exists()) return true;
 
-    // compare timestamp of database input and specified file
-    final MetaData meta = new MetaData(qi.db, options, soptions);
+    // compare timestamp of database input and specified file; rebuild invalid databases
+    final MetaData meta = new MetaData(dbName, options, soptions);
     try {
       meta.read();
-      return meta.time == qi.input.timeStamp();
     } catch(final IOException ex) {
-      // rebuild database if it cannot be opened
       return false;
     }
+    return meta.time == input.timeStamp();
   }
 
   @Override
@@ -84,7 +86,7 @@ public final class Check extends Command {
 
   @Override
   public void databases(final LockResult lr) {
-    lr.read.add(DBLocking.CONTEXT).add(new QueryInput(args[0]).input.dbname());
+    lr.read.add(DBLocking.CONTEXT).add(IO.get(args[0]).dbName());
   }
 
   @Override

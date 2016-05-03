@@ -465,31 +465,31 @@ public final class DbModuleTest extends AdvancedQueryTest {
   @Test
   public void drop() {
     // non-existing DB name
-    final String dbname = NAME + "DBCreate";
+    final String dbName = NAME + "DBCreate";
 
     // drop existing DB
-    query(_DB_CREATE.args(dbname, "<dummy/>", "doc.xml"));
-    query(_DB_DROP.args(dbname));
-    query(_DB_EXISTS.args(dbname), "false");
+    query(_DB_CREATE.args(dbName, "<dummy/>", "doc.xml"));
+    query(_DB_DROP.args(dbName));
+    query(_DB_EXISTS.args(dbName), "false");
 
     // invalid name
     error(_DB_DROP.args(" ''"), BXDB_NAME_X);
     // try to drop non-existing DB
-    error(_DB_DROP.args(dbname), BXDB_WHICH_X);
+    error(_DB_DROP.args(dbName), BXDB_WHICH_X);
   }
 
   /** Test method. */
   @Test
   public void createCommand() {
-    final String dbname = NAME + "DBCreate";
-    query(_DB_CREATE.args(dbname));
-    execute(new Open(dbname));
-    error(_DB_CREATE.args(dbname), BXDB_OPENED_X);
+    final String dbName = NAME + "DBCreate";
+    query(_DB_CREATE.args(dbName));
+    execute(new Open(dbName));
+    error(_DB_CREATE.args(dbName), BXDB_OPENED_X);
     // close and try again
     execute(new Close());
-    query(_DB_CREATE.args(dbname));
+    query(_DB_CREATE.args(dbName));
     // eventually drop database
-    query(_DB_DROP.args(dbname));
+    query(_DB_DROP.args(dbName));
   }
 
   /** Test method. */

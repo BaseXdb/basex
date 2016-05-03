@@ -1,10 +1,10 @@
-package org.basex.util;
+package org.basex.query;
 
 import org.basex.core.*;
 import org.basex.io.*;
 
 /**
- * This class references input passed on in a query.
+ * This class references input passed on in a query. It can be a file path or a database name.
  *
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
@@ -14,29 +14,30 @@ public final class QueryInput {
   public final String original;
   /** Input reference. */
   public final IO input;
-  /** Optional database path. */
-  public String path = "";
-  /** Optional database name. */
-  public String db;
+  /** Database name ({@code null} indicates that no name can be extracted from original path). */
+  public String dbName;
+  /** Database path (empty string indicates root). */
+  public String dbPath = "";
 
   /**
    * Constructor.
-   * @param original original input
+   * @param original original input string
    */
   public QueryInput(final String original) {
     this.original = original;
     input = IO.get(original);
 
-    // checks if the specified input reference is a valid database name
     if(Databases.validName(original)) {
-      db = original;
+      // the specified input is no valid database name
+      dbName = original;
     } else {
+      // extract name and path from input string
       final int s = original.indexOf('/');
       if(s > 0 && original.indexOf(':') == -1) {
         final String n = original.substring(0, s);
         if(Databases.validName(n)) {
-          path = original.substring(s + 1);
-          db = n;
+          dbName = n;
+          dbPath = original.substring(s + 1);
         }
       }
     }

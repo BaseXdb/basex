@@ -11,7 +11,6 @@ import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.util.*;
 
 /**
  * Document and collection functions.
@@ -62,7 +61,7 @@ public abstract class Docs extends StandardFunc {
       if(!visitor.lock(null)) return false;
     } else {
       final QueryInput qi = new QueryInput(string(((Str) exprs[0]).string()));
-      if(!visitor.lock(qi.db)) return false;
+      if(!visitor.lock(qi.dbName)) return false;
     }
     return super.accept(visitor);
   }

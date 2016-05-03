@@ -262,11 +262,11 @@ public abstract class IO {
   }
 
   /**
-   * Chops the path, file suffix and special characters from the specified filename and
-   * returns the database name.
+   * Generates a database name from the name of this resource. The path will be chopped and
+   * special characters from the remaining name will be removed.
    * @return database name
    */
-  public final String dbname() {
+  public final String dbName() {
     final TokenBuilder tb = new TokenBuilder();
     final byte[] n = token(name());
     int i = lastIndexOf(n, '.');

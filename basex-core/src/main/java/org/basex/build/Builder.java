@@ -31,7 +31,7 @@ public abstract class Builder extends Proc {
   /** Parser instance. */
   final Parser parser;
   /** Database name. */
-  final String dbname;
+  final String dbName;
 
   /** Number of cached size values. */
   int ssize;
@@ -54,11 +54,11 @@ public abstract class Builder extends Proc {
 
   /**
    * Constructor.
-   * @param dbname name of database
+   * @param dbName name of database
    * @param parser parser
    */
-  Builder(final String dbname, final Parser parser) {
-    this.dbname = dbname;
+  Builder(final String dbName, final Parser parser) {
+    this.dbName = dbName;
     this.parser = parser;
   }
 

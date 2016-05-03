@@ -12,12 +12,12 @@ import org.junit.*;
  */
 public final class DiskDataTest extends MemDataTest {
   /** Test database name. */
-  private final String dbname = Util.className(DiskDataTest.class);
+  private final String dbName = Util.className(DiskDataTest.class);
 
   @Override
   @Before
   public void setUp() {
-    execute(new CreateDB(dbname, XMLSTR));
+    execute(new CreateDB(dbName, XMLSTR));
   }
 
   /**
@@ -25,6 +25,6 @@ public final class DiskDataTest extends MemDataTest {
    */
   @After
   public void cleanUp() {
-    execute(new DropDB(dbname));
+    execute(new DropDB(dbName));
   }
 }

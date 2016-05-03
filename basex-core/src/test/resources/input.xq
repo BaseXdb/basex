@@ -1,1 +1,1 @@
-doc('src/test/resources/input.xml')//title/text()
+doc('input.xml')//title/text()

@@ -79,7 +79,7 @@ final class DialogAdd extends BaseXBack {
 
     } else {
       boolean ok = general.action(comp, false);
-      if(comp == general.browse || comp == general.input) target.setText(general.dbname);
+      if(comp == general.browse || comp == general.input) target.setText(general.dbName);
 
       final String inf;
       if(ok) {

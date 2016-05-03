@@ -47,7 +47,7 @@ public final class MemBuilder extends Builder {
    * @throws IOException I/O exception
    */
   public static MemData build(final Parser parser) throws IOException {
-    return build(parser.source.dbname(), parser);
+    return build(parser.source.dbName(), parser);
   }
 
   /**
@@ -91,7 +91,7 @@ public final class MemBuilder extends Builder {
   public void init() {
     data = new MemData(path, nspaces, parser.options);
     meta = data.meta;
-    meta.name = dbname;
+    meta.name = dbName;
     elemNames = data.elemNames;
     attrNames = data.attrNames;
     path.data(data);

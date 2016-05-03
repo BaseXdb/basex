@@ -36,7 +36,7 @@ final class DialogImport extends BaseXBack {
   /** Chosen parser. */
   final BaseXCombo parsers;
   /** DB name. */
-  String dbname;
+  String dbName;
 
   /** Dialog reference. */
   private final GUI gui;
@@ -73,7 +73,7 @@ final class DialogImport extends BaseXBack {
     input = new BaseXTextField(path, dial).history(GUIOptions.INPUTS, dial);
 
     final IO io = IO.get(path);
-    if(io instanceof IOFile && !path.isEmpty()) dbname = io.dbname();
+    if(io instanceof IOFile && !path.isEmpty()) dbName = io.dbName();
 
     browse = new BaseXButton(BROWSE_D, dial);
     browse.addActionListener(new ActionListener() {
@@ -221,7 +221,7 @@ final class DialogImport extends BaseXBack {
   void setType(final String in) {
     // get file path, update input path and database name
     final IO io = IO.get(in);
-    if(!in.isEmpty() && io instanceof IOFile) dbname = io.dbname();
+    if(!in.isEmpty() && io instanceof IOFile) dbName = io.dbName();
 
     final boolean dir = io.isDir();
     final boolean archive = io.isArchive();

@@ -51,7 +51,7 @@ public final class DiskBuilder extends Builder implements Closeable {
       final MainOptions opts) {
     super(name, parser);
     this.sopts = sopts;
-    meta = new MetaData(dbname, opts, sopts);
+    meta = new MetaData(dbName, opts, sopts);
   }
 
   @Override
@@ -66,8 +66,8 @@ public final class DiskBuilder extends Builder implements Closeable {
     bs = Math.max(IO.BLOCKSIZE, bs - bs % IO.BLOCKSIZE);
 
     // drop old database (if available) and create new one
-    DropDB.drop(dbname, sopts);
-    sopts.dbPath(dbname).md();
+    DropDB.drop(dbName, sopts);
+    sopts.dbPath(dbName).md();
 
     elemNames = new Names(meta);
     attrNames = new Names(meta);

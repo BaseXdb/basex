@@ -32,17 +32,21 @@ public class ValidateDtd extends ValidateFn {
       void process(final ErrorHandler handler)
           throws IOException, ParserConfigurationException, SAXException, QueryException {
 
-        final Item it = toNodeOrAtomItem(exprs[0], qc);
-        final IO path = exprs.length < 2 ? null : checkPath(toEmptyToken(exprs[1], qc));
+        final Item input = toNodeOrAtomItem(exprs[0], qc);
+        IO schema = null;
+        if(exprs.length == 2) {
+          final Item in = exprs[1].item(qc, info);
+          if(in != null) schema = checkPath(toToken(in));
+        }
 
         // integrate doctype declaration via serialization parameters
         SerializerOptions sp = null;
-        if(path != null) {
+        if(schema != null) {
           sp = new SerializerOptions();
-          sp.set(SerializerOptions.DOCTYPE_SYSTEM, prepare(path, handler).url());
+          sp.set(SerializerOptions.DOCTYPE_SYSTEM, prepare(schema, handler).url());
         }
 
-        final IO in = read(it, qc, sp);
+        final IO in = read(input, qc, sp);
         final SAXParserFactory sf = SAXParserFactory.newInstance();
         sf.setValidating(true);
         sf.newSAXParser().parse(in.inputSource(), handler);

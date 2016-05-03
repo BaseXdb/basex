@@ -106,11 +106,12 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
 
   /**
    * Adds a collection.
-   * @param name name of the collection
+   * @param name name of the collection (can be empty string)
    * @param paths document paths
    * @throws XQueryException exception
    */
   public void addCollection(final String name, final String[] paths) {
+    if(name == null) System.out.println(name);
     final StringList sl = new StringList();
     for(final String p : paths) sl.add(p);
     try {
@@ -121,8 +122,8 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
   }
 
   /**
-   * Returns a collection reference.
-   * @param name name of the collection
+   * Returns a collection of document nodes.
+   * @param name name of the collection (can be empty string)
    * @return reference
    * @throws XQueryException exception
    */
@@ -135,8 +136,8 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
   }
 
   /**
-   * Returns a document reference.
-   * @param name name of the collection
+   * Returns a document node.
+   * @param name name of the document
    * @return reference
    * @throws XQueryException exception
    */
@@ -150,7 +151,7 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
 
   /**
    * Adds a document.
-   * @param name name of the collection
+   * @param name name of the document (can be {@code null})
    * @param path document path
    * @throws XQueryException exception
    */
@@ -165,7 +166,7 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
   /**
    * Adds a resource.
    * @param name name of the collection
-   * @param strings document path, encoding
+   * @param strings document path and encoding
    * @throws XQueryException exception
    */
   public void addResource(final String name, final String... strings) {

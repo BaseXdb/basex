@@ -167,7 +167,7 @@ public final class QueryResources {
       // check if database and input have identical name
       // database instance has same name as input path
       final String n = data.meta.name;
-      if(Prop.CASE ? n.equals(qi.db) : n.equalsIgnoreCase(qi.db)) {
+      if(Prop.CASE ? n.equals(qi.dbName) : n.equalsIgnoreCase(qi.dbName)) {
         return doc(data, qi, info);
       }
     }
@@ -202,17 +202,15 @@ public final class QueryResources {
       throws QueryException {
 
     // favor default database
-    final Data gd = globalData();
-    if(qc.context.options.get(MainOptions.DEFAULTDB) && gd != null) {
-      final IntList pres = gd.resources.docs(qi.original);
-      return DBNodeSeq.get(pres, gd, true, qi.original.isEmpty());
+    final Data global = globalData();
+    if(global != null && qc.context.options.get(MainOptions.DEFAULTDB)) {
+      final IntList pres = global.resources.docs(qi.original);
+      return DBNodeSeq.get(pres, global, true, qi.original.isEmpty());
     }
 
-    // merge input with base directory
-    final String in = baseIO != null ? baseIO.merge(qi.original).path() : null;
-
-    // check currently opened collections
-    if(in != null) {
+    // merge input with base directory and check currently opened collections
+    if(baseIO != null) {
+      final String in = baseIO.merge(qi.original).path();
       final String[] names = { in, qi.original };
       final int cs = colls.size();
       for(int c = 0; c < cs; c++) {
@@ -225,8 +223,8 @@ public final class QueryResources {
     Data dt = null;
     for(final Data data : datas) {
       // return database instance with the same name or file path
-      final String n = data.meta.name;
-      if(Prop.CASE ? n.equals(qi.db) : n.equalsIgnoreCase(qi.db) ||
+      final String db = data.meta.name;
+      if(Prop.CASE ? db.equals(qi.dbName) : db.equalsIgnoreCase(qi.dbName) ||
           IO.get(data.meta.original).eq(qi.input)) {
         dt = data;
         break;
@@ -236,7 +234,7 @@ public final class QueryResources {
     // open new database, or create new instance
     if(dt == null) dt = open(qi);
     if(dt == null) dt = create(qi, false, baseIO, info);
-    return DBNodeSeq.get(dt.resources.docs(qi.path), dt, true, qi.path.isEmpty());
+    return DBNodeSeq.get(dt.resources.docs(qi.dbPath), dt, true, qi.dbPath.isEmpty());
   }
 
   /**
@@ -304,23 +302,20 @@ public final class QueryResources {
 
   /**
    * Returns a valid reference if a file is found at the specified path, or at the static base uri
-   * location. Otherwise, returns an error.
+   * location. Otherwise, returns {@code null}.
    * @param input query input
    * @param baseIO base IO (can be {@code null})
-   * @param info input info
-   * @return input source, or exception
-   * @throws QueryException query exception
+   * @return input source, or {@code null}
    */
-  public static IO checkPath(final QueryInput input, final IO baseIO, final InputInfo info)
-      throws QueryException {
-
+  public static IO checkPath(final QueryInput input, final IO baseIO) {
     IO in = input.input;
     if(in.exists()) return in;
+
     if(baseIO != null) {
       in = baseIO.merge(input.original);
       if(!in.path().equals(input.original) && in.exists()) return in;
     }
-    throw WHICHRES_X.get(info, in);
+    return null;
   }
 
   // TEST APIS ====================================================================================
@@ -328,14 +323,14 @@ public final class QueryResources {
   /**
    * Adds a document with the specified path. Only called from the test APIs.
    * @param name document identifier (may be {@code null})
-   * @param path documents path
+   * @param path document path
    * @param baseIO base URI (can be {@code null})
    * @throws QueryException query exception
    */
   public void addDoc(final String name, final String path, final IO baseIO) throws QueryException {
     final QueryInput qi = new QueryInput(path);
-    final Data d = create(qi, true, baseIO, null);
-    if(name != null) d.meta.original = name;
+    final Data data = create(qi, true, baseIO, null);
+    if(name != null) data.meta.original = name;
   }
 
   /**
@@ -350,7 +345,7 @@ public final class QueryResources {
 
   /**
    * Adds a collection with the specified paths. Only called from the test APIs.
-   * @param name name of collection
+   * @param name name of collection (can be empty string)
    * @param paths documents paths
    * @param baseIO base URI (can be {@code null})
    * @throws QueryException query exception
@@ -385,11 +380,11 @@ public final class QueryResources {
    * @return data reference
    */
   private Data open(final QueryInput input) {
-    if(input.db != null) {
+    final String name = input.dbName;
+    if(name != null) {
       try {
-        // try to open database
         final Context ctx = qc.context;
-        return addData(Open.open(input.db, ctx, ctx.options));
+        return addData(Open.open(name, ctx, ctx.options));
       } catch(final IOException ex) { Util.debug(ex); }
     }
     return null;
@@ -399,7 +394,7 @@ public final class QueryResources {
    * Creates a new database instance.
    * @param input query input
    * @param single expect single document
-   * @param baseIO base URI
+   * @param baseIO base URI (can be {@code null})
    * @param ii input info
    * @return data reference
    * @throws QueryException query exception
@@ -410,25 +405,31 @@ public final class QueryResources {
     // check if new databases can be created
     final Context context = qc.context;
 
-    // do not check input if no read permissions are given
+    // do not check for existence of input if user has no read permissions
     if(!context.user().has(Perm.READ))
       throw BXXQ_PERM_X.get(ii, Util.info(Text.PERM_REQUIRED_X, Perm.READ));
 
-    // check if input is an existing file
-    final IO source = checkPath(input, baseIO, ii);
-    if(single && source.isDir()) throw WHICHRES_X.get(ii, baseIO);
+    // check if input points to a single file
+    final IO source = checkPath(input, baseIO);
+    if(source == null) throw WHICHRES_X.get(ii, input.original);
+
+    if(single && source.isDir()) throw RESDIR_X.get(ii, baseIO);
 
     // overwrite parsing options with default values
+    final boolean mem = !context.options.get(MainOptions.FORCECREATE);
+    final MainOptions opts = new MainOptions(context.options, true);
+    final Parser parser = new DirParser(source, opts);
+
+    final Data data;
     try {
-      final boolean mem = !context.options.get(MainOptions.FORCECREATE);
-      final MainOptions opts = new MainOptions(context.options, true);
-      return addData(CreateDB.create(source.dbname(),
-          new DirParser(source, opts), context, opts, mem));
+      data = CreateDB.create(source.dbName(), parser, context, opts, mem);
     } catch(final IOException ex) {
       throw IOERR_X.get(ii, ex);
-    } finally {
-      input.path = "";
     }
+    // reset database path: indicates that all documents were parsed
+    input.dbPath = "";
+
+    return addData(data);
   }
 
   /**
@@ -443,7 +444,7 @@ public final class QueryResources {
       throws QueryException {
 
     // get all document nodes of the specified database
-    final IntList docs = dt.resources.docs(qi.path);
+    final IntList docs = dt.resources.docs(qi.dbPath);
     // ensure that a single document was filtered
     if(docs.size() == 1) return new DBNode(dt, docs.get(0), Data.DOC);
     throw (docs.isEmpty() ? BXDB_NODOC_X : BXDB_SINGLE_X).get(ii, qi.original);
@@ -462,7 +463,7 @@ public final class QueryResources {
   /**
    * Adds a collection to the global collection list.
    * @param coll documents of collection
-   * @param name collection name
+   * @param name collection name (can be empty string)
    */
   private void addCollection(final Value coll, final String name) {
     colls.add(coll);

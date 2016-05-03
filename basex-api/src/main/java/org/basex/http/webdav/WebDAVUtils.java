@@ -46,7 +46,7 @@ final class WebDAVUtils {
    * @return valid database name
    */
   static String dbname(final String db) {
-    return IO.get(db).dbname();
+    return IO.get(db).dbName();
   }
 
   /**

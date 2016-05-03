@@ -504,6 +504,8 @@ public enum QueryError {
   IOERR_X(FODC, 2, "%"),
   /** FODC0002. */
   WHICHRES_X(FODC, 2, "Resource '%' does not exist."),
+  /** FODC0002. */
+  RESDIR_X(FODC, 2, "URI '%' points to a directory."),
   /** FODC0004. */
   INVCOLL_X(FODC, 4, "Invalid collection URI: '%'."),
   /** FODC0005. */

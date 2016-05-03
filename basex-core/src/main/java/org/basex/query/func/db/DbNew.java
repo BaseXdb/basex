@@ -10,7 +10,6 @@ import org.basex.query.up.primitives.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
