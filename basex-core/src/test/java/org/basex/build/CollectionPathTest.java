@@ -65,7 +65,7 @@ public final class CollectionPathTest extends SandboxTest {
    */
   @Test
   public void baseUri() {
-    assertEquals(NAME + '/' + FILES[1],
+    assertEquals('/' + NAME + '/' + FILES[1],
         query("base-uri(collection('" + NAME + '/' + DIR + "xmark.xml'))"));
   }
 }
