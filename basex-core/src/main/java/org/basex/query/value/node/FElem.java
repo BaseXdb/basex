@@ -4,7 +4,6 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import org.basex.core.MainOptions;
-import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
@@ -353,7 +352,7 @@ public final class FElem extends FNode {
 
   @Override
   public byte[] baseURI() {
-    final byte[] base = attribute(new QNm(BASE, QueryText.XML_URI));
+    final byte[] base = attribute(QNm.XML_BASE);
     return base != null ? base : EMPTY;
   }
 

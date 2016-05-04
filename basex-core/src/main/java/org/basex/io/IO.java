@@ -98,7 +98,7 @@ public abstract class IO {
   /** Offset for compressing texts (see bit layout in {@link Data} class). */
   public static final long OFFCOMP = 0x4000000000L;
 
-  /** File path. The path uses forward slashes, no matter which OS is used. */
+  /** File path. All paths have forward slashes, no matter which OS is used. */
   String pth;
   /** File length. */
   long len = -1;
@@ -110,18 +110,8 @@ public abstract class IO {
    * @param path path
    */
   IO(final String path) {
-    init(path);
-  }
-
-  /**
-   * Sets the file path and name.
-   * @param path file path
-   */
-  private void init(final String path) {
     pth = path;
-    final String n = path.substring(path.lastIndexOf('/') + 1);
-    // use current time if no name is given
-    nm = n.isEmpty() ? Long.toString(System.currentTimeMillis()) + BASEXSUFFIX + XMLSUFFIX : n;
+    nm = path.substring(path.lastIndexOf('/') + 1);
   }
 
   /**
@@ -275,7 +265,8 @@ public abstract class IO {
       final int ch = noDiacritics(cp(n, c));
       if(Databases.validChar(ch, c == 0 || c + 1 == i)) tb.add(ch);
     }
-    return tb.toString();
+    // return hash code if string is empty (mainly required for CHECK command)
+    return tb.isEmpty() ? Integer.toString(hashCode()) : tb.toString();
   }
 
   /**

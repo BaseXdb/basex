@@ -72,7 +72,7 @@ final class WebDAVRoot extends WebDAVFolder {
     return new WebDAVCode<WebDAVDatabase>(this) {
       @Override
       public WebDAVDatabase get() throws IOException {
-        return (WebDAVDatabase) service.createDb(dbname(name));
+        return (WebDAVDatabase) service.createDb(dbName(name));
       }
     }.eval();
   }

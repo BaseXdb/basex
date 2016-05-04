@@ -67,7 +67,7 @@ final class WebDAVFile extends WebDAVResource implements FileResource {
   @Override
   protected void copyToRoot(final String name) throws IOException {
     // document is copied to the root: create new database with it
-    final String nm = dbname(name);
+    final String nm = dbName(name);
     service.createDb(nm);
     service.copyDoc(meta.db, meta.path, nm, name);
   }

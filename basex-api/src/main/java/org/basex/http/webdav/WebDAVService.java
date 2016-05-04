@@ -268,7 +268,7 @@ final class WebDAVService {
    * @throws IOException I/O exception
    */
   void renameDb(final String old, final String db) throws IOException {
-    session().execute(new AlterDB(old, dbname(db)));
+    session().execute(new AlterDB(old, dbName(db)));
   }
 
   /**
@@ -278,7 +278,7 @@ final class WebDAVService {
    * @throws IOException I/O exception
    */
   void copyDb(final String old, final String db) throws IOException {
-    session().execute(new Copy(old, dbname(db)));
+    session().execute(new Copy(old, dbName(db)));
   }
 
   /**
@@ -502,7 +502,7 @@ final class WebDAVService {
       if(peek(bi) == '<') {
         try {
           // add input as XML document
-          return db == null ? createDb(dbname(path), bi) : addXML(db, path, bi);
+          return db == null ? createDb(dbName(path), bi) : addXML(db, path, bi);
         } catch(final IOException ex) {
           // reset stream if it did not work out
           try {
@@ -517,7 +517,7 @@ final class WebDAVService {
       // add input as raw file
       final String d;
       if(db == null) {
-        d = dbname(path);
+        d = dbName(path);
         createDb(d);
       } else {
         d = db;

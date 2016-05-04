@@ -544,13 +544,13 @@ public abstract class W3CTS extends Main {
       tb.add(nm);
 
       // assign document
-      final String dbname = new IOFile(src).dbName();
+      final String dbName = new IOFile(src).dbName();
       // updates: drop updated document or open updated database
       if(updating()) {
         if(first) {
-          new DropDB(dbname).execute(context);
+          new DropDB(dbName).execute(context);
         } else {
-          src = dbname;
+          src = dbName;
         }
       }
 

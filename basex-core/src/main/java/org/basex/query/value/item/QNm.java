@@ -1,6 +1,7 @@
 package org.basex.query.value.item;
 
 import static org.basex.query.QueryError.*;
+import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import java.util.regex.*;
@@ -21,6 +22,8 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class QNm extends Item {
+  /** QName: xml:base. */
+  public static final QNm XML_BASE = new QNm(BASE, XML_URI);
   /** URL pattern (matching Clark and EQName notation). */
   public static final Pattern EQNAME = Pattern.compile("^Q?\\{(.*?)\\}(.+)$");
 

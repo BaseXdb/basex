@@ -194,13 +194,12 @@ public class DBNode extends ANode {
     if(type == NodeType.DOC) {
       final String base = Token.string(data.text(pre, true));
       if(data.inMemory()) {
-        if(base.endsWith(IO.BASEXSUFFIX + IO.XMLSUFFIX)) return Token.EMPTY;
         final String dir = data.meta.original;
         return Token.token(dir.isEmpty() ? base : IO.get(dir).merge(base).url());
       }
-      return new TokenBuilder(data.meta.name).add('/').add(base).finish();
+      return new TokenBuilder().add('/').add(data.meta.name).add('/').add(base).finish();
     }
-    final byte[] base = attribute(new QNm(BASE, XML_URI));
+    final byte[] base = attribute(QNm.XML_BASE);
     return base != null ? base : Token.EMPTY;
   }
 

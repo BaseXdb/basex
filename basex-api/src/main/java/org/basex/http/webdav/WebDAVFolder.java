@@ -126,7 +126,7 @@ class WebDAVFolder extends WebDAVResource implements FolderResource, DeletableCo
   @Override
   protected void copyToRoot(final String name) throws IOException {
     // folder is copied to the root: create new database with it
-    final String dbname = dbname(name);
+    final String dbname = dbName(name);
     service.createDb(dbname);
     service.copyAll(meta.db, meta.path, dbname, "");
   }

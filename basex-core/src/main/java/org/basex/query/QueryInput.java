@@ -10,7 +10,7 @@ import org.basex.io.*;
  * @author Christian Gruen
  */
 public final class QueryInput {
-  /** Original input string. */
+  /** Original input string (resource URI, database path or XML string). */
   public final String original;
   /** Input reference. */
   public final IO io;
@@ -32,7 +32,7 @@ public final class QueryInput {
     io = baseIO == null ? IO.get(original) : baseIO.merge(original);
 
     // check if the specified input string can be rewritten to a database name and path
-    String name = original, path = "";
+    String name = original.startsWith("/") ? original.substring(1) : original, path = "";
     final int s = name.indexOf('/');
     if(s != -1) {
       path = name.substring(s + 1);
