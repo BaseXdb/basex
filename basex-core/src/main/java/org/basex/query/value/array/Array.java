@@ -162,11 +162,6 @@ public abstract class Array extends FItem {
    */
   public abstract Array reverseArray();
 
-  @Override
-  public final boolean isEmpty() {
-    return false;
-  }
-
   /**
    * Checks if this array is empty.
    * Running time: <i>O(1)</i>

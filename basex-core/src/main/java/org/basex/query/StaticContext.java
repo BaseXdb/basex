@@ -99,8 +99,8 @@ public final class StaticContext {
    */
   IO resolve(final String path, final String uri) {
     if(resolver != null) return resolver.resolve(path, uri, baseURI);
-    final IO base = baseIO();
-    return base != null ? base.merge(path) : IO.get(path);
+    final IO baseIO = baseIO();
+    return baseIO != null ? baseIO.merge(path) : IO.get(path);
   }
 
   /**

@@ -554,7 +554,7 @@ public abstract class W3CTS extends Main {
         }
       }
 
-      final Value value = qp.qc.resources.doc(new QueryInput(src), qp.sc.baseIO(), null);
+      final Value value = qp.qc.resources.doc(new QueryInput(src, qp.sc), null);
       qp.bind(string(vars.itemAt(n).string(null)), value);
     }
     return tb.finish();
@@ -587,7 +587,7 @@ public abstract class W3CTS extends Main {
    * @throws QueryException query exception
    */
   private Uri coll(final String name, final QueryProcessor qp) throws QueryException {
-    qp.qc.resources.addCollection(name, colls.get(name), qp.sc.baseIO());
+    qp.qc.resources.addCollection(name, colls.get(name), qp.sc);
     return Uri.uri(name);
   }
 

@@ -15,6 +15,6 @@ public final class InspectModule extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     checkCreate(qc);
-    return new PlainDoc(qc, info).parse(checkPath(exprs[0], qc));
+    return new PlainDoc(qc, info).parse(checkPath(0, qc));
   }
 }

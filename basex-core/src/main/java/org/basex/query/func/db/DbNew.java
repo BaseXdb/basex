@@ -56,13 +56,14 @@ abstract class DbNew extends DbAccess {
 
     if(!input.type.isStringOrUntyped()) throw STRNOD_X_X.get(info, input.type, input);
 
-    final QueryInput qi = new QueryInput(string(input.string(info)));
-    if(!qi.input.exists()) throw WHICHRES_X.get(info, qi.original);
+    final String string = string(input.string(info));
+    final IO io = IO.get(string);
+    if(!io.exists()) throw WHICHRES_X.get(info, string);
 
     // add slash to the target if the addressed file is an archive or directory
     String name = string(path);
     if(name.endsWith(".")) throw RESINV_X.get(info, path);
-    if(!name.endsWith("/") && (qi.input.isDir() || qi.input.isArchive())) name += "/";
+    if(!name.endsWith("/") && (io.isDir() || io.isArchive())) name += "/";
     String target = "";
     final int s = name.lastIndexOf('/');
     if(s != -1) {
@@ -71,14 +72,14 @@ abstract class DbNew extends DbAccess {
     }
 
     // set name of document
-    if(!name.isEmpty()) qi.input.name(name);
+    if(!name.isEmpty()) io.name(name);
     // get name from io reference
-    else if(!(qi.input instanceof IOContent)) name = qi.input.name();
+    else if(!(io instanceof IOContent)) name = io.name();
 
     // ensure that the final name is not empty
     if(name.isEmpty()) throw RESINV_X.get(info, path);
 
-    ni.io = qi.input;
+    ni.io = io;
     ni.path = target;
     return ni;
   }

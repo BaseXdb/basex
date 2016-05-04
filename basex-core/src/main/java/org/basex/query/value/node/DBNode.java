@@ -192,12 +192,11 @@ public class DBNode extends ANode {
   @Override
   public final byte[] baseURI() {
     if(type == NodeType.DOC) {
-      final byte[] base = data.text(pre, true);
+      final String base = Token.string(data.text(pre, true));
       if(data.inMemory()) {
-        final String bs = Token.string(base);
-        if(bs.endsWith(IO.BASEXSUFFIX + IO.XMLSUFFIX)) return Token.EMPTY;
+        if(base.endsWith(IO.BASEXSUFFIX + IO.XMLSUFFIX)) return Token.EMPTY;
         final String dir = data.meta.original;
-        return Token.token(dir.isEmpty() ? bs : IO.get(dir).merge(bs).url());
+        return Token.token(dir.isEmpty() ? base : IO.get(dir).merge(base).url());
       }
       return new TokenBuilder(data.meta.name).add('/').add(base).finish();
     }

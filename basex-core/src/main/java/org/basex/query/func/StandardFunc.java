@@ -58,7 +58,7 @@ public abstract class StandardFunc extends Arr {
    * @param args function arguments
    * @return self reference
    */
-  StandardFunc init(final StaticContext sctx, final InputInfo ii, final Function f,
+  final StandardFunc init(final StaticContext sctx, final InputInfo ii, final Function f,
       final Expr[] args) {
     sc = sctx;
     sig = f;
@@ -104,8 +104,8 @@ public abstract class StandardFunc extends Arr {
    * @return result
    * @throws QueryException query exception
    */
-  protected byte[] serialize(final Iter ir, final SerializerOptions opts, final QueryError err)
-      throws QueryException {
+  protected final byte[] serialize(final Iter ir, final SerializerOptions opts,
+      final QueryError err) throws QueryException {
 
     try {
       final ArrayOutput ao = new ArrayOutput();
@@ -162,7 +162,7 @@ public abstract class StandardFunc extends Arr {
    * @return expression
    * @throws QueryException query exception
    */
-  protected Expr ctxArg(final int index, final QueryContext qc) throws QueryException {
+  protected final Expr ctxArg(final int index, final QueryContext qc) throws QueryException {
     return exprs.length == index ? ctxValue(qc) : exprs[index];
   }
 
@@ -197,7 +197,7 @@ public abstract class StandardFunc extends Arr {
    * @return file instance
    * @throws QueryException query exception
    */
-  protected Path toPath(final int i, final QueryContext qc) throws QueryException {
+  protected final Path toPath(final int i, final QueryContext qc) throws QueryException {
     return i < exprs.length ? toPath(string(toToken(exprs[i], qc))) : null;
   }
 
@@ -207,7 +207,7 @@ public abstract class StandardFunc extends Arr {
    * @return file instance
    * @throws QueryException query exception
    */
-  protected Path toPath(final String path) throws QueryException {
+  protected final Path toPath(final String path) throws QueryException {
     try {
       return Paths.get(IOUrl.isFileURL(path) ? IOUrl.toFile(path) : path);
     } catch(final InvalidPathException ex) {
@@ -218,26 +218,26 @@ public abstract class StandardFunc extends Arr {
   /**
    * Returns a valid reference if a file is found at the specified path or the static base uri.
    * Otherwise, returns an error.
-   * @param path file path
+   * @param i index of URI argument
    * @param qc query context
    * @return input source, or exception
    * @throws QueryException query exception
    */
-  protected IO checkPath(final Expr path, final QueryContext qc) throws QueryException {
-    return checkPath(toToken(path, qc));
+  protected final IO checkPath(final int i, final QueryContext qc) throws QueryException {
+    return checkPath(toToken(exprs[i], qc));
   }
 
   /**
    * Returns a valid reference if a file is found at the specified path or the static base uri.
    * Otherwise, returns an error.
-   * @param path file path
+   * @param uri file URI
    * @return input source, or exception
    * @throws QueryException query exception
    */
-  protected IO checkPath(final byte[] path) throws QueryException {
-    final IO io = QueryResources.checkPath(new QueryInput(string(path)), sc.baseIO());
-    if(io == null) throw WHICHRES_X.get(info, path);
-    return io;
+  protected final IO checkPath(final byte[] uri) throws QueryException {
+    final QueryInput qi = new QueryInput(string(uri), sc);
+    if(qi.io.exists()) return qi.io;
+    throw WHICHRES_X.get(info, uri);
   }
 
   /**
@@ -271,7 +271,7 @@ public abstract class StandardFunc extends Arr {
    * @return passed on options
    * @throws QueryException query exception
    */
-  protected <E extends Options> E toOptions(final int i, final QNm qnm, final E opts,
+  protected final <E extends Options> E toOptions(final int i, final QNm qnm, final E opts,
       final QueryContext qc) throws QueryException {
 
     return i >= exprs.length ? opts :
@@ -359,7 +359,7 @@ public abstract class StandardFunc extends Arr {
    * @return function item
    * @throws QueryException query exception
    */
-  protected FItem checkArity(final Expr expr, final int nargs, final QueryContext qc)
+  protected final FItem checkArity(final Expr expr, final int nargs, final QueryContext qc)
       throws QueryException {
 
     final FItem fun = toFunc(expr, qc);

@@ -133,13 +133,12 @@ abstract class ValidateFn extends StandardFunc {
   /**
    * Returns an input reference (possibly cached) to the first argument.
    * @param it item
-   * @param qc query context
    * @param sopts serializer parameters
    * @return item
    * @throws QueryException query exception
    * @throws IOException exception
    */
-  protected final IO read(final Item it, final QueryContext qc, final SerializerOptions sopts)
+  protected final IO read(final Item it, final SerializerOptions sopts)
       throws QueryException, IOException {
 
     if(it instanceof ANode) {
@@ -150,7 +149,7 @@ abstract class ValidateFn extends StandardFunc {
     }
 
     if(it.type.isStringOrUntyped()) {
-      IO io = checkPath(it, qc);
+      IO io = checkPath(toToken(it));
       if(sopts != null) {
         // add doctype declaration if specified
         io = new IOContent(new DBNode(io).serialize(sopts).finish());

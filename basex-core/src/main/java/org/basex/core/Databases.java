@@ -188,7 +188,7 @@ public final class Databases {
 
   /**
    * Checks if the specified string is a valid database name.
-   * @param name name to be checked
+   * @param name name to be checked (can be {@code null})
    * @return result of check
    */
   public static boolean validName(final String name) {
@@ -197,7 +197,7 @@ public final class Databases {
 
   /**
    * Checks if the specified string is a valid database name.
-   * @param name name to be checked
+   * @param name name to be checked (can be {@code null})
    * @param glob allow glob syntax
    * @return result of check
    */

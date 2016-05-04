@@ -594,9 +594,7 @@ public enum QueryError {
   /** FORG0001. */
   DATEFORMAT_X_X_X(FORG, 1, "Wrong % format: '%' (try e.g. '%')."),
   /** FORG0002. */
-  URIARG_X(FORG, 2, "URI argument is invalid: %."),
-  /** FORG0002. */
-  URINOTABS_X(FORG, 2, "Base URI is not absolute: %."),
+  URIARG_X(FORG, 2, "Specific URI is invalid: %."),
 
   /** FORG0003. */
   ZEROORONE(FORG, 3, "Zero or one value expected."),

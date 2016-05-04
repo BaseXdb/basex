@@ -1,11 +1,11 @@
 package org.basex.query.func.fn;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.query.func.Function.*;
 import static org.basex.util.Token.*;
 
 import org.basex.core.locks.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -29,14 +29,15 @@ public abstract class Docs extends StandardFunc {
    * @throws QueryException query exception
    */
   Value collection(final QueryContext qc) throws QueryException {
-    // return default collection
+    // return default collection or parse specified collection
+    QueryInput qi = null;
     final Item it = exprs.length == 0 ? null : exprs[0].atomItem(qc, info);
-    if(it == null) return qc.resources.collection(info);
-
-    // check if reference is valid
-    final byte[] in = toToken(it);
-    if(!Uri.uri(in).isValid()) throw INVCOLL_X.get(info, in);
-    return qc.resources.collection(new QueryInput(string(in)), sc.baseIO(), info);
+    if(it != null) {
+      final byte[] uri = toToken(it);
+      if(!Uri.uri(uri).isValid()) throw INVCOLL_X.get(info, uri);
+      qi = new QueryInput(string(uri), sc);
+    }
+    return qc.resources.collection(qi, info);
   }
 
   /**
@@ -48,20 +49,24 @@ public abstract class Docs extends StandardFunc {
   ANode doc(final QueryContext qc) throws QueryException {
     final Item it = exprs[0].item(qc, info);
     if(it == null) return null;
-    final byte[] in = toToken(it);
-    if(!Uri.uri(in).isValid()) throw INVDOC_X.get(info, in);
-    return qc.resources.doc(new QueryInput(string(in)), sc.baseIO(), info);
+    final byte[] uri = toToken(it);
+    if(!Uri.uri(uri).isValid()) throw INVDOC_X.get(info, uri);
+    return qc.resources.doc(new QueryInput(string(uri), sc), info);
   }
 
   @Override
   public final boolean accept(final ASTVisitor visitor) {
     if(exprs.length == 0) {
-      if(oneOf(sig, COLLECTION, URI_COLLECTION) && !visitor.lock(COLL)) return false;
-    } else if(!(exprs[0] instanceof Str)) {
-      if(!visitor.lock(null)) return false;
+      // only applies to collections
+      if(!visitor.lock(COLL)) return false;
     } else {
-      final QueryInput qi = new QueryInput(string(((Str) exprs[0]).string()));
-      if(!visitor.lock(qi.dbName)) return false;
+      final Expr expr = exprs[0];
+      if(expr instanceof Str) {
+        final QueryInput qi = new QueryInput(string(((Str) expr).string()), sc);
+        if(!visitor.lock(qi.dbName)) return false;
+      } else if(!expr.isEmpty()) {
+        if(!visitor.lock(null)) return false;
+      }
     }
     return super.accept(visitor);
   }

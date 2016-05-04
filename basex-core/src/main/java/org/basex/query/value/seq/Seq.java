@@ -45,11 +45,6 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  public final boolean isEmpty() {
-    return false;
-  }
-
-  @Override
   public final Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     throw SEQFOUND_X.get(ii, this);
   }

@@ -37,7 +37,7 @@ public final class InspectFunctions extends StandardFunc {
       // cache existing functions
       Collections.addAll(old, qc.funcs.funcs());
       try {
-        final IO io = checkPath(exprs[0], qc);
+        final IO io = checkPath(0, qc);
         qc.parse(Token.string(io.read()), io.path(), sc);
         qc.funcs.compile(qc, true);
       } catch(final IOException ex) {

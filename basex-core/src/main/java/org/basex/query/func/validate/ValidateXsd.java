@@ -55,7 +55,7 @@ public class ValidateXsd extends ValidateFn {
     return process(new Validation() {
       @Override
       void process(final ErrorHandler handler) throws IOException, SAXException, QueryException {
-        final IO in = read(toNodeOrAtomItem(exprs[0], qc), qc, null);
+        final IO in = read(toNodeOrAtomItem(exprs[0], qc), null);
         final Item schema = exprs.length > 1 ? toNodeOrAtomItem(exprs[1].item(qc, info)) : null;
         final String version = exprs.length > 2 ? Token.string(toToken(exprs[2], qc)) : null;
         final boolean xsd11 = VERSION_11.equals(version);
@@ -89,7 +89,7 @@ public class ValidateXsd extends ValidateFn {
           s = sf.newSchema();
         } else {
           // schema is specified as string
-          s = sf.newSchema(new URL(prepare(read(schema, qc, null), handler).url()));
+          s = sf.newSchema(new URL(prepare(read(schema, null), handler).url()));
         }
 
         final Validator v = s.newValidator();

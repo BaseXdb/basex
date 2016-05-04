@@ -85,8 +85,9 @@ public abstract class ASTVisitor {
 
   /**
    * Notifies the visitor of a database lock. Overwritten by {@link MainModule}.
-   * @param db database to be locked
-   * @return if database locks cannot be detected statically
+   * Returns {@code false} if database lock cannot be statically detected.
+   * @param db database to be locked ({@code null} if unknown)
+   * @return if more expressions should be visited
    */
   @SuppressWarnings("unused")
   public boolean lock(final String db) {
@@ -94,12 +95,12 @@ public abstract class ASTVisitor {
   }
 
   /**
-   * Notifies the visitor of an expression entering a focus.
+   * Notifies the visitor of an expression entering a focus. Overwritten by {@link MainModule}.
    */
   public void enterFocus() { }
 
   /**
-   * Notifies the visitor of an expression leaving a focus.
+   * Notifies the visitor of an expression leaving a focus. Overwritten by {@link MainModule}.
    */
   public void exitFocus() { }
 }

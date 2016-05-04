@@ -54,9 +54,9 @@ public abstract class Parse extends StandardFunc {
       if(uri.isAbsolute()) {
         io = IO.get(p);
       } else {
-        final IO base = sc.baseIO();
-        if(base == null) throw STBASEURI.get(info);
-        io = base.merge(p);
+        final IO baseIO = sc.baseIO();
+        if(baseIO == null) throw STBASEURI.get(info);
+        io = baseIO.merge(p);
       }
 
       String[] rp = qc.resources.text(p);

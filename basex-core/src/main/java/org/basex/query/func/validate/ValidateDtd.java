@@ -46,7 +46,7 @@ public class ValidateDtd extends ValidateFn {
           sp.set(SerializerOptions.DOCTYPE_SYSTEM, prepare(schema, handler).url());
         }
 
-        final IO in = read(input, qc, sp);
+        final IO in = read(input, sp);
         final SAXParserFactory sf = SAXParserFactory.newInstance();
         sf.setValidating(true);
         sf.newSAXParser().parse(in.inputSource(), handler);

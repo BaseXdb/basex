@@ -115,7 +115,7 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
     final StringList sl = new StringList();
     for(final String p : paths) sl.add(p);
     try {
-      qp.qc.resources.addCollection(name, sl.toArray(), qp.sc.baseIO());
+      qp.qc.resources.addCollection(name, sl.toArray(), qp.sc);
     } catch(final QueryException ex) {
       throw new XQueryException(ex);
     }
@@ -123,13 +123,14 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
 
   /**
    * Returns a collection of document nodes.
-   * @param name name of the collection (can be empty string)
+   * @param name name of the collection (empty string for default collection)
    * @return reference
    * @throws XQueryException exception
    */
   public XdmValue collection(final String name) {
     try {
-      return XdmValue.get(qp.qc.resources.collection(new QueryInput(name), qp.sc.baseIO(), null));
+      return XdmValue.get(qp.qc.resources.collection(name.isEmpty() ? null :
+        new QueryInput(name, qp.sc), null));
     } catch(final QueryException ex) {
       throw new XQueryException(ex);
     }
@@ -143,7 +144,7 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
    */
   public XdmValue document(final String name) {
     try {
-      return XdmItem.get(qp.qc.resources.doc(new QueryInput(name), qp.sc.baseIO(), null));
+      return XdmItem.get(qp.qc.resources.doc(new QueryInput(name, qp.sc), null));
     } catch(final QueryException ex) {
       throw new XQueryException(ex);
     }
@@ -157,7 +158,7 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
    */
   public void addDocument(final String name, final String path) {
     try {
-      qp.qc.resources.addDoc(name, path, qp.sc.baseIO());
+      qp.qc.resources.addDoc(name, path, qp.sc);
     } catch(final QueryException ex) {
       throw new XQueryException(ex);
     }

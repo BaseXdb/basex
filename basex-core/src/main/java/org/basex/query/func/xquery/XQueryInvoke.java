@@ -18,7 +18,7 @@ public final class XQueryInvoke extends XQueryEval {
   @Override
   protected ItemList eval(final QueryContext qc) throws QueryException {
     checkCreate(qc);
-    final IO io = checkPath(exprs[0], qc);
+    final IO io = checkPath(0, qc);
     try {
       return eval(qc, io.read(), io.path(), false);
     } catch(final IOException ex) {

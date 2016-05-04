@@ -82,7 +82,7 @@ public class XsltTransform extends XsltFn {
         e.getCause(info);
       }
     }
-    if(it.type.isStringOrUntyped()) return checkPath(it, qc);
+    if(it.type.isStringOrUntyped()) return checkPath(toToken(it));
     throw STRNOD_X_X.get(info, it.type, it);
   }
 
