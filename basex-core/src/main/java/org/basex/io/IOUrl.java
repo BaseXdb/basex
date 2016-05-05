@@ -93,15 +93,8 @@ public final class IOUrl extends IO {
   }
 
   @Override
-  public String dir() {
-    return pth.endsWith("/") ? pth : pth.substring(0, pth.lastIndexOf('/') + 1);
-  }
-
-  @Override
-  public IO merge(final String path) {
-    final IO io = IO.get(path);
-    if(!(io instanceof IOFile) || path.contains(":") || path.startsWith("/")) return io;
-    return IO.get((pth.endsWith("/") ? pth : pth.replace("^(.*/).*", "$1")) + path);
+  public boolean isDir() {
+    return pth.endsWith("/");
   }
 
   /**

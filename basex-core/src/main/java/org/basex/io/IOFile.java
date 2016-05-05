@@ -19,18 +19,28 @@ import org.xml.sax.*;
  * @author Christian Gruen
  */
 public final class IOFile extends IO {
+  /** Pattern for absolute file paths. */
+  public static final Pattern ABSOLUTE =
+      Pattern.compile(Prop.WIN ? "^(/|\\|[a-zA-Z]:).*$" : "^/.*");
   /** Pattern for valid file names. */
   private static final Pattern VALIDNAME =
       Pattern.compile("^[^\\\\/" + (Prop.WIN ? ":*?\"<>\\|" : "") + "]+$");
   /** File reference. */
   private final File file;
+  /** Indicate if supplied path was absolute. */
+  private final boolean absolute;
 
   /**
    * Constructor.
-   * @param path file path
+   * @param file file reference
+   * @param original original path
    */
-  public IOFile(final String path) {
-    this(new File(path));
+  private IOFile(final File file, final String original) {
+    super(new PathList().create(file.getAbsolutePath()));
+    absolute = file.isAbsolute();
+    this.file = absolute ? file : file.getAbsoluteFile();
+    // preserve trailing slash
+    if(original.endsWith("/") || original.endsWith("\\")) pth += '/';
   }
 
   /**
@@ -38,26 +48,33 @@ public final class IOFile extends IO {
    * @param file file reference
    */
   public IOFile(final File file) {
-    super(new PathList().create(file.getAbsolutePath()));
-    this.file = file.isAbsolute() ? file : file.getAbsoluteFile();
+    this(file, "");
   }
 
   /**
    * Constructor.
-   * @param dir directory
-   * @param name file name
+   * @param path file path
    */
-  public IOFile(final String dir, final String name) {
-    this(new File(dir, name));
+  public IOFile(final String path) {
+    this(new File(path), path);
   }
 
   /**
    * Constructor.
-   * @param dir directory
-   * @param name file name
+   * @param dir parent directory string
+   * @param child child directory string
    */
-  public IOFile(final IOFile dir, final String name) {
-    this(new File(dir.file, name));
+  public IOFile(final String dir, final String child) {
+    this(new File(dir, child), child);
+  }
+
+  /**
+   * Constructor.
+   * @param dir directory string
+   * @param child child path string
+   */
+  public IOFile(final IOFile dir, final String child) {
+    this(new File(dir.file, child), child);
   }
 
   /**
@@ -98,6 +115,11 @@ public final class IOFile extends IO {
   }
 
   @Override
+  public boolean isAbsolute() {
+    return absolute;
+  }
+
+  @Override
   public long timeStamp() {
     return file.lastModified();
   }
@@ -129,14 +151,7 @@ public final class IOFile extends IO {
    */
   public IOFile resolve(final String path) {
     final File f = new File(path);
-    return f.isAbsolute() ? new IOFile(f) : new IOFile(dir(), path);
-  }
-
-  @Override
-  public IO merge(final String path) {
-    final IO io = IO.get(path);
-    if(!(io instanceof IOFile) || path.contains(":") || path.startsWith("/")) return io;
-    return new IOFile(dir(), path);
+    return f.isAbsolute() ? new IOFile(f) : new IOFile(isDir() ? pth : dir(), path);
   }
 
   /**
@@ -145,11 +160,6 @@ public final class IOFile extends IO {
    */
   public boolean md() {
     return file.exists() || file.mkdirs();
-  }
-
-  @Override
-  public String dir() {
-    return isDir() ? pth : pth.substring(0, pth.lastIndexOf('/') + 1);
   }
 
   /**
@@ -338,7 +348,7 @@ public final class IOFile extends IO {
   // STATIC METHODS ===============================================================================
 
   /**
-   * Checks if the specified sting is a valid file name.
+   * Checks if the specified string is a valid file name.
    * @param name file name
    * @return result of check
    */
@@ -355,9 +365,11 @@ public final class IOFile extends IO {
     // no colon: treat as file path
     final int c = path.indexOf(':');
     if(c == -1) return true;
-    // Windows drive letter? Colon after first slash?
+    // Windows drive letter?
     final int fs = path.indexOf('/'), bs = path.indexOf('\\');
-    return c == 1 && Token.letter(path.charAt(0)) || fs != -1 && fs < c || bs != -1 && bs < c;
+    if(Prop.WIN && c == 1 && Token.letter(path.charAt(0)) && (fs == 2 || bs == 2)) return true;
+    // ensure that slash occurs before colon
+    return fs != -1 && fs < c || bs != -1 && bs < c;
   }
 
   /**

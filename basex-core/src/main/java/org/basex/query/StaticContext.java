@@ -83,27 +83,6 @@ public final class StaticContext {
   }
 
   /**
-   * Returns an IO representation of the static base URI or {@code null}.
-   * @return IO reference (can be {@code null})
-   */
-  public IO baseIO() {
-    return baseURI == Uri.EMPTY ? null : IO.get(string(baseURI.string()));
-  }
-
-  /**
-   * Returns an IO reference for the specified path.
-   * If a base URI exists, it is merged with the path.
-   * @param path file path
-   * @param uri module namespace (can be {@code null})
-   * @return io reference
-   */
-  IO resolve(final String path, final String uri) {
-    if(resolver != null) return resolver.resolve(path, uri, baseURI);
-    final IO baseIO = baseIO();
-    return baseIO != null ? baseIO.merge(path) : IO.get(path);
-  }
-
-  /**
    * Returns the static base URI.
    * @return base URI
    */
@@ -113,23 +92,48 @@ public final class StaticContext {
 
   /**
    * Sets the static base URI.
-   * @param uri uri to be set
+   * @param uri uri to be set ({@code null} invalidates URI)
    */
   public void baseURI(final String uri) {
-    final IO base = IO.get(uri);
-    String url;
-    if(uri.isEmpty()) {
-      url = "";
-    } else if(base instanceof IOContent) {
-      url = uri;
-    } else if(baseURI == Uri.EMPTY) {
-      url = base.url();
-    } else {
-      url = baseIO().merge(uri).url();
+    String string = "";
+    if(uri != null) {
+      // ignore empty URIs
+      if(uri.isEmpty()) return;
+      // adopt original URIs that do not adhere to a known IO schema
+      string = IO.get(uri) instanceof IOContent ? uri : resolve(uri).url();
+      // #1062: check if specified URI points to a directory. if yes, add trailing slash
+      if(!string.endsWith("/") && (uri.endsWith(".") || uri.endsWith("/"))) string += '/';
     }
-    // #1062: check if specified URI points to a directory. if yes, add trailing slash
-    if(!url.endsWith("/") && (uri.endsWith(".") || uri.endsWith("/"))) url += '/';
-    baseURI = Uri.uri(url);
+    baseURI = Uri.uri(string);
+  }
+
+  /**
+   * Returns an IO representation of the static base URI or {@code null}.
+   * @return IO reference (can be {@code null})
+   */
+  public IO baseIO() {
+    return baseURI == Uri.EMPTY ? null : IO.get(string(baseURI.string()));
+  }
+
+  /**
+   * Resolves the specified path against the base URI.
+   * @param path to be resolved
+   * @return resulting path
+   */
+  public IO resolve(final String path) {
+    final IO baseIO = baseIO();
+    return baseIO == null ? IO.get(path) : baseIO.merge(path);
+  }
+
+  /**
+   * Returns an IO reference for the specified path.
+   * If a base URI exists, it is merged with the path.
+   * @param path file path
+   * @param uri module namespace (can be {@code null})
+   * @return io reference
+   */
+  public IO resolve(final String path, final String uri) {
+    return resolver == null ? resolve(path) : resolver.resolve(path, uri, baseURI);
   }
 
   @Override

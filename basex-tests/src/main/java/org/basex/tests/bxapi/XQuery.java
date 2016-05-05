@@ -191,7 +191,7 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
    * @throws XQueryException exception
    */
   public XQuery baseURI(final String base) {
-    qp.sc.baseURI(base);
+    qp.sc.baseURI(base.equals("#UNDEFINED") ? null : base);
     return this;
   }
 

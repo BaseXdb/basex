@@ -169,11 +169,18 @@ public abstract class IO {
 
   /**
    * Tests if this is a directory instance.
-   * Returns {@code false} for IO instances other than {@link IOFile}.
    * @return result of check
    */
   public boolean isDir() {
     return false;
+  }
+
+  /**
+   * Tests if this is an absolute path.
+   * @return result of check
+   */
+  public boolean isAbsolute() {
+    return true;
   }
 
   /**
@@ -234,13 +241,14 @@ public abstract class IO {
   public abstract InputStream inputStream() throws IOException;
 
   /**
-   * Merges two paths. Returns the new specified path for {@link IOContent} and
-   * {@link IOStream} instances.
-   * @param in name/path to be appended
+   * Merges two paths.
+   * @param path path to be merged
    * @return resulting reference
    */
-  public IO merge(final String in) {
-    return get(in);
+  public final IO merge(final String path) {
+    if(path.isEmpty()) return this;
+    final IO io = IO.get(path);
+    return io.isAbsolute() ? io : IO.get((pth.endsWith("/") ? pth : dir()) + path);
   }
 
   /**
@@ -287,12 +295,21 @@ public abstract class IO {
   }
 
   /**
-   * Returns the path.
+   * Returns the full path.
    * The path uses forward slashes, no matter which OS is used.
    * @return path
    */
   public final String path() {
     return pth;
+  }
+
+  /**
+   * Returns the directory path (all characters up to the last slash).
+   * No check will be performed if the directory exists.
+   * @return directory path
+   */
+  public final String dir() {
+    return pth.substring(0, pth.lastIndexOf('/') + 1);
   }
 
   /**
@@ -302,14 +319,6 @@ public abstract class IO {
    */
   public String url() {
     return pth;
-  }
-
-  /**
-   * Returns the directory path.
-   * @return chopped filename
-   */
-  public String dir() {
-    return "";
   }
 
   /**

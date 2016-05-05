@@ -27,9 +27,7 @@ public final class QueryInput {
    */
   public QueryInput(final String original, final StaticContext sc) {
     this.original = original;
-
-    final IO baseIO = sc.baseIO();
-    io = baseIO == null ? IO.get(original) : baseIO.merge(original);
+    io = sc.resolve(original);
 
     // check if the specified input string can be rewritten to a database name and path
     String name = original.startsWith("/") ? original.substring(1) : original, path = "";

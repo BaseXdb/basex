@@ -42,6 +42,7 @@ public abstract class Parse extends StandardFunc {
     final byte[] path = toToken(it);
 
     String enc = null;
+    IO io = null;
     try {
       enc = encoding ? toEncoding(1, ENCODING_X, qc) : null;
 
@@ -50,23 +51,20 @@ public abstract class Parse extends StandardFunc {
       final Uri uri = Uri.uri(p);
       if(!uri.isValid()) throw INVURL_X.get(info, p);
 
-      IO io;
       if(uri.isAbsolute()) {
         io = IO.get(p);
       } else {
-        final IO baseIO = sc.baseIO();
-        if(baseIO == null) throw STBASEURI.get(info);
-        io = baseIO.merge(p);
+        if(sc.baseURI() == Uri.EMPTY) throw STBASEURI.get(info);
+        io = sc.resolve(p);
       }
 
+      // overwrite path with global resource files
       String[] rp = qc.resources.text(p);
       if(rp == null) rp = qc.resources.text(io.path());
-
       if(rp != null && rp.length > 0) {
         io = IO.get(rp[0]);
         if(rp.length > 1) enc = rp[1];
       }
-      if(!io.exists()) throw RESNF_X.get(info, p);
 
       try(final InputStream is = io.inputStream()) {
         final TextInput ti = new TextInput(io).encoding(enc).validate(true);
@@ -83,7 +81,7 @@ public abstract class Parse extends StandardFunc {
         final boolean inv = ex instanceof EncodingException || enc != null;
         throw (inv ? INVCHARS_X : WHICHCHARS_X).get(info, ex);
       }
-      throw RESNF_X.get(info, path);
+      throw RESNF_X.get(info, io);
     }
   }
 

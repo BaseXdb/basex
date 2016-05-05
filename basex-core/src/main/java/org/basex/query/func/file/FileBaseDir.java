@@ -16,6 +16,7 @@ public final class FileBaseDir extends FileFn {
   @Override
   public Item item(final QueryContext qc) {
     final IO base = sc.baseIO();
-    return base instanceof IOFile ? get(absolute(Paths.get(base.dir())), true) : null;
+    if(!(base instanceof IOFile)) return null;
+    return get(absolute(Paths.get(base.isDir() ? base.path() : base.dir())), true);
   }
 }

@@ -310,7 +310,7 @@ public final class QT3TS extends Main {
       if(uri == null) break;
       final XdmItem file = qmod.next();
       if(file == null) break;
-      query.addModule(uri.getString(), baseDir + file.getString());
+      query.addModule(uri.getString(), new IOFile(baseDir, file.getString()).path());
     }
 
     final QT3Result returned = new QT3Result();
@@ -888,7 +888,7 @@ public final class QT3TS extends Main {
    */
   private String file(final boolean base, final String file) {
     final String dir = base ? baseDir : basePath;
-    return dir == null ? file : new File(dir, file).getAbsolutePath();
+    return dir == null ? file : new IOFile(dir, file).path();
   }
 
   /**

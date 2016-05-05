@@ -167,7 +167,7 @@ public final class ProjectView extends BaseXPanel {
       final ProjectNode node = (ProjectNode) en.nextElement();
       if(node.file == null) continue;
 
-      final String path = node.file.path(), dir = node.file.dir() + '/';
+      final String path = node.file.path(), dir = node.file.dir();
       boolean found = false;
       for(final String p : paths) {
         if(p.equals(path) || p.startsWith(dir)) {

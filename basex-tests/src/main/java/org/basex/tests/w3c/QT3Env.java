@@ -66,7 +66,7 @@ final class QT3Env {
     al = list(ctx, env, COLLATION);
     collations = al.isEmpty() ? null : al.get(0);
     final String uri = string(STATIC_BASE_URI, ctx, env);
-    baseURI = "#UNDEFINED".equals(uri) ? "" : uri;
+    baseURI = uri;
 
     // collections
     collURI = XQuery.string("*:collection/@uri", env, ctx);

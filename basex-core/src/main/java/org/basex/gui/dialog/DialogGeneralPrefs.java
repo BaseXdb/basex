@@ -70,7 +70,7 @@ final class DialogGeneralPrefs extends BaseXBack {
       public void actionPerformed(final ActionEvent e) {
         final String path = dbPath.getText();
         final IOFile dir = new BaseXFileChooser(CHOOSE_DIR, path, gui).select(Mode.DOPEN);
-        if(dir != null) dbPath.setText(dir.dir());
+        if(dir != null) dbPath.setText(dir.path());
       }
     });
 
@@ -80,7 +80,7 @@ final class DialogGeneralPrefs extends BaseXBack {
       public void actionPerformed(final ActionEvent e) {
         final String path = repoPath.getText();
         final IOFile dir = new BaseXFileChooser(CHOOSE_DIR, path, gui).select(Mode.DOPEN);
-        if(dir != null) repoPath.setText(dir.dir());
+        if(dir != null) repoPath.setText(dir.path());
       }
     });
 

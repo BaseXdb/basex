@@ -1220,7 +1220,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   /** Test output URI is correctly resolved. */
   @Test
   public void resolveUri() {
-    final String output = sandbox().merge("test.xml").url();
+    final String output = new IOFile(sandbox(), "test.xml").url();
     query(PUT.args("<a/>", output));
   }
 

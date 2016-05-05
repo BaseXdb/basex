@@ -62,7 +62,8 @@ public final class DirParser extends Parser {
   public DirParser(final IO source, final MainOptions options) {
     super(source, options);
 
-    final String dir = source.dir();
+    final boolean isDir = source.isDir();
+    final String dir = isDir ? source.path() : source.dir();
     root = dir.endsWith("/") ? dir : dir + '/';
     skipCorrupt = options.get(MainOptions.SKIPCORRUPT);
     archives = options.get(MainOptions.ADDARCHIVES);
@@ -70,7 +71,7 @@ public final class DirParser extends Parser {
     addRaw = options.get(MainOptions.ADDRAW);
     dtd = options.get(MainOptions.DTD);
     rawParser = options.get(MainOptions.PARSER) == MainParser.RAW;
-    filter = !source.isDir() && !source.isArchive() ? null :
+    filter = !isDir && !source.isArchive() ? null :
       Pattern.compile(IOFile.regex(options.get(MainOptions.CREATEFILTER)));
   }
 

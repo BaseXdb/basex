@@ -194,8 +194,8 @@ public class DBNode extends ANode {
     if(type == NodeType.DOC) {
       final String base = Token.string(data.text(pre, true));
       if(data.inMemory()) {
-        final String dir = data.meta.original;
-        return Token.token(dir.isEmpty() ? base : IO.get(dir).merge(base).url());
+        final String path = data.meta.original;
+        return Token.token(path.isEmpty() ? base : IO.get(path).merge(base).url());
       }
       return new TokenBuilder().add('/').add(data.meta.name).add('/').add(base).finish();
     }

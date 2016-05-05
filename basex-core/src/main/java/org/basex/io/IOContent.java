@@ -29,7 +29,7 @@ public final class IOContent extends IO {
    * @param content contents
    */
   public IOContent(final String content) {
-    this(Token.token(content), "");
+    this(Token.token(content));
   }
 
   /**

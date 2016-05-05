@@ -113,8 +113,8 @@ public final class QueryInfo {
       else tb.add(LOCAL).add(' ').add(Arrays.toString(writeLocked.toArray()));
       tb.add(NL);
     }
-    final IO io = qp.sc.baseIO();
-    final String name = io == null ? "" : " \"" + io.name() + '"';
+    final IO baseIO = qp.sc.baseIO();
+    final String name = baseIO == null ? "" : " \"" + baseIO.name() + '"';
     tb.addExt(NL + QUERY_EXECUTED_X_X, name, Performance.getTime(total, runs));
     return tb.toString();
   }

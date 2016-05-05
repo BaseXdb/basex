@@ -138,8 +138,7 @@ public class QueryParser extends InputParser {
 
     // set path to query file
     final MainOptions opts = qctx.context.options;
-    final String uri = path != null ? path : opts.get(MainOptions.QUERYPATH);
-    if(!uri.isEmpty()) sc.baseURI(uri);
+    sc.baseURI(path != null ? path : opts.get(MainOptions.QUERYPATH));
 
     // bind external variables
     for(final Entry<String, String> entry : opts.toMap(MainOptions.BINDINGS).entrySet()) {
@@ -214,8 +213,8 @@ public class QueryParser extends InputParser {
       wsCheck(";");
 
       // get absolute path
-      final IO base = sc.baseIO();
-      final byte[] path = token(base == null ? "" : base.path());
+      final IO baseO = sc.baseIO();
+      final byte[] path = token(baseO == null ? "" : baseO.path());
       qc.modParsed.put(path, uri);
       qc.modStack.push(path);
 
@@ -679,8 +678,7 @@ public class QueryParser extends InputParser {
    */
   private void baseURIDecl() throws QueryException {
     if(!decl.add(BASE_URI)) throw error(DUPLBASE);
-    final byte[] base = stringLiteral();
-    if(base.length != 0) sc.baseURI(string(base));
+    sc.baseURI(string(stringLiteral()));
   }
 
   /**
