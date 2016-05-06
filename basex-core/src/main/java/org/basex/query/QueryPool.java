@@ -101,14 +101,6 @@ public final class QueryPool {
   }
 
   /**
-   * Closes all running queries.
-   */
-  public void close() {
-    for(final Query query : queries.values()) query.close();
-    queries.clear();
-  }
-
-  /**
    * Creates a context-independent copy of iterator results.
    * @param ctx database context
    * @param iter result iterator

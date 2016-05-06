@@ -1,5 +1,7 @@
 package org.basex.core;
 
+import java.util.concurrent.*;
+
 import org.basex.core.locks.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
@@ -45,10 +47,13 @@ public final class Context {
   /** Log. */
   public final Log log;
 
-  /** Current node context. Set if it does not contain all documents of the current database. */
-  private DBNodes current;
+  /** Running processes. */
+  private final ConcurrentHashMap<Proc, Object> procs;
   /** Process locking. */
   private final Locking locks;
+
+  /** Current node context. Set if it does not contain all documents of the current database. */
+  private DBNodes current;
   /** User reference. */
   private User user;
   /** Data reference. */
@@ -106,6 +111,7 @@ public final class Context {
     repo = ctx.repo;
     log = ctx.log;
     queries = ctx.queries;
+    procs = ctx.procs;
   }
 
   /**
@@ -127,6 +133,7 @@ public final class Context {
     queries = new QueryPool();
     user = users.get(UserText.ADMIN);
     listener = null;
+    procs = new ConcurrentHashMap<>();
   }
 
   /**
@@ -151,10 +158,13 @@ public final class Context {
    * and not on client instances.
    */
   public synchronized void close() {
+    // stop running queries
+    for(final Proc proc : procs.keySet()) proc.stop();
+    while(!procs.isEmpty()) Thread.yield();
+    // stop sessions, close data references
     while(!sessions.isEmpty()) sessions.get(0).quit();
     datas.close();
     log.close();
-    queries.close();
   }
 
   /**
@@ -267,6 +277,7 @@ public final class Context {
    */
   public void register(final Proc pr) {
     assert !pr.registered() : "Already registered:" + pr;
+    procs.put(pr, Boolean.TRUE);
     pr.registered(true);
 
     // administrators will not be affected by the timeout
@@ -289,6 +300,7 @@ public final class Context {
     pr.registered(false);
     locks.release(pr);
     pr.stopTimeout();
+    procs.remove(pr);
   }
 
   /**

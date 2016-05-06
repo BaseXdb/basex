@@ -96,7 +96,7 @@ abstract class RESTCmd extends Command {
    * @throws HTTPException HTTP exception
    */
   final void run(final Command c, final OutputStream os) throws HTTPException {
-    final boolean ok = c.run(context, os);
+    final boolean ok = proc(c).run(context, os);
     error(c.info());
     if(!ok) throw HTTPCode.BAD_REQUEST_X.get(c.info());
   }
