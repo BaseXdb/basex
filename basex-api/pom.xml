@@ -95,7 +95,7 @@
           <excludeArtifactIds>xstream</excludeArtifactIds>
         </configuration>
       </plugin>
-      <!-- <plugin>
+      <plugin>
         <groupId>org.mortbay.jetty</groupId>
         <artifactId>jetty-maven-plugin</artifactId>
         <version>8.1.16.v20140903</version>
@@ -104,7 +104,8 @@
           <stopKey>keyToStopJetty</stopKey>
           <stopPort>8985</stopPort>
         </configuration>
-      </plugin> -->
+      </plugin>
+
       <!-- <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
