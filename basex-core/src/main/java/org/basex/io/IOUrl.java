@@ -13,6 +13,7 @@ import javax.xml.transform.stream.*;
 import org.basex.core.*;
 import org.basex.io.in.*;
 import org.basex.util.*;
+import org.basex.util.http.*;
 import org.xml.sax.*;
 
 /**
@@ -22,8 +23,6 @@ import org.xml.sax.*;
  * @author Christian Gruen
  */
 public final class IOUrl extends IO {
-  /** HTTP header: Authorization. */
-  private static final String AUTHORIZATION = "Authorization";
   /** Timeout for connecting to a resource (seconds). */
   private static final int TIMEOUT = 10;
 
@@ -87,7 +86,7 @@ public final class IOUrl extends IO {
     conn.setConnectTimeout(TIMEOUT * 1000);
     // use basic authentication if credentials are contained in the url
     final String ui = url.getUserInfo();
-    if(ui != null) conn.setRequestProperty(AUTHORIZATION, "Basic " +
+    if(ui != null) conn.setRequestProperty(HttpText.AUTHORIZATION, HttpText.BASIC + ' ' +
         org.basex.util.Base64.encode(ui));
     return conn;
   }
