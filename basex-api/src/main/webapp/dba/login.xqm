@@ -114,7 +114,7 @@ function _:login(
       _:reject($name, $url, 'Please check the syntax of your URL.')
     )
   ) else (
-    let $user := user:list-details($name)
+    let $user := user:list-details()[@name = $name]
     let $pw := $user/password[@algorithm = 'salted-sha256']
     let $salt := $pw/salt
     let $hash := $pw/hash
