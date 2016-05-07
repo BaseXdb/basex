@@ -20,9 +20,10 @@ public final class IOTest {
       assertEquals("C:/x y", IO.get("file://C:/x y").path());
       assertEquals("D:/x+y", IO.get("file:///D:/x%2By").path());
       assertEquals("G:/X", IO.get("file:///G:/X").path());
+      assertEquals("G:/X/", IO.get("file:///G:/X/").path());
     } else {
-      assertEquals("/x y", IOUrl.toFile("file:///x%20y"));
-      assertEquals("/x y/", IOUrl.toFile("file:///x%20y/"));
+      assertEquals("/x y", IOUrl.toFile("file:///x%20y").path());
+      assertEquals("/x y/", IOUrl.toFile("file:///x%20y/").path());
     }
   }
 
