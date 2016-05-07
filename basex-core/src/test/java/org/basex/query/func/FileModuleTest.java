@@ -102,12 +102,19 @@ public final class FileModuleTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void exists() {
+    final String url;
+    if(Prop.WIN) {
+      url = IO.FILEPREF + "///" + PATH1.replace("\\", "/");
+    } else {
+      url = IO.FILEPREF + "//" + PATH1;
+    }
+
     query(_FILE_WRITE.args(PATH1, "()"));
     query(_FILE_EXISTS.args(PATH1), true);
-    query(_FILE_EXISTS.args(IO.FILEPREF + "//" + PATH1), true);
+    query(_FILE_EXISTS.args(url), true);
     query(_FILE_DELETE.args(PATH1));
     query(_FILE_EXISTS.args(PATH1), false);
-    query(_FILE_EXISTS.args(IO.FILEPREF + "//" + PATH1), false);
+    query(_FILE_EXISTS.args(url), false);
   }
 
   /** Test method. */

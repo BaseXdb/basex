@@ -125,37 +125,20 @@ public final class IOUrl extends IO {
    * @param url url to be converted
    * @return file path
    */
-  public static String toFile(final String url) {
-    String file = url;
+  public static IOFile toFile(final String url) {
+    // use conventional conversion
     try {
-      if(file.indexOf('%') != -1) file = URLDecoder.decode(file, Prop.ENCODING);
-    } catch(final Exception ex) { /* ignored. */ }
-    // remove file scheme
-    if(file.startsWith(FILEPREF)) file = file.substring(FILEPREF.length());
-    // remove duplicate slashes
-    file = normSlashes(file);
-    // remove leading slash from Windows paths
-    if(file.length() > 2 && file.charAt(0) == '/' && file.charAt(2) == ':' &&
-        Token.letter(file.charAt(1))) file = file.substring(1);
-    return file;
-  }
-
-  /**
-   * Normalize slashes in the specified path.
-   * @param path path to be normalized
-   * @return normalized path
-   */
-  private static String normSlashes(final String path) {
-    boolean a = true;
-    final StringBuilder sb = new StringBuilder(path.length());
-    final int pl = path.length();
-    for(int p = 0; p < pl; p++) {
-      final char c = path.charAt(p);
-      final boolean b = c != '/';
-      if(a || b) sb.append(c);
-      a = b;
+      return new IOFile(new URI(url));
+    } catch (URISyntaxException ex) {
+      Util.debug(ex);
     }
-    return sb.toString();
+
+    // fallback: normalize slashes, remove file scheme
+    String file = url.replace('\\', '/');
+    if(file.startsWith(FILEPREF)) file = url.substring(FILEPREF.length());
+    // local Windows path: remove leading slashes
+    if(file.matches("^/*[a-zA-Z]:/.*")) file = file.replace("^/+", "");
+    return new IOFile(file);
   }
 
   /**

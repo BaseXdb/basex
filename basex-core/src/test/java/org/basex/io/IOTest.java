@@ -22,6 +22,7 @@ public final class IOTest {
       assertEquals("G:/X", IO.get("file:///G:/X").path());
     } else {
       assertEquals("/x y", IOUrl.toFile("file:///x%20y"));
+      assertEquals("/x y/", IOUrl.toFile("file:///x%20y/"));
     }
   }
 

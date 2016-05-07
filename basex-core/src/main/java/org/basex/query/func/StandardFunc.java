@@ -209,7 +209,7 @@ public abstract class StandardFunc extends Arr {
    */
   protected final Path toPath(final String path) throws QueryException {
     try {
-      return Paths.get(IOUrl.isFileURL(path) ? IOUrl.toFile(path) : path);
+      return IOUrl.isFileURL(path) ? IOUrl.toFile(path).file().toPath() : Paths.get(path);
     } catch(final InvalidPathException ex) {
       throw FILE_INVALID_PATH_X.get(info, path);
     }

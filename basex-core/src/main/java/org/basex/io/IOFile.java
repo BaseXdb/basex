@@ -1,6 +1,7 @@
 package org.basex.io;
 
 import java.io.*;
+import java.net.*;
 import java.nio.file.*;
 import java.util.*;
 import java.util.regex.*;
@@ -49,6 +50,14 @@ public final class IOFile extends IO {
    */
   public IOFile(final File file) {
     this(file, "");
+  }
+
+  /**
+   * Constructor.
+   * @param uri uri reference
+   */
+  public IOFile(final URI uri) {
+    this(new File(uri), uri.toString());
   }
 
   /**
