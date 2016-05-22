@@ -580,7 +580,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final byte[] toBytes(final Item it) throws QueryException {
-    if(checkNoEmpty(it) instanceof AStr) return it.string(info);
+    if(checkNoEmpty(it).type.isStringOrUntyped()) return it.string(info);
     if(it instanceof Bin) return ((Bin) it).binary(info);
     throw STRBIN_X_X.get(info, it.type, it);
   }

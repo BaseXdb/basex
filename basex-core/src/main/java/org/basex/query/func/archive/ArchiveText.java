@@ -26,7 +26,7 @@ interface ArchiveText {
   /** QName. */
   QNm Q_ALGORITHM = new QNm(ARCHIVE_PREFIX, "algorithm", ARCHIVE_URI);
   /** Root node test. */
-  NodeTest TEST = new NodeTest(Q_ENTRY);
+  NodeTest ENTRY = new NodeTest(Q_ENTRY);
 
   /** Level. */
   String LEVEL = "compression-level";

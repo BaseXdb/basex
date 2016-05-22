@@ -18,6 +18,7 @@ public final class HashModuleTest extends AdvancedQueryTest {
   public void md5() {
     query(STRING.args(_HASH_MD5.args("")), "1B2M2Y8AsgTpgAmY7PhCfg==");
     query(STRING.args(_HASH_MD5.args("BaseX")), "DWUYXJ4pYxHAoiABeeR5og==");
+    query(STRING.args(_HASH_MD5.args("<x/>")), "1B2M2Y8AsgTpgAmY7PhCfg==");
   }
 
   /** Test method. */
@@ -25,6 +26,7 @@ public final class HashModuleTest extends AdvancedQueryTest {
   public void sha1() {
     query(STRING.args(_HASH_SHA1.args("")), "2jmj7l5rSw0yVb/vlWAYkK/YBwk=");
     query(STRING.args(_HASH_SHA1.args("BaseX")), "OtWVjw8n1a/9yilXVg8SHQWXpO0=");
+    query(STRING.args(_HASH_SHA1.args("<x/>")), "2jmj7l5rSw0yVb/vlWAYkK/YBwk=");
   }
 
   /** Test method. */

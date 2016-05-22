@@ -28,7 +28,7 @@ abstract class ArchiveFn extends StandardFunc {
    * @throws QueryException query exception
    */
   final Item checkElemToken(final Item it) throws QueryException {
-    if(it instanceof AStr || TEST.eq(it)) return it;
+    if(it instanceof AStr || ENTRY.eq(it)) return it;
     throw ELMSTR_X_X_X.get(info, Q_ENTRY.prefixId(XML), it.type, it);
   }
 

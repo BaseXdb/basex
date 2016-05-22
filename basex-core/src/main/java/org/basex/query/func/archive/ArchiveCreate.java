@@ -125,7 +125,7 @@ public class ArchiveCreate extends ArchiveFn {
 
     // data to be compressed
     byte[] val = toBytes(cont);
-    if(cont instanceof AStr && enc != Strings.UTF8) val = encode(val, enc, qc);
+    if(!(cont instanceof Bin) && enc != Strings.UTF8) val = encode(val, enc, qc);
 
     try {
       out.level(lvl == null ? level : toInt(lvl));
