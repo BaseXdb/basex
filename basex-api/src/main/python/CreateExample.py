@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # This example shows how new databases can be created.
 #
 # Documentation: http://docs.basex.org/wiki/Clients
@@ -6,24 +7,22 @@
 
 import BaseXClient
 
+# create session
+session = BaseXClient.Session('localhost', 1984, 'admin', 'admin')
+
 try:
+    # create new database
+    session.create("database", "<x>Hello World!</x>")
+    print(session.info())
 
-  # create session
-  session = BaseXClient.Session('localhost', 1984, 'admin', 'admin')
+    # run query on database
+    print("\n" + session.execute("xquery doc('database')"))
 
-  # create new database
-  session.create("database", "<x>Hello World!</x>")
-  print session.info()
-  
-  # run query on database
-  print "\n" + session.execute("xquery doc('database')")
-  
-  # drop database
-  session.execute("drop db database")
+    # drop database
+    session.execute("drop db database")
+    print(session.info())
 
-  # close session
-  session.close()
-
-except IOError as e:
-  # print exception
-  print e
+finally:
+    # close session
+    if session:
+        session.close()
