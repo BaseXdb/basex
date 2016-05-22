@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 
 import java.io.*;
 import java.net.*;
+import java.nio.file.*;
 import java.security.*;
 import java.security.cert.*;
 
@@ -112,33 +113,27 @@ public final class IOUrl extends IO {
   }
 
   /**
+   * Normalizes the specified URI and creates a new instance of this class.
+   * @param uri uri to be converted
+   * @return file path
+   */
+  static String toFile(final String uri) {
+    try {
+      final String path = Paths.get(new URI(uri)).toString();
+      return uri.endsWith("/") || uri.endsWith("\\") ? path + File.separator : path;
+    } catch(final Exception ex) {
+      Util.errln(ex);
+      return uri;
+    }
+  }
+
+  /**
    * Checks if the specified string is a valid file URL.
    * @param url url to be tested
    * @return result of check
    */
-  public static boolean isFileURL(final String url) {
+  static boolean isFileURL(final String url) {
     return url.startsWith(FILEPREF + '/');
-  }
-
-  /**
-   * Normalizes the specified URL and creates a new instance of this class.
-   * @param url url to be converted
-   * @return file path
-   */
-  public static IOFile toFile(final String url) {
-    // use conventional conversion
-    try {
-      return new IOFile(new URI(url));
-    } catch(Exception ex) {
-      Util.debug(ex);
-    }
-
-    // fallback: normalize slashes, remove file scheme
-    String file = url.replace('\\', '/');
-    if(file.startsWith(FILEPREF)) file = url.substring(FILEPREF.length());
-    // local Windows path: remove leading slashes
-    if(file.matches("^/*[a-zA-Z]:/.*")) file = file.replace("^/+", "");
-    return new IOFile(file);
   }
 
   /**

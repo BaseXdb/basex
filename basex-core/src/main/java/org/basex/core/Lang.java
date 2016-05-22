@@ -124,7 +124,7 @@ public final class Lang {
           creds.add(credits(cont));
         }
       } else {
-        for(final IO f : IOUrl.toFile(url.toString()).children()) {
+        for(final IO f : ((IOFile) IO.get(url.toString())).children()) {
           langs.add(f.name().replaceAll('.' + SUFFIX, ""));
           creds.add(credits(f.read()));
         }

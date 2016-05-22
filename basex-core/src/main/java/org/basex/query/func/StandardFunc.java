@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
+import java.net.*;
 import java.nio.charset.*;
 import java.nio.file.*;
 import java.util.*;
@@ -198,7 +199,7 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   protected final Path toPath(final int i, final QueryContext qc) throws QueryException {
-    return i < exprs.length ? toPath(string(toToken(exprs[i], qc))) : null;
+    return i < exprs.length ? toPath(toToken(exprs[i], qc)) : null;
   }
 
   /**
@@ -207,10 +208,11 @@ public abstract class StandardFunc extends Arr {
    * @return file instance
    * @throws QueryException query exception
    */
-  protected final Path toPath(final String path) throws QueryException {
+  protected final Path toPath(final byte[] path) throws QueryException {
     try {
-      return IOUrl.isFileURL(path) ? IOUrl.toFile(path).file().toPath() : Paths.get(path);
-    } catch(final InvalidPathException ex) {
+      final String p = string(path);
+      return p.startsWith(IO.FILEPREF + '/') ? Paths.get(new URI(p)) : Paths.get(p);
+    } catch(final InvalidPathException | URISyntaxException ex) {
       throw FILE_INVALID_PATH_X.get(info, path);
     }
   }
