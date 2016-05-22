@@ -129,7 +129,7 @@ public final class IOUrl extends IO {
     // use conventional conversion
     try {
       return new IOFile(new URI(url));
-    } catch (URISyntaxException ex) {
+    } catch(Exception ex) {
       Util.debug(ex);
     }
 
