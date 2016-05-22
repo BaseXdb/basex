@@ -104,7 +104,6 @@ public final class HTTPParams {
   public IOContent body() throws IOException {
     if(content == null) {
       content = new IOContent(new BufferInput(http.req.getInputStream()).content());
-      content.name(http.method + IO.XMLSUFFIX);
     }
     return content;
   }
