@@ -102,9 +102,11 @@ public final class BaseXServer extends CLI implements Runnable {
       socket.setReuseAddress(true);
       socket.bind(new InetSocketAddress(addr, port));
       stopFile = stopFile(port);
-    } catch(final IOException ex) {
+    } catch(final Exception ex) {
       context.log.writeServer(LogType.ERROR, Util.message(ex));
-      throw ex instanceof BindException ? new IOException(Util.info(SRV_RUNNING_X, port)) : ex;
+      if(ex instanceof BindException) throw new BaseXException(SRV_RUNNING_X, port);
+      if(ex instanceof IOException) throw ex;
+      throw new BaseXException(ex.getLocalizedMessage());
     }
 
     new Thread(this).start();
@@ -272,18 +274,12 @@ public final class BaseXServer extends CLI implements Runnable {
    * @throws BaseXException database exception
    */
   public static void start(final int port, final String... args) throws BaseXException {
-    // check if server is already running (needs some time)
-    final String host = S_LOCALHOST;
-    if(ping(host, port)) throw new BaseXException(SRV_RUNNING_X, port);
-
-    Util.start(BaseXServer.class, args);
+    // start server and check if it caused an error message
+    final String error = Util.error(Util.start(BaseXServer.class, args), 2000);
+    if(error != null) throw new BaseXException(error.trim());
 
     // try to connect to the new server instance
-    for(int c = 1; c < 10; ++c) {
-      Performance.sleep(c * 100L);
-      if(ping(host, port)) return;
-    }
-    throw new BaseXException(CONNECTION_ERROR_X, port);
+    if(!ping(S_LOCALHOST, port)) throw new BaseXException(CONNECTION_ERROR_X, port);
   }
 
   /**

@@ -7,6 +7,7 @@ import java.net.*;
 import java.util.*;
 import java.util.Map.Entry;
 
+import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.util.list.*;
 
@@ -288,5 +289,29 @@ public final class Util {
     } catch(final IOException ex) {
       throw notExpected(ex);
     }
+  }
+
+  /**
+   * Returns the error message of a process.
+   * @param process process
+   * @param timeout time out in milliseconds
+   * @return error message, or {@code null}
+   */
+  public static String error(final Process process, final int timeout) {
+    final int wait = 200, to = Math.max(timeout / wait, 1);
+    for(int c = 0; c < to; c++) {
+      try {
+        final int exit = process.exitValue();
+        if(exit == 1) return Token.string(new IOStream(process.getErrorStream()).read());
+        break;
+      } catch(final IllegalThreadStateException ex) {
+        // process is still running
+        Performance.sleep(wait);
+      } catch(final IOException ex) {
+        // return error message of exception
+        return ex.getLocalizedMessage();
+      }
+    }
+    return null;
   }
 }

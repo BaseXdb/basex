@@ -341,13 +341,12 @@ public final class BaseXHTTP extends Main {
   private static void start(final int port, final boolean ssl, final String... args)
       throws BaseXException {
 
-    Util.start(BaseXHTTP.class, args);
+    // start server and check if it caused an error message
+    final String error = Util.error(Util.start(BaseXHTTP.class, args), 2000);
+    if(error != null) throw new BaseXException(error.trim());
+
     // try to connect to the new server instance
-    for(int c = 1; c < 10; ++c) {
-      if(ping(S_LOCALHOST, port, ssl)) return;
-      Performance.sleep(c * 100L);
-    }
-    throw new BaseXException(CONNECTION_ERROR_X, port);
+    if(!ping(S_LOCALHOST, port, ssl)) throw new BaseXException(CONNECTION_ERROR_X, port);
   }
 
   /**
