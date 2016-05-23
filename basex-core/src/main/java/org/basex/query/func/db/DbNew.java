@@ -35,7 +35,7 @@ abstract class DbNew extends DbAccess {
       if(endsWith(path, '.') || endsWith(path, '/')) throw RESINV_X.get(info, path);
 
       // ensure that the final name is not empty
-      ANode node = (ANode) input;
+      final ANode node = (ANode) input;
       byte[] name = path;
       if(name.length == 0) {
         // adopt name from document node

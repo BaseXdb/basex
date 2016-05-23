@@ -1592,7 +1592,7 @@ public class QueryParser extends InputParser {
     boolean lastIs = false;
     ExprList el = null;
     while(true) {
-      boolean is = wsConsumeWs(INTERSECT);
+      final boolean is = wsConsumeWs(INTERSECT);
       if(!is && !wsConsumeWs(EXCEPT)) break;
       if((is != lastIs) && el != null) {
         e = intersectExcept(lastIs, el);

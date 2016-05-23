@@ -36,7 +36,7 @@ public final class IOFile extends IO {
    * @param original original path
    */
   private IOFile(final File file, final String original) {
-    super(new PathList().create(file.getAbsolutePath()));
+    super(create(file.getAbsolutePath()));
     absolute = file.isAbsolute();
     this.file = absolute ? file : file.getAbsoluteFile();
     // preserve trailing slash
@@ -204,22 +204,8 @@ public final class IOFile extends IO {
     final StringList files = new StringList();
     final File[] ch = file.listFiles();
     if(ch == null) return files;
-    if(exists()) add(this, files, path().length() + 1);
+    if(exists()) addDescendants(this, files, path().length() + 1);
     return files;
-  }
-
-  /**
-   * Adds the relative paths of all descendant files to the specified list.
-   * @param io current file
-   * @param files file list
-   * @param offset string length of root path
-   */
-  private static void add(final IOFile io, final StringList files, final int offset) {
-    if(io.isDir()) {
-      for(final IOFile f : io.children()) add(f, files, offset);
-    } else {
-      files.add(io.path().substring(offset));
-    }
   }
 
   /**
@@ -320,6 +306,20 @@ public final class IOFile extends IO {
   }
 
   /**
+   * Returns a native file path representation. If normalization fails, returns the original path.
+   * @return path
+   */
+  public IOFile normalize() {
+    try {
+      return new IOFile(toPath().toRealPath().toFile());
+    } catch(final IOException ex) {
+      return this;
+    }
+  }
+
+  // STATIC METHODS ===============================================================================
+
+  /**
    * Returns a {@link Path} instance of this file.
    * @return path
    * @throws IOException I/O exception
@@ -334,18 +334,18 @@ public final class IOFile extends IO {
   }
 
   /**
-   * Returns a native file path representation. If normalization fails, returns the original path.
-   * @return path
+   * Adds the relative paths of all descendant files to the specified list.
+   * @param io current file
+   * @param files file list
+   * @param offset string length of root path
    */
-  public IOFile normalize() {
-    try {
-      return new IOFile(toPath().toRealPath().toFile());
-    } catch(final IOException ex) {
-      return this;
+  private static void addDescendants(final IOFile io, final StringList files, final int offset) {
+    if(io.isDir()) {
+      for(final IOFile f : io.children()) addDescendants(f, files, offset);
+    } else {
+      files.add(io.path().substring(offset));
     }
   }
-
-  // STATIC METHODS ===============================================================================
 
   /**
    * Checks if the specified string is a valid file name.
@@ -421,50 +421,51 @@ public final class IOFile extends IO {
     return Prop.CASE ? sb.toString() : sb.toString().toLowerCase(Locale.ENGLISH);
   }
 
-  /**
-   * Path constructor. Resolves parent and self references and normalizes the path.
-   */
-  static class PathList extends StringList {
-    /**
-     * Creates a path.
-     * @param path input path
-     * @return path
-     */
-    String create(final String path) {
-      final TokenBuilder tb = new TokenBuilder();
-      final int l = path.length();
-      for(int i = 0; i < l; ++i) {
-        final char ch = path.charAt(i);
-        if(ch == '\\' || ch == '/') add(tb);
-        else tb.add(ch);
-      }
-      add(tb);
-      if(path.startsWith("\\\\") || path.startsWith("//")) tb.add("//");
-      for(int s = 0; s < size; ++s) {
-        if(s != 0 || path.startsWith("/")) tb.add('/');
-        tb.add(list[s]);
-      }
-      return tb.toString();
-    }
+  // PRIVATE METHODS ==============================================================================
 
-    /**
-     * Adds a directory/file to the path list.
-     * @param tb entry to be added
-     */
-    private void add(final TokenBuilder tb) {
-      String s = tb.toString();
-      // switch first Windows letter to upper case
-      if(s.length() > 1 && s.charAt(1) == ':' && size == 0) {
-        s = Character.toUpperCase(s.charAt(0)) + s.substring(1);
-      }
-      if("..".equals(s) && size > 0) {
-        // parent step
-        if(list[size - 1].indexOf(':') == -1) remove(size - 1);
-      } else if(!".".equals(s) && !s.isEmpty()) {
-        // skip self and empty steps
-        add(s);
-      }
-      tb.reset();
+  /**
+   * Creates a path.
+   * @param path input path
+   * @return path
+   */
+  private static String create(final String path) {
+    final StringList sl = new StringList();
+    final int l = path.length();
+    final TokenBuilder tb = new TokenBuilder(l);
+    for(int i = 0; i < l; ++i) {
+      final char ch = path.charAt(i);
+      if(ch == '\\' || ch == '/') add(tb, sl);
+      else tb.add(ch);
     }
+    add(tb, sl);
+    if(path.startsWith("\\\\") || path.startsWith("//")) tb.add("//");
+    final int size = sl.size();
+    for(int s = 0; s < size; ++s) {
+      if(s != 0 || path.startsWith("/")) tb.add('/');
+      tb.add(sl.get(s));
+    }
+    return tb.toString();
   }
+
+  /**
+   * Adds a directory/file to the path list.
+   * @param tb entry to be added
+   * @param sl string list
+   */
+  private static void add(final TokenBuilder tb, final StringList sl) {
+    String s = tb.toString();
+    // switch first Windows letter to upper case
+    if(s.length() > 1 && s.charAt(1) == ':' && sl.isEmpty()) {
+      s = Character.toUpperCase(s.charAt(0)) + s.substring(1);
+    }
+    if("..".equals(s) && !sl.isEmpty()) {
+      // parent step
+      if(sl.get(sl.size() - 1).indexOf(':') == -1) sl.remove(sl.size() - 1);
+    } else if(!".".equals(s) && !s.isEmpty()) {
+      // skip self and empty steps
+      sl.add(s);
+    }
+    tb.reset();
+  }
+
 }

@@ -74,7 +74,7 @@ public final class InspectStaticContext extends StandardFunc {
       case DECIMAL_FORMATS:
         map = Map.EMPTY;
         for(final byte[] format : sctx.decFormats) {
-          DecFormatter df = sctx.decFormats.get(format);
+          final DecFormatter df = sctx.decFormats.get(format);
           map = map.put(Str.get(format), Map.EMPTY.
               put(Str.get(DF_DEC), Str.get(token(df.decimal)), info).
               put(Str.get(DF_EXP), Str.get(token(df.exponent)), info).
@@ -107,7 +107,7 @@ public final class InspectStaticContext extends StandardFunc {
    */
   private static byte[] token(final int... cps) {
     final TokenBuilder tb = new TokenBuilder(cps.length);
-    for(int cp : cps) tb.add(cp);
+    for(final int cp : cps) tb.add(cp);
     return tb.finish();
   }
 }

@@ -337,7 +337,8 @@ public final class QueryResources {
     // check opened databases
     for(final Data data : datas) {
       // compare input path
-      if(IO.get(data.meta.original).eq(qi.io)) return data;
+      final String orig = data.meta.original;
+      if(!orig.isEmpty() && IO.get(orig).eq(qi.io)) return data;
       // compare database name
       final String name = data.meta.name, dbName = qi.dbName;
       if(Prop.CASE ? name.equals(dbName) : name.equalsIgnoreCase(dbName)) return data;
