@@ -843,23 +843,23 @@ public enum AtomType implements Type {
   }
 
   @Override
-  public final boolean eq(final Type t) {
-    return this == t;
+  public final boolean eq(final Type type) {
+    return this == type;
   }
 
   @Override
-  public final boolean instanceOf(final Type t) {
-    return this == t || parent != null && parent.instanceOf(t);
+  public final boolean instanceOf(final Type type) {
+    return this == type || parent != null && parent.instanceOf(type);
   }
 
   @Override
-  public final Type union(final Type t) {
-    if(instanceOf(t)) return t;
-    if(t.instanceOf(this)) return this;
+  public final Type union(final Type type) {
+    if(instanceOf(type)) return type;
+    if(type.instanceOf(this)) return this;
 
-    if(t instanceof AtomType) {
+    if(type instanceof AtomType) {
       final List<AtomType> arr = new ArrayList<>();
-      for(AtomType at = (AtomType) t; (at = at.parent) != null;) arr.add(at);
+      for(AtomType at = (AtomType) type; (at = at.parent) != null;) arr.add(at);
       for(AtomType p = this; (p = p.parent) != null;)
         if(arr.contains(p)) return p;
     }
@@ -867,8 +867,8 @@ public enum AtomType implements Type {
   }
 
   @Override
-  public final Type intersect(final Type t) {
-    return instanceOf(t) ? this : t.instanceOf(this) ? t : null;
+  public final Type intersect(final Type type) {
+    return instanceOf(type) ? this : type.instanceOf(this) ? type : null;
   }
 
   @Override
@@ -901,17 +901,17 @@ public enum AtomType implements Type {
 
   /**
    * Checks the validity of the specified object and returns its long value.
-   * @param o value to be checked
+   * @param value value to be checked
    * @param min minimum value
-   * @param max maximum value
+   * @param max maximum value (no limit if identical to min)
    * @param ii input info
    * @return integer value
    * @throws QueryException query exception
    */
-  final long checkLong(final Object o, final long min, final long max, final InputInfo ii)
+  final long checkLong(final Object value, final long min, final long max, final InputInfo ii)
       throws QueryException {
 
-    final Item it = o instanceof Item ? (Item) o : Str.get(o.toString());
+    final Item it = value instanceof Item ? (Item) value : Str.get(value.toString());
     checkNum(it, ii);
 
     final Type ip = it.type;

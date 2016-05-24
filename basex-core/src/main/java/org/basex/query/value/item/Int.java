@@ -181,27 +181,15 @@ public final class Int extends ANum {
   }
 
   /**
-   * Converts the given item into a long value.
+   * Converts the given value to a long primitive.
    * @param value value to be converted
    * @param ii input info
    * @return long value
    * @throws QueryException query exception
    */
   public static long parse(final byte[] value, final InputInfo ii) throws QueryException {
-    final byte[] val = Token.trim(value);
-    // fast check for valid characters
-    boolean valid = true;
-    for(final byte v : val) {
-      if(!Token.digit(v) && v != '+' && v != '-') {
-        valid = false;
-        break;
-      }
-    }
-    // valid: try fast conversion
-    if(valid) {
-      final long l = Token.toLong(val);
-      if(l != Long.MIN_VALUE || Token.eq(val, Token.MINLONG)) return l;
-    }
-    throw castError(AtomType.INT, val, ii);
+    final long l = Token.toLong(value);
+    if(l != Long.MIN_VALUE || Token.eq(Token.trim(value), Token.MINLONG)) return l;
+    throw castError(AtomType.ITR, value, ii);
   }
 }

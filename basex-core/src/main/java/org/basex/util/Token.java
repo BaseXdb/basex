@@ -506,7 +506,7 @@ public final class Token {
   /**
    * Converts the specified token into an long value.
    * {@link Long#MIN_VALUE} is returned if the input is invalid.
-   * Note that this may also be the actual value ({@link #MINLONG})..
+   * Note that this may also be the actual value ({@link #MINLONG}).
    * @param token token to be converted
    * @return resulting long value
    */
@@ -517,7 +517,7 @@ public final class Token {
   /**
    * Converts the specified token into an long value.
    * {@link Long#MIN_VALUE} is returned if the input is invalid.
-   * Note that this may also be the actual value ({@link #MINLONG})..
+   * Note that this may also be the actual value ({@link #MINLONG}).
    * @param token token to be converted
    * @param start first byte to be parsed
    * @param end last byte to be parsed - exclusive
