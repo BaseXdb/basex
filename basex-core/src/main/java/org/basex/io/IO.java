@@ -62,7 +62,7 @@ public abstract class IO {
   /** Directory for raw files. */
   public static final String RAW = "raw";
   /** File prefix. */
-  public static final String FILEPREF = "file:";
+  public static final String FILEPREF = "file:/";
 
   /** XQuery suffixes. */
   public static final String[] XQSUFFIXES =

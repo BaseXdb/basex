@@ -211,7 +211,7 @@ public abstract class StandardFunc extends Arr {
   protected final Path toPath(final byte[] path) throws QueryException {
     try {
       final String p = string(path);
-      return p.startsWith(IO.FILEPREF + '/') ? Paths.get(new URI(p)) : Paths.get(p);
+      return p.startsWith(IO.FILEPREF) ? Paths.get(new URI(p)) : Paths.get(p);
     } catch(final InvalidPathException | URISyntaxException ex) {
       throw FILE_INVALID_PATH_X.get(info, path);
     }

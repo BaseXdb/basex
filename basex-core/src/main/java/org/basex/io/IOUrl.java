@@ -133,7 +133,7 @@ public final class IOUrl extends IO {
    * @return result of check
    */
   static boolean isFileURL(final String url) {
-    return url.startsWith(FILEPREF + '/');
+    return url.startsWith(FILEPREF);
   }
 
   /**

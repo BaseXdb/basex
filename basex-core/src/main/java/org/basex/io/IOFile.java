@@ -277,12 +277,17 @@ public final class IOFile extends IO {
   @Override
   public String url() {
     final TokenBuilder tb = new TokenBuilder(FILEPREF);
-    // add leading slash for Windows paths
-    if(!pth.startsWith("/")) tb.add("///");
-    final int pl = pth.length();
+    String path = pth;
+    if(path.startsWith("/")) {
+      path = path.substring(1);
+    } else {
+      // add leading slash for Windows paths
+      tb.add("//");
+    }
+    final int pl = path.length();
     for(int p = 0; p < pl; p++) {
       // replace spaces with %20
-      final char ch = pth.charAt(p);
+      final char ch = path.charAt(p);
       if(ch == ' ') tb.add("%20");
       else tb.add(ch);
     }

@@ -4,9 +4,10 @@ import static org.basex.query.QueryError.*;
 
 import java.net.*;
 
+import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
-import org.basex.query.util.UriParser.ParsedUri;
+import org.basex.query.util.UriParser.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -79,10 +80,11 @@ public final class Uri extends AStr {
   public Uri resolve(final Uri add, final InputInfo info) throws QueryException {
     if(add.value.length == 0) return this;
     try {
-      final URI base = new URI(Token.string(value));
-      final URI res = new URI(Token.string(add.value));
-      final URI uri = base.resolve(res);
-      return uri(Token.token(uri.toString()), false);
+      final URI base = new URI(Token.string(value)), res = new URI(Token.string(add.value));
+      String uri = base.resolve(res).toString();
+      if(uri.startsWith(IO.FILEPREF))
+        uri = uri.replaceAll("^" + IO.FILEPREF + "([^/])", IO.FILEPREF + "//$1");
+      return uri(Token.token(uri), false);
     } catch(final URISyntaxException ex) {
       throw URIARG_X.get(info, ex.getMessage());
     }
