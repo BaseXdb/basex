@@ -1780,7 +1780,9 @@ public class QueryParser extends InputParser {
   private Expr extension() throws QueryException {
     final Pragma[] pragmas = pragma();
     if(pragmas == null) return null;
-    final Expr expr = enclosedExpr();
+    wsCheck(CURLY1);
+    final Expr expr = check(expr(), NOPRAGMA);
+    wsCheck(CURLY2);
     return pragmas.length == 0 ? expr : new Extension(info(), pragmas, expr);
   }
 
