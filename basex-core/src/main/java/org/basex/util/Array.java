@@ -110,12 +110,13 @@ public final class Array {
    * @param array array to be resized
    * @param pos position
    * @param <T> array type
-   * @return array
+   * @return new array
    */
   public static <T> T[] delete(final T[] array, final int pos) {
     final int s = array.length - 1;
-    move(array, pos + 1, -1, s - pos);
-    return Arrays.copyOf(array, s);
+    final T[] tmp = Arrays.copyOf(array, s);
+    System.arraycopy(array, pos + 1, tmp, pos, s - pos);
+    return tmp;
   }
 
   /**

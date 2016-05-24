@@ -73,6 +73,12 @@ public final class MapTest extends AdvancedQueryTest {
     error("map {}(())", EMPTYFOUND);
   }
 
+  /** GitHub bug (#1297). */
+  @Test public void gh1297() {
+    query("let $m := map { 'A_':1, 'B@':2, 'C!':3 }"
+        + "return (map:remove($m, 'A_')('A_'), map:remove($m, 'C!')('C!'))", "");
+  }
+
   /** Atomize key. */
   @Test public void atomKey() {
     query("map {'x':42}(['x'])", 42);

@@ -58,6 +58,7 @@ final class TrieList extends TrieNode {
 
     if(h == hash) {
       for(int i = size; i-- > 0;) {
+        // still collisions?
         if(k.sameKey(keys[i], ii)) {
           // found entry
           if(size == 2) {
@@ -65,8 +66,15 @@ final class TrieList extends TrieNode {
             final int o = i ^ 1;
             return new TrieLeaf(h, keys[o], values[o]);
           }
-          // still collisions
-          return new TrieList(h, Array.delete(keys, i), Array.delete(values, i));
+          // create new arrays (modified due to #1297; performance improved)
+          final int s = size - 1;
+          final Item[] ks = new Item[s];
+          System.arraycopy(keys, 0, ks, 0, i);
+          System.arraycopy(keys, i + 1, ks, i, s - i);
+          final Value[] vs = new Value[s];
+          System.arraycopy(values, 0, ks, 0, i);
+          System.arraycopy(values, i + 1, ks, i, s - i);
+          return new TrieList(h, ks, vs);
         }
       }
     }
