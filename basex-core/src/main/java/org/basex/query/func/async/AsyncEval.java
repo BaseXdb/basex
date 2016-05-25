@@ -42,6 +42,7 @@ public final class AsyncEval extends StandardFunc {
     final Context ctx = qc.context;
     final QueryPool queries = ctx.queries;
     final QueryProcessor qp = new QueryProcessor(string(query), ctx);
+    qp.http(qc.http);
     for(final Entry<String, Value> it : bindings.entrySet()) {
       final String key = it.getKey();
       final Value val = queries.copy(it.getValue().iter(), ctx);
