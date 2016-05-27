@@ -19,28 +19,29 @@ import org.xml.sax.*;
  * @author Christian Gruen
  */
 public final class IOFile extends IO {
-  /** Pattern for absolute file paths. */
-  public static final Pattern ABSOLUTE =
-      Pattern.compile(Prop.WIN ? "^(/|\\|[a-zA-Z]:).*$" : "^/.*");
   /** Pattern for valid file names. */
   private static final Pattern VALIDNAME =
       Pattern.compile("^[^\\\\/" + (Prop.WIN ? ":*?\"<>\\|" : "") + "]+$");
+  /** Absolute flag. */
+  private final boolean absolute;
   /** File reference. */
   private final File file;
-  /** Indicate if supplied path was absolute. */
-  private final boolean absolute;
 
   /**
    * Constructor.
    * @param file file reference
-   * @param original original path
+   * @param last last path segment
    */
-  private IOFile(final File file, final String original) {
-    super(create(file.getAbsolutePath()));
-    absolute = file.isAbsolute();
-    this.file = absolute ? file : file.getAbsoluteFile();
-    // preserve trailing slash
-    if(original.endsWith("/") || original.endsWith("\\")) pth += '/';
+  public IOFile(final File file, final String last) {
+    super(create(file.getAbsolutePath(), last));
+    boolean abs = file.isAbsolute();
+    this.file = abs ? file : new File(pth);
+    // Windows: checks if the original file path starts with a slash
+    if(!abs && Prop.WIN) {
+      final String p = file.getPath();
+      abs = p.startsWith("/") || p.startsWith("\\");
+    }
+    absolute = abs;
   }
 
   /**
@@ -150,8 +151,8 @@ public final class IOFile extends IO {
    * @return resulting path
    */
   public IOFile resolve(final String path) {
-    final File f = new File(path);
-    return f.isAbsolute() ? new IOFile(f) : new IOFile(isDir() ? pth : dir(), path);
+    final IOFile f = new IOFile(path);
+    return f.isAbsolute() ? f : new IOFile(isDir() ? pth : dir(), path);
   }
 
   /**
@@ -431,9 +432,10 @@ public final class IOFile extends IO {
   /**
    * Creates a path.
    * @param path input path
+   * @param last last segment
    * @return path
    */
-  private static String create(final String path) {
+  private static String create(final String path, final String last) {
     final StringList sl = new StringList();
     final int l = path.length();
     final TokenBuilder tb = new TokenBuilder(l);
@@ -449,6 +451,15 @@ public final class IOFile extends IO {
       if(s != 0 || path.startsWith("/")) tb.add('/');
       tb.add(sl.get(s));
     }
+
+    // add slash if original file ends with a slash, or if path is a Windows root directory
+    boolean dir = last.endsWith("/") || last.endsWith("\\");
+    if(!dir && Prop.WIN && tb.size() == 2) {
+      final int c = Character.toLowerCase(tb.get(0));
+      dir = c >= 'a' && c <= 'z' && tb.get(1) == ':';
+    }
+    if(dir) tb.add('/');
+
     return tb.toString();
   }
 

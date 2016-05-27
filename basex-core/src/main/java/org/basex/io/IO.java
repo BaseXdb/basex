@@ -98,12 +98,12 @@ public abstract class IO {
   /** Offset for compressing texts (see bit layout in {@link Data} class). */
   public static final long OFFCOMP = 0x4000000000L;
 
-  /** File path. All paths have forward slashes, no matter which OS is used. */
-  String pth;
-  /** File length. */
-  long len = -1;
+  /** Absolute file path. All paths have forward slashes, no matter which OS is used. */
+  protected String pth;
+  /** File size (in bytes). */
+  protected long len = -1;
   /** File name. */
-  private String nm;
+  protected String nm;
 
   /**
    * Protected constructor.
@@ -111,7 +111,8 @@ public abstract class IO {
    */
   IO(final String path) {
     pth = path;
-    nm = path.substring(path.lastIndexOf('/') + 1);
+    final String p = path.endsWith("/") ? path.substring(0, path.length() - 1) : path;
+    nm = p.substring(p.lastIndexOf('/') + 1);
   }
 
   /**

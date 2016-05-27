@@ -2014,45 +2014,48 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Test nodeTest(final boolean att, final boolean all) throws QueryException {
-    final int i = pos;
+    int p = pos;
     if(consume('*')) {
+      p = pos;
+      if(consume(':')) {
+        // name test: *:name
+        if(!consume('*')) return new NameTest(new QNm(ncName(QNAME_X)), Kind.NAME, att, sc.elemNS);
+      }
       // name test: *
-      if(!consume(':')) return new NameTest(att);
-      // name test: *:name
-      return new NameTest(new QNm(ncName(QNAME_X)), Kind.NAME, att, sc.elemNS);
+      pos = p;
+      return new NameTest(att);
     }
 
     if(consume(EQNAME)) {
-      // name test: Q{uri}*
       final byte[] uri = bracedURILiteral();
       if(consume('*')) {
+        // name test: Q{uri}*
         final QNm nm = new QNm(COLON, uri);
         return new NameTest(nm, Kind.URI, att, sc.elemNS);
       }
     }
-    pos = i;
+    pos = p;
 
-    final QNm name = eQName(null, SKIPCHECK);
+    QNm name = eQName(null, SKIPCHECK);
     if(name != null) {
-      final int i2 = pos;
+      p = pos;
       if(all && wsConsumeWs(PAREN1)) {
         final NodeType type = NodeType.find(name);
         if(type != null) return kindTest(type);
       } else {
-        pos = i2;
-        // name test: prefix:*
-        if(consume(":*") && !name.hasPrefix()) {
-          final QNm nm = new QNm(concat(name.string(), COLON));
-          qnames.add(nm, !att);
-          return new NameTest(nm, Kind.URI, att, sc.elemNS);
+        pos = p;
+        if(!name.hasPrefix() && consume(":*")) {
+          // name test: prefix:*
+          name = new QNm(concat(name.string(), COLON));
+          qnames.add(name, !att);
+          return new NameTest(name, Kind.URI, att, sc.elemNS);
         }
         // name test: prefix:name, name, Q{uri}name
-        skipWs();
         qnames.add(name, !att);
         return new NameTest(name, Kind.URI_NAME, att, sc.elemNS);
       }
     }
-    pos = i;
+    pos = p;
     return null;
   }
 
