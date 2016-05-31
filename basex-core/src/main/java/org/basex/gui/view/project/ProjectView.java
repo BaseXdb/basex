@@ -135,15 +135,12 @@ public final class ProjectView extends BaseXPanel {
    * @param rename file has been renamed
    */
   public void save(final IOFile file, final boolean rename) {
-    // only refresh view if saved file is XQuery
-    if(!file.hasSuffix(IO.XQSUFFIXES)) return;
-
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
         final IOFile path = file.normalize();
         if(path.path().startsWith(root.file.path())) refreshTree(path);
-        refresh(rename, true);
+        refresh(rename, file.hasSuffix(IO.XQSUFFIXES));
       }
     });
   }
