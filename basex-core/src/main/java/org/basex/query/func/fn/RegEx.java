@@ -29,7 +29,7 @@ abstract class RegEx extends StandardFunc {
    * @throws QueryException query exception
    */
   Pattern pattern(final Expr pattern, final Expr modifier, final QueryContext qc,
-                  final boolean check) throws QueryException {
+      final boolean check) throws QueryException {
 
     final byte[] pat = toToken(pattern, qc);
     final byte[] mod = modifier != null ? toToken(modifier, qc) : null;
