@@ -2,7 +2,9 @@ package org.basex.query.func.map;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
+import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
 import org.basex.util.*;
 
 /**
@@ -14,6 +16,11 @@ import org.basex.util.*;
 public final class MapRemove extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return toMap(exprs[0], qc).delete(toAtomItem(exprs[1], qc), info);
+    Map map = toMap(exprs[0], qc);
+    final Iter keys = exprs[1].iter(qc);
+    for(Item it; (it = keys.next()) != null;) {
+      map = map.delete(toAtomItem(it, qc), info);
+    }
+    return map;
   }
 }

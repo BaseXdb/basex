@@ -27,15 +27,4 @@ abstract class ArrayFn extends StandardFunc {
     if(pos < 1 || pos > as) throw (as == 0 ? ARRAYEMPTY : ARRAYBOUNDS_X_X).get(info, pos, as);
     return pos - 1;
   }
-
-  /**
-   * Checks if a position is within the range of an array.
-   * @param array array
-   * @param pos position
-   * @return specified position -1
-   * @throws QueryException query exception
-   */
-  final long checkPos(final Array array, final long pos) throws QueryException {
-    return checkPos(array, pos, false);
-  }
 }

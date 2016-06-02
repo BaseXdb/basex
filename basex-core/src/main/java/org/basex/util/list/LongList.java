@@ -122,6 +122,22 @@ public class LongList extends ElementList {
     return this;
   }
 
+  /**
+   * Removes duplicate entries.
+   * @return self reference
+   */
+  public LongList distinct() {
+    if(!isEmpty()) {
+      int i = 1;
+      for(int j = 1; j < size; ++j) {
+        while(j < size && list[i - 1] == list[j]) j++;
+        if(j < size) list[i++] = list[j];
+      }
+      size = i;
+    }
+    return this;
+  }
+
   @Override
   public String toString() {
     return list == null ? "" : Arrays.toString(toArray());

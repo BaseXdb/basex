@@ -226,16 +226,18 @@ public class IntList extends ElementList {
   }
 
   /**
-   * Removes duplicate entries from a sorted list.
+   * Removes duplicate entries.
    * @return self reference
    */
   public IntList distinct() {
-    int i = 1;
-    for(int j = 1; j < size; ++j) {
-      while(j < size && list[i - 1] == list[j]) j++;
-      if(j < size) list[i++] = list[j];
+    if(!isEmpty()) {
+      int i = 1;
+      for(int j = 1; j < size; ++j) {
+        while(j < size && list[i - 1] == list[j]) j++;
+        if(j < size) list[i++] = list[j];
+      }
+      size = i;
     }
-    size = i;
     return this;
   }
 
@@ -249,7 +251,6 @@ public class IntList extends ElementList {
     il.sort(list, true);
     return il.finish();
   }
-
 
   /**
    * Sorts the data.

@@ -442,7 +442,7 @@ public enum Function {
   /** XQuery function. */
   _MAP_CONTAINS(MapContains.class, "contains(map,key)", arg(MAP_O, AAT), BLN, MAP_URI),
   /** XQuery function. */
-  _MAP_REMOVE(MapRemove.class, "remove(map,key)", arg(MAP_O, AAT), MAP_O, MAP_URI),
+  _MAP_REMOVE(MapRemove.class, "remove(map,keys)", arg(MAP_O, AAT_ZM), MAP_O, MAP_URI),
   /** XQuery function. */
   _MAP_SIZE(MapSize.class, "size(map)", arg(MAP_O), ITR, MAP_URI),
   /** XQuery function. */
@@ -464,7 +464,7 @@ public enum Function {
   _ARRAY_SUBARRAY(ArraySubarray.class, "subarray(array,pos[,length])", arg(ARRAY_O, ITR, ITR),
       ARRAY_O, ARRAY_URI),
   /** XQuery function. */
-  _ARRAY_REMOVE(ArrayRemove.class, "remove(array,pos)", arg(ARRAY_O, ITR), ARRAY_O, ARRAY_URI),
+  _ARRAY_REMOVE(ArrayRemove.class, "remove(array,pos)", arg(ARRAY_O, ITR_ZM), ARRAY_O, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_INSERT_BEFORE(ArrayInsertBefore.class, "insert-before(array,pos,value)",
       arg(ARRAY_O, ITR, ITEM_ZO), ARRAY_O, ARRAY_URI),
