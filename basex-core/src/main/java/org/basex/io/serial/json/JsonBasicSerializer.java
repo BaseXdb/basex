@@ -16,7 +16,6 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * This class serializes items as JSON. The input must conform to the rules
@@ -81,9 +80,10 @@ public final class JsonBasicSerializer extends JsonSerializer {
 
       if(printKey) {
         if(key == null) throw error("Element '%' has no key.", type);
+        key = escape(key, escapedKey);
         if(!printedKeys.add(key)) throw error("Duplicate key: %.", key);
         out.print('"');
-        out.print(norm(escape(key, escapedKey)));
+        out.print(norm(key));
         out.print("\":");
       } else {
         if(key != null) throw error("Element '%' must have no key.", type);
@@ -91,7 +91,10 @@ public final class JsonBasicSerializer extends JsonSerializer {
 
       if(eq(type, NULL)) {
         out.print(NULL);
-        if(iter.next() != null) throw error("Element '%' must have no children.", type);
+        for(ANode n; (n = iter.next()) != null;) {
+          if(n.type != NodeType.COM && n.type != NodeType.PI)
+            throw error("Element '%' must have no children.", type);
+        }
       } else if(eq(type, BOOLEAN)) {
         final byte[] value = value(iter, type);
         if(value == null) throw error("Element '%' has no value.", type);
@@ -239,22 +242,29 @@ public final class JsonBasicSerializer extends JsonSerializer {
       }
     }
 
-    final ByteList bl = new ByteList();
-    for(final byte c : value) {
-      if(c >= 0 && c < 32 || c >= 128) {
-        bl.add('\\');
-        if(c == '\b') bl.add('b');
-        else if(c == '\f') bl.add('f');
-        else if(c == '\n') bl.add('n');
-        else if(c == '\r') bl.add('r');
-        else if(c == '\t') bl.add('t');
-        else bl.add('u').add('0').add('0').add(HEX[c >> 4]).add(HEX[c & 0xF]);
+    final TokenBuilder tb = new TokenBuilder();
+    boolean bs = false;
+    final int vl = value.length;
+    for(int v = 0; v < vl; v += cl(value, v)) {
+      final int cp = cp(value, v);
+      if(cp >= 0 && cp < 32 || cp >= 127 && cp < 160) {
+        tb.add('\\');
+        if(cp == '\b') tb.add('b');
+        else if(cp == '\f') tb.add('f');
+        else if(cp == '\n') tb.add('n');
+        else if(cp == '\r') tb.add('r');
+        else if(cp == '\t') tb.add('t');
+        else tb.add('u').add('0').add('0').add(HEX[cp >> 4]).add(HEX[cp & 0xF]);
       } else {
-        if(c == '"' || !escape && c == '\\') bl.add('\\');
-        bl.add(c);
+        if(cp == '"' && !bs || !escape && cp == '\\') {
+          bs = true;
+          tb.add('\\');
+        }
+        tb.add(cp);
       }
+      bs = !bs && cp == '\\';
     }
-    return bl.finish();
+    return tb.finish();
   }
 
   /**
