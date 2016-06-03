@@ -415,7 +415,9 @@ public final class DecFormatter extends FormatUtil {
       final int il = sep == -1 ? sl : sep;
       for(int i = il; i < pic.min[0]; ++i) intgr.add(zero);
       // fractional number: skip leading 0
-      if(!s.startsWith("0.")) for(int i = 0; i < il; i++) intgr.add(zero + s.charAt(i) - '0');
+      if(!s.startsWith("0.") || pic.min[0] > 0) {
+        for(int i = 0; i < il; i++) intgr.add(zero + s.charAt(i) - '0');
+      }
 
       // squeeze in grouping separators
       if(pic.group[0].length == 1 && pic.group[0][0] > 0) {
