@@ -15,6 +15,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.map.Map;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.query.value.type.SeqType.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -51,10 +52,21 @@ public final class Lookup extends Arr {
     }
 
     final Type tp = fs.seqType().type;
-    if(!(tp instanceof ArrayType || tp instanceof MapType)) return this;
+    final boolean map = tp instanceof MapType, array = tp instanceof ArrayType;
+    if(!map && !array) return this;
+
+    final boolean oneInput = fs.size() == 1 || fs.seqType().one();
+    SeqType rt = ((FuncType) tp).type;
+    if(rt != null) {
+      // map lookup may result in empty sequence
+      if(map && !rt.mayBeZero()) rt = rt.withOcc(rt.one() ? Occ.ZERO_ONE : Occ.ZERO_MORE);
+      // wildcard or more than one input
+      if(ks == Str.WC || !oneInput) rt = rt.withOcc(rt.mayBeZero() ? Occ.ZERO_MORE : Occ.ONE_MORE);
+      seqType = rt;
+    }
 
     if(ks != Str.WC) {
-      if(fs.size() == 1 || fs.seqType().one()) {
+      if(oneInput) {
         // one function, rewrite to for-each or function call
         final Expr opt = ks.size() == 1 || ks.seqType().one()
             ? new DynFuncCall(info, sc, fs, ks) : Function.FOR_EACH.get(sc, info, exprs);

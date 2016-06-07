@@ -15,6 +15,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.map.Map;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.value.type.SeqType.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -76,14 +77,19 @@ public final class DynFuncCall extends FuncCall {
   @Override
   public Expr optimize(final QueryContext qc, final VarScope scp) throws QueryException {
     final Expr f = body();
-    final Type t = f.seqType().type;
+    final Type tp = f.seqType().type;
 
     final int nargs = exprs.length - 1;
-    if(t instanceof FuncType) {
-      final FuncType ft = (FuncType) t;
+    if(tp instanceof FuncType) {
+      final FuncType ft = (FuncType) tp;
       if(ft.argTypes != null && ft.argTypes.length != nargs) throw INVARITY_X_X_X_X.get(
           info, nargs, nargs == 1 ? "" : "s", ft.argTypes.length, f.toErrorString());
-      if(ft.type != null) seqType = ft.type;
+      if(ft.type != null) {
+        SeqType rt = ft.type;
+        if(tp instanceof MapType && !rt.mayBeZero())
+          rt = rt.withOcc(rt.one() ? Occ.ZERO_ONE : Occ.ZERO_MORE);
+        seqType = ft.type;
+      }
     }
 
     // maps and arrays can only contain fully evaluated values, so this is safe
