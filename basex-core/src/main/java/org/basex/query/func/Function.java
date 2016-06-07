@@ -758,25 +758,25 @@ public enum Function {
   /* Database Module. */
 
   /** XQuery function. */
-  _DB_OPEN(DbOpen.class, "open(database[,path])", arg(STR, STR), NOD_ZM, DB_URI),
+  _DB_OPEN(DbOpen.class, "open(database[,path])", arg(STR, STR), DOC_ZM, DB_URI),
   /** XQuery function. */
   _DB_OPEN_PRE(DbOpenPre.class, "open-pre(database,pre)", arg(STR, ITR), NOD_ZM, DB_URI),
   /** XQuery function. */
   _DB_OPEN_ID(DbOpenId.class, "open-id(database,id)", arg(STR, ITR), NOD_ZM, DB_URI),
   /** XQuery function. */
-  _DB_TEXT(DbText.class, "text(database,string)", arg(STR, ITEM), NOD_ZM, flag(NDT), DB_URI),
+  _DB_TEXT(DbText.class, "text(database,string)", arg(STR, ITEM), TXT_ZM, flag(NDT), DB_URI),
   /** XQuery function. */
   _DB_TEXT_RANGE(DbTextRange.class, "text-range(database,from,to)",
-      arg(STR, ITEM, ITEM), NOD_ZM, flag(NDT), DB_URI),
+      arg(STR, ITEM, ITEM), TXT_ZM, flag(NDT), DB_URI),
   /** XQuery function. */
   _DB_ATTRIBUTE(DbAttribute.class, "attribute(database,string[,name])",
-      arg(STR, ITEM, STR), NOD_ZM, flag(NDT), DB_URI),
+      arg(STR, ITEM, STR), ATT_ZM, flag(NDT), DB_URI),
   /** XQuery function. */
   _DB_ATTRIBUTE_RANGE(DbAttributeRange.class, "attribute-range(database,from,to[,name])",
-      arg(STR, ITEM, ITEM, STR), NOD_ZM, flag(NDT), DB_URI),
+      arg(STR, ITEM, ITEM, STR), ATT_ZM, flag(NDT), DB_URI),
   /** XQuery function. */
   _DB_TOKEN(DbToken.class, "token(database,string[,name])",
-      arg(STR, ITEM, STR), NOD_ZM, flag(NDT), DB_URI),
+      arg(STR, ITEM, STR), ATT_ZM, flag(NDT), DB_URI),
   /** XQuery function. */
   _DB_LIST(DbList.class, "list([database[,path]])", arg(STR, STR), STR_ZM, flag(NDT), DB_URI),
   /** XQuery function. */
@@ -958,10 +958,10 @@ public enum Function {
 
   /** XQuery function. */
   _FT_CONTAINS(FtContains.class, "contains(input,terms[,options])",
-      arg(ITEM, ITEM_ZM, ITEM), NOD_ZM, flag(NDT), FT_URI),
+      arg(ITEM, ITEM_ZM, ITEM), BLN, flag(NDT), FT_URI),
   /** XQuery function. */
   _FT_SEARCH(FtSearch.class, "search(database,terms[,options])",
-      arg(STR, ITEM_ZM, ITEM), NOD_ZM, flag(NDT), FT_URI),
+      arg(STR, ITEM_ZM, ITEM), TXT_ZM, flag(NDT), FT_URI),
   /** XQuery function. */
   _FT_COUNT(FtCount.class, "count(nodes)", arg(NOD_ZM), ITR, FT_URI),
   /** XQuery function. */
@@ -1042,17 +1042,17 @@ public enum Function {
       INDEX_URI),
   /** XQuery function. */
   _INDEX_TEXTS(IndexTexts.class, "texts(database[,prefix[,ascending]])",
-      arg(STR, STR, BLN), NOD_ZM, flag(NDT), INDEX_URI),
+      arg(STR, STR, BLN), ELM_ZM, flag(NDT), INDEX_URI),
   /** XQuery function. */
   _INDEX_ATTRIBUTES(IndexAttributes.class, "attributes(database[,prefix[,ascending]])",
-      arg(STR, STR, BLN), NOD_ZM, flag(NDT), INDEX_URI),
+      arg(STR, STR, BLN), ELM_ZM, flag(NDT), INDEX_URI),
   /** XQuery function. */
-  _INDEX_TOKENS(IndexTokens.class, "tokens(database)", arg(STR), NOD_ZM, flag(NDT), INDEX_URI),
+  _INDEX_TOKENS(IndexTokens.class, "tokens(database)", arg(STR), ELM_ZM, flag(NDT), INDEX_URI),
   /** XQuery function. */
-  _INDEX_ELEMENT_NAMES(IndexElementNames.class, "element-names(database)", arg(STR), NOD_ZM,
+  _INDEX_ELEMENT_NAMES(IndexElementNames.class, "element-names(database)", arg(STR), ELM_ZM,
       INDEX_URI),
   /** XQuery function. */
-  _INDEX_ATTRIBUTE_NAMES(IndexAttributeNames.class, "attribute-names(database)", arg(STR), NOD_ZM,
+  _INDEX_ATTRIBUTE_NAMES(IndexAttributeNames.class, "attribute-names(database)", arg(STR), ELM_ZM,
       INDEX_URI),
 
   /* Inspection Module. */

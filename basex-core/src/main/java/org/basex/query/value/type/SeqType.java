@@ -197,6 +197,8 @@ public final class SeqType {
   public static final SeqType ATT = NodeType.ATT.seqType();
   /** Zero or one attribute. */
   public static final SeqType ATT_ZO = new SeqType(NodeType.ATT, Occ.ZERO_ONE);
+  /** Zero or more attributes. */
+  public static final SeqType ATT_ZM = new SeqType(NodeType.ATT, Occ.ZERO_MORE);
   /** One comment node. */
   public static final SeqType COM = NodeType.COM.seqType();
   /** One document node. */
@@ -213,8 +215,10 @@ public final class SeqType {
   public static final SeqType NSP = NodeType.NSP.seqType();
   /** Namespace node. */
   public static final SeqType PI = NodeType.PI.seqType();
-  /** Namespace node. */
+  /** Zero or one text node. */
   public static final SeqType TXT_ZO = new SeqType(NodeType.TXT, Occ.ZERO_ONE);
+  /** Zero or more text nodes. */
+  public static final SeqType TXT_ZM = new SeqType(NodeType.TXT, Occ.ZERO_MORE);
 
   /** Any function type. */
   public static final FuncType ANY_FUN = new FuncType(null, (SeqType[]) null);

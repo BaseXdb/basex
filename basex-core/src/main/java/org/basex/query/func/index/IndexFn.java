@@ -55,7 +55,7 @@ public abstract class IndexFn extends StandardFunc {
     return new Iter() {
       final EntryIterator ei = index.entries(entries);
       @Override
-      public ANode next() {
+      public FElem next() {
         final byte[] token = ei.next();
         return token == null ? null : new FElem(ENTRY).add(COUNT, token(ei.count())).add(token);
       }
