@@ -543,13 +543,9 @@ final class TextRenderer extends BaseXBack {
    */
   private void drawError(final Graphics g) {
     final int ww = wordWidth == 0 ? fontWidth(g, ' ') : wordWidth;
-    final int s = Math.max(1, fontHeight / 8);
-    g.setColor(GUIConstants.LRED);
-    g.fillRect(x, y + 2, ww, s);
+    final int s = Math.max(2, fontHeight / 6);
     g.setColor(GUIConstants.RED);
-    for(int xp = x; xp < x + ww; xp++) {
-      if((xp & 1) == 0) g.drawLine(xp, y + 2, xp, y + s + 1);
-    }
+    for(int xp = x; xp < x + ww; xp += 2) g.drawLine(xp - 1, y + 2, xp, y + s + 1);
     if(edit) drawErrorLine(g);
   }
 

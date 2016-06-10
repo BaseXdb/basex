@@ -197,7 +197,7 @@ public final class GUIConstants {
   public static final boolean INVERT = BACK.getRed() + BACK.getGreen() + BACK.getBlue() < 384;
 
   /** Color: red. */
-  public static final Color RED = color(208, 0, 0);
+  public static final Color RED = color(224, 0, 0);
   /** Color: light red. */
   public static final Color LRED = color(255, 216, 216);
   /** Color: green. */
