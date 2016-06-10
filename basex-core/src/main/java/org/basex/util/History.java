@@ -111,8 +111,7 @@ public final class History {
 
     // merge consecutive character inputs without deletions
     int len = str.length;
-    if(pos > 0 && saved != pos && caret[pos] == oc && oc + 1 == nc &&
-        hist[pos - 1].length < len) {
+    if(pos > 0 && saved != pos && caret[pos] == oc && oc + 1 == nc && hist[pos - 1].length < len) {
       hist[pos] = str;
       caret[pos] = nc;
       return;
@@ -132,9 +131,10 @@ public final class History {
     }
     // save new entry
     if(pos >= 0) caret[pos] = oc;
-    hist[++pos] = str;
+    max = ++pos;
+    hist[pos] = str;
     caret[pos] = nc;
-    max = pos;
+    saved = -1;
     // remove old entries to save memory
     for(int p = pos + 1; p < MAX; p++) hist[p] = null;
   }
