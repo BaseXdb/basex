@@ -172,9 +172,8 @@ final class ProjectFiles {
           for(final byte[] mod : qc.modParsed) parsed.add(Token.string(mod));
         } catch(final QueryException ex) {
           // parsing failed: remember path
-          final InputInfo ii = ex.info();
-          errs.put(path, ii);
-          parsed.add(ii.path());
+          errs.put(path, ex.info());
+          parsed.add(path);
         }
       } catch(final IOException ex) {
         // file may not be accessible

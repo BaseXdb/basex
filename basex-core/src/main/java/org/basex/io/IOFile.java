@@ -169,7 +169,7 @@ public final class IOFile extends IO {
    */
   public IOFile parent() {
     final String parent = file.getParent();
-    return parent == null ? null : new IOFile(parent);
+    return parent == null ? null : new IOFile(parent + '/');
   }
 
   /**

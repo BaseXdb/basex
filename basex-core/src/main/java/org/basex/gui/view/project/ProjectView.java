@@ -154,21 +154,24 @@ public final class ProjectView extends BaseXPanel {
   }
 
   /**
-   * Refreshes the tree component.
+   * Finds nodes to be highlighted as erroneous and refreshes the tree.
    */
   void refreshTree() {
-    final TreeMap<String, InputInfo> errs = files.errors();
-    final String[] paths = errs.keySet().toArray(new String[errs.size()]);
+    // loop through all tree nodes
+    final Set<String> errPaths = files.errors().keySet();
     final Enumeration<?> en = root.depthFirstEnumeration();
     while(en.hasMoreElements()) {
       final ProjectNode node = (ProjectNode) en.nextElement();
-      if(node.file == null) continue;
+      final IOFile file = node.file;
+      if(file == null) continue;
 
-      final String path = node.file.path(), dir = node.file.dir();
+      final String path = file.path(), dirPath = path + '/';
       boolean found = false;
-      for(final String p : paths) {
-        if(p.equals(path) || p.startsWith(dir)) {
-          // same file
+
+      // loop through all erroneous paths
+      for(final String errPath : errPaths) {
+        // check if error path equals node path, or if it is a descendant
+        if(errPath.equals(path) || errPath.startsWith(dirPath)) {
           found = true;
           break;
         }
