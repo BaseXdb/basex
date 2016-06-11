@@ -131,10 +131,10 @@ public final class History {
     }
     // save new entry
     if(pos >= 0) caret[pos] = oc;
+    if(saved > pos) saved = -1;
     max = ++pos;
     hist[pos] = str;
     caret[pos] = nc;
-    saved = -1;
     // remove old entries to save memory
     for(int p = pos + 1; p < MAX; p++) hist[p] = null;
   }
