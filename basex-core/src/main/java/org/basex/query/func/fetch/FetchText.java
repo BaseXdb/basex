@@ -19,6 +19,7 @@ public final class FetchText extends StandardFunc {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] uri = toToken(exprs[0], qc);
     final String enc = toEncoding(1, BXFE_ENCODING_X, qc);
-    return new StrStream(IO.get(Token.string(uri)), enc, BXFE_IO_X, qc);
+    final boolean val = exprs.length < 3 || !toBoolean(exprs[2], qc);
+    return new StrStream(IO.get(Token.string(uri)), enc, BXFE_IO_X, val);
   }
 }

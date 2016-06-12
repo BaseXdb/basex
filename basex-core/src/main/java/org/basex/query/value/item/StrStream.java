@@ -2,7 +2,6 @@ package org.basex.query.value.item;
 
 import java.io.*;
 
-import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
@@ -29,16 +28,15 @@ public final class StrStream extends AStr implements Streamable {
    * Constructor.
    * @param input input
    * @param encoding encoding (may be null)
-   * @param qc query context
+   * @param validate validate flag
    * @param error error message to be thrown
    */
   public StrStream(final IO input, final String encoding, final QueryError error,
-      final QueryContext qc) {
-
+      final boolean validate) {
     this.input = input;
     this.encoding = encoding;
     this.error = error;
-    validate = qc.context.options.get(MainOptions.CHECKSTRINGS);
+    this.validate = validate;
   }
 
   @Override

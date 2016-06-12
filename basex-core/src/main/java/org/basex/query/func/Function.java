@@ -852,7 +852,8 @@ public enum Function {
   /* Fetch Module. */
 
   /** XQuery function. */
-  _FETCH_TEXT(FetchText.class, "text(uri[,encoding)", arg(STR, STR), STR, flag(NDT), FETCH_URI),
+  _FETCH_TEXT(FetchText.class, "text(uri[,encoding[,fallback]])",
+      arg(STR, STR, BLN), STR, flag(NDT), FETCH_URI),
   /** XQuery function. */
   _FETCH_BINARY(FetchBinary.class, "binary(uri)", arg(STR), B64, flag(NDT), FETCH_URI),
   /** XQuery function. */
@@ -911,11 +912,11 @@ public enum Function {
   _FILE_DELETE(FileDelete.class, "delete(path[,recursive])",
       arg(STR, BLN), EMP, flag(NDT), FILE_URI),
   /** XQuery function. */
-  _FILE_READ_TEXT(FileReadText.class, "read-text(path[,encoding])",
-      arg(STR, STR), STR, flag(NDT), FILE_URI),
+  _FILE_READ_TEXT(FileReadText.class, "read-text(path[,encoding[,fallback]])",
+      arg(STR, STR, BLN), STR, flag(NDT), FILE_URI),
   /** XQuery function. */
-  _FILE_READ_TEXT_LINES(FileReadTextLines.class, "read-text-lines(path[,encoding])",
-      arg(STR, STR), STR_ZM, flag(NDT), FILE_URI),
+  _FILE_READ_TEXT_LINES(FileReadTextLines.class, "read-text-lines(path[,encoding[,fallback]])",
+      arg(STR, STR, BLN), STR_ZM, flag(NDT), FILE_URI),
   /** XQuery function. */
   _FILE_READ_BINARY(FileReadBinary.class, "read-binary(path[,offset[,length]])",
       arg(STR, ITR, ITR), B64, flag(NDT), FILE_URI),
