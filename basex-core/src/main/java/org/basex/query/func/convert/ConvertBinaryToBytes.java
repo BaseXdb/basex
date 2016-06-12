@@ -20,6 +20,6 @@ public final class ConvertBinaryToBytes extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return BytSeq.get(toBytes(exprs[0], qc));
+    return BytSeq.get(toBin(exprs[0], qc).binary(info));
   }
 }

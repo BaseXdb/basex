@@ -20,7 +20,7 @@ abstract class TextDecoder {
   /** Encoding. */
   String encoding;
   /** Indicates if input must be valid. */
-  boolean valid;
+  boolean validate;
 
   /**
    * Returns the next character.
@@ -54,8 +54,8 @@ abstract class TextDecoder {
    * @throws IOException I/O exception
    */
   int invalid() throws IOException {
-    if(valid) throw new InputException();
-    return Token.INVALID;
+    if(validate) throw new InputException();
+    return Token.REPLACEMENT;
   }
 
   /** UTF8 Decoder. */

@@ -53,8 +53,8 @@ public final class Token {
   /** Colon. */
   public static final byte[] COLON = { ':' };
 
-  /** Invalid Unicode character. */
-  public static final char INVALID = '\uFFFD';
+  /** Unicode replacement character. */
+  public static final char REPLACEMENT = '\uFFFD';
 
   /** Maximum length for hash calculation. */
   private static final byte MAXLENGTH = 96;
@@ -232,7 +232,7 @@ public final class Token {
     if((v & 0xFF) < 192) return v & 0xFF;
     // number of bytes to be read
     final int vl = cl(v);
-    if(pos + vl > token.length) return INVALID;
+    if(pos + vl > token.length) return REPLACEMENT;
     // 110xxxxx 10xxxxxx
     if(vl == 2) return (v & 0x1F) << 6 | token[pos + 1] & 0x3F;
     // 1110xxxx 10xxxxxx 10xxxxxx

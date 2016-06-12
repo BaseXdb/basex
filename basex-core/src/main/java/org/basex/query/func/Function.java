@@ -698,11 +698,11 @@ public enum Function {
   _CONVERT_INTEGER_FROM_BASE(ConvertIntegerFromBase.class, "integer-from-base(string,base)",
       arg(STR, ITR), ITR, CONVERT_URI),
   /** XQuery function. */
-  _CONVERT_BINARY_TO_BYTES(ConvertBinaryToBytes.class, "binary-to-bytes(binary)", arg(ITEM), BYT_ZM,
-      CONVERT_URI),
+  _CONVERT_BINARY_TO_BYTES(ConvertBinaryToBytes.class, "binary-to-bytes(binary)",
+      arg(AAT), BYT_ZM, CONVERT_URI),
   /** XQuery function. */
-  _CONVERT_BINARY_TO_STRING(ConvertBinaryToString.class, "binary-to-string(binary[,encoding])",
-      arg(ITEM, STR), STR, CONVERT_URI),
+  _CONVERT_BINARY_TO_STRING(ConvertBinaryToString.class,
+      "binary-to-string(binary[,encoding[,fallback]])", arg(ITEM, STR, BLN), STR, CONVERT_URI),
   /** XQuery function. */
   _CONVERT_BYTES_TO_HEX(ConvertBytesToHex.class, "bytes-to-hex(bytes)", arg(BYT_ZM), HEX,
       CONVERT_URI),

@@ -373,7 +373,7 @@ final class JsonParser extends InputParser {
     } else if(XMLToken.valid(ch)) {
       tb.add(ch);
     } else if(conv.fallback == null) {
-      tb.add(INVALID);
+      tb.add(REPLACEMENT);
     } else {
       tb.add(conv.fallback.convert(input.substring(s, e)));
     }

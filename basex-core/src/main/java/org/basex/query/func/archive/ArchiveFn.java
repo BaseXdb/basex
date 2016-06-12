@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
+import org.basex.core.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
@@ -43,7 +44,8 @@ abstract class ArchiveFn extends StandardFunc {
   final byte[] encode(final byte[] value, final String encoding, final QueryContext qc)
       throws QueryException {
     try {
-      return ConvertBinaryToString.toString(new ArrayInput(value), encoding, qc);
+      final boolean val = qc.context.options.get(MainOptions.CHECKSTRINGS);
+      return ConvertFn.toString(new ArrayInput(value), encoding, val);
     } catch(final IOException ex) {
       throw ARCH_ENCODE_X.get(info, ex);
     }

@@ -68,7 +68,9 @@ public final class ConvertModuleTest extends AdvancedQueryTest {
     query(_CONVERT_BINARY_TO_STRING.args("xs:base64Binary(xs:hexBinary('41'))"), "A");
     query(_CONVERT_BINARY_TO_STRING.args("xs:hexBinary('41')"), "A");
     query(_CONVERT_BINARY_TO_STRING.args("xs:hexBinary('41')", "CP1252"), "A");
+    query(_CONVERT_BINARY_TO_STRING.args("xs:hexBinary('12')", "CP1252", "true()"), "\uFFFD");
     error(_CONVERT_BINARY_TO_STRING.args("xs:hexBinary('41')", "X"), BXCO_ENCODING_X);
+    error(_CONVERT_BINARY_TO_STRING.args("xs:hexBinary('12')", "CP1252", "false()"), BXCO_STRING_X);
   }
 
   /** Test method. */

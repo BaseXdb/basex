@@ -136,7 +136,7 @@ final class CsvParser {
    * @param ch character
    */
   private static void add(final TokenBuilder entry, final int ch) {
-    entry.add(XMLToken.valid(ch) ? ch : Token.INVALID);
+    entry.add(XMLToken.valid(ch) ? ch : Token.REPLACEMENT);
   }
 
   /**

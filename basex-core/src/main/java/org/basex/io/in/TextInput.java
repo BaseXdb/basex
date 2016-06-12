@@ -20,7 +20,7 @@ public class TextInput extends BufferInput {
   /** Decoder. */
   private TextDecoder decoder;
   /** Indicates if the input is to be checked for valid XML 1.0.5 characters. */
-  private boolean valid;
+  private boolean validate;
 
   /**
    * Constructor.
@@ -87,12 +87,12 @@ public class TextInput extends BufferInput {
   /**
    * Checks the input for valid XML characters and throws an exception if invalid
    * characters are found.
-   * @param v flag to be set
+   * @param flag flag to be set
    * @return self reference
    */
-  public final TextInput validate(final boolean v) {
-    valid = v;
-    decoder.valid = v;
+  public final TextInput validate(final boolean flag) {
+    validate = flag;
+    decoder.validate = flag;
     return this;
   }
 
@@ -107,7 +107,7 @@ public class TextInput extends BufferInput {
       String e = normEncoding(enc);
       if(e == UTF16) e = decoder.encoding == UTF16LE ? UTF16LE : UTF16BE;
       decoder = TextDecoder.get(e);
-      decoder.valid = valid;
+      decoder.validate = validate;
     }
     return this;
   }
@@ -120,7 +120,10 @@ public class TextInput extends BufferInput {
   @Override
   public int read() throws IOException {
     final int ch = decoder.read(this);
-    if(ch != -1 && valid && !XMLToken.valid(ch)) throw new EncodingException(ch);
+    if(ch != -1 && !XMLToken.valid(ch)) {
+      if(validate) throw new EncodingException(ch);
+      return Token.REPLACEMENT;
+    }
     return ch;
   }
 

@@ -66,15 +66,23 @@ public final class Str extends AStr {
   public static Str get(final Object value, final QueryContext qc, final InputInfo ii)
       throws QueryException {
 
+    final boolean validate = qc.context.options.get(MainOptions.CHECKSTRINGS);
     final byte[] bytes = Token.token(value.toString());
-    if(qc.context.options.get(MainOptions.CHECKSTRINGS)) {
-      final int bl = bytes.length;
-      for(int b = 0; b < bl; b += Token.cl(bytes, b)) {
-        final int cp = Token.cp(bytes, b);
-        if(!XMLToken.valid(cp)) throw INVCODE_X.get(ii, Integer.toHexString(cp));
+    final int bl = bytes.length;
+    TokenBuilder tb = null;
+    for(int c = 0; c < bl; c += Token.cl(bytes, c)) {
+      int cp = Token.cp(bytes, c);
+      if(!XMLToken.valid(cp)) {
+        if(validate) throw INVCODE_X.get(ii, Integer.toHexString(cp));
+        cp = Token.REPLACEMENT;
+        if(tb == null) {
+          tb = new TokenBuilder(bl);
+          for(int b = 0; b < c; b++) tb.addByte(bytes[b]);
+        }
       }
+      if(tb != null) tb.add(cp);
     }
-    return get(bytes);
+    return get(tb == null ? bytes : tb.finish());
   }
 
   @Override
