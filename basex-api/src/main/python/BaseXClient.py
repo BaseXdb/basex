@@ -19,11 +19,14 @@ Documentation: http://docs.basex.org/wiki/Clients
 
 """
 
-import hashlib, socket
+import hashlib
+import socket
 import threading
 
 # ---------------------------------
 #
+
+
 class SocketWrapper(object):
     """a wrapper to python native socket module."""
 
@@ -119,7 +122,7 @@ class Session(object):
         hfun = hashlib.md5()
 
         if len(response) > 1:
-            code = "%s:%s:%s" % (user,response[0],password)
+            code = "%s:%s:%s" % (user, response[0], password)
             nonce = response[1]
         else:
             code = password
@@ -198,8 +201,8 @@ yourself explicitly."""
 
     def __send_binary_input(self, code, path, content):
         """internal. don't care."""
-        #at this time, we can't use __send_input itself because of encoding
-        #problem. we have to build bytearray directly.
+        # at this time, we can't use __send_input itself because of encoding
+        # problem. we have to build bytearray directly.
         if not isinstance(content, (bytearray, bytes)):
             raise ValueError("Sorry, content must be bytearray or bytes, not " +
                              str(type(content)))
@@ -247,6 +250,8 @@ typecode list is in http://docs.basex.org/wiki/Server_Protocol:_Types
 
 # ---------------------------------
 #
+
+
 class Query():
     """class Query.
 
@@ -298,8 +303,8 @@ An empty string can be specified as data type."""
 
     def __exc(self, cmd, arg):
         """internal. don't care."""
-        #should we expose this?
-        #(this makes sense only when mismatch between C/S is existing.)
+        # should we expose this?
+        # (this makes sense only when mismatch between C/S is existing.)
         self.__session.send(cmd + arg)
         result = self.__session.receive()
         if not self.__session.server_response_success():
