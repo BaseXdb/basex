@@ -866,19 +866,15 @@ public final class EditorView extends View {
   }
 
   /**
-   * Shows a quit dialog for all modified query files.
-   * @return result of check
+   * Saves the current configuration.
    */
-  public boolean confirm() {
-    // save modified files
-    if(!confirm(null)) return false;
+  public void saveOptions() {
     // remember opened files
     final StringList files = new StringList();
     for(final EditorArea edit : editors()) {
       if(edit.opened()) files.add(edit.file().path());
     }
     gui.gopts.set(GUIOptions.OPEN, files.finish());
-    return true;
   }
 
   /**
@@ -1051,7 +1047,7 @@ public final class EditorView extends View {
    * @param edit editor to be saved, or {@code null} to save all editors
    * @return {@code false} if confirmation was canceled
    */
-  private boolean confirm(final EditorArea edit) {
+  public boolean confirm(final EditorArea edit) {
     final boolean all = edit == null;
     final EditorArea[] eas = all ? editors() : new EditorArea[] { edit };
     final String[] buttons = all && eas.length > 1 ? new String[] { CLOSE_ALL } : new String[0];

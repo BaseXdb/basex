@@ -281,18 +281,27 @@ public final class GUI extends JFrame {
 
   @Override
   public void dispose() {
-    // close opened queries
-    if(!editor.confirm()) return;
+    saveOptions();
+    // check if all modified texts are saved or closed
+    if(editor.confirm(null)) {
+      context.close();
+      super.dispose();
+    }
+  }
 
+  /**
+   * Saves the current configuration.
+   */
+  public void saveOptions() {
+    editor.saveOptions();
     final boolean max = getExtendedState() == MAXIMIZED_BOTH;
     gopts.set(GUIOptions.MAXSTATE, max);
     if(!max) {
       gopts.set(GUIOptions.GUILOC, new int[] { getX(), getY()});
       gopts.set(GUIOptions.GUISIZE, new int[] { getWidth(), getHeight()});
     }
-    super.dispose();
     gopts.write();
-    context.close();
+    context.soptions.write();
   }
 
   /**
