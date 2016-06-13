@@ -21,6 +21,8 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class QueryPool {
+  /** Number of queries to be queued. */
+  private static final int MAXQURIES = 1000;
   /** Queries. */
   private final Map<String, Query> queries = new ConcurrentHashMap<>();
 
@@ -30,8 +32,13 @@ public final class QueryPool {
    * @param cache cache results
    * @param info input info
    * @return query id
+   * @throws QueryException query exception
    */
-  public String add(final QueryProcessor qp, final boolean cache, final InputInfo info) {
+  public String add(final QueryProcessor qp, final boolean cache, final InputInfo info)
+      throws QueryException {
+
+    if(queries.size() == MAXQURIES) throw ASYNC_OVERFLOW.get(info);
+
     final String id = "Query-" + UUID.randomUUID();
     queries.put(id, new Query(qp, id, cache, info));
     return id;

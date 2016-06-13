@@ -71,6 +71,8 @@ public enum QueryError {
   ASYNC_UNKNOWN_X(ASYNC, "unknown", "Unknown query id: %."),
   /** ASYN0004. */
   ASYNC_RUNNING_X(ASYNC, "running", "Query is still running: %."),
+  /** ASYN0005. */
+  ASYNC_OVERFLOW(ASYNC, "overflow", "Too many queries queued."),
 
   // Client module
 
