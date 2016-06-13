@@ -1,5 +1,7 @@
 package org.basex.query.up.primitives.db;
 
+import static org.basex.query.QueryError.*;
+
 import java.util.*;
 
 import org.basex.data.*;
@@ -19,6 +21,8 @@ public final class DBAdd extends DBUpdate {
   private final DBOptions options;
   /** Container for new database documents. */
   private final DBNew newDocs;
+  /** Replace flag. */
+  private final boolean replace;
   /** Size. */
   private int size;
 
@@ -27,15 +31,17 @@ public final class DBAdd extends DBUpdate {
    * @param data target database
    * @param input document to add (IO or ANode instance)
    * @param opts database options
+   * @param replace replace flag
    * @param qc query context
    * @param info input info
    * @throws QueryException query exception
    */
-  public DBAdd(final Data data, final NewInput input, final Options opts, final QueryContext qc,
-      final InputInfo info) throws QueryException {
+  public DBAdd(final Data data, final NewInput input, final Options opts, final boolean replace,
+      final QueryContext qc, final InputInfo info) throws QueryException {
 
     super(UpdateType.DBADD, data, info);
     options = new DBOptions(opts, DBOptions.PARSING, info);
+    this.replace = replace;
 
     final ArrayList<NewInput> docs = new ArrayList<>();
     docs.add(input);
@@ -43,8 +49,12 @@ public final class DBAdd extends DBUpdate {
   }
 
   @Override
-  public void merge(final Update update) {
-    newDocs.merge(((DBAdd) update).newDocs);
+  public void merge(final Update update) throws QueryException {
+    final DBAdd add = (DBAdd) update;
+    if(replace || add.replace)
+      throw UPMULTDOC_X_X.get(info, data.meta.name, newDocs.inputs.get(0).path);
+
+    newDocs.merge(add.newDocs);
   }
 
   @Override

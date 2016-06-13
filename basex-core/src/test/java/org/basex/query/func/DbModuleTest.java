@@ -561,6 +561,14 @@ public final class DbModuleTest extends AdvancedQueryTest {
     query(EXISTS.args(_DB_OPEN.args(NAME, "cache2.xml")), "true");
     query(_DB_REPLACE.args(NAME, "cache3.xml", XML, addcache));
     query(EXISTS.args(_DB_OPEN.args(NAME, "cache3.xml")), "true");
+
+    // replace same target more than once
+    error("(1 to 2) ! " + _DB_REPLACE.args(NAME, "cache3.xml", XML), UPMULTDOC_X_X);
+    error("(1 to 2) ! " + _DB_REPLACE.args(NAME, "cacheX.xml", XML), UPMULTDOC_X_X);
+    error(_DB_ADD.args(NAME, XML, "cacheX.xml") + ',' + _DB_REPLACE.args(NAME, "cacheX.xml", XML),
+        UPMULTDOC_X_X);
+    error(_DB_REPLACE.args(NAME, "cacheX.xml", XML) + ',' + _DB_ADD.args(NAME, XML, "cacheX.xml"),
+        UPMULTDOC_X_X);
   }
 
   /** Test method. */
