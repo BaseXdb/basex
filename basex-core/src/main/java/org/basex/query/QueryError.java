@@ -218,6 +218,8 @@ public enum QueryError {
   BXRE_INST_X(BXRE, 5, "Module % is already installed within another package."),
   /** BXRE0006. */
   BXRE_PARSE_X_X(BXRE, 6, "Package '%' could not be parsed: %."),
+  /** BXRE0006. */
+  BXRE_MAIN_X(BXRE, 6, "No 'Main-Class' attribute found: %/META-INF/MANIFEST.MF."),
   /** BXRE0007. */
   BXRE_DELETE_X(BXRE, 7, "File '%' could not be deleted."),
   /** BXRE0008. */

@@ -67,7 +67,7 @@ public final class RepoManager {
 
     try {
       if(io.hasSuffix(IO.XQSUFFIXES)) return installXQ(cont, path);
-      if(io.hasSuffix(IO.JARSUFFIX)) return installJAR(cont);
+      if(io.hasSuffix(IO.JARSUFFIX)) return installJAR(cont, path);
       return installXAR(cont);
     } catch(final IOException ex) {
       throw BXRE_PARSE_X_X.get(info, io.name(), ex);
@@ -195,11 +195,15 @@ public final class RepoManager {
 
   /**
    * Installs a JAR package.
+   * @param path package path
    * @param content package content
    * @return {@code true} if existing package was replaced
+   * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private boolean installJAR(final byte[] content) throws IOException {
+  private boolean installJAR(final byte[] content, final String path)
+      throws QueryException, IOException {
+
     final Zip zip = new Zip(new IOContent(content));
     final IOContent mf = new IOContent(zip.read(MANIFEST_MF));
     final NewlineInput nli = new NewlineInput(mf);
@@ -208,7 +212,7 @@ public final class RepoManager {
       final Matcher m = MAIN_CLASS.matcher(s);
       if(m.find()) return write(m.group(1).replace('.', '/') + IO.JARSUFFIX, content);
     }
-    return false;
+    throw BXRE_MAIN_X.get(info, path);
   }
 
   /**
