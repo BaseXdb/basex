@@ -2,6 +2,7 @@ package org.expath.ns;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
+import org.basex.util.*;
 
 /**
  * This module contains static error functions for the Geo module.
@@ -75,7 +76,7 @@ final class GeoErrors {
    * @return query exception
    */
   static QNm qname(final int code) {
-    return new QNm(String.format("%s:GEO%04d", QueryText.EXPERR_PREFIX, code),
+    return new QNm(Util.inf("%s:GEO%04d", QueryText.EXPERR_PREFIX, code),
         QueryText.EXPERROR_URI);
   }
 
