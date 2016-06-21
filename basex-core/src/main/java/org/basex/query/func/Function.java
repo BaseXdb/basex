@@ -466,6 +466,9 @@ public enum Function {
   /** XQuery function. */
   _ARRAY_REMOVE(ArrayRemove.class, "remove(array,pos)", arg(ARRAY_O, ITR_ZM), ARRAY_O, ARRAY_URI),
   /** XQuery function. */
+  _ARRAY_PUT(ArrayPut.class, "put(array,pos,member)", arg(ARRAY_O, ITR, ITEM_ZM),
+      ARRAY_O, ARRAY_URI),
+  /** XQuery function. */
   _ARRAY_INSERT_BEFORE(ArrayInsertBefore.class, "insert-before(array,pos,value)",
       arg(ARRAY_O, ITR, ITEM_ZO), ARRAY_O, ARRAY_URI),
   /** XQuery function. */
