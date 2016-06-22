@@ -72,8 +72,8 @@ final class TrieList extends TrieNode {
           System.arraycopy(keys, 0, ks, 0, i);
           System.arraycopy(keys, i + 1, ks, i, s - i);
           final Value[] vs = new Value[s];
-          System.arraycopy(values, 0, ks, 0, i);
-          System.arraycopy(values, i + 1, ks, i, s - i);
+          System.arraycopy(values, 0, vs, 0, i);
+          System.arraycopy(values, i + 1, vs, i, s - i);
           return new TrieList(h, ks, vs);
         }
       }
