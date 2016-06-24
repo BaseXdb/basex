@@ -46,6 +46,30 @@ public final class Var extends ExprInfo {
   private boolean promote;
 
   /**
+   * Constructor for a variable with an already known stack slot.
+   * @param name variable name, {@code null} for unnamed variable
+   * @param declType declared sequence type, {@code null} for no check
+   * @param param function parameter flag
+   * @param slot stack slot
+   * @param qc query context, used for generating a variable ID
+   * @param sc static context
+   * @param info input info
+   */
+  public Var(final QNm name, final SeqType declType, final boolean param, final int slot,
+      final QueryContext qc, final StaticContext sc, final InputInfo info) {
+    this.name = name;
+    this.param = param;
+    this.sc = sc;
+    this.info = info;
+    this.slot = slot;
+    promote = param;
+    type = declType == null || declType.eq(SeqType.ITEM_ZM) ? null : declType;
+    seqType = SeqType.ITEM_ZM;
+    id = qc.varIDs++;
+    size = seqType.occ();
+  }
+
+  /**
    * Constructor.
    * @param name variable name, {@code null} for unnamed variable
    * @param declType declared sequence type, {@code null} for no check
@@ -56,15 +80,7 @@ public final class Var extends ExprInfo {
    */
   public Var(final QNm name, final SeqType declType, final boolean param, final QueryContext qc,
       final StaticContext sc, final InputInfo info) {
-    this.name = name;
-    this.param = param;
-    this.sc = sc;
-    this.info = info;
-    promote = param;
-    type = declType == null || declType.eq(SeqType.ITEM_ZM) ? null : declType;
-    seqType = SeqType.ITEM_ZM;
-    id = qc.varIDs++;
-    size = seqType.occ();
+    this(name, declType, param, -1, qc, sc, info);
   }
 
   /**
