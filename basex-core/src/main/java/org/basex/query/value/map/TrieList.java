@@ -92,7 +92,7 @@ final class TrieList extends TrieNode {
           // replace value
           final Value[] vs = values.clone();
           vs[i] = v;
-          return new TrieList(h, keys.clone(), vs);
+          return new TrieList(h, keys, vs);
         }
       }
       return new TrieList(hash, Array.add(keys, k), Array.add(values, v));
