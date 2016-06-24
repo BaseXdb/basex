@@ -74,6 +74,13 @@ final class SingletonTree<N, E> extends FingerTree<N, E> {
   }
 
   @Override
+  public FingerTree<N, E> set(final long pos, final E val) {
+    final long size = elem.size();
+    if(pos < 0 || pos >= size) throw new IndexOutOfBoundsException(pos + ", size = " + size);
+    return new SingletonTree<>(elem.set(pos, val));
+  }
+
+  @Override
   public FingerTree<N, E> insert(final long pos, final E val) {
     @SuppressWarnings("unchecked")
     final Node<N, E>[] siblings = new Node[4];

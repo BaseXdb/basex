@@ -61,6 +61,11 @@ final class EmptyTree<N, E> extends FingerTree<N, E> {
   }
 
   @Override
+  public FingerTree<N, E> set(final long pos, final E val) {
+    throw new IndexOutOfBoundsException("Empty Tree");
+  }
+
+  @Override
   public long size() {
     return 0;
   }

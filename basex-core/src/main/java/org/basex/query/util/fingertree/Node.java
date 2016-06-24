@@ -55,7 +55,16 @@ public interface Node<N, E> extends NodeLike<N, E> {
    * @param val value to insert
    * @return {@code true} if the node was split, {@code false} otherwise
    */
-  boolean insert(Node<N, E>[] siblings, final long pos, final E val);
+  boolean insert(final Node<N, E>[] siblings, final long pos, final E val);
+
+  /**
+   * Replaces the element at the given position in this node with the given element.
+   * @param pos position
+   * @param val new value
+   * @return resulting node
+   * @throws IndexOutOfBoundsException if {@code pos} is out of bounds
+   */
+  Node<N, E> set(final long pos, final E val);
 
   /**
    * Removes the element at the given position in this node.

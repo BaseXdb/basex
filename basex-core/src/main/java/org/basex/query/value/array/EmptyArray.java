@@ -30,7 +30,12 @@ final class EmptyArray extends Array {
 
   @Override
   public Value get(final long index) {
-    throw new IndexOutOfBoundsException();
+    throw new IndexOutOfBoundsException(Long.toString(index));
+  }
+
+  @Override
+  public Array put(final long pos, final Value val) {
+    throw new IndexOutOfBoundsException(Long.toString(pos));
   }
 
   @Override

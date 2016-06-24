@@ -64,6 +64,14 @@ final class SmallArray extends Array {
   }
 
   @Override
+  public Array put(final long pos, final Value val) {
+    if(pos < 0 || pos >= elems.length) throw new IndexOutOfBoundsException(Long.toString(pos));
+    final Value[] values = elems.clone();
+    values[(int) pos] = val;
+    return new SmallArray(values);
+  }
+
+  @Override
   public long arraySize() {
     return elems.length;
   }

@@ -220,6 +220,31 @@ final class BigArray extends Array {
   }
 
   @Override
+  public Array put(final long pos, final Value val) {
+    if(pos < 0) throw new IndexOutOfBoundsException(Long.toString(pos));
+    long p = pos;
+    if(p < left.length) {
+      final Value[] newLeft = left.clone();
+      newLeft[(int) p] = val;
+      return new BigArray(newLeft, middle, right);
+    }
+    p -= left.length;
+
+    final long m = middle.size();
+    if(p < m) {
+      return new BigArray(left, middle.set(p, val), right);
+    }
+    p -= m;
+
+    if(p < right.length) {
+      final Value[] newRight = right.clone();
+      newRight[(int) p] = val;
+      return new BigArray(left, middle, newRight);
+    }
+    throw new IndexOutOfBoundsException(pos + " > " + arraySize());
+  }
+
+  @Override
   public Array reverseArray() {
     final int l = left.length, r = right.length;
     final Value[] newLeft = new Value[r], newRight = new Value[l];

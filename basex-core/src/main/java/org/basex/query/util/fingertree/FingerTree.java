@@ -115,6 +115,15 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
   }
 
   /**
+   * Replaces the element at the given position in this tree.
+   * @param pos position
+   * @param val element
+   * @return resulting tree
+   * @throws IndexOutOfBoundsException if the position is out of bounds
+   */
+  public abstract FingerTree<N, E> set(final long pos, final E val);
+
+  /**
    * The size of this tree.
    * @return number of elements in this tree
    */

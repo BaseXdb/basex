@@ -252,6 +252,39 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
   }
 
   @Override
+  public FingerTree<N, E> set(final long pos, final E val) {
+    long off = pos;
+    if(off < leftSize) {
+      final Node<N, E>[] newLeft = left.clone();
+      int i = 0;
+      for(;; i++) {
+        final long sub = newLeft[i].size();
+        if(off < sub) break;
+        off -= sub;
+      }
+      newLeft[i] = newLeft[i].set(off, val);
+      return new DeepTree<>(newLeft, leftSize, middle, right, size);
+    }
+    off -= leftSize;
+
+    final long mid = middle.size();
+    if(off < mid) {
+      return new DeepTree<>(left, leftSize, middle.set(off, val), right, size);
+    }
+    off -= mid;
+
+    final Node<N, E>[] newRight = right.clone();
+    int i = 0;
+    for(;; i++) {
+      final long sub = newRight[i].size();
+      if(off < sub) break;
+      off -= sub;
+    }
+    newRight[i] = newRight[i].set(off, val);
+    return new DeepTree<>(left, leftSize, middle, newRight, size);
+  }
+
+  @Override
   public FingerTree<N, E> insert(final long pos, final E val) {
     if(pos <= leftSize) {
       // insert into left digit

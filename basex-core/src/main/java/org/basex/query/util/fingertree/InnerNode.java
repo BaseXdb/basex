@@ -47,12 +47,23 @@ final class InnerNode<N, E> implements Node<Node<N, E>, E> {
   }
 
   @Override
-  public Node<Node<N, E>, E> reverse() {
+  public InnerNode<N, E> reverse() {
     final int n = children.length;
     @SuppressWarnings("unchecked")
     final Node<N, E>[] newChildren = new Node[n];
     for(int i = 0; i < n; i++) newChildren[i] = children[n - 1 - i].reverse();
     return new InnerNode<>(newChildren);
+  }
+
+  @Override
+  public InnerNode<N, E> set(final long pos, final E val) {
+    if(pos < 0 || pos >= bounds[bounds.length - 1]) throw new IndexOutOfBoundsException();
+    int i = 0;
+    while(pos >= bounds[i]) i++;
+    final long p = i == 0 ? pos : pos - bounds[i - 1];
+    final Node<N, E>[] ch = children.clone();
+    ch[i] = children[i].set(p, val);
+    return new InnerNode<>(ch);
   }
 
   @Override
@@ -424,7 +435,7 @@ final class InnerNode<N, E> implements Node<Node<N, E>, E> {
    * @param newFirst new first sub-node
    * @return resulting node
    */
-  Node<Node<N, E>, E> replaceFirst(final Node<N, E> newFirst) {
+  InnerNode<N, E> replaceFirst(final Node<N, E> newFirst) {
     final Node<N, E>[] copy = children.clone();
     copy[0] = newFirst;
     return new InnerNode<>(copy);
@@ -435,7 +446,7 @@ final class InnerNode<N, E> implements Node<Node<N, E>, E> {
    * @param newLast new last sub-node
    * @return resulting node
    */
-  Node<Node<N, E>, E> replaceLast(final Node<N, E> newLast) {
+  InnerNode<N, E> replaceLast(final Node<N, E> newLast) {
     final Node<N, E>[] copy = children.clone();
     copy[copy.length - 1] = newLast;
     return new InnerNode<>(copy);

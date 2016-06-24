@@ -100,6 +100,16 @@ public abstract class Array extends FItem {
   public abstract Value get(long index);
 
   /**
+   * Returns a copy of this array where the entry at the given position is
+   * replaced by the given value.
+   * @param pos position of the entry to replace
+   * @param val value to put into this array
+   * @return resulting array
+   * @throws IndexOutOfBoundsException if {@code pos < 0} or {@code pos >= this.arraySize()}
+   */
+  public abstract Array put(final long pos, final Value val);
+
+  /**
    * Returns the number of elements in this array.
    * Running time: <i>O(1)</i>
    * @return number of elements
