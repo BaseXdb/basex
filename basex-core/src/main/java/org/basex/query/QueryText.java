@@ -241,7 +241,6 @@ public interface QueryText {
   /** XQuery prefix. */ byte[] ANN_PREFIX = token("ann");
   /** XQuery prefix. */ byte[] ARCHIVE_PREFIX = token("archive");
   /** XQuery prefix. */ byte[] ARRAY_PREFIX = token("array");
-  /** XQuery prefix. */ byte[] ASYNC_PREFIX = token("async");
   /** XQuery prefix. */ byte[] BASEX_PREFIX = token("basex");
   /** XQuery prefix. */ byte[] BIN_PREFIX = token("bin");
   /** XQuery prefix. */ byte[] BXERR_PREFIX = token("bxerr");
@@ -263,6 +262,7 @@ public interface QueryText {
   /** XQuery prefix. */ byte[] INDEX_PREFIX = token("index");
   /** XQuery prefix. */ byte[] INPUT_PREFIX = token("input");
   /** XQuery prefix. */ byte[] INSPECT_PREFIX = token("inspect");
+  /** XQuery prefix. */ byte[] JOBS_PREFIX = token("jobs");
   /** XQuery prefix. */ byte[] JSON_PREFIX = token("json");
   /** XQuery prefix. */ byte[] LOCAL_PREFIX = token("local");
   /** XQuery prefix. */ byte[] MAP_PREFIX = token("map");
@@ -326,7 +326,6 @@ public interface QueryText {
   /** BaseX URI. */ String BXMODULES_URI = Prop.URL + "/modules/";
   /** BaseX URI. */ byte[] ADMIN_URI = token(BXMODULES_URI + "admin");
   /** BaseX URI. */ byte[] ARCHIVE_URI = token(BXMODULES_URI + "archive");
-  /** BaseX URI. */ byte[] ASYNC_URI = token(BXMODULES_URI + "async");
   /** BaseX URI. */ byte[] CLIENT_URI = token(BXMODULES_URI + "client");
   /** BaseX URI. */ byte[] CONVERT_URI = token(BXMODULES_URI + "convert");
   /** BaseX URI. */ byte[] CSV_URI = token(BXMODULES_URI + "csv");
@@ -339,6 +338,7 @@ public interface QueryText {
   /** BaseX URI. */ byte[] INDEX_URI = token(BXMODULES_URI + "index");
   /** BaseX URI. */ byte[] INPUT_URI = token(BXMODULES_URI + "input");
   /** BaseX URI. */ byte[] INSPECT_URI = token(BXMODULES_URI + "inspect");
+  /** BaseX URI. */ byte[] JOBS_URI = token(BXMODULES_URI + "jobs");
   /** BaseX URI. */ byte[] JSON_URI = token(BXMODULES_URI + "json");
   /** BaseX URI. */ byte[] OUT_URI = token(BXMODULES_URI + "out");
   /** BaseX URI. */ byte[] PROC_URI = token(BXMODULES_URI + "proc");

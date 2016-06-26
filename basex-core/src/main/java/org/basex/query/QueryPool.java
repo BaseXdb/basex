@@ -37,7 +37,7 @@ public final class QueryPool {
   public String add(final QueryProcessor qp, final boolean cache, final InputInfo info)
       throws QueryException {
 
-    if(queries.size() == MAXQURIES) throw ASYNC_OVERFLOW.get(info);
+    if(queries.size() == MAXQURIES) throw JOBS_OVERFLOW.get(info);
 
     final String id = "Query-" + UUID.randomUUID();
     queries.put(id, new Query(qp, id, cache, info));
@@ -52,8 +52,10 @@ public final class QueryPool {
    * @throws QueryException query exception
    */
   public Value result(final String id, final InputInfo info) throws QueryException {
-    final Query query = get(id, info);
-    if(query.qp != null) throw ASYNC_RUNNING_X.get(info, id);
+    final Query query = queries.get(id);
+    if(query == null) throw JOBS_UNKNOWN_X.get(info, id);
+
+    if(query.qp != null) throw JOBS_RUNNING_X.get(info, id);
 
     try {
       if(query.result != null) return query.result;
@@ -66,12 +68,11 @@ public final class QueryPool {
   /**
    * Checks if the specified query is running.
    * @param id id
-   * @param info input info
-   * @return result of check, or {@code null} if the query is unknown
-   * @throws QueryException query exception
+   * @return result of check
    */
-  public boolean finished(final String id, final InputInfo info) throws QueryException {
-    return get(id, info).qp == null;
+  public boolean finished(final String id) {
+    final Query query = queries.get(id);
+    return query == null || query.qp == null;
   }
 
   /**
@@ -85,26 +86,12 @@ public final class QueryPool {
   }
 
   /**
-   * Checks if the specified query is running.
-   * @param id id
-   * @param info input info
-   * @return result of check, or {@code null} if the query is unknown
-   * @throws QueryException query exception
-   */
-  private Query get(final String id, final InputInfo info) throws QueryException {
-    final Query query = queries.get(id);
-    if(query != null) return query;
-    throw ASYNC_UNKNOWN_X.get(info, id);
-  }
-
-  /**
    * Stops a running query.
    * @param id id
-   * @param info input info
-   * @throws QueryException query exception
    */
-  public void stop(final String id, final InputInfo info) throws QueryException {
-    get(id, info).close();
+  public void stop(final String id) {
+    final Query query = queries.get(id);
+    if(query != null) query.close();
   }
 
   /**
@@ -177,7 +164,7 @@ public final class QueryPool {
       } catch(final QueryException ex) {
         exc = ex;
       } catch(final Throwable ex) {
-        exc = ASYNC_UNEXPECTED_X.get(info, ex);
+        exc = BXXQ_UNEXPECTED_X.get(info, ex);
       } finally {
         if(cache) {
           // cache result, discard it after timeout

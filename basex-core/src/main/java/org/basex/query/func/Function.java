@@ -13,7 +13,6 @@ import org.basex.query.expr.Expr.Flag;
 import org.basex.query.func.admin.*;
 import org.basex.query.func.archive.*;
 import org.basex.query.func.array.*;
-import org.basex.query.func.async.*;
 import org.basex.query.func.bin.*;
 import org.basex.query.func.client.*;
 import org.basex.query.func.convert.*;
@@ -30,6 +29,7 @@ import org.basex.query.func.html.*;
 import org.basex.query.func.http.*;
 import org.basex.query.func.index.*;
 import org.basex.query.func.inspect.*;
+import org.basex.query.func.jobs.*;
 import org.basex.query.func.json.*;
 import org.basex.query.func.map.*;
 import org.basex.query.func.math.*;
@@ -590,23 +590,6 @@ public enum Function {
   @Deprecated _ARCHIVE_WRITE(ArchiveWrite.class, "write(path,archive[,entries])",
       arg(STR, B64, ITEM_ZM), EMP, ARCHIVE_URI),
 
-  /* Async Module. */
-
-  /** XQuery function. */
-  _ASYNC_EVAL(AsyncEval.class, "eval(string[,bindings[,options]])",
-      arg(STR, ITEM, MAP_O), STR, flag(NDT), ASYNC_URI),
-  /** XQuery function. */
-  _ASYNC_RESULT(AsyncResult.class, "result(id)", arg(STR), ITEM_ZM, flag(NDT), ASYNC_URI),
-  /** XQuery function. */
-  _ASYNC_STOP(AsyncStop.class, "stop(id)", arg(STR), BLN, flag(NDT), ASYNC_URI),
-  /** XQuery function. */
-  _ASYNC_FINISHED(AsyncFinished.class, "finished(id)", arg(STR), BLN, flag(NDT), ASYNC_URI),
-  /** XQuery function. */
-  _ASYNC_IDS(AsyncIds.class, "ids()", arg(), STR_ZM, flag(NDT), ASYNC_URI),
-  /** XQuery function. */
-  _ASYNC_FORK_JOIN(AsyncForkJoin.class, "fork-join(functions[,options])",
-      arg(FUN_ZM, MAP_O), ITEM_ZM, flag(HOF), ASYNC_URI),
-
   /* Binary Module. */
 
   /** XQuery function. */
@@ -1033,7 +1016,7 @@ public enum Function {
   /** XQuery function. */
   _HTML_PARSE(HtmlParse.class, "parse(input[,options)", arg(STR, ITEM), DOC_O, HTML_URI),
 
-  /* Http Module. */
+  /* HTTP Module. */
 
   /** XQuery function. */
   _HTTP_SEND_REQUEST(HttpSendRequest.class, "send-request(request[,href,[bodies]])",
@@ -1079,6 +1062,20 @@ public enum Function {
       arg(FUN_O, STR), ITEM_ZM, INSPECT_URI),
   /** XQuery function. */
   _INSPECT_XQDOC(InspectXqdoc.class, "xqdoc(uri)", arg(STR), ELM, INSPECT_URI),
+
+  /* Jobs Module. */
+
+  /** XQuery function. */
+  _JOBS_EVAL(JobsEval.class, "eval(string[,bindings[,options]])",
+      arg(STR, ITEM, MAP_O), STR, flag(NDT), JOBS_URI),
+  /** XQuery function. */
+  _JOBS_RESULT(JobsResult.class, "result(id)", arg(STR), ITEM_ZM, flag(NDT), JOBS_URI),
+  /** XQuery function. */
+  _JOBS_STOP(JobsStop.class, "stop(id)", arg(STR), BLN, flag(NDT), JOBS_URI),
+  /** XQuery function. */
+  _JOBS_FINISHED(JobsFinished.class, "finished(id)", arg(STR), BLN, flag(NDT), JOBS_URI),
+  /** XQuery function. */
+  _JOBS_LIST(JobsList.class, "list()", arg(), STR_ZM, flag(NDT), JOBS_URI),
 
   /* JSON Module. */
 
@@ -1133,6 +1130,8 @@ public enum Function {
   _PROF_VOID(ProfVoid.class, "void(value)", arg(ITEM_ZM), EMP, flag(NDT), PROF_URI),
   /** XQuery function. */
   _PROF_VARIABLES(ProfVariables.class, "variables()", arg(), EMP, flag(NDT), PROF_URI),
+  /** XQuery function. */
+  _PROF_TYPE(ProfType.class, "type(value)", arg(ITEM_ZM), ITEM_ZM, PROF_URI),
 
   /* Random Module. */
 
@@ -1317,7 +1316,8 @@ public enum Function {
   _XQUERY_PARSE_URI(XQueryParseUri.class, "parse-uri(uri[,options])",
       arg(STR, ITEM), NOD, flag(NDT), XQUERY_URI),
   /** XQuery function. */
-  _XQUERY_TYPE(XQueryType.class, "type(value)", arg(ITEM_ZM), ITEM_ZM, XQUERY_URI),
+  _XQUERY_FORK_JOIN(XQueryForkJoin.class, "fork-join(functions[,options])",
+      arg(FUN_ZM, MAP_O), ITEM_ZM, flag(HOF), XQUERY_URI),
 
   /* XSLT Module. */
 

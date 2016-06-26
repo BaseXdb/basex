@@ -1,4 +1,4 @@
-package org.basex.query.func.async;
+package org.basex.query.func.xquery;
 
 import static org.basex.query.QueryError.*;
 
@@ -16,7 +16,7 @@ import org.basex.util.*;
  *
  * @author James Wright
  */
-public final class AsyncForkJoin extends StandardFunc {
+public final class XQueryForkJoin extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Value funcs = qc.value(exprs[0]);
@@ -32,7 +32,7 @@ public final class AsyncForkJoin extends StandardFunc {
       return pool.invoke(task);
     } catch(final Exception ex) {
       final Throwable e = Util.rootException(ex);
-      throw e instanceof QueryException ? (QueryException) e : ASYNC_UNEXPECTED_X.get(info, e);
+      throw e instanceof QueryException ? (QueryException) e : BXXQ_UNEXPECTED_X.get(info, e);
     } finally {
       // required?
       pool.shutdown();

@@ -284,7 +284,7 @@ public final class CommandLockingTest extends SandboxTest {
   public void xqueryModule() {
     ckDBs(new XQuery(_XQUERY_EVAL.args(1)), false, null);
     ckDBs(new XQuery(_XQUERY_EVAL.args(FILE)), false, null);
-    ckDBs(new XQuery(_XQUERY_TYPE.args(DOC.args(NAME))), false, NAME_LIST);
+    ckDBs(new XQuery(_PROF_TYPE.args(DOC.args(NAME))), false, NAME_LIST);
   }
 
   /**

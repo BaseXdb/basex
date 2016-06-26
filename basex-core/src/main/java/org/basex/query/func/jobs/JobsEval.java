@@ -1,4 +1,4 @@
-package org.basex.query.func.async;
+package org.basex.query.func.jobs;
 
 import static org.basex.util.Token.*;
 
@@ -19,7 +19,7 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public final class AsyncEval extends StandardFunc {
+public final class JobsEval extends StandardFunc {
   /** Async options. */
   public static class AsyncOptions extends Options {
     /** Query base-uri. */

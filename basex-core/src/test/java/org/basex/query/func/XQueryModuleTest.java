@@ -74,6 +74,25 @@ public final class XQueryModuleTest extends AdvancedQueryTest {
 
   /** Test method. */
   @Test
+  public void forkJoin() {
+    // pass on one or more functions
+    query(_XQUERY_FORK_JOIN.args(" true#0"), "true");
+    query(_XQUERY_FORK_JOIN.args("(false#0,true#0)"), "false\ntrue");
+    query(_XQUERY_FORK_JOIN.args(" function() { 123 }"), "123");
+    query("count(" + _XQUERY_FORK_JOIN.args(" (1 to 100) ! false#0") + ")", "100");
+
+    // run slow and fast query and check that results are returned in the correct order
+    query(_XQUERY_FORK_JOIN.args("(function() { (1 to 10000000)[.=1] }, true#0)"), "1\ntrue");
+    query(_XQUERY_FORK_JOIN.args("(true#0, function() { (1 to 10000000)[.=1] })"), "true\n1");
+
+    // errors
+    error(_XQUERY_FORK_JOIN.args(" count#1"), ZEROFUNCS_X_X);
+    error(_XQUERY_FORK_JOIN.args(" 123"), ZEROFUNCS_X_X);
+    error(_XQUERY_FORK_JOIN.args(" error#0"), FUNERR1);
+  }
+
+  /** Test method. */
+  @Test
   public void parse() {
     query(_XQUERY_PARSE.args("1") + "/name()", "MainModule");
     query(_XQUERY_PARSE.args("1") + "/@updating/string()", "false");
@@ -100,14 +119,5 @@ public final class XQueryModuleTest extends AdvancedQueryTest {
     query(_XQUERY_PARSE_URI.args("src/test/resources/input.xq") + "/name()", "MainModule");
     query(_XQUERY_PARSE_URI.args("src/test/resources/input.xq") + "/@updating/string()", "false");
     error(_XQUERY_PARSE_URI.args("src/test/resources/xxx.xq"), WHICHRES_X);
-  }
-
-  /** Test method. */
-  @Test
-  public void type() {
-    query(_XQUERY_TYPE.args("()"), "");
-    query(_XQUERY_TYPE.args("1"), "1");
-    query(_XQUERY_TYPE.args("(1, 2, 3)"), "1\n2\n3");
-    query(_XQUERY_TYPE.args("<x a='1' b='2' c='3'/>/@*/data()"), "1\n2\n3");
   }
 }

@@ -1,4 +1,4 @@
-package org.basex.query.func.xquery;
+package org.basex.query.func.prof;
 
 import static org.basex.util.Token.*;
 
@@ -17,7 +17,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public final class XQueryType extends StandardFunc {
+public final class ProfType extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     return value(qc).iter();

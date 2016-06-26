@@ -1,4 +1,4 @@
-package org.basex.query.func.async;
+package org.basex.query.func.jobs;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
@@ -11,11 +11,11 @@ import org.basex.util.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public final class AsyncStop extends StandardFunc {
+public final class JobsStop extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] id = toToken(exprs[0], qc);
-    qc.context.queries.stop(Token.string(id), info);
+    qc.context.queries.stop(Token.string(id));
     return null;
   }
 }

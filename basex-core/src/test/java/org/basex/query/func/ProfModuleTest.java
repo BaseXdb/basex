@@ -69,4 +69,13 @@ public final class ProfModuleTest extends AdvancedQueryTest {
     query(_PROF_VOID.args("1"), "");
     query(_PROF_VOID.args("1,2"), "");
   }
+
+  /** Test method. */
+  @Test
+  public void type() {
+    query(_PROF_TYPE.args("()"), "");
+    query(_PROF_TYPE.args("1"), "1");
+    query(_PROF_TYPE.args("(1, 2, 3)"), "1\n2\n3");
+    query(_PROF_TYPE.args("<x a='1' b='2' c='3'/>/@*/data()"), "1\n2\n3");
+  }
 }

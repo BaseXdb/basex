@@ -1,4 +1,4 @@
-package org.basex.query.func.async;
+package org.basex.query.func.xquery;
 
 import java.util.concurrent.*;
 

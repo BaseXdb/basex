@@ -63,16 +63,12 @@ public enum QueryError {
 
   // Async module
 
-  /** ASYN0001. */
-  ASYNC_UNEXPECTED_X(ASYNC, "unexpected", "Unexpected error: %"),
-  /** ASYN0002. */
-  ASYNC_OUTOFRANGE_X(ASYNC, "out-of-range", "Specified value is out of range: %."),
-  /** ASYN0003. */
-  ASYNC_UNKNOWN_X(ASYNC, "unknown", "Unknown query id: %."),
-  /** ASYN0004. */
-  ASYNC_RUNNING_X(ASYNC, "running", "Query is still running: %."),
-  /** ASYN0005. */
-  ASYNC_OVERFLOW(ASYNC, "overflow", "Too many queries queued."),
+  /** Jobs error. */
+  JOBS_UNKNOWN_X(JOBS, "unknown", "Unknown query id: %."),
+  /** Jobs error. */
+  JOBS_RUNNING_X(JOBS, "running", "Query is still running: %."),
+  /** Jobs error. */
+  JOBS_OVERFLOW(JOBS, "overflow", "Too many queries queued."),
 
   // Client module
 
@@ -289,6 +285,8 @@ public enum QueryError {
   BXXQ_MEMORY(BXXQ, 4, "The memory limit was exceeded."),
   /** BXXQ0005. */
   BXXQ_NESTED(BXXQ, 5, "Nested query evaluation is not allowed."),
+  /** ASYN0001. */
+  BXXQ_UNEXPECTED_X(BXXQ, 6, "Unexpected error: %"),
 
   // Unit module
 
@@ -1396,13 +1394,13 @@ public enum QueryError {
     /** BXXQ Error type. */ BXXQ(BXERR_PREFIX, BXERRORS_URI),
     /** HASH Error type. */ HASH(BXERR_PREFIX, BXERRORS_URI),
     /** INSP Error type. */ INSPECT(INSPECT_PREFIX, INSPECT_URI),
+    /** JOBS Error type. */ JOBS(JOBS_PREFIX, JOBS_URI),
     /** UNIT Error type. */ UNIT(UNIT_PREFIX, UNIT_URI),
     /** USER Error type. */ USER(USER_PREFIX, USER_URI),
 
     // EXPath errors
 
     /** ARCH  Error type. */ ARCH(EXPERR_PREFIX, EXPERROR_URI),
-    /** ASYNC Error type. */ ASYNC(ASYNC_PREFIX, ASYNC_URI),
     /** BIN   Error type. */ BIN(BIN_PREFIX,     BIN_URI),
     /** CX    Error type. */ CX(EXPERR_PREFIX,   EXPERROR_URI),
     /** FILE  Error type. */ FILE(FILE_PREFIX,   FILE_URI),
