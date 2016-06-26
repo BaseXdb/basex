@@ -157,7 +157,7 @@ public final class QueryPool {
       Value value = null;
       try {
         // register and evaluate query, cache results
-        ctx.register(qp);
+        qp.register(ctx);
         value = copy(qp.iter(), ctx);
       } catch(final JobException ex) {
         // query was interrupted: do not cache it
@@ -185,7 +185,7 @@ public final class QueryPool {
 
         // close and invalidate query after result has been assigned
         qp.close();
-        ctx.unregister(qp);
+        qp.unregister(ctx);
         qp = null;
       }
     }

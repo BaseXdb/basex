@@ -94,9 +94,9 @@ public abstract class Command extends Job {
     // checks if the command performs updates
     updating = updating(ctx);
 
+    // register job
+    register(ctx);
     try {
-      // register job
-      ctx.register(this);
       // run command and return success flag
       if(!run(ctx, os)) {
         final BaseXException ex = new BaseXException(info());
@@ -108,7 +108,7 @@ public abstract class Command extends Job {
       throw th;
     } finally {
       // ensure that job will be unregistered
-      ctx.unregister(this);
+      unregister(ctx);
     }
   }
 

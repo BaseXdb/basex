@@ -3,13 +3,14 @@ package org.basex.core.locks;
 import static org.basex.util.Prop.*;
 
 import java.util.*;
-import java.util.Map.Entry;
+import java.util.Map.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
 import java.util.concurrent.locks.*;
 
 import org.basex.core.*;
 import org.basex.core.jobs.*;
+import org.basex.data.*;
 import org.basex.util.list.*;
 
 /**
@@ -89,28 +90,63 @@ public final class DBLocking implements Locking {
    * everything, an empty array lock nothing.
    */
   private final ConcurrentMap<Long, StringList> readLocked = new ConcurrentHashMap<>();
-  /** Static options. */
-  private final StaticOptions sopts;
+  /** Database context. */
+  private final Context ctx;
 
   /**
-   * Initialize new Locking instance.
-   * @param sopts static options
+   * Constructor.
+   * @param ctx context
    */
-  public DBLocking(final StaticOptions sopts) {
-    this.sopts = sopts;
+  public DBLocking(final Context ctx) {
+    this.ctx = ctx;
   }
 
   @Override
-  public void acquire(final Job job, final StringList read, final StringList write) {
+  public void acquire(final Job job) {
+    final LockResult lr = new LockResult();
+    job.databases(lr);
+    final StringList write = prepareLock(lr.write, lr.writeAll);
+    final StringList read = write == null ? null : prepareLock(lr.read, lr.readAll);
+    acquire(read, write);
+  }
+
+  /**
+   * Prepares the string list for locking.
+   * @param sl string list
+   * @param all lock all databases
+   * @return string list, or {@code null} if all databases need to be locked
+   */
+  private StringList prepareLock(final StringList sl, final boolean all) {
+    if(all) return null;
+
+    final Data data = ctx.data();
+    for(int d = 0; d < sl.size(); d++) {
+      // replace context reference with real database name, or remove it if no database is open
+      if(sl.get(d).equals(DBLocking.CONTEXT)) {
+        if(data == null) sl.remove(d--);
+        else sl.set(d, data.meta.name);
+      }
+    }
+    return sl.sort().unique();
+  }
+
+  /**
+   * Puts read and write locks on the specified databases.
+   * @param read names of databases to put read locks on.
+   * Global locking is performed if the passed on reference is {@code null}
+   * @param write names of databases to put write locks on.
+   * Global locking is performed if the passed on reference is {@code null}
+   */
+  void acquire(final StringList read, final StringList write) {
     final long thread = Thread.currentThread().getId();
     if(writeLocked.containsKey(thread) || readLocked.containsKey(thread))
       throw new IllegalMonitorStateException("Thread already holds one or more locks.");
 
     // Wait in queue if necessary
+    final int parallel = ctx.soptions.get(StaticOptions.PARALLEL);
     synchronized(queue) { // Guard queue and transaction, monitor for waiting in queue
       queue.add(thread);
-      while(transactions >= Math.max(sopts.get(StaticOptions.PARALLEL), 1)
-          || queue.peek() != thread) {
+      while(transactions >= Math.max(parallel, 1) || queue.peek() != thread) {
         try {
           queue.wait();
         } catch(final InterruptedException ex) {
@@ -118,7 +154,7 @@ public final class DBLocking implements Locking {
         }
       }
       final int t = transactions++;
-      assert t <= Math.max(sopts.get(StaticOptions.PARALLEL), 1);
+      assert t <= Math.max(parallel, 1);
       queue.remove(thread);
     }
 

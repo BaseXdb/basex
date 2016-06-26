@@ -43,7 +43,7 @@ final class RestXqResponse {
     // assign function call and http context and register process
     qc.mainModule(MainModule.get(sf, args));
     qc.http(http);
-    qc.context.register(qc);
+    qc.register(qc.context);
 
     final RestXqSession session = new RestXqSession(http, function.key, qc);
     String redirect = null, forward = null;
@@ -91,7 +91,7 @@ final class RestXqResponse {
 
     } finally {
       qc.close();
-      qc.context.unregister(qc);
+      qc.unregister(qc.context);
       session.close();
 
       if(redirect != null) {

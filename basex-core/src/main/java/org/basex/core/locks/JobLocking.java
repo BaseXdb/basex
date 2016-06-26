@@ -5,7 +5,6 @@ import java.util.*;
 import org.basex.core.*;
 import org.basex.core.jobs.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Management of executing read/write jobs.
@@ -33,23 +32,21 @@ public final class JobLocking implements Locking {
 
   /**
    * Default constructor.
-   * @param sopts static options
+   * @param ctx database context
    */
-  public JobLocking(final StaticOptions sopts) {
-    this.sopts = sopts;
+  public JobLocking(final Context ctx) {
+    this.sopts = ctx.soptions;
   }
 
   @Override
-  public void acquire(final Job job, final StringList read, final StringList write) {
+  public void acquire(final Job job) {
     final Object o = new Object();
 
     synchronized(mutex) {
       // add object to queue
       queue.add(o);
 
-      // maximum number of readers
-      final int maxReaders = Math.max(sopts.get(StaticOptions.PARALLEL), 1);
-
+      final int parallel = Math.max(sopts.get(StaticOptions.PARALLEL), 1);
       while(true) {
         if(!writer && o == queue.get(0)) {
           if(job.updating) {
@@ -59,7 +56,7 @@ public final class JobLocking implements Locking {
               writer = true;
               break;
             }
-          } else if(readers < maxReaders) {
+          } else if(readers < parallel) {
             // increase number of readers
             ++readers;
             break;

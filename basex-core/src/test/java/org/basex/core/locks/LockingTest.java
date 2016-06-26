@@ -1,4 +1,4 @@
-package org.basex.core;
+package org.basex.core.locks;
 
 import static org.junit.Assert.*;
 
@@ -7,7 +7,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import org.basex.*;
-import org.basex.core.locks.*;
+import org.basex.core.*;
 import org.basex.core.users.*;
 import org.basex.util.list.*;
 import org.junit.*;
@@ -48,7 +48,7 @@ public final class LockingTest extends SandboxTest {
   }
 
   /** Locking instance used for testing. */
-  private final DBLocking locks = new DBLocking(context.soptions);
+  private final DBLocking locks = new DBLocking(context);
   /** Objects used for locking. */
   private final String[] objects = new String[5];
   /** Empty string array for convenience. */
@@ -606,7 +606,7 @@ public final class LockingTest extends SandboxTest {
 
       // Fetch lock if objects are set
       final Command cmd = new Cmd(writing);
-      locks.acquire(cmd,
+      locks.acquire(
         readObjects != null ? new StringList().add(readObjects) : null,
         writeObjects != null ? new StringList().add(writeObjects) : null);
 

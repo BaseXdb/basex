@@ -1,7 +1,6 @@
 package org.basex.core.locks;
 
 import org.basex.core.jobs.*;
-import org.basex.util.list.*;
 
 /**
  * Lock interface; will get obsolete after database locking has been finalized.
@@ -11,18 +10,14 @@ import org.basex.util.list.*;
  */
 public interface Locking {
   /**
-   * Puts read and write locks on the specified databases.
+   * Acquires locks for the specified job.
    * @param job job to be queued
-   * @param read names of databases to put read locks on.
-   * Global locking is performed if the passed on reference is {@code null}
-   * @param write names of databases to put write locks on.
-   * Global locking is performed if the passed on reference is {@code null}
    */
-  void acquire(final Job job, final StringList read, final StringList write);
+  void acquire(final Job job);
 
   /**
-   * Unlock all string locked by a transaction.
-   * @param job job to be unlocked
+   * Removes locks for the specified job.
+   * @param job job to be released
    */
   void release(final Job job);
 }

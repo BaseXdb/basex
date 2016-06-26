@@ -114,7 +114,8 @@ public final class ServerQuery extends Job {
 
     try {
       // parses the query and registers the process
-      ctx.register(parse());
+      parse();
+      qp.register(ctx);
 
       // create serializer
       qp.compile();
@@ -157,7 +158,7 @@ public final class ServerQuery extends Job {
       if(qp != null) {
         qp.close();
         if(parsed) {
-          ctx.unregister(qp);
+          qp.unregister(ctx);
           parsed = false;
         }
         qp = null;

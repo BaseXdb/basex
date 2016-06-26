@@ -122,7 +122,7 @@ final class BXQueryService implements XPathQueryService, BXXMLDBText {
       qp.context(nodes);
       qp.parse();
       try {
-        coll.ctx.register(qp);
+        qp.register(coll.ctx);
         // add default namespaces
         for(final Map.Entry<String, String> entry : ns.entrySet()) {
           qp.sc.ns.add(token(entry.getKey()), token(entry.getValue()), null);
@@ -131,7 +131,7 @@ final class BXQueryService implements XPathQueryService, BXXMLDBText {
         return new BXResourceSet(qp.value(), coll);
       } finally {
         qp.close();
-        coll.ctx.unregister(qp);
+        qp.unregister(coll.ctx);
       }
     } catch(final QueryException ex) {
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());

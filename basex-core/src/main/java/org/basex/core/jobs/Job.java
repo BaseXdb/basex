@@ -4,6 +4,7 @@ import java.util.*;
 
 import org.basex.core.*;
 import org.basex.core.locks.*;
+import org.basex.core.users.*;
 
 /**
  * Job class. This abstract class is implemented by all commands and query instances.
@@ -27,13 +28,32 @@ public abstract class Job {
   /** Stopped flag. */
   public State state = State.OK;
 
-  /** Indicates if a job is currently registered. */
-  protected boolean registered;
-
   /** Timer. */
   private Timer timer;
   /** Sub job. */
   private Job sub;
+
+  /**
+   * Registers the job (puts it on a queue).
+   * @param ctx context
+   */
+  public void register(final Context ctx) {
+    ctx.jobs.put(this, Boolean.TRUE);
+    ctx.locks.acquire(this);
+    // non-admin users: stop process after timeout
+    if(!ctx.user().has(Perm.ADMIN)) startTimeout(ctx.soptions.get(StaticOptions.TIMEOUT) * 1000L);
+  }
+
+  /**
+   * Unregisters the job.
+   * @param ctx context
+   */
+  public void unregister(final Context ctx) {
+    stopTimeout();
+    ctx.locks.release(this);
+    ctx.jobs.remove(this);
+  }
+
 
   /**
    * Returns the currently active job.
@@ -62,7 +82,6 @@ public abstract class Job {
     sub = job;
     if(job != null) {
       job.listener = listener;
-      job.registered = registered;
       job.job(sub.sub);
       if(state != State.OK) job.state(state);
     }
@@ -145,23 +164,6 @@ public abstract class Job {
   public void databases(final LockResult lr) {
     // default (worst case): lock all databases
     lr.writeAll = true;
-  }
-
-  /**
-   * Checks if the job is registered.
-   * @return result of check
-   */
-  public final boolean registered() {
-    return sub != null ? sub.registered() : registered;
-  }
-
-  /**
-   * Sets the registered state.
-   * @param reg registered flag
-   */
-  public final void registered(final boolean reg) {
-    if(sub != null) sub.registered(reg);
-    registered = reg;
   }
 
   /**

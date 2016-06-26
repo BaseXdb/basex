@@ -29,6 +29,8 @@ public final class Context {
   public final ClientListener listener;
   /** Blocked clients. */
   public final ClientBlocker blocker;
+  /** Job pool. */
+  public final ConcurrentHashMap<Job, Object> jobs;
   /** Asynchronous queries. */
   public final QueryPool queries;
   /** Options. */
@@ -48,10 +50,8 @@ public final class Context {
   /** Log. */
   public final Log log;
 
-  /** Running jobs. */
-  private final ConcurrentHashMap<Job, Object> jobs;
   /** Locked jobs. */
-  private final Locking locks;
+  public final Locking locks;
 
   /** Current node context. Set if it does not contain all documents of the current database. */
   private DBNodes current;
@@ -111,8 +111,8 @@ public final class Context {
     users = ctx.users;
     repo = ctx.repo;
     log = ctx.log;
-    queries = ctx.queries;
     jobs = ctx.jobs;
+    queries = ctx.queries;
   }
 
   /**
@@ -126,15 +126,14 @@ public final class Context {
     sessions = new Sessions();
     blocker = new ClientBlocker();
     databases = new Databases(soptions);
-    locks = soptions.get(StaticOptions.GLOBALLOCK) ? new JobLocking(soptions) :
-      new DBLocking(soptions);
+    locks = soptions.get(StaticOptions.GLOBALLOCK) ? new JobLocking(this) : new DBLocking(this);
     users = new Users(soptions);
     repo = new EXPathRepo(soptions);
     log = new Log(soptions);
-    queries = new QueryPool();
     user = users.get(UserText.ADMIN);
     listener = null;
     jobs = new ConcurrentHashMap<>();
+    queries = new QueryPool();
   }
 
   /**
@@ -270,56 +269,5 @@ public final class Context {
     final StringList sl = new StringList(dbs.size());
     for(final String db : dbs) if(perm(perm, db)) sl.add(db);
     return sl;
-  }
-
-  /**
-   * Locks the specified process and starts a timeout thread.
-   * @param pr process
-   */
-  public void register(final Job pr) {
-    assert !pr.registered() : "Already registered:" + pr;
-    jobs.put(pr, Boolean.TRUE);
-    pr.registered(true);
-
-    // administrators will not be affected by the timeout
-    if(!user.has(Perm.ADMIN)) pr.startTimeout(soptions.get(StaticOptions.TIMEOUT) * 1000L);
-
-    // get touched databases
-    final LockResult lr = new LockResult();
-    pr.databases(lr);
-    final StringList write = prepareLock(lr.write, lr.writeAll);
-    final StringList read = write == null ? null : prepareLock(lr.read, lr.readAll);
-    locks.acquire(pr, read, write);
-  }
-
-  /**
-   * Unlocks the process and stops the timeout.
-   * @param pr process
-   */
-  public void unregister(final Job pr) {
-    assert pr.registered() : "Not registered:" + pr;
-    pr.registered(false);
-    locks.release(pr);
-    pr.stopTimeout();
-    jobs.remove(pr);
-  }
-
-  /**
-   * Prepares the string list for locking.
-   * @param sl string list
-   * @param all lock all databases
-   * @return string list, or {@code null} if all databases need to be locked
-   */
-  private StringList prepareLock(final StringList sl, final boolean all) {
-    if(all) return null;
-
-    for(int d = 0; d < sl.size(); d++) {
-      // replace context reference with real database name, or remove it if no database is open
-      if(sl.get(d).equals(DBLocking.CONTEXT)) {
-        if(data == null) sl.remove(d--);
-        else sl.set(d, data.meta.name);
-      }
-    }
-    return sl.sort().unique();
   }
 }
