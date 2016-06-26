@@ -1,18 +1,18 @@
-package org.basex.core;
+package org.basex.core.jobs;
 
 import java.util.*;
 
+import org.basex.core.*;
 import org.basex.core.locks.*;
 
 /**
- * This class is implemented by all kinds of processes.
- * It gives feedback on the current process. A process can be canceled by calling {@link #stop()}.
+ * Job class. This abstract class is implemented by all commands and query instances.
  *
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public abstract class Proc {
-  /** State of process. */
+public abstract class Job {
+  /** State of job. */
   public enum State {
     /** OK.      */ OK,
     /** Stopped. */ STOPPED,
@@ -20,26 +20,26 @@ public abstract class Proc {
     /** Memory.  */ MEMORY;
   }
 
-  /** Listener, reacting on process information. */
+  /** Listener, reacting on job information. */
   public InfoListener listener;
   /** This flag indicates that a command may perform updates. */
   public boolean updating;
   /** Stopped flag. */
   public State state = State.OK;
 
-  /** Indicates if a process is currently registered. */
+  /** Indicates if a job is currently registered. */
   protected boolean registered;
 
   /** Timer. */
   private Timer timer;
-  /** Sub process. */
-  private Proc sub;
+  /** Sub job. */
+  private Job sub;
 
   /**
-   * Returns the currently active process.
+   * Returns the currently active job.
    * @return job
    */
-  public final Proc active() {
+  public final Job active() {
     return sub != null ? sub.active() : this;
   }
 
@@ -53,45 +53,45 @@ public abstract class Proc {
   }
 
   /**
-   * Sets a new sub process.
-   * @param <P> process type
-   * @param proc process
-   * @return passed on process reference
+   * Sets a new sub job.
+   * @param <J> job type
+   * @param job job
+   * @return passed on job reference
    */
-  public final <P extends Proc> P proc(final P proc) {
-    sub = proc;
-    if(proc != null) {
-      proc.listener = listener;
-      proc.registered = registered;
-      proc.proc(sub.sub);
-      if(state != State.OK) proc.state(state);
+  public final <J extends Job> J job(final J job) {
+    sub = job;
+    if(job != null) {
+      job.listener = listener;
+      job.registered = registered;
+      job.job(sub.sub);
+      if(state != State.OK) job.state(state);
     }
-    return proc;
+    return job;
   }
 
   /**
-   * Stops a process or sub process.
+   * Stops a job or sub job.
    */
   public final void stop() {
     state(State.STOPPED);
   }
 
   /**
-   * Stops a process because of a timeout.
+   * Stops a job because of a timeout.
    */
   public final void timeout() {
     state(State.TIMEOUT);
   }
 
   /**
-   * Stops a process because a memory limit was exceeded.
+   * Stops a job because a memory limit was exceeded.
    */
   public final void memory() {
     state(State.MEMORY);
   }
 
   /**
-   * Sets a new process state.
+   * Sets a new job state.
    * @param st new state
    */
   final void state(final State st) {
@@ -101,14 +101,14 @@ public abstract class Proc {
   }
 
   /**
-   * Checks if the process was interrupted; if yes, sends a runtime exception.
+   * Checks if the job was interrupted; if yes, sends a runtime exception.
    */
   public final void checkStop() {
-    if(state != State.OK) throw new ProcException();
+    if(state != State.OK) throw new JobException();
   }
 
   /**
-   * Aborts a failed or interrupted process.
+   * Aborts a failed or interrupted job.
    */
   protected void abort() {
     if(sub != null) sub.abort();
@@ -139,7 +139,7 @@ public abstract class Proc {
   }
 
   /**
-   * Adds the names of the databases that may be touched by the process.
+   * Adds the names of the databases that may be touched by the job.
    * @param lr container for lock result to pass around
    */
   public void databases(final LockResult lr) {
@@ -148,7 +148,7 @@ public abstract class Proc {
   }
 
   /**
-   * Checks if the process is registered.
+   * Checks if the job is registered.
    * @return result of check
    */
   public final boolean registered() {
@@ -165,8 +165,8 @@ public abstract class Proc {
   }
 
   /**
-   * Returns short information on this process.
-   * Can be overwritten to give more detailed information.
+   * Returns short progress information.
+   * Can be overwritten to give more specific feedback.
    * @return header information
    */
   public String shortInfo() {
@@ -174,7 +174,8 @@ public abstract class Proc {
   }
 
   /**
-   * Returns short information on this process.
+   * Returns detailed progress information.
+   * Can be overwritten to give more specific feedback.
    * @return header information
    */
   public String detailedInfo() {
@@ -183,7 +184,7 @@ public abstract class Proc {
 
   /**
    * Returns a progress value (0 - 1).
-   * Can be overwritten to give more detailed information.
+   * Can be overwritten to give more specific feedback.
    * @return header information
    */
   public double progressInfo() {

@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import org.basex.core.*;
+import org.basex.core.jobs.*;
 import org.basex.data.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
@@ -158,7 +159,7 @@ public final class QueryPool {
         // register and evaluate query, cache results
         ctx.register(qp);
         value = copy(qp.iter(), ctx);
-      } catch(final ProcException ex) {
+      } catch(final JobException ex) {
         // query was interrupted: do not cache it
         cache = false;
       } catch(final QueryException ex) {

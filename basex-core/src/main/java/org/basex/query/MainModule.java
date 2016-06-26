@@ -2,7 +2,7 @@ package org.basex.query;
 
 import java.util.*;
 
-import org.basex.core.*;
+import org.basex.core.jobs.*;
 import org.basex.core.locks.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -157,7 +157,7 @@ public final class MainModule extends Module {
    * @param lr lock result
    * @param qc query context
    * @return result of check
-   * @see Proc#databases(LockResult)
+   * @see Job#databases(LockResult)
    */
   boolean databases(final LockResult lr, final QueryContext qc) {
     return expr.accept(new LockVisitor(lr, qc));

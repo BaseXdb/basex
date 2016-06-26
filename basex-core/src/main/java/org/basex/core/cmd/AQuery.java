@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import org.basex.core.*;
+import org.basex.core.jobs.*;
 import org.basex.core.locks.*;
 import org.basex.core.parse.*;
 import org.basex.core.users.*;
@@ -68,7 +69,9 @@ public abstract class AQuery extends Command {
         final int runs = Math.max(1, options.get(MainOptions.RUNS));
         for(int r = 0; r < runs; ++r) {
           // reuse existing processor instance
-          if(r != 0) qp = null;
+          if(r != 0) {
+            qp = null;
+          }
           qp(query, context);
           parse(p);
           if(r == 0) plan(false);
@@ -112,7 +115,7 @@ public abstract class AQuery extends Command {
       } catch(final QueryException | IOException ex) {
         exception = ex;
         error = Util.message(ex);
-      } catch(final ProcException ex) {
+      } catch(final JobException ex) {
         error = INTERRUPTED;
       } catch(final StackOverflowError ex) {
         Util.debug(ex);
@@ -174,20 +177,10 @@ public abstract class AQuery extends Command {
    */
   protected QueryProcessor qp(final String query, final Context ctx) {
     if(qp == null) {
-      qp = proc(new QueryProcessor(query, ctx));
+      qp = job(new QueryProcessor(query, ctx));
       if(info == null) info = qp.qc.info;
     }
     return qp;
-  }
-
-  /**
-   * Closes the query processor.
-   */
-  protected void closeQp() {
-    if(qp != null) {
-      qp.close();
-      qp = null;
-    }
   }
 
   /**

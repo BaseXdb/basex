@@ -5,6 +5,7 @@ import static org.basex.core.Text.*;
 import java.io.*;
 
 import org.basex.core.*;
+import org.basex.core.jobs.*;
 import org.basex.data.*;
 import org.basex.index.value.*;
 import org.basex.util.*;
@@ -16,7 +17,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public abstract class IndexBuilder extends Proc {
+public abstract class IndexBuilder extends Job {
   /** Performance. */
   protected final Performance perf = new Performance();
 

@@ -12,6 +12,7 @@ import java.util.*;
 import org.basex.build.*;
 import org.basex.build.BuildText.Type;
 import org.basex.core.*;
+import org.basex.core.jobs.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.util.*;
@@ -23,7 +24,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-final class XMLScanner extends Proc {
+final class XMLScanner extends Job {
   /** Entities. */
   private static final String[] ENTITIES =
     { "amp", "&", "apos", "'", "quot", "\"", "lt", "<", "gt", ">" };

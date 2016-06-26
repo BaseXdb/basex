@@ -9,6 +9,7 @@ import org.basex.build.text.*;
 import org.basex.build.xml.*;
 import org.basex.core.*;
 import org.basex.core.MainOptions.MainParser;
+import org.basex.core.jobs.*;
 import org.basex.io.*;
 import org.basex.util.*;
 
@@ -18,7 +19,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public abstract class Parser extends Proc {
+public abstract class Parser extends Job {
   /** Source document or {@code null}. */
   public IO source;
   /** Attributes of currently parsed element. */

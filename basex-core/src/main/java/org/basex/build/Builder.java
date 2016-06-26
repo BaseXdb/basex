@@ -6,7 +6,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
-import org.basex.core.*;
+import org.basex.core.jobs.*;
 import org.basex.data.*;
 import org.basex.index.name.*;
 import org.basex.index.path.*;
@@ -23,7 +23,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public abstract class Builder extends Proc {
+public abstract class Builder extends Job {
   /** Tree structure. */
   final PathIndex path = new PathIndex();
   /** Namespace index. */

@@ -50,8 +50,8 @@ public class Execute extends Command {
       final StringBuilder sb = new StringBuilder();
       for(final Command c : list) {
         if(c.openDB && context.data() == null) return error(NO_DB_OPENED);
-        final boolean ok = proc(c).run(context, out);
-        proc(null);
+        final boolean ok = job(c).run(context, out);
+        job(null);
         sb.append(c.info());
         if(!ok) {
           exception = c.exception();

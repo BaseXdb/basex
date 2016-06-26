@@ -6,7 +6,7 @@ import java.io.*;
 
 import org.basex.build.csv.*;
 import org.basex.build.csv.CsvOptions.*;
-import org.basex.core.*;
+import org.basex.core.jobs.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.value.item.*;
@@ -18,7 +18,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public abstract class CsvConverter extends Proc {
+public abstract class CsvConverter extends Job {
   /** CSV token. */
   public static final byte[] CSV = token("csv");
   /** CSV token. */

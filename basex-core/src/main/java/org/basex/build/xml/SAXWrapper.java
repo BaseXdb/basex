@@ -9,6 +9,7 @@ import javax.xml.transform.sax.*;
 
 import org.basex.build.*;
 import org.basex.core.*;
+import org.basex.core.jobs.*;
 import org.basex.io.*;
 import org.basex.util.*;
 import org.xml.sax.*;
@@ -79,7 +80,7 @@ public final class SAXWrapper extends SingleParser {
       final String msg = Util.info(SCANPOS_X_X, source, ex.getLineNumber(),
           ex.getColumnNumber()) + COLS + Util.message(ex);
       throw new IOException(msg, ex);
-    } catch(final ProcException ex) {
+    } catch(final JobException ex) {
       throw ex;
     } catch(final Exception ex) {
       // occurs, e.g. if document encoding is invalid:

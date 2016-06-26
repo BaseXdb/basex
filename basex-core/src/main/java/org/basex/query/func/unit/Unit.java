@@ -8,8 +8,8 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.util.*;
 
-import org.basex.core.*;
 import org.basex.core.Context;
+import org.basex.core.jobs.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
@@ -33,8 +33,8 @@ final class Unit {
   private final Context ctx;
   /** File. */
   private final IOFile file;
-  /** Parent process. */
-  private final Proc proc;
+  /** Parent job. */
+  private final Job job;
 
   /** Query string. */
   private String input;
@@ -54,12 +54,12 @@ final class Unit {
    * Constructor.
    * @param file file
    * @param ctx database context
-   * @param proc process
+   * @param job job
    */
-  Unit(final IOFile file, final Context ctx, final Proc proc) {
+  Unit(final IOFile file, final Context ctx, final Job job) {
     this.file = file;
     this.ctx = ctx;
-    this.proc = proc;
+    this.job = job;
   }
 
   /**
@@ -285,14 +285,14 @@ final class Unit {
     current = func;
 
     try(final QueryContext qctx = new QueryContext(ctx)) {
-      qctx.listener = proc.listener;
+      qctx.listener = job.listener;
       qctx.parse(input, file.path(), null);
       qctx.mainModule(MainModule.get(find(qctx, func), new Expr[0]));
       // ignore results
       final Iter iter = qctx.iter();
       while(iter.next() != null);
     } finally {
-      proc.proc(null);
+      job.job(null);
     }
   }
 

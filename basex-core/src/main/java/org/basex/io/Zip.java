@@ -3,7 +3,7 @@ package org.basex.io;
 import java.io.*;
 import java.util.zip.*;
 
-import org.basex.core.*;
+import org.basex.core.jobs.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -13,7 +13,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public final class Zip extends Proc {
+public final class Zip extends Job {
   /** Archive. */
   private final IO file;
   /** Total files in a zip operation. */

@@ -3,11 +3,12 @@ package org.basex.core.locks;
 import java.util.*;
 
 import org.basex.core.*;
+import org.basex.core.jobs.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
- * Management of executing read/write processes.
+ * Management of executing read/write jobs.
  * Supports multiple readers, limited by {@link StaticOptions#PARALLEL},
  * and a single writer (readers/writer lock).
  *
@@ -17,8 +18,8 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public final class ProcLocking implements Locking {
-  /** Queue for all waiting processes. */
+public final class JobLocking implements Locking {
+  /** Queue for all waiting jobs. */
   private final LinkedList<Object> queue = new LinkedList<>();
   /** Mutex object. */
   private final Object mutex = new Object();
@@ -34,12 +35,12 @@ public final class ProcLocking implements Locking {
    * Default constructor.
    * @param sopts static options
    */
-  public ProcLocking(final StaticOptions sopts) {
+  public JobLocking(final StaticOptions sopts) {
     this.sopts = sopts;
   }
 
   @Override
-  public void acquire(final Proc proc, final StringList read, final StringList write) {
+  public void acquire(final Job job, final StringList read, final StringList write) {
     final Object o = new Object();
 
     synchronized(mutex) {
@@ -51,10 +52,10 @@ public final class ProcLocking implements Locking {
 
       while(true) {
         if(!writer && o == queue.get(0)) {
-          if(proc.updating) {
-            // check updating process
+          if(job.updating) {
+            // check updating job
             if(readers == 0) {
-              // start writing process
+              // start writing job
               writer = true;
               break;
             }
@@ -64,24 +65,24 @@ public final class ProcLocking implements Locking {
             break;
           }
         }
-        // check if process has already been stopped
-        proc.checkStop();
-        // wait for next process to be finalized
+        // check if job has already been stopped
+        job.checkStop();
+        // wait for next job to be finalized
         try {
           mutex.wait();
         } catch(final InterruptedException ex) {
           Util.stack(ex);
         }
       }
-      // start process, remove from queue
+      // start job, remove from queue
       queue.remove(0);
     }
   }
 
   @Override
-  public void release(final Proc proc) {
+  public void release(final Job job) {
     synchronized(mutex) {
-      if(proc.updating) {
+      if(job.updating) {
         writer = false;
       } else {
         --readers;

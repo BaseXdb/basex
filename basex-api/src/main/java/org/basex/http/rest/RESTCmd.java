@@ -79,26 +79,26 @@ abstract class RESTCmd extends Command {
 
   /**
    * Runs the specified command.
-   * @param c command
+   * @param cmd command
    * @return string result
    * @throws HTTPException HTTP exception
    */
-  final String run(final Command c) throws HTTPException {
+  final String run(final Command cmd) throws HTTPException {
     final ArrayOutput ao = new ArrayOutput();
-    run(c, ao);
+    run(cmd, ao);
     return ao.toString();
   }
 
   /**
    * Runs the specified command.
-   * @param c command
+   * @param cmd command
    * @param os output stream
    * @throws HTTPException HTTP exception
    */
-  final void run(final Command c, final OutputStream os) throws HTTPException {
-    final boolean ok = proc(c).run(context, os);
-    error(c.info());
-    if(!ok) throw HTTPCode.BAD_REQUEST_X.get(c.info());
+  final void run(final Command cmd, final OutputStream os) throws HTTPException {
+    final boolean ok = job(cmd).run(context, os);
+    error(cmd.info());
+    if(!ok) throw HTTPCode.BAD_REQUEST_X.get(cmd.info());
   }
 
   /**

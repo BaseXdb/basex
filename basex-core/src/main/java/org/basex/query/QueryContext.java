@@ -12,6 +12,7 @@ import org.basex.build.json.*;
 import org.basex.build.json.JsonOptions.*;
 import org.basex.core.*;
 import org.basex.core.MainOptions.MainParser;
+import org.basex.core.jobs.*;
 import org.basex.core.locks.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
@@ -46,7 +47,7 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public final class QueryContext extends Proc implements Closeable {
+public final class QueryContext extends Job implements Closeable {
   /** The evaluation stack. */
   public final QueryStack stack = new QueryStack();
   /** Static variables. */

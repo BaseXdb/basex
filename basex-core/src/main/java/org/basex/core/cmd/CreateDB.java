@@ -6,6 +6,7 @@ import java.io.*;
 
 import org.basex.build.*;
 import org.basex.core.*;
+import org.basex.core.jobs.*;
 import org.basex.core.locks.*;
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.Cmd;
@@ -84,14 +85,14 @@ public final class CreateDB extends ACreate {
       final Data data;
       if(options.get(MainOptions.MAINMEM)) {
         // create main memory instance
-        data = proc(new MemBuilder(name, parser)).build();
+        data = job(new MemBuilder(name, parser)).build();
         context.openDB(data);
         context.datas.pin(data);
       } else {
         if(context.pinned(name)) return error(DB_PINNED_X, name);
 
         // create disk-based instance
-        proc(new DiskBuilder(name, parser, soptions, options)).build().close();
+        job(new DiskBuilder(name, parser, soptions, options)).build().close();
 
         // second step: open database and create index structures
         final Open open = new Open(name);
@@ -110,7 +111,7 @@ public final class CreateDB extends ACreate {
       if(options.get(MainOptions.CREATEONLY)) new Close().run(context);
 
       return info(parser.info() + DB_CREATED_X_X, name, perf);
-    } catch(final ProcException ex) {
+    } catch(final JobException ex) {
       throw ex;
     } catch(final IOException ex) {
       abort();
@@ -165,7 +166,7 @@ public final class CreateDB extends ACreate {
     if(mem) {
       data = MemBuilder.build(name, parser);
     } else {
-      // database is currently locked by another process
+      // database is currently locked by another job
       if(ctx.pinned(name)) throw new BaseXException(DB_PINNED_X, name);
       new DiskBuilder(name, parser, ctx.soptions, options).build().close();
       data = Open.open(name, ctx, options);

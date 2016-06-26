@@ -6,6 +6,7 @@ import java.io.*;
 
 import org.basex.api.client.*;
 import org.basex.core.*;
+import org.basex.core.jobs.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
@@ -19,9 +20,9 @@ import org.basex.util.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public final class ServerQuery extends Proc {
+public final class ServerQuery extends Job {
   /** Performance. */
-  private final Performance perf = new Performance();
+  private final Performance prf = new Performance();
   /** Query string. */
   private final String query;
   /** Database context. */
@@ -118,9 +119,9 @@ public final class ServerQuery extends Proc {
       // create serializer
       qp.compile();
       final QueryInfo qi = qp.qc.info;
-      qi.compiling = perf.time();
+      qi.compiling = prf.time();
       final Iter ir = qp.iter();
-      qi.evaluating = perf.time();
+      qi.evaluating = prf.time();
 
       // iterate through results
       int c = 0;
@@ -141,12 +142,12 @@ public final class ServerQuery extends Proc {
           c++;
         }
       }
-      qi.serializing = perf.time();
+      qi.serializing = prf.time();
 
       // generate query info
       info = qi.toString(qp, po.size(), c, ctx.options.get(MainOptions.QUERYINFO));
 
-    } catch(final QueryException | ProcException ex) {
+    } catch(final QueryException | JobException ex) {
       throw new BaseXException(ex);
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
@@ -172,7 +173,7 @@ public final class ServerQuery extends Proc {
   private QueryProcessor parse() throws IOException {
     if(!parsed) {
       try {
-        perf.time();
+        final Performance perf = new Performance();
         qp().parse();
         qp.qc.info.parsing = perf.time();
         parsed = true;

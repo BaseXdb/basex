@@ -11,6 +11,7 @@ import javax.servlet.http.*;
 
 import org.basex.core.*;
 import org.basex.core.StaticOptions.*;
+import org.basex.core.jobs.*;
 import org.basex.http.restxq.*;
 import org.basex.query.*;
 import org.basex.server.*;
@@ -69,7 +70,7 @@ public abstract class BaseXServlet extends HttpServlet {
       http.status(SC_UNAUTHORIZED, Util.message(ex), restxq);
     } catch(final IOException | QueryException ex) {
       http.status(SC_BAD_REQUEST, Util.message(ex), restxq);
-    } catch(final ProcException ex) {
+    } catch(final JobException ex) {
       http.status(SC_GONE, Text.INTERRUPTED, restxq);
     } catch(final Exception ex) {
       final String msg = Util.bug(ex);

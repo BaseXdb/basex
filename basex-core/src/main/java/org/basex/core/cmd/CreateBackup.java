@@ -76,7 +76,7 @@ public final class CreateBackup extends ABackup {
     final String backup = db + '-' + DateTime.format(new Date(), DateTime.DATETIME) + IO.ZIPSUFFIX;
     final IOFile zf = sopts.dbPath(backup);
     final Zip zip = new Zip(zf);
-    if(cmd != null) cmd.proc(zip);
+    if(cmd != null) cmd.job(zip);
 
     // skip file that indicates a current update operation (will be the case when using XQuery)
     final IOFile dbpath = sopts.dbPath(db);

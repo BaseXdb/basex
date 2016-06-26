@@ -6,6 +6,7 @@ import java.io.*;
 import java.util.*;
 
 import org.basex.core.*;
+import org.basex.core.jobs.*;
 import org.basex.io.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -30,11 +31,11 @@ public final class Suite {
    * Tests all test functions in the specified path.
    * @param ctx database context
    * @param root path to test modules
-   * @param proc calling process
+   * @param job calling job
    * @return resulting value
    * @throws IOException I/O exception
    */
-  public FElem test(final IOFile root, final Context ctx, final Proc proc) throws IOException {
+  public FElem test(final IOFile root, final Context ctx, final Job job) throws IOException {
     final ArrayList<IOFile> files = new ArrayList<>();
 
     final Performance perf = new Performance();
@@ -49,7 +50,7 @@ public final class Suite {
     }
 
     for(final IOFile file : files) {
-      final Unit unit = new Unit(file, ctx, proc);
+      final Unit unit = new Unit(file, ctx, job);
       unit.test(suites);
       errors += unit.errors;
       failures += unit.failures;

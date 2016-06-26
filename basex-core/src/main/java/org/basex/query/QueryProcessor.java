@@ -6,6 +6,7 @@ import java.io.*;
 import java.util.regex.*;
 
 import org.basex.core.*;
+import org.basex.core.jobs.*;
 import org.basex.core.locks.*;
 import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
@@ -22,7 +23,7 @@ import org.basex.query.value.seq.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public final class QueryProcessor extends Proc implements Closeable {
+public final class QueryProcessor extends Job implements Closeable {
   /** Pattern for detecting library modules. */
   private static final Pattern LIBMOD_PATTERN = Pattern.compile(
   "^(xquery( version ['\"].*?['\"])?( encoding ['\"].*?['\"])? ?; ?)?module namespace.*");
@@ -43,7 +44,7 @@ public final class QueryProcessor extends Proc implements Closeable {
    */
   public QueryProcessor(final String query, final Context ctx) {
     this.query = query;
-    qc = proc(new QueryContext(ctx));
+    qc = job(new QueryContext(ctx));
     sc = new StaticContext(qc);
   }
 

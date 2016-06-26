@@ -42,7 +42,7 @@ public final class Check extends Command {
     } else {
       cmd = new CreateDB(dbName, io.exists() ? input : null);
     }
-    proc(cmd);
+    job(cmd);
 
     // execute command
     final boolean ok = cmd.run(context);

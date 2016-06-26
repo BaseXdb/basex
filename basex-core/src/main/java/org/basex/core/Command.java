@@ -6,6 +6,7 @@ import java.io.*;
 import java.util.*;
 
 import org.basex.core.cmd.*;
+import org.basex.core.jobs.*;
 import org.basex.core.parse.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
@@ -23,7 +24,7 @@ import org.xml.sax.*;
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
  */
-public abstract class Command extends Proc {
+public abstract class Command extends Job {
   /** Command arguments. */
   public final String[] args;
   /** Permission required to execute this command. */
@@ -94,7 +95,7 @@ public abstract class Command extends Proc {
     updating = updating(ctx);
 
     try {
-      // register process
+      // register job
       ctx.register(this);
       // run command and return success flag
       if(!run(ctx, os)) {
@@ -235,7 +236,7 @@ public abstract class Command extends Proc {
    * @param ctx database context
    * @param os output stream
    */
-  public void init(final Context ctx, final OutputStream os) {
+  public final void init(final Context ctx, final OutputStream os) {
     perf = new Performance();
     context = ctx;
     options = ctx.options;
@@ -249,12 +250,12 @@ public abstract class Command extends Proc {
    * @param os output stream
    * @return result of check
    */
-  public boolean run(final Context ctx, final OutputStream os) {
+  public final boolean run(final Context ctx, final OutputStream os) {
     init(ctx, os);
     try {
       return run();
-    } catch(final ProcException ex) {
-      // process was interrupted by the user or server
+    } catch(final JobException ex) {
+      // job was interrupted by the user or server
       abort();
       return error(INTERRUPTED);
     } catch(final OutOfMemoryError ex) {

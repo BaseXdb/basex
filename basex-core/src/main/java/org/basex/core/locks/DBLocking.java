@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.*;
 import java.util.concurrent.locks.*;
 
 import org.basex.core.*;
+import org.basex.core.jobs.*;
 import org.basex.util.list.*;
 
 /**
@@ -100,7 +101,7 @@ public final class DBLocking implements Locking {
   }
 
   @Override
-  public void acquire(final Proc proc, final StringList read, final StringList write) {
+  public void acquire(final Job job, final StringList read, final StringList write) {
     final long thread = Thread.currentThread().getId();
     if(writeLocked.containsKey(thread) || readLocked.containsKey(thread))
       throw new IllegalMonitorStateException("Thread already holds one or more locks.");
@@ -205,7 +206,7 @@ public final class DBLocking implements Locking {
   }
 
   @Override
-  public void release(final Proc proc) {
+  public void release(final Job job) {
     // Release all write locks
     final Long thread = Thread.currentThread().getId();
     final StringList writeObjects = writeLocked.remove(thread);

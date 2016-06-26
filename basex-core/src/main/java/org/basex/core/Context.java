@@ -2,6 +2,7 @@ package org.basex.core;
 
 import java.util.concurrent.*;
 
+import org.basex.core.jobs.*;
 import org.basex.core.locks.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
@@ -47,9 +48,9 @@ public final class Context {
   /** Log. */
   public final Log log;
 
-  /** Running processes. */
-  private final ConcurrentHashMap<Proc, Object> procs;
-  /** Process locking. */
+  /** Running jobs. */
+  private final ConcurrentHashMap<Job, Object> jobs;
+  /** Locked jobs. */
   private final Locking locks;
 
   /** Current node context. Set if it does not contain all documents of the current database. */
@@ -93,7 +94,7 @@ public final class Context {
   }
 
   /**
-   * Constructor, called by clients, and adopting the variables of the main process.
+   * Constructor, called by clients, and adopting the variables of the main context.
    * The {@link #user} reference must be set after calling this method.
    * @param ctx main context
    * @param listener client listener
@@ -111,7 +112,7 @@ public final class Context {
     repo = ctx.repo;
     log = ctx.log;
     queries = ctx.queries;
-    procs = ctx.procs;
+    jobs = ctx.jobs;
   }
 
   /**
@@ -125,7 +126,7 @@ public final class Context {
     sessions = new Sessions();
     blocker = new ClientBlocker();
     databases = new Databases(soptions);
-    locks = soptions.get(StaticOptions.GLOBALLOCK) ? new ProcLocking(soptions) :
+    locks = soptions.get(StaticOptions.GLOBALLOCK) ? new JobLocking(soptions) :
       new DBLocking(soptions);
     users = new Users(soptions);
     repo = new EXPathRepo(soptions);
@@ -133,7 +134,7 @@ public final class Context {
     queries = new QueryPool();
     user = users.get(UserText.ADMIN);
     listener = null;
-    procs = new ConcurrentHashMap<>();
+    jobs = new ConcurrentHashMap<>();
   }
 
   /**
@@ -159,8 +160,8 @@ public final class Context {
    */
   public synchronized void close() {
     // stop running queries
-    for(final Proc proc : procs.keySet()) proc.stop();
-    while(!procs.isEmpty()) Thread.yield();
+    for(final Job job : jobs.keySet()) job.stop();
+    while(!jobs.isEmpty()) Thread.yield();
     // stop sessions, close data references
     while(!sessions.isEmpty()) sessions.get(0).quit();
     datas.close();
@@ -275,9 +276,9 @@ public final class Context {
    * Locks the specified process and starts a timeout thread.
    * @param pr process
    */
-  public void register(final Proc pr) {
+  public void register(final Job pr) {
     assert !pr.registered() : "Already registered:" + pr;
-    procs.put(pr, Boolean.TRUE);
+    jobs.put(pr, Boolean.TRUE);
     pr.registered(true);
 
     // administrators will not be affected by the timeout
@@ -295,12 +296,12 @@ public final class Context {
    * Unlocks the process and stops the timeout.
    * @param pr process
    */
-  public void unregister(final Proc pr) {
+  public void unregister(final Job pr) {
     assert pr.registered() : "Not registered:" + pr;
     pr.registered(false);
     locks.release(pr);
     pr.stopTimeout();
-    procs.remove(pr);
+    jobs.remove(pr);
   }
 
   /**

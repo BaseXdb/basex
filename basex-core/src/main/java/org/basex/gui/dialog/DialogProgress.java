@@ -8,6 +8,7 @@ import java.awt.event.*;
 import javax.swing.*;
 
 import org.basex.core.*;
+import org.basex.core.jobs.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.util.*;
@@ -107,12 +108,12 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
 
   @Override
   public void actionPerformed(final ActionEvent e) {
-    final Proc proc = command.active();
-    setTitle(proc.shortInfo());
-    final String detail = proc.detailedInfo();
+    final Job job = command.active();
+    setTitle(job.shortInfo());
+    final String detail = job.detailedInfo();
     info.setText(detail.isEmpty() ? " " : detail);
     mem.repaint();
-    if(bar != null) bar.setValue((int) (proc.progressInfo() * MAX));
+    if(bar != null) bar.setValue((int) (job.progressInfo() * MAX));
   }
 
   /**

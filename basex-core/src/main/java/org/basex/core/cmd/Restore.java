@@ -80,7 +80,7 @@ public final class Restore extends ABackup {
 
     final IOFile dbpath = sopts.dbPath();
     final Zip zip = new Zip(new IOFile(dbpath, backup + IO.ZIPSUFFIX));
-    if(cmd != null) cmd.proc(zip);
+    if(cmd != null) cmd.job(zip);
     zip.unzip(dbpath);
   }
 
