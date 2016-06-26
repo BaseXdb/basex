@@ -65,7 +65,7 @@ public final class Add extends ACreate {
 
         if(!finishUpdate()) return false;
       }
-      return info(RES_ADDED_X, perf);
+      return info(RES_ADDED_X, job().perf);
     } finally {
       finish();
     }

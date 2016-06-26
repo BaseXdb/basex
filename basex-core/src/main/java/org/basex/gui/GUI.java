@@ -469,7 +469,7 @@ public final class GUI extends JFrame {
       // reset visualizations if data reference will be changed
       if(cmd.newData(context)) notify.init();
       // attaches the info listener to the command
-      cmd.listener(infoListener);
+      cmd.job().listener = infoListener;
 
       // evaluate command
       String inf = null;

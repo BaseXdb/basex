@@ -84,8 +84,12 @@ public final class MemData extends Data {
       default:
         throw Util.notExpected();
     }
-    if(cmd != null) cmd.job(ib);
-    set(type, ib.build());
+    try {
+      if(cmd != null) cmd.pushJob(ib);
+      set(type, ib.build());
+    } finally {
+      if(cmd != null) cmd.popJob();
+    }
   }
 
   @Override

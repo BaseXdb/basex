@@ -284,15 +284,14 @@ final class Unit {
   private void eval(final StaticFunc func) throws QueryException {
     current = func;
 
-    try(final QueryContext qctx = new QueryContext(ctx)) {
-      qctx.listener = job.listener;
+    try(final QueryContext qctx = job.pushJob(new QueryContext(ctx))) {
       qctx.parse(input, file.path(), null);
       qctx.mainModule(MainModule.get(find(qctx, func), new Expr[0]));
       // ignore results
       final Iter iter = qctx.iter();
       while(iter.next() != null);
     } finally {
-      job.job(null);
+      job.popJob();
     }
   }
 

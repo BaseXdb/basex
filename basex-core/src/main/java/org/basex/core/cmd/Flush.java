@@ -25,7 +25,7 @@ public final class Flush extends Command {
   protected boolean run() {
     final Data data = context.data();
     if(!options.get(MainOptions.AUTOFLUSH)) data.flush(true);
-    return info(DB_FLUSHED_X, data.meta.name, perf);
+    return info(DB_FLUSHED_X, data.meta.name, job().perf);
   }
 
   @Override

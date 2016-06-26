@@ -153,7 +153,7 @@ public final class QueryContext extends Job implements Closeable {
    */
   public QueryContext(final QueryContext parent) {
     this(parent.context, parent, parent.info);
-    listener = parent.listener;
+    parent.pushJob(this);
     resources = parent.resources;
     http = parent.http;
     updates = parent.updates;
@@ -221,9 +221,7 @@ public final class QueryContext extends Job implements Closeable {
     info.query = query;
     final QueryParser qp = new QueryParser(query, path, this, sc);
     root = qp.parseMain();
-    if(updating) {
-      updating = (qp.sc.mixUpdates && qp.sc.dynFuncCall) || root.expr.has(Flag.UPD);
-    }
+    if(updating) updating = (qp.sc.mixUpdates && qp.sc.dynFuncCall) || root.expr.has(Flag.UPD);
     return root;
   }
 
@@ -603,6 +601,7 @@ public final class QueryContext extends Job implements Closeable {
     } else {
       // otherwise, adopt update reference (may have been initialized by sub query)
       parent.updates = updates;
+      parent.popJob();
     }
     // reassign original database options
     for(final Entry<Option<?>, Object> e : staticOpts.entrySet()) {

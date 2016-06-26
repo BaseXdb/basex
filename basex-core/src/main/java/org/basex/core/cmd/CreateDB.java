@@ -85,14 +85,22 @@ public final class CreateDB extends ACreate {
       final Data data;
       if(options.get(MainOptions.MAINMEM)) {
         // create main memory instance
-        data = job(new MemBuilder(name, parser)).build();
+        try {
+          data = pushJob(new MemBuilder(name, parser)).build();
+        } finally {
+          popJob();
+        }
         context.openDB(data);
         context.datas.pin(data);
       } else {
         if(context.pinned(name)) return error(DB_PINNED_X, name);
 
         // create disk-based instance
-        job(new DiskBuilder(name, parser, soptions, options)).build().close();
+        try {
+          pushJob(new DiskBuilder(name, parser, soptions, options)).build().close();
+        } finally {
+          popJob();
+        }
 
         // second step: open database and create index structures
         final Open open = new Open(name);
@@ -110,7 +118,7 @@ public final class CreateDB extends ACreate {
 
       if(options.get(MainOptions.CREATEONLY)) new Close().run(context);
 
-      return info(parser.info() + DB_CREATED_X_X, name, perf);
+      return info(parser.info() + DB_CREATED_X_X, name, job().perf);
     } catch(final JobException ex) {
       throw ex;
     } catch(final IOException ex) {

@@ -46,8 +46,6 @@ public abstract class Command extends Job {
 
   /** Exception, resulting from command execution. */
   protected Exception exception;
-  /** Performance measurements. */
-  protected Performance perf;
   /** Maximum number of results (ignored if negative). */
   protected int maxResults = -1;
 
@@ -237,7 +235,6 @@ public abstract class Command extends Job {
    * @param os output stream
    */
   public final void init(final Context ctx, final OutputStream os) {
-    perf = new Performance();
     context = ctx;
     options = ctx.options;
     soptions = ctx.soptions;

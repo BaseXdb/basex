@@ -53,7 +53,7 @@ public final class CreateBackup extends ABackup {
         try {
           backup(db, soptions, this);
           // backup was successful
-          info(DB_BACKUP_X, db, perf);
+          info(DB_BACKUP_X, db, job().perf);
         } catch(final IOException ex) {
           info(DB_NOT_BACKUP_X, db);
           ok = false;
@@ -76,13 +76,17 @@ public final class CreateBackup extends ABackup {
     final String backup = db + '-' + DateTime.format(new Date(), DateTime.DATETIME) + IO.ZIPSUFFIX;
     final IOFile zf = sopts.dbPath(backup);
     final Zip zip = new Zip(zf);
-    if(cmd != null) cmd.job(zip);
 
-    // skip file that indicates a current update operation (will be the case when using XQuery)
-    final IOFile dbpath = sopts.dbPath(db);
-    final StringList files = dbpath.descendants();
-    files.delete(DATAUPD + IO.BASEXSUFFIX);
-    zip.zip(dbpath, files);
+    try {
+      if(cmd != null) cmd.pushJob(zip);
+      final IOFile dbpath = sopts.dbPath(db);
+      final StringList files = dbpath.descendants();
+      // delete file indicating an update (this file is generated when using XQuery)
+      files.delete(DATAUPD + IO.BASEXSUFFIX);
+      zip.zip(dbpath, files);
+    } finally {
+      if(cmd != null) cmd.popJob();
+    }
   }
 
   @Override

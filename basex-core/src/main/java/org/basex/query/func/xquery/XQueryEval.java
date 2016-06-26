@@ -7,7 +7,6 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import org.basex.core.jobs.*;
-import org.basex.core.jobs.Job.*;
 import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
@@ -83,7 +82,7 @@ public class XQueryEval extends StandardFunc {
 
     if(qc.parent != null) throw BXXQ_NESTED.get(info);
 
-    try(final QueryContext qctx = qc.job(new QueryContext(qc))) {
+    try(final QueryContext qctx = new QueryContext(qc)) {
       if(exprs.length > 2) {
         final Options opts = toOptions(2, Q_OPTIONS, new XQueryOptions(), qc);
         final Perm perm = Perm.get(opts.get(XQueryOptions.PERMISSION).toString());
@@ -142,18 +141,16 @@ public class XQueryEval extends StandardFunc {
         }
         return cache;
       } catch(final JobException ex) {
-        if(qctx.state == State.TIMEOUT) throw BXXQ_TIMEOUT.get(info);
-        if(qctx.state == State.MEMORY)  throw BXXQ_MEMORY.get(info);
+        if(qctx.state == JobState.TIMEOUT) throw BXXQ_TIMEOUT.get(info);
+        if(qctx.state == JobState.MEMORY)  throw BXXQ_MEMORY.get(info);
         throw ex;
       } catch(final QueryException ex) {
         throw ex.error() == BASX_PERM_X ? BXXQ_PERM_X.get(info, ex.getLocalizedMessage()) :
           ex.info(info);
       }
-
     } finally {
       if(to != null) to.cancel();
       user.perm(tmp, "");
-      qc.job(null);
     }
   }
 

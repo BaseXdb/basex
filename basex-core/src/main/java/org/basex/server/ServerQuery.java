@@ -21,8 +21,6 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class ServerQuery extends Job {
-  /** Performance. */
-  private final Performance prf = new Performance();
   /** Query string. */
   private final String query;
   /** Database context. */
@@ -89,7 +87,8 @@ public final class ServerQuery extends Job {
    * @throws IOException I/O Exception
    */
   public String parameters() throws IOException {
-    return parse().qc.serParams().toString();
+    parse();
+    return qp.qc.serParams().toString();
   }
 
   /**
@@ -98,7 +97,8 @@ public final class ServerQuery extends Job {
    * @throws IOException I/O Exception
    */
   public boolean updating() throws IOException {
-    return parse().updating;
+    parse();
+    return qp.updating;
   }
 
   /**
@@ -116,13 +116,13 @@ public final class ServerQuery extends Job {
       // parses the query and registers the process
       parse();
       qp.register(ctx);
-
       // create serializer
+      final Performance perf = job().perf;
       qp.compile();
       final QueryInfo qi = qp.qc.info;
-      qi.compiling = prf.time();
+      qi.compiling = perf.time();
       final Iter ir = qp.iter();
-      qi.evaluating = prf.time();
+      qi.evaluating = perf.time();
 
       // iterate through results
       int c = 0;
@@ -143,7 +143,7 @@ public final class ServerQuery extends Job {
           c++;
         }
       }
-      qi.serializing = prf.time();
+      qi.serializing = perf.time();
 
       // generate query info
       info = qi.toString(qp, po.size(), c, ctx.options.get(MainOptions.QUERYINFO));
@@ -156,22 +156,22 @@ public final class ServerQuery extends Job {
     } finally {
       // close processor and unregisters the process
       if(qp != null) {
-        qp.close();
         if(parsed) {
+          qp.close();
           qp.unregister(ctx);
           parsed = false;
         }
         qp = null;
+        popJob();
       }
     }
   }
 
   /**
    * Initializes the query.
-   * @return query processor
    * @throws IOException I/O Exception
    */
-  private QueryProcessor parse() throws IOException {
+  private void parse() throws IOException {
     if(!parsed) {
       try {
         final Performance perf = new Performance();
@@ -182,7 +182,6 @@ public final class ServerQuery extends Job {
         throw new BaseXException(ex);
       }
     }
-    return qp;
   }
 
   /**
@@ -191,7 +190,7 @@ public final class ServerQuery extends Job {
    */
   private QueryProcessor qp() {
     if(parsed || qp == null) {
-      qp = new QueryProcessor(query, ctx);
+      qp = pushJob(new QueryProcessor(query, ctx));
       parsed = false;
     }
     return qp;

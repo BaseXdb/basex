@@ -105,6 +105,6 @@ public final class Replace extends ACreate {
     for(; d < ds; d++) auc.addDelete(docs.get(d));
     auc.execute(false);
 
-    return info(RES_REPLACED_X_X, ds + bs, perf);
+    return info(RES_REPLACED_X_X, ds + bs, job().perf);
   }
 }

@@ -71,6 +71,7 @@ public abstract class AQuery extends Command {
           // reuse existing processor instance
           if(r != 0) {
             qp = null;
+            popJob();
           }
           qp(query, context);
           parse(p);
@@ -175,9 +176,9 @@ public abstract class AQuery extends Command {
    * @param ctx database context
    * @return query processor
    */
-  protected QueryProcessor qp(final String query, final Context ctx) {
+  private QueryProcessor qp(final String query, final Context ctx) {
     if(qp == null) {
-      qp = job(new QueryProcessor(query, ctx));
+      qp = pushJob(new QueryProcessor(query, ctx));
       if(info == null) info = qp.qc.info;
     }
     return qp;
@@ -197,6 +198,7 @@ public abstract class AQuery extends Command {
       error(Util.message(ex));
     } finally {
       qp = null;
+      popJob();
     }
     return SerializerMode.DEFAULT.get().toString();
   }

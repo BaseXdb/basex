@@ -48,8 +48,8 @@ public final class Restore extends ABackup {
     // try to restore database
     try {
       restore(db, backup, soptions, this);
-      return !closed || new Open(db).run(context) ?
-        info(DB_RESTORED_X, backup, perf) : error(DB_NOT_RESTORED_X, db);
+      return !closed || new Open(db).run(context) ? info(DB_RESTORED_X, backup, job().perf) :
+        error(DB_NOT_RESTORED_X, db);
     } catch(final IOException ex) {
       Util.debug(ex);
       return error(DB_NOT_RESTORED_X, db);
@@ -80,8 +80,12 @@ public final class Restore extends ABackup {
 
     final IOFile dbpath = sopts.dbPath();
     final Zip zip = new Zip(new IOFile(dbpath, backup + IO.ZIPSUFFIX));
-    if(cmd != null) cmd.job(zip);
-    zip.unzip(dbpath);
+    try {
+      if(cmd != null) cmd.pushJob(zip);
+      zip.unzip(dbpath);
+    } finally {
+      if(cmd != null) cmd.popJob();
+    }
   }
 
   @Override

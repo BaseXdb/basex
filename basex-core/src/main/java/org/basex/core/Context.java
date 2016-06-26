@@ -1,7 +1,5 @@
 package org.basex.core;
 
-import java.util.concurrent.*;
-
 import org.basex.core.jobs.*;
 import org.basex.core.locks.*;
 import org.basex.core.users.*;
@@ -19,7 +17,6 @@ import org.basex.util.list.*;
  * It references the currently opened database, options, client sessions, users and other meta data.
  * Next, the instance of this class will be passed on to all operations, as it organizes concurrent
  * data access, ensuring that no job will concurrently write to the same data instances.
-
  *
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
@@ -30,7 +27,7 @@ public final class Context {
   /** Blocked clients. */
   public final ClientBlocker blocker;
   /** Job pool. */
-  public final ConcurrentHashMap<Job, Object> jobs;
+  public final JobPool jobs;
   /** Asynchronous queries. */
   public final QueryPool queries;
   /** Options. */
@@ -49,7 +46,6 @@ public final class Context {
   public final Databases databases;
   /** Log. */
   public final Log log;
-
   /** Locked jobs. */
   public final Locking locks;
 
@@ -132,7 +128,7 @@ public final class Context {
     log = new Log(soptions);
     user = users.get(UserText.ADMIN);
     listener = null;
-    jobs = new ConcurrentHashMap<>();
+    jobs = new JobPool();
     queries = new QueryPool();
   }
 
@@ -158,9 +154,7 @@ public final class Context {
    * and not on client instances.
    */
   public synchronized void close() {
-    // stop running queries
-    for(final Job job : jobs.keySet()) job.stop();
-    while(!jobs.isEmpty()) Thread.yield();
+    jobs.close();
     // stop sessions, close data references
     while(!sessions.isEmpty()) sessions.get(0).quit();
     datas.close();

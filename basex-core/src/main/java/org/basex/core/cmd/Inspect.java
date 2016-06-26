@@ -27,7 +27,7 @@ public final class Inspect extends Command {
   protected boolean run() throws IOException {
     final Data data = context.data();
     out.print(inspect(data));
-    return info("'%' inspected in %.", data.meta.name, perf);
+    return info("'%' inspected in %.", data.meta.name, job().perf);
   }
 
   @Override

@@ -103,6 +103,7 @@ public final class DBLocking implements Locking {
 
   @Override
   public void acquire(final Job job) {
+    // get touched databases
     final LockResult lr = new LockResult();
     job.databases(lr);
     final StringList write = prepareLock(lr.write, lr.writeAll);

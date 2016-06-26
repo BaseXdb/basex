@@ -173,8 +173,12 @@ public final class DiskData extends Data {
       case FULLTEXT: ib = new FTBuilder(this); break;
       default: throw Util.notExpected();
     }
-    if(cmd != null) cmd.job(ib);
-    set(type, ib.build());
+    try {
+      if(cmd != null) cmd.pushJob(ib);
+      set(type, ib.build());
+    } finally {
+      if(cmd != null) cmd.popJob();
+    }
   }
 
   @Override

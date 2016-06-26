@@ -51,7 +51,7 @@ public final class Copy extends Command {
     // try to copy database
     try {
       copy(src, trg, soptions, this);
-      return info(DB_COPIED_X, src, perf);
+      return info(DB_COPIED_X, src, job().perf);
     } catch(final IOException ex) {
       return error(DB_NOT_COPIED_X, src);
     }

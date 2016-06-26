@@ -23,7 +23,7 @@ import org.basex.util.list.*;
  */
 public final class QueryPool {
   /** Number of queries to be queued. */
-  private static final int MAXQURIES = 1000;
+  private static final int MAXQUERIES = 1000;
   /** Queries. */
   private final Map<String, Query> queries = new ConcurrentHashMap<>();
 
@@ -38,7 +38,7 @@ public final class QueryPool {
   public String add(final QueryProcessor qp, final boolean cache, final InputInfo info)
       throws QueryException {
 
-    if(queries.size() == MAXQURIES) throw JOBS_OVERFLOW.get(info);
+    if(queries.size() == MAXQUERIES) throw JOBS_OVERFLOW.get(info);
 
     final String id = "Query-" + UUID.randomUUID();
     queries.put(id, new Query(qp, id, cache, info));

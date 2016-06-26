@@ -50,12 +50,15 @@ public class Execute extends Command {
       final StringBuilder sb = new StringBuilder();
       for(final Command c : list) {
         if(c.openDB && context.data() == null) return error(NO_DB_OPENED);
-        final boolean ok = job(c).run(context, out);
-        job(null);
-        sb.append(c.info());
-        if(!ok) {
-          exception = c.exception();
-          return error(sb.toString());
+        try {
+          final boolean ok = pushJob(c).run(context, out);
+          sb.append(c.info());
+          if(!ok) {
+            exception = c.exception();
+            return error(sb.toString());
+          }
+        } finally {
+          popJob();
         }
       }
       return info(sb.toString().replaceAll("\r?\n?$", ""));

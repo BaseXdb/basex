@@ -41,6 +41,10 @@ public final class CsvParser extends SingleParser {
 
   @Override
   protected void parse() throws IOException {
-    job(new CsvBuilder(copts, builder)).convert(source);
+    try {
+      pushJob(new CsvBuilder(copts, builder)).convert(source);
+    } finally {
+      popJob();
+    }
   }
 }

@@ -42,12 +42,15 @@ public final class Check extends Command {
     } else {
       cmd = new CreateDB(dbName, io.exists() ? input : null);
     }
-    job(cmd);
 
     // execute command
-    final boolean ok = cmd.run(context);
-    final String msg = cmd.info().trim();
-    return ok ? info(msg) : error(msg);
+    try {
+      final boolean ok = pushJob(cmd).run(context);
+      final String msg = cmd.info().trim();
+      return ok ? info(msg) : error(msg);
+    } finally {
+      popJob();
+    }
   }
 
   /**

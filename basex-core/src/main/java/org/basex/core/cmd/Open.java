@@ -58,7 +58,7 @@ public final class Open extends Command {
         return error(Util.message(ex));
       }
     }
-    return info(DB_OPENED_X, db, perf);
+    return info(DB_OPENED_X, db, job().perf);
   }
 
   @Override

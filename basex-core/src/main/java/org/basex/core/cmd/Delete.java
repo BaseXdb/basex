@@ -46,7 +46,7 @@ public final class Delete extends ACreate {
     if(!finishUpdate()) return false;
 
     // return info message
-    return info(RES_DELETED_X_X, docs.size() + bins.size(), perf);
+    return info(RES_DELETED_X_X, docs.size() + bins.size(), job().perf);
   }
 
   /**
