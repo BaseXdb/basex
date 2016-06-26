@@ -81,6 +81,8 @@ public class XQueryEval extends StandardFunc {
     String uri = path;
     Timer to = null;
 
+    if(qc.parent != null) throw BXXQ_NESTED.get(info);
+
     try(final QueryContext qctx = qc.proc(new QueryContext(qc))) {
       if(exprs.length > 2) {
         final Options opts = toOptions(2, Q_OPTIONS, new XQueryOptions(), qc);

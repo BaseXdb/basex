@@ -57,8 +57,7 @@ public final class QueryContext extends Proc implements Closeable {
   private final HashMap<QNm, Value> bindings = new HashMap<>();
 
   /** Parent query context. */
-  private final QueryContext parent;
-
+  public final QueryContext parent;
   /** Query info. */
   public final QueryInfo info;
   /** Database context. */

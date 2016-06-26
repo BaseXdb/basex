@@ -287,6 +287,8 @@ public enum QueryError {
   BXXQ_TIMEOUT(BXXQ, 4, "The timeout was exceeded."),
   /** BXXQ0004. */
   BXXQ_MEMORY(BXXQ, 4, "The memory limit was exceeded."),
+  /** BXXQ0005. */
+  BXXQ_NESTED(BXXQ, 5, "Nested query evaluation is not allowed."),
 
   // Unit module
 

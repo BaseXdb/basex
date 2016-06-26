@@ -24,6 +24,7 @@ public final class AsyncForkJoin extends StandardFunc {
       if(!(func instanceof FItem) || ((FItem) func).arity() != 0)
         throw ZEROFUNCS_X_X.get(info, func.type, func);
     }
+    if(qc.parent != null) throw BXXQ_NESTED.get(info);
 
     final ForkJoinPool pool = new ForkJoinPool();
     final ForkJoinTask task = new ForkJoinTask(funcs, qc, info);
