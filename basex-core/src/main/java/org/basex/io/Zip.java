@@ -111,7 +111,7 @@ public final class Zip extends Proc {
   }
 
   @Override
-  protected double prog() {
+  public double progressInfo() {
     return (double) curr / total;
   }
 

@@ -67,7 +67,7 @@ public final class Add extends ACreate {
       }
       return info(RES_ADDED_X, perf);
     } finally {
-      close();
+      finish();
     }
   }
 
@@ -129,7 +129,7 @@ public final class Add extends ACreate {
   /**
    * Finalizes an add operation.
    */
-  void close() {
+  void finish() {
     if(clip != null) DropDB.drop(clip.data, soptions);
   }
 
@@ -169,12 +169,12 @@ public final class Add extends ACreate {
   }
 
   @Override
-  protected String tit() {
+  public String shortInfo() {
     return ADD;
   }
 
   @Override
-  protected double prog() {
-    return build != null ? build.prog() : 0;
+  public double progressInfo() {
+    return build != null ? build.progressInfo() : 0;
   }
 }

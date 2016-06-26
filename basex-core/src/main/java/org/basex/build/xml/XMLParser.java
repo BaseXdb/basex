@@ -82,14 +82,14 @@ public class XMLParser extends SingleParser {
         break;
       } else if(scanner.type != Type.DTD) {
         // L_BR, L_BR_CLOSE
-        if(!fragment && closed) throw new BuildException(MOREROOTS, det());
+        if(!fragment && closed) throw new BuildException(MOREROOTS, detailedInfo());
         if(!parseElement()) break;
         continue;
       }
       if(!scanner.more()) break;
     }
     scanner.close();
-    if(!elms.isEmpty()) throw new BuildException(DOCOPEN, det(), elms.pop());
+    if(!elms.isEmpty()) throw new BuildException(DOCOPEN, detailedInfo(), elms.pop());
   }
 
   @Override
@@ -112,9 +112,9 @@ public class XMLParser extends SingleParser {
       if(stripNS) name = local(name);
       skipSpace();
 
-      if(elms.isEmpty()) throw new BuildException(OPEN, det(), name);
+      if(elms.isEmpty()) throw new BuildException(OPEN, detailedInfo(), name);
       final byte[] open = elms.pop();
-      if(!eq(open, name)) throw new BuildException(CLOSINGELEM, det(), name, open);
+      if(!eq(open, name)) throw new BuildException(CLOSINGELEM, detailedInfo(), name, open);
       chops.pop();
 
       builder.closeElem();
@@ -192,7 +192,7 @@ public class XMLParser extends SingleParser {
    */
   private boolean consume(final Type type) throws IOException {
     if(scanner.type == type) return scanner.more();
-    throw new BuildException(PARSEINV, det(), type.string, scanner.type.string);
+    throw new BuildException(PARSEINV, detailedInfo(), type.string, scanner.type.string);
   }
 
   /**
@@ -208,7 +208,7 @@ public class XMLParser extends SingleParser {
       scanner.more();
       return tok;
     }
-    throw new BuildException(PARSEINV, det(), type.string, scanner.type.string);
+    throw new BuildException(PARSEINV, detailedInfo(), type.string, scanner.type.string);
   }
 
   /**
@@ -220,12 +220,12 @@ public class XMLParser extends SingleParser {
   }
 
   @Override
-  protected final String det() {
-    return scanner.det();
+  public final String detailedInfo() {
+    return scanner.detailedInfo();
   }
 
   @Override
-  public final double prog() {
-    return scanner.prog();
+  public final double progressInfo() {
+    return scanner.progressInfo();
   }
 }

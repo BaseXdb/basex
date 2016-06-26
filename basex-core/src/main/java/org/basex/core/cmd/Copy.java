@@ -97,7 +97,7 @@ public final class Copy extends Command {
   }
 
   @Override
-  protected String tit() {
+  public String shortInfo() {
     return COPY;
   }
 
@@ -107,7 +107,7 @@ public final class Copy extends Command {
   }
 
   @Override
-  protected double prog() {
+  public double progressInfo() {
     return (double) of / tf;
   }
 }

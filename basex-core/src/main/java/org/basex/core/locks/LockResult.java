@@ -1,6 +1,5 @@
 package org.basex.core.locks;
 
-import org.basex.core.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -9,7 +8,6 @@ import org.basex.util.list.*;
  *
  * @author BaseX Team 2005-16, BSD License
  * @author Jens Erat
- * @see Proc#databases(LockResult)
  */
 public class LockResult {
   /** Read locks. */

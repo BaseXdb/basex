@@ -107,11 +107,12 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
 
   @Override
   public void actionPerformed(final ActionEvent e) {
-    setTitle(command.title());
-    final String detail = command.detail();
+    final Proc proc = command.active();
+    setTitle(proc.shortInfo());
+    final String detail = proc.detailedInfo();
     info.setText(detail.isEmpty() ? " " : detail);
     mem.repaint();
-    if(bar != null) bar.setValue((int) (command.progress() * MAX));
+    if(bar != null) bar.setValue((int) (proc.progressInfo() * MAX));
   }
 
   /**

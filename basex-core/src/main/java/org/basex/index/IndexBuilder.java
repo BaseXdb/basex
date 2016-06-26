@@ -153,17 +153,17 @@ public abstract class IndexBuilder extends Proc {
   }
 
   @Override
-  public final String tit() {
+  public final String shortInfo() {
     return CREATING_INDEXES;
   }
 
   @Override
-  public final double prog() {
+  public final double progressInfo() {
     return pre / (size + (splits > 0 ? size / 50d : 0d));
   }
 
   @Override
-  protected final String det() {
+  public final String detailedInfo() {
     switch(type) {
       case TEXT: return INDEX_TEXTS_D;
       case ATTRIBUTE: return INDEX_ATTRIBUTES_D;

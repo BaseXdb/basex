@@ -154,12 +154,12 @@ public final class SAXWrapper extends SingleParser {
   }
 
   @Override
-  public String det() {
-    return length == 0 ? super.det() : Util.info(SCANPOS_X_X, source.name(), line);
+  public String detailedInfo() {
+    return length == 0 ? super.detailedInfo() : Util.info(SCANPOS_X_X, source.name(), line);
   }
 
   @Override
-  public double prog() {
+  public double progressInfo() {
     return length == 0 ? saxh == null ? 0 : saxh.nodes / 3000000d % 1 :
       (double) counter / length;
   }

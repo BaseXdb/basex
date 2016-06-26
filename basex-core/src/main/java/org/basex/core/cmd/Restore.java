@@ -85,7 +85,7 @@ public final class Restore extends ABackup {
   }
 
   @Override
-  protected String tit() {
+  public String shortInfo() {
     return RESTORE;
   }
 

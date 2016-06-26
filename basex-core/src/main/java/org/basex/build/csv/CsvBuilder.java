@@ -79,12 +79,12 @@ final class CsvBuilder extends CsvConverter {
   }
 
   @Override
-  protected String det() {
+  public String detailedInfo() {
     return Util.info(LINE_X, line);
   }
 
   @Override
-  public double prog() {
+  public double progressInfo() {
     return (double) nli.size() / nli.length();
   }
 }

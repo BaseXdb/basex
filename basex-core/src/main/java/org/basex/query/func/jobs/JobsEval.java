@@ -20,8 +20,8 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public final class JobsEval extends StandardFunc {
-  /** Async options. */
-  public static class AsyncOptions extends Options {
+  /** Eval options. */
+  public static class EvalOptions extends Options {
     /** Query base-uri. */
     public static final StringOption BASE_URI = new StringOption("base-uri");
     /** Cache result. */
@@ -33,11 +33,11 @@ public final class JobsEval extends StandardFunc {
     final byte[] query = toToken(exprs[0], qc);
     final HashMap<String, Value> bindings = toBindings(1, qc);
 
-    final AsyncOptions opts = new AsyncOptions();
+    final EvalOptions opts = new EvalOptions();
     if(exprs.length > 2) toOptions(2, null, opts, qc);
 
-    final String uri = opts.get(AsyncOptions.BASE_URI);
-    final boolean cache = opts.get(AsyncOptions.CACHE);
+    final String uri = opts.get(EvalOptions.BASE_URI);
+    final boolean cache = opts.get(EvalOptions.CACHE);
 
     final Context ctx = qc.context;
     final QueryPool queries = ctx.queries;

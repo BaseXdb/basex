@@ -53,7 +53,7 @@ public final class ServerQuery extends Proc {
    */
   public void bind(final String name, final Object value, final String type) throws IOException {
     try {
-      init().bind(name, value, type);
+      qp().bind(name, value, type);
     } catch(final QueryException ex) {
       Util.stack(ex);
       throw new BaseXException(ex);
@@ -68,7 +68,7 @@ public final class ServerQuery extends Proc {
    */
   public void context(final Object value, final String type) throws IOException {
     try {
-      init().context(value, type);
+      qp().context(value, type);
     } catch(final QueryException ex) {
       throw new BaseXException(ex);
     }
@@ -173,7 +173,7 @@ public final class ServerQuery extends Proc {
     if(!parsed) {
       try {
         perf.time();
-        init().parse();
+        qp().parse();
         qp.qc.info.parsing = perf.time();
         parsed = true;
       } catch(final QueryException ex) {
@@ -184,10 +184,10 @@ public final class ServerQuery extends Proc {
   }
 
   /**
-   * Returns an instance of the query processor.
+   * Initializes and returns an instance of the query processor.
    * @return query processor
    */
-  private QueryProcessor init() {
+  private QueryProcessor qp() {
     if(parsed || qp == null) {
       qp = new QueryProcessor(query, ctx);
       parsed = false;

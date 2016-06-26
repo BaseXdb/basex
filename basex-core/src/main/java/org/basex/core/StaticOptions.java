@@ -63,7 +63,7 @@ public final class StaticOptions extends Options {
 
   /** Timeout (seconds) for processing client requests; deactivated if set to 0. */
   public static final NumberOption TIMEOUT = new NumberOption("TIMEOUT", 30);
-  /** Keep alive time of clients; deactivated if set to 0. */
+  /** Keep alive time (seconds) for clients; deactivated if set to 0. */
   public static final NumberOption KEEPALIVE = new NumberOption("KEEPALIVE", 600);
   /** Defines the number of parallel readers. */
   public static final NumberOption PARALLEL = new NumberOption("PARALLEL", 8);

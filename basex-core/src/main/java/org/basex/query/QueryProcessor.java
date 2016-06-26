@@ -336,12 +336,12 @@ public final class QueryProcessor extends Proc implements Closeable {
   }
 
   @Override
-  public String tit() {
+  public String shortInfo() {
     return PLEASE_WAIT_D;
   }
 
   @Override
-  public String det() {
+  public String detailedInfo() {
     return PLEASE_WAIT_D;
   }
 

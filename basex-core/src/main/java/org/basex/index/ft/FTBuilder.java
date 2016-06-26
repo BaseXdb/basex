@@ -55,7 +55,7 @@ public final class FTBuilder extends IndexBuilder {
 
   @Override
   public FTIndex build() throws IOException {
-    Util.debug(det());
+    Util.debug(detailedInfo());
 
     for(pre = 0; pre < size; ++pre) {
       if((pre & 0x0FFF) == 0) check();

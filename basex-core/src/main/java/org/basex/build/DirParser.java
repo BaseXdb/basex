@@ -244,13 +244,13 @@ public final class DirParser extends Parser {
   }
 
   @Override
-  public String det() {
-    return parser != null ? parser.detail() : source.path();
+  public String detailedInfo() {
+    return parser != null ? parser.detailedInfo() : source.path();
   }
 
   @Override
-  public double prog() {
-    if(parser != null) return parser.progress();
+  public double progressInfo() {
+    if(parser != null) return parser.progressInfo();
     if(lastSrc == source) return 1;
     lastSrc = source;
     return Math.random();

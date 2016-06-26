@@ -294,7 +294,7 @@ public abstract class AQuery extends Command {
   }
 
   @Override
-  public final Value finish() {
+  public final Value result() {
     final Value r = result;
     result = null;
     return r;

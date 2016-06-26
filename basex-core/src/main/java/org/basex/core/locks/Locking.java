@@ -11,20 +11,18 @@ import org.basex.util.list.*;
  */
 public interface Locking {
   /**
-   * Puts read and write locks the specified databases.
-   * Store and return the {@code token} for unlocking these objects again.
-   *
-   * @param pr process
+   * Puts read and write locks on the specified databases.
+   * @param proc process to be queued
    * @param read names of databases to put read locks on.
    * Global locking is performed if the passed on reference is {@code null}
    * @param write names of databases to put write locks on.
    * Global locking is performed if the passed on reference is {@code null}
    */
-  void acquire(final Proc pr, final StringList read, final StringList write);
+  void acquire(final Proc proc, final StringList read, final StringList write);
 
   /**
    * Unlock all string locked by a transaction.
-   * @param pr process
+   * @param proc process to be unlocked
    */
-  void release(final Proc pr);
+  void release(final Proc proc);
 }

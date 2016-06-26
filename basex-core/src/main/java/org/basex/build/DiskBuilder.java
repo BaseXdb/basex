@@ -78,7 +78,7 @@ public final class DiskBuilder extends Builder implements Closeable {
       sout = new DataOutput(meta.dbfile(DATATMP), bs);
 
       final Performance perf = Prop.debug ? new Performance() : null;
-      Util.debug(tit() + DOTS);
+      Util.debug(shortInfo() + DOTS);
       parse();
       if(Prop.debug) Util.errln(" " + perf + " (" + Performance.getMemory() + ')');
 

@@ -139,7 +139,7 @@ public final class Export extends Command {
   }
 
   @Override
-  public double prog() {
+  public double progressInfo() {
     return progSize == 0 ? 0 : (double) progPos / progSize;
   }
 
@@ -154,7 +154,7 @@ public final class Export extends Command {
   }
 
   @Override
-  public String det() {
+  public String detailedInfo() {
     return progFile == null ? EXPORT : progFile.path();
   }
 

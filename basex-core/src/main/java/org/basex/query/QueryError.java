@@ -61,15 +61,6 @@ public enum QueryError {
   /** BXAD0003. */
   BXAD_TYPE_X(BXAD, 3, "Log type must consist of uppercase letters: \"%\"."),
 
-  // Async module
-
-  /** Jobs error. */
-  JOBS_UNKNOWN_X(JOBS, "unknown", "Unknown query id: %."),
-  /** Jobs error. */
-  JOBS_RUNNING_X(JOBS, "running", "Query is still running: %."),
-  /** Jobs error. */
-  JOBS_OVERFLOW(JOBS, "overflow", "Too many queries queued."),
-
   // Client module
 
   /** BXCL0001. */
@@ -169,6 +160,15 @@ public enum QueryError {
 
   /** Util error. */
   INSPECT_UNKNOWN_X(INSPECT, "unknown", "Component '%' does not exist."),
+
+  // Jobs module
+
+  /** Jobs error. */
+  JOBS_UNKNOWN_X(JOBS, "unknown", "Unknown query id: %."),
+  /** Jobs error. */
+  JOBS_RUNNING_X(JOBS, "running", "Query is still running: %."),
+  /** Jobs error. */
+  JOBS_OVERFLOW(JOBS, "overflow", "Too many queries queued."),
 
   // JSON module
 
@@ -285,7 +285,7 @@ public enum QueryError {
   BXXQ_MEMORY(BXXQ, 4, "The memory limit was exceeded."),
   /** BXXQ0005. */
   BXXQ_NESTED(BXXQ, 5, "Nested query evaluation is not allowed."),
-  /** ASYN0001. */
+  /** BXXQ0006. */
   BXXQ_UNEXPECTED_X(BXXQ, 6, "Unexpected error: %"),
 
   // Unit module
@@ -1400,12 +1400,12 @@ public enum QueryError {
 
     // EXPath errors
 
-    /** ARCH  Error type. */ ARCH(EXPERR_PREFIX, EXPERROR_URI),
-    /** BIN   Error type. */ BIN(BIN_PREFIX,     BIN_URI),
-    /** CX    Error type. */ CX(EXPERR_PREFIX,   EXPERROR_URI),
-    /** FILE  Error type. */ FILE(FILE_PREFIX,   FILE_URI),
-    /** HC    Error type. */ HC(EXPERR_PREFIX,   EXPERROR_URI),
-    /** ZIP   Error type. */ ZIP(EXPERR_PREFIX,  EXPERROR_URI),
+    /** ARCH Error type. */ ARCH(EXPERR_PREFIX, EXPERROR_URI),
+    /** BIN  Error type. */ BIN(BIN_PREFIX,     BIN_URI),
+    /** CX   Error type. */ CX(EXPERR_PREFIX,   EXPERROR_URI),
+    /** FILE Error type. */ FILE(FILE_PREFIX,   FILE_URI),
+    /** HC   Error type. */ HC(EXPERR_PREFIX,   EXPERROR_URI),
+    /** ZIP  Error type. */ ZIP(EXPERR_PREFIX,  EXPERROR_URI),
 
     // W3 errors
 

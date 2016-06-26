@@ -2,6 +2,7 @@ package org.basex.query.func.fn;
 
 import static org.basex.util.Token.*;
 
+import org.basex.core.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -75,9 +76,10 @@ public final class FnTrace extends StandardFunc {
     final String info = tb.add(value).toString();
 
     // if GUI is used or client is calling, cache trace info
-    if(qc.listen != null || qc.context.listener != null) {
+    final InfoListener il = qc.listener;
+    if(il != null || qc.context.listener != null) {
       qc.evalInfo(info);
-      if(qc.listen != null) qc.listen.info(info);
+      if(il != null) il.info(info);
     } else {
       Util.errln(info);
     }

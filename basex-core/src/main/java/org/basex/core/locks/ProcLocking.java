@@ -39,7 +39,7 @@ public final class ProcLocking implements Locking {
   }
 
   @Override
-  public void acquire(final Proc pr, final StringList read, final StringList write) {
+  public void acquire(final Proc proc, final StringList read, final StringList write) {
     final Object o = new Object();
 
     synchronized(mutex) {
@@ -51,7 +51,7 @@ public final class ProcLocking implements Locking {
 
       while(true) {
         if(!writer && o == queue.get(0)) {
-          if(pr.updating) {
+          if(proc.updating) {
             // check updating process
             if(readers == 0) {
               // start writing process
@@ -65,7 +65,7 @@ public final class ProcLocking implements Locking {
           }
         }
         // check if process has already been stopped
-        pr.checkStop();
+        proc.checkStop();
         // wait for next process to be finalized
         try {
           mutex.wait();
@@ -79,9 +79,9 @@ public final class ProcLocking implements Locking {
   }
 
   @Override
-  public void release(final Proc pr) {
+  public void release(final Proc proc) {
     synchronized(mutex) {
-      if(pr.updating) {
+      if(proc.updating) {
         writer = false;
       } else {
         --readers;

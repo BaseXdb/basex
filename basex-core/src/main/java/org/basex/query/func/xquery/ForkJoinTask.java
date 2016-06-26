@@ -12,7 +12,7 @@ import org.basex.util.*;
  *
  * @author James Wright
  */
-public final class ForkJoinTask extends RecursiveTask<Value> {
+final class ForkJoinTask extends RecursiveTask<Value> {
   /** Functions to evaluate in parallel. */
   private final Value funcs;
   /** Query context. */
@@ -30,7 +30,7 @@ public final class ForkJoinTask extends RecursiveTask<Value> {
    * @param qc query context
    * @param ii input info
    */
-  public ForkJoinTask(final Value funcs, final QueryContext qc, final InputInfo ii) {
+  ForkJoinTask(final Value funcs, final QueryContext qc, final InputInfo ii) {
     this(funcs, qc, ii, 0, (int) funcs.size());
   }
 
@@ -62,6 +62,8 @@ public final class ForkJoinTask extends RecursiveTask<Value> {
       } catch(final QueryException ex) {
         completeExceptionally(ex);
         cancel(true);
+      } finally {
+        qc.close();
       }
     } else {
       // split the work and join the results in the correct order

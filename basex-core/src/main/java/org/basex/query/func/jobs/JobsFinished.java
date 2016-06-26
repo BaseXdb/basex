@@ -14,7 +14,7 @@ import org.basex.util.*;
 public final class JobsFinished extends StandardFunc {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] id = toToken(exprs[0], qc);
-    return Bln.get(qc.context.queries.finished(Token.string(id)));
+    final String id = Token.string(toToken(exprs[0], qc));
+    return Bln.get(qc.context.queries.finished(id));
   }
 }

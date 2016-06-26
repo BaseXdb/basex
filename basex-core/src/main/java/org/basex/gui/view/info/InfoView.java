@@ -264,7 +264,7 @@ public final class InfoView extends View implements LinkListener {
     if(inf != null) tb.add(inf).nline();
     clear = reset;
 
-    // show total time required for running the process
+    // show total time required for running a command
     String total = time;
     if(!times.isEmpty()) {
       total = Performance.getTime(times.get(times.size() - 1) * 10000L * runs, runs);

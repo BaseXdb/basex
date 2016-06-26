@@ -92,7 +92,7 @@ public final class CreateBackup extends ABackup {
   }
 
   @Override
-  protected String tit() {
+  public String shortInfo() {
     return BACKUP;
   }
 

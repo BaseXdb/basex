@@ -469,7 +469,7 @@ public final class GUI extends JFrame {
       // reset visualizations if data reference will be changed
       if(cmd.newData(context)) notify.init();
       // attaches the info listener to the command
-      cmd.listen(infoListener);
+      cmd.listener(infoListener);
 
       // evaluate command
       String inf = null;
@@ -495,7 +495,7 @@ public final class GUI extends JFrame {
       if(edit) editor.info(cause, stopped, true);
 
       // get query result and node references to currently opened database
-      final Value result = cmd.finish();
+      final Value result = cmd.result();
       DBNodes nodes = result instanceof DBNodes && !result.isEmpty() ? (DBNodes) result : null;
 
       // show text view if a non-empty result does not reference the currently opened database
@@ -563,7 +563,7 @@ public final class GUI extends JFrame {
   }
 
   /**
-   * Stops the current process.
+   * Stops the current command.
    */
   public void stop() {
     if(command != null) command.stop();

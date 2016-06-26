@@ -285,7 +285,7 @@ final class Unit {
     current = func;
 
     try(final QueryContext qctx = new QueryContext(ctx)) {
-      qctx.listen = proc.listen;
+      qctx.listener = proc.listener;
       qctx.parse(input, file.path(), null);
       qctx.mainModule(MainModule.get(find(qctx, func), new Expr[0]));
       // ignore results

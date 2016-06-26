@@ -1004,18 +1004,18 @@ final class XMLScanner extends Proc {
    * @return build exception (indicates that an error is raised)
    */
   private BuildException error(final String message, final Object... ext) {
-    return new BuildException(det() + COLS + message, ext);
+    return new BuildException(detailedInfo() + COLS + message, ext);
   }
 
   @Override
-  public String det() {
+  public String detailedInfo() {
     final String path = input.io().path();
     return path.isEmpty() ? Util.info(LINE_X, input.line()) :
         Util.info(SCANPOS_X_X, input.io().path(), input.line());
   }
 
   @Override
-  public double prog() {
+  public double progressInfo() {
     final double l = input.length();
     return l <= 0 ? 0 : input.pos() / l;
   }

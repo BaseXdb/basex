@@ -14,8 +14,8 @@ import org.basex.util.*;
 public final class JobsStop extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] id = toToken(exprs[0], qc);
-    qc.context.queries.stop(Token.string(id));
+    final String id = Token.string(toToken(exprs[0], qc));
+    qc.context.queries.stop(id);
     return null;
   }
 }

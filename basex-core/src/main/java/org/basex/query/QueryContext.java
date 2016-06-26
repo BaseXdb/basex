@@ -148,14 +148,14 @@ public final class QueryContext extends Proc implements Closeable {
 
   /**
    * Constructor.
-   * @param qcParent parent context
+   * @param parent parent context
    */
-  public QueryContext(final QueryContext qcParent) {
-    this(qcParent.context, qcParent, qcParent.info);
-    listen = qcParent.listen;
-    resources = qcParent.resources;
-    http = qcParent.http;
-    updates = qcParent.updates;
+  public QueryContext(final QueryContext parent) {
+    this(parent.context, parent, parent.info);
+    listener = parent.listener;
+    resources = parent.resources;
+    http = parent.http;
+    updates = parent.updates;
   }
 
   /**
@@ -388,11 +388,10 @@ public final class QueryContext extends Proc implements Closeable {
       final Item it = results.get(c);
       // all updates are performed on database nodes
       if(it instanceof FItem) throw BASX_FITEM_X.get(null, it);
-      if(it instanceof DBNode) {
-        final Data data = it.data();
-        if(datas.contains(data) || !data.inMemory() && dbs.contains(data.meta.name)) {
-          results.set(c, ((DBNode) it).dbNodeCopy(context.options));
-        }
+      final Data data = it.data();
+      if(data != null && (datas.contains(data) ||
+          !data.inMemory() && dbs.contains(data.meta.name))) {
+        results.set(c, ((DBNode) it).dbNodeCopy(context.options));
       }
     }
   }
@@ -611,17 +610,17 @@ public final class QueryContext extends Proc implements Closeable {
   }
 
   @Override
-  public String tit() {
+  public String shortInfo() {
     return SAVE;
   }
 
   @Override
-  public String det() {
+  public String detailedInfo() {
     return PLEASE_WAIT_D;
   }
 
   @Override
-  public double prog() {
+  public double progressInfo() {
     return 0;
   }
 

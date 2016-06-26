@@ -21,7 +21,7 @@ public abstract class Proc {
   }
 
   /** Listener, reacting on process information. */
-  public InfoListener listen;
+  public InfoListener listener;
   /** This flag indicates that a command may perform updates. */
   public boolean updating;
   /** Stopped flag. */
@@ -36,37 +36,20 @@ public abstract class Proc {
   private Proc sub;
 
   /**
-   * Returns short information on the current process or sub process.
-   * @return header information
+   * Returns the currently active process.
+   * @return job
    */
-  public final String title() {
-    return sub != null ? sub.title() : tit();
-  }
-
-  /**
-   * Returns detailed information on the current process or sub process.
-   * Can be overwritten to give more detailed information.
-   * @return information in detail
-   */
-  public final String detail() {
-    return sub != null ? sub.detail() : det();
-  }
-
-  /**
-   * Returns a progress value from the interval {@code [0, 1]}.
-   * @return header information
-   */
-  public final double progress() {
-    return sub != null ? sub.progress() : prog();
+  public final Proc active() {
+    return sub != null ? sub.active() : this;
   }
 
   /**
    * Attaches the specified info listener.
    * @param il info listener
    */
-  public final void listen(final InfoListener il) {
-    if(sub != null) sub.listen(il);
-    listen = il;
+  public final void listener(final InfoListener il) {
+    if(sub != null) sub.listener(il);
+    listener = il;
   }
 
   /**
@@ -78,7 +61,7 @@ public abstract class Proc {
   public final <P extends Proc> P proc(final P proc) {
     sub = proc;
     if(proc != null) {
-      proc.listen = listen;
+      proc.listener = listener;
       proc.registered = registered;
       proc.proc(sub.sub);
       if(state != State.OK) proc.state(state);
@@ -186,7 +169,7 @@ public abstract class Proc {
    * Can be overwritten to give more detailed information.
    * @return header information
    */
-  protected String tit() {
+  public String shortInfo() {
     return Text.PLEASE_WAIT_D;
   }
 
@@ -194,7 +177,7 @@ public abstract class Proc {
    * Returns short information on this process.
    * @return header information
    */
-  protected String det() {
+  public String detailedInfo() {
     return Text.PLEASE_WAIT_D;
   }
 
@@ -203,7 +186,7 @@ public abstract class Proc {
    * Can be overwritten to give more detailed information.
    * @return header information
    */
-  protected double prog() {
+  public double progressInfo() {
     return 0;
   }
 }

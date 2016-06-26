@@ -96,7 +96,7 @@ public final class Replace extends ACreate {
         }
         context.invalidate();
       } finally {
-        add.close();
+        add.finish();
       }
     }
 

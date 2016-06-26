@@ -15,10 +15,10 @@ import org.basex.util.list.*;
 
 /**
  * This class serves as a central database context.
- * It references the currently opened database, options, client sessions,
- * users and other meta data. Next, the instance of this class will be passed on to
- * all operations, as it organizes concurrent data access, ensuring that no
- * process will concurrently write to the same data instances.
+ * It references the currently opened database, options, client sessions, users and other meta data.
+ * Next, the instance of this class will be passed on to all operations, as it organizes concurrent
+ * data access, ensuring that no job will concurrently write to the same data instances.
+
  *
  * @author BaseX Team 2005-16, BSD License
  * @author Christian Gruen
@@ -86,7 +86,7 @@ public final class Context {
   /**
    * Constructor, called by clients, and adopting the variables of the specified context.
    * The {@link #user} reference must be set after calling this method.
-   * @param ctx context of the main process
+   * @param ctx main context
    */
   public Context(final Context ctx) {
     this(ctx, null);
@@ -95,7 +95,7 @@ public final class Context {
   /**
    * Constructor, called by clients, and adopting the variables of the main process.
    * The {@link #user} reference must be set after calling this method.
-   * @param ctx context of the main process
+   * @param ctx main context
    * @param listener client listener
    */
   public Context(final Context ctx, final ClientListener listener) {

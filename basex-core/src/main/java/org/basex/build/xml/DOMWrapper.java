@@ -91,12 +91,12 @@ public final class DOMWrapper extends Parser {
   }
 
   @Override
-  public String det() {
+  public String detailedInfo() {
     return Util.info(NODES_PARSED_X_X, filename, nodes);
   }
 
   @Override
-  public double prog() {
+  public double progressInfo() {
     return nodes / 1000000d % 1;
   }
 

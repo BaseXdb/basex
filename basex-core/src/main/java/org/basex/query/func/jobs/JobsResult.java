@@ -15,8 +15,8 @@ import org.basex.util.*;
 public final class JobsResult extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final byte[] id = toToken(exprs[0], qc);
-    return qc.context.queries.result(Token.string(id), info);
+    final String id = Token.string(toToken(exprs[0], qc));
+    return qc.context.queries.result(id, info);
   }
 
   @Override

@@ -66,7 +66,7 @@ public final class OptimizeAll extends ACreate {
   }
 
   @Override
-  public double prog() {
+  public double progressInfo() {
     return (double) pre / size;
   }
 
@@ -76,7 +76,7 @@ public final class OptimizeAll extends ACreate {
   }
 
   @Override
-  public String det() {
+  public String detailedInfo() {
     return CREATE_STATS_D;
   }
 

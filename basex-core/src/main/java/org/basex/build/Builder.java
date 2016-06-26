@@ -166,18 +166,18 @@ public abstract class Builder extends Proc {
   // PROGRESS INFORMATION =====================================================
 
   @Override
-  protected final String tit() {
+  public final String shortInfo() {
     return CREATING_DB;
   }
 
   @Override
-  public final String det() {
-    return spos == 0 ? parser.detail() : FINISHING_D;
+  public final String detailedInfo() {
+    return spos == 0 ? parser.detailedInfo() : FINISHING_D;
   }
 
   @Override
-  public final double prog() {
-    return spos == 0 ? parser.progress() : (double) spos / ssize;
+  public final double progressInfo() {
+    return spos == 0 ? parser.progressInfo() : (double) spos / ssize;
   }
 
   // ABSTRACT METHODS =========================================================
@@ -279,7 +279,7 @@ public abstract class Builder extends Proc {
     final byte[] pref = prefix(name);
     int uriId = nspaces.uriIdForPrefix(pref, true);
     if(uriId == 0 && pref.length != 0 && !eq(pref, XML))
-      throw new BuildException(WHICHNS, parser.detail(), prefix(name));
+      throw new BuildException(WHICHNS, parser.detailedInfo(), prefix(name));
     addElem(dis, nameId, Math.min(IO.MAXATTS, as + 1), uriId, !nsp.isEmpty());
 
     // get and store attribute references
@@ -289,7 +289,7 @@ public abstract class Builder extends Proc {
       nameId = attrNames.index(an, av, true);
       uriId = nspaces.uriIdForPrefix(ap, false);
       if(uriId == 0 && ap.length != 0 && !eq(ap, XML))
-        throw new BuildException(WHICHNS, parser.detail(), an);
+        throw new BuildException(WHICHNS, parser.detailedInfo(), an);
 
       path.put(nameId, Data.ATTR, level + 1, av, meta);
       addAttr(nameId, av, Math.min(IO.MAXATTS, a + 1), uriId);
@@ -313,7 +313,7 @@ public abstract class Builder extends Proc {
    * @throws IOException I/O exception
    */
   private void limit(final int value, final int limit, final String msg) throws IOException {
-    if(value >= limit) throw new BuildException(msg, parser.detail(), limit);
+    if(value >= limit) throw new BuildException(msg, parser.detailedInfo(), limit);
   }
 
   /**

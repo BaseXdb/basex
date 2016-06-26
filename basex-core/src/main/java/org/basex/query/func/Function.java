@@ -1071,9 +1071,9 @@ public enum Function {
   /** XQuery function. */
   _JOBS_RESULT(JobsResult.class, "result(id)", arg(STR), ITEM_ZM, flag(NDT), JOBS_URI),
   /** XQuery function. */
-  _JOBS_STOP(JobsStop.class, "stop(id)", arg(STR), BLN, flag(NDT), JOBS_URI),
-  /** XQuery function. */
   _JOBS_FINISHED(JobsFinished.class, "finished(id)", arg(STR), BLN, flag(NDT), JOBS_URI),
+  /** XQuery function. */
+  _JOBS_STOP(JobsStop.class, "stop(id)", arg(STR), BLN, flag(NDT), JOBS_URI),
   /** XQuery function. */
   _JOBS_LIST(JobsList.class, "list()", arg(), STR_ZM, flag(NDT), JOBS_URI),
 
