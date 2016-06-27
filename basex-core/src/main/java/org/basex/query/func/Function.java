@@ -586,9 +586,6 @@ public enum Function {
       arg(B64, ITEM_ZM), B64, ARCHIVE_URI),
   /** XQuery function. */
   _ARCHIVE_OPTIONS(ArchiveOptions.class, "options(archive)", arg(B64), ELM, ARCHIVE_URI),
-  /** XQuery function (deprecated). */
-  @Deprecated _ARCHIVE_WRITE(ArchiveWrite.class, "write(path,archive[,entries])",
-      arg(STR, B64, ITEM_ZM), EMP, ARCHIVE_URI),
 
   /* Binary Module. */
 
@@ -1076,6 +1073,8 @@ public enum Function {
   _JOBS_STOP(JobsStop.class, "stop(id)", arg(STR), BLN, flag(NDT), JOBS_URI),
   /** XQuery function. */
   _JOBS_LIST(JobsList.class, "list()", arg(), STR_ZM, flag(NDT), JOBS_URI),
+  /** XQuery function. */
+  _JOBS_CURRENT(JobsCurrent.class, "current()", arg(), STR, flag(NDT), JOBS_URI),
 
   /* JSON Module. */
 
