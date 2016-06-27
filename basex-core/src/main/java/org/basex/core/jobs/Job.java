@@ -17,7 +17,7 @@ public abstract class Job {
   /** Child jobs. */
   private final List<Job> children = Collections.synchronizedList(new ArrayList<Job>(0));
   /** Job context. */
-  private JobContext jc = new JobContext(this);
+  private JobContext jc = new JobContext();
 
   /** This flag indicates that a job is updating. */
   public boolean updating;

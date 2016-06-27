@@ -1074,7 +1074,7 @@ public enum Function {
   /** XQuery function. */
   _JOBS_LIST(JobsList.class, "list()", arg(), STR_ZM, flag(NDT), JOBS_URI),
   /** XQuery function. */
-  _JOBS_RESULTS(JobsList.class, "results()", arg(), STR_ZM, flag(NDT), JOBS_URI),
+  _JOBS_RESULTS(JobsResults.class, "results()", arg(), STR_ZM, flag(NDT), JOBS_URI),
   /** XQuery function. */
   _JOBS_CURRENT(JobsCurrent.class, "current()", arg(), STR, flag(NDT), JOBS_URI),
 

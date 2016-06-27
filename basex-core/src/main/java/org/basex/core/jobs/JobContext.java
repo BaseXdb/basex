@@ -20,33 +20,16 @@ public class JobContext {
 
   /** Job id. Will be set via if job is being registered. */
   String id;
-  /** Reference to root job. */
-  Job job;
-
-  /**
-   * Constructor.
-   * @param job root job
-   */
-  JobContext(final Job job) {
-    this.job = job;
-  }
 
   /**
    * Returns the id of the root job.
    * @return id
    */
   public String id() {
-    if(id == null) id(Util.className(job));
+    if(id == null) {
+      jobId = Math.max(0, jobId + 1);
+      id = "Job-" + jobId;
+    }
     return id;
-  }
-
-  /**
-   * Sets the job id, composed by the specified name and an incremental id.
-   * @param name name
-   */
-  public synchronized void id(final String name) {
-    if(id != null) throw Util.notExpected("Name of job cannot be assigned twice.");
-    jobId = Math.max(0, jobId + 1);
-    id = name + '-' + jobId;
   }
 }
